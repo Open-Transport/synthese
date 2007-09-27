@@ -8,12 +8,9 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "01_util/Log.h"
+#include "01_util/threads/Thread.h"
 #include "01_util/Conversion.h"
-#include "01_util/iostreams/Compression.h"
 
-#include "00_tcp/TcpServerSocket.h"
-#include "00_tcp/TcpClientSocket.h"
-#include "00_tcp/TcpService.h"
 #include "00_tcp/Constants.h"
 
 
@@ -37,13 +34,10 @@ const int RingNode::SEND_TOKEN_MAX_NB_TRIES (3);
 
 
 RingNode::RingNode (const NodeInfo& nodeInfo,
-		    UpdateLogSPtr& updateLog,
-                    synthese::tcp::TcpService* tcpService
-		    
-    )
+		    UpdateLogSPtr& updateLog)
     : _data (new Token (nodeInfo.getNodeId (), nodeInfo.getRingId (), updateLog))
     , _timer (min_date_time)
-    , _tcpService (tcpService)
+    , _transmissionStatusMap ()
 {
     setInfo (nodeInfo.getNodeId (), nodeInfo);
 }
@@ -59,6 +53,16 @@ RingNode::~RingNode ()
 void 
 RingNode::initialize ()
 {
+    // Set initial state of all known nodes to OUTRING
+    std::vector<NodeId> nodesAfter = 
+	_data->getNodesAfter (getInfo ().getNodeId ());
+    for (int n=1; n<nodesAfter.size (); ++n)
+    {
+	std::cerr << "yo" << std::endl;
+	_data->setState (nodesAfter[n], OUTRING);
+    }
+
+
 }
 
 
@@ -181,7 +185,7 @@ RingNode::timedOut () const
 
 
 
-bool
+void
 RingNode::sendToken ()
 {
     // Note that sent token is *exactly* _data held by this node, ie
@@ -195,51 +199,48 @@ RingNode::sendToken ()
     
     std::vector<NodeId> tryNodes = _data->getNodesAfter (_data->getEmitterNodeId ());
 
+    
+    // Send to all nodes til the first node with unknown state is found.
     for (int i=1; i<tryNodes.size (); ++i)
     {
 	const NodeInfo& ni = _data->getInfo (tryNodes[i]);
 
-	// Prepare update log for token recipient.
+	TransmissionStatus transmissionStatus = _transmissionStatusMap.getTransmissionStatus (ni.getNodeId ());
+	
+	// Prepare update log for token next recipient.
 	_data->getUpdateLog ()->flush ();
-	
-	// Temporary logs
-	UpdateLogSPtr sinceLastPending (new UpdateLog ());
-	UpdateLogSPtr sinceLastAcknowledged (new UpdateLog ());
-	
-	UpdateRecordTableSync::loadAllAfterTimestamp (sinceLastAcknowledged, ni.getLastAcknowledgedTimestamp ());
-	
-	for (UpdateRecordSet::iterator it = sinceLastAcknowledged->getUpdateRecords ().begin ();
-	     it != sinceLastAcknowledged->getUpdateRecords ().end (); ++it)
+
+	// If recipient is flagged as INSRING, send a data update
+	if (ni.getState () == INSRING)
 	{
-	    UpdateRecordSPtr ur = *it;
-	    if ((ur->getState () == ACKNOWLEDGED) && (ur->getTimestamp () <= ni.getLastPendingTimestamp ()))
+	    // Temporary logs
+	    UpdateLogSPtr sinceLastPending (new UpdateLog ());
+	    UpdateLogSPtr sinceLastAcknowledged (new UpdateLog ());
+	    
+	    UpdateRecordTableSync::loadAllAfterTimestamp (sinceLastAcknowledged, ni.getLastAcknowledgedTimestamp ());
+	    for (UpdateRecordSet::iterator it = sinceLastAcknowledged->getUpdateRecords ().begin ();
+		 it != sinceLastAcknowledged->getUpdateRecords ().end (); ++it)
 	    {
-		// SQL for this update record was already transmitted. Remove SQL part and acknowledge it.
-		ur->setSQL ("");
+		UpdateRecordSPtr ur = *it;
+		if ((ur->getState () == ACKNOWLEDGED) && (ur->getTimestamp () <= ni.getLastPendingTimestamp ()))
+		{
+		    // SQL for this update record was already transmitted. Remove SQL part and acknowledge it.
+		    ur->setSQL ("");
 	    }
-	    _data->getUpdateLog ()->setUpdateRecord (ur);
+		_data->getUpdateLog ()->setUpdateRecord (ur);
+	    }
 	}
-	    
-	if (sendSurefireToken (ni.getHost (), ni.getPort ())) 
-	{
+	std::cerr << "... trying tx to " << ni.getNodeId () << std::endl;
 
-	    std::stringstream logstr;
-	     logstr << "Node " << _data->getEmitterNodeId () << " sent [" 
-	       << (*_data) << "] to node " << ni.getNodeId () << std::endl;
-	    
-	     // Log::GetInstance ().debug (logstr.str ());
-
-	    return true;
-	}
-
-
-	// Failed to send token, mark node as OUTRING
-	_data->setState (ni.getNodeId (), OUTRING);
+	// Token is prepared, spawn the sending thread.
+	Thread::RunOnce (new SendTokenThreadExec (_data->getEmitterNodeId (), ni, _data, _transmissionStatusMap));
 	
+	if (transmissionStatus == UNKNOWN)
+	{ 
+	    break;
+	}
     }
 
-    return false;
-    
 }
 
 
@@ -247,6 +248,37 @@ RingNode::sendToken ()
 void 
 RingNode::loop (const TokenSPtr& token)
 {
+    // Update NodeInfo states according to Transmission statuses.
+    std::vector<NodeId> followers = _data->getNodesAfter (_data->getEmitterNodeId ());;
+    bool allFailed (followers.size () > 0);
+
+
+    for (int n = 1; n<followers.size (); ++n)
+    {
+	TransmissionStatus transmissionStatus = _transmissionStatusMap.getTransmissionStatus (followers[n]);
+	if (transmissionStatus == FAILURE)
+	{
+	    _data->setState (followers[n], OUTRING);
+	    continue;
+	}
+	
+	if (transmissionStatus == SUCCESS)
+	{
+	    _transmissionStatusMap.setTransmissionStatus (followers[n], UNKNOWN);
+	}
+
+	allFailed = false;
+    }
+
+    if (allFailed) 
+    {
+	// _data->setState (OUTRING);
+	for (int n = 1; n<followers.size (); ++n)
+	{
+	    _transmissionStatusMap.setTransmissionStatus (followers[n], UNKNOWN);
+	}
+    }
+
     if (token && (token->getEmitterRingId () != getInfo ().getRingId ())) return;
 
     _token =  token;
@@ -272,8 +304,6 @@ RingNode::loop (const TokenSPtr& token)
 	// Merge token info.
 	_data->merge (_token);
 
-	// ... do some stuff ...
-	
 	// Forward the token only if is more recent 
 	// (or as recent if the token has not been modified), otherwise discard
 	NodeInfo tokenInfo (_token->getInfo ());
@@ -282,7 +312,7 @@ RingNode::loop (const TokenSPtr& token)
 	if (localInfo.isAuthority () && (tokenInfo.getClock () < localInfo.getClock ())) 
 	{
 	    // I am the authority. any deprecated node compared to my local clock is discarded.
-            // std::cerr << " ** 00 Discarded" << std::endl;
+            std::cerr << " ** 00 Discarded" << std::endl;
 	} 
 
 	else if ( (tokenInfo.getState () == ENTRING) && 
@@ -293,7 +323,7 @@ RingNode::loop (const TokenSPtr& token)
 	    // This allows creation of a second token in case the auhtority
 	    // is out ring. This way, write-locked nodes can still exchange info between each
 	    // other.
-	    // std::cerr << " ** 11 Discarded" << std::endl;
+	    std::cerr << " ** 11 Discarded" << std::endl;
 	} 
 
 	else
@@ -301,12 +331,7 @@ RingNode::loop (const TokenSPtr& token)
 	    // Reset the timer only if the token has not been discarded!
 	    resetTimer ();
 
-	    if (sendToken () == false)
-	    {
-		// failed to forward token. revert this node state
-		// to OUTRING.
-		_data->setState (OUTRING);
-	    }
+	    sendToken ();
 	}
 
     }
@@ -324,6 +349,7 @@ RingNode::loop (const TokenSPtr& token)
 	sendToken ();
     }    
     
+
     // One exit point : here.
     setModified (false);
 
@@ -338,44 +364,6 @@ void RingNode::dump ()
 
 }
 
-
-bool 
-RingNode::sendSurefireToken (const std::string& host, int port)
-{
-    bool success (false);
-
-    TcpClientSocket clientSock (host, port, 5*10*TCP_TOKEN_TIMEOUT);
-    for (int i=0; i<SEND_TOKEN_MAX_NB_TRIES; ++i)
-    {
-	clientSock.tryToConnect ();
-	if (clientSock.isConnected () == false) continue;
-
-	try
-	{
-	    boost::iostreams::stream<TcpClientSocket> cliSocketStream (clientSock);
-	    std::stringstream tmp;
-	    tmp << (*_data);
-
-	    Compression::ZlibCompress (tmp, cliSocketStream);
-
-	    cliSocketStream.close ();
-	    success = true;
-	    break;
-
-	}
-	catch (std::exception& e) 
-	{
-	    Log::GetInstance ().error ("Error sending token", e);
-	}
-	catch (...) 
-	{
-	    
-	    Log::GetInstance ().error ("Error sending token UNKNOWN");
-	}
-    }
-
-    return success;
-}
 
 
 

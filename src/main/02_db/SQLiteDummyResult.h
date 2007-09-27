@@ -38,7 +38,7 @@ class SQLiteDummyResult : public SQLiteResult
     std::string getColumnName (int column) const;
     int getColumnIndex (const std::string& columnName) const;
 
-    SQLiteValueSPtr getValue (int column) const;
+    SQLiteValue* getValue (int column) const;
     std::string getText (int column) const;
     int getInt (int column) const;
     long getLong (int column) const;

@@ -1,7 +1,7 @@
 #include "03_db_ring/Node.h"
 #include "03_db_ring/Constants.h"
 #include "03_db_ring/DbRingException.h"
-
+#include "03_db_ring/RecvTokenThreadExec.h"
 #include "03_db_ring/UpdateRecordTableSync.h"
 #include "03_db_ring/UpdateChronologyException.h"
 
@@ -12,19 +12,14 @@
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
 #include "01_util/iostreams/Compression.h"
-#include "01_util/threads/Thread.h"
+#include "01_util/threads/ManagedThread.h"
 
-#include "00_tcp/TcpServerSocket.h"
-#include "00_tcp/TcpClientSocket.h"
-#include "00_tcp/TcpService.h"
-#include "00_tcp/Constants.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 
-using namespace synthese::tcp;
 using namespace synthese::util;
 using namespace synthese::db;
 
@@ -44,7 +39,6 @@ namespace dbring
 Node::Node (const NodeId& id)
     : _id (id)
     , _ringNodes ()
-    , _tcpServices ()
     , _updateLog (new UpdateLog ())
     , _lastUpdateIndex (0)
     , _ringNodesMutex (new boost::recursive_mutex ())
@@ -136,13 +130,22 @@ Node::setNodeInfoCallback (const NodeInfo& nodeInfo)
 				  + " as " + nodeInfo.getHost () + ":" + Conversion::ToString (nodeInfo.getPort ()));
 
 	// Look if a new tcp service needs to be opened.
-	if (_tcpServices.find (nodeInfo.getPort ()) == _tcpServices.end ())
-	    _tcpServices.insert (std::make_pair (nodeInfo.getPort (), TcpService::openService (nodeInfo.getPort ())));
-    
-	TcpService* tcpService = _tcpServices.find (nodeInfo.getPort ())->second;
-	
+	if (_listenPorts.find (nodeInfo.getPort ()) == _listenPorts.end ())
+	{
+	    // Create a new managed thread listening on this port and pushing token in
+	    // this node token queue.
+	    RecvTokenThreadExec* recvTokenThreadExec = new RecvTokenThreadExec (nodeInfo.getPort (), _receivedTokens);
+	    
+	    std::string threadName ("node_tcp_" + Conversion::ToString (nodeInfo.getPort ()));
+	    bool autorespawn (true);
+	    ManagedThread* recvTokenThread = 
+		new ManagedThread (recvTokenThreadExec, threadName, 100, autorespawn);
+	    
+	    _listenPorts.insert (nodeInfo.getPort ());
+	}
+
 	// Sets this node identity for a given ring.
-	_ringNodes.insert (std::make_pair (nodeInfo.getRingId (), RingNodeSPtr (new RingNode (nodeInfo, _updateLog, tcpService))));
+	_ringNodes.insert (std::make_pair (nodeInfo.getRingId (), RingNodeSPtr (new RingNode (nodeInfo, _updateLog))));
     }
     else
     {
@@ -319,65 +322,20 @@ Node::loop ()
     boost::recursive_mutex::scoped_lock updateLogLock (*_updateLogMutex);
 
     TokenSPtr token;
-
-    // try to receive token on each open port and dispatch to 
-    // corrsponding ring node.
-    for (std::map<int, TcpService*>::iterator its = _tcpServices.begin ();
-	 its != _tcpServices.end (); ++its)
+    if (_receivedTokens.empty () == false) 
     {
-	TcpService* tcpService = its->second;
-	
-	token.reset ((Token*) 0);
-
-	synthese::tcp::TcpServerSocket* serverSocket =
-	    tcpService->acceptConnection ();
-
-	// Non-blocking mode (default)
-	if (serverSocket != 0) 
-	{
-	    serverSocket->setTimeOut (5*10*TCP_TOKEN_TIMEOUT);
-	    token.reset (new Token ());
-	    
-	    boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
-		tcpStream (*serverSocket);
-
-	    try
-	    {
-		std::stringstream tmp;
-		Compression::ZlibDecompress (tcpStream, tmp);
-		tmp >> (*(token.get ()));
-	    }
-	    catch (std::exception& e)
-	    {
-		Log::GetInstance ().error ("Error parsing token message", e);
-		continue;
-	    }
-
-	    tcpService->closeConnection (serverSocket);
-
-	}
-
-	if (token.get ())
-	{
-	    std::stringstream logstr;
-	    logstr << "Node " << _id << " recv [" 
-		   << (*token) << "] fm node " << token->getEmitterNodeId () << std::endl;
-	    
-	    // Log::GetInstance ().debug (logstr.str ());
-
-	    mergeUpdateLog (token);
-	}
-	
-	for (RingNodes::iterator it = _ringNodes.begin ();
-	     it != _ringNodes.end (); ++it)
-	{
-	    RingNodeSPtr rn = it->second;
-	    rn->loop (token);
-	}
-	
+	token = _receivedTokens.back ();
+	_receivedTokens.pop ();
+	mergeUpdateLog (token);
     }
-
-
+	
+    for (RingNodes::iterator it = _ringNodes.begin ();
+	 it != _ringNodes.end (); ++it)
+    {
+	RingNodeSPtr rn = it->second;
+	rn->loop (token);
+    }
+    
 }
 
 

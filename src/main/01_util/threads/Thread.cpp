@@ -23,7 +23,7 @@ namespace util
 
 
 
-Thread::Thread (ThreadExec* exec, const std::string& name, int loopDelay)
+    Thread::Thread (ThreadExec* exec, const std::string& name, int loopDelay)
 : _name ((name == "") ? DEFAULT_NAME_PREFIX + Conversion::ToString (_NbThreads++) : name)
 , _exec (exec)
 , _loopDelay (loopDelay)
@@ -73,8 +73,6 @@ Thread::start ()
 
     // The thread is started immediately, we detach it (by deleting it).
     delete thread;
-    
-
 }
 
 
@@ -116,6 +114,7 @@ Thread::operator()()
 	execInitialize ();
 
 	ThreadState state = getState ();
+	
 	while (state != STOPPED) 
 	{
 	    execLoop ();
@@ -252,7 +251,39 @@ Thread::waitForState (const Thread::ThreadState& state) const
 
 
 
+typedef struct runOnce
+{
+    boost::shared_ptr<ThreadExec> _exec;
+    
+    runOnce (ThreadExec* exec) : _exec (exec) {}
+	
+	void operator()()
+	{
+	    try
+	    {
+		_exec->initialize ();
+		_exec->loop ();
+		_exec->finalize ();
+	    }
+	    catch (std::exception& ex)
+	    {
+		Log::GetInstance ().error ("Thread has crashed.", ex);
+	    } 
+	}
+} RunOnceStruct ;
 
+
+
+
+void 
+Thread::RunOnce (ThreadExec* exec)
+{
+    RunOnceStruct runOnce (exec);
+    boost::thread* thread = new boost::thread (runOnce);
+    // The thread is started immediately, we detach it (by deleting it).
+    delete thread;
+
+}
 
 
 

@@ -2,6 +2,7 @@
 #define SYNTHESE_DBRING_NODE_H
 
 #include "01_util/threads/ThreadExec.h"
+#include "01_util/concurrent/SynchronizedQueue.h"
 
 #include "02_db/SQLiteHandle.h"
 
@@ -12,6 +13,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <map>
+#include <set>
 #include <string>
 #include <iostream>
 
@@ -43,8 +45,11 @@ private:
     
     const NodeId _id;
     RingNodes _ringNodes;  //!< Local tokens (one per ring). Info that this node knows locally.
-    std::map<int, tcp::TcpService*> _tcpServices;
+    std::set<int> _listenPorts; //!< Ports this node listen to.
+
     UpdateLogSPtr _updateLog;
+
+    util::SynchronizedQueue<TokenSPtr> _receivedTokens;  //!< Token reception queue.
 
     long _lastUpdateIndex;
     

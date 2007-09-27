@@ -62,6 +62,8 @@ namespace synthese
 		{
 		private:
 
+		    SQLiteStatementSPtr _getRowByIdStatement;
+
 		    const bool _allowInsert;
 		    const bool _allowRemove;
 		    const std::string _triggerOverrideClause;

@@ -20,6 +20,8 @@ namespace db
 {
 
 
+/* 
+// DO NOT USE THIS : blob are not handled by sqlite3_exec
 
 int 
 sqlite_callback (void* result, int nbColumns, char** values, char** columns)
@@ -29,6 +31,7 @@ sqlite_callback (void* result, int nbColumns, char** values, char** columns)
     return 0;
 }
 
+*/
 
 
 
@@ -121,12 +124,8 @@ SQLite::ExecQuery (const SQLiteStatementSPtr& statement, bool lazy)
     // dbtable adaptation does not work anymore!
     // This will be fixed naturally when upgrading yo sqlite 3.5 which relaxes
     // constraints on db connection thread access.
+    lazy = false;
 
-
-    // The poor performances given by frequent access to sqlite_value makes us
-    // override the caching mechanism by value to use all-in-once sqlite fonction
-    // version (which does not exist for precompiled statements, so commenting the following)
-    /*
     SQLiteResultSPtr result (new SQLiteLazyResult (statement));
     if (lazy)
     {
@@ -137,19 +136,13 @@ SQLite::ExecQuery (const SQLiteStatementSPtr& statement, bool lazy)
 	SQLiteCachedResult* cachedResult = new SQLiteCachedResult (result);
 	return SQLiteResultSPtr (cachedResult);
     }
-    */
-    return ExecQuery (statement->getHandle (), statement->getSQL (), false); // force lazy = false
-
 }
 
 
 
-
-
-
-
+/*
 SQLiteResultSPtr 
-SQLite::ExecQuery (sqlite3* handle, const std::string& sql, bool lazy)
+SQLite::ExecQuery2 (sqlite3* handle, const std::string& sql, bool lazy)
 {
     // Log::GetInstance ().debug ("Executing SQLite query " + sql);
     SQLiteCachedResult* result = new SQLiteCachedResult();
@@ -173,8 +166,21 @@ SQLite::ExecQuery (sqlite3* handle, const std::string& sql, bool lazy)
 	throw SQLiteException ("Error executing query \"" + sql + " : " + 
 					msg + "\" (error=" + Conversion::ToString (retc) + ")");
     }
-    // Log::GetInstance ().debug ("Query successful (" + Conversion::ToString (result.getNbRows ()) + " rows).");
+
+  // Log::GetInstance ().debug ("Query successful (" + Conversion::ToString (result.getNbRows ()) + " rows).");
     return SQLiteResultSPtr (result);
+}
+
+*/
+
+SQLiteResultSPtr 
+SQLite::ExecQuery (sqlite3* handle, const std::string& sql, bool lazy)
+{
+    SQLiteStatementSPtr st = 
+	SQLite::CompileStatement (handle, sql);
+    
+    return ExecQuery (st, lazy);
+  
 }
 
 

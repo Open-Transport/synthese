@@ -1,7 +1,8 @@
 #ifndef SYNTHESE_DBRING_RINGNODE_H
 #define SYNTHESE_DBRING_RINGNODE_H
 
-#include "03_db_ring/Token.h"
+#include "03_db_ring/SendTokenThreadExec.h"
+#include "03_db_ring/TransmissionStatusMap.h"
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
@@ -12,11 +13,6 @@
 namespace synthese
 {
 
-
-namespace tcp
-{
-    class TcpService;
-}
 
 
 namespace dbring
@@ -38,9 +34,10 @@ private:
     
     const TokenSPtr _data;  // State token (the one to be sent)
     TokenSPtr _token;   // Received token
+    TransmissionStatusMap _transmissionStatusMap;
 
     boost::posix_time::ptime _timer;
-    synthese::tcp::TcpService* _tcpService;
+ 
 
 protected:
     
@@ -48,8 +45,8 @@ protected:
 public:
     
     RingNode (const NodeInfo& nodeInfo, 
-	      UpdateLogSPtr& updateLog,
-	      synthese::tcp::TcpService* tcpService);
+	      UpdateLogSPtr& updateLog);
+
     ~RingNode ();
 
     /** Ring node initialzation. Called by Node initialization.
@@ -87,14 +84,10 @@ public:
 
     virtual bool timedOut () const;
     
-    virtual bool sendToken ();
+    virtual void sendToken ();
 
  private:
 
-    /** Sends token and guarantees acknowledgement has been received (with retries).
-     */
-    bool sendSurefireToken (const std::string& host, int port);
-    
     void resetTimer ();
 
 

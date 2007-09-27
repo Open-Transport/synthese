@@ -63,6 +63,7 @@ class Thread
     static const std::string DEFAULT_NAME_PREFIX;
     static int _NbThreads;
     
+
  protected:
 
     std::string _name;
@@ -70,6 +71,8 @@ class Thread
 
     int _loopDelay;  //!< Loop delay in nanoseconds
 
+
+    
  private:
     
     boost::shared_ptr<ThreadState> _state;
@@ -97,23 +100,23 @@ class Thread
     void resume ();
     void stop ();
 
-    void operator()();
+    virtual void operator()();
 
     //Thread& operator=(const Thread& ref);
 
     static void Sleep (long ms);
-
 
     ThreadState getState () const;
 
     void waitForState (const Thread::ThreadState& state) const;
     void waitForReadyState () const;
 
+
+    static void RunOnce (ThreadExec* exec);
+
  protected:
     
     void setState (ThreadState state);
-
- private:
 
     unsigned long getNbLoops () const;
 

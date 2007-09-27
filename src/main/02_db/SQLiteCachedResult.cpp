@@ -44,11 +44,11 @@ SQLiteCachedResult::addRow (int nbColumns, char** values, char** columns)
     {
 	if (values[i] == 0)
 	{
-	    row.push_back (SQLiteValueSPtr (new SQLiteValue ("")));
+	    row.push_back (new SQLiteValue (""));
 	}
 	else
 	{
-	    row.push_back (SQLiteValueSPtr (new SQLiteValue (values[i])));
+	    row.push_back (new SQLiteValue (values[i]));
 	}
     }
     addRow (row);
@@ -75,7 +75,17 @@ SQLiteCachedResult::SQLiteCachedResult (const SQLiteResultSPtr& result)
 
 SQLiteCachedResult::~SQLiteCachedResult ()
 {
+    for (std::vector<SQLiteResultRow>::iterator it = _rows.begin ();
+	 it != _rows.end (); ++it) 
+    {
+	SQLiteResultRow& row = *it;
+	for (SQLiteResultRow::iterator it2 = row.begin ();
+	     it2 != row.end (); ++it2) 
+	{
+	    delete *it2;
+	}
 
+    }
 }
 
 
@@ -116,7 +126,7 @@ SQLiteCachedResult::getColumnName (int column) const
 
 
 
-SQLiteValueSPtr
+SQLiteValue*
 SQLiteCachedResult::getValue (int column) const
 {
     return _rows.at (_pos).at (column);

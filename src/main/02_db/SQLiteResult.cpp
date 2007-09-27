@@ -46,7 +46,7 @@ SQLiteResult::getColumnIndex (const std::string& columnName) const
 
 
 
-SQLiteValueSPtr
+SQLiteValue*
 SQLiteResult::getValue (const std::string& name) const
 {
     int index = getColumnIndex (name);

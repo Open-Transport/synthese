@@ -104,11 +104,11 @@ SQLiteLazyResult::getColumnName (int column) const
 
 
 
-SQLiteValueSPtr
+SQLiteValue*
 SQLiteLazyResult::getValue (int column) const
 {
     if (_pos == -1) throw SQLiteException ("Not inside result (use next ())...");
-    return SQLiteValueSPtr (new SQLiteValue (sqlite3_column_value (_statement->getStatement (), column)));
+    return new SQLiteValue (sqlite3_column_value (_statement->getStatement (), column));
 }
 
 

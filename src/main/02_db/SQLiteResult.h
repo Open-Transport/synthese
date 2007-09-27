@@ -17,7 +17,7 @@ namespace db
     class SQLiteResult;
 
     typedef boost::shared_ptr<SQLiteResult> SQLiteResultSPtr;
-    typedef std::vector<SQLiteValueSPtr> SQLiteResultRow;
+    typedef std::vector<SQLiteValue*> SQLiteResultRow;
     
 
 /** Interface for access to a SQLite query result.
@@ -46,8 +46,8 @@ class SQLiteResult
     virtual std::string getColumnName (int column) const = 0;
     virtual int getColumnIndex (const std::string& columnName) const;
 
-    virtual SQLiteValueSPtr getValue (int column) const = 0;
-    virtual SQLiteValueSPtr getValue (const std::string& name) const;
+    virtual SQLiteValue* getValue (int column) const = 0;
+    virtual SQLiteValue* getValue (const std::string& name) const;
 
     virtual std::string getText (int column) const;
     virtual std::string getText (const std::string& name) const;

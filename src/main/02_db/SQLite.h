@@ -53,6 +53,7 @@ class SQLite
 
     static SQLiteResultSPtr ExecQuery (const SQLiteStatementSPtr& statement, bool lazy = true);
     static SQLiteResultSPtr ExecQuery (sqlite3* handle, const SQLData& sql, bool lazy = true);
+    // static SQLiteResultSPtr ExecQuery2 (sqlite3* handle, const SQLData& sql, bool lazy = true);
 
     static void ExecUpdate (const SQLiteStatementSPtr& statement);
     static void ExecUpdate (sqlite3* handle, const SQLData& sql);

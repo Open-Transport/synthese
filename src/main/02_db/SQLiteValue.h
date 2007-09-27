@@ -29,7 +29,6 @@
 #include <sqlite/sqlite3.h>
 
 
-#include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -78,8 +77,6 @@ class SQLiteValue
 
 };
 
-
-typedef boost::shared_ptr<SQLiteValue> SQLiteValueSPtr;
 
 }
 }

@@ -160,7 +160,7 @@ Token::setInfo (const NodeId& nodeId, const NodeInfo& info)
     boost::recursive_mutex::scoped_lock infosLock (*_infosMutex);
 
     _infos[nodeId] = info;
-
+    std::cerr << "?? Node " << nodeId << info << std::endl;
     if (info.isAuthority ()) 
     {
 	if ((_authorityNodeId != -1) && (_authorityNodeId != nodeId))
@@ -416,15 +416,19 @@ Token::merge (const TokenSPtr& token)
 	const NodeInfo& nif = it->second;
 
 	if ( (token->getInfo ().getClock () >= getInfo ().getClock ()) ||  
-	     (hasInfo (token->getEmitterNodeId ()) == false) )  
-//	if ( (nif.getClock () >= getInfo (nid).getClock ()) ||  
-//	     (hasInfo (nid) == false) )  
+	     (hasInfo (token->getEmitterNodeId ()) == false) 
+           /* ||
+	      ((nif.getClock () >= getInfo (nid).getClock ()) && (it->first == token->getEmitterNodeId ())) */
+	     )
 	{
-
-	    // merge info only if recevd token has been updated more recently.
-	    // than this node.
+	    // merge info only if recevd info has been updated more recently
 	    saveInfo (it->first, it->second);
 	} 
+	else
+	{
+
+	}
+
 
     }
 

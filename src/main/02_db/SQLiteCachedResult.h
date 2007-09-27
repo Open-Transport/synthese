@@ -46,7 +46,7 @@ class SQLiteCachedResult : public SQLiteResult
 
     std::string getColumnName (int column) const;
 
-    SQLiteValueSPtr getValue (int column) const;
+    SQLiteValue* getValue (int column) const;
 
     SQLiteResultRow getRow () const;
     

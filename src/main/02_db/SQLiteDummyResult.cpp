@@ -76,7 +76,7 @@ SQLiteDummyResult::getColumnIndex (const std::string& columnName) const
 
 
 
-SQLiteValueSPtr
+SQLiteValue*
 SQLiteDummyResult::getValue (int column) const
 {
     throw SQLiteException ("Dummy result..."); 

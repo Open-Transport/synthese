@@ -48,9 +48,11 @@ SQLiteValue::SQLiteValue (sqlite3_value* value)
 }
 
 
+
 SQLiteValue::SQLiteValue (const std::string& value)
-    : _value (value)
+    : _value ()
 {
+    _value.assign (value.data ());
 }
 
 

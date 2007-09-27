@@ -159,7 +159,7 @@ namespace synthese
 				SQLiteCachedResult* cachedResult = new SQLiteCachedResult (columnNames);
 				
 				SQLiteResultRow values;
-				values.push_back (SQLiteValueSPtr (new SQLiteValue (Conversion::ToString (event.rowId))));
+				values.push_back (new SQLiteValue (Conversion::ToString (event.rowId)));
                                 cachedResult->addRow (values);
 				
 				tableSync->rowsRemoved (emitter, this, SQLiteResultSPtr (cachedResult));

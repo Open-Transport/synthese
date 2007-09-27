@@ -106,6 +106,7 @@ public:
      */
     int getConnectionCount () const;
     
+    int getPort () const { return _portNumber; }
 
 private:
 
