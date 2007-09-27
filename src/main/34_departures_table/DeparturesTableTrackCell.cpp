@@ -29,6 +29,7 @@
 #include "15_env/ServicePointer.h"
 #include "15_env/Edge.h"
 #include "15_env/AddressablePlace.h"
+#include "15_env/PhysicalStop.h"
 
 #include "11_interfaces/ValueElementList.h"
 
@@ -37,6 +38,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace env;
 	
 	namespace util
 	{
@@ -59,7 +61,7 @@ namespace synthese
 
 			const ArrivalDepartureRow* row(static_cast<const ArrivalDepartureRow*>(object));
 
-			stream << row->first.servicePointer.getEdge()->getPlace()->getName();
+			stream << static_cast<const PhysicalStop*>(row->first.servicePointer.getEdge()->getFromVertex())->getName();
 
 			return string();
 		}

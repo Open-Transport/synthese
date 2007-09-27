@@ -129,7 +129,8 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(log, "Affichage des terminus seulement", _screen->getEndFilter(), _endFilter);
 			DBLogModule::appendToLogIfChange(log, "Délai d'effacement", _screen->getClearingDelay(), _cleaningDelay);
 			DBLogModule::appendToLogIfChange(log, "Délai d'apparition", _screen->getMaxDelay(), _maxDelay);
-			DBLogModule::appendToLogIfChange(log, "Type de panneau", _screen->getType()->getName(), _type->getName());
+			if (_screen->getType())
+				DBLogModule::appendToLogIfChange(log, "Type de panneau", _screen->getType()->getName(), _type->getName());
 			DBLogModule::appendToLogIfChange(log, "Titre", _screen->getTitle(), _title);
 
 			// Preparation of the action
