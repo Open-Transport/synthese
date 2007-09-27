@@ -60,6 +60,27 @@ namespace synthese
 
 	namespace resa
 	{
+
+
+			typedef struct
+			{
+				typedef vector<shared_ptr<ReservationTransaction> > Reservations;
+				shared_ptr<Service>		service;
+				Reservations			reservations;
+				int						seatsNumber;
+				bool					overflow;
+				bool					status;
+				
+/*				shared_ptr<const Reservation>	getReservation(
+					const shared_ptr<ReservationTransaction>& transaction
+				) const	{
+					const ReservationTransaction::Reservations& r(transaction->getReservations());
+					for (ReservationTransaction::Reservations::const_iterator ite(r.begin()); ite != r.end(); ++ite)
+						if ((*ite)->getServiceId() == service->getId())
+							return *ite;
+				}
+*/			} ServiceReservations ;
+
 		void ReservationsListInterfaceElement::storeParameters(ValueElementList& vel)
 		{
 			_lineId = vel.front();
@@ -102,24 +123,7 @@ namespace synthese
 			));
 
 			// Download reservations
-			struct ServiceReservations
-			{
-				typedef vector<shared_ptr<ReservationTransaction> > Reservations;
-				shared_ptr<Service>		service;
-				Reservations			reservations;
-				int						seatsNumber;
-				bool					overflow;
-				bool					status;
-				
-/*				shared_ptr<const Reservation>	getReservation(
-					const shared_ptr<ReservationTransaction>& transaction
-				) const	{
-					const ReservationTransaction::Reservations& r(transaction->getReservations());
-					for (ReservationTransaction::Reservations::const_iterator ite(r.begin()); ite != r.end(); ++ite)
-						if ((*ite)->getServiceId() == service->getId())
-							return *ite;
-				}
-*/			};
+
 
 			map<ScheduledService*, ServiceReservations> reservations;
 			for(vector<shared_ptr<ScheduledService> >::const_iterator it(services.begin()); it != services.end(); ++it)

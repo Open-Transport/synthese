@@ -25,6 +25,7 @@
 
 #include <vector>
 #include <utility>
+#include <sstream>
 
 #include "01_util/ModuleClass.h"
 
