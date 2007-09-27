@@ -61,7 +61,6 @@ namespace synthese
 			    static_cast<ConnectionPlace::ConnectionType>(rows->getInt (ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
 			int defaultTransferDelay (rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY));
 			string transferDelaysStr (rows->getText (ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
-			uid alarmId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_ALARMID));
 
 			// Update of the object
 			cp->setKey(id);
@@ -102,7 +101,6 @@ namespace synthese
 		const string ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
 		const string ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
 		const string ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
-		const string ConnectionPlaceTableSync::TABLE_COL_ALARMID = "alarm_id";
 		const string ConnectionPlaceTableSync::COL_NAME13("short_display_name");
 		const string ConnectionPlaceTableSync::COL_NAME26("long_display_name");
 
@@ -117,7 +115,6 @@ namespace synthese
 			addTableColumn (TABLE_COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
 			addTableColumn (TABLE_COL_DEFAULTTRANSFERDELAY, "INTEGER", true);
 			addTableColumn (TABLE_COL_TRANSFERDELAYS, "TEXT", true);
-			addTableColumn (TABLE_COL_ALARMID, "INTEGER", true);
 			addTableColumn (COL_NAME13, "TEXT");
 			addTableColumn (COL_NAME26, "TEXT");
 
@@ -181,47 +178,6 @@ namespace synthese
 					city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
 					cp->store();
 				}
-
-
-
-
-/*			    
-			    string name (rows->getText (TABLE_COL_NAME));
-			    uid cityId (rows->getLongLong (TABLE_COL_CITYID));
-			    ConnectionPlace::ConnectionType connectionType = (ConnectionPlace::ConnectionType)
-				rows->getInt (TABLE_COL_CONNECTIONTYPE);
-			    
-			    bool isCityMainConnection (	rows->getBool (TABLE_COL_ISCITYMAINCONNECTION));
-			    
-			    int defaultTransferDelay (	rows->getInt (TABLE_COL_DEFAULTTRANSFERDELAY));
-			    string transferDelaysStr (rows->getText (TABLE_COL_TRANSFERDELAYS));
-			    uid alarmId (rows->getLongLong (TABLE_COL_ALARMID));
-
-			    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-			    
-			    shared_ptr<City> city = City::GetUpdateable (cityId);
-			    PublicTransportStopZoneConnectionPlace* cp(
-					new PublicTransportStopZoneConnectionPlace(id, name, city.get(), connectionType, defaultTransferDelay)
-				);
-
-			    boost::char_separator<char> sep1 (",");
-			    boost::char_separator<char> sep2 (":");
-			    tokenizer tripletTokens (transferDelaysStr, sep1);
-			    for (tokenizer::iterator tripletIter = tripletTokens.begin();
-				 tripletIter != tripletTokens.end (); ++tripletIter)
-				{
-					tokenizer valueTokens (*tripletIter, sep2);
-					tokenizer::iterator valueIter = valueTokens.begin();
-
-					// (departureRank:arrivalRank:transferDelay)
-					uid startStop(Conversion::ToLongLong(*valueIter));
-					uid endStop(Conversion::ToLongLong(*(++valueIter)));
-					cp->addTransferDelay (startStop, endStop, Conversion::ToInt (*(++valueIter)));
-				}
-
-*/
-
-
 			}
 		}
 
