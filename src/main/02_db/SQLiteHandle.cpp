@@ -34,7 +34,7 @@ namespace synthese
 	
 	int sqliteBusyHandler (void* arg, int nbCalls)
 	{
-	    std::cerr << "busy handleer !! " << std::endl;
+	    // std::cerr << "busy handleer !! " << std::endl;
 	    // Return a non-zero value so that a retry is made, waiting for SQLite not ot be busy anymore...
 	    return 1;
 	    
