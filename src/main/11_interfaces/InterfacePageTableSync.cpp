@@ -78,7 +78,7 @@ namespace synthese
 		}
 
 
-		void InterfacePageTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
+		void InterfacePageTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -88,7 +88,7 @@ namespace synthese
 		}
 
 
-		void InterfacePageTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
+		void InterfacePageTableSync::rowsAdded( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -118,7 +118,7 @@ namespace synthese
 		}
 
 
-		void InterfacePageTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
+		void InterfacePageTableSync::rowsRemoved( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{

@@ -26,7 +26,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "Fare.h"
@@ -56,7 +56,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<Fare>::save(Fare* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
 			{
@@ -92,7 +92,7 @@ namespace synthese
 			addTableColumn (COL_FARETYPE, "INTEGER", true);
 		}
 
-		void FareTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void FareTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -102,7 +102,7 @@ namespace synthese
 			}
 		}
 
-		void FareTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void FareTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -115,7 +115,7 @@ namespace synthese
 			}
 		}
 
-		void FareTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void FareTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -129,7 +129,7 @@ namespace synthese
 
 		std::vector<shared_ptr<Fare> > FareTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

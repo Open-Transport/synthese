@@ -2,6 +2,9 @@
 #define SYNTHESE_DB_SQLITEHANDLE_H
 
 #include "02_db/SQLite.h"
+#include "02_db/SQLiteUpdateHook.h"
+
+#include <boost/shared_ptr.hpp>
 
 
 
@@ -9,6 +12,13 @@ namespace synthese
 {
 	namespace db
 	{
+
+		typedef struct
+		{
+		    std::vector<SQLiteEvent> events;
+		} UpdateHookStruct;
+			  
+
 
 		/** SQLite Handle class.
 
@@ -21,46 +31,48 @@ namespace synthese
 
 		    @ingroup m02
 		*/
-		class SQLiteHandle
+		class SQLiteHandle : public SQLite
 		{
+
+		private:
+		    
+		    const boost::filesystem::path _databaseFile;
+		    boost::thread_specific_ptr<sqlite3> _handle;
+		    boost::thread_specific_ptr<UpdateHookStruct> _updateHookStruct;
+
+		    std::vector<SQLiteUpdateHook*> _hooks;   //!< Hooks to trigger on db update.
+		    boost::shared_ptr<boost::mutex> _hooksMutex; 
+
 		protected:
 
-			SQLiteHandle ();
-			virtual ~SQLiteHandle ();
 		public:
 
-
+			SQLiteHandle (const boost::filesystem::path& databaseFile);
+			virtual ~SQLiteHandle ();
 		    
 			//! @name SQLite db access methods.
 			//@{
 
-			virtual sqlite3* getHandle () = 0;
+			sqlite3* getHandle ();
+
+			void registerUpdateHook (SQLiteUpdateHook* hook);
 
 			virtual SQLiteStatementSPtr compileStatement (const SQLData& sql);
 
-			virtual SQLiteResultSPtr execQuery (const SQLiteStatementSPtr& statement, bool lazy = true) ;
-			virtual SQLiteResultSPtr execQuery (const SQLData& sql, bool lazy = true) ;
+			virtual SQLiteResultSPtr execQuery (const SQLiteStatementSPtr& statement, bool lazy = false) ;
 
-			virtual void execUpdate (const SQLiteStatementSPtr& statement, bool asynchronous = false) ;
-			virtual void execUpdate (const SQLData& sql, bool asynchronous = false) ;
+			virtual void execUpdate (const SQLiteStatementSPtr& statement) ;
 
-			/** Returns true if a transaction is already opened.
-			    SQLite does not support nested transaction.
-			*/
-			virtual bool isTransactionOpened () ;
-			
-			/* Begins an exclusive transaction on the SQLite db. Exclusive means no read nor write
-			   until the transaction is commited. If exclusive is false, it means that read is still
-			   possible before the transaction is completed.
-			*/
-			virtual void beginTransaction (bool exclusive = false);
-			virtual void commitTransaction ();
-			virtual void rollbackTransaction ();
-			
+			static bool IsStatementComplete (const SQLData& sql);
+
 
 			//@}
+		private:
+			UpdateHookStruct* getUpdateHookStruct ();
 
 		};
+
+
 	}
 }
 

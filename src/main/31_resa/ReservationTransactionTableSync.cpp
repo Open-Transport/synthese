@@ -31,7 +31,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -77,7 +77,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<ReservationTransaction>::save(ReservationTransaction* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -132,7 +132,7 @@ namespace synthese
 		}
 
 		void ReservationTransactionTableSync::rowsAdded(
-			SQLiteQueueThreadExec* sqlite
+			SQLite* sqlite
 			, SQLiteSync* sync
 			, const SQLiteResultSPtr& rows
 			, bool isItFirstSync
@@ -140,14 +140,14 @@ namespace synthese
 		}
 		
 		void ReservationTransactionTableSync::rowsUpdated(
-			SQLiteQueueThreadExec* sqlite
+			SQLite* sqlite
 			, SQLiteSync* sync
 			, const SQLiteResultSPtr& rows
 		){
 		}
 
 		void ReservationTransactionTableSync::rowsRemoved(
-			SQLiteQueueThreadExec* sqlite
+			SQLite* sqlite
 			, SQLiteSync* sync
 			, const SQLiteResultSPtr& rows
 		){
@@ -161,7 +161,7 @@ namespace synthese
 			, int number /*= 0*/
 		){
 
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT " << TABLE_NAME << ".*"

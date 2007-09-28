@@ -23,7 +23,7 @@
 #include <sstream>
 
 #include "02_db/DBModule.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/CityTableSync.h"
@@ -152,7 +152,7 @@ namespace synthese
 
 			try
 			{
-				SQLiteHandle* sqlite = DBModule::GetSQLite();
+				SQLite* sqlite = DBModule::GetSQLite();
 				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<const CommercialLine> > objects;
 				while (rows->next ())

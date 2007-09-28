@@ -29,7 +29,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -69,7 +69,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<PublicPlace>::save (PublicPlace* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -97,7 +97,7 @@ namespace synthese
 			addTableColumn (COL_CITYID, "INTEGER", false);
 		}
 
-		void PublicPlaceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
+		void PublicPlaceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 		{
 			while (rows->next ())
 			{
@@ -121,7 +121,7 @@ namespace synthese
 			}
 		}
 		
-		void PublicPlaceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void PublicPlaceTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -139,7 +139,7 @@ namespace synthese
 			}
 		}
 
-		void PublicPlaceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void PublicPlaceTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{

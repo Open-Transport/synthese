@@ -26,7 +26,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "VinciAntivol.h"
@@ -55,7 +55,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<VinciAntivol>::save(VinciAntivol* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -81,21 +81,21 @@ namespace synthese
 			addTableColumn(COL_MARKED_NUMBER, "TEXT", true);
 		}
 
-		void VinciAntivolTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void VinciAntivolTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		}
 		
-		void VinciAntivolTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void VinciAntivolTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 		}
 
-		void VinciAntivolTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void VinciAntivolTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 		}
 
 		vector<shared_ptr<VinciAntivol> > VinciAntivolTableSync::search(const std::string markedNumber, int first /*= 0*/, int number /*= 0*/ )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

@@ -27,7 +27,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "LineStop.h"
@@ -106,7 +106,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<LineStop>::save(LineStop* object)
 		{
-/*			SQLiteHandle* sqlite = DBModule::GetSQLite();
+/*			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -148,7 +148,7 @@ namespace synthese
 			addTableIndex(COL_PHYSICALSTOPID);
 		}
 
-		void LineStopTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void LineStopTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -165,7 +165,7 @@ namespace synthese
 			}
 		}
 		
-		void LineStopTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void LineStopTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -178,7 +178,7 @@ namespace synthese
 			}
 		}
 
-		void LineStopTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void LineStopTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -192,7 +192,7 @@ namespace synthese
 
 		std::vector<shared_ptr<LineStop> > LineStopTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

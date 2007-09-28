@@ -157,6 +157,8 @@ def DefineDefaultCPPDefines (env):
         env.Append ( CPPDEFINES = ['UNIX'] )
         if (env.IsDebug ()):
             env.Append ( CPPDEFINES = ['DEBUG'] )
+        else:  
+            env.Append ( CPPDEFINES = ['NDEBUG'] )
     
     elif (platform=='win32'):
         env.Append ( CPPDEFINES = ['_MBCS', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', 'BOOST_ALL_NO_LIB'] )

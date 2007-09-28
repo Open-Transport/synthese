@@ -25,7 +25,7 @@
 #include "15_env/TransportNetwork.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 
 #include "01_util/Conversion.h"
 
@@ -86,7 +86,7 @@ namespace synthese
 		}
 
 
-		void TransportNetworkTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync /*= false*/ )
+		void TransportNetworkTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync /*= false*/ )
 		{
 			while (rows->next ())
 			{
@@ -106,7 +106,7 @@ namespace synthese
 			}
 		}
 
-		void TransportNetworkTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void TransportNetworkTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 		    while (rows->next ())
 		    {
@@ -121,7 +121,7 @@ namespace synthese
 		}
 
 
-		void TransportNetworkTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  
+		void TransportNetworkTableSync::rowsRemoved( db::SQLite* sqlite,  
 							     db::SQLiteSync* sync, 
 							     const db::SQLiteResultSPtr& rows )
 		{

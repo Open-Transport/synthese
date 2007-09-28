@@ -28,7 +28,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "57_accounting/AccountingModule.h"
@@ -69,7 +69,7 @@ namespace synthese
 		{
 		    try
 		    {
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (t->getKey() > 0)
 			{
@@ -138,19 +138,19 @@ namespace synthese
 			addTableIndex(v);
 		}
 
-		void TransactionTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  
+		void TransactionTableSync::rowsAdded( db::SQLite* sqlite,  
 						      db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, 
 						      bool isFirstSync)
 		{
 
 		}
 
-		void TransactionTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void TransactionTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
-		void TransactionTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void TransactionTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}

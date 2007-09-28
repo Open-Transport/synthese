@@ -130,7 +130,7 @@ namespace synthese
 		}
 
 
-		void SiteTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
+		void SiteTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 		    while (rows->next ())
 		    {
@@ -142,7 +142,7 @@ namespace synthese
 
 
 
-		void SiteTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
+		void SiteTableSync::rowsAdded( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		    while (rows->next ())
 		    {
@@ -162,7 +162,7 @@ namespace synthese
 		}
 
 
-		void SiteTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
+		void SiteTableSync::rowsRemoved( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 		    while (rows->next ())
 		    {

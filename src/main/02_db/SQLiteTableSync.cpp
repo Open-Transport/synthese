@@ -22,7 +22,7 @@
 
 
 #include "02_db/Constants.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteTableSync.h"
 #include "02_db/SQLiteException.h"
 #include "01_util/Conversion.h"
@@ -77,7 +77,7 @@ namespace synthese
 
 
 		void 
-		SQLiteTableSync::firstSync (synthese::db::SQLiteQueueThreadExec* sqlite, 
+		SQLiteTableSync::firstSync (synthese::db::SQLite* sqlite, 
 						synthese::db::SQLiteSync* sync)
 		{
 			// Pre-init phase
@@ -122,7 +122,6 @@ namespace synthese
 			// Create precompiled statement(s)
 			_getRowByIdStatement =
 			    sqlite->compileStatement ("SELECT * FROM " + _tableName + " WHERE " + getPrimaryKey () + "=:id LIMIT 1");
-			    
 
 			// Callbacks according to what already exists in the table.
 			if (_ignoreCallbacksOnFirstSync == false)
@@ -170,13 +169,13 @@ namespace synthese
 			    
 
 		void 
-		SQLiteTableSync::beforeFirstSync (synthese::db::SQLiteQueueThreadExec* sqlite, 
+		SQLiteTableSync::beforeFirstSync (synthese::db::SQLite* sqlite, 
 						  synthese::db::SQLiteSync* sync)
 		{
 		}
 
 		void 
-		SQLiteTableSync::afterFirstSync (synthese::db::SQLiteQueueThreadExec* sqlite, 
+		SQLiteTableSync::afterFirstSync (synthese::db::SQLite* sqlite, 
 						 synthese::db::SQLiteSync* sync)
 		{
 		}
@@ -268,7 +267,7 @@ namespace synthese
 		
 
 		void 
-		SQLiteTableSync::createTable (synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::createTable (synthese::db::SQLite* sqlite,
 						  const std::string& tableSchema,
 						  const std::string& triggerNoInsert,
 						  const std::string& triggerNoRemove,
@@ -376,7 +375,7 @@ namespace synthese
 
 
 		std::vector<std::string> 
-		SQLiteTableSync::GetTableColumnsDb (synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetTableColumnsDb (synthese::db::SQLite* sqlite,
 							const std::string& tableName)
 		{
 			std::vector<std::string> cols;
@@ -394,7 +393,7 @@ namespace synthese
 
 
 		std::string 
-		SQLiteTableSync::GetSQLSchemaDb (synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetSQLSchemaDb (synthese::db::SQLite* sqlite,
 						 const std::string& tableName)
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='table' and name='" +
@@ -409,7 +408,7 @@ namespace synthese
 		
 
 		std::string 
-		SQLiteTableSync::GetTriggerNoInsertDb (synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetTriggerNoInsertDb (synthese::db::SQLite* sqlite,
 							   const std::string& tableName)
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
@@ -421,7 +420,7 @@ namespace synthese
 
 		
 		std::string 
-		SQLiteTableSync::GetTriggerNoRemoveDb (synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetTriggerNoRemoveDb (synthese::db::SQLite* sqlite,
 							   const std::string& tableName)
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
@@ -433,7 +432,7 @@ namespace synthese
 		
 
 		std::string 
-		SQLiteTableSync::GetTriggerNoUpdateDb (synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetTriggerNoUpdateDb (synthese::db::SQLite* sqlite,
 							   const std::string& tableName)
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
@@ -453,7 +452,7 @@ namespace synthese
 
 		
 		void 
-		SQLiteTableSync::adaptTable (synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::adaptTable (synthese::db::SQLite* sqlite,
 					     const std::string& tableSchema,
 					     const std::string& triggerNoInsert,
 					     const std::string& triggerNoRemove,
@@ -560,13 +559,22 @@ namespace synthese
 
 	
 	         SQLiteResultSPtr 
-		 SQLiteTableSync::getRowById (synthese::db::SQLiteQueueThreadExec* sqlite, const uid& id) const
+		 SQLiteTableSync::getRowById (synthese::db::SQLite* sqlite, const uid& id) const
 		 {
+		     
 		     _getRowByIdStatement->reset ();
 		     _getRowByIdStatement->clearBindings ();
 		     _getRowByIdStatement->bindParameterLongLong (":id", id);
 		     
-		     return sqlite->execQuery (_getRowByIdStatement, false); // not lazy !
+		     return sqlite->execQuery (_getRowByIdStatement, false); // not lazy
+
+		     /*
+		     // precompile this ?
+		     
+		     std::stringstream ss;
+		     ss << "SELECT * FROM " << _tableName << " WHERE " << getPrimaryKey () + "=" << id << " LIMIT 1";
+		     return sqlite->execQuery (ss.str (), false); 
+		     */
 		 }
 
 

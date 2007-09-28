@@ -48,7 +48,7 @@ class SQLiteLazyResult : public SQLiteResult
 
  private:
 
-    friend class SQLite;
+    friend class SQLiteHandle;
 
     
 

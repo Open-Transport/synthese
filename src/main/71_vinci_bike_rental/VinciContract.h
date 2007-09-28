@@ -35,7 +35,7 @@ namespace synthese
 {
 	namespace db
 	{
-		class SQLiteQueueThreadExec;
+		class SQLite;
 	}
 
 	namespace security

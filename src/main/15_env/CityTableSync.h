@@ -50,15 +50,15 @@ namespace synthese
 			CityTableSync ();
 			~CityTableSync ();
 
-			void rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			void rowsAdded (synthese::db::SQLite* sqlite, 
 				synthese::db::SQLiteSync* sync,
 				const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync = false);
 
-			void rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			void rowsUpdated (synthese::db::SQLite* sqlite, 
 				synthese::db::SQLiteSync* sync,
 				const synthese::db::SQLiteResultSPtr& rows);
 
-			void rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			void rowsRemoved (synthese::db::SQLite* sqlite, 
 				synthese::db::SQLiteSync* sync,
 				const synthese::db::SQLiteResultSPtr& rows);
 		};

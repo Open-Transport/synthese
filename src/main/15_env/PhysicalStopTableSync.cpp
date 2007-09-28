@@ -24,7 +24,7 @@
 
 #include "01_util/Conversion.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 
 #include "15_env/PhysicalStop.h"
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
@@ -95,7 +95,7 @@ namespace synthese
 		    
 
 
-	void PhysicalStopTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+	void PhysicalStopTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 	{
 	    while (rows->next ())
 	    {
@@ -125,7 +125,7 @@ namespace synthese
 
 
 
-    void PhysicalStopTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+    void PhysicalStopTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
     {
 	while (rows->next ())
 	{
@@ -139,7 +139,7 @@ namespace synthese
 
 
 
-    void PhysicalStopTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+    void PhysicalStopTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
     {
 	while (rows->next ())
 	{

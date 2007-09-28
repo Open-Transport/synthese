@@ -26,7 +26,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/DbModuleClass.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteTableSync.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/DBEmptyResultException.h"
@@ -113,7 +113,7 @@ namespace synthese
 		template <class T>
 			void synthese::db::SQLiteTableSyncTemplate<T>::remove(uid key)
 		{
-			SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "DELETE FROM " << TABLE_NAME
@@ -132,7 +132,7 @@ namespace synthese
 		template <class T>
 		boost::shared_ptr<T> synthese::db::SQLiteTableSyncTemplate<T>::get(uid key)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "SELECT * "
@@ -189,7 +189,7 @@ namespace synthese
 			{
 				try
 				{
-					SQLiteHandle* sqlite = DBModule::GetSQLite();
+					SQLite* sqlite = DBModule::GetSQLite();
 					std::stringstream query;
 					query
 					    << "SELECT " << util::Conversion::ToString((uid) 0x00000000FFFFFFFFLL) 

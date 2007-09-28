@@ -79,7 +79,7 @@ namespace synthese
 
 		    
 		void 
-			CrossingTableSync::rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CrossingTableSync::rowsAdded (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
@@ -103,7 +103,7 @@ namespace synthese
 
 
 		void 
-			CrossingTableSync::rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CrossingTableSync::rowsUpdated (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResultSPtr& rows)
 		{
@@ -121,7 +121,7 @@ namespace synthese
 
 
 		void 
-			CrossingTableSync::rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CrossingTableSync::rowsRemoved (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResultSPtr& rows)
 		{

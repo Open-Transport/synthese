@@ -1,5 +1,7 @@
 #include "02_db/SQLiteStatement.h"
 
+#include "02_db/SQLiteHandle.h"
+
 #include "02_db/SQLiteException.h"
 #include "01_util/Conversion.h"
 
@@ -17,6 +19,11 @@ using namespace synthese::util;
 
 
 
+    void cleanupStatement (sqlite3_stmt* st)
+    {
+	sqlite3_finalize (st);
+    }
+
 namespace synthese
 {
 
@@ -24,23 +31,20 @@ namespace db
 {
 
 
+    // typedef void (*cleanup)(void*) cleanupFunction;
 
 
     
-SQLiteStatement::SQLiteStatement (sqlite3* handle, const SQLData& sql)
-    : _sql (sql)
+SQLiteStatement::SQLiteStatement (const SQLiteHandle& handle, const SQLData& sql)
+    : _handle (handle)
+    , _sql (sql)
+    , _statement (&cleanupStatement)
 {
 
-//    std::cerr << "*** new st : " << sql << std::endl;
-    int retc = sqlite3_prepare_v2 (handle, sql.c_str (), sql.length (), &_statement, 0);
-    if (retc != SQLITE_OK)
-    {
-	throw SQLiteException ("Error compiling \"" + sql + "\" (error=" + Conversion::ToString (retc) + ")");
-    }
 }
 
 
-
+/*
 SQLiteStatement::SQLiteStatement (sqlite3_stmt* statement, const SQLData& sql)
     : _statement (statement)
     , _sql (sql)
@@ -48,14 +52,12 @@ SQLiteStatement::SQLiteStatement (sqlite3_stmt* statement, const SQLData& sql)
     //std::cerr << "*** new st : " << sql << std::endl;
     //++nbres;
 }
-
+*/
 
 
 SQLiteStatement::~SQLiteStatement ()
 {
-    // std::cerr << "*** del st : " << _sql << std::endl;
-    sqlite3_finalize (_statement);
-    //--nbres;
+    _statement.release ();
 }
 
 
@@ -65,7 +67,7 @@ SQLiteStatement::~SQLiteStatement ()
 int 
 SQLiteStatement::getParameterIndex (const std::string& parameterName) const
 {
-    return sqlite3_bind_parameter_index (_statement, parameterName.c_str ());
+    return sqlite3_bind_parameter_index (getStatement (), parameterName.c_str ());
 }
 
 
@@ -74,7 +76,7 @@ SQLiteStatement::getParameterIndex (const std::string& parameterName) const
 void 
 SQLiteStatement::reset ()
 {
-    sqlite3_reset (_statement);
+    sqlite3_reset (getStatement ());
 }
 
 
@@ -82,14 +84,14 @@ SQLiteStatement::reset ()
 void 
 SQLiteStatement::clearBindings ()
 {
-    sqlite3_clear_bindings (_statement);
+    sqlite3_clear_bindings (getStatement ());
 }
 
 
 void 
 SQLiteStatement::bindParameterBlob (int index, const std::string& param)
 {
-    int retc = sqlite3_bind_blob (_statement, index, param.data (), param.length (), SQLITE_TRANSIENT);
+    int retc = sqlite3_bind_blob (getStatement (), index, param.data (), param.length (), SQLITE_TRANSIENT);
     if (retc != SQLITE_OK)
     {
 	throw SQLiteException ("Error binding parameter " + Conversion::ToString (index) 
@@ -101,7 +103,7 @@ SQLiteStatement::bindParameterBlob (int index, const std::string& param)
 void 
 SQLiteStatement::bindParameterBlob (const std::string& name, const std::string& param)
 {
-    int index = sqlite3_bind_parameter_index (_statement, name.c_str ());
+    int index = sqlite3_bind_parameter_index (getStatement (), name.c_str ());
     bindParameterBlob (index, param);
 
 }
@@ -112,7 +114,7 @@ SQLiteStatement::bindParameterBlob (const std::string& name, const std::string& 
 void 
 SQLiteStatement::bindParameterInt (int index, int param)
 {
-    int retc = sqlite3_bind_int (_statement, index, param);
+    int retc = sqlite3_bind_int (getStatement (), index, param);
     if (retc != SQLITE_OK)
     {
 	throw SQLiteException ("Error binding parameter " + Conversion::ToString (index) 
@@ -124,7 +126,7 @@ SQLiteStatement::bindParameterInt (int index, int param)
 void 
 SQLiteStatement::bindParameterInt (const std::string& name, int param)
 {
-    int index = sqlite3_bind_parameter_index (_statement, name.c_str ());
+    int index = sqlite3_bind_parameter_index (getStatement (), name.c_str ());
     bindParameterInt (index, param);
 }
 
@@ -133,7 +135,7 @@ SQLiteStatement::bindParameterInt (const std::string& name, int param)
 void 
 SQLiteStatement::bindParameterDouble (int index, double param)
 {
-    int retc = sqlite3_bind_double (_statement, index, param);
+    int retc = sqlite3_bind_double (getStatement (), index, param);
     if (retc != SQLITE_OK)
     {
 	throw SQLiteException ("Error binding parameter " + Conversion::ToString (index) 
@@ -145,7 +147,7 @@ SQLiteStatement::bindParameterDouble (int index, double param)
 void 
 SQLiteStatement::bindParameterDouble (const std::string& name, double param)
 {
-    int index = sqlite3_bind_parameter_index (_statement, name.c_str ());
+    int index = sqlite3_bind_parameter_index (getStatement (), name.c_str ());
     bindParameterDouble (index, param);
 
 }
@@ -162,7 +164,7 @@ SQLiteStatement::bindParameterTimestamp (int index, const boost::posix_time::pti
 void 
 SQLiteStatement::bindParameterTimestamp (const std::string& name, const boost::posix_time::ptime& param)
 {
-    int index = sqlite3_bind_parameter_index (_statement, name.c_str ());
+    int index = sqlite3_bind_parameter_index (getStatement (), name.c_str ());
     bindParameterTimestamp (index, param);
 
 }
@@ -172,7 +174,7 @@ SQLiteStatement::bindParameterTimestamp (const std::string& name, const boost::p
 void 
 SQLiteStatement::bindParameterText (int index, const std::string& param)
 {
-    int retc = sqlite3_bind_text (_statement, index, param.c_str (), param.length (), SQLITE_TRANSIENT);
+    int retc = sqlite3_bind_text (getStatement (), index, param.c_str (), param.length (), SQLITE_TRANSIENT);
     if (retc != SQLITE_OK)
     {
 	throw SQLiteException ("Error binding parameter " + Conversion::ToString (index) 
@@ -184,7 +186,7 @@ SQLiteStatement::bindParameterText (int index, const std::string& param)
 void 
 SQLiteStatement::bindParameterText (const std::string& name, const std::string& param)
 {
-    int index = sqlite3_bind_parameter_index (_statement, name.c_str ());
+    int index = sqlite3_bind_parameter_index (getStatement (), name.c_str ());
     bindParameterText (index, param);
 
 }
@@ -201,7 +203,7 @@ SQLiteStatement::bindParameterBool (int index, bool param)
 void 
 SQLiteStatement::bindParameterBool (const std::string& name, bool param)
 {
-    int index = sqlite3_bind_parameter_index (_statement, name.c_str ());
+    int index = sqlite3_bind_parameter_index (getStatement (), name.c_str ());
     bindParameterBool (index, param);
 }
 
@@ -217,7 +219,7 @@ SQLiteStatement::bindParameterLong (int index, long param)
 void 
 SQLiteStatement::bindParameterLong (const std::string& name, long param)
 {
-    int index = sqlite3_bind_parameter_index (_statement, name.c_str ());
+    int index = sqlite3_bind_parameter_index (getStatement (), name.c_str ());
     bindParameterLong (index, param);
 }
 
@@ -226,7 +228,7 @@ SQLiteStatement::bindParameterLong (const std::string& name, long param)
 void 
 SQLiteStatement::bindParameterLongLong (int index, long long param)
 {
-    int retc = sqlite3_bind_int64 (_statement, index, param);
+    int retc = sqlite3_bind_int64 (getStatement (), index, param);
     if (retc != SQLITE_OK)
     {
 	throw SQLiteException ("Error binding parameter " + Conversion::ToString (index) 
@@ -238,16 +240,33 @@ SQLiteStatement::bindParameterLongLong (int index, long long param)
 void 
 SQLiteStatement::bindParameterLongLong (const std::string& name, long long param)
 {
-    int index = sqlite3_bind_parameter_index (_statement, name.c_str ());
+    int index = sqlite3_bind_parameter_index (getStatement (), name.c_str ());
     bindParameterLongLong (index, param);
 }
 
 
-sqlite3* 
-SQLiteStatement::getHandle () const
-{
-    return sqlite3_db_handle(_statement);
+
+
+
+sqlite3_stmt* 
+SQLiteStatement::getStatement () 
+{ 
+    if (_statement.get () != 0) return _statement.get ();
+    
+    sqlite3_stmt* st;
+
+    int retc = sqlite3_prepare_v2 (_handle.getHandle (), 
+				   _sql.c_str (), _sql.length (), &st, 0);
+
+    if (retc != SQLITE_OK)
+    {
+	throw SQLiteException ("Error compiling \"" + _sql + "\" (error=" + Conversion::ToString (retc) + ")");
+    }
+    _statement.reset (st);
+
+    return _statement.get (); 
 }
+
 
 
 }

@@ -35,15 +35,15 @@ public:
     ~NodeInfoTableSync ();
 
 
-    virtual void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
+    virtual void rowsAdded (db::SQLite* sqlite, 
 			    db::SQLiteSync* sync,
 			    const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
 
-    virtual void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
+    virtual void rowsUpdated (db::SQLite* sqlite, 
 			      db::SQLiteSync* sync, 
 			      const db::SQLiteResultSPtr& rows);
 
-    virtual void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
+    virtual void rowsRemoved (db::SQLite* sqlite, 
 			      db::SQLiteSync* sync,
 			      const db::SQLiteResultSPtr& rows);
 

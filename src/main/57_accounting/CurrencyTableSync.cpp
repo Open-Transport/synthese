@@ -26,7 +26,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "57_accounting/AccountingModule.h"
@@ -56,7 +56,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<Currency>::save(Currency* currency)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (currency->getKey() > 0)
 			{
@@ -91,7 +91,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_SYMBOL, "TEXT", true);
 		}
 
-		void CurrencyTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void CurrencyTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -101,19 +101,19 @@ namespace synthese
 			}
 		}
 
-		void CurrencyTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void CurrencyTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
-		void CurrencyTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void CurrencyTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
 		std::vector<shared_ptr<Currency> > CurrencyTableSync::search(const std::string& name, const std::string& symbol , int first /*= 0*/, int number /*= 0*/ )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

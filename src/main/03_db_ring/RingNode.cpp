@@ -58,7 +58,6 @@ RingNode::initialize ()
 	_data->getNodesAfter (getInfo ().getNodeId ());
     for (int n=1; n<nodesAfter.size (); ++n)
     {
-	std::cerr << "yo" << std::endl;
 	_data->setState (nodesAfter[n], OUTRING);
     }
 
@@ -230,7 +229,6 @@ RingNode::sendToken ()
 		_data->getUpdateLog ()->setUpdateRecord (ur);
 	    }
 	}
-	std::cerr << "... trying tx to " << ni.getNodeId () << std::endl;
 
 	// Token is prepared, spawn the sending thread.
 	Thread::RunOnce (new SendTokenThreadExec (_data->getEmitterNodeId (), ni, _data, _transmissionStatusMap));

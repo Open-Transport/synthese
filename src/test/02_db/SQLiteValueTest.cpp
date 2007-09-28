@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetSchema)
 {
 /*    boost::filesystem::remove ("test_db.s3db");
       
-    SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+    SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
     SQLiteTableFormat format;

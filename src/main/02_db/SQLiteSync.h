@@ -40,7 +40,7 @@ namespace synthese
 namespace db
 {
 
-    class SQLiteQueueThreadExec;
+    class SQLiteHandle;
     class SQLiteTableSync;
 
 
@@ -68,9 +68,9 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
     SQLiteSync ();
     ~SQLiteSync ();
 
-    void registerCallback (SQLiteQueueThreadExec* emitter);
+    void registerCallback (SQLiteHandle* emitter);
     
-    void eventCallback (SQLiteQueueThreadExec* emitter,
+    void eventCallback (SQLiteHandle* emitter,
 			const SQLiteEvent& event);
 
     /** Adds a new table synchronizer to this global synchronizer update hook.

@@ -51,7 +51,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate< AlarmObjectLink>::save(AlarmObjectLink* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -89,7 +89,7 @@ namespace synthese
 			addTableIndex(COL_ALARM_ID);
 		}
 
-		void AlarmObjectLinkTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void AlarmObjectLinkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -107,12 +107,12 @@ namespace synthese
 			}
 		}
 
-		void AlarmObjectLinkTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void AlarmObjectLinkTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			rowsAdded(sqlite, sync, rows);
 		}
 
-		void AlarmObjectLinkTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void AlarmObjectLinkTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{

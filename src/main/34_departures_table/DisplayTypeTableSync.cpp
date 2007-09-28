@@ -26,7 +26,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "11_interfaces/Interface.h"
@@ -67,7 +67,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<DisplayType>::save(DisplayType* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			if (object->getKey() <= 0)
 				object->setKey(getId());
 			stringstream query;
@@ -103,7 +103,7 @@ namespace synthese
 			addTableColumn(COL_MAX_STOPS_NUMBER, "INTEGER", true);
 		}
 
-		void DisplayTypeTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void DisplayTypeTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -118,7 +118,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayTypeTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void DisplayTypeTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -129,7 +129,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayTypeTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void DisplayTypeTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -147,7 +147,7 @@ namespace synthese
 			, bool orderByName
 			, bool raisingOrder
 		){
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

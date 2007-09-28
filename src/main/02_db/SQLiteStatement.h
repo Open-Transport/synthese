@@ -1,10 +1,11 @@
 #ifndef SYNTHESE_DB_SQLITESTATEMENT_H
 #define SYNTHESE_DB_SQLITESTATEMENT_H
 
+#include <sqlite3.h>
 
-#include <sqlite/sqlite3.h>
 #include <boost/shared_ptr.hpp>
-// #include <rope>
+#include <boost/thread/tss.hpp>
+
 #include <string>
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -17,10 +18,9 @@ namespace synthese
 	namespace db
 	{
 	    class SQLite;
-
+	    class SQLiteHandle;
 
 	    typedef std::string SQLData;
-
 
 		/** SQLite  statement. 
 		    Natively an SQLite statement is a  SQL command.
@@ -32,17 +32,19 @@ namespace synthese
 	    {
 
 		private:
+		
+		const SQLiteHandle& _handle;
+		const SQLData _sql;
 
-		    const SQLData _sql;
+		    boost::thread_specific_ptr<sqlite3_stmt> _statement;
 
-		    sqlite3_stmt* _statement;
+		    SQLiteStatement (const SQLiteHandle& handle, const SQLData& sql);
+		    // SQLiteStatement (const SQLiteHandle, const SQLData& sql);
 
-		    SQLiteStatement (sqlite3* handle, const SQLData& sql);
-		    SQLiteStatement (sqlite3_stmt* statement, const SQLData& sql);
 		    SQLiteStatement (const SQLiteStatement&);
+
 		    SQLiteStatement& operator = (const SQLiteStatement&);
 
-		    sqlite3_stmt* getStatement () { return _statement; }
 
 		public:
 
@@ -84,11 +86,11 @@ namespace synthese
 
 		private:
 
-		    sqlite3* getHandle () const;
+		    sqlite3_stmt* getStatement ();
 
-		    friend class SQLite;
 		    friend class SQLiteLazyResult;
 		    friend class SQLiteBatchStatement;
+		    friend class SQLiteHandle;
 
 		};
 

@@ -61,7 +61,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<VinciContract>::save(VinciContract* vc)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (vc->getKey() <= 0)
 				vc->setKey(getId()); /// @todo Handle grid ID
@@ -97,17 +97,17 @@ namespace synthese
 			addTableIndex(COL_USER_ID);
 		}
 
-		void VinciContractTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void VinciContractTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 
 		}
 
-		void VinciContractTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void VinciContractTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
-		void VinciContractTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void VinciContractTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
@@ -121,7 +121,7 @@ namespace synthese
 			, bool orderBySurnameAndName
 			, bool raisingOrder
 		){
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< "SELECT *"

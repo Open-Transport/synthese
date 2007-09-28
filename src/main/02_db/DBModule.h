@@ -50,7 +50,8 @@ namespace synthese
 	namespace db
 	{
 
-	    class SQLiteQueueThreadExec;
+	    class SQLite;
+	    class SQLiteHandle;
 	    
 
 //		static const std::string TRIGGERS_ENABLED_CLAUSE;
@@ -59,14 +60,14 @@ namespace synthese
 		{
 		private:
 		    
-		    static SQLiteQueueThreadExec* _sqliteQueueThreadExec;
+		    static SQLiteHandle* _sqlite;
 
 		public:
 
 		    void preInit ();
 		    void initialize();
 
-		    static SQLiteQueueThreadExec* GetSQLite ();
+		    static SQLite* GetSQLite ();
 
 		    /** Called whenever a parameter registered by this module is changed
 		     */

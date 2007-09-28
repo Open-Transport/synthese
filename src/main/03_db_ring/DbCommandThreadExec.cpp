@@ -4,7 +4,6 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteHandle.h"
-#include "02_db/SQLiteQueueThreadExec.h"
 
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpService.h"
@@ -84,7 +83,7 @@ namespace synthese
 			{
 
 			    // First determine is SQL is a query or an update
-			    if (SQLite::IsUpdateStatement (requestString))
+			    if (SQLiteHandle::IsUpdateStatement (requestString))
 			    {
 				// With ring replication
 				if (withoutReplication)

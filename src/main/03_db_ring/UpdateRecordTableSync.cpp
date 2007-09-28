@@ -52,7 +52,7 @@ namespace synthese
 
 	template<> void SQLiteTableSyncTemplate<UpdateRecord>::save (UpdateRecord* object)
 	{
-	    SQLiteHandle* sqlite = DBModule::GetSQLite();
+	    SQLite* sqlite = DBModule::GetSQLite();
 	    std::stringstream query;
 
 	    assert (object->getKey() != 0);
@@ -113,7 +113,7 @@ namespace synthese
 
 
 	void 
-	UpdateRecordTableSync::rowsAdded (SQLiteQueueThreadExec* sqlite, 
+	UpdateRecordTableSync::rowsAdded (SQLite* sqlite, 
 					  SQLiteSync* sync,
 					  const SQLiteResultSPtr& rows, bool isFirstSync)
 	{
@@ -123,7 +123,7 @@ namespace synthese
 	
 
 	void 
-	UpdateRecordTableSync::rowsUpdated (SQLiteQueueThreadExec* sqlite, 
+	UpdateRecordTableSync::rowsUpdated (SQLite* sqlite, 
 					    SQLiteSync* sync,
 					    const SQLiteResultSPtr& rows)
 	{
@@ -139,7 +139,7 @@ namespace synthese
 
 
 	void 
-	UpdateRecordTableSync::rowsRemoved (SQLiteQueueThreadExec* sqlite, 
+	UpdateRecordTableSync::rowsRemoved (SQLite* sqlite, 
 					    SQLiteSync* sync,
 					    const SQLiteResultSPtr& rows)
 	{

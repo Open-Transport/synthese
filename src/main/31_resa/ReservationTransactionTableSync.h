@@ -95,7 +95,7 @@ namespace synthese
 				This method loads a new object in ram.
 			*/
 			void rowsAdded (
-				db::SQLiteQueueThreadExec* sqlite
+				db::SQLite* sqlite
 				, db::SQLiteSync* sync
 				, const db::SQLiteResultSPtr& rows
 				, bool isItFirstSync = false
@@ -105,7 +105,7 @@ namespace synthese
 				This method updates the corresponding object in ram.
 			*/
 			void rowsUpdated(
-				db::SQLiteQueueThreadExec* sqlite
+				db::SQLite* sqlite
 				, db::SQLiteSync* sync
 				, const db::SQLiteResultSPtr& rows
 			);
@@ -115,7 +115,7 @@ namespace synthese
 				all necessary cleaning actions.
 			*/
 			void rowsRemoved(
-				db::SQLiteQueueThreadExec* sqlite
+				db::SQLite* sqlite
 				, db::SQLiteSync* sync
 				, const db::SQLiteResultSPtr& rows
 			);

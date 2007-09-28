@@ -26,7 +26,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "15_env/BikeCompliance.h"
@@ -72,7 +72,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<BikeCompliance>::save(BikeCompliance* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
 			{
@@ -108,7 +108,7 @@ namespace synthese
 			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
-		void BikeComplianceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void BikeComplianceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -119,7 +119,7 @@ namespace synthese
 		}
 
 
-		void BikeComplianceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void BikeComplianceTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -133,7 +133,7 @@ namespace synthese
 			}
 		}
 
-		void BikeComplianceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void BikeComplianceTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -147,7 +147,7 @@ namespace synthese
 
 		std::vector<shared_ptr<BikeCompliance> > BikeComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

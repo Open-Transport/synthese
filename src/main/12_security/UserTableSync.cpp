@@ -26,7 +26,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "12_security/Profile.h"
@@ -86,7 +86,7 @@ namespace synthese
 		{
 			try
 			{
-				SQLiteHandle* sqlite = DBModule::GetSQLite();
+				SQLite* sqlite = DBModule::GetSQLite();
 				stringstream query;
 				if (user->getKey() <= 0)
 					user->setKey(getId());
@@ -165,23 +165,23 @@ namespace synthese
 		}
 
 
-		void UserTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
+		void UserTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 		}
 
 
-		void UserTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
+		void UserTableSync::rowsAdded( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		}
 
 
-		void UserTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
+		void UserTableSync::rowsRemoved( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 		}
 
 		shared_ptr<User> UserTableSync::getUserFromLogin(const std::string& login )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "SELECT *"
@@ -216,7 +216,7 @@ namespace synthese
 			, bool orderByProfileName
 			, bool raisingOrder
 		){
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT "
@@ -267,7 +267,7 @@ namespace synthese
 		{
 			try
 			{
-				SQLiteHandle* sqlite = DBModule::GetSQLite();
+				SQLite* sqlite = DBModule::GetSQLite();
 				std::stringstream query;
 				query
 					<< "SELECT " << TABLE_COL_ID

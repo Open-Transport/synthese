@@ -7,7 +7,6 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteException.h"
-#include "02_db/SQLite.h"
   
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
@@ -166,6 +165,7 @@ void
 Node::setUpdateRecordCallback (const UpdateRecordSPtr& updateRecord)
 {
     boost::recursive_mutex::scoped_lock callbackLock (*_ringNodesMutex);
+
     _updateLog->setUpdateRecord (updateRecord);
     
     // If this is an acknowledgement, release the lock taken on update record key just before
@@ -222,6 +222,14 @@ Node::getHandle ()
 
 
 
+synthese::db::SQLiteStatementSPtr 
+Node::compileStatement(const synthese::db::SQLData& sql)
+{
+    return DBModule::GetSQLite()->compileStatement (sql);
+}
+
+
+
 db::SQLiteResultSPtr 
 Node::execQuery (const SQLiteStatementSPtr& statement, bool lazy)
 {
@@ -243,16 +251,16 @@ Node::execQuery (const SQLData& sql, bool lazy)
 
 
 void
-Node::execUpdate (const SQLiteStatementSPtr& statement, bool asynchronous)
+Node::execUpdate (const SQLiteStatementSPtr& statement)
 {
-    execUpdate (statement->getSQL (), asynchronous);
+    execUpdate (statement->getSQL ());
 }
 
 
 
 
 void 
-Node::execUpdate (const SQLData& sql, bool asynchronous)
+Node::execUpdate (const SQLData& sql)
 {
     // If this is not an update statement, return directly
     if (SQLite::IsUpdateStatement (sql) == false)
@@ -290,7 +298,8 @@ Node::execUpdate (const SQLData& sql, bool asynchronous)
 
     saveUpdateRecord (urp);
     
-    if (asynchronous == false)
+    
+    //if (asynchronous == false)
     {
 	// If synchronous update is done, we must wait until the update record is acknowledged locally.
         // This will be notified asynchronously by ::setUpdateRecordCallback.
@@ -454,6 +463,7 @@ Node::saveUpdateRecord (const UpdateRecordSPtr& urp)
 	{
 	    Log::GetInstance ().error ("Error while executing SQL statement on master authority : " + 
 				       Conversion::ToTruncatedString (urp->getSQL ()), e);
+	    DBModule::GetSQLite()->rollbackTransaction (); 
 	    urp->setState (FAILED);
 	    UpdateRecordTableSync::save (urp.get ());
 	}
@@ -482,6 +492,7 @@ Node::saveUpdateRecord (const UpdateRecordSPtr& urp)
 	{
 	    Log::GetInstance ().error ("Error while propagating SQL statement " + 
 				       Conversion::ToTruncatedString (aur->getSQL ()), e);
+	    DBModule::GetSQLite()->rollbackTransaction (); 
 	    aur->setState (FAILED);
 	    UpdateRecordTableSync::save (aur.get ());
 	}
@@ -548,7 +559,6 @@ void Node::dump ()
     {
 	it->second->dump ();
     }
-    if (isMasterAuthority ()) std::cerr << "MASTER!! " << std::endl;
 
 }
 

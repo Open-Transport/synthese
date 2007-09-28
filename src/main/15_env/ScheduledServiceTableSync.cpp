@@ -40,7 +40,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "04_time/Schedule.h"
@@ -154,7 +154,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<ScheduledService>::save(ScheduledService* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -195,7 +195,7 @@ namespace synthese
 			addTableColumn (COL_TEAM, "TEXT");
 		}
 
-		void ScheduledServiceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void ScheduledServiceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		    // Loop on each added row
 		    while (rows->next ())
@@ -218,7 +218,7 @@ namespace synthese
 	    
 
 
-		void ScheduledServiceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void ScheduledServiceTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -232,7 +232,7 @@ namespace synthese
 			}
 		}
 
-		void ScheduledServiceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void ScheduledServiceTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 		    while (rows->next ())
 		    {
@@ -255,7 +255,7 @@ namespace synthese
 			, bool orderByOriginTime
 			, bool raisingOrder
 		){
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -294,7 +294,7 @@ namespace synthese
 			}
 		}
 
-		void ScheduledServiceTableSync::afterFirstSync( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync )
+		void ScheduledServiceTableSync::afterFirstSync( SQLite* sqlite,  SQLiteSync* sync )
 		{
 /*
 		    // Lines

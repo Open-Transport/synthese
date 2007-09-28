@@ -23,11 +23,10 @@
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteSync.h"
 #include "02_db/SQLiteTableSync.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLiteHandle.h"
 
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
-#include "01_util/threads/ManagedThread.h"
 #include "01_util/Factory.h"
 
 #include "00_tcp/TcpService.h"
@@ -42,7 +41,7 @@ namespace synthese
 	namespace db
 	{
 
-	    SQLiteQueueThreadExec* DBModule::_sqliteQueueThreadExec = 0;
+	    SQLiteHandle* DBModule::_sqlite = 0;
 
 
 	    void DBModule::preInit ()
@@ -54,7 +53,7 @@ namespace synthese
 	    void DBModule::initialize()
 	    {
 		
-		_sqliteQueueThreadExec = new SQLiteQueueThreadExec (GetDatabasePath ());
+		_sqlite = new SQLiteHandle (GetDatabasePath ());
 		
 		bool autorespawn (true);
 
@@ -69,20 +68,16 @@ namespace synthese
 		    syncHook->addTableSynchronizer(it.getKey(), *it);
 		}
 		
-		_sqliteQueueThreadExec->registerUpdateHook (syncHook);
-
-		ManagedThread* sqliteQueueThread = 
-		    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 100, autorespawn);
-		
+		_sqlite->registerUpdateHook (syncHook);
 
 	    }
 	    
 	    
 
-	    SQLiteQueueThreadExec*
+	    SQLite*
 	    DBModule::GetSQLite ()
 	    {
-		return _sqliteQueueThreadExec;
+		return _sqlite;
 	    }
 
 

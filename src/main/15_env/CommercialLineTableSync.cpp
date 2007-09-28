@@ -31,7 +31,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -93,7 +93,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<CommercialLine>::save(CommercialLine* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
 			{
@@ -141,7 +141,7 @@ namespace synthese
 			addTableColumn(COL_OPTIONAL_RESERVATION_PLACES, "TEXT", true);
 		}
 
-		void CommercialLineTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void CommercialLineTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -151,7 +151,7 @@ namespace synthese
 			}
 		}
 
-		void CommercialLineTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void CommercialLineTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -160,7 +160,7 @@ namespace synthese
 			}
 		}
 
-		void CommercialLineTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void CommercialLineTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -177,7 +177,7 @@ namespace synthese
 			, bool orderByName
 			, bool raisingOrder
 		){
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT l.*"
@@ -227,7 +227,7 @@ namespace synthese
 			, bool raisingOrder /*= true */
 			, bool mustBeBookable
 		){
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< getSQLLinesList(rights, totalControl, neededLevel, mustBeBookable, "*");

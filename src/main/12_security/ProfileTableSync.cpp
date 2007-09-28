@@ -26,7 +26,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -65,7 +65,7 @@ namespace synthese
 		{
 			try
 			{
-				SQLiteHandle* sqlite = DBModule::GetSQLite();
+				SQLite* sqlite = DBModule::GetSQLite();
 				if (profile->getKey() <= 0)
 					profile->setKey(getId());
 				
@@ -112,7 +112,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHTS_STRING, "TEXT", true);
 		}
 
-		void ProfileTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void ProfileTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		    while (rows->next ())
 		    {
@@ -130,7 +130,7 @@ namespace synthese
 		}
 
 
-		void ProfileTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void ProfileTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -141,7 +141,7 @@ namespace synthese
 			}
 		}
 
-		void ProfileTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void ProfileTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -162,7 +162,7 @@ namespace synthese
 			, bool raisingOrder	
 		){
 			/** @todo Handle right filter */
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -201,7 +201,7 @@ namespace synthese
 			shared_ptr<const Profile> parent
 			, int first /*= 0*/, int number /*= -1*/ )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

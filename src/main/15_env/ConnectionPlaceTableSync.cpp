@@ -25,7 +25,7 @@
 #include "01_util/Conversion.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 
 #include "15_env/City.h"
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
@@ -133,7 +133,7 @@ namespace synthese
 
 		    
 		void ConnectionPlaceTableSync::rowsAdded(
-			SQLiteQueueThreadExec* sqlite
+			SQLite* sqlite
 			, SQLiteSync* sync
 			, const SQLiteResultSPtr& rows
 			, bool isFirstSync
@@ -184,7 +184,7 @@ namespace synthese
 
 
 		void 
-			ConnectionPlaceTableSync::rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			ConnectionPlaceTableSync::rowsUpdated (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResultSPtr& rows)
 		{
@@ -210,7 +210,7 @@ namespace synthese
 
 
 		void 
-			ConnectionPlaceTableSync::rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			ConnectionPlaceTableSync::rowsRemoved (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResultSPtr& rows)
 		{

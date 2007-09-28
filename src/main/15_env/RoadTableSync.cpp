@@ -34,7 +34,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -99,7 +99,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<Road>::save(Road* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -141,7 +141,7 @@ namespace synthese
 			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
-		void RoadTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isItFirstSync)
+		void RoadTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isItFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -170,7 +170,7 @@ namespace synthese
 			}
 		}
 		
-		void RoadTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void RoadTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -190,7 +190,7 @@ namespace synthese
 			}
 		}
 
-		void RoadTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void RoadTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{

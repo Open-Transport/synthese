@@ -5,7 +5,7 @@
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteSync.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteTableSync.h"
 
 #include <boost/filesystem/operations.hpp>
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE (testGetTableColumnsDb)
 {
     boost::filesystem::remove ("test_db.s3db");
       
-    SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+    SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
     SQLiteTableFormat format;
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetSchema)
 {
     boost::filesystem::remove ("test_db.s3db");
       
-    SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+    SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
     SQLiteTableFormat format;
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetTriggerNoInsert)
 {
     boost::filesystem::remove ("test_db.s3db");
       
-    SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+    SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
     SQLiteTableFormat format;
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetTriggerNoRemove)
 {
     boost::filesystem::remove ("test_db.s3db");
       
-    SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+    SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
     SQLiteTableFormat format;
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetTriggerNoUpdate)
 {
     boost::filesystem::remove ("test_db.s3db");
       
-    SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+    SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
     SQLiteTableFormat format;
@@ -170,16 +170,16 @@ public:
     SQLiteTableSyncForTest (const std::string& tableName) 
 	: SQLiteTableSync (tableName) {}
 
-    void rowsAdded (SQLiteQueueThreadExec* sqlite, 
+    void rowsAdded (SQLite* sqlite, 
 		    SQLiteSync* sync,
 		    const SQLiteResult& rows,
 	            bool isFirstSync = false) {}
 	
-    void rowsUpdated (SQLiteQueueThreadExec* sqlite, 
+    void rowsUpdated (SQLite* sqlite, 
 		      SQLiteSync* sync,
 		      const SQLiteResult& rows) {}
 	
-    void rowsRemoved (SQLiteQueueThreadExec* sqlite, 
+    void rowsRemoved (SQLite* sqlite, 
 		      SQLiteSync* sync,
 		      const SQLiteResult& rows) {}
 	
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnAddition)
     boost::filesystem::remove ("test_db.s3db");
 
     {
-	SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+	SQLite* sqlite = new SQLite ("test_db.s3db");
 	SQLiteSync* syncHook = new SQLiteSync ("col1");
 	SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
 	tabsync->addTableColumnForTest ("col1", "INTEGER", true);
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnAddition)
 
     {
 	// Add another column 
-	SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+	SQLite* sqlite = new SQLite ("test_db.s3db");
 	SQLiteSync* syncHook = new SQLiteSync ("col1");
 	SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
 	tabsync->addTableColumnForTest ("col1", "INTEGER", true);
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnDeletion)
 
 
     {
-	SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+	SQLite* sqlite = new SQLite ("test_db.s3db");
 	SQLiteSync* syncHook = new SQLiteSync ("col1");
 	SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
 	tabsync->addTableColumnForTest ("col1", "INTEGER", true);
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnDeletion)
 
     {
 	// Add another column 
-	SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
+	SQLite* sqlite = new SQLite ("test_db.s3db");
 	SQLiteSync* syncHook = new SQLiteSync ("col1");
 	SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
 	tabsync->addTableColumnForTest ("col1", "INTEGER", true);

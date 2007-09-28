@@ -29,7 +29,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -101,7 +101,7 @@ namespace synthese
 	    
 	    template<> void SQLiteTableSyncTemplate<RoadChunk>::save(RoadChunk* object)
 	    {
-		SQLiteHandle* sqlite = DBModule::GetSQLite();
+		SQLite* sqlite = DBModule::GetSQLite();
 		stringstream query;
 		if (object->getKey() <= 0)
 		    object->setKey(getId());	/// @todo Use grid ID
@@ -135,7 +135,7 @@ namespace synthese
 			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
-	    void RoadChunkTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
+	    void RoadChunkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 	    {
 		while (rows->next ())
 		{
@@ -158,7 +158,7 @@ namespace synthese
 	    }
 		
 
-	    void RoadChunkTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+	    void RoadChunkTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 	    {
 		while (rows->next ())
 		{
@@ -172,7 +172,7 @@ namespace synthese
 
 
 	    
-	    void RoadChunkTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+	    void RoadChunkTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 	    {
 		while (rows->next ())
 		{

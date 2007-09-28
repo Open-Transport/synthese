@@ -33,7 +33,7 @@
 #include "01_util/Conversion.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 
 #include "04_time/DateTime.h"
 
@@ -187,7 +187,7 @@ namespace synthese
 		}
 		    
 
-		void AlarmTableSync::rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
+		void AlarmTableSync::rowsAdded (db::SQLite* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
@@ -227,7 +227,7 @@ namespace synthese
 		}
 	    
 	    
-	    void AlarmTableSync::rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
+	    void AlarmTableSync::rowsUpdated (db::SQLite* sqlite, 
 					      db::SQLiteSync* sync,
 					      const db::SQLiteResultSPtr& rows)
 	    {
@@ -243,7 +243,7 @@ namespace synthese
 	    }
 	    
 	    
-	    void AlarmTableSync::rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
+	    void AlarmTableSync::rowsRemoved (db::SQLite* sqlite, 
 					      db::SQLiteSync* sync,
 					      const db::SQLiteResultSPtr& rows)
 	    {
@@ -277,7 +277,7 @@ namespace synthese
 		, bool orderByConflict
 		, bool raisingOrder)
 	    {
-		SQLiteHandle* sqlite = DBModule::GetSQLite();
+		SQLite* sqlite = DBModule::GetSQLite();
 		stringstream query;
 			query
 				<< " SELECT "
@@ -400,7 +400,7 @@ namespace synthese
 
 //		std::vector<boost::shared_ptr<Alarm> > AlarmTableSync::search( const Scenario* scenario , int first /*= 0 */, int number /*= -1 */, bool orderByLevel /*= false */, bool raisingOrder /*= false */ )
 /*		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT a.*"
@@ -436,7 +436,7 @@ namespace synthese
 */
 		std::vector<boost::shared_ptr<ScenarioSentAlarm> > AlarmTableSync::searchScenarioSent( const SentScenario* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool orderByStatus /*= false */, bool orderByConflict /*= false */, bool raisingOrder /*= false */ )
 		{
-		    SQLiteHandle* sqlite = DBModule::GetSQLite();
+		    SQLite* sqlite = DBModule::GetSQLite();
 		    stringstream query;
 		    query
 				<< " SELECT a.*"
@@ -473,7 +473,7 @@ namespace synthese
 		    int first /*= 0 */, int number /*= 0 */, 
 		    bool orderByLevel /*= false */, bool raisingOrder /*= false */ )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT a.*"

@@ -25,7 +25,7 @@
 #include "01_util/Conversion.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 
 #include "15_env/City.h"
 #include "15_env/EnvModule.h"
@@ -60,7 +60,7 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<City>::save(City* object)
 		{
 			/// @todo Implement
-			/*			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			/*			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
 			{
@@ -111,7 +111,7 @@ namespace synthese
 
 		    
 		void 
-			CityTableSync::rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CityTableSync::rowsAdded (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
@@ -131,7 +131,7 @@ namespace synthese
 
 
 		void 
-			CityTableSync::rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CityTableSync::rowsUpdated (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResultSPtr& rows)
 		{
@@ -151,7 +151,7 @@ namespace synthese
 
 
 		void 
-			CityTableSync::rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CityTableSync::rowsRemoved (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResultSPtr& rows)
 		{

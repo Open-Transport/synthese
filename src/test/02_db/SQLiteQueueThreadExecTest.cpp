@@ -3,7 +3,7 @@
 
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteUpdateHook.h"
 
 #include <boost/filesystem/operations.hpp>
@@ -80,14 +80,14 @@ public:
 	    return _labels;
 	}
 
-    void registerCallback (SQLiteQueueThreadExec* emitter)
+    void registerCallback (SQLite* emitter)
 	{
 	    _registerCalled = true;
 	}
 	
 
 	
-    void eventCallback (SQLiteQueueThreadExec* emitter,
+    void eventCallback (SQLite* emitter,
 			const SQLiteEvent& event)
 	{
 	    if ((event.opType == SQLITE_INSERT) 
@@ -95,7 +95,7 @@ public:
 	    {
 		// Query for row values
 		SQLiteResult result = 
-		    ((SQLiteQueueThreadExec*) emitter)->execQuery ("SELECT * FROM test_table WHERE id=" + 
+		    ((SQLite*) emitter)->execQuery ("SELECT * FROM test_table WHERE id=" + 
 								   Conversion::ToString (event.rowId));
 
 		for (int i=0; i<result.getNbRows (); ++i)
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE (testSingleUpdateHook1)
     createTestDb ("test_db.s3db", false); 
 
     TestUpdateHook* hook = new TestUpdateHook ();
-    SQLiteQueueThreadExec* sqliteExec = new SQLiteQueueThreadExec ("test_db.s3db");
+    SQLite* sqliteExec = new SQLite ("test_db.s3db");
 
     // Register hook before launching thread
     sqliteExec->registerUpdateHook (hook);

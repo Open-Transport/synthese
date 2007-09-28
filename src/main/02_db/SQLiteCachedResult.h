@@ -57,7 +57,7 @@ class SQLiteCachedResult : public SQLiteResult
 
  private:
 
-    friend class SQLite;
+    friend class SQLiteHandle;
 
     
 

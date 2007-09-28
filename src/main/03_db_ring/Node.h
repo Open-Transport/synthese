@@ -4,7 +4,7 @@
 #include "01_util/threads/ThreadExec.h"
 #include "01_util/concurrent/SynchronizedQueue.h"
 
-#include "02_db/SQLiteHandle.h"
+#include "02_db/SQLite.h"
 
 #include "03_db_ring/RingNode.h"
 #include "03_db_ring/UpdateLog.h"
@@ -39,7 +39,7 @@ namespace dbring
 
 @ingroup m03
 */
-class Node : public db::SQLiteHandle, public util::ThreadExec 
+class Node : public db::SQLite, public util::ThreadExec 
 {
 private:
     
@@ -85,11 +85,13 @@ public:
     */
     bool canWrite () const;
 
-    db::SQLiteResultSPtr execQuery (const db::SQLiteStatementSPtr& statement, bool lazy = true);
-    db::SQLiteResultSPtr execQuery (const db::SQLData& sql, bool lazy = true) ;
+    db::SQLiteResultSPtr execQuery (const db::SQLiteStatementSPtr& statement, bool lazy = false);
+    db::SQLiteResultSPtr execQuery (const db::SQLData& sql, bool lazy = false) ;
 
-    void execUpdate (const db::SQLiteStatementSPtr& statement, bool asynchronous = false) ;
-    void execUpdate (const db::SQLData& sql, bool asynchronous = false); 
+    db::SQLiteStatementSPtr compileStatement(const db::SQLData&);
+
+    void execUpdate (const db::SQLiteStatementSPtr& statement) ;
+    void execUpdate (const db::SQLData& sql); 
 
     void initialize ();
     void loop ();

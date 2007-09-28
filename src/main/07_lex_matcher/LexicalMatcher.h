@@ -199,9 +199,44 @@ namespace synthese
 			: _ignoreCase (ignoreCase)
 			, _ignoreWordOrder (ignoreWordOrder)
 			, _ignoreWordSpacing (ignoreWordSpacing)
-			, _translations (translations)
+			, _translations ()
 			, _separatorCharacters (separatorCharacters)
 		{
+
+		    for (std::map<std::string, std::string>::iterator it = _translations.globalTranslations.begin ();
+			 it != _translations.globalTranslations.end (); ++it)
+		    {
+			std::string search (it->first);
+			std::string replace (it->second);
+
+			boost::algorithm::trim (search);
+			boost::algorithm::trim (replace);
+			if (_ignoreCase)
+			{
+			    boost::algorithm::to_lower (search);
+			    boost::algorithm::to_lower (replace);
+			}
+			_translations.globalTranslations.insert (std::make_pair(search, replace));
+		    }
+		    
+		    for (std::map<std::string, std::string>::iterator it = _translations.wordTranslations.begin ();
+			 it != _translations.wordTranslations.end (); ++it)
+		    {
+			std::string search (it->first);
+			std::string replace (it->second);
+
+			boost::algorithm::trim (search);
+			boost::algorithm::trim (replace);
+			if (_ignoreCase)
+			{
+			    boost::algorithm::to_lower (search);
+			    boost::algorithm::to_lower (replace);
+			}
+			_translations.wordTranslations.insert (std::make_pair(search, replace));
+		    }
+		    
+		    
+		    
 		}
 
 
@@ -306,11 +341,7 @@ namespace synthese
 			for (std::map<std::string, std::string>::const_iterator it = _translations.globalTranslations.begin ();
 			 it != _translations.globalTranslations.end (); ++it)
 			{
-			std::string search = _ignoreCase ? boost::algorithm::to_lower_copy (it->first) : it->first;
-			boost::algorithm::trim (search);
-			std::string replace = _ignoreCase ? boost::algorithm::to_lower_copy (it->second) : it->second;
-			boost::algorithm::trim (replace);
-			boost::algorithm::replace_all (tmpkey, search, replace);
+			    boost::algorithm::replace_all (tmpkey, it->first, it->second);
 			}
 
 			// Trim the string
@@ -325,32 +356,19 @@ namespace synthese
 			 tok_iter != keyTokens.end (); 
 			 ++tok_iter) 
 			{
-			ppkey.tokens.push_back (*tok_iter);
-			}
+			    std::string tok (*tok_iter);
+			    
+			    // Apply word translations
+			    for (std::map<std::string, std::string>::const_iterator it = _translations.wordTranslations.begin ();
+				 it != _translations.wordTranslations.end (); ++it)
+			    {
+				if (tok == it->first) tok = it->second;
+			    }
+			    ppkey.tokens.push_back (tok);
+			    ppkey.oneWord.append (tok);
+			    ppkey.size += tok.size ();
+			    ppkey.maxWwmBonus += getWwmBonus (0, tok.size ());
 
-			// Apply word translations
-			for (std::map<std::string, std::string>::const_iterator it = _translations.wordTranslations.begin ();
-			 it != _translations.wordTranslations.end (); ++it)
-			{
-			std::string search = _ignoreCase ? boost::algorithm::to_lower_copy (it->first) : it->first;
-			boost::algorithm::trim (search);
-			std::string replace = _ignoreCase ? boost::algorithm::to_lower_copy (it->second) : it->second;
-			boost::algorithm::trim (replace);
-			
-			for (std::vector<std::string>::iterator it = ppkey.tokens.begin ();
-				 it != ppkey.tokens.end (); ++it)
-			{
-				if (*it == search) *it = replace;
-			}
-			}
-
-			for (tokenizer::iterator tok_iter = keyTokens.begin(); 
-			 tok_iter != keyTokens.end (); 
-			 ++tok_iter) 
-			{
-			ppkey.oneWord.append (*tok_iter);
-			ppkey.size += tok_iter->size ();
-			ppkey.maxWwmBonus += getWwmBonus (0, tok_iter->size ());
 			}
 
 			return ppkey;

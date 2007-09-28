@@ -28,7 +28,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -71,7 +71,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<OnlineReservationRule>::save(OnlineReservationRule* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -118,7 +118,7 @@ namespace synthese
 		}
 
 		void OnlineReservationRuleTableSync::rowsAdded(
-			SQLiteQueueThreadExec* sqlite
+			SQLite* sqlite
 			, SQLiteSync* sync
 			, const SQLiteResultSPtr& rows
 			, bool isFirstSync
@@ -139,7 +139,7 @@ namespace synthese
 			}
 		}
 		
-		void OnlineReservationRuleTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void OnlineReservationRuleTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
@@ -152,7 +152,7 @@ namespace synthese
 			}
 		}
 
-		void OnlineReservationRuleTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void OnlineReservationRuleTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
@@ -166,7 +166,7 @@ namespace synthese
 
 		vector<shared_ptr<OnlineReservationRule> > OnlineReservationRuleTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

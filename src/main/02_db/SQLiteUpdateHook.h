@@ -20,7 +20,7 @@ namespace synthese
 namespace db
 {
 
-    class SQLiteQueueThreadExec;
+    class SQLiteHandle;
 
 
 
@@ -52,11 +52,11 @@ namespace db
 
  public:
 
-    /** Method callback on hook registration with the SQLiteQueueThreadExec object.
+    /** Method callback on hook registration with the SQLiteHandle object.
      */
-    virtual void registerCallback (SQLiteQueueThreadExec* emitter) = 0;
+    virtual void registerCallback (SQLiteHandle* emitter) = 0;
     
-    virtual void eventCallback (SQLiteQueueThreadExec* emitter,
+    virtual void eventCallback (SQLiteHandle* emitter,
 				const SQLiteEvent& event) = 0;
 
 

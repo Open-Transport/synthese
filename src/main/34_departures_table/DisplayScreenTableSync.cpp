@@ -39,7 +39,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -160,7 +160,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<DisplayScreen>::save(DisplayScreen* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -325,7 +325,7 @@ namespace synthese
 			addTableColumn(COL_MAINTENANCE_MESSAGE, "TEXT");
 		}
 
-	    void DisplayScreenTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  
+	    void DisplayScreenTableSync::rowsAdded(db::SQLite* sqlite,  
 						   db::SQLiteSync* sync, 
 						   const db::SQLiteResultSPtr& rows, bool isFirstSync)
 	    {
@@ -345,7 +345,7 @@ namespace synthese
 	    }
 	    
 	    
-	    void DisplayScreenTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  
+	    void DisplayScreenTableSync::rowsUpdated(db::SQLite* sqlite,  
 						     db::SQLiteSync* sync, 
 						     const db::SQLiteResultSPtr& rows)
 	    {
@@ -358,7 +358,7 @@ namespace synthese
 	    
 
 	    
-	    void DisplayScreenTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  
+	    void DisplayScreenTableSync::rowsRemoved( db::SQLite* sqlite,  
 						      db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 	    {
 		while (rows->next ())
@@ -393,7 +393,7 @@ namespace synthese
 			, bool orderByMessage
 			, bool raisingOrder
 		){
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 			    << " SELECT"

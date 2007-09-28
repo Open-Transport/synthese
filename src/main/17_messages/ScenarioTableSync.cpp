@@ -31,7 +31,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
 #include "04_time/DateTime.h"
@@ -73,7 +73,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<Scenario>::save(Scenario* object)
 		{
-			SQLiteHandle* sqlite = DBModule::GetSQLite();
+			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			
 			ScenarioTemplate* tobject = dynamic_cast<ScenarioTemplate*>(object);
@@ -143,7 +143,7 @@ namespace synthese
 			addTableIndex(cols);
 		}
 
-		void ScenarioTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		void ScenarioTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		    while (rows->next ())
 			{
@@ -165,7 +165,7 @@ namespace synthese
 			}
 		}
 
-		void ScenarioTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
+		void ScenarioTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 		    while (rows->next ())
 			{
@@ -178,7 +178,7 @@ namespace synthese
 			}
 		}
 
-		void ScenarioTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		void ScenarioTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 		    while (rows->next ())
 		    {
