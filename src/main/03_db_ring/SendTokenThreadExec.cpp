@@ -52,8 +52,8 @@ namespace synthese
 			_transmissionStatusMap.setTransmissionStatus (_nodeInfo.getNodeId (), SUCCESS);
 			
  			  std::stringstream logstr;
- 			  logstr << "Node " << _emitterNodeId << " sent [" << _tokenBuffer.str ().size () << " bytes" <<  
-			      /* << _tokenBuffer.str () << */ "] to node " << _nodeInfo.getNodeId () << std::endl;
+ 			  logstr << "Node " << _emitterNodeId << " sent [" // << _tokenBuffer.str ().size () << " bytes" <<  
+			      << _tokenBuffer.str () << "] to node " << _nodeInfo.getNodeId () << std::endl;
 			  
  			  Log::GetInstance ().debug (logstr.str ());
 			

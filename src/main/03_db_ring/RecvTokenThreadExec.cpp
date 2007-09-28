@@ -78,8 +78,8 @@ namespace synthese
 		    tmp >> (*(token.get ()));
 
 		    std::stringstream logstr;
-		    logstr << "Node " << " recv [" << tmp.str ().size () << " bytes" <<
-			/*<<  (*token)  <<*/ "] fm node " << token->getEmitterNodeId () << std::endl;
+		    logstr << "Node " << " recv [" // << tmp.str ().size () << " bytes" <<
+			<<  (*token)  << "] fm node " << token->getEmitterNodeId () << std::endl;
 		    
 		    Log::GetInstance ().debug (logstr.str ());
 

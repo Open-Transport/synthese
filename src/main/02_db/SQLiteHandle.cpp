@@ -34,7 +34,6 @@ namespace synthese
 	
 	int sqliteBusyHandler (void* arg, int nbCalls)
 	{
-	    // std::cerr << "busy handleer !! " << std::endl;
 	    // Return a non-zero value so that a retry is made, waiting for SQLite not ot be busy anymore...
 	    return 1;
 	    
@@ -44,6 +43,7 @@ namespace synthese
 	
 	void sqliteUpdateHook (void* userData, int opType, const char* dbName, const char* tbName, sqlite_int64 rowId)
 	{
+
 	    // WARNING : the update hook is invoked only when working with the connection
 	    // created inside the body of this thread (initialize).
 	    UpdateHookStruct* uhs = (UpdateHookStruct*) userData;
@@ -146,8 +146,8 @@ namespace synthese
 	void 
 	SQLiteHandle::execUpdate (const SQLiteStatementSPtr& statement)
 	{
-	    UpdateHookStruct* uhs = getUpdateHookStruct ();
 	    
+	    UpdateHookStruct* uhs = getUpdateHookStruct ();
 	    uhs->events.clear ();
 
 	    int retc = SQLITE_ROW;
@@ -176,6 +176,45 @@ namespace synthese
 	}
 
 
+	void 
+	SQLiteHandle::execUpdate (const SQLData& sql)
+	{
+	    UpdateHookStruct* uhs = getUpdateHookStruct ();
+	    uhs->events.clear ();
+
+	    // Do a batch execution (no precompilation since it can contains more than one 
+	    // statement which is impossible to validate wihtout executing them one by one, given one database state)
+	    assert (sql.size () > 0);
+	    
+	    char* errMsg = 0;
+	    int retc = sqlite3_exec (getHandle (), 
+				     sql.c_str (), 
+				     0, 
+				     0, &errMsg);
+	    
+	    if (retc != SQLITE_OK)
+	    {
+		std::string msg (errMsg);
+		sqlite3_free (errMsg);
+		
+		throw SQLiteException ("Error executing batch update \"" + Conversion::ToTruncatedString (sql) + "\" : " + 
+				       msg + " (error=" + Conversion::ToString (retc) + ")");
+	    }
+
+	    // Call hooks!
+	    const std::vector<SQLiteEvent>& events = uhs->events;
+	    for (std::vector<SQLiteEvent>::const_iterator it = events.begin ();
+		 it != events.end (); ++it)
+	    {
+		for (std::vector<SQLiteUpdateHook*>::const_iterator ith = _hooks.begin ();
+		     ith != _hooks.end (); ++ith)
+		{
+		    (*ith)->eventCallback (this, *it);
+		}
+	    }
+
+
+	}
 
 
 	    

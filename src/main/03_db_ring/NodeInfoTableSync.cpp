@@ -62,7 +62,6 @@ namespace synthese
 		  << "," << Conversion::ToSQLiteString (to_iso_string (object->getLastPendingTimestamp ()))    
 		  << "," << Conversion::ToSQLiteString (to_iso_string (object->getLastAcknowledgedTimestamp ())) << ")";	    
 	    
-
 	    sqlite->execUpdate(query.str());
 	}
     }

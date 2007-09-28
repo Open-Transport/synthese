@@ -194,7 +194,7 @@ RingNode::sendToken ()
 
     if (_data->isModified ())
 	_data->setClock (_data->getInfo ().getClock () + 1);
-
+    
     
     std::vector<NodeId> tryNodes = _data->getNodesAfter (_data->getEmitterNodeId ());
 
@@ -291,13 +291,15 @@ RingNode::loop (const TokenSPtr& token)
 	// A token was received. 
 
 	// Update local state
-	if (_data->getInfo ().getState () == ENTRING)	{
+	if (_data->getInfo ().getState () == ENTRING)	
+	{
 	    _data->setState (INSRING);
 	} 
 	else if (_data->getInfo ().getState () == OUTRING)
 	{
 	    _data->setState (ENTRING);
 	}
+
 
 	// Merge token info.
 	_data->merge (_token);
@@ -328,6 +330,7 @@ RingNode::loop (const TokenSPtr& token)
 	{
 	    // Reset the timer only if the token has not been discarded!
 	    resetTimer ();
+
 
 	    sendToken ();
 	}
