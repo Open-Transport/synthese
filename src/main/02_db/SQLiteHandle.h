@@ -37,8 +37,8 @@ namespace synthese
 		private:
 		    
 		    const boost::filesystem::path _databaseFile;
-		    boost::thread_specific_ptr<sqlite3> _handle;
-		    boost::thread_specific_ptr<UpdateHookStruct> _updateHookStruct;
+		    mutable boost::thread_specific_ptr<sqlite3> _handle;
+		    mutable boost::thread_specific_ptr<UpdateHookStruct> _updateHookStruct;
 
 		    std::vector<SQLiteUpdateHook*> _hooks;   //!< Hooks to trigger on db update.
 		    boost::shared_ptr<boost::mutex> _hooksMutex; 
@@ -53,7 +53,7 @@ namespace synthese
 			//! @name SQLite db access methods.
 			//@{
 
-			sqlite3* getHandle ();
+			sqlite3* getHandle () const;
 
 			void registerUpdateHook (SQLiteUpdateHook* hook);
 
@@ -69,7 +69,7 @@ namespace synthese
 
 			//@}
 		private:
-			UpdateHookStruct* getUpdateHookStruct ();
+			UpdateHookStruct* getUpdateHookStruct () const;
 
 		};
 

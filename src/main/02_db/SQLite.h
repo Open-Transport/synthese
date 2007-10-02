@@ -32,7 +32,7 @@ namespace synthese
 			//! @name SQLite db access methods.
 			//@{
 
-			virtual sqlite3* getHandle () = 0;
+			virtual sqlite3* getHandle () const = 0;
 
 			virtual SQLiteStatementSPtr compileStatement (const SQLData& sql) = 0;
 

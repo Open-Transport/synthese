@@ -44,6 +44,7 @@ SQLiteStatement::SQLiteStatement (const SQLiteHandle& handle, const SQLData& sql
 }
 
 
+
 /*
 SQLiteStatement::SQLiteStatement (sqlite3_stmt* statement, const SQLData& sql)
     : _statement (statement)
@@ -68,6 +69,7 @@ int
 SQLiteStatement::getParameterIndex (const std::string& parameterName) const
 {
     return sqlite3_bind_parameter_index (getStatement (), parameterName.c_str ());
+
 }
 
 
@@ -249,7 +251,7 @@ SQLiteStatement::bindParameterLongLong (const std::string& name, long long param
 
 
 sqlite3_stmt* 
-SQLiteStatement::getStatement () 
+SQLiteStatement::getStatement () const
 { 
     if (_statement.get () != 0) return _statement.get ();
     

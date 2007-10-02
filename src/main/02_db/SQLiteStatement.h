@@ -1,7 +1,7 @@
 #ifndef SYNTHESE_DB_SQLITESTATEMENT_H
 #define SYNTHESE_DB_SQLITESTATEMENT_H
 
-#include <sqlite3.h>
+#include <sqlite/sqlite3.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/tss.hpp>
@@ -36,7 +36,7 @@ namespace synthese
 		const SQLiteHandle& _handle;
 		const SQLData _sql;
 
-		    boost::thread_specific_ptr<sqlite3_stmt> _statement;
+		    mutable boost::thread_specific_ptr<sqlite3_stmt> _statement;
 
 		    SQLiteStatement (const SQLiteHandle& handle, const SQLData& sql);
 		    // SQLiteStatement (const SQLiteHandle, const SQLData& sql);
@@ -86,7 +86,7 @@ namespace synthese
 
 		private:
 
-		    sqlite3_stmt* getStatement ();
+		    sqlite3_stmt* getStatement () const;
 
 		    friend class SQLiteLazyResult;
 		    friend class SQLiteBatchStatement;

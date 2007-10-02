@@ -66,6 +66,7 @@ namespace synthese
 
 	{
 	}
+
 	
 	
 	
@@ -86,7 +87,7 @@ namespace synthese
 
 
 	UpdateHookStruct* 
-	SQLiteHandle::getUpdateHookStruct ()
+	SQLiteHandle::getUpdateHookStruct () const
 	{
 	    if (_updateHookStruct.get () == 0)
 	    {
@@ -118,7 +119,7 @@ namespace synthese
 
 
 	sqlite3* 
-	SQLiteHandle::getHandle () 
+	SQLiteHandle::getHandle () const 
 	{
 	    if (_handle.get() == 0)
 	    {
