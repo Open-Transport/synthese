@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = SYNTHESE
 PROJECT_NUMBER         = 
-OUTPUT_DIRECTORY       = ../build
+OUTPUT_DIRECTORY       = ../../build/doc
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = French
 BRIEF_MEMBER_DESC      = YES
@@ -83,9 +83,9 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = . \
-                         ../src \
-                         ../resources
+INPUT                  = ./pages \
+                         ../main \
+                         ../../resources
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cpp \
@@ -96,21 +96,19 @@ FILE_PATTERNS          = *.c \
                          *.sql
 RECURSIVE              = YES
 EXCLUDE                = exemples \
-                         ../src/main/client_rs485 \
-                         ../src/main/cient_term \
-                         ../src/main/server \
-                         ../src/test
+                         ../test
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = *.inc.cpp \
                          *.gen.cpp
 EXCLUDE_SYMBOLS        = 
 EXAMPLE_PATH           = exemples \
-                         ../src/main \
-                         ../src/test
+                         ../main \
+                         ../test
 EXAMPLE_PATTERNS       = *.xml \
                          *.cpp
 EXAMPLE_RECURSIVE      = YES
-IMAGE_PATH             = images
+IMAGE_PATH             = images \
+                         ../../../../resources/doxygen/images
 INPUT_FILTER           = 
 FILTER_PATTERNS        = 
 FILTER_SOURCE_FILES    = NO
@@ -137,9 +135,9 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = 
-HTML_HEADER            = html/en-tete.html
-HTML_FOOTER            = html/footer.html
-HTML_STYLESHEET        = html/doxygen.css
+HTML_HEADER            = ../../../../resources/doxygen/html/en-tete.html
+HTML_FOOTER            = ../../../../resources/doxygen/html/footer.html
+HTML_STYLESHEET        = ../../../../resources/doxygen/html/doxygen.css
 HTML_ALIGN_MEMBERS     = YES
 GENERATE_HTMLHELP      = NO
 CHM_FILE               = 

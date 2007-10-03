@@ -4,7 +4,6 @@
 	Version="8,00"
 	Name="doc"
 	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
-	RootNamespace="doc"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -17,39 +16,18 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			OutputDirectory="..\..\build\doc"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="0"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			BuildLogFile="$(OutDir)\BuildLog.htm"
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
-				PreprocessorDefinitions=""
-				IncludeSearchPath=""
-				ForcedIncludes=""
-				AssemblySearchPath=""
-				ForcedUsingAssemblies=""
-				CompileAsManaged=""
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			>
-			<Tool
-				Name="VCNMakeTool"
-				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
-				PreprocessorDefinitions=""
+				BuildCommandLine="..\..\..\..\resources\doxygen\generate.bat"
+				ReBuildCommandLine="..\..\..\..\resources\doxygen\clean.bat&#x0D;&#x0A;..\..\..\..\resources\doxygen\generate.bat"
+				CleanCommandLine="..\..\..\..\resources\doxygen\clean.bat"
+				Output="..\..\build\doc\html\index.html"
+				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -61,6 +39,170 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="images"
+			>
+			<File
+				RelativePath=".\images\1195515.2.000.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\1195515_1_000.eps"
+				>
+			</File>
+			<File
+				RelativePath=".\images\1195561.2.000.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\1195561_1_000.eps"
+				>
+			</File>
+			<File
+				RelativePath=".\images\1195572.2.000.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\1195572_1_000.eps"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_display.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_display_maint.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_display_types.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_displays.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_home.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_login.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_logs.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_logviewer.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_message.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_messages.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_messages_library.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_place.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_places.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_profile.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_scenario.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_scenario_send.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_user.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_users.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\cap_admin_users_profiles.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\m3.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\supervision_sai_display_failure.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\supervision_sai_normal.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\supervision_sai_pc_failure.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\supervision_sai_vide.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\uc35-resultat.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\uc35-source.png"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="examples"
+			>
+			<File
+				RelativePath=".\exemples\environnement.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\exemples\requete_carto.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\exemples\synthese_env.xsd"
+				>
+				<File
+					RelativePath=".\synthese_env.h"
+					>
+				</File>
+				<File
+					RelativePath=".\exemples\synthese_env.xsx"
+					>
+				</File>
+			</File>
+		</Filter>
+		<Filter
+			Name="customer_specs"
+			>
+			<File
+				RelativePath=".\customer_specs\sai_tisseo.doxygen"
+				>
+			</File>
+		</Filter>
 		<Filter
 			Name="pages"
 			>
@@ -101,11 +243,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\pages\main.doxygen"
+				RelativePath=".\pages\modules.doxygen"
 				>
 			</File>
 			<File
-				RelativePath=".\pages\modules.doxygen"
+				RelativePath=".\pages\tables.doxygen"
 				>
 			</File>
 			<File
@@ -113,35 +255,7 @@
 				>
 			</File>
 			<Filter
-				Name="customer_specs"
-				>
-				<File
-					RelativePath=".\customer_specs\sai_tisseo.doxygen"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="html"
-			>
-			<File
-				RelativePath=".\html\doxygen.css"
-				>
-			</File>
-			<File
-				RelativePath=".\html\en-tete.html"
-				>
-			</File>
-			<File
-				RelativePath=".\html\footer.html"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="schemas"
-			>
-			<Filter
-				Name="captures sai"
+				Name="sai"
 				>
 				<File
 					RelativePath=".\schemas\capturesSAI\admin_display.htm"
@@ -240,16 +354,48 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="schemas"
+			>
+			<File
+				RelativePath=".\schemas\arrets.VSD"
+				>
+			</File>
+			<File
+				RelativePath=".\schemas\associateur.VSD"
+				>
+			</File>
+			<File
+				RelativePath=".\schemas\m3.vsd"
+				>
+			</File>
+			<File
+				RelativePath=".\schemas\pg.VSD"
+				>
+			</File>
+			<File
+				RelativePath=".\schemas\recherche_adresses.VSD"
+				>
+			</File>
+			<File
+				RelativePath=".\schemas\supervision_sai.VSD"
+				>
+			</File>
+			<File
+				RelativePath=".\schemas\texttopade.VSD"
+				>
+			</File>
+			<File
+				RelativePath=".\schemas\uc35.vsd"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\Doxyfile.doxyfile"
 			>
 		</File>
 		<File
-			RelativePath=".\groups.doxygen"
-			>
-		</File>
-		<File
-			RelativePath=".\SConscript"
+			RelativePath=".\pages\main.doxygen"
 			>
 		</File>
 	</Files>
