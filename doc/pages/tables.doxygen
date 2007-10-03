@@ -1,0 +1,10 @@
+/**
+
+@page tables SQLite Tables
+
+<table><tr><th>Numéro</th><th>Classe</th><th>Module</th><th>Documentation</th></table>
+<tr><td>2</td><td>AddressesTableSync</td><td>EnvModule</td><td>@copydoc AddressesTableSync</td></tr>
+<tr><td>3</td><td>AlarmsTableSync</td><td>@ref m17</td><td>@copydoc AlarmTableSync</td></tr>
+</table>
+
+*/
