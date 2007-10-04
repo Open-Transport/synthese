@@ -1,4 +1,4 @@
-# Doxyfile 1.5.2
+# Doxyfile 1.5.3
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -11,9 +11,9 @@ CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = French
 BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = YES
-ABBREVIATE_BRIEF       = "The $name class" \
-                         "The $name widget" \
-                         "The $name file" \
+ABBREVIATE_BRIEF       = "The $name class  " \
+                         "The $name widget  " \
+                         "The $name file  " \
                          is \
                          provides \
                          specifies \
@@ -29,6 +29,7 @@ STRIP_FROM_PATH        =
 STRIP_FROM_INC_PATH    = 
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = NO
 MULTILINE_CPP_IS_BRIEF = NO
 DETAILS_AT_TOP         = YES
 INHERIT_DOCS           = YES
@@ -49,6 +50,7 @@ EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
 EXTRACT_LOCAL_METHODS  = NO
+EXTRACT_ANON_NSPACES   = NO
 HIDE_UNDOC_MEMBERS     = NO
 HIDE_UNDOC_CLASSES     = NO
 HIDE_FRIEND_COMPOUNDS  = NO
@@ -78,14 +80,15 @@ WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = YES
-WARN_FORMAT            = "$file($line) $text"
+WARN_FORMAT            = "$file($line) $text  "
 WARN_LOGFILE           = 
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ./pages \
-                         ../main \
-                         ../../resources
+INPUT                  = ../main \
+                         ../../../../resources \
+                         pages \
+                         cistomer_specs
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cpp \
@@ -140,6 +143,7 @@ HTML_FOOTER            = ../../../../resources/doxygen/html/footer.html
 HTML_STYLESHEET        = ../../../../resources/doxygen/html/doxygen.css
 HTML_ALIGN_MEMBERS     = YES
 GENERATE_HTMLHELP      = NO
+HTML_DYNAMIC_SECTIONS  = NO
 CHM_FILE               = 
 HHC_LOCATION           = 
 GENERATE_CHI           = NO
@@ -208,15 +212,15 @@ EXPAND_ONLY_PREDEF     = NO
 SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = 
 INCLUDE_FILE_PATTERNS  = 
-PREDEFINED             = "DECLARE_INTERFACE(name)=class name" \
-                         "STDMETHOD(result,name)=virtual result name" \
-                         "PURE= = 0" \
+PREDEFINED             = "DECLARE_INTERFACE(name)=class name  " \
+                         "STDMETHOD(result,name)=virtual result name  " \
+                         "PURE= = 0  " \
                          THIS_= \
                          THIS= \
                          DECLARE_REGISTRY_RESOURCEID=// \
                          DECLARE_PROTECT_FINAL_CONSTRUCT=// \
-                         "DECLARE_AGGREGATABLE(Class)= " \
-                         "DECLARE_REGISTRY_RESOURCEID(Id)= " \
+                         "DECLARE_AGGREGATABLE(Class)=   " \
+                         "DECLARE_REGISTRY_RESOURCEID(Id)=   " \
                          DECLARE_MESSAGE_MAP \
                          = \
                          BEGIN_MESSAGE_MAP=/* \
@@ -232,35 +236,35 @@ PREDEFINED             = "DECLARE_INTERFACE(name)=class name" \
                          BEGIN_OBJECT_MAP=/* \
                          END_OBJECT_MAP()=*/// \
                          DECLARE_VIEW_STATUS=// \
-                         "STDMETHOD(a)=HRESULT a" \
-                         "ATL_NO_VTABLE= " \
-                         "__declspec(a)= " \
+                         "STDMETHOD(a)=HRESULT a  " \
+                         "ATL_NO_VTABLE=   " \
+                         "__declspec(a)=   " \
                          BEGIN_CONNECTION_POINT_MAP=/* \
                          END_CONNECTION_POINT_MAP=*/// \
-                         "DECLARE_DYNAMIC(class)= " \
-                         "IMPLEMENT_DYNAMIC(class1, class2)= " \
-                         "DECLARE_DYNCREATE(class)= " \
-                         "IMPLEMENT_DYNCREATE(class1, class2)= " \
-                         "IMPLEMENT_SERIAL(class1, class2, class3)= " \
-                         "DECLARE_MESSAGE_MAP()= " \
+                         "DECLARE_DYNAMIC(class)=   " \
+                         "IMPLEMENT_DYNAMIC(class1, class2)=   " \
+                         "DECLARE_DYNCREATE(class)=   " \
+                         "IMPLEMENT_DYNCREATE(class1, class2)=   " \
+                         "IMPLEMENT_SERIAL(class1, class2, class3)=   " \
+                         "DECLARE_MESSAGE_MAP()=   " \
                          TRY=try \
-                         "CATCH_ALL(e)= catch(...)" \
+                         "CATCH_ALL(e)= catch(...)  " \
                          END_CATCH_ALL= \
-                         "THROW_LAST()= throwRUNTIME_CLASS(class)=class" \
+                         "THROW_LAST()= throwRUNTIME_CLASS(class)=class  " \
                          MAKEINTRESOURCE(nId)=nId \
-                         "IMPLEMENT_REGISTER(v, w, x, y, z)= " \
+                         "IMPLEMENT_REGISTER(v, w, x, y, z)=   " \
                          ASSERT(x)=assert(x) \
                          ASSERT_VALID(x)=assert(x) \
                          TRACE0(x)=printf(x) \
-                         "OS_ERR(A,B)={ #A, B }" \
+                         "OS_ERR(A,B)={ #A, B }  " \
                          __cplusplus \
-                         "DECLARE_OLECREATE(class)= " \
-                         "BEGIN_DISPATCH_MAP(class1, class2)= " \
-                         "INTERFACE_PART(class, id, name)= " \
+                         "DECLARE_OLECREATE(class)=   " \
+                         "BEGIN_DISPATCH_MAP(class1, class2)=   " \
+                         "INTERFACE_PART(class, id, name)=   " \
                          END_INTERFACE_MAP()= \
-                         "DISP_FUNCTION(class, name, function, result, id)=" \
+                         "DISP_FUNCTION(class, name, function, result, id)=  " \
                          END_DISPATCH_MAP()= \
-                         "IMPLEMENT_OLECREATE2(class, name, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11)="
+                         "IMPLEMENT_OLECREATE2(class, name, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11)=  "
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
@@ -275,7 +279,7 @@ PERL_PATH              =
 # Configuration options related to the dot tool   
 #---------------------------------------------------------------------------
 CLASS_DIAGRAMS         = YES
-MSCGEN_PATH            = "C:\Program Files\MSCGen"
+MSCGEN_PATH            = "C:\Program Files\MSCGen  "
 HIDE_UNDOC_RELATIONS   = NO
 HAVE_DOT               = YES
 CLASS_GRAPH            = NO
@@ -293,6 +297,7 @@ DOT_IMAGE_FORMAT       = png
 DOT_PATH               = 
 DOTFILE_DIRS           = 
 DOT_GRAPH_MAX_NODES    = 50
+MAX_DOT_GRAPH_DEPTH    = 1000
 DOT_TRANSPARENT        = NO
 DOT_MULTI_TARGETS      = NO
 GENERATE_LEGEND        = YES
