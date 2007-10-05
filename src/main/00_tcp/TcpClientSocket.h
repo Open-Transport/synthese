@@ -28,6 +28,7 @@
 #include <boost/iostreams/concepts.hpp> 
 #include <boost/shared_ptr.hpp>
 
+#include "Socket.h"
 #include "SocketException.h"
 
 
@@ -36,7 +37,6 @@ namespace synthese
 namespace tcp
 {
 
-class Socket;
   
 /** TCP client side socket device.
 
