@@ -28,7 +28,9 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "PedestrianCompliance.h"
+
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -39,7 +41,7 @@ namespace synthese
 		/** PedestrianCompliances table synchronizer.
 			@ingroup m15LS refLS
 		*/
-		class PedestrianComplianceTableSync : public db::SQLiteTableSyncTemplate<PedestrianCompliance>
+		class PedestrianComplianceTableSync : public db::SQLiteRegistryTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>
 		{
 		public:
 			static const std::string COL_STATUS;
@@ -59,31 +61,6 @@ namespace synthese
 			static std::vector<boost::shared_ptr<PedestrianCompliance> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on PedestrianCompliances creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on PedestrianCompliances creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on PedestrianCompliances deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		};
 	}

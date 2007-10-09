@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace messages
@@ -34,9 +36,9 @@ namespace synthese
 		class TextTemplate;
 
 		/** UpdateTextTemplateAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
-		class UpdateTextTemplateAction : public server::Action
+		class UpdateTextTemplateAction : public util::FactorableTemplate<server::Action, UpdateTextTemplateAction>
 		{
 		public:
 			static const std::string PARAMETER_TEXT_ID;

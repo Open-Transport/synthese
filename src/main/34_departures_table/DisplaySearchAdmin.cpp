@@ -61,6 +61,7 @@ namespace synthese
 	using namespace env;
 	using namespace html;
 	using namespace departurestable;
+	using namespace security;
 
 	namespace util
 	{
@@ -98,44 +99,22 @@ namespace synthese
 
 		void DisplaySearchAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-			
-			it = map.find(PARAMETER_SEARCH_LOCALIZATION_ID);
-			if (it == map.end() || Conversion::ToLongLong(it->second) == UNKNOWN_VALUE)
+			uid placeId(map.getUid(PARAMETER_SEARCH_LOCALIZATION_ID, false, FACTORY_KEY));
+			if (placeId == UNKNOWN_VALUE)
 			{
-				it = map.find(PARAMETER_SEARCH_CITY);
-				if (it != map.end())
-					_searchCity = it->second;
-
-				it = map.find(PARAMETER_SEARCH_STOP);
-				if (it != map.end())
-					_searchStop = it->second;
-
-				it = map.find(PARAMETER_SEARCH_NAME);
-				if (it != map.end())
-					_searchName = it->second;
-
-				it = map.find(PARAMETER_SEARCH_LINE_ID);
-				if (it != map.end())
-					_searchLineId = Conversion::ToLongLong(it->second);
-
-				it = map.find(PARAMETER_SEARCH_TYPE_ID);
-				if (it != map.end())
-					_searchTypeId = Conversion::ToLongLong(it->second);
-
-				it = map.find(PARAMETER_SEARCH_STATE);
-				if (it != map.end())
-					_searchState = Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_SEARCH_MESSAGE);
-				if (it != map.end())
-					_searchMessage = Conversion::ToInt(it->second);
+				_searchCity = map.getString(PARAMETER_SEARCH_CITY, false, FACTORY_KEY);
+				_searchStop = map.getString(PARAMETER_SEARCH_STOP, false, FACTORY_KEY);
+				_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
+				_searchLineId = map.getUid(PARAMETER_SEARCH_LINE_ID, false, FACTORY_KEY);
+				_searchTypeId = map.getUid(PARAMETER_SEARCH_TYPE_ID, false, FACTORY_KEY);
+				_searchState = map.getInt(PARAMETER_SEARCH_STATE, false, FACTORY_KEY);
+				_searchMessage = map.getInt(PARAMETER_SEARCH_MESSAGE, false, FACTORY_KEY);
 			}
 			else
 			{
 				try
 				{
-					_place = ConnectionPlaceTableSync::get(Conversion::ToLongLong(it->second));
+					_place = ConnectionPlaceTableSync::Get(placeId);
 				}
 				catch (...)
 				{
@@ -143,7 +122,7 @@ namespace synthese
 				}
 			}
 
-			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_CITY, 30);
+			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_CITY, 30);
 		}
 
 		string DisplaySearchAdmin::getTitle() const
@@ -242,8 +221,8 @@ namespace synthese
 				maintRequest.setObjectId(screen->getKey());
 
 				stream << t.row(Conversion::ToString(screen->getKey()));
-				stream << t.col() << (screen->getLocalization().get() ? screen->getLocalization()->getCity()->getName() : "(indéterminé)");
-				stream << t.col() << (screen->getLocalization().get() ? screen->getLocalization()->getName() : "(indéterminé)");
+				stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getCity()->getName() : "(indéterminé)");
+				stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getName() : "(indéterminé)");
 				stream << t.col() << screen->getLocalizationComment();
 				stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
 				stream << t.col(); // Bullets showing the states of the display

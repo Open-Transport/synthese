@@ -31,6 +31,7 @@
 
 #include "01_util/ModuleClass.h"
 #include "01_util/UId.h"
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -72,7 +73,7 @@ namespace synthese
 
 		/** 12 Security module class.
 		*/
-		class SecurityModule : public util::ModuleClass
+		class SecurityModule : public util::FactorableTemplate<util::ModuleClass, SecurityModule>
 		{
 		public:
 			static const std::string ROOT_PROFILE;

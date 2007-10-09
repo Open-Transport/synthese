@@ -119,5 +119,15 @@ namespace synthese
 		{
 			_complements = complements;
 		}
+
+		boost::shared_ptr<const SentAlarm> SentAlarm::Get( uid key )
+		{
+			return Registrable<uid, SentAlarm>::Get(key);
+		}
+
+		bool SentAlarm::Contains( uid key )
+		{
+			return Registrable<uid, SentAlarm>::Contains(key);
+		}
 	}
 }

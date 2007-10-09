@@ -25,6 +25,7 @@
 #define SYNTHESE_PlacesListModule_H__
 
 #include "01_util/ModuleClass.h"
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -64,7 +65,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** 16 Transport website module class. */
-		class PlacesListModule : public util::ModuleClass
+		class PlacesListModule : public util::FactorableTemplate<util::ModuleClass, PlacesListModule>
 		{
 		public:
 

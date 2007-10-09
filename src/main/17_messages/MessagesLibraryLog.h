@@ -48,18 +48,18 @@ namespace synthese
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			static void	addUpdateEntry(
-				boost::shared_ptr<const AlarmTemplate> alarm
+				const AlarmTemplate* alarm
 				, const std::string& text
-				, boost::shared_ptr<const security::User> user
+				, const security::User* user
 				);
 			static void	addUpdateEntry(
-				boost::shared_ptr<const ScenarioTemplate> scenario
+				const ScenarioTemplate* scenario
 				, const std::string& text
-				, boost::shared_ptr<const security::User> user
+				, const security::User* user
 				);
 			static void addDeleteEntry(
-				boost::shared_ptr<const ScenarioTemplate> scenario
-				, boost::shared_ptr<const security::User> user
+				const ScenarioTemplate* scenario
+				, const security::User* user
 				);
 			std::string getObjectName(uid id) const;
 		};

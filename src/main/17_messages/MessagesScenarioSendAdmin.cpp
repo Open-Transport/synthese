@@ -49,7 +49,7 @@ namespace synthese
 		{
 			AdminRequest::ParametersMap::const_iterator it;
 
-			it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
+			it = map.find(AdminQueryString::PARAMETER_OBJECT_ID);
 			if (it == map.end())
 				throw AdminParametersException("Scenario not specified");
 

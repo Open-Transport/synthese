@@ -23,23 +23,22 @@
 #ifndef SYNTHESE_PublicPlaceTableSync_H__
 #define SYNTHESE_PublicPlaceTableSync_H__
 
+#include "PublicPlace.h"
+
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
-
 namespace synthese
 {
 	namespace env
 	{
-		class PublicPlace;
-
 		/** PublicPlace table synchronizer.
 			@ingroup m15LS refLS
 		*/
-		class PublicPlaceTableSync : public db::SQLiteTableSyncTemplate<PublicPlace>
+		class PublicPlaceTableSync : public db::SQLiteRegistryTableSyncTemplate<PublicPlaceTableSync,PublicPlace>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -60,38 +59,9 @@ namespace synthese
 				// other search parameters ,
 				int first = 0, int number = 0);
 
-
-		protected:
-
-			/** Action to do on PublicPlace creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows
-				, bool);
-
-			/** Action to do on PublicPlace creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on PublicPlace deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }
 
 #endif // SYNTHESE_PublicPlaceTableSync_H__
-
-
-static const std::string PUBLICPLACES_TABLE_NAME ("t013_public_places");
 

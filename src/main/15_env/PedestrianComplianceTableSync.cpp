@@ -29,7 +29,6 @@
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
-#include "PedestrianCompliance.h"
 #include "PedestrianComplianceTableSync.h"
 
 using namespace std;
@@ -42,13 +41,15 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,PedestrianComplianceTableSync>::FACTORY_KEY("15.10.05 Pedestrian compliances");
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PedestrianCompliance>::TABLE_NAME = "t018_pedestrian_compliances";
-		template<> const int SQLiteTableSyncTemplate<PedestrianCompliance>::TABLE_ID = 18;
-		template<> const bool SQLiteTableSyncTemplate<PedestrianCompliance>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::TABLE_NAME = "t018_pedestrian_compliances";
+		template<> const int SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::TABLE_ID = 18;
+		template<> const bool SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PedestrianCompliance>::load(PedestrianCompliance* cmp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::load(PedestrianCompliance* cmp, const db::SQLiteResultSPtr& rows )
 		{
 			cmp->setKey(rows->getLongLong (TABLE_COL_ID));
 
@@ -71,7 +72,7 @@ namespace synthese
 			cmp->setCapacity (capacity);
 		}
 
-		template<> void SQLiteTableSyncTemplate<PedestrianCompliance>::save(PedestrianCompliance* object)
+		template<> void SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::save(PedestrianCompliance* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -94,6 +95,16 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
+		template<> void SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::_link(PedestrianCompliance* obj, const SQLiteResultSPtr& row, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::_unlink(PedestrianCompliance* obj)
+		{
+
+		}
+
 	}
 
 	namespace env
@@ -102,46 +113,11 @@ namespace synthese
 		const std::string PedestrianComplianceTableSync::COL_CAPACITY ("capacity");
 
 		PedestrianComplianceTableSync::PedestrianComplianceTableSync()
-			: SQLiteTableSyncTemplate<PedestrianCompliance>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_STATUS, "INTEGER");
 			addTableColumn (COL_CAPACITY, "INTEGER");
-		}
-
-		void PedestrianComplianceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				PedestrianCompliance* object(new PedestrianCompliance());
-				load(object, rows);
-				object->store();
-			}
-		}
-
-		void PedestrianComplianceTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (PedestrianCompliance::Contains(id))
-				{
-					shared_ptr<PedestrianCompliance> object = PedestrianCompliance::GetUpdateable(id);
-					load(object.get(), rows);
-				}
-			}
-		}
-
-		void PedestrianComplianceTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (PedestrianCompliance::Contains(id))
-				{
-					PedestrianCompliance::Remove(id);
-				}
-			}
 		}
 
 		std::vector<shared_ptr<PedestrianCompliance> > PedestrianComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )

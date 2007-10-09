@@ -83,7 +83,7 @@ namespace synthese
 				T* createTyped ()
 				{
 					T* obj(new T);
-					obj->setFactoryKey(getKey<T>());
+//					obj->setFactoryKey(getKey<T>());
 					return obj;
 				}
 			};
@@ -109,7 +109,7 @@ namespace synthese
 				@param key Text key of the subclass
 				@return the key if ok, empty string if the subclass is already registered
 			*/
-			template <class T>
+/*			template <class T>
 				static void integrate(const typename Map::key_type& key)
 			{
 				Log::GetInstance ().debug ("Registering compound... " + key);
@@ -123,7 +123,7 @@ namespace synthese
 				_registeredCreator.insert(std::pair<typename Map::key_type, 
 							       CreatorInterface*>(key, creator));
 			}
-
+*/
 			/** Subclass automatic registration.
 				@return the key if ok, empty string if the subclass is already registered
 			*/

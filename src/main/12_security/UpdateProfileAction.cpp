@@ -20,14 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "12_security/UpdateProfileAction.h"
-#include "12_security/Profile.h"
+#include "UpdateProfileAction.h"
+
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 #include "13_dblog/DBLogModule.h"
 
@@ -53,7 +54,7 @@ namespace synthese
 		ParametersMap UpdateProfileAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_NAME, _name));
+			map.insert(PARAMETER_NAME, _name);
 			return map;
 		}
 
@@ -62,7 +63,7 @@ namespace synthese
 			// Profile
 			try
 			{
-				_profile = ProfileTableSync::get(_request->getObjectId());
+				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
 			}
 			catch (DBEmptyResultException<Profile>)
 			{
@@ -70,7 +71,7 @@ namespace synthese
 			}
 
 			// Name
-			_name = Request::getStringFormParameterMap(map, PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::search(string(), _name, string(), 0,1);
 			if (!existingProfiles.empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
@@ -87,7 +88,7 @@ namespace synthese
 			ProfileTableSync::save(_profile.get());
 
 			// Log
-			SecurityLog::addProfileAdmin(_request->getUser(), _profile, log.str());
+			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), log.str());
 		}
 	}
 }

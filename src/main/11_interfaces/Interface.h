@@ -86,13 +86,13 @@ namespace synthese
 
 				//! \name Modifiers
 				//@{
-					void	addPage(const std::string& key, InterfacePage* page );
+					void	addPage(InterfacePage* page );
 					void	removePage( const std::string& page_code );
 					void	setNoSessionDefaultPageCode(const std::string&);
 					void	setName(const std::string& name);
 				//@}
 
-				Interface( const uid& id);
+				Interface( const uid id = UNKNOWN_VALUE);
 		};
 	}
 }

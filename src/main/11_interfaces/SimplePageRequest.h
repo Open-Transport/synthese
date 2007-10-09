@@ -27,6 +27,8 @@
 
 #include "11_interfaces/RequestWithInterface.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace interfaces
@@ -41,7 +43,7 @@ namespace synthese
 
 			NB : Only non registered pages can be displayed. To display a registered page, call a proper function directly.
 		*/
-		class SimplePageRequest : public RequestWithInterface
+		class SimplePageRequest : public util::FactorableTemplate<RequestWithInterface, SimplePageRequest>
 		{
 			static const std::string PARAMETER_PAGE;
 

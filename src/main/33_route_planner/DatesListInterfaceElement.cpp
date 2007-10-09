@@ -42,6 +42,8 @@ namespace synthese
 	using namespace time;
 	using namespace transportwebsite;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::DatesListInterfaceElement>::FACTORY_KEY("dates_list");
+
 	namespace routeplanner
 	{
 		void DatesListInterfaceElement::storeParameters(ValueElementList& vel)

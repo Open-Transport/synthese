@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -37,7 +39,7 @@ namespace synthese
 		/** UserUpdateAction action class.
 			@ingroup m12Actions refActions
 		*/
-		class UserUpdateAction : public server::Action
+		class UserUpdateAction : public util::FactorableTemplate<server::Action,UserUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_LOGIN;

@@ -42,16 +42,20 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,BikeComplianceTableSync>::FACTORY_KEY("15.10.03 Bike compliances");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<BikeCompliance>::TABLE_NAME = "t020_bike_compliances";
-		template<> const int SQLiteTableSyncTemplate<BikeCompliance>::TABLE_ID = 20;
-		template<> const bool SQLiteTableSyncTemplate<BikeCompliance>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::TABLE_NAME = "t020_bike_compliances";
+		template<> const int SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::TABLE_ID = 20;
+		template<> const bool SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<BikeCompliance>::load(BikeCompliance* cmp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::load(BikeCompliance* cmp, const db::SQLiteResultSPtr& rows)
 		{
-		    cmp->setKey(rows->getLongLong (TABLE_COL_ID));
-
+			// Columns reading
 			tribool status = true;
 			int statusInt (rows->getInt (BikeComplianceTableSync::COL_STATUS));
 			if (statusInt < 0)
@@ -65,12 +69,23 @@ namespace synthese
 
 			int capacity (rows->getInt (BikeComplianceTableSync::COL_CAPACITY));
 			
+			// Properties
+			cmp->setKey(rows->getLongLong (TABLE_COL_ID));
 			cmp->setCompliant (status);
 			cmp->setCapacity (capacity);
 		}
 
+		template<> void SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::_link(BikeCompliance* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
 
-		template<> void SQLiteTableSyncTemplate<BikeCompliance>::save(BikeCompliance* object)
+		}
+
+		template<> void SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::_unlink(BikeCompliance* obj)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::save(BikeCompliance* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -101,48 +116,11 @@ namespace synthese
 		const std::string BikeComplianceTableSync::COL_CAPACITY ("capacity");
 
 		BikeComplianceTableSync::BikeComplianceTableSync()
-			: SQLiteTableSyncTemplate<BikeCompliance>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_STATUS, "INTEGER");
 			addTableColumn (COL_CAPACITY, "INTEGER");
-		}
-
-		void BikeComplianceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				BikeCompliance* object(new BikeCompliance());
-				load(object, rows);
-				object->store();
-			}
-		}
-
-
-		void BikeComplianceTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (BikeCompliance::Contains(id))
-				{
-					shared_ptr<BikeCompliance> object = BikeCompliance::GetUpdateable(id);
-					load(object.get(), rows);
-					object->store();
-				}
-			}
-		}
-
-		void BikeComplianceTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (BikeCompliance::Contains(id))
-				{
-					BikeCompliance::Remove(id);
-				}
-			}
 		}
 
 		std::vector<shared_ptr<BikeCompliance> > BikeComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )

@@ -24,10 +24,13 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 #include "34_departures_table/DisplayScreenRemovePhysicalStopAction.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+
+#include "01_util/Conversion.h"
 
 using namespace boost;
 using namespace std;
@@ -37,6 +40,9 @@ namespace synthese
 	using namespace db;
 	using namespace server;
 	using namespace env;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemovePhysicalStopAction>::FACTORY_KEY("dsrps");
 	
 	namespace departurestable
 	{
@@ -54,14 +60,10 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_PHYSICAL);
-				if (it == map.end())
-					throw ActionException("Place not specified");
-				_stop = PhysicalStop::Get(Conversion::ToLongLong(it->second));
+				uid id(map.getUid(PARAMETER_PHYSICAL, true, FACTORY_KEY));
+				_stop = PhysicalStop::Get(id);
 			}
 			catch (DBEmptyResultException<DisplayScreen>& e)
 			{
@@ -75,7 +77,7 @@ namespace synthese
 
 		void DisplayScreenRemovePhysicalStopAction::run()
 		{
-			_screen->removePhysicalStop(_stop);
+			_screen->removePhysicalStop(_stop.get());
 			DisplayScreenTableSync::save(_screen.get());
 		}
 	}

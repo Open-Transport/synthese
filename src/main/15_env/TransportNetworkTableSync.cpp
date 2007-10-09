@@ -22,8 +22,6 @@
 
 #include "TransportNetworkTableSync.h"
 
-#include "15_env/TransportNetwork.h"
-
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
 
@@ -43,13 +41,15 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,TransportNetworkTableSync>::FACTORY_KEY("15.20.02 Network transport");
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TransportNetwork>::TABLE_NAME("t022_transport_networks");
-		template<> const int SQLiteTableSyncTemplate<TransportNetwork>::TABLE_ID(22);
-		template<> const bool SQLiteTableSyncTemplate<TransportNetwork>::HAS_AUTO_INCREMENT(true);
+		template<> const std::string SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::TABLE_NAME("t022_transport_networks");
+		template<> const int SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::TABLE_ID(22);
+		template<> const bool SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::HAS_AUTO_INCREMENT(true);
 
-		template<> void SQLiteTableSyncTemplate<TransportNetwork>::load(TransportNetwork* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::load(TransportNetwork* object, const db::SQLiteResultSPtr& rows )
 		{
 			std::string name (rows->getText (TransportNetworkTableSync::COL_NAME));
 
@@ -57,7 +57,7 @@ namespace synthese
 			object->setName(name);
 		}
 
-		template<> void SQLiteTableSyncTemplate<TransportNetwork>::save(TransportNetwork* object)
+		template<> void SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::save(TransportNetwork* object)
 		{
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -72,6 +72,16 @@ namespace synthese
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
+		template<> void SQLiteTableSyncTemplate<TransportNetworkTableSync, TransportNetwork>::_link(TransportNetwork* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<TransportNetworkTableSync, TransportNetwork>::_unlink(TransportNetwork* obj)
+		{
+
+		}
+
 	}
 
 	namespace env
@@ -79,59 +89,13 @@ namespace synthese
 		const string TransportNetworkTableSync::COL_NAME("name");
 
 		TransportNetworkTableSync::TransportNetworkTableSync ()
-		: SQLiteTableSyncTemplate<TransportNetwork>(true, true, db::TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_NAME, "TEXT");
 		}
 
 
-		void TransportNetworkTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync /*= false*/ )
-		{
-			while (rows->next ())
-			{
-			    uid id (rows->getLongLong (TABLE_COL_ID));
-
-			    if (TransportNetwork::Contains(id))
-			    {
-					shared_ptr<TransportNetwork> object = TransportNetwork::GetUpdateable(id);
-					load(object.get(), rows);
-			    }
-			    else
-			    {
-					TransportNetwork* object(new TransportNetwork);
-					load(object, rows);
-					object->store();
-			    }
-			}
-		}
-
-		void TransportNetworkTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-		    while (rows->next ())
-		    {
-			uid id (rows->getLongLong ( TABLE_COL_ID));
-			
-			if (!TransportNetwork::Contains(id))
-			    continue;
-			
-			shared_ptr<TransportNetwork> object = TransportNetwork::GetUpdateable(id);
-			load(object.get(), rows);
-		    }
-		}
-
-
-		void TransportNetworkTableSync::rowsRemoved( db::SQLite* sqlite,  
-							     db::SQLiteSync* sync, 
-							     const db::SQLiteResultSPtr& rows )
-		{
-		    while (rows->next ())
-		    {
-			uid id (rows->getLongLong (TABLE_COL_ID));
-			TransportNetwork::Remove(id);
-		    }
-		}
-	    
 	    
 	    std::vector<boost::shared_ptr<TransportNetwork> > TransportNetworkTableSync::search(
 			string name

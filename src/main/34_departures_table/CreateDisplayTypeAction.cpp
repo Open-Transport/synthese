@@ -26,6 +26,7 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayTypeTableSync.h"
@@ -57,18 +58,18 @@ namespace synthese
 		ParametersMap CreateDisplayTypeAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_NAME, _name));
+			map.insert(PARAMETER_NAME, _name);
 			if (_interface.get())
-				map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
-			map.insert(make_pair(PARAMETER_ROWS_NUMBER, Conversion::ToString(_rows_number)));
-			map.insert(make_pair(PARAMETER_MAX_STOPS_NUMBER, Conversion::ToString(_max_stops_number)));
+				map.insert(PARAMETER_INTERFACE_ID, _interface->getKey());
+			map.insert(PARAMETER_ROWS_NUMBER, _rows_number);
+			map.insert(PARAMETER_MAX_STOPS_NUMBER, _max_stops_number);
 			return map;
 		}
 
 		void CreateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Name
-			_name = Request::getStringFormParameterMap(map, PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			if (_name.empty())
 				throw ActionException("Le nom ne peut être vide.");
 			vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
@@ -76,17 +77,17 @@ namespace synthese
 				throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 
 			// Rows number
-			_rows_number = Request::getIntFromParameterMap(map, PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
+			_rows_number = map.getInt(PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
 			if (_rows_number < 0)
 				throw ActionException("Un nombre positif de lignes doit être choisi");
 
 			// Max stops number
-			_max_stops_number = Request::getIntFromParameterMap(map, PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
+			_max_stops_number = map.getInt(PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
 			if (_max_stops_number < UNKNOWN_VALUE)
 				throw ActionException("Un nombre positif d'arrêts intermédiaires lignes doit être choisi");
 
 			// Interface
-			uid id(Request::getUidFromParameterMap(map, PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+			uid id(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
 			if (!Interface::Contains(id))
 				throw ActionException("Interface not found");
 			_interface = Interface::Get(id);
@@ -96,13 +97,13 @@ namespace synthese
 		{
 			shared_ptr<DisplayType> dt(new DisplayType);
 			dt->setName(_name);
-			dt->setInterface(_interface);
+			dt->setInterface(_interface.get());
 			dt->setRowNumber(_rows_number);
 			dt->setMaxStopsNumber(_max_stops_number);
 			DisplayTypeTableSync::save(dt.get());
 
 			// Log
-			ArrivalDepartureTableLog::addCreateTypeEntry(dt, _request->getUser());
+			ArrivalDepartureTableLog::addCreateTypeEntry(dt.get(), _request->getUser().get());
 		}
 	}
 }

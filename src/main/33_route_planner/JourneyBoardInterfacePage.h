@@ -27,6 +27,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <boost/logic/tribool.hpp>
 
 namespace synthese
@@ -64,7 +66,7 @@ namespace synthese
 			 - 14 : Online reservation is available
 			 - 15 : Departure time (internal format)
 		*/
-		class JourneyBoardInterfacePage : public interfaces::InterfacePage
+		class JourneyBoardInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

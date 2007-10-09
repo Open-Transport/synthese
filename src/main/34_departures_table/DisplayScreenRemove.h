@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -36,7 +38,7 @@ namespace synthese
 		/** DisplayScreenRemove action class.
 			@ingroup m34Actions refActions
 		*/
-		class DisplayScreenRemove : public server::Action
+		class DisplayScreenRemove : public util::FactorableTemplate<server::Action, DisplayScreenRemove>
 		{
 		public:
 			static const std::string PARAMETER_DISPLAY_SCREEN_ID;

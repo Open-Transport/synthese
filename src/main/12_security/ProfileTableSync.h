@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -43,7 +43,7 @@ namespace synthese
 
 			@ingroup m12LS refLS
 		*/
-		class ProfileTableSync : public db::SQLiteTableSyncTemplate<Profile>
+		class ProfileTableSync : public db::SQLiteRegistryTableSyncTemplate<ProfileTableSync,Profile>
 		{
 
 		public:
@@ -83,29 +83,6 @@ namespace synthese
 			static std::vector<boost::shared_ptr<Profile> > search(
 				boost::shared_ptr<const Profile> parent
 				, int first = 0, int number = -1);
-
-		protected:
-
-			/** Action to do on user creation.
-			No action because the users are not permanently loaded in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on user creation.
-			Updates the users objects in the opened sessions.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on user deletion.
-			Closes the sessions of the deleted user.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		};
 

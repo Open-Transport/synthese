@@ -41,6 +41,8 @@
 #include "13_dblog/DBLogList.h"
 #include "13_dblog/DBLogEntryTableSync.h"
 
+#include "30_server/QueryString.h"
+
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminModule.h"
 
@@ -90,48 +92,36 @@ namespace synthese
 
 		void DBLogViewer::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			// Log key
-			it = map.find(PARAMETER_LOG_KEY);
-			if (it == map.end())
-				throw AdminParametersException("Log key not specified");
-			if (!Factory<DBLog>::contains(it->second))
-				throw AdminParametersException("Invalid log key : " + it->second);
-			_dbLog = Factory<DBLog>::createSharedPtr(it->second);
+			string key(map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY));
+			if (!Factory<DBLog>::contains(key))
+				throw AdminParametersException("Invalid log key : " + key);
+			_dbLog = Factory<DBLog>::createSharedPtr(key);
 
 			// Start Date
-			it = map.find(PARAMETER_START_DATE);
-			if (it != map.end())
-				_searchStartDate = DateTime::FromString(it->second);
+			_searchStartDate = map.getDateTime(PARAMETER_START_DATE, false, FACTORY_KEY);
 
 			// End Date
-			it = map.find(PARAMETER_END_DATE);
-			if (it != map.end())
-				_searchEndDate = DateTime::FromString(it->second);
+			_searchEndDate = map.getDateTime(PARAMETER_END_DATE, false, FACTORY_KEY);
 
 			// User
-			it = map.find(PARAMETER_SEARCH_USER);
-			if (it != map.end() && Conversion::ToLongLong(it->second) > 0)
-				_searchUser = UserTableSync::get(Conversion::ToLongLong(it->second));
+			uid id(map.getUid(PARAMETER_SEARCH_USER, false, FACTORY_KEY));
+			if (id > 0)
+				_searchUser = UserTableSync::Get(id);
 
 			// Level
-			it = map.find(PARAMETER_SEARCH_TYPE);
-			if (it != map.end())
-				_searchLevel = (DBLogEntry::Level) Conversion::ToInt(it->second);
+			int num(map.getInt(PARAMETER_SEARCH_TYPE, false, FACTORY_KEY));
+			if (num != UNKNOWN_VALUE)
+				_searchLevel = static_cast<DBLogEntry::Level>(num);
 
 			// Text
-			it = map.find(PARAMETER_SEARCH_TEXT);
-			if (it != map.end())
-				_searchText = it->second;
+			_searchText = map.getString(PARAMETER_SEARCH_TEXT, false, FACTORY_KEY);
 
 			// Object
-			it = map.find(Request::PARAMETER_OBJECT_ID);
-			if (it != map.end())
-				_searchObjectId = Conversion::ToLongLong(it->second);
+			_searchObjectId = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
 
 			// table parameters
-			_resultTableRequestParameters = ResultHTMLTable::getParameters(map, PARAMETER_START_DATE, 30);
+			_resultTableRequestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_START_DATE, 30);
 
 			// Launch the search
 			_result = DBLogEntryTableSync::search(

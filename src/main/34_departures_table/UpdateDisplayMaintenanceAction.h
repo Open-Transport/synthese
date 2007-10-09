@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -34,9 +36,9 @@ namespace synthese
 		class DisplayScreen;
 
 		/** UpdateDisplayMaintenanceAction action class.
-			@ingroup m34
+			@ingroup m34Actions refActions
 		*/
-		class UpdateDisplayMaintenanceAction : public server::Action
+		class UpdateDisplayMaintenanceAction : public util::FactorableTemplate<server::Action, UpdateDisplayMaintenanceAction>
 		{
 		public:
 			static const std::string PARAMETER_CONTROLS;

@@ -27,6 +27,8 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -38,7 +40,7 @@ namespace synthese
 			@date 2007
 			@ingroup m34Library refLibrary
 		*/
-		class DeparturesTableRowServiceNumberInterfaceElement : public interfaces::LibraryInterfaceElement
+		class DeparturesTableRowServiceNumberInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableRowServiceNumberInterfaceElement>
 		{
 
 		public:

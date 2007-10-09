@@ -37,6 +37,7 @@
 #include "17_messages/MessagesLibraryAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
+#include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
@@ -74,17 +75,14 @@ namespace synthese
 	{
 		void MessagesScenarioAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-			it = map.find(Request::PARAMETER_OBJECT_ID);
-			if (it == map.end())
-				throw AdminParametersException("Scenario not specified");
-			if (Conversion::ToLongLong(it->second) == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
 			shared_ptr<const Scenario> scenario;
 			try
 			{
-				scenario = ScenarioTableSync::getScenario(Conversion::ToLongLong(it->second));
+				scenario = ScenarioTableSync::getScenario(id);
 			}
 			catch(...)
 			{

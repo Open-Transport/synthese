@@ -56,7 +56,7 @@ this_is_also_an_element
 			@ingroup m11Library refLibrary
 		*/
 		class StaticValueInterfaceElement
-			: public LibraryInterfaceElement
+			: public util::FactorableTemplate<LibraryInterfaceElement,StaticValueInterfaceElement>
 		{
 		private:
 			const std::string _value;

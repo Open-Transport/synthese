@@ -20,8 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/Alarm.h"
+#include "Alarm.h"
+
 #include "17_messages/Scenario.h"
+#include "17_messages/SingleSentAlarm.h"
+#include "17_messages/ScenarioSentAlarm.h"
+#include "17_messages/AlarmTemplate.h"
+
+using namespace boost;
 
 namespace synthese
 {
@@ -77,6 +83,20 @@ namespace synthese
 		Alarm::~Alarm()
 		{
 
+		}
+
+		boost::shared_ptr<const Alarm> Alarm::Get( uid key )
+		{
+			if (SentAlarm::Contains(key))
+				return static_pointer_cast<const Alarm, const SentAlarm>(SentAlarm::Get(key));
+			if (AlarmTemplate::Contains(key))
+				return static_pointer_cast<const Alarm, const AlarmTemplate>(AlarmTemplate::Get(key));
+			return shared_ptr<const Alarm>();
+		}
+
+		bool Alarm::Contains( uid key )
+		{
+			return SentAlarm::Contains(key) || AlarmTemplate::Contains(key);
 		}
 	}
 }

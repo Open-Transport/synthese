@@ -31,23 +31,27 @@
 #include "01_util/Factory.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace util;
 
+	template<> const string util::FactorableTemplate<interfaces::RequestWithInterface, interfaces::SimplePageRequest>::FACTORY_KEY("page");
+
 	namespace interfaces
 	{
-		const std::string SimplePageRequest::PARAMETER_PAGE = "page";
+		const string SimplePageRequest::PARAMETER_PAGE = "page";
 
-		void SimplePageRequest::_run( std::ostream& stream ) const
+		void SimplePageRequest::_run( ostream& stream ) const
 		{
 			if (_page == NULL)
 				return;
 
 			ParametersVector pv;
-			for (ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
+			const ParametersMap::Map& pmap(_parameters.getMap());
+			for (ParametersMap::Map::const_iterator it = pmap.begin(); it != pmap.end(); ++it)
 				pv.push_back(it->second);
 			    
 
@@ -62,25 +66,25 @@ namespace synthese
 
 			_parameters = map;
 
-			ParametersMap::iterator it = _parameters.find(PARAMETER_PAGE);
-			if (it == _parameters.end() || it->second.empty())
+			string key(_parameters.getString(PARAMETER_PAGE,false,FACTORY_KEY));
+			if (key.empty())
 				return;
 
 			if (!_interface.get())
 				throw RequestException("Interface was not defined");
 
 			// Drop registered pages
-			if (Factory<InterfacePage>::contains(it->second))
+			if (Factory<InterfacePage>::contains(key))
 				throw RequestException("Forbidden interface page");
 
 			try
 			{
-				_page = _interface->getPage(it->second);
-				_parameters.erase(it);
+				_page = _interface->getPage(key);
+//				_parameters.erase(it);
 			}
 			catch (InterfacePageException& e)
 			{
-				throw RequestException("No such interface page : "+ it->second);
+				throw RequestException("No such interface page : "+ key);
 			}
 		}
 
@@ -89,7 +93,7 @@ namespace synthese
 			ParametersMap map(RequestWithInterface::_getParametersMap());
 
 			if (_page != NULL)
-				map.insert(make_pair(PARAMETER_PAGE, _page->getCode()));
+				map.insert(PARAMETER_PAGE, _page->getFactoryKey());
 			
 			return map;
 		}
@@ -99,7 +103,7 @@ namespace synthese
 			_page = page;
 		}
 
-		bool SimplePageRequest::_runBeforeDisplayIfNoSession( std::ostream& stream )
+		bool SimplePageRequest::_runBeforeDisplayIfNoSession( ostream& stream )
 		{
 			return false;
 		}

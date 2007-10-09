@@ -38,6 +38,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace env;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetDurationRowInterfaceElement>::FACTORY_KEY("schedules_durations");
+
 	namespace routeplanner
 	{
 		void ScheduleSheetDurationRowInterfaceElement::storeParameters(ValueElementList& vel)

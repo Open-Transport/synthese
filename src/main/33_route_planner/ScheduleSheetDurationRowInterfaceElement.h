@@ -27,13 +27,10 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
-
 	namespace routeplanner
 	{
 		/** ScheduleSheetDurationRowInterfaceElement Library Interface Element Class.
@@ -41,7 +38,7 @@ namespace synthese
 			@date 2007
 			@ingroup m53Library refLibrary
 		*/
-		class ScheduleSheetDurationRowInterfaceElement : public interfaces::LibraryInterfaceElement
+		class ScheduleSheetDurationRowInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,ScheduleSheetDurationRowInterfaceElement>
 		{
 			// List of parameters to store
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _cellHeader;

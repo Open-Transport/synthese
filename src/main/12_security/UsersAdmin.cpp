@@ -28,10 +28,9 @@
 
 #include "12_security/SecurityModule.h"
 #include "12_security/UserAdmin.h"
-#include "12_security/User.h"
 #include "12_security/AddUserAction.h"
 #include "12_security/DelUserAction.h"
-#include "12_security/Profile.h"
+#include "12_security/ProfileTableSync.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/UsersAdmin.h"
 #include "12_security/SecurityRight.h"
@@ -84,25 +83,19 @@ namespace synthese
 
 		void UsersAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			// Searched login
-			it = map.find(PARAM_SEARCH_LOGIN);
-			if (it != map.end())
-				_searchLogin = it->second;
+			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
 
 			// Searched name
-			it = map.find(PARAM_SEARCH_NAME);
-			if (it != map.end())
-				_searchName = it->second;
+			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
 
 			// Searched profile
-			it = map.find(PARAM_SEARCH_PROFILE_ID);
-			if (it != map.end() && Profile::Contains(Conversion::ToLongLong(it->second)))
-				_searchProfile = Profile::Get(Conversion::ToLongLong(it->second));
+			uid id(map.getUid(PARAM_SEARCH_PROFILE_ID, false, FACTORY_KEY));
+			if (id != UNKNOWN_VALUE && Profile::Contains(id))
+				_searchProfile = ProfileTableSync::Get(id);
 
 			// Table Parameters
-			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAM_SEARCH_LOGIN, 30);
+			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAM_SEARCH_LOGIN, 30);
 
 			// Launch the users search
 			_users = UserTableSync::search(

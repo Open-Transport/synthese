@@ -23,6 +23,8 @@
 #include "11_interfaces/InterfacePage.h"
 #include "04_time/Hour.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace routeplanner
@@ -44,7 +46,7 @@ namespace synthese
 				- 9 : is it first foot
 
 		*/
-		class RoutePlannerSheetColumnInterfacePage : public interfaces::InterfacePage
+		class RoutePlannerSheetColumnInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetColumnInterfacePage>
 		{
 		public:
 			/** Display of schedule sheet cell.

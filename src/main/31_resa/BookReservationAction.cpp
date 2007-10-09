@@ -49,6 +49,8 @@
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 
+#include "01_util/Conversion.h"
+
 using namespace std;
 using namespace boost;
 
@@ -60,6 +62,8 @@ namespace synthese
 	using namespace env;
 	using namespace transportwebsite;
 	using namespace time;
+	using namespace util;
+	
 
 	namespace util
 	{
@@ -113,12 +117,12 @@ namespace synthese
 			{	// Case operator
 
 				// Customer ID
-				uid id(Request::getUidFromParameterMap(map, PARAMETER_CUSTOMER_ID, false, FACTORY_KEY));
+				uid id(map.getUid(PARAMETER_CUSTOMER_ID, false, FACTORY_KEY));
 				if (id != UNKNOWN_VALUE)
-					_customer = UserTableSync::get(id);
+					_customer = UserTableSync::Get(id);
 
 				// Customer name
-				_customerName = Request::getStringFormParameterMap(map, PARAMETER_CUSTOMER_NAME, !_customer.get(), FACTORY_KEY);
+				_customerName = map.getString(PARAMETER_CUSTOMER_NAME, !_customer.get(), FACTORY_KEY);
 				if (_customerName.empty())
 				{
 					if (!_customer.get())
@@ -127,7 +131,7 @@ namespace synthese
 				}
 
 				// CUstomer email
-				_customerEMail = Request::getStringFormParameterMap(map, PARAMETER_CUSTOMER_EMAIL, false, FACTORY_KEY);
+				_customerEMail = map.getString(PARAMETER_CUSTOMER_EMAIL, false, FACTORY_KEY);
 				if (_customerEMail.empty() && _customer.get())
 					_customerEMail = _customer->getEMail();
 
@@ -140,10 +144,10 @@ namespace synthese
 				throw ActionException("Not authorized");
 
 			// Site
-			shared_ptr<const Site> site(Site::Get(Request::getUidFromParameterMap(map, PARAMETER_SITE, true, FACTORY_KEY)));
+			shared_ptr<const Site> site(Site::Get(map.getUid(PARAMETER_SITE, true, FACTORY_KEY)));
 
 			// Customer contact phone
-			_customerPhone = Request::getStringFormParameterMap(map, PARAMETER_CUSTOMER_PHONE, !_customer.get(), FACTORY_KEY);
+			_customerPhone = map.getString(PARAMETER_CUSTOMER_PHONE, !_customer.get(), FACTORY_KEY);
 			if (_customerPhone.empty())
 			{
 				if(!_customer.get())
@@ -152,23 +156,23 @@ namespace synthese
 			}
 
 			// Seats number
-			_seatsNumber = Request::getIntFromParameterMap(map, PARAMETER_SEATS_NUMBER, true, FACTORY_KEY);
+			_seatsNumber = map.getInt(PARAMETER_SEATS_NUMBER, true, FACTORY_KEY);
 			if (_seatsNumber < 1 || _seatsNumber > 99)
 				throw ActionException("Invalid seats number");
 
 			// Journey
 			const Place* originPlace(site->fetchPlace(
-				Request::getStringFormParameterMap(map, PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
-				, Request::getStringFormParameterMap(map, PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
+				map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
+				, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
 			));
 			const Place* destinationPlace(site->fetchPlace(
-				Request::getStringFormParameterMap(map, PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
-				, Request::getStringFormParameterMap(map, PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
+				map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
+				, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
 			));
-			DateTime departureDateTime(Request::getDateTimeFromParameterMap(map, PARAMETER_DATE_TIME, true, FACTORY_KEY));
+			DateTime departureDateTime(map.getDateTime(PARAMETER_DATE_TIME, true, FACTORY_KEY));
 			// Accessibility
 			AccessibilityParameter accessibility(static_cast<AccessibilityParameter>(
-				Request::getIntFromParameterMap(map, PARAMETER_ACCESSIBILITY, false, string()))
+				map.getInt(PARAMETER_ACCESSIBILITY, false, string()))
 			);
 			AccessParameters ap(site->getAccessParameters(accessibility));
 

@@ -1,5 +1,5 @@
 
-synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::interfaces::InterfaceModule>("11_interfaces");
+synthese::interfaces::InterfaceModule::integrate();
 
 synthese::interfaces::ParameterValueInterfaceElement::integrate();
 synthese::interfaces::IfThenElseInterfaceElement::integrate();
@@ -14,17 +14,17 @@ synthese::interfaces::PlainCharFilterValueInterfaceElement::integrate();
 synthese::interfaces::CommentInterfaceElement::integrate();
 synthese::interfaces::PrintInterfaceElement::integrate();
 synthese::interfaces::DebugInterfaceElement::integrate();
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::LineLabelInterfaceElement>("label");
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::IncludePageInterfaceElement>("include");
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::GotoInterfaceElement>("goto");
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::SetInterfaceElement>("set");
+synthese::interfaces::LineLabelInterfaceElement::integrate();
+synthese::interfaces::IncludePageInterfaceElement::integrate();
+synthese::interfaces::GotoInterfaceElement::integrate();
+synthese::interfaces::SetInterfaceElement::integrate();
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::interfaces::InterfaceTableSync>("16.01 Interfaces");
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::interfaces::InterfacePageTableSync>("16.02 Interface Pages");
+synthese::interfaces::InterfaceTableSync::integrate();
+synthese::interfaces::InterfacePageTableSync::integrate();
 
-synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::RedirectInterfacePage>("redir");
-synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::DurationInterfacePage>("duration");
-synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::DateTimeInterfacePage>("datetime");
+synthese::interfaces::RedirectInterfacePage::integrate();
+synthese::interfaces::DurationInterfacePage::integrate();
+synthese::interfaces::DateTimeInterfacePage::integrate();
 
-synthese::util::Factory<synthese::server::Function>::integrate<synthese::interfaces::SimplePageRequest>("page");
-
+synthese::interfaces::SimplePageRequest::integrate();
+synthese::interfaces::RedirRequest::integrate();

@@ -57,99 +57,35 @@ namespace synthese
 	using namespace env;
 	using namespace dblog;
 	using namespace time;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync, DisplayScreenTableSync>::FACTORY_KEY("34.50 Display Screens");
+	}
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<DisplayScreen>::TABLE_NAME = "t041_display_screens";
-		template<> const int SQLiteTableSyncTemplate<DisplayScreen>::TABLE_ID = 41;
-		template<> const bool SQLiteTableSyncTemplate<DisplayScreen>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::TABLE_NAME = "t041_display_screens";
+		template<> const int SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::TABLE_ID = 41;
+		template<> const bool SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey (rows->getLongLong (TABLE_COL_ID));
-			object->setLocalization (PublicTransportStopZoneConnectionPlace::Get(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID)));
 			object->setLocalizationComment (rows->getText ( DisplayScreenTableSync::COL_NAME));
-			if (rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID) > 0)
-			{
-				object->setType(DisplayType::Get(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID)).get());
-			}
 			object->setWiringCode (rows->getInt ( DisplayScreenTableSync::COL_WIRING_CODE));
 			object->setTitle (rows->getText ( DisplayScreenTableSync::COL_TITLE));
 			object->setBlinkingDelay (rows->getInt ( DisplayScreenTableSync::COL_BLINKING_DELAY));
 			object->setTrackNumberDisplay (rows->getBool ( DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY));
 			object->setServiceNumberDisplay (rows->getBool ( DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY));
-
-			// Physical stops
-			vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
-			object->clearPhysicalStops();
-			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-			{
-			    try
-			    {
-				object->addPhysicalStop(PhysicalStop::Get(Conversion::ToLongLong(*it)).get());
-			    }
-			    catch (PhysicalStop::RegistryKeyException& e)
-			    {
-				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, e);
-			    }
-			}
 			object->setAllPhysicalStopsDisplayed (rows->getBool (DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED));
-			
-			// Forbidden places
-			object->clearForbiddenPlaces();
-			stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
-			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-			{
-			    try
-			    {
-					object->addForbiddenPlace(PublicTransportStopZoneConnectionPlace::Get(Conversion::ToLongLong(*it)).get());
-			    }
-			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
-			    {
-				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
-			    }
-			}
-
-			// DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS // List of forbidden lines uids, separated by comas
-
-			object->setDirection ((DeparturesTableDirection) rows->getInt ( DisplayScreenTableSync::COL_DIRECTION));
-			object->setOriginsOnly ((EndFilter) rows->getInt ( DisplayScreenTableSync::COL_ORIGINS_ONLY));
-			
-			// Displayed places
-			stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
-			object->clearDisplayedPlaces();
-			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-			{
-			    try
-			    {
-					object->addDisplayedPlace(PublicTransportStopZoneConnectionPlace::Get(Conversion::ToLongLong(*it)).get());
-			    }
-			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
-			    {
-				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
-			    }
-			}
-			
+			object->setDirection(static_cast<DeparturesTableDirection>(rows->getInt(DisplayScreenTableSync::COL_DIRECTION)));
+			object->setOriginsOnly(static_cast<EndFilter>(rows->getInt(DisplayScreenTableSync::COL_ORIGINS_ONLY)));
 			object->setMaxDelay (rows->getInt ( DisplayScreenTableSync::COL_MAX_DELAY));
 			object->setClearingDelay (rows->getInt ( DisplayScreenTableSync::COL_CLEARING_DELAY));
 			object->setFirstRow (rows->getInt ( DisplayScreenTableSync::COL_FIRST_ROW));
-			object->setGenerationMethod ((DisplayScreen::GenerationMethod) 
-						     rows->getInt ( DisplayScreenTableSync::COL_GENERATION_METHOD));
-			// Forced destinations
-			stops = Conversion::ToStringVector (rows->getText ( DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
-			object->clearForcedDestinations();
-			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-			{
-			    try
-			    {
-					object->addForcedDestination(PublicTransportStopZoneConnectionPlace::Get (Conversion::ToLongLong(*it)).get());
-			    }
-			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
-			    {
-				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
-			    }
-			}
-			
+			object->setGenerationMethod(static_cast<DisplayScreen::GenerationMethod>(rows->getInt(DisplayScreenTableSync::COL_GENERATION_METHOD)));
 			object->setDestinationForceDelay (rows->getInt ( DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY));
 			object->setMaintenanceChecksPerDay (rows->getInt ( DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY));
 			object->setMaintenanceIsOnline (rows->getBool ( DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE));
@@ -158,7 +94,92 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<DisplayScreen>::save(DisplayScreen* object)
+		template<> void SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::_link(DisplayScreen* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			// Column reading
+			uid placeId(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID));
+			uid typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
+			
+			// Localization
+			object->setLocalization(ConnectionPlaceTableSync::Get(placeId, object, true, temporary));
+
+			// Type
+			if (typeId > 0)
+				object->setType(DisplayTypeTableSync::Get(typeId, object, true, temporary));
+
+			// Physical stops
+			vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
+			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+			{
+				try
+				{
+					uid id(Conversion::ToLongLong(*it));
+					object->addPhysicalStop(PhysicalStopTableSync::Get(id, object, true, temporary));
+				}
+				catch (...)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
+				}
+			}
+
+			// Forbidden places
+			stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
+			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+			{
+				try
+				{
+					object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), object, false, temporary));
+				}
+				catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
+				}
+			}
+
+			// Displayed places
+			stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
+			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+			{
+				try
+				{
+					object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), object, false, temporary));
+				}
+				catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
+				}
+			}
+
+			// Forced destinations
+			stops = Conversion::ToStringVector (rows->getText ( DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
+			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+			{
+				try
+				{
+					object->addForcedDestination(ConnectionPlaceTableSync::Get (Conversion::ToLongLong(*it), object, false, temporary));
+				}
+				catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+				}
+			}
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::_unlink(DisplayScreen* object)
+		{
+			object->setLocalization(NULL);
+			object->setType(NULL);
+			object->clearPhysicalStops();
+			object->clearForbiddenPlaces();
+			object->clearDisplayedPlaces();
+			object->clearForcedDestinations();
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::save(DisplayScreen* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -183,11 +204,10 @@ namespace synthese
 			const PhysicalStops& pss = object->getPhysicalStops(false);
 			for (PhysicalStops::const_iterator itp = pss.begin(); itp != pss.end(); ++itp)
 			{
-				if (!(*itp)->getKey())
-					continue;
+				assert(itp->second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString((*itp)->getKey());
+				query << Conversion::ToString(itp->first);
 			}
 
 			query
@@ -197,11 +217,10 @@ namespace synthese
 			count = 0;
 			for (ForbiddenPlacesList::const_iterator itf = object->getForbiddenPlaces().begin(); itf != object->getForbiddenPlaces().end(); ++itf)
 			{
-				if (!(*itf)->getKey())
-					continue;
+				assert(itf->second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString((*itf)->getKey());
+				query << Conversion::ToString(itf->first);
 			}
 
 			query << "','";
@@ -209,43 +228,40 @@ namespace synthese
 			count = 0;
 			for (LineFilter::const_iterator itl = object->getForbiddenLines().begin(); itl != object->getForbiddenLines().end(); ++itl)
 			{
-				if (!(*itl)->getKey())
-					continue;
+				assert(itl->second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString((*itl)->getKey());
+				query << Conversion::ToString(itl->first);
 			}
 
 			query
-				<< "'," << Conversion::ToString((int) object->getDirection())
-				<< "," << Conversion::ToString((int) object->getEndFilter())
+				<< "'," << Conversion::ToString(static_cast<int>(object->getDirection()))
+				<< "," << Conversion::ToString(static_cast<int>(object->getEndFilter()))
 				<< ",'";
 
 			count = 0;
 			for (DisplayedPlacesList::const_iterator itd = object->getDisplayedPlaces().begin(); itd != object->getDisplayedPlaces().end(); ++itd)
 			{
-				if (!(*itd)->getKey())
-					continue;
+				assert(itd->second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString((*itd)->getKey());
+				query << Conversion::ToString(itd->first);
 			}
 
 			query
 				<< "'," << Conversion::ToString(object->getMaxDelay())
 				<< "," << Conversion::ToString(object->getClearingDelay())
 				<< "," << Conversion::ToString(object->getFirstRow())
-				<< "," << Conversion::ToString((int) object->getGenerationMethod())
+				<< "," << Conversion::ToString(static_cast<int>(object->getGenerationMethod()))
 				<< ",'";
 
 			count = 0;
 			for (DisplayedPlacesList::const_iterator itd = object->getForcedDestinations().begin(); itd != object->getForcedDestinations().end(); ++itd)
 			{
-				if (!(*itd)->getKey())
-					continue;
+				assert(itd->second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString((*itd)->getKey());
+				query << Conversion::ToString(itd->first);
 			}
 
 			query
@@ -295,7 +311,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_DISPLAY_TEAM("display_team");
 
 		DisplayScreenTableSync::DisplayScreenTableSync()
-			: SQLiteTableSyncTemplate<DisplayScreen>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_PLACE_ID, "INTEGER");
@@ -325,48 +341,6 @@ namespace synthese
 			addTableColumn(COL_MAINTENANCE_MESSAGE, "TEXT");
 		}
 
-	    void DisplayScreenTableSync::rowsAdded(db::SQLite* sqlite,  
-						   db::SQLiteSync* sync, 
-						   const db::SQLiteResultSPtr& rows, bool isFirstSync)
-	    {
-		while (rows->next ())
-		{
-			if (DisplayScreen::Contains(rows->getLongLong (TABLE_COL_ID)))
-		    {
-				load(DisplayScreen::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
-		    }
-		    else
-		    {
-				DisplayScreen* object(new DisplayScreen);
-				load(object, rows);
-				object->store();
-		    }
-		}
-	    }
-	    
-	    
-	    void DisplayScreenTableSync::rowsUpdated(db::SQLite* sqlite,  
-						     db::SQLiteSync* sync, 
-						     const db::SQLiteResultSPtr& rows)
-	    {
-		while (rows->next ())
-		{
-			shared_ptr<DisplayScreen> object = DisplayScreen::GetUpdateable(rows->getLongLong (TABLE_COL_ID));
-		    load(object.get(), rows);
-		}
-	    }
-	    
-
-	    
-	    void DisplayScreenTableSync::rowsRemoved( db::SQLite* sqlite,  
-						      db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-	    {
-		while (rows->next ())
-		{
-			DisplayScreen::Remove(rows->getLongLong (TABLE_COL_ID));
-		}
-	    }
-	    
 
 	    
 	    vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::search(
@@ -480,6 +454,7 @@ namespace synthese
 			    {
 				shared_ptr<DisplayScreen> object(new DisplayScreen());
 				load(object.get(), rows);
+				link(object.get(), rows, GET_AUTO);
 				objects.push_back(object);
 				
 				DisplayScreen::Complements c;
@@ -490,7 +465,7 @@ namespace synthese
 				{
 				    if (rows->getLongLong(_COL_LAST_MAINTENANCE_CONTROL))
 				    {
-					shared_ptr<DBLogEntry> le = DBLogEntryTableSync::get(rows->getLongLong(_COL_LAST_MAINTENANCE_CONTROL));
+					shared_ptr<const DBLogEntry> le = DBLogEntryTableSync::Get(rows->getLongLong(_COL_LAST_MAINTENANCE_CONTROL));
 					if ((now - le->getDate()) > ((1440 / object->getMaintenanceChecksPerDay()) * 2))
 					{
 					    if ((now - le->getDate()) < ((1440 / object->getMaintenanceChecksPerDay()) * 5))
@@ -517,7 +492,7 @@ namespace synthese
 				// Bad news test
 				if (rows->getLongLong (_COL_LAST_MAINTENANCE_CONTROL))
 				{
-				    shared_ptr<DBLogEntry> le = DBLogEntryTableSync::get(
+				    shared_ptr<const DBLogEntry> le = DBLogEntryTableSync::Get(
 					rows->getLongLong (_COL_LAST_MAINTENANCE_CONTROL));
 
 				    if (le->getLevel() == DBLogEntry::DB_LOG_ERROR)

@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
@@ -34,9 +36,9 @@ namespace synthese
 		class Alarm;
 
 		/** DeleteAlarmAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
-		class DeleteAlarmAction : public server::Action
+		class DeleteAlarmAction : public util::FactorableTemplate<server::Action, DeleteAlarmAction>
 		{
 		public:
 			static const std::string PARAMETER_ALARM;

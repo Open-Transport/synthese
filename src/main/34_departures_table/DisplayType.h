@@ -43,22 +43,22 @@ namespace synthese
 		class DisplayType : public util::Registrable<uid, DisplayType>
 		{
 		private:
-			std::string										_name;
-			boost::shared_ptr<const interfaces::Interface>	_interf;
-			int												_rowNumber;
-			int												_maxStopsNumber;
+			std::string						_name;
+			const interfaces::Interface*	_interf;
+			int								_rowNumber;
+			int								_maxStopsNumber;
 
 		public:
 			DisplayType();
 			DisplayType(const uid&);
 
 			const std::string& getName() const;
-			boost::shared_ptr<const interfaces::Interface> getInterface() const;
+			const interfaces::Interface* getInterface() const;
 			int getRowNumber() const;
 			int getMaxStopsNumber() const;
 
 			void setName(const std::string& name);
-			void setInterface(boost::shared_ptr<const interfaces::Interface> interf);
+			void setInterface(const interfaces::Interface* interf);
 			void setRowNumber(int number);
 			void setMaxStopsNumber(int number);
 

@@ -25,6 +25,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace admin
@@ -35,7 +37,7 @@ namespace synthese
 		@code admin @endcode
 			@ingroup m14Pages refPages
 		*/
-		class AdminInterfacePage : public interfaces::InterfacePage
+		class AdminInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,AdminInterfacePage>
 		{
 		public:
 

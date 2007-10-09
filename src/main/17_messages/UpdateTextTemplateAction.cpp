@@ -22,11 +22,14 @@
 
 #include "02_db/DBEmptyResultException.h"
 
-#include "30_server/ActionException.h"
-
 #include "UpdateTextTemplateAction.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
+
+#include "01_util/Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -35,6 +38,9 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, messages::UpdateTextTemplateAction>::FACTORY_KEY("utta");
 	
 	namespace messages
 	{
@@ -55,19 +61,12 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
 				// Text ID
-				it = map.find(PARAMETER_TEXT_ID);
-				if (it == map.end())
-					throw ActionException("Text template not specified");
-				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
+				uid id = map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY);
+				_text = TextTemplateTableSync::GetUpdateable(id);
 				
 				// Name
-				it = map.find(PARAMETER_NAME);
-				if (it == map.end())
-					throw ActionException("Name not specified");
-				_name = it->second;
+				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
 				vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_text->getAlarmLevel(), _name, _text.get(), 0, 1);
@@ -75,16 +74,10 @@ namespace synthese
 					throw ActionException("Un texte portant ce nom existe déjà.");
 
 				// Short message
-				it = map.find(PARAMETER_SHORT_MESSAGE);
-				if (it == map.end())
-					throw ActionException("Short message not specified");
-				_shortMessage = it->second;
+				_shortMessage = map.getString(PARAMETER_SHORT_MESSAGE, true, FACTORY_KEY);
 				
 				// Long message
-				it = map.find(PARAMETER_LONG_MESSAGE);
-				if (it == map.end())
-					throw ActionException("Long message not specified");
-				_longMessage = it->second;
+				_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
 			}
 			catch (DBEmptyResultException<TextTemplate>)
 			{

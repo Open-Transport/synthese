@@ -23,15 +23,16 @@
 #ifndef SYNTHESE_IncludePageInterfaceElement_H__
 #define SYNTHESE_IncludePageInterfaceElement_H__
 
-
 #include "11_interfaces/LibraryInterfaceElement.h"
 #include "11_interfaces/ValueElementList.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
-		class IncludePageInterfaceElement : public LibraryInterfaceElement
+		class IncludePageInterfaceElement : public util::FactorableTemplate<LibraryInterfaceElement, IncludePageInterfaceElement>
 		{
 		private:
 			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_page_code;

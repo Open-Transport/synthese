@@ -47,26 +47,26 @@ namespace synthese
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			static void	addUpdateEntry(
-				boost::shared_ptr<const DisplayScreen> screen
+				const DisplayScreen* screen
 				, const std::string& text
-				, boost::shared_ptr<const security::User> user
+				, const security::User* user
 				);
 			static void addRemoveEntry(
-				boost::shared_ptr<const DisplayScreen> screen
-				, boost::shared_ptr<const security::User> user
+				const DisplayScreen* screen
+				, const security::User* user
 				);
 			static void addUpdateTypeEntry(
-				boost::shared_ptr<const DisplayType> type
-				, boost::shared_ptr<const security::User> user
+				const DisplayType* type
+				, const security::User* user
 				, const std::string& text
 				);
 			static void addCreateTypeEntry(
-				boost::shared_ptr<const DisplayType> type
-				, boost::shared_ptr<const security::User> user
+				const DisplayType* type
+				, const security::User* user
 				);
 			static void addDeleteTypeEntry(
-				boost::shared_ptr<const DisplayType> type
-				, boost::shared_ptr<const security::User> user
+				const DisplayType* type
+				, const security::User* user
 				);
 
 			std::string getObjectName(uid id) const;

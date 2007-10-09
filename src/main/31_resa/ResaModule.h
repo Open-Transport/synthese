@@ -24,8 +24,7 @@
 #define SYNTHESE_ResaModule_h__
 
 #include "01_util/ModuleClass.h"
-
-#include "31_resa/OnlineReservationRule.h"
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -75,15 +74,12 @@ namespace synthese
 	{
 		/** 51 Reservation module class.
 		*/
-		class ResaModule : public util::ModuleClass
+		class ResaModule : public util::FactorableTemplate<util::ModuleClass, ResaModule>
 		{
 		private:
-			static OnlineReservationRule::Registry _onlineReservationRules;
 
 		public:
-			ResaModule();
 
-			static OnlineReservationRule::Registry& getOnlineReservationRules();
 
 		};
 	}

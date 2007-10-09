@@ -24,6 +24,7 @@
 #define SYNTHESE_LogoutAction_H__
 
 #include "30_server/Action.h"
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -32,7 +33,7 @@ namespace synthese
 		/** Logout Action Class
 			@ingroup m18Action refActions
 		*/
-		class LogoutAction : public server::Action
+		class LogoutAction : public util::FactorableTemplate<server::Action, LogoutAction>
 		{
 		protected:
 			/** Conversion from attributes to generic parameter maps.

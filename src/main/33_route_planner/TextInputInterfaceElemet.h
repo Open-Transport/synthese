@@ -27,13 +27,10 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
-
 	namespace routeplanner
 	{
 		/** TextInputInterfaceElemet Library Interface Element Class.
@@ -48,7 +45,7 @@ namespace synthese
 			 - 3 : additional html code to put inside the visible field
 
 		*/
-		class TextInputInterfaceElemet : public interfaces::LibraryInterfaceElement
+		class TextInputInterfaceElemet : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,TextInputInterfaceElemet>
 		{
 			// List of parameters to store
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _field;

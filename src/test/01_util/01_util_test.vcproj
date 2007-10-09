@@ -91,18 +91,10 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ThreadTest.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\UIdTest.cpp"
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\main.cpp"
-			>
-		</File>
 		<File
 			RelativePath=".\SConscript"
 			>

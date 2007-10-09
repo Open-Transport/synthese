@@ -48,6 +48,8 @@ namespace synthese
 	using namespace env;
 	using namespace interfaces;
 
+	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,transportwebsite::PlacesListFunction>::FACTORY_KEY("lp");
+
 	namespace transportwebsite
 	{
 		const std::string PlacesListFunction::PARAMETER_INPUT("i");
@@ -58,10 +60,10 @@ namespace synthese
 		ParametersMap PlacesListFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSite::_getParametersMap());
-			map.insert(make_pair(PARAMETER_INPUT, _input));
-			map.insert(make_pair(PARAMETER_CITY_TEXT, _cityText));
-			map.insert(make_pair(PARAMETER_NUMBER, Conversion::ToString(_n)));
-			map.insert(make_pair(PARAMETER_IS_FOR_ORIGIN, Conversion::ToString(_isForOrigin)));
+			map.insert(PARAMETER_INPUT, _input);
+			map.insert(PARAMETER_CITY_TEXT, _cityText);
+			map.insert(PARAMETER_NUMBER, _n);
+			map.insert(PARAMETER_IS_FOR_ORIGIN, _isForOrigin);
 			return map;
 		}
 
@@ -69,30 +71,10 @@ namespace synthese
 		{
 			FunctionWithSite::_setFromParametersMap(map);
 			_page = _site->getInterface()->getPage<PlacesListInterfacePage>();
-
-			ParametersMap::const_iterator it;
-
-			/// @todo Parameters parsing
-			it = map.find(PARAMETER_INPUT);
-			if (it == map.end())
-				throw RequestException("Text input not specified");
-			_input = it->second;
-
-			it = map.find(PARAMETER_IS_FOR_ORIGIN);
-			if (it == map.end())
-				throw RequestException("Is for origin status not specified");
-			_isForOrigin = Conversion::ToBool(it->second);
-
-			it = map.find(PARAMETER_NUMBER);
-			if (it == map.end())
-				throw RequestException("Number not specified");
-			_n = Conversion::ToInt(it->second);
-
-			it = map.find(PARAMETER_CITY_TEXT);
-			if (it == map.end())
-				throw RequestException("City text not specified");
-			_cityText = it->second;
-
+			_input = map.getString(PARAMETER_INPUT, true, "plf");
+			_isForOrigin = map.getBool(PARAMETER_IS_FOR_ORIGIN, true, false, "plf");
+			_n = map.getInt(PARAMETER_NUMBER, true, "plf");
+			_cityText = map.getString(PARAMETER_CITY_TEXT, true, "plf");
 		}
 
 		void PlacesListFunction::_run( std::ostream& stream ) const

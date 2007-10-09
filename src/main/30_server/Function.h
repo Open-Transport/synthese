@@ -24,7 +24,7 @@
 
 #include "01_util/Factorable.h"
 
-#include "30_server/Types.h"
+#include "30_server/ParametersMap.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -41,7 +41,7 @@ namespace synthese
 		/** Function abstract class to use in a Request.
 			@ingroup m18
 		*/
-		class Function : public util::Factorable
+		class Function : public util::Factorable<Function>
 		{
 		protected:
 			Request* _request;

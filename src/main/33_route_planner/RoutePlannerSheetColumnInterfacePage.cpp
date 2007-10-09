@@ -24,12 +24,17 @@
 
 #include "30_server/Request.h"
 
+#include "01_util/Conversion.h"
+
 using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace time;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerSheetColumnInterfacePage>::FACTORY_KEY("schedule_sheet_column");
 
 	namespace routeplanner
 	{

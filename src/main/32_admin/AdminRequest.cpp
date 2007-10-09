@@ -52,6 +52,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace security;
 
+	template<> const string util::FactorableTemplate<RequestWithInterfaceAndRequiredSession,admin::AdminRequest>::FACTORY_KEY("admin");
+
 	namespace admin
 	{
 		const std::string AdminRequest::PARAMETER_PAGE = "rub";
@@ -59,14 +61,15 @@ namespace synthese
 		
 		ParametersMap AdminRequest::_getParametersMap() const
 		{
-			ParametersMap map(RequestWithInterfaceAndRequiredSession::_getParametersMap());
+			ParametersMap result(RequestWithInterfaceAndRequiredSession::_getParametersMap());
 
-			map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
+			result.insert(PARAMETER_PAGE, _page->getFactoryKey());
 			if (_actionFailedPage.get())
-				map.insert(make_pair(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey()));
-			ParametersMap adminMap = _page->getParametersMap();
-			map.insert(adminMap.begin(), adminMap.end());
-			return map;
+				result.insert(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey());
+			const map<string,string> adminMap(_page->getParametersMap().getMap());
+			for (map<string,string>::const_iterator it(adminMap.begin()); it != adminMap.end(); ++it)
+				result.insert(it->first,it->second);
+			return result;
 		}
 
 		void AdminRequest::_setFromParametersMap(const ParametersMap& map)
@@ -76,27 +79,26 @@ namespace synthese
 			try
 			{
 				// Page
-				ParametersMap::const_iterator it;
-
+				string pageKey;
 				if (_request->getActionException())
 				{	// Prepare the KO page
-					it = map.find(PARAMETER_ACTION_FAILED_PAGE);
-					if (it == map.end())
-						it = map.find(PARAMETER_PAGE);
+					pageKey = map.getString(PARAMETER_ACTION_FAILED_PAGE, false, FACTORY_KEY);
+					if (pageKey.empty())
+						pageKey = map.getString(PARAMETER_PAGE, false, FACTORY_KEY);
 				}
 				else
 				{	// Prepare the OK page
 
 					// Saving of the action failed page for url output purposes
-					it = map.find(PARAMETER_ACTION_FAILED_PAGE);
-					if (it != map.end())
-						_actionFailedPage = Factory<AdminInterfaceElement>::createSharedPtr(it->second);
+					pageKey = map.getString(PARAMETER_ACTION_FAILED_PAGE, false, FACTORY_KEY);
+					if (!pageKey.empty())
+						_actionFailedPage = Factory<AdminInterfaceElement>::createSharedPtr(pageKey);
 
-					it = map.find(PARAMETER_PAGE);
+					pageKey = map.getString(PARAMETER_PAGE, false, FACTORY_KEY);
 				}
-				shared_ptr<AdminInterfaceElement> page = (it == map.end())
+				shared_ptr<AdminInterfaceElement> page = pageKey.empty()
 					? static_pointer_cast<AdminInterfaceElement,HomeAdmin>(Factory<AdminInterfaceElement>::createSharedPtr<HomeAdmin>())
-					: Factory<AdminInterfaceElement>::createSharedPtr(it->second);
+					: Factory<AdminInterfaceElement>::createSharedPtr(pageKey);
 				page->setFromParametersMap(map);
 				_page = page;
 				
@@ -147,11 +149,7 @@ namespace synthese
 
 		void AdminRequest::setParameter( const std::string& name, const std::string value )
 		{
-			ParametersMap::iterator it = _parameters.find(name);
-			if (it == _parameters.end())
-				_parameters.insert(make_pair(name, value));
-			else
-				it->second = value;
+			_parameters.insert(name,value);
 		}
 
 		void AdminRequest::setActionFailedPage(shared_ptr<const AdminInterfaceElement> aie )

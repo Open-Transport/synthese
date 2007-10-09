@@ -22,6 +22,7 @@
 
 #include "15_env/LineStop.h"
 #include "15_env/Line.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 
 #include "34_departures_table/ArrivalDepartureTableGenerator.h"
@@ -65,11 +66,11 @@ namespace synthese
 			/** - If a forbidden place is served, the the line is not allowed */
 			if (!_forbiddenPlaces.empty())
 				for (const LineStop* curLinestop = linestop; curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrivalForFineSteppingOnly())
-					if (_forbiddenPlaces.find(curLinestop->getConnectionPlace()) != _forbiddenPlaces.end())
+					if (_forbiddenPlaces.find(curLinestop->getConnectionPlace()->getKey()) != _forbiddenPlaces.end())
 						return false;
 
 			return 	linestop->getLine()->getUseInDepartureBoards()
-				&&	_lineFilter.find(linestop->getLine()) == _lineFilter.end()
+				&&	_lineFilter.find(linestop->getLine()->getKey()) == _lineFilter.end()
 				&&	((_endFilter == WITH_PASSING) || (linestop->getPreviousDepartureForFineSteppingOnly() == NULL))
 				//&&	(((linestop->getFollowingArrival() != NULL) && (linestop->getFollowingArrival()->getConnectionPlace() != _place))
 				//	|| ( linestop->getLine()->getDestination()->getConnectionPlace() != _place))
@@ -95,11 +96,11 @@ namespace synthese
 			{
 				const PublicTransportStopZoneConnectionPlace* place(curLinestop->getConnectionPlace());
 				
-				if (	_displayedPlaces.find(place) != _displayedPlaces.end()
-							&& encounteredPlaces.find(place) == encounteredPlaces.end()	// If the place must be displayed according to the display rules (only once per place)
-							&& place != destinationPlace
-						|| curLinestop->getFollowingArrivalForFineSteppingOnly() == NULL		// or if the place is the terminus
-						|| curLinestop == servicePointer.getEdge()			// or if the place is the origin
+				if(		_displayedPlaces.find(place->getId()) != _displayedPlaces.end()
+					&&	encounteredPlaces.find(place) == encounteredPlaces.end()	// If the place must be displayed according to the display rules (only once per place)
+					&&	place != destinationPlace
+				|| curLinestop->getFollowingArrivalForFineSteppingOnly() == NULL		// or if the place is the terminus
+				|| curLinestop == servicePointer.getEdge()			// or if the place is the origin
 				){
 					arrivals.push_back(place);
 					encounteredPlaces.insert(place);

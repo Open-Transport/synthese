@@ -215,10 +215,11 @@ Node::initialize ()
 
 
 sqlite3* 
-Node::getHandle ()
+Node::getHandle () const
 {
     return DBModule::GetSQLite()->getHandle ();
 }
+
 
 
 

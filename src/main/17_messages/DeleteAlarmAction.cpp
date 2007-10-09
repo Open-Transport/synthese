@@ -20,19 +20,24 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
+#include "DeleteAlarmAction.h"
 
-#include "17_messages/DeleteAlarmAction.h"
 #include "17_messages/Alarm.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesModule.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 	
+	template<> const string util::FactorableTemplate<Action, messages::DeleteAlarmAction>::FACTORY_KEY("deletealarm");
+
 	namespace messages
 	{
 		const string DeleteAlarmAction::PARAMETER_ALARM = Action_PARAMETER_PREFIX + "ala";
@@ -42,17 +47,21 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_alarm.get())
-				map.insert(make_pair(PARAMETER_ALARM, Conversion::ToString(_alarm->getId())));
+				map.insert(PARAMETER_ALARM, _alarm->getId());
 			return map;
 		}
 
 		void DeleteAlarmAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_ALARM);
-			if (it == map.end())
+			uid id(map.getUid(PARAMETER_ALARM, true, FACTORY_KEY));
+			try
+			{
+				_alarm = Alarm::Get(id);
+			}
+			catch (...)
+			{
 				throw ActionException("Alarm not specified");
+			}
 		}
 
 		void DeleteAlarmAction::run()

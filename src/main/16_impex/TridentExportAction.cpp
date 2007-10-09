@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ServerModule.h"
+#include "30_server/ParametersMap.h"
 
 #include "15_env/CommercialLine.h"
 #include "TridentExport.h"
@@ -44,8 +45,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using namespace std;
 using namespace boost;
-using namespace synthese::env;
-
 
 namespace synthese
 {
@@ -53,6 +52,9 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 	using namespace db;
+	using namespace env;
+
+	template<> const string util::FactorableTemplate<Action, impex::TridentExportAction>::FACTORY_KEY("tridentexport");
 
 	namespace impex
 	{
@@ -63,35 +65,20 @@ namespace synthese
 		ParametersMap TridentExportAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_COMMERCIAL_LINE_REGEX, _commercialLineRegex));
-			map.insert(make_pair(PARAMETER_ARCHIVE_BASENAME, _archiveBasename));
+			map.insert(PARAMETER_COMMERCIAL_LINE_REGEX, _commercialLineRegex);
+			map.insert(PARAMETER_ARCHIVE_BASENAME, _archiveBasename);
 			return map;
 		}
 
 		void TridentExportAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_COMMERCIAL_LINE_REGEX);
-			if (it == map.end()) 
-			{
+			_commercialLineRegex = map.getString(PARAMETER_COMMERCIAL_LINE_REGEX, false, FACTORY_KEY);
+			if (_commercialLineRegex.empty()) 
 			    _commercialLineRegex = ".*";
-			}
-			else
-			{
-			    _commercialLineRegex = it->second;
-			}
-
-			it = map.find(PARAMETER_ARCHIVE_BASENAME);
-			if (it == map.end()) 
-			{
+			
+			_archiveBasename = map.getString(PARAMETER_ARCHIVE_BASENAME, false, FACTORY_KEY);
+			if (_archiveBasename.empty())
 			    _archiveBasename = "trident_export";
-			}
-			else
-			{
-			    _archiveBasename = it->second;
-			}
-
 		}
 
 		void TridentExportAction::run()

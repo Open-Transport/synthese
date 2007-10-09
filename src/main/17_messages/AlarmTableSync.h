@@ -51,7 +51,7 @@ namespace synthese
 
 			@note As Alarm is an abstract class, do not use the get static method. Use getAlarm instead.
 		*/
-		class AlarmTableSync : public db::SQLiteTableSyncTemplate<Alarm>
+		class AlarmTableSync : public db::SQLiteTableSyncTemplate<AlarmTableSync,Alarm>
 		{
 		private:
 			static const std::string _COL_CONFLICT_LEVEL;

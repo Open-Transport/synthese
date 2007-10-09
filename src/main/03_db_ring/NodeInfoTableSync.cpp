@@ -1,3 +1,25 @@
+
+/** NodeInfoTableSync class implementation.
+	@file NodeInfoTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "03_db_ring/NodeInfoTableSync.h"
 
 #include "02_db/DBModule.h"
@@ -26,13 +48,18 @@ namespace synthese
     using namespace db;
     using namespace dbring;
 
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<SQLiteTableSync,NodeInfoTableSync>::FACTORY_KEY("0 Node infos");
+	}
+
     namespace db
     {
-	template<> const std::string SQLiteTableSyncTemplate<NodeInfo>::TABLE_NAME = "t998_nodes_infos";
-	template<> const int SQLiteTableSyncTemplate<NodeInfo>::TABLE_ID = 998;
-	template<> const bool SQLiteTableSyncTemplate<NodeInfo>::HAS_AUTO_INCREMENT = true;
+	template<> const std::string SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::TABLE_NAME = "t998_nodes_infos";
+	template<> const int SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::TABLE_ID = 998;
+	template<> const bool SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::HAS_AUTO_INCREMENT = true;
 
-	template<> void SQLiteTableSyncTemplate<NodeInfo>::load (NodeInfo* object, const db::SQLiteResultSPtr& rows)
+	template<> void SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::load (NodeInfo* object, const db::SQLiteResultSPtr& rows)
 	{
 	    object->setNodeId (rows->getInt (NodeInfoTableSync::TABLE_COL_NODEID));
 	    object->setRingId (rows->getInt (NodeInfoTableSync::TABLE_COL_RINGID));
@@ -45,8 +72,17 @@ namespace synthese
 	    object->setLastAcknowledgedTimestamp (rows->getTimestamp (NodeInfoTableSync::TABLE_COL_LASTACKNOWLEDGEDTIMESTAMP));
 	}
 
+	template<> void SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::_link(NodeInfo* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+	{
 
-	template<> void SQLiteTableSyncTemplate<NodeInfo>::save (NodeInfo* object)
+	}
+
+	template<> void SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::_unlink(NodeInfo* obj)
+	{
+
+	}
+
+	template<> void SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::save (NodeInfo* object)
 	{
 	    SQLite* sqlite = DBModule::GetSQLite();
 	    std::stringstream query;
@@ -82,7 +118,7 @@ namespace synthese
 
 
 	NodeInfoTableSync::NodeInfoTableSync ()
-	    : SQLiteTableSyncTemplate<NodeInfo> (true, true, db::TRIGGERS_ENABLED_CLAUSE)
+	    : SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo> ()
 	{
 	    // TODO : make host, port, auth updatables.
 	    addTableColumn (TABLE_COL_ID, "INTEGER", false);

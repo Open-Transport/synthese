@@ -20,8 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #include "11_interfaces/InterfacePage.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -37,7 +38,7 @@ namespace synthese
 			@code schedule_sheet_lines_cell @endcode
 			@ingroup m53Pages refPages
 		*/
-		class RoutePlannerSheetLinesCellInterfacePage : public interfaces::InterfacePage
+		class RoutePlannerSheetLinesCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLinesCellInterfacePage>
 		{
 		public:
 			/** Display of schedule sheet lines list cell.

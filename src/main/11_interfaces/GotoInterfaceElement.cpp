@@ -26,6 +26,8 @@
 
 namespace synthese
 {
+	template<> const std::string util::FactorableTemplate<interfaces::LibraryInterfaceElement,interfaces::GotoInterfaceElement>::FACTORY_KEY("goto");
+
 	namespace interfaces
 	{
 		std::string GotoInterfaceElement::display(

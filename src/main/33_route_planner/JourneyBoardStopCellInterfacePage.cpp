@@ -36,6 +36,8 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 
+	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardStopCellInterfacePage>::FACTORY_KEY("journey_board_stop_cell");
+
 	namespace routeplanner
 	{
 		void JourneyBoardStopCellInterfacePage::display(

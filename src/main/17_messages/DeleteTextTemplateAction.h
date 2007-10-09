@@ -25,7 +25,7 @@
 
 #include "30_server/Action.h"
 
-#include <boost/shared_ptr.hpp>
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -34,9 +34,9 @@ namespace synthese
 		class TextTemplate;
 
 		/** DeleteTextTemplateAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
-		class DeleteTextTemplateAction : public server::Action
+		class DeleteTextTemplateAction : public util::FactorableTemplate<server::Action, DeleteTextTemplateAction>
 		{
 		public:
 			static const std::string PARAMETER_TEXT_ID;

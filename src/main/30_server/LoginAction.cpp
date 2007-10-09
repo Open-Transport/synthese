@@ -20,6 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "LoginAction.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/Session.h"
+#include "30_server/Request.h"
+#include "30_server/ServerModule.h"
+#include "30_server/ParametersMap.h"
+
 #include <boost/shared_ptr.hpp>
 
 #include "12_security/User.h"
@@ -28,17 +36,14 @@
 #include "12_security/UserTableSyncException.h"
 #include "12_security/SecurityLog.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Session.h"
-#include "30_server/Request.h"
-#include "30_server/ServerModule.h"
-#include "30_server/LoginAction.h"
-
-using boost::shared_ptr;
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace security;
+
+	template<> const string util::FactorableTemplate<server::Action, server::LoginAction>::FACTORY_KEY("login");
 
 	namespace server
 	{
@@ -53,15 +58,8 @@ namespace synthese
 
 		void LoginAction::_setFromParametersMap(const ParametersMap& map )
 		{
-			ParametersMap::const_iterator it = map.find(PARAMETER_LOGIN);
-			if (it == map.end())
-				throw ActionException("Login field not found");
-			_login = it->second;
-
-			it = map.find(PARAMETER_PASSWORD);
-			if (it == map.end())
-				throw ActionException("Password field not found");
-			_password = it->second;
+			_login = map.getString(PARAMETER_LOGIN, false, FACTORY_KEY);
+			_password = map.getString(PARAMETER_PASSWORD, false, FACTORY_KEY);
 		}
 
 		void LoginAction::run()
@@ -82,7 +80,7 @@ namespace synthese
 				session->setUser(user);
 				_request->setSession(session);
 
-				SecurityLog::addUserLogin(user);
+				SecurityLog::addUserLogin(user.get());
 			}
 			catch (UserTableSyncException e)
 			{

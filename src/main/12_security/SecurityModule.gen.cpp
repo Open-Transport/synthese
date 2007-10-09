@@ -1,8 +1,8 @@
 
-synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::security::SecurityModule>("12_security");
+synthese::security::SecurityModule::integrate();
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::security::ProfileTableSync>("12.01 Profile");
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::security::UserTableSync>("12.02 User");
+synthese::security::ProfileTableSync::integrate();
+synthese::security::UserTableSync::integrate();
 
 synthese::security::UserNameInterfaceElement::integrate();
 synthese::security::UserIdInterfaceElement::integrate();
@@ -13,16 +13,16 @@ synthese::security::UserAdmin::integrate();
 synthese::security::ProfilesAdmin::integrate();
 synthese::security::ProfileAdmin::integrate();
 
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::AddUserAction>("sau");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::DelUserAction>("sdu");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::AddProfileAction>("apa");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::DeleteProfileAction>("dpa");
+synthese::security::AddUserAction::integrate();
+synthese::security::DelUserAction::integrate();
+synthese::security::AddProfileAction::integrate();
+synthese::security::DeleteProfileAction::integrate();
 synthese::security::AddRightAction::integrate();
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::DeleteRightAction>("dra");
+synthese::security::DeleteRightAction::integrate();
 synthese::security::UpdateRightAction::integrate();
 synthese::security::UpdateProfileAction::integrate();
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserUpdateAction>("uua");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserPasswordUpdateAction>("upua");
+synthese::security::UserUpdateAction::integrate();
+synthese::security::UserPasswordUpdateAction::integrate();
 
 synthese::security::GlobalRight::integrate();
 synthese::security::SecurityRight::integrate();

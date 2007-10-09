@@ -20,16 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "ScenarioUpdateDatesAction.h"
 
-#include "17_messages/ScenarioUpdateDatesAction.h"
 #include "17_messages/MessagesModule.h"
 #include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/MessagesLog.h"
 
+#include "30_server/ActionException.h"
+#include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
+
 #include "04_time/TimeParseException.h"
+
+#include "01_util/Conversion.h"
 
 #include <sstream>
 
@@ -41,7 +45,10 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace time;
-	
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action,messages::ScenarioUpdateDatesAction>::FACTORY_KEY("messscenarioud");
+		
 	namespace messages
 	{
 		const string ScenarioUpdateDatesAction::PARAMETER_ENABLED(Action_PARAMETER_PREFIX + "ena");
@@ -62,24 +69,11 @@ namespace synthese
 			{
 				_scenario = ScenarioTableSync::getSent(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
+				_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 
-				it = map.find(PARAMETER_ENABLED);
-				if (it == map.end())
-					throw ActionException("Enabled status not specified");
-				_enabled = Conversion::ToBool(it->second);
+				_startDate = map.getDateTime(PARAMETER_START_DATE, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_START_DATE);
-				if (it == map.end())
-					throw ActionException("Start date not specified");
-				if (!it->second.empty())
-					_startDate = DateTime::FromString(it->second);
-
-				it = map.find(PARAMETER_END_DATE);
-				if (it == map.end())
-					throw ActionException("End date not specified");
-				if (!it->second.empty())
-					_endDate = DateTime::FromString(it->second);
+				_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
 			}
 			catch (DBEmptyResultException<Scenario>)
 			{
@@ -93,7 +87,7 @@ namespace synthese
 		}
 
 		ScenarioUpdateDatesAction::ScenarioUpdateDatesAction()
-			: Action()
+			: FactorableTemplate<Action, ScenarioUpdateDatesAction>()
 			, _startDate(TIME_UNKNOWN)
 			, _endDate(TIME_UNKNOWN)
 		{}
@@ -116,7 +110,7 @@ namespace synthese
 			ScenarioTableSync::save(_scenario.get());
 
 			// Log
-			MessagesLog::addUpdateEntry(static_pointer_cast<const SentScenario, SentScenario>(_scenario), text.str(), _request->getUser());
+			MessagesLog::addUpdateEntry(_scenario.get(), text.str(), _request->getUser().get());
 		}
 	}
 }

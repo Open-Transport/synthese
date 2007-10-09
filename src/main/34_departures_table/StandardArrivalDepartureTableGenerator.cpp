@@ -55,7 +55,7 @@ namespace synthese
 		{
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 			{
-				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
+				for (set<const Edge*>::const_iterator eit = it->second->getDepartureEdges().begin(); eit != it->second->getDepartureEdges().end(); ++eit)
 				{
 					const LineStop* ls = (const LineStop*) (*eit);
 

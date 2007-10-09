@@ -1,6 +1,7 @@
 
 /** 92 RS485 client main file.
 	@file 92_rs485_client/main.cpp
+	@ingroup m92
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,13 +21,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifdef WIN32
+	#include "Windows.h"
+#endif
 
 #include "00_tcp/TcpClientSocket.h"
 #include "00_tcp/SocketException.h"
 
+#include "01_util/threads/Thread.h"
+
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
-#include "01_util/Thread.h"
 
 
 #include <iostream>

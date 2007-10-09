@@ -23,7 +23,9 @@
 #ifndef SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
 #define SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 #include <string>
 #include <iostream>
@@ -32,8 +34,6 @@ namespace synthese
 {
 	namespace env
 	{
-		class PublicTransportStopZoneConnectionPlace;
-
 		/** ConnectionPlace SQLite table synchronizer.
 			@ingroup m15LS refLS
 
@@ -42,7 +42,7 @@ namespace synthese
 				- on update : 
 				- on delete : X
 		*/
-		class ConnectionPlaceTableSync : public db::SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>
+		class ConnectionPlaceTableSync : public db::SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;
@@ -57,17 +57,6 @@ namespace synthese
 			ConnectionPlaceTableSync ();
 			~ConnectionPlaceTableSync ();
 
-			void rowsAdded (synthese::db::SQLite* sqlite, 
-				synthese::db::SQLiteSync* sync,
-				const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			void rowsUpdated (synthese::db::SQLite* sqlite, 
-				synthese::db::SQLiteSync* sync,
-				const synthese::db::SQLiteResultSPtr& rows);
-
-			void rowsRemoved (synthese::db::SQLite* sqlite, 
-				synthese::db::SQLiteSync* sync,
-				const synthese::db::SQLiteResultSPtr& rows);
 		};
 	}
 }

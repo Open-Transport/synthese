@@ -28,20 +28,20 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 #include "17_messages/Types.h"
+
+#include "TextTemplate.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class TextTemplate;
-
 		/** TextTemplate table synchronizer.
-			@ingroup m17
+			@ingroup m17LS refLS
 		*/
-		class TextTemplateTableSync : public db::SQLiteTableSyncTemplate<TextTemplate>
+		class TextTemplateTableSync : public db::SQLiteNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -71,32 +71,6 @@ namespace synthese
 				, bool orderByLongText = false
 				, bool raisingOrder = true
 				);
-
-
-		protected:
-
-			/** Action to do on TextTemplate creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on TextTemplate creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on TextTemplate deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }

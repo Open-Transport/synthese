@@ -22,16 +22,13 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
-
 	namespace routeplanner
 	{
-		class JourneyLineListInterfaceElement : public interfaces::LibraryInterfaceElement
+		class JourneyLineListInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,JourneyLineListInterfaceElement>
 		{
 		private:
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayPedestrianLines;

@@ -23,9 +23,9 @@
 #include <sstream>
 
 #include "RoadChunkTableSync.h"
-#include "RoadChunk.h"
-#include "15_env/Address.h"
-#include "15_env/Road.h"
+
+#include "15_env/AddressTableSync.h"
+#include "15_env/RoadTableSync.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -48,16 +48,16 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const std::string FactorableTemplate<SQLiteTableSync, RoadChunkTableSync>::FACTORY_KEY("");
+		template<> const std::string FactorableTemplate<SQLiteTableSync, RoadChunkTableSync>::FACTORY_KEY("15.60.01 Road chunks");
 	}
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<RoadChunk>::TABLE_NAME = "t014_road_chunks";
-		template<> const int SQLiteTableSyncTemplate<RoadChunk>::TABLE_ID = 14;
-		template<> const bool SQLiteTableSyncTemplate<RoadChunk>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::TABLE_NAME = "t014_road_chunks";
+		template<> const int SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::TABLE_ID = 14;
+		template<> const bool SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<RoadChunk>::load(RoadChunk* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::load(RoadChunk* object, const db::SQLiteResultSPtr& rows )
 		{
 			// ID
 		    object->setKey (rows->getLongLong (TABLE_COL_ID));
@@ -74,12 +74,6 @@ namespace synthese
 		    int rankInRoad (rows->getInt (RoadChunkTableSync::COL_RANKINPATH));
 		    object->setRankInPath(rankInRoad);
 		    
-		    // From address
-		    uid fromAddressId (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID));
-		    shared_ptr<Address> fromAddress = Address::GetUpdateable (fromAddressId);
-		    object->setParentPath(fromAddress->getRoad());
-		    object->setFromAddress(fromAddress.get());
-
 		    // Via points
 		    object->clearViaPoints ();
 		    std::string viaPointsStr (rows->getText (RoadChunkTableSync::COL_VIAPOINTS));
@@ -90,16 +84,36 @@ namespace synthese
 		    for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
 			 viaPointIter != viaPointsTokens.end (); ++viaPointIter)
 		    {
-			tokenizer valueTokens (*viaPointIter, sep2);
-			tokenizer::iterator valueIter = valueTokens.begin();
-			
-			// X:Y
-			object->addViaPoint (Point2D (Conversion::ToDouble (*valueIter), 
+				tokenizer valueTokens (*viaPointIter, sep2);
+				tokenizer::iterator valueIter = valueTokens.begin();
+				
+				// X:Y
+				object->addViaPoint (Point2D (Conversion::ToDouble (*valueIter), 
 						      Conversion::ToDouble (*(++valueIter))));
 		    }
 		}
+
+
+		template<> void SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::_link(RoadChunk* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			// From address
+			uid fromAddressId (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID));
+			Address* fromAddress(AddressTableSync::GetUpdateable (fromAddressId, obj, temporary));
+			obj->setParentPath(fromAddress->getRoad());
+			obj->setFromAddress(fromAddress);
+
+			if (temporary == GET_REGISTRY)
+			{
+				Road::GetUpdateable(fromAddress->getRoad ()->getId ())->addEdge (obj);
+			}
+		}
+
+		template<> void SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::_unlink(RoadChunk* obj)
+		{
+		}
+
 	    
-	    template<> void SQLiteTableSyncTemplate<RoadChunk>::save(RoadChunk* object)
+	    template<> void SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::save(RoadChunk* object)
 	    {
 		SQLite* sqlite = DBModule::GetSQLite();
 		stringstream query;
@@ -125,7 +139,7 @@ namespace synthese
 		const std::string RoadChunkTableSync::COL_VIAPOINTS ("via_points");  // list of ids
 
 		RoadChunkTableSync::RoadChunkTableSync()
-			: SQLiteTableSyncTemplate<RoadChunk>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<RoadChunkTableSync,RoadChunk>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_ADDRESSID, "INTEGER", false);
@@ -135,7 +149,7 @@ namespace synthese
 			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
-	    void RoadChunkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
+/*	    void RoadChunkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 	    {
 		while (rows->next ())
 		{
@@ -183,7 +197,7 @@ namespace synthese
 		    }
 		}
 	    }
-
+*/
 
 	    vector<shared_ptr<RoadChunk> > RoadChunkTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 	    {

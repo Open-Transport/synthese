@@ -29,6 +29,8 @@ using namespace boost;
 
 namespace synthese
 {
+	template<> const std::string util::FactorableTemplate<interfaces::LibraryInterfaceElement, interfaces::LineLabelInterfaceElement>::FACTORY_KEY("label");
+
 	namespace interfaces
 	{
 		std::string LineLabelInterfaceElement::display(

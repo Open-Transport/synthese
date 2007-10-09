@@ -27,7 +27,7 @@
 #include "02_db/DbModuleClass.h"
 #include "02_db/Constants.h"
 
-
+#include "01_util/FactorableTemplate.h"
 
 #ifdef WITH_DBRING
 
@@ -56,7 +56,7 @@ namespace synthese
 
 //		static const std::string TRIGGERS_ENABLED_CLAUSE;
 
-		class DBModule : public DbModuleClass
+		class DBModule : public util::FactorableTemplate<DbModuleClass, DBModule>
 		{
 		private:
 		    

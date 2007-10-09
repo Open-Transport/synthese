@@ -1,0 +1,1 @@
+dir /b/s ..\main\*.cpp ..\main\*.h | cccc - --outdir=..\..\build\cccc --html_outfile=..\..\build\cccc\index.html --lang=c++

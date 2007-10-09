@@ -119,7 +119,7 @@ namespace synthese
 
 		std::string HTMLForm::getTextAreaInput( const std::string& name, const std::string& value, int rows, int cols )
 		{
-			if (_updateRight)
+			if (!_updateRight)
 				return value;
 
 			_removeHiddenFieldIfExists(name, value);
@@ -181,28 +181,34 @@ namespace synthese
 
 			_removeHiddenFieldIfExists(name, value.toString());
 			string fieldId = _getFieldId(name);
+			string spanId = _getFieldId(name + "SPAN");
 			string triggerId = _getFieldId(name + "TRIGGER");
 			stringstream s;
 			s	<< "<input "
-					<< "type=\"text\" "
+					<< "type=\"hidden\" "
 					<< "readonly=\"1\" "
 					<< "name=\"" << name << "\" "
 					<< "id=\"" << fieldId << "\" "
-					<< "value=\"" << (value.isUnknown() ? "" : value.toString()) << "\" "
-				<< "/><img "
+					<< "value=\"" << (value.isUnknown() ? string() : value.toSQLString(false)) << "\" "
+				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
+					<< value.toString()
+					<< "</span>"
+					<< "<img "
 					<< "src=\"calendar_edit.png\" "
 					<< "style=\"cursor:pointer\" "
 					<< "title=\"Date\" "
 					<< "id=\"" << triggerId << "\" "
-					<< "onmouseover=\"this.style.background=’red’;\" "
+					<< "onmouseover=\"this.style.background='red';\" "
 					<< "onmouseout=\"this.style.background=’’;\" "
 				<< "/>"
 				<< "<script type=\"text/javascript\">"
 					<< "Calendar.setup({"
 					<< "inputField:\"" << fieldId << "\","
+					<< "displayArea:\"" << spanId << "\","
 					<< "button:\"" << triggerId << "\","
 					<< "showsTime : true,"
-					<< "ifFormat :\"%d/%m/%Y %H:%M\","
+					<< "ifFormat :\"%Y-%m-%d %H:%M\","
+					<< "daFormat :\"%e/%m/%Y %H:%M\","
 					<< "electric : false,"
 					<< "singleClick:true,";
 			if (!value.isUnknown())
@@ -222,27 +228,33 @@ namespace synthese
 			_removeHiddenFieldIfExists(name, value.toString());
 			string fieldId = _getFieldId(name);
 			string triggerId = _getFieldId(name + "TRIGGER");
+			string spanId = _getFieldId(name + "SPAN");
 			stringstream s;
 			s	<< "<input "
-					<< "type=\"text\" "
+					<< "type=\"hidden\" "
 					<< "readonly=\"1\" "
 					<< "name=\"" << name << "\" "
 					<< "id=\"" << fieldId << "\" "
-					<< "value=\"" << (value.isUnknown() ? "" : value.toString()) << "\" "
-				<< "/><img "
+					<< "value=\"" << (value.isUnknown() ? "" : value.toSQLString(false)) << "\" "
+				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
+					<< value.toString()
+					<< "</span>"
+					<< "<img "
 					<< "src=\"calendar_edit.png\" "
 					<< "style=\"cursor:pointer\" "
 					<< "title=\"Date\" "
 					<< "id=\"" << triggerId << "\" "
-					<< "onmouseover=\"this.style.background=’red’;\" "
+					<< "onmouseover=\"this.style.background='red';\" "
 					<< "onmouseout=\"this.style.background=’’;\" "
 				<< "/>"
 				<< "<script type=\"text/javascript\">"
 					<< "Calendar.setup({"
 					<< "inputField:\"" << fieldId << "\","
+					<< "displayArea:\"" << spanId << "\","
 					<< "button:\"" << triggerId << "\","
 					<< "showsTime : false,"
-					<< "ifFormat :\"%d/%m/%Y\","
+					<< "ifFormat :\"%Y-%m-%d\","
+					<< "daFormat :\"%e/%m/%Y\","
 					<< "electric : false,"
 					<< "singleClick:true,";
 			if (!value.isUnknown())

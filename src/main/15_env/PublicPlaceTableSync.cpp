@@ -25,7 +25,7 @@
 
 #include "15_env/PublicPlaceTableSync.h"
 #include "15_env/PublicPlace.h"
-#include "15_env/City.h"
+#include "15_env/CityTableSync.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -45,29 +45,43 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const std::string FactorableTemplate<SQLiteTableSync, PublicPlaceTableSync>::FACTORY_KEY("");
+		template<> const std::string FactorableTemplate<SQLiteTableSync, PublicPlaceTableSync>::FACTORY_KEY("15.40.03 Public places");
 	}
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PublicPlace>::TABLE_NAME = "t013_public_places";
-		template<> const int SQLiteTableSyncTemplate<PublicPlace>::TABLE_ID = 13;
-		template<> const bool SQLiteTableSyncTemplate<PublicPlace>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::TABLE_NAME = "t013_public_places";
+		template<> const int SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::TABLE_ID = 13;
+		template<> const bool SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PublicPlace>::load(PublicPlace* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::load(PublicPlace* object, const db::SQLiteResultSPtr& rows )
 		{
 		    object->setKey (rows->getLongLong (TABLE_COL_ID));
-		    std::string name (rows->getText (PublicPlaceTableSync::COL_NAME));
-		    uid cityId (rows->getLongLong (PublicPlaceTableSync::COL_CITYID));
 
-			shared_ptr<const City> city(City::Get(cityId));
-
+			std::string name (rows->getText (PublicPlaceTableSync::COL_NAME));
 			object->setName(name);
-			object->setCity(city.get());
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<PublicPlace>::save (PublicPlace* object)
+		template<> void SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::_link(PublicPlace* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			uid cityId (rows->getLongLong (PublicPlaceTableSync::COL_CITYID));
+			City* city(CityTableSync::GetUpdateable(cityId,obj,temporary));
+			obj->setCity(city);
+
+			city->getPublicPlacesMatcher ().add (obj->getName (), obj);
+		}
+
+		template<> void SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::_unlink(PublicPlace* obj)
+		{
+			City* city(const_cast<City*>(obj->getCity()));
+			city->getPublicPlacesMatcher ().remove (obj->getName ());
+
+			obj->setCity(NULL);
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::save (PublicPlace* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -90,14 +104,14 @@ namespace synthese
 		const std::string PublicPlaceTableSync::COL_CITYID ("city_id");
 
 		PublicPlaceTableSync::PublicPlaceTableSync()
-			: SQLiteTableSyncTemplate<PublicPlace>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<PublicPlaceTableSync,PublicPlace>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_NAME, "TEXT", true);
 			addTableColumn (COL_CITYID, "INTEGER", false);
 		}
 
-		void PublicPlaceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
+/*		void PublicPlaceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 		{
 			while (rows->next ())
 			{
@@ -105,12 +119,10 @@ namespace synthese
 				if (PublicPlace::Contains(id))
 				{
 					shared_ptr<PublicPlace> pp = PublicPlace::GetUpdateable (id);
-					shared_ptr<City> city = City::GetUpdateable (pp->getCity ()->getKey ());
 					city->getPublicPlacesMatcher ().remove (pp->getName ());
 
 					load(PublicPlace::GetUpdateable(id).get(), rows);
 
-					city->getPublicPlacesMatcher ().add (pp->getName (), pp.get());
 				}
 				else
 				{
@@ -154,7 +166,7 @@ namespace synthese
 				}
 			}
 		}
-
+*/
 		vector<shared_ptr<PublicPlace> > PublicPlaceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			stringstream query;

@@ -36,7 +36,7 @@ namespace synthese
 			const std::string& logKey
 			, DBLogEntry::Level level
 			, const DBLogEntry::Content& content
-			, shared_ptr<const security::User> user /*= NULL*/ 
+			, const security::User* user /*= NULL*/ 
 			, uid objectId
 		){
 			shared_ptr<DBLogEntry> e(new DBLogEntry);

@@ -20,14 +20,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "DisplayScreenRemoveForbiddenPlaceAction.h"
+
+#include "34_departures_table/DisplayScreenTableSync.h"
+
+#include "15_env/ConnectionPlaceTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "34_departures_table/DisplayScreenRemoveForbiddenPlaceAction.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -37,6 +38,9 @@ namespace synthese
 	using namespace db;
 	using namespace server;
 	using namespace env;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemoveForbiddenPlaceAction>::FACTORY_KEY("dsrfp");
 
 	namespace departurestable
 	{
@@ -54,14 +58,10 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_PLACE);
-				if (it == map.end())
-					throw ActionException("Place not specified");
-				_place = PublicTransportStopZoneConnectionPlace::Get(Conversion::ToLongLong(it->second));
+				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
+				_place = ConnectionPlaceTableSync::Get(id);
 
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)
@@ -76,7 +76,7 @@ namespace synthese
 
 		void DisplayScreenRemoveForbiddenPlaceAction::run()
 		{
-			_screen->removeForbiddenPlace(_place);
+			_screen->removeForbiddenPlace(_place.get());
 			DisplayScreenTableSync::save(_screen.get());
 		}
 	}

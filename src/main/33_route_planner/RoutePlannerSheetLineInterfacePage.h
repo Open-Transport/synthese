@@ -23,8 +23,9 @@
 #ifndef SYNTHESE_RoutePlannerSheetLineInterfacePage_H__
 #define SYNTHESE_RoutePlannerSheetLineInterfacePage_H__
 
-
 #include "11_interfaces/InterfacePage.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -54,7 +55,7 @@ namespace synthese
 				- 2 : 0|1 is origin row
 				- 3 : 0|1 is destination row
 		*/
-		class RoutePlannerSheetLineInterfacePage : public interfaces::InterfacePage
+		class RoutePlannerSheetLineInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLineInterfacePage>
 		{
 		public:
 			/** Display of line of schedule sheet.

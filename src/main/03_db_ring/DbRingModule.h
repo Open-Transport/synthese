@@ -3,7 +3,7 @@
 
 #include "02_db/DbModuleClass.h"
 
-
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -21,7 +21,7 @@ namespace synthese
 
 	    class Node;
 
-	    class DbRingModule : public db::DbModuleClass
+		class DbRingModule : public util::FactorableTemplate<db::DbModuleClass, DbRingModule>
 	    {
 	    private:
 		

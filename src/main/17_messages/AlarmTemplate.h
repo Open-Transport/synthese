@@ -50,6 +50,9 @@ namespace synthese
 			uid getId() const;
 
 			uid getScenarioId() const;
+
+			static boost::shared_ptr<const AlarmTemplate> Get(uid key);
+			static bool Contains(uid key);
 		};
 	}
 }

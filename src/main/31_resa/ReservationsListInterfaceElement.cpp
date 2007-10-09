@@ -40,6 +40,8 @@
 
 #include "04_time/Date.h"
 
+#include "01_util/Conversion.h"
+
 #include <map>
 
 using namespace std;
@@ -52,6 +54,7 @@ namespace synthese
 	using namespace html;
 	using namespace time;
 	using namespace env;
+	using namespace util;
 	
 	namespace util
 	{
@@ -62,24 +65,24 @@ namespace synthese
 	{
 
 
-			typedef struct
-			{
-				typedef vector<shared_ptr<ReservationTransaction> > Reservations;
-				shared_ptr<Service>		service;
-				Reservations			reservations;
-				int						seatsNumber;
-				bool					overflow;
-				bool					status;
-				
-/*				shared_ptr<const Reservation>	getReservation(
-					const shared_ptr<ReservationTransaction>& transaction
-				) const	{
-					const ReservationTransaction::Reservations& r(transaction->getReservations());
-					for (ReservationTransaction::Reservations::const_iterator ite(r.begin()); ite != r.end(); ++ite)
-						if ((*ite)->getServiceId() == service->getId())
-							return *ite;
-				}
-*/			} ServiceReservations ;
+		typedef struct
+		{
+			typedef vector<shared_ptr<ReservationTransaction> > Reservations;
+			shared_ptr<Service>		service;
+			Reservations			reservations;
+			int						seatsNumber;
+			bool					overflow;
+			bool					status;
+			
+			shared_ptr<Reservation>	getReservation(
+				const ReservationTransaction* transaction
+			) const	{
+				const ReservationTransaction::Reservations& r(transaction->getReservations());
+				for (ReservationTransaction::Reservations::const_iterator ite(r.begin()); ite != r.end(); ++ite)
+					if ((*ite)->getServiceId() == service->getId())
+						return *ite;
+			}
+		} ServiceReservations ;
 
 		void ReservationsListInterfaceElement::storeParameters(ValueElementList& vel)
 		{
@@ -98,24 +101,21 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 
-			shared_ptr<CommercialLine> line(CommercialLineTableSync::get(Conversion::ToLongLong(_lineId->getValue(parameters, variables, object, request))));
-			Date listDate(Date::FromInternalString(_date->getValue(parameters, variables, object, request)));
-			bool displayCancelled(Conversion::ToBool(_displayCancelled->getValue(parameters, variables, object, request)));
+			// Local variables
+			shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(Conversion::ToLongLong(_lineId->getValue(parameters, variables, object, request))));
+			Date listDate(_date ? Date::FromInternalString(_date->getValue(parameters, variables, object, request)) : Date(TIME_CURRENT));
+			bool displayCancelled(_displayCancelled ? Conversion::ToBool(_displayCancelled->getValue(parameters, variables, object, request)) : false);
 			DateTime now(TIME_CURRENT);
 
-			// Feuilles de route
-//			$detail_screen = new Content(FONCTION_FEUILLE_ROUTE_TAD, $this);
-
+			// Temporary variables
 			int seatsNumber(0);
-
-			HTMLTable t;
-			stream << t.open();
-			
-			// Initialization : not in round trip
 			bool round_trip = false;
 			bool next_overflow = false;
 			bool course = false;
 
+			HTMLTable t;
+			stream << t.open();
+			
 			// Boucle sur les circulations
 			vector<shared_ptr<ScheduledService> > services(ScheduledServiceTableSync::search(
 				line.get()
@@ -123,8 +123,6 @@ namespace synthese
 			));
 
 			// Download reservations
-
-
 			map<ScheduledService*, ServiceReservations> reservations;
 			for(vector<shared_ptr<ScheduledService> >::const_iterator it(services.begin()); it != services.end(); ++it)
 			{
@@ -154,6 +152,11 @@ namespace synthese
 
 			for	(vector<shared_ptr<ScheduledService> >::const_iterator it(services.begin()); it != services.end(); ++it)
 			{
+				ScheduledService* service(it->get());
+
+				stream << t.row();
+				stream << t.col(4) << "Service " << service->getServiceNumber() << " - départ de " << service->getDepartureSchedule().getHour().toString();
+
 /*				if ((retour || course) && $circulation = $circulation_suivante)
 				{
 					$reservations_table = $next_reservations_table;
@@ -170,7 +173,12 @@ namespace synthese
 
 					for (ServiceReservations::Reservations::const_iterator itr(serviceReservations.reservations.begin()); itr != serviceReservations.reservations.end(); ++itr)
 					{
-//						shared_ptr<Reservation> reservation(serviceReservations.getReservation(*itr));
+						shared_ptr<Reservation> reservation(serviceReservations.getReservation(itr->get()));
+
+						stream << t.row();
+						stream << t.col() << reservation->getDeparturePlaceName();
+						stream << t.col() << reservation->getArrivalPlaceName();
+						stream << t.col() << reservation->getTransaction()->getCustomerName();
 
 					}
 /*				}

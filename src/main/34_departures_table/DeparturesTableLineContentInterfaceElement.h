@@ -23,8 +23,10 @@
 #ifndef SYNTHESE_DeparturesTableLineContentInterfaceElement_H__
 #define SYNTHESE_DeparturesTableLineContentInterfaceElement_H__
 
-
 #include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
+
 #include <string>
 
 namespace synthese
@@ -40,7 +42,7 @@ namespace synthese
 		/** Line content interface element.
 			@ingroup m34Library refLibrary
 		*/
-		class DeparturesTableLineContentInterfaceElement : public interfaces::LibraryInterfaceElement
+		class DeparturesTableLineContentInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableLineContentInterfaceElement>
 		{
 		private:
 			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_htmlStartLine;

@@ -50,7 +50,7 @@ namespace synthese
 			@ingroup m11
 		*/
 		class LibraryInterfaceElement
-			: public util::Factorable
+			: public util::Factorable<LibraryInterfaceElement>
 			, public util::Registrable<int, LibraryInterfaceElement>
 		{
 		protected:

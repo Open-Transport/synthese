@@ -26,6 +26,8 @@
 #include "11_interfaces/InterfacePage.h"
 #include "04_time/DateTime.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace env
@@ -54,7 +56,7 @@ namespace synthese
 				- 6 Fist time
 				- 7 Last time (empty if continuous service)
 		*/
-		class JourneyBoardStopCellInterfacePage : public interfaces::InterfacePage
+		class JourneyBoardStopCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardStopCellInterfacePage>
 		{
 		public:
 			/** Display.

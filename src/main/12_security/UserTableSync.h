@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -44,7 +44,7 @@ namespace synthese
 			@todo Update the opened session on user update
 		*/
 
-		class UserTableSync : public db::SQLiteTableSyncTemplate<User>
+		class UserTableSync : public db::SQLiteNoSyncTableSyncTemplate<UserTableSync,User>
 		{
 		public:
 			static const std::string TABLE_COL_LOGIN;
@@ -65,7 +65,14 @@ namespace synthese
 
 			UserTableSync();
 
+			/** Gets a user in the database, founded by his login.
+				@param login login to search
+				@return boost::shared_ptr<User> Shared pointer to a new user linked-object.
+				@author Hugues Romain
+				@date 2007
+			*/
 			static boost::shared_ptr<User> getUserFromLogin(const std::string& login);
+
 			static bool loginExists(const std::string& login);
 
 			/** User search.
@@ -79,7 +86,7 @@ namespace synthese
 				@param orderByName Order the results by name and surname
 				@param orderByProfile Order the results by profile name
 				@param raisingOrder True = Ascendant order, false = descendant order
-				@return vector<share_ptr<User>> Founded users. 
+				@return vector<share_ptr<User>> Founded vector of shared pointers to User linked-objects. 
 				@warning only one of the orderBy parameters must be true, or no one. More of one true value will throw an exception.
 				@throw UserTableSyncException If the query has failed (does not occurs in normal case)
 				@author Hugues Romain
@@ -97,30 +104,6 @@ namespace synthese
 				, bool orderByProfileName = false
 				, bool raisingOrder = true
 				);
-
-		protected:
-
-			/** Action to do on user creation.
-				No action because the users are not permanently loaded in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on user creation.
-				Updates the users objects in the opened sessions.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on user deletion.
-				Closes the sessions of the deleted user.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 
 	}

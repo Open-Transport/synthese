@@ -97,7 +97,7 @@ namespace synthese
 		void PublicTransportStopZoneConnectionPlace::addPhysicalStop( const PhysicalStop* physicalStop )
 		{
 			_isoBarycentreToUpdate = true;
-			_physicalStops.insert(physicalStop);
+			_physicalStops.insert(make_pair(physicalStop->getKey(),physicalStop));
 		}
 
 		void PublicTransportStopZoneConnectionPlace::addTransferDelay( uid departureId, uid arrivalId, int transferDelay )
@@ -162,7 +162,7 @@ namespace synthese
 			if (withAll)
 				m.push_back(make_pair(0, "(tous)"));
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
-				m.push_back(make_pair((*it)->getKey(), (*it)->getOperatorCode() + " / " + (*it)->getName()));
+				m.push_back(make_pair(it->first, it->second->getOperatorCode() + " / " + it->second->getName()));
 			return m;
 		}
 
@@ -170,8 +170,8 @@ namespace synthese
 		{
 			PhysicalStopsLabels m;
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
-				if (noDisplay.find(*it) == noDisplay.end())
-					m.push_back(make_pair((*it)->getKey(), (*it)->getOperatorCode() + " / " + (*it)->getName()));
+				if (noDisplay.find(it->first) == noDisplay.end())
+					m.push_back(make_pair(it->first, it->second->getOperatorCode() + " / " + it->second->getName()));
 			return m;
 		}
 
@@ -181,7 +181,7 @@ namespace synthese
 			{
 				map<const CommercialLine*, int> scores;
 				for (PhysicalStops::const_iterator its(_physicalStops.begin()); its != _physicalStops.end(); ++its)
-					for (PhysicalStop::Edges::const_iterator ite((*its)->getDepartureEdges().begin()); ite != (*its)->getDepartureEdges().end(); ++ite)
+					for (PhysicalStop::Edges::const_iterator ite(its->second->getDepartureEdges().begin()); ite != its->second->getDepartureEdges().end(); ++ite)
 					{
 						const Line* route(static_cast<const Line*>((*ite)->getParentPath()));
 						map<const CommercialLine*, int>::iterator itl(scores.find(route->getCommercialLine()));
@@ -226,11 +226,11 @@ namespace synthese
 					++it
 				){
 					result.insert(
-						*it
+						it->second
 						, getVertexAccess(
 							accessDirection
 							, accessParameters
-							, *it
+							, it->second
 							, origin
 						)
 					);
@@ -244,7 +244,7 @@ namespace synthese
 			{
 				_isoBarycentre.clear();
 				for (PhysicalStops::const_iterator it(_physicalStops.begin()); it != _physicalStops.end(); ++it)
-					_isoBarycentre.add(**it);
+					_isoBarycentre.add(*it->second);
 				for (Addresses::const_iterator it(_addresses.begin()); it != _addresses.end(); ++it)
 					_isoBarycentre.add(**it);
 				_isoBarycentreToUpdate = false;

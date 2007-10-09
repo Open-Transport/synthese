@@ -20,13 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "AlarmStopAction.h"
 
 #include "17_messages/SingleSentAlarm.h"
-#include "17_messages/AlarmStopAction.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesLog.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -35,6 +37,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace time;
+
+	template<> const string util::FactorableTemplate<Action, messages::AlarmStopAction>::FACTORY_KEY("masa");
 	
 	namespace messages
 	{
@@ -49,8 +53,6 @@ namespace synthese
 
 		void AlarmStopAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			try
 			{
 				_alarm = AlarmTableSync::getSingleSentAlarm(_request->getObjectId());
@@ -66,7 +68,7 @@ namespace synthese
 		}
 
 		AlarmStopAction::AlarmStopAction()
-			: Action(), _stopDateTime(TIME_CURRENT)
+			: FactorableTemplate<Action,AlarmStopAction>(), _stopDateTime(TIME_CURRENT)
 		{}
 
 		void AlarmStopAction::run()
@@ -77,7 +79,7 @@ namespace synthese
 			AlarmTableSync::save(_alarm.get());
 
 			// Log
-			MessagesLog::addUpdateEntry(dynamic_pointer_cast<const SingleSentAlarm, SingleSentAlarm>(_alarm), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser());
+			MessagesLog::addUpdateEntry(dynamic_pointer_cast<const SingleSentAlarm, SingleSentAlarm>(_alarm).get(), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser().get());
 		}
 	}
 }

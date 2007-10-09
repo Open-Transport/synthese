@@ -25,12 +25,12 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace interfaces
 	{
-		class ValueInterfaceElement;
-
 		/** Execution variable library interface element.
 			
 			Usage :
@@ -38,7 +38,7 @@ namespace synthese
 
 			@ingroup m11Library refLibrary
 		*/
-		class SetInterfaceElement : public interfaces::LibraryInterfaceElement
+		class SetInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, SetInterfaceElement>
 		{
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _varName;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _varValue;

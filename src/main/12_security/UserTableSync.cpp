@@ -46,31 +46,42 @@ namespace synthese
 	using namespace security;
 	using namespace time;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,UserTableSync>::FACTORY_KEY("12.02 User");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<User>::TABLE_NAME = "t026_users";
-		template<> const int SQLiteTableSyncTemplate<User>::TABLE_ID = 26;
-		template<> const bool SQLiteTableSyncTemplate<User>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<UserTableSync,User>::TABLE_NAME = "t026_users";
+		template<> const int SQLiteTableSyncTemplate<UserTableSync,User>::TABLE_ID = 26;
+		template<> const bool SQLiteTableSyncTemplate<UserTableSync,User>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<User>::load(User* user, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteTableSyncTemplate<UserTableSync,User>::load(User* user, const db::SQLiteResultSPtr& rows)
 		{
-			try
-			{
 				user->setKey(rows->getLongLong (TABLE_COL_ID));
 				user->setPassword(rows->getText ( UserTableSync::TABLE_COL_PASSWORD));
 				user->setName(rows->getText ( UserTableSync::TABLE_COL_NAME));
 				user->setSurname(rows->getText ( UserTableSync::TABLE_COL_SURNAME));
 				user->setLogin(rows->getText ( UserTableSync::TABLE_COL_LOGIN));
-				user->_address = rows->getText ( UserTableSync::TABLE_COL_ADDRESS);
-				user->_postCode = rows->getText ( UserTableSync::TABLE_COL_POST_CODE);
-				user->_cityText = rows->getText ( UserTableSync::TABLE_COL_CITY_TEXT);
-				user->_cityId = rows->getLongLong ( UserTableSync::TABLE_COL_CITY_ID);
-				user->_country = rows->getText ( UserTableSync::TABLE_COL_COUNTRY);
-				user->_email = rows->getText ( UserTableSync::TABLE_COL_EMAIL);
-				user->_phone = rows->getText ( UserTableSync::TABLE_COL_PHONE);
+				user->setAddress(rows->getText ( UserTableSync::TABLE_COL_ADDRESS));
+				user->setPostCode(rows->getText ( UserTableSync::TABLE_COL_POST_CODE));
+				user->setCityText(rows->getText ( UserTableSync::TABLE_COL_CITY_TEXT));
+				user->setCityId(rows->getLongLong ( UserTableSync::TABLE_COL_CITY_ID));
+				user->setCountry(rows->getText ( UserTableSync::TABLE_COL_COUNTRY));
+				user->setEMail(rows->getText ( UserTableSync::TABLE_COL_EMAIL));
+				user->setPhone(rows->getText ( UserTableSync::TABLE_COL_PHONE));
 				user->setConnectionAllowed(rows->getBool ( UserTableSync::COL_LOGIN_AUTHORIZED));
-				user->setProfile(Profile::Get(rows->getLongLong ( UserTableSync::TABLE_COL_PROFILE_ID)));
 				user->setBirthDate(Date::FromSQLDate(rows->getText ( UserTableSync::COL_BIRTH_DATE)));
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<UserTableSync,User>::_link(User* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			try
+			{
+				obj->setProfile(ProfileTableSync::Get(rows->getLongLong ( UserTableSync::TABLE_COL_PROFILE_ID), obj, true, GET_AUTO));
 			}
 			catch (Profile::RegistryKeyException e)
 			{
@@ -79,10 +90,14 @@ namespace synthese
 		}
 
 
+		template<> void SQLiteTableSyncTemplate<UserTableSync,User>::_unlink(User* obj)
+		{
+			obj->setProfile(NULL);
+		}
 
 
 
-		template<> void SQLiteTableSyncTemplate<User>::save(User* user )
+		template<> void SQLiteTableSyncTemplate<UserTableSync,User>::save(User* user )
 		{
 			try
 			{
@@ -99,13 +114,13 @@ namespace synthese
 					<< "," << Conversion::ToSQLiteString(user->getLogin())
 					<< "," << Conversion::ToSQLiteString(user->getPassword())
 					<< "," << Conversion::ToString(user->getProfile()->getKey())
-					<< "," << Conversion::ToSQLiteString(user->_address)
-					<< "," << Conversion::ToSQLiteString(user->_postCode)
-					<< "," << Conversion::ToSQLiteString(user->_cityText)
-					<< "," << Conversion::ToString(user->_cityId)
-					<< "," << Conversion::ToSQLiteString(user->_country)
-					<< "," << Conversion::ToSQLiteString(user->_email)
-					<< "," << Conversion::ToSQLiteString(user->_phone)
+					<< "," << Conversion::ToSQLiteString(user->getAddress())
+					<< "," << Conversion::ToSQLiteString(user->getPostCode())
+					<< "," << Conversion::ToSQLiteString(user->getCityText())
+					<< "," << Conversion::ToString(user->getCityId())
+					<< "," << Conversion::ToSQLiteString(user->getCountry())
+					<< "," << Conversion::ToSQLiteString(user->getEMail())
+					<< "," << Conversion::ToSQLiteString(user->getPhone())
 					<< "," << Conversion::ToString(user->getConnectionAllowed())
 					<< "," << user->getBirthDate().toSQLString()
 					<< ")";
@@ -123,23 +138,23 @@ namespace synthese
 	}
 	namespace security
 	{
-		const std::string UserTableSync::TABLE_COL_NAME = "name";
-		const std::string UserTableSync::TABLE_COL_SURNAME = "surname";
-		const std::string UserTableSync::TABLE_COL_LOGIN = "login";
-		const std::string UserTableSync::TABLE_COL_PASSWORD = "password";
-		const std::string UserTableSync::TABLE_COL_PROFILE_ID = "profile_id";
-		const std::string UserTableSync::TABLE_COL_ADDRESS = "address";
-		const std::string UserTableSync::TABLE_COL_POST_CODE = "post_code";
-		const std::string UserTableSync::TABLE_COL_CITY_TEXT = "city_text";
-		const std::string UserTableSync::TABLE_COL_CITY_ID = "city_id";
-		const std::string UserTableSync::TABLE_COL_COUNTRY = "country";
-		const std::string UserTableSync::TABLE_COL_EMAIL = "email";
-		const std::string UserTableSync::TABLE_COL_PHONE = "phone";
-		const std::string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
-		const std::string UserTableSync::COL_BIRTH_DATE = "birth_date";
+		const string UserTableSync::TABLE_COL_NAME = "name";
+		const string UserTableSync::TABLE_COL_SURNAME = "surname";
+		const string UserTableSync::TABLE_COL_LOGIN = "login";
+		const string UserTableSync::TABLE_COL_PASSWORD = "password";
+		const string UserTableSync::TABLE_COL_PROFILE_ID = "profile_id";
+		const string UserTableSync::TABLE_COL_ADDRESS = "address";
+		const string UserTableSync::TABLE_COL_POST_CODE = "post_code";
+		const string UserTableSync::TABLE_COL_CITY_TEXT = "city_text";
+		const string UserTableSync::TABLE_COL_CITY_ID = "city_id";
+		const string UserTableSync::TABLE_COL_COUNTRY = "country";
+		const string UserTableSync::TABLE_COL_EMAIL = "email";
+		const string UserTableSync::TABLE_COL_PHONE = "phone";
+		const string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
+		const string UserTableSync::COL_BIRTH_DATE = "birth_date";
 
 		UserTableSync::UserTableSync()
-			: db::SQLiteTableSyncTemplate<User> (true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: db::SQLiteNoSyncTableSyncTemplate<UserTableSync,User>()
 		{
 			// Columns
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
@@ -165,24 +180,11 @@ namespace synthese
 		}
 
 
-		void UserTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
-		{
-		}
 
-
-		void UserTableSync::rowsAdded( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		}
-
-
-		void UserTableSync::rowsRemoved( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
-		{
-		}
-
-		shared_ptr<User> UserTableSync::getUserFromLogin(const std::string& login )
+		shared_ptr<User> UserTableSync::getUserFromLogin(const string& login )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
-			std::stringstream query;
+			stringstream query;
 			query
 				<< "SELECT *"
 				<< " FROM " << TABLE_NAME
@@ -195,6 +197,7 @@ namespace synthese
 
 				shared_ptr<User> user (new User);
 				load(user.get(), rows);
+				link(user.get(), rows, GET_AUTO);
 				return user;
 			}
 			catch (SQLiteException e)
@@ -205,9 +208,9 @@ namespace synthese
 
 
 
-		std::vector<shared_ptr<User> > UserTableSync::search(
-			const std::string& login
-			, const std::string name
+		vector<shared_ptr<User> > UserTableSync::search(
+			const string& login
+			, const string name
 			, shared_ptr<const Profile> profile
 			, tribool emptyLogin
 			, int first /*= 0*/, int number /*= 0*/
@@ -251,6 +254,7 @@ namespace synthese
 				{
 					shared_ptr<User> user(new User);
 					load(user.get(), rows);
+					link(user.get(), rows, GET_AUTO);
 					users.push_back(user);
 				}
 				return users;
@@ -263,12 +267,12 @@ namespace synthese
 
 
 
-		bool UserTableSync::loginExists( const std::string& login )
+		bool UserTableSync::loginExists( const string& login )
 		{
 			try
 			{
 				SQLite* sqlite = DBModule::GetSQLite();
-				std::stringstream query;
+				stringstream query;
 				query
 					<< "SELECT " << TABLE_COL_ID
 					<< " FROM " << TABLE_NAME

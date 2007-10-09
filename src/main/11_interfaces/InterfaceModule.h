@@ -28,6 +28,7 @@
 
 #include "01_util/ModuleClass.h"
 #include "01_util/UId.h"
+#include "01_util/FactorableTemplate.h"
 
 #include "11_interfaces/Types.h"
 
@@ -108,7 +109,7 @@ namespace synthese
 	{
 		/** Interface module class.
 		*/
-		class InterfaceModule : public util::ModuleClass
+		class InterfaceModule : public util::FactorableTemplate<util::ModuleClass, InterfaceModule>
 		{
 		public:
 			static std::vector<std::pair<uid, std::string> > getInterfaceLabels();

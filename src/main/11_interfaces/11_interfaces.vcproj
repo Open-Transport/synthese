@@ -74,15 +74,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NonPredefinedInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NonPredefinedInterfacePage.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Parametres.h"
-				>
-			</File>
-			<File
-				RelativePath=".\StaticValueInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\StaticValueInterfaceElement.h"
 				>
 			</File>
 			<File
@@ -299,6 +299,14 @@
 			</File>
 			<File
 				RelativePath=".\SetInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StaticValueInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StaticValueInterfaceElement.h"
 				>
 			</File>
 			<File

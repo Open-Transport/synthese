@@ -22,9 +22,12 @@
 
 #include "30_server/LogoutAction.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 namespace synthese
 {
+	template<> const std::string util::FactorableTemplate<server::Action,server::LogoutAction>::FACTORY_KEY("logout");
+
 	namespace server
 	{
 		ParametersMap LogoutAction::getParametersMap() const

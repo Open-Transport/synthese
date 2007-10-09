@@ -20,13 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "UpdateAllStopsDisplayScreenAction.h"
+
+#include "34_departures_table/DisplayScreenTableSync.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "34_departures_table/UpdateAllStopsDisplayScreenAction.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DeparturesTableModule.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -35,7 +35,10 @@ namespace synthese
 {
 	using namespace db;
 	using namespace server;
-	
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, departurestable::UpdateAllStopsDisplayScreenAction>::FACTORY_KEY("uasdsa");
+
 	namespace departurestable
 	{
 		const string UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE = Action_PARAMETER_PREFIX + "val";
@@ -52,14 +55,9 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_VALUE);
-				if (it == map.end())
-					throw ActionException("Stops designation not specified");
-				_value = Conversion::ToBool(it->second);
+				_value = map.getBool(PARAMETER_VALUE, true, false, FACTORY_KEY);
 
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)

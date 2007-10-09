@@ -20,20 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "12_security/DeleteRightAction.h"
-#include "12_security/Profile.h"
+#include "DeleteRightAction.h"
+
 #include "12_security/Right.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+
+	template<> const string util::FactorableTemplate<Action, security::DeleteRightAction>::FACTORY_KEY("dra");
 	
 	namespace security
 	{
@@ -45,36 +48,27 @@ namespace synthese
 			ParametersMap map;
 			if (_right.get())
 			{
-				map.insert(make_pair(PARAMETER_RIGHT, _right->getFactoryKey()));
-				map.insert(make_pair(PARAMETER_PARAMETER, _right->getParameter()));
+				map.insert(PARAMETER_RIGHT, _right->getFactoryKey());
+				map.insert(PARAMETER_PARAMETER, _right->getParameter());
 			}
 			return map;
 		}
 
 		void DeleteRightAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			try
 			{
-				_profile = ProfileTableSync::get(_request->getObjectId());
+				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
 			}
 			catch(...)
 			{
 				throw ActionException("Profile not found");
 			}
 
-			string rightCode;
-			it = map.find(PARAMETER_RIGHT);
-			if (it == map.end())
-				throw ActionException("Right not specified");
-			rightCode = it->second;
-
-			it = map.find(PARAMETER_PARAMETER);
-			if (it == map.end())
-				throw ActionException("Parameter not specified");
+			string rightCode(map.getString(PARAMETER_RIGHT, true, FACTORY_KEY));
+			string parameter(map.getString(PARAMETER_PARAMETER, true, FACTORY_KEY));
 			
-			_right = _profile->getRight(rightCode, it->second);
+			_right = _profile->getRight(rightCode, parameter);
 			if (!_right.get())
 				throw ActionException("Specified right not found");
 		}

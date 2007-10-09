@@ -83,6 +83,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ParametersMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ParametersMap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\QueryString.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\QueryString.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Request.cpp"
 				>
 			</File>

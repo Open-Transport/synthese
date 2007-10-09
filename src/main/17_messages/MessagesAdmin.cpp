@@ -107,31 +107,22 @@ namespace synthese
 			{
 				_parametersMap = map;
 
-				ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_START);
-				if (it != map.end() && !it->second.empty())
-				{
-					_startDate = DateTime::FromString(it->second);
-				}
+				_startDate = map.getDateTime(PARAMETER_SEARCH_START, false, FACTORY_KEY);
+				_endDate = map.getDateTime(PARAMETER_SEARCH_END, false, FACTORY_KEY);
 
-				it = map.find(PARAMETER_SEARCH_END);
-				if (it != map.end() && !it->second.empty())
-				{
-					_endDate = DateTime::FromString(it->second);
-				}
+				int num = map.getInt(PARAMETER_SEARCH_CONFLICT, false, FACTORY_KEY);
+				if (num != UNKNOWN_VALUE)
+					_searchConflict = static_cast<AlarmConflict>(num);
 
-				it = map.find(PARAMETER_SEARCH_CONFLICT);
-				if (it != map.end())
-					_searchConflict = (AlarmConflict) Conversion::ToInt(it->second);
+				num = map.getInt(PARAMETER_SEARCH_STATUS, false, FACTORY_KEY);
+				if (num != UNKNOWN_VALUE)
+					_searchStatus = static_cast<StatusSearch>(num);
 
-				it = map.find(PARAMETER_SEARCH_STATUS);
-				if (it != map.end())
-					_searchStatus = (StatusSearch) Conversion::ToInt(it->second);
+				num = map.getInt(PARAMETER_SEARCH_LEVEL, false, FACTORY_KEY);
+				if (num != UNKNOWN_VALUE)
+					_searchLevel = static_cast<AlarmLevel>(num);
 
-				it = map.find(PARAMETER_SEARCH_LEVEL);
-				if (it != map.end())
-					_searchLevel = (AlarmLevel) Conversion::ToInt(it->second);
-
-				_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_LEVEL, 15);
+				_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_LEVEL, 15);
 
 				_result = AlarmTableSync::searchSingleSent(
 					_startDate

@@ -38,7 +38,7 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const string FactoryTemplate<InterfacePage, PlacesListInterfacePage>::FACTORY_KEY("");
+		template<> const string FactorableTemplate<InterfacePage, PlacesListInterfacePage>::FACTORY_KEY("places_list");
 	}
 
 	namespace transportwebsite

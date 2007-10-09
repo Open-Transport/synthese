@@ -20,19 +20,24 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "DeleteScenarioAction.h"
 
-#include "17_messages/DeleteScenarioAction.h"
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/MessagesLibraryLog.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action,messages::DeleteScenarioAction>::FACTORY_KEY("mdsca");
 	
 	namespace messages
 	{
@@ -43,21 +48,16 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_scenario.get())
-				map.insert(make_pair(PARAMETER_SCENARIO_ID, Conversion::ToString(_scenario->getKey())));
+				map.insert(PARAMETER_SCENARIO_ID, _scenario->getKey());
 			return map;
 		}
 
 		void DeleteScenarioAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_SCENARIO_ID);
-			if (it == map.end())
-				throw ActionException("Scenario not specified.");
-			
+			uid id(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
 			try
 			{
-				_scenario = ScenarioTableSync::getTemplate(Conversion::ToLongLong(it->second));
+				_scenario = ScenarioTableSync::getTemplate(id);
 			}
 			catch(...)
 			{
@@ -65,9 +65,6 @@ namespace synthese
 			}
 		}
 
-		DeleteScenarioAction::DeleteScenarioAction()
-			: Action()
-		{}
 
 		void DeleteScenarioAction::run()
 		{
@@ -75,7 +72,7 @@ namespace synthese
 			ScenarioTableSync::remove(_scenario->getKey());
 
 			// Log
-			MessagesLibraryLog::addDeleteEntry(_scenario, _request->getUser());
+			MessagesLibraryLog::addDeleteEntry(_scenario.get(), _request->getUser().get());
 		}
 
 		void DeleteScenarioAction::setScenario( boost::shared_ptr<const ScenarioTemplate> scenario )

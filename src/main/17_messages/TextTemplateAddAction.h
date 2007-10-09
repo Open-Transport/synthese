@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include "17_messages/Types.h"
 
 namespace synthese
@@ -34,7 +36,7 @@ namespace synthese
 		/** TextTemplateAddAction action class.
 			@ingroup m17Actions refActions
 		*/
-		class TextTemplateAddAction : public server::Action
+		class TextTemplateAddAction : public util::FactorableTemplate<server::Action, TextTemplateAddAction>
 		{
 		public:
 			static const std::string PARAMETER_NAME;

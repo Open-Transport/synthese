@@ -26,12 +26,9 @@
 #include "AddressTableSync.h"
 
 #include "15_env/EnvModule.h"
-#include "15_env/Address.h"
-#include "15_env/Crossing.h"
-#include "15_env/Road.h"
+#include "15_env/RoadTableSync.h"
 #include "15_env/CrossingTableSync.h"
 #include "15_env/ConnectionPlaceTableSync.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -49,30 +46,66 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,AddressTableSync>::FACTORY_KEY("15.50.02 Addresses");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Address>::TABLE_NAME = "t002_addresses";
-		template<> const int SQLiteTableSyncTemplate<Address>::TABLE_ID = 2;
-		template<> const bool SQLiteTableSyncTemplate<Address>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AddressTableSync,Address>::TABLE_NAME = "t002_addresses";
+		template<> const int SQLiteTableSyncTemplate<AddressTableSync,Address>::TABLE_ID = 2;
+		template<> const bool SQLiteTableSyncTemplate<AddressTableSync,Address>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Address>::load(Address* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<AddressTableSync,Address>::load(Address* object, const db::SQLiteResultSPtr& rows)
 		{
+			// Columns reading
 		    uid id (rows->getLongLong (TABLE_COL_ID));
 
+			// Properties
 		    object->setKey (id);
-		    uid placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
-			int tableId = decodeTableId(placeId);
-			if (tableId == CrossingTableSync::TABLE_ID)
-				object->setPlace(Crossing::Get(placeId).get());
-			else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
-				object->setPlace(PublicTransportStopZoneConnectionPlace::Get(placeId).get());
-			object->setRoad (Road::Get (rows->getLongLong (AddressTableSync::COL_ROADID)).get());
 		    object->setMetricOffset (rows->getDouble (AddressTableSync::COL_METRICOFFSET));
 		    object->setXY (rows->getDouble (AddressTableSync::COL_X), rows->getDouble (AddressTableSync::COL_Y));
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<Address>::save(Address* object)
+		template<> void SQLiteTableSyncTemplate<AddressTableSync,Address>::_link(Address* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			// Columns reading
+			uid placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
+			int tableId = decodeTableId(placeId);
+			uid roadId(rows->getLongLong(AddressTableSync::COL_ROADID));
+
+			// Links from the object
+			if (tableId == CrossingTableSync::TABLE_ID)
+				obj->setPlace(CrossingTableSync::Get(placeId, obj, true, temporary));
+			else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
+				obj->setPlace(ConnectionPlaceTableSync::Get(placeId, obj, true, temporary));
+			
+			obj->setRoad (RoadTableSync::Get (rows->getLongLong(roadId), obj, true, temporary));
+
+			// Links to the object
+			shared_ptr<AddressablePlace> place = 
+				EnvModule::fetchUpdateableAddressablePlace (placeId);
+			shared_ptr<Road> road = Road::GetUpdateable(roadId);
+
+			place->addAddress(obj);
+			road->addAddress(obj);
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<AddressTableSync,Address>::_unlink(Address* obj)
+		{
+			shared_ptr<AddressablePlace> place(EnvModule::fetchUpdateableAddressablePlace(obj->getPlace()->getId()));
+//			place->removeAddress(obj);
+
+			shared_ptr<Road> road(Road::GetUpdateable(obj->getRoad()->getKey()));
+//			road->removeAddress(obj);
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<AddressTableSync,Address>::save(Address* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -98,7 +131,7 @@ namespace synthese
 		const std::string AddressTableSync::COL_Y ("y");  // U ??
 
 		AddressTableSync::AddressTableSync()
-			: SQLiteTableSyncTemplate<Address>(true, false, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<AddressTableSync,Address>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_PLACEID, "INTEGER", false);
@@ -113,30 +146,25 @@ namespace synthese
 
 		}
 
-
+/*
 		void AddressTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 		{
 			while (rows->next ())
 			{
 				if (Address::Contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load (Address::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+					shared_ptr<Address> address(Address::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
+					unlink(address.get());
+					load (address.get(), rows);
+					link(address.get(), rows);
 				}
 				else
 				{
 					Address* object(new Address);
 					load(object, rows);
+					link(object, rows);
 					object->store();
 					
-					uid placeId = rows->getLongLong(COL_PLACEID);
-					uid roadId(rows->getLongLong(COL_ROADID));
-
-					shared_ptr<AddressablePlace> place = 
-					    EnvModule::fetchUpdateableAddressablePlace (placeId);
-					shared_ptr<Road> road = Road::GetUpdateable(roadId);
-					    
-					place->addAddress(object);
-					road->addAddress(object);
 				}
 			}
 		}
@@ -148,7 +176,10 @@ namespace synthese
 				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (Address::Contains(id))
 				{
-					load(Address::GetUpdateable(id).get(), rows);
+					shared_ptr<Address> address(Address::GetUpdateable(id));
+					unlink(address.get());
+					load (address.get(), rows);
+					link(address.get(), rows);
 				}
 			}
 		}
@@ -160,11 +191,12 @@ namespace synthese
 				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (Address::Contains(id))
 				{
+					unlink(Address::Get(id));
 					Address::Remove(id);
 				}
 			}
 		}
-
+*/
 		std::vector<shared_ptr<Address> > AddressTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();

@@ -43,21 +43,17 @@ namespace synthese
 		ParametersMap FunctionWithSite::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_SITE, Conversion::ToString(_site->getKey())));
+			map.insert(PARAMETER_SITE, _site->getKey());
 			return map;
 		}
 
 		void FunctionWithSite::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			// Site
-			it = map.find(PARAMETER_SITE);
-			if (it == map.end())
-				throw RequestException("Site not specified");
-			if (!Site::Contains(Conversion::ToLongLong(it->second)))
+			uid id = map.getUid(PARAMETER_SITE, true, "fws");
+			if (!Site::Contains(id))
 				throw RequestException("Specified site not found");
-			_site = Site::Get(Conversion::ToLongLong(it->second));
+			_site = Site::Get(id);
 		}
 
 		void FunctionWithSite::_copy( boost::shared_ptr<const Function> function )

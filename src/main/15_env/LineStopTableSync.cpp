@@ -21,6 +21,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "LineStopTableSync.h"
+
+#include "15_env/LineTableSync.h"
+#include "15_env/PhysicalStopTableSYnc.h"
+
 #include <sstream>
 
 #include "01_util/Conversion.h"
@@ -29,11 +34,6 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
-
-#include "LineStop.h"
-#include "Line.h"
-#include "LineStopTableSync.h"
-#include "PhysicalStop.h"
 
 #include "06_geometry/Point2D.h"
 
@@ -47,22 +47,17 @@ namespace synthese
 	using namespace env;
 	using namespace geometry;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("15.57.01 Line stops");
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<LineStop>::TABLE_NAME = "t010_line_stops";
-		template<> const int SQLiteTableSyncTemplate<LineStop>::TABLE_ID = 10;
-		template<> const bool SQLiteTableSyncTemplate<LineStop>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::TABLE_NAME = "t010_line_stops";
+		template<> const int SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::TABLE_ID = 10;
+		template<> const bool SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<LineStop>::load(LineStop* ls, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::load(LineStop* ls, const db::SQLiteResultSPtr& rows )
 		{
-
 			uid id (rows->getLongLong (TABLE_COL_ID));
-
-			uid fromPhysicalStopId (
-			    rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
-
-			uid lineId (
-			    rows->getLongLong (LineStopTableSync::COL_LINEID));
 
 			int rankInPath (
 			    rows->getInt (LineStopTableSync::COL_RANKINPATH));
@@ -96,15 +91,34 @@ namespace synthese
 			ls->setMetricOffset(metricOffset);
 			ls->setIsArrival(isArrival);
 			ls->setIsDeparture(isDeparture);
-			ls->setPhysicalStop(PhysicalStop::GetUpdateable(fromPhysicalStopId).get());
-			ls->setLine(Line::GetUpdateable (lineId).get());
 			ls->setRankInPath(rankInPath);
-
-			Line::GetUpdateable (lineId)->addEdge(ls);
-			
 		}
 
-		template<> void SQLiteTableSyncTemplate<LineStop>::save(LineStop* object)
+		template<> void SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::_link(LineStop* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+			uid fromPhysicalStopId (
+				rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
+
+			uid lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
+			Line* line(LineTableSync::GetUpdateable (lineId,obj,temporary));
+
+			obj->setPhysicalStop(PhysicalStopTableSync::GetUpdateable(fromPhysicalStopId,obj,temporary));
+			obj->setLine(line);
+
+			if (temporary == GET_REGISTRY)
+				line->addEdge(obj);
+		}
+
+		template<> void SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::_unlink(LineStop* obj)
+		{
+			/// @todo line remove edge
+
+			obj->setLine(NULL);
+			obj->setPhysicalStop(NULL);
+		}
+
+		template<> void SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::save(LineStop* object)
 		{
 /*			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -133,7 +147,7 @@ namespace synthese
 		const std::string LineStopTableSync::COL_VIAPOINTS ("via_points");
 
 		LineStopTableSync::LineStopTableSync()
-			: SQLiteTableSyncTemplate<LineStop>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_PHYSICALSTOPID, "INTEGER", false);
@@ -148,7 +162,7 @@ namespace synthese
 			addTableIndex(COL_PHYSICALSTOPID);
 		}
 
-		void LineStopTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+/*		void LineStopTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
@@ -189,7 +203,7 @@ namespace synthese
 				}
 			}
 		}
-
+*/
 		std::vector<shared_ptr<LineStop> > LineStopTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();

@@ -23,22 +23,22 @@
 #ifndef SYNTHESE_SiteTableSync_H__
 #define SYNTHESE_SiteTableSync_H__
 
+#include "Site.h"
+
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace transportwebsite
 	{
-		class Site;
-
 		/** InterfaceTableSync SQLite table synchronizer.
 			@ingroup m36LS refLS
 		*/
 
-		class SiteTableSync : public db::SQLiteTableSyncTemplate<Site>
+		class SiteTableSync : public db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>
 		{
 		public:
 			static const std::string COL_INTERFACE_ID;
@@ -54,23 +54,7 @@ namespace synthese
 			/** Site SQLite table constructor.
 			*/
 			SiteTableSync();
-
-		protected:
-
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
-
 	}
 }
 #endif // SYNTHESE_SiteTableSync_H__

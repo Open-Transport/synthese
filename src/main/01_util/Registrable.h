@@ -24,6 +24,7 @@
 #define SYNTHESE_UTIL_REGISTRABLE_H
 
 #include <map>
+#include <set>
 
 #include <string>
 #include <iostream>
@@ -47,15 +48,19 @@ namespace synthese
 		class Registrable
 		{
 		public:
-			typedef K	 KeyType;
-			typedef Registry<K, T>					Registry;
-			typedef RegistryKeyException<K, T>		RegistryKeyException;
+			typedef K									KeyType;
+			typedef Registry<K, T>						Registry;
+			typedef RegistryKeyException<K, T>			RegistryKeyException;
 			typedef typename Registry::const_iterator	ConstIterator;
+			typedef	std::set<const void*>				ChildTemporaryObjects;
 
 		private:
-			K					_key;		//!< The key of the object in the registry.
+			K						_key;		//!< The key of the object in the registry.
 			
-			static Registry		_registry;	//!< The official registry of the object (updated at the first insertion)
+			static Registry			_registry;	//!< The official registry of the object (updated at the first insertion)
+
+			bool					_linked;
+			ChildTemporaryObjects	_childTemporaryObjects;
 
 
 		public:
@@ -72,12 +77,29 @@ namespace synthese
 			static ConstIterator Begin();
 			static ConstIterator End();
 			static void Remove(const K& key);
+
 			
 			//! @name Getters/Setters
 			//@{
-				const K&					getKey () const;
-				void						setKey(const K& key);
+				const K&	getKey () const;
+				void		setKey(const K& key);
+				bool		getLinked()	const		{ return _linked; }
+				void		setLinked(bool value)	{ _linked = value; }
 			//@}
+
+				template<class C>
+				void addChildTemporaryObject(C* object)
+				{
+					_childTemporaryObjects.insert(static_cast<const void*>(object));
+				}
+
+				void clearChildTemporaryObjects()
+				{
+					for (ChildTemporaryObjects::iterator it(_childTemporaryObjects.begin()); it != _childTemporaryObjects.end(); ++it)
+						delete *it;
+					_childTemporaryObjects.clear();
+					_linked = false;
+				}
 
 			//! @name Calculators
 			//@{
@@ -98,7 +120,7 @@ namespace synthese
 
 		};
 
-
+		
 		template<class K, class T> 
 		    typename Registrable<K, T>::Registry Registrable<K, T>::_registry;
 
@@ -173,6 +195,7 @@ namespace synthese
 		template<class K, class T>
 			synthese::util::Registrable<K, T>::Registrable()
 			: _key(UNKNOWN_VALUE)
+			, _linked(false)
 		{
 
 		}
@@ -182,6 +205,7 @@ namespace synthese
 		template<class K,class T>
 		Registrable<K,T>::Registrable (const K& key)
 			: _key (key)
+			, _linked(false)
 		{
 		}
 

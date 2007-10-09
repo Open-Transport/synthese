@@ -20,13 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "UpdateAlarmMessagesAction.h"
 
-#include "17_messages/UpdateAlarmMessagesAction.h"
 #include "17_messages/MessagesModule.h"
 #include "17_messages/Alarm.h"
 #include "17_messages/AlarmTableSync.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -36,6 +38,8 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	
+	template<> const string util::FactorableTemplate<Action, messages::UpdateAlarmMessagesAction>::FACTORY_KEY("muama");
+
 	namespace messages
 	{
 		const string UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE = Action_PARAMETER_PREFIX + "sme";
@@ -51,8 +55,6 @@ namespace synthese
 
 		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			try
 			{
 				_alarm = AlarmTableSync::getAlarm(_request->getObjectId());
@@ -62,15 +64,8 @@ namespace synthese
 				throw ActionException("Specified alarm not found");
 			}
 			
-			it = map.find(PARAMETER_SHORT_MESSAGE);
-			if (it == map.end())
-				throw ActionException("Short message not specified");
-			_shortMessage = it->second;
-			
-			it = map.find(PARAMETER_LONG_MESSAGE);
-			if (it == map.end())
-				throw ActionException("Long message not specified");
-			_longMessage = it->second;
+			_shortMessage = map.getString(PARAMETER_SHORT_MESSAGE, true, FACTORY_KEY);
+			_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
 		}
 
 		void UpdateAlarmMessagesAction::run()

@@ -28,18 +28,18 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "Road.h"
+
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class Road;
-
 		/** Road table synchronizer.
 			@ingroup m15LS refLS
 		*/
-		class RoadTableSync : public db::SQLiteTableSyncTemplate<Road>
+		class RoadTableSync : public db::SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>
 		{
 		public:
 			/** Roads table :
@@ -72,33 +72,6 @@ namespace synthese
 			static std::vector<boost::shared_ptr<Road> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on Road creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows
-				, bool isItFirstSync = false);
-
-			/** Action to do on Road creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on Road deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }

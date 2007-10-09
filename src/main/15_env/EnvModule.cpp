@@ -23,6 +23,7 @@
 #include "EnvModule.h"
 
 #include "01_util/Constants.h"
+#include "01_util/Conversion.h"
 #include "01_util/UId.h"
 
 #include "15_env/TransportNetworkTableSync.h"
@@ -50,7 +51,8 @@ using namespace boost;
 namespace synthese
 {
     using namespace lexmatcher;
-    using namespace security;
+	using namespace security;
+	using namespace util;
 
     namespace env
     {

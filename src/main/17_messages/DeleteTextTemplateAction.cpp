@@ -20,13 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DeleteTextTemplateAction.h"
+#include "TextTemplateTableSync.h"
+
 #include "02_db/DBEmptyResultException.h"
 
 #include "30_server/ActionException.h"
-
-#include "DeleteTextTemplateAction.h"
-#include "TextTemplate.h"
-#include "TextTemplateTableSync.h"
+#include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 
@@ -34,6 +35,9 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, messages::DeleteTextTemplateAction>::FACTORY_KEY("dtta");
 	
 	namespace messages
 	{
@@ -44,7 +48,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_text)
-				map.insert(make_pair(PARAMETER_TEXT_ID, Conversion::ToString(_text->getKey())));
+				map.insert(PARAMETER_TEXT_ID, _text->getKey());
 			return map;
 		}
 
@@ -52,13 +56,8 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_TEXT_ID);
-				if (it == map.end())
-					throw ActionException("Text template not specified");
-
-				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
+				uid id(map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY));
+				_text = TextTemplateTableSync::Get(id);
 			}
 			catch (DBEmptyResultException<TextTemplate>)
 			{

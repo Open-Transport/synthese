@@ -57,9 +57,9 @@ namespace synthese
 			
 		public:
 
-			PhysicalStop (const uid& id,
-				const std::string& name, 
-				const PublicTransportStopZoneConnectionPlace* place,
+			PhysicalStop (const uid id = UNKNOWN_VALUE,
+				const std::string name = std::string(), 
+				const PublicTransportStopZoneConnectionPlace* place = NULL,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE);
 

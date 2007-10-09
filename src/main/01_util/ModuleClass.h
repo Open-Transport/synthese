@@ -39,7 +39,7 @@ namespace synthese
 
 			@ingroup m01
 		*/
-		class ModuleClass : public util::Factorable
+		class ModuleClass : public util::Factorable<ModuleClass>
 		{
 		public:
 			ModuleClass();

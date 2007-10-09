@@ -49,7 +49,7 @@ namespace synthese
 
 			@note As Scenario is an abstract class, do not use the get static method. Use getAlarm instead.
 		*/
-		class ScenarioTableSync : public db::SQLiteTableSyncTemplate<Scenario>
+		class ScenarioTableSync : public db::SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>
 		{
 		public:
 			static const std::string COL_IS_TEMPLATE;

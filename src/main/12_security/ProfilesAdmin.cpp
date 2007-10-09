@@ -80,24 +80,14 @@ namespace synthese
 		
 		void ProfilesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-			
 			// Profile name
-			it = map.find(PARAMETER_SEARCH_NAME);
-			if (it != map.end())
-			{
-				_searchName = it->second;
-			}
+			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
 
 			// Profile right
-			it = map.find(PARAMETER_SEARCH_RIGHT);
-			if (it != map.end())
-			{
-				_searchRightName = it->second;
-			}
+			_searchRightName = map.getString(PARAMETER_SEARCH_RIGHT, false, FACTORY_KEY);
 
 			// Parameters
-			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_NAME, 30);
+			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_NAME, 30);
 
 			_searchResult = ProfileTableSync::search(
 				_searchName

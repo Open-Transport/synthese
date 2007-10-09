@@ -20,16 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "UpdateAlarmAction.h"
+
+#include "17_messages/SingleSentAlarm.h"
+#include "17_messages/AlarmTableSync.h"
+#include "17_messages/MessagesModule.h"
+
 #include "04_time/TimeParseException.h"
 #include "04_time/DateTime.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "17_messages/UpdateAlarmAction.h"
-#include "17_messages/SingleSentAlarm.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -39,6 +41,9 @@ namespace synthese
 	using namespace server;
 	using namespace time;
 	using namespace db;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, messages::UpdateAlarmAction>::FACTORY_KEY("updatealarm");
 	
 	namespace messages
 	{
@@ -59,39 +64,16 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
 				_alarm = AlarmTableSync::getAlarm(_request->getObjectId());
 				_singleSentAlarm = dynamic_pointer_cast<SingleSentAlarm, Alarm>(_alarm);
 
-				it = map.find(PARAMETER_TYPE);
-				if (it == map.end())
-					throw ActionException("Type not specified");
-				_type = (AlarmLevel) Conversion::ToInt(it->second);
+				_type = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE, true, FACTORY_KEY));
 
 				if (_singleSentAlarm.get())
 				{
-					it = map.find(PARAMETER_START_DATE);
-					if (it == map.end())
-						throw ActionException("Start date not specified");
-					if (!it->second.empty())
-					{
-						_startDate = DateTime::FromString(it->second);
-					}
-				
-					it = map.find(PARAMETER_END_DATE);
-					if (it == map.end())
-						throw ActionException("End date not specified");
-					if (!it->second.empty())
-					{
-						_endDate = DateTime::FromString(it->second);
-					}
-				
-					// Enabled status
-					it = map.find(PARAMETER_ENABLED);
-					if (it == map.end())
-						throw ActionException("Enabled status not specified");
-					_enabled = Conversion::ToBool(it->second);
+					_startDate = map.getDateTime(PARAMETER_START_DATE, true, FACTORY_KEY);
+					_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
+					_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 				}
 			}
 			catch (DBEmptyResultException<Alarm>)
@@ -109,7 +91,7 @@ namespace synthese
 		}
 
 		UpdateAlarmAction::UpdateAlarmAction()
-			: Action()
+			: FactorableTemplate<Action,UpdateAlarmAction> ()
 			, _startDate(TIME_UNKNOWN), _endDate(TIME_UNKNOWN)
 		{}
 

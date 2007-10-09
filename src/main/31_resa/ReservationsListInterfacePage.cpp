@@ -28,11 +28,14 @@
 
 #include "12_security/User.h"
 
+#include "01_util/Conversion.h"
+
 using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace util;
 
 	namespace util
 	{

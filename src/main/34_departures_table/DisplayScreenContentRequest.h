@@ -27,6 +27,8 @@
 
 #include "30_server/Function.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -36,7 +38,7 @@ namespace synthese
 		/** DisplayScreenContentRequest class.
 			@ingroup m34Functions refFunctions
 		*/
-		class DisplayScreenContentRequest : public server::Function
+		class DisplayScreenContentRequest : public util::FactorableTemplate<server::Function,DisplayScreenContentRequest>
 		{
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_TB;

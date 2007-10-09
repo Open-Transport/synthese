@@ -25,6 +25,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace server
@@ -41,7 +43,7 @@ namespace synthese
 
 			@ingroup m11Pages refPages
 		*/
-		class RedirectInterfacePage : public interfaces::InterfacePage
+		class RedirectInterfacePage : public util::FactorableTemplate<InterfacePage,RedirectInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

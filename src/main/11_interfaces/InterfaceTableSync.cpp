@@ -24,7 +24,6 @@
 
 #include "02_db/SQLiteResult.h"
 
-#include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfaceTableSync.h"
 
 using boost::shared_ptr;
@@ -35,13 +34,18 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<SQLiteTableSync,InterfaceTableSync>::FACTORY_KEY("16.01 Interfaces");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Interface>::TABLE_NAME = "t024_interfaces";
-		template<> const int SQLiteTableSyncTemplate<Interface>::TABLE_ID = 24;
-		template<> const bool SQLiteTableSyncTemplate<Interface>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::TABLE_NAME = "t024_interfaces";
+		template<> const int SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::TABLE_ID = 24;
+		template<> const bool SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Interface>::load(Interface* interf, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::load(Interface* interf, const db::SQLiteResultSPtr& rows)
 		{
 			interf->setKey(rows->getLongLong ( TABLE_COL_ID));
 			interf->setNoSessionDefaultPageCode(rows->getText ( InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE));
@@ -49,10 +53,21 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<Interface>::save(Interface* interf)
+		template<> void SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::save(Interface* interf)
 		{
 			/// @todo Implementation
 		}
+
+		template<> void SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::_link(Interface* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<InterfaceTableSync, Interface>::_unlink(Interface* obj)
+		{
+
+		}
+
 	}
 
 	namespace interfaces
@@ -61,32 +76,11 @@ namespace synthese
 		const std::string InterfaceTableSync::TABLE_COL_NAME = "name";
 
 		InterfaceTableSync::InterfaceTableSync()
-			: db::SQLiteTableSyncTemplate<Interface> (true, true, db::TRIGGERS_ENABLED_CLAUSE )
+			: db::SQLiteRegistryTableSyncTemplate<InterfaceTableSync,Interface> ()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NO_SESSION_DEFAULT_PAGE, "TEXT", true);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
-		}
-
-
-		void InterfaceTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
-		{
-		}
-
-
-		void InterfaceTableSync::rowsAdded( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync )
-		{
-			while (rows->next ())
-			{
-			    Interface* obj(new Interface(rows->getLongLong (TABLE_COL_ID)));
-				load(obj, rows);
-				obj->store();
-			}
-		}
-
-
-		void InterfaceTableSync::rowsRemoved( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
-		{
 		}
 	}
 }

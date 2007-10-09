@@ -65,7 +65,7 @@ namespace synthese
 			
 		}
 
-		shared_ptr<const Interface> Site::getInterface() const
+		const Interface* Site::getInterface() const
 		{
 			return _interface;
 		}
@@ -81,7 +81,7 @@ namespace synthese
 			return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
 		}
 
-		void Site::setInterface(shared_ptr<const Interface> interf )
+		void Site::setInterface(const Interface* interf )
 		{
 			_interface = interf;
 		}

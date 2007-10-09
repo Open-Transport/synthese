@@ -20,19 +20,20 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "UpdateDisplayTypeAction.h"
+
+#include "34_departures_table/DisplayTypeTableSync.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
 
 #include "02_db/DBEmptyResultException.h"
+
+#include "13_dblog/DBLogModule.h"
 
 #include "11_interfaces/Interface.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayTypeTableSync.h"
-#include "34_departures_table/UpdateDisplayTypeAction.h"
-#include "34_departures_table/ArrivalDepartureTableLog.h"
+#include "30_server/ParametersMap.h"
 
 #include <sstream>
 
@@ -45,6 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 	using namespace db;
+	using namespace dblog;
 
 	namespace util
 	{
@@ -63,22 +65,22 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_dt.get())
-				map.insert(make_pair(PARAMETER_ID, Conversion::ToString(_dt->getKey())));
-			map.insert(make_pair(PARAMETER_NAME, _name));
+				map.insert(PARAMETER_ID, _dt->getKey());
+			map.insert(PARAMETER_NAME, _name);
 			if (_interface.get())
-				map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
-			map.insert(make_pair(PARAMETER_ROWS_NUMBER, Conversion::ToString(_rows_number)));
-			map.insert(make_pair(PARAMETER_MAX_STOPS_NUMBER, Conversion::ToString(_max_stops_number)));
+				map.insert(PARAMETER_INTERFACE_ID, _interface->getKey());
+			map.insert(PARAMETER_ROWS_NUMBER, _rows_number);
+			map.insert(PARAMETER_MAX_STOPS_NUMBER, _max_stops_number);
 			return map;
 		}
 
 		void UpdateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Display type ID
-			uid id(Request::getUidFromParameterMap(map, PARAMETER_ID, true, FACTORY_KEY));
+			uid id(map.getUid(PARAMETER_ID, true, FACTORY_KEY));
 			try
 			{
-				_dt = DisplayTypeTableSync::get(id);
+				_dt = DisplayTypeTableSync::GetUpdateable(id);
 			}
 			catch (DBEmptyResultException<DisplayType>&)
 			{
@@ -86,7 +88,7 @@ namespace synthese
 			}
 
 			// Name
-			_name = Request::getStringFormParameterMap(map, PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			if (_name != _dt->getName())
 			{
 				if (_name.empty())
@@ -98,18 +100,18 @@ namespace synthese
 			}
 
 			// Rows number
-			_rows_number = Request::getIntFromParameterMap(map, PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
+			_rows_number = map.getInt(PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
 			if (_rows_number < 0)
 				throw ActionException("Un nombre positif de lignes doit être choisi");
 
 			// Interface
-			id = Request::getUidFromParameterMap(map, PARAMETER_INTERFACE_ID, true, FACTORY_KEY);
+			id = map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY);
 			if (!Interface::Contains(id))
 				throw ActionException("Interface not found");
 			_interface = Interface::Get(id);
 
 			// Max stops number
-			_max_stops_number = Request::getIntFromParameterMap(map, PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
+			_max_stops_number = map.getInt(PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
 			if (_max_stops_number < UNKNOWN_VALUE)
 				throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
 
@@ -119,24 +121,20 @@ namespace synthese
 		{
 			// Log entry content
 			stringstream log;
-			if (_dt->getName() != _name)
-				log << " - Nom : " << _dt->getName() << " => " << _name;
-			if (_dt->getInterface() != _interface)
-				log << " - Interface : " << _dt->getInterface()->getName() << " => " << _interface->getName();
-			if (_dt->getRowNumber() != _rows_number)
-				log << " - Nombre de lignes : " << _dt->getRowNumber() <<  " => " << _rows_number;
-			if (_dt->getMaxStopsNumber() != _max_stops_number)
-				log << " - Nombre d'arrêts intermédiaires : " << _dt->getMaxStopsNumber() << " => " << _max_stops_number;
+			DBLogModule::appendToLogIfChange(log, "Nom", _dt->getName(), _name);
+			DBLogModule::appendToLogIfChange(log, "Interface", _dt->getInterface()->getName(), _interface->getName());
+			DBLogModule::appendToLogIfChange(log, "Nombre de lignes", _dt->getRowNumber(), _rows_number);
+			DBLogModule::appendToLogIfChange(log, "Nombre d'arrêts intermédiaires", _dt->getMaxStopsNumber(), _max_stops_number);
 
 			// Update
 			_dt->setName(_name);
-			_dt->setInterface(_interface);
+			_dt->setInterface(_interface.get());
 			_dt->setRowNumber(_rows_number);
 			_dt->setMaxStopsNumber(_max_stops_number);
 			DisplayTypeTableSync::save(_dt.get());
 
 			// Log
-			ArrivalDepartureTableLog::addUpdateTypeEntry(_dt, _request->getUser(), log.str());
+			ArrivalDepartureTableLog::addUpdateTypeEntry(_dt.get(), _request->getUser().get(), log.str());
 		}
 	}
 }

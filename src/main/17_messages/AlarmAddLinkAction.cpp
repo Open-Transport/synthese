@@ -20,11 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "AlarmAddLinkAction.h"
 
-#include "30_server/ActionException.h"
-
-#include "17_messages/AlarmAddLinkAction.h"
 #include "17_messages/SingleSentAlarm.h"
 #include "17_messages/ScenarioSentAlarm.h"
 #include "17_messages/AlarmTemplate.h"
@@ -35,6 +32,12 @@
 #include "17_messages/MessagesLibraryLog.h"
 #include "17_messages/MessagesLog.h"
 
+#include "01_util/Conversion.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
+
 using namespace std;
 using namespace boost;
 
@@ -43,6 +46,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace dblog;
+
+	template<> const string util::FactorableTemplate<Action, messages::AlarmAddLinkAction>::FACTORY_KEY("maala");
 	
 	namespace messages
 	{
@@ -54,31 +59,24 @@ namespace synthese
 		ParametersMap AlarmAddLinkAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_ALARM_ID, _alarm.get() ? Conversion::ToString(_alarm->getId()) : "0"));
-			map.insert(make_pair(PARAMETER_RECIPIENT_KEY, _recipientKey));
-			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_objectId)));
+			map.insert(PARAMETER_ALARM_ID, _alarm.get() ? _alarm->getId() : uid(0));
+			map.insert(PARAMETER_RECIPIENT_KEY, _recipientKey);
+			map.insert(PARAMETER_OBJECT_ID, _objectId);
 			return map;
 		}
 
 		void AlarmAddLinkAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			// Recipient key
-			it = map.find(PARAMETER_RECIPIENT_KEY);
-			if (it == map.end())
-				throw ActionException("Parameter recipient key not found");
-			if (!Factory<AlarmRecipient>::contains(it->second))
+			_recipientKey = map.getString(PARAMETER_RECIPIENT_KEY, true, FACTORY_KEY);
+			if (!Factory<AlarmRecipient>::contains(_recipientKey))
 				throw ActionException("Specified recipient not found");
-			_recipientKey = it->second;
 
 			// Alarm ID
-			it = map.find(PARAMETER_ALARM_ID);
-			if (it == map.end())
-				throw ActionException("Alarm not specified");
+			uid id(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
 			try
 			{
-				_alarm = AlarmTableSync::getAlarm(Conversion::ToLongLong(it->second));
+				_alarm = AlarmTableSync::getAlarm(id);
 			}
 			catch (...)
 			{
@@ -86,10 +84,7 @@ namespace synthese
 			}
 			
 			// Object ID
-			it = map.find(PARAMETER_OBJECT_ID);
-			if (it == map.end())
-				throw ActionException("Object to link not specified");
-			_objectId = Conversion::ToLongLong(it->second);
+			_objectId = map.getUid(PARAMETER_OBJECT_ID, true, FACTORY_KEY);
 		}
 
 		void AlarmAddLinkAction::run()
@@ -105,17 +100,17 @@ namespace synthese
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
 			{
 				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
-				MessagesLibraryLog::addUpdateEntry(alarmTemplate, "Ajout de destinataire " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser() );
+				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), "Ajout de destinataire " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser().get());
 			}
 			else if (dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm).get())
 			{
 				shared_ptr<const SingleSentAlarm> singleSentAlarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(singleSentAlarm, "Ajout de destinataire à message simple " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser());
+				MessagesLog::addUpdateEntry(singleSentAlarm.get(), "Ajout de destinataire à message simple " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser().get());
 			}
 			else
 			{
 				shared_ptr<const ScenarioSentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(scenarioSentAlarm, "Ajout de destinataire à message de scénario " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser());
+				MessagesLog::addUpdateEntry(scenarioSentAlarm.get(), "Ajout de destinataire à message de scénario " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser().get());
 			}
 		}
 

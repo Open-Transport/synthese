@@ -26,6 +26,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "01_util/UId.h"
+#include "01_util/FactorableTemplate.h"
 
 #include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
 
@@ -38,7 +39,7 @@ namespace synthese
 		/** Administration console Function Class.
 			@ingroup m14Functions refFunctions
 		*/
-		class AdminRequest : public interfaces::RequestWithInterfaceAndRequiredSession
+		class AdminRequest : public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, AdminRequest>
 		{
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ACTION_FAILED_PAGE;

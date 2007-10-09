@@ -23,12 +23,13 @@
 #ifndef SYNTHESE_CommercialLineTableSync_H__
 #define SYNTHESE_CommercialLineTableSync_H__
 
+#include "CommercialLine.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 #include "12_security/Types.h"
 
@@ -36,13 +37,12 @@ namespace synthese
 {
 	namespace env
 	{
-		class CommercialLine;
 		class TransportNetwork;
 
 		/** CommercialLine table synchronizer.
 			@ingroup m15LS refLS
 		*/
-		class CommercialLineTableSync : public db::SQLiteTableSyncTemplate<CommercialLine>
+		class CommercialLineTableSync : public db::SQLiteRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>
 		{
 		public:
 			static const std::string COL_NETWORK_ID;
@@ -144,32 +144,6 @@ neededLevel = READ
 				, bool mustBeBookable
 				, std::string selectedColumns = db::TABLE_COL_ID
 				);
-
-
-		protected:
-
-			/** Action to do on CommercialLine creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on CommercialLine creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on CommercialLine deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }

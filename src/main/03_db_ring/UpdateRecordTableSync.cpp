@@ -1,3 +1,25 @@
+
+/** UpdateRecordTableSync class implementation.
+	@file UpdateRecordTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "03_db_ring/UpdateRecordTableSync.h"
 
 #include "02_db/DBModule.h"
@@ -26,13 +48,19 @@ namespace synthese
     using namespace db;
     using namespace dbring;
 
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<SQLiteTableSync,UpdateRecordTableSync>::FACTORY_KEY("1 Update log");
+	}
+
     namespace db
     {
-	template<> const std::string SQLiteTableSyncTemplate<UpdateRecord>::TABLE_NAME = "t997_update_log";
-	template<> const int SQLiteTableSyncTemplate<UpdateRecord>::TABLE_ID = 997;
-	template<> const bool SQLiteTableSyncTemplate<UpdateRecord>::HAS_AUTO_INCREMENT = true;
+	template<> const std::string SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::TABLE_NAME = "t997_update_log";
+	template<> const int SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::TABLE_ID = 997;
+	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::HAS_AUTO_INCREMENT = true;
+	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::IGNORE_CALLBACKS_ON_FIRST_SYNC(true);
 
-	template<> void SQLiteTableSyncTemplate<UpdateRecord>::load (UpdateRecord* object, const db::SQLiteResultSPtr& rows)
+	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::load (UpdateRecord* object, const db::SQLiteResultSPtr& rows)
 	{
 	    object->setKey (rows->getLongLong (TABLE_COL_ID));
 	    object->setTimestamp (rows->getTimestamp (UpdateRecordTableSync::TABLE_COL_TIMESTAMP));
@@ -50,7 +78,7 @@ namespace synthese
 
 
 
-	template<> void SQLiteTableSyncTemplate<UpdateRecord>::save (UpdateRecord* object)
+	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::save (UpdateRecord* object)
 	{
 	    SQLite* sqlite = DBModule::GetSQLite();
 	    std::stringstream query;
@@ -88,7 +116,7 @@ namespace synthese
 
 
 	UpdateRecordTableSync::UpdateRecordTableSync ()
-	    : SQLiteTableSyncTemplate<UpdateRecord> (true, true, db::TRIGGERS_ENABLED_CLAUSE, true)
+	    : SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord> ()
 	{
 	    // Note : ignore callbacks on first sync. the update log must be populated only when necessary.
 	    

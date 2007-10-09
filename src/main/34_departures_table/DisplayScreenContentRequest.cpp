@@ -38,6 +38,8 @@ namespace synthese
 	using namespace server;
 	using namespace time;
 
+	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenContentRequest>::FACTORY_KEY("tdg");
+
 	namespace departurestable
 	{
 		const std::string DisplayScreenContentRequest::PARAMETER_DATE = "date";
@@ -46,7 +48,7 @@ namespace synthese
 		ParametersMap DisplayScreenContentRequest::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_DATE, _date.toInternalString()));
+			map.insert(PARAMETER_DATE, _date);
 			return map;
 		}
 
@@ -55,24 +57,15 @@ namespace synthese
 			uid screenId = 0;
 			try
 			{
-				ParametersMap::const_iterator it;
-				
 				// Screen
 				if (_request->getObjectId())
 					screenId = _request->getObjectId();
 				else
-				{
-					it = map.find(PARAMETER_TB);
-					if (it == map.end())
-						throw RequestException("Display screen not specified");
-					screenId = Conversion::ToLongLong(it->second);
-				}
+					screenId = map.getUid(PARAMETER_TB, true, "dscr");
 				_screen = DisplayScreen::Get(screenId);
 
 				// Date
-				it = map.find(PARAMETER_DATE);
-				if (it != map.end())
-					_date = DateTime::FromInternalString(it->second);
+				_date = map.getDateTime(PARAMETER_DATE, false, "dscr");
 			}
 			catch (DisplayScreen::RegistryKeyException& e)
 			{

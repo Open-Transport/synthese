@@ -41,8 +41,6 @@
 
 #include "11_interfaces/Interface.h"
 
-#include "01_util/Conversion.h"
-
 using namespace std;
 using namespace boost;
 
@@ -54,6 +52,9 @@ namespace synthese
 	using namespace time;
 	using namespace env;
 	using namespace security;
+	using namespace db;
+
+	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,resa::ReservationsListFunction>::FACTORY_KEY("reservations_list");
 
 	namespace resa
 	{
@@ -66,13 +67,13 @@ namespace synthese
 		ParametersMap ReservationsListFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSite::_getParametersMap());
-			map.insert(make_pair(PARAMETER_DATE, _startDateTime.toInternalString()));
+			map.insert(PARAMETER_DATE, _startDateTime);
 			if (_line.get())
-				map.insert(make_pair(PARAMETER_LINE_ID, Conversion::ToString(_line->getKey())));
+				map.insert(PARAMETER_LINE_ID, _line->getKey());
 			if (_user.get())
-				map.insert(make_pair(PARAMETER_USER_ID, Conversion::ToString(_user->getKey())));
-			map.insert(make_pair(PARAMETER_USER_NAME, _userName));
-			map.insert(make_pair(PARAMETER_DISPLAY_CANCELLED, Conversion::ToString(_displayCancelled)));
+				map.insert(PARAMETER_USER_ID, _user->getKey());
+			map.insert(PARAMETER_USER_NAME, _userName);
+			map.insert(PARAMETER_DISPLAY_CANCELLED, _displayCancelled);
 
 			return map;
 		}
@@ -85,7 +86,7 @@ namespace synthese
 			// Date
 			try
 			{
-				DateTime dateTime(Request::getDateTimeFromParameterMap(map, PARAMETER_DATE, false, getFactoryKey()));
+				DateTime dateTime(map.getDateTime(PARAMETER_DATE, false, getFactoryKey()));
 				if (!dateTime.isUnknown())
 				{
 					_startDateTime = dateTime;
@@ -98,12 +99,12 @@ namespace synthese
 			}
 
 			// Line
-			uid lineId(Request::getUidFromParameterMap(map, PARAMETER_LINE_ID, false, getFactoryKey()));
+			uid lineId(map.getUid(PARAMETER_LINE_ID, false, getFactoryKey()));
 			if (lineId != UNKNOWN_VALUE)
 			{
 				try
 				{
-					_line = CommercialLineTableSync::get(lineId);
+					_line = CommercialLineTableSync::Get(lineId);
 				}
 				catch (...)
 				{
@@ -112,12 +113,12 @@ namespace synthese
 			}
 
 			// Customer
-			uid customerId(Request::getUidFromParameterMap(map, PARAMETER_USER_ID, false, getFactoryKey()));
+			uid customerId(map.getUid(PARAMETER_USER_ID, false, getFactoryKey()));
 			if (customerId != UNKNOWN_VALUE)
 			{
 				try
 				{
-					_user = UserTableSync::get(customerId);
+					_user = UserTableSync::Get(customerId, GET_AUTO, true);
 				}
 				catch (...)
 				{
@@ -126,14 +127,14 @@ namespace synthese
 			}
 
 			// Customer name
-			_userName = Request::getStringFormParameterMap(map, PARAMETER_USER_NAME, false, getFactoryKey());
+			_userName = map.getString(PARAMETER_USER_NAME, false, getFactoryKey());
 
 			// Test if at least one parameter is defined
 			if (!_line.get() && !_user.get() && _userName.empty() && _request->getUser().get())
 				_user = _request->getUser();
 			
 			// Display cancelled
-			_displayCancelled = Request::getBoolFromParameterMap(map, PARAMETER_DISPLAY_CANCELLED, false, false, getFactoryKey());
+			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, getFactoryKey());
 		}
 
 		void ReservationsListFunction::_run( std::ostream& stream ) const

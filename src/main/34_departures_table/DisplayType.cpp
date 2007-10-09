@@ -22,8 +22,6 @@
 
 #include "DisplayType.h"
 
-using namespace boost;
-
 namespace synthese
 {
 	using namespace interfaces;
@@ -44,7 +42,7 @@ namespace synthese
 			return _rowNumber;
 		}
 
-		boost::shared_ptr<const Interface> DisplayType::getInterface() const
+		const Interface* DisplayType::getInterface() const
 		{
 			return _interf;
 		}
@@ -70,7 +68,7 @@ namespace synthese
 			_rowNumber = number;
 		}
 
-		void DisplayType::setInterface(shared_ptr<const Interface> interf )
+		void DisplayType::setInterface(const Interface* interf )
 		{
 			_interf = interf;
 		}

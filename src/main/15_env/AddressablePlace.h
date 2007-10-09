@@ -31,8 +31,6 @@
 
 namespace synthese
 {
-	using namespace geometry;
-
 	namespace env
 	{
 		/** Addressable place base class.

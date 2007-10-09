@@ -25,12 +25,10 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
 	namespace server
 	{
 		class Request;
@@ -44,7 +42,7 @@ namespace synthese
 
 			Parameters : none
 		*/
-		class CityListInterfaceElement : public interfaces::LibraryInterfaceElement
+		class CityListInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,CityListInterfaceElement>
 		{
 		private:
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _errorMessage;

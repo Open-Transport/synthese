@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace messages
@@ -34,7 +36,7 @@ namespace synthese
 		/** UpdateAlarmMessagesAction action class.
 			@ingroup m17Actions refActions
 		*/
-		class UpdateAlarmMessagesAction : public server::Action
+		class UpdateAlarmMessagesAction : public util::FactorableTemplate<server::Action, UpdateAlarmMessagesAction>
 		{
 		public:
 			static const std::string PARAMETER_SHORT_MESSAGE;

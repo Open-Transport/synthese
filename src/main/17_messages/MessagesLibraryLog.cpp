@@ -64,8 +64,11 @@ namespace synthese
 			}			
 		}
 
-		void MessagesLibraryLog::addUpdateEntry( boost::shared_ptr<const ScenarioTemplate> scenario , const std::string& text , boost::shared_ptr<const security::User> user )
-		{
+		void MessagesLibraryLog::addUpdateEntry(
+			const ScenarioTemplate* scenario
+			, const std::string& text
+			, const security::User* user
+		){
 			DBLogEntry::Content content;
 			content.push_back(string());
 			content.push_back(text);
@@ -73,8 +76,11 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
 		}
 
-		void MessagesLibraryLog::addUpdateEntry( boost::shared_ptr<const AlarmTemplate> alarm , const std::string& text , boost::shared_ptr<const security::User> user )
-		{
+		void MessagesLibraryLog::addUpdateEntry(
+			const AlarmTemplate* alarm
+			, const std::string& text
+			, const security::User* user
+		){
 			DBLogEntry::Content content;
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			content.push_back(text);
@@ -87,8 +93,10 @@ namespace synthese
 			return "Administration bibliothèque de messages";
 		}
 
-		void MessagesLibraryLog::addDeleteEntry( boost::shared_ptr<const ScenarioTemplate> scenario , boost::shared_ptr<const security::User> user )
-		{
+		void MessagesLibraryLog::addDeleteEntry(
+			const ScenarioTemplate* scenario
+			, const security::User* user
+		){
 			DBLogEntry::Content content;
 			content.push_back(Conversion::ToString(scenario->getKey()));
 			content.push_back("Suppression du scénario " + scenario->getName());

@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -34,7 +36,7 @@ namespace synthese
 		/** UpdateAllStopsDisplayScreenAction action class.
 			@ingroup m34
 		*/
-		class UpdateAllStopsDisplayScreenAction : public server::Action
+		class UpdateAllStopsDisplayScreenAction : public util::FactorableTemplate<server::Action, UpdateAllStopsDisplayScreenAction>
 		{
 		public:
 			static const std::string PARAMETER_VALUE;

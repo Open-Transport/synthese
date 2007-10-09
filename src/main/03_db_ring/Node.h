@@ -56,6 +56,7 @@ private:
     boost::shared_ptr<boost::recursive_mutex> _ringNodesMutex; 
     boost::shared_ptr<boost::recursive_mutex> _updateLogMutex; 
 
+	sqlite3* getHandle(void) const;
 
 protected:
 

@@ -31,6 +31,8 @@
 
 #include "11_interfaces/ValueElementList.h"
 
+#include "01_util/Conversion.h"
+
 using namespace std;
 using namespace boost;
 
@@ -38,6 +40,9 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace transportwebsite;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::PeriodsListInterfaceElement>::FACTORY_KEY("route_planner_periods");
 
 	namespace routeplanner
 	{

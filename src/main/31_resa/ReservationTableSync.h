@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -42,7 +42,7 @@ namespace synthese
 
 			@warning The load method does not update the transaction attribute. To do it, load the transaction first and load each reservation which belongs to it.
 		*/
-		class ReservationTableSync : public db::SQLiteTableSyncTemplate<Reservation>
+		class ReservationTableSync : public db::SQLiteNoSyncTableSyncTemplate<ReservationTableSync,Reservation>
 		{
 		public:
 			static const std::string COL_TRANSACTION_ID;
@@ -77,32 +77,6 @@ namespace synthese
 				, int first = 0
 				, int number = 0
 			);
-
-
-		protected:
-
-			/** Action to do on Reservation creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on Reservation creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on Reservation deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }

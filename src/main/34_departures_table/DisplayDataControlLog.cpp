@@ -54,7 +54,7 @@ namespace synthese
 				FACTORY_KEY
 				, level
 				, c
-				, boost::shared_ptr<const User>()
+				, NULL
 				, screen->getKey()
 				);
 

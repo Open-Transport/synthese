@@ -20,6 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ContinuousServiceTableSync.h"
+
+#include "15_env/Path.h"
+#include "15_env/LineTableSync.h"
+#include "15_env/BikeComplianceTableSync.h"
+#include "15_env/PedestrianComplianceTableSync.h"
+#include "15_env/HandicappedComplianceTableSYnc.h"
+#include "15_env/EnvModule.h"
+
 #include <sstream>
 
 #include <boost/tokenizer.hpp>
@@ -32,15 +41,6 @@
 #include "02_db/SQLiteException.h"
 
 #include "04_time/Schedule.h"
-
-#include "15_env/ContinuousService.h"
-#include "15_env/Path.h"
-#include "15_env/Line.h"
-#include "15_env/BikeCompliance.h"
-#include "15_env/PedestrianCompliance.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/ContinuousServiceTableSync.h"
-#include "15_env/EnvModule.h"
 
 #include "06_geometry/Point2D.h"
 
@@ -58,13 +58,15 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("15.60.02 Continuous services");
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ContinuousService>::TABLE_NAME = "t017_continuous_services";
-		template<> const int SQLiteTableSyncTemplate<ContinuousService>::TABLE_ID = 17;
-		template<> const bool SQLiteTableSyncTemplate<ContinuousService>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::TABLE_NAME = "t017_continuous_services";
+		template<> const int SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::TABLE_ID = 17;
+		template<> const bool SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ContinuousService>::load(ContinuousService* cs, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::load(ContinuousService* cs, const db::SQLiteResultSPtr& rows )
 		{
 		    uid id (rows->getLongLong (TABLE_COL_ID));
 
@@ -126,36 +128,48 @@ namespace synthese
 			assert (arrivalSchedules.size () > 0);
 			assert (departureSchedules.size () == arrivalSchedules.size ());
 
+
+			cs->setKey(rows->getLongLong (TABLE_COL_ID));
+			cs->setServiceNumber(serviceNumber);
+			cs->setRange(range);
+			cs->setMaxWaitingTime(maxWaitingTime);
+			cs->setDepartureSchedules(departureSchedules);
+			cs->setArrivalSchedules(arrivalSchedules);
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_link(ContinuousService* cs, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
 			uid pathId (rows->getLongLong (ContinuousServiceTableSync::COL_PATHID));
 
 			shared_ptr<Path> path = EnvModule::fetchPath (pathId);
 			assert (path.get());
-			assert (path->getEdges ().size () == arrivalSchedules.size ());
+//			assert (path->getEdges ().size () == arrivalSchedules.size ());
 
 			uid bikeComplianceId (
-			    rows->getLongLong (ContinuousServiceTableSync::COL_BIKECOMPLIANCEID));
-			
-			uid handicappedComplianceId (
-			    rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-			
-			uid pedestrianComplianceId (
-			    rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+				rows->getLongLong (ContinuousServiceTableSync::COL_BIKECOMPLIANCEID));
 
-			cs->setKey(rows->getLongLong (TABLE_COL_ID));
-			cs->setServiceNumber(serviceNumber);
+			uid handicappedComplianceId (
+				rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+
+			uid pedestrianComplianceId (
+				rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+
 			cs->setPath(path.get());
-			cs->setRange(range);
-			cs->setMaxWaitingTime(maxWaitingTime);
 			cs->setBikeCompliance (BikeCompliance::Get(bikeComplianceId).get());
 			cs->setHandicappedCompliance (HandicappedCompliance::Get(handicappedComplianceId).get());
 			cs->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
-			cs->setDepartureSchedules(departureSchedules);
-			cs->setArrivalSchedules(arrivalSchedules);
 
-			path->addService (cs);
+			if (!temporary)
+				path->addService (cs);
 		}
 
-		template<> void SQLiteTableSyncTemplate<ContinuousService>::save(ContinuousService* object)
+		template<> void SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_unlink(ContinuousService* obj)
+		{
+			obj->getPath()->removeService(obj);
+		}
+
+		template<> void SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::save(ContinuousService* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -184,7 +198,7 @@ namespace synthese
 		const std::string ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 
 		ContinuousServiceTableSync::ContinuousServiceTableSync()
-			: SQLiteTableSyncTemplate<ContinuousService>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_SERVICENUMBER, "TEXT", true);
@@ -197,7 +211,7 @@ namespace synthese
 			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
 		}
 
-		void ContinuousServiceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+/*		void ContinuousServiceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			// Loop on each added row
 			while (rows->next ())
@@ -246,7 +260,7 @@ namespace synthese
 				}
 			}
 		}
-
+*/
 		std::vector<shared_ptr<ContinuousService> > ContinuousServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();

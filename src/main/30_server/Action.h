@@ -25,8 +25,6 @@
 
 #include "01_util/Factorable.h"
 
-#include "30_server/Types.h"
-
 #define Action_PARAMETER_PREFIX std::string("actionParam")
 
 /** @defgroup refActions Actions
@@ -38,6 +36,7 @@ namespace synthese
 	namespace server
 	{
 		class Request;
+		class ParametersMap;
 
 		/** Action abstract class to run before the display of a function result.
 
@@ -45,7 +44,7 @@ namespace synthese
 
 			@ingroup m18
 		*/
-		class Action : public util::Factorable
+		class Action : public util::Factorable<Action>
 		{
 		protected:
 			Request* _request;

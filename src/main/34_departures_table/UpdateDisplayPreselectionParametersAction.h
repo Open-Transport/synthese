@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -32,9 +34,9 @@ namespace synthese
 		class DisplayScreen;
 
 		/** UpdateDisplayPreselectionParametersAction action class.
-			@ingroup m34
+			@ingroup m34Actions refActions
 		*/
-		class UpdateDisplayPreselectionParametersAction : public server::Action
+		class UpdateDisplayPreselectionParametersAction : public util::FactorableTemplate<server::Action, UpdateDisplayPreselectionParametersAction>
 		{
 		public:
 			static const std::string PARAMETER_ACTIVATE_PRESELECTION;

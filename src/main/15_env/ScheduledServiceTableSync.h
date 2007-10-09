@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_ScheduledServiceTableSync_H__
 #define SYNTHESE_ScheduledServiceTableSync_H__
 
+#include "ScheduledService.h"
 
 #include <vector>
 #include <string>
@@ -30,19 +31,18 @@
 
 #include "04_time/Date.h"
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class ScheduledService;
 		class CommercialLine;
 
 		/** ScheduledService table synchronizer.
 			@ingroup m15LS refLS
 		*/
-		class ScheduledServiceTableSync : public db::SQLiteTableSyncTemplate<ScheduledService>
+		class ScheduledServiceTableSync : public db::SQLiteRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>
 		{
 		public:
 			static const std::string COL_SERVICENUMBER;
@@ -69,38 +69,13 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<ScheduledService> > search(
-				env::CommercialLine* commercialLine = NULL
+				const env::CommercialLine* commercialLine = NULL
 				, time::Date date = time::Date(time::TIME_UNKNOWN)
 				, int first = 0
 				, int number = 0
 				, bool orderByOriginTime = true
 				, bool raisingOrder = true
 			);
-
-
-		protected:
-
-			/** Action to do on ScheduledService creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on ScheduledService creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on ScheduledService deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 			/** The schedules indexes of each linestop are updated after the whole first sync.
 				@param sqlite SQLite thread

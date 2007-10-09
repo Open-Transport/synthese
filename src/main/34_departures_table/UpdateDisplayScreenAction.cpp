@@ -29,6 +29,7 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 #include "34_departures_table/UpdateDisplayScreenAction.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
@@ -81,23 +82,23 @@ namespace synthese
 			try
 			{
 				// The screen
-				_screen = DisplayScreenTableSync::get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
 
 				// Properties
-				_name = Request::getStringFormParameterMap(map, PARAMETER_NAME, true, FACTORY_KEY);
-				_title = Request::getStringFormParameterMap(map, PARAMETER_TITLE, true, FACTORY_KEY);
-				_wiringCode = Request::getIntFromParameterMap(map, PARAMETER_WIRING_CODE, true, FACTORY_KEY);
-				_blinkingDelay = Request::getIntFromParameterMap(map, PARAMETER_BLINKING_DELAY, true, FACTORY_KEY);
-				_cleaningDelay = Request::getIntFromParameterMap(map, PARAMETER_CLEANING_DELAY, true, FACTORY_KEY);
-				_maxDelay = Request::getIntFromParameterMap(map, PARAMETER_DISPLAY_MAX_DELAY, true, FACTORY_KEY);
-				_displayPlatform = Request::getBoolFromParameterMap(map, PARAMETER_DISPLAY_PLATFORM, true, true, FACTORY_KEY);
-				_displayServiceNumber = Request::getBoolFromParameterMap(map, PARAMETER_DISPLAY_SERVICE_NUMBER, true, true, FACTORY_KEY);
-				_displayTeam = Request::getBoolFromParameterMap(map, PARAMETER_DISPLAY_TEAM, true, true, FACTORY_KEY);
-				_direction = static_cast<DeparturesTableDirection>(Request::getIntFromParameterMap(map, PARAMETER_DISPLAY_DEPARTURE_ARRIVAL, true, FACTORY_KEY));
-				_endFilter = static_cast<EndFilter>(Request::getIntFromParameterMap(map, PARAMETER_DISPLAY_END_FILTER, true, FACTORY_KEY));
+				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+				_title = map.getString(PARAMETER_TITLE, true, FACTORY_KEY);
+				_wiringCode = map.getInt(PARAMETER_WIRING_CODE, true, FACTORY_KEY);
+				_blinkingDelay = map.getInt(PARAMETER_BLINKING_DELAY, true, FACTORY_KEY);
+				_cleaningDelay = map.getInt(PARAMETER_CLEANING_DELAY, true, FACTORY_KEY);
+				_maxDelay = map.getInt(PARAMETER_DISPLAY_MAX_DELAY, true, FACTORY_KEY);
+				_displayPlatform = map.getBool(PARAMETER_DISPLAY_PLATFORM, true, true, FACTORY_KEY);
+				_displayServiceNumber = map.getBool(PARAMETER_DISPLAY_SERVICE_NUMBER, true, true, FACTORY_KEY);
+				_displayTeam = map.getBool(PARAMETER_DISPLAY_TEAM, true, true, FACTORY_KEY);
+				_direction = static_cast<DeparturesTableDirection>(map.getInt(PARAMETER_DISPLAY_DEPARTURE_ARRIVAL, true, FACTORY_KEY));
+				_endFilter = static_cast<EndFilter>(map.getInt(PARAMETER_DISPLAY_END_FILTER, true, FACTORY_KEY));
 
 				// Type
-				uid id(Request::getUidFromParameterMap(map, PARAMETER_TYPE, true, FACTORY_KEY));
+				uid id(map.getUid(PARAMETER_TYPE, true, FACTORY_KEY));
 				_type = DisplayType::Get(id);
 
 			}
@@ -151,7 +152,7 @@ namespace synthese
 			DisplayScreenTableSync::save(_screen.get());
 
 			// Log
-			ArrivalDepartureTableLog::addUpdateEntry(_screen, log.str(), _request->getUser());
+			ArrivalDepartureTableLog::addUpdateEntry(_screen.get(), log.str(), _request->getUser().get());
 		}
 	}
 }

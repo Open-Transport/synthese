@@ -20,14 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "ScenarioStopAction.h"
 
-#include "17_messages/ScenarioStopAction.h"
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/SentScenario.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesLog.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -36,6 +38,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace time;
+
+	template<> const string util::FactorableTemplate<Action, messages::ScenarioStopAction>::FACTORY_KEY("scenariostop");
 	
 	namespace messages
 	{
@@ -64,11 +68,11 @@ namespace synthese
 			ScenarioTableSync::save(_scenario.get());
 
 			// Log
-			MessagesLog::addUpdateEntry(dynamic_pointer_cast<const SentScenario, SentScenario>(_scenario), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser());
+			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser().get());
 		}
 
 		ScenarioStopAction::ScenarioStopAction()
-			: Action(), _stopDateTime(TIME_CURRENT)
+			: FactorableTemplate<Action, ScenarioStopAction>(), _stopDateTime(TIME_CURRENT)
 		{
 	
 		}

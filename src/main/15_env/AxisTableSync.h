@@ -28,20 +28,18 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "Axis.h"
 
-using namespace boost;
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class Axis;
-
 		/** Axis table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 		*/
-		class AxisTableSync : public db::SQLiteTableSyncTemplate<Axis>
+		class AxisTableSync : public db::SQLiteRegistryTableSyncTemplate<AxisTableSync,Axis>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -59,34 +57,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<shared_ptr<Axis> > search(
+			static std::vector<boost::shared_ptr<Axis> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on Axis creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on Axis creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on Axis deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		};
 	}

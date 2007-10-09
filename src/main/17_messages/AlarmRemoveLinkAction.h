@@ -24,6 +24,7 @@
 #define SYNTHESE_AlarmRemoveLinkAction_H__
 
 #include "01_util/UId.h"
+#include "01_util/FactorableTemplate.h"
 
 #include "30_server/Action.h"
 
@@ -32,9 +33,9 @@ namespace synthese
 	namespace messages
 	{
 		/** AlarmRemoveLinkAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
-		class AlarmRemoveLinkAction : public server::Action
+		class AlarmRemoveLinkAction : public util::FactorableTemplate<server::Action,AlarmRemoveLinkAction>
 		{
 		public:
 			static const std::string PARAMETER_ALARM_ID;

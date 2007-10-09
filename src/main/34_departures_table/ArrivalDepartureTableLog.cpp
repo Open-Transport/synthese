@@ -32,9 +32,11 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace dblog;
 	using namespace security;
 	using namespace departurestable;
+	using namespace util;
 
 	namespace util
 	{
@@ -50,7 +52,7 @@ namespace synthese
 			return v;
 		}
 
-		void ArrivalDepartureTableLog::addUpdateEntry( boost::shared_ptr<const DisplayScreen> screen , const std::string& text, shared_ptr<const User> user )
+		void ArrivalDepartureTableLog::addUpdateEntry(const DisplayScreen* screen , const std::string& text, const User* user )
 		{
 			DBLogEntry::Content content;
 			content.push_back(text);
@@ -63,12 +65,12 @@ namespace synthese
 			{
 				if (decodeTableId(id) == DisplayScreenTableSync::TABLE_ID)
 				{
-					shared_ptr<DisplayScreen> ds = DisplayScreenTableSync::get(id);
+					shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id,GET_AUTO,true);
 					return ds->getFullName();
 				}
 				else if (decodeTableId(id) == DisplayTypeTableSync::TABLE_ID)
 				{
-					shared_ptr<DisplayType> dt(DisplayTypeTableSync::get(id));
+					shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id));
 					return dt->getName();
 				}
 
@@ -84,28 +86,30 @@ namespace synthese
 			return "Administration des tableaux de départs";
 		}
 
-		void ArrivalDepartureTableLog::addRemoveEntry( boost::shared_ptr<const DisplayScreen> screen , boost::shared_ptr<const security::User> user )
-		{
+		void ArrivalDepartureTableLog::addRemoveEntry(
+			const DisplayScreen* screen
+			, const security::User* user
+		){
 			DBLogEntry::Content content;
 			content.push_back("Suppression de l'afficheur " + screen->getFullName());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
 		}
 
-		void ArrivalDepartureTableLog::addUpdateTypeEntry( boost::shared_ptr<const DisplayType> type , boost::shared_ptr<const security::User> user , const std::string& text )
+		void ArrivalDepartureTableLog::addUpdateTypeEntry(const DisplayType* type , const security::User* user , const std::string& text )
 		{
 			DBLogEntry::Content content;
 			content.push_back("Mise à jour type d'afficheur " + type->getName() + text);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
 		}
 
-		void ArrivalDepartureTableLog::addCreateTypeEntry( boost::shared_ptr<const DisplayType> type , boost::shared_ptr<const security::User> user )
+		void ArrivalDepartureTableLog::addCreateTypeEntry(const DisplayType* type , const security::User* user )
 		{
 			DBLogEntry::Content content;
 			content.push_back("Création type d'afficheur " + type->getName());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
 		}
 
-		void ArrivalDepartureTableLog::addDeleteTypeEntry( boost::shared_ptr<const DisplayType> type , boost::shared_ptr<const security::User> user )
+		void ArrivalDepartureTableLog::addDeleteTypeEntry(const DisplayType* type , const security::User* user )
 		{
 			DBLogEntry::Content content;
 			content.push_back("Suppression type d'afficheur " + type->getName());

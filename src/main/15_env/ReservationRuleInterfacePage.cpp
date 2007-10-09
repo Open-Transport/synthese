@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const string FactoryTemplate<InterfacePage, ReservationRuleInterfacePage>::FACTORY_KEY("");
+		template<> const string FactorableTemplate<InterfacePage, env::ReservationRuleInterfacePage>::FACTORY_KEY("reservation_rule");
 	}
 
 	namespace env

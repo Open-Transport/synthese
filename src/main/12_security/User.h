@@ -25,12 +25,8 @@
 
 #include <string>
 
-#include <boost/shared_ptr.hpp>
-
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
-
-#include "02_db/SQLiteTableSyncTemplate.h"
 
 #include "04_time/Date.h"
 
@@ -55,9 +51,9 @@ namespace synthese
 		class User : public util::Registrable<uid, User>
 		{
 		private:
-			boost::shared_ptr<const Profile>	_profile;
-			std::string							_login;
-			std::string							_password;
+			const Profile*	_profile;
+			std::string		_login;
+			std::string		_password;
 			std::string		_name;
 			std::string		_surname;
 			std::string		_address;
@@ -69,15 +65,13 @@ namespace synthese
 			std::string		_phone;
 			bool			_isConnectionAllowed;
 			time::Date		_birthDate;
-
-			friend class db::SQLiteTableSyncTemplate<User>;
 			
 		public:
 			User(uid id=0);
 
 			//! \name Setters
 			//@{
-				void setProfile(boost::shared_ptr<const Profile> profile);
+				void setProfile(const Profile* profile);
 				void setLogin(const std::string& login);
 				
 				/** Password setter.
@@ -89,6 +83,7 @@ namespace synthese
 				void setAddress(const std::string& address);
 				void setPostCode(const std::string& code);
 				void setCityText(const std::string& city);
+				void setCityId(uid cityId);
 				void setCountry(const std::string& country);
 				void setEMail(const std::string& email);
 				void setPhone(const std::string& phone);
@@ -98,8 +93,8 @@ namespace synthese
 
 			//! \name Getters
 			//@{
-				boost::shared_ptr<const Profile>	getProfile() const;
-				const std::string&					getLogin() const;
+				const Profile*		getProfile() const;
+				const std::string&	getLogin() const;
 
 				/** Password getter.
 					@todo handle encryption (create a getEncryptedPassword instead)
@@ -110,6 +105,7 @@ namespace synthese
 				const std::string&	getAddress()			const;
 				const std::string&	getPostCode()			const;
 				const std::string&	getCityText()			const;
+				uid					getCityId()				const;
 				const std::string&	getCountry()			const;
 				const std::string&	getEMail()				const;
 				const std::string&	getPhone()				const;

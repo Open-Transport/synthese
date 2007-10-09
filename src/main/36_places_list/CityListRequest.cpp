@@ -45,6 +45,8 @@ namespace synthese
 	using namespace server;
 	using namespace interfaces;
 	using namespace util;
+
+	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,transportwebsite::CityListRequest>::FACTORY_KEY("lc");
 	
 	namespace transportwebsite
 	{
@@ -67,9 +69,9 @@ namespace synthese
 		ParametersMap CityListRequest::_getParametersMap() const
 		{
 			ParametersMap pm(FunctionWithSite::_getParametersMap());
-			pm.insert(make_pair(PARAMETER_INPUT, _input));
-			pm.insert(make_pair(PARAMETER_NUMBER, Conversion::ToString(_n)));
-			pm.insert(make_pair(PARAMETER_IS_FOR_ORIGIN, Conversion::ToString(_isForOrigin)));
+			pm.insert(PARAMETER_INPUT, _input);
+			pm.insert(PARAMETER_NUMBER, _n);
+			pm.insert(PARAMETER_IS_FOR_ORIGIN, _isForOrigin);
 			return pm;
 		}
 
@@ -77,24 +79,11 @@ namespace synthese
 		{
 			FunctionWithSite::_setFromParametersMap(map);
 
-			ParametersMap::const_iterator it;
-
 			_page = _site->getInterface()->getPage<PlacesListInterfacePage>();
+			_input = map.getString(PARAMETER_INPUT, true, "fws");
+			_isForOrigin = map.getBool(PARAMETER_IS_FOR_ORIGIN, true, false, "fws");
 
-			it = map.find(PARAMETER_INPUT);
-			if (it == map.end())
-				throw RequestException("Text input not specified");
-			_input = it->second;
-
-			it = map.find(PARAMETER_IS_FOR_ORIGIN);
-			if (it == map.end())
-				throw RequestException("Is for origin not specified");
-			_isForOrigin = Conversion::ToBool(it->second);
-
-			it = map.find(PARAMETER_NUMBER);
-			if (it == map.end())
-				throw RequestException("Number not specified");
-			_n = Conversion::ToInt(it->second);
+			_n = map.getInt(PARAMETER_NUMBER, true, "fws");
 			if (_n < 0)
 				throw RequestException("Bad value for number");
 		}

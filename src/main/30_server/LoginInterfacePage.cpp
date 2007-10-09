@@ -24,8 +24,8 @@
 
 #include "LoginInterfacePage.h"
 
-#include "30_server/Request.h"
 #include "30_server/Function.h"
+#include "30_server/QueryString.h"
 
 using namespace std;
 
@@ -51,7 +51,7 @@ namespace synthese
 			ParametersVector pv;
 			
 			pv.push_back(functionIfSucceed->getFactoryKey());
-			pv.push_back(Request::getQueryString(functionIfSucceed->_getParametersMap()));
+			pv.push_back(functionIfSucceed->_getParametersMap().getQueryString(true).getContent());
 			pv.push_back(title);
 
 			InterfacePage::display(

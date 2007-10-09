@@ -48,6 +48,13 @@ namespace synthese
 		class SQLiteResult;
 		class SQLite;
 
+		typedef enum
+		{
+			GET_AUTO
+			, GET_TEMPORARY
+			, GET_REGISTRY
+		} GetSource;
+
 		/** @defgroup refLS Table synchronizers.
 			@ingroup ref
 		*/
@@ -58,19 +65,14 @@ namespace synthese
 
 			@ingroup m02
 		*/
-		class SQLiteTableSync : public util::Factorable
+		class SQLiteTableSync : public util::Factorable<SQLiteTableSync>
 		{
 		private:
 
 		    SQLiteStatementSPtr _getRowByIdStatement;
 
-		    const bool _allowInsert;
-		    const bool _allowRemove;
-		    const std::string _triggerOverrideClause;
-		    bool _ignoreCallbacksOnFirstSync;
 		    bool _enableTriggers;
 		    
-		    const std::string _tableName;
 		    SQLiteTableFormat _tableFormat;
 
 		protected:
@@ -78,16 +80,12 @@ namespace synthese
 
 		public:
 
-			SQLiteTableSync ( const std::string& tableName, 
-					  bool allowInsert = true, 
-					  bool allowRemove = true,
-					  const std::string& triggerOverrideClause = "1",
-					  bool ignoreCallbacksOnFirstSync = false
-			    );
-
+			SQLiteTableSync ();
 			~SQLiteTableSync ();
 
-			const std::string& getTableName () const;
+			virtual const std::string& getTableName () const = 0;
+			virtual bool getIgnoreCallbacksOnFirstSync () const;
+			virtual std::string getTriggerOverrideClause () const;
 
 			/** Returns the unique integer identifying a table.
 				@return The unique integer identifying a table
@@ -96,9 +94,7 @@ namespace synthese
 
 			const SQLiteTableFormat& getTableFormat () const;
 
-			bool getIgnoreCallbacksOnFirstSync () const;
-			void setIgnoreCallbacksOnFirstSync (bool ignoreCallbacksOnFirstSync);
-
+			
 			void setEnableTriggers (bool enableTriggers);
 
 			/** First synchronisation.
@@ -172,9 +168,6 @@ namespace synthese
 
 
 		private:
-
-			std::string getTriggerOverrideClause () const;
-
 
 			/** Creates table in SQLite db according to this class
 			 * table format.

@@ -25,6 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace env
@@ -37,9 +39,9 @@ namespace synthese
 		class DisplayScreen;
 
 		/** DisplayScreenRemoveForbiddenPlaceAction action class.
-		@ingroup m34
+		@ingroup m34Actions refActions
 		*/
-		class DisplayScreenRemoveForbiddenPlaceAction : public server::Action
+		class DisplayScreenRemoveForbiddenPlaceAction : public util::FactorableTemplate<server::Action, DisplayScreenRemoveForbiddenPlaceAction>
 		{
 		public:
 			static const std::string PARAMETER_PLACE;

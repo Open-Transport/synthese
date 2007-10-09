@@ -48,6 +48,8 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement, departurestable::DeparturesTableLineContentInterfaceElement>::FACTORY_KEY("departurestablelinecell");
+
 	namespace departurestable
 	{
 		void DeparturesTableLineContentInterfaceElement::storeParameters( ValueElementList& vel )

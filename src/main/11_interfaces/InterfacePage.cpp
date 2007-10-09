@@ -22,7 +22,8 @@
 
 #include "01_util/Log.h"
 
-#include "11_interfaces/InterfacePage.h"
+#include "InterfacePage.h"
+
 #include "11_interfaces/LineLabelInterfaceElement.h"
 #include "11_interfaces/GotoInterfaceElement.h"
 #include "11_interfaces/CommentInterfaceElement.h"
@@ -62,6 +63,8 @@ namespace synthese
 			}
 		}
 
+
+
 		void InterfacePage::parse( const std::string& text )
 		{
 			int counter = 0;
@@ -98,35 +101,35 @@ namespace synthese
 			}
 		}
 
-		void InterfacePage::setInterface(shared_ptr<const Interface> value )
+
+
+		void InterfacePage::setInterface(const Interface* value )
 		{
 			_interface = value;
 		}
 
-		shared_ptr<const Interface> InterfacePage::getInterface() const
+
+
+		const Interface* InterfacePage::getInterface() const
 		{
 			return _interface;
 		}
+
+
 
 		InterfacePage::~InterfacePage()
 		{
 
 		}
 
-		void InterfacePage::setCode( const std::string& code )
-		{
-			_code = code;
-		}
 
-		const std::string& InterfacePage::getCode() const
-		{
-			return _code;
-		}
 
 		InterfacePage::InterfacePage()
 		{
 
 		}
+
+
 
 		string InterfacePage::getValue( const ParametersVector& parameters , VariablesMap& variables , const void* object /*= NULL */, const server::Request* request /*= NULL  */ ) const
 		{

@@ -20,15 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "AddUserAction.h"
 
-#include "12_security/Profile.h"
-#include "12_security/User.h"
+#include "12_security/ProfileTableSync.h"
 #include "12_security/UserTableSync.h"
-#include "12_security/AddUserAction.h"
+#include "12_security/Profile.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/QueryString.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using boost::shared_ptr;
 
@@ -36,6 +37,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+
+	template<> const std::string util::FactorableTemplate<Action, security::AddUserAction>::FACTORY_KEY("sau");
 
 	namespace security
 	{
@@ -46,41 +49,31 @@ namespace synthese
 		ParametersMap AddUserAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_NAME, _name));
-			map.insert(make_pair(PARAMETER_LOGIN, _login));
+			map.insert(PARAMETER_NAME, _name);
+			map.insert(PARAMETER_LOGIN, _login);
 			if (_profile.get())
-				map.insert(make_pair(PARAMETER_PROFILE_ID, Conversion::ToString(_profile->getKey())));
+				map.insert(PARAMETER_PROFILE_ID, _profile->getKey());
 			return map;
 		}
 
 		void AddUserAction::_setFromParametersMap(const ParametersMap& map )
 		{
-			ParametersMap::const_iterator it;
-			
-			it = map.find(PARAMETER_NAME);
-			if (it == map.end())
-				throw ActionException("Name not specified");
-			_name = it->second;
+			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			if (_name.empty())
 				throw ActionException("L'utilisateur ne peut être créé car le nom n'est pas renseigné. Veuillez renseigner le champ nom.");
 			
-			it = map.find(PARAMETER_LOGIN);
-			if (it == map.end())
-				throw ActionException("Login not specified");
-            _login = it->second;
+			_login = map.getString(PARAMETER_LOGIN, true, FACTORY_KEY);
 			if (_login.empty())
 				throw ActionException("L'utilisateur ne peut être créé car le login n'est pas renseigné. Veuillez renseigner le champ login.");
 			if (UserTableSync::loginExists(_login))
 				throw ActionException("L'utilisateur ne peut être créé car le login entré est déjà utilisé. Veuillez choisir un autre login.");
 			
-			it = map.find(PARAMETER_PROFILE_ID);
-			if (it == map.end())
-				throw ActionException("Profile not specified");
-			if (!Profile::Contains(Conversion::ToLongLong(it->second)))
+			uid id(map.getUid(PARAMETER_PROFILE_ID, true, FACTORY_KEY));
+			if (!Profile::Contains(id))
 				throw ActionException("Profil inexistant");
-			_profile = Profile::Get(Conversion::ToLongLong(it->second));
+			_profile = ProfileTableSync::Get(id);
 
-			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void AddUserAction::run()
@@ -88,7 +81,7 @@ namespace synthese
 			shared_ptr<User> user(new User);
 			user->setLogin(_login);
 			user->setName(_name);
-			user->setProfile(_profile);
+			user->setProfile(_profile.get());
 			UserTableSync::save(user.get());
 			_request->setObjectId(user->getKey());
 		}

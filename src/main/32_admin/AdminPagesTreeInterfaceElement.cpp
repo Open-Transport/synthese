@@ -31,6 +31,8 @@
 
 #include "30_server/FunctionRequest.h"
 
+#include <sstream>
+
 using namespace boost;
 using namespace std;
 

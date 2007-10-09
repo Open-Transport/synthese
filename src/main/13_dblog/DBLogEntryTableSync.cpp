@@ -50,32 +50,21 @@ namespace synthese
 	using namespace time;
 	using namespace security;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,DBLogEntryTableSync>::FACTORY_KEY("13.01 DB Log entries");
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<DBLogEntry>::TABLE_NAME = "t045_log_entries";
-		template<> const int SQLiteTableSyncTemplate<DBLogEntry>::TABLE_ID = 45;
-		template<> const bool SQLiteTableSyncTemplate<DBLogEntry>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::TABLE_NAME = "t045_log_entries";
+		template<> const int SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::TABLE_ID = 45;
+		template<> const bool SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DBLogEntry>::load(DBLogEntry* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::load(DBLogEntry* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setLogKey(rows->getText ( DBLogEntryTableSync::COL_LOG_KEY));
 			object->setDate(DateTime::FromSQLTimestamp(rows->getText ( DBLogEntryTableSync::COL_DATE)));
 			object->setLevel((DBLogEntry::Level) rows->getInt ( DBLogEntryTableSync::COL_LEVEL));
 			object->setObjectId(rows->getLongLong ( DBLogEntryTableSync::COL_OBJECT_ID));
-
-			// User ID
-			if (rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID))
-			{
-				try
-				{
-				    object->setUser(UserTableSync::get (rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID)));
-				}
-				catch (DBEmptyResultException<User>)
-				{					
-					/// @todo See if an exception should be thrown
-				}
-			}
 
 			// Content column : parse all contents separated by | 
 			DBLogEntry::Content v;
@@ -88,7 +77,32 @@ namespace synthese
 			object->setContent(v);
 		}
 
-		template<> void SQLiteTableSyncTemplate<DBLogEntry>::save(DBLogEntry* object)
+		template<> void SQLiteTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::_link(DBLogEntry* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			// User ID
+			uid userId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
+
+			if (userId > 0)
+			{
+				try
+				{
+					obj->setUser(UserTableSync::Get(userId, obj, true, temporary));
+				}
+				catch (DBEmptyResultException<User>)
+				{					
+					/// @todo See if an exception should be thrown
+				}
+			}
+
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::_unlink(DBLogEntry* obj)
+		{
+			obj->setUser(NULL);
+		}
+
+		template<> void SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::save(DBLogEntry* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -134,7 +148,7 @@ namespace synthese
 		const std::string DBLogEntryTableSync::COL_OBJECT_ID = "object_id";
 
 		DBLogEntryTableSync::DBLogEntryTableSync()
-			: SQLiteTableSyncTemplate<DBLogEntry>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteNoSyncTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_LOG_KEY, "TEXT");
@@ -149,18 +163,6 @@ namespace synthese
 			m1.push_back(COL_OBJECT_ID);
 			m1.push_back(COL_DATE);
 			addTableIndex(m1);
-		}
-
-		void DBLogEntryTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		}
-
-		void DBLogEntryTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-		}
-
-		void DBLogEntryTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
 		}
 
 		std::vector<shared_ptr<DBLogEntry> > DBLogEntryTableSync::search(
@@ -216,6 +218,7 @@ namespace synthese
 				{
 					shared_ptr<DBLogEntry> object(new DBLogEntry());
 					load(object.get(), rows);
+					link(object.get(), rows, GET_AUTO);
 					objects.push_back(object);
 				}
 				return objects;

@@ -32,6 +32,8 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 
+	template<> const std::string util::FactorableTemplate<interfaces::InterfacePage,admin::AdminInterfacePage>::FACTORY_KEY("admin");
+
 	namespace admin
 	{
 		void AdminInterfacePage::display(

@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -36,7 +38,7 @@ namespace synthese
 		/** DeleteProfileAction action class.
 			@ingroup m12Actions refActions
 		*/
-		class DeleteProfileAction : public server::Action
+		class DeleteProfileAction : public util::FactorableTemplate<server::Action, DeleteProfileAction>
 		{
 		public:
 

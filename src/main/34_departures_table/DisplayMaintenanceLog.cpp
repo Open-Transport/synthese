@@ -25,6 +25,10 @@
 #include "34_departures_table/DisplayMaintenanceLog.h"
 #include "34_departures_table/DisplayScreen.h"
 
+#include "01_util/Conversion.h"
+
+#include <sstream>
+
 using namespace std;
 using namespace boost;
 
@@ -33,6 +37,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace security;
 	using namespace departurestable;
+	using namespace util;
 
 	namespace util
 	{
@@ -51,16 +56,24 @@ namespace synthese
 			return v;
 		}
 
-		void DisplayMaintenanceLog::addAdminEntry(boost::shared_ptr<const DisplayScreen> screen, const DBLogEntry::Level& level, boost::shared_ptr<const security::User> user, const std::string& field, const std::string& oldValue, const std::string& newValue )
-		{
+		void DisplayMaintenanceLog::addAdminEntry(
+			const DisplayScreen* screen
+			, const DBLogEntry::Level& level
+			, const security::User* user
+			, const std::string& field
+			, const std::string& oldValue
+			, const std::string& newValue
+		){
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_ADMIN));
 			c.push_back(field + " : " + oldValue + " => " + newValue);
 			DBLog::_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, screen->getKey());
 		}
 
-		void DisplayMaintenanceLog::addStatusEntry( boost::shared_ptr<const DisplayScreen> screen, bool status )
-		{
+		void DisplayMaintenanceLog::addStatusEntry(
+			const DisplayScreen* screen
+			, bool status
+		){
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_STATUS));
 			c.push_back(Conversion::ToString(status));
@@ -68,7 +81,7 @@ namespace synthese
 				FACTORY_KEY
 				, status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR
 				, c
-				, boost::shared_ptr<const User>()
+				, NULL
 				, screen->getKey()
 			);
 		}
@@ -113,7 +126,7 @@ namespace synthese
 		}
 
 		void DisplayMaintenanceLog::addControlEntry(
-			boost::shared_ptr<const DisplayScreen> screen
+			const DisplayScreen* screen
 			, bool messageOK
 			, bool cpuOK
 			, std::string cpuCode
@@ -141,7 +154,7 @@ namespace synthese
 				FACTORY_KEY
 				, status ? DBLogEntry::DB_LOG_OK : DBLogEntry::DB_LOG_ERROR
 				, c
-				, boost::shared_ptr<const User>()
+				, NULL
 				, screen->getKey()
 				);
 		}

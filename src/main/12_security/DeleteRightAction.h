@@ -29,6 +29,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -39,7 +41,7 @@ namespace synthese
 		/** DeleteRightAction action class.
 			@ingroup m12Actions refActions
 		*/
-		class DeleteRightAction : public server::Action
+		class DeleteRightAction : public util::FactorableTemplate<server::Action, DeleteRightAction>
 		{
 		public:
 			static const std::string PARAMETER_RIGHT;

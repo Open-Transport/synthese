@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -36,7 +38,7 @@ namespace synthese
 		/** User creation action.
 			@ingroup m12Actions refActions
 		*/
-		class AddUserAction : public server::Action
+		class AddUserAction : public util::FactorableTemplate<server::Action,AddUserAction>
 		{
 		public:
 			static const std::string PARAMETER_LOGIN;

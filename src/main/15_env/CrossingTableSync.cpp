@@ -25,9 +25,7 @@
 
 #include "01_util/Conversion.h"
 
-#include "15_env/City.h"
-#include "15_env/Crossing.h"
-#include "15_env/EnvModule.h"
+#include "15_env/CityTableSync.h"
 
 #include <assert.h>
 
@@ -40,19 +38,37 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,CrossingTableSync>::FACTORY_KEY("15.40.02 Crossings");
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Crossing>::TABLE_NAME = "t043_crossings";
-		template<> const int SQLiteTableSyncTemplate<Crossing>::TABLE_ID = 43;
-		template<> const bool SQLiteTableSyncTemplate<Crossing>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::TABLE_NAME = "t043_crossings";
+		template<> const int SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::TABLE_ID = 43;
+		template<> const bool SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Crossing>::load(Crossing* crossing, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::load(Crossing* crossing, const db::SQLiteResultSPtr& rows )
 		{
 			uid id (rows->getLongLong (TABLE_COL_ID));
-			uid cityId (rows->getLongLong (CrossingTableSync::TABLE_COL_CITYID));
-			
 			crossing->setKey(id);
-			crossing->setCity(City::Get(cityId).get());
+		}
+
+		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::_link(Crossing* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			uid cityId (rows->getLongLong (CrossingTableSync::TABLE_COL_CITYID));
+			obj->setCity(City::Get(cityId).get());
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::_unlink(Crossing* obj)
+		{
+
+
+			obj->setCity(NULL);
+		}
+
+		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::save(Crossing* obj)
+		{
+
 		}
 	}
 
@@ -62,7 +78,7 @@ namespace synthese
 		const std::string CrossingTableSync::TABLE_COL_CITYID = "city_id";
 
 		CrossingTableSync::CrossingTableSync ()
-		: SQLiteTableSyncTemplate<Crossing> (true, false, db::TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteRegistryTableSyncTemplate<CrossingTableSync,Crossing> ()
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER", true);
 			addTableColumn (TABLE_COL_CITYID, "INTEGER", false);
@@ -77,7 +93,7 @@ namespace synthese
 
 		}
 
-		    
+/*		    
 		void 
 			CrossingTableSync::rowsAdded (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
@@ -133,6 +149,6 @@ namespace synthese
 			}
 		}
 	    
-
+*/
 	}
 }

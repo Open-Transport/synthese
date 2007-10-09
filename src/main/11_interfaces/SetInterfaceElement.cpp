@@ -29,6 +29,8 @@ namespace synthese
 {
 	using namespace interfaces;
 
+	template<> const std::string util::FactorableTemplate<LibraryInterfaceElement,SetInterfaceElement>::FACTORY_KEY("set");
+
 	namespace interfaces
 	{
 		void SetInterfaceElement::storeParameters(ValueElementList& vel)

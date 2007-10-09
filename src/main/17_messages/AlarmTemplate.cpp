@@ -56,5 +56,15 @@ namespace synthese
 		{
 			return _scenarioId;
 		}
+
+		boost::shared_ptr<const AlarmTemplate> AlarmTemplate::Get( uid key )
+		{
+			return Registrable<uid,AlarmTemplate>::Get(key);
+		}
+
+		bool AlarmTemplate::Contains( uid key )
+		{
+			return Registrable<uid,AlarmTemplate>::Contains(key);
+		}
 	}
 }

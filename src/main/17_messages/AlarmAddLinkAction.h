@@ -26,6 +26,7 @@
 #include "01_util/UId.h"
 
 #include "30_server/Action.h"
+#include "01_util/FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -38,7 +39,7 @@ namespace synthese
 		/** AlarmAddLinkAction action class.
 			@ingroup m17Actions refActions
 		*/
-		class AlarmAddLinkAction : public server::Action
+		class AlarmAddLinkAction : public util::FactorableTemplate<server::Action, AlarmAddLinkAction>
 		{
 		public:
 			static const std::string PARAMETER_RECIPIENT_KEY;

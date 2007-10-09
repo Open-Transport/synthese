@@ -20,14 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/PhysicalStop.h"
+#include "AddDepartureStopToDisplayScreenAction.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
 #include "30_server/Request.h"
 
-#include "34_departures_table/AddDepartureStopToDisplayScreenAction.h"
-#include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+
+#include "15_env/PhysicalStopTableSync.h"
+
+#include "01_util/Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -37,6 +40,12 @@ namespace synthese
 	using namespace server;
 	using namespace env;
 	using namespace db;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, departurestable::AddDepartureStopToDisplayScreenAction>::FACTORY_KEY("adstdsa");
+	}
 	
 	namespace departurestable
 	{
@@ -54,14 +63,10 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_STOP);
-				if (it == map.end())
-					throw ActionException("Place not specified");
-				_stop = PhysicalStop::Get(Conversion::ToLongLong(it->second));
+				uid id(map.getUid(PARAMETER_STOP, true, FACTORY_KEY));
+				_stop = PhysicalStopTableSync::Get(id);
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)
 			{

@@ -20,13 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "UpdateDisplayMaintenanceAction.h"
 
-#include "34_departures_table/UpdateDisplayMaintenanceAction.h"
-#include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DeparturesTableModule.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/QueryString.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -35,7 +35,10 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
-	
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, departurestable::UpdateDisplayMaintenanceAction>::FACTORY_KEY("udm");
+
 	namespace departurestable
 	{
 		const string UpdateDisplayMaintenanceAction::PARAMETER_CONTROLS = Action_PARAMETER_PREFIX + "ctr";
@@ -53,27 +56,12 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
+				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+				_displayScreen = DisplayScreenTableSync::GetUpdateable(id);
 
-				it = map.find(Request::PARAMETER_OBJECT_ID);
-				if (it == map.end())
-					throw ActionException("Display screen not specified");
-				_displayScreen = DisplayScreenTableSync::get(Conversion::ToLongLong(it->second));
-
-				it = map.find(PARAMETER_CONTROLS);
-				if (it == map.end())
-					throw ActionException("Controls per day not specified");
-				_controls = Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_ONLINE);
-				if (it == map.end())
-					throw ActionException("On line status not specified");
-				_online = Conversion::ToBool(it->second);
-
-				it = map.find(PARAMETER_MESSAGE);
-				if (it == map.end())
-					throw ActionException("Maintenance message not specified");
-				_message = it->second;
+				_controls = map.getInt(PARAMETER_CONTROLS, true, FACTORY_KEY);
+				_online = map.getBool(PARAMETER_ONLINE, true, false, FACTORY_KEY);
+				_message = map.getString(PARAMETER_MESSAGE, true, FACTORY_KEY);
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)
 			{

@@ -30,6 +30,8 @@ namespace synthese
 {
 	using namespace server;
 
+	template<> const std::string util::FactorableTemplate<interfaces::InterfacePage,interfaces::RedirectInterfacePage>::FACTORY_KEY("redir");
+
 	namespace interfaces
 	{
 		void RedirectInterfacePage::display( std::ostream& stream, VariablesMap& vars, const std::string& url, const server::Request* request /*= NULL*/ ) const

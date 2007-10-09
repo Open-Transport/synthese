@@ -47,13 +47,18 @@ namespace synthese
 	using namespace db;
 	using namespace security;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,ProfileTableSync>::FACTORY_KEY("12.01 Profile");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Profile>::TABLE_NAME = "t027_profiles";
-		template<> const int SQLiteTableSyncTemplate<Profile>::TABLE_ID = 27;
-		template<> const bool SQLiteTableSyncTemplate<Profile>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<ProfileTableSync,Profile>::TABLE_NAME = "t027_profiles";
+		template<> const int SQLiteTableSyncTemplate<ProfileTableSync,Profile>::TABLE_ID = 27;
+		template<> const bool SQLiteTableSyncTemplate<ProfileTableSync,Profile>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Profile>::load(Profile* profile, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<ProfileTableSync,Profile>::load(Profile* profile, const db::SQLiteResultSPtr& rows )
 		{
 			profile->setKey(rows->getLongLong (TABLE_COL_ID));
 			profile->setName(rows->getText ( ProfileTableSync::TABLE_COL_NAME));
@@ -61,7 +66,21 @@ namespace synthese
 			ProfileTableSync::setRightsFromString(profile, rows->getText ( ProfileTableSync::TABLE_COL_RIGHTS_STRING));
 		}
 
-		template<> void SQLiteTableSyncTemplate<Profile>::save(Profile* profile )
+
+
+		template<> void SQLiteTableSyncTemplate<ProfileTableSync,Profile>::_link(Profile* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<ProfileTableSync,Profile>::_unlink(Profile* obj)
+		{
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<ProfileTableSync,Profile>::save(Profile* profile )
 		{
 			try
 			{
@@ -104,7 +123,7 @@ namespace synthese
 		const std::string ProfileTableSync::TABLE_COL_RIGHTS_STRING = "rights";
 
 		ProfileTableSync::ProfileTableSync()
-			: db::SQLiteTableSyncTemplate<Profile>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: db::SQLiteRegistryTableSyncTemplate<ProfileTableSync,Profile>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -112,45 +131,6 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHTS_STRING, "TEXT", true);
 		}
 
-		void ProfileTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		    while (rows->next ())
-		    {
-			if (Profile::Contains(rows->getLongLong (TABLE_COL_ID)))
-			{
-			    load(Profile::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
-			}
-			else
-			{
-			    Profile* profile(new Profile(rows->getLongLong (TABLE_COL_ID)));
-			    load(profile, rows);
-			    profile->store();
-			}
-		    }
-		}
-
-
-		void ProfileTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				if (Profile::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					load(Profile::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
-				}
-			}
-		}
-
-		void ProfileTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				if (Profile::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					Profile::Remove(rows->getLongLong (TABLE_COL_ID));
-				}
-			}
-		}
 
 		std::vector<shared_ptr<Profile> > ProfileTableSync::search(
 			std::string name

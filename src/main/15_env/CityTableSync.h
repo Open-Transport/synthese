@@ -23,10 +23,12 @@
 #ifndef SYNTHESE_ENVLSSQL_CITYTABLESYNC_H
 #define SYNTHESE_ENVLSSQL_CITYTABLESYNC_H
 
+#include "City.h"
+
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -41,7 +43,7 @@ namespace synthese
 			- on update : update entry in associator
 			- on delete : X
 		*/
-		class CityTableSync : public db::SQLiteTableSyncTemplate<City>
+		class CityTableSync : public db::SQLiteRegistryTableSyncTemplate<CityTableSync,City>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;
@@ -49,18 +51,6 @@ namespace synthese
 
 			CityTableSync ();
 			~CityTableSync ();
-
-			void rowsAdded (synthese::db::SQLite* sqlite, 
-				synthese::db::SQLiteSync* sync,
-				const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			void rowsUpdated (synthese::db::SQLite* sqlite, 
-				synthese::db::SQLiteSync* sync,
-				const synthese::db::SQLiteResultSPtr& rows);
-
-			void rowsRemoved (synthese::db::SQLite* sqlite, 
-				synthese::db::SQLiteSync* sync,
-				const synthese::db::SQLiteResultSPtr& rows);
 		};
 	}
 }

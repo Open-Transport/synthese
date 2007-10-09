@@ -46,6 +46,8 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyLineListInterfaceElement>::FACTORY_KEY("journey_line_list");
+
 	namespace routeplanner
 	{
 		string JourneyLineListInterfaceElement::display(

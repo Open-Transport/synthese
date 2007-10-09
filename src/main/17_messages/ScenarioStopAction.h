@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include "04_time/DateTime.h"
 
 namespace synthese
@@ -34,9 +36,9 @@ namespace synthese
 		class SentScenario;
 
 		/** ScenarioStopAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
-		class ScenarioStopAction : public server::Action
+		class ScenarioStopAction : public util::FactorableTemplate<server::Action, ScenarioStopAction>
 		{
 		private:
 			boost::shared_ptr<SentScenario>	_scenario;

@@ -20,10 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
-#include <sstream>
-#include <string>
+#include "Request.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/ServerModule.h"
+#include "30_server/Session.h"
+#include "30_server/SessionException.h"
+#include "30_server/Action.h"
+#include "30_server/Function.h"
+#include "30_server/RequestException.h"
+#include "30_server/RequestMissingParameterException.h"
+#include "30_server/QueryString.h"
 
 #include "01_util/Exception.h"
 #include "01_util/FactoryException.h"
@@ -33,16 +40,6 @@
 #include "05_html/HTMLForm.h"
 
 #include "04_time/DateTime.h"
-
-#include "30_server/ActionException.h"
-#include "30_server/ServerModule.h"
-#include "30_server/Session.h"
-#include "30_server/SessionException.h"
-#include "30_server/Action.h"
-#include "30_server/Function.h"
-#include "30_server/RequestException.h"
-#include "30_server/Request.h"
-#include "30_server/RequestMissingParameterException.h"
 
 using namespace std;
 using namespace boost;
@@ -56,22 +53,6 @@ namespace synthese
 
 	namespace server
 	{
-
-		const std::string Request::PARAMETER_ACTION ("a");
-		const std::string Request::PARAMETER_SEPARATOR ("&");
-		const std::string Request::PARAMETER_STARTER ("?");
-		const std::string Request::PARAMETER_ASSIGNMENT ("=");
-		const int Request::MAX_REQUEST_SIZE (4096);
-		const std::string Request::PARAMETER_FUNCTION = "fonction";
-		const std::string Request::PARAMETER_SESSION = "sid";
-		const std::string Request::PARAMETER_IP = "ipaddr";
-		const std::string Request::PARAMETER_CLIENT_URL = "clienturl";
-		const std::string Request::PARAMETER_OBJECT_ID = "roid";
-		const std::string Request::PARAMETER_ACTION_FAILED = "raf";
-		const std::string Request::PARAMETER_ERROR_MESSAGE = "rem";
-		const std::string Request::PARAMETER_ERROR_LEVEL = "rel";
-		const uid Request::UID_WILL_BE_GENERATED_BY_THE_ACTION = -2;
-
 		Request::Request( const Request* request/*=NULL*/
 			, shared_ptr<Function> function, shared_ptr<Action> action )
 			: _session(NULL)
@@ -92,89 +73,52 @@ namespace synthese
 			}
 		}
 
-		std::string Request::_normalizeQueryString(const std::string& requestString)
+
+
+		QueryString Request::getQueryString(bool normalize) const
 		{
-			if (requestString.empty())
-				return string();
-
-			std::string s (requestString);
-
-			// The + characters are added by the web browsers instead of spaces
-			boost::algorithm::replace_all (s, "+", " ");
-
-			// Deletes the end of line code
-			size_t pos(s.size() - 1);
-			for (; pos && (s.substr(pos, 1) == "\r" || s.substr(pos, 1) == "\n"); --pos);
-			s = s.substr(0, pos+1);
-
-			/* ?? what do we do with this code ?
-			if (s.size () > MAX_REQUEST_SIZE) {
-			bool parameterTruncated = (s.substr (MAX_REQUEST_SIZE, 1) != PARAMETER_SEPARATOR);
-			s = s.substr (0, MAX_REQUEST_SIZE);
-
-			// Filter last parameter which if it has been truncated
-			if (parameterTruncated) 
-			{
-			s = s.substr (0, s.rfind (PARAMETER_SEPARATOR));
-			}
-			}
-			*/
-			return s;
+			return _getParametersMap().getQueryString(normalize);
 		}
 
-		std::string Request::getQueryString(bool normalize) const
-		{
-			return getQueryString(_getParametersMap(), normalize);
-		}
 
-		std::string Request::getQueryString( const ParametersMap& map, bool normalize/*=true*/ )
-		{
-			stringstream ss;
-			for (ParametersMap::const_iterator iter = map.begin(); 
-				iter != map.end(); 
-				++iter
-			){
-				if (iter != map.begin ())
-					ss << PARAMETER_SEPARATOR;
-				ss << iter->first << PARAMETER_ASSIGNMENT << iter->second;
-			}
-
-			return normalize ? _normalizeQueryString(ss.str()) : ss.str();
-		}
-
+		
 		void Request::run( std::ostream& stream )
 		{
 			// Handle of the action
 			if (_action.get() && !_actionException)
 			{
-				if (!_action->_beforeSessionControl()
-				    && _session == NULL && _action->_runBeforeActionIfNoSession())
-				{
-				    util::Log::GetInstance().warn("Active session required for this action! Request dropped.");
-				    return;
-				}
-
-				try
-				{
-					if (!_action->_isAuthorized())
-					{
-						stream << "Forbidden";
-						return;
-					}
-
-					// Run of the action
-					_action->run();
-					
-					// Run after the action
-					if (_function->_runAfterSucceededAction(stream))	// Overloaded method
-						return;
-				}
-				catch (ActionException e)	// Action run error
-				{
+				if(	!_action->_beforeSessionControl()
+				&&	_session == NULL && _action->_runBeforeActionIfNoSession()
+				){
 					_actionException = true;
-					_errorMessage = e.getMessage();
+					_errorMessage = "Active session required for this action! Action dropped.";
 					_errorLevel = REQUEST_ERROR_WARNING;
 				}
+				else
+					try
+					{
+						if (!_action->_isAuthorized())
+						{
+							_actionException = true;
+							_errorMessage = "Forbidden Action";
+							_errorLevel = REQUEST_ERROR_WARNING;
+						}
+						else
+						{
+							// Run of the action
+							_action->run();
+
+							// Run after the action
+							if (_function->_runAfterSucceededAction(stream))	// Overloaded method
+								return;
+						}
+					}
+					catch (ActionException e)	// Action run error
+					{
+						_actionException = true;
+						_errorMessage = e.getMessage();
+						_errorLevel = REQUEST_ERROR_WARNING;
+					}
 			}
 
 			// No session is active.
@@ -209,7 +153,7 @@ namespace synthese
 		std::string Request::getURL(bool normalize) const
 		{
 			stringstream str;
-			str << _clientURL << PARAMETER_STARTER << getQueryString(normalize);
+			str << _clientURL << QueryString::PARAMETER_STARTER << getQueryString(normalize).getContent();
 			return str.str();
 		}
 		const std::string& Request::getClientURL() const
@@ -227,33 +171,13 @@ namespace synthese
 			_session = session;
 		}
 
-		ParametersMap Request::_parseString( const std::string& text )
-		{
-			ParametersMap map;
-			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-			boost::char_separator<char> sep(PARAMETER_SEPARATOR.c_str ());
 
-			// Parsing
-			tokenizer parametersTokens (text, sep);
-			for (tokenizer::iterator parameterToken = parametersTokens.begin();
-				parameterToken != parametersTokens.end (); ++ parameterToken)
-			{
-				size_t pos = parameterToken->find (PARAMETER_ASSIGNMENT);
-				if (pos == string::npos) continue;
-
-				std::string parameterName (parameterToken->substr (0, pos));
-				std::string parameterValue (parameterToken->substr (pos+1));
-
-				map.insert (make_pair (parameterName, parameterValue));
-			}
-			return map;
-		}
 
 		HTMLForm Request::getHTMLForm(std::string name) const
 		{
 			HTMLForm form(name, _clientURL);
-			ParametersMap map = _getParametersMap();
-			for (ParametersMap::const_iterator it = map.begin(); it != map.end(); ++it)
+			ParametersMap::Map map(_getParametersMap().getMap());
+			for (ParametersMap::Map::const_iterator it = map.begin(); it != map.end(); ++it)
 				form.addHiddenField(it->first, it->second);
 			return form;
 		}
@@ -286,67 +210,64 @@ namespace synthese
 
 		ParametersMap Request::_getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap result;
 			
 			// Function
 			if (_function.get())
 			{
-				map.insert(make_pair(PARAMETER_FUNCTION, _function->getFactoryKey()));
-				ParametersMap functionMap = _function->_getParametersMap();
-				for (ParametersMap::const_iterator it = functionMap.begin(); it != functionMap.end(); ++it)
-					map.insert(make_pair(it->first, it->second));
+				result.insert(QueryString::PARAMETER_FUNCTION, _function->getFactoryKey());
+				ParametersMap::Map functionMap(_function->_getParametersMap().getMap());
+				for (ParametersMap::Map::const_iterator it = functionMap.begin(); it != functionMap.end(); ++it)
+					result.insert(it->first, it->second);
 			}
 			
 			// Action name and parameters
 			if (_action != NULL)
 			{
-				map.insert(make_pair(PARAMETER_ACTION, _action->getFactoryKey()));
-				ParametersMap actionMap = _action->getParametersMap();
-				for (ParametersMap::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
-					map.insert(make_pair(it->first, it->second));
+				result.insert(QueryString::PARAMETER_ACTION, _action->getFactoryKey());
+				ParametersMap::Map actionMap(_action->getParametersMap().getMap());
+				for (ParametersMap::Map::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
+					result.insert(it->first, it->second);
 			}
 
 			// Session
-			map.insert(make_pair(PARAMETER_SESSION, _session ? _session->getKey() : string()));
+			result.insert(QueryString::PARAMETER_SESSION, _session ? _session->getKey() : string());
 
 			// Object ID
 			if (_object_id)
-				map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id)));
+				result.insert(QueryString::PARAMETER_OBJECT_ID, _object_id);
 
-			return map;
+			return result;
 		}
 
 
 
-		Request::Request(const std::string& text )
+		Request::Request(const QueryString& text )
 			: _session(NULL)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
 			, _object_id(0)
 		{
-			std::string s (_normalizeQueryString(text));
-			ParametersMap map = _parseString(s);
-			ParametersMap::iterator it;
+			ParametersMap map(text);
 
 			// IP
-			it = map.find(PARAMETER_IP);
-			if (it == map.end())
+			_ip = map.getString(QueryString::PARAMETER_IP, false, "Request");
+			if (_ip.empty())
 			{
 				util::Log::GetInstance().warn("Query without IP : a bad client is attempting to connect, or there was an attack.");
 				throw RequestException("Client IP not found in parameters.");
 			}
-			_ip = it->second;
 
 			// Session
-			it = map.find(PARAMETER_SESSION);
-			if (it == map.end())
+			string sid(map.getString(QueryString::PARAMETER_SESSION, false, "Request"));
+			if (sid.empty())
 			{
 				_session = NULL;
 				_sessionBroken = false;
 			}
 			else
 			{
-				ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(it->second);
+				ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(sid);
 				if (sit == ServerModule::getSessions().end())
 				{
 					_session = NULL;
@@ -369,27 +290,23 @@ namespace synthese
 			}
 
 			// Function name
-			it = map.find(PARAMETER_FUNCTION);
-			if (it == map.end())
+			string functionName(map.getString(QueryString::PARAMETER_FUNCTION, false, "Request"));
+			if (functionName.empty())
 				throw RequestException("Function not specified");
-			if (!Factory<Function>::contains(it->second))
+			if (!Factory<Function>::contains(functionName))
 				throw RequestException("Function not found");
-			_setFunction(Factory<Function>::createSharedPtr(it->second));
+			_setFunction(Factory<Function>::createSharedPtr(functionName));
 
 			// Object ID
-			it = map.find(PARAMETER_OBJECT_ID);
-			if (it != map.end())
-			{
-				_object_id = Conversion::ToLongLong(it->second);
-			}
+			_object_id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, "Request");
 
 			// Action name
-			it = map.find(PARAMETER_ACTION);
-			if (it != map.end())
+			string actionName(map.getString(QueryString::PARAMETER_ACTION, false, "Request"));
+			if (!actionName.empty())
 			{
-				if (!Factory<Action>::contains(it->second))
+				if (!Factory<Action>::contains(actionName))
 					throw RequestException("Action not found");
-				_setAction(Factory<Action>::createSharedPtr(it->second));
+				_setAction(Factory<Action>::createSharedPtr(actionName));
 
 				// Action parameters
 				try
@@ -397,7 +314,7 @@ namespace synthese
 					_action->_setFromParametersMap(map);
 
 					// Object ID update
-					map[PARAMETER_OBJECT_ID] = Conversion::ToString(_object_id);
+					map.insert(QueryString::PARAMETER_OBJECT_ID, _object_id);
 				}
 				catch (ActionException& e)	// Action parameters error
 				{
@@ -408,32 +325,24 @@ namespace synthese
 			}
 
 			// Client URL
-			it = map.find(PARAMETER_CLIENT_URL);
-			if (it != map.end())
-			{
-				_clientURL = it->second;
-			}
+			_clientURL = map.getString(QueryString::PARAMETER_CLIENT_URL, false, "Request");
 
 			// Last action error
-			it = map.find(PARAMETER_ACTION_FAILED);
-			if (it != map.end())
+			int num = map.getInt(QueryString::PARAMETER_ERROR_LEVEL, false, string());
+			if (!_actionException || (num != UNKNOWN_VALUE && static_cast<ErrorLevel>(num) > _errorLevel))
 			{
-				_actionException = Conversion::ToBool(it->second);
-			}
+				_actionException = map.getBool(QueryString::PARAMETER_ACTION_FAILED, false, false, "Request");
 
-			// Error message
-			it = map.find(PARAMETER_ERROR_MESSAGE);
-			if (it != map.end())
-			{
-				_errorMessage = it->second;
-				_errorLevel = REQUEST_ERROR_WARNING;	// Default error level if non empty message
-			}
+				// Error message
+				_errorMessage = map.getString(QueryString::PARAMETER_ERROR_MESSAGE, false, "Request");
+				if (!_errorMessage.empty() && _errorLevel < REQUEST_ERROR_WARNING)
+					_errorLevel = REQUEST_ERROR_WARNING;	// Default error level if non empty message
 
-			// Error level
-			it = map.find(PARAMETER_ERROR_LEVEL);
-			if (it != map.end())
-			{
-				_errorLevel = (ErrorLevel) Conversion::ToInt(it->second);
+				// Error level
+				if (num != UNKNOWN_VALUE)
+				{
+					_errorLevel = static_cast<ErrorLevel>(num);
+				}
 			}
 
 			// Function parameters
@@ -504,52 +413,6 @@ namespace synthese
 		const Session* Request::getSession() const
 		{
 			return _session;
-		}
-
-		std::string Request::getStringFormParameterMap(
-			const ParametersMap& map
-			, const std::string& parameterName
-			, bool neededParameter
-			, const std::string& source
-		){
-			ParametersMap::const_iterator it(map.find(parameterName));
-			if (it == map.end())
-			{
-				if (neededParameter)
-					throw RequestMissingParameterException(parameterName, source);
-				return string();
-			}
-			return it->second;
-		}
-
-		uid Request::getUidFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , const std::string& source )
-		{
-			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
-			return result.empty() ? UNKNOWN_VALUE : Conversion::ToLongLong(result);
-		}
-
-		int Request::getIntFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , const std::string& source )
-		{
-			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
-			return result.empty() ? UNKNOWN_VALUE : Conversion::ToInt(result);
-		}
-
-		time::DateTime Request::getDateTimeFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , const std::string& source )
-		{
-			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
-			return result.empty() ? DateTime(TIME_UNKNOWN) : DateTime::FromInternalString(result);
-		}
-
-		time::Date Request::getDateFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , const std::string& source )
-		{
-			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
-			return result.empty() ? Date(TIME_UNKNOWN) : Date::FromInternalString(result);
-		}
-
-		bool Request::getBoolFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , bool defaultValue , const std::string& source )
-		{
-			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
-			return result.empty() ? defaultValue : Conversion::ToBool(result);
 		}
 	}
 }

@@ -34,7 +34,6 @@ namespace synthese
 			@{
 		*/
 
-		typedef std::map<std::string, std::string> ParametersMap;
 
 		/** @} */
 	}

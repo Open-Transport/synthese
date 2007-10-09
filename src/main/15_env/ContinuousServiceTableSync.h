@@ -23,23 +23,22 @@
 #ifndef SYNTHESE_ContinuousServiceTableSync_H__
 #define SYNTHESE_ContinuousServiceTableSync_H__
 
+#include "ContinuousService.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class ContinuousService;
-
 		/** ContinuousService table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 		*/
-		class ContinuousServiceTableSync : public db::SQLiteTableSyncTemplate<ContinuousService>
+		class ContinuousServiceTableSync : public db::SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>
 		{
 		public:
 			static const std::string COL_SERVICENUMBER;
@@ -67,29 +66,6 @@ namespace synthese
 				int first = 0, int number = 0);
 
 
-		protected:
-
-			/** Action to do on ContinuousService creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on ContinuousService creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on ContinuousService deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 			/** The schedules indexes of each linestop are updated after the whole first sync.
 				@param sqlite SQLite thread

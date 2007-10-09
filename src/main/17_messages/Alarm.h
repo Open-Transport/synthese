@@ -29,6 +29,8 @@
 
 #include "01_util/UId.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace synthese
 {
 	namespace messages
@@ -69,6 +71,9 @@ namespace synthese
 				void setShortMessage( const std::string& message);
 				void setLongMessage( const std::string& message);
 			//@}
+
+				static boost::shared_ptr<const Alarm> Get(uid key);
+				static bool Contains(uid key);
 		};
 	}
 }

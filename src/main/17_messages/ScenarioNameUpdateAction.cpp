@@ -20,13 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/ScenarioNameUpdateAction.h"
+#include "ScenarioNameUpdateAction.h"
+
 #include "17_messages/MessagesModule.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -35,6 +37,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+
+	template<> const string util::FactorableTemplate<Action, messages::ScenarioNameUpdateAction>::FACTORY_KEY("snu");
 
 	namespace messages
 	{
@@ -52,16 +56,11 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
 				// Scenario
 				_scenario = ScenarioTableSync::getScenario(_request->getObjectId());
 
 				// Name
-				it = map.find(PARAMETER_NAME);
-				if (it == map.end())
-					throw ActionException("Name not specified");
-				_name = it->second;
+				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 
 				// Unicity control
 				if (dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get())

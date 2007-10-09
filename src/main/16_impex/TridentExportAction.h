@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "30_server/Action.h"
 
-
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -38,9 +38,9 @@ namespace synthese
 	namespace impex
 	{
 		/** TridentExportAction action class.
-		@ingroup m15
+		@ingroup m16Actions refActions
 		*/
-		class TridentExportAction : public server::Action
+		class TridentExportAction : public util::FactorableTemplate<server::Action, TridentExportAction>
 		{
 		public:
 			static const std::string PARAMETER_COMMERCIAL_LINE_REGEX;

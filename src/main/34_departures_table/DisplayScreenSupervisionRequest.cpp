@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
-
 #include "30_server/RequestException.h"
 
 #include "34_departures_table/DisplayScreenSupervisionRequest.h"
@@ -35,6 +33,8 @@ namespace synthese
 	using namespace server;
 	using namespace dblog;
 
+	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenSupervisionRequest>::FACTORY_KEY("tds");
+
 	namespace departurestable
 	{
 		const std::string DisplayScreenSupervisionRequest::PARAMETER_DISPLAY_SCREEN_ID = "tb";
@@ -43,8 +43,8 @@ namespace synthese
 		ParametersMap DisplayScreenSupervisionRequest::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_DISPLAY_SCREEN_ID, Conversion::ToString(_displayScreen->getKey())));
-			map.insert(make_pair(PARAMETER_STATUS, _text));
+			map.insert(PARAMETER_DISPLAY_SCREEN_ID, _displayScreen->getKey());
+			map.insert(PARAMETER_STATUS, _text);
 			return map;
 		}
 
@@ -52,19 +52,12 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_DISPLAY_SCREEN_ID);
-				if (it == map.end())
-					throw RequestException("Display screen not specified");
-				if (!DisplayScreen::Contains(Conversion::ToLongLong(it->second)))
-					throw RequestException("Display screen " + it->second + " not found");
-				_displayScreen = DisplayScreen::Get(Conversion::ToLongLong(it->second));
+				uid id(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"));
+				if (!DisplayScreen::Contains(id))
+					throw RequestException("Display screen not found");
+				_displayScreen = DisplayScreen::Get(id);
 			
-				it = map.find(PARAMETER_STATUS);
-				if (it == map.end())
-					throw RequestException("Log text not specified");
-				_text = it->second;
+				_text = map.getString(PARAMETER_STATUS, true, "dssr");
 			}
 			catch (...)
 			{

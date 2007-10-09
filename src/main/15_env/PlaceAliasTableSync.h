@@ -24,23 +24,22 @@
 #ifndef SYNTHESE_PlaceAliasTableSync_H__
 #define SYNTHESE_PlaceAliasTableSync_H__
 
+#include "PlaceAlias.h"
+
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
-
 namespace synthese
 {
 	namespace env
 	{
-		class PlaceAlias;
-
 		/** PlaceAlias table synchronizer.
 			@ingroup m15LS refLS
 		*/
-		class PlaceAliasTableSync : public db::SQLiteTableSyncTemplate<PlaceAlias>
+		class PlaceAliasTableSync : public db::SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -62,32 +61,6 @@ namespace synthese
 			static std::vector<boost::shared_ptr<PlaceAlias> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on PlaceAlias creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool);
-
-			/** Action to do on PlaceAlias creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on PlaceAlias deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }

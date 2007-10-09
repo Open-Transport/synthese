@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace env
@@ -37,9 +39,9 @@ namespace synthese
 		class DisplayScreen;
 
 		/** AddDepartureStopToDisplayScreenAction action class.
-			@ingroup m34
+			@ingroup m34Actions refActions
 		*/
-		class AddDepartureStopToDisplayScreenAction : public server::Action
+		class AddDepartureStopToDisplayScreenAction : public util::FactorableTemplate<server::Action, AddDepartureStopToDisplayScreenAction>
 		{
 		public:
 			static const std::string PARAMETER_STOP;

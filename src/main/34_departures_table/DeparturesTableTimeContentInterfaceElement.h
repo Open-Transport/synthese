@@ -25,6 +25,9 @@
 
 
 #include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
+
 #include <string>
 
 namespace synthese
@@ -45,7 +48,7 @@ namespace synthese
 
 			@ingroup m34Library refLibrary
 		*/
-		class DeparturesTableTimeContentInterfaceElement : public interfaces::LibraryInterfaceElement
+		class DeparturesTableTimeContentInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableTimeContentInterfaceElement>
 		{
 		public:
 			

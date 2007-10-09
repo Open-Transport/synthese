@@ -57,7 +57,7 @@ namespace synthese
 
 			Les différents journaux sont enregistrés dans l'instance de fabrique Factory<DBLog>.
 		*/
-		class DBLog : public util::Factorable
+		class DBLog : public util::Factorable<DBLog>
 		{
 		public:
 			typedef std::vector<std::string> ColumnsVector;
@@ -67,7 +67,7 @@ namespace synthese
 				const std::string& logKey
 				, DBLogEntry::Level level
 				, const DBLogEntry::Content& content
-				, boost::shared_ptr<const security::User> user = boost::shared_ptr<const security::User>()
+				, const security::User* user
 				, uid objectId = 0
 				);
 

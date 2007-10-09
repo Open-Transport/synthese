@@ -24,14 +24,9 @@
 
 namespace synthese
 {
+	template<> const std::string util::FactorableTemplate<util::ModuleClass, resa::ResaModule>::FACTORY_KEY("31_resa");
+
 	namespace resa
 	{
-		OnlineReservationRule::Registry ResaModule::_onlineReservationRules;
-
-
-		OnlineReservationRule::Registry& ResaModule::getOnlineReservationRules()
-		{
-			return _onlineReservationRules;
-		}
 	}
 }

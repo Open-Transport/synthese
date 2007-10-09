@@ -47,20 +47,32 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,env::ServiceDateTableSync>::FACTORY_KEY("15.70.01 Service dates");
+	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ServiceDate>::TABLE_NAME = "t005_service_dates";
-		template<> const int SQLiteTableSyncTemplate<ServiceDate>::TABLE_ID = 5;
-		template<> const bool SQLiteTableSyncTemplate<ServiceDate>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::TABLE_NAME = "t005_service_dates";
+		template<> const int SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::TABLE_ID = 5;
+		template<> const bool SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ServiceDate>::load(ServiceDate* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::load(ServiceDate* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->key = rows->getLongLong (TABLE_COL_ID);
 			object->service = EnvModule::fetchService (rows->getLongLong ( ServiceDateTableSync::COL_SERVICEID)).get();
 			object->date = Date::FromSQLDate (rows->getText ( ServiceDateTableSync::COL_DATE));
 		}
 
-		template<> void SQLiteTableSyncTemplate<ServiceDate>::save(ServiceDate* object)
+		template<> void SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::_link(ServiceDate* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::_unlink(ServiceDate* obj)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::save(ServiceDate* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -84,7 +96,7 @@ namespace synthese
 		const std::string ServiceDateTableSync::COL_DATE("date");
 
 		ServiceDateTableSync::ServiceDateTableSync()
-			: SQLiteTableSyncTemplate<ServiceDate>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_SERVICEID, "INTEGER", false);

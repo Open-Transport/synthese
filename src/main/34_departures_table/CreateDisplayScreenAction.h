@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
@@ -41,7 +43,7 @@ namespace synthese
 		/** Display screen creation action class.
 			@ingroup m34Actions refActions
 		*/
-		class CreateDisplayScreenAction : public server::Action
+		class CreateDisplayScreenAction : public util::FactorableTemplate<server::Action, CreateDisplayScreenAction>
 		{
 		public:
 			static const std::string PARAMETER_LOCALIZATION_ID;

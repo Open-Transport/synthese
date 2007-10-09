@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
@@ -37,7 +39,7 @@ namespace synthese
 		/** UpdateAlarmMessagesFromTemplateAction action class.
 			@ingroup m17Actions refActions
 		*/
-		class UpdateAlarmMessagesFromTemplateAction : public server::Action
+		class UpdateAlarmMessagesFromTemplateAction : public util::FactorableTemplate<server::Action, UpdateAlarmMessagesFromTemplateAction>
 		{
 		public:
 			static const std::string PARAMETER_TEMPLATE_ID;

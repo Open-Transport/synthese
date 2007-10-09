@@ -20,17 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/CreateDisplayScreenAction.h"
+#include "CreateDisplayScreenAction.h"
+
 #include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/ArrivalDepartureTableLog.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
 #include "30_server/Request.h"
+#include "30_server/QueryString.h"
 
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/ConnectionPlaceTableSync.h"
+
+#include "01_util/Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -39,7 +43,11 @@ namespace synthese
 {
 	using namespace server;
 	using namespace env;
+	using namespace util;
+	using namespace db;
 	
+	template<> const string FactorableTemplate<Action, departurestable::CreateDisplayScreenAction>::FACTORY_KEY("createdisplayscreen");
+
 	namespace departurestable
 	{
 		const std::string CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "pti";
@@ -48,36 +56,30 @@ namespace synthese
 		ParametersMap CreateDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_TEMPLATE_ID, _template ? Conversion::ToString(_template->getKey()) : "0"));
-			map.insert(make_pair(PARAMETER_LOCALIZATION_ID, Conversion::ToString(_place.get() ? _place->getKey() : UNKNOWN_VALUE)));
+			map.insert(PARAMETER_TEMPLATE_ID, _template ? _template->getKey() : uid(0));
+			map.insert(PARAMETER_LOCALIZATION_ID, _place.get() ? _place->getKey() : uid(UNKNOWN_VALUE));
 			return map;
 		}
 
 		void CreateDisplayScreenAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_TEMPLATE_ID);
-			if (it != map.end() && Conversion::ToLongLong(it->second))
+			uid id(map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY));
+			if (id > 0)
 			{
-				if (!DisplayScreen::Contains(Conversion::ToLongLong(it->second)))
-					throw ActionException("Specified template not found");
-				_template = DisplayScreen::Get(Conversion::ToLongLong(it->second));
+				_template = DisplayScreenTableSync::Get(id, GET_AUTO, true);
 			}
 
-			it = map.find(PARAMETER_LOCALIZATION_ID);
-			if (it == map.end())
-				throw ActionException("Localization not specified");
+			id = map.getUid(PARAMETER_LOCALIZATION_ID, true, FACTORY_KEY);
 			try
 			{
-				_place = ConnectionPlaceTableSync::get(Conversion::ToLongLong(it->second));
+				_place = ConnectionPlaceTableSync::Get(id);
 			}
 			catch (...)
 			{
 				throw ActionException("Specified localization not found");
 			}
 
-			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void CreateDisplayScreenAction::run()
@@ -85,9 +87,10 @@ namespace synthese
 			// Preparation
 			shared_ptr<DisplayScreen> screen(new DisplayScreen);
 			if (_template)
-				screen->copy(_template);
-			screen->setLocalization(_place);
+				screen->copy(_template.get());
+			screen->setLocalization(_place.get());
 			screen->setMaintenanceIsOnline(true);
+			screen->setLinked(true);
 
 			// Action
 			DisplayScreenTableSync::save(screen.get());
@@ -96,7 +99,7 @@ namespace synthese
 			_request->setObjectId(screen->getKey());
 
 			// Log
-			ArrivalDepartureTableLog::addUpdateEntry(screen, "Création", _request->getUser());
+			ArrivalDepartureTableLog::addUpdateEntry(screen.get(), "Création", _request->getUser().get());
 		}
 
 		void CreateDisplayScreenAction::setPlace( boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> place )

@@ -29,6 +29,8 @@
 
 #include "04_time/DateTime.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
@@ -50,7 +52,7 @@ namespace synthese
 			@date 2007
 			@ingroup m31Functions refFunctions
 		*/
-		class ReservationsListFunction : public transportwebsite::FunctionWithSite
+		class ReservationsListFunction : public util::FactorableTemplate<transportwebsite::FunctionWithSite,ReservationsListFunction>
 		{
 		public:
 			static const std::string PARAMETER_USER_ID;

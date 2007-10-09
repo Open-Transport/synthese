@@ -73,15 +73,13 @@ namespace synthese
 			try
 			{
 				// Interface
-				ParametersMap::const_iterator it = map.find(PARAMETER_INTERFACE);
-				if (it != map.end())
+				uid id(map.getUid(PARAMETER_INTERFACE, false, "RWI"));
+				if (id != UNKNOWN_VALUE)
 				{
-					_interface = Interface::Get(Conversion::ToLongLong(it->second));
+					_interface = Interface::Get(id);
 				}
 
-				it = map.find(PARAMETER_NO_REDIRECT_AFTER_ACTION);
-				if (it != map.end())
-					_redirectAfterAction = !Conversion::ToBool(it->second);
+				_redirectAfterAction = !map.getBool(PARAMETER_NO_REDIRECT_AFTER_ACTION, false, false, "RWI");
 			}
 			catch (Interface::RegistryKeyException& e)
 			{
@@ -93,7 +91,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_interface.get())
-				map.insert(make_pair(PARAMETER_INTERFACE, Conversion::ToString(_interface->getKey())));
+				map.insert(PARAMETER_INTERFACE, _interface->getKey());
 			
 			return map;
 		}

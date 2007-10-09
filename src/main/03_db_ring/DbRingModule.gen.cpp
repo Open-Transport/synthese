@@ -1,7 +1,7 @@
 
 
-synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::dbring::DbRingModule>("03_db_ring");
+synthese::dbring::DbRingModule::integrate();
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::dbring::NodeInfoTableSync>("0 Node infos");
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::dbring::UpdateRecordTableSync>("1 Update log");
+synthese::dbring::NodeInfoTableSync::integrate();
+synthese::dbring::UpdateRecordTableSync::integrate();
 

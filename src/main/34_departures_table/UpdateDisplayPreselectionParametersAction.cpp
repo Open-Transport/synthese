@@ -20,14 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "UpdateDisplayPreselectionParametersAction.h"
+
+#include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
-#include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DeparturesTableModule.h"
-#include "34_departures_table/ArrivalDepartureTableLog.h"
+#include "13_dblog/DBLogModule.h"
 
 using namespace std;
 using namespace boost;
@@ -36,7 +38,11 @@ namespace synthese
 {
 	using namespace db;
 	using namespace server;
-	
+	using namespace util;
+	using namespace dblog;
+
+	template<> const string util::FactorableTemplate<Action, departurestable::UpdateDisplayPreselectionParametersAction>::FACTORY_KEY("udpp");
+
 	namespace departurestable
 	{
 		const std::string UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION = Action_PARAMETER_PREFIX + "ap";
@@ -54,19 +60,9 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
-				_screen = DisplayScreenTableSync::get(_request->getObjectId());
-
-				it = map.find(PARAMETER_ACTIVATE_PRESELECTION);
-				if (it == map.end())
-					throw ActionException("Preselection activation not specified");
-				_activatePreselection = Conversion::ToBool(it->second);
-
-				it = map.find(PARAMETER_PRESELECTION_DELAY);
-				if (it == map.end())
-					throw ActionException("Preselection delay not specified");
-				_preselectionDelay = Conversion::ToInt(it->second);
+				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
+				_activatePreselection =  map.getBool(PARAMETER_ACTIVATE_PRESELECTION, true, false, FACTORY_KEY);
+				_preselectionDelay = map.getInt(PARAMETER_PRESELECTION_DELAY, true, FACTORY_KEY);
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)
 			{
@@ -76,24 +72,18 @@ namespace synthese
 
 		void UpdateDisplayPreselectionParametersAction::run()
 		{
-			// Old values
-			bool wasPreselection = (_screen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD);
-			int oldDelay = _screen->getForceDestinationDelay();
-			
+			// Log
+			stringstream t;
+			DBLogModule::appendToLogIfChange(t, "Mode de présélection", (_screen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD) ? "OUI" : "NON", _activatePreselection ? "OUI" : "NON");
+			DBLogModule::appendToLogIfChange(t, "Délai de préselection", _screen->getForceDestinationDelay(), _preselectionDelay);
+
 			// The update
 			_screen->setDestinationForceDelay(_preselectionDelay);
 			_screen->setGenerationMethod(_activatePreselection ? DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD : DisplayScreen::STANDARD_METHOD);
 			DisplayScreenTableSync::save(_screen.get());
 
-			// Log
-			stringstream t;
-			t << "Mise à jour paramètres présélection : ";
-			if (wasPreselection != _activatePreselection)
-				t << " Mode de présélection => " << (_activatePreselection ? "OUI" : "NON");
-			if (oldDelay != _preselectionDelay)
-				t << " Délai de préselection : " << oldDelay << " => " << _preselectionDelay;
-			shared_ptr<ArrivalDepartureTableLog> log = Factory<dblog::DBLog>::createSharedPtr<ArrivalDepartureTableLog>();
-			log->addUpdateEntry(_screen, t.str(), _request->getUser());
+		
+			ArrivalDepartureTableLog::addUpdateEntry(_screen.get(), t.str(), _request->getUser().get());
 
 		}
 	}

@@ -1,10 +1,10 @@
 
-synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::server::ServerModule>("999_server");
+synthese::server::ServerModule::integrate();
 
 synthese::server::LoginInterfacePage::integrate();
 
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::server::LoginAction>("login");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::server::LogoutAction>("logout");
+synthese::server::LoginAction::integrate();
+synthese::server::LogoutAction::integrate();
 
 synthese::server::HtmlFormInterfaceElement::integrate();
 synthese::server::LogoutHTMLLinkInterfaceElement::integrate();

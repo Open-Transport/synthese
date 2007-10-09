@@ -20,16 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "DisplayScreenRemove.h"
 
-#include "34_departures_table/DisplayScreenRemove.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/ArrivalDepartureTableLog.h"
 #include "34_departures_table/ArrivalDepartureTableRight.h"
 
+#include "30_server/ActionException.h"
+#include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
+
 #include "12_security/Right.h"
+
+#include "01_util/Conversion.h"
 
 using namespace std;
 
@@ -37,7 +40,10 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
-	
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemove>::FACTORY_KEY("dsra");
+
 	namespace departurestable
 	{
 		const string DisplayScreenRemove::PARAMETER_DISPLAY_SCREEN_ID(Action_PARAMETER_PREFIX + "dsi");
@@ -46,21 +52,17 @@ namespace synthese
 		ParametersMap DisplayScreenRemove::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_DISPLAY_SCREEN_ID, Conversion::ToString(_displayScreen->getKey())));
+			map.insert(PARAMETER_DISPLAY_SCREEN_ID, _displayScreen->getKey());
 			return map;
 		}
 
 		void DisplayScreenRemove::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_DISPLAY_SCREEN_ID);
-			if (it == map.end())
-				throw ActionException("Display screen id not found");
+			uid id(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, FACTORY_KEY));
 			
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::get(Conversion::ToLongLong(it->second));
+				_displayScreen = DisplayScreenTableSync::Get(id);
 			}
 			catch (...)
 			{
@@ -72,7 +74,7 @@ namespace synthese
 		{
 			DisplayScreenTableSync::remove(_displayScreen->getKey());
 
-			ArrivalDepartureTableLog::addRemoveEntry(_displayScreen, _request->getUser());
+			ArrivalDepartureTableLog::addRemoveEntry(_displayScreen.get(), _request->getUser().get());
 		}
 
 		bool DisplayScreenRemove::_isAuthorized() const

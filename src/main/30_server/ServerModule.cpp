@@ -45,6 +45,8 @@ namespace synthese
     using namespace util;
     using namespace tcp;
 
+	template<> const std::string util::FactorableTemplate<db::DbModuleClass, server::ServerModule>::FACTORY_KEY("999_server");
+
     namespace server
     {
 	ServerModule::SessionMap	ServerModule::_sessionMap;

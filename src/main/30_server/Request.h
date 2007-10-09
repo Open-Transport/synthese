@@ -30,10 +30,8 @@
 #include "12_security/Profile.h"
 #include "12_security/Right.h"
 
-#include "30_server/Types.h"
 #include "30_server/Session.h"
 
-#include "01_util/UId.h"
 #include "01_util/Factory.h"
 
 #include <boost/shared_ptr.hpp>
@@ -52,6 +50,8 @@ namespace synthese
 	{
 		class Action;
 		class Function;
+		class ParametersMap;
+		class QueryString;
 
 		/** Parsed request.
 			@ingroup m18
@@ -101,21 +101,6 @@ namespace synthese
 		class Request
 		{
 		public:
-			static const std::string PARAMETER_SEPARATOR;
-			static const std::string PARAMETER_STARTER;
-			static const std::string PARAMETER_ASSIGNMENT;
-			static const std::string PARAMETER_FUNCTION;
-			static const std::string PARAMETER_SESSION;
-			static const std::string PARAMETER_IP;
-			static const std::string PARAMETER_CLIENT_URL;
-			static const std::string PARAMETER_OBJECT_ID;
-			static const std::string PARAMETER_ACTION;
-			static const std::string PARAMETER_ACTION_FAILED;
-			static const std::string PARAMETER_ERROR_MESSAGE;
-			static const std::string PARAMETER_ERROR_LEVEL;
-			static const int MAX_REQUEST_SIZE;
-			static const uid UID_WILL_BE_GENERATED_BY_THE_ACTION;
-			
 			typedef enum { REQUEST_ERROR_NONE, REQUEST_ERROR_INFO, REQUEST_ERROR_WARNING, REQUEST_ERROR_FATAL } ErrorLevel;
 
 		private:
@@ -131,20 +116,7 @@ namespace synthese
 			ErrorLevel					_errorLevel;
 			uid							_object_id;			//!< Object ID to display (generic parameter which can be used or not by the subclasses)
 
-			//! \name Static internal services
-			//@{
-				/** Parses a query string into a key => value map.
-					@param text Text to parse
-				*/
-				static ParametersMap _parseString(const std::string& text);
-
-				/** Normalize a query string.
-				@param requestString request to normalize
-				*/
-				static std::string _normalizeQueryString(const std::string& requestString);
-
-				ParametersMap _getParametersMap() const;
-			//@}
+			ParametersMap _getParametersMap() const;
 
 		protected:
 
@@ -198,122 +170,7 @@ namespace synthese
 			boost::shared_ptr<Function> _getFunction();
 			boost::shared_ptr<const Function> _getFunction() const;
 
-			/** Search for the value of a parameter in a ParameterMap object.
-				@param map Map to search in
-				@param parameterName Name of the searched parameter
-				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-				@param source Name of the action or function that requested the parameter (for the error message only)
-				@return std::string Value of the parameter (empty if parameter nor found)
-				@throw RequestMissingParameterException if the parameter is not found and if it is needed
-				@author Hugues Romain
-				@date 2007
-			*/
-			static std::string getStringFormParameterMap(
-				const ParametersMap& map
-				, const std::string& parameterName
-				, bool neededParameter
-				, const std::string& source
-			);
 
-			/** Search for the value of a parameter in a ParameterMap object and converts into an uid.
-				@param map Map to search in
-				@param parameterName Name of the searched parameter
-				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-				@param source Name of the action or function that requested the parameter (for the error message only)
-				@return uid Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-				@throw RequestMissingParameterException if the parameter is not found and if it is needed
-				@author Hugues Romain
-				@date 2007
-			*/
-			static uid getUidFromParameterMap(
-				const ParametersMap& map
-				, const std::string& parameterName
-				, bool neededParameter
-				, const std::string& source
-			);
-
-			/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
-				@param map Map to search in
-				@param parameterName Name of the searched parameter
-				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-				@param source Name of the action or function that requested the parameter (for the error message only)
-				@return int Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-				@throw RequestMissingParameterException if the parameter is not found and if it is needed
-				@author Hugues Romain
-				@date 2007
-			*/
-			static int getIntFromParameterMap(
-				const ParametersMap& map
-				, const std::string& parameterName
-				, bool neededParameter
-				, const std::string& source
-			);
-
-
-			/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
-				@param map Map to search in
-				@param parameterName Name of the searched parameter
-				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-				@param defaultValue Value to return if the parameter is not found
-				@param source Name of the action or function that requested the parameter (for the error message only)
-				@return int Value of the parameter (defaultValue if parameter nor found)
-				@throw RequestMissingParameterException if the parameter is not found and if it is needed
-				@author Hugues Romain
-				@date 2007
-			*/
-			static bool getBoolFromParameterMap(
-				const ParametersMap& map
-				, const std::string& parameterName
-				, bool neededParameter
-				, bool defaultValue
-				, const std::string& source
-			);
-
-			/** Search for the value of a parameter in a ParameterMap object and converts into an DateTime object.
-				@param map Map to search in
-				@param parameterName Name of the searched parameter
-				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-				@param source Name of the action or function that requested the parameter (for the error message only)
-				@return DateTime Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-				@throw RequestMissingParameterException if the parameter is not found and if it is needed
-				@throw TimeParseException if the parameter can not be parsed as a date time (eg : empty string)
-				@author Hugues Romain
-				@date 2007
-			*/
-			static time::DateTime getDateTimeFromParameterMap(
-				const ParametersMap& map
-				, const std::string& parameterName
-				, bool neededParameter
-				, const std::string& source
-			);
-
-			/** Search for the value of a parameter in a ParameterMap object and converts into an Date object.
-				@param map Map to search in
-				@param parameterName Name of the searched parameter
-				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-				@param source Name of the action or function that requested the parameter (for the error message only)
-				@return Date Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-				@throw RequestMissingParameterException if the parameter is not found and if it is needed
-				@throw TimeParseException if the parameter can not be parsed as a date time (eg : empty string)
-				@author Hugues Romain
-				@date 2007
-			*/
-			static time::Date getDateFromParameterMap(
-				const ParametersMap& map
-				, const std::string& parameterName
-				, bool neededParameter
-				, const std::string& source
-			);
-
-			/** Builds a query string upon a parameters map.
-				@param map Parameters map to convert
-				@param normalize Apply normalization filter to the generated query string
-				@return std::string the generated query string
-				@author Hugues Romain
-				@date 2007
-				
-			*/
-			static std::string getQueryString(const ParametersMap& map, bool normalize=true);
 
 			void _setErrorMessage(const std::string& message);
 			void _setActionException(bool value);
@@ -330,7 +187,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 				*/
-				Request(const std::string& querystring);
+				Request(const QueryString& querystring);
 			//@}
 
 			//! \name Getters
@@ -413,7 +270,7 @@ namespace synthese
 						The second option is available if the Request object is used for building virtual urls containing scripts command (eg : synthese?id='+ document.getElementById("toto").value+'&...)
 					@return The query string corresponding to the request.
 				*/
-				std::string getQueryString(bool normalize = true) const;
+				QueryString getQueryString(bool normalize = true) const;
 
 
 				template <class F>
@@ -434,7 +291,7 @@ namespace synthese
 			if (_session == NULL)
 				return false;
 
-			boost::shared_ptr<const security::Profile> profile = _session->getUser()->getProfile();
+			const security::Profile* profile(_session->getUser()->getProfile());
 			boost::shared_ptr<security::Right> neededRight(util::Factory<security::Right>::create<R>());
 			neededRight->setPublicLevel(publicr);
 			neededRight->setPrivateLevel(privater);

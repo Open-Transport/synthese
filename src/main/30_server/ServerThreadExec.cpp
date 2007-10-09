@@ -13,6 +13,7 @@
 #include "30_server/RequestException.h"
 #include "30_server/Action.h"
 #include "30_server/Request.h"
+#include "30_server/QueryString.h"
 #include "30_server/ServerThreadExec.h"
 
 using synthese::util::Log;
@@ -59,7 +60,8 @@ namespace synthese
 			// Parse request
 			try
 			{
-				Request request(requestString);
+				QueryString q(requestString, true);
+				Request request(q);
 				request.run(tcpStream);
 			}
 			catch (RequestException& e)

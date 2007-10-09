@@ -27,6 +27,8 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace routeplanner
@@ -36,7 +38,7 @@ namespace synthese
 			@date 2007
 			@ingroup m53Library refLibrary
 		*/
-		class PeriodsListInterfaceElement : public interfaces::LibraryInterfaceElement
+		class PeriodsListInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,PeriodsListInterfaceElement>
 		{
 			// List of parameters to store
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _current;

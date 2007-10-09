@@ -22,6 +22,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace routeplanner
@@ -30,7 +32,7 @@ namespace synthese
 			@code routeplanner_no_solution @endcode
 			@ingroup m53Pages refPages
 		*/
-		class RoutePlannerNoSolutionInterfacePage : public interfaces::InterfacePage
+		class RoutePlannerNoSolutionInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerNoSolutionInterfacePage>
 		{
 		public:
 			/** Display.

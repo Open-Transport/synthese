@@ -27,6 +27,8 @@ namespace synthese
 {
 	using namespace interfaces;
 
+	template<> const std::string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerNoSolutionInterfacePage>::FACTORY_KEY("routeplanner_no_solution");
+
 	namespace routeplanner
 	{
 		void RoutePlannerNoSolutionInterfacePage::display( std::ostream& stream , const server::Request* request /*= NULL*/ ) const

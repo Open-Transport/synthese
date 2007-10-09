@@ -6,6 +6,7 @@
 
 #include "02_db/DbModuleClass.h"
 
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -28,7 +29,7 @@ namespace synthese
 
 		/** 08 Server module class.
 		*/
-		class ServerModule : public db::DbModuleClass
+		class ServerModule : public util::FactorableTemplate<db::DbModuleClass, ServerModule>
 		{
 		public:
 

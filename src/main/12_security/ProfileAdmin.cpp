@@ -35,6 +35,7 @@
 #include "12_security/ProfilesAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
+#include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -216,9 +217,9 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
-				if (it != map.end() && Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-					_profile = Profile::Get(Conversion::ToLongLong(it->second));
+				uid id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
+				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+					_profile = ProfileTableSync::Get(id);
 			}
 			catch (Profile::RegistryKeyException e)
 			{

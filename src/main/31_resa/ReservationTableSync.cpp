@@ -45,13 +45,18 @@ namespace synthese
 	using namespace resa;
 	using namespace time;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,ReservationTableSync>::FACTORY_KEY("31.1 Reservation Table Sync");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Reservation>::TABLE_NAME = "t044_reservations";
-		template<> const int SQLiteTableSyncTemplate<Reservation>::TABLE_ID = 44;
-		template<> const bool SQLiteTableSyncTemplate<Reservation>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<ReservationTableSync,Reservation>::TABLE_NAME = "t044_reservations";
+		template<> const int SQLiteTableSyncTemplate<ReservationTableSync,Reservation>::TABLE_ID = 44;
+		template<> const bool SQLiteTableSyncTemplate<ReservationTableSync,Reservation>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Reservation>::load(
+		template<> void SQLiteTableSyncTemplate<ReservationTableSync,Reservation>::load(
 			Reservation* object
 			, const db::SQLiteResultSPtr& rows
 		){
@@ -70,7 +75,7 @@ namespace synthese
 			object->setOriginDateTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_ORIGIN_DATE_TIME)));
 		}
 
-		template<> void SQLiteTableSyncTemplate<Reservation>::save(Reservation* object)
+		template<> void SQLiteTableSyncTemplate<ReservationTableSync,Reservation>::save(Reservation* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -116,7 +121,7 @@ namespace synthese
 		const string ReservationTableSync::COL_ORIGIN_DATE_TIME = "origin_date_time";
 
 		ReservationTableSync::ReservationTableSync()
-			: SQLiteTableSyncTemplate<Reservation>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteNoSyncTableSyncTemplate<ReservationTableSync,Reservation>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_TRANSACTION_ID, "INTEGER");
@@ -135,18 +140,6 @@ namespace synthese
 			addTableIndex(COL_LINE_ID);
 			addTableIndex(COL_DEPARTURE_PLACE_ID);
 			addTableIndex(COL_ARRIVAL_PLACE_ID);
-		}
-
-		void ReservationTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		}
-		
-		void ReservationTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-		}
-
-		void ReservationTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
 		}
 
 		vector<shared_ptr<Reservation> > ReservationTableSync::search(

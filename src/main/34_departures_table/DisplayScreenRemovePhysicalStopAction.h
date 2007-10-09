@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace env
@@ -37,9 +39,9 @@ namespace synthese
 		class DisplayScreen;
 
 		/** DisplayScreenRemovePhysicalStopAction action class.
-			@ingroup m34
+			@ingroup m34Actions refActions
 		*/
-		class DisplayScreenRemovePhysicalStopAction : public server::Action
+		class DisplayScreenRemovePhysicalStopAction : public util::FactorableTemplate<server::Action, departurestable::DisplayScreenRemovePhysicalStopAction>
 		{
 		public:
 			static const std::string PARAMETER_PHYSICAL;

@@ -26,6 +26,8 @@ using namespace std;
 
 namespace synthese
 {
+	template<> const string util::FactorableTemplate<interfaces::LibraryInterfaceElement,interfaces::StaticValueInterfaceElement>::FACTORY_KEY("static");
+
 	namespace interfaces
 	{
 		std::string StaticValueInterfaceElement::display(

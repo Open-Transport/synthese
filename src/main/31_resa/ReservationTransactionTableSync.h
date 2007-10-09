@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -51,7 +51,7 @@ namespace synthese
 		/** ReservationTransaction table synchronizer.
 			@ingroup m31LS refLS
 		*/
-		class ReservationTransactionTableSync : public db::SQLiteTableSyncTemplate<ReservationTransaction>
+		class ReservationTransactionTableSync : public db::SQLiteNoSyncTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>
 		{
 		public:
 			static const std::string COL_LAST_RESERVATION_ID;
@@ -86,38 +86,6 @@ namespace synthese
 				, bool withCancelled
 				, int first = 0
 				, int number = 0
-			);
-
-
-		protected:
-
-			/** Action to do on ReservationTransaction creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (
-				db::SQLite* sqlite
-				, db::SQLiteSync* sync
-				, const db::SQLiteResultSPtr& rows
-				, bool isItFirstSync = false
-				);
-
-			/** Action to do on ReservationTransaction creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated(
-				db::SQLite* sqlite
-				, db::SQLiteSync* sync
-				, const db::SQLiteResultSPtr& rows
-			);
-			
-			/** Action to do on ReservationTransaction deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved(
-				db::SQLite* sqlite
-				, db::SQLiteSync* sync
-				, const db::SQLiteResultSPtr& rows
 			);
 		};
 	}

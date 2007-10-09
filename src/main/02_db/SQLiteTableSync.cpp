@@ -40,18 +40,20 @@ namespace synthese
     {
 	//		std::map<int, int> SQLiteTableSync::_autoIncrementValues;
 
-		SQLiteTableSync::SQLiteTableSync ( const std::string& tableName,
+		SQLiteTableSync::SQLiteTableSync ( 
+			
+/*			const std::string& tableName,
 						   bool allowInsert, 
 						   bool allowRemove,
 						   const std::string& triggerOverrideClause,
 						   bool ignoreCallbacksOnFirstSync
-			)
-			: _tableName (tableName)
+*/			)
+			: /*getTableName() (tableName)
 			, _allowInsert (allowInsert)
 			, _allowRemove (allowRemove)
 			, _triggerOverrideClause (triggerOverrideClause)
 			, _ignoreCallbacksOnFirstSync (ignoreCallbacksOnFirstSync)
-			, _enableTriggers (true)
+			,*/ _enableTriggers (true)
 		{ }
 
 
@@ -68,7 +70,7 @@ namespace synthese
 		{
 		    if (_tableFormat.getTableColumnCount () == 0)
 		    {
-			throw SQLiteException ("No column defined for table " + _tableName);
+			throw SQLiteException ("No column defined for table " + getTableName());
 		    }
 		    return _tableFormat.getTableColumn (0).name;
 		}
@@ -85,19 +87,19 @@ namespace synthese
 
 
 			// Check if the table already exists
-			std::string sql = "SELECT * FROM SQLITE_MASTER WHERE name='" + _tableName + "' AND type='table'";
+			std::string sql = "SELECT * FROM SQLITE_MASTER WHERE name='" + getTableName() + "' AND type='table'";
 
 			SQLiteResultSPtr res = sqlite->execQuery (sql);
-			std::string tableSchema = CreateSQLSchema (_tableName, _tableFormat);
+			std::string tableSchema = CreateSQLSchema (getTableName(), _tableFormat);
 
-			std::string triggerNoInsert = _allowInsert ? "" : 
-			CreateTriggerNoInsert (_tableName, getTriggerOverrideClause ());
+			std::string triggerNoInsert/* = _allowInsert ? "" : 
+			CreateTriggerNoInsert (getTableName(), getTriggerOverrideClause ())*/;
 
-			std::string triggerNoRemove = _allowRemove ? "" : 
-			CreateTriggerNoRemove (_tableName, getTriggerOverrideClause ());
+			std::string triggerNoRemove/* = _allowRemove ? "" : 
+			CreateTriggerNoRemove (getTableName(), getTriggerOverrideClause ())*/;
 
-			std::string triggerNoUpdate = (_tableFormat.hasNonUpdatableColumn () == false) ? "" : 
-			CreateTriggerNoUpdate (_tableName, _tableFormat, getTriggerOverrideClause ());
+			std::string triggerNoUpdate/* = (_tableFormat.hasNonUpdatableColumn () == false) ? "" : 
+			CreateTriggerNoUpdate (getTableName(), _tableFormat, getTriggerOverrideClause ())*/;
 		    
 		    
 			if (res->next () == false)
@@ -111,6 +113,9 @@ namespace synthese
 			}
 			else
 			{
+				// Create precompiled statement(s)
+				_getRowByIdStatement =
+					sqlite->compileStatement ("SELECT * FROM " + getTableName() + " WHERE " + getPrimaryKey () + "=:id LIMIT 1");
 			// ...otherwise, tries to adapt it.
 			adaptTable (sqlite, 
 					tableSchema, 
@@ -121,14 +126,14 @@ namespace synthese
 				
 			// Create precompiled statement(s)
 			_getRowByIdStatement =
-			    sqlite->compileStatement ("SELECT * FROM " + _tableName + " WHERE " + getPrimaryKey () + "=:id LIMIT 1");
+			    sqlite->compileStatement ("SELECT * FROM " + getTableName() + " WHERE " + getPrimaryKey () + "=:id LIMIT 1");
 
 			// Callbacks according to what already exists in the table.
-			if (_ignoreCallbacksOnFirstSync == false)
-			{
-				SQLiteResultSPtr result = sqlite->execQuery ("SELECT * FROM " + _tableName);
+	//		if (_ignoreCallbacksOnFirstSync == false)
+	//		{
+				SQLiteResultSPtr result = sqlite->execQuery ("SELECT * FROM " + getTableName());
 				rowsAdded (sqlite, sync, result, true);
-			}
+	//		}
 
 			initAutoIncrement ();
 
@@ -138,7 +143,7 @@ namespace synthese
 			{
 				// Search if the index exists
 				stringstream sql;
-				sql << "SELECT sql FROM SQLITE_MASTER WHERE name='" << getIndexDBName(_tableName, it->first)
+				sql << "SELECT sql FROM SQLITE_MASTER WHERE name='" << getIndexDBName(getTableName(), it->first)
 					<< "' AND type='index'";
 
 				SQLiteResultSPtr res = sqlite->execQuery (sql.str());
@@ -147,16 +152,16 @@ namespace synthese
 				if (res->next ())
 				{
 					// The index already exists and is identical : do nothing
-					if (res->getText("sql") == CreateIndexSQLSchema(_tableName, *it)) continue;
+					if (res->getText("sql") == CreateIndexSQLSchema(getTableName(), *it)) continue;
 
 					// Drop the old index
 					stringstream drop;
-					drop << "DROP INDEX " << getIndexDBName(_tableName, it->first);
+					drop << "DROP INDEX " << getIndexDBName(getTableName(), it->first);
 					sqlite->execUpdate(drop.str());
 				}
 
 				// Creation of the index
-				sqlite->execUpdate(CreateIndexSQLSchema(_tableName, *it));
+				sqlite->execUpdate(CreateIndexSQLSchema(getTableName(), *it));
 			}
 
 
@@ -184,14 +189,14 @@ namespace synthese
 		const std::string& 
 		SQLiteTableSync::getTableName () const
 		{
-			return _tableName;
+			return getTableName();
 		}
 
 
 		int 
 		SQLiteTableSync::getTableId () const
 		{
-			return ParseTableId (_tableName);
+			return ParseTableId (getTableName());
 		}
 
 
@@ -237,18 +242,10 @@ namespace synthese
 		bool 
 		SQLiteTableSync::getIgnoreCallbacksOnFirstSync () const
 		{
-			return _ignoreCallbacksOnFirstSync;
+			return false;
 		}
 			
 
-		void 
-		SQLiteTableSync::setIgnoreCallbacksOnFirstSync (bool ignoreCallbacksOnFirstSync)
-		{
-			_ignoreCallbacksOnFirstSync = ignoreCallbacksOnFirstSync;
-		}
-
-
-		    
 
 		void 
 		SQLiteTableSync::setEnableTriggers (bool enableTriggers)
@@ -261,7 +258,7 @@ namespace synthese
 		std::string 
 		SQLiteTableSync::getTriggerOverrideClause () const
 		{
-			return _enableTriggers ? _triggerOverrideClause : "0";
+			return _enableTriggers ? "1" : "0";
 		}
 
 		
@@ -470,7 +467,7 @@ namespace synthese
 			(triggerNoUpdateDb == triggerNoUpdate)) return;
 		    
 		    
-			std::vector<std::string> dbCols = SQLiteTableSync::GetTableColumnsDb (sqlite, _tableName);
+			std::vector<std::string> dbCols = SQLiteTableSync::GetTableColumnsDb (sqlite, getTableName());
 
 			// Filter columns that are not in new table format
 			std::stringstream colsStr;
@@ -489,23 +486,23 @@ namespace synthese
 				}
 			}
 		    
-			std::string buTableName = _tableName + "_backup";
+			std::string buTableName = getTableName() + "_backup";
 			std::stringstream str;
 			str << "BEGIN TRANSACTION; ";
 
 			// Drop triggers
-			if (triggerNoInsertDb != "") str << "DROP TRIGGER " << _tableName << "_no_insert ;";
-			if (triggerNoRemoveDb != "") str << "DROP TRIGGER " << _tableName << "_no_remove ;";
-			if (triggerNoUpdateDb != "") str << "DROP TRIGGER " << _tableName << "_no_update ;";
+			if (triggerNoInsertDb != "") str << "DROP TRIGGER " << getTableName() << "_no_insert ;";
+			if (triggerNoRemoveDb != "") str << "DROP TRIGGER " << getTableName() << "_no_remove ;";
+			if (triggerNoUpdateDb != "") str << "DROP TRIGGER " << getTableName() << "_no_update ;";
 
 			// Convert table schema (through temporary table)
 			str << "CREATE TEMPORARY TABLE " << buTableName << " (" 
 			<< colsStr.str () << "); ";
 			str << "INSERT INTO " << buTableName 
-			<< " SELECT " << colsStr.str () << " FROM " << _tableName << "; ";
-			str << "DROP TABLE " << _tableName << "; ";
+			<< " SELECT " << colsStr.str () << " FROM " << getTableName() << "; ";
+			str << "DROP TABLE " << getTableName() << "; ";
 			str << tableSchema << "; ";
-			str << "INSERT INTO " << _tableName << " (" << filteredColsStr.str () << ")"
+			str << "INSERT INTO " << getTableName() << " (" << filteredColsStr.str () << ")"
 			<< " SELECT " << filteredColsStr.str () << " FROM " << buTableName << "; ";
 			str << "DROP TABLE " << buTableName << "; ";
 
@@ -572,7 +569,7 @@ namespace synthese
 		     // precompile this ?
 		     
 		     std::stringstream ss;
-		     ss << "SELECT * FROM " << _tableName << " WHERE " << getPrimaryKey () + "=" << id << " LIMIT 1";
+		     ss << "SELECT * FROM " << getTableName() << " WHERE " << getPrimaryKey () + "=" << id << " LIMIT 1";
 		     return sqlite->execQuery (ss.str (), false); 
 		     */
 		 }

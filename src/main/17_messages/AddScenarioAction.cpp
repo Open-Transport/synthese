@@ -26,6 +26,10 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/QueryString.h"
+#include "30_server/ParametersMap.h"
+
+#include "01_util/Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -34,7 +38,10 @@ namespace synthese
 {
 	using namespace server;
 	using namespace time;
+	using namespace util;
 	
+	template<> const string util::FactorableTemplate<Action, messages::AddScenarioAction>::FACTORY_KEY("masca");
+
 	namespace messages
 	{
 		const string AddScenarioAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "t";
@@ -50,15 +57,13 @@ namespace synthese
 
 		void AddScenarioAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			// Template to copy
-			it = map.find(PARAMETER_TEMPLATE_ID);
-			if (it != map.end())
+			uid id(map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY));
+			if (id != UNKNOWN_VALUE)
 			{
 				try
 				{
-					_template = ScenarioTableSync::getTemplate(Conversion::ToLongLong(it->second));
+					_template = ScenarioTableSync::getTemplate(id);
 				}
 				catch(...)
 				{
@@ -67,10 +72,7 @@ namespace synthese
 			}
 			
 			// Name
-			it = map.find(PARAMETER_NAME);
-			if (it == map.end())
-				throw ActionException("Name not found");
-			_name = it->second;
+			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			if(_name.empty())
 				throw ActionException("Le scénario doit avoir un nom.");
 			vector<shared_ptr<ScenarioTemplate> > v = ScenarioTableSync::searchTemplate(_name, NULL, 0, 1);
@@ -78,8 +80,8 @@ namespace synthese
 				throw ActionException("Un scénario de même nom existe déjà");
 
 			// Anti error
-			if (map.find(Request::PARAMETER_OBJECT_ID) == map.end())
-				_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			if (map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY) == UNKNOWN_VALUE)
+				_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void AddScenarioAction::run()

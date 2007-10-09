@@ -69,10 +69,10 @@ namespace synthese
 		private:
 			//! \name Properties
 			//@{
-				boost::shared_ptr<const interfaces::Interface>	_interface;
-				std::string										_name;  //!< Name of the site
-				time::Date										_startValidityDate;
-				time::Date										_endValidityDate;
+				const interfaces::Interface*	_interface;
+				std::string						_name;  //!< Name of the site
+				time::Date						_startValidityDate;
+				time::Date						_endValidityDate;
 			//@}
 
 			//! \name Environment
@@ -106,7 +106,7 @@ namespace synthese
 
 			//! \name Setters
 			//@{
-				void setInterface (boost::shared_ptr<const interfaces::Interface> interf);
+				void setInterface (const interfaces::Interface* interf);
 				void setStartDate ( const time::Date& dateDebut );
 				void setEndDate ( const time::Date& dateFin );
 				void setOnlineBookingAllowed ( const bool valeur );
@@ -118,13 +118,13 @@ namespace synthese
 
 			//! \name Getters
 			//@{
-				boost::shared_ptr<const interfaces::Interface>	getInterface() const;
-				bool											getOnlineBookingAllowed() const;
-				bool											getPastSolutionsDisplayed() const;
-				const time::Date								getMinUseDate() const;
-				const time::Date								getMaxUseDate() const;
-				int												getMaxTransportConnectionsCount()	const;
-				const Periods&									getPeriods()	const;
+				const interfaces::Interface*	getInterface() const;
+				bool							getOnlineBookingAllowed() const;
+				bool							getPastSolutionsDisplayed() const;
+				const time::Date				getMinUseDate() const;
+				const time::Date				getMaxUseDate() const;
+				int								getMaxTransportConnectionsCount()	const;
+				const Periods&					getPeriods()	const;
 			//@}
 
 			// \name Modifiers

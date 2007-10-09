@@ -28,18 +28,18 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "Fare.h"
+
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class Fare;
-
 		/** Fare table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 		*/
-		class FareTableSync : public db::SQLiteTableSyncTemplate<Fare>
+		class FareTableSync : public db::SQLiteRegistryTableSyncTemplate<FareTableSync,Fare>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -59,32 +59,6 @@ namespace synthese
 			static std::vector<boost::shared_ptr<Fare> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on Fare creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on Fare creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on Fare deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }

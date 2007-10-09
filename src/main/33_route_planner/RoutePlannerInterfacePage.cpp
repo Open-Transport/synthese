@@ -49,6 +49,8 @@ namespace synthese
 	using namespace util;
 	using namespace transportwebsite;
 
+	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerInterfacePage>::FACTORY_KEY("route_planner");
+
 	namespace routeplanner
 	{
 

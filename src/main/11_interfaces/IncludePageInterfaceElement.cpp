@@ -33,6 +33,8 @@ using namespace std;
 
 namespace synthese
 {
+	template<> const string util::FactorableTemplate<interfaces::LibraryInterfaceElement,interfaces::IncludePageInterfaceElement>::FACTORY_KEY("include");
+
 	namespace interfaces
 	{
 		std::string IncludePageInterfaceElement::display(

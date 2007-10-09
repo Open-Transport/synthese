@@ -37,6 +37,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace env;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetLinesListLineInterfaceElement>::FACTORY_KEY("schedules_lines");
+	
 	namespace routeplanner
 	{
 		string ScheduleSheetLinesListLineInterfaceElement::display(

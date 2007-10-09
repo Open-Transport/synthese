@@ -84,23 +84,16 @@ namespace synthese
 
 		void BroadcastPointsAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it = map.find(PARAMETER_CITY_NAME);
-			if (it != map.end())
-				_cityName = it->second;
+			_cityName = map.getString(PARAMETER_CITY_NAME, false, FACTORY_KEY);
+			_placeName = map.getString(PARAMETER_PLACE_NAME, false, FACTORY_KEY);
+			
+			int i(map.getInt(PARAMETER_DISPLAY_NUMBER, false, FACTORY_KEY));
+			if (i != UNKNOWN_VALUE)
+				_displayNumber = static_cast<BroadcastPointsPresence>(i);
 
-			it = map.find(PARAMETER_PLACE_NAME);
-			if (it != map.end())
-				_placeName = it->second;
+			_lineUId = map.getUid(PARAMETER_LINE_ID, false, FACTORY_KEY);
 
-			it = map.find(PARAMETER_DISPLAY_NUMBER);
-			if (it != map.end())
-				_displayNumber = (BroadcastPointsPresence) Conversion::ToInt(it->second);
-
-			it = map.find(PARAMETER_LINE_ID);
-			if (it != map.end())
-				_lineUId = Conversion::ToLongLong(it->second);
-
-			_requestParameters = ResultHTMLTable::getParameters(map, PARAMETER_CITY_NAME, 30);
+			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_CITY_NAME, 30);
 		}
 
 		string BroadcastPointsAdmin::getTitle() const

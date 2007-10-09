@@ -23,8 +23,8 @@
 #include <sstream>
 
 #include "PlaceAliasTableSync.h"
-#include "PlaceAlias.h"
-#include "15_env/City.h"
+
+#include "15_env/CityTableSync.h"
 #include "15_env/EnvModule.h"
 
 #include "02_db/DBModule.h"
@@ -45,31 +45,54 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const std::string FactorableTemplate<SQLiteTableSync, PlaceAliasTableSync>::FACTORY_KEY("");
+		template<> const std::string FactorableTemplate<SQLiteTableSync, PlaceAliasTableSync>::FACTORY_KEY("15.50.01 Places Alias");
 	}
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PlaceAlias>::TABLE_NAME = "t011_place_aliases";
-		template<> const int SQLiteTableSyncTemplate<PlaceAlias>::TABLE_ID = 11;
-		template<> const bool SQLiteTableSyncTemplate<PlaceAlias>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::TABLE_NAME = "t011_place_aliases";
+		template<> const int SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::TABLE_ID = 11;
+		template<> const bool SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PlaceAlias>::load(PlaceAlias* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::load(PlaceAlias* object, const db::SQLiteResultSPtr& rows )
 		{
+			object->setKey (rows->getLongLong (TABLE_COL_ID));
+			object->setName (rows->getText (PlaceAliasTableSync::COL_NAME));
+		}
+
+		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_link(PlaceAlias* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			// Because the fetch place has no equivalent in database read mode
+			assert(!temporary);
 
 			uid aliasedPlaceId (
 				rows->getLongLong (PlaceAliasTableSync::COL_ALIASEDPLACEID));
 			uid cityId (
 				rows->getLongLong (PlaceAliasTableSync::COL_CITYID));
+			City* city(CityTableSync::GetUpdateable(cityId,obj,temporary));
 
-			object->setKey (rows->getLongLong (TABLE_COL_ID));
-			object->setName (rows->getText (PlaceAliasTableSync::COL_NAME));
-			object->setCity(City::Get (cityId).get());
-			object->setAliasedPlace(EnvModule::fetchPlace (aliasedPlaceId).get());
+			obj->setCity(city);
+			obj->setAliasedPlace(EnvModule::fetchPlace (aliasedPlaceId).get());
 
+
+			bool isCityMainConnection (rows->getBool ( PlaceAliasTableSync::COL_ISCITYMAINCONNECTION));
+			if (isCityMainConnection)
+			{
+				city->addIncludedPlace (obj);
+			}
+			city->getPlaceAliasesMatcher ().add (obj->getName (), obj);
 		}
 
-		template<> void SQLiteTableSyncTemplate<PlaceAlias>::save(PlaceAlias* object)
+		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_unlink(PlaceAlias* obj)
+		{
+			City* city(const_cast<City*>(obj->getCity()));
+
+			city->getPlaceAliasesMatcher ().remove (obj->getName ());
+			
+			obj->setCity(NULL);
+		}
+
+		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::save(PlaceAlias* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -94,7 +117,7 @@ namespace synthese
 		const std::string PlaceAliasTableSync::COL_ISCITYMAINCONNECTION ("is_city_main_connection");
 
 		PlaceAliasTableSync::PlaceAliasTableSync()
-			: SQLiteTableSyncTemplate<PlaceAlias>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_NAME, "TEXT", true);
@@ -103,7 +126,7 @@ namespace synthese
 			addTableColumn (COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
 		}
 
-		void PlaceAliasTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
+/*		void PlaceAliasTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 		{
 			while (rows->next ())
 			{
@@ -166,7 +189,7 @@ namespace synthese
 				}
 			}
 		}
-
+*/
 		vector<shared_ptr<PlaceAlias> > PlaceAliasTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			stringstream query;

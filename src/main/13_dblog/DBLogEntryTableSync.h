@@ -29,7 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -45,7 +45,7 @@ namespace synthese
 		/** 45 DBLog table synchronizer.
 			@ingroup m13LS refLS
 		*/
-		class DBLogEntryTableSync : public db::SQLiteTableSyncTemplate<DBLogEntry>
+		class DBLogEntryTableSync : public db::SQLiteNoSyncTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>
 		{
 		public:
 			static const std::string CONTENT_SEPARATOR;
@@ -63,7 +63,7 @@ namespace synthese
 				(other search parameters)
 				@param first First DBLog object to answer
 				@param number Number of DBLog objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<DBLogEntry*> Founded DBLog objects.
+				@return vector<DBLogEntry*> Vector of shared pointers to founded DBLog linked-objects.
 				@author Hugues Romain
 				@date 2006
 			*/
@@ -82,31 +82,6 @@ namespace synthese
 				, bool orderByLevel = false
 				, bool raisingOrder = true
 				);
-
-
-		protected:
-
-			/** Action to do on DBLog creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on DBLog creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on DBLog deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		};
 	}

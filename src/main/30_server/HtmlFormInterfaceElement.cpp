@@ -23,6 +23,7 @@
 #include "HtmlFormInterfaceElement.h"
 
 #include "30_server/Request.h"
+#include "30_server/QueryString.h"
 #include "30_server/Action.h"
 
 #include "01_util/FactoryException.h"
@@ -93,25 +94,26 @@ namespace synthese
 				if (_function_parameters)
 					functionParameters = _function_parameters->getValue(parameters, variables, object, request);
 				if (functionParameters.empty() && functionKey == request->_getFunction()->getFactoryKey())
-					functionParameters = Request::getQueryString(request->_getFunction()->getFixedParametersMap());
+					functionParameters = request->_getFunction()->getFixedParametersMap().getQueryString(true).getContent();
 				
 				stringstream s;
-				s	<< Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT << functionKey
-					<< Request::PARAMETER_SEPARATOR << Request::PARAMETER_IP << Request::PARAMETER_ASSIGNMENT
-					<< Request::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << Request::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
+				s	<< QueryString::PARAMETER_FUNCTION << QueryString::PARAMETER_ASSIGNMENT << functionKey
+					<< QueryString::PARAMETER_SEPARATOR << QueryString::PARAMETER_IP << QueryString::PARAMETER_ASSIGNMENT << "0.0.0.0"
+					<< QueryString::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << QueryString::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
 					;
 					
 
 				if (!functionParameters.empty())
-					s << Request::PARAMETER_SEPARATOR << functionParameters;
+					s << QueryString::PARAMETER_SEPARATOR << functionParameters;
 				if (!actionKey.empty())
 				{
-					s << Request::PARAMETER_SEPARATOR << Request::PARAMETER_ACTION << Request::PARAMETER_ASSIGNMENT << actionKey;
+					s << QueryString::PARAMETER_SEPARATOR << QueryString::PARAMETER_ACTION << QueryString::PARAMETER_ASSIGNMENT << actionKey;
 					if (!actionParameters.empty())
-						s << Request::PARAMETER_SEPARATOR << actionParameters;
+						s << QueryString::PARAMETER_SEPARATOR << actionParameters;
 				}
 
-				Request r(s.str());
+				QueryString q(s.str(), true);
+				Request r(q);
 				r.setClientURL(request->getClientURL());
 				
 				

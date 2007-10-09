@@ -21,6 +21,7 @@
 */
 
 #include "15_env/PhysicalStop.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/LineStop.h"
 #include "15_env/Line.h"
 #include "15_env/Edge.h"
@@ -59,15 +60,16 @@ namespace synthese
 			// Add terminuses to forced destinations
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 			{
-				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
+				for (set<const Edge*>::const_iterator eit = it->second->getDepartureEdges().begin(); eit != it->second->getDepartureEdges().end(); ++eit)
 				{
-					const LineStop* ls = (const LineStop*) (*eit);
+					const LineStop* ls = static_cast<const LineStop*>(*eit);
 
 					if (!_allowedLineStop(ls))
 						continue;
 
-					_forcedDestinations.insert(ls->getLine()->getDestination()->getConnectionPlace());
-					_displayedPlaces.insert(ls->getLine()->getDestination()->getConnectionPlace());
+					const PublicTransportStopZoneConnectionPlace* place(ls->getLine()->getDestination()->getConnectionPlace());
+					_forcedDestinations.insert(make_pair(place->getKey(), place));
+					_displayedPlaces.insert(make_pair(place->getKey(), place));
 				}
 			}
 		}
@@ -83,9 +85,9 @@ namespace synthese
 			
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 			{
-				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
+				for (set<const Edge*>::const_iterator eit = it->second->getDepartureEdges().begin(); eit != it->second->getDepartureEdges().end(); ++eit)
 				{
-					const LineStop* ls = (const LineStop*) (*eit);
+					const LineStop* ls = static_cast<const LineStop*>(*eit);
 
 					// Selection of the line
 					if (!_allowedLineStop(ls))
@@ -114,12 +116,14 @@ namespace synthese
 					// Exploration of the line
 					for (const LineStop* curGLA = static_cast<const LineStop*>(ls->getFollowingArrivalForFineSteppingOnly()); curGLA != NULL; curGLA = (const LineStop*) curGLA->getFollowingArrivalForFineSteppingOnly())
 					{
+						const PublicTransportStopZoneConnectionPlace* connectionPlace(curGLA->getConnectionPlace());
+
 						// Attempting to select the destination
-						if (_forcedDestinations.find(curGLA->getConnectionPlace()) == _forcedDestinations.end())
+						if (_forcedDestinations.find(connectionPlace->getKey()) == _forcedDestinations.end())
 							continue;
 
 						// If first reach
-						if (reachedDestination.find(curGLA->getConnectionPlace()) == reachedDestination.end())
+						if (reachedDestination.find(connectionPlace) == reachedDestination.end())
 						{
 							// Allocation
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
@@ -128,11 +132,11 @@ namespace synthese
 							reachedDestination[curGLA->getConnectionPlace()] = itr;
 						}
 						// Else optimizing a previously founded ptd
-						else if (tempStartDateTime < reachedDestination[curGLA->getConnectionPlace()]->first.servicePointer.getActualDateTime())
+						else if (tempStartDateTime < reachedDestination[connectionPlace]->first.servicePointer.getActualDateTime())
 						{
 							// Allocation
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
-							ArrivalDepartureList::iterator oldIt = reachedDestination[curGLA->getConnectionPlace()];
+							ArrivalDepartureList::iterator oldIt = reachedDestination[connectionPlace];
 
 							reachedDestination[curGLA->getConnectionPlace()] = itr;
 

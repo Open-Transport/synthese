@@ -41,20 +41,22 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync, env::FareTableSync>::FACTORY_KEY("15.10.02 Fares");
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Fare>::TABLE_NAME = "t008_fares";
-		template<> const int SQLiteTableSyncTemplate<Fare>::TABLE_ID = 8;
-		template<> const bool SQLiteTableSyncTemplate<Fare>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<FareTableSync,Fare>::TABLE_NAME = "t008_fares";
+		template<> const int SQLiteTableSyncTemplate<FareTableSync,Fare>::TABLE_ID = 8;
+		template<> const bool SQLiteTableSyncTemplate<FareTableSync,Fare>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Fare>::load(Fare* fare, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<FareTableSync,Fare>::load(Fare* fare, const db::SQLiteResultSPtr& rows )
 		{
 			fare->setKey(rows->getLongLong (TABLE_COL_ID));
 			fare->setName (rows->getText (FareTableSync::COL_NAME));
-			fare->setType ((synthese::env::Fare::FareType) rows->getInt (FareTableSync::COL_FARETYPE));
+			fare->setType ((Fare::FareType) rows->getInt (FareTableSync::COL_FARETYPE));
 		}
 
-		template<> void SQLiteTableSyncTemplate<Fare>::save(Fare* object)
+		template<> void SQLiteTableSyncTemplate<FareTableSync,Fare>::save(Fare* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -77,6 +79,16 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
+		template<> void SQLiteTableSyncTemplate<FareTableSync,Fare>::_link(Fare* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<FareTableSync,Fare>::_unlink(Fare* obj)
+		{
+
+		}
+
 	}
 
 	namespace env
@@ -85,46 +97,11 @@ namespace synthese
 		const std::string FareTableSync::COL_FARETYPE ("fare_type");
 
 		FareTableSync::FareTableSync()
-			: SQLiteTableSyncTemplate<Fare>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<FareTableSync,Fare>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_NAME, "TEXT", true);
 			addTableColumn (COL_FARETYPE, "INTEGER", true);
-		}
-
-		void FareTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				Fare* object(new Fare());
-				load(object, rows);
-				object->store();
-			}
-		}
-
-		void FareTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (Fare::Contains(id))
-				{
-					shared_ptr<Fare> object = Fare::GetUpdateable(id);
-					load(object.get(), rows);
-				}
-			}
-		}
-
-		void FareTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (Fare::Contains(id))
-				{
-					Fare::Remove(id);
-				}
-			}
 		}
 
 		std::vector<shared_ptr<Fare> > FareTableSync::search(int first /*= 0*/, int number /*= 0*/ )

@@ -27,6 +27,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace server
@@ -44,7 +46,7 @@ namespace synthese
 			 - 1 : name of the idem
 			 - 2 : id of the item
 		*/
-		class PlacesListItemInterfacePage : public interfaces::InterfacePage
+		class PlacesListItemInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,PlacesListItemInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

@@ -20,13 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "UserUpdateAction.h"
+
+#include "12_security/UserTableSync.h"
+#include "12_security/ProfileTableSync.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "12_security/UserUpdateAction.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/Profile.h"
-#include "12_security/User.h"
+#include "30_server/ParametersMap.h"
 
 #include "02_db/DBEmptyResultException.h"
 
@@ -36,6 +37,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+
+	template<> const string util::FactorableTemplate<Action, security::UserUpdateAction>::FACTORY_KEY("uua");
 	
 	namespace security
 	{
@@ -62,64 +65,33 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::get(_request->getObjectId());
+				_user = UserTableSync::GetUpdateable(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_LOGIN);
-				if (it == map.end())
-					throw ActionException("Login not specified");
-				_login = it->second;
+				_login = map.getString(PARAMETER_LOGIN, true, FACTORY_KEY);
 				if (_login.empty())
 					throw ActionException("Le login ne peut être vide");
 				// Put a control of unicity
 
-				it = map.find(PARAMETER_SURNAME);
-				if (it == map.end())
-					throw ActionException("Prénom non spécifié");
-				_surname = it->second;
+				_surname = map.getString(PARAMETER_SURNAME, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_NAME);
-				if (it == map.end())
-					throw ActionException("Nom non spécifié");
-				_name = it->second;
-				if (_name == "")
+				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+				if (_name.empty())
 					throw ActionException("Le nom de l'utilisateur ne peut être vide");
 
-				it = map.find(PARAMETER_ADDRESS);
-				if (it == map.end())
-					throw ActionException("Adress not specified");
-				_address = it->second;
+				_address = map.getString(PARAMETER_ADDRESS, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_POSTAL_CODE);
-				if (it == map.end())
-					throw ActionException("Post code not specified");
-				_postalCode = it->second;
+				_postalCode = map.getString(PARAMETER_POSTAL_CODE, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_PHONE);
-				if (it == map.end())
-					throw ActionException("Phone not specified");
-				_phone = it->second;
+				_phone = map.getString(PARAMETER_PHONE, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_CITY);
-				if (it == map.end())
-					throw ActionException("City not specified");
-				_city = it->second;
+				_city = map.getString(PARAMETER_CITY, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_EMAIL);
-				if (it == map.end())
-					throw ActionException("E-Mail not specified");
-				_email = it->second;
+				_email = map.getString(PARAMETER_EMAIL, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_AUTHORIZED_LOGIN);
-				if (it == map.end())
-					throw ActionException("Authorized login not specified");
-				_authorizedLogin = Conversion::ToBool(it->second);
+				_authorizedLogin = map.getBool(PARAMETER_AUTHORIZED_LOGIN, true, false, FACTORY_KEY);
 
-				it = map.find(PARAMETER_PROFILE_ID);
-				if (it == map.end())
-					throw ActionException("Profile not specified");
-				_profile = Profile::Get(Conversion::ToLongLong(it->second));
+				uid id(map.getUid(PARAMETER_PROFILE_ID, true, FACTORY_KEY));
+				_profile = ProfileTableSync::Get(id);
 			}
 			catch (Profile::RegistryKeyException)
 			{
@@ -139,7 +111,7 @@ namespace synthese
 			_user->setPostCode(_postalCode);
 			_user->setCityText(_city);
 			_user->setPhone(_phone);
-			_user->setProfile(_profile);
+			_user->setProfile(_profile.get());
 			_user->setConnectionAllowed(_authorizedLogin);
 			_user->setName(_name);
 			_user->setSurname(_surname);

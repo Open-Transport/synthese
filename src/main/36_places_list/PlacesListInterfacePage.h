@@ -29,6 +29,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace env
@@ -56,7 +58,7 @@ namespace synthese
 			Object :
 			 - PlacesList list of results
 		*/
-		class PlacesListInterfacePage : public interfaces::InterfacePage
+		class PlacesListInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, PlacesListInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

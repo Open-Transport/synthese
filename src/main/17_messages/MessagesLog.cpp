@@ -53,24 +53,33 @@ namespace synthese
 			return v;
 		}
 
-		void MessagesLog::addUpdateEntry( boost::shared_ptr<const SingleSentAlarm> alarm , const std::string& text , boost::shared_ptr<const security::User> user )
-		{
+		void MessagesLog::addUpdateEntry(
+			const SingleSentAlarm* alarm
+			, const std::string& text
+			, const security::User* user
+		){
 			DBLog::ColumnsVector content;
 			content.push_back(string());
 			content.push_back(text);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getKey());
 		}
 
-		void MessagesLog::addUpdateEntry( boost::shared_ptr<const SentScenario> scenario , const std::string& text , boost::shared_ptr<const security::User> user )
-		{
+		void MessagesLog::addUpdateEntry(
+			const SentScenario* scenario
+			, const std::string& text
+			, const security::User* user
+		){
 			DBLog::ColumnsVector content;
 			content.push_back(string());
 			content.push_back(text);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
 		}
 
-		void MessagesLog::addUpdateEntry( boost::shared_ptr<const ScenarioSentAlarm> alarm , const std::string& text , boost::shared_ptr<const security::User> user )
-		{
+		void MessagesLog::addUpdateEntry(
+			const ScenarioSentAlarm* alarm
+			, const std::string& text
+			, const security::User* user
+		){
 			DBLog::ColumnsVector content;
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			content.push_back(text);

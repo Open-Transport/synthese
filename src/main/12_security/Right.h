@@ -59,7 +59,7 @@ namespace synthese
 
 			Chaque module contient des définitions d'habilitations (sous-classes enregistrées dans Factory<Right>) qui implémentent le contrôle des droits et la génération d'une liste de paramètres possibles.
 		*/
-		class Right : public util::Factorable
+		class Right : public util::Factorable<Right>
 		{
 		private:
 			RightLevel _privateRightLevel;

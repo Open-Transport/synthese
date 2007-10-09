@@ -27,11 +27,13 @@
 #include <utility>
 #include <vector>
 #include <map>
-#include <set>
 
 #include "15_env/ServicePointer.h"
 
 #include "04_time/DateTime.h"
+
+#include "01_util/UId.h"
+
 
 namespace synthese
 {
@@ -57,9 +59,9 @@ namespace synthese
 		WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 		} BroadcastPointsPresence;
 
-	typedef std::set<const env::PublicTransportStopZoneConnectionPlace*> DisplayedPlacesList;
-	typedef std::set<const env::Line*> LineFilter;
-	typedef std::set<const env::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
+	typedef std::map<uid,const env::PublicTransportStopZoneConnectionPlace*> DisplayedPlacesList;
+	typedef std::map<uid,const env::Line*> LineFilter;
+	typedef std::map<uid,const env::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 0, WITH_PASSING = 1 } EndFilter;
 	struct DeparturesTableElement { 

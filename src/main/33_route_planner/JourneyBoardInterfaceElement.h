@@ -26,17 +26,14 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
     namespace server 
     {
 		class Request;
     }
-
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
 
 	namespace routeplanner
 	{
@@ -47,7 +44,7 @@ namespace synthese
 			 - 0 : Handicapped filter
 			 - 1 : Bike filter
 		*/
-		class JourneyBoardInterfaceElement : public interfaces::LibraryInterfaceElement
+		class JourneyBoardInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,JourneyBoardInterfaceElement>
 		{
 		private:
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _handicappedFilter;

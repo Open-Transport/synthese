@@ -22,12 +22,13 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 #include "34_departures_table/AddForbiddenPlaceToDisplayScreen.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "15_env/ConnectionPlaceTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -37,6 +38,12 @@ namespace synthese
 	using namespace server;
 	using namespace env;
 	using namespace db;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, departurestable::AddForbiddenPlaceToDisplayScreen>::FACTORY_KEY("afptdsa");
+	}
 	
 	namespace departurestable
 	{
@@ -54,17 +61,13 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_PLACE);
-				if (it == map.end())
-					throw ActionException("Place not specified");
+				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
 				
-				_place = PublicTransportStopZoneConnectionPlace::Get(Conversion::ToLongLong(it->second));
+				_place = ConnectionPlaceTableSync::Get(id);
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (...)
 			{
 				throw ActionException("Display screen not found");
 			}

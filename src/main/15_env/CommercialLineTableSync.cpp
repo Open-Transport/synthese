@@ -52,46 +52,66 @@ namespace synthese
 	using namespace env;
 	using namespace security;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,CommercialLineTableSync>::FACTORY_KEY("15.25.01 Commercial lines");
+	}
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<CommercialLine>::TABLE_NAME = "t042_commercial_lines";
-		template<> const int SQLiteTableSyncTemplate<CommercialLine>::TABLE_ID = 42;
-		template<> const bool SQLiteTableSyncTemplate<CommercialLine>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::TABLE_NAME = "t042_commercial_lines";
+		template<> const int SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::TABLE_ID = 42;
+		template<> const bool SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<CommercialLine>::load(CommercialLine* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::load(CommercialLine* object, const db::SQLiteResultSPtr& rows )
 		{
 		    object->setKey(rows->getLongLong (TABLE_COL_ID));
-
-		    boost::shared_ptr<const TransportNetwork> tn = 
-			TransportNetwork::Get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID));
-		    
-		    object->setNetwork (tn.get ());
 		    object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
 		    object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
 		    object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
 		    object->setColor(RGBColor(rows->getText ( CommercialLineTableSync::COL_COLOR)));
 		    object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
+		}
 
-		    typedef tokenizer<char_separator<char> > tokenizer;
-			string stops(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
 
-		    // Parse all optional reservation places separated by ,
-		    char_separator<char> sep1 (",");
-		    tokenizer stopsTokens (stops, sep1);
-		    
-		    for(tokenizer::iterator it(stopsTokens.begin());
-				it != stopsTokens.end ();
-				++it
-			){
-				uid id(Conversion::ToLongLong(*it));
-				shared_ptr<const Place> place(EnvModule::fetchPlace(id));
-				object->addOptionalReservationPlace(place.get());
-		    }
+
+		template<> void SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::_link(CommercialLine* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			const TransportNetwork* tn = 
+				TransportNetworkTableSync::Get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID),obj,true,temporary);
+
+			obj->setNetwork (tn);
+
+			if (temporary == GET_REGISTRY)
+			{
+				typedef tokenizer<char_separator<char> > tokenizer;
+				string stops(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
+
+				// Parse all optional reservation places separated by ,
+				char_separator<char> sep1 (",");
+				tokenizer stopsTokens (stops, sep1);
+
+				for(tokenizer::iterator it(stopsTokens.begin());
+					it != stopsTokens.end ();
+					++it
+					){
+						uid id(Conversion::ToLongLong(*it));
+						shared_ptr<const Place> place(EnvModule::fetchPlace(id));
+						obj->addOptionalReservationPlace(place.get());
+				}
+			}
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::_unlink(CommercialLine* obj)
+		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<CommercialLine>::save(CommercialLine* object)
+
+
+		template<> void SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::save(CommercialLine* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -128,7 +148,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES("optional_reservation_places");
 
 		CommercialLineTableSync::CommercialLineTableSync()
-			: SQLiteTableSyncTemplate<CommercialLine>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_NETWORK_ID, "INTEGER", true);
@@ -141,32 +161,6 @@ namespace synthese
 			addTableColumn(COL_OPTIONAL_RESERVATION_PLACES, "TEXT", true);
 		}
 
-		void CommercialLineTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				CommercialLine* object(new CommercialLine());
-				load(object, rows);
-				object->store();
-			}
-		}
-
-		void CommercialLineTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				shared_ptr<CommercialLine> object= CommercialLine::GetUpdateable(rows->getLongLong (TABLE_COL_ID));
-				load(object.get(), rows);
-			}
-		}
-
-		void CommercialLineTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				CommercialLine::Remove(rows->getLongLong (TABLE_COL_ID));
-			}
-		}
 
 		std::vector<shared_ptr<CommercialLine> > CommercialLineTableSync::search(
 			const TransportNetwork* network

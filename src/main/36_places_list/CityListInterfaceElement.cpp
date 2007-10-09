@@ -40,6 +40,8 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,transportwebsite::CityListInterfaceElement>::FACTORY_KEY("places_list");
+
 	namespace transportwebsite
 	{
 		string CityListInterfaceElement::display(

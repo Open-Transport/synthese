@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/UpdateAlarmMessagesFromTemplateAction.h"
+#include "UpdateAlarmMessagesFromTemplateAction.h"
+
 #include "17_messages/Alarm.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/TextTemplate.h"
@@ -29,6 +30,7 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -37,6 +39,9 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, messages::UpdateAlarmMessagesFromTemplateAction>::FACTORY_KEY("uaft");
 	
 	namespace messages
 	{
@@ -56,13 +61,8 @@ namespace synthese
 			{
 				_message = AlarmTableSync::getAlarm(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_TEMPLATE_ID);
-				if (it == map.end())
-					throw ActionException("Template not specified");
-
-				_template = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
+				uid id = map.getUid(PARAMETER_TEMPLATE_ID, true, FACTORY_KEY);
+				_template = TextTemplateTableSync::Get(id);
 			}
 			catch (DBEmptyResultException<Alarm>)
 			{

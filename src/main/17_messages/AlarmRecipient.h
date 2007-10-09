@@ -57,7 +57,7 @@ namespace synthese
 
 			All the available alarm recipients are listed in the @ref refAlarmrecipients page.
 		*/
-		class AlarmRecipient : public util::Factorable
+		class AlarmRecipient : public util::Factorable<AlarmRecipient>
 		{
 		public:
 			virtual const std::string& getTitle() const = 0;

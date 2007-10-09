@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace server
@@ -32,7 +34,7 @@ namespace synthese
 		/** Login Action Class.
 			@ingroup m18Actions refActions
 		*/
-		class LoginAction : public server::Action
+		class LoginAction : public util::FactorableTemplate<server::Action, LoginAction>
 		{
 		public:
 			static const std::string PARAMETER_LOGIN;

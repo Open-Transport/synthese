@@ -27,6 +27,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace server
@@ -56,7 +58,7 @@ namespace synthese
 			Object :
 			 - DateTime
 		*/
-		class DateTimeInterfacePage : public interfaces::InterfacePage
+		class DateTimeInterfacePage : public util::FactorableTemplate<InterfacePage,DateTimeInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

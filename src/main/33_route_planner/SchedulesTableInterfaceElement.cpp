@@ -50,6 +50,8 @@ namespace synthese
 	using namespace time;
 	using namespace env;
 	using namespace interfaces;
+
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::SchedulesTableInterfaceElement>::FACTORY_KEY("schedules_table");
 	
 	namespace routeplanner
 	{

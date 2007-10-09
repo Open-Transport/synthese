@@ -25,13 +25,10 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
-
 	namespace admin
 	{
 		/** Displays the content of the current admin page.
@@ -42,7 +39,7 @@ namespace synthese
 
 			@ingroup m14Library refLibrary
 		*/
-		class AdminContentInterfaceElement : public interfaces::LibraryInterfaceElement
+		class AdminContentInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,AdminContentInterfaceElement>
 		{
 		public:
 			/** Controls and store the internals parameters.

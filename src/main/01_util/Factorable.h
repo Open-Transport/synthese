@@ -32,15 +32,13 @@ namespace synthese
 		/** Factorable class.
 			@ingroup m01
 		*/
+		template<class T>
 		class Factorable
 		{
-		private:
-			std::string __factory_key;
-
 		public:
-			Factorable();
-			void setFactoryKey(const std::string& key);
-			virtual const std::string& getFactoryKey() const;
+			typedef T FactoryClass;
+
+			virtual const std::string& getFactoryKey() const = 0;
 		};
 	}
 }

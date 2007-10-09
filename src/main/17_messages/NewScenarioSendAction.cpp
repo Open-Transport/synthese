@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/NewScenarioSendAction.h"
+#include "NewScenarioSendAction.h"
+
 #include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
@@ -30,6 +31,8 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/QueryString.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -38,6 +41,9 @@ namespace synthese
 {
 	using namespace server;
 	using namespace dblog;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, messages::NewScenarioSendAction>::FACTORY_KEY("nssa");
 	
 	namespace messages
 	{
@@ -53,15 +59,11 @@ namespace synthese
 
 		void NewScenarioSendAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			// Template to source
-			it = map.find(PARAMETER_TEMPLATE);
-			if (it == map.end())
-				throw ActionException("Template not specified");
+			uid id(map.getUid(PARAMETER_TEMPLATE, true, FACTORY_KEY));
 			try
 			{
-				_template = ScenarioTableSync::getTemplate(Conversion::ToLongLong(it->second));
+				_template = ScenarioTableSync::getTemplate(id);
 			}
 			catch(...)
 			{
@@ -69,7 +71,7 @@ namespace synthese
 			}
 			
 			// Anti error
-			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void NewScenarioSendAction::run()
@@ -100,7 +102,7 @@ namespace synthese
 			}
 
 			// The log
-			MessagesLog::addUpdateEntry(static_pointer_cast<const SentScenario, SentScenario>(scenario), "Diffusion", _request->getUser());
+			MessagesLog::addUpdateEntry(scenario.get(), "Diffusion", _request->getUser().get());
 		}
 	}
 }

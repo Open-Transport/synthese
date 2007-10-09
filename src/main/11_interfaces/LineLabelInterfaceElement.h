@@ -23,8 +23,10 @@
 #ifndef SYNTHESE_LineLabelInterfaceElement_H__
 #define SYNTHESE_LineLabelInterfaceElement_H__
 
-
 #include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
+
 #include <string>
 
 namespace synthese
@@ -36,7 +38,7 @@ namespace synthese
 			@code label <label> @endcode
 			@ingroup m11Library refLibrary
 		*/
-		class LineLabelInterfaceElement : public LibraryInterfaceElement
+		class LineLabelInterfaceElement : public util::FactorableTemplate<LibraryInterfaceElement, LineLabelInterfaceElement>
 		{
 		private:
 			std::string _label;

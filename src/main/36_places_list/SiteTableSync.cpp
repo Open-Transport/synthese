@@ -31,6 +31,7 @@
 #include "04_time/Date.h"
 
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/InterfaceTableSync.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>
@@ -47,18 +48,21 @@ namespace synthese
 	using namespace time;
 	using namespace transportwebsite;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,SiteTableSync>::FACTORY_KEY("36.01 Site");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<Site>::TABLE_NAME = "t025_sites";
-		template<> const int SQLiteTableSyncTemplate<Site>::TABLE_ID = 25;
-		template<> const bool SQLiteTableSyncTemplate<Site>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<SiteTableSync,Site>::TABLE_NAME = "t025_sites";
+		template<> const int SQLiteTableSyncTemplate<SiteTableSync,Site>::TABLE_ID = 25;
+		template<> const bool SQLiteTableSyncTemplate<SiteTableSync,Site>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Site>::load(Site* site, const SQLiteResultSPtr& rows)
+		template<> void SQLiteTableSyncTemplate<SiteTableSync,Site>::load(Site* site, const SQLiteResultSPtr& rows)
 		{
 		    site->setKey(rows->getLongLong (TABLE_COL_ID));
 		    site->setName(rows->getText (SiteTableSync::TABLE_COL_NAME));
-			shared_ptr<const Interface> interf = Interface::Get(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
-		    site->setInterface(interf);
 		    site->setStartDate(Date::FromSQLDate(rows->getText (SiteTableSync::TABLE_COL_START_DATE)));
 		    site->setEndDate(Date::FromSQLDate(rows->getText(SiteTableSync::TABLE_COL_END_DATE)));
 		    site->setOnlineBookingAllowed(rows->getBool(SiteTableSync::TABLE_COL_ONLINE_BOOKING));
@@ -90,7 +94,22 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<Site>::save(Site* site)
+
+
+		template<> void SQLiteTableSyncTemplate<SiteTableSync,Site>::_link(Site* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			obj->setInterface(InterfaceTableSync::Get(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID), obj, false, temporary));
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<SiteTableSync,Site>::_unlink(Site* obj)
+		{
+			obj->setInterface(NULL);
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<SiteTableSync,Site>::save(Site* site)
 		{
 			stringstream query;
 			query << " REPLACE INTO " << TABLE_NAME << " VALUES("
@@ -115,7 +134,7 @@ namespace synthese
 		
 
 		SiteTableSync::SiteTableSync()
-			: db::SQLiteTableSyncTemplate<Site> ( true, true, TRIGGERS_ENABLED_CLAUSE)
+			: db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -129,7 +148,7 @@ namespace synthese
 			addTableColumn(COL_PERIODS, "TEXT", true);
 		}
 
-
+/*
 		void SiteTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 		    while (rows->next ())
@@ -171,5 +190,6 @@ namespace synthese
 				Site::Remove(id);
 		    }
 		}
+		*/
 	}
 }

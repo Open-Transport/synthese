@@ -103,13 +103,10 @@ namespace synthese
 		*/
 		class DisplayAdmin : public admin::AdminInterfaceElementTemplate<DisplayAdmin>
 		{
-			boost::shared_ptr<const DisplayScreen>			_displayScreen;
-			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
+			boost::shared_ptr<const DisplayScreen>	_displayScreen;
 
 		public:
 			DisplayAdmin();
-
-			static const std::string PARAMETER_PLACE;
 
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.

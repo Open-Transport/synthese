@@ -86,13 +86,13 @@ namespace synthese
 
 		void DisplayScreen::addForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace* place)
 		{
-			_forbiddenArrivalPlaces.insert(place);
+			_forbiddenArrivalPlaces.insert(make_pair(place->getId(),place));
 		}
 
 
 		/** Modificateur du point d'arrêt.
 		*/
-		void DisplayScreen::setLocalization(shared_ptr<const PublicTransportStopZoneConnectionPlace> bp)
+		void DisplayScreen::setLocalization(const PublicTransportStopZoneConnectionPlace* bp)
 		{
 			_localization = bp;
 		}
@@ -100,14 +100,14 @@ namespace synthese
 
 		void DisplayScreen::addDisplayedPlace(const env::PublicTransportStopZoneConnectionPlace* __PointArret)
 		{
-			_displayedPlaces.insert(__PointArret);
+			_displayedPlaces.insert(make_pair(__PointArret->getKey(),__PointArret));
 		}
 
 		
 
 		void DisplayScreen::addForcedDestination(const env::PublicTransportStopZoneConnectionPlace* place)
 		{
-			_forcedDestinations.insert(place);
+			_forcedDestinations.insert(make_pair(place->getKey(), place));
 		}
 
 
@@ -155,8 +155,9 @@ namespace synthese
 			}
 		}
 
-		shared_ptr<const PublicTransportStopZoneConnectionPlace> DisplayScreen::getLocalization() const
+		const PublicTransportStopZoneConnectionPlace* DisplayScreen::getLocalization() const
 		{
+			assert(getLinked());
 			return _localization;
 		}
 
@@ -207,7 +208,7 @@ namespace synthese
 
 		void DisplayScreen::addPhysicalStop(const PhysicalStop* physicalStop)
 		{
-			_physicalStops.insert(physicalStop);
+			_physicalStops.insert(make_pair(physicalStop->getKey(),physicalStop));
 		}
 
 		void DisplayScreen::setDirection( DeparturesTableDirection direction )
@@ -323,6 +324,7 @@ namespace synthese
 
 		const PhysicalStops& DisplayScreen::getPhysicalStops(bool result) const
 		{
+			assert(getLinked());
 			return (_allPhysicalStopsDisplayed && _localization && result)
 				? _localization->getPhysicalStops()
 				: _physicalStops;
@@ -330,16 +332,19 @@ namespace synthese
 
 		const ForbiddenPlacesList& DisplayScreen::getForbiddenPlaces() const
 		{
+			assert(getLinked());
 			return _forbiddenArrivalPlaces;
 		}
 
 		const LineFilter& DisplayScreen::getForbiddenLines() const
 		{
+			assert(getLinked());
 			return _forbiddenLines;
 		}
 
 		const DisplayedPlacesList& DisplayScreen::getDisplayedPlaces() const
 		{
+			assert(getLinked());
 			return _displayedPlaces;
 		}
 
@@ -408,7 +413,7 @@ namespace synthese
 
 		std::string DisplayScreen::getFullName() const
 		{
-			if (!_localization.get())
+			if (!_localization)
 				return "(not localized)";
 			else
 			{
@@ -420,12 +425,12 @@ namespace synthese
 			}
 		}
 
-		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const std::set<const env::PublicTransportStopZoneConnectionPlace*>& placesToAvoid) const
+		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const DisplayedPlacesList& placesToAvoid) const
 		{
 			map<std::string, std::pair<uid, string> > m;
 			for (PhysicalStops::const_iterator it = getPhysicalStops().begin(); it != getPhysicalStops().end(); ++it)
 			{
-				const PhysicalStop* p = *it;
+				const PhysicalStop* p(it->second);
 				const std::set<const Edge*>& edges = p->getDepartureEdges();
 				for (std::set<const Edge*>::const_iterator ite = edges.begin(); ite != edges.end(); ++ite)
 				{
@@ -439,9 +444,11 @@ namespace synthese
 			return v;
 		}
 
-		void DisplayScreen::removeForcedDestination(shared_ptr<const PublicTransportStopZoneConnectionPlace> place)
+
+
+		void DisplayScreen::removeForcedDestination(const PublicTransportStopZoneConnectionPlace* place)
 		{
-			DisplayedPlacesList::iterator it = _forcedDestinations.find(place.get());
+			DisplayedPlacesList::iterator it = _forcedDestinations.find(place->getId());
 			if (it != _forcedDestinations.end())
 				_forcedDestinations.erase(it);
 		}
@@ -461,28 +468,28 @@ namespace synthese
 			_forcedDestinations.clear();
 		}
 
-		void DisplayScreen::removePhysicalStop(shared_ptr<const PhysicalStop> stop)
+		void DisplayScreen::removePhysicalStop(const PhysicalStop* stop)
 		{
-			PhysicalStops::iterator it = _physicalStops.find(stop.get());
+			PhysicalStops::iterator it = _physicalStops.find(stop->getKey());
 			if (it != _physicalStops.end())
 				_physicalStops.erase(it);
 		}
 
-		void DisplayScreen::removeDisplayedPlace(shared_ptr<const PublicTransportStopZoneConnectionPlace> place)
+		void DisplayScreen::removeDisplayedPlace(const PublicTransportStopZoneConnectionPlace* place)
 		{
-			DisplayedPlacesList::iterator it = _displayedPlaces.find(place.get());
+			DisplayedPlacesList::iterator it = _displayedPlaces.find(place->getId());
 			if (it != _displayedPlaces.end())
 				_displayedPlaces.erase(it);
 		}
 
-		void DisplayScreen::removeForbiddenPlace(shared_ptr<const PublicTransportStopZoneConnectionPlace> place)
+		void DisplayScreen::removeForbiddenPlace(const PublicTransportStopZoneConnectionPlace* place)
 		{
-			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place.get());
+			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place->getId());
 			if (it != _forbiddenArrivalPlaces.end())
 				_forbiddenArrivalPlaces.erase(it);
 		}
 
-		void DisplayScreen::copy( boost::shared_ptr<const DisplayScreen> other )
+		void DisplayScreen::copy(const DisplayScreen* other )
 		{
 			setAllPhysicalStopsDisplayed(other->getAllPhysicalStopsDisplayed());
 			setBlinkingDelay(other->getBlinkingDelay());
@@ -501,13 +508,13 @@ namespace synthese
 			setType(other->getType());
 			setWiringCode(other->getWiringCode());
 			for (DisplayedPlacesList::const_iterator it = other->getDisplayedPlaces().begin(); it != other->getDisplayedPlaces().end(); ++it)
-				addDisplayedPlace(*it);
+				addDisplayedPlace(it->second);
 			for (DisplayedPlacesList::const_iterator it = other->getForcedDestinations().begin(); it != other->getForcedDestinations().end(); ++it)
-				addForcedDestination(*it);
+				addForcedDestination(it->second);
 			for (ForbiddenPlacesList::const_iterator it = other->getForbiddenPlaces().begin(); it != other->getForbiddenPlaces().end(); ++it)
-				addForbiddenPlace(*it);
+				addForbiddenPlace(it->second);
 			for (PhysicalStops::const_iterator it = other->getPhysicalStops(false).begin(); it != other->getPhysicalStops(false).end(); ++it)
-				addPhysicalStop(*it);
+				addPhysicalStop(it->second);
 		}
 
 		const DisplayScreen::Complements& DisplayScreen::getComplements() const

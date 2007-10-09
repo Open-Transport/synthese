@@ -49,16 +49,16 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const std::string FactorableTemplate<SQLiteTableSync, ReservationTransactionTableSync>::FACTORY_KEY("");
+		template<> const string FactorableTemplate<SQLiteTableSync, ReservationTransactionTableSync>::FACTORY_KEY("31.2 Reservation Transaction Table Sync");
 	}
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ReservationTransaction>::TABLE_NAME("t046_reservation_transactions");
-		template<> const int SQLiteTableSyncTemplate<ReservationTransaction>::TABLE_ID(46);
-		template<> const bool SQLiteTableSyncTemplate<ReservationTransaction>::HAS_AUTO_INCREMENT(true);
+		template<> const string SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::TABLE_NAME("t046_reservation_transactions");
+		template<> const int SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::TABLE_ID(46);
+		template<> const bool SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::HAS_AUTO_INCREMENT(true);
 
-		template<> void SQLiteTableSyncTemplate<ReservationTransaction>::load(
+		template<> void SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::load(
 			ReservationTransaction* object
 			, const db::SQLiteResultSPtr& rows
 		){
@@ -75,7 +75,7 @@ namespace synthese
 			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
 		}
 
-		template<> void SQLiteTableSyncTemplate<ReservationTransaction>::save(ReservationTransaction* object)
+		template<> void SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::save(ReservationTransaction* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -116,7 +116,7 @@ namespace synthese
 		const string ReservationTransactionTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
 
 		ReservationTransactionTableSync::ReservationTransactionTableSync()
-			: SQLiteTableSyncTemplate<ReservationTransaction>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteNoSyncTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_LAST_RESERVATION_ID, "INTEGER");
@@ -129,28 +129,6 @@ namespace synthese
 			addTableColumn(COL_CUSTOMER_EMAIL, "TEXT");
 			addTableColumn(COL_BOOKING_USER_ID, "INTEGER");
 			addTableColumn(COL_CANCEL_USER_ID, "INTEGER");
-		}
-
-		void ReservationTransactionTableSync::rowsAdded(
-			SQLite* sqlite
-			, SQLiteSync* sync
-			, const SQLiteResultSPtr& rows
-			, bool isItFirstSync
-		){
-		}
-		
-		void ReservationTransactionTableSync::rowsUpdated(
-			SQLite* sqlite
-			, SQLiteSync* sync
-			, const SQLiteResultSPtr& rows
-		){
-		}
-
-		void ReservationTransactionTableSync::rowsRemoved(
-			SQLite* sqlite
-			, SQLiteSync* sync
-			, const SQLiteResultSPtr& rows
-		){
 		}
 
 		vector<shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search(

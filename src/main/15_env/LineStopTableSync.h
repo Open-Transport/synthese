@@ -23,23 +23,22 @@
 #ifndef SYNTHESE_LineStopTableSync_H__
 #define SYNTHESE_LineStopTableSync_H__
 
+#include "LineStop.h"
+
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
-
 namespace synthese
 {
 	namespace env
 	{
-		class LineStop;
-
 		/** LineStop table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 		*/
-		class LineStopTableSync : public db::SQLiteTableSyncTemplate<LineStop>
+		class LineStopTableSync : public db::SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>
 		{
 		public:
 			static const std::string COL_PHYSICALSTOPID;
@@ -65,32 +64,6 @@ namespace synthese
 			static std::vector<boost::shared_ptr<LineStop> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on LineStop creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on LineStop creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on LineStop deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }

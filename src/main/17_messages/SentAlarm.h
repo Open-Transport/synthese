@@ -106,6 +106,9 @@ namespace synthese
 				@date 2007				
 			*/
 			AlarmConflict getConflictStatus() const;
+
+			static boost::shared_ptr<const SentAlarm> Get(uid key);
+			static bool Contains(uid key);
 		};
 	}
 }

@@ -26,7 +26,6 @@
 #include <vector>
 #include <utility>
 #include <string>
-#include <boost/shared_ptr.hpp>
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
@@ -58,17 +57,14 @@ namespace synthese
 			@ingroup m11
 		*/
 		class InterfacePage
-			: public util::Factorable
+			: public util::Factorable<InterfacePage>
 			, public util::Registrable<uid, InterfacePage>
 		{
-			
 		private:
-			boost::shared_ptr<const Interface>	_interface;
+			const Interface*					_interface;
 			LibraryInterfaceElement::Registry	_components;
-			std::string							_code;
 			
 		public:
-
 			InterfacePage();
 			virtual ~InterfacePage();
 
@@ -88,12 +84,9 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;
 
-			void setInterface(boost::shared_ptr<const Interface>);
-			boost::shared_ptr<const Interface>	getInterface()	const;
+			void				setInterface(const Interface*);
 
-			void setCode(const std::string& );
-
-			const std::string& getCode() const;
+			const Interface*	getInterface()	const;
 
 			std::string getValue(
 				const ParametersVector& parameters

@@ -20,11 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-
 #include "TextTemplateAddAction.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
+
+#include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
+
+#include "01_util/Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -32,6 +35,9 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
+
+	template<> const string util::FactorableTemplate<Action, messages::TextTemplateAddAction>::FACTORY_KEY("mttaa");
 	
 	namespace messages
 	{
@@ -44,26 +50,18 @@ namespace synthese
 		ParametersMap TextTemplateAddAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_LONG_MESSAGE, _longMessage));
-			map.insert(make_pair(PARAMETER_NAME, _name));
-			map.insert(make_pair(PARAMETER_SHORT_MESSAGE, _shortMessage));
-			map.insert(make_pair(PARAMETER_TYPE, Conversion::ToString((int) _level)));
+			map.insert(PARAMETER_LONG_MESSAGE, _longMessage);
+			map.insert(PARAMETER_NAME, _name);
+			map.insert(PARAMETER_SHORT_MESSAGE, _shortMessage);
+			map.insert(PARAMETER_TYPE, static_cast<int>(_level));
 			return map;
 		}
 
 		void TextTemplateAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
+			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 
-			it = map.find(PARAMETER_NAME);
-			if (it == map.end())
-				throw ActionException("Name not found");
-			_name = it->second;
-
-			it = map.find(PARAMETER_TYPE);
-			if (it == map.end())
-				throw ActionException("Level not found");
-			_level = (AlarmLevel) Conversion::ToInt(it->second);
+			_level = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE , true, FACTORY_KEY));
 			if (_level == ALARM_LEVEL_UNKNOWN)
 				throw ActionException("Bad value for level");
 			
@@ -71,15 +69,8 @@ namespace synthese
 			if (!v.empty())
 				throw ActionException("Un texte portant ce nom existe déjà.");
 
-			it = map.find(PARAMETER_LONG_MESSAGE);
-			if (it == map.end())
-				throw ActionException("Long message not found");
-			_longMessage = it->second;
-			
-			 it = map.find(PARAMETER_SHORT_MESSAGE);
-			 if (it == map.end())
-				 throw ActionException("Short message not found");
-			 _shortMessage = it->second;
+			_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
+			_shortMessage = map.getString(PARAMETER_SHORT_MESSAGE, true, FACTORY_KEY);
 		}
 
 		void TextTemplateAddAction::run()

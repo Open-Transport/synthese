@@ -147,10 +147,10 @@ namespace synthese
 						 itcpps != cpps.end (); ++itcpps) 
 						{
 						    // Skip physical stops which have no departing or arriving edges.
-						    if (((*itcpps)->getDepartureEdges ().size () == 0) && 
-							((*itcpps)->getArrivalEdges ().size () == 0)) continue;
+						    if ((itcpps->second->getDepartureEdges ().size () == 0) && 
+							(itcpps->second->getArrivalEdges ().size () == 0)) continue;
 						    
-						    physicalStops.insert (*itcpps);
+						    physicalStops.insert (itcpps->second);
 						}
 
 						cities.insert (connectionPlace->getCity ());
@@ -263,14 +263,14 @@ namespace synthese
 				os << "<name>" << cp->getName () << "</name>" << std::endl;
 
 				// Contained physical stops
-				const std::set<const PhysicalStop*>& cpps = cp->getPhysicalStops ();
-				for (std::set<const PhysicalStop*>::const_iterator itps = cpps.begin ();
+				const PhysicalStops& cpps = cp->getPhysicalStops ();
+				for (PhysicalStops::const_iterator itps = cpps.begin ();
 				 itps != cpps.end (); ++itps)
 				{
 				// filter physical stops not concerned by this line.
-				if (physicalStops.find (*itps) == physicalStops.end ()) continue;
+				if (physicalStops.find (itps->second) == physicalStops.end ()) continue;
 				
-				os << "<contains>" << TridentId (peerid, "StopArea", (*itps)->getKey ())  << "</contains>" << std::endl;
+				os << "<contains>" << TridentId (peerid, "StopArea", itps->first)  << "</contains>" << std::endl;
 				}
 
 				// Decide what to take for centroidOfArea of a connectionPlace. Only regarding physical stops coordinates
@@ -384,21 +384,21 @@ namespace synthese
 			    
 
 				// Contained physical stops
-				const std::set<const PhysicalStop*>& cpps = cp->getPhysicalStops ();
-				for (std::set<const PhysicalStop*>::const_iterator itps = cpps.begin ();
+				const PhysicalStops& cpps = cp->getPhysicalStops ();
+				for (PhysicalStops::const_iterator itps = cpps.begin ();
 				 itps != cpps.end (); ++itps)
 				{
 				// filter physical stops not concerned by this line.
-				if (physicalStops.find (*itps) == physicalStops.end ()) continue;
+				if (physicalStops.find (itps->second) == physicalStops.end ()) continue;
 
-				const PhysicalStop* from = (*itps);
-				for (std::set<const PhysicalStop*>::const_iterator itps2 = cpps.begin ();
+				const PhysicalStop* from = (itps->second);
+				for (PhysicalStops::const_iterator itps2 = cpps.begin ();
 					 itps2 != cpps.end (); ++itps2)
 				{
 					// filter physical stops not concerned by this line.
-					if (physicalStops.find (*itps2) == physicalStops.end ()) continue;
+					if (physicalStops.find (itps2->second) == physicalStops.end ()) continue;
 				    
-					const PhysicalStop* to = (*itps2);
+					const PhysicalStop* to = (itps2->second);
 				    
 					os << "<ConnectionLink>" << std::endl;
 					std::stringstream clkey;

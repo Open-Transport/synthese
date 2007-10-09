@@ -20,6 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DisplayTypeTableSync.h"
+
 #include <sstream>
 
 #include "01_util/Conversion.h"
@@ -29,10 +31,9 @@
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
-#include "11_interfaces/Interface.h"
+#include "11_interfaces/InterfaceTableSync.h"
 
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayTypeTableSync.h"
+#include "01_util/Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -42,30 +43,45 @@ namespace synthese
 	using namespace db;
 	using namespace departurestable;
 	using namespace interfaces;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,DisplayTypeTableSync>::FACTORY_KEY("34.00 Display Types");
+	}
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<DisplayType>::TABLE_NAME = "t036_display_types";
-		template<> const int SQLiteTableSyncTemplate<DisplayType>::TABLE_ID = 36;
-		template<> const bool SQLiteTableSyncTemplate<DisplayType>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::TABLE_NAME = "t036_display_types";
+		template<> const int SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::TABLE_ID = 36;
+		template<> const bool SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DisplayType>::load(DisplayType* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::load(DisplayType* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setName(rows->getText ( DisplayTypeTableSync::TABLE_COL_NAME));
+			object->setRowNumber(rows->getInt ( DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER));
+			object->setMaxStopsNumber(rows->getInt ( DisplayTypeTableSync::COL_MAX_STOPS_NUMBER));
+		}
 
-			if (Interface::Contains(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID)))
-			{
-			    object->setInterface(Interface::Get(
-						     rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID)));
-			}
 
-	    object->setRowNumber(rows->getInt ( DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER));
-		object->setMaxStopsNumber(rows->getInt ( DisplayTypeTableSync::COL_MAX_STOPS_NUMBER));
-	}
+		template<> void SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::_link(DisplayType* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			uid id(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID));
+
+			if (Interface::Contains(id))
+				object->setInterface(InterfaceTableSync::Get(id, object, false, GET_AUTO));
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::_unlink(DisplayType* obj)
+		{
+			obj->setInterface(NULL);
+		}
+
     
 
-		template<> void SQLiteTableSyncTemplate<DisplayType>::save(DisplayType* object)
+		template<> void SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::save(DisplayType* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			if (object->getKey() <= 0)
@@ -94,50 +110,13 @@ namespace synthese
 		/// @todo Other fields
 
 		DisplayTypeTableSync::DisplayTypeTableSync()
-			: SQLiteTableSyncTemplate<DisplayType>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 			addTableColumn(TABLE_COL_INTERFACE_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_ROWS_NUMBER, "INTEGER", true);
 			addTableColumn(COL_MAX_STOPS_NUMBER, "INTEGER", true);
-		}
-
-		void DisplayTypeTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				if (DisplayType::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					load(DisplayType::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
-				} else {
-					DisplayType* object(new DisplayType());
-					load(object, rows);
-					object->store();
-				}
-			}
-		}
-
-		void DisplayTypeTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				if (DisplayType::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					load(DisplayType::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
-				}
-			}
-		}
-
-		void DisplayTypeTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				if (DisplayType::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					DisplayType::Remove(rows->getLongLong (TABLE_COL_ID));
-				}
-			}
 		}
 
 		vector<shared_ptr<DisplayType> > DisplayTypeTableSync::search(
@@ -170,6 +149,7 @@ namespace synthese
 				{
 					shared_ptr<DisplayType> object(new DisplayType);
 					load(object.get(), rows);
+					link(object.get(), rows, GET_TEMPORARY);
 					objects.push_back(object);
 				}
 				return objects;

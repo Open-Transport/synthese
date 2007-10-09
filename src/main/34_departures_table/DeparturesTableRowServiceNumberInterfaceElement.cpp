@@ -33,6 +33,8 @@ namespace synthese
 {
 	using namespace interfaces;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement, departurestable::DeparturesTableRowServiceNumberInterfaceElement>::FACTORY_KEY("departurestableservicenumbercell");
+
 	namespace departurestable
 	{
 		void DeparturesTableRowServiceNumberInterfaceElement::storeParameters(ValueElementList& vel)

@@ -34,8 +34,11 @@
 #include "12_security/UserPasswordUpdateAction.h"
 
 #include "30_server/ActionFunctionRequest.h"
+#include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
+
+#include "01_util/Conversion.h"
 
 using namespace std;
 
@@ -46,6 +49,7 @@ namespace synthese
 	using namespace db;
 	using namespace html;
 	using namespace security;
+	using namespace util;
 
 	namespace util
 	{
@@ -160,9 +164,9 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
-				if (it != map.end() && (Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION))
-					_user = UserTableSync::get(Conversion::ToLongLong(it->second));
+				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+					_user = UserTableSync::Get(id,GET_AUTO, true);
 			}
 			catch (...)
 			{

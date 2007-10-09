@@ -22,7 +22,6 @@
 
 #include "11_interfaces/ValueElementList.h"
 
-
 #include "30_server/FunctionRequest.h"
 
 #include "32_admin/AdminInterfaceElement.h"
@@ -36,6 +35,8 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace server;
+
+	template<> const string util::FactorableTemplate<interfaces::LibraryInterfaceElement,admin::AdminContentInterfaceElement>::FACTORY_KEY("admincontent");
 
 	namespace admin
 	{

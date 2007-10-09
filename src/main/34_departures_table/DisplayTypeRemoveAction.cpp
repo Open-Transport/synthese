@@ -20,15 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DisplayTypeRemoveAction.h"
+
+#include "34_departures_table/DisplayTypeTableSync.h"
+#include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "34_departures_table/DisplayTypeRemoveAction.h"
-#include "34_departures_table/DisplayTypeTableSync.h"
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/ArrivalDepartureTableLog.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -36,8 +36,11 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 	using namespace security;
-	
+
+	template<> const string FactorableTemplate<Action, departurestable::DisplayTypeRemoveAction>::FACTORY_KEY("dtra");
+
 	namespace departurestable
 	{
 		 const string DisplayTypeRemoveAction::PARAMETER_TYPE_ID(Action_PARAMETER_PREFIX + "ti");
@@ -47,21 +50,16 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_type.get())
-				map.insert(make_pair(PARAMETER_TYPE_ID, Conversion::ToString(_type->getKey())));
+				map.insert(PARAMETER_TYPE_ID, _type->getKey());
 			return map;
 		}
 
 		void DisplayTypeRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_TYPE_ID);
-			if (it == map.end())
-				throw ActionException("Type not specified");
-			
+			uid id(map.getUid(PARAMETER_TYPE_ID, true, FACTORY_KEY));
 			try
 			{
-				_type = DisplayTypeTableSync::get(Conversion::ToLongLong(it->second));
+				_type = DisplayTypeTableSync::Get(id);
 			}
 			catch(...)
 			{
@@ -92,7 +90,7 @@ namespace synthese
 		{
 			DisplayTypeTableSync::remove(_type->getKey());
 
-			ArrivalDepartureTableLog::addDeleteTypeEntry(_type, _request->getUser());
+			ArrivalDepartureTableLog::addDeleteTypeEntry(_type.get(), _request->getUser().get());
 		}
 
 		void DisplayTypeRemoveAction::setType( boost::shared_ptr<const DisplayType> type )

@@ -70,7 +70,7 @@ namespace synthese
 				_surname = it->second;
 			}
 
-			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void AddCustomerAction::run()

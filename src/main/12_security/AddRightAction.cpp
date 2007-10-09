@@ -30,6 +30,7 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -63,15 +64,15 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::get(_request->getObjectId());
+				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
 
-				_rightName = Request::getStringFormParameterMap(map, PARAMETER_RIGHT, true, FACTORY_KEY);
+				_rightName = map.getString(PARAMETER_RIGHT, true, FACTORY_KEY);
 				if (!Factory<Right>::contains(_rightName))
 					throw ActionException("Specified right class not found");
 				
-				_parameter = Request::getStringFormParameterMap(map, PARAMETER_PARAMETER, true, FACTORY_KEY);
-				_publicLevel = static_cast<RightLevel>(Request::getIntFromParameterMap(map, PARAMETER_PUBLIC_LEVEL, true, FACTORY_KEY));
-				_privateLevel = static_cast<RightLevel>(Request::getIntFromParameterMap(map, PARAMETER_PRIVATE_LEVEL, false, FACTORY_KEY));
+				_parameter = map.getString(PARAMETER_PARAMETER, true, FACTORY_KEY);
+				_publicLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PUBLIC_LEVEL, true, FACTORY_KEY));
+				_privateLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PRIVATE_LEVEL, false, FACTORY_KEY));
 			}
 			catch(DBEmptyResultException<Profile>)
 			{
@@ -89,7 +90,7 @@ namespace synthese
 
 			ProfileTableSync::save(_profile.get());
 
-			SecurityLog::addProfileAdmin(_request->getUser(), _profile, "Ajout habilitation " + _rightName + "/" + _parameter);
+			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), "Ajout habilitation " + _rightName + "/" + _parameter);
 		}
 	}
 }

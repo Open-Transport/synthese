@@ -28,6 +28,8 @@ namespace synthese
 {
 	using namespace util;
 
+	template<> const std::string util::FactorableTemplate<interfaces::InterfacePage,interfaces::DurationInterfacePage>::FACTORY_KEY("duration");
+
 	namespace interfaces
 	{
 

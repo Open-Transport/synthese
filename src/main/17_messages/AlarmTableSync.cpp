@@ -47,41 +47,57 @@ namespace synthese
 	using namespace time;
 	using namespace util;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,AlarmTableSync>::FACTORY_KEY("17.10.01 Alarms");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Alarm>::TABLE_NAME = "t003_alarms";
-		template<> const int SQLiteTableSyncTemplate<Alarm>::TABLE_ID = 3;
-		template<> const bool SQLiteTableSyncTemplate<Alarm>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::TABLE_NAME = "t003_alarms";
+		template<> const int SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::TABLE_ID = 3;
+		template<> const bool SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::HAS_AUTO_INCREMENT = true;
 	    
-	    template<> void SQLiteTableSyncTemplate<Alarm>::load(Alarm* alarm, const SQLiteResultSPtr& rows)
+	    template<> void SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::load(Alarm* alarm, const SQLiteResultSPtr& rows)
 	    {
-		if (rows->getBool ( AlarmTableSync::COL_IS_TEMPLATE))
-		{
-		    AlarmTemplate* talarm = dynamic_cast<AlarmTemplate*>(alarm);
-		    talarm->setKey(rows->getLongLong (TABLE_COL_ID));
+			if (rows->getBool ( AlarmTableSync::COL_IS_TEMPLATE))
+			{
+				AlarmTemplate* talarm = dynamic_cast<AlarmTemplate*>(alarm);
+				talarm->setKey(rows->getLongLong (TABLE_COL_ID));
+			}
+			else
+			{
+				if (rows->getLongLong ( AlarmTableSync::COL_SCENARIO_ID))
+				{
+				ScenarioSentAlarm* salarm = dynamic_cast<ScenarioSentAlarm*>(alarm);
+				salarm->setKey(rows->getLongLong (TABLE_COL_ID));
+				}
+				else
+				{
+				SingleSentAlarm* salarm = dynamic_cast<SingleSentAlarm*>(alarm);
+				salarm->setPeriodStart(DateTime::FromSQLTimestamp (rows->getText ( AlarmTableSync::COL_PERIODSTART)));
+				salarm->setPeriodEnd(DateTime::FromSQLTimestamp (rows->getText ( AlarmTableSync::COL_PERIODEND)));
+				salarm->setIsEnabled(rows->getBool ( AlarmTableSync::COL_ENABLED));
+				salarm->setKey(rows->getLongLong (TABLE_COL_ID));
+				}
+			}
+			alarm->setLevel ((AlarmLevel) rows->getInt ( AlarmTableSync::COL_LEVEL));
+			alarm->setShortMessage (rows->getText (AlarmTableSync::COL_SHORT_MESSAGE));
+			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
 		}
-		else
+
+		template<> void SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::_link(Alarm* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
-		    if (rows->getLongLong ( AlarmTableSync::COL_SCENARIO_ID))
-		    {
-			ScenarioSentAlarm* salarm = dynamic_cast<ScenarioSentAlarm*>(alarm);
-			salarm->setKey(rows->getLongLong (TABLE_COL_ID));
-		    }
-		    else
-		    {
-			SingleSentAlarm* salarm = dynamic_cast<SingleSentAlarm*>(alarm);
-			salarm->setPeriodStart(DateTime::FromSQLTimestamp (rows->getText ( AlarmTableSync::COL_PERIODSTART)));
-			salarm->setPeriodEnd(DateTime::FromSQLTimestamp (rows->getText ( AlarmTableSync::COL_PERIODEND)));
-			salarm->setIsEnabled(rows->getBool ( AlarmTableSync::COL_ENABLED));
-			salarm->setKey(rows->getLongLong (TABLE_COL_ID));
-		    }
 		}
-		alarm->setLevel ((AlarmLevel) rows->getInt ( AlarmTableSync::COL_LEVEL));
-		alarm->setShortMessage (rows->getText (AlarmTableSync::COL_SHORT_MESSAGE));
-		alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
-	}
-    
-	    template<> void SQLiteTableSyncTemplate<Alarm>::save(Alarm* object)
+
+
+
+		template<> void SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::_unlink(Alarm* obj)
+		{
+		}
+ 
+
+	    template<> void SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::save(Alarm* object)
 	    {
 		stringstream query;
 		
@@ -162,7 +178,7 @@ namespace synthese
 		const std::string AlarmTableSync::COL_SCENARIO_ID = "scenario_id"; 
 		
 		AlarmTableSync::AlarmTableSync ()
-		: SQLiteTableSyncTemplate<Alarm>(true, true, TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteTableSyncTemplate<AlarmTableSync,Alarm>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_IS_TEMPLATE, "INTEGER", true);

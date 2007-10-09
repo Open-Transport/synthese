@@ -67,7 +67,7 @@ namespace synthese
 		const std::string MapRequest::MAP_PARAMETER ("map");
 
 		/// @todo Parameter names declarations
-		// eg const std::string AdminRequest::PARAMETER_PAGE = "rub";
+		// eg const std::string AdminQueryString::PARAMETER_PAGE = "rub";
 		
 		/// @todo build of the attributes
 		MapRequest::MapRequest()

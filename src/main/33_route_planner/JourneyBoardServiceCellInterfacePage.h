@@ -26,6 +26,8 @@
 #include "11_interfaces/InterfacePage.h"
 #include "04_time/DateTime.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <boost/logic/tribool.hpp>
 
 namespace synthese
@@ -74,7 +76,7 @@ namespace synthese
 			Object :
 				- CommercialLine
 		*/
-		class JourneyBoardServiceCellInterfacePage : public interfaces::InterfacePage
+		class JourneyBoardServiceCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardServiceCellInterfacePage>
 		{
 		public:
 			/** Display.

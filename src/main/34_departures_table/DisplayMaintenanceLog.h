@@ -77,19 +77,19 @@ namespace synthese
 			std::string getObjectName(uid id) const;
 			
 			static void	addAdminEntry(
-				boost::shared_ptr<const DisplayScreen> screen
+				const DisplayScreen* screen
 				, const dblog::DBLogEntry::Level& level
-				, boost::shared_ptr<const security::User> user
+				, const security::User* user
 				, const std::string& field
 				, const std::string& oldValue
 				, const std::string& newValue
 			);
 			static void	addStatusEntry(
-				boost::shared_ptr<const DisplayScreen> screen
+				const DisplayScreen* screen
 				, bool status
 			);
 			static void addControlEntry(
-				boost::shared_ptr<const DisplayScreen> screen
+				const DisplayScreen* screen
 				, bool messageOK
 				, bool cpuOK
 				, std::string cpuCode

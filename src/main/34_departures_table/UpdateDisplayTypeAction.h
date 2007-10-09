@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define SYNTHESE_UpdateDisplayTypeAction_H__
 
 #include "01_util/UId.h"
+#include "01_util/FactorableTemplate.h"
 
 #include "30_server/Action.h"
 
@@ -36,8 +37,10 @@ namespace synthese
 
 	namespace departurestable
 	{
+		class DisplayType;
+
 		/** UpdateDisplayTypeAction action class.
-		@ingroup m34
+			@ingroup m34Actions refActions
 		*/
 		class UpdateDisplayTypeAction : public util::FactorableTemplate<server::Action, UpdateDisplayTypeAction>
 		{

@@ -24,7 +24,6 @@
 
 #include "04_time/DateTime.h"
 
-
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
 
@@ -41,6 +40,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace env;
 	using namespace time;
+
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement, departurestable::DeparturesTableTimeContentInterfaceElement>::FACTORY_KEY("departurestabletimecell");
 
 	namespace departurestable
 	{

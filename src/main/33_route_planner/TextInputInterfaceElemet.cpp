@@ -33,6 +33,8 @@ namespace synthese
 {
 	using namespace interfaces;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::TextInputInterfaceElemet>::FACTORY_KEY("route_planner_input");
+
 	namespace routeplanner
 	{
 		const std::string TextInputInterfaceElemet::FIELD_ORIGIN_CITY("origin_city");

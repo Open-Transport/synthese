@@ -27,8 +27,7 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
 
-#include "15_env/City.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "15_env/CityTableSync.h"
 
 #include <boost/tokenizer.hpp>
 #include <sqlite/sqlite3.h>
@@ -43,20 +42,21 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,env::ConnectionPlaceTableSync>::FACTORY_KEY("15.40.01 Connection places");
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::TABLE_NAME = "t007_connection_places";
-		template<> const int SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::TABLE_ID = 7;
-		template<> const bool SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::TABLE_NAME = "t007_connection_places";
+		template<> const int SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::TABLE_ID = 7;
+		template<> const bool SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::load(PublicTransportStopZoneConnectionPlace* cp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::load(PublicTransportStopZoneConnectionPlace* cp, const db::SQLiteResultSPtr& rows )
 		{
 			// Reading of the row
 			uid id (rows->getLongLong (TABLE_COL_ID));
 			string name (rows->getText (ConnectionPlaceTableSync::TABLE_COL_NAME));
 			string name13(rows->getText(ConnectionPlaceTableSync::COL_NAME13));
 			string name26(rows->getText(ConnectionPlaceTableSync::COL_NAME26));
-			uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
 			ConnectionPlace::ConnectionType connectionType = 
 			    static_cast<ConnectionPlace::ConnectionType>(rows->getInt (ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
 			int defaultTransferDelay (rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY));
@@ -69,7 +69,6 @@ namespace synthese
 				cp->setName13(name13);
 			if (!name26.empty())
 				cp->setName26(name26);
-			cp->setCity(City::Get(cityId).get());
 			cp->setConnectionType (connectionType);
 			cp->setDefaultTransferDelay (defaultTransferDelay);
 
@@ -91,6 +90,40 @@ namespace synthese
 				cp->addTransferDelay (startStop, endStop, Conversion::ToInt (*(++valueIter)));
 			}
 		}
+
+		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::save(PublicTransportStopZoneConnectionPlace* obj)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::_link(PublicTransportStopZoneConnectionPlace* cp, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
+			cp->setCity(CityTableSync::Get(cityId,cp,true,temporary));
+
+			if (!temporary)
+			{
+				shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
+
+				bool isCityMainConnection (	rows->getBool (ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION));
+				if (isCityMainConnection)
+				{
+					city->addIncludedPlace (cp);
+				}
+				city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
+				city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
+			}
+		}
+
+		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::_unlink(PublicTransportStopZoneConnectionPlace* cp)
+		{
+			shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
+
+			city->getConnectionPlacesMatcher ().remove (cp->getName ());
+			city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
+
+			cp->setCity(NULL);
+		}
 	}
 
 	namespace env
@@ -106,7 +139,7 @@ namespace synthese
 
 
 		ConnectionPlaceTableSync::ConnectionPlaceTableSync ()
-		: SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace> (true, false, db::TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace> ()
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER", true);
 			addTableColumn (TABLE_COL_NAME, "TEXT", true);
@@ -131,7 +164,7 @@ namespace synthese
 
 		}
 
-		    
+/*		    
 		void ConnectionPlaceTableSync::rowsAdded(
 			SQLite* sqlite
 			, SQLiteSync* sync
@@ -227,7 +260,7 @@ namespace synthese
 			    PublicTransportStopZoneConnectionPlace::Remove (id);
 			}
 		}
-	    
+*/	    
 
 	}
 }

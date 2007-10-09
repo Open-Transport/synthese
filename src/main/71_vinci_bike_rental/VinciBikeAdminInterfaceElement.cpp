@@ -30,6 +30,7 @@
 #include "05_html/HTMLForm.h"
 
 #include "30_server/ActionFunctionRequest.h"
+#include "30_server/QueryString.h"
 
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminParametersException.h"
@@ -105,10 +106,10 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+				ParametersMap::const_iterator it = map.find(QueryString::PARAMETER_OBJECT_ID);
 				if (it != map.end())
 				{
-					if (Conversion::ToLongLong(it->second) == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+					if (Conversion::ToLongLong(it->second) == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 						return;
 					_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
 				}

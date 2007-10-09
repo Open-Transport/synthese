@@ -34,6 +34,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace messages;
 	using namespace env;
+
+	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardJunctionCellInterfacePage>::FACTORY_KEY("journey_board_junction_cell");
 	
 	namespace routeplanner
 	{

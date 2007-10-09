@@ -32,6 +32,8 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 
+	template<> const string util::FactorableTemplate<InterfacePage,DateTimeInterfacePage>::FACTORY_KEY("datetime");
+
 	namespace util
 	{
 		// template<> const string FactoryTemplate<InterfacePage, DateTimeInterfacePage>::FACTORY_KEY("datetime");

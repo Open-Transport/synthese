@@ -25,6 +25,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace env
@@ -51,7 +53,7 @@ namespace synthese
 				- 3 : Odd or even row in the journey board
 				- 4 : Road name
 		*/
-		class JourneyBoardJunctionCellInterfacePage : public interfaces::InterfacePage
+		class JourneyBoardJunctionCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardJunctionCellInterfacePage>
 		{
 		public:
 			/** Display.

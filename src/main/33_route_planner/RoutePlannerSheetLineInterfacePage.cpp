@@ -26,6 +26,9 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
+
+	template<> const std::string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerSheetLineInterfacePage>::FACTORY_KEY("schedule_sheet_row");
+
 	
 	namespace routeplanner
 	{

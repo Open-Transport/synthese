@@ -67,11 +67,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\DbModuleConfigTableSync.cpp"
+				RelativePath=".\DbModuleClass.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\DbModuleConfigTableSync.h"
+				RelativePath=".\DbModuleClass.h"
 				>
 			</File>
 			<File
@@ -112,14 +112,6 @@
 			</File>
 			<File
 				RelativePath=".\SQLiteLazyResult.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteQueueThreadExec.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteQueueThreadExec.h"
 				>
 			</File>
 			<File
@@ -188,6 +180,14 @@
 			Name="00 Factory"
 			>
 			<File
+				RelativePath=".\SQLiteNoSyncTableSyncTemplate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteRegistryTableSyncTemplate.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SQLiteTableSync.cpp"
 				>
 			</File>
@@ -197,6 +197,18 @@
 			</File>
 			<File
 				RelativePath=".\SQLiteTableSyncTemplate.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="10 Table Sync"
+			>
+			<File
+				RelativePath=".\DbModuleConfigTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DbModuleConfigTableSync.h"
 				>
 			</File>
 		</Filter>
@@ -218,14 +230,6 @@
 		</File>
 		<File
 			RelativePath=".\DBModule.inc.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\DbModuleClass.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\DbModuleClass.h"
 			>
 		</File>
 		<File

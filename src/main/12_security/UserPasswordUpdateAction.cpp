@@ -20,15 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "UserPasswordUpdateAction.h"
+
+#include "12_security/UserTableSync.h"
+
 #include "02_db/DBEmptyResultException.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "12_security/UserPasswordUpdateAction.h"
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
-
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 
@@ -36,6 +36,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+
+	template<> const string util::FactorableTemplate<Action, security::UserPasswordUpdateAction>::FACTORY_KEY("upua");
 	
 	namespace security
 	{
@@ -54,17 +56,12 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::get(_request->getObjectId());
+				_user = UserTableSync::GetUpdateable(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
+				_password = map.getString(PARAMETER_PASS1, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_PASS1);
-				if (it == map.end())
-					throw ActionException("Mot de passe non spécifié");
-				_password = it->second;
-
-				it = map.find(PARAMETER_PASS2);
-				if (it == map.end() || it->second != _password)
+				string pass2(map.getString(PARAMETER_PASS2, false, FACTORY_KEY));
+				if (pass2 != _password)
 					throw ActionException("Les mots de passe entrés ne sont pas identiques");
 			}
 			catch (DBEmptyResultException<User>)

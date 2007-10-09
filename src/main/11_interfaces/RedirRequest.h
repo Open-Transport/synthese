@@ -25,6 +25,8 @@
 
 #include "11_interfaces/RequestWithInterface.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace interfaces
@@ -34,7 +36,7 @@ namespace synthese
 
 			The redirection avoids to run an action.
 		*/
-		class RedirRequest : public RequestWithInterface
+		class RedirRequest : public util::FactorableTemplate<RequestWithInterface,RedirRequest>
 		{
 			static const std::string PARAMETER_URL;
 			

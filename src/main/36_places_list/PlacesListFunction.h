@@ -27,6 +27,8 @@
 
 #include "36_places_list/FunctionWithSite.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace env
@@ -43,7 +45,7 @@ namespace synthese
 			@date 2007
 			@ingroup m36Functions refFunctions
 		*/
-		class PlacesListFunction : public FunctionWithSite
+		class PlacesListFunction : public util::FactorableTemplate<FunctionWithSite,PlacesListFunction>
 		{
 		public:
 			static const std::string PARAMETER_INPUT;

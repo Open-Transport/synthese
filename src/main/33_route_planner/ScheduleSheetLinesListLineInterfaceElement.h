@@ -22,11 +22,13 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace routeplanner
 	{
-		class ScheduleSheetLinesListLineInterfaceElement : public interfaces::LibraryInterfaceElement
+		class ScheduleSheetLinesListLineInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,ScheduleSheetLinesListLineInterfaceElement>
 		{
 		private:
 			static const bool _registered;

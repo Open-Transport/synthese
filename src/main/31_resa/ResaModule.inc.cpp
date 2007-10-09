@@ -12,3 +12,4 @@
 #include "31_resa/ReservationsListInterfacePage.h"
 
 #include "31_resa/BookableCommercialLinesInterfaceElement.h"
+#include "31_resa/ReservationsListInterfaceElement.h"

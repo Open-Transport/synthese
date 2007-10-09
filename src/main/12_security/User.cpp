@@ -25,7 +25,6 @@
 #include "12_security/User.h"
 #include "12_security/UserException.h"
 
-using boost::shared_ptr;
 using namespace std;
 
 namespace synthese
@@ -49,7 +48,7 @@ namespace synthese
 		{
 		}
 
-		void User::setProfile(shared_ptr<const Profile> profile )
+		void User::setProfile(const Profile* profile )
 		{
 			_profile = profile;
 		}
@@ -74,7 +73,7 @@ namespace synthese
 			_surname = surname;
 		}
 
-		shared_ptr<const Profile> User::getProfile() const
+		const Profile* User::getProfile() const
 		{
 			return _profile;
 		}
@@ -193,6 +192,16 @@ namespace synthese
 				s << getSurname() << " ";
 			s << getName();
 			return s.str();
+		}
+
+		void User::setCityId( uid cityId )
+		{
+			_cityId = cityId;
+		}
+
+		uid User::getCityId() const
+		{
+			return _cityId;
 		}
 	}
 }

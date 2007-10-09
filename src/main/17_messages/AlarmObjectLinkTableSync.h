@@ -47,11 +47,11 @@ namespace synthese
 	namespace messages
 	{
 		/** Alarm object links table synchronizer.
-			@ingroup m17
+			@ingroup m17LS refLS
 			
 			Only the links concerning the sent alarms are loaded in ram.
 		*/
-		class AlarmObjectLinkTableSync : public db::SQLiteTableSyncTemplate<AlarmObjectLink>
+		class AlarmObjectLinkTableSync : public db::SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;
@@ -69,7 +69,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			template<class T>
+			template<class K, class T>
 			static std::vector<boost::shared_ptr<T> > search(
 				const Alarm* alarm,
 				const std::string& recipientKey,
@@ -121,7 +121,7 @@ namespace synthese
 
 		};
 
-		template<class T>
+		template<class K, class T>
 		std::vector< boost::shared_ptr<T> > AlarmObjectLinkTableSync::search(const Alarm* alarm, const std::string& recipientKey, int first /*= 0*/, int number /*= 0*/ )
 		{
 			std::stringstream query;
@@ -143,7 +143,7 @@ namespace synthese
 				std::vector< boost::shared_ptr<T> > objects;
 				while (rows->next ())
 				{
-				    objects.push_back (db::SQLiteTableSyncTemplate<T>::get(
+				    objects.push_back (db::SQLiteTableSyncTemplate<K,T>::GetUpdateable(
 							   rows->getLongLong (COL_OBJECT_ID)));
 				}
 				return objects;

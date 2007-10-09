@@ -57,7 +57,7 @@ namespace synthese
 			return v;
 		}
 
-		void SecurityLog::addUserLogin( shared_ptr<const User> user )
+		void SecurityLog::addUserLogin(const User* user )
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(LOGIN_ENTRY));
@@ -66,7 +66,7 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, user->getKey());
 		}
 
-		void SecurityLog::addUserAdmin(shared_ptr<const User> user, shared_ptr<const User> subject, const string& text)
+		void SecurityLog::addUserAdmin(const User* user, const User* subject, const string& text)
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(USER_ADMIN_ENTRY));
@@ -75,7 +75,7 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, subject->getKey());
 		}
 
-		void SecurityLog::addProfileAdmin( shared_ptr<const User> user, shared_ptr<const Profile> subject, const std::string& text )
+		void SecurityLog::addProfileAdmin(const User* user, const Profile* subject, const std::string& text )
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(PROFILE_ADMIN_ENTRY));
@@ -93,7 +93,7 @@ namespace synthese
 			case LOGIN_ENTRY:
 				try
 				{
-					shared_ptr<User> user(UserTableSync::get(Conversion::ToLongLong(cols[1])));
+					shared_ptr<const User> user(UserTableSync::Get(Conversion::ToLongLong(cols[1])));
 					v.push_back(user->getLogin());
 				}
 				catch(...)
@@ -107,7 +107,7 @@ namespace synthese
 			case USER_ADMIN_ENTRY:
 				try
 				{
-					shared_ptr<User> user(UserTableSync::get(Conversion::ToLongLong(cols[1])));
+					shared_ptr<const User> user(UserTableSync::Get(Conversion::ToLongLong(cols[1])));
 					v.push_back(user->getLogin());
 				}
 				catch(...)
@@ -121,7 +121,7 @@ namespace synthese
 			case PROFILE_ADMIN_ENTRY:
 				try
 				{
-					shared_ptr<Profile> profile(ProfileTableSync::get(Conversion::ToLongLong(cols[1])));
+					shared_ptr<const Profile> profile(ProfileTableSync::Get(Conversion::ToLongLong(cols[1])));
 					v.push_back(profile->getName());
 				}
 				catch(...)

@@ -30,6 +30,8 @@
 
 #include "04_time/DateTime.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace transportwebsite
@@ -49,7 +51,7 @@ namespace synthese
 		/** Route planning Function class.
 			@ingroup m53Functions refFunctions
 		*/
-		class RoutePlannerFunction : public transportwebsite::FunctionWithSite
+		class RoutePlannerFunction : public util::FactorableTemplate<transportwebsite::FunctionWithSite,RoutePlannerFunction>
 		{
 		public:
 			static const std::string PARAMETER_SITE;

@@ -20,18 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "12_security/User.h"
+#include "DelUserAction.h"
+
 #include "12_security/UserTableSync.h"
-#include "12_security/DelUserAction.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+
+	template<> const string util::FactorableTemplate<Action, security::DelUserAction>::FACTORY_KEY("sdu");
 	
 	namespace security
 	{
@@ -44,7 +47,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::get(_request->getObjectId());
+				_user = UserTableSync::Get(_request->getObjectId());
 			}
 			catch (User::RegistryKeyException e)
 			{

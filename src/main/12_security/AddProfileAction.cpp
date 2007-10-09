@@ -20,15 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "AddProfileAction.h"
 
 #include "12_security/Profile.h"
 #include "12_security/ProfileTableSync.h"
-#include "12_security/AddProfileAction.h"
 #include "12_security/GlobalRight.h"
 #include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/QueryString.h"
+#include "30_server/ParametersMap.h"
 #include "30_server/Request.h"
 
 using namespace std;
@@ -39,6 +40,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace dblog;
+
+	template<> const string util::FactorableTemplate<Action, security::AddProfileAction>::FACTORY_KEY("apa");
 	
 	namespace security
 	{
@@ -49,29 +52,24 @@ namespace synthese
 		ParametersMap AddProfileAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_NAME, _name));
+			map.insert(PARAMETER_NAME, _name);
 			if (_templateProfile.get())
-				map.insert(make_pair(PARAMETER_TEMPLATE_ID, Conversion::ToString(_templateProfile->getKey())));
+				map.insert(PARAMETER_TEMPLATE_ID, _templateProfile->getKey());
 			return map;
 		}
 
 		void AddProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			// Name
-			it = map.find(PARAMETER_NAME);
-			if (it == map.end())
-				throw ActionException("Name not specified");
-			_name = it->second;
+			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 
 			// Template
-			it = map.find(PARAMETER_TEMPLATE_ID);
-			if (it != map.end() && Conversion::ToLongLong(it->second) != UNKNOWN_VALUE)
+			uid id = map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY);
+			if (id != UNKNOWN_VALUE)
 			{
-				if (!Profile::Contains(Conversion::ToLongLong(it->second)))
+				if (!Profile::Contains(id))
 					throw ActionException("Specified root profile not found.");
-				_templateProfile = Profile::Get(Conversion::ToLongLong(it->second));
+				_templateProfile = ProfileTableSync::Get(id);
 			}
 
 			// Name unicity
@@ -79,7 +77,7 @@ namespace synthese
 			if (!existingProfiles.empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 
-			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void AddProfileAction::run()
@@ -104,7 +102,7 @@ namespace synthese
 			_request->setObjectId(profile->getKey());
 
 			// DBLog
-			SecurityLog::addProfileAdmin(_request->getUser(), profile, "Création du profil" + (_templateProfile.get() ? " à partir de " + _templateProfile->getName() : string()));
+			SecurityLog::addProfileAdmin(_request->getUser().get(), profile.get(), "Création du profil" + (_templateProfile.get() ? " à partir de " + _templateProfile->getName() : string()));
 		}
 	}
 }

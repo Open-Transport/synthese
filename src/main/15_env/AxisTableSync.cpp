@@ -42,13 +42,18 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,AxisTableSync>::FACTORY_KEY("15.20.03 Axes");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Axis>::TABLE_NAME = "t004_axes";
-		template<> const int SQLiteTableSyncTemplate<Axis>::TABLE_ID = 4;
-		template<> const bool SQLiteTableSyncTemplate<Axis>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AxisTableSync,Axis>::TABLE_NAME = "t004_axes";
+		template<> const int SQLiteTableSyncTemplate<AxisTableSync,Axis>::TABLE_ID = 4;
+		template<> const bool SQLiteTableSyncTemplate<AxisTableSync,Axis>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Axis>::load(Axis* axis, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteTableSyncTemplate<AxisTableSync,Axis>::load(Axis* axis, const db::SQLiteResultSPtr& rows)
 		{
 		    axis->setKey(rows->getLongLong (TABLE_COL_ID));
 		    axis->setName (rows->getText (AxisTableSync::COL_NAME));
@@ -57,7 +62,18 @@ namespace synthese
 		}
 	    
 
-		template<> void SQLiteTableSyncTemplate<Axis>::save(Axis* object)
+
+		template<> void SQLiteTableSyncTemplate<AxisTableSync,Axis>::_link(Axis* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<AxisTableSync,Axis>::_unlink(Axis* obj)
+		{
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<AxisTableSync,Axis>::save(Axis* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -90,48 +106,12 @@ namespace synthese
 
 
 		AxisTableSync::AxisTableSync()
-			: SQLiteTableSyncTemplate<Axis>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<AxisTableSync,Axis>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_NAME, "TEXT", true);
 			addTableColumn (COL_FREE, "BOOLEAN", true);
 			addTableColumn (COL_ALLOWED, "BOOLEAN", true);
-		}
-
-		void AxisTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				Axis* object(new Axis());
-				load(object, rows);
-				object->store();
-			}
-		}
-
-		void AxisTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid lineId = rows->getLongLong (TABLE_COL_ID);
-				if (Axis::Contains(lineId))
-				{
-					shared_ptr<Axis> object = Axis::GetUpdateable(lineId);
-					load(object.get(), rows);
-					object->store();
-				}
-			}
-		}
-
-		void AxisTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid lineId = rows->getLongLong (TABLE_COL_ID);
-				if (Axis::Contains(lineId))
-				{
-					Axis::Remove(lineId);
-				}
-			}
 		}
 
 		std::vector<shared_ptr<Axis> > AxisTableSync::search(int first /*= 0*/, int number /*= 0*/ )

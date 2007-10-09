@@ -54,7 +54,7 @@ namespace synthese
 				- un administrateur a accès à tous les composants d'administration.
 			
 		*/
-		class AdminInterfaceElement : public util::Factorable
+		class AdminInterfaceElement : public util::Factorable<AdminInterfaceElement>
 		{
 		public:
 			typedef enum { EVER_DISPLAYED, DISPLAYED_IF_CURRENT, NEVER_DISPLAYED } DisplayMode;

@@ -20,9 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
-
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 #include "17_messages/AlarmRemoveLinkAction.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
@@ -33,7 +33,9 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
-	
+
+	template<> const string util::FactorableTemplate<Action, messages::AlarmRemoveLinkAction>::FACTORY_KEY("marla");
+
 	namespace messages
 	{
 		const string AlarmRemoveLinkAction::PARAMETER_ALARM_ID = Action_PARAMETER_PREFIX + "aid";
@@ -43,24 +45,15 @@ namespace synthese
 		ParametersMap AlarmRemoveLinkAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_ALARM_ID, Conversion::ToString(_alarmId)));
-			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_objectId)));
+			map.insert(PARAMETER_ALARM_ID, _alarmId);
+			map.insert(PARAMETER_OBJECT_ID, _objectId);
 			return map;
 		}
 
 		void AlarmRemoveLinkAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_OBJECT_ID);
-			if (it == map.end())
-				throw ActionException("Object ID not specified");
-			_objectId = Conversion::ToLongLong(it->second);
-
-			it = map.find(PARAMETER_ALARM_ID);
-			if (it == map.end())
-				throw ActionException("Alarm ID not specified");
-			_alarmId = Conversion::ToLongLong(it->second);
+			_objectId = map.getUid(PARAMETER_OBJECT_ID, true, FACTORY_KEY);
+			_alarmId = map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY);
 		}
 
 		void AlarmRemoveLinkAction::run()

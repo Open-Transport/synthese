@@ -28,12 +28,20 @@
 
 #include "11_interfaces/ValueElementList.h"
 
+#include "01_util/Conversion.h"
+
 using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace server;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<interfaces::LibraryInterfaceElement, transportwebsite::PlacesListRequestInterfaceElement>::FACTORY_KEY("places_list_request");
+	}
 
 	namespace transportwebsite
 	{

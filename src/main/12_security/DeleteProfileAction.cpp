@@ -21,19 +21,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <vector>
 
-#include "01_util/Conversion.h"
+#include "DeleteProfileAction.h"
 
-#include "12_security/DeleteProfileAction.h"
-#include "12_security/Profile.h"
-#include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
+
+#include <vector>
 
 using namespace std;
 using boost::shared_ptr;
@@ -42,6 +41,8 @@ namespace synthese
 {
 	using namespace server;
 	
+	template<> const std::string util::FactorableTemplate<Action,security::DeleteProfileAction>::FACTORY_KEY("dpa");
+
 	namespace security
 	{
 		ParametersMap DeleteProfileAction::getParametersMap() const
@@ -54,7 +55,7 @@ namespace synthese
 		{
 			if (!Profile::Contains(_request->getObjectId()))
 				throw ActionException("Specified Profile not found");
-			_profile = Profile::Get(_request->getObjectId());
+			_profile = ProfileTableSync::Get(_request->getObjectId());
 
 			// Search of child profiles
 			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(_profile, 0, 1);
@@ -72,7 +73,7 @@ namespace synthese
 			ProfileTableSync::remove(_profile->getKey());
 
 			// Log
-			SecurityLog::addProfileAdmin(_request->getUser(), _profile, "Suppression de " + _profile->getName());
+			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), "Suppression de " + _profile->getName());
 		}
 	}
 }

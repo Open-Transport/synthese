@@ -27,6 +27,8 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace routeplanner
@@ -40,7 +42,7 @@ namespace synthese
 				- 0 : Form name
 				- 1 : HTML complement
 		*/
-		class RequestInterfaceElement : public interfaces::LibraryInterfaceElement
+		class RequestInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,RequestInterfaceElement>
 		{
 			// List of parameters to store
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _formName;

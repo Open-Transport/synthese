@@ -103,8 +103,8 @@ namespace synthese
 		protected:
 			//! \name Localization
 			//@{
-				boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_localization;		//!< Localization of the display screen (belongs to a place)
-				std::string									_localizationComment;
+				const env::PublicTransportStopZoneConnectionPlace*	_localization;		//!< Localization of the display screen (belongs to a place)
+				std::string											_localizationComment;
 			//@}
 
 			//! \name Technical data
@@ -173,7 +173,7 @@ namespace synthese
 				void	setDirection(DeparturesTableDirection direction);
 				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
-				void	setLocalization(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>);
+				void	setLocalization(const env::PublicTransportStopZoneConnectionPlace*);
 				void	setLocalizationComment(const std::string&);
 				void	setMaintenanceChecksPerDay(int number);
 				void	setMaintenanceIsOnline(bool value);
@@ -199,16 +199,16 @@ namespace synthese
 				void	clearForbiddenPlaces();
 				void	clearForcedDestinations();
 				void	clearPhysicalStops();
-				void	copy(boost::shared_ptr<const DisplayScreen>);
-				void	removeDisplayedPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>);
-				void	removeForbiddenPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>);
-				void	removeForcedDestination(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>);
-				void	removePhysicalStop(boost::shared_ptr<const env::PhysicalStop>);
+				void	copy(const DisplayScreen*);
+				void	removeDisplayedPlace(const env::PublicTransportStopZoneConnectionPlace*);
+				void	removeForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace*);
+				void	removeForcedDestination(const env::PublicTransportStopZoneConnectionPlace*);
+				void	removePhysicalStop(const env::PhysicalStop*);
 			//@}
 
 			//!	\name Getters
 			//@{
-				boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	getLocalization()				const;
+				const env::PublicTransportStopZoneConnectionPlace*	getLocalization()	const;
 				const std::string&				getLocalizationComment()		const;
 				const DisplayType*				getType()						const;				
 				int								getWiringCode()					const;
@@ -244,7 +244,7 @@ namespace synthese
 				const env::PhysicalStops&							getPhysicalStops(bool result=true)										const;
 
 				std::vector<std::pair<uid, std::string> > 
-					getSortedAvaliableDestinationsLabels(const std::set<const env::PublicTransportStopZoneConnectionPlace*>& placesToAvoid)	const;
+					getSortedAvaliableDestinationsLabels(const DisplayedPlacesList& placesToAvoid)	const;
 			//@}
 
 		};

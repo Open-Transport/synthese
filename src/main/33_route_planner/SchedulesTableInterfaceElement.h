@@ -24,6 +24,8 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <vector>
 #include <sstream>
 
@@ -41,7 +43,7 @@ namespace synthese
 			@code schedules_table @endcode
 			@ingroup m53Library refLibrary
 		*/
-		class SchedulesTableInterfaceElement : public interfaces::LibraryInterfaceElement
+		class SchedulesTableInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,SchedulesTableInterfaceElement>
 		{
 		private:
 			static const bool _registered;

@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -36,7 +38,7 @@ namespace synthese
 		/** DisplayTypeRemoveAction action class.
 			@ingroup m34Actions refActions
 		*/
-		class DisplayTypeRemoveAction : public server::Action
+		class DisplayTypeRemoveAction : public util::FactorableTemplate<server::Action, DisplayTypeRemoveAction>
 		{
 		public:
 			static const std::string PARAMETER_TYPE_ID;

@@ -47,13 +47,18 @@ namespace synthese
 	using namespace messages;
 	using namespace time;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,ScenarioTableSync>::FACTORY_KEY("17.00.01 Alarm scenarii");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Scenario>::TABLE_NAME = "t039_scenarios";
-		template<> const int SQLiteTableSyncTemplate<Scenario>::TABLE_ID = 39;
-		template<> const bool SQLiteTableSyncTemplate<Scenario>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::TABLE_NAME = "t039_scenarios";
+		template<> const int SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::TABLE_ID = 39;
+		template<> const bool SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Scenario>::load(Scenario* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::load(Scenario* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setName(rows->getText ( ScenarioTableSync::COL_NAME));
 			if (rows->getBool ( ScenarioTableSync::COL_IS_TEMPLATE))
@@ -71,7 +76,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<Scenario>::save(Scenario* object)
+		template<> void SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::save(Scenario* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -128,7 +133,7 @@ namespace synthese
 
 		
 		ScenarioTableSync::ScenarioTableSync()
-			: SQLiteTableSyncTemplate<Scenario>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_IS_TEMPLATE, "INTEGER");

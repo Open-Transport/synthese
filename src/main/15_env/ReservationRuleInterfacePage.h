@@ -27,6 +27,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace server
@@ -52,7 +54,7 @@ namespace synthese
 			 - Reservation delay
 			 - Reservation deadline
 		*/
-		class ReservationRuleInterfacePage : public interfaces::InterfacePage
+		class ReservationRuleInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,env::ReservationRuleInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

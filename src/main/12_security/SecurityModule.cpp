@@ -40,6 +40,8 @@ namespace synthese
 {
 	using namespace util;
 
+	template<> const string util::FactorableTemplate<ModuleClass, security::SecurityModule>::FACTORY_KEY("12_security");
+
 	namespace security
 	{
 		const std::string SecurityModule::ROOT_PROFILE = "root";
@@ -69,13 +71,15 @@ namespace synthese
 
 			vector<shared_ptr<User> > users = UserTableSync::search(ROOT_USER, ROOT_USER, _rootProfile);
 			if (users.size() == 0)
+			{
 				_rootUser.reset(new User);
+				_rootUser->setLogin(ROOT_USER);
+				_rootUser->setPassword(ROOT_USER);
+			}
 			else
 				_rootUser = users.front();
 			_rootUser->setName(ROOT_USER);
-			_rootUser->setLogin(ROOT_USER);
-			_rootUser->setPassword(ROOT_USER);
-			_rootUser->setProfile(_rootProfile);
+			_rootUser->setProfile(_rootProfile.get());
 			_rootUser->setConnectionAllowed(true);
 			UserTableSync::save(_rootUser.get());
 		}

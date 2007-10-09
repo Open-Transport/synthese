@@ -76,7 +76,7 @@ namespace synthese
 
 		void MessagesLibraryAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			_requestParameters = ResultHTMLTable::getParameters(map, PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
+			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
 		}
 
 		string MessagesLibraryAdmin::getTitle() const

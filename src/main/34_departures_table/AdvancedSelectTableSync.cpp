@@ -37,6 +37,8 @@
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 
+#include "01_util/Conversion.h"
+
 using namespace std;
 using namespace boost;
 
@@ -45,6 +47,7 @@ namespace synthese
 	using namespace db;
 	using namespace env;
 	using namespace security;
+	using namespace util;
 
 	namespace departurestable
 	{

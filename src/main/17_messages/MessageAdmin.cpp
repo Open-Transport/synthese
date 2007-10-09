@@ -39,6 +39,7 @@
 #include "17_messages/MessagesLibraryAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
+#include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -80,16 +81,14 @@ namespace synthese
 
 		void MessageAdmin::setFromParametersMap( const ParametersMap& map )
 		{
-			ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
-			if (it == map.end())
-				throw AdminParametersException("Missing message ID");
+			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 
-			if (Conversion::ToLongLong(it->second) == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
 			try
 			{
-				_alarm = AlarmTableSync::getAlarm(Conversion::ToLongLong(it->second));
+				_alarm = AlarmTableSync::getAlarm(id);
 			}
 			catch(...)
 			{
@@ -183,7 +182,7 @@ namespace synthese
 				// Alarm messages destinations loop
 				for (Factory<AlarmRecipient>::Iterator arit = Factory<AlarmRecipient>::begin(); arit != Factory<AlarmRecipient>::end(); ++arit)
 				{
-					addRequest.getAction()->setRecipientKey(arit->getFactoryKey());
+					addRequest.getAction()->setRecipientKey(arit.getKey());
 				
 					stream << "<h1>Diffusion sur " << arit->getTitle() << "</h1>";
 

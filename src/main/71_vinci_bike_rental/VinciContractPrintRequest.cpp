@@ -47,7 +47,7 @@ namespace synthese
 
 	namespace vinci
 	{
-		const std::string VinciContractPrintRequest::PARAMETER_CONTRACT_ID = "ctr";
+		const std::string VinciContractPrintQueryString::PARAMETER_CONTRACT_ID = "ctr";
 
 		ParametersMap VinciContractPrintRequest::_getParametersMap() const
 		{

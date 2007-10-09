@@ -32,6 +32,8 @@
 #include "02_db/DBEmptyResultException.h"
 #include "02_db/SQLiteException.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <sstream>
 #include <string>
 
@@ -45,19 +47,21 @@
 
 namespace synthese
 {
-	using namespace util;
-
 	namespace db
 	{
 		/** Table synchronizer template.
 			@ingroup m02
 		*/
-		template <class T>
-		class SQLiteTableSyncTemplate : public SQLiteTableSync
+		template <class K, class T>
+		class SQLiteTableSyncTemplate : public util::FactorableTemplate<SQLiteTableSync, K>
 		{
 		public:
 			static const std::string	TABLE_NAME;		//!< Table name in the database
 			static const int			TABLE_ID;		//!< Table ID used by util::encodeID and util::decodeTableId
+			static bool					ALLOW_INSERT;
+			static bool					ALLOW_REMOVE;
+			static bool					TRIGGER_OVERRIDE_CLAUSE;
+			static const bool			IGNORE_CALLBACKS_ON_FIRST_SYNC;
 
 		protected:
 			static const bool HAS_AUTO_INCREMENT;
@@ -72,11 +76,11 @@ namespace synthese
 			static uid getId();
 
 			SQLiteTableSyncTemplate(
-				bool allowInsert = true, 
+/*				bool allowInsert = true, 
 				bool allowRemove = true,
 				const std::string& triggerOverrideClause = "1",
-				bool ignoreCallbacksOnFirstSync = false)
-				: SQLiteTableSync(TABLE_NAME, allowInsert, allowRemove, triggerOverrideClause, ignoreCallbacksOnFirstSync)
+				bool ignoreCallbacksOnFirstSync = false*/)
+				: util::FactorableTemplate<SQLiteTableSync, K>() // (TABLE_NAME, allowInsert, allowRemove, triggerOverrideClause, ignoreCallbacksOnFirstSync)
 			{			}
 
 			void initAutoIncrement();
@@ -84,8 +88,95 @@ namespace synthese
 		public:
 			typedef T ObjectsClass;
 
-			static void load(T* obj, const db::SQLiteResultSPtr& rows);
+
+			virtual const std::string& getTableName() const { return TABLE_NAME; }
+			virtual std::string getTriggerOverrideClause() const { return TRIGGERS_ENABLED_CLAUSE; }
+
+
+			static std::string GetFieldValue(uid id, const std::string& field);
+
+		private:
 			
+			/** Object links loader from the SQLite database.
+				@param obj Pointer to the object to load from the database
+				@param rows Row to read
+				@param temporary Objects to link must be temporarily and recursively created from the database
+				@author Hugues Romain
+				@date 2007				
+			*/
+			static void _link(T* obj, const SQLiteResultSPtr& rows, GetSource temporary);
+
+
+
+			/** Remove all the links to the object present in the environment.
+				@author Hugues Romain
+				@date 2007				
+			*/
+			static void _unlink(T* obj);
+			
+
+			static SQLiteResultSPtr _GetRow( uid key )
+			{
+				SQLite* sqlite = DBModule::GetSQLite();
+				std::stringstream query;
+				query
+					<< "SELECT * "
+					<< "FROM " << TABLE_NAME
+					<< " WHERE " << TABLE_COL_ID << "=" << util::Conversion::ToString(key)
+					<< " LIMIT 1";
+				SQLiteResultSPtr rows (sqlite->execQuery (query.str()));
+				if (rows->next() == false)
+					throw DBEmptyResultException<T>(key, "ID not found in database.");
+				return rows;
+			}
+
+
+	
+		public:
+
+			/** Object fetcher.
+				@param key UID of the object
+				@param linked Load on temporary linked object (recursive get)
+				@return Pointer to a new C++ object corresponding to the fetched record
+				@throw DBEmptyResultException<T> if the object was not found
+			*/
+			static T* _Get(uid key, bool linked)
+			{
+				SQLiteResultSPtr rows(_GetRow(key));
+				T* object(new T);
+				load(object, rows);
+				if (linked)
+					link(object, rows, GET_TEMPORARY);
+				return object;
+			}
+
+			static void link(T* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+			{
+				if (obj->getLinked())
+				{
+					unlink(obj);
+					if (temporary)
+						obj->clearChildTemporaryObjects();
+				}
+				_link(obj, rows, temporary);
+				obj->setLinked(true);
+			}
+
+			static void unlink(T* obj)
+			{
+				_unlink(obj);
+				obj->setLinked(false);
+			}
+			
+			/** Object properties loader from the SQLite database.
+				@param obj Pointer to the object to load from the database
+				@param rows Row to read
+				@author Hugues Romain
+				@date 2007
+				@warning To complete the load when building the RAM environment, follow the properties load by the link method
+			*/
+			static void load(T* obj, const SQLiteResultSPtr& rows);
+
 			
 			/** Saving of the object in database.
 				@param obj Object to save
@@ -94,67 +185,133 @@ namespace synthese
 				
 				The object is recognized by its key :
 					- if the object has already a key, then the corresponding record is replaced
-					- if the object does not have any kay, then the autoincrement function generates one for it.
+					- if the object does not have any key, then the autoincrement function generates one for it.
 			*/
 			static void save(T* obj);
 
-			/** Object fetcher.
+
+
+			/** Gets from the database a temporary object linked by another one.
 				@param key UID of the object
-				@return Pointer to a new C++ object corresponding to the fetched record
-				@throw DBEmptyResultException<T> if the object was not found
+				@param obj Parent object which link to the returned object
+				@param linked recursive get
+				@return Pointer to the created object
+				@author Hugues Romain
+				@date 2007
+
+				The deletion of the object will be autoamtically done at the deletion of the parent object
 			*/
-			static boost::shared_ptr<T> get(uid key);
+			template<class C>
+			static const T* Get(uid key, C* obj, bool linked)
+			{
+				const T* c(static_cast<const T*>(_Get(key, linked)));
+				obj->addChildTemporaryObject(c);
+				return c;
+			}
+
+
+						/** Gets from the database a temporary object linked by another one.
+				@param key UID of the object
+				@param obj Parent object which link to the returned object
+				@param linked recursive get
+				@return Pointer to the created object
+				@author Hugues Romain
+				@date 2007
+
+				The deletion of the object will be autoamtically done at the deletion of the parent object
+			*/
+			template<class C>
+			static T* GetUpdateable(uid key, C* obj)
+			{
+				T* c(_Get(key, true));
+				obj->addChildTemporaryObject(c);
+				return c;
+			}
+
+
+
+			template<class C>
+			static const T* Get(uid key, C* obj, bool linked, GetSource source)
+			{
+				return
+					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
+					? T::Get(key).get()
+					: Get(key, obj, linked);
+			}
+
+			template<class C>
+			static T* GetUpdateable(uid key, C* obj, GetSource source)
+			{
+				return
+					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
+					? T::GetUpdateable(key).get()
+					: GetUpdateable(key, obj);
+			}
+
+			static boost::shared_ptr<const T> Get(uid key, GetSource source = GET_AUTO, bool linked = false)
+			{
+				return
+					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
+					? T::Get(key)
+					: boost::shared_ptr<const T>(_Get(key, linked));
+			}
+
+			static boost::shared_ptr<T> GetUpdateable(uid key, GetSource source = GET_TEMPORARY)
+			{
+				return
+					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
+					? T::GetUpdateable(key)
+					: boost::shared_ptr<T>(_Get(key, true));
+			}
 
 			static boost::shared_ptr<T> createEmpty();
 			static void remove(uid key);
 
 		};
 
-		template <class T>
-			void synthese::db::SQLiteTableSyncTemplate<T>::remove(uid key)
+
+		template <class K, class T>
+		std::string SQLiteTableSyncTemplate<K, T>::GetFieldValue(uid id, const std::string& field)
+		{
+			SQLite* sqlite = DBModule::GetSQLite();
+			std::stringstream query;
+			query
+				<< "SELECT " << field << " FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(id);
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			if (!rows->next())
+				throw DBEmptyResultException<T>(id, "ID not found in database.");
+			else
+				return rows->getText(field);
+		}
+
+		template <class K, class T>
+			void SQLiteTableSyncTemplate<K,T>::remove(uid key)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "DELETE FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key);
+				<< " WHERE " << TABLE_COL_ID << "=" << util::Conversion::ToString(key);
 			sqlite->execUpdate(query.str());
 		}
 
-		template <class T>
-		boost::shared_ptr<T> synthese::db::SQLiteTableSyncTemplate<T>::createEmpty()
+		template <class K, class T>
+		boost::shared_ptr<T> SQLiteTableSyncTemplate<K,T>::createEmpty()
 		{
 			boost::shared_ptr<T> object(new T);
 			save(object.get());
 			return object;
 		}
 
-		template <class T>
-		boost::shared_ptr<T> synthese::db::SQLiteTableSyncTemplate<T>::get(uid key)
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
-			std::stringstream query;
-			query
-				<< "SELECT * "
-				<< "FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key)
-				<< " LIMIT 1";
-			db::SQLiteResultSPtr rows (sqlite->execQuery (query.str(), true));
-			if (rows->next() == false)
-				throw DBEmptyResultException<T>(key, "ID not found in database.");
-			boost::shared_ptr<T> object(new T());
-			load(object.get(), rows);
-			return object;
-		}
+		template <class K, class T>
+			boost::shared_ptr<boost::mutex> SQLiteTableSyncTemplate<K,T>::_idMutex(new boost::mutex); 
 
-		template <class T>
-			boost::shared_ptr<boost::mutex> SQLiteTableSyncTemplate<T>::_idMutex(new boost::mutex); 
+		template <class K, class T>
+			int SQLiteTableSyncTemplate<K,T>::_autoIncrementValue(1); 
 
-		template <class T>
-			int SQLiteTableSyncTemplate<T>::_autoIncrementValue(1); 
-
-		template <class T>
-			uid SQLiteTableSyncTemplate<T>::getId()
+		template <class K, class T>
+			uid SQLiteTableSyncTemplate<K,T>::getId()
 		{			
 			boost::mutex::scoped_lock mutex(*_idMutex);
 
@@ -168,13 +325,13 @@ namespace synthese
 		}
 
 
-		template <class T>
-			uid SQLiteTableSyncTemplate<T>::encodeUId (long objectId)
+		template <class K, class T>
+			uid SQLiteTableSyncTemplate<K,T>::encodeUId (long objectId)
 		{
 		    // TODO : plenty of functions should be at SQLiteTableSync level directly.
 		    // default value is 1 for compatibility
-		    static int nodeId = Conversion::ToInt (DbModuleClass::GetParameter ("dbring_node_id", "1"));
-			return synthese::util::encodeUId (TABLE_ID, 
+			static int nodeId = util::Conversion::ToInt (DbModuleClass::GetParameter ("dbring_node_id", "1"));
+			return util::encodeUId (TABLE_ID, 
 							  1, // TODO : remove grid id, deprecated with ring nodes
 							  nodeId, 
 							  objectId);
@@ -182,8 +339,8 @@ namespace synthese
 
 
 
-		template <class T>
-			void SQLiteTableSyncTemplate<T>::initAutoIncrement()
+		template <class K, class T>
+			void SQLiteTableSyncTemplate<K,T>::initAutoIncrement()
 		{
 			if (HAS_AUTO_INCREMENT)
 			{
@@ -210,7 +367,7 @@ namespace synthese
 				}
 				catch (SQLiteException& e)
 				{
-					Log::GetInstance().debug("Table "+ getTableName() +" without preceding id.", e);
+					util::Log::GetInstance().debug("Table "+ getTableName() +" without preceding id.", e);
 
 				}
 				catch (...)

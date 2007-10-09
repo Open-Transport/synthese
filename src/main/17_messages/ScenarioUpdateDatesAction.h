@@ -29,6 +29,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace messages
@@ -38,7 +40,7 @@ namespace synthese
 		/** ScenarioUpdateDatesAction action class.
 			@ingroup m17Actions refActions
 		*/
-		class ScenarioUpdateDatesAction : public server::Action
+		class ScenarioUpdateDatesAction : public util::FactorableTemplate<server::Action, ScenarioUpdateDatesAction>
 		{
 		public:
 			static const std::string PARAMETER_START_DATE;

@@ -53,7 +53,7 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const string FactoryTemplate<InterfacePage, JourneyBoardInterfacePage>::FACTORY_KEY("");
+		template<> const string FactorableTemplate<InterfacePage, JourneyBoardInterfacePage>::FACTORY_KEY("journey_board");
 	}
 
 	namespace routeplanner
@@ -103,7 +103,7 @@ namespace synthese
 			pv.push_back(journey->getDestination()->getPlace()->getFullName());
 			pv.push_back(sDuration.str());
 			pv.push_back(sDate.str());
-			pv.push_back(Conversion::ToString(boost::logic::indeterminate(journey->getReservationCompliance()) && journey->getReservationDeadLine() > now));
+			pv.push_back(Conversion::ToString(journey->getReservationCompliance() && journey->getReservationDeadLine() > now));
 			pv.push_back(Conversion::ToString(journey->getReservationCompliance() == true));
 			pv.push_back(Conversion::ToString(journey->getReservationDeadLine() - now));
 			pv.push_back(sResa.str());

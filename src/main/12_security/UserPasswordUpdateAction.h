@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -36,7 +38,7 @@ namespace synthese
 		/** Password update action class.
 			@ingroup m12Actions refActions
 		*/
-		class UserPasswordUpdateAction : public server::Action
+		class UserPasswordUpdateAction : public util::FactorableTemplate<server::Action, UserPasswordUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_PASS1;

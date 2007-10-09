@@ -43,7 +43,7 @@ namespace synthese
 	namespace interfaces
 	{
 
-		Interface::Interface( const uid& id )
+		Interface::Interface( const uid id )
 			: Registrable<uid,synthese::interfaces::Interface> (id)
 		{
 		}
@@ -59,10 +59,10 @@ namespace synthese
 
 
 
-		void Interface::addPage(const string& code, InterfacePage* page )
+		void Interface::addPage(InterfacePage* page )
 		{
-			page->setInterface(getRegisteredSharedPointer());
-			_pages.insert(make_pair( code, page ));
+			page->setInterface(this);
+			_pages.insert(make_pair(page->getFactoryKey(), page));
 		}
 
 

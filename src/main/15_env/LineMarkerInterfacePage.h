@@ -25,6 +25,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace server
@@ -47,7 +49,7 @@ namespace synthese
 
 			Object : CommercialLine
 		*/
-		class LineMarkerInterfacePage : public interfaces::InterfacePage
+		class LineMarkerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, LineMarkerInterfacePage>
 		{
 		public:
 			/** Display of line of schedule sheet.

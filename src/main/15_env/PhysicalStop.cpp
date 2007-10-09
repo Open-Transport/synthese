@@ -24,6 +24,8 @@
 
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
@@ -36,11 +38,13 @@ namespace synthese
 	namespace env 
 	{
 
-		PhysicalStop::PhysicalStop (const uid& id,
-						const std::string& name,
-						const PublicTransportStopZoneConnectionPlace* place,
-						double x, double y)
-			: Registrable<uid,PhysicalStop> (id)
+		PhysicalStop::PhysicalStop(
+			uid id
+			, string name
+			, const PublicTransportStopZoneConnectionPlace* place
+			, double x
+			, double y
+		)	: Registrable<uid,PhysicalStop> (id)
 			, Vertex (place, x, y)
 			, _name (name)
 		{

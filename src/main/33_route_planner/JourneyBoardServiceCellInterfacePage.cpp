@@ -47,6 +47,8 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 
+	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardServiceCellInterfacePage>::FACTORY_KEY("journey_board_service_cell");
+
 	namespace routeplanner
 	{
 		void JourneyBoardServiceCellInterfacePage::display(

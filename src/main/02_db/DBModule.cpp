@@ -34,10 +34,12 @@
 
 #include <iostream>
 
-using namespace synthese::util;
-
 namespace synthese
 {
+	using namespace util;
+
+	template<> const std::string util::FactorableTemplate<db::DbModuleClass, db::DBModule>::FACTORY_KEY("02_db");
+	
 	namespace db
 	{
 

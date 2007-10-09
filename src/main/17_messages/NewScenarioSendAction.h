@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
@@ -36,7 +38,7 @@ namespace synthese
 		/** New scenario send action class.
 			@ingroup m17Actions refActions
 		*/
-		class NewScenarioSendAction : public server::Action
+		class NewScenarioSendAction : public util::FactorableTemplate<server::Action, NewScenarioSendAction>
 		{
 		public:
 			static const std::string PARAMETER_TEMPLATE;

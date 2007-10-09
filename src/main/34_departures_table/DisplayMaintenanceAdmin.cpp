@@ -33,6 +33,7 @@
 #include "13_dblog/DBLogViewer.h"
 
 #include "30_server/ActionFunctionRequest.h"
+#include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -68,17 +69,15 @@ namespace synthese
 	{
 		void DisplayMaintenanceAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
-			if (it == map.end())
-				throw AdminParametersException("Screen not specified");
+			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::get(Conversion::ToLongLong(it->second));
+				_displayScreen = DisplayScreenTableSync::Get(id);
 			}
 			catch(...)
 			{
-				throw AdminParametersException("Specified display screen not found (" + it->second +")");
+				throw AdminParametersException("Specified display screen not found");
 			}
 		}
 

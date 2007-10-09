@@ -1,15 +1,15 @@
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::transportwebsite::SiteTableSync>("36.01 Site");
+synthese::transportwebsite::SiteTableSync::integrate();
 
-synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::transportwebsite::PlacesListModule>("36_places_list");
+synthese::transportwebsite::PlacesListModule::integrate();
 
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::transportwebsite::CityListInterfaceElement>("places_list");
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::transportwebsite::CityListRequestInterfaceElement>("city_list_request");
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::transportwebsite::PlacesListRequestInterfaceElement>("places_list_request");
+synthese::transportwebsite::CityListInterfaceElement::integrate();
+synthese::transportwebsite::CityListRequestInterfaceElement::integrate();
+synthese::transportwebsite::PlacesListRequestInterfaceElement::integrate();
 
-synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::transportwebsite::PlacesListInterfacePage>("places_list");
-synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::transportwebsite::PlacesListItemInterfacePage>("places_list_item");
+synthese::transportwebsite::PlacesListInterfacePage::integrate();
+synthese::transportwebsite::PlacesListItemInterfacePage::integrate();
 
-synthese::util::Factory<synthese::server::Function>::integrate<synthese::transportwebsite::CityListRequest>("lc");
-synthese::util::Factory<synthese::server::Function>::integrate<synthese::transportwebsite::PlacesListFunction>("lp");
+synthese::transportwebsite::CityListRequest::integrate();
+synthese::transportwebsite::PlacesListFunction::integrate();
 

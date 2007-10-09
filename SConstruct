@@ -193,7 +193,7 @@ def DefineDefaultCCFlags (env):
         env.Append ( CCFLAGS = ['/wd4005', '/wd4996'])
 
         if (env.IsDebug ()):
-            env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI'] )
+            env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI', '/showIncludes'] )
         else:  
             env.Append ( CCFLAGS = ['/Ox', '/FD', '/MT', '/Zi'] )
     

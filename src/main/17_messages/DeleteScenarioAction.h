@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace messages
@@ -32,9 +34,9 @@ namespace synthese
 		class ScenarioTemplate;
 
 		/** DeleteScenarioAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
-		class DeleteScenarioAction : public server::Action
+		class DeleteScenarioAction : public util::FactorableTemplate<server::Action, DeleteScenarioAction>
 		{
 		public:
 			static const std::string PARAMETER_SCENARIO_ID;
@@ -55,9 +57,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			DeleteScenarioAction();
 
 			/** Action to run, defined by each subclass.
 			*/

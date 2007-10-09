@@ -43,7 +43,7 @@ namespace synthese
 			_date = date;
 		}
 
-		void DBLogEntry::setUser(shared_ptr<const security::User> user )
+		void DBLogEntry::setUser(const security::User* user)
 		{
 			_user = user;
 		}
@@ -62,7 +62,7 @@ namespace synthese
 			return _date;
 		}
 
-		shared_ptr<const security::User> DBLogEntry::getUser() const
+		const security::User* DBLogEntry::getUser() const
 		{
 			return _user;
 		}

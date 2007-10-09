@@ -26,8 +26,6 @@
 #include <vector>
 #include <string>
 
-#include <boost/shared_ptr.hpp>
-
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
@@ -56,32 +54,32 @@ namespace synthese
 				, DB_LOG_WARNING = 50
 				, DB_LOG_ERROR = 99
 			}	Level;
-			typedef std::vector<std::string>											Content;
+			typedef std::vector<std::string>	Content;
 
 		private:
-			std::string								_logKey;
-			time::DateTime							_date;
-			boost::shared_ptr<const security::User>	_user;
-			Content									_content;
-			Level									_level;
-			uid										_objectId;
+			std::string				_logKey;
+			time::DateTime			_date;
+			const security::User*	_user;
+			Content					_content;
+			Level					_level;
+			uid						_objectId;
 
 		public:
 			DBLogEntry();
 			void					setLogKey(const std::string& key);
 			void					setDate(const time::DateTime& date);
-			void					setUser(boost::shared_ptr<const security::User> user);
+			void					setUser(const security::User* user);
 			void					setContent(const Content& content);
 			void					setLevel(Level level);
 			void					setObjectId(uid id);
 
-			const std::string&		getLogKey()		const;
-			time::DateTime			getDate()		const;
-			boost::shared_ptr<const security::User>	getUser()		const;
-			const Content&			getContent()	const;
-			std::string								getStringContent()	const;
-			Level					getLevel()		const;
-			uid						getObjectId()	const;
+			const std::string&		getLogKey()			const;
+			time::DateTime			getDate()			const;
+			const security::User*	getUser()			const;
+			const Content&			getContent()		const;
+			std::string				getStringContent()	const;
+			Level					getLevel()			const;
+			uid						getObjectId()		const;
 		};
 	}
 }

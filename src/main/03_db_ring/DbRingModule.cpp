@@ -20,6 +20,8 @@ using namespace synthese::util;
 
 namespace synthese
 {
+	template<> const std::string util::FactorableTemplate<db::DbModuleClass, dbring::DbRingModule>::FACTORY_KEY("03_db_ring");
+
 	namespace dbring
 	{
 

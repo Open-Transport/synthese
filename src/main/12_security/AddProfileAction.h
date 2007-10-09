@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -36,7 +38,7 @@ namespace synthese
 		/** AddProfileAction action class.
 			@ingroup m12Actions refActions
 		*/
-		class AddProfileAction : public server::Action
+		class AddProfileAction : public util::FactorableTemplate<server::Action, AddProfileAction>
 		{
 		public:
 			static const std::string PARAMETER_NAME;

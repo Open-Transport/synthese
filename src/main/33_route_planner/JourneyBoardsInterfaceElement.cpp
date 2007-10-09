@@ -39,6 +39,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyBoardsInterfaceElement>::FACTORY_KEY("journey_boards");
+
 	namespace routeplanner
 	{
 		void JourneyBoardsInterfaceElement::storeParameters(ValueElementList& vel)

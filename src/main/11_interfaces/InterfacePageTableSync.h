@@ -37,7 +37,7 @@ namespace synthese
 		/** InterfacePageTableSync SQLite table synchronizer.
 			@ingroup m11LS refLS
 		*/
-		class InterfacePageTableSync : public db::SQLiteTableSyncTemplate<InterfacePage>
+		class InterfacePageTableSync : public db::SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>
 		{
 		public:
 			static const std::string TABLE_COL_INTERFACE;

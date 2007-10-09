@@ -27,6 +27,8 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace transportwebsite
@@ -44,7 +46,7 @@ namespace synthese
 				- 4 : Number of answers in the popup
 
 		*/
-		class PlacesListRequestInterfaceElement : public interfaces::LibraryInterfaceElement
+		class PlacesListRequestInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, PlacesListRequestInterfaceElement>
 		{
 			// List of parameters to store
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _txtField;

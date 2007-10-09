@@ -27,6 +27,8 @@
 
 #include "30_server/Function.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -34,9 +36,9 @@ namespace synthese
 		class DisplayScreen;
 
 		/** DisplayScreenSupervisionRequest class.
-			@ingroup m34
+			@ingroup m34Functions refFunctions
 		*/
-		class DisplayScreenSupervisionRequest : public server::Function
+		class DisplayScreenSupervisionRequest : public util::FactorableTemplate<server::Function,DisplayScreenSupervisionRequest>
 		{
 			static const std::string PARAMETER_DISPLAY_SCREEN_ID;
 			static const std::string PARAMETER_STATUS;

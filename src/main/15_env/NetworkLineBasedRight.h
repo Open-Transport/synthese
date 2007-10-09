@@ -88,7 +88,7 @@ namespace synthese
 			uid id(util::Conversion::ToLongLong(this->_parameter));
 			try
 			{
-				int tableId(decodeTableId(id));
+				int tableId(util::decodeTableId(id));
 				
 				if (tableId == TransportNetworkTableSync::TABLE_ID)
 				{
@@ -119,12 +119,12 @@ namespace synthese
 			uid id2(util::Conversion::ToLongLong(perimeter));
 			try
 			{
-				int tableId1(decodeTableId(id1));
+				int tableId1(util::decodeTableId(id1));
 				if (tableId1 == TransportNetworkTableSync::TABLE_ID)
 				{
-					if (decodeTableId(id2) == TransportNetworkTableSync::TABLE_ID)
+					if (util::decodeTableId(id2) == TransportNetworkTableSync::TABLE_ID)
 						return id1 == id2;
-					if (decodeTableId(id2) == CommercialLineTableSync::TABLE_ID)
+					if (util::decodeTableId(id2) == CommercialLineTableSync::TABLE_ID)
 					{
 						boost::shared_ptr<const CommercialLine> line(CommercialLine::Get(id2));
 						boost::shared_ptr<const TransportNetwork> network(TransportNetwork::Get(id1));
@@ -133,7 +133,7 @@ namespace synthese
 				}
 				if (tableId1 == CommercialLineTableSync::TABLE_ID)
 				{
-					int tableId2(decodeTableId(id2));
+					int tableId2(util::decodeTableId(id2));
 					if (tableId2 == CommercialLineTableSync::TABLE_ID)
 						return id1 == id2;
 //					if (tableId2 == ConnectionPlaceTableSync::TABLE_ID)

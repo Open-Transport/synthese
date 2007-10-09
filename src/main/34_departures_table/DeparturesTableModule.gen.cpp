@@ -1,9 +1,9 @@
 
 synthese::departurestable::DeparturesTableInterfaceElement::integrate();
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableTimeContentInterfaceElement>("departurestabletimecell");
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableLineContentInterfaceElement>("departurestablelinecell");
+synthese::departurestable::DeparturesTableTimeContentInterfaceElement::integrate();
+synthese::departurestable::DeparturesTableLineContentInterfaceElement::integrate();
 synthese::departurestable::DeparturesTableDestinationContentInterfaceElement::integrate();
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableRowServiceNumberInterfaceElement>("departurestableservicenumbercell");
+synthese::departurestable::DeparturesTableRowServiceNumberInterfaceElement::integrate();
 synthese::departurestable::DisplayScreenHasAlarmValueInterfaceElement::integrate();
 synthese::departurestable::DisplayScreenAlarmContentValueInterfaceElement::integrate();
 synthese::departurestable::DeparturesTableTeamCell::integrate();
@@ -20,32 +20,30 @@ synthese::departurestable::DisplayAdmin::integrate();
 synthese::departurestable::DisplayMaintenanceAdmin::integrate();
 
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::departurestable::DisplayTypeTableSync>("34.00 Display Types");
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::departurestable::DisplayScreenTableSync>("34.50 Display Screens");
+synthese::departurestable::DisplayTypeTableSync::integrate();
+synthese::departurestable::DisplayScreenTableSync::integrate();
 
 
 synthese::departurestable::CreateDisplayTypeAction::integrate();
 synthese::departurestable::UpdateDisplayTypeAction::integrate();
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayScreenAction>("createdisplayscreen");
+synthese::departurestable::CreateDisplayScreenAction::integrate();
 synthese::departurestable::UpdateDisplayScreenAction::integrate();
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddPreselectionPlaceToDisplayScreen>("apptds");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::RemovePreselectionPlaceFromDisplayScreenAction>("rmpsfds");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateAllStopsDisplayScreenAction>("uasdsa");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddDepartureStopToDisplayScreenAction>("adstdsa");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddForbiddenPlaceToDisplayScreen>("afptdsa");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayPreselectionParametersAction>("udpp");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenAddDisplayedPlace>("dsadp");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemovePhysicalStopAction>("dsrps");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemoveDisplayedPlaceAction>("dsrdp");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemoveForbiddenPlaceAction>("dsrfp");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayMaintenanceAction>("udm");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayTypeRemoveAction>("dtra");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemove>("dsra");
+synthese::departurestable::AddPreselectionPlaceToDisplayScreen::integrate();
+synthese::departurestable::RemovePreselectionPlaceFromDisplayScreenAction::integrate();
+synthese::departurestable::UpdateAllStopsDisplayScreenAction::integrate();
+synthese::departurestable::AddDepartureStopToDisplayScreenAction::integrate();
+synthese::departurestable::AddForbiddenPlaceToDisplayScreen::integrate();
+synthese::departurestable::UpdateDisplayPreselectionParametersAction::integrate();
+synthese::departurestable::DisplayScreenAddDisplayedPlace::integrate();
+synthese::departurestable::DisplayScreenRemovePhysicalStopAction::integrate();
+synthese::departurestable::DisplayScreenRemoveDisplayedPlaceAction::integrate();
+synthese::departurestable::DisplayScreenRemoveForbiddenPlaceAction::integrate();
+synthese::departurestable::UpdateDisplayMaintenanceAction::integrate();
+synthese::departurestable::DisplayTypeRemoveAction::integrate();
+synthese::departurestable::DisplayScreenRemove::integrate();
 
-
-
-synthese::util::Factory<synthese::server::Function>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");
-synthese::util::Factory<synthese::server::Function>::integrate<synthese::departurestable::DisplayScreenSupervisionRequest>("tds");
+synthese::departurestable::DisplayScreenContentRequest::integrate();
+synthese::departurestable::DisplayScreenSupervisionRequest::integrate();
 
 synthese::departurestable::ArrivalDepartureTableRight::integrate();
 synthese::departurestable::DisplayMaintenanceRight::integrate();

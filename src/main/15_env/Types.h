@@ -24,12 +24,14 @@
 #define SYNTHESE_Env_Types_H__
 
 #include <set>
+#include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
 #include "15_env/Complyer.h"
 
 #include "01_util/Constants.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
@@ -45,7 +47,7 @@ namespace synthese
 		/** @addtogroup m15
 		@{
 		*/
-		typedef std::set<const PhysicalStop*> PhysicalStops;
+		typedef std::map<uid,const PhysicalStop*> PhysicalStops;
 		typedef std::vector<const Address*> Addresses;
 
 		typedef std::vector<boost::shared_ptr<const City> > CityList;

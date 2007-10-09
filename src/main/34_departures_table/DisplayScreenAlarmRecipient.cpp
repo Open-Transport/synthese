@@ -115,7 +115,7 @@ namespace synthese
 			, server::ActionFunctionRequest<messages::AlarmAddLinkAction,admin::AdminRequest>& addRequest
 			, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
 		){
-			vector<shared_ptr<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
+			vector<shared_ptr<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreenTableSync,DisplayScreen> (alarm, this->getFactoryKey());
 			set<uid> usedDisplayScreens;
 
 			if (!dsv.empty())
@@ -148,13 +148,9 @@ namespace synthese
 
 			stream << "<p>Ajout d'afficheur</p>";
 
-			ParametersMap::const_iterator it;
-			it = parameters.find(PARAMETER_SEARCH_CITY_NAME);
-			string searchCity = (it == parameters.end()) ? string() : it->second;
-			it = parameters.find(PARAMETER_SEARCH_STOP_NAME);
-			string searchStop = (it == parameters.end()) ? string() : it->second;
-			it = parameters.find(PARAMETER_SEARCH_NAME);
-			string searchName = (it == parameters.end()) ? string() : it->second;
+			string searchCity(parameters.getString(PARAMETER_SEARCH_CITY_NAME, false, FACTORY_KEY));
+			string searchStop(parameters.getString(PARAMETER_SEARCH_STOP_NAME, false, FACTORY_KEY));
+			string searchName(parameters.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY));
 			uid searchLine = UNKNOWN_VALUE;
 			uid searchType = UNKNOWN_VALUE;
 			int searchState = UNKNOWN_VALUE;
@@ -173,8 +169,6 @@ namespace synthese
 
 
 			ResultHTMLTable::HeaderVector v1;
-			v1.push_back(make_pair(PARAMETER_SEARCH_CITY_NAME, "Commune"));
-			v1.push_back(make_pair(PARAMETER_SEARCH_STOP_NAME, "Arrêt"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, "Etat"));
@@ -223,13 +217,10 @@ namespace synthese
 
 		AlarmRecipientSearchFieldsMap DisplayScreenAlarmRecipient::getSearchFields(HTMLForm& form, const ParametersMap& parameters) const
 		{
-
-			ParametersMap::const_iterator it;
-
 			shared_ptr<const Line> line;
-			it = parameters.find(PARAMETER_SEARCH_LINE);
-			if (it != parameters.end() && Line::Contains(Conversion::ToLongLong(it->second)))
-				line  = Line::Get(Conversion::ToLongLong(it->second));
+			uid id(parameters.getUid(PARAMETER_SEARCH_LINE, false, FACTORY_KEY));
+			if (id != UNKNOWN_VALUE && Line::Contains(id))
+				line  = Line::Get(id);
 
 			AlarmRecipientSearchFieldsMap map;
 			AlarmRecipientFilter arf;

@@ -143,19 +143,19 @@ namespace synthese
 						DateTime bestTimeAtStop(bestTime);
 						if (_accessDirection == TO_DESTINATION)
 						{
-							int transferDelay(cp->getTransferDelay(vertex, *itp));
+							int transferDelay(cp->getTransferDelay(vertex, itp->second));
 							if (transferDelay == ConnectionPlace::FORBIDDEN_TRANSFER_DELAY)
 								continue;
 							bestTimeAtStop += transferDelay;
 						}
 						else
 						{
-							int transferDelay(cp->getTransferDelay(*itp, vertex));
+							int transferDelay(cp->getTransferDelay(itp->second, vertex));
 							if (transferDelay == ConnectionPlace::FORBIDDEN_TRANSFER_DELAY)
 								continue;
 							bestTimeAtStop -= transferDelay;
 						}
-						insert (*itp, bestTimeAtStop, false);
+						insert (itp->second, bestTimeAtStop, false);
 					}
 				}
 			}

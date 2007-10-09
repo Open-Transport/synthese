@@ -36,6 +36,8 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 
+	template<> const string util::FactorableTemplate<interfaces::RequestWithInterface,interfaces::RedirRequest>::FACTORY_KEY("redir");
+
 	namespace interfaces
 	{
 		const std::string RedirRequest::PARAMETER_URL = "url";
@@ -44,7 +46,7 @@ namespace synthese
 		{
 			ParametersMap map(RequestWithInterface::_getParametersMap());
 
-			map.insert(make_pair(PARAMETER_URL, _url));
+			map.insert(PARAMETER_URL, _url);
 			return map;
 		}
 
@@ -52,11 +54,7 @@ namespace synthese
 		{
 			RequestWithInterface::_setFromParametersMap(map);
 
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_URL);
-			if (it == map.end())
-				throw RequestException("URL to redirect not specified");
+			_url = map.getString(PARAMETER_URL, true, FACTORY_KEY);
 		}
 
 		void RedirRequest::_run( std::ostream& stream ) const

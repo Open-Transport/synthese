@@ -39,6 +39,8 @@ namespace synthese
 {
 	using namespace db;
 
+	template<> const string util::FactorableTemplate<util::ModuleClass, interfaces::InterfaceModule>::FACTORY_KEY("11_interfaces");
+
 	namespace interfaces
 	{
 		void InterfaceModule::initialize()

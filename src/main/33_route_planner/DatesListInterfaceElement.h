@@ -27,13 +27,10 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
-
 	namespace routeplanner
 	{
 		/** DatesListInterfaceElement Library Interface Element Class.
@@ -41,7 +38,7 @@ namespace synthese
 			@date 2007
 			@ingroup m53Library refLibrary
 		*/
-		class DatesListInterfaceElement : public interfaces::LibraryInterfaceElement
+		class DatesListInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,DatesListInterfaceElement>
 		{
 			// List of parameters to store
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _value;

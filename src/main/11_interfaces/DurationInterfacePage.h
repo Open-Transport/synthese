@@ -25,6 +25,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace server
@@ -44,7 +46,7 @@ namespace synthese
 
 			The display can be "#1 min" or "#2 h #3 min" etc.
 		*/
-		class DurationInterfacePage : public interfaces::InterfacePage
+		class DurationInterfacePage : public util::FactorableTemplate<InterfacePage,DurationInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

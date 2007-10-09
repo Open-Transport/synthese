@@ -56,6 +56,8 @@ namespace synthese
 	using namespace time;
 	using namespace env;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyBoardInterfaceElement>::FACTORY_KEY("journey_board");
+
 	namespace routeplanner
 	{
 

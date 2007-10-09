@@ -38,6 +38,8 @@ namespace synthese
 	using namespace server;
 	using namespace html;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::RequestInterfaceElement>::FACTORY_KEY("route_planner_form");
+
 	namespace routeplanner
 	{
 		void RequestInterfaceElement::storeParameters(ValueElementList& vel)

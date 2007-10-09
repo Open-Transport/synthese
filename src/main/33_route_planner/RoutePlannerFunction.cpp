@@ -49,6 +49,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace transportwebsite;
 
+	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
+
 	namespace routeplanner
 	{
 		const string RoutePlannerFunction::PARAMETER_DATE = "da";
@@ -74,32 +76,32 @@ namespace synthese
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 
 			// Origin and destination places
-			_originCityText = Request::getStringFormParameterMap(map, PARAMETER_DEPARTURE_CITY_TEXT, false, string());
-			_destinationCityText = Request::getStringFormParameterMap(map, PARAMETER_ARRIVAL_CITY_TEXT, false, string());
+			_originCityText = map.getString(PARAMETER_DEPARTURE_CITY_TEXT, false, string());
+			_destinationCityText = map.getString(PARAMETER_ARRIVAL_CITY_TEXT, false, string());
 			if (_originCityText.empty() || _destinationCityText.empty())
 				_home = true;
 			else
 			{
-				_originPlaceText = Request::getStringFormParameterMap(map, PARAMETER_DEPARTURE_PLACE_TEXT, false, string());
+				_originPlaceText = map.getString(PARAMETER_DEPARTURE_PLACE_TEXT, false, string());
 				_departure_place = _site->fetchPlace(_originCityText, _originPlaceText);
 
-				_destinationPlaceText = Request::getStringFormParameterMap(map, PARAMETER_ARRIVAL_PLACE_TEXT, false, string());
+				_destinationPlaceText = map.getString(PARAMETER_ARRIVAL_PLACE_TEXT, false, string());
 				_arrival_place = _site->fetchPlace(_destinationCityText, _destinationPlaceText);
 			}
 
 			// Date
 			try
 			{
-				Date day(Request::getDateFromParameterMap(map, PARAMETER_DAY, false, string()));
+				Date day(map.getDate(PARAMETER_DAY, false, string()));
 				if (day.isUnknown())
 				{
-					_startDate = Request::getDateTimeFromParameterMap(map, PARAMETER_DATE, !_home, string());
+					_startDate = map.getDateTime(PARAMETER_DATE, !_home, string());
 					_endDate = _startDate;
 					_endDate.addDaysDuration(1);						
 				}
 				else
 				{
-					_periodId = Request::getIntFromParameterMap(map, PARAMETER_PERIOD_ID, true, string());
+					_periodId = map.getInt(PARAMETER_PERIOD_ID, true, string());
 					if (_periodId < 0 || _periodId >= _site->getPeriods().size())
 						throw RequestException("Bad value for period id");
 					_startDate = DateTime(day, Hour(0, 0));
@@ -114,13 +116,13 @@ namespace synthese
 			}
 
 			// Max solutions number
-			_maxSolutionsNumber = Request::getIntFromParameterMap(map, PARAMETER_MAX_SOLUTIONS_NUMBER, false, string());
+			_maxSolutionsNumber = map.getInt(PARAMETER_MAX_SOLUTIONS_NUMBER, false, string());
 			if (_maxSolutionsNumber < UNKNOWN_VALUE)
 				throw RequestException("Bad max solutions number");
 
 			// Accessibility
 			_accessibility = static_cast<AccessibilityParameter>(
-				Request::getIntFromParameterMap(map, PARAMETER_ACCESSIBILITY, !_home, string())
+				map.getInt(PARAMETER_ACCESSIBILITY, !_home, string())
 			);
 			_accessParameters = _site->getAccessParameters(_accessibility);
 		}

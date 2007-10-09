@@ -22,15 +22,13 @@
 
 #include "ScheduledServiceTableSync.h"
 
-#include "15_env/ScheduledService.h"
 #include "15_env/Path.h"
 #include "15_env/EnvModule.h"
-#include "15_env/BikeCompliance.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/PedestrianCompliance.h"
-#include "15_env/ReservationRule.h"
+#include "15_env/BikeComplianceTableSync.h"
+#include "15_env/HandicappedComplianceTableSync.h"
+#include "15_env/PedestrianComplianceTableSync.h"
+#include "15_env/ReservationRuleTableSync.h"
 #include "15_env/LineTableSync.h"
-#include "15_env/CommercialLine.h"
 #include "15_env/CommercialLineTableSync.h"
 #include "15_env/ServiceDateTableSync.h"
 
@@ -62,13 +60,15 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 
+	template<> const string util::FactorableTemplate<SQLiteTableSync,ScheduledServiceTableSync>::FACTORY_KEY("15.60.03 Scheduled services");
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ScheduledService>::TABLE_NAME = "t016_scheduled_services";
-		template<> const int SQLiteTableSyncTemplate<ScheduledService>::TABLE_ID = 16;
-		template<> const bool SQLiteTableSyncTemplate<ScheduledService>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::TABLE_NAME = "t016_scheduled_services";
+		template<> const int SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::TABLE_ID = 16;
+		template<> const bool SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ScheduledService>::load(ScheduledService* ss, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::load(ScheduledService* ss, const db::SQLiteResultSPtr& rows )
 		{
 
 
@@ -123,36 +123,46 @@ namespace synthese
 		    assert (arrivalSchedules.size () > 0);
 		    assert (departureSchedules.size () == arrivalSchedules.size ());
 		    
-		    uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
 		    
-		    shared_ptr<Path> path = EnvModule::fetchPath (pathId);
-		    assert (path != 0);
-		    assert (path->getEdges ().size () == arrivalSchedules.size ());
-		    
-		    uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
-		    
-		    uid handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-		    
-		    uid pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
-		    
-		    uid reservationRuleId (rows->getLongLong (ScheduledServiceTableSync::COL_RESERVATIONRULEID));
-
-		    ss->setPath(path.get());
 		    ss->setServiceNumber(serviceNumber);
 		    ss->setKey(id);
-		    ss->setBikeCompliance (BikeCompliance::Get (bikeComplianceId).get());
-		    ss->setHandicappedCompliance (HandicappedCompliance::Get (handicappedComplianceId).get());
-		    ss->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
-		    ss->setReservationRule (ReservationRule::Get (reservationRuleId).get());
 		    ss->setDepartureSchedules(departureSchedules);
 		    ss->setArrivalSchedules(arrivalSchedules);
 			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
-			ss->getPath()->addService(ss);
-			
 		}
 
+		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_link(ScheduledService* ss, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
 
-		template<> void SQLiteTableSyncTemplate<ScheduledService>::save(ScheduledService* object)
+			Path* path = LineTableSync::GetUpdateable(pathId,ss,temporary);
+			
+			assert (path);
+//			assert (path->getEdges ().size () == ss-> arrivalSchedules.size ());
+
+			uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
+
+			uid handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+
+			uid pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+
+			uid reservationRuleId (rows->getLongLong (ScheduledServiceTableSync::COL_RESERVATIONRULEID));
+
+			ss->setPath(path);
+			ss->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,ss,true,temporary));
+			ss->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,ss,true,temporary));
+			ss->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId,ss,true,temporary));
+			ss->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,ss,true,temporary));
+
+			path->addService(ss);
+		}
+
+		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_unlink(ScheduledService* ss)
+		{
+			ss->getPath()->removeService(ss);
+		}
+
+		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::save(ScheduledService* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -182,7 +192,7 @@ namespace synthese
 		const string ScheduledServiceTableSync::COL_TEAM("team");
 
 		ScheduledServiceTableSync::ScheduledServiceTableSync()
-			: SQLiteTableSyncTemplate<ScheduledService>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_SERVICENUMBER, "TEXT", true);
@@ -195,24 +205,25 @@ namespace synthese
 			addTableColumn (COL_TEAM, "TEXT");
 		}
 
-		void ScheduledServiceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+/*		void ScheduledServiceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		    // Loop on each added row
 		    while (rows->next ())
 		    {
-			if (ScheduledService::Contains(rows->getLongLong (TABLE_COL_ID)))
-			{
-			    boost::shared_ptr<ScheduledService> service(ScheduledService::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-			    service->getPath()->removeService(service.get());
-			    load(service.get(), rows);
-			}
-			else
-			{
-			    ScheduledService* service(new ScheduledService);
-			    load(service, rows);
-			    service->store();
-			}
-			
+				if (ScheduledService::Contains(rows->getLongLong (TABLE_COL_ID)))
+				{
+					boost::shared_ptr<ScheduledService> service(ScheduledService::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
+					service->getPath()->removeService(service.get());
+					load(service.get(), rows);
+					service->getPath()->addService(service.get());
+				}
+				else
+				{
+					ScheduledService* service(new ScheduledService);
+					load(service, rows);
+					service->store();
+					service->getPath()->addService(service);
+				}
 		    }
 		}
 	    
@@ -225,9 +236,10 @@ namespace synthese
 			    uid id = rows->getLongLong (TABLE_COL_ID);
 			    if (ScheduledService::Contains(id))
 			    {
-				shared_ptr<ScheduledService> object = ScheduledService::GetUpdateable(id);
-				object->getPath()->removeService(object.get());
-				load(object.get(), rows);
+					shared_ptr<ScheduledService> object = ScheduledService::GetUpdateable(id);
+					object->getPath()->removeService(object.get());
+					load(object.get(), rows);
+					object->getPath()->addService(object.get());
 			    }
 			}
 		}
@@ -236,19 +248,19 @@ namespace synthese
 		{
 		    while (rows->next ())
 		    {
-			uid id = rows->getLongLong (TABLE_COL_ID);
-			if (ScheduledService::Contains(id))
-			{
-			    shared_ptr<ScheduledService> object(ScheduledService::GetUpdateable(id));
-			    object->getPath()->removeService(object.get());
-			    ScheduledService::Remove(id);
-			}
+				uid id = rows->getLongLong (TABLE_COL_ID);
+				if (ScheduledService::Contains(id))
+				{
+					shared_ptr<ScheduledService> object(ScheduledService::GetUpdateable(id));
+					object->getPath()->removeService(object.get());
+					ScheduledService::Remove(id);
+				}
 		    }
 		}
-
+*/
 
 		vector<shared_ptr<ScheduledService> > ScheduledServiceTableSync::search(
-			CommercialLine* commercialLine
+			const CommercialLine* commercialLine
 			, Date date
 			, int first /*= 0*/
 			, int number /*= 0*/
@@ -266,7 +278,7 @@ namespace synthese
 			if (commercialLine)
 				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLine->getKey();
 			if (!date.isUnknown())
-				query << " AND (EXISTS(SELECT * FROM " << ServiceDateTableSync::TABLE_NAME << " WHERE " << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE_NAME << "." << TABLE_COL_ID << " AND " << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString() << ")";
+				query << " AND EXISTS(SELECT * FROM " << ServiceDateTableSync::TABLE_NAME << " WHERE " << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE_NAME << "." << TABLE_COL_ID << " AND " << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString() << ")";
 			query << " ORDER BY ";
 			if (orderByOriginTime)
 				query << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");

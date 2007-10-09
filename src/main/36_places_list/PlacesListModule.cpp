@@ -24,6 +24,8 @@
 
 namespace synthese
 {
+	template<> const std::string util::FactorableTemplate<util::ModuleClass,transportwebsite::PlacesListModule>::FACTORY_KEY("36_places_list");
+
 	namespace transportwebsite
 	{
 		void PlacesListModule::initialize()

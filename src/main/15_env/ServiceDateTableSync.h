@@ -36,9 +36,9 @@ namespace synthese
 		class ServiceDate;
 
 		/** Service dates table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 		*/
-		class ServiceDateTableSync : public db::SQLiteTableSyncTemplate<ServiceDate>
+		class ServiceDateTableSync : public db::SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>
 		{
 		private:
 			static void _updateServiceCalendar (const db::SQLiteResultSPtr& rows, bool marked) ;

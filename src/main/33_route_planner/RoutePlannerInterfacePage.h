@@ -31,6 +31,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace transportwebsite
@@ -77,7 +79,7 @@ namespace synthese
 				- 13 : accessibility code
 				- 14 : site id
 		*/
-		class RoutePlannerInterfacePage : public interfaces::InterfacePage
+		class RoutePlannerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerInterfacePage>
 		{
 		public:
 			/** Display of a successful route planning

@@ -27,7 +27,6 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
 
-#include "15_env/City.h"
 #include "15_env/EnvModule.h"
 
 #include <sqlite/sqlite3.h>
@@ -43,21 +42,35 @@ namespace synthese
 	using namespace db;
 	using namespace env;
 
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<SQLiteTableSync,CityTableSync>::FACTORY_KEY("15.20.01 Cities");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<City>::TABLE_NAME = "t006_cities";
-		template<> const int SQLiteTableSyncTemplate<City>::TABLE_ID = 6;
-		template<> const bool SQLiteTableSyncTemplate<City>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<CityTableSync,City>::TABLE_NAME = "t006_cities";
+		template<> const int SQLiteTableSyncTemplate<CityTableSync,City>::TABLE_ID = 6;
+		template<> const bool SQLiteTableSyncTemplate<CityTableSync,City>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<City>::load(City* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<CityTableSync,City>::load(City* object, const db::SQLiteResultSPtr& rows)
 		{
 		    object->setKey(rows->getLongLong (TABLE_COL_ID));
 		    object->setName(rows->getText ( CityTableSync::TABLE_COL_NAME));
 		    object->setCode(rows->getText ( CityTableSync::TABLE_COL_CODE));  
 		}
 
+		template<> void SQLiteTableSyncTemplate<CityTableSync,City>::_link(City* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			EnvModule::getCitiesMatcher ().add (obj->getName (), obj->getKey ());
+		}
 
-		template<> void SQLiteTableSyncTemplate<City>::save(City* object)
+		template<> void SQLiteTableSyncTemplate<CityTableSync,City>::_unlink(City* obj)
+		{
+			EnvModule::getCitiesMatcher ().remove (obj->getName ());
+		}
+
+		template<> void SQLiteTableSyncTemplate<CityTableSync,City>::save(City* object)
 		{
 			/// @todo Implement
 			/*			SQLite* sqlite = DBModule::GetSQLite();
@@ -93,7 +106,7 @@ namespace synthese
 		const std::string CityTableSync::TABLE_COL_CODE = "code";
 		
 		CityTableSync::CityTableSync ()
-			: SQLiteTableSyncTemplate<City> (true, false, db::TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<CityTableSync,City> ()
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER");
 			addTableColumn (TABLE_COL_NAME, "TEXT");
@@ -109,7 +122,7 @@ namespace synthese
 
 		}
 
-		    
+/*		    
 		void 
 			CityTableSync::rowsAdded (synthese::db::SQLite* sqlite, 
 			synthese::db::SQLiteSync* sync,
@@ -122,7 +135,7 @@ namespace synthese
 			if (City::Contains (id)) return;
 			
 			City* city(new City);
-			load (city, rows);
+			load (city, rows, true);
 			city->store();
 
 			EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
@@ -142,7 +155,7 @@ namespace synthese
 			    
 				EnvModule::getCitiesMatcher().remove (city->getName ());
 			    
-			    load(city.get(), rows);
+			    load(city.get(), rows, true);
 			    
 			    EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
 			}
@@ -163,6 +176,6 @@ namespace synthese
 			    City::Remove (id);
 			}
 		}
-
+*/
 	}
 }

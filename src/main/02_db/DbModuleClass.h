@@ -19,7 +19,6 @@ namespace synthese
 	        class DbModuleClass : public util::ModuleClass
 		{
 		public:
-
 		    typedef std::map<std::string, std::string> Parameters;
 
 		private:

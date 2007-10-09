@@ -35,13 +35,18 @@ namespace synthese
 	using namespace util;
 	using namespace messages;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,AlarmObjectLinkTableSync>::FACTORY_KEY("99.00.01 Alarm links");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate< AlarmObjectLink>::TABLE_NAME = "t040_alarm_object_links";
-		template<> const int SQLiteTableSyncTemplate< AlarmObjectLink>::TABLE_ID = 40;
-		template<> const bool SQLiteTableSyncTemplate< AlarmObjectLink>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::TABLE_NAME = "t040_alarm_object_links";
+		template<> const int SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::TABLE_ID = 40;
+		template<> const bool SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate< AlarmObjectLink>::load(AlarmObjectLink* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::load(AlarmObjectLink* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setAlarmId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_ALARM_ID));
@@ -49,7 +54,28 @@ namespace synthese
 			object->setRecipientKey(rows->getText ( AlarmObjectLinkTableSync::COL_RECIPIENT_KEY));
 		}
 
-		template<> void SQLiteTableSyncTemplate< AlarmObjectLink>::save(AlarmObjectLink* object)
+
+		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_link(AlarmObjectLink* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			assert(temporary == GET_AUTO || temporary == GET_REGISTRY);
+			shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::createSharedPtr(obj->getRecipientKey());
+			shared_ptr<SentAlarm> alarm(SentAlarm::GetUpdateable(obj->getAlarmId()));
+			ar->addObject(alarm.get(), obj->getObjectId());
+			obj->setLinked(true);
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_unlink(AlarmObjectLink* aol)
+		{
+			shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::createSharedPtr(aol->getRecipientKey());
+			shared_ptr<SentAlarm> alarm = SentAlarm::GetUpdateable(aol->getAlarmId());
+			ar->removeObject(alarm.get(), aol->getObjectId());
+			aol->setLinked(false);
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::save(AlarmObjectLink* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -75,7 +101,7 @@ namespace synthese
 
 
 		AlarmObjectLinkTableSync::AlarmObjectLinkTableSync()
-			: SQLiteTableSyncTemplate<AlarmObjectLink>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_RECIPIENT_KEY, "TEXT");
@@ -100,9 +126,7 @@ namespace synthese
 				if (!SentAlarm::Contains(aol->getAlarmId()))
 					continue;
 
-				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::createSharedPtr(aol->getRecipientKey());
-				shared_ptr<SentAlarm> alarm(SentAlarm::GetUpdateable(aol->getAlarmId()));
-				ar->addObject(alarm.get(), aol->getObjectId());
+				link(aol, rows, GET_REGISTRY);
 				aol->store();
 			}
 		}
@@ -121,12 +145,10 @@ namespace synthese
 
 				shared_ptr<AlarmObjectLink> aol = AlarmObjectLink::GetUpdateable(rows->getLongLong (TABLE_COL_ID));
 				
-				// Alarm not found in ram : this is a template
+				// Alarm not found in ram : this is not a template
 				if (SentAlarm::Contains(aol->getAlarmId()))
 				{
-					shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::createSharedPtr(aol->getRecipientKey());
-					shared_ptr<SentAlarm> alarm = SentAlarm::GetUpdateable(aol->getAlarmId());
-					ar->removeObject(alarm.get(), aol->getObjectId());
+					unlink(aol.get());
 				}
 				AlarmObjectLink::Remove(rows->getLongLong (TABLE_COL_ID));
 			}

@@ -41,13 +41,18 @@ namespace synthese
 	using namespace util;
 	using namespace messages;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,TextTemplateTableSync>::FACTORY_KEY("17.10.10 Text templates");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TextTemplate>::TABLE_NAME = "t038_text_templates";
-		template<> const int SQLiteTableSyncTemplate<TextTemplate>::TABLE_ID = 38;
-		template<> const bool SQLiteTableSyncTemplate<TextTemplate>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::TABLE_NAME = "t038_text_templates";
+		template<> const int SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::TABLE_ID = 38;
+		template<> const bool SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<TextTemplate>::load(TextTemplate* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::load(TextTemplate* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setName(rows->getText (TextTemplateTableSync::COL_NAME));
@@ -57,7 +62,15 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<TextTemplate>::save(TextTemplate* object)
+		template<> void SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::_link(TextTemplate* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+		}
+
+		template<> void SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::_unlink(TextTemplate* obj)
+		{
+		}
+
+		template<> void SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::save(TextTemplate* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -96,7 +109,7 @@ namespace synthese
 		const std::string TextTemplateTableSync::COL_LEVEL = "level";
 
 		TextTemplateTableSync::TextTemplateTableSync()
-			: SQLiteTableSyncTemplate<TextTemplate>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_NAME, "TEXT");
@@ -105,17 +118,6 @@ namespace synthese
 			addTableColumn(COL_LEVEL, "INTEGER");
 		}
 
-		void TextTemplateTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		}
-
-		void TextTemplateTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-		}
-
-		void TextTemplateTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-		}
 
 		vector<shared_ptr<TextTemplate> > TextTemplateTableSync::search(
 			AlarmLevel level

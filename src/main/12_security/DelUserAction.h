@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -36,10 +38,10 @@ namespace synthese
 		/** User removal action class.
 			@ingroup m12Actions refActions
 		*/
-		class DelUserAction : public server::Action
+		class DelUserAction : public util::FactorableTemplate<server::Action, DelUserAction>
 		{
 		private:
-			boost::shared_ptr<User>	_user;
+			boost::shared_ptr<const User>	_user;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

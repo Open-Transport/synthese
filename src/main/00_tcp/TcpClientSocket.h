@@ -24,11 +24,11 @@
 #define SYNTHESE_TCP_TCPCLIENTSOCKET_H
 
 
+#include "Socket.h"
 
 #include <boost/iostreams/concepts.hpp> 
 #include <boost/shared_ptr.hpp>
 
-#include "Socket.h"
 #include "SocketException.h"
 
 

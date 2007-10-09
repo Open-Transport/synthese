@@ -35,7 +35,8 @@ namespace synthese
 	int sqliteBusyHandler (void* arg, int nbCalls)
 	{
 	    // Return a non-zero value so that a retry is made, waiting for SQLite not ot be busy anymore...
-	    return 1;
+		cerr << "occupé";
+		return 1;
 	    
 	}
 	
@@ -102,15 +103,18 @@ namespace synthese
 	SQLiteResultSPtr 
 	SQLiteHandle::execQuery (const SQLiteStatementSPtr& statement, bool lazy)
 	{
+//		cerr << "open" << statement->getSQL();
 	    // lazy = false;
 	    SQLiteResultSPtr result (new SQLiteLazyResult (statement));
 	    if (lazy)
 	    {
+//			cerr << "close lazy" << statement->getSQL();
 		return result;
 	    }
 	    else
 	    {
 		SQLiteCachedResult* cachedResult = new SQLiteCachedResult (result);
+//		cerr << "close" << statement->getSQL();
 		return SQLiteResultSPtr (cachedResult);
 	    }
 	}
@@ -147,7 +151,7 @@ namespace synthese
 	void 
 	SQLiteHandle::execUpdate (const SQLiteStatementSPtr& statement)
 	{
-	    
+//	    cerr << "open" << statement->getSQL();
 	    UpdateHookStruct* uhs = getUpdateHookStruct ();
 	    uhs->events.clear ();
 
@@ -173,13 +177,15 @@ namespace synthese
 		    (*ith)->eventCallback (this, *it);
 		}
 	    }
-	    
+//		cerr << "close" << statement->getSQL();
+    
 	}
 
 
 	void 
 	SQLiteHandle::execUpdate (const SQLData& sql)
 	{
+//		cerr << "open" << sql;
 	    UpdateHookStruct* uhs = getUpdateHookStruct ();
 	    uhs->events.clear ();
 
@@ -214,6 +220,7 @@ namespace synthese
 		}
 	    }
 
+//		cerr << "close" << sql;
 
 	}
 

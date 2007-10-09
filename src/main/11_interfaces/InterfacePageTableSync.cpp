@@ -22,6 +22,7 @@
 #include "InterfacePageTableSync.h"
 
 #include "11_interfaces/InterfacePage.h"
+#include "11_interfaces/NonPredefinedInterfacePage.h"
 #include "11_interfaces/Interface.h"
 
 #include "01_util/Conversion.h"
@@ -39,24 +40,36 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<SQLiteTableSync,InterfacePageTableSync>::FACTORY_KEY("16.02 Interface Pages");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<InterfacePage>::TABLE_NAME = "t023_interface_pages";
-		template<> const int SQLiteTableSyncTemplate<InterfacePage>::TABLE_ID = 23;
-		template<> const bool SQLiteTableSyncTemplate<InterfacePage>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::TABLE_NAME = "t023_interface_pages";
+		template<> const int SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::TABLE_ID = 23;
+		template<> const bool SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::HAS_AUTO_INCREMENT = true;
 
 
 
-		template<> void SQLiteTableSyncTemplate<InterfacePage>::load(InterfacePage* page, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::load(InterfacePage* page, const db::SQLiteResultSPtr& rows )
 		{
 			page->setKey(rows->getLongLong (TABLE_COL_ID));
-			page->setCode(rows->getText (InterfacePageTableSync::TABLE_COL_PAGE));
 			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
 		}
 
+		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::_link(InterfacePage* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
 
+		}
 
-		template<> void SQLiteTableSyncTemplate<InterfacePage>::save(InterfacePage* object)
+		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::_unlink(InterfacePage* obj)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::save(InterfacePage* object)
 		{
 
 		}
@@ -69,7 +82,7 @@ namespace synthese
 		const std::string InterfacePageTableSync::TABLE_COL_CONTENT = "content";
 
 		InterfacePageTableSync::InterfacePageTableSync()
-			: SQLiteTableSyncTemplate<InterfacePage> (true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_INTERFACE, "INTEGER", false);
@@ -98,7 +111,7 @@ namespace synthese
 					InterfacePage* page(
 						Factory<InterfacePage>::contains(rows->getText(TABLE_COL_PAGE))
 						? Factory<InterfacePage>::create(rows->getText(TABLE_COL_PAGE))
-						: new InterfacePage
+						: new NonPredefinedInterfacePage(rows->getText(TABLE_COL_PAGE))
 					);
 
 					load(page, rows);
@@ -108,7 +121,7 @@ namespace synthese
 						rows->getLongLong ( TABLE_COL_INTERFACE )
 					);
 					
-					interf->addPage(rows->getText ( TABLE_COL_PAGE), page );
+					interf->addPage(page);
 				}
 				catch (Interface::RegistryKeyException& e)
 				{

@@ -63,9 +63,18 @@ namespace synthese
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
-			static void addUserLogin(boost::shared_ptr<const User> user);
-			static void addUserAdmin(boost::shared_ptr<const User> user, boost::shared_ptr<const User> subject, const std::string& text);
-			static void addProfileAdmin(boost::shared_ptr<const User> user, boost::shared_ptr<const Profile> subject, const std::string& text);
+
+			static void addUserLogin(const User* user);
+			static void addUserAdmin(
+				const User* user
+				, const User* subject
+				, const std::string& text
+			);
+			static void addProfileAdmin(
+				const User* user
+				, const Profile* subject
+				, const std::string& text
+			);
 		};
 	}
 }

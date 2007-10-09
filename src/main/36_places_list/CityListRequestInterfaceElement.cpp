@@ -41,6 +41,8 @@ namespace synthese
 	using namespace html;
 	using namespace util;
 
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,transportwebsite::CityListRequestInterfaceElement>::FACTORY_KEY("city_list_request");
+
 	namespace transportwebsite
 	{
 		void CityListRequestInterfaceElement::storeParameters(ValueElementList& vel)

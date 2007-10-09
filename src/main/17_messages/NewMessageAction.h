@@ -25,6 +25,9 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
+
 namespace synthese
 {
 	namespace messages
@@ -34,9 +37,9 @@ namespace synthese
 		class ScenarioTemplate;
 
 		/** Alarm creation action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
-		class NewMessageAction : public server::Action
+		class NewMessageAction : public util::FactorableTemplate<server::Action, NewMessageAction>
 		{
 		public:
 			static const std::string PARAMETER_IS_TEMPLATE;

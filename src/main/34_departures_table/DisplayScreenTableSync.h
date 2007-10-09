@@ -28,25 +28,23 @@
 #include <string>
 #include <iostream>
 
+#include "DisplayScreen.h"
+
 #include "01_util/Constants.h"
 #include "01_util/UId.h"
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 #include "12_security/Types.h"
 
 namespace synthese
 {
-	using namespace security;
-
 	namespace departurestable
 	{
-		class DisplayScreen;
-
 		/** DisplayScreen table synchronizer.
-			@ingroup m34
+			@ingroup m34LS refLS
 		*/
-		class DisplayScreenTableSync : public db::SQLiteTableSyncTemplate<DisplayScreen>
+		class DisplayScreenTableSync : public db::SQLiteRegistryTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>
 		{
 			static const std::string _COL_LINE_EXISTS;
 			static const std::string _COL_LAST_MAINTENANCE_CONTROL;
@@ -100,7 +98,7 @@ namespace synthese
 			static std::vector<boost::shared_ptr<DisplayScreen> > search(
 				const security::RightsOfSameClassMap& rights 
 				, bool totalControl 
-				, RightLevel neededLevel
+				, security::RightLevel neededLevel
 				, uid duid = UNKNOWN_VALUE
 				, uid localizationid = UNKNOWN_VALUE
 				, uid lineid = UNKNOWN_VALUE
@@ -120,33 +118,7 @@ namespace synthese
 				, bool orderByStatus = false
 				, bool orderByMessage = false
 				, bool raisingOrder = true
-				);
-
-
-		protected:
-
-			/** Action to do on DisplayScreen creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on DisplayScreen creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on DisplayScreen deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
+			);
 		};
 	}
 }

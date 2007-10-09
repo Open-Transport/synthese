@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "12_security/UpdateRightAction.h"
+#include "UpdateRightAction.h"
+
 #include "12_security/ProfileTableSync.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/Right.h"
@@ -28,6 +29,7 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
 
 #include "13_dblog/DBLogModule.h"
 
@@ -37,6 +39,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace dblog;
+	using namespace util;
 
 	namespace util
 	{
@@ -55,21 +58,19 @@ namespace synthese
 			ParametersMap map;
 			if (_right.get())
 			{
-				map.insert(make_pair(PARAMETER_RIGHT_CODE, _right->getFactoryKey()));
-				map.insert(make_pair(PARAMETER_RIGHT_PARAMETER, _right->getParameter()));
-				map.insert(make_pair(PARAMETER_PUBLIC_VALUE, Conversion::ToString(static_cast<int>(_right->getPublicRightLevel()))));
-				map.insert(make_pair(PARAMETER_PRIVATE_VALUE, Conversion::ToString(static_cast<int>(_right->getPrivateRightLevel()))));
+				map.insert(PARAMETER_RIGHT_CODE, _right->getFactoryKey());
+				map.insert(PARAMETER_RIGHT_PARAMETER, _right->getParameter());
+				map.insert(PARAMETER_PUBLIC_VALUE, static_cast<int>(_right->getPublicRightLevel()));
+				map.insert(PARAMETER_PRIVATE_VALUE, static_cast<int>(_right->getPrivateRightLevel()));
 			}
 			return map;
 		}
 
 		void UpdateRightAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			try
 			{
-				_profile = ProfileTableSync::get(_request->getObjectId());
+				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
 			}
 			catch(...)
 			{
@@ -77,19 +78,19 @@ namespace synthese
 			}
 
 			// Right code
-			string rightCode(Request::getStringFormParameterMap(map, PARAMETER_RIGHT_CODE, true, FACTORY_KEY));
+			string rightCode(map.getString(PARAMETER_RIGHT_CODE, true, FACTORY_KEY));
 
 			// Right parameter
-			string parameter(Request::getStringFormParameterMap(map, PARAMETER_RIGHT_PARAMETER, true, FACTORY_KEY));
+			string parameter(map.getString(PARAMETER_RIGHT_PARAMETER, true, FACTORY_KEY));
 			_right = _profile->getRight(rightCode, parameter);
 			if (!_right.get())
 				throw ActionException("Specified right not found on profile");
 
 			// Public level
-			_publicLevel = static_cast<RightLevel>(Request::getIntFromParameterMap(map, PARAMETER_PUBLIC_VALUE, true, FACTORY_KEY));
+			_publicLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PUBLIC_VALUE, true, FACTORY_KEY));
 
 			// Private level
-			_privateLevel = static_cast<RightLevel>(Request::getIntFromParameterMap(map, PARAMETER_PRIVATE_VALUE, false, FACTORY_KEY));
+			_privateLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PRIVATE_VALUE, false, FACTORY_KEY));
 		}
 
 		void UpdateRightAction::run()
@@ -103,7 +104,7 @@ namespace synthese
 
 			ProfileTableSync::save(_profile.get());
 
-			SecurityLog::addProfileAdmin(_request->getUser(), _profile, _right->getFactoryKey() + "/" + _right->getParameter() + log.str());
+			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), _right->getFactoryKey() + "/" + _right->getParameter() + log.str());
 		}
 	}
 }

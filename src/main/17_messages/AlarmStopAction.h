@@ -24,7 +24,10 @@
 #define SYNTHESE_AlarmStopAction_H__
 
 #include "30_server/Action.h"
+
 #include "04_time/DateTime.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -33,9 +36,9 @@ namespace synthese
 		class SingleSentAlarm;
 
 		/** AlarmStopAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
-		class AlarmStopAction : public server::Action
+		class AlarmStopAction : public util::FactorableTemplate<server::Action, AlarmStopAction>
 		{
 		public:
 			static const std::string PARAMETER_ALARM_ID;
