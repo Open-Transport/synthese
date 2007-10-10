@@ -38,6 +38,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace time;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<Action, messages::ScenarioStopAction>::FACTORY_KEY("scenariostop");
 	

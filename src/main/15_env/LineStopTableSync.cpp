@@ -24,7 +24,7 @@
 #include "LineStopTableSync.h"
 
 #include "15_env/LineTableSync.h"
-#include "15_env/PhysicalStopTableSYnc.h"
+#include "15_env/PhysicalStopTableSync.h"
 
 #include <sstream>
 

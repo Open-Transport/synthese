@@ -133,9 +133,9 @@ namespace synthese
 					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getId())
 					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToSQLiteString(recipientKey);
 			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			    query << " LIMIT " << util::Conversion::ToString(number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			    query << " OFFSET " << util::Conversion::ToString(first);
 
 			try
 			{

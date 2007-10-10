@@ -277,7 +277,7 @@ namespace synthese
 			std::stringstream query;
 			query
 				<< "SELECT " << field << " FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(id);
+				<< " WHERE " << TABLE_COL_ID << "=" << util::Conversion::ToString(id);
 			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			if (!rows->next())
 				throw DBEmptyResultException<T>(id, "ID not found in database.");

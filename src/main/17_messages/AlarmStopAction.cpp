@@ -37,6 +37,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace time;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<Action, messages::AlarmStopAction>::FACTORY_KEY("masa");
 	
@@ -68,7 +69,8 @@ namespace synthese
 		}
 
 		AlarmStopAction::AlarmStopAction()
-			: FactorableTemplate<Action,AlarmStopAction>(), _stopDateTime(TIME_CURRENT)
+			: FactorableTemplate<Action,AlarmStopAction>()
+			, _stopDateTime(TIME_CURRENT)
 		{}
 
 		void AlarmStopAction::run()

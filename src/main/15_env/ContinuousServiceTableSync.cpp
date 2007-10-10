@@ -26,7 +26,7 @@
 #include "15_env/LineTableSync.h"
 #include "15_env/BikeComplianceTableSync.h"
 #include "15_env/PedestrianComplianceTableSync.h"
-#include "15_env/HandicappedComplianceTableSYnc.h"
+#include "15_env/HandicappedComplianceTableSync.h"
 #include "15_env/EnvModule.h"
 
 #include <sstream>

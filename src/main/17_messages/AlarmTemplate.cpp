@@ -24,6 +24,9 @@
 
 namespace synthese
 {
+    using util::Registrable;
+
+
 	namespace messages
 	{
 

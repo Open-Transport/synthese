@@ -54,15 +54,15 @@ namespace synthese
 					if (T::Contains(rows->getLongLong (TABLE_COL_ID)))
 					{
 						boost::shared_ptr<T> address(T::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-						unlink(address.get());
+						SQLiteTableSyncTemplate<K,T>::unlink(address.get());
 						load (address.get(), rows);
-						link(address.get(), rows, GET_REGISTRY);
+						    SQLiteTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
 					}
 					else
 					{
 						T* object(new T);
 						load(object, rows);
-						link(object, rows, GET_REGISTRY);
+						    SQLiteTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
 						object->store();
 					}
 				}
@@ -83,9 +83,9 @@ namespace synthese
 					if (T::Contains(id))
 					{
 						boost::shared_ptr<T> address(T::GetUpdateable(id));
-						unlink(address.get());
+						    SQLiteTableSyncTemplate<K,T>::unlink(address.get());
 						load (address.get(), rows);
-						link(address.get(), rows, GET_REGISTRY);
+						    SQLiteTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
 					}
 				}
 			}
@@ -105,7 +105,7 @@ namespace synthese
 					uid id = rows->getLongLong (TABLE_COL_ID);
 					if (T::Contains(id))
 					{
-						unlink(T::GetUpdateable(id).get());
+					    SQLiteTableSyncTemplate<K,T>::unlink(T::GetUpdateable(id).get());
 						T::Remove(id);
 					}
 				}
