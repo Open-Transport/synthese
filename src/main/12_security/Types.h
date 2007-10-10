@@ -77,7 +77,8 @@ namespace synthese
 
 		/** Niveaux d'habilitation. */
 		typedef enum {
-			FORBIDDEN	= 0		//!< Interdiction
+			UNKNOWN_RIGHT_LEVEL = -1
+			, FORBIDDEN	= 0		//!< Interdiction
 			, USE		= 20	//!< Utilisation de fonction autorisée
 			, READ		= 40	//!< Lecture directe de données autorisée
 			, WRITE		= 60	//!< Ecriture directe de donnée autorisée

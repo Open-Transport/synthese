@@ -28,7 +28,9 @@
 #include "15_env/TransportNetworkTableSync.h"
 #include "15_env/TransportNetwork.h"
 #include "15_env/CommercialLineTableSync.h"
+#include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/CommercialLine.h"
+#include "15_env/AdvancedSelectTableSync.h"
 #include "15_env/EnvModule.h"
 
 #include "12_security/Constants.h"
@@ -122,22 +124,25 @@ namespace synthese
 				int tableId1(util::decodeTableId(id1));
 				if (tableId1 == TransportNetworkTableSync::TABLE_ID)
 				{
-					if (util::decodeTableId(id2) == TransportNetworkTableSync::TABLE_ID)
+					int tableId2(util::decodeTableId(id2));
+					if (tableId2 == TransportNetworkTableSync::TABLE_ID)
 						return id1 == id2;
-					if (util::decodeTableId(id2) == CommercialLineTableSync::TABLE_ID)
+					if (tableId2 == CommercialLineTableSync::TABLE_ID)
 					{
 						boost::shared_ptr<const CommercialLine> line(CommercialLine::Get(id2));
 						boost::shared_ptr<const TransportNetwork> network(TransportNetwork::Get(id1));
 						return line->getNetwork() == network.get();
 					}
+					if (tableId2 == ConnectionPlaceTableSync::TABLE_ID)
+						return isPlaceServedByNetwork(id1, id2);
 				}
 				if (tableId1 == CommercialLineTableSync::TABLE_ID)
 				{
 					int tableId2(util::decodeTableId(id2));
 					if (tableId2 == CommercialLineTableSync::TABLE_ID)
 						return id1 == id2;
-//					if (tableId2 == ConnectionPlaceTableSync::TABLE_ID)
-//						return isPlaceServedByCommercialLine(id1, id2);
+					if (tableId2 == ConnectionPlaceTableSync::TABLE_ID)
+						return isPlaceServedByCommercialLine(id1, id2);
 				}
 			}
 			catch(...)

@@ -29,7 +29,8 @@ namespace synthese
 {
 	namespace env
 	{
-		static bool isPlaceServedByCommercialLine(uid Line, uid place);
+		bool isPlaceServedByCommercialLine(uid Line, uid place);
+		bool isPlaceServedByNetwork(uid networkId, uid place);
 	}
 }
 

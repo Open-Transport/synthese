@@ -63,6 +63,7 @@
 #include "34_departures_table/ArrivalDepartureTableRight.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -100,7 +101,7 @@ namespace synthese
 		void DisplayAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
 			// Rights
-			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, FORBIDDEN, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
 
 			// Update request
 			ActionFunctionRequest<UpdateDisplayScreenAction,AdminRequest> updateDisplayRequest(request);
@@ -467,7 +468,18 @@ namespace synthese
 
 		bool DisplayAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return request->isAuthorized<ArrivalDepartureTableRight>(READ, FORBIDDEN, Conversion::ToString(request->getObjectId()));
+			if (request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				return true;
+
+			try
+			{
+				shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(request->getObjectId(), GET_AUTO, true));
+				return request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(screen->getLocalization()->getKey()));
+			}
+			catch (...)
+			{
+				return false;
+			}
 		}
 
 		DisplayAdmin::DisplayAdmin()

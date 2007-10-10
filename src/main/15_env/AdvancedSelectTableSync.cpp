@@ -25,8 +25,7 @@
 #include "15_env/LineStopTableSync.h"
 #include "15_env/LineTableSync.h"
 #include "15_env/PhysicalStopTableSync.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/ConnectionPlace.h"
+#include "15_env/CommercialLineTableSync.h"
 
 #include "02_db/DBModule.h"
 
@@ -46,13 +45,30 @@ namespace synthese
 		{
 			stringstream query;
 			query
-				<< "SELECT ls." << TABLE_COL_ID << " FROM"
-				<< LineStopTableSync::TABLE_NAME << " AS ls"
+				<< "SELECT ls." << TABLE_COL_ID << " FROM "
+				<< LineStopTableSync::TABLE_NAME << " AS ls "
 				<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_PHYSICALSTOPID
 				<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID
 				<< " WHERE "
 				<< "p." << PhysicalStopTableSync::COL_PLACEID << "=" << placeId
 				<< " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId
+				<< " LIMIT 1";
+			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));
+			return rows->next();
+		}
+
+		bool isPlaceServedByNetwork( uid networkId, uid placeId )
+		{
+			stringstream query;
+			query
+				<< "SELECT ls." << TABLE_COL_ID << " FROM "
+				<< LineStopTableSync::TABLE_NAME << " AS ls "
+				<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_PHYSICALSTOPID
+				<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID
+				<< " INNER JOIN " << CommercialLineTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=l." << LineTableSync::COL_COMMERCIAL_LINE_ID
+				<< " WHERE "
+				<< "p." << PhysicalStopTableSync::COL_PLACEID << "=" << placeId
+				<< " AND c." << CommercialLineTableSync::COL_NETWORK_ID << "=" << networkId
 				<< " LIMIT 1";
 			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));
 			return rows->next();

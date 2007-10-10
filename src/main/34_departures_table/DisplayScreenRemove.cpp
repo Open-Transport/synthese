@@ -81,7 +81,7 @@ namespace synthese
 		{
 			return _request->isAuthorized<ArrivalDepartureTableRight>(
 				DELETE_RIGHT
-				, FORBIDDEN
+				, UNKNOWN_RIGHT_LEVEL
 				, Conversion::ToString(_displayScreen->getKey())
 				);
 		}

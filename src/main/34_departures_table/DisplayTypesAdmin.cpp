@@ -79,7 +79,7 @@ namespace synthese
 		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// Right
-			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, FORBIDDEN, GLOBAL_PERIMETER));
+			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 
 			vector<shared_ptr<DisplayType> > searchResult(DisplayTypeTableSync::search(string()));
 
@@ -145,7 +145,7 @@ namespace synthese
 
 		bool DisplayTypesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return request->isAuthorized<ArrivalDepartureTableRight>(READ, FORBIDDEN, GLOBAL_PERIMETER);
+			return request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER);
 		}
 
 		DisplayTypesAdmin::DisplayTypesAdmin()

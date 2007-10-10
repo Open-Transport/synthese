@@ -69,7 +69,7 @@ namespace synthese
 			vector<shared_ptr<DisplayScreen> > v = DisplayScreenTableSync::search(
 				RightsOfSameClassMap()
 				, true
-				, FORBIDDEN
+				, UNKNOWN_RIGHT_LEVEL
 				, UNKNOWN_VALUE
 				, UNKNOWN_VALUE
 				, UNKNOWN_VALUE
