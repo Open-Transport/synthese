@@ -134,6 +134,10 @@ namespace synthese
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
 				}
+				catch (std::exception e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
+				}
 			}
 
 			// Displayed places
@@ -148,6 +152,10 @@ namespace synthese
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
 				}
+				catch (std::exception e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
+				}
 			}
 
 			// Forced destinations
@@ -161,6 +169,10 @@ namespace synthese
 				catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+				}
+				catch (std::exception e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 				}
 			}
 		}
