@@ -38,7 +38,7 @@ print "cxx  = ", rootenv['CXX']
 rootenv.Replace ( PLATFORM = platform )
 rootenv.Replace ( MODE = mode )
 
-buildroot = 'build' + '/' + platform + '/' + toolset +'/' + mode
+buildroot = 'build' + '/' + platform + '/' + toolset +'/' + mode 
 buildmain = buildroot + '/main'
 buildtest = buildroot + '/test'
 
@@ -127,7 +127,7 @@ def DefaultModuleName ( env ):
 
   if istestmodule:
     mn = 'test_' + mn
-    
+
   return mn
 
 
@@ -409,7 +409,7 @@ def UnitTest (env):
 
 
 def SyntheseDist (env, exeprog):
-    
+  
   resourcesdistdir = '#' + resourcesdist + '/' + exeprog.name
   installerdir = distname + '_dist'
   localdir = installerdir + '/_' + distname

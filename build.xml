@@ -3,7 +3,7 @@
 
   <import file="../common.xml"/>
 
-  <property name="version" value="3_0"/>
+  <property name="version" value="3.0"/>
   <property name="lang" value="c++"/>
   
   <property name="include.home" value="${src.home}"/>
