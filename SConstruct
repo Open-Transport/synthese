@@ -324,7 +324,7 @@ def RecursiveBuild (parentenv):
       if not os.path.isdir (os.path.join (srcpath, f)): continue
       if not os.path.exists (os.path.join (srcpath, f, 'SConscript')): continue
       modules.append (f)
-    
+
     for module in modules:
       s0 = os.path.join (srcpath, module, 'SConscript')
       s1 = os.path.join (builddir, module)
@@ -543,7 +543,7 @@ def GenerateMSVSSolution (env):
 
 
 
-def SyntheseBuild (env, binname, generatemain = True):
+def SyntheseProgram (env, binname, generatemain = True):
 
     if goal == "genmsvs":
       env.GenerateMSVSProject ()
@@ -573,7 +573,7 @@ def SyntheseBuild (env, binname, generatemain = True):
       tmpinc = open (tempfile.gettempdir () + '/includes.cpp.inc', "w" )
 
       for module in reversed (modules):
-        moduledir = os.path.join (env.Dir ('..').srcnode ().abspath, module.replace ('__', os.sep))
+        moduledir = os.path.join (env.Dir ('../..').srcnode ().abspath, module.replace ('__', os.sep))
         for file in os.listdir (moduledir) :
           if fnmatch.fnmatch (file, '*.gen.cpp') :
             fragmentfile = os.path.join (moduledir, file)
@@ -591,8 +591,8 @@ def SyntheseBuild (env, binname, generatemain = True):
       tmpgen.close ()
       tmpinc.close ()
 
-      env.CopyFile (env.Dir ('#src/main').abspath + '/' + currentmodule + '/generated.cpp.inc', tmpgen.name)
-      env.CopyFile (env.Dir ('#src/main').abspath + '/' + currentmodule + '/includes.cpp.inc', tmpinc.name)
+      env.CopyFile (env.Dir ('#src/main/programs').abspath + '/' + currentmodule + '/generated.cpp.inc', tmpgen.name)
+      env.CopyFile (env.Dir ('#src/main/programs').abspath + '/' + currentmodule + '/includes.cpp.inc', tmpinc.name)
 
 
     exeprog = env.Program ( binname, files )[0]
@@ -629,7 +629,7 @@ SConsEnvironment.IsProfile=IsProfile
 SConsEnvironment.GenerateMSVSProject=GenerateMSVSProject 
 SConsEnvironment.GenerateMSVSSolution=GenerateMSVSSolution
 
-SConsEnvironment.SyntheseBuild=SyntheseBuild
+SConsEnvironment.SyntheseProgram=SyntheseProgram
 SConsEnvironment.SyntheseDist=SyntheseDist
 
 SConsEnvironment.UnitTest=UnitTest

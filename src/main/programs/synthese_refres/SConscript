@@ -7,6 +7,6 @@ modules = ['39_map', '30_server', '15_env', '12_security', '32_admin', '13_dblog
 
 syntheseenv = env.SyntheseEnv (modules)
 
-syntheseenv.SyntheseBuild (syntheseenv.DefaultModuleName ())
+syntheseenv.SyntheseProgram (syntheseenv.DefaultModuleName ())
 
 

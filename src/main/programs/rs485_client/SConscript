@@ -6,7 +6,7 @@ Import ('env')
 if (env['PLATFORM'] == 'win32'):
   modules = ['01_util', '01_util__threads', '00_tcp'];
   syntheseenv = env.SyntheseEnv (modules)
-  syntheseenv.SyntheseBuild (syntheseenv.DefaultModuleName (), False)
+  syntheseenv.SyntheseProgram (syntheseenv.DefaultModuleName (), False)
 
 
 
