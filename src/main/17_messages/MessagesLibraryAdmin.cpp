@@ -38,6 +38,7 @@
 #include "17_messages/MessagesLibraryRight.h"
 
 #include "30_server/ActionFunctionRequest.h"
+#include "32_admin/AdminRequest.h"
 
 using namespace std;
 using namespace boost;

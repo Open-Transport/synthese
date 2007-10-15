@@ -24,6 +24,7 @@
 
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
 
 #include "05_html/HTMLModule.h"
 

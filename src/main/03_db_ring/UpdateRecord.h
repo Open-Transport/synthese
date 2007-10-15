@@ -2,12 +2,15 @@
 #define SYNTHESE_DBRING_UPDATERECORD_H
 
 #include "03_db_ring/NodeInfo.h"
+#include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
 
 #include <string>
+#include <set>
 
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 
@@ -28,7 +31,7 @@ namespace dbring
 
 
 
-class UpdateRecord
+    class UpdateRecord : public util::Registrable<uid,UpdateRecord>
 {
 
 private:
@@ -37,7 +40,7 @@ private:
     boost::posix_time::ptime _timestamp;   //!< Original emission time (sort criterium).
     NodeId _emitterNodeId;                 //!< Original emitter node id.
     RecordState _state;                    //!< Record enforcement state.
-    std::string _sql;                      //!< Update SQL query string.
+    std::string _compressedSQL;            //!< Update SQL query string (zlib compressed).
 
 
 public:
@@ -48,7 +51,8 @@ public:
 		  const boost::posix_time::ptime& timestamp, 
 		  const NodeId& emitterNodeId,
 		  const RecordState& state,
-		  const std::string& sql);
+		  const std::string& compressedSQL);
+
 
     ~UpdateRecord ();
 
@@ -64,8 +68,14 @@ public:
     const RecordState& getState () const { return _state; }
     void setState (const RecordState& state) { _state = state; }
 
-    const std::string& getSQL () const { return _sql; }
-    void setSQL (const std::string& sql) { _sql = sql; }
+    bool hasCompressedSQL () const;
+    const std::string& getCompressedSQL () const;
+    void setCompressedSQL (const std::string& compressedSQL);
+
+    // TODO : remove this (unneeded)
+    // bool getLinked () const { return true; }
+    //void setLinked (bool linked) {}
+
 	      
 private:
 
@@ -75,6 +85,24 @@ private:
 
 };
 
+    typedef boost::shared_ptr<UpdateRecord> UpdateRecordSPtr;
+
+
+    struct updateRecordCmp
+    {
+	bool operator()(const UpdateRecordSPtr& op1, const UpdateRecordSPtr& op2) const
+	{
+	    return op1->getTimestamp () < op2->getTimestamp ();
+	}
+    };
+
+    
+    typedef std::set<UpdateRecordSPtr, updateRecordCmp> UpdateRecordSet;
+
+
+
+std::ostream& operator<< ( std::ostream& os, const UpdateRecordSet& op );
+std::istream& operator>> ( std::istream& is, UpdateRecordSet& op );
 
 
 std::ostream& operator<< ( std::ostream& os, const UpdateRecord& op );

@@ -27,8 +27,14 @@ namespace synthese
 			~Compression ();
 
 		public:
-
+			/**
+			   Compress data incoming from a stream to another.
+			*/
 			static void ZlibCompress (std::istream& is, std::ostream& o);
+
+			/**
+			   Decompress data incoming from a stream to another.
+			*/
 			static void ZlibDecompress (std::istream& is, std::ostream& os);
 
 		};

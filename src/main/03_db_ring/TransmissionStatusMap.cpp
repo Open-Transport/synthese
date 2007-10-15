@@ -14,8 +14,16 @@ namespace dbring
     {
 	boost::mutex::scoped_lock mapLock ( _mapMutex);
 	std::map<NodeId, TransmissionStatus>::const_iterator it = _map.find (nodeId);
-	if (it == _map.end ()) return UNKNOWN;
+	if (it == _map.end ()) return READY;
 	return it->second;
+    }
+
+
+    void
+    TransmissionStatusMap::reset ()
+    {
+	boost::mutex::scoped_lock mapLock ( _mapMutex);
+	_map.clear ();
     }
 
 

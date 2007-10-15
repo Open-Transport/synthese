@@ -42,11 +42,14 @@ std::map<int, TcpService*> TcpService::_activeServices;
 
 TcpService::TcpService (int portNumber,
 			bool tcpProtocol,
-			bool nonBlocking)
+			bool nonBlocking,
+			int backlogSize
+    )
     : _portNumber (portNumber)
     , _protocol (tcpProtocol ? PROTOCOL_TYPE_TCP 
                   : PROTOCOL_TYPE_UDP )
     , _nonBlocking (nonBlocking)
+    , _backlogSize (backlogSize)
     , _socket (0)
 {
     initialize ();
@@ -72,7 +75,7 @@ TcpService::~TcpService ()
 void 
 TcpService::initialize () 
 {
-    Socket* socket = new Socket (_nonBlocking);
+    Socket* socket = new Socket (_nonBlocking, _backlogSize);
     try 
     {
 	socket->open ("*",
@@ -94,12 +97,15 @@ TcpService::initialize ()
 TcpService* 
 TcpService::openService (int portNumber, 
 			 bool tcpProtocol,
-			 bool nonBlocking)
+			 bool nonBlocking,
+			 int backlogSize)
 {
     std::map<int, TcpService*>::iterator it = 
 	_activeServices.find (portNumber);
     
     if (it != _activeServices.end ()) return it->second;
+
+    //std::cerr << "**************************************  NEW TCP SERVICE " << portNumber << std::endl;
 
     TcpService* newService = new TcpService (portNumber, tcpProtocol, nonBlocking);
     _activeServices.insert (std::make_pair (portNumber, newService));
@@ -128,21 +134,26 @@ TcpService::closeService (int portNumber)
 TcpServerSocket*
 TcpService::acceptConnection () 
 {
+	boost::mutex::scoped_lock lock (_serviceMutex);
     if (_socket == 0) throw SocketException ("Socket not ready !");
+
     try 
     {
 	int socketId = _socket->acceptConnection ();
+
 	if (socketId == INVALID_SOCKET) return 0;
 
 	// Note : the lock must be done here; otherwise another take the lock, waits
         // for client connection and no other client connection will ever be closed!
         // This is valid because the acceptConnection method does not modify Socket object.
 
-	boost::mutex::scoped_lock lock (_serviceMutex);
+//	boost::mutex::scoped_lock lock (_serviceMutex);
 
 	TcpServerSocket* serverSocket = new TcpServerSocket (*this, socketId);
 
 	_activeConnections.insert (std::make_pair (socketId, serverSocket));
+
+	// std::cerr << " nb conn = " << _activeConnections.size () << std::endl;
 	return serverSocket;
     }
     catch (const char* msg)
@@ -170,7 +181,6 @@ TcpService::closeConnection (TcpServerSocket* socket)
     boost::mutex::scoped_lock lock (_serviceMutex);
 
     int socketId = socket->getSocketId ();
-
     std::map<int, TcpServerSocket*>::iterator iter = 
 	_activeConnections.find (socketId);
 

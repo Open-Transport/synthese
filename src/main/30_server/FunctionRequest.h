@@ -24,6 +24,7 @@
 #define SYNTHESE_FunctionRequest_h__
 
 #include "30_server/Request.h"
+#include "30_server/Function.h"
 
 #include "01_util/Factory.h"
 

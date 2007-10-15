@@ -45,6 +45,7 @@
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminModule.h"
+#include "32_admin/AdminRequest.h"
 
 using namespace std;
 using boost::shared_ptr;

@@ -39,6 +39,7 @@
 #include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
 
 #include "34_departures_table/DisplayAdmin.h"
 #include "34_departures_table/DeparturesTableModule.h"

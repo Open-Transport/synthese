@@ -1,17 +1,29 @@
 #include "03_db_ring/RingNode.h"
 #include "03_db_ring/Constants.h"
 
+#include "03_db_ring/DbRingModule.h"
 #include "03_db_ring/DbRingException.h"
 #include "03_db_ring/UpdateRecordTableSync.h"
+#include "03_db_ring/Node.h"
+
+#include "03_db_ring/NodeServerThreadExec.h"
+#include "03_db_ring/NodeClientThreadExec.h"
 
 #include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/copy.hpp>
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "01_util/Log.h"
 #include "01_util/threads/Thread.h"
 #include "01_util/Conversion.h"
+#include "01_util/iostreams/Compression.h"
 
 #include "00_tcp/Constants.h"
+#include "00_tcp/TcpServerSocket.h"
+#include "00_tcp/TcpClientSocket.h"
+#include "00_tcp/TcpService.h"
+
 
 
 using namespace synthese::tcp;
@@ -26,20 +38,21 @@ namespace dbring
 {
 
 
-const time_duration RingNode::RECV_TOKEN_TIMEOUT = milliseconds (4000);
-const int RingNode::SEND_TOKEN_MAX_NB_TRIES (3);
+const time_duration RingNode::UNREACHABLE_NODES_RETRY_TIMEOUT = milliseconds (10000);
 
 
 
 
-
-RingNode::RingNode (const NodeInfo& nodeInfo,
-		    UpdateLogSPtr& updateLog)
-    : _data (new Token (nodeInfo.getNodeId (), nodeInfo.getRingId (), updateLog))
-    , _timer (min_date_time)
-    , _transmissionStatusMap ()
+RingNode::RingNode (const NodeInfo& nodeInfo)
+    : _nodeId (nodeInfo.getNodeId ())
+    , _ringId (nodeInfo.getRingId ())
+    , _unreachableNodesRetryTimer (min_date_time)
+    , _infos ()
+    , _clientStatusMap ()
+    , _serverStatusMap ()
+    , _infosMutex (new boost::recursive_mutex ())
 {
-    setInfo (nodeInfo.getNodeId (), nodeInfo);
+    setInfo (nodeInfo);
 }
 
 
@@ -50,18 +63,41 @@ RingNode::~RingNode ()
 
 
 
+std::vector<NodeId> 
+RingNode::getNodesAfter (const NodeId& id) const
+{
+    boost::recursive_mutex::scoped_lock infosLock (*_infosMutex);
+
+    std::vector<NodeId> nodesAfter;
+    NodeInfoMap::const_iterator it = _infos.find (id);
+    assert (it != _infos.end ());
+
+    // append this searched node itself
+    nodesAfter.push_back (it->first);
+
+    ++it;
+    while (it != _infos.end ())
+    {
+	nodesAfter.push_back (it->first);
+	++it;
+    }
+    
+    it = _infos.begin ();
+    while (it != _infos.find (id))
+    {
+	nodesAfter.push_back (it->first);
+	++it;
+    }
+    return nodesAfter;
+}
+
+
+
+
+
 void 
 RingNode::initialize ()
 {
-    // Set initial state of all known nodes to OUTRING
-    std::vector<NodeId> nodesAfter = 
-	_data->getNodesAfter (getInfo ().getNodeId ());
-    for (int n=1; n<nodesAfter.size (); ++n)
-    {
-	_data->setState (nodesAfter[n], OUTRING);
-    }
-
-
 }
 
 
@@ -70,14 +106,19 @@ RingNode::initialize ()
 bool 
 RingNode::hasInfo (const NodeId& nodeId) const
 {
-    return _data->hasInfo (nodeId);
+    boost::recursive_mutex::scoped_lock infosLock (*_infosMutex);
+
+    NodeInfoMap::const_iterator it = _infos.find (nodeId);
+    return (it != _infos.end ());
 }
 
 
 NodeInfo  
 RingNode::getInfo (const NodeId& nodeId) const
 {
-    return _data->getInfo (nodeId);
+    boost::recursive_mutex::scoped_lock infosLock (*_infosMutex);
+    assert (hasInfo (nodeId));
+    return _infos.find (nodeId)->second;
 }
 
 
@@ -85,285 +126,147 @@ RingNode::getInfo (const NodeId& nodeId) const
 NodeInfo  
 RingNode::getInfo () const
 {
-    return _data->getInfo ();
-}
-
-
-
-
-
-
-
-void 
-RingNode::setInfo (const NodeId& nodeId, const NodeInfo& nodeInfo)
-{
-    _data->setInfo (nodeId, nodeInfo);
-}
-
-
-
-
-void 
-RingNode::setModified (bool modified)
-{
-    _data->setModified (modified);
+    return getInfo (_nodeId);
 }
 
 
     
-
-
-
-boost::posix_time::ptime
-RingNode::getLastPendingTimestamp () const
+    
+void 
+RingNode::setInfo (const NodeInfo& info)
 {
-    return _data->getLastPendingTimestamp ();
+    boost::recursive_mutex::scoped_lock infosLock (*_infosMutex);
+    _infos[info.getNodeId ()] = info;
 }
+
+
 
 
 
 
 void 
-RingNode::setLastPendingTimestamp (const boost::posix_time::ptime& lastPendingTimestamp)
+RingNode::resetUnreachableNodesRetryTimer ()
 {
-    _data->setLastPendingTimestamp (lastPendingTimestamp);
+    _unreachableNodesRetryTimer = boost::date_time::microsec_clock<ptime>::local_time ();
 }
 
-
-boost::posix_time::ptime
-RingNode::getLastAcknowledgedTimestamp () const
-{
-    return _data->getLastAcknowledgedTimestamp ();
-}
-
-
-
-
-void 
-RingNode::setLastAcknowledgedTimestamp (const boost::posix_time::ptime& lastAcknowledgedTimestamp)
-{
-    _data->setLastAcknowledgedTimestamp (lastAcknowledgedTimestamp);
-}
 
 
 
 bool 
-RingNode::canWrite () const
-{
-
-    // TODO : check that a node can only be connected by its authority!
-
-    NodeId authorityNodeId = _data->getAuthorityNodeId ();
-    return (authorityNodeId == _data->getInfo ().getNodeId ()) ||
-	 ((authorityNodeId != -1) &&
-	 (getInfo (authorityNodeId).getState () == INSRING) &&
-	 (getInfo (authorityNodeId).getClock () == _data->getInfo ().getClock ()));
-}
-
-
-
-
-
-void 
-RingNode::resetTimer ()
-{
-    _timer = boost::date_time::microsec_clock<ptime>::local_time ();
-}
-
-
-
-bool 
-RingNode::timedOut () const
+RingNode::unreachableNodesRetryTimedOut () const
 {
     ptime checkTime = boost::date_time::microsec_clock<ptime>::local_time ();
-    return (checkTime - _timer > RECV_TOKEN_TIMEOUT);
+    return (checkTime - _unreachableNodesRetryTimer > UNREACHABLE_NODES_RETRY_TIMEOUT);
 }   
 
 
 
-
-
-
 void
-RingNode::sendToken ()
+RingNode::loop ()
 {
-    // Note that sent token is *exactly* _data held by this node, ie
-    // _data which is known by this node at t time and persisted in db,
-    // each time it is necessary.
-    // There should never be any token copy created.
 
-    if (_data->isModified ())
-	_data->setClock (_data->getInfo ().getClock () + 1);
-    
-    
-    std::vector<NodeId> tryNodes = _data->getNodesAfter (_data->getEmitterNodeId ());
-
-    
-    // Send to all nodes til the first node with unknown state is found.
-    for (int i=1; i<tryNodes.size (); ++i)
+    // Check that unreachable nodes are tried sometimes...
+    if (unreachableNodesRetryTimedOut ())
     {
-	const NodeInfo& ni = _data->getInfo (tryNodes[i]);
-
-	TransmissionStatus transmissionStatus = _transmissionStatusMap.getTransmissionStatus (ni.getNodeId ());
-	
-	// Prepare update log for token next recipient.
-	_data->getUpdateLog ()->flush ();
-
-	// If recipient is flagged as INSRING, send a data update
-	if (ni.getState () == INSRING)
-	{
-	    // Temporary logs
-	    UpdateLogSPtr sinceLastPending (new UpdateLog ());
-	    UpdateLogSPtr sinceLastAcknowledged (new UpdateLog ());
-	    
-	    UpdateRecordTableSync::loadAllAfterTimestamp (sinceLastAcknowledged, ni.getLastAcknowledgedTimestamp ());
-	    for (UpdateRecordSet::iterator it = sinceLastAcknowledged->getUpdateRecords ().begin ();
-		 it != sinceLastAcknowledged->getUpdateRecords ().end (); ++it)
-	    {
-		UpdateRecordSPtr ur = *it;
-		if ((ur->getState () == ACKNOWLEDGED) && (ur->getTimestamp () <= ni.getLastPendingTimestamp ()))
-		{
-		    // SQL for this update record was already transmitted. Remove SQL part and acknowledge it.
-		    ur->setSQL ("");
-	    }
-		_data->getUpdateLog ()->setUpdateRecord (ur);
-	    }
-	}
-
-	// Token is prepared, spawn the sending thread.
-	Thread::RunOnce (new SendTokenThreadExec (_data->getEmitterNodeId (), ni, _data, _transmissionStatusMap));
-	
-	if (transmissionStatus == UNKNOWN)
-	{ 
-	    break;
-	}
+	resetUnreachableNodesRetryTimer ();
+	_clientStatusMap.reset (); 
     }
+
+    clientLoop ();
 
 }
 
 
 
 void 
-RingNode::loop (const TokenSPtr& token)
+RingNode::clientLoop ()
 {
-    // Update NodeInfo states according to Transmission statuses.
-    std::vector<NodeId> followers = _data->getNodesAfter (_data->getEmitterNodeId ());;
+    std::vector<NodeId> followers = getNodesAfter (_nodeId);;
+
     bool allFailed (followers.size () > 0);
 
-
+    // And immediately, try to initiate a new client connection with one of of followers (if not in transmission)
     for (int n = 1; n<followers.size (); ++n)
     {
-	TransmissionStatus transmissionStatus = _transmissionStatusMap.getTransmissionStatus (followers[n]);
-	if (transmissionStatus == FAILURE)
-	{
-	    _data->setState (followers[n], OUTRING);
-	    continue;
-	}
-	
-	if (transmissionStatus == SUCCESS)
-	{
-	    _transmissionStatusMap.setTransmissionStatus (followers[n], UNKNOWN);
-	}
+	// If last client connection to node has failed, try another one on ring.
+	if (_clientStatusMap.getTransmissionStatus (followers[n]) == FAILURE) continue;
 
 	allFailed = false;
-    }
+
+	// Do not initiate another connection with a node is another one is in progress.
+	if (_clientStatusMap.getTransmissionStatus (followers[n]) != READY)
+	{
+	    break;
+	}
+	
+	const NodeInfo& tryNode = getInfo (followers[n]);
+
+	Thread::RunOnce (new NodeClientThreadExec (
+			     tryNode,
+			     getInfo (),
+			     _infos,
+			     _clientStatusMap));
+
+	break;
+    }    
 
     if (allFailed) 
     {
-	// _data->setState (OUTRING);
-	for (int n = 1; n<followers.size (); ++n)
-	{
-	    _transmissionStatusMap.setTransmissionStatus (followers[n], UNKNOWN);
-	}
+	resetUnreachableNodesRetryTimer ();
+	_clientStatusMap.reset (); 
     }
-
-    if (token && (token->getEmitterRingId () != getInfo ().getRingId ())) return;
-
-    _token =  token;
-
-    if (_data->hasRecipient () == false) 
-    {
-	// knows only itself...
-    }
-    
-    if (_token.get ())
-    {
-	// A token was received. 
-
-	// Update local state
-	if (_data->getInfo ().getState () == ENTRING)	
-	{
-	    _data->setState (INSRING);
-	} 
-	else if (_data->getInfo ().getState () == OUTRING)
-	{
-	    _data->setState (ENTRING);
-	}
-
-
-	// Merge token info.
-	_data->merge (_token);
-
-	// Forward the token only if is more recent 
-	// (or as recent if the token has not been modified), otherwise discard
-	NodeInfo tokenInfo (_token->getInfo ());
-	NodeInfo localInfo (_data->getInfo ());
-
-	if (localInfo.isAuthority () && (tokenInfo.getClock () < localInfo.getClock ())) 
-	{
-	    // I am the authority. any deprecated node compared to my local clock is discarded.
-            std::cerr << " ** 00 Discarded" << std::endl;
-	} 
-
-	else if ( (tokenInfo.getState () == ENTRING) && 
-		  (tokenInfo.isAuthority () == false) &&
-		  (_token->getAuthorityState () == INSRING) )
-	{
-	    // The node is ENTRING but the authority is already INSRING; 
-	    // This allows creation of a second token in case the auhtority
-	    // is out ring. This way, write-locked nodes can still exchange info between each
-	    // other.
-	    std::cerr << " ** 11 Discarded" << std::endl;
-	} 
-
-	else
-	{
-	    // Reset the timer only if the token has not been discarded!
-	    resetTimer ();
-
-
-	    sendToken ();
-	}
-
-    }
-    else if (timedOut ())
-    {
-	
-	// Reset timer.
-	resetTimer ();
-	std::cerr << "## TIMEOUT!! " << std::endl;
-
-	// Create init token...
-	_data->setState (ENTRING);
-
-	// ...and send it in any case
-	sendToken ();
-    }    
-    
-
-    // One exit point : here.
-    setModified (false);
 
 
 }
 
 
-void RingNode::dump ()
+
+
+
+void 
+RingNode::serverLoop (NodeInfo clientNodeInfo,  int port, TcpServerSocket* serverSocket)
 {
-    // for debug
-    std::cerr << (*_data) << " " << (canWrite () ? "WRITEABLE" : "READABLE") << std::endl;
+    
+    // Merge client node info
+    NodeInfoMap::const_iterator itni = _infos.find (clientNodeInfo.getNodeId ());
+    if ( (itni == _infos.end ()) ||
+	 (itni->second != clientNodeInfo) )
+    {
+	DbRingModule::GetNode ()->saveNodeInfo (clientNodeInfo);
+    } 
+
+
+    if (_serverStatusMap.getTransmissionStatus (clientNodeInfo.getNodeId ()) != READY)
+    {
+	TcpService::openService (port)->closeConnection (serverSocket);
+	return;
+    }
+
+    std::vector<NodeId> followers = getNodesAfter (_nodeId);
+
+    // A channel has been established by the node
+    // Do a synchronization cycle with the client ring node.
+    // A synchronization cycle is composed of 2 steps :
+    // 1) N2 sends N1 its lastPendingTimestamp (pending or acknowledged)
+    // 2) N1 sends token to N2 with acknowledged log prepared for the returned timestamp
+    // 3) N2 acknowledged N1.
+    
+    // Spawn immediately a node server thread exec to handle tcp query.
+    Thread::RunOnce (new NodeServerThreadExec (clientNodeInfo,
+					       port,
+					       serverSocket, 
+					       _infos,
+					       _serverStatusMap));
+    
 
 }
+
+
+
+
+
+
 
 
 

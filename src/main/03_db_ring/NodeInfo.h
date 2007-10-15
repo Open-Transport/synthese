@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <map>
 
 #include <iostream>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -21,15 +22,6 @@ namespace dbring
     typedef int NodeId;
     typedef int RingId;
 
-    typedef signed long long int TokenClock;
-
-
-    typedef enum {
-        OUTRING = 0,    //!< Node is out of ring.
-        ENTRING = 1,    //!< Node is entering ring.
-        INSRING = 2    //!< Node is inside ring.
-    } NodeState ;
-
 
 
 class NodeInfo
@@ -41,12 +33,6 @@ private:
     RingId _ringId;
     std::string _host;    //!< Node IP address, or DNS name.
     int _port;            //!< Port to be used for replication messages.
-    bool _authority;      //!< Is this node authority on a given ring ?
-    NodeState _state;     //!< Node state.
-    TokenClock _clock;    //!< Last received token clock
-    boost::posix_time::ptime _lastPendingTimestamp;   // Last time the ring node was updated with a pending record.
-    boost::posix_time::ptime _lastAcknowledgedTimestamp;   // Last time the ring node was updated with an ack record.
-
 
 public:
 
@@ -55,12 +41,7 @@ public:
     NodeInfo (const NodeId& nodeId, 
 	      const RingId& ringId,
 	      const std::string& host,
-	      int port,
-	      bool authority = false,
-	      const NodeState& state = OUTRING,
-	      const TokenClock& clock = -1,
-	      const boost::posix_time::ptime& lastPendingTimestamp = boost::posix_time::min_date_time,
-	      const boost::posix_time::ptime& lastAcknowledgedTimestamp = boost::posix_time::min_date_time);
+	      int port);
 
     ~NodeInfo ();
 
@@ -76,20 +57,6 @@ public:
     int getPort () const { return _port; }
     void setPort (int port) { _port = port; }
 
-    bool isAuthority () const { return _authority; }
-    void setAuthority (bool authority) { _authority = authority; }
-
-    const NodeState& getState () const { return _state; }
-    void setState (const NodeState& state) { _state = state; }
-
-    const TokenClock& getClock () const { return _clock; }
-    void setClock (const TokenClock& clock) { _clock = clock; }
-	      
-    const boost::posix_time::ptime& getLastPendingTimestamp () const { return _lastPendingTimestamp; }
-    void setLastPendingTimestamp (const boost::posix_time::ptime& lastPendingTimestamp) { _lastPendingTimestamp = lastPendingTimestamp; }
-    
-    const boost::posix_time::ptime& getLastAcknowledgedTimestamp () const { return _lastAcknowledgedTimestamp; }
-    void setLastAcknowledgedTimestamp (const boost::posix_time::ptime& lastAcknowledgedTimestamp) { _lastAcknowledgedTimestamp = lastAcknowledgedTimestamp; }
     
 private:
 
@@ -98,6 +65,9 @@ private:
 
 
 };
+
+
+    typedef std::map<NodeId, NodeInfo> NodeInfoMap;
 
 
 

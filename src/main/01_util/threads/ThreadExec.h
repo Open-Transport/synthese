@@ -57,7 +57,7 @@ class ThreadExec
  public:
 
     ThreadExec ();
-    ~ThreadExec ();
+    virtual ~ThreadExec ();
 
 
     virtual void initialize ();

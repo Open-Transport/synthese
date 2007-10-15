@@ -49,6 +49,15 @@ namespace synthese
 {
 	namespace db
 	{
+
+		typedef enum
+		{
+			GET_AUTO
+			, GET_TEMPORARY
+			, GET_REGISTRY
+		} GetSource;
+
+
 		/** Table synchronizer template.
 			@ingroup m02
 		*/
@@ -58,10 +67,6 @@ namespace synthese
 		public:
 			static const std::string	TABLE_NAME;		//!< Table name in the database
 			static const int			TABLE_ID;		//!< Table ID used by util::encodeID and util::decodeTableId
-			static bool					ALLOW_INSERT;
-			static bool					ALLOW_REMOVE;
-			static bool					TRIGGER_OVERRIDE_CLAUSE;
-			static const bool			IGNORE_CALLBACKS_ON_FIRST_SYNC;
 
 		protected:
 			static const bool HAS_AUTO_INCREMENT;
@@ -75,13 +80,10 @@ namespace synthese
 			*/
 			static uid getId();
 
-			SQLiteTableSyncTemplate(
-/*				bool allowInsert = true, 
-				bool allowRemove = true,
-				const std::string& triggerOverrideClause = "1",
-				bool ignoreCallbacksOnFirstSync = false*/)
-				: util::FactorableTemplate<SQLiteTableSync, K>() // (TABLE_NAME, allowInsert, allowRemove, triggerOverrideClause, ignoreCallbacksOnFirstSync)
-			{			}
+		SQLiteTableSyncTemplate()	
+		    : util::FactorableTemplate<SQLiteTableSync, K>() 
+			{			
+			}
 
 			void initAutoIncrement();
 

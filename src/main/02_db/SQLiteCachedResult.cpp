@@ -32,28 +32,6 @@ SQLiteCachedResult::SQLiteCachedResult ()
 }
 
 
-void 
-SQLiteCachedResult::addRow (int nbColumns, char** values, char** columns)
-{
-    if (_columnNames.size () == 0) 
-    {
-	for (int i=0; i<nbColumns; ++i) _columnNames.push_back (columns[i]);
-    }
-    SQLiteResultRow row;
-    for (int i=0; i<nbColumns; ++i) 
-    {
-	if (values[i] == 0)
-	{
-	    row.push_back (new SQLiteValue (""));
-	}
-	else
-	{
-	    row.push_back (new SQLiteValue (values[i]));
-	}
-    }
-    addRow (row);
-}
-
 
 
 
@@ -148,6 +126,29 @@ SQLiteCachedResult::addRow (const SQLiteResultRow& row)
     _rows.push_back (row);
 }
 
+
+
+void 
+SQLiteCachedResult::addRow (int nbColumns, char** values, char** columns)
+{
+    if (_columnNames.size () == 0) 
+    {
+	for (int i=0; i<nbColumns; ++i) _columnNames.push_back (columns[i]);
+    }
+    SQLiteResultRow row;
+    for (int i=0; i<nbColumns; ++i) 
+    {
+	if (values[i] == 0)
+	{
+	    row.push_back (new SQLiteValue (""));
+	}
+	else
+	{
+	    row.push_back (new SQLiteValue (values[i]));
+	}
+    }
+    addRow (row);
+}
 
 
 

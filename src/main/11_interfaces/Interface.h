@@ -32,6 +32,8 @@
 #include "01_util/UId.h"
 #include "01_util/Factory.h"
 
+#include "11_interfaces/InterfacePage.h"
+
 namespace synthese
 {
 	namespace interfaces

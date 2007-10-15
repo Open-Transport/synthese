@@ -1,6 +1,6 @@
 
-/** SendTokenThreadExec class header.
-	@file SendTokenThreadExec.h
+/** Thread class header.
+	@file Thread.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -21,60 +21,51 @@
 */
 
 
-#ifndef SYNTHESE_DBRING_SENDTOKENTHREADEXEC_H
-#define SYNTHESE_DBRING_SENDTOKENTHREADEXEC_H
+#ifndef SYNTHESE_UTIL_THREADAWARE_H
+#define SYNTHESE_UTIL_THREADAWARE_H
 
-#include "03_db_ring/TransmissionStatusMap.h"
-#include "03_db_ring/Token.h"
 
-#include "01_util/threads/ThreadExec.h"
+#include <boost/thread/thread.hpp>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/shared_ptr.hpp>
 
 
 
 namespace synthese
 {
-
-
-namespace dbring
+namespace util
 {
 
 
+/** Base class that gurantees that the created object is aware of the thread which ordered
+    its construction.
 
-/** Send token thread execution.
-
-@ingroup m03
+@ingroup m01
 */
-class SendTokenThreadExec : public synthese::util::ThreadExec
+class ThreadAware
 {
- private:
+private:
 
-    const NodeId _emitterNodeId;
-    const NodeInfo _nodeInfo;
-    std::stringstream _tokenBuffer;
-    TransmissionStatusMap& _transmissionStatusMap;
+    const boost::thread _ownerThread;
+
+ protected:
+    
+    ThreadAware ();
+    virtual ~ThreadAware ();
 
  public:
 
-    SendTokenThreadExec (const NodeId& emitterNodeId, 
-			 const NodeInfo& nodeInfo, 
-			 const TokenSPtr token, 
-			 TransmissionStatusMap& transmissionStatusMap);
+    const boost::thread& getOwnerThread () const { return _ownerThread; }
 
-
-    /** Execution body.
+    /** Returns wheter or not this call is done inside this object owner thread.
      */
-    void loop ();
+    bool insideOwnerThread () const;
 
 };
 
 
+
 }
+
 }
-
-
-
 #endif
 

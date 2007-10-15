@@ -23,10 +23,9 @@ namespace dbring
 
 
     typedef enum {
-        INPROGRESS = 0, 
-        SUCCESS = 1,    
-        FAILURE = 2,    
-        UNKNOWN = 3
+	READY = 0,
+        INPROGRESS = 1, 
+        FAILURE = 2    
     } TransmissionStatus ;
     
 
@@ -44,15 +43,16 @@ public:
     TransmissionStatusMap () {};
     ~TransmissionStatusMap () {};
 
+    /* Resets all transmission statuses.
+       Actually, this method clears the map (the default transmission status being returned is UNKNOWN)
+    */
+    void reset ();
+    
     TransmissionStatus getTransmissionStatus (const NodeId& nodeId) const;
     void setTransmissionStatus (const NodeId& nodeId, const TransmissionStatus& transmissionStatus);
-    // bool hasAllFailed () const;
-
+    
 
 private:
-
-    // friend std::ostream& operator<< ( std::ostream& os, const UpdateLog& op );
-    // friend std::istream& operator>> ( std::istream& is, UpdateLog& op );
 
 };
 

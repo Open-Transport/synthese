@@ -48,13 +48,6 @@ namespace synthese
 		class SQLiteResult;
 		class SQLite;
 
-		typedef enum
-		{
-			GET_AUTO
-			, GET_TEMPORARY
-			, GET_REGISTRY
-		} GetSource;
-
 		/** @defgroup refLS Table synchronizers.
 			@ingroup ref
 		*/
@@ -69,23 +62,54 @@ namespace synthese
 		{
 		private:
 
-		    SQLiteStatementSPtr _getRowByIdStatement;
-
+		    const bool _allowInsert;
+		    const bool _allowRemove;
+		    const std::string _triggerOverrideClause;
+		    bool _ignoreCallbacksOnFirstSync;
 		    bool _enableTriggers;
 		    
+		    const std::string _tableName;
 		    SQLiteTableFormat _tableFormat;
+
+		    std::vector<std::string> _selectOnCallbackColumns;
 
 		protected:
 			virtual void initAutoIncrement();
 
 		public:
 
-			SQLiteTableSync ();
+			class Args
+			{
+			public:
+
+			    bool allowInsert;
+			    bool allowRemove;
+			    std::string triggerOverrideClause;
+			    bool ignoreCallbacksOnFirstSync;
+			    bool enableTriggers;
+
+			    Args (bool allowInsertArg = true, 
+				  bool allowRemoveArg = true,
+				  const std::string& triggerOverrideClauseArg = "1",
+				  bool ignoreCallbacksOnFirstSyncArg = false,
+				  bool enableTriggersArg = true
+				) 
+
+				: allowInsert (allowInsertArg)
+				, allowRemove (allowRemoveArg)
+				, triggerOverrideClause (triggerOverrideClauseArg)
+				, ignoreCallbacksOnFirstSync (ignoreCallbacksOnFirstSyncArg)
+				, enableTriggers (enableTriggersArg)
+			    {}
+
+			};
+
+
+			SQLiteTableSync (const Args& args = Args ());
+
 			~SQLiteTableSync ();
 
 			virtual const std::string& getTableName () const = 0;
-			virtual bool getIgnoreCallbacksOnFirstSync () const;
-			virtual std::string getTriggerOverrideClause () const;
 
 			/** Returns the unique integer identifying a table.
 				@return The unique integer identifying a table
@@ -94,8 +118,12 @@ namespace synthese
 
 			const SQLiteTableFormat& getTableFormat () const;
 
-			
+			bool getIgnoreCallbacksOnFirstSync () const;
+			void setIgnoreCallbacksOnFirstSync (bool ignoreCallbacksOnFirstSync);
+
 			void setEnableTriggers (bool enableTriggers);
+
+			void updateSchema (synthese::db::SQLite* sqlite);
 
 			/** First synchronisation.
 				This method is called when the synchronizer is created
@@ -147,8 +175,10 @@ namespace synthese
 
 
 			void addTableColumn (const std::string& columnName, 
-					const std::string& columnType, 
-					bool updatable = true);
+					     const std::string& columnType, 
+					     bool updatable = true,
+					     bool selectOnCallback = true
+			    );
 
 			/** Adds a multi-column index in the table description.
 				@param columns Vector of column names
@@ -168,6 +198,9 @@ namespace synthese
 
 
 		private:
+
+			std::string getTriggerOverrideClause () const;
+
 
 			/** Creates table in SQLite db according to this class
 			 * table format.
@@ -194,6 +227,9 @@ namespace synthese
 					 const std::string& triggerNoRemove,
 					 const std::string& triggerNoUpdate);
 			
+
+			std::string getSelectOnCallbackColumnsClause () const;
+
 
 		public:
 

@@ -112,13 +112,14 @@ socket.write(Client,Buffer,Size,Timeout);
 			bool _nonBlocking;
 			sockaddr_in _sockAddr;
 			SOCKET _socket;
+			int _backlogSize;
 
 		protected:
 			void name(const char* hostName, int portNumber);
 			void initializeSocket(const char* protoName);
 		    
 		public:
-			Socket (bool nonBlocking = true);
+			Socket (bool nonBlocking = true, int backlogSize = 20);
 			~Socket ();
 			void closeSocket();
 			void closeSocket (SOCKET socket);

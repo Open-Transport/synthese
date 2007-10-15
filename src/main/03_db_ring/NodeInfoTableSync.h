@@ -26,7 +26,7 @@
 
 
 #include "02_db/SQLiteTableSyncTemplate.h"
-#include "03_db_ring/Token.h"
+#include "03_db_ring/NodeInfo.h"
 
 
 namespace synthese
@@ -48,11 +48,6 @@ public:
     static const std::string TABLE_COL_RINGID;
     static const std::string TABLE_COL_HOST;
     static const std::string TABLE_COL_PORT;
-    static const std::string TABLE_COL_AUTH;
-    static const std::string TABLE_COL_STATE;
-    static const std::string TABLE_COL_CLOCK;
-    static const std::string TABLE_COL_LASTPENDINGTIMESTAMP;
-    static const std::string TABLE_COL_LASTACKNOWLEDGEDTIMESTAMP;
 
     NodeInfoTableSync ();
     ~NodeInfoTableSync ();

@@ -47,6 +47,7 @@ TcpServerSocket::TcpServerSocket (TcpService& service,
 
 TcpServerSocket::~TcpServerSocket ()
 {
+//    std::cerr << "destroying server socket" << std::endl;
 }
 
 

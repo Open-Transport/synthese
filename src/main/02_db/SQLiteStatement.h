@@ -1,10 +1,12 @@
 #ifndef SYNTHESE_DB_SQLITESTATEMENT_H
 #define SYNTHESE_DB_SQLITESTATEMENT_H
 
+#include "01_util/threads/ThreadAware.h"
+
+
 #include <sqlite/sqlite3.h>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/tss.hpp>
 
 #include <string>
 
@@ -28,31 +30,25 @@ namespace synthese
 
 		    @ingroup m02
 		*/
-	    class SQLiteStatement 
+	    class SQLiteStatement : public util::ThreadAware
 	    {
 
 		private:
 		
-		const SQLiteHandle& _handle;
+		sqlite3_stmt* _statement;
 		const SQLData _sql;
 
-		    mutable boost::thread_specific_ptr<sqlite3_stmt> _statement;
-
-		    SQLiteStatement (const SQLiteHandle& handle, const SQLData& sql);
-		    // SQLiteStatement (const SQLiteHandle, const SQLData& sql);
-
-		    SQLiteStatement (const SQLiteStatement&);
-
-		    SQLiteStatement& operator = (const SQLiteStatement&);
-
+		
+		SQLiteStatement (sqlite3_stmt* statement, const SQLData& sql);
+		SQLiteStatement (const SQLiteStatement&);
+		
+		SQLiteStatement& operator = (const SQLiteStatement&);
 
 		public:
 
 		    ~SQLiteStatement ();
 
 		    const SQLData& getSQL () const { return _sql; }
-
-		    
 
 		    int getParameterIndex (const std::string& parameterName) const;
 		    

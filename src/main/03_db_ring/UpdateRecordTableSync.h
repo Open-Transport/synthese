@@ -25,17 +25,19 @@
 
 
 #include "02_db/SQLiteTableSyncTemplate.h"
-#include "03_db_ring/UpdateLog.h"
 #include "03_db_ring/UpdateRecord.h"
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <vector>
 
 namespace synthese
 {
 
 namespace dbring
 {
+
 
 
 
@@ -67,15 +69,43 @@ public:
 			      db::SQLiteSync* sync,
 			      const db::SQLiteResultSPtr& rows);
 
-    static void loadAllAfterTimestamp (UpdateLogSPtr dest, 
-				       const boost::posix_time::ptime& timestamp,
-				       bool inclusive = false);
+    static void LoadDeltaUpdate (UpdateRecordSet& dest, 
+				 const boost::posix_time::ptime& clientLastAcknowledgedTimestamp,
+				 std::set<uid> clientLastPendingIds);
 
-    static boost::posix_time::ptime getLastPendingTimestamp ();
+    static void LoadPendingRecordIds (std::set<uid>& updateRecordIds);
 
-    static long getLastUpdateIndex (NodeId nodeId);
+    static void LoadPendingRecords (std::vector<UpdateRecordSPtr>& updateRecords, 
+				    const boost::posix_time::ptime& lastAcknowledgedTimestamp,
+				    bool lateOnes, bool withBlob);
+
+
+    static void ApplyUpdateRecord (const UpdateRecordSPtr& updateRecord, bool overwriteTimestamp = false);
+
+    static void AbortUpdateRecord (const UpdateRecordSPtr& updateRecord, bool overwriteTimestamp = false);
+
+    static void PostponeUpdateRecord (const UpdateRecordSPtr& updateRecord);
+
+
+    /**
+       Select all update records between two timestamps.
+       @param startTimestamp Start timestamp (exclusive)
+       @param endTimestamp End timestamp (exclusive)
+       @param result Result vector
+    */
+    /*   static void SelectAllRecordIdsBetween (const boost::posix_time::ptime& startTimestamp,
+					   const boost::posix_time::ptime& endTimestamp,
+					   std::vector<uid>& result); 
+	
+    */
+
+
+    static boost::posix_time::ptime GetLastTimestampWithState (const RecordState& recordState);
+
+    static long GetLastUpdateIndex (NodeId nodeId);
 
 private:
+
 
 };
 

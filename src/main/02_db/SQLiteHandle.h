@@ -4,7 +4,9 @@
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteUpdateHook.h"
 
+#include <boost/thread/tss.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 
 
@@ -13,12 +15,14 @@ namespace synthese
 	namespace db
 	{
 
-		typedef struct
-		{
-		    std::vector<SQLiteEvent> events;
-		} UpdateHookStruct;
-			  
 
+	    typedef struct
+	    {
+		sqlite3* handle;
+		std::vector<SQLiteEvent> events;
+		
+	    } SQLiteTSS;
+	    
 
 		/** SQLite Handle class.
 
@@ -35,13 +39,16 @@ namespace synthese
 		{
 
 		private:
-		    
+
+			  
+
+
 		    const boost::filesystem::path _databaseFile;
-		    mutable boost::thread_specific_ptr<sqlite3> _handle;
-		    mutable boost::thread_specific_ptr<UpdateHookStruct> _updateHookStruct;
+		    mutable boost::thread_specific_ptr<SQLiteTSS> _tss;
 
 		    std::vector<SQLiteUpdateHook*> _hooks;   //!< Hooks to trigger on db update.
 		    boost::shared_ptr<boost::mutex> _hooksMutex; 
+		    boost::shared_ptr<boost::recursive_mutex> _updateMutex; 
 
 		protected:
 
@@ -52,8 +59,6 @@ namespace synthese
 		    
 			//! @name SQLite db access methods.
 			//@{
-
-			sqlite3* getHandle () const;
 
 			void registerUpdateHook (SQLiteUpdateHook* hook);
 
@@ -67,9 +72,15 @@ namespace synthese
 			static bool IsStatementComplete (const SQLData& sql);
 
 
+			void callHooks (const SQLiteEvent& event);
+
+			SQLiteTSS* getSQLiteTSS () const;
+
 			//@}
 		private:
-			UpdateHookStruct* getUpdateHookStruct () const;
+
+			sqlite3* getHandle () const;
+
 
 		};
 

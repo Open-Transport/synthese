@@ -1,7 +1,8 @@
 #include "03_db_ring/Node.h"
 #include "03_db_ring/Constants.h"
 #include "03_db_ring/DbRingException.h"
-#include "03_db_ring/RecvTokenThreadExec.h"
+#include "03_db_ring/NodeInfoTableSync.h"
+#include "03_db_ring/ApplyUpdateThreadExec.h"
 #include "03_db_ring/UpdateRecordTableSync.h"
 #include "03_db_ring/UpdateChronologyException.h"
 
@@ -13,6 +14,10 @@
 #include "01_util/iostreams/Compression.h"
 #include "01_util/threads/ManagedThread.h"
 
+#include "00_tcp/TcpService.h"
+#include "00_tcp/Constants.h"
+#include "00_tcp/SocketException.h"
+
 
 #include <boost/algorithm/string.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -21,6 +26,7 @@
 
 using namespace synthese::util;
 using namespace synthese::db;
+using namespace synthese::tcp;
 
 using namespace boost::posix_time;
 
@@ -35,15 +41,16 @@ namespace dbring
 
 
 
-Node::Node (const NodeId& id)
+Node::Node (const NodeId& id, bool isAuthority)
     : _id (id)
+    , _isAuthority (isAuthority)
     , _ringNodes ()
-    , _updateLog (new UpdateLog ())
     , _lastUpdateIndex (0)
+    , _lastAcknowledgedTimestamp (min_date_time)
     , _ringNodesMutex (new boost::recursive_mutex ())
-    , _updateLogMutex (new boost::recursive_mutex ())
+    , _lastAcknowledgedTimestampMutex (new boost::recursive_mutex ())
+    , _pendingUpdateRecordsMutex (new boost::recursive_mutex ())
 {
-
 }
 
     
@@ -63,95 +70,35 @@ Node::getId () const
 
 
 
-bool 
-Node::hasInfo (const NodeId& nodeId, const RingId& ringId) const
-{
-    boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
-    RingNodes::const_iterator it = _ringNodes.find (ringId);
-    if (it == _ringNodes.end ()) return false;
-    return it->second->hasInfo (nodeId);
-}
-
-
-
-    
-NodeInfo
-Node::getInfo (const NodeId& nodeId, const RingId& ringId) const
-{
-    boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
-    assert (hasInfo (nodeId, ringId));
-    return _ringNodes.find (ringId)->second->getInfo (nodeId);
-}
-
-
-
-
-
-bool
-Node::hasInfo (const RingId& ringId) const
-{
-    return hasInfo (_id, ringId);
-}
-
-
-
-NodeInfo 
-Node::getInfo (const RingId& ringId) const
-{
-    return getInfo (_id, ringId);
-}
-
-
-
-void 
-Node::flushUpdates ()
-{
-    _updateLog->flush ();
-}
-
-
 
 
 void 
 Node::setNodeInfoCallback (const NodeInfo& nodeInfo)
 {
-    boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
+    boost::recursive_mutex::scoped_lock lock (*_ringNodesMutex);
 
     RingNodes::iterator it = _ringNodes.find (nodeInfo.getRingId ());
     if (it == _ringNodes.end ()) 
     {
 	if (nodeInfo.getNodeId () != _id)
 	{
+	    
 	    throw DbRingException ("Node " + Conversion::ToString (_id) + " is not identified on ring " + Conversion::ToString (nodeInfo.getRingId ()));
 	}
-
+	
 	Log::GetInstance ().info ("Node " + Conversion::ToString (_id) + " is now identified on ring " + Conversion::ToString (nodeInfo.getRingId ())
 				  + " as " + nodeInfo.getHost () + ":" + Conversion::ToString (nodeInfo.getPort ()));
-
-	// Look if a new tcp service needs to be opened.
-	if (_listenPorts.find (nodeInfo.getPort ()) == _listenPorts.end ())
-	{
-	    // Create a new managed thread listening on this port and pushing token in
-	    // this node token queue.
-	    RecvTokenThreadExec* recvTokenThreadExec = new RecvTokenThreadExec (nodeInfo.getPort (), _receivedTokens);
-	    
-	    std::string threadName ("node_tcp_" + Conversion::ToString (nodeInfo.getPort ()));
-	    bool autorespawn (true);
-	    ManagedThread* recvTokenThread = 
-		new ManagedThread (recvTokenThreadExec, threadName, 100, autorespawn);
-	    
-	    _listenPorts.insert (nodeInfo.getPort ());
-	}
-
+	
 	// Sets this node identity for a given ring.
-	_ringNodes.insert (std::make_pair (nodeInfo.getRingId (), RingNodeSPtr (new RingNode (nodeInfo, _updateLog))));
+	RingNode* ringNode = new RingNode (nodeInfo);
+	_ringNodes.insert (std::make_pair (nodeInfo.getRingId (), RingNodeSPtr (ringNode)));
+
+	ManagedThread* ringNodeThread = 
+	    new ManagedThread (ringNode, "dbring_node_" + Conversion::ToString (nodeInfo.getRingId ()), 100);
     }
     else
     {
-//	Log::GetInstance ().info ("Node " + Conversion::ToString (_id) + " is now identified on ring " + Conversion::ToString (ringId)
-//				  + " as " + host + ":" + Conversion::ToString (port));
-
-	it->second->setInfo (nodeInfo.getNodeId (), nodeInfo);
+	it->second->setInfo (nodeInfo);
 
 	// TODO : change tcp service
     }
@@ -164,46 +111,30 @@ Node::setNodeInfoCallback (const NodeInfo& nodeInfo)
 void 
 Node::setUpdateRecordCallback (const UpdateRecordSPtr& updateRecord)
 {
-    boost::recursive_mutex::scoped_lock callbackLock (*_ringNodesMutex);
-
-    _updateLog->setUpdateRecord (updateRecord);
-    
-    // If this is an acknowledgement, release the lock taken on update record key just before
-    // it was saved.
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void 
-Node::initialize ()
-{
-    _lastUpdateIndex = UpdateRecordTableSync::getLastUpdateIndex (_id);
-
-    if (_ringNodes.empty ())
+    // Update timestamps
+    if ((updateRecord->getState () != PENDING) && 
+	(updateRecord->getTimestamp () > getLastAcknowledgedTimestamp ()))
     {
-	Log::GetInstance ().warn ("This node is not connected to any ring; it will be writable by default.");
+	boost::recursive_mutex::scoped_lock lock (*_lastAcknowledgedTimestampMutex);
+	_lastAcknowledgedTimestamp = updateRecord->getTimestamp ();
     }
-    else
+
     {
-	for (RingNodes::iterator it = _ringNodes.begin ();
-	     it != _ringNodes.end (); ++it)
+	boost::recursive_mutex::scoped_lock lock (*_pendingUpdateRecordsMutex);
+	// Update pending records
+	if (updateRecord->getState () == PENDING)
 	{
-	    RingNodeSPtr rn = it->second;
-	    rn->initialize ();
+	    // std::cerr << "?? Ading " << updateRecord->getKey () << " to pendig ids" << std::endl;
+	    _pendingUpdateRecords.insert (updateRecord->getKey ());
+	}
+	else
+	{
+	    // std::cerr << "?? Rming " << updateRecord->getKey () << " fm pendig ids" << std::endl;
+	    std::set<uid>::iterator it = _pendingUpdateRecords.find (updateRecord->getKey ());
+	    if (it != _pendingUpdateRecords.end ())
+	    {
+		_pendingUpdateRecords.erase (it);
+	    }
 	}
     }
 
@@ -213,12 +144,41 @@ Node::initialize ()
 
 
 
-
-sqlite3* 
-Node::getHandle () const
+void 
+Node::initialize ()
 {
-    return DBModule::GetSQLite()->getHandle ();
+    _lastUpdateIndex = UpdateRecordTableSync::GetLastUpdateIndex (_id);
+
+    
+    if (_ringNodes.empty ())
+    {
+	Log::GetInstance ().warn ("This node is not connected to any ring; it will be writable by default.");
+    }
+
+
+    if (isAuthority ())
+    {
+	Log::GetInstance ().info ("This node is authority.");
+
+	// Launch special authority thread
+	ManagedThread* authorityThread = 
+	    new ManagedThread (new ApplyUpdateThreadExec (), "dbring_auth", 100); 
+    }
+
 }
+
+
+
+
+
+
+boost::posix_time::ptime
+Node::getLastAcknowledgedTimestamp () const
+{
+    boost::recursive_mutex::scoped_lock lock (*_lastAcknowledgedTimestampMutex);
+    return _lastAcknowledgedTimestamp;
+}
+
 
 
 
@@ -251,11 +211,15 @@ Node::execQuery (const SQLData& sql, bool lazy)
 
 
 
+
+
 void
 Node::execUpdate (const SQLiteStatementSPtr& statement)
 {
     execUpdate (statement->getSQL ());
 }
+
+
 
 
 
@@ -270,55 +234,34 @@ Node::execUpdate (const SQLData& sql)
 	return;
     }
 
-    // Ensure that the update log cannot be modified both by main loop and by local
-    // update action. This guarantees that the local update will not occur after token sending
-    // and before update log flushing.
-    boost::recursive_mutex::scoped_lock updateLogLock (*_updateLogMutex);
-
-    if (canWrite () == false)
-    {
-	throw DbRingException ("Node is locked for writing");
-    }
-
     // Use UTC time
     boost::posix_time::ptime now (boost::date_time::microsec_clock<ptime>::universal_time ());
 
+    // Compress sql
+    std::stringstream decompressedSQL (sql);
+    std::stringstream compressedSQL;
+    Compression::ZlibCompress (decompressedSQL, compressedSQL);
+    
     // Increment record update.
     ++_lastUpdateIndex;
     UpdateRecordSPtr urp (new UpdateRecord (encodeUpdateKey (_id, _lastUpdateIndex) , now,
-					    _id, PENDING,
-					    sql ));
+					    _id, PENDING, compressedSQL.str ()));
 
-    // TODO : wrong way to do this. because
-    // 1) the node hangs til the update has finished and does not respond to another nodes nor propagate the info
-    // 2) the synchronous stuff is wrong cos no loop is done til update record acknowledged, but acknoledgement cannot 
-    //    be done if node is not looping.
-
-    // should have another thread polling acknowledged update records and executing them.
-    // with another state succeeded ?
+    
+    {
+	boost::recursive_mutex::scoped_lock lock (*_pendingUpdateRecordsMutex);
+	_pendingUpdateRecords.insert (urp->getKey ());
+    }
 
     saveUpdateRecord (urp);
-    
-    
-    //if (asynchronous == false)
-    {
-	// If synchronous update is done, we must wait until the update record is acknowledged locally.
-        // This will be notified asynchronously by ::setUpdateRecordCallback.
-	while (true)
-	{
-	    // Note : if node is not authority, getting the acknowledgement can take a while...
-	    // or just not happened (TODO : add a timeout ?)
-	    RecordState state = _updateLog->getUpdateRecord (urp->getKey ())->getState ();
-	    if (state == ACKNOWLEDGED) break;
-	    if (state == FAILED) 
-	    {
-		throw DbRingException ("ring update failed");
-	    }
-	    
-	    loop ();
-	    Thread::Sleep (10);
-	}
 
+    // Wait for this update record to be acknowledged
+    while (true)
+    {
+	{
+	    boost::recursive_mutex::scoped_lock lock (*_pendingUpdateRecordsMutex);
+	    if (_pendingUpdateRecords.find (urp->getKey ()) == _pendingUpdateRecords.end ()) break;
+	}
     }
 }
 
@@ -329,200 +272,133 @@ Node::execUpdate (const SQLData& sql)
 void 
 Node::loop ()
 {
-    boost::recursive_mutex::scoped_lock updateLogLock (*_updateLogMutex);
+    static const int maxlen (1024); 
+    static char buf[maxlen];
+	    
+    boost::recursive_mutex::scoped_lock lock (*_ringNodesMutex);
 
-    TokenSPtr token;
-    if (_receivedTokens.empty () == false) 
-    {
-	token = _receivedTokens.back ();
-	_receivedTokens.pop ();
-	mergeUpdateLog (token);
-    }
-	
+    // If several ring nodes use the same service port, this loop 
+    // ensures that the port will accept connection several times as well.
     for (RingNodes::iterator it = _ringNodes.begin ();
 	 it != _ringNodes.end (); ++it)
     {
 	RingNodeSPtr rn = it->second;
-	rn->loop (token);
-    }
-    
-}
 
-
-
-
-boost::posix_time::ptime 
-Node::getLastPendingTimestamp () const
-{
-    boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
-    if (_ringNodes.size () == 0) return min_date_time;
-
-    // if node is identified at least on one ring, returns this ring node 
-    // timestamp (same for all).
-    return _ringNodes.begin ()->second->getLastPendingTimestamp ();
-}
-
-
-
-
-boost::posix_time::ptime 
-Node::getLastAcknowledgedTimestamp () const
-{
-    boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
-    if (_ringNodes.size () == 0) return min_date_time;
-
-    // if node is identified at least on one ring, returns this ring node 
-    // timestamp (same for all).
-    return _ringNodes.begin ()->second->getLastAcknowledgedTimestamp ();
-}
-
-
-
-
-
-void
-Node::mergeUpdateLog (const TokenSPtr& token)
-{
-    const UpdateRecordSet& records  = token->getUpdateLog ()->getUpdateRecords ();
-    if (records.size () == 0) return;
-    
-    // Prepare local in-memory update log for merge
-    UpdateRecordTableSync::loadAllAfterTimestamp (_updateLog, 
-						  token->getUpdateLog ()->getUpdateLogBeginTimestamp (),
-						  true //inclusive
-	);    
-    
-    for (UpdateRecordSet::const_iterator itr = records.begin ();
-	 itr != records.end (); ++itr)
-    {
-	UpdateRecordSPtr ur = *itr;
-
-	// Do not propagate failed update record.
-	if (ur->getState () == FAILED) continue;
-
-	// Do not propagate locally acknowledged update record (authority might not have got the
-	// info that local node has already acknowledged it).
-	if (_updateLog->hasUpdateRecord (ur->getKey ()) &&
-	    _updateLog->getUpdateRecord (ur->getKey ())->getState () == ACKNOWLEDGED) continue;
-
-	std::stringstream ss;
-	ss << "Merging record " << (*ur);
-	Log::GetInstance ().debug (ss.str ());
-
-	if (ur->getTimestamp () < getLastAcknowledgedTimestamp ())
-	{
-	    throw UpdateChronologyException ("Cannot insert an update record in past");
-	}
+	int backlogSize = 1;
+	TcpService* tcpService = TcpService::openService (rn->getInfo ().getPort (), true, true, backlogSize);
 	
-	saveUpdateRecord (ur);
-    }
+	synthese::tcp::TcpServerSocket* serverSocket =
+	    tcpService->acceptConnection ();
 
+	// Non-blocking mode (default)
+	if (serverSocket != 0) 
+	{
+	    int serverTimeout = 200;
+	    serverSocket->setTimeOut (serverTimeout);
+
+	    try
+	    {
+
+		// First get client node info
+		std::stringstream ss;
+		char buf[1];
+		while (true)
+		{
+		    serverSocket->read (buf, 1);
+		    if (buf[0] == ETB) break;
+		    ss << buf[0];
+		}
+		
+		NodeInfo clientNodeInfo;
+		ss >> clientNodeInfo;
+		
+		RingNodeSPtr ringNode = _ringNodes.find (clientNodeInfo.getRingId ())->second;
+
+		ringNode->serverLoop (clientNodeInfo, rn->getInfo ().getPort (), serverSocket);
+	    } 
+	    catch (SocketException& se)
+	    {
+		// Silently ignore timeout.
+	    }
+	}
+
+    }
+    
 }
 
 
 
 
 bool 
-Node::isMasterAuthority () const
+Node::isAuthority () const
 {
-    boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
-
-    // By default, a node which is not connected to any other ring node is
-    // a master authority.
-    if (_ringNodes.empty ()) return true;
-
-    for (RingNodes::const_iterator it = _ringNodes.begin (); it != _ringNodes.end (); ++it)
-    {
-	if (it->second->getInfo ().isAuthority () == false) return false;
-    }
-    return true;
+    return _isAuthority;
 }
 
+
+
+
+
+void 
+Node::saveNodeInfo (NodeInfo info)
+{
+    NodeInfoTableSync::save ((NodeInfo*) &info);
+    
+    // This will trigger the hook and the memory state will be acknowledged through
+    // the db callback (with setNodeInfoCallback). 
+}
+ 
 
 
 
 void
 Node::saveUpdateRecord (const UpdateRecordSPtr& urp)
 {
-    // Note : acknowledging an update record does NOT increment the record timestamp, but it
-    // DOES increment the token clock (...and other nodes are locked for writing if their clocks
-    // are not equal to authority clock).
-    if (isMasterAuthority ())
-    {
-	assert (urp->getState () == PENDING);
-	try
-	{
-	    DBModule::GetSQLite()->beginTransaction (true);  // exclusive
-	    // batch execution, without precompilation!
-	    DBModule::GetSQLite()->execUpdate (urp->getSQL ());
-	    urp->setState (ACKNOWLEDGED);
-	    UpdateRecordTableSync::save (urp.get ());
-	    DBModule::GetSQLite()->commitTransaction (); 
-	    Log::GetInstance ().info ("Executed : " + Conversion::ToTruncatedString (urp->getSQL ()));
-	}
-	catch (std::exception& e)
-	{
-	    Log::GetInstance ().error ("Error while executing SQL statement on master authority : " + 
-				       Conversion::ToTruncatedString (urp->getSQL ()), e);
-	    DBModule::GetSQLite()->rollbackTransaction (); 
-	    urp->setState (FAILED);
-	    UpdateRecordTableSync::save (urp.get ());
-	}
 
-    }
-    else if (urp->getState () == ACKNOWLEDGED)
+    if (isAuthority ())
     {
-	UpdateRecordSPtr aur (urp);
-	try
+	if (urp->getState () == PENDING)
 	{
-	    // The SQL might have been removed if the UpdateRecord was already pending.
-	    if (urp->getSQL () == "")
-	    {
-		UpdateRecordSPtr alreadyIn (_updateLog->getUpdateRecord (urp->getKey ()));
-		alreadyIn->setState (ACKNOWLEDGED);
-		aur = alreadyIn;
-	    }
-
-	    DBModule::GetSQLite()->beginTransaction (true);  // exclusive
-	    DBModule::GetSQLite()->execUpdate (aur->getSQL ());
-	    UpdateRecordTableSync::save (aur.get ());
-	    DBModule::GetSQLite()->commitTransaction (); 
-	    Log::GetInstance ().info ("Executed : " + Conversion::ToTruncatedString (aur->getSQL ()));
-	}
-	catch (std::exception& e)
-	{
-	    Log::GetInstance ().error ("Error while propagating SQL statement " + 
-				       Conversion::ToTruncatedString (aur->getSQL ()), e);
-	    DBModule::GetSQLite()->rollbackTransaction (); 
-	    aur->setState (FAILED);
-	    UpdateRecordTableSync::save (aur.get ());
+	    UpdateRecordTableSync::save (urp.get ());
 	}
     }
     else 
     {
-	// New PENDING on a non master authority node.
-	UpdateRecordTableSync::save (urp.get ());
-    }
-
-
-    for (RingNodes::iterator it = _ringNodes.begin ();
-	 it != _ringNodes.end (); ++it)
-    {
-	RingNodeSPtr rn = it->second;
-	
-	if (urp->getTimestamp () > rn->getLastPendingTimestamp ())
+	// Locally pending record.
+	if (urp->getState () == PENDING)
 	{
-	    if (urp->getState () == PENDING)
+	    UpdateRecordTableSync::save (urp.get ());
+	}
+
+	// These are notifications of record ACKNOWLEDGED or FAILED by authority.
+	// We must apply them as well locally.
+	// The difference is that we do not overwrite timestamp so as to stay consistent
+	// with authority chronology.
+	else if (urp->getState () == ACKNOWLEDGED)
+	{
+	    // Does it hold compressed SQL ? If yes, it means that this record was
+	    // not even pending on this node. So save it first as a pending record.
+	    if (urp->hasCompressedSQL ())
 	    {
-		rn->setLastPendingTimestamp (urp->getTimestamp ());
-	    } 
-	    else if (urp->getState () == ACKNOWLEDGED)
-	    {
-		rn->setLastAcknowledgedTimestamp (urp->getTimestamp ());
+		// If we receive an apply update order with sql we must first save it as PENDING
+		urp->setState (PENDING);
+		UpdateRecordTableSync::save (urp.get ());
 	    }
+
+	    UpdateRecordTableSync::ApplyUpdateRecord (urp, false);
+	}
+	else if (urp->getState () == FAILED)
+	{
+	    UpdateRecordTableSync::save (urp.get ());
+
+	    // It will be saved, not matter if it was before in db because
+	    // we do not care about failed SQL.
+	    UpdateRecordTableSync::AbortUpdateRecord (urp, false);
 	}
     }
+
 }
+
 
     
 
@@ -536,32 +412,10 @@ Node::finalize ()
 
 
     
-bool 
-Node::canWrite () const
-{
-    boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
-    for (RingNodes::const_iterator it = _ringNodes.begin ();
-	 it != _ringNodes.end (); ++it)
-    {
-	if (it->second->canWrite () == false) return false;
-    }
-    return true;
-}
 
 
 
 
-void Node::dump ()
-{
-    // for debug
-    boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
-    for (RingNodes::iterator it = _ringNodes.begin ();
-	 it != _ringNodes.end (); ++it)
-    {
-	it->second->dump ();
-    }
-
-}
 
 	
 
@@ -575,6 +429,19 @@ Node::encodeUpdateKey (NodeId nodeId, long updateId)
     id |= (tmp << 52);
     return id;	    
 }
+
+
+
+
+std::set<uid> 
+Node::getPendingUpdateRecords () const
+{
+    // returns a copy for thread safety.
+    boost::recursive_mutex::scoped_lock lock (*_pendingUpdateRecordsMutex);
+    return _pendingUpdateRecords;
+}
+
+
 
 
 

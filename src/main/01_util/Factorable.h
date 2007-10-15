@@ -38,6 +38,16 @@ namespace synthese
 		public:
 			typedef T FactoryClass;
 
+			/** Empty args definition for default constructor call if any.
+			 */
+			class Args
+			{
+			public:
+			    Args () {}
+			};
+			    
+
+
 			virtual const std::string& getFactoryKey() const = 0;
 		};
 	}

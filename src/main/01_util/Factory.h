@@ -64,7 +64,7 @@ namespace synthese
 			class CreatorInterface
 			{
 			private:
-				virtual RootObject* create() = 0;
+				virtual RootObject* create(const typename RootObject::Args& args = typename RootObject::Args ()) = 0;
 				friend class Factory;
 				friend class Factory::Iterator;
 			};
@@ -75,12 +75,12 @@ namespace synthese
 			{
 			private:
 				friend class Factory;
-				RootObject* create ()
+				RootObject* create (const typename T::Args& args = typename T::Args ())
 				{
-					return static_cast<RootObject*>(createTyped());
+				    return static_cast<RootObject*>(createTyped(args));
 				}
-
-				T* createTyped ()
+				
+				T* createTyped (const typename T::Args& args = typename T::Args ())
 				{
 					T* obj(new T);
 //					obj->setFactoryKey(getKey<T>());
@@ -173,19 +173,20 @@ namespace synthese
 			}
 
 			template<class T>
-			static T* create()
+			    static T* create(const typename T::Args& args = typename T::Args ())
 			{
 				Creator<T> creator;
-				return creator.createTyped();
+				return creator.createTyped(args);
 			}
 
 			template<class T>
-			static boost::shared_ptr<T> createSharedPtr()
+			static boost::shared_ptr<T> createSharedPtr(const typename T::Args& args = typename T::Args ())
 			{
-				return boost::shared_ptr<T>(create<T>());
+				return boost::shared_ptr<T>(create<T>(args));
 			}
 
-			static RootObject* create(const typename Map::key_type& key)
+			static RootObject* create(const typename Map::key_type& key, 
+						  const typename RootObject::Args& args = typename RootObject::Args ())
 			{
 				// The factory "single object" was never filled
 				if (size () == 0)
@@ -199,14 +200,15 @@ namespace synthese
 				    throw FactoryException<RootObject>("Unable to factor "+ key +" object (class not found)");
 
 				// The key is found : return of an instance of the object
-				return it->second->create();
+				return it->second->create(args);
 			}
 
-			static boost::shared_ptr<RootObject> createSharedPtr(const typename Map::key_type& key)
+			static boost::shared_ptr<RootObject> createSharedPtr(const typename Map::key_type& key,
+									     const typename RootObject::Args& args = typename RootObject::Args ())
 			{
-				return boost::shared_ptr<RootObject>(create(key));
+			    return boost::shared_ptr<RootObject>(create(key, args));
 			}
-
+			
 			static void destroy()
 			{
 			    // MJ : never called; review memory management...

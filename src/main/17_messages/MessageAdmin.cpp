@@ -42,6 +42,8 @@
 #include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
+
 
 using namespace std;
 using namespace boost;

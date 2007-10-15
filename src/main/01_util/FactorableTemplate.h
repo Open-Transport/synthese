@@ -54,7 +54,7 @@ namespace synthese
 		template<class F, class C>
 		void synthese::util::FactorableTemplate<F, C>::integrate ()
 		{
-			synthese::util::Factory<F::FactoryClass>::template integrate<C> ();
+			synthese::util::Factory<typename F::FactoryClass>::template integrate<C> ();
 		}
 
 		template<class F, class C>

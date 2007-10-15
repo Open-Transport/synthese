@@ -42,6 +42,7 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminModule.h"
+#include "32_admin/AdminRequest.h"
 #include "32_admin/HomeAdmin.h"
 #include "32_admin/AdminParametersException.h"
 

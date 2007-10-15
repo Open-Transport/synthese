@@ -37,6 +37,7 @@
 #include "30_server/Session.h"
 
 #include "32_admin/HomeAdmin.h"
+#include "32_admin/AdminRequest.h"
 
 #include "12_security/User.h"
 #include "12_security/Profile.h"

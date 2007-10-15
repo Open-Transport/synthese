@@ -29,6 +29,7 @@
 #include "01_util/FactorableTemplate.h"
 
 #include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
+#include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {

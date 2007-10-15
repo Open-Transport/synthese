@@ -58,7 +58,6 @@ namespace synthese
 	template<> const std::string SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::TABLE_NAME = "t997_update_log";
 	template<> const int SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::TABLE_ID = 997;
 	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::HAS_AUTO_INCREMENT = true;
-	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::IGNORE_CALLBACKS_ON_FIRST_SYNC(true);
 
 	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::load (UpdateRecord* object, const db::SQLiteResultSPtr& rows)
 	{
@@ -67,12 +66,11 @@ namespace synthese
 	    object->setEmitterNodeId (rows->getInt ( UpdateRecordTableSync::TABLE_COL_EMITTERNODEID));
 	    object->setState ((RecordState) rows->getInt ( UpdateRecordTableSync::TABLE_COL_STATE));
 
-	    // Uncompress SQL
-	    std::stringstream compressed (rows->getBlob (UpdateRecordTableSync::TABLE_COL_SQL));
-	    std::stringstream sql;
-
-	    Compression::ZlibDecompress (compressed, sql);
-	    object->setSQL (sql.str ());
+	    // Load compressed SQL if available only
+	    if (rows->getColumnIndex (UpdateRecordTableSync::TABLE_COL_SQL) != -1)
+	    {
+		object->setCompressedSQL (rows->getBlob (UpdateRecordTableSync::TABLE_COL_SQL));
+	    }
 	}
 
 
@@ -84,21 +82,17 @@ namespace synthese
 	    std::stringstream query;
 
 	    assert (object->getKey() != 0);
-	    
-	    query << "REPLACE INTO " << TABLE_NAME << " VALUES (:key, :timestamp, :emitter_node_id, :state, :sql)";
+	    assert (object->hasCompressedSQL ());
+
+		query << "REPLACE INTO " << TABLE_NAME << " VALUES (:key, :timestamp, :emitter_node_id, :state, :sql)";
+
 	    SQLiteStatementSPtr statement (sqlite->compileStatement (query.str ()));
 	    
 	    statement->bindParameterLongLong (":key", object->getKey ());
 	    statement->bindParameterTimestamp (":timestamp", object->getTimestamp ());
 	    statement->bindParameterLongLong (":emitter_node_id", object->getEmitterNodeId ());
 	    statement->bindParameterInt (":state", object->getState ());
-
-	    // Compress SQL
-	    std::stringstream sql (object->getSQL ());
-	    std::stringstream compressed;
-	    Compression::ZlibCompress (sql, compressed);
-
-	    statement->bindParameterBlob (":sql", compressed.str ());
+	    statement->bindParameterBlob (":sql", object->getCompressedSQL ());
 
 	    sqlite->execUpdate (statement);
 
@@ -118,17 +112,14 @@ namespace synthese
 	UpdateRecordTableSync::UpdateRecordTableSync ()
 	    : SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord> ()
 	{
-	    // Note : ignore callbacks on first sync. the update log must be populated only when necessary.
-	    
 	    addTableColumn (TABLE_COL_ID, "INTEGER", false);
-	    addTableColumn (TABLE_COL_TIMESTAMP, "TEXT", false);
+	    addTableColumn (TABLE_COL_TIMESTAMP, "TEXT", true);
 	    addTableColumn (TABLE_COL_EMITTERNODEID, "INTEGER", false);
-	    addTableColumn (TABLE_COL_STATE, "INTEGER", false);
-	    addTableColumn (TABLE_COL_SQL, "BLOB", false);
+	    addTableColumn (TABLE_COL_STATE, "INTEGER", true);
+	    addTableColumn (TABLE_COL_SQL, "BLOB", false, false);  // Not loaded on callback
 	    
 	    addTableIndex(TABLE_COL_EMITTERNODEID);
 	    addTableIndex(TABLE_COL_TIMESTAMP);
-	    
 	}
 	
 	
@@ -160,8 +151,10 @@ namespace synthese
 		UpdateRecord* ur = new UpdateRecord ();
 		load (ur, rows);
 		UpdateRecordSPtr urp (ur);
+
 		DbRingModule::GetNode ()->setUpdateRecordCallback (urp);
 	    }
+
 	}
  
 
@@ -175,41 +168,242 @@ namespace synthese
 	}
 
 
+	void 
+	UpdateRecordTableSync::LoadDeltaUpdate (UpdateRecordSet& dest, 
+						const boost::posix_time::ptime& clientLastAcknowledgedTimestamp,
+						std::set<uid> clientLastPendingIds)
+	{
+	    // First query only necessary ids.
+	    // The delta is composed of:
+	    // * All pending records that are not already pending in client update log (known through clientLastPendingIds)
+	    // * All acknowledged records that are flagged pending in client update log. Those ones are not fully loaded since the SQL
+	    //   compressed part have already been sent.
 
 
+	    // First part : full load of 
+            // - acknowledged/failed records that are not known on client side and after client last acknowledged timestamp
+	    // - pending records not known on client side whenever they occured (will be processed as late records on authority)
+	    
+	    {
+		std::stringstream query;
+		query << "SELECT * FROM " << TABLE_NAME << " WHERE " ;
 
+		query << "((" << TABLE_COL_TIMESTAMP << " > " << Conversion::ToSQLiteString (to_iso_string (clientLastAcknowledgedTimestamp)) << ") OR ";
+		query << "(" << TABLE_COL_STATE << "=" << PENDING << ")) AND";
+
+		query << " (" << TABLE_COL_ID << " NOT IN (";
+		for (std::set<uid>::const_iterator it = clientLastPendingIds.begin ();
+		     it != clientLastPendingIds.end (); ++it)
+		{
+		    if (it != clientLastPendingIds.begin ()) query << ",";
+		    query << "'" << Conversion::ToString (*it) << "'";
+		}
+		query << "))" ;
+		
+		// query << "(" << TABLE_COL_STATE << "=" << PENDING << " OR " << TABLE_COL_STATE << "=" << ACKNOWLEDGED << "))";
+		
+		//std::cerr << query.str () << std::endl;
+
+		SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
+		
+		while (result->next ())
+		{
+		    // std::cerr << "<<<< FULL LOAD " <<std::endl;
+		    UpdateRecord* ur = new UpdateRecord ();
+		    load (ur, result);
+		    dest.insert (UpdateRecordSPtr (ur));
+		}
+	    }
+	    
+	    // Second part : partial load (excluded compressed SQL) of acknowledged/failed records that are pending on client side
+	    {
+		std::stringstream query;
+		query << "SELECT " <<
+		    TABLE_COL_ID << "," << TABLE_COL_TIMESTAMP << "," << TABLE_COL_EMITTERNODEID << "," << TABLE_COL_STATE
+		      << " FROM " << TABLE_NAME << " WHERE (" 
+		      << TABLE_COL_TIMESTAMP << " > " << Conversion::ToSQLiteString (to_iso_string (clientLastAcknowledgedTimestamp)) << ") AND (";
+
+		query << "(" << TABLE_COL_ID << " IN (";
+		for (std::set<uid>::const_iterator it = clientLastPendingIds.begin ();
+		     it != clientLastPendingIds.end (); ++it)
+		{
+		    if (it != clientLastPendingIds.begin ()) query << ",";
+		    query << "'" << Conversion::ToString (*it) << "'";
+		}
+		query << ")) AND " ;
+		
+		query << "(" << TABLE_COL_STATE << "=" << ACKNOWLEDGED << " OR " << TABLE_COL_STATE << "=" << FAILED << "))";
+		//std::cerr << "..." << query.str () << std::endl;
+		
+		SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
+		
+		while (result->next ())
+		{
+		    // std::cerr << "<<<< PARTIAL LOAD " <<std::endl;
+		    UpdateRecord* ur = new UpdateRecord ();
+		    load (ur, result);
+		    dest.insert (UpdateRecordSPtr (ur));
+		}
+	    }
+	    
+
+
+	}
 
 
 
 	void 
-	UpdateRecordTableSync::loadAllAfterTimestamp (UpdateLogSPtr dest, 
-						      const boost::posix_time::ptime& timestamp,
-						      bool inclusive)
+	UpdateRecordTableSync::LoadPendingRecordIds (std::set<uid>& updateRecordIds)
 	{
 	    std::stringstream query;
-
-	    query << "SELECT * FROM " << TABLE_NAME << " WHERE " 
-		  << TABLE_COL_TIMESTAMP << " " << (inclusive ? ">=" : ">") << " " << Conversion::ToSQLiteString (to_iso_string (timestamp));
+	    query << "SELECT " << TABLE_COL_ID << " FROM " << TABLE_NAME << " WHERE " << TABLE_COL_STATE << "=" << PENDING;
 
 	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
+	    if (result->next ())
+	    {
+		updateRecordIds.insert (result->getLongLong (TABLE_COL_ID));
+	    }
+	}
+
+
+
+	void 
+	UpdateRecordTableSync::LoadPendingRecords (std::vector<UpdateRecordSPtr>& updateRecords, 
+						   const boost::posix_time::ptime& lastAcknowledgedTimestamp,
+						   bool lateOnes, bool withBlob)
+	{
+	    std::string selectClause (withBlob ? "*" : TABLE_COL_ID + "," + TABLE_COL_TIMESTAMP + 
+				      "," + TABLE_COL_EMITTERNODEID + "," + TABLE_COL_STATE);
+
+	    std::stringstream query;
+	    query << "SELECT " << selectClause << " FROM " << TABLE_NAME << " WHERE " << TABLE_COL_STATE << "=" << PENDING << " AND " 
+		  << TABLE_COL_TIMESTAMP << (lateOnes ? "<=" : ">") 
+		  << Conversion::ToSQLiteString (to_iso_string (lastAcknowledgedTimestamp))
+		// << "(SELECT MAX(" << TABLE_COL_TIMESTAMP << ") FROM " << TABLE_NAME << " WHERE " << TABLE_COL_STATE << "=" << ACKNOWLEDGED << ")"
+		  << " ORDER BY " << TABLE_COL_TIMESTAMP;
 	    
-	    while (result->next ())
+	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
+	    if (result->next ())
 	    {
 		UpdateRecord* ur = new UpdateRecord ();
 		load (ur, result);
-		dest->setUpdateRecord (UpdateRecordSPtr (ur));
+		updateRecords.push_back (UpdateRecordSPtr (ur));
 	    }
 	}
 
 
 
 
-	boost::posix_time::ptime 
-	UpdateRecordTableSync::getLastPendingTimestamp ()
+
+	
+	void 
+	UpdateRecordTableSync::ApplyUpdateRecord (const UpdateRecordSPtr& ur, bool overwriteTimestamp)
+	{
+	    //std::cerr << "......... Applying update record  " << std::endl;
+	    UpdateRecordSPtr urp (ur);
+
+	    if (ur->hasCompressedSQL () == false)
+	    {
+		// Retrieve the corresponding pending record and use it.
+		urp = Get (ur->getKey ());
+
+		// If was already acnkwowledged, nothing to do.
+		if (urp->getState () == ACKNOWLEDGED) return;
+	    }
+
+	    bool failed (false);
+	    try
+	    {
+		std::stringstream compressedSQL;
+		std::stringstream decompressedSQL;
+		
+		// Wrap the update in a unique transaction;
+		// so that update record cannot be acknowledged only if it has executed successfully.
+		// For this reason, usage of begin is strictly forbidden in an SQL update.
+		// (nested transactions are not supported)
+
+		// Note that update record timestamp is overriden with the real acknowledgement timestamp
+		// which corresponds to execution order on authority.
+		
+		decompressedSQL << "BEGIN;" << std::endl;
+		
+		compressedSQL << urp->getCompressedSQL ();
+		Compression::ZlibDecompress (compressedSQL, decompressedSQL);
+
+		// Update state, and always override timestamp with one from record received from authority.
+		decompressedSQL << "UPDATE " << TABLE_NAME << " SET " << TABLE_COL_STATE << "=" << ((int) ACKNOWLEDGED)
+				<< "," << TABLE_COL_TIMESTAMP << "=" << Conversion::ToSQLiteString (to_iso_string (ur->getTimestamp ()));
+
+		decompressedSQL  << " WHERE " << TABLE_COL_ID << "='" << urp->getKey () << "';";
+
+		decompressedSQL << "END;" << std::endl;
+		
+		// batch execution, without precompilation!
+		DBModule::GetSQLite()->execUpdate (decompressedSQL.str ());
+		
+		// Log::GetInstance ().info ("Executed : " + Conversion::ToTruncatedString (urp->getSQL ()));
+	    }
+	    catch (std::exception& e)
+	    {
+		failed = true;
+
+		Log::GetInstance ().error ("Error while executing SQL statement ", e);
+	    }
+	    catch (...)
+	    {
+		failed = true;
+	    }
+
+	    if (failed)
+	    {
+		AbortUpdateRecord (ur, overwriteTimestamp);
+	    }
+	    
+	    //std::cerr << "......... Applying update finished  " << std::endl;
+	    
+	}
+
+
+
+
+	void 
+	UpdateRecordTableSync::AbortUpdateRecord (const UpdateRecordSPtr& ur, bool overwriteTimestamp)
 	{
 	    std::stringstream query;
+	    // Update state, and always override timestamp with one from record received from authority.
+	    query << "UPDATE " << TABLE_NAME << " SET " << TABLE_COL_STATE << "=" << FAILED
+		  << "," << TABLE_COL_TIMESTAMP << "=" << Conversion::ToSQLiteString (to_iso_string (ur->getTimestamp ()));
 
-	    query << "SELECT MAX(" << TABLE_COL_TIMESTAMP << ") AS ts FROM " << TABLE_NAME ;
+	    query  << " WHERE " << TABLE_COL_ID << "='" << ur->getKey () << "';";
+	    DBModule::GetSQLite()->execUpdate (query.str ());
+
+	}
+
+
+
+
+	void 
+	UpdateRecordTableSync::PostponeUpdateRecord (const UpdateRecordSPtr& ur)
+	{
+	    boost::posix_time::ptime now (boost::date_time::microsec_clock<ptime>::universal_time ());
+	    std::stringstream query;
+	    query << "UPDATE " << TABLE_NAME << " SET " << TABLE_COL_TIMESTAMP << "=" << Conversion::ToSQLiteString (to_iso_string (now));
+	    query  << " WHERE " << TABLE_COL_ID << "='" << ur->getKey () << "';";
+	    DBModule::GetSQLite()->execUpdate (query.str ());
+	}
+
+
+
+
+	boost::posix_time::ptime 
+	UpdateRecordTableSync::GetLastTimestampWithState (const RecordState& recordState)
+	{
+	    // TODO : filter failed records!
+	    std::stringstream query;
+
+	    query << "SELECT MAX(" << TABLE_COL_TIMESTAMP << ") AS ts FROM " 
+		  << TABLE_NAME << " WHERE " << TABLE_COL_STATE << "=" << recordState;
+
 	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
 	    if (result->next () && (result->getText ("ts") != ""))
 	    {
@@ -223,7 +417,7 @@ namespace synthese
 
 
 	long 
-	UpdateRecordTableSync::getLastUpdateIndex (NodeId nodeId)
+	UpdateRecordTableSync::GetLastUpdateIndex (NodeId nodeId)
 	{
 	    std::stringstream query;
 
@@ -236,6 +430,37 @@ namespace synthese
 	    }
 	    return 0;
 	}
+
+
+
+
+
+
+/*
+	void 
+	UpdateRecordTableSync::SelectAllRecordIdsBetween (const boost::posix_time::ptime& startTimestamp,
+							  const boost::posix_time::ptime& endTimestamp,
+							  std::vector<uid>& result)
+	{
+	    std::stringstream query;
+	    query << "SELECT " << TABLE_COL_ID << " FROM " << TABLE_NAME << " WHERE " 
+		  << TABLE_COL_TIMESTAMP << " > " << Conversion::ToSQLiteString (to_iso_string (startTimestamp)) << " AND "
+		  << TABLE_COL_TIMESTAMP << " < " << Conversion::ToSQLiteString (to_iso_string (endTimestamp)) ;
+	    
+	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
+	    
+	    while (result->next ())
+	    {
+		result.push_back ((uid) result->getLongLong (TABLE_COL_ID));
+	    }
+	}
+*/
+
+
+
+
+
+
 
 
 

@@ -279,9 +279,12 @@ void
 Thread::RunOnce (ThreadExec* exec)
 {
     RunOnceStruct runOnce (exec);
-    boost::thread* thread = new boost::thread (runOnce);
+    runOnce ();
+
+
+    /* boost::thread* thread = new boost::thread (runOnce);
     // The thread is started immediately, we detach it (by deleting it).
-    delete thread;
+    delete thread; */
 
 }
 

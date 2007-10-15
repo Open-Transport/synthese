@@ -66,10 +66,20 @@ void sig_INT_handler(int sig)
 }
 
 
+void sig_PIPE_handler(int sig)
+{
+    // Catch SIGPIPE and ignore it. We do not want the program to 
+    // die on a broken pipe error, which is well detected at socket level.
+    Log::GetInstance ().info ("Ignoring broken pipe.");
+    
+}
+
+
 
 int main( int argc, char **argv )
 {
     std::signal(SIGINT, sig_INT_handler);
+    std::signal(SIGPIPE, sig_PIPE_handler);
 
     try 
     {
@@ -146,7 +156,6 @@ int main( int argc, char **argv )
     {
 	Log::GetInstance ().fatal ("Unexpected exception.");
     }
- 
     
 }
 

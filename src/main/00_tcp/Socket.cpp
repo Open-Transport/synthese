@@ -20,8 +20,9 @@ namespace tcp
     \author Christophe Romain
     \date 2005
 */
-Socket::Socket (bool nonBlocking)
+    Socket::Socket (bool nonBlocking, int backlogSize)
     : _nonBlocking (nonBlocking)
+    , _backlogSize (backlogSize)
 {
 #ifdef WIN32
     WSADATA wsaData;
@@ -171,7 +172,7 @@ Socket::server()
         throw "bind";
 
     // Demarre le service
-    result = listen(_socket, 10);
+    result = listen(_socket, _backlogSize);
     if (result == SOCKET_ERROR)
         throw "listen";
 }
@@ -249,7 +250,8 @@ Socket::write(SOCKET socket, const char* buffer, int size, int timeout)
     FD_ZERO(&fd);
     FD_SET(socket, &fd);
 
-    if(select(socket+1, 0, &fd, 0, (timeout > 0) ? &tv : 0) == 0)
+    int err = select(socket+1, 0, &fd, 0, (timeout > 0) ? &tv : 0);
+    if(err == 0)
     {
         throw "Socket send timeout";
     }
@@ -257,11 +259,12 @@ Socket::write(SOCKET socket, const char* buffer, int size, int timeout)
 
 
     int bytesSent;
-    bytesSent = send (socket, buffer, size, 0);
+    bytesSent = send (socket, buffer, size, /*0*/ MSG_NOSIGNAL );
 
     if(bytesSent == SOCKET_ERROR)
 	throw "Send";
 
+    // std::cerr << "(" << bytesSent << ")" << std::endl;
     return bytesSent;
 }
 

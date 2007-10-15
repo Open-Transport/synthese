@@ -96,6 +96,7 @@ public:
      */
     void setTimeOut (int timeOut);
 
+
     std::streamsize read(char* s, std::streamsize n);
 
     std::streamsize write(const char* s, std::streamsize n);

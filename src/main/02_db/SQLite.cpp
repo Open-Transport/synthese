@@ -45,39 +45,6 @@ namespace synthese
 
 
 
-	bool 
-	SQLite::isTransactionOpened ()
-	{
-	    char* errMsg = 0;
-	    // Try to open/close a fake transaction to check...
-	    // Crap but only way found to achieve this.
-	    int retc = sqlite3_exec (getHandle (), 
-				     "BEGIN EXCLUSIVE; END;", 
-				     0, 
-			     0, &errMsg);
-	    return (retc == 1);
-	}
-	
-	
-	void 
-	SQLite::beginTransaction (bool exclusive)
-	{
-	    execUpdate ("BEGIN;");
-	}
-	    
-	    
-	void 
-	SQLite::commitTransaction ()
-	{
-	    execUpdate ("COMMIT;");
-	}
-
-
-	void 
-	SQLite::rollbackTransaction ()
-	{
-	    execUpdate ("ROLLBACK;");
-	}
 
 
 

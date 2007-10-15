@@ -20,14 +20,14 @@ namespace synthese
     {
 	
 	
-	void cleanupHandle (sqlite3* hdl)
+	void cleanupTSS (SQLiteTSS* tss)
 	{
-	    int retc = sqlite3_close (hdl);
+	    int retc = sqlite3_close (tss->handle);
 	    if (retc != SQLITE_OK)
 	    {
 		throw SQLiteException ("Cannot close SQLite handle (error=" + Conversion::ToString (retc) + ")");
 	    }
-	    // TODO clean update hook struct.
+	    delete tss;
 	}
 	
 	
@@ -35,9 +35,8 @@ namespace synthese
 	int sqliteBusyHandler (void* arg, int nbCalls)
 	{
 	    // Return a non-zero value so that a retry is made, waiting for SQLite not ot be busy anymore...
-		cerr << "occupé";
-		return 1;
-	    
+	    return 1;
+		
 	}
 	
 
@@ -47,7 +46,7 @@ namespace synthese
 
 	    // WARNING : the update hook is invoked only when working with the connection
 	    // created inside the body of this thread (initialize).
-	    UpdateHookStruct* uhs = (UpdateHookStruct*) userData;
+	    SQLiteTSS* tss = (SQLiteTSS*) userData;
 	    
 	    SQLiteEvent event;
 	    event.opType = opType;
@@ -55,16 +54,37 @@ namespace synthese
 	    event.tbName = tbName;
 	    event.rowId = rowId;
 	    
-	    uhs->events.push_back (event);
+	    tss->events.push_back (event);
 	}
 	
+
+	void sqliteRollbackHook (void* arg)
+	{
+	    SQLiteTSS* tss = (SQLiteTSS*) arg;
+	    tss->events.clear ();
+	}
+
+
+
+	void 
+	SQLiteHandle::callHooks (const SQLiteEvent& event)
+	{
+	    // Call hooks!
+	    for (std::vector<SQLiteUpdateHook*>::const_iterator ith = _hooks.begin ();
+		 ith != _hooks.end (); ++ith)
+	    {
+		(*ith)->eventCallback (this, event);
+	    }
+	    
+	}
+
 	
 
 	SQLiteHandle::SQLiteHandle (const boost::filesystem::path& databaseFile)
 	    : _databaseFile (databaseFile)
-	    , _handle (&cleanupHandle)
+	    , _tss (&cleanupTSS)
 	    , _hooksMutex (new boost::mutex ())
-
+	    , _updateMutex (new boost::recursive_mutex ())
 	{
 	}
 
@@ -87,14 +107,34 @@ namespace synthese
 	
 
 
-	UpdateHookStruct* 
-	SQLiteHandle::getUpdateHookStruct () const
+	SQLiteTSS* 
+	SQLiteHandle::getSQLiteTSS () const
 	{
-	    if (_updateHookStruct.get () == 0)
+	    if (_tss.get () == 0)
 	    {
-		_updateHookStruct.reset (new UpdateHookStruct ());
+		// Create the sqlite handle
+		
+		sqlite3* handle;
+		int retc = sqlite3_open (_databaseFile.string ().c_str (), &handle);
+		if (retc != SQLITE_OK)
+		{
+		    throw SQLiteException ("Cannot open SQLite handle to " + 
+					   _databaseFile.string () + "(error=" + Conversion::ToString (retc) + ")");
+		}
+		
+		// int 
+		sqlite3_busy_handler(handle, &sqliteBusyHandler, 0);
+		
+		SQLiteTSS* tss = new SQLiteTSS ();
+
+		sqlite3_update_hook (handle, &sqliteUpdateHook, tss);
+		sqlite3_rollback_hook (handle, &sqliteRollbackHook, tss);
+		
+		tss->handle = handle;
+
+		_tss.reset (tss);
 	    }
-	    return _updateHookStruct.get ();
+	    return _tss.get ();
 	}
 	
 	
@@ -103,18 +143,16 @@ namespace synthese
 	SQLiteResultSPtr 
 	SQLiteHandle::execQuery (const SQLiteStatementSPtr& statement, bool lazy)
 	{
-//		cerr << "open" << statement->getSQL();
-	    // lazy = false;
+	    assert (lazy == false);
+	    lazy = false;
 	    SQLiteResultSPtr result (new SQLiteLazyResult (statement));
 	    if (lazy)
 	    {
-//			cerr << "close lazy" << statement->getSQL();
 		return result;
 	    }
 	    else
 	    {
 		SQLiteCachedResult* cachedResult = new SQLiteCachedResult (result);
-//		cerr << "close" << statement->getSQL();
 		return SQLiteResultSPtr (cachedResult);
 	    }
 	}
@@ -125,35 +163,24 @@ namespace synthese
 	sqlite3* 
 	SQLiteHandle::getHandle () const 
 	{
-	    if (_handle.get() == 0)
-	    {
-		
-		sqlite3* handle;
-		int retc = sqlite3_open (_databaseFile.string ().c_str (), &handle);
-		if (retc != SQLITE_OK)
-		{
-		    throw SQLiteException ("Cannot open SQLite handle to " + 
-					   _databaseFile.string () + "(error=" + Conversion::ToString (retc) + ")");
-		}
-		    
-		// int 
-		sqlite3_busy_handler(handle, &sqliteBusyHandler, 0);
-		
-		// std::cerr << " New handle ! " << handle << std::endl;
-		sqlite3_update_hook (handle, &sqliteUpdateHook, getUpdateHookStruct ());
-		_handle.reset (handle);
-	    }
-	    return _handle.get ();
-	    
+	    return getSQLiteTSS ()->handle;
 	}
 
 
 	void 
 	SQLiteHandle::execUpdate (const SQLiteStatementSPtr& statement)
 	{
-//	    cerr << "open" << statement->getSQL();
-	    UpdateHookStruct* uhs = getUpdateHookStruct ();
-	    uhs->events.clear ();
+	    // Lock this method so that no database update can start before hooks
+	    // have finished their execution. The mutex is recursive so that
+	    // an update can still be called inside hook callback.
+	    boost::recursive_mutex::scoped_lock lock (*_updateMutex);
+	    SQLiteTSS* tss = getSQLiteTSS ();
+	    tss->events.clear ();
+
+	    if (statement->insideOwnerThread () == false)
+	    {
+		throw SQLiteException ("SQLiteStatement called outside its creation thread is forbidden.");
+	    }
 
 	    int retc = SQLITE_ROW;
 	    while (retc == SQLITE_ROW)
@@ -166,33 +193,30 @@ namespace synthese
 				       Conversion::ToTruncatedString (statement->getSQL ()));
 	    }
 
-	    // Call hooks!
-	    const std::vector<SQLiteEvent>& events = uhs->events;
+	    const std::vector<SQLiteEvent>& events = tss->events;
 	    for (std::vector<SQLiteEvent>::const_iterator it = events.begin ();
 		 it != events.end (); ++it)
 	    {
-		for (std::vector<SQLiteUpdateHook*>::const_iterator ith = _hooks.begin ();
-		     ith != _hooks.end (); ++ith)
-		{
-		    (*ith)->eventCallback (this, *it);
-		}
+		callHooks (*it);
 	    }
-//		cerr << "close" << statement->getSQL();
-    
 	}
 
 
 	void 
 	SQLiteHandle::execUpdate (const SQLData& sql)
 	{
-//		cerr << "open" << sql;
-	    UpdateHookStruct* uhs = getUpdateHookStruct ();
-	    uhs->events.clear ();
+	    // Lock this method so that no database update can start before hooks
+	    // have finished their execution. The mutex is recursive so that
+	    // an update can still be called inside hook callback.
+	    boost::recursive_mutex::scoped_lock lock (*_updateMutex);
 
 	    // Do a batch execution (no precompilation since it can contains more than one 
 	    // statement which is impossible to validate wihtout executing them one by one, given one database state)
 	    assert (sql.size () > 0);
 	    
+	    SQLiteTSS* tss = getSQLiteTSS ();
+	    tss->events.clear ();
+
 	    char* errMsg = 0;
 	    int retc = sqlite3_exec (getHandle (), 
 				     sql.c_str (), 
@@ -208,20 +232,12 @@ namespace synthese
 				       msg + " (error=" + Conversion::ToString (retc) + ")");
 	    }
 
-	    // Call hooks!
-	    const std::vector<SQLiteEvent>& events = uhs->events;
+	    const std::vector<SQLiteEvent>& events = tss->events;
 	    for (std::vector<SQLiteEvent>::const_iterator it = events.begin ();
 		 it != events.end (); ++it)
 	    {
-		for (std::vector<SQLiteUpdateHook*>::const_iterator ith = _hooks.begin ();
-		     ith != _hooks.end (); ++ith)
-		{
-		    (*ith)->eventCallback (this, *it);
-		}
+		callHooks (*it);
 	    }
-
-//		cerr << "close" << sql;
-
 	}
 
 
@@ -229,7 +245,16 @@ namespace synthese
 	SQLiteStatementSPtr 
 	SQLiteHandle::compileStatement (const SQLData& sql)
 	{
-	    return SQLiteStatementSPtr (new SQLiteStatement (*this, sql));
+	    sqlite3_stmt* st;
+	    
+	    int retc = sqlite3_prepare_v2 (getHandle (), 
+					   sql.c_str (), sql.length (), &st, 0);
+
+	    if (retc != SQLITE_OK)
+	    {
+		throw SQLiteException ("Error compiling \"" + sql + "\" (error=" + Conversion::ToString (retc) + ")");
+	    }
+	    return SQLiteStatementSPtr (new SQLiteStatement (st, sql));
 	}
 
 

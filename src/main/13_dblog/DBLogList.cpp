@@ -21,6 +21,7 @@
 */
 
 #include "32_admin/HomeAdmin.h"
+#include "32_admin/AdminRequest.h"
 
 #include <boost/shared_ptr.hpp>
 

@@ -2,18 +2,19 @@
 #define SYNTHESE_DBRING_NODE_H
 
 #include "01_util/threads/ThreadExec.h"
-#include "01_util/concurrent/SynchronizedQueue.h"
 
 #include "02_db/SQLite.h"
 
 #include "03_db_ring/RingNode.h"
-#include "03_db_ring/UpdateLog.h"
+#include "03_db_ring/UpdateRecord.h"
 
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <map>
 #include <set>
+#include <vector>
 #include <string>
 #include <iostream>
 
@@ -44,17 +45,19 @@ class Node : public db::SQLite, public util::ThreadExec
 private:
     
     const NodeId _id;
-    RingNodes _ringNodes;  //!< Local tokens (one per ring). Info that this node knows locally.
-    std::set<int> _listenPorts; //!< Ports this node listen to.
+    bool _isAuthority;
 
-    UpdateLogSPtr _updateLog;
+    RingNodes _ringNodes;
 
-    util::SynchronizedQueue<TokenSPtr> _receivedTokens;  //!< Token reception queue.
+    std::set<uid> _pendingUpdateRecords;
 
-    long _lastUpdateIndex;
-    
+    int _lastUpdateIndex;
+
+    boost::posix_time::ptime _lastAcknowledgedTimestamp;   //!< Last acknowledged update record timestamp.
+
     boost::shared_ptr<boost::recursive_mutex> _ringNodesMutex; 
-    boost::shared_ptr<boost::recursive_mutex> _updateLogMutex; 
+    boost::shared_ptr<boost::recursive_mutex> _lastAcknowledgedTimestampMutex; 
+    boost::shared_ptr<boost::recursive_mutex> _pendingUpdateRecordsMutex; 
 
 	sqlite3* getHandle(void) const;
 
@@ -63,27 +66,14 @@ protected:
 
  public:
 
-    Node (const NodeId& id);
+    Node (const NodeId& id, bool isAuthority);
 
     ~Node ();
 
 public:
 
-    sqlite3* getHandle ();
-
     const NodeId& getId () const;
 
-    bool hasInfo (const NodeId& nodeId, const RingId& ringId) const;
-    NodeInfo getInfo (const NodeId& nodeId, const RingId& ringId) const;
-
-    bool hasInfo (const RingId& ringId) const;
-    NodeInfo getInfo (const RingId& ringId) const;
-
-    /* Returns whether or not this node is allowed
-       to gain global write access to db. 
-       If this node is authority, it must have write access on all
-       rings on which it is connected.
-    */
     bool canWrite () const;
 
     db::SQLiteResultSPtr execQuery (const db::SQLiteStatementSPtr& statement, bool lazy = false);
@@ -98,27 +88,24 @@ public:
     void loop ();
     void finalize ();
 
-    boost::posix_time::ptime getLastPendingTimestamp () const;
     boost::posix_time::ptime getLastAcknowledgedTimestamp () const;
 
-    void flushUpdates ();
+    std::set<uid> getPendingUpdateRecords () const;
 
-    void dump ();
-
-private:
-
-    bool isMasterAuthority () const;
-    
-    uid encodeUpdateKey (NodeId nodeId, long updateId);
-
-    void filterUpdateLog (const TokenSPtr& token);
-    void mergeUpdateLog (const TokenSPtr& token);
+    void saveNodeInfo (NodeInfo info);
     void saveUpdateRecord (const UpdateRecordSPtr& urp);
 
 
+private:
+
+
+    bool isAuthority () const;
+    
+    uid encodeUpdateKey (NodeId nodeId, long updateId);
+
     void setNodeInfoCallback (const NodeInfo& nodeInfo);
     void setUpdateRecordCallback (const UpdateRecordSPtr& updateRecord);
-    
+
     friend class NodeInfoTableSync;
     friend class UpdateRecordTableSync;
 

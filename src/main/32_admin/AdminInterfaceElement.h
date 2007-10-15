@@ -31,7 +31,6 @@
 
 #include "30_server/FunctionRequest.h"
 
-#include "32_admin/AdminRequest.h"
 
 namespace synthese
 {
@@ -42,6 +41,8 @@ namespace synthese
 
 	namespace admin
 	{
+	    class AdminRequest;
+
 		/** Composant d'administration.
 			@ingroup m14
 			

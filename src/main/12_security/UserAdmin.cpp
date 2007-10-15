@@ -37,6 +37,7 @@
 #include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
 
 #include "01_util/Conversion.h"
 

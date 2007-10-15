@@ -34,11 +34,12 @@ namespace util
 	fs.pop ();
 	
 	int size = tmp.str ().length (); 
+
 	os << size << '#';
 	boost::iostreams::copy (tmp, os);
 
     }
-    
+        
 
 
     void Compression::ZlibDecompress (std::istream& is, std::ostream& os)
@@ -49,11 +50,15 @@ namespace util
 	if (size == 0) return;
 
 	filtering_stream<input> fs;
+
 	fs.push (zlib_decompressor());
 	fs.push (restrict (is, 0, size));
 	
 	boost::iostreams::copy(fs, os);
+	// fs.set_auto_close (false);
 	fs.pop ();
+
+	// Warning filtering stream is closed at destruction causing all underlying device to be clolsed as well.
 
     }
 

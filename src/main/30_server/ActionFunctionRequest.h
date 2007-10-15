@@ -24,6 +24,7 @@
 #define SYNTHESE_ActionFunctionRequest_h__
 
 #include "30_server/FunctionRequest.h"
+#include "30_server/Action.h"
 
 namespace synthese
 {

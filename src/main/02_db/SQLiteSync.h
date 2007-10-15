@@ -61,7 +61,7 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
 
 	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _tableSynchronizers;
 	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _rankedTableSynchronizers;
-    mutable boost::recursive_mutex _tableSynchronizersMutex; 
+	mutable boost::recursive_mutex _tableSynchronizersMutex; 
 
  public:
 

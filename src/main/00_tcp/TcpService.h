@@ -61,6 +61,7 @@ private:
     const int _portNumber;
     const std::string _protocol;
     const bool _nonBlocking;
+    int _backlogSize;
 
     Socket* _socket;
 
@@ -68,7 +69,8 @@ private:
 
     TcpService (int portNumber,
 		bool tcpProtocol = true,
-		bool nonBlocking = true);
+		bool nonBlocking = true,
+		int backlogSize = 20);
 
     ~TcpService ();
 
@@ -82,7 +84,8 @@ public:
      */
     static TcpService* openService (int portNumber,
 	                            bool tcpProtocol = true,
-				    bool nonBlocking = true);
+				    bool nonBlocking = true,
+				    int backlogSize = 20);
     
     /** Closes the TCP service listening on the given port.
      * All the active connection to this service are closed.

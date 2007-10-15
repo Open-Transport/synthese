@@ -10,7 +10,7 @@ namespace synthese
 namespace dbring
 {
 
-    static const int TCP_TOKEN_TIMEOUT (200); // 200 milliseconds
+    static const int TCP_TOKEN_TIMEOUT (3000); // 3 seconds
 
 
 }

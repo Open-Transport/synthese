@@ -54,6 +54,7 @@ TcpClientSocket::TcpClientSocket (const std::string& hostName,
     
 TcpClientSocket::~TcpClientSocket ()
 {
+//    std::cerr << "destroying client socket" << std::endl;
 }
 
 
@@ -68,8 +69,7 @@ TcpClientSocket::isConnected () const
 
 
 
-
-
+   
 
 void 
 TcpClientSocket::tryToConnect ()

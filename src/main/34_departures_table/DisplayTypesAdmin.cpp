@@ -27,6 +27,8 @@
 
 #include "30_server/ActionFunctionRequest.h"
 
+#include "32_admin/AdminRequest.h"
+
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayTypesAdmin.h"

@@ -106,9 +106,27 @@ namespace synthese
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
+			// Call the update schema step on all synchronizers.
+			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = 
+				 _rankedTableSynchronizers.begin (); 
+			     it != _rankedTableSynchronizers.end (); ++it)
+			{
+			    Log::GetInstance().info("Updating schema for table " + it->first);
+			    try 
+			    {
+				it->second->updateSchema (emitter);
+			    }
+			    catch (std::exception& e)
+			    {
+				Log::GetInstance().error ("Error during schema update of " + it->first + 
+							  ".", e);
+			    }
+			}
+
 			_isRegistered = true;
+
 			
-			// Call the init sequence on all synchronizers.
+			// Call the first sync step on all synchronizers.
 			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = 
 				 _rankedTableSynchronizers.begin (); 
 			     it != _rankedTableSynchronizers.end (); ++it)
@@ -135,6 +153,7 @@ namespace synthese
 					const SQLiteEvent& event)
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
+			if (_isRegistered == false) return;
 
 			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it 
 				 = _tableSynchronizers.begin ();
