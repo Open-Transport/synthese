@@ -13,6 +13,8 @@
 
   <property name="profile" value="false"/>     
 
+  <property name="build.number" value="snapshot"/>     
+
 
   <target name="build" description="[-Dtarget=TARGET] [-Dmode=MODE] : build TARGET">
 
@@ -49,7 +51,8 @@
 
 
 
-  <target name="dist" description="[-Dtarget=TARGET] [-Dmode=MODE] -Ddistname=DISTNAME : create an installable distribution of TARGET as DISTNAME">
+  <target name="dist" description="[-Dtarget=TARGET] [-Dmode=MODE] -Ddistname=DISTNAME : create an installable distribution of TARGET as DISTNAME"
+	  depends="setbuildversion">
 
     <fail unless="target"/>
     <fail unless="distname"/>
@@ -59,6 +62,8 @@
       <param name="target.param" value="${target}"/>
       <param name="profile.param" value="${profile}"/>
       <param name="distname.param" value="${distname}"/>
+      <param name="version.param" value="${version}"/>
+      <param name="buildnumber.param" value="${build.number}"/>
     </antcall>
 
   </target>
@@ -127,6 +132,26 @@
       
       
   </target>
+
+
+
+  <target name="setbuildversion" description="Sets the buildversion for the current build">
+    <exec executable="svnversion" spawn="false" dir="${basedir}" outputproperty="tmp.build.number">
+      <arg line="."/>
+    </exec>
+
+    <propertyregex property="build.number"
+		   input="${tmp.build.number}"
+		   regexp="([0-9]*)"
+		   select="\1"
+		   casesensitive="false"
+		   defaultValue="snapshot"
+		   override="true"/>
+
+    <echo message="Build number is ${build.number}"/>
+
+  </target>
+
 
 
 
