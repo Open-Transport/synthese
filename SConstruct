@@ -115,8 +115,11 @@ def DefaultModuleName ( env ):
   mn = env.Dir('.').srcnode ().abspath
   prefix = ''
   istestmodule = (mn.find ('src' + os.sep + 'test' + os.sep) != -1)
+  isprogrammodule = (mn.find ('src' + os.sep + 'main' + os.sep + 'programs' + os.sep) != -1)
   if istestmodule:
     prefix = 'src' + os.sep + 'test' + os.sep  # be careful with / and os.path.separator when doing string find!!!
+  elif isprogrammodule:
+    prefix = 'src' + os.sep + 'main' + os.sep + 'programs' + os.sep
   else:
     prefix = 'src' + os.sep + 'main' + os.sep  # be careful with / and os.path.separator when doing string find!!!
     
