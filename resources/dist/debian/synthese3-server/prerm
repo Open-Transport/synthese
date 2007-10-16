@@ -1,0 +1,12 @@
+#!/bin/sh
+
+test ! -x /etc/init.d/synthese3-server || /etc/init.d/synthese3-server stop
+
+
+
+
+
+
+
+
+

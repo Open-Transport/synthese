@@ -1,0 +1,10 @@
+#!/bin/sh
+
+
+update-rc.d synthese3-server remove
+
+
+
+
+
+

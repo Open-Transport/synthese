@@ -1,0 +1,11 @@
+#!/bin/sh
+
+update-rc.d synthese3-server defaults
+
+# Start server
+test ! -x /etc/init.d/synthese3-server || /etc/init.d/synthese3-server start
+
+
+
+
+

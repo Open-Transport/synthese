@@ -1,0 +1,9 @@
+tisseo-sai (1.10-3) unstable; urgency=low
+
+  * Copy generated file LocalMsgIndex into development package
+    (closes: #355735)
+
+ -- Berin Lautenbach <berin@debian.org>  Sat, 11 Mar 2006 11:09:00 +1100
+
+
+
