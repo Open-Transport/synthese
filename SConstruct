@@ -26,6 +26,11 @@ sqliteversion = ARGUMENTS.get('sqliteversion').lower()
 zlibversion = ARGUMENTS.get('zlibversion').lower()
 distname = ARGUMENTS.get('distname', 'dist').lower()
 
+useRepository = False
+if platform == 'win32':
+  useRepository = True
+
+
 
 print "librepo = ", librepo
 print "platform = ", platform
@@ -240,11 +245,12 @@ def AddDependency (env, libname, libversion, multithreaded):
     deplib = libname
 
     if multithreaded:
-      deplib = deplib + "-mt"
+      if useRepository:
+        deplib = deplib + "-mt"
     
     if platform == 'posix':
       # ALWAYS DYNAMIC LINK !
-      if env.IsDebug () :
+      if env.IsDebug () and useRepository:
         deplib = deplib + "-d"
       
       
@@ -253,8 +259,10 @@ def AddDependency (env, libname, libversion, multithreaded):
       deplib = 'lib' + deplib + "-s"
       if env.IsDebug () :
         deplib = deplib + "gd"
-        
-    deplib = deplib + "-" + libversion
+    
+    if useRepository:    
+      deplib = deplib + "-" + libversion
+
     env.Append (LIBS = [deplib] )
     distlib = env['LIBPREFIX'] + deplib + env['SHLIBSUFFIX']
     env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
@@ -262,15 +270,21 @@ def AddDependency (env, libname, libversion, multithreaded):
 
 
 def AddBoostDependency (env, libname):
-  AddDependency (env, libname, boostversion, True)
+    AddDependency (env, libname, boostversion, True)
     
 
 
 def AddSQLiteDependency (env):
-  AddDependency (env, "sqlite", sqliteversion, True)
+  sqlitelibname = 'sqlite3'
+  if useRepository:
+    sqlitelibname = 'sqlite'
+  AddDependency (env, sqlitelibname, sqliteversion, True)
     
 def AddZlibDependency (env):
-  AddDependency (env, "zlib", zlibversion, True)
+  zlibname = 'z'
+  if useRepository:
+    zlibname = 'zlib'
+  AddDependency (env, zlibname, zlibversion, True)
     
 
 
@@ -664,7 +678,7 @@ def SyntheseProgram (env, binname, generatemain = True):
     
     if goal == 'dist':
       env.SyntheseDist (exeprog)
-      env.SyntheseDeb (exeprog)
+      #env.SyntheseDeb (exeprog)
 
 			       
 

@@ -3,7 +3,7 @@
 #include "01_util/Conversion.h"
 
 #include "SQLiteException.h"
-#include "sqlite/sqlite3.h"
+#include "sqlite3.h"
 
 #include <iomanip>
 #include <boost/date_time/posix_time/time_formatters.hpp>

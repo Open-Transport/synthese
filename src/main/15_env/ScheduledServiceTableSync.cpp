@@ -45,7 +45,6 @@
 #include "04_time/Date.h"
 
 #include <boost/tokenizer.hpp>
-#include <sqlite/sqlite3.h>
 
 #include <assert.h>
 #include <set>

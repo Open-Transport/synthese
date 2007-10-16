@@ -30,7 +30,6 @@
 #include "15_env/CityTableSync.h"
 
 #include <boost/tokenizer.hpp>
-#include <sqlite/sqlite3.h>
 #include <assert.h>
 
 using namespace std;

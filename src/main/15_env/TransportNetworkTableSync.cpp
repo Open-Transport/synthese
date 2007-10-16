@@ -27,7 +27,6 @@
 
 #include "01_util/Conversion.h"
 
-#include <sqlite/sqlite3.h>
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
 

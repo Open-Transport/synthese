@@ -29,7 +29,7 @@
 
 #include "15_env/EnvModule.h"
 
-#include <sqlite/sqlite3.h>
+#include <sqlite3.h>
 #include <assert.h>
 
 

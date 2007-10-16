@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sqlite/sqlite3.h>
+#include <sqlite3.h>
 #include <assert.h>
 
 #include "01_util/Conversion.h"

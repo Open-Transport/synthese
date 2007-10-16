@@ -28,7 +28,6 @@
 
 #include "15_env/ConnectionPlaceTableSync.h"
 
-#include <sqlite/sqlite3.h>
 #include <assert.h>
 
 using namespace std;
