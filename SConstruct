@@ -265,7 +265,12 @@ def AddDependency (env, libname, libversion, multithreaded):
 
     env.Append (LIBS = [deplib] )
     distlib = env['LIBPREFIX'] + deplib + env['SHLIBSUFFIX']
-    env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
+    if useRepository:
+      env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
+    else:
+      env.Append (DISTLIBS = ['/usr/lib/' + distlib])
+
+
 
 
 
@@ -678,7 +683,7 @@ def SyntheseProgram (env, binname, generatemain = True):
     
     if goal == 'dist':
       env.SyntheseDist (exeprog)
-      #env.SyntheseDeb (exeprog)
+      env.SyntheseDeb (exeprog)
 
 			       
 
