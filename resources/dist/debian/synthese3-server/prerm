@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
-test ! -x /etc/init.d/synthese3-server || /etc/init.d/synthese3-server stop
+test ! -x /etc/init.d/synthese3 || /etc/init.d/synthese3 stop && exit 0
+
 
 
 

@@ -471,7 +471,11 @@ def SyntheseDeb (env, exeprog):
   env.Command (File (debdir + '/usr/share/' + distname + '/' + distname), exeprog,
                [Copy ('$TARGET', '$SOURCE'), Chmod('$TARGET', 0755), Action ('strip $TARGET')] )
 
-  env.Command (File (debdir + '/etc/init.d/' + distname), File (resourcesdistdir + '/etc/init.d/' + distname ) ,
+  env.Command (File (debdir + '/usr/share/' + distname + '/' + 'startup.sh'), File (resourcesdistdir + '/' + 'startup.sh' ),
+               [Copy ('$TARGET', '$SOURCE'), Chmod('$TARGET', 0755)] )
+
+  # init.d script is always called synthese3...
+  env.Command (File (debdir + '/etc/init.d/' + 'synthese3'), File (resourcesdistdir + '/' + 'synthese3' ) ,
                [Copy ('$TARGET', '$SOURCE'), Chmod('$TARGET', 0755)] )
 
   for controlfile in ['control', 'conffiles']:

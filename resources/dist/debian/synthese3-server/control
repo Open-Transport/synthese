@@ -3,7 +3,7 @@ Version: 3.0
 Section: misc
 Priority: extra
 Architecture: i386
-Depends: libboost-date-time1.33.1, libboost-filesystem1.33.1, libboost-iostreams1.33.1, libboost-program-options1.33.1, libboost-regex1.33.1, libboost-thread1.33.1, sqlite3 (>= 3.3.13), zlib (>= 1:1.2.3)
+Depends: libboost-date-time1.33.1, libboost-filesystem1.33.1, libboost-iostreams1.33.1, libboost-program-options1.33.1, libboost-regex1.33.1, libboost-thread1.33.1, sqlite3 (>= 3.3.13), zlib1g (>= 1:1.2.3)
 Installed-Size: 10000
 Maintainer: Marc Jambert <marc.jambert@reseaux-conseil.com>
 Source: synthese3-server
