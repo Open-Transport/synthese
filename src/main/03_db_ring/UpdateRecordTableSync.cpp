@@ -59,6 +59,20 @@ namespace synthese
 	template<> const int SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::TABLE_ID = 997;
 	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::HAS_AUTO_INCREMENT = true;
 
+
+	
+	
+	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::_link(UpdateRecord* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+	{
+	}
+
+
+	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::_unlink(UpdateRecord* obj)
+	{
+	}
+
+
+
 	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::load (UpdateRecord* object, const db::SQLiteResultSPtr& rows)
 	{
 	    object->setKey (rows->getLongLong (TABLE_COL_ID));
