@@ -82,7 +82,7 @@ namespace synthese
 			else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
 				obj->setPlace(ConnectionPlaceTableSync::Get(placeId, obj, true, temporary));
 			
-			obj->setRoad (RoadTableSync::Get (rows->getLongLong(roadId), obj, true, temporary));
+			obj->setRoad (RoadTableSync::Get (roadId, obj, true, temporary));
 
 			// Links to the object
 			shared_ptr<AddressablePlace> place = 
