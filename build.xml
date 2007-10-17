@@ -29,6 +29,23 @@
     
   </target>
 
+
+
+  <target name="deploy" description="[-Dtarget=TARGET] [-Dmode=MODE] : deploy TARGET into repository as a deb file" depends="dist">
+
+      <property name="deploy.local.deb.home" 
+		value="${repository.local.home}/${platform}/${toolset}/${mode}/deb"/>
+
+      <mkdir dir="${deploy.local.deb.home}"/>
+
+      <property name="lib.patterns" value="**/*.deb"/>
+
+      <copy todir="${deploy.local.deb.home}" flatten="true">
+	<fileset dir="${build.home}/${platform}/${toolset}/${mode}" includes="${lib.patterns}"/>
+      </copy>
+    
+  </target>
+
        
   <target name="genmsvs" description=" : generate MS Visual Studio 2005 project files">
 
