@@ -479,48 +479,22 @@ def SyntheseDeb (env, exeprog):
                [Copy ('$TARGET', '$SOURCE'), Chmod('$TARGET', 0755)] )
 
   for controlfile in ['control', 'conffiles']:
-    env.Command (File (debdir + '/' + controlfile), File (resourcesdistdir + '/' + controlfile ) ,
-                 [Copy ('$TARGET', '$SOURCE'), Action ('sudo chown root:root $TARGET')] )
+    env.Command (File (debdir + '/DEBIAN/' + controlfile), File (resourcesdistdir + '/' + controlfile ) ,
+                 [Copy ('$TARGET', '$SOURCE')] )
   
   for controlfile in ['preinst', 'postinst', 'prerm', 'postrm']:
-    env.Command (File (debdir + '/' + controlfile), File (resourcesdistdir + '/' + controlfile ) ,
-                 [Copy ('$TARGET', '$SOURCE'), Chmod('$TARGET', 0755), Action ('sudo chown root:root $TARGET')] )
-
+    env.Command (File (debdir + '/DEBIAN/' + controlfile), File (resourcesdistdir + '/' + controlfile ) ,
+                 [Copy ('$TARGET', '$SOURCE'), Chmod('$TARGET', 0755)] )
+    
   env.Command (File (debdir + '/usr/share/doc/' + distname + '/changelog.gz'), File (resourcesdistdir + '/' + 'changelog' ) ,
                [Action ('gzip --best -c $SOURCE > $TARGET')] )
-
-  env.Command (File (debdir + '/usr/share/doc/' + distname + '/copyright'), File (resourcesdistdir + '/' + 'copyright' ) ,
-               [Copy ('$TARGET', '$SOURCE'), Action ('sudo chown -R root:root ' + Dir(debdir).abspath + '/usr/share/doc/' + distname)] )
   
-  env.Command (File (debdir + '/' + '/debian-binary'), File (resourcesdistdir + '/' + 'debian-binary' ) ,
+  env.Command (File (debdir + '/usr/share/doc/' + distname + '/copyright'), File (resourcesdistdir + '/' + 'copyright' ) ,
                [Copy ('$TARGET', '$SOURCE')] )
-
-  controlfiles = []
-  targzcmd = 'cd ' + Dir (debdir).abspath + '; tar czf control.tar.gz'
-  for controlfile in ['control', 'conffiles', 'preinst', 'postinst', 'prerm', 'postrm']:
-    controlfiles.append (File (debdir + '/' + controlfile))
-    targzcmd = targzcmd + ' ' + controlfile
-
-  env.Command (File (debdir + '/control.tar.gz'), controlfiles,
-               Action (targzcmd) )
-
-  datadirs = []
-  targzcmd = 'cd ' + Dir (debdir).abspath + '; tar czf data.tar.gz'
-  for datadir in ['etc', 'usr']:
-    datadirs.append (Dir (debdir + '/' + datadir))
-    targzcmd = targzcmd + ' ' + datadir
-    
-  env.Command (File (debdir + '/data.tar.gz'), datadirs,
-               Action (targzcmd) )
-
-
-  artarget = File (distname + '-' + version + '-' + buildnumber + '.deb')
-  arsources = []
-  for arfile in ['debian-binary', 'control.tar.gz', 'data.tar.gz']:
-    arsources.append (File (debdir + '/' + arfile))
-
-  env.Command (artarget, arsources,
-               Action ('ar cr $TARGET $SOURCES') )
+  
+  env.Command (File (distname + '-' + version + '-' + buildnumber + '.deb'),
+               Dir (debdir),
+               Action ('fakeroot dpkg-deb -b $SOURCE $TARGET') )
 
   env.AlwaysBuild (Dir (debdir))
 
