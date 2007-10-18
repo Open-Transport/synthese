@@ -56,6 +56,8 @@ namespace synthese
 	    {
 		
 		_sqlite = new SQLiteHandle (GetDatabasePath ());
+
+		Log::GetInstance ().info ("Using lib SQLite version " + SQLite::GetLibVersion ());
 		
 		bool autorespawn (true);
 

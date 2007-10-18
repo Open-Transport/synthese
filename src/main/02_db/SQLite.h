@@ -28,9 +28,12 @@ namespace synthese
 
 		public:
 
+
 		    
 			//! @name SQLite db access methods.
 			//@{
+			static std::string GetLibVersion ();
+
 
 			virtual SQLiteStatementSPtr compileStatement (const SQLData& sql) = 0;
 

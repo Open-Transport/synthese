@@ -34,6 +34,14 @@ namespace synthese
 	
 
 
+	std::string 
+	SQLite::GetLibVersion ()
+	{
+	    return std::string (sqlite3_libversion ());
+	}
+
+
+
 	SQLiteResultSPtr 
 	SQLite::execQuery (const SQLData& sql, bool lazy)
 	{
