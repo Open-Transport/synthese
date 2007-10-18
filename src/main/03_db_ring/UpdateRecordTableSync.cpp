@@ -319,7 +319,7 @@ namespace synthese
 	    if (ur->hasCompressedSQL () == false)
 	    {
 		// Retrieve the corresponding pending record and use it.
-		urp = Get (ur->getKey ());
+		urp = GetUpdateable (ur->getKey ());
 
 		// If was already acnkwowledged, nothing to do.
 		if (urp->getState () == ACKNOWLEDGED) return;

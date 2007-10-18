@@ -23,7 +23,7 @@ namespace dbring
 /** SQLite server thread execution body.
 
 
-@ingroup m02
+@ingroup m10
 */
 class DbCommandThreadExec : public synthese::util::ThreadExec
 {
