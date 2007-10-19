@@ -241,7 +241,7 @@ def DefineDefaultLibs (env):
 
 
 
-def AddDependency (env, libname, libversion, multithreaded):
+def AddDependency (env, libname, libversion = '', multithreaded = True):
     deplib = libname
 
     if multithreaded:
@@ -605,7 +605,7 @@ def GenerateMSVSSolution (env):
 
 
 
-def SyntheseProgram (env, binname, generatemain = True):
+def SyntheseProgram (env, binname, generatemain = True, includes = 'main.cpp'):
 
     if goal == "genmsvs":
       env.GenerateMSVSProject ()
@@ -617,7 +617,7 @@ def SyntheseProgram (env, binname, generatemain = True):
       maincopy = env.File ('main.cpp').srcnode ().abspath;
       env.CopyFile (maincopy, maintemplate);
     
-    files = env.Glob('main.cpp', [])
+    files = env.Glob(includes, [])
     
     if generatemain:
       # source is expected to be main.cpp file
@@ -699,6 +699,7 @@ SConsEnvironment.SyntheseDeb=SyntheseDeb
 SConsEnvironment.UnitTest=UnitTest
 
 
+SConsEnvironment.AddDependency=AddDependency
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
 SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency

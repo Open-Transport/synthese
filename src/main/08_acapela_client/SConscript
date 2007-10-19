@@ -2,7 +2,7 @@
 Import ('mainenv')
 
 if mainenv['PLATFORM'] == 'posix':
-  mainenv.ModuleBuild (includes = '*.c');
+  mainenv.ModuleBuild ();
 
 
 
