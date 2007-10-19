@@ -370,7 +370,7 @@ int AGITool_exec(AGI_TOOLS *tool, AGI_CMD_RESULT *res, char *application, char *
 {
 	char temp[4096];
 	sprintf(temp,"EXEC %s %s\n", application, options);	
-	return AGITool_sendcmd(tool, res, "EXEC %s %s\n", application, options);
+	return AGITool_sendcmd(tool, res, temp);
 }
 
 //
