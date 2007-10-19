@@ -39,7 +39,7 @@ namespace server
 
     
     void 
-    BasicClient::request (std::ostream& out, std::string ip, std::string request, std::string clientUrl)
+    BasicClient::request (std::ostream& out, const std::string& request, const std::string& ip, const std::string& clientUrl)
     {
 	std::stringstream req;
 	req << request ;
