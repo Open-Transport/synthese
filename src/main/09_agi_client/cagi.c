@@ -368,7 +368,7 @@ int AGITool_channel_status(AGI_TOOLS *tool, AGI_CMD_RESULT *res, char *channel)
 //
 int AGITool_exec(AGI_TOOLS *tool, AGI_CMD_RESULT *res, char *application, char *options)
 {
-	char *temp=new char[4096];
+	char temp[4096];
 	sprintf(temp,"EXEC %s %s\n", application, options);	
 	return AGITool_sendcmd(tool, res, "EXEC %s %s\n", application, options);
 }
