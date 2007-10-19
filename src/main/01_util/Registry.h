@@ -132,7 +132,7 @@ namespace synthese
 		boost::shared_ptr<T> Registry<K, T>::getUpdateable( const K& key )
 		{
 			if (contains (key) == false) 
-				throw T::ObjectNotFoundInRegistryException(key);
+				throw typename T::ObjectNotFoundInRegistryException(key);
 
 			return _registry.find (key)->second;
 		}
@@ -178,7 +178,7 @@ namespace synthese
 		boost::shared_ptr<const T> Registry<K,T>::get (const K& key) const
 		{
 			if (contains (key) == false) 
-				throw T::ObjectNotFoundInRegistryException(key);
+				throw typename T::ObjectNotFoundInRegistryException(key);
 
 			return _registry.find (key)->second;
 		}
@@ -207,10 +207,10 @@ namespace synthese
 		void Registry<K,T>::add (boost::shared_ptr<T> ptr)
 		{
 			if (ptr->getKey() == UNKNOWN_VALUE)
-				throw T::RegistryKeyException("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
+				throw typename T::RegistryKeyException("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
 
 			if (contains (ptr->getKey ())) 
-				throw T::RegistryKeyException("Duplicate key in registry", ptr->getKey ());
+				throw typename T::RegistryKeyException("Duplicate key in registry", ptr->getKey ());
 		    
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
 		}
@@ -230,10 +230,10 @@ namespace synthese
 		Registry<K,T>::remove (const K& key)
 		{
 			if (key == 0)
-				throw T::RegistryKeyException("Neutral object cannot be removed at execution time", 0);
+				throw typename T::RegistryKeyException("Neutral object cannot be removed at execution time", 0);
 
 			if (contains (key) == false) 
-				throw T::ObjectNotFoundInRegistryException(key);
+				throw typename T::ObjectNotFoundInRegistryException(key);
 
 			_registry.erase (key);
 		}
