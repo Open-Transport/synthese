@@ -22,8 +22,6 @@
 
 #include "01_util/Conversion.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/Interface.h"
 
@@ -73,7 +71,7 @@ namespace synthese
 
 				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException<VinciContract>)
+			catch (VinciContract::ObjectNotFoundException& e)
 			{
 				throw RequestException("Specified contract not found");
 			}

@@ -71,7 +71,6 @@ namespace synthese
 					bool isValid () const;
 					bool isUnknown () const;
 					std::string toString () const;
-					std::string toInternalString () const;
 					std::string toSQLString(bool withApostrophes = true) const;
 				//@}
 

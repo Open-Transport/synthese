@@ -247,16 +247,6 @@ namespace synthese
 
 
 
-		string 
-		DateTime::toInternalString () const
-		{
-			return string (getDate ().toInternalString() + 
-					getHour ().toInternalString ());
-		}
-
-
-
-
 		ostream&
 		operator<< ( ostream& os, const DateTime& op )
 		{
@@ -366,8 +356,11 @@ namespace synthese
 		DateTime // AAAA/(M)M/(J)J hh:mm
 		DateTime::FromSQLTimestamp (const string& sqlTimestamp)
 		{
-			if (sqlTimestamp == "")
+			if (sqlTimestamp.empty())
 				return DateTime(time::TIME_UNKNOWN);
+
+			if (sqlTimestamp.size() == 1)
+				return DateTime(sqlTimestamp[0]);
 
 			int spaceSeparator = (int) sqlTimestamp.find(' ');
 
@@ -408,32 +401,6 @@ namespace synthese
 			return isUnknown()
 				? string()
 				: (_date.toString() + " " + _hour.toString());
-		}
-
-		DateTime DateTime::FromInternalString( const string& str )
-		{
-			if(	str.size() == 1 
-			&&	(	str.at(0) == TIME_CURRENT
-				||	str.at(0) == TIME_TOMORROW
-				)
-			){
-				return DateTime(str.at(0));
-			}
-
-			if (str.length() < 12)
-				throw TimeParseException("Invalid string length");
-
-			DateTime result(Conversion::ToInt (str.substr (6, 2)),
-				Conversion::ToInt (str.substr (4, 2)),
-				Conversion::ToInt (str.substr (0, 4)),
-				Conversion::ToInt (str.substr (8, 2)),
-				Conversion::ToInt (str.substr (10, 2))
-			);
-
-			if (!result.isValid())
-				throw TimeParseException("Invalid date time value");
-
-			return result;
 		}
 	}
 }

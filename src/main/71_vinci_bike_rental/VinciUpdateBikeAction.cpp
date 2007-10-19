@@ -26,8 +26,6 @@
 #include "VinciBikeTableSync.h"
 #include "VinciBike.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 using namespace std;
 using boost::shared_ptr;
 
@@ -73,7 +71,7 @@ namespace synthese
 					throw ActionException("Parameter number not found");
 				_markedNumber = it->second;
 			}
-			catch(DBEmptyResultException<VinciBike> e)
+			catch(VinciBike::ObjectNotFoundException& e)
 			{
 				throw ActionException("Le vélo spécifié est introuvable");
 			}

@@ -123,7 +123,7 @@ namespace synthese
 					
 					interf->addPage(page);
 				}
-				catch (Interface::RegistryKeyException& e)
+				catch (Interface::ObjectNotFoundException& e)
 				{
 					Log::GetInstance().warn("Corrupted data on "+ TABLE_NAME +" table : Interface not found", e);
 				}

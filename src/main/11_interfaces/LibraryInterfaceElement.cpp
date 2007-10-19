@@ -91,7 +91,7 @@ namespace synthese
 		bool LibraryInterfaceElement::isFalse( const ParametersVector& pv, interfaces::VariablesMap& variables , const void* object /*= NULL */, const server::Request* request /*= NULL  */ ) const
 		{
 			string value(getValue(pv, variables, object, request));
-			return value.empty() || value == "0" || Conversion::ToLongLong(value) < 0;
+			return value.empty() || value == "0" || Conversion::ToInt(value) == UNKNOWN_VALUE;
 		}
 
 		void LibraryInterfaceElement::setPage(const InterfacePage* page )

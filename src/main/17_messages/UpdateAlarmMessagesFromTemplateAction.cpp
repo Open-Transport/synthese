@@ -64,13 +64,13 @@ namespace synthese
 				uid id = map.getUid(PARAMETER_TEMPLATE_ID, true, FACTORY_KEY);
 				_template = TextTemplateTableSync::Get(id);
 			}
-			catch (DBEmptyResultException<Alarm>)
+			catch (ObjectNotFoundException<uid,Alarm>& e)
 			{
-				throw ActionException("Specified message not found");
+				throw ActionException("Specified message not found" + e.getMessage());
 			}
-			catch(DBEmptyResultException<TextTemplate>)
+			catch(TextTemplate::ObjectNotFoundException& e)
 			{
-				throw ActionException("Specified template not found");
+				throw ActionException("Specified template not found" + e.getMessage());
 			}
 		}
 

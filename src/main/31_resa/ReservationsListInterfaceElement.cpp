@@ -103,7 +103,7 @@ namespace synthese
 
 			// Local variables
 			shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(Conversion::ToLongLong(_lineId->getValue(parameters, variables, object, request))));
-			Date listDate(_date ? Date::FromInternalString(_date->getValue(parameters, variables, object, request)) : Date(TIME_CURRENT));
+			Date listDate(_date ? Date::FromSQLDate(_date->getValue(parameters, variables, object, request)) : Date(TIME_CURRENT));
 			bool displayCancelled(_displayCancelled ? Conversion::ToBool(_displayCancelled->getValue(parameters, variables, object, request)) : false);
 			DateTime now(TIME_CURRENT);
 

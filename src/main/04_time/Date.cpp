@@ -199,25 +199,6 @@ namespace synthese
 
 
 
-		std::string 
-		Date::toInternalString () const
-		{
-		std::stringstream os;
-		    
-		os << std::setw( 4 ) << std::setfill ( '0' )
-			<< getYear ()
-			<< std::setw( 2 ) << std::setfill ( '0' )
-			<< getMonth ()
-			<< std::setw( 2 ) << std::setfill ( '0' )
-			<< getDay ();
-
-		return os.str ();
-		    
-		}
-
-
-
-
 		Date&
 		Date::operator++( int )
 		{
@@ -443,11 +424,14 @@ namespace synthese
 			if (sqlTimestamp.empty())
 				return UNKNOWN_DATE;
 
+			if(	sqlTimestamp.size() == 1)
+				return Date(sqlTimestamp[0]);
+
 			int firstSlash = (int) sqlTimestamp.find('-');
 			int secondSlash = (int) sqlTimestamp.find('-', firstSlash+1);
 
 			if (firstSlash == -1 || secondSlash == -1)
-				throw TimeParseException("Invalid date");
+				throw TimeParseException(sqlTimestamp);
 
 			return Date(Conversion::ToInt (sqlTimestamp.substr (secondSlash+1, sqlTimestamp.length() - secondSlash)),
 				Conversion::ToInt (sqlTimestamp.substr (firstSlash+1, secondSlash - firstSlash)),
@@ -502,27 +486,5 @@ namespace synthese
 			return Conversion::ToString(_day.getValue()) + "/" + Conversion::ToString(_month.getValue()) +"/" + Conversion::ToString(_year.getValue());
 		}
 
-		Date Date::FromInternalString( const std::string& date )
-		{
-			if (date.size() == 1 
-				&& (date[0] == TIME_CURRENT || date[0] == TIME_TOMORROW)
-			){
-				return Date(date[0]);
-			}
-
-			if (date.size() < 8)
-				throw TimeParseException("Bad length for internal date string");
-
-			Date result(
-				Conversion::ToInt(date.substr(6,2))
-				, Conversion::ToInt(date.substr(4,2))
-				, Conversion::ToInt(date.substr(0,4))
-			);
-
-			if (!result.isValid())
-				throw TimeParseException("Bad date value");
-
-			return result;
-		}
 	}
 }

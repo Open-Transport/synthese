@@ -97,18 +97,18 @@ namespace synthese
 				, int year = TIME_SAME
 			);
 
-				~Date();
+			~Date();
 
-				//! @name Getters/Setters
-				//@{
+			//! @name Getters/Setters
+			//@{
 				int getDay() const;
 				int getMonth() const;
 				int getYear() const;
-				//@}
+			//@}
 
 
-				//! @name Query methods
-				//@{
+			//! @name Query methods
+			//@{
 
 				/** Gets week day of this date.
 					@return 0 = Sunday, 1 = Monday, ... , 6 = Saturday
@@ -124,26 +124,20 @@ namespace synthese
 
 				bool isUnknown () const;
 
-				std::string toInternalString () const;
 				std::string toSQLString(bool withApostrophes = true) const;
 				std::string toString() const;
 
 				//@}
 
 
-			/** Constructs a Date from an SQL date string (AAAA-MM-JJ).
-				@todo Throw an exception on parsing error
+			/** Constructs a Date from an SQL date string or a one character internal command.
+				@param sqlDate Text to parse :
+					- YYYY-MM-DD : SQL date
+					- A/M/m/T... : internal command, see @ref Date::Date "Date Constructor documentation"
+				@throw TimeParseException if the text cannot be parsed
 			*/
 			static Date FromSQLDate (const std::string& sqlDate);
 
-			/** Constructs a Date from an internal date string (AAAAMMJJ).
-				@param date The text to parse
-				@return synthese::time::Date The parsed date
-				@throw TimeParseException if the format of the date is not parsable
-				@author Hugues Romain
-				@date 2007				
-			*/
-			static Date FromInternalString(const std::string& date);
 
 			static Date FromString (const std::string& sqlString);
 

@@ -65,13 +65,13 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_PHYSICAL, true, FACTORY_KEY));
 				_stop = PhysicalStop::Get(id);
 			}
-			catch (DBEmptyResultException<DisplayScreen>& e)
+			catch (DisplayScreen::ObjectNotFoundException& e)
 			{
-				throw ActionException("Display screen not found");
+				throw ActionException("Display screen not found" + e.getMessage());
 			}
-			catch (PhysicalStop::RegistryKeyException& e)
+			catch (PhysicalStop::ObjectNotFoundException& e)
 			{
-				throw ActionException("Specified stop not found");
+				throw ActionException("Specified stop not found" + e.getMessage());
 			}
 		}
 

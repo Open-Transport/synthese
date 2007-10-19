@@ -75,11 +75,11 @@ namespace synthese
 
 				_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
 			}
-			catch (DBEmptyResultException<Scenario>)
+			catch (ObjectNotFoundException<uid,Scenario>& e)
 			{
-				throw ActionException("Scenario not found");
+				throw ActionException(e.getMessage());
 			}
-			catch(TimeParseException)
+			catch(TimeParseException& e)
 			{
 				throw ActionException("Une date ou une heure est mal formée");
 			}

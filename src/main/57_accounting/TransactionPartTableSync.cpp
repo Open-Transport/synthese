@@ -24,7 +24,6 @@
 #include <sstream>
 
 #include "01_util/Conversion.h"
-#include "01_util/RegistryKeyException.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"

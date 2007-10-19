@@ -23,8 +23,6 @@
 
 #include "01_util/Conversion.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 
@@ -146,13 +144,13 @@ namespace synthese
 				}
 
 			}
-			catch (DBEmptyResultException<VinciContract>)
+			catch (VinciContract::ObjectNotFoundException& e)
 			{
-				throw ActionException("Contract not found");
+				throw ActionException(e.getMessage());
 			}
-			catch (DBEmptyResultException<User>)
+			catch (User::ObjectNotFoundException& e)
 			{
-				throw ActionException("Contract without corresponding user");
+				throw ActionException("Contract without corresponding user " + e.getMessage());
 			}
 
 		}

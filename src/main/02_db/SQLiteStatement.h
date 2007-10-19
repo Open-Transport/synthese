@@ -28,7 +28,7 @@ namespace synthese
 		    Natively an SQLite statement is a  SQL command.
 		    This class reflects this model and cannot contain a batch of commands.
 
-		    @ingroup m02
+		    @ingroup m10
 		*/
 	    class SQLiteStatement : public util::ThreadAware
 	    {

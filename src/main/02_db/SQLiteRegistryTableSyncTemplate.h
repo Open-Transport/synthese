@@ -25,12 +25,17 @@
 
 #include "SQLiteTableSyncTemplate.h"
 
+#include "01_util/Exception.h"
+#include "01_util/Log.h"
+
 namespace synthese
 {
 	namespace db
 	{
 		/** SQLiteRegistryTableSyncTemplate class.
-			@ingroup m02
+				- class K : Class of the table sync
+				- class T : Class of the corresponding objects
+			@ingroup m10
 		*/
 		template<class K, class T>
 		class SQLiteRegistryTableSyncTemplate : public SQLiteTableSyncTemplate<K,T>
@@ -51,19 +56,26 @@ namespace synthese
 			){
 				while (rows->next ())
 				{
-					if (T::Contains(rows->getLongLong (TABLE_COL_ID)))
+					try
 					{
-						boost::shared_ptr<T> address(T::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-						SQLiteTableSyncTemplate<K,T>::unlink(address.get());
-						load (address.get(), rows);
-						    SQLiteTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+						if (T::Contains(rows->getLongLong (TABLE_COL_ID)))
+						{
+							boost::shared_ptr<T> address(T::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
+							SQLiteTableSyncTemplate<K,T>::unlink(address.get());
+							load (address.get(), rows);
+							SQLiteTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+						}
+						else
+						{
+							T* object(new T);
+							load(object, rows);
+								SQLiteTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
+							object->store();
+						}
 					}
-					else
+					catch(util::Exception& e)
 					{
-						T* object(new T);
-						load(object, rows);
-						    SQLiteTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
-						object->store();
+						util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
 					}
 				}
 			}
@@ -79,13 +91,20 @@ namespace synthese
 			){
 				while (rows->next ())
 				{
-					uid id = rows->getLongLong (TABLE_COL_ID);
-					if (T::Contains(id))
+					try
 					{
-						boost::shared_ptr<T> address(T::GetUpdateable(id));
-						    SQLiteTableSyncTemplate<K,T>::unlink(address.get());
-						load (address.get(), rows);
-						    SQLiteTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+						uid id = rows->getLongLong (TABLE_COL_ID);
+						if (T::Contains(id))
+						{
+							boost::shared_ptr<T> address(T::GetUpdateable(id));
+							SQLiteTableSyncTemplate<K,T>::unlink(address.get());
+							load (address.get(), rows);
+							SQLiteTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+						}
+					}
+					catch (util::Exception& e)
+					{
+						util::Log::GetInstance().warn("Error on load after row update : ", e);
 					}
 				}
 			}
@@ -102,11 +121,18 @@ namespace synthese
 			){
 				while (rows->next ())
 				{
-					uid id = rows->getLongLong (TABLE_COL_ID);
-					if (T::Contains(id))
+					try
 					{
-					    SQLiteTableSyncTemplate<K,T>::unlink(T::GetUpdateable(id).get());
-						T::Remove(id);
+						uid id = rows->getLongLong (TABLE_COL_ID);
+						if (T::Contains(id))
+						{
+							SQLiteTableSyncTemplate<K,T>::unlink(T::GetUpdateable(id).get());
+							T::Remove(id);
+						}
+					}
+					catch (util::Exception& e)
+					{
+						util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
 					}
 				}
 			}

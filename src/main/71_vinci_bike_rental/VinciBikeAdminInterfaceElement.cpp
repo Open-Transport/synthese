@@ -114,9 +114,9 @@ namespace synthese
 					_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
 				}
 			}
-			catch(DBEmptyResultException<VinciBike>)
+			catch(VinciBike::ObjectNotFoundException& e)
 			{
-				throw AdminParametersException("Specified bike not found");
+				throw AdminParametersException(e.getMessage());
 			}
 		}
 

@@ -64,7 +64,7 @@ namespace synthese
 				_activatePreselection =  map.getBool(PARAMETER_ACTIVATE_PRESELECTION, true, false, FACTORY_KEY);
 				_preselectionDelay = map.getInt(PARAMETER_PRESELECTION_DELAY, true, FACTORY_KEY);
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (DisplayScreen::ObjectNotFoundException&)
 			{
 				throw ActionException("Display screen not found");
 			}

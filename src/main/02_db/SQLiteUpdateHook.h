@@ -37,7 +37,7 @@ namespace db
 
 /** SQLite update hook interface.
 
- @ingroup m02
+ @ingroup m10
 */
  class SQLiteUpdateHook
 {

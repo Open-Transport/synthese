@@ -26,6 +26,7 @@
 
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
+#include "02_db/LinkException.h"
 
 #include "15_env/CityTableSync.h"
 
@@ -98,19 +99,27 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::_link(PublicTransportStopZoneConnectionPlace* cp, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
-			cp->setCity(CityTableSync::Get(cityId,cp,true,temporary));
 
-			if (!temporary)
+			try
 			{
-				shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
+				cp->setCity(CityTableSync::Get(cityId,cp,true,temporary));
 
-				bool isCityMainConnection (	rows->getBool (ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION));
-				if (isCityMainConnection)
+				if (temporary == GET_REGISTRY)
 				{
-					city->addIncludedPlace (cp);
+					shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
+
+					bool isCityMainConnection (	rows->getBool (ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION));
+					if (isCityMainConnection)
+					{
+						city->addIncludedPlace (cp);
+					}
+					city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
+					city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
 				}
-				city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
-				city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
+			}
+			catch(City::ObjectNotFoundException& e)
+			{
+				throw LinkException<ConnectionPlaceTableSync>(cp->getKey(), ConnectionPlaceTableSync::TABLE_COL_CITYID, e);
 			}
 		}
 

@@ -103,15 +103,15 @@ namespace synthese
 					_date = DateTime::FromString(it->second);
 				}
 			}
-			catch (DBEmptyResultException<Account>)
+			catch (Account::ObjectNotFoundException& e)
 			{
-				throw ActionException("Specified account not found");
+				throw ActionException("Specified account not found " + e.getMessage());
 			}
-			catch(DBEmptyResultException<VinciContract>)
+			catch(VinciContract::ObjectNotFoundException& e)
 			{
-				throw ActionException("Specified contract not found");
+				throw ActionException("Specified contract not found " + e.getMessage());
 			}
-			catch (TimeParseException e)
+			catch (TimeParseException& e)
 			{
 				throw ActionException("La date saisie n'est pas correcte");
 			}

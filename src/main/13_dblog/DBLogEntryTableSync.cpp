@@ -88,7 +88,7 @@ namespace synthese
 				{
 					obj->setUser(UserTableSync::Get(userId, obj, true, temporary));
 				}
-				catch (DBEmptyResultException<User>)
+				catch (User::ObjectNotFoundException& e)
 				{					
 					/// @todo See if an exception should be thrown
 				}

@@ -24,35 +24,29 @@
 #define SYNTHESE_DBEmptyResultException_H__
 
 #include "01_util/UId.h"
-#include "01_util/Exception.h"
-#include "01_util/Conversion.h"
+#include "01_util/ObjectNotFoundException.h"
+
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 #include <string>
-
-
 
 namespace synthese
 {
 	namespace db
 	{
 		/** Empty result in a selection db query.
-			@ingroup m02
+			@ingroup m02Exceptions refExceptions
 
 			This exception occurs when the execution of a selection query returns an empty result though it should not.
 		*/
 		template <class T>
-		class DBEmptyResultException : public util::Exception
+		class DBEmptyResultException : public util::ObjectNotFoundException<uid,typename T::ObjectType>
 		{
 		public:
-			DBEmptyResultException (uid& id, const std::string& message);
+			DBEmptyResultException (uid& id)
+				: util::ObjectNotFoundException<uid,T::ObjectType>(id, "Unable to fetch object in database table " + T::TABLE_NAME)
+			{}
 		};
-
-
-		template <class T>
-		DBEmptyResultException<T>::DBEmptyResultException (uid& id, const std::string& message)
-		    : Exception("Unable to fetch object with ID=" + util::Conversion::ToString(id) /* + " in table " + SQLiteTableSyncTemplate<T>::TABLE_NAME */ + ". Reason : " + message)
-		{
-		}
 	}
 }
 

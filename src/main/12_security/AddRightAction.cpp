@@ -74,7 +74,7 @@ namespace synthese
 				_publicLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PUBLIC_LEVEL, true, FACTORY_KEY));
 				_privateLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PRIVATE_LEVEL, false, FACTORY_KEY));
 			}
-			catch(DBEmptyResultException<Profile>)
+			catch(Profile::ObjectNotFoundException& e)
 			{
 				throw ActionException("Profil introuvable");
 			}

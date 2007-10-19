@@ -39,7 +39,7 @@
 
 namespace synthese
 {
-	/** @defgroup m02 10 SQLite database access
+	/** @defgroup m10 10 SQLite database access
 		@ingroup m1
 
 	@{

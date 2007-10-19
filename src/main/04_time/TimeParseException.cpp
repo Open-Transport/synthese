@@ -26,8 +26,8 @@ namespace synthese
 {
 	namespace time
 	{
-		TimeParseException::TimeParseException(const std::string& message)
-			: synthese::util::Exception(message)
+		TimeParseException::TimeParseException(const std::string& text)
+			: util::Exception("Invalid date "+ text)
 		{
 		}
 

@@ -75,9 +75,9 @@ namespace synthese
 					throw ActionException("Guarantee not specified");
 				_guarantee = TransactionTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch(DBEmptyResultException<Transaction>)
+			catch(Transaction::ObjectNotFoundException& e)
 			{
-				throw ActionException("Specified guarantee not found");
+				throw ActionException(e.getMessage());
 			}
 		}
 

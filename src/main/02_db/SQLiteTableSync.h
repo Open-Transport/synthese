@@ -56,7 +56,7 @@ namespace synthese
 			By convention, the table name must always start with the t letter
 			followed by a unique 3 digits integer (SQLite does not allow ids starting with number).
 
-			@ingroup m02
+			@ingroup m10
 		*/
 		class SQLiteTableSync : public util::Factorable<SQLiteTableSync>
 		{

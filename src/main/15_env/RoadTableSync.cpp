@@ -97,7 +97,7 @@ namespace synthese
 
 
 			// Links to the loaded object
-			if (!temporary)
+			if (temporary == GET_REGISTRY)
 			{
 				City* city(City::GetUpdateable(cityId).get());
 				city->getRoadsMatcher ().add (object->getName (), object);

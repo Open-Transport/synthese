@@ -14,7 +14,7 @@ namespace db
 
 /** Implementation class for access to a SQLite query result.
 
- @ingroup m02
+ @ingroup m10
 */
 class SQLiteLazyResult : public SQLiteResult
 {

@@ -68,11 +68,11 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_STOP, true, FACTORY_KEY));
 				_stop = PhysicalStopTableSync::Get(id);
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (DisplayScreen::ObjectNotFoundException&)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (PhysicalStop::RegistryKeyException&)
+			catch (PhysicalStop::ObjectNotFoundException&)
 			{
 				throw ActionException("Specified stop not found");
 			}

@@ -63,7 +63,7 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_link(PlaceAlias* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			// Because the fetch place has no equivalent in database read mode
-			assert(!temporary);
+			assert(temporary == GET_REGISTRY);
 
 			uid aliasedPlaceId (
 				rows->getLongLong (PlaceAliasTableSync::COL_ALIASEDPLACEID));

@@ -223,9 +223,9 @@ namespace synthese
 				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 					_profile = ProfileTableSync::Get(id);
 			}
-			catch (Profile::RegistryKeyException e)
+			catch (Profile::ObjectNotFoundException& e)
 			{
-				throw AdminParametersException("Bad profile");
+				throw AdminParametersException("Bad profile" + e.getMessage());
 			}
 		}
 

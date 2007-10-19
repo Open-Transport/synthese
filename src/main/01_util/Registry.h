@@ -29,7 +29,7 @@
 
 #include "01_util/Constants.h"
 #include "01_util/RegistryKeyException.h"
-#include "01_util/Constants.h"
+#include "01_util/ObjectNotFoundInRegistryException.h"
 
 namespace synthese
 {
@@ -39,7 +39,7 @@ namespace synthese
 		class Exception;
 
 		/** Generic registry class for common operations (get, add, remove...).
-			Note that the registry has the responsability of destroying	registered objects due to the use of shared pointers.
+			Note that the registry has the responsibility of destroying	registered objects due to the use of shared pointers.
 			This class should not be used directly : use instead the "template" typedef in the classes derived from Registrable.
 
 			@ingroup m01
@@ -71,27 +71,53 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-			bool contains (const K& key) const;
-			boost::shared_ptr<const T> get (const K& key) const;
-			boost::shared_ptr<T> getUpdateable (const K& key);
-			
-			size_t size () const;
-			const_iterator begin() const;
-			const_iterator end() const;
+				bool contains (const K& key) const;
 
+				/** Gets a shared pointer to a registered object with read permission.
+					@param key key of the object to find
+					@return boost::shared_ptr<T> the founded object
+					@throws ObjectNotFoundInRegistryException if the key does not exists in the registry
+				*/
+				boost::shared_ptr<const T> get (const K& key) const;
+				
+				/** Gets a shared pointer to a registered object with write permission.
+					@param key key of the object to find
+					@return boost::shared_ptr<T> the founded object
+					@throws ObjectNotFoundInRegistryException if the key does not exists in the registry
+				*/
+				boost::shared_ptr<T> getUpdateable (const K& key);
+				
+				size_t size () const;
+				const_iterator begin() const;
+				const_iterator end() const;
 			//@}
 
 		    
 			//! @name Update methods
 			//@{
+				/** Removes and destroy all the registered objects.
+				*/
+				void clear ();
 
-			/** Removes and destroy all the registered objects.
-			 */
-			void clear ();
-
-			void add (boost::shared_ptr<T> ptr);
-			void replace (boost::shared_ptr<T> ptr);
-			void remove (const K& key);
+				/** Adds an object to the registry.
+					@param ptr Shared pointer to the object to add
+					@throws RegistryKeyException if the key of the object is UNKNOWN_VALUE or if the keys is already used in the registry
+				*/
+				void add (boost::shared_ptr<T> ptr);
+				
+				/** Replaces an object in the registry.
+					@param ptr Shared pointer to the new object to add instead of the old one
+					@throws RegistryKeyException if the key of the object is 0 (0 is reserved for a const neutral element)
+					@throws ObjectNotFoundInRegistryException if no object with the same key was existing in the registry
+				*/
+				void replace (boost::shared_ptr<T> ptr);
+				
+				/** Removes an object from the registry.
+					@param key key of the object to remove
+					@throws RegistryKeyException if the key of the object is 0 (0 is reserved for a const neutral element)
+					@throws ObjectNotFoundInRegistryException if the key is not found in the registry
+				*/
+				void remove (const K& key);
 			//@}
 		    
 
@@ -103,10 +129,10 @@ namespace synthese
 		};
 
 		template<class K, class T>
-		boost::shared_ptr<T> synthese::util::Registry<K, T>::getUpdateable( const K& key )
+		boost::shared_ptr<T> Registry<K, T>::getUpdateable( const K& key )
 		{
 			if (contains (key) == false) 
-				throw RegistryKeyException<K,T> ("No such key in registry", key);
+				throw T::ObjectNotFoundInRegistryException(key);
 
 			return _registry.find (key)->second;
 		}
@@ -152,7 +178,7 @@ namespace synthese
 		boost::shared_ptr<const T> Registry<K,T>::get (const K& key) const
 		{
 			if (contains (key) == false) 
-				throw RegistryKeyException<K,T> ("No such key in registry", key);
+				throw T::ObjectNotFoundInRegistryException(key);
 
 			return _registry.find (key)->second;
 		}
@@ -181,10 +207,10 @@ namespace synthese
 		void Registry<K,T>::add (boost::shared_ptr<T> ptr)
 		{
 			if (ptr->getKey() == UNKNOWN_VALUE)
-				throw RegistryKeyException<K,T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
+				throw T::RegistryKeyException("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
 
 			if (contains (ptr->getKey ())) 
-				throw RegistryKeyException<K,T> ("Duplicate key in registry", ptr->getKey ());
+				throw T::RegistryKeyException("Duplicate key in registry", ptr->getKey ());
 		    
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
 		}
@@ -204,10 +230,10 @@ namespace synthese
 		Registry<K,T>::remove (const K& key)
 		{
 			if (key == 0)
-				throw RegistryKeyException<K,T>("Neutral object cannot be removed at execution time", 0);
+				throw T::RegistryKeyException("Neutral object cannot be removed at execution time", 0);
 
 			if (contains (key) == false) 
-				throw RegistryKeyException<K,T> ("No such key in registry", key);
+				throw T::ObjectNotFoundInRegistryException(key);
 
 			_registry.erase (key);
 		}

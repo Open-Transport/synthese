@@ -23,8 +23,6 @@
 #include "DeleteTextTemplateAction.h"
 #include "TextTemplateTableSync.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -59,9 +57,9 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY));
 				_text = TextTemplateTableSync::Get(id);
 			}
-			catch (DBEmptyResultException<TextTemplate>)
+			catch (TextTemplate::ObjectNotFoundException& e)
 			{
-				throw ActionException("Specified text template not found");
+				throw ActionException(e.getMessage());
 			}
 		}
 		void DeleteTextTemplateAction::run()

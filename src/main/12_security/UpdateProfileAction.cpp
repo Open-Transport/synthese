@@ -65,9 +65,9 @@ namespace synthese
 			{
 				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
 			}
-			catch (DBEmptyResultException<Profile>)
+			catch (Profile::ObjectNotFoundException& e)
 			{
-				throw ActionException("Profile not found");
+				throw ActionException(e.getMessage());
 			}
 
 			// Name

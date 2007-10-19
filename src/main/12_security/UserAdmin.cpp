@@ -23,8 +23,6 @@
 #include "05_html/HTMLTable.h"
 #include "05_html/HTMLForm.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "12_security/UserAdmin.h"
 #include "12_security/UsersAdmin.h"
 #include "12_security/User.h"
@@ -169,9 +167,9 @@ namespace synthese
 				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 					_user = UserTableSync::Get(id,GET_AUTO, true);
 			}
-			catch (...)
+			catch (User::ObjectNotFoundException& e)
 			{
-				throw AdminParametersException("Bad user");
+				throw AdminParametersException(e.getMessage());
 			}
 		}
 

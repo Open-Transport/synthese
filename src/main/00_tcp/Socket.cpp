@@ -259,7 +259,13 @@ Socket::write(SOCKET socket, const char* buffer, int size, int timeout)
 
 
     int bytesSent;
-    bytesSent = send (socket, buffer, size, /*0*/ MSG_NOSIGNAL );
+    bytesSent = send (socket, buffer, size, 
+#ifdef WIN32
+		0
+#else
+		MSG_NOSIGNAL 
+#endif
+		);
 
     if(bytesSent == SOCKET_ERROR)
 	throw "Send";

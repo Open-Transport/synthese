@@ -83,9 +83,9 @@ namespace synthese
 			{
 				obj->setProfile(ProfileTableSync::Get(rows->getLongLong ( UserTableSync::TABLE_COL_PROFILE_ID), obj, true, GET_AUTO));
 			}
-			catch (Profile::RegistryKeyException e)
+			catch (Profile::ObjectNotFoundException& e)
 			{
-				throw UserTableSyncException("Bad profile "+ rows->getText ( UserTableSync::TABLE_COL_PROFILE_ID));
+				throw UserTableSyncException("Bad profile "+ rows->getText ( UserTableSync::TABLE_COL_PROFILE_ID)+ e.getMessage());
 			}
 		}
 

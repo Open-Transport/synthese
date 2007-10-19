@@ -76,11 +76,11 @@ namespace synthese
 					_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 				}
 			}
-			catch (DBEmptyResultException<Alarm>)
+			catch (ObjectNotFoundException<uid,Alarm>& e)
 			{
-				throw ActionException("Specified alarm not found");
+				throw ActionException(e.getMessage());
 			}
-			catch(TimeParseException)
+			catch(TimeParseException& e)
 			{
 				throw ActionException("Une date ou une heure est mal formée");
 			}

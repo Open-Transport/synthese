@@ -310,7 +310,7 @@ namespace synthese
 
 			db::SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 			if (rows->next () == false)
-			    throw DBEmptyResultException<Scenario>(key, "ID not found in database.");
+			    throw DBEmptyResultException(key);
 
 			boost::shared_ptr<Scenario> object(
 			    rows->getBool (ScenarioTableSync::COL_IS_TEMPLATE)

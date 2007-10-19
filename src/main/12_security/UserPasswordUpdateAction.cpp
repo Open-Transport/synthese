@@ -24,8 +24,6 @@
 
 #include "12_security/UserTableSync.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -64,7 +62,7 @@ namespace synthese
 				if (pass2 != _password)
 					throw ActionException("Les mots de passe entrés ne sont pas identiques");
 			}
-			catch (DBEmptyResultException<User>)
+			catch (User::ObjectNotFoundException)
 			{
 				throw ActionException("Utilisateur introuvable");
 			}

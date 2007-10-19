@@ -45,7 +45,7 @@ namespace db
 
 /** Interface for access to an SQLite value.
 
- @ingroup m02
+ @ingroup m10
 */
 class SQLiteValue
 {

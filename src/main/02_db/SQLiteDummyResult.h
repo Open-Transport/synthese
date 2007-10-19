@@ -13,7 +13,7 @@ namespace db
 
 /** Dummy SQLite result.
 
- @ingroup m02
+ @ingroup m10
 */
 class SQLiteDummyResult : public SQLiteResult
 {

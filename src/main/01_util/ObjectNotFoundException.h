@@ -1,6 +1,6 @@
 
-/** DelUserAction class implementation.
-	@file DelUserAction.cpp
+/** ObjectNotFoundException class header.
+	@file ObjectNotFoundException.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,45 +20,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DelUserAction.h"
+#ifndef SYNTHESE_util_ObjectNotFoundException_h__
+#define SYNTHESE_util_ObjectNotFoundException_h__
 
-#include "12_security/UserTableSync.h"
+#include "01_util/Exception.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
-
-using namespace std;
+#include "01_util/Conversion.h"
 
 namespace synthese
 {
-	using namespace server;
-
-	template<> const string util::FactorableTemplate<Action, security::DelUserAction>::FACTORY_KEY("sdu");
-	
-	namespace security
+	namespace util
 	{
-		ParametersMap DelUserAction::getParametersMap() const
+		/** ObjectNotFoundException class.
+			@ingroup m01Exceptions refExceptions
+		*/
+		template<class K, class T>
+		class ObjectNotFoundException : public Exception
 		{
-			return ParametersMap();
-		}
+			const K& _key;
 
-		void DelUserAction::_setFromParametersMap(const ParametersMap& map)
-		{
-			try
+		public:
+			ObjectNotFoundException(const K& key, const std::string& message)
+				: Exception(message + " (key=" + Conversion::ToString(key) + ")")
+				, _key(key)
+			{}
+
+			const K& getKey() const
 			{
-				_user = UserTableSync::Get(_request->getObjectId());
-			}
-			catch (User::ObjectNotFoundException& e)
-			{
-				throw ActionException("Specified user not found" + e.getMessage());
+				return _key;
 			}
 
-		}
-
-		void DelUserAction::run()
-		{
-			UserTableSync::remove(_user->getKey());
-		}
+		};
 	}
 }
+
+#endif // SYNTHESE_util_ObjectNotFoundException_h__

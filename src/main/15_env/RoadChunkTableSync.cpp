@@ -31,6 +31,7 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
+#include "02_db/LinkException.h"
 
 #include "01_util/Conversion.h"
 
@@ -98,13 +99,23 @@ namespace synthese
 		{
 			// From address
 			uid fromAddressId (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID));
-			Address* fromAddress(AddressTableSync::GetUpdateable (fromAddressId, obj, temporary));
-			obj->setParentPath(fromAddress->getRoad());
-			obj->setFromAddress(fromAddress);
 
-			if (temporary == GET_REGISTRY)
+			try
 			{
-				Road::GetUpdateable(fromAddress->getRoad ()->getId ())->addEdge (obj);
+				Address* fromAddress(AddressTableSync::GetUpdateable (fromAddressId, obj, temporary));
+				obj->setParentPath(fromAddress->getRoad());
+				obj->setFromAddress(fromAddress);
+
+				if (temporary == GET_REGISTRY)
+				{
+					if (!fromAddress->getRoad())
+						throw LinkException<RoadChunkTableSync>(obj->getKey(), RoadChunkTableSync::COL_ADDRESSID, Exception("Address without road"));
+					const_cast<Road*>(fromAddress->getRoad())->addEdge (obj);
+				}
+			}
+			catch (Address::ObjectNotFoundException& e)
+			{
+				throw LinkException<RoadChunkTableSync>(obj->getKey(), RoadChunkTableSync::COL_ADDRESSID, e);
 			}
 		}
 

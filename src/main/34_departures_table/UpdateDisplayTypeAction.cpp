@@ -25,8 +25,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/ArrivalDepartureTableLog.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "13_dblog/DBLogModule.h"
 
 #include "11_interfaces/Interface.h"
@@ -82,7 +80,7 @@ namespace synthese
 			{
 				_dt = DisplayTypeTableSync::GetUpdateable(id);
 			}
-			catch (DBEmptyResultException<DisplayType>&)
+			catch (DisplayType::ObjectNotFoundException&)
 			{
 				throw ActionException("Display Type not found");
 			}

@@ -168,6 +168,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LinkException.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SQLiteException.cpp"
 				>
 			</File>

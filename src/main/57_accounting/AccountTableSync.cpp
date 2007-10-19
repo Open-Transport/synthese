@@ -23,7 +23,6 @@
 #include <sstream>
 
 #include "01_util/Conversion.h"
-#include "01_util/RegistryKeyException.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -68,7 +67,7 @@ namespace synthese
 			    account->setRightUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_RIGHT_USER_ID));
 			    account->setName(rows->getText ( AccountTableSync::TABLE_COL_NAME));
 			}
-			catch (Currency::RegistryKeyException& e)
+			catch (Currency::ObjectNotFoundException& e)
 			{
 			}
 		}

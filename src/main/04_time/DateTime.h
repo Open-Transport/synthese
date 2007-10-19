@@ -93,7 +93,6 @@ namespace synthese
 			//@{
 				bool isValid () const;
 				bool isUnknown() const;
-				std::string toInternalString () const;
 				std::string toSQLString(bool withApostrophes = true) const;
 				std::string toString() const;
 			//@}
@@ -121,20 +120,15 @@ namespace synthese
 
 			/** Constructs a DateTime from an SQL timestamp string (AAAAMMJJhhmmss);
 				seconds are ignored.
+				@param str Text to parse :
+					- YYYY-MM-DD HH:MM : SQL date time
+					- A/T/M/m/... internal command
 			*/
 			static DateTime FromSQLTimestamp (const std::string& sqlTimestamp);
 
-			/** Constructs a DateTime from an SQL timestamp string
-				@param str Internal string : 
-					- format YYYYMMDDHHMM, additional seconds are ignored
-					- "A" = TIME_CURRENT, the result is now
-				@return DateTime object
-				@throw TimeParseException if no valid DateTime can be builded
-			*/
-			static DateTime FromInternalString (const std::string& str);
 
 			/** Constructs a DateTime from a string AAAA/MM/JJ hh:mm:ss;
-				seconds are ignored.
+				seconds are ignored.				
 			*/
 			static DateTime FromString (const std::string& str);
 

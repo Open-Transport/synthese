@@ -81,9 +81,9 @@ namespace synthese
 
 				_redirectAfterAction = !map.getBool(PARAMETER_NO_REDIRECT_AFTER_ACTION, false, false, "RWI");
 			}
-			catch (Interface::RegistryKeyException& e)
+			catch (Interface::ObjectNotFoundException& e)
 			{
-				throw RequestException("Specified interface not found (" + Conversion::ToString(e.getKey()) +")");
+				throw RequestException("Specified interface not found : "+ e.getMessage());
 			}
 		}
 

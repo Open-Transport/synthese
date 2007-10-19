@@ -63,7 +63,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
 				_place = ConnectionPlaceTableSync::Get(id);
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (DisplayScreen::ObjectNotFoundException&)
 			{
 				throw ActionException("Display screen not found");
 			}

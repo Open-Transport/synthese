@@ -13,7 +13,7 @@ namespace db
 
 /** Cached SQLite result.
 
- @ingroup m02
+ @ingroup m10
 */
 class SQLiteCachedResult : public SQLiteResult
 {

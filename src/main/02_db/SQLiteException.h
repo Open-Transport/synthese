@@ -37,7 +37,7 @@ namespace db
 
 
 /** SQLite related exception class.
-	@ingroup m02
+	@ingroup m10
 
 	This exception occurs when the execution of a query generates an error :
 		- SQL syntax error

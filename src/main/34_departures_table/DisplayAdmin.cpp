@@ -26,8 +26,6 @@
 
 #include "01_util/Constants.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLTable.h"
 
@@ -457,11 +455,11 @@ namespace synthese
 			{
 				_displayScreen = DisplayScreenTableSync::Get(id, GET_AUTO, true);
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (DisplayScreen::ObjectNotFoundException& e)
 			{
 				throw AdminParametersException("Display screen not found");
 			}
-			catch (DBEmptyResultException<PublicTransportStopZoneConnectionPlace>&)
+			catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
 			{
 				throw AdminParametersException("Place not found");
 			}

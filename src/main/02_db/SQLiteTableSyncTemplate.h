@@ -59,12 +59,15 @@ namespace synthese
 
 
 		/** Table synchronizer template.
-			@ingroup m02
+			@ingroup m10
 		*/
 		template <class K, class T>
 		class SQLiteTableSyncTemplate : public util::FactorableTemplate<SQLiteTableSync, K>
 		{
 		public:
+			typedef T							ObjectType;
+			typedef DBEmptyResultException<K>	DBEmptyResultException;
+
 			static const std::string	TABLE_NAME;		//!< Table name in the database
 			static const int			TABLE_ID;		//!< Table ID used by util::encodeID and util::decodeTableId
 
@@ -117,6 +120,13 @@ namespace synthese
 			static void _unlink(T* obj);
 			
 
+			/** Gets a result row in the database.
+				@param key key of the row to get (corresponds to the id field)
+				@return SQLiteResultSPtr The found result row
+				@throw DBEmptyResultException if the key was not found in the table
+				@author Hugues Romain
+				@date 2007				
+			*/
 			static SQLiteResultSPtr _GetRow( uid key )
 			{
 				SQLite* sqlite = DBModule::GetSQLite();
@@ -128,7 +138,7 @@ namespace synthese
 					<< " LIMIT 1";
 				SQLiteResultSPtr rows (sqlite->execQuery (query.str()));
 				if (rows->next() == false)
-					throw DBEmptyResultException<T>(key, "ID not found in database.");
+					throw DBEmptyResultException(key);
 				return rows;
 			}
 
@@ -140,7 +150,7 @@ namespace synthese
 				@param key UID of the object
 				@param linked Load on temporary linked object (recursive get)
 				@return Pointer to a new C++ object corresponding to the fetched record
-				@throw DBEmptyResultException<T> if the object was not found
+				@throw DBEmptyResultException if the object was not found
 			*/
 			static T* _Get(uid key, bool linked)
 			{
@@ -282,7 +292,7 @@ namespace synthese
 				<< " WHERE " << TABLE_COL_ID << "=" << util::Conversion::ToString(id);
 			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			if (!rows->next())
-				throw DBEmptyResultException<T>(id, "ID not found in database.");
+				throw DBEmptyResultException(id);
 			else
 				return rows->getText(field);
 		}

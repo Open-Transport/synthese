@@ -71,6 +71,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BasicClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BasicClient.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CleanerThreadExec.cpp"
 				>
 			</File>

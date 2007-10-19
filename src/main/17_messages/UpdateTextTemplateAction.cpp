@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "UpdateTextTemplateAction.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
@@ -79,9 +77,9 @@ namespace synthese
 				// Long message
 				_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
 			}
-			catch (DBEmptyResultException<TextTemplate>)
+			catch (TextTemplate::ObjectNotFoundException& e)
 			{
-				throw ActionException("Specified text template not found");
+				throw ActionException(e.getMessage());
 			}
 		}
 

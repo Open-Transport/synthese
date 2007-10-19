@@ -63,7 +63,7 @@ namespace synthese
 				_online = map.getBool(PARAMETER_ONLINE, true, false, FACTORY_KEY);
 				_message = map.getString(PARAMETER_MESSAGE, true, FACTORY_KEY);
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (DisplayScreen::ObjectNotFoundException&)
 			{
 				throw ActionException("Specified display screen not found");
 			}

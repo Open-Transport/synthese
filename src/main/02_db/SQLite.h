@@ -14,7 +14,7 @@ namespace synthese
 			  
 
 		/** SQLite interface class.
-		    @ingroup m02
+		    @ingroup m10
 		*/
 		class SQLite
 		{

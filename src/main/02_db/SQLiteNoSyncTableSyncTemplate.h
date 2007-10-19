@@ -30,7 +30,7 @@ namespace synthese
 	namespace db
 	{
 		/** SQLiteNoSyncTableSyncTemplate class.
-		@ingroup m02
+		@ingroup m10
 		*/
 		template<class K, class T>
 		class SQLiteNoSyncTableSyncTemplate : public SQLiteTableSyncTemplate<K,T>

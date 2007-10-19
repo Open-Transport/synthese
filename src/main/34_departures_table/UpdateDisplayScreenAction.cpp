@@ -22,8 +22,6 @@
 
 #include "01_util/Conversion.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 
@@ -102,11 +100,11 @@ namespace synthese
 				_type = DisplayType::Get(id);
 
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (DisplayScreen::ObjectNotFoundException&)
 			{
 				throw ActionException("Display screen not specified or specified display screen not found");
 			}
-			catch (DisplayType::RegistryKeyException&)
+			catch (DisplayType::ObjectNotFoundException&)
 			{
 				throw ActionException("Specified display type not found");
 			}

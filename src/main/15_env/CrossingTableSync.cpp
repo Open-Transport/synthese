@@ -23,6 +23,8 @@
 
 #include "CrossingTableSync.h"
 
+#include "02_db/LinkException.h"
+
 #include "01_util/Conversion.h"
 
 #include "15_env/CityTableSync.h"
@@ -55,14 +57,18 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::_link(Crossing* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid cityId (rows->getLongLong (CrossingTableSync::TABLE_COL_CITYID));
-			obj->setCity(City::Get(cityId).get());
-
+			try
+			{
+				obj->setCity(City::Get(cityId).get());
+			}
+			catch(City::ObjectNotFoundException& e)
+			{
+				throw LinkException<CrossingTableSync>(obj->getKey(), CrossingTableSync::TABLE_COL_CITYID, e);
+			}
 		}
 
 		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::_unlink(Crossing* obj)
 		{
-
-
 			obj->setCity(NULL);
 		}
 

@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "04_time/DateTime.h"
 
 #include "30_server/ActionException.h"
@@ -69,9 +67,9 @@ namespace synthese
 
 				_transactionPart = TransactionPartTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException<TransactionPart> e)
+			catch (TransactionPart::ObjectNotFoundException& e)
 			{
-				throw ActionException("Specified transaction part not found ");
+				throw ActionException(e.getMessage());
 			}
 		}
 

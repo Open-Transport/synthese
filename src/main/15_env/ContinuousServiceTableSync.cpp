@@ -160,7 +160,7 @@ namespace synthese
 			cs->setHandicappedCompliance (HandicappedCompliance::Get(handicappedComplianceId).get());
 			cs->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
 
-			if (!temporary)
+			if (temporary == GET_REGISTRY)
 				path->addService (cs);
 		}
 

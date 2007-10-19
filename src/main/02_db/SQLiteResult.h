@@ -22,7 +22,7 @@ namespace db
 
 /** Interface for access to a SQLite query result.
 
- @ingroup m02
+ @ingroup m10
 */
 class SQLiteResult 
 {

@@ -59,7 +59,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			
-			Date dateDefaut(Date::FromInternalString(_value->getValue(parameters, variables, object, request)));
+			Date dateDefaut(Date::FromSQLDate(_value->getValue(parameters, variables, object, request)));
 			shared_ptr<const RoutePlannerFunction> function(request->getFunction<RoutePlannerFunction>());
 
 			assert(function.get());
@@ -81,7 +81,7 @@ namespace synthese
 				stream << "<option ";
 				if ( iDate == dateDefaut )
 					stream << "selected=\"1\" ";
-				stream << "value=\"" << iDate.toInternalString() << "\">";
+				stream << "value=\"" << iDate.toSQLString(false) << "\">";
 				datePage->display(stream, variables, iDate, request);
 				stream << "</option>";
 			}

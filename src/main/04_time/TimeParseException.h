@@ -40,9 +40,9 @@ namespace synthese
 		public:
 
 			/** Constructor.
-				@param message Message to display when the exception occurs.
+				@param text Text which the parser was attempting to parse.
 			*/
-			TimeParseException(const std::string& message);
+			TimeParseException(const std::string& text);
 
 			/** Destructor.
 			*/

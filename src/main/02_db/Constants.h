@@ -30,7 +30,7 @@ namespace synthese
 {
 	namespace db
 	{
-		/** @addtogroup m02
+		/** @addtogroup m10
 			@{
 		*/
 

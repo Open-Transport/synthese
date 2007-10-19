@@ -67,11 +67,11 @@ namespace synthese
 				_place = ConnectionPlaceTableSync::Get(id);
 				
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (DisplayScreen::ObjectNotFoundException&)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
+			catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
 			{
 				throw ActionException("Specified place not found");
 			}

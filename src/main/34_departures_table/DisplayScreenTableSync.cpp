@@ -101,7 +101,14 @@ namespace synthese
 			uid typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
 			
 			// Localization
-			object->setLocalization(ConnectionPlaceTableSync::Get(placeId, object, true, temporary));
+			try
+			{
+				object->setLocalization(ConnectionPlaceTableSync::Get(placeId, object, true, temporary));
+			}
+			catch(PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
+			{
+				Log::GetInstance().warn("Data corrupted in "+ TABLE_NAME + " on display screen : localization "+ Conversion::ToString(placeId) + " not found");
+			}
 
 			// Type
 			if (typeId > 0)
@@ -116,7 +123,7 @@ namespace synthese
 					uid id(Conversion::ToLongLong(*it));
 					object->addPhysicalStop(PhysicalStopTableSync::Get(id, object, true, temporary));
 				}
-				catch (...)
+				catch (PhysicalStop::ObjectNotFoundException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 				}
@@ -130,13 +137,9 @@ namespace synthese
 				{
 					object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), object, false, temporary));
 				}
-				catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
+				catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
-				}
-				catch (std::exception e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 				}
 			}
 
@@ -148,13 +151,9 @@ namespace synthese
 				{
 					object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), object, false, temporary));
 				}
-				catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
+				catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
-				}
-				catch (std::exception e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 				}
 			}
 
@@ -166,13 +165,9 @@ namespace synthese
 				{
 					object->addForcedDestination(ConnectionPlaceTableSync::Get (Conversion::ToLongLong(*it), object, false, temporary));
 				}
-				catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
+				catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
-				}
-				catch (std::exception e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 				}
 			}
 		}

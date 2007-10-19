@@ -33,7 +33,7 @@ namespace synthese
 		    to wrap them into transations (the exexcution time is about
 		    60x shorter!!)
 
-		    @ingroup m02
+		    @ingroup m10
 		*/
 		class SQLiteHandle : public SQLite
 		{

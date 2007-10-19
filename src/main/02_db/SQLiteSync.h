@@ -50,7 +50,7 @@ namespace db
     db data with live object model.
 
 
-@ingroup m02
+@ingroup m10
 */
 
 class SQLiteSync : public synthese::db::SQLiteUpdateHook

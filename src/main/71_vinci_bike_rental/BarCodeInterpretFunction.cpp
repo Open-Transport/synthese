@@ -31,8 +31,6 @@
 
 #include "01_util/Conversion.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "11_interfaces/RedirectInterfacePage.h"
 #include "11_interfaces/Interface.h"
 
@@ -113,7 +111,7 @@ namespace synthese
 				{
 					_bike = VinciBikeTableSync::get(uidCode);
 				}
-				catch (DBEmptyResultException<VinciBike>)
+				catch (VinciBike::ObjectNotFoundException& e)
 				{
 					throw RequestException("Specified bike not found");
 				}
@@ -124,7 +122,7 @@ namespace synthese
 				{
 					_contract = VinciContractTableSync::get(uidCode);
 				}
-				catch (DBEmptyResultException<VinciContract>)
+				catch (VinciContract::ObjectNotFoundException& e)
 				{
 					throw RequestException("Specified contract not found");
 				}

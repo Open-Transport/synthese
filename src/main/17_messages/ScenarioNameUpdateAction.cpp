@@ -37,6 +37,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<Action, messages::ScenarioNameUpdateAction>::FACTORY_KEY("snu");
 
@@ -70,9 +71,9 @@ namespace synthese
 						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
 				}
 			}
-			catch (DBEmptyResultException<Scenario>)
+			catch (ObjectNotFoundException<uid,Scenario>& e)
 			{
-				throw ActionException("Scenario not found");
+				throw ActionException(e.getMessage());
 			}
 		}
 

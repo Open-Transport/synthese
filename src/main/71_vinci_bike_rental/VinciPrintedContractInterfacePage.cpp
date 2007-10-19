@@ -21,8 +21,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "04_time/Date.h"
 
 #include "12_security/User.h"

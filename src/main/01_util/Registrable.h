@@ -48,11 +48,13 @@ namespace synthese
 		class Registrable
 		{
 		public:
-			typedef K									KeyType;
-			typedef Registry<K, T>						Registry;
-			typedef RegistryKeyException<K, T>			RegistryKeyException;
-			typedef typename Registry::const_iterator	ConstIterator;
-			typedef	std::set<const void*>				ChildTemporaryObjects;
+			typedef K										KeyType;
+			typedef Registry<K, T>							Registry;
+			typedef RegistryKeyException<K, T>				RegistryKeyException;
+			typedef ObjectNotFoundException<K,T>			ObjectNotFoundException;
+			typedef ObjectNotFoundInRegistryException<K,T>	ObjectNotFoundInRegistryException;
+			typedef typename Registry::const_iterator		ConstIterator;
+			typedef	std::set<const void*>					ChildTemporaryObjects;
 
 		private:
 			K						_key;		//!< The key of the object in the registry.

@@ -161,6 +161,14 @@
 				Name="Registry"
 				>
 				<File
+					RelativePath=".\ObjectNotFoundException.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ObjectNotFoundInRegistryException.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Registrable.h"
 					>
 				</File>

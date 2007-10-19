@@ -228,7 +228,7 @@ namespace synthese
 		See :
 		- class @ref synthese::envlssql::ComponentTableSync "ComponentTableSync"
 		- class @ref synthese::envlssql::EnvironmentSyncException "EnvironmentSyncException"
-		- module @ref m02
+		- module @ref m10
 
 	*/
 

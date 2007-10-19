@@ -90,7 +90,7 @@ namespace synthese
 			datePage->display(sDate, variables, date, request);
 
 			ParametersVector pv;
-			pv.push_back(date.toInternalString());
+			pv.push_back(date.toSQLString(false));
 			pv.push_back("0");
 			pv.push_back(originCity->getName());
 			pv.push_back(Conversion::ToString(accessParameters.complyer.getHandicappedCompliance()->isCompliant()));
@@ -131,7 +131,7 @@ namespace synthese
 			datePage->display(sDate, variables, date, request);
 
 			ParametersVector pv;
-			pv.push_back(date.toInternalString());
+			pv.push_back(date.toSQLString(false));
 			pv.push_back(Conversion::ToString(home));
 			pv.push_back(originCity);
 			pv.push_back(Conversion::ToString(accessParameters.complyer.getHandicappedCompliance()->isCompliant()));

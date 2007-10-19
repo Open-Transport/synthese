@@ -20,7 +20,7 @@
 
 #include "01_util/Exception.h"
 
-
+#undef max
 
 namespace synthese
 {

@@ -34,6 +34,7 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
+#include "02_db/LinkException.h"
 
 #include "01_util/Conversion.h"
 
@@ -77,20 +78,35 @@ namespace synthese
 			uid roadId(rows->getLongLong(AddressTableSync::COL_ROADID));
 
 			// Links from the object
-			if (tableId == CrossingTableSync::TABLE_ID)
-				obj->setPlace(CrossingTableSync::Get(placeId, obj, true, temporary));
-			else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
-				obj->setPlace(ConnectionPlaceTableSync::Get(placeId, obj, true, temporary));
-			
-			obj->setRoad (RoadTableSync::Get (roadId, obj, true, temporary));
+			try
+			{
+				if (tableId == CrossingTableSync::TABLE_ID)
+					obj->setPlace(CrossingTableSync::Get(placeId, obj, true, temporary));
+				else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
+					obj->setPlace(ConnectionPlaceTableSync::Get(placeId, obj, true, temporary));
 
-			// Links to the object
-			shared_ptr<AddressablePlace> place = 
-				EnvModule::fetchUpdateableAddressablePlace (placeId);
-			shared_ptr<Road> road = Road::GetUpdateable(roadId);
+				obj->setRoad (RoadTableSync::Get (roadId, obj, true, temporary));
 
-			place->addAddress(obj);
-			road->addAddress(obj);
+				// Links to the object
+				shared_ptr<AddressablePlace> place = 
+					EnvModule::fetchUpdateableAddressablePlace (placeId);
+				shared_ptr<Road> road = Road::GetUpdateable(roadId);
+
+				place->addAddress(obj);
+				road->addAddress(obj);
+			}
+			catch (Crossing::ObjectNotFoundException& e)
+			{
+				throw LinkException<AddressTableSync>(obj->getKey(), "Crossing ("+ AddressTableSync::COL_PLACEID +")", e);
+			}
+			catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
+			{
+				throw LinkException<AddressTableSync>(obj->getKey(), "Connection place ("+ AddressTableSync::COL_PLACEID +")", e);
+			}
+			catch (Road::ObjectNotFoundException& e)
+			{
+				throw LinkException<AddressTableSync>(obj->getKey(), AddressTableSync::COL_ROADID, e);
+			}
 		}
 
 

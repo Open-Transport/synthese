@@ -36,8 +36,6 @@
 
 #include "01_util/Conversion.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "04_time/DateTime.h"
 #include "04_time/TimeParseException.h"
 
@@ -99,7 +97,7 @@ namespace synthese
 				{
 					_rate = VinciRateTableSync::get(Conversion::ToLongLong(it->second));
 				}
-				catch (DBEmptyResultException<VinciRate> e)
+				catch (VinciRate::ObjectNotFoundException& e)
 				{
 					throw ActionException("Specified rate not found");
 				}
@@ -124,7 +122,7 @@ namespace synthese
 				{
 					_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
 				}
-				catch(DBEmptyResultException<VinciContract> e)
+				catch(VinciContract::ObjectNotFoundException& e)
 				{
 					throw ActionException("Specified contract not found");
 				}

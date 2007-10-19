@@ -60,7 +60,7 @@ namespace synthese
 				_value = map.getBool(PARAMETER_VALUE, true, false, FACTORY_KEY);
 
 			}
-			catch (DBEmptyResultException<DisplayScreen>&)
+			catch (DisplayScreen::ObjectNotFoundException&)
 			{
 				throw ActionException("Display screen not found");
 			}

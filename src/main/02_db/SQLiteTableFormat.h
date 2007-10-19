@@ -49,7 +49,7 @@ namespace synthese
 				- the columns
 				- the indexes
 
-			@ingroup m02
+			@ingroup m10
 		*/
 	    class SQLiteTableFormat 
 	    {

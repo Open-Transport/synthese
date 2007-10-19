@@ -387,7 +387,7 @@ namespace synthese
 			
 			db::SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery (query.str());
 			if (rows->next () == false)
-			    throw DBEmptyResultException<Alarm>(key, "ID not found in database.");
+			    throw DBEmptyResultException(key);
 
 			boost::shared_ptr<Alarm> object;
 			uid scenarioId = rows->getLongLong (AlarmTableSync::COL_SCENARIO_ID);
@@ -400,7 +400,7 @@ namespace synthese
 				if (scenarioId)
 				{
 				    if (!SentScenario::Contains(scenarioId))
-					throw DBEmptyResultException<Alarm>(key, "No such scenario in RAM");
+						throw DBEmptyResultException(key);
 				    
 				    shared_ptr<const SentScenario> scenario = SentScenario::Get(scenarioId);
 				    object.reset(new ScenarioSentAlarm(*scenario));
@@ -526,7 +526,7 @@ namespace synthese
 			shared_ptr<Alarm> alarm(getAlarm(key));
 			shared_ptr<SingleSentAlarm> singleSentAlarm(dynamic_pointer_cast<SingleSentAlarm, Alarm>(alarm));
 			if (!singleSentAlarm.get())
-				throw DBEmptyResultException<SingleSentAlarm>(key, "Not a single sent alarm");
+				throw DBEmptyResultException(key);
 			return singleSentAlarm;
 		}
 	}

@@ -61,13 +61,15 @@ namespace synthese
 				if (_request->getObjectId())
 					screenId = _request->getObjectId();
 				else
-					screenId = map.getUid(PARAMETER_TB, true, "dscr");
+					screenId = map.getUid(PARAMETER_TB, true, FACTORY_KEY);
 				_screen = DisplayScreen::Get(screenId);
 
 				// Date
-				_date = map.getDateTime(PARAMETER_DATE, false, "dscr");
+				_date = map.getDateTime(PARAMETER_DATE, false, FACTORY_KEY);
+				if (_date.isUnknown())
+					_date = DateTime(TIME_CURRENT);
 			}
-			catch (DisplayScreen::RegistryKeyException& e)
+			catch (...)
 			{
 				throw RequestException("Display screen " + Conversion::ToString(screenId) + " not found");
 			}

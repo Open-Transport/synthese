@@ -29,8 +29,6 @@
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
 
-#include "02_db/DBEmptyResultException.h"
-
 using namespace std;
 
 namespace synthese
@@ -93,11 +91,11 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_PROFILE_ID, true, FACTORY_KEY));
 				_profile = ProfileTableSync::Get(id);
 			}
-			catch (Profile::RegistryKeyException)
+			catch (Profile::ObjectNotFoundException& e)
 			{
 				throw ActionException("Profil introuvable");
 			}
-			catch (DBEmptyResultException<User>)
+			catch (User::ObjectNotFoundException& e)
 			{
 				throw ActionException("Utilisateur introuvable");
 			}

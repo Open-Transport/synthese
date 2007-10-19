@@ -1,6 +1,6 @@
 
-/** DelUserAction class implementation.
-	@file DelUserAction.cpp
+/** LinkException class header.
+	@file LinkException.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,45 +20,31 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DelUserAction.h"
+#ifndef SYNTHESE_db_LinkException_h__
+#define SYNTHESE_db_LinkException_h__
 
-#include "12_security/UserTableSync.h"
-
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
-
-using namespace std;
+#include "01_util/Exception.h"
+#include "01_util/UId.h"
+#include "01_util/Conversion.h"
 
 namespace synthese
 {
-	using namespace server;
-
-	template<> const string util::FactorableTemplate<Action, security::DelUserAction>::FACTORY_KEY("sdu");
-	
-	namespace security
+	namespace db
 	{
-		ParametersMap DelUserAction::getParametersMap() const
+		/** LinkException class template.
+				- class C : Class of the table sync of the current object
+			@ingroup m10Exceptions refExceptions
+		*/
+		template<class C>
+		class LinkException : public util::Exception
 		{
-			return ParametersMap();
-		}
+		public:
+			LinkException(uid currentId, const std::string& field, const util::Exception& e)
+				: Exception("There was an error in "+ C::TABLE_NAME +" table at row "+ Conversion::ToString(currentId) +" in field "+ field +" : "+ e.getMessage())
+			{	}
 
-		void DelUserAction::_setFromParametersMap(const ParametersMap& map)
-		{
-			try
-			{
-				_user = UserTableSync::Get(_request->getObjectId());
-			}
-			catch (User::ObjectNotFoundException& e)
-			{
-				throw ActionException("Specified user not found" + e.getMessage());
-			}
-
-		}
-
-		void DelUserAction::run()
-		{
-			UserTableSync::remove(_user->getKey());
-		}
+		};
 	}
 }
+
+#endif // SYNTHESE_db_LinkException_h__
