@@ -31,6 +31,8 @@
 #include "01_util/FactoryException.h"
 #include "01_util/Log.h"
 
+
+
 namespace synthese
 {
 	namespace util
@@ -64,7 +66,8 @@ namespace synthese
 			class CreatorInterface
 			{
 			private:
-				virtual RootObject* create(const typename RootObject::Args& args = typename RootObject::Args ()) = 0;
+				virtual RootObject* create() = 0;
+				virtual RootObject* create(const typename RootObject::Args& args) = 0;
 				friend class Factory;
 				friend class Factory::Iterator;
 			};
@@ -74,13 +77,24 @@ namespace synthese
 			class Creator : public CreatorInterface
 			{
 			private:
+
 				friend class Factory;
-				RootObject* create (const typename T::Args& args = typename T::Args ())
+
+
+				RootObject* create ()
+				{
+					typename T::Args defaultArgs;
+				    return create (defaultArgs);
+				}
+
+
+				RootObject* create (const typename T::Args& args)
 				{
 				    return static_cast<RootObject*>(createTyped(args));
 				}
 				
-				T* createTyped (const typename T::Args& args = typename T::Args ())
+
+				T* createTyped (const typename T::Args& args)
 				{
 					T* obj(new T);
 //					obj->setFactoryKey(getKey<T>());
@@ -172,21 +186,47 @@ namespace synthese
 				return it != _registeredCreator.end();
 			}
 
+
 			template<class T>
-			    static T* create(const typename T::Args& args = T::Args ())
+			    static T* create()
+			{
+				typename T::Args defaultArgs;
+				return create<T> (defaultArgs);
+			}
+
+
+			template<class T>
+			    static T* create(const typename T::Args& args)
 			{
 				Creator<T> creator;
 				return creator.createTyped(args);
 			}
 
+
 			template<class T>
-			static boost::shared_ptr<T> createSharedPtr(const typename T::Args& args = T::Args ())
+			static boost::shared_ptr<T> createSharedPtr()
+			{
+				typename T::Args defaultArgs;
+                return createSharedPtr<T> (defaultArgs);
+			}
+
+
+			template<class T>
+			static boost::shared_ptr<T> createSharedPtr(const typename T::Args& args)
 			{
 				return boost::shared_ptr<T>(create<T>(args));
 			}
 
+
+			static RootObject* create(const typename Map::key_type& key)
+			{
+				typename RootObject::Args defaultArgs;
+				return create (key, defaultArgs);
+			}
+
+
 			static RootObject* create(const typename Map::key_type& key, 
-						  const typename RootObject::Args& args = RootObject::Args ())
+						  const typename RootObject::Args& args)
 			{
 				// The factory "single object" was never filled
 				if (size () == 0)
@@ -203,8 +243,15 @@ namespace synthese
 				return it->second->create(args);
 			}
 
+
+			static boost::shared_ptr<RootObject> createSharedPtr(const typename Map::key_type& key)
+			{
+				typename RootObject::Args defaultArgs;
+				return createSharedPtr (key, defaultArgs);
+			}
+
 			static boost::shared_ptr<RootObject> createSharedPtr(const typename Map::key_type& key,
-									     const typename RootObject::Args& args = RootObject::Args ())
+									     const typename RootObject::Args& args)
 			{
 			    return boost::shared_ptr<RootObject>(create(key, args));
 			}
