@@ -1,0 +1,4 @@
+
+Import ('mainenv')
+mainenv.ModuleBuild (includes = '*.c');
+
