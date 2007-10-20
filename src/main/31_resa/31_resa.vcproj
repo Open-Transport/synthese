@@ -242,22 +242,6 @@
 			Name="18 Functions"
 			>
 			<File
-				RelativePath=".\BookingScreenFunction.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BookingScreenFunction.h"
-				>
-			</File>
-			<File
-				RelativePath=".\BoolingConfirmationFunction.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BoolingConfirmationFunction.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ReservationsListFunction.cpp"
 				>
 			</File>
