@@ -70,9 +70,9 @@ namespace synthese
 			if (!name26.empty())
 				cp->setName26(name26);
 			cp->setConnectionType (connectionType);
-			cp->setDefaultTransferDelay (defaultTransferDelay);
-
+			
 			cp->clearTransferDelays ();    
+			cp->setDefaultTransferDelay (defaultTransferDelay);
 
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 			boost::char_separator<char> sep1 (",");
