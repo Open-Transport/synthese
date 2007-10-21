@@ -79,7 +79,9 @@ void sig_PIPE_handler(int sig)
 int main( int argc, char **argv )
 {
     std::signal(SIGINT, sig_INT_handler);
-    std::signal(SIGPIPE, sig_PIPE_handler);
+#ifndef WIN32
+	std::signal(SIGPIPE, sig_PIPE_handler);
+#endif
 
     try 
     {
