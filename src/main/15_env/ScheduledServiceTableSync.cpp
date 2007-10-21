@@ -74,6 +74,8 @@ namespace synthese
 		    uid id (rows->getLongLong (TABLE_COL_ID));
 		    
 		    int serviceNumber (rows->getInt (ScheduledServiceTableSync::COL_SERVICENUMBER));
+
+			uid pathId(rows->getLongLong(ScheduledServiceTableSync::COL_PATHID));
 		    
 		    string schedules (rows->getText (ScheduledServiceTableSync::COL_SCHEDULES));
 
@@ -128,7 +130,10 @@ namespace synthese
 		    ss->setDepartureSchedules(departureSchedules);
 		    ss->setArrivalSchedules(arrivalSchedules);
 			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
+			ss->setPathId(pathId);
 		}
+
+
 
 		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_link(ScheduledService* ss, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
@@ -204,59 +209,7 @@ namespace synthese
 			addTableColumn (COL_TEAM, "TEXT");
 		}
 
-/*		void ScheduledServiceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		    // Loop on each added row
-		    while (rows->next ())
-		    {
-				if (ScheduledService::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					boost::shared_ptr<ScheduledService> service(ScheduledService::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-					service->getPath()->removeService(service.get());
-					load(service.get(), rows);
-					service->getPath()->addService(service.get());
-				}
-				else
-				{
-					ScheduledService* service(new ScheduledService);
-					load(service, rows);
-					service->store();
-					service->getPath()->addService(service);
-				}
-		    }
-		}
-	    
 
-
-		void ScheduledServiceTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    if (ScheduledService::Contains(id))
-			    {
-					shared_ptr<ScheduledService> object = ScheduledService::GetUpdateable(id);
-					object->getPath()->removeService(object.get());
-					load(object.get(), rows);
-					object->getPath()->addService(object.get());
-			    }
-			}
-		}
-
-		void ScheduledServiceTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-		    while (rows->next ())
-		    {
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (ScheduledService::Contains(id))
-				{
-					shared_ptr<ScheduledService> object(ScheduledService::GetUpdateable(id));
-					object->getPath()->removeService(object.get());
-					ScheduledService::Remove(id);
-				}
-		    }
-		}
-*/
 
 		vector<shared_ptr<ScheduledService> > ScheduledServiceTableSync::search(
 			const CommercialLine* commercialLine

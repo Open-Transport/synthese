@@ -29,6 +29,8 @@
 
 #include "02_db/DBModule.h"
 
+#include "01_util/Exception.h"
+
 #include <sstream>
 
 using namespace std;
@@ -36,6 +38,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace db;
+	using namespace util;
 
 	namespace env
 	{
@@ -72,6 +75,23 @@ namespace synthese
 				<< " LIMIT 1";
 			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));
 			return rows->next();
+		}
+
+		int getRankOfLastDepartureLineStop( uid line )
+		{
+			stringstream query;
+			query
+				<< "SELECT "
+				<< LineStopTableSync::COL_RANKINPATH
+				<< " FROM " << LineStopTableSync::TABLE_NAME
+				<< " WHERE "
+				<< LineStopTableSync::COL_LINEID << "=" << line
+				<< " AND " << LineStopTableSync::COL_ISDEPARTURE << "=1"
+				<< " LIMIT 1";
+			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));
+			if (!rows->next())
+				throw Exception("The line does not exists or does not contains any line stop");
+			return rows->getInt(LineStopTableSync::COL_RANKINPATH);
 		}
 	}
 }

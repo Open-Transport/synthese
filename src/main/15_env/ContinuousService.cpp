@@ -201,16 +201,16 @@ namespace synthese
 			Schedule schedule(
 				(servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
 				? _arrivalSchedules.at(edgeIndex).first
-				: _departureSchedules.at(edgeIndex).first
+				: getDepartureSchedule(edgeIndex)
 				);
 			DateTime actualDateTime(servicePointer.getOriginDateTime());
-			actualDateTime += (schedule - _departureSchedules.at(0).first);
+			actualDateTime += (schedule - getDepartureSchedule());
 			return actualDateTime;
 		}
 
-		time::Schedule ContinuousService::getDepartureSchedule() const
+		time::Schedule ContinuousService::getDepartureSchedule(int rank) const
 		{
-			return _departureSchedules.at(0).first;
+			return _departureSchedules.at(rank).first;
 		}
 
 		void ContinuousService::setDepartureSchedules( const Schedules& schedules )

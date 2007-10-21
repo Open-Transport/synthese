@@ -66,43 +66,36 @@ namespace synthese
 		class Service : public Complyer
 		{
 		private:
-
 			int				_serviceNumber;
+			uid				_pathId;
 			Path*			_path;
 
 		public:
-			//! \name Update methods
-			//@{
 
-			//@}
-
-			Service (int serviceNumber,
-					 Path* path
-					);
+			Service (int serviceNumber, Path* path);
 			Service();
 			~Service ();
 
 
 			//! @name Getters
 			//@{
-			const Path*			getPath () const;
-			Path*			getPath ();
-			int				getServiceNumber () const;
+				const Path*		getPath () const;
+				Path*			getPath ();
+				uid				getPathId()			const;
+				int				getServiceNumber()	const;
 
-			/** Returns the departure schedule for this service.
-
-			@return If this service is continuous, the first departure schedule
-			(first course) is returned. Otherwise, it is the "normal" 
-			departure schedule.
-			*/
-			virtual time::Schedule getDepartureSchedule () const = 0;
-
+				/** Gets a departure schedule for this service.
+					@param rank Rank of the stop where to get the departure schedule
+					@return see the implementations of the method.
+				*/
+				virtual time::Schedule getDepartureSchedule (int rank = 0) const = 0;
 			//@}
 
 			//! @name Setters
 			//@{
-			void setPath(Path* path);
-			void setServiceNumber (int serviceNumber);
+				void setPath(Path* path);
+				void setPathId(uid id);
+				void setServiceNumber (int serviceNumber);
 			//@}
 
 

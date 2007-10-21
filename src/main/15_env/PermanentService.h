@@ -37,13 +37,12 @@ namespace synthese
 		public:
 			PermanentService(Path* path);
 			
-			/** Returns the departure schedule for this service.
-
-			@return If this service is continuous, the first departure schedule
-			(first course) is returned. Otherwise, it is the "normal" 
-			departure schedule.
+			/** Gets a departure schedule for this service.
+				@param rank Rank of the stop where to get the departure schedule.
+				@warning Only a 0 value is allowed for the rank.
+				@return time::Schedule The schedule at the specified stop rank
 			*/
-			virtual time::Schedule getDepartureSchedule () const;
+			virtual time::Schedule getDepartureSchedule(int rank = 0) const;
 
 			virtual bool isContinuous () const;
 

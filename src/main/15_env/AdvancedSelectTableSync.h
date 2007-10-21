@@ -31,6 +31,18 @@ namespace synthese
 	{
 		bool isPlaceServedByCommercialLine(uid Line, uid place);
 		bool isPlaceServedByNetwork(uid networkId, uid place);
+		
+		/** Reads in database the rank of the last departure stop of a route.
+			@param line The ID of the route
+			@return int the rank of the last departure line-stop
+			@author Hugues Romain
+			@date 2007
+			@throw Exception if there is no line stop corresponding to the specified route id. Possible reasons :
+				- the route does not exist
+				- no line-stop are registered for the specified route (database corruption)
+				- no departure line-stop are registered for the specified route (database corruption)
+		*/
+		int getRankOfLastDepartureLineStop(uid line);
 	}
 }
 

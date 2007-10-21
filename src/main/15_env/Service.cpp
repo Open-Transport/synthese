@@ -90,19 +90,10 @@ namespace synthese
 		void Service::setPath( Path* path )
 		{
 			_path = path;
+			setPathId(path->getId());
 			setComplianceParent(path);
 		}
 
-/*		const Schedule& Service::getLastArrivalSchedule() const
-		{
-			return _arrivalSchedule;
-		}
-
-		void Service::setArrivalSchedule( const synthese::time::Schedule& schedule )
-		{
-			_arrivalSchedule = schedule;
-		}
-*/
 		DateTime Service::getOriginDateTime(const Date& departureDate, const Schedule& departureTime) const
 		{
 			DateTime originDateTime(departureDate);
@@ -114,6 +105,16 @@ namespace synthese
 		std::string Service::getTeam() const
 		{
 			return std::string();
+		}
+
+		void Service::setPathId( uid id )
+		{
+			_pathId = id;
+		}
+
+		uid Service::getPathId() const
+		{
+			return _pathId;
 		}
 	}
 }

@@ -162,9 +162,9 @@ namespace synthese
 			_arrivalSchedules = schedules;
 		}
 
-		Schedule ScheduledService::getDepartureSchedule() const
+		Schedule ScheduledService::getDepartureSchedule(int rank) const
 		{
-			return _departureSchedules.at(0);
+			return _departureSchedules.at(rank);
 		}
 
 		Schedule ScheduledService::getDepartureBeginScheduleToIndex( const Edge* edge ) const

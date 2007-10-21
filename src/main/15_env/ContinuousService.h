@@ -111,7 +111,12 @@ namespace synthese
 					, const Edge* edge
 					) const;
 
-				virtual time::Schedule getDepartureSchedule () const;
+				/** Gets a departure schedule for this service.
+					@param rank Rank of the stop where to get the departure schedule
+					@return time::Schedule The first schedule of the continuous range, at the specified stop rank
+				*/
+				virtual time::Schedule getDepartureSchedule(int rank = 0) const;
+
 				virtual const time::Schedule& getLastArrivalSchedule() const;
 
 				virtual time::Schedule getDepartureBeginScheduleToIndex(const Edge* edge) const;

@@ -33,6 +33,7 @@
 #include "15_env/ScheduledService.h"
 #include "15_env/ScheduledServiceTableSync.h"
 #include "15_env/ReservationRule.h"
+#include "15_env/AdvancedSelectTableSync.h"
 
 #include "11_interfaces/ValueElementList.h"
 
@@ -123,13 +124,14 @@ namespace synthese
 			));
 
 			// Download reservations
-			map<ScheduledService*, ServiceReservations> reservations;
+			map<const ScheduledService*, ServiceReservations> reservations;
 			for(vector<shared_ptr<ScheduledService> >::const_iterator it(services.begin()); it != services.end(); ++it)
 			{
-				const ReservationRule* rule((*it)->getReservationRule());
+				const ScheduledService* service(it->get());
+				const ReservationRule* rule(service->getReservationRule());
 				ServiceReservations obj;
 				obj.reservations = ReservationTransactionTableSync::search(
-					it->get()
+					service
 					, listDate
 					, displayCancelled
 				);
@@ -140,13 +142,15 @@ namespace synthese
 					
 				obj.overflow = rule->getCapacity() && (obj.seatsNumber > rule->getCapacity());
 
+				int lastDepartureLineStop(getRankOfLastDepartureLineStop(service->getPathId()));
+
 				obj.status = rule->isReservationPossible(
-					DateTime(listDate, (*it)->getDepartureSchedule())
+					DateTime(listDate, service->getDepartureSchedule())
 					, now
-					, DateTime(listDate, (*it)->getLastDepartureSchedule())
+					, DateTime(listDate, service->getDepartureSchedule(lastDepartureLineStop))
 				);
 				
-				reservations.insert(make_pair(it->get(), obj));
+				reservations.insert(make_pair(service, obj));
 
 			}
 

@@ -100,8 +100,9 @@ namespace synthese
 			return false;
 		}
 
-		Schedule PermanentService::getDepartureSchedule() const
+		Schedule PermanentService::getDepartureSchedule(int rank) const
 		{
+			assert(rank != 0);
 			return Schedule(Hour(TIME_MIN),0);
 		}
 
