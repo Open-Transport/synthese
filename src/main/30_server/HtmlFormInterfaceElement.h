@@ -40,17 +40,19 @@ namespace synthese
 				- 2 : function parameters (query string format) (empty = current fixed parameters)
 				- 3 : action key (optional)
 				- 4 : action parameters (query string format)
+				- 5 and following : fields not to fill with input type=hidden
 		*/
 		class HtmlFormInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, HtmlFormInterfaceElement>
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _name;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _function_key;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _function_parameters;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _action_key;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _action_parameters;
-			bool								_with_action;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>					_name;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>					_function_key;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>					_function_parameters;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>					_action_key;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>					_action_parameters;
+			std::vector<boost::shared_ptr<interfaces::LibraryInterfaceElement> >	_fieldsToAvoid;
+			bool																	_with_action;
 
 		public:
 			/** Parameters parser.

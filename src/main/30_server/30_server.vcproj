@@ -211,6 +211,22 @@
 			Name="11 LibraryInterfaceElement"
 			>
 			<File
+				RelativePath=".\HtmlFormCalendarFieldInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HtmlFormCalendarFieldInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HtmlFormFieldInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HtmlFormFieldInterfaceElement.h"
+				>
+			</File>
+			<File
 				RelativePath=".\HtmlFormInterfaceElement.cpp"
 				>
 			</File>

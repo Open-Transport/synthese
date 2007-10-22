@@ -55,12 +55,15 @@ namespace synthese
 	{
 		void HtmlFormInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			if (vel.size() < 3)
+			if (vel.size() < 1)
 				throw InterfacePageException("Not enough arguments in HTML Form interface element");
 
 			_name = vel.front();
-			_function_key = vel.front();
-			_function_parameters = vel.front();
+			if (!vel.isEmpty())
+			{
+				_function_key = vel.front();
+				_function_parameters = vel.front();
+			}
 			if (!vel.isEmpty())
 			{
 				_with_action = true;
@@ -71,34 +74,40 @@ namespace synthese
 			{
 				_with_action = false;
 			}
+
+			while(!vel.isEmpty())
+				_fieldsToAvoid.push_back(vel.front());
 		}
 
 		string HtmlFormInterfaceElement::display(
 			ostream& stream
 			, const interfaces::ParametersVector& parameters
 			, interfaces::VariablesMap& variables
-			, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
-		{
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/
+		) const	{
 			try
 			{
-				string functionKey(_function_key->getValue(parameters, variables, object, request));
+				string functionKey;
+				if (_function_key.get())
+					functionKey = _function_key->getValue(parameters, variables, object, request);
 				if (functionKey.empty())
 					functionKey = request->_getFunction()->getFactoryKey();
 				string actionKey;
-				if (_action_key)
+				if (_action_key.get())
 					actionKey = _action_key->getValue(parameters, variables, object, request);
 				string actionParameters;
-				if (_action_parameters)
+				if (_action_parameters.get())
 					actionParameters = _action_parameters->getValue(parameters, variables, object, request);
 				string functionParameters;
-				if (_function_parameters)
+				if (_function_parameters.get())
 					functionParameters = _function_parameters->getValue(parameters, variables, object, request);
 				if (functionParameters.empty() && functionKey == request->_getFunction()->getFactoryKey())
 					functionParameters = request->_getFunction()->getFixedParametersMap().getQueryString(true).getContent();
 				
 				stringstream s;
 				s	<< QueryString::PARAMETER_FUNCTION << QueryString::PARAMETER_ASSIGNMENT << functionKey
-					<< QueryString::PARAMETER_SEPARATOR << QueryString::PARAMETER_IP << QueryString::PARAMETER_ASSIGNMENT << "0.0.0.0"
+					<< QueryString::PARAMETER_SEPARATOR << QueryString::PARAMETER_IP << QueryString::PARAMETER_ASSIGNMENT << request->getIP()
 					<< QueryString::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << QueryString::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
 					;
 					
@@ -111,6 +120,8 @@ namespace synthese
 					if (!actionParameters.empty())
 						s << QueryString::PARAMETER_SEPARATOR << actionParameters;
 				}
+				if (request->getSession())
+					s << QueryString::PARAMETER_SEPARATOR << QueryString::PARAMETER_SESSION << QueryString::PARAMETER_ASSIGNMENT << request->getSession()->getKey();
 
 				QueryString q(s.str(), true);
 				Request r(q);
@@ -118,6 +129,13 @@ namespace synthese
 				
 				
 				HTMLForm f(r.getHTMLForm(_name->getValue(parameters, variables, object, request)));
+				
+				for (vector<shared_ptr<LibraryInterfaceElement> >::const_iterator it = _fieldsToAvoid.begin(); it != _fieldsToAvoid.end(); ++it)
+				{
+					string fieldName((*it)->getValue(parameters, variables, object, request));
+					string fieldValue;
+					f.removeHiddenFieldIfExists(fieldName, fieldValue);
+				}
 				stream << f.open();
 				stream << f.getHiddenFields();
 				

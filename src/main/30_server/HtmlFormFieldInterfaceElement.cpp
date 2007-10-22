@@ -1,6 +1,8 @@
 
-/** LoginHtmlField class implementation.
-	@file LoginHtmlField.cpp
+/** HtmlFormFieldInterfaceElement class implementation.
+	@file HtmlFormFieldInterfaceElement.cpp
+	@author Hugues Romain
+	@date 2007
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,42 +22,49 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "LoginHtmlField.h"
+#include "HtmlFormFieldInterfaceElement.h"
 
-#include "30_server/LoginAction.h"
+#include "11_interfaces/ValueElementList.h"
 
 #include "05_html/HTMLForm.h"
 
 using namespace std;
-using namespace boost;
 
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace server;
 	using namespace html;
-
+	
 	namespace util
 	{
-		template<> const string FactorableTemplate<LibraryInterfaceElement, LoginHtmlField>::FACTORY_KEY("loginhtmlfield");
+		template<> const string FactorableTemplate<LibraryInterfaceElement, server::HtmlFormFieldInterfaceElement>::FACTORY_KEY("htmlinput");
 	}
 
 	namespace server
 	{
-		void LoginHtmlField::storeParameters(ValueElementList& vel)
+		void HtmlFormFieldInterfaceElement::storeParameters(ValueElementList& vel)
 		{
+			_name = vel.front();
+			_value = vel.front();
 		}
 
-		string LoginHtmlField::display(
+		string HtmlFormFieldInterfaceElement::display(
 			ostream& stream
-			, const interfaces::ParametersVector& parameters
-			, interfaces::VariablesMap& variables
-			, const void* rootObject /*= NULL*/
-			, const server::Request* request /*= NULL*/ ) const
-		{
-			stream << HTMLForm::GetTextInput(LoginAction::PARAMETER_LOGIN, string());
+			, const ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/
+		) const {
+			string name(_name->getValue(parameters,variables,object,request));
+			string value(_value->getValue(parameters,variables,object,request));
+
+			stream << HTMLForm::GetTextInput(name, value);
+
 			return string();
+		}
+
+		HtmlFormFieldInterfaceElement::~HtmlFormFieldInterfaceElement()
+		{
 		}
 	}
 }
-

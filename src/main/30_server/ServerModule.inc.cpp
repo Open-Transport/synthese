@@ -8,5 +8,7 @@
 #include "30_server/LogoutHTMLLinkInterfaceElement.h"
 #include "30_server/ValidSessionInterfaceElement.h"
 #include "30_server/ObjectIdInterfaceElement.h"
+#include "30_server/HTMLFormCalendarFieldInterfaceElement.h"
+#include "30_server/HTMLFormFieldInterfaceElement.h"
 
 #include "30_server/LoginInterfacePage.h"

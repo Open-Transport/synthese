@@ -47,6 +47,10 @@ namespace synthese
 		class User;
 	}
 
+	namespace time
+	{
+		class Date;
+	}
 
 	namespace resa
 	{
@@ -57,6 +61,8 @@ namespace synthese
 				- 0 : Line ID to search
 				- 1 : Customer ID to search
 				- 2 : Reservation name to search
+				- 3 : date
+				- 4 : Display canceled reservations
 		*/
 		class ReservationsListInterfacePage
 			: public util::FactorableTemplate<interfaces::InterfacePage, ReservationsListInterfacePage>
@@ -65,7 +71,10 @@ namespace synthese
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
-				@param ...	
+				@param line Commercial line on which the reservations belong
+				@param user Customer for which reservations are done
+				@param userName Name of customer for which reservations are done
+				@param date Date of the search
 				@param variables Execution variables
 				@param request Source request
 			*/
@@ -74,6 +83,8 @@ namespace synthese
 				, boost::shared_ptr<const env::CommercialLine> line
 				, boost::shared_ptr<const security::User> user
 				, const std::string& userName
+				, const time::Date& date
+				, bool withCancelledReservations
 				, interfaces::VariablesMap& variables
 				, const server::Request* request = NULL
 			) const;

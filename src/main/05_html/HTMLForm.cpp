@@ -26,7 +26,6 @@
 #include "HTMLForm.h"
 
 #include "04_time/DateTime.h"
-#include "04_time/Date.h"
 
 #include "01_util/Conversion.h"
 
@@ -35,6 +34,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
 
 	namespace html
 	{
@@ -76,7 +76,22 @@ namespace synthese
 			if (!_updateRight)
 				return value;
 
-			_removeHiddenFieldIfExists(name, value);
+			removeHiddenFieldIfExists(name, value);
+
+			return GetTextInput(name, value, displayTextBeforeTyping, _getFieldId(name));
+		}
+
+
+
+		std::string HTMLForm::GetTextInput(
+			const std::string& name
+			, const std::string& value
+			, std::string displayTextBeforeTyping /*= std::string() */
+			, std::string fieldId
+		){
+			if (fieldId.empty())
+				fieldId = name + "__ID";
+
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"text\" "
@@ -84,10 +99,10 @@ namespace synthese
 				<< "value=\"";
 			if (value == "" && displayTextBeforeTyping != "")
 				s	<< displayTextBeforeTyping << "\" "
-					<< "onfocus=\"if(this.value == '" << displayTextBeforeTyping << "') this.value='';\" ";
+				<< "onfocus=\"if(this.value == '" << displayTextBeforeTyping << "') this.value='';\" ";
 			else
 				s << value << "\" ";
-			s	<< "id=\"" << _getFieldId(name) << "\" "
+			s	<< "id=\"" << fieldId << "\" "
 				<< "/>";
 			return s.str();
 		}
@@ -122,7 +137,7 @@ namespace synthese
 			if (!_updateRight)
 				return value;
 
-			_removeHiddenFieldIfExists(name, value);
+			removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<textarea "
 				<< "name=\"" << name << "\" "
@@ -147,7 +162,7 @@ namespace synthese
 			if (!_updateRight)
 				return string();
 
-			_removeHiddenFieldIfExists(name, value);
+			removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"checkbox\" "
@@ -163,7 +178,7 @@ namespace synthese
 			if (!_updateRight)
 				return string();
 		
-			_removeHiddenFieldIfExists(name, value);
+			removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"password\" "
@@ -179,45 +194,64 @@ namespace synthese
 			if (!_updateRight)
 				return value.toString();
 
-			_removeHiddenFieldIfExists(name, value.toString());
+			removeHiddenFieldIfExists(name, value.toString());
 			string fieldId = _getFieldId(name);
 			string spanId = _getFieldId(name + "SPAN");
 			string triggerId = _getFieldId(name + "TRIGGER");
+
+			return GetCalendarInput(name, value, fieldId, triggerId, spanId);
+		}
+
+		std::string HTMLForm::GetCalendarInput(
+			const std::string& name
+			, const time::DateTime& value
+			, std::string fieldId
+			, std::string triggerId
+			, std::string spanId
+		){
+			if (fieldId.empty())
+				fieldId = name + "__FID";
+			if (triggerId.empty())
+				triggerId = name + "__TID";
+			if (spanId.empty())
+				spanId = name + "__SID";
+
 			stringstream s;
 			s	<< "<input "
-					<< "type=\"hidden\" "
-					<< "readonly=\"1\" "
-					<< "name=\"" << name << "\" "
-					<< "id=\"" << fieldId << "\" "
-					<< "value=\"" << (value.isUnknown() ? string() : value.toSQLString(false)) << "\" "
+				<< "type=\"hidden\" "
+				<< "readonly=\"1\" "
+				<< "name=\"" << name << "\" "
+				<< "id=\"" << fieldId << "\" "
+				<< "value=\"" << (value.isUnknown() ? string() : value.toSQLString(false)) << "\" "
 				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
-					<< value.toString()
-					<< "</span>"
-					<< "<img "
-					<< "src=\"calendar_edit.png\" "
-					<< "style=\"cursor:pointer\" "
-					<< "title=\"Date\" "
-					<< "id=\"" << triggerId << "\" "
-					<< "onmouseover=\"this.style.background='red';\" "
-					<< "onmouseout=\"this.style.background=’’;\" "
+				<< value.toString()
+				<< "</span>"
+				<< "<img "
+				<< "src=\"calendar_edit.png\" "
+				<< "style=\"cursor:pointer\" "
+				<< "title=\"Date\" "
+				<< "id=\"" << triggerId << "\" "
+				<< "onmouseover=\"this.style.background='red';\" "
+				<< "onmouseout=\"this.style.background=’’;\" "
 				<< "/>"
 				<< "<script type=\"text/javascript\">"
-					<< "Calendar.setup({"
-					<< "inputField:\"" << fieldId << "\","
-					<< "displayArea:\"" << spanId << "\","
-					<< "button:\"" << triggerId << "\","
-					<< "showsTime : true,"
-					<< "ifFormat :\"%Y-%m-%d %H:%M\","
-					<< "daFormat :\"%e/%m/%Y %H:%M\","
-					<< "electric : false,"
-					<< "singleClick:true,";
+				<< "Calendar.setup({"
+				<< "inputField:\"" << fieldId << "\","
+				<< "displayArea:\"" << spanId << "\","
+				<< "button:\"" << triggerId << "\","
+				<< "showsTime : true,"
+				<< "ifFormat :\"%Y-%m-%d %H:%M\","
+				<< "daFormat :\"%e/%m/%Y %H:%M\","
+				<< "electric : false,"
+				<< "singleClick:true,";
 			if (!value.isUnknown())
 				s << "date:new Date(" << value.getYear() <<","<< value.getMonth() <<","<< value.getDay() <<","<< value.getHours() <<"," << value.getMinutes() <<",0),";
 			s		<< "firstDay:1"
-					<< "});"
+				<< "});"
 				<< "</script>";
-			
+
 			return s.str();
+
 		}
 
 		std::string HTMLForm::getCalendarInput( const std::string& name, const time::Date& value )
@@ -225,44 +259,65 @@ namespace synthese
 			if (!_updateRight)
 				return value.toString();
 
-			_removeHiddenFieldIfExists(name, value.toString());
-			string fieldId = _getFieldId(name);
-			string triggerId = _getFieldId(name + "TRIGGER");
-			string spanId = _getFieldId(name + "SPAN");
+			removeHiddenFieldIfExists(name, value.toString());
+
+			return GetCalendarInput(
+				name
+				, value
+				, _getFieldId(name)
+				, _getFieldId(name + "TRIGGER")
+				, _getFieldId(name + "SPAN")
+			);
+		}
+
+		std::string HTMLForm::GetCalendarInput(
+			const std::string& name
+			, const Date& value
+			, string fieldId
+			, string triggerId
+			, string spanId
+		){
+			if (fieldId.empty())
+				fieldId = name + "__FID";
+			if (triggerId.empty())
+				triggerId = name + "__TID";
+			if (spanId.empty())
+				spanId = name + "__SID";
+
 			stringstream s;
 			s	<< "<input "
-					<< "type=\"hidden\" "
-					<< "readonly=\"1\" "
-					<< "name=\"" << name << "\" "
-					<< "id=\"" << fieldId << "\" "
-					<< "value=\"" << (value.isUnknown() ? "" : value.toSQLString(false)) << "\" "
+				<< "type=\"hidden\" "
+				<< "readonly=\"1\" "
+				<< "name=\"" << name << "\" "
+				<< "id=\"" << fieldId << "\" "
+				<< "value=\"" << (value.isUnknown() ? "" : value.toSQLString(false)) << "\" "
 				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
-					<< value.toString()
-					<< "</span>"
-					<< "<img "
-					<< "src=\"calendar_edit.png\" "
-					<< "style=\"cursor:pointer\" "
-					<< "title=\"Date\" "
-					<< "id=\"" << triggerId << "\" "
-					<< "onmouseover=\"this.style.background='red';\" "
-					<< "onmouseout=\"this.style.background=’’;\" "
+				<< value.toString()
+				<< "</span>"
+				<< "<img "
+				<< "src=\"calendar_edit.png\" "
+				<< "style=\"cursor:pointer\" "
+				<< "title=\"Date\" "
+				<< "id=\"" << triggerId << "\" "
+				<< "onmouseover=\"this.style.background='red';\" "
+				<< "onmouseout=\"this.style.background=’’;\" "
 				<< "/>"
 				<< "<script type=\"text/javascript\">"
-					<< "Calendar.setup({"
-					<< "inputField:\"" << fieldId << "\","
-					<< "displayArea:\"" << spanId << "\","
-					<< "button:\"" << triggerId << "\","
-					<< "showsTime : false,"
-					<< "ifFormat :\"%Y-%m-%d\","
-					<< "daFormat :\"%e/%m/%Y\","
-					<< "electric : false,"
-					<< "singleClick:true,";
+				<< "Calendar.setup({"
+				<< "inputField:\"" << fieldId << "\","
+				<< "displayArea:\"" << spanId << "\","
+				<< "button:\"" << triggerId << "\","
+				<< "showsTime : false,"
+				<< "ifFormat :\"%Y-%m-%d\","
+				<< "daFormat :\"%e/%m/%Y\","
+				<< "electric : false,"
+				<< "singleClick:true,";
 			if (!value.isUnknown())
 				s << "date:new Date(" << value.getYear() <<","<< value.getMonth() <<","<< value.getDay() << "),";
 			s		<< "firstDay:1"
-					<< "});"
+				<< "});"
 				<< "</script>";
-			
+
 			return s.str();
 		}
 
@@ -325,7 +380,7 @@ namespace synthese
 			return s.str();
 		}
 
-		void HTMLForm::_removeHiddenFieldIfExists( const std::string& name, const std::string& value )
+		void HTMLForm::removeHiddenFieldIfExists( const std::string& name, const std::string& value )
 		{
 			HiddenFieldsMap::iterator it = _hiddenFields.find(name);
 			if (it != _hiddenFields.end())

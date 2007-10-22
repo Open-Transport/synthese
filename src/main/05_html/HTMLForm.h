@@ -79,15 +79,18 @@ namespace synthese
 			std::string _getFieldId(const std::string& name, bool increment=true);
 
 
-			/** Removes an hidden field if exists, to avoid to an interactive field to be in conflict with an hiddenone.
+			
+		public:
+
+			/** Removes an hidden field if exists, to avoid to an interactive field to be in conflict with an hidden one.
 				@param name Name of the hidden field to remove
 				@param value Initial value of the field
 				@author Hugues Romain
 				@date 2007
 			*/
-			void _removeHiddenFieldIfExists(const std::string& name, const std::string& value);
+			void removeHiddenFieldIfExists(const std::string& name, const std::string& value);
 
-		public:
+
 
 			/** Update right setter.
 				@param value Value to set
@@ -176,6 +179,14 @@ namespace synthese
 			*/
 			std::string getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping="");
 
+			static std::string GetTextInput(
+				const std::string& name
+				, const std::string& value
+				, std::string displayTextBeforeTyping = std::string()
+				, std::string fieldId = std::string()
+			);
+
+
 			std::string getPasswordInput(const std::string& name, const std::string& value);
 
 			/** Interactive calendar input generator.
@@ -195,6 +206,14 @@ namespace synthese
 			*/
 			std::string getCalendarInput(const std::string& name, const time::DateTime& value);
 
+			static std::string GetCalendarInput(
+				const std::string& name
+				, const time::DateTime& value
+				, std::string fieldId = std::string()
+				, std::string triggerId = std::string()
+				, std::string spanId = std::string()
+			);
+
 			/** Interactive calendar input generator.
 				@param name Name of the field
 				@param value Default value of the calendar
@@ -211,6 +230,14 @@ namespace synthese
 				@endcode
 			*/
 			std::string getCalendarInput(const std::string& name, const time::Date& value);
+
+			static std::string GetCalendarInput(
+				const std::string& name
+				, const time::Date& value
+				, std::string fieldId = std::string()
+				, std::string triggerId = std::string()
+				, std::string spanId = std::string()
+			);
 
 			/** Register of an hidden field.
 				@param name Name of the field

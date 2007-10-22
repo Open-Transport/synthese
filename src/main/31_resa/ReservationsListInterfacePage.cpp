@@ -36,6 +36,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
+	using namespace time;
 
 	namespace util
 	{
@@ -50,6 +51,8 @@ namespace synthese
 			, boost::shared_ptr<const env::CommercialLine> line
 			, boost::shared_ptr<const security::User> user
 			, const std::string& userName
+			, const Date& date
+			, bool withCanceledReservations
 			, VariablesMap& variables
 			, const server::Request* request /*= NULL*/
 		) const	{
@@ -58,6 +61,8 @@ namespace synthese
 			pv.push_back(line.get() ? Conversion::ToString(line->getKey()) : string());
 			pv.push_back(user.get() ? Conversion::ToString(user->getKey()) : string());
 			pv.push_back(userName);
+			pv.push_back(date.toSQLString(false));
+			pv.push_back(Conversion::ToString(withCanceledReservations));
 
 			InterfacePage::display(
 				stream

@@ -149,6 +149,8 @@ namespace synthese
 					, _line
 					, _user
 					, _userName
+					, _startDateTime.getDate()
+					, _displayCancelled
 					, vm
 					, _request
 				);
