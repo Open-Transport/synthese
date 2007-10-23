@@ -25,9 +25,10 @@ class Functions
 	public:
 		// call implicitly by readKey to prepare the filename
 		static string text2Voice(string _text);
+		static bool validateInput(int *_menuKey,int _nMenuKey, int _inputKey);
 		
 		// call directly
-		static int readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int _nMenuKey, int _nKey, string _menu);
+		static int readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int _nMenuKey, int _nKey, string _menu, int tryTime=0);
 		// call directly
 		static int playbackText(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string _msg);
 		

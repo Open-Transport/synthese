@@ -23,7 +23,7 @@ class Login
 		~Login();
 		
 		int start(string _fatalError);
-		SessionReturnType* identifyUser(int _usr, int _psw) throw (int);
+		bool identifyUser() throw (int);
 		
 		SessionReturnType* getSession();
 

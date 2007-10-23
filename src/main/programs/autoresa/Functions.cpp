@@ -16,18 +16,34 @@ string Functions::text2Voice(string _text)
 {
   // file name without extension like au
   string fileName="/usr/share/asterisk/agi-bin/fileName";
-  cout<<"Do voice file: "<<fileName+"au";
+  //cout<<"Do voice file: "<<fileName+"au"<<endl;
   PlaybackAcapela::mainFunc(_text,fileName+".au");
   return fileName;
 }
 
 /*
-this function is to read a keyboard input in max length with background vocal of the text message given
+	 to verify the input validate, called by readKey
+**/
+bool Functions::validateInput(int *_menuKey,int _nMenuKey, int _inputKey)
+{
+	int i=0;
+	while(i<_nMenuKey)
+	{
+		if(_menuKey[i]==_inputKey) return true;
+		else i++;
+	}
+	return false;
+}
+
+/*
+this function is to play a background message, to read the keyboard dtmf input and to return this input as one int
 @parameters:
 	AGI_TOOLS*: agi handle
 	AGI_CMD_RESULT*: agi result handle
+	
 	int*: defined autorised menu key
 	int: how many menu key
+	
 	int: each key size, normally is 1 as 1 touche
 	string: menu text
 @return:
@@ -36,62 +52,26 @@ this function is to read a keyboard input in max length with background vocal of
 		if -1: input incorrect
 		others: correct input
 **/
-int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int _nMenuKey, int _nKey, string _menu)
+int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int _nMenuKey, int _nKey, string _menu, int tryTime=0)
 {
-	char temp[4096];
-	string option;
-	string inputKey;  // take temp like string var
-	int n=0;
-	bool inputCorrect=false;
-	int inputNo;
+	if(tryTime>2) return -1;
 	
+	int inputKey=0;
+	// to play background message
 	string fileName=text2Voice(_menu);
-	
-	if(_menuKey==NULL || _nMenuKey==0)
-	{
-	
-		while( (n<3) && (!inputCorrect) )
-		{
-		
-			sprintf(temp,"usrInput,%s,%d,,1,%d",fileName.c_str(),_nKey,_nKey*5);
-			AGITool_exec(_agi, _res, "Read", temp);
-			if(AGITool_get_variable2(_agi, _res, "usrInput", temp, _nKey)==0)
-			{
-				inputKey=temp;
-				cout<<"inputKey: "<<temp;
 
-				if(inputKey.empty()||inputKey.compare("0"))  // if input #,then return null, so goto manuel
-				{
-					return 0;
-				}
-				
-				istringstream iss(inputKey,istringstream::in);
-				iss >> inputNo;
-				
-				int i=0;
-				while( (inputNo!=_menuKey[i]) && (i<=_nMenuKey) ) i++;
-				if(i<=_nMenuKey)	inputCorrect=true;	// input correct finded in menuKey
-				
-				n++;
-			}
-			else exit(-1);
-		}
-	}
-	else  // no need the key verif
-	{
-		sprintf(temp,"usrInput,%s,%d,,1,%d",fileName.c_str(),_nKey,(int)(_nKey*1.5));
-		AGITool_exec(_agi, _res, "read", temp);
-		AGITool_get_variable2(_agi, _res, "usrInput", temp, sizeof(_nKey));
-		
-		inputKey=temp;
-		istringstream iss(inputKey,istringstream::in);
-		iss >> inputNo;
-		inputCorrect=true;
-	}
+	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),3000*_nKey, _nKey);
+	
+	if((_nKey==1)&&(inputKey==0)) Functions::passToManuel(_agi,_res,"test");
+	
+	if(_nMenuKey==0)
+		return inputKey;
+	else if(validateInput(_menuKey,_nMenuKey,inputKey)) return inputKey;
+		else
+			return readKey(_agi,_res,_menuKey,_nMenuKey,_nKey,_menu,++tryTime);
 
-	if(inputCorrect) return inputNo;
-	else return -1;
 }
+	
 
 /*
 	the function is to play the forground text message vocal
@@ -104,7 +84,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 **/
 int Functions::playbackText(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string _msg)
 {
-	return AGITool_exec(_agi, _res, "Playback", const_cast<char *>(text2Voice(_msg).c_str()));
+	return AGITool_stream_file(_agi, _res, const_cast<char *>(text2Voice(_msg).c_str()), "", 0);
 }
 
 /*
@@ -217,22 +197,5 @@ int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId)
 	fatalError="Warning: custumer pass to ";
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

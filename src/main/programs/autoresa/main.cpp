@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
 	
 	AGITool_answer(&agi, &res);
-	cout<<"main AutoResa";
+	//cout<<"main AutoResa";
 	
 	//int menuKey[]={1,2,3,4,5};
 	//Functions::setLanguage(Functions::readKey(&agi,&res,menuKey,5,1,Functions::getMenu(0,0)));
@@ -44,13 +44,13 @@ int main(int argc, char *argv[])
 	**/
 	switch(state)
 	{
-		case 7: cout<<"jump to FeedbackCst";
+		case 7: //cout<<"jump to FeedbackCst";
 			confirmation->start(Functions::getFatalError(),login->getSession());
 			break;
-		case 8: cout<<"jump to FeedbackDrv";
+		case 8: //cout<<"jump to FeedbackDrv";
 			confirmation->start(Functions::getFatalError(),login->getSession());
 			break;
-		case 9: cout<<"jump to search";
+		case 9: //cout<<"jump to search";
 			do
 			{
 				state=search->start(Functions::getFatalError(),login->getSession());
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 						switch(stateRs)
 						{
 							case 1:
-								cout<<"reservation successful";
+								//cout<<"reservation successful";
 								break;
 							case -1:
 								// do nothing, bcz fatalError faised
@@ -88,11 +88,11 @@ int main(int argc, char *argv[])
 			break;
 			
 		case -1:
-			cout<<"interuption, system stopped";
+			//cout<<"interuption, system stopped";
 			break;
 			
 		default:  //like 0
-			cout<<"jump to operator";
+			//cout<<"jump to operator";
 			Functions::passToManuel(&agi, &res, const_cast<char *>((login->getSession())->callerId.c_str()));
 			break;
 	}
