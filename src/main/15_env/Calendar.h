@@ -17,7 +17,7 @@ namespace synthese
 		/** Calendar.
 			@ingroup m15
 
-			Les services ne circulent pas tous tous les jours. Ils suivent un calendrier de circulation, indiquant les jours où sont effectués des départs de l'origine des services qui le respectent.
+			Les services ne circulent pas tous tous les jours. Ils suivent un calendrier de circulation, indiquant les jours oÃƒÂ¹ sont effectuÃ©s des dÃ©parts de l'origine des services qui le respectent.
 
 			The Calendar class implements the service calendar, holding a bitset representing year days.
 			Each year day can be marked or not.
@@ -26,34 +26,34 @@ namespace synthese
 			marked date. The last bit corresponds to the last date marked.
 
 
-			<h3>Catégorie de calendrier</h3>
+			<h3>CatÃ©gorie de calendrier</h3>
 
 			@todo Reactivate calendar category
 
-			Pour choisir le calendrier le plus simple d’affichage, pour l’édition des renvois d’indicateur par exemple, les calendriers sont rangés par catégorie, selon le format binaire suivant&nbsp;:</p>
+			Pour choisir le calendrier le plus simple d'affichage, pour l'Ã©dition des renvois d'indicateur par exemple, les calendriers sont rangÃ©s par catÃ©gorie, selon le format binaire suivant&nbsp;:</p>
 
 			<table class="tableau">
-			<tr><td colspan="2">Plage de dates</td><td></td><td></td><td>Influence période scolaire</td><td></td><td></td><td>Tout/partiel</td></tr>
+			<tr><td colspan="2">Plage de dates</td><td></td><td></td><td>Influence pÃ©riode scolaire</td><td></td><td></td><td>Tout/partiel</td></tr>
 			<tr><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
 			<tr><td>7</td><td colspan="6"></td><td>0</td></tr>
 			</table>
 
-			On obtient la classification de catégories suivante :
+			On obtient la classification de catÃ©gories suivante :
 			<table class="tableau">
-			<tr><th>Plage de dates</th><th>Influence période scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code décimal</th></tr>
-			<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>00000000</td><td>0</td></tr>
+			<tr><th>Plage de dates</th><th>Influence pÃ©riode scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code dÃ©cimal</th></tr>
+			<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>TotalitÃ© de la pÃ©riode</td><td>00000000</td><td>0</td></tr>
 			<tr><td>Restriction</td><td>00000001</td><td>1</td></tr>
-			<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>00001000</td><td>0</td></tr>
+			<tr><td rowspan="2">Oui</td><td>TotalitÃ© de la pÃ©riode</td><td>00001000</td><td>0</td></tr>
 			<tr><td>Restriction</td><td>00001001</td><td>1</td></tr>
-			<tr><td rowspan="4">Service de transporteur (été, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>01000000</td><td>0</td></tr>
+			<tr><td rowspan="4">Service de transporteur (Ã©tÃ©, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>TotalitÃ© de la pÃ©riode</td><td>01000000</td><td>0</td></tr>
 			<tr><td>Restriction</td><td>01000001</td><td>1</td></tr>
-			<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>01001000</td><td>0</td></tr>
+			<tr><td rowspan="2">Oui</td><td>TotalitÃ© de la pÃ©riode</td><td>01001000</td><td>0</td></tr>
 			<tr><td>Restriction</td><td>01001001</td><td>1</td></tr>
-			<tr><td rowspan="4">Plage restreinte (ski...)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>10000000</td><td>0</td></tr>
+			<tr><td rowspan="4">Plage restreinte (ski...)</td><td rowspan="2">Non</td><td>TotalitÃ© de la pÃ©riode</td><td>10000000</td><td>0</td></tr>
 			<tr><td>Restriction</td><td>10000001</td><td>1</td></tr>
-			<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>10001000</td><td>0</td></tr>
+			<tr><td rowspan="2">Oui</td><td>TotalitÃ© de la pÃ©riode</td><td>10001000</td><td>0</td></tr>
 			<tr><td>Restriction</td><td>10001001</td><td>1</td></tr>
-			<tr><td colspan="3">Autres calendriers (défaut)</td><td>11111111</td><td>255</td></tr>
+			<tr><td colspan="3">Autres calendriers (dÃ©faut)</td><td>11111111</td><td>255</td></tr>
 			</table>
 
 		*/

@@ -26,15 +26,15 @@
 
 @subsubsection defLigneCommerciale Ligne commerciale
 
-Une ligne commerciale est un ensemble de circulations regroupées selon des critères de similitude géographique en général. La ligne commerciale porte l'identification client des services (ex : Ligne 2).
+Une ligne commerciale est un ensemble de circulations regroupÃ©es selon des critÃ¨res de similitude gÃ©ographique en gÃ©nÃ©ral. La ligne commerciale porte l'identification client des services (ex : Ligne 2).
 
 @subsubsection defCirculation Circulation
 
-Les circulations sont identifiées au sein de leur @ref defLigneCommerciale par un code alphanumérique unique de 6 cractères maximum.
+Les circulations sont identifiÃ©es au sein de leur @ref defLigneCommerciale par un code alphanumÃ©rique unique de 6 cractÃ¨res maximum.
 
-@subsubsection defMateriel Matériel roulant
+@subsubsection defMateriel MatÃ©riel roulant
 
-Type de véhicules utilisés par les circulations, faisant intervenir certaines propriétés communes.
+Type de vÃ©hicules utilisÃ©s par les circulations, faisant intervenir certaines propriÃ©tÃ©s communes.
 
 
 
@@ -47,11 +47,11 @@ Type de véhicules utilisés par les circulations, faisant intervenir certaines pr
 
 @subsubsection defLigne Ligne technique
 @copydoc synthese::env::Line
-Les lignes techniques sont implémentées par la classe @ref synthese::15_env::Line.
+Les lignes techniques sont implÃ©mentÃ©es par la classe @ref synthese::15_env::Line.
 
 @subsubsection defAxe Axe
 @copydoc synthese::env::Axis
-Les axes sont implémentés par la classe @ref synthese::15_env::Axis.
+Les axes sont implÃ©mentÃ©s par la classe @ref synthese::15_env::Axis.
 
 @subsubsection defCalendrier Calendrier de circulation
 @copydoc synthese::env::Calendar
@@ -64,15 +64,15 @@ The calendars are implemented by the @ref synthese::15_env::Calendar class.
 
 @subsubsection defRight Habilitation
 @copydoc synthese::security::Right
-La notion d'habilitation est implémentée par la classe @ref synthese::security::Right .
+La notion d'habilitation est implÃ©mentÃ©e par la classe @ref synthese::security::Right .
 
 @subsubsection defUserProfile Profil utilisateur
 @copydoc synthese::security::Profile
-La notion de profil utilisateur est implémentée par la classe @ref synthese::security::Profile .
+La notion de profil utilisateur est implÃ©mentÃ©e par la classe @ref synthese::security::Profile .
 
 @subsubsection defUser Utilisateur
 @copydoc synthese::security::User
-La notion d'utilisateur est implémentée par la classe @ref synthese::security::User .
+La notion d'utilisateur est implÃ©mentÃ©e par la classe @ref synthese::security::User .
 
 
 
@@ -80,7 +80,7 @@ La notion d'utilisateur est implémentée par la classe @ref synthese::security::U
 
 @subsubsection defAdmin Composants d'administration
 @copydoc synthese::interfaces::AdminInterfaceElement
-La notion de composant d'administration est implémentée par des sous-classes de @ref synthese::interfaces::AdminInterfaceElement.
+La notion de composant d'administration est implÃ©mentÃ©e par des sous-classes de @ref synthese::interfaces::AdminInterfaceElement.
 
 @subsubsection defLog Journaux
 @copydoc synthese::interfaces::DBLogViewer
@@ -95,13 +95,13 @@ La notion de composant d'administration est implémentée par des sous-classes de 
 	
 
 
-@page defGeolocalisation Géolocalisation
+@page defGeolocalisation GÃ©olocalisation
 
-La géolocalisation est la fourniture des coordonnées géographiques des objets, permettant de les situer précisément. Le système de coordonnées utilisé dans SYNTHESE est le Lambert II Etendu, valable en France.
+La gÃ©olocalisation est la fourniture des coordonnÃ©es gÃ©ographiques des objets, permettant de les situer prÃ©cisÃ©ment. Le systÃ¨me de coordonnÃ©es utilisÃ© dans SYNTHESE est le Lambert II Etendu, valable en France.
 
-Les géolocalisations sont disponibles d’après les CD CartoExploreur ou d’après la lecture des chiffres bleus situés à l’intérieur des cadres des cartes IGN 1/25000<sup>ème</sup>. En cas d’absence de l’un de ces deux outils pour un point d’arrêt, utiliser l’utilitaire d’importation des coordonnées géographiques moyens des communes (base de données INSEE)</p>
+Les gÃ©olocalisations sont disponibles d'aprÃ¨s les CD CartoExploreur ou d'aprÃ¨s la lecture des chiffres bleus situÃ©s Ã  l'intÃ©rieur des cadres des cartes IGN 1/25000<sup>Ã¨me</sup>. En cas d'absence de l'un de ces deux outils pour un point d'arrÃªt, utiliser l'utilitaire d'importation des coordonnÃ©es gÃ©ographiques moyens des communes (base de donnÃ©es INSEE)</p>
 
-La géolocalisation est implémentée par la classe cPoint.
+La gÃ©olocalisation est implÃ©mentÃ©e par la classe cPoint.
 
 
 
@@ -110,15 +110,15 @@ La géolocalisation est implémentée par la classe cPoint.
 
 Les vitesses maximales interviennent dans l'optimisaion.
 
-Les vitesses maximales sont fabriquées automatiquement dans le programme d’administration. Lancer la procédure et patienter quelques minutes&nbsp;: le fichier <b>.vmax.per</b> est alors écrit. Vérifier à l’intérieur de ce fichier les dépassements de 200 km/h qui sont tous signalés par un message adéquat (<i>Attention, V&gt;200 km/h</i>).
+Les vitesses maximales sont fabriquÃ©es automatiquement dans le programme d'administration. Lancer la procÃ©dure et patienter quelques minutes&nbsp;: le fichier <b>.vmax.per</b> est alors Ã©crit. VÃ©rifier Ã  l'intÃ©rieur de ce fichier les dÃ©passements de 200 km/h qui sont tous signalÃ©s par un message adÃ©quat (<i>Attention, V&gt;200 km/h</i>).
 
-Corriger éventuellement les données correspondant à ces dépassements s’ils sont anormaux.
+Corriger Ã©ventuellement les donnÃ©es correspondant Ã  ces dÃ©passements s'ils sont anormaux.
 
-Les sources d’erreurs les plus fréquentes sont&nbsp;:
-	- Erreur de géolocalisation d’un point d’arrêt (se voit lorsque beaucoup de vitesses supérieures à 200 sont signalées sur un même point d’arrêt)
-	- Erreur d’horaires. (voir le fichier <b>log.txt</b> pour d’éventuelles correspondances avec des dépassements de vitesse de matériel, remarqués au stade du chargement des lignes)
-	- Erreur de code point d’arrêt dans un fichier d’horaires
+Les sources d'erreurs les plus frÃ©quentes sont&nbsp;:
+	- Erreur de gÃ©olocalisation d'un point d'arrÃªt (se voit lorsque beaucoup de vitesses supÃ©rieures Ã  200 sont signalÃ©es sur un mÃªme point d'arrÃªt)
+	- Erreur d'horaires. (voir le fichier <b>log.txt</b> pour d'Ã©ventuelles correspondances avec des dÃ©passements de vitesse de matÃ©riel, remarquÃ©s au stade du chargement des lignes)
+	- Erreur de code point d'arrÃªt dans un fichier d'horaires
 
-Une fois validé le fichier <b>.vmax.per</b>, lancer l’importation dans l’assistant de saisie des données. Les Vmax sont saisies automatiquement dans le fichier des points d’arret, remplaçant ainsi les anciens.
+Une fois validÃ© le fichier <b>.vmax.per</b>, lancer l'importation dans l'assistant de saisie des donnÃ©es. Les Vmax sont saisies automatiquement dans le fichier des points d'arret, remplaÃ§ant ainsi les anciens.
 
 */

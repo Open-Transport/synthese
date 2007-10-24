@@ -1,29 +1,29 @@
-/** @page data Base de données SYNTHESE
+/** @page data Base de donnÃ©es SYNTHESE
 
-Les données devant être entrées dans le serveur sont les suivantes :
+Les donnÃ©es devant Ãªtre entrÃ©es dans le serveur sont les suivantes :
  - fonds de carte bitmap
- - données et tracés de contours des communes
- - données et tracés de lignes, horaires, circulations
- - données sur le réseau routier
- - données et coordonnées des adresses (arrêts, lieux publics, domiciles)
- - modalités diverses d'utilisation des lignes
-Ces données doivent être chargées au démarrage pour pouvoir être utilisées ensuite.
+ - donnÃ©es et tracÃ©s de contours des communes
+ - donnÃ©es et tracÃ©s de lignes, horaires, circulations
+ - donnÃ©es sur le rÃ©seau routier
+ - donnÃ©es et coordonnÃ©es des adresses (arrÃªts, lieux publics, domiciles)
+ - modalitÃ©s diverses d'utilisation des lignes
+Ces donnÃ©es doivent Ãªtre chargÃ©es au dÃ©marrage pour pouvoir Ãªtre utilisÃ©es ensuite.
 
-La fabrication des données au format nécessaire ne fait pas partie du périmètre du serveur de SYNTHESE. 
+La fabrication des donnÃ©es au format nÃ©cessaire ne fait pas partie du pÃ©rimÃ¨tre du serveur de SYNTHESE. 
 
-À titre indicatif, il est prévu que les éléments proviennent des sources suivantes :
- - fonds de cartes géolocalisés, données routières, communes et adresses achetés auprès de sociétés spécialisées et mises à jour sur abonnement
- - données lignes et arrêts exportés depuis le référentiel réseau de manière synchronisée avec SYNTHESE
- - données horaires et calendriers exportés depuis la base de l'exploitant HASTUS
+A titre indicatif, il est prÃ©vu que les Ã©lÃ©ments proviennent des sources suivantes :
+ - fonds de cartes gÃ©olocalisÃ©s, donnÃ©es routiÃ¨res, communes et adresses achetÃ©s auprÃ¨s de sociÃ©tÃ©s spÃ©cialisÃ©es et mises Ã  jour sur abonnement
+ - donnÃ©es lignes et arrÃªts exportÃ©s depuis le rÃ©fÃ©rentiel rÃ©seau de maniÃ¨re synchronisÃ©e avec SYNTHESE
+ - donnÃ©es horaires et calendriers exportÃ©s depuis la base de l'exploitant HASTUS
 
-De manière générale, la synchronisation avec les applications clientes est importante puisqu'un décalage pourrait conduire à des contradictions sur les objets gérés à la fois par les deux applications. Par exemple, si un arrêt de SYNTHESE n'est pas présent dans le serveur de cartographie, il ne pourra alors pas être utilisé puisque ne pouvant pas figurer parmi les résultats de la recherche d'arrêt.
+De maniÃ¨re gÃ©nÃ©rale, la synchronisation avec les applications clientes est importante puisqu'un dÃ©calage pourrait conduire Ã  des contradictions sur les objets gÃ©rÃ©s Ã  la fois par les deux applications. Par exemple, si un arrÃªt de SYNTHESE n'est pas prÃ©sent dans le serveur de cartographie, il ne pourra alors pas Ãªtre utilisÃ© puisque ne pouvant pas figurer parmi les rÃ©sultats de la recherche d'arrÃªt.
 
 	- @subpage base
 	- @subpage fichiers
 
-Par contre, la fonction de @ref uc20 doit pouvoir afficher des données non présentes dans l'alimentation initiale (voir cas d'utilisation @ref uc20)
+Par contre, la fonction de @ref uc20 doit pouvoir afficher des donnÃ©es non prÃ©sentes dans l'alimentation initiale (voir cas d'utilisation @ref uc20)
 	
-@page fichiers Fichiers de données
+@page fichiers Fichiers de donnÃ©es
 
 	- @subpage envi
 	- @subpage interface
@@ -40,9 +40,9 @@ Par contre, la fonction de @ref uc20 doit pouvoir afficher des données non prése
 
 @page base Structure d'une base SYNTHESE : obligations et conseils
 
-@section baseRepertoirePrincipal Répertoire principal
+@section baseRepertoirePrincipal RÃ©pertoire principal
 
-Le répertoire principal désigné en paramètre lors du lancement du serveur doit impérativement contenir les fichiers suivants :
+Le rÃ©pertoire principal dÃ©signÃ© en paramÃ¨tre lors du lancement du serveur doit impÃ©rativement contenir les fichiers suivants :
  - environnements.per
  - interfaces.per
  - formats.per
@@ -51,17 +51,17 @@ Le répertoire principal désigné en paramètre lors du lancement du serveur doit i
  - sites.per
  - databases.per
 
-Les éléments suivants sont disposés à la guise de l'administrateur :
- - fichiers de données d'environnement
- - fichiers de données d'interface
- - fichiers mis à disposition du serveur web pour l'affichage
+Les Ã©lÃ©ments suivants sont disposÃ©s Ã  la guise de l'administrateur :
+ - fichiers de donnÃ©es d'environnement
+ - fichiers de donnÃ©es d'interface
+ - fichiers mis Ã  disposition du serveur web pour l'affichage
 
-Il est conseillé de placer ces fichiers dans des répertoires dédiés, et de les placer dans le répertoire principal :
- - environnements/ -> contient les données d'environnement
- - interfaces/ -> contient les données d'interface
- - fichiers/ -> contient les fichiers à disposition du serveur web. Ce répertoire peut ainsi être mis en alias pour publication directe.
+Il est conseillÃ© de placer ces fichiers dans des rÃ©pertoires dÃ©diÃ©s, et de les placer dans le rÃ©pertoire principal :
+ - environnements/ -> contient les donnÃ©es d'environnement
+ - interfaces/ -> contient les donnÃ©es d'interface
+ - fichiers/ -> contient les fichiers Ã  disposition du serveur web. Ce rÃ©pertoire peut ainsi Ãªtre mis en alias pour publication directe.
 
-Exemple d'arborescence (à compléter) :
+Exemple d'arborescence (Ã  complÃ©ter) :
 
 @code
 /environnements/all/horaires/MP/TLS/index.horaires.per
@@ -80,7 +80,7 @@ Exemple d'arborescence (à compléter) :
 
 @section baseEnvironnements Fichiers d'environnement
 
-Un répertoire d'environnement doit obligatoirement contenir les fichiers suivants :
+Un rÃ©pertoire d'environnement doit obligatoirement contenir les fichiers suivants :
  - horaires.per
  - gares.per
  - resa.per
@@ -92,102 +92,102 @@ Un répertoire d'environnement doit obligatoirement contenir les fichiers suivant
  - materiel.per
  - handicape.per
  
-Il est conseillé que chaque répertoire d'environnement se trouve dans le répertoire environnements/ placé dans le répertoire principal.
+Il est conseillÃ© que chaque rÃ©pertoire d'environnement se trouve dans le rÃ©pertoire environnements/ placÃ© dans le rÃ©pertoire principal.
 
 @subsection baseFichiersHoraires Fichiers d'horaires
 
-Les horaires proprements dits sont stockés dans des fichiers portant l'extension horaires.per, appelés par horaires.per sont placés à la guise de l'administrateur. Il est conseillé d'appliquer la structuration suivante, permettant de retrouver l'arborescence des codes de ligne :
- - la racine des horaires est un répertoire nommé @c /horaires @c dans le répertoire de l'environnement
- - un répertoire par région ensuite, avec fichier index.horaires.per listant les réseaux
- - un répertoire par réseau ensuite, avec fichier index.horaires.per listant les lignes
+Les horaires proprements dits sont stockÃ©s dans des fichiers portant l'extension horaires.per, appelÃ©s par horaires.per sont placÃ©s Ã  la guise de l'administrateur. Il est conseillÃ© d'appliquer la structuration suivante, permettant de retrouver l'arborescence des codes de ligne :
+ - la racine des horaires est un rÃ©pertoire nommÃ© @c /horaires @c dans le rÃ©pertoire de l'environnement
+ - un rÃ©pertoire par rÃ©gion ensuite, avec fichier index.horaires.per listant les rÃ©seaux
+ - un rÃ©pertoire par rÃ©seau ensuite, avec fichier index.horaires.per listant les lignes
  - un fichier par \ref defLigneCommerciale , contenant toutes les \ref defLigne "lignes SYNTHESE".
- - les jonctions sont dans un unique fichier jonctions.horaires.per placé dans le répertoire de l'environnemen
- - le fichier horaires.per liste les régions et le fichier des jonctions
+ - les jonctions sont dans un unique fichier jonctions.horaires.per placÃ© dans le rÃ©pertoire de l'environnemen
+ - le fichier horaires.per liste les rÃ©gions et le fichier des jonctions
  
 @subsection baseFichiersCalendriers Fichiers de calendriers
 
-Les calendriers de circulations sont déclarés dans un fichier unique nommé jours.per présent dans le répertoire de l'environnement.
+Les calendriers de circulations sont dÃ©clarÃ©s dans un fichier unique nommÃ© jours.per prÃ©sent dans le rÃ©pertoire de l'environnement.
 
-La définition jour par jour des calendriers peut être placée dans des fichiers dans le cadre d'une base maintenue manuellement.
-Dans ce cas, les fichiers sont rangés dans le sous-répertoire @a calendriers du répertoire de l'environnement. Ils portent comme nom le numéro du calendrier qu'ils décrivent.
+La dÃ©finition jour par jour des calendriers peut Ãªtre placÃ©e dans des fichiers dans le cadre d'une base maintenue manuellement.
+Dans ce cas, les fichiers sont rangÃ©s dans le sous-rÃ©pertoire @a calendriers du rÃ©pertoire de l'environnement. Ils portent comme nom le numÃ©ro du calendrier qu'ils dÃ©crivent.
 Ex : calendriers/125.jours.per
 
-@subsection baseHoraires Conventions de nommage des fichiers et éléments de description des lignes
+@subsection baseHoraires Conventions de nommage des fichiers et Ã©lÃ©ments de description des lignes
  
-Les noms de répertoires et fichiers suivent les conventions suivantes :
- - régions
-  - code sur 2 caractères - Ex : MP = Midi-Pyrénées
- - réseaux
-  - 3 caractères max
-  - Réseaux départementaux : numéro minéralogique
-  - Réseaux urbains ou locaux : texte distinctif (nom de la ville principale…) Ex : TLS = Toulouse
+Les noms de rÃ©pertoires et fichiers suivent les conventions suivantes :
+ - rÃ©gions
+  - code sur 2 caractÃ¨res - Ex : MP = Midi-PyrÃ©nÃ©es
+ - rÃ©seaux
+  - 3 caractÃ¨res max
+  - RÃ©seaux dÃ©partementaux : numÃ©ro minÃ©ralogique
+  - RÃ©seaux urbains ou locaux : texte distinctif (nom de la ville principale) Ex : TLS = Toulouse
  - lignes :
-  - 6 caractères max
-  - Si ligne numérotée&nbsp;: numéro de ligne
-  - Sinon origine et destination sur 3 caractères chacun, reprenant les mêmes codes de ville que le réseau urbain de la ville le cas échéant (Ex&nbsp;: TLS = Toulouse), sauf si précision supplémentaire (Ex&nbsp;: PAZ = Paris Austerlitz)</p>
+  - 6 caractÃ¨res max
+  - Si ligne numÃ©rotÃ©e&nbsp;: numÃ©ro de ligne
+  - Sinon origine et destination sur 3 caractÃ¨res chacun, reprenant les mÃªmes codes de ville que le rÃ©seau urbain de la ville le cas Ã©chÃ©ant (Ex&nbsp;: TLS = Toulouse), sauf si prÃ©cision supplÃ©mentaire (Ex&nbsp;: PAZ = Paris Austerlitz)</p>
 
-Les \ref defLigne "lignes SYNTHESE" sont désignées de manière universelle par un code unique, débutant par le code de ligne commerciale (Ex&nbsp;: MP/TER/12/1/A)
+Les \ref defLigne "lignes SYNTHESE" sont dÃ©signÃ©es de maniÃ¨re universelle par un code unique, dÃ©butant par le code de ligne commerciale (Ex&nbsp;: MP/TER/12/1/A)
 
-Les \ref defAxe "axes" dont désignés de manière unique à partir des lignes qu’il contient&nbsp;: 
- - les parties communes sont éliminées de droite à gauche, jusqu’à trouver des différences. 
- - Lors de réunion de plusieurs différences, elles sont listées et séparées par des virgules. Ex&nbsp;: MP/TER/12/1,2,3 pour les missions 1, 2, et 3 de la ligne logique MP/TER/12.
- - La longueur du code d'axe n'est pas limitée
+Les \ref defAxe "axes" dont dÃ©signÃ©s de maniÃ¨re unique Ã  partir des lignes qu'il contient&nbsp;: 
+ - les parties communes sont Ã©liminÃ©es de droite Ã  gauche, jusqu'Ã  trouver des diffÃ©rences. 
+ - Lors de rÃ©union de plusieurs diffÃ©rences, elles sont listÃ©es et sÃ©parÃ©es par des virgules. Ex&nbsp;: MP/TER/12/1,2,3 pour les missions 1, 2, et 3 de la ligne logique MP/TER/12.
+ - La longueur du code d'axe n'est pas limitÃ©e
  
-Les identificateurs des \ref defModaliteResa "modalités de réservation", @ref defPointArret "points d'arrêt", @ref defMateriel "matériels roulants" doivent respecter les règles des clés primaires :
- - ils doivent être unique
+Les identificateurs des \ref defModaliteResa "modalitÃ©s de rÃ©servation", @ref defPointArret "points d'arrÃªt", @ref defMateriel "matÃ©riels roulants" doivent respecter les rÃ¨gles des clÃ©s primaires :
+ - ils doivent Ãªtre unique
  - ils ne doivent pas changer au cours du temps.
 
 
 @section baseFichiers Fichiers pour le serveur web
 
-La répartition interne des fichiers du répertoire publié est libre car n'intervenant qu'au niveau des balises HTML disposées dans les fichiers de données d'interface. Il est cependant conseillé d'appliquer une structuration constante, décrite ci-après.
+La rÃ©partition interne des fichiers du rÃ©pertoire publiÃ© est libre car n'intervenant qu'au niveau des balises HTML disposÃ©es dans les fichiers de donnÃ©es d'interface. Il est cependant conseillÃ© d'appliquer une structuration constante, dÃ©crite ci-aprÃ¨s.
 
-@subsection baseFichiersLignes Bibliothèque de fichiers pour lignes
+@subsection baseFichiersLignes BibliothÃ¨que de fichiers pour lignes
 
-Les données propres aux lignes sont rangées dans le dossier <b>fichiers/bl/</b> (Bibliothèque Lignes).
+Les donnÃ©es propres aux lignes sont rangÃ©es dans le dossier <b>fichiers/bl/</b> (BibliothÃ¨que Lignes).
 
-On y trouve des images servant à la fabrication des cartouches. Leur nom est à la fois concis et explicatif&nbsp;:
+On y trouve des images servant Ã  la fabrication des cartouches. Leur nom est Ã  la fois concis et explicatif&nbsp;:
 
-Les premiers caractères du nom servent à identifier la ligne, les suivants le format de l’image&nbsp;:
- - <b>txt</b> indique que l’image est destinée à figurer dans un texte.
- - <b>xxyy</b> indique les dimensions de l’image.
+Les premiers caractÃ¨res du nom servent Ã  identifier la ligne, les suivants le format de l'image&nbsp;:
+ - <b>txt</b> indique que l'image est destinÃ©e Ã  figurer dans un texte.
+ - <b>xxyy</b> indique les dimensions de l'image.
 
-On y trouve également un fichier de feuilles de style contenant les codages des couleurs de lignes&nbsp;: <b>fichiers/bl/couleurs.css</b>.
+On y trouve Ã©galement un fichier de feuilles de style contenant les codages des couleurs de lignes&nbsp;: <b>fichiers/bl/couleurs.css</b>.
 
-@subsection baseFichiersInterfaces Bibliothèque de fichiers pour interfaces
+@subsection baseFichiersInterfaces BibliothÃ¨que de fichiers pour interfaces
 
-Les éléments d’interface graphique de toute nature sont rangés dans le dossier <b>fichiers/bi/x</b> avec <i>x</i>=le numéro de l’interface.
+Les Ã©lÃ©ments d'interface graphique de toute nature sont rangÃ©s dans le dossier <b>fichiers/bi/x</b> avec <i>x</i>=le numÃ©ro de l'interface.
 
 On y trouve en particulier&nbsp;(selon interface):
- - des images nécessaires à l’affichage (<b>*.gif</b> ou <b>*.jpg</b> ou <b>*.png</b>)
+ - des images nÃ©cessaires Ã  l'affichage (<b>*.gif</b> ou <b>*.jpg</b> ou <b>*.png</b>)
  - des feuilles de style (<b>*.css</b>)
  - des fichiers de scripts (<b>*.js</b>)
  - des pages HTML (<b>*.html</b>)
 
-Pour reconnaître aisément les éléments majeurs des interfaces, il est conseillé de suivre les conventions suivantes&nbsp;:
+Pour reconnaÃ®tre aisÃ©ment les Ã©lÃ©ments majeurs des interfaces, il est conseillÃ© de suivre les conventions suivantes&nbsp;:
  - La feuille de style principale doit se nommer <b>main.css</b>.
- - Le fichier de scripts de contrôle du formulaire doit se nommer <b>form.js</b>.
- - Le fichier de scripts assurant l’interactivité de la fiche horaire doit se nommer <b>fichehoraire.js</b>.
- - L’image représentant la flèche vers le bas (parcours à pied) doit se nommer <b>fl-pied.gif</b>.
- - L’image représentant l’action fermer doit se nommer <b>bt-close.gif</b>.
- - L’image représentant l’action retour doit se nommer <b>bt-retour.gif</b>.
- - Plus généralement, les boutons doivent commencer par <b>bt-</b>.
- - Rappel&nbsp;: l’image représentant la marche à pied doit se nommer <b>/bi/x/m/m12.png</b>. (matériel n°12)
- - Les images représentant les matériels roulant doivent se nommer <b>mx.png</b> avec <i>x</i>=le numéro du matériel (format <b>PNG</b> de préférence)
+ - Le fichier de scripts de contrÃ´le du formulaire doit se nommer <b>form.js</b>.
+ - Le fichier de scripts assurant l'interactivitÃ© de la fiche horaire doit se nommer <b>fichehoraire.js</b>.
+ - L'image reprÃ©sentant la flÃ¨che vers le bas (parcours Ã  pied) doit se nommer <b>fl-pied.gif</b>.
+ - L'image reprÃ©sentant l'action fermer doit se nommer <b>bt-close.gif</b>.
+ - L'image reprÃ©sentant l'action retour doit se nommer <b>bt-retour.gif</b>.
+ - Plus gÃ©nÃ©ralement, les boutons doivent commencer par <b>bt-</b>.
+ - Rappel&nbsp;: l'image reprÃ©sentant la marche Ã  pied doit se nommer <b>/bi/x/m/m12.png</b>. (matÃ©riel nÂ°12)
+ - Les images reprÃ©sentant les matÃ©riels roulant doivent se nommer <b>mx.png</b> avec <i>x</i>=le numÃ©ro du matÃ©riel (format <b>PNG</b> de prÃ©fÃ©rence)
 
-Enfin, d’autres fichiers complémentaires à ces fonctions doivent être clairement identifiables.
+Enfin, d'autres fichiers complÃ©mentaires Ã  ces fonctions doivent Ãªtre clairement identifiables.
 
-Pour éviter le désorde, les fichiers doivent être classés dans des répertoires par types de fichiers&nbsp;:
- - <b>/bi/x/m</b> pour les images matériel
+Pour Ã©viter le dÃ©sorde, les fichiers doivent Ãªtre classÃ©s dans des rÃ©pertoires par types de fichiers&nbsp;:
+ - <b>/bi/x/m</b> pour les images matÃ©riel
  - <b>/bi/x/css</b> pour les feuilles de style
  - <b>/bi/x/js</b> pour les fichiers de scripts
  - <b>/bi/x/img</b> pour les autres images
 
-@subsection baseFichiersPhotos Photographies d'arrêts
+@subsection baseFichiersPhotos Photographies d'arrÃªts
 
-Les photos d’arrêt doivent être rangées dans le répertoire <b>/ph</b>.
+Les photos d'arrÃªt doivent Ãªtre rangÃ©es dans le rÃ©pertoire <b>/ph</b>.
 
-Elles doivent être nommées <b>Pxxxxxx-y</b> avec <i>xxxxxx</i>=le numéro du point d’arrêt avec x rempli de 0 si nécessaire, pour garantir que l’ordre alphabétique est le même que l’ordre numérique, et <i>y</i> un sous numéro de photo pour garantir l’unicité du nom.
+Elles doivent Ãªtre nommÃ©es <b>Pxxxxxx-y</b> avec <i>xxxxxx</i>=le numÃ©ro du point d'arrÃªt avec x rempli de 0 si nÃ©cessaire, pour garantir que l'ordre alphabÃ©tique est le mÃªme que l'ordre numÃ©rique, et <i>y</i> un sous numÃ©ro de photo pour garantir l'unicitÃ© du nom.
 
 Les images sont dans la mesure du possible au format <b>JPEG</b>.
 
@@ -197,61 +197,61 @@ Les images sont dans la mesure du possible au format <b>JPEG</b>.
 @section horincl Inclusion de fichiers
 @copydoc HORAIRESFORMATLIGNELien 
 
-@section hordecl Déclarations d'objets
+@section hordecl DÃ©clarations d'objets
 @subsection hordeclaxe Axes
 @copydoc HORAIRESFORMATLIGNEAxe 
 
 @subsection hordecllignes Lignes
 @copydoc HORAIRESFORMATLIGNELigne 
 
-@section hordescr Propriétés des lignes
+@section hordescr PropriÃ©tÃ©s des lignes
 @subsection hordescraff Affichage
 @copydoc HORAIRESFORMATLIGNECartouche 
 @copydoc HORAIRESFORMATLIGNEImage
-<p class="attention">Au moins un des deux libellés CAR ou IMG doit être fourni.</p>
+<p class="attention">Au moins un des deux libellÃ©s CAR ou IMG doit Ãªtre fourni.</p>
 @copydoc HORAIRESFORMATLIGNELibelleComplet
 @copydoc HORAIRESFORMATLIGNEStyle 
 
-@subsection hordescrautre Autres propriétés
+@subsection hordescrautre Autres propriÃ©tÃ©s
 @copydoc HORAIRESFORMATLIGNEMateriel 
 @copydoc HORAIRESFORMATLIGNEReseau
 @copydoc HORAIRESFORMATLIGNEGirouette
 
 
-@page gar Fichiers de poins d'arrêt
+@page gar Fichiers de poins d'arrÃªt
 
-@section gardec Déclaration
+@section gardec DÃ©claration
 @copydoc PAFORMATLIGNEPointArret
 
 @section garalloc Commande obligatoire d'allocation
 @copydoc PAFORMATLIGNENombreQuais
 
-@section garegps Géolocalisation du point d'arrêt
-Les points d’arrêt peuvent être @ref defGeolocalisation "géolocalisés" de deux manières :
-	- Une géolocalisation moyenne pour le point d’arrêt
-	- Une géolocalisation par quais. L’arrêt sera ensuite automatiquement géolocalisé aux coordonnées moyens de ceux des quais
+@section garegps GÃ©olocalisation du point d'arrÃªt
+Les points d'arrÃªt peuvent Ãªtre @ref defGeolocalisation "gÃ©olocalisÃ©s" de deux maniÃ¨res :
+	- Une gÃ©olocalisation moyenne pour le point d'arrÃªt
+	- Une gÃ©olocalisation par quais. L'arrÃªt sera ensuite automatiquement gÃ©olocalisÃ© aux coordonnÃ©es moyens de ceux des quais
 
 @copydoc PAFORMATLIGNEGpsx
 @copydoc PAFORMATLIGNEGpsy	
 
-Le programme fonctionne en l’absence de géolocalisation d’un ou plusieurs points d’arrêt, mais ses performances sont alors altérées, en raison de la désactivation de certaines optimisations basées sur cette information.
+Le programme fonctionne en l'absence de gÃ©olocalisation d'un ou plusieurs points d'arrÃªt, mais ses performances sont alors altÃ©rÃ©es, en raison de la dÃ©sactivation de certaines optimisations basÃ©es sur cette information.
 
-Il est donc conseillé de terminer complètement la géolocalisation de l’ensemble des points d’arrêt avant toute mise à jour des données.
+Il est donc conseillÃ© de terminer complÃ¨tement la gÃ©olocalisation de l'ensemble des points d'arrÃªt avant toute mise Ã  jour des donnÃ©es.
 
-@section garedes Désignation de point d'arrêt
+@section garedes DÃ©signation de point d'arrÃªt
 @copydoc PAFORMATLIGNEDescription
 
-Au moins une désignation par point d’arrêt est requise.
+Au moins une dÃ©signation par point d'arrÃªt est requise.
 
-Les désignations supplémentaires ne servent qu’à assister l’utilisateur pour trouver un point d’arrêt. Seule la première désignation du point d’arrêt est «&nbsp;officielle&nbsp;». Attention donc à ce que cette désignation soit la bonne, car c’est elle qui situe le point d’arrêt dans sa commune, et qui définit l’affichage du nom du point d’arrêt dans toutes les fonctions d’affichage.
+Les dÃ©signations supplÃ©mentaires ne servent qu'Ã  assister l'utilisateur pour trouver un point d'arrÃªt. Seule la premiÃ¨re dÃ©signation du point d'arrÃªt est &nbsp;officielle&nbsp;. Attention donc Ã  ce que cette dÃ©signation soit la bonne, car c'est elle qui situe le point d'arrÃªt dans sa commune, et qui dÃ©finit l'affichage du nom du point d'arrÃªt dans toutes les fonctions d'affichage.
 
-@section garevmax Vitesses maximales (désactivé)
+@section garevmax Vitesses maximales (dÃ©sactivÃ©)
 @copydoc PAFORMATLIGNEVMax
 
 @section garequais Quais
 @copydoc PAFORMATLIGNEQuai
 
-Les déclarations des quais doivent nécessairement être précédées par la commande d’allocation @c NQ.
+Les dÃ©clarations des quais doivent nÃ©cessairement Ãªtre prÃ©cÃ©dÃ©es par la commande d'allocation @c NQ.
 
 @section garephotos Photos
 @copydoc PAFORMATLIGNENombrePhotos
@@ -269,12 +269,12 @@ Les déclarations des quais doivent nécessairement être précédées par la commande
 @section calobl Commande d'allocation obligatoire
 @copydoc JCFORMATLIGNEService
 
-@section calcal Déclarations
+@section calcal DÃ©clarations
 @copydoc JCFORMATLIGNECalendrier
 @copydoc JCFORMATLIGNECategorie
 
 @section calremp Remplissage des calendriers
-Le remplissage des calendriers s'effectue par scripts. L'ordre des commandes est donc important : elles construisent petit à petit le calendrier.
+Le remplissage des calendriers s'effectue par scripts. L'ordre des commandes est donc important : elles construisent petit Ã  petit le calendrier.
 @copydoc JCFORMATLIGNEAjoutDate
 @copydoc JCFORMATLIGNESuppressionDate
 @copydoc JCFORMATLIGNEAjoutCalendrier
@@ -292,42 +292,42 @@ Le remplissage des calendriers s'effectue par scripts. L'ordre des commandes est
 
 a
 
-@page dat Fichiers de base de données
+@page dat Fichiers de base de donnÃ©es
 
 a
 
-@page tdg Fichiers de définition de tableaux de départs
+@page tdg Fichiers de dÃ©finition de tableaux de dÃ©parts
 
 a
 
-@page ind Fichiers de définition d'indicateurs horaires papier
+@page ind Fichiers de dÃ©finition d'indicateurs horaires papier
 
 a
 
-@page direnv Répertoire de fichiers de description d'environnement
+@page direnv RÃ©pertoire de fichiers de description d'environnement
 
-@section direnvrep Structure du répertoire
+@section direnvrep Structure du rÃ©pertoire
 
-La description des environnements se fait par l'utilisation de balises XML désignant des objets d'environnement, pouvant être disposés dans des répertoires. La disposition est à la liberté de l'administrateur, mais doit cependant respecter les critères suivants :
- - Les fichiers peuvent être lus dans un ordre quelconque dans un même répertoire
- - La référence à un objet n'est possible que si celui-ci a été déclaré dans un répertoire parent
+La description des environnements se fait par l'utilisation de balises XML dÃ©signant des objets d'environnement, pouvant Ãªtre disposÃ©s dans des rÃ©pertoires. La disposition est Ã  la libertÃ© de l'administrateur, mais doit cependant respecter les critÃ¨res suivants :
+ - Les fichiers peuvent Ãªtre lus dans un ordre quelconque dans un mÃªme rÃ©pertoire
+ - La rÃ©fÃ©rence Ã  un objet n'est possible que si celui-ci a Ã©tÃ© dÃ©clarÃ© dans un rÃ©pertoire parent
  
 @section direnvfic Format des fichiers
 
 @subsection direnvficcom Communes
 @copydoc XML_ENV_COMMUNE
 
-@subsection direnvficarret Arrêts
+@subsection direnvficarret ArrÃªts
 
 @subsection direnvficcal Calendriers
 
-@subsection direnvficmatos Matériel roulant
+@subsection direnvficmatos MatÃ©riel roulant
 
-@subsection direnvficresa Modalités de réservation
+@subsection direnvficresa ModalitÃ©s de rÃ©servation
 
-@subsection direnvficvelo Modalités de prise en charge des vélos
+@subsection direnvficvelo ModalitÃ©s de prise en charge des vÃ©los
 
-@subsection direnvfichand Modalités de prise en charge des handicapés
+@subsection direnvfichand ModalitÃ©s de prise en charge des handicapÃ©s
 
 @subsection direnvficlignes Axes/Lignes/Services
 

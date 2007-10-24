@@ -1,8 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 
 <fichier_environnement name="environnement.xml" description="Exemple complet de fichier d'environnement">
 
-/* Essai de commentaire */
 <arret_logique id="1" type="correspondance" x="24562147" y="13245621">
 	<arret_physique rang="1" nom="quai bus" x="24562148" y="13246521"/>
 	<arret_physique rang="2" nom="quai train" x="24562149" y="13246546"/>

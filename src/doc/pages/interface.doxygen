@@ -9,14 +9,14 @@
 
 @page fint Fichiers d'interfaces
 
-@section intdecl Déclaration
+@section intdecl DÃ©claration
 @copydoc INTERFACESFORMATLIGNEInterface
 
-@section intDefinition Définition du rendu
+@section intDefinition DÃ©finition du rendu
 @copydoc INTERFACESFORMATLIGNEElement
 @copydoc INTERFACESFORMATLIGNEParametre
 
-@section intparam Paramètres de fonctionnement
+@section intparam ParamÃ¨tres de fonctionnement
 @copydoc INTERFACESFORMATLIGNEPeriode
 
 @section intdico Dictionnaire
@@ -25,7 +25,7 @@
 @copydoc INTERFACESFORMATLIGNEPrefixeAlerte
 
 
-@page feint Fichiers d'éléments d'interface
+@page feint Fichiers d'Ã©lÃ©ments d'interface
 
 @section feintdes Production de contenu
 @copydoc ELEMENTSINTERFACEFORMATLIGNETexte
@@ -42,7 +42,7 @@
 
 @page eint Pages standard d'interface
 
-@section eintref Référence
+@section eintref RÃ©fÃ©rence
 @copydoc INTERFACEEnTete
 @copydoc INTERFACEPied
 @copydoc INTERFACEFormulaireEntree
@@ -78,8 +78,8 @@
 @copydoc INTERFACECaseParticularite
 
 
-@page oint Objets d'interface de la bibliothèque
-@section ointref Référence
+@page oint Objets d'interface de la bibliothÃ¨que
+@section ointref RÃ©fÃ©rence
 @subsection ointreffh Fiche horaire
 @copydoc ELEMENTINTERFACEFicheHoraire
 @copydoc EI_OBJETDYNAMIQUE_ListeLignesTrajets
@@ -90,7 +90,7 @@
 @copydoc EI_BIBLIOTHEQUE_Trajet_Duree
 @copydoc EI_BIBLIOTHEQUE_Cases_Particularites
 
-@subsection ointreftdg Tableaux de départs
+@subsection ointreftdg Tableaux de dÃ©parts
 @copydoc ELEMENTINTERFACETbDepGare
 @copydoc ELEMENTINTERFACETbDep
 @copydoc ELEMENTINTERFACEMiniTbDepGare
@@ -100,7 +100,7 @@
 @copydoc EI_BIBLIOTHEQUE_DescriptionPassage_Quai
 @copydoc EI_BIBLIOTHEQUE_DescriptionPassage_Heure
 
-@subsection ointreffa Fiche arrêt
+@subsection ointreffa Fiche arrÃªt
 @copydoc ELEMENTINTERFACELieuArret
 @copydoc ELEMENTINTERFACELienPhotosQuais
 @copydoc ELEMENTINTERFACELienAutresPhotos
@@ -110,7 +110,7 @@
 @copydoc ELEMENTINTERFACEDivServices
 @copydoc ELEMENTINTERFACEFicheArretScript
 
-@subsection ointrefresa Réservation
+@subsection ointrefresa RÃ©servation
 @copydoc ELEMENTINTERFACEChampsReservation
 
 @subsection ointrefecr Ecrans de dialogue
@@ -122,7 +122,7 @@
 @copydoc EI_BIBLIOTHEQUE_Date	
 @copydoc EI_BIBLIOTHEQUE_Interface_PrefixeAlerte
 
-@subsection ointrefobj Propriétés d'objets
+@subsection ointrefobj PropriÃ©tÃ©s d'objets
 @copydoc ELEMENTINTERFACENomCommune
 @copydoc EI_BIBLIOTHEQUE_Ligne_Destination
 
@@ -134,9 +134,9 @@
 
 
 
-@page aint Attributs d'objets de données accessibles depuis l'interface
+@page aint Attributs d'objets de donnÃ©es accessibles depuis l'interface
 
-@section aintpa Points d'arrêts
+@section aintpa Points d'arrÃªts
 @copydoc EI_ATTRIBUT_PointArret_Nom
 @copydoc EI_ATTRIBUT_PointArret_NomCommune
 
@@ -151,165 +151,165 @@
 	- @subpage intlumiplan
 	- @subpage intvelec
 
-@page intweb Exemple d'interface web : le démonstrateur RCS
+@page intweb Exemple d'interface web : le dÃ©monstrateur RCS
 
-A détailler
+A dÃ©tailler
 
-@page intlumiplan Exemple d'interface Lumiplan page entière
+@page intlumiplan Exemple d'interface Lumiplan page entiÃ¨re
 
-Cet exemple ne concerne que les tableaux de départs.
+Cet exemple ne concerne que les tableaux de dÃ©parts.
 
-A remplir à l'aide du guide lumiplan à lier en pdf
+A remplir Ã  l'aide du guide lumiplan Ã  lier en pdf
 
 @page intvelec Exemple d'interface Velec
 
-Cet exemple ne concerne que les tableaux de départs.
+Cet exemple ne concerne que les tableaux de dÃ©parts.
 
-A remplir à l'aide du guide velec à lier en pdf
-
-
+A remplir Ã  l'aide du guide velec Ã  lier en pdf
 
 
 
 
 
-@page intpoubelle Vieille page interface à vider
+
+
+@page intpoubelle Vieille page interface Ã  vider
 
 \section InterfaceArchitecture Architecture
 
-L'application SYNTHESE produit des résultats de calculs avancés fonctions des données présentes dans sa base. Les résultats de calculs sont systématiquement fournis à travers le <b>module d'interface</b>, chargé de les mettre en forme avant de les envoyer sur la sortie désirée.
+L'application SYNTHESE produit des rÃ©sultats de calculs avancÃ©s fonctions des donnÃ©es prÃ©sentes dans sa base. Les rÃ©sultats de calculs sont systÃ©matiquement fournis Ã  travers le <b>module d'interface</b>, chargÃ© de les mettre en forme avant de les envoyer sur la sortie dÃ©sirÃ©e.
 
-Identiquement, un seul point d'entrée est disponible pour demander des calculs : la classe SYNTHESE elle-même est l'unique entité proposant de telles fonctionnalités, à travers ses \ref InterfaceMethodesInteractivite , décrites dans le présent document.
+Identiquement, un seul point d'entrÃ©e est disponible pour demander des calculs : la classe SYNTHESE elle-mÃªme est l'unique entitÃ© proposant de telles fonctionnalitÃ©s, Ã  travers ses \ref InterfaceMethodesInteractivite , dÃ©crites dans le prÃ©sent document.
 
 \subsection InterfaceArchitectureInterface Architecture du module d'interface
 
-Au niveau fonctionnel, le module d'interface est défini par des objets.
+Au niveau fonctionnel, le module d'interface est dÃ©fini par des objets.
 
-Chaque méthode d'interactivité lance le calcul des résultats demandés, puis déclenche le module d'interface en lui fournissant les résultats produits. Lors de l'appel à ce module, la classe cInterface est sollicitée, via la méthode cInterface::Affiche(), en spécifiant quelle représentation des résultats doit être faite.
+Chaque mÃ©thode d'interactivitÃ© lance le calcul des rÃ©sultats demandÃ©s, puis dÃ©clenche le module d'interface en lui fournissant les rÃ©sultats produits. Lors de l'appel Ã  ce module, la classe cInterface est sollicitÃ©e, via la mÃ©thode cInterface::Affiche(), en spÃ©cifiant quelle reprÃ©sentation des rÃ©sultats doit Ãªtre faite.
 
-Les représentation possibles pour les résultats sont décrites dans des \ref InterfaceObjetsStandard .
+Les reprÃ©sentation possibles pour les rÃ©sultats sont dÃ©crites dans des \ref InterfaceObjetsStandard .
  
-\section InterfaceMethodesInteractivite Méthodes d'interactivité
+\section InterfaceMethodesInteractivite MÃ©thodes d'interactivitÃ©
 
-\subsection InterfaceMethodesInteractivite Validation des entrées du formulaire de recherche d'itinéraire : ValidFH
+\subsection InterfaceMethodesInteractivite Validation des entrÃ©es du formulaire de recherche d'itinÃ©raire : ValidFH
 
 \copydoc SYNTHESE::ValidFH()
 
 
-Les descriptions des objets de sortie sont codées par listes chaînées d'éléments de plusieurs types. Un polymorphisme permet de masquer ces variations aux classes faisant appel aux interfaces.
+Les descriptions des objets de sortie sont codÃ©es par listes chaÃ®nÃ©es d'Ã©lÃ©ments de plusieurs types. Un polymorphisme permet de masquer ces variations aux classes faisant appel aux interfaces.
 
-Les types d'éléments sont différenciés pour permettre leur conception à deux stades différents&nbsp;: les éléments statiques sont entièrement définis lors de la création de l'interface (charte graphique), alors que les éléments dynamiques dépendent de données (résultats de calculs) et sont préparés lors de la création de l'interface, pour être finalisés lors de l'exécution.
+Les types d'Ã©lÃ©ments sont diffÃ©renciÃ©s pour permettre leur conception Ã  deux stades diffÃ©rents&nbsp;: les Ã©lÃ©ments statiques sont entiÃ¨rement dÃ©finis lors de la crÃ©ation de l'interface (charte graphique), alors que les Ã©lÃ©ments dynamiques dÃ©pendent de donnÃ©es (rÃ©sultats de calculs) et sont prÃ©parÃ©s lors de la crÃ©ation de l'interface, pour Ãªtre finalisÃ©s lors de l'exÃ©cution.
 
-Les objets statiques sont codés directement dans les éléments d’interface, par le texte à envoyer au client. Les objets dynamiques sont de deux types&nbsp;:
-	- Les paramètres dynamiques, fournis lors de l’exécution,
-	- Les objets dynamiques par défaut, définis dans le code source dans la fonction <b>AfficheObjetDynamique</b>.
+Les objets statiques sont codÃ©s directement dans les Ã©lÃ©ments d'interface, par le texte Ã  envoyer au client. Les objets dynamiques sont de deux types&nbsp;:
+	- Les paramÃ¨tres dynamiques, fournis lors de l'exÃ©cution,
+	- Les objets dynamiques par dÃ©faut, dÃ©finis dans le code source dans la fonction <b>AfficheObjetDynamique</b>.
 
-Pour l’affichage, les objets disposent de tous les paramètres fournis, ainsi que d’un pointeur vers l’environnement, donnant par les index l’accès à tous les objets.
+Pour l'affichage, les objets disposent de tous les paramÃ¨tres fournis, ainsi que d'un pointeur vers l'environnement, donnant par les index l'accÃ¨s Ã  tous les objets.
 
 <h2>Description des classes</h2>
 
 <h3>Classe cInterface</h3>
 
-La classe cInterface est donc constituée de&nbsp;:
+La classe cInterface est donc constituÃ©e de&nbsp;:
 	- <b>ExtensionFichier&nbsp;</b>: extension du fichier de sortie (texte)
-	- <b>Elements&nbsp;</b>: Tableau des premiers éléments de la liste chaînée, de longueur égale au nombre d’éléments fixé par convention dans Parametres.h.
+	- <b>Elements&nbsp;</b>: Tableau des premiers Ã©lÃ©ments de la liste chaÃ®nÃ©e, de longueur Ã©gale au nombre d'Ã©lÃ©ments fixÃ© par convention dans Parametres.h.
 
-Le nombre d’éléments est stocké dans la constante INTERFACESNOMBREELEMENTS à mettre à jour à chaque ajout d’élément.
+Le nombre d'Ã©lÃ©ments est stockÃ© dans la constante INTERFACESNOMBREELEMENTS Ã  mettre Ã  jour Ã  chaque ajout d'Ã©lÃ©ment.
 
 <h3>Classe cElementInterface</h3>
 
-Les éléments d’interface sont de plusieurs types. Un
-polymorphisme permet de masquer cette diversité. La classe cElementInterface ne
-contient à la base que le pointeur <b>Suivant </b>qui permet le chaînage, et
-une méthode virtuelle <b>Affiche(Flux de sortie, Paramètres)</b> permettant
-dans tous les cas l’affichage.
+Les Ã©lÃ©ments d'interface sont de plusieurs types. Un
+polymorphisme permet de masquer cette diversitÃ©. La classe cElementInterface ne
+contient Ã  la base que le pointeur <b>Suivant </b>qui permet le chaÃ®nage, et
+une mÃ©thode virtuelle <b>Affiche(Flux de sortie, ParamÃ¨tres)</b> permettant
+dans tous les cas l'affichage.
 
-La méthode ElementRang permet l’accès au nième élément d’une liste cElementInterface.
+La mÃ©thode ElementRang permet l'accÃ¨s au niÃ¨me Ã©lÃ©ment d'une liste cElementInterface.
 
-<h3>Classe dérivée cElementInterfaceStatique</h3>
+<h3>Classe dÃ©rivÃ©e cElementInterfaceStatique</h3>
 
-La classe cElementInterfaceStatique dérivée de cElementInterface est la plus simple&nbsp;: elle contient le texte à afficher.
+La classe cElementInterfaceStatique dÃ©rivÃ©e de cElementInterface est la plus simple&nbsp;: elle contient le texte Ã  afficher.
 
-La classe cElementInterfaceStatique est donc constituée de&nbsp;:
+La classe cElementInterfaceStatique est donc constituÃ©e de&nbsp;:
 	- Texte
 
-La méthode <b>Affiche</b> consiste en le simple envoi du
-texte au flux de sortie, indépendamment des paramètres fournis.
+La mÃ©thode <b>Affiche</b> consiste en le simple envoi du
+texte au flux de sortie, indÃ©pendamment des paramÃ¨tres fournis.
 
-<h3>Classe dérivée cElementInterfaceParametreDynamique</h3>
+<h3>Classe dÃ©rivÃ©e cElementInterfaceParametreDynamique</h3>
 
-<p class=MsoNormal>La classe cElementInterfaceParametreDynamique dérivée de
-cElementInterface contient un numéro de paramètre à lire lors de l’exécution.
+<p class=MsoNormal>La classe cElementInterfaceParametreDynamique dÃ©rivÃ©e de
+cElementInterface contient un numÃ©ro de paramÃ¨tre Ã  lire lors de l'exÃ©cution.
 
-La classe cElementInterfaceParametreDynamique est donc constituée de&nbsp;:
-	- Code paramètre
+La classe cElementInterfaceParametreDynamique est donc constituÃ©e de&nbsp;:
+	- Code paramÃ¨tre
 
-La méthode <b>Affiche</b> consiste en l’appel de cette
-dernière sur le paramètre fourni en entrée de rang <b>Code paramètre</b>. Ce
-paramètre doit, lors de l’exécution, être un cElementInterfaceStatique.
+La mÃ©thode <b>Affiche</b> consiste en l'appel de cette
+derniÃ¨re sur le paramÃ¨tre fourni en entrÃ©e de rang <b>Code paramÃ¨tre</b>. Ce
+paramÃ¨tre doit, lors de l'exÃ©cution, Ãªtre un cElementInterfaceStatique.
 
-<h3>Classe dérivée cElementInterfaceObjetDynamique</h3>
+<h3>Classe dÃ©rivÃ©e cElementInterfaceObjetDynamique</h3>
 
-La classe cElementInterfaceObjetDynamique dérivée de
-cElementInterface contient un numéro d’objet à construire lors de l’exécution,
-à partir de paramètres statiques ou dynamiques.
+La classe cElementInterfaceObjetDynamique dÃ©rivÃ©e de
+cElementInterface contient un numÃ©ro d'objet Ã  construire lors de l'exÃ©cution,
+Ã  partir de paramÃ¨tres statiques ou dynamiques.
 
-La classe cElementInterfaceObjetDynamique est donc constituée de&nbsp;:
+La classe cElementInterfaceObjetDynamique est donc constituÃ©e de&nbsp;:
 	- <b>Code objet</b> qui respecte la nomenclature fournie plus loin
-	- <b>Parametres</b> qui contient la définition des paramètres
-d’entrée de l’objet, définis plus loin. Ces paramètres sont de type
-cElementInterface et peuvent être soit des éléments statiques, soit des
-paramètres dynamiques (qui seront donc lus au moment de l’exécution de la méthode Affiche)
+	- <b>Parametres</b> qui contient la dÃ©finition des paramÃ¨tres
+d'entrÃ©e de l'objet, dÃ©finis plus loin. Ces paramÃ¨tres sont de type
+cElementInterface et peuvent Ãªtre soit des Ã©lÃ©ments statiques, soit des
+paramÃ¨tres dynamiques (qui seront donc lus au moment de l'exÃ©cution de la mÃ©thode Affiche)
 
 <h2>Construction des objets</h2>
 
-La construction d’une interface se fait par la juxtaposition
-des cElementInterface au fur et à mesure de la lecture des données mémoire
-morte, à l’aide d’une fonction par type de construction, gérant le chaînage, et
-retournant un pointeur vers le dernier élément créé&nbsp;:
-	- <b>Ajoute(char*)&nbsp;</b>: chargée de l’ajout d’un objet
+La construction d'une interface se fait par la juxtaposition
+des cElementInterface au fur et Ã  mesure de la lecture des donnÃ©es mÃ©moire
+morte, Ã  l'aide d'une fonction par type de construction, gÃ©rant le chaÃ®nage, et
+retournant un pointeur vers le dernier Ã©lÃ©ment crÃ©Ã©&nbsp;:
+	- <b>Ajoute(char*)&nbsp;</b>: chargÃ©e de l'ajout d'un objet
 statique simple (texte)
-	- Ajoute(cElementInterface* Paramètres,
-tNumeroParametreInterface NumeroParametre)&nbsp;</b>: chargée de l’ajout d’un
-paramètre. L’élément créé est dynamique si le paramètre indiqué par
-NumeroParamètre l’est, et est statique sinon.
-	- <b>AjouteObjet(Code de l’objet)&nbsp;</b>: chargée de l’ajout
-d’un objet. La création de la sortie se fait au moment de la lecture de
-l’interface et non de son chargement.
-	- <b>AjouteAutreElement(cElementInterface*</b>)&nbsp;: chargée de
-l’inclusion d’un objet de sortie <u>déjà défini</u>.
+	- Ajoute(cElementInterface* ParamÃ¨tres,
+tNumeroParametreInterface NumeroParametre)&nbsp;</b>: chargÃ©e de l'ajout d'un
+paramÃ¨tre. L'Ã©lÃ©ment crÃ©Ã© est dynamique si le paramÃ¨tre indiquÃ© par
+NumeroParamÃ¨tre l'est, et est statique sinon.
+	- <b>AjouteObjet(Code de l'objet)&nbsp;</b>: chargÃ©e de l'ajout
+d'un objet. La crÃ©ation de la sortie se fait au moment de la lecture de
+l'interface et non de son chargement.
+	- <b>AjouteAutreElement(cElementInterface*</b>)&nbsp;: chargÃ©e de
+l'inclusion d'un objet de sortie <u>dÃ©jÃ  dÃ©fini</u>.
 
-<b>NB&nbsp;: La déclaration des éléments se fait dans un
-ordre quelconque. De ce fait, ordonner les déclarations de manière à ce que
-chaque inclusion fasse appel à un élément déjà défini. Dans le cas d’une
-tentative d’inclusion d’un élément non défini, l’inclusion est ignorée (voir
+<b>NB&nbsp;: La dÃ©claration des Ã©lÃ©ments se fait dans un
+ordre quelconque. De ce fait, ordonner les dÃ©clarations de maniÃ¨re Ã  ce que
+chaque inclusion fasse appel Ã  un Ã©lÃ©ment dÃ©jÃ  dÃ©fini. Dans le cas d'une
+tentative d'inclusion d'un Ã©lÃ©ment non dÃ©fini, l'inclusion est ignorÃ©e (voir
 erreur 04002)</b>
 
-Pour les deux dernières fonctions, des paramètres sont
-passés lors de l’inclusion pour personnaliser la sortie. Ces paramètres sont fournis en tant que chaîne de caractères, séparés par des espaces
-et sous la forme P## pour faire référence à un paramètre de l’objet demandant
-l’inclusion, ou bien {##} pour fournir directement leur contenu. Une fonction
-spéciale lit le nième paramètre depuis une telle chaîne de caractères, et
-fonctionne selon le même principe que les quatre précédentes&nbsp;:
+Pour les deux derniÃ¨res fonctions, des paramÃ¨tres sont
+passÃ©s lors de l'inclusion pour personnaliser la sortie. Ces paramÃ¨tres sont fournis en tant que chaÃ®ne de caractÃ¨res, sÃ©parÃ©s par des espaces
+et sous la forme P## pour faire rÃ©fÃ©rence Ã  un paramÃ¨tre de l'objet demandant
+l'inclusion, ou bien {##} pour fournir directement leur contenu. Une fonction
+spÃ©ciale lit le niÃ¨me paramÃ¨tre depuis une telle chaÃ®ne de caractÃ¨res, et
+fonctionne selon le mÃªme principe que les quatre prÃ©cÃ©dentes&nbsp;:
 	- ListeParametres(char*).
 
 
 
 \section InterfaceObjetsStandard Objets standard
 
-Les objets standard sont des objets d'interface définis comme suit :
- - La définition de leur modèle d'affichage est effectuée au niveau de la base de données
- - La fabrication des résultats et effectuée à l'éxécution en fonction :
-  - d'une liste chaînée d'éléments paramètres
-  - d'un pointeur vers le résultat à afficher
-  - d'un pointeur vers l'environnement ayant servi à la fabrication du résultat
+Les objets standard sont des objets d'interface dÃ©finis comme suit :
+ - La dÃ©finition de leur modÃ¨le d'affichage est effectuÃ©e au niveau de la base de donnÃ©es
+ - La fabrication des rÃ©sultats et effectuÃ©e Ã  l'Ã©xÃ©cution en fonction :
+  - d'une liste chaÃ®nÃ©e d'Ã©lÃ©ments paramÃ¨tres
+  - d'un pointeur vers le rÃ©sultat Ã  afficher
+  - d'un pointeur vers l'environnement ayant servi Ã  la fabrication du rÃ©sultat
 
-En règle générale, les méthodes d'interactivité de SYNTHESE déclenchent l'affichage de l'un des objets standard pour afficher le résultat.
+En rÃ¨gle gÃ©nÃ©rale, les mÃ©thodes d'interactivitÃ© de SYNTHESE dÃ©clenchent l'affichage de l'un des objets standard pour afficher le rÃ©sultat.
 
-Ce paragraphe contient une liste des objets standard, fournissant les éléments suivants :
- - Spécification de la liste chaînée des paramètres à fournir pour l'affichage
- - Spécification de l'objet résultat à fournir
- - Conseil de rédaction d'un modèle d'affichage HTML pour l'objet
+Ce paragraphe contient une liste des objets standard, fournissant les Ã©lÃ©ments suivants :
+ - SpÃ©cification de la liste chaÃ®nÃ©e des paramÃ¨tres Ã  fournir pour l'affichage
+ - SpÃ©cification de l'objet rÃ©sultat Ã  fournir
+ - Conseil de rÃ©daction d'un modÃ¨le d'affichage HTML pour l'objet
 
 
 
@@ -324,19 +324,19 @@ Ce paragraphe contient une liste des objets standard, fournissant les éléments s
 
 \section IHM Interface homme machine
 
-\subsection IHMElementsFonctionnels Eléments fonctionnels 
+\subsection IHMElementsFonctionnels ElÃ©ments fonctionnels 
 
-\subsubsection IHMFiltreHandicape Filtre handicapés
+\subsubsection IHMFiltreHandicape Filtre handicapÃ©s
 
-Le filtre handicapés est une fonctionnalité permettant à l'utilisateur de spécifier que la recherche d'itinéraires ne doit prendre en compte que les services ouverts au transport des handicapés.
+Le filtre handicapÃ©s est une fonctionnalitÃ© permettant Ã  l'utilisateur de spÃ©cifier que la recherche d'itinÃ©raires ne doit prendre en compte que les services ouverts au transport des handicapÃ©s.
 
-En cas d'activation de ce filtre, l'interface peut afficher le nombre de places disponibles dans les véhicules. Cet élément est en général affiché dans la feuille de route.
+En cas d'activation de ce filtre, l'interface peut afficher le nombre de places disponibles dans les vÃ©hicules. Cet Ã©lÃ©ment est en gÃ©nÃ©ral affichÃ© dans la feuille de route.
 
-\subsubsection IHMFiltreVelo Filtre vélos
+\subsubsection IHMFiltreVelo Filtre vÃ©los
 
-Le filtre vélos est une fonctionnalité permettant à l'utilisateur de spécifier que la recherche d'itinéraires ne doit prendre encompte que les services ouverts au transport des vélos.
+Le filtre vÃ©los est une fonctionnalitÃ© permettant Ã  l'utilisateur de spÃ©cifier que la recherche d'itinÃ©raires ne doit prendre encompte que les services ouverts au transport des vÃ©los.
 
-En cas d'activation de ce filtre, l'interface peut afficher le nombre de places disponibles dans les véhicules. Cet élément est en général affiché dans la feuille de route.
+En cas d'activation de ce filtre, l'interface peut afficher le nombre de places disponibles dans les vÃ©hicules. Cet Ã©lÃ©ment est en gÃ©nÃ©ral affichÃ© dans la feuille de route.
 
 
 

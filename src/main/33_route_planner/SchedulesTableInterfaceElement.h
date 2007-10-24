@@ -65,10 +65,10 @@ namespace synthese
 				);
 			
 			/** Insertion d'un arrêt de passage dans la liste des arrêts d'une fiche horaire.
-				@param ArretLogique Arrêt à insérer
-				@param Position Position minimale à donner à l'arrêt
+				@param ArretLogique Arrêt Ã  insérer
+				@param Position Position minimale Ã  donner Ã  l'arrêt
 
-				L'insertion décale les arrêts suivants une ligne plus bas. Si un trajet piéton (représenté par deux flèches devant être attenantes) se trouve à la position demandée, alors l'arrêt est placé en suivant pour ne pas rompre le cheminement piéton.
+				L'insertion décale les arrêts suivants une ligne plus bas. Si un trajet piéton (représenté par deux flÃšches devant être attenantes) se trouve Ã  la position demandée, alors l'arrêt est placé en suivant pour ne pas rompre le cheminement piéton.
 			*/
 			static int OrdrePAInsere(
 				PlaceList&
@@ -78,7 +78,7 @@ namespace synthese
 				, bool isLockedAtTheEnd
 			);
 			
-			/** Contrôle de la compatibilité entre l'ordre des arrêts dans la grille horaire et les arrêts du trajet. */
+			/** ContrÃŽle de la compatibilité entre l'ordre des arrêts dans la grille horaire et les arrêts du trajet. */
 			static std::vector<bool> OrdrePAConstruitLignesAPermuter(
 				const PlaceList&
 				, const env::Journey& __TrajetATester

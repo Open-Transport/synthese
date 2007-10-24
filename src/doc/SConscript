@@ -1,11 +1,17 @@
-import os
 
-os.system ('doxygen Doxyfile.doxyfile')
 
-#source = 'Doxyfile.doxyfile'
-#target = ['html/index.html']
 
-#Command(target, source, 'doxygen $SOURCES')
+Import ('rootenv')
+
+docenv = rootenv.Copy()
+
+
+
+doxyfile = File ('Doxyfile.doxyfile').srcnode()
+print doxyfile.abspath
+
+docenv.Doxygen(doxyfile.abspath)
+
 
 
 

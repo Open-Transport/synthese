@@ -8,13 +8,13 @@
 	- @subpage uc7
 	- @subpage uc9
 
-@page uc0 0 Données et administration
+@page uc0 0 DonnÃ©es et administration
 
 	- @subpage uc01
 	- @subpage uc02
 	- @subpage uc03
 	
-@page uc1 1 Validation d'entrées utilisateur
+@page uc1 1 Validation d'entrÃ©es utilisateur
 
 	- @subpage uc11
 	- @subpage uc12
@@ -23,13 +23,13 @@
 	- @subpage uc15
 	- @subpage uc16
 
-@page uc1 2 Recherche d'itinéraires
+@page uc1 2 Recherche d'itinÃ©raires
 
 	- @subpage uc21
 	- @subpage uc22
 	- @subpage uc23
 	
-@page uc3 3 Information aux arrêts
+@page uc3 3 Information aux arrÃªts
 
 	- @subpage uc31
 	- @subpage uc32
@@ -37,38 +37,38 @@
 	- @subpage uc34
 	- @subpage uc35
 	
-@page uc5 5 Etats et accès à la base
+@page uc5 5 Etats et accÃ¨s Ã  la base
 
-	- @subpage uc51 51 Génération d'indicateurs papier
-	- @subpage uc52 52 Traçage de carte de lignes (avec possibilité d'apport de tracés supplémentaires)
-	- @subpage uc53 53 Accès à la commune d'un point géographique
+	- @subpage uc51 51 GÃ©nÃ©ration d'indicateurs papier
+	- @subpage uc52 52 TraÃ§age de carte de lignes (avec possibilitÃ© d'apport de tracÃ©s supplÃ©mentaires)
+	- @subpage uc53 53 AccÃ¨s Ã  la commune d'un point gÃ©ographique
 	- @subpage uc54
 	- @subpage uc55
 	- @subpage uc56
 
-@page uc6 6 Médias
+@page uc6 6 MÃ©dias
 
 	- @subpage uc61
 	- @ref m72
 	- @subpage uc63
 
-@page uc7 7 Réservation
+@page uc7 7 RÃ©servation
 
-	- @subpage uc71 71 Contrôle de places disponibles d'un service
-	- @subpage uc72 72 Prise de réservation
-	- @subpage uc73 73 Annulation de réservation
-	- @subpage uc74 74 Recherche de réservation
-	- @subpage uc75 75 Liste de réservations par service
-	- @subpage uc76 76 Envoi de rapport de réservation par e-mail
-	- @subpage uc77 77 Export de la liste des réservations
+	- @subpage uc71 71 ContrÃ´le de places disponibles d'un service
+	- @subpage uc72 72 Prise de rÃ©servation
+	- @subpage uc73 73 Annulation de rÃ©servation
+	- @subpage uc74 74 Recherche de rÃ©servation
+	- @subpage uc75 75 Liste de rÃ©servations par service
+	- @subpage uc76 76 Envoi de rapport de rÃ©servation par e-mail
+	- @subpage uc77 77 Export de la liste des rÃ©servations
 	
 @page uc9 9 Profils utilisateurs
 
-	- @subpage uc91 91 Création d'un profil utilisateur
+	- @subpage uc91 91 CrÃ©ation d'un profil utilisateur
 	- @ref synthese::interface::ProfileAdmin
 	- @subpage uc93 93 Connexion en tant que profil
-	- @subpage uc94 94 Déconnexion en tant que profil
-	- @subpage uc95 95 Edition des requêtes favorites
+	- @subpage uc94 94 DÃ©connexion en tant que profil
+	- @subpage uc95 95 Edition des requÃªtes favorites
 
 
 
@@ -80,27 +80,27 @@
 
 
 
-@page uc01 01 Entrées fichier
+@page uc01 01 EntrÃ©es fichier
 
-Les données peuvent être chargées par un "dump" de fichier, contenant toutes les catégories d'informations :
-	- modalités de réservation
+Les donnÃ©es peuvent Ãªtre chargÃ©es par un "dump" de fichier, contenant toutes les catÃ©gories d'informations :
+	- modalitÃ©s de rÃ©servation
 	- tarifications
-	- matériels roulants
+	- matÃ©riels roulants
 	- calendriers
-	- points d'arrêt
+	- points d'arrÃªt
 	- lignes, horaires, services continus
 	- interfaces
-	- tableaux de départs/arrivées
+	- tableaux de dÃ©parts/arrivÃ©es
 	- sites, environnements
-	- messages de situations perturbées
+	- messages de situations perturbÃ©es
 etc.
 	
 
 
 
-@page uc02 02 Entrées temps réel
+@page uc02 02 EntrÃ©es temps rÃ©el
 
-Les données suivantes peuvent être modifiées en temps réel :
+Les donnÃ©es suivantes peuvent Ãªtre modifiÃ©es en temps rÃ©el :
 	- @subpage uc021
 	- @subpage uc022
 	- @subpage uc023
@@ -108,101 +108,101 @@ Les données suivantes peuvent être modifiées en temps réel :
 
 
 
-@page uc022 Saisie temps réel de messages d'alerte
+@page uc022 Saisie temps rÃ©el de messages d'alerte
 
-Ecran réservé aux utilisateur ayant le droit d'accès (voir @ref uc9), permettant l'entrée de messages d'alerte (voir @ref uc54) :
-	- sélection de la destination du message : 
+Ecran rÃ©servÃ© aux utilisateur ayant le droit d'accÃ¨s (voir @ref uc9), permettant l'entrÃ©e de messages d'alerte (voir @ref uc54) :
+	- sÃ©lection de la destination du message : 
 		- choix de ligne
-		- choix d'arrêt logique pour tous dispositifs installés
-		- choix d'arrêt logique pour écrans concernant plusieurs quais
-		- choix d'arrêt physique pour tout écrans le concernant (généraux + spécifiques)
-		- choix d'arrêt physique pour écran ne concernant que ce quai
+		- choix d'arrÃªt logique pour tous dispositifs installÃ©s
+		- choix d'arrÃªt logique pour Ã©crans concernant plusieurs quais
+		- choix d'arrÃªt physique pour tout Ã©crans le concernant (gÃ©nÃ©raux + spÃ©cifiques)
+		- choix d'arrÃªt physique pour Ã©cran ne concernant que ce quai
 		- choix d'afficheur
 	- remplissage du contenu du message
 	
-Le résultat de l'entrée temps réel d'un message est le suivant :
-	- prise en compte immédiate par impact sur mémoire vive
-	- journalisation sur fichier pour conservation en cas de redémarrage du serveur
+Le rÃ©sultat de l'entrÃ©e temps rÃ©el d'un message est le suivant :
+	- prise en compte immÃ©diate par impact sur mÃ©moire vive
+	- journalisation sur fichier pour conservation en cas de redÃ©marrage du serveur
 
 
 
 
-@page uc03 03 Activation/désactivation de ligne en temps réel
+@page uc03 03 Activation/dÃ©sactivation de ligne en temps rÃ©el
 	
 	- choix de ligne
 	- destinataire (web, afficheurs, web+afficheurs)
-	- bouton activer ou désactiver
+	- bouton activer ou dÃ©sactiver
 
-Le résultat de l'entrée temps réel d'une activation/désactivation de ligne est le suivant :
-	- prise en compte immédiate par impact sur mémoire vive
-	- journalisation sur fichier pour conservation en cas de redémarrage du serveur
-
-
-
-
-@page uc11 11 Recherche de commune à partir de texte
-
-Cette fonctionnalité consiste en la recherche de communes dont le nom est susceptible de correspondre au texte entré en paramètre.
-
-Deux cas se présentent : 
- - soit une commune peut être choisie sans ambiguité, elle est alors retournée seule
- - soit plusieurs communes répondent à la demande sans possibilité de départager avec certitude, la liste est alors retournée dans l'ordre décroissant de probabilité de choix
-
-L'ambiguité et plus généralement le score de probabilité de choix sont évalués selon la formule suivante :
+Le rÃ©sultat de l'entrÃ©e temps rÃ©el d'une activation/dÃ©sactivation de ligne est le suivant :
+	- prise en compte immÃ©diate par impact sur mÃ©moire vive
+	- journalisation sur fichier pour conservation en cas de redÃ©marrage du serveur
 
 
 
 
-@page uc12 Recherche d'adresse (arrêt, lieu public, domicile) dans une commune spécifiée, à partir de texte
+@page uc11 11 Recherche de commune Ã  partir de texte
 
-La recherche se fait sur les noms d'adresse uniquement et sur le territoire communal spécifié uniquement
+Cette fonctionnalitÃ© consiste en la recherche de communes dont le nom est susceptible de correspondre au texte entrÃ© en paramÃ¨tre.
 
-Deux cas se présentent : 
- - soit un arrêt peut être choisi sans ambiguité, il est alors retourné seul
- - soit plusieurs arrêts répondent à la demande sans possibilité de départager avec certitude, la liste est alors retournée dans l'ordre décroissant de probabilité de choix
+Deux cas se prÃ©sentent : 
+ - soit une commune peut Ãªtre choisie sans ambiguitÃ©, elle est alors retournÃ©e seule
+ - soit plusieurs communes rÃ©pondent Ã  la demande sans possibilitÃ© de dÃ©partager avec certitude, la liste est alors retournÃ©e dans l'ordre dÃ©croissant de probabilitÃ© de choix
 
-L'ambiguité et plus généralement le score de probabilité de choix sont évalués selon la formule suivante :
+L'ambiguitÃ© et plus gÃ©nÃ©ralement le score de probabilitÃ© de choix sont Ã©valuÃ©s selon la formule suivante :
 
-@page uc13 13 Recherche d'adresse (arrêt, lieu public, domicile) à partir de deux textes : un pour la commune, un pour l'arret
+
+
+
+@page uc12 Recherche d'adresse (arrÃªt, lieu public, domicile) dans une commune spÃ©cifiÃ©e, Ã  partir de texte
+
+La recherche se fait sur les noms d'adresse uniquement et sur le territoire communal spÃ©cifiÃ© uniquement
+
+Deux cas se prÃ©sentent : 
+ - soit un arrÃªt peut Ãªtre choisi sans ambiguitÃ©, il est alors retournÃ© seul
+ - soit plusieurs arrÃªts rÃ©pondent Ã  la demande sans possibilitÃ© de dÃ©partager avec certitude, la liste est alors retournÃ©e dans l'ordre dÃ©croissant de probabilitÃ© de choix
+
+L'ambiguitÃ© et plus gÃ©nÃ©ralement le score de probabilitÃ© de choix sont Ã©valuÃ©s selon la formule suivante :
+
+@page uc13 13 Recherche d'adresse (arrÃªt, lieu public, domicile) Ã  partir de deux textes : un pour la commune, un pour l'arret
 
 La recherche se fait en deux temps :
  - recherche de communes sur le premier texte (fonction @ref uc11 )
- - recherche d'adresse sur chaque commune retournée (fonction @ref uc12 )
+ - recherche d'adresse sur chaque commune retournÃ©e (fonction @ref uc12 )
 
-@page uc14 14 Recherche d'adresse (arrêt, lieu public, domicile) à partir d'un texte unique
+@page uc14 14 Recherche d'adresse (arrÃªt, lieu public, domicile) Ã  partir d'un texte unique
 
-(abandonné pour l'instant)
+(abandonnÃ© pour l'instant)
 
-@page uc15 15 Recherche d'arrêts à partir d'une adresse avec trajet routier
+@page uc15 15 Recherche d'arrÃªts Ã  partir d'une adresse avec trajet routier
 
-Cette fonctionnalité consiste en la détermination de l'ensemble des points d'arrêt accessibles en un temps maximal fixé avec le descriptif du trajet d'approche à effectuer à pied, à partir des éléments suivants :
- - voirie : on ne suit que des cheminements réels
- - limites de communes : permet de déterminer la commune du point géographique, ainsi que le parcours le plus court pour pénétrer aux communes proches dans le but d'y trouver un éventuel arrêt tout lieux.
+Cette fonctionnalitÃ© consiste en la dÃ©termination de l'ensemble des points d'arrÃªt accessibles en un temps maximal fixÃ© avec le descriptif du trajet d'approche Ã  effectuer Ã  pied, Ã  partir des Ã©lÃ©ments suivants :
+ - voirie : on ne suit que des cheminements rÃ©els
+ - limites de communes : permet de dÃ©terminer la commune du point gÃ©ographique, ainsi que le parcours le plus court pour pÃ©nÃ©trer aux communes proches dans le but d'y trouver un Ã©ventuel arrÃªt tout lieux.
 
 @image html uc35-source.png
 @image latex uc35-source.png "" width=14cm
 
 Le processus complet est le suivant, avec application sur l'exemple ci-dessus :
-	- Etape 1 : Lecture de la commune du point géographique (module @ref m03), et extraction du « Tous lieux » de la commune s'il existe :
-		<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+	- Etape 1 : Lecture de la commune du point gÃ©ographique (module @ref m03), et extraction du Â« Tous lieux Â» de la commune s'il existe :
+		<center><table class="tableau"><tr><th>Point d'arrÃªt</th><th>DurÃ©e</th></tr>
 		<tr><td>PA 6</td><td>0</td></tr>
 		</table></center>
 
-	- Etape 2 : Calcul d'approche vers des communes proches (module @ref m40), et extraction de « Tous lieux » des communes s'ils existent :
-		<center><table class="Tableau"><tr><th>Communes</th><th>Point d'arrêt</th><th>Durée</th></tr>
+	- Etape 2 : Calcul d'approche vers des communes proches (module @ref m40), et extraction de Â« Tous lieux Â» des communes s'ils existent :
+		<center><table class="Tableau"><tr><th>Communes</th><th>Point d'arrÃªt</th><th>DurÃ©e</th></tr>
 		<tr><td>A</td><td>PA 4</td><td>7</td></tr>	
 		<tr><td>B</td><td>PA 5</td><td>5</td></tr>
 		</table></center>
 
-	- Etape 3 : Calcul d'approche vers des points d'arrêt proches (module @ref m40) :
-		<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+	- Etape 3 : Calcul d'approche vers des points d'arrÃªt proches (module @ref m40) :
+		<center><table class="tableau"><tr><th>Point d'arrÃªt</th><th>DurÃ©e</th></tr>
 		<tr><td>PA 1</td><td>8</td></tr>
 		<tr><td>PA 2</td><td>12</td></tr>
 		</table></center>
 
-L'objet final construit est donc le suivant, incluant les descriptions de trajet représentées sur le schéma en suivant :
+L'objet final construit est donc le suivant, incluant les descriptions de trajet reprÃ©sentÃ©es sur le schÃ©ma en suivant :
 	
-	<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+	<center><table class="tableau"><tr><th>Point d'arrÃªt</th><th>DurÃ©e</th></tr>
 	<tr><td>PA 1</td><td>8</td></tr>
 	<tr><td>PA 2</td><td>12</td></tr>
 	<tr><td>PA 4</td><td>7</td></tr>
@@ -214,13 +214,13 @@ L'objet final construit est donc le suivant, incluant les descriptions de trajet
 @image latex uc35-resultat.png "" width=14cm
 
 Remarques :
-Le point d'arrêt PA 3 a été ignoré car il n'est pas accessible malgré sa proximité à vol d'oiseau
-Les désignations de référence des points d'arrêts PA 1 et PA 2 n'ont pas besoin d'être copiées, puisque la distance vers les communes A et B est forcément plus courte
+Le point d'arrÃªt PA 3 a Ã©tÃ© ignorÃ© car il n'est pas accessible malgrÃ© sa proximitÃ© Ã  vol d'oiseau
+Les dÃ©signations de rÃ©fÃ©rence des points d'arrÃªts PA 1 et PA 2 n'ont pas besoin d'Ãªtre copiÃ©es, puisque la distance vers les communes A et B est forcÃ©ment plus courte
 
 
-@page uc16 16 Sélection d'une adresse sur carte
+@page uc16 16 SÃ©lection d'une adresse sur carte
 
-L'adresse sélectionnée est ensuite envoyée à @ref uc15.
+L'adresse sÃ©lectionnÃ©e est ensuite envoyÃ©e Ã  @ref uc15.
 
 @page uc21 21 Fiche horaire
 
@@ -230,65 +230,65 @@ L'adresse sélectionnée est ensuite envoyée à @ref uc15.
 
 @page uc31 31 Tableaux de gare
 
-@page uc32 32 Tableau d'affichage journée
+@page uc32 32 Tableau d'affichage journÃ©e
 
 @page uc33 33 Tableau d'affichage miniature pour site web
 
-@page uc34 34 Fiche arrêt avec photos
+@page uc34 34 Fiche arrÃªt avec photos
 
 @page uc35 35 Cartographie de voisinage
 
 
 @page uc54 54 Messages d'alerte
 
-Données :
-	- date de début
+DonnÃ©es :
+	- date de dÃ©but
 	- date de fin
 	- texte court
 	- texte long
-	- priorité (information/complémentaire, alerte/prioritaire)
+	- prioritÃ© (information/complÃ©mentaire, alerte/prioritaire)
 	- destination (web, afficheurs, web+afficheurs)
 
 @page uc55 55 Liste des messages d'alerte en cours
 
 Liste de tous les messages d'alerte, avec leur statut :
-	- provenance (fichier/temps réel)
-	- priorité
+	- provenance (fichier/temps rÃ©el)
+	- prioritÃ©
 	- destination
 	- lien vers page de modification (voir @ref uc54)
 	
-@page uc56 56 Liste des tableaux de départ
+@page uc56 56 Liste des tableaux de dÃ©part
 
-Liste complète des tableaux présents, avec pour chaque tableau un lien vers son rendu :
+Liste complÃ¨te des tableaux prÃ©sents, avec pour chaque tableau un lien vers son rendu :
 	- tableau de type web : lien simple
-	- tableau de type afficheur matériel spécifique : forçage d'une interface générique en lieu et place du codage technique
+	- tableau de type afficheur matÃ©riel spÃ©cifique : forÃ§age d'une interface gÃ©nÃ©rique en lieu et place du codage technique
 
 Le lien pointe vers la fonction @ref uc31.
 
 
-@page uc61 61 Intégration à un site web
+@page uc61 61 IntÃ©gration Ã  un site web
 
-L'utilisation historique de SYNTHESE consiste à l'utilisation de ses fonctionnalités au travers d'un site web.
+L'utilisation historique de SYNTHESE consiste Ã  l'utilisation de ses fonctionnalitÃ©s au travers d'un site web.
 
-Afin de fonctionner sur un maximum de plateformes serveur, cette intégration se fait en respectant la norme CGI.
+Afin de fonctionner sur un maximum de plateformes serveur, cette intÃ©gration se fait en respectant la norme CGI.
 
-Un @ref m71 "Client CGI" est réalisé à cette fin.
+Un @ref m71 "Client CGI" est rÃ©alisÃ© Ã  cette fin.
 
-Il effectue les opérations suivantes :
- - lancement par le serveur web lors d'une requête
- - vérifications de base sur la requête
- - transmission de la requête au serveur, complétée par des informations sur le client final
- - réception du résultat
- - transmission du résultat au serveur web
- - fin de l'éxécution
+Il effectue les opÃ©rations suivantes :
+ - lancement par le serveur web lors d'une requÃªte
+ - vÃ©rifications de base sur la requÃªte
+ - transmission de la requÃªte au serveur, complÃ©tÃ©e par des informations sur le client final
+ - rÃ©ception du rÃ©sultat
+ - transmission du rÃ©sultat au serveur web
+ - fin de l'Ã©xÃ©cution
 
 
-@page uc63 63 Terminal d'accès direct et de test
+@page uc63 63 Terminal d'accÃ¨s direct et de test
 
-Un @ref m70 "accès terminal" permet les fonctionnalités suivantes :
+Un @ref m70 "accÃ¨s terminal" permet les fonctionnalitÃ©s suivantes :
  - utilisation de fonctions de SYNTHESE directement depuis la ligne de commande
- - interface de menus d'accès textuels permettant l'utilisation quasi normale de SYNTHESE, sans dispositif d'affichage graphique
- - accès aux commandes de tests et à toute autre fonction non disponible via le module d'interface
+ - interface de menus d'accÃ¨s textuels permettant l'utilisation quasi normale de SYNTHESE, sans dispositif d'affichage graphique
+ - accÃ¨s aux commandes de tests et Ã  toute autre fonction non disponible via le module d'interface
 
 
 */

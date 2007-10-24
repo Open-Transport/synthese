@@ -8,7 +8,14 @@ opts = Options('custom.py')
 opts.Add('CC', 'The C compiler.')
 opts.Add('CXX', 'The C++ compiler.')
 
-rootenv = Environment(ENV = os.environ, options=opts)
+# note : specifying doxygen as a tool will call generate on doxygen.py toolpath
+rootenv = Environment(ENV = os.environ, options=opts, tools= ["default", "doxygen"])
+
+
+# TODO : to be declared as a side effect of build/doc/latex/latex.tex :
+# "(cd ${TARGET.dir}/latex && make refman.pdf) || 1"],
+
+
 
 Help(opts.GenerateHelpText(rootenv))
 
@@ -786,6 +793,8 @@ builddir = '#' + buildroot
 
 rootenv.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
 rootenv.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
+rootenv.SConscript ('src/doc/SConscript', build_dir = '#build/doc', duplicate = 0)
+
 
 # Generate MSVS solution at this level if required
 if goal == "genmsvs":

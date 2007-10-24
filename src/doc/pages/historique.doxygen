@@ -1,16 +1,16 @@
 /** @page historique Historique et futur de synthese
 
-Evolutions passées :
- - 2000 : lancement du développement, mise au point de l'algorithme principal du calculateur d'itinéraires et démonstrateur visual basic
- - 2001 : version ß1 : calcul d'itinéraires,  tableaux de départs. Technologie ISAPI (Windows/IIS) développé en C++. Base de données multimodale sur la Haute Garonne. Version présentée à la SNCF, utilisée expérimentalement pour gérer une situation perturbée avec succès.
- - 2002 : version ß2 : fiche arrêt (visites photo), indicateurs papier, module d'interfaces simplifié. Base de données multimodale exhaustive sur Midi-Pyrénées. Version présentée au public au SITEF sur le stand de la SEMVAT. De nombreux visiteurs ont manifesté leur intérêt pour le produit tel que présenté.
- - 2003 : Version 1 : interface semvat.com, mise en place de la procédure d'alimentation semi-automatique des données bus (Hastus), et des procédures manuelles d'alimentation en données (9 sources de données contractualisées), portage en technologie FastCGI sous Linux. Version mise en ligne sur le site Internet semvat.com (interface utilisateur WS Interactive ne prenant pas en charge l'impression des feuilles de route), toutefois bridée aux seules données du réseau urbain de la SEMVAT suite à l'interdiction du SMTC de proposer la base multimodale Midi-Pyrénées.
- - 2004 : version 1.1 : module de réservation pour le TAD 106, et procédure de génération automatique des horaires selon les règles particulières. Version mise en ligne à la centrale de réservation RCS.
- - @subpage v20 : refonte technique (serveur TCP fonctionnant sur toutes les plateformes serveur (Linux, Windows, etc) + client TCP pour CGI), amélioration des performances, module d'interface évolué, clients pour matériels d'affichage de tableaux de départs propriétaires (Windows/RDP, Lumiplan, Hantarex/Velec, Varacter/Velec). Version mise en ligne sur le site tisseo.fr (interface graphique RCS conforme à la charte graphique Systonic/Tisséo), toujours bridée à la base de données urbaine. RCS met en place parallèlement un démonstrateur européen, faisant de la base SYNTHESE la plus importante base multimodale de l'histoire en nombre de circulations gérées.
+Evolutions passÃ©es :
+ - 2000 : lancement du dÃ©veloppement, mise au point de l'algorithme principal du calculateur d'itinÃ©raires et dÃ©monstrateur visual basic
+ - 2001 : version ÃŸ1 : calcul d'itinÃ©raires,  tableaux de dÃ©parts. Technologie ISAPI (Windows/IIS) dÃ©veloppÃ© en C++. Base de donnÃ©es multimodale sur la Haute Garonne. Version prÃ©sentÃ©e Ã  la SNCF, utilisÃ©e expÃ©rimentalement pour gÃ©rer une situation perturbÃ©e avec succÃ¨s.
+ - 2002 : version ÃŸ2 : fiche arrÃªt (visites photo), indicateurs papier, module d'interfaces simplifiÃ©. Base de donnÃ©es multimodale exhaustive sur Midi-PyrÃ©nÃ©es. Version prÃ©sentÃ©e au public au SITEF sur le stand de la SEMVAT. De nombreux visiteurs ont manifestÃ© leur intÃ©rÃªt pour le produit tel que prÃ©sentÃ©.
+ - 2003 : Version 1 : interface semvat.com, mise en place de la procÃ©dure d'alimentation semi-automatique des donnÃ©es bus (Hastus), et des procÃ©dures manuelles d'alimentation en donnÃ©es (9 sources de donnÃ©es contractualisÃ©es), portage en technologie FastCGI sous Linux. Version mise en ligne sur le site Internet semvat.com (interface utilisateur WS Interactive ne prenant pas en charge l'impression des feuilles de route), toutefois bridÃ©e aux seules donnÃ©es du rÃ©seau urbain de la SEMVAT suite Ã  l'interdiction du SMTC de proposer la base multimodale Midi-PyrÃ©nÃ©es.
+ - 2004 : version 1.1 : module de rÃ©servation pour le TAD 106, et procÃ©dure de gÃ©nÃ©ration automatique des horaires selon les rÃ¨gles particuliÃ¨res. Version mise en ligne Ã  la centrale de rÃ©servation RCS.
+ - @subpage v20 : refonte technique (serveur TCP fonctionnant sur toutes les plateformes serveur (Linux, Windows, etc) + client TCP pour CGI), amÃ©lioration des performances, module d'interface Ã©voluÃ©, clients pour matÃ©riels d'affichage de tableaux de dÃ©parts propriÃ©taires (Windows/RDP, Lumiplan, Hantarex/Velec, Varacter/Velec). Version mise en ligne sur le site tisseo.fr (interface graphique RCS conforme Ã  la charte graphique Systonic/TissÃ©o), toujours bridÃ©e Ã  la base de donnÃ©es urbaine. RCS met en place parallÃ¨lement un dÃ©monstrateur europÃ©en, faisant de la base SYNTHESE la plus importante base multimodale de l'histoire en nombre de circulations gÃ©rÃ©es.
 
-Evolutions prévues :
- - @subpage v21 : module cartographique, module de recherche d'adresses, module de réservation distribué, gestion de profils utilisateur (pour réservation des TAD en ligne sur tisseo.fr), améliorations diverses interface (gestion navigateurs mobiles)
- - 2007 : version 3 : base de données distribuée, modifiable à chaud (prise en charge du temps réel, prêt pour connexion SAE)
+Evolutions prÃ©vues :
+ - @subpage v21 : module cartographique, module de recherche d'adresses, module de rÃ©servation distribuÃ©, gestion de profils utilisateur (pour rÃ©servation des TAD en ligne sur tisseo.fr), amÃ©liorations diverses interface (gestion navigateurs mobiles)
+ - 2007 : version 3 : base de donnÃ©es distribuÃ©e, modifiable Ã  chaud (prise en charge du temps rÃ©el, prÃªt pour connexion SAE)
 
 
 @page v20 2005 : Version 2.0
@@ -24,7 +24,7 @@ Evolutions prévues :
 
 @section v202 10/2005 - Version 2.0.2
 
-	- Remise en fonction téléaffichage
+	- Remise en fonction tÃ©lÃ©affichage
 
 @section v203 7/12/2005 - Version 2.0.3
 
@@ -35,25 +35,25 @@ Evolutions prévues :
 
 @section v21contexte Contexte
 
-Trois besoins émergent à l'utilisation de SYNTHESE :
- - Trouver un ou plusieurs arrêts logiques à partir d'une adresse
- - Afficher le tracé d'une solution
- - Afficher le plan du voisinage d'un arrêt de correspondance  ou d'extrémité
+Trois besoins Ã©mergent Ã  l'utilisation de SYNTHESE :
+ - Trouver un ou plusieurs arrÃªts logiques Ã  partir d'une adresse
+ - Afficher le tracÃ© d'une solution
+ - Afficher le plan du voisinage d'un arrÃªt de correspondance  ou d'extrÃ©mitÃ©
 
-Un module de cartographie apparaît alors nécessaire.
+Un module de cartographie apparaÃ®t alors nÃ©cessaire.
 
-@subsection v21refres Référentiel réseau
+@subsection v21refres RÃ©fÃ©rentiel rÃ©seau
 
-Le référentiel réseau, en cours de développement, est une base de données contenant l'ensemble des informations topographiques concernant les différents éléments du réseau, avec historisation complète.
+Le rÃ©fÃ©rentiel rÃ©seau, en cours de dÃ©veloppement, est une base de donnÃ©es contenant l'ensemble des informations topographiques concernant les diffÃ©rents Ã©lÃ©ments du rÃ©seau, avec historisation complÃ¨te.
 
-Bon nombre de représentations cartographiques du référentiel sont envisageables, et certaines d'entre elles sont nécessaires dès l'ouverture du référentiel réseau :
- - Tracé de ligne
- - Tracé de points d'arrêt
- - Tracés comparatifs entre plusieurs versions d'un objet , selon la date
+Bon nombre de reprÃ©sentations cartographiques du rÃ©fÃ©rentiel sont envisageables, et certaines d'entre elles sont nÃ©cessaires dÃ¨s l'ouverture du rÃ©fÃ©rentiel rÃ©seau :
+ - TracÃ© de ligne
+ - TracÃ© de points d'arrÃªt
+ - TracÃ©s comparatifs entre plusieurs versions d'un objet , selon la date
 
 @section v21mutualisation Mutualisation
 
-Les besoins de SYNTHESE et du référentiel réseau étant très étroitement liés, il apparaît judicieux de développer un serveur de cartographie adapté à la problématique transports, pouvant être appelé par ces deux applications, et éventuellement par d'autres dans le futur.
+Les besoins de SYNTHESE et du rÃ©fÃ©rentiel rÃ©seau Ã©tant trÃ¨s Ã©troitement liÃ©s, il apparaÃ®t judicieux de dÃ©velopper un serveur de cartographie adaptÃ© Ã  la problÃ©matique transports, pouvant Ãªtre appelÃ© par ces deux applications, et Ã©ventuellement par d'autres dans le futur.
 
 
 */
