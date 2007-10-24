@@ -2,6 +2,7 @@
 #define FUNCTIONS_H
 
 #include "08_acapela_client/PlaybackAcapela.h"
+#include "30_server/BasicClient.h"
 
 extern "C"
 {
@@ -15,6 +16,7 @@ extern "C"
 #include <ctime>
 #include <sstream>
 #include <set>
+
 
 
 
@@ -52,6 +54,9 @@ class Functions
 		static string getMenu(int _category, int _step);
 		// call directly or implicitly
 		static int passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId);
+		
+		// call BasicClient of Synthese
+		static string makeRequest(string _request) throw (int);
 	
 		
 	private:

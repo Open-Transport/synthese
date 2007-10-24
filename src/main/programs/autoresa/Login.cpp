@@ -100,19 +100,19 @@ bool Login::identifyUser() throw (int)
 		
 	int psw=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,3));
 	
-	SessionReturnType *_session=new SessionReturnType;
-	if((usr==123456789) && (psw==1234))
+	SessionReturnType *sessionLocal=new SessionReturnType;
+	
+	try
 	{
-		_session->sessionId="123456789";
-		_session->type=1;
-		_session->name="Dupont";
-		_session->totalResa=2;
-		_session->driverTotalResa=0;
-		_session->message="Bonjour\, voici le test\.";
-		_session->callerId="0225480668";
+		Functions::makeRequest("id=123");
+	}
+	catch (int e)
+	{
+		Functions::translateExpt(e);
+		return false;
 	}
 	
-	session=_session;
+	session=sessionLocal;
 }
 
 SessionReturnType* Login::getSession()

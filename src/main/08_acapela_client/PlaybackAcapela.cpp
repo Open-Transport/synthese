@@ -17,13 +17,13 @@ int PlaybackAcapela::callBackSpeechEvent(unsigned int nEventID,
 		case NSC_EVID_TEXT_STARTED :
 		{
 			NSC_EVENT_DATA_TextStarted *pEVTS = (NSC_EVENT_DATA_TextStarted *)pEventData;
-			printf("IdText %i : Synthesis started", (int)pEVTS->pUserData);
+			//printf("IdText %i : Synthesis started", (int)pEVTS->pUserData);
 			break;
 		}
 		case NSC_EVID_TEXT_DONE :
 		{
 			NSC_EVENT_DATA_TextDone *pEVTD = (NSC_EVENT_DATA_TextDone *)pEventData;
-			printf("IdText %i : Synthesis done", (int)pEVTD->pUserData);
+			//printf("IdText %i : Synthesis done", (int)pEVTD->pUserData);
 			break;
 		}
     }
@@ -67,11 +67,11 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
 	/* connect to server using old client-server communication protocol */
     if ((Result = nscCreateServerContext(NSC_AF_INET,0,_ipServer.c_str(),&hSrv)) == NSC_OK)
     {
-          //cout<<"nsc connected"<<endl;
+          ////cout<<"nsc connected"<<endl;
     }
     else
     {
-        cout<<"EROR: nscCreateServerContext return "<<Result<<endl;
+        //cout<<"EROR: nscCreateServerContext return "<<Result<<endl;
         return -1;
     }
 
@@ -79,11 +79,11 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
     /* Dispatch */
     if ((Result = nscCreateDispatcher(&hDispatch)) == NSC_OK)
     {
-        //cout<<"Dispatcher created"<<endl;
+        ////cout<<"Dispatcher created"<<endl;
     }
     else
     {
-        cout<<"ERROR: nscCreateDispatcher return "<<Result<<endl;
+        //cout<<"ERROR: nscCreateDispatcher return "<<Result<<endl;
         return -1;
     }
 
@@ -92,13 +92,13 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
     /* Enumeration */
     if ((Result = nscGetServerInfo(hSrv, &SrvInfo)) != NSC_OK)
     {
-		cout<<"ERROR: nscGetServerInfo return "<<Result<<endl;
+		//cout<<"ERROR: nscGetServerInfo return "<<Result<<endl;
 		return -1;
     }
     ptabFindVoice = (NSC_FINDVOICE_DATA *)malloc(sizeof(NSC_FINDVOICE_DATA) * SrvInfo.nMaxNbVoice);
     if (ptabFindVoice == NULL)
     {
-        cout<<"ERROR: not enough memory"<<endl;
+        //cout<<"ERROR: not enough memory"<<endl;
         return -1;
     }
   
@@ -114,7 +114,7 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
     }
     else
     {
-        cout<<"ERROR: nscFindFirstVoice return "<<Result<<endl;
+        //cout<<"ERROR: nscFindFirstVoice return "<<Result<<endl;
         return -1;
     }
     nscCloseFindVoice(hVoice);
@@ -124,7 +124,7 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
   
     while (nbvoice > 0) 
     {
-		//cout<<ptabFindVoice[idtabFindVoice].cVoiceName<<endl;
+		////cout<<ptabFindVoice[idtabFindVoice].cVoiceName<<endl;
 		idtabFindVoice++;
 		nbvoice--;
     }
@@ -134,11 +134,11 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
 
     if ((Result = nscInitChannel(hSrv,_voice.c_str(),0,0,hDispatch,&ChId)) == NSC_OK)
     {
-        //cout<<"Channel initialised"<<endl;
+        ////cout<<"Channel initialised"<<endl;
     }
     else
     {
-        cout<<"ERROR: nscInitChannel return "<<Result<<endl;
+        //cout<<"ERROR: nscInitChannel return "<<Result<<endl;
         return -1;
     }
 
@@ -146,28 +146,28 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
     /* Lock channel */
     if( (Result = nscLockChannel(hSrv,ChId,hDispatch,&hTTS)) == NSC_OK)
     {
-        //cout<<"Channel locked"<<endl;
+        ////cout<<"Channel locked"<<endl;
     }
     else
     {
-        cout<<"ERROR: nscLockChannel return "<<Result<<endl;
+        //cout<<"ERROR: nscLockChannel return "<<Result<<endl;
         return -1;
     }
 
     /* AddText channel */
-     //cout<<"textVoiceAck: "<<_text<<endl;
-     //cout<<"voiceFileNameAck: "<<_fileName<<endl;
+     ////cout<<"textVoiceAck: "<<_text<<endl;
+     ////cout<<"voiceFileNameAck: "<<_fileName<<endl;
   
     int IdText = 1;
-    //cout<<"Text %i adding...   "<<IdText<<endl;
+    ////cout<<"Text %i adding...   "<<IdText<<endl;
     
     if ((Result = nscAddText(hTTS,_text.c_str(),(void *)IdText)) == NSC_OK)
     {
-        //cout<<"Text added: "<<_text<<endl;
+        ////cout<<"Text added: "<<_text<<endl;
     }
     else
     {
-        cout<<"ERROR: nscAddText return "<<Result<<endl;
+        //cout<<"ERROR: nscAddText return "<<Result<<endl;
         return -1;
     }
 
@@ -194,29 +194,29 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
 
         if((Result = nscExecChannel(hTTS,&ExecData)) == NSC_OK)
 		{
-	            //cout<<"Channel Executed "<<endl;
+	            ////cout<<"Channel Executed "<<endl;
 		}
 		else
 		{
-	            cout<<"ERROR: nscExecChannel return"<<endl;
+	            //cout<<"ERROR: nscExecChannel return"<<endl;
 	            return -1;
 		}
 		fclose(f);
     }
     else
     {
-		cout<<"ERROR:PERMISSION DENIED"<<endl;
+		//cout<<"ERROR:PERMISSION DENIED"<<endl;
     }
 
     /* Unlock channel */
 
     if ((Result = nscUnlockChannel(hTTS)) == NSC_OK)
     {
-        //cout<<"Channel unlocked"<<endl;
+        ////cout<<"Channel unlocked"<<endl;
     }
     else
     {
-        cout<<"ERROR: nscUnlockChannel return  "<<Result<<endl;
+        //cout<<"ERROR: nscUnlockChannel return  "<<Result<<endl;
         return -1;
     }
 	
@@ -224,11 +224,11 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
 
     if( (Result = nscCloseChannel(hSrv,ChId))==NSC_OK)
     {
-        //cout<<"Channel closed"<<endl;
+        ////cout<<"Channel closed"<<endl;
     }
     else
     {
-        cout<<"ERROR: nscCloseChannel return "<<endl;
+        //cout<<"ERROR: nscCloseChannel return "<<endl;
         return -1;
     }
 			
@@ -237,11 +237,11 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
 
     if ((Result = nscDeleteDispatcher(hDispatch)) == NSC_OK)
     {
-        //cout<<"Dispatcher Deleted"<<endl;
+        ////cout<<"Dispatcher Deleted"<<endl;
     }
     else
     {
-        cout<<"ERROR: nscDeleteDispatcher return "<<Result<<endl;
+        //cout<<"ERROR: nscDeleteDispatcher return "<<Result<<endl;
         return -1;
     }
 
@@ -249,11 +249,11 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
 
     if ((Result = nscReleaseServerContext(hSrv)) == NSC_OK)
     {
-        //cout<<"Disconnected"<<endl;
+        ////cout<<"Disconnected"<<endl;
     }
     else
     {
-        cout<<"ERROR: nscReleaseServerContext return "<<Result<<endl;
+        //cout<<"ERROR: nscReleaseServerContext return "<<Result<<endl;
         return -1;
     }
   

@@ -198,4 +198,22 @@ int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId)
 	return 0;
 }
 
+/*
+
+**/
+string Functions::makeRequest(string _request) throw (int)
+{
+	synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("127.0.0.1",3591,0);
+	
+	std::stringstream out;
+	basicClient->request(out,_request);
+	
+	delete basicClient;
+	
+	cout<<"Noop request: "<<_request<<", return: "<<out.str() <<endl;
+	
+	return out.str();
+	
+}
+
 
