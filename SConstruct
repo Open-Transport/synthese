@@ -9,7 +9,7 @@ opts.Add('CC', 'The C compiler.')
 opts.Add('CXX', 'The C++ compiler.')
 
 # note : specifying doxygen as a tool will call generate on doxygen.py toolpath
-rootenv = Environment(ENV = os.environ, options=opts, tools= ["default", "doxygen"])
+rootenv = Environment(ENV = os.environ, options=opts, tools= ["default", "doxygen", "test"])
 
 
 # TODO : to be declared as a side effect of build/doc/latex/latex.tex :
@@ -719,21 +719,6 @@ SConsEnvironment.AddZlibDependency=AddZlibDependency
 # -------------------------------------------------------
 # Custom builders
 # -------------------------------------------------------
-def builder_unit_test(target, source, env):
-  app = str(source[0].abspath)
-
-  # Exec in the test program dir!
-  curdir = os.path.abspath (os.curdir)
-  os.chdir (os.path.dirname (source[0].abspath))
-
-  if os.system(app)==0:
-    os.chdir (curdir)
-    open(str(target[0]),'w').write("PASSED\n")
-  else:
-    os.chdir (curdir)
-    return 1
-
-
 
 
 def builder_distscript (target, source, env):
@@ -769,9 +754,6 @@ rootenv.DefineDefaultLibs ()
 # default include path
 rootenv.Append (CPPPATH = ['#src/main'] )
 
-
-bld = Builder(action = builder_unit_test)
-rootenv.Append(BUILDERS = {'Test' :  bld})
 
 bld = Builder(action = builder_distscript)
 rootenv.Append(BUILDERS = {'DistScript' :  bld})
