@@ -50,17 +50,17 @@ namespace synthese
 			 inherits from Route
 			@ingroup m15
 
-			Une ligne technique est un regroupement de services, constitué dans un but d'amélioration des performances de la recherche d'itinéraires. En effet, plusieurs services groupés dans une ligne ne comptent que pour un dans leur participation au temps de calcul, ce qui rend tout son intérÃªt au regroupement des services en lignes.
-			Le regroupement en lignes techniques s'effectue cependant, par convention, uniquement Ã  l'intérieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant Ãªtre groupés selon les critÃšres ci-dessous, mais n'appartenant pas Ã  la mÃªme ligne commerciale, ne seront pas groupés dans une ligne technique. De ce fait, les lignes techniques sont considérés comme des subdivisions de lignes commerciales.
+			Une ligne technique est un regroupement de services, constitué dans un but d'amélioration des performances de la recherche d'itinéraires. En effet, plusieurs services groupés dans une ligne ne comptent que pour un dans leur participation au temps de calcul, ce qui rend tout son intér�ªt au regroupement des services en lignes.
+			Le regroupement en lignes techniques s'effectue cependant, par convention, uniquement �  l'intérieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant �ªtre groupés selon les crit�šres ci-dessous, mais n'appartenant pas �  la m�ªme ligne commerciale, ne seront pas groupés dans une ligne technique. De ce fait, les lignes techniques sont considérés comme des subdivisions de lignes commerciales.
 
 			Cependant, pour assurer la justesse des calculs, les regroupements en ligne doivent respecter des conditions strictes, constituant ainsi la théorie des lignes&nbsp;:
-				- Les services d'une mÃªme ligne doivent desservir exactement les mÃªmes points d'arrÃªt, dans le mÃªme ordre
-				- Les conditions de desserte de chaque point d'arrÃªt (départ/passage/arrivée et horaires saisis/non saisis) sont les mÃªmes pour tous les services d'une ligne
-				- Les services d'une mÃªme ligne sont assurés par le mÃªme matériel roulant, observent les mÃªmes conditions de réservation, appartiennent au mÃªme réseau de transport, et suivent la mÃªme tarification
-				- Un service d'une ligne ne doit pas desservir un point d'arrÃªt Ã  la mÃªme heure qu'un autre service de la mÃªme ligne
-				- Un service d'une ligne desservant un point d'arrÃªt avant un autre de la mÃªme ligne ne doit pas desservir un autre point d'arrÃªt aprÃšs ce dernier&nbsp;: deux services ne doivent pas se Â«&nbsp;doubler&nbsp;Â»
+				- Les services d'une m�ªme ligne doivent desservir exactement les m�ªmes points d'arr�ªt, dans le m�ªme ordre
+				- Les conditions de desserte de chaque point d'arr�ªt (départ/passage/arrivée et horaires saisis/non saisis) sont les m�ªmes pour tous les services d'une ligne
+				- Les services d'une m�ªme ligne sont assurés par le m�ªme matériel roulant, observent les m�ªmes conditions de réservation, appartiennent au m�ªme réseau de transport, et suivent la m�ªme tarification
+				- Un service d'une ligne ne doit pas desservir un point d'arr�ªt �  la m�ªme heure qu'un autre service de la m�ªme ligne
+				- Un service d'une ligne desservant un point d'arr�ªt avant un autre de la m�ªme ligne ne doit pas desservir un autre point d'arr�ªt apr�šs ce dernier&nbsp;: deux services ne doivent pas se �«&nbsp;doubler&nbsp;�»
 
-			NB : la correspondance entre deux services d'une mÃªme ligne est interdite, sauf dans les axes libres.
+			NB : la correspondance entre deux services d'une m�ªme ligne est interdite, sauf dans les axes libres.
 
 		*/
 		class Line : 

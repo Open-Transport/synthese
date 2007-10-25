@@ -9,7 +9,7 @@
 
 	@section csst_glossary Glossaire
 
-		Le téléaffichage (SAI) consiste en la diffusion de la liste des prochains départs aux arrêts, de manière dynamique.
+		Le téléaffichage (SAI) consiste en la diffusion de la liste des prochains départs aux arrêts, de mani�re dynamique.
 	
 	@subsection csst_securite Sécurité
 
@@ -44,7 +44,7 @@
 
 		@subsection csst_ihm_liste Liste des écrans
 		
-		L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à l'ensemble des écrans d'administraion :
+		L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne acc�s à l'ensemble des écrans d'administraion :
 			- @ref csst_ihm_users
 				- @ref csst_ihm_users_login
 				- @ref csst_ihm_users_profiles
@@ -75,7 +75,7 @@
 			- <tt>C/E/S</tt> = Création / Edition / Suppression
 			- fond jaune = page de la console d'administration
 			- fond vert = page de journal
-			- fond bleu = accès à une fonction SYNTHESE hors administration
+			- fond bleu = acc�s à une fonction SYNTHESE hors administration
 			- fond blanc = fonction intégrée à la page de niveau supérieur
 
 		@dot
@@ -191,7 +191,7 @@
 
 			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité SecurityLog :
 				- INFO : Connexion d'utilisateur
-				- WARNING : Refus de connexion après cinq tentatives sur une même session
+				- WARNING : Refus de connexion apr�s cinq tentatives sur une même session
 	
 		@subsubsection csst_ihm_users_profiles Liste des profils d'habilitations
 		@copydoc synthese::security::ProfilesAdmin
@@ -225,7 +225,7 @@
 		@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matériel d'afficheurs
 		@copydoc synthese::departurestable::DisplaySearchAdmin
 		
-		@subsubsection csst_ihm_display_DisplayAdmin Edition des paramètres d'un afficheur
+		@subsubsection csst_ihm_display_DisplayAdmin Edition des param�tres d'un afficheur
 		@copydoc synthese::departurestable::DisplayAdmin
 
 		@subsubsection csst_ihm_display_DisplayMaintenanceAdmin Supervision d'un afficheur
@@ -235,7 +235,7 @@
 	
 	@subsection csst_ihm_messages Gestion des messages
 	
-		@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
+		@subsubsection csst_ihm_messages_MessagesLibraryAdmin Biblioth�que de messages prédéfinis
 		@copydoc synthese::messages::MessagesLibraryAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesScenarioAdmin Edition de scénario de diffusion prédéfini
@@ -281,7 +281,7 @@
 		@subsection csst_security_messages Messages (MessagesRight)
 		@copydoc synthese::messages::MessagesRight
 
-		@subsection csst_security_messages_library Bibliothèque de messages (MessagesLibraryRight)
+		@subsection csst_security_messages_library Biblioth�que de messages (MessagesLibraryRight)
 		@copydoc synthese::messages::MessagesLibraryRight
 	
 		@subsection csst_security_log Journaux (DBLogRight)
@@ -314,7 +314,7 @@
 		@subsection csst_logs_messages Envois de messages (MessagesLog)
 		@copydoc synthese::messages::MessagesLog
 		
-		@subsection csst_logs_messages_library Bibliothèque de messages (MessagesLibraryLog)
+		@subsection csst_logs_messages_library Biblioth�que de messages (MessagesLibraryLog)
 		@copydoc synthese::messages::MessagesLibraryLog
 		
 		@subsection csst_logs_displays Gestion des afficheurs (ArrivalDepartureTableLog)

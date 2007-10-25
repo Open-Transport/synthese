@@ -214,15 +214,15 @@ namespace synthese
 				/*
 				// GESTION DES ALERTES
 				// Gestion des alertes : 3 cas possibles :
-				// Alerte sur arrï¿½t de dï¿½part
-				// Circulation ï¿½ rï¿½servation
+				// Alerte sur arrï¿t de dï¿part
+				// Circulation ï¿ rï¿servation
 				// Alerte sur circulation
-				// Alerte sur arrï¿½t d'arrivï¿½e
+				// Alerte sur arrï¿t d'arrivï¿e
 				synthese::time::DateTime __debutAlerte, __finAlerte;
 
-				// Alerte sur arrï¿½t de dï¿½part
-				// Dï¿½but alerte = premier dï¿½part
-				// Fin alerte = dernier dï¿½part
+				// Alerte sur arrï¿t de dï¿part
+				// Dï¿but alerte = premier dï¿part
+				// Fin alerte = dernier dï¿part
 				synthese::time::DateTime debutPrem = curET->getDepartureTime();
 				synthese::time::DateTime finPrem = debutPrem;
 				if (__Trajet->getContinuousServiceRange ().Valeur())
@@ -231,7 +231,7 @@ namespace synthese
 				&& __NiveauRenvoiColonne < curET->getGareDepart()->getAlarm().Niveau())
 				__NiveauRenvoiColonne = curET->getGareDepart()->getAlarm().Niveau();
 
-				// Circulation ï¿½ rï¿½servation obligatoire
+				// Circulation ï¿ rï¿servation obligatoire
 				synthese::time::DateTime maintenant;
 				maintenant.setMoment();
 				if (curET->getLigne()->GetResa()->TypeResa() == Obligatoire
@@ -239,7 +239,7 @@ namespace synthese
 				&& __NiveauRenvoiColonne < ALERTE_ATTENTION)
 				__NiveauRenvoiColonne = ALERTE_ATTENTION;
 
-				// Circulation ï¿½ rï¿½servation possible
+				// Circulation ï¿ rï¿servation possible
 				maintenant.setMoment();
 				if (curET->getLigne()->GetResa()->TypeResa() == Facultative
 				&& curET->getLigne()->GetResa()->reservationPossible(curET->getLigne()->GetTrain(curET->getService()), maintenant, curET->getDepartureTime())
@@ -247,8 +247,8 @@ namespace synthese
 				__NiveauRenvoiColonne = ALERTE_INFO;
 
 				// Alerte sur circulation
-				// Dï¿½but alerte = premier dï¿½part
-				// Fin alerte = derniï¿½re arrivï¿½e
+				// Dï¿but alerte = premier dï¿part
+				// Fin alerte = derniï¿re arrivï¿e
 				debutPrem = curET->getDepartureTime();
 				finPrem = curET->getArrivalTime ();
 				if (__Trajet->getContinuousServiceRange ().Valeur())
@@ -257,9 +257,9 @@ namespace synthese
 				&& __NiveauRenvoiColonne < curET->getLigne()->getAlarm().Niveau())
 				__NiveauRenvoiColonne = curET->getLigne()->getAlarm().Niveau();
 
-				// Alerte sur arrï¿½t d'arrivï¿½e
-				// Dï¿½but alerte = premiï¿½re arrivï¿½e
-				// Fin alerte = dernier dï¿½part de l'arrï¿½t si correspondnce, derniï¿½re arrivï¿½e sinon
+				// Alerte sur arrï¿t d'arrivï¿e
+				// Dï¿but alerte = premiï¿re arrivï¿e
+				// Fin alerte = dernier dï¿part de l'arrï¿t si correspondnce, derniï¿re arrivï¿e sinon
 				__debutAlerte = curET->getArrivalTime ();
 				__finAlerte = __debutAlerte;
 				if (curET->Suivant() != NULL)
@@ -332,7 +332,7 @@ namespace synthese
 						LignesAPermuter[ i ] = true;
 			}
 
-			// Tests d'ï¿½changeabilitï¿½ binaire
+			// Tests d'ï¿changeabilitï¿ binaire
 			// A la premiere contradiction on s'arrete
 			__i=0;
 			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
@@ -441,14 +441,14 @@ namespace synthese
 			, int& i
 			, const ConnectionPlace* GareAChercher
 		){
-			// Recherche de la gare en suivant ï¿½ partir de la position i
+			// Recherche de la gare en suivant ï¿ partir de la position i
 			for ( ; i < pl.size() && pl[ i ].place != NULL && pl[ i ].place != GareAChercher; ++i );
 
-			// Gare trouvï¿½e en suivant avant la fin du tableau
+			// Gare trouvï¿e en suivant avant la fin du tableau
 			if ( i < pl.size() && pl[ i ].place != NULL )
 				return true;
 
-			// Recherche de position antï¿½rieure ï¿½ i
+			// Recherche de position antï¿rieure ï¿ i
 			for ( i = 0; i < pl.size() && pl[ i ].place != NULL && pl[ i ].place != GareAChercher; ++i );
 
 			return i < pl.size() && pl[ i ].place != NULL;
@@ -459,7 +459,7 @@ namespace synthese
 			@author Hugues Romain
 			@date 2001-2006
 
-			Le but de la mï¿½thode est de fournir une liste ordonnï¿½e de points d'arrï¿½t de taille minimale dï¿½terminant les lignes du tableau de fiche horaire.
+			Le but de la mï¿thode est de fournir une liste ordonnï¿e de points d'arrï¿t de taille minimale dï¿terminant les lignes du tableau de fiche horaire.
 
 			Examples of results after journeys addings :
 
@@ -518,7 +518,7 @@ namespace synthese
 			<tr><td>D</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
 			</table>
 
-			Pas 5 : Service AED (E insï¿½rï¿½ avant B pour ne pas rompre la continuitï¿½ BC)
+			Pas 5 : Service AED (E insï¿rï¿ avant B pour ne pas rompre la continuitï¿ BC)
 
 			<table class="Tableau" cellspacing="0" cellpadding="5">
 			<tr><td>A</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
@@ -529,9 +529,9 @@ namespace synthese
 			<tr><td>D</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
 			</table>
 
-			Pour chaque trajet, on procï¿½de donc par balayage dans l'ordre des gares existantes. Si la gare ï¿½ relier nï¿½est pas trouvï¿½e entre la position de la gare prï¿½cï¿½dente et la fin, deux solutions :
-			- soit la gare nï¿½est prï¿½sente nulle part (balayage avant la position de la prï¿½cï¿½dente) auquel cas elle est crï¿½ï¿½e et rajoutï¿½e ï¿½ la position de la gare prï¿½cï¿½dente + 1
-			- soit la gare est prï¿½sente avant la gare prï¿½cï¿½dente. Dans ce cas, on tente de descendre la ligne de la gare recherchï¿½e au niveau de la position de la gare prï¿½cï¿½dente + 1. On contrï¿½le sur chacun des trajets prï¿½cï¿½dents que la chronologie n'en serait pas affectï¿½e. Si elle ne l'est pas, alors la ligne est descendue. Sinon une nouvelle ligne est crï¿½ï¿½e.
+			Pour chaque trajet, on procï¿de donc par balayage dans l'ordre des gares existantes. Si la gare ï¿ relier nï¿est pas trouvï¿e entre la position de la gare prï¿cï¿dente et la fin, deux solutions :
+			- soit la gare nï¿est prï¿sente nulle part (balayage avant la position de la prï¿cï¿dente) auquel cas elle est crï¿ï¿e et rajoutï¿e ï¿ la position de la gare prï¿cï¿dente + 1
+			- soit la gare est prï¿sente avant la gare prï¿cï¿dente. Dans ce cas, on tente de descendre la ligne de la gare recherchï¿e au niveau de la position de la gare prï¿cï¿dente + 1. On contrï¿le sur chacun des trajets prï¿cï¿dents que la chronologie n'en serait pas affectï¿e. Si elle ne l'est pas, alors la ligne est descendue. Sinon une nouvelle ligne est crï¿ï¿e.
 
 			Contrôle de l'échangeabilité :
 
@@ -548,48 +548,48 @@ namespace synthese
 			Si <sub><img width=25 height=24
 			src="interface.doxygen_fichiers/image009.gif"></sub>est la ligne de la gare
 			précédemment trouvée, et <sub><img width=24 height=24
-			src="interface.doxygen_fichiers/image010.gif"></sub>ï¿½lï¿½emplacement de la gare
-			souhaitï¿½e pour permuter, alors les permutations ï¿½ opï¿½rer ne peuvent concerner
+			src="interface.doxygen_fichiers/image010.gif"></sub>ï¿lï¿emplacement de la gare
+			souhaitï¿e pour permuter, alors les permutations ï¿ opï¿rer ne peuvent concerner
 			que des lignes comprises entre <sub><img width=24 height=24
-			src="interface.doxygen_fichiers/image010.gif"></sub>ï¿½et <sub><img width=25
+			src="interface.doxygen_fichiers/image010.gif"></sub>ï¿et <sub><img width=25
 			height=24 src="interface.doxygen_fichiers/image009.gif"></sub>. En effet, les
-			autres lignes nï¿½influent pas.</p>
+			autres lignes nï¿influent pas.</p>
 
 
-			En premier lieu il est nï¿½cessaire de dï¿½terminer lï¿½ensemble
-			des lignes ï¿½ permuter. Cet ensemble est construit en explorant chaque colonne.
-			Si <sub><img width=16 height=24 src="interface.doxygen_fichiers/image011.gif"></sub>ï¿½est
-			lï¿½ensemble des lignes ï¿½ permuter pour assurer lï¿½intï¿½gritï¿½ des colonnes <sub><img
+			En premier lieu il est nï¿cessaire de dï¿terminer lï¿ensemble
+			des lignes ï¿ permuter. Cet ensemble est construit en explorant chaque colonne.
+			Si <sub><img width=16 height=24 src="interface.doxygen_fichiers/image011.gif"></sub>ï¿est
+			lï¿ensemble des lignes ï¿ permuter pour assurer lï¿intï¿gritï¿ des colonnes <sub><img
 			width=36 height=27 src="interface.doxygen_fichiers/image012.gif"></sub>, on
-			peut dï¿½finir cet ensemble en fonction du prï¿½cï¿½dent <sub><img width=25
+			peut dï¿finir cet ensemble en fonction du prï¿cï¿dent <sub><img width=25
 			height=24 src="interface.doxygen_fichiers/image013.gif"></sub>&nbsp;: <sub><img
 			width=308 height=35 src="interface.doxygen_fichiers/image014.gif"></sub>
 
-			Le but ï¿½tant de faire descendre la ligne <sub><img width=24
-			height=24 src="interface.doxygen_fichiers/image010.gif"></sub>ï¿½vers <sub><img
+			Le but ï¿tant de faire descendre la ligne <sub><img width=24
+			height=24 src="interface.doxygen_fichiers/image010.gif"></sub>ï¿vers <sub><img
 			width=25 height=24 src="interface.doxygen_fichiers/image009.gif"></sub>, les
-			lignes appartenant ï¿½ L doivent ï¿½tre ï¿½changeables avecï¿½ les positions <sub><img
+			lignes appartenant ï¿ L doivent ï¿tre ï¿changeables avecï¿ les positions <sub><img
 			width=216 height=27 src="interface.doxygen_fichiers/image015.gif"></sub>.
-			Lï¿½ensemble de ces tests doit ï¿½tre rï¿½alisï¿½. Au moindre ï¿½chec, lï¿½ensemble de la
+			Lï¿ensemble de ces tests doit ï¿tre rï¿alisï¿. Au moindre ï¿chec, lï¿ensemble de la
 			permutation est rendu impossible.
 
-			Lï¿½ï¿½changeabilitï¿½ binaire entre deux lignes l et m revient ï¿½
-			contrï¿½ler la propriï¿½tï¿½&nbsp;<sub><img width=89 height=28
+			Lï¿ï¿changeabilitï¿ binaire entre deux lignes l et m revient ï¿
+			contrï¿ler la propriï¿tï¿&nbsp;<sub><img width=89 height=28
 			src="interface.doxygen_fichiers/image016.gif"></sub>.
 
-			Lï¿½ï¿½changeabilitï¿½ totale sï¿½ï¿½crit donc <sub><img width=145
+			Lï¿ï¿changeabilitï¿ totale sï¿ï¿crit donc <sub><img width=145
 			height=28 src="interface.doxygen_fichiers/image017.gif"></sub>
 
-			Lï¿½algorithme est donc le suivant&nbsp;:
+			Lï¿algorithme est donc le suivant&nbsp;:
 
 			- Construction de L
-			- Contrï¿½le dï¿½ï¿½changeabilitï¿½ binaire pour chaque ï¿½lï¿½ment de L avec
+			- Contrï¿le dï¿ï¿changeabilitï¿ binaire pour chaque ï¿lï¿ment de L avec
 			sa future position
 			- Permutation
 
 			<b>Echange</b>&nbsp;:
 
-			Exemple dï¿½ï¿½change&nbsp;:
+			Exemple dï¿ï¿change&nbsp;:
 
 			<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=340
 			style='width:254.95pt;margin-left:141.6pt;border-collapse:collapse;border:
@@ -788,7 +788,7 @@ namespace synthese
 
 
 	
-		/*! \brief Crï¿½ation des niveaux d'alerte des trajets en fonction des donnï¿½es lignes et arrï¿½ts
+		/*! \brief Crï¿ation des niveaux d'alerte des trajets en fonction des donnï¿es lignes et arrï¿ts
 		\author Hugues Romain
 		\date 2005
 		*/

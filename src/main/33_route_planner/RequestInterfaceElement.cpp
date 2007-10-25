@@ -132,10 +132,10 @@ namespace synthese
 				request.addParameter( synthese::server::PARAMETER_DIRECTION, 0 );
 			}
 
-			// Affichage de la requï¿½te au format voulu
+			// Affichage de la requï¿te au format voulu
 			if ( __TypeSortie == ( "url" ) )
 			{
-				// Partie exï¿½cutable de l'url
+				// Partie exï¿cutable de l'url
 				pCtxt << __Site->getURLClient() << "?";
 
 				// Champ fonction

@@ -39,25 +39,25 @@ namespace synthese
 		/** Habilitation (abstraite).
 			@ingroup m12
 
-			Une habilitation est un droit d'effectuer une ou plusieurs opération(s) sur un périmÃštre donné.
+			Une habilitation est un droit d'effectuer une ou plusieurs opération(s) sur un périm�štre donné.
 
 			Une habilitation est définie par :
-				-# un périmÃštre d'application dont l'usage est précisé par les sous classes. Exemple d'utilisations possibles :
+				-# un périm�štre d'application dont l'usage est précisé par les sous classes. Exemple d'utilisations possibles :
 					- Masque de code SYNTHESE d'objet (MP/TLS/*, MP/TLS/14/*...)
 					- Liste d'objet(s) (MP/TLS/14;MP/TLS/41)
-					- @c * = Pas de restriction de périmÃštre
-				-# un niveau de droit sur les objets appartenant Ã  l'utilisateur (droits privés)
-				-# un niveau de droit sur les objets n'appartenant pas Ã  l'utilisateur (droits publics)
+					- @c * = Pas de restriction de périm�štre
+				-# un niveau de droit sur les objets appartenant �  l'utilisateur (droits privés)
+				-# un niveau de droit sur les objets n'appartenant pas �  l'utilisateur (droits publics)
 
 			Les niveaux de droits sont les suivants :
 				- FORBIDDEN : interdiction (utile pour annuler une habilitation héritée)
 				- USE : droit d'utiliser une fonction
-				- READ : accÃšs en lecture
-				- WRITE : accÃšs en écriture, effacement non permis
-				- DELETE : accÃšs en écriture, effacement permis
+				- READ : acc�šs en lecture
+				- WRITE : acc�šs en écriture, effacement non permis
+				- DELETE : acc�šs en écriture, effacement permis
 				- NB : Chaque niveau de droit inclut les niveaux précédents.
 
-			Chaque module contient des définitions d'habilitations (sous-classes enregistrées dans Factory<Right>) qui implémentent le contrÃŽle des droits et la génération d'une liste de paramÃštres possibles.
+			Chaque module contient des définitions d'habilitations (sous-classes enregistrées dans Factory<Right>) qui implémentent le contr��le des droits et la génération d'une liste de param�štres possibles.
 		*/
 		class Right : public util::Factorable<Right>
 		{

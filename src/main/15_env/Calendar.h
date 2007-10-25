@@ -17,7 +17,7 @@ namespace synthese
 		/** Calendar.
 			@ingroup m15
 
-			Les services ne circulent pas tous tous les jours. Ils suivent un calendrier de circulation, indiquant les jours oÃ¹ sont effectués des départs de l'origine des services qui le respectent.
+			Les services ne circulent pas tous tous les jours. Ils suivent un calendrier de circulation, indiquant les jours o�¹ sont effectués des départs de l'origine des services qui le respectent.
 
 			The Calendar class implements the service calendar, holding a bitset representing year days.
 			Each year day can be marked or not.

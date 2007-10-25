@@ -66,16 +66,16 @@ namespace synthese
 
 		@subsection m34_target_structure Architecture fonctionnelle cible
 
-		Un systÃƒÅ¡me de tÃ©lÃ©affichage basÃ© sur SYNTHESE repose sur les principes suivants :
-			- la base de donnÃ©es de SYNTHESE constitue le point de convergence des diverses sources de donnÃ©es. Dans le cadre du tÃ©lÃ©affichage, les sources majeures sont : 
-			- les sources dites <i>thÃ©oriques</i> : elles proviennent de fichiers mis ÃƒÂ  jour par saisie manuelle ou par import informatique
-			- les sources dites <i>temps rÃ©el</i> : saisies manuelles dans la console d'administration (ex : saisie de messages...) ou rÃ©ceptions de donnÃ©es transmises automatiquement (ex : contrÃƒÅ½les de supervision issues du client de supervision, import modifications horaires SAE...)
-			- le tÃ©lÃ©affichage est un service du systÃƒÅ¡me SYNTHESE comme un autre : il exploite la base de donnÃ©es ÃƒÂ  chaud et fabrique des objets rÃ©sultats (une liste de dÃ©parts ou d'arrivÃ©e) qui sont transmis au module d'interface, chargÃ© de les diffuser selon un langage dÃ©fini
-			- le module d'interface permet de dÃ©finir le format des sorties sous forme de donnÃ©es d'entrÃ©e, dans une grande libertÃ© de choix. Les formats de sortie peuvent ÃƒÂªtre dÃ©finis en HTML pour intÃ©gration ÃƒÂ  une charte graphique, en XML pour communiquer avec d'autres applications, ou encore selon un langage propriÃ©taire pour piloter des dispositifs de tÃ©lÃ©affichage matÃ©riels
+		Un système de téléaffichage basé sur SYNTHESE repose sur les principes suivants :
+			- la base de données de SYNTHESE constitue le point de convergence des diverses sources de données. Dans le cadre du téléaffichage, les sources majeures sont : 
+			- les sources dites <i>théoriques</i> : elles proviennent de fichiers mis à jour par saisie manuelle ou par import informatique
+			- les sources dites <i>temps réel</i> : saisies manuelles dans la console d'administration (ex : saisie de messages...) ou réceptions de données transmises automatiquement (ex : contrôles de supervision issues du client de supervision, import modifications horaires SAE...)
+			- le téléaffichage est un service du système SYNTHESE comme un autre : il exploite la base de données à chaud et fabrique des objets résultats (une liste de départs ou d'arrivée) qui sont transmis au module d'interface, chargé de les diffuser selon un langage défini
+			- le module d'interface permet de définir le format des sorties sous forme de données d'entrée, dans une grande liberté de choix. Les formats de sortie peuvent être définis en HTML pour intégration à une charte graphique, en XML pour communiquer avec d'autres applications, ou encore selon un langage propriétaire pour piloter des dispositifs de téléaffichage matériels
 
-		Le schÃ©ma suivant reprÃ©sente l'architecture cible d'un systÃƒÅ¡me de tÃ©lÃ©affichage basÃ© sur la solution SYNTHESE :
+		Le schéma suivant représente l'architecture cible d'un système de téléaffichage basé sur la solution SYNTHESE :
 
-		@image latex 1195515_1_000.eps "Architecture cible d'un systÃƒÅ¡me de tÃ©lÃ©affichage SYNTHESE" height=10cm
+		@image latex 1195515_1_000.eps "Architecture cible d'un système de téléaffichage SYNTHESE" height=10cm
 		@image html 1195515.2.000.png
 
 	@{

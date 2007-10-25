@@ -49,7 +49,7 @@ this_is_also_an_element
 			@endcode
 
 			@note If a value element contains both { and [ elements, then separate it into smaller elements, and join it with the concatenation element :
-			@code {{¤ {element with spaces and [ character} [ element with space and { character ] OK !}} @endcode
+			@code {{ {element with spaces and [ character} [ element with space and { character ] OK !}} @endcode
 			will output
 			@code element with spaces and [ character element with space and { character OK! @endcode
 

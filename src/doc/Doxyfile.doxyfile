@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-DOXYFILE_ENCODING      = UTF-8
+DOXYFILE_ENCODING      = ISO-8859-15
 PROJECT_NAME           = SYNTHESE
 PROJECT_NUMBER         = 
 OUTPUT_DIRECTORY       = ../../build/doc
@@ -89,7 +89,7 @@ INPUT                  = ../main \
                          ../../resources \
                          pages \
                          cistomer_specs
-INPUT_ENCODING         = UTF-8
+INPUT_ENCODING         = ISO-8859-15
 FILE_PATTERNS          = *.c \
                          *.cpp \
                          *.h \

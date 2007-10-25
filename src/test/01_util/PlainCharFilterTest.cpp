@@ -22,25 +22,25 @@ BOOST_AUTO_TEST_CASE (testFiltering)
       out.push (sout);
 
       {
-	  out << "áàâä" << std::flush;
+	  out << "áàâ�" << std::flush;
 	  std::string expected ("aaaa");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "ÁÀÄÂ" << std::flush;
+	  out << "�ä��" << std::flush;
 	  std::string expected ("AAAA");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "éèêë" << std::flush;
+	  out << "é�êë" << std::flush;
 	  std::string expected ("eeee");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "ÉÈÊË" << std::flush;
+	  out << "��æ�" << std::flush;
 	  std::string expected ("EEEE");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
@@ -52,31 +52,31 @@ BOOST_AUTO_TEST_CASE (testFiltering)
       }
       sout.str ("");
       {
-	  out << "ÍÌÏÎ" << std::flush;
+	  out << "�ü�ô" << std::flush;
 	  std::string expected ("IIII");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "óòöô" << std::flush;
+	  out << "óòö�" << std::flush;
 	  std::string expected ("oooo");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "ÓÒÖÔ" << std::flush;
+	  out << "����" << std::flush;
 	  std::string expected ("OOOO");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "úùüû" << std::flush;
+	  out << "úù�û" << std::flush;
 	  std::string expected ("uuuu");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "ÚÙÜÛ" << std::flush;
+	  out << "è�ý�" << std::flush;
 	  std::string expected ("UUUU");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE (testFiltering)
       }
       sout.str ("");
       {
-	  out << "Ç" << std::flush;
+	  out << "�" << std::flush;
 	  std::string expected ("C");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }

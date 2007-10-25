@@ -78,7 +78,7 @@ Socket::open(const char* hostName,
 
 
 
-/** \brief Nommage de la connection rï¿½seau
+/** \brief Nommage de la connection rï¿seau
     \author Christophe Romain
     \date 2005
 */
@@ -134,7 +134,7 @@ Socket::initializeSocket(const char* protoName)
 
 
 
-/** \brief Initialisation du mode serveur : ï¿½coute sur le port
+/** \brief Initialisation du mode serveur : ï¿coute sur le port
     \author Christophe Romain
     \date 2005
 */
