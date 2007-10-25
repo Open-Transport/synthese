@@ -31,8 +31,15 @@
 
 namespace synthese
 {
+	namespace html
+	{
+		class HTMLTable;
+	}
+
 	namespace resa
 	{
+		class Reservation;
+
 		/** ReservationsListInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
@@ -46,6 +53,8 @@ namespace synthese
 				- 2 : Reservation name to search
 				- 3 : date
 				- 4 : display cancelled reservations
+				- 5 : Title cell style
+				- 6 : Table style
 
 			Object : none
 
@@ -59,6 +68,10 @@ namespace synthese
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _userName;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _date;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayCancelled;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _titleCellStyle;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _tableStyle;
+
+			static void _DisplayReservation(std::ostream& stream, html::HTMLTable& t, const Reservation* reservation);
 
 		public:
 			/** Controls and store the internals parameters.

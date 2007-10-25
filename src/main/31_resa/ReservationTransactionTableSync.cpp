@@ -151,7 +151,7 @@ namespace synthese
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << originDate.toSQLString(false) << " 0:0'"
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << originDate.toSQLString(false) << " 23:59'";
 			if (!withCancelled)
-				query << " AND " << COL_CANCELLATION_TIME << " IS NOT NULL";
+				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
 			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME;
 			if (number > 0)
@@ -177,6 +177,49 @@ namespace synthese
 			{
 				throw Exception(e.getMessage());
 			}
+		}
+
+		std::vector<boost::shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search( const std::string& userName , uid userId , bool withCancelled , int first /*= 0 */, int number /*= 0  */ )
+		{
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT " << TABLE_NAME << ".*"
+				<< " FROM " << TABLE_NAME
+				<< " INNER JOIN " << ReservationTableSync::TABLE_NAME << " AS r ON "
+				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
+				<< " WHERE " 
+				<< TABLE_NAME << "." << COL_CUSTOMER_NAME << " LIKE " << Conversion::ToSQLiteString(userName);
+			if (userId != UNKNOWN_VALUE)
+				query << " AND " << COL_CANCEL_USER_ID << "=" << userId;
+			if (!withCancelled)
+				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
+			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
+			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME << " DESC";
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				vector<shared_ptr<ReservationTransaction> > objects;
+				while (rows->next ())
+				{
+					shared_ptr<ReservationTransaction> object(new ReservationTransaction());
+					load(object.get(), rows);
+					vector<shared_ptr<Reservation> > reservations(ReservationTableSync::search(object.get()));
+					object->setReservations(reservations);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+
 		}
 
 		ReservationTransactionTableSync::~ReservationTransactionTableSync()

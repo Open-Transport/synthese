@@ -111,68 +111,8 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="14 Admin Pages"
-			>
-			<File
-				RelativePath=".\CommercialLineReservationsAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CommercialLinesReservationAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservableCommercialLinesAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservableCommercialLinesAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservationCancellationAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservationCancellationAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservationReportAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservationReportAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UserReservationsAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UserReservationsAdmin.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="11 Interface pages"
 			>
-			<File
-				RelativePath=".\BookingConfirmationInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BookingConfirmationInterfacePage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\BookingScreenInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BookingScreenInterfacePage.h"
-				>
-			</File>
 			<File
 				RelativePath=".\ReservationsListInterfacePage.cpp"
 				>

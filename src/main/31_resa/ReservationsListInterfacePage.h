@@ -63,6 +63,7 @@ namespace synthese
 				- 2 : Reservation name to search
 				- 3 : date
 				- 4 : Display canceled reservations
+				- 5 : Line name
 		*/
 		class ReservationsListInterfacePage
 			: public util::FactorableTemplate<interfaces::InterfacePage, ReservationsListInterfacePage>
