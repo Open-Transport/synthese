@@ -30,13 +30,11 @@ int Login::start(string _fatalError)
 {
 	if(_fatalError.empty())
 	{
-		// menu bienvenu, waiting for usr and psw
-		Functions::playbackText(agi,res,Functions::getMenu(1,1));
 		int tryTime=0;
 
 		try
 		{
-			while(!(identifyUser()||tryTime>2))
+			while((!identifyUser())&&(tryTime<2))
 			{
 				Functions::playbackText(agi,res,Functions::getMenu(1,7));
 				tryTime++;
@@ -104,7 +102,10 @@ bool Login::identifyUser() throw (int)
 	
 	try
 	{
-		Functions::makeRequest("id=123");
+		std::stringstream req;
+		req<<"user="<<usr<<",password="<<psw;
+
+		sessionLocal->sessionId=Functions::makeRequest(req.str());
 	}
 	catch (int e)
 	{
@@ -113,6 +114,8 @@ bool Login::identifyUser() throw (int)
 	}
 	
 	session=sessionLocal;
+	
+	return false;
 }
 
 SessionReturnType* Login::getSession()

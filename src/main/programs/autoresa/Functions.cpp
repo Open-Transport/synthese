@@ -14,6 +14,7 @@ this function is called implicited by readKey and playbackText
 **/
 string Functions::text2Voice(string _text)
 {
+  //cout<<"Noop do vocal message: "<<_text<<endl;
   // file name without extension like au
   string fileName="/usr/share/asterisk/agi-bin/fileName";
   //cout<<"Do voice file: "<<fileName+"au"<<endl;
@@ -210,7 +211,7 @@ string Functions::makeRequest(string _request) throw (int)
 	
 	delete basicClient;
 	
-	cout<<"Noop request: "<<_request<<", return: "<<out.str() <<endl;
+	//cout<<"Noop request: "<<_request<<", return: "<<out.str() <<endl;
 	
 	return out.str();
 	

@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
 	//Functions::setLanguage(Functions::readKey(&agi,&res,menuKey,5,1,Functions::getMenu(0,0)));
 	Functions::setLanguage(1);
 	
+	// menu bienvenu, time to creat the objects
+	Functions::playbackText(&agi,&res,Functions::getMenu(1,1));
+	
 	// prepare objects during the language
 	Login *login=new Login(&agi,&res);
 	Search *search=new Search(&agi,&res);

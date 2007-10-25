@@ -38,9 +38,9 @@ string Functions::getMenu(int _category, int _step)
 						case 1: // welcome
 							return "Bienvenu au système de reservation";
 						case 2: // input usr name
-							return "Veuillez introduire 9 chiffres du numero d\'utilisateur, ou presser # pour la reception manuelle.";
+							return "Veuillez introduire 9 chiffres du numero d\'utilisateur";
 						case 3:	// input psw
-							return "Veuillez entrer 6 chiffres du mots de passe";
+							return "Veuillez entrer 4 chiffres du mots de passe";
 						case 4: // driver menu
 							return "pressez 8 pour consulter la liste de reservation et pressez 9 pour reserver un trajet entant qu\'un client";
 						case 5: // say how much reservation
@@ -48,7 +48,7 @@ string Functions::getMenu(int _category, int _step)
 						case 6: // ask key input
 							return "veuillez entrer 7 pour consulter la liste des reservations effectuées et 9 pour commencer une nouvelle recherche";
 						case 7: // usr or psw incrroct
-							return "Le nom d'utilisateur ou mots de passe incorrects, veuilez le verifier. Pressez 0 pour la reception manuelle.";
+							return "Le nom d'utilisateur ou mots de passe incorrects, veuilez le verifier.";
 						case 8: // close session
 							return "L'entrée invalide, la session sera fermée. Merci de votre visite, au revoir.";
 						default:
