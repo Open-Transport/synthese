@@ -16,8 +16,11 @@ namespace util
 {
 
 
-/** Filters any stressed or special alphabetical character, whiwh are converted
+/** Filters any stressed or special alphabetical character, which are converted
     to their closest equivalent in A-Za-z.
+    Note that this filter is written given the encoding of this source file,
+    which is expected to be ISO8859-15.
+
 @ingroup m01
 */
 class PlainCharFilter : public boost::iostreams::multichar_output_filter {
