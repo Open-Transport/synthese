@@ -58,6 +58,9 @@ namespace XmlToolkit
 			  const std::string& nodeName,
 			  int index);
 
+
+    XMLNode ParseString (const std::string& str, const std::string& rootNodeTag);
+
     XMLNode ParseFile (const boost::filesystem::path& file, const std::string& rootNodeTag);
 
 
