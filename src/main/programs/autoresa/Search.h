@@ -2,9 +2,13 @@
 #define SEARCH_H
 
 #include "Functions.h"
+#include "33_route_planner/RoutePlannerFunction.h"
 
 
 using namespace std;
+using namespace synthese::transportwebsite;
+using namespace synthese::env;
+using namespace synthese::routeplanner;
 
 class Search
 {

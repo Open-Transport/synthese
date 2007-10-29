@@ -61,9 +61,13 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 	// to play background message
 	string fileName=text2Voice(_menu);
 
-	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),3000*_nKey, _nKey);
+	// clic * to stop input
+	
+	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),(int)(ceil(tan(100*_nKey*3.14159265/180)*50)), _nKey);
 	
 	if((_nKey==1)&&(inputKey==0)) Functions::passToManuel(_agi,_res,"test");
+	
+	//cout<<"Noop inputKey: "<<inputKey<<endl;
 	
 	if(_nMenuKey==0)
 		return inputKey;

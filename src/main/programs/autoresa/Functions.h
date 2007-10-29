@@ -1,14 +1,6 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-#include "08_acapela_client/PlaybackAcapela.h"
-#include "30_server/BasicClient.h"
-
-extern "C"
-{
-#include "09_agi_client/cagi.h"
-}
-
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
@@ -16,10 +8,22 @@ extern "C"
 #include <ctime>
 #include <sstream>
 #include <set>
+#include <cmath>
+#include <vector>
 
+extern "C"
+{
+	#include "09_agi_client/cagi.h"
+}
 
+#include "08_acapela_client/PlaybackAcapela.h"
+#include "30_server/BasicClient.h"
+#include "30_server/LoginAction.h"
+#include "01_util/XmlToolkit.h"
+#include "30_server/ActionFunctionRequest.h"
 
-
+using namespace synthese::server;
+//using namespace XmlToolkit;
 using namespace std;
 
 class Functions
@@ -66,6 +70,16 @@ class Functions
 
 };
 
+/**
+; the return variables:
+;       @sessionId: the session number, if is null, no need look others
+;       @type: 1 usr, 0 driver
+        @name: the user name
+;       @totalResa: the numeber means the total resa done
+        @driverTotalResa: the total resa for the driver if type=0
+;       @message: the eventual message for the custumer
+*/
+
 class SessionReturnType
 {
 	public:
@@ -76,6 +90,7 @@ class SessionReturnType
 		int driverTotalResa;
 		string message;
 		string callerId;
+		//ActionFunctionRequest<LoginAction,SimplePageRequest> loginRequest;
 };
 #endif
 

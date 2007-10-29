@@ -27,7 +27,7 @@ string Functions::getMenu(int _category, int _step)
 					switch(_step)
 					{
 						case 0:
-							return "dial 1 for english, 2 pour le francais, 3 fuer Deutsch, 4 per italien, 5 para espanol.";
+							return "dial 1 for english, 2 pour le francais, 3 fuer Deutsch, 4 per italien, 5 para español.";
 						case 1:
 							return "merci de votre utilisation, au revoir";
 					}
@@ -38,9 +38,9 @@ string Functions::getMenu(int _category, int _step)
 						case 1: // welcome
 							return "Bienvenu au système de reservation";
 						case 2: // input usr name
-							return "Veuillez introduire 9 chiffres du numero d\'utilisateur";
+							return "Veuillez introduire le numero d\'utilisateur";
 						case 3:	// input psw
-							return "Veuillez entrer 4 chiffres du mots de passe";
+							return "Veuillez entrer le mots de passe";
 						case 4: // driver menu
 							return "pressez 8 pour consulter la liste de reservation et pressez 9 pour reserver un trajet entant qu\'un client";
 						case 5: // say how much reservation

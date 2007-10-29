@@ -2,6 +2,7 @@
 #define LOGOUT_H
 
 #include "Functions.h"
+#include "30_server/LogoutAction.h"
 
 using namespace std;
 

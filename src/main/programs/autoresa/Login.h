@@ -2,8 +2,10 @@
 #define LOGIN_H
 
 #include "Functions.h"
+#include "30_server/LoginAction.h"
 
 using namespace std;
+using namespace synthese::server;
 
 /**
 ; the return variables:

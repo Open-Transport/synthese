@@ -2,9 +2,13 @@
 #define CONFIRMATION_H
 
 #include "Functions.h"
-#include <vector>
+#include "31_resa/ReservationsListFunction.h"
+#include "31_resa/CancelReservationAction.h"
 
 using namespace std;
+using namespace synthese::env;
+using namespace synthese::security;
+using namespace synthese::resa;
 
 /**
 

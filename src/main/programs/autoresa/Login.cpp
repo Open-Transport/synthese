@@ -95,17 +95,23 @@ bool Login::identifyUser() throw (int)
 {
 	
 	int usr=Functions::readKey(agi,res,menuKey,0,9,Functions::getMenu(1,2));
-		
+	/*
+	LoginAction *loginAction=new LoginAction;
+	SessionReturnType *sessionLocal=new SessionReturnType;
+	ParametersMap *parametersMap=new ParametersMap;
+	*/
 	int psw=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,3));
 	
-	SessionReturnType *sessionLocal=new SessionReturnType;
-	
+	std::stringstream req;
+	req<<usr;	
+	//session->loginRequest.setLogin(req);
+	req<<psw;
+	//session->loginRequest.setPassword(req);
+
 	try
 	{
-		std::stringstream req;
-		req<<"user="<<usr<<",password="<<psw;
-
-		sessionLocal->sessionId=Functions::makeRequest(req.str());
+		// valeur de retour à reflechir
+		//sessionLocal->sessionId=Functions::makeRequest(session->loginRequest.getParametersMap().getQueryString(true));
 	}
 	catch (int e)
 	{
@@ -113,7 +119,7 @@ bool Login::identifyUser() throw (int)
 		return false;
 	}
 	
-	session=sessionLocal;
+	//session=sessionLocal;
 	
 	return false;
 }

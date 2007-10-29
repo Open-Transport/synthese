@@ -2,8 +2,11 @@
 #define RESERVATION_H
 
 #include "Functions.h"
+#include "31_resa/BookReservationAction.h"
 
 using namespace std;
+using namespace synthese::security;
+using namespace synthese::resa;
 
 class Reservation
 {
