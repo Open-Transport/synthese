@@ -1,6 +1,8 @@
 
-/** LoginAction class header.
-	@file LoginAction.h
+/** AddUserFavoriteJourneyAction class header.
+	@file AddUserFavoriteJourneyAction.h
+	@author Hugues Romain
+	@date 2007
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,58 +22,65 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_LoginAction_H__
-#define SYNTHESE_LoginAction_H__
+#ifndef SYNTHESE_AddUserFavoriteJourneyAction_H__
+#define SYNTHESE_AddUserFavoriteJourneyAction_H__
 
 #include "30_server/Action.h"
 
 #include "01_util/FactorableTemplate.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace synthese
 {
-	namespace server
+	namespace security
 	{
-		/** Login Action Class.
-			@ingroup m18Actions refActions
+		class User;
+	}
+
+	namespace routeplanner
+	{
+		/** AddUserFavoriteJourneyAction action class.
+			@ingroup m53Actions refActions
 		*/
-		class LoginAction : public util::FactorableTemplate<server::Action, LoginAction>
+		class AddUserFavoriteJourneyAction
+			: public util::FactorableTemplate<server::Action, AddUserFavoriteJourneyAction>
 		{
 		public:
-			static const std::string PARAMETER_LOGIN;
-			static const std::string PARAMETER_PASSWORD;
+			static const std::string PARAMETER_USER_ID;
+			static const std::string PARAMETER_ORIGIN_CITY_NAME;
+			static const std::string PARAMETER_ORIGIN_PLACE_NAME;
+			static const std::string PARAMETER_DESTINATION_CITY_NAME;
+			static const std::string PARAMETER_DESTINATION_PLACE_NAME;
 
 		private:
-			std::string _login;
-			std::string _password;
+			boost::shared_ptr<const security::User>	_user;
+			std::string						_originCityName;
+			std::string						_originPlaceName;
+			std::string						_destinationCityName;
+			std::string						_destinationPlaceName;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
+				@return Generated parameters map
 			*/
 			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
-			Removes the used parameters from the map.
+				Removes the used parameters from the map.
+				@param map Parameters map to interpret
+				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 
-			/** Activates the action before the session control.
-				@return TRUE
-				@author Hugues Romain
-				@date 2007				
-			*/
-			bool _beforeSessionControl() const;
-
 		public:
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
-
-			void setLogin(const std::string& login);
-			void setPassword(const std::string& password);
+			
+			AddUserFavoriteJourneyAction();
 		};
 	}
 }
 
-#endif // SYNTHESE_LoginAction_H__
-
+#endif // SYNTHESE_AddUserFavoriteJourneyAction_H__

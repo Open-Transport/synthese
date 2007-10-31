@@ -96,5 +96,15 @@ namespace synthese
 		{
 			return true;
 		}
+
+		void LoginAction::setLogin( const std::string& login )
+		{
+			_login = login;
+		}
+
+		void LoginAction::setPassword( const std::string& password )
+		{
+			_password = password;
+		}
 	}
 }

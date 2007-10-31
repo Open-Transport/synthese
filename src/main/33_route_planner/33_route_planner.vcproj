@@ -98,10 +98,26 @@
 				RelativePath=".\RoutePlanner.h"
 				>
 			</File>
+			<File
+				RelativePath=".\UserFavoriteJourney.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UserFavoriteJourney.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="10 LS SQL"
 			>
+			<File
+				RelativePath=".\UserFavoriteJourneyTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UserFavoriteJourneyTableSync.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="18 Functions"
@@ -280,6 +296,30 @@
 			</File>
 			<File
 				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="12 UserPrefPanel"
+			>
+			<File
+				RelativePath=".\RoutePlanningUserPrefPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlanningUserPrefPanel.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="18 Actions"
+			>
+			<File
+				RelativePath=".\AddUserFavoriteJourneyAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AddUserFavoriteJourneyAction.h"
 				>
 			</File>
 		</Filter>

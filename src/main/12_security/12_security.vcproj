@@ -301,6 +301,14 @@
 				RelativePath=".\RightTemplate.h"
 				>
 			</File>
+			<File
+				RelativePath=".\UserPrefPanel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UserPrefPanelTemplate.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="11 Interface Library"
