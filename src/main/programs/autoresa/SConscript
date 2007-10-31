@@ -1,7 +1,7 @@
 
 Import ('env')
 
-modules = ['30_server', '08_acapela_client', '09_agi_client', '04_time', '01_util__threads', '01_util__iostreams', '01_util', '00_tcp'];
+modules = ['33_route_planner', '31_resa', '30_server', '12_security', '13_dblog', '11_interfaces', '08_acapela_client', '09_agi_client', '05_html', '04_time', '02_db', '01_util__threads', '01_util__iostreams', '01_util', '00_tcp'];
 
 syntheseenv = env.SyntheseEnv (modules)
 syntheseenv.AddDependency ('nscube')

@@ -17,13 +17,16 @@ extern "C"
 }
 
 #include "08_acapela_client/PlaybackAcapela.h"
+
 #include "30_server/BasicClient.h"
 #include "30_server/LoginAction.h"
 #include "01_util/XmlToolkit.h"
 #include "30_server/ActionFunctionRequest.h"
+#include "11_interfaces/SimplePageRequest.h"
 
 using namespace synthese::server;
-//using namespace XmlToolkit;
+using namespace synthese::util::XmlToolkit;
+using namespace synthese::interfaces;
 using namespace std;
 
 class Functions
@@ -90,7 +93,8 @@ class SessionReturnType
 		int driverTotalResa;
 		string message;
 		string callerId;
-		//ActionFunctionRequest<LoginAction,SimplePageRequest> loginRequest;
+		ActionFunctionRequest<LoginAction,SimplePageRequest> loginRequest;
+		
 };
 #endif
 

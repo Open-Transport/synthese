@@ -95,11 +95,7 @@ bool Login::identifyUser() throw (int)
 {
 	
 	int usr=Functions::readKey(agi,res,menuKey,0,9,Functions::getMenu(1,2));
-	/*
-	LoginAction *loginAction=new LoginAction;
-	SessionReturnType *sessionLocal=new SessionReturnType;
-	ParametersMap *parametersMap=new ParametersMap;
-	*/
+		
 	int psw=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,3));
 	
 	std::stringstream req;
@@ -111,7 +107,7 @@ bool Login::identifyUser() throw (int)
 	try
 	{
 		// valeur de retour à reflechir
-		//sessionLocal->sessionId=Functions::makeRequest(session->loginRequest.getParametersMap().getQueryString(true));
+		//session->sessionId=Functions::makeRequest(loginRequest.getSession()->getKey());
 	}
 	catch (int e)
 	{
@@ -119,9 +115,16 @@ bool Login::identifyUser() throw (int)
 		return false;
 	}
 	
-	//session=sessionLocal;
+	// provisoire pour le test
+	session->sessionId="12345555666677778888";
+	session->type=1;
+	session->name="Hugues";
+	session->totalResa=1;
+	session->driverTotalResa=0;
+	session->message="";
+	session->callerId="41225480668";
 	
-	return false;
+	return true;
 }
 
 SessionReturnType* Login::getSession()

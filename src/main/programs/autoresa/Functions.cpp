@@ -63,7 +63,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 
 	// clic * to stop input
 	
-	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),(int)(ceil(tan(100*_nKey*3.14159265/180)*50)), _nKey);
+	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),(int)(ceil(_nKey*1.2))*1000, _nKey);
 	
 	if((_nKey==1)&&(inputKey==0)) Functions::passToManuel(_agi,_res,"test");
 	
@@ -196,11 +196,12 @@ the function is to delivery the user to central
 int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId)
 {
 	// no need to listen the promo one more time, so jump to 4
+	playbackText(_agi,_res,Functions::getMenu(0,2));
 	char *ext="75";
 	char *pri="4";
 	AGITool_exec_goto(_agi, _res, "tad", ext, pri);
 	fatalError="Warning: custumer pass to ";
-	return 0;
+	exit(1);
 }
 
 /*

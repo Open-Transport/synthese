@@ -11,16 +11,18 @@ Confirmation::~Confirmation()
 
 }
 
-int Confirmation::start(string _fatalError,SessionReturnType *_session)
+int Confirmation::start(SessionReturnType *_session)
 {
 	session=_session;
-	if(session->sessionId.empty())
+	
+	if(_session->sessionId.empty())
 	{
 		Functions::setFatalError("session Id invalid in Confirmation");
 		return -1;
 	}
 	
-	if(!_fatalError.empty())
+	//!(Functions::getFatalError().empty()) inside, but temp true
+	if(true)
 	{
 		bool driverWantSelfConfirm=false;
 		
@@ -35,6 +37,7 @@ int Confirmation::start(string _fatalError,SessionReturnType *_session)
 		try
 		{
 			requestResaConfirmedHistory(driverWantSelfConfirm);
+			
 		}
 		catch(int e)
 		{
@@ -42,7 +45,11 @@ int Confirmation::start(string _fatalError,SessionReturnType *_session)
 			return -1;
 		}
 		
-		int menuKey[]={1,2,3,4,5,6,9,0};
+		stringstream msg;
+		msg<<Functions::getMenu(4,1)<<history.size()<<Functions::getMenu(4,2);
+		Functions::playbackText(agi,res,msg.str());
+		
+		int menuKey[]={1,2,3,4,5,6,9};
 		int currentStep=0;
 		
 		/*
@@ -54,6 +61,7 @@ int Confirmation::start(string _fatalError,SessionReturnType *_session)
 		do
 		{
 			dtmfInput=Functions::readKey(agi,res,menuKey,8,1,Functions::getMenu(3,3));
+			//cout<<"Noop keyread: "<<dtmfInput<<endl;
 			switch(dtmfInput)
 			{
 				case 4:
@@ -64,11 +72,13 @@ int Confirmation::start(string _fatalError,SessionReturnType *_session)
 				case 6:
 					if(++currentStep>(int)history.size()-1) currentStep--;
 					break;
+				/*
 				case 9:
 					currentStep+=3;
 					if(currentStep>(int)history.size()-1) currentStep=history.size()-1;
 					break;
-				case 0:
+				*/
+				case 9:
 					currentStep=-99;
 					break;
 				default:
@@ -99,7 +109,7 @@ int Confirmation::start(string _fatalError,SessionReturnType *_session)
 		}
 		while(currentStep!=-99);
 		
-		Functions::playbackText(agi,res,Functions::getMenu(0,1));
+		
 		return 0;
 	}
 	else  // fatalError raised, do nothing
@@ -115,6 +125,8 @@ int Confirmation::start(string _fatalError,SessionReturnType *_session)
 int Confirmation::requestResaConfirmedHistory(bool _driverWantSelfConfirm) throw (int)
 {
 	// update history
+	history.push_back("la reservation effectué: 1,aujourd\'hui, depuis l'aigle pour Toulouse à 19h35.");
+	history.push_back("la reservation effectué: 2, le jeudi 6 décemdre, depuis Morteau pour Paris à 4h23.");
 	return 0;
 }
 /*

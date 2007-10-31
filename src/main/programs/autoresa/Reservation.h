@@ -14,7 +14,7 @@ class Reservation
 		Reservation(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res);
 		~Reservation();
 		
-		int start(string _fatalError,SessionReturnType *_session,int _currentSearch,int _currentChoice);
+		int start(SessionReturnType *_session,int _currentSearch,int _currentChoice);
 		
 		int requestReservationToSynthese() throw (int);
 		

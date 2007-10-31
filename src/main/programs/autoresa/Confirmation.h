@@ -19,7 +19,7 @@ class Confirmation
 		Confirmation(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res);
 		~Confirmation();
 		
-		int start(string _fatalError,SessionReturnType *_session);
+		int start(SessionReturnType *_session);
 		int requestResaConfirmedHistory(bool _driverWantSelfConfirm) throw (int);
 		int deleteResaToSynthese(int _n) throw (int);
 		

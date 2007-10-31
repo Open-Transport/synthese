@@ -16,7 +16,7 @@ class Search
 		Search(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res);
 		~Search();
 		
-		int start(string _fatalError, SessionReturnType *_session);
+		int start(SessionReturnType *_session);
 		int getChoicedFavorisTrajet();
 		int getChoicedTimeOfChoicedTrip();
 		
@@ -45,7 +45,9 @@ class Search
 		int choicedTimeOfChoicedTrip;
 		
 		tm dateTime;
-
+		
+		
+		
 };
 #endif
 

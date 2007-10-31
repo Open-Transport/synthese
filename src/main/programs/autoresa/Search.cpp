@@ -24,7 +24,7 @@ Search::~Search()
 			notice: if the custumer want to finish,
 			the function will set fatalError to skip other procedures
 **/
-int Search::start(string _fatalError, SessionReturnType *_session)
+int Search::start(SessionReturnType *_session)
 {
 	session=_session;
 	if(_session->sessionId.empty()) Functions::setFatalError("without session id in Search processus");
@@ -47,7 +47,7 @@ int Search::start(string _fatalError, SessionReturnType *_session)
 			Functions::playbackText(agi,res,Functions::getMenu(2,1));
 			
 			for(int i=0;i<nFavorisTrip;i++) menuKey[i]=i;
-			choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,nFavorisTrip,(int)(nFavorisTrip/10)+1,favorisTrip);
+			choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,nFavorisTrip,1,favorisTrip);
 			
 			// request to the synthese for the time table of the favoris trip choiced
 			try
@@ -128,6 +128,9 @@ int Search::getFavorisFromSynthese() throw (int)
 **/
 int Search::searchFromSynthese(int _favoris, tm _dataTime) throw (int)
 {
+	//(session->loginRequest);
+	
+	
 	if(_dataTime.tm_year==0)
 	{
 		time_t rawtime;
@@ -138,6 +141,9 @@ int Search::searchFromSynthese(int _favoris, tm _dataTime) throw (int)
 	
 	// update timeOfChoicedTrip for the favoris trajet text
 	// return nTimeOfChoicedTrip max 3
+	
+	favorisTrip="favoris 1: Aigle pour Toulous, 2 Nyon pour Marseille.";
+	nFavorisTrip=2;
 	
 	return 3;
 	

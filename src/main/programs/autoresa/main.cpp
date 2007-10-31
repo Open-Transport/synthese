@@ -48,19 +48,20 @@ int main(int argc, char *argv[])
 	switch(state)
 	{
 		case 7: //cout<<"jump to FeedbackCst";
-			confirmation->start(Functions::getFatalError(),login->getSession());
+			//cout<<"Noop before confirmation, fatalError: "<<Functions::getFatalError()<<" sessionId: "<<login->getSession()<<endl;
+			state=confirmation->start(login->getSession());
 			break;
 		case 8: //cout<<"jump to FeedbackDrv";
-			confirmation->start(Functions::getFatalError(),login->getSession());
+			state=confirmation->start(login->getSession());
 			break;
 		case 9: //cout<<"jump to search";
 			do
 			{
-				state=search->start(Functions::getFatalError(),login->getSession());
+				state=search->start(login->getSession());
 				switch(state)
 				{
 					case 1:
-						stateRs=reservation->start(Functions::getFatalError(),login->getSession(),search->getChoicedFavorisTrajet(),search->getChoicedTimeOfChoicedTrip());
+						stateRs=reservation->start(login->getSession(),search->getChoicedFavorisTrajet(),search->getChoicedTimeOfChoicedTrip());
 
 						switch(stateRs)
 						{
@@ -74,16 +75,10 @@ int main(int argc, char *argv[])
 								// custumer doesnot confirm the reservation, research again
 								// after break, will be new in this loop bcz stateRs==0
 								break;
-							default:
-								Functions::passToManuel(&agi, &res, const_cast<char *>((login->getSession())->callerId.c_str()));
-								break;
 						}
 						break;
 					case -1:
 						// do nothing, bcz fatalError raised
-						break;
-					default:  // like 0, bcz fatalError
-						Functions::passToManuel(&agi, &res, const_cast<char *>((login->getSession())->callerId.c_str()));
 						break;
 				}
 			}
@@ -93,16 +88,12 @@ int main(int argc, char *argv[])
 		case -1:
 			//cout<<"interuption, system stopped";
 			break;
-			
-		default:  //like 0
-			//cout<<"jump to operator";
-			Functions::passToManuel(&agi, &res, const_cast<char *>((login->getSession())->callerId.c_str()));
-			break;
 	}
 
 
+	Functions::playbackText(&agi,&res,Functions::getMenu(0,1));
 	
-
+	sleep(2);
 	AGITool_Destroy(&agi);
 	logout->start(Functions::getFatalError(),login->getSession());
 	

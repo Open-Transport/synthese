@@ -30,13 +30,15 @@ string Functions::getMenu(int _category, int _step)
 							return "dial 1 for english, 2 pour le francais, 3 fuer Deutsch, 4 per italien, 5 para español.";
 						case 1:
 							return "merci de votre utilisation, au revoir";
+						case 2:
+							return "Veuillez patienter, le système vous transfet au centre de reservation.";
 					}
 
 				case 1:	// login
 					switch(_step)
 					{
 						case 1: // welcome
-							return "Bienvenu au système de reservation";
+							return "Bienvenu au système de reservation\.";
 						case 2: // input usr name
 							return "Veuillez introduire le numero d\'utilisateur";
 						case 3:	// input psw
@@ -69,11 +71,11 @@ string Functions::getMenu(int _category, int _step)
 					switch(_step)
 					{
 						case 1:	// confirmation
-							return "pressez 1 pour oui et 3 pour non";
+							return "pressez le 1 pour oui ou pressez le 3 pour non.";
 						case 2:	// favoris list
-							return "Nous vous informons que votre reservation est effectuee avec succes.";
+							return "Nous vous informons que votre reservation est effectuee avec succès.";
 						case 3: // menukey 4,5,6,9,0
-							return "4 pour le precedent, 6 pour le prochain et 5 pour repeter le trajet, pressez 9 pour les 3 prochaines reservations enregistrees et 0 pour sortir";
+							return "5 pour écouter le trajet actuel, 4 pour precedent, 6 pour prochain. pressez 9 pour sortir.";
 						case 4: // without delete
 							return "aucune reservation effectuee, veuillez contacter operator";
 						case 5: // driver no delete right
@@ -83,6 +85,14 @@ string Functions::getMenu(int _category, int _step)
 			
 					}
 					break;
+				case 4:	// confirmation
+					switch(_step)
+					{
+						case 1:	// how many resa
+							return "Vous avez: ";
+						case 2:	// add after 1
+							return " reservation enregistrée";
+					}
 			
 			}
 			break;

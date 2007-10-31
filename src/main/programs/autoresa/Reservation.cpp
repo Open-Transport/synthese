@@ -12,7 +12,7 @@ Reservation::~Reservation()
 
 }
 
-int Reservation::start(string _fatalError, SessionReturnType *_session, int _tripChoiced, int _timeChoiced)
+int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _timeChoiced)
 {
 	session=_session;
 	tripChoiced=_tripChoiced;
