@@ -52,6 +52,7 @@ int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _timeC
 	else
 	{
 		// do noting bcz fatalError raised
+		cerr<<Functions::getFatalError()<<endl;
 		return -1;
 	}
 

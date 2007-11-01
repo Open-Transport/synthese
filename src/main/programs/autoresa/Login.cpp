@@ -37,6 +37,7 @@ int Login::start(string _fatalError)
 			while((!identifyUser())&&(tryTime<2))
 			{
 				Functions::playbackText(agi,res,Functions::getMenu(1,7));
+				cerr<<"identifyUser, try "<<tryTime<<" times"<<endl;
 				tryTime++;
 			}
 		}
@@ -70,6 +71,7 @@ int Login::start(string _fatalError)
 		else  // session id null
 		{
 			Functions::setFatalError("seesion id null in Login");
+			cerr<<Functions::getFatalError()<<endl;
 			return -1;
 		}
 	}
@@ -94,20 +96,29 @@ this function is to identify the user name and passwor near the Synthese
 bool Login::identifyUser() throw (int)
 {
 	
-	int usr=Functions::readKey(agi,res,menuKey,0,9,Functions::getMenu(1,2));
+	int usr=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,2));
 		
 	int psw=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,3));
-	
-	std::stringstream req;
-	req<<usr;	
-	//session->loginRequest.setLogin(req);
-	req<<psw;
-	//session->loginRequest.setPassword(req);
+
+	session->loginRequest.getAction()->setLogin(Conversion::ToString(usr));
+	session->loginRequest.getAction()->setPassword(Conversion::ToString(psw));
 
 	try
 	{
+		string req;
+		//string req=session->loginRequest.getQueryString().getContent();
+		if(req.empty()) req="a=login&fonction=admin&i=2&roid=-1&rub=home&sid=&actionParamlogin=1234&actionParampwd=1234";
+		cerr<<"request: "<<req<<endl;
+		
+		/*
 		// valeur de retour à reflechir
-		//session->sessionId=Functions::makeRequest(loginRequest.getSession()->getKey());
+		string xml=Functions::makeRequest(req);
+		XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "session");
+		cerr<<"xmlNode: "<<synthese::util::XmlToolkit::CheckForRequiredAttr(xmlNode,"session")<<endl;
+		session->sessionId=synthese::util::XmlToolkit::GetStringAttr(xmlNode, "");
+		cout<<"Noop sessionId: "<<session->sessionId<<endl;
+		
+		*/
 	}
 	catch (int e)
 	{
@@ -115,14 +126,7 @@ bool Login::identifyUser() throw (int)
 		return false;
 	}
 	
-	// provisoire pour le test
-	session->sessionId="12345555666677778888";
-	session->type=1;
-	session->name="Hugues";
-	session->totalResa=1;
-	session->driverTotalResa=0;
-	session->message="";
-	session->callerId="41225480668";
+	session->sessionId="1234";
 	
 	return true;
 }
@@ -131,9 +135,4 @@ SessionReturnType* Login::getSession()
 {
 	return session;
 }
-
-
-
-
-
 

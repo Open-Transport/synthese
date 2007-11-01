@@ -78,6 +78,7 @@ int Search::start(SessionReturnType *_session)
 	else
 	{
 		// do noting normally bcz fatalError raised
+		cerr<<Functions::getFatalError()<<endl;
 		return -1;
 	}
 }

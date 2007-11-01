@@ -114,6 +114,7 @@ int Confirmation::start(SessionReturnType *_session)
 	}
 	else  // fatalError raised, do nothing
 	{
+		cerr<<Functions::getFatalError()<<endl;
 		return -1;
 	}
 	

@@ -17,14 +17,16 @@ extern "C"
 }
 
 #include "08_acapela_client/PlaybackAcapela.h"
-
+#include "01_util/XmlToolkit.h"
 #include "30_server/BasicClient.h"
 #include "30_server/LoginAction.h"
-#include "01_util/XmlToolkit.h"
 #include "30_server/ActionFunctionRequest.h"
 #include "11_interfaces/SimplePageRequest.h"
+#include "01_util/Conversion.h"
+#include "30_server/QueryString.h"
 
 using namespace synthese::server;
+using namespace synthese::util;
 using namespace synthese::util::XmlToolkit;
 using namespace synthese::interfaces;
 using namespace std;

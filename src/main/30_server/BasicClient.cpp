@@ -62,7 +62,7 @@ namespace server
 	
 	if (clientSock.isConnected () == false)
 	{
-	    throw ClientException ("Cannot connect to server " + _serverHost + ":" + Conversion::ToString (_serverPort));
+		throw ClientException ("Cannot connect to server " + _serverHost + ":" + Conversion::ToString (_serverPort));
 	}
 	
 	cliSocketStream.open (clientSock);

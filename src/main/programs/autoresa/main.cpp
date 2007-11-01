@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
 	
 	AGITool_answer(&agi, &res);
-	//cout<<"main AutoResa";
+	cerr<<"main AutoResa"<<endl;
 	
 	//int menuKey[]={1,2,3,4,5};
 	//Functions::setLanguage(Functions::readKey(&agi,&res,menuKey,5,1,Functions::getMenu(0,0)));
@@ -47,14 +47,15 @@ int main(int argc, char *argv[])
 	**/
 	switch(state)
 	{
-		case 7: //cout<<"jump to FeedbackCst";
-			//cout<<"Noop before confirmation, fatalError: "<<Functions::getFatalError()<<" sessionId: "<<login->getSession()<<endl;
+		case 7: cerr<<"jump to FeedbackCst"<<endl;
+			cerr<<"Noop before confirmation, fatalError: "<<Functions::getFatalError()<<" sessionId: "<<login->getSession()<<endl;
+			state=confirmation->start(login->getSession());
+			cerr<<"state of confirmation: "<<state<<endl;
+			break;
+		case 8: cerr<<"jump to FeedbackDrv"<<endl;
 			state=confirmation->start(login->getSession());
 			break;
-		case 8: //cout<<"jump to FeedbackDrv";
-			state=confirmation->start(login->getSession());
-			break;
-		case 9: //cout<<"jump to search";
+		case 9: cerr<<"jump to search"<<endl;
 			do
 			{
 				state=search->start(login->getSession());
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
 						switch(stateRs)
 						{
 							case 1:
-								//cout<<"reservation successful";
+								cerr<<"reservation successful"<<endl;
 								break;
 							case -1:
 								// do nothing, bcz fatalError faised
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
 			break;
 			
 		case -1:
-			//cout<<"interuption, system stopped";
+			cerr<<"interuption, system stopped"<<endl;
 			break;
 	}
 

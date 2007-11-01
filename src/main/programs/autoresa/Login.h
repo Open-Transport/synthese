@@ -4,12 +4,10 @@
 #include "Functions.h"
 #include "30_server/LoginAction.h"
 
-#include "01_util/XmlToolkit.h"
 #include "30_server/ActionFunctionRequest.h"
 #include "11_interfaces/SimplePageRequest.h"
 
 using namespace synthese::server;
-using namespace synthese::util::XmlToolkit;
 using namespace synthese::interfaces;
 using namespace std;
 

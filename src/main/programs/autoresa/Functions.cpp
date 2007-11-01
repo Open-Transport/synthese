@@ -14,10 +14,10 @@ this function is called implicited by readKey and playbackText
 **/
 string Functions::text2Voice(string _text)
 {
-  //cout<<"Noop do vocal message: "<<_text<<endl;
+  cerr<<"do vocal message: "<<_text<<endl;
   // file name without extension like au
   string fileName="/usr/share/asterisk/agi-bin/fileName";
-  //cout<<"Do voice file: "<<fileName+"au"<<endl;
+  cerr<<"do voice file: "<<fileName+"au"<<endl;
   PlaybackAcapela::mainFunc(_text,fileName+".au");
   return fileName;
 }
@@ -30,9 +30,14 @@ bool Functions::validateInput(int *_menuKey,int _nMenuKey, int _inputKey)
 	int i=0;
 	while(i<_nMenuKey)
 	{
-		if(_menuKey[i]==_inputKey) return true;
+		if(_menuKey[i]==_inputKey)
+		{
+			cerr<<"input key is valable"<<endl;
+			return true;
+		}
 		else i++;
 	}
+	cerr<<"input key is NOT valable"<<endl;
 	return false;
 }
 
@@ -67,7 +72,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 	
 	if((_nKey==1)&&(inputKey==0)) Functions::passToManuel(_agi,_res,"test");
 	
-	//cout<<"Noop inputKey: "<<inputKey<<endl;
+	cerr<<"Noop inputKey: "<<inputKey<<endl;
 	
 	if(_nMenuKey==0)
 		return inputKey;
@@ -89,6 +94,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 **/
 int Functions::playbackText(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string _msg)
 {
+	cerr<<"playbackText called for "<<_msg<<endl;
 	return AGITool_stream_file(_agi, _res, const_cast<char *>(text2Voice(_msg).c_str()), "", 0);
 }
 
@@ -99,7 +105,7 @@ int Functions::playbackText(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string _msg)
 **/
 void Functions::exptMsgDtmf()
 {
-	cout<<"dtmf malformed error";
+	cerr<<"dtmf malformed error";
 	// voice warning pass to the operator
 	// write to log later with callerid
 }
@@ -110,7 +116,7 @@ void Functions::exptMsgDtmf()
 **/
 void Functions::exptMsgTimeout()
 {
-	cout<<"timeout exceeded";
+	cerr<<"timeout exceeded";
 	// voice warning, set fatalerror to cut system
 	// write to log later with callerid
 }
@@ -123,7 +129,7 @@ void Functions::exptMsgTimeout()
 **/
 void Functions::exptMsgRmtFailed()
 {
-	cout<<"remote server failed";
+	cerr<<"remote server failed";
 	// voice warning, set fatalerror to cut system
 	// write to log later with callerid 
 }
@@ -152,6 +158,7 @@ int Functions::getLanguage()
 void Functions::translateExpt(int _n)
 {
 	string temp;
+	cerr<<"Exception cached"<<endl;
 	switch(_n)
 	{
 		case 0: temp="normal termine";
@@ -160,25 +167,29 @@ void Functions::translateExpt(int _n)
 		/*the pair numbers are for the serious error*/
 		case 2:	// for manuel reception
 				setFatalError("warning: pass to operator");
+				cerr<<fatalError<<endl;
 				break;
 		case 4: // remote connection failed
 				setFatalError("error: remote server or connection error");
+				cerr<<fatalError<<endl;
 				exptMsgRmtFailed();
 				break;
 				
 		case 6: // dtmf malformed
 				setFatalError("error: dtmf malformed");
+				cerr<<fatalError<<endl;
 				exptMsgDtmf();
-		
 				break;
+				
 		case 8: // absolut timeout error
 				setFatalError("error: absolut timeout exceeded");
+				cerr<<fatalError<<endl;
 				exptMsgTimeout();
 		
 				break;
 				
 		default: // unknown error
-				cout<<"unknown error raised as Nr. "<<_n;
+				cerr<<"unknown error raised as Nr. "<<_n<<endl;
 				exit(-1);
 				break;
 	}
@@ -195,6 +206,7 @@ the function is to delivery the user to central
 **/
 int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId)
 {
+	cerr<<"pass to manuel called"<<endl;
 	// no need to listen the promo one more time, so jump to 4
 	playbackText(_agi,_res,Functions::getMenu(0,2));
 	char *ext="75";
@@ -209,14 +221,16 @@ int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId)
 **/
 string Functions::makeRequest(string _request) throw (int)
 {
-	synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("127.0.0.1",3591,0);
+	cerr<<"request: "<<_request<<endl;
+	
+	synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("localhost",3591);
 	
 	std::stringstream out;
 	basicClient->request(out,_request);
 	
 	delete basicClient;
 	
-	//cout<<"Noop request: "<<_request<<", return: "<<out.str() <<endl;
+	cerr<<"Noop request: "<<_request<<", return: "<<out.str() <<endl;
 	
 	return out.str();
 	
