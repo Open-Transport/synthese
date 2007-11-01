@@ -13,6 +13,7 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
 
 using namespace synthese::server;
 using namespace synthese::util;
