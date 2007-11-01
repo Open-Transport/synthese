@@ -68,7 +68,8 @@ namespace server
 	cliSocketStream.open (clientSock);
 	
 	// Send request to server
-	cliSocketStream << req.str () << std::flush;
+	cliSocketStream << req.str () << endl;
+	cliSocketStream.flush();
 	
 	// This is valid because server closes stream as soon as it has replied.
 	boost::iostreams::copy (cliSocketStream, out);
