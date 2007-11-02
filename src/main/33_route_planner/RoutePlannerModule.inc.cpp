@@ -20,3 +20,4 @@
 #include "33_route_planner/PeriodsListInterfaceElement.h"
 #include "33_route_planner/JourneyBoardsInterfaceElement.h"
 #include "33_route_planner/JourneyBoardInterfacePage.h"
+#include "33_route_planner/UserFavoriteJourneyTableSync.h"

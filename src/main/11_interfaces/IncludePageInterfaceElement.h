@@ -32,9 +32,17 @@ namespace synthese
 {
 	namespace interfaces
 	{
+		/** Page inclusion interface element.
+
+			Parameters :
+				- 0 : Class code
+				- 1 : Page code (optional)
+				- ... : parameters to transmit at the subpage
+		*/
 		class IncludePageInterfaceElement : public util::FactorableTemplate<LibraryInterfaceElement, IncludePageInterfaceElement>
 		{
 		private:
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_class_code;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_page_code;
 			ValueElementList							_parameters;
 

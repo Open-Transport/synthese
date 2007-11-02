@@ -222,6 +222,14 @@
 				RelativePath=".\TextInputInterfaceElemet.h"
 				>
 			</File>
+			<File
+				RelativePath=".\UserFavoriteListInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UserFavoriteListInterfaceElement.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="11 InterfacePage"

@@ -25,6 +25,7 @@ synthese::interfaces::InterfacePageTableSync::integrate();
 synthese::interfaces::RedirectInterfacePage::integrate();
 synthese::interfaces::DurationInterfacePage::integrate();
 synthese::interfaces::DateTimeInterfacePage::integrate();
+synthese::interfaces::NonPredefinedInterfacePage::integrate();
 
 synthese::interfaces::SimplePageRequest::integrate();
 synthese::interfaces::RedirRequest::integrate();

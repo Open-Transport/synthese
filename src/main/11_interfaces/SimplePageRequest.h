@@ -46,6 +46,7 @@ namespace synthese
 		class SimplePageRequest : public util::FactorableTemplate<RequestWithInterface, SimplePageRequest>
 		{
 			static const std::string PARAMETER_PAGE;
+			static const std::string PARAMETER_PAGE_CLASS;
 
 			//! \name Request parameters
 			//@{

@@ -25,6 +25,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <string>
 
 namespace synthese
@@ -32,17 +34,12 @@ namespace synthese
 	namespace interfaces
 	{
 		/** NonPredefinedInterfacePage class.
-			@ingroup m11
+			@ingroup m11Pages refPages
 		*/
-		class NonPredefinedInterfacePage : public InterfacePage
+		class NonPredefinedInterfacePage : public util::FactorableTemplate<InterfacePage,NonPredefinedInterfacePage>
 		{
-		private:
-			const std::string _key;
-
 		public:
-			NonPredefinedInterfacePage(const std::string& key);
 
-			const std::string& getFactoryKey() const;
 		};
 	}
 }

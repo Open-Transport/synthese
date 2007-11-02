@@ -154,21 +154,21 @@ namespace synthese
 
 
 
-		vector<shared_ptr<UserFavoriteJourney> > UserFavoriteJourneyTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		vector<shared_ptr<UserFavoriteJourney> > UserFavoriteJourneyTableSync::search(
+			const User* user
+			, int first /*= 0*/
+			, int number /*= 0*/
+			, bool raisingOrder
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				<< " WHERE "
+				<< COL_USER_ID << "=" << user->getKey()
+				<< " ORDER BY " << COL_RANK << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

@@ -44,7 +44,7 @@ namespace synthese
 			, const void* object
 			, const server::Request* request) const
 		{
-			const InterfacePage* page_to_include = _page->getInterface()->getPage(_page_code->getValue(parameters, variables, object, request));
+			const InterfacePage* page_to_include = _page->getInterface()->getPage(_class_code->getValue(parameters, variables, object, request), _page_code->getValue(parameters, variables, object, request));
 			page_to_include->display(stream, _parameters.fillParameters( parameters, variables, object, request ), variables, object, request);
 			return string();
 		}
@@ -54,6 +54,11 @@ namespace synthese
 			if (vel.isEmpty())
 				throw InterfacePageException("Included page not specified");
 
+			_class_code = vel.front();
+
+			if (vel.isEmpty())
+				return;
+			
 			_page_code = vel.front();
 			_parameters.takeFrom(vel, _page);
 		}

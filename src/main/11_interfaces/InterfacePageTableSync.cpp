@@ -22,7 +22,6 @@
 #include "InterfacePageTableSync.h"
 
 #include "11_interfaces/InterfacePage.h"
-#include "11_interfaces/NonPredefinedInterfacePage.h"
 #include "11_interfaces/Interface.h"
 
 #include "01_util/Conversion.h"
@@ -33,6 +32,7 @@
 #include "02_db/SQLiteResult.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -42,12 +42,12 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync,InterfacePageTableSync>::FACTORY_KEY("16.02 Interface Pages");
+		template<> const string FactorableTemplate<SQLiteTableSync,InterfacePageTableSync>::FACTORY_KEY("16.02 Interface Pages");
 	}
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::TABLE_NAME = "t023_interface_pages";
+		template<> const string SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::TABLE_NAME = "t023_interface_pages";
 		template<> const int SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::TABLE_ID = 23;
 		template<> const bool SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::HAS_AUTO_INCREMENT = true;
 
@@ -56,6 +56,8 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::load(InterfacePage* page, const db::SQLiteResultSPtr& rows )
 		{
 			page->setKey(rows->getLongLong (TABLE_COL_ID));
+			page->setPageCode(rows->getText(InterfacePageTableSync::TABLE_COL_PAGE));
+			page->setDirectDisplayAllowed(rows->getBool(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED));
 			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
 		}
 
@@ -77,16 +79,20 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string InterfacePageTableSync::TABLE_COL_INTERFACE = "interface_id";
-		const std::string InterfacePageTableSync::TABLE_COL_PAGE = "page_code";
-		const std::string InterfacePageTableSync::TABLE_COL_CONTENT = "content";
+		const string InterfacePageTableSync::TABLE_COL_INTERFACE = "interface_id";
+		const string InterfacePageTableSync::TABLE_COL_CLASS = "class_code";
+		const string InterfacePageTableSync::TABLE_COL_PAGE = "page_code";
+		const string InterfacePageTableSync::TABLE_COL_CONTENT = "content";
+		const string InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED("direct_display_allowed");
 
 		InterfacePageTableSync::InterfacePageTableSync()
 			: SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_INTERFACE, "INTEGER", false);
+			addTableColumn(TABLE_COL_CLASS, "TEXT", false);
 			addTableColumn(TABLE_COL_PAGE, "TEXT", false);
+			addTableColumn(TABLE_COL_DIRECT_DISPLAY_ALLOWED, "INTEGER", true);
 			addTableColumn(TABLE_COL_CONTENT, "TEXT", true);
 		}
 
@@ -105,14 +111,16 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
+				if (!Factory<InterfacePage>::contains(rows->getText(TABLE_COL_CLASS)))
+				{
+					Log::GetInstance().warn("Corrupted data on "+ TABLE_NAME +" table : Interface page class not found : " + rows->getText(TABLE_COL_CLASS));
+					continue;
+				}
+
 			    // Search the specified interface
 			    try
 			    {
-					InterfacePage* page(
-						Factory<InterfacePage>::contains(rows->getText(TABLE_COL_PAGE))
-						? Factory<InterfacePage>::create(rows->getText(TABLE_COL_PAGE))
-						: new NonPredefinedInterfacePage(rows->getText(TABLE_COL_PAGE))
-					);
+					InterfacePage* page(Factory<InterfacePage>::create(rows->getText(TABLE_COL_CLASS)));
 
 					load(page, rows);
 					page->store();
@@ -137,7 +145,7 @@ namespace synthese
 			{
 				/// @todo to be reimplemented
 				Interface::GetUpdateable (rows->getLongLong ( TABLE_COL_INTERFACE))
-				    ->removePage( rows->getText ( TABLE_COL_PAGE) );
+				    ->removePage(rows->getText(TABLE_COL_CLASS), rows->getText ( TABLE_COL_PAGE) );
 				InterfacePage::Remove(rows->getLongLong(TABLE_COL_ID));
 			}
 		}

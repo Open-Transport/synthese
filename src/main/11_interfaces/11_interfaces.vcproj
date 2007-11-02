@@ -74,14 +74,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\NonPredefinedInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NonPredefinedInterfacePage.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Parametres.h"
 				>
 			</File>
@@ -343,6 +335,14 @@
 			</File>
 			<File
 				RelativePath=".\DurationInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NonPredefinedInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NonPredefinedInterfacePage.h"
 				>
 			</File>
 			<File

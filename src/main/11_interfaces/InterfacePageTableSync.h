@@ -41,7 +41,9 @@ namespace synthese
 		{
 		public:
 			static const std::string TABLE_COL_INTERFACE;
+			static const std::string TABLE_COL_CLASS;
 			static const std::string TABLE_COL_PAGE;
+			static const std::string TABLE_COL_DIRECT_DISPLAY_ALLOWED;
 			static const std::string TABLE_COL_CONTENT;
 
 			/** Interface page SQLite table constructor.

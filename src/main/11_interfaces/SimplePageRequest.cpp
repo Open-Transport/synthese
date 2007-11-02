@@ -25,6 +25,7 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageException.h"
+#include "11_interfaces/NonPredefinedInterfacePage.h"
 
 #include "30_server/RequestException.h"
 
@@ -42,6 +43,7 @@ namespace synthese
 
 	namespace interfaces
 	{
+		const string SimplePageRequest::PARAMETER_PAGE_CLASS("pcl");
 		const string SimplePageRequest::PARAMETER_PAGE = "page";
 
 		void SimplePageRequest::_run( ostream& stream ) const
@@ -66,26 +68,26 @@ namespace synthese
 
 			_parameters = map;
 
+			string classKey(_parameters.getString(PARAMETER_PAGE_CLASS,false,FACTORY_KEY));
 			string key(_parameters.getString(PARAMETER_PAGE,false,FACTORY_KEY));
-			if (key.empty())
-				return;
 
+			if (classKey.empty())
+				classKey = NonPredefinedInterfacePage::FACTORY_KEY;
+			
 			if (!_interface.get())
 				throw RequestException("Interface was not defined");
 
-			// Drop registered pages
-			if (Factory<InterfacePage>::contains(key))
-				throw RequestException("Forbidden interface page");
-
 			try
 			{
-				_page = _interface->getPage(key);
-//				_parameters.erase(it);
+				_page = _interface->getPage(classKey,key);
 			}
 			catch (InterfacePageException& e)
 			{
-				throw RequestException("No such interface page : "+ key);
+				throw RequestException("No such interface page : "+ classKey + "/" + key);
 			}
+
+			if (!_page->getDirectDisplayAllowed())
+				throw RequestException("Forbidden page : "+ classKey + "/" + key);
 		}
 
 		ParametersMap SimplePageRequest::_getParametersMap() const
@@ -93,8 +95,10 @@ namespace synthese
 			ParametersMap map(RequestWithInterface::_getParametersMap());
 
 			if (_page != NULL)
-				map.insert(PARAMETER_PAGE, _page->getFactoryKey());
-			
+			{
+				map.insert(PARAMETER_PAGE, _page->getPageCode());
+				map.insert(PARAMETER_PAGE_CLASS, _page->getFactoryKey());
+			}
 			return map;
 		}
 

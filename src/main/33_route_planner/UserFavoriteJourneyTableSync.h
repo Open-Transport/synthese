@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace routeplanner
 	{
 		class UserFavoriteJourney;
@@ -63,8 +68,11 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<UserFavoriteJourney> > search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+				const security::User* user
+				, int first = 0
+				, int number = 0
+				, bool raisingOrder = true
+			);
 
 
 		};

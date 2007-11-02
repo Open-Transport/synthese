@@ -49,12 +49,23 @@ namespace synthese
 		}
 
 
-		const InterfacePage* Interface::getPage(const std::string& index) const
+		const InterfacePage* Interface::getPage(const string& classCode, string pageCode) const
 		{
-			PagesMap::const_iterator it = _pages.find(index);
+			PagesMap::const_iterator it = _pages.find(classCode);
 			if (it == _pages.end())
-				throw InterfacePageException("No such interface page " + index);
-			return it->second;
+				throw InterfacePageException("No such interface page class " + classCode);
+			const PagesMap::mapped_type& map2(it->second);
+			PagesMap::mapped_type::const_iterator it2(map2.find(pageCode));
+			if (it2 == map2.end())
+			{
+				// If index not found and empty, return the first element
+				if (pageCode.empty())
+				{
+					return map2.begin()->second;
+				}
+				throw InterfacePageException("No such interface page key " + pageCode + " for class " + classCode);
+			}
+			return it2->second;
 		}
 
 
@@ -62,24 +73,31 @@ namespace synthese
 		void Interface::addPage(InterfacePage* page )
 		{
 			page->setInterface(this);
-			_pages.insert(make_pair(page->getFactoryKey(), page));
+			PagesMap::iterator it(_pages.find(page->getFactoryKey()));
+			if (it == _pages.end())
+				it = _pages.insert(make_pair(page->getFactoryKey(), PagesMap::mapped_type())).first;
+			it->second.insert(make_pair(page->getPageCode(), page));
 		}
 
 
 
-		void Interface::removePage( const std::string& page_code )
+		void Interface::removePage(const string& classCode, const string& pageCode)
 		{
-			/** @todo Add a removal of each link to the page */
-			PagesMap::const_iterator it = _pages.find(page_code);
-			if (it != _pages.end())
-			{
-				_pages.erase( page_code );
-			}
+			PagesMap::iterator it = _pages.find(classCode);
+			if (it == _pages.end())
+				throw InterfacePageException("No such interface page class " + classCode);
+			PagesMap::mapped_type& map2(it->second);
+			PagesMap::mapped_type::iterator it2(map2.find(pageCode));
+			if (it2 == map2.end())
+				throw InterfacePageException("No such interface page key " + pageCode + " for class " + classCode);
+			map2.erase(it2);
+			if (map2.empty())
+				_pages.erase(it);
 		}
 
 
 
-		void Interface::setNoSessionDefaultPageCode( const std::string& code)
+		void Interface::setNoSessionDefaultPageCode(const string& code)
 		{
 			_noSessionDefaultPageCode = code;
 		}

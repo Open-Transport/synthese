@@ -137,6 +137,26 @@ namespace synthese
 			display(s, parameters, variables, object, request);
 			return s.str();
 		}
+
+		void InterfacePage::setPageCode( const std::string& code )
+		{
+			_pageCode = code;
+		}
+
+		const std::string& InterfacePage::getPageCode() const
+		{
+			return _pageCode;
+		}
+
+		void InterfacePage::setDirectDisplayAllowed( bool value )
+		{
+			_directDisplayAllowed = value;
+		}
+
+		bool InterfacePage::getDirectDisplayAllowed() const
+		{
+			return _directDisplayAllowed;
+		}
 	}
 }
 

@@ -26,17 +26,9 @@ using namespace std;
 
 namespace synthese
 {
+	template<> const std::string util::FactorableTemplate<interfaces::InterfacePage,interfaces::NonPredefinedInterfacePage>::FACTORY_KEY("*");
+
 	namespace interfaces
 	{
-		NonPredefinedInterfacePage::NonPredefinedInterfacePage(const string& key)
-			: InterfacePage(), _key(key)
-		{
-
-		}
-
-		const std::string& NonPredefinedInterfacePage::getFactoryKey() const
-		{
-			return _key;
-		}
 	}
 }

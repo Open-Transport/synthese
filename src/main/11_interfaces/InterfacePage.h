@@ -61,8 +61,10 @@ namespace synthese
 			, public util::Registrable<uid, InterfacePage>
 		{
 		private:
+			std::string							_pageCode;
 			const Interface*					_interface;
 			LibraryInterfaceElement::Registry	_components;
+			bool								_directDisplayAllowed;
 			
 		public:
 			InterfacePage();
@@ -85,8 +87,12 @@ namespace synthese
 				, const server::Request* request = NULL) const;
 
 			void				setInterface(const Interface*);
+			void				setPageCode(const std::string& code);
+			void				setDirectDisplayAllowed(bool value);
 
-			const Interface*	getInterface()	const;
+			const Interface*	getInterface()				const;
+			const std::string&	getPageCode()				const;
+			bool				getDirectDisplayAllowed()	const;
 
 			std::string getValue(
 				const ParametersVector& parameters

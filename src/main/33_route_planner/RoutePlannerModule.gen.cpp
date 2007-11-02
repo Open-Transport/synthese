@@ -22,3 +22,5 @@ synthese::routeplanner::PeriodsListInterfaceElement::integrate();
 synthese::routeplanner::JourneyBoardsInterfaceElement::integrate();
 
 synthese::routeplanner::RoutePlannerFunction::integrate();
+
+synthese::routeplanner::UserFavoriteJourneyTableSync::integrate();

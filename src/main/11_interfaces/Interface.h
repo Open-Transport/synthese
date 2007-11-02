@@ -55,31 +55,34 @@ namespace synthese
 		class Interface : public util::Registrable<uid, Interface>
 		{
 			private:
-				typedef std::map<std::string, InterfacePage*> PagesMap;
-
+				typedef std::map<std::string, std::map<std::string, InterfacePage*> >	PagesMap;
+				
 				std::string	_name;
 				PagesMap	_pages;
 				std::string	_noSessionDefaultPageCode;
 
 			public:
+				//! \name Setters
+				//@{
+					void	setName(const std::string& name);
+				//@}
 
-				//! \name Accesseurs
+				//! \name Getters
 				//@{
 					/** Gets a stored page from the class factory key.
-						@param key Key of the wanted class
+						@param key Key of the wanted class (pair of strings : if the second element of the pair is empty, and no element has empty page key, then the first element of the class is returned)
 						@return A pointer to the existing wanted page in the interface definition. The pointer does not know the real type of the page.
 						@exception InterfacePageException The code is not available in the factory
 					*/
-					const InterfacePage* getPage( const std::string& key) const;
+					const InterfacePage* getPage(const std::string& classCode, std::string pageCode = std::string()) const;
 
 					/** Gets a stored page from its class (template).
 						@return The required page, directly known as its type.
 					*/
 					template <class T>
-					const T* const getPage() const
+					const T* const getPage(std::string pageKey = std::string()) const
 					{
-						std::string key(util::Factory<InterfacePage>::getKey<T>());
-						return static_cast<const T*>(getPage(key));
+						return static_cast<const T*>(getPage(T::FACTORY_KEY, pageKey));
 					}
 
 					const std::string& getNoSessionDefaultPageCode() const;
@@ -88,10 +91,9 @@ namespace synthese
 
 				//! \name Modifiers
 				//@{
-					void	addPage(InterfacePage* page );
-					void	removePage( const std::string& page_code );
-					void	setNoSessionDefaultPageCode(const std::string&);
-					void	setName(const std::string& name);
+					void	addPage(InterfacePage* page);
+					void	removePage(const std::string& classCode, const std::string& pageCode);
+					void	setNoSessionDefaultPageCode(const std::string& classCode);
 				//@}
 
 				Interface( const uid id = UNKNOWN_VALUE);
