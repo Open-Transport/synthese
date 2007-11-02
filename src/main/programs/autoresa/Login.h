@@ -29,11 +29,13 @@ class Login
 		Login(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res);
 		~Login();
 		
-		int start(string _fatalError);
+		int start();
 		bool identifyUser() throw (int);
 		
 		SessionReturnType* getSession();
-
+		// smart xml parser
+		static string smartXmlParser(string xml, string nodeName);
+	
 		
 	private:
 		// common variables

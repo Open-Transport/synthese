@@ -26,28 +26,36 @@ Login::~Login()
 			-1: interruption, stop system
 			else to operator
 **/
-int Login::start(string _fatalError)
+int Login::start()
 {
-	if(_fatalError.empty())
+	int temp=0;
+	
+	if(Functions::getFatalError().empty())
 	{
 		int tryTime=0;
-
+		session->callerId=Functions::getCallerId(agi,res);		
 		try
 		{
 			while((!identifyUser())&&(tryTime<2))
 			{
-				Functions::playbackText(agi,res,Functions::getMenu(1,7));
+				temp=Functions::playbackText(agi,res,Functions::getMenu(1,7));
 				cerr<<"identifyUser, try "<<tryTime<<" times"<<endl;
 				tryTime++;
 			}
+			if(tryTime>2) Functions::setFatalError("usr login failed");
 		}
 		catch(int e)
 		{
 			Functions::translateExpt(e);
 			return -1;
 		}
-
-		if(!session->sessionId.empty())
+		catch(string e)
+		{
+			cerr<<"unknown Exception catched "<<e<<endl;
+			return 0;
+		}		
+		
+		if((!session->sessionId.empty())&&(Functions::getFatalError().empty()))
 		{
 			if(!session->message.empty()) Functions::text2Voice(session->message);
 			
@@ -78,6 +86,7 @@ int Login::start(string _fatalError)
 	else  // if fatalError producted
 	{
 		// do nothing for the moment
+		cerr<<"fatal error found in Login"<<endl;
 		return 0;
 	}
 	
@@ -96,43 +105,80 @@ this function is to identify the user name and passwor near the Synthese
 bool Login::identifyUser() throw (int)
 {
 	
-	int usr=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,2));
+	int usr,psw;
+
+	usr=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,2));
 		
-	int psw=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,3));
+	psw=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,3));
+	
+	//usr=1234; psw=1234;
 
 	session->loginRequest.getAction()->setLogin(Conversion::ToString(usr));
 	session->loginRequest.getAction()->setPassword(Conversion::ToString(psw));
 
 	try
 	{
-		string req;
-		//string req=session->loginRequest.getQueryString().getContent();
-		if(req.empty()) req="a=login&fonction=admin&i=2&roid=-1&rub=home&sid=&actionParamlogin=1234&actionParampwd=1234";
-		cerr<<"request: "<<req<<endl;
+		stringstream req;
+
+		// interface 4
+		req<<"ipaddr=0.0.0.0&a=login&fonction=page&page=ajax_login_response&i=2&actionParamlogin="<<usr<<"&actionParampwd="<<psw<<"&nr=1";
+
+		cerr<<"request: "<< req.str() <<endl;
 		
-		/*
-		// valeur de retour à reflechir
-		string xml=Functions::makeRequest(req);
-		XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "session");
-		cerr<<"xmlNode: "<<synthese::util::XmlToolkit::CheckForRequiredAttr(xmlNode,"session")<<endl;
-		session->sessionId=synthese::util::XmlToolkit::GetStringAttr(xmlNode, "");
-		cout<<"Noop sessionId: "<<session->sessionId<<endl;
 		
-		*/
+		// valeur de retour Ã  reflechir
+		string xml=Functions::makeRequest(req.str());
+		//cerr<<"xml return"<<xml<<endl;		
+
+		// do xml parser
+		session->name=smartXmlParser(xml,"name");
+		cerr<<"name: "<<session->name<<endl;
+		session->sessionId=smartXmlParser(xml,"session");
+		cerr<<"sessionId: "<<session->sessionId<<endl;
+		session->type=1;
+		
+		
 	}
 	catch (int e)
 	{
 		Functions::translateExpt(e);
 		return false;
 	}
+	catch (string e)
+	{
+		cerr<<"unknown Exception cached: "<<e<<endl;
+	}
 	
-	session->sessionId="1234";
-	
-	return true;
+	if(session->sessionId.empty())
+	{
+	    return false;
+	}
+	else
+	{
+	    return true;
+	}
 }
 
 SessionReturnType* Login::getSession()
 {
 	return session;
 }
+
+/*
+
+**/
+static string Login::smartXmlParser(string xml, string nodeName)
+{
+	// do xml parser
+	XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, nodeName);
+	cerr<<"xml Node: "<<xmlNode.getName()<<endl;
+	xmlNode=synthese::util::XmlToolkit::ParseString(xml, xmlNode.getName());
+	
+	int i=0;
+	string msg;
+	msg=xmlNode.getChildNode(nodeName.c_str()).getText();
+
+	return msg;
+}
+
 

@@ -17,6 +17,7 @@ extern "C"
 }
 
 #include "08_acapela_client/PlaybackAcapela.h"
+#include "01_util/XmlParser.h"
 #include "01_util/XmlToolkit.h"
 #include "30_server/BasicClient.h"
 #include "30_server/LoginAction.h"
@@ -67,7 +68,9 @@ class Functions
 		// call BasicClient of Synthese
 		static string makeRequest(string _request) throw (int);
 	
-		
+		// return caller id
+		static string getCallerId(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res);
+			
 	private:
 		static string fatalError;
 		static int language;

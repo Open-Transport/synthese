@@ -190,7 +190,7 @@ void Functions::translateExpt(int _n)
 				
 		default: // unknown error
 				cerr<<"unknown error raised as Nr. "<<_n<<endl;
-				exit(-1);
+				//exit(-1);
 				break;
 	}
 	
@@ -236,4 +236,10 @@ string Functions::makeRequest(string _request) throw (int)
 	
 }
 
-
+string Functions::getCallerId(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res)
+{
+	char number[20];
+	AGITool_get_variable2(_agi,_res, "CALLERID(NUMBER)", number, 20);
+	cerr<<"caller Id: "<<number<<endl;
+	return number;
+}

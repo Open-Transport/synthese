@@ -36,7 +36,8 @@ int main(int argc, char *argv[])
 	Confirmation *confirmation=new Confirmation(&agi,&res);
 	Logout *logout=new Logout(&agi,&res);
 
-	state=login->start(Functions::getFatalError());
+	state=login->start();
+	cerr<<"login return: "<<state<<endl;
 	/*
 	* state is to signe the next step,
 		7: FeedbackCst
@@ -47,11 +48,13 @@ int main(int argc, char *argv[])
 	**/
 	switch(state)
 	{
-		case 7: cerr<<"jump to FeedbackCst"<<endl;
+		case 7:
+			cerr<<"jump to FeedbackCst"<<endl;
 			cerr<<"Noop before confirmation, fatalError: "<<Functions::getFatalError()<<" sessionId: "<<login->getSession()<<endl;
 			state=confirmation->start(login->getSession());
 			cerr<<"state of confirmation: "<<state<<endl;
 			break;
+			
 		case 8: cerr<<"jump to FeedbackDrv"<<endl;
 			state=confirmation->start(login->getSession());
 			break;
@@ -88,6 +91,9 @@ int main(int argc, char *argv[])
 			
 		case -1:
 			cerr<<"interuption, system stopped"<<endl;
+			break;
+		default:
+			cerr<<"state return: "<<state<<endl;
 			break;
 	}
 
