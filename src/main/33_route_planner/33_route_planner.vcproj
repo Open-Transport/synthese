@@ -306,6 +306,14 @@
 				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.h"
 				>
 			</File>
+			<File
+				RelativePath=".\UserFavoriteInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UserFavoriteInterfacePage.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="12 UserPrefPanel"

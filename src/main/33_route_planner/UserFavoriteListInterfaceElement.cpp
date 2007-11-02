@@ -26,12 +26,14 @@
 
 #include "33_route_planner/UserFavoriteJourney.h"
 #include "33_route_planner/UserFavoriteJourneyTableSync.h"
+#include "33_route_planner/UserFavoriteInterfacePage.h"
 
 #include "30_server/Request.h"
 
 #include "12_security/User.h"
 
 #include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/Interface.h"
 
 using namespace std;
 using namespace boost;
@@ -50,6 +52,7 @@ namespace synthese
 	{
 		void UserFavoriteListInterfaceElement::storeParameters(ValueElementList& vel)
 		{
+			_elementPageCode = vel.front();
 		}
 
 		string UserFavoriteListInterfaceElement::display(
@@ -60,10 +63,13 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 
+			const UserFavoriteInterfacePage* page(_page->getInterface()->getPage<UserFavoriteInterfacePage>(_elementPageCode->getValue(parameters, variables, object, request)));
+
 			const User* user(request->getUser().get());
 			vector<shared_ptr<UserFavoriteJourney> > journeys(UserFavoriteJourneyTableSync::search(user));
 
-
+			for (vector<boost::shared_ptr<UserFavoriteJourney> >::const_iterator it(journeys.begin()); it != journeys.end(); ++it)
+				page->display(stream, it->get(), variables, request);
 
 			return string();
 		}

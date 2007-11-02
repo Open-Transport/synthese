@@ -8,6 +8,7 @@ synthese::routeplanner::JourneyBoardJunctionCellInterfacePage::integrate();
 synthese::routeplanner::RoutePlannerNoSolutionInterfacePage::integrate();
 synthese::routeplanner::RoutePlannerInterfacePage::integrate();
 synthese::routeplanner::JourneyBoardInterfacePage::integrate();
+synthese::routeplanner::UserFavoriteInterfacePage::integrate();
 
 synthese::routeplanner::JourneyLineListInterfaceElement::integrate();
 synthese::routeplanner::JourneyBoardInterfaceElement::integrate();
@@ -20,6 +21,7 @@ synthese::routeplanner::TextInputInterfaceElemet::integrate();
 synthese::routeplanner::RequestInterfaceElement::integrate();
 synthese::routeplanner::PeriodsListInterfaceElement::integrate();
 synthese::routeplanner::JourneyBoardsInterfaceElement::integrate();
+synthese::routeplanner::UserFavoriteListInterfaceElement::integrate();
 
 synthese::routeplanner::RoutePlannerFunction::integrate();
 
