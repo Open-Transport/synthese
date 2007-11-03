@@ -35,7 +35,7 @@ namespace synthese
 		     */
 		    void request (std::ostream& out, 
 				  const std::string& request, 
-				  const std::string& clientIp = "127.0.0.1", 
+				  const std::string& clientIp = "0.0.0.0", 
 				  const std::string& clientUrl = "");
 
 		    

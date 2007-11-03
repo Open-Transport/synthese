@@ -14,7 +14,7 @@ class Reservation
 		Reservation(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res);
 		~Reservation();
 		
-		int start(SessionReturnType *_session,int _currentSearch,int _currentChoice);
+		int start(SessionReturnType *_session, int _tripChoiced, int _rankChoiced);
 		
 		int requestReservationToSynthese() throw (int);
 		
@@ -28,7 +28,7 @@ class Reservation
 		// local variables
 		int *menuKey;
 		int tripChoiced;
-		int timeChoiced;
+		int rankChoiced;
 };
 #endif
 

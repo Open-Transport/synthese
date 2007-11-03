@@ -70,6 +70,9 @@ class Functions
 	
 		// return caller id
 		static string getCallerId(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res);
+		
+		// smart xml parser
+		static string smartXmlParser(string xml, string nodeName);
 			
 	private:
 		static string fatalError;
@@ -91,15 +94,42 @@ class Functions
 class SessionReturnType
 {
 	public:
+		struct FavorisVectorStruct
+		{
+			int rank;
+			string origin_city;
+			string origin_place;
+			string destination_city;
+			string destination_place;
+		};
+		
+		struct SolutionSt
+		{
+				int rank;
+				string date;
+				int reservation;
+				string sentence;
+		};
+
+		
+		string usr;
+		string psw;
 		string sessionId;
 		int type;
 		string name;
+		string registredPhone;
+		string userId;
 		int totalResa;
 		int driverTotalResa;
 		string message;
 		string callerId;
+		string favorisSentence;
+		vector<FavorisVectorStruct> favoris;
 		ActionFunctionRequest<LoginAction,SimplePageRequest> loginRequest;
+		vector<SolutionSt> solutionVector;
 		
+	
 };
+
 #endif
 

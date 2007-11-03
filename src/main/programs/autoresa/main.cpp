@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 				switch(state)
 				{
 					case 1:
-						stateRs=reservation->start(login->getSession(),search->getChoicedFavorisTrajet(),search->getChoicedTimeOfChoicedTrip());
+						stateRs=reservation->start(login->getSession(),search->getChoicedFavorisTrajet(),search->getRankOfChoicedTrajet());
 
 						switch(stateRs)
 						{
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	}
 
 
-	Functions::playbackText(&agi,&res,Functions::getMenu(0,1));
+	//Functions::playbackText(&agi,&res,Functions::getMenu(0,1));
 	
 	sleep(2);
 	AGITool_Destroy(&agi);

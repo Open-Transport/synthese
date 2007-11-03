@@ -18,7 +18,7 @@ string Functions::text2Voice(string _text)
   // file name without extension like au
   string fileName="/usr/share/asterisk/agi-bin/fileName";
   cerr<<"do voice file: "<<fileName+"au"<<endl;
-  PlaybackAcapela::mainFunc(_text,fileName+".au");
+  PlaybackAcapela::mainFunc(_text,fileName+".au","10.12.155.36","claire8kmu");
   return fileName;
 }
 
@@ -68,7 +68,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 
 	// clic * to stop input
 	
-	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),(int)(ceil(_nKey*1.2))*1000, _nKey);
+	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),(int)(ceil(_nKey*2))*1000, _nKey);
 	
 	if((_nKey==1)&&(inputKey==0)) Functions::passToManuel(_agi,_res,"test");
 	
@@ -243,3 +243,22 @@ string Functions::getCallerId(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res)
 	cerr<<"caller Id: "<<number<<endl;
 	return number;
 }
+
+
+/*
+
+**/
+static string Functions::smartXmlParser(string xml, string nodeName)
+{
+	// do xml parser
+	XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, nodeName);
+	cerr<<"xml Node: "<<xmlNode.getName()<<endl;
+	xmlNode=synthese::util::XmlToolkit::ParseString(xml, xmlNode.getName());
+	
+	int i=0;
+	string msg;
+	msg=xmlNode.getChildNode(nodeName.c_str()).getText();
+
+	return msg;
+}
+

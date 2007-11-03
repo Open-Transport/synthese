@@ -124,7 +124,7 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
   
     while (nbvoice > 0) 
     {
-		////cout<<ptabFindVoice[idtabFindVoice].cVoiceName<<endl;
+		cerr<<ptabFindVoice[idtabFindVoice].cVoiceName<<endl;
 		idtabFindVoice++;
 		nbvoice--;
     }
@@ -141,8 +141,7 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
         //cout<<"ERROR: nscInitChannel return "<<Result<<endl;
         return -1;
     }
-
-  
+	
     /* Lock channel */
     if( (Result = nscLockChannel(hSrv,ChId,hDispatch,&hTTS)) == NSC_OK)
     {
@@ -154,6 +153,16 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
         return -1;
     }
 
+	if((Result=nscSetParamChannel(hTTS,NSC_PRM_SPEED,96))== NSC_OK)
+	{
+		cerr<<"parameter of voice speed changed"<<endl;
+	}
+	else
+	{
+		cerr<<"change of voice speed error: "<<Result<<endl;
+	}
+	
+	
     /* AddText channel */
      ////cout<<"textVoiceAck: "<<_text<<endl;
      ////cout<<"voiceFileNameAck: "<<_fileName<<endl;

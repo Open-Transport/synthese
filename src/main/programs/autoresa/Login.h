@@ -33,8 +33,7 @@ class Login
 		bool identifyUser() throw (int);
 		
 		SessionReturnType* getSession();
-		// smart xml parser
-		static string smartXmlParser(string xml, string nodeName);
+		
 	
 		
 	private:

@@ -58,7 +58,7 @@ int Login::start()
 		if((!session->sessionId.empty())&&(Functions::getFatalError().empty()))
 		{
 			if(!session->message.empty()) Functions::text2Voice(session->message);
-			
+			/*
 			switch(session->type)
 			{
 				case 0:
@@ -68,13 +68,15 @@ int Login::start()
 					menuKey[1]=9;
 					dtmfInput=Functions::readKey(agi,res,menuKey,2,1,Functions::getMenu(1,4));
 					break;
-				case 1:
+				default:
 					menuKey[0]=7;
 					menuKey[1]=9;
 					dtmfInput=Functions::readKey(agi,res,menuKey,2,1,Functions::getMenu(1,6));
 					break;
 			}
 			return dtmfInput;
+			*/
+			return 9;
 		}
 		else  // session id null
 		{
@@ -111,7 +113,8 @@ bool Login::identifyUser() throw (int)
 		
 	psw=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,3));
 	
-	//usr=1234; psw=1234;
+	session->usr=usr;
+	session->psw=synthese::util::Conversion::ToString(psw);
 
 	session->loginRequest.getAction()->setLogin(Conversion::ToString(usr));
 	session->loginRequest.getAction()->setPassword(Conversion::ToString(psw));
@@ -121,21 +124,64 @@ bool Login::identifyUser() throw (int)
 		stringstream req;
 
 		// interface 4
-		req<<"ipaddr=0.0.0.0&a=login&fonction=page&page=ajax_login_response&i=2&actionParamlogin="<<usr<<"&actionParampwd="<<psw<<"&nr=1";
+		req<<"ipaddr=0.0.0.0&a=login&fonction=page&page=login_response&i=4&actionParamlogin="<<usr<<"&actionParampwd="<<psw<<"&nr=1";
 
 		cerr<<"request: "<< req.str() <<endl;
 		
 		
 		// valeur de retour à reflechir
 		string xml=Functions::makeRequest(req.str());
-		//cerr<<"xml return"<<xml<<endl;		
+		//cerr<<"xml return"<<xml<<endl; 
 
 		// do xml parser
-		session->name=smartXmlParser(xml,"name");
+		session->name=Functions::smartXmlParser(xml,"name");
 		cerr<<"name: "<<session->name<<endl;
-		session->sessionId=smartXmlParser(xml,"session");
+		session->sessionId=Functions::smartXmlParser(xml,"session");
 		cerr<<"sessionId: "<<session->sessionId<<endl;
-		session->type=1;
+		session->userId=Functions::smartXmlParser(xml,"user_id");
+		cerr<<"userId: "<<session->userId<<endl;
+		//session->registredPhone=Functions::smartXmlParser(xml,"phone");
+		//cerr<<"registred Phone: "<<session->registredPhone<<endl;
+		session->favorisSentence=Functions::smartXmlParser(xml,"sentence");
+		cerr<<"sentence: "<<session->favorisSentence<<endl;
+		
+		/*
+		<favorite rank="1" origin_city="TOULOUSE" origin_place="Capitole" destination_city="FLOURENS" destination_place="Mairie" />
+		<favorite rank="2" origin_city="QUINT-FONSEGRIVES" origin_place="Mairie" destination_city="PIN-BALMA" destination_place="Pastoureau" />
+		*/
+		int n=0;
+		
+		XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "login");
+		XMLNode xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"favorite",0);
+		bool stillValue=true;
+		SessionReturnType::FavorisVectorStruct favorisSt;
+		string place;
+		
+		while(!xmlNodeChild.isEmpty())
+		{
+			
+			place="rank";
+			favorisSt.rank=synthese::util::XmlToolkit::GetIntAttr(xmlNodeChild,place);;
+			place="origin_city";
+			favorisSt.origin_city=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+			place="origin_place";
+			favorisSt.origin_place=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+			place="destination_city";
+			favorisSt.destination_city=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+			place="destination_place";
+			favorisSt.destination_place=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+			
+			cerr<<endl;
+			cerr<<"favoris rank: "<<favorisSt.rank<<endl;
+			cerr<<"origin_city: "<<favorisSt.origin_city<<endl;
+			cerr<<"origin_place: "<<favorisSt.origin_place<<endl;
+			cerr<<"destination_city: "<<favorisSt.destination_city<<endl;
+			cerr<<"destination_place: "<<favorisSt.destination_place<<endl<<endl;
+				
+			session->favoris.push_back(favorisSt);
+			xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"favorite",++n);
+		}
+
 		
 		
 	}
@@ -162,23 +208,6 @@ bool Login::identifyUser() throw (int)
 SessionReturnType* Login::getSession()
 {
 	return session;
-}
-
-/*
-
-**/
-static string Login::smartXmlParser(string xml, string nodeName)
-{
-	// do xml parser
-	XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, nodeName);
-	cerr<<"xml Node: "<<xmlNode.getName()<<endl;
-	xmlNode=synthese::util::XmlToolkit::ParseString(xml, xmlNode.getName());
-	
-	int i=0;
-	string msg;
-	msg=xmlNode.getChildNode(nodeName.c_str()).getText();
-
-	return msg;
 }
 
 

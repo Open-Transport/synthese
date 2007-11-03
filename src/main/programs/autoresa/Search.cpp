@@ -33,8 +33,8 @@ int Search::start(SessionReturnType *_session)
 	{
 		try
 		{
-			// get favoris trip from synthese
-			nFavorisTrip=getFavorisFromSynthese();
+			for(int i=0;i<=session->favoris.size();i++) menuKey[i]=i;
+			choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,session->favoris.size(),1,session->favorisSentence);
 		}
 		catch(int e)
 		{
@@ -42,17 +42,13 @@ int Search::start(SessionReturnType *_session)
 			return -1;
 		}
 		
-		if(nFavorisTrip!=0)	// with favoris
+		if(session->favoris.size()!=0)	// with favoris
 		{
-			Functions::playbackText(agi,res,Functions::getMenu(2,1));
-			
-			for(int i=0;i<nFavorisTrip;i++) menuKey[i]=i;
-			choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,nFavorisTrip,1,favorisTrip);
-			
+
 			// request to the synthese for the time table of the favoris trip choiced
 			try
 			{
-				nTimeOfChoicedTrip=searchFromSynthese(choicedFavorisTrajet,dateTime);
+				sentence=searchFromSynthese(choicedFavorisTrajet);
 			}
 			catch(int e)
 			{
@@ -60,8 +56,18 @@ int Search::start(SessionReturnType *_session)
 				return -1;
 			}
 			
-			for(int i=0;i<nTimeOfChoicedTrip;i++) menuKey[i]=i;
-			choicedTimeOfChoicedTrip=Functions::readKey(agi,res,menuKey,nTimeOfChoicedTrip,(int)(nTimeOfChoicedTrip/10)+1,timeOfChoicedTrip);
+			
+			
+			
+			
+			// take the choice];
+			for(int i=0;i<=session->solutionVector.size();i++) menuKey[i]=i;
+			do
+			{
+				choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,session->solutionVector.size()+1,1,sentence);
+			}
+			while(!session->solutionVector.at(choicedFavorisTrajet-1).reservation);
+			
 			
 			return 1;		// Ok
 
@@ -87,9 +93,9 @@ int Search::getChoicedFavorisTrajet()
 {
 	return choicedFavorisTrajet;
 }
-int Search::getChoicedTimeOfChoicedTrip()
+int Search::getRankOfChoicedTrajet()
 {
-	return choicedTimeOfChoicedTrip;
+	return session->solutionVector.at(choicedFavorisTrajet-1).rank;
 }
 
 
@@ -97,15 +103,11 @@ int Search::getChoicedTimeOfChoicedTrip()
 	function is to get how many favoris for this session from Synthese
 	@parameters:
 	@return:
-		int: quantity of favoris saved for this session
+		int: 0 ok, else error
 **/
 int Search::getFavorisFromSynthese() throw (int)
 {
-	// ask with session->sessionId
-	// update favorisTrip as favoris message
-	// return quantity of favoris
-	// for the moment
-	return 5;
+	// update favorisTrip
 }
 
 /*
@@ -127,39 +129,57 @@ int Search::getFavorisFromSynthese() throw (int)
 	@return:
 		int: 1 ok, 0 failed and raison saved in fatalError
 **/
-int Search::searchFromSynthese(int _favoris, tm _dataTime) throw (int)
+string Search::searchFromSynthese(int _favoris) throw (int)
 {
-	//(session->loginRequest);
+		_favoris--;
+		string req="fonction=rp&si=3&da=A&msn=3&dct="+session->favoris.at(_favoris).origin_city+"&dpt="+session->favoris.at(_favoris).origin_place+"&act="+session->favoris.at(_favoris).destination_city+"&apt="+session->favoris.at(_favoris).destination_place+"&ac=0";
+	
+		cerr<<"request: "<< req<<endl;
+				
+		// valeur de retour à reflechir
+		string xml=Functions::makeRequest(req);
+		
+		/*
+		<solution
+			rank="1"
+			date="2007-11-03 19:38:00" 
+			reservation="1"
+			sentence="D?tail de votre trajet : Vous partez de City68 93.A 19:38, prenez la ligne 92 ? destination de City12 99.Descendez ? l\'arr?tCity12 97.A 20:11, prenez la ligne 94 ? destination de City68 93.Descendez ? l\'arr?tCity6 95.Vous arrivez ? City6 95 ? 20:15.Attention ! La r?servation est obligatoire pour pouvoir emprunter cette relation.Taper 1 pour r?server votre place." />
+		*/
+		
+		// prepare solutions
+		int n=0;
+		XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "solutions");
+		XMLNode xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"solution",0);
+		
+		bool stillValue=true;
+		SessionReturnType::SolutionSt solutionSt;
+		string place;
+		
+		while(!xmlNodeChild.isEmpty())
+		{
+			
+			place="rank";
+			solutionSt.rank=synthese::util::XmlToolkit::GetIntAttr(xmlNodeChild,place);;
+			place="date";
+			solutionSt.date=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+			place="reservation";
+			solutionSt.reservation=synthese::util::XmlToolkit::GetIntAttr(xmlNodeChild,place);
+			place="sentence";
+			solutionSt.sentence=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+			
+			cerr<<endl;
+			cerr<<"solution rank: "<<solutionSt.rank<<endl;
+			cerr<<"date: "<<solutionSt.date<<endl;
+			cerr<<"reservation: "<<solutionSt.reservation<<endl;
+			cerr<<"sentence: "<<solutionSt.sentence<<endl;
+				
+			session->solutionVector.push_back(solutionSt);
+			xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"solution",++n);
+		}
+		
+		return Functions::smartXmlParser(xml,"sentence");
 	
 	
-	if(_dataTime.tm_year==0)
-	{
-		time_t rawtime;
-
-		time ( &rawtime );
-		//_dataTime = localtime ( &rawtime );
-	}
-	
-	// update timeOfChoicedTrip for the favoris trajet text
-	// return nTimeOfChoicedTrip max 3
-	
-	favorisTrip="favoris 1: Aigle pour Toulous, 2 Nyon pour Marseille.";
-	nFavorisTrip=2;
-	
-	return 3;
-	
-}
-
-int Search::searchFromSynthese(string _orignal, string _destination, tm _dataTime) throw (int)
-{
-	if(_dataTime.tm_year==0)
-	{
-		time_t rawtime;
-
-		time ( &rawtime );
-		//_dataTime = localtime ( &rawtime );
-	}
-	
-	return 0;
 }
 

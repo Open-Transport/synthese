@@ -1,6 +1,8 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
+#include "vector"
+
 #include "Functions.h"
 #include "33_route_planner/RoutePlannerFunction.h"
 
@@ -18,12 +20,10 @@ class Search
 		
 		int start(SessionReturnType *_session);
 		int getChoicedFavorisTrajet();
-		int getChoicedTimeOfChoicedTrip();
+		int getRankOfChoicedTrajet();
 		
 		int getFavorisFromSynthese() throw (int);
-		int searchFromSynthese(int _favoris, tm _dataTime) throw (int);
-		int searchFromSynthese(string _orignal, string _destination, tm _dataTime) throw (int);
-		
+		string searchFromSynthese(int _favoris) throw (int);
 		
 	private:
 		// common variables
@@ -34,8 +34,8 @@ class Search
 		int *menuKey;
 		
 		// local variables
-		string favorisTrip;
-		int nFavorisTrip;
+		vector<string> favorisTrip;
+		string sentence;
 
 		string timeOfChoicedTrip;
 		int nTimeOfChoicedTrip;
@@ -45,6 +45,9 @@ class Search
 		int choicedTimeOfChoicedTrip;
 		
 		tm dateTime;
+		
+		//ActionFunctionRequest<SearchRequest> searchRequest;
+		
 		
 		
 		

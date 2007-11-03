@@ -12,18 +12,19 @@ Reservation::~Reservation()
 
 }
 
-int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _timeChoiced)
+int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _rankChoiced)
 {
 	session=_session;
 	tripChoiced=_tripChoiced;
-	timeChoiced=_timeChoiced;
+	rankChoiced=_rankChoiced;
 	if(_session->sessionId.empty()) Functions::setFatalError("without session id in Reservation processus");
 	
 	if(Functions::getFatalError().empty())
 	{
 		menuKey[0]=1;
 		menuKey[1]=3;
-		dtmfInput=Functions::readKey(agi,res,menuKey,2,1,Functions::getMenu(3,1));
+		dtmfInput=Functions::readKey(agi,res,menuKey,2,1,session->solutionVector.at(rankChoiced-1).sentence);
+		dtmfInput=1;
 		
 		switch(dtmfInput)
 		{
@@ -68,5 +69,37 @@ int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _timeC
 **/
 int Reservation::requestReservationToSynthese() throw (int)
 {
+		string req="a=bra&fonction=page&i=4&nr=1&sid="
+							+session->sessionId+
+							"&page=resa_response&actionParamcuid="
+							+session->userId+
+							"&actionParamsit=3&actionParamacc=0&actionParamdct="
+							+session->favoris.at(tripChoiced-1).origin_city+
+							"&actionParamdpt="
+							+session->favoris.at(tripChoiced-1).origin_place+
+							"&actionParamact="
+							+session->favoris.at(tripChoiced-1).destination_city+
+							"&actionParamapt="
+							+session->favoris.at(tripChoiced-1).destination_place+
+							"&actionParamda="
+							+session->solutionVector.at(rankChoiced).date+
+							"&actionParamsenu=1&actionParamcuph="
+							+session->registredPhone+
+							"&actionParampass="
+							+session->psw;
+	
+		cerr<<"request: "<< req<<endl;
+		
+		// valeur de retour à reflechir
+		string xml=Functions::makeRequest(req);
+		
+		/*
+		<reservation>
+		<reservation>-1</reservation>
+		<sentence>Attention ! La r?servation n'a pas ?t? effectu?e pour des raisons techniques. Veuillez presser 0 pour contacter le centre d'appels. Merci pour votre appel et au revoir. </sentence>
+		</reservations>
+		*/
+		Functions::readKey(agi,res,menuKey,1,1,Functions::smartXmlParser(xml,"sentence"));		
+
 	return 0;
 }

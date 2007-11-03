@@ -62,7 +62,7 @@ string Functions::getMenu(int _category, int _step)
 					switch(_step)
 					{
 						case 1:	// favoris list
-							return "veuillez introduire un numero des favoris de trajets suivants:";
+							return "veuillez introduire le numero des favoris de trajets.";
 						case 2:	// favoris list
 							return "veuillez tapez directment le numero de trajet pour une reservation:";
 					}
