@@ -41,11 +41,13 @@ namespace synthese
 			Parameters :
 			- 0 : Handicapped filter
 			- 1 : Bike filter
+			- 2 : Journey board page code
 		*/
 		class JourneyBoardsInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,JourneyBoardsInterfaceElement>
 		{
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _handicappedFilter;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _bikeFilter;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pageCode;
 
 
 		public:

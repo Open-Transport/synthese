@@ -49,6 +49,9 @@ namespace synthese
 				throw InterfacePageException("Insufficient parameters number");
 			_handicappedFilter = vel.front();
 			_bikeFilter = vel.front();
+			if (vel.isEmpty())
+				return;
+			_pageCode = vel.front();
 		}
 
 		string JourneyBoardsInterfaceElement::display(
@@ -59,9 +62,10 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			const JourneyBoardJourneys* jv(static_cast<const JourneyBoardJourneys*>(object));
-			const JourneyBoardInterfacePage* page(_page->getInterface()->getPage<JourneyBoardInterfacePage>());
+			const JourneyBoardInterfacePage* page(_page->getInterface()->getPage<JourneyBoardInterfacePage>(_pageCode ? _pageCode->getValue(parameters, variables, object, request) : string()));
 			logic::tribool hFilter(Conversion::ToTribool(_handicappedFilter->getValue(parameters, variables, object, request)));
 			logic::tribool bFilter(Conversion::ToTribool(_bikeFilter->getValue(parameters, variables, object, request)));
+			
 
 			if ( jv == NULL || jv->empty())  // No solution or type error
 				return string();
