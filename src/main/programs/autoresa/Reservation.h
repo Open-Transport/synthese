@@ -26,7 +26,6 @@ class Reservation
 		SessionReturnType *session;
 		
 		// local variables
-		int *menuKey;
 		int tripChoiced;
 		int rankChoiced;
 };

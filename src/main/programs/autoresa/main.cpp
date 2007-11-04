@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	Functions::setLanguage(1);
 	
 	// menu bienvenu, time to creat the objects
-	Functions::playbackText(&agi,&res,Functions::getMenu(1,1));
+	Functions::playbackText(&agi,&res,"Bienvenu au système de reservation.");
 	
 	// prepare objects during the language
 	Login *login=new Login(&agi,&res);
@@ -72,12 +72,8 @@ int main(int argc, char *argv[])
 							case 1:
 								cerr<<"reservation successful"<<endl;
 								break;
-							case -1:
-								// do nothing, bcz fatalError faised
-								break;
-							case 0:
-								// custumer doesnot confirm the reservation, research again
-								// after break, will be new in this loop bcz stateRs==0
+							default:
+								stateRs=3;
 								break;
 						}
 						break;
@@ -86,10 +82,11 @@ int main(int argc, char *argv[])
 						break;
 				}
 			}
-			while(stateRs==0);
+			while(stateRs==3);
 			break;
 			
 		case -1:
+			Functions::playbackText(&agi,&res,"Identification échuée. Veuillez renouveler votre appel.");
 			cerr<<"interuption, system stopped"<<endl;
 			break;
 		default:

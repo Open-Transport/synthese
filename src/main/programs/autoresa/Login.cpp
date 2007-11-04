@@ -42,7 +42,12 @@ int Login::start()
 				cerr<<"identifyUser, try "<<tryTime<<" times"<<endl;
 				tryTime++;
 			}
-			if(tryTime>2) Functions::setFatalError("usr login failed");
+			if(tryTime>2)
+			{
+				Functions::setFatalError("usr login failed");
+				
+				
+			}
 		}
 		catch(int e)
 		{
@@ -57,7 +62,7 @@ int Login::start()
 		
 		if((!session->sessionId.empty())&&(Functions::getFatalError().empty()))
 		{
-			if(!session->message.empty()) Functions::text2Voice(session->message);
+			if(!session->message.empty()) Functions::playbackText(agi,res,session->message);
 			/*
 			switch(session->type)
 			{
@@ -109,11 +114,11 @@ bool Login::identifyUser() throw (int)
 	
 	int usr,psw;
 
-	usr=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,2));
-		
-	psw=Functions::readKey(agi,res,menuKey,0,4,Functions::getMenu(1,3));
+	usr=Functions::readKey(agi,res,menuKey,0,4,"Veuillez entrer le numero d\'utilisateur");
+
+	psw=Functions::readKey(agi,res,menuKey,0,4,"Veuillez entrer votre mots de passe");
 	
-	session->usr=usr;
+	session->psw=synthese::util::Conversion::ToString(usr);
 	session->psw=synthese::util::Conversion::ToString(psw);
 
 	session->loginRequest.getAction()->setLogin(Conversion::ToString(usr));
@@ -125,8 +130,6 @@ bool Login::identifyUser() throw (int)
 
 		// interface 4
 		req<<"ipaddr=0.0.0.0&a=login&fonction=page&page=login_response&i=4&actionParamlogin="<<usr<<"&actionParampwd="<<psw<<"&nr=1";
-
-		cerr<<"request: "<< req.str() <<endl;
 		
 		
 		// valeur de retour à reflechir
@@ -134,55 +137,69 @@ bool Login::identifyUser() throw (int)
 		//cerr<<"xml return"<<xml<<endl; 
 
 		// do xml parser
-		session->name=Functions::smartXmlParser(xml,"name");
-		cerr<<"name: "<<session->name<<endl;
 		session->sessionId=Functions::smartXmlParser(xml,"session");
 		cerr<<"sessionId: "<<session->sessionId<<endl;
-		session->userId=Functions::smartXmlParser(xml,"user_id");
-		cerr<<"userId: "<<session->userId<<endl;
-		//session->registredPhone=Functions::smartXmlParser(xml,"phone");
-		//cerr<<"registred Phone: "<<session->registredPhone<<endl;
-		session->favorisSentence=Functions::smartXmlParser(xml,"sentence");
-		cerr<<"sentence: "<<session->favorisSentence<<endl;
 		
-		/*
-		<favorite rank="1" origin_city="TOULOUSE" origin_place="Capitole" destination_city="FLOURENS" destination_place="Mairie" />
-		<favorite rank="2" origin_city="QUINT-FONSEGRIVES" origin_place="Mairie" destination_city="PIN-BALMA" destination_place="Pastoureau" />
-		*/
-		int n=0;
-		
-		XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "login");
-		XMLNode xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"favorite",0);
-		bool stillValue=true;
-		SessionReturnType::FavorisVectorStruct favorisSt;
-		string place;
-		
-		while(!xmlNodeChild.isEmpty())
+		if(!session->sessionId.empty())
 		{
-			
-			place="rank";
-			favorisSt.rank=synthese::util::XmlToolkit::GetIntAttr(xmlNodeChild,place);;
-			place="origin_city";
-			favorisSt.origin_city=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
-			place="origin_place";
-			favorisSt.origin_place=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
-			place="destination_city";
-			favorisSt.destination_city=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
-			place="destination_place";
-			favorisSt.destination_place=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
-			
-			cerr<<endl;
-			cerr<<"favoris rank: "<<favorisSt.rank<<endl;
-			cerr<<"origin_city: "<<favorisSt.origin_city<<endl;
-			cerr<<"origin_place: "<<favorisSt.origin_place<<endl;
-			cerr<<"destination_city: "<<favorisSt.destination_city<<endl;
-			cerr<<"destination_place: "<<favorisSt.destination_place<<endl<<endl;
-				
-			session->favoris.push_back(favorisSt);
-			xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"favorite",++n);
-		}
-
 		
+			session->name=Functions::smartXmlParser(xml,"name");
+			cerr<<"name: "<<session->name<<endl;
+			
+			session->userId=Functions::smartXmlParser(xml,"user_id");
+			cerr<<"userId: "<<session->userId<<endl;
+			//session->registredPhone=Functions::smartXmlParser(xml,"phone");
+			//cerr<<"registred Phone: "<<session->registredPhone<<endl;
+			session->favorisSentence=Functions::smartXmlParser(xml,"sentence");
+			cerr<<"sentence: "<<session->favorisSentence<<endl;
+			
+			session->favoris.clear();
+			/*
+			<favorite rank="1" origin_city="TOULOUSE" origin_place="Capitole" destination_city="FLOURENS" destination_place="Mairie" />
+			<favorite rank="2" origin_city="QUINT-FONSEGRIVES" origin_place="Mairie" destination_city="PIN-BALMA" destination_place="Pastoureau" />
+			*/
+			
+			XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "login");
+			XMLNode xmlNodeChild;
+			
+			bool stillValue=true;
+			SessionReturnType::FavorisVectorStruct favorisSt;
+			string place;
+			
+			cerr<<xmlNode.nChildNode("favorite")<<" favoris finded"<<endl;
+			
+			for(int i=0;i<xmlNode.nChildNode("favorite");i++)
+			{
+				
+				xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"favorite",i);
+				place="rank";
+				favorisSt.rank=synthese::util::XmlToolkit::GetIntAttr(xmlNodeChild,place);;
+				place="origin_city";
+				favorisSt.origin_city=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+				place="origin_place";
+				favorisSt.origin_place=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+				place="destination_city";
+				favorisSt.destination_city=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+				place="destination_place";
+				favorisSt.destination_place=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
+				
+				cerr<<endl;
+				cerr<<"favoris rank: "<<favorisSt.rank<<endl;
+				cerr<<"origin_city: "<<favorisSt.origin_city<<endl;
+				cerr<<"origin_place: "<<favorisSt.origin_place<<endl;
+				cerr<<"destination_city: "<<favorisSt.destination_city<<endl;
+				cerr<<"destination_place: "<<favorisSt.destination_place<<endl<<endl;
+					
+				session->favoris.push_back(favorisSt);
+			}
+			
+			return true;
+		}
+		else
+		{
+				cerr<<"session id null"<<endl;
+				return false;
+		}
 		
 	}
 	catch (int e)
@@ -194,15 +211,7 @@ bool Login::identifyUser() throw (int)
 	{
 		cerr<<"unknown Exception cached: "<<e<<endl;
 	}
-	
-	if(session->sessionId.empty())
-	{
-	    return false;
-	}
-	else
-	{
-	    return true;
-	}
+
 }
 
 SessionReturnType* Login::getSession()

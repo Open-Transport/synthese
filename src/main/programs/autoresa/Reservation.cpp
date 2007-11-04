@@ -4,7 +4,6 @@ Reservation::Reservation(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res)
 {
 	agi=_agi;
 	res=_res;
-	menuKey=new int[12];
 }
 
 Reservation::~Reservation()
@@ -21,10 +20,9 @@ int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _rankC
 	
 	if(Functions::getFatalError().empty())
 	{
-		menuKey[0]=1;
-		menuKey[1]=3;
-		dtmfInput=Functions::readKey(agi,res,menuKey,2,1,session->solutionVector.at(rankChoiced-1).sentence);
-		dtmfInput=1;
+		Functions::playbackText(agi,res,"veuillez patienter.");
+		int menuKey[]={0,1,3};
+		dtmfInput=Functions::readKey(agi,res,menuKey,3,1,session->solutionVector.at(rankChoiced-1).sentence);
 		
 		switch(dtmfInput)
 		{
@@ -42,7 +40,7 @@ int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _rankC
 				Functions::playbackText(agi,res,Functions::getMenu(3,2));
 				break;
 			case 3:
-				return 0;	// will redo search
+				return 3;	// will redo search
 				break;
 			default:
 				return 2;	// will transfer to operator
@@ -99,7 +97,14 @@ int Reservation::requestReservationToSynthese() throw (int)
 		<sentence>Attention ! La r?servation n'a pas ?t? effectu?e pour des raisons techniques. Veuillez presser 0 pour contacter le centre d'appels. Merci pour votre appel et au revoir. </sentence>
 		</reservations>
 		*/
-		Functions::readKey(agi,res,menuKey,1,1,Functions::smartXmlParser(xml,"sentence"));		
+		if(Functions::smartXmlParser(xml,"reservation")=="-1")
+		{
+			Functions::readKey(agi,res,new int,1,1,Functions::smartXmlParser(xml,"sentence"),10);	
+		}
+		else
+		{
+			Functions::playbackText(agi,res,Functions::smartXmlParser(xml,"sentence"));	
+		}
 
 	return 0;
 }

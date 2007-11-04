@@ -4,7 +4,6 @@ Search::Search(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res)
 {
 	agi=_agi;
 	res=_res;
-	menuKey=new int[12];
 }
 
 Search::~Search()
@@ -33,8 +32,10 @@ int Search::start(SessionReturnType *_session)
 	{
 		try
 		{
+			Functions::playbackText(agi,res,"veuillez patienter.");
+			int menuKey[12];
 			for(int i=0;i<=session->favoris.size();i++) menuKey[i]=i;
-			choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,session->favoris.size(),1,session->favorisSentence);
+			choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,session->favoris.size()+1,1,session->favorisSentence);
 		}
 		catch(int e)
 		{
@@ -55,15 +56,13 @@ int Search::start(SessionReturnType *_session)
 				Functions::translateExpt(e);
 				return -1;
 			}
-			
-			
-			
-			
-			
+
 			// take the choice];
+			int menuKey[12];
 			for(int i=0;i<=session->solutionVector.size();i++) menuKey[i]=i;
 			do
 			{
+				Functions::playbackText(agi,res,"veuillez patienter.");
 				choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,session->solutionVector.size()+1,1,sentence);
 			}
 			while(!session->solutionVector.at(choicedFavorisTrajet-1).reservation);
@@ -133,8 +132,6 @@ string Search::searchFromSynthese(int _favoris) throw (int)
 {
 		_favoris--;
 		string req="fonction=rp&si=3&da=A&msn=3&dct="+session->favoris.at(_favoris).origin_city+"&dpt="+session->favoris.at(_favoris).origin_place+"&act="+session->favoris.at(_favoris).destination_city+"&apt="+session->favoris.at(_favoris).destination_place+"&ac=0";
-	
-		cerr<<"request: "<< req<<endl;
 				
 		// valeur de retour à reflechir
 		string xml=Functions::makeRequest(req);
@@ -146,7 +143,7 @@ string Search::searchFromSynthese(int _favoris) throw (int)
 			reservation="1"
 			sentence="D?tail de votre trajet : Vous partez de City68 93.A 19:38, prenez la ligne 92 ? destination de City12 99.Descendez ? l\'arr?tCity12 97.A 20:11, prenez la ligne 94 ? destination de City68 93.Descendez ? l\'arr?tCity6 95.Vous arrivez ? City6 95 ? 20:15.Attention ! La r?servation est obligatoire pour pouvoir emprunter cette relation.Taper 1 pour r?server votre place." />
 		*/
-		
+		session->solutionVector.clear();
 		// prepare solutions
 		int n=0;
 		XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "solutions");

@@ -36,7 +36,7 @@ class Functions
 {
 	public:
 		// call implicitly by readKey to prepare the filename
-		static string text2Voice(string _text);
+		static string text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text);
 		static bool validateInput(int *_menuKey,int _nMenuKey, int _inputKey);
 		
 		// call directly
@@ -63,7 +63,7 @@ class Functions
 		// call directly
 		static string getMenu(int _category, int _step);
 		// call directly or implicitly
-		static int passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId);
+		static int passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string callId);
 		
 		// call BasicClient of Synthese
 		static string makeRequest(string _request) throw (int);

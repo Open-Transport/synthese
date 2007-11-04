@@ -31,7 +31,6 @@ class Search
 		AGI_CMD_RESULT *res;
 		int dtmfInput;
 		SessionReturnType *session;
-		int *menuKey;
 		
 		// local variables
 		vector<string> favorisTrip;

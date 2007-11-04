@@ -12,14 +12,53 @@ this function is called implicited by readKey and playbackText
 @return:
 	char* : the file name without extension like .au
 **/
-string Functions::text2Voice(string _text)
+string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 {
-  cerr<<"do vocal message: "<<_text<<endl;
-  // file name without extension like au
-  string fileName="/usr/share/asterisk/agi-bin/fileName";
-  cerr<<"do voice file: "<<fileName+"au"<<endl;
-  PlaybackAcapela::mainFunc(_text,fileName+".au","10.12.155.36","claire8kmu");
-  return fileName;
+	/*
+	cerr<<"do vocal message: "<<_text<<endl<<endl;
+
+	string fileName="/usr/share/asterisk/agi-bin/";
+	string temp;
+	
+	for(int i=0;i<_text.size()%10;)
+	{
+		do
+		{
+			temp=_text.at(i);
+			i++;
+		}
+		while((temp.c_str()<="a")||(temp.c_str()>="z"));
+		fileName+=temp;
+	}
+	
+	FILE *pFile;
+	pFile = fopen (fileName.c_str(),"r");
+	if (pFile!=NULL)
+	{
+		
+		cerr<<fileName+".au"<<" exist already"<<endl;
+		return fileName;
+	}
+	else
+	{
+		// file name without extension like au
+
+		cerr<<"do voice file: "<<fileName+".au"<<endl<<endl;
+		PlaybackAcapela::mainFunc(_text,fileName+".au","10.12.155.36","claire8kmu");
+		 return fileName;
+	}
+	*/
+	
+	cerr<<"do vocal message: "<<_text<<endl<<endl;
+
+	string fileName="/usr/share/asterisk/agi-bin/fileName";
+	
+	// file name without extension like au
+
+	cerr<<"do voice file: "<<fileName+".au"<<endl<<endl;
+	PlaybackAcapela::mainFunc(_text,fileName+".au","10.12.155.36","claire8kmu");
+	return fileName;
+
 }
 
 /*
@@ -60,19 +99,34 @@ this function is to play a background message, to read the keyboard dtmf input a
 **/
 int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int _nMenuKey, int _nKey, string _menu, int tryTime=0)
 {
-	if(tryTime>2) return -1;
+	if(tryTime>2)
+	{
+		playbackText(_agi,_res,"désolé, veuillez renouveler votre appel. Au revoir.");
+		return -1;
+	}
+	else if(tryTime>0)
+	{
+		playbackText(_agi,_res,"l\'entrée invalide, veuillez reessayer.");
+	}
+	
+	cerr<<"MenuKey autorised: ";
+	for(int i=0;i<_nMenuKey;i++) cerr<<_menuKey[i]<<" ";
+	cerr<<endl;
 	
 	int inputKey=0;
 	// to play background message
-	string fileName=text2Voice(_menu);
+	string fileName=text2Voice(_agi,_res,_menu);
 
 	// clic * to stop input
+	int timeout=0;
+	if(_nMenuKey==1) timeout=6000;
+	else timeout=(int)(ceil(_nKey*1.5))*1000;
 	
-	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),(int)(ceil(_nKey*2))*1000, _nKey);
+	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),timeout, _nKey);
 	
-	if((_nKey==1)&&(inputKey==0)) Functions::passToManuel(_agi,_res,"test");
+	if((_nKey==1)&&(inputKey==0)) Functions::passToManuel(_agi,_res,getCallerId(_agi,_res));
 	
-	cerr<<"Noop inputKey: "<<inputKey<<endl;
+	cerr<<"inputKey: "<<inputKey<<endl;
 	
 	if(_nMenuKey==0)
 		return inputKey;
@@ -95,7 +149,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 int Functions::playbackText(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string _msg)
 {
 	cerr<<"playbackText called for "<<_msg<<endl;
-	return AGITool_stream_file(_agi, _res, const_cast<char *>(text2Voice(_msg).c_str()), "", 0);
+	return AGITool_stream_file(_agi, _res, const_cast<char *>(text2Voice(_agi,_res,_msg).c_str()), "", 0);
 }
 
 /*
@@ -204,15 +258,15 @@ the function is to delivery the user to central
 @return:
 	int : system return 0 is correct
 **/
-int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId)
+int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string callId)
 {
 	cerr<<"pass to manuel called"<<endl;
 	// no need to listen the promo one more time, so jump to 4
-	playbackText(_agi,_res,Functions::getMenu(0,2));
+	playbackText(_agi,_res,"Veuillez patienter. Le système vous transfert au centre de reservation");
 	char *ext="75";
 	char *pri="4";
 	AGITool_exec_goto(_agi, _res, "tad", ext, pri);
-	fatalError="Warning: custumer pass to ";
+	fatalError="Warning: custumer pass to centre";
 	exit(1);
 }
 
@@ -221,8 +275,7 @@ int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, char* callId)
 **/
 string Functions::makeRequest(string _request) throw (int)
 {
-	cerr<<"request: "<<_request<<endl;
-	
+	cerr<<"REQUEST: "<<_request<<endl;
 	synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("localhost",3591);
 	
 	std::stringstream out;
@@ -230,7 +283,7 @@ string Functions::makeRequest(string _request) throw (int)
 	
 	delete basicClient;
 	
-	cerr<<"Noop request: "<<_request<<", return: "<<out.str() <<endl;
+	cerr<<"RETURN: "<<out.str() <<endl;
 	
 	return out.str();
 	
@@ -254,11 +307,23 @@ static string Functions::smartXmlParser(string xml, string nodeName)
 	XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, nodeName);
 	cerr<<"xml Node: "<<xmlNode.getName()<<endl;
 	xmlNode=synthese::util::XmlToolkit::ParseString(xml, xmlNode.getName());
-	
-	int i=0;
+		
 	string msg;
-	msg=xmlNode.getChildNode(nodeName.c_str()).getText();
-
+	int i=0;
+	
+	try
+	{
+		xmlNode=xmlNode.getChildNode(nodeName.c_str());
+		if(xmlNode.nText()>0)
+		{
+			msg=xmlNode.getText();
+		}
+	}
+	catch (std::exception e)
+	{
+		//cerr<<e;
+	}
+	
 	return msg;
 }
 

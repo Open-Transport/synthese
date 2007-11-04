@@ -63,10 +63,10 @@ XmlToolkit::CheckForRequiredAttr (XMLNode& node,
     const char* attrValue = node.getAttribute (attrName.c_str ());
     if (attrValue == 0) 
     {
-	std::stringstream msg;
-	msg << "No such attribute '" << attrName << "' on element <" <<
-	    node.getName () << ">";
-	throw XmlException (msg.str ());
+		std::stringstream msg;
+		msg << "No such attribute '" << attrName << "' on element <" <<
+		    node.getName () << ">";
+		throw XmlException (msg.str ());
     }
     return attrValue;
 }

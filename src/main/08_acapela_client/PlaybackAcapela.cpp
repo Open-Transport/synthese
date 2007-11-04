@@ -124,7 +124,7 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
   
     while (nbvoice > 0) 
     {
-		cerr<<ptabFindVoice[idtabFindVoice].cVoiceName<<endl;
+		//cerr<<ptabFindVoice[idtabFindVoice].cVoiceName<<endl;
 		idtabFindVoice++;
 		nbvoice--;
     }
