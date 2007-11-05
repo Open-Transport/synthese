@@ -226,11 +226,15 @@ namespace synthese
 				<< " FROM " << TABLE_NAME;
 			if (commercialLine)
 				query << " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
+			if (!date.isUnknown())
+				query << " INNER JOIN " << ServiceDateTableSync::TABLE_NAME << " AS d ON d." << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE_NAME << "." << TABLE_COL_ID;
 			query << " WHERE 1 ";
 			if (commercialLine)
 				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLine->getKey();
 			if (!date.isUnknown())
-				query << " AND EXISTS(SELECT * FROM " << ServiceDateTableSync::TABLE_NAME << " WHERE " << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE_NAME << "." << TABLE_COL_ID << " AND " << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString() << ")";
+				query << " AND d." << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString();
+			if (!date.isUnknown())
+				query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY ";
 			if (orderByOriginTime)
 				query << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");

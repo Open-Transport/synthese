@@ -37,17 +37,17 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)"
-			IntermediateDirectory="../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)"
+			OutputDirectory="../../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)"
+			IntermediateDirectory="../../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)"
 			ConfigurationType="0"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../../../vsscons build -Dtarget=src/main/$(InputName)"
+				BuildCommandLine="ant -s build.xml -Dtarget=src/main/programs/synthese_sai -Dmode=release"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
+				Output="../../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
 				PreprocessorDefinitions=""
 				IncludeSearchPath=""
 				ForcedIncludes=""

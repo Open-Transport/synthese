@@ -77,7 +77,7 @@ namespace synthese
 				, request->getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
 				, READ
 				, 0, 0
-				, true, false, true, true
+				, false, true, true, true
 			));
 			const LineMarkerInterfacePage* page(_page->getInterface()->getPage<LineMarkerInterfacePage>());
 

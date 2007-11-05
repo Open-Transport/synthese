@@ -101,6 +101,11 @@ namespace synthese
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_SERVICEID, "INTEGER", false);
 			addTableColumn (COL_DATE , "DATE", false);
+			
+			vector<string> cols;
+			cols.push_back(COL_SERVICEID);
+			cols.push_back(COL_DATE);
+			addTableIndex(cols);
 		}
 
 		void ServiceDateTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
