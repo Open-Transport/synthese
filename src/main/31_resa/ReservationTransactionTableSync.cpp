@@ -148,7 +148,7 @@ namespace synthese
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
 				<< " WHERE " 
 				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << Conversion::ToString(service->getId())
-				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << originDate.toSQLString(false) << " 0:0'"
+				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << originDate.toSQLString(false) << " 00:00'"
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << originDate.toSQLString(false) << " 23:59'";
 			if (!withCancelled)
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
