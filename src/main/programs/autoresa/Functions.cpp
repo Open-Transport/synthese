@@ -119,12 +119,14 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 
 	// clic * to stop input
 	int timeout=0;
-	if(_nMenuKey==1) timeout=6000;
+	if(_nMenuKey==1) timeout=8000;
 	else timeout=(int)(ceil(_nKey*1.5))*1000;
 	
 	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),timeout, _nKey);
 	
-	if((_nKey==1)&&(inputKey==0)) Functions::passToManuel(_agi,_res,getCallerId(_agi,_res));
+	if((_nKey==1)&&(inputKey==0))
+		//Functions::passToManuel(_agi,_res,getCallerId(_agi,_res));
+		 return readKey(_agi,_res,_menuKey,_nMenuKey,_nKey,_menu,++tryTime);
 	
 	cerr<<"inputKey: "<<inputKey<<endl;
 	
