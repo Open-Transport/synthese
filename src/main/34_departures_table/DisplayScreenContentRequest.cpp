@@ -58,7 +58,7 @@ namespace synthese
 			try
 			{
 				// Screen
-				if (_request->getObjectId())
+				if (_request->getObjectId() > 0)
 					screenId = _request->getObjectId();
 				else
 					screenId = map.getUid(PARAMETER_TB, true, FACTORY_KEY);

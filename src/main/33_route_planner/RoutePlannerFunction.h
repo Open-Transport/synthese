@@ -64,6 +64,7 @@ namespace synthese
 			static const std::string PARAMETER_DEPARTURE_PLACE_TEXT;
 			static const std::string PARAMETER_ARRIVAL_PLACE_TEXT;
 			static const std::string PARAMETER_ACCESSIBILITY;
+			static const std::string PARAMETER_FAVORITE_ID;
 			
 		private:
 			//! \name Parameters
@@ -83,6 +84,7 @@ namespace synthese
 				const transportwebsite::HourPeriod*			_period;
 				bool										_home;
 				transportwebsite::AccessibilityParameter	_accessibility;
+				uid											_favoriteId;
 			//@}
 
 

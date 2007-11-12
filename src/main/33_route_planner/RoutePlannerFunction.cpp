@@ -22,6 +22,9 @@
 
 #include "RoutePlannerFunction.h"
 
+#include "33_route_planner/UserFavoriteJourneyTableSync.h"
+#include "33_route_planner/UserFavoriteJourney.h"
+
 #include "36_places_list/Site.h"
 #include "36_places_list/HourPeriod.h"
 
@@ -36,6 +39,7 @@
 #include "04_time/TimeParseException.h"
 
 #include "01_util/Conversion.h"
+#include "01_util/ObjectNotFoundException.h"
 
 using namespace std;
 using namespace boost;
@@ -48,6 +52,7 @@ namespace synthese
 	using namespace time;
 	using namespace interfaces;
 	using namespace transportwebsite;
+	using namespace db;
 
 	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
@@ -62,6 +67,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT("act");
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
+		const string RoutePlannerFunction::PARAMETER_FAVORITE_ID("fid");
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
@@ -76,16 +82,39 @@ namespace synthese
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 
 			// Origin and destination places
-			_originCityText = map.getString(PARAMETER_DEPARTURE_CITY_TEXT, false, string());
-			_destinationCityText = map.getString(PARAMETER_ARRIVAL_CITY_TEXT, false, string());
-			if (_originCityText.empty() || _destinationCityText.empty())
-				_home = true;
+			_favoriteId = map.getUid(PARAMETER_FAVORITE_ID, false, FACTORY_KEY);
+			if (_favoriteId != UNKNOWN_VALUE)
+			{
+				try
+				{
+					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(_favoriteId, GET_AUTO, true));
+					if (favorite->getUser()->getKey() != _request->getUser()->getKey())
+						throw RequestException("Forbidden favorite");
+					_originCityText = favorite->getOriginCityName();
+					_originPlaceText = favorite->getOriginPlaceName();
+					_destinationCityText = favorite->getDestinationCityName();
+					_destinationPlaceText = favorite->getDestinationPlaceName();
+				}
+				catch(ObjectNotFoundException<uid,UserFavoriteJourney> e)
+				{
+					throw RequestException(e.getMessage());
+				}
+			}
 			else
 			{
-				_originPlaceText = map.getString(PARAMETER_DEPARTURE_PLACE_TEXT, false, string());
+				_originCityText = map.getString(PARAMETER_DEPARTURE_CITY_TEXT, false, string());
+				_destinationCityText = map.getString(PARAMETER_ARRIVAL_CITY_TEXT, false, string());
+				if (_originCityText.empty() || _destinationCityText.empty())
+					_home = true;
+				else
+				{
+					_originPlaceText = map.getString(PARAMETER_DEPARTURE_PLACE_TEXT, false, string());
+					_destinationPlaceText = map.getString(PARAMETER_ARRIVAL_PLACE_TEXT, false, string());
+				}
+			}
+			if (!_home)
+			{
 				_departure_place = _site->fetchPlace(_originCityText, _originPlaceText);
-
-				_destinationPlaceText = map.getString(PARAMETER_ARRIVAL_PLACE_TEXT, false, string());
 				_arrival_place = _site->fetchPlace(_destinationCityText, _destinationPlaceText);
 			}
 
@@ -187,6 +216,7 @@ namespace synthese
 			, _arrival_place(NULL)
 			, _home(false)
 			, _maxSolutionsNumber(UNKNOWN_VALUE)
+			, _favoriteId(UNKNOWN_VALUE)
 		{
 			
 		}
