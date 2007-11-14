@@ -29,9 +29,10 @@
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
-#include "57_accounting/AccountingModule.h"
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
+#include "57_accounting/Currency.h"
+#include "57_accounting/CurrencyTableSync.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -42,61 +43,78 @@ namespace synthese
 	using namespace accounts;
 	using namespace util;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,AccountTableSync>::FACTORY_KEY("57.10 Account");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Account>::TABLE_NAME = "t028_account";
-		template<> const int SQLiteTableSyncTemplate<Account>::TABLE_ID = 28;
-		template<> const bool SQLiteTableSyncTemplate<Account>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AccountTableSync,Account>::TABLE_NAME = "t028_account";
+		template<> const int SQLiteTableSyncTemplate<AccountTableSync,Account>::TABLE_ID = 28;
+		template<> const bool SQLiteTableSyncTemplate<AccountTableSync,Account>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Account>::load(Account* account, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::load(Account* account, const db::SQLiteResultSPtr& rows )
 		{
-			try
-			{
 			    account->setKey(rows->getLongLong (TABLE_COL_ID));
-			    account->setLeftClassNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER));
-			    account->setLeftCurrency(AccountingModule::getCurrencies().get(
-							 rows->getLongLong ( AccountTableSync::TABLE_COL_LEFT_CURRENCY_ID)));
-
+			
+				account->setLeftClassNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER));
 			    account->setLeftNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_NUMBER));
 			    account->setLeftUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_LEFT_USER_ID));
 			    account->setRightClassNumber(rows->getText ( AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER));
-			    account->setRightCurrency(AccountingModule::getCurrencies().get (
-							  rows->getLongLong ( AccountTableSync::TABLE_COL_RIGHT_CURRENCY_ID)));
 
 			    account->setRightNumber(rows->getText ( AccountTableSync::TABLE_COL_RIGHT_NUMBER));
 			    account->setRightUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_RIGHT_USER_ID));
 			    account->setName(rows->getText ( AccountTableSync::TABLE_COL_NAME));
+		}
+
+		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::_link(Account* account, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+			try
+			{
+				account->setLeftCurrency(CurrencyTableSync::Get(
+						rows->getLongLong ( AccountTableSync::TABLE_COL_LEFT_CURRENCY_ID)
+						, account
+						, false
+						, temporary
+				));
+				account->setRightCurrency(CurrencyTableSync::Get(
+						rows->getLongLong ( AccountTableSync::TABLE_COL_RIGHT_CURRENCY_ID)
+						, account
+						, false
+						, temporary
+				));
 			}
 			catch (Currency::ObjectNotFoundException& e)
 			{
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<Account>::save(Account* account)
+		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::_unlink(Account* account)
+		{
+			account->setLeftCurrency(NULL);
+			account->setRightCurrency(NULL);
+		}
+
+		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::save(Account* account)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (account->getKey() == 0)
-			{
+			if (account->getKey() <= 0)
 				account->setKey(getId());
-				query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(account->getKey())
-					<< "," << Conversion::ToString(account->getLeftUserId())
-					<< "," << Conversion::ToSQLiteString(account->getName())
-					<< "," << Conversion::ToSQLiteString(account->getLeftNumber())
-					<< "," << Conversion::ToSQLiteString(account->getLeftClassNumber())
-					<< "," << Conversion::ToString(account->getLeftCurrency()->getKey())
-					<< "," << Conversion::ToString(account->getRightUserId())
-					<< "," << Conversion::ToSQLiteString(account->getRightNumber())
-					<< "," << Conversion::ToSQLiteString(account->getRightClassNumber())
-					<< "," << Conversion::ToString(account->getRightCurrency()->getKey())
-					<< ")";
-			}
-			else
-			{
-				// UPDATE
-			}
+			query
+				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(account->getKey())
+				<< "," << Conversion::ToString(account->getLeftUserId())
+				<< "," << Conversion::ToSQLiteString(account->getName())
+				<< "," << Conversion::ToSQLiteString(account->getLeftNumber())
+				<< "," << Conversion::ToSQLiteString(account->getLeftClassNumber())
+				<< "," << Conversion::ToString(account->getLeftCurrency()->getKey())
+				<< "," << Conversion::ToString(account->getRightUserId())
+				<< "," << Conversion::ToSQLiteString(account->getRightNumber())
+				<< "," << Conversion::ToSQLiteString(account->getRightClassNumber())
+				<< "," << Conversion::ToString(account->getRightCurrency()->getKey())
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 	}
@@ -115,23 +133,8 @@ namespace synthese
 
 
 
-		void AccountTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-
-		}
-
-		void AccountTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
-
-		void AccountTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
-
 		AccountTableSync::AccountTableSync()
-			: SQLiteTableSyncTemplate<Account>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteNoSyncTableSyncTemplate<AccountTableSync,Account>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);

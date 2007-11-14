@@ -30,6 +30,7 @@ using boost::shared_ptr;
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
 
 	namespace accounts
 	{
@@ -38,6 +39,8 @@ namespace synthese
 			, _documentId(0)
 			, _leftUserId(0)
 			, _placeId(0)
+			, _startDateTime(TIME_UNKNOWN)
+			, _endDateTime(TIME_UNKNOWN)
 		{
 
 		}

@@ -126,7 +126,7 @@ namespace synthese
 			goRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<BroadcastPointsAdmin>());
+			searchRequest.getFunction()->setPage(shared_ptr<AdminInterfaceElement>(new BroadcastPointsAdmin));
 
 			vector<pair<int, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));

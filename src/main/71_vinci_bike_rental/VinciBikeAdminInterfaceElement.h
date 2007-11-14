@@ -39,7 +39,7 @@ namespace synthese
 		*/
 		class VinciBikeAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>
 		{
-			boost::shared_ptr<VinciBike> _bike;
+			boost::shared_ptr<const VinciBike> _bike;
 
 		public:
 			VinciBikeAdminInterfaceElement ();

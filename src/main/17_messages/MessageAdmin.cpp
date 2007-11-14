@@ -138,7 +138,7 @@ namespace synthese
 				stream << "<h1>Contenu</h1>";
 
 				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(request);
-				templateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessageAdmin>());
+				templateRequest.getFunction()->setPage<MessageAdmin>();
 				templateRequest.setObjectId(request->getObjectId());
 
 				HTMLForm fc(templateRequest.getHTMLForm("template"));
@@ -151,7 +151,7 @@ namespace synthese
 				stream << tc.close() << fc.close();
 
 				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(request);
-				updateMessagesRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessageAdmin>());
+				updateMessagesRequest.getFunction()->setPage<MessageAdmin>();
 				updateMessagesRequest.setObjectId(request->getObjectId());
 
 				HTMLForm fu(updateMessagesRequest.getHTMLForm("messages"));
@@ -168,16 +168,16 @@ namespace synthese
 				stream << tu.close() << fu.close();
 
 				FunctionRequest<AdminRequest> searchRequest(request);
-				searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessageAdmin>());
+				searchRequest.getFunction()->setPage<MessageAdmin>();
 				searchRequest.setObjectId(request->getObjectId());
 
 				ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(request);
-				addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessageAdmin>());
+				addRequest.getFunction()->setPage<MessageAdmin>();
 				addRequest.setObjectId(request->getObjectId());
 				addRequest.getAction()->setAlarm(_alarm);
 
 				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(request);
-				removeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessageAdmin>());
+				removeRequest.getFunction()->setPage<MessageAdmin>();
 				removeRequest.setObjectId(request->getObjectId());
 				removeRequest.getAction()->setAlarmId(_alarm->getId());
 				

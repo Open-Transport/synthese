@@ -167,20 +167,20 @@ namespace synthese
 
 
 			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);
-			createDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
-			createDisplayRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplaySearchAdmin>());
+			createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
+			createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 			createDisplayRequest.getAction()->setPlace(_place);
 
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplaySearchAdmin>());
+			searchRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
 			FunctionRequest<AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
+			updateRequest.getFunction()->setPage<DisplayAdmin>();
 
 			FunctionRequest<DisplayScreenContentRequest> viewRequest(request);
 
 			FunctionRequest<AdminRequest> maintRequest(request);
-			maintRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayMaintenanceAdmin>());
+			maintRequest.getFunction()->setPage<DisplayMaintenanceAdmin>();
 
 			if (!_place.get())
 			{

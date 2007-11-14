@@ -4,7 +4,6 @@
 
 	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
 	Copyright (C) 2006 Vinci Park 
-	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -40,6 +39,7 @@
 #include "04_time/TimeParseException.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/Transaction.h"
@@ -57,6 +57,11 @@ namespace synthese
 	using namespace accounts;
 	using namespace db;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, vinci::RentABikeAction>::FACTORY_KEY("rentabike");
+	}
+
 	namespace vinci
 	{
 		const std::string RentABikeAction::PARAMETER_RATE_ID = Action_PARAMETER_PREFIX + "ri";
@@ -65,18 +70,28 @@ namespace synthese
 		const std::string RentABikeAction::PARAMETER_LOCK_ID = Action_PARAMETER_PREFIX + "li";
 		const std::string RentABikeAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
 
+
+
+		RentABikeAction::RentABikeAction()
+			: FactorableTemplate<Action, RentABikeAction>()
+			, _date(TIME_CURRENT)
+		{
+
+		}
+
+
 		/** Conversion from attributes to generic parameter maps.
 		*/
 		ParametersMap RentABikeAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if (_rate)
-				map.insert(make_pair(PARAMETER_RATE_ID, Conversion::ToString(_rate->getKey())));
+				map.insert(PARAMETER_RATE_ID, _rate->getKey());
 			if (_contract)
-				map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
+				map.insert(PARAMETER_CONTRACT_ID, _contract->getKey());
 			if (_bike)
-				map.insert(make_pair(PARAMETER_BIKE_ID, Conversion::ToString(_bike->getKey())));
-			map.insert(make_pair(PARAMETER_LOCK_ID, _lock ? Conversion::ToString(_lock->getKey()) : ""));
+				map.insert(PARAMETER_BIKE_ID, _bike->getKey());
+			map.insert(PARAMETER_LOCK_ID, _lock ? Conversion::ToString(_lock->getKey()) : string());
 			return map;
 		}
 
@@ -87,15 +102,11 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
 				// Rate
-				it=map.find(PARAMETER_RATE_ID);
-				if (it == map.end())
-					throw ActionException("Rate not specified");
+				uid id = map.getUid(PARAMETER_RATE_ID, true, FACTORY_KEY);
 				try
 				{
-					_rate = VinciRateTableSync::get(Conversion::ToLongLong(it->second));
+					_rate = VinciRateTableSync::Get(id);
 				}
 				catch (VinciRate::ObjectNotFoundException& e)
 				{
@@ -103,24 +114,20 @@ namespace synthese
 				}
 
 				// Bike
-				it=map.find(PARAMETER_BIKE_ID);
-				if (it == map.end())
-					throw ActionException("Bike not specified");
-				if (it->second.empty())
+				id = map.getUid(PARAMETER_BIKE_ID, true, FACTORY_KEY);
+				if (id == UNKNOWN_VALUE)
 					throw ActionException("Le numéro de vélo doit être saisi");
-				vector<shared_ptr<VinciBike> > bikes = VinciBikeTableSync::search(it->second, "");
+				vector<shared_ptr<VinciBike> > bikes = VinciBikeTableSync::search(map.getString(PARAMETER_BIKE_ID, true, FACTORY_KEY), "");
 				if (bikes.empty())
 					throw ActionException("Vélo introuvable");
 				vector<shared_ptr<VinciBike> >::iterator itb = bikes.begin();
 				_bike = *itb;
 
 				// Contract
-				it=map.find(PARAMETER_CONTRACT_ID);
-				if (it == map.end())
-					throw ActionException("Contract not specified");
+				id = map.getUid(PARAMETER_CONTRACT_ID, true, FACTORY_KEY);
 				try
 				{
-					_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
+					_contract = VinciContractTableSync::Get(id);
 				}
 				catch(VinciContract::ObjectNotFoundException& e)
 				{
@@ -128,25 +135,16 @@ namespace synthese
 				}
 
 				// Lock
-				it = map.find(PARAMETER_LOCK_ID);
-				if (it == map.end())
-					throw ActionException("Lock not specified");
-				if (it->second.empty())
+				id = map.getUid(PARAMETER_LOCK_ID, true, FACTORY_KEY);
+				if (id == UNKNOWN_VALUE)
 					throw ActionException("L'antivol doit être saisi.");
-				if (!it->second.empty())
-				{
-					_lockMarkedNumber = it->second;
-					vector<shared_ptr<VinciAntivol> > locks = VinciAntivolTableSync::search(_lockMarkedNumber);
-					if (!locks.empty())
-						_lock = locks.front();
-				}
+				_lockMarkedNumber = map.getString(PARAMETER_LOCK_ID, true, FACTORY_KEY);
+				vector<shared_ptr<VinciAntivol> > locks = VinciAntivolTableSync::search(_lockMarkedNumber);
+				if (!locks.empty())
+					_lock = locks.front();
 
 				// Date
-				it = map.find(PARAMETER_DATE);
-				if (it != map.end())
-				{
-					_date = DateTime::FromString(it->second);
-				}
+				_date = map.getDateTime(PARAMETER_DATE, false, FACTORY_KEY);
 
 				// TODO Control of guarantees
 

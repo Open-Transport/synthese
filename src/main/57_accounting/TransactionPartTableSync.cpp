@@ -48,14 +48,20 @@ namespace synthese
 	using namespace accounts;
 	using namespace security;
 	using namespace time;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<SQLiteTableSync,TransactionPartTableSync>::FACTORY_KEY("57.30 Transaction Part");
+	}
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TransactionPart>::TABLE_NAME = "t030_transaction_parts";
-		template<> const int SQLiteTableSyncTemplate<TransactionPart>::TABLE_ID = 30;
-		template<> const bool SQLiteTableSyncTemplate<TransactionPart>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::TABLE_NAME = "t030_transaction_parts";
+		template<> const int SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::TABLE_ID = 30;
+		template<> const bool SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<TransactionPart>::load(TransactionPart* tp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::load(TransactionPart* tp, const db::SQLiteResultSPtr& rows )
 		{
 			tp->setKey (rows->getLongLong (TABLE_COL_ID));
 			tp->setTransactionId(rows->getLongLong ( TransactionPartTableSync::TABLE_COL_TRANSACTION_ID));
@@ -68,13 +74,26 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<TransactionPart>::save(TransactionPart* tp)
+		template<> void SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_link(TransactionPart* tp, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		{
+
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_unlink(TransactionPart* tp)
+		{
+
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::save(TransactionPart* tp)
 		{
 			try
 			{
 				SQLite* sqlite = DBModule::GetSQLite();
 				if (!tp->getKey())
-					tp->setKey(getId()); /// @todo Handle grid
+					tp->setKey(getId());
 				stringstream query;
 				query << "REPLACE INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(tp->getKey())
@@ -108,7 +127,7 @@ namespace synthese
 		const std::string TransactionPartTableSync::TABLE_COL_COMMENT = "comment";
 
 		TransactionPartTableSync::TransactionPartTableSync()
-			: SQLiteTableSyncTemplate<TransactionPart>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteNoSyncTableSyncTemplate<TransactionPartTableSync,TransactionPart>()
 		{
 			// Columns
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
@@ -126,20 +145,7 @@ namespace synthese
 			addTableIndex(TABLE_COL_TRADED_OBJECT_ID);
 		}
 
-		void TransactionPartTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
 
-		}
-
-		void TransactionPartTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
-
-		void TransactionPartTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
 
 		vector<shared_ptr<TransactionPart> > TransactionPartTableSync::search(
 				shared_ptr<const Transaction> transaction, shared_ptr<const Account> account

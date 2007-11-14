@@ -28,6 +28,7 @@
 #include "12_security/User.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
@@ -50,6 +51,11 @@ namespace synthese
 	using namespace accounts;
 	using namespace time;
 	using namespace db;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action,vinci::VinciReturnGuaranteeAction>::FACTORY_KEY("vinciretguarantee");
+	}
 	
 	namespace vinci
 	{
@@ -60,7 +66,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_guarantee.get())
-				map.insert(make_pair(PARAMETER_GUARANTEE_ID, Conversion::ToString(_guarantee->getKey())));
+				map.insert(PARAMETER_GUARANTEE_ID, _guarantee->getKey());
 			return map;
 		}
 
@@ -68,12 +74,8 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_GUARANTEE_ID);
-				if (it == map.end())
-					throw ActionException("Guarantee not specified");
-				_guarantee = TransactionTableSync::get(Conversion::ToLongLong(it->second));
+				uid id = map.getUid(PARAMETER_GUARANTEE_ID, true, FACTORY_KEY);
+				_guarantee = TransactionTableSync::GetUpdateable(id);
 			}
 			catch(Transaction::ObjectNotFoundException& e)
 			{
@@ -83,7 +85,7 @@ namespace synthese
 
 		void VinciReturnGuaranteeAction::run()
 		{
-			DateTime now;
+			DateTime now(TIME_CURRENT);
 			_guarantee->setEndDateTime(now);
 			TransactionTableSync::save(_guarantee.get());
 		}

@@ -42,8 +42,8 @@ namespace synthese
 		*/
 		class VinciCustomerAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>
 		{
-			boost::shared_ptr<VinciContract>	_contract;
-			boost::shared_ptr<security::User>	_user;
+			boost::shared_ptr<const VinciContract>	_contract;
+			boost::shared_ptr<const security::User>	_user;
 
 		public:
 			VinciCustomerAdminInterfaceElement();

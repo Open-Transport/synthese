@@ -26,6 +26,8 @@
 #include "12_security/Profile.h"
 
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
+#include "30_server/QueryString.h"
 
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
@@ -40,6 +42,11 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action,vinci::AddCustomerAction>::FACTORY_KEY("vinciaddcustomer");
+	}
+
 	namespace vinci
 	{
 		const string AddCustomerAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
@@ -49,27 +56,15 @@ namespace synthese
 		ParametersMap AddCustomerAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_NAME, _name));
-			map.insert(make_pair(PARAMETER_SURNAME, _surname));
+			map.insert(PARAMETER_NAME, _name);
+			map.insert(PARAMETER_SURNAME, _surname);
 			return map;
 		}
 
 		void AddCustomerAction::_setFromParametersMap(const ParametersMap& map )
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_NAME);
-			if (it != map.end())
-			{
-				_name = it->second;
-			}
-
-			it = map.find(PARAMETER_SURNAME);
-			if (it != map.end())
-			{
-				_surname = it->second;
-			}
-
+			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			_surname = map.getString(PARAMETER_SURNAME, true, FACTORY_KEY);
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
@@ -80,7 +75,7 @@ namespace synthese
 			
 			user->setName(_name);
 			user->setSurname(_surname);
-			user->setProfile(profile);
+			user->setProfile(profile.get());
 			UserTableSync::save(user.get());
 
 			shared_ptr<VinciContract> contract(new VinciContract);

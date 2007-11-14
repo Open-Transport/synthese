@@ -2,9 +2,9 @@
 /** VinciContractPrintRequest class implementation.
 	@file VinciContractPrintRequest.cpp
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
 	as published by the Free Software Foundation; either version 2
@@ -43,16 +43,21 @@ namespace synthese
 	using namespace db;
 	using namespace interfaces;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<RequestWithInterfaceAndRequiredSession, vinci::VinciContractPrintRequest>::FACTORY_KEY("vinciprintcontract");
+	}
+
 	namespace vinci
 	{
-		const std::string VinciContractPrintQueryString::PARAMETER_CONTRACT_ID = "ctr";
+		const std::string VinciContractPrintRequest::PARAMETER_CONTRACT_ID = "ctr";
 
 		ParametersMap VinciContractPrintRequest::_getParametersMap() const
 		{
 			ParametersMap map(RequestWithInterfaceAndRequiredSession::_getParametersMap());
 
 			if (_contract.get())
-				map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
+				map.insert(PARAMETER_CONTRACT_ID, _contract->getKey());
 			
 			return map;
 		}
@@ -63,13 +68,8 @@ namespace synthese
 
 			try
 			{
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_CONTRACT_ID);
-				if (it == map.end())
-					throw RequestException("Contract not specified");
-
-				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
+				uid id = map.getUid(PARAMETER_CONTRACT_ID, true, FACTORY_KEY);
+				_contract = VinciContractTableSync::Get(id);
 			}
 			catch (VinciContract::ObjectNotFoundException& e)
 			{

@@ -2,8 +2,8 @@
 /** BarCodeInterpretFunction class header.
 	@file BarCodeInterpretFunction.h
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_BarCodeInterpretFunction_H__
 #define SYNTHESE_BarCodeInterpretFunction_H__
 
-#include "01_util/UId.h"
-
 #include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
+
+#include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
@@ -49,7 +50,7 @@ namespace synthese
 				- other text :
 					- display the contract search by user name and search the entered text (this function can be used to search a customer from text coming from a manual typing)
 		*/
-		class BarCodeInterpretFunction : public interfaces::RequestWithInterfaceAndRequiredSession
+		class BarCodeInterpretFunction : public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, BarCodeInterpretFunction>
 		{
 		public:
 			static const std::string PARAMETER_READED_CODE;
@@ -62,8 +63,8 @@ namespace synthese
 				std::string							_lastPage;
 				uid									_lastId;
 				int									_tableId;
-				boost::shared_ptr<VinciBike>		_bike;
-				boost::shared_ptr<VinciContract>	_contract;
+				boost::shared_ptr<const VinciBike>		_bike;
+				boost::shared_ptr<const VinciContract>	_contract;
 				std::string							_strCode;
 			//@}
 			

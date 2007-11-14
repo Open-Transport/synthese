@@ -30,7 +30,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -48,7 +48,7 @@ namespace synthese
 			@ingroup m71LS refLS
 		*/
 
-		class VinciBikeTableSync : public db::SQLiteTableSyncTemplate<VinciBike>
+		class VinciBikeTableSync : public db::SQLiteNoSyncTableSyncTemplate<VinciBikeTableSync,VinciBike>
 		{
 		public:
 			static const std::string TABLE_COL_NUMBER;
@@ -87,32 +87,7 @@ namespace synthese
 				@date 2007				
 			*/
 			static boost::shared_ptr<accounts::TransactionPart> getRentTransactionPart(boost::shared_ptr<const VinciBike> bike);
-
-		protected:
-
-			/** Action to do on user creation.
-			No action because the users are not permanently loaded in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite,	
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on user creation.
-			Updates the users objects in the opened sessions.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on user deletion.
-			Closes the sessions of the deleted user.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
-
 	}
 }
 

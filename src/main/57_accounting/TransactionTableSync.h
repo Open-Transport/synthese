@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -39,10 +39,10 @@ namespace synthese
 		class Account;
 
 		/** Transaction SQLite table synchronizer.
-			@ingroup m57
+			@ingroup m57LS refLS
 		*/
 
-		class TransactionTableSync : public db::SQLiteTableSyncTemplate<Transaction>
+		class TransactionTableSync : public db::SQLiteNoSyncTableSyncTemplate<TransactionTableSync,Transaction>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;
@@ -70,30 +70,6 @@ namespace synthese
 			static boost::shared_ptr<TransactionPart> getPart(
 				boost::shared_ptr<const Transaction> transaction, boost::shared_ptr<const Account> account
 			);
-
-		protected:
-
-			/** Action to do on user creation.
-			No action because the users are not permanently loaded in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on user creation.
-			Updates the users objects in the opened sessions.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on user deletion.
-			Closes the sessions of the deleted user.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 
 	}

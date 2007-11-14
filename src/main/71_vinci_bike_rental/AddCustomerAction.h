@@ -12,7 +12,7 @@ namespace synthese
 		/** Customer creation Action Class.
 			@ingroup m71Actions refActions
 		*/
-		class AddCustomerAction : public server::Action
+		class AddCustomerAction : public util::FactorableTemplate<server::Action, AddCustomerAction>
 		{
 		public:
 			static const std::string PARAMETER_NAME;

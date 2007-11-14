@@ -35,67 +35,65 @@ namespace synthese
 {
 	using namespace vinci;
 	using namespace db;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,VinciRateTableSync>::FACTORY_KEY("71.02 Vinci Rate");
+	}
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciRate>::TABLE_NAME = "t033_vinci_rates";
-		template<> const int SQLiteTableSyncTemplate<VinciRate>::TABLE_ID = 33;
-		template<> const bool SQLiteTableSyncTemplate<VinciRate>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::TABLE_NAME = "t033_vinci_rates";
+		template<> const int SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::TABLE_ID = 33;
+		template<> const bool SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::HAS_AUTO_INCREMENT = true;
 		
-		template<> void SQLiteTableSyncTemplate<VinciRate>::load(VinciRate* vr, const SQLiteResultSPtr& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::load(VinciRate* vr, const SQLiteResultSPtr& rows)
 		{
 			vr->setKey(rows->getLongLong (TABLE_COL_ID));
-			vr->_name = rows->get ( VinciRateTableSync::TABLE_COL_NAME);
-			vr->_validityDuration = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_VALIDITY_DURATION));
-			vr->_startFinancialPrice = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_START_FINANCIAL_PRICE));
-			vr->_startTicketsPrice = Conversion::ToInt(rows->get ( VinciRateTableSync::TABLE_COL_START_TICKETS_PRICE));
-			vr->_endFinancialPrice = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_END_FINANCIAL_PRICE));
-			vr->_endTicketsPrice = Conversion::ToInt(rows->get ( VinciRateTableSync::TABLE_COL_END_TICKETS_PRICE));
-			vr->_firstPenalty = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_FIRST_PENALTY));
-			vr->_firstPenaltyValidityDuration = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION));
-			vr->_recurringPenalty = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY));
-			vr->_recurringPenaltyPeriod = Conversion::ToInt(rows->get ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD));
-			vr->_recurringPenaltyCancelsFirst = Conversion::ToBool(rows->get ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST));
+			vr->setName(rows->getText ( VinciRateTableSync::TABLE_COL_NAME));
+			vr->setValidityDuration(rows->getDouble ( VinciRateTableSync::TABLE_COL_VALIDITY_DURATION));
+			vr->setStartFinancialPrice(rows->getDouble ( VinciRateTableSync::TABLE_COL_START_FINANCIAL_PRICE));
+			vr->setStartTicketsPrice(rows->getInt ( VinciRateTableSync::TABLE_COL_START_TICKETS_PRICE));
+			vr->setEndFinancialPrice(rows->getDouble ( VinciRateTableSync::TABLE_COL_END_FINANCIAL_PRICE));
+			vr->setEndTicketsPrice(rows->getInt ( VinciRateTableSync::TABLE_COL_END_TICKETS_PRICE));
+			vr->setFirstPenalty(rows->getDouble ( VinciRateTableSync::TABLE_COL_FIRST_PENALTY));
+			vr->setFirstPenaltyValidityDuration(rows->getDouble ( VinciRateTableSync::TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION));
+			vr->setRecurringPenalty(rows->getDouble ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY));
+			vr->setRecurringPenaltyPeriod(rows->getInt ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD));
+			vr->setRecurringPenaltyCancelsFirst(rows->getBool ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciRate>::save(VinciRate* vr)
+		template<> void SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::_link(VinciRate* vr, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::_unlink(VinciRate* vr)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::save(VinciRate* vr)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (vr->getKey() > 0)
-			{	// UPDATE
-				query << "UPDATE " << TABLE_NAME << " SET "
-					<< VinciRateTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(vr->_name)
-					<< "," << VinciRateTableSync::TABLE_COL_VALIDITY_DURATION << "=" << vr->_validityDuration
-					<< "," << VinciRateTableSync::TABLE_COL_START_FINANCIAL_PRICE << "=" << vr->_startFinancialPrice
-					<< "," << VinciRateTableSync::TABLE_COL_START_TICKETS_PRICE << "=" << vr->_startTicketsPrice
-					<< "," << VinciRateTableSync::TABLE_COL_END_FINANCIAL_PRICE << "=" << vr->_endFinancialPrice
-					<< "," << VinciRateTableSync::TABLE_COL_END_TICKETS_PRICE << "=" << vr->_endTicketsPrice
-					<< "," << VinciRateTableSync::TABLE_COL_FIRST_PENALTY << "=" << vr->_firstPenalty
-					<< "," << VinciRateTableSync::TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION << "=" << vr->_firstPenaltyValidityDuration
-					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY << "=" << vr->_recurringPenalty
-					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD << "=" << vr->_recurringPenaltyPeriod
-					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST << "=" << Conversion::ToString(vr->_recurringPenaltyCancelsFirst)
-					<< " WHERE " << TABLE_COL_ID << "=" << vr->getKey();
-			}
-			else
-			{	// INSERT
-				vr->setKey(getId(0,0));	/// @todo Handle grid name
-				query << "INSERT INTO " << TABLE_NAME << " VALUES("
-					<< vr->getKey()
-					<< "," << Conversion::ToSQLiteString(vr->_name)
-					<< "," << vr->_validityDuration
-					<< "," << vr->_startFinancialPrice
-					<< "," << vr->_startTicketsPrice
-					<< "," << vr->_endFinancialPrice
-					<< "," << vr->_endTicketsPrice
-					<< "," << vr->_firstPenalty
-					<< "," << vr->_firstPenaltyValidityDuration
-					<< "," << vr->_recurringPenalty
-					<< "," << vr->_recurringPenaltyPeriod
-					<< "," << Conversion::ToString(vr->_recurringPenaltyCancelsFirst)
-					<< ")";
-			}
+			if (vr->getKey() <= 0)
+				vr->setKey(getId());
+			query << "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< vr->getKey()
+				<< "," << Conversion::ToSQLiteString(vr->getName())
+				<< "," << vr->getValidityDuration()
+				<< "," << vr->getStartFinancialPrice()
+				<< "," << vr->getStartTicketsPrice()
+				<< "," << vr->getEndFinancialPrice()
+				<< "," << vr->getEndTicketsPrice()
+				<< "," << vr->getFirstPenalty()
+				<< "," << vr->getFirstPenaltyValidityDuration()
+				<< "," << vr->getRecurringPenalty()
+				<< "," << vr->getRecurringPenaltyPeriod()
+				<< "," << Conversion::ToString(vr->getRecurringPenaltyCancelsFirst())
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 	}
@@ -115,7 +113,7 @@ namespace synthese
 		const std::string VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST = "recurring_penalty_cancels_first";
 
 		VinciRateTableSync::VinciRateTableSync()
-			: SQLiteTableSyncTemplate<VinciRate>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteNoSyncTableSyncTemplate<VinciRateTableSync,VinciRate>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -131,27 +129,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST, "BOOLEAN", true);
 		}
 
-		void VinciRateTableSync::rowsAdded (db::SQLite* sqlite, 
-			db::SQLiteSync* sync,
-			const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
 
-		}
-
-		
-		void VinciRateTableSync::rowsUpdated (db::SQLite* sqlite, 
-			db::SQLiteSync* sync,
-			const db::SQLiteResultSPtr& rows)
-		{
-
-		}
-
-		void VinciRateTableSync::rowsRemoved (db::SQLite* sqlite, 
-			db::SQLiteSync* sync,
-			const db::SQLiteResultSPtr& rows)
-		{
-
-		}
 
 		std::vector<shared_ptr<VinciRate> > VinciRateTableSync::search(
 				 int first, int number)
@@ -165,12 +143,12 @@ namespace synthese
 
 			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<VinciRate> > rates;
-			for (int i=0; i<result.getNbRows(); ++i)
+			while(rows->next())
 			{
 				shared_ptr<VinciRate> rate(new VinciRate);
 				try
 				{
-					load(rate.get (), result, i);
+					load(rate.get (), rows);
 					rates.push_back(rate);
 				}
 				catch (Exception e)

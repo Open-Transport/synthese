@@ -47,7 +47,7 @@ namespace synthese
 
 		template<class F>
 		FunctionRequest<F>::FunctionRequest(const Request* request)
-			: Request(request, boost::shared_ptr<F>(util::Factory<Function>::create<F>()))
+			: Request(request, boost::shared_ptr<F>(new F))
 		{
 		}
 

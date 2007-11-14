@@ -4,7 +4,6 @@
 
 	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
 	Copyright (C) 2006 Vinci Park 
-	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -40,7 +39,7 @@ namespace synthese
 		/** Guarantee return Action Class.
 			@ingroup m71Actions refActions
 		*/
-		class VinciReturnGuaranteeAction : public server::Action
+		class VinciReturnGuaranteeAction : public util::FactorableTemplate<server::Action, VinciReturnGuaranteeAction>
 		{
 		public:
 			static const std::string PARAMETER_GUARANTEE_ID;

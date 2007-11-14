@@ -106,12 +106,12 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it = map.find(QueryString::PARAMETER_OBJECT_ID);
-				if (it != map.end())
+				uid id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
+				if (id != UNKNOWN_VALUE)
 				{
-					if (Conversion::ToLongLong(it->second) == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+					if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 						return;
-					_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
+					_bike = VinciBikeTableSync::Get(id);
 				}
 			}
 			catch(VinciBike::ObjectNotFoundException& e)

@@ -29,6 +29,7 @@
 #include "30_server/ServerModule.h"
 #include "30_server/Request.h"
 #include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
 
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
@@ -43,6 +44,11 @@ namespace synthese
 	using namespace security;
 	using namespace time;
 	using namespace db;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<server::Action, vinci::VinciUpdateCustomerAction>::FACTORY_KEY("vinciupdatecustomer");
+	}
 	
 	namespace vinci
 	{
@@ -57,18 +63,25 @@ namespace synthese
 		const string VinciUpdateCustomerAction::PARAMETER_BIRTH_DATE = Action_PARAMETER_PREFIX + "bd";
 		const string VinciUpdateCustomerAction::PARAMETER_PASSPORT = Action_PARAMETER_PREFIX + "pp";
 
+		VinciUpdateCustomerAction::VinciUpdateCustomerAction()
+			: FactorableTemplate<Action, VinciUpdateCustomerAction>()
+			, _birthDate(TIME_UNKNOWN)
+		{
+
+		}
+
 		ParametersMap VinciUpdateCustomerAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_NAME, _name));
-			map.insert(make_pair(PARAMETER_SURNAME, _surname));
-			map.insert(make_pair(PARAMETER_ADDRESS, _address));
-			map.insert(make_pair(PARAMETER_POST_CODE, _postCode));
-			map.insert(make_pair(PARAMETER_CITY, _city));
-			map.insert(make_pair(PARAMETER_COUNTRY, _country));
-			map.insert(make_pair(PARAMETER_EMAIL, _email));
-			map.insert(make_pair(PARAMETER_PHONE, _phone));
-			map.insert(make_pair(PARAMETER_BIRTH_DATE, _birthDate.toString()));
+			map.insert(PARAMETER_NAME, _name);
+			map.insert(PARAMETER_SURNAME, _surname);
+			map.insert(PARAMETER_ADDRESS, _address);
+			map.insert(PARAMETER_POST_CODE, _postCode);
+			map.insert(PARAMETER_CITY, _city);
+			map.insert(PARAMETER_COUNTRY, _country);
+			map.insert(PARAMETER_EMAIL, _email);
+			map.insert(PARAMETER_PHONE, _phone);
+			map.insert(PARAMETER_BIRTH_DATE, _birthDate);
 			return map;
 		}
 
@@ -76,73 +89,22 @@ namespace synthese
 		{
 			try
 			{
-				_contract = VinciContractTableSync::get(_request->getObjectId());
+				_contract = VinciContractTableSync::GetUpdateable(_request->getObjectId());
 				_user = _contract->getUser();
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_NAME);
-				if (it != map.end())
-				{
-					_name = it->second;
-				}
+				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
 
-				it = map.find(PARAMETER_SURNAME);
-				if (it != map.end())
-				{
-					_surname = it->second;
-				}
-
-				it = map.find(PARAMETER_ADDRESS);
-				if (it != map.end())
-				{
-					_address = it->second;
-				}
-
-				it = map.find(PARAMETER_POST_CODE);
-				if (it != map.end())
-				{
-					_postCode = it->second;
-				}
-
-				it = map.find(PARAMETER_CITY);
-				if (it != map.end())
-				{
-					_city = it->second;
-				}
-
-				it = map.find(PARAMETER_COUNTRY);
-				if (it != map.end())
-				{
-					_country = it->second;
-				}
-
-				it = map.find(PARAMETER_EMAIL);
-				if (it != map.end())
-				{
-					_email = it->second;
-				}
-
-				it = map.find(PARAMETER_PHONE);
-				if (it != map.end())
-				{
-					_phone = it->second;
-				}
-
-				it = map.find(PARAMETER_BIRTH_DATE);
-				if (it != map.end())
-				{
-					_birthDate = Date::FromString(it->second);
-				}
-
-				it = map.find(PARAMETER_PASSPORT);
-				if (it != map.end())
-				{
-					_passport = it->second;
-				}
-
+				_surname = map.getString(PARAMETER_SURNAME, false, FACTORY_KEY);
+				_address = map.getString(PARAMETER_ADDRESS, false, FACTORY_KEY);
+				_postCode = map.getString(PARAMETER_POST_CODE, false, FACTORY_KEY);
+				_city = map.getString(PARAMETER_CITY, false, FACTORY_KEY);
+				_country = map.getString(PARAMETER_COUNTRY, false, FACTORY_KEY);
+				_email = map.getString(PARAMETER_EMAIL, false, FACTORY_KEY);
+				_phone = map.getString(PARAMETER_PHONE, false, FACTORY_KEY);
+				_birthDate = map.getDate(PARAMETER_BIRTH_DATE, false, FACTORY_KEY);
+				_passport = map.getString(PARAMETER_PASSPORT, false, FACTORY_KEY);
 			}
 			catch (VinciContract::ObjectNotFoundException& e)
 			{

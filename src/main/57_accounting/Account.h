@@ -25,8 +25,6 @@
 
 #include <string>
 
-#include <boost/shared_ptr.hpp>
-
 #include "01_util/UId.h"
 #include "01_util/Registrable.h"
 
@@ -54,11 +52,11 @@ namespace synthese
 			uid				_leftUserId;
 			std::string		_leftNumber;
 			std::string		_leftClassNumber;
-			boost::shared_ptr<const Currency>	_leftCurrency;
+			const Currency*	_leftCurrency;
 			uid				_rightUserId;
 			std::string		_rightNumber;
 			std::string		_rightClassNumber;
-			boost::shared_ptr<const Currency>	_rightCurrency;
+			const Currency*	_rightCurrency;
 			std::string		_name;
 
 		public:
@@ -67,21 +65,21 @@ namespace synthese
 			const uid				getLeftUserId() const;
 			const std::string&		getLeftNumber() const;
 			const std::string&		getLeftClassNumber() const;
-			boost::shared_ptr<const Currency>		getLeftCurrency() const;
+			const Currency*			getLeftCurrency() const;
 			const uid				getRightUserId() const;
 			const std::string&		getRightNumber() const;
 			const std::string&		getRightClassNumber() const;
-			boost::shared_ptr<const Currency>		getRightCurrency() const;
+			const Currency*			getRightCurrency() const;
 			const std::string&		getName() const;
 
 			void setLeftUserId(uid id);
 			void setLeftNumber(const std::string& LeftNumber);
 			void setLeftClassNumber(const std::string& classNumber);
-			void setLeftCurrency(boost::shared_ptr<const Currency> currency);
+			void setLeftCurrency(const Currency* currency);
 			void setRightUserId(uid id);
 			void setRightNumber(const std::string& RightNumber);
 			void setRightClassNumber(const std::string& classNumber);
-			void setRightCurrency(boost::shared_ptr<const Currency> currency);
+			void setRightCurrency(const Currency* currency);
 			void setName(const std::string& name);
 
 		};

@@ -30,7 +30,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -41,9 +41,9 @@ namespace synthese
 		/** Vinci Rate SQLite table synchronizer.
 			@ingroup m71LS refLS
 		*/
-		class VinciRateTableSync : public db::SQLiteTableSyncTemplate<VinciRate>
+		class VinciRateTableSync : public db::SQLiteNoSyncTableSyncTemplate<VinciRateTableSync,VinciRate>
 		{
-		private:
+		public:
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_VALIDITY_DURATION;
 			static const std::string TABLE_COL_START_FINANCIAL_PRICE;
@@ -56,9 +56,6 @@ namespace synthese
 			static const std::string TABLE_COL_RECURRING_PENALTY_PERIOD;
 			static const std::string TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST;
 
-			friend class db::SQLiteTableSyncTemplate<VinciRate>;
-			
-		public:
 			VinciRateTableSync();
 
 			/** VinciRate search.
@@ -71,30 +68,6 @@ namespace synthese
 			*/
 			static std::vector<boost::shared_ptr<VinciRate> > search(
 				int first = 0, int number = -1);
-
-
-		protected:
-
-			/** Action to do on user creation.
-			No action because the users are not permanently loaded in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on user creation.
-			Updates the users objects in the opened sessions.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on user deletion.
-			Closes the sessions of the deleted user.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		};
 

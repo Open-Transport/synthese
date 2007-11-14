@@ -295,7 +295,7 @@ namespace synthese
 				throw RequestException("Function not specified");
 			if (!Factory<Function>::contains(functionName))
 				throw RequestException("Function not found");
-			_setFunction(Factory<Function>::createSharedPtr(functionName));
+			_setFunction(shared_ptr<Function>(Factory<Function>::create(functionName)));
 
 			// Object ID
 			_object_id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, "Request");
@@ -306,7 +306,7 @@ namespace synthese
 			{
 				if (!Factory<Action>::contains(actionName))
 					throw RequestException("Action not found");
-				_setAction(Factory<Action>::createSharedPtr(actionName));
+				_setAction(shared_ptr<Action>(Factory<Action>::create(actionName)));
 
 				// Action parameters
 				try

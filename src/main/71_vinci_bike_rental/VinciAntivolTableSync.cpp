@@ -41,24 +41,39 @@ namespace synthese
 	using namespace util;
 	using namespace vinci;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,VinciAntivolTableSync>::FACTORY_KEY("71.04 Vinci Locks");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciAntivol>::TABLE_NAME = "t043_vinci_locks";
-		template<> const int SQLiteTableSyncTemplate<VinciAntivol>::TABLE_ID = 43;
-		template<> const bool SQLiteTableSyncTemplate<VinciAntivol>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>::TABLE_NAME = "t043_vinci_locks";
+		template<> const int SQLiteTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>::TABLE_ID = 43;
+		template<> const bool SQLiteTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciAntivol>::load(VinciAntivol* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>::load(VinciAntivol* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setMarkedNumber(rows->getText ( VinciAntivolTableSync::COL_MARKED_NUMBER));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciAntivol>::save(VinciAntivol* object)
+		template<> void SQLiteTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>::_link(VinciAntivol* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>::_unlink(VinciAntivol* object)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>::save(VinciAntivol* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
-				object->setKey(getId());	/// @todo Use grid ID
+				object->setKey(getId());
                
 			 query
 				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
@@ -75,23 +90,13 @@ namespace synthese
 		const std::string VinciAntivolTableSync::COL_MARKED_NUMBER = "marked_number";
 
 		VinciAntivolTableSync::VinciAntivolTableSync()
-			: SQLiteTableSyncTemplate<VinciAntivol>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteNoSyncTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_MARKED_NUMBER, "TEXT", true);
 		}
 
-		void VinciAntivolTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		}
-		
-		void VinciAntivolTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-		}
 
-		void VinciAntivolTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-		}
 
 		vector<shared_ptr<VinciAntivol> > VinciAntivolTableSync::search(const std::string markedNumber, int first /*= 0*/, int number /*= 0*/ )
 		{

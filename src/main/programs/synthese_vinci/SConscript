@@ -1,6 +1,6 @@
 Import ('env')
 
-modules = ['71_vinci_bike_rental', '57_accounting', '30_server', '11_interfaces', '12_security', '32_admin', '13_dblog', '05_html', '04_time', '02_db', '01_util', '00_tcp'];
+modules = ['71_vinci_bike_rental', '57_accounting', '30_server', '11_interfaces', '12_security', '32_admin', '13_dblog', '05_html', '04_time', '02_db', '01_util', '00_tcp', '01_util__threads', '01_util__iostreams'];
 
 
 syntheseenv = env.SyntheseEnv (modules)

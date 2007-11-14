@@ -29,7 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 #include "71_vinci_bike_rental/VinciAntivol.h"
 
@@ -40,7 +40,7 @@ namespace synthese
 		/** VinciAntivol table synchronizer.
 			@ingroup m71LS refLS
 		*/
-		class VinciAntivolTableSync : public db::SQLiteTableSyncTemplate<VinciAntivol>
+		class VinciAntivolTableSync : public db::SQLiteNoSyncTableSyncTemplate<VinciAntivolTableSync,VinciAntivol>
 		{
 		public:
 			static const std::string COL_MARKED_NUMBER;
@@ -59,31 +59,6 @@ namespace synthese
 			static std::vector<boost::shared_ptr<VinciAntivol> > search(
 				std::string markedNumber = ""
 				, int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on VinciAntivol creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on VinciAntivol creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on VinciAntivol deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		};
 	}

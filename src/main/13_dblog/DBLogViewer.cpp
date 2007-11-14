@@ -97,7 +97,7 @@ namespace synthese
 			string key(map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY));
 			if (!Factory<DBLog>::contains(key))
 				throw AdminParametersException("Invalid log key : " + key);
-			_dbLog = Factory<DBLog>::createSharedPtr(key);
+			_dbLog.reset(Factory<DBLog>::create(key));
 
 			// Start Date
 			_searchStartDate = map.getDateTime(PARAMETER_START_DATE, false, FACTORY_KEY);

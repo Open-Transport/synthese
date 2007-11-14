@@ -42,7 +42,7 @@ namespace synthese
 		/** Update of the contract with the customer.
 			@ingroup m71Actions refActions
 		*/
-		class VinciUpdateCustomerAction : public server::Action
+		class VinciUpdateCustomerAction : public util::FactorableTemplate<server::Action, VinciUpdateCustomerAction>
 		{
 		public:
 			static const std::string PARAMETER_NAME;
@@ -85,6 +85,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			VinciUpdateCustomerAction();
 		};
 	}
 }

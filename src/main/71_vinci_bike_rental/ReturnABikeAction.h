@@ -2,8 +2,8 @@
 /** ReturnABikeAction class header.
 	@file ReturnABikeAction.h
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -39,13 +39,13 @@ namespace synthese
 		/** Bike return action class.
 			@ingroup m71Actions refActions
 		*/
-		class ReturnABikeAction : public server::Action
+		class ReturnABikeAction : public util::FactorableTemplate<server::Action, ReturnABikeAction>
 		{
 		public:
 			static const std::string PARAMETER_TRANSACTION_PART_ID;
 
 		private:
-			boost::shared_ptr<accounts::TransactionPart>	_transactionPart;
+			boost::shared_ptr<const accounts::TransactionPart>	_transactionPart;
 			
 		protected:
 			/** Conversion from attributes to generic parameter maps.

@@ -40,38 +40,48 @@ namespace synthese
 {
 	using namespace db;
 	using namespace accounts;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<SQLiteTableSync,CurrencyTableSync>::FACTORY_KEY("57.00 Currency");
+	}
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Currency>::TABLE_NAME = "t029_currencies";
-		template<> const int SQLiteTableSyncTemplate<Currency>::TABLE_ID = 29;
-		template<> const bool SQLiteTableSyncTemplate<Currency>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::TABLE_NAME = "t029_currencies";
+		template<> const int SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::TABLE_ID = 29;
+		template<> const bool SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Currency>::load(Currency* currency, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::load(Currency* currency, const db::SQLiteResultSPtr& rows )
 		{
 			currency->setKey(rows->getLongLong (TABLE_COL_ID));
 			currency->setName(rows->getText ( CurrencyTableSync::TABLE_COL_NAME));
 			currency->setSymbol(rows->getText ( CurrencyTableSync::TABLE_COL_SYMBOL));
 		}
 
-		template<> void SQLiteTableSyncTemplate<Currency>::save(Currency* currency)
+		template<> void SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::_link(Currency* currency, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::_unlink(Currency* currency)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::save(Currency* currency)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (currency->getKey() > 0)
-			{
-				// UPDATE
-			}
-			else
-			{
+			if (currency->getKey() <= 0)
 				currency->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(currency->getKey())
-					<< "," << Conversion::ToSQLiteString(currency->getName())
-					<< "," << Conversion::ToSQLiteString(currency->getSymbol())
-					<< ")";
-			}
+            query
+				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(currency->getKey())
+				<< "," << Conversion::ToSQLiteString(currency->getName())
+				<< "," << Conversion::ToSQLiteString(currency->getSymbol())
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -84,32 +94,14 @@ namespace synthese
 
 
 		CurrencyTableSync::CurrencyTableSync()
-			: SQLiteTableSyncTemplate<Currency>(true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteRegistryTableSyncTemplate<CurrencyTableSync,Currency>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 			addTableColumn(TABLE_COL_SYMBOL, "TEXT", true);
 		}
 
-		void CurrencyTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				shared_ptr<Currency> currency(new Currency);
-				load(currency.get(), rows);
-				AccountingModule::getCurrencies().add(currency);
-			}
-		}
 
-		void CurrencyTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
-
-		void CurrencyTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
 
 		std::vector<shared_ptr<Currency> > CurrencyTableSync::search(const std::string& name, const std::string& symbol , int first /*= 0*/, int number /*= 0*/ )
 		{

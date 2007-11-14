@@ -165,7 +165,7 @@ namespace synthese
 
 					try
 					{
-						vie = Factory<LibraryInterfaceElement>::createSharedPtr(str.substr(2, position - 2));
+						vie.reset(Factory<LibraryInterfaceElement>::create(str.substr(2, position - 2)));
 						ValueElementList vel;
 						if (position < str.size() - 3)
 							vel.parse(str.substr(position + 1, str.size() - position - 3), page);

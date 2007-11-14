@@ -2,8 +2,8 @@
 /** VinciUpdateBikeAction class header.
 	@file VinciUpdateBikeAction.h
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace vinci
@@ -36,7 +38,7 @@ namespace synthese
 		/** VinciUpdateBikeAction action class.
 			@ingroup m71Action refAction
 		*/
-		class VinciUpdateBikeAction : public server::Action
+		class VinciUpdateBikeAction : public util::FactorableTemplate<server::Action, VinciUpdateBikeAction>
 		{
 		public:
 			static const std::string PARAMETER_BIKE_ID;

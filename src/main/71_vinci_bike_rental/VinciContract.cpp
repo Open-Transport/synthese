@@ -73,7 +73,7 @@ namespace synthese
 		{
 			try
 			{
-				return UserTableSync::get(_userId);
+				return UserTableSync::GetUpdateable(_userId);
 			}
 			catch (...)
 			{
@@ -100,7 +100,7 @@ namespace synthese
 		{
 			try
 			{
-				return VinciSiteTableSync::get(_siteId);
+				return VinciSiteTableSync::GetUpdateable(_siteId);
 			}
 			catch(...)
 			{
@@ -126,7 +126,7 @@ namespace synthese
 				if (!tp.get())
 					return shared_ptr<VinciBike>();
 				if (tp->getTradedObjectId() != "")
-					return VinciBikeTableSync::get(Conversion::ToLongLong(tp->getTradedObjectId()));
+					return VinciBikeTableSync::GetUpdateable(Conversion::ToLongLong(tp->getTradedObjectId()));
 				return shared_ptr<VinciBike>();
 			}
 			catch(...)
@@ -142,7 +142,7 @@ namespace synthese
 
 		shared_ptr<TransactionPart> VinciContract::getCurrentRentTransactionPart() const
 		{
-			vector<shared_ptr<TransactionPart> > rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), UserTableSync::get(_userId), false, 0, 1);
+			vector<shared_ptr<TransactionPart> > rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), UserTableSync::Get(_userId), false, 0, 1);
 			return rents.empty() ? shared_ptr<TransactionPart>() : rents.front();
 		}
 
@@ -153,9 +153,9 @@ namespace synthese
 				shared_ptr<TransactionPart> tp = getCurrentRentTransactionPart();
 				if (!tp.get())
 					return shared_ptr<VinciAntivol>();
-				shared_ptr<Transaction> t = TransactionTableSync::get(tp->getTransactionId());
+				shared_ptr<const Transaction> t = TransactionTableSync::Get(tp->getTransactionId());
 				tp = TransactionTableSync::getPart(t, VinciBikeRentalModule::getFreeLockRentServiceAccount());
-				return VinciAntivolTableSync::get(Conversion::ToLongLong(tp->getTradedObjectId()));
+				return VinciAntivolTableSync::GetUpdateable(Conversion::ToLongLong(tp->getTradedObjectId()));
 			}
 			catch (...)
 			{
@@ -165,7 +165,7 @@ namespace synthese
 
 		shared_ptr<TransactionPart> VinciContract::getCurrentGuaranteeTransactionPart() const
 		{
-			vector<shared_ptr<TransactionPart> > gua = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), UserTableSync::get(_userId), false, -1, 1);
+			vector<shared_ptr<TransactionPart> > gua = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), UserTableSync::Get(_userId), false, -1, 1);
 			return gua.empty() ? shared_ptr<TransactionPart>() : gua.front();
 		}
 	}

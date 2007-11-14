@@ -70,6 +70,12 @@ namespace synthese
 
 		}
 
+		ParametersMap::ParametersMap( const Map& source )
+			: _map(source)
+		{
+
+		}
+
 		std::string ParametersMap::getString( const std::string& parameterName , bool neededParameter , const std::string& source ) const
 		{
 			Map::const_iterator it(_map.find(parameterName));
@@ -92,6 +98,12 @@ namespace synthese
 		{
 			const string result(getString(parameterName, neededParameter, source));
 			return result.empty() ? UNKNOWN_VALUE : Conversion::ToInt(result);
+		}
+
+		double ParametersMap::getDouble( const std::string& parameterName , bool neededParameter , const std::string& source ) const
+		{
+			const string result(getString(parameterName, neededParameter, source));
+			return result.empty() ? UNKNOWN_VALUE : Conversion::ToDouble(result);
 		}
 
 		bool ParametersMap::getBool( const std::string& parameterName , bool neededParameter , bool defaultValue , const std::string& source ) const
@@ -118,6 +130,11 @@ namespace synthese
 		}
 
 		void ParametersMap::insert( const std::string& parameterName, int value )
+		{
+			insert(parameterName, Conversion::ToString(value));
+		}
+
+		void ParametersMap::insert( const std::string& parameterName, double value )
 		{
 			insert(parameterName, Conversion::ToString(value));
 		}

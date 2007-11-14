@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
 
 #include "VinciUpdateBikeAction.h"
 #include "VinciBikeTableSync.h"
@@ -33,6 +34,11 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, vinci::VinciUpdateBikeAction>::FACTORY_KEY("vinciupdatebike");
+	}
 	
 	namespace vinci
 	{
@@ -44,9 +50,9 @@ namespace synthese
 		ParametersMap VinciUpdateBikeAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_BIKE_ID, Conversion::ToString(_bike.get() ? _bike->getKey() : uid())));
-			map.insert(make_pair(PARAMETER_NUMBER, _number));
-			map.insert(make_pair(PARAMETER_MARKED_NUMBER, _markedNumber));
+			map.insert(PARAMETER_BIKE_ID, _bike.get() ? _bike->getKey() : uid());
+			map.insert(PARAMETER_NUMBER, _number);
+			map.insert(PARAMETER_MARKED_NUMBER, _markedNumber);
 			return map;
 		}
 
@@ -54,22 +60,12 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_BIKE_ID);
-				if (it == map.end())
-					throw ActionException("Parameter bike not found");
-				_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
+				uid id = map.getUid(PARAMETER_BIKE_ID, true, FACTORY_KEY);
+				_bike = VinciBikeTableSync::GetUpdateable(id);
 				
-				it = map.find(PARAMETER_NUMBER);
-				if (it == map.end())
-					throw ActionException("Parameter number not found");
-				_number = it->second;
+				_number = map.getString(PARAMETER_NUMBER, true, FACTORY_KEY);
 
-				it = map.find(PARAMETER_MARKED_NUMBER);
-				if (it == map.end())
-					throw ActionException("Parameter number not found");
-				_markedNumber = it->second;
+				_markedNumber = map.getString(PARAMETER_MARKED_NUMBER, true, FACTORY_KEY);
 			}
 			catch(VinciBike::ObjectNotFoundException& e)
 			{

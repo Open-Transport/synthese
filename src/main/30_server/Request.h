@@ -292,7 +292,7 @@ namespace synthese
 				return false;
 
 			const security::Profile* profile(_session->getUser()->getProfile());
-			boost::shared_ptr<security::Right> neededRight(util::Factory<security::Right>::create<R>());
+			boost::shared_ptr<security::Right> neededRight(new R);
 			neededRight->setPublicLevel(publicr);
 			neededRight->setPrivateLevel(privater);
 			neededRight->setParameter(parameter);

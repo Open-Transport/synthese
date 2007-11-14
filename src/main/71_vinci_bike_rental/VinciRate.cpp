@@ -145,7 +145,7 @@ namespace synthese
 
 		double VinciRate::getAdditionalAmountToPay(const time::DateTime& startDate) const
 		{
-			DateTime now;
+			DateTime now(TIME_CURRENT);
 			if (now <= getEndDate(startDate))
 				return 0;
 

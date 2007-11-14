@@ -66,7 +66,10 @@ namespace synthese
 	namespace vinci
 	{
 		VinciReportsAdminInterfaceElement::VinciReportsAdminInterfaceElement()
-			: AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>() {}
+			: AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>() 
+			, _startDate(TIME_CURRENT)
+			, _endDate(TIME_CURRENT)
+		{}
 
 		const std::string VinciReportsAdminInterfaceElement::PARAM_START_DATE = "vraiepsd";
 		const std::string VinciReportsAdminInterfaceElement::PARAM_END_DATE = "vraieped";
@@ -126,10 +129,10 @@ namespace synthese
 				for(std::map<uid, RentReportResult>::const_iterator it2 = _resultsPerRate.begin();
 					it2 != _resultsPerRate.end(); ++it2)
 				{
-					shared_ptr<VinciRate> rate;
+					shared_ptr<const VinciRate> rate;
 					try
 					{
-						rate = VinciRateTableSync::get(it2->first);
+						rate = VinciRateTableSync::Get(it2->first);
 					}
 					catch (...)
 					{
@@ -146,18 +149,14 @@ namespace synthese
 
 		void VinciReportsAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-			it = map.find(PARAM_START_DATE);
-			if (it != map.end())
-				_startDate = Date::FromString(it->second);
-			it = map.find(PARAM_END_DATE);
-			if (it != map.end())
-				_endDate = Date::FromString(it->second);
-            if (!_startDate.isUnknown() && !_endDate.isUnknown())
-			{
-				_resultsPerDay = getRentsPerDay(_startDate, _endDate);
-				_resultsPerRate = getRentsPerRate(_startDate, _endDate);
-			}
+			_startDate = map.getDate(PARAM_START_DATE, false, FACTORY_KEY);
+			if (!_startDate.isUnknown())
+				_startDate = Date(TIME_CURRENT);
+			_endDate = map.getDate(PARAM_END_DATE, false, FACTORY_KEY);
+			if (!_endDate.isUnknown())
+				_endDate = Date(TIME_CURRENT);
+            _resultsPerDay = getRentsPerDay(_startDate, _endDate);
+			_resultsPerRate = getRentsPerRate(_startDate, _endDate);
 		}
 
 		bool VinciReportsAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const

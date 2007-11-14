@@ -2,9 +2,9 @@
 /** BarCodeInterpretFunction class implementation.
 	@file BarCodeInterpretFunction.cpp
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
 	as published by the Free Software Foundation; either version 2
@@ -53,6 +53,11 @@ namespace synthese
 	using namespace interfaces;
 	using namespace db;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<RequestWithInterfaceAndRequiredSession, vinci::BarCodeInterpretFunction>::FACTORY_KEY("barcoderead");
+	}
+
 	namespace vinci
 	{
 		const string BarCodeInterpretFunction::PARAMETER_READED_CODE = "rco";
@@ -63,9 +68,9 @@ namespace synthese
 		{
 			ParametersMap map(RequestWithInterfaceAndRequiredSession::_getParametersMap());
 
-			map.insert(make_pair(PARAMETER_LAST_PAGE, _lastPage));
+			map.insert(PARAMETER_LAST_PAGE, _lastPage);
 			if (_lastId)
-				map.insert(make_pair(PARAMETER_LAST_OBJECT_ID, Conversion::ToString(_lastId)));
+				map.insert(PARAMETER_LAST_OBJECT_ID, _lastId);
 			return map;
 		}
 
@@ -73,24 +78,15 @@ namespace synthese
 		{
 			RequestWithInterfaceAndRequiredSession::_setFromParametersMap(map);
 
-			ParametersMap::const_iterator it;
-
 			// Read code
-			it = map.find(PARAMETER_READED_CODE);
-			if (it == map.end())
-				throw RequestException("Readed code not found");
-			uid uidCode = Conversion::ToLongLong(it->second);
-			_strCode = it->second;
+			uid uidCode = map.getUid(PARAMETER_READED_CODE, true, FACTORY_KEY);
+			_strCode = map.getString(PARAMETER_READED_CODE, true, FACTORY_KEY);
 
 			// Last page
-			it = map.find(PARAMETER_LAST_PAGE);
-			if (it != map.end())
-				_lastPage = it->second;
+			_lastPage = map.getString(PARAMETER_LAST_PAGE, false, FACTORY_KEY);
 
 			// Last object
-			it = map.find(PARAMETER_LAST_OBJECT_ID);
-			if (it != map.end())
-				_lastId = Conversion::ToLongLong(it->second);
+			_lastId = map.getUid(PARAMETER_LAST_OBJECT_ID, false, FACTORY_KEY);
 
 			// Interface control
 			try
@@ -109,7 +105,7 @@ namespace synthese
 			{
 				try
 				{
-					_bike = VinciBikeTableSync::get(uidCode);
+					_bike = VinciBikeTableSync::Get(uidCode);
 				}
 				catch (VinciBike::ObjectNotFoundException& e)
 				{
@@ -120,7 +116,7 @@ namespace synthese
 			{
 				try
 				{
-					_contract = VinciContractTableSync::get(uidCode);
+					_contract = VinciContractTableSync::Get(uidCode);
 				}
 				catch (VinciContract::ObjectNotFoundException& e)
 				{
@@ -136,9 +132,8 @@ namespace synthese
 				shared_ptr<VinciContract> contract = VinciBikeTableSync::getRentContract(_bike);
 				if (contract.get())
 				{
-					if (_lastPage == Factory<AdminInterfaceElement>::getKey<VinciCustomerAdminInterfaceElement>()
-						&& _lastId == contract->getKey()
-					){
+					if (_lastPage == VinciCustomerAdminInterfaceElement::FACTORY_KEY && _lastId == contract->getKey())
+					{
 						shared_ptr<TransactionPart> transactionPart = VinciBikeTableSync::getRentTransactionPart(_bike);
 
 						// Action : return the bike(s)
@@ -166,7 +161,7 @@ namespace synthese
 				}
 				else
 				{
-					if (_lastPage == Factory<AdminInterfaceElement>::getKey<VinciCustomerAdminInterfaceElement>())
+					if (_lastPage == VinciCustomerAdminInterfaceElement::FACTORY_KEY)
 					{
 						// Action : rent the bike (what about the lock ? do not implement this part now)
 						// Function : keep the current display
@@ -187,7 +182,7 @@ namespace synthese
 			}
 			else if (_tableId == VinciContractTableSync::TABLE_ID)
 			{
-				if (_lastPage == Factory<AdminInterfaceElement>::getKey<VinciCustomerAdminInterfaceElement>()
+				if (_lastPage == VinciCustomerAdminInterfaceElement::FACTORY_KEY
 					&& _lastId == _contract->getKey()
 				){
 					// Action : return all the bikes
@@ -211,7 +206,7 @@ namespace synthese
 			{
 				// Function : go to the customer search page
 				FunctionRequest<AdminRequest> redirRequest(_request);
-				shared_ptr<VinciCustomerSearchAdminInterfaceElement> page = Factory<AdminInterfaceElement>::create<VinciCustomerSearchAdminInterfaceElement>();
+				shared_ptr<VinciCustomerSearchAdminInterfaceElement> page(new VinciCustomerSearchAdminInterfaceElement);
 				page->setSearchName(_strCode);
 				redirRequest.getFunction()->setPage(page);
 				VariablesMap vm;

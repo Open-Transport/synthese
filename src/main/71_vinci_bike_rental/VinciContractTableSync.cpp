@@ -44,29 +44,44 @@ namespace synthese
 	using namespace security;
 	using namespace vinci;
 	using namespace accounts;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,VinciContractTableSync>::FACTORY_KEY("71.11 Vinci Contract");
+	}
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciContract>::TABLE_NAME = "t035_vinci_contract";
-		template<> const int SQLiteTableSyncTemplate<VinciContract>::TABLE_ID = 35;
-		template<> const bool SQLiteTableSyncTemplate<VinciContract>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::TABLE_NAME = "t035_vinci_contract";
+		template<> const int SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::TABLE_ID = 35;
+		template<> const bool SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciContract>::load(VinciContract* vc, const SQLiteResultSPtr& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::load(VinciContract* vc, const SQLiteResultSPtr& rows)
 		{
 			vc->setKey(rows->getLongLong (TABLE_COL_ID));
-			vc->setUserId(rows->getLongLong ( VinciContractTableSync::COL_USER_ID)));
-			vc->setSiteId(rows->getLongLong ( VinciContractTableSync::COL_SITE_ID)));
-			vc->setPassport(rows->get ( VinciContractTableSync::COL_PASSPORT));
+			vc->setUserId(rows->getLongLong ( VinciContractTableSync::COL_USER_ID));
+			vc->setSiteId(rows->getLongLong ( VinciContractTableSync::COL_SITE_ID));
+			vc->setPassport(rows->getText ( VinciContractTableSync::COL_PASSPORT));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciContract>::save(VinciContract* vc)
+		template<> void SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::_link(VinciContract* vc, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::_unlink(VinciContract* vc)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::save(VinciContract* vc)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (vc->getKey() <= 0)
-				vc->setKey(getId()); /// @todo Handle grid ID
+				vc->setKey(getId());
 			
-			// INSERT
 			query << "REPLACE INTO " << TABLE_NAME << " VALUES("
 					<< vc->getKey()
 					<< "," << Conversion::ToString(vc->getUserId())
@@ -86,7 +101,7 @@ namespace synthese
 		const std::string VinciContractTableSync::COL_PASSPORT = "passport";
 
 		VinciContractTableSync::VinciContractTableSync()
-			: SQLiteTableSyncTemplate<VinciContract>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteNoSyncTableSyncTemplate<VinciContractTableSync,VinciContract>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_USER_ID, "INTEGER", true);
@@ -97,20 +112,7 @@ namespace synthese
 			addTableIndex(COL_USER_ID);
 		}
 
-		void VinciContractTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
 
-		}
-
-		void VinciContractTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
-
-		void VinciContractTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
 
 		std::vector<shared_ptr<VinciContract> > VinciContractTableSync::search(
 			std::string name /*= ""*/
@@ -141,12 +143,12 @@ namespace synthese
 				query << " OFFSET " << first;
 			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<VinciContract> > contracts;
-			for (int i=0; i<result.getNbRows(); ++i)
+			while(rows->next())
 			{
 				try
 				{
 					shared_ptr<VinciContract> contract(new VinciContract);
-					SQLiteTableSyncTemplate<VinciContract>::load(contract.get (), result, i);
+					SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::load(contract.get (), rows);
 					contract->getUser();
 					contracts.push_back(contract);
 				}

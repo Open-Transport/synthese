@@ -54,6 +54,7 @@ namespace synthese
 		public:
 			ParametersMap();
 			ParametersMap(const QueryString& text);
+			ParametersMap(const Map& source);
 
 			//! \name Getters
 			//@{
@@ -103,6 +104,23 @@ namespace synthese
 					@date 2007
 				*/
 				int getInt(
+					const std::string& parameterName
+					, bool neededParameter
+					, const std::string& source
+				) const;
+
+
+
+				/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
+					@param parameterName Name of the searched parameter
+					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
+					@param source Name of the action or function that requested the parameter (for the error message only)
+					@return int Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
+					@throw RequestMissingParameterException if the parameter is not found and if it is needed
+					@author Hugues Romain
+					@date 2007
+				*/
+				double getDouble(
 					const std::string& parameterName
 					, bool neededParameter
 					, const std::string& source
@@ -174,6 +192,7 @@ namespace synthese
 			//@{
 				void insert(const std::string& parameterName, const std::string& value);
 				void insert(const std::string& parameterName, int value);
+				void insert(const std::string& parameterName, double value);
 				void insert(const std::string& parameterName, uid value);
 				void insert(const std::string& parameterName, bool value);
 				void insert(const std::string& parameterName, const time::DateTime& value);

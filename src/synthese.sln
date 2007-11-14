@@ -78,6 +78,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "main\programs\test\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "91_cgi_client", "main\programs\cgi_client\91_cgi_client.vcproj", "{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "99_synthese_vinci", "main\programs\synthese_vinci\99_synthese_vinci.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CCCC|Win32 = CCCC|Win32
@@ -301,6 +303,12 @@ Global
 		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Debug|Win32.Build.0 = Debug|Win32
 		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release|Win32.ActiveCfg = Release|Win32
 		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release|Win32.Build.0 = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.CCCC|Win32.ActiveCfg = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.CCCC|Win32.Build.0 = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug|Win32.Build.0 = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release|Win32.ActiveCfg = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

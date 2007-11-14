@@ -4,7 +4,6 @@
 
 	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
 	Copyright (C) 2006 Vinci Park 
-	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -30,6 +29,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace vinci
@@ -42,7 +43,7 @@ namespace synthese
 		/** Starting a bike rent Action Class.
 			@ingroup m71Actions refActions
 		*/
-		class RentABikeAction : public server::Action
+		class RentABikeAction : public util::FactorableTemplate<server::Action, RentABikeAction>
 		{
 		public:
 			static const std::string PARAMETER_RATE_ID;
@@ -53,10 +54,10 @@ namespace synthese
 
 		private:
 			time::DateTime	_date;
-			boost::shared_ptr<VinciRate>		_rate;
-			boost::shared_ptr<VinciBike>		_bike;
-			boost::shared_ptr<VinciContract>	_contract;
-			boost::shared_ptr<VinciAntivol>		_lock;
+			boost::shared_ptr<const VinciRate>		_rate;
+			boost::shared_ptr<const VinciBike>		_bike;
+			boost::shared_ptr<const VinciContract>	_contract;
+			boost::shared_ptr<VinciAntivol>	_lock;
 			std::string		_lockMarkedNumber;
 			double			_amount;
 
@@ -74,7 +75,8 @@ namespace synthese
 			/** Action execution.
 			*/
 			void run();
-			
+
+			RentABikeAction();
 		};
 	}
 }

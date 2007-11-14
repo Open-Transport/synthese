@@ -30,7 +30,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -42,16 +42,13 @@ namespace synthese
 			@ingroup m71LS refLS
 		*/
 
-		class VinciSiteTableSync : public db::SQLiteTableSyncTemplate<VinciSite>
+		class VinciSiteTableSync : public db::SQLiteNoSyncTableSyncTemplate<VinciSiteTableSync,VinciSite>
 		{
-		private:
+		public:
 			static const std::string COL_NAME;
 			static const std::string COL_ADDRESS;
 			static const std::string COL_PHONE;
 			
-			friend class db::SQLiteTableSyncTemplate<VinciSite>;
-
-		public:
 
 			VinciSiteTableSync();
 
@@ -68,30 +65,6 @@ namespace synthese
 				, bool orderByName=true
 				, bool raisingOrder=true
 				);
-
-
-		protected:
-
-			/** Action to do on user creation.
-			No action because the users are not permanently loaded in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on user creation.
-			Updates the users objects in the opened sessions.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on user deletion.
-			Closes the sessions of the deleted user.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		};
 

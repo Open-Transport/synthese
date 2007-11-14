@@ -35,29 +35,44 @@ namespace synthese
 {
 	using namespace db;
 	using namespace vinci;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,VinciSiteTableSync>::FACTORY_KEY("71.03 Vinci Site");
+	}
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciSite>::TABLE_NAME = "t034_vinci_site";
-		template<> const int SQLiteTableSyncTemplate<VinciSite>::TABLE_ID = 34;
-		template<> const bool SQLiteTableSyncTemplate<VinciSite>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::TABLE_NAME = "t034_vinci_site";
+		template<> const int SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::TABLE_ID = 34;
+		template<> const bool SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciSite>::load(VinciSite* vs, const SQLiteResultSPtr& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::load(VinciSite* vs, const SQLiteResultSPtr& rows)
 		{
 			vs->setKey(rows->getLongLong (TABLE_COL_ID));
-			vs->setName(rows->get ( VinciSiteTableSync::COL_NAME));
-			vs->setAddress(rows->get ( VinciSiteTableSync::COL_ADDRESS));
-			vs->setPhone(rows->get ( VinciSiteTableSync::COL_PHONE));
+			vs->setName(rows->getText ( VinciSiteTableSync::COL_NAME));
+			vs->setAddress(rows->getText ( VinciSiteTableSync::COL_ADDRESS));
+			vs->setPhone(rows->getText ( VinciSiteTableSync::COL_PHONE));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciSite>::save(VinciSite* vs)
+		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::_link(VinciSite* vs, const SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::_unlink(VinciSite* vs)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::save(VinciSite* vs)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (vs->getKey() <= 0)
-				vs->setKey(getId(0,0)); /// @todo Handle grid id
+				vs->setKey(getId());
 
-			// INSERT
 			query << "REPLACE INTO " << TABLE_NAME << " VALUES("
 				<< vs->getKey()
 				<< "," << Conversion::ToSQLiteString(vs->getName())
@@ -76,7 +91,7 @@ namespace synthese
 		const std::string VinciSiteTableSync::COL_PHONE = "phone";
 
 		VinciSiteTableSync::VinciSiteTableSync()
-			: SQLiteTableSyncTemplate<VinciSite>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteNoSyncTableSyncTemplate<VinciSiteTableSync,VinciSite>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_NAME, "TEXT", true);
@@ -86,20 +101,7 @@ namespace synthese
 			addTableIndex(COL_NAME);
 		}
 
-		void VinciSiteTableSync::rowsAdded( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
 
-		}
-
-		void VinciSiteTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
-
-		void VinciSiteTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
 
 		std::vector<boost::shared_ptr<VinciSite> > VinciSiteTableSync::search( int first /*= 0*/, int number /*= 0 */, bool orderByName/*=true */, bool raisingOrder/*=true */ )
 		{
@@ -116,10 +118,10 @@ namespace synthese
 			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<VinciSite> > sites;
 
-			for (int i=0; i<result.getNbRows(); ++i)
+			while(rows->next())
 			{
 				shared_ptr<VinciSite> site(new VinciSite);
-				load(site.get(), result, i);
+				load(site.get(), rows);
 				sites.push_back(site);
 			}
 			return sites;

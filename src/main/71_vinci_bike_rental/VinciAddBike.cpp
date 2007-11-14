@@ -22,6 +22,8 @@
 */
 
 #include "30_server/Request.h"
+#include "30_server/ParametersMap.h"
+#include "30_server/QueryString.h"
 
 #include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
@@ -33,6 +35,11 @@ using boost::shared_ptr;
 namespace synthese
 {
 	using namespace server;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, vinci::VinciAddBike>::FACTORY_KEY("vinciaddbike");
+	}
 	
 	namespace vinci
 	{
@@ -43,27 +50,15 @@ namespace synthese
 		ParametersMap VinciAddBike::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_NUMBER, _number));
-			map.insert(make_pair(PARAMETER_MARKED_NUMBER, _marked_number));
+			map.insert(PARAMETER_NUMBER, _number);
+			map.insert(PARAMETER_MARKED_NUMBER, _marked_number);
 			return map;
 		}
 
 		void VinciAddBike::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_NUMBER);
-			if (it != map.end())
-			{
-				_number = it->second;
-			}
-
-			it = map.find(PARAMETER_MARKED_NUMBER);
-			if (it != map.end())
-			{
-				_marked_number = it->second;
-			}
-
+			_number = map.getString(PARAMETER_NUMBER, true, FACTORY_KEY);
+			_marked_number = map.getString(PARAMETER_MARKED_NUMBER, true, FACTORY_KEY);
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 

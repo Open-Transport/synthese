@@ -85,15 +85,11 @@ namespace synthese
 
 		void VinciBikeSearchAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NUMBER);
-			if (it != map.end())
-				_bikeNumber = it->second;
+			_bikeNumber = map.getString(PARAMETER_SEARCH_NUMBER, false, FACTORY_KEY);
 
-			it  = map.find(PARAMETER_SEARCH_CADRE);
-			if (it != map.end())
-				_cadreNumber = it->second;
+			_cadreNumber = map.getString(PARAMETER_SEARCH_CADRE, false, FACTORY_KEY);
 
-			_resultRequestParameters = ResultHTMLTable::getParameters(map, PARAMETER_SEARCH_NUMBER, 30);
+			_resultRequestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_NUMBER, 30);
 
 			_bikes = VinciBikeTableSync::search(
 				_bikeNumber
@@ -170,7 +166,7 @@ namespace synthese
 					if (bike->getComplements().lastContract.get())
 					{
 						viewContract.setObjectId(bike->getComplements().lastContract->getKey());
-						shared_ptr<User> user = UserTableSync::get(bike->getComplements().lastContract->getUserId());
+						shared_ptr<const User> user = UserTableSync::Get(bike->getComplements().lastContract->getUserId());
 						stream << " par " << HTMLModule::getHTMLLink(viewContract.getURL(), user->getFullName());
 					}
 				}

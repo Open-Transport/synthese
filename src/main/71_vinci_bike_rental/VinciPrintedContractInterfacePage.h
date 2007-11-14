@@ -43,7 +43,7 @@ namespace synthese
 		/** Vinci printed contract.
 			@ingroup m71Pages refPages
 		*/
-		class VinciPrintedContractInterfacePage : public interfaces::InterfacePage
+		class VinciPrintedContractInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, VinciPrintedContractInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

@@ -134,15 +134,11 @@ namespace synthese
 
 		void VinciCustomerSearchAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it = map.find(PARAM_SEARCH_SURNAME);
-			if (it != map.end())
-				_searchSurname = it->second;
+			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
 
-			it = map.find(PARAM_SEARCH_NAME);
-			if (it != map.end())
-				_searchName = it->second;
+			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
 
-			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAM_SEARCH_NAME, 30);
+			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAM_SEARCH_NAME, 30);
 
 			_activeSearch = !_searchName.empty() || !_searchSurname.empty();
 
@@ -167,8 +163,8 @@ namespace synthese
 		server::ParametersMap VinciCustomerSearchAdminInterfaceElement::getParametersMap() const
 		{
 			ParametersMap map(ActionResultHTMLTable::getParametersMap(_requestParameters));
-			map.insert(make_pair(PARAM_SEARCH_NAME, _searchName));
-			map.insert(make_pair(PARAM_SEARCH_SURNAME, _searchSurname));
+			map.insert(PARAM_SEARCH_NAME, _searchName);
+			map.insert(PARAM_SEARCH_SURNAME, _searchSurname);
 			return map;
 		}
 

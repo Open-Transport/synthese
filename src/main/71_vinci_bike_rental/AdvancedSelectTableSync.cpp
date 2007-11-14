@@ -43,6 +43,7 @@ namespace synthese
 	using namespace accounts;
 	using namespace time;
 	using namespace db;
+	using namespace util;
 
 	namespace vinci
 	{

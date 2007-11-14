@@ -56,8 +56,6 @@ namespace synthese
 			int			_recurringPenaltyPeriod;
 			bool		_recurringPenaltyCancelsFirst;
 
-			friend class db::SQLiteTableSyncTemplate<VinciRate>;
-
 		public:
 			VinciRate(uid id=0);
 

@@ -58,7 +58,7 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_link(AlarmObjectLink* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			assert(temporary == GET_AUTO || temporary == GET_REGISTRY);
-			shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::createSharedPtr(obj->getRecipientKey());
+			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(obj->getRecipientKey()));
 			shared_ptr<SentAlarm> alarm(SentAlarm::GetUpdateable(obj->getAlarmId()));
 			ar->addObject(alarm.get(), obj->getObjectId());
 			obj->setLinked(true);
@@ -68,7 +68,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_unlink(AlarmObjectLink* aol)
 		{
-			shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::createSharedPtr(aol->getRecipientKey());
+			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(aol->getRecipientKey()));
 			shared_ptr<SentAlarm> alarm = SentAlarm::GetUpdateable(aol->getAlarmId());
 			ar->removeObject(alarm.get(), aol->getObjectId());
 			aol->setLinked(false);

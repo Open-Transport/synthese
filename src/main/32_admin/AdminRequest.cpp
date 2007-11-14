@@ -92,13 +92,14 @@ namespace synthese
 					// Saving of the action failed page for url output purposes
 					pageKey = map.getString(PARAMETER_ACTION_FAILED_PAGE, false, FACTORY_KEY);
 					if (!pageKey.empty())
-						_actionFailedPage = Factory<AdminInterfaceElement>::createSharedPtr(pageKey);
+						_actionFailedPage.reset(Factory<AdminInterfaceElement>::create(pageKey));
 
 					pageKey = map.getString(PARAMETER_PAGE, false, FACTORY_KEY);
 				}
-				shared_ptr<AdminInterfaceElement> page = pageKey.empty()
-					? static_pointer_cast<AdminInterfaceElement,HomeAdmin>(Factory<AdminInterfaceElement>::createSharedPtr<HomeAdmin>())
-					: Factory<AdminInterfaceElement>::createSharedPtr(pageKey);
+				shared_ptr<AdminInterfaceElement> page(pageKey.empty()
+					? new HomeAdmin
+					: Factory<AdminInterfaceElement>::create(pageKey)
+				);
 				page->setFromParametersMap(map);
 				_page = page;
 				

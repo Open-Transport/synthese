@@ -48,17 +48,25 @@ namespace synthese
 	using namespace html;
 	using namespace admin;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, vinci::BarCodeHTMLFormValueInterfaceElement>::FACTORY_KEY("barcodefield");
+	}
+
 	namespace vinci
 	{
-		string BarCodeHTMLFormValueInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
-		{
+		string BarCodeHTMLFormValueInterfaceElement::display(
+			ostream& s
+			, const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object
+			, const server::Request* request
+		) const	{
 			FunctionRequest<BarCodeInterpretFunction> newRequest(request);
 			HTMLForm f = newRequest.getHTMLForm("barcode");
 			f.addHiddenField(BarCodeInterpretFunction::PARAMETER_LAST_OBJECT_ID, Conversion::ToString(request->getObjectId()));
 			const shared_ptr<const AdminInterfaceElement>* aie = (const shared_ptr<const AdminInterfaceElement>*) object;
 			f.addHiddenField(BarCodeInterpretFunction::PARAMETER_LAST_PAGE, (*aie)->getFactoryKey());
-
-			stringstream s;
 
 			s << f.open();
 			s << f.getTextInput(BarCodeInterpretFunction::PARAMETER_READED_CODE, string());
@@ -66,7 +74,7 @@ namespace synthese
 			s << f.close();
 			s << f.setFocus(BarCodeInterpretFunction::PARAMETER_READED_CODE);
 
-			return s.str();
+			return string();
 		}
 
 		void BarCodeHTMLFormValueInterfaceElement::storeParameters(ValueElementList& vel)

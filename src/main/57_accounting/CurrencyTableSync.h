@@ -29,7 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -38,10 +38,10 @@ namespace synthese
 		class Currency;
 
 		/** Currency SQLite table synchronizer.
-			@ingroup m57
+			@ingroup m57LS refLS
 		*/
 
-		class CurrencyTableSync : public db::SQLiteTableSyncTemplate<Currency>
+		class CurrencyTableSync : public db::SQLiteRegistryTableSyncTemplate<CurrencyTableSync,Currency>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;
@@ -61,30 +61,6 @@ namespace synthese
 			static std::vector<boost::shared_ptr<Currency> > search(
 				const std::string& name, const std::string& symbol
 				, int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on user creation.
-			No action because the users are not permanently loaded in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on user creation.
-			Updates the users objects in the opened sessions.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on user deletion.
-			Closes the sessions of the deleted user.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		};
 

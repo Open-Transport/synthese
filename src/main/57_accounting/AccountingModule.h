@@ -3,6 +3,7 @@
 
 
 #include "01_util/ModuleClass.h"
+#include "01_util/FactorableTemplate.h"
 
 #include "57_accounting/Currency.h"
 
@@ -19,15 +20,11 @@ namespace synthese
 	{
 
 		/** 57 Accounting module class. */
-		class AccountingModule : public util::ModuleClass
+		class AccountingModule : public util::FactorableTemplate<util::ModuleClass, AccountingModule>
 		{
-		private:
-			static Currency::Registry _currencies;
-
 		public:
 			void initialize();
 
-			static Currency::Registry& getCurrencies();
 		};
 	}
 	/** @} */

@@ -44,14 +44,21 @@ namespace synthese
 	using namespace accounts;
 	using namespace time;
 	using namespace accounts;
+	using namespace util;
+	
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,TransactionTableSync>::FACTORY_KEY("57.20 Transaction");
+	}
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Transaction>::TABLE_NAME = "t031_transactions";
-		template<> const int SQLiteTableSyncTemplate<Transaction>::TABLE_ID = 31;
-		template<> const bool SQLiteTableSyncTemplate<Transaction>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::TABLE_NAME = "t031_transactions";
+		template<> const int SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::TABLE_ID = 31;
+		template<> const bool SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Transaction>::load(Transaction* t, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::load(Transaction* t, const db::SQLiteResultSPtr& rows )
 		{
 		    t->setKey(rows->getLongLong (TABLE_COL_ID));
 		    t->setComment(rows->getText ( TransactionTableSync::TABLE_COL_COMMENT));
@@ -64,39 +71,39 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<Transaction>::save(Transaction* t)
+
+		template<> void SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::_link(Transaction* t, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		{
+
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::_unlink(Transaction* t)
+		{
+
+		}
+
+
+		template<> void SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::save(Transaction* t)
 		{
 		    try
 		    {
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (t->getKey() > 0)
-			{
-			    query << "UPDATE " << TABLE_NAME << " SET "
-				  << TransactionTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(t->getName())
-				  << "," << TransactionTableSync::TABLE_COL_DOCUMENT_ID << "=" << Conversion::ToString(t->getDocumentId())
-				  << "," << TransactionTableSync::TABLE_COL_START_DATE_TIME << "=" << t->getStartDateTime().toSQLString()
-				  << "," << TransactionTableSync::TABLE_COL_END_DATE_TIME << "=" << t->getEndDateTime().toSQLString()
-				  << "," << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(t->getLeftUserId())
-				  << "," << TransactionTableSync::TABLE_COL_PLACE_ID << "=" << Conversion::ToString(t->getPlaceId())
-				  << "," << TransactionTableSync::TABLE_COL_COMMENT << "=" << Conversion::ToSQLiteString(t->getComment())
-				  << " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(t->getKey());
-			}
-			else
-			{
-			    t->setKey(getId());	/// @todo Handle grid
-			    query << "INSERT INTO " << TABLE_NAME << " VALUES("
-				  << Conversion::ToString(t->getKey())
-				  << "," << Conversion::ToSQLiteString(t->getName())
-				  << "," << Conversion::ToString(t->getDocumentId())
-				  << "," << t->getStartDateTime().toSQLString()
-				  << "," << t->getEndDateTime().toSQLString()
-				  << "," << Conversion::ToString(t->getLeftUserId())
-				  << "," << Conversion::ToString(t->getPlaceId())
-				  << "," << Conversion::ToSQLiteString(t->getComment())
-				  << ")";
-			}
-			sqlite->execUpdate(query.str());
+				SQLite* sqlite = DBModule::GetSQLite();
+				stringstream query;
+				if (t->getKey() <= 0)
+					t->setKey(getId());
+				query
+					<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+					<< Conversion::ToString(t->getKey())
+					<< "," << Conversion::ToSQLiteString(t->getName())
+					<< "," << Conversion::ToString(t->getDocumentId())
+					<< "," << t->getStartDateTime().toSQLString()
+					<< "," << t->getEndDateTime().toSQLString()
+					<< "," << Conversion::ToString(t->getLeftUserId())
+					<< "," << Conversion::ToString(t->getPlaceId())
+					<< "," << Conversion::ToSQLiteString(t->getComment())
+					<< ")";
+				sqlite->execUpdate(query.str());
 		    }
 		    catch (SQLiteException& e)
 		    {
@@ -119,7 +126,7 @@ namespace synthese
 		const std::string TransactionTableSync::TABLE_COL_COMMENT = "comment";
 
 		TransactionTableSync::TransactionTableSync()
-			: SQLiteTableSyncTemplate<Transaction>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteNoSyncTableSyncTemplate<TransactionTableSync,Transaction>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -137,22 +144,7 @@ namespace synthese
 			addTableIndex(v);
 		}
 
-		void TransactionTableSync::rowsAdded( db::SQLite* sqlite,  
-						      db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, 
-						      bool isFirstSync)
-		{
 
-		}
-
-		void TransactionTableSync::rowsUpdated( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
-
-		void TransactionTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-
-		}
 
 		shared_ptr<TransactionPart> TransactionTableSync::getPart(shared_ptr<const Transaction> transaction, shared_ptr<const Account> account )
 		{

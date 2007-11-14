@@ -90,16 +90,16 @@ namespace synthese
 		void DisplayMaintenanceAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			ActionFunctionRequest<UpdateDisplayMaintenanceAction,AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayMaintenanceAdmin>());
+			updateRequest.getFunction()->setPage<DisplayMaintenanceAdmin>();
 			updateRequest.setObjectId(_displayScreen->getKey());
 
 			FunctionRequest<AdminRequest> goToLogRequest(request);
-			goToLogRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DBLogViewer>());
+			goToLogRequest.getFunction()->setPage<DBLogViewer>();
 			goToLogRequest.getFunction()->setParameter(DBLogViewer::PARAMETER_LOG_KEY, "displaymaintenance");
 			goToLogRequest.setObjectId(request->getObjectId());
 
 			FunctionRequest<AdminRequest> goToDataLogRequest(request);
-			goToDataLogRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DBLogViewer>());
+			goToDataLogRequest.getFunction()->setPage<DBLogViewer>();
 			goToDataLogRequest.getFunction()->setParameter(DBLogViewer::PARAMETER_LOG_KEY, "displaydata");
 			goToDataLogRequest.setObjectId(request->getObjectId());
 

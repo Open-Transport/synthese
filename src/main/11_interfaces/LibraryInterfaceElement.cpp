@@ -57,7 +57,7 @@ namespace synthese
 			shared_ptr<LibraryInterfaceElement> lie;
 			try
 			{
-				lie = Factory<LibraryInterfaceElement>::createSharedPtr(text.substr(start_pos, word_end_pos - start_pos));
+				lie.reset(Factory<LibraryInterfaceElement>::create(text.substr(start_pos, word_end_pos - start_pos)));
 			}
 			catch (FactoryException<LibraryInterfaceElement>& e)
 			{

@@ -32,7 +32,6 @@
 #include "01_util/Log.h"
 
 
-
 namespace synthese
 {
 	namespace util
@@ -46,12 +45,8 @@ namespace synthese
 
 			Possible uses :
 				- Factory<FactoryClass>::create("class_key") -> Creates an object from the string key of the class
-				- Factory<FactoryClass>::create<Subclass>() -> equivalent as new Subclass but the created object knows the key of its class as if it comes from a from string creation.
-				- object->getFactoryKey() -> Answers the key corresponding to the class of the object, if the object has been created by the factory
-				- Factory<FactoryClass>::getKey<SubClass>() -> returns the key corresponding to the sub class
 				- Factory<FactoryClass>::contains("class_key") -> Answers if a class is registered with the specified key
 
-			@todo See if the getKey() method could be optimized by use of static variable (my first attempts have failed)
 			@ingroup m01
 		*/
 		template <class RootObject>
@@ -90,25 +85,21 @@ namespace synthese
 
 				RootObject* create (const typename T::Args& args)
 				{
-				    return static_cast<RootObject*>(createTyped(args));
-				}
-				
-
-				T* createTyped (const typename T::Args& args)
-				{
 					T* obj(new T);
-//					obj->setFactoryKey(getKey<T>());
-					return obj;
+				    return static_cast<RootObject*>(obj);
 				}
 			};
+
+
 
 			/** Registered subclasses map type. */
 			typedef std::map<std::string, CreatorInterface*> Map;
 
+
+
 			/** The registered subclasses map.
 			*/
 			static Map _registeredCreator;
-
 
 
 
@@ -119,25 +110,6 @@ namespace synthese
 				return _registeredCreator.size();
 			}
 
-			/** Subclass registration.
-				@param key Text key of the subclass
-				@return the key if ok, empty string if the subclass is already registered
-			*/
-/*			template <class T>
-				static void integrate(const typename Map::key_type& key)
-			{
-				Log::GetInstance ().debug ("Registering compound... " + key);
-
-				// If the key is already used then return false (it would be better to use exceptions)
-				if(_registeredCreator.find(key) != _registeredCreator.end())
-					throw FactoryException<RootObject>("Attempted to integrate a class twice");
-
-				// Saving of the auto generated builder
-				CreatorInterface* creator = new Creator<T>;
-				_registeredCreator.insert(std::pair<typename Map::key_type, 
-							       CreatorInterface*>(key, creator));
-			}
-*/
 			/** Subclass automatic registration.
 				@return the key if ok, empty string if the subclass is already registered
 			*/
@@ -156,27 +128,13 @@ namespace synthese
 					CreatorInterface*>(T::FACTORY_KEY, creator));
 			}
 
-			template <class T>
-				static typename Map::key_type getKey()
-			{
-				// If no registered classes
-				if (size () == 0)
-					throw FactoryException<RootObject>("Factorable class not found (empty factory)");
 
-				// Search for a creator for the T class
-				typename Map::const_iterator it;
-				for (it = _registeredCreator.begin(); 
-				     it != _registeredCreator.end(); ++it)
-				{
-				    if (dynamic_cast<Creator<T>*>(it->second) != NULL)
-					return it->first;
-				}
 
-				// No such creator was founded
-				throw FactoryException<RootObject>("Factorable class not found");
-
-			}
-
+			/** Tests if the factory contains a class registered with the specified key.
+				@param key Key to search
+				@return bool true if a class is already registered with the specified key
+				@author Hugues Romain
+			*/
 			static bool contains( const typename Map::key_type& key )
 			{
 				// Search of the key of the wished class in the map
@@ -187,37 +145,14 @@ namespace synthese
 			}
 
 
-			template<class T>
-			    static T* create()
-			{
-				typename T::Args defaultArgs;
-				return create<T> (defaultArgs);
-			}
+		
+			/** Creation of an object from the key of its class, without arguments, returned as a pointer to an instantiation of the factory root class.
+				@param key Key of the class to instantiate
+				@return RootObject* Pointer to the instantiated object
+				@author Hugues Romain
 
-
-			template<class T>
-			    static T* create(const typename T::Args& args)
-			{
-				Creator<T> creator;
-				return creator.createTyped(args);
-			}
-
-
-			template<class T>
-			static boost::shared_ptr<T> createSharedPtr()
-			{
-				typename T::Args defaultArgs;
-                return createSharedPtr<T> (defaultArgs);
-			}
-
-
-			template<class T>
-			static boost::shared_ptr<T> createSharedPtr(const typename T::Args& args)
-			{
-				return boost::shared_ptr<T>(create<T>(args));
-			}
-
-
+				Default arguments are used to instantiate the object.
+			*/
 			static RootObject* create(const typename Map::key_type& key)
 			{
 				typename RootObject::Args defaultArgs;
@@ -225,6 +160,13 @@ namespace synthese
 			}
 
 
+
+			/** Creation of an object from the key of its class, with arguments, returned as a pointer to an instantiation of the factory root class.
+				@param key Key of the class to instantiate
+				@param args Arguments to transmit to the constructor
+				@return RootObject* Pointer to the instantiated object
+				@author Hugues Romain
+			*/
 			static RootObject* create(const typename Map::key_type& key, 
 						  const typename RootObject::Args& args)
 			{
@@ -244,17 +186,6 @@ namespace synthese
 			}
 
 
-			static boost::shared_ptr<RootObject> createSharedPtr(const typename Map::key_type& key)
-			{
-				typename RootObject::Args defaultArgs;
-				return createSharedPtr (key, defaultArgs);
-			}
-
-			static boost::shared_ptr<RootObject> createSharedPtr(const typename Map::key_type& key,
-									     const typename RootObject::Args& args)
-			{
-			    return boost::shared_ptr<RootObject>(create(key, args));
-			}
 			
 			static void destroy()
 			{

@@ -22,8 +22,6 @@
 
 #include "57_accounting/Account.h"
 
-using boost::shared_ptr;
-
 namespace synthese
 {
 	using namespace util;
@@ -48,7 +46,7 @@ namespace synthese
 			return _leftClassNumber;
 		}
 
-		shared_ptr<const Currency> Account::getLeftCurrency() const
+		const Currency* Account::getLeftCurrency() const
 		{
 			return _leftCurrency;
 		}
@@ -63,7 +61,7 @@ namespace synthese
 			return _rightClassNumber;
 		}
 
-		shared_ptr<const Currency> Account::getRightCurrency() const
+		const Currency* Account::getRightCurrency() const
 		{
 			return _rightCurrency;
 		}
@@ -83,7 +81,7 @@ namespace synthese
 			_leftClassNumber = classNumber;
 		}
 
-		void Account::setLeftCurrency(boost::shared_ptr<const Currency> currency )
+		void Account::setLeftCurrency(const Currency* currency )
 		{
 			_leftCurrency = currency;
 		}
@@ -103,7 +101,7 @@ namespace synthese
 			_rightClassNumber = classNumber;
 		}
 
-		void Account::setRightCurrency(shared_ptr<const Currency> currency )
+		void Account::setRightCurrency(const Currency* currency )
 		{
 			_rightCurrency = currency;
 		}

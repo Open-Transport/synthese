@@ -31,6 +31,7 @@
 #include "12_security/UserTableSync.h"
 
 #include "30_server/ActionFunctionRequest.h"
+#include "30_server/QueryString.h"
 
 #include "32_admin/AdminRequest.h"
 
@@ -72,6 +73,7 @@ namespace synthese
 	using namespace html;
 	using namespace interfaces;
 	using namespace vinci;
+	using namespace util;
 
 	namespace util
 	{
@@ -193,14 +195,14 @@ namespace synthese
 				<< addGuaranteeForm.open() << ct.open();
 
 			stream << ct.row();
-			stream << ct.col() << addGuaranteeForm.getCalendarInput(VinciAddGuaranteeAction::PARAMETER_DATE, DateTime());
+			stream << ct.col() << addGuaranteeForm.getCalendarInput(VinciAddGuaranteeAction::PARAMETER_DATE, DateTime(TIME_CURRENT));
 			stream << ct.col() << addGuaranteeForm.getTextInput(VinciAddGuaranteeAction::PARAMETER_AMOUNT, "260");
 			stream << ct.col() << addGuaranteeForm.getSelectInput(VinciAddGuaranteeAction::PARAMETER_ACCOUNT_ID, paymentModesMap, uid());
 			stream << ct.col() << addGuaranteeForm.getSubmitButton("Nouvelle caution");
 
 			for (vector<shared_ptr<TransactionPart> >::iterator it = guarantees.begin(); it != guarantees.end(); ++it)
 			{
-				shared_ptr<Transaction> transaction = TransactionTableSync::get((*it)->getTransactionId());
+				shared_ptr<const Transaction> transaction = TransactionTableSync::Get((*it)->getTransactionId());
 				vector<shared_ptr<TransactionPart> > payments = TransactionPartTableSync::search(transaction);
 
 				stream << ct.row();
@@ -211,7 +213,7 @@ namespace synthese
 				{
 					if ((*it2)->getKey() != (*it)->getKey())
 					{
-						shared_ptr<Account> account = AccountTableSync::get((*it2)->getAccountId());
+						shared_ptr<const Account> account = AccountTableSync::Get((*it2)->getAccountId());
 						if (account->getRightClassNumber() == VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE)
 							stream << "Chèque";
 						else
@@ -250,7 +252,7 @@ namespace synthese
 				<< addRentForm.open() << rt.open();
 
 			stream << rt.row();
-			stream << rt.col() << addRentForm.getCalendarInput(RentABikeAction::PARAMETER_DATE, DateTime());
+			stream << rt.col() << addRentForm.getCalendarInput(RentABikeAction::PARAMETER_DATE, DateTime(TIME_CURRENT));
 			stream << rt.col() << addRentForm.getTextInput(RentABikeAction::PARAMETER_BIKE_ID, "");
 			stream << rt.col() << addRentForm.getTextInput(RentABikeAction::PARAMETER_LOCK_ID, "");
 			stream << rt.col() << "<select name=\"" << RentABikeAction::PARAMETER_RATE_ID << "\">";
@@ -262,22 +264,22 @@ namespace synthese
 
 			for (vector<shared_ptr<TransactionPart> >::iterator it = rents.begin(); it != rents.end(); ++it)
 			{
-				shared_ptr<Transaction> transaction = TransactionTableSync::get((*it)->getTransactionId());
+				shared_ptr<const Transaction> transaction = TransactionTableSync::Get((*it)->getTransactionId());
 								
 				shared_ptr<VinciRate> rate;
 				if ((*it)->getRateId() > 0)
-					rate = VinciRateTableSync::get((*it)->getRateId());
+					rate = VinciRateTableSync::GetUpdateable((*it)->getRateId());
 
 				shared_ptr<VinciBike> bike;
 				if ((*it)->getTradedObjectId() != "")
-					bike = VinciBikeTableSync::get(Conversion::ToLongLong((*it)->getTradedObjectId()));
+					bike = VinciBikeTableSync::GetUpdateable(Conversion::ToLongLong((*it)->getTradedObjectId()));
 
 				shared_ptr<VinciAntivol> lock;
 				vector<shared_ptr<TransactionPart> > vtp = TransactionPartTableSync::search(transaction, VinciBikeRentalModule::getFreeLockRentServiceAccount(), 0, 1);
 				if (!vtp.empty())
 				{
 					shared_ptr<TransactionPart> tp = vtp.front();
-					lock = VinciAntivolTableSync::get(Conversion::ToLongLong(tp->getTradedObjectId()));
+					lock = VinciAntivolTableSync::GetUpdateable(Conversion::ToLongLong(tp->getTradedObjectId()));
 				}
 
 				stream << rt.row();
@@ -288,7 +290,7 @@ namespace synthese
 				stream << rt.col();
 				if (transaction->getEndDateTime().isUnknown())
 				{
-					DateTime now;
+					DateTime now(TIME_CURRENT);
 					if (now > rate->getEndDate(transaction->getStartDateTime()))
 					{
 						stream << "Retard : ";
@@ -321,13 +323,13 @@ namespace synthese
 		void VinciCustomerAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
 			// Current contract
-			const ParametersMap::const_iterator it = map.find(QueryString::PARAMETER_OBJECT_ID);
-			if (it != map.end())
+			uid id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
+			if (id != UNKNOWN_VALUE)
 			{
-				if (Conversion::ToLongLong(it->second) == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 					return;
-				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
-				_user = UserTableSync::get(_contract->getUserId());
+				_contract = VinciContractTableSync::Get(id);
+				_user = UserTableSync::Get(_contract->getUserId());
 			}
 		}
 

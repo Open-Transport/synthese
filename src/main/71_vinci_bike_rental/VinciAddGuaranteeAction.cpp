@@ -29,6 +29,7 @@
 #include "12_security/User.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
@@ -52,6 +53,11 @@ namespace synthese
 	using namespace accounts;
 	using namespace time;
 	using namespace db;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, vinci::VinciAddGuaranteeAction>::FACTORY_KEY("vinciaddguarantee");
+	}
 	
 	namespace vinci
 	{
@@ -61,15 +67,23 @@ namespace synthese
 		const string VinciAddGuaranteeAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
 
 
+
+		VinciAddGuaranteeAction::VinciAddGuaranteeAction()
+			: FactorableTemplate<Action,VinciAddGuaranteeAction>()
+			, _date(TIME_CURRENT)
+		{
+
+		}
+
 		ParametersMap VinciAddGuaranteeAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_AMOUNT, Conversion::ToString(_amount)));
+			map.insert(PARAMETER_AMOUNT, _amount);
 			if (_contract.get())
-				map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
+				map.insert(PARAMETER_CONTRACT_ID, _contract->getKey());
 			if (_account.get())
-				map.insert(make_pair(PARAMETER_ACCOUNT_ID, Conversion::ToString(_account->getKey())));
-			map.insert(make_pair(PARAMETER_DATE, Conversion::ToString(_date.toString())));
+				map.insert(PARAMETER_ACCOUNT_ID, _account->getKey());
+			map.insert(PARAMETER_DATE, _date);
 			return map;
 		}
 
@@ -77,31 +91,17 @@ namespace synthese
 		{
 			try
 			{
-				ParametersMap::const_iterator it;
+				_amount = map.getDouble(PARAMETER_AMOUNT, false, FACTORY_KEY);
 
-				it = map.find(PARAMETER_AMOUNT);
-				if (it != map.end())
-				{
-					_amount = Conversion::ToDouble(it->second);
-				}
+				uid id = map.getUid(PARAMETER_ACCOUNT_ID, false, FACTORY_KEY);
+				_account = AccountTableSync::Get(id);
 
-				it = map.find(PARAMETER_ACCOUNT_ID);
-				if (it != map.end())
-				{
-					_account = AccountTableSync::get(Conversion::ToLongLong(it->second));
-				}
+				id = map.getUid(PARAMETER_CONTRACT_ID, false, FACTORY_KEY);
+				_contract = VinciContractTableSync::Get(id);
 
-				it = map.find(PARAMETER_CONTRACT_ID);
-				if (it != map.end())
-				{
-					_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
-				}
-
-				it = map.find(PARAMETER_DATE);
-				if (it != map.end())
-				{
-					_date = DateTime::FromString(it->second);
-				}
+				_date = map.getDateTime(PARAMETER_DATE, false, FACTORY_KEY);
+				if (_date.isUnknown())
+					_date = DateTime(TIME_CURRENT);
 			}
 			catch (Account::ObjectNotFoundException& e)
 			{

@@ -27,7 +27,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
 
 #include "04_time/DateTime.h"
 
@@ -50,9 +50,9 @@ namespace synthese
 		class Transaction;
 
 		/** Transaction part SQLite table synchronizer.
-			@ingroup m57
+			@ingroup m57LS refLS
 		*/
-		class TransactionPartTableSync : public db::SQLiteTableSyncTemplate<TransactionPart>
+		class TransactionPartTableSync : public db::SQLiteNoSyncTableSyncTemplate<TransactionPartTableSync,TransactionPart>
 		{
 		public:
 			static const std::string TABLE_COL_TRANSACTION_ID;
@@ -98,30 +98,6 @@ namespace synthese
 			static std::map<int, int> TransactionPartTableSync::count(
 				boost::shared_ptr<const Account> account
 				, time::Date startDate, time::Date endDate, int first=0, int number=-1);
-
-		protected:
-
-			/** Action to do on user creation.
-			No action because the users are not permanently loaded in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on user creation.
-			Updates the users objects in the opened sessions.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on user deletion.
-			Closes the sessions of the deleted user.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-            
 		};
 	}
 }

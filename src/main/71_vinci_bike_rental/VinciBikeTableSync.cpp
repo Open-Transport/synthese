@@ -46,23 +46,37 @@ namespace synthese
 	using namespace util;
 	using namespace accounts;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<SQLiteTableSync,VinciBikeTableSync>::FACTORY_KEY("71.01 Vinci Bike");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciBike>::TABLE_NAME = "t032_vinci_bike";
-		template<> const int SQLiteTableSyncTemplate<VinciBike>::TABLE_ID = 32;
-		template<> const bool SQLiteTableSyncTemplate<VinciBike>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::TABLE_NAME = "t032_vinci_bike";
+		template<> const int SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::TABLE_ID = 32;
+		template<> const bool SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciBike>::load(VinciBike* bike, const db::SQLiteResultSPtr& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::load(VinciBike* bike, const db::SQLiteResultSPtr& rows)
 		{
 			bike->setKey(rows->getLongLong (TABLE_COL_ID));
-			bike->setNumber(rows->get ( VinciBikeTableSync::TABLE_COL_NUMBER));
-			bike->setMarkedNumber(rows->get ( VinciBikeTableSync::TABLE_COL_MARKED_NUMBER));
+			bike->setNumber(rows->getText ( VinciBikeTableSync::TABLE_COL_NUMBER));
+			bike->setMarkedNumber(rows->getText ( VinciBikeTableSync::TABLE_COL_MARKED_NUMBER));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciBike>::save(VinciBike* bike)
+		template<> void SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::_link(VinciBike* bike, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		{
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::_unlink(VinciBike* bike)
+		{
+
+		}
+		template<> void SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::save(VinciBike* bike)
 		{
 			if (bike->getKey() <= 0)
-				bike->setKey(getId()); /// @todo Handle grid number
+				bike->setKey(getId());
 
 			stringstream query;
 			query << "REPLACE INTO " << TABLE_NAME << " VALUES("
@@ -82,7 +96,7 @@ namespace synthese
 		const std::string VinciBikeTableSync::TABLE_COL_MARKED_NUMBER = "marked_number";
 
 		VinciBikeTableSync::VinciBikeTableSync()
-			: db::SQLiteTableSyncTemplate<VinciBike>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: db::SQLiteNoSyncTableSyncTemplate<VinciBikeTableSync,VinciBike>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NUMBER, "TEXT", true);
@@ -93,29 +107,6 @@ namespace synthese
 		}
 
 		
-		/** Action to do on user creation.
-		No action because the users are not permanently loaded in ram.
-		*/
-		void VinciBikeTableSync::rowsAdded (db::SQLite* sqlite, 
-			db::SQLiteSync* sync,
-			const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{}
-
-		/** Action to do on user creation.
-		Updates the users objects in the opened sessions.
-		*/
-		void VinciBikeTableSync::rowsUpdated (db::SQLite* sqlite, 
-			db::SQLiteSync* sync,
-			const db::SQLiteResultSPtr& rows)
-		{}
-
-		/** Action to do on user deletion.
-		Closes the sessions of the deleted user.
-		*/
-		void VinciBikeTableSync::rowsRemoved (db::SQLite* sqlite, 
-			db::SQLiteSync* sync,
-			const db::SQLiteResultSPtr& rows)
-		{}
 
 		/** Example of support request :
 
@@ -180,12 +171,12 @@ FROM
 
 			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<VinciBike> > bikes;
-			for (int i=0; i<result.getNbRows(); ++i)
+			while(rows->next ())
 			{
 				shared_ptr<VinciBike> bike(new VinciBike);
 				try
 				{
-					load(bike.get(), result, i);
+					load(bike.get(), rows);
 					VinciBike::Complements c;
 					stringstream query2;
 					query2 << "SELECT tt." << TABLE_COL_ID << " AS transaction_id"
@@ -197,8 +188,8 @@ FROM
 						<< " LIMIT 1";
 					SQLiteResultSPtr rows2 = sqlite->execQuery(query2.str());
 
-					if (result2.getNbRows() > 0)
-						c.lastTransaction = TransactionTableSync::get(Conversion::ToLongLong(result2.getColumn(0, "transaction_id")));
+					if (rows2->next())
+						c.lastTransaction = TransactionTableSync::GetUpdateable(rows2->getLongLong("transaction_id"));
 
 					stringstream query3;
 					query3
@@ -212,8 +203,8 @@ FROM
 						<< " LIMIT 1";
 					SQLiteResultSPtr rows3 = sqlite->execQuery(query3.str());
 
-					if (result3.getNbRows() > 0)
-						c.lastContract = VinciContractTableSync::get(Conversion::ToLongLong(result3.getColumn(0, "contract_id")));
+					if (rows3->next())
+						c.lastContract = VinciContractTableSync::GetUpdateable(rows3->getLongLong("contract_id"));
 					bike->setComplements(c);
 					bikes.push_back(bike);
 				}
@@ -241,10 +232,10 @@ FROM
 					<< "t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC"
 				<< " LIMIT 1 ";
 			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-			if (!result.getNbRows())
+			if (!rows->next())
 				return shared_ptr<VinciContract>();
 			shared_ptr<VinciContract> contract(new VinciContract);
-			VinciContractTableSync::load(contract.get(), result, 0);
+			VinciContractTableSync::load(contract.get(), rows);
 			return contract;
 		}
 
@@ -263,10 +254,10 @@ FROM
 					<< "t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC"
 				<< " LIMIT 1 ";
 			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-			if (!result.getNbRows())
+			if (!rows->next())
 				return shared_ptr<TransactionPart>();
 			shared_ptr<TransactionPart> tp(new TransactionPart);
-			TransactionPartTableSync::load(tp.get(), result, 0);
+			TransactionPartTableSync::load(tp.get(), rows);
 			return tp;
 		}
 	}

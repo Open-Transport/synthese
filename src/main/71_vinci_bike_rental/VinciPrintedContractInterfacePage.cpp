@@ -21,7 +21,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "04_time/Date.h"
+#include "04_time/DateTime.h"
 
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
@@ -50,40 +50,48 @@ namespace synthese
 	using namespace db;
 	using namespace accounts;
 	using namespace time;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<InterfacePage, vinci::VinciPrintedContractInterfacePage>::FACTORY_KEY("vincicontractprint");
+	}
 
 	namespace vinci
 	{
 
-		void VinciPrintedContractInterfacePage::display(std::ostream& stream
+		void VinciPrintedContractInterfacePage::display(
+			std::ostream& stream
 			, VariablesMap& vars
 			, shared_ptr<const VinciContract> contract
-			, const server::Request* request /*= NULL*/) const
-		{
-			shared_ptr<User>			user = UserTableSync::get(contract->getUserId());
-			shared_ptr<VinciSite>		site = contract->getSite();
-			shared_ptr<VinciBike>		bike = contract->getCurrentBike();
-			shared_ptr<TransactionPart>	tp = contract->getCurrentRentTransactionPart();
-			shared_ptr<Transaction>		t;
-			shared_ptr<VinciAntivol>	antivol;
-			shared_ptr<VinciRate>		rate;
-			DateTime					endDate(Date::UNKNOWN_DATE, Hour());
+			, const server::Request* request /*= NULL*/
+		) const	{
+			shared_ptr<const User>			user = UserTableSync::Get(contract->getUserId());
+			shared_ptr<VinciSite>			site = contract->getSite();
+			shared_ptr<VinciBike>			bike = contract->getCurrentBike();
+			shared_ptr<TransactionPart>		tp = contract->getCurrentRentTransactionPart();
+			shared_ptr<const Transaction>	t;
+			shared_ptr<VinciAntivol>		antivol;
+			shared_ptr<const VinciRate>		rate;
+			time::DateTime					endDate(TIME_UNKNOWN);
+			endDate.setHour(Hour(TIME_CURRENT));
 
 			if (tp.get())
 			{
-				t = TransactionTableSync::get(tp->getTransactionId());
+				t = TransactionTableSync::Get(tp->getTransactionId());
 				antivol = contract->getCurrentLock();
-				rate = VinciRateTableSync::get(tp->getRateId());
-				if (t)
+				rate = VinciRateTableSync::Get(tp->getRateId());
+				if (t.get())
 				{
 					endDate = rate->getEndDate(t->getStartDateTime());
 				}
 			}
 
 			shared_ptr<TransactionPart>	guarantee = contract->getCurrentGuaranteeTransactionPart();
-			shared_ptr<Account>			guaranteeAccount;
+			shared_ptr<const Account>			guaranteeAccount;
 			if (guarantee.get())
 			{
-				guaranteeAccount = AccountTableSync::get(guarantee->getAccountId());
+				guaranteeAccount = AccountTableSync::Get(guarantee->getAccountId());
 			}
 
 

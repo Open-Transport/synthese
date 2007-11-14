@@ -175,20 +175,20 @@ namespace synthese
 			newMessageRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
 
 			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(request);
-			newScenarioRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessagesScenarioAdmin>());
-			newScenarioRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::createSharedPtr<MessagesAdmin>());
+			newScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
+			newScenarioRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
 
 			FunctionRequest<AdminRequest> alarmRequest(request);
-			alarmRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessageAdmin>());
+			alarmRequest.getFunction()->setPage<MessageAdmin>();
 
 			FunctionRequest<AdminRequest> scenarioRequest(request);
-			scenarioRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessagesScenarioAdmin>());
+			scenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 
 			ActionFunctionRequest<AlarmStopAction,AdminRequest> stopRequest(request);
-			stopRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessagesAdmin>());
+			stopRequest.getFunction()->setPage<MessagesAdmin>();
 			
 			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(request);
-			scenarioStopRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<MessagesAdmin>());
+			scenarioStopRequest.getFunction()->setPage<MessagesAdmin>();
 			
 			vector<pair<StatusSearch, string> > statusMap;
 			statusMap.push_back(make_pair(ALL_STATUS, "(tous les états)"));
