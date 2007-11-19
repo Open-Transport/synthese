@@ -131,8 +131,8 @@ namespace synthese
 					<< TABLE_NAME << " AS c "
 					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << COL_USER_ID << "=u." << TABLE_COL_ID
 				<< " WHERE "
-					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '%" << Conversion::ToSQLiteString(surname, false) << "%'";
+					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '" << Conversion::ToSQLiteString(name, false) << "%'"
+					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '" << Conversion::ToSQLiteString(surname, false) << "%'";
 			if (orderByNameAndSurname)
 				query << " ORDER BY " << UserTableSync::TABLE_COL_NAME << "," << UserTableSync::TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderBySurnameAndName)
