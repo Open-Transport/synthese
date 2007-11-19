@@ -42,14 +42,14 @@ namespace synthese
 
 	namespace util
 	{
-		const string FactorableTemplate<AdminInterfaceElement,VinciSitesAdminInterfaceElement>::FACTORY_KEY("vincisites");
+	    template <> const string FactorableTemplate<AdminInterfaceElement,VinciSitesAdminInterfaceElement>::FACTORY_KEY("vincisites");
 	}
 
 	namespace admin
 	{
-		const string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::ICON("building.png");
-		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::getSuperior()
+	    template <> const string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::ICON("building.png");
+	    template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+	    template <> string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::getSuperior()
 		{
 			return HomeAdmin::FACTORY_KEY;
 		}

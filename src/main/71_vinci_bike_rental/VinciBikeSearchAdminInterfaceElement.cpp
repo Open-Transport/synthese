@@ -56,14 +56,14 @@ namespace synthese
 
 	namespace util
 	{
-		const string FactorableTemplate<AdminInterfaceElement, VinciBikeSearchAdminInterfaceElement>::FACTORY_KEY("vincibikes");
+	template <> const string FactorableTemplate<AdminInterfaceElement, VinciBikeSearchAdminInterfaceElement>::FACTORY_KEY("vincibikes");
 	}
 
 	namespace admin
 	{
-		const string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::ICON("tag_blue.png");
-		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::getSuperior()
+	template <> const string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::ICON("tag_blue.png");
+	template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+	template <> string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::getSuperior()
 		{
 			return HomeAdmin::FACTORY_KEY;
 		}

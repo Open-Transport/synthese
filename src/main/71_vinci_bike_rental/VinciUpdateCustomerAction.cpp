@@ -35,6 +35,9 @@
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 #include "71_vinci_bike_rental/VinciUpdateCustomerAction.h"
 
+#include <boost/algorithm/string.hpp>
+
+
 using namespace std;
 
 namespace synthese
@@ -95,10 +98,10 @@ namespace synthese
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
-				transform(_name.begin(), _name.end(), _name.begin(), toupper);
+				boost::algorithm::to_upper (_name);
 
 				_surname = map.getString(PARAMETER_SURNAME, false, FACTORY_KEY);
-				transform(_surname.begin(), _surname.end(), _surname.begin(), toupper);
+				boost::algorithm::to_upper (_surname);
 
 				_address = map.getString(PARAMETER_ADDRESS, false, FACTORY_KEY);
 				_postCode = map.getString(PARAMETER_POST_CODE, false, FACTORY_KEY);

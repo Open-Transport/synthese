@@ -51,14 +51,14 @@ namespace synthese
 
 	namespace util
 	{
-		const string FactorableTemplate<AdminInterfaceElement,VinciCustomerSearchAdminInterfaceElement>::FACTORY_KEY("vincicustomers");
+	template <> const string FactorableTemplate<AdminInterfaceElement,VinciCustomerSearchAdminInterfaceElement>::FACTORY_KEY("vincicustomers");
 	}
 
 	namespace admin
 	{
-		const string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::ICON("user_gray.png");
-		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::getSuperior()
+	template <> const string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::ICON("user_gray.png");
+	template <>const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+	template <> string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::getSuperior()
 		{
 			return HomeAdmin::FACTORY_KEY;
 		}

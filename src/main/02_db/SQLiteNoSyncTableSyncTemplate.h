@@ -36,7 +36,8 @@ namespace synthese
 		class SQLiteNoSyncTableSyncTemplate : public SQLiteTableSyncTemplate<K,T>
 		{
 		public:
-			SQLiteNoSyncTableSyncTemplate() : SQLiteTableSyncTemplate<K,T>(SQLiteTableSyncTemplate::Args(true, true, TRIGGERS_ENABLED_CLAUSE, true, true))
+		SQLiteNoSyncTableSyncTemplate() : SQLiteTableSyncTemplate<K,T>(
+		    typename SQLiteTableSyncTemplate<K,T>::Args(true, true, TRIGGERS_ENABLED_CLAUSE, true, true))
 			{}
 
 		protected:
