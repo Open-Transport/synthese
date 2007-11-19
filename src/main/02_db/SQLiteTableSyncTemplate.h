@@ -83,10 +83,13 @@ namespace synthese
 			*/
 			static uid getId();
 
-		SQLiteTableSyncTemplate()	
-		    : util::FactorableTemplate<SQLiteTableSync, K>() 
-			{			
-			}
+			SQLiteTableSyncTemplate()	
+				: util::FactorableTemplate<SQLiteTableSync, K>() 
+			{}
+
+			SQLiteTableSyncTemplate(const SQLiteTableSync::Args& args)
+				: util::FactorableTemplate<SQLiteTableSync, K>(args)
+			{}
 
 			void initAutoIncrement();
 

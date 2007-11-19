@@ -33,6 +33,7 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/RedirRequest.h"
 #include "11_interfaces/SimplePageRequest.h"
+#include "11_interfaces/NonPredefinedInterfacePage.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -81,7 +82,7 @@ namespace synthese
 				try
 				{
 					ActionFunctionRequest<LogoutAction,SimplePageRequest> redirRequest(request);
-					redirRequest.getFunction()->setPage(_page->getInterface()->getPage(requestKey));
+					redirRequest.getFunction()->setPage(_page->getInterface()->getPage(NonPredefinedInterfacePage::FACTORY_KEY, requestKey));
 					stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 				}
 				catch (InterfacePageException e)

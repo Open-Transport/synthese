@@ -40,9 +40,11 @@ namespace synthese
 		public:
 			FactorableTemplate()
 				: F()
-			{
+			{}
 
-			}
+			FactorableTemplate(const typename F::Args& args)
+				: F(args)
+			{}
 
 			static const std::string FACTORY_KEY;
 

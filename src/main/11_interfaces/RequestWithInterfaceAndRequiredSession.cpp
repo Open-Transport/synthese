@@ -24,6 +24,7 @@
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
+#include "11_interfaces/NonPredefinedInterfacePage.h"
 
 #include "30_server/Request.h"
 
@@ -46,7 +47,7 @@ namespace synthese
 			{
 				try
 				{
-					const InterfacePage* page = _interface->getPage(_interface->getNoSessionDefaultPageCode());
+					const InterfacePage* page = _interface->getPage(NonPredefinedInterfacePage::FACTORY_KEY, _interface->getNoSessionDefaultPageCode());
 					ParametersVector pv;
 					VariablesMap vm;
 					page->display(stream, pv, vm, NULL, _request);

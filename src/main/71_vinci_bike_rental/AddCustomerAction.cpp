@@ -64,7 +64,9 @@ namespace synthese
 		void AddCustomerAction::_setFromParametersMap(const ParametersMap& map )
 		{
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			transform(_name.begin(), _name.end(), _name.begin(), toupper);
 			_surname = map.getString(PARAMETER_SURNAME, true, FACTORY_KEY);
+			transform(_surname.begin(), _surname.end(), _surname.begin(), toupper);
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
