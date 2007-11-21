@@ -22,6 +22,8 @@ synthese::vinci::VinciAddBike::integrate();
 synthese::vinci::RentABikeAction::integrate();
 synthese::vinci::ReturnABikeAction::integrate();
 synthese::vinci::VinciUpdateBikeAction::integrate();
+synthese::vinci::VinciAddFinancialAction::integrate();
+synthese::vinci::RemoveCustomerAction::integrate();
 
 synthese::vinci::VinciContractPrintRequest::integrate();
 synthese::vinci::BarCodeInterpretFunction::integrate();

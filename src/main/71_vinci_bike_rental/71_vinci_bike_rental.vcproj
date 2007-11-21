@@ -273,6 +273,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\RemoveCustomerAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\RemoveCustomerAction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciAddFinancialAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciAddFinancialAction.h"
+					>
+				</File>
+				<File
 					RelativePath=".\VinciUpdateCustomerAction.cpp"
 					>
 				</File>

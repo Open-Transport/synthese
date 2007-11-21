@@ -75,6 +75,7 @@ namespace synthese
 				, int number = -1
 				, bool orderByNameAndSurname = true
 				, bool orderBySurnameAndName = false
+				, bool orderByLate = false
 				, bool raisingOrder = true
 				);
 

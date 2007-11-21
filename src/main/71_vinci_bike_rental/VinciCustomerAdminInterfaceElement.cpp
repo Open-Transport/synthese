@@ -58,7 +58,9 @@
 #include "71_vinci_bike_rental/VinciContractPrintRequest.h"
 #include "71_vinci_bike_rental/VinciReturnGuaranteeAction.h"
 #include "71_vinci_bike_rental/ReturnABikeAction.h"
+#include "71_vinci_bike_rental/RemoveCustomerAction.h"
 #include "71_vinci_bike_rental/VinciCustomerSearchAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciAddFinancialAction.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -82,7 +84,7 @@ namespace synthese
 
 	namespace admin
 	{
-	    template <> const string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::ICON("user_gray.png");
+	    template <> const string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::ICON("vcard.png");
 	    template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
 	    template <> string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::getSuperior()
 		{
@@ -124,6 +126,12 @@ namespace synthese
 			addRentRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 			addRentRequest.setObjectId(request->getObjectId());
 
+			// Add Financial request
+			ActionFunctionRequest<VinciAddFinancialAction, AdminRequest> addFinancialRequest(request);
+			addFinancialRequest.getAction()->setUser(_contract->getUser());
+			addFinancialRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
+			addFinancialRequest.setObjectId(request->getObjectId());
+
 			// Return Rent request
 			ActionFunctionRequest<ReturnABikeAction,AdminRequest> returnRentRequest(request);
 			returnRentRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
@@ -132,6 +140,12 @@ namespace synthese
 			// Print request
 			FunctionRequest<VinciContractPrintRequest> printRequest(request);
 			printRequest.getFunction()->setContract(_contract);
+
+			// Remove request
+			ActionFunctionRequest<RemoveCustomerAction,AdminRequest> removeRequest(request);
+			removeRequest.getFunction()->setPage<VinciCustomerSearchAdminInterfaceElement>();
+			removeRequest.getAction()->setContract(_contract);
+
 
 			// Personal Data
 			stream << "<h1>Coordonnées</h1>";
@@ -176,6 +190,8 @@ namespace synthese
 			shared_ptr<Account> checkAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE);
 			shared_ptr<Account> cardAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE);
 			vector<pair<uid, string> > paymentModesMap;
+			DateTime oneMonthBefore(TIME_CURRENT);
+			oneMonthBefore -= 31;
 			paymentModesMap.push_back(make_pair(checkAccount->getKey(), "Chèque"));
 			paymentModesMap.push_back(make_pair(cardAccount->getKey(), "Carte"));
 
@@ -226,6 +242,8 @@ namespace synthese
 					HTMLForm returnForm(returnGuaranteeRequest.getHTMLForm("return" + Conversion::ToString(transaction->getKey())));
 					returnForm.addHiddenField(VinciReturnGuaranteeAction::PARAMETER_GUARANTEE_ID, Conversion::ToString(transaction->getKey()));
 					stream << returnForm.getLinkButton("Rendre la caution");
+					if (transaction->getStartDateTime() <= oneMonthBefore)
+						stream << "<script>alert(\"Attention caution périmée\");</script>";
 				}
 				else
 					stream << "Caution rendue le " << transaction->getEndDateTime().toString();
@@ -318,6 +336,47 @@ namespace synthese
 
 			// Change
 			stream << "<h1>Compte client</h1>";
+			shared_ptr<const Account> fa((shared_ptr<const Account>) VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE));
+			vector<shared_ptr<TransactionPart> > ftps = TransactionPartTableSync::search(fa, _user);
+			double solde(TransactionPartTableSync::sum(fa, _user));
+			HTMLTable::ColsVector fv;
+			fv.push_back("Date");
+			fv.push_back("Libellé");
+			fv.push_back("Montant");
+			HTMLTable ft(fv);
+			HTMLForm addFinancialForm(addFinancialRequest.getHTMLForm("addfinancial"));
+			stream
+				<< "<div class=\"" << VinciBikeRentalModule::CSS_LIMITED_HEIGHT << "\">"
+				<< addFinancialForm.open() << ft.open();
+
+			stream << ft.row();
+			stream << ft.col() << addFinancialForm.getSubmitButton("Ajouter");
+			stream << ft.col() << "Réglement";
+			stream << ft.col() << addFinancialForm.getTextInput(VinciAddFinancialAction::PARAMETER_AMOUNT, "");
+
+
+			stream << ft.row();
+			stream << ft.col();
+			stream << ft.col() << "SOLDE";
+			stream << ft.col() << solde;
+
+			for (vector<shared_ptr<TransactionPart> >::iterator it = ftps.begin(); it != ftps.end(); ++it)
+			{
+				shared_ptr<const Transaction> transaction = TransactionTableSync::Get((*it)->getTransactionId());
+				stream << ft.row();
+				stream << ft.col() << transaction->getStartDateTime().toString();
+				stream << ft.col() << transaction->getName();
+				stream << ft.col() << (*it)->getLeftCurrencyAmount();
+			}
+
+			stream
+				<< ft.close() << addFinancialForm.close();
+
+			// Admin
+			stream << "<h1>Opérations avancées</h1>";
+
+			if (removeRequest.isActionFunctionAuthorized())
+				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le contrat ?", "vcard_delete.png") << " ";
 		}
 
 		void VinciCustomerAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)

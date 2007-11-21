@@ -39,6 +39,7 @@ namespace synthese
 			void setTransactionId(uid id);
 			void setLeftCurrencyAmount(double amount);
 			void setRightCurrencyAmount(double amount);
+			void setAmount(double amount);
 			void setAccountId(uid id);
 			void setRateId(uid id);
 			void setTradedObjectId(const std::string& id);

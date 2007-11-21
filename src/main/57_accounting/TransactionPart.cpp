@@ -84,5 +84,11 @@ namespace synthese
 		{
 			_comment = comment;
 		}
+
+		void TransactionPart::setAmount( double amount )
+		{
+			setLeftCurrencyAmount(amount);
+			setRightCurrencyAmount(amount);
+		}
 	}
 }

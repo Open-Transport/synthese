@@ -206,6 +206,9 @@ namespace synthese
 
 
 
+			static void Remove(uid key);
+
+
 			/** Gets from the database a temporary object linked by another one.
 				@param key UID of the object
 				@param obj Parent object which link to the returned object
@@ -283,6 +286,17 @@ namespace synthese
 			static void remove(uid key);
 
 		};
+
+		template <class K, class T>
+		void synthese::db::SQLiteTableSyncTemplate<K, T>::Remove( uid key )
+		{
+			SQLite* sqlite = DBModule::GetSQLite();
+			std::stringstream query;
+			query
+				<< "DELETE FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_ID << "=" << util::Conversion::ToString(key);
+			sqlite->execUpdate(query.str());
+		}
 
 
 		template <class K, class T>

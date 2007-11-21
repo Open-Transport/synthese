@@ -95,9 +95,14 @@ namespace synthese
 				, boost::shared_ptr<const Account> account=boost::shared_ptr<const Account>()
 				, int first = 0, int number = -1);
 
-			static std::map<int, int> TransactionPartTableSync::count(
+			static std::map<int, int> count(
 				boost::shared_ptr<const Account> account
 				, time::Date startDate, time::Date endDate, int first=0, int number=-1);
+
+			static double sum(
+				boost::shared_ptr<const Account> account
+				, boost::shared_ptr<const security::User> user
+			);
 		};
 	}
 }

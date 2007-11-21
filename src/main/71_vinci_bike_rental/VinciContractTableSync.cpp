@@ -26,14 +26,19 @@
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 
+#include "04_time/DateTime.h"
+
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/UserTableSyncException.h"
 
 #include "57_accounting/TransactionTableSync.h"
+#include "57_accounting/TransactionPartTableSync.h"
+#include "57_accounting/Account.h"
 
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -45,6 +50,7 @@ namespace synthese
 	using namespace vinci;
 	using namespace accounts;
 	using namespace util;
+	using namespace time;
 
 	namespace util
 	{
@@ -121,12 +127,23 @@ namespace synthese
 			, int number /*=-1*/ 
 			, bool orderByNameAndSurname
 			, bool orderBySurnameAndName
+			, bool orderByLate
 			, bool raisingOrder
 		){
+			DateTime yesterday(TIME_CURRENT);
+			yesterday -= 1;
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< "SELECT *"
+				<< ",(SELECT MAX(t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") FROM " 
+					<< TransactionPartTableSync::TABLE_NAME << " AS p INNER JOIN " 
+					<< TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
+					<< " WHERE t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
+					<< " AND p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE)->getKey()
+					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << " IS NULL "
+					<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<" << yesterday.toSQLString()
+					<< ") AS ret"
 				<< " FROM "
 					<< TABLE_NAME << " AS c "
 					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << COL_USER_ID << "=u." << TABLE_COL_ID
@@ -137,6 +154,8 @@ namespace synthese
 				query << " ORDER BY " << UserTableSync::TABLE_COL_NAME << "," << UserTableSync::TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderBySurnameAndName)
 				query << " ORDER BY " << UserTableSync::TABLE_COL_SURNAME << "," << UserTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderByLate)
+				query << " ORDER BY ret" << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << (number + 1);
 			if (first)
@@ -150,6 +169,8 @@ namespace synthese
 					shared_ptr<VinciContract> contract(new VinciContract);
 					SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::load(contract.get (), rows);
 					contract->getUser();
+					DateTime late(DateTime::FromSQLTimestamp(rows->getText("ret")));
+					contract->setLate(late);
 					contracts.push_back(contract);
 				}
 				catch (UserTableSyncException e)

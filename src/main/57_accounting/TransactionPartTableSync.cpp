@@ -234,5 +234,23 @@ namespace synthese
 			return mapii;
 		}
 
+		double TransactionPartTableSync::sum(
+			boost::shared_ptr<const Account> account
+			, boost::shared_ptr<const security::User> user
+		){
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT sum(p." << TABLE_COL_LEFT_CURRENCY_AMOUNT << ") AS sum"
+				<< " FROM " << TABLE_NAME << " AS p "
+				<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
+				<< " WHERE "
+				<< " p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
+				<< " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user->getKey())
+				;
+
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			return rows->next () ? rows->getDouble("sum") : 0;
+		}
 	}
 }

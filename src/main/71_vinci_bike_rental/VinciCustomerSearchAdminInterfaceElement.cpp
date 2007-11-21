@@ -56,9 +56,9 @@ namespace synthese
 
 	namespace admin
 	{
-	template <> const string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::ICON("user_gray.png");
-	template <>const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-	template <> string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::getSuperior()
+		template <> const string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::ICON("vcard.png");
+		template <>const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template <> string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::getSuperior()
 		{
 			return HomeAdmin::FACTORY_KEY;
 		}
@@ -104,6 +104,7 @@ namespace synthese
 			h.push_back(make_pair(string(), "ID"));
 			h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(PARAM_SEARCH_SURNAME, "Prénom"));
+			h.push_back(make_pair(string(), "Retard"));
 			ActionResultHTMLTable t(h, st.getForm(), _requestParameters, _resultParameters, addContractRequest.getHTMLForm("add"));
 			stream << t.open();
 			if (_contracts.size() == 0)
@@ -120,6 +121,7 @@ namespace synthese
 					stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), Conversion::ToString((*it)->getKey()));
 					stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getName());
 					stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getSurname());
+					stream << t.col() << (*it)->getLate().toString();
 				}
 			}
 			if (_activeSearch)

@@ -57,6 +57,7 @@ namespace synthese
 		VinciContract::VinciContract(uid id)
 			: Registrable<uid, VinciContract>(id)
 			, _date(TIME_UNKNOWN)
+			, _late(TIME_UNKNOWN)
 		{}
 
 		void VinciContract::setUserId(uid id)
@@ -167,6 +168,16 @@ namespace synthese
 		{
 			vector<shared_ptr<TransactionPart> > gua = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), UserTableSync::Get(_userId), false, -1, 1);
 			return gua.empty() ? shared_ptr<TransactionPart>() : gua.front();
+		}
+
+		void VinciContract::setLate( const time::DateTime& date )
+		{
+			_late = date;
+		}
+
+		const time::DateTime& VinciContract::getLate() const
+		{
+			return _late;
 		}
 	}
 }

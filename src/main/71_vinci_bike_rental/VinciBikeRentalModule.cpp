@@ -271,7 +271,19 @@ namespace synthese
 			_freeLockRent->setLeftCurrency(_euroCurrency.get());
 			_freeLockRent->setRightUserId(_vinciUser->getKey());
 			AccountTableSync::save(_freeLockRent.get ());
-			
+
+			shared_ptr<Account> financialBikeRent;
+			accounts = AccountTableSync::search(getVinciUser()->getKey(), VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE, 0, "");
+			if (accounts.empty())
+				financialBikeRent.reset(new Account);
+			else
+				financialBikeRent = accounts.front();
+			financialBikeRent->setRightClassNumber(VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE);
+			financialBikeRent->setRightCurrency(_euroCurrency.get());
+			financialBikeRent->setLeftCurrency(_euroCurrency.get());
+			financialBikeRent->setRightUserId(_vinciUser->getKey());
+			AccountTableSync::save(financialBikeRent.get ());
+
 
 			// Payment accounts
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_TICKETS_PUNCHING_ACCOUNT_CODE, 0, "");
@@ -283,6 +295,17 @@ namespace synthese
 				ticketPunchings->setLeftCurrency(_ticketCurrency.get());
 				ticketPunchings->setRightUserId(_vinciUser->getKey());
 				AccountTableSync::save(ticketPunchings.get ());
+			}
+
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_CASH_ACCOUNT_CODE, 0, "");
+			if (accounts.size() == 0)
+			{
+				shared_ptr<Account> cash(new Account);
+				cash->setRightClassNumber(VINCI_CHANGE_CASH_ACCOUNT_CODE);
+				cash->setRightCurrency(_euroCurrency.get());
+				cash->setLeftCurrency(_euroCurrency.get());
+				cash->setRightUserId(_vinciUser->getKey());
+				AccountTableSync::save(cash.get ());
 			}
 
 			// Stock accounts

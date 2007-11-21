@@ -29,10 +29,12 @@
 #include "57_accounting/TransactionPartTableSync.h"
 #include "57_accounting/Transaction.h"
 #include "57_accounting/TransactionTableSync.h"
+#include "57_accounting/Account.h"
 
 #include "71_vinci_bike_rental/ReturnABikeAction.h"
 #include "71_vinci_bike_rental/VinciRate.h"
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -79,10 +81,35 @@ namespace synthese
 		{
 			DateTime now(TIME_CURRENT);
 			shared_ptr<const VinciRate> rate = VinciRateTableSync::Get(_transactionPart->getRateId());
-
-			// Create an other transaction if the customer has to pay for the transaction
-
 			shared_ptr<Transaction> t = TransactionTableSync::GetUpdateable(_transactionPart->getTransactionId());
+			double amount(rate->getAdditionalAmountToPay(t->getStartDateTime()));
+
+			if (amount > 0)
+			{
+				shared_ptr<Transaction> ft(new Transaction);
+				ft->setStartDateTime(now);
+				ft->setEndDateTime(now);
+				ft->setLeftUserId(t->getLeftUserId());
+				ft->setName("Retour vélo, pénalité de retard");
+				TransactionTableSync::save(ft.get());
+
+				// Part 1 : customer
+				shared_ptr<TransactionPart> ftp(new TransactionPart);
+				ftp->setTransactionId(ft->getKey());
+				ftp->setAmount(-amount);
+				ftp->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE)->getKey());
+				TransactionPartTableSync::save(ftp.get());
+
+				// Part 2 : service
+				shared_ptr<TransactionPart> ftp2(new TransactionPart);
+				ftp2->setTransactionId(ft->getKey());
+				ftp2->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE)->getKey());
+				ftp2->setLeftCurrencyAmount(amount);
+				ftp2->setRightCurrencyAmount(amount);
+				ftp2->setRateId(rate->getKey());
+				TransactionPartTableSync::save(ftp2.get());
+			}
+
 			t->setEndDateTime(now);
 			TransactionTableSync::save(t.get());
 		}
