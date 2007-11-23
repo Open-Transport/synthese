@@ -607,6 +607,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RollingStockTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RollingStockTableSync.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ServiceDateTableSync.cpp"
 				>
 			</File>

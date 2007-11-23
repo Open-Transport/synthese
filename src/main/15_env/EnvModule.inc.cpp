@@ -30,6 +30,7 @@
 #include "15_env/ReservationRuleTableSync.h"
 #include "15_env/RoadChunkTableSync.h"
 #include "15_env/RoadTableSync.h"
+#include "15_env/RollingStockTableSync.h"
 #include "15_env/ScheduledServiceTableSync.h"
 #include "15_env/ServiceDateTableSync.h"
 #include "15_env/TransportNetworkTableSync.h"

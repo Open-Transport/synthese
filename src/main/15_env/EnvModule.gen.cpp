@@ -13,6 +13,7 @@ synthese::env::BikeComplianceTableSync::integrate();
 synthese::env::HandicappedComplianceTableSync::integrate();
 synthese::env::PedestrianComplianceTableSync::integrate();
 synthese::env::ReservationRuleTableSync::integrate();
+synthese::env::RollingStockTableSync::integrate();
 
 synthese::env::CityTableSync::integrate();
 synthese::env::TransportNetworkTableSync::integrate();

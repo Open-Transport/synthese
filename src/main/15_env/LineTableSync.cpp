@@ -37,7 +37,7 @@
 #include "15_env/PedestrianComplianceTableSync.h"
 #include "15_env/LineTableSync.h"
 #include "15_env/FareTableSync.h"
-//#include "15_env/RollingStockTableSync.h"
+#include "15_env/RollingStockTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -117,8 +117,15 @@ namespace synthese
 
 			line->setAxis(AxisTableSync::Get(axisId,line,true,temporary));
 
-//			if (rollingStockId > 0)
-//				line->setRollingStock(RollingSto::Get(rollingStockId,line,false,temporary).get());
+			try
+			{
+				if (rollingStockId > 0)
+					line->setRollingStock(RollingStockTableSync::Get(rollingStockId,line,false,temporary));
+			}
+			catch(...)
+			{
+				Log::GetInstance().warn("Bad value " + Conversion::ToString(rollingStockId) + " for rolling stock in line " + Conversion::ToString(line->getKey()));
+			}
 			// Fare
 			try
 			{
