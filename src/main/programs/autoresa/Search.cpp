@@ -131,7 +131,8 @@ int Search::getFavorisFromSynthese() throw (int)
 string Search::searchFromSynthese(int _favoris) throw (int)
 {
 		_favoris--;
-		string req="fonction=rp&si=3&da=A&msn=3&dct="+session->favoris.at(_favoris).origin_city+"&dpt="+session->favoris.at(_favoris).origin_place+"&act="+session->favoris.at(_favoris).destination_city+"&apt="+session->favoris.at(_favoris).destination_place+"&ac=0";
+		// change da=yyyy-mm-dd hh:mm:ss
+		string req="fonction=rp&si=3&da=2007-11-08 14:30:00&msn=3&dct="+session->favoris.at(_favoris).origin_city+"&dpt="+session->favoris.at(_favoris).origin_place+"&act="+session->favoris.at(_favoris).destination_city+"&apt="+session->favoris.at(_favoris).destination_place+"&ac=0";
 				
 		// valeur de retour à reflechir
 		string xml=Functions::makeRequest(req);

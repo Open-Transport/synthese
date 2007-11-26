@@ -114,9 +114,9 @@ bool Login::identifyUser() throw (int)
 	
 	int usr,psw;
 
-	usr=Functions::readKey(agi,res,menuKey,0,4,"Veuillez entrer le numero d\'utilisateur");
+	usr=Functions::readKey(agi,res,menuKey,0,4,"Veuillez entrer le numero d\'utilisateur.");
 
-	psw=Functions::readKey(agi,res,menuKey,0,4,"Veuillez entrer votre mots de passe");
+	psw=Functions::readKey(agi,res,menuKey,0,4,"Veuillez entrer votre mots de passe.");
 	
 	session->psw=synthese::util::Conversion::ToString(usr);
 	session->psw=synthese::util::Conversion::ToString(psw);

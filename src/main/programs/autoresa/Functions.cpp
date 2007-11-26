@@ -44,7 +44,7 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 		// file name without extension like au
 
 		cerr<<"do voice file: "<<fileName+".au"<<endl<<endl;
-		PlaybackAcapela::mainFunc(_text,fileName+".au","10.12.155.36","claire8kmu");
+		PlaybackAcapela::mainFunc(_text,fileName+".au","10.12.155.36","claire22s");
 		 return fileName;
 	}
 	*/
@@ -55,8 +55,12 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 	
 	// file name without extension like au
 
-	cerr<<"do voice file: "<<fileName+".au"<<endl<<endl;
-	PlaybackAcapela::mainFunc(_text,fileName+".au","10.12.155.36","claire8kmu");
+	cerr<<"do voice file: "<<fileName+".raw"<<endl<<endl;
+	PlaybackAcapela::mainFunc(_text,fileName+".raw","192.168.100.1","claire22s");
+	cerr<<system("sox -r 22060 -s -w /usr/share/asterisk/agi-bin/fileName.raw /usr/share/asterisk/agi-bin/wavFileName.wav")<<endl;
+	cerr<<system("sox /usr/share/asterisk/agi-bin/wavFileName.wav -r 8000 /usr/share/asterisk/agi-bin/gsmFileName.gsm resample -ql")<<endl;
+	
+	fileName="/usr/share/asterisk/agi-bin/gsmFileName";
 	return fileName;
 
 }
@@ -279,6 +283,7 @@ string Functions::makeRequest(string _request) throw (int)
 {
 	cerr<<"REQUEST: "<<_request<<endl;
 	synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("localhost",3591);
+	//synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("81.63.140.157",3593);
 	
 	std::stringstream out;
 	basicClient->request(out,_request);
