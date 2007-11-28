@@ -35,6 +35,7 @@ using namespace std;
 class Functions
 {
 	public:
+		static unsigned int RSHash(const std::string& str);
 		// call implicitly by readKey to prepare the filename
 		static string text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text);
 		static bool validateInput(int *_menuKey,int _nMenuKey, int _inputKey);

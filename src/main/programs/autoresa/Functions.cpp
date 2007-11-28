@@ -3,6 +3,22 @@
 int Functions::language;
 string Functions::fatalError;
 
+
+unsigned int Functions::RSHash(const std::string& str)
+{
+   unsigned int b    = 378551;
+   unsigned int a    = 63689;
+   unsigned int hash = 0;
+
+   for(std::size_t i = 0; i < str.length(); i++)
+   {
+      hash = hash * a + str[i];
+      a    = a * b;
+   }
+
+   return hash;
+}
+
 /*
 the function is to translate text into voice message with
 the cache system and interface with playbackAcapela
@@ -14,54 +30,79 @@ this function is called implicited by readKey and playbackText
 **/
 string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 {
-	/*
-	cerr<<"do vocal message: "<<_text<<endl<<endl;
+	/* Cache Management Mecanism
+	// struct in DB t800_cache_system
+	// words : string (key) , fileName : string , filePath : string , creatDateTime : date , lastAcessDateTime : date , category : number (p.ex: 0 music, 1 file etc)
+	SQLite* sqlite = DBModule::GetSQLite();
+	stringstream query;
+	query
+		<< "SELECT *"
+		<< " FROM " << " t800_cache_system "
+		<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(login);
+	try
+	{
+		db::SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+		if (rows->next () == false)
+			throw UserTableSyncException("User "+ login + " not found in database.");
 
-	string fileName="/usr/share/asterisk/agi-bin/";
-	string temp;
-	
-	for(int i=0;i<_text.size()%10;)
-	{
-		do
-		{
-			temp=_text.at(i);
-			i++;
-		}
-		while((temp.c_str()<="a")||(temp.c_str()>="z"));
-		fileName+=temp;
+		shared_ptr<User> user (new User);
+		load(user.get(), rows);
+		link(user.get(), rows, GET_AUTO);
+		return user;
 	}
-	
-	FILE *pFile;
-	pFile = fopen (fileName.c_str(),"r");
-	if (pFile!=NULL)
+	catch (SQLiteException e)
 	{
-		
-		cerr<<fileName+".au"<<" exist already"<<endl;
-		return fileName;
-	}
-	else
-	{
-		// file name without extension like au
-
-		cerr<<"do voice file: "<<fileName+".au"<<endl<<endl;
-		PlaybackAcapela::mainFunc(_text,fileName+".au","10.12.155.36","claire22s");
-		 return fileName;
+		throw UserTableSyncException(e.getMessage());
 	}
 	*/
-	
 	cerr<<"do vocal message: "<<_text<<endl<<endl;
 
-	string fileName="/usr/share/asterisk/agi-bin/fileName";
+	string spath="/usr/share/asterisk/agi-bin/resaVoice/";
+	string fileName=synthese::util::Conversion::ToString(RSHash(_text));
+	string fileTemp=spath+"temp/"+fileName;
+	fileName=spath+fileName;
 	
-	// file name without extension like au
-
-	cerr<<"do voice file: "<<fileName+".raw"<<endl<<endl;
-	PlaybackAcapela::mainFunc(_text,fileName+".raw","192.168.100.1","claire22s");
-	cerr<<system("sox -r 22060 -s -w /usr/share/asterisk/agi-bin/fileName.raw /usr/share/asterisk/agi-bin/wavFileName.wav")<<endl;
-	cerr<<system("sox /usr/share/asterisk/agi-bin/wavFileName.wav -r 8000 /usr/share/asterisk/agi-bin/gsmFileName.gsm resample -ql")<<endl;
+	cerr<<" FileName: "<<fileName<<" and FileTemp: "<<fileTemp<<endl;
 	
-	fileName="/usr/share/asterisk/agi-bin/gsmFileName";
-	return fileName;
+	string gsmFileName=fileName+".gsm";
+	cerr<<"gsmFileName: "<<gsmFileName<<endl;
+	
+	// search if file exist
+	FILE * pFile;
+	pFile = fopen (gsmFileName.c_str(),"r");
+	if (pFile!=NULL)
+	{
+		// file exist
+		fclose (pFile);
+		cerr<<"file exist, no needs to remake"<<endl;
+		return fileName;
+	}
+	else // without file, do it
+	{
+		// file name without extension like au
+		cerr<<"do voice file, bcz not exist: "<<fileTemp+".raw"<<endl<<endl;
+		PlaybackAcapela::mainFunc(_text,fileTemp+".raw","192.168.100.1","claire22s");
+		
+		string cmdSox="sox -r 22060 -s -w  "+fileTemp+".raw "+fileTemp+".wav";
+		cerr<<"command: "<<cmdSox.c_str()<<" , return: "<<endl;
+		int returnVal=system(cmdSox.c_str());
+		if(returnVal==0)
+		{
+			//sox /usr/share/asterisk/agi-bin/wavFileName.wav -r 8000 /usr/share/asterisk/agi-bin/gsmFileName.gsm resample -ql
+			cmdSox="sox "+fileTemp+".wav -r 8000 "+gsmFileName+" resample -ql";
+			cerr<<"command: "<<cmdSox.c_str()<<" , return: "<<endl;
+			cerr<<system(cmdSox.c_str())<<endl;
+		}
+		else
+		{
+			cerr<<"system error, voice file is not created: "<<returnVal<<endl;
+		}
+		
+		return fileName;
+	}
+		
+	
+	
 
 }
 
