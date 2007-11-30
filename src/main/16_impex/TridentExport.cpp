@@ -228,6 +228,7 @@ namespace synthese
 				// old : stopname += " (" + Conversion::ToString (ps->getKey ()) + ")";
 				std::string stopname (ps->getConnectionPlace ()->getName () + "/" + ps->getOperatorCode ());
 				if (ps->getName ().empty () == false) stopname.append (" (" + ps->getName () + ")");
+				stopname.append (" " + Conversion::ToString (ps->getKey ()));
 				
 				os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << std::endl;
 				os << "<name>" << stopname << "</name>" << std::endl;
