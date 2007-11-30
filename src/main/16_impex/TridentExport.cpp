@@ -33,6 +33,7 @@
 #include "15_env/TransportNetwork.h"
 #include "15_env/City.h"
 #include "15_env/Service.h"
+#include "15_env/RollingStock.h"
 
 #include "14_geography/Projection.h"
 #include "06_geometry/Point2D.h"
@@ -117,6 +118,7 @@ namespace synthese
 			std::set<const PublicTransportStopZoneConnectionPlace*> connectionPlaces;
 			std::set<const City*> cities;
 			std::set<const LineStop*> lineStops;
+			const RollingStock* rollingStock (0);
 			ServiceSet services;
 
 			std::set<const PhysicalStop*> filteredPhysicalStops; // if no departing/arriving edge
@@ -124,6 +126,8 @@ namespace synthese
 			for (LineSet::const_iterator itline = lines.begin ();
 			 itline != lines.end (); ++itline)
 			{
+			    rollingStock = (*itline)->getRollingStock ();
+
 			const std::vector<Edge*>& edges = (*itline)->getEdges ();
 			for (std::vector<Edge*>::const_iterator itedge = edges.begin ();
 				 itedge != edges.end (); ++itedge)
@@ -220,8 +224,11 @@ namespace synthese
 				if ((ps->getDepartureEdges ().size () == 0) && (ps->getArrivalEdges ().size () == 0)) continue;
 
 				os << "<StopArea>" << std::endl;
-				std::string stopname (ps->getName ());
-				stopname += " (" + Conversion::ToString (ps->getKey ()) + ")";
+				// old : std::string stopname (ps->getName ());
+				// old : stopname += " (" + Conversion::ToString (ps->getKey ()) + ")";
+				std::string stopname (ps->getConnectionPlace ()->getName () + "/" + ps->getOperatorCode ());
+				if (ps->getName ().empty () == false) stopname.append (" (" + ps->getName () + ")");
+				
 				os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << std::endl;
 				os << "<name>" << stopname << "</name>" << std::endl;
 
@@ -457,6 +464,33 @@ namespace synthese
 				os << "<objectId>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</objectId>" << std::endl;
 				os << "<name>" << commercialLine->getName () << "</name>" << std::endl;
 				os << "<publishedName>" << commercialLine->getLongName () << "</publishedName>" << std::endl;
+				
+				std::string tm ("");
+				if (rollingStock != 0)
+				{
+				    switch (rollingStock->getKey ())
+				    {
+				    case 13792273858822157LL : tm = "RapidTransit"; break;  // train Eurostar
+				    case 13792273858822158LL : tm = "RapidTransit"; break;  // train intercity
+				    case 13792273858822159LL : tm = "LocalTrain"; break;  // train de banlieue
+				    case 13792273858822160LL : tm = "LongDistanceTrain"; break;  // train de Grandes Lignes
+				    case 13792273858822583LL : tm = "LocalTrain"; break;  // bus scolaire
+				    case 13792273858822584LL : tm = "Coach"; break;  // autocar
+				    case 13792273858822585LL : tm = "Bus"; break;  // bus
+				    case 13792273858822586LL : tm = "Metro"; break;  // metro
+				    case 13792273858822587LL : tm = "Train"; break;  // train regional
+				    case 13792273858822588LL : tm = "Tramway"; break;  // tramway
+				    case 13792273858822589LL : tm = "Other"; break;  // transport a la demande
+				    case 13792273858822590LL : tm = "RapidTransit"; break;  // train a grande vitesse
+				    case 13792273858822591LL : tm = "Other"; break;  // telecabine
+				    case 13792273858822594LL : tm = "Bus"; break;  // ligne de bus speciale
+				    case 13792273858822638LL : tm = "LongDistanceTrain"; break;  // train de nuit
+				    case 13792273859967672LL : tm = "LongDistanceTrain"; break;  // train de nuit Corail Lunea
+				    case 13792273859967678LL : tm = "LongDistanceTrain"; break;  // train grandes lignes Corail Teoz
+				    default: tm = "Other"; 
+				    }
+				}
+				os << "<transportModeName>" << tm << "</transportModeName>" << std::endl;
 			    
 				for (LineSet::const_iterator itline = lines.begin ();
 				 itline != lines.end (); ++itline)

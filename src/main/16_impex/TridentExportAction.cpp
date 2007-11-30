@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "30_server/ParametersMap.h"
 
 #include "15_env/CommercialLine.h"
+#include "15_env/TransportNetwork.h"
 #include "TridentExport.h"
 
 #include <boost/filesystem/path.hpp>
@@ -59,6 +60,7 @@ namespace synthese
 	namespace impex
 	{
 		const string TridentExportAction::PARAMETER_COMMERCIAL_LINE_REGEX = Action_PARAMETER_PREFIX + "cl_regex";
+		const string TridentExportAction::PARAMETER_NETWORK_REGEX = Action_PARAMETER_PREFIX + "nw_regex";
 		const string TridentExportAction::PARAMETER_ARCHIVE_BASENAME = Action_PARAMETER_PREFIX + "cl_archbn";
 
 
@@ -66,6 +68,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_COMMERCIAL_LINE_REGEX, _commercialLineRegex);
+			map.insert(PARAMETER_NETWORK_REGEX, _commercialLineRegex);
 			map.insert(PARAMETER_ARCHIVE_BASENAME, _archiveBasename);
 			return map;
 		}
@@ -76,6 +79,10 @@ namespace synthese
 			if (_commercialLineRegex.empty()) 
 			    _commercialLineRegex = ".*";
 			
+			_networkRegex = map.getString(PARAMETER_NETWORK_REGEX, false, FACTORY_KEY);
+			if (_networkRegex.empty()) 
+			    _networkRegex = ".*";
+			
 			_archiveBasename = map.getString(PARAMETER_ARCHIVE_BASENAME, false, FACTORY_KEY);
 			if (_archiveBasename.empty())
 			    _archiveBasename = "trident_export";
@@ -84,9 +91,9 @@ namespace synthese
 		void TridentExportAction::run()
 		{
 		    // Create the regex 
-		    boost::regex regex (_commercialLineRegex);
+		    boost::regex clRegex (_commercialLineRegex);
+		    boost::regex nwRegex (_networkRegex);
 		    
-
 		    // Create archive directory in global temp directory
 		    const boost::filesystem::path& tempDir = ServerModule::GetParameter (ServerModule::MODULE_PARAM_TMP_DIR);
 		    const boost::filesystem::path archiveDir (tempDir / _archiveBasename);
@@ -94,7 +101,7 @@ namespace synthese
 		    // Create tar ostream
 		    const boost::filesystem::path archfp (tempDir / (_archiveBasename + ".tar"));
 		    std::ofstream archos (archfp.string ().c_str ());
-		    
+
 		    bool result = boost::filesystem::create_directory(archiveDir);
 		    Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf ()), archos);
 		    
@@ -108,16 +115,13 @@ namespace synthese
 		    {
 			boost::shared_ptr<CommercialLine> cl = it->second;
 			std::string name = cl->getName ();
-			
-			if (boost::regex_match (name, regex) == false) continue;
-			
-			std::string filename ("trident");
-			for (int i=0; i<name.length (); ++i) 
-			{
-			    filename += (name[i] == '/') ? '_' : name[i];
-			}
-			filename += ".xml";
+			std::string networkName = cl->getNetwork ()->getName ();
 
+			if (boost::regex_match (name, clRegex) == false) continue;
+			if (boost::regex_match (networkName, nwRegex) == false) continue;
+			
+			std::string filename ("trident_line_" + cl->getShortName () + ".xml");
+			
 			boost::filesystem::path xmlfp (archiveDir.string () + "/" + filename);
 			std::ofstream out (xmlfp.string ().c_str (), std::ios_base::binary);
 			TridentExport::Export (out, cl->getKey ());

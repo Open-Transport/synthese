@@ -44,11 +44,13 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_COMMERCIAL_LINE_REGEX;
+			static const std::string PARAMETER_NETWORK_REGEX;
 			static const std::string PARAMETER_ARCHIVE_BASENAME;
 
 		private:
 
 			std::string _commercialLineRegex;
+			std::string _networkRegex;
 			std::string _archiveBasename;
 
 		protected:
