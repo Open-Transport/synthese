@@ -669,7 +669,7 @@ def SyntheseProgram (env, binname, generatemain = True, includes = 'main.cpp'):
     
     if goal == 'dist':
       env.SyntheseDist (exeprog)
-      env.SyntheseDeb (exeprog)
+      #env.SyntheseDeb (exeprog)
 
 			       
 

@@ -98,7 +98,7 @@
 		   regexp="^.*/(.*)" select="\1" override="true"/>
 
     <var name="distdir" 
-	 value="${build.home}/${platform}/${toolset}/${mode}/main/${targetname}/${distname}_dist"/>
+	 value="${build.home}/${platform}/${toolset}/${mode}/main/programs/${targetname}/${distname}_dist"/>
     
     <switch value="${platform}">
       
