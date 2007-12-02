@@ -40,6 +40,7 @@ class Functions
 		static string text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text);
 		static bool validateInput(int *_menuKey,int _nMenuKey, int _inputKey);
 		
+		
 		// call directly
 		static int readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int _nMenuKey, int _nKey, string _menu, int tryTime=0);
 		// call directly

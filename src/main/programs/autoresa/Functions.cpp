@@ -84,13 +84,14 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 		PlaybackAcapela::mainFunc(_text,fileTemp+".raw","192.168.100.1","claire22s");
 		
 		string cmdSox="sox -r 22060 -s -w  "+fileTemp+".raw "+fileTemp+".wav";
-		cerr<<"command: "<<cmdSox.c_str()<<" , return: "<<endl;
+		cerr<<"command: "<<cmdSox.c_str()<<" , return: ";
 		int returnVal=system(cmdSox.c_str());
+		cerr<<returnVal<<endl;
 		if(returnVal==0)
 		{
 			//sox /usr/share/asterisk/agi-bin/wavFileName.wav -r 8000 /usr/share/asterisk/agi-bin/gsmFileName.gsm resample -ql
 			cmdSox="sox "+fileTemp+".wav -r 8000 "+gsmFileName+" resample -ql";
-			cerr<<"command: "<<cmdSox.c_str()<<" , return: "<<endl;
+			cerr<<"command: "<<cmdSox.c_str()<<" , return: ";
 			cerr<<system(cmdSox.c_str())<<endl;
 		}
 		else
@@ -124,6 +125,7 @@ bool Functions::validateInput(int *_menuKey,int _nMenuKey, int _inputKey)
 	cerr<<"input key is NOT valable"<<endl;
 	return false;
 }
+
 
 /*
 this function is to play a background message, to read the keyboard dtmf input and to return this input as one int
@@ -167,11 +169,34 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 	if(_nMenuKey==1) timeout=8000;
 	else timeout=(int)(ceil(_nKey*1.5))*1000;
 	
-	inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),timeout, _nKey);
+	if(_nKey==1)	// if one input, call stream_file function to diff 0 and *,#
+	{
+		char allkey[]={'0','1','2','3','4','5','6','7','8','9'};
+		inputKey=AGITool_stream_file(_agi, _res,fileName.c_str(),allkey, 0)-48;
+		cerr<<"stream_file called for one dtmf: "<<inputKey<<endl;
+		if(inputKey==-48)
+		{
+			// timeout in millesec
+			inputKey=AGITool_wait_for_digit(_agi, _res, 15000)-48;
+			cerr<<"wait_digit called for one dtmf: "<<inputKey<<endl;
+		}
+		if(inputKey==-49)  // -1-48 channel failed
+		{
+			setFatalError("dtmf channel failed");
+			cerr<<"dtmf channel failed, system halt"<<endl;
+			exit(-1);
+		}
+		
+	}
+	else	// if many input, call get_data, diff is no more important
+	{
+		inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),timeout, _nKey);
+		cerr<<"get_data called for mtl. dtmf: "<<inputKey<<endl;
+	}
 	
 	if((_nKey==1)&&(inputKey==0))
-		//Functions::passToManuel(_agi,_res,getCallerId(_agi,_res));
-		 return readKey(_agi,_res,_menuKey,_nMenuKey,_nKey,_menu,++tryTime);
+		Functions::passToManuel(_agi,_res,getCallerId(_agi,_res));
+		//return readKey(_agi,_res,_menuKey,_nMenuKey,_nKey,_menu,++tryTime);
 	
 	cerr<<"inputKey: "<<inputKey<<endl;
 	
@@ -309,7 +334,7 @@ int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string callId
 {
 	cerr<<"pass to manuel called"<<endl;
 	// no need to listen the promo one more time, so jump to 4
-	playbackText(_agi,_res,"Veuillez patienter. Le système vous transfert au centre de reservation");
+	playbackText(_agi,_res,"Veuillez patienter, Le système vous transfert au centre de reservation.");
 	char *ext="75";
 	char *pri="4";
 	AGITool_exec_goto(_agi, _res, "tad", ext, pri);
