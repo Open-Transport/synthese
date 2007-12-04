@@ -231,7 +231,8 @@ namespace synthese
 				//stopname.append (" " + Conversion::ToString (ps->getKey ()));
 				
 				os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << std::endl;
-				os << "<name>" << stopname << "</name>" << std::endl;
+				os << "<name>" << stopname << " (" 
+				   << ps->getConnectionPlace ()->getCity ()->getName () << ")" << "</name>" << std::endl;
 
 				// Add all stop points referencing this physical stop
                                 // Otherly said : all line stops based on this physical stop. highly redundant since the other link exists.
@@ -251,6 +252,7 @@ namespace synthese
 				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</centroidOfArea>" << std::endl;
 				os << "<StopAreaExtension>" << std::endl;
 				os << "<areaType>" << "Quay" << "</areaType>" << std::endl;
+				os << "<registration><registrationNumber>" << ps->getOperatorCode () << "</registrationNumber></registration>" << std::endl;
 				os << "</StopAreaExtension>" << std::endl;
 				os << "</StopArea>" << std::endl;
 			    
@@ -268,7 +270,7 @@ namespace synthese
 
 				os << "<StopArea>" << std::endl;
 				os << "<objectId>" << TridentId (peerid, "StopArea", cp->getKey ()) << "</objectId>" << std::endl;
-				os << "<name>" << cp->getName () << "</name>" << std::endl;
+				os << "<name>" << cp->getName () << " (" << cp->getCity ()->getName () << ")" << "</name>" << std::endl;
 
 				// Contained physical stops
 				const PhysicalStops& cpps = cp->getPhysicalStops ();
@@ -464,6 +466,7 @@ namespace synthese
 				os << "<Line>" << std::endl;
 				os << "<objectId>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</objectId>" << std::endl;
 				os << "<name>" << commercialLine->getName () << "</name>" << std::endl;
+				os << "<number>" << commercialLine->getShortName () << "</number>" << std::endl;
 				os << "<publishedName>" << commercialLine->getLongName () << "</publishedName>" << std::endl;
 				
 				std::string tm ("");
