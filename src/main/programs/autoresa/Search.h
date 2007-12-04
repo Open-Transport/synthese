@@ -5,6 +5,7 @@
 
 #include "Functions.h"
 #include "33_route_planner/RoutePlannerFunction.h"
+#include "04_time/DateTime.h"
 
 
 using namespace std;
@@ -23,6 +24,7 @@ class Search
 		int getRankOfChoicedTrajet();
 		
 		int getFavorisFromSynthese() throw (int);
+		string readDateTime();
 		string searchFromSynthese(int _favoris) throw (int);
 		
 	private:

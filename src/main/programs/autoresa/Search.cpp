@@ -60,12 +60,20 @@ int Search::start(SessionReturnType *_session)
 			// take the choice];
 			int menuKey[12];
 			for(int i=0;i<=session->solutionVector.size();i++) menuKey[i]=i;
-			do
+			if(session->solutionVector.size()==0)  // no solution
 			{
-				Functions::playbackText(agi,res,"veuillez patienter.");
-				choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,session->solutionVector.size()+1,1,sentence);
+				Functions::playbackText(agi,res,"désolé, aucune solution trouvée, veuiller verifier la validation des données entrées.");
+				return start(_session);
 			}
-			while(!session->solutionVector.at(choicedFavorisTrajet-1).reservation);
+			else
+			{
+				do
+				{
+					Functions::playbackText(agi,res,"veuillez patienter.");
+					choicedFavorisTrajet=Functions::readKey(agi,res,menuKey,session->solutionVector.size()+1,1,sentence);
+				}
+				while(!session->solutionVector.at(choicedFavorisTrajet-1).reservation);
+			}
 			
 			
 			return 1;		// Ok
@@ -109,6 +117,73 @@ int Search::getFavorisFromSynthese() throw (int)
 	// update favorisTrip
 }
 
+string Search::readDateTime()
+{
+	synthese::time::Date *dateTime=new synthese::time::Date(synthese::time::TIME_CURRENT);
+	// change da=yyyy-mm-dd hh:mm:ss 2007-10-20 18:50, by default: A means Actuel
+	//string dt="2007-10-20 18:50";
+	int menuKey[]={1,2,3};
+	dtmfInput=Functions::readKey(agi,res,menuKey,3,1,"veuillez entrer, 1, pour une recherche en temps actuel. presser 2 pour modifier l\'heure du trajet cherché. presser 3 pour modifier la date et l\'heure du trajet cherché.");
+	if(dtmfInput==1) return "A";
+	if(dtmfInput==2)
+	{
+		dtmfInput=Functions::readKey(agi,res,menuKey,0,4,"veuillez entrer l\'heure de recheche en 4 chiffres. par exemple: 1 2 3 5, signifient 12:35. ou presser 4 fois 0 pour revenir au menu supérieur.");
+		if(dtmfInput==0) return readDateTime();
+		//string dt="2007-10-20 18:50";
+		else
+		{
+			string dt=synthese::util::Conversion::ToString(dtmfInput);
+			
+			if(dt.size()<4)
+			{
+				string zeros;
+				for(int i=0;i<4-dt.size();i++) zeros+="0";
+				cerr<<"no enough number detected, "<<zeros<<" will be added"<<endl;
+				dt.insert(0,zeros);
+			}
+			
+			// dt format orignal: 08350310 , il faut 03-10 08:35
+			string hour=dt.substr(0,2); cerr<<"hour input: "<<hour<<", ";
+			string min=dt.substr(2,2); cerr<<"min input: "<<min<<", ";
+			string date=synthese::util::Conversion::ToString(dateTime->getDay()); cerr<<"date input: "<<date<<", ";
+			string month=synthese::util::Conversion::ToString(dateTime->getMonth()); cerr<<"month input: "<<month<<", "; cerr<<endl;
+			
+			string year=synthese::util::Conversion::ToString(dateTime->getYear());
+			dt=year+"-"+month+"-"+date+" "+hour+":"+min;
+			cerr<<"time organised: "<<dt<<endl;
+			return dt;
+		}
+	}
+	if(dtmfInput==3)
+	{
+		dtmfInput=Functions::readKey(agi,res,menuKey,0,8,"veuillez entrer la date et l\'heure de recheche en 8 chiffres. par exemple: 0 8 3 5 et 0 3 1 0, signifient 8:35 du 3 octobre. ou presser 8 fois 0 pour revenir au menu supérieur.");
+		if(dtmfInput==0) return readDateTime();
+		//string dt="2007-10-20 18:50"; the input format 08350310 so hhmmDDMM
+		else
+		{
+			string dt=synthese::util::Conversion::ToString(dtmfInput);
+			
+			if(dt.size()<8)
+			{
+				string zeros;
+				for(int i=0;i<8-dt.size();i++) zeros+="0";
+				cerr<<"no enough number detected, "<<zeros<<" will be added"<<endl;
+				dt.insert(0,zeros);
+			}
+			
+			// dt format orignal: 08350310 , il faut 03-10 08:35
+			string hour=dt.substr(0,2); cerr<<"hour input: "<<hour<<", ";
+			string min=dt.substr(2,2); cerr<<"min input: "<<min<<", ";
+			string date=dt.substr(4,2); cerr<<"date input: "<<date<<", ";
+			string month=dt.substr(6,2); cerr<<"month input: "<<month<<", "; cerr<<endl;
+			string year=synthese::util::Conversion::ToString(dateTime->getYear());
+			dt=year+"-"+month+"-"+date+" "+hour+":"+min;
+			cerr<<"time organised: "<<dt<<endl;
+			return dt;
+		}
+	}
+}
+
 /*
 	function to call Synthese and fill in the currrentSearchText and currentSearch
 	@parameters:
@@ -131,8 +206,8 @@ int Search::getFavorisFromSynthese() throw (int)
 string Search::searchFromSynthese(int _favoris) throw (int)
 {
 		_favoris--;
-		// change da=yyyy-mm-dd hh:mm:ss 2007-10-20 18:50, by default: A means Actuel
-		string dt="2007-10-20 18:50";
+		
+		string dt=readDateTime();
 		string req="fonction=rp&si=3&da="+dt+"&msn=3&dct="+session->favoris.at(_favoris).origin_city+"&dpt="+session->favoris.at(_favoris).origin_place+"&act="+session->favoris.at(_favoris).destination_city+"&apt="+session->favoris.at(_favoris).destination_place+"&ac=0";
 				
 		// valeur de retour à reflechir

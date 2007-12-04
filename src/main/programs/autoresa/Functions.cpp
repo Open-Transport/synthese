@@ -167,7 +167,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 	// clic * to stop input
 	int timeout=0;
 	if(_nMenuKey==1) timeout=8000;
-	else timeout=(int)(ceil(_nKey*1.5))*1000;
+	else timeout=(int)(ceil(_nKey*1.5))*1000+_menu.size()*1000;
 	
 	if(_nKey==1)	// if one input, call stream_file function to diff 0 and *,#
 	{
@@ -177,7 +177,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 		if(inputKey==-48)
 		{
 			// timeout in millesec
-			inputKey=AGITool_wait_for_digit(_agi, _res, 15000)-48;
+			inputKey=AGITool_wait_for_digit(_agi, _res, timeout)-48;
 			cerr<<"wait_digit called for one dtmf: "<<inputKey<<endl;
 		}
 		if(inputKey==-49)  // -1-48 channel failed
