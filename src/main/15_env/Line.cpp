@@ -248,6 +248,13 @@ namespace synthese
 			return synthese::util::Registrable<uid,Line>::getKey();
 		}
 
+
+		const PhysicalStop* Line::getOrigin() const
+		{
+		    return static_cast<const PhysicalStop*>((getEdges().at (0))->getFromVertex());
+		}
+
+
 		const PhysicalStop* Line::getDestination() const
 		{
 			Edge* edge = getLastEdge();

@@ -226,13 +226,14 @@ namespace synthese
 				os << "<StopArea>" << std::endl;
 				// old : std::string stopname (ps->getName ());
 				// old : stopname += " (" + Conversion::ToString (ps->getKey ()) + ")";
-				std::string stopname (ps->getConnectionPlace ()->getName () + "/" + ps->getOperatorCode ());
-				if (ps->getName ().empty () == false) stopname.append (" (" + ps->getName () + ")");
-				//stopname.append (" " + Conversion::ToString (ps->getKey ()));
-				
+
 				os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << std::endl;
-				os << "<name>" << stopname << " (" 
-				   << ps->getConnectionPlace ()->getCity ()->getName () << ")" << "</name>" << std::endl;
+
+				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
+				    ps->getConnectionPlace ()->getName ();
+				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
+				os << " / " << ps->getOperatorCode ();
+				os << "</name>" << std::endl;
 
 				// Add all stop points referencing this physical stop
                                 // Otherly said : all line stops based on this physical stop. highly redundant since the other link exists.
@@ -517,7 +518,17 @@ namespace synthese
 				os << "<ChouetteRoute>" << std::endl;
 				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << std::endl;
 				os << "<name>" << line->getName () << "</name>" << std::endl;
-				os << "<publishedName>" << line->getTimetableName () << "</publishedName>" << std::endl;
+				os << "<publishedName>";
+				{
+				    const PhysicalStop* ps = line->getOrigin ();
+				    os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
+				}
+				os << " -&gt; ";
+				{
+				    const PhysicalStop* ps = line->getDestination ();
+				    os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
+				}
+				os << "</publishedName>" << std::endl;
 				
 				const std::vector<Edge*>& edges = line->getEdges ();
 				for (std::vector<Edge*>::const_iterator itedge = edges.begin ();
@@ -707,8 +718,11 @@ namespace synthese
 		TridentExport::TridentId (const std::string& peer,  const std::string clazz, const synthese::env::Service* service)
 		{
 			std::stringstream ss;
+			int skey = service->getServiceNumber ();
+			if (skey == 0) skey = service->getId ();
+
 			ss << peer << ":" << clazz << ":" << ((const Line*) service->getPath ())->getKey () 
-			   << "s" << service->getServiceNumber () ;
+			   << "s" << skey ;
 
 			return ss.str ();
 		}
