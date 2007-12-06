@@ -271,7 +271,7 @@ namespace synthese
 
 				os << "<StopArea>" << std::endl;
 				os << "<objectId>" << TridentId (peerid, "StopArea", cp->getKey ()) << "</objectId>" << std::endl;
-				os << "<name>" << cp->getName () << " (" << cp->getCity ()->getName () << ")" << "</name>" << std::endl;
+				os << "<name>" << cp->getCity ()->getName () << " " << cp->getName () << "</name>" << std::endl;
 
 				// Contained physical stops
 				const PhysicalStops& cpps = cp->getPhysicalStops ();
