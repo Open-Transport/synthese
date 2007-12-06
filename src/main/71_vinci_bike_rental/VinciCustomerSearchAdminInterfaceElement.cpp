@@ -91,11 +91,15 @@ namespace synthese
 			FunctionRequest<AdminRequest> contractRequest(request);
 			contractRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 
+			// Filter list
+			
+
 			stream << "<h1>Recherche de client</h1>";
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
 			stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname));
+//			stream << st.cell("Filtre", st.getForm().getSelectInput(PARAM_SEARCH_FILTER, filters, _searchFilter));
 			stream << st.close();
 
 			stream << "<h1>Résultat de la recherche</h1>";

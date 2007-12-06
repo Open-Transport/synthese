@@ -44,11 +44,25 @@ namespace synthese
 		public:
 			static const std::string PARAM_SEARCH_NAME;
 			static const std::string PARAM_SEARCH_SURNAME;
+			static const std::string PARAM_SEARCH_FILTER;
+
 
 		private:
+
+			typedef enum
+			{
+				FILTER_NONE
+				, FILTER_ONLATE
+				, FILTER_DUE
+				, FILTER_OUTDATED_GUARANTEE
+				, FILTER_ALL_PROBLEMS
+				, FILTER_CONTRACTED_GUARANTEE
+			} _Filter;
+
 			std::vector<boost::shared_ptr<VinciContract> >	_contracts;
 			std::string										_searchName;
 			std::string										_searchSurname;
+			_Filter											_searchFilter;
 			bool											_activeSearch;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
 			html::ActionResultHTMLTable::ResultParameters	_resultParameters;

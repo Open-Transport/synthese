@@ -154,7 +154,7 @@ namespace synthese
 
 			if (getRecurringPenaltyCancelsFirst())
 			{
-				double penalties = ceil((double) ((now - startDate) / (double) (_recurringPenaltyPeriod * 60)));
+				double penalties = ceil((double) ((now - getFirstPenaltyEndDate(startDate)) / (double) (_recurringPenaltyPeriod * 60)));
 				return _recurringPenalty * penalties;
 			}
 			else

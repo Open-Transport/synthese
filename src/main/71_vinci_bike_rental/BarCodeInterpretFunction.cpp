@@ -138,8 +138,9 @@ namespace synthese
 
 						// Action : return the bike(s)
 						// Function : display the contract
-						ActionFunctionRequest<ReturnABikeAction, AdminRequest> redirRequest(_request);
-						redirRequest.getAction()->setTransactionPart(transactionPart);
+//						ActionFunctionRequest<ReturnABikeAction, AdminRequest> redirRequest(_request);
+//						redirRequest.getAction()->setTransactionPart(transactionPart);
+						FunctionRequest<AdminRequest> redirRequest;
 						redirRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 						redirRequest.setObjectId(contract->getKey());
 						VariablesMap vm;
