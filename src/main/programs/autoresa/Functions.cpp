@@ -3,6 +3,11 @@
 int Functions::language;
 string Functions::fatalError;
 
+string  Functions::ipAcapela="192.168.100.1";
+string  Functions::ipSynthese3="localhost";
+int  Functions::portSynthese3=3591;
+string  Functions::voiceChoiced="claire22s";
+
 
 unsigned int Functions::RSHash(const std::string& str)
 {
@@ -81,7 +86,7 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 	{
 		// file name without extension like au
 		cerr<<"do voice file, bcz not exist: "<<fileTemp+".raw"<<endl<<endl;
-		PlaybackAcapela::mainFunc(_text,fileTemp+".raw","192.168.100.1","claire22s");
+		PlaybackAcapela::mainFunc(_text,fileTemp+".raw",ipAcapela,voiceChoiced);
 		
 		string cmdSox="sox -r 22060 -s -w  "+fileTemp+".raw "+fileTemp+".wav";
 		cerr<<"command: "<<cmdSox.c_str()<<" , return: ";
@@ -348,7 +353,7 @@ int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string callId
 string Functions::makeRequest(string _request) throw (int)
 {
 	cerr<<"REQUEST: "<<_request<<endl;
-	synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("localhost",3591);
+	synthese::server::BasicClient *basicClient=new synthese::server::BasicClient(ipSynthese3,portSynthese3);
 	//synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("81.63.140.157",3593);
 	
 	std::stringstream out;

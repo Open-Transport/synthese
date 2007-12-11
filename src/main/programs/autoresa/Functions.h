@@ -79,6 +79,12 @@ class Functions
 	private:
 		static string fatalError;
 		static int language;
+		
+		// envir. variables
+		static string ipAcapela;
+		static string ipSynthese3;
+		static int portSynthese3;
+		static string voiceChoiced;
 	
 
 };
