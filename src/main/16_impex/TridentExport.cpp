@@ -237,17 +237,25 @@ namespace synthese
 
 				// Add all stop points referencing this physical stop
                                 // Otherly said : all line stops based on this physical stop. highly redundant since the other link exists.
+				// Store them into a set to remove duplicates
+				std::set<const LineStop*> lineStops;
 				const Vertex::Edges& departingLineStops = ps->getDepartureEdges ();
 				for (Vertex::Edges::const_iterator itls = departingLineStops.begin ();
 				     itls != departingLineStops.end (); ++itls) {
 				    const LineStop* ls = dynamic_cast<const LineStop*> (*itls);
-				    os << "<contains>" << TridentId (peerid, "StopPoint", ls->getKey ())  << "</contains>" << std::endl;
+				    lineStops.insert (ls);
 				}
 				const Vertex::Edges& arrivingLineStops = ps->getArrivalEdges ();
 				for (Vertex::Edges::const_iterator itls = arrivingLineStops.begin ();
 				     itls != arrivingLineStops.end (); ++itls) {
 				    const LineStop* ls = dynamic_cast<const LineStop*> (*itls);
-				    os << "<contains>" << TridentId (peerid, "StopPoint", ls->getKey ())  << "</contains>" << std::endl;
+				    lineStops.insert (ls);
+				}
+
+				for (std::set<const LineStop*>::const_iterator itls = lineStops.begin ();
+				     itls != lineStops.end (); ++itls)
+				{
+				    os << "<contains>" << TridentId (peerid, "StopPoint", (*itls)->getKey ())  << "</contains>" << std::endl;
 				}
 
 				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</centroidOfArea>" << std::endl;
@@ -377,7 +385,7 @@ namespace synthese
 				os << "</projectedPoint>" << std::endl;
 
 				os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << std::endl;
-				os << "<name/>" << std::endl;
+				os << "<name>" << Conversion::ToString (ps->getKey ()) << "</name>" << std::endl;
 
 				os << "</AreaCentroid>" << std::endl;
 			    
