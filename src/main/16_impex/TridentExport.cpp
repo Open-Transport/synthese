@@ -143,19 +143,6 @@ namespace synthese
 					if (connectionPlace) 
 					{
 						connectionPlaces.insert (connectionPlace);
-						const PhysicalStops& cpps(connectionPlace->getPhysicalStops());
-
-						// add also physical stops of each connection place otherwise we will
-						// lack connection links.
-						for (PhysicalStops::const_iterator itcpps = cpps.begin ();
-						 itcpps != cpps.end (); ++itcpps) 
-						{
-						    // Skip physical stops which have no departing or arriving edges.
-						    if ((itcpps->second->getDepartureEdges ().size () == 0) && 
-							(itcpps->second->getArrivalEdges ().size () == 0)) continue;
-						    
-						    physicalStops.insert (itcpps->second);
-						}
 
 						cities.insert (connectionPlace->getCity ());
 					}
@@ -238,22 +225,22 @@ namespace synthese
 				// Add all stop points referencing this physical stop
                                 // Otherly said : all line stops based on this physical stop. highly redundant since the other link exists.
 				// Store them into a set to remove duplicates
-				std::set<const LineStop*> lineStops;
+				std::set<const LineStop*> lstops;
 				const Vertex::Edges& departingLineStops = ps->getDepartureEdges ();
 				for (Vertex::Edges::const_iterator itls = departingLineStops.begin ();
 				     itls != departingLineStops.end (); ++itls) {
 				    const LineStop* ls = dynamic_cast<const LineStop*> (*itls);
-				    lineStops.insert (ls);
+				    lstops.insert (ls);
 				}
 				const Vertex::Edges& arrivingLineStops = ps->getArrivalEdges ();
 				for (Vertex::Edges::const_iterator itls = arrivingLineStops.begin ();
 				     itls != arrivingLineStops.end (); ++itls) {
 				    const LineStop* ls = dynamic_cast<const LineStop*> (*itls);
-				    lineStops.insert (ls);
+				    lstops.insert (ls);
 				}
 
-				for (std::set<const LineStop*>::const_iterator itls = lineStops.begin ();
-				     itls != lineStops.end (); ++itls)
+				for (std::set<const LineStop*>::const_iterator itls = lstops.begin ();
+				     itls != lstops.end (); ++itls)
 				{
 				    os << "<contains>" << TridentId (peerid, "StopPoint", (*itls)->getKey ())  << "</contains>" << std::endl;
 				}
@@ -261,7 +248,9 @@ namespace synthese
 				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</centroidOfArea>" << std::endl;
 				os << "<StopAreaExtension>" << std::endl;
 				os << "<areaType>" << "Quay" << "</areaType>" << std::endl;
-				os << "<registration><registrationNumber>" << ps->getOperatorCode () << "</registrationNumber></registration>" << std::endl;
+				std::string rn = ps->getOperatorCode ();
+				if (rn.empty ()) rn = "0";
+				os << "<registration><registrationNumber>" << rn << "</registrationNumber></registration>" << std::endl;
 				os << "</StopAreaExtension>" << std::endl;
 				os << "</StopArea>" << std::endl;
 			    
@@ -415,7 +404,8 @@ namespace synthese
 					 itps2 != cpps.end (); ++itps2)
 				{
 					// filter physical stops not concerned by this line.
-					if (physicalStops.find (itps2->second) == physicalStops.end ()) continue;
+
+					//if (physicalStops.find (itps2->second) == physicalStops.end ()) continue;
 				    
 					const PhysicalStop* to = (itps2->second);
 				    
@@ -577,7 +567,12 @@ namespace synthese
 
 
 				os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << std::endl;
-				os << "<name>" << ps->getName () << "</name>" << std::endl;
+				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
+				    ps->getConnectionPlace ()->getName ();
+				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
+				os << " / " << ps->getOperatorCode ();
+				os << "</name>" << std::endl;
+				// os << "<name>" << ps->getName () << "</name>" << std::endl;
 
 				os << "<lineIdShortcut>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineIdShortcut>" << std::endl;
 				os << "<ptNetworkIdShortcut>" << TridentId (peerid, "PTNetwork", tn->getKey ()) << "</ptNetworkIdShortcut>" << std::endl;
