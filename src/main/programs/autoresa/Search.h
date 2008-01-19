@@ -24,7 +24,7 @@ class Search
 		int getRankOfChoicedTrajet();
 		
 		int getFavorisFromSynthese() throw (int);
-		string readDateTime();
+		string readDateTime(int prefix=4);
 		string searchFromSynthese(int _favoris) throw (int);
 		
 	private:
