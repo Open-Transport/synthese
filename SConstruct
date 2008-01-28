@@ -33,7 +33,7 @@ sqliteversion = ARGUMENTS.get('sqliteversion').lower()
 zlibversion = ARGUMENTS.get('zlibversion').lower()
 distname = ARGUMENTS.get('distname', 'dist').lower()
 
-useRepository = False
+useRepository = True
 if platform == 'win32':
   useRepository = True
 
