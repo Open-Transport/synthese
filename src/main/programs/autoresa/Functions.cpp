@@ -3,10 +3,10 @@
 int Functions::language;
 string Functions::fatalError;
 
-string  Functions::ipAcapela="192.168.100.1";
-string  Functions::ipSynthese3="localhost";
+string  Functions::ipAcapela="10.12.155.55";  // idefix
+string  Functions::ipSynthese3="10.12.155.55";  // idefix
 int  Functions::portSynthese3=3591;
-string  Functions::voiceChoiced="claire22s";
+string  Functions::voiceChoiced="claire8kmu";
 
 
 unsigned int Functions::RSHash(const std::string& str)
@@ -64,17 +64,19 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 
 	string spath="/usr/share/asterisk/agi-bin/resaVoice/";
 	string fileName=synthese::util::Conversion::ToString(RSHash(_text));
-	string fileTemp=spath+"temp/"+fileName;
+	//string fileTemp=spath+"temp/"+fileName;
 	fileName=spath+fileName;
 	
-	cerr<<" FileName: "<<fileName<<" and FileTemp: "<<fileTemp<<endl;
+	//cerr<<" FileName: "<<fileName<<" and FileTemp: "<<fileTemp<<endl;
+	cerr<<" FileName: "<<fileName<<endl;	
 	
-	string gsmFileName=fileName+".gsm";
-	cerr<<"gsmFileName: "<<gsmFileName<<endl;
+	//string gsmFileName=fileName+".gsm";
+	//cerr<<"gsmFileName: "<<gsmFileName<<endl;
 	
 	// search if file exist
 	FILE * pFile;
-	pFile = fopen (gsmFileName.c_str(),"r");
+	//pFile = fopen (gsmFileName.c_str(),"r");
+	pFile = fopen((fileName+".au").c_str(),"r");
 	if (pFile!=NULL)
 	{
 		// file exist
@@ -85,9 +87,12 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 	else // without file, do it
 	{
 		// file name without extension like au
-		cerr<<"do voice file, bcz not exist: "<<fileTemp+".raw"<<endl<<endl;
-		PlaybackAcapela::mainFunc(_text,fileTemp+".raw",ipAcapela,voiceChoiced);
+		//cerr<<"do voice file, bcz not exist: "<<fileTemp+".raw"<<endl<<endl;
+		cerr<<"do voice file, bcz not exist: "<<fileName+".au"<<endl<<endl;
+		//PlaybackAcapela::mainFunc(_text,fileTemp+".raw",ipAcapela,voiceChoiced);
+		PlaybackAcapela::mainFunc(_text,fileName+".au",ipAcapela,voiceChoiced);
 		
+		/*
 		string cmdSox="sox -r 22060 -s -w  "+fileTemp+".raw "+fileTemp+".wav";
 		cerr<<"command: "<<cmdSox.c_str()<<" , return: ";
 		int returnVal=system(cmdSox.c_str());
@@ -103,8 +108,9 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 		{
 			cerr<<"system error, voice file is not created: "<<returnVal<<endl;
 		}
+		*/
 		
-		return fileName;
+		return fileName+".au";
 	}
 		
 	
