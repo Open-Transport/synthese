@@ -37,6 +37,7 @@
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
+#include "57_accounting/AccountingModule.h"
 #include "57_accounting/TransactionPart.h"
 #include "57_accounting/TransactionPartTableSync.h"
 #include "57_accounting/Transaction.h"
@@ -337,6 +338,23 @@ namespace synthese
 			// Change
 			stream << "<h1>Compte client</h1>";
 			shared_ptr<const Account> fa((shared_ptr<const Account>) VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE));
+			
+			HTMLForm addFinancialForm(addFinancialRequest.getHTMLForm("addfinancial"));
+			std::vector<std::pair<uid, std::string> > financialAccounts(AccountingModule::getAccountsName(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_CODE, true));
+			stream << "<p>" << addFinancialForm.open();
+			stream << "Réglement : " << addFinancialForm.getSelectInput(VinciAddFinancialAction::PARAMETER_ACCOUNT, financialAccounts, static_cast<uid>(UNKNOWN_VALUE));
+			stream << addFinancialForm.getTextInput(VinciAddFinancialAction::PARAMETER_AMOUNT, "");
+			stream << addFinancialForm.getSubmitButton("Ajouter");
+			stream << addFinancialForm.close() << "</p>";
+
+			HTMLForm addSaleForm(addFinancialRequest.getHTMLForm("addfinancial"));
+			financialAccounts = AccountingModule::getAccountsName(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_SERVICES_SALES_CODE + "%", true);
+			stream << "<p>" << addSaleForm.open();
+			stream << "Vente de produit : " << addSaleForm.getSelectInput(VinciAddFinancialAction::PARAMETER_ACCOUNT, financialAccounts, static_cast<uid>(UNKNOWN_VALUE));
+			stream << addSaleForm.getSelectNumberInput(VinciAddFinancialAction::PARAMETER_PIECES, 1, 99, 1);
+			stream << addSaleForm.getSubmitButton("Ajouter");
+			stream << addSaleForm.close() << "</p>";
+
 			vector<shared_ptr<TransactionPart> > ftps = TransactionPartTableSync::search(fa, _user);
 			double solde(TransactionPartTableSync::sum(fa, _user));
 			HTMLTable::ColsVector fv;
@@ -344,17 +362,8 @@ namespace synthese
 			fv.push_back("Libellé");
 			fv.push_back("Montant");
 			HTMLTable ft(fv);
-			HTMLForm addFinancialForm(addFinancialRequest.getHTMLForm("addfinancial"));
-			stream
-				<< "<div class=\"" << VinciBikeRentalModule::CSS_LIMITED_HEIGHT << "\">"
-				<< addFinancialForm.open() << ft.open();
-
-			stream << ft.row();
-			stream << ft.col() << addFinancialForm.getSubmitButton("Ajouter");
-			stream << ft.col() << "Réglement";
-			stream << ft.col() << addFinancialForm.getTextInput(VinciAddFinancialAction::PARAMETER_AMOUNT, "");
-
-
+			stream << "<div class=\"" << VinciBikeRentalModule::CSS_LIMITED_HEIGHT << "\">";
+			stream << ft.open();
 			stream << ft.row();
 			stream << ft.col();
 			stream << ft.col() << "SOLDE";
@@ -369,8 +378,7 @@ namespace synthese
 				stream << ft.col() << (*it)->getLeftCurrencyAmount();
 			}
 
-			stream
-				<< ft.close() << addFinancialForm.close();
+			stream << ft.close();
 
 			// Admin
 			stream << "<h1>Opérations avancées</h1>";

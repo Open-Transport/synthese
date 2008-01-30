@@ -41,7 +41,9 @@ namespace synthese
 		private:
 			std::string _name;
 			std::string _address;
-			std::string _phone;
+			std::string	_phone;
+			bool		_locked;
+			uid			_parentSiteId;
 
 		public:
 			VinciSite();
@@ -49,10 +51,14 @@ namespace synthese
 			void setName(const std::string& name);
 			void setAddress(const std::string& address);
 			void setPhone(const std::string& phone);
+			void setLocked(bool value);
+			void setParentSiteId(uid value);
 
-			const std::string& getName() const;
-			const std::string& getAddress() const;
-			const std::string& getPhone() const;
+			const std::string&	getName()			const;
+			const std::string&	getAddress()		const;
+			const std::string&	getPhone()			const;
+			bool				getLocked()			const;
+			uid					getParentSiteId()	const;
 		};
 	}
 }

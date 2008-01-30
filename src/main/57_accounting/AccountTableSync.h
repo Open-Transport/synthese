@@ -53,6 +53,9 @@ namespace synthese
 			static const std::string TABLE_COL_RIGHT_NUMBER;
 			static const std::string TABLE_COL_RIGHT_CLASS_NUMBER;
 			static const std::string TABLE_COL_RIGHT_CURRENCY_ID;
+			static const std::string COL_LOCKED;
+			static const std::string COL_STOCK_ACCOUNT_ID;
+			static const std::string COL_UNIT_PRICE;
 
 			AccountTableSync();
 
@@ -70,9 +73,14 @@ namespace synthese
 				, uid leftUserId
 				, const std::string& leftClassNumber
 				, const std::string name=""
+				, bool orderByName = true
+				, bool raisingOrder = true
 				, int first = 0
 				, int number = 0
 			);
+
+			static std::string GetNextCode(std::string basisCode);
+			
 		};
 
 	}

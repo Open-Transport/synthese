@@ -26,10 +26,21 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <vector>
+#include <map>
+#include <utility>
+
 #include "01_util/ModuleClass.h"
+#include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
+	namespace server
+	{
+		class Session;
+	}
+
 	namespace security
 	{
 		class Profile;
@@ -179,11 +190,15 @@ namespace synthese
 			static boost::shared_ptr<security::Profile>		_vinciProfile;
 			static boost::shared_ptr<security::Profile>		_vinciCustomerProfile;
 			static boost::shared_ptr<accounts::Currency>	_euroCurrency;
-			static boost::shared_ptr<accounts::Currency>	_bikeCurrency;
+			static boost::shared_ptr<accounts::Currency>	_objectCurrency;
 			static boost::shared_ptr<accounts::Currency>	_ticketCurrency;
+			static boost::shared_ptr<accounts::Account>		_stockChargeAccount;
 
 
 			static const std::string VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE;
+
+			typedef std::map<const server::Session*, uid> _SessionsSitesMap;
+			static _SessionsSitesMap _sessionsSites;
 
 
 		public:
@@ -198,15 +213,25 @@ namespace synthese
 			static const std::string VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE;
 			static const std::string VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE;
 			static const std::string VINCI_AVAILABLE_BIKES_STOCKS_ACCOUNT_CODE;
+			
+			static const std::string VINCI_SERVICES_CODE;
 			static const std::string VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE;
 			static const std::string VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE;
 			static const std::string VINCI_SERVICES_DELAYED_PAYMENTS_ACCOUNT_CODE;
 			static const std::string VINCI_SERVICES_UNRETURNED_BIKE_ACCOUNT_CODE;
+			static const std::string VINCI_SERVICES_SALES_CODE;
+
+			static const std::string VINCI_CHANGE_CODE;
 			static const std::string VINCI_CHANGE_GUARANTEE_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_CHECKS_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_CREDIT_CARD_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_CASH_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_TICKETS_PUNCHING_ACCOUNT_CODE;
+			static const std::string VINCI_CHANGE_CUSTOM_CODE;
+
+			static const std::string VINCI_STOCK_CODE;
+
+			static const std::string VINCI_CHARGE_STOCK_CHANGE_CODE;
 
 			static const std::string VINCI_ACCOUNTING_PROFILE;
 			static const std::string VINCI_ACCOUNTING_PROFILE_RIGHTS;
@@ -217,8 +242,8 @@ namespace synthese
 
 			static const std::string VINCI_CURRENCY_EURO_NAME;
 			static const std::string VINCI_CURRENCY_EURO;
-			static const std::string VINCI_CURRENCY_BIKE_NAME;
-			static const std::string VINCI_CURRENCY_BIKE;
+			static const std::string VINCI_CURRENCY_OBJECT_NAME;
+			static const std::string VINCI_CURRENCY_OBJECT;
 			static const std::string VINCI_CURRENCY_TICKET_PUNCHING_NAME;
 			static const std::string VINCI_CURRENCY_TICKET_PUNCHING;
 
@@ -245,11 +270,18 @@ namespace synthese
 				static boost::shared_ptr<const security::Profile>	getCustomerProfile();
 				static boost::shared_ptr<const security::User>		getVinciUser();
 				static boost::shared_ptr<const accounts::Account>	getFreeLockRentServiceAccount();
+				static boost::shared_ptr<const accounts::Account>	getStockChargeAccount();
 				static boost::shared_ptr<const accounts::Currency>	getEuroCurrency();
+				static boost::shared_ptr<const accounts::Currency>	getObjectCurrency();
 				
 				static boost::shared_ptr<accounts::Account> getAccount(const std::string& code);
 
 			//@}
+
+			static void AddSessionSite(const server::Session* session, uid siteId);
+			static uid GetSessionSite(const server::Session* session);
+
+			static std::vector<std::pair<uid, std::string> > GetSitesName(uid differentValue);
 		};
 	}
 	/** @} */

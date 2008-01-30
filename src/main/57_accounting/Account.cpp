@@ -32,6 +32,7 @@ namespace synthese
 			: Registrable<uid, Account>(id)
 			, _leftUserId(0)
 			, _rightUserId(0)
+			, _unitPrice(0)
 		{
 
 		}
@@ -124,6 +125,36 @@ namespace synthese
 		const uid Account::getLeftUserId() const
 		{
 			return _leftUserId;
+		}
+
+		bool Account::getLocked() const
+		{
+			return _locked;
+		}
+
+		uid Account::getStockAccountId() const
+		{
+			return _stockAccountId;
+		}
+
+		double Account::getUnitPrice() const
+		{
+			return _unitPrice;
+		}
+
+		void Account::setLocked( bool value )
+		{
+			_locked = value;
+		}
+
+		void Account::setStockAccountId( uid id )
+		{
+			_stockAccountId = id;
+		}
+
+		void Account::setUnitPrice( double value )
+		{
+			_unitPrice = value;
 		}
 	}
 }

@@ -22,11 +22,15 @@
 
 #include "Conversion.h"
 
+#include "01_util/Constants.h"
+
+#include <complex>
 #include <sstream>
 #include <iomanip>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 
+using namespace std;
 
 namespace synthese
 {
@@ -240,5 +244,16 @@ namespace synthese
 		return (s.length () <= size ? s : (s.substr (0, size) + "  (...)"));
 	    }
 
+		std::string Conversion::ToFixedSizeString( int number, int size )
+		{
+			if (size == UNKNOWN_VALUE)
+				return ToString(number);
+			stringstream s;
+			for (; size; size--)
+				if (number < pow(10.0, size - 1))
+					s << "0";
+			s << number;
+			return s.str();
+		}
 	}
 }

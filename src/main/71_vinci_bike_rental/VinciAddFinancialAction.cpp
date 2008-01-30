@@ -27,6 +27,7 @@
 #include "57_accounting/Transaction.h"
 #include "57_accounting/TransactionTableSync.h"
 #include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/ParametersMap.h"
@@ -39,6 +40,8 @@
 #include "VinciAddFinancialAction.h"
 #include "VinciBikeRentalModule.h"
 
+#include "01_util/Conversion.h"
+
 using namespace std;
 using namespace boost;
 
@@ -48,6 +51,7 @@ namespace synthese
 	using namespace security;
 	using namespace time;
 	using namespace accounts;
+	using namespace util;
 
 	namespace util
 	{
@@ -58,7 +62,8 @@ namespace synthese
 	{
 		const string VinciAddFinancialAction::PARAMETER_AMOUNT = Action_PARAMETER_PREFIX + "am";
 		const string VinciAddFinancialAction::PARAMETER_USER = Action_PARAMETER_PREFIX + "us";
-
+		const string VinciAddFinancialAction::PARAMETER_ACCOUNT = Action_PARAMETER_PREFIX + "ac";
+		const string VinciAddFinancialAction::PARAMETER_PIECES = Action_PARAMETER_PREFIX + "pi";
 		
 		
 		VinciAddFinancialAction::VinciAddFinancialAction()
@@ -79,7 +84,6 @@ namespace synthese
 		
 		void VinciAddFinancialAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_amount = map.getDouble(PARAMETER_AMOUNT, true, FACTORY_KEY);
 			uid id = map.getUid(PARAMETER_USER, true, FACTORY_KEY);
 			try
 			{
@@ -89,6 +93,27 @@ namespace synthese
 			{
 				throw ActionException("User not found");
 			}
+
+			id = map.getUid(PARAMETER_ACCOUNT, true, FACTORY_KEY);
+			try
+			{
+				_account = AccountTableSync::Get(id);
+				if (_account->getStockAccountId() > 0)
+					_stockAccount = AccountTableSync::Get(_account->getStockAccountId());
+			}
+			catch (Account::ObjectNotFoundException e)
+			{
+				throw ActionException("Account not found");
+			}
+
+			_pieces = map.getInt(PARAMETER_PIECES, false, FACTORY_KEY);
+			_amount = (_pieces != UNKNOWN_VALUE) 
+				? -_pieces * _account->getUnitPrice()
+				: map.getDouble(PARAMETER_AMOUNT, true, FACTORY_KEY);
+
+			_name = (_pieces != UNKNOWN_VALUE)
+				? "Vente " + Conversion::ToString(_pieces) + " x " + _account->getName()
+				: "Reglement " + _account->getName();
 		}
 		
 		
@@ -101,7 +126,7 @@ namespace synthese
 			ft->setStartDateTime(now);
 			ft->setEndDateTime(now);
 			ft->setLeftUserId(_user->getKey());
-			ft->setName("Reglement");
+			ft->setName(_name);
 			TransactionTableSync::save(ft.get());
 
 			// Part 1 : customer
@@ -114,9 +139,26 @@ namespace synthese
 			// Part 2 : cash
 			shared_ptr<TransactionPart> ftp2(new TransactionPart);
 			ftp2->setTransactionId(ft->getKey());
-			ftp2->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_CASH_ACCOUNT_CODE)->getKey());
+			ftp2->setAccountId(_account->getKey());
 			ftp2->setAmount(-_amount);
 			TransactionPartTableSync::save(ftp2.get());
+
+			if (_pieces != UNKNOWN_VALUE && _stockAccount.get())
+			{
+				// Part 3 : stock
+				TransactionPart	ftp3;
+				ftp3.setTransactionId(ft->getKey());
+				ftp3.setAccountId(_stockAccount->getKey());
+				ftp3.setAmount(-_pieces);
+				TransactionPartTableSync::save(&ftp3);
+
+				// Part 4 : charge
+				TransactionPart ftp4;
+				ftp4.setTransactionId(ft->getKey());
+				ftp4.setAccountId(VinciBikeRentalModule::getStockChargeAccount()->getKey());
+				ftp4.setAmount(_pieces);
+				TransactionPartTableSync::save(&ftp4);
+			}
 		}
 
 		void VinciAddFinancialAction::setUser( boost::shared_ptr<const security::User> user )

@@ -110,6 +110,8 @@ namespace synthese
 			*/
 			static std::string ToSQLiteString (const std::string& s, bool withApostrophes=true);
 
+			static std::string ToFixedSizeString(int number, int size);
+
 		};
 	}
 }

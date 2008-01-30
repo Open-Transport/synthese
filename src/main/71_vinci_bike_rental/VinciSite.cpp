@@ -31,6 +31,8 @@ namespace synthese
 	{
 		VinciSite::VinciSite()
 			: Registrable<uid, VinciSite>()
+			, _locked(false)
+			, _parentSiteId(UNKNOWN_VALUE)
 		{ }
 
 
@@ -62,6 +64,26 @@ namespace synthese
 		const std::string& VinciSite::getPhone() const
 		{
 			return _phone;
+		}
+
+		void VinciSite::setLocked( bool value )
+		{
+			_locked = value;
+		}
+
+		void VinciSite::setParentSiteId( uid value )
+		{
+			_parentSiteId = value;
+		}
+
+		bool VinciSite::getLocked() const
+		{
+			return _locked;
+		}
+
+		uid VinciSite::getParentSiteId() const
+		{
+			return _parentSiteId;
 		}
 	}
 }

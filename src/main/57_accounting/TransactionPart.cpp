@@ -90,5 +90,15 @@ namespace synthese
 			setLeftCurrencyAmount(amount);
 			setRightCurrencyAmount(amount);
 		}
+
+		uid TransactionPart::getStockId() const
+		{
+			return _stockId;
+		}
+
+		void TransactionPart::setStockId( uid id )
+		{
+			_stockId = id;
+		}
 	}
 }

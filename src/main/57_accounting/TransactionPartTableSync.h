@@ -62,6 +62,7 @@ namespace synthese
 			static const std::string TABLE_COL_RATE_ID;
 			static const std::string TABLE_COL_TRADED_OBJECT_ID;
 			static const std::string TABLE_COL_COMMENT;
+			static const std::string COL_STOCK_ID;
 
 			TransactionPartTableSync();
 

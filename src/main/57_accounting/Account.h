@@ -58,19 +58,25 @@ namespace synthese
 			std::string		_rightClassNumber;
 			const Currency*	_rightCurrency;
 			std::string		_name;
+			bool			_locked;
+			uid				_stockAccountId;
+			double			_unitPrice;
 
 		public:
 			Account(uid id=0);
 
-			const uid				getLeftUserId() const;
-			const std::string&		getLeftNumber() const;
-			const std::string&		getLeftClassNumber() const;
-			const Currency*			getLeftCurrency() const;
-			const uid				getRightUserId() const;
-			const std::string&		getRightNumber() const;
-			const std::string&		getRightClassNumber() const;
-			const Currency*			getRightCurrency() const;
-			const std::string&		getName() const;
+			const uid				getLeftUserId()			const;
+			const std::string&		getLeftNumber()			const;
+			const std::string&		getLeftClassNumber()	const;
+			const Currency*			getLeftCurrency()		const;
+			const uid				getRightUserId()		const;
+			const std::string&		getRightNumber()		const;
+			const std::string&		getRightClassNumber()	const;
+			const Currency*			getRightCurrency()		const;
+			const std::string&		getName()				const;
+			bool					getLocked()				const;
+			uid						getStockAccountId()		const;
+			double					getUnitPrice()			const;
 
 			void setLeftUserId(uid id);
 			void setLeftNumber(const std::string& LeftNumber);
@@ -81,6 +87,10 @@ namespace synthese
 			void setRightClassNumber(const std::string& classNumber);
 			void setRightCurrency(const Currency* currency);
 			void setName(const std::string& name);
+			void setLocked(bool value);
+			void setStockAccountId(uid id);
+			void setUnitPrice(double value);
+
 
 		};
 	}

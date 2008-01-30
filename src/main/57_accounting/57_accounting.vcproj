@@ -143,6 +143,42 @@
 			Name="11 Interface elements library"
 			>
 		</Filter>
+		<Filter
+			Name="18 Actions"
+			>
+			<File
+				RelativePath=".\AccountAddAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AccountAddAction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AccountLockAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AccountLockAction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AccountRenameAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AccountRenameAction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AccountUnitPriceUpdateAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AccountUnitPriceUpdateAction.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\AccountingModule.cpp"
 			>

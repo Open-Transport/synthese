@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_VinciSitesAdminInterfaceElement_H__
 #define SYNTHESE_VinciSitesAdminInterfaceElement_H__
 
-#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
@@ -39,14 +39,25 @@ namespace synthese
 			@ingroup m71Admin refAdmin
 			@author Hugues Romain
 			@date 2007
+
+			List of sites :
+				- name
+				- edit
+				- stock alert
+				- parent site
 		*/
 		class VinciSitesAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>
 		{
-			std::vector<boost::shared_ptr<VinciSite> >		_sites;
-			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
+			html::ResultHTMLTable::RequestParameters		_requestParameters;
+			html::ResultHTMLTable::ResultParameters		_resultParameters;
+			std::string											_searchName;
 
 		public:
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_SITE;
+			static const std::string PARAMETER_ALERTS;
+			static const std::string PARAMETER_LOCK;
+
 			VinciSitesAdminInterfaceElement();
 			
 			/** Initialization of the parameters from a parameters map.

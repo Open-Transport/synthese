@@ -1,19 +1,25 @@
 
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
+#include "71_vinci_bike_rental/VinciAccountsAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciCustomerSearchAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciCustomerAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciBikeSearchAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciBikeAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciReportsAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciSitesAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciSiteAdmin.h"
+#include "71_vinci_bike_rental/VinciAccountAdmin.h"
 
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 #include "71_vinci_bike_rental/VinciAntivolTableSync.h"
+#include "71_vinci_bike_rental/VinciStockAlertTableSync.h"
 
+#include "71_vinci_bike_rental/VinciSiteUpdateAction.h"
+#include "71_vinci_bike_rental/VinciSiteAddAction.h"
 #include "71_vinci_bike_rental/VinciAddBike.h"
 #include "71_vinci_bike_rental/AddCustomerAction.h"
 #include "71_vinci_bike_rental/VinciUpdateCustomerAction.h"
@@ -24,6 +30,8 @@
 #include "71_vinci_bike_rental/VinciUpdateBikeAction.h"
 #include "71_vinci_bike_rental/VinciAddFinancialAction.h"
 #include "71_vinci_bike_rental/RemoveCustomerAction.h"
+#include "71_vinci_bike_rental/VinciCreateStockAction.h"
+#include "71_vinci_bike_rental/VinciSiteLoginAction.h"
 
 #include "71_vinci_bike_rental/VinciContractPrintRequest.h"
 #include "71_vinci_bike_rental/BarCodeInterpretFunction.h"
@@ -31,3 +39,5 @@
 #include "71_vinci_bike_rental/VinciPrintedContractInterfacePage.h"
 
 #include "71_vinci_bike_rental/BarCodeHTMLFormValueInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciSitesListInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciCurrentSiteInterfaceElement.h"

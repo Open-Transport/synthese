@@ -54,6 +54,8 @@ namespace synthese
 			vs->setName(rows->getText ( VinciSiteTableSync::COL_NAME));
 			vs->setAddress(rows->getText ( VinciSiteTableSync::COL_ADDRESS));
 			vs->setPhone(rows->getText ( VinciSiteTableSync::COL_PHONE));
+			vs->setLocked(rows->getBool(VinciSiteTableSync::COL_LOCKED));
+			vs->setParentSiteId(rows->getLongLong(VinciSiteTableSync::COL_PARENT_SITE_ID));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::_link(VinciSite* vs, const SQLiteResultSPtr& rows, GetSource temporary)
@@ -78,6 +80,8 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(vs->getName())
 				<< "," << Conversion::ToSQLiteString(vs->getAddress())
 				<< "," << Conversion::ToSQLiteString(vs->getPhone())
+				<< "," << Conversion::ToString(vs->getLocked())
+				<< "," << Conversion::ToString(vs->getParentSiteId())
 				<< ")";
 			
 			sqlite->execUpdate(query.str());
@@ -86,9 +90,11 @@ namespace synthese
 
 	namespace vinci
 	{
-		const std::string VinciSiteTableSync::COL_NAME = "name";
-		const std::string VinciSiteTableSync::COL_ADDRESS = "address";
-		const std::string VinciSiteTableSync::COL_PHONE = "phone";
+		const string VinciSiteTableSync::COL_NAME("name");
+		const string VinciSiteTableSync::COL_ADDRESS("address");
+		const string VinciSiteTableSync::COL_PHONE("phone");
+		const string VinciSiteTableSync::COL_LOCKED("locked");
+		const string VinciSiteTableSync::COL_PARENT_SITE_ID("parent_site_id");
 
 		VinciSiteTableSync::VinciSiteTableSync()
 			: SQLiteNoSyncTableSyncTemplate<VinciSiteTableSync,VinciSite>()
@@ -97,21 +103,37 @@ namespace synthese
 			addTableColumn(COL_NAME, "TEXT", true);
 			addTableColumn(COL_ADDRESS, "TEXT", true);
 			addTableColumn(COL_PHONE, "TEXT", true);
+			addTableColumn(COL_LOCKED, "INTEGER", true);
+			addTableColumn(COL_PARENT_SITE_ID, "INTEGER", true);
 
 			addTableIndex(COL_NAME);
 		}
 
 
 
-		std::vector<boost::shared_ptr<VinciSite> > VinciSiteTableSync::search( int first /*= 0*/, int number /*= 0 */, bool orderByName/*=true */, bool raisingOrder/*=true */ )
-		{
+		vector<shared_ptr<VinciSite> > VinciSiteTableSync::search(
+			const string& searchName
+			, uid differentUID
+			, int first /*= 0*/
+			, int number /*= 0 */
+			, bool orderByName/*=true */
+			, bool raisingOrder/*=true */
+			, bool withNonListed
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 
 			query
 				<< "SELECT *"
 				<< " FROM "
-				<< TABLE_NAME;
+					<< TABLE_NAME
+				<< " WHERE "
+					<< COL_NAME << " LIKE " << Conversion::ToSQLiteString(searchName)
+				;
+			if (!withNonListed)
+				query << " AND " << COL_LOCKED << "=0";
+			if (differentUID != UNKNOWN_VALUE)
+				query << " AND " << TABLE_COL_ID << "!=" << Conversion::ToString(differentUID);
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 

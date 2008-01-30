@@ -56,16 +56,20 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::load(Account* account, const db::SQLiteResultSPtr& rows )
 		{
-			    account->setKey(rows->getLongLong (TABLE_COL_ID));
-			
-				account->setLeftClassNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER));
-			    account->setLeftNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_NUMBER));
-			    account->setLeftUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_LEFT_USER_ID));
-			    account->setRightClassNumber(rows->getText ( AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER));
+		    account->setKey(rows->getLongLong (TABLE_COL_ID));
+		
+			account->setLeftClassNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER));
+		    account->setLeftNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_NUMBER));
+		    account->setLeftUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_LEFT_USER_ID));
+		    account->setRightClassNumber(rows->getText ( AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER));
 
-			    account->setRightNumber(rows->getText ( AccountTableSync::TABLE_COL_RIGHT_NUMBER));
-			    account->setRightUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_RIGHT_USER_ID));
-			    account->setName(rows->getText ( AccountTableSync::TABLE_COL_NAME));
+		    account->setRightNumber(rows->getText ( AccountTableSync::TABLE_COL_RIGHT_NUMBER));
+		    account->setRightUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_RIGHT_USER_ID));
+		    account->setName(rows->getText ( AccountTableSync::TABLE_COL_NAME));
+
+			account->setLocked(rows->getBool(AccountTableSync::COL_LOCKED));
+			account->setStockAccountId(rows->getLongLong(AccountTableSync::COL_STOCK_ACCOUNT_ID));
+			account->setUnitPrice(rows->getDouble(AccountTableSync::COL_UNIT_PRICE));
 		}
 
 		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::_link(Account* account, const db::SQLiteResultSPtr& rows, GetSource temporary)
@@ -105,8 +109,8 @@ namespace synthese
 			query
 				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
 				<< Conversion::ToString(account->getKey())
-				<< "," << Conversion::ToString(account->getLeftUserId())
 				<< "," << Conversion::ToSQLiteString(account->getName())
+				<< "," << Conversion::ToString(account->getLeftUserId())
 				<< "," << Conversion::ToSQLiteString(account->getLeftNumber())
 				<< "," << Conversion::ToSQLiteString(account->getLeftClassNumber())
 				<< "," << Conversion::ToString(account->getLeftCurrency()->getKey())
@@ -114,6 +118,9 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(account->getRightNumber())
 				<< "," << Conversion::ToSQLiteString(account->getRightClassNumber())
 				<< "," << Conversion::ToString(account->getRightCurrency()->getKey())
+				<< "," << Conversion::ToString(account->getLocked())
+				<< "," << Conversion::ToString(account->getStockAccountId())
+				<< "," << Conversion::ToString(account->getUnitPrice())
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -121,15 +128,18 @@ namespace synthese
 
 	namespace accounts
 	{
-		const std::string AccountTableSync::TABLE_COL_NAME = "name";
-		const std::string AccountTableSync::TABLE_COL_LEFT_USER_ID = "left_user_id";
-		const std::string AccountTableSync::TABLE_COL_LEFT_NUMBER = "left_number";
-		const std::string AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER = "left_class_number";
-		const std::string AccountTableSync::TABLE_COL_LEFT_CURRENCY_ID = "left_currency_id";
-		const std::string AccountTableSync::TABLE_COL_RIGHT_USER_ID = "right_user_id";
-		const std::string AccountTableSync::TABLE_COL_RIGHT_NUMBER = "right_number";
-		const std::string AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER = "right_class_number";
-		const std::string AccountTableSync::TABLE_COL_RIGHT_CURRENCY_ID = "right_currency_id";
+		const string AccountTableSync::TABLE_COL_NAME = "name";
+		const string AccountTableSync::TABLE_COL_LEFT_USER_ID = "left_user_id";
+		const string AccountTableSync::TABLE_COL_LEFT_NUMBER = "left_number";
+		const string AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER = "left_class_number";
+		const string AccountTableSync::TABLE_COL_LEFT_CURRENCY_ID = "left_currency_id";
+		const string AccountTableSync::TABLE_COL_RIGHT_USER_ID = "right_user_id";
+		const string AccountTableSync::TABLE_COL_RIGHT_NUMBER = "right_number";
+		const string AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER = "right_class_number";
+		const string AccountTableSync::TABLE_COL_RIGHT_CURRENCY_ID = "right_currency_id";
+		const string AccountTableSync::COL_LOCKED("locked");
+		const string AccountTableSync::COL_STOCK_ACCOUNT_ID("stock_account_id");
+		const string AccountTableSync::COL_UNIT_PRICE("unit_price");
 
 
 
@@ -146,12 +156,23 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHT_NUMBER, "TEXT", true);
 			addTableColumn(TABLE_COL_RIGHT_CLASS_NUMBER, "TEXT", true);
 			addTableColumn(TABLE_COL_RIGHT_CURRENCY_ID, "INTEGER", true);
+			addTableColumn(COL_LOCKED, "INTEGER", true);
+			addTableColumn(COL_STOCK_ACCOUNT_ID, "INTEGER", true);
+			addTableColumn(COL_UNIT_PRICE, "REAL", true);
 		}
 
-		std::vector<shared_ptr<Account> > AccountTableSync::search(uid rightUserId
-			, const std::string& rightClassNumber, uid leftUserId, const std::string& leftClassNumber, const std::string name
-			, int first /*= 0*/, int number /*= 0*/ )
-		{
+
+		std::vector<shared_ptr<Account> > AccountTableSync::search(
+			uid rightUserId
+			, const std::string& rightClassNumber
+			, uid leftUserId
+			, const std::string& leftClassNumber
+			, const std::string name
+			, bool orderByName
+			, bool raisingOrder
+			, int first /*= 0*/
+			, int number /*= 0*/
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -160,9 +181,11 @@ namespace synthese
 				<< " WHERE " << TABLE_COL_RIGHT_USER_ID << "=" << Conversion::ToString(rightUserId)
 				<< " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
 				<< " AND (" << TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(leftUserId) << " OR " << TABLE_COL_LEFT_USER_ID << "=0 OR " << TABLE_COL_LEFT_USER_ID << "=\"\")"
-				<< " AND " << TABLE_COL_LEFT_CLASS_NUMBER << " LIKE '%" << Conversion::ToSQLiteString(leftClassNumber, false) << "%'"
-				<< " AND " << TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE '%" << Conversion::ToSQLiteString(rightClassNumber, false) << "%'"
+				<< " AND " << TABLE_COL_LEFT_CLASS_NUMBER << " LIKE '" << Conversion::ToSQLiteString(leftClassNumber, false) << "'"
+				<< " AND " << TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE '" << Conversion::ToSQLiteString(rightClassNumber, false) << "'"
 			;
+			if (orderByName)
+				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -179,6 +202,32 @@ namespace synthese
 					accounts.push_back(account);
 				}
 				return accounts;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+
+		std::string AccountTableSync::GetNextCode( std::string basisCode )
+		{
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT MAX(" << TABLE_COL_RIGHT_CLASS_NUMBER << ") AS nu"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE '" << basisCode << "%'";
+			try
+			{
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				int nextCode(1);
+				if (rows->next() && !rows->getText("nu").empty())
+				{
+					string number(rows->getText("nu"));
+					number = number.substr(basisCode.size());
+					nextCode = Conversion::ToInt(number) + 1;
+				}
+				return basisCode + Conversion::ToFixedSizeString(nextCode, 5);
 			}
 			catch(SQLiteException& e)
 			{

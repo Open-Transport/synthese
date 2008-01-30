@@ -22,7 +22,11 @@
 
 #include "57_accounting/AccountingModule.h"
 
+#include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -38,5 +42,21 @@ namespace synthese
 		{
 
 		}
+
+		std::vector<std::pair<uid, std::string> > AccountingModule::getAccountsName(
+			uid rightUserId
+			, const std::string& className
+			, bool emptyLine
+		){
+			string emptyString("%");
+			vector<shared_ptr<Account> > accountss(AccountTableSync::search(rightUserId, className, UNKNOWN_VALUE, emptyString));
+			vector<pair<uid, string> > result;
+			if (emptyLine)
+				result.push_back(make_pair(UNKNOWN_VALUE, string()));
+			for (vector<shared_ptr<Account> >::const_iterator it(accountss.begin()); it != accountss.end(); ++it)
+				result.push_back(make_pair((*it)->getKey(), (*it)->getName()));
+			return result;
+		}
+
 	}
 }

@@ -24,11 +24,19 @@
 
 #include "71_vinci_bike_rental/VinciSitesAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
+#include "71_vinci_bike_rental/VinciSite.h"
+#include "71_vinci_bike_rental/VinciRight.h"
+#include "71_vinci_bike_rental/VinciSiteAddAction.h"
+#include "71_vinci_bike_rental/VinciSiteAdmin.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/HomeAdmin.h"
+#include "32_admin/AdminRequest.h"
+
+#include "30_server/ActionFunctionRequest.h"
 
 #include "05_html/ActionResultHTMLTable.h"
+#include "05_html/SearchFormHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -39,6 +47,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace vinci;
+	using namespace security;
+	using namespace html;
 
 	namespace util
 	{
@@ -57,13 +67,19 @@ namespace synthese
 
 	namespace vinci
 	{
-		/// @todo Verify the parent constructor parameters
+		const std::string VinciSitesAdminInterfaceElement::PARAMETER_NAME("na");
+		const std::string VinciSitesAdminInterfaceElement::PARAMETER_SITE("si");
+		const std::string VinciSitesAdminInterfaceElement::PARAMETER_ALERTS("al");
+		const std::string VinciSitesAdminInterfaceElement::PARAMETER_LOCK("lo");
+
+
 		VinciSitesAdminInterfaceElement::VinciSitesAdminInterfaceElement()
 			: AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>() {}
 
 		void VinciSitesAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			_sites = VinciSiteTableSync::search();
+			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
+			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), string(), 30);
 		}
 
 		string VinciSitesAdminInterfaceElement::getTitle() const
@@ -73,13 +89,85 @@ namespace synthese
 
 		void VinciSitesAdminInterfaceElement::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
+			// Requests
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<VinciSitesAdminInterfaceElement>();
 
+			ActionFunctionRequest<VinciSiteAddAction,AdminRequest> addRequest(request);
+			addRequest.getFunction()->setPage<VinciSiteAdmin>();
+			addRequest.getFunction()->setActionFailedPage<VinciSitesAdminInterfaceElement>();
+
+			FunctionRequest<AdminRequest> goRequest(request);
+			goRequest.getFunction()->setPage<VinciSiteAdmin>();
+
+			// Search
+			vector<shared_ptr<VinciSite> > sites(
+				VinciSiteTableSync::search(
+					"%"+_searchName+"%"
+					, UNKNOWN_VALUE
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAMETER_NAME
+					, _requestParameters.raisingOrder
+			)	);
+
+			// HTML search form
+			stream << "<h1>Recherche</h1>";
+			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
+			stream << st.open();
+			stream << st.cell("Nom", st.getForm().getTextInput(PARAMETER_NAME, _searchName));
+			stream << st.close();
+
+			// Results list
+			stream << "<h1>Sites</h1>";
+
+			ResultHTMLTable::ResultParameters p(ResultHTMLTable::getParameters(_requestParameters, sites));
+
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(PARAMETER_NAME, "Nom"));
+			h.push_back(make_pair(PARAMETER_SITE, "Site d'alimentation"));
+			h.push_back(make_pair(PARAMETER_ALERTS, "Alerte Stock"));
+			h.push_back(make_pair(string(), "Edition"));
+			h.push_back(make_pair(PARAMETER_LOCK, "Liste"));
+
+			ResultHTMLTable t(h, st.getForm(), _requestParameters, p);
+			stream << t.open();
+
+			for (vector<shared_ptr<VinciSite> >::const_iterator it(sites.begin()); it != sites.end(); ++it)
+			{
+				goRequest.setObjectId((*it)->getKey());
+
+				
+				stream << t.row();
+				stream << t.col() << (*it)->getName();
+				stream << t.col();
+				if ((*it)->getParentSiteId() > 0)
+				{
+					shared_ptr<const VinciSite> parentSite(VinciSiteTableSync::Get((*it)->getParentSiteId()));
+					stream << parentSite->getName();
+				}
+				else
+					stream << "AUCUN";
+
+				stream << t.col();
+				stream << t.col() << HTMLModule::getLinkButton(goRequest.getURL(), "Ouvrir", string(), "building_edit.png");
+				stream << t.col() << ((*it)->getLocked() ? "NON" : "OUI");
+			}
+
+			HTMLForm af(addRequest.getHTMLForm("add"));
+
+			stream << t.row();
+			stream << t.col() << af.open();
+			stream << af.getTextInput(VinciSiteAddAction::PARAMETER_NAME, string(), "(entrer le nom du site ici)");
+			stream << af.getSubmitButton("Ajouter");
+			stream << af.close();
+
+			stream << t.close();
 		}
 
 		bool VinciSitesAdminInterfaceElement::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			/// @todo Implement the right control;
-			return false;
+			return request->isAuthorized<VinciRight>(READ);
 		}
 	}
 }

@@ -71,6 +71,7 @@ namespace synthese
 			tp->setRightCurrencyAmount (rows->getDouble ( TransactionPartTableSync::TABLE_COL_RIGHT_CURRENCY_AMOUNT));
 			tp->setRateId (rows->getLongLong ( TransactionPartTableSync::TABLE_COL_RATE_ID));
 			tp->setTradedObjectId (rows->getText ( TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID));
+			tp->setStockId(rows->getLongLong(TransactionPartTableSync::COL_STOCK_ID));
 		}
 
 
@@ -104,6 +105,7 @@ namespace synthese
 					<< "," << Conversion::ToString(tp->getRateId())
 					<< "," << Conversion::ToSQLiteString(tp->getTradedObjectId())
 					<< "," << Conversion::ToSQLiteString(tp->getComment())
+					<< "," << Conversion::ToString(tp->getStockId())
 					<< ')';
 				sqlite->execUpdate(query.str());
 			}
@@ -125,6 +127,7 @@ namespace synthese
 		const std::string TransactionPartTableSync::TABLE_COL_RATE_ID = "rate_id";
 		const std::string TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID = "traded_object";
 		const std::string TransactionPartTableSync::TABLE_COL_COMMENT = "comment";
+		const string TransactionPartTableSync::COL_STOCK_ID("stock_id");
 
 		TransactionPartTableSync::TransactionPartTableSync()
 			: SQLiteNoSyncTableSyncTemplate<TransactionPartTableSync,TransactionPart>()
@@ -138,11 +141,13 @@ namespace synthese
 			addTableColumn(TABLE_COL_RATE_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_TRADED_OBJECT_ID, "TEXT", true);
 			addTableColumn(TABLE_COL_COMMENT, "TEXT", true);
+			addTableColumn(COL_STOCK_ID, "INTEGER", true);
 
 			// Indexes
 			addTableIndex(TABLE_COL_TRANSACTION_ID);
 			addTableIndex(TABLE_COL_ACCOUNT_ID);
 			addTableIndex(TABLE_COL_TRADED_OBJECT_ID);
+			addTableIndex(COL_STOCK_ID);
 		}
 
 

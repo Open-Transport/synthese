@@ -7,6 +7,9 @@
 
 #include "57_accounting/Currency.h"
 
+#include <vector>
+#include <utility>
+
 namespace synthese
 {
 	/** @defgroup m57 37 Accounting
@@ -24,6 +27,12 @@ namespace synthese
 		{
 		public:
 			void initialize();
+
+			static std::vector<std::pair<uid, std::string> > getAccountsName(
+				uid rightUserId
+				, const std::string& className
+				, bool emptyLine
+			);
 
 		};
 	}

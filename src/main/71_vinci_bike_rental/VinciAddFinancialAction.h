@@ -45,12 +45,18 @@ namespace synthese
 			: public util::FactorableTemplate<server::Action, VinciAddFinancialAction>
 		{
 		public:
+			static const std::string PARAMETER_ACCOUNT;
 			static const std::string PARAMETER_AMOUNT;
 			static const std::string PARAMETER_USER;
+			static const std::string PARAMETER_PIECES;
 
 		private:
-			double _amount;
-			boost::shared_ptr<const security::User> _user;
+			double										_amount;
+			int											_pieces;
+			boost::shared_ptr<const security::User>		_user;
+			boost::shared_ptr<const accounts::Account>	_account;
+			boost::shared_ptr<const accounts::Account>	_stockAccount;
+			std::string									_name;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

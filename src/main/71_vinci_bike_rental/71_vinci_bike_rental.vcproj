@@ -105,6 +105,14 @@
 				RelativePath=".\VinciSite.h"
 				>
 			</File>
+			<File
+				RelativePath=".\VinciStockAlert.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciStockAlert.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
@@ -157,10 +165,26 @@
 				RelativePath=".\VinciSiteTableSync.h"
 				>
 			</File>
+			<File
+				RelativePath=".\VinciStockAlertTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciStockAlertTableSync.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="14 Admin Interface elements"
 			>
+			<File
+				RelativePath=".\VinciAccountAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciAccountAdmin.h"
+				>
+			</File>
 			<File
 				RelativePath=".\VinciAccountsAdminInterfaceElement.cpp"
 				>
@@ -210,11 +234,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\VinciSiteAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciSiteAdmin.h"
+				>
+			</File>
+			<File
 				RelativePath=".\VinciSitesAdminInterfaceElement.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\VinciSitesAdminInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciStockAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciStockAdmin.h"
 				>
 			</File>
 		</Filter>
@@ -325,6 +365,54 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Stock"
+				>
+				<File
+					RelativePath=".\VinciCreateStockAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciCreateStockAction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciStockAlertAdd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciStockAlertAdd.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Site"
+				>
+				<File
+					RelativePath=".\VinciSiteAddAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciSiteAddAction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciSiteLoginAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciSiteLoginAction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciSiteUpdateAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciSiteUpdateAction.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="18 Functions"
@@ -360,10 +448,22 @@
 					RelativePath=".\BarCodeHTMLFormValueInterfaceElement.h"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="Interface elements library"
-				>
+				<File
+					RelativePath=".\VinciCurrentSiteInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciCurrentSiteInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciSitesListInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciSitesListInterfaceElement.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Interface pages"
@@ -377,6 +477,18 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="12 Rights"
+			>
+			<File
+				RelativePath=".\VinciRight.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciRight.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\LICENSE.txt"

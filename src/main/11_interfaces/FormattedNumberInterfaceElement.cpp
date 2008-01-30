@@ -27,8 +27,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/StaticValueInterfaceElement.h"
 
-#include <complex>
-
 #include "01_util/Conversion.h"
 
 using namespace std;
@@ -87,12 +85,7 @@ namespace synthese
 			int numbers = Conversion::ToInt(__Format);
 			if (numbers > 0)
 			{
-				for (; numbers; numbers--)
-				{
-					if (__Nombre < pow(10.0, numbers - 1))
-						s << "0";
-				}
-				s << __Nombre;
+				s << Conversion::ToFixedSizeString(__Nombre, numbers);
 				return string();
 			}
 
