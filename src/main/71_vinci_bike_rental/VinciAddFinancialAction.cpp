@@ -31,6 +31,7 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/ParametersMap.h"
+#include "30_server/Request.h"
 
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
@@ -114,6 +115,8 @@ namespace synthese
 			_name = (_pieces != UNKNOWN_VALUE)
 				? "Vente " + Conversion::ToString(_pieces) + " x " + _account->getName()
 				: "Reglement " + _account->getName();
+
+			_stockId = VinciBikeRentalModule::GetSessionSite(_request->getSession());
 		}
 		
 		
@@ -150,6 +153,7 @@ namespace synthese
 				ftp3.setTransactionId(ft->getKey());
 				ftp3.setAccountId(_stockAccount->getKey());
 				ftp3.setAmount(-_pieces);
+				ftp3.setStockId(_stockId);
 				TransactionPartTableSync::save(&ftp3);
 
 				// Part 4 : charge

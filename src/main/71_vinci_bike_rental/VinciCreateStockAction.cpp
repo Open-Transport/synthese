@@ -88,7 +88,7 @@ namespace synthese
 		{
 			Account a;
 			a.setName("Stock : "+ _account->getName());
-			a.setRightClassNumber(VinciBikeRentalModule::VINCI_STOCK_CODE + _account->getRightClassNumber().substr(1));
+			a.setRightClassNumber(VinciBikeRentalModule::VINCI_STOCK_CODE_PREFIX + _account->getRightClassNumber().substr(1));
 			a.setRightUserId(_account->getRightUserId());
 			a.setRightCurrency(VinciBikeRentalModule::getObjectCurrency().get());
 			a.setLeftCurrency(VinciBikeRentalModule::getObjectCurrency().get());

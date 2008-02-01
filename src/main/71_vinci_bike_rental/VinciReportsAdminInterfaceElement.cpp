@@ -150,10 +150,10 @@ namespace synthese
 		void VinciReportsAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
 			_startDate = map.getDate(PARAM_START_DATE, false, FACTORY_KEY);
-			if (!_startDate.isUnknown())
+			if (_startDate.isUnknown())
 				_startDate = Date(TIME_CURRENT);
 			_endDate = map.getDate(PARAM_END_DATE, false, FACTORY_KEY);
-			if (!_endDate.isUnknown())
+			if (_endDate.isUnknown())
 				_endDate = Date(TIME_CURRENT);
             _resultsPerDay = getRentsPerDay(_startDate, _endDate);
 			_resultsPerRate = getRentsPerRate(_startDate, _endDate);

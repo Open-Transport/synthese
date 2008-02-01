@@ -48,6 +48,8 @@ namespace synthese
 			static const std::string COL_ACCOUNT_ID;
 			static const std::string COL_MIN_ALERT;
 			static const std::string COL_MAX_ALERT;
+
+			static const std::string COL_STOCK_SIZE;
 			
 			VinciStockAlertTableSync();
 

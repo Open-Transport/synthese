@@ -27,6 +27,8 @@
 #include "VinciStockAlertTableSync.h"
 #include "VinciStockAlert.h"
 
+#include "57_accounting/TransactionPartTableSync.h"
+
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
@@ -42,6 +44,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace vinci;
+	using namespace accounts;
 
 	namespace util
 	{
@@ -69,6 +72,9 @@ namespace synthese
 			object->setAccountId(rows->getLongLong(VinciStockAlertTableSync::COL_ACCOUNT_ID));
 			object->setMinAlert(rows->getDouble(VinciStockAlertTableSync::COL_MIN_ALERT));
 			object->setMaxAlert(rows->getDouble(VinciStockAlertTableSync::COL_MAX_ALERT));
+
+			// Results
+			object->setStockSize(rows->getDouble(VinciStockAlertTableSync::COL_STOCK_SIZE));
 		}
 
 
@@ -118,6 +124,7 @@ namespace synthese
 		const string VinciStockAlertTableSync::COL_MIN_ALERT("min_alert");
 		const string VinciStockAlertTableSync::COL_MAX_ALERT("max_alert");
 
+		const string VinciStockAlertTableSync::COL_STOCK_SIZE("stock_size");
 
 
 		VinciStockAlertTableSync::VinciStockAlertTableSync()
@@ -146,7 +153,9 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
+				<< ", SUM(tp." << TransactionPartTableSync::TABLE_COL_LEFT_CURRENCY_AMOUNT << ") AS " << COL_STOCK_SIZE
 				<< " FROM " << TABLE_NAME
+				<< " INNER JOIN " << TransactionPartTableSync::TABLE_NAME << " AS tp ON tp." << TransactionPartTableSync::COL_STOCK_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
 				<< " WHERE 1 ";
 			if (siteId != UNKNOWN_VALUE)
 			 	query << " AND " << COL_SITE_ID << "=" << siteId;
@@ -154,6 +163,7 @@ namespace synthese
 				query << " AND " << COL_ACCOUNT_ID << "=" << accountId;
 			//if (orderByName)
 			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

@@ -40,6 +40,8 @@ namespace synthese
 			double	_min_alert;
 			double	_max_alert;
 
+			double	_stockSize;
+
 		public:
 			VinciStockAlert();
 
@@ -48,10 +50,14 @@ namespace synthese
 			void setMinAlert(double value);
 			void setMaxAlert(double value);
 
+			void setStockSize(double value);
+
 			uid		getSiteId()		const;
 			uid		getAccountId()	const;
 			double	getMinAlert()	const;
 			double	getMaxAlert()	const;
+
+			double	getStockSize()	const;
 
 		};
 	}

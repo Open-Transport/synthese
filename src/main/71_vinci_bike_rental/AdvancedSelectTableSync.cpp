@@ -29,11 +29,14 @@
 #include "04_time/Date.h"
 
 #include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
 #include "57_accounting/TransactionTableSync.h"
 #include "57_accounting/TransactionPartTableSync.h"
 
 #include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+#include "71_vinci_bike_rental/VinciSiteTableSync.h"
+#include "71_vinci_bike_rental/VinciStockAlertTableSync.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -209,6 +212,60 @@ namespace synthese
 			}
 
 			return m;
+		}
+
+		StocksSize getStocksSize( uid accountId, uid siteId )
+		{
+			SQLite* sqlite = DBModule::GetSQLite();
+
+			stringstream query;
+			query
+				<< " SELECT "
+				<< "tp." << TransactionPartTableSync::COL_STOCK_ID
+				<< ", tp." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID
+				<< ", SUM(tp." << TransactionPartTableSync::TABLE_COL_LEFT_CURRENCY_AMOUNT << ") AS " << VinciStockAlertTableSync::COL_STOCK_SIZE
+				<< ", sa." << VinciStockAlertTableSync::COL_MIN_ALERT
+				<< ", sa." << VinciStockAlertTableSync::COL_MAX_ALERT
+				<< ", asx." << AccountTableSync::COL_UNIT_PRICE
+				<< " FROM " << TransactionPartTableSync::TABLE_NAME << " AS tp"
+				<< " INNER JOIN " << VinciSiteTableSync::TABLE_NAME << " AS s ON s." << TABLE_COL_ID  << "=tp." << TransactionPartTableSync::COL_STOCK_ID
+				<< " INNER JOIN " << AccountTableSync::TABLE_NAME << " AS a ON a." << TABLE_COL_ID << "=tp." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID
+				<< " INNER JOIN " << AccountTableSync::TABLE_NAME << " AS asx ON asx." << AccountTableSync::COL_STOCK_ACCOUNT_ID << "=a." << TABLE_COL_ID
+				<< " LEFT JOIN " << VinciStockAlertTableSync::TABLE_NAME << " AS sa ON sa." << VinciStockAlertTableSync::COL_SITE_ID << "=s." << TABLE_COL_ID << " AND sa." << VinciStockAlertTableSync::COL_ACCOUNT_ID << "=a." << TABLE_COL_ID
+				<< " WHERE 1 ";
+			if (siteId != UNKNOWN_VALUE)
+				query << " AND tp." << TransactionPartTableSync::COL_STOCK_ID << "=" << siteId;
+			if (accountId != UNKNOWN_VALUE)
+				query << " AND tp." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << accountId;
+			//if (orderByName)
+			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			query << " GROUP BY "
+				<< "s." << TABLE_COL_ID
+				<< ",a." << TABLE_COL_ID
+				;
+
+			try
+			{
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				StocksSize objects;
+				while (rows->next ())
+				{
+					StockSizeResult r;
+					r.maxAlert = rows->getDouble("sa."+VinciStockAlertTableSync::COL_MAX_ALERT);
+					r.minAlert = rows->getDouble("sa."+VinciStockAlertTableSync::COL_MIN_ALERT);
+					r.size = rows->getDouble(VinciStockAlertTableSync::COL_STOCK_SIZE);
+					r.unitPrice = rows->getDouble("asx."+AccountTableSync::COL_UNIT_PRICE);
+					pair<uid,uid> p;
+					p.first = rows->getLongLong("tp."+TransactionPartTableSync::TABLE_COL_ACCOUNT_ID);
+					p.second = rows->getLongLong("tp."+TransactionPartTableSync::COL_STOCK_ID);
+					objects.insert(make_pair(p, r));
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
 		}
 	}
 }

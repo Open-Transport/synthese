@@ -27,6 +27,11 @@
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
 #include "71_vinci_bike_rental/VinciSite.h"
 #include "71_vinci_bike_rental/VinciSiteUpdateAction.h"
+#include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
+#include "71_vinci_bike_rental/VinciStockFullfillAction.h"
+
+#include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
@@ -48,6 +53,7 @@ namespace synthese
 	using namespace util;
 	using namespace vinci;
 	using namespace html;
+	using namespace accounts;
 
 	namespace util
 	{
@@ -96,6 +102,11 @@ namespace synthese
 			updateRequest.getFunction()->setPage<VinciSiteAdmin>();
 			updateRequest.setObjectId(_site->getKey());
 
+			ActionFunctionRequest<VinciStockFullfillAction,AdminRequest> fRequest(request);
+			fRequest.getFunction()->setPage<VinciSiteAdmin>();
+			fRequest.setObjectId(_site->getKey());
+			fRequest.getAction()->setSite(_site);
+
 			// Output
 			HTMLForm uf(updateRequest.getHTMLForm("update"));
 
@@ -136,11 +147,53 @@ namespace synthese
 			
 			stream << ut.close() << uf.close();
 
-			stream << "<h1>Stocks suivis</h1>";
+			stream << "<h1>Stocks</h1>";
+			StocksSize ss(getStocksSize(UNKNOWN_VALUE, _site->getKey()));
 
-			stream << "<h1>Autres stocks</h1>";
+			HTMLTable::ColsVector sv;
+			sv.push_back("Produit");
+			sv.push_back("Nombre de pièces");
+			sv.push_back("Prix unitaire");
+			sv.push_back("Valeur totale");
+			sv.push_back("Approvisionnement");
+			//			sv.push_back("Alerte");
+			HTMLTable tv(sv);
+			stream << tv.open();
+			double amount(0);
 
-			stream << "<h1>Derniers mouvements de stock</h1>";
+			for (StocksSize::const_iterator it(ss.begin()); it != ss.end(); ++it)
+			{
+				amount += it->second.unitPrice * it->second.size;
+				shared_ptr<const Account> si(AccountTableSync::Get(it->first.first));
+				fRequest.getAction()->setAccount(si);
+				stream << tv.row();
+				stream << tv.col();
+				stream << si->getName();
+				stream << tv.col();
+				stream << it->second.size;
+				stream << tv.col();
+				stream << it->second.unitPrice;
+				stream << tv.col();
+				stream << (it->second.unitPrice * it->second.size);
+				stream << tv.col();
+
+				HTMLForm f(fRequest.getHTMLForm("f"+Conversion::ToString(si->getKey())));
+				stream << f.open();
+				stream << f.getTextInput(VinciStockFullfillAction::PARAMETER_PIECES, string());
+				stream << f.getSubmitButton("Approvisionner");
+				stream << f.close();
+				/*				if ((*it)->getMinAlert() > 0 && it->second.size < (*it)->getMinAlert())
+				stream << "ALERTE BAS";
+				if ((*it)->getMaxAlert() > 0 && (*it)->getStockSize() > (*it)->getMaxAlert())
+				stream << "ALERTE HAUT";
+				*/			}
+			stream << tv.row();
+			stream << tv.col(3) << "TOTAL";
+			stream << tv.col() << amount;
+			stream << tv.col();
+
+			stream << tv.close();
+
 		}
 
 		bool VinciSiteAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const

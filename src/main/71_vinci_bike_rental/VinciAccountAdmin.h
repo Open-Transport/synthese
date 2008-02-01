@@ -27,8 +27,15 @@
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
+#include "05_html/ResultHTMLTable.h"
+
 namespace synthese
 {
+	namespace accounts
+	{
+		class Account;
+	}
+
 	namespace vinci
 	{
 		/** VinciAccountAdmin Class.
@@ -38,6 +45,8 @@ namespace synthese
 		*/
 		class VinciAccountAdmin : public admin::AdminInterfaceElementTemplate<VinciAccountAdmin>
 		{
+			boost::shared_ptr<const accounts::Account>	_account;
+
 		public:
 			VinciAccountAdmin();
 			

@@ -73,9 +73,11 @@ namespace synthese
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE = "4117";
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE = "4119";
 		
+		const std::string VinciBikeRentalModule::VINCI_STOCK_CODE_PREFIX("3");
 		const std::string VinciBikeRentalModule::VINCI_STOCK_CODE("3%");
 		const std::string VinciBikeRentalModule::VINCI_AVAILABLE_BIKES_STOCKS_ACCOUNT_CODE = "30831";
 
+		const std::string VinciBikeRentalModule::VINCI_SERVICES_CODE_PREFIX("7");
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_CODE("7%");
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE = "70831";
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE = "70832";
@@ -369,7 +371,7 @@ namespace synthese
 				_stockChargeAccount.reset(new Account);
 			else
 				_stockChargeAccount = accounts.front();
-			_stockChargeAccount->setRightClassNumber(VINCI_AVAILABLE_BIKES_STOCKS_ACCOUNT_CODE);
+			_stockChargeAccount->setRightClassNumber(VINCI_CHARGE_STOCK_CHANGE_CODE);
 			_stockChargeAccount->setRightCurrency(_objectCurrency.get());
 			_stockChargeAccount->setLeftCurrency(_objectCurrency.get());
 			_stockChargeAccount->setRightUserId(_vinciUser->getKey());

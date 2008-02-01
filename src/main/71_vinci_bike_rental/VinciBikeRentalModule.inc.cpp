@@ -32,6 +32,7 @@
 #include "71_vinci_bike_rental/RemoveCustomerAction.h"
 #include "71_vinci_bike_rental/VinciCreateStockAction.h"
 #include "71_vinci_bike_rental/VinciSiteLoginAction.h"
+#include "71_vinci_bike_rental/VinciStockFullfillAction.h"
 
 #include "71_vinci_bike_rental/VinciContractPrintRequest.h"
 #include "71_vinci_bike_rental/BarCodeInterpretFunction.h"

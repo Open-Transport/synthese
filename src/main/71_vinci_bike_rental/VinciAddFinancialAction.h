@@ -56,6 +56,7 @@ namespace synthese
 			boost::shared_ptr<const security::User>		_user;
 			boost::shared_ptr<const accounts::Account>	_account;
 			boost::shared_ptr<const accounts::Account>	_stockAccount;
+			uid											_stockId;
 			std::string									_name;
 
 		protected:

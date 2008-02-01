@@ -76,5 +76,15 @@ namespace synthese
 		{
 			return _max_alert;
 		}
+
+		double VinciStockAlert::getStockSize() const
+		{
+			return _stockSize;
+		}
+
+		void VinciStockAlert::setStockSize( double value )
+		{
+			_stockSize = value;
+		}
 	}
 }

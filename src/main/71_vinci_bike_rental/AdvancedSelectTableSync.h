@@ -44,6 +44,10 @@ namespace synthese
 		std::map<std::pair<time::Date, const VinciRate*>, RentReportResult> getRentsPerRatePerDay(const time::Date& start, const time::Date& end);
 		std::map<uid, RentReportResult> getRentsPerRate(const time::Date& start, const time::Date& end);
 
+		struct StockSizeResult { double size; double minAlert; double maxAlert; double unitPrice; };
+		typedef std::map<std::pair<uid,uid>, StockSizeResult> StocksSize;
+		StocksSize getStocksSize(uid accountId, uid siteId);
+
 		/** @} */
 	}
 }

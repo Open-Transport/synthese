@@ -1,6 +1,6 @@
 
-/** AccountLockAction class header.
-	@file AccountLockAction.h
+/** VinciStockFullfillAction class header.
+	@file VinciStockFullfillAction.h
 	@author Hugues Romain
 	@date 2008
 
@@ -22,8 +22,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_AccountLockAction_H__
-#define SYNTHESE_AccountLockAction_H__
+#ifndef SYNTHESE_VinciStockFullfillAction_H__
+#define SYNTHESE_VinciStockFullfillAction_H__
 
 #include "30_server/Action.h"
 
@@ -34,17 +34,27 @@ namespace synthese
 	namespace accounts
 	{
 		class Account;
+	}
 
-		/** AccountLockAction action class.
-			@ingroup m57Actions refActions
+	namespace vinci
+	{
+		class VinciSite;
+
+		/** VinciStockFullfillAction action class.
+			@ingroup m71Actions refActions
 		*/
-		class AccountLockAction
-			: public util::FactorableTemplate<server::Action, AccountLockAction>
+		class VinciStockFullfillAction
+			: public util::FactorableTemplate<server::Action, VinciStockFullfillAction>
 		{
 		public:
+			static const std::string PARAMETER_SITE_ID;
+			static const std::string PARAMETER_ACCOUNT_ID;
+			static const std::string PARAMETER_PIECES;
 
 		private:
-			boost::shared_ptr<Account>	_account;
+			boost::shared_ptr<const VinciSite>			_site;
+			boost::shared_ptr<const accounts::Account>	_account;
+			double										_pieces;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -64,9 +74,12 @@ namespace synthese
 			*/
 			void run();
 			
-			AccountLockAction();
+			VinciStockFullfillAction();
+
+			void setSite(boost::shared_ptr<const VinciSite> site);
+			void setAccount(boost::shared_ptr<const accounts::Account> account);
 		};
 	}
 }
 
-#endif // SYNTHESE_AccountLockAction_H__
+#endif // SYNTHESE_VinciStockFullfillAction_H__

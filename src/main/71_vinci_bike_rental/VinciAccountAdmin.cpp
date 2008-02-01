@@ -25,9 +25,23 @@
 #include "VinciAccountAdmin.h"
 #include "VinciAccountsAdminInterfaceElement.h"
 
+#include "71_vinci_bike_rental/VinciStockAlert.h"
+#include "71_vinci_bike_rental/VinciStockAlertTableSync.h"
+#include "71_vinci_bike_rental/VinciSite.h"
+#include "71_vinci_bike_rental/VinciSiteTableSync.h"
+#include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
+
+#include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
+
 #include "32_admin/AdminParametersException.h"
 
+#include "30_server/QueryString.h"
+
+#include "05_html/HTMLTable.h"
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -36,6 +50,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace vinci;
+	using namespace accounts;
+	using namespace html;
 
 	namespace util
 	{
@@ -61,20 +77,48 @@ namespace synthese
 
 		void VinciAccountAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
-			// Exception example:
-			// throw AdminParametersException("Parameter not found");
+			try
+			{
+				_account = AccountTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			}
+			catch (...)
+			{
+				throw AdminParametersException("Account not found");
+			}
 		}
 
 		string VinciAccountAdmin::getTitle() const
 		{
-			/// @todo Change the title of the page
-			return "title";
+			return "Produit " + (_account.get() ? _account->getName() : "");
 		}
 
 		void VinciAccountAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
-			/// @todo Implement the display by streaming the output to the stream variable
+			stream << "<h1>Stocks</h1>";
+			StocksSize ss(getStocksSize(_account->getKey(), UNKNOWN_VALUE));
+
+			HTMLTable::ColsVector sv;
+			sv.push_back("Site");
+			sv.push_back("Nombre de pièces");
+//			sv.push_back("Alerte");
+			HTMLTable tv(sv);
+			stream << tv.open();
+
+			for (StocksSize::const_iterator it(ss.begin()); it != ss.end(); ++it)
+			{
+				shared_ptr<const VinciSite> si(VinciSiteTableSync::Get(it->first.second));
+				stream << tv.row();
+				stream << tv.col();
+				stream << si->getName();
+				stream << tv.col();
+				stream << it->second.size;
+				stream << tv.col();
+/*				if ((*it)->getMinAlert() > 0 && it->second.size < (*it)->getMinAlert())
+					stream << "ALERTE BAS";
+				if ((*it)->getMaxAlert() > 0 && (*it)->getStockSize() > (*it)->getMaxAlert())
+					stream << "ALERTE HAUT";
+*/			}
+			stream << tv.close();
 		}
 
 		bool VinciAccountAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const

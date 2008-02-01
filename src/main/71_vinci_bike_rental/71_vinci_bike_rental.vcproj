@@ -384,6 +384,14 @@
 					RelativePath=".\VinciStockAlertAdd.h"
 					>
 				</File>
+				<File
+					RelativePath=".\VinciStockFullfillAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciStockFullfillAction.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Site"

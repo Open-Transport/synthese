@@ -34,6 +34,7 @@
 #include "57_accounting/AccountAddAction.h"
 #include "57_accounting/AccountRenameAction.h"
 #include "57_accounting/AccountUnitPriceUpdateAction.h"
+#include "57_accounting/AccountLockAction.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/HomeAdmin.h"
@@ -94,7 +95,7 @@ namespace synthese
 
 		string VinciAccountsAdminInterfaceElement::getTitle() const
 		{
-			return "Comptes";
+			return "Produits";
 		}
 
 		void VinciAccountsAdminInterfaceElement::display(ostream& stream, VariablesMap & variables, const FunctionRequest<AdminRequest>* request) const
@@ -121,6 +122,9 @@ namespace synthese
 
 			FunctionRequest<AdminRequest> openStockRequest(request);
 			openStockRequest.getFunction()->setPage<VinciAccountAdmin>();
+
+			ActionFunctionRequest<AccountLockAction,AdminRequest> lockRequest(request);
+			lockRequest.getFunction()->setPage<VinciAccountsAdminInterfaceElement>();
 
 			// Search of the results
 			string emptyString;
@@ -173,9 +177,10 @@ namespace synthese
 			for (vector<shared_ptr<Account> >::const_iterator it = salesSearchResult.begin(); it != salesSearchResult.end(); ++it)
 			{
 				createStockRequest.setObjectId((*it)->getKey());
-				openStockRequest.setObjectId((*it)->getKey());
+				openStockRequest.setObjectId((*it)->getStockAccountId());
 				unitPriceRequest.setObjectId((*it)->getKey());
 				renameRequest.setObjectId((*it)->getKey());
+				lockRequest.setObjectId((*it)->getKey());
 
 				stream << t.row();
 				stream << t.col();
@@ -209,7 +214,7 @@ namespace synthese
 				stream << t.col() << (((*it)->getStockAccountId() > 0) 
 					? "OUI : " + HTMLModule::getLinkButton(openStockRequest.getURL(), "Ouvrir", string(), "cart_go.png")
 					: "NON : " +((*it)->getLocked() ? "" : HTMLModule::getLinkButton(createStockRequest.getURL(), "Activer", string(), "cart_add.png")));
-				stream << t.col() << ((*it)->getLocked() ? "NON" : "OUI : Supprimer");
+				stream << t.col() << ((*it)->getLocked() ? "NON" : "OUI : " + HTMLModule::getLinkButton(lockRequest.getURL(), "Supprimer", "E^tes-vous sûr de vouloir supprimer le compte ? (cette opération est définitive)", "cart_delete.png"));
 			}
 
 			// New account
@@ -241,11 +246,19 @@ namespace synthese
 			for (vector<shared_ptr<Account> >::const_iterator it = changeSearchResult.begin(); it != changeSearchResult.end(); ++it)
 			{
 				stream << tc.row();
-				stream << tc.col() << (*it)->getName();
-				if (!(*it)->getLocked())
-					stream << " RENOMMER";
+				stream << t.col();
+				if ((*it)->getLocked())
+					stream << (*it)->getName();
+				else
+				{
+					HTMLForm upr(renameRequest.getHTMLForm("re"+Conversion::ToString((*it)->getKey())));
+					stream << upr.open();
+					stream << upr.getTextInput(AccountRenameAction::PARAMETER_VALUE, (*it)->getName());
+					stream << upr.getSubmitButton("Renommer");
+					stream << upr.close();
+				}
 				stream << tc.col() << (*it)->getRightClassNumber().substr(1);
-				stream << tc.col() << ((*it)->getLocked() ? "NON" : "OUI : RETIRER");
+				stream << t.col() << ((*it)->getLocked() ? "NON" : "OUI : " + HTMLModule::getLinkButton(lockRequest.getURL(), "Supprimer", "E^tes-vous sûr de vouloir supprimer le compte ? (cette opération est définitive)", "cart_delete.png"));
 			}
 
 			// New account
