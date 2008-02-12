@@ -92,6 +92,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PropertiesHTMLTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PropertiesHTMLTable.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ResultHTMLTable.cpp"
 				>
 			</File>

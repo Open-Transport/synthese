@@ -28,6 +28,7 @@
 
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLTable.h"
+#include "05_html/PropertiesHTMLTable.h"
 
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
@@ -203,99 +204,33 @@ namespace synthese
 
 			stream << "<h1>Propriétés</h1>";
 
-			HTMLForm pf(updateDisplayRequest.getHTMLForm("updateprops"));
-			pf.setUpdateRight(writeRight);
-
-			stream << pf.open() << "<h2>Emplacement</h2>";
-
-			HTMLTable t;
+			PropertiesHTMLTable t(updateDisplayRequest.getHTMLForm("updateprops"));
+			t.getForm().setUpdateRight(writeRight);
 
 			stream << t.open();
-			stream << t.row();
-			stream << t.col() << "Lieu logique";
-			stream << t.col() << _displayScreen->getLocalization()->getFullName();
-
-			stream << t.row();
-			stream << t.col() << "Nom";
-			stream << t.col() << pf.getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getLocalizationComment());
+			stream << t.title("Emplacement");
+			stream << t.cell("Lieu logique", _displayScreen->getLocalization()->getFullName());
+			stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getLocalizationComment()));
 			
+			stream << t.title("Données techniques");
+			stream << t.cell("Type d'afficheur", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_TYPE, DeparturesTableModule::getDisplayTypeLabels(), _displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE));
+			stream << t.cell("Code de branchement", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()));
+			stream << t.cell("UID", Conversion::ToString(_displayScreen->getKey()));
+
+			stream << t.title("Apparence");
+			stream << t.cell("Titre", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_TITLE, _displayScreen->getTitle()));
+			stream << t.cell("Clignotement", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY, blinkingDelaysMap, _displayScreen->getBlinkingDelay()));
+			stream << t.cell("Affichage numéro de quai", t.getForm().getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()));
+			stream << t.cell("Affichage numéro de service", t.getForm().getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()));
+			stream << t.cell("Affichage numéro d'équipe", t.getForm().getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
+
+			stream << t.title("Contenu");
+			stream << t.cell("Horaires", t.getForm().getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL, directionMap, _displayScreen->getDirection()));
+			stream << t.cell("Sélection", t.getForm().getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER, endFilterMap, _displayScreen->getEndFilter()));
+			stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
+			stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY, clearDelayMap, _displayScreen->getClearingDelay()));
+
 			stream << t.close();
-
-			// Technical data
-			stream << "<h2>Données techniques</h2>";
-			
-			HTMLTable pt;
-
-			stream << pt.open();
-
-			stream << pt.row();
-			stream << pt.col() << "Type d'afficheur";
-			stream << pt.col() << pf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_TYPE, DeparturesTableModule::getDisplayTypeLabels(), _displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE);
-
-			stream << pt.row();
-			stream << pt.col() << "Code de branchement";
-			stream << pt.col() << pf.getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode());
-			
-			stream << pt.row();
-			stream << pt.col() << "UID";
-			stream << pt.col() << _displayScreen->getKey();
-
-			stream << pt.close();
-
-			// Appearance
-			stream << "<h2>Apparence</h2>";
-
-			HTMLTable dt;
-			stream << dt.open();
-
-			stream << dt.row();
-			stream << dt.col() << "Titre";
-			stream << dt.col() << pf.getTextInput(UpdateDisplayScreenAction::PARAMETER_TITLE, _displayScreen->getTitle());
-
-			stream << dt.row();
-			stream << dt.col() << "Clignotement";
-			stream << dt.col() << pf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY, blinkingDelaysMap, _displayScreen->getBlinkingDelay());
-
-			stream << dt.row();
-			stream << dt.col() << "Affichage numéro de quai";
-			stream << dt.col() << pf.getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay());
-			
-			stream << dt.row();
-			stream << dt.col() << "Affichage numéro de service";
-			stream << dt.col() << pf.getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay());
-
-			stream << dt.row();
-			stream << dt.col() << "Affichage numéro d'équipe";
-			stream << dt.col() << pf.getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam());
-
-			stream << dt.close();
-
-			// Content
-			stream << "<h2>Contenu</h2>";
-
-			HTMLTable ct;
-			stream << ct.open();
-
-			stream << ct.row();
-			stream << ct.col() << "Horaires";
-			stream << ct.col() << pf.getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL, directionMap, _displayScreen->getDirection());
-
-			stream << ct.row();
-			stream << ct.col() << "Sélection";
-			stream << ct.col() << pf.getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER, endFilterMap, _displayScreen->getEndFilter());
-
-			stream << ct.row();
-			stream << ct.col() << "Délai maximum d'affichage";
-			stream << ct.col() << pf.getTextInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) << " minutes";
-
-			stream << ct.row();
-			stream << ct.col() << "Délai d'effacement";
-			stream << ct.col() << pf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY, clearDelayMap, _displayScreen->getClearingDelay());
-
-			stream << ct.close();
-
-			stream << pf.getSubmitButton("Enregistrer les modifications des propriétés");
-			stream << pf.close();
 
 			// Used physical stops
 			stream << "<h1>Arrêts de desserte</h1>";
