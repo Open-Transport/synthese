@@ -120,7 +120,7 @@ namespace synthese
 			if (boost::regex_match (name, clRegex) == false) continue;
 			if (boost::regex_match (networkName, nwRegex) == false) continue;
 			
-			std::string filename ("trident_line_" + cl->getShortName () + ".xml");
+			std::string filename ("trident_line_" + cl->getShortName () + "_" + Conversion::ToString (cl->getKey ()) + ".xml");
 			
 			boost::filesystem::path xmlfp (archiveDir.string () + "/" + filename);
 			std::ofstream out (xmlfp.string ().c_str (), std::ios_base::binary);
