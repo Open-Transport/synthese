@@ -23,11 +23,17 @@
 #include "DeleteAlarmAction.h"
 
 #include "17_messages/Alarm.h"
+#include "17_messages/SentAlarm.h"
+#include "17_messages/AlarmTemplate.h"
 #include "17_messages/AlarmTableSync.h"
+#include "17_messages/AlarmObjectLinkTableSync.h"
 #include "17_messages/MessagesModule.h"
+#include "17_messages/MessagesLog.h"
+#include "17_messages/MessagesLibraryLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/ParametersMap.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -53,21 +59,32 @@ namespace synthese
 
 		void DeleteAlarmAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_ALARM, true, FACTORY_KEY));
+			setAlarmId(map.getUid(PARAMETER_ALARM, true, FACTORY_KEY));
+		}
+
+		void DeleteAlarmAction::run()
+		{
+			// Action
+			AlarmObjectLinkTableSync::Remove(_alarm->getId());
+			AlarmTableSync::Remove(_alarm->getId());
+
+			// Log
+			if (dynamic_cast<const SentAlarm*>(_alarm.get()))
+				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(_alarm.get()), _request->getUser().get());
+			else
+				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(_alarm.get()), _request->getUser().get());
+		}
+
+		void DeleteAlarmAction::setAlarmId( uid id )
+		{
 			try
 			{
-				_alarm.reset(AlarmTableSync::Get(id));
+				_alarm.reset(AlarmTableSync::Get(id, true));
 			}
 			catch (...)
 			{
 				throw ActionException("Alarm not specified");
 			}
-		}
-
-		void DeleteAlarmAction::run()
-		{
-			/// @todo Delete alarm broadcast list
-			AlarmTableSync::Remove(_alarm->getId());
 		}
 	}
 }

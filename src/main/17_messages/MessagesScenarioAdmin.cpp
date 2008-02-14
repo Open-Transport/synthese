@@ -166,7 +166,8 @@ namespace synthese
 			{
 				shared_ptr<const Alarm> alarm = *it;
 				messRequest.setObjectId(alarm->getId());
-				deleteRequest.getFunction()->setParameter(DeleteAlarmAction::PARAMETER_ALARM, Conversion::ToString(alarm->getId()));
+				deleteRequest.getAction()->setAlarmId(alarm->getId());
+
 				stream << t.row(Conversion::ToString(alarm->getId()));
 				stream << t.col() << alarm->getShortMessage();
 				stream << t.col() << ""; // Emplacement

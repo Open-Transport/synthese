@@ -69,8 +69,10 @@ namespace synthese
 			// Content column : parse all contents separated by | 
 			DBLogEntry::Content v;
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-			boost::char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR.c_str());
 			string content = rows->getText ( DBLogEntryTableSync::COL_CONTENT);
+			if (content.size() && content.at(0) == *DBLogEntryTableSync::CONTENT_SEPARATOR.c_str())
+				v.push_back(string());
+			boost::char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR.c_str());
 			tokenizer columns (content, sep);
 			for (tokenizer::iterator it = columns.begin(); it != columns.end (); ++it)
 				v.push_back(*it);

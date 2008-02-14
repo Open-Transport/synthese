@@ -23,6 +23,8 @@
 #include "DeleteScenarioAction.h"
 
 #include "17_messages/ScenarioTemplateInheritedTableSync.h"
+#include "17_messages/AlarmTableSync.h"
+#include "17_messages/AlarmObjectLinkTableSync.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/MessagesLibraryLog.h"
 
@@ -31,6 +33,7 @@
 #include "30_server/Request.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -68,6 +71,15 @@ namespace synthese
 
 		void DeleteScenarioAction::run()
 		{
+
+			// The action on the alarms
+			vector<shared_ptr<AlarmTemplate> > alarms = AlarmTableSync::searchTemplates(_scenario.get());
+			for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
+			{
+				AlarmObjectLinkTableSync::Remove((*it)->getKey());
+				AlarmTableSync::Remove((*it)->getKey());
+			}
+
 			// Action
 			ScenarioTableSync::Remove(_scenario->getKey());
 

@@ -24,6 +24,7 @@
 #include "17_messages/AlarmTemplate.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
+#include "17_messages/AlarmTableSync.h"
 
 #include "01_util/Conversion.h"
 
@@ -53,15 +54,24 @@ namespace synthese
 
 		std::string MessagesLibraryLog::getObjectName( uid id ) const
 		{
+			int tableId = decodeTableId(id);
 			try
 			{
-				shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id));
-				return scenario->getName();
+				if (tableId == ScenarioTableSync::TABLE_ID)
+				{
+					shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id));
+					return scenario->getName();
+				}
+				else if (tableId == AlarmTableSync::TABLE_ID)
+				{
+					shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id));
+					return alarm->getShortMessage();
+				}
 			}
 			catch (...)
 			{
-				return Conversion::ToString(id);
-			}			
+			}
+			return Conversion::ToString(id);
 		}
 
 		void MessagesLibraryLog::addUpdateEntry(
@@ -73,7 +83,7 @@ namespace synthese
 			content.push_back(string());
 			content.push_back(text);
 			
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, UNKNOWN_VALUE);
 		}
 
 		void MessagesLibraryLog::addUpdateEntry(
@@ -98,7 +108,7 @@ namespace synthese
 			, const security::User* user
 		){
 			DBLogEntry::Content content;
-			content.push_back(Conversion::ToString(scenario->getKey()));
+			content.push_back(string());
 			content.push_back("Suppression du scénario " + scenario->getName());
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
@@ -107,7 +117,7 @@ namespace synthese
 		void MessagesLibraryLog::addCreateEntry( const ScenarioTemplate* scenario , const ScenarioTemplate* scenarioTemplate, const security::User* user )
 		{
 			DBLogEntry::Content content;
-			content.push_back(Conversion::ToString(scenario->getKey()));
+			content.push_back(string());
 			stringstream text;
 			text << "Création du scénario " << scenario->getName();
 			if (scenarioTemplate != NULL)
@@ -115,6 +125,18 @@ namespace synthese
 			content.push_back(text.str());
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+		}
+
+		void MessagesLibraryLog::AddDeleteEntry( const AlarmTemplate* alarm , const security::User* user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back(Conversion::ToString(alarm->getId()));
+			stringstream text;
+			text
+				<< "Suppression du message " << alarm->getShortMessage()
+				<< " du scénario " << alarm->getScenario()->getName();
+			content.push_back(text.str());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
 	}
 }

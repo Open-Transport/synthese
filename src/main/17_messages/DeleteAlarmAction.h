@@ -26,6 +26,7 @@
 #include "30_server/Action.h"
 
 #include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -61,6 +62,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			void setAlarmId(uid id);
 		};
 	}
 }

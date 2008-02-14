@@ -157,15 +157,16 @@ namespace synthese
 			}
 		}
 
-		void AlarmObjectLinkTableSync::remove( uid alarmId, uid objectId )
+		void AlarmObjectLinkTableSync::Remove( uid alarmId, uid objectId )
 		{
 			std::stringstream query;
 			query
 				<< "DELETE FROM " << TABLE_NAME
 				<< " WHERE " 
-				<< COL_ALARM_ID << "=" << Conversion::ToString(alarmId)
-				<< " AND " << COL_OBJECT_ID << "=" << Conversion::ToString(objectId)
-				;
+				<< COL_ALARM_ID << "=" << Conversion::ToString(alarmId);
+			if (objectId != UNKNOWN_VALUE)
+				query << " AND " << COL_OBJECT_ID << "=" << Conversion::ToString(objectId);
+
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 

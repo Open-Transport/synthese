@@ -34,6 +34,7 @@ namespace synthese
 		class SingleSentAlarm;
 		class ScenarioSentAlarm;
 		class SentScenario;
+		class SentAlarm;
 
 		/** Journal des envois de messages.
 
@@ -69,6 +70,21 @@ namespace synthese
 				, const std::string& text
 				, const security::User* user
 				);
+			
+
+
+			/** Adds an Alarm deletion entry.
+				@param alarm Pointer to the deleted alarm : must be linked with the scenario
+				@param user User who has launched the deletion
+				@author Hugues Romain
+				@date 2008
+			*/
+			static void	AddDeleteEntry(
+				const SentAlarm* alarm
+				, const security::User* user
+			);
+
+
 			std::string getObjectName(uid id) const;
 		};
 	}

@@ -61,6 +61,20 @@ namespace synthese
 				const ScenarioTemplate* scenario
 				, const security::User* user
 				);
+			
+
+
+			/** Adds an Alarm deletion entry.
+				@param alarm Pointer to the deleted alarm : must be linked with the scenario
+				@param user User who has launched the deletion
+				@author Hugues Romain
+				@date 2008
+			*/
+			static void	AddDeleteEntry(
+				const AlarmTemplate* alarm
+				, const security::User* user
+			);
+
 			static void addCreateEntry(
 				const ScenarioTemplate* scenario
 				, const ScenarioTemplate* scenarioTemplate
