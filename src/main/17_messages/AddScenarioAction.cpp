@@ -24,6 +24,9 @@
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTemplateInheritedTableSync.h"
 #include "17_messages/ScenarioInheritedTableSync.h"
+#include "17_messages/MessagesLibraryLog.h"
+#include "17_messages/AlarmObjectLink.h"
+#include "17_messages/AlarmObjectLinkTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -88,15 +91,40 @@ namespace synthese
 
 		void AddScenarioAction::run()
 		{
+			// The action on the scenario
 			shared_ptr<ScenarioTemplate> scenario;
 			if (_template.get())
 				scenario.reset(new ScenarioTemplate(*_template, _name));
 			else
 				scenario.reset(new ScenarioTemplate(_name));
-
 			ScenarioTableSync::Save (scenario.get());
-			SaveAlarms(scenario.get());
+
+			// Remember of the id of created object to view it after the action
 			_request->setObjectId(scenario->getKey());
+
+			// The action on the alarms
+			if (_template.get())
+			{
+				const ScenarioTemplate::AlarmsSet& alarms(_template->getAlarms());
+				for (ScenarioTemplate::AlarmsSet::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
+				{
+					shared_ptr<AlarmTemplate> alarm(new AlarmTemplate(**it, scenario.get()));
+					AlarmTableSync::Save(alarm.get());
+
+					vector<shared_ptr<AlarmObjectLink> > aols = AlarmObjectLinkTableSync::search(*it);
+					for (vector<shared_ptr<AlarmObjectLink> >::const_iterator itaol = aols.begin(); itaol != aols.end(); ++itaol)
+					{
+						shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
+						aol->setAlarmId(alarm->getKey());
+						aol->setObjectId((*itaol)->getObjectId());
+						aol->setRecipientKey((*itaol)->getRecipientKey());
+						AlarmObjectLinkTableSync::save(aol.get());
+					}
+				}
+			}
+
+			// Log
+			MessagesLibraryLog::addCreateEntry(scenario.get(), _template.get(), _request->getUser().get());
 		}
 	}
 }

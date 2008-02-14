@@ -103,5 +103,18 @@ namespace synthese
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
 		}
+
+		void MessagesLibraryLog::addCreateEntry( const ScenarioTemplate* scenario , const ScenarioTemplate* scenarioTemplate, const security::User* user )
+		{
+			DBLogEntry::Content content;
+			content.push_back(Conversion::ToString(scenario->getKey()));
+			stringstream text;
+			text << "Création du scénario " << scenario->getName();
+			if (scenarioTemplate != NULL)
+				text << " par copie du scénario " << scenarioTemplate->getName();
+			content.push_back(text.str());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+		}
 	}
 }
