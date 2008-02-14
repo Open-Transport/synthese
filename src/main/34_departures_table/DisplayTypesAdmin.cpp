@@ -28,13 +28,13 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminRequest.h"
+#include "32_admin/ModuleAdmin.h"
 
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayTypesAdmin.h"
 #include "34_departures_table/CreateDisplayTypeAction.h"
 #include "34_departures_table/UpdateDisplayTypeAction.h"
-#include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/DisplayTypeRemoveAction.h"
 #include "34_departures_table/ArrivalDepartureTableRight.h"
@@ -54,28 +54,19 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement,DisplayTypesAdmin>::FACTORY_KEY("displaytypes");
+		template<> const string FactorableTemplate<AdminInterfaceElement,DisplayTypesAdmin>::FACTORY_KEY("2displaytypes");
 	}
 
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DisplayTypesAdmin>::ICON("monitor.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DisplayTypesAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		template<> string AdminInterfaceElementTemplate<DisplayTypesAdmin>::getSuperior()
-		{
-			return DisplaySearchAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<DisplayTypesAdmin>::DEFAULT_TITLE("Types d'afficheurs");
 	}
 
 	namespace departurestable
 	{
 		void DisplayTypesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-		}
-
-		string DisplayTypesAdmin::getTitle() const
-		{
-			return "Types d'afficheurs";
 		}
 
 		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -154,6 +145,16 @@ namespace synthese
 			: AdminInterfaceElementTemplate<DisplayTypesAdmin>()
 		{
 
+		}
+
+		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

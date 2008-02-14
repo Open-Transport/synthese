@@ -55,12 +55,8 @@ namespace synthese
 
 	namespace admin
 	{
-	    template <> const string AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>::ICON("tag_blue.png");
-	    template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-	    template <> string AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>::getSuperior()
-		{
-			return VinciBikeSearchAdminInterfaceElement::FACTORY_KEY;
-		}
+		template <> const string AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>::ICON("tag_blue.png");
+		template <> const string AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>::DEFAULT_TITLE("Vélo inconnu");
 	}
 
 	namespace vinci
@@ -69,10 +65,6 @@ namespace synthese
 			: AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>() {}
 
 
-		std::string VinciBikeAdminInterfaceElement::getTitle() const
-		{
-			return "Vélo " + _bike->getNumber();
-		}
 
 		void VinciBikeAdminInterfaceElement::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
@@ -112,6 +104,9 @@ namespace synthese
 					if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 						return;
 					_bike = VinciBikeTableSync::Get(id);
+					_pageLink.name = "Vélo " + _bike->getNumber();
+					_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					_pageLink.parameterValue = Conversion::ToString(id);
 				}
 			}
 			catch(VinciBike::ObjectNotFoundException& e)
@@ -123,6 +118,16 @@ namespace synthese
 		bool VinciBikeAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		AdminInterfaceElement::PageLinks VinciBikeAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == VinciBikeSearchAdminInterfaceElement::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				links.push_back(currentPage.getPageLink());
+			}
+			return links;
 		}
 	}
 }

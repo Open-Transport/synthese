@@ -50,31 +50,6 @@ namespace synthese
 
 	namespace admin
 	{
-		std::string AdminPagePositionInterfaceElement::getUpPages(shared_ptr<const AdminInterfaceElement> page, const server::FunctionRequest<admin::AdminRequest>* request, bool isFirst)
-		{
-			stringstream str;
-			Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); 
-			for (; it != Factory<AdminInterfaceElement>::end() && it->getFactoryKey() != page->getSuperiorVirtual(); ++it);
-			
-			if (it != Factory<AdminInterfaceElement>::end())
-			{
-				str << getUpPages(*it, request, false);
-				str << "&nbsp;&gt;&nbsp;";
-			}
-			str << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
-			if (!isFirst)
-			{
-				FunctionRequest<AdminRequest> r(request);
-				r.getFunction()->setPage(page);
-				str << HTMLModule::getHTMLLink(r.getURL(), page->getTitle());
-			}
-			else
-			{
-				str << page->getTitle();
-			}			
-			return str.str();
-		}
-
 		void AdminPagePositionInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
 		{
 
@@ -86,10 +61,20 @@ namespace synthese
 			, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
 			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
-			stream << getUpPages(
-				*page
-				, (const server::FunctionRequest<admin::AdminRequest>*) request
-			);
+
+			const AdminInterfaceElement::PageLinks& links((*page)->getTreePosition(static_cast<const server::FunctionRequest<AdminRequest>*>(request)));
+
+			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
+			{
+				if (it != links.begin())
+					stream << "&nbsp;&gt;&nbsp;";
+
+				stream << HTMLModule::getHTMLImage(it->icon, it->name);
+				if (it != (links.end() -1))
+					stream << HTMLModule::getHTMLLink(it->getURL(static_cast<const server::FunctionRequest<AdminRequest>*>(request)), it->name);
+				else
+					stream << it->name;
+			}
 			return string();
 		}
 	}

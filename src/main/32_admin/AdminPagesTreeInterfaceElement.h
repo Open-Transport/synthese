@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_AdminPagesTreeInterfaceElement_H__
 #define SYNTHESE_AdminPagesTreeInterfaceElement_H__
 
+#include "32_admin/AdminInterfaceElement.h"
+
 #include "30_server/FunctionRequest.h"
 
 #include "11_interfaces/LibraryInterfaceElement.h"
@@ -34,20 +36,29 @@ namespace synthese
 	namespace admin
 	{
 		class AdminRequest;
-		class AdminInterfaceElement;
 		
 		/** Tree of admin pages links.
 			@ingroup m14Values refValues
+
+			Parameters :
+				- Sub page introducer
+				- Last sub page introducer
+				- Level indenter to use before the last subpage
+				- Level indenter to use after the last subpage
+				- Ending
+				- Node sub page introducer (optional : if not provided, same as sub page introducer)
+				- Node last sub page introducer (optional : if not provided, same as last sub page introducer)
 		*/
 		class AdminPagesTreeInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagesTreeInterfaceElement>
 		{
 			std::string getSubPages(
-				const std::string& page
-				, boost::shared_ptr<const AdminInterfaceElement> currentPage
+				const AdminInterfaceElement::PageLinksTree& pages
+				, const AdminInterfaceElement& currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
-				, int level = -1
-				, std::string prefix = std::string()
+				, int level
+				, std::string prefix
+				, bool last
 			) const;
 
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _subpageIntroducerVIE;
@@ -55,11 +66,15 @@ namespace synthese
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _levelIndenterVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _lastLevelIndenterVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _endingVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _folderSubpageIntroducerVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _folderLastSubpageIntroducerVIE;
 			mutable std::string _subpageIntroducer;
 			mutable std::string _lastSubpageIntroducer;
 			mutable std::string _levelIndenter;
 			mutable std::string _lastLevelIndenter;
 			mutable std::string _ending;
+			mutable std::string _folderSubpageIntroducer;
+			mutable std::string _folderLastSubpageIntroducer;
 
 		public:
 			/** Controls and store the internals parameters.

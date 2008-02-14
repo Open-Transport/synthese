@@ -1,6 +1,6 @@
 
-/** VinciAccountsAdminInterfaceElement class header.
-	@file VinciAccountsAdminInterfaceElement.h
+/** MessagesTemplateLibraryAdmin class header.
+	@file MessagesTemplateLibraryAdmin.h
 	@author Hugues Romain
 	@date 2008
 
@@ -22,8 +22,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_VinciAccountsAdminInterfaceElement_H__
-#define SYNTHESE_VinciAccountsAdminInterfaceElement_H__
+#ifndef SYNTHESE_MessagesTemplateLibraryAdmin_H__
+#define SYNTHESE_MessagesTemplateLibraryAdmin_H__
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
@@ -31,27 +31,25 @@
 
 namespace synthese
 {
-	namespace vinci
+	namespace messages
 	{
-		/** VinciAccountsAdminInterfaceElement Class.
-			@ingroup m71Admin refAdmin
+		/** MessagesTemplateLibraryAdmin Class.
+			@ingroup m17Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/
-		class VinciAccountsAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>
+		class MessagesTemplateLibraryAdmin : public admin::AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>
 		{
-			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			std::string									_searchName;
-			std::string									_searchCode;
-
 		public:
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_CODE;
-			static const std::string PARAMETER_UNIT_PRICE;
-			static const std::string PARAMETER_LOCKED;
-			static const std::string PARAMETER_STOCK;
+			static const std::string PARAMETER_SHORT_TEXT;
+			static const std::string PARAMETER_LONG_TEXT;
 
-			VinciAccountsAdminInterfaceElement();
+		private:
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+
+		public:
+			MessagesTemplateLibraryAdmin();
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -67,8 +65,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& , const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
-
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
 			
 			/** Authorization control.
 				@param request The current request
@@ -78,11 +75,10 @@ namespace synthese
 			*/
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 			
-
 			/** Gets sub page of the designed parent page, which are from the current class.
-				@param factoryKey Key of the parent class
-				@param request User request
-				@return PageLinks A link to the page if the parent is Home
+				@param parentLink Link to the parent page
+				@param currentPage Currently displayed page
+				@return PageLinks each subpage of the parent page designed in parentLink
 				@author Hugues Romain
 				@date 2008
 			*/
@@ -90,8 +86,20 @@ namespace synthese
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
 			) const;
+			
+			/** Sub pages getter.
+				@param currentPage Currently displayed page
+				@param request User request
+				@return PageLinks each subpage of the current page
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage
+				, const server::FunctionRequest<admin::AdminRequest>* request
+			) const;
 		};
 	}
 }
 
-#endif // SYNTHESE_VinciAccountsAdminInterfaceElement_H__
+#endif // SYNTHESE_MessagesTemplateLibraryAdmin_H__

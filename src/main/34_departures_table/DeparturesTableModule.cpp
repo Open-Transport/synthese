@@ -38,6 +38,11 @@ namespace synthese
 	using namespace env;
 	using namespace security;
 
+	namespace util
+	{
+		template<> const std::string util::FactorableTemplate<ModuleClass, departurestable::DeparturesTableModule>::FACTORY_KEY("54_departures_table");
+	}
+
 	namespace departurestable
 	{
 		std::vector<pair<uid, std::string> > DeparturesTableModule::getDisplayTypeLabels( bool withAll /*= false*/ )
@@ -77,6 +82,11 @@ namespace synthese
 			for (vector<shared_ptr<const CommercialLine> >::const_iterator it = c.begin(); it != c.end(); ++it)
 				m.push_back(make_pair((*it)->getKey(), (*it)->getShortName()));
 			return m;
+		}
+
+		void DeparturesTableModule::initialize()
+		{
+
 		}
 	}
 }

@@ -37,21 +37,11 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::ICON = "house.png";
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<HomeAdmin>::DISPLAY_MODE = AdminInterfaceElement::EVER_DISPLAYED;
-
-		template<> string AdminInterfaceElementTemplate<HomeAdmin>::getSuperior()
-		{
-			return string();
-		}
+		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::DEFAULT_TITLE = "Accueil";
 
 		void HomeAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			stream << "Bienvenue sur le panneau de configuration de SYNTHESE";
-		}
-
-		std::string HomeAdmin::getTitle() const
-		{
-			return "Accueil";
 		}
 
 		void HomeAdmin::setFromParametersMap(const ParametersMap& map)
@@ -68,6 +58,11 @@ namespace synthese
 			: AdminInterfaceElementTemplate<HomeAdmin>()
 		{
 	
+		}
+
+		AdminInterfaceElement::PageLinks HomeAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			return AdminInterfaceElement::PageLinks();
 		}
 	}
 }

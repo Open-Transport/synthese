@@ -1,4 +1,6 @@
 
+synthese::dblog::DBLogModule::integrate();
+
 synthese::dblog::DBLogList::integrate();
 synthese::dblog::DBLogViewer::integrate();
 

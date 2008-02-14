@@ -66,12 +66,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>::ICON("cart.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-
-		template<> string AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>::DISPLAY_MODE("Produits");
 	}
 
 	namespace vinci
@@ -91,11 +86,6 @@ namespace synthese
 			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
 			_searchCode = map.getString(PARAMETER_CODE, false, FACTORY_KEY);
 			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), string(), 30);
-		}
-
-		string VinciAccountsAdminInterfaceElement::getTitle() const
-		{
-			return "Produits";
 		}
 
 		void VinciAccountsAdminInterfaceElement::display(ostream& stream, VariablesMap & variables, const FunctionRequest<AdminRequest>* request) const
@@ -278,6 +268,16 @@ namespace synthese
 		bool VinciAccountsAdminInterfaceElement::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
 			return request->isAuthorized<VinciRight>(READ);
+		}
+
+		AdminInterfaceElement::PageLinks VinciAccountsAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

@@ -33,6 +33,11 @@ using namespace boost;
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> const std::string util::FactorableTemplate<ModuleClass, messages::MessagesModule>::FACTORY_KEY("17_messages");
+	}
+
 	namespace messages
 	{
 		std::vector<pair<uid, std::string> > MessagesModule::getScenarioTemplatesLabels( bool withAll /*= false*/ )
@@ -104,7 +109,7 @@ namespace synthese
 			}
 		}
 
-		void initialize()
+		void MessagesModule::initialize()
 		{
 
 		}

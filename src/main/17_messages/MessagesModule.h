@@ -25,6 +25,7 @@
 
 #include "01_util/ModuleClass.h"
 #include "01_util/UId.h"
+#include "01_util/FactorableTemplate.h"
 
 #include "17_messages/Types.h"
 
@@ -46,7 +47,7 @@ namespace synthese
 	{
 		/** 17 Messages module class.
 		*/
-		class MessagesModule : public util::ModuleClass
+		class MessagesModule : public util::FactorableTemplate<util::ModuleClass, MessagesModule>
 		{
 		public:
 			void initialize();

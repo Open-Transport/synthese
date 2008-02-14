@@ -63,12 +63,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<VinciSiteAdmin>::ICON("building.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciSiteAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-
-		template<> string AdminInterfaceElementTemplate<VinciSiteAdmin>::getSuperior()
-		{
-			return VinciSitesAdminInterfaceElement::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<VinciSiteAdmin>::DEFAULT_TITLE("Site inconnu");
 	}
 
 	namespace vinci
@@ -85,16 +80,15 @@ namespace synthese
 				if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 					return;
 				_site = VinciSiteTableSync::Get(id);
+				_pageLink.name = "Site " + _site->getName();
+				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			else
 				throw AdminParametersException("Site not found");
 		}
 
-		string VinciSiteAdmin::getTitle() const
-		{
-			return "Site " + (_site.get() ? _site->getName() : "inconnu");
-		}
-
+	
 		void VinciSiteAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
 			// Requests
@@ -199,6 +193,16 @@ namespace synthese
 		bool VinciSiteAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
 			return true;
+		}
+
+		AdminInterfaceElement::PageLinks VinciSiteAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == VinciSitesAdminInterfaceElement::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				links.push_back(currentPage.getPageLink());
+			}
+			return links;
 		}
 	}
 }

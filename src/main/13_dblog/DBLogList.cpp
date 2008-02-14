@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminRequest.h"
 
 #include <boost/shared_ptr.hpp>
@@ -32,6 +32,7 @@
 #include "13_dblog/DBLogList.h"
 #include "13_dblog/DBLogViewer.h"
 #include "13_dblog/DBLogRight.h"
+#include "13_dblog/DBLogModule.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -54,22 +55,13 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DBLogList>::ICON("book.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DBLogList>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		template<> string AdminInterfaceElementTemplate<DBLogList>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<DBLogList>::DEFAULT_TITLE("Journaux");
 	}
 
 	namespace dblog
 	{
 		void DBLogList::setFromParametersMap(const ParametersMap& map)
 		{
-		}
-
-		string DBLogList::getTitle() const
-		{
-			return "Journaux";
 		}
 
 		void DBLogList::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -102,6 +94,16 @@ namespace synthese
 			: AdminInterfaceElementTemplate<DBLogList>()
 		{
 
+		}
+
+		AdminInterfaceElement::PageLinks DBLogList::getSubPagesOfParent( const PageLink& parentLink, const AdminInterfaceElement& currentPage) const /*= 0*/
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DBLogModule::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

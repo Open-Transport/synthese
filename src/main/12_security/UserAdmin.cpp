@@ -20,8 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "05_html/HTMLTable.h"
-#include "05_html/HTMLForm.h"
+#include "05_html/PropertiesHTMLTable.h"
 
 #include "12_security/UserAdmin.h"
 #include "12_security/UsersAdmin.h"
@@ -58,29 +57,17 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<UserAdmin>::ICON("user.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<UserAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-		template<> string AdminInterfaceElementTemplate<UserAdmin>::getSuperior()
-		{
-			return UsersAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<UserAdmin>::DEFAULT_TITLE("Utilisateur inconnu");
 	}
 	
 	namespace security
 	{
-		const string UserAdmin::PARAM_USER_ID = "roid";
-
 		UserAdmin::UserAdmin()
 			: AdminInterfaceElementTemplate<UserAdmin>()
 			, _userError(false)
 		{
 		}
 
-		std::string UserAdmin::getTitle() const
-		{
-			return (_user.get())
-				? _user->getSurname() + " " + _user->getName()
-				: "";
-		}
 
 		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -93,69 +80,34 @@ namespace synthese
 			userPasswordUpdateRequest.setObjectId(request->getObjectId());
 
 			{
-				stream << "<h1>Coordonnées</h1>";
-				HTMLForm form(updateRequest.getHTMLForm("update"));
-				stream << form.open();
-				HTMLTable t;
+				stream << "<h1>Propriétés</h1>";
+				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 				stream << t.open();
-				stream << t.row();
-				stream << t.col(2) << "Connexion";
-				stream << t.row();
-				stream << t.col() << "Login";
-				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin());
-				stream << t.row();
-				stream << t.col(2) << "Coordonnées";
-				stream << t.row();
-				stream << t.col() << "Prénom";
-				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname());
-				stream << t.row();
-				stream << t.col() << "Nom";
-				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName());
-				stream << t.row();
-				stream << t.col() << "Adresse";
-				stream << t.col() << form.getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50);
-				stream << t.row();
-				stream << t.col() << "Code postal";
-				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode());
-				stream << t.row();
-				stream << t.col() << "Ville";
-				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText());
-				stream << t.row();
-				stream << t.col() << "Téléphone";
-				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone());
-				stream << t.row();
-				stream << t.col() << "E-mail";
-				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail());
-				stream << t.row();
-				stream << t.col(2) << "Droits";
-				stream << t.row();
-				stream << t.col() << "Connexion autorisée";
-				stream << t.col() << form.getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed());
-				stream << t.row();
-				stream << t.col() << "Profil";
-				stream << t.col() << form.getSelectInput(UserUpdateAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), _user->getProfile()->getKey());
-				stream << t.row();
-				stream << t.col(2) << form.getSubmitButton("Enregistrer les modifications");
+				stream << t.title("Connexion");
+				stream << t.cell("Login", t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()));
+				
+				stream << t.title("Coordonnées");
+				stream << t.cell("Prénom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
+				stream << t.cell("Nom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName()));
+				stream << t.cell("Adresse", t.getForm().getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50));
+				stream << t.cell("Code postal", t.getForm().getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()));
+				stream << t.cell("Ville", t.getForm().getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText()));
+				stream << t.cell("Téléphone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
+				stream << t.cell("E-mail",t.getForm().getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
+				
+				stream << t.title("Droits");
+				stream << t.cell("Connexion autorisée",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
+				stream << t.cell("Profil",t.getForm().getSelectInput(UserUpdateAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), _user->getProfile()->getKey()));
 				stream << t.close();
-				stream << form.close();
 			}
 
 			stream << "<h1>Changement de mot de passe</h1>";
 			{
-				HTMLForm form(userPasswordUpdateRequest.getHTMLForm("pass"));
-				stream << form.open();
-				HTMLTable t;
+				PropertiesHTMLTable t(userPasswordUpdateRequest.getHTMLForm("pass"));
 				stream << t.open();
-				stream << t.row();
-				stream << t.col() << "Mot de passe";
-				stream << t.col() << form.getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS1, "");
-				stream << t.row();
-				stream << t.col() << "Mot de passe (vérification)";
-				stream << t.col() << form.getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS2, "");
-				stream << t.row();
-				stream << t.col(2) << form.getSubmitButton("Changer le mot de passe");
+				stream << t.cell("Mot de passe", t.getForm().getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS1, ""));
+				stream << t.cell("Mot de passe (vérification)", t.getForm().getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS2, ""));
 				stream << t.close();
-				stream << form.close();
 			}
 		}
 
@@ -165,7 +117,11 @@ namespace synthese
 			{
 				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
 					_user = UserTableSync::Get(id,GET_AUTO, true);
+					_pageLink.name = _user->getSurname() + " " + _user->getName();
+					_pageLink.parameterValue = Conversion::ToString(id);
+				}
 			}
 			catch (User::ObjectNotFoundException& e)
 			{
@@ -176,6 +132,16 @@ namespace synthese
 		bool UserAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		AdminInterfaceElement::PageLinks UserAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == UsersAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				links.push_back(currentPage.getPageLink());
+			}
+			return links;
 		}
 	}
 }

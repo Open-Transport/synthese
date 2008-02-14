@@ -41,18 +41,6 @@ namespace synthese
 		class AdminPagePositionInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagePositionInterfaceElement>
 		{
-			
-			/** Upper pages list generator, with HTML links, according to the system registrations.
-				@param page Current page
-				@param request Current request
-				@param isFirst True if the current page is the lower page in the tree : will avoid to produce link to itself.
-				@return std::string The generated HTML code.
-				@author Hugues Romain
-				@date 2007
-				@note This static method is recursive.
-			*/
-			static std::string getUpPages(boost::shared_ptr<const AdminInterfaceElement> page, const server::FunctionRequest<admin::AdminRequest>* request, bool isFirst = true);
-
 		public:
 			/** Controls and store the internals parameters.
 			@param vel Parameters list to read

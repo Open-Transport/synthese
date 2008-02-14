@@ -85,12 +85,8 @@ namespace synthese
 
 	namespace admin
 	{
-	    template <> const string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::ICON("vcard.png");
-	    template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-	    template <> string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::getSuperior()
-		{
-			return VinciCustomerSearchAdminInterfaceElement::FACTORY_KEY;
-		}
+		template <> const string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::ICON("vcard.png");
+		template <> const string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::DEFAULT_TITLE("Client inconnu");
 	}
 
 	namespace vinci
@@ -100,10 +96,6 @@ namespace synthese
 		{}
 
 
-		std::string VinciCustomerAdminInterfaceElement::getTitle() const
-		{
-			return "Client " + _user->getSurname() + " " + _user->getName();
-		}
 
 		void VinciCustomerAdminInterfaceElement::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
@@ -397,12 +389,25 @@ namespace synthese
 					return;
 				_contract = VinciContractTableSync::Get(id);
 				_user = UserTableSync::Get(_contract->getUserId());
+				_pageLink.name = "Client " + _user->getSurname() + " " + _user->getName();
+				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 		}
 
 		bool VinciCustomerAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		AdminInterfaceElement::PageLinks VinciCustomerAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == VinciCustomerSearchAdminInterfaceElement::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				links.push_back(currentPage.getPageLink());
+			}
+			return links;
 		}
 	}
 }

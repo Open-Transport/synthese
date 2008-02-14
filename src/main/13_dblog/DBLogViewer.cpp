@@ -69,11 +69,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DBLogViewer>::ICON("book_open.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DBLogViewer>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-		template<> string AdminInterfaceElementTemplate<DBLogViewer>::getSuperior()
-		{
-			return DBLogList::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<DBLogViewer>::DEFAULT_TITLE("Journal inconnu");
 	}
 
 	namespace dblog
@@ -98,6 +94,11 @@ namespace synthese
 			if (!Factory<DBLog>::contains(key))
 				throw AdminParametersException("Invalid log key : " + key);
 			_dbLog.reset(Factory<DBLog>::create(key));
+
+			// Name
+			_pageLink.name = _dbLog->getName();
+			_pageLink.parameterName = PARAMETER_LOG_KEY;
+			_pageLink.parameterValue = key;
 
 			// Start Date
 			_searchStartDate = map.getDateTime(PARAMETER_START_DATE, false, FACTORY_KEY);
@@ -147,10 +148,6 @@ namespace synthese
 				_result.pop_back();
 		}
 
-		string DBLogViewer::getTitle() const
-		{
-			return (_dbLog != NULL) ? _dbLog->getName() : "(pas de journal)";
-		}
 
 		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -204,6 +201,21 @@ namespace synthese
 		bool DBLogViewer::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfParent( const PageLink& parentLink, const AdminInterfaceElement& currentPage) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == DBLogList::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				links.push_back(currentPage.getPageLink());
+			}
+			return links;
+		}
+
+		AdminInterfaceElement::PageLinks DBLogViewer::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return AdminInterfaceElement::PageLinks();
 		}
 	}
 }

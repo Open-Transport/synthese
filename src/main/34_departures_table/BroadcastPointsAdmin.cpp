@@ -23,6 +23,7 @@
 #include "34_departures_table/BroadcastPointsAdmin.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/ArrivalDepartureTableRight.h"
+#include "34_departures_table/DeparturesTableModule.h"
 
 #include <map>
 
@@ -36,7 +37,7 @@
 #include "30_server/FunctionRequest.h"
 #include "30_server/Session.h"
 
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminRequest.h"
 
 #include "12_security/User.h"
@@ -57,17 +58,13 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, BroadcastPointsAdmin>::FACTORY_KEY("broadcastpoints");
+		template<> const string FactorableTemplate<AdminInterfaceElement, BroadcastPointsAdmin>::FACTORY_KEY("1broadcastpoints");
 	}
 
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::ICON("building.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<BroadcastPointsAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		template<> string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::DEFAULT_TITLE("Points de diffusion");
 	}
 
 	namespace departurestable
@@ -95,11 +92,6 @@ namespace synthese
 			_lineUId = map.getUid(PARAMETER_LINE_ID, false, FACTORY_KEY);
 
 			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_CITY_NAME, 30);
-		}
-
-		string BroadcastPointsAdmin::getTitle() const
-		{
-			return "Points de diffusion";
 		}
 
 		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -187,6 +179,16 @@ namespace synthese
 		bool BroadcastPointsAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
 			return request->isAuthorized<ArrivalDepartureTableRight>(READ);
+		}
+
+		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

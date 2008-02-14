@@ -32,6 +32,12 @@ namespace synthese
 {
 	using namespace html;
 
+	namespace util
+	{
+		template<> const std::string util::FactorableTemplate<ModuleClass, dblog::DBLogModule>::FACTORY_KEY("13_dblog");
+	}
+
+
 	namespace dblog
 	{
 
@@ -67,6 +73,11 @@ namespace synthese
 			case DBLogEntry::DB_LOG_ERROR : return IMG_URL_ERROR;
 			default : return string();
 			}
+		}
+
+		void DBLogModule::initialize()
+		{
+
 		}
 	}
 }

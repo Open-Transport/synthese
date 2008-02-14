@@ -237,9 +237,12 @@ namespace synthese
 			if (_object_id)
 				result.insert(QueryString::PARAMETER_OBJECT_ID, _object_id);
 
+			// Internal parameters
+			ParametersMap::Map internalMap(_internalParameters.getMap());
+			for (ParametersMap::Map::const_iterator it(internalMap.begin()); it != internalMap.end(); ++it)
+				result.insert(it->first, it->second);
 			return result;
 		}
-
 
 
 		Request::Request(const QueryString& text )
@@ -413,6 +416,11 @@ namespace synthese
 		const Session* Request::getSession() const
 		{
 			return _session;
+		}
+
+		ParametersMap& Request::getInternalParameters()
+		{
+			return _internalParameters;
 		}
 	}
 }

@@ -76,12 +76,6 @@ namespace synthese
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
 
-			/** Title of the admin compound.
-				@return The title of the admin compound, for display purposes.
-				@author Hugues Romain
-				@date 2007
-			*/
-			std::string getTitle() const;
 			
 			/** Authorization control.
 				@param request The current request
@@ -91,6 +85,18 @@ namespace synthese
 			*/
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 			
+
+			/** Gets sub page of the designed parent page, which are from the current class.
+				@param factoryKey Key of the parent class
+				@param request User request
+				@return PageLinks A link to the page if the parent is Home
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
+				const PageLink& parentLink
+				, const AdminInterfaceElement& currentPage
+			) const;
 		};
 	}
 }

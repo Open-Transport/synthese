@@ -43,7 +43,7 @@
 
 #include "32_admin/AdminModule.h"
 #include "32_admin/AdminRequest.h"
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminParametersException.h"
 
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
@@ -66,17 +66,13 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement,DisplaySearchAdmin>::FACTORY_KEY("displays");
+		template<> const string FactorableTemplate<AdminInterfaceElement,DisplaySearchAdmin>::FACTORY_KEY("0displays");
 	}
 
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::ICON("monitor.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DisplaySearchAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		template<> string AdminInterfaceElementTemplate<DisplaySearchAdmin>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::DEFAULT_TITLE("Afficheurs");
 	}
 
 	namespace departurestable
@@ -116,6 +112,7 @@ namespace synthese
 				try
 				{
 					_place = ConnectionPlaceTableSync::Get(placeId);
+					_pageLink.name = "Afficheurs " + _place->getName();
 				}
 				catch (...)
 				{
@@ -126,10 +123,6 @@ namespace synthese
 			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_CITY, 30);
 		}
 
-		string DisplaySearchAdmin::getTitle() const
-		{
-			return _place.get() ? "Afficheurs " + _place->getName() : "Afficheurs";
-		}
 
 		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -280,6 +273,16 @@ namespace synthese
 		bool DisplaySearchAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

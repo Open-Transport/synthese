@@ -61,11 +61,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<ProfileAdmin>::ICON("group.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<ProfileAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-		template<> string AdminInterfaceElementTemplate<ProfileAdmin>::getSuperior()
-		{
-			return ProfilesAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<ProfileAdmin>::DEFAULT_TITLE("Profil inconnu");
 	}
 
 	namespace security
@@ -79,10 +75,6 @@ namespace synthese
 
 		}
 
-		std::string ProfileAdmin::getTitle() const
-		{
-			return _profile.get() ? _profile->getName()	: string();
-		}
 
 		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -221,7 +213,10 @@ namespace synthese
 			{
 				uid id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
 				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
 					_profile = ProfileTableSync::Get(id);
+					_pageLink.name = _profile->getName();
+				}
 			}
 			catch (Profile::ObjectNotFoundException& e)
 			{
@@ -232,6 +227,16 @@ namespace synthese
 		bool ProfileAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == ProfilesAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				links.push_back(currentPage.getPageLink());
+			}
+			return links;
 		}
 	}
 }

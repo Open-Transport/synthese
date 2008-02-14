@@ -57,12 +57,8 @@ namespace synthese
 
 	namespace admin
 	{
-	    template <> const string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::ICON("building.png");
-	    template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-	    template <> string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template <> const string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::ICON("building.png");
+		template <> const string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::DEFAULT_TITLE("Sites");
 	}
 
 	namespace vinci
@@ -82,10 +78,6 @@ namespace synthese
 			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), string(), 30);
 		}
 
-		string VinciSitesAdminInterfaceElement::getTitle() const
-		{
-			return "Sites";
-		}
 
 		void VinciSitesAdminInterfaceElement::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
@@ -168,6 +160,16 @@ namespace synthese
 		bool VinciSitesAdminInterfaceElement::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
 			return request->isAuthorized<VinciRight>(READ);
+		}
+
+		AdminInterfaceElement::PageLinks VinciSitesAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

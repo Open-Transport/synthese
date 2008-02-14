@@ -26,8 +26,7 @@
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
 
-#include "05_html/HTMLForm.h"
-#include "05_html/HTMLTable.h"
+#include "05_html/PropertiesHTMLTable.h"
 #include "05_html/Constants.h"
 
 #include "13_dblog/DBLogViewer.h"
@@ -59,11 +58,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>::ICON("monitor_lightning.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-		template<> string AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>::getSuperior()
-		{
-			return DisplaySearchAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>::DEFAULT_TITLE("Supervision et maintenance");
 	}
 
 	namespace departurestable
@@ -75,6 +70,8 @@ namespace synthese
 			try
 			{
 				_displayScreen = DisplayScreenTableSync::Get(id);
+				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			catch(...)
 			{
@@ -82,10 +79,6 @@ namespace synthese
 			}
 		}
 
-		string DisplayMaintenanceAdmin::getTitle() const
-		{
-			return "Supervision de " + _displayScreen->getFullName();
-		}
 
 		void DisplayMaintenanceAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -105,27 +98,13 @@ namespace synthese
 
 			stream << "<h1>Paramètres de maintenance</h1>";
 
-			HTMLForm f(updateRequest.getHTMLForm("update"));
-			HTMLTable t;
-			
-			stream << f.open() << t.open();
+			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 
-			stream << t.row();
-			stream << t.col() << "Nombre de contrôles par jour";
-			stream << t.col() << f.getSelectNumberInput(UpdateDisplayMaintenanceAction::PARAMETER_CONTROLS, 0, 1440, _displayScreen->getMaintenanceChecksPerDay(), 10);
-
-			stream << t.row();
-			stream << t.col() << "Afficheur déclaré en service";
-			stream << t.col() << f.getOuiNonRadioInput(UpdateDisplayMaintenanceAction::PARAMETER_ONLINE, _displayScreen->getIsOnline());
-
-			stream << t.row();
-			stream << t.col() << "Message de maintenance";
-			stream << t.col() << f.getTextAreaInput(UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE, _displayScreen->getMaintenanceMessage(), 3, 30);
-
-			stream << t.row();
-			stream << t.col(2) << f.getSubmitButton("Enregistrer les modifications");
-
-			stream << t.close() << f.close();
+			stream << t.open();
+			stream << t.cell("Nombre de contrôles par jour", t.getForm().getSelectNumberInput(UpdateDisplayMaintenanceAction::PARAMETER_CONTROLS, 0, 1440, _displayScreen->getMaintenanceChecksPerDay(), 10));
+			stream << t.cell("Afficheur déclaré en service", t.getForm().getOuiNonRadioInput(UpdateDisplayMaintenanceAction::PARAMETER_ONLINE, _displayScreen->getIsOnline()));
+			stream << t.cell("Message de maintenance", t.getForm().getTextAreaInput(UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE, _displayScreen->getMaintenanceMessage(), 3, 30));
+			stream << t.close();
 
 			stream << "<h1>Contrôle de cohérence des données</h1>";
 			
@@ -200,6 +179,21 @@ namespace synthese
 			: AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>()
 		{
 	
+		}
+
+		AdminInterfaceElement::PageLinks DisplayMaintenanceAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				links.push_back(currentPage.getPageLink());
+			}
+			return links;
+		}
+
+		AdminInterfaceElement::PageLinks DisplayMaintenanceAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return AdminInterfaceElement::PageLinks();
 		}
 	}
 }

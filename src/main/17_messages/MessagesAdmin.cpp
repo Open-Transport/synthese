@@ -46,9 +46,10 @@
 #include "17_messages/AlarmStopAction.h"
 #include "17_messages/ScenarioStopAction.h"
 #include "17_messages/MessagesRight.h"
+#include "17_messages/MessagesModule.h"
 
 #include "32_admin/AdminRequest.h"
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminModule.h"
 #include "32_admin/AdminParametersException.h"
 
@@ -68,17 +69,13 @@ namespace synthese
 
 	namespace util
 	{
-		template <> const string FactorableTemplate<AdminInterfaceElement,MessagesAdmin>::FACTORY_KEY("messages");
+		template <> const string FactorableTemplate<AdminInterfaceElement,MessagesAdmin>::FACTORY_KEY("0messages");
 	}
 
 	namespace admin
 	{
 		template <> const string AdminInterfaceElementTemplate<MessagesAdmin>::ICON("note.png");
-		template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<MessagesAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		template <> string AdminInterfaceElementTemplate<MessagesAdmin>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template <> const string AdminInterfaceElementTemplate<MessagesAdmin>::DEFAULT_TITLE("Messages diffusés");
 	}
 
 	namespace messages
@@ -160,10 +157,6 @@ namespace synthese
 
 		}
 
-		string MessagesAdmin::getTitle() const
-		{
-			return "Messages";
-		}
 
 		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -396,6 +389,16 @@ namespace synthese
 		bool MessagesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return request->isAuthorized<MessagesRight>(READ);
+		}
+
+		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

@@ -1,4 +1,6 @@
 
+synthese::departurestable::DeparturesTableModule::integrate();
+
 synthese::departurestable::DeparturesTableInterfaceElement::integrate();
 synthese::departurestable::DeparturesTableTimeContentInterfaceElement::integrate();
 synthese::departurestable::DeparturesTableLineContentInterfaceElement::integrate();

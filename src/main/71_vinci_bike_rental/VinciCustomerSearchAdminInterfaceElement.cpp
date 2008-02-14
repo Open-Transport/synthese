@@ -57,11 +57,7 @@ namespace synthese
 	namespace admin
 	{
 		template <> const string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::ICON("vcard.png");
-		template <>const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		template <> string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template <> const string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::DEFAULT_TITLE("Clients");
 	}
 
 	namespace vinci
@@ -72,10 +68,7 @@ namespace synthese
 		VinciCustomerSearchAdminInterfaceElement::VinciCustomerSearchAdminInterfaceElement()
 			: AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>() {}
 
-		string VinciCustomerSearchAdminInterfaceElement::getTitle() const
-		{
-			return "Clients";
-		}
+
 
 		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -177,6 +170,16 @@ namespace synthese
 		void VinciCustomerSearchAdminInterfaceElement::setSearchName( const std::string& name )
 		{
 			_searchName = name;
+		}
+
+		AdminInterfaceElement::PageLinks VinciCustomerSearchAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

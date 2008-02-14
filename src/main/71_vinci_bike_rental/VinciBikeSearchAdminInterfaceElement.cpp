@@ -61,12 +61,8 @@ namespace synthese
 
 	namespace admin
 	{
-	template <> const string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::ICON("tag_blue.png");
-	template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-	template <> string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template <> const string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::ICON("tag_blue.png");
+		template <> const string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::DEFAULT_TITLE("Parc de vélos");
 	}
 
 	namespace vinci
@@ -76,12 +72,6 @@ namespace synthese
 
 		VinciBikeSearchAdminInterfaceElement::VinciBikeSearchAdminInterfaceElement()
 			: AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>() {}
-
-		string VinciBikeSearchAdminInterfaceElement::getTitle() const
-		{
-			return "Parc de vélos";
-		}
-
 
 		void VinciBikeSearchAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
@@ -177,6 +167,16 @@ namespace synthese
 			stream << rt.col() << rt.getActionForm().getTextInput(VinciAddBike::PARAMETER_MARKED_NUMBER, _cadreNumber);
 			stream << rt.col() << rt.getActionForm().getSubmitButton("Créer");
 			stream << rt.close();
+		}
+
+		AdminInterfaceElement::PageLinks VinciBikeSearchAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

@@ -84,20 +84,11 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DisplayAdmin>::ICON("monitor.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DisplayAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-		template<> string AdminInterfaceElementTemplate<DisplayAdmin>::getSuperior()
-		{
-			return DisplaySearchAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<DisplayAdmin>::DEFAULT_TITLE("Afficheur inconnu");
 	}
 
 	namespace departurestable
 	{
-		std::string DisplayAdmin::getTitle() const
-		{
-			return _displayScreen->getFullName();
-		}
-
 		void DisplayAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
 			// Rights
@@ -389,6 +380,10 @@ namespace synthese
 			try
 			{
 				_displayScreen = DisplayScreenTableSync::Get(id, GET_AUTO, true);
+				_pageLink.name = _displayScreen->getFullName();
+				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				_pageLink.parameterValue = Conversion::ToString(id);
+
 			}
 			catch (DisplayScreen::ObjectNotFoundException& e)
 			{
@@ -420,6 +415,30 @@ namespace synthese
 			: AdminInterfaceElementTemplate<DisplayAdmin>()
 		{
 
+		}
+
+		AdminInterfaceElement::PageLinks DisplayAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				links.push_back(currentPage.getPageLink());
+			}
+			return links;
+		}
+
+		
+		AdminInterfaceElement::PageLinks DisplayAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			AdminInterfaceElement::PageLink link;
+			link.factoryKey = DisplayMaintenanceAdmin::FACTORY_KEY;
+			link.icon = DisplayMaintenanceAdmin::ICON;
+			link.name = _displayScreen->getFullName();
+			link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+			link.parameterValue = Conversion::ToString(_displayScreen->getKey());
+			links.push_back(link);
+			return links;
 		}
 	}
 }

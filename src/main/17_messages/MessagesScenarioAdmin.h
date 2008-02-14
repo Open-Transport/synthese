@@ -91,12 +91,30 @@ namespace synthese
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
 
-			/** Title of the admin compound.
-				@return The title of the admin compound, for display purposes.
-			*/
-			std::string getTitle() const;
-
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+
+			/** Gets sub page of the designed parent page, which are from the current class.
+				@param factoryKey Key of the parent class
+				@param request User request
+				@return PageLinks A link to the page if the parent is DBLogList and if the page is the currently displayed one
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
+				const PageLink& parentLink
+				, const AdminInterfaceElement& currentPage
+			) const;
+
+			/** Sub pages getter.
+				@param request User request
+				@return PageLinks Ordered vector of sub pages links
+				@author Hugues Romain
+				@date 2008
+				
+				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
+				This method can be overloaded to create customized sub tree.
+			*/
+			virtual PageLinks getSubPages(const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}
 }

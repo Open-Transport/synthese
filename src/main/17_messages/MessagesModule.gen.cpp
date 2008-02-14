@@ -1,4 +1,6 @@
 
+synthese::messages::MessagesModule::integrate();
+
 synthese::messages::ScenarioTableSync::integrate();
 synthese::messages::AlarmTableSync::integrate();
 synthese::messages::TextTemplateTableSync::integrate();
@@ -13,6 +15,7 @@ synthese::messages::SingleSentAlarmInheritedTableSync::integrate();
 synthese::messages::MessagesAdmin::integrate();
 synthese::messages::MessageAdmin::integrate();
 synthese::messages::MessagesLibraryAdmin::integrate();
+synthese::messages::MessagesTemplateLibraryAdmin::integrate();
 synthese::messages::MessagesScenarioAdmin::integrate();
 
 synthese::messages::MessagesRight::integrate();

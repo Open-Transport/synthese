@@ -42,9 +42,11 @@ namespace synthese
 		*/
 		class AdminRequest : public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, AdminRequest>
 		{
+		public:
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ACTION_FAILED_PAGE;
 			
+		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const AdminInterfaceElement>	_page;

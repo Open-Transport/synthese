@@ -33,10 +33,14 @@
 #include "17_messages/AlarmAddLinkAction.h"
 #include "17_messages/AlarmRemoveLinkAction.h"
 #include "17_messages/SingleSentAlarm.h"
+#include "17_messages/ScenarioSentAlarm.h"
+#include "17_messages/ScenarioTemplate.h"
+#include "17_messages/SentScenario.h"
 #include "17_messages/AlarmTemplate.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesAdmin.h"
 #include "17_messages/MessagesLibraryAdmin.h"
+#include "17_messages/MessagesScenarioAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
 #include "30_server/QueryString.h"
@@ -64,23 +68,12 @@ namespace synthese
 
 	namespace admin
 	{
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<MessageAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
 		template<> const string AdminInterfaceElementTemplate<MessageAdmin>::ICON("note.png");
-		template<> string AdminInterfaceElementTemplate<MessageAdmin>::getSuperior()
-		{
-//			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
-//				return MessagesLibraryAdmin::FACTORY_KEY;
-			return MessagesAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<MessageAdmin>::DEFAULT_TITLE("Message inconnu");
 	}
 
 	namespace messages
 	{
-		string MessageAdmin::getTitle() const
-		{
-			return _alarm->getShortMessage();
-		}
-
 		void MessageAdmin::setFromParametersMap( const ParametersMap& map )
 		{
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
@@ -90,7 +83,10 @@ namespace synthese
 
 			try
 			{
-				_alarm.reset(AlarmTableSync::Get(id));
+				_alarm.reset(AlarmTableSync::Get(id, true));
+				_pageLink.name = _alarm->getShortMessage();
+				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			catch(...)
 			{
@@ -184,6 +180,32 @@ namespace synthese
 			: AdminInterfaceElementTemplate<MessageAdmin>()
 		{
 		
+		}
+
+		AdminInterfaceElement::PageLinks MessageAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				const MessageAdmin& currentSPage(static_cast<const MessageAdmin&>(currentPage));
+				shared_ptr<const SingleSentAlarm> alarm(dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(currentSPage._alarm));
+				if (alarm.get())
+				{
+					if (parentLink.factoryKey == MessagesAdmin::FACTORY_KEY)
+						links.push_back(currentPage.getPageLink());
+				}
+			}
+			return links;
+		}
+
+		AdminInterfaceElement::PageLinks MessageAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return AdminInterfaceElement::PageLinks();
+		}
+
+		boost::shared_ptr<const Alarm> MessageAdmin::getAlarm() const
+		{
+			return _alarm;
 		}
 	}
 }

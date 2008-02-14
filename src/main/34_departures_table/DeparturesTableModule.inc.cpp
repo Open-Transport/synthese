@@ -1,4 +1,6 @@
 
+#include "34_departures_table/DeparturesTableModule.h"
+
 #include "34_departures_table/DeparturesTableInterfaceElement.h"
 
 

@@ -88,6 +88,14 @@
 				RelativePath=".\HomeAdmin.h"
 				>
 			</File>
+			<File
+				RelativePath=".\ModuleAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ModuleAdmin.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="18 Functions"

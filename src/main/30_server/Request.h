@@ -31,6 +31,7 @@
 #include "12_security/Right.h"
 
 #include "30_server/Session.h"
+#include "30_server/ParametersMap.h"
 
 #include "01_util/Factory.h"
 
@@ -50,7 +51,6 @@ namespace synthese
 	{
 		class Action;
 		class Function;
-		class ParametersMap;
 		class QueryString;
 
 		/** Parsed request.
@@ -115,6 +115,8 @@ namespace synthese
 			std::string					_errorMessage;
 			ErrorLevel					_errorLevel;
 			uid							_object_id;			//!< Object ID to display (generic parameter which can be used or not by the subclasses)
+			ParametersMap				_internalParameters;
+
 
 			ParametersMap _getParametersMap() const;
 
@@ -151,21 +153,22 @@ namespace synthese
 			void _setFunction(boost::shared_ptr<Function> function);
 			//@}
 
-				/** Construction of an empty request from an other one.
+		public:
+			/** Construction of an empty request from an other one.
 					@param request Request to copy (default/NULL = no copy)
 					@param function Function to link with
 					@param action Action to link with
 					@author Hugues Romain
 					@date 2007
 					Use the public setters to fill the request.					
-				*/
+			*/
 			Request(
 				const Request* request=NULL
 				, boost::shared_ptr<Function> function=boost::shared_ptr<Function>()
 				, boost::shared_ptr<Action> action=boost::shared_ptr<Action>()
-				);
-				
-		public:
+			);
+
+			ParametersMap&					getInternalParameters();
 
 			boost::shared_ptr<Function> _getFunction();
 			boost::shared_ptr<const Function> _getFunction() const;

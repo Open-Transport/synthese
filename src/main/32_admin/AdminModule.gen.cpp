@@ -2,6 +2,7 @@
 synthese::admin::AdminInterfacePage::integrate();
 
 synthese::admin::HomeAdmin::integrate();
+synthese::admin::ModuleAdmin::integrate();
 
 synthese::admin::AdminRequest::integrate();
 

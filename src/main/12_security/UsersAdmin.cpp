@@ -40,7 +40,7 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminModule.h"
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminRequest.h"
 
 
@@ -64,11 +64,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<UsersAdmin>::ICON("user.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<UsersAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		template<> string AdminInterfaceElementTemplate<UsersAdmin>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<UsersAdmin>::DEFAULT_TITLE("Utilisateurs");
 	}
 	
 	namespace security
@@ -76,11 +72,6 @@ namespace synthese
 		const std::string UsersAdmin::PARAM_SEARCH_PROFILE_ID = "searchprofileid";
 		const std::string UsersAdmin::PARAM_SEARCH_NAME = "searchname";
 		const std::string UsersAdmin::PARAM_SEARCH_LOGIN = "searchlogin";
-
-		std::string UsersAdmin::getTitle() const
-		{
-			return "Utilisateurs";
-		}
 
 
 		void UsersAdmin::setFromParametersMap(const ParametersMap& map)
@@ -195,6 +186,16 @@ namespace synthese
 			: AdminInterfaceElementTemplate<UsersAdmin>()
 		{
 		
+		}
+
+		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == SecurityModule::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

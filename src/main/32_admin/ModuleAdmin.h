@@ -1,6 +1,6 @@
 
-/** VinciAccountsAdminInterfaceElement class header.
-	@file VinciAccountsAdminInterfaceElement.h
+/** ModuleAdmin class header.
+	@file ModuleAdmin.h
 	@author Hugues Romain
 	@date 2008
 
@@ -22,36 +22,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_VinciAccountsAdminInterfaceElement_H__
-#define SYNTHESE_VinciAccountsAdminInterfaceElement_H__
+#ifndef SYNTHESE_ModuleAdmin_H__
+#define SYNTHESE_ModuleAdmin_H__
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
-#include "05_html/ResultHTMLTable.h"
-
 namespace synthese
 {
-	namespace vinci
+	namespace admin
 	{
-		/** VinciAccountsAdminInterfaceElement Class.
-			@ingroup m71Admin refAdmin
+		/** ModuleAdmin Class.
+			@ingroup m14Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/
-		class VinciAccountsAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>
+		class ModuleAdmin : public admin::AdminInterfaceElementTemplate<ModuleAdmin>
 		{
-			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			std::string									_searchName;
-			std::string									_searchCode;
+			std::string	_moduleKey;
 
 		public:
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_CODE;
-			static const std::string PARAMETER_UNIT_PRICE;
-			static const std::string PARAMETER_LOCKED;
-			static const std::string PARAMETER_STOCK;
+			static const std::string PARAMETER_MODULE;
 
-			VinciAccountsAdminInterfaceElement();
+			ModuleAdmin();
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -67,8 +59,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& , const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
-
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
 			
 			/** Authorization control.
 				@param request The current request
@@ -78,7 +69,6 @@ namespace synthese
 			*/
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 			
-
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
 				@param request User request
@@ -94,4 +84,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_VinciAccountsAdminInterfaceElement_H__
+#endif // SYNTHESE_ModuleAdmin_H__

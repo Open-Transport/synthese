@@ -81,8 +81,6 @@ namespace synthese
 		*/
 		class UserAdmin: public admin::AdminInterfaceElementTemplate<UserAdmin>
 		{
-			static const std::string PARAM_USER_ID;
-
 			boost::shared_ptr<const User> _user;
 			bool _userError;
 
@@ -94,9 +92,20 @@ namespace synthese
 			*/
 			void setFromParametersMap(const server::ParametersMap& map);
 
-			std::string getTitle() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+
+			/** Gets sub page of the designed parent page, which are from the current class.
+				@param factoryKey Key of the parent class
+				@param request User request
+				@return PageLinks A link to the page if the parent is Users and if the page is the currently displayed one
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
+				const PageLink& parentLink
+				, const AdminInterfaceElement& currentPage
+			) const;
 		};
 	}
 }

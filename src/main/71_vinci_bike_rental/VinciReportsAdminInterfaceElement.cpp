@@ -55,12 +55,8 @@ namespace synthese
 
 	namespace admin
 	{
-	    template <> const string AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>::ICON("chart_curve.png");
-	    template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-	    template <> string AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>::getSuperior()
-		{
-			return HomeAdmin::FACTORY_KEY;
-		}
+		template <> const string AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>::ICON("chart_curve.png");
+		template <> const string AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>::DEFAULT_TITLE("Etats statistiques");
 	}
 
 	namespace vinci
@@ -74,10 +70,6 @@ namespace synthese
 		const std::string VinciReportsAdminInterfaceElement::PARAM_START_DATE = "vraiepsd";
 		const std::string VinciReportsAdminInterfaceElement::PARAM_END_DATE = "vraieped";
 
-		string VinciReportsAdminInterfaceElement::getTitle() const
-		{
-			return "Etats journaliers";
-		}
 
 		void VinciReportsAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -162,6 +154,16 @@ namespace synthese
 		bool VinciReportsAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		AdminInterfaceElement::PageLinks VinciReportsAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

@@ -40,12 +40,12 @@
 #include "12_security/SecurityRight.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/Constants.h"
-#include "12_security/UsersAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminModule.h"
 #include "32_admin/AdminRequest.h"
+#include "32_admin/ModuleAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -67,11 +67,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<ProfilesAdmin>::ICON("group.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<ProfilesAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
-		template<> string AdminInterfaceElementTemplate<ProfilesAdmin>::getSuperior()
-		{
-			return UsersAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<ProfilesAdmin>::DEFAULT_TITLE("Profils");
 	}
 
 	namespace security
@@ -101,11 +97,6 @@ namespace synthese
 			);
 
 			_resultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _searchResult);
-		}
-
-		string ProfilesAdmin::getTitle() const
-		{
-			return "Profils";
 		}
 
 		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -186,6 +177,16 @@ namespace synthese
 			: AdminInterfaceElementTemplate<ProfilesAdmin>()
 		{
 
+		}
+
+		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == SecurityModule::FACTORY_KEY)
+			{
+				links.push_back(_pageLink);
+			}
+			return links;
 		}
 	}
 }

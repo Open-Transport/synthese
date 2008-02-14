@@ -31,6 +31,7 @@
 
 #include "30_server/FunctionRequest.h"
 
+#include <vector>
 
 namespace synthese
 {
@@ -58,12 +59,68 @@ namespace synthese
 		class AdminInterfaceElement : public util::Factorable<AdminInterfaceElement>
 		{
 		public:
-			typedef enum { EVER_DISPLAYED, DISPLAYED_IF_CURRENT, NEVER_DISPLAYED } DisplayMode;
+			struct Args
+			{
+				std::string defaultIcon;
+				std::string defaultName;
+				std::string factoryKey;
+
+				Args(const std::string& _factoryKey, const std::string& _defaultIcon, const std::string& defaultName);
+				Args();
+			};
+			
+			struct PageLink
+			{
+				std::string name;
+				std::string factoryKey;
+				std::string parameterName;
+				std::string parameterValue;
+				std::string icon;
+
+				PageLink(
+					const std::string& _factoryKey
+					, const std::string& _defaultIcon
+					, const std::string& _defaultName
+				);
+				PageLink();
+
+				bool operator==(const PageLink& other) const;
+
+				std::string getURL(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			};
+			
+			typedef std::vector<PageLink> PageLinks;
+			
+			struct PageLinksTree
+			{
+				PageLink					pageLink;
+				std::vector<PageLinksTree>	subPages;
+			};
+
+
+		protected:
+			PageLink				_pageLink;
+			mutable PageLinks		_treePosition;
+			mutable PageLinksTree	_tree;
+
+			std::vector<PageLinksTree>	_buildTreeRecursion(
+				const PageLink page
+				, const server::FunctionRequest<admin::AdminRequest>* request
+				, const PageLinks position
+			) const;
+
+			void _buildTree(
+				const server::FunctionRequest<admin::AdminRequest>* request
+			) const;
 
 		public:
-			AdminInterfaceElement();
+			AdminInterfaceElement(const Args& args);
 
-//			std::string getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			const PageLinks&		getTreePosition(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			const PageLinksTree&	getTree(const server::FunctionRequest<admin::AdminRequest>* request)	const;
+
+			static boost::shared_ptr<AdminInterfaceElement>	GetAdminPage(const PageLink& pageLink);
+
 
 			//! \name Virtual initialization method
 			//@{
@@ -97,16 +154,38 @@ namespace synthese
 				*/
 				virtual void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<AdminRequest>* request=NULL) const = 0;
 
-				/** Title of the admin compound.
-					@return The title of the admin compound, for display purposes.
+				
+				/** Current page link getter.
+					@return const PageLink& Current page link
+					@author Hugues Romain
+					@date 2008					
 				*/
-				virtual std::string getTitle() const = 0;
+				const PageLink& getPageLink() const;
 
-				virtual std::string getIcon() const = 0;
+				/** Gets sub page of the designed parent page, which are from the current class.
+					@param factoryKey Key of the parent class
+					@param request User request
+					@return PageLinks Ordered vector of sub pages links
+					@author Hugues Romain
+					@date 2008
+					
+				*/
+				virtual PageLinks getSubPagesOfParent(
+					const PageLink& parentLink
+					, const AdminInterfaceElement& currentPage
+				) const = 0;
 
-				virtual std::string getSuperiorVirtual() const = 0;
 
-				virtual DisplayMode getDisplayMode() const = 0;
+				/** Sub pages getter.
+					@param request User request
+					@return PageLinks Ordered vector of sub pages links
+					@author Hugues Romain
+					@date 2008
+					
+					The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
+					This method can be overloaded to create customized sub tree.
+				*/
+				virtual PageLinks getSubPages(const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request) const;
 			//@}
 		};
 	}

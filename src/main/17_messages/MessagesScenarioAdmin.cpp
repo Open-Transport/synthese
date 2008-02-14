@@ -24,6 +24,7 @@
 #include "05_html/PropertiesHTMLTable.h"
 
 #include "17_messages/MessagesScenarioAdmin.h"
+#include "17_messages/MessagesAdmin.h"
 #include "17_messages/MessageAdmin.h"
 #include "17_messages/Scenario.h"
 #include "17_messages/ScenarioTemplate.h"
@@ -62,13 +63,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<MessagesScenarioAdmin>::ICON("cog.png");
-		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<MessagesScenarioAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
-		template<> string AdminInterfaceElementTemplate<MessagesScenarioAdmin>::getSuperior()
-		{
-//			if (_sentScenario.get())
-//				_setSuperior("messages");
-			return MessagesLibraryAdmin::FACTORY_KEY;
-		}
+		template<> const string AdminInterfaceElementTemplate<MessagesScenarioAdmin>::DEFAULT_TITLE("Scénario inconnu");
 	}
 
 	namespace messages
@@ -84,6 +79,9 @@ namespace synthese
 				_scenario.reset(ScenarioTableSync::Get(id));
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
 				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
+				_pageLink.name = _scenario->getName();
+				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			catch(...)
 			{
@@ -91,10 +89,6 @@ namespace synthese
 			}
 		}
 
-		string MessagesScenarioAdmin::getTitle() const
-		{
-			return _scenario->getName();
-		}
 
 		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
@@ -190,6 +184,74 @@ namespace synthese
 			: AdminInterfaceElementTemplate<MessagesScenarioAdmin>()
 		{
 
+		}
+
+		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			if (currentPage.getFactoryKey() == FACTORY_KEY)
+			{
+				const MessagesScenarioAdmin& currentSPage(static_cast<const MessagesScenarioAdmin&>(currentPage));
+				if (parentLink.factoryKey == (currentSPage._sentScenario.get() ? MessagesAdmin::FACTORY_KEY : MessagesLibraryAdmin::FACTORY_KEY))
+				{
+					links.push_back(currentPage.getPageLink());
+				}
+			}
+
+			if (currentPage.getFactoryKey() == MessageAdmin::FACTORY_KEY && parentLink.factoryKey == MessagesAdmin::FACTORY_KEY)
+			{
+				const MessageAdmin& currentSPage(static_cast<const MessageAdmin&>(currentPage));
+				shared_ptr<const ScenarioSentAlarm> alarm(dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(currentSPage.getAlarm()));
+				if (alarm.get())
+				{
+					const SentScenario* scenario(alarm->getScenario());
+					AdminInterfaceElement::PageLink link;
+					link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
+					link.name = scenario->getName();
+					link.icon = MessagesScenarioAdmin::ICON;
+					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterValue = Conversion::ToString(scenario->getKey());
+					links.push_back(link);
+				}
+			}
+
+			return links;
+		}
+
+		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+			
+			if (_sentScenario.get())
+			{
+				vector<shared_ptr<ScenarioSentAlarm> > vs = AlarmTableSync::searchScenarioSent(_sentScenario.get());
+				for (vector<shared_ptr<ScenarioSentAlarm> >::const_iterator it = vs.begin(); it != vs.end(); ++it)
+				{
+					AdminInterfaceElement::PageLink link;
+					link.factoryKey = MessageAdmin::FACTORY_KEY;
+					link.name = (*it)->getShortMessage();
+					link.icon = MessageAdmin::ICON;
+					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterValue = Conversion::ToString((*it)->getId());
+					links.push_back(link);
+				}
+			}
+			else if (_templateScenario.get())
+			{
+				vector<shared_ptr<AlarmTemplate> > vs = AlarmTableSync::searchTemplates(_templateScenario.get());
+				for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = vs.begin(); it != vs.end(); ++it)
+				{
+					AdminInterfaceElement::PageLink link;
+					link.factoryKey = MessageAdmin::FACTORY_KEY;
+					link.name = (*it)->getShortMessage();
+					link.icon = MessageAdmin::ICON;
+					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterValue = Conversion::ToString((*it)->getId());
+					links.push_back(link);
+				}
+			}
+
+			return links;
 		}
 	}
 }
