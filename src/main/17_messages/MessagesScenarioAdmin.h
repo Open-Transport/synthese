@@ -74,9 +74,9 @@ namespace synthese
 		class MessagesScenarioAdmin : public admin::AdminInterfaceElementTemplate<MessagesScenarioAdmin>
 		{
 		private:
-			boost::shared_ptr<const SentScenario> _sentScenario;
-			boost::shared_ptr<const ScenarioTemplate> _templateScenario;
-			const Scenario*								_scenario;
+			boost::shared_ptr<const SentScenario>		_sentScenario;
+			boost::shared_ptr<const ScenarioTemplate>	_templateScenario;
+			boost::shared_ptr<const Scenario>			_scenario;
 
 		public:
 			MessagesScenarioAdmin();

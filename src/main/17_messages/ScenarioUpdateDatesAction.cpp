@@ -23,8 +23,9 @@
 #include "ScenarioUpdateDatesAction.h"
 
 #include "17_messages/MessagesModule.h"
-#include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTableSync.h"
+#include "17_messages/SentScenario.h"
+#include "17_messages/SentScenarioInheritedTableSync.h"
 #include "17_messages/MessagesLog.h"
 
 #include "30_server/ActionException.h"
@@ -47,7 +48,7 @@ namespace synthese
 	using namespace time;
 	using namespace util;
 
-	template<> const string util::FactorableTemplate<Action,messages::ScenarioUpdateDatesAction>::FACTORY_KEY("messscenarioud");
+	template<> const string util::FactorableTemplate<Action,messages::ScenarioUpdateDatesAction>::FACTORY_KEY("ScenarioUpdateDatesAction");
 		
 	namespace messages
 	{
@@ -67,7 +68,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = ScenarioTableSync::getSent(_request->getObjectId());
+				_scenario.reset(SentScenarioInheritedTableSync::GetUpdateable(_request->getObjectId()));
 
 				_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 
@@ -107,7 +108,7 @@ namespace synthese
 			_scenario->setIsEnabled(_enabled);
 			_scenario->setPeriodStart(_startDate);
 			_scenario->setPeriodEnd(_endDate);
-			ScenarioTableSync::save(_scenario.get());
+			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
 			MessagesLog::addUpdateEntry(_scenario.get(), text.str(), _request->getUser().get());

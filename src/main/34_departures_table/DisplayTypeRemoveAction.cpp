@@ -88,7 +88,7 @@ namespace synthese
 
 		void DisplayTypeRemoveAction::run()
 		{
-			DisplayTypeTableSync::remove(_type->getKey());
+			DisplayTypeTableSync::Remove(_type->getKey());
 
 			ArrivalDepartureTableLog::addDeleteTypeEntry(_type.get(), _request->getUser().get());
 		}

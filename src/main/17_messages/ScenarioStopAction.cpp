@@ -24,6 +24,7 @@
 
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/SentScenario.h"
+#include "17_messages/SentScenarioInheritedTableSync.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesLog.h"
 
@@ -54,7 +55,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = ScenarioTableSync::getSent(_request->getObjectId());
+				_scenario.reset(SentScenarioInheritedTableSync::GetUpdateable(_request->getObjectId()));
 			}
 			catch (...) {
 				throw ActionException("Invalid scenario");
@@ -66,7 +67,7 @@ namespace synthese
 			// Action
 			_scenario->setPeriodEnd(_stopDateTime);
 			_scenario->setIsEnabled(false);
-			ScenarioTableSync::save(_scenario.get());
+			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
 			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser().get());

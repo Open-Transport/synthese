@@ -49,28 +49,28 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<CityTableSync,City>::TABLE_NAME = "t006_cities";
-		template<> const int SQLiteTableSyncTemplate<CityTableSync,City>::TABLE_ID = 6;
-		template<> const bool SQLiteTableSyncTemplate<CityTableSync,City>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<CityTableSync>::TABLE_NAME = "t006_cities";
+		template<> const int SQLiteTableSyncTemplate<CityTableSync>::TABLE_ID = 6;
+		template<> const bool SQLiteTableSyncTemplate<CityTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<CityTableSync,City>::load(City* object, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::load(City* object, const db::SQLiteResultSPtr& rows)
 		{
 		    object->setKey(rows->getLongLong (TABLE_COL_ID));
 		    object->setName(rows->getText ( CityTableSync::TABLE_COL_NAME));
 		    object->setCode(rows->getText ( CityTableSync::TABLE_COL_CODE));  
 		}
 
-		template<> void SQLiteTableSyncTemplate<CityTableSync,City>::_link(City* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::_link(City* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			EnvModule::getCitiesMatcher ().add (obj->getName (), obj->getKey ());
 		}
 
-		template<> void SQLiteTableSyncTemplate<CityTableSync,City>::_unlink(City* obj)
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::_unlink(City* obj)
 		{
 			EnvModule::getCitiesMatcher ().remove (obj->getName ());
 		}
 
-		template<> void SQLiteTableSyncTemplate<CityTableSync,City>::save(City* object)
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::save(City* object)
 		{
 			/// @todo Implement
 			/*			SQLite* sqlite = DBModule::GetSQLite();

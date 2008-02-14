@@ -53,13 +53,13 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::TABLE_NAME("t050_vinci_stock_alerts");
-		template<> const int SQLiteTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::TABLE_ID(50);
-		template<> const bool SQLiteTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::HAS_AUTO_INCREMENT(true);
+		template<> const string SQLiteTableSyncTemplate<VinciStockAlertTableSync>::TABLE_NAME("t050_vinci_stock_alerts");
+		template<> const int SQLiteTableSyncTemplate<VinciStockAlertTableSync>::TABLE_ID(50);
+		template<> const bool SQLiteTableSyncTemplate<VinciStockAlertTableSync>::HAS_AUTO_INCREMENT(true);
 
 
 
-		template<> void SQLiteTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::load(
+		template<> void SQLiteDirectTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::load(
 			VinciStockAlert* object
 			, const db::SQLiteResultSPtr& rows
 		){
@@ -79,7 +79,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::save(
+		template<> void SQLiteDirectTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::save(
 			VinciStockAlert* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -100,7 +100,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::_link(
+		template<> void SQLiteDirectTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::_link(
 			VinciStockAlert* object
 			, const SQLiteResultSPtr& rows
 			, GetSource temporary
@@ -108,7 +108,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::_unlink(
+		template<> void SQLiteDirectTableSyncTemplate<VinciStockAlertTableSync,VinciStockAlert>::_unlink(
 			VinciStockAlert* obj
 		){
 		}

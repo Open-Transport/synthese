@@ -52,11 +52,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::TABLE_NAME = "t036_display_types";
-		template<> const int SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::TABLE_ID = 36;
-		template<> const bool SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE_NAME = "t036_display_types";
+		template<> const int SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE_ID = 36;
+		template<> const bool SQLiteTableSyncTemplate<DisplayTypeTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::load(DisplayType* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::load(DisplayType* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setName(rows->getText ( DisplayTypeTableSync::TABLE_COL_NAME));
@@ -65,7 +65,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::_link(DisplayType* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::_link(DisplayType* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid id(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID));
 
@@ -74,14 +74,14 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::_unlink(DisplayType* obj)
+		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::_unlink(DisplayType* obj)
 		{
 			obj->setInterface(NULL);
 		}
 
     
 
-		template<> void SQLiteTableSyncTemplate<DisplayTypeTableSync,DisplayType>::save(DisplayType* object)
+		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::save(DisplayType* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			if (object->getKey() <= 0)

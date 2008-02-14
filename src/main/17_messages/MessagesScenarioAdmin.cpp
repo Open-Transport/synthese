@@ -21,7 +21,7 @@
 */
 
 #include "05_html/ActionResultHTMLTable.h"
-#include "05_html/HTMLForm.h"
+#include "05_html/PropertiesHTMLTable.h"
 
 #include "17_messages/MessagesScenarioAdmin.h"
 #include "17_messages/MessageAdmin.h"
@@ -79,19 +79,16 @@ namespace synthese
 			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
-			shared_ptr<const Scenario> scenario;
 			try
 			{
-				scenario = ScenarioTableSync::getScenario(id);
+				_scenario.reset(ScenarioTableSync::Get(id));
+				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
+				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
 			}
 			catch(...)
 			{
 				throw AdminParametersException("Specified scenario not found");
 			}
-
-			_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
-			_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
-			_scenario = scenario.get();
 		}
 
 		string MessagesScenarioAdmin::getTitle() const
@@ -118,10 +115,10 @@ namespace synthese
 			addRequest.getAction()->setIsTemplate(_templateScenario.get() != NULL);
 
 			stream << "<h1>Propriété</h1>";
-			HTMLForm uf(updateRequest.getHTMLForm("update"));
-			stream << uf.open();
-			stream << "<p>Nom : " << uf.getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()) << uf.getSubmitButton("Modifier") << "</p>";
-			stream << uf.close();
+			PropertiesHTMLTable tp(updateRequest.getHTMLForm("update"));
+			stream << tp.open();
+			stream << tp.cell("Nom", tp.getForm().getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()));
+			stream << tp.close();
 
 			if (_sentScenario.get())
 			{
@@ -130,25 +127,14 @@ namespace synthese
 				updateDatesRequest.setObjectId(_scenario->getId());
 
 				stream << "<h1>Diffusion</h1>";
-				HTMLForm udf(updateDatesRequest.getHTMLForm("update_dates"));
-				HTMLTable udt;
+				PropertiesHTMLTable udt(updateDatesRequest.getHTMLForm("update_dates"));
 
-				stream << udf.open() << udt.open();
+				stream << udt.open();
 
-				stream << udt.row();
-				stream << udt.col() << "Début diffusion";
-				stream << udt.col() << udf.getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart());
-				stream << udt.row();
-				stream << udt.col() << "Fin diffusion";
-				stream << udt.col() << udf.getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd());
-				stream << udt.row();
-				stream << udt.col() << "Actif";
-				stream << udt.col() << udf.getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled());
-
-				stream << udt.row();
-				stream << udt.col(2) << udf.getSubmitButton("Enregistrer");
-
-				stream << udt.close() << udf.close();
+				stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
+				stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd()));
+				stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
+				stream << udt.close();
 			}
 
 			stream << "<h1>Messages</h1>";

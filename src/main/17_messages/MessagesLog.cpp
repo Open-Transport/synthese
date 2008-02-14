@@ -83,7 +83,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			content.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario().getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
 
 		std::string MessagesLog::getObjectName( uid id ) const
@@ -92,14 +92,16 @@ namespace synthese
 
 			if (tableId == AlarmTableSync::TABLE_ID)
 			{
-				shared_ptr<Alarm> alarm = AlarmTableSync::getAlarm(id);
+				shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id));
 				return alarm->getShortMessage();
 			}
 			else if (tableId == ScenarioTableSync::TABLE_ID)
 			{
-				shared_ptr<Scenario> scenario = ScenarioTableSync::getScenario(id);
+				shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id));
 				return scenario->getName();
 			}
+
+			return std::string();
 		}
 
 		std::string MessagesLog::getName() const

@@ -50,11 +50,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AccountTableSync,Account>::TABLE_NAME = "t028_account";
-		template<> const int SQLiteTableSyncTemplate<AccountTableSync,Account>::TABLE_ID = 28;
-		template<> const bool SQLiteTableSyncTemplate<AccountTableSync,Account>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AccountTableSync>::TABLE_NAME = "t028_account";
+		template<> const int SQLiteTableSyncTemplate<AccountTableSync>::TABLE_ID = 28;
+		template<> const bool SQLiteTableSyncTemplate<AccountTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::load(Account* account, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::load(Account* account, const db::SQLiteResultSPtr& rows )
 		{
 		    account->setKey(rows->getLongLong (TABLE_COL_ID));
 		
@@ -72,7 +72,7 @@ namespace synthese
 			account->setUnitPrice(rows->getDouble(AccountTableSync::COL_UNIT_PRICE));
 		}
 
-		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::_link(Account* account, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::_link(Account* account, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			try
 			{
@@ -94,13 +94,13 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::_unlink(Account* account)
+		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::_unlink(Account* account)
 		{
 			account->setLeftCurrency(NULL);
 			account->setRightCurrency(NULL);
 		}
 
-		template<> void SQLiteTableSyncTemplate<AccountTableSync,Account>::save(Account* account)
+		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::save(Account* account)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

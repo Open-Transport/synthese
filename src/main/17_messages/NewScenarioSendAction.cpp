@@ -24,6 +24,7 @@
 
 #include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTemplate.h"
+#include "17_messages/ScenarioTemplateInheritedTableSync.h"
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
@@ -63,7 +64,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_TEMPLATE, true, FACTORY_KEY));
 			try
 			{
-				_template = ScenarioTableSync::getTemplate(id);
+				_template.reset(ScenarioTemplateInheritedTableSync::Get(id));
 			}
 			catch(...)
 			{
@@ -78,7 +79,7 @@ namespace synthese
 		{
 			// The action on the scenario
 			shared_ptr<SentScenario> scenario(new SentScenario(_template->getName()));
-			ScenarioTableSync::save (scenario.get());
+			ScenarioTableSync::Save (scenario.get());
 
 			// Remember of the id of created object to view it after the action
 			_request->setObjectId(scenario->getKey());
@@ -87,8 +88,8 @@ namespace synthese
 			vector<shared_ptr<AlarmTemplate> > alarms = AlarmTableSync::searchTemplates(_template.get());
 			for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
 			{
-				shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(*scenario, **it));
-				AlarmTableSync::save(alarm.get());
+				shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(scenario.get(), **it));
+				AlarmTableSync::Save(alarm.get());
 
 				vector<shared_ptr<AlarmObjectLink> > aols = AlarmObjectLinkTableSync::search(it->get());
 				for (vector<shared_ptr<AlarmObjectLink> >::const_iterator itaol = aols.begin(); itaol != aols.end(); ++itaol)

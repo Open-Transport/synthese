@@ -59,7 +59,7 @@ namespace synthese
 		{
 			try
 			{
-				_message = AlarmTableSync::getAlarm(_request->getObjectId());
+				_message.reset(AlarmTableSync::GetUpdateable(_request->getObjectId(), true));
 
 				uid id = map.getUid(PARAMETER_TEMPLATE_ID, true, FACTORY_KEY);
 				_template = TextTemplateTableSync::Get(id);
@@ -78,7 +78,7 @@ namespace synthese
 		{
 			_message->setShortMessage(_template->getShortMessage());
 			_message->setLongMessage(_template->getLongMessage());
-			AlarmTableSync::save(_message.get());
+			AlarmTableSync::Save(_message.get());
 		}
 	}
 }

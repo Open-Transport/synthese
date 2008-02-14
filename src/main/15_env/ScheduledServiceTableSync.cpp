@@ -63,11 +63,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::TABLE_NAME = "t016_scheduled_services";
-		template<> const int SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::TABLE_ID = 16;
-		template<> const bool SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE_NAME = "t016_scheduled_services";
+		template<> const int SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE_ID = 16;
+		template<> const bool SQLiteTableSyncTemplate<ScheduledServiceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::load(ScheduledService* ss, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::load(ScheduledService* ss, const db::SQLiteResultSPtr& rows )
 		{
 
 
@@ -135,7 +135,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_link(ScheduledService* ss, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_link(ScheduledService* ss, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
 
@@ -161,12 +161,12 @@ namespace synthese
 			path->addService(ss);
 		}
 
-		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_unlink(ScheduledService* ss)
+		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_unlink(ScheduledService* ss)
 		{
 			ss->getPath()->removeService(ss);
 		}
 
-		template<> void SQLiteTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::save(ScheduledService* object)
+		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::save(ScheduledService* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

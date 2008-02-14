@@ -51,11 +51,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::TABLE_NAME = "t010_line_stops";
-		template<> const int SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::TABLE_ID = 10;
-		template<> const bool SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<LineStopTableSync>::TABLE_NAME = "t010_line_stops";
+		template<> const int SQLiteTableSyncTemplate<LineStopTableSync>::TABLE_ID = 10;
+		template<> const bool SQLiteTableSyncTemplate<LineStopTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::load(LineStop* ls, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::load(LineStop* ls, const db::SQLiteResultSPtr& rows )
 		{
 			uid id (rows->getLongLong (TABLE_COL_ID));
 
@@ -94,7 +94,7 @@ namespace synthese
 			ls->setRankInPath(rankInPath);
 		}
 
-		template<> void SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::_link(LineStop* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::_link(LineStop* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 			uid fromPhysicalStopId (
@@ -110,7 +110,7 @@ namespace synthese
 				line->addEdge(obj);
 		}
 
-		template<> void SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::_unlink(LineStop* obj)
+		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::_unlink(LineStop* obj)
 		{
 			/// @todo line remove edge
 
@@ -118,7 +118,7 @@ namespace synthese
 			obj->setPhysicalStop(NULL);
 		}
 
-		template<> void SQLiteTableSyncTemplate<LineStopTableSync,LineStop>::save(LineStop* object)
+		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::save(LineStop* object)
 		{
 /*			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

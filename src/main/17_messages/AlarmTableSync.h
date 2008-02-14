@@ -22,12 +22,14 @@
 #ifndef SYNTHESE_ENVLSSQL_ALARMTABLESYNC_H
 #define SYNTHESE_ENVLSSQL_ALARMTABLESYNC_H
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteInheritanceTableSyncTemplate.h"
 
 #include "04_time/DateTime.h"
 
 #include "17_messages/Alarm.h"
 #include "17_messages/Types.h"
+
+#include "01_util/Exception.h"
 
 #include <string>
 
@@ -51,7 +53,7 @@ namespace synthese
 
 			@note As Alarm is an abstract class, do not use the get static method. Use getAlarm instead.
 		*/
-		class AlarmTableSync : public db::SQLiteTableSyncTemplate<AlarmTableSync,Alarm>
+		class AlarmTableSync : public db::SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>
 		{
 		private:
 			static const std::string _COL_CONFLICT_LEVEL;
@@ -69,30 +71,6 @@ namespace synthese
 			
 			AlarmTableSync ();
 			~AlarmTableSync ();
-
-		protected:
-
-
-			/** Action to do on alarm creation.
-				
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on alarm update.
-			
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on alarm deletion.
-			
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
 
 		public:
 /*			static std::vector<boost::shared_ptr<Alarm> > search(
@@ -151,7 +129,7 @@ WHERE
 				, bool orderByStatus = false
 				, bool orderByConflict = false
 				, bool raisingOrder = false
-				);
+			);
 			
 			static std::vector<boost::shared_ptr<AlarmTemplate> > searchTemplates(
 				const ScenarioTemplate* scenario
@@ -159,12 +137,8 @@ WHERE
 				, int number = 0
 				, bool orderByLevel = false
 				, bool raisingOrder = false
-				);
-
-			static boost::shared_ptr<Alarm> getAlarm(uid key);
-			static boost::shared_ptr<SingleSentAlarm> getSingleSentAlarm(uid key);
+			);
 		};
-
 	}
 }
 

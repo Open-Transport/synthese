@@ -70,6 +70,7 @@ namespace synthese
 			, _trackNumberDisplay(false)
 			, _serviceNumberDisplay(false)
 			, _displayType(NULL)
+			, _localization(NULL)
 		{
 		}
 

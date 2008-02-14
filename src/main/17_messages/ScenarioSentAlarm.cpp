@@ -30,7 +30,7 @@ namespace synthese
 
 	namespace messages
 	{
-		ScenarioSentAlarm::ScenarioSentAlarm(const SentScenario& scenario, const AlarmTemplate& source )
+		ScenarioSentAlarm::ScenarioSentAlarm(const SentScenario* scenario, const AlarmTemplate& source )
 			: SentAlarm()
 			, _scenario(scenario)
 		{
@@ -39,7 +39,7 @@ namespace synthese
 			setLongMessage(source.getLongMessage());
 		}
 
-		ScenarioSentAlarm::ScenarioSentAlarm( const SentScenario& scenario )
+		ScenarioSentAlarm::ScenarioSentAlarm( const SentScenario* scenario )
 			: SentAlarm()
 			, _scenario(scenario)
 		{
@@ -52,22 +52,27 @@ namespace synthese
 
 		bool ScenarioSentAlarm::getIsEnabled() const
 		{
-			return _scenario.getIsEnabled();
+			return _scenario->getIsEnabled();
 		}
 
 		const time::DateTime& ScenarioSentAlarm::getPeriodStart() const
 		{
-			return _scenario.getPeriodStart();
+			return _scenario->getPeriodStart();
 		}
 
 		const time::DateTime& ScenarioSentAlarm::getPeriodEnd() const
 		{
-			return _scenario.getPeriodEnd();
+			return _scenario->getPeriodEnd();
 		}
 
-		const SentScenario& ScenarioSentAlarm::getScenario() const
+		const SentScenario* ScenarioSentAlarm::getScenario() const
 		{
 			return _scenario;
+		}
+
+		void ScenarioSentAlarm::setScenario( const SentScenario* scenario )
+		{
+			_scenario = scenario;
 		}
 	}
 }

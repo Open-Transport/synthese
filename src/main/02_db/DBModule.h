@@ -28,6 +28,7 @@
 #include "02_db/Constants.h"
 
 #include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 #ifdef WITH_DBRING
 
@@ -58,9 +59,13 @@ namespace synthese
 
 		class DBModule : public util::FactorableTemplate<DbModuleClass, DBModule>
 		{
+		public:
+			typedef std::map<uid, std::string>	SubClassMap;
+
 		private:
 		    
-		    static SQLiteHandle* _sqlite;
+		    static SQLiteHandle*	_sqlite;
+			static SubClassMap		_subClassMap;
 
 		public:
 
@@ -74,6 +79,8 @@ namespace synthese
 		    static void ParameterCallback (const std::string& name, 
 						   const std::string& value);
 
+			static void AddSubClass(uid, const std::string&);
+			static std::string GetSubClass(uid id);
 		};
 		
 

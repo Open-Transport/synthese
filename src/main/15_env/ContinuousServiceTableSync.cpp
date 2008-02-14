@@ -62,11 +62,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::TABLE_NAME = "t017_continuous_services";
-		template<> const int SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::TABLE_ID = 17;
-		template<> const bool SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE_NAME = "t017_continuous_services";
+		template<> const int SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE_ID = 17;
+		template<> const bool SQLiteTableSyncTemplate<ContinuousServiceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::load(ContinuousService* cs, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::load(ContinuousService* cs, const db::SQLiteResultSPtr& rows )
 		{
 		    uid id (rows->getLongLong (TABLE_COL_ID));
 
@@ -138,7 +138,7 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_link(ContinuousService* cs, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_link(ContinuousService* cs, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid pathId (rows->getLongLong (ContinuousServiceTableSync::COL_PATHID));
 
@@ -164,12 +164,12 @@ namespace synthese
 				path->addService (cs);
 		}
 
-		template<> void SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_unlink(ContinuousService* obj)
+		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_unlink(ContinuousService* obj)
 		{
 			obj->getPath()->removeService(obj);
 		}
 
-		template<> void SQLiteTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::save(ContinuousService* object)
+		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::save(ContinuousService* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -211,56 +211,8 @@ namespace synthese
 			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
 		}
 
-/*		void ContinuousServiceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			// Loop on each added row
-			while (rows->next ())
-			{
-				if (ContinuousService::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					boost::shared_ptr<ContinuousService> service(ContinuousService::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-					service->getPath()->removeService(service.get());
-					load(service.get(), rows);
-				}
-				else
-				{
-					ContinuousService* service(new ContinuousService);
-					load(service, rows);
-					service->store();
-				}
-			}
-		}
-		
 
 
-		void ContinuousServiceTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (ContinuousService::Contains(id))
-				{
-					shared_ptr<ContinuousService> object = ContinuousService::GetUpdateable(id);
-					object->getPath()->removeService(object.get());
-					load(object.get(), rows);
-				}
-			}
-		}
-
-		void ContinuousServiceTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (ContinuousService::Contains(id))
-				{
-					shared_ptr<ContinuousService> object = ContinuousService::GetUpdateable(id);
-					object->getPath()->removeService(object.get());
-					ContinuousService::Remove(id);
-				}
-			}
-		}
-*/
 		std::vector<shared_ptr<ContinuousService> > ContinuousServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();

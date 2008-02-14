@@ -46,9 +46,8 @@ namespace synthese
 			static const std::string PARAMETER_SCENARIO_ID;
 
 		private:
-			boost::shared_ptr<SentScenario>	_sentScenario;
-			boost::shared_ptr<ScenarioTemplate>	_scenarioTemplate;
-			boost::shared_ptr<Scenario> _scenario;
+			boost::shared_ptr<const SentScenario>		_sentScenario;
+			boost::shared_ptr<const ScenarioTemplate>	_scenarioTemplate;
 			bool		_isTemplate;
 
 		protected:

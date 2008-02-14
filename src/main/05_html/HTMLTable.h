@@ -43,11 +43,11 @@ namespace synthese
 
 		protected:
 			std::string			_headers;	//<! Line of th columns. Will be displayed between tr tags
+			int					_cols;
 
 			int					_getColsNumber() const;
 
 		private:
-			int					_cols;
 			int					_curCol;
 			int					_curRow;
 			const std::string	_className;

@@ -49,11 +49,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AxisTableSync,Axis>::TABLE_NAME = "t004_axes";
-		template<> const int SQLiteTableSyncTemplate<AxisTableSync,Axis>::TABLE_ID = 4;
-		template<> const bool SQLiteTableSyncTemplate<AxisTableSync,Axis>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AxisTableSync>::TABLE_NAME = "t004_axes";
+		template<> const int SQLiteTableSyncTemplate<AxisTableSync>::TABLE_ID = 4;
+		template<> const bool SQLiteTableSyncTemplate<AxisTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<AxisTableSync,Axis>::load(Axis* axis, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::load(Axis* axis, const db::SQLiteResultSPtr& rows)
 		{
 		    axis->setKey(rows->getLongLong (TABLE_COL_ID));
 		    axis->setName (rows->getText (AxisTableSync::COL_NAME));
@@ -63,17 +63,17 @@ namespace synthese
 	    
 
 
-		template<> void SQLiteTableSyncTemplate<AxisTableSync,Axis>::_link(Axis* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::_link(Axis* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<AxisTableSync,Axis>::_unlink(Axis* obj)
+		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::_unlink(Axis* obj)
 		{
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<AxisTableSync,Axis>::save(Axis* object)
+		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::save(Axis* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

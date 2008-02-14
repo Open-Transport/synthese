@@ -54,11 +54,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::TABLE_NAME = "t045_log_entries";
-		template<> const int SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::TABLE_ID = 45;
-		template<> const bool SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE_NAME = "t045_log_entries";
+		template<> const int SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE_ID = 45;
+		template<> const bool SQLiteTableSyncTemplate<DBLogEntryTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::load(DBLogEntry* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::load(DBLogEntry* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setLogKey(rows->getText ( DBLogEntryTableSync::COL_LOG_KEY));
@@ -77,7 +77,7 @@ namespace synthese
 			object->setContent(v);
 		}
 
-		template<> void SQLiteTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::_link(DBLogEntry* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::_link(DBLogEntry* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			// User ID
 			uid userId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
@@ -97,12 +97,12 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::_unlink(DBLogEntry* obj)
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::_unlink(DBLogEntry* obj)
 		{
 			obj->setUser(NULL);
 		}
 
-		template<> void SQLiteTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::save(DBLogEntry* object)
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::save(DBLogEntry* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

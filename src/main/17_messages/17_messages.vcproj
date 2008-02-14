@@ -192,6 +192,54 @@
 				RelativePath=".\TextTemplateTableSync.h"
 				>
 			</File>
+			<Filter
+				Name="Subclasses"
+				>
+				<File
+					RelativePath=".\AlarmTemplateInheritedTableSync.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\AlarmTemplateInheritedTableSync.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioInheritedTableSync.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioSentAlarmInheritedTableSync.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioSentAlarmInheritedTableSync.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioTemplateInheritedTableSync.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioTemplateInheritedTableSync.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SentScenarioInheritedTableSync.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\SentScenarioInheritedTableSync.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SingleSentAlarmInheritedTableSync.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\SingleSentAlarmInheritedTableSync.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="14 Admin Compounds"

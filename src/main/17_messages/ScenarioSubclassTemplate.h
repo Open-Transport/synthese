@@ -45,6 +45,7 @@ namespace synthese
 		{
 		public:
 			typedef std::set<T*>	AlarmsSet;
+			typedef T				AlarmType;
 
 		private:
 			AlarmsSet					_alarms;

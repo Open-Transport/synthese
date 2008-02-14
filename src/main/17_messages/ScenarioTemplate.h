@@ -41,7 +41,7 @@ namespace synthese
 			, public util::Registrable<uid, ScenarioTemplate>
 		{
 		public:
-			ScenarioTemplate(const std::string& name);
+			ScenarioTemplate(const std::string name = std::string());
 			ScenarioTemplate(const ScenarioTemplate& source, const std::string& name);
 			~ScenarioTemplate();
 			uid getId() const;

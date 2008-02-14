@@ -50,11 +50,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::TABLE_NAME = "t047_online_reservation_rules";
-		template<> const int SQLiteTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::TABLE_ID = 47;
-		template<> const bool SQLiteTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE_NAME = "t047_online_reservation_rules";
+		template<> const int SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE_ID = 47;
+		template<> const bool SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::load(OnlineReservationRule* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::load(OnlineReservationRule* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setEMail(rows->getText(OnlineReservationRuleTableSync::COL_EMAIL));
@@ -65,7 +65,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::_link(OnlineReservationRule* object, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::_link(OnlineReservationRule* object, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			try
 			{
@@ -78,12 +78,12 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::_unlink(OnlineReservationRule* object)
+		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::_unlink(OnlineReservationRule* object)
 		{
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::save(OnlineReservationRule* object)
+		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::save(OnlineReservationRule* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

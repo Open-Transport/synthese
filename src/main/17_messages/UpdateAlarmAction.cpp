@@ -64,7 +64,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::getAlarm(_request->getObjectId());
+				_alarm.reset(AlarmTableSync::GetUpdateable(_request->getObjectId(), true));
 				_singleSentAlarm = dynamic_pointer_cast<SingleSentAlarm, Alarm>(_alarm);
 
 				_type = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE, true, FACTORY_KEY));
@@ -104,7 +104,7 @@ namespace synthese
 				_singleSentAlarm->setPeriodEnd(_endDate);
 				_singleSentAlarm->setIsEnabled(_enabled);
 			}
-			AlarmTableSync::save(_alarm.get());
+			AlarmTableSync::Save(_alarm.get());
 		}
 	}
 }

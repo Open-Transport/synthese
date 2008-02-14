@@ -25,7 +25,7 @@
 				Name="VCNMakeTool"
 				BuildCommandLine="ant -s build.xml -Dtarget=src/main/programs/synthese_sai"
 				ReBuildCommandLine="../../../../vsscons rebuild -Dtarget=src/main/programs/$(InputName)"
-				CleanCommandLine="../../../../vsscons clean -Dtarget=src/main/programs/$(InputName)"
+				CleanCommandLine="ant clean  -s build.xml -Dtarget=src/main/programs/$(InputName)"
 				Output="../../../../build/win32/vc-8_0/$(ConfigurationName)/main/programs/synthese_sai/synthese_sai.exe"
 				PreprocessorDefinitions=""
 				IncludeSearchPath=""

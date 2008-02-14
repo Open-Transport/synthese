@@ -49,23 +49,13 @@ namespace synthese
 {
 	namespace db
 	{
-
-		typedef enum
-		{
-			GET_AUTO
-			, GET_TEMPORARY
-			, GET_REGISTRY
-		} GetSource;
-
-
 		/** Table synchronizer template.
 			@ingroup m10
 		*/
-		template <class K, class T>
+		template <class K>
 		class SQLiteTableSyncTemplate : public util::FactorableTemplate<SQLiteTableSync, K>
 		{
 		public:
-			typedef T							ObjectType;
 			typedef DBEmptyResultException<K>	DBEmptyResultException;
 
 			static const std::string	TABLE_NAME;		//!< Table name in the database
@@ -94,8 +84,6 @@ namespace synthese
 			void initAutoIncrement();
 
 		public:
-			typedef T ObjectsClass;
-
 
 			virtual const std::string& getTableName() const { return TABLE_NAME; }
 			virtual std::string getTriggerOverrideClause() const { return TRIGGERS_ENABLED_CLAUSE; }
@@ -103,26 +91,8 @@ namespace synthese
 
 			static std::string GetFieldValue(uid id, const std::string& field);
 
-		private:
+		protected:
 			
-			/** Object links loader from the SQLite database.
-				@param obj Pointer to the object to load from the database
-				@param rows Row to read
-				@param temporary Objects to link must be temporarily and recursively created from the database
-				@author Hugues Romain
-				@date 2007				
-			*/
-			static void _link(T* obj, const SQLiteResultSPtr& rows, GetSource temporary);
-
-
-
-			/** Remove all the links to the object present in the environment.
-				@author Hugues Romain
-				@date 2007				
-			*/
-			static void _unlink(T* obj);
-			
-
 			/** Gets a result row in the database.
 				@param key key of the row to get (corresponds to the id field)
 				@return SQLiteResultSPtr The found result row
@@ -149,146 +119,12 @@ namespace synthese
 	
 		public:
 
-			/** Object fetcher.
-				@param key UID of the object
-				@param linked Load on temporary linked object (recursive get)
-				@return Pointer to a new C++ object corresponding to the fetched record
-				@throw DBEmptyResultException if the object was not found
-			*/
-			static T* _Get(uid key, bool linked)
-			{
-				SQLiteResultSPtr rows(_GetRow(key));
-				T* object(new T);
-				load(object, rows);
-				if (linked)
-					link(object, rows, GET_TEMPORARY);
-				return object;
-			}
-
-			static void link(T* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-			{
-				if (obj->getLinked())
-				{
-					unlink(obj);
-					if (temporary)
-						obj->clearChildTemporaryObjects();
-				}
-				_link(obj, rows, temporary);
-				obj->setLinked(true);
-			}
-
-			static void unlink(T* obj)
-			{
-				_unlink(obj);
-				obj->setLinked(false);
-			}
-			
-			/** Object properties loader from the SQLite database.
-				@param obj Pointer to the object to load from the database
-				@param rows Row to read
-				@author Hugues Romain
-				@date 2007
-				@warning To complete the load when building the RAM environment, follow the properties load by the link method
-			*/
-			static void load(T* obj, const SQLiteResultSPtr& rows);
-
-			
-			/** Saving of the object in database.
-				@param obj Object to save
-				@author Hugues Romain
-				@date 2007
-				
-				The object is recognized by its key :
-					- if the object has already a key, then the corresponding record is replaced
-					- if the object does not have any key, then the autoincrement function generates one for it.
-			*/
-			static void save(T* obj);
-
-
-
 			static void Remove(uid key);
-
-
-			/** Gets from the database a temporary object linked by another one.
-				@param key UID of the object
-				@param obj Parent object which link to the returned object
-				@param linked recursive get
-				@return Pointer to the created object
-				@author Hugues Romain
-				@date 2007
-
-				The deletion of the object will be autoamtically done at the deletion of the parent object
-			*/
-			template<class C>
-			static const T* Get(uid key, C* obj, bool linked)
-			{
-				const T* c(static_cast<const T*>(_Get(key, linked)));
-				obj->addChildTemporaryObject(c);
-				return c;
-			}
-
-
-						/** Gets from the database a temporary object linked by another one.
-				@param key UID of the object
-				@param obj Parent object which link to the returned object
-				@param linked recursive get
-				@return Pointer to the created object
-				@author Hugues Romain
-				@date 2007
-
-				The deletion of the object will be autoamtically done at the deletion of the parent object
-			*/
-			template<class C>
-			static T* GetUpdateable(uid key, C* obj)
-			{
-				T* c(_Get(key, true));
-				obj->addChildTemporaryObject(c);
-				return c;
-			}
-
-
-
-			template<class C>
-			static const T* Get(uid key, C* obj, bool linked, GetSource source)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
-					? T::Get(key).get()
-					: Get(key, obj, linked);
-			}
-
-			template<class C>
-			static T* GetUpdateable(uid key, C* obj, GetSource source)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
-					? T::GetUpdateable(key).get()
-					: GetUpdateable(key, obj);
-			}
-
-			static boost::shared_ptr<const T> Get(uid key, GetSource source = GET_AUTO, bool linked = false)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
-					? T::Get(key)
-					: boost::shared_ptr<const T>(_Get(key, linked));
-			}
-
-			static boost::shared_ptr<T> GetUpdateable(uid key, GetSource source = GET_TEMPORARY)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
-					? T::GetUpdateable(key)
-					: boost::shared_ptr<T>(_Get(key, true));
-			}
-
-			static boost::shared_ptr<T> createEmpty();
-			static void remove(uid key);
 
 		};
 
-		template <class K, class T>
-		void synthese::db::SQLiteTableSyncTemplate<K, T>::Remove( uid key )
+		template <class K>
+		void synthese::db::SQLiteTableSyncTemplate<K>::Remove( uid key )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
@@ -299,8 +135,8 @@ namespace synthese
 		}
 
 
-		template <class K, class T>
-		std::string SQLiteTableSyncTemplate<K, T>::GetFieldValue(uid id, const std::string& field)
+		template <class K>
+		std::string SQLiteTableSyncTemplate<K>::GetFieldValue(uid id, const std::string& field)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
@@ -314,33 +150,15 @@ namespace synthese
 				return rows->getText(field);
 		}
 
-		template <class K, class T>
-			void SQLiteTableSyncTemplate<K,T>::remove(uid key)
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
-			std::stringstream query;
-			query
-				<< "DELETE FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_ID << "=" << util::Conversion::ToString(key);
-			sqlite->execUpdate(query.str());
-		}
 
-		template <class K, class T>
-		boost::shared_ptr<T> SQLiteTableSyncTemplate<K,T>::createEmpty()
-		{
-			boost::shared_ptr<T> object(new T);
-			save(object.get());
-			return object;
-		}
+		template <class K>
+			boost::shared_ptr<boost::mutex> SQLiteTableSyncTemplate<K>::_idMutex(new boost::mutex); 
 
-		template <class K, class T>
-			boost::shared_ptr<boost::mutex> SQLiteTableSyncTemplate<K,T>::_idMutex(new boost::mutex); 
+		template <class K>
+			int SQLiteTableSyncTemplate<K>::_autoIncrementValue(1); 
 
-		template <class K, class T>
-			int SQLiteTableSyncTemplate<K,T>::_autoIncrementValue(1); 
-
-		template <class K, class T>
-			uid SQLiteTableSyncTemplate<K,T>::getId()
+		template <class K>
+			uid SQLiteTableSyncTemplate<K>::getId()
 		{			
 			boost::mutex::scoped_lock mutex(*_idMutex);
 
@@ -354,8 +172,8 @@ namespace synthese
 		}
 
 
-		template <class K, class T>
-			uid SQLiteTableSyncTemplate<K,T>::encodeUId (long objectId)
+		template <class K>
+			uid SQLiteTableSyncTemplate<K>::encodeUId (long objectId)
 		{
 		    // TODO : plenty of functions should be at SQLiteTableSync level directly.
 		    // default value is 1 for compatibility
@@ -368,8 +186,8 @@ namespace synthese
 
 
 
-		template <class K, class T>
-			void SQLiteTableSyncTemplate<K,T>::initAutoIncrement()
+		template <class K>
+			void SQLiteTableSyncTemplate<K>::initAutoIncrement()
 		{
 			if (HAS_AUTO_INCREMENT)
 			{

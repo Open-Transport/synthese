@@ -64,7 +64,7 @@ namespace synthese
 		}
 		void DeleteTextTemplateAction::run()
 		{
-			TextTemplateTableSync::remove(_text->getKey());
+			TextTemplateTableSync::Remove(_text->getKey());
 		}
 	}
 }

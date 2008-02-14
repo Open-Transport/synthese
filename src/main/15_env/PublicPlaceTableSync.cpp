@@ -50,11 +50,11 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::TABLE_NAME = "t013_public_places";
-		template<> const int SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::TABLE_ID = 13;
-		template<> const bool SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE_NAME = "t013_public_places";
+		template<> const int SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE_ID = 13;
+		template<> const bool SQLiteTableSyncTemplate<PublicPlaceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::load(PublicPlace* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::load(PublicPlace* object, const db::SQLiteResultSPtr& rows )
 		{
 		    object->setKey (rows->getLongLong (TABLE_COL_ID));
 
@@ -63,7 +63,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::_link(PublicPlace* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::_link(PublicPlace* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid cityId (rows->getLongLong (PublicPlaceTableSync::COL_CITYID));
 			City* city(CityTableSync::GetUpdateable(cityId,obj,temporary));
@@ -72,7 +72,7 @@ namespace synthese
 			city->getPublicPlacesMatcher ().add (obj->getName (), obj);
 		}
 
-		template<> void SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::_unlink(PublicPlace* obj)
+		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::_unlink(PublicPlace* obj)
 		{
 			City* city(const_cast<City*>(obj->getCity()));
 			city->getPublicPlacesMatcher ().remove (obj->getName ());
@@ -81,7 +81,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::save (PublicPlace* object)
+		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::save (PublicPlace* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

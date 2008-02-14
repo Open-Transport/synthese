@@ -55,13 +55,13 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::TABLE_NAME("t048_user_favorite_journey");
-		template<> const int SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::TABLE_ID(48);
-		template<> const bool SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::HAS_AUTO_INCREMENT(true);
+		template<> const string SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE_NAME("t048_user_favorite_journey");
+		template<> const int SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE_ID(48);
+		template<> const bool SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::HAS_AUTO_INCREMENT(true);
 
 
 
-		template<> void SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::load(
+		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::load(
 			UserFavoriteJourney* object
 			, const db::SQLiteResultSPtr& rows
 		){
@@ -80,7 +80,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::save(
+		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::save(
 			UserFavoriteJourney* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -110,7 +110,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::_link(
+		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::_link(
 			UserFavoriteJourney* object
 			, const SQLiteResultSPtr& rows
 			, GetSource temporary
@@ -120,7 +120,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::_unlink(
+		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::_unlink(
 			UserFavoriteJourney* object
 		){
 			object->setUser(NULL);

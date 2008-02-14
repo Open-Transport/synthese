@@ -57,11 +57,11 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::TABLE_NAME = "t030_transaction_parts";
-		template<> const int SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::TABLE_ID = 30;
-		template<> const bool SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE_NAME = "t030_transaction_parts";
+		template<> const int SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE_ID = 30;
+		template<> const bool SQLiteTableSyncTemplate<TransactionPartTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::load(TransactionPart* tp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::load(TransactionPart* tp, const db::SQLiteResultSPtr& rows )
 		{
 			tp->setKey (rows->getLongLong (TABLE_COL_ID));
 			tp->setTransactionId(rows->getLongLong ( TransactionPartTableSync::TABLE_COL_TRANSACTION_ID));
@@ -75,20 +75,20 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_link(TransactionPart* tp, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_link(TransactionPart* tp, const db::SQLiteResultSPtr& rows, GetSource temporary )
 		{
 
 		}
 
 
 
-		template<> void SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_unlink(TransactionPart* tp)
+		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_unlink(TransactionPart* tp)
 		{
 
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<TransactionPartTableSync,TransactionPart>::save(TransactionPart* tp)
+		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::save(TransactionPart* tp)
 		{
 			try
 			{

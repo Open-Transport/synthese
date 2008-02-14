@@ -24,13 +24,8 @@
 
 namespace synthese
 {
-    using util::Registrable;
-
-
 	namespace messages
 	{
-
-
 		AlarmTemplate::~AlarmTemplate()
 		{
 
@@ -40,34 +35,30 @@ namespace synthese
 		{
 			return getKey();
 		}
-		AlarmTemplate::AlarmTemplate(uid scenario)
+
+		AlarmTemplate::AlarmTemplate(const ScenarioTemplate* scenario)
 			: Alarm()
 			, util::Registrable<uid, AlarmTemplate>()
-			, _scenarioId(scenario)
+			, _scenario(scenario)
 		{
 
 		}
 
-		AlarmTemplate::AlarmTemplate( const AlarmTemplate& source, uid scenarioId )
+		AlarmTemplate::AlarmTemplate( const AlarmTemplate& source, const ScenarioTemplate* scenario)
 			: Alarm(source)
-			, _scenarioId(scenarioId)
+			, _scenario(scenario)
 		{
 
 		}
 
-		uid AlarmTemplate::getScenarioId() const
+		const ScenarioTemplate* AlarmTemplate::getScenario() const
 		{
-			return _scenarioId;
+			return _scenario;
 		}
 
-		boost::shared_ptr<const AlarmTemplate> AlarmTemplate::Get( uid key )
+		void AlarmTemplate::setScenario( const ScenarioTemplate* scenario )
 		{
-			return Registrable<uid,AlarmTemplate>::Get(key);
-		}
-
-		bool AlarmTemplate::Contains( uid key )
-		{
-			return Registrable<uid,AlarmTemplate>::Contains(key);
+			_scenario = scenario;
 		}
 	}
 }

@@ -47,13 +47,13 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::TABLE_NAME = "t023_interface_pages";
-		template<> const int SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::TABLE_ID = 23;
-		template<> const bool SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<InterfacePageTableSync>::TABLE_NAME = "t023_interface_pages";
+		template<> const int SQLiteTableSyncTemplate<InterfacePageTableSync>::TABLE_ID = 23;
+		template<> const bool SQLiteTableSyncTemplate<InterfacePageTableSync>::HAS_AUTO_INCREMENT = true;
 
 
 
-		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::load(InterfacePage* page, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::load(InterfacePage* page, const db::SQLiteResultSPtr& rows )
 		{
 			page->setKey(rows->getLongLong (TABLE_COL_ID));
 			page->setPageCode(rows->getText(InterfacePageTableSync::TABLE_COL_PAGE));
@@ -61,17 +61,17 @@ namespace synthese
 			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
 		}
 
-		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::_link(InterfacePage* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::_link(InterfacePage* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::_unlink(InterfacePage* obj)
+		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::_unlink(InterfacePage* obj)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>::save(InterfacePage* object)
+		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::save(InterfacePage* object)
 		{
 
 		}
@@ -86,7 +86,7 @@ namespace synthese
 		const string InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED("direct_display_allowed");
 
 		InterfacePageTableSync::InterfacePageTableSync()
-			: SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
+			: SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_INTERFACE, "INTEGER", false);

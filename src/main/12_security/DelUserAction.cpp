@@ -58,7 +58,7 @@ namespace synthese
 
 		void DelUserAction::run()
 		{
-			UserTableSync::remove(_user->getKey());
+			UserTableSync::Remove(_user->getKey());
 		}
 	}
 }

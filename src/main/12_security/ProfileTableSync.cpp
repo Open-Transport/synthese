@@ -54,11 +54,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ProfileTableSync,Profile>::TABLE_NAME = "t027_profiles";
-		template<> const int SQLiteTableSyncTemplate<ProfileTableSync,Profile>::TABLE_ID = 27;
-		template<> const bool SQLiteTableSyncTemplate<ProfileTableSync,Profile>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<ProfileTableSync>::TABLE_NAME = "t027_profiles";
+		template<> const int SQLiteTableSyncTemplate<ProfileTableSync>::TABLE_ID = 27;
+		template<> const bool SQLiteTableSyncTemplate<ProfileTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ProfileTableSync,Profile>::load(Profile* profile, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::load(Profile* profile, const db::SQLiteResultSPtr& rows )
 		{
 			profile->setKey(rows->getLongLong (TABLE_COL_ID));
 			profile->setName(rows->getText ( ProfileTableSync::TABLE_COL_NAME));
@@ -68,19 +68,19 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<ProfileTableSync,Profile>::_link(Profile* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::_link(Profile* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 		}
 
 
 
-		template<> void SQLiteTableSyncTemplate<ProfileTableSync,Profile>::_unlink(Profile* obj)
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::_unlink(Profile* obj)
 		{
 		}
 
 
 
-		template<> void SQLiteTableSyncTemplate<ProfileTableSync,Profile>::save(Profile* profile )
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::save(Profile* profile )
 		{
 			try
 			{

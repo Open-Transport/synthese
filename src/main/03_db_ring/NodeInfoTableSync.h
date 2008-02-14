@@ -25,7 +25,7 @@
 #define SYNTHESE_DBRING_NODEINFOTABLESYNC_H
 
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteDirectTableSyncTemplate.h"
 #include "03_db_ring/NodeInfo.h"
 
 
@@ -38,7 +38,7 @@ namespace dbring
 
 
 
-class NodeInfoTableSync : public db::SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>
+class NodeInfoTableSync : public db::SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo>
 {
 
 

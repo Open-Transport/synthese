@@ -48,11 +48,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::TABLE_NAME = "t038_text_templates";
-		template<> const int SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::TABLE_ID = 38;
-		template<> const bool SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE_NAME = "t038_text_templates";
+		template<> const int SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE_ID = 38;
+		template<> const bool SQLiteTableSyncTemplate<TextTemplateTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::load(TextTemplate* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::load(TextTemplate* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setName(rows->getText (TextTemplateTableSync::COL_NAME));
@@ -62,15 +62,15 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::_link(TextTemplate* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::_link(TextTemplate* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 		}
 
-		template<> void SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::_unlink(TextTemplate* obj)
+		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::_unlink(TextTemplate* obj)
 		{
 		}
 
-		template<> void SQLiteTableSyncTemplate<TextTemplateTableSync,TextTemplate>::save(TextTemplate* object)
+		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::save(TextTemplate* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

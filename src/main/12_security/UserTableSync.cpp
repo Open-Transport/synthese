@@ -53,11 +53,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<UserTableSync,User>::TABLE_NAME = "t026_users";
-		template<> const int SQLiteTableSyncTemplate<UserTableSync,User>::TABLE_ID = 26;
-		template<> const bool SQLiteTableSyncTemplate<UserTableSync,User>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<UserTableSync>::TABLE_NAME = "t026_users";
+		template<> const int SQLiteTableSyncTemplate<UserTableSync>::TABLE_ID = 26;
+		template<> const bool SQLiteTableSyncTemplate<UserTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<UserTableSync,User>::load(User* user, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::load(User* user, const db::SQLiteResultSPtr& rows)
 		{
 				user->setKey(rows->getLongLong (TABLE_COL_ID));
 				user->setPassword(rows->getText ( UserTableSync::TABLE_COL_PASSWORD));
@@ -77,7 +77,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<UserTableSync,User>::_link(User* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::_link(User* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			try
 			{
@@ -90,14 +90,14 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<UserTableSync,User>::_unlink(User* obj)
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::_unlink(User* obj)
 		{
 			obj->setProfile(NULL);
 		}
 
 
 
-		template<> void SQLiteTableSyncTemplate<UserTableSync,User>::save(User* user )
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::save(User* user )
 		{
 			try
 			{

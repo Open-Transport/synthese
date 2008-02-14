@@ -41,11 +41,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::TABLE_NAME = "t024_interfaces";
-		template<> const int SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::TABLE_ID = 24;
-		template<> const bool SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE_NAME = "t024_interfaces";
+		template<> const int SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE_ID = 24;
+		template<> const bool SQLiteTableSyncTemplate<InterfaceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::load(Interface* interf, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::load(Interface* interf, const db::SQLiteResultSPtr& rows)
 		{
 			interf->setKey(rows->getLongLong ( TABLE_COL_ID));
 			interf->setNoSessionDefaultPageCode(rows->getText ( InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE));
@@ -53,17 +53,17 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::save(Interface* interf)
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::save(Interface* interf)
 		{
 			/// @todo Implementation
 		}
 
-		template<> void SQLiteTableSyncTemplate<InterfaceTableSync,Interface>::_link(Interface* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::_link(Interface* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<InterfaceTableSync, Interface>::_unlink(Interface* obj)
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync, Interface>::_unlink(Interface* obj)
 		{
 
 		}

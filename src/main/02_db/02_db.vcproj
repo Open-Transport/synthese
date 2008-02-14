@@ -184,6 +184,26 @@
 			Name="00 Factory"
 			>
 			<File
+				RelativePath=".\SQLiteDirectTableSyncTemplate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteInheritanceTableSyncTemplate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteInheritedNoSyncTableSyncTemplate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteInheritedRegistryTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteInheritedTableSyncTemplate.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SQLiteNoSyncTableSyncTemplate.h"
 				>
 			</File>
@@ -238,6 +258,10 @@
 		</File>
 		<File
 			RelativePath=".\SConscript"
+			>
+		</File>
+		<File
+			RelativePath=".\Types.h"
 			>
 		</File>
 	</Files>

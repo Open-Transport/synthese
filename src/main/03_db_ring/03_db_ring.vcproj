@@ -115,14 +115,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\RecvTokenThreadExec.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RecvTokenThreadExec.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Ring.h"
 				>
 			</File>
@@ -135,35 +127,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SendTokenThreadExec.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SendTokenThreadExec.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Token.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Token.h"
-				>
-			</File>
-			<File
 				RelativePath=".\TransmissionStatusMap.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\TransmissionStatusMap.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateLog.h"
 				>
 			</File>
 			<File

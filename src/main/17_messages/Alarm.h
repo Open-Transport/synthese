@@ -72,8 +72,8 @@ namespace synthese
 				void setLongMessage( const std::string& message);
 			//@}
 
-				static boost::shared_ptr<const Alarm> Get(uid key);
-				static bool Contains(uid key);
+//				static boost::shared_ptr<const Alarm> Get(uid key);
+//				static bool Contains(uid key);
 		};
 	}
 }

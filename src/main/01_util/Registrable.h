@@ -49,6 +49,7 @@ namespace synthese
 		{
 		public:
 			typedef K										KeyType;
+			typedef T										ValueType;
 			typedef Registry<K, T>							Registry;
 			typedef RegistryKeyException<K, T>				RegistryKeyException;
 			typedef ObjectNotFoundException<K,T>			ObjectNotFoundException;

@@ -43,12 +43,12 @@ namespace synthese
 
     namespace db
     {
-		template<> const std::string SQLiteTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::TABLE_NAME = "t012_physical_stops";
-		template<> const int SQLiteTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::TABLE_ID = 12;
-		template<> const bool SQLiteTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE_NAME = "t012_physical_stops";
+		template<> const int SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE_ID = 12;
+		template<> const bool SQLiteTableSyncTemplate<PhysicalStopTableSync>::HAS_AUTO_INCREMENT = true;
 
 		/** Does not update the place */
-		template<> void SQLiteTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::load(PhysicalStop* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::load(PhysicalStop* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setName(rows->getText ( PhysicalStopTableSync::COL_NAME));
@@ -56,7 +56,7 @@ namespace synthese
 			object->setOperatorCode(rows->getText ( PhysicalStopTableSync::COL_OPERATOR_CODE));
 		}
 
-		template<> void SQLiteTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::_link(PhysicalStop* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::_link(PhysicalStop* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			PublicTransportStopZoneConnectionPlace* place = ConnectionPlaceTableSync::GetUpdateable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), obj, temporary);
 			obj->setPlace(place);
@@ -64,7 +64,7 @@ namespace synthese
 			place->addPhysicalStop(obj);
 		}
 
-		template<> void SQLiteTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::_unlink(PhysicalStop* obj)
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::_unlink(PhysicalStop* obj)
 		{
 			PublicTransportStopZoneConnectionPlace* place = const_cast<PublicTransportStopZoneConnectionPlace*>(obj->getConnectionPlace());
 /// @todo	place->removePhysicalStop(obj);
@@ -72,7 +72,7 @@ namespace synthese
 			obj->setPlace(NULL);
 		}
 
-		template<> void SQLiteTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::save(PhysicalStop* object)
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::save(PhysicalStop* object)
 		{
 			/// @todo Implementation
 		}

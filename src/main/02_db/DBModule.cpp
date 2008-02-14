@@ -44,6 +44,7 @@ namespace synthese
 	{
 
 	    SQLiteHandle* DBModule::_sqlite = 0;
+		DBModule::SubClassMap DBModule::_subClassMap;
 
 
 	    void DBModule::preInit ()
@@ -90,6 +91,17 @@ namespace synthese
 						 const std::string& value)
 	    {
 	    }
+
+		void DBModule::AddSubClass( uid id, const std::string& subclass)
+		{
+			_subClassMap[id] = subclass;
+		}
+
+		std::string DBModule::GetSubClass(uid id )
+		{
+			SubClassMap::const_iterator it(_subClassMap.find(id));
+			return (it == _subClassMap.end()) ? std::string() : it->second;
+		}
 
 	}
 }

@@ -53,27 +53,27 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::TABLE_NAME = "t032_vinci_bike";
-		template<> const int SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::TABLE_ID = 32;
-		template<> const bool SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciBikeTableSync>::TABLE_NAME = "t032_vinci_bike";
+		template<> const int SQLiteTableSyncTemplate<VinciBikeTableSync>::TABLE_ID = 32;
+		template<> const bool SQLiteTableSyncTemplate<VinciBikeTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::load(VinciBike* bike, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<VinciBikeTableSync,VinciBike>::load(VinciBike* bike, const db::SQLiteResultSPtr& rows)
 		{
 			bike->setKey(rows->getLongLong (TABLE_COL_ID));
 			bike->setNumber(rows->getText ( VinciBikeTableSync::TABLE_COL_NUMBER));
 			bike->setMarkedNumber(rows->getText ( VinciBikeTableSync::TABLE_COL_MARKED_NUMBER));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::_link(VinciBike* bike, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<VinciBikeTableSync,VinciBike>::_link(VinciBike* bike, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::_unlink(VinciBike* bike)
+		template<> void SQLiteDirectTableSyncTemplate<VinciBikeTableSync,VinciBike>::_unlink(VinciBike* bike)
 		{
 
 		}
-		template<> void SQLiteTableSyncTemplate<VinciBikeTableSync,VinciBike>::save(VinciBike* bike)
+		template<> void SQLiteDirectTableSyncTemplate<VinciBikeTableSync,VinciBike>::save(VinciBike* bike)
 		{
 			if (bike->getKey() <= 0)
 				bike->setKey(getId());

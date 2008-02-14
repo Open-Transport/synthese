@@ -121,7 +121,7 @@ namespace synthese
 			, std::vector<boost::shared_ptr<T> >& result
 		){
 			ResultParameters p;
-			p.next = (requestParameters.maxSize != UNLIMITED_SIZE) && (result.size() > requestParameters.maxSize);
+			p.next = (requestParameters.maxSize != UNLIMITED_SIZE) && (result.size() > static_cast<size_t>(requestParameters.maxSize));
 			if (p.next)
 				result.pop_back();
 			p.size = result.size();

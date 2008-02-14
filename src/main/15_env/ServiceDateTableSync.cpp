@@ -51,43 +51,9 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::TABLE_NAME = "t005_service_dates";
-		template<> const int SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::TABLE_ID = 5;
-		template<> const bool SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::HAS_AUTO_INCREMENT = true;
-
-		template<> void SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::load(ServiceDate* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->key = rows->getLongLong (TABLE_COL_ID);
-			object->service = EnvModule::fetchService (rows->getLongLong ( ServiceDateTableSync::COL_SERVICEID)).get();
-			object->date = Date::FromSQLDate (rows->getText ( ServiceDateTableSync::COL_DATE));
-		}
-
-		template<> void SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::_link(ServiceDate* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-
-		}
-
-		template<> void SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::_unlink(ServiceDate* obj)
-		{
-
-		}
-
-		template<> void SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>::save(ServiceDate* object)
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->key <= 0)
-				object->key = getId();	
-               
-			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
-				<< Conversion::ToString(object->key)
-				<< "," << Conversion::ToString(object->service->getId())
-				<< "," << object->date.toSQLString()
-				<< ")";
-			sqlite->execUpdate(query.str());
-		}
-
+		template<> const std::string SQLiteTableSyncTemplate<ServiceDateTableSync>::TABLE_NAME = "t005_service_dates";
+		template<> const int SQLiteTableSyncTemplate<ServiceDateTableSync>::TABLE_ID = 5;
+		template<> const bool SQLiteTableSyncTemplate<ServiceDateTableSync>::HAS_AUTO_INCREMENT = true;
 	}
 
 	namespace env
@@ -96,7 +62,7 @@ namespace synthese
 		const std::string ServiceDateTableSync::COL_DATE("date");
 
 		ServiceDateTableSync::ServiceDateTableSync()
-			: SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>()
+			: SQLiteTableSyncTemplate<ServiceDateTableSync>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_SERVICEID, "INTEGER", false);
@@ -158,6 +124,26 @@ namespace synthese
 
 			//environment.updateMinMaxDatesInUse (newDate, marked);
 
+		}
+
+		void ServiceDateTableSync::Save( env::NonPermanentService* service )
+		{
+//////////////////////////////////////////////////////////////////////////
+			/// @todo Loop on each date of the service
+
+/*			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->key <= 0)
+				object->key = getId();	
+
+			query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->key)
+				<< "," << Conversion::ToString(object->service->getId())
+				<< "," << object->date.toSQLString()
+				<< ")";
+			sqlite->execUpdate(query.str());
+*/
 		}
 	}
 }

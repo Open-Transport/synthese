@@ -35,7 +35,10 @@ namespace synthese
 		{
 			stringstream s;
 			if (!_selectName.empty())
+			{
 				s << "<th>Sel</th>";
+				++_cols;
+			}
 			s << _headers;
 			_headers = s.str();
 		}
@@ -50,6 +53,7 @@ namespace synthese
 		std::string ActionResultHTMLTable::close()
 		{
 			stringstream s;
+			_selectName.erase();
 			s << ResultHTMLTable::close() << _actionForm.close();
 			return s.str();
 		}

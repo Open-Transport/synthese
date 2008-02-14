@@ -54,11 +54,11 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<RoadTableSync,Road>::TABLE_NAME = "t015_roads";
-		template<> const int SQLiteTableSyncTemplate<RoadTableSync,Road>::TABLE_ID = 15;
-		template<> const bool SQLiteTableSyncTemplate<RoadTableSync,Road>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<RoadTableSync>::TABLE_NAME = "t015_roads";
+		template<> const int SQLiteTableSyncTemplate<RoadTableSync>::TABLE_ID = 15;
+		template<> const bool SQLiteTableSyncTemplate<RoadTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<RoadTableSync,Road>::load(Road* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::load(Road* object, const db::SQLiteResultSPtr& rows )
 		{
 			// ID
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
@@ -73,7 +73,7 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<RoadTableSync,Road>::_link(Road* object, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::_link(Road* object, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			// City
 			uid cityId (rows->getLongLong (RoadTableSync::COL_CITYID));
@@ -106,7 +106,7 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<RoadTableSync,Road>::_unlink(Road* obj)
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::_unlink(Road* obj)
 		{
 			City* city = const_cast<City*>(obj->getCity ());
 			city->getRoadsMatcher ().remove (obj->getName ());
@@ -120,7 +120,7 @@ namespace synthese
 			obj->setReservationRule(NULL);
 		}
 
-		template<> void SQLiteTableSyncTemplate<RoadTableSync,Road>::save(Road* object)
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::save(Road* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

@@ -126,9 +126,9 @@ namespace synthese
 				return string();
 
 			stringstream s;
-			s	<< "<script type=\"text/javascript\">"
+			s	<< HTMLModule::GetHTMLJavascriptOpen()
 				<< "document.getElementById('" << _getFieldId(fieldName, false) << "').focus();"
-				<< "</script>";
+				<< HTMLModule::GetHTMLJavascriptClose();
 			return s.str();
 		}
 
@@ -232,9 +232,9 @@ namespace synthese
 				<< "title=\"Date\" "
 				<< "id=\"" << triggerId << "\" "
 				<< "onmouseover=\"this.style.background='red';\" "
-				<< "onmouseout=\"this.style.background=;\" "
+				<< "onmouseout=\"this.style.background='';\" "
 				<< "/>"
-				<< "<script type=\"text/javascript\">"
+				<< HTMLModule::GetHTMLJavascriptOpen()
 				<< "Calendar.setup({"
 				<< "inputField:\"" << fieldId << "\","
 				<< "displayArea:\"" << spanId << "\","
@@ -248,7 +248,7 @@ namespace synthese
 				s << "date:new Date(" << value.getYear() <<","<< value.getMonth() <<","<< value.getDay() <<","<< value.getHours() <<"," << value.getMinutes() <<",0),";
 			s		<< "firstDay:1"
 				<< "});"
-				<< "</script>";
+				<< HTMLModule::GetHTMLJavascriptClose();
 
 			return s.str();
 
@@ -300,9 +300,9 @@ namespace synthese
 				<< "title=\"Date\" "
 				<< "id=\"" << triggerId << "\" "
 				<< "onmouseover=\"this.style.background='red';\" "
-				<< "onmouseout=\"this.style.background=;\" "
+				<< "onmouseout=\"this.style.background='';\" "
 				<< "/>"
-				<< "<script type=\"text/javascript\">"
+				<< HTMLModule::GetHTMLJavascriptOpen()
 				<< "Calendar.setup({"
 				<< "inputField:\"" << fieldId << "\","
 				<< "displayArea:\"" << spanId << "\","
@@ -316,7 +316,7 @@ namespace synthese
 				s << "date:new Date(" << value.getYear() <<","<< value.getMonth() <<","<< value.getDay() << "),";
 			s		<< "firstDay:1"
 				<< "});"
-				<< "</script>";
+				<< HTMLModule::GetHTMLJavascriptClose();
 
 			return s.str();
 		}
@@ -403,7 +403,7 @@ namespace synthese
 			for (HiddenFieldsMap::const_iterator it = fields.begin(); it != fields.end(); ++it)
 			{
 				if (it != fields.begin())
-					url << "&";
+					url << "&amp;";
 				url << it->first << "=" << it->second;
 			}
 

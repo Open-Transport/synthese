@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef SYNTHESE_db_SQLiteNoSyncTableSyncTemplate_h__
 #define SYNTHESE_db_SQLiteNoSyncTableSyncTemplate_h__
 
-#include "SQLiteTableSyncTemplate.h"
+#include "SQLiteDirectTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -33,12 +33,17 @@ namespace synthese
 		@ingroup m10
 		*/
 		template<class K, class T>
-		class SQLiteNoSyncTableSyncTemplate : public SQLiteTableSyncTemplate<K,T>
+		class SQLiteNoSyncTableSyncTemplate : public SQLiteDirectTableSyncTemplate<K,T>
 		{
 		public:
-		SQLiteNoSyncTableSyncTemplate() : SQLiteTableSyncTemplate<K,T>(
-		    typename SQLiteTableSyncTemplate<K,T>::Args(true, true, TRIGGERS_ENABLED_CLAUSE, true, true))
+		SQLiteNoSyncTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>(
+		    typename SQLiteTableSyncTemplate<K>::Args(true, true, TRIGGERS_ENABLED_CLAUSE, true, true))
 			{}
+
+		virtual bool getRegisterInSubClassMap() const
+		{
+			return false;
+		}
 
 		protected:
 

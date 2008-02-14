@@ -44,11 +44,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::TABLE_NAME = "t033_vinci_rates";
-		template<> const int SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::TABLE_ID = 33;
-		template<> const bool SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciRateTableSync>::TABLE_NAME = "t033_vinci_rates";
+		template<> const int SQLiteTableSyncTemplate<VinciRateTableSync>::TABLE_ID = 33;
+		template<> const bool SQLiteTableSyncTemplate<VinciRateTableSync>::HAS_AUTO_INCREMENT = true;
 		
-		template<> void SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::load(VinciRate* vr, const SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<VinciRateTableSync,VinciRate>::load(VinciRate* vr, const SQLiteResultSPtr& rows)
 		{
 			vr->setKey(rows->getLongLong (TABLE_COL_ID));
 			vr->setName(rows->getText ( VinciRateTableSync::TABLE_COL_NAME));
@@ -64,17 +64,17 @@ namespace synthese
 			vr->setRecurringPenaltyCancelsFirst(rows->getBool ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::_link(VinciRate* vr, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<VinciRateTableSync,VinciRate>::_link(VinciRate* vr, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::_unlink(VinciRate* vr)
+		template<> void SQLiteDirectTableSyncTemplate<VinciRateTableSync,VinciRate>::_unlink(VinciRate* vr)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciRateTableSync,VinciRate>::save(VinciRate* vr)
+		template<> void SQLiteDirectTableSyncTemplate<VinciRateTableSync,VinciRate>::save(VinciRate* vr)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

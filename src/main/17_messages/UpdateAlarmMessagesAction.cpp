@@ -57,7 +57,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::getAlarm(_request->getObjectId());
+				_alarm.reset(AlarmTableSync::GetUpdateable(_request->getObjectId(), true));
 			}
 			catch (...)
 			{
@@ -72,7 +72,7 @@ namespace synthese
 		{
 			_alarm->setShortMessage(_shortMessage);
 			_alarm->setLongMessage(_longMessage);
-			AlarmTableSync::save(_alarm.get());
+			AlarmTableSync::Save(_alarm.get());
 		}
 	}
 }

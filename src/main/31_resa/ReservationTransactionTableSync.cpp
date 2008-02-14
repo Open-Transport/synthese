@@ -54,11 +54,11 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::TABLE_NAME("t046_reservation_transactions");
-		template<> const int SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::TABLE_ID(46);
-		template<> const bool SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::HAS_AUTO_INCREMENT(true);
+		template<> const string SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE_NAME("t046_reservation_transactions");
+		template<> const int SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE_ID(46);
+		template<> const bool SQLiteTableSyncTemplate<ReservationTransactionTableSync>::HAS_AUTO_INCREMENT(true);
 
-		template<> void SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::load(
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::load(
 			ReservationTransaction* object
 			, const db::SQLiteResultSPtr& rows
 		){
@@ -75,7 +75,7 @@ namespace synthese
 			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
 		}
 
-		template<> void SQLiteTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::save(ReservationTransaction* object)
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::save(ReservationTransaction* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

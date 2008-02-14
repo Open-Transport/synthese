@@ -23,7 +23,7 @@
 #include "AlarmStopAction.h"
 
 #include "17_messages/SingleSentAlarm.h"
-#include "17_messages/AlarmTableSync.h"
+#include "17_messages/SingleSentAlarmInheritedTableSync.h"
 #include "17_messages/MessagesLog.h"
 
 #include "30_server/ActionException.h"
@@ -56,7 +56,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::getSingleSentAlarm(_request->getObjectId());
+				_alarm.reset(SingleSentAlarmInheritedTableSync::GetUpdateable(_request->getObjectId(), true));
 			}
 			catch(...)
 			{
@@ -78,7 +78,7 @@ namespace synthese
 			// Action
 			_alarm->setPeriodEnd(_stopDateTime);
 			_alarm->setIsEnabled(false);
-			AlarmTableSync::save(_alarm.get());
+			AlarmTableSync::Save(_alarm.get());
 
 			// Log
 			MessagesLog::addUpdateEntry(dynamic_pointer_cast<const SingleSentAlarm, SingleSentAlarm>(_alarm).get(), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser().get());

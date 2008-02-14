@@ -46,11 +46,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::TABLE_NAME = "t007_connection_places";
-		template<> const int SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::TABLE_ID = 7;
-		template<> const bool SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::TABLE_NAME = "t007_connection_places";
+		template<> const int SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::TABLE_ID = 7;
+		template<> const bool SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::load(PublicTransportStopZoneConnectionPlace* cp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::load(PublicTransportStopZoneConnectionPlace* cp, const db::SQLiteResultSPtr& rows )
 		{
 			// Reading of the row
 			uid id (rows->getLongLong (TABLE_COL_ID));
@@ -91,12 +91,12 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::save(PublicTransportStopZoneConnectionPlace* obj)
+		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::save(PublicTransportStopZoneConnectionPlace* obj)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::_link(PublicTransportStopZoneConnectionPlace* cp, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::_link(PublicTransportStopZoneConnectionPlace* cp, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
 
@@ -123,7 +123,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::_unlink(PublicTransportStopZoneConnectionPlace* cp)
+		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::_unlink(PublicTransportStopZoneConnectionPlace* cp)
 		{
 			shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
 

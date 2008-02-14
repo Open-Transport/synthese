@@ -39,7 +39,7 @@ namespace synthese
 			: public SentAlarm
 		{
 		private:
-			const SentScenario& _scenario;
+			const SentScenario* _scenario;
 
 		public:
 			/** Copy constructor.
@@ -49,14 +49,14 @@ namespace synthese
 				@date 2007				
 				@warning the recipients are not copied. Do it at the table synchronization.
 			*/
-			ScenarioSentAlarm(const SentScenario& scenario, const AlarmTemplate& source);
+			ScenarioSentAlarm(const SentScenario* scenario, const AlarmTemplate& source);
 			
 			/** Basic constructor.
 				@param scenario Scenario which belongs the new alarm
 				@author Hugues Romain
 				@date 2007				
 			*/
-			ScenarioSentAlarm(const SentScenario& scenario);
+			ScenarioSentAlarm(const SentScenario* scenario = NULL);
 			
 			~ScenarioSentAlarm();
 
@@ -64,7 +64,9 @@ namespace synthese
 			const time::DateTime&	getPeriodStart()	const;
 			const time::DateTime&	getPeriodEnd()		const;
 
-			const SentScenario&		getScenario()		const;
+			const SentScenario*		getScenario()		const;
+			
+			void					setScenario(const SentScenario* scenario);
 		};
 	}
 }

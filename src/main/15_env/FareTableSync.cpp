@@ -45,18 +45,18 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<FareTableSync,Fare>::TABLE_NAME = "t008_fares";
-		template<> const int SQLiteTableSyncTemplate<FareTableSync,Fare>::TABLE_ID = 8;
-		template<> const bool SQLiteTableSyncTemplate<FareTableSync,Fare>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<FareTableSync>::TABLE_NAME = "t008_fares";
+		template<> const int SQLiteTableSyncTemplate<FareTableSync>::TABLE_ID = 8;
+		template<> const bool SQLiteTableSyncTemplate<FareTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<FareTableSync,Fare>::load(Fare* fare, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::load(Fare* fare, const db::SQLiteResultSPtr& rows )
 		{
 			fare->setKey(rows->getLongLong (TABLE_COL_ID));
 			fare->setName (rows->getText (FareTableSync::COL_NAME));
 			fare->setType ((Fare::FareType) rows->getInt (FareTableSync::COL_FARETYPE));
 		}
 
-		template<> void SQLiteTableSyncTemplate<FareTableSync,Fare>::save(Fare* object)
+		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::save(Fare* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -79,12 +79,12 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteTableSyncTemplate<FareTableSync,Fare>::_link(Fare* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::_link(Fare* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<FareTableSync,Fare>::_unlink(Fare* obj)
+		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::_unlink(Fare* obj)
 		{
 
 		}

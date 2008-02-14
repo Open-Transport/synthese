@@ -33,10 +33,10 @@ namespace synthese
 			, util::Registrable<uid, ScenarioTemplate>()
 		{
 			for (AlarmsSet::const_iterator it = source.getAlarms().begin(); it != source.getAlarms().end(); ++it)
-				addAlarm(new AlarmTemplate(**it, getKey()));
+				addAlarm(new AlarmTemplate(**it, this));
 		}
 
-		ScenarioTemplate::ScenarioTemplate(const std::string& name)
+		ScenarioTemplate::ScenarioTemplate(const std::string name)
 			: ScenarioSubclassTemplate<AlarmTemplate>(name)
 			, util::Registrable<uid, ScenarioTemplate>()
 		{

@@ -76,7 +76,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
 			try
 			{
-				_alarm = AlarmTableSync::getAlarm(id);
+				_alarm.reset(AlarmTableSync::Get(id, true));
 			}
 			catch (...)
 			{

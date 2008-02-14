@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteDirectTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -37,7 +37,7 @@ namespace synthese
 		/** InterfacePageTableSync SQLite table synchronizer.
 			@ingroup m11LS refLS
 		*/
-		class InterfacePageTableSync : public db::SQLiteTableSyncTemplate<InterfacePageTableSync,InterfacePage>
+		class InterfacePageTableSync : public db::SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>
 		{
 		public:
 			static const std::string TABLE_COL_INTERFACE;

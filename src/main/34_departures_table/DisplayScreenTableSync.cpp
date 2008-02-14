@@ -66,11 +66,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::TABLE_NAME = "t041_display_screens";
-		template<> const int SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::TABLE_ID = 41;
-		template<> const bool SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE_NAME = "t041_display_screens";
+		template<> const int SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE_ID = 41;
+		template<> const bool SQLiteTableSyncTemplate<DisplayScreenTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey (rows->getLongLong (TABLE_COL_ID));
 			object->setLocalizationComment (rows->getText ( DisplayScreenTableSync::COL_NAME));
@@ -94,7 +94,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::_link(DisplayScreen* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::_link(DisplayScreen* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			// Column reading
 			uid placeId(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID));
@@ -174,7 +174,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::_unlink(DisplayScreen* object)
+		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::_unlink(DisplayScreen* object)
 		{
 			object->setLocalization(NULL);
 			object->setType(NULL);
@@ -186,7 +186,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::save(DisplayScreen* object)
+		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::save(DisplayScreen* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

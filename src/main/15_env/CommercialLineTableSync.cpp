@@ -58,11 +58,11 @@ namespace synthese
 	}
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::TABLE_NAME = "t042_commercial_lines";
-		template<> const int SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::TABLE_ID = 42;
-		template<> const bool SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<CommercialLineTableSync>::TABLE_NAME = "t042_commercial_lines";
+		template<> const int SQLiteTableSyncTemplate<CommercialLineTableSync>::TABLE_ID = 42;
+		template<> const bool SQLiteTableSyncTemplate<CommercialLineTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::load(CommercialLine* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::load(CommercialLine* object, const db::SQLiteResultSPtr& rows )
 		{
 		    object->setKey(rows->getLongLong (TABLE_COL_ID));
 		    object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
@@ -75,7 +75,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::_link(CommercialLine* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::_link(CommercialLine* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			const TransportNetwork* tn = 
 				TransportNetworkTableSync::Get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID),obj,true,temporary);
@@ -104,14 +104,14 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::_unlink(CommercialLine* obj)
+		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::_unlink(CommercialLine* obj)
 		{
 
 		}
 
 
 
-		template<> void SQLiteTableSyncTemplate<CommercialLineTableSync,CommercialLine>::save(CommercialLine* object)
+		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::save(CommercialLine* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

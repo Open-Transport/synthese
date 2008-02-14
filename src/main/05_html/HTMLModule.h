@@ -85,7 +85,9 @@ input[type=submit]:hover {background-color:#0080E0;}
 
 			static std::string getHTMLImage(const std::string& url, const std::string& alt);
 
-			
+			static std::string GetHTMLJavascriptOpen(std::string url=std::string());
+
+			static std::string GetHTMLJavascriptClose();
 		};
 
 

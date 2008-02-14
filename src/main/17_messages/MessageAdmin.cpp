@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "05_html/HTMLForm.h"
+#include "05_html/PropertiesHTMLTable.h"
 #include "05_html/HTMLTable.h"
 
 #include "17_messages/MessageAdmin.h"
@@ -90,7 +90,7 @@ namespace synthese
 
 			try
 			{
-				_alarm = AlarmTableSync::getAlarm(id);
+				_alarm.reset(AlarmTableSync::Get(id));
 			}
 			catch(...)
 			{
@@ -109,29 +109,18 @@ namespace synthese
 			shared_ptr<const SingleSentAlarm> salarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
 			
 			stream << "<h1>Paramètres</h1>";
-			HTMLForm f(updateRequest.getHTMLForm("update"));
-			HTMLTable t;
-
-			stream << f.open() << t.open();
-			stream << t.row();
-			stream << t.col() << "Type";
-			stream << t.col() << f.getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel());
+			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
+			
+			stream << t.open();
+			stream << t.cell("Type", t.getForm().getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()));
 
 			if (salarm.get())
 			{
-				stream << t.row();
-				stream << t.col() << "Début diffusion";
-				stream << t.col() << f.getCalendarInput(UpdateAlarmAction::PARAMETER_START_DATE, salarm->getPeriodStart());
-				stream << t.row();
-				stream << t.col() << "Fin diffusion";
-				stream << t.col() << f.getCalendarInput(UpdateAlarmAction::PARAMETER_END_DATE, salarm->getPeriodEnd());
-				stream << t.row();
-				stream << t.col() << "Actif";
-				stream << t.col() << f.getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, salarm->getIsEnabled());
+				stream << t.cell("Début diffusion", t.getForm().getCalendarInput(UpdateAlarmAction::PARAMETER_START_DATE, salarm->getPeriodStart()));
+				stream << t.cell("Fin diffusion", t.getForm().getCalendarInput(UpdateAlarmAction::PARAMETER_END_DATE, salarm->getPeriodEnd()));
+				stream << t.cell("Actif", t.getForm().getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, salarm->getIsEnabled()));
 			}
-			stream << t.row();
-			stream << t.col(2) << f.getSubmitButton("Enregistrer");
-			stream << t.close() << f.close();
+			stream << t.close();
 
 			if (_alarm->getLevel() != ALARM_LEVEL_UNKNOWN)
 			{
@@ -154,18 +143,11 @@ namespace synthese
 				updateMessagesRequest.getFunction()->setPage<MessageAdmin>();
 				updateMessagesRequest.setObjectId(request->getObjectId());
 
-				HTMLForm fu(updateMessagesRequest.getHTMLForm("messages"));
-				HTMLTable tu;
-				stream << fu.open() << tu.open();
-				stream << tu.row();
-				stream << tu.col() << "Message court";
-				stream << tu.col() << fu.getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 20);
-				stream << tu.row();
-				stream << tu.col() << "Message long";
-				stream << tu.col() << fu.getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 4, 30);
-				stream << tu.row();
-				stream << tu.col(2) << fu.getSubmitButton("Enregistrer");
-				stream << tu.close() << fu.close();
+				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
+				stream << tu.open();
+				stream << tu.cell("Message court", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 20));
+				stream << tu.cell("Message long", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 4, 30));
+				stream << tu.close();
 
 				FunctionRequest<AdminRequest> searchRequest(request);
 				searchRequest.getFunction()->setPage<MessageAdmin>();

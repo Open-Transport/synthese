@@ -45,11 +45,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::TABLE_NAME = "t021_reservation_rules";
-		template<> const int SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::TABLE_ID = 21;
-		template<> const bool SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<ReservationRuleTableSync>::TABLE_NAME = "t021_reservation_rules";
+		template<> const int SQLiteTableSyncTemplate<ReservationRuleTableSync>::TABLE_ID = 21;
+		template<> const bool SQLiteTableSyncTemplate<ReservationRuleTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::load(ReservationRule* rr, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::load(ReservationRule* rr, const db::SQLiteResultSPtr& rows )
 		{
 		    rr->setKey (rows->getLongLong (TABLE_COL_ID));
 		    
@@ -90,7 +90,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::save(ReservationRule* object)
+		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::save(ReservationRule* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -113,12 +113,12 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::_link(ReservationRule* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::_link(ReservationRule* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::_unlink(ReservationRule* obj)
+		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::_unlink(ReservationRule* obj)
 		{
 
 		}
@@ -140,7 +140,7 @@ namespace synthese
 		const std::string ReservationRuleTableSync::COL_WEBSITEURL ("web_site_url");
 
 		ReservationRuleTableSync::ReservationRuleTableSync()
-			: SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>()
+			: SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_TYPE, "INTEGER", true);

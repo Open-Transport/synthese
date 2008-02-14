@@ -54,11 +54,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::TABLE_NAME = "t031_transactions";
-		template<> const int SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::TABLE_ID = 31;
-		template<> const bool SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<TransactionTableSync>::TABLE_NAME = "t031_transactions";
+		template<> const int SQLiteTableSyncTemplate<TransactionTableSync>::TABLE_ID = 31;
+		template<> const bool SQLiteTableSyncTemplate<TransactionTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::load(Transaction* t, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::load(Transaction* t, const db::SQLiteResultSPtr& rows )
 		{
 		    t->setKey(rows->getLongLong (TABLE_COL_ID));
 		    t->setComment(rows->getText ( TransactionTableSync::TABLE_COL_COMMENT));
@@ -72,19 +72,19 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::_link(Transaction* t, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::_link(Transaction* t, const db::SQLiteResultSPtr& rows, GetSource temporary )
 		{
 
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::_unlink(Transaction* t)
+		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::_unlink(Transaction* t)
 		{
 
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<TransactionTableSync,Transaction>::save(Transaction* t)
+		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::save(Transaction* t)
 		{
 		    try
 		    {

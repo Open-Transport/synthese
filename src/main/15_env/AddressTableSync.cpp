@@ -54,11 +54,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AddressTableSync,Address>::TABLE_NAME = "t002_addresses";
-		template<> const int SQLiteTableSyncTemplate<AddressTableSync,Address>::TABLE_ID = 2;
-		template<> const bool SQLiteTableSyncTemplate<AddressTableSync,Address>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AddressTableSync>::TABLE_NAME = "t002_addresses";
+		template<> const int SQLiteTableSyncTemplate<AddressTableSync>::TABLE_ID = 2;
+		template<> const bool SQLiteTableSyncTemplate<AddressTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<AddressTableSync,Address>::load(Address* object, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::load(Address* object, const db::SQLiteResultSPtr& rows)
 		{
 			// Columns reading
 		    uid id (rows->getLongLong (TABLE_COL_ID));
@@ -70,7 +70,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<AddressTableSync,Address>::_link(Address* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::_link(Address* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			// Columns reading
 			uid placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
@@ -111,7 +111,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<AddressTableSync,Address>::_unlink(Address* obj)
+		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::_unlink(Address* obj)
 		{
 			shared_ptr<AddressablePlace> place(EnvModule::fetchUpdateableAddressablePlace(obj->getPlace()->getId()));
 //			place->removeAddress(obj);
@@ -121,7 +121,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<AddressTableSync,Address>::save(Address* object)
+		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::save(Address* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

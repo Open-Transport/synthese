@@ -33,17 +33,23 @@ namespace synthese
 {
 	namespace env
 	{
-		class ServiceDate;
-
 		/** Service dates table synchronizer.
 			@ingroup m15LS refLS
 		*/
-		class ServiceDateTableSync : public db::SQLiteTableSyncTemplate<ServiceDateTableSync,ServiceDate>
+		class ServiceDateTableSync : public db::SQLiteTableSyncTemplate<ServiceDateTableSync>
 		{
 		private:
 			static void _updateServiceCalendar (const db::SQLiteResultSPtr& rows, bool marked) ;
 
 		public:
+			/** Writing of the dates of a service.
+				@param service pointer to the service from which save the dates
+				@author Hugues Romain
+				@date 2008
+				@todo implement it
+			*/
+			static void Save(env::NonPermanentService* service);
+
 			static const std::string COL_SERVICEID;
 			static const std::string COL_DATE;
 			

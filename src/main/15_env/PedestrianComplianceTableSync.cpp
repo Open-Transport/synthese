@@ -45,11 +45,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::TABLE_NAME = "t018_pedestrian_compliances";
-		template<> const int SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::TABLE_ID = 18;
-		template<> const bool SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE_NAME = "t018_pedestrian_compliances";
+		template<> const int SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE_ID = 18;
+		template<> const bool SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::load(PedestrianCompliance* cmp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::load(PedestrianCompliance* cmp, const db::SQLiteResultSPtr& rows )
 		{
 			cmp->setKey(rows->getLongLong (TABLE_COL_ID));
 
@@ -72,7 +72,7 @@ namespace synthese
 			cmp->setCapacity (capacity);
 		}
 
-		template<> void SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::save(PedestrianCompliance* object)
+		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::save(PedestrianCompliance* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -95,12 +95,12 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::_link(PedestrianCompliance* obj, const SQLiteResultSPtr& row, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::_link(PedestrianCompliance* obj, const SQLiteResultSPtr& row, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::_unlink(PedestrianCompliance* obj)
+		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::_unlink(PedestrianCompliance* obj)
 		{
 
 		}

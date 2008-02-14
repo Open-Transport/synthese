@@ -26,9 +26,14 @@
 #include "17_messages/SingleSentAlarm.h"
 #include "17_messages/AlarmTemplate.h"
 #include "17_messages/SentScenario.h"
+#include "17_messages/SentScenarioInheritedTableSync.h"
 #include "17_messages/ScenarioTemplate.h"
+#include "17_messages/ScenarioTemplateInheritedTableSync.h"
 #include "17_messages/Types.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
+#include "17_messages/AlarmTemplateInheritedTableSync.h"
+#include "17_messages/SingleSentAlarmInheritedTableSync.h"
+#include "17_messages/ScenarioSentAlarmInheritedTableSync.h"
 
 #include "01_util/Conversion.h"
 
@@ -54,112 +59,111 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::TABLE_NAME = "t003_alarms";
-		template<> const int SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::TABLE_ID = 3;
-		template<> const bool SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AlarmTableSync>::TABLE_NAME = "t003_alarms";
+		template<> const int SQLiteTableSyncTemplate<AlarmTableSync>::TABLE_ID = 3;
+		template<> const bool SQLiteTableSyncTemplate<AlarmTableSync>::HAS_AUTO_INCREMENT = true;
 	    
-	    template<> void SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::load(Alarm* alarm, const SQLiteResultSPtr& rows)
+		template<>
+		string SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const SQLiteResultSPtr& row)
+		{
+			return row->getBool(AlarmTableSync::COL_IS_TEMPLATE)
+				? AlarmTemplateInheritedTableSync::FACTORY_KEY
+				: (row->getLongLong(AlarmTableSync::COL_SCENARIO_ID) > 0) 
+				? ScenarioSentAlarmInheritedTableSync::FACTORY_KEY
+				: SingleSentAlarmInheritedTableSync::FACTORY_KEY
+				;
+		}
+
+		template<> void SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::Load(Alarm* alarm, const SQLiteResultSPtr& rows)
 	    {
-			if (rows->getBool ( AlarmTableSync::COL_IS_TEMPLATE))
+			std::string subClassKey(_GetSubClassKey(rows));
+			if (subClassKey == AlarmTemplateInheritedTableSync::FACTORY_KEY)
 			{
 				AlarmTemplate* talarm = dynamic_cast<AlarmTemplate*>(alarm);
 				talarm->setKey(rows->getLongLong (TABLE_COL_ID));
 			}
-			else
+			else if (subClassKey == ScenarioSentAlarmInheritedTableSync::FACTORY_KEY)
 			{
-				if (rows->getLongLong ( AlarmTableSync::COL_SCENARIO_ID))
-				{
 				ScenarioSentAlarm* salarm = dynamic_cast<ScenarioSentAlarm*>(alarm);
 				salarm->setKey(rows->getLongLong (TABLE_COL_ID));
-				}
-				else
-				{
+			}
+			else if (subClassKey == SingleSentAlarmInheritedTableSync::FACTORY_KEY)
+			{
 				SingleSentAlarm* salarm = dynamic_cast<SingleSentAlarm*>(alarm);
 				salarm->setPeriodStart(DateTime::FromSQLTimestamp (rows->getText ( AlarmTableSync::COL_PERIODSTART)));
 				salarm->setPeriodEnd(DateTime::FromSQLTimestamp (rows->getText ( AlarmTableSync::COL_PERIODEND)));
 				salarm->setIsEnabled(rows->getBool ( AlarmTableSync::COL_ENABLED));
 				salarm->setKey(rows->getLongLong (TABLE_COL_ID));
-				}
 			}
-			alarm->setLevel ((AlarmLevel) rows->getInt ( AlarmTableSync::COL_LEVEL));
+			alarm->setLevel (static_cast<AlarmLevel>(rows->getInt ( AlarmTableSync::COL_LEVEL)));
 			alarm->setShortMessage (rows->getText (AlarmTableSync::COL_SHORT_MESSAGE));
 			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
 		}
 
-		template<> void SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::_link(Alarm* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-		}
 
 
-
-		template<> void SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::_unlink(Alarm* obj)
-		{
-		}
- 
-
-	    template<> void SQLiteTableSyncTemplate<AlarmTableSync,Alarm>::save(Alarm* object)
+	    template<> void SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::Save(Alarm* object)
 	    {
-		stringstream query;
-		
-		ScenarioSentAlarm* sobject = dynamic_cast<ScenarioSentAlarm*>(object);
-		AlarmTemplate* tobject = dynamic_cast<AlarmTemplate*>(object);
-		SingleSentAlarm* gobject = dynamic_cast<SingleSentAlarm*>(object);
-		
-		if (sobject)
-		{
-		    if (sobject->getKey() <= 0)
-			sobject->setKey(getId());
-		    query
-			<< " REPLACE INTO " << TABLE_NAME << " VALUES("
-			<< Conversion::ToString(sobject->getKey())
-			<< ",0"
-			<< "," << Conversion::ToString(sobject->getIsEnabled())
-			<< "," << Conversion::ToString((int) sobject->getLevel())
-			<< "," << Conversion::ToSQLiteString(sobject->getShortMessage())
-			<< "," << Conversion::ToSQLiteString(sobject->getLongMessage())
-			<< "," << sobject->getPeriodStart().toSQLString()
-			<< "," << sobject->getPeriodEnd().toSQLString()
-			<< "," << Conversion::ToString(sobject->getScenario().getKey())
-			<< ")";
-		}
-		else if (gobject)
-		{
-		    if (gobject->getKey() <= 0)
-			gobject->setKey(getId());
-		    query
-			<< " REPLACE INTO " << TABLE_NAME << " VALUES("
-			<< Conversion::ToString(gobject->getKey())
-			<< ",0"
-			<< "," << Conversion::ToString(gobject->getIsEnabled())
-			<< "," << Conversion::ToString((int) gobject->getLevel())
-			<< "," << Conversion::ToSQLiteString(gobject->getShortMessage())
-			<< "," << Conversion::ToSQLiteString(gobject->getLongMessage())
-			<< "," << gobject->getPeriodStart().toSQLString()
-			<< "," << gobject->getPeriodEnd().toSQLString()
-			<< ",0"
-			<< ")";
-		}
-		else if (tobject)
-		{
-		    if (tobject->getKey() <= 0)
-			tobject->setKey(getId());
-		    
-		    query
-			<< " REPLACE INTO " << TABLE_NAME << " VALUES("
-			<< Conversion::ToString(tobject->getKey())
-			<< ",1"
-			<< ",0"
-			<< "," << Conversion::ToString((int) tobject->getLevel())
-			<< "," << Conversion::ToSQLiteString(tobject->getShortMessage())
-			<< "," << Conversion::ToSQLiteString(tobject->getLongMessage())
-			<< ",''"
-			<< ",''"
-			<< "," << Conversion::ToString(tobject->getScenarioId())
-			<< ")";
-		}
-		DBModule::GetSQLite()->execUpdate(query.str());
+			stringstream query;
+			
+			ScenarioSentAlarm* sobject = dynamic_cast<ScenarioSentAlarm*>(object);
+			AlarmTemplate* tobject = dynamic_cast<AlarmTemplate*>(object);
+			SingleSentAlarm* gobject = dynamic_cast<SingleSentAlarm*>(object);
+			
+			if (sobject)
+			{
+				if (sobject->getKey() <= 0)
+				sobject->setKey(getId());
+				query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(sobject->getKey())
+				<< ",0"
+				<< "," << Conversion::ToString(sobject->getIsEnabled())
+				<< "," << Conversion::ToString((int) sobject->getLevel())
+				<< "," << Conversion::ToSQLiteString(sobject->getShortMessage())
+				<< "," << Conversion::ToSQLiteString(sobject->getLongMessage())
+				<< "," << sobject->getPeriodStart().toSQLString()
+				<< "," << sobject->getPeriodEnd().toSQLString()
+				<< "," << Conversion::ToString(sobject->getScenario()->getKey())
+				<< ")";
+			}
+			else if (gobject)
+			{
+				if (gobject->getKey() <= 0)
+				gobject->setKey(getId());
+				query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(gobject->getKey())
+				<< ",0"
+				<< "," << Conversion::ToString(gobject->getIsEnabled())
+				<< "," << Conversion::ToString((int) gobject->getLevel())
+				<< "," << Conversion::ToSQLiteString(gobject->getShortMessage())
+				<< "," << Conversion::ToSQLiteString(gobject->getLongMessage())
+				<< "," << gobject->getPeriodStart().toSQLString()
+				<< "," << gobject->getPeriodEnd().toSQLString()
+				<< ",0"
+				<< ")";
+			}
+			else if (tobject)
+			{
+				if (tobject->getKey() <= 0)
+				tobject->setKey(getId());
+			    
+				query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(tobject->getKey())
+				<< ",1"
+				<< ",0"
+				<< "," << Conversion::ToString((int) tobject->getLevel())
+				<< "," << Conversion::ToSQLiteString(tobject->getShortMessage())
+				<< "," << Conversion::ToSQLiteString(tobject->getLongMessage())
+				<< ",''"
+				<< ",''"
+				<< "," << Conversion::ToString(tobject->getScenario()->getKey())
+				<< ")";
+			}
+			DBModule::GetSQLite()->execUpdate(query.str());
 	    }
-	    
 	}
 
 
@@ -178,7 +182,7 @@ namespace synthese
 		const std::string AlarmTableSync::COL_SCENARIO_ID = "scenario_id"; 
 		
 		AlarmTableSync::AlarmTableSync ()
-		: SQLiteTableSyncTemplate<AlarmTableSync,Alarm>()
+		: SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_IS_TEMPLATE, "INTEGER", true);
@@ -202,7 +206,7 @@ namespace synthese
 
 		}
 		    
-
+/*
 		void AlarmTableSync::rowsAdded (db::SQLite* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResultSPtr& rows, bool isFirstSync)
@@ -278,7 +282,7 @@ namespace synthese
 		    }
 		}
 	    }
-	    		
+*/	    		
 	    
 	    std::vector<shared_ptr<SingleSentAlarm> > AlarmTableSync::searchSingleSent(
 		time::DateTime startDate
@@ -335,7 +339,7 @@ namespace synthese
 			    while (rows->next ())
 			    {
 				shared_ptr<SingleSentAlarm> object(new SingleSentAlarm);
-				load(object.get(), rows);
+				Load(object.get(), rows);
 				SingleSentAlarm::Complements c;
 				c.recipientsNumber = rows->getInt (_COL_RECIPIENTS_NUMBER);
 				
@@ -376,7 +380,7 @@ namespace synthese
 		}
 		
 
-		shared_ptr<Alarm> AlarmTableSync::getAlarm(uid key)
+/*		shared_ptr<Alarm> AlarmTableSync::getAlarm(uid key)
 		{
 			std::stringstream query;
 			query
@@ -391,9 +395,10 @@ namespace synthese
 
 			boost::shared_ptr<Alarm> object;
 			uid scenarioId = rows->getLongLong (AlarmTableSync::COL_SCENARIO_ID);
+			shared_ptr<const Scenario> scenario = ScenarioTableSync::Get(scenarioId);
 			if (rows->getBool (AlarmTableSync::COL_IS_TEMPLATE))
 			{
-			    object.reset(new AlarmTemplate(scenarioId));
+			    object.reset(new AlarmTemplate(static_pointer_cast<const ScenarioTemplate, const Scenario>(scenario).get()));
 			}
 			else
 			{
@@ -402,18 +407,17 @@ namespace synthese
 				    if (!SentScenario::Contains(scenarioId))
 						throw DBEmptyResultException(key);
 				    
-				    shared_ptr<const SentScenario> scenario = SentScenario::Get(scenarioId);
-				    object.reset(new ScenarioSentAlarm(*scenario));
+				    object.reset(new ScenarioSentAlarm(static_pointer_cast<const SentScenario, const Scenario>(scenario).get()));
 				}
 				else
 				{
 				    object.reset(new SingleSentAlarm);
 				}
 			}
-			load(object.get(), rows);
+			Load(object.get(), rows);
 			return object;
 		}
-
+*/
 //		std::vector<boost::shared_ptr<Alarm> > AlarmTableSync::search( const Scenario* scenario , int first /*= 0 */, int number /*= -1 */, bool orderByLevel /*= false */, bool raisingOrder /*= false */ )
 /*		{
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -471,8 +475,8 @@ namespace synthese
 			    vector<shared_ptr<ScenarioSentAlarm> > objects;
 			    while (rows->next ())
 			    {
-				shared_ptr<ScenarioSentAlarm> object(new ScenarioSentAlarm(*scenario));
-				load(object.get(), rows);
+				shared_ptr<ScenarioSentAlarm> object(new ScenarioSentAlarm(scenario));
+				Load(object.get(), rows);
 				objects.push_back(object);
 			    }
 			    return objects;
@@ -508,8 +512,8 @@ namespace synthese
 				vector<shared_ptr<AlarmTemplate> > objects;
 				while (rows->next ())
 				{
-					shared_ptr<AlarmTemplate> object(new AlarmTemplate(scenario->getKey()));
-					load(object.get(), rows);
+					shared_ptr<AlarmTemplate> object(new AlarmTemplate(scenario));
+					Load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
@@ -521,7 +525,7 @@ namespace synthese
 		}
 
 
-		boost::shared_ptr<SingleSentAlarm> AlarmTableSync::getSingleSentAlarm( uid key )
+/*		boost::shared_ptr<SingleSentAlarm> AlarmTableSync::getSingleSentAlarm( uid key )
 		{
 			shared_ptr<Alarm> alarm(getAlarm(key));
 			shared_ptr<SingleSentAlarm> singleSentAlarm(dynamic_pointer_cast<SingleSentAlarm, Alarm>(alarm));
@@ -529,5 +533,5 @@ namespace synthese
 				throw DBEmptyResultException(key);
 			return singleSentAlarm;
 		}
-	}
+*/	}
 }

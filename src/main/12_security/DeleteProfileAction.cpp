@@ -70,7 +70,7 @@ namespace synthese
 
 		void DeleteProfileAction::run()
 		{
-			ProfileTableSync::remove(_profile->getKey());
+			ProfileTableSync::Remove(_profile->getKey());
 
 			// Log
 			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), "Suppression de " + _profile->getName());

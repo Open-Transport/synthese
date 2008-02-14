@@ -58,7 +58,7 @@ namespace synthese
 			try
 			{
 				// Scenario
-				_scenario = ScenarioTableSync::getScenario(_request->getObjectId());
+				_scenario.reset(ScenarioTableSync::GetUpdateable(_request->getObjectId()));
 
 				// Name
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
@@ -80,7 +80,7 @@ namespace synthese
 		void ScenarioNameUpdateAction::run()
 		{
 			_scenario->setName(_name);
-			ScenarioTableSync::save(_scenario.get());
+			ScenarioTableSync::Save(_scenario.get());
 		}
 	}
 }

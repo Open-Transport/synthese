@@ -55,7 +55,7 @@ namespace synthese
 		{
 			try
 			{
-				shared_ptr<Scenario> scenario = ScenarioTableSync::getScenario(id);
+				shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id));
 				return scenario->getName();
 			}
 			catch (...)
@@ -85,7 +85,7 @@ namespace synthese
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			content.push_back(text);
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenarioId());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
 
 		std::string MessagesLibraryLog::getName() const

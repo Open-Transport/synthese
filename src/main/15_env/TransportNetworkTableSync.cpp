@@ -44,11 +44,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::TABLE_NAME("t022_transport_networks");
-		template<> const int SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::TABLE_ID(22);
-		template<> const bool SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::HAS_AUTO_INCREMENT(true);
+		template<> const std::string SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE_NAME("t022_transport_networks");
+		template<> const int SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE_ID(22);
+		template<> const bool SQLiteTableSyncTemplate<TransportNetworkTableSync>::HAS_AUTO_INCREMENT(true);
 
-		template<> void SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::load(TransportNetwork* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::load(TransportNetwork* object, const db::SQLiteResultSPtr& rows )
 		{
 			std::string name (rows->getText (TransportNetworkTableSync::COL_NAME));
 
@@ -56,7 +56,7 @@ namespace synthese
 			object->setName(name);
 		}
 
-		template<> void SQLiteTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::save(TransportNetwork* object)
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::save(TransportNetwork* object)
 		{
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -71,12 +71,12 @@ namespace synthese
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
-		template<> void SQLiteTableSyncTemplate<TransportNetworkTableSync, TransportNetwork>::_link(TransportNetwork* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync, TransportNetwork>::_link(TransportNetwork* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<TransportNetworkTableSync, TransportNetwork>::_unlink(TransportNetwork* obj)
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync, TransportNetwork>::_unlink(TransportNetwork* obj)
 		{
 
 		}

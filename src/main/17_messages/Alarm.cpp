@@ -85,7 +85,7 @@ namespace synthese
 
 		}
 
-		boost::shared_ptr<const Alarm> Alarm::Get( uid key )
+/*		boost::shared_ptr<const Alarm> Alarm::Get( uid key )
 		{
 			if (SentAlarm::Contains(key))
 				return static_pointer_cast<const Alarm, const SentAlarm>(SentAlarm::Get(key));
@@ -98,5 +98,5 @@ namespace synthese
 		{
 			return SentAlarm::Contains(key) || AlarmTemplate::Contains(key);
 		}
-	}
+*/	}
 }

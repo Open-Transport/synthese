@@ -54,11 +54,11 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::TABLE_NAME = "t014_road_chunks";
-		template<> const int SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::TABLE_ID = 14;
-		template<> const bool SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE_NAME = "t014_road_chunks";
+		template<> const int SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE_ID = 14;
+		template<> const bool SQLiteTableSyncTemplate<RoadChunkTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::load(RoadChunk* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::load(RoadChunk* object, const db::SQLiteResultSPtr& rows )
 		{
 			// ID
 		    object->setKey (rows->getLongLong (TABLE_COL_ID));
@@ -95,7 +95,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::_link(RoadChunk* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::_link(RoadChunk* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			// From address
 			uid fromAddressId (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID));
@@ -119,12 +119,12 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::_unlink(RoadChunk* obj)
+		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::_unlink(RoadChunk* obj)
 		{
 		}
 
 	    
-	    template<> void SQLiteTableSyncTemplate<RoadChunkTableSync,RoadChunk>::save(RoadChunk* object)
+	    template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::save(RoadChunk* object)
 	    {
 		SQLite* sqlite = DBModule::GetSQLite();
 		stringstream query;

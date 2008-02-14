@@ -3,14 +3,24 @@
 #include "17_messages/TextTemplateTableSync.h"
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
+
+#include "17_messages/SentScenarioInheritedTableSync.h"
+#include "17_messages/ScenarioTemplateInheritedTableSync.h"
+#include "17_messages/AlarmTemplateInheritedTableSync.h"
+#include "17_messages/ScenarioSentAlarmInheritedTableSync.h"
+#include "17_messages/SingleSentAlarmInheritedTableSync.h"
+
 #include "17_messages/MessagesAdmin.h"
 #include "17_messages/MessageAdmin.h"
 #include "17_messages/MessagesScenarioAdmin.h"
 #include "17_messages/MessagesLibraryAdmin.h"
+
 #include "17_messages/MessagesRight.h"
 #include "17_messages/MessagesLibraryRight.h"
+
 #include "17_messages/MessagesLog.h"
 #include "17_messages/MessagesLibraryLog.h"
+
 #include "17_messages/ScenarioUpdateDatesAction.h"
 #include "17_messages/DeleteAlarmAction.h"
 #include "17_messages/UpdateAlarmMessagesFromTemplateAction.h"

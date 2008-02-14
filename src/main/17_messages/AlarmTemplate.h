@@ -41,18 +41,16 @@ namespace synthese
 			, public util::Registrable<uid, AlarmTemplate>
 		{
 		private:
-			const uid _scenarioId;
+			const ScenarioTemplate* _scenario;
 
 		public:
-			AlarmTemplate(uid scenarioId);
-			AlarmTemplate(const AlarmTemplate& source, uid scenarioId);
+			AlarmTemplate(const ScenarioTemplate* scenario = NULL);
+			AlarmTemplate(const AlarmTemplate& source, const ScenarioTemplate* scenario);
 			~AlarmTemplate();
 			uid getId() const;
 
-			uid getScenarioId() const;
-
-			static boost::shared_ptr<const AlarmTemplate> Get(uid key);
-			static bool Contains(uid key);
+			const ScenarioTemplate* getScenario() const;
+			void					setScenario(const ScenarioTemplate* scenario);
 		};
 	}
 }

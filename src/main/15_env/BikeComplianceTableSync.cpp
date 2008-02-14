@@ -49,11 +49,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::TABLE_NAME = "t020_bike_compliances";
-		template<> const int SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::TABLE_ID = 20;
-		template<> const bool SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<BikeComplianceTableSync>::TABLE_NAME = "t020_bike_compliances";
+		template<> const int SQLiteTableSyncTemplate<BikeComplianceTableSync>::TABLE_ID = 20;
+		template<> const bool SQLiteTableSyncTemplate<BikeComplianceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::load(BikeCompliance* cmp, const db::SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::load(BikeCompliance* cmp, const db::SQLiteResultSPtr& rows)
 		{
 			// Columns reading
 			tribool status = true;
@@ -75,17 +75,17 @@ namespace synthese
 			cmp->setCapacity (capacity);
 		}
 
-		template<> void SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::_link(BikeCompliance* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::_link(BikeCompliance* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::_unlink(BikeCompliance* obj)
+		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::_unlink(BikeCompliance* obj)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::save(BikeCompliance* object)
+		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::save(BikeCompliance* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

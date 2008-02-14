@@ -49,13 +49,13 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<RollingStockTableSync,RollingStock>::TABLE_NAME("t049_rolling_stock");
-		template<> const int SQLiteTableSyncTemplate<RollingStockTableSync,RollingStock>::TABLE_ID(49);
-		template<> const bool SQLiteTableSyncTemplate<RollingStockTableSync,RollingStock>::HAS_AUTO_INCREMENT(true);
+		template<> const string SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE_NAME("t049_rolling_stock");
+		template<> const int SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE_ID(49);
+		template<> const bool SQLiteTableSyncTemplate<RollingStockTableSync>::HAS_AUTO_INCREMENT(true);
 
 
 
-		template<> void SQLiteTableSyncTemplate<RollingStockTableSync,RollingStock>::load(
+		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::load(
 			RollingStock* object
 			, const db::SQLiteResultSPtr& rows
 		){
@@ -71,7 +71,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<RollingStockTableSync,RollingStock>::save(
+		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::save(
 			RollingStock* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -89,7 +89,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<RollingStockTableSync,RollingStock>::_link(
+		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::_link(
 			RollingStock* object
 			, const SQLiteResultSPtr& rows
 			, GetSource temporary
@@ -98,7 +98,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<RollingStockTableSync,RollingStock>::_unlink(
+		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::_unlink(
 			RollingStock* obj
 		){
 			/// @todo Fill it

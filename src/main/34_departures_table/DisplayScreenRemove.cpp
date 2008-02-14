@@ -72,7 +72,7 @@ namespace synthese
 
 		void DisplayScreenRemove::run()
 		{
-			DisplayScreenTableSync::remove(_displayScreen->getKey());
+			DisplayScreenTableSync::Remove(_displayScreen->getKey());
 
 			ArrivalDepartureTableLog::addRemoveEntry(_displayScreen.get(), _request->getUser().get());
 		}

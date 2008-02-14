@@ -23,7 +23,9 @@
 #include "NewMessageAction.h"
 
 #include "17_messages/ScenarioTemplate.h"
+#include "17_messages/ScenarioTemplateInheritedTableSync.h"
 #include "17_messages/SentScenario.h"
+#include "17_messages/SentScenarioInheritedTableSync.h"
 #include "17_messages/ScenarioSentAlarm.h"
 #include "17_messages/SingleSentAlarm.h"
 #include "17_messages/AlarmTemplate.h"
@@ -55,8 +57,10 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_IS_TEMPLATE, _isTemplate);
-			if (_scenario.get())
-				map.insert(PARAMETER_SCENARIO_ID, _scenario->getId());
+			if (_sentScenario.get())
+				map.insert(PARAMETER_SCENARIO_ID, _sentScenario->getKey());
+			if (_scenarioTemplate.get())
+				map.insert(PARAMETER_SCENARIO_ID, _scenarioTemplate->getKey());
 			return map;
 		}
 
@@ -71,8 +75,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
 				try
 				{
-					_scenarioTemplate = ScenarioTableSync::getTemplate(id);
-					_scenario = static_pointer_cast<Scenario, ScenarioTemplate>(_scenarioTemplate);
+					_scenarioTemplate.reset(ScenarioTemplateInheritedTableSync::Get(id));
 				}
 				catch (...)
 				{
@@ -86,8 +89,7 @@ namespace synthese
 				{
 					try
 					{
-						_sentScenario = ScenarioTableSync::getSent(id);
-						_scenario = static_pointer_cast<Scenario, SentScenario>(_sentScenario);
+						_sentScenario.reset(SentScenarioInheritedTableSync::Get(id));
 					}
 					catch (...)
 					{
@@ -103,22 +105,22 @@ namespace synthese
 		{
 			if (_isTemplate)
 			{
-				shared_ptr<AlarmTemplate> alarm(new AlarmTemplate(_scenarioTemplate->getKey()));
-				AlarmTableSync::save(alarm.get());
+				shared_ptr<AlarmTemplate> alarm(new AlarmTemplate(_scenarioTemplate.get()));
+				AlarmTableSync::Save(alarm.get());
 				_request->setObjectId(alarm->getKey());
 			}
 			else
 			{
 				if (_sentScenario.get())
 				{
-					shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(*_sentScenario));
-					AlarmTableSync::save(alarm.get());
+					shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(_sentScenario.get()));
+					AlarmTableSync::Save(alarm.get());
 					_request->setObjectId(alarm->getKey());
 				}
 				else
 				{
 					shared_ptr<SingleSentAlarm> alarm(new SingleSentAlarm);
-					AlarmTableSync::save(alarm.get());
+					AlarmTableSync::Save(alarm.get());
 					_request->setObjectId(alarm->getKey());
 				}
 			}
@@ -129,13 +131,11 @@ namespace synthese
 			_isTemplate = value;
 		}
 
-		void NewMessageAction::setScenarioId(uid scenario )
+		void NewMessageAction::setScenarioId(uid key)
 		{
-			_sentScenario = ScenarioTableSync::getSent(scenario);
-			_scenarioTemplate = ScenarioTableSync::getTemplate(scenario);
-			_scenario = _sentScenario.get()
-				? static_pointer_cast<Scenario, SentScenario>(_sentScenario) 
-				: static_pointer_cast<Scenario, ScenarioTemplate>(_scenarioTemplate);
+			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(key));
+			_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
+			_scenarioTemplate = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
 		}
 	}
 }

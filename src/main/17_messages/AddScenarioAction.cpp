@@ -21,8 +21,9 @@
 */
 
 #include "17_messages/AddScenarioAction.h"
-#include "17_messages/ScenarioTableSync.h"
 #include "17_messages/ScenarioTemplate.h"
+#include "17_messages/ScenarioTemplateInheritedTableSync.h"
+#include "17_messages/ScenarioInheritedTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -39,6 +40,7 @@ namespace synthese
 	using namespace server;
 	using namespace time;
 	using namespace util;
+	using namespace db;
 	
 	template<> const string util::FactorableTemplate<Action, messages::AddScenarioAction>::FACTORY_KEY("masca");
 
@@ -63,7 +65,7 @@ namespace synthese
 			{
 				try
 				{
-					_template = ScenarioTableSync::getTemplate(id);
+					_template.reset(ScenarioTemplateInheritedTableSync::Get(id,true));
 				}
 				catch(...)
 				{
@@ -92,8 +94,8 @@ namespace synthese
 			else
 				scenario.reset(new ScenarioTemplate(_name));
 
-			ScenarioTableSync::save (scenario.get());
-			ScenarioTableSync::saveAlarms(scenario.get());
+			ScenarioTableSync::Save (scenario.get());
+			SaveAlarms(scenario.get());
 			_request->setObjectId(scenario->getKey());
 		}
 	}

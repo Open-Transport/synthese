@@ -44,17 +44,17 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::TABLE_NAME = "t043_crossings";
-		template<> const int SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::TABLE_ID = 43;
-		template<> const bool SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<CrossingTableSync>::TABLE_NAME = "t043_crossings";
+		template<> const int SQLiteTableSyncTemplate<CrossingTableSync>::TABLE_ID = 43;
+		template<> const bool SQLiteTableSyncTemplate<CrossingTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::load(Crossing* crossing, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::load(Crossing* crossing, const db::SQLiteResultSPtr& rows )
 		{
 			uid id (rows->getLongLong (TABLE_COL_ID));
 			crossing->setKey(id);
 		}
 
-		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::_link(Crossing* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::_link(Crossing* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid cityId (rows->getLongLong (CrossingTableSync::TABLE_COL_CITYID));
 			try
@@ -67,12 +67,12 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::_unlink(Crossing* obj)
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::_unlink(Crossing* obj)
 		{
 			obj->setCity(NULL);
 		}
 
-		template<> void SQLiteTableSyncTemplate<CrossingTableSync,Crossing>::save(Crossing* obj)
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::save(Crossing* obj)
 		{
 
 		}

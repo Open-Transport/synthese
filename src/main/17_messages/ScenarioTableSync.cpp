@@ -22,7 +22,9 @@
 
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/SentScenario.h"
+#include "17_messages/SentScenarioInheritedTableSync.h"
 #include "17_messages/ScenarioTemplate.h"
+#include "17_messages/ScenarioTemplateInheritedTableSync.h"
 #include "17_messages/AlarmTableSync.h"
 
 #include <sstream>
@@ -54,11 +56,22 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::TABLE_NAME = "t039_scenarios";
-		template<> const int SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::TABLE_ID = 39;
-		template<> const bool SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE_NAME = "t039_scenarios";
+		template<> const int SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE_ID = 39;
+		template<> const bool SQLiteTableSyncTemplate<ScenarioTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::load(Scenario* object, const db::SQLiteResultSPtr& rows )
+
+		template<>
+		string SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::_GetSubClassKey(const SQLiteResultSPtr& row)
+		{
+			return row->getBool(ScenarioTableSync::COL_IS_TEMPLATE)
+				? ScenarioTemplateInheritedTableSync::FACTORY_KEY
+				: SentScenarioInheritedTableSync::FACTORY_KEY
+				;
+		}
+
+
+		template<> void SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::Load(Scenario* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setName(rows->getText ( ScenarioTableSync::COL_NAME));
 			if (rows->getBool ( ScenarioTableSync::COL_IS_TEMPLATE))
@@ -76,7 +89,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>::save(Scenario* object)
+		template<> void SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::Save(Scenario* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -120,7 +133,6 @@ namespace synthese
 			}
 
 		}
-
 	}
 
 	namespace messages
@@ -133,7 +145,7 @@ namespace synthese
 
 		
 		ScenarioTableSync::ScenarioTableSync()
-			: SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>()
+			: SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_IS_TEMPLATE, "INTEGER");
@@ -148,7 +160,7 @@ namespace synthese
 			addTableIndex(cols);
 		}
 
-		void ScenarioTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+/*		void ScenarioTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		    while (rows->next ())
 			{
@@ -159,12 +171,12 @@ namespace synthese
 				if (SentScenario::Contains (id))
 				{
 					shared_ptr<SentScenario> scenario(SentScenario::GetUpdateable(id));
-					load(scenario.get(), rows);
+					Load(scenario.get(), rows);
 				}
 				else
 				{
 					SentScenario* scenario(new SentScenario);
-					load(scenario, rows);
+					Load(scenario, rows);
 					scenario->store();
 				}
 			}
@@ -179,7 +191,7 @@ namespace synthese
 
 				uid id = rows->getLongLong (TABLE_COL_ID);
 				shared_ptr<SentScenario> alarm = SentScenario::GetUpdateable(id);
-				load(alarm.get(), rows);
+				Load(alarm.get(), rows);
 			}
 		}
 
@@ -194,7 +206,7 @@ namespace synthese
 			    SentScenario::Remove (id);	/// @todo Not so simple.
 			}
 		}
-
+*/
 		std::vector<shared_ptr<SentScenario> > ScenarioTableSync::searchSent(
 			time::DateTime startDate
 			, time::DateTime endDate
@@ -234,7 +246,7 @@ namespace synthese
 				while (rows->next ())
 				{
 					shared_ptr<SentScenario> object(new SentScenario);
-					load(object.get(), rows);
+					Load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
@@ -277,7 +289,7 @@ namespace synthese
 				while (rows->next ())
 				{
 					shared_ptr<ScenarioTemplate> object(new ScenarioTemplate(rows->getText (COL_NAME)));
-					load (object.get(), rows);
+					Load (object.get(), rows);
 					objects.push_back (object);
 				}
 				return objects;
@@ -289,17 +301,8 @@ namespace synthese
 
 		}
 
-		boost::shared_ptr<ScenarioTemplate> ScenarioTableSync::getTemplate( uid key )
-		{
-			return dynamic_pointer_cast<ScenarioTemplate, Scenario>(getScenario(key));
-		}
 
-		boost::shared_ptr<SentScenario> ScenarioTableSync::getSent( uid key )
-		{
-			return dynamic_pointer_cast<SentScenario, Scenario>(getScenario(key));
-		}
-
-		boost::shared_ptr<Scenario> ScenarioTableSync::getScenario(uid key)
+/**		boost::shared_ptr<Scenario> ScenarioTableSync::getScenario(uid key)
 		{
 			std::stringstream query;
 			query
@@ -321,7 +324,7 @@ namespace synthese
 			load(object.get(), rows);
 			return object;
 		}
-
+*/
 
 	}
 }

@@ -36,7 +36,7 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteDirectTableSyncTemplate.h"
 
 #include "17_messages/AlarmObjectLink.h"
 #include "17_messages/Alarm.h"
@@ -51,7 +51,7 @@ namespace synthese
 			
 			Only the links concerning the sent alarms are loaded in ram.
 		*/
-		class AlarmObjectLinkTableSync : public db::SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
+		class AlarmObjectLinkTableSync : public db::SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;
@@ -143,7 +143,7 @@ namespace synthese
 				std::vector< boost::shared_ptr<T> > objects;
 				while (rows->next ())
 				{
-				    objects.push_back (db::SQLiteTableSyncTemplate<K,T>::GetUpdateable(
+				    objects.push_back (db::SQLiteDirectTableSyncTemplate<K,T>::GetUpdateable(
 							   rows->getLongLong (COL_OBJECT_ID)));
 				}
 				return objects;

@@ -46,11 +46,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::TABLE_NAME = "t019_handicapped_compliances";
-		template<> const int SQLiteTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::TABLE_ID = 19;
-		template<> const bool SQLiteTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE_NAME = "t019_handicapped_compliances";
+		template<> const int SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE_ID = 19;
+		template<> const bool SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::load(HandicappedCompliance* cmp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::load(HandicappedCompliance* cmp, const db::SQLiteResultSPtr& rows )
 		{
 		    cmp->setKey(rows->getLongLong (TABLE_COL_ID));
 		    
@@ -74,7 +74,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::save(HandicappedCompliance* object)
+		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::save(HandicappedCompliance* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -97,12 +97,12 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteTableSyncTemplate<HandicappedComplianceTableSync, HandicappedCompliance>::_link(HandicappedCompliance* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync, HandicappedCompliance>::_link(HandicappedCompliance* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<HandicappedComplianceTableSync, HandicappedCompliance>::_unlink(HandicappedCompliance* obj)
+		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync, HandicappedCompliance>::_unlink(HandicappedCompliance* obj)
 		{
 
 		}

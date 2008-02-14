@@ -31,7 +31,7 @@
 
 #include "04_time/DateTime.h"
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteInheritanceTableSyncTemplate.h"
 
 #include <vector>
 #include <string>
@@ -49,7 +49,7 @@ namespace synthese
 
 			@note As Scenario is an abstract class, do not use the get static method. Use getAlarm instead.
 		*/
-		class ScenarioTableSync : public db::SQLiteTableSyncTemplate<ScenarioTableSync,Scenario>
+		class ScenarioTableSync : public db::SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>
 		{
 		public:
 			static const std::string COL_IS_TEMPLATE;
@@ -80,7 +80,7 @@ namespace synthese
 				, bool orderByStatus = false
 				, bool orderByConflict = false
 				, bool raisingOrder = false
-				);
+			);
 
 			/** Template scenario search.
 				@param name Name of the template
@@ -97,55 +97,11 @@ namespace synthese
 				, int number = -1
 				, bool orderByName = true
 				, bool raisingOrder = false
-				);
-
-			template <class U>
-			static void saveAlarms(ScenarioSubclassTemplate<U>* object);
-
-			static boost::shared_ptr<ScenarioTemplate> getTemplate(uid key);
-			static boost::shared_ptr<SentScenario> getSent(uid key);
-			static boost::shared_ptr<Scenario> getScenario(uid key);
-
-		protected:
-
-			/** Action to do on Scenario creation.
-				This method loads the new sent scenarii in ram.
-				The templates are not loaded
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on Scenario creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on Scenario deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
+			);
 		};
 
-		template <class S>
-		void synthese::messages::ScenarioTableSync::saveAlarms( ScenarioSubclassTemplate<S>* object )
-		{
-		    // save(object);
-			typename ScenarioSubclassTemplate<S>::AlarmsSet& alarms = object->getAlarms();
-			for (typename ScenarioSubclassTemplate<S>::AlarmsSet::iterator it = alarms.begin(); it != alarms.end(); ++it)
-			{
-				AlarmTableSync::save(static_cast<Alarm*>(*it));
 
-				/// @todo Saving of the broadcast list
-			}
 
-		}
 	}
 }
 

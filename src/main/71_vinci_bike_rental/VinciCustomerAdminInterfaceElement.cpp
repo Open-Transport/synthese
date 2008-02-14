@@ -244,7 +244,7 @@ namespace synthese
 					returnForm.addHiddenField(VinciReturnGuaranteeAction::PARAMETER_GUARANTEE_ID, Conversion::ToString(transaction->getKey()));
 					stream << returnForm.getLinkButton("Rendre la caution");
 					if (transaction->getStartDateTime() <= oneMonthBefore)
-						stream << "<script>alert(\"Attention caution périmée\");</script>";
+						stream << HTMLModule::GetHTMLJavascriptOpen() << "alert(\"Attention caution périmée\");" << HTMLModule::GetHTMLJavascriptClose();
 				}
 				else
 					stream << "Caution rendue le " << transaction->getEndDateTime().toString();

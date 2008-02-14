@@ -52,11 +52,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<LineTableSync,Line>::TABLE_NAME = "t009_lines";
-		template<> const int SQLiteTableSyncTemplate<LineTableSync,Line>::TABLE_ID = 9;
-		template<> const bool SQLiteTableSyncTemplate<LineTableSync,Line>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<LineTableSync>::TABLE_NAME = "t009_lines";
+		template<> const int SQLiteTableSyncTemplate<LineTableSync>::TABLE_ID = 9;
+		template<> const bool SQLiteTableSyncTemplate<LineTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<LineTableSync,Line>::load(Line* line, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::load(Line* line, const db::SQLiteResultSPtr& rows )
 		{
 			line->setKey(rows->getLongLong (TABLE_COL_ID));
 
@@ -81,7 +81,7 @@ namespace synthese
 			line->setUseInRoutePlanning (useInRoutePlanning);
 		}
 
-		template<> void SQLiteTableSyncTemplate<LineTableSync,Line>::save(Line* object)
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::save(Line* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -104,7 +104,7 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteTableSyncTemplate<LineTableSync,Line>::_link(Line* line, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::_link(Line* line, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			uid axisId (rows->getLongLong (LineTableSync::COL_AXISID));
 			uid rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
@@ -145,7 +145,7 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<LineTableSync,Line>::_unlink(Line* obj)
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::_unlink(Line* obj)
 		{
 			obj->setAxis(NULL);
 			obj->setFare(NULL);

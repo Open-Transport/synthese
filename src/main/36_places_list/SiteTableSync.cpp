@@ -55,11 +55,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<SiteTableSync,Site>::TABLE_NAME = "t025_sites";
-		template<> const int SQLiteTableSyncTemplate<SiteTableSync,Site>::TABLE_ID = 25;
-		template<> const bool SQLiteTableSyncTemplate<SiteTableSync,Site>::HAS_AUTO_INCREMENT = true;
+		template<> const string SQLiteTableSyncTemplate<SiteTableSync>::TABLE_NAME = "t025_sites";
+		template<> const int SQLiteTableSyncTemplate<SiteTableSync>::TABLE_ID = 25;
+		template<> const bool SQLiteTableSyncTemplate<SiteTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<SiteTableSync,Site>::load(Site* site, const SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::load(Site* site, const SQLiteResultSPtr& rows)
 		{
 		    site->setKey(rows->getLongLong (TABLE_COL_ID));
 		    site->setName(rows->getText (SiteTableSync::TABLE_COL_NAME));
@@ -96,20 +96,20 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<SiteTableSync,Site>::_link(Site* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::_link(Site* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			obj->setInterface(InterfaceTableSync::Get(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID), obj, false, temporary));
 		}
 
 
 
-		template<> void SQLiteTableSyncTemplate<SiteTableSync,Site>::_unlink(Site* obj)
+		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::_unlink(Site* obj)
 		{
 			obj->setInterface(NULL);
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<SiteTableSync,Site>::save(Site* site)
+		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::save(Site* site)
 		{
 			stringstream query;
 			query << " REPLACE INTO " << TABLE_NAME << " VALUES("
@@ -147,49 +147,5 @@ namespace synthese
 			addTableColumn(COL_USE_DATES_RANGE, "INTEGER", true);
 			addTableColumn(COL_PERIODS, "TEXT", true);
 		}
-
-/*
-		void SiteTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
-		{
-		    while (rows->next ())
-		    {
-			uid id = rows->getLongLong (TABLE_COL_ID);
-			if (Site::Contains(id))
-				load(Site::GetUpdateable(id).get(), rows);
-		    }
-		}
-
-
-
-		void SiteTableSync::rowsAdded( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		    while (rows->next ())
-		    {
-			uid id = rows->getLongLong (TABLE_COL_ID);
-			if (Site::Contains(id))
-			{
-				shared_ptr<Site> site(Site::GetUpdateable(id));
-			    load(site.get(), rows);
-			}
-			else
-			{
-			    Site* site(new Site);
-			    load(site, rows);
-				site->store();
-			}
-		    }
-		}
-
-
-		void SiteTableSync::rowsRemoved( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
-		{
-		    while (rows->next ())
-		    {
-			uid id = rows->getLongLong (TABLE_COL_ID);
-			if (Site::Contains(id))
-				Site::Remove(id);
-		    }
-		}
-		*/
 	}
 }

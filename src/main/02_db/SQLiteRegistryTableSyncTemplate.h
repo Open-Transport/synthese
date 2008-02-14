@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_db_SQLiteRegistryTableSyncTemplate_h__
 #define SYNTHESE_db_SQLiteRegistryTableSyncTemplate_h__
 
-#include "SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteDirectTableSyncTemplate.h"
 
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
@@ -38,10 +38,10 @@ namespace synthese
 			@ingroup m10
 		*/
 		template<class K, class T>
-		class SQLiteRegistryTableSyncTemplate : public SQLiteTableSyncTemplate<K,T>
+		class SQLiteRegistryTableSyncTemplate : public SQLiteDirectTableSyncTemplate<K,T>
 		{
 		public:
-			SQLiteRegistryTableSyncTemplate() : SQLiteTableSyncTemplate<K,T>() {}
+			SQLiteRegistryTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>() {}
 
 		protected:
 
@@ -61,15 +61,15 @@ namespace synthese
 						if (T::Contains(rows->getLongLong (TABLE_COL_ID)))
 						{
 							boost::shared_ptr<T> address(T::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-							SQLiteTableSyncTemplate<K,T>::unlink(address.get());
+							SQLiteDirectTableSyncTemplate<K,T>::unlink(address.get());
 							load (address.get(), rows);
-							SQLiteTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+							SQLiteDirectTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
 						}
 						else
 						{
 							T* object(new T);
 							load(object, rows);
-								SQLiteTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
+								SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
 							object->store();
 						}
 					}
@@ -97,9 +97,9 @@ namespace synthese
 						if (T::Contains(id))
 						{
 							boost::shared_ptr<T> address(T::GetUpdateable(id));
-							SQLiteTableSyncTemplate<K,T>::unlink(address.get());
+							SQLiteDirectTableSyncTemplate<K,T>::unlink(address.get());
 							load (address.get(), rows);
-							SQLiteTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+							SQLiteDirectTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
 						}
 					}
 					catch (util::Exception& e)
@@ -126,7 +126,7 @@ namespace synthese
 						uid id = rows->getLongLong (TABLE_COL_ID);
 						if (T::Contains(id))
 						{
-							SQLiteTableSyncTemplate<K,T>::unlink(T::GetUpdateable(id).get());
+							SQLiteDirectTableSyncTemplate<K,T>::unlink(T::GetUpdateable(id).get());
 							T::Remove(id);
 						}
 					}

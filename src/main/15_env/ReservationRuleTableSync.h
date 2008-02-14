@@ -30,7 +30,7 @@
 
 #include "ReservationRule.h"
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteDirectTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -41,7 +41,7 @@ namespace synthese
 		/** ReservationRule table synchronizer.
 			@ingroup m15LS refLS
 		*/
-		class ReservationRuleTableSync : public db::SQLiteTableSyncTemplate<ReservationRuleTableSync,ReservationRule>
+		class ReservationRuleTableSync : public db::SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>
 		{
 		public:
 			static const std::string COL_TYPE;

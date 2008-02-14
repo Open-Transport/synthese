@@ -44,11 +44,11 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::TABLE_NAME = "t034_vinci_site";
-		template<> const int SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::TABLE_ID = 34;
-		template<> const bool SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciSiteTableSync>::TABLE_NAME = "t034_vinci_site";
+		template<> const int SQLiteTableSyncTemplate<VinciSiteTableSync>::TABLE_ID = 34;
+		template<> const bool SQLiteTableSyncTemplate<VinciSiteTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::load(VinciSite* vs, const SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<VinciSiteTableSync,VinciSite>::load(VinciSite* vs, const SQLiteResultSPtr& rows)
 		{
 			vs->setKey(rows->getLongLong (TABLE_COL_ID));
 			vs->setName(rows->getText ( VinciSiteTableSync::COL_NAME));
@@ -58,17 +58,17 @@ namespace synthese
 			vs->setParentSiteId(rows->getLongLong(VinciSiteTableSync::COL_PARENT_SITE_ID));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::_link(VinciSite* vs, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<VinciSiteTableSync,VinciSite>::_link(VinciSite* vs, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::_unlink(VinciSite* vs)
+		template<> void SQLiteDirectTableSyncTemplate<VinciSiteTableSync,VinciSite>::_unlink(VinciSite* vs)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciSiteTableSync,VinciSite>::save(VinciSite* vs)
+		template<> void SQLiteDirectTableSyncTemplate<VinciSiteTableSync,VinciSite>::save(VinciSite* vs)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

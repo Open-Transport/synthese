@@ -22,7 +22,7 @@
 
 #include "DeleteScenarioAction.h"
 
-#include "17_messages/ScenarioTableSync.h"
+#include "17_messages/ScenarioTemplateInheritedTableSync.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/MessagesLibraryLog.h"
 
@@ -57,7 +57,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
 			try
 			{
-				_scenario = ScenarioTableSync::getTemplate(id);
+				_scenario.reset(ScenarioTemplateInheritedTableSync::Get(id));
 			}
 			catch(...)
 			{
@@ -69,7 +69,7 @@ namespace synthese
 		void DeleteScenarioAction::run()
 		{
 			// Action
-			ScenarioTableSync::remove(_scenario->getKey());
+			ScenarioTableSync::Remove(_scenario->getKey());
 
 			// Log
 			MessagesLibraryLog::addDeleteEntry(_scenario.get(), _request->getUser().get());

@@ -24,7 +24,7 @@
 #define SYNTHESE_DBRING_UPDATERECORDTABLESYNC_H
 
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "02_db/SQLiteDirectTableSyncTemplate.h"
 #include "03_db_ring/UpdateRecord.h"
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -42,7 +42,7 @@ namespace dbring
 
 
 
-class UpdateRecordTableSync : public db::SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>
+class UpdateRecordTableSync : public db::SQLiteDirectTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>
 {
 
 

@@ -59,11 +59,11 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::TABLE_NAME = "t035_vinci_contract";
-		template<> const int SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::TABLE_ID = 35;
-		template<> const bool SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciContractTableSync>::TABLE_NAME = "t035_vinci_contract";
+		template<> const int SQLiteTableSyncTemplate<VinciContractTableSync>::TABLE_ID = 35;
+		template<> const bool SQLiteTableSyncTemplate<VinciContractTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::load(VinciContract* vc, const SQLiteResultSPtr& rows)
+		template<> void SQLiteDirectTableSyncTemplate<VinciContractTableSync,VinciContract>::load(VinciContract* vc, const SQLiteResultSPtr& rows)
 		{
 			vc->setKey(rows->getLongLong (TABLE_COL_ID));
 			vc->setUserId(rows->getLongLong ( VinciContractTableSync::COL_USER_ID));
@@ -71,17 +71,17 @@ namespace synthese
 			vc->setPassport(rows->getText ( VinciContractTableSync::COL_PASSPORT));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::_link(VinciContract* vc, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<VinciContractTableSync,VinciContract>::_link(VinciContract* vc, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::_unlink(VinciContract* vc)
+		template<> void SQLiteDirectTableSyncTemplate<VinciContractTableSync,VinciContract>::_unlink(VinciContract* vc)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::save(VinciContract* vc)
+		template<> void SQLiteDirectTableSyncTemplate<VinciContractTableSync,VinciContract>::save(VinciContract* vc)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -167,7 +167,7 @@ namespace synthese
 				try
 				{
 					shared_ptr<VinciContract> contract(new VinciContract);
-					SQLiteTableSyncTemplate<VinciContractTableSync,VinciContract>::load(contract.get (), rows);
+					SQLiteDirectTableSyncTemplate<VinciContractTableSync,VinciContract>::load(contract.get (), rows);
 					contract->getUser();
 					DateTime late(DateTime::FromSQLTimestamp(rows->getText("ret")));
 					contract->setLate(late);

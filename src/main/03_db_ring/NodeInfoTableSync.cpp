@@ -55,11 +55,11 @@ namespace synthese
 
     namespace db
     {
-	template<> const std::string SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::TABLE_NAME = "t998_nodes_infos";
-	template<> const int SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::TABLE_ID = 998;
-	template<> const bool SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::HAS_AUTO_INCREMENT = true;
+	template<> const std::string SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE_NAME = "t998_nodes_infos";
+	template<> const int SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE_ID = 998;
+	template<> const bool SQLiteTableSyncTemplate<NodeInfoTableSync>::HAS_AUTO_INCREMENT = true;
 
-	template<> void SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::load (NodeInfo* object, const db::SQLiteResultSPtr& rows)
+	template<> void SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo>::load (NodeInfo* object, const db::SQLiteResultSPtr& rows)
 	{
 	    object->setNodeId (rows->getInt (NodeInfoTableSync::TABLE_COL_NODEID));
 	    object->setRingId (rows->getInt (NodeInfoTableSync::TABLE_COL_RINGID));
@@ -67,17 +67,17 @@ namespace synthese
 	    object->setPort (rows->getInt (NodeInfoTableSync::TABLE_COL_PORT));
 	}
 
-	template<> void SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::_link(NodeInfo* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+	template<> void SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo>::_link(NodeInfo* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 	{
 
 	}
 
-	template<> void SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::_unlink(NodeInfo* obj)
+	template<> void SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo>::_unlink(NodeInfo* obj)
 	{
 
 	}
 
-	template<> void SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo>::save (NodeInfo* object)
+	template<> void SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo>::save (NodeInfo* object)
 	{
 	    SQLite* sqlite = DBModule::GetSQLite();
 	    std::stringstream query;
@@ -106,7 +106,7 @@ namespace synthese
 
 
 	NodeInfoTableSync::NodeInfoTableSync ()
-	    : SQLiteTableSyncTemplate<NodeInfoTableSync,NodeInfo> ()
+	    : SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo> ()
 	{
 	    // TODO : make host, port, updatables.
 	    addTableColumn (TABLE_COL_ID, "INTEGER", false);

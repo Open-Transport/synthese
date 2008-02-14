@@ -49,28 +49,28 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::TABLE_NAME = "t029_currencies";
-		template<> const int SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::TABLE_ID = 29;
-		template<> const bool SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE_NAME = "t029_currencies";
+		template<> const int SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE_ID = 29;
+		template<> const bool SQLiteTableSyncTemplate<CurrencyTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::load(Currency* currency, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::load(Currency* currency, const db::SQLiteResultSPtr& rows )
 		{
 			currency->setKey(rows->getLongLong (TABLE_COL_ID));
 			currency->setName(rows->getText ( CurrencyTableSync::TABLE_COL_NAME));
 			currency->setSymbol(rows->getText ( CurrencyTableSync::TABLE_COL_SYMBOL));
 		}
 
-		template<> void SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::_link(Currency* currency, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::_link(Currency* currency, const db::SQLiteResultSPtr& rows, GetSource temporary )
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::_unlink(Currency* currency)
+		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::_unlink(Currency* currency)
 		{
 
 		}
 
-		template<> void SQLiteTableSyncTemplate<CurrencyTableSync,Currency>::save(Currency* currency)
+		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::save(Currency* currency)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

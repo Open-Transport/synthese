@@ -42,11 +42,11 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::TABLE_NAME = "t040_alarm_object_links";
-		template<> const int SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::TABLE_ID = 40;
-		template<> const bool SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE_NAME = "t040_alarm_object_links";
+		template<> const int SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE_ID = 40;
+		template<> const bool SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::load(AlarmObjectLink* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::load(AlarmObjectLink* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setAlarmId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_ALARM_ID));
@@ -55,7 +55,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_link(AlarmObjectLink* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_link(AlarmObjectLink* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			assert(temporary == GET_AUTO || temporary == GET_REGISTRY);
 			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(obj->getRecipientKey()));
@@ -66,7 +66,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_unlink(AlarmObjectLink* aol)
+		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_unlink(AlarmObjectLink* aol)
 		{
 			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(aol->getRecipientKey()));
 			shared_ptr<SentAlarm> alarm = SentAlarm::GetUpdateable(aol->getAlarmId());
@@ -75,7 +75,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::save(AlarmObjectLink* object)
+		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::save(AlarmObjectLink* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -101,7 +101,7 @@ namespace synthese
 
 
 		AlarmObjectLinkTableSync::AlarmObjectLinkTableSync()
-			: SQLiteTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>()
+			: SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_RECIPIENT_KEY, "TEXT");
@@ -124,7 +124,10 @@ namespace synthese
 				
 				// Alarm not found in ram : this is a template
 				if (!SentAlarm::Contains(aol->getAlarmId()))
+				{
+					delete aol;
 					continue;
+				}
 
 				link(aol, rows, GET_REGISTRY);
 				aol->store();

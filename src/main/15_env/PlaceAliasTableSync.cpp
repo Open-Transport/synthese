@@ -50,17 +50,17 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::TABLE_NAME = "t011_place_aliases";
-		template<> const int SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::TABLE_ID = 11;
-		template<> const bool SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE_NAME = "t011_place_aliases";
+		template<> const int SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE_ID = 11;
+		template<> const bool SQLiteTableSyncTemplate<PlaceAliasTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::load(PlaceAlias* object, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::load(PlaceAlias* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey (rows->getLongLong (TABLE_COL_ID));
 			object->setName (rows->getText (PlaceAliasTableSync::COL_NAME));
 		}
 
-		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_link(PlaceAlias* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_link(PlaceAlias* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
 			// Because the fetch place has no equivalent in database read mode
 			assert(temporary == GET_REGISTRY);
@@ -83,7 +83,7 @@ namespace synthese
 			city->getPlaceAliasesMatcher ().add (obj->getName (), obj);
 		}
 
-		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_unlink(PlaceAlias* obj)
+		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_unlink(PlaceAlias* obj)
 		{
 			City* city(const_cast<City*>(obj->getCity()));
 
@@ -92,7 +92,7 @@ namespace synthese
 			obj->setCity(NULL);
 		}
 
-		template<> void SQLiteTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::save(PlaceAlias* object)
+		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::save(PlaceAlias* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

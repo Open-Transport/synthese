@@ -4,6 +4,12 @@ synthese::messages::AlarmTableSync::integrate();
 synthese::messages::TextTemplateTableSync::integrate();
 synthese::messages::AlarmObjectLinkTableSync::integrate();
 
+synthese::messages::SentScenarioInheritedTableSync::integrate();
+synthese::messages::ScenarioTemplateInheritedTableSync::integrate();
+synthese::messages::AlarmTemplateInheritedTableSync::integrate();
+synthese::messages::ScenarioSentAlarmInheritedTableSync::integrate();
+synthese::messages::SingleSentAlarmInheritedTableSync::integrate();
+
 synthese::messages::MessagesAdmin::integrate();
 synthese::messages::MessageAdmin::integrate();
 synthese::messages::MessagesLibraryAdmin::integrate();

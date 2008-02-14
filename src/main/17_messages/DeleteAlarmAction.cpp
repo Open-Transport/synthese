@@ -56,7 +56,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_ALARM, true, FACTORY_KEY));
 			try
 			{
-				_alarm = Alarm::Get(id);
+				_alarm.reset(AlarmTableSync::Get(id));
 			}
 			catch (...)
 			{
@@ -67,7 +67,7 @@ namespace synthese
 		void DeleteAlarmAction::run()
 		{
 			/// @todo Delete alarm broadcast list
-			AlarmTableSync::remove(_alarm->getId());
+			AlarmTableSync::Remove(_alarm->getId());
 		}
 	}
 }

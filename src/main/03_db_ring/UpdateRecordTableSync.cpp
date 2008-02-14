@@ -55,25 +55,25 @@ namespace synthese
 
     namespace db
     {
-	template<> const std::string SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::TABLE_NAME = "t997_update_log";
-	template<> const int SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::TABLE_ID = 997;
-	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::HAS_AUTO_INCREMENT = true;
+	template<> const std::string SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE_NAME = "t997_update_log";
+	template<> const int SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE_ID = 997;
+	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync>::HAS_AUTO_INCREMENT = true;
 
 
 	
 	
-	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::_link(UpdateRecord* obj, const SQLiteResultSPtr& rows, GetSource temporary)
+	template<> void SQLiteDirectTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::_link(UpdateRecord* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 	{
 	}
 
 
-	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::_unlink(UpdateRecord* obj)
+	template<> void SQLiteDirectTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::_unlink(UpdateRecord* obj)
 	{
 	}
 
 
 
-	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::load (UpdateRecord* object, const db::SQLiteResultSPtr& rows)
+	template<> void SQLiteDirectTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::load (UpdateRecord* object, const db::SQLiteResultSPtr& rows)
 	{
 	    object->setKey (rows->getLongLong (TABLE_COL_ID));
 	    object->setTimestamp (rows->getTimestamp (UpdateRecordTableSync::TABLE_COL_TIMESTAMP));
@@ -90,7 +90,7 @@ namespace synthese
 
 
 
-	template<> void SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::save (UpdateRecord* object)
+	template<> void SQLiteDirectTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>::save (UpdateRecord* object)
 	{
 	    SQLite* sqlite = DBModule::GetSQLite();
 	    std::stringstream query;
@@ -124,7 +124,7 @@ namespace synthese
 
 
 	UpdateRecordTableSync::UpdateRecordTableSync ()
-	    : SQLiteTableSyncTemplate<UpdateRecordTableSync,UpdateRecord> ()
+	    : SQLiteDirectTableSyncTemplate<UpdateRecordTableSync,UpdateRecord> ()
 	{
 	    addTableColumn (TABLE_COL_ID, "INTEGER", false);
 	    addTableColumn (TABLE_COL_TIMESTAMP, "TEXT", true);

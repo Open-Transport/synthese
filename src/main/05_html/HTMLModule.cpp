@@ -64,5 +64,24 @@ namespace synthese
 			s << "<img src=\"" << url << "\" alt=\"" << alt << "\" />";
 			return s.str();
 		}
+
+		std::string HTMLModule::GetHTMLJavascriptOpen( std::string url/*=std::string()*/ )
+		{
+			stringstream s;
+			s << "<script type=\"text/javascript\"";
+			if (!url.empty())
+				s << " src=\"" << url << "\"";
+			s << ">";
+			if (url.empty())
+				s << "\r// <![CDATA[\r";
+			else
+				s << "</script>";
+			return s.str();
+		}
+
+		std::string HTMLModule::GetHTMLJavascriptClose()
+		{
+			return string("\r// ]]>\r</script>");
+		}
 	}
 }
