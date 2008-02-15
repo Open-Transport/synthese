@@ -59,6 +59,8 @@ namespace synthese
 
 			static std::string							getLevelLabel(const AlarmLevel& level);
 			static std::string							getConflictLabel(const AlarmConflict& conflict);
+
+			virtual std::string getName() const;
 		};
 	}
 	/** @} */

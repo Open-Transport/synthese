@@ -60,7 +60,7 @@ namespace synthese
 			{
 				if (it->isAuthorized(static_cast<const FunctionRequest<AdminRequest>* >(request)))
 				{
-					PageLinks l(it->getSubPagesOfParent(_pageLink, currentPage));
+					PageLinks l(it->getSubPagesOfParent(_pageLink, currentPage, static_cast<const FunctionRequest<AdminRequest>* >(request)));
 					links.insert(links.end(), l.begin(), l.end());
 				}
 			}

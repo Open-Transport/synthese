@@ -173,6 +173,7 @@ namespace synthese
 				virtual PageLinks getSubPagesOfParent(
 					const PageLink& parentLink
 					, const AdminInterfaceElement& currentPage
+					, const server::FunctionRequest<admin::AdminRequest>* request
 				) const = 0;
 
 
@@ -185,7 +186,10 @@ namespace synthese
 					The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
 					This method can be overloaded to create customized sub tree.
 				*/
-				virtual PageLinks getSubPages(const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request) const;
+				virtual PageLinks getSubPages(
+					const AdminInterfaceElement& currentPage
+					, const server::FunctionRequest<admin::AdminRequest>* request
+				) const;
 			//@}
 		};
 	}

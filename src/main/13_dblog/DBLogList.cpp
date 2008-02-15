@@ -96,7 +96,8 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks DBLogList::getSubPagesOfParent( const PageLink& parentLink, const AdminInterfaceElement& currentPage) const /*= 0*/
+		AdminInterfaceElement::PageLinks DBLogList::getSubPagesOfParent( const PageLink& parentLink, const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const /*= 0*/
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DBLogModule::FACTORY_KEY)

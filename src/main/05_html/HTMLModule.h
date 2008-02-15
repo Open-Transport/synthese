@@ -88,6 +88,8 @@ input[type=submit]:hover {background-color:#0080E0;}
 			static std::string GetHTMLJavascriptOpen(std::string url=std::string());
 
 			static std::string GetHTMLJavascriptClose();
+
+			virtual std::string getName() const;
 		};
 
 

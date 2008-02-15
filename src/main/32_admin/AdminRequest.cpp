@@ -123,7 +123,7 @@ namespace synthese
 				if (_interface != NULL)
 				{
 					const AdminInterfacePage* const aip = _interface->getPage<AdminInterfacePage>();
-					aip->display(stream, &_page, _request->getObjectId(), (const FunctionRequest<AdminRequest>*) _request);
+					aip->display(stream, &const_pointer_cast<const AdminInterfaceElement>(_page), _request->getObjectId(), (const FunctionRequest<AdminRequest>*) _request);
 				}
 				else
 				{
@@ -137,13 +137,13 @@ namespace synthese
 			}
 		}
 
-		void AdminRequest::setPage(shared_ptr<const AdminInterfaceElement> aie )
+		void AdminRequest::setPage(shared_ptr<AdminInterfaceElement> aie )
 		{
 			_page = aie;
 		}
 
 		
-		shared_ptr<const AdminInterfaceElement> AdminRequest::getPage() const
+		shared_ptr<AdminInterfaceElement> AdminRequest::getPage() const
 		{
 			return _page;
 		}
@@ -153,7 +153,7 @@ namespace synthese
 			_parameters.insert(name,value);
 		}
 
-		void AdminRequest::setActionFailedPage(shared_ptr<const AdminInterfaceElement> aie )
+		void AdminRequest::setActionFailedPage(shared_ptr<AdminInterfaceElement> aie )
 		{
 			_actionFailedPage = aie;
 		}

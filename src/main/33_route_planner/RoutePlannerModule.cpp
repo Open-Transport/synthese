@@ -28,5 +28,10 @@ namespace synthese
 {
 	namespace routeplanner
 	{
+
+		std::string RoutePlannerModule::getName() const
+		{
+			return "Calcul d'itinéraires";
+		}
 	}
 }

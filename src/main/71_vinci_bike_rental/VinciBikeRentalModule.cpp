@@ -452,5 +452,10 @@ namespace synthese
 				result.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 			return result;
 		}
+
+		std::string VinciBikeRentalModule::getName() const
+		{
+			return "Vinci Location de vélos";
+		}
 	}
 }

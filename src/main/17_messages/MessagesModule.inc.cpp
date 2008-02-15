@@ -5,6 +5,7 @@
 #include "17_messages/TextTemplateTableSync.h"
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
+#include "17_messages/ScenarioFolderTableSync.h"
 
 #include "17_messages/SentScenarioInheritedTableSync.h"
 #include "17_messages/ScenarioTemplateInheritedTableSync.h"
@@ -42,3 +43,4 @@
 #include "17_messages/AlarmRemoveLinkAction.h"
 #include "17_messages/AlarmAddLinkAction.h"
 #include "17_messages/ScenarioStopAction.h"
+#include "17_messages/ScenarioFolderAdd.h"

@@ -31,6 +31,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class ScenarioFolder;
+
 		/** Ecran d'édition des modèles de texte destinés aux messages.
 			@ingroup m17
 
@@ -76,9 +78,12 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_FOLDER_ID;
 
 		private:
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
+			uid											_folderId;
+			boost::shared_ptr<const ScenarioFolder>		_folder;
 
 			
 		public:
@@ -96,6 +101,10 @@ namespace synthese
 
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 
+			void setFolderId(uid folder);
+
+			virtual server::ParametersMap getParametersMap() const;
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
 				@param request User request
@@ -106,7 +115,8 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-			) const;
+				, const server::FunctionRequest<admin::AdminRequest>* request
+				) const;
 
 			/** Sub pages getter.
 				@param request User request

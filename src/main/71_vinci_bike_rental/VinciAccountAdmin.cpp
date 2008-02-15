@@ -121,7 +121,8 @@ namespace synthese
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks VinciAccountAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		AdminInterfaceElement::PageLinks VinciAccountAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == VinciAccountsAdminInterfaceElement::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)

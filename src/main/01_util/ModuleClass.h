@@ -46,6 +46,7 @@ namespace synthese
 
 			virtual void preInit () {};
 			virtual void initialize () {};
+			virtual std::string getName() const = 0;
 
 		};
 	}

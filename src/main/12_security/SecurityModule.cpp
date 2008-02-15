@@ -143,5 +143,10 @@ namespace synthese
 			}
 			return v;
 		}
+
+		std::string SecurityModule::getName() const
+		{
+			return "Sécurité";
+		}
 	}
 }

@@ -400,7 +400,8 @@ namespace synthese
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks VinciCustomerAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		AdminInterfaceElement::PageLinks VinciCustomerAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == VinciCustomerSearchAdminInterfaceElement::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)

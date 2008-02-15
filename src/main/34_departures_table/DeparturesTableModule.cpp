@@ -88,5 +88,10 @@ namespace synthese
 		{
 
 		}
+
+		std::string DeparturesTableModule::getName() const
+		{
+			return "SAI Tableaux de départs";
+		}
 	}
 }

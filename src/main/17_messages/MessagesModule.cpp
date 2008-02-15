@@ -45,7 +45,7 @@ namespace synthese
 			vector<pair<uid,string> > m;
 			if (withAll)
 				m.push_back(make_pair(0, "(tous)"));
-			vector<shared_ptr<ScenarioTemplate> > sc = ScenarioTableSync::searchTemplate();
+			vector<shared_ptr<ScenarioTemplate> > sc = ScenarioTableSync::searchTemplate(0);
 			for(vector<shared_ptr<ScenarioTemplate> >::const_iterator it = sc.begin(); it != sc.end(); ++it)
 				m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 			return m;
@@ -112,6 +112,11 @@ namespace synthese
 		void MessagesModule::initialize()
 		{
 
+		}
+
+		std::string MessagesModule::getName() const
+		{
+			return "Gestion d'actualités";
 		}
 	}
 }

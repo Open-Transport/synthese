@@ -39,6 +39,7 @@ namespace synthese
 		ScenarioTemplate::ScenarioTemplate(const std::string name)
 			: ScenarioSubclassTemplate<AlarmTemplate>(name)
 			, util::Registrable<uid, ScenarioTemplate>()
+			, _folderId(UNKNOWN_VALUE)
 		{
 
 		}
@@ -51,6 +52,16 @@ namespace synthese
 		uid ScenarioTemplate::getId() const
 		{
 			return getKey();
+		}
+
+		uid ScenarioTemplate::getFolderId() const
+		{
+			return _folderId;
+		}
+
+		void ScenarioTemplate::setFolderId( uid value )
+		{
+			_folderId = value;
 		}
 	}
 }

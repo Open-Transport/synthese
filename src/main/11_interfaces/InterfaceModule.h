@@ -117,6 +117,8 @@ namespace synthese
 			void initialize();
 
 			static std::string getVariableFromMap(const VariablesMap& variables, const std::string& varName);
+
+			virtual std::string getName() const;
 		};
 	}
 	/** @} */

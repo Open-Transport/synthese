@@ -147,7 +147,8 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)

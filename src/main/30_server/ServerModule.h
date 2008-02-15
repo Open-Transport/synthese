@@ -60,6 +60,8 @@ namespace synthese
 			static void ParameterCallback (const std::string& name, 
 						       const std::string& value);
 
+			virtual std::string getName() const;
+
 		};
 
 		/// @todo Move constants below in corresponding Request class
@@ -116,6 +118,7 @@ namespace synthese
 
 		static const std::string PARAMETER_RESERVATION_COUNT ("NbPlaces");
 		static const std::string PARAMETER_DEPARTURE_TABLE_CODE ("tb");
+
 	}
 	/** @} */
 }

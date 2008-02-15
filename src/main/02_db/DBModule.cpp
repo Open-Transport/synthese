@@ -103,6 +103,11 @@ namespace synthese
 			return (it == _subClassMap.end()) ? std::string() : it->second;
 		}
 
+		std::string DBModule::getName() const
+		{
+			return "Base de données SQLite";
+		}
+
 	}
 }
 

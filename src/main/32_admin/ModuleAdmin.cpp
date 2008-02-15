@@ -27,6 +27,8 @@
 
 #include "01_util/ModuleClass.h"
 
+#include "05_html/HTMLModule.h"
+
 #include "32_admin/AdminParametersException.h"
 
 using namespace std;
@@ -38,6 +40,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace admin;
+	using namespace html;
 
 	namespace util
 	{
@@ -60,15 +63,43 @@ namespace synthese
 		
 		void ModuleAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			_moduleKey = map.getString(PARAMETER_MODULE, true, FACTORY_KEY);
-			_pageLink.name = _moduleKey;	/// @todo temporary
-			_pageLink.parameterName = PARAMETER_MODULE;
-			_pageLink.parameterValue = _moduleKey;
+			try
+			{
+				_moduleKey = map.getString(PARAMETER_MODULE, true, FACTORY_KEY);
+				_moduleClass.reset(Factory<ModuleClass>::create(_moduleKey));
+				_pageLink.name = _moduleClass->getName();
+				_pageLink.parameterName = PARAMETER_MODULE;
+				_pageLink.parameterValue = _moduleKey;
+			}
+			catch(...)
+			{
+				throw AdminParametersException("Invalid Module Key");
+			}
 		}
 		
 		void ModuleAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
-			/// @todo Implement the display by streaming the output to the stream variable
+			stream << "<h1>Informations sur le module</h1>";
+
+			stream << "<ul>";
+			stream << "<li>Code : " << _moduleClass->getFactoryKey() << "</li>";
+			stream << "<li>Nom : " << _moduleClass->getName() << "</li>";
+			stream << "</ul>";
+
+			stream << "<h1>Pages d'administration</h1>";
+
+			stream << "Les liens suivants donnent accès aux pages d'administration du module " << _moduleClass->getName() << ".</p>";
+			
+			stream << "<ul>";
+
+			AdminInterfaceElement::PageLinks links(getSubPages(*this, request));
+			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
+			{
+				stream << "<li>" << HTMLModule::getHTMLImage(it->icon, it->name);
+				stream << HTMLModule::getHTMLLink(it->getURL(static_cast<const server::FunctionRequest<AdminRequest>*>(request)), it->name);
+				stream << "</li>";
+			}
+			stream << "</ul>";
 		}
 
 		bool ModuleAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
@@ -79,20 +110,23 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
+			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
 			{
 				for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
 					it != Factory<ModuleClass>::end(); ++it)
-				{ /// @todo Add a control of presence of at least a subpage for the module
+				{
 					AdminInterfaceElement::PageLink link;
 					link.factoryKey = FACTORY_KEY;
 					link.icon = ICON;
 					link.parameterValue = it.getKey();
 					link.parameterName = PARAMETER_MODULE;
-					link.name = it.getKey();	/// @todo Replace it by a name
-					links.push_back(link);
+					link.name = it->getName();
+
+					if (!AdminInterfaceElement::GetAdminPage(link)->getSubPages(currentPage, request).empty())
+						links.insert(links.begin(), link);
 				}
 			}
 			return links;

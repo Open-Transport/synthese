@@ -78,6 +78,7 @@ namespace synthese
 			{
 				ScenarioTemplate* tobject = static_cast<ScenarioTemplate*>(object);
 				tobject->setKey(rows->getLongLong (TABLE_COL_ID));
+				tobject->setFolderId(rows->getLongLong(ScenarioTableSync::COL_FOLDER_ID));
 			}
 			else
 			{
@@ -115,6 +116,7 @@ namespace synthese
 					<< "," << Conversion::ToSQLiteString(object->getName())
 					<< "," << (sobject ? sobject->getPeriodStart().toSQLString() : "NULL")
 					<< "," << (sobject ? sobject->getPeriodEnd().toSQLString() : "NULL")
+					<< "," << Conversion::ToString(tobject ? tobject->getFolderId() : UNKNOWN_VALUE)
 				<< ")";
 			sqlite->execUpdate(query.str());
 
@@ -142,6 +144,7 @@ namespace synthese
 		const std::string ScenarioTableSync::COL_NAME = "name";
 		const std::string ScenarioTableSync::COL_PERIODSTART = "period_start";
 		const std::string ScenarioTableSync::COL_PERIODEND = "period_end"; 
+		const std::string ScenarioTableSync::COL_FOLDER_ID("folder_id");
 
 		
 		ScenarioTableSync::ScenarioTableSync()
@@ -153,11 +156,14 @@ namespace synthese
 			addTableColumn(COL_NAME, "TEXT");
 			addTableColumn (COL_PERIODSTART, "TIMESTAMP", true);
 			addTableColumn (COL_PERIODEND, "TIMESTAMP", true);
+			addTableColumn(COL_FOLDER_ID, "INTEGER");
 
 			vector<string> cols;
 			cols.push_back(COL_IS_TEMPLATE);
 			cols.push_back(COL_PERIODSTART);
 			addTableIndex(cols);
+
+			addTableIndex(COL_FOLDER_ID);
 		}
 
 /*		void ScenarioTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
@@ -258,7 +264,8 @@ namespace synthese
 		}
 
 		std::vector<boost::shared_ptr<ScenarioTemplate> > ScenarioTableSync::searchTemplate(
-			const std::string name /*= std::string() */
+			uid folderId
+			, const std::string name /*= std::string() */
 			, const ScenarioTemplate* scenarioToBeDifferentWith
 			, int first /*= 0 */
 			, int number /*= -1 */
@@ -271,6 +278,11 @@ namespace synthese
 				<< " FROM " << TABLE_NAME
 				<< " WHERE " 
 				<< COL_IS_TEMPLATE << "=1";
+			if (folderId > 0)
+				query << " AND " << COL_FOLDER_ID << "=" << Conversion::ToString(folderId);
+			else
+				query << " AND (" << COL_FOLDER_ID << "=0 OR " << COL_FOLDER_ID << " IS NULL)";
+				
 			if (!name.empty())
 				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
 			if (scenarioToBeDifferentWith)

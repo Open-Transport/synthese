@@ -70,6 +70,8 @@ namespace synthese
 		public:
 
 			void initialize();
+
+			virtual std::string getName() const;
 		};
 	}
 

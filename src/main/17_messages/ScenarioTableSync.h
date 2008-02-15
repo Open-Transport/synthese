@@ -57,6 +57,7 @@ namespace synthese
 			static const std::string COL_NAME;
 			static const std::string COL_PERIODSTART;
 			static const std::string COL_PERIODEND;
+			static const std::string COL_FOLDER_ID;
 
 			ScenarioTableSync();
 
@@ -91,7 +92,8 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<ScenarioTemplate> > searchTemplate(
-				const std::string name = std::string()
+				uid folderId
+				, const std::string name = std::string()
 				, const ScenarioTemplate* scenarioToBeDifferentWith = NULL
 				, int first = 0
 				, int number = -1

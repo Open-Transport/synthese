@@ -28,5 +28,10 @@ namespace synthese
 
 	namespace resa
 	{
+
+		std::string ResaModule::getName() const
+		{
+			return "TAD Réservation";
+		}
 	}
 }

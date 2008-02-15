@@ -172,7 +172,8 @@ namespace synthese
 			_searchName = name;
 		}
 
-		AdminInterfaceElement::PageLinks VinciCustomerSearchAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		AdminInterfaceElement::PageLinks VinciCustomerSearchAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage 		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)

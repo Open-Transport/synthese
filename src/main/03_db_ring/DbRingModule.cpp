@@ -91,6 +91,11 @@ namespace synthese
 		}
 		
 	    }
+
+		std::string DbRingModule::getName() const
+		{
+			return "Synchronisation base de données répartie";
+		}
 	    
 	}
 }

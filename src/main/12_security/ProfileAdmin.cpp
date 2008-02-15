@@ -229,7 +229,8 @@ namespace synthese
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage 		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ProfilesAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)

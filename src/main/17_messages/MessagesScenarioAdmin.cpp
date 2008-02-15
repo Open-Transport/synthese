@@ -186,7 +186,8 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (currentPage.getFactoryKey() == FACTORY_KEY)

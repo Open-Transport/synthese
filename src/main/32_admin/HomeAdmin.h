@@ -71,6 +71,7 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
+				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;

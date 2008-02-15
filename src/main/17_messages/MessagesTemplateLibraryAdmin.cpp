@@ -221,7 +221,8 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-		) const	{
+			, const server::FunctionRequest<admin::AdminRequest>* request
+			) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
 				links.push_back(_pageLink);

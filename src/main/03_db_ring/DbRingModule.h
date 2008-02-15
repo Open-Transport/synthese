@@ -38,7 +38,8 @@ namespace synthese
 		 */
 		static void ParameterCallback (const std::string& name, 
 					       const std::string& value);
-		    
+		   
+		virtual std::string getName() const;
 	    };
 	    
 	}

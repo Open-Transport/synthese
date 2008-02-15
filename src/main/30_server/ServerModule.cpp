@@ -147,6 +147,11 @@ namespace synthese
 
 	    }
 
+		std::string ServerModule::getName() const
+		{
+			return "Serveur TCP";
+		}
+
 	}
 	
 	

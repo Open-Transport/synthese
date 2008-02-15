@@ -80,7 +80,7 @@ namespace synthese
 
 		public:
 
-
+			virtual std::string getName() const;
 		};
 	}
 	/** @} */

@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ModuleClass;
+	}
+
 	namespace admin
 	{
 		/** ModuleAdmin Class.
@@ -38,7 +43,8 @@ namespace synthese
 		*/
 		class ModuleAdmin : public admin::AdminInterfaceElementTemplate<ModuleAdmin>
 		{
-			std::string	_moduleKey;
+			std::string								_moduleKey;
+			boost::shared_ptr<util::ModuleClass>	_moduleClass;
 
 		public:
 			static const std::string PARAMETER_MODULE;
@@ -79,6 +85,7 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
+				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 		};
 	}

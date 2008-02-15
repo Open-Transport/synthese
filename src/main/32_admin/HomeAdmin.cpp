@@ -60,8 +60,11 @@ namespace synthese
 	
 		}
 
-		AdminInterfaceElement::PageLinks HomeAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
-		{
+		AdminInterfaceElement::PageLinks HomeAdmin::getSubPagesOfParent( 
+			const PageLink& parentLink 
+			, const AdminInterfaceElement& currentPage 
+			, const server::FunctionRequest<admin::AdminRequest>* request
+		) const	{
 			return AdminInterfaceElement::PageLinks();
 		}
 	}

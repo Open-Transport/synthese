@@ -58,5 +58,9 @@ namespace synthese
 			return result;
 		}
 
+		std::string AccountingModule::getName() const
+		{
+			return "Modélisation comptabilité";
+		}
 	}
 }

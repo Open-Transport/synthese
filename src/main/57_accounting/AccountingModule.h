@@ -34,6 +34,8 @@ namespace synthese
 				, bool emptyLine
 			);
 
+			virtual std::string getName() const;
+
 		};
 	}
 	/** @} */

@@ -293,6 +293,7 @@ namespace synthese
 
 			static void getNetworkLinePlaceRightParameterList(security::ParameterLabelsVector& m);
 
+			virtual std::string getName() const;
 		};
 	}
 	/** @} */

@@ -81,6 +81,8 @@ namespace synthese
 
 			static void AddSubClass(uid, const std::string&);
 			static std::string GetSubClass(uid id);
+
+			virtual std::string getName() const;
 		};
 		
 

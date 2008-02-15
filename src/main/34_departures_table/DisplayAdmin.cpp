@@ -417,26 +417,49 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks DisplayAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
-		{
+		AdminInterfaceElement::PageLinks DisplayAdmin::getSubPagesOfParent(
+			const PageLink& parentLink
+			, const AdminInterfaceElement& currentPage
+			, const server::FunctionRequest<admin::AdminRequest>* request
+		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			
+			if (parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY)
 			{
-				links.push_back(currentPage.getPageLink());
+				if (currentPage.getFactoryKey() == FACTORY_KEY)
+				{
+					links.push_back(currentPage.getPageLink());
+				}
+
+				if (currentPage.getFactoryKey() == DisplayMaintenanceAdmin::FACTORY_KEY)
+				{
+					const DisplayMaintenanceAdmin& currentSPage(static_cast<const DisplayMaintenanceAdmin&>(currentPage));
+					shared_ptr<const DisplayScreen> screen(currentSPage.getDisplayScreen());
+
+					AdminInterfaceElement::PageLink link(_pageLink);
+					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterValue = Conversion::ToString(screen->getKey());
+					link.name = screen->getFullName();
+					links.push_back(link);
+				}
 			}
+
 			return links;
 		}
 
 		
 		AdminInterfaceElement::PageLinks DisplayAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
+			const DisplayMaintenanceAdmin& currentSPage(static_cast<const DisplayMaintenanceAdmin&>(currentPage));
+			shared_ptr<const DisplayScreen> screen(currentSPage.getDisplayScreen());
+
 			AdminInterfaceElement::PageLinks links;
 			AdminInterfaceElement::PageLink link;
 			link.factoryKey = DisplayMaintenanceAdmin::FACTORY_KEY;
 			link.icon = DisplayMaintenanceAdmin::ICON;
-			link.name = _displayScreen->getFullName();
+			link.name = DisplayMaintenanceAdmin::DEFAULT_TITLE;
 			link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-			link.parameterValue = Conversion::ToString(_displayScreen->getKey());
+			link.parameterValue = Conversion::ToString(screen->getKey());
 			links.push_back(link);
 			return links;
 		}

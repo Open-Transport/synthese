@@ -62,5 +62,10 @@ namespace synthese
 				return "";
 			return it->second;
 		}
+
+		std::string InterfaceModule::getName() const
+		{
+			return "Moteur d'interfaces";
+		}
 	}
 }

@@ -40,11 +40,16 @@ namespace synthese
 			: public ScenarioSubclassTemplate<AlarmTemplate>
 			, public util::Registrable<uid, ScenarioTemplate>
 		{
+			uid	_folderId;
+
 		public:
 			ScenarioTemplate(const std::string name = std::string());
 			ScenarioTemplate(const ScenarioTemplate& source, const std::string& name);
 			~ScenarioTemplate();
-			uid getId() const;
+			uid getId()			const;
+			uid	getFolderId()	const;
+
+			void	setFolderId(uid value);
 		};
 	}
 }

@@ -1,6 +1,6 @@
 
-/** PlacesListModule class implementation.
-	@file PlacesListModule.cpp
+/** ScenarioFolder class header.
+	@file ScenarioFolder.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,22 +20,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PlacesListModule.h"
+#ifndef SYNTHESE_messages_ScenarioFolder_h__
+#define SYNTHESE_messages_ScenarioFolder_h__
+
+#include "01_util/UId.h"
+#include "01_util/Registrable.h"
 
 namespace synthese
 {
-	template<> const std::string util::FactorableTemplate<util::ModuleClass,transportwebsite::PlacesListModule>::FACTORY_KEY("36_places_list");
-
-	namespace transportwebsite
+	namespace messages
 	{
-		void PlacesListModule::initialize()
+		/** ScenarioFolder class.
+			@ingroup m17
+		*/
+		class ScenarioFolder : public util::Registrable<uid, ScenarioFolder>
 		{
+			uid			_parentId;
+			std::string	_name;
 
-		}
+		public:
+			ScenarioFolder();
 
-		std::string PlacesListModule::getName() const
-		{
-			return "Site web transport public";
-		}
+			uid					getParentId()	const;
+			const std::string&	getName()		const;
+
+			void	setName(const std::string& value);
+			void	setParentId(uid value);
+		};
 	}
 }
+
+#endif // SYNTHESE_messages_ScenarioFolder_h__

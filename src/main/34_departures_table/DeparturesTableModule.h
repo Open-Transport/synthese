@@ -99,6 +99,8 @@ namespace synthese
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineWithBroadcastLabels(bool withAll = false);
 
 			void initialize();
+
+			virtual std::string getName() const;
 		};
 	}
 

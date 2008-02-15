@@ -83,7 +83,8 @@ namespace synthese
 				@date 2007
 			*/			
 //			void initialize();
-			
+
+			virtual std::string getName() const;
 		};
 	}
 	/** @} */

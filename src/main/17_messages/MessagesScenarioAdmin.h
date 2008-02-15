@@ -103,7 +103,8 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-			) const;
+				, const server::FunctionRequest<admin::AdminRequest>* request
+				) const;
 
 			/** Sub pages getter.
 				@param request User request

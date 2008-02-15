@@ -60,6 +60,8 @@ namespace synthese
 			}
 
 			void initialize();
+
+			virtual std::string getName() const;
 		};
 	}
 

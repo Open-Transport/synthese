@@ -1,6 +1,8 @@
 
-/** AddScenarioAction class header.
-	@file AddScenarioAction.h
+/** ScenarioFolderAdd class header.
+	@file ScenarioFolderAdd.h
+	@author Hugues Romain
+	@date 2008
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,46 +22,40 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_AddScenarioAction_H__
-#define SYNTHESE_AddScenarioAction_H__
+#ifndef SYNTHESE_ScenarioFolderAdd_H__
+#define SYNTHESE_ScenarioFolderAdd_H__
 
 #include "30_server/Action.h"
 
 #include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
-
-#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
 	namespace messages
 	{
-		class ScenarioTemplate;
-		class ScenarioFolder;
-
-		/** Scenario template creation action class.
+		/** ScenarioFolderAdd action class.
 			@ingroup m17Actions refActions
 		*/
-		class AddScenarioAction : public util::FactorableTemplate<server::Action, AddScenarioAction>
+		class ScenarioFolderAdd
+			: public util::FactorableTemplate<server::Action, ScenarioFolderAdd>
 		{
 		public:
-			static const std::string PARAMETER_TEMPLATE_ID;
+			static const std::string PARAMETER_PARENT_ID;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_FOLDER_ID;
 
 		private:
-			boost::shared_ptr<const ScenarioTemplate>	_template;
-			std::string									_name;
-			boost::shared_ptr<const ScenarioFolder>		_folder;
-			uid											_folderId;
+			uid			_parentId;
+			std::string	_name;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
+				@return Generated parameters map
 			*/
 			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 				Removes the used parameters from the map.
+				@param map Parameters map to interpret
 				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
@@ -68,10 +64,12 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+			
+			ScenarioFolderAdd();
 
-			void setFolderId(uid value);
+			void setParentId(uid value);
 		};
 	}
 }
 
-#endif // SYNTHESE_AddScenarioAction_H__
+#endif // SYNTHESE_ScenarioFolderAdd_H__

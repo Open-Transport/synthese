@@ -83,5 +83,10 @@ namespace synthese
 		{
 			return string("\r// ]]>\r</script>");
 		}
+
+		std::string HTMLModule::getName() const
+		{
+			return "Bibliothèque HTML";
+		}
 	}
 }

@@ -181,19 +181,22 @@ namespace synthese
 	
 		}
 
-		AdminInterfaceElement::PageLinks DisplayMaintenanceAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
-		{
-			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
-			{
-				links.push_back(currentPage.getPageLink());
-			}
-			return links;
+		AdminInterfaceElement::PageLinks DisplayMaintenanceAdmin::getSubPagesOfParent(
+			const PageLink& parentLink
+			, const AdminInterfaceElement& currentPage
+			, const server::FunctionRequest<admin::AdminRequest>* request
+		) const	{
+			return AdminInterfaceElement::PageLinks();
 		}
 
 		AdminInterfaceElement::PageLinks DisplayMaintenanceAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return AdminInterfaceElement::PageLinks();
+		}
+
+		boost::shared_ptr<const DisplayScreen> DisplayMaintenanceAdmin::getDisplayScreen() const
+		{
+			return _displayScreen;
 		}
 	}
 }

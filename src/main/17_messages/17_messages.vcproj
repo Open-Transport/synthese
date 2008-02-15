@@ -92,6 +92,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ScenarioFolder.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolder.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ScenarioSubclassTemplate.h"
 					>
 				</File>
@@ -174,6 +182,14 @@
 			</File>
 			<File
 				RelativePath=".\AlarmTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ScenarioFolderTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ScenarioFolderTableSync.h"
 				>
 			</File>
 			<File
@@ -361,6 +377,14 @@
 				</File>
 				<File
 					RelativePath=".\NewScenarioSendAction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolderAdd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolderAdd.h"
 					>
 				</File>
 				<File

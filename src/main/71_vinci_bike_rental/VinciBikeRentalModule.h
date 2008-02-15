@@ -284,6 +284,8 @@ namespace synthese
 			static uid GetSessionSite(const server::Session* session);
 
 			static std::vector<std::pair<uid, std::string> > GetSitesName(uid differentValue);
+
+			virtual std::string getName() const;
 		};
 	}
 	/** @} */

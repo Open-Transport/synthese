@@ -218,5 +218,10 @@ namespace synthese
 			m.push_back(make_pair(Conversion::ToString((*itl)->getKey()), (*itl)->getName() ));
 
 		}
+
+		std::string EnvModule::getName() const
+		{
+			return  "Modélisation transport public";
+		}
     }
 }

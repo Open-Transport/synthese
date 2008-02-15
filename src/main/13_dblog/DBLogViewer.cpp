@@ -203,7 +203,8 @@ namespace synthese
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfParent( const PageLink& parentLink, const AdminInterfaceElement& currentPage) const
+		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfParent( const PageLink& parentLink, const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == DBLogList::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)

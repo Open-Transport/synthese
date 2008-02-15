@@ -162,7 +162,8 @@ namespace synthese
 			return request->isAuthorized<VinciRight>(READ);
 		}
 
-		AdminInterfaceElement::PageLinks VinciSitesAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage ) const
+		AdminInterfaceElement::PageLinks VinciSitesAdminInterfaceElement::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
+			) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)

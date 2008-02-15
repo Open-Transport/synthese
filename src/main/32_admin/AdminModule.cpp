@@ -33,6 +33,10 @@ namespace synthese
 		{
 		}
 
+		std::string AdminModule::getName() const
+		{
+			return "Console d'administration";
+		}
 
 
 

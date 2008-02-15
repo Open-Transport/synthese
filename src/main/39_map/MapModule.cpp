@@ -66,6 +66,11 @@ namespace synthese
 
 	    }
 
+		std::string MapModule::getName() const
+		{
+			return "Cartographie";
+		}
+
 
 	}
 }

@@ -49,7 +49,6 @@ namespace synthese
 		ParametersMap ScenarioNameUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
@@ -64,9 +63,10 @@ namespace synthese
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 
 				// Unicity control
-				if (dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get())
+				shared_ptr<ScenarioTemplate> tscenario(dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario));
+				if (tscenario.get())
 				{
-					vector<shared_ptr<ScenarioTemplate> > existing = ScenarioTableSync::searchTemplate(_name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
+					vector<shared_ptr<ScenarioTemplate> > existing = ScenarioTableSync::searchTemplate(tscenario->getFolderId(), _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
 					if (!existing.empty())
 						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
 				}

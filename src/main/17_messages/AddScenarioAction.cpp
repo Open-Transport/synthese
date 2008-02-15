@@ -27,6 +27,8 @@
 #include "17_messages/MessagesLibraryLog.h"
 #include "17_messages/AlarmObjectLink.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
+#include "17_messages/ScenarioFolder.h"
+#include "17_messages/ScenarioFolderTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -49,14 +51,15 @@ namespace synthese
 
 	namespace messages
 	{
-		const string AddScenarioAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "t";
-		const string AddScenarioAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "n";
+		const string AddScenarioAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "ti";
+		const string AddScenarioAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string AddScenarioAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
 
 
 		ParametersMap AddScenarioAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			map.insert(PARAMETER_FOLDER_ID, _folderId);
 			return map;
 		}
 
@@ -75,12 +78,15 @@ namespace synthese
 					throw ActionException("specified scenario template not found");
 				}
 			}
+
+			// Folder
+			setFolderId(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
 			
 			// Name
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			if(_name.empty())
 				throw ActionException("Le scénario doit avoir un nom.");
-			vector<shared_ptr<ScenarioTemplate> > v = ScenarioTableSync::searchTemplate(_name, NULL, 0, 1);
+			vector<shared_ptr<ScenarioTemplate> > v = ScenarioTableSync::searchTemplate(_folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1);
 			if (!v.empty())
 				throw ActionException("Un scénario de même nom existe déjà");
 
@@ -97,6 +103,7 @@ namespace synthese
 				scenario.reset(new ScenarioTemplate(*_template, _name));
 			else
 				scenario.reset(new ScenarioTemplate(_name));
+			scenario->setFolderId(_folder.get() ? _folder->getKey() : 0);
 			ScenarioTableSync::Save (scenario.get());
 
 			// Remember of the id of created object to view it after the action
@@ -125,6 +132,27 @@ namespace synthese
 
 			// Log
 			MessagesLibraryLog::addCreateEntry(scenario.get(), _template.get(), _request->getUser().get());
+		}
+
+		void AddScenarioAction::setFolderId( uid id)
+		{
+			if (id > 0)
+			{
+				try
+				{
+					_folderId = id;
+					_folder = ScenarioFolderTableSync::Get(_folderId);
+				}
+				catch (...)
+				{
+					throw ActionException("Bad folder ID");
+				}
+			}
+			else
+			{
+				_folderId = 0;
+			}
+
 		}
 	}
 }

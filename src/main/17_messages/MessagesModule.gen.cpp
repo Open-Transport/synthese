@@ -5,6 +5,7 @@ synthese::messages::ScenarioTableSync::integrate();
 synthese::messages::AlarmTableSync::integrate();
 synthese::messages::TextTemplateTableSync::integrate();
 synthese::messages::AlarmObjectLinkTableSync::integrate();
+synthese::messages::ScenarioFolderTableSync::integrate();
 
 synthese::messages::SentScenarioInheritedTableSync::integrate();
 synthese::messages::ScenarioTemplateInheritedTableSync::integrate();
@@ -41,3 +42,4 @@ synthese::messages::TextTemplateAddAction::integrate();
 synthese::messages::UpdateAlarmMessagesAction::integrate();
 synthese::messages::AlarmRemoveLinkAction::integrate();
 synthese::messages::AlarmAddLinkAction::integrate();
+synthese::messages::ScenarioFolderAdd::integrate();

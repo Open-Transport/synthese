@@ -65,6 +65,8 @@ namespace synthese
 			static const std::string ICON_PATH_INTERFACE_VARIABLE;
 
 			void initialize();
+
+			virtual std::string getName() const;
 		};
 	}
 	/** @} */

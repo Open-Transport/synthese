@@ -49,9 +49,9 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const AdminInterfaceElement>	_page;
-				boost::shared_ptr<const AdminInterfaceElement>	_actionFailedPage;
-				server::ParametersMap							_parameters;
+				boost::shared_ptr<AdminInterfaceElement>	_page;
+				boost::shared_ptr<AdminInterfaceElement>	_actionFailedPage;
+				server::ParametersMap						_parameters;
 			//@}
 
 
@@ -70,17 +70,17 @@ namespace synthese
 			bool _isAuthorized() const;
 
 		public:
-			void setPage(boost::shared_ptr<const AdminInterfaceElement> aie);
+			void setPage(boost::shared_ptr<AdminInterfaceElement> aie);
 
 			template<class T>
 			void setPage();
 
-			void setActionFailedPage(boost::shared_ptr<const AdminInterfaceElement> aie);
+			void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie);
 
 			template<class T>
 			void setActionFailedPage();
 
-			boost::shared_ptr<const AdminInterfaceElement> getPage() const;
+			boost::shared_ptr<AdminInterfaceElement> getPage() const;
 
 			void setParameter(const std::string& name, const std::string value);
 		};
