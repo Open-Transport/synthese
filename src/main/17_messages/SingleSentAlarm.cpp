@@ -41,6 +41,17 @@ namespace synthese
 
 		}
 
+		SingleSentAlarm::SingleSentAlarm( const SingleSentAlarm& source)
+			: SentAlarm()
+			, _enabled(false)
+			, _periodStart(source.getPeriodStart())
+			, _periodEnd(source.getPeriodEnd())
+		{			
+			setLevel(source.getLevel());
+			setShortMessage(source.getShortMessage());
+			setLongMessage(source.getLongMessage());
+		}
+
 		void SingleSentAlarm::setIsEnabled( bool value )
 		{
 			_enabled = value;

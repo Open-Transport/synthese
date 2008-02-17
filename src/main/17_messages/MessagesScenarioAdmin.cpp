@@ -149,7 +149,8 @@ namespace synthese
 			h.push_back(make_pair(string(), "Message"));
 			h.push_back(make_pair(string(), "Emplacement"));
 			h.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t(h, HTMLForm(string(), string()), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addRequest.getHTMLForm("add"), NewMessageAction::PARAMETER_IS_TEMPLATE);
+			h.push_back(make_pair(string(), "Actions"));
+			ActionResultHTMLTable t(h, HTMLForm(string(), string()), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addRequest.getHTMLForm("add"), NewMessageAction::PARAMETER_MESSAGE_TEMPLATE);
 
 			stream << t.open();
 
@@ -162,13 +163,14 @@ namespace synthese
 				stream << t.row(Conversion::ToString(alarm->getId()));
 				stream << t.col() << alarm->getShortMessage();
 				stream << t.col() << ""; // Emplacement
-				stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Modifier")
-					<< "&nbsp;" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le message du scénario ?");
+				stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Modifier");
+				stream << t.col() << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le message du scénario ?");
 			}
 
 			stream << t.row();
 			stream << t.col(2) << "(sélectionnez un&nbsp;message existant pour créer une copie)";
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
+			stream << t.col();
 			stream << t.close();
 		}
 

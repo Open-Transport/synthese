@@ -52,6 +52,7 @@ namespace synthese
 	{
 		const string NewMessageAction::PARAMETER_IS_TEMPLATE = Action_PARAMETER_PREFIX + "tpl";
 		const string NewMessageAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "tps";
+		const string NewMessageAction::PARAMETER_MESSAGE_TEMPLATE(Action_PARAMETER_PREFIX + "mt");
 
 		ParametersMap NewMessageAction::getParametersMap() const
 		{
@@ -61,6 +62,8 @@ namespace synthese
 				map.insert(PARAMETER_SCENARIO_ID, _sentScenario->getKey());
 			if (_scenarioTemplate.get())
 				map.insert(PARAMETER_SCENARIO_ID, _scenarioTemplate->getKey());
+			if (_messageTemplate.get())
+				map.insert(PARAMETER_MESSAGE_TEMPLATE, _messageTemplate->getId());
 			return map;
 		}
 
@@ -98,6 +101,18 @@ namespace synthese
 				}
 			}
 
+			// Message template
+			uid id(map.getUid(PARAMETER_MESSAGE_TEMPLATE, false, FACTORY_KEY));
+			if (id != UNKNOWN_VALUE)
+			try
+			{
+				_messageTemplate.reset(AlarmTableSync::Get(id, true));
+			}
+			catch (...)
+			{
+				throw ActionException("Specified template message not found");
+			}
+
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
@@ -105,7 +120,11 @@ namespace synthese
 		{
 			if (_isTemplate)
 			{
-				shared_ptr<AlarmTemplate> alarm(new AlarmTemplate(_scenarioTemplate.get()));
+				shared_ptr<AlarmTemplate> alarm(
+					_messageTemplate.get()
+					? new AlarmTemplate(*static_cast<const AlarmTemplate*>(_messageTemplate.get()))
+					: new AlarmTemplate(_scenarioTemplate.get())
+				);
 				AlarmTableSync::Save(alarm.get());
 				_request->setObjectId(alarm->getKey());
 			}
@@ -113,13 +132,21 @@ namespace synthese
 			{
 				if (_sentScenario.get())
 				{
-					shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(_sentScenario.get()));
+					shared_ptr<ScenarioSentAlarm> alarm(
+						_messageTemplate.get()
+						? new ScenarioSentAlarm(*static_cast<const ScenarioSentAlarm*>(_messageTemplate.get()))
+						: new ScenarioSentAlarm(_sentScenario.get())
+					);
 					AlarmTableSync::Save(alarm.get());
 					_request->setObjectId(alarm->getKey());
 				}
 				else
 				{
-					shared_ptr<SingleSentAlarm> alarm(new SingleSentAlarm);
+					shared_ptr<SingleSentAlarm> alarm(
+						_messageTemplate.get()
+						? new SingleSentAlarm(*static_cast<const SingleSentAlarm*>(_messageTemplate.get()))
+						: new SingleSentAlarm()
+					);
 					AlarmTableSync::Save(alarm.get());
 					_request->setObjectId(alarm->getKey());
 				}

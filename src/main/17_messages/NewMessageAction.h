@@ -35,6 +35,7 @@ namespace synthese
 		class Scenario;
 		class SentScenario;
 		class ScenarioTemplate;
+		class Alarm;
 
 		/** Alarm creation action class.
 			@ingroup m17Actions refActions
@@ -44,11 +45,13 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_IS_TEMPLATE;
 			static const std::string PARAMETER_SCENARIO_ID;
+			static const std::string PARAMETER_MESSAGE_TEMPLATE;
 
 		private:
 			boost::shared_ptr<const SentScenario>		_sentScenario;
 			boost::shared_ptr<const ScenarioTemplate>	_scenarioTemplate;
-			bool		_isTemplate;
+			bool										_isTemplate;
+			boost::shared_ptr<const Alarm>				_messageTemplate;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

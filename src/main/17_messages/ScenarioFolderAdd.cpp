@@ -75,7 +75,7 @@ namespace synthese
 			_parentId = map.getUid(PARAMETER_PARENT_ID, false, FACTORY_KEY);
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 
-			if (_parentId != UNKNOWN_VALUE)
+			if (_parentId > 0)
 			{
 				try
 				{
@@ -86,6 +86,8 @@ namespace synthese
 					throw ActionException("Le répertoire parent désigné n'existe pas.");
 				}
 			}
+			if (_parentId < 0)
+				throw ActionException("Bad parent folder id");
 
 			vector<shared_ptr<ScenarioFolder> > folders = ScenarioFolderTableSync::search(_parentId, _name, 0, 1);
 			if (!folders.empty())

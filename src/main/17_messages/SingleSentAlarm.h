@@ -41,6 +41,7 @@ namespace synthese
 			time::DateTime	_periodEnd;   //!< Alarm applicability period end
 
 		public:
+			SingleSentAlarm(const SingleSentAlarm& alarm);
 			SingleSentAlarm();
 			~SingleSentAlarm();
 

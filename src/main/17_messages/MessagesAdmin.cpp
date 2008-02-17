@@ -297,7 +297,7 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _alarmResultParameters, newMessageRequest.getHTMLForm("newmess"), NewMessageAction::PARAMETER_IS_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _alarmResultParameters, newMessageRequest.getHTMLForm("newmess"), NewMessageAction::PARAMETER_MESSAGE_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 

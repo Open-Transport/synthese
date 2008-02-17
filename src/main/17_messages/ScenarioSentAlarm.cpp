@@ -45,6 +45,16 @@ namespace synthese
 		{
 
 		}
+
+		ScenarioSentAlarm::ScenarioSentAlarm( const ScenarioSentAlarm& source )
+			: SentAlarm()
+			, _scenario(source._scenario)
+		{
+			setLevel(source.getLevel());
+			setShortMessage(source.getShortMessage());
+			setLongMessage(source.getLongMessage());
+		}
+
 		ScenarioSentAlarm::~ScenarioSentAlarm()
 		{
 

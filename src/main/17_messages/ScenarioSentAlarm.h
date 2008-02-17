@@ -43,6 +43,14 @@ namespace synthese
 
 		public:
 			/** Copy constructor.
+				@param source Alarm template to copy
+				@author Hugues Romain
+				@date 2007				
+				@warning the recipients are not copied. Do it at the table synchronization.
+			*/
+			ScenarioSentAlarm(const ScenarioSentAlarm& source);
+			
+			/** Alarm template copy constructor.
 				@param scenario Scenario which belongs the new alarm
 				@param source Alarm template to copy
 				@author Hugues Romain

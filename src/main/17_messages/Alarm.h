@@ -48,12 +48,11 @@ namespace synthese
 		*/
 		class Alarm
 		{
-		private:
+		protected:
 			AlarmLevel					_level;
 			std::string					_shortMessage;  //!< Alarm message
 			std::string					_longMessage;  //!< Alarm message
 		    
-		protected:
 			Alarm();
 			Alarm(const Alarm& source);
 			

@@ -45,7 +45,8 @@ namespace synthese
 
 		public:
 			AlarmTemplate(const ScenarioTemplate* scenario = NULL);
-			AlarmTemplate(const AlarmTemplate& source, const ScenarioTemplate* scenario);
+			AlarmTemplate(const ScenarioTemplate* scenario, const AlarmTemplate& source);
+			AlarmTemplate(const AlarmTemplate& source);
 			~AlarmTemplate();
 			uid getId() const;
 

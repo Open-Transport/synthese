@@ -115,7 +115,7 @@ namespace synthese
 				const ScenarioTemplate::AlarmsSet& alarms(_template->getAlarms());
 				for (ScenarioTemplate::AlarmsSet::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
 				{
-					shared_ptr<AlarmTemplate> alarm(new AlarmTemplate(**it, scenario.get()));
+					shared_ptr<AlarmTemplate> alarm(new AlarmTemplate(scenario.get(), **it));
 					AlarmTableSync::Save(alarm.get());
 
 					vector<shared_ptr<AlarmObjectLink> > aols = AlarmObjectLinkTableSync::search(*it);
