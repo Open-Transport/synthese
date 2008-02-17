@@ -119,8 +119,6 @@ namespace synthese
 				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
 					_user = UserTableSync::Get(id,GET_AUTO, true);
-					_pageLink.name = _user->getSurname() + " " + _user->getName();
-					_pageLink.parameterValue = Conversion::ToString(id);
 				}
 			}
 			catch (User::ObjectNotFoundException& e)
@@ -143,6 +141,21 @@ namespace synthese
 				links.push_back(currentPage.getPageLink());
 			}
 			return links;
+		}
+
+		std::string UserAdmin::getTitle() const
+		{
+			return _user.get() ? _user->getSurname() + " " + _user->getName() : DEFAULT_TITLE;
+		}
+
+		std::string UserAdmin::getParameterName() const
+		{
+			return _user.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string UserAdmin::getParameterValue() const
+		{
+			return _user.get() ? Conversion::ToString(_user->getKey()) : string();
 		}
 	}
 }

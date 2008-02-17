@@ -145,7 +145,7 @@ namespace synthese
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
-				) const;
+			) const;
 
 			/** Sub pages getter.
 				@param request User request
@@ -154,6 +154,10 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request) const;
+
+			virtual std::string getTitle() const;
+			virtual std::string getParameterName() const;
+			virtual std::string getParameterValue() const;
 		};
 	}
 }

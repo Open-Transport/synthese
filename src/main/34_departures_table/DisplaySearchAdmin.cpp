@@ -31,6 +31,7 @@
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/ArrivalDepartureTableRight.h"
 #include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/BroadcastPointsAdmin.h"
 
 #include "11_interfaces/InterfaceModule.h"
 
@@ -112,7 +113,6 @@ namespace synthese
 				try
 				{
 					_place = ConnectionPlaceTableSync::Get(placeId);
-					_pageLink.name = "Afficheurs " + _place->getName();
 				}
 				catch (...)
 				{
@@ -182,11 +182,14 @@ namespace synthese
 				stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
 			}
 
-			stream << "<h1>Résultats de la recherche</h1>";
+			stream << "<h1>" << (_place.get() ? "Afficheurs" : "Résultats de la recherche") << "</h1>";
 
 			ActionResultHTMLTable::HeaderVector v;
-			v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
-			v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
+			if (!_place.get())
+			{
+				v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
+				v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
+			}
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
 			v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
@@ -215,8 +218,11 @@ namespace synthese
 				maintRequest.setObjectId(screen->getKey());
 
 				stream << t.row(Conversion::ToString(screen->getKey()));
-				stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getCity()->getName() : "(indéterminé)");
-				stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getName() : "(indéterminé)");
+				if (!_place.get())
+				{
+					stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getCity()->getName() : "(indéterminé)");
+					stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getName() : "(indéterminé)");
+				}
 				stream << t.col() << screen->getLocalizationComment();
 				stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
 				stream << t.col(); // Bullets showing the states of the display
@@ -229,7 +235,7 @@ namespace synthese
 			if (_place.get())
 			{
 				stream << t.row();
-				stream << t.col(6) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
+				stream << t.col(_place.get() ? 4 : 6) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
 				stream << t.col(3) << t.getActionForm().getSubmitButton("Créer un nouvel afficheur");
 			}
 
@@ -275,15 +281,45 @@ namespace synthese
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfParent(
+			const PageLink& parentLink
+			, const AdminInterfaceElement& currentPage
+			, const server::FunctionRequest<admin::AdminRequest>* request
+		) const {
 			AdminInterfaceElement::PageLinks links;
+
+			// General search page
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
 			{
-				links.push_back(_pageLink);
+				links.push_back(getPageLink());
+			}
+
+			// Broadcast points search
+			if (parentLink.factoryKey == BroadcastPointsAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY && static_cast<const DisplaySearchAdmin&>(currentPage)._place.get())
+			{
+				links.push_back(currentPage.getPageLink());
 			}
 			return links;
+		}
+
+		std::string DisplaySearchAdmin::getTitle() const
+		{
+			return _place.get() ? _place->getFullName() : DEFAULT_TITLE;
+		}
+
+		std::string DisplaySearchAdmin::getParameterName() const
+		{
+			return _place.get() ? PARAMETER_SEARCH_LOCALIZATION_ID : string();
+		}
+
+		std::string DisplaySearchAdmin::getParameterValue() const
+		{
+			return _place.get() ? Conversion::ToString(_place->getId()) : string();
+		}
+
+		std::string DisplaySearchAdmin::getIcon() const
+		{
+			return _place.get() ? BroadcastPointsAdmin::ICON : ICON;
 		}
 	}
 }

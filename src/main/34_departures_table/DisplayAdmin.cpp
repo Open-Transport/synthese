@@ -380,10 +380,6 @@ namespace synthese
 			try
 			{
 				_displayScreen = DisplayScreenTableSync::Get(id, GET_AUTO, true);
-				_pageLink.name = _displayScreen->getFullName();
-				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				_pageLink.parameterValue = Conversion::ToString(id);
-
 			}
 			catch (DisplayScreen::ObjectNotFoundException& e)
 			{
@@ -436,7 +432,7 @@ namespace synthese
 					const DisplayMaintenanceAdmin& currentSPage(static_cast<const DisplayMaintenanceAdmin&>(currentPage));
 					shared_ptr<const DisplayScreen> screen(currentSPage.getDisplayScreen());
 
-					AdminInterfaceElement::PageLink link(_pageLink);
+					AdminInterfaceElement::PageLink link(getPageLink());
 					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(screen->getKey());
 					link.name = screen->getFullName();
@@ -462,6 +458,21 @@ namespace synthese
 			link.parameterValue = Conversion::ToString(screen->getKey());
 			links.push_back(link);
 			return links;
+		}
+
+		std::string DisplayAdmin::getTitle() const
+		{
+			return _displayScreen.get() ? _displayScreen->getFullName() : DEFAULT_TITLE;
+		}
+
+		std::string DisplayAdmin::getParameterName() const
+		{
+			return _displayScreen.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string DisplayAdmin::getParameterValue() const
+		{
+			return _displayScreen.get() ? Conversion::ToString(_displayScreen->getKey()) : string();
 		}
 	}
 }

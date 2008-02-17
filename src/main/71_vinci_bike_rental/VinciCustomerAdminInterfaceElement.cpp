@@ -389,9 +389,6 @@ namespace synthese
 					return;
 				_contract = VinciContractTableSync::Get(id);
 				_user = UserTableSync::Get(_contract->getUserId());
-				_pageLink.name = "Client " + _user->getSurname() + " " + _user->getName();
-				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 		}
 
@@ -409,6 +406,21 @@ namespace synthese
 				links.push_back(currentPage.getPageLink());
 			}
 			return links;
+		}
+
+		std::string VinciCustomerAdminInterfaceElement::getTitle() const
+		{
+			return _user.get() ? "Client " + _user->getSurname() + " " + _user->getName() : DEFAULT_TITLE;
+		}
+
+		std::string VinciCustomerAdminInterfaceElement::getParameterName() const
+		{
+			return _user.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string VinciCustomerAdminInterfaceElement::getParameterValue() const
+		{
+			return _user.get() ? Conversion::ToString(_contract->getKey()) : string();
 		}
 	}
 }

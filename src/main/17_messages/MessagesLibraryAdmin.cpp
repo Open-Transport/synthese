@@ -71,32 +71,30 @@ namespace synthese
 	namespace messages
 	{
 		const std::string MessagesLibraryAdmin::PARAMETER_NAME = "nam";
-		const string MessagesLibraryAdmin::PARAMETER_FOLDER_ID("fi");
 
 		
 		void MessagesLibraryAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
-			setFolderId(map.getUid(PARAMETER_FOLDER_ID, false, FACTORY_KEY));
+			setFolderId(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 		}
 
 		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<MessagesLibraryAdmin>();
-			searchRequest.getFunction()->setParameter(PARAMETER_FOLDER_ID, Conversion::ToString(_folderId));
+			searchRequest.setObjectId(_folderId);
 
 			FunctionRequest<AdminRequest> updateScenarioRequest(request);
 			updateScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			
 			ActionFunctionRequest<DeleteScenarioAction,AdminRequest> deleteScenarioRequest(request);
 			deleteScenarioRequest.getFunction()->setPage<MessagesLibraryAdmin>();
-			deleteScenarioRequest.getFunction()->setParameter(PARAMETER_FOLDER_ID, Conversion::ToString(_folderId));
+			deleteScenarioRequest.setObjectId(_folderId);
 			
 			ActionFunctionRequest<AddScenarioAction,AdminRequest> addScenarioRequest(request);
 			addScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
-			addScenarioRequest.getFunction()->setParameter(PARAMETER_FOLDER_ID, Conversion::ToString(_folderId));
 			addScenarioRequest.getAction()->setFolderId(_folderId);
 
 			ActionFunctionRequest<ScenarioFolderAdd,AdminRequest> addFolderRequest(request);
@@ -188,7 +186,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
 			{
-				links.push_back(_pageLink);
+				links.push_back(getPageLink());
 			}
 			return links;
 		}
@@ -198,20 +196,20 @@ namespace synthese
 			PageLinks links;
 
 			// Folders
-			vector<shared_ptr<ScenarioFolder> > folders(ScenarioFolderTableSync::search((Conversion::ToLongLong(_pageLink.parameterValue) > 0) ? Conversion::ToLongLong(_pageLink.parameterValue) : 0));
+			vector<shared_ptr<ScenarioFolder> > folders(ScenarioFolderTableSync::search(_folder.get() ? _folder->getKey() : 0));
 			for (vector<shared_ptr<ScenarioFolder> >::const_iterator it(folders.begin()); it != folders.end(); ++it)
 			{
 				PageLink link;
 				link.factoryKey = MessagesLibraryAdmin::FACTORY_KEY;
 				link.icon = "folder.png";
 				link.name = (*it)->getName();
-				link.parameterName = MessagesLibraryAdmin::PARAMETER_FOLDER_ID;
+				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
 				link.parameterValue = Conversion::ToString((*it)->getKey());
 				links.push_back(link);
 			}
 			
 			// Scenarios
-			vector<shared_ptr<ScenarioTemplate> > sv(ScenarioTableSync::searchTemplate((Conversion::ToLongLong(_pageLink.parameterValue) > 0) ? Conversion::ToLongLong(_pageLink.parameterValue) : 0));
+			vector<shared_ptr<ScenarioTemplate> > sv(ScenarioTableSync::searchTemplate(_folder.get() ? _folder->getKey() : 0));
 			for (vector<shared_ptr<ScenarioTemplate> >::const_iterator it(sv.begin()); it != sv.end(); ++it)
 			{
 				PageLink link;
@@ -229,7 +227,6 @@ namespace synthese
 		server::ParametersMap MessagesLibraryAdmin::getParametersMap() const
 		{
 			server::ParametersMap map;
-			map.insert(PARAMETER_FOLDER_ID, _folderId);
 			return map;
 		}
 
@@ -241,10 +238,6 @@ namespace synthese
 				{
 					_folderId = id;
 					_folder = ScenarioFolderTableSync::Get(_folderId);
-					_pageLink.name = _folder->getName();
-					_pageLink.icon = "folder.png";
-					_pageLink.parameterName = PARAMETER_FOLDER_ID;
-					_pageLink.parameterValue = Conversion::ToString(_folderId);
 				}
 				catch (...)
 				{
@@ -255,6 +248,26 @@ namespace synthese
 			{
 				_folderId = 0;
 			}
+		}
+
+		std::string MessagesLibraryAdmin::getTitle() const
+		{
+			return _folder.get() ? _folder->getName() : DEFAULT_TITLE;
+		}
+
+		std::string MessagesLibraryAdmin::getParameterName() const
+		{
+			return _folder.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string MessagesLibraryAdmin::getParameterValue() const
+		{
+			return _folder.get() ? Conversion::ToString(_folder->getKey()) : string();
+		}
+
+		std::string MessagesLibraryAdmin::getIcon() const
+		{
+			return _folder.get() ? "folder.png" : ICON;
 		}
 	}
 }

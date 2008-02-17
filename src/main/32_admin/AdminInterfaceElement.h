@@ -63,9 +63,8 @@ namespace synthese
 			{
 				std::string defaultIcon;
 				std::string defaultName;
-				std::string factoryKey;
-
-				Args(const std::string& _factoryKey, const std::string& _defaultIcon, const std::string& defaultName);
+				
+				Args(const std::string& _defaultIcon, const std::string& defaultName);
 				Args();
 			};
 			
@@ -76,13 +75,6 @@ namespace synthese
 				std::string parameterName;
 				std::string parameterValue;
 				std::string icon;
-
-				PageLink(
-					const std::string& _factoryKey
-					, const std::string& _defaultIcon
-					, const std::string& _defaultName
-				);
-				PageLink();
 
 				bool operator==(const PageLink& other) const;
 
@@ -99,7 +91,6 @@ namespace synthese
 
 
 		protected:
-			PageLink				_pageLink;
 			mutable PageLinks		_treePosition;
 			mutable PageLinksTree	_tree;
 
@@ -154,13 +145,17 @@ namespace synthese
 				*/
 				virtual void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<AdminRequest>* request=NULL) const = 0;
 
-				
+				virtual std::string getIcon() const = 0;
+				virtual std::string getTitle() const = 0;
+				virtual std::string getParameterName() const;
+				virtual std::string getParameterValue() const;
+
 				/** Current page link getter.
 					@return const PageLink& Current page link
 					@author Hugues Romain
 					@date 2008					
 				*/
-				const PageLink& getPageLink() const;
+				PageLink getPageLink() const;
 
 				/** Gets sub page of the designed parent page, which are from the current class.
 					@param factoryKey Key of the parent class

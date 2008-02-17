@@ -79,9 +79,6 @@ namespace synthese
 				_scenario.reset(ScenarioTableSync::Get(id));
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
 				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
-				_pageLink.name = _scenario->getName();
-				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			catch(...)
 			{
@@ -253,6 +250,21 @@ namespace synthese
 			}
 
 			return links;
+		}
+
+		std::string MessagesScenarioAdmin::getTitle() const
+		{
+			return _scenario.get() ? _scenario->getName() : DEFAULT_TITLE;
+		}
+
+		std::string MessagesScenarioAdmin::getParameterName() const
+		{
+			return _scenario.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string MessagesScenarioAdmin::getParameterValue() const
+		{
+			return _scenario.get() ? Conversion::ToString(_scenario->getId()) : string();
 		}
 	}
 }

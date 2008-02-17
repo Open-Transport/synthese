@@ -67,9 +67,6 @@ namespace synthese
 			{
 				_moduleKey = map.getString(PARAMETER_MODULE, true, FACTORY_KEY);
 				_moduleClass.reset(Factory<ModuleClass>::create(_moduleKey));
-				_pageLink.name = _moduleClass->getName();
-				_pageLink.parameterName = PARAMETER_MODULE;
-				_pageLink.parameterValue = _moduleKey;
 			}
 			catch(...)
 			{
@@ -131,6 +128,22 @@ namespace synthese
 			}
 			return links;
 		}
+
+		std::string ModuleAdmin::getTitle() const
+		{
+			return _moduleClass.get() ? _moduleClass->getName() : DEFAULT_TITLE;
+		}
+
+		std::string ModuleAdmin::getParameterName() const
+		{
+			return _moduleClass.get() ? PARAMETER_MODULE : string();
+		}
+
+		std::string ModuleAdmin::getParameterValue() const
+		{
+			return _moduleClass.get() ? _moduleKey : string();
+		}
+
 		
 	}
 }

@@ -42,10 +42,26 @@ namespace synthese
 			static const std::string DEFAULT_TITLE;
 
 			AdminInterfaceElementTemplate()
-				: util::FactorableTemplate<AdminInterfaceElement, T>(AdminInterfaceElement::Args(FACTORY_KEY, ICON, DEFAULT_TITLE))
+				: util::FactorableTemplate<AdminInterfaceElement, T>(AdminInterfaceElement::Args(ICON, DEFAULT_TITLE))
 			{
 			}
+
+			virtual std::string getIcon() const;
+
+			virtual std::string getTitle() const;
 		};
+
+		template<class T>
+		std::string synthese::admin::AdminInterfaceElementTemplate<T>::getTitle() const
+		{
+			return DEFAULT_TITLE;
+		}
+
+		template<class T>
+		std::string synthese::admin::AdminInterfaceElementTemplate<T>::getIcon() const
+		{
+			return ICON;
+		}
 	}
 }
 

@@ -225,7 +225,7 @@ namespace synthese
 			) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
-				links.push_back(_pageLink);
+				links.push_back(getPageLink());
 			return links;
 		}
 		

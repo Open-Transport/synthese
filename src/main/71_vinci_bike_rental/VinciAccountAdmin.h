@@ -87,7 +87,11 @@ namespace synthese
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
-				) const;
+			) const;
+
+			virtual std::string getTitle() const;
+			virtual std::string getParameterName() const;
+			virtual std::string getParameterValue() const;
 		};
 	}
 }

@@ -187,7 +187,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
 			{
-				links.push_back(_pageLink);
+				links.push_back(getPageLink());
 			}
 			return links;
 		}

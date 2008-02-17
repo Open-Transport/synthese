@@ -215,7 +215,6 @@ namespace synthese
 				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
 					_profile = ProfileTableSync::Get(id);
-					_pageLink.name = _profile->getName();
 				}
 			}
 			catch (Profile::ObjectNotFoundException& e)
@@ -238,6 +237,21 @@ namespace synthese
 				links.push_back(currentPage.getPageLink());
 			}
 			return links;
+		}
+
+		std::string ProfileAdmin::getTitle() const
+		{
+			return _profile.get() ? _profile->getName() : DEFAULT_TITLE;
+		}
+
+		std::string ProfileAdmin::getParameterName() const
+		{
+			return _profile.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string ProfileAdmin::getParameterValue() const
+		{
+			return _profile.get() ? Conversion::ToString(_profile->getKey()) : string();
 		}
 	}
 }

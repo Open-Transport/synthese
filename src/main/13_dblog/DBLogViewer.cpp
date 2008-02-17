@@ -95,11 +95,6 @@ namespace synthese
 				throw AdminParametersException("Invalid log key : " + key);
 			_dbLog.reset(Factory<DBLog>::create(key));
 
-			// Name
-			_pageLink.name = _dbLog->getName();
-			_pageLink.parameterName = PARAMETER_LOG_KEY;
-			_pageLink.parameterValue = key;
-
 			// Start Date
 			_searchStartDate = map.getDateTime(PARAMETER_START_DATE, false, FACTORY_KEY);
 
@@ -217,6 +212,21 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DBLogViewer::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return AdminInterfaceElement::PageLinks();
+		}
+
+		std::string DBLogViewer::getTitle() const
+		{
+			return _dbLog.get() ? _dbLog->getName() : DEFAULT_TITLE;
+		}
+
+		std::string DBLogViewer::getParameterName() const
+		{
+			return _dbLog.get() ? PARAMETER_LOG_KEY : string();
+		}
+
+		std::string DBLogViewer::getParameterValue() const
+		{
+			return _dbLog.get() ? _dbLog->getFactoryKey() : string();
 		}
 	}
 }

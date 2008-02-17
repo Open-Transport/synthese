@@ -47,7 +47,6 @@ namespace synthese
 	{
 
 		AdminInterfaceElement::AdminInterfaceElement(const Args& args)
-			: _pageLink(args.factoryKey, args.defaultIcon, args.defaultName)
 		{
 		}
 
@@ -56,22 +55,29 @@ namespace synthese
 			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
+			PageLink currentPageLink(getPageLink());
 			for (Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); it != Factory<AdminInterfaceElement>::end(); ++it)
 			{
 				if (it->isAuthorized(static_cast<const FunctionRequest<AdminRequest>* >(request)))
 				{
-					PageLinks l(it->getSubPagesOfParent(_pageLink, currentPage, static_cast<const FunctionRequest<AdminRequest>* >(request)));
+					PageLinks l(it->getSubPagesOfParent(currentPageLink, currentPage, static_cast<const FunctionRequest<AdminRequest>* >(request)));
 					links.insert(links.end(), l.begin(), l.end());
 				}
 			}
 			return links;
 		}
 
-		const AdminInterfaceElement::PageLink& AdminInterfaceElement::getPageLink() const
-		{
-			return _pageLink;
-		}
 
+		AdminInterfaceElement::PageLink AdminInterfaceElement::getPageLink() const
+		{
+			PageLink link;
+			link.factoryKey = getFactoryKey();
+			link.icon = getIcon();
+			link.name = getTitle();
+			link.parameterName = getParameterName();
+			link.parameterValue = getParameterValue();
+			return link;
+		}
 		shared_ptr<AdminInterfaceElement> AdminInterfaceElement::GetAdminPage( const PageLink& pageLink )
 		{
 			boost::shared_ptr<AdminInterfaceElement> page(Factory<AdminInterfaceElement>::create(pageLink.factoryKey));
@@ -106,7 +112,7 @@ namespace synthese
 
 			// Position
 			position.push_back(page);
-			if (page == _pageLink)
+			if (page == getPageLink())
 				_treePosition = position;
 
 			// Tree
@@ -137,17 +143,14 @@ namespace synthese
 			return _tree;
 		}
 
-		AdminInterfaceElement::PageLink::PageLink( const std::string& _factoryKey  , const std::string& _defaultIcon  , const std::string& _defaultName )
-			: name(_defaultName)
-			, icon(_defaultIcon)
-			, factoryKey(_factoryKey)
+		std::string AdminInterfaceElement::getParameterName() const
 		{
-
+			return std::string();
 		}
 
-		AdminInterfaceElement::PageLink::PageLink()
+		std::string AdminInterfaceElement::getParameterValue() const
 		{
-
+			return std::string();
 		}
 
 		bool AdminInterfaceElement::PageLink::operator==(const AdminInterfaceElement::PageLink& other) const
@@ -167,10 +170,9 @@ namespace synthese
 			return r.getURL();
 		}
 
-		AdminInterfaceElement::Args::Args(const std::string& _factoryKey, const std::string& _defaultIcon, const std::string& _defaultName )
+		AdminInterfaceElement::Args::Args(const std::string& _defaultIcon, const std::string& _defaultName )
 			: defaultIcon(_defaultIcon)
 			, defaultName(_defaultName)
-			, factoryKey(_factoryKey)
 		{
 		
 		}

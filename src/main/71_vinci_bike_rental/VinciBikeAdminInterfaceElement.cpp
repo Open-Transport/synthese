@@ -104,9 +104,6 @@ namespace synthese
 					if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 						return;
 					_bike = VinciBikeTableSync::Get(id);
-					_pageLink.name = "Vélo " + _bike->getNumber();
-					_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
-					_pageLink.parameterValue = Conversion::ToString(id);
 				}
 			}
 			catch(VinciBike::ObjectNotFoundException& e)
@@ -129,6 +126,21 @@ namespace synthese
 				links.push_back(currentPage.getPageLink());
 			}
 			return links;
+		}
+
+		std::string VinciBikeAdminInterfaceElement::getTitle() const
+		{
+			return _bike.get() ? "Vélo " + _bike->getNumber() : DEFAULT_TITLE;
+		}
+
+		std::string VinciBikeAdminInterfaceElement::getParameterName() const
+		{
+			return _bike.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string VinciBikeAdminInterfaceElement::getParameterValue() const
+		{
+			return _bike.get() ? Conversion::ToString(_bike->getKey()) : string();
 		}
 	}
 }

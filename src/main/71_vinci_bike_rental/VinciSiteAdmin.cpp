@@ -80,9 +80,6 @@ namespace synthese
 				if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 					return;
 				_site = VinciSiteTableSync::Get(id);
-				_pageLink.name = "Site " + _site->getName();
-				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			else
 				throw AdminParametersException("Site not found");
@@ -204,6 +201,21 @@ namespace synthese
 				links.push_back(currentPage.getPageLink());
 			}
 			return links;
+		}
+
+		std::string VinciSiteAdmin::getTitle() const
+		{
+			return _site.get() ? "Site " + _site->getName() : DEFAULT_TITLE;
+		}
+
+		std::string VinciSiteAdmin::getParameterName() const
+		{
+			return _site.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string VinciSiteAdmin::getParameterValue() const
+		{
+			return _site.get() ? Conversion::ToString(_site->getKey()) : string();
 		}
 	}
 }

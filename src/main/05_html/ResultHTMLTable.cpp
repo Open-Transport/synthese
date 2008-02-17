@@ -57,26 +57,36 @@ namespace synthese
 			, _size(resultParameters.size)
 		{
 			stringstream s;
+			int colspan(1);
 			for (HeaderVector::const_iterator it = header.begin(); it != header.end(); ++it)
 			{
-				s << "<th>";
-				
-				// This column is sortable
-				if (!it->first.empty())
-				{
-					HTMLForm::HiddenFieldsMap h;
-					h.insert(make_pair(_PARAMETER_ORDER_FIELD, it->first));
-					h.insert(make_pair(_PARAMETER_RAISING_ORDER, Conversion::ToString((_orderField == it->first) ? !_raisingOrder : true)));
-					s << HTMLModule::getHTMLLink(_searchForm.getURL(h), it->second);
-
-					if (it->first == _orderField)
-					{
-						s << "&nbsp;" << HTMLModule::getHTMLImage(iconPath + (_raisingOrder ? "down" : "up") + ".png", _raisingOrder ? "V" : "^");
-					}						
-				}
+				if ((it+1) != header.end() && *(it+1) == *it)
+					++colspan;
 				else
-					s << it->second;
-				s << "</th>";
+				{
+					s << "<th";
+					if (colspan > 1)
+						s << " colspan=\"" << colspan << "\"";
+					s << ">";
+
+					// This column is sortable
+					if (!it->first.empty())
+					{
+						HTMLForm::HiddenFieldsMap h;
+						h.insert(make_pair(_PARAMETER_ORDER_FIELD, it->first));
+						h.insert(make_pair(_PARAMETER_RAISING_ORDER, Conversion::ToString((_orderField == it->first) ? !_raisingOrder : true)));
+						s << HTMLModule::getHTMLLink(_searchForm.getURL(h), it->second);
+
+						if (it->first == _orderField)
+						{
+							s << "&nbsp;" << HTMLModule::getHTMLImage(iconPath + (_raisingOrder ? "down" : "up") + ".png", _raisingOrder ? "V" : "^");
+						}						
+					}
+					else
+						s << it->second;
+					s << "</th>";
+					colspan = 1;
+				}
 			}
 			_headers = s.str();
 

@@ -70,8 +70,6 @@ namespace synthese
 			try
 			{
 				_displayScreen = DisplayScreenTableSync::Get(id);
-				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			catch(...)
 			{
@@ -197,6 +195,16 @@ namespace synthese
 		boost::shared_ptr<const DisplayScreen> DisplayMaintenanceAdmin::getDisplayScreen() const
 		{
 			return _displayScreen;
+		}
+
+		std::string DisplayMaintenanceAdmin::getParameterName() const
+		{
+			return _displayScreen.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string DisplayMaintenanceAdmin::getParameterValue() const
+		{
+			return _displayScreen.get() ? Conversion::ToString(_displayScreen->getKey()) : string();
 		}
 	}
 }

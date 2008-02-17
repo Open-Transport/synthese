@@ -116,6 +116,11 @@ namespace synthese
 				This method can be overloaded to create customized sub tree.
 			*/
 			virtual PageLinks getSubPages(const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request) const;
+
+			virtual std::string getTitle() const;
+			virtual std::string getParameterName() const;
+			virtual std::string getParameterValue() const;
+
 		};
 	}
 }

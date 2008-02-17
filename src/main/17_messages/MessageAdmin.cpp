@@ -84,9 +84,6 @@ namespace synthese
 			try
 			{
 				_alarm.reset(AlarmTableSync::Get(id, true));
-				_pageLink.name = _alarm->getShortMessage();
-				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			catch(...)
 			{
@@ -207,6 +204,21 @@ namespace synthese
 		boost::shared_ptr<const Alarm> MessageAdmin::getAlarm() const
 		{
 			return _alarm;
+		}
+
+		std::string MessageAdmin::getTitle() const
+		{
+			return _alarm.get() ? _alarm->getShortMessage() : DEFAULT_TITLE;
+		}
+
+		std::string MessageAdmin::getParameterName() const
+		{
+			return _alarm.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string MessageAdmin::getParameterValue() const
+		{
+			return _alarm.get() ? Conversion::ToString(_alarm->getId()) : string();
 		}
 	}
 }

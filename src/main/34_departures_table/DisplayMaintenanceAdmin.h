@@ -126,6 +126,8 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request) const;
 
+			virtual std::string getParameterName() const;
+			virtual std::string getParameterValue() const;
 		};
 	}
 }

@@ -76,9 +76,6 @@ namespace synthese
 			{
 				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 				_account = AccountTableSync::Get(id);
-				_pageLink.name = _account->getName();
-				_pageLink.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				_pageLink.parameterValue = Conversion::ToString(id);
 			}
 			catch (...)
 			{
@@ -130,6 +127,21 @@ namespace synthese
 				links.push_back(currentPage.getPageLink());
 			}
 			return links;
+		}
+
+		std::string VinciAccountAdmin::getTitle() const
+		{
+			return _account.get() ? _account->getName() : DEFAULT_TITLE;
+		}
+
+		std::string VinciAccountAdmin::getParameterName() const
+		{
+			return _account.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+		std::string VinciAccountAdmin::getParameterValue() const
+		{
+			return _account.get() ? Conversion::ToString(_account->getKey()) : string();
 		}
 	}
 }
