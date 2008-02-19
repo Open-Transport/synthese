@@ -28,9 +28,10 @@
 #include "71_vinci_bike_rental/VinciRight.h"
 #include "71_vinci_bike_rental/VinciSiteAddAction.h"
 #include "71_vinci_bike_rental/VinciSiteAdmin.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 #include "32_admin/AdminParametersException.h"
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminRequest.h"
 
 #include "30_server/ActionFunctionRequest.h"
@@ -166,7 +167,7 @@ namespace synthese
 			) const
 		{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.factoryKey == VinciBikeRentalModule::FACTORY_KEY)
 			{
 				links.push_back(getPageLink());
 			}

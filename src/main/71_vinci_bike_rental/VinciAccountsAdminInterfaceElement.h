@@ -90,7 +90,15 @@ namespace synthese
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
-				) const;
+			) const;
+
+			/** Gets the opening position of the node in the tree view.
+				@return Always visible
+				@author Hugues Romain
+				@date 2008					
+			*/
+			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
+
 		};
 	}
 }

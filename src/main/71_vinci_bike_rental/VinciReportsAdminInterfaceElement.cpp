@@ -33,7 +33,7 @@
 #include "04_time/Date.h"
 
 #include "32_admin/AdminRequest.h"
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -160,7 +160,7 @@ namespace synthese
 			) const
 		{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == VinciBikeRentalModule::FACTORY_KEY)
 			{
 				links.push_back(getPageLink());
 			}

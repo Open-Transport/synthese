@@ -26,6 +26,7 @@
 #include "71_vinci_bike_rental/AddCustomerAction.h"
 #include "71_vinci_bike_rental/VinciCustomerAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciCustomerSearchAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 #include "05_html/SearchFormHTMLTable.h"
 #include "05_html/ActionResultHTMLTable.h"
@@ -35,7 +36,7 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminRequest.h"
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -51,7 +52,7 @@ namespace synthese
 
 	namespace util
 	{
-	template <> const string FactorableTemplate<AdminInterfaceElement,VinciCustomerSearchAdminInterfaceElement>::FACTORY_KEY("vincicustomers");
+	template <> const string FactorableTemplate<AdminInterfaceElement,VinciCustomerSearchAdminInterfaceElement>::FACTORY_KEY("1vincicustomers");
 	}
 
 	namespace admin
@@ -176,7 +177,7 @@ namespace synthese
 			) const
 		{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == VinciBikeRentalModule::FACTORY_KEY)
 			{
 				links.push_back(getPageLink());
 			}

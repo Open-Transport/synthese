@@ -28,6 +28,7 @@
 #include "71_vinci_bike_rental/VinciRight.h"
 #include "71_vinci_bike_rental/VinciAccountAdmin.h"
 #include "71_vinci_bike_rental/VinciCreateStockAction.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 #include "57_accounting/AccountTableSync.h"
 #include "57_accounting/Account.h"
@@ -37,7 +38,7 @@
 #include "57_accounting/AccountLockAction.h"
 
 #include "32_admin/AdminParametersException.h"
-#include "32_admin/HomeAdmin.h"
+#include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminRequest.h"
 
 #include "30_server/ActionFunctionRequest.h"
@@ -66,7 +67,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>::ICON("cart.png");
-		template<> const string AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>::DISPLAY_MODE("Produits");
+		template<> const string AdminInterfaceElementTemplate<VinciAccountsAdminInterfaceElement>::DEFAULT_TITLE("Produits");
 	}
 
 	namespace vinci
@@ -274,11 +275,16 @@ namespace synthese
 			) const
 		{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == VinciBikeRentalModule::FACTORY_KEY)
 			{
 				links.push_back(getPageLink());
 			}
 			return links;
+		}
+
+		bool VinciAccountsAdminInterfaceElement::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
+		{
+			return true;
 		}
 	}
 }
