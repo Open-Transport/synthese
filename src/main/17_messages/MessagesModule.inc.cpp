@@ -44,3 +44,4 @@
 #include "17_messages/AlarmAddLinkAction.h"
 #include "17_messages/ScenarioStopAction.h"
 #include "17_messages/ScenarioFolderAdd.h"
+#include "17_messages/ScenarioFolderRemoveAction.h"

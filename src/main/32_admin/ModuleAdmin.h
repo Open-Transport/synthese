@@ -91,6 +91,13 @@ namespace synthese
 			virtual std::string getTitle() const;
 			virtual std::string getParameterName() const;
 			virtual std::string getParameterValue() const;
+
+			/** Gets the opening position of the node in the tree view.
+				@return A module page is always visible in the tree
+				@author Hugues Romain
+				@date 2008					
+			*/
+			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
 		};
 	}
 }

@@ -87,6 +87,10 @@ namespace synthese
 			{
 				PageLink					pageLink;
 				std::vector<PageLinksTree>	subPages;
+				bool						isNodeOpened;
+
+				PageLinksTree()
+					: pageLink(), subPages(), isNodeOpened(false) {}
 			};
 
 
@@ -94,8 +98,8 @@ namespace synthese
 			mutable PageLinks		_treePosition;
 			mutable PageLinksTree	_tree;
 
-			std::vector<PageLinksTree>	_buildTreeRecursion(
-				const PageLink page
+			PageLinksTree	_buildTreeRecursion(
+				const AdminInterfaceElement* page
 				, const server::FunctionRequest<admin::AdminRequest>* request
 				, const PageLinks position
 			) const;
@@ -110,7 +114,7 @@ namespace synthese
 			const PageLinks&		getTreePosition(const server::FunctionRequest<admin::AdminRequest>* request) const;
 			const PageLinksTree&	getTree(const server::FunctionRequest<admin::AdminRequest>* request)	const;
 
-			static boost::shared_ptr<AdminInterfaceElement>	GetAdminPage(const PageLink& pageLink);
+			static AdminInterfaceElement*	GetAdminPage(const PageLink& pageLink);
 
 
 			//! \name Virtual initialization method
@@ -185,6 +189,15 @@ namespace synthese
 					const AdminInterfaceElement& currentPage
 					, const server::FunctionRequest<admin::AdminRequest>* request
 				) const;
+
+
+
+				/** Gets the opening position of the node in the tree view.
+					@return bool true = the page is visble, all the superior nodes are open, false = the page must not be visible, and will be hidden if no one another page of the same level must be visible.
+					@author Hugues Romain
+					@date 2008					
+				*/
+				virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
 			//@}
 		};
 	}

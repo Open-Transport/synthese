@@ -388,6 +388,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ScenarioFolderRemoveAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolderRemoveAction.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ScenarioNameUpdateAction.cpp"
 					>
 				</File>

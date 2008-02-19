@@ -236,5 +236,10 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			return links;
 		}
+
+		bool MessagesTemplateLibraryAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
+		{
+			return true;
+		}
 	}
 }

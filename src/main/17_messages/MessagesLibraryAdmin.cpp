@@ -35,6 +35,7 @@
 #include "17_messages/ScenarioFolderAdd.h"
 #include "17_messages/ScenarioFolderTableSync.h"
 #include "17_messages/ScenarioFolder.h"
+#include "17_messages/ScenarioFolderRemoveAction.h"
 
 #include "30_server/ActionFunctionRequest.h"
 #include "30_server/QueryString.h"
@@ -105,12 +106,9 @@ namespace synthese
 			FunctionRequest<AdminRequest> goFolderRequest(request);
 			goFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 
-			if (_folderId > 0)
-			{
-				stream << "<h1>Répertoire</h1>";
-			}
-
-			stream << "<h1>Scénarios</h1>";
+			ActionFunctionRequest<ScenarioFolderRemoveAction,AdminRequest> removeFolderRequest(request);
+			removeFolderRequest.getAction()->setFolder(_folder);
+			removeFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 
 			vector<shared_ptr<ScenarioTemplate> > sv = ScenarioTableSync::searchTemplate(
 				_folderId
@@ -120,8 +118,19 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 
+			if (_folderId > 0)
+			{
+				stream << "<h1>Répertoire</h1>";
+
+				if (sv.empty())
+					stream << HTMLModule::getLinkButton(removeFolderRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png");
+			}
+
+			stream << "<h1>Scénarios</h1>";
+
 			ActionResultHTMLTable::HeaderVector h3;
 			h3.push_back(make_pair(PARAMETER_NAME, "Nom"));
+			h3.push_back(make_pair(string(), "Actions"));
 			h3.push_back(make_pair(string(), "Actions"));
 			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, ActionResultHTMLTable::ResultParameters(), addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
 			stream << t3.open();
@@ -133,14 +142,13 @@ namespace synthese
 				deleteScenarioRequest.getAction()->setScenario(scenario);
 				stream << t3.row(Conversion::ToString(scenario->getKey()));
 				stream << t3.col() << scenario->getName();
-				stream << t3.col()
-					<< HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Modifier", string(), "cog_edit.png")
-					<< " " << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "cog_delete.png");
+				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Modifier", string(), "cog_edit.png");
+				stream << t3.col() << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "cog_delete.png");
 			}
 
 			stream << t3.row();
 			stream << t3.col() << t3.getActionForm().getTextInput(AddScenarioAction::PARAMETER_NAME, string(), "Entrez le nom ici");
-			stream << t3.col() << t3.getActionForm().getSubmitButton("Ajouter");
+			stream << t3.col(2) << t3.getActionForm().getSubmitButton("Ajouter");
 			stream << t3.close();
 
 			stream << "<h1>Sous-répertoires</h1>";
@@ -227,6 +235,8 @@ namespace synthese
 		server::ParametersMap MessagesLibraryAdmin::getParametersMap() const
 		{
 			server::ParametersMap map;
+			if (_folder.get())
+				map.insert(QueryString::PARAMETER_OBJECT_ID, _folder->getKey());
 			return map;
 		}
 
@@ -268,6 +278,11 @@ namespace synthese
 		std::string MessagesLibraryAdmin::getIcon() const
 		{
 			return _folder.get() ? "folder.png" : ICON;
+		}
+
+		bool MessagesLibraryAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
+		{
+			return !_folder.get();
 		}
 	}
 }

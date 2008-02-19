@@ -144,6 +144,9 @@ namespace synthese
 			return _moduleClass.get() ? _moduleKey : string();
 		}
 
-		
+		bool ModuleAdmin::isPageVisibleInTree(const AdminInterfaceElement& currentPage) const
+		{
+			return true;
+		}		
 	}
 }

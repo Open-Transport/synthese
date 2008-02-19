@@ -191,5 +191,10 @@ namespace synthese
 			}
 			return links;
 		}
+
+		bool BroadcastPointsAdmin::isPageVisibleInTree(const AdminInterfaceElement& currentPage) const
+		{
+			return true;
+		}
 	}
 }

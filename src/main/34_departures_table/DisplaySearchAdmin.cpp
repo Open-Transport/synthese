@@ -321,5 +321,10 @@ namespace synthese
 		{
 			return _place.get() ? BroadcastPointsAdmin::ICON : ICON;
 		}
+
+		bool DisplaySearchAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
+		{
+			return true;
+		}
 	}
 }

@@ -135,10 +135,12 @@ namespace synthese
 			stringstream s;
 			if (_curRow > -1)
 				s << _closeRow();
-			s << "<tr";
+			s << "<tr class=\"";
 			if (!className.empty())
-				s << " class=\"" << className << "\"";
-			s << ">";
+				s << className;
+			else
+				s << "r" << ((_curRow % 2) ? "1" : "2");
+			s << "\">";
 			++_curRow;
 			_curCol = -1;
 			return s.str();

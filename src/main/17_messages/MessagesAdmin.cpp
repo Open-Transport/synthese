@@ -401,5 +401,10 @@ namespace synthese
 			}
 			return links;
 		}
+
+		bool MessagesAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
+		{
+			return true;
+		}
 	}
 }

@@ -54,16 +54,23 @@ namespace synthese
 	{
 		void AdminPagesTreeInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			if (vel.size() < 5)
-				throw AdminParametersException("5 arguments needed");
+			if (vel.size() < 12)
+				throw AdminParametersException("12 arguments needed");
 			_subpageIntroducerVIE = vel.front();
 			_lastSubpageIntroducerVIE = vel.front();
 			_levelIndenterVIE = vel.front();
 			_lastLevelIndenterVIE = vel.front();
+			_subpagesIntroducerIfOpenedVIE = vel.front();
+			_subpagesIntroducerIfClosedVIE = vel.front();
+			_openingVIE = vel.front();
 			_endingVIE = vel.front();
-			_folderSubpageIntroducerVIE = vel.size() ? vel.front() : _subpageIntroducerVIE;
-			_folderLastSubpageIntroducerVIE = vel.size() ? vel.front() : _lastSubpageIntroducerVIE;
+			_openedFolderSubpageIntroducerVIE = vel.front();
+			_closedFolderSubpageIntroducerVIE = vel.front();
+			_openedFolderLastSubpageIntroducerVIE = vel.front();
+			_closedFolderLastSubpageIntroducerVIE = vel.front();
 		}
+
+
 
 		std::string AdminPagesTreeInterfaceElement::display(
 			ostream& stream
@@ -74,9 +81,14 @@ namespace synthese
 			_levelIndenter = _levelIndenterVIE->getValue(parameters, variables, object, request);
 			_lastSubpageIntroducer = _lastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
 			_subpageIntroducer = _subpageIntroducerVIE->getValue(parameters, variables, object, request);
+			_subpagesIntroducerIfClosed = _subpagesIntroducerIfClosedVIE->getValue(parameters, variables, object, request);
+			_subpagesIntroducerIfOpened = _subpagesIntroducerIfOpenedVIE->getValue(parameters, variables, object, request);
+			_opening = _openingVIE->getValue(parameters, variables, object, request);
 			_ending = _endingVIE->getValue(parameters, variables, object, request);
-			_folderSubpageIntroducer = _folderSubpageIntroducerVIE->getValue(parameters, variables, object, request);
-			_folderLastSubpageIntroducer = _folderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+			_openedFolderSubpageIntroducer = _openedFolderSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+			_closedFolderSubpageIntroducer = _closedFolderSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+			_openedFolderLastSubpageIntroducer = _openedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+			_closedFolderLastSubpageIntroducer = _closedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
 
 			stream << getSubPages(
 				(*page)->getTree(static_cast<const server::FunctionRequest<AdminRequest>*>(request))
@@ -101,6 +113,7 @@ namespace synthese
 
 			stringstream str;
 
+			str << _opening;
 			str << prefix;
 			string curPrefix(prefix);
 			if (level > 0)
@@ -108,12 +121,12 @@ namespace synthese
 				if (last)
 				{
 					curPrefix += _lastLevelIndenter;
-					str << (pages.subPages.empty() ? _lastSubpageIntroducer : _folderLastSubpageIntroducer);
+					str << (pages.subPages.empty() ? _lastSubpageIntroducer : (pages.isNodeOpened ? _openedFolderLastSubpageIntroducer : _closedFolderLastSubpageIntroducer ));
 				}
 				else
 				{
 					curPrefix += _levelIndenter;
-					str << (pages.subPages.empty() ? _subpageIntroducer : _folderSubpageIntroducer);
+					str << (pages.subPages.empty() ? _subpageIntroducer : (pages.isNodeOpened ? _openedFolderSubpageIntroducer : _closedFolderSubpageIntroducer));
 				}
 			}
 
@@ -127,12 +140,14 @@ namespace synthese
 				str << HTMLModule::getHTMLImage(pages.pageLink.icon, pages.pageLink.name)
 					<< HTMLModule::getHTMLLink(pages.pageLink.getURL(request), pages.pageLink.name);
 			}
-			str << _ending;
+			str << (pages.isNodeOpened ? _subpagesIntroducerIfOpened : _subpagesIntroducerIfClosed);
 
 			for (vector<AdminInterfaceElement::PageLinksTree>::const_iterator it = pages.subPages.begin(); it != pages.subPages.end(); ++it)
 			{
 				str << getSubPages(*it, currentPage, request, level+1, curPrefix, it==(pages.subPages.end()-1) );
 			}
+			str << _ending;
+
 			return str.str();
 		}
 	}

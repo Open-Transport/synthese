@@ -78,9 +78,12 @@ namespace synthese
 			link.parameterValue = getParameterValue();
 			return link;
 		}
-		shared_ptr<AdminInterfaceElement> AdminInterfaceElement::GetAdminPage( const PageLink& pageLink )
+		
+		
+		
+		AdminInterfaceElement* AdminInterfaceElement::GetAdminPage( const PageLink& pageLink )
 		{
-			boost::shared_ptr<AdminInterfaceElement> page(Factory<AdminInterfaceElement>::create(pageLink.factoryKey));
+			AdminInterfaceElement* page(Factory<AdminInterfaceElement>::create(pageLink.factoryKey));
 			if (!pageLink.parameterName.empty())
 			{
 				ParametersMap parameter;
@@ -89,6 +92,8 @@ namespace synthese
 			}
 			return page;
 		}
+
+
 
 		void AdminInterfaceElement::_buildTree(
 			const server::FunctionRequest<admin::AdminRequest>* request
@@ -99,34 +104,50 @@ namespace synthese
 
 			// Initialisation
 			auto_ptr<HomeAdmin> homeAdmin(new HomeAdmin);
-			_tree.pageLink = homeAdmin->getPageLink();
-			_tree.subPages = _buildTreeRecursion(_tree.pageLink, request, PageLinks());
+			PageLinks position;
+			PageLink homeLink(homeAdmin->getPageLink());
+			position.push_back(homeLink);
+			_tree = _buildTreeRecursion(homeAdmin.get(), request, position);
+			if (homeLink == getPageLink())
+				_treePosition = position;
 		}
 
-		vector<AdminInterfaceElement::PageLinksTree> AdminInterfaceElement::_buildTreeRecursion(
-			const PageLink page
+
+
+		AdminInterfaceElement::PageLinksTree AdminInterfaceElement::_buildTreeRecursion(
+			const AdminInterfaceElement* adminPage
 			, const server::FunctionRequest<admin::AdminRequest>* request
 			, PageLinks position
 		) const {
-			vector<AdminInterfaceElement::PageLinksTree> trees;
 
-			// Position
-			position.push_back(page);
-			if (page == getPageLink())
-				_treePosition = position;
-
+			// Local variables
+			AdminInterfaceElement::PageLinksTree	tree;
+			
 			// Tree
-			PageLinks pages = GetAdminPage(page)->getSubPages(*this, request);
-
+			tree.pageLink = adminPage->getPageLink();
+			
 			// Recursion
+			PageLinks pages = adminPage->getSubPages(*this, request);
 			for (AdminInterfaceElement::PageLinks::const_iterator it = pages.begin(); it != pages.end(); ++it)
 			{
-				PageLinksTree tree;
-				tree.pageLink = *it;
-				tree.subPages = _buildTreeRecursion(*it, request, position);
-				trees.push_back(tree);
+				position.push_back(*it);
+				if (*it == getPageLink())
+				{
+					_treePosition = position;
+					tree.isNodeOpened = true;
+				}
+				
+				auto_ptr<AdminInterfaceElement>			subPage(GetAdminPage(*it));
+				AdminInterfaceElement::PageLinksTree	subTree(_buildTreeRecursion(subPage.get(), request, position));
+
+				tree.subPages.push_back(subTree);
+				if (!tree.isNodeOpened)
+					tree.isNodeOpened = subPage->isPageVisibleInTree(*this) || subTree.isNodeOpened;
+
+				position.pop_back();
 			}
-			return trees;
+
+			return tree;
 		}
 
 		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getTreePosition(const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -148,15 +169,27 @@ namespace synthese
 			return std::string();
 		}
 
+
+
 		std::string AdminInterfaceElement::getParameterValue() const
 		{
 			return std::string();
 		}
 
+
+
+		bool AdminInterfaceElement::isPageVisibleInTree(const AdminInterfaceElement& currentPage) const
+		{
+			return false;
+		}
+
+
 		bool AdminInterfaceElement::PageLink::operator==(const AdminInterfaceElement::PageLink& other) const
 		{
 			return factoryKey == other.factoryKey && parameterName == other.parameterName && parameterValue == other.parameterValue;
 		}
+
+
 
 		std::string AdminInterfaceElement::PageLink::getURL( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
@@ -169,6 +202,8 @@ namespace synthese
 				r.getInternalParameters().insert(parameterName, parameterValue);
 			return r.getURL();
 		}
+
+
 
 		AdminInterfaceElement::Args::Args(const std::string& _defaultIcon, const std::string& _defaultName )
 			: defaultIcon(_defaultIcon)

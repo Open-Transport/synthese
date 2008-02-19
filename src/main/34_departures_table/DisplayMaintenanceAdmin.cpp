@@ -25,6 +25,7 @@
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
+#include "34_departures_table/DisplayAdmin.h"
 
 #include "05_html/PropertiesHTMLTable.h"
 #include "05_html/Constants.h"
@@ -205,6 +206,12 @@ namespace synthese
 		std::string DisplayMaintenanceAdmin::getParameterValue() const
 		{
 			return _displayScreen.get() ? Conversion::ToString(_displayScreen->getKey()) : string();
+		}
+
+		bool DisplayMaintenanceAdmin::isPageVisibleInTree(const AdminInterfaceElement& currentPage) const
+		{
+			return currentPage.getFactoryKey() == DisplayAdmin::FACTORY_KEY
+				&& currentPage.getPageLink().parameterValue == getPageLink().parameterValue;
 		}
 	}
 }

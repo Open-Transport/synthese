@@ -128,6 +128,14 @@ namespace synthese
 
 			virtual std::string getParameterName() const;
 			virtual std::string getParameterValue() const;
+
+			/** Gets the opening position of the node in the tree view.
+				@return Visible if the current page is DisplayAdmin
+				@author Hugues Romain
+				@date 2008					
+			*/
+			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
+
 		};
 	}
 }

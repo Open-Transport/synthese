@@ -220,5 +220,21 @@ namespace synthese
 		{
 			return _alarm.get() ? Conversion::ToString(_alarm->getId()) : string();
 		}
+
+		bool MessageAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
+		{
+			if (currentPage.getFactoryKey() != MessagesScenarioAdmin::FACTORY_KEY)
+				return false;
+
+			const shared_ptr<const ScenarioSentAlarm> salarm(dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm));
+			if (salarm.get())
+				return salarm->getScenario()->getKey() == Conversion::ToLongLong(currentPage.getPageLink().parameterValue);
+
+			const shared_ptr<const AlarmTemplate> talarm(dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm));
+			if (talarm.get())
+				return talarm->getScenario()->getKey() == Conversion::ToLongLong(currentPage.getPageLink().parameterValue);
+
+			return false;
+		}
 	}
 }

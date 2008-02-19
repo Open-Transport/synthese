@@ -157,5 +157,10 @@ namespace synthese
 			}
 			return links;
 		}
+
+		bool DisplayTypesAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
+		{
+			return true;
+		}
 	}
 }

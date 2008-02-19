@@ -132,6 +132,13 @@ namespace synthese
 			virtual std::string getParameterName() const;
 			virtual std::string getParameterValue() const;
 			virtual std::string getIcon() const;
+
+			/** Gets the opening position of the node in the tree view.
+				@return Always visible
+				@author Hugues Romain
+				@date 2008					
+			*/
+			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
 		};
 	}
 }

@@ -45,9 +45,14 @@ namespace synthese
 				- Last sub page introducer
 				- Level indenter to use before the last subpage
 				- Level indenter to use after the last subpage
-				- Ending
-				- Node sub page introducer (optional : if not provided, same as sub page introducer)
-				- Node last sub page introducer (optional : if not provided, same as last sub page introducer)
+				- Node + subpages opening
+				- Sub pages introducer if opened (might be a div opening) 
+				- Sub pages introducer if closed (might be a div opening) 
+				- Sub pages ending
+				- Opened Node sub page introducer
+				- Closed Node sub page introducer
+				- Opened Node last sub page introducer
+				- Closed Node last sub page introducer
 		*/
 		class AdminPagesTreeInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagesTreeInterfaceElement>
@@ -65,16 +70,27 @@ namespace synthese
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _lastSubpageIntroducerVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _levelIndenterVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _lastLevelIndenterVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _subpagesIntroducerIfOpenedVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _subpagesIntroducerIfClosedVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _openingVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _endingVIE;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _folderSubpageIntroducerVIE;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _folderLastSubpageIntroducerVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _openedFolderSubpageIntroducerVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _closedFolderSubpageIntroducerVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _openedFolderLastSubpageIntroducerVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _closedFolderLastSubpageIntroducerVIE;
+
 			mutable std::string _subpageIntroducer;
 			mutable std::string _lastSubpageIntroducer;
 			mutable std::string _levelIndenter;
 			mutable std::string _lastLevelIndenter;
+			mutable std::string _subpagesIntroducerIfOpened;
+			mutable std::string _subpagesIntroducerIfClosed;
+			mutable std::string _opening;
 			mutable std::string _ending;
-			mutable std::string _folderSubpageIntroducer;
-			mutable std::string _folderLastSubpageIntroducer;
+			mutable std::string _openedFolderSubpageIntroducer;
+			mutable std::string _closedFolderSubpageIntroducer;
+			mutable std::string _openedFolderLastSubpageIntroducer;
+			mutable std::string _closedFolderLastSubpageIntroducer;
 
 		public:
 			/** Controls and store the internals parameters.
