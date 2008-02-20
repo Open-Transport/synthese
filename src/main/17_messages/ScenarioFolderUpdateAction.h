@@ -1,6 +1,8 @@
 
-/** ScenarioNameUpdateAction class header.
-	@file ScenarioNameUpdateAction.h
+/** ScenarioFolderUpdateAction class header.
+	@file ScenarioFolderUpdateAction.h
+	@author Hugues Romain
+	@date 2008
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,45 +22,44 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ScenarioNameUpdateAction_H__
-#define SYNTHESE_ScenarioNameUpdateAction_H__
+#ifndef SYNTHESE_ScenarioFolderUpdateAction_H__
+#define SYNTHESE_ScenarioFolderUpdateAction_H__
 
 #include "30_server/Action.h"
 
 #include "01_util/FactorableTemplate.h"
-
-#include <boost/shared_ptr.hpp>
-#include <string>
+#include "01_util/UId.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class ScenarioTemplate;
-		class Scenario;
 		class ScenarioFolder;
 
-		/** ScenarioNameUpdateAction action class.
+		/** ScenarioFolderUpdateAction action class.
 			@ingroup m17Actions refActions
 		*/
-		class ScenarioNameUpdateAction : public util::FactorableTemplate<server::Action, ScenarioNameUpdateAction>
+		class ScenarioFolderUpdateAction
+			: public util::FactorableTemplate<server::Action, ScenarioFolderUpdateAction>
 		{
 		public:
+			static const std::string PARAMETER_PARENT_FOLDER_ID;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_FOLDER_ID;
 
 		private:
+			boost::shared_ptr<ScenarioFolder>		_folder;
+			boost::shared_ptr<const ScenarioFolder>	_parentFolder;
 			std::string								_name;
-			boost::shared_ptr<const ScenarioFolder>	_folder;
-			boost::shared_ptr<Scenario>				_scenario;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
+				@return Generated parameters map
 			*/
 			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 				Removes the used parameters from the map.
+				@param map Parameters map to interpret
 				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
@@ -67,8 +68,12 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+			
+			ScenarioFolderUpdateAction();
+
+			void setFolderId(uid id);
 		};
 	}
 }
 
-#endif // SYNTHESE_ScenarioNameUpdateAction_H__
+#endif // SYNTHESE_ScenarioFolderUpdateAction_H__

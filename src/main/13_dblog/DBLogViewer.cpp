@@ -38,7 +38,6 @@
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogViewer.h"
 #include "13_dblog/DBLogModule.h"
-#include "13_dblog/DBLogList.h"
 #include "13_dblog/DBLogEntryTableSync.h"
 
 #include "30_server/QueryString.h"
@@ -91,10 +90,7 @@ namespace synthese
 		void DBLogViewer::setFromParametersMap(const ParametersMap& map)
 		{
 			// Log key
-			string key(map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY));
-			if (!Factory<DBLog>::contains(key))
-				throw AdminParametersException("Invalid log key : " + key);
-			_dbLog.reset(Factory<DBLog>::create(key));
+			setLogKey(map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY));
 
 			// Start Date
 			_searchStartDate = map.getDateTime(PARAMETER_START_DATE, false, FACTORY_KEY);
@@ -239,6 +235,21 @@ namespace synthese
 		std::string DBLogViewer::getParameterValue() const
 		{
 			return _dbLog.get() ? _dbLog->getFactoryKey() : string();
+		}
+
+		void DBLogViewer::setLogKey( const std::string& key )
+		{
+			if (!Factory<DBLog>::contains(key))
+				throw AdminParametersException("Invalid log key : " + key);
+			_dbLog.reset(Factory<DBLog>::create(key));
+		}
+
+		server::ParametersMap DBLogViewer::getParametersMap() const
+		{
+			server::ParametersMap m;
+			if (_dbLog.get())
+				m.insert(PARAMETER_LOG_KEY, _dbLog->getFactoryKey());
+			return m;
 		}
 	}
 }

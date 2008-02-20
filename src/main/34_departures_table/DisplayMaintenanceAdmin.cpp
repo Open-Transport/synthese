@@ -26,9 +26,12 @@
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/DisplayAdmin.h"
+#include "34_departures_table/DisplayMaintenanceLog.h"
+#include "34_departures_table/DisplayDataControlLog.h"
 
 #include "05_html/PropertiesHTMLTable.h"
 #include "05_html/Constants.h"
+#include "05_html/HTMLList.h"
 
 #include "13_dblog/DBLogViewer.h"
 
@@ -87,12 +90,12 @@ namespace synthese
 
 			FunctionRequest<AdminRequest> goToLogRequest(request);
 			goToLogRequest.getFunction()->setPage<DBLogViewer>();
-			goToLogRequest.getFunction()->setParameter(DBLogViewer::PARAMETER_LOG_KEY, "displaymaintenance");
+			static_pointer_cast<DBLogViewer,AdminInterfaceElement>(goToLogRequest.getFunction()->getPage())->setLogKey(DisplayMaintenanceLog::FACTORY_KEY);
 			goToLogRequest.setObjectId(request->getObjectId());
 
 			FunctionRequest<AdminRequest> goToDataLogRequest(request);
 			goToDataLogRequest.getFunction()->setPage<DBLogViewer>();
-			goToDataLogRequest.getFunction()->setParameter(DBLogViewer::PARAMETER_LOG_KEY, "displaydata");
+			static_pointer_cast<DBLogViewer,AdminInterfaceElement>(goToDataLogRequest.getFunction()->getPage())->setLogKey(DisplayDataControlLog::FACTORY_KEY);
 			goToDataLogRequest.setObjectId(request->getObjectId());
 
 			stream << "<h1>Paramètres de maintenance</h1>";
@@ -107,12 +110,10 @@ namespace synthese
 
 			stream << "<h1>Contrôle de cohérence des données</h1>";
 			
-			HTMLTable ct;
-			stream << ct.open();
+			HTMLList l;
+			stream << l.open();
 
-			stream << ct.row();
-			stream << ct.col() << "Etat";
-			stream << ct.col();
+			stream << l.element() << "Etat : ";
 			if (_displayScreen->getComplements().dataControl == DISPLAY_DATA_CORRUPTED)
 				stream << HTMLModule::getHTMLImage(IMG_URL_ERROR, _displayScreen->getComplements().dataControlText);
 			if (_displayScreen->getComplements().dataControl == DISPLAY_DATA_NO_LINES)
@@ -120,28 +121,21 @@ namespace synthese
 			if (_displayScreen->getComplements().dataControl == DISPLAY_DATA_OK)
 				stream << HTMLModule::getHTMLImage(IMG_URL_INFO, "OK");
 
+			stream << l.element() << "Détail : ";
+			stream << _displayScreen->getComplements().dataControlText;
 
-			stream << ct.row();
-			stream << ct.col() << "Détail";
-			stream << ct.col() << _displayScreen->getComplements().dataControlText;
+			stream << l.element() << "Date du dernier contrôle positif : ";
+			stream << _displayScreen->getComplements().lastOKDataControl.toString();
 
-			stream << ct.row();
-			stream << ct.col() << "Date du dernier contrôle positif";
-			stream << ct.col() << _displayScreen->getComplements().lastOKDataControl.toString();
+			stream << l.element("log") << HTMLModule::getHTMLLink(goToDataLogRequest.getURL(), "Accéder au journal de surveillance des données de l'afficheur");
 
-			stream << ct.row();
-			stream << ct.col(2) << HTMLModule::getLinkButton(goToDataLogRequest.getURL(), "Accéder au journal de surveillance des données de l'afficheur", string(), "book_open.png");
-
-			stream << ct.close();
+			stream << l.close();
 
 			stream << "<h1>Contrôle du matériel d'affichage</h1>";
 
-			HTMLTable mt;
-			stream << mt.open();
+			stream << l.open();
 
-			stream << mt.row();
-			stream << mt.col() << "Etat";
-			stream << mt.col();
+			stream << l.element() << "Etat : ";
 			if (_displayScreen->getComplements().status == DISPLAY_STATUS_NO_NEWS_WARNING
 				|| _displayScreen->getComplements().status == DISPLAY_STATUS_HARDWARE_WARNING)
 				stream << HTMLModule::getHTMLImage(IMG_URL_WARNING, _displayScreen->getComplements().statusText);
@@ -151,22 +145,18 @@ namespace synthese
 			if (_displayScreen->getComplements().status == DISPLAY_STATUS_OK)
 				stream << HTMLModule::getHTMLImage(IMG_URL_INFO, "OK");
 
-			stream << mt.row();
-			stream << mt.col() << "Détail";
-			stream << mt.col() << _displayScreen->getComplements().statusText;
+			stream << l.element() << "Détail : ";
+			stream << _displayScreen->getComplements().statusText;
 
-			stream << mt.row();
-			stream << mt.col() << "Date du dernier contrôle";
-			stream << mt.col() << _displayScreen->getComplements().lastControl.toString();
+			stream << l.element() << "Date du dernier contrôle : ";
+			stream << _displayScreen->getComplements().lastControl.toString();
 
-			stream << mt.row();
-			stream << mt.col() << "Date du dernier contrôle positif";
-			stream << mt.col() << _displayScreen->getComplements().lastOKStatus.toString();
+			stream << l.element() << "Date du dernier contrôle positif : ";
+			stream << _displayScreen->getComplements().lastOKStatus.toString();
 
-			stream << mt.row();
-			stream << mt.col(2) << HTMLModule::getLinkButton(goToLogRequest.getURL(), "Accéder au journal de maintenance de l'afficheur", string(), "book_open.png");
+			stream << l.element("log") << HTMLModule::getHTMLLink(goToLogRequest.getURL(), "Accéder au journal de maintenance de l'afficheur");
 
-			stream << mt.close();
+			stream << l.close();
 		}
 
 		bool DisplayMaintenanceAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const

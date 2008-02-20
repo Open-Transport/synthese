@@ -380,22 +380,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\ScenarioFolderAdd.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ScenarioFolderAdd.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ScenarioFolderRemoveAction.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ScenarioFolderRemoveAction.h"
-					>
-				</File>
-				<File
 					RelativePath=".\ScenarioNameUpdateAction.cpp"
 					>
 				</File>
@@ -513,6 +497,34 @@
 				</File>
 				<File
 					RelativePath=".\UpdateTextTemplateAction.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Scenario Folder"
+				>
+				<File
+					RelativePath=".\ScenarioFolderAdd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolderAdd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolderRemoveAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolderRemoveAction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolderUpdateAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioFolderUpdateAction.h"
 					>
 				</File>
 			</Filter>

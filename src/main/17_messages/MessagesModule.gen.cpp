@@ -44,3 +44,4 @@ synthese::messages::AlarmRemoveLinkAction::integrate();
 synthese::messages::AlarmAddLinkAction::integrate();
 synthese::messages::ScenarioFolderAdd::integrate();
 synthese::messages::ScenarioFolderRemoveAction::integrate();
+synthese::messages::ScenarioFolderUpdateAction::integrate();

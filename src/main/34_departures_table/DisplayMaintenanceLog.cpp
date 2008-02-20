@@ -122,7 +122,7 @@ namespace synthese
 
 		std::string DisplayMaintenanceLog::getName() const
 		{
-			return "Supervision et maintenance des tableaux de départs";
+			return "SAI : Supervision et maintenance";
 		}
 
 		void DisplayMaintenanceLog::addControlEntry(

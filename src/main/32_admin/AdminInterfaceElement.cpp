@@ -140,6 +140,9 @@ namespace synthese
 				auto_ptr<AdminInterfaceElement>			subPage(GetAdminPage(*it));
 				AdminInterfaceElement::PageLinksTree	subTree(_buildTreeRecursion(subPage.get(), request, position));
 
+				if (*it == getPageLink())
+					subTree.isNodeOpened = true;
+
 				tree.subPages.push_back(subTree);
 				if (!tree.isNodeOpened)
 					tree.isNodeOpened = subPage->isPageVisibleInTree(*this) || subTree.isNodeOpened;

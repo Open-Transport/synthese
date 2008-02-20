@@ -100,7 +100,7 @@ namespace synthese
 
 		std::string MessagesLibraryLog::getName() const
 		{
-			return "Administration bibliothèque de messages";
+			return "Bibliothèque de messages";
 		}
 
 		void MessagesLibraryLog::addDeleteEntry(

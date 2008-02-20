@@ -173,6 +173,7 @@ namespace synthese
 			h2.push_back(make_pair(PARAMETER_SHORT_TEXT, "Texte&nbsp;court"));
 			h2.push_back(make_pair(PARAMETER_LONG_TEXT, "Texte&nbsp;long"));
 			h2.push_back(make_pair(string(), "Actions"));
+			h2.push_back(make_pair(string(), "Actions"));
 			ResultHTMLTable t2(h2, searchRequest.getHTMLForm(), _requestParameters, ResultHTMLTable::getParameters(_requestParameters, te));
 
 			stream << t2.open();

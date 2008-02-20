@@ -87,9 +87,9 @@ namespace synthese
 			
 			stream
 				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
-				<< "<table id=\"searchresult\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Max arrêts intermédiaires</th>";
+				<< "<table class=\"adminresults\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Max arrêts intermédiaires</th>";
 			if (writeRight)
-				stream << "<th>Actions</th>";
+				stream << "<th colspan=\"2\">Actions</th>";
 			stream << "</tr>";
 
 			// Display types loop
@@ -128,7 +128,7 @@ namespace synthese
 					<< "<td>" << cf.getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), (uid) 0) << "</td>"
 					<< "<td>" << cf.getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99) << "</td>"
 					<< "<td>" << cf.getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER, UNKNOWN_VALUE, 99) << "</td>"
-					<< "<td>" << cf.getSubmitButton("Ajouter") << "</td>"
+					<< "<td colspan=\"2\">" << cf.getSubmitButton("Ajouter") << "</td>"
 					<< "</tr>";
 				stream << cf.close();
 			}

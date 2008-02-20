@@ -25,6 +25,7 @@
 
 #include "01_util/ModuleClass.h"
 #include "01_util/UId.h"
+#include "01_util/Constants.h"
 #include "01_util/FactorableTemplate.h"
 
 #include "17_messages/Types.h"
@@ -52,7 +53,38 @@ namespace synthese
 		public:
 			void initialize();
 
-			static std::vector<std::pair<uid, std::string> >			getScenarioTemplatesLabels(bool withAll = false);
+			/** Labels list containing each scenario template ordered by folder, indicating the full path in the folder tree.
+				@param withAll true = add a link "all scenarios"
+				@param folderId id of the main parent folder (optional) :
+					- 0/default value is the root folder
+					- UNKWNOWN_VALUE = do not use this criteria : return all templates without their full path
+				@param prefix text to add at the beginning of each item (optional)
+				@return std::vector<std::pair<uid, std::string> > The list
+				@author Hugues Romain
+				@date 2008
+			*/
+			static std::vector<std::pair<uid, std::string> > GetScenarioTemplatesLabels(
+				bool withAll = false
+				, uid folderId = 0
+				, std::string prefix = std::string()
+			);
+
+
+
+			/** Labels list containing each scenario template folder, indicating the full path in the folder tree.
+				@param folderId id of the main parent folder (optional)
+				@param prefix text to add at the beginning of each item (optional)
+				@param forbiddenFolderId id of a folder which must not be present in the result
+				@return std::vector<std::pair<uid, std::string> > The list
+				@author Hugues Romain
+				@date 2008
+			*/
+			static std::vector<std::pair<uid, std::string> > GetScenarioFoldersLabels(
+				uid folderId = 0
+				, std::string prefix = std::string()
+				, uid forbiddenFolderId = UNKNOWN_VALUE
+			);
+
 			static std::vector<std::pair<AlarmLevel, std::string> >		getLevelLabels(bool withAll = false);
 			static std::vector<std::pair<AlarmConflict, std::string> >	getConflictLabels(bool withAll = false);
 			static std::vector<std::pair<uid, std::string> >			getTextTemplateLabels(const AlarmLevel& level);

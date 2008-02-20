@@ -25,6 +25,8 @@
 #include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
+#include "17_messages/ScenarioFolder.h"
+#include "17_messages/ScenarioFolderTableSync.h"
 #include "17_messages/TextTemplateTableSync.h"
 #include "17_messages/TextTemplate.h"
 
@@ -40,17 +42,57 @@ namespace synthese
 
 	namespace messages
 	{
-		std::vector<pair<uid, std::string> > MessagesModule::getScenarioTemplatesLabels( bool withAll /*= false*/ )
-		{
+		std::vector<pair<uid, std::string> > MessagesModule::GetScenarioTemplatesLabels(
+			bool withAll /*= false*/
+			, uid folderId
+			, string prefix
+		){
 			vector<pair<uid,string> > m;
 			if (withAll)
 				m.push_back(make_pair(0, "(tous)"));
-			vector<shared_ptr<ScenarioTemplate> > sc = ScenarioTableSync::searchTemplate(0);
-			for(vector<shared_ptr<ScenarioTemplate> >::const_iterator it = sc.begin(); it != sc.end(); ++it)
-				m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
-			return m;
 
+			vector<shared_ptr<ScenarioTemplate> > sc = ScenarioTableSync::searchTemplate(folderId);
+			for(vector<shared_ptr<ScenarioTemplate> >::const_iterator it = sc.begin(); it != sc.end(); ++it)
+				m.push_back(make_pair((*it)->getKey(), prefix + (*it)->getName()));
+
+			if (folderId != UNKNOWN_VALUE)
+			{
+				vector<shared_ptr<ScenarioFolder> > sf(ScenarioFolderTableSync::search(folderId));
+				for (vector<shared_ptr<ScenarioFolder> >::const_iterator itf(sf.begin()); itf != sf.end(); ++itf)
+				{
+					std::vector<pair<uid, std::string> > r(GetScenarioTemplatesLabels(false, (*itf)->getKey(), prefix + (*itf)->getName() +"/"));
+					m.insert(m.end(),r.begin(), r.end());
+				}
+			}
+			return m;
 		}
+
+
+
+		std::vector<std::pair<uid, std::string> > MessagesModule::GetScenarioFoldersLabels(
+			uid folderId /*= 0 */
+			, std::string prefix /*= std::string()  */
+			, uid forbiddenFolderId
+		){
+			vector<pair<uid,string> > m;
+			if (folderId == 0)
+				m.push_back(make_pair(0, "(racine)"));
+
+			vector<shared_ptr<ScenarioFolder> > sf(ScenarioFolderTableSync::search(folderId));
+			for (vector<shared_ptr<ScenarioFolder> >::const_iterator itf(sf.begin()); itf != sf.end(); ++itf)
+			{
+				if ((*itf)->getKey() == forbiddenFolderId)
+					continue;
+
+				m.push_back(make_pair((*itf)->getKey(), prefix + (*itf)->getName()));
+				
+				vector<pair<uid, string> > r(GetScenarioFoldersLabels((*itf)->getKey(), prefix + (*itf)->getName() +"/", forbiddenFolderId));
+				m.insert(m.end(),r.begin(), r.end());
+			}
+			return m;
+		}
+
+
 
 		std::vector<pair<AlarmLevel, std::string> > MessagesModule::getLevelLabels( bool withAll /*= false*/ )
 		{

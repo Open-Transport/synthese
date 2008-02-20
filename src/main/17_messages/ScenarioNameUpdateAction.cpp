@@ -25,6 +25,8 @@
 #include "17_messages/MessagesModule.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
+#include "17_messages/ScenarioFolder.h"
+#include "17_messages/ScenarioFolderTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -44,7 +46,7 @@ namespace synthese
 	namespace messages
 	{
 		const string ScenarioNameUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
-
+		const string ScenarioNameUpdateAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
 
 		ParametersMap ScenarioNameUpdateAction::getParametersMap() const
 		{
@@ -66,9 +68,15 @@ namespace synthese
 				shared_ptr<ScenarioTemplate> tscenario(dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario));
 				if (tscenario.get())
 				{
-					vector<shared_ptr<ScenarioTemplate> > existing = ScenarioTableSync::searchTemplate(tscenario->getFolderId(), _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
+					uid folderId(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
+
+					if (folderId != 0)
+						_folder = ScenarioFolderTableSync::Get(folderId);
+
+					vector<shared_ptr<ScenarioTemplate> > existing = ScenarioTableSync::searchTemplate(folderId, _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
 					if (!existing.empty())
 						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
+
 				}
 			}
 			catch (ObjectNotFoundException<uid,Scenario>& e)
@@ -80,6 +88,11 @@ namespace synthese
 		void ScenarioNameUpdateAction::run()
 		{
 			_scenario->setName(_name);
+
+			shared_ptr<ScenarioTemplate> tscenario(dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario));
+			if (tscenario.get())
+				tscenario->setFolderId(_folder.get() ? _folder->getKey() : 0);
+
 			ScenarioTableSync::Save(_scenario.get());
 		}
 	}

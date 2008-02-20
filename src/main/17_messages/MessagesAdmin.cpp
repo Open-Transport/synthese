@@ -282,7 +282,7 @@ namespace synthese
 			}
 			stream << t1.row();
 			stream << t1.col();
-			stream << t1.col() << t1.getActionForm().getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::getScenarioTemplatesLabels(), uid(0));
+			stream << t1.col() << t1.getActionForm().getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::GetScenarioTemplatesLabels(), uid(0));
 			stream << t1.col(3) << t1.getActionForm().getSubmitButton("Nouvelle diffusion de scénario");
 
 			stream << t1.close();

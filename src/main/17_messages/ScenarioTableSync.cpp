@@ -280,7 +280,7 @@ namespace synthese
 				<< COL_IS_TEMPLATE << "=1";
 			if (folderId > 0)
 				query << " AND " << COL_FOLDER_ID << "=" << Conversion::ToString(folderId);
-			else
+			else if (folderId == 0)
 				query << " AND (" << COL_FOLDER_ID << "=0 OR " << COL_FOLDER_ID << " IS NULL)";
 				
 			if (!name.empty())

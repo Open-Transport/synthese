@@ -78,14 +78,6 @@
 			Name="14 AdminInterfaceElement"
 			>
 			<File
-				RelativePath=".\DBLogList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DBLogList.h"
-				>
-			</File>
-			<File
 				RelativePath=".\DBLogViewer.cpp"
 				>
 			</File>

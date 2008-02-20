@@ -36,6 +36,7 @@
 #include "17_messages/DeleteAlarmAction.h"
 #include "17_messages/NewMessageAction.h"
 #include "17_messages/MessagesLibraryAdmin.h"
+#include "17_messages/MessagesModule.h"
 
 #include "30_server/ActionFunctionRequest.h"
 #include "30_server/QueryString.h"
@@ -105,10 +106,14 @@ namespace synthese
 			addRequest.getAction()->setScenarioId(_scenario->getId());
 			addRequest.getAction()->setIsTemplate(_templateScenario.get() != NULL);
 
-			stream << "<h1>Propriété</h1>";
+			stream << "<h1>Propriétés</h1>";
 			PropertiesHTMLTable tp(updateRequest.getHTMLForm("update"));
 			stream << tp.open();
 			stream << tp.cell("Nom", tp.getForm().getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()));
+			if (_templateScenario.get())
+			{
+				stream << tp.cell("Répertoire", tp.getForm().getSelectInput(ScenarioNameUpdateAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(), _templateScenario->getFolderId()));
+			}
 			stream << tp.close();
 
 			if (_sentScenario.get())

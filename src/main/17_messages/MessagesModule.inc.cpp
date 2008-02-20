@@ -45,3 +45,4 @@
 #include "17_messages/ScenarioStopAction.h"
 #include "17_messages/ScenarioFolderAdd.h"
 #include "17_messages/ScenarioFolderRemoveAction.h"
+#include "17_messages/ScenarioFolderUpdateAction.h"

@@ -23,6 +23,7 @@
 #include "05_html/ActionResultHTMLTable.h"
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLList.h"
+#include "05_html/PropertiesHTMLTable.h"
 
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
@@ -37,6 +38,7 @@
 #include "17_messages/ScenarioFolderTableSync.h"
 #include "17_messages/ScenarioFolder.h"
 #include "17_messages/ScenarioFolderRemoveAction.h"
+#include "17_messages/ScenarioFolderUpdateAction.h"
 
 #include "30_server/ActionFunctionRequest.h"
 #include "30_server/QueryString.h"
@@ -111,6 +113,11 @@ namespace synthese
 			removeFolderRequest.getAction()->setFolder(_folder);
 			removeFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 
+			ActionFunctionRequest<ScenarioFolderUpdateAction,AdminRequest> updateFolderRequest(request);
+			updateFolderRequest.getAction()->setFolderId(_folder.get() ? _folder->getKey() : 0);
+			updateFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
+			updateFolderRequest.setObjectId(_folder.get() ? _folder->getKey() : 0);
+
 			vector<shared_ptr<ScenarioTemplate> > sv = ScenarioTableSync::searchTemplate(
 				_folderId
 				, string(), NULL
@@ -118,13 +125,20 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_NAME
 				, _requestParameters.raisingOrder
 			);
+			vector<shared_ptr<ScenarioFolder> > folders(ScenarioFolderTableSync::search(_folderId));
 
 			if (_folderId > 0)
 			{
 				stream << "<h1>Répertoire</h1>";
 
-				if (sv.empty())
-					stream << HTMLModule::getLinkButton(removeFolderRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png");
+				if (sv.empty() && folders.empty())
+					stream << "<p>" << HTMLModule::getLinkButton(removeFolderRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
+
+				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.cell("Nom", t.getForm().getTextInput(ScenarioFolderUpdateAction::PARAMETER_NAME, _folder->getName()));
+				stream << t.cell("Répertoire parent", t.getForm().getSelectInput(ScenarioFolderUpdateAction::PARAMETER_PARENT_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()), _folder->getParentId()));
+				stream << t.close();
 			}
 
 			stream << "<h1>Scénarios</h1>";
@@ -154,7 +168,6 @@ namespace synthese
 
 			stream << "<h1>Sous-répertoires</h1>";
 
-			vector<shared_ptr<ScenarioFolder> > folders(ScenarioFolderTableSync::search(_folderId));
 			if (folders.empty())
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";

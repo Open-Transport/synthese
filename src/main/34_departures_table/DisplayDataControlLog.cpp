@@ -91,7 +91,7 @@ namespace synthese
 
 		std::string DisplayDataControlLog::getName() const
 		{
-			return "Contrôles de cohérence des données des tableaux de départs";
+			return "SAI : Cohérence des données";
 		}
 	}
 }

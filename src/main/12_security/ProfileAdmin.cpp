@@ -20,6 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "05_html/PropertiesHTMLTable.h"
 #include "05_html/HTMLTable.h"
 #include "05_html/HTMLForm.h"
 
@@ -104,19 +105,10 @@ namespace synthese
 
 			stream	<< "<h1>Propriétés</h1>";
 
-			HTMLForm form(updateRequest.getHTMLForm("update"));
-			stream << form.open();
-
-			{
-				HTMLTable t;
-				stream << t.open();
-				stream << t.row();
-				stream << t.col() << "Nom";
-				stream << t.col() << form.getTextInput(UpdateProfileAction::PARAMETER_NAME, _profile->getName());
-				stream << t.col() << form.getSubmitButton("Modifier");
-				stream << t.close();
-				stream << form.close();
-			}
+			PropertiesHTMLTable pt(updateRequest.getHTMLForm("update"));
+			stream << pt.open();
+			stream << pt.cell("Nom", pt.getForm().getTextInput(UpdateProfileAction::PARAMETER_NAME, _profile->getName()));
+			stream << pt.close();
 	
 			stream << "<h1>Habilitations du profil</h1>";
 
@@ -129,7 +121,7 @@ namespace synthese
 				v.push_back("Périmètre");
 				v.push_back("Droits");
 				v.push_back("Actions");
-				HTMLTable t(v);
+				HTMLTable t(v, "adminresults");
 				stream << t.open();
 
 				// Habilitations list
@@ -170,7 +162,7 @@ namespace synthese
 			v.push_back("Droit public");
 			v.push_back("Droit privé");
 			v.push_back("Action");
-			HTMLTable t(v);
+			HTMLTable t(v, "adminresults");
 
 			stream << t.open();
 

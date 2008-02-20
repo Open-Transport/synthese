@@ -158,6 +158,16 @@ namespace synthese
 			virtual std::string getTitle() const;
 			virtual std::string getParameterName() const;
 			virtual std::string getParameterValue() const;
+
+			/** Key log setter.
+				@param key Key of the log to display
+				@throw AdminParametersException if the log does not exist
+				@author Hugues Romain
+				@date 2008				
+			*/
+			void setLogKey(const std::string& key);
+
+			virtual server::ParametersMap getParametersMap() const;
 		};
 	}
 }
