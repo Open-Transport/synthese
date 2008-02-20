@@ -124,13 +124,11 @@ namespace synthese
 				templateRequest.setObjectId(request->getObjectId());
 
 				HTMLForm fc(templateRequest.getHTMLForm("template"));
-				HTMLTable tc;
-				stream << fc.open() << tc.open();
-				stream << tc.row();
-				stream << tc.col() << "Modèle";
-				stream << tc.col() << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, MessagesModule::getTextTemplateLabels(_alarm->getLevel()), uid());
+				stream << fc.open() << "<p>";
+				stream << "Modèle : ";
+				stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, MessagesModule::getTextTemplateLabels(_alarm->getLevel()), uid());
 				stream << fc.getSubmitButton("Copier contenu");
-				stream << tc.close() << fc.close();
+				stream << "</p>" << fc.close();
 
 				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(request);
 				updateMessagesRequest.getFunction()->setPage<MessageAdmin>();

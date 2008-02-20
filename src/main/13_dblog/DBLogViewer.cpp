@@ -46,6 +46,7 @@
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminModule.h"
 #include "32_admin/AdminRequest.h"
+#include "32_admin/ModuleAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -198,13 +199,24 @@ namespace synthese
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfParent( const PageLink& parentLink, const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+
+
+		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfParent(
+			const PageLink& parentLink
+			, const AdminInterfaceElement& currentPage
+			, const server::FunctionRequest<admin::AdminRequest>* request
+		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == DBLogList::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DBLogModule::FACTORY_KEY)
 			{
-				links.push_back(currentPage.getPageLink());
+				for (Factory<DBLog>::Iterator it = Factory<DBLog>::begin(); it != Factory<DBLog>::end(); ++it)
+				{
+					AdminInterfaceElement::PageLink link(getPageLink());
+					link.name = it->getName();
+					link.parameterName = PARAMETER_LOG_KEY;
+					link.parameterValue = it.getKey();
+					links.push_back(link);
+				}
 			}
 			return links;
 		}

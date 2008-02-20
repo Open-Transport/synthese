@@ -114,6 +114,7 @@ namespace synthese
 			h1.push_back(make_pair(PARAMETER_SHORT_TEXT, "Texte&nbsp;court"));
 			h1.push_back(make_pair(PARAMETER_LONG_TEXT, "Texte&nbsp;long"));
 			h1.push_back(make_pair(string(), "Actions"));
+			h1.push_back(make_pair(string(), "Actions"));
 			ResultHTMLTable t1(h1, searchRequest.getHTMLForm(), _requestParameters, ActionResultHTMLTable::getParameters(_requestParameters, tw));
 
 			stream << t1.open();

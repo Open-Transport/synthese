@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "05_html/ResultHTMLTable.h"
+#include "05_html/HTMLList.h"
 
 #include "12_security/Constants.h"
 
@@ -120,13 +121,8 @@ namespace synthese
 
 			if (!dsv.empty())
 			{
-				vector<string> v;
-				v.push_back("Emplacement");
-				v.push_back("Etat");
-				v.push_back("Actions");
-				HTMLTable t(v);
-
-				stream << t.open();
+				HTMLList l;
+				stream << l.open();
 
 				for (vector<shared_ptr<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
 				{
@@ -134,16 +130,15 @@ namespace synthese
 					usedDisplayScreens.insert(ds->getKey());
 					removeRequest.getAction()->setObjectId(ds->getKey());
 					
-					stream << t.row();
-					stream << t.col() << ds->getLocalization()->getFullName() << "/" << ds->getLocalization()->getName();
+					stream << l.element("display");
+					stream << HTMLModule::getHTMLLink(removeRequest.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer"));
+					
+					stream << ds->getLocalization()->getFullName() << "/" << ds->getLocalization()->getName();
 					if (ds->getLocalizationComment() != "")
 						stream << "/" << ds->getLocalizationComment();
-
-					stream << t.col() << "<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT>"; // Bullet
-					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l\\'afficheur des destinataires du message ?");
 				}
 
-				stream << t.close();
+				stream << l.close();
 			}
 
 			stream << "<p>Ajout d'afficheur</p>";

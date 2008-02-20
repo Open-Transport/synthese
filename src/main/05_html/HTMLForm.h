@@ -254,6 +254,16 @@ namespace synthese
 
 			std::string getSubmitButton(const std::string& caption);
 
+			/** Image submit button.
+				@param imageURL URL of the image
+				@param alt Replacement text
+				@param name Name of the input (optional)
+				@return std::string HTML input button
+				@author Hugues Romain
+				@date 2008				
+			*/
+			std::string getImageSubmitButton(const std::string& imageURL, const std::string& alt, std::string name="im");
+
 			std::string getCheckBox(const std::string& name, const std::string& value, bool checked);
 
 			std::string getSelectNumberInput(const std::string& name, int mini, int maxi, int value=UNKNOWN_VALUE, int step=1);

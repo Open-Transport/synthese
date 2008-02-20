@@ -22,6 +22,7 @@
 
 #include "05_html/ActionResultHTMLTable.h"
 #include "05_html/HTMLForm.h"
+#include "05_html/HTMLList.h"
 
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
@@ -158,22 +159,22 @@ namespace synthese
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
-			else
-			{
-				stream << "<ul>";
-				for (vector<shared_ptr<ScenarioFolder> >::const_iterator it(folders.begin()); it != folders.end(); ++it)
-				{
-					static_pointer_cast<MessagesLibraryAdmin,AdminInterfaceElement>(goFolderRequest.getFunction()->getPage())->setFolderId((*it)->getKey());
-					stream << "<li>" << HTMLModule::getHTMLImage("folder.png","") << HTMLModule::getHTMLLink(goFolderRequest.getURL(), (*it)->getName()) << "</li>";
-				}
-				stream << "</ul>";
-			}
-
+			
 			HTMLForm f(addFolderRequest.getHTMLForm());
-			stream << f.open();
+			HTMLList l;
+			stream << f.open() << l.open();
+
+			for (vector<shared_ptr<ScenarioFolder> >::const_iterator it(folders.begin()); it != folders.end(); ++it)
+			{
+				static_pointer_cast<MessagesLibraryAdmin,AdminInterfaceElement>(goFolderRequest.getFunction()->getPage())->setFolderId((*it)->getKey());
+				stream << l.element("folder");
+				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), (*it)->getName());
+			}
+			
+			stream << l.element("folder");
+			stream << f.getImageSubmitButton("add.png", "Ajouter");
 			stream << f.getTextInput(ScenarioFolderAdd::PARAMETER_NAME,"","(Entrez le nom du répertoire ici)");
-			stream << f.getSubmitButton("Créer le sous-répertoire");
-			stream << f.close();
+			stream << l.close() << f.close();
 
 		}
 

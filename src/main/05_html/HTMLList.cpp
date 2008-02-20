@@ -1,6 +1,6 @@
 
-/** SearchFormHTMLTable class implementation.
-	@file SearchFormHTMLTable.cpp
+/** HTMLList class implementation.
+	@file HTMLList.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,9 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "HTMLList.h"
 
-#include "SearchFormHTMLTable.h"
+#include <sstream>
 
 using namespace std;
 
@@ -31,46 +31,46 @@ namespace synthese
 	namespace html
 	{
 
-		SearchFormHTMLTable::SearchFormHTMLTable(const HTMLForm& form)
-			: HTMLTable(6, "searchform")
-			, _form(form)
+
+		HTMLList::HTMLList()
+			: _element(false)
 		{
+			
 		}
 
-		std::string SearchFormHTMLTable::open()
+		std::string HTMLList::closeElement()
+		{
+			if (_element)
+			{
+				_element = false;
+				return "</li>";
+			}
+			return string();
+		}
+
+		std::string HTMLList::open()
+		{
+			return "<ul>";
+		}
+
+		std::string HTMLList::element( std::string className /*= std::string()*/ )
 		{
 			stringstream s;
-			s	<< _form.open()
-				<< HTMLTable::open();
+			s << closeElement();
+			s << "<li";
+			if (!className.empty())
+				s << " class=\"" << className << "\"";
+			s << ">";
+			_element = true;
 			return s.str();
 		}
 
-		std::string SearchFormHTMLTable::close()
+		std::string HTMLList::close()
 		{
 			stringstream s;
-			s	<< goCol(6, 2, "submitcell") << _form.getSubmitButton("Rechercher");
-			s	<< HTMLTable::close();
-			s	<< _form.close();
+			s << closeElement();
+			s << "</ul>";
 			return s.str();
-		}
-
-		std::string SearchFormHTMLTable::cell( const std::string& label, const std::string& content, std::string id/*=""*/ )
-		{
-			stringstream s;
-			s	<< col();
-			if (!id.empty())
-				s << "<label for=\"" << id << "\">";
-			s	<< label;
-			if (!id.empty())
-				s << "</label>";
-			s	<< col()
-				<< content;
-			return s.str();
-		}
-
-		HTMLForm& SearchFormHTMLTable::getForm()
-		{
-			return _form;
 		}
 	}
 }

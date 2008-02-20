@@ -28,6 +28,7 @@
 
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLTable.h"
+#include "05_html/HTMLList.h"
 #include "05_html/PropertiesHTMLTable.h"
 
 #include "15_env/ConnectionPlaceTableSync.h"
@@ -187,10 +188,12 @@ namespace synthese
 
 			stream << "<h1>Actions</h1>";
 
+			stream << "<p>";
 			if (deleteRequest.isActionFunctionAuthorized())
 				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l\\'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
 			stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png") << " ";
 			stream << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision", string(), "monitor_lightning.png") << " ";
+			stream << "</p>";
 
 
 			stream << "<h1>Propriétés</h1>";
@@ -223,151 +226,131 @@ namespace synthese
 
 			stream << t.close();
 
+			stream << "<p class=\"info\">Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalités proposées. Selon le type de l'afficheur, certains champs peuvent donc être sans effet sur l'affichage.</p>";
+
 			// Used physical stops
 			stream << "<h1>Arrêts de desserte</h1>";
 			
-			HTMLTable st;
-			stream << st.open();
-			
 			HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
 			uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()));
-			stream << st.row();
-			stream << st.col() << "Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
-			stream << st.col() << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
-			
+			stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
+			stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
+			stream << "</p>";
+			HTMLList l;
+
 			if (!_displayScreen->getAllPhysicalStopsDisplayed())
 			{
-				stream << st.row();
-				stream << st.col() << "Arrêt";
-				stream << st.col() << "Action";
+				bool withAddForm(_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getPhysicalStops().size());
+				HTMLForm ap(addPhysicalRequest.getHTMLForm("addphy"));
 
+				// Opening
+				if (withAddForm)
+					stream << ap.open();
+				stream << l.open();
+
+				// Loop on linked stops
 				for (PhysicalStops::const_iterator it = _displayScreen->getPhysicalStops().begin(); it != _displayScreen->getPhysicalStops().end(); ++it)
 				{
 					const PhysicalStop* ps(it->second);
 					HTMLForm rs(rmPhysicalRequest.getHTMLForm("rm" + Conversion::ToString(ps->getKey())));
 					rs.addHiddenField(DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()));
 
-					stream << st.row();
-					stream << st.col() << ps->getOperatorCode() << " / " << ps->getName();
-					stream << st.col() << rs.getLinkButton("Supprimer");
+					stream << l.element("broadcastpoint");
+					stream << HTMLModule::getHTMLLink(rs.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << ps->getOperatorCode() << " / " << ps->getName();
 				}
-				if (_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getPhysicalStops().size())
+				
+				// Add a link
+				if (withAddForm)
 				{
-					HTMLForm ap(addPhysicalRequest.getHTMLForm("addphy"));
-					stream << st.row();
-					stream << st.col(2) << ap.open();
+					stream << l.element("broadcastpoint");
+					stream << ap.getImageSubmitButton("add.png", "Ajouter");
 					stream << ap.getSelectInput(AddDepartureStopToDisplayScreenAction::PARAMETER_STOP, _displayScreen->getLocalization()->getPhysicalStopLabels(_displayScreen->getPhysicalStops()) , uid(0));
-					stream << ap.getSubmitButton("Ajouter");
-					stream << ap.close();
 				}
+
+				// Closing
+				stream << l.close();
+				if (withAddForm)
+					stream << ap.close();
 			}
-			stream << st.close();
 
 			// Intermediate stops to display
 			stream << "<h1>Arrêts intermédiaires à afficher</h1>";
 
-			HTMLTable::ColsVector mtv;
-			mtv.push_back("Arrêt");
-			mtv.push_back("Action");
-			HTMLTable mt(mtv);;
-			stream << mt.open();
+			HTMLForm amf(addDisplayRequest.getHTMLForm("adddispl"));
+			
+			stream << amf.open();
+			stream << l.open();
 			
 			for (DisplayedPlacesList::const_iterator it(_displayScreen->getDisplayedPlaces().begin()); it != _displayScreen->getDisplayedPlaces().end(); ++it)
 			{
 				HTMLForm mf(rmDisplayedRequest.getHTMLForm("rmdp" + Conversion::ToString(it->second->getKey())));
 				mf.addHiddenField(DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
 
-				stream << mt.row();
-				stream << mt.col() << it->second->getFullName();
-				stream << mt.col() << mf.getLinkButton("Supprimer");
+				stream << l.element("broadcastpoint");
+				stream << HTMLModule::getHTMLLink(mf.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
 			}
 
-			HTMLForm amf(addDisplayRequest.getHTMLForm("adddispl"));
-			stream << mt.row();
-			stream << mt.col(2) << amf.open();
+			stream << l.element("broadcastpoint");
+			stream << amf.getImageSubmitButton("add.png", "Ajouter");
 			stream << amf.getSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
-			stream << amf.getSubmitButton("Ajouter");
-			stream << amf.close();
 
-			stream << mt.close();
+			stream << l.close();
+			stream << amf.close();
 		
 			// Forbidden places
 			stream << "<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>";
-			HTMLTable::ColsVector ntv;
-			ntv.push_back("Arrêt");
-			ntv.push_back("Action");
-			HTMLTable nt(ntv);
-			stream << nt.open();
+			
+			HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
+			stream << ant.open() << l.open();
 
 			for (DisplayedPlacesList::const_iterator it = _displayScreen->getForbiddenPlaces().begin(); it != _displayScreen->getForbiddenPlaces().end(); ++it)
 			{
 				HTMLForm ntu(rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString(it->second->getKey())));
 				ntu.addHiddenField(DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
-				stream << nt.row();
-				stream << nt.col() << it->second->getFullName();
-				stream << nt.col() << ntu.getLinkButton("Supprimer");
+				stream << l.element("broadcastpoint");
+				stream << HTMLModule::getHTMLLink(ntu.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
 			}
-			HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
-			stream << nt.row();
-			stream << nt.col(2) << ant.open();
+
+			stream << l.element("broadcastpoint");
+			stream << ant.getImageSubmitButton("add.png", "Ajouter");
 			stream << ant.getSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0));
-			stream << ant.getSubmitButton("Ajouter");
-			stream << ant.close();
-			
-			stream << nt.close();
+			stream << l.close() << ant.close();
 			
 			// Preselection
 			stream << "<h1>Présélection</h1>";
 
-			HTMLForm tf(updPreselRequest.getHTMLForm("updpresel"));
-			HTMLTable tt;
-			stream << tf.open() << tt.open();
-			
-			stream << tt.row();
-			stream << tt.col() << "Activer";
-			stream << tt.col() << tf.getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION, _displayScreen->getGenerationMethod() != DisplayScreen::STANDARD_METHOD);
-			
-			stream << tt.row();
-			stream << tt.col() << "Délai maximum présélection";
-			stream << tt.col() << tf.getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay()));
+			PropertiesHTMLTable tt(updPreselRequest.getHTMLForm("updpresel"));
+			tt.getForm().setUpdateRight(writeRight);
 
-			stream << tt.row();
-			stream << tt.col(2) << tf.getSubmitButton("Enregister les paramètres de présélection");
-
-			stream << tt.close() << tf.close();
+			stream << tt.open();
+			stream << tt.title("Paramètres de présélection");
+			stream << tt.cell("Activer", tt.getForm().getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION, _displayScreen->getGenerationMethod() != DisplayScreen::STANDARD_METHOD));
+			stream << tt.cell("Délai maximum présélection", tt.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay())));
+			stream << tt.close();
 
 			if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
 			{
 				// Additional preselection stops
-				stream << "<h1>Arrêts de présélection (les terminus de lignes sont automatiquement présélectionnés)</h1>";
+				stream << "<p>Arrêts de présélection</p>";
 
-				HTMLTable::ColsVector pstv;
-				pstv.push_back("Arrêt");
-				pstv.push_back("Action");
-				HTMLTable pst(pstv);
-				stream << pst.open();
+				HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
+				stream << psaf.open() << l.open();
 
 				for (DisplayedPlacesList::const_iterator it = _displayScreen->getForcedDestinations().begin(); it != _displayScreen->getForcedDestinations().end(); ++it)
 				{
 					HTMLForm psdf(rmPreselRequest.getHTMLForm("rmpres" + Conversion::ToString(it->second->getKey())));
 					psdf.addHiddenField(RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
-					stream << pst.row();
-					stream << pst.col() << it->second->getFullName();
-					stream << pst.col() << psdf.getLinkButton("Supprimer");
+					stream << l.element("broadcastpoint");
+					stream << HTMLModule::getHTMLLink(psdf.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
 				}
 
-				HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
-				stream << pst.row();
-				stream << pst.col(2) << psaf.open();
+				stream << l.element("broadcastpoint");
+				stream << psaf.getImageSubmitButton("add.png", "Ajouter");
 				stream << psaf.getSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0));
-				stream << psaf.getSubmitButton("Ajouter");
-				stream << psaf.close();
+				stream << l.close() << psaf.close();
 
-				stream << pst.close();
+				stream << "<p class=\"info\">Les terminus de lignes sont automatiquement présélectionnés.</p>";
 			}
-
-			stream
-				<< "<p>NB : Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalités proposées. Selon le type de l'afficheur, certains champs peuvent donc être sans effet sur l'affichage.</p>";
 		}
 
 		void DisplayAdmin::setFromParametersMap(const ParametersMap& map)

@@ -414,5 +414,21 @@ namespace synthese
 		{
 			_updateRight = value;
 		}
+
+		std::string HTMLForm::getImageSubmitButton( const std::string& imageURL, const std::string& alt, string name )
+		{
+			if (!_updateRight)
+				return string();
+
+			stringstream s;
+			s	<< "<input "
+				<< "type=\"image\" "
+				<< "src=\"" << imageURL << "\" "
+				<< "name=\"" << name << "\" "
+				<< "id=\"" << _getFieldId(name) << "\" "
+				<< "alt=\"" << alt << "\" "
+				<< " />";
+			return s.str();
+		}
 	}
 }

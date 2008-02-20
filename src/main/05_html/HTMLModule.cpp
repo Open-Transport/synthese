@@ -42,7 +42,7 @@ namespace synthese
 			if (confirm.empty())
 				s << "href=\"" << url << "\"";
 			else
-				s << "onclick=\"if (window.confirm('" << confirm << "')) window.location='" << url << "';\"";
+				s << "href=\"#\" onclick=\"if (window.confirm('" << confirm << "')) window.location='" << url << "';\"";
 			s	<< ">";
 			if (!icon.empty())
 				s << getHTMLImage(icon, caption) << "&nbsp;";

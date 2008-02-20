@@ -84,6 +84,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HTMLList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HTMLList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\HTMLTable.cpp"
 				>
 			</File>

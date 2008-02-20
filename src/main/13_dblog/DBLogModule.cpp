@@ -82,7 +82,7 @@ namespace synthese
 
 		std::string DBLogModule::getName() const
 		{
-			return "Journalisation";
+			return "Journaux";
 		}
 	}
 }
