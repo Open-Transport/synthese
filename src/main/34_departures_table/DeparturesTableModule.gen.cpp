@@ -46,6 +46,7 @@ synthese::departurestable::DisplayScreenRemove::integrate();
 
 synthese::departurestable::DisplayScreenContentRequest::integrate();
 synthese::departurestable::DisplayScreenSupervisionRequest::integrate();
+synthese::departurestable::AlarmTestOnDisplayScreenFunction::integrate();
 
 synthese::departurestable::ArrivalDepartureTableRight::integrate();
 synthese::departurestable::DisplayMaintenanceRight::integrate();

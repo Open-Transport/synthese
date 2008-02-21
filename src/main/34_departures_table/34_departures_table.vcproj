@@ -161,6 +161,14 @@
 			Name="18 Functions"
 			>
 			<File
+				RelativePath=".\AlarmTestOnDisplayScreenFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AlarmTestOnDisplayScreenFunction.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DisplayScreenContentRequest.cpp"
 				>
 			</File>

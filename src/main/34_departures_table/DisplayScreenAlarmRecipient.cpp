@@ -21,6 +21,7 @@
 */
 
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
+#include "34_departures_table/AlarmTestOnDisplayScreenFunction.h"
 
 #include <vector>
 
@@ -119,7 +120,24 @@ namespace synthese
 			vector<shared_ptr<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreenTableSync,DisplayScreen> (alarm, this->getFactoryKey());
 			set<uid> usedDisplayScreens;
 
-			if (!dsv.empty())
+			FunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(&addRequest);
+			testRequest.getFunction()->setAlarmId(alarm->getId());
+
+			stream << "<h2>Test du message</h2>";
+			
+			HTMLForm testForm(testRequest.getHTMLForm("testForm"));
+			stream << testForm.open() << "<p>";
+			stream << "Type d'afficheur à tester : " << testForm.getSelectInput(AlarmTestOnDisplayScreenFunction::PARAMETER_DISPLAY_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(), static_cast<uid>(UNKNOWN_VALUE));
+			stream << testForm.getSubmitOnPopupLink(HTMLModule::getHTMLImage("accept.png", "OK"), 800, 600);
+			stream << "</p>" << testForm.close();
+
+			stream << "<h2>Afficheurs destinataires</h2>";
+
+			if (dsv.empty())
+			{
+				stream << "<p>Aucun afficheur destinataire</p>";
+			}
+			else
 			{
 				HTMLList l;
 				stream << l.open();
@@ -141,7 +159,7 @@ namespace synthese
 				stream << l.close();
 			}
 
-			stream << "<p>Ajout d'afficheur</p>";
+			stream << "<h2>Recherche d'afficheur à ajouter</h2>";
 
 			string searchCity(parameters.getString(PARAMETER_SEARCH_CITY_NAME, false, FACTORY_KEY));
 			string searchStop(parameters.getString(PARAMETER_SEARCH_STOP_NAME, false, FACTORY_KEY));
@@ -171,7 +189,7 @@ namespace synthese
 			v1.push_back(make_pair(string(), "Add"));
 			ResultHTMLTable t1(v1,searchRequest.getHTMLForm(), ResultHTMLTable::RequestParameters(), ResultHTMLTable::ResultParameters());
 
-			stream << "<p>Résultats de la recherche :</p>";
+			stream << "<h2>Résultats de la recherche :</h2>";
 
 			stream << t1.open();
 

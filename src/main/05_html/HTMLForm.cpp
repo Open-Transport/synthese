@@ -430,5 +430,21 @@ namespace synthese
 				<< " />";
 			return s.str();
 		}
+
+		std::string HTMLForm::getSubmitOnPopupLink( const std::string& content, int width, int height )
+		{
+			stringstream s;
+			s	<< HTMLModule::GetHTMLJavascriptOpen()
+				<< "function pop_" << _name << "() {"
+				<< "my_form = eval(" << _name << ");"
+				<< "window.open(\"" << _action << "?\",\"" << _name << "popup\",\"height=" << height << ",width=" << width << ",menubar='no',toolbar='no',location='no',status='no',scrollbars='no'\");"
+				<< "my_form.target = \"" << _name << "popup\";"
+				<< "my_form.submit();}"
+				<< HTMLModule::GetHTMLJavascriptClose()
+				<< "<a href=\"#\" onclick=\"pop_" << _name << "();\">"
+				<< content
+				<< "</a>";
+			return s.str();
+		}
 	}
 }

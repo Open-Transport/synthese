@@ -275,6 +275,8 @@ namespace synthese
 					@todo integrate language parameter to internationalize the labels
 			*/
 			std::string getOuiNonRadioInput(const std::string& name, bool value);
+
+			std::string getSubmitOnPopupLink(const std::string& content, int width, int height);
 		};
 
 

@@ -41,6 +41,9 @@ namespace synthese
 		class AdminPagePositionInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagePositionInterfaceElement>
 		{
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_normalSeparator;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_lastSeparator;
+
 		public:
 			/** Controls and store the internals parameters.
 			@param vel Parameters list to read

@@ -31,6 +31,7 @@
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminPagePositionInterfaceElement.h"
+#include "32_admin/AdminParametersException.h"
 
 using namespace boost;
 using namespace std;
@@ -52,22 +53,29 @@ namespace synthese
 	{
 		void AdminPagePositionInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
 		{
-
+			if (vel.size() < 2)
+				throw AdminParametersException("2 arguments needed");
+			_normalSeparator = vel.front();
+			_lastSeparator = vel.front();
 		}
 
 		std::string AdminPagePositionInterfaceElement::display(
 			ostream& stream
-			, const ParametersVector&
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
 			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
+			string normalSeparator(_normalSeparator->getValue(parameters, variables, object, request));
+			string lastSeparator(_lastSeparator->getValue(parameters, variables, object, request));
 
 			const AdminInterfaceElement::PageLinks& links((*page)->getTreePosition(static_cast<const server::FunctionRequest<AdminRequest>*>(request)));
 
 			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
 			{
-				if (it != links.begin())
-					stream << "&nbsp;&gt;&nbsp;";
+				if (it == links.end()-1)
+					stream << lastSeparator;
+				else if (it != links.begin())
+					stream << normalSeparator;
 
 				stream << HTMLModule::getHTMLImage(it->icon, it->name);
 				if (it != (links.end() -1))
