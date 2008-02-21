@@ -65,7 +65,7 @@ namespace synthese
 
 	namespace util
 	{
-		const string FactorableTemplate<Function, departurestable::AlarmTestOnDisplayScreenFunction>::FACTORY_KEY("AlarmTestOnDisplayScreenFunction");
+		template<> const string FactorableTemplate<Function, departurestable::AlarmTestOnDisplayScreenFunction>::FACTORY_KEY("AlarmTestOnDisplayScreenFunction");
 	}
 
 	namespace departurestable
