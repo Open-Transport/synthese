@@ -437,7 +437,7 @@ namespace synthese
 			s	<< HTMLModule::GetHTMLJavascriptOpen()
 				<< "function pop_" << _name << "() {"
 				<< "my_form = eval(" << _name << ");"
-				<< "window.open(\"" << _action << "?\",\"" << _name << "popup\",\"height=" << height << ",width=" << width << ",menubar='no',toolbar='no',location='no',status='no',scrollbars='no'\");"
+				<< "window.open(\"" << _action << "?\",\"" << _name << "popup\",\"height=" << height << ",width=" << width << ",menubar='no',toolbar='no',location='no',status='no',scrollbars='no',resizable=1\");"
 				<< "my_form.target = \"" << _name << "popup\";"
 				<< "my_form.submit();}"
 				<< HTMLModule::GetHTMLJavascriptClose()

@@ -29,6 +29,7 @@
 #include "30_server/QueryString.h"
 
 #include "17_messages/Alarm.h"
+#include "17_messages/SingleSentAlarm.h"
 #include "17_messages/AlarmTableSync.h"
 
 #include "34_departures_table/DisplayType.h"
@@ -40,10 +41,14 @@
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageException.h"
 
+#include "04_time/DateTime.h"
+
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/ServicePointer.h"
 #include "15_env/Line.h"
 #include "15_env/LineStop.h"
+#include "15_env/City.h"
+#include "15_env/CommercialLine.h"
 
 #include "AlarmTestOnDisplayScreenFunction.h"
 
@@ -56,6 +61,7 @@ namespace synthese
 	using namespace messages;
 	using namespace env;
 	using namespace interfaces;
+	using namespace time;
 
 	namespace util
 	{
@@ -78,7 +84,7 @@ namespace synthese
 		void AlarmTestOnDisplayScreenFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-
+			setAlarmId(id);
 
 			id = map.getUid(PARAMETER_DISPLAY_TYPE_ID, true, FACTORY_KEY);
 			try
@@ -97,22 +103,39 @@ namespace synthese
 			{
 				ArrivalDepartureListWithAlarm displayedObject;
 
+				auto_ptr<City> city(new City);
+				city->setName("CITY");
 				auto_ptr<PublicTransportStopZoneConnectionPlace> place(new PublicTransportStopZoneConnectionPlace);
 				place->setName("TEST");
+				place->setCity(city.get());
 				vector<const PublicTransportStopZoneConnectionPlace*> places;
 				places.push_back(place.get());
+				places.push_back(place.get());
+				auto_ptr<CommercialLine> cline(new CommercialLine);
+				cline->setShortName("00");
 				auto_ptr<Line> line(new Line);
+				line->setCommercialLine(cline.get());
 				auto_ptr<LineStop> lineStop(new LineStop);
 				lineStop->setLine(line.get());
-				ServicePointer sp(ServicePointer::DEPARTURE_TO_ARRIVAL,lineStop.get());
+				DateTime d(TIME_CURRENT);
 				
 
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
+					ServicePointer sp(ServicePointer::DEPARTURE_TO_ARRIVAL,lineStop.get());
+					sp.setActualTime(d);
 					DeparturesTableElement dte(sp, false);
 					displayedObject.map.insert(make_pair(dte, places));
+					d += 1;
 				}
-				displayedObject.alarm = _alarm.get();
+
+				auto_ptr<SingleSentAlarm> alarm(new SingleSentAlarm);
+				alarm->setShortMessage(_alarm->getShortMessage());
+				alarm->setLongMessage(_alarm->getLongMessage());
+				alarm->setLevel(_alarm->getLevel());
+				alarm->setIsEnabled(true);
+
+				displayedObject.alarm = alarm.get();
 				const DeparturesTableInterfacePage* page(_type->getInterface()->getPage<DeparturesTableInterfacePage>());
 				VariablesMap variables;
 
