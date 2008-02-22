@@ -83,7 +83,7 @@ namespace synthese
 
 		std::string ArrivalDepartureTableLog::getName() const
 		{
-			return "SAI : Administration";
+			return "SAI : Afficheurs";
 		}
 
 		void ArrivalDepartureTableLog::addRemoveEntry(
