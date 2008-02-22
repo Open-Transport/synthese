@@ -29,6 +29,7 @@
 
 #include "01_util/ModuleClass.h"
 #include "01_util/UId.h"
+#include "01_util/FactorableTemplate.h"
 
 #include "07_lex_matcher/LexicalMatcher.h"
 
@@ -247,7 +248,7 @@ namespace synthese
 
 		/** 15 Transport network module class.
 		*/
-		class EnvModule : public util::ModuleClass
+		class EnvModule : public util::FactorableTemplate<util::ModuleClass, EnvModule>
 		{
 		private:
 

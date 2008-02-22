@@ -738,6 +738,30 @@
 		<Filter
 			Name="14 AdminInterfaceElement"
 			>
+			<File
+				RelativePath=".\CommercialLineAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CommercialLineAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LineAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LineAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TransportNetworkAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TransportNetworkAdmin.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="11 InterfacePage"

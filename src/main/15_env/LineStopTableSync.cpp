@@ -92,6 +92,9 @@ namespace synthese
 			ls->setIsArrival(isArrival);
 			ls->setIsDeparture(isDeparture);
 			ls->setRankInPath(rankInPath);
+			
+			if (rows->getColumnIndex (LineStopTableSync::COL_SCHEDULEINPUT) != UNKNOWN_VALUE)
+				ls->setScheduleInput(rows->getBool(LineStopTableSync::COL_SCHEDULEINPUT));
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::_link(LineStop* obj, const SQLiteResultSPtr& rows, GetSource temporary)
@@ -162,58 +165,19 @@ namespace synthese
 			addTableIndex(COL_PHYSICALSTOPID);
 		}
 
-/*		void LineStopTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				if (LineStop::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					load(LineStop::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
-				}
-				else
-				{
-					LineStop* object(new LineStop);
-					load(object, rows);
-					object->store();
-				}
-			}
-		}
-		
-		void LineStopTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (LineStop::Contains(id))
-				{
-					shared_ptr<LineStop> object = LineStop::GetUpdateable(id);
-					load(object.get(), rows);
-				}
-			}
-		}
 
-		void LineStopTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (LineStop::Contains(id))
-				{
-					LineStop::Remove(id);
-				}
-			}
-		}
-*/
-		std::vector<shared_ptr<LineStop> > LineStopTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		std::vector<shared_ptr<LineStop> > LineStopTableSync::search(
+			uid lineId
+			, int first /*= 0*/
+			, int number /*= 0*/
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				<< " WHERE " << COL_LINEID << "=" << lineId
+				<< " ORDER BY " << COL_RANKINPATH
 				;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
@@ -228,6 +192,7 @@ namespace synthese
 				{
 					shared_ptr<LineStop> object(new LineStop());
 					load(object.get(), rows);
+					link(object.get(), rows, GET_AUTO);
 					objects.push_back(object);
 				}
 				return objects;

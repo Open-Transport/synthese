@@ -132,12 +132,12 @@ namespace synthese
 
 			if (pages.pageLink == currentPage.getPageLink())
 			{
-				str << HTMLModule::getHTMLImage(currentPage.getPageLink().icon, currentPage.getPageLink().name)
+				str << HTMLModule::getHTMLImage(currentPage.getPageLink().icon, std::string())
 					<< currentPage.getPageLink().name;
 			}
 			else
 			{
-				str << HTMLModule::getHTMLImage(pages.pageLink.icon, pages.pageLink.name)
+				str << HTMLModule::getHTMLImage(pages.pageLink.icon, std::string())
 					<< HTMLModule::getHTMLLink(pages.pageLink.getURL(request), pages.pageLink.name);
 			}
 			str << (pages.isNodeOpened ? _subpagesIntroducerIfOpened : _subpagesIntroducerIfClosed);

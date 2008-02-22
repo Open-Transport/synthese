@@ -54,6 +54,12 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 
+	namespace util
+	{
+		template<>
+		const string FactorableTemplate<ModuleClass,env::EnvModule>::FACTORY_KEY("35_env");
+	}
+
     namespace env
     {
 		LexicalMatcher<uid>				EnvModule::_citiesMatcher; //!< @todo To be moved in transportwebsite::Site
@@ -221,7 +227,7 @@ namespace synthese
 
 		std::string EnvModule::getName() const
 		{
-			return  "Modélisation transport public";
+			return  "Réseaux de transport public";
 		}
     }
 }

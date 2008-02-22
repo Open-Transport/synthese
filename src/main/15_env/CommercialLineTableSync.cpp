@@ -163,7 +163,7 @@ namespace synthese
 
 
 		std::vector<shared_ptr<CommercialLine> > CommercialLineTableSync::search(
-			const TransportNetwork* network
+			uid networkId
 			, std::string name
 			, int first
 			, int number
@@ -177,8 +177,8 @@ namespace synthese
 				<< " SELECT l.*"
 				<< " FROM " << TABLE_NAME << " AS l "
 				<< " WHERE 1 ";
-			if (network)
-				query << " AND l." << COL_NETWORK_ID << "=" << network->getKey();
+			if (networkId != UNKNOWN_VALUE)
+				query << " AND l." << COL_NETWORK_ID << "=" << networkId;
 			if (name.empty())
 				query << " AND l." << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
 			if (orderByNetwork)
@@ -200,6 +200,7 @@ namespace synthese
 				{
 					shared_ptr<CommercialLine> object(new CommercialLine());
 					load(object.get(), rows);
+					link(object.get(), rows, GET_AUTO);
 					objects.push_back(object);
 				}
 				return objects;

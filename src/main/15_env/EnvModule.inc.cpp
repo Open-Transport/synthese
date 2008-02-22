@@ -34,3 +34,9 @@
 #include "15_env/ScheduledServiceTableSync.h"
 #include "15_env/ServiceDateTableSync.h"
 #include "15_env/TransportNetworkTableSync.h"
+
+#include "15_env/TransportNetworkAdmin.h"
+#include "15_env/CommercialLineAdmin.h"
+#include "15_env/LineAdmin.h"
+
+#include "15_env/EnvModule.h"

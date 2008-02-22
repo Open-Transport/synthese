@@ -62,8 +62,10 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<LineStop> > search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+				uid lineId
+				, int first = 0
+				, int number = 0
+			);
 		};
 	}
 }

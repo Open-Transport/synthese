@@ -53,6 +53,7 @@ namespace synthese
 			, Edge (isDeparture, isArrival, line, rankInPath)
 			, _physicalStop (physicalStop)
 			, _metricOffset (metricOffset)
+			, _scheduleInput(true)
 		{
 		}
 
@@ -144,6 +145,16 @@ namespace synthese
 		const PublicTransportStopZoneConnectionPlace* LineStop::getConnectionPlace() const
 		{
 			return static_cast<const PublicTransportStopZoneConnectionPlace*>(Edge::getConnectionPlace());
+		}
+
+		void LineStop::setScheduleInput( bool value )
+		{
+			_scheduleInput = value;
+		}
+
+		bool LineStop::getScheduleInput() const
+		{
+			return _scheduleInput;
 		}
 	}
 }

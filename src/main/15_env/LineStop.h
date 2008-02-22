@@ -50,6 +50,7 @@ namespace synthese
 			const PhysicalStop*  _physicalStop;   //!< Physical stop
 
 			double _metricOffset;      //!< Metric offset of stop on line
+			bool	_scheduleInput;
 
 
 		public:
@@ -68,9 +69,10 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const PhysicalStop*	getPhysicalStop() const;
-				double				getMetricOffset () const;
-				Line*				getLine() const;
+				const PhysicalStop*	getPhysicalStop()	const;
+				double				getMetricOffset ()	const;
+				Line*				getLine()			const;
+				bool				getScheduleInput()	const;
 			//@}
 				
 			//!	@name Setters
@@ -84,7 +86,7 @@ namespace synthese
 				*/
 				void				setPhysicalStop(PhysicalStop* stop);
 
-
+				void				setScheduleInput(bool value);
 				void				setMetricOffset (double metricOffset);
 				void				setLine(const Line* line);
 			//@}

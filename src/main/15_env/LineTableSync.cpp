@@ -205,17 +205,23 @@ namespace synthese
 		}
 
 
-		std::vector<shared_ptr<Line> > LineTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		std::vector<shared_ptr<Line> > LineTableSync::search(
+			uid commercialLineId
+			, int first /*= 0*/
+			, int number /*= 0*/
+			, bool orderByName
+			, bool raisingOrder
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< " WHERE 1 ";
+			if (commercialLineId != UNKNOWN_VALUE)
+				query << " AND " << COL_COMMERCIAL_LINE_ID << "=" << commercialLineId;
+			if (orderByName)
+				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -229,6 +235,7 @@ namespace synthese
 				{
 					shared_ptr<Line> object(new Line());
 					load(object.get(), rows);
+					link(object.get(), rows, GET_AUTO);
 					objects.push_back(object);
 				}
 				return objects;
