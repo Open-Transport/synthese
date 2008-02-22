@@ -25,6 +25,7 @@
 #define SYNTHESE_VinciCustomerSearchAdminInterfaceElement_H__
 
 #include <vector>
+#include <utility>
 
 #include "05_html/ActionResultHTMLTable.h"
 
@@ -45,7 +46,7 @@ namespace synthese
 			static const std::string PARAM_SEARCH_NAME;
 			static const std::string PARAM_SEARCH_SURNAME;
 			static const std::string PARAM_SEARCH_FILTER;
-
+			
 
 		private:
 
@@ -58,6 +59,8 @@ namespace synthese
 				, FILTER_ALL_PROBLEMS
 				, FILTER_CONTRACTED_GUARANTEE
 			} _Filter;
+
+			static std::vector<std::pair<_Filter, std::string> > _GetFilterNames();
 
 			std::vector<boost::shared_ptr<VinciContract> >	_contracts;
 			std::string										_searchName;

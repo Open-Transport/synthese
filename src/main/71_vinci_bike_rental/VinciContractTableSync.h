@@ -71,13 +71,18 @@ namespace synthese
 			static std::vector<boost::shared_ptr<VinciContract> > search(
 				std::string name = std::string()
 				, std::string surname = std::string()
+				, bool lateFilter = false
+				, bool dueFilter = false
+				, bool outdatedGuarantee = false
+				, bool contractedGuarantee = false
 				, int first = 0
 				, int number = -1
 				, bool orderByNameAndSurname = true
 				, bool orderBySurnameAndName = false
 				, bool orderByLate = false
+				, bool orderByDue = false
 				, bool raisingOrder = true
-				);
+			);
 
 			static std::vector<boost::shared_ptr<accounts::TransactionPart> > getBikeRentTransactionParts(boost::shared_ptr<const VinciContract> contract);
 

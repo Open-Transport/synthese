@@ -63,8 +63,9 @@ namespace synthese
 
 	namespace vinci
 	{
-		const string VinciCustomerSearchAdminInterfaceElement::PARAM_SEARCH_NAME = "searchname";
-		const string VinciCustomerSearchAdminInterfaceElement::PARAM_SEARCH_SURNAME = "searchsurname";
+		const string VinciCustomerSearchAdminInterfaceElement::PARAM_SEARCH_NAME = "sn";
+		const string VinciCustomerSearchAdminInterfaceElement::PARAM_SEARCH_SURNAME = "ss";
+		const string VinciCustomerSearchAdminInterfaceElement::PARAM_SEARCH_FILTER = "sf";
 
 		VinciCustomerSearchAdminInterfaceElement::VinciCustomerSearchAdminInterfaceElement()
 			: AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>() {}
@@ -93,7 +94,7 @@ namespace synthese
 			stream << st.open();
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
 			stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname));
-//			stream << st.cell("Filtre", st.getForm().getSelectInput(PARAM_SEARCH_FILTER, filters, _searchFilter));
+			stream << st.cell("Filtre", st.getForm().getSelectInput(PARAM_SEARCH_FILTER, _GetFilterNames(), _searchFilter));
 			stream << st.close();
 
 			stream << "<h1>Résultat de la recherche</h1>";
@@ -103,6 +104,8 @@ namespace synthese
 			h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(PARAM_SEARCH_SURNAME, "Prénom"));
 			h.push_back(make_pair(string(), "Retard"));
+			h.push_back(make_pair(string(), "Solde"));
+			h.push_back(make_pair(string(), "Caution retard"));
 			ActionResultHTMLTable t(h, st.getForm(), _requestParameters, _resultParameters, addContractRequest.getHTMLForm("add"));
 			stream << t.open();
 			if (_contracts.size() == 0)
@@ -120,6 +123,8 @@ namespace synthese
 					stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getName());
 					stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getSurname());
 					stream << t.col() << (*it)->getLate().toString();
+					stream << t.col() << (*it)->getDue();
+					stream << t.col() << (*it)->getOutDatedGuarantee().toString();
 				}
 			}
 			if (_activeSearch)
@@ -138,6 +143,8 @@ namespace synthese
 
 			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
 
+			_searchFilter = static_cast<_Filter>(map.getInt(PARAM_SEARCH_FILTER, false, FACTORY_KEY));
+
 			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAM_SEARCH_NAME, 30);
 
 			_activeSearch = !_searchName.empty() || !_searchSurname.empty();
@@ -145,10 +152,15 @@ namespace synthese
 			_contracts = VinciContractTableSync::search(
 				_searchName
 				, _searchSurname
+				, _searchFilter == FILTER_ONLATE
+				, _searchFilter == FILTER_DUE
+				, _searchFilter == FILTER_OUTDATED_GUARANTEE
+				, _searchFilter == FILTER_CONTRACTED_GUARANTEE
 				, _requestParameters.first
 				, _requestParameters.maxSize
 				, _requestParameters.orderField == PARAM_SEARCH_NAME
 				, _requestParameters.orderField == PARAM_SEARCH_SURNAME
+				, _requestParameters.orderField == PARAM_SEARCH_FILTER
 				, _requestParameters.raisingOrder
 			);
 
@@ -182,6 +194,18 @@ namespace synthese
 				links.push_back(getPageLink());
 			}
 			return links;
+		}
+
+		std::vector<std::pair<VinciCustomerSearchAdminInterfaceElement::_Filter, std::string> > VinciCustomerSearchAdminInterfaceElement::_GetFilterNames()
+		{
+			std::vector<std::pair<VinciCustomerSearchAdminInterfaceElement::_Filter, std::string> > filters;
+			filters.push_back(make_pair(FILTER_NONE, "Aucun filtre"));
+			filters.push_back(make_pair(FILTER_ONLATE, "Clients en retard"));
+			filters.push_back(make_pair(FILTER_DUE, "Clients débiteurs"));
+			filters.push_back(make_pair(FILTER_OUTDATED_GUARANTEE, "Cautions périmées"));
+			filters.push_back(make_pair(FILTER_ALL_PROBLEMS, "Tous problèmes"));
+			filters.push_back(make_pair(FILTER_CONTRACTED_GUARANTEE, "Cautions spéciales"));
+			return filters;
 		}
 	}
 }

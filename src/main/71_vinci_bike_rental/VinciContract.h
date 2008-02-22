@@ -66,7 +66,10 @@ namespace synthese
 			uid				_siteId;
 			time::DateTime	_date;
 			std::string		_passport;
+
 			time::DateTime	_late;
+			double			_due;
+			time::DateTime	_outDatedGuarantee;
 			
 		public:
 			VinciContract(uid id=0);
@@ -78,15 +81,19 @@ namespace synthese
 				void setDate(const time::DateTime& date);
 				void setPassport(const std::string& text);
 				void setLate(const time::DateTime& date);
+				void setDue(double value);
+				void setOutDatedGuarantee(const time::DateTime& date);
 			//@}
 
 			//! \name Getters
 			//@{
-				uid						getUserId()		const;
-				uid						getSiteId()		const;
-				const time::DateTime&	getDate()		const;
-				const std::string&		getPassport()	const;
-				const time::DateTime&	getLate()		const;
+				uid						getUserId()				const;
+				uid						getSiteId()				const;
+				const time::DateTime&	getDate()				const;
+				const std::string&		getPassport()			const;
+				const time::DateTime&	getLate()				const;
+				double					getDue()				const;
+				const time::DateTime&	getOutDatedGuarantee()	const;
 			//@}
 
 			//! \name Queries

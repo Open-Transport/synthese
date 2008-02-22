@@ -35,6 +35,7 @@
 #include "57_accounting/TransactionTableSync.h"
 #include "57_accounting/TransactionPartTableSync.h"
 #include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
 
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
@@ -123,39 +124,72 @@ namespace synthese
 		std::vector<shared_ptr<VinciContract> > VinciContractTableSync::search(
 			std::string name /*= ""*/
 			, std::string surname /*= "" */
+			, bool lateFilter
+			, bool dueFilter
+			, bool outdatedGuaranteeFilter
+			, bool contractedGuarantee
 			, int first /*= 0*/
 			, int number /*=-1*/ 
 			, bool orderByNameAndSurname
 			, bool orderBySurnameAndName
 			, bool orderByLate
+			, bool orderByDue
 			, bool raisingOrder
 		){
 			DateTime yesterday(TIME_CURRENT);
 			yesterday -= 1;
+			DateTime oneMonthBefore(TIME_CURRENT);
+			oneMonthBefore -= 31;
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< "SELECT *"
 				<< ",(SELECT MAX(t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") FROM " 
-					<< TransactionPartTableSync::TABLE_NAME << " AS p INNER JOIN " 
-					<< TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
-					<< " WHERE t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
-					<< " AND p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE)->getKey()
-					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << " IS NULL "
-					<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<" << yesterday.toSQLString()
+						<< TransactionPartTableSync::TABLE_NAME << " AS p "
+						<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
+					<< " WHERE "
+						<< " t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
+						<< " AND p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE)->getKey()
+						<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << " IS NULL "
+						<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<" << yesterday.toSQLString()
 					<< ") AS ret"
-				<< " FROM "
+					<< ",SUM(stp." << TransactionPartTableSync::TABLE_COL_RIGHT_CURRENCY_AMOUNT << ") AS solde"
+					<< ",MAX(tg." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") FROM "
+						<< TransactionPartTableSync::TABLE_NAME << " AS tpg "
+						<< " INNER JOIN " << TransactionTableSync::TABLE_COL_NAME << " AS tg ON tg." << TABLE_COL_ID << "=tpg." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
+					<< " WHERE " 
+						<< " t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
+						<< " AND p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE)->getKey()
+						<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << " IS NULL "
+						<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<" << oneMonthBefore.toSQLString()
+					<< ") AS gua"
+				;
+			query << " FROM "
 					<< TABLE_NAME << " AS c "
 					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << COL_USER_ID << "=u." << TABLE_COL_ID
+					<< " LEFT JOIN " << TransactionTableSync::TABLE_NAME << " AS st ON st." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
+					<< " LEFT JOIN " << TransactionPartTableSync::TABLE_NAME << " AS stp ON stp." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE)->getKey() << " AND stp." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=st." << TABLE_COL_ID
+
 				<< " WHERE "
 					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '" << Conversion::ToSQLiteString(name, false) << "%'"
-					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '" << Conversion::ToSQLiteString(surname, false) << "%'";
+					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '" << Conversion::ToSQLiteString(surname, false) << "%'"
+				;
+
+			query
+				<< " GROUP BY u." << TABLE_COL_ID;
+
+			if (lateFilter)
+				query << " HAVING ret IS NOT NULL";
+			if (dueFilter)
+				query << " HAVING solde < 0";
+			if (outdatedGuaranteeFilter)
+				query << " HAVING gua IS NOT NULL";
 			if (orderByNameAndSurname)
-				query << " ORDER BY " << UserTableSync::TABLE_COL_NAME << "," << UserTableSync::TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY u." << UserTableSync::TABLE_COL_NAME << ",u." << UserTableSync::TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderBySurnameAndName)
-				query << " ORDER BY " << UserTableSync::TABLE_COL_SURNAME << "," << UserTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY u." << UserTableSync::TABLE_COL_SURNAME << ",u." << UserTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByLate)
-				query << " ORDER BY ret" << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY ret" << (raisingOrder ? " DESC" : " ASC");
 			if (number > 0)
 				query << " LIMIT " << (number + 1);
 			if (first)
@@ -171,6 +205,10 @@ namespace synthese
 					contract->getUser();
 					DateTime late(DateTime::FromSQLTimestamp(rows->getText("ret")));
 					contract->setLate(late);
+					contract->setDue(rows->getDouble("solde"));
+					DateTime outdatedGuarantee(DateTime::FromSQLTimestamp(rows->getText("gua")));
+					contract->setOutDatedGuarantee(outdatedGuarantee);
+
 					contracts.push_back(contract);
 				}
 				catch (UserTableSyncException e)

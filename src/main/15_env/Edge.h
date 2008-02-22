@@ -109,7 +109,6 @@ namespace synthese
 				void	setRankInPath(int value);
 				void	setParentPath(const Path* path);
 				void	setNextInPath (const Edge* nextInPath);
-				void	setPreviousDeparture ( const Edge* previousDeparture);
 				void	setPreviousConnectionDeparture( const Edge* previousConnectionDeparture);
 				void	setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture);
 				void	setFollowingConnectionArrival( const Edge* followingConnectionArrival);
@@ -135,8 +134,6 @@ namespace synthese
 				double getLength () const;
 
 				const Edge* getNextInPath () const;
-
-				const Edge* getPreviousDeparture () const;
 
 				const Edge* getPreviousConnectionDeparture () const;
 

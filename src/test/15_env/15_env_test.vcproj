@@ -24,7 +24,7 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../../../vsscons build -Dtarget=src/test/15_env"
+				BuildCommandLine="cd ../../..&#x0D;&#x0A;ant -Dtarget=src/test/15_env"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/test/$(RootNamespace)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/test/$(RootNamespace)"
 				Output="../../../build/win32/vc-8_0/$(ConfigurationName)/test/15_env/$(InputName).exe"
@@ -61,16 +61,14 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+		<File
+			RelativePath=".\CalendarTest.cpp"
 			>
-			<File
-				RelativePath=".\CalendarTest.cpp"
-				>
-			</File>
-		</Filter>
+		</File>
+		<File
+			RelativePath=".\EdgeTest.cpp"
+			>
+		</File>
 		<File
 			RelativePath=".\SConscript"
 			>

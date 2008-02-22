@@ -58,6 +58,7 @@ namespace synthese
 			: Registrable<uid, VinciContract>(id)
 			, _date(TIME_UNKNOWN)
 			, _late(TIME_UNKNOWN)
+			, _outDatedGuarantee(TIME_UNKNOWN)
 		{}
 
 		void VinciContract::setUserId(uid id)
@@ -178,6 +179,26 @@ namespace synthese
 		const time::DateTime& VinciContract::getLate() const
 		{
 			return _late;
+		}
+
+		void VinciContract::setDue(double value )
+		{
+			_due = value;
+		}
+
+		double VinciContract::getDue() const
+		{
+			return _due;
+		}
+
+		void VinciContract::setOutDatedGuarantee( const time::DateTime& date )
+		{
+			_outDatedGuarantee = date;
+		}
+
+		const time::DateTime& VinciContract::getOutDatedGuarantee() const
+		{
+			return _outDatedGuarantee;
 		}
 	}
 }

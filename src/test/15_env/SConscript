@@ -1,6 +1,6 @@
 Import ('env')
 
-modules = ['15_env', '07_lex_matcher', '04_time', '02_db', '01_util'];
+modules = ['15_env', '14_geography', '07_lex_matcher', '06_geometry', '04_time', '02_db', '01_util'];
 
 unittestenv = env.UnitTestEnv (modules)
 unittestenv.UnitTest ()
