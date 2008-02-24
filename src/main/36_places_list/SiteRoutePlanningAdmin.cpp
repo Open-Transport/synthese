@@ -139,9 +139,11 @@ namespace synthese
 			endDate++;
 
 			// Route planning
+			const Place* startPlace(_site->fetchPlace(_startCity, _startPlace));
+			const Place* endPlace(_site->fetchPlace(_endCity, _endPlace));
 			RoutePlanner r(
-				_site->fetchPlace(_startCity, _startPlace)
-				, _site->fetchPlace(_endCity, _endPlace)
+				startPlace
+				, endPlace
 				, _site->getAccessParameters(_accessibility)
 				, PlanningOrder()
 				, _dateTime
@@ -152,18 +154,18 @@ namespace synthese
 
 			if (jv.journeys.empty())
 			{
-				stream << "Aucun résultat trouvé.";
+				stream << "Aucun résultat trouvé de " << startPlace->getFullName() << " à " << endPlace->getFullName();
 				return;
 			}
 			
 			HTMLTable::ColsVector v;
-			v.push_back("Dép<br />" + _startCity + "<br />"+ _startPlace);
+			v.push_back("Départ<br />" + startPlace->getFullName());
 			v.push_back("Ligne");
-			v.push_back("Arr");
+			v.push_back("Arrivée");
 			v.push_back("Correspondance");
-			v.push_back("Dép");
+			v.push_back("Départ");
 			v.push_back("Ligne");
-			v.push_back("Arr<br />" + _endCity + "<br />"+ _endPlace);
+			v.push_back("Arrivée<br />" + endPlace->getFullName());
 			HTMLTable t(v,"adminresults");
 
 			int solution(1);
