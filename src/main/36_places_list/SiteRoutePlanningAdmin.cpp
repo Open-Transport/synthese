@@ -197,12 +197,15 @@ namespace synthese
 				// Line
 				const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
 				const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-				stream << t.col((its == ((*it)->getServiceUses().end() -1)) ? 5 : 1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-				
+				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
 				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName());
 
 				// Transfers
-				if (its != (*it)->getServiceUses().end() -1)
+				if (its == (*it)->getServiceUses().end() -1)
+				{
+					stream << t.col(4) << "(trajet direct)";
+				}
+				else
 				{
 					while(true)
 					{
