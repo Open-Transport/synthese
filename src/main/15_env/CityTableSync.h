@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "02_db/SQLiteAutoRegisterTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -43,7 +43,7 @@ namespace synthese
 			- on update : update entry in associator
 			- on delete : X
 		*/
-		class CityTableSync : public db::SQLiteRegistryTableSyncTemplate<CityTableSync,City>
+		class CityTableSync : public db::SQLiteAutoRegisterTableSyncTemplate<CityTableSync,City>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;

@@ -184,34 +184,6 @@
 			Name="00 Factory"
 			>
 			<File
-				RelativePath=".\SQLiteDirectTableSyncTemplate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteInheritanceTableSyncTemplate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteInheritedNoSyncTableSyncTemplate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteInheritedRegistryTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteInheritedTableSyncTemplate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteNoSyncTableSyncTemplate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteRegistryTableSyncTemplate.h"
-				>
-			</File>
-			<File
 				RelativePath=".\SQLiteTableSync.cpp"
 				>
 			</File>
@@ -223,6 +195,46 @@
 				RelativePath=".\SQLiteTableSyncTemplate.h"
 				>
 			</File>
+			<Filter
+				Name="Direct"
+				>
+				<File
+					RelativePath=".\SQLiteAutoRegisterTableSyncTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLiteDirectTableSyncTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLiteNoSyncTableSyncTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLiteRegistryTableSyncTemplate.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Inheritance"
+				>
+				<File
+					RelativePath=".\SQLiteInheritanceTableSyncTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLiteInheritedNoSyncTableSyncTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLiteInheritedRegistryTableSync.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SQLiteInheritedTableSyncTemplate.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="10 Table Sync"

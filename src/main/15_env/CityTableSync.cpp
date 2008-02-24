@@ -75,31 +75,7 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::save(City* object)
 		{
-			/// @todo Implement
-			/*			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() > 0)
-			{
-			query
-			<< "UPDATE " << TABLE_NAME << " SET "
-			<< DisplayTypeTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(object->getName())
-			<< "," << DisplayTypeTableSync::TABLE_COL_INTERFACE_ID << "="  << Conversion::ToString(object->getInterface()->getKey())
-			<< "," << DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER << "="  << Conversion::ToString(object->getRowNumber())
-			<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
-			object->setKey(getId());
-			query
-			<< " INSERT INTO " << TABLE_NAME << " VALUES("
-			<< Conversion::ToString(object->getKey())
-			<< "," << Conversion::ToSQLiteString(object->getName())
-			<< "," << Conversion::ToString(object->getInterface()->getKey())
-			<< "," << Conversion::ToString(object->getRowNumber())
-			<< ")";
-			}
-			sqlite->execUpdate(query.str());
-			*/		
+			/// @todo Implement it
 		}
 	}
 
@@ -109,7 +85,7 @@ namespace synthese
 		const std::string CityTableSync::TABLE_COL_CODE = "code";
 		
 		CityTableSync::CityTableSync ()
-			: SQLiteRegistryTableSyncTemplate<CityTableSync,City> ()
+			: SQLiteAutoRegisterTableSyncTemplate<CityTableSync,City> ()
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER");
 			addTableColumn (TABLE_COL_NAME, "TEXT");
@@ -124,61 +100,5 @@ namespace synthese
 		{
 
 		}
-
-/*		    
-		void 
-			CityTableSync::rowsAdded (synthese::db::SQLite* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		    while (rows->next ())
-		    {
-			uid id = rows->getLongLong (TABLE_COL_ID);
-			
-			if (City::Contains (id)) return;
-			
-			City* city(new City);
-			load (city, rows, true);
-			city->store();
-
-			EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
-		    }
-		}
-
-
-		void 
-			CityTableSync::rowsUpdated (synthese::db::SQLite* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    shared_ptr<City> city = City::GetUpdateable (id);
-			    
-				EnvModule::getCitiesMatcher().remove (city->getName ());
-			    
-			    load(city.get(), rows, true);
-			    
-			    EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
-			}
-		}
-
-
-
-		void 
-			CityTableSync::rowsRemoved (synthese::db::SQLite* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-			    uid id =rows->getLongLong (TABLE_COL_ID);
-			    
-				EnvModule::getCitiesMatcher ().remove (City::Get (id)->getName ());
-			    City::Remove (id);
-			}
-		}
-*/
 	}
 }
