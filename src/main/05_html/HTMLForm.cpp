@@ -60,16 +60,38 @@ namespace synthese
 
 		}
 
-		std::string HTMLForm::getSelectNumberInput(const std::string& name, int mini, int maxi, int value/*=UNKNOWN_VALUE*/, int step )
-		{
+
+
+		std::string HTMLForm::getSelectNumberInput(
+			const std::string& name
+			, int mini
+			, int maxi
+			, int value/*=UNKNOWN_VALUE*/
+			, int step
+			, std::string unknownValueText /*= std::string() */
+		){
+			// Right control
 			if (!_updateRight)
 				return Conversion::ToString(value);
 
-			std::vector<pair<int,int> > m;
-			for (int i=mini; i<=maxi; i += step)
-				m.push_back(std::make_pair(i,i));
+			// Init
+			std::vector<pair<int, string> > m;
+			
+			// Unknown_value choice
+			if (!unknownValueText.empty())
+				m.push_back(make_pair(UNKNOWN_VALUE, unknownValueText));
+
+			// Generation of the suite
+			for (int i((step > 0) ? mini : maxi);
+				(step > 0) ? (i <= maxi) : (i >= mini);
+				i += step)
+				m.push_back(make_pair(i, Conversion::ToString(i)));
+
+			// HTML Code
 			return getSelectInput(name, m, value);
 		}
+
+
 
 		std::string HTMLForm::getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping/*=""*/)
 		{

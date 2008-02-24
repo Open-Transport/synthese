@@ -125,6 +125,7 @@ namespace synthese
 				const time::Date				getMaxUseDate() const;
 				int								getMaxTransportConnectionsCount()	const;
 				const Periods&					getPeriods()	const;
+				const std::string&				getName()							const;
 			//@}
 
 			// \name Modifiers

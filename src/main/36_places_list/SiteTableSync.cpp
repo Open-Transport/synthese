@@ -147,5 +147,48 @@ namespace synthese
 			addTableColumn(COL_USE_DATES_RANGE, "INTEGER", true);
 			addTableColumn(COL_PERIODS, "TEXT", true);
 		}
+
+
+		vector<shared_ptr<Site> > SiteTableSync::search(
+			std::string name
+			, int first /*= 0*/, int number /*= 0*/ 
+			, bool orderByName
+			, bool raisingOrder
+		){
+			SQLite* sqlite = DBModule::GetSQLite();
+
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE 1 ";
+			if (!name.empty())
+			 	query << " AND " << TABLE_COL_NAME << " LIKE '" << Conversion::ToSQLiteString(name, false) << "'";
+				;
+			if (orderByName)
+				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				vector<shared_ptr<Site> > objects;
+				while (rows->next ())
+				{
+					shared_ptr<Site> object(new Site);
+					load(object.get(), rows);
+					link(object.get(), rows, GET_AUTO);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
 	}
 }

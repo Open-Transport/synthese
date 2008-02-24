@@ -144,8 +144,24 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="14 AdminInterfaceElement"
+			Name="14 Admin"
 			>
+			<File
+				RelativePath=".\SiteRoutePlanningAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SiteRoutePlanningAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TransportSiteAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TransportSiteAdmin.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="11 LibraryInterfaceElement"

@@ -26,6 +26,12 @@ using namespace std;
 
 namespace synthese
 {
+	namespace util
+	{
+		template<>
+		const string FactorableTemplate<ModuleClass, routeplanner::RoutePlannerModule>::FACTORY_KEY("53_route_planner");
+	}
+
 	namespace routeplanner
 	{
 

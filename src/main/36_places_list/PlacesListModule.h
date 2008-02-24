@@ -24,8 +24,13 @@
 #ifndef SYNTHESE_PlacesListModule_H__
 #define SYNTHESE_PlacesListModule_H__
 
+#include "36_places_list/Types.h"
+
 #include "01_util/ModuleClass.h"
 #include "01_util/FactorableTemplate.h"
+
+#include <utility>
+#include <vector>
 
 namespace synthese
 {
@@ -72,6 +77,8 @@ namespace synthese
 			void initialize();
 
 			virtual std::string getName() const;
+
+			static std::vector<std::pair<AccessibilityParameter, std::string> >  GetAccessibilityNames();
 		};
 	}
 

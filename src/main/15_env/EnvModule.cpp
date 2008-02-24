@@ -25,6 +25,7 @@
 #include "01_util/Constants.h"
 #include "01_util/Conversion.h"
 #include "01_util/UId.h"
+#include "01_util/T9Filter.h"
 
 #include "15_env/TransportNetworkTableSync.h"
 #include "15_env/TransportNetwork.h"
@@ -45,6 +46,8 @@
 #include "12_security/Constants.h"
 #include "12_security/Right.h"
 
+#include <boost/iostreams/filtering_stream.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -63,6 +66,7 @@ namespace synthese
     namespace env
     {
 		LexicalMatcher<uid>				EnvModule::_citiesMatcher; //!< @todo To be moved in transportwebsite::Site
+		LexicalMatcher<uid>				EnvModule::_citiesT9Matcher; //!< @todo To be moved in transportwebsite::Site
 
 		void EnvModule::initialize()
 		{
@@ -191,23 +195,20 @@ namespace synthese
 
 
 
-		CityList EnvModule::guessCity (const std::string& fuzzyName, int nbMatches)
+		CityList EnvModule::guessCity (const std::string& fuzzyName, int nbMatches, bool t9)
 		{
 			CityList result;
-			LexicalMatcher<uid>::MatchResult matches =  _citiesMatcher.bestMatches (fuzzyName, nbMatches);
+			LexicalMatcher<uid>::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).bestMatches (fuzzyName, nbMatches);
 			for (LexicalMatcher<uid>::MatchResult::iterator it = matches.begin ();
 			 it != matches.end (); ++it)
 			{
-			uid id = it->value;
-			result.push_back (City::Get (id));
+				uid id = it->value;
+				result.push_back (City::Get (id));
 			}
 			return result;
 		}
 
-		lexmatcher::LexicalMatcher<uid>& EnvModule::getCitiesMatcher ()
-		{
-			return _citiesMatcher;
-		}
+
 
 		void EnvModule::getNetworkLinePlaceRightParameterList(ParameterLabelsVector& m)
 		{
@@ -228,6 +229,32 @@ namespace synthese
 		std::string EnvModule::getName() const
 		{
 			return  "Réseaux de transport public";
+		}
+
+		void EnvModule::AddToCitiesMatchers( City* city )
+		{
+			_citiesMatcher.add(city->getName (), city->getKey ());
+			
+			stringstream ss;
+			boost::iostreams::filtering_ostream out;
+			out.push (T9Filter());
+			out.push (ss);
+			out << city->getName() << flush;
+			
+			_citiesT9Matcher.add(ss.str(), city->getKey());
+		}
+
+		void EnvModule::RemoveFromCitiesMatchers( City* city )
+		{
+			_citiesMatcher.remove(city->getName());
+
+			stringstream ss;
+			boost::iostreams::filtering_ostream out;
+			out.push (T9Filter());
+			out.push (ss);
+			out << city->getName() << flush;
+
+			_citiesT9Matcher.remove(ss.str());
 		}
     }
 }

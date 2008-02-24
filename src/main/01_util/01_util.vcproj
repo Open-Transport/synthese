@@ -133,6 +133,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\T9Filter.h"
+					>
+				</File>
+				<File
 					RelativePath=".\WithoutAccentsFilter.h"
 					>
 				</File>

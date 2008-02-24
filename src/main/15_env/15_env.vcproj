@@ -434,6 +434,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Rules"
+				>
+				<File
+					RelativePath=".\NonConcurrencyRule.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\NonConcurrencyRule.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="12 Rights"
@@ -548,6 +560,14 @@
 			</File>
 			<File
 				RelativePath=".\LineTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NonConcurrencyRuleTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NonConcurrencyRuleTableSync.h"
 				>
 			</File>
 			<File

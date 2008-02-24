@@ -22,6 +22,8 @@
 
 #include "PlacesListModule.h"
 
+using namespace std;
+
 namespace synthese
 {
 	template<> const std::string util::FactorableTemplate<util::ModuleClass,transportwebsite::PlacesListModule>::FACTORY_KEY("36_places_list");
@@ -36,6 +38,15 @@ namespace synthese
 		std::string PlacesListModule::getName() const
 		{
 			return "Site web transport public";
+		}
+
+		std::vector<std::pair<AccessibilityParameter, std::string> > PlacesListModule::GetAccessibilityNames()
+		{
+			vector<pair<AccessibilityParameter, string> > result;
+			result.push_back(make_pair(PEDESTRIAN_ACCESSIBILITY, "Piéton"));
+			result.push_back(make_pair(HANDICCAPED_ACCESSIBILITY, "PMR"));
+			result.push_back(make_pair(BIKE_ACCESSIBILITY, "Vélo"));
+			return result;
 		}
 	}
 }

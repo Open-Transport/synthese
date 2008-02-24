@@ -252,7 +252,9 @@ namespace synthese
 		{
 		private:
 
-			static lexmatcher::LexicalMatcher<uid> _citiesMatcher; //!< @todo To be moved in RoutePlanner
+			static lexmatcher::LexicalMatcher<uid> _citiesMatcher; //!< @todo To be moved in 36_transport_website
+			static lexmatcher::LexicalMatcher<uid> _citiesT9Matcher;
+
 
 		public:
 		
@@ -261,8 +263,8 @@ namespace synthese
 			
 
 			/** Fetches a addressable place given its id.
-			All the containers storong objects typed (or subtyped) as AddressablePlace
-			are inspected.
+				All the containers storong objects typed (or subtyped) as AddressablePlace
+				are inspected.
 			*/
 			static boost::shared_ptr<const AddressablePlace> fetchAddressablePlace (const uid& id);
 			static boost::shared_ptr<AddressablePlace> fetchUpdateableAddressablePlace (const uid& id);
@@ -278,8 +280,23 @@ namespace synthese
 			 */
 			static LineSet fetchLines (const uid& commercialLineId);
 
-			static CityList guessCity (const std::string& fuzzyName, int nbMatches = 10);
-			static lexmatcher::LexicalMatcher<uid>& getCitiesMatcher ();
+			/** Find the best matches in the city list comparing to a text entry.
+				@param fuzzyName The text entry to compare
+				@param nbMatches The number of matches to return
+				@param t9 true indicates that the text entry follows the t9 format (optional : default = false)
+				@return synthese::env::CityList The list of results
+				@author Hugues Romain
+				@date 2008
+				
+			*/
+			static CityList guessCity(
+				const std::string& fuzzyName
+				, int nbMatches = 10
+				, bool t9 = false
+			);
+			
+			static void AddToCitiesMatchers(City* city);
+			static void RemoveFromCitiesMatchers(City* city);
 
 
 			static boost::shared_ptr<Path> fetchPath (const uid& id);

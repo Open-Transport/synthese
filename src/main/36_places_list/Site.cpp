@@ -281,5 +281,10 @@ namespace synthese
 
 			return place;		
 		}
+
+		const std::string& Site::getName() const
+		{
+			return _name;
+		}
 	}
 }

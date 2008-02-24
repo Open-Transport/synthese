@@ -34,10 +34,11 @@ namespace synthese
 {
 	namespace transportwebsite
 	{
-		/** InterfaceTableSync SQLite table synchronizer.
+		class Site;
+
+		/** Transport website SQLite table synchronizer.
 			@ingroup m36LS refLS
 		*/
-
 		class SiteTableSync : public db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>
 		{
 		public:
@@ -54,6 +55,25 @@ namespace synthese
 			/** Site SQLite table constructor.
 			*/
 			SiteTableSync();
+
+			/** Site search.
+				(other search parameters)
+				@param first First Site object to answer
+				@param number Number of Site objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<Site> Founded Site objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static std::vector<boost::shared_ptr<Site> > search(
+				std::string name = std::string()
+				, int first = 0
+				, int number = 0
+				, bool orderByName = true
+				, bool raisingOrder = true
+			);
+
+
+
 		};
 	}
 }

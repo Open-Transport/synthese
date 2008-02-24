@@ -1,4 +1,7 @@
 
+synthese::transportwebsite::TransportSiteAdmin::integrate();
+synthese::transportwebsite::SiteRoutePlanningAdmin::integrate();
+
 synthese::transportwebsite::SiteTableSync::integrate();
 
 synthese::transportwebsite::PlacesListModule::integrate();

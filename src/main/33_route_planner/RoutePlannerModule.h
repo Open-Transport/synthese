@@ -25,6 +25,7 @@
 #ifndef SYNTHESE_RoutePlannerModule_H__
 #define SYNTHESE_RoutePlannerModule_H__
 
+#include "01_util/FactorableTemplate.h"
 #include "01_util/ModuleClass.h"
 
 namespace synthese
@@ -72,7 +73,7 @@ namespace synthese
 			@author Hugues Romain
 			@date 2007
 		*/
-		class RoutePlannerModule : public util::ModuleClass
+		class RoutePlannerModule : public util::FactorableTemplate<util::ModuleClass, RoutePlannerModule>
 		{
 		private:
 			

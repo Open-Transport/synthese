@@ -62,12 +62,15 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::_link(City* obj, const SQLiteResultSPtr& rows, GetSource temporary)
 		{
-			EnvModule::getCitiesMatcher ().add (obj->getName (), obj->getKey ());
+			if (temporary == GET_REGISTRY)
+			{
+				EnvModule::AddToCitiesMatchers(obj);
+			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::_unlink(City* obj)
 		{
-			EnvModule::getCitiesMatcher ().remove (obj->getName ());
+			EnvModule::RemoveFromCitiesMatchers(obj);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::save(City* object)
