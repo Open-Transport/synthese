@@ -116,5 +116,59 @@ namespace synthese
 		{
 			return _pathId;
 		}
+
+		bool Service::respectsLineTheoryWith( const Service& other ) const
+		{
+			assert (_path != NULL);
+
+			// Loop on each stop
+			bool timeOrder;
+			bool orderDefined(false);
+			const Path::Edges& edges(_path->getEdges());
+			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
+			{
+				int i((*it)->getRankInPath());
+
+				if ((*it)->isDeparture())
+				{
+					/// - Test 1 : Conflict between continuous service range or identical schedule
+					if (getDepartureBeginScheduleToIndex(i) <= other.getDepartureEndScheduleToIndex(i) && getDepartureEndScheduleToIndex(i) >= other.getDepartureBeginScheduleToIndex(i))
+						return false;
+
+					/// - Test 2 : Order of times
+					if (!orderDefined)
+					{
+						timeOrder = (getDepartureBeginScheduleToIndex(i) < other.getDepartureBeginScheduleToIndex(i));
+						orderDefined = true;
+					}
+					else
+					{
+						if ((getDepartureBeginScheduleToIndex(i) < other.getDepartureBeginScheduleToIndex(i)) != timeOrder)
+							return false;
+					}
+				}
+				if ((*it)->isArrival())
+				{
+					/// - Test 1 : Conflict between continuous service range or identical schedule
+					if (getArrivalBeginScheduleToIndex(i) <= other.getArrivalEndScheduleToIndex(i) && getArrivalEndScheduleToIndex(i) >= other.getArrivalBeginScheduleToIndex(i))
+						return false;
+
+					/// - Test 2 : Order of times
+					if (!orderDefined)
+					{
+						timeOrder = (getArrivalBeginScheduleToIndex(i) < other.getArrivalBeginScheduleToIndex(i));
+						orderDefined = true;
+					}
+					else
+					{
+						if ((getArrivalBeginScheduleToIndex(i) < other.getArrivalBeginScheduleToIndex(i)) != timeOrder)
+							return false;
+					}
+				}
+			}
+
+			// No failure : return OK
+			return true;
+		}
 	}
 }

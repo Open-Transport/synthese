@@ -29,6 +29,7 @@
 #include "15_env/PhysicalStop.h"
 #include "15_env/ScheduledService.h"
 #include "15_env/Line.h"
+#include "15_env/SubLine.h"
 #include "15_env/LineStop.h"
 #include "15_env/TransportNetwork.h"
 #include "15_env/City.h"
@@ -154,6 +155,15 @@ namespace synthese
 				 itsrv != lservices.end (); ++itsrv)
 				{
 				services.insert ((*itsrv));
+				}
+
+				// Sub-lines : will be useless when the trident export will work with database rows instead of objects in ram
+				const Line::SubLines& sublines((*itline)->getSubLines());
+				for (Line::SubLines::const_iterator itsubline(sublines.begin()); itsubline != sublines.end(); ++itsubline)
+				{
+					const ServiceSet& lservices((*itsubline)->getServices ());
+					for (ServiceSet::const_iterator itsrv = lservices.begin ();	itsrv != lservices.end (); ++itsrv)
+						services.insert(*itsrv);
 				}
 			}
 
@@ -648,6 +658,11 @@ namespace synthese
 					continue;
 
 				const Line* line = ((const Line*) srv->getPath ());
+
+				// subline tweak
+				if (dynamic_cast<const SubLine*>(line))
+					line = static_cast<const SubLine*>(line)->getMainLine();
+
 				const Calendar& cal = srv->getCalendar ();
 				
 				os << "<VehicleJourney>" << std::endl;
@@ -671,10 +686,10 @@ namespace synthese
 					os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", srv) << "</vehicleJourneyId>" << std::endl;
 
 					if (e != 0)
-						os << "<arrivalTime>" << ToXsdTime (srv->getArrivalBeginScheduleToIndex (ls).getHour ()) 
+						os << "<arrivalTime>" << ToXsdTime (srv->getArrivalBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
 						   << "</arrivalTime>" << std::endl;
 					if (e != edges.size () - 1)
-						os << "<departureTime>" << ToXsdTime (srv->getDepartureBeginScheduleToIndex (ls).getHour ()) 
+						os << "<departureTime>" << ToXsdTime (srv->getDepartureBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
 						   << "</departureTime>" << std::endl;
 
 

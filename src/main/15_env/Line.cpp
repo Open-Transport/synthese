@@ -26,6 +26,7 @@
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "15_env/CommercialLine.h"
+#include "15_env/SubLine.h"
 
 namespace synthese
 {
@@ -71,6 +72,8 @@ namespace synthese
 
 		Line::~Line ()
 		{
+			for (SubLines::const_iterator it(_subLines.begin()); it != _subLines.end(); ++it)
+				delete *it;
 		}
 
 
@@ -279,6 +282,51 @@ namespace synthese
 		bool Line::isPedestrianMode() const
 		{
 			return getWalkingLine();
+		}
+
+		int Line::addSubLine( SubLine* line )
+		{
+			SubLines::iterator it(_subLines.insert(_subLines.end(), line));
+			return (it - _subLines.begin());
+		}
+
+		void Line::addService( Service* service )
+		{
+			/// Test of the respect of the line theory
+			/// If OK call the normal Path service insertion
+			if (respectsLineTheory(*service))
+			{
+				Path::addService(service);
+				return;
+			}
+
+			/// If not OK test of the respect of the line theory on each subline and add to it
+			for (SubLines::const_iterator it(_subLines.begin()); it != _subLines.end(); ++it)
+			{
+				if ((*it)->addServiceIfCompatible(service))
+					return;
+			}
+		
+			// If no subline can handle the service, create one for it
+			SubLine* subline(new SubLine(this));
+			bool isok(subline->addServiceIfCompatible(service));
+
+			assert(isok);
+		}
+
+
+
+		bool Line::respectsLineTheory( const Service& service ) const
+		{
+			for (ServiceSet::const_iterator it(_services.begin()); it != _services.end(); ++it)
+				if (!(*it)->respectsLineTheoryWith(service))
+					return false;
+			return true;
+		}
+
+		const Line::SubLines Line::getSubLines() const
+		{
+			return _subLines;
 		}
 	}
 }

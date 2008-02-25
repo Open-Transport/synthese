@@ -158,12 +158,16 @@ namespace synthese
 				*/
 				void addEdge (Edge* edge);
 
+
+
 				/** Adds a service to a path.
 					@param service Service to add
 					@author Hugues Romain
 					@date 2007
+
+					The method is virtual to avoid subclasses to have a different behavior than the simple add to the services list (see SubLine).
 				*/
-				void addService (Service* service);
+				virtual void addService (Service* service);
 
 				void removeService (Service* service);
 

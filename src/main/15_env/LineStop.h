@@ -61,7 +61,7 @@ namespace synthese
 				  bool isDeparture = true,
 				  bool isArrival = true,
 				  double metricOffset = UNKNOWN_VALUE,
-				  const PhysicalStop* physicalStop = 0);
+				  PhysicalStop* physicalStop = NULL);
 			    
 			
 			~LineStop();

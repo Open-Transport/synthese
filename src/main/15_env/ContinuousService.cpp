@@ -223,24 +223,24 @@ namespace synthese
 			_arrivalSchedules = schedules;
 		}
 
-		Schedule ContinuousService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
+		Schedule ContinuousService::getDepartureBeginScheduleToIndex(int rankInPath) const
 		{
-			return _departureSchedules.at(edge->getRankInPath()).first;
+			return _departureSchedules.at(rankInPath).first;
 		}
 
-		Schedule ContinuousService::getDepartureEndScheduleToIndex( const Edge* edge ) const
+		Schedule ContinuousService::getDepartureEndScheduleToIndex(int rankInPath) const
 		{
-			return _departureSchedules.at(edge->getRankInPath()).second;
+			return _departureSchedules.at(rankInPath).second;
 		}
 
-		Schedule ContinuousService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
+		Schedule ContinuousService::getArrivalBeginScheduleToIndex(int rankInPath) const
 		{
-			return _arrivalSchedules.at(edge->getRankInPath()).first;
+			return _arrivalSchedules.at(rankInPath).first;
 		}
 
-		Schedule ContinuousService::getArrivalEndScheduleToIndex( const Edge* edge ) const
+		Schedule ContinuousService::getArrivalEndScheduleToIndex(int rankInPath) const
 		{
-			return _arrivalSchedules.at(edge->getRankInPath()).second;
+			return _arrivalSchedules.at(rankInPath).second;
 		}
 
 		const time::Schedule& ContinuousService::getLastArrivalSchedule() const

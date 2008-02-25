@@ -119,10 +119,10 @@ namespace synthese
 
 				virtual const time::Schedule& getLastArrivalSchedule() const;
 
-				virtual time::Schedule getDepartureBeginScheduleToIndex(const Edge* edge) const;
-				virtual time::Schedule getDepartureEndScheduleToIndex(const Edge* edge) const;
-				virtual time::Schedule getArrivalBeginScheduleToIndex(const Edge* edge) const;
-				virtual time::Schedule getArrivalEndScheduleToIndex(const Edge* edge) const;
+				virtual time::Schedule getDepartureBeginScheduleToIndex(int rankInPath) const;
+				virtual time::Schedule getDepartureEndScheduleToIndex(int rankInPath) const;
+				virtual time::Schedule getArrivalBeginScheduleToIndex(int rankInPath) const;
+				virtual time::Schedule getArrivalEndScheduleToIndex(int rankInPath) const;
 
 			//@}
 

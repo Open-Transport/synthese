@@ -167,24 +167,24 @@ namespace synthese
 			return _departureSchedules.at(rank);
 		}
 
-		Schedule ScheduledService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
+		Schedule ScheduledService::getDepartureBeginScheduleToIndex(int rankInPath) const
 		{
-			return _departureSchedules.at(edge->getRankInPath());
+			return _departureSchedules.at(rankInPath);
 		}
 
-		Schedule ScheduledService::getDepartureEndScheduleToIndex( const Edge* edge ) const
+		Schedule ScheduledService::getDepartureEndScheduleToIndex(int rankInPath) const
 		{
-			return _departureSchedules.at(edge->getRankInPath());
+			return _departureSchedules.at(rankInPath);
 		}
 
-		Schedule ScheduledService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
+		Schedule ScheduledService::getArrivalBeginScheduleToIndex(int rankInPath) const
 		{
-			return _arrivalSchedules.at(edge->getRankInPath());
+			return _arrivalSchedules.at(rankInPath);
 		}
 
-		Schedule ScheduledService::getArrivalEndScheduleToIndex( const Edge* edge ) const
+		Schedule ScheduledService::getArrivalEndScheduleToIndex(int rankInPath) const
 		{
-			return _arrivalSchedules.at(edge->getRankInPath());
+			return _arrivalSchedules.at(rankInPath);
 		}
 
 		const time::Schedule& ScheduledService::getLastArrivalSchedule() const

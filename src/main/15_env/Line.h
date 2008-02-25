@@ -43,6 +43,7 @@ namespace synthese
 		class LineAlarmBroadcast;
 		class CommercialLine;
 		class TransportNetwork;
+		class SubLine;
 
 
 		/** Technical line.
@@ -62,11 +63,15 @@ namespace synthese
 
 			NB : la correspondance entre deux services d'une mÃÂªme ligne est interdite, sauf dans les axes libres.
 
+			If a service is responsible of a break of the preceding rules, then the line is copied as a SubLine, and the service is linked to the new line. The _sublines container keeps a pointer on each SubLine.
 		*/
 		class Line : 
 			public synthese::util::Registrable<uid,Line>,
 			public Path
 		{
+		public:
+			typedef std::vector<SubLine*> SubLines;
+
 		private:
 
 			const Axis*				_axis;
@@ -82,7 +87,9 @@ namespace synthese
 		    
 			bool _useInDepartureBoards; 
 			bool _useInTimetables; 
-			bool _useInRoutePlanning; 
+			bool _useInRoutePlanning;
+
+			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
 		public:
 
@@ -109,6 +116,7 @@ namespace synthese
 				const RollingStock*		getRollingStock()			const;
 				bool					getWalkingLine ()			const;
 				const CommercialLine*	getCommercialLine()			const;
+				const SubLines			getSubLines()				const;
 			//@}
 
 
@@ -130,6 +138,27 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
+
+				/** Adds a sub-line to the line.
+					@param line sub-line to add
+					@return int rank of the sub-line in the array of sub-lines
+					@author Hugues Romain
+					@date 2008
+				*/
+				int addSubLine(SubLine* line);
+
+
+				/** Adds a service to a line.
+					@param service Service to add
+					@author Hugues Romain
+					@date 2007
+
+					The method verifies if the service is compatible with the other ones, by the way of the lines theory.
+					If not, then it attempts to register the service in an existing SubLine, or creates one if necessary.
+
+					Note : in this case, the service is NOT added to the current line.
+				*/
+				virtual void addService (Service* service);
 			//@}
 		    
 			//! @name Query methods
@@ -142,6 +171,14 @@ namespace synthese
 
 				const PhysicalStop* getDestination () const;
 				const PhysicalStop* getOrigin () const;
+
+				/** Tests if the line theory would be respected if the service were inserted into the line.
+					@param service service to test
+					@return bool true if the line theory would be respected
+					@author Hugues Romain
+					@date 2008					
+				*/
+				bool respectsLineTheory(const Service& service) const;
 			//@}
 		    
 		};

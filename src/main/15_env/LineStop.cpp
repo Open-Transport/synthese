@@ -48,13 +48,16 @@ namespace synthese
 				    bool isDeparture,
 				    bool isArrival,		
 				    double metricOffset,
-				    const PhysicalStop* physicalStop)
+				    PhysicalStop* physicalStop)
 			: synthese::util::Registrable<uid,LineStop> (id)
 			, Edge (isDeparture, isArrival, line, rankInPath)
-			, _physicalStop (physicalStop)
 			, _metricOffset (metricOffset)
 			, _scheduleInput(true)
 		{
+			if (physicalStop)
+				setPhysicalStop(physicalStop);
+			else
+				_physicalStop = NULL;
 		}
 
 

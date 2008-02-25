@@ -192,7 +192,7 @@ namespace synthese
 				rankInPath, 
 				isDeparture, isArrival,
 				metricOffset, 
-				physicalStops.get(physicalStopId).get()))
+				const_cast<PhysicalStop*>(physicalStops.get(physicalStopId).get())))
 			;
 
 			// Add via points

@@ -416,13 +416,13 @@ namespace synthese
 			for (i=0; i<getParentPath()->getServices().size(); ++i)
 			{
 				const Service* service = getParentPath()->getService(i);
-				const Schedule& endSchedule(service->getDepartureEndScheduleToIndex(this));
-				const Schedule& beginSchedule(service->getDepartureBeginScheduleToIndex(this));
+				const Schedule& endSchedule(service->getDepartureEndScheduleToIndex(getRankInPath()));
+				const Schedule& beginSchedule(service->getDepartureBeginScheduleToIndex(getRankInPath()));
 
 				for (numHour = 0; numHour <= endSchedule.getHours(); ++numHour)
 				{
 					if (_departureIndex[numHour] == UNKNOWN_VALUE
-						|| getParentPath()->getService(_departureIndex[numHour])->getDepartureBeginScheduleToIndex(this).getHour() > endSchedule.getHour()
+						|| getParentPath()->getService(_departureIndex[numHour])->getDepartureBeginScheduleToIndex(getRankInPath()).getHour() > endSchedule.getHour()
 						)
 						_departureIndex[numHour] = i;
 				}
@@ -440,13 +440,13 @@ namespace synthese
 			for (i=getParentPath()->getServices().size()-1; i>=0; --i)
 			{
 				const Service* service = getParentPath()->getService(i);
-				const Schedule& endSchedule(service->getArrivalEndScheduleToIndex(this));
-				const Schedule& beginSchedule(service->getArrivalBeginScheduleToIndex(this));
+				const Schedule& endSchedule(service->getArrivalEndScheduleToIndex(getRankInPath()));
+				const Schedule& beginSchedule(service->getArrivalBeginScheduleToIndex(getRankInPath()));
 
-				for (numHour = HOURS_PER_DAY-1; numHour >= endSchedule.getHours(); --numHour)
+				for (numHour = HOURS_PER_DAY-1; numHour >= beginSchedule.getHours(); --numHour)
 				{
 					if (_arrivalIndex[numHour] == UNKNOWN_VALUE
-						|| getParentPath()->getService(_arrivalIndex[numHour])->getArrivalBeginScheduleToIndex(this).getHour() < endSchedule.getHour()
+						|| getParentPath()->getService(_arrivalIndex[numHour])->getArrivalBeginScheduleToIndex(getRankInPath()).getHour() < beginSchedule.getHour()
 						)
 						_arrivalIndex[numHour] = i;
 				}

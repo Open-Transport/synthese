@@ -55,10 +55,10 @@ namespace synthese
 			*/
 			virtual bool isProvided(const time::Date& originDate) const;
 
-			virtual time::Schedule getDepartureBeginScheduleToIndex(const Edge* edge) const;
-			virtual time::Schedule getDepartureEndScheduleToIndex(const Edge* edge) const;
-			virtual time::Schedule getArrivalBeginScheduleToIndex(const Edge* edge) const;
-			virtual time::Schedule getArrivalEndScheduleToIndex(const Edge* edge) const;
+			virtual time::Schedule getDepartureBeginScheduleToIndex(int rankInPath) const;
+			virtual time::Schedule getDepartureEndScheduleToIndex(int rankInPath) const;
+			virtual time::Schedule getArrivalBeginScheduleToIndex(int rankInPath) const;
+			virtual time::Schedule getArrivalEndScheduleToIndex(int rankInPath) const;
 
 			/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
 				@param method Search departure or arrival :

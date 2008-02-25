@@ -65,22 +65,22 @@ namespace synthese
 			return dt;
 		}
 
-		time::Schedule PermanentService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
+		time::Schedule PermanentService::getDepartureBeginScheduleToIndex(int rankInPath) const
 		{
 			return Schedule(Hour(TIME_MIN),0);
 		}
 
-		time::Schedule PermanentService::getDepartureEndScheduleToIndex( const Edge* edge ) const
+		time::Schedule PermanentService::getDepartureEndScheduleToIndex(int rankInPath) const
 		{
 			return Schedule(Hour(TIME_MAX),0);
 		}
 
-		time::Schedule PermanentService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
+		time::Schedule PermanentService::getArrivalBeginScheduleToIndex(int rankInPath) const
 		{
 			return Schedule(Hour(TIME_MIN),0);
 		}
 
-		time::Schedule PermanentService::getArrivalEndScheduleToIndex( const Edge* edge ) const
+		time::Schedule PermanentService::getArrivalEndScheduleToIndex(int rankInPath) const
 		{
 			return Schedule(Hour(TIME_MAX),0);
 		}

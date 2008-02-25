@@ -141,6 +141,14 @@
 					RelativePath=".\Road.h"
 					>
 				</File>
+				<File
+					RelativePath=".\SubLine.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\SubLine.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Edge"
