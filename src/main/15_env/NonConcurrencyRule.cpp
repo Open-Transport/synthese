@@ -24,6 +24,8 @@
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace env
 	{
 
