@@ -76,7 +76,7 @@ namespace synthese
 						SQLiteResultSPtr rows(_GetRow(key));
 						T* object(new T);
 						load(object, rows);
-						link(object, rows, GET_REGISTRY);
+						SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
 						object->store();
 					}
 					return T::GetUpdateable(key).get();
@@ -94,7 +94,7 @@ namespace synthese
 						SQLiteResultSPtr rows(_GetRow(key));
 						T* object(new T);
 						load(object, rows);
-						link(object, rows, GET_REGISTRY);
+						SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
 						object->store();
 					}
 					return T::Get(key);
@@ -112,7 +112,7 @@ namespace synthese
 						SQLiteResultSPtr rows(_GetRow(key));
 						T* object(new T);
 						load(object, rows);
-						link(object, rows, GET_REGISTRY);
+						SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
 						object->store();
 					}
 					return T::GetUpdateable(key);
