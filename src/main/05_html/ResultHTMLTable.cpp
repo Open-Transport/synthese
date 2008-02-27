@@ -79,7 +79,7 @@ namespace synthese
 
 						if (it->first == _orderField)
 						{
-							s << "&nbsp;" << HTMLModule::getHTMLImage(iconPath + (_raisingOrder ? "down" : "up") + ".png", _raisingOrder ? "V" : "^");
+							s << "&nbsp;" << HTMLModule::getHTMLImage(iconPath + (_raisingOrder ? "up" : "down") + ".png", _raisingOrder ? "V" : "^");
 						}						
 					}
 					else
@@ -127,7 +127,7 @@ namespace synthese
 				if (_first)
 				{
 					HTMLForm::HiddenFieldsMap f;
-					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString((_first > _maxSize) ? _first - _maxSize : 0)));
+					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString((_first > _maxSize) ? _first - _maxSize - 1: 0)));
 					s << HTMLModule::getHTMLLink(_searchForm.getURL(f), HTMLModule::getHTMLImage("resultset_previous.png", "<<")) << "&nbsp;|&nbsp;";
 				}
 				if (_size > 0)

@@ -109,6 +109,7 @@ namespace synthese
 
 		DBLogEntry::DBLogEntry()
 			: _date(TIME_CURRENT)
+			, _user(NULL)
 		{
 
 		}

@@ -199,6 +199,7 @@ namespace synthese
 					, const time::DateTime& calculationMoment
 					, bool controlIfTheServiceIsReachable
 					, int minNextServiceIndex = UNKNOWN_VALUE					
+					, bool inverted = false
 				) const;
 
 			    
@@ -221,6 +222,7 @@ namespace synthese
 					, const time::DateTime& calculationMoment
 					, bool controlIfTheServiceIsReachable
 					, int maxPreviousServiceIndex = UNKNOWN_VALUE
+					, bool inverted = false
 				) const;
 			    
 			//@}

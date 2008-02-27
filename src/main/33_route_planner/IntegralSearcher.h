@@ -84,6 +84,7 @@ namespace synthese
 				const time::DateTime&		_previousContinuousServiceLastDeparture;
 				const int					_maxDepth;
 				const bool					_optim;
+				const bool					_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
 			//@}
 
 			/** Integral search of objects within the network.
@@ -125,7 +126,8 @@ namespace synthese
 				, const time::DateTime&			previousContinuousServiceLastDeparture
 				, const int						maxDepth
 				, bool							optim
-				);
+				, bool							inverted
+			);
 
 			/** Launch of the integral search upon a vertex access map.
 				@param result Result to consider and to write on
@@ -158,7 +160,8 @@ namespace synthese
 				@param bool optimization mode
 				@return pair<bool,bool> Possible values : false/false, true/true, false/true
 					- first : utility to store the journey as result or a future result part.
-					- second : utility to continue to traverse the rest of the path
+					- second.first : utility to continue to traverse the rest of the path
+					- second.second : utility to continue to iterate ont services of the same path
 				@author Hugues Romain
 				@date 2007				
 			*/

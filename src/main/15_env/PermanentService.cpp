@@ -40,6 +40,7 @@ namespace synthese
 			, const DateTime& presenceDateTime
 			, const DateTime& computingTime
 			, bool controlIfTheServiceIsReachable
+			, bool inverted
 		) const	{
 			ServicePointer sp(method,edge);
 			sp.setActualTime(presenceDateTime);

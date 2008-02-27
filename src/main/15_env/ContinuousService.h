@@ -104,6 +104,7 @@ namespace synthese
 					, const time::DateTime& presenceDateTime
 					, const time::DateTime& computingTime
 					, bool controlIfTheServiceIsReachable
+					, bool inverted
 				) const;
 
 				virtual time::DateTime getLeaveTime(

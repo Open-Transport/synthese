@@ -66,6 +66,7 @@ namespace synthese
 			, const DateTime& previousContinuousServiceLastDeparture
 			, int maxDepth
 			, bool optim
+			, bool inverted
 		)	: _accessDirection(accessDirection)
 			, _accessParameters(accessParameters)
 			, _searchAddresses(searchAddresses)
@@ -81,6 +82,7 @@ namespace synthese
 			, _previousContinuousServiceLastDeparture(previousContinuousServiceLastDeparture)
 			, _maxDepth(maxDepth)
 			, _optim(optim)
+			, _inverted(inverted)
 		{	}
 
 // ------------------------------------------------------------------- 2 Initialization
@@ -205,130 +207,139 @@ namespace synthese
 					if (!currentJourney.verifyAxisConstraints(edge->getParentPath()->getAxis()))
 						continue;
 
-					// Reach of the next/previous service serving the edge
-					DateTime departureMoment(correctedDesiredTime);
-					ServicePointer serviceInstance(
-						(_accessDirection == TO_DESTINATION)
-						?	edge->getNextService (
-								departureMoment
-								, _minMaxDateTimeAtDestination
-								, _calculationTime
-								, true
-							)
-						:	edge->getPreviousService(
-								departureMoment
-								, _minMaxDateTimeAtDestination
-								, _calculationTime
-								, true
-							)
-					);
-
-					// If no service, advande to the next edge
-					if (!serviceInstance.getService())
-						continue;
-
-					// Strict time control if the departure time must be exactly the desired one (optimization only)
-					if (strictTime && serviceInstance.getActualDateTime() != correctedDesiredTime)
-						continue;
-
-					// Check for service compliancy rules.
-					/// @todo ERROR : must be integrated in ServicePointer constructor. A similar line can be written for edge level.
-//					if (!serviceInstance.getService()->isCompatibleWith(_accessParameters.complyer))
-//						continue;
-
-					PtrEdgeStep step(	
-						(_accessDirection == TO_DESTINATION)
-							? (	_destinationVam.needFineSteppingForArrival (edge->getParentPath ())
-								? (&Edge::getFollowingArrivalForFineSteppingOnly)
-								: (&Edge::getFollowingConnectionArrival)
-							):( _destinationVam.needFineSteppingForDeparture (edge->getParentPath ())
-								? (&Edge::getPreviousDepartureForFineSteppingOnly)
-								: (&Edge::getPreviousConnectionDeparture)
-							))
-						;
-
-					// The path is traversed
-					for (const Edge* curEdge = (edge->*step) ();
-						curEdge != 0; curEdge = (curEdge->*step) ())
+					int serviceNumber(UNKNOWN_VALUE);
+					for(bool loopOnServices(true); loopOnServices;)
 					{
-						// The reached vertex is analyzed only in two cases :
-						//  - if the vertex belongs to the goal
-						//  - if the vertex is a connecting vertex
-						const Vertex* reachedVertex(curEdge->getFromVertex());
-						bool isGoalReached(_destinationVam.contains(reachedVertex));
-						if (!reachedVertex->isConnectionAllowed() && !isGoalReached)
-							continue;
-						
-						// Storage of the useful solution
-						Journey* resultJourney = new Journey(fullApproachJourney);
-						ServiceUse serviceUse(serviceInstance, curEdge);
-						if (_accessDirection == FROM_ORIGIN && !serviceUse.isReservationRuleCompliant(_calculationTime))
+						// Reach of the next/previous service serving the edge
+						DateTime departureMoment(correctedDesiredTime);
+						ServicePointer serviceInstance(
+							(_accessDirection == TO_DESTINATION)
+							?	edge->getNextService (
+									departureMoment
+									, _minMaxDateTimeAtDestination
+									, _calculationTime
+									, true
+									, serviceNumber
+									, _inverted
+								)
+							:	edge->getPreviousService(
+									departureMoment
+									, _minMaxDateTimeAtDestination
+									, _calculationTime
+									, true
+									, serviceNumber
+									, _inverted
+								)
+						);
+						loopOnServices = false;
+
+						// If no service, advande to the next edge
+						if (!serviceInstance.getService())
 							continue;
 
-						if (_accessDirection == TO_DESTINATION)
-							resultJourney->append (serviceUse);
-						else
-							resultJourney->prepend(serviceUse);
-						if (isGoalReached)
-							resultJourney->setEndApproachDuration(_destinationVam.getVertexAccess(reachedVertex).approachTime);
-							
+						// Strict time control if the departure time must be exactly the desired one (optimization only)
+						if (strictTime && serviceInstance.getActualDateTime() != correctedDesiredTime)
+							continue;
 
-						// Analyze of the utility of the edge
-						// If the edge is useless, the path is not traversed anymore
-						pair<bool,bool> evaluationResult(evaluateJourney(*resultJourney, _optim));
-						if (!evaluationResult.first)
+						serviceNumber = serviceInstance.getServiceIndex() + 1;
+
+						// Check for service compliancy rules.
+						/// @todo ERROR : must be integrated in ServicePointer constructor. A similar line can be written for edge level.
+	//					if (!serviceInstance.getService()->isCompatibleWith(_accessParameters.complyer))
+	//						continue;
+
+						PtrEdgeStep step(	
+							(_accessDirection == TO_DESTINATION)
+								? (	_destinationVam.needFineSteppingForArrival (edge->getParentPath ())
+									? (&Edge::getFollowingArrivalForFineSteppingOnly)
+									: (&Edge::getFollowingConnectionArrival)
+								):( _destinationVam.needFineSteppingForDeparture (edge->getParentPath ())
+									? (&Edge::getPreviousDepartureForFineSteppingOnly)
+									: (&Edge::getPreviousConnectionDeparture)
+								))
+							;
+
+						// The path is traversed
+						for (const Edge* curEdge = (edge->*step) ();
+							curEdge != 0; curEdge = (curEdge->*step) ())
 						{
-							delete resultJourney;
-
-							if (!evaluationResult.second)
-								break;
-							else
+							// The reached vertex is analyzed only in two cases :
+							//  - if the vertex belongs to the goal
+							//  - if the vertex is a connecting vertex
+							const Vertex* reachedVertex(curEdge->getFromVertex());
+							bool isGoalReached(_destinationVam.contains(reachedVertex));
+							if (!reachedVertex->isConnectionAllowed() && !isGoalReached)
 								continue;
-						}
+							
+							// Storage of the useful solution
+							Journey* resultJourney = new Journey(fullApproachJourney);
+							ServiceUse serviceUse(serviceInstance, curEdge);
+							if (_accessDirection == FROM_ORIGIN && !serviceUse.isReservationRuleCompliant(_calculationTime))
+								continue;
 
-						// Storage of the journey for recursion
-						if (maxDepth > 0)
-						{
-							map<const Vertex*, Journey*>::iterator itr(recursionVertices.find(reachedVertex));
-							if (itr != recursionVertices.end())
-							{
-								delete itr->second;
-								itr->second = new Journey(*resultJourney);
-							}
-							else
-								recursionVertices.insert(make_pair<const Vertex*, Journey*>(reachedVertex, new Journey(*resultJourney)));
-						}
-
-						resultJourney->setEndReached(isGoalReached);
-						resultJourney->setSquareDistanceToEnd(_destinationVam);
-						resultJourney->setMinSpeedToEnd(_minMaxDateTimeAtDestination);
-
-						// Storage of the journey as a result
-						if(	(	_searchAddresses == SEARCH_ADDRESSES
-							&&	reachedVertex->getConnectionPlace()->hasAddresses()
-							)
-						||	(	_searchPhysicalStops == SEARCH_PHYSICALSTOPS
-							&&	reachedVertex->getConnectionPlace()->hasPhysicalStops()
-							)
-						||	isGoalReached
-						)	_result.add(resultJourney);
-
-						// Storage of the reach time at the vertex in the best vertex reaches map
-						_bestVertexReachesMap.insert (serviceUse);
-
-						// Storage of the reach time at the goal if applicable
-						if (isGoalReached)
-						{
-							_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
 							if (_accessDirection == TO_DESTINATION)
-								_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
+								resultJourney->append (serviceUse);
 							else
-								_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
-						}
-					}
+								resultJourney->prepend(serviceUse);
+							if (isGoalReached)
+								resultJourney->setEndApproachDuration(_destinationVam.getVertexAccess(reachedVertex).approachTime);
+								
 
-				} // next edge
+							// Analyze of the utility of the edge
+							// If the edge is useless, the path is not traversed anymore
+							pair<bool,bool> evaluationResult(evaluateJourney(*resultJourney, _optim));
+							if (!evaluationResult.first)
+							{
+								delete resultJourney;
 
+								if (!evaluationResult.second)
+									break;
+								else
+									continue;
+							}
+
+							// Storage of the journey for recursion
+							if (maxDepth > 0)
+							{
+								map<const Vertex*, Journey*>::iterator itr(recursionVertices.find(reachedVertex));
+								if (itr != recursionVertices.end())
+								{
+									delete itr->second;
+									itr->second = new Journey(*resultJourney);
+								}
+								else
+									recursionVertices.insert(make_pair<const Vertex*, Journey*>(reachedVertex, new Journey(*resultJourney)));
+							}
+
+							resultJourney->setEndReached(isGoalReached);
+							resultJourney->setSquareDistanceToEnd(_destinationVam);
+							resultJourney->setMinSpeedToEnd(_minMaxDateTimeAtDestination);
+
+							// Storage of the journey as a result
+							if(	(	_searchAddresses == SEARCH_ADDRESSES
+								&&	reachedVertex->getConnectionPlace()->hasAddresses()
+								)
+							||	(	_searchPhysicalStops == SEARCH_PHYSICALSTOPS
+								&&	reachedVertex->getConnectionPlace()->hasPhysicalStops()
+								)
+							||	isGoalReached
+							)	_result.add(resultJourney);
+
+							// Storage of the reach time at the vertex in the best vertex reaches map
+							_bestVertexReachesMap.insert (serviceUse);
+
+							// Storage of the reach time at the goal if applicable
+							if (isGoalReached)
+							{
+								_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
+								if (_accessDirection == TO_DESTINATION)
+									_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
+								else
+									_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
+							}
+						} // next arrival edge
+					} // next service
+				} // next departure edge
 			} // next vertex in vam
 
 
@@ -467,7 +478,7 @@ namespace synthese
 				||	(	(method == TO_DESTINATION)
 					&&	(bestHopedGoalAccessDateTime > _minMaxDateTimeAtDestination)
 					)
-				)	return make_pair(false, true);
+				)	return make_pair(false,false);
 			}
 
 			/** - Best vertex map control : the service use is useful only if no other already founded
@@ -479,7 +490,7 @@ namespace synthese
 			||	(	(method == TO_DESTINATION)
 				&&	(reachDateTime > _bestVertexReachesMap.getBestTime (reachedVertex, reachDateTime))
 				)
-			)	return make_pair(false, true);
+			)	return make_pair(false,false);
 
 			return make_pair(true,true);
 		}

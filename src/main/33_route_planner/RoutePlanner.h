@@ -153,6 +153,7 @@ namespace synthese
 				, const env::VertexAccessMap& endVam
 				, const time::DateTime& startTime
 				, bool strictTime
+				, bool inverted
 			);
 
 			void computeRoutePlanningDepartureArrival(

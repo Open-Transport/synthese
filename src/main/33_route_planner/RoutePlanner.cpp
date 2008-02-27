@@ -127,6 +127,7 @@ namespace synthese
 				, dt4
 				, std::numeric_limits<int>::max ()
 				, false
+				, false
 				);
 			iso.integralSearch (
 				_originVam
@@ -216,6 +217,7 @@ namespace synthese
 				, dt2
 				, std::numeric_limits<int>::max ()
 				, false
+				, true
 			);
 			isd.integralSearch (
 				_destinationVam
@@ -298,9 +300,9 @@ namespace synthese
 				
 				//! <li> If no journey was found and last service is continuous, 
 					//! then repeat computation after continuous service range. </li>
-				if(	journey->empty()
-				&&	!_result.journeys.empty()
+				if(	!_result.journeys.empty()
 				&&	(_result.journeys.back ()->getContinuousServiceRange () > 0)
+				&&	(journey->empty() || journey->getDepartureTime() > _previousContinuousServiceLastDeparture)
 				){
 					_minDepartureTime = _previousContinuousServiceLastDeparture;
 					_minDepartureTime += 1;
@@ -353,7 +355,7 @@ namespace synthese
 			_maxArrivalTime.addDaysDuration(7);	/// @todo Replace 7 by a parameter
 		    
 			// Look for best arrival
-			findBestJourney (result, ovam, dvam, _minDepartureTime, false);
+			findBestJourney (result, ovam, dvam, _minDepartureTime, false, false);
 		    
 			if (result.empty() || result.getDepartureTime() > _journeySheetEndTime)
 			{
@@ -372,7 +374,7 @@ namespace synthese
 		
 			// Look for best departure
 			// A revoir il faut surement faire currentJourney = result
-			findBestJourney (result, dvam, ovam, _maxArrivalTime, true);
+			findBestJourney (result, dvam, ovam, _maxArrivalTime, true, true);
 
 			if (result.getDepartureTime() > _journeySheetEndTime)
 			{
@@ -425,6 +427,7 @@ namespace synthese
 			, const env::VertexAccessMap& endVam
 			, const time::DateTime& startTime
 			, bool strictTime
+			, bool inverted
 		){
 			const AccessDirection& accessDirection(result.getMethod());
 
@@ -476,6 +479,7 @@ namespace synthese
 				, _previousContinuousServiceLastDeparture
 				, 0
 				, strictTime
+				, inverted
 				);
 
 			is.integralSearch(startVam, startTime, strictTime);

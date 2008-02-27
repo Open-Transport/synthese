@@ -294,6 +294,7 @@ namespace synthese
 			, const DateTime& calculationMoment
 			, bool controlIfTheServiceIsReachable
 			, int minNextServiceIndex
+			, bool inverted
 		) const	{
 			// Search schedule
 			int next(getDepartureFromIndex (departureMoment.getHours ()));
@@ -319,6 +320,7 @@ namespace synthese
 								, departureMoment
 								, calculationMoment
 								, controlIfTheServiceIsReachable
+								, inverted
 							)
 						);
 
@@ -355,6 +357,7 @@ namespace synthese
 			, const DateTime& computingDateTime
 			, bool controlIfTheServiceIsReachable
 			, int maxPreviousServiceIndex
+			, bool inverted
 		) const	{
 			int previous(getArrivalFromIndex (arrivalMoment.getHours ()));
 			
@@ -372,6 +375,7 @@ namespace synthese
 								, arrivalMoment
 								, computingDateTime
 								, controlIfTheServiceIsReachable
+								, inverted
 							)
 						);
 

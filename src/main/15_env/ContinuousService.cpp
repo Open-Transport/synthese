@@ -118,6 +118,7 @@ namespace synthese
 			, const time::DateTime& presenceDateTime
 			, const time::DateTime& computingTime
 			, bool controlIfTheServiceIsReachable
+			, bool inverted
 		) const	{
 
 			ServicePointer ptr(method, edge);
@@ -144,8 +145,16 @@ namespace synthese
 						&& presenceDateTime.getHour() < _departureSchedules.at(edgeIndex).first.getHour())
 						actualDateTime.setHour(schedule.getHour());
 				}
-				validityEndTime.setHour(_departureSchedules.at(edgeIndex).second.getHour());
-				range = validityEndTime - actualDateTime;
+				if (inverted)
+				{
+					validityEndTime.setHour(_departureSchedules.at(edgeIndex).first.getHour());
+					range = actualDateTime - validityEndTime;
+				}
+				else
+				{
+					validityEndTime.setHour(_departureSchedules.at(edgeIndex).second.getHour());
+					range = validityEndTime - actualDateTime;
+				}
 			}
 			else
 			{
@@ -163,8 +172,16 @@ namespace synthese
 						&& presenceDateTime.getHour() > _arrivalSchedules.at(edgeIndex).first.getHour())
 						actualDateTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
 				}
-				validityEndTime.setHour(_arrivalSchedules.at(edgeIndex).first.getHour());
-				range = actualDateTime - validityEndTime;
+				if (inverted)
+				{
+					validityEndTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
+					range = validityEndTime - actualDateTime;
+				}
+				else
+				{
+					validityEndTime.setHour(_arrivalSchedules.at(edgeIndex).first.getHour());
+					range = actualDateTime - validityEndTime;
+				}
 			}
 			ptr.setActualTime(actualDateTime);
 			ptr.setServiceRange(range);

@@ -79,7 +79,7 @@ namespace synthese
 
 		bool TransportSiteAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			return true;
+			return false;
 		}
 		
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfParent(

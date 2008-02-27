@@ -86,7 +86,7 @@ namespace synthese
 
 		bool TransportNetworkAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			return true;
+			return false;
 		}
 		
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfParent(
