@@ -29,10 +29,10 @@ namespace synthese
 
 
 		NonConcurrencyRule::NonConcurrencyRule( const CommercialLine* priorityLine /*= NULL */, const CommercialLine* hiddenLine /*= NULL */, int delay /*= UNKNOWN_VALUE  */ )
-			: _prorityLine(priorityLine)
+			: Registrable<uid, NonConcurrencyRule>()
+			, _prorityLine(priorityLine)
 			, _hiddenLine(hiddenLine)
 			, _delay(delay)
-			, Registrable<uid, NonConcurrencyRule>()
 		{
 		}
 
