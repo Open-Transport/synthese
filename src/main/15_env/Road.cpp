@@ -158,7 +158,17 @@ namespace synthese
 			return true;
 		}
 
-
-
+		void Road::getImmediateVertices( VertexAccessMap& result,  const AccessDirection& accessDirection,  const AccessParameters& accessParameters,  SearchAddresses returnAddresses  , SearchPhysicalStops returnPhysicalStops  , const Vertex* origin /*= 0 */ ) const
+		{
+			for (Addresses::const_iterator it = _addresses.begin ();
+				it != _addresses.end (); ++it
+			){
+				(*it)->getPlace()->getImmediateVertices(
+						result, accessDirection, accessParameters
+						, returnAddresses, returnPhysicalStops
+						, origin
+				);
+			}
+		}
 	}
 }

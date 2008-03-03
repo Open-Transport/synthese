@@ -262,6 +262,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="13 DBLog"
+			>
+			<File
+				RelativePath=".\ResaDBLog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResaDBLog.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\71_vinci_bike_rental\LICENSE.txt"
 			>

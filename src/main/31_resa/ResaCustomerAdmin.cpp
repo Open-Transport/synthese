@@ -32,6 +32,7 @@
 #include "31_resa/ReservationTableSync.h"
 
 #include "05_html/HTMLTable.h"
+#include "05_html/PropertiesHTMLTable.h"
 
 #include "30_server/QueryString.h"
 
@@ -89,6 +90,18 @@ namespace synthese
 		
 		void ResaCustomerAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
+//			ActionFunctionRequest
+
+			stream << "<h1>Coordonnées</h1>";
+
+//			PropertiesHTMLTable pt()
+
+			stream << "<h1>Droits</h1>";
+
+			stream << "<h1>Trajets favoris</h1>";
+
+			stream << "<h1>Journal</h1>";
+
 			HTMLTable t(0,"adminresults");
 			stream << t.open();
 
@@ -120,10 +133,8 @@ namespace synthese
 			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			/// @todo Implement it or leave empty
-			// Example
-			// if(parentLink.factoryKey == ResaCustomersAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
-			//	links.push_back(getPageLink());
+			if(parentLink.factoryKey == ResaCustomersAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
+				links.push_back(currentPage.getPageLink());
 			return links;
 		}
 		
@@ -133,7 +144,6 @@ namespace synthese
 			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
-			/// @todo Implement it or remove the method to get the default behaviour
 			return links;
 		}
 

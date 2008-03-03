@@ -25,10 +25,17 @@
 #ifndef SYNTHESE_ResaCustomersAdmin_H__
 #define SYNTHESE_ResaCustomersAdmin_H__
 
+#include "05_html/ActionResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace resa
 	{
 		/** ResaCustomersAdmin Class.
@@ -38,6 +45,19 @@ namespace synthese
 		*/
 		class ResaCustomersAdmin : public admin::AdminInterfaceElementTemplate<ResaCustomersAdmin>
 		{
+		public:
+			static const std::string PARAM_SEARCH_NAME;
+			static const std::string PARAM_SEARCH_LOGIN;
+			static const std::string PARAM_SEARCH_PHONE;
+
+		private:
+			std::vector<boost::shared_ptr<security::User> >	_users;
+			std::string										_searchLogin;
+			std::string										_searchName;
+			std::string										_searchPhone;
+			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
+			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
+
 		public:
 			ResaCustomersAdmin();
 			

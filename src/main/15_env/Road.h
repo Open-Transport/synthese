@@ -104,7 +104,26 @@ namespace synthese
 		  bool isRoad () const;
 		  bool isLine () const;
 		  virtual bool isPedestrianMode() const;
-		  
+
+		  /** getImmediateVertices.
+		  	@param result : all the vertices of all places traversed by the road
+		  	@param accessDirection
+		  	@param accessParameters
+		  	@param returnAddresses
+		  	@param returnPhysicalStops
+		  	@param origin
+		  	@author Hugues Romain
+		  	@date 2008		  	
+		  */
+		  void getImmediateVertices (VertexAccessMap& result, 
+			  const AccessDirection& accessDirection,
+			  const AccessParameters& accessParameters,
+			  SearchAddresses returnAddresses
+			  , SearchPhysicalStops returnPhysicalStops
+			  , const Vertex* origin = 0
+		  ) const;
+
+
 		  /** Find closest address of this road, before a given metric offset.
 			  @param metricOffset The reference point.
 			  @return Closest address before reference, or 0 if none.

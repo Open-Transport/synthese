@@ -53,13 +53,16 @@ namespace synthese
 
 		time::DateTime PermanentService::getLeaveTime( const ServicePointer& servicePointer , const Edge* edge ) const
 		{
-			int distance((servicePointer.getMethod() == TO_DESTINATION)
+			double distance((servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
 				? edge->getMetricOffset() - servicePointer.getEdge()->getMetricOffset()
 				: servicePointer.getEdge()->getMetricOffset() - edge->getMetricOffset()
 			);
-			int duration(distance * 0.015);
+
+			assert(distance > 0);
+
+			int duration(ceil(distance * 0.015));
 			DateTime dt(servicePointer.getActualDateTime());
-			if (servicePointer.getMethod() == TO_DESTINATION)
+			if (servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
 				dt += duration;
 			else
 				dt -= duration;

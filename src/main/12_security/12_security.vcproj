@@ -83,7 +83,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="14 AdminInterfaceElement"
+			Name="14 Admin"
 			>
 			<File
 				RelativePath=".\ProfileAdmin.cpp"

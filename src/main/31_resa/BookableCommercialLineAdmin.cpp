@@ -366,7 +366,7 @@ namespace synthese
 		bool BookableCommercialLineAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
 			/// @todo Implement the right control;
-			return false;
+			return true;
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPagesOfParent(

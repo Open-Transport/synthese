@@ -23,12 +23,17 @@
 */
 
 #include "ResaCustomersAdmin.h"
-#include "ResaModule.h"
+
+#include "31_resa/ResaModule.h"
+#include "31_resa/ResaRight.h"
+#include "31_resa/ResaCustomerAdmin.h"
 
 #include "30_server/QueryString.h"
+#include "30_server/Request.h"
 
 #include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
 
 using namespace std;
 
@@ -39,6 +44,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace resa;
+	using namespace admin;
+	using namespace security;
 
 	namespace util
 	{
@@ -69,13 +76,25 @@ namespace synthese
 		
 		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
-			/// @todo Implement the display by streaming the output to the stream variable
+			// Requests
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<ResaCustomersAdmin>();
+
+			FunctionRequest<AdminRequest> openRequest(request);
+			searchRequest.getFunction()->setPage<ResaCustomerAdmin>();
+			
+			// Form
+
+			// Search
+
+			// Results
+
 		}
 
-		bool ResaCustomersAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
-		{
-			/// @todo Implement the right control;
-			return false;
+		bool ResaCustomersAdmin::isAuthorized(
+			const FunctionRequest<AdminRequest>* request
+		) const	{
+			return request->isAuthorized<ResaRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfParent(

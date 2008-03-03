@@ -128,7 +128,12 @@ namespace synthese
 				, std::numeric_limits<int>::max ()
 				, false
 				, false
-				);
+			);
+
+			// Best arrival at starting places is start time
+			for (VertexAccessMap::VamMap::const_iterator it(_originVam.getMap().begin()); it != _originVam.getMap().end(); ++it)
+				bvrmd.insert(it->first, _journeySheetStartTime, false);
+			
 			iso.integralSearch (
 				_originVam
 				, _journeySheetStartTime
@@ -219,6 +224,11 @@ namespace synthese
 				, false
 				, true
 			);
+
+			// Best departure at starting places is start time
+			for (VertexAccessMap::VamMap::const_iterator it(_destinationVam.getMap().begin()); it != _destinationVam.getMap().end(); ++it)
+				bvrmo.insert(it->first, _journeySheetEndTime, false);
+
 			isd.integralSearch (
 				_destinationVam
 				, _journeySheetEndTime
