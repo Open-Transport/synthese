@@ -179,8 +179,12 @@ namespace synthese
 			}
 		}
 
-		std::vector<boost::shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search( const std::string& userName , uid userId , bool withCancelled , int first /*= 0 */, int number /*= 0  */ )
-		{
+		std::vector<boost::shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search(
+			uid userId
+			, bool withCancelled
+			, int first /*= 0 */
+			, int number /*= 0  */
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -188,10 +192,7 @@ namespace synthese
 				<< " FROM " << TABLE_NAME
 				<< " INNER JOIN " << ReservationTableSync::TABLE_NAME << " AS r ON "
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
-				<< " WHERE " 
-				<< TABLE_NAME << "." << COL_CUSTOMER_NAME << " LIKE " << Conversion::ToSQLiteString(userName);
-			if (userId != UNKNOWN_VALUE)
-				query << " AND " << COL_CANCEL_USER_ID << "=" << userId;
+				<< " WHERE " << COL_CANCEL_USER_ID << "=" << userId;
 			if (!withCancelled)
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
 			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;

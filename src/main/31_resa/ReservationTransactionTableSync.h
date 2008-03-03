@@ -90,8 +90,7 @@ namespace synthese
 
 
 			static std::vector<boost::shared_ptr<ReservationTransaction> > search(
-				const std::string& userName
-				, uid userId
+				uid userId
 				, bool withCancelled
 				, int first = 0
 				, int number = 0

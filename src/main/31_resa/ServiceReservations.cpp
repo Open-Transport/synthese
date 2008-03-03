@@ -1,6 +1,6 @@
 
-/** ResaModule class implementation.
-	@file ResaModule.cpp
+/** ServiceReservations class implementation.
+	@file ServiceReservations.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,35 +20,35 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ResaModule.h"
+#include "ServiceReservations.h"
 
-#include "05_html/HTMLTable.h"
+#include "15_env/Service.h"
+
 
 #include "31_resa/Reservation.h"
 #include "31_resa/ReservationTransaction.h"
 
 namespace synthese
 {
-	template<> const std::string util::FactorableTemplate<util::ModuleClass, resa::ResaModule>::FACTORY_KEY("31_resa");
-
 	namespace resa
 	{
 
-		std::string ResaModule::getName() const
+
+		boost::shared_ptr<Reservation> ServiceReservations::getReservation( const ReservationTransaction* transaction ) const
 		{
-			return "TAD Réservation";
+			const ReservationTransaction::Reservations& r(transaction->getReservations());
+			for (ReservationTransaction::Reservations::const_iterator ite(r.begin()); ite != r.end(); ++ite)
+				if ((*ite)->getServiceId() == service->getId())
+					return *ite;
 		}
 
-		void ResaModule::DisplayReservation( std::ostream& stream, html::HTMLTable& t, const Reservation* reservation)
+		ServiceReservations::ServiceReservations()
+			: service(NULL)
+			, seatsNumber(0)
+			, overflow(false)
+			, status(false)	
 		{
-			stream << t.row();
-			stream << t.col() << reservation->getDepartureTime().toString();
-			stream << t.col() << reservation->getDeparturePlaceName();
-			stream << t.col() << reservation->getArrivalPlaceName();
-			stream << t.col() << reservation->getArrivalTime().toString();
-			stream << t.col() << reservation->getTransaction()->getSeats();
-			stream << t.col() << reservation->getTransaction()->getCustomerName();
-		}
 
+		}
 	}
 }

@@ -116,8 +116,7 @@ namespace synthese
 				stream << t.open();
 
 				vector<shared_ptr<ReservationTransaction> > resats(ReservationTransactionTableSync::search(
-					userName
-					, UNKNOWN_VALUE
+					UNKNOWN_VALUE
 					, displayCancelled
 				));
 				for (vector<shared_ptr<ReservationTransaction> >::const_iterator itr(resats.begin()); itr != resats.end(); ++itr)

@@ -89,6 +89,14 @@
 				RelativePath=".\ReservationTransaction.h"
 				>
 			</File>
+			<File
+				RelativePath=".\ServiceReservations.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceReservations.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="18 Actions"
@@ -215,6 +223,42 @@
 			</File>
 			<File
 				RelativePath=".\ReservationsListInterfaceElement.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="14 Admin"
+			>
+			<File
+				RelativePath=".\BookableCommercialLineAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BookableCommercialLineAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\BookableCommercialLinesAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BookableCommercialLinesAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ResaCustomerAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResaCustomerAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ResaCustomersAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResaCustomersAdmin.h"
 				>
 			</File>
 		</Filter>

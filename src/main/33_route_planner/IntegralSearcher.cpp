@@ -478,7 +478,7 @@ namespace synthese
 				||	(	(method == TO_DESTINATION)
 					&&	(bestHopedGoalAccessDateTime > _minMaxDateTimeAtDestination)
 					)
-				)	return make_pair(false,false);
+				)	return make_pair(false,true);
 			}
 
 			/** - Best vertex map control : the service use is useful only if no other already founded
@@ -490,7 +490,7 @@ namespace synthese
 			||	(	(method == TO_DESTINATION)
 				&&	(reachDateTime > _bestVertexReachesMap.getBestTime (reachedVertex, reachDateTime))
 				)
-			)	return make_pair(false,false);
+			)	return make_pair(false,true);
 
 			return make_pair(true,true);
 		}

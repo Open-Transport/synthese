@@ -26,8 +26,15 @@
 #include "01_util/ModuleClass.h"
 #include "01_util/FactorableTemplate.h"
 
+#include <ostream>
+
 namespace synthese
 {
+	namespace html
+	{
+		class HTMLTable;
+	}
+
 	/** @defgroup m31 31 Reservation
 		@ingroup m3
 
@@ -72,6 +79,8 @@ namespace synthese
 	*/
 	namespace resa
 	{
+		class Reservation;
+
 		/** 51 Reservation module class.
 		*/
 		class ResaModule : public util::FactorableTemplate<util::ModuleClass, ResaModule>
@@ -81,6 +90,13 @@ namespace synthese
 		public:
 
 			virtual std::string getName() const;
+
+			static void DisplayReservation(
+				std::ostream& stream
+				, html::HTMLTable& t
+				, const Reservation* reservation
+			);
+
 		};
 	}
 	/** @} */
