@@ -27,6 +27,8 @@
 
 #include "04_time/module.h"
 
+#include <math.h>
+
 namespace synthese
 {
 	using namespace time;
