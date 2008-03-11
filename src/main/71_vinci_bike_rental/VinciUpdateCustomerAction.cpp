@@ -106,7 +106,7 @@ namespace synthese
 				_address = map.getString(PARAMETER_ADDRESS, false, FACTORY_KEY);
 				_postCode = map.getString(PARAMETER_POST_CODE, false, FACTORY_KEY);
 				_city = map.getString(PARAMETER_CITY, false, FACTORY_KEY);
-				transform(_city.begin(), _city.end(), _city.begin(), toupper);
+				boost::algorithm::to_upper (_city);
 
 				_country = map.getString(PARAMETER_COUNTRY, false, FACTORY_KEY);
 				_email = map.getString(PARAMETER_EMAIL, false, FACTORY_KEY);
