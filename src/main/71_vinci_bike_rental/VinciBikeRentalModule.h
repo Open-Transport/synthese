@@ -178,6 +178,7 @@ namespace synthese
 	/** 71 Vinci Bike Rental Module namespace. */
 	namespace vinci
 	{
+		class VinciContract;
 
 		/** 71 Vinci Bike Rental Module class. */
 		class VinciBikeRentalModule : public util::FactorableTemplate<util::ModuleClass, VinciBikeRentalModule>
@@ -193,6 +194,7 @@ namespace synthese
 			static boost::shared_ptr<accounts::Currency>	_objectCurrency;
 			static boost::shared_ptr<accounts::Currency>	_ticketCurrency;
 			static boost::shared_ptr<accounts::Account>		_stockChargeAccount;
+			static boost::shared_ptr<VinciContract>			_vinciFreeRentContract;
 
 
 			static const std::string VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE;
@@ -275,7 +277,8 @@ namespace synthese
 				static boost::shared_ptr<const accounts::Account>	getStockChargeAccount();
 				static boost::shared_ptr<const accounts::Currency>	getEuroCurrency();
 				static boost::shared_ptr<const accounts::Currency>	getObjectCurrency();
-				
+				static boost::shared_ptr<const VinciContract>		GetFreeRentContract();
+
 				static boost::shared_ptr<accounts::Account> getAccount(const std::string& code);
 
 			//@}

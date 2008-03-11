@@ -124,6 +124,7 @@ namespace synthese
 		std::vector<shared_ptr<VinciContract> > VinciContractTableSync::search(
 			std::string name /*= ""*/
 			, std::string surname /*= "" */
+			, uid userId
 			, bool lateFilter
 			, bool dueFilter
 			, bool outdatedGuaranteeFilter
@@ -166,14 +167,17 @@ namespace synthese
 				;
 			query << " FROM "
 					<< TABLE_NAME << " AS c "
-					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << COL_USER_ID << "=u." << TABLE_COL_ID
-					<< " LEFT JOIN " << TransactionTableSync::TABLE_NAME << " AS st ON st." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
+					<< " LEFT JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << COL_USER_ID << "=u." << TABLE_COL_ID
+					<< " LEFT JOIN " << TransactionTableSync::TABLE_NAME << " AS st ON st." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID;
+			query
 					<< " LEFT JOIN " << TransactionPartTableSync::TABLE_NAME << " AS stp ON stp." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE)->getKey() << " AND stp." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=st." << TABLE_COL_ID
 
 				<< " WHERE "
 					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '" << Conversion::ToSQLiteString(name, false) << "%'"
 					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '" << Conversion::ToSQLiteString(surname, false) << "%'"
 				;
+			if (userId != UNKNOWN_VALUE)
+				query << " ANS c." << COL_USER_ID << "=" << userId;
 
 			query
 				<< " GROUP BY u." << TABLE_COL_ID;

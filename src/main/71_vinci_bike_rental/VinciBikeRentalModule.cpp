@@ -26,6 +26,8 @@
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 #include "71_vinci_bike_rental/VinciSite.h"
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
+#include "71_vinci_bike_rental/VinciContract.h"
+#include "71_vinci_bike_rental/VinciContractTableSync.h"
 
 #include "12_security/UserTableSync.h"
 #include "12_security/User.h"
@@ -66,6 +68,7 @@ namespace synthese
 		shared_ptr<Currency> VinciBikeRentalModule::_objectCurrency;
 		VinciBikeRentalModule::_SessionsSitesMap VinciBikeRentalModule::_sessionsSites;
 		shared_ptr<Currency> VinciBikeRentalModule::_ticketCurrency;
+		shared_ptr<VinciContract> VinciBikeRentalModule::_vinciFreeRentContract;
 
 		const string VinciBikeRentalModule::CSS_LIMITED_HEIGHT = "limitedheight";
 
@@ -91,9 +94,8 @@ namespace synthese
 		const std::string VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE = "5331";
 		const std::string VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE = "5332";
 		const std::string VinciBikeRentalModule::VINCI_CHANGE_CREDIT_CARD_ACCOUNT_CODE = "5121";
-		const std::string VinciBikeRentalModule::VINCI_CHANGE_CASH_ACCOUNT_CODE = "532";
 		const std::string VinciBikeRentalModule::VINCI_CHANGE_TICKETS_PUNCHING_ACCOUNT_CODE = "59";
-		const std::string VinciBikeRentalModule::VINCI_CHANGE_CUSTOM_CODE("533");
+		const std::string VinciBikeRentalModule::VINCI_CHANGE_CUSTOM_CODE("532");
 
 		const std::string VinciBikeRentalModule::VINCI_CHARGE_STOCK_CHANGE_CODE("603");
 		
@@ -336,20 +338,6 @@ namespace synthese
 			ticketPunchings->setLocked(true);
 			AccountTableSync::save(ticketPunchings.get ());
 
-			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_CASH_ACCOUNT_CODE, 0, "");
-			shared_ptr<Account> cash;
-			if (accounts.empty())
-				cash.reset(new Account);
-			else
-				cash = accounts.front();
-			cash->setRightClassNumber(VINCI_CHANGE_CASH_ACCOUNT_CODE);
-			cash->setRightCurrency(_euroCurrency.get());
-			cash->setLeftCurrency(_euroCurrency.get());
-			cash->setRightUserId(_vinciUser->getKey());
-			cash->setName("Caisse : monnaie euros");
-			cash->setLocked(true);
-			AccountTableSync::save(cash.get ());
-
 			// Stock accounts
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_AVAILABLE_BIKES_STOCKS_ACCOUNT_CODE, 0, "");
 			shared_ptr<Account> bikeStockAccount;
@@ -392,6 +380,14 @@ namespace synthese
 			_vinciCustomerProfile->cleanRights();
 			_vinciCustomerProfile->addRight(r);
 			ProfileTableSync::save(_vinciCustomerProfile.get ());
+
+			// Free rent account
+			vector<shared_ptr<VinciContract> > contracts(VinciContractTableSync::search(string(), string(), 0));
+			if (contracts.empty())
+				_vinciFreeRentContract.reset(new VinciContract);
+			else
+				_vinciFreeRentContract = contracts.front();
+			VinciContractTableSync::save(_vinciFreeRentContract.get());
 		}
 
 		shared_ptr<const Profile> VinciBikeRentalModule::getCustomerProfile()
@@ -456,6 +452,11 @@ namespace synthese
 		std::string VinciBikeRentalModule::getName() const
 		{
 			return "Vinci Location de vélos";
+		}
+
+		boost::shared_ptr<const VinciContract> VinciBikeRentalModule::GetFreeRentContract()
+		{
+			return _vinciFreeRentContract;
 		}
 	}
 }

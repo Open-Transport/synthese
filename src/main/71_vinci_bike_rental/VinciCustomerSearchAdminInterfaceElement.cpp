@@ -152,6 +152,7 @@ namespace synthese
 			_contracts = VinciContractTableSync::search(
 				_searchName
 				, _searchSurname
+				, UNKNOWN_VALUE
 				, _searchFilter == FILTER_ONLATE
 				, _searchFilter == FILTER_DUE
 				, _searchFilter == FILTER_OUTDATED_GUARANTEE

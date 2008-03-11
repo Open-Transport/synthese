@@ -96,6 +96,17 @@ namespace synthese
 				, boost::shared_ptr<const Account> account=boost::shared_ptr<const Account>()
 				, int first = 0, int number = -1);
 
+			static std::vector<boost::shared_ptr<TransactionPart> > Search(
+				std::string accountCode
+				, uid rightUserId = UNKNOWN_VALUE
+				, uid stockId = UNKNOWN_VALUE
+				, bool orderByAccount = false
+				, bool orderByDate = true
+				, bool raisingOrder = true
+				, int first = 0
+				, int number = -1
+			);
+
 			static std::map<int, int> count(
 				boost::shared_ptr<const Account> account
 				, time::Date startDate, time::Date endDate, int first=0, int number=-1);

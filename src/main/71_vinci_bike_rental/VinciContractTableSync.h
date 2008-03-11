@@ -71,6 +71,7 @@ namespace synthese
 			static std::vector<boost::shared_ptr<VinciContract> > search(
 				std::string name = std::string()
 				, std::string surname = std::string()
+				, uid userId = UNKNOWN_VALUE
 				, bool lateFilter = false
 				, bool dueFilter = false
 				, bool outdatedGuarantee = false

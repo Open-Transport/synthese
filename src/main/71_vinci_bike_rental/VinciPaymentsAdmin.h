@@ -1,6 +1,6 @@
 
-/** VinciSiteAdmin class header.
-	@file VinciSiteAdmin.h
+/** VinciPaymentsAdmin class header.
+	@file VinciPaymentsAdmin.h
 	@author Hugues Romain
 	@date 2008
 
@@ -22,37 +22,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_VinciSiteAdmin_H__
-#define SYNTHESE_VinciSiteAdmin_H__
+#ifndef SYNTHESE_VinciPaymentsAdmin_H__
+#define SYNTHESE_VinciPaymentsAdmin_H__
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
 #include "05_html/ResultHTMLTable.h"
 
-#include <boost/shared_ptr.hpp>
-
 namespace synthese
 {
 	namespace vinci
 	{
-		class VinciSite;
-
-		/** VinciSiteAdmin Class.
+		/** VinciPaymentsAdmin Class.
 			@ingroup m71Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/
-		class VinciSiteAdmin : public admin::AdminInterfaceElementTemplate<VinciSiteAdmin>
+		class VinciPaymentsAdmin : public admin::AdminInterfaceElementTemplate<VinciPaymentsAdmin>
 		{
-			boost::shared_ptr<const VinciSite>	_site;
-			html::ResultHTMLTable::RequestParameters		_requestParameters;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+			std::string									_searchName;
+			std::string									_searchCode;
 
 		public:
-			static const std::string PARAMETER_ACCOUNT;
-			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_CODE;
+			static const std::string PARAMETER_LOCKED;
 
-			VinciSiteAdmin();
+			VinciPaymentsAdmin();
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -70,7 +67,6 @@ namespace synthese
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
 			
-			
 			/** Authorization control.
 				@param request The current request
 				@return bool True if the displayed page can be displayed
@@ -79,11 +75,10 @@ namespace synthese
 			*/
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 			
-
 			/** Gets sub page of the designed parent page, which are from the current class.
-				@param factoryKey Key of the parent class
-				@param request User request
-				@return PageLinks A link to the page if the parent is Home
+				@param parentLink Link to the parent page
+				@param currentPage Currently displayed page
+				@return PageLinks each subpage of the parent page designed in parentLink
 				@author Hugues Romain
 				@date 2008
 			*/
@@ -92,13 +87,23 @@ namespace synthese
 				, const AdminInterfaceElement& currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
-
-			virtual std::string getTitle() const;
-			virtual std::string getParameterName() const;
-			virtual std::string getParameterValue() const;
-
+			
+			/** Sub pages getter.
+				@param currentPage Currently displayed page
+				@param request User request
+				@return PageLinks each subpage of the current page
+				@author Hugues Romain
+				@date 2008
+				REMOVE IF YOU WANT TO USE THE STANDARD INHERITANCE METHOD DESIGNED IN ADMININTERFACEELEMENT
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const PageLink& parentLink
+				, const AdminInterfaceElement& currentPage
+				, const server::FunctionRequest<admin::AdminRequest>* request
+				
+			) const;
 		};
 	}
 }
 
-#endif // SYNTHESE_VinciSiteAdmin_H__
+#endif // SYNTHESE_VinciPaymentsAdmin_H__

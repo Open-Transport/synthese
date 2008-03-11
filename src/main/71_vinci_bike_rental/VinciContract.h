@@ -72,6 +72,8 @@ namespace synthese
 			time::DateTime	_outDatedGuarantee;
 			
 		public:
+			static const std::string DEFAULT_NAME;
+
 			VinciContract(uid id=0);
 
 			//!	\name Setters

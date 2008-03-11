@@ -10,6 +10,7 @@ synthese::vinci::VinciBikeAdminInterfaceElement::integrate();
 synthese::vinci::VinciSitesAdminInterfaceElement::integrate();
 synthese::vinci::VinciSiteAdmin::integrate();
 synthese::vinci::VinciAccountAdmin::integrate();
+synthese::vinci::VinciPaymentsAdmin::integrate();
 
 synthese::vinci::VinciBikeTableSync::integrate();
 synthese::vinci::VinciRateTableSync::integrate();

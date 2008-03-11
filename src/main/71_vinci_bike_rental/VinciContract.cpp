@@ -54,6 +54,8 @@ namespace synthese
 
 	namespace vinci
 	{
+		const string VinciContract::DEFAULT_NAME("Vente libre");
+
 		VinciContract::VinciContract(uid id)
 			: Registrable<uid, VinciContract>(id)
 			, _date(TIME_UNKNOWN)

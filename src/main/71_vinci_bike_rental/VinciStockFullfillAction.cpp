@@ -56,7 +56,7 @@ namespace synthese
 		const string VinciStockFullfillAction::PARAMETER_ACCOUNT_ID = Action_PARAMETER_PREFIX + "ac";
 		const string VinciStockFullfillAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "si";
 		const string VinciStockFullfillAction::PARAMETER_PIECES = Action_PARAMETER_PREFIX + "pi";
-
+		const string VinciStockFullfillAction::PARAMETER_COMMENT(Action_PARAMETER_PREFIX + "co");
 		
 		
 		VinciStockFullfillAction::VinciStockFullfillAction()
@@ -101,6 +101,7 @@ namespace synthese
 			}
 
 			_pieces = map.getDouble(PARAMETER_PIECES, true, FACTORY_KEY);
+			_comment = map.getString(PARAMETER_COMMENT, false, FACTORY_KEY);
 		}
 		
 		
@@ -114,6 +115,7 @@ namespace synthese
 			ft.setEndDateTime(now);
 			string name(string((_pieces > 0) ? "Approvisionnement" : "Sortie") + " de stock");
 			ft.setName(name);
+			ft.setComment(_comment);
 			TransactionTableSync::save(&ft);
 
 			// Stock fullfill

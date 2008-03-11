@@ -167,7 +167,7 @@ namespace synthese
 			) const
 		{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.factoryKey == VinciBikeRentalModule::FACTORY_KEY)
+			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == VinciBikeRentalModule::FACTORY_KEY)
 			{
 				links.push_back(getPageLink());
 			}

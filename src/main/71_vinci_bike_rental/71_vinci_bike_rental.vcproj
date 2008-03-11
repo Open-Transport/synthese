@@ -226,6 +226,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\VinciPaymentsAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciPaymentsAdmin.h"
+				>
+			</File>
+			<File
 				RelativePath=".\VinciReportsAdminInterfaceElement.cpp"
 				>
 			</File>

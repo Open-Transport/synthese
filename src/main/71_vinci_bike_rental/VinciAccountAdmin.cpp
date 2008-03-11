@@ -30,15 +30,18 @@
 #include "71_vinci_bike_rental/VinciSite.h"
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
 #include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
+#include "71_vinci_bike_rental/VinciStockFullfillAction.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
 
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
 
 #include "30_server/QueryString.h"
+#include "30_server/ActionFunctionRequest.h"
 
-#include "05_html/HTMLTable.h"
+#include "05_html/PropertiesHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -86,6 +89,13 @@ namespace synthese
 
 		void VinciAccountAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
+			// Requests
+			ActionFunctionRequest<VinciStockFullfillAction,AdminRequest> fRequest(request);
+			fRequest.getFunction()->setPage<VinciAccountAdmin>();
+			fRequest.setObjectId(_account->getKey());
+			fRequest.getAction()->setAccount(_account);
+
+			// Display
 			stream << "<h1>Stocks</h1>";
 			StocksSize ss(getStocksSize(_account->getKey(), UNKNOWN_VALUE));
 
@@ -93,7 +103,7 @@ namespace synthese
 			sv.push_back("Site");
 			sv.push_back("Nombre de pièces");
 //			sv.push_back("Alerte");
-			HTMLTable tv(sv);
+			HTMLTable tv(sv, "adminresults");
 			stream << tv.open();
 
 			for (StocksSize::const_iterator it(ss.begin()); it != ss.end(); ++it)
@@ -111,6 +121,21 @@ namespace synthese
 					stream << "ALERTE HAUT";
 */			}
 			stream << tv.close();
+
+			stream << "<h1>Approvisionnement</h1>";
+
+			PropertiesHTMLTable nt(fRequest.getHTMLForm("newstock"));
+
+			stream << nt.open();
+			vector<pair<uid, string> > sites;
+			vector<shared_ptr<VinciSite> > rsites(VinciSiteTableSync::search(string("%")));
+			for (vector<shared_ptr<VinciSite> >::const_iterator it(rsites.begin()); it != rsites.end(); ++it)
+				sites.push_back(make_pair((*it)->getKey(), (*it)->getName()));
+			stream << nt.cell("Site", nt.getForm().getSelectInput(VinciStockFullfillAction::PARAMETER_SITE_ID, sites, static_cast<uid>(UNKNOWN_VALUE)));
+			stream << nt.cell("Quantité", nt.getForm().getTextInput(VinciStockFullfillAction::PARAMETER_PIECES, string()));
+			stream << nt.cell("Commentaire", nt.getForm().getTextAreaInput(VinciStockFullfillAction::PARAMETER_COMMENT, string(), 3, 50));
+			stream << nt.close();
+
 		}
 
 		bool VinciAccountAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const

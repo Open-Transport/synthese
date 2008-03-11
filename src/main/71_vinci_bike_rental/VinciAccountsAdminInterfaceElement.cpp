@@ -28,7 +28,6 @@
 #include "71_vinci_bike_rental/VinciRight.h"
 #include "71_vinci_bike_rental/VinciAccountAdmin.h"
 #include "71_vinci_bike_rental/VinciCreateStockAction.h"
-#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 #include "57_accounting/AccountTableSync.h"
 #include "57_accounting/Account.h"
@@ -130,23 +129,13 @@ namespace synthese
 				, _requestParameters.first
 				, _requestParameters.maxSize
 			);
-			vector<shared_ptr<Account> > changeSearchResult = AccountTableSync::search(
-				VinciBikeRentalModule::getVinciUser()->getKey()
-				, VinciBikeRentalModule::VINCI_CHANGE_CODE
-				, UNKNOWN_VALUE
-				, emptyString
-				, _searchName
-				, _requestParameters.orderField == PARAMETER_NAME
-				, _requestParameters.raisingOrder
-				, _requestParameters.first
-				, _requestParameters.maxSize
-			);
 
 			// HTML search form
 			stream << "<h1>Recherche</h1>";
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAMETER_NAME, _searchName));
+			stream << st.cell("Code", st.getForm().getTextInput(PARAMETER_CODE, _searchCode));
 			stream << st.close();
 
 			// Results list
@@ -204,8 +193,8 @@ namespace synthese
 
 				stream << t.col() << (((*it)->getStockAccountId() > 0) 
 					? "OUI : " + HTMLModule::getLinkButton(openStockRequest.getURL(), "Ouvrir", string(), "cart_go.png")
-					: "NON : " +((*it)->getLocked() ? "" : HTMLModule::getLinkButton(createStockRequest.getURL(), "Activer", string(), "cart_add.png")));
-				stream << t.col() << ((*it)->getLocked() ? "NON" : "OUI : " + HTMLModule::getLinkButton(lockRequest.getURL(), "Supprimer", "E^tes-vous sûr de vouloir supprimer le compte ? (cette opération est définitive)", "cart_delete.png"));
+					: "NON : " +((*it)->getLocked() ? "" : HTMLModule::getLinkButton(createStockRequest.getURL(), "Activer", "Êtes-vous sûr de vouloir activer le stock de "+ (*it)->getName()+" ?", "cart_add.png")));
+				stream << t.col() << ((*it)->getLocked() ? "NON" : "OUI : " + HTMLModule::getLinkButton(lockRequest.getURL(), "Supprimer", "Êtes-vous sûr de vouloir supprimer le compte ? (cette opération est définitive)", "cart_delete.png"));
 			}
 
 			// New account
@@ -216,54 +205,11 @@ namespace synthese
 			stream << t.col() << af.open();
 			stream << af.getTextInput(AccountAddAction::PARAMETER_NAME, emptyString, string("(nom du produit)"));
 			stream << " " << af.getSubmitButton("Ajouter");
+			stream << t.col();
+			stream << t.col();
 			stream << af.close();
 			
 			stream << t.close();
-
-			// Change accounts list
-			stream << "<h1>Modes de paiement</h1>";
-
-			ResultHTMLTable::ResultParameters pc(ResultHTMLTable::getParameters(_requestParameters, changeSearchResult));
-
-			ResultHTMLTable::HeaderVector hc;
-			hc.push_back(make_pair(PARAMETER_NAME, "Nom"));
-			hc.push_back(make_pair(PARAMETER_CODE, "Code mode"));
-			hc.push_back(make_pair(PARAMETER_LOCKED, "Liste"));
-
-			ResultHTMLTable tc(hc, st.getForm(), _requestParameters, p);
-			stream << tc.open();
-
-			// Loop on each result
-			for (vector<shared_ptr<Account> >::const_iterator it = changeSearchResult.begin(); it != changeSearchResult.end(); ++it)
-			{
-				stream << tc.row();
-				stream << t.col();
-				if ((*it)->getLocked())
-					stream << (*it)->getName();
-				else
-				{
-					HTMLForm upr(renameRequest.getHTMLForm("re"+Conversion::ToString((*it)->getKey())));
-					stream << upr.open();
-					stream << upr.getTextInput(AccountRenameAction::PARAMETER_VALUE, (*it)->getName());
-					stream << upr.getSubmitButton("Renommer");
-					stream << upr.close();
-				}
-				stream << tc.col() << (*it)->getRightClassNumber().substr(1);
-				stream << t.col() << ((*it)->getLocked() ? "NON" : "OUI : " + HTMLModule::getLinkButton(lockRequest.getURL(), "Supprimer", "E^tes-vous sûr de vouloir supprimer le compte ? (cette opération est définitive)", "cart_delete.png"));
-			}
-
-			// New account
-			addRequest.getAction()->setClass(VinciBikeRentalModule::VINCI_CHANGE_CUSTOM_CODE);
-			HTMLForm afc(addRequest.getHTMLForm("addc"));
-
-			stream << tc.row();
-			stream << tc.col() << afc.open();
-			stream << afc.getTextInput(AccountAddAction::PARAMETER_NAME, emptyString, string("(nom du mode de paiement)"));
-			stream << " " << afc.getSubmitButton("Ajouter");
-			stream << afc.close();
-
-			stream << tc.close();
-
 		}
 
 		bool VinciAccountsAdminInterfaceElement::isAuthorized(const FunctionRequest<AdminRequest>* request) const

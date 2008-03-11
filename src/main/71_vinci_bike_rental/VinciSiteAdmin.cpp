@@ -29,9 +29,14 @@
 #include "71_vinci_bike_rental/VinciSiteUpdateAction.h"
 #include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
 #include "71_vinci_bike_rental/VinciStockFullfillAction.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
+#include "57_accounting/Transaction.h"
+#include "57_accounting/TransactionTableSync.h"
+#include "57_accounting/TransactionPart.h"
+#include "57_accounting/TransactionPartTableSync.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
@@ -40,7 +45,9 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "05_html/HTMLForm.h"
-#include "05_html/HTMLTable.h"
+#include "05_html/PropertiesHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
+#include "05_html/SearchFormHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -68,6 +75,9 @@ namespace synthese
 
 	namespace vinci
 	{
+		const std::string VinciSiteAdmin::PARAMETER_ACCOUNT("ac");
+		const std::string VinciSiteAdmin::PARAMETER_DATE("da");
+
 		VinciSiteAdmin::VinciSiteAdmin()
 			: AdminInterfaceElementTemplate<VinciSiteAdmin>()
 		{ }
@@ -98,29 +108,19 @@ namespace synthese
 			fRequest.setObjectId(_site->getKey());
 			fRequest.getAction()->setSite(_site);
 
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<VinciSiteAdmin>();
+
 			// Output
-			HTMLForm uf(updateRequest.getHTMLForm("update"));
+			PropertiesHTMLTable ut(updateRequest.getHTMLForm("update"));
 
 			stream << "<h1>Propriétés</h1>";
-			stream << uf.open();
-
-			HTMLTable ut;
+			
 			stream << ut.open();
-			stream << ut.row();
-			stream << ut.col() << "Nom";
-			stream << ut.col() << uf.getTextInput(VinciSiteUpdateAction::PARAMETER_NAME, _site->getName());
-
-			stream << ut.row();
-			stream << ut.col() << "Adresse";
-			stream << ut.col() << uf.getTextInput(VinciSiteUpdateAction::PARAMETER_ADDRESS, _site->getAddress());
-
-			stream << ut.row();
-			stream << ut.col() << "Téléphone";
-			stream << ut.col() << uf.getTextInput(VinciSiteUpdateAction::PARAMETER_PHONE, _site->getPhone());
-
-			stream << ut.row();
-			stream << ut.col() << "Ouvert";
-			stream << ut.col() << uf.getOuiNonRadioInput(VinciSiteUpdateAction::PARAMETER_OPENED, !_site->getLocked());
+			stream << ut.cell("Nom", ut.getForm().getTextInput(VinciSiteUpdateAction::PARAMETER_NAME, _site->getName()));
+			stream << ut.cell("Adresse", ut.getForm().getTextInput(VinciSiteUpdateAction::PARAMETER_ADDRESS, _site->getAddress()));
+			stream << ut.cell("Téléphone", ut.getForm().getTextInput(VinciSiteUpdateAction::PARAMETER_PHONE, _site->getPhone()));
+			stream << ut.cell("Ouvert", ut.getForm().getOuiNonRadioInput(VinciSiteUpdateAction::PARAMETER_OPENED, !_site->getLocked()));
 
 			vector<pair<uid, string> > othersites;
 			othersites.push_back(make_pair(UNKNOWN_VALUE, "Pas de site d'approvisionnement"));
@@ -128,15 +128,9 @@ namespace synthese
 			for (vector<shared_ptr<VinciSite> >::const_iterator it(sites.begin()); it != sites.end(); ++it)
 				if ((*it)->getKey() != _site->getKey())
 					othersites.push_back(make_pair((*it)->getKey(), (*it)->getName()));
-			stream << ut.row();
-			stream << ut.col() << "Site d'approvisionnement";
-			stream << ut.col() << uf.getSelectInput(VinciSiteUpdateAction::PARAMETER_PARENT_SITE_ID, othersites, _site->getParentSiteId());
+			stream << ut.cell("Site d'approvisionnement", ut.getForm().getSelectInput(VinciSiteUpdateAction::PARAMETER_PARENT_SITE_ID, othersites, _site->getParentSiteId()));
 
-			stream << ut.row();
-			stream << ut.col();
-			stream << ut.col() << uf.getSubmitButton("Enregistrer");
-			
-			stream << ut.close() << uf.close();
+			stream << ut.close();
 
 			stream << "<h1>Stocks</h1>";
 			StocksSize ss(getStocksSize(UNKNOWN_VALUE, _site->getKey()));
@@ -146,9 +140,8 @@ namespace synthese
 			sv.push_back("Nombre de pièces");
 			sv.push_back("Prix unitaire");
 			sv.push_back("Valeur totale");
-			sv.push_back("Approvisionnement");
 			//			sv.push_back("Alerte");
-			HTMLTable tv(sv);
+			HTMLTable tv(sv,"adminresults");
 			stream << tv.open();
 			double amount(0);
 
@@ -166,14 +159,8 @@ namespace synthese
 				stream << it->second.unitPrice;
 				stream << tv.col();
 				stream << (it->second.unitPrice * it->second.size);
-				stream << tv.col();
-
-				HTMLForm f(fRequest.getHTMLForm("f"+Conversion::ToString(si->getKey())));
-				stream << f.open();
-				stream << f.getTextInput(VinciStockFullfillAction::PARAMETER_PIECES, string());
-				stream << f.getSubmitButton("Approvisionner");
-				stream << f.close();
-				/*				if ((*it)->getMinAlert() > 0 && it->second.size < (*it)->getMinAlert())
+				/* stream << tv.col();
+				if ((*it)->getMinAlert() > 0 && it->second.size < (*it)->getMinAlert())
 				stream << "ALERTE BAS";
 				if ((*it)->getMaxAlert() > 0 && (*it)->getStockSize() > (*it)->getMaxAlert())
 				stream << "ALERTE HAUT";
@@ -181,9 +168,60 @@ namespace synthese
 			stream << tv.row();
 			stream << tv.col(3) << "TOTAL";
 			stream << tv.col() << amount;
-			stream << tv.col();
 
 			stream << tv.close();
+
+			stream << "<h1>Approvisionnement</h1>";
+
+			PropertiesHTMLTable nt(fRequest.getHTMLForm("newstock"));
+
+			stream << nt.open();
+			vector<pair<uid, string> > productslist;
+			vector<shared_ptr<Account> > products(AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_STOCK_CODE, UNKNOWN_VALUE, string()));
+			for (vector<shared_ptr<Account> >::const_iterator it(products.begin()); it != products.end(); ++it)
+				productslist.push_back(make_pair((*it)->getKey(), (*it)->getName()));
+			stream << nt.cell("Produit", nt.getForm().getSelectInput(VinciStockFullfillAction::PARAMETER_ACCOUNT_ID, productslist, static_cast<uid>(UNKNOWN_VALUE)));
+			stream << nt.cell("Quantité", nt.getForm().getTextInput(VinciStockFullfillAction::PARAMETER_PIECES, string()));
+			stream << nt.cell("Commentaire", nt.getForm().getTextAreaInput(VinciStockFullfillAction::PARAMETER_COMMENT, string(), 3, 50));
+			stream << nt.close();
+
+			stream << "<h1>Historique</h1>";
+
+			// Search
+			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
+
+			shared_ptr<const Account> fa((shared_ptr<const Account>) VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_STOCK_CODE));
+			vector<shared_ptr<TransactionPart> > tp(
+				TransactionPartTableSync::Search(
+					VinciBikeRentalModule::VINCI_STOCK_CODE
+					, VinciBikeRentalModule::getVinciUser()->getKey()
+					, _site->getKey()
+					, _requestParameters.orderField == PARAMETER_ACCOUNT
+					, _requestParameters.orderField == PARAMETER_DATE
+					, _requestParameters.raisingOrder
+			)	);
+
+			ResultHTMLTable::ResultParameters p(ResultHTMLTable::getParameters(_requestParameters, sites));
+
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(PARAMETER_DATE, "Date"));
+			h.push_back(make_pair(PARAMETER_ACCOUNT, "Produit"));
+			h.push_back(make_pair(string(), "Quantité"));
+			h.push_back(make_pair(string(), "Commentaire"));
+			
+			ResultHTMLTable ft(h, st.getForm(), _requestParameters, p);
+			stream << ft.open();
+
+			for (vector<shared_ptr<TransactionPart> >::iterator it = tp.begin(); it != tp.end(); ++it)
+			{
+				shared_ptr<const Transaction> transaction = TransactionTableSync::Get((*it)->getTransactionId());
+				shared_ptr<const Account> product = AccountTableSync::Get((*it)->getAccountId());
+				stream << ft.row();
+				stream << ft.col() << transaction->getStartDateTime().toString();
+				stream << ft.col() << product->getName();
+				stream << ft.col() << (*it)->getRightCurrencyAmount();
+				stream << ft.col() << transaction->getComment();
+			}
 
 		}
 

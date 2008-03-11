@@ -50,11 +50,13 @@ namespace synthese
 			static const std::string PARAMETER_SITE_ID;
 			static const std::string PARAMETER_ACCOUNT_ID;
 			static const std::string PARAMETER_PIECES;
+			static const std::string PARAMETER_COMMENT;
 
 		private:
 			boost::shared_ptr<const VinciSite>			_site;
 			boost::shared_ptr<const accounts::Account>	_account;
 			double										_pieces;
+			std::string									_comment;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

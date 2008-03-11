@@ -38,6 +38,8 @@
 #include "57_accounting/TransactionTableSync.h"
 #include "57_accounting/TransactionPart.h"
 #include "57_accounting/TransactionPartTableSync.h"
+#include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -179,6 +181,49 @@ namespace synthese
 		}
 
 
+
+		vector<shared_ptr<TransactionPart> > TransactionPartTableSync::Search(
+			string accountCode
+			, uid rightUserId
+			, uid stockId
+			, bool orderByAccount
+			, bool orderByDate
+			, bool raisingOrder
+			, int first
+			, int number
+		){
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT * "
+				<< " FROM " << TABLE_NAME << " AS p "
+				<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
+				<< " INNER JOIN " << AccountTableSync::TABLE_NAME << " AS a ON a." << TABLE_COL_ID << "=p." << TABLE_COL_ACCOUNT_ID
+				<< " WHERE "
+				<< " a." << AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE " << accountCode
+			;
+			if (rightUserId != UNKNOWN_VALUE)
+				query << " AND a." << AccountTableSync::TABLE_COL_RIGHT_USER_ID << "=" << rightUserId;
+			if (stockId != UNKNOWN_VALUE)
+				query << " AND p." << COL_STOCK_ID << "=" << stockId;
+			if (orderByAccount)
+				query << " ORDER BY a." << AccountTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC";
+			if (orderByDate)
+				query << " ORDER BY t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << (raisingOrder ? " ASC" : " DESC");
+			query << " LIMIT " << number << " OFFSET " << first;
+
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			vector<shared_ptr<TransactionPart> > tps;
+			while (rows->next ())
+			{
+				shared_ptr<TransactionPart> tp(new TransactionPart);
+				load(tp.get (), rows);
+				tps.push_back(tp);
+			}
+			return tps;
+		}
+
+
 		vector<shared_ptr<TransactionPart> > TransactionPartTableSync::search(
 			shared_ptr<const Account> account
 			, shared_ptr<const User> user
@@ -192,8 +237,8 @@ namespace synthese
 				<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
 				<< " WHERE "
 				<< " p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
-				;
-			if (user != NULL)
+			;
+			if (user.get())
 				query << " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user->getKey());
 			query << " ORDER BY " << TransactionTableSync::TABLE_COL_START_DATE_TIME;
 			if (!order)

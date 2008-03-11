@@ -10,6 +10,7 @@
 #include "71_vinci_bike_rental/VinciSitesAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciSiteAdmin.h"
 #include "71_vinci_bike_rental/VinciAccountAdmin.h"
+#include "71_vinci_bike_rental/VinciPaymentsAdmin.h"
 
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
