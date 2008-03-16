@@ -200,7 +200,7 @@ namespace synthese
 				<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
 				<< " INNER JOIN " << AccountTableSync::TABLE_NAME << " AS a ON a." << TABLE_COL_ID << "=p." << TABLE_COL_ACCOUNT_ID
 				<< " WHERE "
-				<< " a." << AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE " << accountCode
+				<< " a." << AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE " << Conversion::ToSQLiteString(accountCode)
 			;
 			if (rightUserId != UNKNOWN_VALUE)
 				query << " AND a." << AccountTableSync::TABLE_COL_RIGHT_USER_ID << "=" << rightUserId;
@@ -238,8 +238,7 @@ namespace synthese
 				<< " WHERE "
 				<< " p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
 			;
-			if (user.get())
-				query << " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user->getKey());
+			query << " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user.get() ? user->getKey() : 0);
 			query << " ORDER BY " << TransactionTableSync::TABLE_COL_START_DATE_TIME;
 			if (!order)
 				query << " DESC ";
@@ -296,7 +295,7 @@ namespace synthese
 				<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
 				<< " WHERE "
 				<< " p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
-				<< " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user->getKey())
+				<< " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user.get() ? user->getKey() : 0)
 				;
 
 			SQLiteResultSPtr rows = sqlite->execQuery(query.str());

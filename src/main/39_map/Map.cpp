@@ -1,3 +1,25 @@
+
+/** Map class implementation.
+	@file Map.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "Map.h"
 
 #include "Geometry.h"
@@ -9,9 +31,6 @@
 #include "MapBackgroundManager.h"
 
 #include "PostscriptCanvas.h"
-#include "01_util/RGBColor.h"
-
-
 
 #include <algorithm>
 #include <vector>
@@ -21,24 +40,26 @@
 #include <cmath>
 #include <limits>
 
-#include "15_env/Point.h"
-#include "15_env/PhysicalStop.h"
+#include "06_geometry/Point2D.h"
 
+#include "15_env/PhysicalStop.h"
 
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
+#include "01_util/RGBColor.h"
 
 using synthese::util::Log;
 using synthese::util::Conversion;
 
 
-using synthese::env::Point;
 using synthese::env::PhysicalStop;
 using namespace std;
 
 
 namespace synthese
 {
+	using namespace geometry;
+	
 namespace map
 {
 
@@ -116,11 +137,11 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 it != selectedLines.end ();
 	 ++it)
     {
-	const std::vector<const Point*>& points = (*it)->getPoints ();
-	for (std::vector<const Point*>::const_iterator itp = points.begin ();
+	const std::vector<const Point2D*>& points = (*it)->getPoints ();
+	for (std::vector<const Point2D*>::const_iterator itp = points.begin ();
 	     itp != points.end () ; ++itp)
 	{
-	    const Point* p = *itp;
+	    const Point2D* p = *itp;
 	    if (p->getX () < lowerLeftLatitude) lowerLeftLatitude = p->getX ();
 	    if (p->getY () < lowerLeftLongitude) lowerLeftLongitude = p->getY ();
 	    if (p->getX () > upperRightLatitude) upperRightLatitude = p->getX ();
@@ -181,8 +202,8 @@ Map::populateLineIndex (const DrawableLineIndex& lineIndex, const std::set<Drawa
     {
 		(*it)->fuzzyfyPoints (lineIndex);
 
-		const std::vector<Point>& points = (*it)->getFuzzyfiedPoints ();
-		for (std::vector<Point>::const_iterator itp = points.begin ();
+		const std::vector<Point2D>& points = (*it)->getFuzzyfiedPoints ();
+		for (std::vector<Point2D>::const_iterator itp = points.begin ();
 			itp != points.end () ; ++itp)
 		{
 			lineIndex.add (*itp, *it);
@@ -217,20 +238,20 @@ Map::~Map()
 }
 
 
-Point 
-Map::toRealFrame (const Point& p)
+Point2D 
+Map::toRealFrame (const Point2D& p)
 {
-    return Point (
+    return Point2D (
         (p.getX () * _realFrame.getWidth()) / _width + _realFrame.getX(),
         (p.getY () * _realFrame.getHeight()) / _height + _realFrame.getY());
 }
 
 
 
-Point 
-Map::toOutputFrame (const Point& p)
+Point2D 
+Map::toOutputFrame (const Point2D& p)
 {
-    return Point (
+    return Point2D (
 	((p.getX() - _realFrame.getX()) / _realFrame.getWidth ()) * _width ,
 	((p.getY() - _realFrame.getY()) / _realFrame.getHeight()) * _height );
 }
@@ -252,7 +273,7 @@ Map::getUrlPattern () const
 
 std::vector<DrawableLine*>
 Map::findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
-			    const Point& point) const 
+			    const Point2D& point) const 
 {
 	// std::cerr << "*** findLinesSharingPoint " << drawableLines.size () << " x="
 	// 	<< point.getX () << " y=" << point.getY () << std::endl;
@@ -277,13 +298,13 @@ Map::findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
 
 
 
-std::pair<Point, int>
+std::pair<Point2D, int>
 Map::findMostSharedPoint (const DrawableLine* line, 
 			  const std::set<DrawableLine*>& exclusionList) const {
     int curPointIndex = -1;
     unsigned int cpt = 1;
 	
-    const std::vector<Point>& points = line->getFuzzyfiedPoints ();
+    const std::vector<Point2D>& points = line->getFuzzyfiedPoints ();
     for (unsigned int i=0; i<points.size (); ++i) 
     {
 	// Create a copy 
@@ -301,7 +322,7 @@ Map::findMostSharedPoint (const DrawableLine* line,
 	    curPointIndex = i;
 	}
     }
-    return std::pair<Point, int> (points[curPointIndex], cpt);
+    return std::pair<Point2D, int> (points[curPointIndex], cpt);
 }
 
 
@@ -312,7 +333,7 @@ DrawableLine*
 Map::findMostSharedLine (const std::set<DrawableLine*>& drawableLines, 
 			 const std::set<DrawableLine*>& exclusionList) const
 {
-    std::pair<const Point*, int> curPointCpt	(0, -1);
+    std::pair<const Point2D*, int> curPointCpt	(0, -1);
 	
     DrawableLine* dbl;
 	
@@ -349,7 +370,7 @@ Map::findMostSharedLine (const std::set<DrawableLine*>& drawableLines,
 
 
 std::pair<const DrawableLine*, int>
-Map::findLeftMostLine (const Point& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
+Map::findLeftMostLine (const Point2D& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
 {
     int leftMostShift = -10000;
     const DrawableLine* leftMostLine = 0;
@@ -383,7 +404,7 @@ Map::findLeftMostLine (const Point& v, const DrawableLine* reference, const std:
 
 
 std::pair<const DrawableLine*, int>
-Map::findRightMostLine (const Point& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
+Map::findRightMostLine (const Point2D& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
 {
     int rightMostShift = +10000;
     const DrawableLine* rightMostLine = 0;
@@ -415,7 +436,7 @@ Map::findRightMostLine (const Point& v, const DrawableLine* reference, const std
 
 void 
 Map::assignShiftFactors (const DrawableLine* reference, 
-			 const Point& referencePoint, 
+			 const Point2D& referencePoint, 
 			 DrawableLine* line, 
 			 const std::set<DrawableLine*>& exclusionList)
 {
@@ -429,7 +450,7 @@ Map::assignShiftFactors (const DrawableLine* reference,
     for (unsigned int j=0; j<line->getFuzzyfiedPoints().size (); ++j) {
 	// cout << "Processing point " << j << endl;
 	
-	const Point& v = line->getFuzzyfiedPoints()[j];
+	const Point2D& v = line->getFuzzyfiedPoints()[j];
 	
 	if (_lineGrouping)
 	{
@@ -539,7 +560,7 @@ void
 Map::preparePhysicalStops () 
 {
     std::set<const PhysicalStop*> iteratedStops;
-	std::vector<Point> fuzzyStopPoints;
+	std::vector<Point2D> fuzzyStopPoints;
 
     // Create drawable physical stops (for each physical stop)
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
@@ -548,15 +569,15 @@ Map::preparePhysicalStops ()
 	    const DrawableLine* dbl = *it;
         if (dbl->getWithPhysicalStops () == false) continue;
 
-	    const std::vector<const Point*>& points = dbl->getPoints ();
+	    const std::vector<const Point2D*>& points = dbl->getPoints ();
 	    for (int i=0; i<points.size (); ++i)
 	    {
-	        const Point* p = points[i];
+	        const Point2D* p = points[i];
 
 	        const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (p);
 	        if (physicalStop)
 	        {
-				Point fuzzyPoint (_indexedLines.getFuzzyPoint (*p));
+				Point2D fuzzyPoint (_indexedLines.getFuzzyPoint (*p));
                 if ( (iteratedStops.find (physicalStop) == iteratedStops.end ()) &&
 					 (find (fuzzyStopPoints.begin(), fuzzyStopPoints.end(), fuzzyPoint) == fuzzyStopPoints.end ()) )
                 {
@@ -601,7 +622,7 @@ Map::prepareLines ()
 		
 	// Get the most shared point of the most shared bus line
 	// TODO : check there cannot be an infinite loop going through this.
-	std::pair<Point, int> pointAndCpt = findMostSharedPoint (mostSharedLine);
+	std::pair<Point2D, int> pointAndCpt = findMostSharedPoint (mostSharedLine);
 
 	// Check if the most shared bus line is sharing its most shared point
 	// with a line which is in the exclusion list. If yes, this line becomes

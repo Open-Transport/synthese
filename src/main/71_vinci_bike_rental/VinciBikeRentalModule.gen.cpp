@@ -34,6 +34,8 @@ synthese::vinci::RemoveCustomerAction::integrate();
 synthese::vinci::VinciCreateStockAction::integrate();
 synthese::vinci::VinciSiteLoginAction::integrate();
 synthese::vinci::VinciStockFullfillAction::integrate();
+synthese::vinci::VinciStockAlertAdd::integrate();
+synthese::vinci::VinciStockAlertRemoveAction::integrate();
 
 synthese::vinci::VinciContractPrintRequest::integrate();
 synthese::vinci::BarCodeInterpretFunction::integrate();

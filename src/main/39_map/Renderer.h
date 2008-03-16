@@ -21,7 +21,7 @@ namespace synthese
 		class Map;
 
 
-		class Renderer : public util::Factorable
+		class Renderer : public util::Factorable<Renderer>
 		{
 		protected:
 

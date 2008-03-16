@@ -34,6 +34,7 @@
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
+#include "57_accounting/AccountUnitPriceUpdateAction.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
@@ -95,7 +96,19 @@ namespace synthese
 			fRequest.setObjectId(_account->getKey());
 			fRequest.getAction()->setAccount(_account);
 
+			ActionFunctionRequest<AccountUnitPriceUpdateAction,AdminRequest> unitPriceRequest(request);
+			unitPriceRequest.getFunction()->setPage<VinciAccountAdmin>();
+			unitPriceRequest.setObjectId(_account->getKey());
+
 			// Display
+			stream << "<h1>Propriétés</h1>";
+
+			PropertiesHTMLTable pt(unitPriceRequest.getHTMLForm("prop"));
+			stream << pt.open();
+			stream << pt.cell("Prix unitaire", pt.getForm().getTextInput(AccountUnitPriceUpdateAction::PARAMETER_VALUE, Conversion::ToString(_account->getUnitPrice())));
+			stream << pt.close();
+
+
 			stream << "<h1>Stocks</h1>";
 			StocksSize ss(getStocksSize(_account->getKey(), UNKNOWN_VALUE));
 
@@ -114,8 +127,8 @@ namespace synthese
 				stream << si->getName();
 				stream << tv.col();
 				stream << it->second.size;
-				stream << tv.col();
-/*				if ((*it)->getMinAlert() > 0 && it->second.size < (*it)->getMinAlert())
+/*				stream << tv.col();
+				if ((*it)->getMinAlert() > 0 && it->second.size < (*it)->getMinAlert())
 					stream << "ALERTE BAS";
 				if ((*it)->getMaxAlert() > 0 && (*it)->getStockSize() > (*it)->getMaxAlert())
 					stream << "ALERTE HAUT";

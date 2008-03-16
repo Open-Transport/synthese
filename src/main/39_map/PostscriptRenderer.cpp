@@ -1,3 +1,26 @@
+
+/** PostscriptRenderer class implementation.
+	@file PostscriptRenderer.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+
 #include "PostscriptRenderer.h"
 
 #include "Geometry.h"
@@ -8,6 +31,8 @@
 #include "MapBackground.h"
 #include "MapBackgroundManager.h"
 
+#include "06_geometry/Point2D.h"
+
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
 
@@ -15,21 +40,16 @@
 #include <iostream>
 #include <fstream>
 
-using synthese::util::RGBColor;
-using synthese::util::Log;
-using synthese::util::Conversion;
-using synthese::env::Point;
-
-
-
-
 namespace synthese
 {
+	using namespace geometry;
+	using namespace util;
 
 	namespace map
 	{
 
 		PostscriptRenderer::PostscriptRenderer()
+			: FactorableTemplate<Renderer,PostscriptRenderer>()
 		{
 		}
 
@@ -159,7 +179,7 @@ namespace synthese
 			for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
-			const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 			
 			doDrawCurvedLine(_canvas, dbl);
 			}
@@ -168,7 +188,7 @@ namespace synthese
 			for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
-			const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 			_canvas.setrgbcolor(dbl->getColor ());
 
 			doDrawCurvedLine(_canvas, dbl);
@@ -178,10 +198,10 @@ namespace synthese
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
 			if (dbl->getWithPhysicalStops() == false) continue;
-			const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 			for (unsigned int i=1; i<shiftedPoints.size()-1; ++i) 
 			{
-				Point pt (shiftedPoints[i].getX() + 100.0, shiftedPoints[i].getY());
+				Point2D pt (shiftedPoints[i].getX() + 100.0, shiftedPoints[i].getY());
 				double angle = calculateAngle (pt, shiftedPoints[i], shiftedPoints[i+1]);
 
 				if (dbl->isStopPoint (i)) 
@@ -198,12 +218,12 @@ namespace synthese
 			for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
-			const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 
 			// Draw Terminuses
 			if (shiftedPoints.size () >= 2) {
 
-				Point pt (shiftedPoints[0].getX() + 100.0, 
+				Point2D pt (shiftedPoints[0].getX() + 100.0, 
 					shiftedPoints[0].getY());
 
 				double angle = calculateAngle (pt, 
@@ -213,7 +233,7 @@ namespace synthese
 				doDrawSquareTerminus (_canvas, shiftedPoints[0], 
 						toDegrees(angle - M_PI_2));
 		        
-				pt = Point (shiftedPoints[shiftedPoints.size ()-2].getX() + 100.0, 
+				pt = Point2D (shiftedPoints[shiftedPoints.size ()-2].getX() + 100.0, 
 					shiftedPoints[shiftedPoints.size ()-2].getY());
 
 				angle = calculateAngle (pt, 
@@ -238,7 +258,7 @@ namespace synthese
 		void 
 		PostscriptRenderer::doDrawCurvedLine (PostscriptCanvas& _canvas,const DrawableLine* dbl)
 		{
-			const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 			_canvas.newpath();
 		/*
 			_canvas.moveto(shiftedPoints[0].getX()+5, shiftedPoints[0].getY()+10);
@@ -257,8 +277,8 @@ namespace synthese
 			if (_config.getEnableCurves () && (i < shiftedPoints.size () - 1)) 
 			{
 				// Take care of intern/extern turn to invert radius
-				const Point& p_minus_1 = shiftedPoints[i-1];
-				const Point& p_plus_1 = shiftedPoints[i+1];
+				const Point2D& p_minus_1 = shiftedPoints[i-1];
+				const Point2D& p_plus_1 = shiftedPoints[i+1];
 			    
 				double angle = calculateAngle (p_minus_1, shiftedPoints[i], p_plus_1);
 				if (angle < 0) 
@@ -308,7 +328,7 @@ namespace synthese
 
 
 		void 
-		PostscriptRenderer::doDrawTriangleArrow (PostscriptCanvas& _canvas,const synthese::env::Point& point, 
+		PostscriptRenderer::doDrawTriangleArrow (PostscriptCanvas& _canvas,const Point2D& point, 
 							double angle)
 		{
 			_canvas.gsave ();
@@ -324,7 +344,7 @@ namespace synthese
 
 
 		void 
-		PostscriptRenderer::doDrawSquareStop (PostscriptCanvas& _canvas,const synthese::env::Point& point, 
+		PostscriptRenderer::doDrawSquareStop (PostscriptCanvas& _canvas,const Point2D& point, 
 							double angle)
 		{
 			_canvas.gsave ();
@@ -343,7 +363,7 @@ namespace synthese
 
 
 		void 
-		PostscriptRenderer::doDrawSquareTerminus (PostscriptCanvas& _canvas,const synthese::env::Point& point, 
+		PostscriptRenderer::doDrawSquareTerminus (PostscriptCanvas& _canvas,const Point2D& point, 
 							double angle)
 		{
 			_canvas.gsave ();
@@ -371,7 +391,7 @@ namespace synthese
 			{
 				const DrawablePhysicalStop* dps = *it;
 			
-			Point cp = dps->getPoint ();
+			Point2D cp = dps->getPoint ();
 			_canvas.moveto (cp.getX (), cp.getY ());
 			_canvas.sticker (dps->getName (), synthese::util::RGBColor ("yellow"), 10, 10);
 			}

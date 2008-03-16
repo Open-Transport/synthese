@@ -1,3 +1,25 @@
+
+/** DrawableLineComparator class implementation.
+	@file DrawableLineComparator.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "DrawableLineComparator.h"
 
 #include "DrawableLine.h"
@@ -11,20 +33,20 @@
 #include <iostream>
 #include <algorithm>
 
-using synthese::env::Point;
-
 using namespace std;
 
 namespace synthese
 {
+	using namespace geometry;
+	
 namespace map
 {
 
 
 DrawableLineComparator::DrawableLineComparator(
     const DrawableLine* reference, 
-    const Point& referencePoint, 
-    const Point& point)
+    const Point2D& referencePoint, 
+    const Point2D& point)
     : _reference (reference)
     , _referencePoint (referencePoint)
     , _point (point)
@@ -39,8 +61,8 @@ DrawableLineComparator::~DrawableLineComparator()
 
 
 int 
-DrawableLineComparator::firstIndexOf (const Point& point, 
-				      const std::vector<Point>& points) const
+DrawableLineComparator::firstIndexOf (const Point2D& point, 
+				      const std::vector<Point2D>& points) const
 {
     for (unsigned int i=0; i<points.size (); ++i)
     {
@@ -53,7 +75,7 @@ DrawableLineComparator::firstIndexOf (const Point& point,
 
 
 void 
-DrawableLineComparator::setPoint (const Point& point)
+DrawableLineComparator::setPoint (const Point2D& point)
 {
     _point = point;	
 }
@@ -62,14 +84,14 @@ DrawableLineComparator::setPoint (const Point& point)
 /*
 double
 DrawableLineComparator::calculateStartAngleAtIndex (
-    const std::vector<const Point*>& points, 
+    const std::vector<const Point2D*>& points, 
     int index) const
 {
     if (index+2 >= (int) points.size ()) return -1;
     
-    const Point* vs0_1 = (const Point*) points[index];
-    const Point* vs1_1 = (const Point*) points[index + 1];
-    const Point* vs2_1 = (const Point*) points[index + 2];
+    const Point2D* vs0_1 = (const Point2D*) points[index];
+    const Point2D* vs1_1 = (const Point2D*) points[index + 1];
+    const Point2D* vs2_1 = (const Point2D*) points[index + 2];
     
     double angle = calculateAngle (*vs0_1, *vs1_1, *vs2_1);
     if (angle < 0) angle += 2*M_PI;
@@ -81,14 +103,14 @@ DrawableLineComparator::calculateStartAngleAtIndex (
 
 double
 DrawableLineComparator::calculateEndAngleAtIndex (
-    const std::vector<const Point*>& points, 
+    const std::vector<const Point2D*>& points, 
     int index) const
 {
     if (index < 2) return -1;
     
-    const Point* vs0_1 = (const Point*) points[index - 2];
-    const Point* vs1_1 = (const Point*) points[index - 1];
-    const Point* vs2_1 = (const Point*) points[index];
+    const Point2D* vs0_1 = (const Point2D*) points[index - 2];
+    const Point2D* vs1_1 = (const Point2D*) points[index - 1];
+    const Point2D* vs2_1 = (const Point2D*) points[index];
     
     double angle = calculateAngle (*vs0_1, *vs1_1, *vs2_1);
     if (angle < 0) angle += 2*M_PI;
@@ -100,14 +122,14 @@ DrawableLineComparator::calculateEndAngleAtIndex (
 
 double
 DrawableLineComparator::calculateStartAngleAtIndex (
-    const std::vector<Point>& points, 
+    const std::vector<Point2D>& points, 
     int index) const
 {
     if (index+2 >= (int) points.size ()) return -1;
     
-    const Point& vs0_1 = points[index];
-    const Point& vs1_1 = points[index + 1];
-    const Point& vs2_1 = points[index + 2];
+    const Point2D& vs0_1 = points[index];
+    const Point2D& vs1_1 = points[index + 1];
+    const Point2D& vs2_1 = points[index + 2];
     
     double angle = calculateAngle (vs0_1, vs1_1, vs2_1);
     if (angle < 0) angle += 2*M_PI;
@@ -119,14 +141,14 @@ DrawableLineComparator::calculateStartAngleAtIndex (
 
 double
 DrawableLineComparator::calculateEndAngleAtIndex (
-    const std::vector<Point>& points, 
+    const std::vector<Point2D>& points, 
     int index) const
 {
     if (index < 2) return -1;
     
-    const Point& vs0_1 = points[index - 2];
-    const Point& vs1_1 = points[index - 1];
-    const Point& vs2_1 = points[index];
+    const Point2D& vs0_1 = points[index - 2];
+    const Point2D& vs1_1 = points[index - 1];
+    const Point2D& vs2_1 = points[index];
     
     double angle = calculateAngle (vs0_1, vs1_1, vs2_1);
     if (angle < 0) angle += 2*M_PI;
@@ -138,19 +160,19 @@ DrawableLineComparator::calculateEndAngleAtIndex (
 
 std::pair<double, double>
 DrawableLineComparator::calculateStartAngles (
-	const std::vector<Point>& points1, int index1,
-	const std::vector<Point>& points2, int index2) const
+	const std::vector<Point2D>& points1, int index1,
+	const std::vector<Point2D>& points2, int index2) const
 {
     assert (points1.size () >= 2);
     assert (points2.size () >= 2);
 
     // The six points for calculating angles
-    Point p1_0 (0, 0);
-    Point p1_1 (0, 0);
-    Point p1_2 (0, 0);
-    Point p2_0 (0, 0);
-    Point p2_1 (0, 0);
-    Point p2_2 (0, 0);
+    Point2D p1_0 (0, 0);
+    Point2D p1_1 (0, 0);
+    Point2D p1_2 (0, 0);
+    Point2D p2_0 (0, 0);
+    Point2D p2_1 (0, 0);
+    Point2D p2_2 (0, 0);
 
     if ((index1 == -1) && (index2 == -1))
     {
@@ -239,19 +261,19 @@ DrawableLineComparator::calculateStartAngles (
 
 
 std::pair<double, double>
-DrawableLineComparator::calculateEndAngles (const std::vector<Point>& points1, int index1,
-					    const std::vector<Point>& points2, int index2) const
+DrawableLineComparator::calculateEndAngles (const std::vector<Point2D>& points1, int index1,
+					    const std::vector<Point2D>& points2, int index2) const
 {
     assert (points1.size () >= 2);
     assert (points2.size () >= 2);
 
     // The six points for calculating angles
-    Point p1_0 (0, 0);
-    Point p1_1 (0, 0);
-    Point p1_2 (0, 0);
-    Point p2_0 (0, 0);
-    Point p2_1 (0, 0);
-    Point p2_2 (0, 0);
+    Point2D p1_0 (0, 0);
+    Point2D p1_1 (0, 0);
+    Point2D p1_2 (0, 0);
+    Point2D p2_0 (0, 0);
+    Point2D p2_1 (0, 0);
+    Point2D p2_2 (0, 0);
 
     if ((index1 == points1.size ()) && (index2 == points2.size ()))
     {
@@ -373,15 +395,15 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
     }
     
     // TODO Other special cases to be handled...
-    std::vector<Point> points1 = bl1->getFuzzyfiedPoints ();
-    std::vector<Point> points2 = bl2->getFuzzyfiedPoints ();
+    std::vector<Point2D> points1 = bl1->getFuzzyfiedPoints ();
+    std::vector<Point2D> points2 = bl2->getFuzzyfiedPoints ();
     
     int index1_1, index1_2, index2_1, index2_2;
     
     bool mustReverseLine2 = bl2->isReverseWayAt (_point, bl1);
     if (mustReverseLine2) std::reverse (points2.begin (), points2.end ());
     
-    Point curPoint = _point;
+    Point2D curPoint = _point;
     index1_1 = firstIndexOf(curPoint, points1);
     index1_2 = firstIndexOf(curPoint, points2);
     

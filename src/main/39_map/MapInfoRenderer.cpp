@@ -1,3 +1,25 @@
+
+/** MapInfoRenderer class implementation.
+	@file MapInfoRenderer.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "MapInfoRenderer.h"
 
 #include "Geometry.h"
@@ -12,6 +34,7 @@
 
 #include <boost/algorithm/string/replace.hpp>
 
+#include "06_geometry/Point2D.h"
 
 #include <fstream>
 #include <cmath>
@@ -19,17 +42,15 @@
 #include <sstream>
 
 
-using synthese::util::RGBColor;
-using synthese::util::Log;
-using synthese::util::Conversion;
-using synthese::env::Point;
 using synthese::env::PhysicalStop;
-
-
 
 
 namespace synthese
 {
+	using namespace util;
+	using namespace geometry;
+	
+	
 
 namespace map
 {
@@ -85,7 +106,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
          it != selectedLines.end () ; ++it) 
     {
 	const DrawableLine* dbl = *it;
-	const std::vector<const Point*>& points = dbl->getPoints ();
+	const std::vector<const Point2D*>& points = dbl->getPoints ();
 
 
 	
@@ -164,6 +185,12 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
     return resultFilename;
 }
 
+MapInfoRenderer::MapInfoRenderer()
+: FactorableTemplate<Renderer,MapInfoRenderer>()
+{
+
+}
+
 
 
 
@@ -184,10 +211,10 @@ MapInfoRenderer::renderLines (Map& map)
          it != selectedLines.end () ; ++it) 
 	{
 		const DrawableLine* dbl = *it;
-		const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
+		const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 
 		// Shift them again on right and left of half-width to get the enveloppe.
-		const std::vector<synthese::env::Point> points1 =
+		const std::vector<synthese::env::Point2D> points1 =
 		  dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
 		
 		std::string href (_urlPattern);
@@ -199,7 +226,7 @@ MapInfoRenderer::renderLines (Map& map)
 			_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
 		}
 
-		std::vector<synthese::env::Point> points2 = 
+		std::vector<synthese::env::Point2D> points2 = 
 			dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
 
 		std::reverse (points2.begin (), points2.end ());

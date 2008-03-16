@@ -77,7 +77,7 @@ namespace synthese
 		ParametersMap VinciAddFinancialAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_USER, _user->getKey());
+			map.insert(PARAMETER_USER, _user.get() ? _user->getKey() : 0);
 			return map;
 		}
 		
@@ -86,13 +86,16 @@ namespace synthese
 		void VinciAddFinancialAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			uid id = map.getUid(PARAMETER_USER, true, FACTORY_KEY);
-			try
+			if (id != 0)
 			{
-				_user = UserTableSync::Get(id);
-			}
-			catch (User::ObjectNotFoundException e)
-			{
-				throw ActionException("User not found");
+				try
+				{
+					_user = UserTableSync::Get(id);
+				}
+				catch (User::ObjectNotFoundException e)
+				{
+					throw ActionException("User not found");
+				}
 			}
 
 			id = map.getUid(PARAMETER_ACCOUNT, true, FACTORY_KEY);
@@ -128,7 +131,7 @@ namespace synthese
 			shared_ptr<Transaction> ft(new Transaction);
 			ft->setStartDateTime(now);
 			ft->setEndDateTime(now);
-			ft->setLeftUserId(_user->getKey());
+			ft->setLeftUserId(_user.get() ? _user->getKey() : 0);
 			ft->setName(_name);
 			TransactionTableSync::save(ft.get());
 

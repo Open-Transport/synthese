@@ -53,6 +53,7 @@ namespace synthese
 			time::DateTime					_dateTime;
 			int								_resultsNumber;
 			AccessibilityParameter			_accessibility;
+			bool							_log;
 
 		public:
 			static const std::string PARAMETER_START_CITY;
@@ -62,6 +63,7 @@ namespace synthese
 			static const std::string PARAMETER_DATE_TIME;
 			static const std::string PARAMETER_RESULTS_NUMBER;
 			static const std::string PARAMETER_ACCESSIBILITY;
+			static const std::string PARAMETER_LOG;
 
 			SiteRoutePlanningAdmin();
 

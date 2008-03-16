@@ -1,17 +1,37 @@
+
+/** TileGrid class implementation.
+	@file TileGrid.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "TileGrid.h"
 
 #include "Geometry.h"
-#include "15_env/Point.h"
+#include "06_geometry/Point2D.h"
 
 #include <cmath>
 
-
-using synthese::env::Point;
-
-
-
 namespace synthese
 {
+	using namespace geometry;
+	
+
 namespace map
 {
 
@@ -49,7 +69,7 @@ TileGrid::~TileGrid ()
 
 	
 void 
-TileGrid::markTilesForPoint (const synthese::env::Point& p)
+TileGrid::markTilesForPoint (const Point2D& p)
 {
     int tileX = (int) (p.getX () / _tileWidth);
     int tileY = (int) (p.getY () / _tileHeight);
@@ -59,8 +79,8 @@ TileGrid::markTilesForPoint (const synthese::env::Point& p)
 
 
 void 
-TileGrid::markTilesForLine (const synthese::env::Point& from, 
-			    const synthese::env::Point& to)
+TileGrid::markTilesForLine (const Point2D& from, 
+			    const Point2D& to)
 {
     markTilesForPoint (from);
     markTilesForPoint (to);
@@ -68,10 +88,10 @@ TileGrid::markTilesForLine (const synthese::env::Point& from,
     // Special case if from.getX () == to.getX ()
     if (from.getX () == to.getX ())
     {
-	Point next (from);
+	Point2D next (from);
 	while (1)
 	{
-	    next.setY (next.getY () + _tileHeight);
+	    next.setXY (next.getX(), next.getY () + _tileHeight);
 	    if (next.getY () > to.getY ()) break;
 	    markTilesForPoint (next);
 	}
@@ -94,7 +114,7 @@ TileGrid::markTilesForLine (const synthese::env::Point& from,
 
     for (int i=startTileX; i<=endTileX; ++i)
     {
-	Point p (i*_tileWidth, 
+	Point2D p (i*_tileWidth, 
 		 from.getY () + a * ((i*_tileWidth) - from.getX ()));
 	markTilesForPoint (p);
     }
@@ -113,7 +133,7 @@ TileGrid::markTilesForLine (const synthese::env::Point& from,
 
     for (int i=startTileY; i<=endTileY; ++i)
     {
-	Point p (from.getX () + a * (i*_tileHeight - from.getY()), 
+	Point2D p (from.getX () + a * (i*_tileHeight - from.getY()), 
 		 i*_tileHeight);
 	markTilesForPoint (p);
     }
@@ -122,8 +142,8 @@ TileGrid::markTilesForLine (const synthese::env::Point& from,
 
 
 void 
-TileGrid::markTilesForRectangle (const synthese::env::Point& from, 
-				 const synthese::env::Point& to, 
+TileGrid::markTilesForRectangle (const Point2D& from, 
+				 const Point2D& to, 
 				 bool filled)
 {
 

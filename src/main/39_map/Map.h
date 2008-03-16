@@ -1,3 +1,25 @@
+
+/** Map class header.
+	@file Map.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_CARTO_MAP_H
 #define SYNTHESE_CARTO_MAP_H
 
@@ -16,11 +38,10 @@
 
 namespace synthese
 {
-
-namespace env
-{
-    class Point;
-}
+	namespace geometry
+	{
+		class Point2D;
+	}
 
 namespace map
 {
@@ -59,9 +80,9 @@ private:
     
     std::vector<DrawableLine*>
 	findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
-			       const synthese::env::Point& point) const;
+			       const geometry::Point2D& point) const;
     
-    std::pair<synthese::env::Point, int>
+    std::pair<geometry::Point2D, int>
 	findMostSharedPoint (const DrawableLine* drawableLine, 
 			     const std::set<DrawableLine*>& exclusionList = 
 			     std::set<DrawableLine*> ()) const;
@@ -71,20 +92,20 @@ private:
     
     
     std::pair<const DrawableLine*, int>
-	findLeftMostLine (const synthese::env::Point& vertex, 
+	findLeftMostLine (const geometry::Point2D& vertex, 
 			  const DrawableLine* reference, 
 			  const std::set<DrawableLine*>& lines) const;
     
 
     std::pair<const DrawableLine*, int>
-	findRightMostLine (const synthese::env::Point& vertex, 
+	findRightMostLine (const geometry::Point2D& vertex, 
 			   const DrawableLine* reference, 
 			   const std::set<DrawableLine*>& lines) const;
     
     
     void 
 	assignShiftFactors (const DrawableLine* reference, 
-			    const synthese::env::Point& referencePoint, 
+			    const geometry::Point2D& referencePoint, 
 			    DrawableLine* drawableLine, 
 			    const std::set<DrawableLine*>& exclusionList);
     
@@ -124,8 +145,8 @@ public:
     
     virtual ~Map();
     
-    synthese::env::Point toRealFrame (const synthese::env::Point& p);
-    synthese::env::Point toOutputFrame (const synthese::env::Point& p);
+    geometry::Point2D toRealFrame (const geometry::Point2D& p);
+    geometry::Point2D toOutputFrame (const geometry::Point2D& p);
 	
     //! @name Getters/Setters
     //@{

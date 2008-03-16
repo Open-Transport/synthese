@@ -79,11 +79,13 @@ namespace synthese
 		const string SiteRoutePlanningAdmin::PARAMETER_END_PLACE("ep");
 		const string SiteRoutePlanningAdmin::PARAMETER_RESULTS_NUMBER("rn");
 		const string SiteRoutePlanningAdmin::PARAMETER_ACCESSIBILITY("ac");
+		const string SiteRoutePlanningAdmin::PARAMETER_LOG("lo");
 
 		SiteRoutePlanningAdmin::SiteRoutePlanningAdmin()
 			: AdminInterfaceElementTemplate<SiteRoutePlanningAdmin>()
 			, _resultsNumber(UNKNOWN_VALUE)
 			, _dateTime(TIME_UNKNOWN)
+			, _log(false)
 		{ }
 		
 		void SiteRoutePlanningAdmin::setFromParametersMap(const ParametersMap& map)
@@ -101,6 +103,7 @@ namespace synthese
 			_endCity = map.getString(PARAMETER_END_CITY, false, FACTORY_KEY);
 			_endPlace = map.getString(PARAMETER_END_PLACE, false, FACTORY_KEY);
 			_dateTime = map.getDateTime(PARAMETER_DATE_TIME, false, FACTORY_KEY);
+			_log = map.getBool(PARAMETER_LOG, false, false, FACTORY_KEY);
 			if (_dateTime.isUnknown())
 				_dateTime = DateTime(TIME_CURRENT);
 			_resultsNumber = map.getInt(PARAMETER_RESULTS_NUMBER, false, FACTORY_KEY);
@@ -127,6 +130,7 @@ namespace synthese
 			stream << st.cell("Date/Heure", st.getForm().getCalendarInput(PARAMETER_DATE_TIME, _dateTime));
 			stream << st.cell("Nombre réponses", st.getForm().getSelectNumberInput(PARAMETER_RESULTS_NUMBER, 1, 99, _resultsNumber, 1, "(illimité)"));
 			stream << st.cell("Accessibilité", st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, PlacesListModule::GetAccessibilityNames(), _accessibility));
+			stream << st.cell("Trace", st.getForm().getOuiNonRadioInput(PARAMETER_LOG, _log));
 			stream << st.close();
 
 			// No calculation without cities
@@ -141,6 +145,7 @@ namespace synthese
 			// Route planning
 			const Place* startPlace(_site->fetchPlace(_startCity, _startPlace));
 			const Place* endPlace(_site->fetchPlace(_endCity, _endPlace));
+			stringstream trace;
 			RoutePlanner r(
 				startPlace
 				, endPlace
@@ -149,6 +154,8 @@ namespace synthese
 				, _dateTime
 				, endDate
 				, _resultsNumber
+				, &trace
+				, _log ? Log::LEVEL_TRACE : Log::LEVEL_NONE
 				);
 			const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
 
@@ -247,6 +254,13 @@ namespace synthese
 				stream << t.col() << its->getArrivalDateTime().toString();
 			}
 			stream << t.close();
+
+			if (_log)
+			{
+				stream << "<h1>Trace</h1><pre>";
+				stream << trace.str();
+				stream << "</pre>";
+			}
 		}
 
 		bool SiteRoutePlanningAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const

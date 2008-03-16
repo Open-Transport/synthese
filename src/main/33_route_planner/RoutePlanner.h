@@ -27,6 +27,8 @@
 #include <vector>
 #include <map>
 
+#include "01_util/Log.h"
+
 #include "04_time/DateTime.h"
 
 #include "15_env/Place.h"
@@ -93,7 +95,9 @@ namespace synthese
 				int _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
 				time::DateTime _previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
 				Result			_result;
-				 //!< 
+				std::ostream* const			_logStream;
+				const util::Log::Level		_logLevel;
+				//!< 
 			//@}
 
 		public:
@@ -116,6 +120,8 @@ namespace synthese
 				 const time::DateTime& journeySheetStartTime,
 				 const time::DateTime& journeySheetEndTime
 				 , int maxSolutionsNumber = UNKNOWN_VALUE
+				 , std::ostream* logStream = NULL
+				 , util::Log::Level				logLevel = util::Log::LEVEL_NONE
 			);
 
 			~RoutePlanner ();

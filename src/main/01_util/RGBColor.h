@@ -25,7 +25,9 @@ struct RGBColor
 
 	RGBColor (const std::string& colorName);
 	
-	
+
+	bool operator == (const synthese::util::RGBColor& op2 ) const;
+
 };
 
 
@@ -33,7 +35,6 @@ struct RGBColor
 }
 }
 
-bool operator == ( const synthese::util::RGBColor& op1, const synthese::util::RGBColor& op2 );
 
 
 #endif

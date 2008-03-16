@@ -143,6 +143,7 @@ namespace synthese
 			oneMonthBefore -= 31;
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
+			string squery;
 			query
 				<< "SELECT *"
 				<< ",(SELECT MAX(t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") FROM " 
@@ -155,32 +156,34 @@ namespace synthese
 						<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<" << yesterday.toSQLString()
 					<< ") AS ret"
 					<< ",SUM(stp." << TransactionPartTableSync::TABLE_COL_RIGHT_CURRENCY_AMOUNT << ") AS solde"
-					<< ",MAX(tg." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") FROM "
+					<< ",(SELECT MAX(tg." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") FROM "
 						<< TransactionPartTableSync::TABLE_NAME << " AS tpg "
-						<< " INNER JOIN " << TransactionTableSync::TABLE_COL_NAME << " AS tg ON tg." << TABLE_COL_ID << "=tpg." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
+						<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS tg ON tg." << TABLE_COL_ID << "=tpg." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
 					<< " WHERE " 
-						<< " t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
-						<< " AND p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE)->getKey()
-						<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << " IS NULL "
-						<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<" << oneMonthBefore.toSQLString()
+						<< " tg." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
+						<< " AND tpg." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE)->getKey()
+						<< " AND tg." << TransactionTableSync::TABLE_COL_END_DATE_TIME << " IS NULL "
+						<< " AND tg." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<" << oneMonthBefore.toSQLString()
 					<< ") AS gua"
 				;
 			query << " FROM "
 					<< TABLE_NAME << " AS c "
 					<< " LEFT JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << COL_USER_ID << "=u." << TABLE_COL_ID
-					<< " LEFT JOIN " << TransactionTableSync::TABLE_NAME << " AS st ON st." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID;
-			query
+					<< " LEFT JOIN " << TransactionTableSync::TABLE_NAME << " AS st ON st." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=u." << TABLE_COL_ID
 					<< " LEFT JOIN " << TransactionPartTableSync::TABLE_NAME << " AS stp ON stp." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE)->getKey() << " AND stp." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=st." << TABLE_COL_ID
 
-				<< " WHERE "
-					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '" << Conversion::ToSQLiteString(name, false) << "%'"
+				<< " WHERE 1 ";
+
+			if (userId != 0)
+				query
+					<< " AND u." << UserTableSync::TABLE_COL_NAME << " LIKE '" << Conversion::ToSQLiteString(name, false) << "%'"
 					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '" << Conversion::ToSQLiteString(surname, false) << "%'"
 				;
 			if (userId != UNKNOWN_VALUE)
-				query << " ANS c." << COL_USER_ID << "=" << userId;
+				query << " AND c." << COL_USER_ID << "=" << userId;
 
 			query
-				<< " GROUP BY u." << TABLE_COL_ID;
+					<< " GROUP BY u." << TABLE_COL_ID;
 
 			if (lateFilter)
 				query << " HAVING ret IS NOT NULL";

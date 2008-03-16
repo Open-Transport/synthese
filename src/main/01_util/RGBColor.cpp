@@ -50,14 +50,14 @@ RGBColor::RGBColor (const std::string& colorName)
 	}
 }
 
-
-
-}
-}
-
-bool operator == ( const synthese::util::RGBColor& op1, const synthese::util::RGBColor& op2 )
+bool RGBColor::operator == (const RGBColor& op2 ) const
 {
-	return (op1.r == op2.r) && (op1.g == op2.g) && (op1.b == op2.b);
+	return (r == op2.r) && (g == op2.g) && (b == op2.b);
 }
+
+
+}
+}
+
 
 

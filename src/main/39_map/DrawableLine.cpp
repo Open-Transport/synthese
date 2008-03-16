@@ -1,3 +1,25 @@
+
+/** DrawableLine class implementation.
+	@file DrawableLine.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "DrawableLine.h"
 
 #include "Geometry.h"
@@ -13,15 +35,12 @@
 #include "15_env/PhysicalStop.h"
 
 
-using synthese::util::Conversion;
-using synthese::util::RGBColor;
-using synthese::env::Line;
-using synthese::env::Point;
-using synthese::env::PhysicalStop;
-
-
 namespace synthese
 {
+	using namespace geometry;
+	using namespace env;
+	using namespace util;
+
 namespace map
 {
 
@@ -54,7 +73,7 @@ DrawableLine::DrawableLine (const Line* line,
 
     
 DrawableLine::DrawableLine (const uid& lineId, 
-			    const std::vector<const synthese::env::Point*>& points,
+			    const std::vector<const Point2D*>& points,
 			    const std::string& shortName,
 			    const synthese::util::RGBColor& color,
 			    bool withPhysicalStops)
@@ -93,21 +112,21 @@ DrawableLine::getLineId () const
 
 
 bool 
-DrawableLine::hasPoint (const synthese::env::Point& p) const
+DrawableLine::hasPoint (const Point2D& p) const
 {
     return firstIndexOf (p) != -1;
 }
 
 
 
-const std::vector<const Point*>& 
+const std::vector<const Point2D*>& 
 DrawableLine::getPoints () const
 {
     return _points;
 }
 
 
-const std::vector<Point>& 
+const std::vector<Point2D>& 
 DrawableLine::getFuzzyfiedPoints () const
 {
     return _fuzzyfiedPoints;
@@ -116,7 +135,7 @@ DrawableLine::getFuzzyfiedPoints () const
 
 
 
-const std::vector<synthese::env::Point>&
+const std::vector<Point2D>&
 DrawableLine::getShiftedPoints () const
 {
     return _shiftedPoints;
@@ -152,7 +171,7 @@ DrawableLine::setShift (int pointIndex, int shift)
 
 
 int 
-DrawableLine::firstIndexOf (const Point& p) const
+DrawableLine::firstIndexOf (const Point2D& p) const
 {
     for (int i=0; i<_fuzzyfiedPoints.size (); ++i)
     {
@@ -164,10 +183,10 @@ DrawableLine::firstIndexOf (const Point& p) const
 
 
 bool 
-DrawableLine::isReverseWayAt (const Point& p, 
+DrawableLine::isReverseWayAt (const Point2D& p, 
 			      const DrawableLine* dbl) const
 {
-    const std::vector<Point>& points2 = dbl->getFuzzyfiedPoints ();
+    const std::vector<Point2D>& points2 = dbl->getFuzzyfiedPoints ();
 	
     // if _point has a following point in _points which is the
     // previous one in points2 or if _point has a previous point in _points
@@ -179,13 +198,13 @@ DrawableLine::isReverseWayAt (const Point& p,
     
     if ((index1+1 < (int) getFuzzyfiedPoints ().size ())) 
     {
-	Point fp1 = _fuzzyfiedPoints[index1+1];
+	Point2D fp1 = _fuzzyfiedPoints[index1+1];
 	if ((index2-1 >= 0) && (points2[index2-1] == fp1)) reverse = true;
     }
     
     if (index1-1 >= 0) 
     {
-	Point pp1 = _fuzzyfiedPoints[index1-1];
+	Point2D pp1 = _fuzzyfiedPoints[index1-1];
 	if ((index2+1 < (int) points2.size ()) && (points2[index2+1] == pp1)) reverse = true;
     }
     
@@ -198,7 +217,7 @@ DrawableLine::isReverseWayAt (const Point& p,
 bool 
 DrawableLine::isFullyReverseWay (const DrawableLine* dbl) const
 {
-    std::vector<Point> points2 = dbl->getFuzzyfiedPoints ();
+    std::vector<Point2D> points2 = dbl->getFuzzyfiedPoints ();
     std::reverse (points2.begin (), points2.end ());
     if (points2.size () != _fuzzyfiedPoints.size ()) return false;
     for (int i=0; i<_fuzzyfiedPoints.size (); ++i)
@@ -212,7 +231,7 @@ DrawableLine::isFullyReverseWay (const DrawableLine* dbl) const
 bool 
 DrawableLine::isFullySameWay (const DrawableLine* dbl) const
 {
-    const std::vector<Point>& points2 = dbl->getFuzzyfiedPoints ();
+    const std::vector<Point2D>& points2 = dbl->getFuzzyfiedPoints ();
     if (points2.size () != _fuzzyfiedPoints.size ()) return false;
     for (int i=0; i<_fuzzyfiedPoints.size (); ++i)
     {
@@ -228,7 +247,7 @@ DrawableLine::numberOfCommonPointsWith (const DrawableLine* dbl) const
     int nb = 0;
     for (int i=0; i<_fuzzyfiedPoints.size (); ++i) 
     {
-	const Point& p = _fuzzyfiedPoints[i];
+	const Point2D& p = _fuzzyfiedPoints[i];
 	if (dbl->firstIndexOf (p) != -1) 
 	{
 	    ++nb;
@@ -242,7 +261,7 @@ DrawableLine::numberOfCommonPointsWith (const DrawableLine* dbl) const
 bool 
 DrawableLine::isStopPoint (int pointIndex) const
 {
-    const Point* p = _points[pointIndex];
+    const Point2D* p = _points[pointIndex];
     return dynamic_cast<const PhysicalStop*> (p) != 0;
 }
 
@@ -258,17 +277,17 @@ DrawableLine::isViaPoint (int pointIndex) const
 
 
 
-Point 
-DrawableLine::calculateSingleShiftedPoint (Point a, 
-					   Point b, 
+Point2D 
+DrawableLine::calculateSingleShiftedPoint (Point2D a, 
+					   Point2D b, 
 					   double distance) const
 {
-    double gamma = calculateAngle (b, a, Point (b.getX(), a.getY()));
+    double gamma = calculateAngle (b, a, Point2D (b.getX(), a.getY()));
 
 	double deltax = distance * cos (M_PI_2 - gamma);
     double deltay = distance * sin (M_PI_2 - gamma);
     
-    Point a_ (a.getX() + deltax, a.getY() + deltay);
+    Point2D a_ (a.getX() + deltax, a.getY() + deltay);
         
     double angle = calculateAngle (b, a, a_);
     
@@ -276,7 +295,7 @@ DrawableLine::calculateSingleShiftedPoint (Point a,
     // reverse point.
     if (((distance > 0) && (angle < 0)) 
         || ((distance < 0) && (angle > 0)) ) {
-        return Point (a.getX() - deltax, a.getY() - deltay);
+        return Point2D (a.getX() - deltax, a.getY() - deltay);
     } 
     return a_;
     
@@ -284,10 +303,10 @@ DrawableLine::calculateSingleShiftedPoint (Point a,
 
 
 
-Point  
-DrawableLine::calculateSingleShiftedPoint (Point a, 
-					   Point b, 
-					   Point c, 
+Point2D  
+DrawableLine::calculateSingleShiftedPoint (Point2D a, 
+					   Point2D b, 
+					   Point2D c, 
 					   double distance) const
 {
 
@@ -296,7 +315,7 @@ DrawableLine::calculateSingleShiftedPoint (Point a,
 
     double alpha = calculateAngle (a, b, c);
 
-    double gamma = calculateAngle (b, a, Point (b.getX(), a.getY()));
+    double gamma = calculateAngle (b, a, Point2D (b.getX(), a.getY()));
 
     double deltax = (distance / sin (alpha/2.0)) * (cos ((alpha/2.0) - gamma));
     double deltay = (distance / sin (alpha/2.0)) * (sin ((alpha/2.0) - gamma));
@@ -305,7 +324,7 @@ DrawableLine::calculateSingleShiftedPoint (Point a,
 		int yy = 5;
 	} */
 
-    Point b_ ( b.getX() + deltax , b.getY() + deltay );
+    Point2D b_ ( b.getX() + deltax , b.getY() + deltay );
         
     // Check that the angle formed by (b, a, b_) is positive otherwise
     // reverse point.
@@ -313,7 +332,7 @@ DrawableLine::calculateSingleShiftedPoint (Point a,
     
     if (((distance > 0) && (angle < 0)) 
         || ((distance < 0) && (angle > 0)) ) {
-        return Point (b.getX() - deltax, b.getY() - deltay);
+        return Point2D (b.getX() - deltax, b.getY() - deltay);
     } 
     return b_;
     
@@ -323,10 +342,10 @@ DrawableLine::calculateSingleShiftedPoint (Point a,
 
 
 
-Point  
-DrawableLine::calculateDoubleShiftedPoint (Point a, 
-					   Point b, 
-					   Point c, 
+Point2D  
+DrawableLine::calculateDoubleShiftedPoint (Point2D a, 
+					   Point2D b, 
+					   Point2D c, 
 					   double incomingDistance, 
 					   double outgoingDistance) const
 {
@@ -341,12 +360,12 @@ DrawableLine::calculateDoubleShiftedPoint (Point a,
         return calculateSingleShiftedPoint (a, b, c, incomingDistance);
     }
     
-    double gamma0 = calculateAngle (b, a, Point (b.getX(), a.getY()));
-    double gamma1 = calculateAngle (c, b, Point (c.getX(), b.getY()));
+    double gamma0 = calculateAngle (b, a, Point2D (b.getX(), a.getY()));
+    double gamma1 = calculateAngle (c, b, Point2D (c.getX(), b.getY()));
     
     if (gamma0 == gamma1) {
         // A, B, C are aligned; thus d0 == d1.
-        Point p = 
+        Point2D p = 
 	    calculateSingleShiftedPoint (a, b, c, incomingDistance);    
         return p;
     }
@@ -415,7 +434,7 @@ DrawableLine::calculateDoubleShiftedPoint (Point a,
         yk = a1 * xk + bk1;
     }
 
-	Point k (xk, yk);
+	Point2D k (xk, yk);
 
 	// <Heuristic 1 : 
 	// Note : this is experimental... but necessary. A better way
@@ -451,12 +470,12 @@ DrawableLine::fuzzyfyPoints (const DrawableLineIndex& lineIndex)
 
 
 
-const std::vector<Point>
-DrawableLine::calculateShiftedPoints (const std::vector<Point>& points, 
+const std::vector<Point2D>
+DrawableLine::calculateShiftedPoints (const std::vector<Point2D>& points, 
 				      double spacing, 
 				      PointShiftingMode shiftMode) const
 {
-    std::vector<Point> shiftedPoints;
+    std::vector<Point2D> shiftedPoints;
     
     // First point
     shiftedPoints.push_back (
@@ -468,9 +487,9 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points,
     // All triplets in between
     for (unsigned int i=0; i<points.size()-2; ++i) 
     {
-	const Point& p_i = points[i]; 
-	const Point& p_i_plus_1 = points[i+1];
-	const Point& p_i_plus_2 = points[i+2];
+	const Point2D& p_i = points[i]; 
+	const Point2D& p_i_plus_1 = points[i+1];
+	const Point2D& p_i_plus_2 = points[i+2];
 	
 	if (_shifts[i+1] != 0) 
 	{
@@ -572,11 +591,11 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points,
 
 
 
-const std::vector<Point>
-DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Point>& points, 
+const std::vector<Point2D>
+DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Point2D>& points, 
 										 double spacing) const
 {
-    std::vector<Point> shiftedPoints;
+    std::vector<Point2D> shiftedPoints;
     
     // First point
     shiftedPoints.push_back (
@@ -588,9 +607,9 @@ DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Point>& points,
     // All triplets in between
     for (unsigned int i=0; i<points.size()-2; ++i) 
     {
-		const Point& p_i = points[i]; 
-		const Point& p_i_plus_1 = points[i+1];
-		const Point& p_i_plus_2 = points[i+2];
+		const Point2D& p_i = points[i]; 
+		const Point2D& p_i_plus_1 = points[i+1];
+		const Point2D& p_i_plus_2 = points[i+2];
 
 		double distance =  _shifts[i+1] * spacing;
 		shiftedPoints.push_back ( calculateSingleShiftedPoint (
@@ -619,24 +638,23 @@ DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Point>& points,
 void 
 DrawableLine::prepare (Map& map, double spacing, PointShiftingMode shiftMode) const
 {
-    std::vector<Point> points;
+    std::vector<Point2D> points;
     
 	const DrawableLineIndex& lineIndex = map.getLineIndex ();
 
-	Point previousPoint (-1, -1);
+	Point2D previousPoint (-1, -1);
     // Convert coordinates to output frame
     for (unsigned int i=0; i<_fuzzyfiedPoints.size(); ++i) {
-		Point p = _fuzzyfiedPoints[i];
+		Point2D p = _fuzzyfiedPoints[i];
 
 		// Fuzzyfication of points can lead to having to points exactly
 		// identical in the list. Slightly move them (not filtering to
 		// keep bijection with reference points.
-		Point outputPoint = map.toOutputFrame(p);
+		Point2D outputPoint = map.toOutputFrame(p);
 		 
 		if (outputPoint == previousPoint) 
 		{
-			outputPoint.setX (outputPoint.getX() + 0.1);
-			outputPoint.setY (outputPoint.getY() + 0.1);
+			outputPoint.setXY(outputPoint.getX() + 0.1, outputPoint.getY() + 0.1);
 		} 
 		previousPoint = outputPoint; 
         points.push_back (outputPoint);

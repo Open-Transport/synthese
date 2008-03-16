@@ -29,6 +29,8 @@
 #include "71_vinci_bike_rental/VinciSiteAddAction.h"
 #include "71_vinci_bike_rental/VinciSiteAdmin.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+#include "71_vinci_bike_rental/VinciStockAlert.h"
+#include "71_vinci_bike_rental/VinciStockAlertTableSync.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/ModuleAdmin.h"
@@ -143,6 +145,13 @@ namespace synthese
 					stream << "AUCUN";
 
 				stream << t.col();
+
+				vector<shared_ptr<VinciStockAlert> > alerts(VinciStockAlertTableSync::search((*it)->getKey(), UNKNOWN_VALUE, 0, 0, true));
+				if (!alerts.empty())
+				{
+					stream << " " << HTMLModule::getHTMLImage("error.png", "Au moins un stock est en alerte sur ce site");
+				}
+
 				stream << t.col() << HTMLModule::getLinkButton(goRequest.getURL(), "Ouvrir", string(), "building_edit.png");
 				stream << t.col() << ((*it)->getLocked() ? "NON" : "OUI");
 			}

@@ -30,7 +30,7 @@
 #include "15_env/CommercialLine.h"
 #include "15_env/Line.h"
 #include "15_env/LineStop.h"
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 
 
@@ -53,7 +53,7 @@ namespace synthese
 		// and that we can copy (and complete static module regitries here)
 		synthese::env::City::Registry _cities;
 		synthese::env::Axis::Registry _axes;
-		synthese::env::ConnectionPlace::Registry _connectionPlaces;
+		synthese::env::PublicTransportStopZoneConnectionPlace::Registry _connectionPlaces;
 		synthese::env::PhysicalStop::Registry _physicalStops;
 		synthese::env::CommercialLine::Registry _commercialLines;
 		synthese::env::Line::Registry _lines;

@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_routeplanner_IntegralSearcher_h__
 #define SYNTHESE_routeplanner_IntegralSearcher_h__
 
+#include "01_util/Log.h"
+
 #include "15_env/Types.h"
 
 #include "33_route_planner/Types.h"
@@ -85,6 +87,8 @@ namespace synthese
 				const int					_maxDepth;
 				const bool					_optim;
 				const bool					_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
+				std::ostream* const			_logStream;
+				const util::Log::Level		_logLevel;
 			//@}
 
 			/** Integral search of objects within the network.
@@ -127,6 +131,8 @@ namespace synthese
 				, const int						maxDepth
 				, bool							optim
 				, bool							inverted
+				, std::ostream* const			logStream = NULL
+				, util::Log::Level				logLevel = util::Log::LEVEL_NONE
 			);
 
 			/** Launch of the integral search upon a vertex access map.

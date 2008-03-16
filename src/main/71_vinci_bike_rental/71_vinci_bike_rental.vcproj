@@ -393,6 +393,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\VinciStockAlertRemoveAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciStockAlertRemoveAction.h"
+					>
+				</File>
+				<File
 					RelativePath=".\VinciStockFullfillAction.cpp"
 					>
 				</File>

@@ -85,11 +85,11 @@ namespace synthese
 
 		void MapRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
+			ParametersMap::Map::const_iterator it;
 
 			// Output
-			it = map.find(OUTPUT_PARAMETER);
-			if (it == map.end())
+			it = map.getMap().find(OUTPUT_PARAMETER);
+			if (it == map.getMap().end())
 			    throw RequestException("Output not specified");
 
 			_output = it->second;
@@ -99,8 +99,8 @@ namespace synthese
 			}
 			
 			// XML data
-			it = map.find (DATA_PARAMETER);
-			if (it == map.end())
+			it = map.getMap().find (DATA_PARAMETER);
+			if (it == map.getMap().end())
 			    throw RequestException("No data specified");
 
 			/// @todo Throw an exception if xml parsing fails
@@ -165,8 +165,8 @@ namespace synthese
 			}
 			
 			// Map XML
-			it = map.find (MAP_PARAMETER);
-			if (it == map.end())
+			it = map.getMap().find (MAP_PARAMETER);
+			if (it == map.getMap().end())
 			    throw RequestException("Map to draw not specified");
 
 			/// @todo Throw an exception if xml parsing fails
@@ -190,7 +190,7 @@ namespace synthese
 			RenderingConfig conf;
 
 			// Choose the renderer
-			shared_ptr<Renderer> renderer = Factory<Renderer>::create(_output);
+			shared_ptr<Renderer> renderer(Factory<Renderer>::create(_output));
 
 			// Generate an id for the map file based on current time
 			ptime timems (boost::date_time::microsec_clock<ptime>::local_time ());

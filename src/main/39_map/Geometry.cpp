@@ -1,23 +1,41 @@
+
+/** Geometry class implementation.
+	@file Geometry.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "Geometry.h"
 
 #include <cmath>
-
-#include "15_env/Point.h"
-
-using synthese::env::Point;
-
-
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace geometry;
+	
 namespace map
 {
 
 
 double 
-calculateAngle (const Point& a, const Point& b, const Point& c)
+calculateAngle (const Point2D& a, const Point2D& b, const Point2D& c)
 {
     double angle = atan2 (c.getY()-b.getY(), c.getX()-b.getX()) - 
 	atan2 (a.getY()-b.getY(), a.getX()-b.getX());
@@ -31,7 +49,7 @@ calculateAngle (const Point& a, const Point& b, const Point& c)
 
 
 double 
-calculateDistance (const Point& a, const Point& b) 
+calculateDistance (const Point2D& a, const Point2D& b) 
 {
     return sqrt((b.getX()-a.getX())*(b.getX()-a.getX()) + 
 		(b.getY()-a.getY())*(b.getY()-a.getY()));
@@ -47,18 +65,18 @@ toDegrees (double angle)
 
 
 
-Point  
-calculateSymetric (const Point& a, const Point& b)
+Point2D  
+calculateSymetric (const Point2D& a, const Point2D& b)
 {
     double deltax = b.getX() - a.getX();
     double deltay = b.getY() - a.getY();
-    return Point (b.getX() + deltax, b.getY() + deltay);
+    return Point2D (b.getX() + deltax, b.getY() + deltay);
 } 
 
 
 
 
-Point 
+Point2D 
 calculateIntersection (double a1, double b1, double a2, double b2)
 {
     // Intersection of :
@@ -67,7 +85,7 @@ calculateIntersection (double a1, double b1, double a2, double b2)
     
     if (a1 == a2) throw "No intersection";
     
-    return Point ( (b2 - b1) / (a1 -a2),
+    return Point2D ( (b2 - b1) / (a1 -a2),
 		     (b2*a1 - a2*b1) / (a1 - a2) );
 }
 
@@ -75,7 +93,7 @@ calculateIntersection (double a1, double b1, double a2, double b2)
 
 
 std::pair<double, double>
-calculateAffineEquation (const Point& p0, const Point& p1) {
+calculateAffineEquation (const Point2D& p0, const Point2D& p1) {
     // Given 2 points return a and b so that y = a.x + b
     // goes through p0 and p1
     double u0 = p1.getX() - p0.getX ();
@@ -91,9 +109,9 @@ calculateAffineEquation (const Point& p0, const Point& p1) {
 
 
 
-Point 
-calculateIntersection (const Point& p0, const Point& p1, 
-		       const Point& p2, const Point& p3)
+Point2D 
+calculateIntersection (const Point2D& p0, const Point2D& p1, 
+		       const Point2D& p2, const Point2D& p3)
 {
     double u0 = p1.getX() - p0.getX ();
     double v0 = p1.getY() - p0.getY ();

@@ -1,3 +1,25 @@
+
+/** DrawableLine class header.
+	@file DrawableLine.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_CARTO_DRAWABLELINE_H
 #define SYNTHESE_CARTO_DRAWABLELINE_H
 
@@ -9,9 +31,8 @@
 
 #include "01_util/RGBColor.h"
 #include "01_util/UId.h"
-#include "15_env/Point.h"
 
-
+#include "06_geometry/Point2D.h"
 
 
 namespace synthese
@@ -35,7 +56,7 @@ private:
 
     const uid _lineId;
 
-    std::vector<const synthese::env::Point*> _points;  //!< Reference line points
+    std::vector<const geometry::Point2D*> _points;  //!< Reference line points
     const std::string _shortName;
     const synthese::util::RGBColor _color;
     const bool _withPhysicalStops;
@@ -43,8 +64,8 @@ private:
     std::vector<int> _shifts;
     std::vector<bool> _shifted;
 	
-	std::vector<synthese::env::Point> _fuzzyfiedPoints;
-    mutable std::vector<synthese::env::Point> _shiftedPoints;
+	std::vector<geometry::Point2D> _fuzzyfiedPoints;
+    mutable std::vector<geometry::Point2D> _shiftedPoints;
 
 	
 
@@ -60,7 +81,7 @@ public:
 
 
     DrawableLine (const uid& lineId,
-		  const std::vector<const synthese::env::Point*>& points,
+		  const std::vector<const geometry::Point2D*>& points,
 		  const std::string& shortName,
 		  const synthese::util::RGBColor& color,
 		  bool withPhysicalStops = true);
@@ -75,14 +96,14 @@ public:
 	const synthese::util::RGBColor& getColor () const;
     bool getWithPhysicalStops () const;
 
-    const std::vector<const synthese::env::Point*>& 
+    const std::vector<const geometry::Point2D*>& 
 	getPoints () const;
 
-	const std::vector<synthese::env::Point>& 
+	const std::vector<geometry::Point2D>& 
 	getFuzzyfiedPoints () const;
 
 
-    bool hasPoint (const synthese::env::Point&) const;
+    bool hasPoint (const geometry::Point2D&) const;
 
     bool isStopPoint (int pointIndex) const;
     bool isViaPoint (int pointIndex) const;
@@ -91,7 +112,7 @@ public:
     int getShift (int pointIndex) const;
     void setShift (int pointIndex, int shift);
 
-    const std::vector<synthese::env::Point>& getShiftedPoints () const;
+    const std::vector<geometry::Point2D>& getShiftedPoints () const;
 
     //@}
 
@@ -99,7 +120,7 @@ public:
 
     bool isFullyReverseWay (const DrawableLine* dbl) const;
     bool isFullySameWay (const DrawableLine* dbl) const;
-    bool isReverseWayAt (const synthese::env::Point& p, const DrawableLine* dbl) const;
+    bool isReverseWayAt (const geometry::Point2D& p, const DrawableLine* dbl) const;
     int numberOfCommonPointsWith (const DrawableLine* dbl) const;
 
     virtual void prepare (Map& map, double spacing, PointShiftingMode shiftMode = DOUBLE) const;
@@ -107,34 +128,34 @@ public:
     /** Find first point in this line points
 	which is equal (by value) to a given point.
     */
-    int firstIndexOf (const synthese::env::Point& p) const;
+    int firstIndexOf (const geometry::Point2D& p) const;
 
-    const std::vector<synthese::env::Point> 
-	calculateShiftedPoints (const std::vector<synthese::env::Point>& points, 
+    const std::vector<geometry::Point2D> 
+	calculateShiftedPoints (const std::vector<geometry::Point2D>& points, 
 				double spacing, 
 				PointShiftingMode shiftMode) const;
 
-	const std::vector<synthese::env::Point>
-	calculateAbsoluteShiftedPoints (const std::vector<synthese::env::Point>& points, 
+	const std::vector<geometry::Point2D>
+	calculateAbsoluteShiftedPoints (const std::vector<geometry::Point2D>& points, 
 										 double spacing) const;
 
 private:
 
 
-    synthese::env::Point  
-	calculateSingleShiftedPoint (synthese::env::Point a, 
-				     synthese::env::Point b, 
+    geometry::Point2D  
+	calculateSingleShiftedPoint (geometry::Point2D a, 
+				     geometry::Point2D b, 
 				     double distance) const;
 
-    synthese::env::Point  
-	calculateSingleShiftedPoint (synthese::env::Point a, 
-				     synthese::env::Point b, 
-				     synthese::env::Point c, 
+    geometry::Point2D  
+	calculateSingleShiftedPoint (geometry::Point2D a, 
+				     geometry::Point2D b, 
+				     geometry::Point2D c, 
 				     double distance) const;
-    synthese::env::Point  
-	calculateDoubleShiftedPoint (synthese::env::Point a, 
-				     synthese::env::Point b, 
-				     synthese::env::Point c, 
+    geometry::Point2D  
+	calculateDoubleShiftedPoint (geometry::Point2D a, 
+				     geometry::Point2D b, 
+				     geometry::Point2D c, 
 				     double incomingDistance, 
 				     double outgoingDistance) const;
     

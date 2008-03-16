@@ -30,8 +30,6 @@
 #include "15_env/Vertex.h"
 #include "15_env/ConnectionPlace.h"
 
-#include "01_util/Log.h"
-
 #include <vector>
 #include <sstream>
 
@@ -130,7 +128,7 @@ namespace synthese
 				add(*it);
 		}
 
-		void JourneysResult::log() const
+		string JourneysResult::getLog() const
 		{
 			stringstream s;
 			s << "Exploration queue : (size=" << _result.size() << ")";
@@ -147,7 +145,7 @@ namespace synthese
 					<< ")";
 			}
 			s << "\n";
-			Log::GetInstance().trace(s.str());
+			return s.str();
 		}
 	}
 }

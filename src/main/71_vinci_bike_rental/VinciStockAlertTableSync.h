@@ -65,7 +65,9 @@ namespace synthese
 			static std::vector<boost::shared_ptr<VinciStockAlert> > search(
 				uid siteId = UNKNOWN_VALUE
 				, uid accountId = UNKNOWN_VALUE
-				, int first = 0, int number = 0);
+				, int first = 0, int number = 0
+				, bool searchError = false
+			);
 		};
 	}
 }

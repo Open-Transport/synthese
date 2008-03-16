@@ -25,6 +25,8 @@
 
 #include <assert.h>
 
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+
 #include "01_util/Conversion.h"
 #include "01_util/XmlToolkit.h"
 #include "01_util/UId.h"
@@ -72,7 +74,7 @@ namespace synthese
 
 
 		    
-		shared_ptr<ConnectionPlace>
+		shared_ptr<PublicTransportStopZoneConnectionPlace>
 		XmlBuilder::CreateConnectionPlace (XMLNode& node, 
 						   const City::Registry& cities)
 		{

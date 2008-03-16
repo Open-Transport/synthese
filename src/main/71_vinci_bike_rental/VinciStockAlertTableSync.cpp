@@ -74,7 +74,14 @@ namespace synthese
 			object->setMaxAlert(rows->getDouble(VinciStockAlertTableSync::COL_MAX_ALERT));
 
 			// Results
-			object->setStockSize(rows->getDouble(VinciStockAlertTableSync::COL_STOCK_SIZE));
+			try
+			{
+				object->setStockSize(rows->getDouble(VinciStockAlertTableSync::COL_STOCK_SIZE));
+			}
+			catch(...)
+			{
+
+			}
 		}
 
 
@@ -147,6 +154,7 @@ namespace synthese
 			, uid accountId
 			, int first /*= 0*/
 			, int number /*= 0*/
+			, bool searchError
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 
@@ -155,20 +163,22 @@ namespace synthese
 				<< " SELECT *"
 				<< ", SUM(tp." << TransactionPartTableSync::TABLE_COL_LEFT_CURRENCY_AMOUNT << ") AS " << COL_STOCK_SIZE
 				<< " FROM " << TABLE_NAME
-				<< " INNER JOIN " << TransactionPartTableSync::TABLE_NAME << " AS tp ON tp." << TransactionPartTableSync::COL_STOCK_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
+				<< " LEFT JOIN " << TransactionPartTableSync::TABLE_NAME << " AS tp ON tp." << TransactionPartTableSync::COL_STOCK_ID << "=" << TABLE_NAME << "." << COL_SITE_ID << " AND tp." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << TABLE_NAME << "." << COL_ACCOUNT_ID
 				<< " WHERE 1 ";
 			if (siteId != UNKNOWN_VALUE)
 			 	query << " AND " << COL_SITE_ID << "=" << siteId;
 			if (accountId != UNKNOWN_VALUE)
-				query << " AND " << COL_ACCOUNT_ID << "=" << accountId;
+				query << " AND " << TABLE_NAME << "." << COL_ACCOUNT_ID << "=" << accountId;
 			//if (orderByName)
 			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
+			if (searchError)
+				query << " HAVING " << COL_STOCK_SIZE << "<=" << TABLE_NAME << "." << COL_MIN_ALERT
+					<< " OR " << COL_STOCK_SIZE << ">=" << TABLE_NAME << "." << COL_MAX_ALERT;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
-
 			try
 			{
 				SQLiteResultSPtr rows = sqlite->execQuery(query.str());

@@ -387,6 +387,7 @@ namespace synthese
 				_vinciFreeRentContract.reset(new VinciContract);
 			else
 				_vinciFreeRentContract = contracts.front();
+			_vinciFreeRentContract->setUserId(0);
 			VinciContractTableSync::save(_vinciFreeRentContract.get());
 		}
 

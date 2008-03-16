@@ -146,7 +146,7 @@ namespace synthese
 				stream << "<h1>Coordonnées</h1>";
 
 				HTMLForm form(updateRequest.getHTMLForm("update"));
-				HTMLTable t;
+				HTMLTable t(4, "propertysheet");
 
 				stream << form.open() << t.open();
 				stream << t.row();
@@ -199,7 +199,7 @@ namespace synthese
 				cv.push_back("Montant");
 				cv.push_back("Nature");
 				cv.push_back("Actions");
-				HTMLTable ct(cv);
+				HTMLTable ct(cv,"adminresults");
 
 				stream
 					<< "<div class=\"" << VinciBikeRentalModule::CSS_LIMITED_HEIGHT << "\">"
@@ -259,7 +259,7 @@ namespace synthese
 				rv.push_back("Antivol");
 				rv.push_back("Tarif");
 				rv.push_back("Actions");
-				HTMLTable rt(rv);
+				HTMLTable rt(rv,"adminresults");
 				stream
 					<< "<div class=\"" << VinciBikeRentalModule::CSS_LIMITED_HEIGHT << "\">"
 					<< addRentForm.open() << rt.open();
@@ -333,22 +333,22 @@ namespace synthese
 			// Change
 			stream << "<h1>Compte client</h1>";
 			shared_ptr<const Account> fa((shared_ptr<const Account>) VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE));
-			
-			HTMLForm addFinancialForm(addFinancialRequest.getHTMLForm("addfinancial"));
-			std::vector<std::pair<uid, std::string> > financialAccounts(AccountingModule::getAccountsName(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_CODE, true));
-			stream << "<p>" << addFinancialForm.open();
-			stream << "Réglement : " << addFinancialForm.getSelectInput(VinciAddFinancialAction::PARAMETER_ACCOUNT, financialAccounts, static_cast<uid>(UNKNOWN_VALUE));
-			stream << addFinancialForm.getTextInput(VinciAddFinancialAction::PARAMETER_AMOUNT, "");
-			stream << addFinancialForm.getSubmitButton("Ajouter");
-			stream << addFinancialForm.close() << "</p>";
 
-			HTMLForm addSaleForm(addFinancialRequest.getHTMLForm("addfinancial"));
-			financialAccounts = AccountingModule::getAccountsName(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_SERVICES_SALES_CODE + "%", true);
+			HTMLForm addSaleForm(addFinancialRequest.getHTMLForm("addsale"));
+			std::vector<std::pair<uid, std::string> > financialAccounts = AccountingModule::getAccountsName(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_SERVICES_SALES_CODE + "%", true);
 			stream << "<p>" << addSaleForm.open();
 			stream << "Vente de produit : " << addSaleForm.getSelectInput(VinciAddFinancialAction::PARAMETER_ACCOUNT, financialAccounts, static_cast<uid>(UNKNOWN_VALUE));
 			stream << addSaleForm.getSelectNumberInput(VinciAddFinancialAction::PARAMETER_PIECES, 1, 99, 1);
 			stream << addSaleForm.getSubmitButton("Ajouter");
 			stream << addSaleForm.close() << "</p>";
+
+			HTMLForm addFinancialForm(addFinancialRequest.getHTMLForm("addfinancial"));
+			financialAccounts = AccountingModule::getAccountsName(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_CODE, true);
+			stream << "<p>" << addFinancialForm.open();
+			stream << "Réglement : " << addFinancialForm.getSelectInput(VinciAddFinancialAction::PARAMETER_ACCOUNT, financialAccounts, static_cast<uid>(UNKNOWN_VALUE));
+			stream << addFinancialForm.getTextInput(VinciAddFinancialAction::PARAMETER_AMOUNT, "");
+			stream << addFinancialForm.getSubmitButton("Ajouter");
+			stream << addFinancialForm.close() << "</p>";
 
 			vector<shared_ptr<TransactionPart> > ftps = TransactionPartTableSync::search(fa, _user);
 			double solde(TransactionPartTableSync::sum(fa, _user));
@@ -356,7 +356,7 @@ namespace synthese
 			fv.push_back("Date");
 			fv.push_back("Libellé");
 			fv.push_back("Montant");
-			HTMLTable ft(fv);
+			HTMLTable ft(fv, "adminresults");
 			stream << "<div class=\"" << VinciBikeRentalModule::CSS_LIMITED_HEIGHT << "\">";
 			stream << ft.open();
 			stream << ft.row();
@@ -391,7 +391,8 @@ namespace synthese
 				if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 					return;
 				_contract = VinciContractTableSync::Get(id);
-				_user = UserTableSync::Get(_contract->getUserId());
+				if (_contract->getUserId() > 0)
+					_user = UserTableSync::Get(_contract->getUserId());
 			}
 		}
 
@@ -415,7 +416,7 @@ namespace synthese
 				link.icon = "basket.png";
 				link.name = VinciContract::DEFAULT_NAME;
 				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				link.parameterValue = VinciBikeRentalModule::GetFreeRentContract()->getKey();
+				link.parameterValue = Conversion::ToString(VinciBikeRentalModule::GetFreeRentContract()->getKey());
 				links.push_back(link);					
 			}
 			return links;

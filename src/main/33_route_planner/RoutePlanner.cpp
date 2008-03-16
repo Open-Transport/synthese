@@ -31,6 +31,7 @@
 #include "15_env/Line.h"
 #include "15_env/Service.h"
 #include "15_env/Vertex.h"
+#include "15_env/PhysicalStop.h"
 #include "15_env/Journey.h"
 #include "15_env/VertexAccessMap.h"
 #include "15_env/BikeCompliance.h"
@@ -45,6 +46,7 @@
 
 #include <algorithm>
 #include <set>
+#include <sstream>
 
 using namespace boost;
 using namespace std;
@@ -67,6 +69,8 @@ namespace synthese
 			const DateTime& journeySheetStartTime,
 			const DateTime& journeySheetEndTime
 			, int maxSolutionsNumber
+			, std::ostream* 			logStream
+			, util::Log::Level			logLevel
 		)	: _accessParameters (accessParameters)
 			, _planningOrder (planningOrder)
 			, _journeySheetStartTime (journeySheetStartTime)
@@ -76,6 +80,8 @@ namespace synthese
 			, _maxArrivalTime(TIME_UNKNOWN)
 			, _previousContinuousServiceLastDeparture(TIME_UNKNOWN)
 			, _calculationTime(TIME_CURRENT)
+			, _logStream(logStream)
+			, _logLevel(logLevel)
 		{
 			origin->getImmediateVertices (
 				_originVam
@@ -106,6 +112,20 @@ namespace synthese
 		{
 			_result.clear();
 
+			// Log
+			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+				|| _logLevel <= Log::LEVEL_TRACE
+			){
+				stringstream s;
+				s << "<h1>Origin access map calculation</h1>\n<pre>";
+
+				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					Log::GetInstance().trace(s.str());
+				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+					*_logStream << s.str();
+			}
+
+
 			// Create origin vam from integral search on roads
 			JourneysResult originJourneys;
 			BestVertexReachesMap bvrmd(TO_DESTINATION, true);
@@ -128,6 +148,8 @@ namespace synthese
 				, std::numeric_limits<int>::max ()
 				, false
 				, false
+				, _logStream
+				, _logLevel
 			);
 
 			// Best arrival at starting places is start time
@@ -145,7 +167,25 @@ namespace synthese
 			ovam.merge (_originVam, 
 				VertexAccessMap::DO_NOT_MERGE_ADDRESSES,
 				VertexAccessMap::MERGE_PHYSICALSTOPS);
-			
+
+			// Log
+			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+			|| _logLevel <= Log::LEVEL_TRACE
+			){
+				stringstream s;
+				s << "</pre><h2>Destinations</h2>\n<table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
+
+				for (VertexAccessMap::VamMap::const_iterator it(ovam.getMap().begin()); it != ovam.getMap().end(); ++it)
+					s << "<tr><td>" << it->first->getConnectionPlace()->getFullName() << "</td><td>" << static_cast<const PhysicalStop*>(it->first)->getName() << "</td><td>" << it->second.approachDistance << "</td><td>" << it->second.approachTime << "</td></tr>";
+				s << "</table>";
+
+				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					Log::GetInstance().trace(s.str());
+				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+					*_logStream << s.str();
+			}
+
+
 			Journey* candidate(new Journey(TO_DESTINATION));
 			for(JourneysResult::ResultSet::const_iterator itoj(originJourneys.getJourneys().begin());
 				itoj != originJourneys.getJourneys().end ();
@@ -201,6 +241,19 @@ namespace synthese
 			else
 				delete candidate;
 
+			// Log
+			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+				|| _logLevel <= Log::LEVEL_TRACE
+				){
+					stringstream s;
+					s << "<h1>Origin access map calculation</h1>\n<pre>";
+
+					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+						Log::GetInstance().trace(s.str());
+					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+						*_logStream << s.str();
+			}
+
 			// Create destination vam from integral search on roads
 			JourneysResult destinationJourneys;
 			BestVertexReachesMap bvrmo(TO_DESTINATION, true);
@@ -223,6 +276,8 @@ namespace synthese
 				, std::numeric_limits<int>::max ()
 				, false
 				, true
+				, _logStream
+				, _logLevel
 			);
 
 			// Best departure at starting places is start time
@@ -241,6 +296,22 @@ namespace synthese
 				VertexAccessMap::DO_NOT_MERGE_ADDRESSES,
 				VertexAccessMap::MERGE_PHYSICALSTOPS);
 
+			// Log
+			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+			|| _logLevel <= Log::LEVEL_TRACE
+			){
+				stringstream s;
+				s << "</pre><h2>Origins</h2>\n<table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
+
+				for (VertexAccessMap::VamMap::const_iterator it(dvam.getMap().begin()); it != dvam.getMap().end(); ++it)
+					s << "<tr><td>" << it->first->getConnectionPlace()->getFullName() << "</td><td>" << static_cast<const PhysicalStop* const>(it->first)->getName() << "</td><td>" << it->second.approachDistance << "</td><td>" << it->second.approachTime << "</td></tr>";
+				s << "</table>";
+
+				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					Log::GetInstance().trace(s.str());
+				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+					*_logStream << s.str();
+			}
 
 			for(JourneysResult::ResultSet::const_iterator itdj(destinationJourneys.getJourneys().begin());
 				itdj != destinationJourneys.getJourneys().end ();
@@ -490,7 +561,9 @@ namespace synthese
 				, 0
 				, strictTime
 				, inverted
-				);
+				, _logStream
+				, _logLevel
+			);
 
 			is.integralSearch(startVam, startTime, strictTime);
 			
@@ -532,8 +605,15 @@ namespace synthese
 				if (todo.empty())
 					break;
 
-				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-					todo.log();
+				if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+					|| _logLevel <= Log::LEVEL_TRACE
+				){
+					string s(todo.getLog());
+					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+						Log::GetInstance().trace(s);
+					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+						*_logStream << s;
+				}
 
 				lastBestEndTime = bestEndTime;
 
@@ -545,9 +625,17 @@ namespace synthese
 				delete journey;
 			}
 
-			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-				Log::GetInstance().trace("End of findJourney computing. Was made with " + Conversion::ToString(integralSerachsNumber) + " integral searches.");
+			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+				|| _logLevel <= Log::LEVEL_TRACE
+			){
+				stringstream s;
+				s << "End of findJourney computing. Was made with " << integralSerachsNumber << " integral searches.";
 
+				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					Log::GetInstance().trace(s.str());
+				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+					*_logStream << s.str();
+			}
 		}
 
 		RoutePlanner::Result::~Result()

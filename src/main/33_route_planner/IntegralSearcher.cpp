@@ -67,6 +67,8 @@ namespace synthese
 			, int maxDepth
 			, bool optim
 			, bool inverted
+			, ostream* const logStream
+			, Log::Level logLevel
 		)	: _accessDirection(accessDirection)
 			, _accessParameters(accessParameters)
 			, _searchAddresses(searchAddresses)
@@ -83,6 +85,8 @@ namespace synthese
 			, _maxDepth(maxDepth)
 			, _optim(optim)
 			, _inverted(inverted)
+			, _logStream(logStream)
+			, _logLevel(logLevel)
 		{	}
 
 // ------------------------------------------------------------------- 2 Initialization
@@ -100,8 +104,9 @@ namespace synthese
 				, strictTime
 				);
 
-			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-			{
+			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+				|| _logLevel <= Log::LEVEL_TRACE
+			){
 				stringstream s;
 				if (_accessDirection == TO_DESTINATION)
 					s << "TO_DESTINATION";
@@ -111,7 +116,10 @@ namespace synthese
 					<< " at " << desiredTime.toString()
 				;
 
-				Log::GetInstance().trace(s.str());
+				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					Log::GetInstance().trace(s.str());
+				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+					*_logStream << s.str();
 			}
 		}
 
@@ -140,8 +148,9 @@ namespace synthese
 			);
 
 
-			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-			{
+			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+				|| _logLevel <= Log::LEVEL_TRACE
+			){
 				string spaces(journey.getServiceUses().size(), '*');
 
 				stringstream s;
@@ -154,7 +163,10 @@ namespace synthese
 					<< journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
 					<< " at " << journey.getEndTime().toString();
 
-				Log::GetInstance().trace(s.str());
+				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					Log::GetInstance().trace(s.str());
+				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+					*_logStream << s.str();
 			}
 		}
 // ------------------------------------------------------------------------ 3 Recursion

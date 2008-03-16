@@ -1,6 +1,6 @@
 
-/** VinciStockAlertAdd class header.
-	@file VinciStockAlertAdd.h
+/** VinciStockAlertRemoveAction class header.
+	@file VinciStockAlertRemoveAction.h
 	@author Hugues Romain
 	@date 2008
 
@@ -22,8 +22,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_VinciStockAlertAdd_H__
-#define SYNTHESE_VinciStockAlertAdd_H__
+#ifndef SYNTHESE_VinciStockAlertRemoveAction_H__
+#define SYNTHESE_VinciStockAlertRemoveAction_H__
 
 #include "30_server/Action.h"
 
@@ -31,32 +31,21 @@
 
 namespace synthese
 {
-	namespace accounts
-	{
-		class Account;
-	}
-
 	namespace vinci
 	{
-		class VinciSite;
+		class VinciStockAlert;
 
-		/** VinciStockAlertAdd action class.
+		/** VinciStockAlertRemoveAction action class.
 			@ingroup m71Actions refActions
 		*/
-		class VinciStockAlertAdd
-			: public util::FactorableTemplate<server::Action, VinciStockAlertAdd>
+		class VinciStockAlertRemoveAction
+			: public util::FactorableTemplate<server::Action, VinciStockAlertRemoveAction>
 		{
 		public:
-			static const std::string PARAMETER_PRODUCT;
-			static const std::string PARAMETER_SITE;
-			static const std::string PARAMETER_MIN;
-			static const std::string PARAMETER_MAX;
+			static const std::string PARAMETER_ALERT;
 
 		private:
-			boost::shared_ptr<const accounts::Account>	_product;
-			boost::shared_ptr<const VinciSite>			_site;
-			double										_min;
-			double										_max;
+			boost::shared_ptr<const VinciStockAlert>	_alert;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -76,12 +65,11 @@ namespace synthese
 			*/
 			void run();
 			
-			VinciStockAlertAdd();
+			VinciStockAlertRemoveAction();
 
-			void setSite(boost::shared_ptr<const VinciSite> site);
-			void setProduct(boost::shared_ptr<const accounts::Account> product);
+			void setAlert(boost::shared_ptr<const VinciStockAlert> alert);
 		};
 	}
 }
 
-#endif // SYNTHESE_VinciStockAlertAdd_H__
+#endif // SYNTHESE_VinciStockAlertRemoveAction_H__

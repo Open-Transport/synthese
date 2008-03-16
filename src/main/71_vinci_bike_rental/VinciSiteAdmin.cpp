@@ -26,10 +26,14 @@
 #include "71_vinci_bike_rental/VinciSitesAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
 #include "71_vinci_bike_rental/VinciSite.h"
+#include "71_vinci_bike_rental/VinciStockAlertRemoveAction.h"
 #include "71_vinci_bike_rental/VinciSiteUpdateAction.h"
 #include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
 #include "71_vinci_bike_rental/VinciStockFullfillAction.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+#include "71_vinci_bike_rental/VinciStockAlertAdd.h"
+#include "71_vinci_bike_rental/VinciStockAlert.h"
+#include "71_vinci_bike_rental/VinciStockAlertTableSync.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
@@ -108,8 +112,18 @@ namespace synthese
 			fRequest.setObjectId(_site->getKey());
 			fRequest.getAction()->setSite(_site);
 
+			ActionFunctionRequest<VinciStockAlertAdd,AdminRequest> alertAddRequest(request);
+			alertAddRequest.getFunction()->setPage<VinciSiteAdmin>();
+			alertAddRequest.setObjectId(_site->getKey());
+			alertAddRequest.getAction()->setSite(_site);
+
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<VinciSiteAdmin>();
+			searchRequest.setObjectId(_site->getKey());
+
+			ActionFunctionRequest<VinciStockAlertRemoveAction,AdminRequest> alertRemoveRequest(request);
+			alertRemoveRequest.getFunction()->setPage<VinciSiteAdmin>();
+			alertRemoveRequest.setObjectId(_site->getKey());
 
 			// Output
 			PropertiesHTMLTable ut(updateRequest.getHTMLForm("update"));
@@ -140,31 +154,49 @@ namespace synthese
 			sv.push_back("Nombre de pièces");
 			sv.push_back("Prix unitaire");
 			sv.push_back("Valeur totale");
-			//			sv.push_back("Alerte");
+			sv.push_back("Alerte");
 			HTMLTable tv(sv,"adminresults");
 			stream << tv.open();
 			double amount(0);
 
 			for (StocksSize::const_iterator it(ss.begin()); it != ss.end(); ++it)
 			{
-				amount += it->second.unitPrice * it->second.size;
 				shared_ptr<const Account> si(AccountTableSync::Get(it->first.first));
+				vector<shared_ptr<VinciStockAlert> > alerts(VinciStockAlertTableSync::search(_site->getKey(), si->getKey()));
+
+				amount += it->second.unitPrice * it->second.size;
+				shared_ptr<VinciStockAlert> alert;
+				if (!alerts.empty())
+					alert = alerts.front();
 				fRequest.getAction()->setAccount(si);
 				stream << tv.row();
 				stream << tv.col();
 				stream << si->getName();
 				stream << tv.col();
 				stream << it->second.size;
+				if (alert.get() && ((alert->getMinAlert() > 0 && it->second.size <= alert->getMinAlert()) || (alert->getMaxAlert() > 0 && it->second.size >= alert->getMaxAlert())))
+					stream << " " << HTMLModule::getHTMLImage("error.png", (alert->getMinAlert() > 0 && it->second.size <= alert->getMinAlert()) ? ("La quantité de pièces en stock est trop basse (limite = "+ Conversion::ToString(alert->getMinAlert()) + ")") : ("La quantité de pièces en stock est trop élevée (limite = "+ Conversion::ToString(alert->getMaxAlert()) + ")"));
 				stream << tv.col();
 				stream << it->second.unitPrice;
 				stream << tv.col();
 				stream << (it->second.unitPrice * it->second.size);
-				/* stream << tv.col();
-				if ((*it)->getMinAlert() > 0 && it->second.size < (*it)->getMinAlert())
-				stream << "ALERTE BAS";
-				if ((*it)->getMaxAlert() > 0 && (*it)->getStockSize() > (*it)->getMaxAlert())
-				stream << "ALERTE HAUT";
-				*/			}
+				stream << tv.col();
+				if (!alerts.empty())
+				{
+					shared_ptr<VinciStockAlert> alert(alerts.front());
+
+					stream << "Si ";
+					if (alert->getMinAlert() > 0)
+						stream << "quantité < " << alert->getMinAlert();
+					if (alert->getMinAlert() > 0 && alert->getMaxAlert() > 0)
+						stream << " et ";
+					if (alert->getMaxAlert() > 0)
+						stream << "quantité > " << alert->getMaxAlert();
+
+					alertRemoveRequest.getAction()->setAlert(alert);
+					stream << " " << HTMLModule::getLinkButton(alertRemoveRequest.getURL(), "Supprimer", "Êtes-vous sûr de vouloir supprimer l alerte ?", "error_delete.png");
+				}
+			}
 			stream << tv.row();
 			stream << tv.col(3) << "TOTAL";
 			stream << tv.col() << amount;
@@ -184,6 +216,15 @@ namespace synthese
 			stream << nt.cell("Quantité", nt.getForm().getTextInput(VinciStockFullfillAction::PARAMETER_PIECES, string()));
 			stream << nt.cell("Commentaire", nt.getForm().getTextAreaInput(VinciStockFullfillAction::PARAMETER_COMMENT, string(), 3, 50));
 			stream << nt.close();
+
+			stream << "<h1>Alertes</h1>";
+
+			PropertiesHTMLTable at(alertAddRequest.getHTMLForm("addalert"));
+			stream << at.open();
+			stream << at.cell("Produit",at.getForm().getSelectInput(VinciStockAlertAdd::PARAMETER_PRODUCT, productslist, static_cast<uid>(UNKNOWN_VALUE)));
+			stream << at.cell("Valeur minimale (0 = pas d'alerte)", at.getForm().getTextInput(VinciStockAlertAdd::PARAMETER_MIN, string()));
+			stream << at.cell("Valeur maximale (0 = pas d'alerte)", at.getForm().getTextInput(VinciStockAlertAdd::PARAMETER_MAX, string()));
+			stream << at.close();
 
 			stream << "<h1>Historique</h1>";
 
@@ -222,6 +263,7 @@ namespace synthese
 				stream << ft.col() << (*it)->getRightCurrencyAmount();
 				stream << ft.col() << transaction->getComment();
 			}
+			stream << ft.close();
 
 		}
 

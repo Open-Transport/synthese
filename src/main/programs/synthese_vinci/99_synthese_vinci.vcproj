@@ -26,7 +26,7 @@
 				Name="VCNMakeTool"
 				BuildCommandLine="ant -s build.xml -Dtarget=src/main/programs/synthese_vinci"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				CleanCommandLine="../../../vsscons clean -Dtarget=src/main/$(InputName)"
+				CleanCommandLine="ant -s build.xml -Dtarget=src/main/programs/synthese_vinci -Dmode=debug clean"
 				Output="../../../../build/win32/vc-8_0/$(ConfigurationName)/main/programs/synthese_vinci/synthese_vinci.exe"
 				PreprocessorDefinitions=""
 				IncludeSearchPath=""

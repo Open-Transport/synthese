@@ -30,8 +30,8 @@
 #include "CommercialLine.h"
 #include "Line.h"
 #include "LineStop.h"
+#include "15_env/PhysicalStop.h"
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "PhysicalStop.h"
 
 
 struct XMLNode;
@@ -45,8 +45,7 @@ namespace synthese
 
 namespace env
 {
-
-    
+   
 
 /** Environment XML loading/saving service class.
 
@@ -128,7 +127,7 @@ class XmlBuilder
 	 static boost::shared_ptr<City> CreateCity (XMLNode& node);
 
     
-	 static boost::shared_ptr<ConnectionPlace> CreateConnectionPlace (XMLNode& node, 
+	 static boost::shared_ptr<PublicTransportStopZoneConnectionPlace> CreateConnectionPlace (XMLNode& node, 
 						   const City::Registry& cities);
 
 	 static boost::shared_ptr<CommercialLine> CreateCommercialLine (XMLNode& node);

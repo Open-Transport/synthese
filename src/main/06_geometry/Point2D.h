@@ -47,7 +47,7 @@ namespace synthese
 			public:
 
 				Point2D (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
-				~Point2D () {}
+				virtual ~Point2D () {}
 
 
 				//! @name Getters
