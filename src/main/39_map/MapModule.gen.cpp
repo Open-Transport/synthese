@@ -1,9 +1,7 @@
-synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::map::MapModule> ("39_map");
-
-synthese::util::Factory<synthese::map::Renderer>::integrate<synthese::map::HtmlMapRenderer>("html");
-synthese::util::Factory<synthese::map::Renderer>::integrate<synthese::map::JpegRenderer>("jpeg");
-synthese::util::Factory<synthese::map::Renderer>::integrate<synthese::map::MapInfoRenderer>("mapinfo");
-synthese::util::Factory<synthese::map::Renderer>::integrate<synthese::map::PostscriptRenderer>("ps");
-
-synthese::util::Factory<synthese::server::Function>::integrate<synthese::map::MapRequest> ("map");
+synthese::map::MapModule::integrate ();
+synthese::map::HtmlMapRenderer::integrate ();
+synthese::map::JpegRenderer::integrate ();
+synthese::map::MapInfoRenderer::integrate ();
+synthese::map::PostscriptRenderer::integrate ();
+synthese::map::MapRequest::integrate ();
 

@@ -24,6 +24,7 @@
 #define SYNTHESE_MapModule_H__
 
 
+#include "01_util/FactorableTemplate.h"
 #include "02_db/DbModuleClass.h"
 
 
@@ -92,7 +93,7 @@ namespace synthese
 	{
 
 		/** 59 Map module class. */
-		class MapModule : public db::DbModuleClass
+		class MapModule : public util::FactorableTemplate<db::DbModuleClass, MapModule>
 		{
 		public:
 

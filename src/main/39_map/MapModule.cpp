@@ -21,6 +21,12 @@ namespace synthese
 {
 
 
+	namespace util
+	{
+		template<>
+		const std::string FactorableTemplate<db::DbModuleClass,map::MapModule>::FACTORY_KEY("39_map");
+	}
+
 
 	namespace map
 	{

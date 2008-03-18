@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_MapRequest_H__
 #define SYNTHESE_MapRequest_H__
 
+#include "01_util/FactorableTemplate.h"
 #include "30_server/Function.h"
 
 #include "15_env/Axis.h"
@@ -43,7 +44,7 @@ namespace synthese
 	    /** MapRequest class.
 			@ingroup m59Functions refFunctions
 	    */
-	    class MapRequest : public server::Function
+	    class MapRequest : public util::FactorableTemplate<server::Function, MapRequest>
 	    {
 		
 	    private:

@@ -32,6 +32,13 @@ namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<>
+		const std::string FactorableTemplate<map::Renderer,map::JpegRenderer>::FACTORY_KEY ("jpeg");
+	}
+
+
 	namespace map
 	{
 

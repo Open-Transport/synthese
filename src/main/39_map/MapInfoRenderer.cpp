@@ -50,6 +50,13 @@ namespace synthese
 	using namespace util;
 	using namespace geometry;
 	
+
+
+	namespace util
+	{
+		template<>
+		const std::string FactorableTemplate<map::Renderer,map::MapInfoRenderer>::FACTORY_KEY ("mapinfo");
+	}
 	
 
 namespace map

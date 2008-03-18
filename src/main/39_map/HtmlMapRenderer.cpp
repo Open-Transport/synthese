@@ -61,6 +61,15 @@ namespace synthese
 	using namespace util;
 	
 
+	namespace util
+	{
+		template<>
+		const std::string FactorableTemplate<map::Renderer,map::HtmlMapRenderer>::FACTORY_KEY ("html");
+	}
+
+
+
+
 namespace map
 {
 

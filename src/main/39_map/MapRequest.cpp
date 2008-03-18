@@ -58,6 +58,8 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 
+        template<> const string util::FactorableTemplate<server::Function, map::MapRequest>::FACTORY_KEY ("map");
+
 	namespace map
 	{
 
