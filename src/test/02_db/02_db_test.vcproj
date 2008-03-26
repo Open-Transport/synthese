@@ -67,7 +67,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\SQLiteThreadExecTest.cpp"
+				RelativePath=".\SQLiteQueueThreadExecTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteTableSyncTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteValueTest.cpp"
 				>
 			</File>
 		</Filter>
@@ -76,10 +84,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\SQLiteThreadExecTest.h"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\main.cpp"
@@ -87,6 +91,14 @@
 		</File>
 		<File
 			RelativePath=".\SConscript"
+			>
+		</File>
+		<File
+			RelativePath=".\SQLiteThreadExecTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\SQLiteThreadExecTest.h"
 			>
 		</File>
 	</Files>

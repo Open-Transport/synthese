@@ -22,6 +22,11 @@
 
 #include "Reservation.h"
 
+#include "31_resa/ReservationTransaction.h"
+#include "31_resa/ResaModule.h"
+
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
@@ -34,6 +39,8 @@ namespace synthese
 			, _departureTime(TIME_UNKNOWN)
 			, _arrivalTime(TIME_UNKNOWN)
 			, _originDateTime(TIME_UNKNOWN)
+			, _reservationDeadLine(TIME_UNKNOWN)
+			, _reservationRuleId(UNKNOWN_VALUE)
 		{
 
 		}
@@ -189,6 +196,68 @@ namespace synthese
 		uid Reservation::getServiceId() const
 		{
 			return _serviceId;
+		}
+
+
+
+		ReservationStatus Reservation::getStatus() const
+		{
+			if (_reservationRuleId == UNKNOWN_VALUE)
+				return ReservationStatus::NO_RESERVATION;
+
+			const DateTime& cancellationTime(getTransaction()->getCancellationTime());
+			const DateTime now(TIME_CURRENT);
+
+			if (cancellationTime.isUnknown())
+			{
+				if (now < _reservationDeadLine)
+					return ReservationStatus::OPTION;
+				if (now < _departureTime)
+					return ReservationStatus::TO_BE_DONE;
+				if (now < _arrivalTime)
+					return ReservationStatus::AT_WORK;
+				return ReservationStatus::DONE;
+			}
+			else
+			{
+				if (cancellationTime < _reservationDeadLine)
+					return ReservationStatus::CANCELLED;
+				if (cancellationTime < _departureTime)
+					return ReservationStatus::CANCELLED_AFTER_DELAY;
+				return ReservationStatus::NO_SHOW;
+			}
+		}
+
+
+
+		void Reservation::setReservationDeadLine( const time::DateTime& time )
+		{
+			_reservationDeadLine = time;
+		}
+
+
+
+		const time::DateTime& Reservation::getReservationDeadLine() const
+		{
+			return _reservationDeadLine;
+		}
+
+
+
+		std::string Reservation::getFullStatusText() const
+		{
+			ReservationStatus status(getStatus());
+			string statusText(ResaModule::GetStatusText(status));
+			
+			switch(status)
+			{
+			case ReservationStatus::OPTION: return statusText + " pouvant être annulée avant le " + _reservationDeadLine.toString();
+			case ReservationStatus::CANCELLED: return statusText + " le " + getTransaction()->getCancellationTime().toString();
+			case ReservationStatus::CANCELLED_AFTER_DELAY: statusText + " le " + getTransaction()->getCancellationTime().toString();
+			case ReservationStatus::NO_SHOW: return statusText + " constantée le " + getTransaction()->getCancellationTime().toString();
+			}
+
+			return statusText;
 		}
 	}
 }

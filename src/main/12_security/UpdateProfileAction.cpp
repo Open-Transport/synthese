@@ -72,7 +72,7 @@ namespace synthese
 
 			// Name
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
-			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::search(string(), _name, string(), 0,1);
+			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::Search(_name, string(), 0,1);
 			if (!existingProfiles.empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 		}

@@ -69,18 +69,17 @@ namespace synthese
 	
 	namespace security
 	{
-		const std::string UsersAdmin::PARAM_SEARCH_PROFILE_ID = "searchprofileid";
-		const std::string UsersAdmin::PARAM_SEARCH_NAME = "searchname";
-		const std::string UsersAdmin::PARAM_SEARCH_LOGIN = "searchlogin";
+		const std::string UsersAdmin::PARAM_SEARCH_PROFILE_ID = "sp";
+		const std::string UsersAdmin::PARAM_SEARCH_NAME = "sn";
+		const std::string UsersAdmin::PARAM_SEARCH_LOGIN = "sl";
+		const std::string UsersAdmin::PARAM_SEARCH_SURNAME = "ss";
 
 
 		void UsersAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			// Searched login
 			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
-
-			// Searched name
 			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
+			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
 
 			// Searched profile
 			uid id(map.getUid(PARAM_SEARCH_PROFILE_ID, false, FACTORY_KEY));
@@ -88,28 +87,7 @@ namespace synthese
 				_searchProfile = ProfileTableSync::Get(id);
 
 			// Table Parameters
-			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAM_SEARCH_LOGIN, 30);
-
-			// Launch the users search
-			_users = UserTableSync::search(
-				_searchLogin
-				, _searchName
-				, _searchProfile
-				, false
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAM_SEARCH_LOGIN
-				, _requestParameters.orderField == PARAM_SEARCH_NAME
-				, _requestParameters.orderField == PARAM_SEARCH_PROFILE_ID
-				, _requestParameters.raisingOrder
-				);
-
-			// Result parameters
-			_resultParameters.next = (_users.size() == _requestParameters.maxSize + 1);
-			if (_resultParameters.next)
-				_users.pop_back();
-			_resultParameters.size = _users.size();
-
+			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_LOGIN, 30);
 		}
 
 		bool UsersAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
@@ -119,6 +97,25 @@ namespace synthese
 
 		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			// Search
+			vector<shared_ptr<User> > _users(UserTableSync::Search(
+				"%"+_searchLogin+"%"
+				, "%"+_searchName+"%"
+				, "%"+_searchSurname+"%"
+				, "%"
+				, _searchProfile.get() ? _searchProfile->getKey() : UNKNOWN_VALUE
+				, false
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAM_SEARCH_LOGIN
+				, _requestParameters.orderField == PARAM_SEARCH_NAME
+				, _requestParameters.orderField == PARAM_SEARCH_PROFILE_ID
+				, _requestParameters.raisingOrder
+			));
+			ResultHTMLTable::ResultParameters	_resultParameters;
+			_resultParameters.setFromResult(_requestParameters, _users);
+
+
 			// Request for search form
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<UsersAdmin>();
@@ -143,6 +140,7 @@ namespace synthese
 			stream << searchTable.open();
 			stream << searchTable.cell("Login", searchTable.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin));
 			stream << searchTable.cell("Nom", searchTable.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
+			stream << searchTable.cell("Prénom", searchTable.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname));
 			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfile.get() ? _searchProfile->getKey() : uid(0)));
 			stream << searchTable.close();
 

@@ -23,8 +23,8 @@
 */
 
 #include "BookableCommercialLinesAdmin.h"
-#include "ResaModule.h"
 
+#include "31_resa/ResaModule.h"
 #include "31_resa/BookableCommercialLineAdmin.h"
 #include "31_resa/ResaRight.h"
 
@@ -35,6 +35,7 @@
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/ModuleAdmin.h"
+#include "32_admin/AdminRequest.h"
 
 using namespace std;
 using namespace boost;
@@ -48,6 +49,7 @@ namespace synthese
 	using namespace resa;
 	using namespace env;
 	using namespace security;
+	using namespace html;
 
 	namespace util
 	{
@@ -72,13 +74,51 @@ namespace synthese
 		
 		void BookableCommercialLinesAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
-			stream << "Not implemented yet, use treeview instead.";
+			// Search
+			vector<shared_ptr<CommercialLine> > lines(CommercialLineTableSync::search(
+				request->getUser()->getProfile()->getRightsForModuleClass<ResaRight>()
+				, request->getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
+				, READ
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, false, true, true, true
+			));
+			ResultHTMLTable::ResultParameters rp;
+			rp.setFromResult(_requestParameters, lines);
+
+			// Requests
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
+
+			FunctionRequest<AdminRequest> openRequest(request);
+			openRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
+
+			// Display
+			stream << "<h1>Lignes</h1>";
+
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(string(),"Ligne"));
+			h.push_back(make_pair(string(),"Description"));
+			h.push_back(make_pair(string(),"Liens"));
+			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, rp);
+			stream << t.open();
+
+			for (vector<shared_ptr<CommercialLine> >::const_iterator it(lines.begin()); it != lines.end(); ++it)
+			{
+				openRequest.setObjectId((*it)->getKey());
+
+				stream << t.row();
+				stream << t.col(1, (*it)->getStyle()) << (*it)->getShortName();
+				stream << t.col() << (*it)->getName();
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "chart_line.png");
+			}
+			stream << t.close();
+
 		}
 
 		bool BookableCommercialLinesAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			/// @todo Implement the right control;
-			return true;
+			return request->isAuthorized<ResaRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfParent(
@@ -93,8 +133,7 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPages(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+			const AdminInterfaceElement& currentPage
 			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
@@ -114,7 +153,7 @@ namespace synthese
 				link.icon = "chart_line.png";
 				link.name = (*it)->getName();
 				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				link.parameterValue = (*it)->getKey();
+				link.parameterValue = Conversion::ToString((*it)->getKey());
 				links.push_back(link);
 			}
 

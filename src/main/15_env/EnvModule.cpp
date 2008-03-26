@@ -256,5 +256,34 @@ namespace synthese
 
 			_citiesT9Matcher.remove(ss.str());
 		}
+
+		const Place* EnvModule::FetchPlace( const std::string& cityName, const std::string& placeName )
+		{
+				const Place* place(NULL);
+
+				if (cityName.empty())
+					throw Exception("Empty city name");
+
+				shared_ptr<const City> city;
+				CityList cityList = guessCity(cityName, 1);
+				if (cityName.empty())
+					throw Exception("An error has occured in city name search");
+				city = cityList.front();
+				place = city.get();
+				assert(place != NULL);
+
+				if (!placeName.empty())
+				{
+					LexicalMatcher<const Place*>::MatchResult places = city->getAllPlacesMatcher().bestMatches(placeName, 1);
+					if (!places.empty())
+					{
+						place = places.front().value;
+					}
+				}
+
+				return place;		
+		
+
+		}
     }
 }

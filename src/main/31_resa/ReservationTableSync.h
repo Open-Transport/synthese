@@ -58,6 +58,7 @@ namespace synthese
 			static const std::string COL_ARRIVAL_PLACE_NAME;
 			static const std::string COL_ARRIVAL_TIME;
 			static const std::string COL_RESERVATION_RULE_ID;
+			static const std::string COL_RESERVATION_DEAD_LINE;
 
 			ReservationTableSync();
 			~ReservationTableSync();

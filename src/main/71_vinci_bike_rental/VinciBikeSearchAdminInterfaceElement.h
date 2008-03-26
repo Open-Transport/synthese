@@ -24,9 +24,6 @@
 #ifndef SYNTHESE_VinciBikeSearchAdminInterfaceElement_H__
 #define SYNTHESE_VinciBikeSearchAdminInterfaceElement_H__
 
-#include <vector>
-#include <boost/shared_ptr.hpp>
-
 #include "05_html/ResultHTMLTable.h"
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
@@ -45,12 +42,10 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_NUMBER;
 			static const std::string PARAMETER_SEARCH_CADRE;
 
-			std::vector<boost::shared_ptr<VinciBike> > _bikes;
 			std::string _cadreNumber;
 			std::string _bikeNumber;
 
 			html::ResultHTMLTable::RequestParameters	_resultRequestParameters;
-			html::ResultHTMLTable::ResultParameters		_resultResultParameters;
 
 		public:
 			VinciBikeSearchAdminInterfaceElement();

@@ -23,11 +23,9 @@
 #include "Site.h"
 
 #include "15_env/EnvModule.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/BikeCompliance.h"
-#include "15_env/ReservationRule.h"
 #include "15_env/City.h"
 #include "15_env/ConnectionPlace.h"
+#include "15_env/AccessParameters.h"
 
 #include "07_lex_matcher/LexicalMatcher.h"
 
@@ -168,46 +166,14 @@ namespace synthese
 			switch(parameter)
 			{
 			case HANDICCAPED_ACCESSIBILITY:
-				{
-					HandicappedCompliance* hc(new HandicappedCompliance);
-					hc->setCompliant(true);
-					ap.complyer.setHandicappedCompliance(hc);
-					BikeCompliance* bc(new BikeCompliance);
-					bc->setCompliant(logic::indeterminate);
-					ap.complyer.setBikeCompliance(bc);
-					ap.approachSpeed = 34; // m/min = 2 km/h
-					ap.maxApproachDistance = 300;
-				}
-				break;
+				return AccessParameters(false, NULL, true, true, false, false, 300, 23, 34, _maxTransportConnectionsCount);
 
 			case BIKE_ACCESSIBILITY:
-				{
-					HandicappedCompliance* hc(new HandicappedCompliance);
-					hc->setCompliant(logic::indeterminate);
-					ap.complyer.setHandicappedCompliance(hc);
-					BikeCompliance* bc(new BikeCompliance);
-					bc->setCompliant(true);
-					ap.complyer.setBikeCompliance(bc);
-					ap.approachSpeed = 201; // m/min = 12 km/h
-					ap.maxApproachDistance = 3000;
-				}
-				break;
+				return AccessParameters(true, NULL, false, true, false, false, 3000, 23, 201, _maxTransportConnectionsCount);
 
 			default:
-				{
-					ap.approachSpeed = 67; // m/min = 4 km/h
-					ap.maxApproachDistance = 1000;
-				}
+				return AccessParameters(false, NULL, false, true, false, false, 1000, 23, 67, _maxTransportConnectionsCount);
 			}
-
-			// Temporary
-			ReservationRule* resa(new ReservationRule);
-			resa->setCompliant(boost::logic::indeterminate);
-			ap.complyer.setReservationRule(resa);
-			ap.maxApproachTime = 23;
-
-			ap.maxTransportConnectionCount = _maxTransportConnectionsCount;
-			return ap;
 		}
 
 
@@ -257,29 +223,7 @@ namespace synthese
 			const std::string& cityName
 			, const std::string& placeName
 		) const {
-			const Place* place(NULL);
-
-			if (cityName.empty())
-				throw Exception("Empty city name");
-
-			shared_ptr<const City> city;
-			CityList cityList = EnvModule::guessCity(cityName, 1);
-			if (cityName.empty())
-				throw Exception("An error has occured in city name search");
-			city = cityList.front();
-			place = city.get();
-			assert(place != NULL);
-
-			if (!placeName.empty())
-			{
-				LexicalMatcher<const Place*>::MatchResult places = city->getAllPlacesMatcher().bestMatches(placeName, 1);
-				if (!places.empty())
-				{
-					place = places.front().value;
-				}
-			}
-
-			return place;		
+			return EnvModule::FetchPlace(cityName, placeName);
 		}
 
 		const std::string& Site::getName() const

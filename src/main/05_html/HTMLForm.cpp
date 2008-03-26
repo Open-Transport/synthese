@@ -142,14 +142,26 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string HTMLForm::setFocus(const std::string& fieldName )
+		std::string HTMLForm::setFocus(const std::string& fieldName ) const
 		{
-			if (_updateRight)
+			if (!_updateRight)
 				return string();
 
 			stringstream s;
 			s	<< HTMLModule::GetHTMLJavascriptOpen()
-				<< "document.getElementById('" << _getFieldId(fieldName, false) << "').focus();"
+				<< "document.forms." << _name << ".elements." << fieldName << ".focus();"
+				<< HTMLModule::GetHTMLJavascriptClose();
+			return s.str();
+		}
+
+		std::string HTMLForm::setFocus( const std::string& fieldName, int fieldRank ) const
+		{
+			if (!_updateRight)
+				return string();
+
+			stringstream s;
+			s	<< HTMLModule::GetHTMLJavascriptOpen()
+				<< "document.forms." << _name << ".elements." << fieldName << "[" << fieldRank << "].focus();"
 				<< HTMLModule::GetHTMLJavascriptClose();
 			return s.str();
 		}
@@ -364,7 +376,7 @@ namespace synthese
 				if (it == _idCounter.end())
 					_idCounter.insert(make_pair(name, 0));
 				else
-					counter = it->second++;
+					counter = ++it->second;
 			}
 
 			// Code generation
@@ -391,7 +403,7 @@ namespace synthese
 			return HTMLModule::getLinkButton(getURL(), caption, confirm, icon);
 		}
 
-		std::string HTMLForm::getHiddenFields() const
+		std::string HTMLForm::getHiddenFields()
 		{
 			if (!_updateRight)
 				return string();
@@ -399,6 +411,7 @@ namespace synthese
 			stringstream s;
 			for (HiddenFieldsMap::const_iterator it = _hiddenFields.begin(); it != _hiddenFields.end(); ++it)
 				s << "<input type=\"hidden\" name=\"" << it->first << "\" value=\"" << it->second << "\" />";
+			_hiddenFields.clear();
 			return s.str();
 		}
 
@@ -407,7 +420,7 @@ namespace synthese
 			HiddenFieldsMap::iterator it = _hiddenFields.find(name);
 			if (it != _hiddenFields.end())
 				_hiddenFields.erase(it);
-			_initialFields.insert(make_pair(name, value));
+			_initialFields[name] = value;
 		}
 
 		std::string HTMLForm::getURL( HiddenFieldsMap overridingFields, bool withInitialValues ) const
@@ -467,6 +480,16 @@ namespace synthese
 				<< content
 				<< "</a>";
 			return s.str();
+		}
+
+		std::string HTMLForm::getFieldId( const std::string& name )
+		{
+			return _getFieldId(name, false);
+		}
+
+		const std::string& HTMLForm::getName() const
+		{
+			return _name;
 		}
 	}
 }

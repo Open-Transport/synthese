@@ -110,6 +110,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CallBeginAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CallBeginAction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CallEndAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CallEndAction.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CancelReservationAction.cpp"
 				>
 			</File>
@@ -127,14 +143,6 @@
 			</File>
 			<File
 				RelativePath=".\ReservationsListInterfacePage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ServiceReservationsRoadMapInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ServiceReservationsRoadMapInterfacePage.h"
 				>
 			</File>
 		</Filter>
@@ -190,6 +198,14 @@
 			Name="18 Functions"
 			>
 			<File
+				RelativePath=".\ResaCustomerHtmlOptionListFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResaCustomerHtmlOptionListFunction.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ReservationsListFunction.cpp"
 				>
 			</File>
@@ -197,24 +213,16 @@
 				RelativePath=".\ReservationsListFunction.h"
 				>
 			</File>
-			<File
-				RelativePath=".\ServiceReservationsRoadMapFunction.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ServiceReservationsRoadMapFunction.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="11 Interface Library"
 			>
 			<File
-				RelativePath=".\BookableCommercialLinesInterfaceElement.cpp"
+				RelativePath=".\ResaCallButtonInterfaceElement.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\BookableCommercialLinesInterfaceElement.h"
+				RelativePath=".\ResaCallButtonInterfaceElement.h"
 				>
 			</File>
 			<File
@@ -261,6 +269,22 @@
 				RelativePath=".\ResaCustomersAdmin.h"
 				>
 			</File>
+			<File
+				RelativePath=".\ResaEditLogEntryAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResaEditLogEntryAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationRoutePlannerAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationRoutePlannerAdmin.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="13 DBLog"
@@ -296,6 +320,10 @@
 		</File>
 		<File
 			RelativePath=".\SConscript"
+			>
+		</File>
+		<File
+			RelativePath=".\Types.h"
 			>
 		</File>
 	</Files>

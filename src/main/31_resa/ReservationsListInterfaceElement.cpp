@@ -152,7 +152,8 @@ namespace synthese
 
 				// Boucle sur les circulations
 				vector<shared_ptr<ScheduledService> > services(ScheduledServiceTableSync::search(
-					line.get()
+					NULL
+					, line->getKey()
 					, listDate
 					));
 

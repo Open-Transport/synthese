@@ -34,11 +34,6 @@
 #include "15_env/PhysicalStop.h"
 #include "15_env/Journey.h"
 #include "15_env/VertexAccessMap.h"
-#include "15_env/BikeCompliance.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/PedestrianCompliance.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/Fare.h"
 
 #include "06_geometry/SquareDistance.h"
 

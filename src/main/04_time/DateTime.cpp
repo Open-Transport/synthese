@@ -36,9 +36,9 @@ namespace synthese
 	namespace time
 	{
 		DateTime::DateTime ( int day, int month, int year,
-							int hours, int minutes )
+							int hours, int minutes, int seconds )
 							: _date(day, month, year)
-							, _hour((hours == TIME_SAME) ? day : hours, minutes)
+							, _hour((hours == TIME_SAME) ? day : hours, minutes, seconds)
 		{
 		}
 
@@ -130,17 +130,6 @@ namespace synthese
 
 
 
-		DateTime&
-		DateTime::operator = ( const string& op )
-		{
-		_date = op.substr (0, 8);
-		_hour = op.substr (8, 4);
-		return (*this);
-
-		}
-
-
-
 		bool
 		DateTime::isValid () const
 		{
@@ -222,24 +211,21 @@ namespace synthese
 		}
 
 
-		void 
-		DateTime::setHour ( const Hour& hour)
+		void		DateTime::setHour ( const Hour& hour)
 		{
-		_hour = hour;
+			_hour = hour;
 		}
 
 
 
-		void
-		DateTime::addDaysDuration ( int daysToAdd )
+		void		DateTime::addDaysDuration ( int daysToAdd )
 		{
 			_date += daysToAdd;
 		}
 
 
 
-		void
-		DateTime::subDaysDuration ( int daysToSub )
+		void		DateTime::subDaysDuration ( int daysToSub )
 		{
 			_date -= daysToSub;
 
@@ -247,21 +233,15 @@ namespace synthese
 
 
 
-		ostream&
-		operator<< ( ostream& os, const DateTime& op )
+		ostream&		operator<< ( ostream& os, const DateTime& op )
 		{
-			os << op.getDate () << op.getHour ();
+			os << op.toSQLString(false);
 			return os;
 		}
 
 
 
-
-
-
-
-		bool
-			DateTime::operator == ( const DateTime& op2 ) const
+		bool			DateTime::operator == ( const DateTime& op2 ) const
 		{
 			return (getDate () == op2.getDate () ) &&
 				( getHour () == op2.getHour () );
@@ -269,34 +249,28 @@ namespace synthese
 
 
 
-
-
-		bool
-			DateTime::operator != ( const DateTime& op2 ) const
+		bool			DateTime::operator != ( const DateTime& op2 ) const
 		{
 			return ( getDate () != op2.getDate () || getHour () != op2.getHour () );
 		}
 
 
 
-		bool
-			DateTime::operator<=( const DateTime &op2 ) const
+		bool			DateTime::operator<=( const DateTime &op2 ) const
 		{
 			return ( getDate () < op2.getDate () || getDate () == op2.getDate () && getHour () <= op2.getHour () );
 		}
 
 
 
-		bool
-			DateTime::operator < ( const DateTime &op2 ) const
+		bool			DateTime::operator < ( const DateTime &op2 ) const
 		{
 			return ( getDate () < op2.getDate () || getDate () == op2.getDate () && getHour () < op2.getHour () );
 		}
 
 
 
-		bool
-			DateTime::operator>=( const DateTime& op2 ) const
+		bool			DateTime::operator>=( const DateTime& op2 ) const
 		{
 			return ( getDate () > op2.getDate () ||
 					getDate () == op2.getDate () && getHour () >= op2.getHour () );
@@ -304,48 +278,44 @@ namespace synthese
 
 
 
-		bool
-			DateTime::operator > ( const DateTime &op2 ) const
+		bool			DateTime::operator > ( const DateTime &op2 ) const
 		{
 			return ( getDate () > op2.getDate () ||
 					( getDate () == op2.getDate () && getHour () > op2.getHour () ) );
 		}
 
 
-		int 
-		operator - ( const DateTime& op1, const DateTime& op2 )
+		int DateTime::operator - (const DateTime& op2 ) const
 		{
-		int result;
-		int retain = 0;
-		  
-		// 1: Hour
-		result = op1.getHour () - op2.getHour ();
-		if (result < 0)
+			int result;
+			int retain = 0;
+			  
+			// 1: Hour
+			result = _hour - op2._hour;
+			if (result < 0)
 			{
-			retain = 1;
-			result += MINUTES_PER_DAY;
+				retain = 1;
+				result += MINUTES_PER_DAY;
 			}
-		  
-		// 2: Days since departure
-		result += ((op1.getDate () - op2.getDate ()) - retain) * MINUTES_PER_DAY;
-		return result;
+			  
+			// 2: Days since departure
+			result += ((_date - op2._date) - retain) * MINUTES_PER_DAY;
+			return result;
 		}
 
 
-		DateTime 
-		operator + ( const DateTime& op, int minutesDuration )
+		DateTime DateTime::operator + (int minutesDuration ) const
 		{
-			DateTime result (op);
+			DateTime result (*this);
 			result += minutesDuration;
 			return result;
 		}
 
 
 
-		DateTime 
-		operator - ( const DateTime& op, int minutesDuration )
+		DateTime DateTime::operator - (int minutesDuration ) const
 		{
-			DateTime result (op);
+			DateTime result (*this);
 			result -= minutesDuration;
 			return result;
 		}
@@ -396,11 +366,31 @@ namespace synthese
 			return _date.isUnknown();
 		}
 
-		string DateTime::toString() const
+		string DateTime::toString(bool withSeconds) const
 		{
 			return isUnknown()
 				? string()
-				: (_date.toString() + " " + _hour.toString());
+				: (_date.toString() + " " + _hour.toString(withSeconds));
+		}
+
+
+
+		int DateTime::getSecondsDifference( const DateTime& op2 ) const
+		{
+			int result;
+			int retain = 0;
+
+			// 1: Hour
+			result = _hour.getSecondsDifference(op2._hour);
+			if (result < 0)
+			{
+				retain = 1;
+				result += 3600;
+			}
+
+			// 2: Days since departure
+			result += ((_date - op2._date) - retain) * 86400;
+			return result;
 		}
 	}
 }

@@ -242,7 +242,8 @@ namespace synthese
 					, _requestParameters.raisingOrder
 			)	);
 
-			ResultHTMLTable::ResultParameters p(ResultHTMLTable::getParameters(_requestParameters, sites));
+			ResultHTMLTable::ResultParameters p;
+			p.setFromResult(_requestParameters, sites);
 
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_DATE, "Date"));

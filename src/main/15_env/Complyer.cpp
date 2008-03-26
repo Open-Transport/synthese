@@ -99,16 +99,6 @@ namespace synthese
 			_reservationRule = rule;
 		}
 
-		bool Complyer::isCompatibleWith( const Complyer& complyer ) const
-		{
-			return
-				getBikeCompliance()->isCompatibleWith(*complyer.getBikeCompliance())
-				&& getFare()->isCompatibleWith(*complyer.getFare())
-				&& getHandicappedCompliance()->isCompatibleWith(*complyer.getHandicappedCompliance())
-				&& getPedestrianCompliance()->isCompatibleWith(*complyer.getPedestrianCompliance())
-				&& getReservationRule()->isCompatibleWith(*complyer.getReservationRule())
-				;
-		}
 
 		Complyer::~Complyer()
 		{

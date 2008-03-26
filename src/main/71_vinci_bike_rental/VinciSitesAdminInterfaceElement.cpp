@@ -78,7 +78,7 @@ namespace synthese
 		void VinciSitesAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
 			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
-			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), string(), 30);
+			_requestParameters.setFromParametersMap(map.getMap(), string(), 30);
 		}
 
 
@@ -105,6 +105,8 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_NAME
 					, _requestParameters.raisingOrder
 			)	);
+			html::ResultHTMLTable::ResultParameters		_resultParameters;
+			_resultParameters.setFromResult(_requestParameters, sites);
 
 			// HTML search form
 			stream << "<h1>Recherche</h1>";
@@ -116,8 +118,6 @@ namespace synthese
 			// Results list
 			stream << "<h1>Sites</h1>";
 
-			ResultHTMLTable::ResultParameters p(ResultHTMLTable::getParameters(_requestParameters, sites));
-
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_NAME, "Nom"));
 			h.push_back(make_pair(PARAMETER_SITE, "Site d'alimentation"));
@@ -125,7 +125,7 @@ namespace synthese
 			h.push_back(make_pair(string(), "Edition"));
 			h.push_back(make_pair(PARAMETER_LOCK, "Liste"));
 
-			ResultHTMLTable t(h, st.getForm(), _requestParameters, p);
+			ResultHTMLTable t(h, st.getForm(), _requestParameters, _resultParameters);
 			stream << t.open();
 
 			for (vector<shared_ptr<VinciSite> >::const_iterator it(sites.begin()); it != sites.end(); ++it)

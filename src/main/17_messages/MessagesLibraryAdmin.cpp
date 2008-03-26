@@ -79,12 +79,13 @@ namespace synthese
 		
 		void MessagesLibraryAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
 			setFolderId(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 		}
 
 		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			searchRequest.setObjectId(_folderId);
@@ -118,6 +119,7 @@ namespace synthese
 			updateFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			updateFolderRequest.setObjectId(_folder.get() ? _folder->getKey() : 0);
 
+			// Search
 			vector<shared_ptr<ScenarioTemplate> > sv = ScenarioTableSync::searchTemplate(
 				_folderId
 				, string(), NULL
@@ -125,6 +127,8 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_NAME
 				, _requestParameters.raisingOrder
 			);
+			ResultHTMLTable::ResultParameters p;
+			p.setFromResult(_requestParameters, sv);
 			vector<shared_ptr<ScenarioFolder> > folders(ScenarioFolderTableSync::search(_folderId));
 
 			if (_folderId > 0)
@@ -147,7 +151,7 @@ namespace synthese
 			h3.push_back(make_pair(PARAMETER_NAME, "Nom"));
 			h3.push_back(make_pair(string(), "Actions"));
 			h3.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, ActionResultHTMLTable::ResultParameters(), addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
+			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, p, addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
 			stream << t3.open();
 			
 			for (vector<shared_ptr<ScenarioTemplate> >::const_iterator it = sv.begin(); it != sv.end(); ++it)

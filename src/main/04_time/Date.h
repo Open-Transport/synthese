@@ -27,34 +27,22 @@
 
 #include "module.h"
 
-#include "Day.h"
-#include "Month.h"
-#include "Year.h"
-
-
 #include <iostream>
 #include <string>
-
-
 
 namespace synthese
 {
 	namespace time
 	{
-
-		class DateTime;
-
-		/** Date
-		@ingroup m04
+		/** Date.
+			@ingroup m04
 		*/
 		class Date
 		{
 		private:
-
-
-			Day _day; //!< Day
-			Month _month; //!< Month
-			Year _year; //!< Year
+			int _day; //!< Day
+			int _month; //!< Month
+			int _year; //!< Year
 		    
 		public:
 
@@ -115,7 +103,6 @@ namespace synthese
 				*/
 				int getWeekDay () const;
 
-				bool isYearUnknown () const;
 
 				/** Checks this date values.
 					@return true If this date is an existing day.
@@ -126,6 +113,33 @@ namespace synthese
 
 				std::string toSQLString(bool withApostrophes = true) const;
 				std::string toString() const;
+
+				
+				/** Number of days in this month.
+					@param year Year for this month
+				  \return Number of days in this month, taking into account leap years
+				*/
+				int getDaysPerMonth() const;
+
+				/** Number of days left til the end of this month.
+				  \param day Current day of this month
+				  \param year Year of this month
+				  \return Number of days left til the end of this month,
+				  excluding current day
+				*/
+				int getDaysLeftToEndOfMonth () const;
+
+
+				/** Marc should comment his function.
+					@param endMonth End month
+					@param endYear End year
+					@return what Marc wants to this function returns
+				*/
+				int getDaysLeftToMonth (int endMonth, int endYear ) const;
+
+
+				bool isLeapYear () const;
+				int getDaysPerYear () const;
 
 				//@}
 
@@ -172,22 +186,16 @@ namespace synthese
 				*/
 				Date& operator = ( const std::string& op );
 
-				Date& operator = ( const DateTime& op );
-
 				int operator - ( const Date& op2 ) const;
 
+				bool operator <  (const Date& op2 ) const;
+				bool operator <= (const Date& op2 ) const;
+				bool operator >  (const Date& op2 ) const;
+				bool operator >= (const Date& op2 ) const;
+				bool operator == (const Date& op2 ) const;
+				bool operator != (const Date& op2 ) const;
 
 		};
-
-
-		bool operator < ( const Date& op1, const Date& op2 );
-		bool operator <= ( const Date& op1, const Date& op2 );
-		bool operator <= ( const Date& op1, const DateTime& op2 );
-		bool operator > ( const Date& op1, const Date& op2 );
-		bool operator >= ( const Date& op1, const Date& op2 );
-		bool operator == ( const Date& op1, const Date& op2 );
-		bool operator != ( const Date& op1, const Date& op2 );
-
 
 		std::ostream& operator<< ( std::ostream& os, const Date& op );
 

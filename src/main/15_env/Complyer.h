@@ -80,11 +80,6 @@ namespace synthese
 				void	setComplianceParent(const Complyer* parent);
 			//@}
 
-			//! @name Query methods.
-			//@{
-				bool	isCompatibleWith(const Complyer& complyer) const;
-			//@}
-		    
 			//! @name Update methods.
 			//@{
 			//@}

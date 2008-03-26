@@ -27,8 +27,7 @@
 
 #include "15_env/City.h"
 #include "15_env/Place.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/BikeCompliance.h"
+#include "15_env/AccessParameters.h"
 
 #include "11_interfaces/DateTimeInterfacePage.h"
 #include "11_interfaces/Interface.h"
@@ -93,9 +92,9 @@ namespace synthese
 			pv.push_back(date.toSQLString(false));
 			pv.push_back("0");
 			pv.push_back(originCity->getName());
-			pv.push_back(Conversion::ToString(accessParameters.complyer.getHandicappedCompliance()->isCompliant()));
+			pv.push_back(Conversion::ToString(accessParameters.getHandicappedFilter()));
 			pv.push_back(originPlaceName);
-			pv.push_back(Conversion::ToString(accessParameters.complyer.getBikeCompliance()->isCompliant()));
+			pv.push_back(Conversion::ToString(accessParameters.getBikeFilter()));
 			pv.push_back(destinationCity->getName());
 			pv.push_back(Conversion::ToString(destinationPlace->getId()));
 			pv.push_back(destinationPlaceName);
@@ -134,9 +133,9 @@ namespace synthese
 			pv.push_back(date.toSQLString(false));
 			pv.push_back(Conversion::ToString(home));
 			pv.push_back(originCity);
-			pv.push_back(Conversion::ToString(accessParameters.complyer.getHandicappedCompliance()->isCompliant()));
+			pv.push_back(Conversion::ToString(accessParameters.getHandicappedFilter()));
 			pv.push_back(originPlace);
-			pv.push_back(Conversion::ToString(accessParameters.complyer.getBikeCompliance()->isCompliant()));
+			pv.push_back(Conversion::ToString(accessParameters.getBikeFilter()));
 			pv.push_back(destinationCity);
 			pv.push_back(string());
 			pv.push_back(destinationPlace);

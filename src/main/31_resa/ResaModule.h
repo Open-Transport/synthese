@@ -23,16 +23,30 @@
 #ifndef SYNTHESE_ResaModule_h__
 #define SYNTHESE_ResaModule_h__
 
+#include "31_resa/Types.h"
+
 #include "01_util/ModuleClass.h"
 #include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
+#include <map>
 #include <ostream>
 
 namespace synthese
 {
+	namespace security
+	{
+		class Profile;
+	}
+
 	namespace html
 	{
 		class HTMLTable;
+	}
+
+	namespace server
+	{
+		class Session;
 	}
 
 	/** @defgroup m31 31 Reservation
@@ -79,23 +93,45 @@ namespace synthese
 	*/
 	namespace resa
 	{
-		class Reservation;
+		class ReservationTransaction;
 
 		/** 51 Reservation module class.
 		*/
 		class ResaModule : public util::FactorableTemplate<util::ModuleClass, ResaModule>
 		{
 		private:
+			typedef std::map<const server::Session*, uid> _SessionsCallIdMap;
+			static _SessionsCallIdMap _sessionsCallIds;
+
+			static const std::string _BASIC_PROFILE_NAME;
+
+			static boost::shared_ptr<security::Profile>	_basicProfile;
 
 		public:
+			
+			/** Module initialization method.
+				@author Hugues Romain
+				@date 2008
+				
+				The initialization consists in the creation of a profile for the basic Resa clients
+			*/
+			virtual void initialize();
 
 			virtual std::string getName() const;
 
-			static void DisplayReservation(
+			static boost::shared_ptr<security::Profile> GetBasicResaCustomerProfile();
+
+			static void DisplayReservations(
 				std::ostream& stream
-				, html::HTMLTable& t
-				, const Reservation* reservation
+				, const ReservationTransaction* reservation
 			);
+
+			static void CallOpen(const server::Session* session);
+			static void CallClose(const server::Session* session);
+			static uid GetCurrentCallId(const server::Session* session);
+
+			static std::string GetStatusIcon(ReservationStatus status);
+			static std::string GetStatusText(ReservationStatus status);
 
 		};
 	}

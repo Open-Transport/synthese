@@ -24,7 +24,6 @@
 #define SYNTHESE_DBLogViewer_H__
 
 #include <string>
-#include <vector>
 
 #include <boost/shared_ptr.hpp>
 
@@ -103,13 +102,7 @@ namespace synthese
 				std::string								_searchText;
 				boost::shared_ptr<DBLog>				_dbLog;
 				uid										_searchObjectId;
-			//@}
-
-			//! \name Stored search result
-			//@{
 				html::ResultHTMLTable::RequestParameters	_resultTableRequestParameters;
-				html::ResultHTMLTable::ResultParameters		_resultTableResultParameters;
-				std::vector<boost::shared_ptr<DBLogEntry> >	_result;
 			//@}
 
 		public:

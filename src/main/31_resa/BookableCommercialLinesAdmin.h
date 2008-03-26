@@ -25,6 +25,8 @@
 #ifndef SYNTHESE_BookableCommercialLinesAdmin_H__
 #define SYNTHESE_BookableCommercialLinesAdmin_H__
 
+#include "05_html/ResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
@@ -38,6 +40,8 @@ namespace synthese
 		*/
 		class BookableCommercialLinesAdmin : public admin::AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>
 		{
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+
 		public:
 			BookableCommercialLinesAdmin();
 			
@@ -86,10 +90,8 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+				const AdminInterfaceElement& currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
-				
 			) const;
 		};
 	}

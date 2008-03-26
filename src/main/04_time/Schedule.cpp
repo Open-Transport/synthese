@@ -1,276 +1,259 @@
 
+/** Schedule class implementation.
+	@file Schedule.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "Schedule.h"
 #include "assert.h"
 
 #include "01_util/Conversion.h"
 
+#include <sstream>
 
-using synthese::util::Conversion;
-
+using namespace std;
 
 namespace synthese
 {
-namespace time
-{
+	using namespace util;
 
+	namespace time
+	{
 
-  Schedule::Schedule ()
-	  : _hour(TIME_UNKNOWN)
-  {
-  }
 
+		  Schedule::Schedule ()
+			  : _hour(TIME_UNKNOWN)
+		  {
+		  }
 
-Schedule::Schedule ( const Hour& hour, int daysSinceDeparture )
-        : _hour ( hour )
-        , _daysSinceDeparture ( daysSinceDeparture )
-{
-    assert ( ( _daysSinceDeparture >= 0 ) &&
-             ( _daysSinceDeparture <= 28 ) );
-}
 
+		Schedule::Schedule ( const Hour& hour, int daysSinceDeparture )
+				: _hour ( hour )
+				, _daysSinceDeparture ( daysSinceDeparture )
+		{
+			assert ( ( _daysSinceDeparture >= 0 ) &&
+					 ( _daysSinceDeparture <= 28 ) );
+		}
 
 
-Schedule::Schedule ( const Schedule& ref )
-        : _hour ( ref._hour )
-        , _daysSinceDeparture ( ref._daysSinceDeparture )
-{
-    assert ( ( _daysSinceDeparture >= 0 ) &&
-             ( _daysSinceDeparture <= 28 ) );
 
-}
+		Schedule::Schedule ( const Schedule& ref )
+				: _hour ( ref._hour )
+				, _daysSinceDeparture ( ref._daysSinceDeparture )
+		{
+			assert ( ( _daysSinceDeparture >= 0 ) &&
+					 ( _daysSinceDeparture <= 28 ) );
 
+		}
 
-Schedule::~Schedule ()
-{}
 
+		Schedule::~Schedule ()
+		{}
 
-const Hour&
-Schedule::getHour() const
-{
-    return _hour;
-}
 
+		const Hour&
+		Schedule::getHour() const
+		{
+			return _hour;
+		}
 
 
-int
-Schedule::getHours() const
-{
-    return _hour.getHours ();
-}
 
+		int
+		Schedule::getDaysSinceDeparture () const
+		{
+			return _daysSinceDeparture;
+		}
 
 
-int
-Schedule::getMinutes() const
-{
-    return _hour.getMinutes ();
-}
+		void
+		Schedule::setDaysSinceDeparture ( int daysSinceDeparture )
+		{
+			_daysSinceDeparture = daysSinceDeparture;
+		}
 
 
+		bool 
+		Schedule::isValid () const
+		{
+		  return(_daysSinceDeparture >= 0 && 
+			 _daysSinceDeparture <=28 && 
+			 _hour.isValid ());
+		}
 
-int
-Schedule::getDaysSinceDeparture () const
-{
-    return _daysSinceDeparture;
-}
 
 
-void
-Schedule::setDaysSinceDeparture ( int daysSinceDeparture )
-{
-    _daysSinceDeparture = daysSinceDeparture;
-}
+		void
+		Schedule::setMinimum()
+		{
+			_daysSinceDeparture = 0;
+			_hour = Hour(TIME_MIN );
+		}
 
 
-bool 
-Schedule::isValid () const
-{
-  return(_daysSinceDeparture >= 0 && 
-	 _daysSinceDeparture <=28 && 
-	 _hour.isValid ());
-}
+		void
+		Schedule::setMaximum()
+		{
+			_daysSinceDeparture = 255;
+			_hour = Hour(TIME_MAX );
+		}
 
 
+		Schedule&
+		Schedule::operator += ( int op )
+		{
+			_daysSinceDeparture = ( _daysSinceDeparture + ( _hour += op ) );
+			return ( *this );
+		}
 
-void
-Schedule::setMinimum()
-{
-    _daysSinceDeparture = 0;
-    _hour = Hour(TIME_MIN );
-}
 
 
-void
-Schedule::setMaximum()
-{
-    _daysSinceDeparture = 255;
-    _hour = Hour(TIME_MAX );
-}
 
+		Schedule Schedule::operator + (int op2 ) const
+		{
+			Schedule result(*this);
+			result += op2;
+			return result;
+		}
 
-Schedule&
-Schedule::operator += ( int op )
-{
-    _daysSinceDeparture = ( _daysSinceDeparture + ( _hour += op ) );
-    return ( *this );
-}
 
 
+		bool Schedule::operator < (const Schedule& op2 ) const
+		{
+			return	_daysSinceDeparture < op2._daysSinceDeparture
+				||	_daysSinceDeparture == op2._daysSinceDeparture
+					&&	 _hour < op2._hour
+			;
+		}
 
 
-Schedule
-operator + ( const Schedule& op1, int op2 )
-{
-    Schedule result = op1;
-    result += op2;
-    return result;
-}
 
+		bool Schedule::operator < (const Hour& op2 ) const
+		{
+			return _hour < op2;
+		}
 
 
 
+		bool Schedule::operator <= (const Schedule& op2 ) const
+		{
+			return	_daysSinceDeparture < op2._daysSinceDeparture
+				||	_daysSinceDeparture == op2._daysSinceDeparture
+					&&	_hour <= op2._hour
+			;
+		}
 
 
-bool
-operator < ( const Schedule& op1, const Schedule& op2 )
-{
-    return ( op1.getDaysSinceDeparture () < op2.getDaysSinceDeparture () ||
-             op1.getDaysSinceDeparture () == op2.getDaysSinceDeparture () &&
-             op1.getHour() < op2.getHour () );
-}
 
+		bool Schedule::operator <= (const Hour& op2 ) const
+		{
+			return _hour <= op2;
+		}
 
 
-bool
-operator < ( const Schedule& op1, const Hour& op2 )
-{
-    return ( op1.getHour () < op2 );
-}
 
+		bool Schedule::operator >= (const Schedule& op2 ) const
+		{
+			return	_daysSinceDeparture > op2._daysSinceDeparture
+				||	_daysSinceDeparture == op2._daysSinceDeparture
+					&&	_hour >= op2._hour
+			;
+		}
 
-bool operator <= ( const Schedule& op1, const Schedule& op2 )
-{
-    return ( op1.getDaysSinceDeparture () < op2.getDaysSinceDeparture () ||
-             op1.getDaysSinceDeparture () == op2.getDaysSinceDeparture () &&
-             op1.getHour () <= op2.getHour () );
 
-}
 
+		bool Schedule::operator >= (const Hour& op2 ) const
+		{
+			return _hour >= op2;
+		}
 
 
-bool
-operator <= ( const Schedule& op1, const Hour& op2 )
-{
-    return ( op1.getHour () <= op2 );
 
-}
 
+		bool Schedule::operator > (const Hour& op2 ) const
+		{
+			return _hour > op2;
+		}
 
 
-bool
-operator >= ( const Schedule& op1, const Schedule& op2 )
-{
-    return ( op1.getDaysSinceDeparture () > op2.getDaysSinceDeparture () ||
-             op1.getDaysSinceDeparture () == op2.getDaysSinceDeparture () &&
-             op1.getHour () >= op2.getHour () );
-}
 
+		int Schedule::operator - (const Schedule& op2 ) const
+		{
+			int retain = 0;
 
+			// 1: Hour
+			int result = _hour - op2._hour;
 
-bool
-operator >= ( const Schedule& op1, const Hour& op2 )
-{
-    return ( op1.getHour () >= op2 );
-}
+			if ( result < 0 )
+			{
+				retain = 1;
+				result += MINUTES_PER_DAY;
+			}
 
+			// 2: Days since departure
+			result += (_daysSinceDeparture - op2._daysSinceDeparture - retain) * MINUTES_PER_DAY;
 
+			return result;
+		}
 
 
-bool
-operator > ( const Schedule& op1, const Hour& op2 )
-{
-    return ( op1.getHour () > op2 );
-}
 
 
+		std::ostream&
+		operator << ( std::ostream& os, const Schedule& op )
+		{
+			os << op.getDaysSinceDeparture ();
+			os << op.getHour ();
+			return os ;
+		}
 
-int
-operator - ( const Schedule& op1, const Schedule& op2 )
-{
-    int retain = 0;
 
-    // 1: Hour
-    int result = op1.getHour () - op2.getHour ();
 
-    if ( result < 0 )
-    {
-        retain = 1;
-        result += MINUTES_PER_DAY;
-    }
+		Schedule
+		Schedule::FromString (const std::string& str)
+		{
+			// DD:hh:mm
+			return Schedule (
+			Hour (Conversion::ToInt (str.substr (3, 2)),
+				  Conversion::ToInt (str.substr (6, 2))),
+			Conversion::ToInt (str.substr (0, 2))
+			);
+		}
 
-    // 2: Days since departure
-    result += ( op1.getDaysSinceDeparture () - op2.getDaysSinceDeparture () - retain )
-              * MINUTES_PER_DAY;
+		std::string Schedule::toString() const
+		{
+			if (_hour.isUnknown())
+				return string();
 
-    return result;
-}
+			std::stringstream os;
+			if (_daysSinceDeparture)
+				os << ((_daysSinceDeparture > 0) ? "+" : "") << _daysSinceDeparture << "/";
 
+			os << _hour.toString();
+			return os.str ();
+		}
 
-
-
-std::ostream&
-operator << ( std::ostream& os, const Schedule& op )
-{
-    os << op.getDaysSinceDeparture ();
-    os << op.getHour ();
-    return os ;
-}
-
-
-
-
-Schedule&
-Schedule::operator = ( const std::string& op )
-{
-    if ( op.size () == 0 )
-    {
-        _daysSinceDeparture = 0;
-        _hour = op;
-    }
-    else if ( op[ 0 ] == TIME_MIN )
-        setMinimum();
-    else if ( op[ 0 ] == TIME_MAX )
-        setMaximum();
-    else
-    {
-        _daysSinceDeparture = atoi ( op.substr ( 0, 1 ).c_str () );
-        _hour = op.substr( 1 );
-    }
-    return *this;
-}
-
-
-
-Schedule
-Schedule::FromString (const std::string& str)
-{
-    // DD:hh:mm
-    return Schedule (
-	Hour (Conversion::ToInt (str.substr (3, 2)),
-	      Conversion::ToInt (str.substr (6, 2))),
-	Conversion::ToInt (str.substr (0, 2))
-	);
-}
-
-bool operator==( const Schedule& op1, const Schedule& op2 )
-{
-	return
-		op1.getDaysSinceDeparture() == op2.getDaysSinceDeparture()
-		&& op1.getHour() == op2.getHour();
-}
-
-
-
-}
+		bool Schedule::operator==(const Schedule& op2 ) const
+		{
+			return	_daysSinceDeparture == op2._daysSinceDeparture
+				&&	_hour == op2._hour;
+		}
+	}
 }
 

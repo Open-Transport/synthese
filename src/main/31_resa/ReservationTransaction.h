@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_resa_ReservationTransaction_h__
 #define SYNTHESE_resa_ReservationTransaction_h__
 
+#include "31_resa/Types.h"
+
 #include "04_time/DateTime.h"
 
 #include "01_util/Registrable.h"
@@ -111,6 +113,35 @@ namespace synthese
 			*/
 			boost::shared_ptr<Reservation> newReservation();
 
+
+
+			//! @name Queries
+			//@{				
+				/** Reservation transaction status computing.
+					@return ReservationStatus the status of the reservation transaction
+					@author Hugues Romain
+					@date 2008
+					
+					The reservation status of a reservation transaction is :
+						- NO_SHOW if at least one reservation is at NO_SHOW status
+						- else the minimum of the status of each reservation
+				*/
+				ReservationStatus getStatus() const;
+
+				std::string	getFullStatusText()	const;
+
+				
+				
+				/** Dead line of the reservation transaction.
+					@return time::DateTime the dead line
+					@author Hugues Romain
+					@date 2008
+					
+					The dead line of the reservation transaction is the time when the cancellation is not allowed anymore.
+					This is the first reservation dead line in chronological order.
+				*/
+				time::DateTime getReservationDeadLine() const;
+			//@}
 		};
 	}
 }

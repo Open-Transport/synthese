@@ -131,14 +131,8 @@ namespace synthese
 			AlarmLevel											_searchLevel;
 			AlarmConflict										_searchConflict;
 			html::ActionResultHTMLTable::RequestParameters		_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters		_scenarioResultParameters;
-			html::ActionResultHTMLTable::ResultParameters		_alarmResultParameters;
-
-			server::ParametersMap	_parametersMap;
 			
-			std::vector<boost::shared_ptr<SingleSentAlarm> >		_result;
-			std::vector<boost::shared_ptr<SentScenario> >	_scenarioResult;
-
+			server::ParametersMap	_parametersMap;
 			
 		public:
 			static const std::string PARAMETER_SEARCH_START;

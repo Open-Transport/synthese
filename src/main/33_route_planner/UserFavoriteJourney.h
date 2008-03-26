@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "15_env/Types.h"
+#include "15_env/AccessParameters.h"
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
@@ -51,7 +51,7 @@ namespace synthese
 			std::string				_originPlaceName;
 			std::string				_destinationCityName;
 			std::string				_destinationPlaceName;
-			AccessParameters		_accessParameters;
+			env::AccessParameters	_accessParameters;
 
 		public:
 			UserFavoriteJourney();
@@ -62,15 +62,15 @@ namespace synthese
 			void setOriginPlaceName(const std::string& value);
 			void setDestinationCityName(const std::string& value);
 			void setDestinationPlaceName(const std::string& value);
-			void setAccessParameters(const AccessParameters& value);
+			void setAccessParameters(const env::AccessParameters& value);
 
-			int						getRank()					const;
-			const security::User*	getUser()					const;
-			const std::string&		getOriginCityName()			const;
-			const std::string&		getOriginPlaceName()		const;
-			const std::string&		getDestinationCityName()	const;
-			const std::string&		getDestinationPlaceName()	const;
-			const AccessParameters&	getAccessParameters()		const;
+			int								getRank()					const;
+			const security::User*			getUser()					const;
+			const std::string&				getOriginCityName()			const;
+			const std::string&				getOriginPlaceName()		const;
+			const std::string&				getDestinationCityName()	const;
+			const std::string&				getDestinationPlaceName()	const;
+			const env::AccessParameters&	getAccessParameters()		const;
 
 		};
 	}

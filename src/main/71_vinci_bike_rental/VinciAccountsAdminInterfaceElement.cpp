@@ -85,7 +85,7 @@ namespace synthese
 		{
 			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
 			_searchCode = map.getString(PARAMETER_CODE, false, FACTORY_KEY);
-			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), string(), 30);
+			_requestParameters.setFromParametersMap(map.getMap(), string(), 30);
 		}
 
 		void VinciAccountsAdminInterfaceElement::display(ostream& stream, VariablesMap & variables, const FunctionRequest<AdminRequest>* request) const
@@ -141,7 +141,8 @@ namespace synthese
 			// Results list
 			stream << "<h1>Produits vendus</h1>";
 
-			ResultHTMLTable::ResultParameters p(ResultHTMLTable::getParameters(_requestParameters, salesSearchResult));
+			ResultHTMLTable::ResultParameters p;
+			p.setFromResult(_requestParameters, salesSearchResult);
 
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_NAME, "Nom"));

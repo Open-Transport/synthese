@@ -26,8 +26,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
-
 #include "05_html/HTMLTable.h"
 #include "05_html/HTMLForm.h"
 
@@ -68,16 +66,31 @@ namespace synthese
 					, maxSize(30)
 					, raisingOrder(true)
 				{}
+
+				void setFromParametersMap(
+					const std::map<std::string, std::string>& map
+					, const std::string defaultOrderField = std::string()
+					, int defaultMaxSize = UNLIMITED_SIZE
+					, bool defaultRaisingOrder = true
+				);
+
+				std::map<std::string, std::string> getParametersMap() const;
 			};
+
 
 			struct ResultParameters
 			{
 				bool				next;
 				int					size;
-				ResultParameters()
-					: next(false)
-					, size(UNLIMITED_SIZE)
-				{}
+
+				template<class T>
+				void setFromResult(const RequestParameters& p, std::vector<T>& v)
+				{
+					next = v.size() == p.maxSize + 1;
+					if (next)
+						v.pop_back();
+					size = v.size();
+				}
 			};
 
 		protected:
@@ -97,36 +110,8 @@ namespace synthese
 				, std::string iconPath = std::string()
 				);
 
-			virtual std::string close();
-
-			static RequestParameters getParameters(
-				const std::map<std::string, std::string>& map
-				, const std::string defaultOrderField = std::string()
-				, int defaultMaxSize = UNLIMITED_SIZE
-				);
-			
-			template <class T>
-			static ResultParameters getParameters(
-				const RequestParameters& requestParameters
-				, std::vector<boost::shared_ptr<T> >& result);
-
-			static std::map<std::string, std::string> getParametersMap(
-				const RequestParameters& requestParameters);
-			
+			virtual std::string close();			
 		};
-
-		template <class T>
-		ResultHTMLTable::ResultParameters ResultHTMLTable::getParameters(
-			const RequestParameters& requestParameters
-			, std::vector<boost::shared_ptr<T> >& result
-		){
-			ResultParameters p;
-			p.next = (requestParameters.maxSize != UNLIMITED_SIZE) && (result.size() > static_cast<size_t>(requestParameters.maxSize));
-			if (p.next)
-				result.pop_back();
-			p.size = result.size();
-			return p;
-		}
 	}
 }
 

@@ -37,7 +37,6 @@ namespace synthese
 	namespace security
 	{
 		class User;
-		class Profile;
 
 		/** User SQLite table synchronizer.
 			@ingroup m12LS refLS
@@ -76,9 +75,11 @@ namespace synthese
 			static bool loginExists(const std::string& login);
 
 			/** User search.
-				@param login login to search (empty = no search on login)
-				@param name name to search (empty = no search on name)
-				@param profile Profile which user must belong (null = filter deactivated)
+				@param login login to search : use LIKE syntax
+				@param name name to search : use LIKE syntax
+				@param surname name to search : use LIKE syntax
+				@param phone phone to search (LIKE syntax)
+				@param profileId Profile ID which user must belong (UNKNOWN_VALUE = filter deactivated)
 				@param emptyLogin User without login acceptation (true = user must have a login, false = user must not have a login, indeterminate = filter deactivated)
 				@param first First user to answer
 				@param number Number of users to answer (-1 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others users to show. Test it to know if the situation needs a "click for more" button.
@@ -92,10 +93,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<boost::shared_ptr<User> > search(
-				const std::string& login
-				, const std::string name
-				, boost::shared_ptr<const security::Profile> profile = boost::shared_ptr<const security::Profile>()
+			static std::vector<boost::shared_ptr<User> > Search(
+				const std::string login = std::string("%")
+				, const std::string name = std::string("%")
+				, const std::string surname = std::string("%")
+				, const std::string phone = std::string("%")
+				, uid profileId = UNKNOWN_VALUE
 				, boost::logic::tribool emptyLogin = boost::logic::indeterminate
 				, int first = 0
 				, int number = -1
@@ -103,7 +106,7 @@ namespace synthese
 				, bool orderByName = false
 				, bool orderByProfileName = false
 				, bool raisingOrder = true
-				);
+			);
 		};
 
 	}

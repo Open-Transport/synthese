@@ -51,8 +51,7 @@ namespace synthese
 		}
 
 
-		boost::logic::tribool 
-		Compliance::isCompliant () const
+		const boost::logic::tribool& Compliance::isCompliant () const
 		{
 			return _compliant;
 		}
@@ -66,19 +65,23 @@ namespace synthese
 
 
 		void 
-		Compliance::setCompliant (boost::logic::tribool compliant)
+		Compliance::setCompliant (const boost::logic::tribool& compliant)
 		{
 			_compliant = compliant;
 		}
 
 		bool Compliance::isCompatibleWith( const Compliance& compliance ) const
 		{
-			return
-				boost::logic::indeterminate(isCompliant())
-				|| boost::logic::indeterminate(compliance.isCompliant())
-				|| compliance.isCompliant() == isCompliant();
+			return isCompatibleWith(compliance._compliant);
 		}
 
+		bool Compliance::isCompatibleWith(const boost::logic::tribool& value ) const
+		{
+			return
+				boost::logic::indeterminate(value)
+				|| boost::logic::indeterminate(_compliant)
+				|| _compliant == value;
+		}
 
 	}
 }

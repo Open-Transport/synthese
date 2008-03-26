@@ -213,17 +213,23 @@ namespace synthese
 
 
 
-		std::vector<shared_ptr<ContinuousService> > ContinuousServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		std::vector<shared_ptr<ContinuousService> > ContinuousServiceTableSync::search(
+			uid lineId
+			, int first /*= 0*/
+			, int number /*= 0*/
+			, bool orderByDepartureTime
+			, bool raisingOrder
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< " WHERE 1 ";
+			if (lineId != UNKNOWN_VALUE)
+				query << " AND " << COL_PATHID << "=" << lineId;
+			if (orderByDepartureTime)
+				query << " ORDER BY " << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

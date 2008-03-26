@@ -74,6 +74,27 @@ namespace synthese
 
 		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			// Search
+			vector<shared_ptr<VinciContract> >	_contracts(VinciContractTableSync::search(
+				_searchName
+				, _searchSurname
+				, UNKNOWN_VALUE
+				, _searchFilter == FILTER_ONLATE
+				, _searchFilter == FILTER_DUE
+				, _searchFilter == FILTER_OUTDATED_GUARANTEE
+				, _searchFilter == FILTER_CONTRACTED_GUARANTEE
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAM_SEARCH_NAME
+				, _requestParameters.orderField == PARAM_SEARCH_SURNAME
+				, _requestParameters.orderField == PARAM_SEARCH_FILTER
+				, _requestParameters.raisingOrder
+			));
+			ResultHTMLTable::ResultParameters	_resultParameters;
+			_resultParameters.setFromResult(_requestParameters, _contracts);
+
+
+
 			// Search request
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<VinciCustomerSearchAdminInterfaceElement>();
@@ -145,27 +166,9 @@ namespace synthese
 
 			_searchFilter = static_cast<_Filter>(map.getInt(PARAM_SEARCH_FILTER, false, FACTORY_KEY));
 
-			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAM_SEARCH_NAME, 30);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
 
 			_activeSearch = !_searchName.empty() || !_searchSurname.empty();
-
-			_contracts = VinciContractTableSync::search(
-				_searchName
-				, _searchSurname
-				, UNKNOWN_VALUE
-				, _searchFilter == FILTER_ONLATE
-				, _searchFilter == FILTER_DUE
-				, _searchFilter == FILTER_OUTDATED_GUARANTEE
-				, _searchFilter == FILTER_CONTRACTED_GUARANTEE
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAM_SEARCH_NAME
-				, _requestParameters.orderField == PARAM_SEARCH_SURNAME
-				, _requestParameters.orderField == PARAM_SEARCH_FILTER
-				, _requestParameters.raisingOrder
-			);
-
-			_resultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _contracts);
 		}
 
 		bool VinciCustomerSearchAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
@@ -175,7 +178,7 @@ namespace synthese
 
 		server::ParametersMap VinciCustomerSearchAdminInterfaceElement::getParametersMap() const
 		{
-			ParametersMap map(ActionResultHTMLTable::getParametersMap(_requestParameters));
+			ParametersMap map(_requestParameters.getParametersMap());
 			map.insert(PARAM_SEARCH_NAME, _searchName);
 			map.insert(PARAM_SEARCH_SURNAME, _searchSurname);
 			return map;

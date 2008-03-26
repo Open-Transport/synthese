@@ -23,11 +23,7 @@
 #ifndef SYNTHESE_PROFILES_ADMIN_H
 #define SYNTHESE_PROFILES_ADMIN_H
 
-#include <vector>
-
-#include <boost/shared_ptr.hpp>
-
-#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
@@ -89,9 +85,7 @@ namespace synthese
 			std::string _searchName;
 			std::string _searchRightName;
 
-			std::vector<boost::shared_ptr<Profile> >		_searchResult;
-			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
 			ProfilesAdmin();

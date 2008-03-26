@@ -58,12 +58,12 @@ namespace synthese
 			_profile = ProfileTableSync::Get(_request->getObjectId());
 
 			// Search of child profiles
-			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(_profile, 0, 1);
+			vector<shared_ptr<Profile> > profiles = ProfileTableSync::Search(_profile, 0, 1);
 			if (!profiles.empty())
 				throw ActionException("Au moins un profil hérite du profil spécifié. La suppression est impossible.");
 
 			// Search of users
-			vector<shared_ptr<User> > users = UserTableSync::search("","", _profile, boost::logic::indeterminate, 0, 1);
+			vector<shared_ptr<User> > users = UserTableSync::Search("%","%","%","%", _profile->getKey(), boost::logic::indeterminate, 0, 1);
 			if (!users.empty())
 				throw ActionException("Au moins un utilisateur appartient au profil spécifié. La suppression est impossible.");
 		}

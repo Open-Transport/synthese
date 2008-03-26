@@ -43,6 +43,7 @@ namespace synthese
 
 	namespace env
 	{
+		class AccessParameters;
 		class City;
 		class Vertex;
 		struct VertexAccess;
@@ -118,10 +119,12 @@ namespace synthese
 			//! @name Query methods
 			//@{
 
-			virtual VertexAccess getVertexAccess (const AccessDirection& accessDirection,
-							const AccessParameters& accessParameters,
-							const Vertex* destination,
-							const Vertex* origin) const;
+			virtual VertexAccess getVertexAccess (
+				const AccessDirection& accessDirection
+				, const AccessParameters& accessParameters
+				, const Vertex* destination
+				, const Vertex* origin
+			) const;
 
 
 			virtual void getImmediateVertices(

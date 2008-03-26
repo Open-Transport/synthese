@@ -26,6 +26,7 @@
 #include "01_util/Log.h"
 
 #include "15_env/Types.h"
+#include "15_env/AccessParameters.h"
 
 #include "33_route_planner/Types.h"
 #include "33_route_planner/JourneysResult.h"
@@ -71,7 +72,7 @@ namespace synthese
 
 			//! @name Parameters
 			//@{
-				const AccessParameters		_accessParameters;
+				const env::AccessParameters	_accessParameters;
 				const AccessDirection		_accessDirection;
 				const SearchAddresses		_searchAddresses;
 				const SearchPhysicalStops	_searchPhysicalStops;
@@ -116,7 +117,7 @@ namespace synthese
 		public:
 			IntegralSearcher(
 				AccessDirection					accessDirection
-				, const AccessParameters&		accessParameters
+				, const env::AccessParameters&	accessParameters
 				, SearchAddresses				searchAddresses
 				, SearchPhysicalStops			searchPhysicalStops
 				, UseRoads						useRoads

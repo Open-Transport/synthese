@@ -28,6 +28,7 @@
 #include <map>
 
 #include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
 
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/City.h"
@@ -91,12 +92,12 @@ namespace synthese
 
 			_lineUId = map.getUid(PARAMETER_LINE_ID, false, FACTORY_KEY);
 
-			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_CITY_NAME, 30);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
 		}
 
 		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(searchConnectionPlacesWithBroadcastPoints(
+			vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(searchConnectionPlacesWithBroadcastPoints(
 				request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 				, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 				, READ
@@ -110,9 +111,10 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_PLACE_NAME
 				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
 				, _requestParameters.raisingOrder
-				));
+			));
 
-			ResultHTMLTable::ResultParameters resultParameters(ResultHTMLTable::getParameters(_requestParameters, searchResult));
+			ResultHTMLTable::ResultParameters resultParameters;
+			resultParameters.setFromResult(_requestParameters, searchResult);
 
 			FunctionRequest<AdminRequest> goRequest(request);
 			goRequest.getFunction()->setPage<DisplaySearchAdmin>();

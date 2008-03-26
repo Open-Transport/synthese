@@ -28,8 +28,6 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#include "15_env/Complyer.h"
-
 #include "01_util/Constants.h"
 #include "01_util/UId.h"
 
@@ -44,7 +42,7 @@ namespace synthese
 		class Address;
 		class Place;
 
-		/** @addtogroup m15
+		/** @addtogroup m35
 		@{
 		*/
 		typedef std::map<uid,const PhysicalStop*> PhysicalStops;
@@ -57,22 +55,12 @@ namespace synthese
 		/** @} */
 	}
 
-	/** @addtogroup m15
+	/** @addtogroup m35
 		@{
 	*/
 	typedef enum { SEARCH_ADDRESSES, DO_NOT_SEARCH_ADDRESSES } SearchAddresses;
 	typedef enum { SEARCH_PHYSICALSTOPS, DO_NOT_SEARCH_PHYSICALSTOPS } SearchPhysicalStops;
 	typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
-
-	struct AccessParameters {
-		double maxApproachDistance;
-		double maxApproachTime;
-		double approachSpeed;
-		int maxTransportConnectionCount;
-
-		env::Complyer	complyer;
-
-	};
 
 	/** @} */
 

@@ -137,11 +137,12 @@ namespace synthese
 				Log::GetInstance().warn("Bad value " + Conversion::ToString(fareId) + " for fare in line " + Conversion::ToString(line->getKey()));
 			}
 
-			line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,line,true,temporary));
-			line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,line,true,temporary));
-			line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId,line,true,temporary));
-			line->setCommercialLine(CommercialLineTableSync::Get(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID), line,true,temporary));
-			line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,line,true,temporary));
+			// GET_AUTO is used to benefit of the Neutral Element if id=0
+			line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,line,true,GET_AUTO));
+			line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,line,true,GET_AUTO));
+			line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId,line,true,GET_AUTO));
+			line->setCommercialLine(CommercialLineTableSync::Get(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID), line,true,GET_AUTO));
+			line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,line,true,GET_AUTO));
 
 		}
 

@@ -63,7 +63,11 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_SITE;
+			
+			// Accessibility
 			static const std::string PARAMETER_ACCESSIBILITY;
+			static const std::string PARAMETER_DISABLED_CUSTOMER;
+			static const std::string PARAMETER_DRT_ONLY;
 
 			// Journey information
 			static const std::string PARAMETER_ORIGIN_CITY;
@@ -73,8 +77,10 @@ namespace synthese
 			static const std::string PARAMETER_DATE_TIME;
 
 			// Customer information
+			static const std::string PARAMETER_CREATE_CUSTOMER;
 			static const std::string PARAMETER_CUSTOMER_ID;
 			static const std::string PARAMETER_CUSTOMER_NAME;
+			static const std::string PARAMETER_CUSTOMER_SURNAME;
 			static const std::string PARAMETER_CUSTOMER_PHONE;
 			static const std::string PARAMETER_CUSTOMER_EMAIL;
 
@@ -85,12 +91,12 @@ namespace synthese
 			static const std::string PARAMETER_SEATS_NUMBER;
 
 		private:
-			env::Journey							_journey;
-			boost::shared_ptr<const security::User>	_customer;
-			std::string								_customerName;
-			std::string								_customerPhone;
-			std::string								_customerEMail;
-			int										_seatsNumber;
+			env::Journey						_journey;
+			boost::shared_ptr<security::User>	_customer;
+			bool								_createCustomer;
+			bool								_disabledCustomer;
+			bool								_drtOnly;
+			int									_seatsNumber;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -111,6 +117,8 @@ namespace synthese
 			void run();
 
 			BookReservationAction();
+			
+			void setJourney(const env::Journey& journey);
 		};
 	}
 }

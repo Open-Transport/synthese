@@ -25,6 +25,7 @@
 #include "15_env/Address.h"
 #include "15_env/Road.h"
 #include "15_env/VertexAccessMap.h"
+#include "15_env/AccessParameters.h"
 
 
 namespace synthese
@@ -76,7 +77,7 @@ TemporaryPlace::getVertexAccess (const AccessDirection& accessDirection,
 {
     VertexAccess access(accessDirection);
     access.approachDistance = _metricOffset - ((Address*) destination)->getMetricOffset ();
-    access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+    access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
 	return access;
 }
     
@@ -103,7 +104,7 @@ TemporaryPlace::getImmediateVertices (VertexAccessMap& result,
     {
 		VertexAccess access(accessDirection);
 		access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
-		access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+		access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
 		
 		result.insert (closestBefore, access);
     }
@@ -112,7 +113,7 @@ TemporaryPlace::getImmediateVertices (VertexAccessMap& result,
     {
 		VertexAccess access(accessDirection);
 		access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
-		access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+		access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
 		
 		result.insert (closestAfter, access);
     }

@@ -23,7 +23,9 @@
 #include "ReservationTransaction.h"
 
 #include "31_resa/Reservation.h"
+#include "31_resa/ResaModule.h"
 
+using namespace std;
 using namespace boost;
 
 namespace synthese
@@ -166,6 +168,55 @@ namespace synthese
 		void ReservationTransaction::setReservations( const Reservations& reservations )
 		{
 			_reservations = reservations;
+		}
+
+
+
+		synthese::resa::ReservationStatus ReservationTransaction::getStatus() const
+		{
+			ReservationStatus status(ReservationStatus::NO_RESERVATION);
+			for(Reservations::const_iterator it(_reservations.begin()); it != _reservations.end(); ++it)
+			{
+				ReservationStatus rs((*it)->getStatus());
+
+				if (rs == NO_SHOW)
+					return NO_SHOW;
+
+				if (rs < status)
+					status = rs;
+			}
+			return status;
+		}
+
+
+
+		std::string ReservationTransaction::getFullStatusText() const
+		{
+			ReservationStatus status(getStatus());
+			string statusText(ResaModule::GetStatusText(status));
+
+			switch(status)
+			{
+			case OPTION: return statusText + " pouvant être annulée avant le " + getReservationDeadLine().toString();
+			case CANCELLED: return statusText + " le " + _cancellationTime.toString();
+			case CANCELLED_AFTER_DELAY: statusText + " le " + _cancellationTime.toString();
+			case NO_SHOW: return statusText + " constantée le " + _cancellationTime.toString();
+			}
+
+			return statusText;
+		}
+
+
+
+		time::DateTime ReservationTransaction::getReservationDeadLine() const
+		{
+			DateTime result(TIME_UNKNOWN);
+			for (Reservations::const_iterator it(_reservations.begin()); it != _reservations.end(); ++it)
+			{
+				if (!(*it)->getReservationDeadLine().isUnknown() && (result.isUnknown() || (*it)->getReservationDeadLine() < result))
+					result = (*it)->getReservationDeadLine();
+			}
+			return result;
 		}
 	}
 }

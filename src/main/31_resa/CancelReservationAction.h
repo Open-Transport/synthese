@@ -43,12 +43,10 @@ namespace synthese
 			: public util::FactorableTemplate<server::Action, CancelReservationAction>
 		{
 		public:
-			static const std::string PARAMETER_RESERVATION_ID;
 			static const std::string PARAMETER_RESERVATION_TRANSACTION_ID;
 			static const std::string PARAMETER_PASSWORD;
 
 		private:
-			uid											_resaId;
 			boost::shared_ptr<ReservationTransaction>	_transaction;
 			
 		protected:
@@ -70,6 +68,8 @@ namespace synthese
 			void run();
 			
 			CancelReservationAction();
+
+			void setTransaction(boost::shared_ptr<ReservationTransaction> transaction);
 		};
 	}
 }

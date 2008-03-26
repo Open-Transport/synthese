@@ -28,10 +28,14 @@
 #include <sstream>
 #include <ctime>
 
+#include <boost/tokenizer.hpp>
+
 #include "01_util/Conversion.h"
 
 #include "04_time/Schedule.h"
 #include "04_time/TimeParseException.h"
+
+using namespace boost;
 
 namespace synthese
 {
@@ -40,9 +44,10 @@ namespace synthese
 	namespace time
 	{
 
-		Hour::Hour ( int hours, int minutes )
+		Hour::Hour ( int hours, int minutes, int seconds )
 				: _hours (UNKNOWN_VALUE)
 				, _minutes (UNKNOWN_VALUE)
+				, _seconds(UNKNOWN_VALUE)
 		{
 			time_t rawtime;
 			struct tm * timeinfo = 0;
@@ -79,12 +84,24 @@ namespace synthese
 				_minutes = UNKNOWN_VALUE;
 			else if ( minutes != TIME_UNCHANGED && ( minutes != TIME_SAME || hours != TIME_UNCHANGED ) )
 				_minutes = minutes;
+
+			if ( seconds == TIME_CURRENT || seconds == TIME_SAME && hours == TIME_CURRENT )
+				_seconds = ( *timeinfo ).tm_sec;
+			else if ( seconds == TIME_MAX || seconds == TIME_SAME && hours == TIME_MAX )
+				_seconds = 59;
+			else if ( seconds == TIME_MIN || seconds == TIME_SAME && hours == TIME_MIN )
+				_seconds = 0;
+			else if ( _seconds == TIME_UNKNOWN || seconds == TIME_SAME && hours == TIME_UNKNOWN )
+				_seconds = UNKNOWN_VALUE;
+			else if ( seconds != TIME_UNCHANGED && ( seconds != TIME_SAME || hours != TIME_UNCHANGED ) )
+				_seconds = seconds;
 		}
 
 
 		Hour::Hour ( const Hour& ref )
 				: _hours ( ref._hours )
 				, _minutes ( ref._minutes )
+				, _seconds(ref._seconds)
 		{
 		}
 
@@ -98,8 +115,10 @@ namespace synthese
 		bool
 		Hour::isValid () const
 		{
-			return ( _hours >= 0 ) && ( _hours < HOURS_PER_DAY ) &&
-				   ( _minutes >= 0 ) && ( _minutes < MINUTES_PER_HOUR );
+			return _hours >= 0 && _hours < HOURS_PER_DAY
+				&& _minutes >= 0 && _minutes < MINUTES_PER_HOUR
+				&& _seconds >= 0 && _seconds < SECONDS_PER_MINUTE
+			;
 		}
 
 
@@ -107,109 +126,124 @@ namespace synthese
 		bool
 		Hour::isUnknown () const
 		{
-			return ( _hours == UNKNOWN_VALUE ) || ( _minutes == UNKNOWN_VALUE );
+			return _hours == UNKNOWN_VALUE || _minutes == UNKNOWN_VALUE || _seconds == UNKNOWN_VALUE;
 		}
 
 
-		std::string Hour::toString () const
+		std::string Hour::toString (bool withSeconds) const
 		{
 			if (isUnknown())
 				return "";
 
 			std::stringstream os;
 			os << std::setw( 2 ) << std::setfill ( '0' )
-				<< getHours () << ":" 
+				<< _hours << ":" 
 				<< std::setw( 2 ) << std::setfill ( '0' )
-				<< getMinutes ();
+				<< _minutes;
+			if (withSeconds)
+			{
+			os << ":" 
+				<< std::setw( 2 ) << std::setfill ( '0' )
+				<< _seconds;
+			}
 			return os.str ();
 		}
 
 
-		bool
-		operator == ( const Hour& op1, const Hour& op2 )
+		bool Hour::operator == (const Hour& op2 ) const
 		{
-			return ( op1.getHours () == op2.getHours () ) &&
-				   ( op1.getMinutes () == op2.getMinutes () );
+			return _hours == op2._hours
+				&& _minutes == op2._minutes
+				&& _seconds == op2._seconds
+			;
 		}
 
 
 
-		bool
-		operator != ( const Hour& op1, const Hour& op2 )
+		bool Hour::operator != (const Hour& op2 ) const
 		{
-			return ( op1.getHours () != op2.getHours () ) ||
-				   ( op1.getMinutes () != op2.getMinutes () );
+			return _hours != op2._hours
+				|| _minutes != op2._minutes
+				|| _seconds != op2._seconds
+			;
 		}
 
 
 
-		bool
-		operator <= ( const Hour& op1, const Hour& op2 )
+		bool Hour::operator <= (const Hour& op2 ) const
 		{
-			if ( op1.getHours () == op2.getHours () )
-				return op1.getMinutes () <= op2.getMinutes ();
-
-			return op1.getHours () < op2.getHours ();
+			if (_hours == op2._hours)
+			{
+				if (_minutes == op2._minutes)
+					return _seconds <= op2._seconds;
+				else
+					return _minutes < op2._minutes;
+			}
+			return _hours < op2._hours;
 		}
 
 
 
-		bool
-		operator<( const Hour& op1, const Hour& op2 )
+		bool Hour::operator<(const Hour& op2 ) const
 		{
-			if ( op1.getHours () == op2.getHours () )
-				return op1.getMinutes () < op2.getMinutes ();
-
-			return op1.getHours () < op2.getHours ();
-		}
-
-
-		bool
-		operator>=( const Hour& op1, const Hour& op2 )
-		{
-			if ( op1.getHours () == op2.getHours () )
-				return op1.getMinutes () >= op2.getMinutes ();
-
-			return op1.getHours () > op2.getHours ();
-
+			if (_hours == op2._hours)
+			{
+				if (_minutes == op2._minutes)
+					return _seconds < op2._seconds;
+				else
+					return _minutes < op2._minutes;
+			}
+			return _hours < op2._hours;
 		}
 
 
 
-		bool
-		operator > ( const Hour& op1, const Hour& op2 )
+		bool Hour::operator>=(const Hour& op2 ) const
 		{
-			if ( op1.getHours () == op2.getHours () )
-				return op1.getMinutes () > op2.getMinutes ();
+			if (_hours == op2._hours)
+			{
+				if (_minutes == op2._minutes)
+					return _seconds >= op2._seconds;
+				else
+					return _minutes > op2._minutes;
+			}
+			return _hours > op2._hours;
+		}
 
-			return op1.getHours () > op2.getHours ();
 
+
+		bool Hour::operator > (const Hour& op2 ) const
+		{
+			if (_hours == op2._hours)
+			{
+				if (_minutes == op2._minutes)
+					return _seconds > op2._seconds;
+				else
+					return _minutes > op2._minutes;
+			}
+			return _hours > op2._hours;
 		}
 
 
 
 		std::ostream& operator<< ( std::ostream& os, const Hour& op )
 		{
-			os << std::setw( 2 ) << std::setfill ( '0' )
-			<< op.getHours ()
-			<< std::setw( 2 ) << std::setfill ( '0' )
-			<< op.getMinutes ();
+			os << op.toSQLString(false);
 			return os;
 		}
 
 
 
-		int
-		operator-( const Hour& op1, const Hour& op2 )
+		int Hour::operator-(const Hour& op2 ) const
 		{
 			int result = 0;
 
 			// 1: Minutes
-			int retain = ( MINUTES_PER_HOUR - 1 + op2.getMinutes() - op1.getMinutes() ) / MINUTES_PER_HOUR;
-			result += op1.getMinutes () + retain * MINUTES_PER_HOUR - op2.getMinutes ();
+			int retain = ( MINUTES_PER_HOUR - 1 + op2._minutes -_minutes) / MINUTES_PER_HOUR;
+			result += _minutes + retain * MINUTES_PER_HOUR - op2._minutes;
 
 			// 2: Hours
-			result += MINUTES_PER_HOUR * ( op1.getHours () - op2.getHours() - retain );
+			result += MINUTES_PER_HOUR * (_hours - op2._hours - retain );
 
 			return result;
 		}
@@ -225,12 +259,12 @@ namespace synthese
 				return operator-=(-minutesToAdd);
 
 			// 1: Minutes
-			int calculatedTime = getMinutes () + minutesToAdd;
+			int calculatedTime = _minutes + minutesToAdd;
 			int retain = calculatedTime / MINUTES_PER_HOUR;
 			_minutes = calculatedTime % MINUTES_PER_HOUR;
 
 			// 2: Hours
-			calculatedTime = getHours () + retain;
+			calculatedTime = _hours + retain;
 			retain = calculatedTime / HOURS_PER_DAY;
 			_hours = calculatedTime % HOURS_PER_DAY;
 
@@ -248,76 +282,52 @@ namespace synthese
 				return operator+=(-minutesToSubstract);
 
 			// 1: Minutes
-			int retain = ( MINUTES_PER_HOUR - 1 + minutesToSubstract - getMinutes() ) / MINUTES_PER_HOUR;
+			int retain = ( MINUTES_PER_HOUR - 1 + minutesToSubstract - _minutes) / MINUTES_PER_HOUR;
 			_minutes = retain * MINUTES_PER_HOUR + _minutes - minutesToSubstract;
 			int hoursToSubstract = retain;
 
 			// 2: Hours
-			retain = ( HOURS_PER_DAY - 1 + hoursToSubstract - getHours () ) / HOURS_PER_DAY;
-			_hours = retain * HOURS_PER_DAY + getHours () - hoursToSubstract;
+			retain = ( HOURS_PER_DAY - 1 + hoursToSubstract - _hours) / HOURS_PER_DAY;
+			_hours = retain * HOURS_PER_DAY + _hours - hoursToSubstract;
 			return retain;
 		}
 
 
 
-
-		Hour&
-		Hour::operator = ( const Schedule& op )
+		Hour& Hour::operator = ( const Schedule& op )
 		{
-			_hours = op.getHours();
-			_minutes = op.getMinutes ();
-			return ( *this );
+			return operator=(op.getHour());
 		}
 
 
 
-		Hour&
-		Hour::operator = ( const std::string& op )
+		Hour Hour::FromSQLTime (const std::string& sqlTime)
 		{
-			if ( op.empty())
-			{
-				_hours = 0;
-				_minutes = 0;
-			}
-			else if ( op.size () == 1 )
-			{
-				operator=(Hour(op[0]));
-			}
-			else
-			{
-				_hours = atoi ( op.substr ( 0, 2 ).c_str () );
-				_minutes = atoi ( op.substr ( 2, 2 ).c_str () );
-			}
-			return ( *this );
+			return FromString(sqlTime);
 		}
 
 
 
-		Hour
-		Hour::FromSQLTime (const std::string& sqlTime)
+		Hour Hour::FromString (const std::string& str)
 		{
-			int dot = (int) sqlTime.find(':');
+			typedef tokenizer<char_separator<char> > tokenizer;
+			char_separator<char> sep (":","",keep_empty_tokens);
+			tokenizer columns (str, sep);
 
-			if (dot == -1)
+
+			tokenizer::iterator it = columns.begin();
+			int hour = Conversion::ToInt(*it);
+			++it;
+			if (it == columns.end())
 				throw TimeParseException("Invalid hour");
 
-			return Hour(Conversion::ToInt (sqlTime.substr (0, dot)),
-				Conversion::ToInt (sqlTime.substr (dot+1, sqlTime.length() - dot))
-			);
-		}
+			int minutes = Conversion::ToInt(*it);
+			++it;
+			int seconds(0);
+			if (it != columns.end())
+				seconds = Conversion::ToInt(*it);
 
-
-		Hour
-		Hour::FromString (const std::string& str)
-		{
-			int dot = (int) str.find(':');
-
-			if (dot == -1)
-				throw TimeParseException("Invalid hour");
-
-			return Hour(Conversion::ToInt (str.substr (0, dot)),
-				Conversion::ToInt (str.substr (dot+1, str.length() - dot))
-			);
+			return Hour(hour, minutes, seconds);
 		}
 
 		std::string Hour::toSQLString( bool withApostrophes /*= true*/ ) const
@@ -332,9 +342,12 @@ namespace synthese
 				os << "'"; 
 
 			os << std::setw( 2 ) << std::setfill ( '0' )
-				<< getHours () << ":"
+				<< _hours << ":"
 				<< std::setw( 2 ) << std::setfill ( '0' )
-				<< getMinutes () << ":00";
+				<< _minutes << ":"
+				<< std::setw( 2 ) << std::setfill ( '0' )
+				<< _seconds
+				;
 
 			if (withApostrophes)
 				os << "'"; 
@@ -342,6 +355,25 @@ namespace synthese
 			return os.str ();
 		}
 
+
+
+		int Hour::getSecondsDifference( const Hour& op2 ) const
+		{
+			int result = 0;
+
+			// 0 : Seconds
+			int retain = ( 59 + op2._seconds -_seconds) / 60;
+			result = _seconds + retain * 60 - op2._seconds;
+
+			// 1: Minutes
+			retain = ( 3599 + op2._minutes -_minutes) / 3600;
+			result += 60 * (_minutes + retain * 3600 - op2._minutes);
+
+			// 2: Hours
+			result += 3600 * (_hours - op2._hours - retain );
+
+			return result;
+		}
 
 
 	}

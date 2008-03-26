@@ -47,16 +47,14 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAM_SEARCH_NAME;
+			static const std::string PARAM_SEARCH_SURNAME;
 			static const std::string PARAM_SEARCH_LOGIN;
-			static const std::string PARAM_SEARCH_PHONE;
 
 		private:
-			std::vector<boost::shared_ptr<security::User> >	_users;
 			std::string										_searchLogin;
 			std::string										_searchName;
-			std::string										_searchPhone;
+			std::string										_searchSurname;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
 
 		public:
 			ResaCustomersAdmin();

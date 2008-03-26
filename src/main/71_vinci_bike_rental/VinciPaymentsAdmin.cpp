@@ -80,7 +80,7 @@ namespace synthese
 		{
 			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
 			_searchCode = map.getString(PARAMETER_CODE, false, FACTORY_KEY);
-			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), string(), 30);
+			_requestParameters.setFromParametersMap(map.getMap(), string(), 30);
 		}
 		
 		void VinciPaymentsAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
@@ -126,7 +126,8 @@ namespace synthese
 			// Change accounts list
 			stream << "<h1>Modes de paiement</h1>";
 
-			ResultHTMLTable::ResultParameters pc(ResultHTMLTable::getParameters(_requestParameters, changeSearchResult));
+			ResultHTMLTable::ResultParameters pc;
+			pc.setFromResult(_requestParameters, changeSearchResult);
 
 			ResultHTMLTable::HeaderVector hc;
 			hc.push_back(make_pair(PARAMETER_NAME, "Nom"));

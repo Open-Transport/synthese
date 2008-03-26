@@ -119,36 +119,7 @@ namespace synthese
 				if (num != UNKNOWN_VALUE)
 					_searchLevel = static_cast<AlarmLevel>(num);
 
-				_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_LEVEL, 15);
-
-				_result = AlarmTableSync::searchSingleSent(
-					_startDate
-					, _endDate
-					, _searchConflict
-					, _searchLevel
-					, _requestParameters.first
-					, _requestParameters.maxSize
-					, _requestParameters.orderField == PARAMETER_SEARCH_START
-					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
-					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
-					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
-					, _requestParameters.raisingOrder					
-					);
-				_alarmResultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _result);
-
-				_scenarioResult = ScenarioTableSync::searchSent(
-					_startDate
-					, _endDate
-					, std::string()
-					, _requestParameters.first
-					, _requestParameters.maxSize
-					, _requestParameters.orderField == PARAMETER_SEARCH_START
-					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
-					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
-					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
-					, _requestParameters.raisingOrder
-					);
-				_scenarioResultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _scenarioResult);
+				_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_LEVEL, 15, false);
 			}
 			catch (TimeParseException e)
 			{
@@ -160,6 +131,7 @@ namespace synthese
 
 		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<MessagesAdmin>();
 
@@ -183,6 +155,39 @@ namespace synthese
 			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(request);
 			scenarioStopRequest.getFunction()->setPage<MessagesAdmin>();
 			
+			// Searches
+			vector<shared_ptr<SingleSentAlarm> >_result(AlarmTableSync::searchSingleSent(
+				_startDate
+				, _endDate
+				, _searchConflict
+				, _searchLevel
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAMETER_SEARCH_START
+				, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
+				, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
+				, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
+				, _requestParameters.raisingOrder					
+			));
+			ActionResultHTMLTable::ResultParameters _alarmResultParameters;
+			_alarmResultParameters.setFromResult(_requestParameters, _result);
+
+			vector<shared_ptr<SentScenario> > _scenarioResult(ScenarioTableSync::searchSent(
+				_startDate
+				, _endDate
+				, std::string()
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAMETER_SEARCH_START
+				, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
+				, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
+				, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
+				, _requestParameters.raisingOrder
+			));
+			html::ActionResultHTMLTable::ResultParameters _scenarioResultParameters;
+			_scenarioResultParameters.setFromResult(_requestParameters, _scenarioResult);
+
+
 			vector<pair<StatusSearch, string> > statusMap;
 			statusMap.push_back(make_pair(ALL_STATUS, "(tous les états)"));
 			statusMap.push_back(make_pair(BROADCAST_OVER, "Diffusion terminée"));

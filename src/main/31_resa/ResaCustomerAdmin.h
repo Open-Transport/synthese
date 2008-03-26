@@ -25,6 +25,8 @@
 #ifndef SYNTHESE_ResaCustomerAdmin_H__
 #define SYNTHESE_ResaCustomerAdmin_H__
 
+#include "05_html/ResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
@@ -43,11 +45,18 @@ namespace synthese
 		*/
 		class ResaCustomerAdmin : public admin::AdminInterfaceElementTemplate<ResaCustomerAdmin>
 		{
-			boost::shared_ptr<const security::User>	_customer;
-			bool									_displayCancelled;
+			boost::shared_ptr<const security::User>		_user;
+			bool										_displayCancelled;
+			bool										_displayEvents;
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+			time::Date									_eventDate;
+			
 	
 		public:
 			static const std::string PARAMETER_DISPLAY_CANCELLED;
+			static const std::string PARAMETER_DISPLAY_EVENTS;
+			static const std::string PARAMETER_EVENT_DATE;
+			static const std::string PARAMETER_TRAVEL_DATE;
 
 			ResaCustomerAdmin();
 			

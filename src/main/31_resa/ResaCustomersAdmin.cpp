@@ -24,6 +24,9 @@
 
 #include "ResaCustomersAdmin.h"
 
+#include "12_security/User.h"
+#include "12_security/UserTableSync.h"
+
 #include "31_resa/ResaModule.h"
 #include "31_resa/ResaRight.h"
 #include "31_resa/ResaCustomerAdmin.h"
@@ -35,7 +38,11 @@
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
 
+#include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -46,6 +53,7 @@ namespace synthese
 	using namespace resa;
 	using namespace admin;
 	using namespace security;
+	using namespace html;
 
 	namespace util
 	{
@@ -60,34 +68,94 @@ namespace synthese
 
 	namespace resa
 	{
+		const string ResaCustomersAdmin::PARAM_SEARCH_LOGIN("sl");
+		const string ResaCustomersAdmin::PARAM_SEARCH_NAME("sn");
+		const string ResaCustomersAdmin::PARAM_SEARCH_SURNAME("ss");
+
 		ResaCustomersAdmin::ResaCustomersAdmin()
 			: AdminInterfaceElementTemplate<ResaCustomersAdmin>()
 		{ }
 		
 		void ResaCustomersAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
-			// Exception example:
-			// throw AdminParametersException("Parameter not found");
-			// Example : _pageLink.name=object.getName();
-			// Example : _pageLink.parameterName=QueryString::PARAMETER_OBJECT_ID;
-			// Example : _pageLink.parameterValue=Conversion::ToString(id);
+			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
+			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
+			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
+			
+			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
 		}
 		
 		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
+			// Search
+			vector<shared_ptr<security::User> >	users(UserTableSync::Search(
+				"%" + _searchLogin + "%"
+				, "%" + _searchName + "%"
+				, "%" + _searchSurname + "%"
+				, "%"
+				, UNKNOWN_VALUE
+				, logic::indeterminate
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAM_SEARCH_LOGIN
+				, _requestParameters.orderField == PARAM_SEARCH_NAME
+				, false
+				, _requestParameters.raisingOrder
+			));
+
+			ResultHTMLTable::ResultParameters	resultParameters;
+			resultParameters.setFromResult(_requestParameters, users);
+
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<ResaCustomersAdmin>();
 
 			FunctionRequest<AdminRequest> openRequest(request);
-			searchRequest.getFunction()->setPage<ResaCustomerAdmin>();
+			openRequest.getFunction()->setPage<ResaCustomerAdmin>();
 			
 			// Form
+			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
+			stream << "<h1>Recherche</h1>";
+			stream << st.open();
+			stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
+			stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname));
+			stream << st.cell("Login", st.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin));
+			stream << st.close();
+			stream << st.getForm().setFocus(PARAM_SEARCH_NAME);
 
-			// Search
+			stream << "<h1>Résultats</h1>";
 
 			// Results
+			if (users.empty())
+				stream << "<p>Aucun client trouvé.</p>";
+			else
+			{
+				ResultHTMLTable::HeaderVector h;
+				h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
+				h.push_back(make_pair(string(), "Prénom"));
+				h.push_back(make_pair(string(), "Téléphone"));
+				h.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
+				h.push_back(make_pair(string(), "Action"));
+				ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, resultParameters);
+
+				stream << t.open();
+
+				for (vector<shared_ptr<User> >::const_iterator it(users.begin()); it != users.end(); ++it)
+				{
+					openRequest.setObjectId((*it)->getKey());
+
+					stream << t.row();
+
+					stream << t.col() << (*it)->getName();
+					stream << t.col() << (*it)->getSurname();
+					stream << t.col() << (*it)->getPhone();
+					stream << t.col() << (*it)->getLogin();
+
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "user.png");
+				}
+
+				stream << t.close();
+			}
 
 		}
 
@@ -103,10 +171,8 @@ namespace synthese
 			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			/// @todo Implement it or leave empty
-			// Example
-			// if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
-			//	links.push_back(getPageLink());
+			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
+				links.push_back(getPageLink());
 			return links;
 		}
 	}

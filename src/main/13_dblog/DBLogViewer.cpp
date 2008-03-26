@@ -115,14 +115,18 @@ namespace synthese
 			_searchObjectId = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
 
 			// table parameters
-			_resultTableRequestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_START_DATE, 30);
+			_resultTableRequestParameters.setFromParametersMap(map.getMap(), PARAMETER_START_DATE, 30, false);
+		}
 
-			// Launch the search
-			_result = DBLogEntryTableSync::search(
+
+		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		{
+			// Search
+			vector<shared_ptr<DBLogEntry> >	_result(DBLogEntryTableSync::search(
 				_dbLog->getFactoryKey()
 				, _searchStartDate
 				, _searchEndDate
-				, _searchUser
+				, _searchUser.get() ? _searchUser->getKey() : UNKNOWN_VALUE
 				, _searchLevel
 				, _searchObjectId
 				, _searchText
@@ -132,17 +136,11 @@ namespace synthese
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_USER
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
 				, _resultTableRequestParameters.raisingOrder
-				);
+			));
+			ResultHTMLTable::ResultParameters		_resultTableResultParameters;
+			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, _result);
 
-			_resultTableResultParameters.next = _result.size() == _resultTableRequestParameters.maxSize + 1;
-			_resultTableResultParameters.size = _result.size();
-			if (_resultTableResultParameters.next)
-				_result.pop_back();
-		}
-
-
-		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
+			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<DBLogViewer>();
 
@@ -178,11 +176,11 @@ namespace synthese
 				shared_ptr<DBLogEntry> dbe = *it;
 				stream << t.row();
 				stream << t.col() << HTMLModule::getHTMLImage(DBLogModule::getEntryIcon(dbe->getLevel()), DBLogModule::getEntryLevelLabel(dbe->getLevel()));
-				stream << t.col() << dbe->getDate().toString();
+				stream << t.col() << dbe->getDate().toString(true);
 				stream << t.col() << (dbe->getUser() ? dbe->getUser()->getLogin() : "(supprimé)");
 				stream << t.col() << ((dbe->getObjectId() > 0) ? _dbLog->getObjectName(dbe->getObjectId()) : string());
 
-				DBLog::ColumnsVector cols = _dbLog->parse(dbe->getContent());
+				DBLog::ColumnsVector cols = _dbLog->parse(*dbe);
 				for (DBLog::ColumnsVector::const_iterator it = cols.begin(); it != cols.end(); ++it)
 					stream << t.col() << *it;
 			}

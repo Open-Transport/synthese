@@ -84,23 +84,24 @@ namespace synthese
 			_searchRightName = map.getString(PARAMETER_SEARCH_RIGHT, false, FACTORY_KEY);
 
 			// Parameters
-			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_NAME, 30);
-
-			_searchResult = ProfileTableSync::search(
-				_searchName
-				, string()
-				, _searchRightName
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-				, _requestParameters.raisingOrder
-			);
-
-			_resultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _searchResult);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
 		}
 
 		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			// Search
+			vector<shared_ptr<Profile> > _searchResult(ProfileTableSync::Search(
+				"%"+_searchName+"%"
+				, "%"+_searchRightName+"%"
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+				, _requestParameters.raisingOrder
+			));
+			ActionResultHTMLTable::ResultParameters	_resultParameters;
+			_resultParameters.setFromResult(_requestParameters, _searchResult);
+
+			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<ProfilesAdmin>();
 

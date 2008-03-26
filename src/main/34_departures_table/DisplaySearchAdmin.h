@@ -23,9 +23,7 @@
 #ifndef SYNTHESE_DISPLAY_SEARCH_ADMIN_H
 #define SYNTHESE_DISPLAY_SEARCH_ADMIN_H
 
-#include <vector>
-
-#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
@@ -127,7 +125,7 @@ namespace synthese
 			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
 			int												_searchState;
 			int												_searchMessage;
-			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
+			html::ResultHTMLTable::RequestParameters		_requestParameters;
 
 		public:
 			static const std::string PARAMETER_SEARCH_CITY;

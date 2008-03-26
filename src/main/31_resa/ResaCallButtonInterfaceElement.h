@@ -1,8 +1,8 @@
 
-/** BookableCommercialLinesInterfaceElement class header.
-	@file BookableCommercialLinesInterfaceElement.h
+/** ResaCallButtonInterfaceElement class header.
+	@file ResaCallButtonInterfaceElement.h
 	@author Hugues Romain
-	@date 2007
+	@date 2008
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,8 +22,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_BookableCommercialLinesInterfaceElement_H__
-#define SYNTHESE_BookableCommercialLinesInterfaceElement_H__
+#ifndef SYNTHESE_ResaCallButtonInterfaceElement_H__
+#define SYNTHESE_ResaCallButtonInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
@@ -33,14 +33,30 @@ namespace synthese
 {
 	namespace resa
 	{
-		/** BookableCommercialLinesInterfaceElement Library Interface Element Class.
+		/** ResaCallButtonInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
-			@date 2007
+			@date 2008
 			@ingroup m31Library refLibrary
+
+			@code callbutton @endcode
+
+			Parameters :
+				- 0 : take call icon
+				- 1 : take call text
+				- 2 : stop call icon
+				- 3 : stop call text
+
+			Object : 
+
 		*/
-		class BookableCommercialLinesInterfaceElement
-			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, BookableCommercialLinesInterfaceElement>
+		class ResaCallButtonInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, ResaCallButtonInterfaceElement>
 		{
+			// List of parameters to store
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _takeCallIcon;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _takeCallText;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _stopCallIcon;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _stopCallText;
 
 		public:
 			/** Controls and store the internals parameters.
@@ -63,9 +79,9 @@ namespace synthese
 				, const server::Request* request = NULL
 				) const;
 				
-			~BookableCommercialLinesInterfaceElement();
+			~ResaCallButtonInterfaceElement();
 		};
 	}
 }
 
-#endif // SYNTHESE_BookableCommercialLinesInterfaceElement_H__
+#endif // SYNTHESE_ResaCallButtonInterfaceElement_H__

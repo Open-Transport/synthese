@@ -272,6 +272,7 @@ namespace synthese
 			static boost::shared_ptr<const IncludingPlace> fetchIncludingPlace (const uid& id);
 
 			static boost::shared_ptr<const Place> fetchPlace (const uid& id);
+			static const Place* FetchPlace(const std::string& city, const std::string& place);
 
 
  		    static boost::shared_ptr<const Vertex> fetchVertex (const uid& id);

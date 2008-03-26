@@ -221,14 +221,13 @@ namespace synthese
 
 
 
-
-
-
 		bool Edge::isRunning(
 			const DateTime& startMoment
 			, const DateTime& endMoment
 		) const	{
-			for (Date startDate(startMoment.getDate()); startDate <= endMoment; startDate++ )
+			const Date& endDate(endMoment.getDate());
+
+			for (Date startDate(startMoment.getDate()); startDate <= endDate; startDate++ )
 				if ( getParentPath ()->isInService ( startDate ) )
 					return true;
 			return false;
@@ -236,10 +235,7 @@ namespace synthese
 
 
 
-
-
-/*
-		int 
+/*		int 
 		Edge::getBestRunTime (const Edge& other ) const
 		{
 			int curT;
@@ -420,19 +416,20 @@ namespace synthese
 			for (i=0; i<getParentPath()->getServices().size(); ++i)
 			{
 				const Service* service = getParentPath()->getService(i);
-				const Schedule& endSchedule(service->getDepartureEndScheduleToIndex(getRankInPath()));
-				const Schedule& beginSchedule(service->getDepartureBeginScheduleToIndex(getRankInPath()));
+				const Hour& endHour(service->getDepartureEndScheduleToIndex(getRankInPath()).getHour());
+				int endHours(endHour.getHours());
+				const Hour& beginHour(service->getDepartureBeginScheduleToIndex(getRankInPath()).getHour());
 
-				for (numHour = 0; numHour <= endSchedule.getHours(); ++numHour)
+				for (numHour = 0; numHour <= endHours; ++numHour)
 				{
-					if (_departureIndex[numHour] == UNKNOWN_VALUE
-						|| getParentPath()->getService(_departureIndex[numHour])->getDepartureBeginScheduleToIndex(getRankInPath()).getHour() > endSchedule.getHour()
-						)
+					if(	_departureIndex[numHour] == UNKNOWN_VALUE
+					||	getParentPath()->getService(_departureIndex[numHour])->getDepartureBeginScheduleToIndex(getRankInPath()).getHour() > endHour
+					)
 						_departureIndex[numHour] = i;
 				}
-				if (endSchedule.getHour() < beginSchedule.getHour())
+				if (endHour < beginHour)
 				{
-					for (numHour = endSchedule.getHours(); numHour < HOURS_PER_DAY; ++numHour)
+					for (numHour = endHours; numHour < HOURS_PER_DAY; ++numHour)
 					{
 						if (_departureIndex[numHour] == UNKNOWN_VALUE)
 							_departureIndex[numHour] = i;
@@ -444,19 +441,20 @@ namespace synthese
 			for (i=getParentPath()->getServices().size()-1; i>=0; --i)
 			{
 				const Service* service = getParentPath()->getService(i);
-				const Schedule& endSchedule(service->getArrivalEndScheduleToIndex(getRankInPath()));
-				const Schedule& beginSchedule(service->getArrivalBeginScheduleToIndex(getRankInPath()));
+				const Hour& endHour(service->getArrivalEndScheduleToIndex(getRankInPath()).getHour());
+				const Hour& beginHour(service->getArrivalBeginScheduleToIndex(getRankInPath()).getHour());
+				int beginHours(beginHour.getHours());
 
-				for (numHour = HOURS_PER_DAY-1; numHour >= beginSchedule.getHours(); --numHour)
+				for (numHour = HOURS_PER_DAY-1; numHour >= beginHours; --numHour)
 				{
 					if (_arrivalIndex[numHour] == UNKNOWN_VALUE
-						|| getParentPath()->getService(_arrivalIndex[numHour])->getArrivalBeginScheduleToIndex(getRankInPath()).getHour() < beginSchedule.getHour()
+						|| getParentPath()->getService(_arrivalIndex[numHour])->getArrivalBeginScheduleToIndex(getRankInPath()).getHour() < beginHour
 						)
 						_arrivalIndex[numHour] = i;
 				}
-				if (endSchedule.getHour() < beginSchedule.getHour())
+				if (endHour < beginHour)
 				{
-					for (numHour = endSchedule.getHours(); numHour >= 0; --numHour)
+					for (numHour = endHour.getHours(); numHour >= 0; --numHour)
 					{
 						if (_arrivalIndex[numHour] == UNKNOWN_VALUE)
 							_arrivalIndex[numHour] = i;

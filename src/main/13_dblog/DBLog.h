@@ -63,20 +63,33 @@ namespace synthese
 			typedef std::vector<std::string> ColumnsVector;
 			
 		protected:
-			static void _addEntry(
+			
+			/** Adds an entry to a log (generic method).
+				@param logKey key of the DBLog to write
+				@param level level of the entry (@see DBLogEntry::Level)
+				@param content serialized content of the entry
+				@param user user of the entry
+				@param objectId id of the referring object 
+				@return uid id of the created entry
+				@author Hugues Romain
+				@date 2008
+				
+				This method is intended to be used by subclasses to do managed entry creations.
+			*/
+			static uid _addEntry(
 				const std::string& logKey
 				, DBLogEntry::Level level
 				, const DBLogEntry::Content& content
 				, const security::User* user
 				, uid objectId = 0
-				);
+			);
 
 		public:
 
 			virtual std::string getName() const = 0;
 			virtual ColumnsVector getColumnNames() const = 0;
 
-			virtual ColumnsVector parse(const DBLogEntry::Content& cols) const;
+			virtual ColumnsVector parse(const DBLogEntry& entry) const;
 			virtual std::string getObjectName(uid id) const;
 		};
 	}

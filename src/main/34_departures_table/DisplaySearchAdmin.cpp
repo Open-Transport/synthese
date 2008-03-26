@@ -120,18 +120,14 @@ namespace synthese
 				}
 			}
 
-			_requestParameters = ActionResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_CITY, 30);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_CITY, 30);
 		}
 
 
 		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 
-			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
-
-			std::vector<boost::shared_ptr<DisplayScreen> >	_result;
-
-			_result = DisplayScreenTableSync::search(
+			vector<shared_ptr<DisplayScreen> >	_result(DisplayScreenTableSync::search(
 				request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 				, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 				, READ
@@ -154,9 +150,9 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SEARCH_STATE
 				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
 				, _requestParameters.raisingOrder
-				);
-
-			_resultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _result);
+			));
+			ResultHTMLTable::ResultParameters	_resultParameters;
+			_resultParameters.setFromResult(_requestParameters, _result);
 
 
 			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);

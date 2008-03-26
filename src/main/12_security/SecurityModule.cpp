@@ -55,7 +55,7 @@ namespace synthese
 
 		void SecurityModule::initialize()
 		{
-			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(string(), ROOT_PROFILE);
+			vector<shared_ptr<Profile> > profiles = ProfileTableSync::Search(ROOT_PROFILE);
 			if (profiles.empty())
 				_rootProfile.reset(new Profile);
 			else
@@ -69,7 +69,7 @@ namespace synthese
 			_rootProfile->addRight(r);
 			ProfileTableSync::save(_rootProfile.get());
 
-			vector<shared_ptr<User> > users = UserTableSync::search(ROOT_USER, ROOT_USER, _rootProfile);
+			vector<shared_ptr<User> > users = UserTableSync::Search(ROOT_USER, ROOT_USER, "%","%", _rootProfile->getKey());
 			if (users.size() == 0)
 			{
 				_rootUser.reset(new User);
@@ -109,7 +109,7 @@ namespace synthese
 			vector<pair<uid, string> > m;
 			if (withAll)
 				m.push_back(make_pair(uid(0), "(tous)"));
-			vector<shared_ptr<User> > users = UserTableSync::search("","", shared_ptr<const Profile>(), false);
+			vector<shared_ptr<User> > users = UserTableSync::Search("%","%","%","%",UNKNOWN_VALUE, false);
 			for (vector<shared_ptr<User> >::iterator it = users.begin(); it != users.end(); ++it)
 				m.push_back(make_pair((*it)->getKey(), (*it)->getSurname() + " " + (*it)->getName()));
 			return m;

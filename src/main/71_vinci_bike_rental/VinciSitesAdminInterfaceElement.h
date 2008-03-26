@@ -49,7 +49,6 @@ namespace synthese
 		class VinciSitesAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>
 		{
 			html::ResultHTMLTable::RequestParameters		_requestParameters;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
 			std::string											_searchName;
 
 		public:

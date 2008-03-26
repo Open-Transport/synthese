@@ -33,15 +33,20 @@
 #include "31_resa/Reservation.h"
 #include "31_resa/ReservationTransactionTableSync.h"
 #include "31_resa/ReservationTableSync.h"
+#include "31_resa/ResaDBLog.h"
+#include "31_resa/ResaModule.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 
 #include "15_env/Place.h"
+#include "15_env/City.h"
 #include "15_env/Journey.h"
 #include "15_env/Service.h"
 #include "15_env/Edge.h"
 #include "15_env/Line.h"
+#include "15_env/CommercialLine.h"
+#include "15_env/Road.h"
 #include "15_env/ReservationRule.h"
 #include "15_env/AddressablePlace.h"
 
@@ -73,19 +78,11 @@ namespace synthese
 	namespace resa
 	{
 		const string BookReservationAction::PARAMETER_SITE = Action_PARAMETER_PREFIX + "sit";
-		const string BookReservationAction::PARAMETER_ACCESSIBILITY = Action_PARAMETER_PREFIX + "acc";
+		
+		const string BookReservationAction::PARAMETER_ACCESSIBILITY(Action_PARAMETER_PREFIX + "ac");
+		const string BookReservationAction::PARAMETER_DISABLED_CUSTOMER(Action_PARAMETER_PREFIX + "dc");
+		const string BookReservationAction::PARAMETER_DRT_ONLY(Action_PARAMETER_PREFIX + "do");
 
-	    /*
-	      l'ordre des inits statiques de chaque module est impredictible (depend du compiler/linker);
-	      les constantes n'etaient pas initialisées mais cependant utilisées => segfault
-	      je recopie la constante en dur ; c'est une solution temporaire evidemment car il y a ici un pb de design plus global
-
-
-                const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT("dct");
-		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT("act");
-		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
-		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
-	    */
 		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + "dct";
 		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + "dpt";
 		const string BookReservationAction::PARAMETER_DESTINATION_CITY = Action_PARAMETER_PREFIX + "act";
@@ -93,8 +90,10 @@ namespace synthese
         const string BookReservationAction::PARAMETER_DATE_TIME = Action_PARAMETER_PREFIX + "da";
 
 
+		const string BookReservationAction::PARAMETER_CREATE_CUSTOMER = Action_PARAMETER_PREFIX + "cc";
 		const string BookReservationAction::PARAMETER_CUSTOMER_ID = Action_PARAMETER_PREFIX + "cuid";
 		const string BookReservationAction::PARAMETER_CUSTOMER_NAME = Action_PARAMETER_PREFIX + "cuna";
+		const string BookReservationAction::PARAMETER_CUSTOMER_SURNAME = Action_PARAMETER_PREFIX + "cs";
 		const string BookReservationAction::PARAMETER_CUSTOMER_PHONE = Action_PARAMETER_PREFIX + "cuph";
 		const string BookReservationAction::PARAMETER_CUSTOMER_EMAIL = Action_PARAMETER_PREFIX + "cupe";
 
@@ -106,7 +105,18 @@ namespace synthese
 		ParametersMap BookReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if (_journey.getOrigin())
+			{
+				map.insert(PARAMETER_ORIGIN_CITY, _journey.getOrigin()->getPlace()->getCity()->getName());
+				map.insert(PARAMETER_ORIGIN_PLACE, _journey.getOrigin()->getPlace()->getName());
+			}
+			if (_journey.getDestination())
+			{
+				map.insert(PARAMETER_DESTINATION_CITY, _journey.getDestination()->getPlace()->getCity()->getName());
+				map.insert(PARAMETER_DESTINATION_PLACE, _journey.getOrigin()->getPlace()->getName());
+			}
+			if (!_journey.getDepartureTime().isUnknown())
+				map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
 			return map;
 		}
 
@@ -114,46 +124,71 @@ namespace synthese
 		{
 			// Right control
 			if (_request->isAuthorized<ResaRight>(WRITE, WRITE))
-			{	// Case operator
+			{
+				_createCustomer = map.getBool(PARAMETER_CREATE_CUSTOMER, false, false, FACTORY_KEY);
 
-				// Customer ID
-				uid id(map.getUid(PARAMETER_CUSTOMER_ID, false, FACTORY_KEY));
-				if (id != UNKNOWN_VALUE)
-					_customer = UserTableSync::Get(id);
-
-				// Customer name
-				_customerName = map.getString(PARAMETER_CUSTOMER_NAME, !_customer.get(), FACTORY_KEY);
-				if (_customerName.empty())
+				if (_createCustomer)
 				{
-					if (!_customer.get())
-						throw ActionException("Empty name");
-					_customerName = _customer->getFullName();
+					_customer.reset(new User);
+					_customer->setName(map.getString(PARAMETER_CUSTOMER_NAME, true, FACTORY_KEY));
+					if (_customer->getName().empty())
+						throw ActionException("Le nom du client doit être rempli");
+
+					_customer->setSurname(map.getString(PARAMETER_CUSTOMER_SURNAME, true, FACTORY_KEY));
+					if (_customer->getSurname().empty())
+						throw ActionException("Le prénom du client doit être rempli");
+
+					_customer->setPhone(map.getString(PARAMETER_CUSTOMER_PHONE, true, FACTORY_KEY));
+					if (_customer->getPhone().empty())
+						throw ActionException("Le numéro de téléphone doit être rempli");
+
+					// Integrity test : the key is name + surname + phone
+					vector<shared_ptr<User> > users(UserTableSync::Search("%",_customer->getName(), _customer->getSurname(), _customer->getPhone(), UNKNOWN_VALUE, logic::indeterminate, 0, 1));
+					if (!users.empty())
+						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+					
+					_customer->setEMail(map.getString(PARAMETER_CUSTOMER_EMAIL, false, FACTORY_KEY));
+					_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
 				}
-
-				// CUstomer email
-				_customerEMail = map.getString(PARAMETER_CUSTOMER_EMAIL, false, FACTORY_KEY);
-				if (_customerEMail.empty() && _customer.get())
-					_customerEMail = _customer->getEMail();
-
+				else
+				{
+					// Customer ID
+					uid id(map.getUid(PARAMETER_CUSTOMER_ID, false, FACTORY_KEY));
+					if (id != UNKNOWN_VALUE)
+						_customer = UserTableSync::GetUpdateable(id);
+				}
 			}
 			else if (_request->isAuthorized<ResaRight>(FORBIDDEN, WRITE))
 			{
-				_customer = _request->getUser();
+				_customer = const_pointer_cast<User, const User>(_request->getUser());
+
+				// Password control
+				string password(map.getString(PARAMETER_PASSWORD, true, FACTORY_KEY));
+				if (password.empty())
+					throw ActionException("Le mot de passe doit être fourni");
+
+				if (password != _customer->getPassword())
+				{
+					throw ActionException("Mot de passe erronné");
+				}
 			}
 			else
 				throw ActionException("Not authorized");
 
-			// Site
-			shared_ptr<const Site> site(Site::Get(map.getUid(PARAMETER_SITE, true, FACTORY_KEY)));
+			assert(_customer.get());
 
-			// Customer contact phone
-			_customerPhone = map.getString(PARAMETER_CUSTOMER_PHONE, !_customer.get(), FACTORY_KEY);
-			if (_customerPhone.empty())
-			{
-				if(!_customer.get())
-					throw ActionException("Empty phone number");
-				_customerPhone = _customer->getPhone();
-			}
+			// Deduce naming fields from the customer if already recognized
+			if (_customer->getName().empty())
+				throw ActionException("Client sans nom. Réservation impossible");
+
+			if (_customer->getPhone().empty())
+				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
+
+			// Site
+			uid id(map.getUid(PARAMETER_SITE, false, FACTORY_KEY));
+			shared_ptr<const Site> site;
+			if (id > 0 && Site::Contains(id))
+				site = Site::Get(id);
 
 			// Seats number
 			_seatsNumber = map.getInt(PARAMETER_SEATS_NUMBER, true, FACTORY_KEY);
@@ -161,20 +196,43 @@ namespace synthese
 				throw ActionException("Invalid seats number");
 
 			// Journey
-			const Place* originPlace(site->fetchPlace(
-				map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
-				, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
-			));
-			const Place* destinationPlace(site->fetchPlace(
-				map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
-				, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
-			));
-			DateTime departureDateTime(map.getDateTime(PARAMETER_DATE_TIME, true, FACTORY_KEY));
-			// Accessibility
-			AccessibilityParameter accessibility(static_cast<AccessibilityParameter>(
-				map.getInt(PARAMETER_ACCESSIBILITY, false, string()))
+			const Place* originPlace(site.get() 
+				? site->fetchPlace(
+					map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
+					, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
+				) : EnvModule::FetchPlace(
+					map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
+					, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
+				)
 			);
-			AccessParameters ap(site->getAccessParameters(accessibility));
+			const Place* destinationPlace(site.get()
+				? site->fetchPlace(
+					map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
+					, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
+				) : EnvModule::FetchPlace(
+					map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
+					, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
+				)
+			);
+			
+			// Departure date time
+			DateTime departureDateTime(map.getDateTime(PARAMETER_DATE_TIME, true, FACTORY_KEY));
+
+			// Accessibility
+			AccessParameters ap;
+
+			
+			if (site.get())
+			{			
+				AccessibilityParameter accessibility(static_cast<AccessibilityParameter>(
+					map.getInt(PARAMETER_ACCESSIBILITY, false, string()))
+				);
+				ap = site->getAccessParameters(accessibility);
+			}
+			else
+			{
+				ap = AccessParameters(false, NULL, _disabledCustomer, true, _drtOnly, false);
+			}
 
 			RoutePlanner rp(
 				originPlace
@@ -196,52 +254,84 @@ namespace synthese
 
 		void BookReservationAction::run()
 		{
+			// Save customer if necessary
+			if (_createCustomer)
+				UserTableSync::save(_customer.get());
+
 			// New ReservationTransaction
 			const DateTime now(TIME_CURRENT);
 			ReservationTransaction rt;
 			rt.setBookingTime(now);
 			rt.setBookingUserId(_request->getUser()->getKey());
-			rt.setCustomerName(_customerName);
-			rt.setCustomerPhone(_customerPhone);
-			rt.setCustomerEMail(_customerEMail);
-			rt.setCustomerUserId(_customer.get() ? _customer->getKey() : UNKNOWN_VALUE);
+			rt.setCustomerName(_customer->getName() + " " + _customer->getSurname());
+			rt.setCustomerPhone(_customer->getPhone());
+			rt.setCustomerEMail(_customer->getEMail());
+			rt.setCustomerUserId(_customer->getKey());
 			rt.setSeats(_seatsNumber);
 			ReservationTransactionTableSync::save(&rt);
 
-			// New reservation for each bookable journey leg
+			// New reservation for each journey leg
 			for (Journey::ServiceUses::const_iterator su(_journey.getServiceUses().begin()); su != _journey.getServiceUses().end(); ++su)
 			{
-				if(	su->getService()->getReservationRule()->isReservationPossible(
-						su->getOriginDateTime()
-						, now
-						, su->getDepartureDateTime()
-					)
-				){
-					shared_ptr<Reservation> r(rt.newReservation());
-					r->setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getId());
-					r->setDeparturePlaceName(su->getDepartureEdge()->getPlace()->getFullName());
-					r->setDepartureTime(su->getDepartureDateTime());
-					r->setOriginDateTime(su->getOriginDateTime());
-					r->setArrivalPlaceId(su->getArrivalEdge()->getPlace()->getId());
-					r->setArrivalPlaceName(su->getArrivalEdge()->getPlace()->getFullName());
-					r->setArrivalTime(su->getArrivalDateTime());
-					r->setLineCode(static_cast<const Line*>(su->getService()->getPath())->getName());
-					r->setLineId(su->getService()->getPath()->getId());
-					r->setReservationRuleId(su->getService()->getReservationRule()->getKey());
-					r->setServiceId(su->getService()->getId());
-					r->setServiceCode(Conversion::ToString(su->getService()->getServiceNumber()));
-					ReservationTableSync::save(r.get());
+				shared_ptr<Reservation> r(rt.newReservation());
+				r->setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getId());
+				r->setDeparturePlaceName(su->getDepartureEdge()->getPlace()->getFullName());
+				r->setDepartureTime(su->getDepartureDateTime());
+				r->setOriginDateTime(su->getOriginDateTime());
+				r->setArrivalPlaceId(su->getArrivalEdge()->getPlace()->getId());
+				r->setArrivalPlaceName(su->getArrivalEdge()->getPlace()->getFullName());
+				r->setArrivalTime(su->getArrivalDateTime());
+				
+				const Line* line(dynamic_cast<const Line*>(su->getService()->getPath()));
+				if (line)
+				{
+					r->setLineCode(line->getCommercialLine()->getName());
+					r->setLineId(line->getCommercialLine()->getKey());
 				}
+				const Road* road(dynamic_cast<const Road*>(su->getService()->getPath()));
+				if (road)
+				{
+					r->setLineCode(road->getName());
+					r->setLineId(road->getKey());
+				}
+
+
+				if(	su->getService()->getReservationRule()->isReservationPossible(
+					su->getOriginDateTime()
+					, now
+					, su->getDepartureDateTime()
+				))
+				{
+					r->setReservationRuleId(su->getService()->getReservationRule()->getKey());
+					r->setReservationDeadLine(su->getService()->getReservationRule()->getReservationDeadLine(
+						su->getOriginDateTime()
+						, su->getDepartureDateTime()
+					));
+				}
+				r->setServiceId(su->getService()->getId());
+				r->setServiceCode(Conversion::ToString(su->getService()->getServiceNumber()));
+				ReservationTableSync::save(r.get());
 			}
 
+			// Log
+			ResaDBLog::AddBookReservationEntry(_request->getSession(), rt);
+
+			// Redirect
 			_request->setObjectId(rt.getKey());
 		}
 
 		BookReservationAction::BookReservationAction()
 			: FactorableTemplate<Action, BookReservationAction>()
 			, _journey(TO_DESTINATION)
+			, _disabledCustomer(false)
+			, _drtOnly(false)
 		{
 
+		}
+
+		void BookReservationAction::setJourney( const env::Journey& journey )
+		{
+			_journey = journey;
 		}
 	}
 }

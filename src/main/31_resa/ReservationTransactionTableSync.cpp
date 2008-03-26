@@ -99,6 +99,16 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::_link(
+			ReservationTransaction* obj, const SQLiteResultSPtr& rows, GetSource temporary
+		){
+		}
+
+		template<> void  SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::_unlink(
+			ReservationTransaction* obj
+		){
+
+		}
 	}
 
 	namespace resa

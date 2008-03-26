@@ -26,8 +26,6 @@
 #include "36_places_list/HourPeriod.h"
 #include "36_places_list/Types.h"
 
-#include "15_env/Types.h"
-
 #include "04_time/Date.h"
 
 #include "01_util/Registrable.h"
@@ -39,10 +37,16 @@
 
 namespace synthese
 {
+	namespace time
+	{
+		class DateTime;
+	}
+
 	namespace env
 	{
 		class CommercialLine;
 		class Place;
+		class AccessParameters;
 	}
 
 	namespace interfaces
@@ -137,12 +141,12 @@ namespace synthese
 			//@{
 				/** Access parameter generator.
 					@param parameter Access profile
-					@return synthese::AccessParameters
+					@return AccessParameters
 					@author Hugues Romain
 					@date 2007
 					@todo Modify the generated object to avoid memory leaks due to the use of new operator
 				*/
-				AccessParameters	getAccessParameters(AccessibilityParameter parameter)	const;
+				env::AccessParameters	getAccessParameters(AccessibilityParameter parameter)	const;
 	
 				bool dateControl() const;
 
@@ -192,6 +196,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 					@throw Exception if no place can be found
+					@todo Implement a true place fetcher which takes into account the place selection of the site
 				*/
 				const env::Place* fetchPlace(
 					const std::string& cityName

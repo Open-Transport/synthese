@@ -80,23 +80,7 @@ namespace synthese
 
 			_cadreNumber = map.getString(PARAMETER_SEARCH_CADRE, false, FACTORY_KEY);
 
-			_resultRequestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_SEARCH_NUMBER, 30);
-
-			_bikes = VinciBikeTableSync::search(
-				_bikeNumber
-				, _cadreNumber
-				, _resultRequestParameters.first
-				, _resultRequestParameters.maxSize
-				, _resultRequestParameters.orderField == PARAMETER_SEARCH_NUMBER
-				, _resultRequestParameters.orderField == PARAMETER_SEARCH_CADRE
-				, _resultRequestParameters.raisingOrder
-				);
-
-			_resultResultParameters.next = (_bikes.size() == _resultRequestParameters.maxSize + 1);
-			if (_resultResultParameters.next)
-				_bikes.pop_back();
-			_resultResultParameters.size = _bikes.size();
-
+			_resultRequestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NUMBER, 30);
 		}
 
 		bool VinciBikeSearchAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
@@ -106,6 +90,19 @@ namespace synthese
 
 		void VinciBikeSearchAdminInterfaceElement::display(ostream& stream, VariablesMap& vars, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			// Search
+			vector<shared_ptr<VinciBike> > _bikes(VinciBikeTableSync::search(
+				_bikeNumber
+				, _cadreNumber
+				, _resultRequestParameters.first
+				, _resultRequestParameters.maxSize
+				, _resultRequestParameters.orderField == PARAMETER_SEARCH_NUMBER
+				, _resultRequestParameters.orderField == PARAMETER_SEARCH_CADRE
+				, _resultRequestParameters.raisingOrder
+			));
+			ResultHTMLTable::ResultParameters _resultResultParameters;
+			_resultResultParameters.setFromResult(_resultRequestParameters, _bikes);
+
 			// AddStatus
 			FunctionRequest<AdminRequest> addStatusRequest(request);
 			addStatusRequest.getFunction()->setPage<VinciBikeSearchAdminInterfaceElement>();

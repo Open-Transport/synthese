@@ -27,8 +27,6 @@
 
 #include "33_route_planner/Types.h"
 
-#include "15_env/Types.h"
-
 #include "11_interfaces/InterfacePage.h"
 
 #include "01_util/FactorableTemplate.h"
@@ -55,6 +53,7 @@ namespace synthese
 	{
 		class Journey;
 		class Place;
+		class AccessParameters;
 	}
 
 	namespace routeplanner
@@ -95,7 +94,7 @@ namespace synthese
 				, const env::Place* originPlace
 				, const env::Place* destinationPlace
 				, const transportwebsite::HourPeriod* period
-				, const AccessParameters& accessParameters
+				, const env::AccessParameters& accessParameters
 				, const server::Request* request
 				, const transportwebsite::AccessibilityParameter& accessibility
 				, const transportwebsite::Site* site
@@ -112,7 +111,7 @@ namespace synthese
 				, const std::string& destinationCity
 				, const std::string& destinationPlace
 				, const transportwebsite::HourPeriod* period
-				, const AccessParameters& accessParameters
+				, const env::AccessParameters& accessParameters
 				, const server::Request* request
 				, const transportwebsite::AccessibilityParameter& accessibility
 				, const transportwebsite::Site* site

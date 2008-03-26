@@ -80,7 +80,7 @@ namespace synthese
 		
 		void MessagesTemplateLibraryAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			_requestParameters = ResultHTMLTable::getParameters(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
 		}
 		
 		void MessagesTemplateLibraryAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
@@ -107,7 +107,9 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SHORT_TEXT
 				, _requestParameters.orderField == PARAMETER_LONG_TEXT
 				, _requestParameters.raisingOrder
-				);
+			);
+			ResultHTMLTable::ResultParameters p;
+			p.setFromResult(_requestParameters, tw);
 
 			ResultHTMLTable::HeaderVector h1;
 			h1.push_back(make_pair(PARAMETER_NAME, "Nom"));
@@ -115,7 +117,7 @@ namespace synthese
 			h1.push_back(make_pair(PARAMETER_LONG_TEXT, "Texte&nbsp;long"));
 			h1.push_back(make_pair(string(), "Actions"));
 			h1.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t1(h1, searchRequest.getHTMLForm(), _requestParameters, ActionResultHTMLTable::getParameters(_requestParameters, tw));
+			ResultHTMLTable t1(h1, searchRequest.getHTMLForm(), _requestParameters, p);
 
 			stream << t1.open();
 
@@ -166,7 +168,9 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SHORT_TEXT
 				, _requestParameters.orderField == PARAMETER_LONG_TEXT
 				, _requestParameters.raisingOrder
-				);
+			);
+			ResultHTMLTable::ResultParameters p2;
+			p2.setFromResult(_requestParameters, te);
 
 			ResultHTMLTable::HeaderVector h2;
 			h2.push_back(make_pair(PARAMETER_NAME, "Nom"));
@@ -174,7 +178,7 @@ namespace synthese
 			h2.push_back(make_pair(PARAMETER_LONG_TEXT, "Texte&nbsp;long"));
 			h2.push_back(make_pair(string(), "Actions"));
 			h2.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t2(h2, searchRequest.getHTMLForm(), _requestParameters, ResultHTMLTable::getParameters(_requestParameters, te));
+			ResultHTMLTable t2(h2, searchRequest.getHTMLForm(), _requestParameters, p2);
 
 			stream << t2.open();
 

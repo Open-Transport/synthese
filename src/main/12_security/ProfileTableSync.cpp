@@ -132,16 +132,14 @@ namespace synthese
 		}
 
 
-		std::vector<shared_ptr<Profile> > ProfileTableSync::search(
+		std::vector<shared_ptr<Profile> > ProfileTableSync::Search(
 			std::string name
-			, string exactName
 			, string right
 			, int first /*= 0*/
 			, int number /*= -1*/ 
 			, bool orderByName
 			, bool raisingOrder	
 		){
-			/** @todo Handle right filter */
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -149,9 +147,9 @@ namespace synthese
 				<< " FROM " << TABLE_NAME					
 				<< " WHERE 1 ";
 			if (!name.empty())
-				query << " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-			if (!exactName.empty())
-				query << " AND " << TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(exactName);
+				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(name);
+			if (!right.empty())
+				query << " AND " << TABLE_COL_RIGHTS_STRING << " LIKE " << Conversion::ToSQLiteString(right);
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
@@ -177,7 +175,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<shared_ptr<Profile> > ProfileTableSync::search(
+		std::vector<shared_ptr<Profile> > ProfileTableSync::Search(
 			shared_ptr<const Profile> parent
 			, int first /*= 0*/, int number /*= -1*/ )
 		{

@@ -208,10 +208,12 @@ namespace synthese
 
 
 
-		vector<shared_ptr<User> > UserTableSync::search(
-			const string& login
+		vector<shared_ptr<User> > UserTableSync::Search(
+			const string login
 			, const string name
-			, shared_ptr<const Profile> profile
+			, const string surname
+			, const string phone
+			, uid profileId
 			, tribool emptyLogin
 			, int first /*= 0*/, int number /*= 0*/
 			, bool orderByLogin
@@ -229,10 +231,13 @@ namespace synthese
 				query << " INNER JOIN " << ProfileTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=t." << TABLE_COL_PROFILE_ID;
 			query
 				<< " WHERE " 
-				<< " t." << TABLE_COL_LOGIN << " LIKE '%" << Conversion::ToSQLiteString(login, false) << "%'"
-				<< " AND t." << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-			if (profile.get())
-				query << " AND " << TABLE_COL_PROFILE_ID << "=" << Conversion::ToString(profile->getKey());
+				<< " t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToSQLiteString(login)
+				<< " AND t." << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(name)
+				<< " AND t." << TABLE_COL_SURNAME << " LIKE " << Conversion::ToSQLiteString(surname)
+				<< " AND t." << TABLE_COL_PHONE << " LIKE " << Conversion::ToSQLiteString(phone)
+			;
+			if (profileId != UNKNOWN_VALUE)
+				query << " AND " << TABLE_COL_PROFILE_ID << "=" << profileId;
 			if (emptyLogin != tribool::indeterminate_value)
 				query << " AND " << TABLE_COL_LOGIN << (emptyLogin ? "=''" : "!=''");
 			if (orderByProfileName)

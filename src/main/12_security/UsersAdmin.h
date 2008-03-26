@@ -23,11 +23,7 @@
 #ifndef SYNTHESE_SECURITY_USERS_ADMIN_H
 #define SYNTHESE_SECURITY_USERS_ADMIN_H
 
-#include <vector>
-
-#include <boost/shared_ptr.hpp>
-
-#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
 
 #include "32_admin/AdminInterfaceElement.h"
 
@@ -91,15 +87,15 @@ namespace synthese
 		public:
 			static const std::string PARAM_SEARCH_PROFILE_ID;
 			static const std::string PARAM_SEARCH_NAME;
+			static const std::string PARAM_SEARCH_SURNAME;
 			static const std::string PARAM_SEARCH_LOGIN;
 
 		private:
-			std::vector<boost::shared_ptr<User> >			_users;
-			std::string										_searchLogin;
-			std::string										_searchName;
-			boost::shared_ptr<const Profile>				_searchProfile;
-			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
+			std::string									_searchLogin;
+			std::string									_searchName;
+			std::string									_searchSurname;
+			boost::shared_ptr<const Profile>			_searchProfile;
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
 			
 		public:
 			UsersAdmin();

@@ -25,6 +25,7 @@
 namespace synthese
 {
 	using namespace security;
+	using namespace env;
 
 	namespace routeplanner
 	{

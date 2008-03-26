@@ -30,8 +30,11 @@
 #include "31_resa/ReservationTableSync.h"
 #include "31_resa/ReservationTransaction.h"
 #include "31_resa/Reservation.h"
+#include "31_resa/CancelReservationAction.h"
+#include "31_resa/ResaCustomerAdmin.h"
+#include "31_resa/ResaRight.h"
 
-#include "05_html/HTMLTable.h"
+#include "05_html/SearchFormHTMLTable.h"
 
 #include "15_env/CommercialLine.h"
 #include "15_env/AdvancedSelectTableSync.h"
@@ -42,9 +45,11 @@
 
 #include "30_server/QueryString.h"
 #include "30_server/RequestException.h"
+#include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/ModuleAdmin.h"
+#include "32_admin/AdminRequest.h"
 
 #include <map>
 
@@ -61,6 +66,7 @@ namespace synthese
 	using namespace time;
 	using namespace env;
 	using namespace html;
+	using namespace security;
 
 	namespace util
 	{
@@ -121,6 +127,22 @@ namespace synthese
 		
 		void BookableCommercialLineAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
+			// Rights
+			bool globalReadRight(request->isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL));
+			bool globalDeleteRight(request->isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL));
+
+			// Requests
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
+			searchRequest.setObjectId(_line->getKey());
+
+			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(request);
+			cancelRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
+			cancelRequest.setObjectId(_line->getKey());
+
+			FunctionRequest<AdminRequest> customerRequest(request);
+			customerRequest.getFunction()->setPage<ResaCustomerAdmin>();
+			
 			// Local variables
 			DateTime now(TIME_CURRENT);
 
@@ -130,12 +152,33 @@ namespace synthese
 			bool next_overflow = false;
 			bool course = false;
 
-			HTMLTable t(0,"adminresults");
+			stream << "<h1>Recherche</h1>";
+
+			SearchFormHTMLTable st(searchRequest.getHTMLForm());
+			stream << st.open();
+			stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _startDateTime.getDate()));
+			stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
+			stream << st.close();
+
+			stream << "<h1>Résultats</h1>";
+
+			HTMLTable::ColsVector c;
+			c.push_back("Statut");
+			c.push_back("Heure départ");
+			c.push_back("Arrêt départ");
+			c.push_back("Arrêt arrivée");
+			c.push_back("Heure arrivée");
+			c.push_back("Places");
+			c.push_back("Client");
+			if (globalDeleteRight)
+				c.push_back("Actions");
+			HTMLTable t(c,"adminresults");
 			stream << t.open();
 
 			// Boucle sur les circulations
 			vector<shared_ptr<ScheduledService> > services(ScheduledServiceTableSync::search(
-					_line.get()
+					UNKNOWN_VALUE
+					, _line->getKey()
 					, _startDateTime.getDate()
 			)	);
 
@@ -174,9 +217,9 @@ namespace synthese
 			for	(vector<shared_ptr<ScheduledService> >::const_iterator it(services.begin()); it != services.end(); ++it)
 			{
 				ScheduledService* service(it->get());
+				const ServiceReservations& serviceReservations (reservations[it->get()]);
+				string plural((serviceReservations.seatsNumber > 1) ? "s" : "");
 
-				stream << t.row();
-				stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de " << service->getDepartureSchedule().getHour().toString();
 
 				/*				if ((retour || course) && $circulation = $circulation_suivante)
 				{
@@ -190,11 +233,65 @@ namespace synthese
 				*/					// Dates of departure
 				DateTime originDateTime(DateTime(_startDateTime.getDate(), (*it)->getDepartureSchedule()));
 
-				const ServiceReservations& serviceReservations (reservations[it->get()]);
 
-				for (ServiceReservations::Reservations::const_iterator itr(serviceReservations.reservations.begin()); itr != serviceReservations.reservations.end(); ++itr)
+
+				// Display
+				stream << t.row();
+				stream << t.col(8, string(), true) << "Service " << service->getServiceNumber() << " - départ de " << service->getDepartureSchedule().getHour().toString();
+				if (serviceReservations.seatsNumber > 0)
+					stream << " - " << serviceReservations.seatsNumber << " place" << plural << " réservée" << plural;
+
+				if (serviceReservations.reservations.empty())
 				{
-					ResaModule::DisplayReservation(stream, t, serviceReservations.getReservation(itr->get()).get());
+					stream << t.row();
+					stream << t.col(8) << "Aucune réservation";
+				}
+				else
+				{
+					for (ServiceReservations::Reservations::const_iterator itr(serviceReservations.reservations.begin()); itr != serviceReservations.reservations.end(); ++itr)
+					{
+						const Reservation* reservation(serviceReservations.getReservation(itr->get()).get());
+						ReservationStatus status(reservation->getStatus());
+
+						customerRequest.setObjectId(reservation->getTransaction()->getCancelUserId());
+						cancelRequest.getAction()->setTransaction(ReservationTransactionTableSync::GetUpdateable(reservation->getTransaction()->getKey()));
+
+						stream << t.row();
+						stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
+						stream << t.col() << reservation->getDepartureTime().toString();
+						stream << t.col() << reservation->getDeparturePlaceName();
+						stream << t.col() << reservation->getArrivalPlaceName();
+						stream << t.col() << reservation->getArrivalTime().toString();
+						stream << t.col() << reservation->getTransaction()->getSeats();
+
+						// Customer name
+						stream << t.col();
+						if (globalReadRight)
+							stream  << HTMLModule::getHTMLLink(customerRequest.getURL(), reservation->getTransaction()->getCustomerName());
+						else
+							stream << reservation->getTransaction()->getCustomerName();
+
+						// Cancel link
+						if (globalDeleteRight)
+						{
+							stream << t.col();
+							switch(status)
+							{
+							case ReservationStatus::OPTION:
+								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", "bullet_delete.png");
+								break;
+
+							case ReservationStatus::TO_BE_DONE:
+								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", "error.png");
+								break;
+
+							case ReservationStatus::AT_WORK:
+								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "exclamation.png");
+								break;
+							}
+						}
+
+					}
 				}
 				/*				}
 				else
@@ -365,8 +462,10 @@ namespace synthese
 
 		bool BookableCommercialLineAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			/// @todo Implement the right control;
-			return true;
+			if (!_line.get())
+				return false;
+
+			return request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_line->getKey()));
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPagesOfParent(

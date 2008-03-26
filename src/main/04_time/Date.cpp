@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <cmath>
 #include <ctime>
+#include <assert.h>
 
 #include "01_util/Conversion.h"
 
@@ -96,7 +97,7 @@ namespace synthese
 			if ( day == TIME_CURRENT )
 				_day = ( *timeinfo ).tm_mday;
 			else if ( day == TIME_MAX )
-				_day = _month.getDaysCount( _year );
+				_day = getDaysPerMonth();
 			else if ( day == TIME_MIN )
 				_day = 1;
 			else if ( day == TIME_UNKNOWN )
@@ -118,7 +119,7 @@ namespace synthese
 		int
 		Date::getDay() const
 		{
-			return _day.getValue ();
+			return _day;
 		}
 
 
@@ -127,7 +128,7 @@ namespace synthese
 		int
 		Date::getMonth() const
 		{
-			return _month.getValue ();
+			return _month;
 		}
 
 
@@ -135,7 +136,7 @@ namespace synthese
 		int
 		Date::getYear() const
 		{
-			return _year.getValue ();
+			return _year;
 		}
 
 
@@ -143,11 +144,11 @@ namespace synthese
 		bool
 		Date::isValid () const
 		{
-			return _year.getValue () >= 0
-				&& _month.getValue () > 0
-				&& _month.getValue () <= MONTHS_PER_YEAR
-				&& _day.getValue () > 0
-				&& _day.getValue () <= _month.getDaysCount( _year );
+			return _year >= 0
+				&& _month > 0
+				&& _month <= MONTHS_PER_YEAR
+				&& _day > 0
+				&& _day <= getDaysPerMonth();
 		}
 
 
@@ -156,8 +157,8 @@ namespace synthese
 		int
 		Date::getWeekDay () const
 		{
-			int mz = getMonth () - 2;
-			int az = getYear ();
+			int mz = _month - 2;
+			int az = _year;
 			if ( mz <= 0 )
 			{
 				mz += MONTHS_PER_YEAR;
@@ -166,7 +167,7 @@ namespace synthese
 			int s = az / 100;
 			int e = az % 100;
 
-			int j = getDay () + ( int ) floor ( 2.6 * mz - 0.2 );
+			int j = _day + static_cast<int>(floor ( 2.6 * mz - 0.2 ));
 			j += e + ( e / 4 ) + ( s / 4 ) - 2 * s;
 			if ( j >= 0 )
 				j %= 7;
@@ -182,19 +183,11 @@ namespace synthese
 
 
 		bool
-		Date::isYearUnknown () const
-		{
-			return _year.getValue () == UNKNOWN_VALUE;
-		}
-
-
-
-		bool
 		Date::isUnknown () const
 		{
-			return _year.getValue() == UNKNOWN_VALUE &&
-				_month.getValue () == UNKNOWN_VALUE &&
-				_day.getValue () == UNKNOWN_VALUE;
+			return _year == UNKNOWN_VALUE ||
+				_month == UNKNOWN_VALUE ||
+				_day == UNKNOWN_VALUE;
 		}
 
 
@@ -203,11 +196,11 @@ namespace synthese
 		Date::operator++( int )
 		{
 			_day++;
-			if ( getDay () > _month.getDaysCount ( _year ) )
+			if (_day > getDaysPerMonth() )
 			{
 				_day = 1;
 				_month++;
-				if ( getMonth () > MONTHS_PER_YEAR )
+				if (_month > MONTHS_PER_YEAR )
 				{
 					_month = 1;
 					_year++;
@@ -223,15 +216,15 @@ namespace synthese
 		Date::operator--( int )
 		{
 			_day--;
-			if ( getDay () == 0 )
+			if (_day == 0 )
 			{
 				_month--;
-				if ( getMonth () == 0 )
+				if (_month == 0 )
 				{
 					_year--;
 					_month = 12;
 				}
-				_day = _month.getDaysCount ( _year );
+				_day = getDaysPerMonth();
 			}
 			return *this;
 		}
@@ -281,138 +274,96 @@ namespace synthese
 		}
 
 
-		Date&
-		Date::operator = ( const DateTime& op )
+
+		std::ostream&		operator<< ( std::ostream& os, const Date& op )
 		{
-			return ( *this = op.getDate() );
-		}
-
-
-
-
-
-
-
-
-
-		std::ostream&
-		operator<< ( std::ostream& os, const Date& op )
-		{
-			os << std::setw( 4 ) << std::setfill ( '0' )
-			<< op.getYear ()
-			<< std::setw( 2 ) << std::setfill ( '0' )
-			<< op.getMonth ()
-			<< std::setw( 2 ) << std::setfill ( '0' )
-			<< op.getDay ();
-
+			os << op.toSQLString(false);
 			return os;
 		}
 
 
 
-
-
-		bool
-		operator < ( const Date& op1, const Date& op2 )
+		bool Date::operator < (const Date& op2 ) const
 		{
-			return op1.getYear () < op2.getYear ()
-				|| op1.getYear () == op2.getYear ()
-				&& ( op1.getMonth () < op2.getMonth ()
-						|| op1.getMonth () == op2.getMonth ()
-						&& op1.getDay () < op2.getDay ()
+			return _year < op2._year
+				|| _year == op2._year
+				&& ( _month < op2._month
+						|| _month == op2._month
+						&& _day < op2._day
 					);
 		}
 
 
-		bool
-		operator <= ( const Date& op1, const Date& op2 )
+		bool Date::operator <= (const Date& op2 ) const
 		{
-			return op1.getYear () < op2.getYear ()
-				|| op1.getYear () == op2.getYear ()
-				&& ( op1.getMonth () < op2.getMonth ()
-						|| op1.getMonth () == op2.getMonth ()
-						&& op1.getDay () <= op2.getDay ()
+			return _year < op2._year
+				|| _year == op2._year
+				&& ( _month < op2._month
+						|| _month == op2._month
+						&& _day <= op2._day
 					);
 
 		}
 
 
 
-		bool
-		operator <= ( const Date& op1, const DateTime& op2 )
+		bool Date::operator > (const Date& op2 ) const
 		{
-			return op1 <= op2.getDate();
-		}
-
-
-
-
-		bool
-		operator > ( const Date& op1, const Date& op2 )
-		{
-			return op1.getYear () > op2.getYear ()
-				|| op1.getYear () == op2.getYear ()
-				&& ( op1.getMonth () > op2.getMonth ()
-						|| op1.getMonth () == op2.getMonth ()
-						&& op1.getDay () > op2.getDay ()
+			return _year > op2._year
+				|| _year == op2._year
+				&& ( _month > op2._month
+						|| _month == op2._month
+						&& _day > op2._day
 					);
-
 		}
 
 
-		bool
-		operator >= ( const Date& op1, const Date& op2 )
+		bool Date::operator >= (const Date& op2 ) const
 		{
-			return op1.getYear () > op2.getYear ()
-				|| op1.getYear () == op2.getYear ()
-				&& ( op1.getMonth () > op2.getMonth ()
-						|| op1.getMonth () == op2.getMonth ()
-						&& op1.getDay () >= op2.getDay ()
+			return _year > op2._year
+				|| _year == op2._year
+				&& ( _month > op2._month
+						|| _month == op2._month
+						&& _day >= op2._day
 					);
-
 		}
 
 
-		bool
-		operator == ( const Date& op1, const Date& op2 )
+		bool Date::operator == (const Date& op2 ) const
 		{
-			return op1.getYear () == op2.getYear ()
-				&& op1.getMonth () == op2.getMonth ()
-				&& op1.getDay () == op2.getDay ();
-
+			return _year == op2._year
+				&& _month == op2._month
+				&& _day == op2._day
+				;
 		}
 
 
-		bool
-		operator != ( const Date& op1, const Date& op2 )
+		bool Date::operator != (const Date& op2 ) const
 		{
-			return op1.getYear () != op2.getYear ()
-				|| op1.getMonth () != op2.getMonth ()
-				|| op1.getDay () != op2.getDay ();
-
+			return _year != op2._year
+				|| _month != op2._month
+				|| _day != op2._day
+				;
 		}
 
 
 
 
-		int
-		Date::operator - ( const Date& op2 ) const
+		int	Date::operator - ( const Date& op2 ) const
 		{
 			if ( *this < op2 )
 				return ( -( op2 - *this ) );
 
 			// Temporary...
-			if ( ( getMonth () != op2.getMonth () ) ||
-					( getYear () != op2.getYear () ) )
+			if (_month != op2._month || _year != op2._year)
 			{
-
-				return _month.getDaysLeftToEndOfMonth ( getDay (), _year )
-					+ op2._month.getDaysLeftToMonth ( op2._year, getMonth (), _year )
-					+ op2.getDay ();
+				return getDaysLeftToEndOfMonth()
+					+ op2.getDaysLeftToMonth (_month, _year )
+					+ op2._day;
 			}
 			else
 			{
-				return getDay () - op2.getDay ();
+				return _day - op2._day;
 			}
 		}
 
@@ -466,11 +417,11 @@ namespace synthese
 			if (!isUnknown())
 			{
 				s	<< setw( 4 ) << setfill ( '0' )
-					<< getYear () << "-"
+					<< _year << "-"
 					<< setw( 2 ) << setfill ( '0' )
-					<< getMonth () << "-"
+					<< _month << "-"
 					<< setw( 2 ) << setfill ( '0' )
-					<< getDay ();
+					<< _day;
 
 			}
 			if (withApostrophes)
@@ -483,8 +434,82 @@ namespace synthese
 			if (isUnknown())
 				return string();
 
-			return Conversion::ToString(_day.getValue()) + "/" + Conversion::ToString(_month.getValue()) +"/" + Conversion::ToString(_year.getValue());
+			return Conversion::ToString(_day) + "/" + Conversion::ToString(_month) +"/" + Conversion::ToString(_year);
 		}
 
+
+
+		int Date::getDaysLeftToMonth( int endMonth, int endYear ) const
+		{
+			int result = 0;
+			Date startDate(1,_month,_year);
+			
+			while (startDate._year < endYear || startDate._month < ( endMonth - 1 ) )
+			{
+				++startDate._month;
+				if (startDate._month > MONTHS_PER_YEAR )
+				{
+					startDate._month = 1;
+					++startDate._year;
+				}
+
+				result = result + startDate.getDaysPerMonth();
+			}
+
+			return result;
+		}
+
+
+
+		int Date::getDaysLeftToEndOfMonth() const
+		{
+			return (getDaysPerYear() - _day );
+		}
+
+
+
+		int Date::getDaysPerYear() const
+		{
+			return isLeapYear() ? LEAP_YEAR_DAYS_COUNT :
+				NON_LEAP_YEAR_DAYS_COUNT;
+		}
+
+
+
+		bool Date::isLeapYear() const
+		{
+			if ( _year % 400 == 0 )
+				return true;
+			if ( _year % 100 == 0 )
+				return false;
+			return _year % 4 == 0;
+		}
+
+
+
+		int Date::getDaysPerMonth() const
+		{
+			switch (_month)
+			{
+			case 1:
+			case 3:
+			case 5:
+			case 7:
+			case 8:
+			case 10:
+			case 12:
+				return 31;
+			case 4:
+			case 6:
+			case 9:
+			case 11:
+				return 30;
+			case 2:
+				return isLeapYear() ? 29 : 28;
+			}
+
+			assert(false);
+			return 0;
+		}
 	}
 }

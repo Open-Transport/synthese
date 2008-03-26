@@ -96,24 +96,21 @@ namespace synthese
 			_searchForm.addHiddenField(_PARAMETER_MAX_SIZE, Conversion::ToString(_maxSize));
 		}
 
-		ResultHTMLTable::RequestParameters ResultHTMLTable::getParameters(const map<string, string>& m, const string defaultOrderField, int defaultMaxSize )
+		void ResultHTMLTable::RequestParameters::setFromParametersMap(const map<string, string>& m, const string defaultOrderField, int defaultMaxSize, bool defaultRaisingOrder)
 		{
 			map<string, string>::const_iterator it;
-			RequestParameters p;
 
 			it = m.find(_PARAMETER_FIRST);
-			p.first = (it == m.end()) ? 0 : Conversion::ToInt(it->second);
+			first = (it == m.end()) ? 0 : Conversion::ToInt(it->second);
 
 			it = m.find(_PARAMETER_ORDER_FIELD);
-			p.orderField = (it == m.end()) ? defaultOrderField : it->second;
+			orderField = (it == m.end()) ? defaultOrderField : it->second;
 
 			it = m.find(_PARAMETER_RAISING_ORDER);
-			p.raisingOrder = (it == m.end()) ? true : Conversion::ToBool(it->second);
+			raisingOrder = (it == m.end()) ? defaultRaisingOrder : Conversion::ToBool(it->second);
 
 			it = m.find(_PARAMETER_MAX_SIZE);
-			p.maxSize = (it == m.end()) ? defaultMaxSize : Conversion::ToInt(it->second);
-
-			return p;
+			maxSize = (it == m.end()) ? defaultMaxSize : Conversion::ToInt(it->second);
 		}
 
 		std::string ResultHTMLTable::close()
@@ -145,13 +142,13 @@ namespace synthese
 			return s.str();
 		}
 
-		std::map<std::string, std::string> ResultHTMLTable::getParametersMap( const RequestParameters& requestParameters)
+		std::map<std::string, std::string> ResultHTMLTable::RequestParameters::getParametersMap() const
 		{
 			std::map<std::string, std::string> map;
-			map.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString(requestParameters.first)));
-			map.insert(make_pair(_PARAMETER_MAX_SIZE, Conversion::ToString(requestParameters.maxSize)));
-			map.insert(make_pair(_PARAMETER_ORDER_FIELD, requestParameters.orderField));
-			map.insert(make_pair(_PARAMETER_RAISING_ORDER, Conversion::ToString(requestParameters.raisingOrder)));
+			map.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString(first)));
+			map.insert(make_pair(_PARAMETER_MAX_SIZE, Conversion::ToString(maxSize)));
+			map.insert(make_pair(_PARAMETER_ORDER_FIELD, orderField));
+			map.insert(make_pair(_PARAMETER_RAISING_ORDER, Conversion::ToString(raisingOrder)));
 			return map;
 		}
 	}

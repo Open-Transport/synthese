@@ -27,6 +27,7 @@
 #include "36_places_list/Types.h"
 
 #include "15_env/Types.h"
+#include "15_env/AccessParameters.h"
 
 #include "04_time/DateTime.h"
 
@@ -78,7 +79,7 @@ namespace synthese
 				std::string									_destinationPlaceText;
 				time::DateTime								_startDate;
 				time::DateTime								_endDate;
-				AccessParameters							_accessParameters;
+				env::AccessParameters						_accessParameters;
 				int											_maxSolutionsNumber;
 				int											_periodId;
 				const transportwebsite::HourPeriod*			_period;

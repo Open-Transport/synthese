@@ -4,6 +4,7 @@
 	Version="8,00"
 	Name="04_time"
 	ProjectGUID="{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}"
+	RootNamespace="04_time"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -82,14 +83,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Day.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Day.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Hour.cpp"
 				>
 			</File>
@@ -98,27 +91,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Month.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Month.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Schedule.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Schedule.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Year.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Year.h"
 				>
 			</File>
 		</Filter>

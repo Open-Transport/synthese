@@ -33,11 +33,6 @@
 
 namespace synthese
 {
-	namespace security
-	{
-		class User;
-	}
-
 	namespace dblog
 	{
 		class DBLog;
@@ -60,7 +55,13 @@ namespace synthese
 
 
 			/** DBLog search.
-				(other search parameters)
+				@param logKey key of the log (LIKE format)
+				@param startDate start date
+				@param endDate end date
+				@param userId ID of user
+				@param level level of the entry
+				@param id ID of the object
+				@param text text in the content (LIKE format)
 				@param first First DBLog object to answer
 				@param number Number of DBLog objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return vector<DBLogEntry*> Vector of shared pointers to founded DBLog linked-objects.
@@ -71,7 +72,7 @@ namespace synthese
 				const std::string& logKey
 				, const time::DateTime& startDate
 				, const time::DateTime& endDate
-				, const boost::shared_ptr<const security::User> user
+				, uid userId
 				, DBLogEntry::Level level
 				, uid id
 				, const std::string& text

@@ -212,7 +212,7 @@ namespace synthese
 				{
 					const Edge* edge = (*itEdge);
 
-					if (!edge->getParentPath ()->isCompatibleWith(_accessParameters.complyer))
+					if (!_accessParameters.isCompatibleWith(*edge->getParentPath()))
 						continue;
 
 					/// @todo reintroduce optimization on following axis departure/arrival ?
@@ -417,15 +417,9 @@ namespace synthese
 			if (reachedVertex->isAddress ())
 			{
 				/** - If the edge is an address, the currentJourney necessarily contains
-					only road legs, filter on max approach distance (= walk distance).
+					only road legs, filter approach (= walk distance and duration).
 				*/
-				if(journey.getDistance () > _accessParameters.maxApproachDistance)
-					return make_pair(false,false);
-
-				/** - If the edge is an address, the currentJourney necessarily contains
-					only road legs, filter on max approach time (= walk time).
-				*/
-				if(journey.getEffectiveDuration () > _accessParameters.maxApproachTime)
+				if(_accessParameters.isCompatibleWithApproach(journey.getDistance(), journey.getEffectiveDuration()))
 					return make_pair(false,false);
 			}
 

@@ -68,11 +68,10 @@ namespace synthese
 
 			// Content column : parse all contents separated by | 
 			DBLogEntry::Content v;
-			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+			typedef tokenizer<char_separator<char> > tokenizer;
 			string content = rows->getText ( DBLogEntryTableSync::COL_CONTENT);
-			if (content.size() && content.at(0) == *DBLogEntryTableSync::CONTENT_SEPARATOR.c_str())
-				v.push_back(string());
-			boost::char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR.c_str());
+			char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR.c_str(), "", keep_empty_tokens);
+			
 			tokenizer columns (content, sep);
 			for (tokenizer::iterator it = columns.begin(); it != columns.end (); ++it)
 				v.push_back(*it);
@@ -171,7 +170,7 @@ namespace synthese
 			const std::string& logKey
 			, const time::DateTime& startDate
 			, const time::DateTime& endDate
-			, const shared_ptr<const User> user
+			, uid userId
 			, DBLogEntry::Level level
 			, uid objectId
 			, const std::string& text
@@ -188,13 +187,13 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
 				<< " WHERE "
-					<< COL_LOG_KEY << "=" << Conversion::ToSQLiteString(logKey);
+					<< COL_LOG_KEY << " LIKE " << Conversion::ToSQLiteString(logKey);
 			if (!startDate.isUnknown())
 				query << " AND " << COL_DATE << ">=" << startDate.toSQLString();
 			if (!endDate.isUnknown())
 				query << " AND " << COL_DATE << "<=" << endDate.toSQLString();
-			if (user.get())
-				query << " AND " << COL_USER_ID << "=" << user->getKey();
+			if (userId != UNKNOWN_VALUE)
+				query << " AND " << COL_USER_ID << "=" << userId;
 			if (level != DBLogEntry::DB_LOG_UNKNOWN)
 				query << " AND " << COL_LEVEL << "=" << Conversion::ToString((int) level);
 			if (!text.empty())

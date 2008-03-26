@@ -212,7 +212,8 @@ namespace synthese
 
 
 		vector<shared_ptr<ScheduledService> > ScheduledServiceTableSync::search(
-			const CommercialLine* commercialLine
+			uid lineId
+			, uid commercialLineId
 			, Date date
 			, int first /*= 0*/
 			, int number /*= 0*/
@@ -224,13 +225,15 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME;
-			if (commercialLine)
+			if (commercialLineId != UNKNOWN_VALUE)
 				query << " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
 			if (!date.isUnknown())
 				query << " INNER JOIN " << ServiceDateTableSync::TABLE_NAME << " AS d ON d." << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE_NAME << "." << TABLE_COL_ID;
 			query << " WHERE 1 ";
-			if (commercialLine)
-				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLine->getKey();
+			if (lineId != UNKNOWN_VALUE)
+				query << " AND " << ScheduledServiceTableSync::COL_PATHID << "=" << lineId;
+			if (commercialLineId != UNKNOWN_VALUE)
+				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId;
 			if (!date.isUnknown())
 				query << " AND d." << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString();
 			if (!date.isUnknown())

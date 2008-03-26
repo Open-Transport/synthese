@@ -42,7 +42,7 @@ namespace synthese
 
 			Compliance values :
 				- true : with toll
-				- indeterminate : all fares (filter only)
+				- indeterminate : no sense
 				- false : toll free
 
 			@ingroup m15

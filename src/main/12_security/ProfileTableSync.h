@@ -60,7 +60,7 @@ namespace synthese
 			ProfileTableSync();
 
 			/** Profile search.
-				@param name name to search (empty = no search on name)
+				@param name name to search (LIKE format)
 				@param right right to search
 				@param first First user to answer
 				@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others users to show. Test it to know if the situation needs a "click for more" button.
@@ -68,9 +68,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<boost::shared_ptr<Profile> > search(
+			static std::vector<boost::shared_ptr<Profile> > Search(
 				std::string name = std::string()
-				, std::string exactName = std::string()
 				, std::string right = std::string()
 				, int first = 0
 				, int number = UNKNOWN_VALUE
@@ -80,7 +79,7 @@ namespace synthese
 
 			/** Profile search by parent.
 			*/
-			static std::vector<boost::shared_ptr<Profile> > search(
+			static std::vector<boost::shared_ptr<Profile> > Search(
 				boost::shared_ptr<const Profile> parent
 				, int first = 0, int number = -1);
 

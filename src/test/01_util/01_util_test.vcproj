@@ -67,36 +67,40 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\ConversionTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LogTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LowerCaseFilterTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PlainCharFilterTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RegistrableTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SqlFilterTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UIdTest.cpp"
+				RelativePath=".\iostreams\CompressionTest.cpp"
 				>
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\ConversionTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\LogTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\LowerCaseFilterTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\PlainCharFilterTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\RegistrableTest.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\SConscript"
+			>
+		</File>
+		<File
+			RelativePath=".\SqlFilterTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\UIdTest.cpp"
 			>
 		</File>
 	</Files>

@@ -446,11 +446,27 @@
 				Name="Rules"
 				>
 				<File
+					RelativePath=".\AccessParameters.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\AccessParameters.h"
+					>
+				</File>
+				<File
 					RelativePath=".\NonConcurrencyRule.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\NonConcurrencyRule.h"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionalReservationStopRule.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionalReservationStopRule.h"
 					>
 				</File>
 			</Filter>

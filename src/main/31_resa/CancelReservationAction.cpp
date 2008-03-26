@@ -26,19 +26,26 @@
 
 #include "31_resa/ReservationTransaction.h"
 #include "31_resa/ReservationTransactionTableSync.h"
+#include "31_resa/Reservation.h"
 #include "31_resa/ReservationTableSync.h"
+#include "31_resa/ResaRight.h"
+#include "31_resa/ResaDBLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/ParametersMap.h"
+#include "30_server/Request.h"
 
 #include "01_util/Conversion.h"
 
 using namespace std;
-/*
+using namespace boost;
+
 namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace security;
+	using namespace time;
 	
 	namespace util
 	{
@@ -48,7 +55,6 @@ namespace synthese
 	namespace resa
 	{
 		const string CancelReservationAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pw";
-		const string CancelReservationAction::PARAMETER_RESERVATION_ID = Action_PARAMETER_PREFIX + "ri";
 		const string CancelReservationAction::PARAMETER_RESERVATION_TRANSACTION_ID = Action_PARAMETER_PREFIX + "rt";
 
 		
@@ -63,8 +69,7 @@ namespace synthese
 		ParametersMap CancelReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_RESERVATION_ID, Conversion::ToString(_resa->getKey())));
-			map.insert(make_pair(PARAMETER_RESERVATION_TRANSACTION_ID, Conversion::ToString(_transaction->getKey())));
+			map.insert(PARAMETER_RESERVATION_TRANSACTION_ID, _transaction->getKey());
 			return map;
 		}
 		
@@ -72,28 +77,72 @@ namespace synthese
 		
 		void CancelReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_resaId = map->getUid(PARAMETER_RESERVATION_ID);
-			if (_resaId != UNKNOWN_VALUE)
+			// Load of the transaction
+			try
 			{
-				uid id(ReservationTableSync::GetFieldValue(_resaId, ReservationTableSync::COL_TRANSACTION_ID));
-				_transaction = ReservationTransactionTableSync::Get(id);
+				_transaction = ReservationTransactionTableSync::GetUpdateable(map.getUid(PARAMETER_RESERVATION_TRANSACTION_ID, true, FACTORY_KEY));
 			}
-			else
+			catch(...)
 			{
-				_transaction = ReservationTransactionTableSync::Get(map->getUid(PARAMETER_RESERVATION_TRANSACTION_ID));
+				throw ActionException("No such reservation");
 			}
 
-			// Password control
+			// Minimal right is standard user
+			if (!_request->isAuthorized<ResaRight>(FORBIDDEN, WRITE))
+				throw ActionException("Non autorisé");
+
+			// Standard user
+			if (!_request->isAuthorized<ResaRight>(WRITE, WRITE))
+			{
+				if (_request->getUser()->getKey() != _transaction->getCustomerUserId())
+					throw ActionException("Non autorisé");
+
+				string password(map.getString(PARAMETER_PASSWORD, true, FACTORY_KEY));
+				if (password.empty())
+					throw ActionException("Le mot de passe doit être fourni");
+
+				if (password != _request->getUser()->getPassword())
+				{
+					throw ActionException("Mot de passe erronné");
+				}
+			}
+
+			// Control of the date : a cancellation has no sense if after the arrival time
+			DateTime now(TIME_CURRENT);
+			vector<shared_ptr<Reservation> > reservations(ReservationTableSync::search(_transaction.get()));
+			for(vector<shared_ptr<Reservation> >::const_reverse_iterator it(reservations.rbegin()); it != reservations.rend(); ++it)
+			{
+				if ((*it)->getReservationRuleId() != UNKNOWN_VALUE)
+				{
+					if (now > (*it)->getArrivalTime())
+						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
+					break;
+				}
+			}
 		}
 		
 		
 		
 		void CancelReservationAction::run()
 		{
+			// Store old parameters
+			ReservationStatus oldStatus(_transaction->getStatus());
+
+			// Write the cancellation
 			DateTime now(TIME_CURRENT);
 			_transaction->setCancellationTime(now);
 			_transaction->setCancelUserId(_request->getUser()->getKey());
 			ReservationTransactionTableSync::save(_transaction.get());
+
+			// Write the log
+			ResaDBLog::AddCancelReservationEntry(_request->getSession(), *_transaction, oldStatus);
+		}
+
+
+
+		void CancelReservationAction::setTransaction( boost::shared_ptr<ReservationTransaction> transaction )
+		{
+			_transaction = transaction;
 		}
 	}
-}*/
+}

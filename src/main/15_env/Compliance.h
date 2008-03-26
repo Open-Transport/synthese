@@ -53,18 +53,19 @@ namespace synthese
 			//! @name Getters/Setters
 			//@{
 				int getCapacity () const;
-				boost::logic::tribool isCompliant () const;
+				const boost::logic::tribool& isCompliant () const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void setCapacity (int capacity);
-				void setCompliant (boost::logic::tribool status);
+				void setCompliant (const boost::logic::tribool& status);
 			//@}
 
 			//! @name Queries
 			//@{
-				virtual bool isCompatibleWith(const Compliance& compliance) const;
+				bool isCompatibleWith(const Compliance& compliance) const;
+				bool isCompatibleWith(const boost::logic::tribool& value) const;
 			//@}
 
 		};

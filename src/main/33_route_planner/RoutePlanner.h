@@ -34,6 +34,7 @@
 #include "15_env/Place.h"
 #include "15_env/VertexAccessMap.h"
 #include "15_env/ServiceUse.h"
+#include "15_env/AccessParameters.h"
 
 #include "33_route_planner/Types.h"
 
@@ -78,23 +79,23 @@ namespace synthese
 			
 			//! @name Parameters
 			//@{
-				env::VertexAccessMap _originVam;
-				env::VertexAccessMap _destinationVam;
-				const AccessParameters _accessParameters;
-				const time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet.
-				const time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet.
-				const PlanningOrder _planningOrder;  //!< Define planning sequence.
-				const time::DateTime _calculationTime;    //!< Time of calculation (initialized to current time)
-				const int _maxSolutionsNumber;
+				env::VertexAccessMap		_originVam;
+				env::VertexAccessMap		_destinationVam;
+				const env::AccessParameters	_accessParameters;
+				const time::DateTime		_journeySheetStartTime;  //!< Start time of schedule sheet.
+				const time::DateTime		_journeySheetEndTime;    //!< End time of schedule sheet.
+				const PlanningOrder			_planningOrder;  //!< Define planning sequence.
+				const time::DateTime		_calculationTime;    //!< Time of calculation (initialized to current time)
+				const int					_maxSolutionsNumber;
 			//@}
 
 			//! @name Working variables
 			//@{
-				time::DateTime _minDepartureTime;  //!< Min departure time.
-				time::DateTime _maxArrivalTime;  //!< Max arrival time.
-				int _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
-				time::DateTime _previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
-				Result			_result;
+				time::DateTime				_minDepartureTime;  //!< Min departure time.
+				time::DateTime				_maxArrivalTime;  //!< Max arrival time.
+				int							_previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
+				time::DateTime				_previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
+				Result						_result;
 				std::ostream* const			_logStream;
 				const util::Log::Level		_logLevel;
 				//!< 
@@ -115,7 +116,7 @@ namespace synthese
 			RoutePlanner(
 				 const env::Place* origin,
 				 const env::Place* destination,
-				 const AccessParameters& accessParameters,
+				 const env::AccessParameters& accessParameters,
 				 const PlanningOrder& planningOrder,
 				 const time::DateTime& journeySheetStartTime,
 				 const time::DateTime& journeySheetEndTime
@@ -144,15 +145,6 @@ namespace synthese
 					- true : solutions allowing a comfort raising and a time saving are selected
 					- false :solutions allowing a time saving are only selected
 			*/
-/*			void findBestJourney(
-				env::Journey& result
-				, const env::VertexAccessMap& ovam
-				, const env::VertexAccessMap& dvam
-				, const env::Journey& currentJourney
-				, bool strictTime
-			);
-*/			
-
 			void findBestJourney(
 				env::Journey& result
 				, const env::VertexAccessMap& startVam

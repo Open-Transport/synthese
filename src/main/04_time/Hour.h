@@ -38,13 +38,14 @@ namespace synthese
 
 		class Schedule;
 
-		/** Heure
-		@ingroup m04
+		/** Hour.
+			@ingroup m04
 		*/
 		class Hour
 		{
-				int _hours; //!< Hours
-				int _minutes; //!< Minutes
+				int _hours;		//!< Hours
+				int _minutes;	//!< Minutes
+				int _seconds;	//!< Seconds
 
 			public :
 
@@ -53,7 +54,7 @@ namespace synthese
 					@param minutes Minutes (A=current, M=maximum, m=minimum,
 						_=unchanged, I=same than hours)
 				*/
-				Hour ( int hours, int minutes = TIME_SAME);
+				Hour ( int hours, int minutes = TIME_SAME, int seconds= TIME_SAME);
 				Hour ( const Hour& ref );
 
 
@@ -63,6 +64,7 @@ namespace synthese
 				//@{
 				int getMinutes() const { return _minutes; }
 				int getHours() const { return _hours; }
+				int getSeconds() const { return _seconds; }
 				//@}
 
 
@@ -70,7 +72,16 @@ namespace synthese
 				//@{
 					bool isValid () const;
 					bool isUnknown () const;
-					std::string toString () const;
+					
+					
+					/** Human friendly hour display.
+						@param withSeconds displays the seconds if true (default = false)
+						@return std::string
+						@author Hugues Romain
+						@date 2008
+						The output format is HH:MM:SS
+					*/
+					std::string toString (bool withSeconds = false) const;
 					std::string toSQLString(bool withApostrophes = true) const;
 				//@}
 
@@ -88,11 +99,6 @@ namespace synthese
 				*/
 				int operator -= ( int );
 
-				/** @param op Updates this hour according to the meaning of
-							the given 4 special characters ( m => minimum, M =>
-							maximum...  max = 5 chars).
-				*/
-				Hour& operator = ( const std::string& op );
 
 				Hour& operator = ( const Schedule& op );
 
@@ -100,24 +106,21 @@ namespace synthese
 			static Hour FromSQLTime (const std::string& sqlTime);
 
 
+			bool operator == (const Hour& op2 ) const;
+			bool operator != (const Hour& op2 ) const;
+			bool operator <= (const Hour& op2 ) const;
+			bool operator <  (const Hour& op2 ) const;
+			bool operator >= (const Hour& op2 ) const;
+			bool operator >  (const Hour& op2 ) const;
+
+			/** Number of minutes elapsed between two hours.
+			*/
+			int operator- (const Hour& op2 ) const;
+
+			int getSecondsDifference(const Hour& op2) const;
 		};
 
-
-		bool operator == ( const Hour& op1, const Hour& op2 );
-		bool operator != ( const Hour& op1, const Hour& op2 );
-		bool operator <= ( const Hour& op1, const Hour& op2 );
-		bool operator < ( const Hour& op1, const Hour& op2 );
-		bool operator >= ( const Hour& op1, const Hour& op2 );
-		bool operator > ( const Hour& op1, const Hour& op2 );
-
-		/** Number of minutes elapsed between two hours.
-		*/
-		int operator- ( const Hour& op1, const Hour& op2 );
-
 		std::ostream& operator<< ( std::ostream& os, const Hour& op );
-
-
-
 	}
 }
 

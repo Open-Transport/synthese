@@ -24,10 +24,9 @@
 #ifndef SYNTHESE_VinciCustomerSearchAdminInterfaceElement_H__
 #define SYNTHESE_VinciCustomerSearchAdminInterfaceElement_H__
 
-#include <vector>
 #include <utility>
 
-#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
@@ -62,13 +61,11 @@ namespace synthese
 
 			static std::vector<std::pair<_Filter, std::string> > _GetFilterNames();
 
-			std::vector<boost::shared_ptr<VinciContract> >	_contracts;
 			std::string										_searchName;
 			std::string										_searchSurname;
 			_Filter											_searchFilter;
 			bool											_activeSearch;
-			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
+			html::ResultHTMLTable::RequestParameters		_requestParameters;
 
 		public:
 			VinciCustomerSearchAdminInterfaceElement();

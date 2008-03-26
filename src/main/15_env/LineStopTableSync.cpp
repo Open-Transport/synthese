@@ -192,7 +192,7 @@ namespace synthese
 				{
 					shared_ptr<LineStop> object(new LineStop());
 					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
+					link(object.get(), rows, GET_TEMPORARY);
 					objects.push_back(object);
 				}
 				return objects;

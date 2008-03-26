@@ -73,6 +73,7 @@ namespace synthese
 			object->setArrivalTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_ARRIVAL_TIME)));
 			object->setReservationRuleId(rows->getLongLong ( ReservationTableSync::COL_RESERVATION_RULE_ID));
 			object->setOriginDateTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_ORIGIN_DATE_TIME)));
+			object->setReservationDeadLine(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_RESERVATION_DEAD_LINE)));
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::save(Reservation* object)
@@ -98,6 +99,7 @@ namespace synthese
 				<< "," << object->getArrivalTime().toSQLString()
 				<< "," << Conversion::ToString(object->getReservationRuleId())
 				<< "," << object->getOriginDateTime().toSQLString()
+				<< "," << object->getReservationDeadLine().toSQLString()
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -119,6 +121,7 @@ namespace synthese
 		const string ReservationTableSync::COL_ARRIVAL_TIME = "arrival_time";
 		const string ReservationTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
 		const string ReservationTableSync::COL_ORIGIN_DATE_TIME = "origin_date_time";
+		const string ReservationTableSync::COL_RESERVATION_DEAD_LINE("reservation_dead_line");
 
 		ReservationTableSync::ReservationTableSync()
 			: SQLiteNoSyncTableSyncTemplate<ReservationTableSync,Reservation>()
@@ -137,6 +140,8 @@ namespace synthese
 			addTableColumn(COL_ARRIVAL_TIME, "TIMESTAMP");
 			addTableColumn(COL_RESERVATION_RULE_ID, "INTEGER");
 			addTableColumn(COL_ORIGIN_DATE_TIME, "TIMESTAMP");
+			addTableColumn(COL_RESERVATION_DEAD_LINE, "TIMESTAMP");
+			
 			addTableIndex(COL_LINE_ID);
 			addTableIndex(COL_DEPARTURE_PLACE_ID);
 			addTableIndex(COL_ARRIVAL_PLACE_ID);

@@ -59,6 +59,7 @@ namespace synthese
 				, int year = TIME_SAME
 				, int hours = TIME_SAME
 				, int minutes = TIME_SAME
+				, int seconds = TIME_SAME
 			);
 
 			DateTime ( const DateTime& ref);
@@ -94,7 +95,7 @@ namespace synthese
 				bool isValid () const;
 				bool isUnknown() const;
 				std::string toSQLString(bool withApostrophes = true) const;
-				std::string toString() const;
+				std::string toString(bool withSeconds = false) const;
 			//@}
 
 
@@ -113,12 +114,11 @@ namespace synthese
 
 			DateTime& operator = ( const DateTime& ref);
 
-			DateTime& operator = ( const std::string& );
 			DateTime& operator = ( const Date& );
 			DateTime& operator = ( const Hour& );
 
 
-			/** Constructs a DateTime from an SQL timestamp string (AAAAMMJJhhmmss);
+			/** Constructs a DateTime from an SQL timestamp string (AAAA-MM-JJ: hh:mm:ss);
 				seconds are ignored.
 				@param str Text to parse :
 					- YYYY-MM-DD HH:MM : SQL date time
@@ -138,20 +138,19 @@ namespace synthese
 			bool operator < (const DateTime& op2 ) const;
 			bool operator >= (const DateTime& op2 ) const;
 			bool operator > (const DateTime& op2 ) const;
+
+			/** Minutes duration calculation.
+				@return The number of minutes between two DateTime objects.
+			*/
+			int operator - (const DateTime& op2 ) const;
+
+			DateTime operator + (int minutesDuration ) const;
+			DateTime operator - (int minutesDuration ) const;
+
+			int getSecondsDifference(const DateTime& op2) const;
 		};
 
 		std::ostream& operator<< ( std::ostream& os, const DateTime& op );
-
-
-		/**
-		* @return The number of minutes between two DateTime objects.
-		*/
-		int operator - ( const DateTime& op1, const DateTime& op2 );
-
-		DateTime operator + ( const DateTime& op, int minutesDuration );
-		DateTime operator - ( const DateTime& op, int minutesDuration );
-
-
 	}
 }
 
