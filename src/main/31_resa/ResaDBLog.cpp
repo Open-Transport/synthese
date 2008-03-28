@@ -169,19 +169,19 @@ namespace synthese
 
 			switch (oldStatus)
 			{
-			case ReservationStatus::OPTION:
+			case OPTION:
 				type = ResaDBLog::CANCELLATION_ENTRY;
 				description = "Annulation";
 				level = DBLogEntry::DB_LOG_INFO;
 				break;
 
-			case ReservationStatus::TO_BE_DONE:
+			case TO_BE_DONE:
 				type = ResaDBLog::DELAYED_CANCELLATION_ENTRY;
 				description = "Annulation hors délai";
 				level = DBLogEntry::DB_LOG_WARNING;
 				break;
 
-			case ReservationStatus::AT_WORK:
+			case AT_WORK:
 				type = ResaDBLog::NO_SHOW;
 				description = "Absence";
 				level = DBLogEntry::DB_LOG_ERROR;

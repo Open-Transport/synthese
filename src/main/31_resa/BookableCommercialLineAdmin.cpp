@@ -277,15 +277,15 @@ namespace synthese
 							stream << t.col();
 							switch(status)
 							{
-							case ReservationStatus::OPTION:
+							case OPTION:
 								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", "bullet_delete.png");
 								break;
 
-							case ReservationStatus::TO_BE_DONE:
+							case TO_BE_DONE:
 								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", "error.png");
 								break;
 
-							case ReservationStatus::AT_WORK:
+							case AT_WORK:
 								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "exclamation.png");
 								break;
 							}

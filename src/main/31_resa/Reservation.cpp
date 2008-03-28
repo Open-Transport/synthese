@@ -203,7 +203,7 @@ namespace synthese
 		ReservationStatus Reservation::getStatus() const
 		{
 			if (_reservationRuleId == UNKNOWN_VALUE)
-				return ReservationStatus::NO_RESERVATION;
+				return NO_RESERVATION;
 
 			const DateTime& cancellationTime(getTransaction()->getCancellationTime());
 			const DateTime now(TIME_CURRENT);
@@ -211,20 +211,20 @@ namespace synthese
 			if (cancellationTime.isUnknown())
 			{
 				if (now < _reservationDeadLine)
-					return ReservationStatus::OPTION;
+					return OPTION;
 				if (now < _departureTime)
-					return ReservationStatus::TO_BE_DONE;
+					return TO_BE_DONE;
 				if (now < _arrivalTime)
-					return ReservationStatus::AT_WORK;
-				return ReservationStatus::DONE;
+					return AT_WORK;
+				return DONE;
 			}
 			else
 			{
 				if (cancellationTime < _reservationDeadLine)
-					return ReservationStatus::CANCELLED;
+					return CANCELLED;
 				if (cancellationTime < _departureTime)
-					return ReservationStatus::CANCELLED_AFTER_DELAY;
-				return ReservationStatus::NO_SHOW;
+					return CANCELLED_AFTER_DELAY;
+				return NO_SHOW;
 			}
 		}
 
@@ -251,10 +251,10 @@ namespace synthese
 			
 			switch(status)
 			{
-			case ReservationStatus::OPTION: return statusText + " pouvant être annulée avant le " + _reservationDeadLine.toString();
-			case ReservationStatus::CANCELLED: return statusText + " le " + getTransaction()->getCancellationTime().toString();
-			case ReservationStatus::CANCELLED_AFTER_DELAY: statusText + " le " + getTransaction()->getCancellationTime().toString();
-			case ReservationStatus::NO_SHOW: return statusText + " constantée le " + getTransaction()->getCancellationTime().toString();
+			case OPTION: return statusText + " pouvant être annulée avant le " + _reservationDeadLine.toString();
+			case CANCELLED: return statusText + " le " + getTransaction()->getCancellationTime().toString();
+			case CANCELLED_AFTER_DELAY: statusText + " le " + getTransaction()->getCancellationTime().toString();
+			case NO_SHOW: return statusText + " constantée le " + getTransaction()->getCancellationTime().toString();
 			}
 
 			return statusText;

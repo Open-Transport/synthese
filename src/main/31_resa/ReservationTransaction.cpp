@@ -174,7 +174,7 @@ namespace synthese
 
 		synthese::resa::ReservationStatus ReservationTransaction::getStatus() const
 		{
-			ReservationStatus status(ReservationStatus::NO_RESERVATION);
+			ReservationStatus status(NO_RESERVATION);
 			for(Reservations::const_iterator it(_reservations.begin()); it != _reservations.end(); ++it)
 			{
 				ReservationStatus rs((*it)->getStatus());

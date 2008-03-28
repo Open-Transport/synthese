@@ -149,13 +149,13 @@ namespace synthese
 		{
 			switch(status)
 			{
-			case ReservationStatus::OPTION: return "bullet_yellow.png";
-			case ReservationStatus::TO_BE_DONE: return "bullet_green.png";
-			case ReservationStatus::CANCELLED: return "bullet_black.png";
-			case ReservationStatus::CANCELLED_AFTER_DELAY: "error.png";
-			case ReservationStatus::AT_WORK: return "car.png";
-			case ReservationStatus::NO_SHOW: return "exclamation.png";
-			case ReservationStatus::DONE: return "bullet_white.png";
+			case OPTION: return "bullet_yellow.png";
+			case TO_BE_DONE: return "bullet_green.png";
+			case CANCELLED: return "bullet_black.png";
+			case CANCELLED_AFTER_DELAY: "error.png";
+			case AT_WORK: return "car.png";
+			case NO_SHOW: return "exclamation.png";
+			case DONE: return "bullet_white.png";
 			}
 			return string();
 		}
@@ -166,13 +166,13 @@ namespace synthese
 		{
 			switch(status)
 			{
-			case ReservationStatus::OPTION: return "option";
-			case ReservationStatus::TO_BE_DONE: return "confirmé";
-			case ReservationStatus::CANCELLED: return "annulé";
-			case ReservationStatus::CANCELLED_AFTER_DELAY: "annulé hors délai";
-			case ReservationStatus::AT_WORK: return "en cours";
-			case ReservationStatus::NO_SHOW: return "absence";
-			case ReservationStatus::DONE: return "terminé";
+			case OPTION: return "option";
+			case TO_BE_DONE: return "confirmé";
+			case CANCELLED: return "annulé";
+			case CANCELLED_AFTER_DELAY: "annulé hors délai";
+			case AT_WORK: return "en cours";
+			case NO_SHOW: return "absence";
+			case DONE: return "terminé";
 			}
 			return string();
 		}
