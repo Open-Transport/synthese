@@ -160,7 +160,7 @@ PlainCharFilter::write(Sink& dest, const char* s, std::streamsize n)
 	else if (
 		(c == '°')
 	){
-		boost::iostream::put(dest, 'o');
+		boost::iostreams::put(dest, 'o');
 	}
 	else 
 	{
