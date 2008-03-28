@@ -393,7 +393,7 @@ namespace synthese
 		{
 
 			const Interface* interf(_displayType->getInterface());
-//			DisplayMaintenanceLog::addControlEntry(this, level, text);
+			DisplayMaintenanceLog::addControlEntry(this, level, text);
 			
 		}
 

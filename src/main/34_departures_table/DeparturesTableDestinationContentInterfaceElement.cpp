@@ -112,10 +112,10 @@ namespace synthese
 
 				// Affichage de la commune dans les cas necessaire
 				if(	__TypeAffichage == TYPE_STATION_CITY
-					||(	__TypeAffichage == TYPE_STATION_CITY_IF_NEW
-						||(	__TypeAffichage == TYPE_CHAR_26_OR_STATION_CITY_IF_NEW 
-							&& place->getName26().empty()
-						) && place->getCity() != __DerniereCommune
+					||(	(	__TypeAffichage == TYPE_STATION_CITY_IF_NEW
+							|| __TypeAffichage == TYPE_CHAR_26_OR_STATION_CITY_IF_NEW
+						)&&	place->getName26().empty()
+						&& place->getCity() != __DerniereCommune
 					)
 				){
 					stringstream ss;
