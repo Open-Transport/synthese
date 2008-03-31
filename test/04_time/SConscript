@@ -1,0 +1,8 @@
+Import ('s3env')
+
+senv = s3env.Clone ()
+
+prj = CppTestProject (senv, 's3-time-test', s3env['S3VERSION'], source_files = senv.Glob ('*Test.cpp'),
+                     dependencies = ['s3-time.shlib'])
+senv.SConsProject (prj)
+

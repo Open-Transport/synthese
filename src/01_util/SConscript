@@ -1,0 +1,13 @@
+Import ('s3env')
+
+senv = s3env.Clone ()
+
+prj = CppLibProject (senv, 's3-util', s3env['S3VERSION'], 
+                     source_files = senv.Glob ('*.cpp'),
+                     dependencies = ['boost-iostreams.shlib', 'boost-thread.shlib', 
+                                     'boost-date-time.shlib', 'boost-filesystem.shlib', 'boost-regex.shlib'])
+senv.SConsProject (prj)
+
+senv.SubBuild ()
+
+
