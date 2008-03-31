@@ -1,0 +1,51 @@
+Import ('s3env')
+
+senv = s3env.Clone ()
+
+if senv['_BUILDSTAGE'] == 0:
+    gsources = list ()
+    isources = list ()
+    for s3libdir in [
+        '36_places_list', 
+        '34_departures_table', 
+        '33_route_planner', 
+        '32_admin', 
+        '31_resa', 
+        '30_server', 
+        '17_messages', 
+        '16_impex', 
+        '15_env', 
+        '13_dblog', 
+        '12_security', 
+        '11_interfaces', 
+        '05_html', 
+        '04_time', 
+        '03_db_ring', 
+        '02_db', 
+        '01_util', 
+        '00_tcp']:
+        gsources.extend (senv.Glob ('*.gen.cpp', dir = '../../' + s3libdir, exclude_gen = False, abs_path = True))
+        isources.extend (senv.Glob ('*.inc.cpp', dir = '../../' + s3libdir, exclude_gen = False, abs_path = True))
+	
+    senv.Merge ('generated.cpp.inc', gsources)
+    senv.Merge ('includes.cpp.inc', isources)
+
+prj = CppBinProject (senv, 's3-server', s3env['S3VERSION'], 
+                     include_dir = Dir ('.').abspath,
+                     source_files = senv.Glob ('main.cpp'),
+		     dependencies= ['s3-departures-table.shlib', 
+                                    's3-route-planner.shlib', 
+                                    's3-places-list.shlib', 
+                                    's3-resa.shlib', 
+                                    's3-admin.shlib',
+                                    's3-dblog.shlib',
+                                    's3-messages.shlib', 
+                                    's3-impex.shlib', 
+                                    's3-security.shlib', 
+                                    's3-env.shlib', 
+                                    's3-db-ring.shlib', 
+                                    's3-util-iostreams.shlib', 
+                                    'boost-program-options.shlib'])
+senv.SConsProject (prj)
+
+

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+update-rc.d -f s3-server remove && exit 0
+
+
+
+
+
+
+
