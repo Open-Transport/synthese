@@ -1,9 +1,0 @@
-Import ('env')
-
-modules = ['01_util'];
-
-unittestenv = env.UnitTestEnv (modules)
-unittestenv.UnitTest ()
-
-
-

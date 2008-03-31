@@ -1,4 +1,0 @@
-
-Import ('mainenv')
-mainenv.ModuleBuild ();
-

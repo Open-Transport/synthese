@@ -1,9 +1,0 @@
-Import ('env')
-
-modules = ['02_db', '01_util', '00_tcp'];
-
-unittestenv = env.UnitTestEnv (modules)
-unittestenv.UnitTest ()
-
-
-

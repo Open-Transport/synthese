@@ -1,9 +1,0 @@
-Import ('env')
-
-modules = ['14_geography', '06_geometry'];
-
-unittestenv = env.UnitTestEnv (modules)
-unittestenv.UnitTest ()
-
-
-

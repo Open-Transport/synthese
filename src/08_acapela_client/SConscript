@@ -1,8 +1,0 @@
-
-Import ('mainenv')
-
-if mainenv['PLATFORM'] == 'posix':
-  mainenv.ModuleBuild ();
-
-
-

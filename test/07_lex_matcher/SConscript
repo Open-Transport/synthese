@@ -1,9 +1,0 @@
-Import ('env')
-
-modules = ['07_lex_matcher', '01_util'];
-
-unittestenv = env.UnitTestEnv (modules)
-unittestenv.UnitTest ()
-
-
-
