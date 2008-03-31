@@ -102,14 +102,10 @@ namespace synthese
 		    const boost::filesystem::path archfp (tempDir / (_archiveBasename + ".tar"));
 		    std::ofstream archos (archfp.string ().c_str ());
 
-		    bool result = boost::filesystem::create_directory(archiveDir);
+		    boost::filesystem::remove (archiveDir);
+		    boost::filesystem::create_directory(archiveDir);
 		    Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf ()), archos);
 		    
-		    if (result == false) 
-		    {
-			throw ActionException ("Could not create archive directory " + archiveDir.string ());
-		    }
-			
 		    for (CommercialLine::ConstIterator it = CommercialLine::Begin();
 			 it != CommercialLine::End (); ++it)
 		    {
