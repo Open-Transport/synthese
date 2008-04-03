@@ -1,2 +1,2 @@
-/etc/init.d/s3-server
+/etc/init.d/s2-server
 /etc/opt/rcs/s3-server.conf
