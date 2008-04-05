@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = ISO-8859-15
 PROJECT_NAME           = SYNTHESE
 PROJECT_NUMBER         = 
-OUTPUT_DIRECTORY       = ../../build/doc
+#OUTPUT_DIRECTORY       = ../../build/doc
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = French
 BRIEF_MEMBER_DESC      = YES
@@ -90,8 +90,8 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ../main \
-                         ../../resources \
+INPUT                  = ../src \
+		         ../test \
                          pages \
                          customer_specs
 INPUT_ENCODING         = ISO-8859-15
@@ -110,7 +110,7 @@ EXCLUDE_PATTERNS       = *.inc.cpp \
                          *.gen.cpp
 EXCLUDE_SYMBOLS        = 
 EXAMPLE_PATH           = exemples \
-                         ../main \
+                         ../src \
                          ../test
 EXAMPLE_PATTERNS       = *.xml \
                          *.cpp
