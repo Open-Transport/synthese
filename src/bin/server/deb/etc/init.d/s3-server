@@ -10,7 +10,7 @@ DAEMON=/opt/rcs/bin/$NAME
 test -x $DAEMON || exit 0
 
 # delete stale pid file if any
-(pgrep -P 1 $NAME >& /dev/null) || (rm -f $S3_SERVER_PID_FILE)
+(pgrep -P 1 ${NAME:0:15} >& /dev/null) || (rm -f $S3_SERVER_PID_FILE)
 
 case "$1" in
 
@@ -21,7 +21,7 @@ case "$1" in
     stop)
 	echo "Stopping $NAME server... "
 	test -f $S3_SERVER_PID_FILE && kill -15 `cat $S3_SERVER_PID_FILE`
-	pkill -P 1 $NAME >& /dev/null
+	pkill -P 1 ${NAME:0:15} >& /dev/null
 	;;
     restart)
 	$0 stop
