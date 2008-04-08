@@ -2,7 +2,7 @@ Import ('s3env')
 
 senv = s3env.Clone ()
 
-prj = DoxProject (senv, 's3', s3env['S3VERSION'], doxyfile = File ('Doxyfile.doxyfile').srcnode())
+prj = DoxProject (senv, 's3-doc', s3env['S3VERSION'], doxyfile = File ('Doxyfile.doxyfile').srcnode())
 senv.SConsProject (prj)
 
 
