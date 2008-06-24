@@ -191,9 +191,11 @@ namespace synthese
 
 		std::vector<boost::shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search(
 			uid userId
+			, const time::DateTime& minDate
+			, const time::DateTime& maxDate
 			, bool withCancelled
-			, int first /*= 0 */
-			, int number /*= 0  */
+			, int first
+			, int number
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -203,6 +205,10 @@ namespace synthese
 				<< " INNER JOIN " << ReservationTableSync::TABLE_NAME << " AS r ON "
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
 				<< " WHERE " << COL_CANCEL_USER_ID << "=" << userId;
+			if (!minDate.isUnknown())
+				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << ">=" << minDate.toSQLString();
+			if (!maxDate.isUnknown())
+				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << "<=" << maxDate.toSQLString();
 			if (!withCancelled)
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
 			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;

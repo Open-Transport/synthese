@@ -35,7 +35,7 @@ namespace synthese
 	namespace env
 	{
 		/** ConnectionPlace SQLite table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 
 			Connection places table :
 				- on insert : 

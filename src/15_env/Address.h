@@ -45,7 +45,7 @@ namespace synthese
 			An address may be associated with a connection place in the following cases :
 			  - The address corresponds to a crossing between two roads
 			  - The address belongs to a logical stop
-			@ingroup m15
+			@ingroup m35
 		*/
 		 class Address : 
 			 public synthese::util::Registrable<uid,Address>,

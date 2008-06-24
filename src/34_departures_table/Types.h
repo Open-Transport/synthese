@@ -49,7 +49,7 @@ namespace synthese
 		class Alarm;
 	}
 
-	/** @addtogroup m34
+	/** @addtogroup m54
 	@{
 	*/
 

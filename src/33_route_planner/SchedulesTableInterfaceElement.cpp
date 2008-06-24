@@ -34,6 +34,7 @@
 #include "15_env/ServiceUse.h"
 #include "15_env/Line.h"
 #include "15_env/Journey.h"
+#include "15_env/Crossing.h"
 
 #include "11_interfaces/Interface.h"
 
@@ -62,30 +63,32 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const JourneyBoardJourneys* jv(static_cast<const JourneyBoardJourneys*>(object));
+			const RoutePlannerResult* jv(static_cast<const RoutePlannerResult*>(object));
 
-			if ( jv == NULL || jv->empty())  // No solution or type error
+			if ( jv == NULL || jv->result.empty())  // No solution or type error
 			{
 				const RoutePlannerNoSolutionInterfacePage* noSolutionPage = _page->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>();
 				noSolutionPage->display(stream, request);
 			}
 			else
 			{
-				const PlaceList placesList(getStopsListForScheduleTable(*jv));
+				const PlaceList placesList(getStopsListForScheduleTable(jv->result, jv->departurePlace, jv->arrivalPlace));
 				Hour unknownTime( TIME_UNKNOWN );
 				const RoutePlannerSheetColumnInterfacePage* columnInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>());
 				const RoutePlannerSheetLineInterfacePage* lineInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>());
-				bool pedestrianMode = false;
-				bool lastPedestrianMode = false;
 				
 				// Cells
 				
 				// Loop on each journey
 				int i=1;
-				for(JourneyBoardJourneys::const_iterator it(jv->begin());
-					it != jv->end();
+				for(JourneyBoardJourneys::const_iterator it(jv->result.begin());
+					it != jv->result.end();
 					++it, ++i
 				){
+
+					bool pedestrianMode = false;
+					bool lastPedestrianMode = false;
+
 					// Loop on each leg
 					int __Ligne(0);
 					const Journey::ServiceUses& jl((*it)->getServiceUses());
@@ -95,10 +98,16 @@ namespace synthese
 
 						if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode() || lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode())
 						{
+							const Place* placeToSearch(
+								(itl == jl.begin() && dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getPlace()))
+								? jv->departurePlace
+								: curET.getDepartureEdge()->getPlace()
+							);
+
 							DateTime lastDateTime(curET.getDepartureDateTime());
 							lastDateTime += (*it)->getContinuousServiceRange();
 
-							for (; placesList[ __Ligne ].place != curET.getDepartureEdge()->getFromVertex ()->getConnectionPlace(); ++__Ligne)
+							for (; placesList[ __Ligne ].place != placeToSearch; ++__Ligne)
 								columnInterfacePage->display(
 									*(placesList[__Ligne].content)
 									, __Ligne==0
@@ -139,7 +148,13 @@ namespace synthese
 						||	!(itl+1)->getEdge()->getParentPath()->isPedestrianMode()
 						||	!curET.getEdge()->getParentPath()->isPedestrianMode()
 						){
-							for (; placesList[ __Ligne ].place != curET.getArrivalEdge()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
+							const Place* placeToSearch(
+								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getPlace())
+								? jv->arrivalPlace
+								: curET.getArrivalEdge()->getPlace()
+							);
+							
+							for (; placesList[ __Ligne ].place != placeToSearch; __Ligne++ )
 								columnInterfacePage->display(
 									*(placesList[__Ligne].content)
 									, true
@@ -320,29 +335,26 @@ namespace synthese
 
 			// Construction de l'ensemble des lignes a permuter
 			LignesAPermuter[ PositionActuelle ] = true;
-			int __i(0);
-			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
+			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it)
 			{
 				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, **it, PositionActuelle );
-				for ( i = PositionActuelle; i > PositionGareSouhaitee; i-- )
+				for ( i = PositionActuelle; i > PositionGareSouhaitee; --i)
 					if ( curLignesET[ i ] && LignesAPermuter[ i ] )
 						break;
-				for ( ; i > PositionGareSouhaitee; i-- )
+				for ( ; i > PositionGareSouhaitee; --i)
 					if ( curLignesET[ i ] )
 						LignesAPermuter[ i ] = true;
 			}
 
 			// Tests d'ï¿changeabilitï¿ binaire
 			// A la premiere contradiction on s'arrete
-			__i=0;
-			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
+			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it)
 			{
 				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, **it, PositionActuelle );
 				i = PositionGareSouhaitee;
-				for ( j = PositionGareSouhaitee; true; j++ )
+				for ( j = PositionGareSouhaitee; true; ++j)
 				{
-					for ( ; !LignesAPermuter[ i ]; i++ )
-					{ }
+					for (; i<LignesAPermuter.size() && !LignesAPermuter[i]; ++i);
 
 					if ( i > PositionActuelle )
 						break;
@@ -361,10 +373,9 @@ namespace synthese
 			// Echange ou insertion
 			if ( Echangeable )
 			{
-				for ( j = 0; true; j++ )
+				for ( j = 0; true; ++j)
 				{
-					for ( i = j; !LignesAPermuter[ i ] && i <= PositionActuelle; i++ )
-					{ }
+					for(i = j; i < LignesAPermuter.size() && !LignesAPermuter[ i ] && i <= PositionActuelle; ++i);
 
 					if ( i > PositionActuelle )
 						break;
@@ -372,7 +383,7 @@ namespace synthese
 					LignesAPermuter[ i ] = false;
 
 					tempGare = pl[ i ];
-					for ( ; i > PositionGareSouhaitee + j; i-- )
+					for ( ; i > PositionGareSouhaitee + j; --i)
 						pl[i] = pl[i-1];
 
 					pl[ i ] = tempGare;
@@ -387,7 +398,7 @@ namespace synthese
 
 		int SchedulesTableInterfaceElement::OrdrePAInsere(
 			PlaceList& pl
-			, const ConnectionPlace* place
+			, const Place* place
 			, int position
 			, bool lockedAtTheTop
 			, bool lockedAtTheEnd
@@ -420,9 +431,9 @@ namespace synthese
 			vector<bool> result;
 			int l(0);
 			const ServiceUse* curET((l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l));
-			for (int i(0); pl[ i ].place != NULL && i <= LigneMax; i++ )
+			for (int i(0); i <= LigneMax && pl[ i ].place != NULL; i++ )
 			{
-				if ( curET != NULL && pl[ i ].place == curET->getDepartureEdge() ->getConnectionPlace() )
+				if ( curET != NULL && pl[ i ].place == curET->getDepartureEdge()->getPlace() )
 				{
 					result.push_back(true);
 					++l;
@@ -439,7 +450,7 @@ namespace synthese
 		bool SchedulesTableInterfaceElement::OrdrePARechercheGare(
 			const PlaceList& pl
 			, int& i
-			, const ConnectionPlace* GareAChercher
+			, const Place* GareAChercher
 		){
 			// Recherche de la gare en suivant ï¿ partir de la position i
 			for ( ; i < pl.size() && pl[ i ].place != NULL && pl[ i ].place != GareAChercher; ++i );
@@ -724,6 +735,8 @@ namespace synthese
 		*/
 		SchedulesTableInterfaceElement::PlaceList SchedulesTableInterfaceElement::getStopsListForScheduleTable(
 			const JourneyBoardJourneys& jv
+			, const Place* departurePlace
+			, const Place* arrivalPlace
 		){
 			// Variables locales
 			int i;
@@ -747,14 +760,20 @@ namespace synthese
 					// Search of the place from the preceding one
 					if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode())
 					{
-						if ( OrdrePARechercheGare( pl, i, curET.getDepartureEdge()->getConnectionPlace() ) )
+						const Place* placeToSearch(
+							(itl == jl.begin() && dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getPlace()))
+							? departurePlace
+							: curET.getDepartureEdge()->getPlace()
+						);
+						
+						if (OrdrePARechercheGare( pl, i, placeToSearch))
 						{
 							if ( i < dernieri )
 								i = OrdrePAEchangeSiPossible( jv, pl, dernieri, i );
 						}
 						else
 						{
-							i = OrdrePAInsere( pl, curET.getDepartureEdge()->getConnectionPlace(), dernieri + 1, itl == jl.begin(), false);
+							i = OrdrePAInsere(pl, placeToSearch, dernieri + 1, itl == jl.begin(), false);
 						}
 
 						dernieri = i;
@@ -763,14 +782,20 @@ namespace synthese
 
 					if (itl == jl.end()-1 || !curET.getEdge()->getParentPath()->isPedestrianMode())
 					{
-						if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
+						const Place* placeToSearch(
+							itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getPlace())
+							? arrivalPlace
+							: curET.getArrivalEdge()->getPlace()
+						);
+						
+						if (OrdrePARechercheGare(pl, i, placeToSearch))
 						{
 							if ( i < dernieri )
 								i=OrdrePAEchangeSiPossible(jv, pl, dernieri, i );
 						}
 						else
 						{
-							i = OrdrePAInsere( pl, curET.getArrivalEdge()->getConnectionPlace(), dernieri + 1, false, itl == jl.end()-1);
+							i = OrdrePAInsere(pl, placeToSearch, dernieri + 1, false, itl == jl.end()-1);
 						}
 						dernieri = i;
 					}

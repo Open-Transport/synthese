@@ -121,25 +121,21 @@ namespace synthese
 					stringstream ss;
 					boost::iostreams::filtering_ostream out;
 					out.push (LowerCaseFilter());
-					out.push (PlainCharFilter());
 					out.push (ss);
 
 					out << place->getCity () ->getName() << flush;
 					string cityName (ss.str ());
 					
-
-					// stringMinuscules __TexteMinuscule;
-					// __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
-					if ((cityName.size () > 0) &&
-					    (cityName[0] >= 'a') && (cityName[0]  <= 'z'))
-					{
+					if(
+						!cityName.empty()
+						&& cityName[0] >= 'a'
+						&& cityName[0] <= 'z'
+					){
 					    cityName[0] = cityName[0] - 'a' + 'A';
 					}
 					stream << __AvantCommune << cityName << __ApresCommune;
 
 					__DerniereCommune = place->getCity();
-
-
 				}
 
 				// Affichage du nom d'arret dans les cas ou necessaire

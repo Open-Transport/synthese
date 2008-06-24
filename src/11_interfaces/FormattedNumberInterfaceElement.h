@@ -34,7 +34,7 @@ namespace synthese
 	namespace interfaces
 	{
 		/** Formatted number interface element.
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 		*/
 		class FormattedNumberInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, FormattedNumberInterfaceElement>

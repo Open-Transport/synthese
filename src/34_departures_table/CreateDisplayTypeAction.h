@@ -37,7 +37,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** CreateDisplayTypeAction action class.
-			@ingroup m34
+			@ingroup m54
 		*/
 		class CreateDisplayTypeAction : public util::FactorableTemplate<server::Action, CreateDisplayTypeAction>
 		{

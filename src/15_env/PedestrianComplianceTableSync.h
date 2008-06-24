@@ -39,7 +39,7 @@ namespace synthese
 		class PedestrianCompliance;
 
 		/** PedestrianCompliances table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class PedestrianComplianceTableSync : public db::SQLiteRegistryTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>
 		{

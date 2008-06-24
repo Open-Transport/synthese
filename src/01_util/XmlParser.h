@@ -1,4 +1,4 @@
-/**
+/** @file XmlParser.h
  ****************************************************************************
  * <P> XML.c - implementation file for basic XML parser written in ANSI C++ 
  * for portability. It works by using recursion and a node tree for breaking 
@@ -33,6 +33,11 @@
 #ifdef WIN32
 #include <tchar.h>
 #endif
+
+/** @defgroup m01XML XML Parser
+	@ingroup m01
+	@{
+*/
 
 // Some common types for char set portable code
 #ifdef _UNICODE
@@ -253,4 +258,6 @@ LPTSTR toXMLString(LPTSTR dest,LPCTSTR source);
 LPTSTR stringDup(LPCTSTR source, int cbData=0);
 
 #endif
+
+/** @} */
 

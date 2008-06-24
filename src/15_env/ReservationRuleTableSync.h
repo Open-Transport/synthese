@@ -39,7 +39,7 @@ namespace synthese
 		class ReservationRule;
 
 		/** ReservationRule table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class ReservationRuleTableSync : public db::SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>
 		{

@@ -39,7 +39,7 @@ namespace synthese
 		class Line;
 
 		/** Line table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 
 		Lines table :
 			- on insert : 

@@ -41,31 +41,34 @@ namespace synthese
 		class Line;
 	}
 
-	/**	@defgroup m34Actions 54 Actions
-		@ingroup m34
+	/**	@defgroup m54Actions 54 Actions
+		@ingroup m54
 
-		@defgroup m34Pages 54 Pages
-		@ingroup m34
+		@defgroup m54Pages 54 Pages
+		@ingroup m54
 
-		@defgroup m34Functions 54 Functions
-		@ingroup m34
+		@defgroup m54Functions 54 Functions
+		@ingroup m54
 
-		@defgroup m34LS 54 Table synchronizers
-		@ingroup m34
+		@defgroup m54LS 54 Table synchronizers
+		@ingroup m54
 
-		@defgroup m34Admin 54 Administration pages
-		@ingroup m34
+		@defgroup m54Admin 54 Administration pages
+		@ingroup m54
 
-		@defgroup m34Rights 54 Rights
-		@ingroup m34
+		@defgroup m54Rights 54 Rights
+		@ingroup m54
 
-		@defgroup m34Logs 54 DB Logs
-		@ingroup m34
+		@defgroup m54Logs 54 DB Logs
+		@ingroup m54
 
-		@defgroup m34 54 Arrival/departures tables service module.
+		@defgroup m54Alarm 54 Message recipient
+		@ingroup m54
+
+		@defgroup m54 54 Arrival/departures tables service module.
 		@ingroup m5
 
-		@subsection m34_target_structure Architecture fonctionnelle cible
+		@subsection m54_target_structure Architecture fonctionnelle cible
 
 		Un système de téléaffichage basé sur SYNTHESE repose sur les principes suivants :
 			- la base de données de SYNTHESE constitue le point de convergence des diverses sources de données. Dans le cadre du téléaffichage, les sources majeures sont : 
@@ -82,7 +85,7 @@ namespace synthese
 	@{
 	*/
 
-	/** 34 departures table module namespace.
+	/** 54 departures table module namespace.
 	*/
 	namespace departurestable
 	{

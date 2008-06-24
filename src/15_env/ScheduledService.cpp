@@ -82,7 +82,7 @@ namespace synthese
 		}
 
 		ServicePointer ScheduledService::getFromPresenceTime(
-			ServicePointer::DeterminationMethod method
+			AccessDirection method
 			, const Edge* edge
 			, const time::DateTime& presenceDateTime
 			, const time::DateTime& computingTime
@@ -98,17 +98,17 @@ namespace synthese
 			int edgeIndex(edge->getRankInPath());
 
 			// Actual time
-			if (method == ServicePointer::DEPARTURE_TO_ARRIVAL)
+			if (method == DEPARTURE_TO_ARRIVAL)
 			{
 				schedule = _departureSchedules.at(edgeIndex);
 				if (presenceDateTime.getHour() > schedule.getHour())
-					return ServicePointer();
+					return ServicePointer(DEPARTURE_TO_ARRIVAL);
 			}
-			if (method == ServicePointer::ARRIVAL_TO_DEPARTURE)
+			if (method == ARRIVAL_TO_DEPARTURE)
 			{
 				schedule = _arrivalSchedules.at(edgeIndex);
 				if (presenceDateTime.getHour() < schedule.getHour())
-					return ServicePointer();
+					return ServicePointer(ARRIVAL_TO_DEPARTURE);
 			}
 			actualTime.setHour(schedule.getHour());
 			ptr.setActualTime(actualTime);
@@ -121,13 +121,13 @@ namespace synthese
 
 			// Date control
 			if (!isProvided(originDateTime.getDate()))
-				return ServicePointer();
+				return ServicePointer(method);
 
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
 				if (!ptr.isReservationRuleCompliant(computingTime))
-					return ServicePointer();
+					return ServicePointer(method);
 			}
 			else
 			{
@@ -144,7 +144,7 @@ namespace synthese
 		) const	{
 			int edgeIndex(edge->getRankInPath());
 			Schedule schedule(
-				(servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+				(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				? _arrivalSchedules.at(edgeIndex)
 				: _departureSchedules.at(edgeIndex)
 				);

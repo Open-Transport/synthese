@@ -39,7 +39,7 @@ namespace synthese
 
 		/** Commercial line class.
 			TRIDENT = Line
-			@ingroup m15
+			@ingroup m35
 		*/
 		class CommercialLine : public util::Registrable<uid, CommercialLine>
 		{

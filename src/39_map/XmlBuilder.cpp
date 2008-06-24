@@ -33,6 +33,7 @@ XmlBuilder::CreateDrawableLine (XMLNode& node,
     uid lineId (GetLongLongAttr (node, "lineId"));
     
     shared_ptr<const Line> line = lines.get (lineId);
+	
     const std::vector<synthese::env::Edge*>& lineStops = line->getEdges ();
     
     assert (lineStops.size () >= 2);

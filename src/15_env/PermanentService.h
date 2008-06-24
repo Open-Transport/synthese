@@ -30,7 +30,7 @@ namespace synthese
 	namespace env
 	{
 		/** PermanentService class.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class PermanentService : public Service
 		{
@@ -76,7 +76,7 @@ namespace synthese
 				@warning The service index is unknown in the generated ServicePointer.					
 			*/
 			virtual ServicePointer getFromPresenceTime(
-				ServicePointer::DeterminationMethod method
+				AccessDirection method
 				, const Edge* edge
 				, const time::DateTime& presenceDateTime
 				, const time::DateTime& computingTime

@@ -48,11 +48,11 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const JourneyBoardJourneys* jv = static_cast<const JourneyBoardJourneys*>(object);
+			const RoutePlannerResult* jv = static_cast<const RoutePlannerResult*>(object);
 			const RoutePlannerSheetLinesCellInterfacePage* linesInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetLinesCellInterfacePage>();
 
 			int n = 1;
-			for (JourneyBoardJourneys::const_iterator it = jv->begin(); it != jv->end(); ++it, ++n )
+			for (JourneyBoardJourneys::const_iterator it = jv->result.begin(); it != jv->result.end(); ++it, ++n )
 			{
 				linesInterfacePage->display( stream, n, variables, *it, request );
 			}

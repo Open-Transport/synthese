@@ -49,7 +49,7 @@ namespace synthese
 	namespace env
 	{
 		/** Network and commercial line based perimeter right, for derivating purposes.
-			@ingroup m15
+			@ingroup m35
 
 			Perimeter definition :
 				- CommercialLine object : the rules apply only on reservation for the specified line

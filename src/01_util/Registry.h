@@ -35,14 +35,16 @@ namespace synthese
 {
 	namespace util
 	{
-
 		class Exception;
+
+		/** @defgroup m01Registry Registry
+			@ingroup m01
+			@{
+		*/
 
 		/** Generic registry class for common operations (get, add, remove...).
 			Note that the registry has the responsibility of destroying	registered objects due to the use of shared pointers.
 			This class should not be used directly : use instead the "template" typedef in the classes derived from Registrable.
-
-			@ingroup m01
 		*/
 		template<class K, class T>
 		class Registry
@@ -62,11 +64,6 @@ namespace synthese
 			*/
 			Registry ();
 			~Registry ();
-
-
-			//! @name Getters/Setters
-			//@{
-			//@}
 
 
 			//! @name Query methods
@@ -127,6 +124,8 @@ namespace synthese
 			Registry& operator= ( const Registry& rhs );
 
 		};
+
+		/** @} */
 
 		template<class K, class T>
 		boost::shared_ptr<T> Registry<K, T>::getUpdateable( const K& key )

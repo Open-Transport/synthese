@@ -36,7 +36,7 @@ namespace synthese
 		class AdminRequest;
 
 		/** Position of current admin page in the tree.
-			@ingroup m14Values refValues
+			@ingroup m14Values refLibrary
 		*/
 		class AdminPagePositionInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagePositionInterfaceElement>

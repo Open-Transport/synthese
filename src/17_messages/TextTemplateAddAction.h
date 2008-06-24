@@ -26,6 +26,7 @@
 #include "30_server/Action.h"
 
 #include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 #include "17_messages/Types.h"
 
@@ -43,13 +44,23 @@ namespace synthese
 			static const std::string PARAMETER_SHORT_MESSAGE;
 			static const std::string PARAMETER_LONG_MESSAGE;
 			static const std::string PARAMETER_TYPE;
+			static const std::string PARAMETER_PARENT_ID;
+			static const std::string PARAMETER_IS_FOLDER;
 
 		private:
 			std::string		_name;
 			std::string		_shortMessage;
 			std::string		_longMessage;
 			AlarmLevel		_level;
+			uid				_parentId;
+			bool			_isFolder;
 
+			/** Authorization control.
+				@return True if the action run is authorized
+				@author Hugues Romain
+				@date 2007
+			*/
+			virtual bool _isAuthorized() const;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -66,6 +77,10 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			void setLevel(AlarmLevel level);
+			void setParentId(uid value);
+			void setIsFolder(bool value);
 		};
 	}
 }

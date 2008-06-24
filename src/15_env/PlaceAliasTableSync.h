@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** PlaceAlias table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class PlaceAliasTableSync : public db::SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>
 		{

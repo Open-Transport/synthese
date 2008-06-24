@@ -155,7 +155,6 @@ namespace synthese
 			uid pedestrianComplianceId (
 				rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
 
-			cs->setPath(path.get());
 			cs->setBikeCompliance (BikeCompliance::Get(bikeComplianceId).get());
 			cs->setHandicappedCompliance (HandicappedCompliance::Get(handicappedComplianceId).get());
 			cs->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());

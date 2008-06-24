@@ -29,7 +29,7 @@ namespace dbring
 
 /** Node client thread execution.
 
-@ingroup m02
+@ingroup m101
 */
 class NodeClientThreadExec : public synthese::util::ThreadExec
 {

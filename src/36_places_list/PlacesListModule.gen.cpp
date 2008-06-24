@@ -16,3 +16,6 @@ synthese::transportwebsite::PlacesListItemInterfacePage::integrate();
 synthese::transportwebsite::CityListRequest::integrate();
 synthese::transportwebsite::PlacesListFunction::integrate();
 
+synthese::transportwebsite::SiteUpdateAction::integrate();
+
+synthese::transportwebsite::TransportWebsiteRight::integrate();

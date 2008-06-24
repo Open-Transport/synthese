@@ -45,12 +45,22 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_SHORT_MESSAGE;
 			static const std::string PARAMETER_LONG_MESSAGE;
+			static const std::string PARAMETER_FOLDER_ID;
 
 		private:
 			boost::shared_ptr<TextTemplate>	_text;
+			boost::shared_ptr<const TextTemplate>	_folder;
 			std::string						_name;
 			std::string						_shortMessage;
 			std::string						_longMessage;
+
+			
+			/** Authorization control.
+				@return True if the action run is authorized
+				@author Hugues Romain
+				@date 2007
+			*/
+			virtual bool _isAuthorized() const;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -68,6 +78,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			void setTemplate(boost::shared_ptr<TextTemplate> text);
 		};
 	}
 }

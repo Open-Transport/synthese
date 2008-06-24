@@ -244,7 +244,11 @@ namespace synthese
 				void run(std::ostream& stream);
 
 				template<class R>
-				bool isAuthorized(security::RightLevel publicr = security::FORBIDDEN, security::RightLevel privater = security::FORBIDDEN, std::string parameter = security::UNKNOWN_PERIMETER) const;
+				bool isAuthorized(
+					security::RightLevel publicr
+					, security::RightLevel privater = security::UNKNOWN_RIGHT_LEVEL
+					, std::string parameter = security::UNKNOWN_PERIMETER
+				) const;
 
 				bool isActionFunctionAuthorized() const;
 			//@}

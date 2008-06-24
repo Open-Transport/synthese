@@ -119,7 +119,7 @@ namespace synthese
 		std::vector<pair<uid, std::string> > MessagesModule::getTextTemplateLabels(const AlarmLevel& level)
 		{
 			vector<pair<uid, string> > m;
-			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(level);
+			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::Search(level);
 			for (vector<shared_ptr<TextTemplate> >::iterator it = v.begin(); it != v.end(); ++it)
 			{
 				m.push_back(make_pair((*it)->getKey(), (*it)->getName()));

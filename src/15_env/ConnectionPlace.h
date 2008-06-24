@@ -40,7 +40,7 @@ namespace synthese
 			Each connection is associated with a type (authorized, 
 			forbidden, recommended...) and a transfer delay.
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class ConnectionPlace : 
 			public AddressablePlace

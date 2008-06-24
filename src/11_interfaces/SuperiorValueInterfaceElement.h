@@ -32,7 +32,7 @@ namespace synthese
 	namespace interfaces
 	{
 		/** Superior operator value interface element class.
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 
 			The comparison is numerical only.
 		*/

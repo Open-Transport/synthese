@@ -60,7 +60,13 @@ namespace synthese
 	*/
 	typedef enum { SEARCH_ADDRESSES, DO_NOT_SEARCH_ADDRESSES } SearchAddresses;
 	typedef enum { SEARCH_PHYSICALSTOPS, DO_NOT_SEARCH_PHYSICALSTOPS } SearchPhysicalStops;
-	typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
+	
+	
+	/** Service determination method.
+		- DEPARTURE_TO_ARRIVAL = the service is chosen from a presence time before a departure. The arrival will be chosen in the following edges.
+		- ARRIVAL_TO_DEPARTURE = the service is chosen from a presence time after an arrival. The departure will be chosen in the preceding edges.
+	*/
+	typedef enum { ARRIVAL_TO_DEPARTURE, DEPARTURE_TO_ARRIVAL } AccessDirection ;
 
 	/** @} */
 

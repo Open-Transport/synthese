@@ -39,6 +39,7 @@ namespace synthese
 
 		  Schedule::Schedule ()
 			  : _hour(TIME_UNKNOWN)
+			  , _daysSinceDeparture(0)
 		  {
 		  }
 

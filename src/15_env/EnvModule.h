@@ -39,198 +39,33 @@
 
 namespace synthese
 {
-	/**	@defgroup m15Actions 15 Actions
-		@ingroup m15
+	/**	@defgroup m35Actions 35 Actions
+		@ingroup m35
 
-		@defgroup m15Pages 15 Pages
-		@ingroup m15
+		@defgroup m35Pages 35 Pages
+		@ingroup m35
 
-		@defgroup m15Library 15 Interface library
-		@ingroup m15
+		@defgroup m35Library 35 Interface library
+		@ingroup m35
 
-		@defgroup m15Functions 35 Functions
-		@ingroup m15
+		@defgroup m35Functions 35 Functions
+		@ingroup m35
 
-		@defgroup m15LS 35 Table synchronizers
-		@ingroup m15
+		@defgroup m35LS 35 Table synchronizers
+		@ingroup m35
 
-		@defgroup m15Admin 35 Administration pages
-		@ingroup m15
+		@defgroup m35Admin 35 Administration pages
+		@ingroup m35
 
-		@defgroup m15Rights 35 Rights
-		@ingroup m15
+		@defgroup m35Rights 35 Rights
+		@ingroup m35
 
-		@defgroup m15Logs 35 DB Logs
-		@ingroup m15
+		@defgroup m35Logs 35 DB Logs
+		@ingroup m35
 
-		@defgroup m15 35 Transport
+		@defgroup m35 35 Transport
 		@ingroup m3
 	@{
-		SQLite persistent data loader (with CDM)
-
-		<h2>Conceptual data model</h2>
-
-		<h3>Cities</h3>
-
-		@copydoc synthese::envlssql::CityTableSync
-		@dontinclude CityTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Continuous services</h3>
-
-		@copydoc synthese::envlssql::ContinuousServiceTableSync
-		@dontinclude ContinuousServiceTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Line stops</h3>
-
-		@copydoc synthese::envlssql::LineStopTableSync
-		@dontinclude LineStopTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Environments</h3>
-
-		@copydoc synthese::envlssql::EnvironmentTableSync
-		@dontinclude EnvironmentTableSync.cpp
-		@skip synthese::db::SQLiteTableSync
-		@until }
-
-		<h3>Transport network</h3>
-
-		@copydoc synthese::envlssql::TransportNetworkTableSync
-		@dontinclude TransportNetworkTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Addresses</h3>
-
-		@copydoc synthese::envlssql::AddressTableSync
-		@dontinclude AddressTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Alarms</h3>
-
-		@copydoc synthese::envlssql::AlarmTableSync
-		@dontinclude AlarmTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Axis</h3>
-
-		@copydoc synthese::envlssql::AxisTableSync
-		@dontinclude AxisTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Bike compliance</h3>
-
-		@copydoc synthese::envlssql::BikeComplianceTableSync
-		@dontinclude BikeComplianceTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Handicapped compliance</h3>
-
-		@copydoc synthese::envlssql::HandicappedComplianceTableSync
-		@dontinclude HandicappedComplianceTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Pedestrian compliance</h3>
-
-		@copydoc synthese::envlssql::PedestrianComplianceTableSync
-		@dontinclude PedestrianComplianceTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Connection places</h3>
-
-		@copydoc synthese::envlssql::ConnectionPlaceTableSync
-		@dontinclude ConnectionPlaceTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Fares</h3>
-
-		@copydoc synthese::envlssql::FareTableSync
-		@dontinclude FareTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Physical stops</h3>
-
-		@copydoc synthese::envlssql::PhysicalStopTableSync
-		@dontinclude PhysicalStopTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Place alias</h3>
-
-		@copydoc synthese::envlssql::PlaceAliasTableSync
-		@dontinclude PlaceAliasTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Public places</h3>
-
-		@copydoc synthese::envlssql::PublicPlaceTableSync
-		@dontinclude PublicPlaceTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Reservation rules</h3>
-
-		@copydoc synthese::envlssql::ReservationRuleTableSync
-		@dontinclude ReservationRuleTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Road chunks</h3>
-
-		@copydoc synthese::envlssql::RoadChunkTableSync
-		@dontinclude RoadChunkTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Roads</h3>
-
-		@copydoc synthese::envlssql::RoadTableSync
-		@dontinclude RoadTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Scheduled Services</h3>
-
-		@copydoc synthese::envlssql::ScheduledServiceTableSync
-		@dontinclude ScheduledServiceTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Service circulation dates</h3>
-
-		@copydoc synthese::envlssql::ServiceDateTableSync
-		@dontinclude ServiceDateTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h3>Lines</h3>
-
-		@copydoc synthese::envlssql::LineTableSync
-		@dontinclude LineTableSync.cpp
-		@skip ComponentTableSync
-		@until }
-
-		<h2>Loader internals</h2>
-
-		See :
-		- class @ref synthese::envlssql::ComponentTableSync "ComponentTableSync"
-		- class @ref synthese::envlssql::EnvironmentSyncException "EnvironmentSyncException"
-		- module @ref m10
-
 	*/
 
 	/** 35 Transport network module namespace.
@@ -246,7 +81,7 @@ namespace synthese
 		class NonPermanentService;
 		
 
-		/** 15 Transport network module class.
+		/** 35 Transport network module class.
 		*/
 		class EnvModule : public util::FactorableTemplate<util::ModuleClass, EnvModule>
 		{

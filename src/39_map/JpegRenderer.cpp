@@ -24,20 +24,24 @@
 #include "PostscriptRenderer.h"
 #include <sstream>
 #include "Map.h"
+
 #include "01_util/Log.h"
 #include "01_util/Exception.h"
+
 #include <boost/filesystem/operations.hpp>
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace map;
 
 	namespace util
 	{
 		template<>
-		const std::string FactorableTemplate<map::Renderer,map::JpegRenderer>::FACTORY_KEY ("jpeg");
+		const string FactorableTemplate<Renderer,JpegRenderer>::FACTORY_KEY("jpeg");
 	}
-
 
 	namespace map
 	{

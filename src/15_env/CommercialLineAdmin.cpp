@@ -31,8 +31,10 @@
 #include "15_env/Line.h"
 #include "15_env/LineAdmin.h"
 #include "15_env/LineTableSync.h"
+#include "15_env/TransportNetworkRight.h"
 
 #include "30_server/QueryString.h"
+#include "30_server/Request.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -46,6 +48,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace env;
+	using namespace security;
 
 	namespace util
 	{
@@ -84,7 +87,7 @@ namespace synthese
 
 		bool CommercialLineAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			return true;
+			return request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPagesOfParent(

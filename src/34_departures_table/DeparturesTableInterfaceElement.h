@@ -40,7 +40,7 @@ namespace synthese
 	{
 
 		/** Departure table based on a display screen definition.
-			@ingroup m34Library refLibrary
+			@ingroup m54Library refLibrary
 			@todo Verify the documentation
 
 			Displays : The defined departure table.

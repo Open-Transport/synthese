@@ -33,7 +33,7 @@ namespace synthese
 	{
 
 		/** ASCII character Value Interface Element Class.
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 
 			Usage :
 			@code {{chr <number>}} @endcode

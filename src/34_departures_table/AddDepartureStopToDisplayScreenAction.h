@@ -39,7 +39,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** AddDepartureStopToDisplayScreenAction action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class AddDepartureStopToDisplayScreenAction : public util::FactorableTemplate<server::Action, AddDepartureStopToDisplayScreenAction>
 		{

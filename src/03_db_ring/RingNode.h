@@ -33,7 +33,7 @@ namespace dbring
     This class associates a physical node with a specific ring.
     It holds all node data relative to the associated ring.
 
-@ingroup m03
+@ingroup m101
 */
     class RingNode : public util::ThreadExec
 {

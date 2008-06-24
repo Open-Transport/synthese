@@ -33,7 +33,7 @@ namespace synthese
 
 
 		/** Square of distance between two points, approximated to 2kms.
-		@ingroup m15
+		@ingroup m06
 
 		This class is used to store squre distances between point coordinates in kilometers.
 		The approximation is aimed at fastening intensive calculation that is needed by recursive algorithm.

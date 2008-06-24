@@ -54,7 +54,7 @@ label bloc2
 label end_of_bloc
 			@endcode
 
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 		*/
 		class IfThenElseInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, IfThenElseInterfaceElement>

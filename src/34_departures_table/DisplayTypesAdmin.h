@@ -31,7 +31,7 @@ namespace synthese
 	{
 
 		/** Ecran d'administration des types d'affichage.
-			@ingroup m34
+			@ingroup m54Admin refAdmin
 
 			@image html cap_admin_display_types.png
 			@image latex cap_admin_display_types.png "Ecran d'édition des types d'affichage" width=14cm

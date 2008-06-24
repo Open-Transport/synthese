@@ -41,21 +41,19 @@
 #include <algorithm>
 #include <sstream>
 
-
-using synthese::env::PhysicalStop;
-
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace geometry;
-	
-
+	using namespace map;
+	using namespace env;	
 
 	namespace util
 	{
 		template<>
-		const std::string FactorableTemplate<map::Renderer,map::MapInfoRenderer>::FACTORY_KEY ("mapinfo");
+		const string FactorableTemplate<Renderer,MapInfoRenderer>::FACTORY_KEY("mapinfo");
 	}
 	
 

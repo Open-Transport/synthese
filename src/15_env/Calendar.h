@@ -15,7 +15,7 @@ namespace synthese
 	{
 
 		/** Calendar.
-			@ingroup m15
+			@ingroup m35
 
 			Les services ne circulent pas tous tous les jours. Ils suivent un calendrier de circulation, indiquant les jours o�¹ sont effectués des départs de l'origine des services qui le respectent.
 
@@ -94,12 +94,25 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
-			void mark (time::Date date, bool state = true);
-
+				void mark (time::Date date, bool state = true);
+				void subDates(const Calendar& calendar);
 			//@}
+
+
+			
+			
+			/** Or comparison operator : tests if at least one date is marked in the two calendars.
+				@param op calendar to compare with
+				@return bool true if at least one date is marked in the two calendars
+				@author Hugues Romain
+				@date 2008				
+			*/
+			bool operator || (const Calendar& op) const;
 
 			Calendar& operator&= (const Calendar& op);
 			Calendar& operator|= (const Calendar& op);
+
+			bool operator==(const Calendar& op) const;
 
 			static void LogicalAnd (Calendar& dest, const Calendar& op1, const Calendar& op2);
 			static void LogicalOr (Calendar& dest, const Calendar& op1, const Calendar& op2);
@@ -119,8 +132,6 @@ namespace synthese
 			static time::Date DateBefore (time::Date date, unsigned int nbBits);
 
 			static int NbBitsBetweenDates (time::Date date1, time::Date date2);
-
-
 		};
 
 

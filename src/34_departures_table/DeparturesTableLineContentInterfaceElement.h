@@ -40,7 +40,7 @@ namespace synthese
 	{
 
 		/** Line content interface element.
-			@ingroup m34Library refLibrary
+			@ingroup m54Library refLibrary
 		*/
 		class DeparturesTableLineContentInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableLineContentInterfaceElement>
 		{

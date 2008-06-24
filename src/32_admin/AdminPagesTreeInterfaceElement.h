@@ -38,7 +38,7 @@ namespace synthese
 		class AdminRequest;
 		
 		/** Tree of admin pages links.
-			@ingroup m14Values refValues
+			@ingroup m14Values refLibrary
 
 			Parameters :
 				- Sub page introducer

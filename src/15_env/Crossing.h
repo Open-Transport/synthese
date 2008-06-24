@@ -34,7 +34,7 @@ namespace synthese
 		/** Crossing class.
 			Special kind of ConnectionPlace between roads, with a zero transfer delay between them.
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Crossing
 			: public util::Registrable<uid,Crossing>

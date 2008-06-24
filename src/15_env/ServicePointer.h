@@ -25,6 +25,8 @@
 
 #include "04_time/DateTime.h"
 
+#include "15_env/Types.h"
+
 namespace synthese
 {
 	namespace env
@@ -33,7 +35,7 @@ namespace synthese
 		class Edge;
 
 		/** Service Pointer class.
-			@ingroup m15
+			@ingroup m35
 
 			A service pointer determinates :
 				- a service
@@ -43,26 +45,13 @@ namespace synthese
 		*/
 		class ServicePointer
 		{
-		public:
-			/** Service determination method.
-				- DEPARTURE_TO_ARRIVAL = the service is chosen from a presence time before a departure. The arrival will be chosen in the following edges.
-				- ARRIVAL_TO_DEPARTURE = the service is chosen from a presence time after an arrival. The departure will be chosen in the preceding edges.
-			*/
-			typedef enum
-			{
-				DEPARTURE_TO_ARRIVAL
-				, ARRIVAL_TO_DEPARTURE
-				, NULL_POINTER
-			} DeterminationMethod;
-
-		private:
+		protected:
 			//! @name Initial parameters
 			//@{
-				DeterminationMethod	_determinationMethod;
+				AccessDirection				_determinationMethod;
 				const env::Edge*			_edge;
 			//@}
 
-		protected:
 			//! @name Result elements
 			//@{
 				const Service*				_service;
@@ -74,8 +63,7 @@ namespace synthese
 				int							_range;
 
 		public:
-			ServicePointer();
-			ServicePointer(DeterminationMethod method, const env::Edge* edge);
+			ServicePointer(AccessDirection method, const env::Edge* edge = NULL);
 
 			//! @name Setters
 			//@{
@@ -91,7 +79,7 @@ namespace synthese
 				const Service*			getService()			const;
 				const time::DateTime&	getActualDateTime()		const;
 				const time::DateTime&	getOriginDateTime()		const;
-				DeterminationMethod		getMethod()				const;
+				AccessDirection			getMethod()				const;
 				int						getServiceIndex()		const;
 				int						getServiceRange()		const;
 			//@}

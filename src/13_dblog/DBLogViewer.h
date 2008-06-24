@@ -48,7 +48,7 @@ namespace synthese
 		class DBLogEntry;
 
 		/** Visualisation de journal d'événements.
-			@ingroup m13
+			@ingroup m13Admin refAdmin
 		
 			@image html cap_admin_logviewer.png
 			@image latex cap_admin_logviewer.png "Maquette de l'écran de visualisation de journal" width=14cm

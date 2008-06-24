@@ -23,7 +23,9 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/XmlToolkit.h"
+
 #include "15_env/XmlBuilder.h"
+#include "15_env/Line.h"
 
 #include "30_server/RequestException.h"
 
@@ -41,24 +43,22 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
-using synthese::map::Map;
-using synthese::map::RenderingConfig;
-
-using synthese::util::Conversion;
-using synthese::util::Log;
 using namespace boost::posix_time;
-
 using namespace std;
 using namespace boost;
-using namespace synthese::util::XmlToolkit;
-
 
 namespace synthese
 {
 	using namespace util;
 	using namespace server;
+	using namespace util::XmlToolkit;
+	using namespace env;
 
-        template<> const string util::FactorableTemplate<server::Function, map::MapRequest>::FACTORY_KEY ("map");
+	namespace util
+	{
+		template<>
+		const string FactorableTemplate<Function, map::MapRequest>::FACTORY_KEY("map");
+	}
 
 	namespace map
 	{
@@ -67,19 +67,20 @@ namespace synthese
 		const std::string MapRequest::OUTPUT_PARAMETER ("output");
 		const std::string MapRequest::DATA_PARAMETER ("data");
 		const std::string MapRequest::MAP_PARAMETER ("map");
-
-		/// @todo Parameter names declarations
-		// eg const std::string AdminQueryString::PARAMETER_PAGE = "rub";
+		const string MapRequest::PARAMETER_USE_ENVIRONMENT("ue");
 		
-		/// @todo build of the attributes
+
 		MapRequest::MapRequest()
+			: _useEnvironment(true)
 		{}
 
 		ParametersMap MapRequest::_getParametersMap() const
 		{
 			ParametersMap map;
-			/// @todo Map filling
-			// eg : map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
+			map.insert(OUTPUT_PARAMETER, _output);
+			map.insert(DATA_PARAMETER, _data);
+			map.insert(MAP_PARAMETER, _query);
+			map.insert(PARAMETER_USE_ENVIRONMENT, _useEnvironment);
 			return map;
 		}
 
@@ -87,95 +88,19 @@ namespace synthese
 
 		void MapRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::Map::const_iterator it;
+			setUseEnvironment(map.getBool(PARAMETER_USE_ENVIRONMENT, false, true, FACTORY_KEY));
 
 			// Output
-			it = map.getMap().find(OUTPUT_PARAMETER);
-			if (it == map.getMap().end())
-			    throw RequestException("Output not specified");
-
-			_output = it->second;
-			if (!Factory<Renderer>::contains(_output))
-			{
-			    throw RequestException ("Invalid map output type " + _output);
-			}
+			setOutput(map.getString(OUTPUT_PARAMETER, true, FACTORY_KEY));
 			
-			// XML data
-			it = map.getMap().find (DATA_PARAMETER);
-			if (it == map.getMap().end())
-			    throw RequestException("No data specified");
-
-			/// @todo Throw an exception if xml parsing fails
-			XMLNode dataNode = XMLNode::parseString (it->second.c_str (), "data");
-
-			// Fill in local registries
-
-			XMLNode citiesNode = GetChildNode (dataNode, "cities", 0);
-			int nbCities = GetChildNodeCount (citiesNode, "city");
-			for (int i=0; i<nbCities; ++i) 
+			if (!_useEnvironment)
 			{
-			    XMLNode cityNode = GetChildNode (citiesNode, "city", i);
-			    _cities.add (synthese::env::XmlBuilder::CreateCity (cityNode));
-			}
-
-			XMLNode axesNode = GetChildNode (dataNode, "axes", 0);
-			int nbAxes = GetChildNodeCount (axesNode, "axis");
-			for (int i=0; i<nbAxes; ++i) 
-			{
-			    XMLNode axisNode = GetChildNode (axesNode, "axis", i);
-			    _axes.add (synthese::env::XmlBuilder::CreateAxis (axisNode));
-			}
-
-			XMLNode connectionPlacesNode = GetChildNode (dataNode, "connectionPlaces", 0);
-			int nbConnectionPlaces = GetChildNodeCount (connectionPlacesNode, "connectionPlace");
-			for (int i=0; i<nbConnectionPlaces; ++i) 
-			{
-			    XMLNode connectionPlaceNode = GetChildNode (connectionPlacesNode, "connectionPlace", i);
-			    _connectionPlaces.add (synthese::env::XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _cities));
-			}
-    
-			XMLNode physicalStopsNode = GetChildNode (dataNode, "physicalStops", 0);
-			int nbPhysicalStops = GetChildNodeCount (physicalStopsNode, "physicalStop");
-			for (int i=0; i<nbPhysicalStops; ++i) 
-			{
-			    XMLNode physicalStopNode = GetChildNode (physicalStopsNode, "physicalStop", i);
-			    _physicalStops.add (synthese::env::XmlBuilder::CreatePhysicalStop (physicalStopNode, _connectionPlaces));
-			}
-			
-			XMLNode commercialLinesNode = GetChildNode (dataNode, "commercialLines", 0);
-			int nbCommercialLines = GetChildNodeCount (commercialLinesNode, "commercialLine");
-			for (int i=0; i<nbCommercialLines; ++i) 
-			{
-			    XMLNode commercialLineNode = GetChildNode (commercialLinesNode, "commercialLine", i);
-			    _commercialLines.add (synthese::env::XmlBuilder::CreateCommercialLine (commercialLineNode));
-			}
-			
-			XMLNode linesNode = GetChildNode (dataNode, "lines", 0);
-			int nbLines = GetChildNodeCount (linesNode, "line");
-			for (int i=0; i<nbLines; ++i) 
-			{
-			    XMLNode lineNode = GetChildNode (linesNode, "line", i);
-			    _lines.add (synthese::env::XmlBuilder::CreateLine (lineNode, _axes, _commercialLines));
-			}
-			
-			XMLNode lineStopsNode = GetChildNode (dataNode, "lineStops", 0);
-			int nbLineStops = GetChildNodeCount (lineStopsNode, "lineStop");
-			for (int i=0; i<nbLineStops; ++i) 
-			{
-			    XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
-			    _lineStops.add (synthese::env::XmlBuilder::CreateLineStop (lineStopNode, _lines, _physicalStops));
+				// XML data
+				setData(map.getString(DATA_PARAMETER, false, FACTORY_KEY));
 			}
 			
 			// Map XML
-			it = map.getMap().find (MAP_PARAMETER);
-			if (it == map.getMap().end())
-			    throw RequestException("Map to draw not specified");
-
-			/// @todo Throw an exception if xml parsing fails
-			XMLNode mapNode = XMLNode::parseString (it->second.c_str (), "map");
-			
-			_map = synthese::map::XmlBuilder::CreateMap (mapNode, _lines);
-
+			setQuery(map.getString(MAP_PARAMETER, true, FACTORY_KEY));
 		}
 
 
@@ -183,11 +108,14 @@ namespace synthese
 
 		void MapRequest::_run( std::ostream& stream ) const
 		{
+			if (!_map.get())
+				return;
+
 			// Prepare the map (once for all renderings!)
 			_map->prepare ();
 
 			// Create a temporary file name based on system time
-			const boost::filesystem::path& tempDir = MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_DIR);
+			const filesystem::path tempDir(MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_DIR), filesystem::native);
 
 			RenderingConfig conf;
 
@@ -205,7 +133,7 @@ namespace synthese
 			    + "/" + resultFilename;
 			
 			// Send the URL to the the generated local JPEG file.
-			stream << resultURL << std::endl;
+			stream << resultURL;
 			
 			Log::GetInstance ().debug ("Sent result url " + resultURL);
 
@@ -215,7 +143,105 @@ namespace synthese
 
 		MapRequest::~MapRequest()
 		{
-		    delete _map;
+		}
+
+
+
+		void MapRequest::setData( const std::string& value )
+		{
+			_data = value;
+
+			/// @todo Throw an exception if xml parsing fails
+			XMLNode dataNode = XMLNode::parseString (_data.c_str (), "data");
+
+			// Fill in local registries
+
+			XMLNode citiesNode = GetChildNode (dataNode, "cities", 0);
+			int nbCities = GetChildNodeCount (citiesNode, "city");
+			for (int i=0; i<nbCities; ++i) 
+			{
+				XMLNode cityNode = GetChildNode (citiesNode, "city", i);
+				_cities.add (synthese::env::XmlBuilder::CreateCity (cityNode));
+			}
+
+			XMLNode axesNode = GetChildNode (dataNode, "axes", 0);
+			int nbAxes = GetChildNodeCount (axesNode, "axis");
+			for (int i=0; i<nbAxes; ++i) 
+			{
+				XMLNode axisNode = GetChildNode (axesNode, "axis", i);
+				_axes.add (synthese::env::XmlBuilder::CreateAxis (axisNode));
+			}
+
+			XMLNode connectionPlacesNode = GetChildNode (dataNode, "connectionPlaces", 0);
+			int nbConnectionPlaces = GetChildNodeCount (connectionPlacesNode, "connectionPlace");
+			for (int i=0; i<nbConnectionPlaces; ++i) 
+			{
+				XMLNode connectionPlaceNode = GetChildNode (connectionPlacesNode, "connectionPlace", i);
+				_connectionPlaces.add (synthese::env::XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _cities));
+			}
+
+			XMLNode physicalStopsNode = GetChildNode (dataNode, "physicalStops", 0);
+			int nbPhysicalStops = GetChildNodeCount (physicalStopsNode, "physicalStop");
+			for (int i=0; i<nbPhysicalStops; ++i) 
+			{
+				XMLNode physicalStopNode = GetChildNode (physicalStopsNode, "physicalStop", i);
+				_physicalStops.add (synthese::env::XmlBuilder::CreatePhysicalStop (physicalStopNode, _connectionPlaces));
+			}
+
+			XMLNode commercialLinesNode = GetChildNode (dataNode, "commercialLines", 0);
+			int nbCommercialLines = GetChildNodeCount (commercialLinesNode, "commercialLine");
+			for (int i=0; i<nbCommercialLines; ++i) 
+			{
+				XMLNode commercialLineNode = GetChildNode (commercialLinesNode, "commercialLine", i);
+				_commercialLines.add (synthese::env::XmlBuilder::CreateCommercialLine (commercialLineNode));
+			}
+
+			XMLNode linesNode = GetChildNode (dataNode, "lines", 0);
+			int nbLines = GetChildNodeCount (linesNode, "line");
+			for (int i=0; i<nbLines; ++i) 
+			{
+				XMLNode lineNode = GetChildNode (linesNode, "line", i);
+				_lines.add (synthese::env::XmlBuilder::CreateLine (lineNode, _axes, _commercialLines));
+			}
+
+			XMLNode lineStopsNode = GetChildNode (dataNode, "lineStops", 0);
+			int nbLineStops = GetChildNodeCount (lineStopsNode, "lineStop");
+			for (int i=0; i<nbLineStops; ++i) 
+			{
+				XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
+				_lineStops.add (synthese::env::XmlBuilder::CreateLineStop (lineStopNode, _lines, _physicalStops));
+			}
+		}
+
+
+
+		void MapRequest::setQuery( const std::string& value )
+		{
+			_query = value;
+
+			/// @todo Throw an exception if xml parsing fails
+			XMLNode mapNode = XMLNode::parseString (_query.c_str (), "map");
+
+			_map.reset(map::XmlBuilder::CreateMap (mapNode, _useEnvironment ? Line::GetRegistry() : _lines));
+		}
+
+
+
+		void MapRequest::setOutput( const std::string& value )
+		{
+			_output = value;
+
+			if (!Factory<Renderer>::contains(_output))
+			{
+				throw RequestException ("Invalid map output type " + _output);
+			}
+		}
+
+
+
+		void MapRequest::setUseEnvironment( bool value )
+		{
+			_useEnvironment = value;
 		}
 	}
 }

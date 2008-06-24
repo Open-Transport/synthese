@@ -40,7 +40,7 @@ namespace synthese
 		    Crossing are just a special kind of connection place (road-road) that we want 
 		    to keep in a separate table.
 
-		    @ingroup m15LS refLS
+		    @ingroup m35LS refLS
 		    
 		    Connection places table :
 		    - on insert : 

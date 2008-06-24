@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** HandicappedCompliance table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class HandicappedComplianceTableSync : public db::SQLiteRegistryTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>
 		{

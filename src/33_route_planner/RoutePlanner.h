@@ -62,6 +62,22 @@ namespace synthese
 		typedef enum {DEPARTURE_FIRST, ARRIVAL_FIRST} PlanningOrder;
 
 		/** Route planner class.
+
+			Potential optimization by maximal speeds
+
+			Les vitesses maximales interviennent dans l'optimisaion.
+
+			Les vitesses maximales sont fabriquées automatiquement dans le programme d'administration. Lancer la procédure et patienter quelques minutes&nbsp;: le fichier <b>.vmax.per</b> est alors écrit. Vérifier à l'intérieur de ce fichier les dépassements de 200 km/h qui sont tous signalés par un message adéquat (<i>Attention, V&gt;200 km/h</i>).
+
+			Corriger éventuellement les données correspondant à ces dépassements s'ils sont anormaux.
+
+			Les sources d'erreurs les plus fréquentes sont&nbsp;:
+			- Erreur de géolocalisation d'un point d'arrêt (se voit lorsque beaucoup de vitesses supérieures à 200 sont signalées sur un même point d'arrêt)
+			- Erreur d'horaires. (voir le fichier <b>log.txt</b> pour d'éventuelles correspondances avec des dépassements de vitesse de matériel, remarqués au stade du chargement des lignes)
+			- Erreur de code point d'arrêt dans un fichier d'horaires
+
+			Une fois validé le fichier <b>.vmax.per</b>, lancer l'importation dans l'assistant de saisie des données. Les Vmax sont saisies automatiquement dans le fichier des points d'arret, remplaçant ainsi les anciens.
+
 			@ingroup m53
 		*/
 		class RoutePlanner
@@ -70,6 +86,7 @@ namespace synthese
 			class Result
 			{
 			public:
+				bool samePlaces;
 				JourneyBoardJourneys journeys;
 				void clear();
 				~Result();
@@ -167,7 +184,6 @@ namespace synthese
 				@date 2007
 			*/
 			const Result& computeJourneySheetDepartureArrival ();
-
 			//@}
 		};
 	}

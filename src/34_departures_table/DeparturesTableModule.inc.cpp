@@ -57,3 +57,4 @@
 #include "34_departures_table/DisplayScreenSupervisionRequest.h"
 #include "34_departures_table/DisplayScreenContentRequest.h"
 #include "34_departures_table/AlarmTestOnDisplayScreenFunction.h"
+#include "34_departures_table/DisplayScreenPhysicalStopFunction.h"

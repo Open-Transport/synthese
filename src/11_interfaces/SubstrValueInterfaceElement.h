@@ -36,7 +36,7 @@ namespace synthese
 		class ValueElementList;
 
 		/** SubstrValueInterfaceElement value interface element class.
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 
 			Usage :
 			@code {{substr <param> <param>}} @endcode

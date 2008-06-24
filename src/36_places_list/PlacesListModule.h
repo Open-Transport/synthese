@@ -58,7 +58,7 @@ namespace synthese
 		@defgroup m36Logs 36 DB Logs
 		@ingroup m36
 		
-		@defgroup m36 Transport website
+		@defgroup m36 36 Transport website
 		@ingroup m3
 		
 		(Module documentation)

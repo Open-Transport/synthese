@@ -1,4 +1,4 @@
-ï»¿/** @page customer_spec_sai_tisseo SpÃ©cification dÃ©taillÃ©e SAI SYNTHESE
+/** @page customer_spec_sai_tisseo Spécification détaillée SAI SYNTHESE
 
 	@section csst_sommaire Sommaire du document
 	
@@ -9,9 +9,9 @@
 
 	@section csst_glossary Glossaire
 
-		Le tÃ©lÃ©affichage (SAI) consiste en la diffusion de la liste des prochains dÃ©parts aux arrÃªts, de maniÃre dynamique.
+		Le téléaffichage (SAI) consiste en la diffusion de la liste des prochains départs aux arrêts, de manire dynamique.
 	
-	@subsection csst_securite SÃ©curitÃ©
+	@subsection csst_securite Sécurité
 
 		@subsubsection defRight Habilitation
 		@copydoc synthese::security::Right
@@ -39,12 +39,12 @@
 
 	@section csst_ihm Interface Homme Machine (IHM)
 	
-		@subsection csst_ihm_generique Ecran gÃ©nÃ©rique
+		@subsection csst_ihm_generique Ecran générique
 		@copydoc synthese::admin::HomeAdmin
 
-		@subsection csst_ihm_liste Liste des Ã©crans
+		@subsection csst_ihm_liste Liste des écrans
 		
-		L'ensemble des Ã©crans de gestion du SAI SYNTHESE est centralisÃ© dans une "console d'administration", qui donne accÃs Ã  l'ensemble des Ã©crans d'administraion :
+		L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à l'ensemble des écrans d'administraion :
 			- @ref csst_ihm_users
 				- @ref csst_ihm_users_login
 				- @ref csst_ihm_users_profiles
@@ -69,20 +69,21 @@
 				- @ref csst_ihm_journal_liste
 				- @ref csst_ihm_journal_viewer
 		
-		Le schÃ©ma suivant reprÃ©sente l'arborescence des pages et actions utilisÃ©es pour la gestion autonome du tÃ©lÃ©affichage.
+		Le schéma suivant représente l'arborescence des pages et actions utilisées pour la gestion autonome du téléaffichage.
 
-		<i>LÃ©gende</i>
-			- <tt>C/E/S</tt> = CrÃ©ation / Edition / Suppression
+		<i>Légende</i>
+			- <tt>C/E/S</tt> = Création / Edition / Suppression
 			- fond jaune = page de la console d'administration
 			- fond vert = page de journal
-			- fond bleu = accÃs Ã  une fonction SYNTHESE hors administration
-			- fond blanc = fonction intÃ©grÃ©e Ã  la page de niveau supÃ©rieur
+			- fond bleu = accàs à une fonction SYNTHESE hors administration
+			- fond blanc = fonction intégrée à la page de niveau supérieur
 
 		@dot
 		digraph {
 			size="6,12"
 			rankdir=LR
-			node [shape=rectangle style=filled color="red"]
+		    edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  			node [shape=rectangle style=filled color="red" fontname="FreeSans" fontsize=10 shape=record]
 	
 			{
 				node [fillcolor="gold"]
@@ -170,28 +171,28 @@
 		@subsubsection csst_ihm_users_login Ecran de connexion
 		
 			@image html cap_admin_login.png
-			@image latex cap_admin_login.png "Maquette de l'Ã©cran de connexion intÃ©grÃ© Ã  la console d'administration" width=14cm
+			@image latex cap_admin_login.png "Maquette de l'écran de connexion intégré à la console d'administration" width=14cm
 
-			<i>Titre de la fenÃªtre</i> :
+			<i>Titre de la fenêtre</i> :
 				- SYNTHESE Admin - Login
 
 			<i>Barre de navigation</i> :
 				- Bienvenue sur SYNTHESE Admin
 
 			<i>Zone de contenus</i> : Il s'agit d'un <b>Formulaire de connexion</b>.
-				-# <tt>Utilisateur</tt> : Champ texte destinÃ© Ã  recevoir le nom d'utilisateur.
-				-# <tt>Mot de passe</tt> : Champ texte cachÃ© destinÃ© Ã  recevoir le mot de passe de l'utilisateur.
+				-# <tt>Utilisateur</tt> : Champ texte destiné à recevoir le nom d'utilisateur.
+				-# <tt>Mot de passe</tt> : Champ texte caché destiné à recevoir le mot de passe de l'utilisateur.
 				-# bouton <tt>Connexion</tt> : Lance la tentative d'identification :
-				- Si l'utilisateur a le droit de se connecter (habilitation privÃ©e SecurityRight de niveau USE) et si le mot de passe est valide alors l'utilisateur est conduit sur la page d'accueil HomeAdmin.
-				- Sinon un message d'erreur "Utilisateur incorrect" est retournÃ©.
+				- Si l'utilisateur a le droit de se connecter (habilitation privée SecurityRight de niveau USE) et si le mot de passe est valide alors l'utilisateur est conduit sur la page d'accueil HomeAdmin.
+				- Sinon un message d'erreur "Utilisateur incorrect" est retourné.
 
-			<i>SÃ©curitÃ©</i>
+			<i>Sécurité</i>
 				- Cette page est accessible sans restriction
-				- Une habilitation privÃ©e SecurityRight de niveau USE est nÃ©cessaire pour pouvoir se connecter.
+				- Une habilitation privée SecurityRight de niveau USE est nécessaire pour pouvoir se connecter.
 
-			<i>Journaux</i> : Les opÃ©rations suivantes sont consignÃ©es dans le journal de sÃ©curitÃ© SecurityLog :
+			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité SecurityLog :
 				- INFO : Connexion d'utilisateur
-				- WARNING : Refus de connexion aprÃs cinq tentatives sur une mÃªme session
+				- WARNING : Refus de connexion aprs cinq tentatives sur une même session
 	
 		@subsubsection csst_ihm_users_profiles Liste des profils d'habilitations
 		@copydoc synthese::security::ProfilesAdmin
@@ -222,10 +223,10 @@
 		@subsubsection csst_ihm_display_DisplayTypesAdmin Gestion des types d'affichage
 		@copydoc synthese::departurestable::DisplayTypesAdmin	
 		
-		@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matÃ©riel d'afficheurs
+		@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matériel d'afficheurs
 		@copydoc synthese::departurestable::DisplaySearchAdmin
 		
-		@subsubsection csst_ihm_display_DisplayAdmin Edition des paramÃtres d'un afficheur
+		@subsubsection csst_ihm_display_DisplayAdmin Edition des paramtres d'un afficheur
 		@copydoc synthese::departurestable::DisplayAdmin
 
 		@subsubsection csst_ihm_display_DisplayMaintenanceAdmin Supervision d'un afficheur
@@ -235,10 +236,10 @@
 	
 	@subsection csst_ihm_messages Gestion des messages
 	
-		@subsubsection csst_ihm_messages_MessagesLibraryAdmin BibliothÃque de messages prÃ©dÃ©finis
+		@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
 		@copydoc synthese::messages::MessagesLibraryAdmin
 		
-		@subsubsection csst_ihm_messages_MessagesScenarioAdmin Edition de scÃ©nario de diffusion prÃ©dÃ©fini
+		@subsubsection csst_ihm_messages_MessagesScenarioAdmin Edition de scénario de diffusion prédéfini
 		@copydoc synthese::messages::MessagesScenarioAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
@@ -247,12 +248,12 @@
 		@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
 		@copydoc synthese::messages::MessageAdmin
 		
-		@subsubsection csst_ihm_messages_MessagesScenarioSend Diffusion de messages selon un scÃ©nario prÃ©dÃ©fini
+		@subsubsection csst_ihm_messages_MessagesScenarioSend Diffusion de messages selon un scénario prédéfini
 		@copydoc synthese::messages::MessagesScenarioSendAdmin
 
 	
 	
-	@subsection csst_ihm_journal Journal des Ã©vÃ©nements
+	@subsection csst_ihm_journal Journal des événements
 	
 		@subsubsection csst_ihm_journal_liste Liste des journaux
 		@copydoc synthese::dblog::DBLogList
@@ -262,9 +263,9 @@
 
 
 
-	@section csst_security SÃ©curitÃ©
+	@section csst_security Sécurité
 	
-		Les habilitations suivantes sont utilisÃ©es par le SAI :
+		Les habilitations suivantes sont utilisées par le SAI :
 			- @ref csst_security_right
 			- @ref csst_security_messages
 			- @ref csst_security_messages_library
@@ -273,21 +274,21 @@
 			- @ref csst_security_maintenance
 			- @ref csst_security_places
 		
-		Leur utilisation prÃ©cise est spÃ©cifiÃ©e dans la documentation de chaque Ã©cran.
+		Leur utilisation précise est spécifiée dans la documentation de chaque écran.
 		
-		@subsection csst_security_right SÃ©curitÃ© (SecurityRight)
+		@subsection csst_security_right Sécurité (SecurityRight)
 		@copydoc synthese::security::SecurityRight
 		
 		@subsection csst_security_messages Messages (MessagesRight)
 		@copydoc synthese::messages::MessagesRight
 
-		@subsection csst_security_messages_library BibliothÃque de messages (MessagesLibraryRight)
+		@subsection csst_security_messages_library Bibliothque de messages (MessagesLibraryRight)
 		@copydoc synthese::messages::MessagesLibraryRight
 	
 		@subsection csst_security_log Journaux (DBLogRight)
 		@copydoc synthese::dblog::DBLogRight
 		
-		@subsection csst_security_arrivaldeparturestables Tableaux de dÃ©parts et d'arrivÃ©e (ArrivalDepartureTableRight)
+		@subsection csst_security_arrivaldeparturestables Tableaux de départs et d'arrivée (ArrivalDepartureTableRight)
 		@copydoc synthese::departurestable::ArrivalDepartureTableRight
 		
 		@subsection csst_security_maintenance Maintenance des afficheurs (DisplayMaintenanceRight)
@@ -300,7 +301,7 @@
 	
 	@section csst_logs Journaux
 	
-		Les journaux suivants sont alimentÃ©s pour le SAI :
+		Les journaux suivants sont alimentés pour le SAI :
 			- @ref csst_logs_security
 			- @ref csst_logs_displays
 			- @ref csst_logs_maintenance
@@ -308,13 +309,13 @@
 			- @ref csst_logs_messages
 			- @ref csst_logs_transport
 		
-		@subsection csst_logs_security SÃ©curitÃ© (SecurityLog)
+		@subsection csst_logs_security Sécurité (SecurityLog)
 		@copydoc synthese::security::SecurityLog
 		
 		@subsection csst_logs_messages Envois de messages (MessagesLog)
 		@copydoc synthese::messages::MessagesLog
 		
-		@subsection csst_logs_messages_library BibliothÃque de messages (MessagesLibraryLog)
+		@subsection csst_logs_messages_library Bibliothque de messages (MessagesLibraryLog)
 		@copydoc synthese::messages::MessagesLibraryLog
 		
 		@subsection csst_logs_displays Gestion des afficheurs (ArrivalDepartureTableLog)
@@ -323,7 +324,7 @@
 		@subsection csst_logs_maintenance Maintenance des afficheurs (DisplayMaintenanceLog)
 		@copydoc synthese::departurestable::DisplayMaintenanceLog
 		
-		@subsection csst_logs_transport DonnÃ©es rÃ©seau, emplacements (TransportNetworkDataLog)
+		@subsection csst_logs_transport Données réseau, emplacements (TransportNetworkDataLog)
 		@copydoc synthese::departurestable::BroadcastPointsDataLog
 		
 */

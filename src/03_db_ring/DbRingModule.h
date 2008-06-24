@@ -7,14 +7,14 @@
 
 namespace synthese
 {
-	/** @defgroup m03 03 Database synchronisation ring.
-		@ingroup m0
+	/** @defgroup m101 101 Database synchronization ring.
+		@ingroup m1
 
 	@{
 	*/
 
 
-	/** 03 Database ring namespace.
+	/** 101 Database ring namespace.
 	*/
 	namespace dbring
 	{

@@ -79,5 +79,33 @@ namespace synthese
 		{
 			return _name;
 		}
+
+
+
+		bool TextTemplate::getIsFolder() const
+		{
+			return _isFolder;
+		}
+
+
+
+		uid TextTemplate::getParentId() const
+		{
+			return _parentId;
+		}
+
+
+
+		void TextTemplate::setIsFolder( bool value )
+		{
+			_isFolder = value;
+		}
+
+
+
+		void TextTemplate::setParentId( uid value )
+		{
+			_parentId = value;
+		}
 	}
 }

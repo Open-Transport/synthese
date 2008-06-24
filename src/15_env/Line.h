@@ -49,7 +49,7 @@ namespace synthese
 		/** Technical line.
 			TRIDENT JourneyPattern = Mission
 			 inherits from Route
-			@ingroup m15
+			@ingroup m35
 
 			Une ligne technique est un regroupement de services, constitué dans un but d'amélioration des performances de la recherche d'itinéraires. En effet, plusieurs services groupés dans une ligne ne comptent que pour un dans leur participation au temps de calcul, ce qui rend tout son intér�ªt au regroupement des services en lignes.
 			Le regroupement en lignes techniques s'effectue cependant, par convention, uniquement �  l'intérieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant �ªtre groupés selon les crit�šres ci-dessous, mais n'appartenant pas �  la m�ªme ligne commerciale, ne seront pas groupés dans une ligne technique. De ce fait, les lignes techniques sont considérés comme des subdivisions de lignes commerciales.

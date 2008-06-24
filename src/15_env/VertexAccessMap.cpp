@@ -102,32 +102,45 @@ namespace synthese
 		VertexAccessMap::insert (const Vertex* vertex, 
 					 const VertexAccess& vertexAccess)
 		{
-			_map.insert (std::make_pair (vertex, vertexAccess));
-			_isobarycentreToUpdate = true;
-			_isobarycenterMaxSquareDistanceUpToDate = false;
+			VamMap::iterator it(_map.find(vertex));
+
+			if (it == _map.end())
+			{
+				// Insertion of a new vertex
+				_map.insert (std::make_pair (vertex, vertexAccess));
+				_isobarycentreToUpdate = true;
+				_isobarycenterMaxSquareDistanceUpToDate = false;
+
+				// Updating the paths which needs fine stepping set
+				if (!vertex->isConnectionAllowed())
+				{
+					// Departure vertices
+					for (set<const Edge*>::const_iterator itEdge(vertex->getDepartureEdges().begin());
+						itEdge != vertex->getDepartureEdges().end (); ++itEdge)
+					{
+						_pathOnWhichFineSteppingForDeparture.insert((*itEdge)->getParentPath());
+					}
+
+					// Arrival vertices
+					for (set<const Edge*>::const_iterator itEdge(vertex->getArrivalEdges().begin());
+						itEdge != vertex->getArrivalEdges().end (); ++itEdge)
+					{
+						_pathOnWhichFineSteppingForArrival.insert((*itEdge)->getParentPath());
+					}
+				}
+			}
+			else
+			{	// Update of the access conditions if more efficient
+				if(	vertexAccess.approachTime < it->second.approachTime
+				||	vertexAccess.approachTime == it->second.approachTime
+					&&	vertexAccess.approachDistance < it->second.approachDistance
+				)	it->second = vertexAccess;
+			}
+
 			if (vertexAccess.approachTime < _minApproachTime)
 			{
 				_minApproachTime = vertexAccess.approachTime;
 			}
-
-			// Updating the paths which needs fine stepping set
-			if (!vertex->isConnectionAllowed())
-			{
-				// Departure vertices
-				for (set<const Edge*>::const_iterator itEdge(vertex->getDepartureEdges().begin());
-					itEdge != vertex->getDepartureEdges().end (); ++itEdge)
-				{
-					_pathOnWhichFineSteppingForDeparture.insert((*itEdge)->getParentPath());
-				}
-
-				// Arrival vertices
-				for (set<const Edge*>::const_iterator itEdge(vertex->getArrivalEdges().begin());
-					itEdge != vertex->getArrivalEdges().end (); ++itEdge)
-				{
-					_pathOnWhichFineSteppingForArrival.insert((*itEdge)->getParentPath());
-				}
-			}
-
 		}
 
 

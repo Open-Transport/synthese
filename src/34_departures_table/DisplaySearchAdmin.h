@@ -44,7 +44,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** Ecran de gestion du parc matériel d'afficheurs.
-			@ingroup m34Admin refAdmin
+			@ingroup m54Admin refAdmin
 
 			@image html cap_admin_displays.png
 			@image latex cap_admin_displays.png "Maquette de l'écran de gestion des afficheurs" width=14cm

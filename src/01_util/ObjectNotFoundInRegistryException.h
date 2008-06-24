@@ -33,7 +33,7 @@ namespace synthese
 	namespace util
 	{
 		/** ObjectNotFoundInRegistryException class.
-			@ingroup m01Exceptions refExceptions
+			@ingroup m01Registry m01Exceptions refExceptions
 		*/
 		template<class K, class T>
 		class ObjectNotFoundInRegistryException : public ObjectNotFoundException<K,T>

@@ -41,7 +41,7 @@ namespace synthese
 
 		/** Handicapped compliance class.
 			MobilityRestricted
-		 @ingroup m15
+		 @ingroup m35
 		 */
 		class HandicappedCompliance : 
 			public util::RegistrableWithNeutralElement<uid,HandicappedCompliance>

@@ -27,7 +27,7 @@ namespace synthese
 {
 	namespace env
 	{
-		/** @addtogroup m15
+		/** @addtogroup m35
 			@{
 		*/
 

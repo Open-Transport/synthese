@@ -25,8 +25,8 @@
 #include "MessagesTemplateLibraryAdmin.h"
 #include "MessagesModule.h"
 
-#include "05_html/ActionResultHTMLTable.h"
-#include "05_html/HTMLForm.h"
+#include "05_html/PropertiesHTMLTable.h"
+#include "05_html/HTMLList.h"
 
 #include "30_server/ActionFunctionRequest.h"
 #include "30_server/QueryString.h"
@@ -42,6 +42,7 @@
 #include "17_messages/TextTemplateAddAction.h"
 #include "17_messages/MessagesLibraryRight.h"
 #include "17_messages/MessagesModule.h"
+#include "17_messages/TextTemplateFolderUpdateAction.h"
 
 
 using namespace std;
@@ -64,174 +65,155 @@ namespace synthese
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>::ICON("package.png");
+		template<> const string AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>::ICON("folder.png");
 		template<> const string AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>::DEFAULT_TITLE("Bibliothèque de textes");
 	}
 
 	namespace messages
 	{
-		const std::string MessagesTemplateLibraryAdmin::PARAMETER_NAME = "nam";
-		const std::string MessagesTemplateLibraryAdmin::PARAMETER_SHORT_TEXT = "stx";
-		const std::string MessagesTemplateLibraryAdmin::PARAMETER_LONG_TEXT = "ltx";
+		const string MessagesTemplateLibraryAdmin::PARAMETER_FOLDER_ID("fo");
+
+
 
 		MessagesTemplateLibraryAdmin::MessagesTemplateLibraryAdmin()
 			: AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>()
 		{ }
 		
+
+
 		void MessagesTemplateLibraryAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
+			uid id(map.getUid(PARAMETER_FOLDER_ID, false, FACTORY_KEY));
+			if (id > 0)
+				_folder = TextTemplateTableSync::Get(id);
 		}
 		
+
+
 		void MessagesTemplateLibraryAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
-			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
-
+			// Requests
 			ActionFunctionRequest<UpdateTextTemplateAction,AdminRequest> updateRequest(request);
 			updateRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
-
+			
 			ActionFunctionRequest<DeleteTextTemplateAction,AdminRequest> deleteRequest(request);
 			deleteRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
-
+			
 			ActionFunctionRequest<TextTemplateAddAction,AdminRequest> addRequest(request);
 			addRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
+			
+			ActionFunctionRequest<TextTemplateFolderUpdateAction,AdminRequest> updateFolderRequest(request);
+			updateFolderRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
+			
 
-			stream << "<h1>Modèles de textes destinés aux messages complémentaires</h1>";
+			// Rights
+			bool updateRight(request->isAuthorized<MessagesLibraryRight>(WRITE));
+			bool deleteRight(request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
 
-			vector<shared_ptr<TextTemplate> > tw = TextTemplateTableSync::search(
-				ALARM_LEVEL_INFO
-				, string(), NULL
-				, 0, -1
-				, _requestParameters.orderField == PARAMETER_NAME
-				, _requestParameters.orderField == PARAMETER_SHORT_TEXT
-				, _requestParameters.orderField == PARAMETER_LONG_TEXT
-				, _requestParameters.raisingOrder
+			// Search
+			vector<shared_ptr<TextTemplate> > tw = TextTemplateTableSync::Search(
+				ALARM_LEVEL_UNKNOWN
+				, _folder.get() ? _folder->getKey() : 0
+				, false
+				, string()
+				, NULL
+				, 0
+				, -1
+				, true
+				, false
+				, false
+				, true
 			);
-			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, tw);
 
-			ResultHTMLTable::HeaderVector h1;
-			h1.push_back(make_pair(PARAMETER_NAME, "Nom"));
-			h1.push_back(make_pair(PARAMETER_SHORT_TEXT, "Texte&nbsp;court"));
-			h1.push_back(make_pair(PARAMETER_LONG_TEXT, "Texte&nbsp;long"));
-			h1.push_back(make_pair(string(), "Actions"));
-			h1.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t1(h1, searchRequest.getHTMLForm(), _requestParameters, p);
+			vector<shared_ptr<TextTemplate> > folders = TextTemplateTableSync::Search(
+				ALARM_LEVEL_UNKNOWN
+				, _folder.get() ? _folder->getKey() : 0
+				, true
+				, string()
+				, NULL
+				, 0
+				, -1
+				, true
+				, false
+				, false
+				, true
+			);
 
-			stream << t1.open();
-
-			for (vector<shared_ptr<TextTemplate> >::iterator itw = tw.begin(); itw != tw.end(); ++itw)
+			stream << "<h1>Répertoires</h1>";
+			HTMLList l;
+			for (vector<shared_ptr<TextTemplate> >::iterator itf(folders.begin()); itf != folders.end(); ++itf)
 			{
-				shared_ptr<TextTemplate> t = *itw;
-
-				HTMLForm uf(updateRequest.getHTMLForm("upd" + Conversion::ToString(t->getKey())));
-				uf.addHiddenField(UpdateTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()));
-
-				HTMLForm df(deleteRequest.getHTMLForm());
-				df.addHiddenField(DeleteTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()));
-
-				stream << uf.open();
-				stream
-					<< "<tr>"
-					<< "<td>" << uf.getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, t->getName()) << "</td>"
-					<< "<td>" << uf.getTextInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, t->getShortMessage()) << "</td>"
-					<< "<td>" << uf.getTextInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, t->getLongMessage()) << "</td>"
-					<< "<td>" << uf.getSubmitButton("Modifier") << "</td>"
-					<< "<td>" << df.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer le modèle sélectionné ?")
-					<< "</td>"
-					<< "</tr>";
-				stream << uf.close();
 			}
 
-			HTMLForm af(addRequest.getHTMLForm("add1"));
-			af.addHiddenField(TextTemplateAddAction::PARAMETER_TYPE, Conversion::ToString((int) ALARM_LEVEL_INFO));
-			stream << af.open();
-			stream
-				<< "<tr>"
-				<< "<td>" << af.getTextInput(TextTemplateAddAction::PARAMETER_NAME, string()) << "</td>"
-				<< "<td>" << af.getTextInput(TextTemplateAddAction::PARAMETER_SHORT_MESSAGE, string()) << "</td>"
-				<< "<td>" << af.getTextInput(TextTemplateAddAction::PARAMETER_LONG_MESSAGE, string()) << "</td>"
-				<< "<td>" << af.getSubmitButton("Ajouter") << "</td>"
-				<< "</tr>";
-			stream << af.close();
-
-			stream << t1.close();
-
-			stream << "<h1>Modèles de textes destinés aux messages prioritaires</h1>";
-
-			vector<shared_ptr<TextTemplate> > te = TextTemplateTableSync::search(
-				ALARM_LEVEL_WARNING
-				, string(), NULL
-				, 0, -1
-				, _requestParameters.orderField == PARAMETER_NAME
-				, _requestParameters.orderField == PARAMETER_SHORT_TEXT
-				, _requestParameters.orderField == PARAMETER_LONG_TEXT
-				, _requestParameters.raisingOrder
-			);
-			ResultHTMLTable::ResultParameters p2;
-			p2.setFromResult(_requestParameters, te);
-
-			ResultHTMLTable::HeaderVector h2;
-			h2.push_back(make_pair(PARAMETER_NAME, "Nom"));
-			h2.push_back(make_pair(PARAMETER_SHORT_TEXT, "Texte&nbsp;court"));
-			h2.push_back(make_pair(PARAMETER_LONG_TEXT, "Texte&nbsp;long"));
-			h2.push_back(make_pair(string(), "Actions"));
-			h2.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t2(h2, searchRequest.getHTMLForm(), _requestParameters, p2);
-
-			stream << t2.open();
-
-			for (vector<shared_ptr<TextTemplate> >::iterator ite = te.begin(); ite != te.end(); ++ite)
+			if (_folder.get())
 			{
-				shared_ptr<TextTemplate> t = *ite;
+				stream << "<h2>Propriétés</h2>";
 
-				/// @todo See if we use textarea
-				HTMLForm uf(updateRequest.getHTMLForm("upd" + Conversion::ToString(t->getKey())));
-				uf.addHiddenField(UpdateTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()));
+				if (tw.empty() && folders.empty())
+					stream << "<p>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
 
-				HTMLForm df(deleteRequest.getHTMLForm("del" + Conversion::ToString(t->getKey())));
-				df.addHiddenField(DeleteTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()));
-
-				stream << uf.open();
-				stream
-					<< "<tr>"
-					<< "<td>" << uf.getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, t->getName()) << "</td>"
-					<< "<td>" << uf.getTextInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, t->getShortMessage()) << "</td>"
-					<< "<td>" << uf.getTextInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, t->getLongMessage()) << "</td>"
-					<< "<td>" << uf.getSubmitButton("Modifier") << "</td>"
-					<< "<td>" << df.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer le modèle sélectionné ?") << "</td>"
-					<< "</tr>";
-				stream << uf.close();
+				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, _folder->getName()));
+				stream << t.cell("Répertoire parent", t.getForm().getSelectInput(UpdateTextTemplateAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()), _folder->getParentId()));
+				stream << t.close();
 			}
-			HTMLForm af2(addRequest.getHTMLForm("add2"));
-			af2.addHiddenField(TextTemplateAddAction::PARAMETER_TYPE, Conversion::ToString(static_cast<int>(ALARM_LEVEL_WARNING)));
-			stream << af2.open();
-			stream
-				<< "<tr>"
-				<< "<td>" << af2.getTextInput(TextTemplateAddAction::PARAMETER_NAME, string()) << "</td>"
-				<< "<td>" << af2.getTextInput(TextTemplateAddAction::PARAMETER_SHORT_MESSAGE, string()) << "</td>"
-				<< "<td>" << af2.getTextInput(TextTemplateAddAction::PARAMETER_LONG_MESSAGE, string()) << "</td>"
-				<< "<td>" << af2.getSubmitButton("Ajouter") << "</td>"
-				<< "</tr>";
-			stream << af2.close();
 
-			stream << t2.close();
+
+			stream << "<h1>Modèles de texte</h1>";
+			for (vector<shared_ptr<TextTemplate> >::iterator it(tw.begin()); it != tw.end(); ++it)
+			{
+				// Variables
+				deleteRequest.getAction()->setTemplate(*it);
+				updateRequest.getAction()->setTemplate(*it);
+
+				// Display
+				stream << "<h2>";
+				if (deleteRight)
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ (*it)->getName()+" ?", "page_delete.png") << " ";
+				stream << (*it)->getName() << "</h2>";
+
+				PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+Conversion::ToString((*it)->getKey())));
+				t.getForm().setUpdateRight(updateRight);
+				stream << t.open();
+				stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, (*it)->getName()));
+				stream << t.cell("Texte court", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, (*it)->getShortMessage(), 2, 60));
+				stream << t.cell("Texte long", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, (*it)->getLongMessage(), 6, 60));
+				stream << t.close();
+			}
+
+			if (updateRight)
+			{
+				stream << "<h1>Nouveau modèle de textes</h1>"; 
+				PropertiesHTMLTable ta(addRequest.getHTMLForm("add"));
+				stream << ta.open();
+				stream << ta.cell("Nom", ta.getForm().getTextInput(TextTemplateAddAction::PARAMETER_NAME, string()));
+				stream << ta.cell("Texte court", ta.getForm().getTextAreaInput(TextTemplateAddAction::PARAMETER_SHORT_MESSAGE, string(), 2, 60));
+				stream << ta.cell("Texte long", ta.getForm().getTextAreaInput(TextTemplateAddAction::PARAMETER_LONG_MESSAGE, string(), 6, 60));
+				stream << ta.close();
+			}
 		}
+
+
 
 		bool MessagesTemplateLibraryAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
 			return request->isAuthorized<MessagesLibraryRight>(READ);
 		}
 		
+
+
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
 			, const server::FunctionRequest<admin::AdminRequest>* request
-			) const	{
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
-				links.push_back(getPageLink());
+			{
+				MessagesTemplateLibraryAdmin a;
+				links.push_back(a.getPageLink());
+			}
 			return links;
 		}
 		
@@ -246,6 +228,27 @@ namespace synthese
 		bool MessagesTemplateLibraryAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
 		{
 			return true;
+		}
+
+
+
+		std::string MessagesTemplateLibraryAdmin::getTitle() const
+		{
+			return _folder.get() ? _folder->getName() : DEFAULT_TITLE;
+		}
+
+
+
+		std::string MessagesTemplateLibraryAdmin::getParameterName() const
+		{
+			return _folder.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+		}
+
+
+
+		std::string MessagesTemplateLibraryAdmin::getParameterValue() const
+		{
+			return _folder.get() ? Conversion::ToString(_folder->getKey()) : string();
 		}
 	}
 }

@@ -37,7 +37,7 @@ namespace dbring
        If this commit fails, the update record is marked as FAILED.
       
 
-@ingroup m03
+@ingroup m101
 */
 class ApplyUpdateThreadExec : public synthese::util::ThreadExec
 {

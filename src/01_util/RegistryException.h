@@ -37,7 +37,7 @@ namespace util
 
 
 /** Registry related exception class
-@ingroup m01Exceptions refExceptions
+@ingroup m01Registry m01Exceptions refExceptions
 */
 template<class K, class T>
 class RegistryException : public synthese::util::Exception

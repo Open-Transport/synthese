@@ -42,7 +42,7 @@ namespace synthese
 		class VertexAccessMap;
 
 		/** Journey class.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Journey
 		{
@@ -54,6 +54,8 @@ namespace synthese
 			typedef const env::ServiceUse& (Journey::*ServiceUseGetter) () const;
 			typedef const env::Edge* (Journey::*EdgeGetter) () const;
 			typedef time::DateTime (Journey::*DateTimeGetter) () const;
+			typedef void (Journey::*JourneyPusher) (const Journey& journey);
+			typedef void (Journey::*ServiceUsePusher) (const ServiceUse& serviceUse);
 
 			//! @name Content
 			//@{
@@ -92,9 +94,13 @@ namespace synthese
 				EdgeGetter							_beginEdgeGetter;
 				DateTimeGetter						_endDateTimeGetter;
 				DateTimeGetter						_beginDateTimeGetter;
+				JourneyPusher						_journeyPusher;
+				ServiceUsePusher					_serviceUsePusher;
 			//@}
 
 				void _setMethod(AccessDirection method);
+				void _prependServiceUse(const ServiceUse& leg);
+				void _appendServiceUse(const env::ServiceUse& leg);
 
 		 public:
 			Journey(AccessDirection method);
@@ -117,8 +123,6 @@ namespace synthese
 				*/
 				int getEffectiveDuration () const;
 	
-				int getTransportConnectionCount ();
-
 				/** Continuous service range of this journey.
 					@return Range duration in minutes, or 0 if unique service.
 				*/
@@ -127,6 +131,8 @@ namespace synthese
 				bool		getEndReached() const;
 				const time::DateTime::ComparisonOperator& getBestTimeStrictOperator() const;
 				int			getScore()	const;
+				int			getStartApproachDuration()	const;
+				int			getEndApproroachDuration()	const;
 			//@}
 
 			//! @name Setters
@@ -202,10 +208,7 @@ namespace synthese
 				void push(const ServiceUse& leg);
 				void push(const Journey& journey);
 				
-				void prepend (const ServiceUse& leg);
 				void prepend (const Journey& journey);
-
-				void append (const env::ServiceUse& leg);
 				void append (const Journey& journey);
 
 				void shift(int duration, int continuousServiceRange = UNKNOWN_VALUE);

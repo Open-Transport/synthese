@@ -47,7 +47,7 @@ PlainCharFilter::write(Sink& dest, const char* s, std::streamsize n)
     while (i != n)
     {
 	char c = s[i];
-	
+		
 	if ( 
 	    (c == 'á') || 
 	    (c == 'à') || 

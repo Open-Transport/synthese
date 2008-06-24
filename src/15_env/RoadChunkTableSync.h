@@ -36,7 +36,7 @@ namespace synthese
 	namespace env
 	{
 		/** RoadChunk table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class RoadChunkTableSync : public db::SQLiteRegistryTableSyncTemplate<RoadChunkTableSync,RoadChunk>
 		{

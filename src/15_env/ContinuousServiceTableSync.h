@@ -36,7 +36,7 @@ namespace synthese
 	namespace env
 	{
 		/** ContinuousService table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class ContinuousServiceTableSync : public db::SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>
 		{

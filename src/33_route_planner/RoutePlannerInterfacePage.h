@@ -77,6 +77,7 @@ namespace synthese
 				- 12 : solutions number
 				- 13 : accessibility code
 				- 14 : site id
+				- 15 : empty result because of same places
 		*/
 		class RoutePlannerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerInterfacePage>
 		{
@@ -88,7 +89,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
-				, const JourneyBoardJourneys& object
+				, const RoutePlannerResult& object
 				, const time::Date& date
 				, int periodId
 				, const env::Place* originPlace
@@ -98,6 +99,7 @@ namespace synthese
 				, const server::Request* request
 				, const transportwebsite::AccessibilityParameter& accessibility
 				, const transportwebsite::Site* site
+				, bool samePlaces
 			) const;
 
 			void display(

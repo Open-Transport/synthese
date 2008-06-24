@@ -33,6 +33,7 @@ namespace synthese
 	{
 		class AlarmTemplate;
 		class ScenarioTemplate;
+		class TextTemplate;
 
 		/** Journal concernant la bibliothèque de messages.
 
@@ -51,17 +52,35 @@ namespace synthese
 				const AlarmTemplate* alarm
 				, const std::string& text
 				, const security::User* user
-				);
+			);
 			static void	addUpdateEntry(
 				const ScenarioTemplate* scenario
 				, const std::string& text
 				, const security::User* user
-				);
+			);
 			static void addDeleteEntry(
 				const ScenarioTemplate* scenario
 				, const security::User* user
-				);
+			);
 			
+			static void AddTemplateDeleteEntry(
+				const TextTemplate& text
+				, const security::User* user
+			);
+			static void AddTemplateUpdateEntry(
+				const TextTemplate& text
+				, const std::string& changes
+				, const security::User* user
+			);
+			static void AddTemplateCreationEntry(
+				const TextTemplate& text
+				, const security::User* user
+			);
+			static void AddTemplateFolderUpdateEntry(
+				const TextTemplate& text
+				, const std::string& changes
+				, const security::User* user
+			);
 
 
 			/** Adds an Alarm deletion entry.

@@ -23,6 +23,8 @@
 #include "DrawablePhysicalStop.h"
 
 #include "15_env/PhysicalStop.h"
+#include "15_env/AddressablePlace.h"
+
 #include "01_util/RGBColor.h"
 
 #include "Map.h"
@@ -40,7 +42,7 @@ namespace map
 
 DrawablePhysicalStop::DrawablePhysicalStop (const synthese::env::PhysicalStop* physicalStop)
 : _physicalStopId (physicalStop->getId ())
-, _name (physicalStop->getName ())
+, _name (physicalStop->getPlace()->getName ())
 , _point (*physicalStop)
 {
 

@@ -49,6 +49,7 @@ namespace synthese
 		Path::Path ()
 			: Complyer()
 			, _calendar ()
+			, _allDays(false)
 		{
 		}
 		    
@@ -93,6 +94,7 @@ namespace synthese
 						+ " is already defined in path " + Conversion::ToString (getId ()));
 			}
 			markScheduleIndexesUpdateNeeded ();
+			service->setPath(this);
 		}
 
 
@@ -110,8 +112,7 @@ namespace synthese
 
 
 
-		bool 
-		Path::isInService (const synthese::time::Date& date) const
+		bool Path::isInService (const synthese::time::Date& date) const
 		{
 			return _allDays || _calendar.isMarked ( date );
 		}
@@ -325,6 +326,12 @@ namespace synthese
 
 
 
+		const Calendar& Path::getCalendar() const
+		{
+			return _calendar;
+		}
+
+
 	    void 
 	    Path::markScheduleIndexesUpdateNeeded()
 	    {
@@ -335,6 +342,13 @@ namespace synthese
 		void Path::setAllDays( bool value )
 		{
 			_allDays = value;
+		}
+
+
+
+		bool Path::getAllDays() const
+		{
+			return _allDays;
 		}
 
 		bool cmpService::operator ()(const Service *s1, const Service *s2) const

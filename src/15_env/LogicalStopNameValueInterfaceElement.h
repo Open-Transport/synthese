@@ -33,7 +33,7 @@ namespace synthese
 	{
 		/** Logical stop name.
 			@code stop_name @endcode
-			@ingroup m15Values refValues
+			@ingroup m35Values refLibrary
 		*/
 		class LogicalStopNameValueInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LogicalStopNameValueInterfaceElement>

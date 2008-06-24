@@ -37,7 +37,7 @@ namespace synthese
 
 
 		/** Thread related exception class
-		@ingroup m01Exceptions refExceptions
+		@ingroup m01Factory m01Exceptions refExceptions
 		*/
 
 		template<class T>

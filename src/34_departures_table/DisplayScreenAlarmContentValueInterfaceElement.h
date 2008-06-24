@@ -37,7 +37,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Value Interface Element : Display screen alarm content (if applicable).
-			@ingroup m34Values refValues
+			@ingroup m54Values refLibrary
 
 			Output : the alarm content if applicable
 			Parameters :

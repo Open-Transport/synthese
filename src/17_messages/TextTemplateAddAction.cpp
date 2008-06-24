@@ -24,8 +24,12 @@
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 
+#include "17_messages/MessagesLibraryLog.h"
+#include "17_messages/MessagesLibraryRight.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/ParametersMap.h"
+#include "30_server/Request.h"
 
 #include "01_util/Conversion.h"
 
@@ -36,6 +40,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::TextTemplateAddAction>::FACTORY_KEY("mttaa");
 	
@@ -45,6 +50,8 @@ namespace synthese
 		const string TextTemplateAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string TextTemplateAddAction::PARAMETER_SHORT_MESSAGE = Action_PARAMETER_PREFIX + "sm";
 		const string TextTemplateAddAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
+		const string TextTemplateAddAction::PARAMETER_IS_FOLDER(Action_PARAMETER_PREFIX + "if");
+		const string TextTemplateAddAction::PARAMETER_PARENT_ID(Action_PARAMETER_PREFIX + "pi");
 
 
 		ParametersMap TextTemplateAddAction::getParametersMap() const
@@ -65,7 +72,25 @@ namespace synthese
 			if (_level == ALARM_LEVEL_UNKNOWN)
 				throw ActionException("Bad value for level");
 			
-			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_level, _name, NULL, 0, 1);
+			_isFolder = map.getBool(PARAMETER_IS_FOLDER, true, false, FACTORY_KEY);
+
+			_parentId = map.getUid(PARAMETER_PARENT_ID, true, FACTORY_KEY);
+			if (_parentId > 0)
+			{
+				shared_ptr<const TextTemplate> parent;
+				try
+				{
+					parent = TextTemplateTableSync::Get(_parentId);
+				}
+				catch(...)
+				{
+					throw ActionException("No such folder");
+				}
+				if (!parent->getIsFolder())
+					throw ActionException("This is not a folder");
+			}
+
+			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::Search(_level, _parentId, _isFolder, _name, NULL, 0, 1);
 			if (!v.empty())
 				throw ActionException("Un texte portant ce nom existe déjà.");
 
@@ -75,12 +100,45 @@ namespace synthese
 
 		void TextTemplateAddAction::run()
 		{
-			shared_ptr<TextTemplate> tt(new TextTemplate);
-			tt->setAlarmLevel(_level);
-			tt->setLongMessage(_longMessage);
-			tt->setShortMessage(_shortMessage);
-			tt->setName(_name);
-			TextTemplateTableSync::save(tt.get());
+			TextTemplate tt;
+			tt.setAlarmLevel(_level);
+			tt.setLongMessage(_longMessage);
+			tt.setShortMessage(_shortMessage);
+			tt.setName(_name);
+			tt.setIsFolder(_isFolder);
+			tt.setParentId(_parentId);
+			TextTemplateTableSync::save(&tt);
+
+			// Log
+			MessagesLibraryLog::AddTemplateCreationEntry(tt, _request->getUser().get());
+		}
+
+
+
+		void TextTemplateAddAction::setLevel( AlarmLevel level )
+		{
+			_level = level;
+		}
+
+
+
+		bool TextTemplateAddAction::_isAuthorized() const
+		{
+			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+		}
+
+
+
+		void TextTemplateAddAction::setParentId(uid value)
+		{
+			_parentId = value;
+		}
+
+
+
+		void TextTemplateAddAction::setIsFolder( bool value )
+		{
+			_isFolder = value;
 		}
 	}
 }

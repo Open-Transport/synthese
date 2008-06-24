@@ -161,6 +161,7 @@ namespace synthese
 			VariablesMap vm;
 			if (_departure_place && _arrival_place)
 			{
+				// Initialisation
 				RoutePlanner r(
 					_departure_place
 					, _arrival_place
@@ -170,11 +171,21 @@ namespace synthese
 					, _endDate
 					, _maxSolutionsNumber
 				);
+				
+				// Computing
 				const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
+				
+				// Build of the result object
+				RoutePlannerResult result;
+				result.result = jv.journeys;
+				result.departurePlace = _departure_place;
+				result.arrivalPlace = _arrival_place;
+				
+				// Display
 				_page->display(
 					stream
 					, vm
-					, jv.journeys
+					, result
 					, _startDate.getDate()
 					, _periodId
 					, _departure_place
@@ -184,6 +195,7 @@ namespace synthese
 					, _request
 					, _accessibility
 					, _site.get()
+					, jv.samePlaces
 				);
 			}
 			else

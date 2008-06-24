@@ -23,6 +23,9 @@
 #include "DeleteTextTemplateAction.h"
 #include "TextTemplateTableSync.h"
 
+#include "17_messages/MessagesLibraryLog.h"
+#include "17_messages/MessagesLibraryRight.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -34,6 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::DeleteTextTemplateAction>::FACTORY_KEY("dtta");
 	
@@ -45,7 +49,7 @@ namespace synthese
 		ParametersMap DeleteTextTemplateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_text)
+			if (_text.get())
 				map.insert(PARAMETER_TEXT_ID, _text->getKey());
 			return map;
 		}
@@ -64,7 +68,23 @@ namespace synthese
 		}
 		void DeleteTextTemplateAction::run()
 		{
+			MessagesLibraryLog::AddTemplateDeleteEntry(*_text, _request->getUser().get());
+
 			TextTemplateTableSync::Remove(_text->getKey());
+		}
+
+
+
+		void DeleteTextTemplateAction::setTemplate( boost::shared_ptr<const TextTemplate> value )
+		{
+			_text = value;
+		}
+
+
+
+		bool DeleteTextTemplateAction::_isAuthorized() const
+		{
+			return _request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 		}
 	}
 }

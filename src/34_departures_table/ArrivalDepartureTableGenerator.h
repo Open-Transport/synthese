@@ -41,9 +41,9 @@ namespace synthese
 	{
 
 		/** Arrivals/Departures Table generator interface.
-			@ingroup m34
+			@ingroup m54
 
-			SYNTHESE3 : the place will be removed, replaced with the physical stops list which is enough for reaching the linestops
+			@todo the place will be removed, replaced with the physical stops list which is enough for reaching the linestops
 		*/
 		class ArrivalDepartureTableGenerator
 		{

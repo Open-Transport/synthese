@@ -191,14 +191,15 @@ namespace synthese
 
 
 
-		bool 
-		ReservationRule::isReservationPossible (
+		bool ReservationRule::isReservationPossible(
 			const DateTime& originDateTime
 			, const DateTime& reservationTime
 			, const DateTime& departureTime
 		) const {
-			return reservationTime <= getReservationDeadLine(originDateTime, departureTime )
-			&& reservationTime >= getReservationStartTime (reservationTime);
+			return	isCompliant() != false
+				&&	reservationTime <= getReservationDeadLine(originDateTime, departureTime )
+				&&	reservationTime >= getReservationStartTime (reservationTime)
+			;
 		}
 
 

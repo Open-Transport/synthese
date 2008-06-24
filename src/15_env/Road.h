@@ -40,7 +40,7 @@ namespace synthese
 		class RoadChunk;
 
 		/** Road class.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Road : 
 			public synthese::util::Registrable<uid,Road>, 

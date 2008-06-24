@@ -42,7 +42,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** DisplayScreen table synchronizer.
-			@ingroup m34LS refLS
+			@ingroup m54LS refLS
 		*/
 		class DisplayScreenTableSync : public db::SQLiteRegistryTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>
 		{

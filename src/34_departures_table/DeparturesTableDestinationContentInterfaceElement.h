@@ -35,7 +35,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Departure Table Destination Content Interface Element Class.
-			@ingroup m34Library refLibrary
+			@ingroup m54Library refLibrary
 
 			Parameters :
 				- 0 : Rank of first intermediate stop to display (1 = first intermediate stop)

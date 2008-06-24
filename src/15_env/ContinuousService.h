@@ -24,6 +24,7 @@
 #define SYNTHESE_ENV_CONTINUOUSSERVICE_H
 
 #include "15_env/NonPermanentService.h"
+#include "15_env/Types.h"
 
 #include "01_util/Registrable.h"
 
@@ -35,7 +36,7 @@ namespace synthese
 	{
 
 		/** Continuous service.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class ContinuousService : 
 			public util::Registrable<uid,ContinuousService>, 
@@ -99,7 +100,7 @@ namespace synthese
 					@warning The service index is unknown in the generated ServicePointer.					
 				*/
 				virtual ServicePointer getFromPresenceTime(
-					ServicePointer::DeterminationMethod method
+					AccessDirection method
 					, const Edge* edge
 					, const time::DateTime& presenceDateTime
 					, const time::DateTime& computingTime

@@ -38,7 +38,7 @@ namespace synthese
 	namespace interfaces
 	{
 		/** PlainCharFilterValueInterfaceElement value interface element class.
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 
 			Usage :
 			@code {{plain_char <param> <param>}} @endcode

@@ -40,17 +40,24 @@ template<typename Sink>
 bool 
 LowerCaseFilter::put(Sink& dest, int c)
 {
-    if ( c >= 'A' && c <= 'Z' )
-    {
-	return boost::iostreams::put(dest, c - 'A' + 'a');
+    if(
+		c >= 'A' && c <= 'Z'
+	){
+		return boost::iostreams::put(dest, c - 'A' + 'a');
     }
-    else if ( c >= '0' && c <= '9' || c >= 'a' && c <= 'z' )
-    {
-	return boost::iostreams::put(dest, c);
-    }
-    else 
-    {
-	return boost::iostreams::put(dest, ' ');
+	else if(
+		c >= 'À' && c <= 'Þ'
+	){
+		return boost::iostreams::put(dest, c - 'À' + 'à');
+	}
+	else if(
+		c == 'Œ'
+	){
+		return boost::iostreams::put(dest, 'œ');
+	}
+	else
+	{
+		return boost::iostreams::put(dest, c);
     }
 }
  

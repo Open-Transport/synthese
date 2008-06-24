@@ -26,6 +26,7 @@
 #include "EnvModule.h"
 
 #include "30_server/QueryString.h"
+#include "30_server/Request.h"
 
 #include "15_env/TransportNetwork.h"
 #include "15_env/TransportNetworkTableSync.h"
@@ -34,9 +35,13 @@
 #include "15_env/CommercialLineTableSync.h"
 #include "15_env/Line.h"
 #include "15_env/LineAdmin.h"
+#include "15_env/TransportNetworkRight.h"
 
+#include "32_admin/AdminRequest.h"
 #include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminParametersException.h"
+
+#include "05_html/SearchFormHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -48,6 +53,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace env;
+	using namespace security;
+	using namespace html;
 
 	namespace util
 	{
@@ -62,6 +69,8 @@ namespace synthese
 
 	namespace env
 	{
+		const string TransportNetworkAdmin::PARAMETER_SEARCH_NAME("sn");
+
 		TransportNetworkAdmin::TransportNetworkAdmin()
 			: AdminInterfaceElementTemplate<TransportNetworkAdmin>()
 		{ }
@@ -76,17 +85,76 @@ namespace synthese
 			{
 				throw AdminParametersException("No such network");
 			}
+
+			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
 		}
 		
 		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
-			/// @todo Implement the display by streaming the output to the stream variable
-			stream << "Not yet implemented, use treeview to navigate";
+			// Requests
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<TransportNetworkAdmin>();
+			searchRequest.setObjectId(_network->getKey());
+
+			FunctionRequest<AdminRequest> lineOpenRequest(request);
+			lineOpenRequest.getFunction()->setPage<CommercialLineAdmin>();
+
+
+			// Results
+			vector<shared_ptr<CommercialLine> > lines(CommercialLineTableSync::search(
+				_network->getKey()
+				, "%"+_searchName+"%"
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, false
+				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+				, _requestParameters.raisingOrder
+			));
+			ResultHTMLTable::ResultParameters	_resultParameters;
+			_resultParameters.setFromResult(_requestParameters, lines);
+
+
+			// Search form
+			stream << "<h1>Recherche</h1>";
+			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
+			stream << s.open();
+			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
+			HTMLForm sortedForm(s.getForm());
+			stream << s.close();
+
+
+			// Results display
+			stream << "<h1>Résultat de la recherche</h1>";
+			
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(string(), "N°"));
+			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
+			h.push_back(make_pair(string(), "Actions"));
+			ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
+
+			stream << t.open();
+			for (vector<shared_ptr<CommercialLine> >::const_iterator it(lines.begin()); it != lines.end(); ++it)
+			{
+				CommercialLine& line(**it);
+				lineOpenRequest.setObjectId(line.getKey());
+				stream << t.row();
+				stream << t.col(1, line.getStyle(), true);
+				stream << line.getShortName();
+				stream << t.col();
+				stream << line.getLongName();
+				stream << t.col();
+				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
+			}
+			stream << t.close();
+
+
+
 		}
 
 		bool TransportNetworkAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			return true;
+			return request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfParent(

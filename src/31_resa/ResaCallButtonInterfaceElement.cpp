@@ -31,6 +31,7 @@
 #include "31_resa/CallBeginAction.h"
 #include "31_resa/CallEndAction.h"
 #include "31_resa/ReservationRoutePlannerAdmin.h"
+#include "31_resa/ResaEditLogEntryAdmin.h"
 #include "31_resa/ResaModule.h"
 #include "31_resa/ResaRight.h"
 
@@ -86,9 +87,9 @@ namespace synthese
 			else
 			{
 				ActionFunctionRequest<CallEndAction,AdminRequest> callRequest(request);
-				callRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
+				callRequest.getFunction()->setPage<ResaEditLogEntryAdmin>();
+				callRequest.setObjectId(callId);
 				stream << HTMLModule::getLinkButton(callRequest.getURL(), _stopCallText->getValue(parameters,variables,object,request),string(), _stopCallIcon->getValue(parameters,variables,object,request));
-
 			}
 
 			return string();

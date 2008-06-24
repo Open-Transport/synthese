@@ -15,7 +15,7 @@ namespace env
 
 
 /** Environment related exception class
-@ingroup m15
+@ingroup m35
 */
 
 class Exception : public synthese::util::Exception

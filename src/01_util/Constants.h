@@ -23,24 +23,15 @@
 #ifndef SYNTHESE_Constants_H__
 #define SYNTHESE_Constants_H__
 
-/** @defgroup m01Exceptions 01 Exceptions
-	@ingroup m01
-	
-	@defgroup m01 01 Various utilities
-	@ingroup m0
-	@{
-*/
-
 namespace synthese
 {
+	/** @addtogroup m01
+		@{
+	*/
+
 	static const int UNKNOWN_VALUE = -1;
 
-	namespace util
-	{
-
-	}
+	/** @} */
 }
-
-/** @} */
 
 #endif // SYNTHESE_Constants_H__

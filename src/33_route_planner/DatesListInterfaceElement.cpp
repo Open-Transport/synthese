@@ -80,7 +80,7 @@ namespace synthese
 			{
 				stream << "<option ";
 				if ( iDate == dateDefaut )
-					stream << "selected=\"1\" ";
+					stream << "selected=\"selected\" ";
 				stream << "value=\"" << iDate.toSQLString(false) << "\">";
 				datePage->display(stream, variables, iDate, request);
 				stream << "</option>";

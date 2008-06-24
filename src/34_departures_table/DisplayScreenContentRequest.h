@@ -34,19 +34,22 @@ namespace synthese
 	namespace departurestable
 	{
 		class DisplayScreen;
+		class DisplayType;
 
 		/** DisplayScreenContentRequest class.
-			@ingroup m34Functions refFunctions
+			@ingroup m54Functions refFunctions
 		*/
 		class DisplayScreenContentRequest : public util::FactorableTemplate<server::Function,DisplayScreenContentRequest>
 		{
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_TB;
+			static const std::string PARAMETER_INTERFACE_ID;
 			
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const DisplayScreen>	_screen;
-				time::DateTime			_date;
+				boost::shared_ptr<DisplayType>			_type;
+				time::DateTime							_date;
 			//@}
 
 

@@ -18,6 +18,9 @@ namespace synthese
 
 namespace dbring
 {
+	/** @addtogroup m101
+		@{
+	*/
 
     typedef int NodeId;
     typedef int RingId;
@@ -78,6 +81,7 @@ bool operator== (const NodeInfo& op1, const NodeInfo& op2);
 bool operator!= (const NodeInfo& op1, const NodeInfo& op2);
 
 
+		/** @} */
 }
 }
 

@@ -49,7 +49,7 @@ namespace synthese
 		- a physical stop address
 		- a public place address
 
-		 @ingroup m15
+		 @ingroup m35
 		*/
 		class RoadChunk : 
 			public synthese::util::Registrable<uid,RoadChunk>,

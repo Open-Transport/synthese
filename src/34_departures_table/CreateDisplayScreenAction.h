@@ -41,7 +41,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** Display screen creation action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class CreateDisplayScreenAction : public util::FactorableTemplate<server::Action, CreateDisplayScreenAction>
 		{

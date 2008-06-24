@@ -17,7 +17,7 @@ namespace geometry
 
 
 /** Projection service functions
-    @ingroup m14
+    @ingroup m09
 */
 
 namespace geography

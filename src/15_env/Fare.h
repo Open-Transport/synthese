@@ -45,7 +45,7 @@ namespace synthese
 				- indeterminate : no sense
 				- false : toll free
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Fare
 			: public util::RegistrableWithNeutralElement<uid,Fare>

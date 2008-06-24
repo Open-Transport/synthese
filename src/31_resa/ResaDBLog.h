@@ -84,6 +84,8 @@ namespace synthese
 			typedef enum
 			{
 				CALL_ENTRY = 10
+				, RADIO_CALL = 12
+				, AUTO_CALL_ENTRY = 14
 				, FAKE_CALL = 15
 				, RESERVATION_ENTRY = 20
 				, CANCELLATION_ENTRY = 30

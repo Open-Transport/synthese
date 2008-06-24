@@ -41,7 +41,9 @@ namespace dbring
 
 
 
-
+/** .
+	@ingroup m101
+*/
 class UpdateRecordTableSync : public db::SQLiteDirectTableSyncTemplate<UpdateRecordTableSync,UpdateRecord>
 {
 

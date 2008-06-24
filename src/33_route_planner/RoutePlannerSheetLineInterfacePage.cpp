@@ -39,7 +39,7 @@ namespace synthese
 			, bool isOrigin
 			, bool isDestination
 			, VariablesMap& variables,
-		    const env::ConnectionPlace* place, 
+		    const env::Place* place, 
 		    const server::Request* request /*= NULL */
 		) const {
 			ParametersVector pv;

@@ -35,7 +35,7 @@ namespace synthese
 
 		/** Rolling stock.
 		 TRIDENT = VehicleType
-		 @ingroup m15
+		 @ingroup m35
 		*/
 		class RollingStock : public synthese::util::Registrable<uid,RollingStock>
 		{

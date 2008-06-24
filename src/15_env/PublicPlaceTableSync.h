@@ -36,7 +36,7 @@ namespace synthese
 	namespace env
 	{
 		/** PublicPlace table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class PublicPlaceTableSync : public db::SQLiteRegistryTableSyncTemplate<PublicPlaceTableSync,PublicPlace>
 		{

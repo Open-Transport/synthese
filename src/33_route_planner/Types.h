@@ -33,6 +33,7 @@ namespace synthese
 	{
 		class ConnectionPlace;
 		class Journey;
+		class Place;
 	}
 
 	namespace routeplanner
@@ -44,6 +45,13 @@ namespace synthese
 
 		typedef std::vector<env::Journey*>			JourneyBoardJourneys;
 		typedef std::vector<const env::ConnectionPlace*>	JourneyBoardPlaces;
+
+		struct RoutePlannerResult
+		{
+			JourneyBoardJourneys	result;
+			const env::Place*		departurePlace;
+			const env::Place*		arrivalPlace;
+		};
 
 		typedef enum { USE_ROADS, DO_NOT_USE_ROADS } UseRoads;
 		typedef enum { USE_LINES, DO_NOT_USE_LINES } UseLines;

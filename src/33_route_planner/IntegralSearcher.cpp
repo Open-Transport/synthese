@@ -30,6 +30,13 @@
 #include "15_env/Path.h"
 #include "15_env/ConnectionPlace.h"
 #include "15_env/Journey.h"
+#include "15_env/JourneyComparator.h"
+
+// To be removed by a log class
+#include "15_env/LineStop.h"
+#include "15_env/Road.h"
+#include "15_env/Line.h"
+#include "15_env/CommercialLine.h"
 
 #include "04_time/DateTime.h"
 
@@ -57,7 +64,7 @@ namespace synthese
 			, SearchPhysicalStops searchPhysicalStops
 			, UseRoads useRoads
 			, UseLines useLines
-			, JourneysResult&				result
+			, JourneysResult<env::JourneyComparator>&				result
 			, BestVertexReachesMap& bestVertexReachesMap
 			, const VertexAccessMap& destinationVam
 			, const DateTime& calculationDateTime
@@ -89,303 +96,323 @@ namespace synthese
 			, _logLevel(logLevel)
 		{	}
 
-// ------------------------------------------------------------------- 2 Initialization
+
 
 		void IntegralSearcher::integralSearch(
-			const VertexAccessMap& vertices
-			, const DateTime& desiredTime
-			, bool strictTime /*= false  */
-		){
-			_integralSearchRecursion(
-				vertices
-				, desiredTime
-				, Journey(_accessDirection)
-				, _maxDepth
-				, strictTime
-				);
-
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-			){
-				stringstream s;
-				if (_accessDirection == TO_DESTINATION)
-					s << "TO_DESTINATION";
-				else
-					s << "FROM_ORIGIN   ";
-				s	<< " Initial IntegralSearch. Start : "
-					<< " at " << desiredTime.toString()
-				;
-
-				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-					Log::GetInstance().trace(s.str());
-				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-					*_logStream << s.str();
-			}
-		}
-
-		void IntegralSearcher::integralSearch(
-			const env::Journey& journey
-		){
-			assert(!journey.empty());
-
-			VertexAccessMap vertices;
-			const Vertex* vertex(journey.getEndEdge()->getFromVertex());
-			vertex->getPlace()->getImmediateVertices(
-				vertices
-				, _accessDirection
-				, _accessParameters
-				, _searchAddresses
-				, _searchPhysicalStops
-				, vertex
-				);
-
-			_integralSearchRecursion(
-				vertices
-				, journey.getEndTime()
-				, journey
-				, _maxDepth
-				, false
-			);
-
-
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-			){
-				string spaces(journey.getServiceUses().size(), '*');
-
-				stringstream s;
-				s	<< spaces;
-				if (_accessDirection == TO_DESTINATION)
-					s << "TO_DESTINATION";
-				else
-					s << "FROM_ORIGIN   ";
-				s	<< " IntegralSearch. Start : "
-					<< journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
-					<< " at " << journey.getEndTime().toString();
-
-				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-					Log::GetInstance().trace(s.str());
-				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-					*_logStream << s.str();
-			}
-		}
-// ------------------------------------------------------------------------ 3 Recursion
-
-		void IntegralSearcher::_integralSearchRecursion(
-			const env::VertexAccessMap& vam
-			, const time::DateTime& desiredTime
-			, const Journey& currentJourney
+			const env::VertexAccessMap& startVam
+			, const time::DateTime& startTime
+			, const Journey& startJourney
 			, int maxDepth
 			, bool strictTime /*= false  */ 
 		){
-			// Local variables initialization
-			map<const Vertex*, Journey*> recursionVertices;
+			// Recusrions to do
+			JourneysResult<_JourneyComparator> todo;
+			todo.addEmptyJourney(startJourney.getMethod());
 
-			// Loop on each origin vertex
-			for(std::map<const Vertex*, VertexAccess>::const_iterator itVertex(vam.getMap ().begin());
-				itVertex != vam.getMap ().end ()
-				; ++itVertex
-			){
-				// Initialization of loop local variables
-				const Vertex* origin(itVertex->first);
-				
-				if (origin->isAddress() && _useRoads != USE_ROADS
-					|| origin->isPhysicalStop() && _useLines != USE_LINES)
-					continue;
+			string s("<table class=\"adminresults\">");
+			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+				Log::GetInstance().trace(s);
+			if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+				*_logStream << s;
 
-				// Approach to the vertex
-				Journey fullApproachJourney(currentJourney);
-				if(fullApproachJourney.empty())
-					fullApproachJourney.setStartApproachDuration(itVertex->second.approachTime);
-
-				DateTime correctedDesiredTime(desiredTime);
-				if (_accessDirection == TO_DESTINATION)
-					correctedDesiredTime += static_cast<int>(itVertex->second.approachTime);
-				else
-					correctedDesiredTime -= static_cast<int>(itVertex->second.approachTime);
-
-				// Goal edges loop
-				const std::set<const Edge*>& edges((_accessDirection == TO_DESTINATION) ? origin->getDepartureEdges() : origin->getArrivalEdges());
-
-				for (std::set<const Edge*>::const_iterator itEdge = edges.begin ();
-					itEdge != edges.end () ; ++itEdge)
-				{
-					const Edge* edge = (*itEdge);
-
-					if (!_accessParameters.isCompatibleWith(*edge->getParentPath()))
-						continue;
-
-					/// @todo reintroduce optimization on following axis departure/arrival ?
-					if (!currentJourney.verifyAxisConstraints(edge->getParentPath()->getAxis()))
-						continue;
-
-					int serviceNumber(UNKNOWN_VALUE);
-					for(bool loopOnServices(true); loopOnServices;)
-					{
-						// Reach of the next/previous service serving the edge
-						DateTime departureMoment(correctedDesiredTime);
-						ServicePointer serviceInstance(
-							(_accessDirection == TO_DESTINATION)
-							?	edge->getNextService (
-									departureMoment
-									, _minMaxDateTimeAtDestination
-									, _calculationTime
-									, true
-									, serviceNumber
-									, _inverted
-								)
-							:	edge->getPreviousService(
-									departureMoment
-									, _minMaxDateTimeAtDestination
-									, _calculationTime
-									, true
-									, serviceNumber
-									, _inverted
-								)
-						);
-						loopOnServices = false;
-
-						// If no service, advande to the next edge
-						if (!serviceInstance.getService())
-							continue;
-
-						// Strict time control if the departure time must be exactly the desired one (optimization only)
-						if (strictTime && serviceInstance.getActualDateTime() != correctedDesiredTime)
-							continue;
-
-						serviceNumber = serviceInstance.getServiceIndex() + 1;
-
-						// Check for service compliancy rules.
-						/// @todo ERROR : must be integrated in ServicePointer constructor. A similar line can be written for edge level.
-	//					if (!serviceInstance.getService()->isCompatibleWith(_accessParameters.complyer))
-	//						continue;
-
-						PtrEdgeStep step(	
-							(_accessDirection == TO_DESTINATION)
-								? (	_destinationVam.needFineSteppingForArrival (edge->getParentPath ())
-									? (&Edge::getFollowingArrivalForFineSteppingOnly)
-									: (&Edge::getFollowingConnectionArrival)
-								):( _destinationVam.needFineSteppingForDeparture (edge->getParentPath ())
-									? (&Edge::getPreviousDepartureForFineSteppingOnly)
-									: (&Edge::getPreviousConnectionDeparture)
-								))
-							;
-
-						// The path is traversed
-						for (const Edge* curEdge = (edge->*step) ();
-							curEdge != 0; curEdge = (curEdge->*step) ())
-						{
-							// The reached vertex is analyzed only in two cases :
-							//  - if the vertex belongs to the goal
-							//  - if the vertex is a connecting vertex
-							const Vertex* reachedVertex(curEdge->getFromVertex());
-							bool isGoalReached(_destinationVam.contains(reachedVertex));
-							if (!reachedVertex->isConnectionAllowed() && !isGoalReached)
-								continue;
-							
-							// Storage of the useful solution
-							Journey* resultJourney = new Journey(fullApproachJourney);
-							ServiceUse serviceUse(serviceInstance, curEdge);
-							if (_accessDirection == FROM_ORIGIN && !serviceUse.isReservationRuleCompliant(_calculationTime))
-								continue;
-
-							if (_accessDirection == TO_DESTINATION)
-								resultJourney->append (serviceUse);
-							else
-								resultJourney->prepend(serviceUse);
-							if (isGoalReached)
-								resultJourney->setEndApproachDuration(_destinationVam.getVertexAccess(reachedVertex).approachTime);
-								
-
-							// Analyze of the utility of the edge
-							// If the edge is useless, the path is not traversed anymore
-							pair<bool,bool> evaluationResult(evaluateJourney(*resultJourney, _optim));
-							if (!evaluationResult.first)
-							{
-								delete resultJourney;
-
-								if (!evaluationResult.second)
-									break;
-								else
-									continue;
-							}
-
-							// Storage of the journey for recursion
-							if (maxDepth > 0)
-							{
-								map<const Vertex*, Journey*>::iterator itr(recursionVertices.find(reachedVertex));
-								if (itr != recursionVertices.end())
-								{
-									delete itr->second;
-									itr->second = new Journey(*resultJourney);
-								}
-								else
-									recursionVertices.insert(make_pair<const Vertex*, Journey*>(reachedVertex, new Journey(*resultJourney)));
-							}
-
-							resultJourney->setEndReached(isGoalReached);
-							resultJourney->setSquareDistanceToEnd(_destinationVam);
-							resultJourney->setMinSpeedToEnd(_minMaxDateTimeAtDestination);
-
-							// Storage of the journey as a result
-							if(	(	_searchAddresses == SEARCH_ADDRESSES
-								&&	reachedVertex->getConnectionPlace()->hasAddresses()
-								)
-							||	(	_searchPhysicalStops == SEARCH_PHYSICALSTOPS
-								&&	reachedVertex->getConnectionPlace()->hasPhysicalStops()
-								)
-							||	isGoalReached
-							)	_result.add(resultJourney);
-
-							// Storage of the reach time at the vertex in the best vertex reaches map
-							_bestVertexReachesMap.insert (serviceUse);
-
-							// Storage of the reach time at the goal if applicable
-							if (isGoalReached)
-							{
-								_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
-								if (_accessDirection == TO_DESTINATION)
-									_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
-								else
-									_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
-							}
-						} // next arrival edge
-					} // next service
-				} // next departure edge
-			} // next vertex in vam
-
-
-			// Recursion on each service use
-			if (maxDepth > 0)
+			// The Loop
+			while(!todo.empty())
 			{
-				// Now iterate on each journey leg and call recursively the integral search
-				for(map<const Vertex*, Journey*>::const_iterator itLeg(recursionVertices.begin());
-					itLeg != recursionVertices.end();
-					++itLeg
-				){
-					const Journey& journey(*itLeg->second);
-					const ServiceUse& serviceUse(journey.getEndServiceUse());
-					const Vertex* nextVertex(itLeg->first);
+				const Journey* journey(todo.front());
 
-					VertexAccessMap nextVam;
-					nextVertex->getPlace ()->getImmediateVertices(
-						nextVam,
+				if(	!journey->empty()
+				&&	(Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+					|| _logLevel <= Log::LEVEL_TRACE
+					)
+				){
+					stringstream stream;
+					stream
+						<< "<tr>"
+						<< "<th colspan=\"7\">Journey</th>"
+						<< "</tr>"
+						;
+					
+					// Departure time
+					Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
+
+/*					if (journey->getContinuousServiceRange() > 1)
+					{
+						DateTime endRange(its->getDepartureDateTime());
+						endRange += journey->getContinuousServiceRange();
+						stream << " - Service continu jusqu'à " << endRange.toString();
+					}
+					if (journey->getReservationCompliance() == true)
+					{
+						stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine().toString();
+					}
+					if (journey->getReservationCompliance() == boost::logic::indeterminate)
+					{
+						stream << " - Réservation facultative avant le " << journey->getReservationDeadLine().toString();
+					}
+*/
+					stream << "<tr>";
+					stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+
+					// Line
+					const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
+					const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+					stream << "<td";
+					if (ls)
+						stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
+					stream << ">";
+					stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName()) << "</td>";
+
+					// Transfers
+					if (its == journey->getServiceUses().end() -1)
+					{
+						stream << "<td colspan=\"4\">(trajet direct)</td>";
+					}
+					else
+					{
+						while(true)
+						{
+							// Arrival
+							stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
+
+							// Place
+							stream << "<td>" << its->getArrivalEdge()->getPlace()->getFullName() << "</td>";
+
+							// Next service use
+							++its;
+
+							// Departure
+							stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+
+							// Line
+							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
+							const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+							stream << "<td";
+							if (ls)
+								stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
+							stream << ">";
+							stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName()) << "</td>";
+
+							// Exit if last service use
+							if (its == journey->getServiceUses().end() -1)
+								break;
+
+							// Empty final arrival col
+							stream << "<td></td>";
+
+							// New row and empty origin departure cols;
+							stream << "</tr><tr>";
+							stream << "<td></td>";
+							stream << "<td></td>";
+						}
+					}
+
+					// Final arrival
+					stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
+
+
+					string s(todo.getLog());
+					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					{
+						Log::GetInstance().trace(stream.str());
+						Log::GetInstance().trace(s);
+					}
+					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+					{
+						*_logStream << stream.str();
+						*_logStream << s;
+					}
+				}
+
+				VertexAccessMap vam;
+				DateTime desiredTime(TIME_UNKNOWN);
+				if (journey->empty())
+				{
+					vam = startVam;
+					desiredTime = startTime;
+				}
+				else
+				{
+					journey->getEndEdge()->getFromVertex()->getConnectionPlace()->getImmediateVertices(
+						vam,
 						_accessDirection,
 						_accessParameters
 						, (_useRoads == USE_ROADS) ? SEARCH_ADDRESSES : DO_NOT_SEARCH_ADDRESSES
 						, (_useLines == USE_LINES) ? SEARCH_PHYSICALSTOPS : DO_NOT_SEARCH_PHYSICALSTOPS
-						, nextVertex
+						, journey->getEndEdge()->getFromVertex()
 					);
-
-					_integralSearchRecursion(
-						nextVam
-						, serviceUse.getSecondActualDateTime()
-						, journey
-						, maxDepth - 1
-						, false
-					);
+					desiredTime = journey->getEndTime();
 				}
-			}
+
+				Journey currentJourney(startJourney);
+				currentJourney.push(*journey);
+
+				// Loop on each origin vertex
+				for(std::map<const Vertex*, VertexAccess>::const_iterator itVertex(vam.getMap ().begin())
+					; itVertex != vam.getMap ().end ()
+					; ++itVertex
+				){
+					// Initialization of loop local variables
+					const Vertex* origin(itVertex->first);
+
+					if (origin->isAddress() && _useRoads != USE_ROADS
+						|| origin->isPhysicalStop() && _useLines != USE_LINES)
+						continue;
+
+					// Approach to the vertex
+					Journey fullApproachJourney(currentJourney);
+					if(fullApproachJourney.empty())
+						fullApproachJourney.setStartApproachDuration(itVertex->second.approachTime);
+
+					DateTime correctedDesiredTime(desiredTime);
+					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
+						correctedDesiredTime += static_cast<int>(itVertex->second.approachTime);
+					else
+						correctedDesiredTime -= static_cast<int>(itVertex->second.approachTime);
+
+					// Goal edges loop
+					const std::set<const Edge*>& edges((_accessDirection == DEPARTURE_TO_ARRIVAL) ? origin->getDepartureEdges() : origin->getArrivalEdges());
+
+					for(std::set<const Edge*>::const_iterator itEdge = edges.begin ()
+						; itEdge != edges.end ()
+						; ++itEdge
+					){
+						const Edge* edge = (*itEdge);
+
+						if (!_accessParameters.isCompatibleWith(*edge->getParentPath()))
+							continue;
+
+						/// @todo reintroduce optimization on following axis departure/arrival ?
+						if (!currentJourney.verifyAxisConstraints(edge->getParentPath()->getAxis()))
+							continue;
+
+						int serviceNumber(UNKNOWN_VALUE);
+						for(bool loopOnServices(true); loopOnServices;)
+						{
+							// Reach of the next/previous service serving the edge
+							DateTime departureMoment(correctedDesiredTime);
+							ServicePointer serviceInstance(
+								(_accessDirection == DEPARTURE_TO_ARRIVAL)
+								?	edge->getNextService (
+										departureMoment
+										, _minMaxDateTimeAtDestination
+										, _calculationTime
+										, true
+										, serviceNumber
+										, _inverted
+									)
+								:	edge->getPreviousService(
+										departureMoment
+										, _minMaxDateTimeAtDestination
+										, _calculationTime
+										, true
+										, serviceNumber
+										, _inverted
+									)
+							);
+							loopOnServices = false;
+
+							// If no service, advance to the next edge
+							if (!serviceInstance.getService())
+								continue;
+
+							// Strict time control if the departure time must be exactly the desired one (optimization only)
+							if (strictTime && serviceInstance.getActualDateTime() != correctedDesiredTime)
+								continue;
+
+							serviceNumber = serviceInstance.getServiceIndex() + 1;
+
+							// Check for service compliance rules.
+							/// @todo ERROR : must be integrated in ServicePointer constructor. A similar line can be written for edge level.
+							//					if (!serviceInstance.getService()->isCompatibleWith(_accessParameters.complyer))
+							//						continue;
+
+							PtrEdgeStep step(	
+								(_accessDirection == DEPARTURE_TO_ARRIVAL)
+								?(	_useRoads == USE_ROADS || _destinationVam.needFineSteppingForArrival (edge->getParentPath ())
+									? (&Edge::getFollowingArrivalForFineSteppingOnly)
+									: (&Edge::getFollowingConnectionArrival)
+								):(	_useRoads == USE_ROADS || _destinationVam.needFineSteppingForDeparture (edge->getParentPath ())
+									? (&Edge::getPreviousDepartureForFineSteppingOnly)
+									: (&Edge::getPreviousConnectionDeparture)
+								)
+							);
+
+							// The path is traversed
+							for (const Edge* curEdge = (edge->*step) ();
+								curEdge != 0; curEdge = (curEdge->*step) ())
+							{
+								// The reached vertex is analyzed only in two cases :
+								//  - if the vertex belongs to the goal
+								//  - if the vertex is a connecting vertex
+								const Vertex* reachedVertex(curEdge->getFromVertex());
+								bool isGoalReached(_destinationVam.contains(reachedVertex));
+								
+								// In road integral search, all nodes are potential connection points
+								if (_useRoads != USE_ROADS && !reachedVertex->isConnectionAllowed() && !isGoalReached)
+									continue;
+
+								// Storage of the useful solution
+								Journey* resultJourney(new Journey(fullApproachJourney));
+								ServiceUse serviceUse(serviceInstance, curEdge);
+								if (_accessDirection == ARRIVAL_TO_DEPARTURE && !serviceUse.isReservationRuleCompliant(_calculationTime))
+									continue;
+
+								resultJourney->push(serviceUse);
+
+								if (isGoalReached)
+									resultJourney->setEndApproachDuration(_destinationVam.getVertexAccess(reachedVertex).approachTime);
+
+
+								// Analyze of the utility of the edge
+								// If the edge is useless, the path is not traversed anymore
+								pair<bool,bool> evaluationResult(evaluateJourney(*resultJourney, _optim));
+								if (!evaluationResult.first)
+								{
+									delete resultJourney;
+
+									if (!evaluationResult.second)
+										break;
+									else
+										continue;
+								}
+
+								resultJourney->setEndReached(isGoalReached);
+								resultJourney->setSquareDistanceToEnd(_destinationVam);
+								resultJourney->setMinSpeedToEnd(_minMaxDateTimeAtDestination);
+
+								// Storage of the journey for recursion
+								if (journey->getJourneyLegCount() < maxDepth)
+								{
+									Journey* todoJourney(new Journey(*journey));
+									todoJourney->push(serviceUse);
+									todo.add(todoJourney);
+								}
+
+								// Storage of the journey as a result
+								if(	(	_searchAddresses == SEARCH_ADDRESSES
+										&&	reachedVertex->getConnectionPlace()->hasAddresses()
+									)||(_searchPhysicalStops == SEARCH_PHYSICALSTOPS
+										&&	reachedVertex->getConnectionPlace()->hasPhysicalStops()
+									)||	isGoalReached
+								)	_result.add(resultJourney);
+
+								// Storage of the reach time at the vertex in the best vertex reaches map
+								_bestVertexReachesMap.insert (serviceUse);
+
+								// Storage of the reach time at the goal if applicable
+								if (isGoalReached)
+								{
+									_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
+									if (_accessDirection == DEPARTURE_TO_ARRIVAL)
+										_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
+									else
+										_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
+								}
+							} // next arrival edge
+						} // next service
+					} // next departure edge
+				} // next vertex in vam
+			} // Next place to explore (todo)
 
 			// Validating all the service uses compared to the final result list
 /*			for (IntegralSearchWorkingResult::iterator it(result.begin()); it != result.end();)
@@ -399,6 +426,26 @@ namespace synthese
 				}
 			}
 */
+			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
+				|| _logLevel <= Log::LEVEL_TRACE
+				){
+					stringstream s;
+					s << "<tr><th colspan=\"7\">";
+					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
+						s << "DEPARTURE_TO_ARRIVAL";
+					else
+						s << "ARRIVAL_TO_DEPARTURE   ";
+					s	<< " IntegralSearch. Start "
+						<< " at " << startTime.toString()
+						<< "</th></tr>"
+						<< "</table>"
+						;
+
+					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+						Log::GetInstance().trace(s.str());
+					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+						*_logStream << s.str();
+			}
 
 		}
 
@@ -419,7 +466,7 @@ namespace synthese
 				/** - If the edge is an address, the currentJourney necessarily contains
 					only road legs, filter approach (= walk distance and duration).
 				*/
-				if(_accessParameters.isCompatibleWithApproach(journey.getDistance(), journey.getEffectiveDuration()))
+				if(!_accessParameters.isCompatibleWithApproach(journey.getDistance(), journey.getEffectiveDuration()))
 					return make_pair(false,false);
 			}
 
@@ -437,10 +484,10 @@ namespace synthese
 			/** - To be worse than the absolute best time is forbidden. */
 			const DateTime& reachDateTime(serviceUse.getSecondActualDateTime());
 			const AccessDirection& method(journey.getMethod());
-			if(	(	(method == FROM_ORIGIN)
+			if(	(	(method == ARRIVAL_TO_DEPARTURE)
 				&&	(reachDateTime < _minMaxDateTimeAtDestination)
 				)
-			||	(	(method == TO_DESTINATION)
+			||	(	(method == DEPARTURE_TO_ARRIVAL)
 				&&	(reachDateTime > _minMaxDateTimeAtDestination)
 				)
 			)	return make_pair(false,false);
@@ -473,15 +520,15 @@ namespace synthese
 					+ 1															// Minimal time to reach the goal
 				);
 
-				if (method == TO_DESTINATION)
+				if (method == DEPARTURE_TO_ARRIVAL)
 					bestHopedGoalAccessDateTime += minimalGoalReachDuration;
 				else
 					bestHopedGoalAccessDateTime -= minimalGoalReachDuration;
 
-				if(	(	(method == FROM_ORIGIN)
+				if(	(	(method == ARRIVAL_TO_DEPARTURE)
 					&&	(bestHopedGoalAccessDateTime < _minMaxDateTimeAtDestination)
 					)
-				||	(	(method == TO_DESTINATION)
+				||	(	(method == DEPARTURE_TO_ARRIVAL)
 					&&	(bestHopedGoalAccessDateTime > _minMaxDateTimeAtDestination)
 					)
 				)	return make_pair(false,true);
@@ -490,15 +537,32 @@ namespace synthese
 			/** - Best vertex map control : the service use is useful only if no other already founded
 				service use reaches the vertex at a strictly better time.
 			*/
-			if( (	(method == FROM_ORIGIN)
+			if( (	(method == ARRIVAL_TO_DEPARTURE)
 				&&	(reachDateTime < _bestVertexReachesMap.getBestTime(reachedVertex, reachDateTime))
 				)
-			||	(	(method == TO_DESTINATION)
+			||	(	(method == DEPARTURE_TO_ARRIVAL)
 				&&	(reachDateTime > _bestVertexReachesMap.getBestTime (reachedVertex, reachDateTime))
 				)
 			)	return make_pair(false,true);
 
 			return make_pair(true,true);
+		}
+
+
+
+		bool IntegralSearcher::_JourneyComparator::operator() (const Journey* j1, const Journey* j2) const
+		{
+			assert(j1 != NULL);
+			assert(j2 != NULL);
+			assert(j1->getMethod() == j2->getMethod());
+
+			int duration1(j1->getDuration());
+			int duration2(j2->getDuration());
+
+			if (duration1 != duration2)
+				return duration1 < duration2;
+
+			return j1 < j2;
 		}
 	}
 }

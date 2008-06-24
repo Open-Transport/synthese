@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_MapModule_H__
 #define SYNTHESE_MapModule_H__
 
+#include "01_util/FactorableTemplate.h"
 
 #include "01_util/FactorableTemplate.h"
 #include "02_db/DbModuleClass.h"

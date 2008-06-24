@@ -93,6 +93,7 @@ namespace synthese
 
 			//! \name Cached used days
 			//@{
+				bool	_useOldData;
 				int		_useDateRange;
 				Periods	_periods;
 			//@}
@@ -125,11 +126,12 @@ namespace synthese
 				const interfaces::Interface*	getInterface() const;
 				bool							getOnlineBookingAllowed() const;
 				bool							getPastSolutionsDisplayed() const;
-				const time::Date				getMinUseDate() const;
-				const time::Date				getMaxUseDate() const;
 				int								getMaxTransportConnectionsCount()	const;
 				const Periods&					getPeriods()	const;
 				const std::string&				getName()							const;
+				int								getUseDatesRange()					const;
+				const time::Date&				getStartDate()						const;
+				const time::Date&				getEndDate()						const;
 			//@}
 
 			// \name Modifiers
@@ -149,6 +151,9 @@ namespace synthese
 				env::AccessParameters	getAccessParameters(AccessibilityParameter parameter)	const;
 	
 				bool dateControl() const;
+
+				const time::Date				getMinUseDate() const;
+				const time::Date				getMaxUseDate() const;
 
 				/** Interprets date from text and environment data.
 					@param text Text to interpret

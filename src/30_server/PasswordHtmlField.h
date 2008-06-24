@@ -32,7 +32,7 @@ namespace synthese
 	namespace server
 	{
 		/** Password HTML Input field Value Interface Element Class.
-			@ingroup m18Values refValues
+			@ingroup m18Values refLibrary
 		*/
 		class PasswordHtmlField
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, PasswordHtmlField>

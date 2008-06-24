@@ -33,7 +33,7 @@ namespace synthese
 	{
 
 		/** DisplayScreenAlarmRecipient class.
-			@ingroup m34 refAlarmrecipients
+			@ingroup m54Messages refAlarmrecipients
 		*/
 		class DisplayScreenAlarmRecipient : public messages::AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>
 		{

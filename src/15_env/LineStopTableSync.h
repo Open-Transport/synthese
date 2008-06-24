@@ -36,7 +36,7 @@ namespace synthese
 	namespace env
 	{
 		/** LineStop table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class LineStopTableSync : public db::SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>
 		{

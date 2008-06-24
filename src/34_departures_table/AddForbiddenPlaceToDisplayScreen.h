@@ -39,7 +39,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** AddForbiddenPlaceToDisplayScreen action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class AddForbiddenPlaceToDisplayScreen : public util::FactorableTemplate<server::Action,AddForbiddenPlaceToDisplayScreen>
 		{

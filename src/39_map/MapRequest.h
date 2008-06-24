@@ -24,6 +24,7 @@
 #define SYNTHESE_MapRequest_H__
 
 #include "01_util/FactorableTemplate.h"
+
 #include "30_server/Function.h"
 
 #include "15_env/Axis.h"
@@ -44,43 +45,76 @@ namespace synthese
 	    /** MapRequest class.
 			@ingroup m59Functions refFunctions
 	    */
-	    class MapRequest : public util::FactorableTemplate<server::Function, MapRequest>
+		class MapRequest : public util::FactorableTemplate<server::Function, MapRequest>
 	    {
 		
 	    private:
-		std::string _output;
+			//! @name Query
+			//@{
+				std::string _output;
+				std::string _query;
+			//@}
 
-		// @todo use shared_ptr in registry so that memory is not a pb anymore 
-		// and that we can copy (and complete static module regitries here)
-		synthese::env::City::Registry _cities;
-		synthese::env::Axis::Registry _axes;
-		synthese::env::PublicTransportStopZoneConnectionPlace::Registry _connectionPlaces;
-		synthese::env::PhysicalStop::Registry _physicalStops;
-		synthese::env::CommercialLine::Registry _commercialLines;
-		synthese::env::Line::Registry _lines;
-		synthese::env::LineStop::Registry _lineStops;
+			//! @name Temporary environment
+			//@{
+				std::string _data;
+				bool		_useEnvironment;
+				env::City::Registry _cities;
+				env::Axis::Registry _axes;
+				env::PublicTransportStopZoneConnectionPlace::Registry _connectionPlaces;
+				env::PhysicalStop::Registry _physicalStops;
+				env::CommercialLine::Registry _commercialLines;
+				env::Line::Registry _lines;
+				env::LineStop::Registry _lineStops;
+			//@}
 
-		Map* _map;
+			//! @name Result
+			//@{
+				std::auto_ptr<Map> _map;
+			//@}
 
 		    
-		/** Conversion from attributes to generic parameter maps.
-		 */
-		server::ParametersMap _getParametersMap() const;
-		
-		/** Conversion from generic parameters map to attributes.
-		 */
-		void _setFromParametersMap(const server::ParametersMap& map);
+			/** Conversion from attributes to generic parameter maps.
+			 */
+			server::ParametersMap _getParametersMap() const;
+			
+			/** Conversion from generic parameters map to attributes.
+			 */
+			void _setFromParametersMap(const server::ParametersMap& map);
 
 	    public:
 			
 		static const std::string OUTPUT_PARAMETER;
 		static const std::string DATA_PARAMETER;
 		static const std::string MAP_PARAMETER;
+			static const std::string PARAMETER_USE_ENVIRONMENT;
 
 		MapRequest();
 		~MapRequest();
 		
-		/// @todo Getters/Setters for parsed parameters
+		//! @name Setters
+		//@{
+			
+			
+			/** Sets and parse the data to be used for drawing the map.
+				The call of this setter is useless if _useEnvironment is set to true / default.
+				@param value the data provided in XML format
+				@author Hugues Romain
+				@date 2008
+			*/
+			void setData(const std::string& value);
+			
+			
+			/** Sets and parse the map XML query.
+				@warning the setUseEnvironment and/or the setData method must be launched before setQuery.
+				@param value the XML Query
+				@author Hugues Romain
+				@date 2008			
+			*/
+			void setQuery(const std::string& value);
+			void setOutput(const std::string& value);
+			void setUseEnvironment(bool value);
+		//@}
 		
 		/** Action to run, defined by each subclass.
 		 */

@@ -37,7 +37,7 @@ namespace synthese
 	{
 
 		/** Pedestrian compliance class.
-		 @ingroup m15
+		 @ingroup m35
 		*/
 		class PedestrianCompliance : 
 			public util::RegistrableWithNeutralElement<uid,PedestrianCompliance>

@@ -55,10 +55,10 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			const JourneyBoardJourneys* jv = static_cast<const JourneyBoardJourneys*>(object);
+			const RoutePlannerResult* jv = static_cast<const RoutePlannerResult*>(object);
 			const ReservationRuleInterfacePage* resaInterfacePage = _page->getInterface()->getPage<ReservationRuleInterfacePage>();
 
-			for (JourneyBoardJourneys::const_iterator it = jv->begin(); it != jv->end(); ++it)
+			for (JourneyBoardJourneys::const_iterator it = jv->result.begin(); it != jv->result.end(); ++it)
 			{
 				stream << _cellHeader->getValue(parameters, variables, object, request);
 				resaInterfacePage->display(stream, variables, **it, request);

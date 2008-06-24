@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** Address table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 
 			Addresses table :
 				- on insert : 

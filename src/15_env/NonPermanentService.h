@@ -31,7 +31,7 @@ namespace synthese
 	namespace env
 	{
 		/** NonPermanentService class.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class NonPermanentService : public Service
 		{

@@ -36,7 +36,7 @@ namespace synthese
 		class ValueElementList;
 
 		/** AndValueInterfaceElement value interface element class.
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 
 			Usage :
 			@code {{&& <param1> <param2> ... <paramn>}} @endcode

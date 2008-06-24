@@ -43,6 +43,7 @@ namespace synthese
 		class VertexAccessMap;
 		class Edge;
 		class Journey;
+		class JourneyComparator;
 	}
 
 	namespace time
@@ -53,7 +54,6 @@ namespace synthese
 	namespace routeplanner
 	{
 		class BestVertexReachesMap;
-		class JourneysResult;
 
 		/** IntegralSearcher class.
 			@ingroup m53
@@ -63,56 +63,40 @@ namespace synthese
 			The area is defined by several constraints.
 
 			This algorithm can be used in a route planning : it handles optionally the concept of searched place (destination).
-
 		*/
 		class IntegralSearcher
 		{
 		private:
 			typedef const env::Edge* (env::Edge::*PtrEdgeStep) () const;
 
+			class _JourneyComparator
+			{
+			public:
+				bool operator()(const env::Journey* j1, const env::Journey* j2) const;
+			};
+
 			//! @name Parameters
 			//@{
-				const env::AccessParameters	_accessParameters;
-				const AccessDirection		_accessDirection;
-				const SearchAddresses		_searchAddresses;
-				const SearchPhysicalStops	_searchPhysicalStops;
-				const UseRoads				_useRoads;
-				const UseLines				_useLines;
-				JourneysResult&				_result;
-				BestVertexReachesMap&		_bestVertexReachesMap;
-				const env::VertexAccessMap&	_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
-				const time::DateTime&		_calculationTime;
-				time::DateTime&				_minMaxDateTimeAtDestination;
-				const int					_previousContinuousServiceDuration;
-				const time::DateTime&		_previousContinuousServiceLastDeparture;
-				const int					_maxDepth;
-				const bool					_optim;
-				const bool					_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
-				std::ostream* const			_logStream;
-				const util::Log::Level		_logLevel;
+				const env::AccessParameters				_accessParameters;
+				const AccessDirection					_accessDirection;
+				const SearchAddresses					_searchAddresses;
+				const SearchPhysicalStops				_searchPhysicalStops;
+				const UseRoads							_useRoads;
+				const UseLines							_useLines;
+				JourneysResult<env::JourneyComparator>&	_result;
+				BestVertexReachesMap&					_bestVertexReachesMap;
+				const env::VertexAccessMap&				_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
+				const time::DateTime&					_calculationTime;
+				time::DateTime&							_minMaxDateTimeAtDestination;
+				const int								_previousContinuousServiceDuration;
+				const time::DateTime&					_previousContinuousServiceLastDeparture;
+				const int								_maxDepth;
+				const bool								_optim;
+				const bool								_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
+				std::ostream* const						_logStream;
+				const util::Log::Level					_logLevel;
 			//@}
 
-			/** Integral search of objects within the network.
-				@param vertices
-				@param desiredTime Desired time.
-				@param accessDirection
-				@param currentJourney Journey currently being built.
-				@param maxDepth Maximum recursion depth.
-				@param accessDirection
-				@param accessDirection
-				@param searchAddresses Whether or not to search for addresses.
-				@param searchPhysicalStops Whether or not to search for physicalStops.
-				@param useRoads Filter : true = the search is allowed to use the road network
-				@param useLines Filter : true = the search is allowed to use the transport network
-				@param strictTime Must the departure time be strictly equal to desired time ?
-			 */
-			void _integralSearchRecursion (
-				const env::VertexAccessMap& vertices
-				, const time::DateTime& desiredTime
-				, const env::Journey& currentJourney
-				, int maxDepth
-				, bool strictTime = false
-			);
 
 		public:
 			IntegralSearcher(
@@ -121,8 +105,8 @@ namespace synthese
 				, SearchAddresses				searchAddresses
 				, SearchPhysicalStops			searchPhysicalStops
 				, UseRoads						useRoads
-				, UseLines						useLines
-				, JourneysResult&				result
+				, UseLines									useLines
+				, JourneysResult<env::JourneyComparator>&	result
 				, BestVertexReachesMap&			bestVertexReachesMap
 				, const env::VertexAccessMap&	destinationVam
 				, const time::DateTime&			calculationTime
@@ -136,30 +120,22 @@ namespace synthese
 				, util::Log::Level				logLevel = util::Log::LEVEL_NONE
 			);
 
-			/** Launch of the integral search upon a vertex access map.
-				@param result Result to consider and to write on
-				@param vertices Access map
-				@param desiredTime Time to use for starting the search
-				@param maxDepth Maximum depth of recursion
-				@param strictTime If true, only the journeys starting exactly at the desired time are selected, and the best vertex map use is in optimizing purpose
-				@author Hugues Romain
-				@date 2007				
-			*/
+
+			/** Integral search of objects within the network.
+				@param vertices
+				@param desiredTime Desired time.
+				@param currentJourney Journey currently being built.
+				@param maxDepth Maximum recursion depth.
+				@param strictTime Must the departure time be strictly equal to desired time ?
+			 */
 			void integralSearch(
 				const env::VertexAccessMap& vertices
 				, const time::DateTime& desiredTime
+				, const env::Journey& currentJourney
+				, int maxDepth
 				, bool strictTime = false
 			);
 
-			/** Launch of the integral search upon a journey corresponding to a beginning of a route planning.
-				@param journey The journey to complete.
-				@warning The journey must be non empty
-				@author Hugues Romain
-				@date 2007				
-			*/
-			void integralSearch(
-				const env::Journey& journey
-			);
 
 
 			/** Journey utility evaluation.

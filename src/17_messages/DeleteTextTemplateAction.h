@@ -44,6 +44,13 @@ namespace synthese
 		private:
 			boost::shared_ptr<const TextTemplate>	_text;
 
+			/** Authorization control.
+				@return True if the action run is authorized
+				@author Hugues Romain
+				@date 2007
+			*/
+			virtual bool _isAuthorized() const;
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -59,6 +66,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			void setTemplate(boost::shared_ptr<const TextTemplate> value);
 		};
 	}
 }

@@ -80,7 +80,7 @@ namespace synthese
 				return false;
 
 			Path::addService(service);
-
+			
 			return true;
 		}
 

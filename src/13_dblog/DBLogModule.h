@@ -34,12 +34,44 @@
 
 namespace synthese
 {
-	/** @defgroup m13 13 Database stored applicative log.
+	/**	@defgroup m13Actions 13 Actions
+		@ingroup m13
+
+		@defgroup m13Pages 13 Pages
+		@ingroup m13
+
+		@defgroup m13Functions 13 Functions
+		@ingroup m13
+
+		@defgroup m13Exceptions 13 Exceptions
+		@ingroup m13
+
+		@defgroup m13Alarm 13 Messages recipient
+		@ingroup m13
+
+		@defgroup m13LS 13 Table synchronizers
+		@ingroup m13
+
+		@defgroup m13Admin 13 Administration pages
+		@ingroup m13
+
+		@defgroup m13Rights 13 Rights
+		@ingroup m13
+
+		@defgroup m13Logs 13 DB Logs
+		@ingroup m13
+		
+		@defgroup m13 13 Database stored applicative log
 		@ingroup m1
+		
+		(Module documentation)
+		
 		@{
 	*/
 
-	/** 13 database stored applicative log namespace.
+	/** 13 Database stored applicative log Module namespace.
+		@author Hugues Romain
+		@date 2008
 	*/
 	namespace dblog
 	{

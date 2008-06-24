@@ -34,7 +34,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** UpdateAllStopsDisplayScreenAction action class.
-			@ingroup m34
+			@ingroup m54Action refAction
 		*/
 		class UpdateAllStopsDisplayScreenAction : public util::FactorableTemplate<server::Action, UpdateAllStopsDisplayScreenAction>
 		{

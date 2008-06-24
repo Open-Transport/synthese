@@ -41,7 +41,7 @@ namespace synthese
 			@todo Merge Complyer and Calendar : put a CalendarDays set in Complyer
 			and delegate to the tablesync the parent calendar update. Add the useinrouteplannoing and departuretable attributes.
 		    
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Complyer
 		{

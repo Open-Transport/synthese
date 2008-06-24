@@ -25,6 +25,7 @@
 
 #include "15_env/Complyer.h"
 #include "15_env/ServicePointer.h"
+#include "15_env/Types.h"
 
 #include <string>
 
@@ -61,7 +62,7 @@ namespace synthese
 			but also self-provided by the traveller himself 
 			(walking, cycling...).
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Service : public Complyer
 		{
@@ -152,7 +153,7 @@ namespace synthese
 					@warning The service index is unknown in the generated ServicePointer.					
 				*/
 				virtual ServicePointer getFromPresenceTime(
-					ServicePointer::DeterminationMethod method
+					AccessDirection method
 					, const Edge* edge
 					, const time::DateTime& presenceDateTime
 					, const time::DateTime& computingTime

@@ -32,7 +32,7 @@ namespace synthese
 	{
 
 		/** Compliance class.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Compliance
 		{

@@ -15,7 +15,7 @@ namespace dbring
 
 
 /** Db ring related exception class.
-	@ingroup m03
+	@ingroup m101
 
 */
 

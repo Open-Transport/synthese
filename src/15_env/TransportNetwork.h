@@ -35,7 +35,7 @@ namespace synthese
 	{
 		/** Transport network.
 		TRIDENT OK
-			@ingroup m15
+			@ingroup m35
 		*/
 		class TransportNetwork : public synthese::util::Registrable<uid,TransportNetwork>
 		{

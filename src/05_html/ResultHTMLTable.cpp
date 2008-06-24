@@ -40,6 +40,7 @@ namespace synthese
 		const std::string ResultHTMLTable::_PARAMETER_RAISING_ORDER = "rhtr";
 		const std::string ResultHTMLTable::_PARAMETER_MAX_SIZE = "rhts";
 		const int ResultHTMLTable::UNLIMITED_SIZE = -1;
+		const string ResultHTMLTable::CSS_CLASS("adminresults");
 
 		ResultHTMLTable::ResultHTMLTable(
 			const ResultHTMLTable::HeaderVector& header
@@ -47,7 +48,7 @@ namespace synthese
 			, const RequestParameters& requestParameters
 			, const ResultParameters& resultParameters
 			, std::string iconPath )
-			: HTMLTable(header.size(), "adminresults")
+			: HTMLTable(header.size(), CSS_CLASS)
 			, _searchForm(searchForm)
 			, _maxSize(requestParameters.maxSize)
 			, _first(requestParameters.first)

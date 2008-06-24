@@ -80,10 +80,10 @@ namespace synthese
 			FunctionWithSite::_setFromParametersMap(map);
 
 			_page = _site->getInterface()->getPage<PlacesListInterfacePage>();
-			_input = map.getString(PARAMETER_INPUT, true, "fws");
-			_isForOrigin = map.getBool(PARAMETER_IS_FOR_ORIGIN, true, false, "fws");
+			_input = map.getString(PARAMETER_INPUT, true, FACTORY_KEY);
+			_isForOrigin = map.getBool(PARAMETER_IS_FOR_ORIGIN, false, false, FACTORY_KEY);
 
-			_n = map.getInt(PARAMETER_NUMBER, true, "fws");
+			_n = map.getInt(PARAMETER_NUMBER, true, FACTORY_KEY);
 			if (_n < 0)
 				throw RequestException("Bad value for number");
 		}

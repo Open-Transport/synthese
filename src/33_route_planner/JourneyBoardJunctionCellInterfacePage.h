@@ -31,7 +31,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class Place;
 		class Road;
 	}
 
@@ -52,6 +52,7 @@ namespace synthese
 				- 2 : Alarm
 				- 3 : Odd or even row in the journey board
 				- 4 : Road name
+				- 5 : Length of the junction
 		*/
 		class JourneyBoardJunctionCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardJunctionCellInterfacePage>
 		{
@@ -62,14 +63,16 @@ namespace synthese
 				@param alarm Alarm to display for the road use
 				@param color Odd or even row in the journey board
 				@param road Used road
+				@param distance Length of the junction
 				@param request Source request
 			*/
 			void display(
 				std::ostream& stream
-				, const env::ConnectionPlace* place
+				, const env::Place* place
 				, const messages::SentAlarm* alarm
 				, bool color
 				, const env::Road* road
+				, int distance
 				, const server::Request* request = NULL
 			) const;
 

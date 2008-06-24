@@ -36,7 +36,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** UpdateDisplayMaintenanceAction action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class UpdateDisplayMaintenanceAction : public util::FactorableTemplate<server::Action, UpdateDisplayMaintenanceAction>
 		{

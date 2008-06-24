@@ -78,7 +78,7 @@ namespace synthese
 				- a ferry line is compliant with cars, bikes, pedestrian
 				- ...
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Path : public Complyer
 		{
@@ -106,21 +106,21 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				virtual uid			getId () const = 0;
-
-				const ServiceSet&			getServices () const;
-				const Service*				getService (int serviceIndex) const;
-
-				virtual const Axis*			getAxis () const = 0;
-
-				const std::vector<Edge*>&	getEdges () const;
-				const Edge*					getEdge (int index) const;
-
+				const ServiceSet&			getServices()	const;
+				const std::vector<Edge*>&	getEdges()		const;
+				const Calendar&				getCalendar()	const;
 				Calendar&					getCalendar();
+				bool						getAllDays()	const;
 			//@}
 
 			//! @name Query methods.
 			//@{
+				const Service*				getService (int serviceIndex) const;
+
+				const Edge*					getEdge (int index) const;
+
+				virtual uid			getId () const = 0;
+				virtual const Axis*			getAxis () const = 0;
 
 				virtual bool isRoad () const = 0;
 				virtual bool isLine () const = 0;

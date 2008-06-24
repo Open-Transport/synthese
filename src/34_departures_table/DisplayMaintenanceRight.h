@@ -30,7 +30,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Habilitation portant sur la maintenance des afficheurs.
-			@ingroup m34
+			@ingroup m54Rights refRights
 
 			Les niveaux de droit utilisés sont les suivants :
 				- READ : Permet de consulter les états de maintenance des afficheurs

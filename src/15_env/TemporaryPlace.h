@@ -37,7 +37,7 @@ namespace env
 
 
 /** Temporary place on the road network.
-	@ingroup m15
+	@ingroup m35
 	
     Temporary means it is not a part of the graph definition and can just
     be used as an entry point on this graph.

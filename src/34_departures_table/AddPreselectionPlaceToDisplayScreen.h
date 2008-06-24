@@ -39,7 +39,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** AddPreselectionPlaceToDisplayScreen action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class AddPreselectionPlaceToDisplayScreen : public util::FactorableTemplate<server::Action,AddPreselectionPlaceToDisplayScreen>
 		{

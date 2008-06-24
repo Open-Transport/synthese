@@ -36,7 +36,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** DisplayScreenRemove action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class DisplayScreenRemove : public util::FactorableTemplate<server::Action, DisplayScreenRemove>
 		{

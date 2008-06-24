@@ -43,7 +43,7 @@ namespace synthese
 
 			A vertex is the abstract graph node used for route planning.
 			A vertex is necessarily connected to its corresponding path.
-		@ingroup m15
+		@ingroup m35
 		*/
 		class Vertex : public geometry::Point2D
 		{

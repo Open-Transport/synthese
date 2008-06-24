@@ -39,7 +39,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** RemovePreselectionPlaceFromDisplayScreenAction action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class RemovePreselectionPlaceFromDisplayScreenAction : public util::FactorableTemplate<server::Action,RemovePreselectionPlaceFromDisplayScreenAction>
 		{

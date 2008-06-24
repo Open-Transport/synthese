@@ -30,7 +30,7 @@ namespace synthese
 		class Journey;
 
 		/** JourneyComparator class.
-			@ingroup m15
+			@ingroup m35
 
 			The journey comparison is used for ordering purposes, in the exploration queue of the route planner for example.
 

@@ -38,7 +38,7 @@ namespace synthese
 	namespace env
 	{
 		/** Line style.
-			@ingroup m15Library refLibrary
+			@ingroup m35Library refLibrary
 
 			@code line_style @endcode
 

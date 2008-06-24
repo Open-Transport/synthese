@@ -29,6 +29,7 @@
 #include "15_env/AddressablePlace.h"
 #include "15_env/ReservationRule.h"
 #include "15_env/Service.h"
+#include "15_env/Crossing.h"
 
 #include "11_interfaces/DurationInterfacePage.h"
 #include "11_interfaces/DateTimeInterfacePage.h"
@@ -64,8 +65,11 @@ namespace synthese
 			, interfaces::VariablesMap& variables
 			, int n
 			, const Journey* journey
-			, boost::logic::tribool handicappedFilter
-			, boost::logic::tribool bikeFilter
+			, const Place* departurePlace
+			, const Place* arrivalPlace
+			, logic::tribool handicappedFilter
+			, logic::tribool bikeFilter
+			, bool isTheLast
 			, const server::Request* request
 		) const {
 			const DurationInterfacePage* durationInterfacePage = getInterface()->getPage<DurationInterfacePage>();
@@ -75,6 +79,8 @@ namespace synthese
 			stringstream sDate;
 			dateInterfacePage->display(sDate, variables, journey->getDepartureTime().getDate(), request);
 			DateTime now(TIME_CURRENT);
+			DateTime resaDeadLine(journey->getReservationDeadLine());
+			logic::tribool resaCompliance(journey->getReservationCompliance());
 			stringstream sResa;
 			dateInterfacePage->display(sResa, variables, journey->getReservationDeadLine(), request);
 
@@ -93,23 +99,37 @@ namespace synthese
 					onlineBooking = false;
 			}
 
+			// Determination of the displayed place names
+			string displayedDeparturePlace(
+				dynamic_cast<const Crossing*>(journey->getOrigin()->getPlace())
+				? departurePlace->getFullName()
+				: journey->getOrigin()->getPlace()->getFullName()
+			);
+			string displayedArrivalPlace(
+				dynamic_cast<const Crossing*>(journey->getDestination()->getPlace())
+				? arrivalPlace->getFullName()
+				: journey->getDestination()->getPlace()->getFullName()
+			);
+
+
 			ParametersVector pv;
 			pv.push_back(Conversion::ToString(n));
 			pv.push_back(Conversion::ToString(handicappedFilter));
 			pv.push_back(Conversion::ToString(bikeFilter));
 			pv.push_back(journey->getDepartureTime().getHour().toString());
-			pv.push_back(journey->getOrigin()->getPlace()->getFullName());
+			pv.push_back(displayedDeparturePlace);
 			pv.push_back(journey->getArrivalTime().getHour().toString());
-			pv.push_back(journey->getDestination()->getPlace()->getFullName());
+			pv.push_back(displayedArrivalPlace);
 			pv.push_back(sDuration.str());
 			pv.push_back(sDate.str());
-			pv.push_back(Conversion::ToString(journey->getReservationCompliance() && journey->getReservationDeadLine() > now));
-			pv.push_back(Conversion::ToString(journey->getReservationCompliance() == true));
-			pv.push_back(Conversion::ToString(journey->getReservationDeadLine() - now));
+			pv.push_back(Conversion::ToString(resaCompliance && resaDeadLine > now));
+			pv.push_back(Conversion::ToString(resaCompliance == true));
+			pv.push_back(Conversion::ToString(resaDeadLine.isUnknown() ? 0 : resaDeadLine - now));
 			pv.push_back(sResa.str());
 			pv.push_back(sPhones.str());
 			pv.push_back(Conversion::ToString(onlineBooking));
 			pv.push_back(journey->getDepartureTime().toSQLString(false));
+			pv.push_back(Conversion::ToString(isTheLast));
 			
 			InterfacePage::display(stream, pv, variables, static_cast<const void*>(journey), request);
 		}

@@ -40,13 +40,16 @@
 
 namespace synthese
 {
-	/** @defgroup m10 10 SQLite database access
+	/** @defgroup m10Exceptions 10 Exceptions
+		@ingroup m10
+	
+		@defgroup m10 10 SQLite database access
 		@ingroup m1
 
 	@{
 	*/
 
-	/** 02 SQLite database access module namespace.
+	/** 10 SQLite database access module namespace.
 	*/
 	namespace db
 	{

@@ -84,15 +84,17 @@ namespace synthese
 			bool __Couleur = false;
 
 			const Place* lastPlace(journey->getOrigin()->getFromVertex()->getPlace());
+			int distance(0);
 
-			for (Journey::ServiceUses::const_iterator it = journey->getServiceUses().begin(); it != journey->getServiceUses().end(); ++it)
+			const Journey::ServiceUses& services(journey->getServiceUses());
+			for (Journey::ServiceUses::const_iterator it = services.begin(); it != services.end(); ++it)
 			{
 				const ServiceUse& leg(*it);
-
 
 				const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
 				if (road == NULL)
 				{
+					distance = 0;
 
 					// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
 					if (leg.getDepartureEdge()->getConnectionPlace() != lastPlace)
@@ -176,15 +178,28 @@ namespace synthese
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();
 */
+					distance += leg.getDistance();
+
+					if (it + 1 != services.end())
+					{
+						const ServiceUse& nextLeg(*(it+1));
+						const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
+
+						if (nextRoad && nextRoad->getName() == road->getName())
+							continue;
+					}
+
 					junctionCellInterfacePage->display(
 						stream
 						, leg.getArrivalEdge()->getConnectionPlace()
 						, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, __Couleur
 						, road
+						, distance
 						, request
 					);
-				
+					
+					distance = 0;				
 					__Couleur = !__Couleur;
 				}
 			}

@@ -32,7 +32,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** Ecran de supervision d'un afficheur.
-			@ingroup m34
+			@ingroup m54Admin refAdmin
 
 			@image html cap_admin_display_maint.png
 			@image latex cap_admin_display_maint.png "Maquette de l'écran de supervision d'un afficheur" width=14cm

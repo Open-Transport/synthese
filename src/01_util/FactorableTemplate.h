@@ -32,7 +32,7 @@ namespace synthese
 	namespace util
 	{
 		/** FactorableTemplate class.
-			@ingroup m01
+			@ingroup m01Factory
 		*/
 		template<class F, class C>
 		class FactorableTemplate : public F

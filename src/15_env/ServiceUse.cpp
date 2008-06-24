@@ -39,37 +39,38 @@ namespace synthese
 		{
 		}
 
-		ServiceUse::ServiceUse()
-			: _secondActualDateTime(TIME_UNKNOWN)
-		{
 
-		}
+
 		const env::Edge* ServiceUse::getDepartureEdge() const
 		{
-			return (getMethod() == DEPARTURE_TO_ARRIVAL)
-				? getEdge()
-				: getSecondEdge();
+			return (_determinationMethod == DEPARTURE_TO_ARRIVAL)
+				? _edge
+				: _secondEdge
+				;
 		}
 
 		const env::Edge* ServiceUse::getArrivalEdge() const
 		{
-			return (getMethod() == ARRIVAL_TO_DEPARTURE)
-				? getEdge()
-				: getSecondEdge();
+			return (_determinationMethod == ARRIVAL_TO_DEPARTURE)
+				? _edge
+				: _secondEdge
+				;
 		}
 
 		const time::DateTime& ServiceUse::getDepartureDateTime() const
 		{
-			return  (getMethod() == DEPARTURE_TO_ARRIVAL)
-				? getActualDateTime()
-				: getSecondActualDateTime();
+			return  (_determinationMethod == DEPARTURE_TO_ARRIVAL)
+				? _actualTime
+				: _secondActualDateTime
+				;
 		}
 
 		const time::DateTime& ServiceUse::getArrivalDateTime() const
 		{
-			return  (getMethod() == ARRIVAL_TO_DEPARTURE)
-				? getActualDateTime()
-				: getSecondActualDateTime();
+			return  (_determinationMethod == ARRIVAL_TO_DEPARTURE)
+				? _actualTime
+				: _secondActualDateTime
+				;
 		}
 
 		const env::Edge* ServiceUse::getSecondEdge() const
@@ -118,6 +119,23 @@ namespace synthese
 				return _service->getReservationRule()->getReservationDeadLine(_originDateTime, getDepartureDateTime());
 
 			return DateTime(TIME_UNKNOWN);
+		}
+
+
+
+		void ServiceUse::reverse()
+		{
+			// Reverse edge
+			const Edge* edge(_secondEdge);
+			_secondEdge = _edge;
+			_edge = edge;
+
+			// Reverse time
+			DateTime dateTime(_secondActualDateTime);
+			_secondActualDateTime = _actualTime;
+			_actualTime = dateTime;
+
+			_determinationMethod = (_determinationMethod == DEPARTURE_TO_ARRIVAL) ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL;
 		}
 	}
 }

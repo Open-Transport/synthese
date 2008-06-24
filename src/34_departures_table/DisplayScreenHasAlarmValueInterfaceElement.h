@@ -37,7 +37,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Value Interface Element : Test of presence of an alarm on the display screen.
-			@ingroup m34Values refValues
+			@ingroup m54Values refLibrary
 
 			Output : The level of the present alarm, ALARM_LEVEL_NO_ALARM if no alarm.
 		*/

@@ -20,7 +20,9 @@ namespace synthese
 
 namespace dbring
 {
-
+	/** @addtogroup m101
+		@{
+	*/
 
     typedef enum {
 	READY = 0,
@@ -55,7 +57,7 @@ public:
 private:
 
 };
-
+		/** @} */
 
 }
 }

@@ -1,0 +1,16 @@
+/**
+
+@page admin Administrator manual
+	- @subpage deploiement
+	- @subpage binaires
+
+@page binaires Binaires
+	- @subpage server
+	
+@page server Serveur
+
+@copydoc m90
+
+
+
+*/

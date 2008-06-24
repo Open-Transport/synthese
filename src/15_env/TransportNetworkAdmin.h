@@ -25,6 +25,8 @@
 #ifndef SYNTHESE_TransportNetworkAdmin_H__
 #define SYNTHESE_TransportNetworkAdmin_H__
 
+#include "05_html/ResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
@@ -42,7 +44,13 @@ namespace synthese
 		{
 			boost::shared_ptr<const TransportNetwork>	_network;
 
+			std::string	_searchName;
+
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+
 		public:
+			static const std::string PARAMETER_SEARCH_NAME;
+
 			TransportNetworkAdmin();
 			
 			/** Initialization of the parameters from a parameters map.

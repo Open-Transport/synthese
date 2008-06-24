@@ -41,7 +41,7 @@ namespace synthese
 
 		/** Bike compliance class.
 		Not present in Transmodel
-		 @ingroup m15
+		 @ingroup m35
 		 */
 		class BikeCompliance : 
 			public util::RegistrableWithNeutralElement<uid,BikeCompliance>

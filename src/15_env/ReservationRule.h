@@ -41,7 +41,7 @@ namespace synthese
 				- compliant = reservation compulsory
 				- indeterminate = reservation optional
 				- not compliant = reservation impossible
-			@ingroup m15
+			@ingroup m35
 		*/
 		class ReservationRule
 			: public util::RegistrableWithNeutralElement<uid,ReservationRule>

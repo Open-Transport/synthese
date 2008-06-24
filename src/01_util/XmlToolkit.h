@@ -40,7 +40,7 @@ namespace util
 {
 
 /** Toolkit for XML related tasks.
-@ingroup m01
+@ingroup m01XML
 */
 namespace XmlToolkit
 {

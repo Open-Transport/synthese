@@ -34,7 +34,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** UpdateDisplayPreselectionParametersAction action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class UpdateDisplayPreselectionParametersAction : public util::FactorableTemplate<server::Action, UpdateDisplayPreselectionParametersAction>
 		{

@@ -39,7 +39,7 @@ namespace synthese
 	namespace env
 	{
 		/** RollingStock table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class RollingStockTableSync : public db::SQLiteRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>
 		{

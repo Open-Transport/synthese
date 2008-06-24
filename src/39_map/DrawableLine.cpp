@@ -55,11 +55,9 @@ DrawableLine::DrawableLine (const Line* line,
     : _lineId (line->getId ())
     , _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
     , _shortName (line->getName ())
-    , _color (line->getCommercialLine ()->getColor ())
+	, _color ((line->getCommercialLine ()->getColor().b < 0 || line->getCommercialLine ()->getColor().g < 0 || line->getCommercialLine ()->getColor().r < 0) ? RGBColor(0,0,0) : line->getCommercialLine ()->getColor())
     , _withPhysicalStops (withPhysicalStops)
 {
-
-    
     for (unsigned int i=0; i<_points.size (); ++i) {
         // Shift initially to 0; 
 	_shifts.push_back (0); 

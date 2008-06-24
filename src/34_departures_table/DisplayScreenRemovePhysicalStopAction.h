@@ -39,7 +39,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** DisplayScreenRemovePhysicalStopAction action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class DisplayScreenRemovePhysicalStopAction : public util::FactorableTemplate<server::Action, departurestable::DisplayScreenRemovePhysicalStopAction>
 		{

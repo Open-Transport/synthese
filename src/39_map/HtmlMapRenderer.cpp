@@ -43,31 +43,23 @@
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
 
-using synthese::util::RGBColor;
-using synthese::util::Log;
-using synthese::util::Conversion;
-
-using synthese::env::Environment;
-using synthese::env::Line;
-using synthese::env::LineStop;
-using synthese::env::Edge;
-
 using namespace boost;
-
+using namespace std;
 
 namespace synthese
 {
 	using namespace geometry;
 	using namespace util;
+	using namespace map;
+	using namespace env;
 	
-
+	
+	
 	namespace util
 	{
 		template<>
-		const std::string FactorableTemplate<map::Renderer,map::HtmlMapRenderer>::FACTORY_KEY ("html");
+		const string FactorableTemplate<Renderer, HtmlMapRenderer>::FACTORY_KEY("html");
 	}
-
-
 
 
 namespace map

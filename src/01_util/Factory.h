@@ -36,6 +36,11 @@ namespace synthese
 {
 	namespace util
 	{
+		/** @defgroup m01Factory Factory
+			@ingroup m01
+			@{
+		*/
+
 		/** Generic class factory.
 
 			The features of the generic class factory are :
@@ -46,8 +51,6 @@ namespace synthese
 			Possible uses :
 				- Factory<FactoryClass>::create("class_key") -> Creates an object from the string key of the class
 				- Factory<FactoryClass>::contains("class_key") -> Answers if a class is registered with the specified key
-
-			@ingroup m01
 		*/
 		template <class RootObject>
 		class Factory
@@ -258,6 +261,8 @@ namespace synthese
 				return Iterator( _registeredCreator.end() );
 			}
 		};
+
+		/** @} */
 
 		template <class T>
 			typename Factory<T>::Map Factory<T>::_registeredCreator;

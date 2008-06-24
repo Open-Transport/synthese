@@ -42,7 +42,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Ecran de recherche de lieux pour administration des points de diffusion.
-			@ingroup m34
+			@ingroup m54Admin refAdmin
 
 			@image html cap_admin_places.png
 			@image latex cap_admin_places.png "Maquette de l'écran de recherche de lieux" width=14cm

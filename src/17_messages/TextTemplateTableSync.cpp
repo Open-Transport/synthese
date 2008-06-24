@@ -58,7 +58,9 @@ namespace synthese
 			object->setName(rows->getText (TextTemplateTableSync::COL_NAME));
 			object->setShortMessage(rows->getText ( TextTemplateTableSync::COL_SHORT_TEXT));
 			object->setLongMessage(rows->getText ( TextTemplateTableSync::COL_LONG_TEXT));
-			object->setAlarmLevel((AlarmLevel) rows->getInt ( TextTemplateTableSync::COL_LEVEL));
+			object->setAlarmLevel(static_cast<AlarmLevel>(rows->getInt ( TextTemplateTableSync::COL_LEVEL)));
+			object->setIsFolder(rows->getBool(TextTemplateTableSync::COL_IS_FOLDER));
+			object->setParentId(rows->getLongLong(TextTemplateTableSync::COL_PARENT_ID));
 		}
 
 
@@ -74,28 +76,18 @@ namespace synthese
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					<< TextTemplateTableSync::COL_NAME << "=" << Conversion::ToSQLiteString(object->getName())
-					<< "," << TextTemplateTableSync::COL_SHORT_TEXT << "=" << Conversion::ToSQLiteString(object->getShortMessage())
-					<< "," << TextTemplateTableSync::COL_LONG_TEXT << "=" << Conversion::ToSQLiteString(object->getLongMessage())
-					<< "," << TextTemplateTableSync::COL_LEVEL << "=" << Conversion::ToString((int) object->getAlarmLevel())
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() <= 0)
 				object->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					<< "," << Conversion::ToSQLiteString(object->getName())
-					<< "," << Conversion::ToSQLiteString(object->getShortMessage())
-					<< "," << Conversion::ToSQLiteString(object->getLongMessage())
-					<< "," << Conversion::ToString((int) object->getAlarmLevel())
-					<< ")";
-			}
+            query
+				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				<< "," << Conversion::ToSQLiteString(object->getName())
+				<< "," << Conversion::ToSQLiteString(object->getShortMessage())
+				<< "," << Conversion::ToSQLiteString(object->getLongMessage())
+				<< "," << Conversion::ToString(static_cast<int>(object->getAlarmLevel()))
+				<< "," << Conversion::ToString(object->getIsFolder())
+				<< "," << Conversion::ToString(object->getParentId())
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -103,10 +95,13 @@ namespace synthese
 
 	namespace messages
 	{
-		const std::string TextTemplateTableSync::COL_NAME = "name";
-		const std::string TextTemplateTableSync::COL_SHORT_TEXT = "short_text";
-		const std::string TextTemplateTableSync::COL_LONG_TEXT = "long_text";
-		const std::string TextTemplateTableSync::COL_LEVEL = "level";
+		const string TextTemplateTableSync::COL_NAME = "name";
+		const string TextTemplateTableSync::COL_SHORT_TEXT = "short_text";
+		const string TextTemplateTableSync::COL_LONG_TEXT = "long_text";
+		const string TextTemplateTableSync::COL_LEVEL = "level";
+		const string TextTemplateTableSync::COL_IS_FOLDER("is_folder");
+		const string TextTemplateTableSync::COL_PARENT_ID("parent_id");
+			
 
 		TextTemplateTableSync::TextTemplateTableSync()
 			: SQLiteNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>()
@@ -116,11 +111,18 @@ namespace synthese
 			addTableColumn(COL_SHORT_TEXT, "TEXT");
 			addTableColumn(COL_LONG_TEXT, "TEXT");
 			addTableColumn(COL_LEVEL, "INTEGER");
+			addTableColumn(COL_IS_FOLDER, "INTEGER");
+			addTableColumn(COL_PARENT_ID, "INTEGER");
+
+			addTableIndex(COL_LEVEL);
+			addTableIndex(COL_PARENT_ID);
 		}
 
 
-		vector<shared_ptr<TextTemplate> > TextTemplateTableSync::search(
+		vector<shared_ptr<TextTemplate> > TextTemplateTableSync::Search(
 			AlarmLevel level
+			, uid parentId
+			, bool isFolder
 			, string name
 			, const TextTemplate* templateToBeDifferentWith
 			, int first
@@ -134,19 +136,29 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				<< COL_LEVEL << "=" << Conversion::ToString((int) level)
-				;
+				<< " WHERE "
+
+			// Filtering
+				<< "is_folder=" << Conversion::ToString(isFolder)
+			;
+			if (level != ALARM_LEVEL_UNKNOWN)
+				query << " AND " << COL_LEVEL << "=" << Conversion::ToString(static_cast<int>(level));
+			if (parentId != static_cast<uid>(UNKNOWN_VALUE))
+				query << " AND " << COL_PARENT_ID << "=" << parentId;
 			if (!name.empty())
 				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
 			if (templateToBeDifferentWith)
 				query << " AND " << TABLE_COL_ID << "!=" << Conversion::ToString(templateToBeDifferentWith->getKey());
+			
+			// Ordering
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByShortText)
 				query << " ORDER BY " << COL_SHORT_TEXT << (raisingOrder ? " ASC" : " DESC");
 			if (orderByLongText)
 				query << " ORDER BY " << COL_LONG_TEXT << (raisingOrder ? " ASC" : " DESC");
+			
+			// Size
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

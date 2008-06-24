@@ -37,12 +37,11 @@ namespace synthese
 	namespace util
 	{
 
-		/** Generic registry class for common environment
-			operations (get, add, remove...).
+		/** Generic registry class for common environment operations (get, add, remove...).
 			@warning The registry only has the responsibility of destroying registered objects. So do not create shared pointers on Registrable object, use getRegisteredSharedPointer method instead.
 			@note A Registrable object must be registered in only one registry.
 
-			@ingroup m01
+			@ingroup m01Registry
 		*/
 		template<class K, class T>
 		class Registrable
@@ -60,7 +59,7 @@ namespace synthese
 		private:
 			K						_key;		//!< The key of the object in the registry.
 			
-			static Registry			_registry;	//!< The official registry of the object (updated at the first insertion)
+			static typename Registry		_registry;	//!< The official registry of the object (updated at the first insertion)
 
 			bool					_linked;
 			ChildTemporaryObjects	_childTemporaryObjects;
@@ -71,24 +70,31 @@ namespace synthese
 			Registrable (const K& key);
 			virtual ~Registrable ();
 
-			void	store();
-			void	remove();
-
 			static boost::shared_ptr<const T>	Get(const K& key);
 			static boost::shared_ptr<T>			GetUpdateable(const K& key);
 			static bool Contains(const K& key);
 			static ConstIterator Begin();
 			static ConstIterator End();
 			static void Remove(const K& key);
+			static const typename Registry& GetRegistry() { return _registry; }
 
 			
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
 				const K&	getKey () const;
-				void		setKey(const K& key);
 				bool		getLinked()	const		{ return _linked; }
+			//@}
+
+			//! @name Setters
+			//@{
+				void		setKey(const K& key);
 				void		setLinked(bool value)	{ _linked = value; }
 			//@}
+
+			//! @name Update methods
+			//@{
+				void	store();
+				void	remove();
 
 				template<class C>
 				void addChildTemporaryObject(C* object)
@@ -103,6 +109,7 @@ namespace synthese
 					_childTemporaryObjects.clear();
 					_linked = false;
 				}
+			//@}
 
 			//! @name Calculators
 			//@{
@@ -118,9 +125,6 @@ namespace synthese
 				*/
 				boost::shared_ptr<const T>	getRegisteredSharedPointer() const;
 			//@}
-
-//			friend class util::Registry<K, T>;
-
 		};
 
 		

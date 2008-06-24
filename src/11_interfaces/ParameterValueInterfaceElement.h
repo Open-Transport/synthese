@@ -36,7 +36,7 @@ namespace synthese
 			Usage :
 			@code {{param <rank>}} @endcode
 
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 		*/
 		class ParameterValueInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, ParameterValueInterfaceElement>

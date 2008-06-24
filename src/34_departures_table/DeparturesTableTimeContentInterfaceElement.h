@@ -46,7 +46,7 @@ namespace synthese
 				- text to write before the hour if the departure is immediate
 				- text to write after the hour if the departure is immediate
 
-			@ingroup m34Library refLibrary
+			@ingroup m54Library refLibrary
 		*/
 		class DeparturesTableTimeContentInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableTimeContentInterfaceElement>
 		{

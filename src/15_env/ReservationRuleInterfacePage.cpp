@@ -32,6 +32,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -51,14 +52,16 @@ namespace synthese
 		{
 			DateTime now(TIME_CURRENT);
 			ParametersVector pv;
+			DateTime deadLine(journey.getReservationDeadLine());
+			logic::tribool compliance(journey.getReservationCompliance());
 
-			pv.push_back(Conversion::ToString(boost::logic::indeterminate(journey.getReservationCompliance()) && journey.getReservationDeadLine() > now));
-			pv.push_back(Conversion::ToString(journey.getReservationCompliance() == true));
-			pv.push_back(Conversion::ToString(journey.getReservationDeadLine() - now));
+			pv.push_back(Conversion::ToString(logic::indeterminate(compliance) && deadLine > now));
+			pv.push_back(Conversion::ToString(compliance == true));
+			pv.push_back(Conversion::ToString(deadLine.isUnknown() ? 0 : deadLine - now));
 			
 			stringstream s;
 			const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());
-			datePage->display(s, variables, journey.getReservationDeadLine(), request);
+			datePage->display(s, variables, deadLine, request);
 			pv.push_back(s.str());
 
 			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&journey), request);

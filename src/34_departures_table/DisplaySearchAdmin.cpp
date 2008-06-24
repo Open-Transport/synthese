@@ -274,7 +274,7 @@ namespace synthese
 
 		bool DisplaySearchAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return true;
+			return request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfParent(

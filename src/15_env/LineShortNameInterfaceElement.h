@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** LineShortNameInterfaceElement class.
-			@ingroup m15Library refLibrary
+			@ingroup m35Library refLibrary
 
 			@code line_short_name @endcode
 

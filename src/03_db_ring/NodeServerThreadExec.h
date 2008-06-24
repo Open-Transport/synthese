@@ -30,7 +30,7 @@ namespace dbring
 
 /** Node server thread execution.
 
-@ingroup m02
+@ingroup m101
 */
 class NodeServerThreadExec : public synthese::util::ThreadExec
 {

@@ -50,7 +50,7 @@ namespace synthese
 		class Address;
 
 		/** PublicTransportStopZoneConnectionPlace class.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class PublicTransportStopZoneConnectionPlace
 			: public util::Registrable<uid,PublicTransportStopZoneConnectionPlace>

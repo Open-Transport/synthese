@@ -71,6 +71,7 @@ namespace synthese
 			, _serviceNumberDisplay(false)
 			, _displayType(NULL)
 			, _localization(NULL)
+			, _maintenanceIsOnline(true)
 		{
 		}
 
@@ -275,6 +276,7 @@ namespace synthese
 					, getTrackNumberDisplay()
 					, getDisplayTeam()
 					, getType()->getMaxStopsNumber()
+					, getLocalization()
 					, displayedObject
 				);
 			}

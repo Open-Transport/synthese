@@ -48,13 +48,11 @@ namespace synthese
 			@code reservations_list @endcode
 
 			Parameters :
-				- 0 : Line ID to search
-				- 1 : Customer ID to search
-				- 2 : Reservation name to search
-				- 3 : date
-				- 4 : display cancelled reservations
-				- 5 : Title cell style
-				- 6 : Table style
+				- 0 : Display future reservations
+				- 1 : Display old reservations
+				- 2 : Display canceled reservations
+				- 3 : First element
+				- 4 : Number of elements
 
 			Object : none
 
@@ -63,15 +61,11 @@ namespace synthese
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, ReservationsListInterfaceElement>
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _lineId;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _userId;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _userName;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _date;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayCancelled;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _titleCellStyle;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _tableStyle;
-
-			static void _DisplayReservation(std::ostream& stream, html::HTMLTable& t, const Reservation* reservation);
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayFutureReservations;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayOldReservations;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayCanceledReservations;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _first;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _number;
 
 		public:
 			/** Controls and store the internals parameters.
@@ -94,6 +88,7 @@ namespace synthese
 				, const server::Request* request = NULL
 			) const;
 				
+			ReservationsListInterfaceElement();
 			~ReservationsListInterfaceElement();
 		};
 	}

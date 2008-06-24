@@ -36,7 +36,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** DisplayScreenSupervisionRequest class.
-			@ingroup m34Functions refFunctions
+			@ingroup m54Functions refFunctions
 		*/
 		class DisplayScreenSupervisionRequest : public util::FactorableTemplate<server::Function,DisplayScreenSupervisionRequest>
 		{

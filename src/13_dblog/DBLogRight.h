@@ -32,7 +32,7 @@ namespace synthese
 	namespace dblog
 	{
 		/** Habilitation portant sur la gestion des journaux.
-			@ingroup m13
+			@ingroup m13Rights refRights
 
 			Les niveaux de droit utilisés sont les suivants :
 				- READ : Permet de consulter un journal

@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** Axis table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class AxisTableSync : public db::SQLiteRegistryTableSyncTemplate<AxisTableSync,Axis>
 		{

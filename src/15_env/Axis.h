@@ -13,7 +13,7 @@ namespace synthese
 	namespace env
 	{
 		/** Axis.
-			@ingroup m15
+			@ingroup m35
 
 			Regroupement technique de lignes techniques, donnant lieu à l'application de propriétés aux lignes contenues, dont par défaut :
 				- la correspondance entre deux services de lignes incluses dans un même axe est interdite.

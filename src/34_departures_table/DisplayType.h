@@ -38,7 +38,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Type of display screen, describing the input and output facilities.
-			@ingroup m34
+			@ingroup m54
 		*/
 		class DisplayType : public util::Registrable<uid, DisplayType>
 		{

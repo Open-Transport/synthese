@@ -37,7 +37,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** Ecran de paramétrage d'un afficheur.
-			@ingroup m34
+			@ingroup m54Admin refAdmin
 
 			@image html cap_admin_display.png
 			@image latex cap_admin_display.png "Maquette de l'écran de paramétrage d'un afficheur" width=14cm

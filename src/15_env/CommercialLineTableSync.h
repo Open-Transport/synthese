@@ -38,7 +38,7 @@ namespace synthese
 	namespace env
 	{
 		/** CommercialLine table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class CommercialLineTableSync : public db::SQLiteRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>
 		{
@@ -65,7 +65,7 @@ namespace synthese
 			*/
 			static std::vector<boost::shared_ptr<CommercialLine> > search(
 				uid networkId = UNKNOWN_VALUE
-				, std::string name = std::string()
+				, std::string name = "%"
 				, int first = 0
 				, int number = 0
 				, bool orderByNetwork = true

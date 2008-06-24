@@ -37,7 +37,9 @@ namespace dbring
 
 
 
-
+/** .
+	@ingroup m101
+*/
 class NodeInfoTableSync : public db::SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo>
 {
 

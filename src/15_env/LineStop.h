@@ -41,7 +41,7 @@ namespace synthese
 		/** Association class between line and physical stop.
 			The linestop is the implementation of the edge of a transport line.
 			TRIDENT = PtLink
-			@ingroup m15
+			@ingroup m35
 		*/
 		class LineStop : 
 			public synthese::util::Registrable<uid,LineStop>, public Edge

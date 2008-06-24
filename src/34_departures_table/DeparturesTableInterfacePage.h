@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class PublicTransportStopZoneConnectionPlace;
+	}
+
 	namespace departurestable
 	{
 		/** Departures table.
@@ -46,11 +51,12 @@ namespace synthese
 				- 3 : display the track number
 				- 4 : number of intermediates stops to display
 				- 5 : display the team identifier
+				- 6 : name of the stop
 				
 			Object :
 				- result of table generation
 
-			@ingroup m34Pages refPages
+			@ingroup m54Pages refPages
 		*/
 		class DeparturesTableInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, DeparturesTableInterfacePage>
 		{
@@ -71,6 +77,7 @@ namespace synthese
 				, bool displayTrackNumber
 				, bool displayTeam
 				, int intermediatesStopsToDisplay
+				, const env::PublicTransportStopZoneConnectionPlace* place
 				, const ArrivalDepartureListWithAlarm& rows
 				, const server::Request* request = NULL) const;
 		};

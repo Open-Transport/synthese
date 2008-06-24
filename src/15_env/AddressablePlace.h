@@ -39,7 +39,7 @@ namespace synthese
 			addresses, i.e. it contains vertices which could be found at a path
 			traversing.
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class AddressablePlace : public Place
 		{

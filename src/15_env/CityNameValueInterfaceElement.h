@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** City Name.
-			@ingroup m15Values refValues
+			@ingroup m35Values refLibrary
 		*/
 		class CityNameValueInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, CityNameValueInterfaceElement>

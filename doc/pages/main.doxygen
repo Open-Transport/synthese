@@ -1,0 +1,32 @@
+/**
+@mainpage SYNTHESE Documentation
+
+<h2>Index</h2>
+ - @subpage overview
+ - @subpage admin
+ - @subpage dev
+ - @subpage customer_specs
+ - @subpage backoffice_user_manual
+ - @subpage annexes
+
+<h2>License</h2>
+
+All SYNTHESE modules and each corresponding documentation are under the @subpage gpl .
+
+@page overview Overview
+ - @subpage
+
+@page dev Developer documentation
+	- @subpage mod
+
+@page customer_specs Functional specifications
+	- @subpage customer_spec_sai_tisseo
+
+@page annexes Annexes
+	- @subpage historique
+	- @subpage todo
+	- @subpage deprecated
+	- @subpage erreurs
+	- @subpage backoffice_user_manual_fake_images
+
+*/

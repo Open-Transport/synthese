@@ -195,15 +195,18 @@ namespace synthese
 		Date&
 		Date::operator++( int )
 		{
-			_day++;
-			if (_day > getDaysPerMonth() )
+			if (!isUnknown())
 			{
-				_day = 1;
-				_month++;
-				if (_month > MONTHS_PER_YEAR )
+				_day++;
+				if (_day > getDaysPerMonth() )
 				{
-					_month = 1;
-					_year++;
+					_day = 1;
+					_month++;
+					if (_month > MONTHS_PER_YEAR )
+					{
+						_month = 1;
+						_year++;
+					}
 				}
 			}
 			return ( *this );
@@ -215,16 +218,19 @@ namespace synthese
 		Date&
 		Date::operator--( int )
 		{
-			_day--;
-			if (_day == 0 )
+			if (!isUnknown())
 			{
-				_month--;
-				if (_month == 0 )
+				_day--;
+				if (_day == 0 )
 				{
-					_year--;
-					_month = 12;
+					_month--;
+					if (_month == 0 )
+					{
+						_year--;
+						_month = 12;
+					}
+					_day = getDaysPerMonth();
 				}
-				_day = getDaysPerMonth();
 			}
 			return *this;
 		}
@@ -234,8 +240,11 @@ namespace synthese
 		Date&
 		Date::operator+=( int daysToAdd )
 		{
-			for ( ; daysToAdd != 0; daysToAdd-- )
-				operator++( 0 );
+			if (!isUnknown())
+			{
+				for ( ; daysToAdd != 0; daysToAdd-- )
+					operator++( 0 );
+			}
 			return ( *this );
 		}
 
@@ -243,9 +252,11 @@ namespace synthese
 		Date&
 		Date::operator-=( int daysToSub )
 		{
-			// To be optimized...
-			for ( ; daysToSub != 0; daysToSub-- )
-				operator--( 0 );
+			if (!isUnknown())
+			{
+				for ( ; daysToSub != 0; daysToSub-- )
+					operator--( 0 );
+			}
 			return ( *this );
 		}
 

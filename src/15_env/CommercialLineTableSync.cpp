@@ -180,7 +180,7 @@ namespace synthese
 			if (networkId != UNKNOWN_VALUE)
 				query << " AND l." << COL_NETWORK_ID << "=" << networkId;
 			if (name.empty())
-				query << " AND l." << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+				query << " AND l." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(name);
 			if (orderByNetwork)
 				query << " ORDER BY "
 					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE_NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")

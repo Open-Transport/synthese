@@ -31,7 +31,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class Place;
 	}
 
 	namespace server
@@ -74,7 +74,7 @@ namespace synthese
 				, bool isOrigin
 				, bool isDestination
 				, interfaces::VariablesMap& variables
-				, const synthese::env::ConnectionPlace* place
+				, const env::Place* place
 				, const server::Request* request = NULL
 			) const;
 

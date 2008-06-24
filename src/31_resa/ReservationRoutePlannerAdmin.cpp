@@ -25,6 +25,7 @@
 #include "ReservationRoutePlannerAdmin.h"
 
 #include "31_resa/ResaModule.h"
+#include "31_resa/ResaRight.h"
 #include "31_resa/BookReservationAction.h"
 #include "31_resa/ResaCustomerHtmlOptionListFunction.h"
 #include "31_resa/ReservationTransaction.h"
@@ -401,7 +402,7 @@ namespace synthese
 
 		bool ReservationRoutePlannerAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			return true;
+			return request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfParent(

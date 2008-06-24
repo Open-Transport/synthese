@@ -48,6 +48,8 @@ namespace synthese
 			static const std::string COL_SHORT_TEXT;
 			static const std::string COL_LONG_TEXT;
 			static const std::string COL_LEVEL;
+			static const std::string COL_IS_FOLDER;
+			static const std::string COL_PARENT_ID;
 
 			TextTemplateTableSync();
 
@@ -60,8 +62,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<TextTemplate> > search(
-				AlarmLevel level
+			static std::vector<boost::shared_ptr<TextTemplate> > Search(
+				AlarmLevel level = ALARM_LEVEL_UNKNOWN
+				, uid parentId = static_cast<uid>(UNKNOWN_VALUE)
+				, bool isFolder = false
 				, std::string name = std::string()
 				, const TextTemplate* templateToBeDifferentWith = NULL
 				, int first = 0

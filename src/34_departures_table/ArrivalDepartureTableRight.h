@@ -30,7 +30,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Habilitation portant sur le téléaffichage.
-			@ingroup m34
+			@ingroup m54Rights refRights
 
 			Les niveaux de droit utilisés sont les suivants :
 				- USE : Parmet de visualiser un tableau de départ ou d'arrivée

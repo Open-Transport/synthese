@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** Fare table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class FareTableSync : public db::SQLiteRegistryTableSyncTemplate<FareTableSync,Fare>
 		{

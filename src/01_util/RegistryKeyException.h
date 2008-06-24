@@ -39,7 +39,7 @@ namespace util
 
 /** Registry key related exception class.
     Should not be used directly, use Registrable::RegistryKeyException.
-@ingroup m01Exceptions refExceptions
+@ingroup m01Registry m01Exceptions refExceptions
 */
 template<class K, class T>
 class RegistryKeyException : public synthese::util::Exception

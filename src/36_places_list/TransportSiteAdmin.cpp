@@ -26,11 +26,26 @@
 #include "36_places_list/PlacesListModule.h"
 #include "36_places_list/SiteTableSync.h"
 #include "36_places_list/Site.h"
+#include "36_places_list/SiteUpdateAction.h"
+#include "36_places_list/SiteRoutePlanningAdmin.h"
+#include "36_places_list/TransportWebsiteRight.h"
 
 #include "30_server/QueryString.h"
+#include "30_server/ActionFunctionRequest.h"
+#include "30_server/Request.h"
+
+#include "33_route_planner/RoutePlannerFunction.h"
 
 #include "32_admin/ModuleAdmin.h"
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
+
+#include "05_html/ResultHTMLTable.h"
+#include "05_html/PropertiesHTMLTable.h"
+#include "05_html/HTMLModule.h"
+
+#include "11_interfaces/Interface.h"
+#include "11_interfaces/InterfaceModule.h"
 
 using namespace std;
 using namespace boost;
@@ -42,6 +57,9 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace transportwebsite;
+	using namespace html;
+	using namespace routeplanner;
+	using namespace security;
 
 	namespace util
 	{
@@ -74,12 +92,65 @@ namespace synthese
 		
 		void TransportSiteAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
-			stream << "Not yet implemented, use the tree to navigate.";
+			// Requests
+			ActionFunctionRequest<SiteUpdateAction,AdminRequest> updateRequest(request);
+			updateRequest.getAction()->setSiteId(_site->getKey());
+			updateRequest.getFunction()->setPage<TransportSiteAdmin>();
+			updateRequest.setObjectId(_site->getKey());
+
+			FunctionRequest<AdminRequest> routeplannerRequest(request);
+			routeplannerRequest.getFunction()->setPage<SiteRoutePlanningAdmin>();
+			routeplannerRequest.setObjectId(_site->getKey());
+
+			FunctionRequest<RoutePlannerFunction> rpHomeRequest(request);
+			rpHomeRequest.getFunction()->setSite(_site);
+
+			// Display
+			stream << "<h1>Liens</h1>";
+			stream << "<p>";
+			stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Calcul d'itinéraires (admin)", string(), AdminInterfaceElementTemplate<transportwebsite::SiteRoutePlanningAdmin>::ICON);
+			stream << HTMLModule::getLinkButton(rpHomeRequest.getURL(), "Calcul d'itinéraires (home client)", string(), AdminInterfaceElementTemplate<transportwebsite::SiteRoutePlanningAdmin>::ICON);
+			stream << "</p>";
+
+			stream << "<h1>Propriétés</h1>";
+			PropertiesHTMLTable pt(updateRequest.getHTMLForm());
+			stream << pt.open();
+			stream << pt.title("Identification");
+			stream << pt.cell("Nom", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_NAME, _site->getName()));
+			stream << pt.cell("Début validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_START_DATE, _site->getStartDate()));
+			stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_END_DATE, _site->getEndDate()));
+			stream << pt.title("Apparence");
+			stream << pt.cell("Interface", pt.getForm().getSelectInput(SiteUpdateAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), _site->getInterface()->getKey()));
+			stream << pt.title("Recherche d'itinéraires");
+			stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _site->getMaxTransportConnectionsCount(), 1, "illimité"));
+			stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _site->getOnlineBookingAllowed()));
+			stream << pt.cell("Affichage données passées", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_USE_OLD_DATA, _site->getPastSolutionsDisplayed()));
+			stream << pt.cell("Nombre de jours chargés", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_USE_DATES_RANGE, 0, 365, _site->getUseDatesRange(), 1, "illimité"));
+			stream << pt.close();
+
+			stream << "<h1>Périodes de recherche d'itinéraire</h1>";
+			HTMLTable::ColsVector cv;
+			cv.push_back("Nom");
+			cv.push_back("Heure début");
+			cv.push_back("Heure fin");
+			HTMLTable ct(cv, ResultHTMLTable::CSS_CLASS);
+			stream << ct.open();
+			const Site::Periods& periods(_site->getPeriods());
+			for (Site::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
+			{
+				stream << ct.row();
+				stream << ct.col() << it->getCaption();
+				stream << ct.col() << it->getBeginHour().toString();
+				stream << ct.col() << it->getEndHour().toString();
+			}
+			stream << ct.close();
+			
+			stream << "<h1>Périmètre de la base transport</h1>";
 		}
 
 		bool TransportSiteAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			return true;
+			return request->isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfParent(

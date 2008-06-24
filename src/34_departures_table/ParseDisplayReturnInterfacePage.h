@@ -65,7 +65,7 @@ namespace synthese
 			outputs :
 			@code 1|1|0|1|0|1|0000|1|0000 @endcode
 
-			@ingroup m34Pages refPages
+			@ingroup m54Pages refPages
 		*/
 		class ParseDisplayReturnInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, ParseDisplayReturnInterfacePage>
 		{

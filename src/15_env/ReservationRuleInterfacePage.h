@@ -46,13 +46,13 @@ namespace synthese
 		class Journey;
 
 		/** ReservationRuleInterfacePage Interface Page Class.
-			@ingroup m15Pages refPages
+			@ingroup m35Pages refPages
 
 			Parameters :
-			 - Reservation is optional
-			 - Reservation is compulsory
-			 - Reservation delay
-			 - Reservation deadline
+			 - Reservation is optional 1|0
+			 - Reservation is compulsory 1|0
+			 - Reservation delay (0 if reservation impossible)
+			 - Reservation deadline (-1/-1/-1 if reservation impossible)
 		*/
 		class ReservationRuleInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,env::ReservationRuleInterfacePage>
 		{

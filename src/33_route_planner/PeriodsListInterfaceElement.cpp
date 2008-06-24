@@ -72,7 +72,7 @@ namespace synthese
 			{
 				stream << "<option value=\"" << i << "\"";
 				if (i == current)
-					stream << " selected=\"1\"";
+					stream << " selected=\"selected\"";
 				stream << ">" << periods.at(i).getCaption() << "</option>";
 			}
 			stream << "</select>";

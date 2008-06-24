@@ -113,7 +113,7 @@ namespace synthese
 
 
 		ServicePointer ContinuousService::getFromPresenceTime(
-			ServicePointer::DeterminationMethod method
+			AccessDirection method
 			, const Edge* edge
 			, const time::DateTime& presenceDateTime
 			, const time::DateTime& computingTime
@@ -129,13 +129,13 @@ namespace synthese
 			int range;
 			int edgeIndex(edge->getRankInPath());
 			
-			if (method == ServicePointer::DEPARTURE_TO_ARRIVAL)
+			if (method == DEPARTURE_TO_ARRIVAL)
 			{
 				schedule = _departureSchedules.at(edgeIndex).first;
 				if (_departureSchedules.at(edgeIndex).first.getHour() <= _departureSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() > _departureSchedules.at(edgeIndex).second.getHour())
-						return ServicePointer();
+						return ServicePointer(DEPARTURE_TO_ARRIVAL);
 					if (presenceDateTime.getHour() < schedule.getHour())
 						actualDateTime.setHour(schedule.getHour());
 				}
@@ -162,7 +162,7 @@ namespace synthese
 				if (_arrivalSchedules.at(edgeIndex).first.getHour() <= _arrivalSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() < _arrivalSchedules.at(edgeIndex).first.getHour())
-						return ServicePointer();
+						return ServicePointer(ARRIVAL_TO_DEPARTURE);
 					if (presenceDateTime.getHour() > _arrivalSchedules.at(edgeIndex).second.getHour())
 						actualDateTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
 				}
@@ -194,13 +194,13 @@ namespace synthese
 
 			// Date control
 			if (!isProvided(originDateTime.getDate()))
-				return ServicePointer();
+				return ServicePointer(method);
 
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
 				if (!ptr.isReservationRuleCompliant(computingTime))
-					return ServicePointer();
+					return ServicePointer(method);
 			}
 			else
 			{
@@ -216,7 +216,7 @@ namespace synthese
 		{
 			int edgeIndex(edge->getRankInPath());
 			Schedule schedule(
-				(servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+				(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				? _arrivalSchedules.at(edgeIndex).first
 				: getDepartureSchedule(edgeIndex)
 				);

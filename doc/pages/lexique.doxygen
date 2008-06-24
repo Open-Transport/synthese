@@ -1,0 +1,95 @@
+/**
+
+@page glossary Glossary
+
+@section glossarySummary Summary
+
+@subsection glossarySummaryBusiness Business glossary
+
+	- @ref lexiqueLignes
+	- @ref defCirculation
+	- @ref defMateriel
+	- @ref defCalendrier
+	- @ref defUserProfile
+	- @ref defAdminlog
+	- @ref defGeolocalisation
+	- @ref defVitessesMax
+	- @ref DisplayTerminal
+
+@subsection glossarySummaryTechnical Technical glossary
+
+	- @ref technicalGlossaryTransportNetwork
+
+@section businessGlossary Business glossary
+
+@subsection businessGlossaryTransport Transport network
+
+@subsubsection defLigneCommerciale Ligne commerciale
+
+Une ligne commerciale est un ensemble de circulations regroupées selon des critères de similitude géographique en général. La ligne commerciale porte l'identification client des services (ex : Ligne 2).
+
+@subsubsection defCirculation Circulation
+
+Les circulations sont identifiées au sein de leur @ref defLigneCommerciale par un code alphanumérique unique de 6 cractères maximum.
+
+@subsubsection defMateriel Matériel roulant
+
+Type de véhicules utilisés par les circulations, faisant intervenir certaines propriétés communes.
+
+
+
+
+
+
+@section technicalGlossary Technical glossary
+
+@subsection technicalGlossaryTransportNetwork Transport network
+
+@subsubsection defLigne Ligne technique
+@copydoc synthese::env::Line
+Les lignes techniques sont implémentées par la classe @ref synthese::15_env::Line.
+
+@subsubsection defAxe Axe
+@copydoc synthese::env::Axis
+Les axes sont implémentés par la classe @ref synthese::15_env::Axis.
+
+@subsubsection defCalendrier Calendrier de circulation
+@copydoc synthese::env::Calendar
+The calendars are implemented by the @ref synthese::15_env::Calendar class.
+
+
+
+
+@subsection defRightsUserProfile Droits, profils utilisateurs, utilisateurs
+
+@subsubsection defRight Habilitation
+@copydoc synthese::security::Right
+La notion d'habilitation est implémentée par la classe @ref synthese::security::Right .
+
+@subsubsection defUserProfile Profil utilisateur
+@copydoc synthese::security::Profile
+La notion de profil utilisateur est implémentée par la classe @ref synthese::security::Profile .
+
+@subsubsection defUser Utilisateur
+@copydoc synthese::security::User
+La notion d'utilisateur est implémentée par la classe @ref synthese::security::User .
+
+
+
+@subsection defAdminlog Composants d'administration, journaux
+
+@subsubsection defAdmin Composants d'administration
+@copydoc synthese::interfaces::AdminInterfaceElement
+La notion de composant d'administration est implémentée par des sous-classes de @ref synthese::interfaces::AdminInterfaceElement.
+
+@subsubsection defLog Journaux
+@copydoc synthese::interfaces::DBLogViewer
+
+
+
+@subsection defDisplay Terminaux d'affichage
+
+@subsubsection defDisplayTerminal Terminal d'affichage
+@copydoc synthese::departurestable::DisplayScreen
+
+*/

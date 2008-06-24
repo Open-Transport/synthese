@@ -13,11 +13,13 @@
 #include "31_resa/CancelReservationAction.h"
 #include "31_resa/CallBeginAction.h"
 #include "31_resa/CallEndAction.h"
+#include "31_resa/ResaLogEntryUpdateAction.h"
 
 #include "31_resa/ReservationsListFunction.h"
 #include "31_resa/ResaCustomerHtmlOptionListFunction.h"
 
 #include "31_resa/ReservationsListInterfacePage.h"
+#include "31_resa/ReservationItemInterfacePage.h"
 
 #include "31_resa/ReservationsListInterfaceElement.h"
 #include "31_resa/ResaCallButtonInterfaceElement.h"
@@ -27,3 +29,5 @@
 #include "31_resa/ResaCustomerAdmin.h"
 #include "31_resa/ResaCustomersAdmin.h"
 #include "31_resa/ReservationRoutePlannerAdmin.h"
+#include "31_resa/ResaLogAdmin.h"
+#include "31_resa/ResaEditLogEntryAdmin.h"

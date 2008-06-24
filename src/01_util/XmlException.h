@@ -37,7 +37,7 @@ namespace util
 
 
 /** Xml related exception class
-@ingroup m01Exceptions refExceptions
+@ingroup m01XML m01Exceptions refExceptions
 */
 
 class XmlException : public synthese::util::Exception

@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** BikeCompliance table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class BikeComplianceTableSync : public db::SQLiteRegistryTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>
 		{

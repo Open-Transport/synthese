@@ -39,7 +39,7 @@ namespace synthese
 		class DisplayType;
 
 		/** DisplayType table synchronizer.
-			@ingroup m34LS refLS
+			@ingroup m54LS refLS
 		*/
 		class DisplayTypeTableSync : public db::SQLiteRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>
 		{

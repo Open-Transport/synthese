@@ -40,7 +40,7 @@ namespace synthese
 
 		/** Place alias.
 
-		 @ingroup m15
+		 @ingroup m35
 		*/
 		class PlaceAlias : 
 			public synthese::util::Registrable<uid, PlaceAlias>,

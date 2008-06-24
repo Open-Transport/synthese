@@ -140,10 +140,9 @@ namespace synthese
 			uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
 
 			Path* path = LineTableSync::GetUpdateable(pathId,ss,temporary);
-			
 			assert (path);
 //			assert (path->getEdges ().size () == ss-> arrivalSchedules.size ());
-
+			
 			uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
 
 			uid handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
@@ -152,7 +151,6 @@ namespace synthese
 
 			uid reservationRuleId (rows->getLongLong (ScheduledServiceTableSync::COL_RESERVATIONRULEID));
 
-			ss->setPath(path);
 			ss->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,ss,true,temporary));
 			ss->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,ss,true,temporary));
 			ss->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId,ss,true,temporary));

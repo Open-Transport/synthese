@@ -37,7 +37,7 @@ namespace synthese
 		class PhysicalStop;
 
 		/** PhysicalStop SQLite table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 			
 			Physical stops table :
 				- on insert : 

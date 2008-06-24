@@ -75,7 +75,7 @@ namespace synthese
 		int 
 		Journey::getJourneyLegCount () const
 		{
-			return (int) _journeyLegs.size ();
+			return static_cast<int>(_journeyLegs.size());
 		}
 
 
@@ -124,7 +124,7 @@ namespace synthese
 			DateTime d(getFirstJourneyLeg ().getDepartureDateTime());
 			if (d.isUnknown())
 				return d;
-			d -= (_method == TO_DESTINATION) ? _startApproachDuration : _endApproachDuration;
+			d -= (_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration;
 			return d;
 		}
 
@@ -135,14 +135,16 @@ namespace synthese
 			DateTime d(getLastJourneyLeg ().getArrivalDateTime());
 			if (d.isUnknown())
 				return d;
-			d += (_method == TO_DESTINATION) ? _endApproachDuration : _startApproachDuration;
+			d += (_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration;
 			return d;
 		}
 
 
-		void 
-		Journey::prepend (const ServiceUse& leg)
+
+		void Journey::_prependServiceUse(const ServiceUse& leg)
 		{
+			assert(leg.getMethod() == _method);
+
 			_journeyLegs.push_front (leg);
 			_effectiveDuration += leg.getDuration ();
 			_distance += leg.getDistance ();
@@ -164,9 +166,9 @@ namespace synthese
 			for(ServiceUses::const_reverse_iterator it(journey._journeyLegs.rbegin());
 				it != journey._journeyLegs.rend();
 				++it
-			)	prepend(*it);
+			)	_prependServiceUse(*it);
 
-			if (_method == TO_DESTINATION)
+			if (_method == DEPARTURE_TO_ARRIVAL)
 				_startApproachDuration = journey._startApproachDuration;
 			else
 			{
@@ -177,11 +179,10 @@ namespace synthese
 
 
 
-
-
-		void 
-		Journey::append (const ServiceUse& leg)
+		void Journey::_appendServiceUse(const ServiceUse& leg)
 		{
+			assert(leg.getMethod() == _method);
+
 			_journeyLegs.push_back (leg);
 			_effectiveDuration += leg.getDuration ();
 			_distance += leg.getDistance ();
@@ -203,9 +204,9 @@ namespace synthese
 			for(ServiceUses::const_iterator it(journey._journeyLegs.begin());
 				it != journey._journeyLegs.end();
 				++it
-			)	append(*it);
+			)	_appendServiceUse(*it);
 
-			if (_method == TO_DESTINATION)
+			if (_method == DEPARTURE_TO_ARRIVAL)
 			{
 				_endReached = journey._endReached;
 				_endApproachDuration = journey._endApproachDuration;
@@ -463,10 +464,17 @@ namespace synthese
 
 		void Journey::reverse()
 		{
-			_setMethod((_method == TO_DESTINATION) ? FROM_ORIGIN : TO_DESTINATION);
 			int duration(_startApproachDuration);
 			_startApproachDuration = _endApproachDuration;
 			_endApproachDuration = duration;
+
+			for (ServiceUses::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			{
+				assert(it->getMethod() == _method);
+				it->reverse();
+			}
+
+			_setMethod((_method == DEPARTURE_TO_ARRIVAL) ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL);
 		}
 
 		synthese::AccessDirection Journey::getMethod() const
@@ -503,9 +511,9 @@ namespace synthese
 				_minSpeedToEnd = 0;
 			else
 			{
-				assert((_method == TO_DESTINATION) ? dateTime > getArrivalTime() : getDepartureTime() > dateTime);
+				assert((_method == DEPARTURE_TO_ARRIVAL) ? dateTime > getArrivalTime() : getDepartureTime() > dateTime);
 
-				_minSpeedToEnd = (1000 * _squareDistanceToEnd.getSquareDistance()) / ((_method == TO_DESTINATION) ? dateTime - getArrivalTime() : getDepartureTime() - dateTime);
+				_minSpeedToEnd = (1000 * _squareDistanceToEnd.getSquareDistance()) / ((_method == DEPARTURE_TO_ARRIVAL) ? dateTime - getArrivalTime() : getDepartureTime() - dateTime);
 
 				_score = _minSpeedToEnd;
 				if (_score < 100)
@@ -537,7 +545,7 @@ namespace synthese
 		void Journey::_setMethod( AccessDirection method )
 		{
 			_method = method;
-			if (_method == TO_DESTINATION)
+			if (_method == DEPARTURE_TO_ARRIVAL)
 			{
 				_bestTimeStrictOperator = &DateTime::operator<;
 				_endServiceUseGetter = &Journey::getLastJourneyLeg;
@@ -546,6 +554,8 @@ namespace synthese
 				_beginEdgeGetter = &Journey::getOrigin;
 				_endDateTimeGetter = &Journey::getArrivalTime;
 				_beginDateTimeGetter = &Journey::getDepartureTime;
+				_serviceUsePusher = &Journey::_appendServiceUse;
+				_journeyPusher = &Journey::append;
 			}
 			else
 			{
@@ -556,6 +566,8 @@ namespace synthese
 				_beginEdgeGetter = &Journey::getDestination;
 				_endDateTimeGetter = &Journey::getDepartureTime;
 				_beginDateTimeGetter = &Journey::getArrivalTime;
+				_serviceUsePusher = &Journey::_prependServiceUse;
+				_journeyPusher = &Journey::prepend;
 			}
 		}
 
@@ -592,6 +604,34 @@ namespace synthese
 				}
 			}
 			return result;
+		}
+
+
+
+		void Journey::push( const ServiceUse& leg )
+		{
+			(this->*_serviceUsePusher)(leg);
+		}
+
+
+
+		void Journey::push( const Journey& journey )
+		{
+			(this->*_journeyPusher)(journey);
+		}
+
+
+
+		int Journey::getStartApproachDuration() const
+		{
+			return _startApproachDuration;
+		}
+
+
+
+		int Journey::getEndApproroachDuration() const
+		{
+			return _endApproachDuration;
 		}
 	}
 }

@@ -37,7 +37,7 @@ namespace synthese
 	{
 
 		ServicePointer PermanentService::getFromPresenceTime(
-			ServicePointer::DeterminationMethod method
+			AccessDirection method
 			, const Edge* edge
 			, const DateTime& presenceDateTime
 			, const DateTime& computingTime
@@ -55,7 +55,7 @@ namespace synthese
 
 		time::DateTime PermanentService::getLeaveTime( const ServicePointer& servicePointer , const Edge* edge ) const
 		{
-			double distance((servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+			double distance((servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				? edge->getMetricOffset() - servicePointer.getEdge()->getMetricOffset()
 				: servicePointer.getEdge()->getMetricOffset() - edge->getMetricOffset()
 			);
@@ -64,7 +64,7 @@ namespace synthese
 
 			int duration(ceil(distance * 0.015));
 			DateTime dt(servicePointer.getActualDateTime());
-			if (servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+			if (servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				dt += duration;
 			else
 				dt -= duration;

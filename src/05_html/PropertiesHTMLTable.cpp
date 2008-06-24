@@ -49,8 +49,11 @@ namespace synthese
 		std::string PropertiesHTMLTable::close()
 		{
 			stringstream s;
-			s	<< row();
-			s	<< col(2, string(), true) << _form.getSubmitButton("Enregistrer les modifications");
+			if (_form.getUpdateRight())
+			{
+				s	<< row();
+				s	<< col(2, string(), true) << _form.getSubmitButton("Enregistrer les modifications");
+			}
 			s	<< HTMLTable::close() << _form.close();
 			return s.str();
 		}

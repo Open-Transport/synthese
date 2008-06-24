@@ -30,8 +30,6 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePage.h"
 
-#include "12_security/GlobalRight.h"
-
 #include "30_server/RequestException.h"
 #include "30_server/Action.h"
 
@@ -160,9 +158,7 @@ namespace synthese
 
 		bool AdminRequest::_isAuthorized() const
 		{
-			return 
-				_request->isAuthorized<GlobalRight>(USE, UNKNOWN_RIGHT_LEVEL)
-				&& _page->isAuthorized(static_cast<const FunctionRequest<AdminRequest>* >(_request));
+			return _page->isAuthorized(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 		}
 	}
 }

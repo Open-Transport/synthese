@@ -36,12 +36,14 @@
 #include "36_places_list/Site.h"
 #include "36_places_list/SiteTableSync.h"
 #include "36_places_list/TransportSiteAdmin.h"
+#include "36_places_list/TransportWebsiteRight.h"
 
 #include "33_route_planner/RoutePlanner.h"
 
 #include "05_html/SearchFormHTMLTable.h"
 
 #include "30_server/QueryString.h"
+#include "30_server/Request.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
@@ -58,6 +60,7 @@ namespace synthese
 	using namespace time;
 	using namespace html;
 	using namespace env;
+	using namespace security;
 
 	namespace util
 	{
@@ -137,7 +140,8 @@ namespace synthese
 			if (_startCity.empty() || _endCity.empty())
 				return;
 
-			stream << "<h1>Résultats</h1>";
+			if (_log)
+				stream << "<h1>Trace</h1>";
 
 			DateTime endDate(_dateTime);
 			endDate++;
@@ -145,7 +149,6 @@ namespace synthese
 			// Route planning
 			const Place* startPlace(_site->fetchPlace(_startCity, _startPlace));
 			const Place* endPlace(_site->fetchPlace(_endCity, _endPlace));
-			stringstream trace;
 			RoutePlanner r(
 				startPlace
 				, endPlace
@@ -154,10 +157,12 @@ namespace synthese
 				, _dateTime
 				, endDate
 				, _resultsNumber
-				, &trace
+				, &stream
 				, _log ? Log::LEVEL_TRACE : Log::LEVEL_NONE
 				);
 			const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
+
+			stream << "<h1>Résultats</h1>";
 
 			if (jv.journeys.empty())
 			{
@@ -254,18 +259,11 @@ namespace synthese
 				stream << t.col() << its->getArrivalDateTime().toString();
 			}
 			stream << t.close();
-
-			if (_log)
-			{
-				stream << "<h1>Trace</h1><pre>";
-				stream << trace.str();
-				stream << "</pre>";
-			}
 		}
 
 		bool SiteRoutePlanningAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			return true;
+			return request->isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks SiteRoutePlanningAdmin::getSubPagesOfParent(

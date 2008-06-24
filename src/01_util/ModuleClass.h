@@ -32,12 +32,15 @@ namespace synthese
 {
 	namespace util
 	{
+		/** @defgroup m01Modularization Modularization
+			@ingroup m01
+			@{
+		*/
+
 		/** Module recorder.
 
 			Each module must implement a ModuleClass subclass and register it by the Generic Factory.
 			Chosen key indicates the order of loading and can be important in several cases.
-
-			@ingroup m01
 		*/
 		class ModuleClass : public util::Factorable<ModuleClass>
 		{
@@ -49,6 +52,8 @@ namespace synthese
 			virtual std::string getName() const = 0;
 
 		};
+
+		/** @} */
 	}
 }
 #endif // SYNTHESE_ModuleClass_H__

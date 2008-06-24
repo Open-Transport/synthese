@@ -41,7 +41,7 @@ namespace synthese
 		
 		/** Journal relatif au contrôle des données de définition des afficheurs.
 
-			@ingroup m34log reflog				
+			@ingroup m54log reflog				
 		*/
 		class DisplayDataControlLog : public util::FactorableTemplate<dblog::DBLog, DisplayDataControlLog>
 		{

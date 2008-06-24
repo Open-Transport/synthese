@@ -122,7 +122,7 @@ namespace synthese
 
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
-					ServicePointer sp(ServicePointer::DEPARTURE_TO_ARRIVAL,lineStop.get());
+					ServicePointer sp(DEPARTURE_TO_ARRIVAL,lineStop.get());
 					sp.setActualTime(d);
 					DeparturesTableElement dte(sp, false);
 					displayedObject.map.insert(make_pair(dte, places));
@@ -148,6 +148,7 @@ namespace synthese
 					, false
 					, false
 					, _type->getMaxStopsNumber()
+					, place.get()
 					, displayedObject
 				);
 			}

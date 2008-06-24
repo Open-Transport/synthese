@@ -27,12 +27,14 @@
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
-#include "05_html/ResultHTMLTable.h"
+#include "17_messages/Types.h"
 
 namespace synthese
 {
 	namespace messages
 	{
+		class TextTemplate;
+
 		/** MessagesTemplateLibraryAdmin Class.
 			@ingroup m17Admin refAdmin
 			@author Hugues Romain
@@ -41,12 +43,10 @@ namespace synthese
 		class MessagesTemplateLibraryAdmin : public admin::AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>
 		{
 		public:
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_SHORT_TEXT;
-			static const std::string PARAMETER_LONG_TEXT;
+			static const std::string PARAMETER_FOLDER_ID;
 
 		private:
-			html::ResultHTMLTable::RequestParameters	_requestParameters;
+			boost::shared_ptr<const TextTemplate>	_folder;
 
 		public:
 			MessagesTemplateLibraryAdmin();
@@ -58,6 +58,8 @@ namespace synthese
 				@date 2008
 			*/
 			void setFromParametersMap(const server::ParametersMap& map);
+
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -99,12 +101,38 @@ namespace synthese
 				const AdminInterfaceElement& currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
+
+
+
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible
 				@author Hugues Romain
 				@date 2008					
 			*/
 			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
+
+
+
+			/** Title generator.
+				@return The title of the page
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual std::string getTitle() const;
+
+			/** Parameter name getter.
+				@return The name of the parameter of the page
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual std::string getParameterName() const;
+
+			/** Parameter value getter.
+				@return The value of the parameter of the page
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual std::string getParameterValue() const;
 		};
 	}
 }

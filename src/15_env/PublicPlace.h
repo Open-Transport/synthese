@@ -39,7 +39,7 @@ namespace synthese
 
 
 		/** Public place class.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class PublicPlace : public synthese::util::Registrable<uid, PublicPlace>, public AddressablePlace
 		{

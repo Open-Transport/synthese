@@ -371,6 +371,45 @@ namespace synthese
 
 
 	}
+
+		bool Calendar::operator||( const Calendar& op ) const
+		{
+			if (_firstMarkedDate.isUnknown() || _lastMarkedDate.isUnknown() || op._firstMarkedDate.isUnknown() || op._lastMarkedDate.isUnknown())
+				return false;
+
+			const Date& firstMarkedDate(_firstMarkedDate < op._firstMarkedDate ? op._firstMarkedDate : _firstMarkedDate);
+			const Date& lastMarkedDate(_lastMarkedDate < op._lastMarkedDate ? _lastMarkedDate : op._lastMarkedDate);
+
+			int thisShifting(NbBitsBetweenDates(_firstMarkedDate, firstMarkedDate));
+			int opShifting(NbBitsBetweenDates(op._firstMarkedDate, firstMarkedDate));
+			
+			for (int todo(NbBitsBetweenDates(firstMarkedDate, lastMarkedDate)); todo >= 0; --todo)
+			{
+				if (_markedDates[thisShifting] && op._markedDates[opShifting])
+					return true;
+
+				++thisShifting;
+				++opShifting;
+			}
+
+			return false;
+		}
+
+
+
+		bool Calendar::operator==( const Calendar& op ) const
+		{
+			return _firstMarkedDate == op._firstMarkedDate
+				&& _lastMarkedDate == op._lastMarkedDate
+				&& _markedDates == op._markedDates;
+		}
+
+
+
+		void Calendar::subDates( const Calendar& calendar )
+		{
+			/// @todo TO BE IMPLEMENTED
+		}
     }
 }
     

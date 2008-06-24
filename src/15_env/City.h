@@ -52,7 +52,7 @@ namespace env
 A city holds in its included places the main connection places
  (those taken by default when no stop is explicitly chosen).
 
-@ingroup m15
+@ingroup m35
 */
 class City : public util::Registrable<uid, City>, 
     public IncludingPlace

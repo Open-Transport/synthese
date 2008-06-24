@@ -37,7 +37,9 @@ namespace map
 
 class DrawableLine;
 
-
+/** .
+	@ingroup m59
+*/
 class DrawableLineIndex
 {
 

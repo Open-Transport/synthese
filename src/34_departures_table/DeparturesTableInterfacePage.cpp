@@ -24,6 +24,8 @@
 
 #include "01_util/Conversion.h"
 
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+
 using namespace boost;
 using namespace std;
 
@@ -47,6 +49,7 @@ namespace synthese
 			, bool displayTrackNumber
 			, bool displayTeam
 			, int intermediatesStopsToDisplay
+			, const env::PublicTransportStopZoneConnectionPlace* place
 			, const ArrivalDepartureListWithAlarm& rows
 			, const server::Request* request /*= NULL*/ ) const
 		{
@@ -57,6 +60,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(displayTrackNumber));
 			pv.push_back(Conversion::ToString(intermediatesStopsToDisplay));
 			pv.push_back(Conversion::ToString(displayTeam));
+			pv.push_back(place->getFullName());
 
 			InterfacePage::display(
 				stream

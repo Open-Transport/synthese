@@ -56,7 +56,7 @@ namespace synthese
 		void RoutePlannerInterfacePage::display(
 			ostream& stream
 			, VariablesMap& variables
-			, const JourneyBoardJourneys& object /*= NULL*/
+			, const RoutePlannerResult& object
 			, const time::Date& date
 			, int periodId
 			, const env::Place* originPlace
@@ -66,6 +66,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 			, const AccessibilityParameter& accessibility
 			, const Site* site
+			, bool samePlaces
 		) const	{
 			const void* vobj(static_cast<const void*>(&object));
 			const City* originCity(dynamic_cast<const City*>(originPlace));
@@ -101,9 +102,10 @@ namespace synthese
 			pv.push_back(Conversion::ToString(periodId));
 			pv.push_back(sDate.str());
 			pv.push_back((period == NULL) ? string() : period->getCaption());
-			pv.push_back(Conversion::ToString(object.size()));
+			pv.push_back(Conversion::ToString(object.result.size()));
 			pv.push_back(Conversion::ToString(accessibility));
 			pv.push_back(Conversion::ToString(site->getKey()));
+			pv.push_back(Conversion::ToString(samePlaces));
 
 			InterfacePage::display(stream, pv, variables, vobj, request);
 		}
@@ -145,6 +147,7 @@ namespace synthese
 			pv.push_back("0");
 			pv.push_back(Conversion::ToString(accessibility));
 			pv.push_back(Conversion::ToString(site->getKey()));
+			pv.push_back("0");
 
 			InterfacePage::display(stream, pv, variables, NULL, request);
 

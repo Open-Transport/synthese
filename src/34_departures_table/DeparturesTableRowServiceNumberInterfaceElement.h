@@ -38,7 +38,7 @@ namespace synthese
 		/** Departures Table Row Service Number Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m34Library refLibrary
+			@ingroup m54Library refLibrary
 		*/
 		class DeparturesTableRowServiceNumberInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableRowServiceNumberInterfaceElement>
 		{

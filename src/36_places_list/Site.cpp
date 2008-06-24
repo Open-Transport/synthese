@@ -230,5 +230,26 @@ namespace synthese
 		{
 			return _name;
 		}
+
+
+
+		int Site::getUseDatesRange() const
+		{
+			return _useDateRange;
+		}
+
+
+
+		const time::Date& Site::getStartDate() const
+		{
+			return _startValidityDate;
+		}
+
+
+
+		const time::Date& Site::getEndDate() const
+		{
+			return _endValidityDate;
+		}
 	}
 }

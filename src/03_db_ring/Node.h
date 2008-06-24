@@ -38,7 +38,7 @@ namespace dbring
 
 /** Db ring node class.
 
-@ingroup m03
+@ingroup m101
 */
 class Node : public db::SQLite, public util::ThreadExec 
 {

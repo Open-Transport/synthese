@@ -24,8 +24,14 @@
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 
+#include "13_dblog/DBLogModule.h"
+
+#include "17_messages/MessagesLibraryLog.h"
+#include "17_messages/MessagesLibraryRight.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/ParametersMap.h"
+#include "30_server/Request.h"
 
 #include "01_util/Conversion.h"
 
@@ -37,6 +43,8 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace util;
+	using namespace dblog;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::UpdateTextTemplateAction>::FACTORY_KEY("utta");
 	
@@ -46,12 +54,14 @@ namespace synthese
 		const string UpdateTextTemplateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "n";
 		const string UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE = Action_PARAMETER_PREFIX + "sm";
 		const string UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lm";
+		const string UpdateTextTemplateAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
 
 
 		ParametersMap UpdateTextTemplateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if (_text.get())
+				map.insert(PARAMETER_TEXT_ID, _text->getKey());
 			return map;
 		}
 
@@ -62,12 +72,15 @@ namespace synthese
 				// Text ID
 				uid id = map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY);
 				_text = TextTemplateTableSync::GetUpdateable(id);
-				
+		
+				id = map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY);
+				_folder = TextTemplateTableSync::Get(id);
+
 				// Name
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
-				vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_text->getAlarmLevel(), _name, _text.get(), 0, 1);
+				vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::Search(ALARM_LEVEL_UNKNOWN, _text->getParentId(), false, _name, _text.get(), 0, 1);
 				if (!v.empty())
 					throw ActionException("Un texte portant ce nom existe déjà.");
 
@@ -85,10 +98,34 @@ namespace synthese
 
 		void UpdateTextTemplateAction::run()
 		{
+			stringstream logChanges;
+
+			DBLogModule::appendToLogIfChange(logChanges, "Nom", _text->getName(), _name);
 			_text->setName(_name);
+			DBLogModule::appendToLogIfChange(logChanges, "Message court", _text->getShortMessage(), _shortMessage);
 			_text->setShortMessage(_shortMessage);
+			DBLogModule::appendToLogIfChange(logChanges, "Message long", _text->getLongMessage(), _longMessage);
 			_text->setLongMessage(_longMessage);
+			DBLogModule::appendToLogIfChange(logChanges, "Déplacement", _text->getParentId(), _folder->getKey());
+			_text->setParentId(_folder->getKey());
+
 			TextTemplateTableSync::save(_text.get());
+
+			MessagesLibraryLog::AddTemplateUpdateEntry(*_text, logChanges.str(), _request->getUser().get());
+		}
+
+
+
+		void UpdateTextTemplateAction::setTemplate( boost::shared_ptr<TextTemplate> text )
+		{
+			_text = text;
+		}
+
+
+
+		bool UpdateTextTemplateAction::_isAuthorized() const
+		{
+			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

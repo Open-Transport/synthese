@@ -311,7 +311,7 @@ namespace synthese
 						// Saving of the used service
 						ServicePointer servicePointer(
 							getParentPath ()->getService(next)->getFromPresenceTime(
-								ServicePointer::DEPARTURE_TO_ARRIVAL
+								DEPARTURE_TO_ARRIVAL
 								, this
 								, departureMoment
 								, calculationMoment
@@ -325,7 +325,7 @@ namespace synthese
 
 						// Control of validity of departure date time
 						if (servicePointer.getActualDateTime() > maxDepartureMoment )
-							return ServicePointer();
+							return ServicePointer(DEPARTURE_TO_ARRIVAL);
 
 						// Store the service rank in edge
 						servicePointer.setServiceIndex(next);
@@ -342,7 +342,7 @@ namespace synthese
 				next = _departureIndex[ 0 ];
 			}
 
-			return ServicePointer();
+			return ServicePointer(DEPARTURE_TO_ARRIVAL);
 		}
 
 
@@ -366,7 +366,7 @@ namespace synthese
 						// Saving of the used service
 						ServicePointer servicePointer(
 							getParentPath ()->getService(previous)->getFromPresenceTime(
-								ServicePointer::ARRIVAL_TO_DEPARTURE
+								ARRIVAL_TO_DEPARTURE
 								, this
 								, arrivalMoment
 								, computingDateTime
@@ -380,7 +380,7 @@ namespace synthese
 
 						// Control of validity of departure date time
 						if (servicePointer.getActualDateTime() < minArrivalMoment)
-							return ServicePointer();
+							return ServicePointer(ARRIVAL_TO_DEPARTURE);
 
 						// Store service rank in edge
 						servicePointer.setServiceIndex(previous);
@@ -395,7 +395,7 @@ namespace synthese
 				previous = _arrivalIndex[ 23 ];
 			}
 
-			return ServicePointer();
+			return ServicePointer(ARRIVAL_TO_DEPARTURE);
 		}
 
 

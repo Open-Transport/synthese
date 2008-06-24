@@ -43,7 +43,7 @@ namespace synthese
 		Crossing::Crossing(
 			const uid& key
 			, const City* city
-		)	: ConnectionPlace (string(), city, CONNECTION_TYPE_ROADROAD)
+		)	: ConnectionPlace ("X", city, CONNECTION_TYPE_ROADROAD)
 			, Registrable<uid,Crossing>(key)
 	    {
 	    }
@@ -84,7 +84,13 @@ namespace synthese
 
 		void Crossing::addAddress( const Address* address )
 		{
-			setName(getName() + "/" + address->getRoad()->getName());
+			Addresses::const_iterator it;
+			for (it = _addresses.begin(); it != _addresses.end(); ++it)
+				if ((*it)->getRoad()->getName() == address->getRoad()->getName())
+					break;
+			if (it == _addresses.end())
+				setName(getName() + "/" + address->getRoad()->getName());
+
 			AddressablePlace::addAddress(address);
 		}
 	}

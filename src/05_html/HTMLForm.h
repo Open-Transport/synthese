@@ -144,6 +144,16 @@ namespace synthese
 					@date 2008					
 				*/
 				const std::string& getName() const;
+
+
+				
+				
+				/** Gets the update right status.
+					@return bool the update right status
+					@author Hugues Romain
+					@date 2008
+				*/
+				bool getUpdateRight() const;
 			//@}
 
 
@@ -554,7 +564,7 @@ namespace synthese
 				{
 					s << "<option value=\"" << it->first << "\"";
 					if (it->first == value)
-						s << " selected=\"1\"";
+						s << " selected=\"selected\"";
 					s << ">" << it->second << "</option>";
 				}
 				s << "</select>";
@@ -577,9 +587,9 @@ namespace synthese
 			s << "<input name=\"" << name << "\" type=\"radio\" value=\"" << valueIfSelected << "\""
 				<< " id=\"" << id << "\"";
 			if (valueIfSelected == valueToSelect)
-				s << " checked=\"1\"";
+				s << " checked=\"checked\"";
 			if (disabled)
-				s << " disabled=\"1\"";
+				s << " disabled=\"disabled\"";
 			s << " /><label for=\"" << id << "\">" << label << "</label>";
 			std::stringstream vs;
 			vs << valueToSelect;

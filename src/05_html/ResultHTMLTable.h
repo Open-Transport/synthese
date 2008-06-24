@@ -53,7 +53,8 @@ namespace synthese
 			
 		public:
 			typedef std::vector<std::pair<std::string, std::string> > HeaderVector;
-			static const int UNLIMITED_SIZE;
+			static const int			UNLIMITED_SIZE;
+			static const std::string	CSS_CLASS;
 
 			struct RequestParameters
 			{
@@ -86,10 +87,13 @@ namespace synthese
 				template<class T>
 				void setFromResult(const RequestParameters& p, std::vector<T>& v)
 				{
-					next = v.size() == p.maxSize + 1;
-					if (next)
-						v.pop_back();
-					size = v.size();
+					if (p.maxSize != UNKNOWN_VALUE)
+					{
+						next = v.size() == p.maxSize + 1;
+						if (next && !v.empty())
+							v.pop_back();
+						size = v.size();
+					}
 				}
 			};
 

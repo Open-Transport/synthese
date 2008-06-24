@@ -1,3 +1,25 @@
+
+/** DbModuleClass class implementation.
+	@file DbModuleClass.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "DbModuleClass.h"
 
 #include "01_util/Log.h"
@@ -70,21 +92,24 @@ namespace synthese
 
 
 
-	    void
-	    DbModuleClass::SetParameter (const std::string& name, 
-					 const std::string& value)
-	    {
-		_Parameters.insert (std::make_pair (name, value));
+	    void DbModuleClass::SetParameter(
+			const std::string& name
+			, const std::string& value
+			, bool runCallback
+		){
+			_Parameters.insert (std::make_pair (name, value));
+			
+			Log::GetInstance ().info ("Parameter " + name + " set to : " + value);
 		
-		Log::GetInstance ().info ("Parameter " + name + " set to : " + value);
-		
-		// Launches corresponding callback (only one allowed right now)
-		std::map<std::string, PtrCallback>::const_iterator it = 
-		    _Callbacks.find (name);
-		if (it == _Callbacks.end ()) return;
-		PtrCallback cb = it->second;
-		(*cb) (name, value);
-	    }
+			if (runCallback)
+			{	// Launches corresponding callback (only one allowed right now)
+				std::map<std::string, PtrCallback>::const_iterator it = 
+					_Callbacks.find (name);
+				if (it == _Callbacks.end ()) return;
+				PtrCallback cb = it->second;
+				(*cb) (name, value);
+			}
+		}
 
 
 

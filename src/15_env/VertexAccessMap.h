@@ -56,7 +56,7 @@ namespace synthese
 		 
 		/** 
 TRIDENT : VertexAccess => AccesPoint
-		@ingroup m15
+		@ingroup m35
 		*/
 		class VertexAccessMap
 		{
@@ -99,6 +99,17 @@ TRIDENT : VertexAccess => AccesPoint
 			bool needFineSteppingForArrival (const Path* path) const;
 		    
 			bool contains (const Vertex* vertex) const;
+			
+					
+			
+			/** Vertex insertion.
+				@param vertex the vertex to insert
+				@param vertexAccess access conditions to the vertex
+				@author Hugues Romain
+				@date 2008
+				
+				If the vertex already belongs to the object, then only the access conditions are updated, only if they are more efficient.
+			*/
 			void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
 		    
 			void merge (const VertexAccessMap& vam,

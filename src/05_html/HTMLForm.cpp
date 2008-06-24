@@ -491,5 +491,12 @@ namespace synthese
 		{
 			return _name;
 		}
+
+
+
+		bool HTMLForm::getUpdateRight() const
+		{
+			return _updateRight;
+		}
 	}
 }

@@ -98,7 +98,9 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::_link(Site* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
 		{
-			obj->setInterface(InterfaceTableSync::Get(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID), obj, false, temporary));
+			uid id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
+			if (id != UNKNOWN_VALUE)
+				obj->setInterface(InterfaceTableSync::Get(id, obj, false, temporary));
 		}
 
 
@@ -113,7 +115,27 @@ namespace synthese
 		{
 			stringstream query;
 			query << " REPLACE INTO " << TABLE_NAME << " VALUES("
-				
+				<< site->getKey()
+				<< "," << Conversion::ToSQLiteString(site->getName())
+				<< "," << (site->getInterface() ? site->getInterface()->getKey() : static_cast<uid>(UNKNOWN_VALUE))
+				<< "," << site->getStartDate().toSQLString()
+				<< "," << site->getEndDate().toSQLString()
+				<< "," << Conversion::ToString(site->getOnlineBookingAllowed())
+				<< "," << Conversion::ToString(site->getPastSolutionsDisplayed())
+				<< "," << site->getMaxTransportConnectionsCount()
+				<< "," << site->getUseDatesRange();
+			
+			const Site::Periods& periods(site->getPeriods());
+			query << ",'";
+			for(Site::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
+			{
+				if (it != periods.begin())
+					query << ",";
+				query << it->getBeginHour().toSQLString(false)
+					<< "|" << it->getEndHour().toSQLString(false)
+					<< "|" << Conversion::ToSQLiteString(it->getCaption(), false);
+			}
+			query << "'"
 				<< ")";
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}

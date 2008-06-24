@@ -57,7 +57,7 @@ namespace synthese
 			of geographical location in terms of coordinates; it is rather
 			a human abstraction.
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Place 
 		{

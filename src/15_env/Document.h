@@ -16,7 +16,7 @@ namespace env
 
 
 
-/** @ingroup m15 */
+/** @ingroup m35 */
 class Document : public synthese::util::Registrable<uid,Document>
 {
 public:

@@ -27,8 +27,15 @@
 
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace synthese
 {
+	namespace dblog
+	{
+		class DBLogEntry;
+	}
+
 	namespace resa
 	{
 		/** ResaEditLogEntryAdmin Class.
@@ -38,6 +45,8 @@ namespace synthese
 		*/
 		class ResaEditLogEntryAdmin : public admin::AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>
 		{
+			boost::shared_ptr<const dblog::DBLogEntry>	_entry;
+
 		public:
 			ResaEditLogEntryAdmin();
 			

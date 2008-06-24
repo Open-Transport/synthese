@@ -35,7 +35,7 @@ namespace synthese
 
 		/** Base class for a place including other places.
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class IncludingPlace : public Place
 		{

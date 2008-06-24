@@ -35,7 +35,7 @@ namespace synthese
 	namespace env
 	{
 		/** TransportNetwork SQLite table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class TransportNetworkTableSync : public db::SQLiteRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>
 		{

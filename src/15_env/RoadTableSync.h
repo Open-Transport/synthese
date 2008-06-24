@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		/** Road table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class RoadTableSync : public db::SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>
 		{

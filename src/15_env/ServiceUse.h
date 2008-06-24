@@ -32,7 +32,7 @@ namespace synthese
 		class Edge;
 
 		/** ServiceUse class.
-			@ingroup m15
+			@ingroup m35
 		*/
 		class ServiceUse : public ServicePointer
 		{
@@ -45,7 +45,7 @@ namespace synthese
 
 		public:
 			ServiceUse(const ServicePointer& servicePointer, const Edge* edge);
-			ServiceUse();
+	//		ServiceUse();
 			
 
 			//! @name Getters
@@ -69,6 +69,7 @@ namespace synthese
 			//! @name Update
 			//@{
 				void shift(int duration);
+				void reverse();
 			//@}
 		};
 	}

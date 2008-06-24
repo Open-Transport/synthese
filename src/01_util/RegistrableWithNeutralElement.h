@@ -30,7 +30,7 @@ namespace synthese
 	namespace util
 	{
 		/** RegistrableWithNeutralElement class.
-			@ingroup m01
+			@ingroup m01Registry
 		*/
 		template<class K, class T>
 		class RegistrableWithNeutralElement : public Registrable<K,T>

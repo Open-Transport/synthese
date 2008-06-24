@@ -34,7 +34,7 @@ namespace synthese
 	namespace env
 	{
 		/** Service dates table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class ServiceDateTableSync : public db::SQLiteTableSyncTemplate<ServiceDateTableSync>
 		{

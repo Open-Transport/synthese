@@ -43,7 +43,7 @@ namespace synthese
 		class DisplayType;
 		
 		/** UpdateDisplayScreenAction action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class UpdateDisplayScreenAction : public util::FactorableTemplate<server::Action, UpdateDisplayScreenAction>
 		{

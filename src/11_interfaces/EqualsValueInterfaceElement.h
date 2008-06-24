@@ -35,7 +35,7 @@ namespace synthese
 		class ValueElementList;
 
 		/** Equality test Value Interface Element class.
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 		*/
 		class EqualsValueInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, EqualsValueInterfaceElement>

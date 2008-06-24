@@ -40,17 +40,20 @@
 #include <iostream>
 #include <fstream>
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace geometry;
 	using namespace util;
+	using namespace map;
 
 	namespace util
 	{
 		template<>
-		const std::string FactorableTemplate<map::Renderer,map::PostscriptRenderer>::FACTORY_KEY ("ps");
+		const string FactorableTemplate<Renderer,PostscriptRenderer>::FACTORY_KEY("ps");
 	}
-
+	
 
 	namespace map
 	{

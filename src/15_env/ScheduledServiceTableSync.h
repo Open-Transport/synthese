@@ -38,7 +38,7 @@ namespace synthese
 	namespace env
 	{
 		/** ScheduledService table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 		*/
 		class ScheduledServiceTableSync : public db::SQLiteRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>
 		{

@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class Place;
 		class Journey;
 	}
 
@@ -50,7 +50,7 @@ namespace synthese
 
 			struct PlaceInformation
 			{
-				const env::ConnectionPlace* place;
+				const env::Place* place;
 				bool isOrigin;
 				bool isDestination;
 				std::ostringstream* content;
@@ -72,7 +72,7 @@ namespace synthese
 			*/
 			static int OrdrePAInsere(
 				PlaceList&
-				, const env::ConnectionPlace*
+				, const env::Place*
 				, int Position
 				, bool isLockedAtTheTop
 				, bool isLockedAtTheEnd
@@ -89,10 +89,14 @@ namespace synthese
 			static bool OrdrePARechercheGare(
 				const PlaceList&
 				, int& i
-				, const env::ConnectionPlace* GareAChercher
+				, const env::Place* GareAChercher
 			);
 
-			static PlaceList getStopsListForScheduleTable( const JourneyBoardJourneys& );
+			static PlaceList getStopsListForScheduleTable(
+				const JourneyBoardJourneys&
+				, const env::Place* departurePlace
+				, const env::Place* arrivalPlace
+			);
 
 		public:
 			/** Display.

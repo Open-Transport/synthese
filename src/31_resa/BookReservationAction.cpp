@@ -105,18 +105,21 @@ namespace synthese
 		ParametersMap BookReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_journey.getOrigin())
+			if (!_journey.empty())
 			{
-				map.insert(PARAMETER_ORIGIN_CITY, _journey.getOrigin()->getPlace()->getCity()->getName());
-				map.insert(PARAMETER_ORIGIN_PLACE, _journey.getOrigin()->getPlace()->getName());
+				if (_journey.getOrigin())
+				{
+					map.insert(PARAMETER_ORIGIN_CITY, _journey.getOrigin()->getPlace()->getCity()->getName());
+					map.insert(PARAMETER_ORIGIN_PLACE, _journey.getOrigin()->getPlace()->getName());
+				}
+				if (_journey.getDestination())
+				{
+					map.insert(PARAMETER_DESTINATION_CITY, _journey.getDestination()->getPlace()->getCity()->getName());
+					map.insert(PARAMETER_DESTINATION_PLACE, _journey.getOrigin()->getPlace()->getName());
+				}
+				if (!_journey.getDepartureTime().isUnknown())
+					map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
 			}
-			if (_journey.getDestination())
-			{
-				map.insert(PARAMETER_DESTINATION_CITY, _journey.getDestination()->getPlace()->getCity()->getName());
-				map.insert(PARAMETER_DESTINATION_PLACE, _journey.getOrigin()->getPlace()->getName());
-			}
-			if (!_journey.getDepartureTime().isUnknown())
-				map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
 			return map;
 		}
 
@@ -322,7 +325,7 @@ namespace synthese
 
 		BookReservationAction::BookReservationAction()
 			: FactorableTemplate<Action, BookReservationAction>()
-			, _journey(TO_DESTINATION)
+			, _journey(DEPARTURE_TO_ARRIVAL)
 			, _disabledCustomer(false)
 			, _drtOnly(false)
 		{

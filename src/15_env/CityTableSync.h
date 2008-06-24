@@ -37,7 +37,7 @@ namespace synthese
 		class City;
 
 		/** City SQLite table synchronizer.
-			@ingroup m15LS refLS
+			@ingroup m35LS refLS
 
 			- on insert : insert entry in associator
 			- on update : update entry in associator

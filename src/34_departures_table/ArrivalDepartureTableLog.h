@@ -39,7 +39,7 @@ namespace synthese
 			Colonnes :
 				- Action effectuée				
 
-			@ingroup m34Log refLog
+			@ingroup m54Log refLog
 		*/
 		class ArrivalDepartureTableLog : public util::FactorableTemplate<dblog::DBLog, ArrivalDepartureTableLog>
 		{

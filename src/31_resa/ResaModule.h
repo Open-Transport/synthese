@@ -23,6 +23,10 @@
 #ifndef SYNTHESE_ResaModule_h__
 #define SYNTHESE_ResaModule_h__
 
+#include "05_html/ResultHTMLTable.h"
+
+#include "30_server/ActionFunctionRequest.h"
+
 #include "31_resa/Types.h"
 
 #include "01_util/ModuleClass.h"
@@ -34,6 +38,16 @@
 
 namespace synthese
 {
+	namespace admin
+	{
+		class AdminRequest;
+	}
+
+	namespace dblog
+	{
+		class DBLogEntry;
+	}
+
 	namespace security
 	{
 		class Profile;
@@ -49,7 +63,34 @@ namespace synthese
 		class Session;
 	}
 
-	/** @defgroup m31 31 Reservation
+	/**	@defgroup m31Actions 31 Actions
+		@ingroup m31
+
+		@defgroup m31Pages 31 Pages
+		@ingroup m31
+
+		@defgroup m31Functions 31 Functions
+		@ingroup m31
+
+		@defgroup m31Exceptions 31 Exceptions
+		@ingroup m31
+
+		@defgroup m31Alarm 31 Messages recipient
+		@ingroup m31
+
+		@defgroup m31LS 31 Table synchronizers
+		@ingroup m31
+
+		@defgroup m31Admin 31 Administration pages
+		@ingroup m31
+
+		@defgroup m31Rights 31 Rights
+		@ingroup m31
+
+		@defgroup m31Logs 31 DB Logs
+		@ingroup m31
+
+		@defgroup m31 31 Reservation
 		@ingroup m3
 
 		The reservation module provides the ability to book seats on transport on demand lines.
@@ -89,13 +130,16 @@ namespace synthese
 	@{
 	*/
 
-	/** 51 Reservation module namespace.
+	/** 31 Reservation Module namespace.
+		@author Hugues Romain
+		@date 2008
 	*/
 	namespace resa
 	{
 		class ReservationTransaction;
+		class CancelReservationAction;
 
-		/** 51 Reservation module class.
+		/** 31 Reservation module class.
 		*/
 		class ResaModule : public util::FactorableTemplate<util::ModuleClass, ResaModule>
 		{
@@ -133,6 +177,15 @@ namespace synthese
 			static std::string GetStatusIcon(ReservationStatus status);
 			static std::string GetStatusText(ReservationStatus status);
 
+			static void DisplayResaDBLog(
+				std::ostream& stream
+				, std::vector<boost::shared_ptr<dblog::DBLogEntry> >& resats
+				, const std::string& parameterDate
+				, server::FunctionRequest<admin::AdminRequest>& searchRequest
+				, server::ActionFunctionRequest<CancelReservationAction,admin::AdminRequest>& cancelRequest
+				, const html::ResultHTMLTable::RequestParameters& _requestParameters
+				, bool displayCustomer
+			);
 		};
 	}
 	/** @} */

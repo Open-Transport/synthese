@@ -24,27 +24,15 @@
 
 namespace synthese
 {
-    namespace util
-    {
-	template<> const std::string 
-	FactorableTemplate<security::UserPrefPanel, 
-			   routeplanner::RoutePlanningUserPrefPanel>::FACTORY_KEY ("RoutePlanningUserPrefPanel"); // ?
-    }	
-    
-    namespace security
-    {
-	template<> const std::string 
-	UserPrefPanelTemplate<synthese::routeplanner::RoutePlanningUserPrefPanel>::NAME ("RoutePlanningUserPrefPanel"); // ?
-    }
+	using namespace security;
 
-    
-    namespace routeplanner
-    {
-	
-	
-	void RoutePlanningUserPrefPanel::display( std::ostream& stream, const security::User* user ) const
+	namespace routeplanner
 	{
-	    
+
+
+		void RoutePlanningUserPrefPanel::display( std::ostream& stream, const User* user ) const
+		{
+
+		}
 	}
-    }
 }

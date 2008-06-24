@@ -24,8 +24,10 @@
 
 #include "17_messages/SentAlarm.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/Place.h"
 #include "15_env/Road.h"
+
+#include "01_util/Conversion.h"
 
 using namespace std;
 
@@ -34,6 +36,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace messages;
 	using namespace env;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardJunctionCellInterfacePage>::FACTORY_KEY("journey_board_junction_cell");
 	
@@ -41,18 +44,20 @@ namespace synthese
 	{
 		void JourneyBoardJunctionCellInterfacePage::display( 
 		    ostream& stream
-		    , const ConnectionPlace* place
+		    , const Place* place
 		    , const SentAlarm* alarm
 		    , bool color
 			, const Road* road
+			, int distance
 		    , const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector pv;
-			pv.push_back(util::Conversion::ToString(place->getId()));
+			pv.push_back(Conversion::ToString(place->getId()));
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
-			pv.push_back(util::Conversion::ToString(color));
+			pv.push_back(Conversion::ToString(color));
 			pv.push_back(road ? road->getName() : string());
+			pv.push_back(Conversion::ToString(distance));
 
 			VariablesMap vm;
 

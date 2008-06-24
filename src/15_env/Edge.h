@@ -67,7 +67,7 @@ namespace synthese
 				- a passage edge if it can be considered both as a departure edge 
 				and as an arrival edge.
 
-			@ingroup m15
+			@ingroup m35
 		*/
 		class Edge
 		{

@@ -61,21 +61,32 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			const JourneyBoardJourneys* jv(static_cast<const JourneyBoardJourneys*>(object));
+			const RoutePlannerResult* result(static_cast<const RoutePlannerResult*>(object));
 			const JourneyBoardInterfacePage* page(_page->getInterface()->getPage<JourneyBoardInterfacePage>(_pageCode ? _pageCode->getValue(parameters, variables, object, request) : string()));
 			logic::tribool hFilter(Conversion::ToTribool(_handicappedFilter->getValue(parameters, variables, object, request)));
 			logic::tribool bFilter(Conversion::ToTribool(_bikeFilter->getValue(parameters, variables, object, request)));
 			
 
-			if ( jv == NULL || jv->empty())  // No solution or type error
+			if (result == NULL || result->result.empty())  // No solution or type error
 				return string();
 
 			int i=1;
-			for(JourneyBoardJourneys::const_iterator it(jv->begin());
-				it != jv->end();
+			for(JourneyBoardJourneys::const_iterator it(result->result.begin());
+				it != result->result.end();
 				++it, ++i
 			){
-				page->display(stream, variables, i, *it, hFilter, bFilter, request);
+				page->display(
+					stream
+					, variables
+					, i
+					, *it
+					, result->departurePlace
+					, result->arrivalPlace
+					, hFilter
+					, bFilter
+					, it+1 != result->result.end()
+					, request
+				);
 			}
 			return string();
 		}

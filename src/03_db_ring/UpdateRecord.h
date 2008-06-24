@@ -22,6 +22,9 @@ namespace synthese
 
 namespace dbring
 {
+	/** @addtogroup m101
+		@{
+	*/
 
     typedef enum {
         PENDING = 0,       //!< Pending.
@@ -112,6 +115,7 @@ std::istream& operator>> ( std::istream& is, UpdateRecord& op );
 bool operator== (const UpdateRecord& op1, const UpdateRecord& op2);
 bool operator!= (const UpdateRecord& op1, const UpdateRecord& op2);
 
+		/** @} */
 
 }
 }

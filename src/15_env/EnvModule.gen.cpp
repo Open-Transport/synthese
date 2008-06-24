@@ -46,3 +46,5 @@ synthese::env::CommercialLineAdmin::integrate();
 synthese::env::LineAdmin::integrate();
 
 synthese::env::EnvModule::integrate();
+
+synthese::env::TransportNetworkRight::integrate();

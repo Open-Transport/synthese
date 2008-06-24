@@ -43,20 +43,32 @@ namespace synthese
 			std::string	_name;
 			std::string _short_message;
 			std::string	_long_message;
+			uid			_parentId;
+			bool		_isFolder;
 			AlarmLevel	_level;
 
 		public:
 			TextTemplate();
 
-			const std::string& getName() const;
-			const std::string& getShortMessage() const;
-			const std::string& getLongMessage() const;
-			AlarmLevel getAlarmLevel() const;
+			//! @name Getters
+			//@{
+				const std::string&	getName()			const;
+				const std::string&	getShortMessage()	const;
+				const std::string&	getLongMessage()	const;
+				AlarmLevel			getAlarmLevel()		const;
+				bool				getIsFolder()		const;
+				uid					getParentId()		const;
+			//@}
 
-			void setName(const std::string& name);
-			void setShortMessage(const std::string& message);
-			void setLongMessage(const std::string& message);
-			void setAlarmLevel(AlarmLevel level);
+			//! @name Setters
+			//@{
+				void setName(const std::string& name);
+				void setShortMessage(const std::string& message);
+				void setLongMessage(const std::string& message);
+				void setAlarmLevel(AlarmLevel level);
+				void setIsFolder(bool value);
+				void setParentId(uid value);
+			//@}
 		};
 	}
 }

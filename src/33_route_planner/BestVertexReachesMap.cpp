@@ -47,7 +47,7 @@ namespace synthese
 			, bool optim
 		)	: _accessDirection(accessDirection)
 		{
-		    if (accessDirection == TO_DESTINATION)
+		    if (accessDirection == DEPARTURE_TO_ARRIVAL)
 			{
 				_cleanUpUselessComparison = &DateTime::operator>;
 				_comparison = optim ? &DateTime::operator> : &DateTime::operator>=;
@@ -117,7 +117,7 @@ namespace synthese
 					for (Addresses::const_iterator ita(ads.begin()); ita != ads.end(); ++ita)
 					{
 						DateTime bestTimeAtAddress(bestTime);
-						if (_accessDirection == TO_DESTINATION)
+						if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 						{
 							int transferDelay(cp->getTransferDelay(vertex, *ita));
 							if (transferDelay == ConnectionPlace::FORBIDDEN_TRANSFER_DELAY)
@@ -141,7 +141,7 @@ namespace synthese
 					for (PhysicalStops::const_iterator itp(ps.begin()); itp != ps.end(); ++itp)
 					{
 						DateTime bestTimeAtStop(bestTime);
-						if (_accessDirection == TO_DESTINATION)
+						if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 						{
 							int transferDelay(cp->getTransferDelay(vertex, itp->second));
 							if (transferDelay == ConnectionPlace::FORBIDDEN_TRANSFER_DELAY)

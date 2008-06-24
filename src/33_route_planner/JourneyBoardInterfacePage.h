@@ -36,6 +36,7 @@ namespace synthese
 	namespace env
 	{
 		class Journey;
+		class Place;
 	}
 
 	namespace server
@@ -53,9 +54,9 @@ namespace synthese
 			 - 1 : Handicapped filter
 			 - 2 : Bike filter
 			 - 3 : Departure time
-			 - 4 : Departure place name
+			 - 4 : Departure place name to display (can be the asked road if it is actually a crossing)
 			 - 5 : Arrival time
-			 - 6 : Arrival place name
+			 - 6 : Arrival place name (can be the asked road if it is actually a crossing)
 			 - 7 : Duration
 			 - 8 : Departure date
 			 - 9 : Reservation possible
@@ -65,20 +66,27 @@ namespace synthese
 			 - 13 : Reservation phone number(s) with opening hours
 			 - 14 : Online reservation is available
 			 - 15 : Departure time (internal format)
+			 - 16 : Is it the last journey board ?
 		*/
 		class JourneyBoardInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
+
+				@param departurePlace Asked departure place
+				@param arrivalPlace Asked arrival place
 			*/
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
 				, int n
 				, const env::Journey* journey
+				, const env::Place* departurePlace
+				, const env::Place* arrivalPlace
 				, boost::logic::tribool handicappedFilter
 				, boost::logic::tribool bikeFilter
+				, bool isTheLast
 				, const server::Request* request = NULL
 			) const;
 		};

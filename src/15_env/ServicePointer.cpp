@@ -35,7 +35,7 @@ namespace synthese
 	namespace env
 	{
 
-		ServicePointer::ServicePointer(DeterminationMethod method, const Edge* edge)
+		ServicePointer::ServicePointer(AccessDirection method, const Edge* edge)
 			: _service(NULL)
 			, _originDateTime(TIME_UNKNOWN)
 			, _serviceIndex(UNKNOWN_VALUE)
@@ -47,17 +47,8 @@ namespace synthese
 
 		}
 
-		ServicePointer::ServicePointer()
-			: _determinationMethod(NULL_POINTER)
-			, _service(NULL)
-			, _originDateTime(TIME_UNKNOWN)
-			, _serviceIndex(UNKNOWN_VALUE)
-			, _actualTime(TIME_UNKNOWN)
-			, _range(0)
-			, _edge(NULL) 
-		{
 
-		}
+
 		void ServicePointer::setActualTime( const time::DateTime& dateTime )
 		{
 			_actualTime = dateTime;
@@ -104,7 +95,7 @@ namespace synthese
 			return _originDateTime;
 		}
 
-		ServicePointer::DeterminationMethod ServicePointer::getMethod() const
+		AccessDirection ServicePointer::getMethod() const
 		{
 			return _determinationMethod;
 		}

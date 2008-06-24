@@ -41,8 +41,10 @@
 #include "15_env/ContinuousService.h"
 #include "15_env/ContinuousServiceTableSync.h"
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "15_env/TransportNetworkRight.h"
 
 #include "30_server/QueryString.h"
+#include "30_server/Request.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -58,6 +60,7 @@ namespace synthese
 	using namespace env;
 	using namespace html;
 	using namespace time;
+	using namespace security;
 
 	namespace util
 	{
@@ -211,7 +214,7 @@ namespace synthese
 
 		bool LineAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
 		{
-			return true;
+			return request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks LineAdmin::getSubPagesOfParent(

@@ -24,7 +24,7 @@ namespace dbring
     This class is a link between a node and a ring. 
     It holds all info related to one specific ring, considered from one specific node.
 
-@ingroup m03
+@ingroup m101
 */
 
 

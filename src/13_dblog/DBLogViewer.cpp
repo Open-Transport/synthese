@@ -39,8 +39,10 @@
 #include "13_dblog/DBLogViewer.h"
 #include "13_dblog/DBLogModule.h"
 #include "13_dblog/DBLogEntryTableSync.h"
+#include "13_dblog/DBLogRight.h"
 
 #include "30_server/QueryString.h"
+#include "30_server/Request.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminModule.h"
@@ -190,7 +192,7 @@ namespace synthese
 
 		bool DBLogViewer::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return true;
+			return request->isAuthorized<DBLogRight>(READ);
 		}
 
 

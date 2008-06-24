@@ -48,7 +48,11 @@ namespace synthese
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
-			stream << parameters[Conversion::ToInt(_rank->getValue(parameters, variables, object, request))] ;
+			int value(Conversion::ToInt(_rank->getValue(parameters, variables, object, request)));
+			if (value >= parameters.size() || value < 0)
+				Log::GetInstance().warn("Invalid parameter rank in interface module");
+			else
+				stream << parameters[value];
 			return string();
 		}
 

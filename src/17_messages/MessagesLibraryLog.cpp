@@ -25,6 +25,8 @@
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/AlarmTableSync.h"
+#include "17_messages/TextTemplate.h"
+#include "17_messages/TextTemplateTableSync.h"
 
 #include "01_util/Conversion.h"
 
@@ -66,6 +68,11 @@ namespace synthese
 				{
 					shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id));
 					return alarm->getShortMessage();
+				}
+				else if (tableId == TextTemplateTableSync::TABLE_ID)
+				{
+					shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id));
+					return text->getName();
 				}
 			}
 			catch (...)
@@ -137,6 +144,46 @@ namespace synthese
 				<< " du scénario " << alarm->getScenario()->getName();
 			content.push_back(text.str());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
+		}
+
+
+
+		void MessagesLibraryLog::AddTemplateDeleteEntry( const TextTemplate& text , const security::User* user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
+			content.push_back("Suppression");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
+		}
+
+
+
+		void MessagesLibraryLog::AddTemplateUpdateEntry( const TextTemplate& text , const std::string& changes , const security::User* user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
+			content.push_back("Modification : " + changes);
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
+		}
+
+
+
+		void MessagesLibraryLog::AddTemplateCreationEntry( const TextTemplate& text , const security::User* user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
+			content.push_back("Création");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
+		}
+
+
+
+		void MessagesLibraryLog::AddTemplateFolderUpdateEntry( const TextTemplate& text , const std::string& changes , const security::User* user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back("Répertoire de modèles de textes" + text.getName());
+			content.push_back("Modification : " + changes);
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
 		}
 	}
 }

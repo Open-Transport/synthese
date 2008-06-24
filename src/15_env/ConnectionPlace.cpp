@@ -68,7 +68,7 @@ namespace synthese
 			if (origin != 0)
 			{
 				access.approachDistance = 0;
-				if (accessDirection == FROM_ORIGIN)
+				if (accessDirection == ARRIVAL_TO_DEPARTURE)
 				{
 					access.approachTime = getTransferDelay (origin, destination);
 				} 

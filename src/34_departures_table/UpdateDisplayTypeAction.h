@@ -40,7 +40,7 @@ namespace synthese
 		class DisplayType;
 
 		/** UpdateDisplayTypeAction action class.
-			@ingroup m34Actions refActions
+			@ingroup m54Actions refActions
 		*/
 		class UpdateDisplayTypeAction : public util::FactorableTemplate<server::Action, UpdateDisplayTypeAction>
 		{
