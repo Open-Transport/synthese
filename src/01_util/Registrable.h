@@ -76,7 +76,7 @@ namespace synthese
 			static ConstIterator Begin();
 			static ConstIterator End();
 			static void Remove(const K& key);
-			static const typename Registry& GetRegistry() { return _registry; }
+			static const typename Registrable::Registry& GetRegistry() { return _registry; }
 
 			
 			//! @name Getters
