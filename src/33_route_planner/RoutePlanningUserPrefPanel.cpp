@@ -27,6 +27,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace security;
+	using namespace routeplanner;
 
 	namespace util
 	{
