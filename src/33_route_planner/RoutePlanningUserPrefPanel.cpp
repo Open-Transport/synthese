@@ -22,14 +22,26 @@
 
 #include "RoutePlanningUserPrefPanel.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace security;
 
+	namespace util
+	{
+		template<>
+		const string FactorableTemplate<UserPrefPanel,RoutePlanningUserPrefPanel>::FACTORY_KEY("RoutePlanningUserPrefPanel");
+	}
+
+	namespace security
+	{
+		template<>
+		const string UserPrefPanelTemplate<RoutePlanningUserPrefPanel>::NAME("Recherche d'itinéraires");
+	}
+
 	namespace routeplanner
 	{
-
-
 		void RoutePlanningUserPrefPanel::display( std::ostream& stream, const User* user ) const
 		{
 

@@ -121,17 +121,10 @@ TemporaryPlace::getImmediateVertices (VertexAccessMap& result,
 
 
 
-
-
-
-
-
-uid Place::getId() const
-{
-	return UNKNOWN_VALUE;
+		uid TemporaryPlace::getId() const
+		{
+			return static_cast<uid>(UNKNOWN_VALUE);
+		}
+	}
 }
-}
-}
-
-
 
