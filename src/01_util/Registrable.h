@@ -59,7 +59,7 @@ namespace synthese
 		private:
 			K						_key;		//!< The key of the object in the registry.
 			
-			static typename Registry		_registry;	//!< The official registry of the object (updated at the first insertion)
+			static typename Registrable::Registry		_registry;	//!< The official registry of the object (updated at the first insertion)
 
 			bool					_linked;
 			ChildTemporaryObjects	_childTemporaryObjects;
