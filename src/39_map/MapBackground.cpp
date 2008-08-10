@@ -12,10 +12,10 @@
 
 #include "01_util/Log.h"
 
-using synthese::util::Log;
+#undef min
+#undef max
 
 using namespace std;
-
 
 
 namespace fs = boost::filesystem;
@@ -23,6 +23,8 @@ namespace fs = boost::filesystem;
 
 namespace synthese
 {
+	using namespace util;
+
 namespace map
 {
 

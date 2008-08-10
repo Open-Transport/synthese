@@ -1,0 +1,7 @@
+Import ('s3env')
+
+CppLibProject(
+	s3env, 'accounting', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = ['s3-server.cpplib', 's3-security.cpplib', 's3-db.cpplib']
+)

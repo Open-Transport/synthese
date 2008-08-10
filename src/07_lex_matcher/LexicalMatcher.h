@@ -21,6 +21,7 @@
 #include "01_util/Exception.h"
 
 #undef max
+#undef min
 
 namespace synthese
 {
@@ -560,13 +561,13 @@ namespace synthese
 		    
 			for ( int i = 1; i <= n; i++ ) 
 			{
-			char sc = s[i-1];
-			for (int j = 1; j <= m;j++) 
-			{
-				int v = matrix[i-1][j-1];
-				if ( t[j-1] !=  sc ) v++;
-				matrix[i][j] = std::min( std::min( matrix[i-1][ j] + 1, matrix[i][j-1] + 1 ), v );
-			}
+				char sc = s[i-1];
+				for (int j = 1; j <= m;j++) 
+				{
+					int v = matrix[i-1][j-1];
+					if ( t[j-1] !=  sc ) v++;
+					matrix[i][j] = std::min( std::min( matrix[i-1][ j] + 1, matrix[i][j-1] + 1 ), v );
+				}
 			}
 			return matrix[n][m];
 		}

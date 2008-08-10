@@ -1,9 +1,7 @@
 Import ('s3env')
 
-senv = s3env.Clone ()
-
-prj = CppLibProject (senv, 's3-lex-matcher', s3env['S3VERSION'], 
-                     source_files = senv.Glob ('*.cpp', excludes = ['old_main.cpp']),
-                     dependencies = ['s3-util.shlib'])
-senv.SConsProject (prj)
-
+CppLibProject(
+	s3env, 's3-lex-matcher', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp', excludes = ['old_main.cpp']),
+	dependencies = ['s3-util.cpplib']
+)

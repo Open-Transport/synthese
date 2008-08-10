@@ -1,9 +1,7 @@
 Import ('s3env')
 
-senv = s3env.Clone ()
-
-prj = CppLibProject (senv, 's3-security', s3env['S3VERSION'], 
-                     source_files = senv.Glob ('*.cpp'),
-                     dependencies = ['s3-admin.stlib', 's3-interfaces.stlib', 's3-server.stlib', 's3-dblog.stlib', 's3-db.shlib', 's3-html.shlib'])
-senv.SConsProject (prj)
-
+CppLibProject(
+	s3env, 's3-security', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = ['s3-admin.cpplib', 's3-interfaces.cpplib', 's3-server.cpplib', 's3-dblog.cpplib', 's3-db.cpplib', 's3-html.cpplib']
+)

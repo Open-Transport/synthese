@@ -14,18 +14,17 @@
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
 
-using synthese::util::Log;
-using synthese::util::Conversion;
-
-
+#undef min
+#undef max
 
 namespace fs = boost::filesystem;
 
 using namespace std;
 
-
 namespace synthese
 {
+	using namespace util;
+
 namespace map
 {
 

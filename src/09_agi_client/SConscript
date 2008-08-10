@@ -3,8 +3,6 @@ Import ('s3env')
 senv = s3env.Clone ()
 
 if s3env.GetPlatform () == 'posix':
-   prj = CppLibProject (senv, 's3-agi-client', s3env['S3VERSION'], 
+   CppLibProject (senv, 's3-agi-client', s3env['S3VERSION'], 
                         source_files = senv.Glob ('*.c'),
                         dependencies = [])
-   senv.SConsProject (prj)
-

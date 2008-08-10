@@ -48,17 +48,18 @@
 #include "01_util/Conversion.h"
 #include "01_util/RGBColor.h"
 
-using synthese::util::Log;
-using synthese::util::Conversion;
+#undef min
+#undef max
 
-
-using synthese::env::PhysicalStop;
 using namespace std;
 
 
 namespace synthese
 {
 	using namespace geometry;
+	using namespace env;
+	using namespace util;
+	
 	
 namespace map
 {

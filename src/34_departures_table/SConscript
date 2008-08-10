@@ -1,9 +1,7 @@
 Import ('s3env')
 
-senv = s3env.Clone ()
-
-prj = CppLibProject (senv, 's3-departures-table', s3env['S3VERSION'], 
-                     source_files = senv.Glob ('*.cpp'),
-                     dependencies = ['s3-messages.stlib', 's3-env.stlib', 's3-lex-matcher.shlib', 's3-geometry.shlib', 's3-db.shlib'])
-senv.SConsProject (prj)
-
+CppLibProject(
+	s3env, 's3-departures-table', s3env['S3VERSION'], 
+    source_files = s3env.Glob ('*.cpp'),
+    dependencies = ['s3-messages.cpplib', 's3-env.cpplib', 's3-lex-matcher.cpplib', 's3-geometry.cpplib', 's3-db.cpplib']
+)

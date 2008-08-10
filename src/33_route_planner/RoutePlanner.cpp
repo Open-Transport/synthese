@@ -50,6 +50,9 @@
 #include <set>
 #include <sstream>
 
+#undef max
+#undef min
+
 using namespace boost;
 using namespace std;
 

@@ -1,8 +1,12 @@
 Import ('s3env')
 
-senv = s3env.Clone ()
-
-prj = CppLibProject (senv, 's3-db-ring', s3env['S3VERSION'], 
-                     source_files = senv.Glob ('*.cpp'),
-                     dependencies = ['s3-db.shlib', 's3-util-iostreams.shlib'])
-senv.SConsProject (prj)
+CppLibProject(
+	s3env,
+	's3-db-ring',
+	s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+    dependencies = [
+		's3-db.cpplib',
+		's3-util-iostreams.cpplib'
+	]
+)

@@ -1,10 +1,7 @@
 Import ('s3env')
 
-senv = s3env.Clone ()
-
-prj = CppLibProject (senv, 's3-resa', s3env['S3VERSION'], 
-                     source_files = senv.Glob ('*.cpp'),
-                     dependencies = ['s3-places-list.stlib', 's3-route-planner.stlib', 's3-env.shlib'])
-	     
-senv.SConsProject (prj)
-
+CppLibProject(
+	s3env, 's3-resa', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = ['s3-places-list.cpplib', 's3-route-planner.cpplib', 's3-env.cpplib']
+)
