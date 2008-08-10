@@ -1,9 +1,7 @@
 Import ('s3env')
 
-senv = s3env.Clone ()
-
-prj = CppTestProject (senv, 's3-tcp-test', s3env['S3VERSION'], source_files = senv.Glob ('*Test.cpp'),
-                     dependencies = ['s3-tcp.shlib', 's3-util-iostreams.shlib'])
-senv.SConsProject (prj)
-
-
+CppTestProject(
+	s3env, 's3-tcp-test', s3env['S3VERSION'],
+	source_files = s3env.Glob ('*Test.cpp'),
+	dependencies = ['s3-tcp.cpplib', 's3-util-iostreams.cpplib']
+)
