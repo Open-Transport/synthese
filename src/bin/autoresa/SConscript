@@ -4,8 +4,8 @@ senv = s3env.Clone ()
 
 if senv.GetPlatform () == 'posix':
   # not in forge	    
-  prj = CppBinProject (senv, 's3-autoresa', s3env['S3VERSION'], 
+  CppBinProject (senv, 's3-autoresa', s3env['S3VERSION'], 
                        source_files = senv.Glob ('*.cpp'),
-                       dependencies = ['s3-security.shlib', 's3-acapela-client.shlib', 's3-agi-client.shlib'])
-  senv.SConsProject (prj)
+                       dependencies = ['s3-security.cpplib', 's3-acapela-client.cpplib', 's3-agi-client.cpplib'])
+  
 
