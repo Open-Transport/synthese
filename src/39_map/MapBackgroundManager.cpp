@@ -132,7 +132,7 @@ MapBackgroundManager::Initialize (const boost::filesystem::path& backgroundsDir)
 	  dir_itr != end_iter;
 	  ++dir_itr )
     {
-	std::string dirpath = dir_itr->leaf();
+	std::string dirpath = dir_itr->filename();
 	
 	MapBackgroundManager* manager = new MapBackgroundManager (backgroundsDir / dirpath);
 	_managers.insert (std::make_pair (dirpath, manager));
