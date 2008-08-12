@@ -1,5 +1,5 @@
 Import ('s3env')
 
-s3env.Append (CPPPATH = [Dir ('.').abspath])
+#s3env.Append (CPPPATH = [Dir ('.').abspath])
 
 s3env.SubBuild ()

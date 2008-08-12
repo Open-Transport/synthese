@@ -5,5 +5,5 @@ CppLibProject(
 	's3-env',
 	s3env['S3VERSION'], 
     source_files = s3env.Glob ('*.cpp'),
-    dependencies = ['s3-security.cpplib', 's3-interfaces.cpplib', 's3-lex-matcher.cpplib', 's3-geometry.cpplib', 's3-db.cpplib', 's3-time.cpplib']
+    dependencies = ['s3-security.cpplib', 's3-util.cpplib', 's3-interfaces.cpplib', 's3-lex-matcher.cpplib', 's3-geometry.cpplib', 's3-db.cpplib', 's3-time.cpplib']
 )

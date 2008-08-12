@@ -9,17 +9,17 @@ CppSynthese3BinProject(
 	dependencies = [
 		's3-departures-table.cpplib', 
 		's3-map.cpplib',
-        's3-route-planner.cpplib', 
-        's3-places-list.cpplib', 
-        's3-resa.cpplib', 
-        's3-admin.cpplib',
-        's3-dblog.cpplib',
-        's3-messages.cpplib', 
-        's3-impex.cpplib', 
-        's3-security.cpplib', 
-        's3-env.cpplib', 
-        's3-db-ring.cpplib', 
-        's3-util-iostreams.cpplib', 
-		'boost-program-options.cpplib'
-	]
+	        's3-route-planner.cpplib', 
+	        's3-places-list.cpplib', 
+	        's3-resa.cpplib', 
+	        's3-admin.cpplib',
+	        's3-dblog.cpplib',
+	        's3-messages.cpplib', 
+	        's3-impex.cpplib', 
+	        's3-security.cpplib', 
+	        's3-env.cpplib', 
+	        's3-util-iostreams.cpplib', 
+	        'boost-program-options.cpplib',
+	        'boost.cppinc'
+	],
 )

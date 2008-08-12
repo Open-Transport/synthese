@@ -32,7 +32,7 @@ namespace map
 MapBackground::MapBackground(const std::string& tileDir)
 : _tileDir (tileDir, fs::native)
 {
-    std::string tileDirStr = _tileDir.filename(); 
+    std::string tileDirStr = _tileDir.leaf(); 
     
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
     boost::char_separator<char> sep("_");
@@ -61,7 +61,7 @@ MapBackground::MapBackground(const std::string& tileDir)
           ++dir_itr )
     {
         std::string filepath = dir_itr->string();
-        std::string filename = dir_itr->filename();
+        std::string filename = dir_itr->leaf();
         
         if (filename.substr (filename.size ()-3, 3) == ".ps") {
             filename = filename.substr (0, filename.size ()-3);

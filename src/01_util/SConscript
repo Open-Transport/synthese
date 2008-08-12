@@ -3,8 +3,11 @@ Import ('s3env')
 CppLibProject(
 	s3env, 's3-util', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
-	dependencies = ['boost-iostreams.cpplib', 'boost-system.cpplib', 'boost-thread.cpplib', 
-                                     'boost-date-time.cpplib', 'boost-filesystem.cpplib', 'boost-regex.cpplib']
+	dependencies = [
+		'boost.cppinc',
+		'boost-iostreams.cpplib', 'boost-system.cpplib', 'boost-thread.cpplib', 
+		'boost-date-time.cpplib', 'boost-filesystem.cpplib', 'boost-regex.cpplib'
+	],
 )
 
 s3env.SubBuild ()

@@ -20,12 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Place.h"
-#include "15_env/City.h"
-#include "15_env/VertexAccessMap.h"
+#include "Place.h"
+#include "City.h"
+#include "VertexAccessMap.h"
 
-#include "01_util/WithoutAccentsFilter.h"
-#include "01_util/PlainCharFilter.h"
+#include "WithoutAccentsFilter.h"
+#include "PlainCharFilter.h"
 
 #include <sstream>
 #include <boost/iostreams/filtering_stream.hpp>
