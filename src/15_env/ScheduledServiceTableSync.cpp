@@ -22,27 +22,27 @@
 
 #include "ScheduledServiceTableSync.h"
 
-#include "15_env/Path.h"
-#include "15_env/EnvModule.h"
-#include "15_env/BikeComplianceTableSync.h"
-#include "15_env/HandicappedComplianceTableSync.h"
-#include "15_env/PedestrianComplianceTableSync.h"
-#include "15_env/ReservationRuleTableSync.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/ServiceDateTableSync.h"
+#include "Path.h"
+#include "EnvModule.h"
+#include "BikeComplianceTableSync.h"
+#include "HandicappedComplianceTableSync.h"
+#include "PedestrianComplianceTableSync.h"
+#include "ReservationRuleTableSync.h"
+#include "LineTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "ServiceDateTableSync.h"
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "04_time/Schedule.h"
-#include "04_time/Date.h"
+#include "Schedule.h"
+#include "Date.h"
 
 #include <boost/tokenizer.hpp>
 
@@ -73,7 +73,7 @@ namespace synthese
 
 		    uid id (rows->getLongLong (TABLE_COL_ID));
 		    
-		    int serviceNumber (rows->getInt (ScheduledServiceTableSync::COL_SERVICENUMBER));
+		    string serviceNumber (rows->getText(ScheduledServiceTableSync::COL_SERVICENUMBER));
 
 			uid pathId(rows->getLongLong(ScheduledServiceTableSync::COL_PATHID));
 		    

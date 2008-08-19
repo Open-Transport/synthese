@@ -24,8 +24,7 @@
 #ifndef SYNTHESE_IMPEX_TRIDENTEXPORT_H
 #define SYNTHESE_IMPEX_TRIDENTEXPORT_H
 
-#include "01_util/UId.h"
-
+#include "UId.h"
 
 #include <iostream>
 
@@ -33,56 +32,47 @@
 namespace synthese
 {
 
-namespace env
-{
-    class Service;
+	namespace env
+	{
+		class Service;
+	}
+
+	namespace impex
+	{
+
+		/** Trident/Chouette export.
+			@todo Move it into 35
+		 */
+		    
+		class TridentExport
+		{
+		public:
+
+		    
+		private:
+		    
+			TridentExport ();
+			~TridentExport();
+
+		    
+		public:
+
+			/** -> ChouettePTNetwork
+			 */
+			static void Export(
+				std::ostream& os
+				, const uid& commercialLineId
+				, bool withTisseoExtensions = false
+			);
+
+		private:
+		    
+			static std::string TridentId (const std::string& peer, const std::string clazz, const uid& id);
+			static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
+			static std::string TridentId (const std::string& peer, const std::string clazz, const env::Service* srv);
+
+		};
+	}
 }
-
-
-namespace impex
-{
-
-
-
-/** Trident/Chouette export.
-	@todo Move it into 35
- */
-    
-class TridentExport
-{
-public:
-
-    
-private:
-    
-    TridentExport ();
-    ~TridentExport();
-
-    
-public:
-
-    /** -> ChouettePTNetwork
-     */
-    static void Export (std::ostream& os, 
-			const uid& commercialLineId);
-
-private:
-    
-    static std::string TridentId (const std::string& peer, const std::string clazz, const uid& id);
-    static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
-    static std::string TridentId (const std::string& peer, const std::string clazz, const env::Service* srv);
-
-
-};
-
-
-
-
-
-
-
-}
-}
-
 
 #endif

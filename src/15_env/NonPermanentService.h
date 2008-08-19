@@ -23,8 +23,8 @@
 #ifndef SYNTHESE_env_NonPermanentService_h__
 #define SYNTHESE_env_NonPermanentService_h__
 
-#include "15_env/Service.h"
-#include "15_env/Calendar.h"
+#include "Service.h"
+#include "Calendar.h"
 
 namespace synthese
 {
@@ -41,7 +41,7 @@ namespace synthese
 		public:
 			NonPermanentService();
 			NonPermanentService(
-				int serviceNumber
+				std::string serviceNumber
 				, Path* path
 			);
 

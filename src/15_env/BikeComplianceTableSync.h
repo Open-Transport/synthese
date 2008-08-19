@@ -30,7 +30,7 @@
 
 #include "BikeCompliance.h"
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -44,6 +44,7 @@ namespace synthese
 		public:
 			static const std::string COL_STATUS;
 			static const std::string COL_CAPACITY;
+			static const std::string COL_RESERVATION_RULE;
 
 			BikeComplianceTableSync();
 

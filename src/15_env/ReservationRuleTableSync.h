@@ -28,9 +28,11 @@
 #include <string>
 #include <iostream>
 
+#include <boost/shared_ptr.hpp>
+
 #include "ReservationRule.h"
 
-#include "02_db/SQLiteDirectTableSyncTemplate.h"
+#include "SQLiteDirectTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -68,7 +70,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<ReservationRule*> search(
+			static std::vector<boost::shared_ptr<ReservationRule> > Search(
 				// other search parameters ,
 				int first = 0, int number = 0);
 

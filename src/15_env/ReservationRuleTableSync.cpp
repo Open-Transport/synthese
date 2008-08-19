@@ -25,12 +25,12 @@
 
 #include "ReservationRuleTableSync.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
 using namespace std;
 using namespace boost;
@@ -191,14 +191,16 @@ namespace synthese
 			}
 		}
 
-		std::vector<ReservationRule*> ReservationRuleTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		vector<shared_ptr<ReservationRule> > ReservationRuleTableSync::Search(
+			int first /*= 0*/
+			, int number /*= 0*/
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
+				<< " WHERE 1 " 
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
 				;
@@ -210,11 +212,12 @@ namespace synthese
 			try
 			{
 				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<ReservationRule*> objects;
+				vector<shared_ptr<ReservationRule> > objects;
 				while (rows->next ())
 				{
-					ReservationRule* object = new ReservationRule();
-					load(object, rows);
+					shared_ptr<ReservationRule> object(new ReservationRule);
+					load(object.get(), rows);
+					link(object.get(), rows, GET_AUTO);
 					objects.push_back(object);
 				}
 				return objects;

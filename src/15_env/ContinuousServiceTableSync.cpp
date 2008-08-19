@@ -22,27 +22,27 @@
 
 #include "ContinuousServiceTableSync.h"
 
-#include "15_env/Path.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/BikeComplianceTableSync.h"
-#include "15_env/PedestrianComplianceTableSync.h"
-#include "15_env/HandicappedComplianceTableSync.h"
-#include "15_env/EnvModule.h"
+#include "Path.h"
+#include "LineTableSync.h"
+#include "BikeComplianceTableSync.h"
+#include "PedestrianComplianceTableSync.h"
+#include "HandicappedComplianceTableSync.h"
+#include "EnvModule.h"
 
 #include <sstream>
 
 #include <boost/tokenizer.hpp>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "04_time/Schedule.h"
+#include "Schedule.h"
 
-#include "06_geometry/Point2D.h"
+#include "Point2D.h"
 
 #include <set>
 #include <boost/algorithm/string.hpp>
@@ -70,11 +70,11 @@ namespace synthese
 		{
 		    uid id (rows->getLongLong (TABLE_COL_ID));
 
-		    int serviceNumber (rows->getInt (ContinuousServiceTableSync::COL_SERVICENUMBER));
+		    string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
 		    int range (rows->getInt (ContinuousServiceTableSync::COL_RANGE));
 		    int maxWaitingTime (rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME));
 
-		    std::string schedules (
+		    string schedules (
 			rows->getText (ContinuousServiceTableSync::COL_SCHEDULES));
 
 		    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;

@@ -65,6 +65,7 @@ namespace synthese
 			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_RESERVATIONRULEID;
+			static const std::string COL_WAYBACK;
 
 			LineTableSync();
 

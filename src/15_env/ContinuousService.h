@@ -23,10 +23,10 @@
 #ifndef SYNTHESE_ENV_CONTINUOUSSERVICE_H
 #define SYNTHESE_ENV_CONTINUOUSSERVICE_H
 
-#include "15_env/NonPermanentService.h"
-#include "15_env/Types.h"
+#include "NonPermanentService.h"
+#include "Types.h"
 
-#include "01_util/Registrable.h"
+#include "Registrable.h"
 
 #include <string>
 
@@ -55,11 +55,12 @@ namespace synthese
 
 		public:
 
-			ContinuousService (const uid& id,
-					int serviceNumber,
-					Path* path,
-					int range,
-					int maxWaitingTime);
+			ContinuousService(
+				const uid& id,
+				const std::string& serviceNumber,
+				Path* path,
+				int range,
+				int maxWaitingTime);
 			ContinuousService();
 
 			~ContinuousService ();

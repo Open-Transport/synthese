@@ -22,15 +22,15 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "15_env/BikeCompliance.h"
-#include "15_env/BikeComplianceTableSync.h"
+#include "BikeCompliance.h"
+#include "BikeComplianceTableSync.h"
 
 using namespace std;
 using boost::logic::tribool;

@@ -68,27 +68,29 @@ namespace synthese
 			ReservationRule();
 			virtual ~ReservationRule();
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
-				const synthese::time::Hour& getHourDeadLine () const;
-				void setHourDeadLine (const synthese::time::Hour& hourDeadLine);
-
-				const std::string& getPhoneExchangeNumber () const;
-				void setPhoneExchangeNumber (const std::string& phoneExchangeNumber);
-
-				const std::string& getPhoneExchangeOpeningHours () const;
-				void setPhoneExchangeOpeningHours (const std::string& phoneExchangeOpeningHours);
-
+				bool getOriginIsReference() const;
+				const time::Hour& getHourDeadLine() const;
+				const std::string& getPhoneExchangeNumber()			const;
+				const std::string& getPhoneExchangeOpeningHours()	const;
 				const std::string& getWebSiteUrl () const;
-				void setWebSiteUrl (const std::string& webSiteUrl);
-
 				const std::string& getDescription () const;
-				void setDescription (const std::string& description);
+				int getMinDelayDays() const;
+				int getMinDelayMinutes() const;
+				int getMaxDelayDays()								const;
+			//@}
 
+			//! @name Setters
+			//@{
+				void setHourDeadLine (const synthese::time::Hour& hourDeadLine);
+				void setPhoneExchangeNumber (const std::string& phoneExchangeNumber);
+				void setPhoneExchangeOpeningHours (const std::string& phoneExchangeOpeningHours);
+				void setWebSiteUrl (const std::string& webSiteUrl);
+				void setDescription (const std::string& description);
 				void setMinDelayMinutes (int minDelayMinutes);
 				void setMinDelayDays (int minDelayDays);
 				void setMaxDelayDays (int maxDelayDays);
-
 				void setOnline (bool online);
 				void setOriginIsReference (bool originIsReference);
 			//@}

@@ -27,12 +27,12 @@
 #include "NonConcurrencyRuleTableSync.h"
 #include "NonConcurrencyRule.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -50,8 +50,8 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE_NAME("t052_non_concurrency_rules");
-		template<> const int SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE_ID(52);
+		template<> const string SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE_NAME("t056_non_concurrency_rules");
+		template<> const int SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE_ID(56);
 		template<> const bool SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::HAS_AUTO_INCREMENT(true);
 
 
@@ -62,11 +62,15 @@ namespace synthese
 		){
 			// Columns reading
 			uid id(rows->getLongLong(TABLE_COL_ID));
+			uid hiddenLineId(rows->getLongLong(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID));
+			uid priorityLineId(rows->getLongLong(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID));
+			int delay(rows->getInt(NonConcurrencyRuleTableSync::COL_DELAY));
 
 			// Properties
 			object->setKey(id);
-			/// @todo Set all other attributes from the row
-
+			object->setDelay(delay);
+			object->setHiddenLine(hiddenLineId);
+			object->setPriorityLine(priorityLineId);
 		}
 
 
@@ -94,14 +98,13 @@ namespace synthese
 			, const SQLiteResultSPtr& rows
 			, GetSource temporary
 		){
-			/// @todo Fill it
 		}
 
 
 		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::_unlink(
 			NonConcurrencyRule* obj
 		){
-			/// @todo Fill it
+			
 		}
 	}
 	
@@ -124,8 +127,11 @@ namespace synthese
 			addTableColumn(COL_DELAY, "INTEGER", true);
 		}
 
-		vector<shared_ptr<NonConcurrencyRule> > NonConcurrencyRuleTableSync::search(
-			int first /*= 0*/
+		vector<shared_ptr<NonConcurrencyRule> > NonConcurrencyRuleTableSync::Search(
+			int hiddenLineId
+			, int priorityLineId
+			, bool hiddenAndPriority
+			, int first /*= 0*/
 			, int number /*= 0*/ 
 			, bool orderByPriorityLine //= true
 			, bool orderByHiddenLine //= false
@@ -139,12 +145,24 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
 				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
+				query << " AND(1";
+			if (priorityLineId != UNKNOWN_VALUE)
+				query << " AND " << COL_PRIORITY_LINE_ID << "=" << priorityLineId;
+			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
+				query << (hiddenAndPriority ? " AND " : " OR ");
+			if (hiddenLineId != UNKNOWN_VALUE)
+				query << " AND " << COL_HIDDEN_LINE_ID << "=" << hiddenLineId;
+			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
+				query << ")";
+
+			if(orderByPriorityLine)
+				query << " ORDER BY " << COL_PRIORITY_LINE_ID << (raisingOrder ? " ASC" : " DESC");
+			else if(orderByHiddenLine)
+				query << " ORDER BY " << COL_HIDDEN_LINE_ID << (raisingOrder ? " ASC" : " DESC");
+			else if(orderByDelay)
+				query << " ORDER BY " << COL_DELAY << (raisingOrder ? " ASC" : " DESC");
+
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

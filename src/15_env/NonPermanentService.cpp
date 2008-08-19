@@ -22,6 +22,8 @@
 
 #include "NonPermanentService.h"
 
+using namespace std;
+
 namespace synthese
 {
 	namespace env
@@ -34,7 +36,7 @@ namespace synthese
 
 		}
 
-		NonPermanentService::NonPermanentService( int serviceNumber , Path* path )
+		NonPermanentService::NonPermanentService(string serviceNumber , Path* path )
 			: Service(serviceNumber, path)
 		{
 

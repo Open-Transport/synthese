@@ -37,10 +37,11 @@ namespace synthese
 
 	namespace env
 	{
-		Line::Line (const uid& id,
-				const std::string& name, 
-				const Axis* axis)
-			: synthese::util::Registrable<uid,Line> (id)
+		Line::Line(
+			const uid& id
+			, const std::string& name
+			, const Axis* axis
+		)	: synthese::util::Registrable<uid,Line> (id)
 			, Path ()
 			, _name (name)
 			, _axis (axis)
@@ -50,24 +51,21 @@ namespace synthese
 			, _useInTimetables (true)
 			, _useInRoutePlanning (true)
 			, _commercialLine(NULL)
-		{
-
-		}
-
-		Line::Line()
-		: synthese::util::Registrable<uid,Line>()
-		, Path ()
-		, _rollingStock (NULL)
-		, _isWalkingLine (false)
-		, _useInDepartureBoards (true)
-		, _useInTimetables (true)
-		, _useInRoutePlanning (true)
-		, _commercialLine(NULL)
-		{
-
-		}
+			, _wayBack(boost::logic::indeterminate)
+		{	}
 
 
+		Line::Line(
+		)	: synthese::util::Registrable<uid,Line>()
+			, Path ()
+			, _rollingStock (NULL)
+			, _isWalkingLine (false)
+			, _useInDepartureBoards (true)
+			, _useInTimetables (true)
+			, _useInRoutePlanning (true)
+			, _commercialLine(NULL)
+			, _wayBack(boost::logic::indeterminate)
+		{	}
 
 
 		Line::~Line ()
@@ -77,17 +75,13 @@ namespace synthese
 		}
 
 
-
-		const std::string& 
-		Line::getName () const
+		const std::string& Line::getName() const
 		{
 			return _name;
 		}
 
 
-
-		void 
-		Line::setName (const std::string& name)
+		void Line::setName (const std::string& name)
 		{
 			_name = name;
 		}
@@ -327,6 +321,16 @@ namespace synthese
 		const Line::SubLines Line::getSubLines() const
 		{
 			return _subLines;
+		}
+
+		boost::logic::tribool Line::getWayBack() const
+		{
+			return _wayBack;
+		}
+
+		void Line::setWayBack( boost::logic::tribool value )
+		{
+			_wayBack = value;
 		}
 	}
 }

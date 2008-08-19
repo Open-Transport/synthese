@@ -20,9 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Service.h"
-#include "15_env/Path.h"
-#include "15_env/Edge.h"
+#include "Service.h"
+#include "Path.h"
+#include "Edge.h"
+
+using namespace std;
 
 namespace synthese
 {
@@ -30,10 +32,10 @@ namespace synthese
 
 	namespace env
 	{
-		Service::Service (int serviceNumber,
-				Path* path
-		)
-			: Complyer () 
+		Service::Service(
+			const string& serviceNumber
+			, Path* path
+		)	: Complyer () 
 			, _serviceNumber (serviceNumber)
 			, _path (path)
 		{
@@ -43,7 +45,6 @@ namespace synthese
 
 		Service::Service()
 		: Complyer()
-		, _serviceNumber(0)
 		, _path(NULL)
 		{
 
@@ -56,21 +57,17 @@ namespace synthese
 
 
 
-		int
-		Service::getServiceNumber () const
+		const string& Service::getServiceNumber () const
 		{
 			return _serviceNumber;
 		}
 
 
 
-		void 
-		Service::setServiceNumber (int serviceNumber)
+		void Service::setServiceNumber(string serviceNumber)
 		{
 			_serviceNumber = serviceNumber;
 		}
-
-
 
 
 		Path* 
@@ -78,6 +75,7 @@ namespace synthese
 		{
 			return _path;
 		}
+
 
 		const Path* 
 			Service::getPath () const

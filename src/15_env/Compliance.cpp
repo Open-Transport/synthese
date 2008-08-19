@@ -31,13 +31,14 @@ namespace synthese
 
 
 
-		Compliance::Compliance (boost::logic::tribool compliant,
-					int capacity)
-			: _compliant (compliant)
+		Compliance::Compliance(
+			boost::logic::tribool compliant
+			, int capacity
+			, ReservationRule* reservationRule
+		)	: _compliant (compliant)
 			, _capacity (capacity)
-		{
-
-		}
+			, _reservationRule(reservationRule)
+		{}
 
 		Compliance::~Compliance()
 		{
@@ -83,6 +84,15 @@ namespace synthese
 				|| _compliant == value;
 		}
 
+		void Compliance::setReservationRule(const ReservationRule* value )
+		{
+			_reservationRule = value;
+		}
+
+		const ReservationRule* Compliance::getReservationRule() const
+		{
+			return _reservationRule;
+		}
 	}
 }
 

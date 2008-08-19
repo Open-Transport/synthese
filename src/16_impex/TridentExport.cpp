@@ -20,39 +20,53 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
+// 36 Impex
 #include "TridentExport.h"
 
-#include "15_env/EnvModule.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/ScheduledService.h"
-#include "15_env/Line.h"
-#include "15_env/SubLine.h"
-#include "15_env/LineStop.h"
-#include "15_env/TransportNetwork.h"
-#include "15_env/City.h"
-#include "15_env/Service.h"
-#include "15_env/RollingStock.h"
+// 35 Env
+#include "EnvModule.h"
+#include "CommercialLine.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
+#include "ScheduledService.h"
+#include "ContinuousService.h"
+#include "Line.h"
+#include "SubLine.h"
+#include "LineStop.h"
+#include "TransportNetwork.h"
+#include "City.h"
+#include "Service.h"
+#include "RollingStock.h"
+#include "NonConcurrencyRule.h"
+#include "NonConcurrencyRuleTableSync.h"
+#include "ReservationRule.h"
+#include "ReservationRuleTableSync.h"
+#include "HandicappedCompliance.h"
+#include "BikeCompliance.h"
 
-#include "14_geography/Projection.h"
-#include "06_geometry/Point2D.h"
+// 06 Geometry
+#include "Projection.h"
+#include "Point2D.h"
 
-#include "04_time/Date.h"
-#include "04_time/Hour.h"
+// 04 Time
+#include "Date.h"
+#include "Hour.h"
 
-#include "01_util/Conversion.h"
+// 01 Util
+#include "Conversion.h"
 
+// Std
 #include <iomanip>
 #include <sstream>
 #include <iomanip>
 #include <locale>
 #include <string>
 
+using namespace std;
+using namespace boost;
+
 namespace synthese
 {
-
 	using namespace geography;
 	using namespace geometry;
 	using namespace time;
@@ -63,74 +77,138 @@ namespace synthese
 	{
 
 
-
-		std::string ToXsdDuration (int transferDelayMinutes)
+		string ToXsdDuration (int transferDelayMinutes)
 		{
 			return "PT" + Conversion::ToString (transferDelayMinutes) + "M";
 		}
 
-		std::string ToXsdDate (const Date& date)
+		string ToXsdDate (const Date& date)
 		{
-			std::stringstream ss;
-			ss << std::setw( 4 ) << std::setfill ( '0' )
+			stringstream ss;
+			ss << setw( 4 ) << setfill ( '0' )
 			   << date.getYear () << "-"
-			   << std::setw( 2 ) << std::setfill ( '0' )
+			   << setw( 2 ) << setfill ( '0' )
 			   << date.getMonth () << "-"
-			   << std::setw( 2 ) << std::setfill ( '0' )
+			   << setw( 2 ) << setfill ( '0' )
 			   << date.getDay ();
 			return ss.str ();
 		}
 
 
 
-		std::string ToXsdTime (const Hour& time)
+		string ToXsdTime (const Hour& time)
 		{
-			std::stringstream ss;
-			ss << std::setw( 2 ) << std::setfill ( '0' )
+			stringstream ss;
+			ss << setw( 2 ) << setfill ( '0' )
 			   << time.getHours () << ":"
-			   << std::setw( 2 ) << std::setfill ( '0' )
+			   << setw( 2 ) << setfill ( '0' )
 			   << time.getMinutes () << ":00";
 			return ss.str ();
 		}
 
 
-		void 
-		TridentExport::Export (std::ostream& os, 
-					   const uid& commercialLineId)
-		{
+		void TridentExport::Export (
+			ostream& os
+			, const uid& commercialLineId
+			, bool withTisseoExtensions
+		){
 
-			os.imbue (std::locale(""));
+			static const string peerid ("SYNTHESE");
 
-			// os.imbue (std::locale("en_US.ISO-8859-15"));
-			std::cerr << "locale = " << os.getloc ().name () << std::endl;
+			os.imbue (locale(""));
+
+			// os.imbue (locale("en_US.ISO-8859-15"));
+			cerr << "locale = " << os.getloc ().name () << endl;
 
 
 
-			os << "<?xml version='1.0' encoding='ISO-8859-15'?>" << std::endl << std::endl;
+			os << "<?xml version='1.0' encoding='ISO-8859-15'?>" << endl << endl;
 
-			boost::shared_ptr<const CommercialLine> commercialLine = CommercialLine::Get (commercialLineId);
+			shared_ptr<const CommercialLine> commercialLine = CommercialLine::Get (commercialLineId);
 			LineSet lines = EnvModule::fetchLines (commercialLineId);
 			const TransportNetwork* tn = commercialLine->getNetwork ();
 		    
 
 			// Collect all data related to selected commercial line
 
-			std::set<const PhysicalStop*> physicalStops;
-			std::set<const PublicTransportStopZoneConnectionPlace*> connectionPlaces;
-			std::set<const City*> cities;
-			std::set<const LineStop*> lineStops;
+			// Non concurrency -----------------------------------------------------------------------
+			if (withTisseoExtensions)
+			{
+				vector<shared_ptr<NonConcurrencyRule> > rules(NonConcurrencyRuleTableSync::Search(
+					commercialLineId, commercialLineId, false));
+				for(vector<shared_ptr<NonConcurrencyRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
+				{
+					os << "<LineConflict>" << endl;
+					os << "<objectId>" << TridentId (peerid, "LineConflict", (*it)->getKey ()) << "</objectId>" << endl;
+					os << "<forbiddenLine>" << TridentId (peerid, "Line", (*it)->getHiddenLine()) << "</forbiddenLine>" << endl;
+					os << "<usedLine>" << TridentId (peerid, "Line", (*it)->getPriorityLine()) << "</usedLine>" << endl;
+					os << "<conflictDelay>" << Conversion::ToString((*it)->getDelay()) << "</conflictDelay>" << endl;
+					os << "</LineConflict>" << endl;
+				}
+			}
+
+			// Reservation Rules -----------------------------------------------------------------------
+			if (withTisseoExtensions)
+			{
+				vector<shared_ptr<ReservationRule> > rules(ReservationRuleTableSync::Search());
+				for (vector<shared_ptr<ReservationRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
+				{
+					const ReservationRule& rule(**it);
+					if (rule.isCompliant() == false) continue;
+
+					os << "<ReservationRule>" << endl;
+					os << "<objectId>" << TridentId (peerid, "ReservationRule", (*it)->getKey ()) << "</objectId>" << endl;
+					os << "<ReservationCompulsory>" << (rule.isCompliant() == true ? "compulsory" : "optional") << "</ReservationCompulsory>" << endl;
+					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << endl;
+					if (rule.getMinDelayMinutes() > 0)
+					{
+						os << "<minMinutesDurationBeforeDeadline>" << rule.getMinDelayMinutes() << "</minMinutesDurationBeforeDeadline>" << endl;
+					}
+					if (rule.getMinDelayDays() > 0)
+					{
+						os << "<minDaysDurationBeforeDeadline>" << rule.getMinDelayDays() << "</minDaysDurationBeforeDeadline>" << endl;
+					}
+					if (!rule.getHourDeadLine().isUnknown())
+					{
+						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << endl;
+					}
+					if (rule.getMaxDelayDays() > 0)
+					{
+						os << "<maxDaysDurationBeforeDeadline>" << rule.getMaxDelayDays() << "</maxDaysDurationBeforeDeadline>" << endl;
+					}
+					if (!rule.getPhoneExchangeNumber().empty())
+					{
+						os << "<phoneNumber>" << rule.getPhoneExchangeNumber() << "</phoneNumber>" << endl;
+						os << "<callcenterOpeningPeriod>" << rule.getPhoneExchangeOpeningHours() << "</callcenterOpeningPeriod>" << endl;
+					}
+					if (!rule.getWebSiteUrl().empty())
+					{
+						os << "<bookingWebsiteURL>" << rule.getWebSiteUrl() << "</bookingWebsiteURL>" << endl;
+					}
+					os << "</ReservationRule>" << endl;
+				}
+			}
+
+
+			// Physical stops ------------------------------------------------------------------------
+
+			set<const PhysicalStop*> physicalStops;
+			set<const PublicTransportStopZoneConnectionPlace*> connectionPlaces;
+			set<const City*> cities;
+			set<const LineStop*> lineStops;
 			const RollingStock* rollingStock (0);
 			ServiceSet services;
 
-			std::set<const PhysicalStop*> filteredPhysicalStops; // if no departing/arriving edge
+			set<const PhysicalStop*> filteredPhysicalStops; // if no departing/arriving edge
 
-			for (LineSet::const_iterator itline = lines.begin ();
-			 itline != lines.end (); ++itline)
-			{
+			for(LineSet::const_iterator itline = lines.begin ();
+				itline != lines.end ();
+				++itline
+			){
 			    rollingStock = (*itline)->getRollingStock ();
 
-			const std::vector<Edge*>& edges = (*itline)->getEdges ();
-			for (std::vector<Edge*>::const_iterator itedge = edges.begin ();
+			const vector<Edge*>& edges = (*itline)->getEdges ();
+			for (vector<Edge*>::const_iterator itedge = edges.begin ();
 				 itedge != edges.end (); ++itedge)
 			{
 				const LineStop* lineStop = dynamic_cast<const LineStop*> (*itedge);
@@ -169,43 +247,42 @@ namespace synthese
 
 			}
 		    
-			std::string peerid ("SYNTHESE");
 		    
-			os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident Chouette.xsd'>" << std::endl;
+			os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident Chouette.xsd'>" << endl;
 
 
 			// --------------------------------------------------- PTNetwork 
 			{
-			os << "<PTNetwork>" << std::endl;
-			os << "<objectId>" << TridentId (peerid, "PTNetwork", tn->getKey ()) << "</objectId>" << std::endl;
-			os << "<versionDate>" << ToXsdDate (Date (TIME_CURRENT)) << "</versionDate>" << std::endl;
-			os << "<name>" << tn->getName () << "</name>" << std::endl;
-			os << "<registration>" << std::endl;
-			os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << std::endl;
-			os << "</registration>" << std::endl;
-			os << "<lineId>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineId>" << std::endl;
-			os << "<comment/>" << std::endl;
-			os << "</PTNetwork>" << std::endl;
+			os << "<PTNetwork>" << endl;
+			os << "<objectId>" << TridentId (peerid, "PTNetwork", tn->getKey ()) << "</objectId>" << endl;
+			os << "<versionDate>" << ToXsdDate (Date (TIME_CURRENT)) << "</versionDate>" << endl;
+			os << "<name>" << tn->getName () << "</name>" << endl;
+			os << "<registration>" << endl;
+			os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << endl;
+			os << "</registration>" << endl;
+			os << "<lineId>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineId>" << endl;
+			os << "<comment/>" << endl;
+			os << "</PTNetwork>" << endl;
 			}
 
 			// --------------------------------------------------- GroupOfLine
 
 
 			// --------------------------------------------------- Company
-			os << "<Company>" << std::endl;
-			os << "<objectId>SYNTHESE:Company:1</objectId>" << std::endl;
-			os << "<name>Tisséo Réseau Urbain</name>" << std::endl;
-			os << "<shortName>TRU</shortName>" << std::endl;
-			os << "<organisationalUnit></organisationalUnit>" << std::endl;
-			os << "<operatingDepartmentName></operatingDepartmentName>" << std::endl;
-			os << "<code>31000</code>" << std::endl;
-			os << "<phone>0561417070</phone>" << std::endl;
-			os << "<fax></fax>" << std::endl;
-			os << "<email></email>" << std::endl;
-			os << "<registration><registrationNumber>1</registrationNumber></registration>" << std::endl;
-			os << "</Company>" << std::endl;
+			os << "<Company>" << endl;
+			os << "<objectId>SYNTHESE:Company:1</objectId>" << endl;
+			os << "<name>Tisséo Réseau Urbain</name>" << endl;
+			os << "<shortName>TRU</shortName>" << endl;
+			os << "<organisationalUnit></organisationalUnit>" << endl;
+			os << "<operatingDepartmentName></operatingDepartmentName>" << endl;
+			os << "<code>31000</code>" << endl;
+			os << "<phone>0561417070</phone>" << endl;
+			os << "<fax></fax>" << endl;
+			os << "<email></email>" << endl;
+			os << "<registration><registrationNumber>1</registrationNumber></registration>" << endl;
+			os << "</Company>" << endl;
 
-			os << "<ChouetteArea>" << std::endl;
+			os << "<ChouetteArea>" << endl;
 
 			// --------------------------------------------------- StopArea (type = BoardingPosition)
 			// BoardingPosition corresponds to a very accurate location along a quay for instance.
@@ -213,29 +290,29 @@ namespace synthese
 
 			// --------------------------------------------------- StopArea (type = Quay) <=> PhysicalStop
 			{
-			for (std::set<const PhysicalStop*>::const_iterator it = physicalStops.begin ();
+			for (set<const PhysicalStop*>::const_iterator it = physicalStops.begin ();
 				 it != physicalStops.end (); ++it)
 			{
 
 				const PhysicalStop* ps = (*it);
 				if ((ps->getDepartureEdges ().size () == 0) && (ps->getArrivalEdges ().size () == 0)) continue;
 
-				os << "<StopArea>" << std::endl;
-				// old : std::string stopname (ps->getName ());
+				os << "<StopArea>" << endl;
+				// old : string stopname (ps->getName ());
 				// old : stopname += " (" + Conversion::ToString (ps->getKey ()) + ")";
 
-				os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << std::endl;
+				os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << endl;
 
 				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
 				    ps->getConnectionPlace ()->getName ();
 				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
 				os << " / " << ps->getOperatorCode ();
-				os << "</name>" << std::endl;
+				os << "</name>" << endl;
 
 				// Add all stop points referencing this physical stop
                                 // Otherly said : all line stops based on this physical stop. highly redundant since the other link exists.
 				// Store them into a set to remove duplicates
-				std::set<const LineStop*> lstops;
+				set<const LineStop*> lstops;
 				const Vertex::Edges& departingLineStops = ps->getDepartureEdges ();
 				for (Vertex::Edges::const_iterator itls = departingLineStops.begin ();
 				     itls != departingLineStops.end (); ++itls) {
@@ -249,36 +326,36 @@ namespace synthese
 				    lstops.insert (ls);
 				}
 
-				for (std::set<const LineStop*>::const_iterator itls = lstops.begin ();
+				for (set<const LineStop*>::const_iterator itls = lstops.begin ();
 				     itls != lstops.end (); ++itls)
 				{
-				    os << "<contains>" << TridentId (peerid, "StopPoint", (*itls)->getKey ())  << "</contains>" << std::endl;
+				    os << "<contains>" << TridentId (peerid, "StopPoint", (*itls)->getKey ())  << "</contains>" << endl;
 				}
 
-				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</centroidOfArea>" << std::endl;
-				os << "<StopAreaExtension>" << std::endl;
-				os << "<areaType>" << "Quay" << "</areaType>" << std::endl;
-				std::string rn = ps->getOperatorCode ();
+				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</centroidOfArea>" << endl;
+				os << "<StopAreaExtension>" << endl;
+				os << "<areaType>" << "Quay" << "</areaType>" << endl;
+				string rn = ps->getOperatorCode ();
 				if (rn.empty ()) rn = "0";
-				os << "<registration><registrationNumber>" << rn << "</registrationNumber></registration>" << std::endl;
-				os << "</StopAreaExtension>" << std::endl;
-				os << "</StopArea>" << std::endl;
+				os << "<registration><registrationNumber>" << rn << "</registrationNumber></registration>" << endl;
+				os << "</StopAreaExtension>" << endl;
+				os << "</StopArea>" << endl;
 			    
 			}
 			}
 		    
 			// --------------------------------------------------- StopArea (type = CommercialStopPoint)
 			{
-			for (std::set<const PublicTransportStopZoneConnectionPlace*>::const_iterator it = connectionPlaces.begin ();
+			for (set<const PublicTransportStopZoneConnectionPlace*>::const_iterator it = connectionPlaces.begin ();
 				 it != connectionPlaces.end (); ++it)
 			{
 				const PublicTransportStopZoneConnectionPlace* cp = (*it);
 
 				if (cp->getPhysicalStops ().size () == 0) continue;
 
-				os << "<StopArea>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "StopArea", cp->getKey ()) << "</objectId>" << std::endl;
-				os << "<name>" << cp->getCity ()->getName () << " " << cp->getName () << "</name>" << std::endl;
+				os << "<StopArea>" << endl;
+				os << "<objectId>" << TridentId (peerid, "StopArea", cp->getKey ()) << "</objectId>" << endl;
+				os << "<name>" << cp->getCity ()->getName () << " " << cp->getName () << "</name>" << endl;
 
 				// Contained physical stops
 				const PhysicalStops& cpps = cp->getPhysicalStops ();
@@ -288,69 +365,65 @@ namespace synthese
 				// filter physical stops not concerned by this line.
 				if (physicalStops.find (itps->second) == physicalStops.end ()) continue;
 				
-				os << "<contains>" << TridentId (peerid, "StopArea", itps->first)  << "</contains>" << std::endl;
+				os << "<contains>" << TridentId (peerid, "StopArea", itps->first)  << "</contains>" << endl;
 				}
 
 				// Decide what to take for centroidOfArea of a connectionPlace. Only regarding physical stops coordinates
 				// or also regarding addresses coordinates, or fixed manually ? 
-				// os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", cp->getKey ()) << "</centroidOfArea>" << std::endl;
+				// os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", cp->getKey ()) << "</centroidOfArea>" << endl;
 			    
-				os << "<StopAreaExtension>" << std::endl;
-				os << "<areaType>" << "CommercialStopPoint" << "</areaType>" << std::endl;
-				os << "</StopAreaExtension>" << std::endl;
-				os << "</StopArea>" << std::endl;
+				os << "<StopAreaExtension>" << endl;
+				os << "<areaType>" << "CommercialStopPoint" << "</areaType>" << endl;
+				os << "</StopAreaExtension>" << endl;
+				os << "</StopArea>" << endl;
 			}
 
 			}
 
-			// --------------------------------------------------- StopArea (type = StopPlace)
-			// A higher level of inclusion. Mapped on cities right now... Add zones later...
+			// --------------------------------------------------- StopArea (type = CityMainStops)
+			if (withTisseoExtensions)
 			{
-			for (std::set<const City*>::const_iterator it = cities.begin ();
-				 it != cities.end (); ++it)
-			{
-			    
-
-				const City* ci = (*it);
-				std::vector<std::string> containedStopAreas;
-
-				// Contained connection places
-				const std::vector<const Place*>& ciip = ci->getIncludedPlaces ();
-				for (std::vector<const Place*>::const_iterator itip = ciip.begin ();
-				 itip != ciip.end (); ++itip)
+				for (set<const City*>::const_iterator it = cities.begin ();
+					 it != cities.end (); ++it)
 				{
-				const PublicTransportStopZoneConnectionPlace* cp = dynamic_cast<const PublicTransportStopZoneConnectionPlace*> (*itip);
-				if (cp == 0) continue;
+				    
 
-				// filter physical stops not concerned by this line.
-				if (connectionPlaces.find (cp) == connectionPlaces.end ()) continue;
+					const City* ci = (*it);
+					vector<string> containedStopAreas;
 
-				containedStopAreas.push_back (TridentId (peerid, "StopArea", cp->getKey ()));
+					// Contained connection places
+					const vector<const Place*>& ciip = ci->getIncludedPlaces ();
+					for (vector<const Place*>::const_iterator itip = ciip.begin ();
+					 itip != ciip.end (); ++itip)
+					{
+						const PublicTransportStopZoneConnectionPlace* cp = dynamic_cast<const PublicTransportStopZoneConnectionPlace*> (*itip);
+						if (cp == 0) continue;
 
+						// filter physical stops not concerned by this line.
+						if (connectionPlaces.find (cp) == connectionPlaces.end ()) continue;
+
+						containedStopAreas.push_back (TridentId (peerid, "StopArea", cp->getKey ()));
+
+					}
+					if (containedStopAreas.size () == 0) continue;
+
+
+					os << "<CityMainStops>" << endl;
+					os << "<objectId>" << TridentId (peerid, "CityMainStops", ci->getKey ()) << "</objectId>" << endl;
+					os << "<name>" << ci->getName () << "</name>" << endl;
+
+					
+					for (vector<string>::const_iterator itsa = containedStopAreas.begin ();
+						 itsa != containedStopAreas.end (); ++itsa) {
+						os << "<contains>" << (*itsa)  << "</contains>" << endl;
+					}
+
+	  
+					os << "</CityMainStops>" << endl;
 				}
-				if (containedStopAreas.size () == 0) continue;
-
-
-				os << "<StopArea>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "StopArea", ci->getKey ()) << "</objectId>" << std::endl;
-				os << "<name>" << ci->getName () << "</name>" << std::endl;
-
-				
-				for (std::vector<std::string>::const_iterator itsa = containedStopAreas.begin ();
-				     itsa != containedStopAreas.end (); ++itsa) {
-				    os << "<contains>" << (*itsa)  << "</contains>" << std::endl;
-				}
-
-  
-				// Decide what to take for centroidOfArea of a city. 
-				// os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", cp->getKey ()) << "</centroidOfArea>" << std::endl;
-			    
-				os << "<StopAreaExtension>" << std::endl;
-				os << "<areaType>" << "StopPlace" << "</areaType>" << std::endl;
-				os << "</StopAreaExtension>" << std::endl;
-				os << "</StopArea>" << std::endl;
 			}
-			}
+
+
 
 		    
 			// --------------------------------------------------- StopArea (type = ITL)
@@ -361,124 +434,117 @@ namespace synthese
 
 			// --------------------------------------------------- AreaCentroid
 			{
-			// we do not provide addresses right now.
+				// we do not provide addresses right now.
 
-			for (std::set<const PhysicalStop*>::const_iterator it = physicalStops.begin ();
-				 it != physicalStops.end (); ++it)
-			{
-				const PhysicalStop* ps = (*it);
-				os << "<AreaCentroid>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</objectId>" << std::endl;
-			    
-				Point2D pt (ps->getX (), ps->getY ());
-				GeoPoint gp = FromLambertIIe (pt);
-			    
-				os << "<longitude>" << Conversion::ToString (gp.getLongitude ()) << "</longitude>" << std::endl;
-				os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << std::endl;
-				os << "<longLatType>" << "WGS84" << "</longLatType>" << std::endl;
+				for (set<const PhysicalStop*>::const_iterator it = physicalStops.begin ();
+					 it != physicalStops.end (); ++it)
+				{
+					const PhysicalStop* ps = (*it);
+					os << "<AreaCentroid>" << endl;
+					os << "<objectId>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</objectId>" << endl;
+				    
+					Point2D pt (ps->getX (), ps->getY ());
+					GeoPoint gp = FromLambertIIe (pt);
+				    
+					os << "<longitude>" << Conversion::ToString (gp.getLongitude ()) << "</longitude>" << endl;
+					os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << endl;
+					os << "<longLatType>" << "WGS84" << "</longLatType>" << endl;
 
-				os << "<projectedPoint>" << std::endl;
-				os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << std::endl;
-				os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << std::endl;
-				os << "<projectionType>" << "LambertIIe" << "</projectionType>" << std::endl;
-				os << "</projectedPoint>" << std::endl;
+					os << "<projectedPoint>" << endl;
+					os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << endl;
+					os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << endl;
+					os << "<projectionType>" << "LambertIIe" << "</projectionType>" << endl;
+					os << "</projectedPoint>" << endl;
 
-				os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << std::endl;
-				os << "<name>" << Conversion::ToString (ps->getKey ()) << "</name>" << std::endl;
+					os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << endl;
+					os << "<name>" << Conversion::ToString (ps->getKey ()) << "</name>" << endl;
 
-				os << "</AreaCentroid>" << std::endl;
-			    
+					os << "</AreaCentroid>" << endl;
+				    
+				}
 			}
-			}
 
-			os << "</ChouetteArea>" << std::endl;
+			os << "</ChouetteArea>" << endl;
 
 			// --------------------------------------------------- ConnectionLink
 			{
-			for (std::set<const PublicTransportStopZoneConnectionPlace*>::const_iterator it = connectionPlaces.begin ();
-				 it != connectionPlaces.end (); ++it)
-			{
-				const PublicTransportStopZoneConnectionPlace* cp = (*it);
-			    
-
-				// Contained physical stops
-				const PhysicalStops& cpps = cp->getPhysicalStops ();
-				for (PhysicalStops::const_iterator itps = cpps.begin ();
-				 itps != cpps.end (); ++itps)
+				for (set<const PublicTransportStopZoneConnectionPlace*>::const_iterator it = connectionPlaces.begin ();
+					 it != connectionPlaces.end (); ++it)
 				{
-				// filter physical stops not concerned by this line.
-				if (physicalStops.find (itps->second) == physicalStops.end ()) continue;
-
-				const PhysicalStop* from = (itps->second);
-				for (PhysicalStops::const_iterator itps2 = cpps.begin ();
-					 itps2 != cpps.end (); ++itps2)
-				{
-					// filter physical stops not concerned by this line.
-
-					//if (physicalStops.find (itps2->second) == physicalStops.end ()) continue;
+					const PublicTransportStopZoneConnectionPlace* cp = (*it);
 				    
-					const PhysicalStop* to = (itps2->second);
-				    
-					os << "<ConnectionLink>" << std::endl;
-					std::stringstream clkey;
-					clkey << from->getKey () << "t" << to->getKey ();
-					os << "<objectId>" << TridentId (peerid, "ConnectionLink", clkey.str ()) << "</objectId>" << std::endl;
-					os << "<startOfLink>" << TridentId (peerid, "StopArea", from->getKey ()) << "</startOfLink>" << std::endl;
-					os << "<endOfLink>" << TridentId (peerid, "StopArea", to->getKey ()) << "</endOfLink>" << std::endl;
-					os << "<defaultDuration>" << ToXsdDuration (cp->getTransferDelay (from, to)) << "</defaultDuration>" << std::endl;
-					os << "</ConnectionLink>" << std::endl;
-				}
 
-				}
-			}
+					// Contained physical stops
+					const PhysicalStops& cpps = cp->getPhysicalStops ();
+					for (PhysicalStops::const_iterator itps = cpps.begin ();
+					 itps != cpps.end (); ++itps)
+					{
+						// filter physical stops not concerned by this line.
+						if (physicalStops.find (itps->second) == physicalStops.end ()) continue;
 
+						const PhysicalStop* from = (itps->second);
+						for (PhysicalStops::const_iterator itps2 = cpps.begin ();
+							 itps2 != cpps.end (); ++itps2)
+						{
+							// filter physical stops not concerned by this line.
+
+							//if (physicalStops.find (itps2->second) == physicalStops.end ()) continue;
+						    
+							const PhysicalStop* to = (itps2->second);
+						    
+							os << "<ConnectionLink>" << endl;
+							stringstream clkey;
+							clkey << from->getKey () << "t" << to->getKey ();
+							os << "<objectId>" << TridentId (peerid, "ConnectionLink", clkey.str ()) << "</objectId>" << endl;
+							os << "<startOfLink>" << TridentId (peerid, "StopArea", from->getKey ()) << "</startOfLink>" << endl;
+							os << "<endOfLink>" << TridentId (peerid, "StopArea", to->getKey ()) << "</endOfLink>" << endl;
+							os << "<defaultDuration>" << ToXsdDuration (cp->getTransferDelay (from, to)) << "</defaultDuration>" << endl;
+							os << "</ConnectionLink>" << endl;
+						}
+
+					}
+				}
 			}
 		    
 			// --------------------------------------------------- Timetable
 			{
-			for (ServiceSet::const_iterator it = services.begin ();
-				 it != services.end (); ++it)
-			{
-				// One timetable per service
-				const ScheduledService* srv(dynamic_cast<const ScheduledService*>(*it));
-				if (srv == NULL)
-					continue;
+				for (ServiceSet::const_iterator it = services.begin ();
+					 it != services.end (); ++it
+				){
+					// One timetable per service
+					const ScheduledService* srv(dynamic_cast<const ScheduledService*>(*it));
+					if (srv == NULL)
+						continue;
 
-				const Calendar& cal = srv->getCalendar ();
-			    
-				os << "<Timetable>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "Timetable", srv) << "</objectId>" << std::endl;
-			    
-				std::vector<Date> markedDates = cal.getMarkedDates ();
-				for (int d=0; d<markedDates.size (); ++d)
-				{
-				os << "<calendarDay>" << ToXsdDate (markedDates[d]) << "</calendarDay>" << std::endl;
+					const Calendar& cal = srv->getCalendar ();
+				    
+					os << "<Timetable>" << endl;
+					os << "<objectId>" << TridentId (peerid, "Timetable", srv) << "</objectId>" << endl;
+				    
+					vector<Date> markedDates = cal.getMarkedDates ();
+					for (int d=0; d<markedDates.size (); ++d)
+					{
+					os << "<calendarDay>" << ToXsdDate (markedDates[d]) << "</calendarDay>" << endl;
+					}
+					os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", srv) << "</vehicleJourneyId>" << endl;
+
+					os << "</Timetable>" << endl;
 				}
-				os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", srv) << "</vehicleJourneyId>" << std::endl;
-
-				os << "</Timetable>" << std::endl;
-			    
-			}
-
-			}
-
-			// --------------------------------------------------- TimeSlot
-			{
 			}
 
 			// --------------------------------------------------- ChouetteLineDescription
 			{
-			os << "<ChouetteLineDescription>" << std::endl;
+			os << "<ChouetteLineDescription>" << endl;
 			
 			// --------------------------------------------------- Line
 			{
-				os << "<Line>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</objectId>" << std::endl;
-				os << "<name>" << commercialLine->getName () << "</name>" << std::endl;
-				os << "<number>" << commercialLine->getShortName () << "</number>" << std::endl;
-				os << "<publishedName>" << commercialLine->getLongName () << "</publishedName>" << std::endl;
+				os << "<Line>" << endl;
+				os << "<objectId>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</objectId>" << endl;
+				os << "<name>" << commercialLine->getName () << "</name>" << endl;
+				os << "<number>" << commercialLine->getShortName () << "</number>" << endl;
+				os << "<publishedName>" << commercialLine->getLongName () << "</publishedName>" << endl;
 				
-				std::string tm ("");
+				string tm ("");
 				if (rollingStock != 0)
 				{
 				    switch (rollingStock->getKey ())
@@ -503,18 +569,18 @@ namespace synthese
 				    default: tm = "Other"; 
 				    }
 				}
-				os << "<transportModeName>" << tm << "</transportModeName>" << std::endl;
+				os << "<transportModeName>" << tm << "</transportModeName>" << endl;
 			    
 				for (LineSet::const_iterator itline = lines.begin ();
 				 itline != lines.end (); ++itline)
 				{
-				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", (*itline)->getKey ()) << "</routeId>" << std::endl;
+				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", (*itline)->getKey ()) << "</routeId>" << endl;
 				}
-				os << "<registration>" << std::endl;
-				os << "<registrationNumber>" << Conversion::ToString (commercialLine->getKey ()) << "</registrationNumber>" << std::endl;
-				os << "</registration>" << std::endl;
+				os << "<registration>" << endl;
+				os << "<registrationNumber>" << Conversion::ToString (commercialLine->getKey ()) << "</registrationNumber>" << endl;
+				os << "</registration>" << endl;
 
-				os << "</Line>" << std::endl;
+				os << "</Line>" << endl;
 			}
 
 			// --------------------------------------------------- ChouetteRoute
@@ -522,10 +588,10 @@ namespace synthese
 				for (LineSet::const_iterator itline = lines.begin ();
 				 itline != lines.end (); ++itline)
 				{
-				boost::shared_ptr<const Line> line = (*itline);
-				os << "<ChouetteRoute>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << std::endl;
-				os << "<name>" << line->getName () << "</name>" << std::endl;
+				shared_ptr<const Line> line = (*itline);
+				os << "<ChouetteRoute>" << endl;
+				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << endl;
+				os << "<name>" << line->getName () << "</name>" << endl;
 				os << "<publishedName>";
 				{
 				    const PhysicalStop* ps = line->getOrigin ();
@@ -536,59 +602,76 @@ namespace synthese
 				    const PhysicalStop* ps = line->getDestination ();
 				    os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
-				os << "</publishedName>" << std::endl;
+				os << "</publishedName>" << endl;
 				
-				const std::vector<Edge*>& edges = line->getEdges ();
-				for (std::vector<Edge*>::const_iterator itedge = edges.begin ();
+				const vector<Edge*>& edges = line->getEdges ();
+				for (vector<Edge*>::const_iterator itedge = edges.begin ();
 					 itedge != edges.end (); ++itedge)
 				{
 					const LineStop* lineStop = dynamic_cast<const LineStop*> (*itedge);
 					if (lineStop->getNextInPath () == 0) continue;
-					os << "<ptLinkId>" << TridentId (peerid, "PtLink", lineStop->getKey ()) << "</ptLinkId>" << std::endl;
+					os << "<ptLinkId>" << TridentId (peerid, "PtLink", lineStop->getKey ()) << "</ptLinkId>" << endl;
 				}
-				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << std::endl;
-				os << "</ChouetteRoute>" << std::endl;
+				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
+				os << "<RouteExtension>" << endl;
+				if (line->getWayBack() != logic::indeterminate)
+					os << "<wayBack>" << Conversion::ToString(line->getWayBack()) << "</wayBack>" << endl;
+				os << "</RouteExtension>" << endl;
+				os << "</ChouetteRoute>" << endl;
 				}
 			}
 
 			// --------------------------------------------------- StopPoint
 			{
-				for (std::set<const LineStop*>::const_iterator itls = lineStops.begin ();
+				for (set<const LineStop*>::const_iterator itls = lineStops.begin ();
 				 itls != lineStops.end (); ++itls)
 				{
-				const LineStop* ls = (*itls);
-				const PhysicalStop* ps = (const PhysicalStop*) ls->getFromVertex ();
+					const LineStop* ls = (*itls);
+					const PhysicalStop* ps = (const PhysicalStop*) ls->getFromVertex ();
 
-				os << "<StopPoint>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "StopPoint", ls->getKey ()) << "</objectId>" << std::endl;
+					if (withTisseoExtensions)
+					{
+						os << "<TisseoStopPoint>" << endl;
+						os << "<mobilityRestrictedSuitability>0</mobilityRestrictedSuitability>" << endl;
+					}
+					else
+					{
+						os << "<StopPoint>" << endl;
+					}
+					os << "<objectId>" << TridentId (peerid, "StopPoint", ls->getKey ()) << "</objectId>" << endl;
+					os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << endl;
 
-				Point2D pt (ps->getX (), ps->getY ());
-				GeoPoint gp = FromLambertIIe (pt);
-				
-				os << "<longitude>" << Conversion::ToString (gp.getLongitude ()) << "</longitude>" << std::endl;
-				os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << std::endl;
-				os << "<longLatType>" << "WGS84" << "</longLatType>" << std::endl;
-				
-				os << "<projectedPoint>" << std::endl;
-				os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << std::endl;
-				os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << std::endl;
-				os << "<projectionType>" << "LambertIIe" << "</projectionType>" << std::endl;
-				os << "</projectedPoint>" << std::endl;
+					Point2D pt (ps->getX (), ps->getY ());
+					GeoPoint gp = FromLambertIIe (pt);
+					
+					os << "<longitude>" << Conversion::ToString (gp.getLongitude ()) << "</longitude>" << endl;
+					os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << endl;
+					os << "<longLatType>" << "WGS84" << "</longLatType>" << endl;
+					
+					os << "<projectedPoint>" << endl;
+					os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << endl;
+					os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << endl;
+					os << "<projectionType>" << "LambertIIe" << "</projectionType>" << endl;
+					os << "</projectedPoint>" << endl;
 
 
-				os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << std::endl;
-				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
-				    ps->getConnectionPlace ()->getName ();
-				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
-				os << " / " << ps->getOperatorCode ();
-				os << "</name>" << std::endl;
-				// os << "<name>" << ps->getName () << "</name>" << std::endl;
+					os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << endl;
+					os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
+						ps->getConnectionPlace ()->getName ();
+					if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
+					os << "</name>" << endl;
+					
+					os << "<lineIdShortcut>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineIdShortcut>" << endl;
+					os << "<ptNetworkIdShortcut>" << TridentId (peerid, "PTNetwork", tn->getKey ()) << "</ptNetworkIdShortcut>" << endl;
 
-				os << "<lineIdShortcut>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineIdShortcut>" << std::endl;
-				os << "<ptNetworkIdShortcut>" << TridentId (peerid, "PTNetwork", tn->getKey ()) << "</ptNetworkIdShortcut>" << std::endl;
-
-				os << "</StopPoint>" << std::endl;
-
+					if (withTisseoExtensions)
+					{
+						os << "</TisseoStopPoint>" << endl;
+					}
+					else
+					{
+						os << "</StopPoint>" << endl;
+					}
 				}
 
 			}
@@ -602,7 +685,7 @@ namespace synthese
 
 			// --------------------------------------------------- PtLink
 			{
-				for (std::set<const LineStop*>::const_iterator itls = lineStops.begin ();
+				for (set<const LineStop*>::const_iterator itls = lineStops.begin ();
 				 itls != lineStops.end (); ++itls)
 				{
 				const LineStop* from = (*itls);
@@ -611,12 +694,12 @@ namespace synthese
 
 				const PhysicalStop* ps = (const PhysicalStop*) from->getFromVertex ();
 
-				os << "<PtLink>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "PtLink", from->getKey ()) << "</objectId>" << std::endl;
-				os << "<startOfLink>" << TridentId (peerid, "StopPoint", from->getKey ()) << "</startOfLink>" << std::endl;
-				os << "<endOfLink>" << TridentId (peerid, "StopPoint", to->getKey ()) << "</endOfLink>" << std::endl;
-				os << "<linkDistance>" << Conversion::ToString (from->getLength ()) << "</linkDistance>" << std::endl;   // in meters!
-				os << "</PtLink>" << std::endl;
+				os << "<PtLink>" << endl;
+				os << "<objectId>" << TridentId (peerid, "PtLink", from->getKey ()) << "</objectId>" << endl;
+				os << "<startOfLink>" << TridentId (peerid, "StopPoint", from->getKey ()) << "</startOfLink>" << endl;
+				os << "<endOfLink>" << TridentId (peerid, "StopPoint", to->getKey ()) << "</endOfLink>" << endl;
+				os << "<linkDistance>" << Conversion::ToString (from->getLength ()) << "</linkDistance>" << endl;   // in meters!
+				os << "</PtLink>" << endl;
 				}
 			}
 
@@ -626,24 +709,24 @@ namespace synthese
 				for (LineSet::const_iterator itline = lines.begin ();
 				 itline != lines.end (); ++itline)
 				{
-				boost::shared_ptr<const Line> line = (*itline);
-				os << "<JourneyPattern>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</objectId>" << std::endl;
-				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << std::endl;
+				shared_ptr<const Line> line = (*itline);
+				os << "<JourneyPattern>" << endl;
+				os << "<objectId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</objectId>" << endl;
+				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << endl;
 
-				const std::vector<Edge*>& edges = line->getEdges ();
-				os << "<origin>" << TridentId (peerid, "StopPoint", ((const LineStop*) edges.at (0))->getKey ()) << "</origin>" << std::endl;
-				os << "<destination>" << TridentId (peerid, "StopPoint", ((const LineStop*) edges.at (edges.size ()-1))->getKey ()) << "</destination>" << std::endl;
+				const vector<Edge*>& edges = line->getEdges ();
+				os << "<origin>" << TridentId (peerid, "StopPoint", ((const LineStop*) edges.at (0))->getKey ()) << "</origin>" << endl;
+				os << "<destination>" << TridentId (peerid, "StopPoint", ((const LineStop*) edges.at (edges.size ()-1))->getKey ()) << "</destination>" << endl;
 
-				for (std::vector<Edge*>::const_iterator itedge = edges.begin ();
+				for (vector<Edge*>::const_iterator itedge = edges.begin ();
 					 itedge != edges.end (); ++itedge)
 				{
 					const LineStop* lineStop = dynamic_cast<const LineStop*> (*itedge);
-					os << "<stopPointList>" << TridentId (peerid, "StopPoint", lineStop->getKey ()) << "</stopPointList>" << std::endl;
+					os << "<stopPointList>" << TridentId (peerid, "StopPoint", lineStop->getKey ()) << "</stopPointList>" << endl;
 				}
 
-				os << "<lineIdShortcut>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineIdShortcut>" << std::endl;
-				os << "</JourneyPattern>" << std::endl;
+				os << "<lineIdShortcut>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineIdShortcut>" << endl;
+				os << "</JourneyPattern>" << endl;
 				}
 			}
 
@@ -652,92 +735,145 @@ namespace synthese
 				for (ServiceSet::const_iterator it = services.begin ();
 				 it != services.end (); ++it)
 				{
-				// One timetable per service
-				const ScheduledService* srv(dynamic_cast<const ScheduledService*>(*it));
-				if (srv == NULL)
-					continue;
+					const Line* line = ((const Line*) (*it)->getPath ());
+					// subline tweak
+					if (dynamic_cast<const SubLine*>(line))
+						line = static_cast<const SubLine*>(line)->getMainLine();
 
-				const Line* line = ((const Line*) srv->getPath ());
+					const NonPermanentService* srv(dynamic_cast<const NonPermanentService*>(*it));
+					if (srv == NULL)
+						continue;
 
-				// subline tweak
-				if (dynamic_cast<const SubLine*>(line))
-					line = static_cast<const SubLine*>(line)->getMainLine();
+					const Calendar& cal = srv->getCalendar ();
 
-				const Calendar& cal = srv->getCalendar ();
-				
-				os << "<VehicleJourney>" << std::endl;
-				os << "<objectId>" << TridentId (peerid, "VehicleJourney", srv) << "</objectId>" << std::endl;
-				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << std::endl;
-				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << std::endl;
-				os << "<lineIdShortcut>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineIdShortcut>" << std::endl;
-				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeIdShortcut>" << std::endl;
-				
-				os << "<number>" << Conversion::ToString (srv->getServiceNumber ()) << "</number>" << std::endl;
-				// --------------------------------------------------- VehicleJourneyAtStop
-				{
-					const std::vector<Edge*>& edges = line->getEdges ();
-				    
-					for (int e=0; e<edges.size (); ++e)
+					const ScheduledService* ssrv(dynamic_cast<const ScheduledService*>(*it));
+					const ContinuousService* csrv(dynamic_cast<const ContinuousService*>(*it));
+
+					string timeSlotId;
+					if (csrv)
 					{
-					const LineStop* ls = (const LineStop*) edges.at (e);
-					
-					os << "<vehicleJourneyAtStop>" << std::endl;
-					os << "<stopPointId>" << TridentId (peerid, "StopPoint", ls->getKey ()) << "</stopPointId>" << std::endl;
-					os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", srv) << "</vehicleJourneyId>" << std::endl;
+						timeSlotId = TridentId(peerid, "TimeSlot", srv);
+						os << "<TimeSlot>" << endl;
+						os << "<objectId>" << timeSlotId << "</objectId>" << endl;
+						os << "<beginningSlotTime>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(0).getHour()) << "</beginningSlotTime>" << endl;
+						os << "<endSlotTime>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(0).getHour()) << "</endSlotTime>" << endl;
+						os << "</TimeSlot>" << endl;
+					}
 
-					if (e != 0)
-						os << "<arrivalTime>" << ToXsdTime (srv->getArrivalBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
-						   << "</arrivalTime>" << std::endl;
-					if (e != edges.size () - 1)
-						os << "<departureTime>" << ToXsdTime (srv->getDepartureBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
-						   << "</departureTime>" << std::endl;
+					bool isDRT(srv->getReservationRule()->isCompliant() != false);
+					if (withTisseoExtensions)
+					{
+						if (isDRT)
+						{
+							os << "<DRTVehicleJourney>";
+							os << "<ReservationRule>" << TridentId(peerid, "ReservationRule", srv->getReservationRule()->getKey()) << "</ReservationRule>" << endl;
+						}
+						else
+						{
+							os << "<TisseoVehicleJourney>" << endl;
+						}
+						os << "<mobilityRestrictedSuitability>" << Conversion::ToString(srv->getHandicappedCompliance()->isCompliant() != false) << "</mobilityRestrictedSuitability>" << endl;
+						if (srv->getHandicappedCompliance()->getReservationRule())
+							os << "<mobilityRestrictedSuitabilityReservationRule>" <<  TridentId(peerid, "ReservationRule", srv->getHandicappedCompliance()->getReservationRule()->getKey()) << "</mobilityRestrictedSuitabilityReservationRule>" << endl;
+						os << "<bikeSuitability>" << Conversion::ToString(srv->getBikeCompliance()->isCompliant() != false) << "</bikeSuitability>" << endl;
+						if (srv->getBikeCompliance()->getReservationRule())
+							os << "<bikeReservationRule>" << TridentId(peerid, "ReservationRule", srv->getBikeCompliance()->getReservationRule()->getKey()) << "</bikeReservationRule>" << endl;
+					}
+					else
+					{
+						os << "<VehicleJourney>" << endl;
+					}
+					os << "<creatorId>" << ssrv->getServiceNumber() << "</creatorId>" << endl;
+					os << "<number>" << ssrv->getServiceNumber() << "</number>" << endl;
+					os << "<objectId>" << TridentId (peerid, "VehicleJourney", srv->getId()) << "</objectId>" << endl;
+					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << endl;
+					os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
+					os << "<lineIdShortcut>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineIdShortcut>" << endl;
+					os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeIdShortcut>" << endl;
 
+					if (csrv) // Continuous service
+					{
+						os << "<timeSlotId>" << timeSlotId << "</timeSlotId>" << endl;
+					}
 
-					os << "</vehicleJourneyAtStop>" << std::endl;
+					// --------------------------------------------------- VehicleJourneyAtStop
+					{
+						const vector<Edge*>& edges = line->getEdges ();
+
+						for (int e=0; e<edges.size (); ++e)
+						{
+							const LineStop* ls = (const LineStop*) edges.at (e);
+
+							os << "<vehicleJourneyAtStop>" << endl;
+							os << "<stopPointId>" << TridentId (peerid, "StopPoint", ls->getKey ()) << "</stopPointId>" << endl;
+							os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", srv) << "</vehicleJourneyId>" << endl;
+
+							if (ssrv)
+							{
+								if (e != 0 && ls->isArrival())
+									os << "<arrivalTime>" << ToXsdTime (srv->getArrivalBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
+									<< "</arrivalTime>" << endl;
+								if (e != edges.size () - 1 && ls->isDeparture())
+									os << "<departureTime>" << ToXsdTime (srv->getDepartureBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
+									<< "</departureTime>" << endl;
+							}
+							if (csrv)
+							{
+								os << "<headwayFrequency>" << Conversion::ToString(csrv->getMaxWaitingTime()) << "</headwayFrequency>" << endl;
+								os << "<elapseDuration>" << Conversion::ToString(srv->getArrivalBeginScheduleToIndex(ls->getRankInPath()) - srv->getDepartureBeginScheduleToIndex(0)) << "</elapseDuration>" << endl;
+							}
+
+							os << "</vehicleJourneyAtStop>" << endl;
+						}
+					}
+					os << "<comment>" << TridentId (peerid, "VehicleJourney", srv) << "</comment>" << endl;
+
+					if (withTisseoExtensions)
+					{
+						os << (isDRT ? "</DRTVehicleJourney>" : "</TisseoVehicleJourney>") << endl;
+					}
+					else
+					{
+						os << "</VehicleJourney>" << endl;
 					}
 				}
-				os << "<comment>" << TridentId (peerid, "VehicleJourney", srv) << "</comment>" << std::endl;
-
-				os << "</VehicleJourney>" << std::endl;
-				
-				}
 			}
 
 
-			os << "</ChouetteLineDescription>" << std::endl;
+			os << "</ChouetteLineDescription>" << endl;
 			}
 
-			os << "</ChouettePTNetwork>" <<  std::endl << std::flush;
+			os << "</ChouettePTNetwork>" <<  endl << flush;
 
 		}
 
 
 
 
-		std::string 
-		TridentExport::TridentId (const std::string& peer, const std::string clazz, const uid& id)
+		string 
+		TridentExport::TridentId (const string& peer, const string clazz, const uid& id)
 		{
-			std::stringstream ss;
+			stringstream ss;
 			ss << peer << ":" << clazz << ":" << id;
 			return ss.str ();
 		}
 
-		std::string 
-		TridentExport::TridentId (const std::string& peer, const std::string clazz, const std::string& s)
+		string 
+		TridentExport::TridentId (const string& peer, const string clazz, const string& s)
 		{
-			std::stringstream ss;
+			stringstream ss;
 			ss << peer << ":" << clazz << ":" << s;
 			return ss.str ();
 		}
 
 
 
-		std::string 
-		TridentExport::TridentId (const std::string& peer,  const std::string clazz, const synthese::env::Service* service)
+		string 
+		TridentExport::TridentId (const string& peer,  const string clazz, const synthese::env::Service* service)
 		{
-			std::stringstream ss;
-			int skey = service->getServiceNumber ();
-			if (skey == 0) skey = service->getId ();
+			stringstream ss;
+			string skey = service->getServiceNumber ();
+			if (skey.empty()) skey = Conversion::ToString(service->getId());
 
 			ss << peer << ":" << clazz << ":" << ((const Line*) service->getPath ())->getKey () 
 			   << "s" << skey ;

@@ -23,37 +23,37 @@
 #ifndef SYNTHESE_env_NonConcurrencyRule_h__
 #define SYNTHESE_env_NonConcurrencyRule_h__
 
-#include "01_util/Registrable.h"
-#include "01_util/Constants.h"
+#include "Registrable.h"
+#include "Constants.h"
+
+#include "UId.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class CommercialLine;
-
 		/** Non-concurrency rule class.
 			@ingroup m35
 		*/
 		class NonConcurrencyRule : public util::Registrable<uid, NonConcurrencyRule>
 		{
-			const CommercialLine*	_prorityLine;
-			const CommercialLine*	_hiddenLine;
-			int						_delay;
+			uid	_prorityLine;
+			uid	_hiddenLine;
+			int	_delay;
 
 		public:
 			NonConcurrencyRule(
-				const CommercialLine* priorityLine = NULL
-				, const CommercialLine* hiddenLine = NULL
+				uid priorityLine = UNKNOWN_VALUE
+				, uid hiddenLine = UNKNOWN_VALUE
 				, int delay = UNKNOWN_VALUE
 			);
 
-			const CommercialLine*	getPriorityLine()	const;
-			const CommercialLine*	getHiddenLine()		const;
-			int						getDelay()			const;
+			uid getPriorityLine()	const;
+			uid	getHiddenLine()		const;
+			int	getDelay()			const;
 
-			void setPriorityLine(const CommercialLine* value);
-			void setHiddenLine(const CommercialLine* value);
+			void setPriorityLine(uid value);
+			void setHiddenLine(uid value);
 			void setDelay(int value);
 
 		};

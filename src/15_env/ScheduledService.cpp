@@ -21,10 +21,11 @@
 */
 
 #include "ScheduledService.h"
+#include "Path.h"
+#include "Edge.h"
+#include "ReservationRule.h"
 
-#include "15_env/Path.h"
-#include "15_env/Edge.h"
-#include "15_env/ReservationRule.h"
+using namespace std;
 
 namespace synthese
 {
@@ -39,22 +40,19 @@ namespace synthese
 	namespace env
 	{
 
-		ScheduledService::ScheduledService (const uid& id,
-							int serviceNumber,
-							Path* path
-							)
-			: synthese::util::Registrable<uid,ScheduledService> (id)
+		ScheduledService::ScheduledService(
+			const uid& id,
+			const string& serviceNumber,
+			Path* path
+		)	: Registrable<uid,ScheduledService> (id)
 			, NonPermanentService(serviceNumber, path)
-		{
+		{	}
 
-		}
 
 		ScheduledService::ScheduledService()
 			: Registrable<uid,ScheduledService>()
 			, NonPermanentService()
-		{
-		}
-
+		{	}
 
 
 		ScheduledService::~ScheduledService ()

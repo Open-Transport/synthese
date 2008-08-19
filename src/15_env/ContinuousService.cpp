@@ -20,14 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/ContinuousService.h"
-#include "15_env/Edge.h"
+#include "ContinuousService.h"
+#include "Edge.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace time;
+	using namespace util;
 
 	namespace util
 	{
@@ -36,34 +39,27 @@ namespace synthese
 
 	namespace env
 	{
-		ContinuousService::ContinuousService (const uid& id,
-							int serviceNumber,
-							Path* path,
-							int range,
-							int maxWaitingTime)
-			: synthese::util::Registrable<uid,ContinuousService> (id)
+		ContinuousService::ContinuousService(
+			const uid& id,
+			const string& serviceNumber,
+			Path* path,
+			int range,
+			int maxWaitingTime
+		)	: Registrable<uid,ContinuousService> (id)
 			, NonPermanentService(serviceNumber, path)
 			, _range (range)
 			, _maxWaitingTime (maxWaitingTime)
-		{
+		{	}
 
-		}
 
 		ContinuousService::ContinuousService()
 			: synthese::util::Registrable<uid,ContinuousService> ()
 			, NonPermanentService()
-
-		{
-
-		}
+		{	}
 		    
 
-
 		ContinuousService::~ContinuousService ()
-		{
-		}
-
-
+		{	}
 
 
 		    

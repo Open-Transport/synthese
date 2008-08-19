@@ -23,15 +23,15 @@
 #ifndef SYNTHESE_ENV_SERVICE_H
 #define SYNTHESE_ENV_SERVICE_H
 
-#include "15_env/Complyer.h"
-#include "15_env/ServicePointer.h"
-#include "15_env/Types.h"
+#include "Complyer.h"
+#include "ServicePointer.h"
+#include "Types.h"
 
 #include <string>
 
-#include "01_util/UId.h"
+#include "UId.h"
 
-#include "04_time/Schedule.h"
+#include "Schedule.h"
 
 namespace synthese
 {
@@ -67,23 +67,28 @@ namespace synthese
 		class Service : public Complyer
 		{
 		private:
-			int				_serviceNumber;
-			uid				_pathId;
-			Path*			_path;
+			std::string	_serviceNumber;
+			uid			_pathId;
+			Path*		_path;
 
 		public:
 
-			Service (int serviceNumber, Path* path);
+			Service(
+				const std::string& serviceNumber,
+				Path* path
+			);
+
 			Service();
 			~Service ();
 
 
 			//! @name Getters
 			//@{
-				const Path*		getPath () const;
-				Path*			getPath ();
-				uid				getPathId()			const;
-				int				getServiceNumber()	const;
+				const Path*			getPath () const;
+				Path*				getPath ();
+				uid					getPathId()			const;
+				const std::string&	getServiceNumber()	const;
+
 
 				/** Gets a departure schedule for this service.
 					@param rank Rank of the stop where to get the departure schedule
@@ -96,7 +101,7 @@ namespace synthese
 			//@{
 				void setPath(Path* path);
 				void setPathId(uid id);
-				void setServiceNumber (int serviceNumber);
+				void setServiceNumber(std::string serviceNumber);
 			//@}
 
 

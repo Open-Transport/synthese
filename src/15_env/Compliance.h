@@ -30,6 +30,7 @@ namespace synthese
 {
 	namespace env
 	{
+		class ReservationRule;
 
 		/** Compliance class.
 			@ingroup m35
@@ -37,14 +38,17 @@ namespace synthese
 		class Compliance
 		{
 		private:
-			boost::logic::tribool _compliant;
-			int _capacity;
+			boost::logic::tribool	_compliant;
+			int						_capacity;
+			const ReservationRule*	_reservationRule;
 
 		protected:
 
-			Compliance (
-				boost::logic::tribool compliant,
-					int capacity);
+			Compliance(
+				boost::logic::tribool compliant
+				, int capacity
+				, ReservationRule* reservationRule = NULL
+			);
 			
 		public:
 
@@ -54,12 +58,14 @@ namespace synthese
 			//@{
 				int getCapacity () const;
 				const boost::logic::tribool& isCompliant () const;
+				const ReservationRule* getReservationRule() const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void setCapacity (int capacity);
 				void setCompliant (const boost::logic::tribool& status);
+				void setReservationRule(const ReservationRule* value);
 			//@}
 
 			//! @name Queries

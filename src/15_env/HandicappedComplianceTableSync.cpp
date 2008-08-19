@@ -22,12 +22,12 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
 #include "HandicappedCompliance.h"
 #include "HandicappedComplianceTableSync.h"
@@ -113,13 +113,15 @@ namespace synthese
 	{
 		const std::string HandicappedComplianceTableSync::COL_STATUS ("status");
 		const std::string HandicappedComplianceTableSync::COL_CAPACITY ("capacity");
+		const std::string HandicappedComplianceTableSync::COL_RESERVATION_RULE("reservation_rule");
 
 		HandicappedComplianceTableSync::HandicappedComplianceTableSync()
 			: SQLiteRegistryTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_STATUS, "INTEGER");
-			addTableColumn (COL_CAPACITY, "INTEGER");
+			addTableColumn(COL_STATUS, "INTEGER");
+			addTableColumn(COL_CAPACITY, "INTEGER");
+			addTableColumn(COL_RESERVATION_RULE, "INTEGER");
 		}
 
 		std::vector<shared_ptr<HandicappedCompliance> > HandicappedComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )

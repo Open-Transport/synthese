@@ -23,10 +23,10 @@
 #ifndef SYNTHESE_ENV_SCHEDULEDSERVICE_H
 #define SYNTHESE_ENV_SCHEDULEDSERVICE_H
 
-#include "15_env/NonPermanentService.h"
-#include "15_env/Types.h"
+#include "NonPermanentService.h"
+#include "Types.h"
 
-#include "01_util/Registrable.h"
+#include "Registrable.h"
 
 #include <string>
 
@@ -52,10 +52,11 @@ namespace synthese
 
 		public:
 
-			ScheduledService (const uid& id,
-					int serviceNumber,
-					Path* path
-					);
+			ScheduledService(
+				const uid& id,
+				const std::string& serviceNumber,
+				Path* path
+			);
 			ScheduledService();
 
 			~ScheduledService ();

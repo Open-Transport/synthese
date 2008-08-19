@@ -30,20 +30,22 @@ namespace synthese
 	{
 
 
-		NonConcurrencyRule::NonConcurrencyRule( const CommercialLine* priorityLine /*= NULL */, const CommercialLine* hiddenLine /*= NULL */, int delay /*= UNKNOWN_VALUE  */ )
-			: Registrable<uid, NonConcurrencyRule>()
+		NonConcurrencyRule::NonConcurrencyRule(
+			uid priorityLine /*= NULL */
+			, uid hiddenLine /*= NULL */
+			, int delay /*= UNKNOWN_VALUE  */
+		)	: Registrable<uid, NonConcurrencyRule>()
 			, _prorityLine(priorityLine)
 			, _hiddenLine(hiddenLine)
 			, _delay(delay)
-		{
-		}
+		{}
 
-		const CommercialLine* NonConcurrencyRule::getPriorityLine() const
+		uid NonConcurrencyRule::getPriorityLine() const
 		{
 			return _prorityLine;
 		}
 
-		const CommercialLine* NonConcurrencyRule::getHiddenLine() const
+		uid NonConcurrencyRule::getHiddenLine() const
 		{
 			return _hiddenLine;
 		}
@@ -53,12 +55,12 @@ namespace synthese
 			return _delay;
 		}
 
-		void NonConcurrencyRule::setPriorityLine( const CommercialLine* value )
+		void NonConcurrencyRule::setPriorityLine(uid value )
 		{
 			_prorityLine = value;
 		}
 
-		void NonConcurrencyRule::setHiddenLine( const CommercialLine* value )
+		void NonConcurrencyRule::setHiddenLine(uid value )
 		{
 			_hiddenLine = value;
 		}

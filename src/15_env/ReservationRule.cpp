@@ -261,5 +261,24 @@ namespace synthese
 			_originIsReference = originIsReference;
 		}
 
+		bool ReservationRule::getOriginIsReference() const
+		{
+			return _originIsReference;
+		}
+
+		int ReservationRule::getMinDelayDays() const
+		{
+			return _minDelayDays;
+		}
+
+		int ReservationRule::getMinDelayMinutes() const
+		{
+			return _minDelayMinutes;
+		}
+
+		int ReservationRule::getMaxDelayDays() const
+		{
+			return _maxDelayDays;
+		}
 	}
 }

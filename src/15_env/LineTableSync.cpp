@@ -22,22 +22,22 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "15_env/AxisTableSync.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/ReservationRuleTableSync.h"
-#include "15_env/BikeComplianceTableSync.h"
-#include "15_env/HandicappedComplianceTableSync.h"
-#include "15_env/PedestrianComplianceTableSync.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/FareTableSync.h"
-#include "15_env/RollingStockTableSync.h"
+#include "AxisTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "ReservationRuleTableSync.h"
+#include "BikeComplianceTableSync.h"
+#include "HandicappedComplianceTableSync.h"
+#include "PedestrianComplianceTableSync.h"
+#include "LineTableSync.h"
+#include "FareTableSync.h"
+#include "RollingStockTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -71,6 +71,7 @@ namespace synthese
 			bool useInDepartureBoards (rows->getBool (LineTableSync::COL_USEINDEPARTUREBOARDS));
 			bool useInTimetables (rows->getBool (LineTableSync::COL_USEINTIMETABLES));
 			bool useInRoutePlanning (rows->getBool (LineTableSync::COL_USEINROUTEPLANNING));
+			logic::tribool wayBack(rows->getTribool(LineTableSync::COL_WAYBACK));
 			
 			line->setName(name);
 			line->setTimetableName (timetableName);
@@ -79,6 +80,7 @@ namespace synthese
 			line->setUseInDepartureBoards (useInDepartureBoards);
 			line->setUseInTimetables (useInTimetables);
 			line->setUseInRoutePlanning (useInRoutePlanning);
+			line->setWayBack(wayBack);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::save(Line* object)
@@ -178,6 +180,7 @@ namespace synthese
 		const std::string LineTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
 		const std::string LineTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 		const std::string LineTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
+		const std::string LineTableSync::COL_WAYBACK("wayback");
 
 		LineTableSync::LineTableSync()
 			: SQLiteRegistryTableSyncTemplate<LineTableSync,Line>()
@@ -186,21 +189,23 @@ namespace synthese
 			addTableColumn (COL_COMMERCIAL_LINE_ID, "INTEGER", false);
 			addTableColumn (COL_AXISID, "INTEGER", false);
 			
-			addTableColumn (COL_NAME, "TEXT", true);
-			addTableColumn (COL_TIMETABLENAME, "TEXT", true);
-			addTableColumn (COL_DIRECTION, "TEXT", true);
-			addTableColumn (COL_ISWALKINGLINE, "BOOLEAN", true);
-			addTableColumn (COL_USEINDEPARTUREBOARDS, "BOOLEAN", true);
-			addTableColumn (COL_USEINTIMETABLES, "BOOLEAN", true);
-			addTableColumn (COL_USEINROUTEPLANNING, "BOOLEAN", true);
+			addTableColumn (COL_NAME, "TEXT");
+			addTableColumn (COL_TIMETABLENAME, "TEXT");
+			addTableColumn (COL_DIRECTION, "TEXT");
+			addTableColumn (COL_ISWALKINGLINE, "BOOLEAN");
+			addTableColumn (COL_USEINDEPARTUREBOARDS, "BOOLEAN");
+			addTableColumn (COL_USEINTIMETABLES, "BOOLEAN");
+			addTableColumn (COL_USEINROUTEPLANNING, "BOOLEAN");
 
-			addTableColumn (COL_ROLLINGSTOCKID, "INTEGER", true);
-			addTableColumn (COL_FAREID, "INTEGER", true);
-			addTableColumn (COL_ALARMID, "INTEGER", true);
-			addTableColumn (COL_BIKECOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_HANDICAPPEDCOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_RESERVATIONRULEID, "INTEGER", true);
+			addTableColumn (COL_ROLLINGSTOCKID, "INTEGER");
+			addTableColumn (COL_FAREID, "INTEGER");
+			addTableColumn (COL_ALARMID, "INTEGER");
+			addTableColumn (COL_BIKECOMPLIANCEID, "INTEGER");
+			addTableColumn (COL_HANDICAPPEDCOMPLIANCEID, "INTEGER");
+			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER");
+			addTableColumn (COL_RESERVATIONRULEID, "INTEGER");
+
+			addTableColumn(COL_WAYBACK, "INTEGER");
 
 			addTableIndex(COL_COMMERCIAL_LINE_ID);
 		}

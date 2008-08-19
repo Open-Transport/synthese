@@ -26,10 +26,12 @@
 #include <vector>
 #include <string>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include <boost/logic/tribool.hpp>
 
-#include "15_env/Path.h"
+#include "Registrable.h"
+#include "UId.h"
+
+#include "Path.h"
 
 namespace synthese
 {
@@ -91,6 +93,8 @@ namespace synthese
 
 			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
+			boost::logic::tribool		_wayBack;	//!< true if back route, false if forward route, indeterminate if unknown
+
 		public:
 
 			Line (const uid& id,
@@ -117,6 +121,7 @@ namespace synthese
 				bool					getWalkingLine ()			const;
 				const CommercialLine*	getCommercialLine()			const;
 				const SubLines			getSubLines()				const;
+				boost::logic::tribool	getWayBack()				const;
 			//@}
 
 
@@ -132,6 +137,7 @@ namespace synthese
 				void setUseInRoutePlanning (bool useInRoutePlanning);
 				void setUseInTimetables (bool useInTimetables);
 				void setCommercialLine(const CommercialLine* commercialLine);
+				void setWayBack(boost::logic::tribool value);
 			//@}
 
 

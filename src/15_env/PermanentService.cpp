@@ -20,14 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/PermanentService.h"
-#include "15_env/Edge.h"
-#include "15_env/Path.h"
+#include "PermanentService.h"
+#include "Edge.h"
+#include "Path.h"
+
 #include "15_env/Types.h"
 
 #include "04_time/module.h"
 
 #include <math.h>
+
+using namespace std;
 
 namespace synthese
 {
@@ -113,7 +116,7 @@ namespace synthese
 		}
 
 		PermanentService::PermanentService( Path* path )
-			: Service(UNKNOWN_VALUE, path)
+			: Service(string(), path)
 		{
 			path->setAllDays(true);
 		}
