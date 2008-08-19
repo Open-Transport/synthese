@@ -24,9 +24,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define SYNTHESE_IMPEX_TRIDENT_EXPORT_ACTION_H__
 
 
-#include "30_server/Action.h"
+#include "Action.h"
 
-#include "01_util/FactorableTemplate.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -46,12 +46,14 @@ namespace synthese
 			static const std::string PARAMETER_COMMERCIAL_LINE_REGEX;
 			static const std::string PARAMETER_NETWORK_REGEX;
 			static const std::string PARAMETER_ARCHIVE_BASENAME;
+			static const std::string PARAMETER_WITH_TISSEO_EXTENSION;
 
 		private:
 
 			std::string _commercialLineRegex;
 			std::string _networkRegex;
 			std::string _archiveBasename;
+			bool		_withTisseoExtension;
 
 		protected:
 

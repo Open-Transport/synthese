@@ -19,30 +19,36 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+
+// 36 Impex
 #include "TridentExportAction.h"
-
-#include "01_util/Conversion.h"
-#include "01_util/Log.h"
-#include "01_util/iostreams/Archive.h"
-
-
-#include "11_interfaces/Interface.h"
-
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ServerModule.h"
-#include "30_server/ParametersMap.h"
-
-#include "15_env/CommercialLine.h"
-#include "15_env/TransportNetwork.h"
 #include "TridentExport.h"
 
+// 01 Util
+#include "Conversion.h"
+#include "Log.h"
+#include "iostreams/Archive.h"
+
+// 11 Interface
+#include "Interface.h"
+
+// 30 Server
+#include "ActionException.h"
+#include "Request.h"
+#include "ServerModule.h"
+#include "ParametersMap.h"
+
+// 35 Transport
+#include "CommercialLine.h"
+#include "TransportNetwork.h"
+
+// Boost
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/regex.hpp>
 
+// Std
 #include <fstream>
-
 
 using namespace std;
 using namespace boost;
@@ -62,6 +68,7 @@ namespace synthese
 		const string TridentExportAction::PARAMETER_COMMERCIAL_LINE_REGEX = Action_PARAMETER_PREFIX + "cl_regex";
 		const string TridentExportAction::PARAMETER_NETWORK_REGEX = Action_PARAMETER_PREFIX + "nw_regex";
 		const string TridentExportAction::PARAMETER_ARCHIVE_BASENAME = Action_PARAMETER_PREFIX + "cl_archbn";
+		const string TridentExportAction::PARAMETER_WITH_TISSEO_EXTENSION = Action_PARAMETER_PREFIX + "wte";
 
 
 		ParametersMap TridentExportAction::getParametersMap() const
@@ -70,6 +77,7 @@ namespace synthese
 			map.insert(PARAMETER_COMMERCIAL_LINE_REGEX, _commercialLineRegex);
 			map.insert(PARAMETER_NETWORK_REGEX, _commercialLineRegex);
 			map.insert(PARAMETER_ARCHIVE_BASENAME, _archiveBasename);
+			map.insert(PARAMETER_WITH_TISSEO_EXTENSION, _withTisseoExtension);
 			return map;
 		}
 
@@ -86,6 +94,8 @@ namespace synthese
 			_archiveBasename = map.getString(PARAMETER_ARCHIVE_BASENAME, false, FACTORY_KEY);
 			if (_archiveBasename.empty())
 			    _archiveBasename = "trident_export";
+
+			_withTisseoExtension = map.getBool(PARAMETER_WITH_TISSEO_EXTENSION, false, false, FACTORY_KEY);
 		}
 
 		void TridentExportAction::run()
@@ -107,31 +117,31 @@ namespace synthese
 		    
 		    if (result == false) 
 		    {
-			throw ActionException ("Could not create archive directory " + archiveDir.string ());
+				throw ActionException ("Could not create archive directory " + archiveDir.string ());
 		    }
 			
 		    for (CommercialLine::ConstIterator it = CommercialLine::Begin();
 			 it != CommercialLine::End (); ++it)
 		    {
-			boost::shared_ptr<CommercialLine> cl = it->second;
-			std::string name = cl->getName ();
-			std::string networkName = cl->getNetwork ()->getName ();
+				boost::shared_ptr<CommercialLine> cl = it->second;
+				std::string name = cl->getName ();
+				std::string networkName = cl->getNetwork ()->getName ();
 
-			if (boost::regex_match (name, clRegex) == false) continue;
-			if (boost::regex_match (networkName, nwRegex) == false) continue;
-			
-			std::string filename ("trident_line_" + cl->getShortName () + "_" + Conversion::ToString (cl->getKey ()) + ".xml");
-			
-			boost::filesystem::path xmlfp (archiveDir.string () + "/" + filename);
-			std::ofstream out (xmlfp.string ().c_str (), std::ios_base::binary);
-			TridentExport::Export (out, cl->getKey ());
-			out.close ();
+				if (boost::regex_match (name, clRegex) == false) continue;
+				if (boost::regex_match (networkName, nwRegex) == false) continue;
+				
+				std::string filename ("trident_line_" + cl->getShortName () + "_" + Conversion::ToString (cl->getKey ()) + ".xml");
+				
+				boost::filesystem::path xmlfp (archiveDir.string () + "/" + filename);
+				std::ofstream out (xmlfp.string ().c_str (), std::ios_base::binary);
+				TridentExport::Export (out, cl->getKey (), _withTisseoExtension);
+				out.close ();
 
-			// Add the file to the archive
-			Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf () + "/" + filename), archos);
-			boost::filesystem::remove (xmlfp);
+				// Add the file to the archive
+				Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf () + "/" + filename), archos);
+				boost::filesystem::remove (xmlfp);
 
-			Log::GetInstance ().debug ("Commercial line " + cl->getName () + " exported to " + filename);
+				Log::GetInstance ().debug ("Commercial line " + cl->getName () + " exported to " + filename);
 		    }
 		    
 		    boost::filesystem::remove (archiveDir);

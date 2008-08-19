@@ -25,7 +25,6 @@
 #include <sstream>
 
 #include "NonConcurrencyRuleTableSync.h"
-#include "NonConcurrencyRule.h"
 
 #include "DBModule.h"
 #include "SQLiteResult.h"

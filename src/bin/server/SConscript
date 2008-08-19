@@ -19,7 +19,9 @@ CppSynthese3BinProject(
 	        's3-security.cpplib', 
 	        's3-env.cpplib', 
 	        's3-util-iostreams.cpplib', 
+	        'boost-filesystem.cpplib',
 	        'boost-program-options.cpplib',
+	        'boost-system.cpplib',
 	        'boost.cppinc'
 	],
 )
