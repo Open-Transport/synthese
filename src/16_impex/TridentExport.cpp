@@ -33,6 +33,7 @@
 #include "Line.h"
 #include "SubLine.h"
 #include "LineStop.h"
+#include "LineStopTableSync.h"
 #include "TransportNetwork.h"
 #include "City.h"
 #include "Service.h"
@@ -131,63 +132,6 @@ namespace synthese
 
 			// Collect all data related to selected commercial line
 
-			// Non concurrency -----------------------------------------------------------------------
-			if (withTisseoExtensions)
-			{
-				vector<shared_ptr<NonConcurrencyRule> > rules(NonConcurrencyRuleTableSync::Search(
-					commercialLineId, commercialLineId, false));
-				for(vector<shared_ptr<NonConcurrencyRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
-				{
-					os << "<LineConflict>" << endl;
-					os << "<objectId>" << TridentId (peerid, "LineConflict", (*it)->getKey ()) << "</objectId>" << endl;
-					os << "<forbiddenLine>" << TridentId (peerid, "Line", (*it)->getHiddenLine()) << "</forbiddenLine>" << endl;
-					os << "<usedLine>" << TridentId (peerid, "Line", (*it)->getPriorityLine()) << "</usedLine>" << endl;
-					os << "<conflictDelay>" << Conversion::ToString((*it)->getDelay()) << "</conflictDelay>" << endl;
-					os << "</LineConflict>" << endl;
-				}
-			}
-
-			// Reservation Rules -----------------------------------------------------------------------
-			if (withTisseoExtensions)
-			{
-				vector<shared_ptr<ReservationRule> > rules(ReservationRuleTableSync::Search());
-				for (vector<shared_ptr<ReservationRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
-				{
-					const ReservationRule& rule(**it);
-					if (rule.isCompliant() == false) continue;
-
-					os << "<ReservationRule>" << endl;
-					os << "<objectId>" << TridentId (peerid, "ReservationRule", (*it)->getKey ()) << "</objectId>" << endl;
-					os << "<ReservationCompulsory>" << (rule.isCompliant() == true ? "compulsory" : "optional") << "</ReservationCompulsory>" << endl;
-					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << endl;
-					if (rule.getMinDelayMinutes() > 0)
-					{
-						os << "<minMinutesDurationBeforeDeadline>" << rule.getMinDelayMinutes() << "</minMinutesDurationBeforeDeadline>" << endl;
-					}
-					if (rule.getMinDelayDays() > 0)
-					{
-						os << "<minDaysDurationBeforeDeadline>" << rule.getMinDelayDays() << "</minDaysDurationBeforeDeadline>" << endl;
-					}
-					if (!rule.getHourDeadLine().isUnknown())
-					{
-						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << endl;
-					}
-					if (rule.getMaxDelayDays() > 0)
-					{
-						os << "<maxDaysDurationBeforeDeadline>" << rule.getMaxDelayDays() << "</maxDaysDurationBeforeDeadline>" << endl;
-					}
-					if (!rule.getPhoneExchangeNumber().empty())
-					{
-						os << "<phoneNumber>" << rule.getPhoneExchangeNumber() << "</phoneNumber>" << endl;
-						os << "<callcenterOpeningPeriod>" << rule.getPhoneExchangeOpeningHours() << "</callcenterOpeningPeriod>" << endl;
-					}
-					if (!rule.getWebSiteUrl().empty())
-					{
-						os << "<bookingWebsiteURL>" << rule.getWebSiteUrl() << "</bookingWebsiteURL>" << endl;
-					}
-					os << "</ReservationRule>" << endl;
-				}
-			}
 
 
 			// Physical stops ------------------------------------------------------------------------
@@ -250,6 +194,63 @@ namespace synthese
 		    
 			os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident Chouette.xsd'>" << endl;
 
+			// Non concurrency -----------------------------------------------------------------------
+			if (withTisseoExtensions)
+			{
+				vector<shared_ptr<NonConcurrencyRule> > rules(NonConcurrencyRuleTableSync::Search(
+					commercialLineId, commercialLineId, false));
+				for(vector<shared_ptr<NonConcurrencyRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
+				{
+					os << "<LineConflict>" << endl;
+					os << "<objectId>" << TridentId (peerid, "LineConflict", (*it)->getKey ()) << "</objectId>" << endl;
+					os << "<forbiddenLine>" << TridentId (peerid, "Line", (*it)->getHiddenLine()) << "</forbiddenLine>" << endl;
+					os << "<usedLine>" << TridentId (peerid, "Line", (*it)->getPriorityLine()) << "</usedLine>" << endl;
+					os << "<conflictDelay>" << Conversion::ToString((*it)->getDelay()) << "</conflictDelay>" << endl;
+					os << "</LineConflict>" << endl;
+				}
+			}
+
+			// Reservation Rules -----------------------------------------------------------------------
+			if (withTisseoExtensions)
+			{
+				vector<shared_ptr<ReservationRule> > rules(ReservationRuleTableSync::Search());
+				for (vector<shared_ptr<ReservationRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
+				{
+					const ReservationRule& rule(**it);
+					if (rule.isCompliant() == false) continue;
+
+					os << "<ReservationRule>" << endl;
+					os << "<objectId>" << TridentId (peerid, "ReservationRule", (*it)->getKey ()) << "</objectId>" << endl;
+					os << "<ReservationCompulsory>" << (rule.isCompliant() == true ? "compulsory" : "optional") << "</ReservationCompulsory>" << endl;
+					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << endl;
+					if (rule.getMinDelayMinutes() > 0)
+					{
+						os << "<minMinutesDurationBeforeDeadline>" << rule.getMinDelayMinutes() << "</minMinutesDurationBeforeDeadline>" << endl;
+					}
+					if (rule.getMinDelayDays() > 0)
+					{
+						os << "<minDaysDurationBeforeDeadline>" << rule.getMinDelayDays() << "</minDaysDurationBeforeDeadline>" << endl;
+					}
+					if (!rule.getHourDeadLine().isUnknown())
+					{
+						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << endl;
+					}
+					if (rule.getMaxDelayDays() > 0)
+					{
+						os << "<maxDaysDurationBeforeDeadline>" << rule.getMaxDelayDays() << "</maxDaysDurationBeforeDeadline>" << endl;
+					}
+					if (!rule.getPhoneExchangeNumber().empty())
+					{
+						os << "<phoneNumber>" << rule.getPhoneExchangeNumber() << "</phoneNumber>" << endl;
+						os << "<callcenterOpeningPeriod>" << rule.getPhoneExchangeOpeningHours() << "</callcenterOpeningPeriod>" << endl;
+					}
+					if (!rule.getWebSiteUrl().empty())
+					{
+						os << "<bookingWebsiteURL>" << rule.getWebSiteUrl() << "</bookingWebsiteURL>" << endl;
+					}
+					os << "</ReservationRule>" << endl;
+				}
+			}
 
 			// --------------------------------------------------- PTNetwork 
 			{
@@ -298,35 +299,20 @@ namespace synthese
 				if ((ps->getDepartureEdges ().size () == 0) && (ps->getArrivalEdges ().size () == 0)) continue;
 
 				os << "<StopArea>" << endl;
-				// old : string stopname (ps->getName ());
-				// old : stopname += " (" + Conversion::ToString (ps->getKey ()) + ")";
 
+				os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << endl;
 				os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << endl;
 
 				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
 				    ps->getConnectionPlace ()->getName ();
-				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
-				os << " / " << ps->getOperatorCode ();
+				if (!ps->getName().empty()) os << " (" + ps->getName () + ")";
 				os << "</name>" << endl;
 
-				// Add all stop points referencing this physical stop
-                                // Otherly said : all line stops based on this physical stop. highly redundant since the other link exists.
-				// Store them into a set to remove duplicates
-				set<const LineStop*> lstops;
-				const Vertex::Edges& departingLineStops = ps->getDepartureEdges ();
-				for (Vertex::Edges::const_iterator itls = departingLineStops.begin ();
-				     itls != departingLineStops.end (); ++itls) {
-				    const LineStop* ls = dynamic_cast<const LineStop*> (*itls);
-				    lstops.insert (ls);
-				}
-				const Vertex::Edges& arrivingLineStops = ps->getArrivalEdges ();
-				for (Vertex::Edges::const_iterator itls = arrivingLineStops.begin ();
-				     itls != arrivingLineStops.end (); ++itls) {
-				    const LineStop* ls = dynamic_cast<const LineStop*> (*itls);
-				    lstops.insert (ls);
-				}
-
-				for (set<const LineStop*>::const_iterator itls = lstops.begin ();
+				vector<shared_ptr<LineStop> > lstops(LineStopTableSync::Search(
+					UNKNOWN_VALUE,
+					ps->getKey()
+				));
+				for (vector<shared_ptr<LineStop> >::const_iterator itls = lstops.begin ();
 				     itls != lstops.end (); ++itls)
 				{
 				    os << "<contains>" << TridentId (peerid, "StopPoint", (*itls)->getKey ())  << "</contains>" << endl;
@@ -595,12 +581,14 @@ namespace synthese
 				os << "<publishedName>";
 				{
 				    const PhysicalStop* ps = line->getOrigin ();
-				    os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
+				    if (ps)
+						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
 				os << " -&gt; ";
 				{
 				    const PhysicalStop* ps = line->getDestination ();
-				    os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
+				    if (ps)
+						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
 				os << "</publishedName>" << endl;
 				
@@ -710,6 +698,10 @@ namespace synthese
 				 itline != lines.end (); ++itline)
 				{
 				shared_ptr<const Line> line = (*itline);
+
+				if (line->getEdges().empty())
+					continue;
+
 				os << "<JourneyPattern>" << endl;
 				os << "<objectId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</objectId>" << endl;
 				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << endl;
@@ -783,8 +775,8 @@ namespace synthese
 					{
 						os << "<VehicleJourney>" << endl;
 					}
-					os << "<creatorId>" << ssrv->getServiceNumber() << "</creatorId>" << endl;
-					os << "<number>" << ssrv->getServiceNumber() << "</number>" << endl;
+					os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << endl;
+					os << "<number>" << srv->getServiceNumber() << "</number>" << endl;
 					os << "<objectId>" << TridentId (peerid, "VehicleJourney", srv->getId()) << "</objectId>" << endl;
 					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << endl;
 					os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
@@ -875,8 +867,11 @@ namespace synthese
 			string skey = service->getServiceNumber ();
 			if (skey.empty()) skey = Conversion::ToString(service->getId());
 
-			ss << peer << ":" << clazz << ":" << ((const Line*) service->getPath ())->getKey () 
-			   << "s" << skey ;
+			const Line* line(static_cast<const Line*>(service->getPath()));
+			if (dynamic_cast<const SubLine*>(line))
+				line = static_cast<const SubLine*>(line)->getMainLine();
+
+			ss << peer << ":" << clazz << ":" << line->getKey() << "s" << skey ;
 
 			return ss.str ();
 		}

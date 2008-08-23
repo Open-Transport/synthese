@@ -248,12 +248,16 @@ namespace synthese
 
 		const PhysicalStop* Line::getOrigin() const
 		{
+			if (getEdges().empty())
+				return NULL;
 		    return static_cast<const PhysicalStop*>((getEdges().at (0))->getFromVertex());
 		}
 
 
 		const PhysicalStop* Line::getDestination() const
 		{
+			if (getEdges().empty())
+				return NULL;
 			Edge* edge = getLastEdge();
 			return static_cast<const PhysicalStop*>(edge->getFromVertex());
 		}
@@ -312,9 +316,24 @@ namespace synthese
 
 		bool Line::respectsLineTheory( const Service& service ) const
 		{
-			for (ServiceSet::const_iterator it(_services.begin()); it != _services.end(); ++it)
-				if (!(*it)->respectsLineTheoryWith(service))
-					return false;
+			ServiceSet::const_iterator last_it;
+			ServiceSet::const_iterator it;
+			for(it = _services.begin();
+				it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(0) < service.getDepartureEndScheduleToIndex(0);
+				last_it = it++);
+
+			// Same departure time is forbidden
+			if (it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(0) == service.getDepartureEndScheduleToIndex(0))
+				return false;
+
+			// Control of the next service if exists
+			if (it != _services.end() && !(*it)->respectsLineTheoryWith(service))
+				return false;
+
+			// Control of the previous service if exists
+			if (it != _services.begin() && !(*last_it)->respectsLineTheoryWith(service))
+				return false;
+
 			return true;
 		}
 

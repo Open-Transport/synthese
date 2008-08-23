@@ -98,7 +98,7 @@ namespace synthese
 
 			stream << "<h1>Arrêts desservis</h1>";
 
-			vector<shared_ptr<LineStop> > linestops(LineStopTableSync::search(_line->getKey()));
+			vector<shared_ptr<LineStop> > linestops(LineStopTableSync::Search(_line->getKey()));
 			
 			HTMLTable::ColsVector v;
 			v.push_back("Rang");

@@ -166,19 +166,26 @@ namespace synthese
 		}
 
 
-		std::vector<shared_ptr<LineStop> > LineStopTableSync::search(
+		std::vector<shared_ptr<LineStop> > LineStopTableSync::Search(
 			uid lineId
+			, uid physicalStopId
 			, int first /*= 0*/
 			, int number /*= 0*/
+			, bool orderByRank
+			, bool raisingOrder
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " << COL_LINEID << "=" << lineId
-				<< " ORDER BY " << COL_RANKINPATH
-				;
+				<< " WHERE 1 ";
+			if (lineId != UNKNOWN_VALUE)
+				query << " AND " << COL_LINEID << "=" << lineId;
+			if (physicalStopId != UNKNOWN_VALUE)
+				query << " AND " << COL_PHYSICALSTOPID << "=" << physicalStopId;
+			if (orderByRank)
+				query << " ORDER BY " << COL_RANKINPATH << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

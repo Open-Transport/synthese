@@ -61,10 +61,13 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<LineStop> > search(
-				uid lineId
+			static std::vector<boost::shared_ptr<LineStop> > Search(
+				uid lineId = UNKNOWN_VALUE
+				, uid physicalStopId = UNKNOWN_VALUE
 				, int first = 0
 				, int number = 0
+				, bool orderByRank = true
+				, bool raisingOrder = true				
 			);
 		};
 	}

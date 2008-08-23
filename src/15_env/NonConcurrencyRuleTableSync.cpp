@@ -145,13 +145,13 @@ namespace synthese
 				<< " FROM " << TABLE_NAME
 				<< " WHERE 1 ";
 			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
-				query << " AND(1";
+				query << " AND (";
 			if (priorityLineId != UNKNOWN_VALUE)
-				query << " AND " << COL_PRIORITY_LINE_ID << "=" << priorityLineId;
+				query << COL_PRIORITY_LINE_ID << "=" << priorityLineId;
 			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
 				query << (hiddenAndPriority ? " AND " : " OR ");
 			if (hiddenLineId != UNKNOWN_VALUE)
-				query << " AND " << COL_HIDDEN_LINE_ID << "=" << hiddenLineId;
+				query << COL_HIDDEN_LINE_ID << "=" << hiddenLineId;
 			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
 				query << ")";
 

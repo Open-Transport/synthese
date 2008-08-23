@@ -22,6 +22,9 @@ CppSynthese3BinProject(
 	        'boost-filesystem.cpplib',
 	        'boost-program-options.cpplib',
 	        'boost-system.cpplib',
+	        'boost-thread.cpplib',
+	        'boost-date-time.cpplib',
+	        'boost-regex.cpplib',
 	        'boost.cppinc'
 	],
 )

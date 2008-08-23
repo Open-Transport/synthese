@@ -113,7 +113,7 @@ namespace synthese
 		    std::ofstream archos (archfp.string ().c_str ());
 
 		    bool result = boost::filesystem::create_directory(archiveDir);
-		    Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf ()), archos);
+		    //Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf ()), archos);
 		    
 		    if (result == false) 
 		    {
@@ -138,8 +138,8 @@ namespace synthese
 				out.close ();
 
 				// Add the file to the archive
-				Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf () + "/" + filename), archos);
-				boost::filesystem::remove (xmlfp);
+				//Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf () + "/" + filename), archos);
+				//boost::filesystem::remove (xmlfp);
 
 				Log::GetInstance ().debug ("Commercial line " + cl->getName () + " exported to " + filename);
 		    }

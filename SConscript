@@ -5,7 +5,7 @@ if s3env.GetPlatform () == 'posix':
   s3env.Append ( CCFLAGS = ['-fpermissive'] )
   s3env.Append ( CPPDEFINES = ['BOOST_ALL_DYN_LINK'] )
 
-s3env.Append ( CPPDEFINES = ['BOOST_ALL_NO_LIB'] )
+#s3env.Append ( CPPDEFINES = ['BOOST_ALL_NO_LIB'] )
 s3env.Append (CPPPATH = [Dir ('src').abspath])
 
 s3env.Append (S3VERSION = '3.01')
