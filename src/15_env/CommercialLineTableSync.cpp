@@ -20,26 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// Env
 #include "CommercialLineTableSync.h"
+#include "CommercialLine.h"
+#include "TransportNetworkTableSync.h"
+#include "TransportNetwork.h"
+#include "LineTableSync.h"
+#include "Place.h"
+#include "EnvModule.h"
 
-#include "15_env/CommercialLine.h"
-#include "15_env/TransportNetworkTableSync.h"
-#include "15_env/TransportNetwork.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/Place.h"
-#include "15_env/EnvModule.h"
+// Db
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+// Util
+#include "Conversion.h"
 
-#include "01_util/Conversion.h"
-
+// Security
 #include "12_security/Constants.h"
-#include "12_security/Right.h"
+#include "Right.h"
 
+// Std
 #include <sstream>
+
+// Boost
 #include <boost/tokenizer.hpp>
 
 using namespace std;
@@ -184,9 +190,9 @@ namespace synthese
 			if (orderByNetwork)
 				query << " ORDER BY "
 					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE_NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
-					<< ",l." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+					<< ",l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
-				query << " ORDER BY l." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -231,7 +237,7 @@ namespace synthese
 				<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE_NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE_NAME << "." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
 				<< "," << TABLE_NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
-				query << " ORDER BY " << TABLE_NAME << "." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY " << TABLE_NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

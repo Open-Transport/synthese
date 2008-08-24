@@ -23,14 +23,18 @@
 #ifndef SYNTHESE_CommercialLineTableSync_H__
 #define SYNTHESE_CommercialLineTableSync_H__
 
+// Env
 #include "CommercialLine.h"
 
+// Std
 #include <vector>
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+// Db
+#include "SQLiteRegistryTableSyncTemplate.h"
 
+// Security
 #include "12_security/Types.h"
 
 namespace synthese
@@ -56,9 +60,13 @@ namespace synthese
 
 
 			/** CommercialLine search.
-				(other search parameters)
+				@param networkId Id of the network which the lines must belong (default = UNKNOWN_VALUE = all networks)
+				@param name SQL LIKE mask that line names must respect (default = "%" = all names). Use % and ? to specify jokers.
 				@param first First CommercialLine object to answer
 				@param number Number of CommercialLine objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@param orderByNetwork Order the results by network name, and by line name (default = true)
+				@param orderByName Order the result by line name (default = false)
+				@param raisingOrder true = ascendant order, false = descendant order (default = true)
 				@return vector<CommercialLine*> Founded CommercialLine objects.
 				@author Hugues Romain
 				@date 2006

@@ -20,9 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// Std
 #include <sstream>
 
-#include "05_html/HTMLModule.h"
+// Html
+#include "HTMLModule.h"
 
 using namespace std;
 
