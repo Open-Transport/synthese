@@ -7,9 +7,10 @@
 #include "15_env/LineStyleInterfaceElement.h"
 #include "15_env/LineShortNameInterfaceElement.h"
 #include "15_env/LineImageURLInterfaceElement.h"
-
 #include "15_env/LogicalStopNameValueInterfaceElement.h"
 #include "15_env/CityNameValueInterfaceElement.h"
+
+#include "LinesListFunction.cpp"
 
 #include "15_env/AddressTableSync.h"
 #include "15_env/AxisTableSync.h"
@@ -34,6 +35,7 @@
 #include "15_env/ScheduledServiceTableSync.h"
 #include "15_env/ServiceDateTableSync.h"
 #include "15_env/TransportNetworkTableSync.h"
+#include "15_env/NonConcurrencyRuleTableSync.h"
 
 #include "15_env/TransportNetworkAdmin.h"
 #include "15_env/CommercialLineAdmin.h"

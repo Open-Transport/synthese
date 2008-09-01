@@ -35,6 +35,8 @@ synthese::env::PhysicalStopTableSync::integrate();
 
 synthese::env::LineStopTableSync::integrate();
 
+synthese::env::NonConcurrencyRuleTableSync::integrate();
+
 synthese::env::RoadChunkTableSync::integrate();
 synthese::env::ContinuousServiceTableSync::integrate();
 synthese::env::ScheduledServiceTableSync::integrate();
@@ -48,3 +50,5 @@ synthese::env::LineAdmin::integrate();
 synthese::env::EnvModule::integrate();
 
 synthese::env::TransportNetworkRight::integrate();
+
+synthese::env::LinesListFunction::integrate();
