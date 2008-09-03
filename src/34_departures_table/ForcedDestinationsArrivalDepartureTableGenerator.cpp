@@ -93,15 +93,13 @@ namespace synthese
 					if (!_allowedLineStop(ls))
 						continue;
 
-					// Next service
-					DateTime tempStartDateTime = _startDateTime;
-					
 					// Max time for forced destination
 					DateTime maxTimeForForcedDestination(_startDateTime);
 					maxTimeForForcedDestination += _persistanceDuration;
 
+					// Next service
 					ServicePointer serviceInstance = ls->getNextService(
-						tempStartDateTime
+						_startDateTime
 						, maxTimeForForcedDestination
 						, _calculationDateTime
 						, false
@@ -132,7 +130,7 @@ namespace synthese
 							reachedDestination[curGLA->getConnectionPlace()] = itr;
 						}
 						// Else optimizing a previously founded ptd
-						else if (tempStartDateTime < reachedDestination[connectionPlace]->first.servicePointer.getActualDateTime())
+						else if(serviceInstance.getActualDateTime() < reachedDestination[connectionPlace]->first.servicePointer.getActualDateTime())
 						{
 							// Allocation
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
