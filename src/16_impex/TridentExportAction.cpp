@@ -108,12 +108,7 @@ namespace synthese
 		    const boost::filesystem::path& tempDir = ServerModule::GetParameter (ServerModule::MODULE_PARAM_TMP_DIR);
 		    const boost::filesystem::path archiveDir (tempDir / _archiveBasename);
 		    
-		    // Create tar ostream
-		    const boost::filesystem::path archfp (tempDir / (_archiveBasename + ".tar"));
-		    std::ofstream archos (archfp.string ().c_str ());
-
 		    bool result = boost::filesystem::create_directory(archiveDir);
-		    //Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf ()), archos);
 		    
 		    if (result == false) 
 		    {
@@ -136,10 +131,6 @@ namespace synthese
 				std::ofstream out (xmlfp.string ().c_str (), std::ios_base::binary);
 				TridentExport::Export (out, cl->getKey (), _withTisseoExtension);
 				out.close ();
-
-				// Add the file to the archive
-				//Archive::Tar (tempDir, boost::filesystem::path(archiveDir.leaf () + "/" + filename), archos);
-				//boost::filesystem::remove (xmlfp);
 
 				Log::GetInstance ().debug ("Commercial line " + cl->getName () + " exported to " + filename);
 		    }

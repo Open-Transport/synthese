@@ -77,10 +77,22 @@ namespace synthese
 	namespace impex
 	{
 
+		string ToXsdDaysDuration (int daysDelay)
+		{
+			stringstream s;
+			s << "P" << daysDelay << "D";
+			return s.str();
+		}
+
 
 		string ToXsdDuration (int transferDelayMinutes)
 		{
-			return "PT" + Conversion::ToString (transferDelayMinutes) + "M";
+			stringstream s;
+			s << "PT";
+			if (transferDelayMinutes > 59)
+				s << (transferDelayMinutes / 60) << "H";
+			s << (transferDelayMinutes % 60) << "M";
+			return s.str();
 		}
 
 		string ToXsdDate (const Date& date)
@@ -191,66 +203,10 @@ namespace synthese
 
 			}
 		    
-		    
-			os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident Chouette.xsd'>" << endl;
-
-			// Non concurrency -----------------------------------------------------------------------
-			if (withTisseoExtensions)
-			{
-				vector<shared_ptr<NonConcurrencyRule> > rules(NonConcurrencyRuleTableSync::Search(
-					commercialLineId, commercialLineId, false));
-				for(vector<shared_ptr<NonConcurrencyRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
-				{
-					os << "<LineConflict>" << endl;
-					os << "<objectId>" << TridentId (peerid, "LineConflict", (*it)->getKey ()) << "</objectId>" << endl;
-					os << "<forbiddenLine>" << TridentId (peerid, "Line", (*it)->getHiddenLine()) << "</forbiddenLine>" << endl;
-					os << "<usedLine>" << TridentId (peerid, "Line", (*it)->getPriorityLine()) << "</usedLine>" << endl;
-					os << "<conflictDelay>" << Conversion::ToString((*it)->getDelay()) << "</conflictDelay>" << endl;
-					os << "</LineConflict>" << endl;
-				}
-			}
-
-			// Reservation Rules -----------------------------------------------------------------------
-			if (withTisseoExtensions)
-			{
-				vector<shared_ptr<ReservationRule> > rules(ReservationRuleTableSync::Search());
-				for (vector<shared_ptr<ReservationRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
-				{
-					const ReservationRule& rule(**it);
-					if (rule.isCompliant() == false) continue;
-
-					os << "<ReservationRule>" << endl;
-					os << "<objectId>" << TridentId (peerid, "ReservationRule", (*it)->getKey ()) << "</objectId>" << endl;
-					os << "<ReservationCompulsory>" << (rule.isCompliant() == true ? "compulsory" : "optional") << "</ReservationCompulsory>" << endl;
-					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << endl;
-					if (rule.getMinDelayMinutes() > 0)
-					{
-						os << "<minMinutesDurationBeforeDeadline>" << rule.getMinDelayMinutes() << "</minMinutesDurationBeforeDeadline>" << endl;
-					}
-					if (rule.getMinDelayDays() > 0)
-					{
-						os << "<minDaysDurationBeforeDeadline>" << rule.getMinDelayDays() << "</minDaysDurationBeforeDeadline>" << endl;
-					}
-					if (!rule.getHourDeadLine().isUnknown())
-					{
-						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << endl;
-					}
-					if (rule.getMaxDelayDays() > 0)
-					{
-						os << "<maxDaysDurationBeforeDeadline>" << rule.getMaxDelayDays() << "</maxDaysDurationBeforeDeadline>" << endl;
-					}
-					if (!rule.getPhoneExchangeNumber().empty())
-					{
-						os << "<phoneNumber>" << rule.getPhoneExchangeNumber() << "</phoneNumber>" << endl;
-						os << "<callcenterOpeningPeriod>" << rule.getPhoneExchangeOpeningHours() << "</callcenterOpeningPeriod>" << endl;
-					}
-					if (!rule.getWebSiteUrl().empty())
-					{
-						os << "<bookingWebsiteURL>" << rule.getWebSiteUrl() << "</bookingWebsiteURL>" << endl;
-					}
-					os << "</ReservationRule>" << endl;
-				}
-			}
+		    if (withTisseoExtensions)
+				os << "<TisseoPTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident http://www.reseaux-conseil.com/trident/tisseo-chouette-extension.xsd'>" << endl;
+			else
+				os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident Chouette.xsd'>" << endl;
 
 			// --------------------------------------------------- PTNetwork 
 			{
@@ -300,8 +256,8 @@ namespace synthese
 
 				os << "<StopArea>" << endl;
 
-				os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << endl;
 				os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << endl;
+				os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << endl;
 
 				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
 				    ps->getConnectionPlace ()->getName ();
@@ -365,51 +321,6 @@ namespace synthese
 			}
 
 			}
-
-			// --------------------------------------------------- StopArea (type = CityMainStops)
-			if (withTisseoExtensions)
-			{
-				for (set<const City*>::const_iterator it = cities.begin ();
-					 it != cities.end (); ++it)
-				{
-				    
-
-					const City* ci = (*it);
-					vector<string> containedStopAreas;
-
-					// Contained connection places
-					const vector<const Place*>& ciip = ci->getIncludedPlaces ();
-					for (vector<const Place*>::const_iterator itip = ciip.begin ();
-					 itip != ciip.end (); ++itip)
-					{
-						const PublicTransportStopZoneConnectionPlace* cp = dynamic_cast<const PublicTransportStopZoneConnectionPlace*> (*itip);
-						if (cp == 0) continue;
-
-						// filter physical stops not concerned by this line.
-						if (connectionPlaces.find (cp) == connectionPlaces.end ()) continue;
-
-						containedStopAreas.push_back (TridentId (peerid, "StopArea", cp->getKey ()));
-
-					}
-					if (containedStopAreas.size () == 0) continue;
-
-
-					os << "<CityMainStops>" << endl;
-					os << "<objectId>" << TridentId (peerid, "CityMainStops", ci->getKey ()) << "</objectId>" << endl;
-					os << "<name>" << ci->getName () << "</name>" << endl;
-
-					
-					for (vector<string>::const_iterator itsa = containedStopAreas.begin ();
-						 itsa != containedStopAreas.end (); ++itsa) {
-						os << "<contains>" << (*itsa)  << "</contains>" << endl;
-					}
-
-	  
-					os << "</CityMainStops>" << endl;
-				}
-			}
-
-
 
 		    
 			// --------------------------------------------------- StopArea (type = ITL)
@@ -518,6 +429,31 @@ namespace synthese
 				}
 			}
 
+
+			// --------------------------------------------------- TimeSlot
+			{
+				for(ServiceSet::const_iterator it = services.begin ();
+					it != services.end ();
+					++it
+				){
+					const ContinuousService* csrv(dynamic_cast<const ContinuousService*>(*it));
+					if (csrv == NULL) continue;
+
+					const NonPermanentService* srv(dynamic_cast<const NonPermanentService*>(*it));
+					string timeSlotId;
+					timeSlotId = TridentId(peerid, "TimeSlot", srv);
+
+					os << "<TimeSlot>" << endl;
+					os << "<objectId>" << timeSlotId << "</objectId>" << endl;
+					os << "<beginningSlotTime>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(0).getHour()) << "</beginningSlotTime>" << endl;
+					os << "<endSlotTime>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(0).getHour()) << "</endSlotTime>" << endl;
+					os << "<firstDepartureTimeInSlot>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(0).getHour()) << "</firstDepartureTimeInSlot>" << endl;
+					os << "<lastDepartureTimeInSlot>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(0).getHour()) << "</lastDepartureTimeInSlot>" << endl;
+					os << "</TimeSlot>" << endl;
+				}
+			}
+
+
 			// --------------------------------------------------- ChouetteLineDescription
 			{
 			os << "<ChouetteLineDescription>" << endl;
@@ -601,10 +537,10 @@ namespace synthese
 					os << "<ptLinkId>" << TridentId (peerid, "PtLink", lineStop->getKey ()) << "</ptLinkId>" << endl;
 				}
 				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
-				os << "<RouteExtension>" << endl;
+				os << "<RouteExtension><wayBack>";
 				if (line->getWayBack() != logic::indeterminate)
-					os << "<wayBack>" << Conversion::ToString(line->getWayBack()) << "</wayBack>" << endl;
-				os << "</RouteExtension>" << endl;
+					os << Conversion::ToString(line->getWayBack());
+				os << "</wayBack></RouteExtension>" << endl;
 				os << "</ChouetteRoute>" << endl;
 				}
 			}
@@ -617,15 +553,7 @@ namespace synthese
 					const LineStop* ls = (*itls);
 					const PhysicalStop* ps = (const PhysicalStop*) ls->getFromVertex ();
 
-					if (withTisseoExtensions)
-					{
-						os << "<TisseoStopPoint>" << endl;
-						os << "<mobilityRestrictedSuitability>0</mobilityRestrictedSuitability>" << endl;
-					}
-					else
-					{
-						os << "<StopPoint>" << endl;
-					}
+					os << "<StopPoint" << (withTisseoExtensions ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << endl;
 					os << "<objectId>" << TridentId (peerid, "StopPoint", ls->getKey ()) << "</objectId>" << endl;
 					os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << endl;
 
@@ -654,12 +582,9 @@ namespace synthese
 
 					if (withTisseoExtensions)
 					{
-						os << "</TisseoStopPoint>" << endl;
+						os << "<mobilityRestrictedSuitability>0</mobilityRestrictedSuitability>" << endl;
 					}
-					else
-					{
-						os << "</StopPoint>" << endl;
-					}
+					os << "</StopPoint>" << endl;
 				}
 
 			}
@@ -741,51 +666,23 @@ namespace synthese
 					const ScheduledService* ssrv(dynamic_cast<const ScheduledService*>(*it));
 					const ContinuousService* csrv(dynamic_cast<const ContinuousService*>(*it));
 
-					string timeSlotId;
-					if (csrv)
-					{
-						timeSlotId = TridentId(peerid, "TimeSlot", srv);
-						os << "<TimeSlot>" << endl;
-						os << "<objectId>" << timeSlotId << "</objectId>" << endl;
-						os << "<beginningSlotTime>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(0).getHour()) << "</beginningSlotTime>" << endl;
-						os << "<endSlotTime>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(0).getHour()) << "</endSlotTime>" << endl;
-						os << "</TimeSlot>" << endl;
-					}
-
 					bool isDRT(srv->getReservationRule()->isCompliant() != false);
+
+					os << "<VehicleJourney";
 					if (withTisseoExtensions)
 					{
-						if (isDRT)
-						{
-							os << "<DRTVehicleJourney>";
-							os << "<ReservationRule>" << TridentId(peerid, "ReservationRule", srv->getReservationRule()->getKey()) << "</ReservationRule>" << endl;
-						}
-						else
-						{
-							os << "<TisseoVehicleJourney>" << endl;
-						}
-						os << "<mobilityRestrictedSuitability>" << Conversion::ToString(srv->getHandicappedCompliance()->isCompliant() != false) << "</mobilityRestrictedSuitability>" << endl;
-						if (srv->getHandicappedCompliance()->getReservationRule())
-							os << "<mobilityRestrictedSuitabilityReservationRule>" <<  TridentId(peerid, "ReservationRule", srv->getHandicappedCompliance()->getReservationRule()->getKey()) << "</mobilityRestrictedSuitabilityReservationRule>" << endl;
-						os << "<bikeSuitability>" << Conversion::ToString(srv->getBikeCompliance()->isCompliant() != false) << "</bikeSuitability>" << endl;
-						if (srv->getBikeCompliance()->getReservationRule())
-							os << "<bikeReservationRule>" << TridentId(peerid, "ReservationRule", srv->getBikeCompliance()->getReservationRule()->getKey()) << "</bikeReservationRule>" << endl;
+						os << " xsi:type=\"" << (isDRT ? "DRTVehicleJourneyType" : "TisseoVehicleJourneyType" ) << "\"";
 					}
-					else
-					{
-						os << "<VehicleJourney>" << endl;
-					}
-					os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << endl;
-					os << "<number>" << srv->getServiceNumber() << "</number>" << endl;
+					os << ">" << endl;
 					os << "<objectId>" << TridentId (peerid, "VehicleJourney", srv->getId()) << "</objectId>" << endl;
+					os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << endl;
 					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << endl;
 					os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
 					os << "<lineIdShortcut>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineIdShortcut>" << endl;
 					os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeIdShortcut>" << endl;
-
-					if (csrv) // Continuous service
+					if (!srv->getServiceNumber().empty())
 					{
-						os << "<timeSlotId>" << timeSlotId << "</timeSlotId>" << endl;
+						os << "<number>" << srv->getServiceNumber() << "</number>" << endl;
 					}
 
 					// --------------------------------------------------- VehicleJourneyAtStop
@@ -805,29 +702,48 @@ namespace synthese
 								if (e != 0 && ls->isArrival())
 									os << "<arrivalTime>" << ToXsdTime (srv->getArrivalBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
 									<< "</arrivalTime>" << endl;
+								
+								os	<< "<departureTime>";
 								if (e != edges.size () - 1 && ls->isDeparture())
-									os << "<departureTime>" << ToXsdTime (srv->getDepartureBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
-									<< "</departureTime>" << endl;
+								{
+									os << ToXsdTime (srv->getDepartureBeginScheduleToIndex (ls->getRankInPath()).getHour());
+								}
+								else
+								{
+									os << ToXsdTime (srv->getArrivalBeginScheduleToIndex (ls->getRankInPath()).getHour());
+								}
+								os	<< "</departureTime>" << endl;
 							}
 							if (csrv)
 							{
-								os << "<headwayFrequency>" << Conversion::ToString(csrv->getMaxWaitingTime()) << "</headwayFrequency>" << endl;
-								os << "<elapseDuration>" << Conversion::ToString(srv->getArrivalBeginScheduleToIndex(ls->getRankInPath()) - srv->getDepartureBeginScheduleToIndex(0)) << "</elapseDuration>" << endl;
+								const Schedule& schedule((e > 0 && ls->isArrival()) ? srv->getArrivalBeginScheduleToIndex(e) : srv->getDepartureBeginScheduleToIndex(e));
+								os << "<elapseDuration>" << ToXsdDuration(schedule - srv->getDepartureBeginScheduleToIndex(0)) << "</elapseDuration>" << endl;
+								os << "<headwayFrequency>" << ToXsdDuration(csrv->getMaxWaitingTime()) << "</headwayFrequency>" << endl;
 							}
 
 							os << "</vehicleJourneyAtStop>" << endl;
 						}
 					}
 					os << "<comment>" << TridentId (peerid, "VehicleJourney", srv) << "</comment>" << endl;
+					if (csrv) // Continuous service
+					{
+						os << "<timeSlotId>" << TridentId(peerid, "TimeSlot", srv) << "</timeSlotId>" << endl;
+					}
 
 					if (withTisseoExtensions)
 					{
-						os << (isDRT ? "</DRTVehicleJourney>" : "</TisseoVehicleJourney>") << endl;
+						os << "<mobilityRestrictedSuitability>" << Conversion::ToString(srv->getHandicappedCompliance()->isCompliant() != false) << "</mobilityRestrictedSuitability>" << endl;
+						if (srv->getHandicappedCompliance()->getReservationRule())
+							os << "<mobilityRestrictedSuitabilityReservationRule>" <<  TridentId(peerid, "ReservationRule", srv->getHandicappedCompliance()->getReservationRule()->getKey()) << "</mobilityRestrictedSuitabilityReservationRule>" << endl;
+						os << "<bikeSuitability>" << Conversion::ToString(srv->getBikeCompliance()->isCompliant() != false) << "</bikeSuitability>" << endl;
+						if (srv->getBikeCompliance()->getReservationRule())
+							os << "<bikeReservationRule>" << TridentId(peerid, "ReservationRule", srv->getBikeCompliance()->getReservationRule()->getKey()) << "</bikeReservationRule>" << endl;
+						if (isDRT)
+						{
+							os << "<reservationRule>" << TridentId(peerid, "ReservationRule", srv->getReservationRule()->getKey()) << "</reservationRule>" << endl;
+						}
 					}
-					else
-					{
-						os << "</VehicleJourney>" << endl;
-					}
+					os << "</VehicleJourney>" << endl;
 				}
 			}
 
@@ -835,34 +751,139 @@ namespace synthese
 			os << "</ChouetteLineDescription>" << endl;
 			}
 
-			os << "</ChouettePTNetwork>" <<  endl << flush;
 
+			if (withTisseoExtensions)
+			{
+				// Reservation Rules -----------------------------------------------------------------------
+
+				vector<shared_ptr<ReservationRule> > rules(ReservationRuleTableSync::Search());
+				for (vector<shared_ptr<ReservationRule> >::const_iterator it(rules.begin()); it != rules.end(); ++it)
+				{
+					const ReservationRule& rule(**it);
+					if (rule.isCompliant() == false || (rule.getMinDelayDays() == 0 && rule.getMinDelayMinutes() == 0))	continue;
+
+					os << "<ReservationRule>" << endl;
+					os << "<objectId>" << TridentId (peerid, "ReservationRule", (*it)->getKey ()) << "</objectId>" << endl;
+					os << "<ReservationCompulsory>" << (rule.isCompliant() == true ? "compulsory" : "optional") << "</ReservationCompulsory>" << endl;
+					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << endl;
+					if (rule.getMinDelayMinutes() > 0)
+					{
+						os << "<minMinutesDurationBeforeDeadline>" << ToXsdDuration(rule.getMinDelayMinutes()) << "</minMinutesDurationBeforeDeadline>" << endl;
+					}
+					if (rule.getMinDelayDays() > 0)
+					{
+						os << "<minDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMinDelayDays()) << "</minDaysDurationBeforeDeadline>" << endl;
+					}
+					if (!rule.getHourDeadLine().isUnknown())
+					{
+						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << endl;
+					}
+					if (rule.getMaxDelayDays() > 0)
+					{
+						os << "<maxDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMaxDelayDays()) << "</maxDaysDurationBeforeDeadline>" << endl;
+					}
+					if (!rule.getPhoneExchangeNumber().empty())
+					{
+						os << "<phoneNumber>" << rule.getPhoneExchangeNumber() << "</phoneNumber>" << endl;
+						os << "<callcenterOpeningPeriod>" << rule.getPhoneExchangeOpeningHours() << "</callcenterOpeningPeriod>" << endl;
+					}
+					if (!rule.getWebSiteUrl().empty())
+					{
+						os << "<bookingWebsiteURL>" << rule.getWebSiteUrl() << "</bookingWebsiteURL>" << endl;
+					}
+					os << "</ReservationRule>" << endl;
+				}
+
+				// Non concurrency -----------------------------------------------------------------------
+				vector<shared_ptr<NonConcurrencyRule> > ncrules(NonConcurrencyRuleTableSync::Search(
+					commercialLineId, commercialLineId, false));
+				for(vector<shared_ptr<NonConcurrencyRule> >::const_iterator itr(ncrules.begin()); itr != ncrules.end(); ++itr)
+				{
+					const NonConcurrencyRule& rule(**itr);
+					os << "<LineConflict>" << endl;
+					os << "<objectId>" << TridentId (peerid, "LineConflict", rule.getKey ()) << "</objectId>" << endl;
+					os << "<forbiddenLine>" << TridentId (peerid, "Line", rule.getHiddenLine()) << "</forbiddenLine>" << endl;
+					os << "<usedLine>" << TridentId (peerid, "Line", rule.getPriorityLine()) << "</usedLine>" << endl;
+					os << "<conflictDelay>" << ToXsdDuration(rule.getDelay()) << "</conflictDelay>" << endl;
+					os << "</LineConflict>" << endl;
+				}
+
+
+				// CityMainStops --------------------------------------------------- 
+				for(set<const City*>::const_iterator itc(cities.begin());
+					itc != cities.end ();
+					++itc
+				){
+					const City& ci(**itc);
+					vector<string> containedStopAreas;
+
+					// Contained connection places
+					const vector<const Place*>& ciip = ci.getIncludedPlaces ();
+					for (vector<const Place*>::const_iterator itip = ciip.begin ();
+						itip != ciip.end (); ++itip)
+					{
+						const PublicTransportStopZoneConnectionPlace* cp = dynamic_cast<const PublicTransportStopZoneConnectionPlace*> (*itip);
+						if (cp == 0) continue;
+
+						// filter physical stops not concerned by this line.
+						if (connectionPlaces.find (cp) == connectionPlaces.end ()) continue;
+
+						containedStopAreas.push_back (TridentId (peerid, "StopArea", cp->getKey ()));
+
+					}
+					if (containedStopAreas.size () == 0) continue;
+
+
+					os << "<CityMainStops>" << endl;
+					os << "<objectId>" << TridentId (peerid, "CityMainStops", ci.getKey ()) << "</objectId>" << endl;
+					os << "<name>" << ci.getName () << "</name>" << endl;
+
+
+					for (vector<string>::const_iterator itsa = containedStopAreas.begin ();
+						itsa != containedStopAreas.end (); ++itsa) {
+							os << "<contains>" << (*itsa)  << "</contains>" << endl;
+					}
+
+
+					os << "</CityMainStops>" << endl;
+				}
+			}
+
+
+			if (withTisseoExtensions)
+				os << "</TisseoPTNetwork>" <<  endl << flush;
+			else
+				os << "</ChouettePTNetwork>" <<  endl << flush;
 		}
 
 
-
-
-		string 
-		TridentExport::TridentId (const string& peer, const string clazz, const uid& id)
-		{
+		string TridentExport::TridentId(
+			const string& peer,
+			const string clazz,
+			const uid& id
+		){
 			stringstream ss;
 			ss << peer << ":" << clazz << ":" << id;
 			return ss.str ();
 		}
 
-		string 
-		TridentExport::TridentId (const string& peer, const string clazz, const string& s)
-		{
+
+		string TridentExport::TridentId(
+			const string& peer,
+			const string clazz,
+			const string& s
+		){
 			stringstream ss;
 			ss << peer << ":" << clazz << ":" << s;
 			return ss.str ();
 		}
 
 
-
-		string 
-		TridentExport::TridentId (const string& peer,  const string clazz, const synthese::env::Service* service)
-		{
+		string TridentExport::TridentId(
+			const string& peer,
+			const string clazz,
+			const synthese::env::Service* service
+		){
 			stringstream ss;
 			string skey = service->getServiceNumber ();
 			if (skey.empty()) skey = Conversion::ToString(service->getId());
@@ -875,12 +896,5 @@ namespace synthese
 
 			return ss.str ();
 		}
-
-
-
-
-
-
-
 	}
 }
