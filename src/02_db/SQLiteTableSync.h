@@ -73,10 +73,9 @@ namespace synthese
 
 		    std::vector<std::string> _selectOnCallbackColumns;
 
-		protected:
-			virtual void initAutoIncrement();
-
 		public:
+
+			virtual void initAutoIncrement();
 
 			class Args
 			{

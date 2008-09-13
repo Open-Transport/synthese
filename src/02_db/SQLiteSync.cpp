@@ -114,7 +114,7 @@ namespace synthese
 			    Log::GetInstance().info("Updating schema for table " + it->first);
 			    try 
 			    {
-				it->second->updateSchema (emitter);
+					it->second->updateSchema (emitter);
 			    }
 			    catch (std::exception& e)
 			    {
@@ -125,6 +125,13 @@ namespace synthese
 
 			_isRegistered = true;
 
+
+			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = 
+				_rankedTableSynchronizers.begin (); 
+				it != _rankedTableSynchronizers.end (); ++it)
+			{
+				it->second->initAutoIncrement ();
+			}
 			
 			// Call the first sync step on all synchronizers.
 			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = 
@@ -134,11 +141,11 @@ namespace synthese
 			    Log::GetInstance().info("Loading table " + it->first);
 			    try 
 			    {
-				it->second->firstSync (emitter, this);
+					it->second->firstSync (emitter, this);
 			    }
 			    catch (std::exception& e)
 			    {
-				Log::GetInstance().error ("Error during first sync of " + it->first + 
+					Log::GetInstance().error ("Unattended error during first sync of " + it->first + 
 							  ". In-memory data might be inconsistent.", e);
 			    }
 			}

@@ -20,38 +20,44 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/DisplayScreenAlarmRecipient.h"
-#include "34_departures_table/AlarmTestOnDisplayScreenFunction.h"
+// departurestable
+#include "DisplayScreenAlarmRecipient.h"
+#include "AlarmTestOnDisplayScreenFunction.h"
+#include "DeparturesTableModule.h"
+#include "DisplaySearchAdmin.h"
+#include "DisplayScreenTableSync.h"
+#include "ArrivalDepartureTableRight.h"
+#include "DisplayType.h"
+#include "DisplayScreen.h"
 
+// Std
 #include <vector>
 
-#include "05_html/ResultHTMLTable.h"
-#include "05_html/HTMLList.h"
+// html
+#include "ResultHTMLTable.h"
+#include "HTMLList.h"
 
+// security
 #include "12_security/Constants.h"
+#include "User.h"
+#include "Profile.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/Line.h"
-#include "15_env/EnvModule.h"
+// transport
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "Line.h"
+#include "EnvModule.h"
 
-#include "17_messages/Alarm.h"
-#include "17_messages/AlarmObjectLink.h"
-#include "17_messages/AlarmObjectLinkTableSync.h"
-#include "17_messages/AlarmRemoveLinkAction.h"
-#include "17_messages/AlarmAddLinkAction.h"
-#include "17_messages/MessagesRight.h"
+// messages
+#include "Alarm.h"
+#include "AlarmObjectLink.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "AlarmRemoveLinkAction.h"
+#include "AlarmAddLinkAction.h"
+#include "MessagesRight.h"
+#include "AlarmObjectLinkException.h"
 
-#include "32_admin/AdminModule.h"
-
-#include "34_departures_table/DeparturesTableModule.h"
-#include "34_departures_table/DisplaySearchAdmin.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/ArrivalDepartureTableRight.h"
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayScreen.h"
-
-#include "12_security/User.h"
-#include "12_security/Profile.h"
+// admin
+#include "AdminModule.h"
 
 using namespace std;
 using namespace boost;
@@ -248,6 +254,9 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::addObject(const SentAlarm* alarm, uid objectId )
 		{
+			if (!DisplayScreen::Contains(objectId))
+				throw AlarmObjectLinkException(objectId, alarm->getKey(), "Display screen not found");
+
 			add(DisplayScreen::Get(objectId).get(), alarm);
 		}
 

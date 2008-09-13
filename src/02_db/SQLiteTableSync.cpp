@@ -172,12 +172,8 @@ namespace synthese
 			    rowsAdded (sqlite, sync, result, true);
 			}
 
-			initAutoIncrement ();
-
 			// Post-init phase
 			afterFirstSync (sqlite, sync);
-				
-
 		}
 
 			    

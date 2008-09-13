@@ -21,10 +21,10 @@
 */
 
 #include "AlarmObjectLinkTableSync.h"
-
-#include "17_messages/AlarmRecipient.h"
-#include "17_messages/AlarmObjectLink.h"
-#include "17_messages/SentAlarm.h"
+#include "AlarmObjectLinkException.h"
+#include "AlarmRecipient.h"
+#include "AlarmObjectLink.h"
+#include "SentAlarm.h"
 
 using namespace std;
 using namespace boost;
@@ -60,7 +60,15 @@ namespace synthese
 			assert(temporary == GET_AUTO || temporary == GET_REGISTRY);
 			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(obj->getRecipientKey()));
 			shared_ptr<SentAlarm> alarm(SentAlarm::GetUpdateable(obj->getAlarmId()));
-			ar->addObject(alarm.get(), obj->getObjectId());
+			try
+			{
+				ar->addObject(alarm.get(), obj->getObjectId());
+			}
+			catch (AlarmObjectLinkException e)
+			{
+				Log::GetInstance().error ("Alarm object link error (t040_alarm_object_links table) : ", e);
+			}
+
 			obj->setLinked(true);
 		}
 
