@@ -539,7 +539,7 @@ namespace synthese
 					os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
 					
 					// Wayback
-					int wayback = static_cast<int>(line->getWayBack());
+					int wayback(line->getWayBack() ? 1 : 0);
 					if (withTisseoExtensions)
 						++wayback;
 
