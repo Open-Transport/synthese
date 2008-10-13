@@ -539,7 +539,7 @@ namespace synthese
 				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
 				os << "<RouteExtension><wayBack>";
 				if (line->getWayBack() != logic::indeterminate)
-					os << Conversion::ToString(line->getWayBack());
+					os << Conversion::ToString(static_cast<int>(line->getWayBack())+1);
 				os << "</wayBack></RouteExtension>" << endl;
 				os << "</ChouetteRoute>" << endl;
 				}
