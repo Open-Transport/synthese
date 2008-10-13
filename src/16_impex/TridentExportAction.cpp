@@ -105,10 +105,15 @@ namespace synthese
 		    boost::regex nwRegex (_networkRegex);
 		    
 		    // Create archive directory in global temp directory
-		    const boost::filesystem::path& tempDir = ServerModule::GetParameter (ServerModule::MODULE_PARAM_TMP_DIR);
-		    const boost::filesystem::path archiveDir (tempDir / _archiveBasename);
+		    const filesystem::path& tempDir = ServerModule::GetParameter (ServerModule::MODULE_PARAM_TMP_DIR);
+		    const filesystem::path archiveDir (tempDir / _archiveBasename);
 		    
-		    bool result = boost::filesystem::create_directory(archiveDir);
+			if (filesystem::exists(archiveDir))
+			{
+				filesystem::remove_all(archiveDir)
+			}
+
+		    bool result = filesystem::create_directory(archiveDir);
 		    
 		    if (result == false) 
 		    {
