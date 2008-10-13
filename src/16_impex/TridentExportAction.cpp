@@ -110,7 +110,7 @@ namespace synthese
 		    
 			if (filesystem::exists(archiveDir))
 			{
-				filesystem::remove_all(archiveDir)
+				filesystem::remove_all(archiveDir);
 			}
 
 		    bool result = filesystem::create_directory(archiveDir);
