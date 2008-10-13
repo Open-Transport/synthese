@@ -510,38 +510,44 @@ namespace synthese
 				for (LineSet::const_iterator itline = lines.begin ();
 				 itline != lines.end (); ++itline)
 				{
-				shared_ptr<const Line> line = (*itline);
-				os << "<ChouetteRoute>" << endl;
-				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << endl;
-				os << "<name>" << line->getName () << "</name>" << endl;
-				os << "<publishedName>";
-				{
-				    const PhysicalStop* ps = line->getOrigin ();
-				    if (ps)
-						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
-				}
-				os << " -&gt; ";
-				{
-				    const PhysicalStop* ps = line->getDestination ();
-				    if (ps)
-						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
-				}
-				os << "</publishedName>" << endl;
-				
-				const vector<Edge*>& edges = line->getEdges ();
-				for (vector<Edge*>::const_iterator itedge = edges.begin ();
-					 itedge != edges.end (); ++itedge)
-				{
-					const LineStop* lineStop = dynamic_cast<const LineStop*> (*itedge);
-					if (lineStop->getNextInPath () == 0) continue;
-					os << "<ptLinkId>" << TridentId (peerid, "PtLink", lineStop->getKey ()) << "</ptLinkId>" << endl;
-				}
-				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
-				os << "<RouteExtension><wayBack>";
-				if (line->getWayBack() != logic::indeterminate)
-					os << Conversion::ToString(static_cast<int>(line->getWayBack())+1);
-				os << "</wayBack></RouteExtension>" << endl;
-				os << "</ChouetteRoute>" << endl;
+					shared_ptr<const Line> line = (*itline);
+					os << "<ChouetteRoute>" << endl;
+					os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << endl;
+					os << "<name>" << line->getName () << "</name>" << endl;
+					os << "<publishedName>";
+					{
+						const PhysicalStop* ps = line->getOrigin ();
+						if (ps)
+							os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
+					}
+					os << " -&gt; ";
+					{
+						const PhysicalStop* ps = line->getDestination ();
+						if (ps)
+							os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
+					}
+					os << "</publishedName>" << endl;
+					
+					const vector<Edge*>& edges = line->getEdges ();
+					for (vector<Edge*>::const_iterator itedge = edges.begin ();
+						 itedge != edges.end (); ++itedge)
+					{
+						const LineStop* lineStop = dynamic_cast<const LineStop*> (*itedge);
+						if (lineStop->getNextInPath () == 0) continue;
+						os << "<ptLinkId>" << TridentId (peerid, "PtLink", lineStop->getKey ()) << "</ptLinkId>" << endl;
+					}
+					os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
+					
+					// Wayback
+					int wayback = static_cast<int>(line->getWayBack());
+					if (withTisseoExtensions)
+						++wayback;
+
+					os << "<RouteExtension><wayBack>";
+					if (line->getWayBack() != logic::indeterminate)
+						os << Conversion::ToString(wayback);
+					os << "</wayBack></RouteExtension>" << endl;
+					os << "</ChouetteRoute>" << endl;
 				}
 			}
 
