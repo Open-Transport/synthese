@@ -544,7 +544,7 @@ namespace synthese
 						++wayback;
 
 					os << "<RouteExtension><wayBack>";
-					if (line->getWayBack() != logic::indeterminate)
+					if (!logic::indeterminate(line->getWayBack()))
 						os << Conversion::ToString(wayback);
 					os << "</wayBack></RouteExtension>" << endl;
 					os << "</ChouetteRoute>" << endl;
