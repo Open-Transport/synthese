@@ -1,0 +1,19 @@
+Import ('env')
+
+version = '1.0'
+
+PhpProject(
+	env,
+	'synthese-diff',
+	version,
+	dependencies = [], 
+    extra_dependencies = [('php5-cli', '5.2.0-8')],
+    rootdir = env.SrcDir('src')
+)
+
+DoxProject(
+	env,
+	'synthese-diff',
+	env.SrcFile('doc/Doxyfile.doxyfile'),
+	version
+)
