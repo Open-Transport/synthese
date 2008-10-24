@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2007 (http://www.altova.com) by Totot (Tutut) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="updatetype">
+		<xs:annotation>
+			<xs:documentation>Contain all type of update</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Add"/>
+			<xs:enumeration value="Delete"/>
+			<xs:enumeration value="UpdateData"/>
+			<xs:enumeration value="UpdateGeo"/>
+			<xs:enumeration value="UpdateAll"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="UpdateTRU_RCSDelta">
+		<xs:annotation>
+			<xs:documentation>Contain all TRU-RCS objects that have been updated</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="StopPoint" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Trident StopPoint</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="Id" type="xs:string" use="required"/>
+					<xs:attribute name="update" type="updatetype"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ChouetteRoute" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Trident ChouetteRoute</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="Id" type="xs:string" use="required"/>
+					<xs:attribute name="update" type="updatetype"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ConnectionLink" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Trident ConnectionLink</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="Id" type="xs:string" use="required"/>
+					<xs:attribute name="update" type="updatetype"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="syntheseDelta" type="UpdateTRU_RCSDelta"/>
+</xs:schema>
