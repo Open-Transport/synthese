@@ -15,6 +15,7 @@ Export ('s3env')
 s3env.SubBuild ('src', 'src')
 s3env.SubBuild ('test', 'test')
 s3env.SubBuild ('doc', 'doc')
+s3env.SubBuild ('utils', 'utils')
 
 
 
