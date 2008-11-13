@@ -680,7 +680,7 @@ namespace synthese
 						os << " xsi:type=\"" << (isDRT ? "DRTVehicleJourneyType" : "TisseoVehicleJourneyType" ) << "\"";
 					}
 					os << ">" << endl;
-					os << "<objectId>" << TridentId (peerid, "VehicleJourney", srv->getId()) << "</objectId>" << endl;
+					os << "<objectId>" << TridentId (peerid, "VehicleJourney", srv) << "</objectId>" << endl;
 					os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << endl;
 					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << endl;
 					os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << endl;
@@ -730,7 +730,6 @@ namespace synthese
 							os << "</vehicleJourneyAtStop>" << endl;
 						}
 					}
-					os << "<comment>" << TridentId (peerid, "VehicleJourney", srv) << "</comment>" << endl;
 					if (csrv) // Continuous service
 					{
 						os << "<timeSlotId>" << TridentId(peerid, "TimeSlot", srv) << "</timeSlotId>" << endl;
