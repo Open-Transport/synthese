@@ -27,7 +27,9 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "Date.h"
+
+#include "SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -54,6 +56,8 @@ namespace synthese
 			static const std::string COL_DATE;
 			
 			ServiceDateTableSync();
+
+			static std::vector<time::Date> GetDatesOfService(uid serviceId);
 
 		protected:
 

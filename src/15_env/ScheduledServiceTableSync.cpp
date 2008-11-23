@@ -253,6 +253,7 @@ namespace synthese
 				{
 					shared_ptr<ScheduledService> object ( new ScheduledService());
 					load(object.get(), rows);
+//					link(object.get(), rows, GET_AUTO);
 					objects.push_back(object);
 				}
 				return objects;

@@ -172,103 +172,50 @@ namespace synthese
 
 		}
 
-/*		    
-		void ConnectionPlaceTableSync::rowsAdded(
-			SQLite* sqlite
-			, SQLiteSync* sync
-			, const SQLiteResultSPtr& rows
-			, bool isFirstSync
+
+
+		ConnectionPlaceTableSync::SearchResult ConnectionPlaceTableSync::Search(
+			uid cityId /*= UNKNOWN_VALUE */
+			, logic::tribool mainConnectionOnly
+			, ConnectionPlace::ConnectionType minConnectionType
+			, bool orderByCityNameAndName /*= true */
+			, bool raisingOrder /*= true */
+			, int first /*= 0 */
+			, int number /*= 0 */
 		){
-			while (rows->next ())
-			{
-			    uid id (rows->getLongLong (TABLE_COL_ID));
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE "
+				<< TABLE_COL_CONNECTIONTYPE << ">=" << static_cast<int>(minConnectionType);
+			if (cityId != UNKNOWN_VALUE)
+				query << " AND " << TABLE_COL_CITYID << "=" << cityId;
+			if (!logic::indeterminate(mainConnectionOnly))
+				query << " AND " << TABLE_COL_ISCITYMAINCONNECTION << "=" << Conversion::ToString(mainConnectionOnly);
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
 
-				if (PublicTransportStopZoneConnectionPlace::Contains (id))
+			try
+			{
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				SearchResult objects;
+				while (rows->next ())
 				{
-					shared_ptr<PublicTransportStopZoneConnectionPlace> cp = PublicTransportStopZoneConnectionPlace::GetUpdateable(
-						rows->getLongLong (TABLE_COL_ID)
-						);
-
-					shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
-					city->getConnectionPlacesMatcher ().remove (cp->getName ());
-					city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
-
-					load(cp.get(), rows);
-
-					bool isCityMainConnection (	rows->getBool (TABLE_COL_ISCITYMAINCONNECTION));
-					if (isCityMainConnection)
-					{
-						city->addIncludedPlace (cp.get());
-					}
-					city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
-					city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp.get()));
+					shared_ptr<PublicTransportStopZoneConnectionPlace> object(new PublicTransportStopZoneConnectionPlace());
+					load(object.get(), rows);
+					link(object.get(), rows, GET_AUTO);
+					objects.push_back(object);
 				}
-				else
-				{
-					PublicTransportStopZoneConnectionPlace* cp(new PublicTransportStopZoneConnectionPlace);
-
-					load(cp, rows);
-
-					shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
-					bool isCityMainConnection (	rows->getBool (TABLE_COL_ISCITYMAINCONNECTION));
-					if (isCityMainConnection)
-					{
-						city->addIncludedPlace (cp);
-					}
-					city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
-					city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
-					cp->store();
-				}
+				return objects;
 			}
-		}
-
-
-
-		void 
-			ConnectionPlaceTableSync::rowsUpdated (synthese::db::SQLite* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
+			catch(SQLiteException& e)
 			{
-				shared_ptr<PublicTransportStopZoneConnectionPlace> cp = PublicTransportStopZoneConnectionPlace::GetUpdateable(
-				    rows->getLongLong (TABLE_COL_ID)
-				);
-				
-				shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
-				city->getConnectionPlacesMatcher ().remove (cp->getName ());
-				city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
-				
-				load(cp.get(), rows);
-
-				city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
-				city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp.get()));
+				throw Exception(e.getMessage());
 			}
 		}
-
-
-
-
-
-		void 
-			ConnectionPlaceTableSync::rowsRemoved (synthese::db::SQLite* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				// TODO not finished...
-			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    
-			    shared_ptr<const ConnectionPlace> cp = PublicTransportStopZoneConnectionPlace::Get (id);
-			    shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
-			    city->getConnectionPlacesMatcher ().remove (cp->getName ());
-				city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
-			    
-			    PublicTransportStopZoneConnectionPlace::Remove (id);
-			}
-		}
-*/	    
-
 	}
 }

@@ -73,6 +73,7 @@ namespace synthese
 		    string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
 		    int range (rows->getInt (ContinuousServiceTableSync::COL_RANGE));
 		    int maxWaitingTime (rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME));
+			uid pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
 
 		    string schedules (
 			rows->getText (ContinuousServiceTableSync::COL_SCHEDULES));
@@ -135,7 +136,7 @@ namespace synthese
 			cs->setMaxWaitingTime(maxWaitingTime);
 			cs->setDepartureSchedules(departureSchedules);
 			cs->setArrivalSchedules(arrivalSchedules);
-
+			cs->setPathId(pathId);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_link(ContinuousService* cs, const SQLiteResultSPtr& rows, GetSource temporary)
@@ -159,8 +160,7 @@ namespace synthese
 			cs->setHandicappedCompliance (HandicappedCompliance::Get(handicappedComplianceId).get());
 			cs->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
 
-			if (temporary == GET_REGISTRY)
-				path->addService (cs);
+			path->addService (cs);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_unlink(ContinuousService* obj)
@@ -242,6 +242,7 @@ namespace synthese
 				{
 					shared_ptr<ContinuousService> object(new ContinuousService());
 					load(object.get(), rows);
+//					link(object.get(), rows, GET_AUTO);
 					objects.push_back(object);
 				}
 				return objects;

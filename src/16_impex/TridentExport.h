@@ -28,13 +28,12 @@
 
 #include <iostream>
 
-
 namespace synthese
 {
-
 	namespace env
 	{
 		class Service;
+		class CommercialLine;
 	}
 
 	namespace impex
@@ -51,19 +50,20 @@ namespace synthese
 		    
 		private:
 		    
-			TridentExport ();
-			~TridentExport();
-
+			const env::CommercialLine* const	_commercialLine;
+			const bool							_withTisseoExtension;
 		    
 		public:
 
+			TridentExport(
+				const env::CommercialLine* line
+				, bool withTisseoExtension
+				);
+			~TridentExport();
+
 			/** -> ChouettePTNetwork
 			 */
-			static void Export(
-				std::ostream& os
-				, const uid& commercialLineId
-				, bool withTisseoExtensions = false
-			);
+			void run(std::ostream& os);
 
 		private:
 		    

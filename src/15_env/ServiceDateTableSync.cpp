@@ -29,8 +29,6 @@
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 
-#include "04_time/Date.h"
-
 #include "15_env/ServiceDate.h"
 #include "15_env/ServiceDateTableSync.h"
 #include "15_env/NonPermanentService.h"
@@ -144,6 +142,31 @@ namespace synthese
 				<< ")";
 			sqlite->execUpdate(query.str());
 */
+		}
+
+
+
+		std::vector<time::Date> ServiceDateTableSync::GetDatesOfService( uid serviceId )
+		{
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+
+			query << "SELECT " << COL_DATE << " FROM " << TABLE_NAME << " WHERE " << COL_SERVICEID << "=" << serviceId << " ORDER BY " << COL_DATE;
+			
+			try
+			{
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
+				vector<Date> objects;
+				while (rows->next ())
+				{
+					objects.push_back(Date::FromSQLDate(rows->getText(COL_DATE)));
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
 		}
 	}
 }

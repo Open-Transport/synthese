@@ -105,7 +105,7 @@ namespace synthese
 				stream
 					<< "<tr>"
 					<< "<td>" << uf.getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, dt->getName()) << "</td>"
-					<< "<td>" << uf.getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), dt->getInterface()->getKey()) << "</td>"
+					<< "<td>" << uf.getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), dt->getInterface() ? dt->getInterface()->getKey() : uid(0)) << "</td>"
 					<< "<td>" << uf.getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99, dt->getRowNumber()) << "</td>"
 					<< "<td>" << uf.getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER, UNKNOWN_VALUE, 99, dt->getMaxStopsNumber()) << "</td>";
 					;

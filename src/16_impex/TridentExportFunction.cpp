@@ -22,12 +22,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "30_server/RequestException.h"
-#include "30_server/RequestMissingParameterException.h"
+#include "RequestException.h"
+#include "RequestMissingParameterException.h"
+
+#include "CommercialLineTableSync.h"
 
 #include "TridentExportFunction.h"
+#include "TridentExport.h"
 
 using namespace std;
 
@@ -35,52 +38,45 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
+	using namespace env;
 
-        template<> const string util::FactorableTemplate<server::Function, impex::TridentExportFunction>::FACTORY_KEY ("tridentexport");
+	template<> const string util::FactorableTemplate<server::Function, impex::TridentExportFunction>::FACTORY_KEY ("tridentexport");
 
 	namespace impex
 	{
-
-	    
-
-
-		/// @todo Parameter names declarations
-		//const string TridentExportFunction::PARAMETER_PAGE("rub");
+		const string TridentExportFunction::PARAMETER_LINE_ID("li");
+		const string TridentExportFunction::PARAMETER_WITH_TISSEO_EXTENSION("wt");
 		
 		ParametersMap TridentExportFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			/// @todo Map filling
-			// eg : map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
+			map.insert(PARAMETER_LINE_ID, _line->getKey());
+			map.insert(PARAMETER_WITH_TISSEO_EXTENSION, _withTisseoExtension);
 			return map;
 		}
 
 		void TridentExportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-		    //ParametersMap::const_iterator it;
+			uid id(map.getUid(PARAMETER_LINE_ID, true, FACTORY_KEY));
+			if (id == UNKNOWN_VALUE)
+				throw RequestException("Line id must be specified");
 
-			/// @todo Parameters parsing
-			// eg
-			//it = map.find(PARAMETER_PAGE);
-			// if (it == map.end())
-			//	throw RequestMissingParameterException(PARAMETER_PAGE, FACTORY_KEY);
-			//try
-			//{
-			//	AdminInterfaceElement* page = (it == map.end())
-			//		? Factory<AdminInterfaceElement>::create<HomeAdmin>()
-			//		: Factory<AdminInterfaceElement>::create(it->second);
-			//	page->setFromParametersMap(map);
-			//	_page = page;
-			//}
-			//catch (FactoryException<AdminInterfaceElement> e)
-			//{
-			//	throw RequestException("Admin page " + it->second + " not found");
-			//}
+			try
+			{
+				_line = CommercialLineTableSync::Get(id);
+			}
+			catch (...)
+			{
+				throw RequestException("No such line");
+			}
+
+			_withTisseoExtension = map.getBool(PARAMETER_WITH_TISSEO_EXTENSION, false, false, FACTORY_KEY);
 		}
 
 		void TridentExportFunction::_run( std::ostream& stream ) const
 		{
-			/// @todo Fill it
+			TridentExport t(_line.get(), _withTisseoExtension);
+			t.run(stream);
 		}
 	}
 }

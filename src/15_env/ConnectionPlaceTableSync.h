@@ -25,7 +25,7 @@
 
 #include "PublicTransportStopZoneConnectionPlace.h"
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 #include <string>
 #include <iostream>
@@ -57,6 +57,16 @@ namespace synthese
 			ConnectionPlaceTableSync ();
 			~ConnectionPlaceTableSync ();
 
+			typedef std::vector<boost::shared_ptr<PublicTransportStopZoneConnectionPlace> > SearchResult;
+			static SearchResult Search(
+				uid cityId = UNKNOWN_VALUE
+				, boost::logic::tribool mainConnection = boost::logic::indeterminate
+				, ConnectionPlace::ConnectionType minConnectionType = ConnectionPlace::ConnectionType::CONNECTION_TYPE_FORBIDDEN
+				, bool orderByCityNameAndName = true
+				, bool raisingOrder = true
+				, int first = 0
+				, int number = 0
+			);
 		};
 	}
 }

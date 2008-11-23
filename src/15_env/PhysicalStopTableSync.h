@@ -57,6 +57,12 @@ namespace synthese
 
 			PhysicalStopTableSync ();
 			~PhysicalStopTableSync ();
+
+			static std::vector<boost::shared_ptr<PhysicalStop> > Search(
+				uid placeId = UNKNOWN_VALUE
+				, int first = 0
+				, int number = 0
+			);
 		};
 	}
 }

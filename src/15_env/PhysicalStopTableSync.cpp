@@ -108,59 +108,40 @@ namespace synthese
 
 		}
 
-				/*
 
 
-		void PhysicalStopTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
+		std::vector<boost::shared_ptr<PhysicalStop> > PhysicalStopTableSync::Search( uid placeId /*= UNKNOWN_VALUE */, int first /*= 0 */, int number /*= 0 */ )
 		{
-			while (rows->next ())
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE 1 ";
+			if (placeId != UNKNOWN_VALUE)
+				query << " AND " << COL_PLACEID << "=" << placeId;
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
 			{
-				
-			uid id = rows->getLongLong (TABLE_COL_ID);
-				
-			if (PhysicalStop::Contains (id)) return;
-				
-			    
-			PhysicalStop* ps(
-			new PhysicalStop (
-				id,
-				rows->getText (COL_NAME),
-				rows->getDouble (COL_X),
-				rows->getDouble (COL_Y)
-				))
-			;
-			    
-			place->addPhysicalStop(ps);
-			ps->setOperatorCode(rows->getText (COL_OPERATOR_CODE));
-			    
-			ps->store();
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				vector<shared_ptr<PhysicalStop> > objects;
+				while (rows->next ())
+				{
+					shared_ptr<PhysicalStop> object(new PhysicalStop());
+					load(object.get(), rows);
+					link(object.get(), rows, GET_AUTO);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
 		}
-		}
-
-
-
-		void PhysicalStopTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-		while (rows->next ())
-		{
-			uid id = rows->getLongLong ( TABLE_COL_ID);
-			shared_ptr<PhysicalStop> ps = PhysicalStop::GetUpdateable(id);
-
-			load(ps.get(), rows);
-
-		}
-		}
-
-
-
-		void PhysicalStopTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-		while (rows->next ())
-		{
-			uid id = rows->getLongLong ( TABLE_COL_ID);
-			PhysicalStop::Remove (id);
-			/// @todo Handle the link between place and stop
-		}
-		}*/
 	}
 }

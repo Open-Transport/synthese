@@ -22,7 +22,7 @@
 
 #include "12_security/User.h"
 
-#include "34_departures_table/DisplayMaintenanceLog.h"
+#include "DisplayMaintenanceLog.h"
 #include "34_departures_table/DisplayScreen.h"
 
 #include "01_util/Conversion.h"

@@ -41,15 +41,14 @@ namespace synthese
 		class TridentExportFunction :  public util::FactorableTemplate<server::Function, TridentExportFunction>
 		{
 		public:
-			/// @todo request parameter names declaration
-			// eg : static const std::string PARAMETER_xxx;
+			static const std::string PARAMETER_LINE_ID;	//!< Commercial line id parameter
+			static const std::string PARAMETER_WITH_TISSEO_EXTENSION;	//!< With tisseo extension parameter
 			
 		protected:
 			//! \name Page parameters
 			//@{
-				/// @todo Parsed parameters declaration
-				// eg : const void*	_object;
-				// eg : ParametersMap			_parameters;
+				boost::shared_ptr<const env::CommercialLine> _line; //!< Commercial line to export
+				bool											_withTisseoExtension;
 			//@}
 			
 			
@@ -62,8 +61,6 @@ namespace synthese
 				@param map Parameters map to interpret
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
-			
-			/// @todo Getters/Setters for parsed parameters
 			
 		public:
 			/** Action to run, defined by each subclass.
