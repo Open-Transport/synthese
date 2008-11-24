@@ -61,7 +61,7 @@ namespace synthese
 			static SearchResult Search(
 				uid cityId = UNKNOWN_VALUE
 				, boost::logic::tribool mainConnection = boost::logic::indeterminate
-				, ConnectionPlace::ConnectionType minConnectionType = ConnectionPlace::ConnectionType::CONNECTION_TYPE_FORBIDDEN
+				, ConnectionPlace::ConnectionType minConnectionType = ConnectionPlace::CONNECTION_TYPE_FORBIDDEN
 				, bool orderByCityNameAndName = true
 				, bool raisingOrder = true
 				, int first = 0

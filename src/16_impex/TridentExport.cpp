@@ -594,7 +594,7 @@ namespace synthese
 
 			// --------------------------------------------------- PtLink
 			{
-				for (vector<shared_ptr<LineStop> >::const_iterator& its(lineStops.begin()); (its+1) != lineStops.end(); ++its)
+				for (vector<shared_ptr<LineStop> >::const_iterator its(lineStops.begin()); (its+1) != lineStops.end(); ++its)
 				{
 					const LineStop& from(**its);
 					const LineStop& to(**(its+1));
