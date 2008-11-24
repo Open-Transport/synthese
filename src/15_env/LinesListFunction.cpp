@@ -77,7 +77,7 @@ namespace synthese
 		{
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, CommercialLineTableSync::search(_network->getKey()))
 			{
-				stream << line->getKey() << ";" << line->getShortName() << "\n";
+				stream << line->getKey() << ";" << line->getShortName() << "+\n";
 			}
 		}
 	}
