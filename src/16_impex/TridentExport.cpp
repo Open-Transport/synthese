@@ -357,6 +357,9 @@ namespace synthese
 					os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << "\n";
 					os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
 
+					// we do not provide full addresses right now.
+					os << "<address><countryCode>" << ps->getPlace()->getCity()->getCode() << "</countryCode></address>";
+
 					os << "<projectedPoint>" << "\n";
 					os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << "\n";
 					os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << "\n";
@@ -365,9 +368,6 @@ namespace synthese
 
 					os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << "\n";
 					os << "<name>" << Conversion::ToString (ps->getKey ()) << "</name>" << "\n";
-
-					// we do not provide full addresses right now.
-					os << "<address><countryCode>" << ps->getPlace()->getCity()->getCode() << "</countryCode></address>";
 
 					os << "</AreaCentroid>" << "\n";
 				    
@@ -525,7 +525,6 @@ namespace synthese
 					
 					BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineLineStops)
 					{
-						if (lineStop->getNextInPath () == 0) continue;
 						os << "<ptLinkId>" << TridentId (peerid, "PtLink", lineStop->getKey ()) << "</ptLinkId>" << "\n";
 					}
 					os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << "\n";
@@ -560,6 +559,8 @@ namespace synthese
 					os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << "\n";
 					os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
 					
+					os << "<address><countryCode>" << ps->getPlace()->getCity()->getCode() << "</countryCode></address>";
+
 					os << "<projectedPoint>" << "\n";
 					os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << "\n";
 					os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << "\n";

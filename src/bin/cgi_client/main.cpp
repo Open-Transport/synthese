@@ -146,7 +146,7 @@ int main(int argc, char **argv)
 #ifdef DEBUG    
 	int timeout = 1800000;
 #else
-	int timeout = 180000;
+	int timeout = 360000;
 #endif
     TcpClientSocket clientSock (server, port, timeout);
     boost::iostreams::stream<TcpClientSocket> cliSocketStream;
