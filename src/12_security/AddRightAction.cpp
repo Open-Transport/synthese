@@ -64,7 +64,7 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
+				_profile = ProfileTableSync::GetEditable(_request->getObjectId());
 
 				_rightName = map.getString(PARAMETER_RIGHT, true, FACTORY_KEY);
 				if (!Factory<Right>::contains(_rightName))
@@ -74,7 +74,7 @@ namespace synthese
 				_publicLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PUBLIC_LEVEL, true, FACTORY_KEY));
 				_privateLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PRIVATE_LEVEL, false, FACTORY_KEY));
 			}
-			catch(Profile::ObjectNotFoundException& e)
+			catch(ObjectNotFoundException<Profile>& e)
 			{
 				throw ActionException("Profil introuvable");
 			}
@@ -88,7 +88,7 @@ namespace synthese
 			right->setPublicLevel(_publicLevel);
 			_profile->addRight(right);
 
-			ProfileTableSync::save(_profile.get());
+			ProfileTableSync::Save(_profile.get());
 
 			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), "Ajout habilitation " + _rightName + "/" + _parameter);
 		}

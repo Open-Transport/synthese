@@ -23,37 +23,22 @@
 #ifndef SYNTHESE_util_ObjectNotFoundInRegistryException_h__
 #define SYNTHESE_util_ObjectNotFoundInRegistryException_h__
 
-#include "01_util/ObjectNotFoundException.h"
+#include "ObjectNotFoundException.h"
 
-#include "01_util/UId.h"
-#include "01_util/Conversion.h"
+#include "UId.h"
+#include "Conversion.h"
 
 namespace synthese
 {
 	namespace util
 	{
-		/** ObjectNotFoundInRegistryException class.
-			@ingroup m01Registry m01Exceptions refExceptions
-		*/
-		template<class K, class T>
-		class ObjectNotFoundInRegistryException : public ObjectNotFoundException<K,T>
-		{
-		public:
-			ObjectNotFoundInRegistryException(const K& key) throw ()
-				: ObjectNotFoundException<K,T>(key, "Object not found in registry")
-			{}
-
-			~ObjectNotFoundInRegistryException() throw () {}
-
-		};
-
 		template<class T>
-		class ObjectNotFoundInRegistryException<uid,T> : public ObjectNotFoundException<uid,T>
+		class ObjectNotFoundInRegistryException : public ObjectNotFoundException<T>
 		{
 		public:
 
-			ObjectNotFoundInRegistryException(const uid& key) throw ()
-				: ObjectNotFoundException<uid,T>(key, "Object not found in registry " + Conversion::ToString(decodeTableId(key)))
+			ObjectNotFoundInRegistryException(const RegistryKeyType& key) throw ()
+				: ObjectNotFoundException<T>(key, "Object not found in registry " + Conversion::ToString(decodeTableId(key)))
 			{}
 
 			~ObjectNotFoundInRegistryException() throw () {}

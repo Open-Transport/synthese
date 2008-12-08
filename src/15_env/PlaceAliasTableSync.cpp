@@ -54,36 +54,42 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE_ID = 11;
 		template<> const bool SQLiteTableSyncTemplate<PlaceAliasTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::load(PlaceAlias* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->setKey (rows->getLongLong (TABLE_COL_ID));
-			object->setName (rows->getText (PlaceAliasTableSync::COL_NAME));
-		}
+		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Load(
+			PlaceAlias* obj,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
+			obj->setName (rows->getText (PlaceAliasTableSync::COL_NAME));
 
-		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_link(PlaceAlias* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			// Because the fetch place has no equivalent in database read mode
-			assert(temporary == GET_REGISTRY);
-
-			uid aliasedPlaceId (
-				rows->getLongLong (PlaceAliasTableSync::COL_ALIASEDPLACEID));
-			uid cityId (
-				rows->getLongLong (PlaceAliasTableSync::COL_CITYID));
-			City* city(CityTableSync::GetUpdateable(cityId,obj,temporary));
-
-			obj->setCity(city);
-			obj->setAliasedPlace(EnvModule::fetchPlace (aliasedPlaceId).get());
-
-
-			bool isCityMainConnection (rows->getBool ( PlaceAliasTableSync::COL_ISCITYMAINCONNECTION));
-			if (isCityMainConnection)
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				city->addIncludedPlace (obj);
+				// Because the fetch place has no equivalent in database read mode
+//				assert(temporary == GET_REGISTRY);
+
+				uid aliasedPlaceId (
+					rows->getLongLong (PlaceAliasTableSync::COL_ALIASEDPLACEID));
+				uid cityId (
+					rows->getLongLong (PlaceAliasTableSync::COL_CITYID));
+				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
+
+				obj->setCity(city);
+				obj->setAliasedPlace(EnvModule::FetchPlace(aliasedPlaceId, *env).get());
+
+
+				bool isCityMainConnection (rows->getBool ( PlaceAliasTableSync::COL_ISCITYMAINCONNECTION));
+				if (isCityMainConnection)
+				{
+					city->addIncludedPlace (obj);
+				}
+				city->getPlaceAliasesMatcher ().add (obj->getName (), obj);
 			}
-			city->getPlaceAliasesMatcher ().add (obj->getName (), obj);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::_unlink(PlaceAlias* obj)
+		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Unlink(
+			PlaceAlias* obj,
+			Env* env
+			)
 		{
 			City* city(const_cast<City*>(obj->getCity()));
 
@@ -92,7 +98,7 @@ namespace synthese
 			obj->setCity(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::save(PlaceAlias* object)
+		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Save(PlaceAlias* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -126,72 +132,14 @@ namespace synthese
 			addTableColumn (COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
 		}
 
-/*		void PlaceAliasTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (PlaceAlias::Contains(id))
-				{
-					load(PlaceAlias::GetUpdateable(id).get(), rows);
-				}
-				else
-				{
-					PlaceAlias* object(new PlaceAlias);
-					load(object, rows);
-					object->store();
 
-					uid cityId (rows->getLongLong (COL_CITYID));
-					
-					shared_ptr<City> city = City::GetUpdateable (cityId);
 
-					bool isCityMainConnection (rows->getBool ( COL_ISCITYMAINCONNECTION));
-
-					if (isCityMainConnection)
-					{
-						city->addIncludedPlace (object);
-					}
-
-					city->getPlaceAliasesMatcher ().add (object->getName (), object);
-				}
-			}
-		}
-		
-		void PlaceAliasTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (PlaceAlias::Contains(id))
-				{
-					shared_ptr<PlaceAlias> object = PlaceAlias::GetUpdateable(id);
-					load(object.get(), rows);
-
-					shared_ptr<City> city = City::GetUpdateable (object->getCity ()->getKey ());
-					city->getPlaceAliasesMatcher ().add (object->getName (), object.get());
-					/// @todo Where is the removal of the old name ??
-				}
-			}
-		}
-
-		void PlaceAliasTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (PlaceAlias::Contains(id))
-				{
-					shared_ptr<const PlaceAlias> pa = PlaceAlias::Get(id);
-					shared_ptr<City> city = City::GetUpdateable (pa->getCity ()->getKey ());
-					city->getPlaceAliasesMatcher ().remove (pa->getName ());
-
-					PlaceAlias::Remove(id);
-				}
-			}
-		}
-*/
-		vector<shared_ptr<PlaceAlias> > PlaceAliasTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		void PlaceAliasTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -208,22 +156,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-				vector<shared_ptr<PlaceAlias> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<PlaceAlias> object(new PlaceAlias);
-					load (object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

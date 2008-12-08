@@ -67,14 +67,15 @@ namespace synthese
 			uid id = map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY);
 			if (id != UNKNOWN_VALUE)
 			{
-				if (!Profile::Contains(id))
+				if (!Env::GetOfficialEnv()->template getRegistry<Profile>().contains(id))
 					throw ActionException("Specified root profile not found.");
 				_templateProfile = ProfileTableSync::Get(id);
 			}
 
 			// Name unicity
-			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::Search(_name, string(),0,1);
-			if (!existingProfiles.empty())
+			Env env;
+			ProfileTableSync::Search(env, _name, string(),0,1);
+			if (!env.template getRegistry<Profile>().empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
@@ -98,7 +99,7 @@ namespace synthese
 				r->setPublicLevel(FORBIDDEN);
 				profile->addRight(r);
 			}
-			ProfileTableSync::save(profile.get());
+			ProfileTableSync::Save(profile.get());
 			_request->setObjectId(profile->getKey());
 
 			// DBLog

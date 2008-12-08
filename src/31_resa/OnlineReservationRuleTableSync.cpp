@@ -22,14 +22,14 @@
 
 #include "OnlineReservationRuleTableSync.h"
 
-#include "15_env/ReservationRuleTableSync.h"
+#include "ReservationRuleTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 #include <sstream>
 
@@ -54,36 +54,39 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE_ID = 47;
 		template<> const bool SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::load(OnlineReservationRule* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
+			OnlineReservationRule* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			object->setEMail(rows->getText(OnlineReservationRuleTableSync::COL_EMAIL));
 			object->setCopyEMail(rows->getText(OnlineReservationRuleTableSync::COL_COPY_EMAIL));
 			object->setMaxSeats(rows->getInt(OnlineReservationRuleTableSync::COL_MAX_SEATS));
 			/// @todo Finish to implement the loader
 
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::_link(OnlineReservationRule* object, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			try
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				object->setReservationRule(ReservationRuleTableSync::Get(rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID), object, true, GET_AUTO));
-			}
-			catch (...)
-			{
-				Log::GetInstance().warn("Reservation rule not found for online reservation rule "+ Conversion::ToString(object->getKey()));
+				try
+				{
+					object->setReservationRule(ReservationRuleTableSync::Get(rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID), env, linkLevel));
+				}
+				catch (...)
+				{
+					Log::GetInstance().warn("Reservation rule not found for online reservation rule "+ Conversion::ToString(object->getKey()));
+				}
 			}
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::_unlink(OnlineReservationRule* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Unlink(
+			OnlineReservationRule* object,
+			Env* env
+		){
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::save(OnlineReservationRule* object)
+		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Save(OnlineReservationRule* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -131,56 +134,14 @@ namespace synthese
 			addTableIndex(COL_RESERVATION_RULE_ID);
 		}
 
-/*		void OnlineReservationRuleTableSync::rowsAdded(
-			SQLite* sqlite
-			, SQLiteSync* sync
-			, const SQLiteResultSPtr& rows
-			, bool isFirstSync
-		){
-			// 
-			while (rows->next ())
-			{
-				if (ResaModule::getOnlineReservationRules().contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					load(ResaModule::getOnlineReservationRules().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
-				}
-				else
-				{
-					shared_ptr<OnlineReservationRule> object(new OnlineReservationRule);
-					load(object.get(), rows);
-					ResaModule::getOnlineReservationRules().add(object);
-				}
-			}
-		}
-		
-		void OnlineReservationRuleTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (ResaModule::getOnlineReservationRules().contains(id))
-				{
-					shared_ptr<OnlineReservationRule> object(ResaModule::getOnlineReservationRules().getUpdateable(id));
-					load(object.get(), rows);
-				}
-			}
-		}
 
-		void OnlineReservationRuleTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (ResaModule::getOnlineReservationRules().contains(id))
-				{
-					ResaModule::getOnlineReservationRules().remove(id);
-				}
-			}
-		}
-*/
-		vector<shared_ptr<OnlineReservationRule> > OnlineReservationRuleTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
+
+		void OnlineReservationRuleTableSync::Search(
+			Env* env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -194,22 +155,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<OnlineReservationRule> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<OnlineReservationRule> object(new OnlineReservationRule());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 		OnlineReservationRuleTableSync::~OnlineReservationRuleTableSync()

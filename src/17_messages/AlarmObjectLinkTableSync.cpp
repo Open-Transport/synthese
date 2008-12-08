@@ -25,6 +25,7 @@
 #include "AlarmRecipient.h"
 #include "AlarmObjectLink.h"
 #include "SentAlarm.h"
+#include "Registry.h"
 
 using namespace std;
 using namespace boost;
@@ -46,44 +47,44 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE_ID = 40;
 		template<> const bool SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::load(AlarmObjectLink* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
+			AlarmObjectLink* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			object->setAlarmId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_ALARM_ID));
 			object->setObjectId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_OBJECT_ID));
 			object->setRecipientKey(rows->getText ( AlarmObjectLinkTableSync::COL_RECIPIENT_KEY));
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_link(AlarmObjectLink* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			assert(temporary == GET_AUTO || temporary == GET_REGISTRY);
-			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(obj->getRecipientKey()));
-			shared_ptr<SentAlarm> alarm(SentAlarm::GetUpdateable(obj->getAlarmId()));
-			try
+		
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				ar->addObject(alarm.get(), obj->getObjectId());
+				shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
+				shared_ptr<SentAlarm> alarm(env->template getEditableRegistry<SentAlarm>().getEditable(object->getAlarmId()));
+				try
+				{
+					ar->addObject(alarm.get(), object->getObjectId());
+				}
+				catch (AlarmObjectLinkException e)
+				{
+					Log::GetInstance().error ("Alarm object link error (t040_alarm_object_links table) : ", e);
+				}
 			}
-			catch (AlarmObjectLinkException e)
-			{
-				Log::GetInstance().error ("Alarm object link error (t040_alarm_object_links table) : ", e);
-			}
-
-			obj->setLinked(true);
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::_unlink(AlarmObjectLink* aol)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
+			AlarmObjectLink* aol,
+			Env* env
+		){
 			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(aol->getRecipientKey()));
-			shared_ptr<SentAlarm> alarm = SentAlarm::GetUpdateable(aol->getAlarmId());
+			shared_ptr<SentAlarm> alarm = env->template getEditableRegistry<SentAlarm>().getEditable(aol->getAlarmId());
 			ar->removeObject(alarm.get(), aol->getObjectId());
-			aol->setLinked(false);
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::save(AlarmObjectLink* object)
+		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Save(AlarmObjectLink* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -125,20 +126,13 @@ namespace synthese
 
 		void AlarmObjectLinkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
+			Env* env(Env::GetOfficialEnv());
+			Registry<AlarmObjectLink>& registry(env->template getEditableRegistry<AlarmObjectLink>());
 			while (rows->next ())
 			{
-				AlarmObjectLink* aol(new AlarmObjectLink);
-				load(aol, rows);
-				
-				// Alarm not found in ram : this is a template
-				if (!SentAlarm::Contains(aol->getAlarmId()))
-				{
-					delete aol;
-					continue;
-				}
-
-				link(aol, rows, GET_REGISTRY);
-				aol->store();
+				shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
+				Load(aol.get(), rows, env);
+				registry.add(aol);
 			}
 		}
 
@@ -151,17 +145,14 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (!AlarmObjectLink::Contains(rows->getLongLong (TABLE_COL_ID)))
+				if (!Env::GetOfficialEnv()->template getRegistry<AlarmObjectLink>().contains(rows->getLongLong (TABLE_COL_ID)))
 					continue;
 
-				shared_ptr<AlarmObjectLink> aol = AlarmObjectLink::GetUpdateable(rows->getLongLong (TABLE_COL_ID));
+				shared_ptr<AlarmObjectLink> aol = Env::GetOfficialEnv()->template getEditableRegistry<AlarmObjectLink>().getEditable(rows->getLongLong (TABLE_COL_ID));
 				
 				// Alarm not found in ram : this is not a template
-				if (SentAlarm::Contains(aol->getAlarmId()))
-				{
-					unlink(aol.get());
-				}
-				AlarmObjectLink::Remove(rows->getLongLong (TABLE_COL_ID));
+				Unlink(aol.get());
+				Env::GetOfficialEnv()->template getEditableRegistry<AlarmObjectLink>().remove(rows->getLongLong (TABLE_COL_ID));
 			}
 		}
 
@@ -178,35 +169,25 @@ namespace synthese
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
-		std::vector<boost::shared_ptr<AlarmObjectLink> > AlarmObjectLinkTableSync::search( const Alarm* alarm, int first /*= 0*/, int number /*= 0*/ )
-		{
+		void AlarmObjectLinkTableSync::Search(
+			Env& env,
+			const Alarm* alarm,
+			int first /*= 0*/,
+			int number, /*= 0*/
+			LinkLevel linkLevel
+		){
 			std::stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
 				<< " WHERE " 
-				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getId());
+				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getKey());
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				db::SQLiteResultSPtr rows = db::DBModule::GetSQLite()->execQuery(query.str());
-				std::vector< boost::shared_ptr<AlarmObjectLink> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<AlarmObjectLink> object(new AlarmObjectLink);
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(db::SQLiteException& e)
-			{
-				throw util::Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

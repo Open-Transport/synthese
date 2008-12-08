@@ -24,6 +24,7 @@
 #define SYNTHESE_ENV_COMPLYER_H
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
@@ -48,11 +49,11 @@ namespace synthese
 
 		private:
 
-			const BikeCompliance*			_bikeCompliance;
-			const Fare*						_fare;
-			const HandicappedCompliance*	_handicappedCompliance;
-			const PedestrianCompliance*		_pedestrianCompliance;
-			const ReservationRule*			_reservationRule;
+			boost::shared_ptr<const BikeCompliance>			_bikeCompliance;
+			boost::shared_ptr<const Fare>					_fare;
+			boost::shared_ptr<const HandicappedCompliance>	_handicappedCompliance;
+			boost::shared_ptr<const PedestrianCompliance>	_pedestrianCompliance;
+			boost::shared_ptr<const ReservationRule>		_reservationRule;
 			
 			const Complyer*					_complianceParent;
 
@@ -63,20 +64,20 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const BikeCompliance*			getBikeCompliance ()		const;
-				const Fare*						getFare()					const;
-				const HandicappedCompliance*	getHandicappedCompliance()	const;
-				const PedestrianCompliance*		getPedestrianCompliance()	const;
-				const ReservationRule*			getReservationRule()		const;
+				boost::shared_ptr<const BikeCompliance>			getBikeCompliance ()		const;
+				boost::shared_ptr<const Fare>					getFare()					const;
+				boost::shared_ptr<const HandicappedCompliance>	getHandicappedCompliance()	const;
+				boost::shared_ptr<const PedestrianCompliance>	getPedestrianCompliance()	const;
+				boost::shared_ptr<const ReservationRule>		getReservationRule()		const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void	setHandicappedCompliance(const HandicappedCompliance* compliance);
-				void	setPedestrianCompliance(const PedestrianCompliance* compliance);
-				void	setBikeCompliance(const BikeCompliance* compliance);
-				void	setFare(const Fare* fare);
-				void	setReservationRule(const ReservationRule* rule);
+				void	setHandicappedCompliance(boost::shared_ptr<const HandicappedCompliance> compliance);
+				void	setPedestrianCompliance(boost::shared_ptr<const PedestrianCompliance> compliance);
+				void	setBikeCompliance(boost::shared_ptr<const BikeCompliance> compliance);
+				void	setFare(boost::shared_ptr<const Fare> fare);
+				void	setReservationRule(boost::shared_ptr<const ReservationRule> rule);
 				void	setComplianceParent(const Complyer* parent);
 			//@}
 

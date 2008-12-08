@@ -80,7 +80,7 @@ namespace synthese
 			try
 			{
 				// The screen
-				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
 
 				// Properties
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
@@ -100,11 +100,11 @@ namespace synthese
 				_type = DisplayType::Get(id);
 
 			}
-			catch (DisplayScreen::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not specified or specified display screen not found");
 			}
-			catch (DisplayType::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<DisplayType>&)
 			{
 				throw ActionException("Specified display type not found");
 			}
@@ -147,7 +147,7 @@ namespace synthese
 			_screen->setDisplayTeam(_displayTeam);
 
 			// The action
-			DisplayScreenTableSync::save(_screen.get());
+			DisplayScreenTableSync::Save(_screen.get());
 
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(_screen.get(), log.str(), _request->getUser().get());

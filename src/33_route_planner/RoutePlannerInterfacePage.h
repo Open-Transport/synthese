@@ -82,6 +82,8 @@ namespace synthese
 		class RoutePlannerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerInterfacePage>
 		{
 		public:
+			RoutePlannerInterfacePage();
+
 			/** Display of a successful route planning
 				Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.

@@ -30,5 +30,13 @@ namespace synthese
 
 	namespace interfaces
 	{
+
+
+
+		NonPredefinedInterfacePage::NonPredefinedInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

@@ -58,17 +58,17 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
 
 				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
 				_place = ConnectionPlaceTableSync::Get(id);
 
 			}
-			catch (DisplayScreen::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
 			{
 				throw ActionException("Specified place not found");
 			}
@@ -77,7 +77,7 @@ namespace synthese
 		void DisplayScreenRemoveForbiddenPlaceAction::run()
 		{
 			_screen->removeForbiddenPlace(_place.get());
-			DisplayScreenTableSync::save(_screen.get());
+			DisplayScreenTableSync::Save(_screen.get());
 		}
 	}
 }

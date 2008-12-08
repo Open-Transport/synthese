@@ -23,12 +23,9 @@
 #ifndef SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
 #define SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
 
-#include "15_env/ConnectionPlace.h"
+#include "ConnectionPlace.h"
 
-#include "06_geometry/IsoBarycentre.h"
-
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "IsoBarycentre.h"
 
 #include <map>
 #include <utility>
@@ -53,8 +50,7 @@ namespace synthese
 			@ingroup m35
 		*/
 		class PublicTransportStopZoneConnectionPlace
-			: public util::Registrable<uid,PublicTransportStopZoneConnectionPlace>
-			, public ConnectionPlace
+		:	public ConnectionPlace
 		{
 		private:
 			typedef std::map< std::pair<uid, uid>, int > TransferDelaysMap;
@@ -77,7 +73,7 @@ namespace synthese
 			typedef std::vector<std::pair<uid, std::string> > PhysicalStopsLabels;
 
 			PublicTransportStopZoneConnectionPlace(
-				uid id = UNKNOWN_VALUE
+				util::RegistryKeyType id = UNKNOWN_VALUE
 				, std::string name = std::string()
 				, const City* city = NULL
 				, ConnectionType connectionType = CONNECTION_TYPE_FORBIDDEN
@@ -89,7 +85,6 @@ namespace synthese
 				const PhysicalStops&			getPhysicalStops() const;
 				int								getDefaultTransferDelay() const;
 				virtual int						getMinTransferDelay() const;
-				virtual uid						getId() const;
 			//@}
 
 			//! @name Setters

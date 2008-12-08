@@ -125,8 +125,8 @@ namespace synthese
 			{
 				try
 				{
-					_confirmedTransaction = ReservationTransactionTableSync::GetUpdateable(id);
-					ReservationTableSync::search(_confirmedTransaction.get());
+					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(id);
+					//ReservationTableSync::Search(_confirmedTransaction.get());
 				}
 				catch (...)
 				{

@@ -23,8 +23,8 @@
 #ifndef SYNTHESE_routeplanner_SiteCommercialLineLink_h__
 #define SYNTHESE_routeplanner_SiteCommercialLineLink_h__
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
+
 #include "01_util/Constants.h"
 
 namespace synthese
@@ -34,13 +34,14 @@ namespace synthese
 		/** SiteCommercialLineLink class.
 			@ingroup m36
 		*/
-		class SiteCommercialLineLink : public util::Registrable<uid, SiteCommercialLineLink>
+		class SiteCommercialLineLink
+		:	public virtual util::Registrable
 		{
 			uid _siteId;
 			uid _commercialLineId;
 
 		public:
-			SiteCommercialLineLink(uid id = UNKNOWN_VALUE);
+			SiteCommercialLineLink(util::RegistryKeyType id = UNKNOWN_VALUE);
 
 			void setSiteId(uid id);
 			void setCommercialLineId(uid id);

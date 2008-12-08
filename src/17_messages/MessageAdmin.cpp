@@ -83,7 +83,7 @@ namespace synthese
 
 			try
 			{
-				_alarm.reset(AlarmTableSync::Get(id, true));
+				_alarm = AlarmTableSync::Get(id);
 			}
 			catch(...)
 			{
@@ -152,7 +152,7 @@ namespace synthese
 				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(request);
 				removeRequest.getFunction()->setPage<MessageAdmin>();
 				removeRequest.setObjectId(request->getObjectId());
-				removeRequest.getAction()->setAlarmId(_alarm->getId());
+				removeRequest.getAction()->setAlarmId(_alarm->getKey());
 				
 				// Alarm messages destinations loop
 				for (Factory<AlarmRecipient>::Iterator arit = Factory<AlarmRecipient>::begin(); arit != Factory<AlarmRecipient>::end(); ++arit)
@@ -216,7 +216,7 @@ namespace synthese
 
 		std::string MessageAdmin::getParameterValue() const
 		{
-			return _alarm.get() ? Conversion::ToString(_alarm->getId()) : string();
+			return _alarm.get() ? Conversion::ToString(_alarm->getKey()) : string();
 		}
 
 		bool MessageAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const

@@ -112,14 +112,14 @@ namespace synthese
 		void MessagesLog::AddDeleteEntry( const SentAlarm* alarm , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(alarm->getId()));
+			content.push_back(Conversion::ToString(alarm->getKey()));
 			stringstream text;
 			text << "Suppression du message " << alarm->getShortMessage();
 			const ScenarioSentAlarm* salarm(dynamic_cast<const ScenarioSentAlarm*>(alarm));
 			if (salarm)
 				text << " du scénario " << salarm->getScenario()->getName();
 			content.push_back(text.str());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getId());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getKey());
 		}
 	}
 }

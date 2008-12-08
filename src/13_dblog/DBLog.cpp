@@ -43,7 +43,7 @@ namespace synthese
 			e.setLogKey(logKey);
 			e.setContent(content);
 			e.setObjectId(objectId);
-			DBLogEntryTableSync::save(&e);
+			DBLogEntryTableSync::Save(&e);
 
 			return e.getKey();
 		}

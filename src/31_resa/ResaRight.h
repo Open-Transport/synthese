@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_resa_ResaRight_H__
 #define SYNTHESE_resa_ResaRight_H__
 
-#include "15_env/NetworkLineBasedRight.h"
+#include "NetworkLineBasedRight.h"
 
 namespace synthese
 {

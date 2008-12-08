@@ -76,7 +76,6 @@ namespace synthese
 			_type->setRowNumber(10);
 			_type->setInterface(Interface::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
 
-			screen->setLinked(true);
 			screen->setLocalization(place);
 			screen->setAllPhysicalStopsDisplayed(false);
 			const PhysicalStops& stops(place->getPhysicalStops());

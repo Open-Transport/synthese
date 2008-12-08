@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/AlarmTemplate.h"
+#include "ScenarioTemplate.h"
+#include "AlarmTemplate.h"
 
 namespace synthese
 {
@@ -30,7 +30,7 @@ namespace synthese
 
 		ScenarioTemplate::ScenarioTemplate( const ScenarioTemplate& source, const std::string& name)
 			: ScenarioSubclassTemplate<AlarmTemplate>(name)
-			, util::Registrable<uid, ScenarioTemplate>()
+			, util::Registrable()
 		{
 			for (AlarmsSet::const_iterator it = source.getAlarms().begin(); it != source.getAlarms().end(); ++it)
 				addAlarm(new AlarmTemplate(this,**it ));
@@ -38,7 +38,16 @@ namespace synthese
 
 		ScenarioTemplate::ScenarioTemplate(const std::string name)
 			: ScenarioSubclassTemplate<AlarmTemplate>(name)
-			, util::Registrable<uid, ScenarioTemplate>()
+			, util::Registrable()
+			, _folderId(UNKNOWN_VALUE)
+		{
+
+		}
+
+
+
+		ScenarioTemplate::ScenarioTemplate( util::RegistryKeyType key )
+			: util::Registrable(key)
 			, _folderId(UNKNOWN_VALUE)
 		{
 
@@ -49,10 +58,7 @@ namespace synthese
 
 		}
 
-		uid ScenarioTemplate::getId() const
-		{
-			return getKey();
-		}
+
 
 		uid ScenarioTemplate::getFolderId() const
 		{

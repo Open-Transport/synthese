@@ -28,3 +28,7 @@ synthese::security::GlobalRight::integrate();
 synthese::security::SecurityRight::integrate();
 
 synthese::security::SecurityLog::integrate();
+
+// Registries
+synthese::util::Env::template Integrate<synthese::security::User>();
+synthese::util::Env::template Integrate<synthese::security::Profile>();

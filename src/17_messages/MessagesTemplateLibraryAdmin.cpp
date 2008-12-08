@@ -44,6 +44,7 @@
 #include "17_messages/MessagesModule.h"
 #include "17_messages/TextTemplateFolderUpdateAction.h"
 
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -111,7 +112,9 @@ namespace synthese
 			bool deleteRight(request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
 
 			// Search
-			vector<shared_ptr<TextTemplate> > tw = TextTemplateTableSync::Search(
+			Env tenv;
+			TextTemplateTableSync::Search(
+				tenv,
 				ALARM_LEVEL_UNKNOWN
 				, _folder.get() ? _folder->getKey() : 0
 				, false
@@ -125,7 +128,9 @@ namespace synthese
 				, true
 			);
 
-			vector<shared_ptr<TextTemplate> > folders = TextTemplateTableSync::Search(
+			Env fenv;
+			TextTemplateTableSync::Search(
+				fenv,
 				ALARM_LEVEL_UNKNOWN
 				, _folder.get() ? _folder->getKey() : 0
 				, true
@@ -141,7 +146,7 @@ namespace synthese
 
 			stream << "<h1>Répertoires</h1>";
 			HTMLList l;
-			for (vector<shared_ptr<TextTemplate> >::iterator itf(folders.begin()); itf != folders.end(); ++itf)
+			BOOST_FOREACH(shared_ptr<TextTemplate> folder, fenv.template getRegistry<TextTemplate>())
 			{
 			}
 
@@ -149,7 +154,7 @@ namespace synthese
 			{
 				stream << "<h2>Propriétés</h2>";
 
-				if (tw.empty() && folders.empty())
+				if (tenv.template getRegistry<TextTemplate>().empty() && fenv.template getRegistry<TextTemplate>().empty())
 					stream << "<p>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
 
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
@@ -161,24 +166,24 @@ namespace synthese
 
 
 			stream << "<h1>Modèles de texte</h1>";
-			for (vector<shared_ptr<TextTemplate> >::iterator it(tw.begin()); it != tw.end(); ++it)
+			BOOST_FOREACH(shared_ptr<TextTemplate> tt, tenv.template getRegistry<TextTemplate>())
 			{
 				// Variables
-				deleteRequest.getAction()->setTemplate(*it);
-				updateRequest.getAction()->setTemplate(*it);
+				deleteRequest.getAction()->setTemplate(tt);
+				updateRequest.getAction()->setTemplate(tt);
 
 				// Display
 				stream << "<h2>";
 				if (deleteRight)
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ (*it)->getName()+" ?", "page_delete.png") << " ";
-				stream << (*it)->getName() << "</h2>";
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ tt->getName()+" ?", "page_delete.png") << " ";
+				stream << tt->getName() << "</h2>";
 
-				PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+Conversion::ToString((*it)->getKey())));
+				PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+Conversion::ToString(tt->getKey())));
 				t.getForm().setUpdateRight(updateRight);
 				stream << t.open();
-				stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, (*it)->getName()));
-				stream << t.cell("Texte court", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, (*it)->getShortMessage(), 2, 60));
-				stream << t.cell("Texte long", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, (*it)->getLongMessage(), 6, 60));
+				stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, tt->getName()));
+				stream << t.cell("Texte court", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, tt->getShortMessage(), 2, 60));
+				stream << t.cell("Texte long", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, tt->getLongMessage(), 6, 60));
 				stream << t.close();
 			}
 

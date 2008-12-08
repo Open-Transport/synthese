@@ -58,11 +58,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE_ID(46);
 		template<> const bool SQLiteTableSyncTemplate<ReservationTransactionTableSync>::HAS_AUTO_INCREMENT(true);
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::load(
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Load(
 			ReservationTransaction* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
 		){
-			object->setKey(rows->getLongLong(TABLE_COL_ID));
 			object->setLastReservation(rows->getLongLong ( ReservationTransactionTableSync::COL_LAST_RESERVATION_ID));
 			object->setSeats(rows->getInt( ReservationTransactionTableSync::COL_SEATS));
 			object->setBookingTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTransactionTableSync::COL_BOOKING_TIME)));
@@ -73,9 +74,19 @@ namespace synthese
 			object->setBookingUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_BOOKING_USER_ID));
 			object->setCancelUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CANCEL_USER_ID));
 			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
+
+			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			{
+				Env senv;
+				ReservationTableSync::Search(senv, object.get());
+				BOOST_FOREACH(shared_ptr<Reservation> resa, senv.template getRegistry<Reservation>())
+				{
+					object->addReservation(resa);
+				}
+			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::save(ReservationTransaction* object)
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Save(ReservationTransaction* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -99,13 +110,9 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::_link(
-			ReservationTransaction* obj, const SQLiteResultSPtr& rows, GetSource temporary
-		){
-		}
-
-		template<> void  SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::_unlink(
-			ReservationTransaction* obj
+		template<> void  SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Unlink(
+			ReservationTransaction* obj,
+			Env* env
 		){
 
 		}
@@ -141,15 +148,15 @@ namespace synthese
 			addTableColumn(COL_CANCEL_USER_ID, "INTEGER");
 		}
 
-		vector<shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search(
+		vector<shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::Search(
+			Env& env,
 			const env::Service* service
 			, const time::Date& originDate
 			, bool withCancelled
 			, int first /*= 0*/
-			, int number /*= 0*/
+			, int number, /*= 0*/
+			LinkLevel linkLevel
 		){
-
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT " << TABLE_NAME << ".*"
@@ -157,7 +164,7 @@ namespace synthese
 				<< " INNER JOIN " << ReservationTableSync::TABLE_NAME << " AS r ON "
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
 				<< " WHERE " 
-				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << Conversion::ToString(service->getId())
+				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << Conversion::ToString(service->getKey())
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << originDate.toSQLString(false) << " 00:00'"
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << originDate.toSQLString(false) << " 23:59'";
 			if (!withCancelled)
@@ -169,35 +176,19 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<ReservationTransaction> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<ReservationTransaction> object(new ReservationTransaction());
-					load(object.get(), rows);
-					vector<shared_ptr<Reservation> > reservations(ReservationTableSync::search(object.get()));
-					object->setReservations(reservations);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
-		std::vector<boost::shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search(
+		void ReservationTransactionTableSync::Search(
+			Env& env,
 			uid userId
 			, const time::DateTime& minDate
 			, const time::DateTime& maxDate
 			, bool withCancelled
 			, int first
-			, int number
+			, int number,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT " << TABLE_NAME << ".*"
@@ -218,25 +209,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<ReservationTransaction> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<ReservationTransaction> object(new ReservationTransaction());
-					load(object.get(), rows);
-					vector<shared_ptr<Reservation> > reservations(ReservationTableSync::search(object.get()));
-					object->setReservations(reservations);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
-
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 		ReservationTransactionTableSync::~ReservationTransactionTableSync()

@@ -59,13 +59,7 @@ namespace synthese
 			//@{
 				std::string _data;
 				bool		_useEnvironment;
-				env::City::Registry _cities;
-				env::Axis::Registry _axes;
-				env::PublicTransportStopZoneConnectionPlace::Registry _connectionPlaces;
-				env::PhysicalStop::Registry _physicalStops;
-				env::CommercialLine::Registry _commercialLines;
-				env::Line::Registry _lines;
-				env::LineStop::Registry _lineStops;
+				Env			_temporaryEnvironment;
 			//@}
 
 			//! @name Result

@@ -20,32 +20,33 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "05_html/SearchFormHTMLTable.h"
-#include "05_html/ActionResultHTMLTable.h"
-#include "05_html/HTMLModule.h"
+#include "SearchFormHTMLTable.h"
+#include "ActionResultHTMLTable.h"
+#include "HTMLModule.h"
 
-#include "11_interfaces/InterfaceModule.h"
+#include "InterfaceModule.h"
 
-#include "12_security/SecurityModule.h"
-#include "12_security/UserAdmin.h"
-#include "12_security/AddUserAction.h"
-#include "12_security/DelUserAction.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/UsersAdmin.h"
-#include "12_security/SecurityRight.h"
+#include "SecurityModule.h"
+#include "UserAdmin.h"
+#include "AddUserAction.h"
+#include "DelUserAction.h"
+#include "ProfileTableSync.h"
+#include "UserTableSync.h"
+#include "UsersAdmin.h"
+#include "SecurityRight.h"
 
-#include "30_server/Session.h"
-#include "30_server/ServerModule.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "Session.h"
+#include "ServerModule.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/AdminModule.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminModule.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
 
+#include <boost/foreach.hpp>
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -83,7 +84,7 @@ namespace synthese
 
 			// Searched profile
 			uid id(map.getUid(PARAM_SEARCH_PROFILE_ID, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE && Profile::Contains(id))
+			if (id != UNKNOWN_VALUE && Env::GetOfficialEnv()->template getRegistry<Profile>().contains(id))
 				_searchProfile = ProfileTableSync::Get(id);
 
 			// Table Parameters
@@ -98,7 +99,9 @@ namespace synthese
 		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// Search
-			vector<shared_ptr<User> > _users(UserTableSync::Search(
+			Env env;
+			UserTableSync::Search(
+				env,
 				"%"+_searchLogin+"%"
 				, "%"+_searchName+"%"
 				, "%"+_searchSurname+"%"
@@ -111,9 +114,9 @@ namespace synthese
 				, _requestParameters.orderField == PARAM_SEARCH_NAME
 				, _requestParameters.orderField == PARAM_SEARCH_PROFILE_ID
 				, _requestParameters.raisingOrder
-			));
+			);
 			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, _users);
+			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<User>());
 
 
 			// Request for search form
@@ -146,7 +149,7 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			if (_users.size() == 0)
+			if (env.template getRegistry<User>().empty())
 				stream << "Aucun utilisateur trouvé";
 
 
@@ -159,9 +162,8 @@ namespace synthese
 
 			stream << t.open();
 
-			for(vector<shared_ptr<User> >::const_iterator it = _users.begin(); it != _users.end(); ++it)
+			BOOST_FOREACH(shared_ptr<User> user, env.template getRegistry<User>())
 			{
-				shared_ptr<User> user = *it;
 				userRequest.setObjectId(user->getKey());
 				deleteUserRequest.setObjectId(user->getKey());
 				stream << t.row();

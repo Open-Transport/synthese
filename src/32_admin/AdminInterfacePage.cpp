@@ -52,5 +52,13 @@ namespace synthese
 				, (const void*) page
 				, request);
 		}
+
+
+
+		AdminInterfacePage::AdminInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

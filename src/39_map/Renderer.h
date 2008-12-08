@@ -35,7 +35,7 @@ namespace synthese
 
 			virtual std::string render (const boost::filesystem::path& tempDir, 
 						    const std::string& filenamePrefix,
-						    const synthese::env::Line::Registry& lines,
+							const util::Registry<env::Line>& lines,
 						    synthese::map::Map& map,
 						    const synthese::map::RenderingConfig& config) = 0;
 		    

@@ -34,11 +34,12 @@ namespace synthese
 	{
 
 
-		boost::shared_ptr<Reservation> ServiceReservations::getReservation( const ReservationTransaction* transaction ) const
-		{
+		boost::shared_ptr<Reservation> ServiceReservations::getReservation(
+			const ReservationTransaction* transaction
+		) const	{
 			const ReservationTransaction::Reservations& r(transaction->getReservations());
 			for (ReservationTransaction::Reservations::const_iterator ite(r.begin()); ite != r.end(); ++ite)
-				if ((*ite)->getServiceId() == service->getId())
+				if ((*ite)->getServiceId() == service->getKey())
 					return *ite;
 		}
 

@@ -21,16 +21,24 @@
 */
 
 #include "ScenarioFolder.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> const string Registry<messages::ScenarioFolder>::KEY("ScenarioFolder");
+	}
+
 	namespace messages
 	{
 
 
-		uid ScenarioFolder::getParentId() const
+		RegistryKeyType ScenarioFolder::getParentId() const
 		{
 			return _parentId;
 		}
@@ -45,13 +53,13 @@ namespace synthese
 			_name = value;
 		}
 
-		void ScenarioFolder::setParentId( uid value )
+		void ScenarioFolder::setParentId(RegistryKeyType value )
 		{
 			_parentId = value;
 		}
 
-		ScenarioFolder::ScenarioFolder()
-			: Registrable<uid,ScenarioFolder>()
+		ScenarioFolder::ScenarioFolder(RegistryKeyType key)
+		:	Registrable(key)
 		{
 	
 		}

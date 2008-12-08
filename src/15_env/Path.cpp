@@ -91,7 +91,7 @@ namespace synthese
 			if (result.second == false)
 			{
 				throw Exception ("Service number " + Conversion::ToString (service->getServiceNumber ())
-						+ " is already defined in path " + Conversion::ToString (getId ()));
+						+ " is already defined in path " + Conversion::ToString (getKey()));
 			}
 			markScheduleIndexesUpdateNeeded ();
 			service->setPath(this);

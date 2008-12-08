@@ -22,8 +22,9 @@
 
 #include <sstream>
 
-#include "12_security/User.h"
-#include "12_security/UserException.h"
+#include "Registry.h"
+#include "User.h"
+#include "UserException.h"
 
 using namespace std;
 
@@ -34,14 +35,14 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,security::User>::Registry Registrable<uid,security::User>::_registry;
+		template<> const string Registry<security::User>::KEY("User");
 	}
 
 
 	namespace security
 	{
-		User::User(uid id)
-			: Registrable<uid, User>(id)
+		User::User(util::RegistryKeyType id)
+			: Registrable(id)
 			, _cityId(0)
 			, _isConnectionAllowed(true)
 			, _birthDate(TIME_UNKNOWN)

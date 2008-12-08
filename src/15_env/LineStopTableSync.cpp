@@ -23,19 +23,19 @@
 
 #include "LineStopTableSync.h"
 
-#include "15_env/LineTableSync.h"
-#include "15_env/PhysicalStopTableSync.h"
+#include "LineTableSync.h"
+#include "PhysicalStopTableSync.h"
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "06_geometry/Point2D.h"
+#include "Point2D.h"
 
 using namespace std;
 using namespace boost;
@@ -55,19 +55,16 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<LineStopTableSync>::TABLE_ID = 10;
 		template<> const bool SQLiteTableSyncTemplate<LineStopTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::load(LineStop* ls, const db::SQLiteResultSPtr& rows )
-		{
-			uid id (rows->getLongLong (TABLE_COL_ID));
-
-			int rankInPath (
-			    rows->getInt (LineStopTableSync::COL_RANKINPATH));
-			
+		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Load(
+			LineStop* ls,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
+			int rankInPath(rows->getInt (LineStopTableSync::COL_RANKINPATH));
 			bool isDeparture (rows->getBool (LineStopTableSync::COL_ISDEPARTURE));
-
 			bool isArrival (rows->getBool (LineStopTableSync::COL_ISARRIVAL));
-
 			double metricOffset (rows->getDouble (LineStopTableSync::COL_METRICOFFSET));
-
 			std::string viaPointsStr (rows->getText (LineStopTableSync::COL_VIAPOINTS));
 
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
@@ -87,7 +84,6 @@ namespace synthese
 					Conversion::ToDouble (*(++valueIter))));
 			}
 
-			ls->setKey(id);
 			ls->setMetricOffset(metricOffset);
 			ls->setIsArrival(isArrival);
 			ls->setIsDeparture(isDeparture);
@@ -95,33 +91,33 @@ namespace synthese
 			
 			if (rows->getColumnIndex (LineStopTableSync::COL_SCHEDULEINPUT) != UNKNOWN_VALUE)
 				ls->setScheduleInput(rows->getBool(LineStopTableSync::COL_SCHEDULEINPUT));
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				uid fromPhysicalStopId (
+					rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
+
+				uid lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
+				Line* line(LineTableSync::GetEditable (lineId, env, linkLevel).get());
+
+				ls->setPhysicalStop(PhysicalStopTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());
+				ls->setLine(line);
+
+				line->addEdge(ls);
+			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::_link(LineStop* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-
-			uid fromPhysicalStopId (
-				rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
-
-			uid lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
-			Line* line(LineTableSync::GetUpdateable (lineId,obj,temporary));
-
-			obj->setPhysicalStop(PhysicalStopTableSync::GetUpdateable(fromPhysicalStopId,obj,temporary));
-			obj->setLine(line);
-
-			if (temporary == GET_REGISTRY)
-				line->addEdge(obj);
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::_unlink(LineStop* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Unlink(
+			LineStop* obj,
+			Env* env
+		){
 			/// @todo line remove edge
 
 			obj->setLine(NULL);
 			obj->setPhysicalStop(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::save(LineStop* object)
+		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Save(LineStop* object)
 		{
 /*			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -166,15 +162,16 @@ namespace synthese
 		}
 
 
-		std::vector<shared_ptr<LineStop> > LineStopTableSync::Search(
+		void LineStopTableSync::Search(
+			Env& env,
 			uid lineId
 			, uid physicalStopId
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByRank
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -191,23 +188,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<LineStop> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<LineStop> object(new LineStop());
-					load(object.get(), rows);
-					link(object.get(), rows, GET_TEMPORARY);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

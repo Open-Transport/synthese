@@ -57,15 +57,16 @@ namespace synthese
 			ConnectionPlaceTableSync ();
 			~ConnectionPlaceTableSync ();
 
-			typedef std::vector<boost::shared_ptr<PublicTransportStopZoneConnectionPlace> > SearchResult;
-			static SearchResult Search(
-				uid cityId = UNKNOWN_VALUE
+			static void Search(
+				util::Env& env,
+				util::RegistryKeyType cityId = UNKNOWN_VALUE
 				, boost::logic::tribool mainConnection = boost::logic::indeterminate
 				, ConnectionPlace::ConnectionType minConnectionType = ConnectionPlace::CONNECTION_TYPE_FORBIDDEN
 				, bool orderByCityNameAndName = true
 				, bool raisingOrder = true
 				, int first = 0
 				, int number = 0
+				, util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 	}

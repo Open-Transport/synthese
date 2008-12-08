@@ -41,7 +41,7 @@ namespace map
 
 
 DrawablePhysicalStop::DrawablePhysicalStop (const synthese::env::PhysicalStop* physicalStop)
-: _physicalStopId (physicalStop->getId ())
+: _physicalStopId (physicalStop->getKey())
 , _name (physicalStop->getPlace()->getName ())
 , _point (*physicalStop)
 {

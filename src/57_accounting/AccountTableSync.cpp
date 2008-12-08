@@ -100,7 +100,7 @@ namespace synthese
 			account->setRightCurrency(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::save(Account* account)
+		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::Save(Account* account)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

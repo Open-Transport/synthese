@@ -52,7 +52,7 @@ DrawableLine::DrawableLine (const Line* line,
 			    int fromLineStopIndex,
 			    int toLineStopIndex,
 			    bool withPhysicalStops)
-    : _lineId (line->getId ())
+    : _lineId (line->getKey())
     , _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
     , _shortName (line->getName ())
 	, _color ((line->getCommercialLine ()->getColor().b < 0 || line->getCommercialLine ()->getColor().g < 0 || line->getCommercialLine ()->getColor().r < 0) ? RGBColor(0,0,0) : line->getCommercialLine ()->getColor())

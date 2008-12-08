@@ -1,10 +1,32 @@
+
+/** UpdateRecord class header.
+	@file UpdateRecord.h
+	@author Hugues Romain
+	@date 2008
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_DBRING_UPDATERECORD_H
 #define SYNTHESE_DBRING_UPDATERECORD_H
 
-#include "03_db_ring/NodeInfo.h"
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-
+#include "NodeInfo.h"
+#include "Registrable.h"
 
 #include <string>
 #include <set>
@@ -34,12 +56,11 @@ namespace dbring
 
 
 
-    class UpdateRecord : public util::Registrable<uid,UpdateRecord>
+    class UpdateRecord : public util::Registrable
 {
 
 private:
 
-    uid _key;
     boost::posix_time::ptime _timestamp;   //!< Original emission time (sort criterium).
     NodeId _emitterNodeId;                 //!< Original emitter node id.
     RecordState _state;                    //!< Record enforcement state.
@@ -50,7 +71,7 @@ public:
 
     UpdateRecord ();
  
-    UpdateRecord (const uid& key,
+	UpdateRecord (const util::RegistryKeyType key,
 		  const boost::posix_time::ptime& timestamp, 
 		  const NodeId& emitterNodeId,
 		  const RecordState& state,

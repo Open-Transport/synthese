@@ -27,12 +27,12 @@
 #include <utility>
 #include <string>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-#include "01_util/Factorable.h"
+#include "Registrable.h"
+#include "Registry.h"
+#include "Factorable.h"
 
 #include "11_interfaces/Types.h"
-#include "11_interfaces/LibraryInterfaceElement.h"
+#include "LibraryInterfaceElement.h"
 
 /** @defgroup refPages Interface Pages
 	@ingroup refInt
@@ -57,17 +57,21 @@ namespace synthese
 			@ingroup m11
 		*/
 		class InterfacePage
-			: public util::Factorable<InterfacePage>
-			, public util::Registrable<uid, InterfacePage>
+		:	public util::Factorable<InterfacePage>,
+			public virtual util::Registrable
 		{
+		public:
+			typedef std::vector<boost::shared_ptr<LibraryInterfaceElement> >	Components;
 		private:
-			std::string							_pageCode;
-			const Interface*					_interface;
-			LibraryInterfaceElement::Registry	_components;
-			bool								_directDisplayAllowed;
+			std::string			_pageCode;
+			const Interface*	_interface;
+			Components			_components;
+			bool				_directDisplayAllowed;
 			
 		public:
-			InterfacePage();
+			InterfacePage(
+				util::RegistryKeyType key = UNKNOWN_VALUE
+			);
 			virtual ~InterfacePage();
 
 			void parse( const std::string& text );

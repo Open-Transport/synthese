@@ -21,25 +21,30 @@
 */
 
 #include "PlaceAlias.h"
+#include "Registry.h"
 
+using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace util
 	{
-		template<> typename Registrable<uid,env::PlaceAlias>::Registry Registrable<uid,env::PlaceAlias>::_registry;
+		template<> const string Registry<env::PlaceAlias>::KEY("PlaceAlias");
 	}
 
 	namespace env
 	{
 
 
-		PlaceAlias::PlaceAlias (uid id,
-					std::string name,
-					const Place* aliasedPlace,
-					const City* city)
-		: synthese::util::Registrable<uid,PlaceAlias> (id)
-		, IncludingPlace (name, city)
+		PlaceAlias::PlaceAlias(
+			RegistryKeyType id,
+			std::string name,
+			const Place* aliasedPlace,
+			const City* city
+		):	Registrable(id),
+			IncludingPlace(id, name, city)
 		{
 			addIncludedPlace (aliasedPlace);
 		}
@@ -71,21 +76,5 @@ namespace synthese
 			_includedPlaces.clear();
 			addIncludedPlace(place);
 		}
-
-		uid PlaceAlias::getId() const
-		{
-			return getKey();
-		}
-
-
-
-
-
-
-
-
 	}
 }
-
-
-

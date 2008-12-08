@@ -23,13 +23,10 @@
 #ifndef SYNTHESE_ENV_RESERVATIONRULE_H
 #define SYNTHESE_ENV_RESERVATIONRULE_H
 
-#include "15_env/Compliance.h"
+#include "Compliance.h"
 
-#include "04_time/Hour.h"
-#include "04_time/DateTime.h"
-
-#include "01_util/RegistrableWithNeutralElement.h"
-#include "01_util/UId.h"
+#include "Hour.h"
+#include "DateTime.h"
 
 namespace synthese
 {
@@ -44,8 +41,7 @@ namespace synthese
 			@ingroup m35
 		*/
 		class ReservationRule
-			: public util::RegistrableWithNeutralElement<uid,ReservationRule>
-			, public Compliance
+		:	public Compliance
 		{
 		private:
 			bool _online;  //!< Reservation via SYNTHESE active
@@ -64,8 +60,7 @@ namespace synthese
 			std::string _webSiteUrl;    //!< URL of a website allowing online reservation
 
 		 public:
-
-			ReservationRule();
+			ReservationRule(util::RegistryKeyType key = UNKNOWN_VALUE);
 			virtual ~ReservationRule();
 
 			//! @name Getters
@@ -177,10 +172,6 @@ namespace synthese
 			//@}
 
 		};
-
-
-
-
 	}
 }
 

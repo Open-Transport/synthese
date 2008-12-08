@@ -1,8 +1,8 @@
 #ifndef SYNTHESE_DB_SQLITERESULT_H
 #define SYNTHESE_DB_SQLITERESULT_H
 
-
-#include "02_db/SQLiteValue.h"
+#include "SQLiteValue.h"
+#include "UtilTypes.h"
 
 #include <iostream>
 #include <vector>
@@ -80,6 +80,7 @@ class SQLiteResult
 
     std::vector<int> computeMaxColWidths () const;
     
+	virtual util::RegistryKeyType getKey() const;
 
 };
 

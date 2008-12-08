@@ -48,7 +48,7 @@ namespace synthese
 		/** Financial transaction.
 			@ingroup m37
 		*/
-		class Transaction : public util::Registrable<uid, Transaction>
+		class Transaction : public util::RegistrableTemplate< Transaction>
 		{
 		public:
 			typedef std::vector<TransactionPart*> PartsVector;

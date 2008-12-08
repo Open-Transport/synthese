@@ -25,10 +25,9 @@
 
 #include <string>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
 
-#include "15_env/Edge.h"
+
+#include "Edge.h"
 
 namespace synthese
 {
@@ -43,8 +42,8 @@ namespace synthese
 			TRIDENT = PtLink
 			@ingroup m35
 		*/
-		class LineStop : 
-			public synthese::util::Registrable<uid,LineStop>, public Edge
+		class LineStop
+		:	public Edge
 		{
 		private:
 			const PhysicalStop*  _physicalStop;   //!< Physical stop
@@ -55,14 +54,15 @@ namespace synthese
 
 		public:
 
-			LineStop (const uid id = 0,
-				  const Line* line = NULL,
-				  int rankInPath = UNKNOWN_VALUE,
-				  bool isDeparture = true,
-				  bool isArrival = true,
-				  double metricOffset = UNKNOWN_VALUE,
-				  PhysicalStop* physicalStop = NULL);
-			    
+			LineStop(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				const Line* line = NULL,
+				int rankInPath = UNKNOWN_VALUE,
+				bool isDeparture = true,
+				bool isArrival = true,
+				double metricOffset = UNKNOWN_VALUE,
+				PhysicalStop* physicalStop = NULL
+			);
 			
 			~LineStop();
 

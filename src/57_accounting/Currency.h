@@ -14,7 +14,7 @@ namespace synthese
 		/** Currency.
 			@ingroup m37
 		*/
-		class Currency : public util::Registrable<uid, Currency>
+		class Currency : public util::RegistrableTemplate< Currency>
 		{
 		private:
 			std::string	_symbol;

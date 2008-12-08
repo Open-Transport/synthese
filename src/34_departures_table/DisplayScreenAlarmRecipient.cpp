@@ -59,6 +59,8 @@
 // admin
 #include "AdminModule.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -127,7 +129,7 @@ namespace synthese
 			set<uid> usedDisplayScreens;
 
 			FunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(&addRequest);
-			testRequest.getFunction()->setAlarmId(alarm->getId());
+			testRequest.getFunction()->setAlarmId(alarm->getKey());
 
 			stream << "<h2>Test du message</h2>";
 			
@@ -199,7 +201,9 @@ namespace synthese
 
 			stream << t1.open();
 
-			vector<boost::shared_ptr<DisplayScreen> > result2 = DisplayScreenTableSync::search(
+			Env env;
+			DisplayScreenTableSync::Search(
+				env,
 				searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>()
 				, searchRequest.getUser()->getProfile()->getGlobalPublicRight<MessagesRight>() >= READ
 				, WRITE
@@ -211,11 +215,10 @@ namespace synthese
 				, searchStop
 				, searchName
 				, searchState
-				, searchMessage);
-
-			for (vector<shared_ptr<DisplayScreen> >::const_iterator it = result2.begin(); it != result2.end(); ++it)
+				, searchMessage
+			);
+			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, env.template getRegistry<DisplayScreen>())
 			{
-				shared_ptr<const DisplayScreen> screen = *it;
 				if (screen->getLocalization() == NULL)
 					continue;
 				if (usedDisplayScreens.find(screen->getKey()) != usedDisplayScreens.end())
@@ -254,10 +257,14 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::addObject(const SentAlarm* alarm, uid objectId )
 		{
-			if (!DisplayScreen::Contains(objectId))
+			try
+			{
+				add(Env::GetOfficialEnv()->template getRegistry<DisplayScreen>().get(objectId).get(), alarm);
+			}
+			catch(...)
+			{
 				throw AlarmObjectLinkException(objectId, alarm->getKey(), "Display screen not found");
-
-			add(DisplayScreen::Get(objectId).get(), alarm);
+			}
 		}
 
 		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, uid objectId )

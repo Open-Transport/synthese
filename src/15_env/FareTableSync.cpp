@@ -22,14 +22,13 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "Fare.h"
 #include "FareTableSync.h"
 
 using namespace std;
@@ -49,14 +48,17 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<FareTableSync>::TABLE_ID = 8;
 		template<> const bool SQLiteTableSyncTemplate<FareTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::load(Fare* fare, const db::SQLiteResultSPtr& rows )
-		{
-			fare->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Load(
+			Fare* fare,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel		
+		){
 			fare->setName (rows->getText (FareTableSync::COL_NAME));
-			fare->setType ((Fare::FareType) rows->getInt (FareTableSync::COL_FARETYPE));
+			fare->setType (static_cast<Fare::FareType>(rows->getInt (FareTableSync::COL_FARETYPE)));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::save(Fare* object)
+		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Save(Fare* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -79,12 +81,8 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::_link(Fare* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
 
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::_unlink(Fare* obj)
+		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Unlink(Fare* obj, Env* env)
 		{
 
 		}
@@ -104,9 +102,12 @@ namespace synthese
 			addTableColumn (COL_FARETYPE, "INTEGER", true);
 		}
 
-		std::vector<shared_ptr<Fare> > FareTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
+		void FareTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -120,22 +121,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Fare> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<Fare> object(new Fare());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

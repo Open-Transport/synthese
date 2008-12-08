@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_DurationInterfacePage_H__
 #define SYNTHESE_DurationInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -49,6 +48,8 @@ namespace synthese
 		class DurationInterfacePage : public util::FactorableTemplate<InterfacePage,DurationInterfacePage>
 		{
 		public:
+			DurationInterfacePage();
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 

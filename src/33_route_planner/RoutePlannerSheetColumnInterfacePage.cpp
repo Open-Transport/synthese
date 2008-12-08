@@ -68,5 +68,13 @@ namespace synthese
 			InterfacePage::display( stream, pv, vm, NULL, request );
 			
 		}
+
+
+
+		RoutePlannerSheetColumnInterfacePage::RoutePlannerSheetColumnInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

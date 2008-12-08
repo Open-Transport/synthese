@@ -23,10 +23,8 @@
 #ifndef SYNTHESE_CityNameValueInterfaceElement_H__
 #define SYNTHESE_CityNameValueInterfaceElement_H__
 
-#include "11_interfaces/LibraryInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
+#include "LibraryInterfaceElement.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {

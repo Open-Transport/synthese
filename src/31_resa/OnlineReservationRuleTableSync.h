@@ -30,7 +30,7 @@
 
 #include "OnlineReservationRule.h"
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -65,9 +65,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<OnlineReservationRule> > search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+			static void Search(
+				util::Env& env,
+				int first = 0,
+				int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
 	}
 }

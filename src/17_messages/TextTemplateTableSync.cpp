@@ -22,12 +22,12 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
@@ -52,9 +52,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE_ID = 38;
 		template<> const bool SQLiteTableSyncTemplate<TextTemplateTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::load(TextTemplate* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(
+			TextTemplate* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			object->setName(rows->getText (TextTemplateTableSync::COL_NAME));
 			object->setShortMessage(rows->getText ( TextTemplateTableSync::COL_SHORT_TEXT));
 			object->setLongMessage(rows->getText ( TextTemplateTableSync::COL_LONG_TEXT));
@@ -63,20 +66,17 @@ namespace synthese
 			object->setParentId(rows->getLongLong(TextTemplateTableSync::COL_PARENT_ID));
 		}
 
-
-		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::_link(TextTemplate* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Unlink(
+			TextTemplate* obj,
+			Env* env
+		){
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::_unlink(TextTemplate* obj)
-		{
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::save(TextTemplate* object)
+		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Save(TextTemplate* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() <= 0)
+			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
             query
 				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
@@ -119,7 +119,8 @@ namespace synthese
 		}
 
 
-		vector<shared_ptr<TextTemplate> > TextTemplateTableSync::Search(
+		void TextTemplateTableSync::Search(
+			Env& env,
 			AlarmLevel level
 			, uid parentId
 			, bool isFolder
@@ -130,7 +131,8 @@ namespace synthese
 			, bool orderByName
 			, bool orderByShortText
 			, bool orderByLongText
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
 			stringstream query;
 			query
@@ -164,22 +166,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-				vector<shared_ptr<TextTemplate> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<TextTemplate> object(new TextTemplate());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

@@ -59,6 +59,8 @@ namespace synthese
 		class JourneyBoardStopCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardStopCellInterfacePage>
 		{
 		public:
+			JourneyBoardStopCellInterfacePage();
+
 			/** Display.
 				@param stream Stream to write on
 				@param isItArrival (0) true if the stop is used as an arrival, false else
@@ -85,4 +87,3 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_JourneyBoardStopCellInterfacePage_H__
-

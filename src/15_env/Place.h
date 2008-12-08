@@ -28,11 +28,11 @@
 #include <string>
 #include <vector>
 
+#include "Registrable.h"
+
 #include "15_env/Types.h"
 
-#include "06_geometry/IsoBarycentre.h"
-
-#include "01_util/UId.h"
+#include "IsoBarycentre.h"
 
 namespace synthese
 {
@@ -59,7 +59,8 @@ namespace synthese
 
 			@ingroup m35
 		*/
-		class Place 
+		class Place
+			: public virtual util::Registrable
 		{
 		protected:
 			mutable bool _isoBarycentreToUpdate;
@@ -74,8 +75,10 @@ namespace synthese
 
 		protected:
 
-			Place (const std::string& name,
-			const City* city);
+			Place(
+				const std::string& name,
+				const City* city
+			);
 
 		public:
 
@@ -137,8 +140,6 @@ namespace synthese
 			) const = 0;
 
 			virtual const geometry::Point2D& getPoint() const = 0;
-
-			virtual uid getId() const = 0;
 
 			virtual bool includes(const Place* place) const;
 

@@ -50,6 +50,8 @@ namespace synthese
 		class DepartureTableRowInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, DepartureTableRowInterfacePage>
 		{
 		public:
+			DepartureTableRowInterfacePage();
+
 			/** Display of the admin page.
 			*/
 			void display( std::ostream& stream

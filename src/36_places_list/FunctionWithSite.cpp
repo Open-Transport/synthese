@@ -49,11 +49,14 @@ namespace synthese
 
 		void FunctionWithSite::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Site
-			uid id = map.getUid(PARAMETER_SITE, true, "fws");
-			if (!Site::Contains(id))
+			try
+			{
+				_site = Env::GetOfficialEnv()->getRegistry<Site>()::get(map.getUid(PARAMETER_SITE, true, "fws"));
+			}
+			catch (ObjectNotFoundException<Site>& e)
+			{
 				throw RequestException("Specified site not found");
-			_site = Site::Get(id);
+			}
 		}
 
 		void FunctionWithSite::_copy( boost::shared_ptr<const Function> function )

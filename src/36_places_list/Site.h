@@ -23,13 +23,13 @@
 #ifndef SYNTHESE_CSITE_H
 #define SYNTHESE_CSITE_H
 
-#include "36_places_list/HourPeriod.h"
-#include "36_places_list/Types.h"
+#include "HourPeriod.h"
+#include "Types.h"
 
-#include "04_time/Date.h"
+#include "Date.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
+
 #include "01_util/Constants.h"
 
 #include <string>
@@ -65,7 +65,8 @@ namespace synthese
 				- transport sub-environment definition
 
 		*/
-		class Site : public util::Registrable<uid, Site>
+		class Site
+		:	public virtual util::Registrable
 		{
 		public:
 			typedef std::vector<HourPeriod> Periods;
@@ -106,7 +107,7 @@ namespace synthese
 
 			//! \name Constructeur
 			//@{
-				Site(uid uid = UNKNOWN_VALUE);
+				Site(util::RegistryKeyType uid = UNKNOWN_VALUE);
 			//@}
 
 			//! \name Setters

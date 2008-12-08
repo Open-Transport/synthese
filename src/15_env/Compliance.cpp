@@ -21,24 +21,27 @@
 */
 
 #include "Compliance.h"
+#include "ReservationRule.h"
 
-
+using namespace boost;
 
 namespace synthese
 {
 	namespace env
 	{
-
-
-
 		Compliance::Compliance(
 			boost::logic::tribool compliant
 			, int capacity
-			, ReservationRule* reservationRule
+			, shared_ptr<const ReservationRule> reservationRule
 		)	: _compliant (compliant)
 			, _capacity (capacity)
 			, _reservationRule(reservationRule)
-		{}
+		{
+			if (_reservationRule.get() == NULL)
+			{
+				_reservationRule.reset(new ReservationRule(0));
+			}
+		}
 
 		Compliance::~Compliance()
 		{
@@ -84,15 +87,20 @@ namespace synthese
 				|| _compliant == value;
 		}
 
-		void Compliance::setReservationRule(const ReservationRule* value )
+		void Compliance::setReservationRule(shared_ptr<const ReservationRule> value )
 		{
 			_reservationRule = value;
+			if (_reservationRule.get() == NULL)
+			{
+				_reservationRule.reset(new ReservationRule(0));
+			}
 		}
 
-		const ReservationRule* Compliance::getReservationRule() const
+		
+		
+		shared_ptr<const ReservationRule> Compliance::getReservationRule() const
 		{
 			return _reservationRule;
 		}
 	}
 }
-

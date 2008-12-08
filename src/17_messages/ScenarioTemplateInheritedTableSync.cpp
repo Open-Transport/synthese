@@ -31,6 +31,8 @@ namespace synthese
 {
 	using namespace db;
 	using namespace messages;
+	using namespace util;
+	
 
 	template<>
 	const string util::FactorableTemplate<ScenarioTableSync, ScenarioTemplateInheritedTableSync>::FACTORY_KEY("ScenarioTemplateInheritedTableSync");
@@ -39,15 +41,49 @@ namespace synthese
 	{
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::_Link(ScenarioTemplate* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			LoadScenarioAlarms<ScenarioTemplate>(obj);
+		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Load(
+			ScenarioTemplate* obj, 
+			const SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
+			_CommonLoad(obj, rows, env, linkLevel);
+
+			obj->setFolderId(rows->getLongLong(ScenarioTableSync::COL_FOLDER_ID));
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				LoadScenarioAlarms<ScenarioTemplate>(obj);
+			}
 		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::_Unlink(ScenarioTemplate* obj)
+		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Unlink(ScenarioTemplate* obj, Env* env)
 		{
 
+		}
+
+
+		template<>
+		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Save(ScenarioTemplate* obj)
+		{
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+
+			if (obj->getKey() == UNKNOWN_VALUE)
+				obj->setKey(getId());
+
+			query
+				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(obj->getKey())
+				<< ",1"
+				<< ",0" 
+				<< "," << Conversion::ToSQLiteString(obj->getName())
+				<< ",NULL"
+				<< ",NULL"
+				<< "," << Conversion::ToString(obj->getFolderId())
+				<< ")";
+			sqlite->execUpdate(query.str());
 		}
 	}
 
@@ -58,6 +94,34 @@ namespace synthese
 			: SQLiteInheritedNoSyncTableSyncTemplate<ScenarioTableSync, ScenarioTemplateInheritedTableSync, ScenarioTemplate>()
 		{
 
+		}
+
+
+
+		void ScenarioTemplateInheritedTableSync::Search( util::Env& env, uid folderId , const std::string name /*= std::string() */, const ScenarioTemplate* scenarioToBeDifferentWith /*= NULL */, int first /*= 0 */, int number /*= -1 */, bool orderByName /*= true */, bool raisingOrder /*= false*/, util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */ )
+		{
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " 
+				<< COL_IS_TEMPLATE << "=1";
+			if (folderId > 0)
+				query << " AND " << COL_FOLDER_ID << "=" << Conversion::ToString(folderId);
+			else if (folderId == 0)
+				query << " AND (" << COL_FOLDER_ID << "=0 OR " << COL_FOLDER_ID << " IS NULL)";
+
+			if (!name.empty())
+				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
+			if (scenarioToBeDifferentWith)
+				query << " AND " << TABLE_COL_ID << "!=" << scenarioToBeDifferentWith->getKey();
+			if (orderByName)
+				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

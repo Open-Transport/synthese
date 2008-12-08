@@ -26,10 +26,10 @@
 #include <vector>
 #include <set>
 
-#include "01_util/UId.h"
+#include "Registrable.h"
 
-#include "15_env/Calendar.h"
-#include "15_env/Complyer.h"
+#include "Calendar.h"
+#include "Complyer.h"
 
 namespace synthese
 {
@@ -80,12 +80,10 @@ namespace synthese
 
 			@ingroup m35
 		*/
-		class Path : public Complyer
+		class Path
+		:	public Complyer,
+			public virtual util::Registrable
 		{
-
-		private:
-
-
 		public:
 
 			typedef std::vector<Edge*> Edges;
@@ -97,7 +95,7 @@ namespace synthese
 			Calendar		_calendar; //!< Calendar indicating if there is at least one service running on each day. (move it in Complyer)
 			bool			_allDays;	//!< A permanent service is present : the calendar is ignored
 
-			Path ();
+			Path();
 
 		public:
 
@@ -119,7 +117,6 @@ namespace synthese
 
 				const Edge*					getEdge (int index) const;
 
-				virtual uid			getId () const = 0;
 				virtual const Axis*			getAxis () const = 0;
 
 				virtual bool isRoad () const = 0;

@@ -26,7 +26,6 @@
 #include "11_interfaces/LibraryInterfaceElement.h"
 
 #include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
 
 namespace synthese
 {
@@ -55,11 +54,9 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;
 
-			/** Parser.
-			@param text Optional parameter
-			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 		};
 	}
 }
+
 #endif // SYNTHESE_CityNameValueInterfaceElement_H__

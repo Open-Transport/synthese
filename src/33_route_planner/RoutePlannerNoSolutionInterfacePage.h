@@ -35,6 +35,8 @@ namespace synthese
 		class RoutePlannerNoSolutionInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerNoSolutionInterfacePage>
 		{
 		public:
+			RoutePlannerNoSolutionInterfacePage();
+
 			/** Display.
 				@param stream Stream to write on
 				@param site Display site

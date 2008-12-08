@@ -20,6 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "Registry.h"
 #include "ContinuousService.h"
 #include "Edge.h"
 
@@ -34,29 +35,24 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::ContinuousService>::Registry Registrable<uid,env::ContinuousService>::_registry;
+		template<> const string Registry<env::ContinuousService>::KEY("ContinuousService");
 	}
 
 	namespace env
 	{
 		ContinuousService::ContinuousService(
-			const uid& id,
-			const string& serviceNumber,
+			RegistryKeyType id,
+			string serviceNumber,
 			Path* path,
 			int range,
 			int maxWaitingTime
-		)	: Registrable<uid,ContinuousService> (id)
+		)	: Registrable(id)
 			, NonPermanentService(serviceNumber, path)
 			, _range (range)
 			, _maxWaitingTime (maxWaitingTime)
 		{	}
 
 
-		ContinuousService::ContinuousService()
-			: synthese::util::Registrable<uid,ContinuousService> ()
-			, NonPermanentService()
-		{	}
-		    
 
 		ContinuousService::~ContinuousService ()
 		{	}
@@ -99,11 +95,6 @@ namespace synthese
 		ContinuousService::isContinuous () const
 		{
 			return true;
-		}
-
-		uid ContinuousService::getId() const
-		{
-			return getKey();
 		}
 
 

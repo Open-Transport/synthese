@@ -103,5 +103,13 @@ namespace synthese
 			VariablesMap vm;
 			InterfacePage::display( stream, pv, vm, static_cast<const void*>(commercialLine), request );
 		}
+
+
+
+		JourneyBoardServiceCellInterfacePage::JourneyBoardServiceCellInterfacePage()
+		:	Registrable()
+		{
+
+		}
 	}
 }

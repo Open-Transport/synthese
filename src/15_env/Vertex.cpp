@@ -31,9 +31,6 @@ namespace synthese
 
 	namespace env
 	{
-
-
-
 		Vertex::Vertex (const AddressablePlace* place,
 				double x,
 				double y) 
@@ -81,9 +78,6 @@ namespace synthese
 			return _arrivalEdges;
 		}
 
-
-
-
 		 
 
 		void 
@@ -104,15 +98,5 @@ namespace synthese
 		{
 			_addressablePlace = place;
 		}
-
-
-
-
-
-
-
-
-
 	}
 }
-

@@ -61,26 +61,29 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::load(
+		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Load(
 			UserFavoriteJourney* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
 		){
-			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
-
 			// Properties
-			object->setKey(id);
 			object->setRank(rows->getInt(UserFavoriteJourneyTableSync::COL_RANK));
 			object->setDestinationCityName(rows->getText(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME));
 			object->setDestinationPlaceName(rows->getText(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME));
 			object->setOriginCityName(rows->getText(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME));
 			object->setOriginPlaceName(rows->getText(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME));
 
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				const User* user(UserTableSync::Get(rows->getLongLong(UserFavoriteJourneyTableSync::COL_USER_ID), env, linkLevel));
+				object->setUser(user);
+			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::save(
+		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Save(
 			UserFavoriteJourney* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -110,18 +113,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::_link(
-			UserFavoriteJourney* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
-		){
-			const User* user(UserTableSync::Get(rows->getLongLong(UserFavoriteJourneyTableSync::COL_USER_ID), object, true, temporary));
-			object->setUser(user);
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::_unlink(
-			UserFavoriteJourney* object
+		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Unlink(
+			UserFavoriteJourney* object,
+			Env* env
 		){
 			object->setUser(NULL);
 		}
@@ -154,14 +148,14 @@ namespace synthese
 
 
 
-		vector<shared_ptr<UserFavoriteJourney> > UserFavoriteJourneyTableSync::search(
+		void UserFavoriteJourneyTableSync::Search(
+			Env& env,
 			const User* user
 			, int first /*= 0*/
 			, int number /*= 0*/
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -174,23 +168,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<UserFavoriteJourney> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<UserFavoriteJourney> object(new UserFavoriteJourney);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

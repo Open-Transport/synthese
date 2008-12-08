@@ -19,3 +19,8 @@ synthese::transportwebsite::PlacesListFunction::integrate();
 synthese::transportwebsite::SiteUpdateAction::integrate();
 
 synthese::transportwebsite::TransportWebsiteRight::integrate();
+
+// Registries
+synthese::util::Env::template Integrate<synthese::transportwebsite::ObjectSiteLink>();
+synthese::util::Env::template Integrate<synthese::transportwebsite::Site>();
+synthese::util::Env::template Integrate<synthese::transportwebsite::SiteCommercialLineLink>();

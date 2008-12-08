@@ -27,7 +27,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "12_security/RightTemplate.h"
+#include "RightTemplate.h"
 
 namespace synthese
 {
@@ -57,9 +57,19 @@ namespace synthese
 		class SecurityRight : public RightTemplate<SecurityRight>
 		{
 		public:
-			static void addSubProfilesLabel(ParameterLabelsVector& map, boost::shared_ptr<const Profile> parent, std::string label);
-			std::string	displayParameter()	const;
-			bool perimeterIncludes(const std::string& perimeter) const;
+			static void addSubProfilesLabel(
+				ParameterLabelsVector& map,
+				boost::shared_ptr<Profile> parent,
+				std::string label
+			);
+
+			std::string	displayParameter(
+				util::Env* env = util::Env::GetOfficialEnv()
+			) const;
+			bool perimeterIncludes(
+				const std::string& perimeter,
+				util::Env* env = util::Env::GetOfficialEnv()
+			) const;
 		};
 	}
 }

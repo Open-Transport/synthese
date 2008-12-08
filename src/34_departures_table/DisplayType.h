@@ -25,8 +25,8 @@
 
 #include <string>
 
-#include "01_util/UId.h"
-#include "01_util/Registrable.h"
+#include "Registrable.h"
+
 
 namespace synthese
 {
@@ -40,7 +40,8 @@ namespace synthese
 		/** Type of display screen, describing the input and output facilities.
 			@ingroup m54
 		*/
-		class DisplayType : public util::Registrable<uid, DisplayType>
+		class DisplayType
+		:	public virtual util::Registrable
 		{
 		private:
 			std::string						_name;
@@ -49,8 +50,7 @@ namespace synthese
 			int								_maxStopsNumber;
 
 		public:
-			DisplayType();
-			DisplayType(const uid&);
+			DisplayType(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 			const std::string& getName() const;
 			const interfaces::Interface* getInterface() const;

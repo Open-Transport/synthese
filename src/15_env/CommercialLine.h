@@ -27,9 +27,9 @@
 
 #include "15_env/Types.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-#include "01_util/RGBColor.h"
+#include "Registrable.h"
+
+#include "RGBColor.h"
 
 namespace synthese
 {
@@ -41,7 +41,8 @@ namespace synthese
 			TRIDENT = Line
 			@ingroup m35
 		*/
-		class CommercialLine : public util::Registrable<uid, CommercialLine>
+		class CommercialLine
+		:	public virtual util::Registrable
 		{
 		private:
 			std::string			_name;		//!< Name (code)
@@ -57,7 +58,7 @@ namespace synthese
 			PlacesSet	_optionalReservationPlaces;
 
 		public:
-			CommercialLine();
+			CommercialLine(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 			const std::string& getStyle () const;
 			void setStyle (const std::string& style);

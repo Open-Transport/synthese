@@ -95,7 +95,7 @@ namespace synthese
 					_destinationCityText = favorite->getDestinationCityName();
 					_destinationPlaceText = favorite->getDestinationPlaceName();
 				}
-				catch(ObjectNotFoundException<uid,UserFavoriteJourney> e)
+				catch(ObjectNotFoundException<UserFavoriteJourney> e)
 				{
 					throw RequestException(e.getMessage());
 				}

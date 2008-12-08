@@ -55,5 +55,13 @@ namespace synthese
 
 			InterfacePage::display(stream, pv, variables, NULL, request);
 		}
+
+
+
+		PlacesListItemInterfacePage::PlacesListItemInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

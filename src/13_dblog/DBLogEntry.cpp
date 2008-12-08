@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "13_dblog/DBLogEntry.h"
+#include "DBLogEntry.h"
+#include "Registry.h"
 
 #include <sstream>
 
@@ -30,10 +31,11 @@ using namespace std;
 namespace synthese
 {
 	using namespace time;
+	using namespace util;
 
 	namespace util
 	{
-		template<> typename Registrable<uid,dblog::DBLogEntry>::Registry Registrable<uid,dblog::DBLogEntry>::_registry;
+		template<> const string Registry<dblog::DBLogEntry>::KEY("DBLogEntry");
 	}
 
 	namespace dblog
@@ -107,8 +109,9 @@ namespace synthese
 			return s.str();
 		}
 
-		DBLogEntry::DBLogEntry()
-			: _date(TIME_CURRENT)
+		DBLogEntry::DBLogEntry(RegistryKeyType key)
+		:	Registrable(key),
+			_date(TIME_CURRENT)
 			, _user(NULL)
 		{
 

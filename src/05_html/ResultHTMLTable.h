@@ -26,8 +26,9 @@
 #include <utility>
 #include <vector>
 
-#include "05_html/HTMLTable.h"
-#include "05_html/HTMLForm.h"
+#include "HTMLTable.h"
+#include "HTMLForm.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -85,7 +86,7 @@ namespace synthese
 				int					size;
 
 				template<class T>
-				void setFromResult(const RequestParameters& p, std::vector<T>& v)
+				void setFromResult(const RequestParameters& p, util::Registry<T>& v)
 				{
 					if (p.maxSize != UNKNOWN_VALUE)
 					{

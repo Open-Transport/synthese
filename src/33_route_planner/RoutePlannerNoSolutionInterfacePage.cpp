@@ -36,5 +36,13 @@ namespace synthese
 		    VariablesMap vm;
 		    InterfacePage::display(stream, ParametersVector(), vm, NULL, request);
 		}
+
+
+
+		RoutePlannerNoSolutionInterfacePage::RoutePlannerNoSolutionInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

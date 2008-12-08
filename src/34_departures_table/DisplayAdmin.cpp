@@ -24,44 +24,44 @@
 #include <utility>
 #include <sstream>
 
-#include "01_util/Constants.h"
+#include "Constants.h"
 
-#include "05_html/HTMLForm.h"
-#include "05_html/HTMLTable.h"
-#include "05_html/HTMLList.h"
-#include "05_html/PropertiesHTMLTable.h"
+#include "HTMLForm.h"
+#include "HTMLTable.h"
+#include "HTMLList.h"
+#include "PropertiesHTMLTable.h"
 
-#include "15_env/ConnectionPlaceTableSync.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
+#include "ConnectionPlaceTableSync.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
 
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/QueryString.h"
+#include "ActionFunctionRequest.h"
+#include "QueryString.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
-#include "34_departures_table/DisplayAdmin.h"
-#include "34_departures_table/DeparturesTableModule.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/UpdateDisplayScreenAction.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
-#include "34_departures_table/AddPreselectionPlaceToDisplayScreen.h"
-#include "34_departures_table/RemovePreselectionPlaceFromDisplayScreenAction.h"
-#include "34_departures_table/UpdateAllStopsDisplayScreenAction.h"
-#include "34_departures_table/AddDepartureStopToDisplayScreenAction.h"
-#include "34_departures_table/AddForbiddenPlaceToDisplayScreen.h"
-#include "34_departures_table/DisplayScreenAddDisplayedPlace.h"
-#include "34_departures_table/DisplayScreenRemovePhysicalStopAction.h"
-#include "34_departures_table/DisplayScreenRemoveDisplayedPlaceAction.h"
-#include "34_departures_table/DisplayScreenRemoveForbiddenPlaceAction.h"
-#include "34_departures_table/DisplaySearchAdmin.h"
-#include "34_departures_table/DisplayScreenRemove.h"
-#include "34_departures_table/DisplayMaintenanceAdmin.h"
-#include "34_departures_table/DisplayScreenContentRequest.h"
-#include "34_departures_table/ArrivalDepartureTableRight.h"
+#include "DisplayAdmin.h"
+#include "DeparturesTableModule.h"
+#include "DisplayScreen.h"
+#include "DisplayType.h"
+#include "UpdateDisplayScreenAction.h"
+#include "DisplayScreenTableSync.h"
+#include "UpdateDisplayPreselectionParametersAction.h"
+#include "AddPreselectionPlaceToDisplayScreen.h"
+#include "RemovePreselectionPlaceFromDisplayScreenAction.h"
+#include "UpdateAllStopsDisplayScreenAction.h"
+#include "AddDepartureStopToDisplayScreenAction.h"
+#include "AddForbiddenPlaceToDisplayScreen.h"
+#include "DisplayScreenAddDisplayedPlace.h"
+#include "DisplayScreenRemovePhysicalStopAction.h"
+#include "DisplayScreenRemoveDisplayedPlaceAction.h"
+#include "DisplayScreenRemoveForbiddenPlaceAction.h"
+#include "DisplaySearchAdmin.h"
+#include "DisplayScreenRemove.h"
+#include "DisplayMaintenanceAdmin.h"
+#include "DisplayScreenContentRequest.h"
+#include "ArrivalDepartureTableRight.h"
 
 using namespace std;
 using namespace boost;
@@ -362,13 +362,13 @@ namespace synthese
 
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(id, GET_AUTO, true);
+				_displayScreen = DisplayScreenTableSync::Get(id);
 			}
-			catch (DisplayScreen::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
 				throw AdminParametersException("Display screen not found");
 			}
-			catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 			{
 				throw AdminParametersException("Place not found");
 			}
@@ -381,7 +381,7 @@ namespace synthese
 
 			try
 			{
-				shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(request->getObjectId(), GET_AUTO, true));
+				shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(request->getObjectId()));
 				return request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(screen->getLocalization()->getKey()));
 			}
 			catch (...)

@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_messages_ScenarioSentAlarmInheritedTableSync_h__
 #define SYNTHESE_messages_ScenarioSentAlarmInheritedTableSync_h__
 
-#include "02_db/SQLiteInheritedRegistryTableSync.h"
+#include "SQLiteInheritedRegistryTableSync.h"
 
 #include "AlarmTableSync.h"
 #include "ScenarioSentAlarm.h"
@@ -42,6 +42,19 @@ namespace synthese
 			/** Constructor.
 			*/
 			ScenarioSentAlarmInheritedTableSync();
+
+
+			static void Search(
+				util::Env& env,
+				const SentScenario* scenario
+				, int first = 0
+				, int number = 0
+				, bool orderByLevel = false
+				, bool orderByStatus = false
+				, bool orderByConflict = false
+				, bool raisingOrder = false,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
 	}
 }

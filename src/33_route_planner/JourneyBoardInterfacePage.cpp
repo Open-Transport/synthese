@@ -133,5 +133,13 @@ namespace synthese
 			
 			InterfacePage::display(stream, pv, variables, static_cast<const void*>(journey), request);
 		}
+
+
+
+		JourneyBoardInterfacePage::JourneyBoardInterfacePage()
+			: Registrable(),
+		{
+
+		}
 	}
 }

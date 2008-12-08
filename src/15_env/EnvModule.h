@@ -27,11 +27,12 @@
 #include <set>
 #include <utility>
 
-#include "01_util/ModuleClass.h"
-#include "01_util/UId.h"
-#include "01_util/FactorableTemplate.h"
+#include "ModuleClass.h"
+#include "FactorableTemplate.h"
+#include "UtilTypes.h"
+#include "Env.h"
 
-#include "07_lex_matcher/LexicalMatcher.h"
+#include "LexicalMatcher.h"
 
 #include "15_env/Types.h"
 
@@ -101,20 +102,34 @@ namespace synthese
 				All the containers storong objects typed (or subtyped) as AddressablePlace
 				are inspected.
 			*/
-			static boost::shared_ptr<const AddressablePlace> fetchAddressablePlace (const uid& id);
-			static boost::shared_ptr<AddressablePlace> fetchUpdateableAddressablePlace (const uid& id);
+			static boost::shared_ptr<const AddressablePlace> FetchAddressablePlace(
+				const util::RegistryKeyType& id,
+				const util::Env& env = *util::Env::GetOfficialEnv()
+			);
 
-			static boost::shared_ptr<const IncludingPlace> fetchIncludingPlace (const uid& id);
+			static boost::shared_ptr<AddressablePlace> FetchEditableAddressablePlace(
+				const util::RegistryKeyType& id,
+				util::Env& env = *util::Env::GetOfficialEnv()
+			);
 
-			static boost::shared_ptr<const Place> fetchPlace (const uid& id);
+			static boost::shared_ptr<const IncludingPlace> FetchIncludingPlace(
+				const util::RegistryKeyType& id,
+				const util::Env& env = *util::Env::GetOfficialEnv()
+			);
+
+			static boost::shared_ptr<const Place> FetchPlace(
+				const util::RegistryKeyType& id,
+				const util::Env& env = *util::Env::GetOfficialEnv()
+			);
+
 			static const Place* FetchPlace(const std::string& city, const std::string& place);
 
 
- 		    static boost::shared_ptr<const Vertex> fetchVertex (const uid& id);
+ 		    static boost::shared_ptr<const Vertex> FetchVertex(
+				const util::RegistryKeyType& id,
+				const util::Env& env = *util::Env::GetOfficialEnv()
+			);
 
-			/** Retrieves all lines associated withb a given commercial line id.
-			 */
-			static LineSet fetchLines (const uid& commercialLineId);
 
 			/** Find the best matches in the city list comparing to a text entry.
 				@param fuzzyName The text entry to compare
@@ -135,8 +150,10 @@ namespace synthese
 			static void RemoveFromCitiesMatchers(City* city);
 
 
-			static boost::shared_ptr<Path> fetchPath (const uid& id);
-			static boost::shared_ptr<NonPermanentService> fetchService (const uid& id);
+			static boost::shared_ptr<NonPermanentService> FetchEditableService(
+				const util::RegistryKeyType& id,
+				util::Env& env = *util::Env::GetOfficialEnv()
+			);
 
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(
 				const security::RightsOfSameClassMap& rights 

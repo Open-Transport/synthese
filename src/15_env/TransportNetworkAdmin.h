@@ -25,9 +25,9 @@
 #ifndef SYNTHESE_TransportNetworkAdmin_H__
 #define SYNTHESE_TransportNetworkAdmin_H__
 
-#include "05_html/ResultHTMLTable.h"
+#include "ResultHTMLTable.h"
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {

@@ -20,36 +20,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/DisplaySearchAdmin.h"
-#include "34_departures_table/AdvancedSelectTableSync.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/CreateDisplayScreenAction.h"
-#include "34_departures_table/DisplayAdmin.h"
-#include "34_departures_table/DisplayMaintenanceAdmin.h"
-#include "34_departures_table/DisplayScreenContentRequest.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/ArrivalDepartureTableRight.h"
-#include "34_departures_table/DeparturesTableModule.h"
-#include "34_departures_table/BroadcastPointsAdmin.h"
+#include "DisplaySearchAdmin.h"
+#include "AdvancedSelectTableSync.h"
+#include "DisplayScreenTableSync.h"
+#include "CreateDisplayScreenAction.h"
+#include "DisplayAdmin.h"
+#include "DisplayMaintenanceAdmin.h"
+#include "DisplayScreenContentRequest.h"
+#include "DisplayScreen.h"
+#include "DisplayType.h"
+#include "ArrivalDepartureTableRight.h"
+#include "DeparturesTableModule.h"
+#include "BroadcastPointsAdmin.h"
 
-#include "11_interfaces/InterfaceModule.h"
+#include "InterfaceModule.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "05_html/ActionResultHTMLTable.h"
-#include "05_html/SearchFormHTMLTable.h"
+#include "ActionResultHTMLTable.h"
+#include "SearchFormHTMLTable.h"
 
-#include "30_server/ActionFunctionRequest.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/AdminModule.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminParametersException.h"
+#include "AdminModule.h"
+#include "AdminRequest.h"
+#include "ModuleAdmin.h"
+#include "AdminParametersException.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/ConnectionPlaceTableSync.h"
-#include "15_env/City.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ConnectionPlaceTableSync.h"
+#include "City.h"
+
+#include <boost/foreach.hpp>
 
 using namespace boost;
 using namespace std;
@@ -126,8 +128,9 @@ namespace synthese
 
 		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-
-			vector<shared_ptr<DisplayScreen> >	_result(DisplayScreenTableSync::search(
+			Env env;
+			DisplayScreenTableSync::Search(
+				env,
 				request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 				, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 				, READ
@@ -150,9 +153,9 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SEARCH_STATE
 				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
 				, _requestParameters.raisingOrder
-			));
+			)
 			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, _result);
+			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<DisplayScreen>());
 
 
 			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);
@@ -206,9 +209,8 @@ namespace synthese
 
 			stream << t.open();
 
-			for (vector<shared_ptr<DisplayScreen> >::const_iterator it = _result.begin(); it != _result.end(); ++it)
+			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, env.template getRegistry<DisplayScreen>())
 			{
-				shared_ptr<DisplayScreen> screen = *it;
 				updateRequest.setObjectId(screen->getKey());
 				viewRequest.setObjectId(screen->getKey());
 				maintRequest.setObjectId(screen->getKey());
@@ -310,7 +312,7 @@ namespace synthese
 
 		std::string DisplaySearchAdmin::getParameterValue() const
 		{
-			return _place.get() ? Conversion::ToString(_place->getId()) : string();
+			return _place.get() ? Conversion::ToString(_place->getKey()) : string();
 		}
 
 		std::string DisplaySearchAdmin::getIcon() const

@@ -24,19 +24,19 @@
 
 #include "RoadTableSync.h"
 
-#include "15_env/CityTableSync.h"
-#include "15_env/FareTableSync.h"
-#include "15_env/BikeComplianceTableSync.h"
-#include "15_env/HandicappedComplianceTableSync.h"
-#include "15_env/PedestrianComplianceTableSync.h"
-#include "15_env/ReservationRuleTableSync.h"
+#include "CityTableSync.h"
+#include "FareTableSync.h"
+#include "BikeComplianceTableSync.h"
+#include "HandicappedComplianceTableSync.h"
+#include "PedestrianComplianceTableSync.h"
+#include "ReservationRuleTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -58,11 +58,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<RoadTableSync>::TABLE_ID = 15;
 		template<> const bool SQLiteTableSyncTemplate<RoadTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::load(Road* object, const db::SQLiteResultSPtr& rows )
-		{
-			// ID
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
-
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Load(
+			Road* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			// Name
 			std::string name (rows->getText (RoadTableSync::COL_NAME));
 			object->setName(name);
@@ -71,56 +72,51 @@ namespace synthese
 			Road::RoadType roadType = (Road::RoadType) rows->getInt (RoadTableSync::COL_ROADTYPE);
 			object->setType(roadType);
 
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::_link(Road* object, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			// City
-			uid cityId (rows->getLongLong (RoadTableSync::COL_CITYID));
-			object->setCity(CityTableSync::Get(cityId, object, true, temporary));
-
-			// Fare
-			uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));
-			object->setFare(FareTableSync::Get (fareId, object, true, temporary));
-
-			uid bikeComplianceId (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID));
-			object->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, object, true, temporary));
-
-			uid handicappedComplianceId (rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-			object->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId, object, true, temporary));
-
-			uid pedestrianComplianceId (rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID));
-			object->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, object, true, temporary));
-
-			uid reservationRuleId (rows->getLongLong (RoadTableSync::COL_RESERVATIONRULEID));
-			object->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, object, true, temporary));
-
-
-			// Links to the loaded object
-			if (temporary == GET_REGISTRY)
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				City* city(City::GetUpdateable(cityId).get());
-				city->getRoadsMatcher ().add (object->getName (), object);
-				city->getAllPlacesMatcher().add(object->getName() + " [voie]", static_cast<const Place*>(object));
-			}
+				// City
+				uid cityId (rows->getLongLong (RoadTableSync::COL_CITYID));
+				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 
+				// Fare
+				uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));
+				object->setFare(FareTableSync::Get (fareId, env, linkLevel));
+
+				uid bikeComplianceId (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID));
+				object->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel));
+
+				uid handicappedComplianceId (rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+				object->setHandicappedCompliance(HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel));
+
+				uid pedestrianComplianceId (rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID));
+				object->setPedestrianCompliance(PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel));
+
+				uid reservationRuleId (rows->getLongLong (RoadTableSync::COL_RESERVATIONRULEID));
+				object->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel));
+
+
+				// Links to the loaded object
+//				if (temporary == GET_REGISTRY)
+				{
+					City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
+					city->getRoadsMatcher ().add (object->getName (), object);
+					city->getAllPlacesMatcher().add(object->getName() + " [voie]", static_cast<const Place*>(object));
+				}
+			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::_unlink(Road* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Unlink(
+			Road* obj,
+			Env* env
+		){
 			City* city = const_cast<City*>(obj->getCity ());
 			city->getRoadsMatcher ().remove (obj->getName ());
 			city->getAllPlacesMatcher().remove(obj->getName() + " [voie]");
 
 			obj->setCity(NULL);
-			obj->setFare(NULL);
-			obj->setBikeCompliance(NULL);
-			obj->setHandicappedCompliance(NULL);
-			obj->setPedestrianCompliance(NULL);
-			obj->setReservationRule(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::save(Road* object)
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Save(Road* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -164,8 +160,12 @@ namespace synthese
 			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
-		vector<shared_ptr<Road> > RoadTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		void RoadTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -182,22 +182,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-				vector<shared_ptr<Road> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<Road> object(new Road);
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

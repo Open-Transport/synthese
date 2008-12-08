@@ -7,7 +7,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class BroadcastScenario : public Registrable<BroadcastScenario, util::uid>
+		class BroadcastScenario : public virtual util::Registrable
 		{
 		private:
 			std::string									_name;

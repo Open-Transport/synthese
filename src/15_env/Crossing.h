@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_ENV_CROSSING_H
 #define SYNTHESE_ENV_CROSSING_H
 
-#include "15_env/ConnectionPlace.h"
+#include "ConnectionPlace.h"
 
-#include "01_util/Registrable.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -37,8 +37,7 @@ namespace synthese
 			@ingroup m35
 		*/
 		class Crossing
-			: public util::Registrable<uid,Crossing>
-			, public ConnectionPlace
+		:	public ConnectionPlace
 		{
 		 private:
 
@@ -70,8 +69,6 @@ namespace synthese
 				*/
 				virtual int getScore() const;
 
-				virtual uid getId() const;
-
 				virtual int						getMinTransferDelay() const;
 
 				/** Adds an address to this place.
@@ -82,8 +79,10 @@ namespace synthese
 
 			//@}
 
-			Crossing (const uid& key = UNKNOWN_VALUE,
-				  const City* city = NULL);
+			Crossing(
+				util::RegistryKeyType key = UNKNOWN_VALUE,
+				const City* city = NULL
+			);
 			      
 			~Crossing ();
 		};

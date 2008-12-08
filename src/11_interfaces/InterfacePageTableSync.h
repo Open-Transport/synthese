@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteDirectTableSyncTemplate.h"
+#include "SQLiteDirectTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -70,4 +70,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_InterfacePageTableSync_H__
-

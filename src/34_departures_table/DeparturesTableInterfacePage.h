@@ -61,6 +61,8 @@ namespace synthese
 		class DeparturesTableInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, DeparturesTableInterfacePage>
 		{
 		public:
+			DeparturesTableInterfacePage();
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 

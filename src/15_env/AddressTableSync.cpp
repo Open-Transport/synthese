@@ -58,71 +58,72 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<AddressTableSync>::TABLE_ID = 2;
 		template<> const bool SQLiteTableSyncTemplate<AddressTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::load(Address* object, const db::SQLiteResultSPtr& rows)
-		{
-			// Columns reading
-		    uid id (rows->getLongLong (TABLE_COL_ID));
-
+		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Load(
+			Address* object
+			, const db::SQLiteResultSPtr& rows
+			, Env* env
+			, LinkLevel linkLevel
+		){
 			// Properties
-		    object->setKey (id);
 		    object->setMetricOffset (rows->getDouble (AddressTableSync::COL_METRICOFFSET));
 		    object->setXY (rows->getDouble (AddressTableSync::COL_X), rows->getDouble (AddressTableSync::COL_Y));
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::_link(Address* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			// Columns reading
-			uid placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
-			int tableId = decodeTableId(placeId);
-			uid roadId(rows->getLongLong(AddressTableSync::COL_ROADID));
-
-			// Links from the object
-			try
+		
+			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
-				if (tableId == CrossingTableSync::TABLE_ID)
-					obj->setPlace(CrossingTableSync::Get(placeId, obj, true, temporary));
-				else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
-					obj->setPlace(ConnectionPlaceTableSync::Get(placeId, obj, true, temporary));
+				// Columns reading
+				uid placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
+				int tableId = decodeTableId(placeId);
+				uid roadId(rows->getLongLong(AddressTableSync::COL_ROADID));
 
-				obj->setRoad (RoadTableSync::Get (roadId, obj, true, temporary));
+				// Links from the object
+				try
+				{
+					if (tableId == CrossingTableSync::TABLE_ID)
+						object->setPlace(CrossingTableSync::Get(placeId, env, linkLevel).get());
+					else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
+						object->setPlace(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
 
-				// Links to the object
-				shared_ptr<AddressablePlace> place = 
-					EnvModule::fetchUpdateableAddressablePlace (placeId);
-				shared_ptr<Road> road = Road::GetUpdateable(roadId);
+					object->setRoad (RoadTableSync::Get (roadId, env, linkLevel).get());
 
-				place->addAddress(obj);
-				road->addAddress(obj);
-			}
-			catch (Crossing::ObjectNotFoundException& e)
-			{
-				throw LinkException<AddressTableSync>(obj->getKey(), "Crossing ("+ AddressTableSync::COL_PLACEID +")", e);
-			}
-			catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
-			{
-				throw LinkException<AddressTableSync>(obj->getKey(), "Connection place ("+ AddressTableSync::COL_PLACEID +")", e);
-			}
-			catch (Road::ObjectNotFoundException& e)
-			{
-				throw LinkException<AddressTableSync>(obj->getKey(), AddressTableSync::COL_ROADID, e);
+					// Links to the object
+					shared_ptr<AddressablePlace> place(EnvModule::FetchEditableAddressablePlace(placeId, *env));
+					shared_ptr<Road> road(RoadTableSync::GetEditable(roadId, env, linkLevel));
+
+					place->addAddress(object);
+					road->addAddress(object);
+				}
+				catch (ObjectNotFoundException<Crossing>& e)
+				{
+					throw LinkException<AddressTableSync>(object->getKey(), "Crossing ("+ AddressTableSync::COL_PLACEID +")", e);
+				}
+				catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+				{
+					throw LinkException<AddressTableSync>(object->getKey(), "Connection place ("+ AddressTableSync::COL_PLACEID +")", e);
+				}
+				catch (ObjectNotFoundException<Road>& e)
+				{
+					throw LinkException<AddressTableSync>(object->getKey(), AddressTableSync::COL_ROADID, e);
+				}
 			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::_unlink(Address* obj)
-		{
-			shared_ptr<AddressablePlace> place(EnvModule::fetchUpdateableAddressablePlace(obj->getPlace()->getId()));
+		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Unlink(
+			Address* obj,
+			Env* env
+		){
+			shared_ptr<AddressablePlace> place(EnvModule::FetchEditableAddressablePlace(obj->getPlace()->getKey(), *env));
 //			place->removeAddress(obj);
 
-			shared_ptr<Road> road(Road::GetUpdateable(obj->getRoad()->getKey()));
+			shared_ptr<Road> road(RoadTableSync::GetEditable(obj->getRoad()->getKey(), env));
 //			road->removeAddress(obj);
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::save(Address* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Save(
+			Address* object
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -162,60 +163,12 @@ namespace synthese
 
 		}
 
-/*
-		void AddressTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
-		{
-			while (rows->next ())
-			{
-				if (Address::Contains(rows->getLongLong (TABLE_COL_ID)))
-				{
-					shared_ptr<Address> address(Address::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-					unlink(address.get());
-					load (address.get(), rows);
-					link(address.get(), rows);
-				}
-				else
-				{
-					Address* object(new Address);
-					load(object, rows);
-					link(object, rows);
-					object->store();
-					
-				}
-			}
-		}
-		
-		void AddressTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (Address::Contains(id))
-				{
-					shared_ptr<Address> address(Address::GetUpdateable(id));
-					unlink(address.get());
-					load (address.get(), rows);
-					link(address.get(), rows);
-				}
-			}
-		}
-
-		void AddressTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (Address::Contains(id))
-				{
-					unlink(Address::Get(id));
-					Address::Remove(id);
-				}
-			}
-		}
-*/
-		std::vector<shared_ptr<Address> > AddressTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
+		void AddressTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -229,22 +182,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Address> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<Address> object(new Address);
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

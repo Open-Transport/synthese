@@ -23,10 +23,7 @@
 #ifndef SYNTHESE_ENV_HANDICAPPEDCOMPLIANCE_H
 #define SYNTHESE_ENV_HANDICAPPEDCOMPLIANCE_H
 
-#include "15_env/Compliance.h"
-
-#include "01_util/RegistrableWithNeutralElement.h"
-#include "01_util/UId.h"
+#include "Compliance.h"
 
 #include <boost/logic/tribool.hpp>
 #include <string>
@@ -43,19 +40,15 @@ namespace synthese
 			MobilityRestricted
 		 @ingroup m35
 		 */
-		class HandicappedCompliance : 
-			public util::RegistrableWithNeutralElement<uid,HandicappedCompliance>
-			, public Compliance
+		class HandicappedCompliance
+		:	public Compliance
 		{
 		private:
 
 		public:
-			HandicappedCompliance();
+			HandicappedCompliance(util::RegistryKeyType key = UNKNOWN_VALUE);
 			~HandicappedCompliance();
-
 		};
-
-
 	}
 }
 

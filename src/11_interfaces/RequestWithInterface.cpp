@@ -76,12 +76,12 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_INTERFACE, false, "RWI"));
 				if (id != UNKNOWN_VALUE)
 				{
-					_interface = Interface::Get(id);
+					_interface = Env::GetOfficialEnv()->template getRegistry<Interface>().get(id);
 				}
 
 				_redirectAfterAction = !map.getBool(PARAMETER_NO_REDIRECT_AFTER_ACTION, false, false, "RWI");
 			}
-			catch (Interface::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<Interface>& e)
 			{
 				throw RequestException("Specified interface not found : "+ e.getMessage());
 			}

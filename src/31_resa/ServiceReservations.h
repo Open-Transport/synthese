@@ -44,10 +44,8 @@ namespace synthese
 		class ServiceReservations
 		{
 		public:
-			typedef std::vector<boost::shared_ptr<ReservationTransaction> > Reservations;
-
 			const env::Service*			service;
-			Reservations			reservations;
+			Env						reservationsEnv;
 			int						seatsNumber;
 			bool					overflow;
 			bool					status;

@@ -20,20 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/TransportNetwork.h"
+#include "TransportNetwork.h"
+#include "Registry.h"
 
 namespace synthese
 {
 	namespace util
 	{
-		template<> typename Registrable<uid,env::TransportNetwork>::Registry Registrable<uid,env::TransportNetwork>::_registry;
+		template<> const std::string Registry<env::TransportNetwork>::KEY("TransportNetwork");
 	}
 
 	namespace env
 	{
-		TransportNetwork::TransportNetwork (uid id, std::string name)
-			: synthese::util::Registrable<uid,TransportNetwork> (id)
-			, _name (name)
+		TransportNetwork::TransportNetwork(
+			util::RegistryKeyType id,
+			std::string name
+		):	util::Registrable(id),
+			_name (name)
 		{
 		}
 

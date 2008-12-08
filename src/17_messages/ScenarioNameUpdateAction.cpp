@@ -27,10 +27,13 @@
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/ScenarioFolder.h"
 #include "17_messages/ScenarioFolderTableSync.h"
+#include "ScenarioTemplateInheritedTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
+
+#include "Env.h"
 
 using namespace std;
 using namespace boost;
@@ -59,7 +62,7 @@ namespace synthese
 			try
 			{
 				// Scenario
-				_scenario.reset(ScenarioTableSync::GetUpdateable(_request->getObjectId()));
+				_scenario = ScenarioTableSync::GetEditable(_request->getObjectId());
 
 				// Name
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
@@ -73,13 +76,14 @@ namespace synthese
 					if (folderId != 0)
 						_folder = ScenarioFolderTableSync::Get(folderId);
 
-					vector<shared_ptr<ScenarioTemplate> > existing = ScenarioTableSync::searchTemplate(folderId, _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
-					if (!existing.empty())
+					Env env;
+					ScenarioTemplateInheritedTableSync::Search(env, folderId, _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
+					if (!env.template getRegistry<ScenarioTemplate>().empty())
 						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
 
 				}
 			}
-			catch (ObjectNotFoundException<uid,Scenario>& e)
+			catch (ObjectNotFoundException<Scenario>& e)
 			{
 				throw ActionException(e.getMessage());
 			}

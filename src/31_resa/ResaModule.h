@@ -23,21 +23,25 @@
 #ifndef SYNTHESE_ResaModule_h__
 #define SYNTHESE_ResaModule_h__
 
-#include "05_html/ResultHTMLTable.h"
+#include "ResultHTMLTable.h"
 
-#include "30_server/ActionFunctionRequest.h"
+#include "ActionFunctionRequest.h"
 
 #include "31_resa/Types.h"
 
-#include "01_util/ModuleClass.h"
-#include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
+#include "ModuleClass.h"
+#include "FactorableTemplate.h"
 
 #include <map>
 #include <ostream>
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
 	namespace admin
 	{
 		class AdminRequest;
@@ -179,7 +183,7 @@ namespace synthese
 
 			static void DisplayResaDBLog(
 				std::ostream& stream
-				, std::vector<boost::shared_ptr<dblog::DBLogEntry> >& resats
+				, util::Env& resaEnv
 				, const std::string& parameterDate
 				, server::FunctionRequest<admin::AdminRequest>& searchRequest
 				, server::ActionFunctionRequest<CancelReservationAction,admin::AdminRequest>& cancelRequest

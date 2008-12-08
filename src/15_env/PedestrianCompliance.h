@@ -23,10 +23,7 @@
 #ifndef SYNTHESE_PEDESTRIAN_COMPLIANCE_H
 #define SYNTHESE_PEDESTRIAN_COMPLIANCE_H
 
-#include "15_env/Compliance.h"
-
-#include "01_util/RegistrableWithNeutralElement.h"
-#include "01_util/UId.h"
+#include "Compliance.h"
 
 #include <boost/logic/tribool.hpp>
 #include <string>
@@ -39,14 +36,12 @@ namespace synthese
 		/** Pedestrian compliance class.
 		 @ingroup m35
 		*/
-		class PedestrianCompliance : 
-			public util::RegistrableWithNeutralElement<uid,PedestrianCompliance>
-			, public Compliance
+		class PedestrianCompliance
+		:	public Compliance
 		{
 		public:
-			PedestrianCompliance();
+			PedestrianCompliance(util::RegistryKeyType key = UNKNOWN_VALUE);
 			~PedestrianCompliance();
-
 		};
 	}
 }

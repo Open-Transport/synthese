@@ -29,3 +29,7 @@ synthese::interfaces::NonPredefinedInterfacePage::integrate();
 
 synthese::interfaces::SimplePageRequest::integrate();
 synthese::interfaces::RedirRequest::integrate();
+
+// Registries
+synthese::util::Env::template Integrate<synthese::interfaces::Interface>();
+synthese::util::Env::template Integrate<synthese::interfaces::InterfacePage>();

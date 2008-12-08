@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_LineMarkerInterfacePage_H__
 #define SYNTHESE_LineMarkerInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
+#include "InterfacePage.h"
 
-#include "01_util/FactorableTemplate.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -52,6 +52,8 @@ namespace synthese
 		class LineMarkerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, LineMarkerInterfacePage>
 		{
 		public:
+			LineMarkerInterfacePage();
+
 			/** Display of line of schedule sheet.
 				@param stream Stream to write on
 				@param vars Execution variables
@@ -76,4 +78,5 @@ namespace synthese
 		};
 	}
 }
+
 #endif // SYNTHESE_LineMarkerInterfacePage_H__

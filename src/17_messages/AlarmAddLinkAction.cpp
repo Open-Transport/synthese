@@ -59,7 +59,7 @@ namespace synthese
 		ParametersMap AlarmAddLinkAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_ALARM_ID, _alarm.get() ? _alarm->getId() : uid(0));
+			map.insert(PARAMETER_ALARM_ID, _alarm.get() ? _alarm->getKey() : uid(0));
 			map.insert(PARAMETER_RECIPIENT_KEY, _recipientKey);
 			map.insert(PARAMETER_OBJECT_ID, _objectId);
 			return map;
@@ -73,12 +73,12 @@ namespace synthese
 				throw ActionException("Specified recipient not found");
 
 			// Alarm ID
-			uid id(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
+			RegistryKeyType id(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
 			try
 			{
-				_alarm.reset(AlarmTableSync::Get(id, true));
+				_alarm = AlarmTableSync::Get(id);
 			}
-			catch (...)
+			catch (ObjectNotFoundException<Alarm>)
 			{
 				throw ActionException("Specified alarm not found");
 			}
@@ -92,9 +92,9 @@ namespace synthese
 			// Action
 			shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
 			aol->setRecipientKey(_recipientKey);
-			aol->setAlarmId(_alarm->getId());
+			aol->setAlarmId(_alarm->getKey());
 			aol->setObjectId(_objectId);
-			AlarmObjectLinkTableSync::save(aol.get());
+			AlarmObjectLinkTableSync::Save(aol.get());
 
 			// Log
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
@@ -124,7 +124,7 @@ namespace synthese
 			_alarm = alarm;
 		}
 
-		void AlarmAddLinkAction::setObjectId( uid id )
+		void AlarmAddLinkAction::setObjectId(RegistryKeyType id )
 		{
 			_objectId = id;
 		}

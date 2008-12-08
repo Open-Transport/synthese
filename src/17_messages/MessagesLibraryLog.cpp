@@ -137,7 +137,7 @@ namespace synthese
 		void MessagesLibraryLog::AddDeleteEntry( const AlarmTemplate* alarm , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(alarm->getId()));
+			content.push_back(Conversion::ToString(alarm->getKey()));
 			stringstream text;
 			text
 				<< "Suppression du message " << alarm->getShortMessage()

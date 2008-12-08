@@ -21,8 +21,10 @@
 */
 
 #include "BikeCompliance.h"
+#include "Registry.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -31,23 +33,22 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::BikeCompliance>::Registry Registrable<uid,env::BikeCompliance>::_registry;
-		template<> boost::shared_ptr<const env::BikeCompliance> RegistrableWithNeutralElement<uid,env::BikeCompliance>::_neutral(new env::BikeCompliance);
+		template<> const string Registry<env::BikeCompliance>::KEY("BikeCompliance");
 	}
 
 
 	namespace env
 	{
 
-		BikeCompliance::BikeCompliance()
-		: RegistrableWithNeutralElement<uid, BikeCompliance>()
-		, Compliance(false, UNKNOWN_VALUE)
+		BikeCompliance::BikeCompliance(
+			RegistryKeyType key
+		)	: Registrable(key)
+			, Compliance(false, UNKNOWN_VALUE)
 		{
 		}
 
 		BikeCompliance::~BikeCompliance()
 		{
 		}
-
 	}
 }

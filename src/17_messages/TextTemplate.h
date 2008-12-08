@@ -25,8 +25,7 @@
 
 #include <string>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 #include "17_messages/Types.h"
 
@@ -37,7 +36,8 @@ namespace synthese
 		/** Text template to paste in an alarm.
 			@ingroup m17
 		*/
-		class TextTemplate : public util::Registrable<uid, TextTemplate>
+		class TextTemplate
+		:	public virtual util::Registrable
 		{
 		private:
 			std::string	_name;
@@ -48,7 +48,7 @@ namespace synthese
 			AlarmLevel	_level;
 
 		public:
-			TextTemplate();
+			TextTemplate(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 			//! @name Getters
 			//@{

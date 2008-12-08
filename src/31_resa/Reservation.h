@@ -27,10 +27,9 @@
 
 #include "31_resa/Types.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -46,10 +45,11 @@ namespace synthese
 
 			@warning Do not create a single Reservation object. Use ReservationTransaction::newReservation() instead.
 		*/
-		class Reservation : public util::Registrable<uid,Reservation>
+		class Reservation
+		:	public virtual util::Registrable
 		{
 		public:
-			Reservation();
+			Reservation(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 
 		private:

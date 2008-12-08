@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_Scenario_h__
 #define SYNTHESE_Scenario_h__
 
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 #include <string>
 #include <set>
@@ -41,12 +41,15 @@ namespace synthese
 				- the sent scenario
 		*/
 		class Scenario
+			:	public virtual util::Registrable
 		{
 		private:
 			std::string					_name;
 
-		public:
+		protected:
 			Scenario(const std::string name = std::string());
+
+		public:
 			virtual ~Scenario();
 
 			/** Name getter.
@@ -63,8 +66,6 @@ namespace synthese
 				@date 2007
 			*/
 			void setName(const std::string& name);
-
-			virtual uid getId() const = 0;
 		};
 	}
 }

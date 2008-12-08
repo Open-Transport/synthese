@@ -31,19 +31,16 @@
 #include <boost/shared_ptr.hpp>
 
 #include "ReservationRule.h"
-
-#include "SQLiteDirectTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class ReservationRule;
-
 		/** ReservationRule table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class ReservationRuleTableSync : public db::SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>
+		class ReservationRuleTableSync : public db::SQLiteRegistryTableSyncTemplate<ReservationRuleTableSync,ReservationRule>
 		{
 		public:
 			static const std::string COL_TYPE;
@@ -70,35 +67,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<ReservationRule> > Search(
-				// other search parameters ,
-				int first = 0, int number = 0);
-
-
-		protected:
-
-			/** Action to do on ReservationRule creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on ReservationRule creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on ReservationRule deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
+			static void Search(
+				util::Env& env,
+				int first = 0,
+				int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
 	}
 }

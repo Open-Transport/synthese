@@ -26,27 +26,29 @@
 #include "CommercialLineAdmin.h"
 #include "EnvModule.h"
 
-#include "04_time/Schedule.h"
+#include "Schedule.h"
 
-#include "05_html/HTMLTable.h"
-#include "05_html/HTMLModule.h"
+#include "HTMLTable.h"
+#include "HTMLModule.h"
 
-#include "15_env/ReservationRule.h"
-#include "15_env/Line.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/LineStop.h"
-#include "15_env/LineStopTableSync.h"
-#include "15_env/ScheduledService.h"
-#include "15_env/ScheduledServiceTableSync.h"
-#include "15_env/ContinuousService.h"
-#include "15_env/ContinuousServiceTableSync.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/TransportNetworkRight.h"
+#include "ReservationRule.h"
+#include "Line.h"
+#include "LineTableSync.h"
+#include "LineStop.h"
+#include "LineStopTableSync.h"
+#include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
+#include "ContinuousService.h"
+#include "ContinuousServiceTableSync.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "TransportNetworkRight.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
+#include "QueryString.h"
+#include "Request.h"
 
-#include "32_admin/AdminParametersException.h"
+#include "AdminParametersException.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -96,10 +98,14 @@ namespace synthese
 			// Reservation
 			bool reservation(_line->getReservationRule() && _line->getReservationRule()->isCompliant() == true);
 
+			// Env
+			Env env;
+			LineStopTableSync::Search(env, _line->getKey());
+			ScheduledServiceTableSync::Search(env, _line->getKey());
+			ContinuousServiceTableSync::Search(env, _line->getKey());
+
 			stream << "<h1>Arrêts desservis</h1>";
 
-			vector<shared_ptr<LineStop> > linestops(LineStopTableSync::Search(_line->getKey()));
-			
 			HTMLTable::ColsVector v;
 			v.push_back("Rang");
 			v.push_back("Arrêt");
@@ -112,14 +118,14 @@ namespace synthese
 
 			stream << t.open();
 
-			for (vector<shared_ptr<LineStop> >::const_iterator it(linestops.begin()); it != linestops.end(); ++it)
+			BOOST_FOREACH(shared_ptr<LineStop> lineStop, env.template getRegistry<LineStop>())
 			{
 				stream << t.row();
-				stream << t.col() << (*it)->getRankInPath();
-				stream << t.col() << (*it)->getConnectionPlace()->getFullName();
-				stream << t.col() << ((*it)->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
-				stream << t.col() << ((*it)->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
-				stream << t.col() << ((*it)->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
+				stream << t.col() << lineStop->getRankInPath();
+				stream << t.col() << lineStop->getConnectionPlace()->getFullName();
+				stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
+				stream << t.col() << (lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
+				stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
 				if (reservation)
 					stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");
 			}
@@ -128,8 +134,7 @@ namespace synthese
 
 			stream << "<h1>Services à horaires</h1>";
 
-			vector<shared_ptr<ScheduledService> > services(ScheduledServiceTableSync::search(_line->getKey()));
-
+			const Registry<ScheduledService>& services(env.template getRegistry<ScheduledService>());
 			if (services.empty())
 				stream << "<p>Aucun service à horaire</p>";
 			else
@@ -144,13 +149,13 @@ namespace synthese
 
 				stream << ts.open();
 
-				for (vector<shared_ptr<ScheduledService> >::const_iterator it(services.begin()); it != services.end(); ++it)
+				BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
 				{
-					Schedule ds((*it)->getDepartureSchedule());
-					Schedule as((*it)->getLastArrivalSchedule());
+					Schedule ds(service->getDepartureSchedule());
+					Schedule as(service->getLastArrivalSchedule());
 					
 					stream << ts.row();
-					stream << ts.col() << (*it)->getServiceNumber();
+					stream << ts.col() << service->getServiceNumber();
 					
 					stream << ts.col() << ds.toString();
 					stream << ts.col() << as.toString();
@@ -166,8 +171,7 @@ namespace synthese
 
 			stream << "<h1>Services continus</h1>";
 
-			vector<shared_ptr<ContinuousService> > cservices(ContinuousServiceTableSync::search(_line->getKey()));
-
+			const Registry<ContinuousService>& cservices(env.template getRegistry<ContinuousService>());
 			if (cservices.empty())
 				stream << "<p>Aucun service continu</p>";
 			else
@@ -185,25 +189,25 @@ namespace synthese
 
 				stream << tc.open();
 
-				for (vector<shared_ptr<ContinuousService> >::const_iterator it(cservices.begin()); it != cservices.end(); ++it)
+				BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
 				{
 					stream << tc.row();
 
-					Schedule ds((*it)->getDepartureSchedule());
-					Schedule as((*it)->getLastArrivalSchedule());
+					Schedule ds(service->getDepartureSchedule());
+					Schedule as(service->getLastArrivalSchedule());
 
 					stream << tc.col() << ds.toString();
-					ds += (*it)->getRange();
+					ds += service->getRange();
 					stream << tc.col() << ds.toString();
 
 					stream << tc.col() << as.toString();
-					as += (*it)->getRange();
+					as += service->getRange();
 					stream << tc.col() << as.toString();
 					
 					stream << tc.col() << (as - ds);
 
-					stream << tc.col() << (*it)->getRange();
-					stream << tc.col() << (*it)->getMaxWaitingTime();
+					stream << tc.col() << service->getRange();
+					stream << tc.col() << service->getMaxWaitingTime();
 					
 					stream << tc.col();
 				}

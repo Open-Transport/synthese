@@ -79,6 +79,8 @@ namespace synthese
 		class JourneyBoardServiceCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardServiceCellInterfacePage>
 		{
 		public:
+			JourneyBoardServiceCellInterfacePage();
+
 			/** Display.
 				@param stream Stream to write on
 				@param serviceUse The service use to display

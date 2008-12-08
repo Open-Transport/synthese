@@ -22,15 +22,17 @@
 
 #include "DeleteScenarioAction.h"
 
-#include "17_messages/ScenarioTemplateInheritedTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/AlarmObjectLinkTableSync.h"
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/MessagesLibraryLog.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "AlarmTemplateInheritedTableSync.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "ScenarioTemplate.h"
+#include "MessagesLibraryLog.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/Request.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Request.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -60,7 +62,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
 			try
 			{
-				_scenario.reset(ScenarioTemplateInheritedTableSync::Get(id));
+				_scenario = ScenarioTemplateInheritedTableSync::Get(id);
 			}
 			catch(...)
 			{
@@ -73,11 +75,12 @@ namespace synthese
 		{
 
 			// The action on the alarms
-			vector<shared_ptr<AlarmTemplate> > alarms = AlarmTableSync::searchTemplates(_scenario.get());
-			for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
+			Env env;
+			AlarmTemplateInheritedTableSync::Search(env,_scenario.get());
+			BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.template getRegistry<AlarmTemplate>())
 			{
-				AlarmObjectLinkTableSync::Remove((*it)->getKey());
-				AlarmTableSync::Remove((*it)->getKey());
+				AlarmObjectLinkTableSync::Remove(alarm->getKey());
+				AlarmTableSync::Remove(alarm->getKey());
 			}
 
 			// Action

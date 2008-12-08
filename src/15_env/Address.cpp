@@ -20,15 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Address.h"
-#include "15_env/ConnectionPlace.h"
-#include "15_env/Edge.h"
+#include "Address.h"
+#include "ConnectionPlace.h"
+#include "Edge.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
 	namespace util
 	{
-		template<> typename Registrable<uid,env::Address>::Registry Registrable<uid,env::Address>::_registry;
+		template<> const string Registry<env::Address>::KEY("Address");
 	}
 
 	namespace env
@@ -41,7 +44,7 @@ namespace synthese
 				  double metricOffset,
 				  double x,
 				  double y)
-			: synthese::util::Registrable<uid,Address> (id)
+		:	util::Registrable(id)
 			, Vertex (place, x, y)
 			, _road (road)
 			, _metricOffset (metricOffset)
@@ -51,12 +54,9 @@ namespace synthese
 
 
 
-
-
 		Address::~Address()
 		{
 		}
-
 
 
 
@@ -65,7 +65,6 @@ namespace synthese
 		{
 			return _road;
 		}
-
 
 
 
@@ -92,14 +91,6 @@ namespace synthese
 		}
 
 
-
-
-
-		const uid& 
-		Address::getId () const
-		{
-			return synthese::util::Registrable<uid,Address>::getKey();
-		}
 
 		void Address::setRoad( const Road* road )
 		{

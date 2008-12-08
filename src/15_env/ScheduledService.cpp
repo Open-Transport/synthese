@@ -24,6 +24,7 @@
 #include "Path.h"
 #include "Edge.h"
 #include "ReservationRule.h"
+#include "Registry.h"
 
 using namespace std;
 
@@ -34,25 +35,20 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::ScheduledService>::Registry Registrable<uid,env::ScheduledService>::_registry;
+		template<> const string Registry<env::ScheduledService>::KEY("ScheduledService");
 	}
 
 	namespace env
 	{
 
 		ScheduledService::ScheduledService(
-			const uid& id,
-			const string& serviceNumber,
+			RegistryKeyType id,
+			string serviceNumber,
 			Path* path
-		)	: Registrable<uid,ScheduledService> (id)
+		)	: Registrable(id)
 			, NonPermanentService(serviceNumber, path)
 		{	}
 
-
-		ScheduledService::ScheduledService()
-			: Registrable<uid,ScheduledService>()
-			, NonPermanentService()
-		{	}
 
 
 		ScheduledService::~ScheduledService ()
@@ -74,10 +70,7 @@ namespace synthese
 			Service::setPath(path);
 		}
 
-		uid ScheduledService::getId() const
-		{
-			return getKey();
-		}
+
 
 		ServicePointer ScheduledService::getFromPresenceTime(
 			AccessDirection method

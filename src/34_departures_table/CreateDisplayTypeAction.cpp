@@ -72,8 +72,9 @@ namespace synthese
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			if (_name.empty())
 				throw ActionException("Le nom ne peut être vide.");
-			vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
-			if (!v.empty())
+			Env env;
+			DisplayTypeTableSync::Search(env, _name, 0, 1));
+			if (!env.template getRegistry<DisplayType>().empty())
 				throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 
 			// Rows number
@@ -87,10 +88,14 @@ namespace synthese
 				throw ActionException("Un nombre positif d'arrêts intermédiaires lignes doit être choisi");
 
 			// Interface
-			uid id(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
-			if (!Interface::Contains(id))
+			try
+			{
+				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+			}
+			catch (...)
+			{
 				throw ActionException("Interface not found");
-			_interface = Interface::Get(id);
+			}
 		}
 
 		void CreateDisplayTypeAction::run()
@@ -100,7 +105,7 @@ namespace synthese
 			dt->setInterface(_interface.get());
 			dt->setRowNumber(_rows_number);
 			dt->setMaxStopsNumber(_max_stops_number);
-			DisplayTypeTableSync::save(dt.get());
+			DisplayTypeTableSync::Save(dt.get());
 
 			// Log
 			ArrivalDepartureTableLog::addCreateTypeEntry(dt.get(), _request->getUser().get());

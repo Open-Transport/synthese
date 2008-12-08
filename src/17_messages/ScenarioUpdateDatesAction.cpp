@@ -68,7 +68,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario.reset(SentScenarioInheritedTableSync::GetUpdateable(_request->getObjectId()));
+				_scenario = SentScenarioInheritedTableSync::GetEditable(_request->getObjectId());
 
 				_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 
@@ -76,7 +76,7 @@ namespace synthese
 
 				_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
 			}
-			catch (ObjectNotFoundException<uid,Scenario>& e)
+			catch (ObjectNotFoundException<Scenario>& e)
 			{
 				throw ActionException(e.getMessage());
 			}

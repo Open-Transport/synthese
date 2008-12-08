@@ -31,15 +31,13 @@ namespace synthese
 
 		}
 
-		uid AlarmTemplate::getId() const
-		{
-			return getKey();
-		}
 
-		AlarmTemplate::AlarmTemplate(const ScenarioTemplate* scenario)
-			: Alarm()
-			, util::Registrable<uid, AlarmTemplate>()
-			, _scenario(scenario)
+
+		AlarmTemplate::AlarmTemplate(
+			util::RegistryKeyType key,
+			const ScenarioTemplate* scenario
+		):	Alarm(key),
+			_scenario(scenario)
 		{
 
 		}
@@ -57,6 +55,8 @@ namespace synthese
 		{
 
 		}
+
+
 
 		const ScenarioTemplate* AlarmTemplate::getScenario() const
 		{

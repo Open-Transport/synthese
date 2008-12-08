@@ -58,3 +58,6 @@ synthese::departurestable::DisplayDataControlLog::integrate();
 
 synthese::departurestable::DisplayScreenAlarmRecipient::integrate();
 
+// Registries
+synthese::util::Env::template Integrate<synthese::departurestable::DisplayScreen>();
+synthese::util::Env::template Integrate<synthese::departurestable::DisplayType>();

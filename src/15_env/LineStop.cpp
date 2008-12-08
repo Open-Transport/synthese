@@ -21,35 +21,39 @@
 */
 
 #include "LineStop.h"
+#include "Registry.h"
 
-#include "15_env/Line.h"
-#include "15_env/Service.h"
-#include "15_env/ContinuousService.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "Line.h"
+#include "Service.h"
+#include "ContinuousService.h"
+#include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
-#include "06_geometry/SquareDistance.h"
+#include "SquareDistance.h"
 
+using namespace std;
 
 namespace synthese
 {
+	using namespace util;
 	using namespace geometry;
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::LineStop>::Registry Registrable<uid,env::LineStop>::_registry;
+		template<> const string Registry<env::LineStop>::KEY("LineStop");
 	}
 
 	namespace env
 	{
-		LineStop::LineStop (const uid id,
-				    const Line* line,
-				    int rankInPath,
-				    bool isDeparture,
-				    bool isArrival,		
-				    double metricOffset,
-				    PhysicalStop* physicalStop)
-			: synthese::util::Registrable<uid,LineStop> (id)
+		LineStop::LineStop(
+			RegistryKeyType id,
+			const Line* line,
+			int rankInPath,
+			bool isDeparture,
+			bool isArrival,		
+			double metricOffset,
+			PhysicalStop* physicalStop
+		):	Registrable(id)
 			, Edge (isDeparture, isArrival, line, rankInPath)
 			, _metricOffset (metricOffset)
 			, _scheduleInput(true)
@@ -76,13 +80,12 @@ namespace synthese
 
 
 
-
-
 		double
 		LineStop::getMetricOffset () const
 		{
 			return _metricOffset;
 		}
+
 
 
 		bool 

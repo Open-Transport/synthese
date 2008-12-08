@@ -26,3 +26,7 @@
 #include "11_interfaces/DateTimeInterfacePage.h"
 #include "11_interfaces/NonPredefinedInterfacePage.h"
 #include "11_interfaces/RedirRequest.h"
+
+// Registries
+#include "Interface.h"
+#include "InterfacePage.h"

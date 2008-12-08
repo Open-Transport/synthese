@@ -63,7 +63,7 @@ namespace synthese
 			if (_scenarioTemplate.get())
 				map.insert(PARAMETER_SCENARIO_ID, _scenarioTemplate->getKey());
 			if (_messageTemplate.get())
-				map.insert(PARAMETER_MESSAGE_TEMPLATE, _messageTemplate->getId());
+				map.insert(PARAMETER_MESSAGE_TEMPLATE, _messageTemplate->getKey());
 			return map;
 		}
 
@@ -78,7 +78,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
 				try
 				{
-					_scenarioTemplate.reset(ScenarioTemplateInheritedTableSync::Get(id));
+					_scenarioTemplate = ScenarioTemplateInheritedTableSync::Get(id);
 				}
 				catch (...)
 				{
@@ -92,7 +92,7 @@ namespace synthese
 				{
 					try
 					{
-						_sentScenario.reset(SentScenarioInheritedTableSync::Get(id));
+						_sentScenario = SentScenarioInheritedTableSync::Get(id);
 					}
 					catch (...)
 					{
@@ -106,7 +106,7 @@ namespace synthese
 			if (id != UNKNOWN_VALUE)
 			try
 			{
-				_messageTemplate.reset(AlarmTableSync::Get(id, true));
+				_messageTemplate = AlarmTableSync::Get(id);
 			}
 			catch (...)
 			{
@@ -123,7 +123,7 @@ namespace synthese
 				shared_ptr<AlarmTemplate> alarm(
 					_messageTemplate.get()
 					? new AlarmTemplate(*static_cast<const AlarmTemplate*>(_messageTemplate.get()))
-					: new AlarmTemplate(_scenarioTemplate.get())
+					: new AlarmTemplate(UNKNOWN_VALUE, _scenarioTemplate.get())
 				);
 				AlarmTableSync::Save(alarm.get());
 				_request->setObjectId(alarm->getKey());
@@ -135,7 +135,7 @@ namespace synthese
 					shared_ptr<ScenarioSentAlarm> alarm(
 						_messageTemplate.get()
 						? new ScenarioSentAlarm(*static_cast<const ScenarioSentAlarm*>(_messageTemplate.get()))
-						: new ScenarioSentAlarm(_sentScenario.get())
+						: new ScenarioSentAlarm(UNKNOWN_VALUE, _sentScenario.get())
 					);
 					AlarmTableSync::Save(alarm.get());
 					_request->setObjectId(alarm->getKey());

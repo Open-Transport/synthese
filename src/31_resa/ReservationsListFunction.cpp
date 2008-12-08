@@ -118,7 +118,7 @@ namespace synthese
 			{
 				try
 				{
-					_user = UserTableSync::Get(customerId, GET_AUTO, true);
+					_user = UserTableSync::Get(customerId);
 				}
 				catch (...)
 				{

@@ -96,7 +96,7 @@ namespace synthese
 			{
 				const PublicTransportStopZoneConnectionPlace* place(curLinestop->getConnectionPlace());
 				
-				if(		_displayedPlaces.find(place->getId()) != _displayedPlaces.end()
+				if(		_displayedPlaces.find(place->getKey()) != _displayedPlaces.end()
 					&&	encounteredPlaces.find(place) == encounteredPlaces.end()	// If the place must be displayed according to the display rules (only once per place)
 					&&	place != destinationPlace
 				|| curLinestop->getFollowingArrivalForFineSteppingOnly() == NULL		// or if the place is the terminus

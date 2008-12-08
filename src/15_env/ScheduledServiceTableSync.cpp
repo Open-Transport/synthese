@@ -67,12 +67,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE_ID = 16;
 		template<> const bool SQLiteTableSyncTemplate<ScheduledServiceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::load(ScheduledService* ss, const db::SQLiteResultSPtr& rows )
-		{
-
-
-		    uid id (rows->getLongLong (TABLE_COL_ID));
-		    
+		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Load(
+			ScheduledService* ss,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    string serviceNumber (rows->getText(ScheduledServiceTableSync::COL_SERVICENUMBER));
 
 			uid pathId(rows->getLongLong(ScheduledServiceTableSync::COL_PATHID));
@@ -126,50 +126,52 @@ namespace synthese
 		    
 		    
 		    ss->setServiceNumber(serviceNumber);
-		    ss->setKey(id);
 		    ss->setDepartureSchedules(departureSchedules);
 		    ss->setArrivalSchedules(arrivalSchedules);
 			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
 			ss->setPathId(pathId);
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
+
+				Path* path = LineTableSync::GetEditable(pathId, env, linkLevel).get();
+				assert (path);
+				//			assert (path->getEdges ().size () == ss-> arrivalSchedules.size ());
+
+				uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
+
+				uid handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+
+				uid pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+
+				uid reservationRuleId (rows->getLongLong (ScheduledServiceTableSync::COL_RESERVATIONRULEID));
+
+				ss->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel, AUTO_CREATE));
+				ss->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId, env, linkLevel, AUTO_CREATE));
+				ss->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
+				ss->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel, AUTO_CREATE));
+
+				path->addService(ss);
+			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_link(ScheduledService* ss, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
-
-			Path* path = LineTableSync::GetUpdateable(pathId,ss,temporary);
-			assert (path);
-//			assert (path->getEdges ().size () == ss-> arrivalSchedules.size ());
-			
-			uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
-
-			uid handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-
-			uid pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
-
-			uid reservationRuleId (rows->getLongLong (ScheduledServiceTableSync::COL_RESERVATIONRULEID));
-
-			ss->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,ss,true,temporary));
-			ss->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,ss,true,temporary));
-			ss->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId,ss,true,temporary));
-			ss->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,ss,true,temporary));
-
-			path->addService(ss);
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::_unlink(ScheduledService* ss)
+		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Unlink(
+			ScheduledService* ss,
+			Env* env
+		)
 		{
 			ss->getPath()->removeService(ss);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::save(ScheduledService* object)
+		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(ScheduledService* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());	/// @todo Use grid ID
+			if (object->getKey() == UNKNOWN_VALUE)
+				object->setKey(getId());
                
 			 query
 				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
@@ -209,16 +211,17 @@ namespace synthese
 
 
 
-		vector<shared_ptr<ScheduledService> > ScheduledServiceTableSync::search(
+		void ScheduledServiceTableSync::Search(
+			Env& env,
 			uid lineId
 			, uid commercialLineId
 			, Date date
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByOriginTime
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -245,23 +248,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<ScheduledService> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<ScheduledService> object ( new ScheduledService());
-					load(object.get(), rows);
-//					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 		void ScheduledServiceTableSync::afterFirstSync( SQLite* sqlite,  SQLiteSync* sync )
@@ -270,7 +257,7 @@ namespace synthese
 		    // Lines
 		    for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)
 		    {
-			shared_ptr<Line> line = EnvModule::getLines().getUpdateable(it->first);
+			shared_ptr<Line> line = EnvModule::getLines().getEditable(it->first);
 			line ->updateScheduleIndexes();
 		    }
 

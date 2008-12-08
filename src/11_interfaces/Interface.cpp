@@ -22,8 +22,9 @@
 
 #include "Interface.h"
 
-#include "11_interfaces/InterfacePage.h"
-#include "11_interfaces/InterfacePageException.h"
+#include "InterfacePage.h"
+#include "InterfacePageException.h"
+#include "Registry.h"
 
 #include <string>
 
@@ -37,14 +38,14 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,interfaces::Interface>::Registry Registrable<uid,interfaces::Interface>::_registry;
+		template<> const string Registry<interfaces::Interface>::KEY("Interface");
 	}
 
 	namespace interfaces
 	{
 
-		Interface::Interface( const uid id )
-			: Registrable<uid,synthese::interfaces::Interface> (id)
+		Interface::Interface(RegistryKeyType id )
+			: Registrable(id)
 		{
 		}
 

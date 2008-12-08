@@ -22,19 +22,21 @@
 
 #include <sstream>
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfacePageException.h"
+#include "Registry.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/Edge.h"
+#include "Interface.h"
+#include "InterfacePageException.h"
+
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
+#include "Edge.h"
 #include "15_env/Types.h"
 
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayMaintenanceLog.h"
-#include "34_departures_table/DeparturesTableInterfacePage.h"
-#include "34_departures_table/DisplayScreenAlarmRecipient.h"
+#include "DisplayScreen.h"
+#include "DisplayType.h"
+#include "DisplayMaintenanceLog.h"
+#include "DeparturesTableInterfacePage.h"
+#include "DisplayScreenAlarmRecipient.h"
 
 using namespace std;
 using namespace boost;
@@ -49,13 +51,13 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,departurestable::DisplayScreen>::Registry Registrable<uid,departurestable::DisplayScreen>::_registry;
+		template<> const string Registry<departurestable::DisplayScreen>::KEY("DisplayScreen");
 	}
 
 	namespace departurestable
 	{
-		DisplayScreen::DisplayScreen()
-			: Registrable<uid, DisplayScreen>()
+		DisplayScreen::DisplayScreen(RegistryKeyType key)
+			: Registrable(key)
 			, _direction(DISPLAY_DEPARTURES)
 			, _generationMethod(STANDARD_METHOD)
 			, _originsOnly(WITH_PASSING)
@@ -88,7 +90,7 @@ namespace synthese
 
 		void DisplayScreen::addForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace* place)
 		{
-			_forbiddenArrivalPlaces.insert(make_pair(place->getId(),place));
+			_forbiddenArrivalPlaces.insert(make_pair(place->getKey(),place));
 		}
 
 
@@ -438,7 +440,7 @@ namespace synthese
 				for (std::set<const Edge*>::const_iterator ite = edges.begin(); ite != edges.end(); ++ite)
 				{
 					for (const Edge* edge= (*ite)->getFollowingArrivalForFineSteppingOnly(); edge != NULL; edge = edge->getFollowingArrivalForFineSteppingOnly())
-						m.insert(make_pair(edge->getConnectionPlace()->getFullName(), make_pair(edge->getConnectionPlace()->getId(), edge->getConnectionPlace()->getFullName())));
+						m.insert(make_pair(edge->getConnectionPlace()->getFullName(), make_pair(edge->getConnectionPlace()->getKey(), edge->getConnectionPlace()->getFullName())));
 				}
 			}
 			vector<pair<uid, string> > v;
@@ -451,7 +453,7 @@ namespace synthese
 
 		void DisplayScreen::removeForcedDestination(const PublicTransportStopZoneConnectionPlace* place)
 		{
-			DisplayedPlacesList::iterator it = _forcedDestinations.find(place->getId());
+			DisplayedPlacesList::iterator it = _forcedDestinations.find(place->getKey());
 			if (it != _forcedDestinations.end())
 				_forcedDestinations.erase(it);
 		}
@@ -480,14 +482,14 @@ namespace synthese
 
 		void DisplayScreen::removeDisplayedPlace(const PublicTransportStopZoneConnectionPlace* place)
 		{
-			DisplayedPlacesList::iterator it = _displayedPlaces.find(place->getId());
+			DisplayedPlacesList::iterator it = _displayedPlaces.find(place->getKey());
 			if (it != _displayedPlaces.end())
 				_displayedPlaces.erase(it);
 		}
 
 		void DisplayScreen::removeForbiddenPlace(const PublicTransportStopZoneConnectionPlace* place)
 		{
-			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place->getId());
+			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place->getKey());
 			if (it != _forbiddenArrivalPlaces.end())
 				_forbiddenArrivalPlaces.erase(it);
 		}

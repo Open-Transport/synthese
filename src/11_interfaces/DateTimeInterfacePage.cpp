@@ -70,5 +70,13 @@ namespace synthese
 
 			InterfacePage::display(stream, pv, variables, NULL, request);
 		}
+
+
+
+		DateTimeInterfacePage::DateTimeInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

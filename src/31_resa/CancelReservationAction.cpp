@@ -24,18 +24,20 @@
 
 #include "CancelReservationAction.h"
 
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTableSync.h"
-#include "31_resa/ResaRight.h"
-#include "31_resa/ResaDBLog.h"
+#include "ReservationTransaction.h"
+#include "ReservationTransactionTableSync.h"
+#include "Reservation.h"
+#include "ReservationTableSync.h"
+#include "ResaRight.h"
+#include "ResaDBLog.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/Request.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Request.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -80,7 +82,7 @@ namespace synthese
 			// Load of the transaction
 			try
 			{
-				_transaction = ReservationTransactionTableSync::GetUpdateable(map.getUid(PARAMETER_RESERVATION_TRANSACTION_ID, true, FACTORY_KEY));
+				_transaction = ReservationTransactionTableSync::GetEditable(map.getUid(PARAMETER_RESERVATION_TRANSACTION_ID, true, FACTORY_KEY));
 			}
 			catch(...)
 			{
@@ -109,12 +111,13 @@ namespace synthese
 
 			// Control of the date : a cancellation has no sense if after the arrival time
 			DateTime now(TIME_CURRENT);
-			vector<shared_ptr<Reservation> > reservations(ReservationTableSync::search(_transaction.get()));
-			for(vector<shared_ptr<Reservation> >::const_reverse_iterator it(reservations.rbegin()); it != reservations.rend(); ++it)
+			Env env;
+			ReservationTableSync::Search(env, _transaction.get());
+			for(shared_ptr<Reservation> resa, env.template getRegistry<Reservation>())
 			{
-				if ((*it)->getReservationRuleId() != UNKNOWN_VALUE)
+				if (resa->getReservationRuleId() != UNKNOWN_VALUE)
 				{
-					if (now > (*it)->getArrivalTime())
+					if (now > resa->getArrivalTime())
 						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
 					break;
 				}
@@ -132,7 +135,7 @@ namespace synthese
 			DateTime now(TIME_CURRENT);
 			_transaction->setCancellationTime(now);
 			_transaction->setCancelUserId(_request->getUser()->getKey());
-			ReservationTransactionTableSync::save(_transaction.get());
+			ReservationTransactionTableSync::Save(_transaction.get());
 
 			// Write the log
 			ResaDBLog::AddCancelReservationEntry(_request->getSession(), *_transaction, oldStatus);

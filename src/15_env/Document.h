@@ -17,7 +17,7 @@ namespace env
 
 
 /** @ingroup m35 */
-class Document : public synthese::util::Registrable<uid,Document>
+class Document : public virtual util::Registrable
 {
 public:
     

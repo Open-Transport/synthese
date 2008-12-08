@@ -20,18 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/IncludingPlace.h"
+#include "IncludingPlace.h"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace env
 	{
 		IncludingPlace::IncludingPlace(
-			const string& name
-			, const City* city
-		)	: Place (name, city)
+			RegistryKeyType key,
+			const string& name,
+			const City* city
+		):	Registrable(key),
+			Place(name, city)			
 		{
 		}
 

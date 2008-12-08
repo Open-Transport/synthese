@@ -23,13 +23,15 @@
 #ifndef SYNTHESE_db_SQLiteRegistryTableSyncTemplate_h__
 #define SYNTHESE_db_SQLiteRegistryTableSyncTemplate_h__
 
-#include "02_db/SQLiteDirectTableSyncTemplate.h"
+#include "SQLiteDirectTableSyncTemplate.h"
 
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace db
 	{
 		/** SQLiteRegistryTableSyncTemplate class.
@@ -54,23 +56,23 @@ namespace synthese
 				, const SQLiteResultSPtr& rows
 				, bool isFirstSync = false
 			){
+				Env* env(Env::GetOfficialEnv());
+				Registry<T>& registry(env->template getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
 					{
-						if (T::Contains(rows->getLongLong (TABLE_COL_ID)))
+						if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
 						{
-							boost::shared_ptr<T> address(T::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-							SQLiteDirectTableSyncTemplate<K,T>::unlink(address.get());
-							load (address.get(), rows);
-							SQLiteDirectTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get(), env);
+							Load (address.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 						else
 						{
-							T* object(new T);
-							load(object, rows);
-								SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
-							object->store();
+							boost::shared_ptr<T> object(new T(rows->getKey()));
+							Load(object.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							registry.add(object);
 						}
 					}
 					catch(util::Exception& e)
@@ -89,17 +91,17 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
+				Env* env(Env::GetOfficialEnv());
+				Registry<T>& registry(env->template getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
 					{
-						uid id = rows->getLongLong (TABLE_COL_ID);
-						if (T::Contains(id))
+						if (registry.contains(rows->getKey()))
 						{
-							boost::shared_ptr<T> address(T::GetUpdateable(id));
-							SQLiteDirectTableSyncTemplate<K,T>::unlink(address.get());
-							load (address.get(), rows);
-							SQLiteDirectTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
+							Unlink(address.get(), env);
+							Load(address.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 					}
 					catch (util::Exception& e)
@@ -119,15 +121,17 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
+				Env* env(Env::GetOfficialEnv());
+				Registry<T>& registry(env->template getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
 					{
-						uid id = rows->getLongLong (TABLE_COL_ID);
-						if (T::Contains(id))
+						util::RegistryKeyType id(rows->getKey());
+						if (registry.contains(id))
 						{
-							SQLiteDirectTableSyncTemplate<K,T>::unlink(T::GetUpdateable(id).get());
-							T::Remove(id);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get(), env);
+							registry.remove(id);
 						}
 					}
 					catch (util::Exception& e)

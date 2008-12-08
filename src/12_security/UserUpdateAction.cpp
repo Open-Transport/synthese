@@ -63,7 +63,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::GetUpdateable(_request->getObjectId());
+				_user = UserTableSync::GetEditable(_request->getObjectId());
 
 				_login = map.getString(PARAMETER_LOGIN, true, FACTORY_KEY);
 				if (_login.empty())
@@ -91,11 +91,11 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_PROFILE_ID, true, FACTORY_KEY));
 				_profile = ProfileTableSync::Get(id);
 			}
-			catch (Profile::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<Profile>& e)
 			{
 				throw ActionException("Profil introuvable");
 			}
-			catch (User::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<User>& e)
 			{
 				throw ActionException("Utilisateur introuvable");
 			}
@@ -113,7 +113,7 @@ namespace synthese
 			_user->setConnectionAllowed(_authorizedLogin);
 			_user->setName(_name);
 			_user->setSurname(_surname);
-			UserTableSync::save(_user.get());
+			UserTableSync::Save(_user.get());
 		}
 	}
 }

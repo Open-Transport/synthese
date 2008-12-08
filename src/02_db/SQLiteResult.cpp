@@ -1,9 +1,11 @@
 #include "SQLiteResult.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 #include "SQLiteException.h"
 #include "sqlite3.h"
+
+#include "02_db/Constants.h"
 
 #include <iomanip>
 #include <boost/date_time/posix_time/time_formatters.hpp>
@@ -11,13 +13,11 @@
 
 
 
-using namespace synthese::util;
 using namespace boost::posix_time;
-
-
 
 namespace synthese
 {
+	using namespace util;
 namespace db
 {
 
@@ -260,6 +260,12 @@ SQLiteResult::computeMaxColWidths () const
 
 
 
+RegistryKeyType SQLiteResult::getKey() const
+{
+	return getLongLong(TABLE_COL_ID);
+}
+
+
 
 
 std::ostream& 
@@ -290,6 +296,3 @@ operator<< ( std::ostream& os, const SQLiteResult& op )
 
 }
 }
-
-
-

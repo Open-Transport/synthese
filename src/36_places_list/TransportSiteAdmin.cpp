@@ -23,29 +23,31 @@
 */
 
 #include "TransportSiteAdmin.h"
-#include "36_places_list/PlacesListModule.h"
-#include "36_places_list/SiteTableSync.h"
-#include "36_places_list/Site.h"
-#include "36_places_list/SiteUpdateAction.h"
-#include "36_places_list/SiteRoutePlanningAdmin.h"
-#include "36_places_list/TransportWebsiteRight.h"
+#include "PlacesListModule.h"
+#include "SiteTableSync.h"
+#include "Site.h"
+#include "SiteUpdateAction.h"
+#include "SiteRoutePlanningAdmin.h"
+#include "TransportWebsiteRight.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/Request.h"
+#include "QueryString.h"
+#include "ActionFunctionRequest.h"
+#include "Request.h"
 
-#include "33_route_planner/RoutePlannerFunction.h"
+#include "RoutePlannerFunction.h"
 
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "ModuleAdmin.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
-#include "05_html/ResultHTMLTable.h"
-#include "05_html/PropertiesHTMLTable.h"
-#include "05_html/HTMLModule.h"
+#include "ResultHTMLTable.h"
+#include "PropertiesHTMLTable.h"
+#include "HTMLModule.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfaceModule.h"
+#include "Interface.h"
+#include "InterfaceModule.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -82,7 +84,7 @@ namespace synthese
 		{
 			try
 			{
-				_site = SiteTableSync::GetUpdateable(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+				_site = SiteTableSync::GetEditable(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			}
 			catch (...)
 			{
@@ -161,15 +163,16 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == PlacesListModule::FACTORY_KEY)
 			{
-				vector<shared_ptr<Site> > sites(SiteTableSync::search());
-				for (vector<shared_ptr<Site> >::const_iterator it(sites.begin()); it != sites.end(); ++it)
+				Env env;
+				SiteTableSync::Search(env);
+				BOOST_FOREACH(shared_ptr<Site> site, env.template getRegistry<Site>())
 				{
 					PageLink link;
 					link.factoryKey = FACTORY_KEY;
 					link.icon = ICON;
-					link.name = (*it)->getName();
+					link.name = site->getName();
 					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString((*it)->getKey());
+					link.parameterValue = Conversion::ToString(site->getKey());
 					links.push_back(link);
 				}
 			}

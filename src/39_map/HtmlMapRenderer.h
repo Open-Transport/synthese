@@ -70,15 +70,17 @@ namespace synthese
 
 			std::string render (const boost::filesystem::path& tempDir, 
 					    const std::string& filenamePrefix,
-					    const synthese::env::Line::Registry& lines,
-					    synthese::map::Map& map,
+						const util::Registry<env::Line>& lines,
+						synthese::map::Map& map,
 					    const synthese::map::RenderingConfig& config);
 			
 		private:
 
-			void renderLines (std::ostream& output, 
-					  const synthese::env::Line::Registry& lines, 
-					  Map& map);
+			void renderLines(
+				std::ostream& output, 
+				const util::Registry<env::Line>& lines, 
+				Map& map
+			);
 
 			void renderPhysicalStops (std::ostream& output, Map& map);
 

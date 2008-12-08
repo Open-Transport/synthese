@@ -24,10 +24,10 @@
 #define SYNTHESE_db_SQLiteInheritedTableSyncTemplate_h__
 
 #include "02_db/Types.h"
-#include "02_db/SQLiteResult.h"
+#include "SQLiteResult.h"
 
-#include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
+#include "FactorableTemplate.h"
+#include "Env.h"
 
 namespace synthese
 {
@@ -52,7 +52,16 @@ namespace synthese
 
 				This method must be implemented by each template instantiation
 			*/
-			static void _Link(ObjectClass* obj, const SQLiteResultSPtr& rows, GetSource temporary);
+			static void Load(
+				ObjectClass* obj,
+				const SQLiteResultSPtr& rows,
+				util::Env* env,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
+
+
+
+			static void Save(ObjectClass* obj);
 
 
 
@@ -63,49 +72,84 @@ namespace synthese
 
 				This method must be implemented by each template instantiation
 			*/
-			static void _Unlink(ObjectClass* obj);
+			static void Unlink(ObjectClass* obj, util::Env* env);
 
 
 		public:
 
-			/** Object fetcher.
-				@param key UID of the object
-				@param linked Load on temporary linked object (recursive get)
-				@return Pointer to a new C++ object corresponding to the fetched record
-				@throw DBEmptyResultException if the object was not found
-			*/
-			static ObjectClass* GetUpdateable(const SQLiteResultSPtr& row, bool linked=false)
-			{
-				ObjectClass* object(new ObjectClass);
-				Load(object, row);
-				if (linked)
-					Link(object, row, GET_TEMPORARY);
-				return object;
+
+			static boost::shared_ptr<ObjectClass> GetEditable(
+				util::RegistryKeyType key,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			){
+					if (env != NULL && env->template getRegistry<ObjectClass>().contains(key))
+						return env->template getEditableRegistry<ObjectClass>().getEditable(key);
+
+					boost::shared_ptr<ObjectClass> object;
+					try
+					{
+						SQLiteResultSPtr rows(_GetRow(key));
+						object.reset(new ObjectClass(rows->getKey()));
+						Load(object.get(), rows, env, linkLevel);
+					}
+					catch (DBEmptyResultException)
+					{
+						if (autoCreate == NEVER_CREATE)
+							throw ObjectNotFoundException<ObjectClass>(key, "Object not found in "+ TABLE_NAME);
+						object.reset(new ObjectClass(0));
+					}
+
+					if (env != NULL)
+						env->template getEditableRegistry<ObjectClass>().add(object);
+					return object;
 			}
 
+
 			/** Object fetcher.
 				@param key UID of the object
 				@param linked Load on temporary linked object (recursive get)
 				@return Pointer to a new C++ object corresponding to the fetched record
 				@throw DBEmptyResultException if the object was not found
 			*/
-			static ObjectClass* GetUpdateable(uid key, bool linked=false)
-			{
-				SQLiteResultSPtr rows(_GetRow(key));
-				return GetUpdateable(rows, linked);
+			static boost::shared_ptr<const ObjectClass> Get(
+				util::RegistryKeyType key,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			){
+				return boost::const_pointer_cast<const ObjectClass>(GetEditable(key,env,linkLevel,autoCreate));
 			}
 
 
 
-			/** Object fetcher.
-				@param key UID of the object
-				@param linked Load on temporary linked object (recursive get)
-				@return Pointer to a new C++ object corresponding to the fetched record
-				@throw DBEmptyResultException if the object was not found
+			/** Load obects into an environment, from a SQL query.
+				@param query SQL query
+				@param env Environment to write
+				@param linkLevel Link level
+				@throws Exception if the load failed
 			*/
-			static const ObjectClass* Get(uid key, bool linked=false)
-			{
-				return const_cast<const ObjectClass*>(GetUpdateable(key,linked));
+			static void LoadFromQuery(
+				const std::string& query,
+				util::Env& env,
+				util::LinkLevel linkLevel
+			){
+				try
+				{
+					util::Registry<ObjectClass>& registry(env.template getEditableRegistry<ObjectClass>());
+					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
+					while (rows->next ())
+					{
+						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
+						Load(object.get(), rows, &env, linkLevel);
+						registry.add(object);
+					}
+				}
+				catch(SQLiteException& e)
+				{
+					throw Exception(e.getMessage());
+				}
 			}
 
 
@@ -115,89 +159,61 @@ namespace synthese
 			{
 			}
 
-			virtual typename ParentTableSyncClass::ObjectType* create()
+		protected:
+			virtual typename ParentTableSyncClass::ObjectType* _create(util::RegistryKeyType key)
 			{
-				return new ObjectClass;
+				return new ObjectClass(key);
 			}
 
-			virtual typename ParentTableSyncClass::ObjectType* get(SQLiteResultSPtr& row, bool linked)
-			{
-				return GetUpdateable(row, linked);
-			}
-
-			static void Link(ObjectClass* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-			{
-				if (obj->getLinked())
+			virtual boost::shared_ptr<typename ParentTableSyncClass::ObjectType> _getEditable(
+				util::RegistryKeyType key,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			){
+				try
 				{
-					Unlink(obj);
-					if (temporary)
-						obj->clearChildTemporaryObjects();
+					return boost::static_pointer_cast<typename ParentTableSyncClass::ObjectType, ObjectClass>(GetEditable(key, env,linkLevel, autoCreate));
 				}
-				_Link(obj, rows, temporary);
-				obj->setLinked(true);
-			}
-
-			static void Unlink(ObjectClass* obj)
-			{
-				_Unlink(obj);
-				obj->setLinked(false);
-			}
-
-			/** Gets from the database a temporary object linked by another one.
-				@param key UID of the object
-				@param obj Parent object which link to the returned object
-				@param linked recursive get
-				@return Pointer to the created object
-				@author Hugues Romain
-				@date 2007
-
-			The deletion of the object will be automatically done at the deletion of the parent object
-			*/
-			template<class LinkedClass>
-			static const ObjectClass* Get(uid key, LinkedClass* obj, bool linked=false)
-			{
-				const ObjectClass* c(Get(key, linked));
-				obj->addChildTemporaryObject(c);
-				return c;
-			}
-
-			/** Gets from the database a temporary object linked by another one.
-				@param key UID of the object
-				@param obj Parent object which link to the returned object
-				@param linked recursive get
-				@return Pointer to the created object
-				@author Hugues Romain
-				@date 2007
-
-				The deletion of the object will be automatically done at the deletion of the parent object
-			*/
-			template<class LinkedClass>
-			static ObjectClass* GetUpdateable(uid key, LinkedClass* obj, bool linked=false)
-			{
-				ObjectClass* c(GetUpdateable(key, linked));
-				obj->addChildTemporaryObject(c);
-				return c;
+				catch(util::ObjectNotFoundException<ObjectClass>& e)
+				{
+					throw util::ObjectNotFoundException<typename ParentTableSyncClass::ObjectType>(e.getKey(), e.getMessage());
+				}
 			}
 
 
-
-/*			static boost::shared_ptr<const ObjectClass> Get(uid key, GetSource source = GET_AUTO, bool linked = false)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && ObjectClass::Contains(key))
-					? ObjectClass::Get(key)
-					: boost::shared_ptr<const ObjectClass>(Get(key, linked));
+			virtual boost::shared_ptr<const typename ParentTableSyncClass::ObjectType> _get(
+				util::RegistryKeyType key,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			){
+				try
+				{
+					return boost::static_pointer_cast<const typename ParentTableSyncClass::ObjectType, const ObjectClass>(Get(key, env,linkLevel, autoCreate));
+				}
+				catch(util::ObjectNotFoundException<ObjectClass>& e)
+				{
+					throw util::ObjectNotFoundException<typename ParentTableSyncClass::ObjectType>(e.getKey(), e.getMessage());
+				}
 			}
 
-
-			static boost::shared_ptr<ObjectClass> GetUpdateable(uid key, GetSource source = GET_AUTO, bool linked = false)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && ObjectClass::Contains(key))
-					? static_pointer_cast<ObjectClass,ObjectClass::ValueType>(ObjectClass::GetUpdateable(key))
-					: boost::shared_ptr<ObjectClass>(GetUpdateable(key, linked));
+			virtual void _load(
+				typename ParentTableSyncClass::ObjectType* obj,
+				const SQLiteResultSPtr& rows,
+				util::Env* env,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			){
+				Load(static_cast<ObjectClass*>(obj), rows, env, linkLevel);
 			}
-*/		};
+
+			
+			virtual void _save(
+				typename ParentTableSyncClass::ObjectType* obj
+			){
+				Save(static_cast<ObjectClass*>(obj));
+			}
+		};
 	}
 }
 

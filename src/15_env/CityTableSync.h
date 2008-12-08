@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteAutoRegisterTableSyncTemplate.h"
+#include "SQLiteAutoRegisterTableSyncTemplate.h"
 
 namespace synthese
 {

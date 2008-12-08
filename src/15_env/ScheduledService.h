@@ -26,7 +26,7 @@
 #include "NonPermanentService.h"
 #include "Types.h"
 
-#include "Registrable.h"
+
 
 #include <string>
 
@@ -38,9 +38,8 @@ namespace synthese
 		/** Scheduled service.
 			@ingroup m35
 		*/
-		class ScheduledService : 
-			public util::Registrable<uid,ScheduledService>, 
-			public NonPermanentService
+		class ScheduledService
+		:	public NonPermanentService
 		{
 		public:
 			typedef std::vector<time::Schedule> Schedules;
@@ -53,11 +52,10 @@ namespace synthese
 		public:
 
 			ScheduledService(
-				const uid& id,
-				const std::string& serviceNumber,
-				Path* path
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				std::string serviceNumber = std::string(),
+				Path* path = NULL
 			);
-			ScheduledService();
 
 			~ScheduledService ();
 
@@ -77,7 +75,6 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				virtual uid		getId()	const;
 				virtual bool isContinuous () const;
 				
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.

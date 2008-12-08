@@ -25,9 +25,10 @@
 #ifndef SYNTHESE_DebugInterfaceElement_H__
 #define SYNTHESE_DebugInterfaceElement_H__
 
-#include "11_interfaces/LibraryInterfaceElement.h"
+#include "LibraryInterfaceElement.h"
+#include "FactorableTemplate.h"
 
-#include "01_util/FactorableTemplate.h"
+#include <vector>
 
 namespace synthese
 {

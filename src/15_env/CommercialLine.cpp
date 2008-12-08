@@ -21,12 +21,15 @@
 */
 
 #include "CommercialLine.h"
+#include "Registry.h"
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace util
 	{
-		template<> Registrable<uid,env::CommercialLine>::Registry Registrable<uid,env::CommercialLine>::_registry;
+		template<> const std::string Registry<env::CommercialLine>::KEY("CommercialLine");
 	}
 
 	namespace env
@@ -43,12 +46,11 @@ namespace synthese
 			_network = network;
 		}
 
-		CommercialLine::CommercialLine()
-			: _color (0, 0, 0)
+		CommercialLine::CommercialLine(RegistryKeyType key)
+			: util::Registrable(key)
+			, _color (0, 0, 0)
 			, _network(NULL)
-
 		{
-		
 		}
 
 		const std::string& CommercialLine::getName() const

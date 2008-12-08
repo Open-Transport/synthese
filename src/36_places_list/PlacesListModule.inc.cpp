@@ -19,3 +19,8 @@
 #include "36_places_list/SiteUpdateAction.h"
 
 #include "36_places_list/TransportWebsiteRight.h"
+
+// Registries
+#include "ObjectSiteLink.h"
+#include "Site.h"
+#include "SiteCommercialLineLink.h"

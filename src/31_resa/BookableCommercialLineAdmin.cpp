@@ -24,34 +24,35 @@
 
 #include "BookableCommercialLineAdmin.h"
 
-#include "31_resa/ResaModule.h"
-#include "31_resa/ServiceReservations.h"
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/ReservationTableSync.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/Reservation.h"
-#include "31_resa/CancelReservationAction.h"
-#include "31_resa/ResaCustomerAdmin.h"
-#include "31_resa/ResaRight.h"
+#include "ResaModule.h"
+#include "ServiceReservations.h"
+#include "ReservationTransactionTableSync.h"
+#include "ReservationTableSync.h"
+#include "ReservationTransaction.h"
+#include "Reservation.h"
+#include "CancelReservationAction.h"
+#include "ResaCustomerAdmin.h"
+#include "ResaRight.h"
 
-#include "05_html/SearchFormHTMLTable.h"
+#include "SearchFormHTMLTable.h"
 
-#include "15_env/CommercialLine.h"
-#include "15_env/AdvancedSelectTableSync.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/ScheduledService.h"
-#include "15_env/ScheduledServiceTableSync.h"
-#include "15_env/ReservationRule.h"
+#include "CommercialLine.h"
+#include "AdvancedSelectTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
+#include "ReservationRule.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/RequestException.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "RequestException.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminParametersException.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
 
 #include <map>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -176,20 +177,23 @@ namespace synthese
 			stream << t.open();
 
 			// Boucle sur les circulations
-			vector<shared_ptr<ScheduledService> > services(ScheduledServiceTableSync::search(
-					UNKNOWN_VALUE
-					, _line->getKey()
-					, _startDateTime.getDate()
-			)	);
+			Env env;
+			ScheduledServiceTableSync::Search(
+				env
+				UNKNOWN_VALUE
+				, _line->getKey()
+				, _startDateTime.getDate()
+			);
 
 			// Download reservations
 			map<const ScheduledService*, ServiceReservations> reservations;
-			for(vector<shared_ptr<ScheduledService> >::const_iterator it(services.begin()); it != services.end(); ++it)
+			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.template getRegistry<ScheduledService>())
 			{
-				const ScheduledService* service(it->get());
 				const ReservationRule* rule(service->getReservationRule());
 				ServiceReservations obj;
-				obj.reservations = ReservationTransactionTableSync::search(
+
+				ReservationTransactionTableSync::Search(
+					obj.reservationsEnv,
 					service
 					, _startDateTime.getDate()
 					, _displayCancelled
@@ -208,16 +212,15 @@ namespace synthese
 					, now
 					, DateTime(_startDateTime.getDate(), service->getDepartureSchedule(lastDepartureLineStop))
 					);
-				obj.service = service;
+				obj.service = service.get();
 
-				reservations.insert(make_pair(service, obj));
+				reservations.insert(make_pair(service.get(), obj));
 
 			}
 
-			for	(vector<shared_ptr<ScheduledService> >::const_iterator it(services.begin()); it != services.end(); ++it)
+			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.template getRegistry<ScheduledService>())
 			{
-				ScheduledService* service(it->get());
-				const ServiceReservations& serviceReservations (reservations[it->get()]);
+				const ServiceReservations& serviceReservations (reservations[service.get()]);
 				string plural((serviceReservations.seatsNumber > 1) ? "s" : "");
 
 
@@ -231,7 +234,7 @@ namespace synthese
 				elseif($circulation = $circulations->GetSuivant())
 				{
 				*/					// Dates of departure
-				DateTime originDateTime(DateTime(_startDateTime.getDate(), (*it)->getDepartureSchedule()));
+				DateTime originDateTime(DateTime(_startDateTime.getDate(), service->getDepartureSchedule()));
 
 
 
@@ -254,7 +257,7 @@ namespace synthese
 						ReservationStatus status(reservation->getStatus());
 
 						customerRequest.setObjectId(reservation->getTransaction()->getCancelUserId());
-						cancelRequest.getAction()->setTransaction(ReservationTransactionTableSync::GetUpdateable(reservation->getTransaction()->getKey()));
+						cancelRequest.getAction()->setTransaction(ReservationTransactionTableSync::GetEditable(reservation->getTransaction()->getKey()));
 
 						stream << t.row();
 						stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());

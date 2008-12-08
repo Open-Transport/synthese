@@ -57,14 +57,19 @@ namespace synthese
 			/** Displays the interpretation of the string perimeter of the right.
 				@return description of the perimeter
 			*/
-			std::string	displayParameter()	const;
+			std::string	displayParameter(
+				util::Env* env = util::Env::GetOfficialEnv()
+			)	const;
 			
 
 			/** Test of inclusion of an other perimeter by the current one.
 				@param perimeter to compare with
 				@return true if the current perimeter includes the compared one, false else
 			*/
-			bool perimeterIncludes(const std::string& perimeter) const;
+			bool perimeterIncludes(
+				const std::string& perimeter,
+				util::Env* env = util::Env::GetOfficialEnv()
+			) const;
 		};
 	}
 }

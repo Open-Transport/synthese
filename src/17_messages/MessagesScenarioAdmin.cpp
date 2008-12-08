@@ -37,12 +37,17 @@
 #include "17_messages/NewMessageAction.h"
 #include "17_messages/MessagesLibraryAdmin.h"
 #include "17_messages/MessagesModule.h"
+#include "ScenarioSentAlarmInheritedTableSync.h"
+#include "AlarmTemplateInheritedTableSync.h"
+
 
 #include "30_server/ActionFunctionRequest.h"
 #include "30_server/QueryString.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -77,7 +82,7 @@ namespace synthese
 
 			try
 			{
-				_scenario.reset(ScenarioTableSync::Get(id));
+				_scenario = ScenarioTableSync::Get(id);
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
 				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
 			}
@@ -92,18 +97,18 @@ namespace synthese
 		{
 			ActionFunctionRequest<ScenarioNameUpdateAction,AdminRequest> updateRequest(request);
 			updateRequest.getFunction()->setPage<MessagesScenarioAdmin>();
-			updateRequest.setObjectId(_scenario->getId());
+			updateRequest.setObjectId(_scenario->getKey());
 
 			FunctionRequest<AdminRequest> messRequest(request);
 			messRequest.getFunction()->setPage<MessageAdmin>();
 
 			ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(request);
 			deleteRequest.getFunction()->setPage<MessagesScenarioAdmin>();
-			deleteRequest.setObjectId(_scenario->getId());
+			deleteRequest.setObjectId(_scenario->getKey());
 
 			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(request);
 			addRequest.getFunction()->setPage<MessageAdmin>();
-			addRequest.getAction()->setScenarioId(_scenario->getId());
+			addRequest.getAction()->setScenarioId(_scenario->getKey());
 			addRequest.getAction()->setIsTemplate(_templateScenario.get() != NULL);
 
 			stream << "<h1>Propriétés</h1>";
@@ -120,7 +125,7 @@ namespace synthese
 			{
 				ActionFunctionRequest<ScenarioUpdateDatesAction, AdminRequest> updateDatesRequest(request);
 				updateDatesRequest.getFunction()->setPage<MessagesScenarioAdmin>();
-				updateDatesRequest.setObjectId(_scenario->getId());
+				updateDatesRequest.setObjectId(_scenario->getKey());
 
 				stream << "<h1>Diffusion</h1>";
 				PropertiesHTMLTable udt(updateDatesRequest.getHTMLForm("update_dates"));
@@ -136,18 +141,23 @@ namespace synthese
 			stream << "<h1>Messages</h1>";
 
 			vector<shared_ptr<Alarm> > v;
+			Env env;
 			
 			if (_sentScenario.get())
 			{
-				vector<shared_ptr<ScenarioSentAlarm> > vs = AlarmTableSync::searchScenarioSent(_sentScenario.get());
-				for (vector<shared_ptr<ScenarioSentAlarm> >::const_iterator it = vs.begin(); it != vs.end(); ++it)
-					v.push_back(static_pointer_cast<Alarm, ScenarioSentAlarm>(*it));
+				ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get());
+				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.template getRegistry<ScenarioSentAlarm>())
+				{
+					v.push_back(static_pointer_cast<Alarm, ScenarioSentAlarm>(alarm));
+				}
 			}
 			else
 			{
-				vector<shared_ptr<AlarmTemplate> > vs = AlarmTableSync::searchTemplates(_templateScenario.get());
-				for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = vs.begin(); it != vs.end(); ++it)
-					v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(*it));
+				AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get());
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.template getRegistry<AlarmTemplate>())
+				{
+					v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
+				}
 			}
 
 			ActionResultHTMLTable::HeaderVector h;
@@ -159,13 +169,12 @@ namespace synthese
 
 			stream << t.open();
 
-			for(vector<shared_ptr<Alarm> >::const_iterator it = v.begin(); it != v.end(); ++it)
+			BOOST_FOREACH(shared_ptr<Alarm> alarm, v)
 			{
-				shared_ptr<const Alarm> alarm = *it;
-				messRequest.setObjectId(alarm->getId());
-				deleteRequest.getAction()->setAlarmId(alarm->getId());
+				messRequest.setObjectId(alarm->getKey());
+				deleteRequest.getAction()->setAlarmId(alarm->getKey());
 
-				stream << t.row(Conversion::ToString(alarm->getId()));
+				stream << t.row(Conversion::ToString(alarm->getKey()));
 				stream << t.col() << alarm->getShortMessage();
 				stream << t.col() << ""; // Emplacement
 				stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Modifier");
@@ -226,32 +235,32 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			AdminInterfaceElement::PageLinks links;
-			
+			Env env;
 			if (_sentScenario.get())
 			{
-				vector<shared_ptr<ScenarioSentAlarm> > vs = AlarmTableSync::searchScenarioSent(_sentScenario.get());
-				for (vector<shared_ptr<ScenarioSentAlarm> >::const_iterator it = vs.begin(); it != vs.end(); ++it)
+				ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get());
+				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.template getRegistry<ScenarioSentAlarm>())
 				{
 					AdminInterfaceElement::PageLink link;
 					link.factoryKey = MessageAdmin::FACTORY_KEY;
-					link.name = (*it)->getShortMessage();
+					link.name = alarm->getShortMessage();
 					link.icon = MessageAdmin::ICON;
 					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString((*it)->getId());
+					link.parameterValue = Conversion::ToString(alarm->getKey());
 					links.push_back(link);
 				}
 			}
 			else if (_templateScenario.get())
 			{
-				vector<shared_ptr<AlarmTemplate> > vs = AlarmTableSync::searchTemplates(_templateScenario.get());
-				for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = vs.begin(); it != vs.end(); ++it)
+				AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get());
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.template getRegistry<AlarmTemplate>())
 				{
 					AdminInterfaceElement::PageLink link;
 					link.factoryKey = MessageAdmin::FACTORY_KEY;
-					link.name = (*it)->getShortMessage();
+					link.name = alarm->getShortMessage();
 					link.icon = MessageAdmin::ICON;
 					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString((*it)->getId());
+					link.parameterValue = Conversion::ToString(alarm->getKey());
 					links.push_back(link);
 				}
 			}
@@ -271,7 +280,7 @@ namespace synthese
 
 		std::string MessagesScenarioAdmin::getParameterValue() const
 		{
-			return _scenario.get() ? Conversion::ToString(_scenario->getId()) : string();
+			return _scenario.get() ? Conversion::ToString(_scenario->getKey()) : string();
 		}
 	}
 }

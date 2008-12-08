@@ -28,18 +28,18 @@
 #include <ostream>
 #include <map>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
-#include "04_time/DateTime.h"
 
-#include "13_dblog/DBLog.h"
+#include "DateTime.h"
+
+#include "DBLog.h"
 
 #include "15_env/Types.h"
 
 #include "34_departures_table/Types.h"
-#include "34_departures_table/ForcedDestinationsArrivalDepartureTableGenerator.h"
-#include "34_departures_table/StandardArrivalDepartureTableGenerator.h"
+#include "ForcedDestinationsArrivalDepartureTableGenerator.h"
+#include "StandardArrivalDepartureTableGenerator.h"
 
 
 namespace synthese
@@ -77,7 +77,8 @@ namespace synthese
 						- Autres paramètres (liste complète : voir IHM)
 
 		*/
-		class DisplayScreen : public util::Registrable<uid,DisplayScreen>
+		class DisplayScreen
+		:	public virtual util::Registrable
 		{
 		public:
 			typedef enum {
@@ -161,7 +162,7 @@ namespace synthese
 		public:
 			//!	\name Constructors/Destructors
 			//@{
-				DisplayScreen();
+				DisplayScreen(util::RegistryKeyType key = UNKNOWN_VALUE);
 			//@}
 
 			//!	\name Setters

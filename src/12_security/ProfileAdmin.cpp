@@ -209,7 +209,7 @@ namespace synthese
 					_profile = ProfileTableSync::Get(id);
 				}
 			}
-			catch (Profile::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<Profile>& e)
 			{
 				throw AdminParametersException("Bad profile" + e.getMessage());
 			}

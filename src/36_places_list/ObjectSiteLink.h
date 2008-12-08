@@ -23,8 +23,7 @@
 #ifndef SYNTHESE_transportwebsite_ObjectSiteLink_h__
 #define SYNTHESE_transportwebsite_ObjectSiteLink_h__
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -35,13 +34,14 @@ namespace synthese
 		/** ObjectSiteLink class.
 			@ingroup m36
 		*/
-		class ObjectSiteLink : public util::Registrable<uid,ObjectSiteLink>
+		class ObjectSiteLink
+		:	public virtual util::Registrable
 		{
 			uid			_objectId;
 			const Site*	_site;
 
 		public:
-			ObjectSiteLink(uid id = UNKNOWN_VALUE);
+			ObjectSiteLink(util::RegistryKeyType id = UNKNOWN_VALUE);
 
 			uid			getObjectId()	const;
 			const Site*	getSite()		const;

@@ -53,6 +53,7 @@
 #include "12_security/User.h"
 
 #include <map>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -89,7 +90,7 @@ namespace synthese
 			) const	{
 				const ReservationTransaction::Reservations& r(transaction->getReservations());
 				for (ReservationTransaction::Reservations::const_iterator ite(r.begin()); ite != r.end(); ++ite)
-					if ((*ite)->getServiceId() == service->getId())
+					if ((*ite)->getServiceId() == service->getKey())
 						return *ite;
 			}
 		} ServiceReservations ;
@@ -129,20 +130,21 @@ namespace synthese
 			if (Conversion::ToBool(_displayOldReservations->getValue(parameters, variables, object, request)))
 				maxDate = DateTime(TIME_CURRENT);
 
-			vector<shared_ptr<ReservationTransaction> > resats(ReservationTransactionTableSync::search(
+			Env env;
+			ReservationTransactionTableSync::Search(
+				env,
 				request->getSession()->getUser()->getKey()
 				, minDate
 				, maxDate
 				, Conversion::ToBool(_displayCanceledReservations->getValue(parameters, variables, object, request))
 				, Conversion::ToInt(_first->getValue(parameters, variables, object, request))
 				, Conversion::ToInt(_number->getValue(parameters, variables, object, request))
-			));
-			for (vector<shared_ptr<ReservationTransaction> >::const_iterator itr(resats.begin()); itr != resats.end(); ++itr)
+				, DOWN_LINKS_LOAD_LEVEL
+			);
+			BOOST_FOREACH(shared_ptr<ReservationTransaction> tran, env.template getRegistry<ReservationTransaction>())
 			{
-				vector<shared_ptr<Reservation> > resas(ReservationTableSync::search(itr->get()));
-
 				const ReservationItemInterfacePage* page(_page->getInterface()->getPage<ReservationItemInterfacePage>());
-				page->display(stream, **itr, variables, request);
+				page->display(stream, *tran, variables, request);
 			}
 
 			return string();

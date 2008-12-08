@@ -24,16 +24,16 @@
 
 #include "RoadChunkTableSync.h"
 
-#include "15_env/AddressTableSync.h"
-#include "15_env/RoadTableSync.h"
+#include "AddressTableSync.h"
+#include "RoadTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
-#include "02_db/LinkException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
+#include "LinkException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 #include <boost/tokenizer.hpp>
 
@@ -58,11 +58,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE_ID = 14;
 		template<> const bool SQLiteTableSyncTemplate<RoadChunkTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::load(RoadChunk* object, const db::SQLiteResultSPtr& rows )
-		{
-			// ID
-		    object->setKey (rows->getLongLong (TABLE_COL_ID));
-
+		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::Load(
+			RoadChunk* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    // Is departure
 		    bool isDeparture (rows->getBool (RoadChunkTableSync::COL_ISDEPARTURE));
 		    object->setIsDeparture(isDeparture);
@@ -92,39 +93,38 @@ namespace synthese
 				object->addViaPoint (Point2D (Conversion::ToDouble (*valueIter), 
 						      Conversion::ToDouble (*(++valueIter))));
 		    }
-		}
 
-
-		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::_link(RoadChunk* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			// From address
-			uid fromAddressId (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID));
-
-			try
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				Address* fromAddress(AddressTableSync::GetUpdateable (fromAddressId, obj, temporary));
-				obj->setParentPath(fromAddress->getRoad());
-				obj->setFromAddress(fromAddress);
+				// From address
+				uid fromAddressId (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID));
 
-				if (temporary == GET_REGISTRY)
+				try
 				{
+					Address* fromAddress(AddressTableSync::GetEditable (fromAddressId, env, linkLevel).get());
+					object->setParentPath(fromAddress->getRoad());
+					object->setFromAddress(fromAddress);
+
 					if (!fromAddress->getRoad())
-						throw LinkException<RoadChunkTableSync>(obj->getKey(), RoadChunkTableSync::COL_ADDRESSID, Exception("Address without road"));
-					const_cast<Road*>(fromAddress->getRoad())->addEdge (obj);
+						throw LinkException<RoadChunkTableSync>(object->getKey(), RoadChunkTableSync::COL_ADDRESSID, Exception("Address without road"));
+					const_cast<Road*>(fromAddress->getRoad())->addEdge (object);
+					
+				}
+				catch (ObjectNotFoundException<Address>& e)
+				{
+					throw LinkException<RoadChunkTableSync>(object->getKey(), RoadChunkTableSync::COL_ADDRESSID, e);
 				}
 			}
-			catch (Address::ObjectNotFoundException& e)
-			{
-				throw LinkException<RoadChunkTableSync>(obj->getKey(), RoadChunkTableSync::COL_ADDRESSID, e);
-			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::_unlink(RoadChunk* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::Unlink(
+			RoadChunk* obj,
+			Env* env
+		){
 		}
 
 	    
-	    template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::save(RoadChunk* object)
+	    template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::Save(RoadChunk* object)
 	    {
 		SQLite* sqlite = DBModule::GetSQLite();
 		stringstream query;
@@ -160,90 +160,31 @@ namespace synthese
 			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
-/*	    void RoadChunkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
-	    {
-		while (rows->next ())
-		{
-		    uid id = rows->getLongLong (TABLE_COL_ID);
-		    if (RoadChunk::Contains(id))
-		    {
-			load(RoadChunk::GetUpdateable(id).get(), rows);
-		    }
-		    else
-		    {
-			RoadChunk* object(new RoadChunk);
-			load(object, rows);
-			object->store();
-			
-			uid fromAddressId (rows->getLongLong ( RoadChunkTableSync::COL_ADDRESSID));
-			shared_ptr<const Address> fromAddress = Address::Get (fromAddressId);
-			Road::GetUpdateable(fromAddress->getRoad ()->getId ())->addEdge (object);
-		    }
-		}
-	    }
-		
-
-	    void RoadChunkTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-	    {
-		while (rows->next ())
-		{
-		    uid id = rows->getLongLong (TABLE_COL_ID);
-		    if (RoadChunk::Contains(id))
-		    {
-			load(RoadChunk::GetUpdateable(id).get(), rows);
-		    }
-		}
-	    }
 
 
-	    
-	    void RoadChunkTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-	    {
-		while (rows->next ())
-		{
-		    uid id = rows->getLongLong (TABLE_COL_ID);
-		    if (RoadChunk::Contains(id))
-		    {
-			RoadChunk::Remove(id);
-		    }
-		}
-	    }
-*/
+	    void RoadChunkTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE 1 ";
+			/// @todo Fill Where criteria
+			// if (!name.empty())
+			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			;
+			//if (orderByName)
+			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
 
-	    vector<shared_ptr<RoadChunk> > RoadChunkTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-	    {
-		stringstream query;
-		query
-		    << " SELECT *"
-		    << " FROM " << TABLE_NAME
-		    << " WHERE 1 ";
-		/// @todo Fill Where criteria
-		// if (!name.empty())
-		// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-		;
-		//if (orderByName)
-		//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
-		if (number > 0)
-		    query << " LIMIT " << Conversion::ToString(number + 1);
-		if (first > 0)
-		    query << " OFFSET " << Conversion::ToString(first);
-		
-		try
-		{
-		    SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-		    vector<shared_ptr<RoadChunk> > objects;
-		    while (rows->next ())
-		    {
-			shared_ptr<RoadChunk> object(new RoadChunk);
-			load(object.get(), rows);
-			objects.push_back(object);
-		    }
-		    return objects;
-		}
-		catch(SQLiteException& e)
-		{
-		    throw Exception(e.getMessage());
-		}
+			LoadFromQuery(query.str(), env, linkLevel);
 	    }
 	}
 }

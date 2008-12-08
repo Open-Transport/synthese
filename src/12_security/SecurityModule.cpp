@@ -24,17 +24,19 @@
 
 #include "SecurityModule.h"
 
-#include "01_util/Factory.h"
+#include "Factory.h"
 #include "01_util/Constants.h"
 
-#include "12_security/ProfileTableSync.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/User.h"
-#include "12_security/Profile.h"
-#include "12_security/GlobalRight.h"
+#include "ProfileTableSync.h"
+#include "UserTableSync.h"
+#include "User.h"
+#include "Profile.h"
+#include "GlobalRight.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -55,11 +57,12 @@ namespace synthese
 
 		void SecurityModule::initialize()
 		{
-			vector<shared_ptr<Profile> > profiles = ProfileTableSync::Search(ROOT_PROFILE);
-			if (profiles.empty())
+			Env env;
+			ProfileTableSync::Search(env, ROOT_PROFILE);
+			if (env.template getRegistry<Profile>().empty())
 				_rootProfile.reset(new Profile);
 			else
-				_rootProfile = profiles.front();
+				_rootProfile = env.template getEditableRegistry<Profile>().front();
 	
 			_rootProfile->setName(ROOT_PROFILE);
 			shared_ptr<Right> r(new GlobalRight);
@@ -67,21 +70,21 @@ namespace synthese
 			r->setPrivateLevel(DELETE_RIGHT);
 			_rootProfile->cleanRights();
 			_rootProfile->addRight(r);
-			ProfileTableSync::save(_rootProfile.get());
+			ProfileTableSync::Save(_rootProfile.get());
 
-			vector<shared_ptr<User> > users = UserTableSync::Search(ROOT_USER, ROOT_USER, "%","%", _rootProfile->getKey());
-			if (users.size() == 0)
+			UserTableSync::Search(env, ROOT_USER, ROOT_USER, "%","%", _rootProfile->getKey());
+			if (env.template getRegistry<User>().empty())
 			{
 				_rootUser.reset(new User);
 				_rootUser->setLogin(ROOT_USER);
 				_rootUser->setPassword(ROOT_USER);
 			}
 			else
-				_rootUser = users.front();
+				_rootUser = env.template getEditableRegistry<User>().front();
 			_rootUser->setName(ROOT_USER);
 			_rootUser->setProfile(_rootProfile.get());
 			_rootUser->setConnectionAllowed(true);
-			UserTableSync::save(_rootUser.get());
+			UserTableSync::Save(_rootUser.get());
 		}
 
 
@@ -99,8 +102,11 @@ namespace synthese
 			vector<pair<uid, string> > m;
 			if (withAll)
 				m.push_back(make_pair(0, "(tous)"));
-			for (Profile::ConstIterator it(Profile::Begin()); it != Profile::End(); ++it)
-				m.push_back(make_pair(it->first, it->second->getName()));
+			
+			Env env;
+			ProfileTableSync::Search(env);
+			BOOST_FOREACH(shared_ptr<Profile> profile, env.template getRegistry<Profile>())
+				m.push_back(make_pair(profile->getKey(), profile->getName()));
 			return m;
 		}
 
@@ -109,9 +115,11 @@ namespace synthese
 			vector<pair<uid, string> > m;
 			if (withAll)
 				m.push_back(make_pair(uid(0), "(tous)"));
-			vector<shared_ptr<User> > users = UserTableSync::Search("%","%","%","%",UNKNOWN_VALUE, false);
-			for (vector<shared_ptr<User> >::iterator it = users.begin(); it != users.end(); ++it)
-				m.push_back(make_pair((*it)->getKey(), (*it)->getSurname() + " " + (*it)->getName()));
+
+			Env env;
+			UserTableSync::Search(env, "%","%","%","%",UNKNOWN_VALUE, false);
+			BOOST_FOREACH(shared_ptr<User> user, env.template getRegistry<User>())
+				m.push_back(make_pair(user->getKey(), user->getSurname() + " " + user->getName()));
 			return m;
 		}
 
@@ -125,20 +133,22 @@ namespace synthese
 			return m;
 		}
 
-		std::vector<shared_ptr<const Profile> > SecurityModule::getSubProfiles(shared_ptr<const Profile> profile )
+		std::vector<shared_ptr<Profile> > SecurityModule::getSubProfiles(shared_ptr<const Profile> profile )
 		{
-			vector<shared_ptr<const Profile> > v;
-			for (Profile::ConstIterator it(Profile::Begin()); it != Profile::End(); ++it)
+			vector<shared_ptr<Profile> > v;
+			Env env;
+			ProfileTableSync::Search(env);
+			BOOST_FOREACH(shared_ptr<Profile> cprofile, env.template getRegistry<Profile>())
 			{
 				if (!profile.get())
 				{
-					if (!it->second->getParentId())
-						v.push_back(it->second);
+					if (!cprofile->getParentId())
+						v.push_back(cprofile);
 				}
 				else
 				{
-					 if (it->second->getParentId() == profile->getKey())
-						v.push_back(it->second);
+					 if (cprofile->getParentId() == profile->getKey())
+						v.push_back(cprofile);
 				}
 			}
 			return v;

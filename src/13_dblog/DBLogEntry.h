@@ -26,10 +26,9 @@
 #include <vector>
 #include <string>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 namespace synthese
 {
@@ -43,7 +42,8 @@ namespace synthese
 		/** DBLogEntry class.
 			@ingroup m13
 		*/
-		class DBLogEntry : public util::Registrable<uid, DBLogEntry>
+		class DBLogEntry
+		: public virtual util::Registrable
 		{
 		public:
 			typedef enum 
@@ -65,7 +65,8 @@ namespace synthese
 			uid						_objectId;
 
 		public:
-			DBLogEntry();
+			DBLogEntry(util::RegistryKeyType key = UNKNOWN_VALUE);
+
 			void					setLogKey(const std::string& key);
 			void					setDate(const time::DateTime& date);
 			void					setUser(const security::User* user);

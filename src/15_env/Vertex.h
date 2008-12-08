@@ -25,7 +25,7 @@
 
 #include <set>
 
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 #include "06_geometry/Point2D.h"
 
@@ -45,7 +45,9 @@ namespace synthese
 			A vertex is necessarily connected to its corresponding path.
 		@ingroup m35
 		*/
-		class Vertex : public geometry::Point2D
+		class Vertex
+		:	public geometry::Point2D,
+			public virtual util::Registrable
 		{
 		public:
 			typedef std::set<const Edge*> Edges;
@@ -73,7 +75,6 @@ namespace synthese
 				const ConnectionPlace*		getConnectionPlace ()	const;  
 				const Edges&				getDepartureEdges ()	const;
 				const Edges&				getArrivalEdges ()		const;
-				virtual const uid&			getId ()				const = 0;
 			//@}
 
 			//! @name Setters

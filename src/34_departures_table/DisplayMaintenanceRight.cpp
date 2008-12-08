@@ -22,7 +22,7 @@
 
 #include "DisplayMaintenanceRight.h"
 
-#include "15_env/EnvModule.h"
+#include "EnvModule.h"
 
 #include "12_security/Constants.h"
 
@@ -58,13 +58,16 @@ namespace synthese
 
 	namespace departurestable
 	{
-		std::string DisplayMaintenanceRight::displayParameter() const
-		{
+		std::string DisplayMaintenanceRight::displayParameter(
+			util::Env* env
+		) const {
 			return _parameter;
 		}
 
-		bool DisplayMaintenanceRight::perimeterIncludes( const std::string& perimeter ) const
-		{
+		bool DisplayMaintenanceRight::perimeterIncludes(
+			const std::string& perimeter,
+			util::Env* env
+		) const	{
 			return true;
 		}
 	}

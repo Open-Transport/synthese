@@ -23,9 +23,7 @@
 #ifndef SYNTHESE_ScenarioTemplate_h__
 #define SYNTHESE_ScenarioTemplate_h__
 
-#include "17_messages/ScenarioSubclassTemplate.h"
-
-#include "01_util/Registrable.h"
+#include "ScenarioSubclassTemplate.h"
 
 namespace synthese
 {
@@ -37,16 +35,15 @@ namespace synthese
 			@ingroup m17
 		*/
 		class ScenarioTemplate
-			: public ScenarioSubclassTemplate<AlarmTemplate>
-			, public util::Registrable<uid, ScenarioTemplate>
+		:	public ScenarioSubclassTemplate<AlarmTemplate>
 		{
 			uid	_folderId;
 
 		public:
 			ScenarioTemplate(const std::string name = std::string());
 			ScenarioTemplate(const ScenarioTemplate& source, const std::string& name);
+			ScenarioTemplate(util::RegistryKeyType key);
 			~ScenarioTemplate();
-			uid getId()			const;
 			uid	getFolderId()	const;
 
 			void	setFolderId(uid value);

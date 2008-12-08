@@ -1,4 +1,7 @@
 
+// ENVMODULE 35
+
+//Factories
 synthese::env::LineMarkerInterfacePage::integrate();
 synthese::env::ReservationRuleInterfacePage::integrate();
 
@@ -52,3 +55,28 @@ synthese::env::EnvModule::integrate();
 synthese::env::TransportNetworkRight::integrate();
 
 synthese::env::LinesListFunction::integrate();
+
+// Registries
+synthese::util::Env::template Integrate<synthese::env::PhysicalStop>();
+synthese::util::Env::template Integrate<synthese::env::Line>();
+synthese::util::Env::template Integrate<synthese::env::Road>();
+synthese::util::Env::template Integrate<synthese::env::Address>();
+synthese::util::Env::template Integrate<synthese::env::Axis>();
+synthese::util::Env::template Integrate<synthese::env::BikeCompliance>();
+synthese::util::Env::template Integrate<synthese::env::Crossing>();
+synthese::util::Env::template Integrate<synthese::env::LineStop>();
+synthese::util::Env::template Integrate<synthese::env::HandicappedCompliance>();
+synthese::util::Env::template Integrate<synthese::env::NonConcurrencyRule>();
+synthese::util::Env::template Integrate<synthese::env::TransportNetwork>();
+synthese::util::Env::template Integrate<synthese::env::PublicTransportStopZoneConnectionPlace>();
+synthese::util::Env::template Integrate<synthese::env::ReservationRule>();
+synthese::util::Env::template Integrate<synthese::env::CommercialLine>();
+synthese::util::Env::template Integrate<synthese::env::PedestrianCompliance>();
+synthese::util::Env::template Integrate<synthese::env::RollingStock>();
+synthese::util::Env::template Integrate<synthese::env::RoadChunk>();
+synthese::util::Env::template Integrate<synthese::env::City>();
+synthese::util::Env::template Integrate<synthese::env::ContinuousService>();
+synthese::util::Env::template Integrate<synthese::env::Fare>();
+synthese::util::Env::template Integrate<synthese::env::PlaceAlias>();
+synthese::util::Env::template Integrate<synthese::env::PublicPlace>();
+synthese::util::Env::template Integrate<synthese::env::ScheduledService>();

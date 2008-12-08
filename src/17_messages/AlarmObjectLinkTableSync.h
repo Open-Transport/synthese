@@ -29,18 +29,18 @@
 #include <iostream>
 #include <sstream>
 
-#include "01_util/Conversion.h"
-#include "01_util/Registrable.h"
+#include "Conversion.h"
+#include "Registrable.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
-#include "02_db/SQLiteDirectTableSyncTemplate.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
+#include "SQLiteDirectTableSyncTemplate.h"
 
-#include "17_messages/AlarmObjectLink.h"
-#include "17_messages/Alarm.h"
-#include "17_messages/MessagesModule.h"
+#include "AlarmObjectLink.h"
+#include "Alarm.h"
+#include "MessagesModule.h"
 
 namespace synthese
 {
@@ -83,9 +83,13 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<AlarmObjectLink> > search(
+			static void Search(
+				util::Env& env,
 				const Alarm* alarm,
-				int first = 0, int number = 0);
+				int first = 0,
+				int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 
 			/** Remove a link between an alarm and an object specified by their id.
 				@param alarmId ID of the alarm
@@ -130,7 +134,7 @@ namespace synthese
 					<< AlarmObjectLinkTableSync::COL_OBJECT_ID
 				<< " FROM " << TABLE_NAME
 				<< " WHERE " 
-					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getId())
+					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getKey())
 					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToSQLiteString(recipientKey);
 			if (number > 0)
 			    query << " LIMIT " << util::Conversion::ToString(number + 1);
@@ -143,7 +147,7 @@ namespace synthese
 				std::vector< boost::shared_ptr<T> > objects;
 				while (rows->next ())
 				{
-				    objects.push_back (db::SQLiteDirectTableSyncTemplate<K,T>::GetUpdateable(
+				    objects.push_back (db::SQLiteDirectTableSyncTemplate<K,T>::GetEditable(
 							   rows->getLongLong (COL_OBJECT_ID)));
 				}
 				return objects;

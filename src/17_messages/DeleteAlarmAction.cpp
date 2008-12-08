@@ -53,7 +53,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_alarm.get())
-				map.insert(PARAMETER_ALARM, _alarm->getId());
+				map.insert(PARAMETER_ALARM, _alarm->getKey());
 			return map;
 		}
 
@@ -65,8 +65,8 @@ namespace synthese
 		void DeleteAlarmAction::run()
 		{
 			// Action
-			AlarmObjectLinkTableSync::Remove(_alarm->getId());
-			AlarmTableSync::Remove(_alarm->getId());
+			AlarmObjectLinkTableSync::Remove(_alarm->getKey());
+			AlarmTableSync::Remove(_alarm->getKey());
 
 			// Log
 			if (dynamic_cast<const SentAlarm*>(_alarm.get()))
@@ -75,11 +75,11 @@ namespace synthese
 				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(_alarm.get()), _request->getUser().get());
 		}
 
-		void DeleteAlarmAction::setAlarmId( uid id )
+		void DeleteAlarmAction::setAlarmId(RegistryKeyType id )
 		{
 			try
 			{
-				_alarm.reset(AlarmTableSync::Get(id, true));
+				_alarm = AlarmTableSync::Get(id);
 			}
 			catch (...)
 			{

@@ -23,11 +23,8 @@
 #ifndef SYNTHESE_interfaces_NonPredefinedInterfacePage_h__
 #define SYNTHESE_interfaces_NonPredefinedInterfacePage_h__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
-
-#include <string>
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -39,6 +36,7 @@ namespace synthese
 		class NonPredefinedInterfacePage : public util::FactorableTemplate<InterfacePage,NonPredefinedInterfacePage>
 		{
 		public:
+			NonPredefinedInterfacePage();
 
 		};
 	}

@@ -22,10 +22,10 @@
 
 #include "12_security/Constants.h"
 
-#include "13_dblog/DBLog.h"
-#include "13_dblog/DBLogRight.h"
+#include "DBLog.h"
+#include "DBLogRight.h"
 
-#include "01_util/Factory.h"
+#include "Factory.h"
 
 using namespace std;
 
@@ -58,16 +58,19 @@ namespace synthese
 
 	namespace dblog
 	{
-		std::string DBLogRight::displayParameter() const
-		{
+		std::string DBLogRight::displayParameter(
+			util::Env* env
+		) const	{
 			if (Factory<DBLog>::contains(_parameter))
 				return Factory<DBLog>::create(_parameter)->getName();
 			else
 				return _parameter;
 		}
 
-		bool DBLogRight::perimeterIncludes( const std::string& perimeter ) const
-		{
+		bool DBLogRight::perimeterIncludes(
+			const std::string& perimeter,
+			util::Env* env
+		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return true;
 

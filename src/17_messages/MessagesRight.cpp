@@ -22,8 +22,8 @@
 
 #include "12_security/Constants.h"
 
-#include "17_messages/MessagesRight.h"
-#include "17_messages/AlarmRecipient.h"
+#include "MessagesRight.h"
+#include "AlarmRecipient.h"
 
 using namespace std;
 
@@ -61,13 +61,16 @@ namespace synthese
 
 	namespace messages
 	{
-		std::string MessagesRight::displayParameter() const
-		{
+		std::string MessagesRight::displayParameter(
+			util::Env* env
+		) const	{
 			return _parameter;
 		}
 
-		bool MessagesRight::perimeterIncludes( const std::string& perimeter ) const
-		{
+		bool MessagesRight::perimeterIncludes(
+			const std::string& perimeter,
+			util::Env* env
+		) const	{
 			return true;
 		}
 	}

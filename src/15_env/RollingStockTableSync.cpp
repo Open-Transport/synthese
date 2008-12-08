@@ -26,12 +26,12 @@
 
 #include "RollingStockTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -55,15 +55,13 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::load(
+		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Load(
 			RollingStock* object
 			, const db::SQLiteResultSPtr& rows
+			, Env* env,
+			LinkLevel linkLevel
 		){
-			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
-
 			// Properties
-			object->setKey(id);
 			object->setName(rows->getText(RollingStockTableSync::COL_NAME));
 			object->setArticle(rows->getText(RollingStockTableSync::COL_ARTICLE));
 			object->setIndicator(rows->getText(RollingStockTableSync::COL_INDICATOR));
@@ -71,7 +69,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::save(
+		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Save(
 			RollingStock* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -89,19 +87,10 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::_link(
-			RollingStock* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
+		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Unlink(
+			RollingStock* obj,
+			Env* env
 		){
-			/// @todo Fill it
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::_unlink(
-			RollingStock* obj
-		){
-			/// @todo Fill it
 		}
 	}
 	
@@ -125,10 +114,12 @@ namespace synthese
 
 
 
-		vector<shared_ptr<RollingStock> > RollingStockTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
-
+		void RollingStockTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -145,23 +136,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<RollingStock> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<RollingStock> object(new RollingStock);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

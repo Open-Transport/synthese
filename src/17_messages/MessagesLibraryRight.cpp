@@ -52,13 +52,16 @@ namespace synthese
 
 	namespace messages
 	{
-		std::string MessagesLibraryRight::displayParameter() const
-		{
+		std::string MessagesLibraryRight::displayParameter(
+			util::Env* env
+		) const	{
 			return _parameter;
 		}
 
-		bool MessagesLibraryRight::perimeterIncludes( const std::string& perimeter ) const
-		{
+		bool MessagesLibraryRight::perimeterIncludes(
+			const std::string& perimeter,
+			util::Env* env
+		) const	{
 			return true;
 		}
 	}

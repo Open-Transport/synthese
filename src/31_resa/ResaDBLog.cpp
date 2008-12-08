@@ -132,23 +132,23 @@ namespace synthese
 
 		void ResaDBLog::UpdateCallEntryDate( uid callId )
 		{
-			shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetUpdateable(callId));
+			shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId));
 			DBLogEntry::Content content(entry->getContent());
 			DateTime now(TIME_CURRENT);
 			content[COL_DATE2] = now.toSQLString(false);
 			entry->setContent(content);
 
-			DBLogEntryTableSync::save(entry.get());
+			DBLogEntryTableSync::Save(entry.get());
 		}
 
 		void ResaDBLog::UpdateCallEntryCustomer( uid callId, uid customerId )
 		{
 			try
 			{
-				shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetUpdateable(callId));
+				shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId));
 				entry->setObjectId(customerId);
 
-				DBLogEntryTableSync::save(entry.get());
+				DBLogEntryTableSync::Save(entry.get());
 			}
 			catch(...)
 			{
@@ -215,8 +215,8 @@ namespace synthese
 			
 			if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
 			{
-				tr = ReservationTransactionTableSync::GetUpdateable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]));
-				ReservationTableSync::search(tr.get());
+				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]));
+				//ReservationTableSync::search(tr.get());
 				status = tr->getStatus();
 			}
 

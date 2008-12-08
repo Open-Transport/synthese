@@ -22,12 +22,12 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
 #include "PedestrianComplianceTableSync.h"
 
@@ -49,10 +49,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE_ID = 18;
 		template<> const bool SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::load(PedestrianCompliance* cmp, const db::SQLiteResultSPtr& rows )
-		{
-			cmp->setKey(rows->getLongLong (TABLE_COL_ID));
-
+		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::Load(
+			PedestrianCompliance* cmp,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			tribool status = true;
 			int statusInt (
 			    rows->getInt (PedestrianComplianceTableSync::COL_STATUS));
@@ -72,7 +74,7 @@ namespace synthese
 			cmp->setCapacity (capacity);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::save(PedestrianCompliance* object)
+		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::Save(PedestrianCompliance* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -95,12 +97,11 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::_link(PedestrianCompliance* obj, const SQLiteResultSPtr& row, GetSource temporary)
-		{
 
-		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::_unlink(PedestrianCompliance* obj)
+		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::Unlink(
+			PedestrianCompliance* obj,
+			Env* env)
 		{
 
 		}
@@ -120,9 +121,11 @@ namespace synthese
 			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
-		std::vector<shared_ptr<PedestrianCompliance> > PedestrianComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		void PedestrianComplianceTableSync::Search(
+			Env& env,
+			int first /*= 0*/, int number, /*= 0*/
+			LinkLevel linkLevel)
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -136,22 +139,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<PedestrianCompliance> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<PedestrianCompliance> object(new PedestrianCompliance());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

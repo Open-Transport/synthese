@@ -36,8 +36,13 @@ namespace synthese
 		{
 		public:
 			GlobalRight();
-			std::string	displayParameter()	const;
-			bool perimeterIncludes(const std::string& perimeter) const;
+			std::string	displayParameter(
+				util::Env* env = util::Env::GetOfficialEnv()
+			) const;
+			bool perimeterIncludes(
+				const std::string& perimeter,
+				util::Env* env = util::Env::GetOfficialEnv()
+			) const;
 		};
 	}
 }

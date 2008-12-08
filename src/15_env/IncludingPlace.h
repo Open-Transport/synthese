@@ -45,6 +45,12 @@ namespace synthese
 		protected:
 			IncludedPlaces _includedPlaces; 
 
+			IncludingPlace(
+				util::RegistryKeyType key,
+				const std::string& name,
+				const City* city
+			);
+
 		public:
 
 			virtual ~IncludingPlace ();
@@ -88,13 +94,6 @@ namespace synthese
 				void addIncludedPlace (const Place* place);
 
 			//@}
-
-
-		protected:
-
-			IncludingPlace (const std::string& name,
-					  const City* city);
-
 		};
 	}
 }

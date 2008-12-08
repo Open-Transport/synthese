@@ -23,13 +23,7 @@
 #ifndef SYNTHESE_UTIL_REGISTRABLE_H
 #define SYNTHESE_UTIL_REGISTRABLE_H
 
-#include <map>
-#include <set>
-
-#include <string>
-#include <iostream>
-
-#include "01_util/Registry.h"
+#include "UtilTypes.h"
 #include "01_util/Constants.h"
 
 namespace synthese
@@ -37,207 +31,43 @@ namespace synthese
 	namespace util
 	{
 
-		/** Generic registry class for common environment operations (get, add, remove...).
-			@warning The registry only has the responsibility of destroying registered objects. So do not create shared pointers on Registrable object, use getRegisteredSharedPointer method instead.
-			@note A Registrable object must be registered in only one registry.
+		/** Base class for all registrable objects.
 
+			As this class is very much used, it is dangerous to derivate directly from it.
+			Use a virtual derivation to ensure that there is always only one instantiation of the
+			class in a sub-class instantiation.
+		
 			@ingroup m01Registry
 		*/
-		template<class K, class T>
 		class Registrable
 		{
-		public:
-			typedef K										KeyType;
-			typedef T										ValueType;
-			typedef Registry<K, T>							Registry;
-			typedef RegistryKeyException<K, T>				RegistryKeyException;
-			typedef ObjectNotFoundException<K,T>			ObjectNotFoundException;
-			typedef ObjectNotFoundInRegistryException<K,T>	ObjectNotFoundInRegistryException;
-			typedef typename Registry::const_iterator		ConstIterator;
-			typedef	std::set<const void*>					ChildTemporaryObjects;
-
 		private:
-			K						_key;		//!< The key of the object in the registry.
-			
-			static typename Registrable::Registry		_registry;	//!< The official registry of the object (updated at the first insertion)
+			RegistryKeyType _key;	//!< ID of the object
 
-			bool					_linked;
-			ChildTemporaryObjects	_childTemporaryObjects;
+		protected:
 
+			/** Constructor.
+				@param key ID of the object.
+			*/
+			Registrable(RegistryKeyType key = UNKNOWN_VALUE);
 
 		public:
-			Registrable();
-			Registrable (const K& key);
-			virtual ~Registrable ();
-
-			static boost::shared_ptr<const T>	Get(const K& key);
-			static boost::shared_ptr<T>			GetUpdateable(const K& key);
-			static bool Contains(const K& key);
-			static ConstIterator Begin();
-			static ConstIterator End();
-			static void Remove(const K& key);
-			static const typename Registrable::Registry& GetRegistry() { return _registry; }
-
-			
-			//! @name Getters
+			//! \name Getters
 			//@{
-				const K&	getKey () const;
-				bool		getLinked()	const		{ return _linked; }
-			//@}
-
-			//! @name Setters
-			//@{
-				void		setKey(const K& key);
-				void		setLinked(bool value)	{ _linked = value; }
-			//@}
-
-			//! @name Update methods
-			//@{
-				void	store();
-				void	remove();
-
-				template<class C>
-				void addChildTemporaryObject(C* object)
-				{
-					_childTemporaryObjects.insert(static_cast<const void*>(object));
-				}
-
-				void clearChildTemporaryObjects()
-				{
-					for (ChildTemporaryObjects::iterator it(_childTemporaryObjects.begin()); it != _childTemporaryObjects.end(); ++it)
-						delete *it;
-					_childTemporaryObjects.clear();
-					_linked = false;
-				}
-			//@}
-
-			//! @name Calculators
-			//@{
-				/** Gets the registered shared pointer if exists.
-					@return boost::shared_ptr<const T> The unique shared pointer to use, a null one if the object is not registered.
-					@author Hugues Romain
-					@date 2007
-
-					This method gives the registered shared pointer to this object, in 
-					order to avoid to create multiple shared pointers to the object, with 
-					the risk of an auto deletion.
-					
+				/** ID of the object getter.
+					@return the ID of the object.
 				*/
-				boost::shared_ptr<const T>	getRegisteredSharedPointer() const;
+				RegistryKeyType getKey() const;
+			//@}
+
+			//! \name Setters
+			//@{
+				/** ID of the object setter.
+					@param key the ID of the object to set 
+				*/
+				void setKey(RegistryKeyType key);
 			//@}
 		};
-
-		
-		template<class K, class T> 
-		    typename Registrable<K, T>::Registry Registrable<K, T>::_registry;
-
-
-		template<class K, class T>
-		typename Registrable<K, T>::ConstIterator Registrable<K, T>::Begin()
-		{
-			return _registry.begin();
-		}
-
-
-
-		template<class K, class T>
-		typename Registrable<K, T>::ConstIterator Registrable<K, T>::End()
-		{
-			return _registry.end();
-		}
-
-
-		template<class K, class T>
-		boost::shared_ptr<const T> Registrable<K, T>::Get(const K& key)
-		{
-			return _registry.get(key);
-		}
-
-
-
-		template<class K, class T>
-		boost::shared_ptr<T> Registrable<K, T>::GetUpdateable(const K& key)
-		{
-			return _registry.getUpdateable(key);
-		}
-
-
-
-		template<class K, class T>
-		bool Registrable<K, T>::Contains(const K& key)
-		{
-			return _registry.contains(key);
-		}
-
-
-
-		template<class K, class T>
-		void Registrable<K, T>::Remove(const K& key)
-		{
-			return _registry.remove(key);
-		}
-
-
-
-		template<class K, class T>
-		void Registrable<K, T>::remove()
-		{
-			_registry.remove(_key);
-		}
-		
-		
-		template<class K, class T>
-		void Registrable<K, T>::store()
-		{
-			_registry.add(boost::shared_ptr<T>(static_cast<T*>(this)));
-		}
-		
-		
-		template<class K, class T>
-		boost::shared_ptr<const T> Registrable<K, T>::getRegisteredSharedPointer() const
-		{
-		    return _registry.get(_key);
-		}
-
-		template<class K, class T>
-			synthese::util::Registrable<K, T>::Registrable()
-			: _key(UNKNOWN_VALUE)
-			, _linked(false)
-		{
-
-		}
-
-
-
-		template<class K,class T>
-		Registrable<K,T>::Registrable (const K& key)
-			: _key (key)
-			, _linked(false)
-		{
-		}
-
-
-		template<class K, class T>
-		Registrable<K,T>::~Registrable ()
-		{
-		}
-
-
-		template<class K, class T>
-		const K&
-		Registrable<K,T>::getKey () const
-		{
-			return _key; 
-		}
-
-
-		template<class K, class T>
-		void
-		Registrable<K,T>::setKey (const K& key)
-		{
-			_key = key;
-		}
-
 	}
 }
 

@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class Service;
+		class NonPermanentService;
 		class CommercialLine;
 	}
 
@@ -69,8 +69,7 @@ namespace synthese
 		    
 			static std::string TridentId (const std::string& peer, const std::string clazz, const uid& id);
 			static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
-			static std::string TridentId (const std::string& peer, const std::string clazz, const env::Service* srv);
-
+			static std::string TridentId (const std::string& peer, const std::string clazz, const env::NonPermanentService* srv);
 		};
 	}
 }

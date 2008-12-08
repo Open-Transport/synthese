@@ -75,7 +75,4 @@ namespace synthese
 			_uid = vel.isEmpty() ? shared_ptr<LibraryInterfaceElement>() : vel.front();
 		}
 	}
-
 }
-
-

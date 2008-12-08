@@ -58,6 +58,8 @@ namespace synthese
 		class RoutePlannerSheetLineInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLineInterfacePage>
 		{
 		public:
+			RoutePlannerSheetLineInterfacePage();
+
 			/** Display of line of schedule sheet.
 				@param stream Stream to write on
 				@param text (0) Text containing cells

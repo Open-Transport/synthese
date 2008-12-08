@@ -20,9 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "15_env/LineMarkerInterfacePage.h"
+#include "LineMarkerInterfacePage.h"
 
 using namespace std;
 
@@ -52,6 +52,14 @@ namespace synthese
 			pv.push_back(Conversion::ToString(pixelWidth));
 			pv.push_back(Conversion::ToString(pixelHeight));
 			InterfacePage::display(stream, pv, vars, static_cast<const void*>(line), request);
+		}
+
+
+
+		LineMarkerInterfacePage::LineMarkerInterfacePage()
+			: Registrable()
+		{
+
 		}
 	}
 }

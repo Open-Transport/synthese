@@ -1,7 +1,7 @@
 
 #include <vector>
 
-#include "01_util/Registrable.h"
+#include "Registrable.h"
 
 #include "04_time/DateTime.h"
 
@@ -15,7 +15,7 @@ namespace synthese
 		class LineAlarmBroadcast;
 		class BroadcastPointAlarmBroadcast;
 
-		class ScenarioBroadcast : public util::Registrable<ScenarioBroadcast, uid>
+		class ScenarioBroadcast : public util::Registrable
 		{
 		private:
 			time::DateTime							_start;

@@ -29,7 +29,6 @@
 #include <boost/logic/tribool.hpp>
 
 #include "Registrable.h"
-#include "UId.h"
 
 #include "Path.h"
 
@@ -67,9 +66,8 @@ namespace synthese
 
 			If a service is responsible of a break of the preceding rules, then the line is copied as a SubLine, and the service is linked to the new line. The _sublines container keeps a pointer on each SubLine.
 		*/
-		class Line : 
-			public synthese::util::Registrable<uid,Line>,
-			public Path
+		class Line
+		:	public Path
 		{
 		public:
 			typedef std::vector<SubLine*> SubLines;
@@ -97,18 +95,18 @@ namespace synthese
 
 		public:
 
-			Line (const uid& id,
-			const std::string& name, 
-			const Axis* axis);
+			Line(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				std::string name = std::string(), 
+				const Axis* axis = NULL
+			);
 
-			Line();
 			virtual ~Line();
 
 
 
 			//! @name Getters
 			//@{
-				virtual uid				getId ()					const;
 				const std::string&		getName ()					const;
 				bool					getUseInDepartureBoards ()	const;
 				bool					getUseInTimetables ()		const;

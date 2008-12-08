@@ -70,6 +70,8 @@ namespace synthese
 		class ParseDisplayReturnInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, ParseDisplayReturnInterfacePage>
 		{
 		public:
+			ParseDisplayReturnInterfacePage();
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 			*/

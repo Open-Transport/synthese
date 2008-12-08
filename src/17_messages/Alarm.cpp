@@ -22,10 +22,10 @@
 
 #include "Alarm.h"
 
-#include "17_messages/Scenario.h"
-#include "17_messages/SingleSentAlarm.h"
-#include "17_messages/ScenarioSentAlarm.h"
-#include "17_messages/AlarmTemplate.h"
+#include "Scenario.h"
+#include "SingleSentAlarm.h"
+#include "ScenarioSentAlarm.h"
+#include "AlarmTemplate.h"
 
 using namespace boost;
 
@@ -36,8 +36,8 @@ namespace synthese
 	namespace messages
 	{
 
-		Alarm::Alarm()
-			: _level(ALARM_LEVEL_INFO)
+		Alarm::Alarm(util::RegistryKeyType key)
+		:	_level(ALARM_LEVEL_INFO)
 		{
 		}
 
@@ -84,19 +84,5 @@ namespace synthese
 		{
 
 		}
-
-/*		boost::shared_ptr<const Alarm> Alarm::Get( uid key )
-		{
-			if (SentAlarm::Contains(key))
-				return static_pointer_cast<const Alarm, const SentAlarm>(SentAlarm::Get(key));
-			if (AlarmTemplate::Contains(key))
-				return static_pointer_cast<const Alarm, const AlarmTemplate>(AlarmTemplate::Get(key));
-			return shared_ptr<const Alarm>();
-		}
-
-		bool Alarm::Contains( uid key )
-		{
-			return SentAlarm::Contains(key) || AlarmTemplate::Contains(key);
-		}
-*/	}
+	}
 }

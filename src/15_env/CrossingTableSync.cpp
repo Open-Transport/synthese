@@ -48,31 +48,34 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<CrossingTableSync>::TABLE_ID = 43;
 		template<> const bool SQLiteTableSyncTemplate<CrossingTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::load(Crossing* crossing, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::Load(
+			Crossing* obj,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel)
 		{
-			uid id (rows->getLongLong (TABLE_COL_ID));
-			crossing->setKey(id);
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				uid cityId (rows->getLongLong (CrossingTableSync::TABLE_COL_CITYID));
+				try
+				{
+					obj->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
+				}
+				catch(ObjectNotFoundException<City>& e)
+				{
+					throw LinkException<CrossingTableSync>(obj->getKey(), CrossingTableSync::TABLE_COL_CITYID, e);
+				}
+			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::_link(Crossing* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			uid cityId (rows->getLongLong (CrossingTableSync::TABLE_COL_CITYID));
-			try
-			{
-				obj->setCity(City::Get(cityId).get());
-			}
-			catch(City::ObjectNotFoundException& e)
-			{
-				throw LinkException<CrossingTableSync>(obj->getKey(), CrossingTableSync::TABLE_COL_CITYID, e);
-			}
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::_unlink(Crossing* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::Unlink(
+			Crossing* obj,
+			Env* env
+		){
 			obj->setCity(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::save(Crossing* obj)
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::Save(Crossing* obj)
 		{
 
 		}
@@ -98,63 +101,5 @@ namespace synthese
 		{
 
 		}
-
-/*		    
-		void 
-			CrossingTableSync::rowsAdded (synthese::db::SQLite* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-			    uid id (rows->getLongLong (TABLE_COL_ID));
-			    
-				if (Crossing::Contains (id)) return;
-			    
-			    uid cityId (rows->getLongLong (TABLE_COL_CITYID));
-
-			    shared_ptr<const City> city = City::Get (cityId);
-			    
-			    Crossing* crossing(new Crossing (id, city.get()));
-
-			    // Add crossing to connection place registry but not in city lexical matcher...
-			    crossing->store();
-			}
-		}
-
-
-
-		void 
-			CrossingTableSync::rowsUpdated (synthese::db::SQLite* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				shared_ptr<Crossing> crossing = Crossing::GetUpdateable(
-				    rows->getLongLong (TABLE_COL_ID)
-				);
-				
-				load(crossing.get(), rows);
-			}
-		}
-
-
-
-
-		void 
-			CrossingTableSync::rowsRemoved (synthese::db::SQLite* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    
-			    Crossing::Remove (id);
-			}
-		}
-	    
-*/
 	}
 }

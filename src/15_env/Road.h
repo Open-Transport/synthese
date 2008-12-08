@@ -25,9 +25,6 @@
 
 #include <string>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-
 #include "AddressablePlace.h"
 #include "Path.h"
 
@@ -35,19 +32,15 @@ namespace synthese
 {
 	namespace env
 	{
-
 		class City;
 		class RoadChunk;
 
 		/** Road class.
 			@ingroup m35
 		*/
-		class Road : 
-			public synthese::util::Registrable<uid,Road>, 
-			public AddressablePlace,
+		class Road
+		:	public AddressablePlace,
 			public Path
-		    
-
 		{
 		public:
 			
@@ -75,26 +68,24 @@ namespace synthese
 		public:
 
 		  Road (
-			  uid id = UNKNOWN_VALUE
-			  , std::string name = std::string()
-			  , const City* city = NULL
-			  ,	RoadType type = ROAD_TYPE_UNKNOWN
-			  );
+			  util::RegistryKeyType key = UNKNOWN_VALUE,
+			  std::string name = std::string(),
+			  const City* city = NULL,
+			  RoadType type = ROAD_TYPE_UNKNOWN
+		  );
 
 		  virtual ~Road();
 
 
 		  //! @name Getters/Setters
 		  //@{
-		  virtual uid getId () const;
+			  bool hasReservationRule () const;
+			  const ReservationRule* getReservationRule () const;
 
-		  bool hasReservationRule () const;
-		  const ReservationRule* getReservationRule () const;
+			  const Axis* getAxis () const;
 
-		  const Axis* getAxis () const;
-
-		  const RoadType& getType () const;
-		  void setType (const RoadType& type);
+			  const RoadType& getType () const;
+			  void setType (const RoadType& type);
 		  //@}
 		    
 
@@ -151,4 +142,3 @@ namespace synthese
 }
 
 #endif 
-

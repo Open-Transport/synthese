@@ -88,7 +88,7 @@ namespace synthese
 		void Service::setPath( Path* path )
 		{
 			_path = path;
-			setPathId(path->getId());
+			setPathId(path->getKey());
 			setComplianceParent(path);
 		}
 

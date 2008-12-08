@@ -26,3 +26,6 @@
 
 #include "12_security/SecurityLog.h"
 
+// Registries
+#include "User.h"
+#include "Profile.h"

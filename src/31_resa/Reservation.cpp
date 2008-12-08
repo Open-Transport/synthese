@@ -34,8 +34,9 @@ namespace synthese
 
 	namespace resa
 	{
-		Reservation::Reservation()
-			: Registrable<uid,Reservation>()
+		Reservation::Reservation(
+			RegistryKeyType key
+		):	Registrable(key)
 			, _departureTime(TIME_UNKNOWN)
 			, _arrivalTime(TIME_UNKNOWN)
 			, _originDateTime(TIME_UNKNOWN)

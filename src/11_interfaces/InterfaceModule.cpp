@@ -24,16 +24,21 @@
 
 #include "InterfaceModule.h"
 
-#include "01_util/threads/Thread.h"
+#include "threads/Thread.h"
 
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteSync.h"
+#include "SQLite.h"
+#include "SQLiteSync.h"
 
-#include "11_interfaces/InterfaceTableSync.h"
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfacePageTableSync.h"
+#include "InterfaceTableSync.h"
+#include "Interface.h"
+#include "InterfacePageTableSync.h"
+
+#include "Env.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -50,8 +55,8 @@ namespace synthese
 		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels()
 		{
 			vector<pair<uid, string> > m;
-			for (Interface::ConstIterator it = Interface::Begin(); it != Interface::End(); ++it)
-				m.push_back(make_pair(it->first, it->second->getName()));
+			BOOST_FOREACH(shared_ptr<Interface> interf, Env::GetOfficialEnv()->template getRegistry<Interface>())
+				m.push_back(make_pair(interf->getKey(), interf->getName()));
 			return m;
 		}
 

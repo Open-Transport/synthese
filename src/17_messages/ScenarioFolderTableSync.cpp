@@ -56,22 +56,19 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::load(
+		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Load(
 			ScenarioFolder* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
 		){
-			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
-
-			// Properties
-			object->setKey(id);
 			object->setName(rows->getText(ScenarioFolderTableSync::COL_NAME));
 			object->setParentId(rows->getLongLong(ScenarioFolderTableSync::COL_PARENT_ID));
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::save(
+		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Save(
 			ScenarioFolder* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -90,16 +87,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::_link(
-			ScenarioFolder* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
-		){
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::_unlink(
-			ScenarioFolder* obj
+		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Unlink(
+			ScenarioFolder* obj,
+			Env* env
 		){
 		}
 	}
@@ -124,14 +114,14 @@ namespace synthese
 
 
 
-		vector<shared_ptr<ScenarioFolder> > ScenarioFolderTableSync::search(
+		void ScenarioFolderTableSync::Search(
+			Env& env,
 			uid parentFolderId
 			, std::string name
 			, int first /*= 0*/
-			, int number /*= 0*/
+			, int number, /*= 0*/
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -148,24 +138,7 @@ namespace synthese
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
-
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<ScenarioFolder> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<ScenarioFolder> object(new ScenarioFolder);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

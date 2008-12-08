@@ -23,6 +23,8 @@
 #include <sstream>
 
 #include "Conversion.h"
+#include "ReservationRule.h"
+#include "ReservationRuleTableSync.h"
 
 #include "DBModule.h"
 #include "SQLiteResult.h"
@@ -50,10 +52,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE_ID = 19;
 		template<> const bool SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::load(HandicappedCompliance* cmp, const db::SQLiteResultSPtr& rows )
-		{
-		    cmp->setKey(rows->getLongLong (TABLE_COL_ID));
-		    
+		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::Load(
+			HandicappedCompliance* cmp,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    tribool status = true;
 		    int statusInt (rows->getInt (HandicappedComplianceTableSync::COL_STATUS));
 
@@ -71,39 +75,41 @@ namespace synthese
 		    
 		    cmp->setCompliant (status);
 		    cmp->setCapacity (capacity);
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				cmp->setReservationRule(
+					ReservationRuleTableSync::Get(
+						rows->getLongLong(HandicappedComplianceTableSync::COL_RESERVATION_RULE),
+						env,
+						linkLevel,
+						AUTO_CREATE
+				)	);
+			}
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::save(HandicappedCompliance* object)
+		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::Save(HandicappedCompliance* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					/// @todo fill fields [,]FIELD=VALUE
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					/// @todo fill other fields separated by ,
-					<< ")";
-			}
+			query
+				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< object->getKey() << ','
+				<< Conversion::ToString(object->isCompliant()) << ","
+				<< object->getCapacity() << ","
+				<< (object->getReservationRule().get() ? Conversion::ToString(object->getReservationRule()->getKey()) : "0")
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync, HandicappedCompliance>::_link(HandicappedCompliance* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync, HandicappedCompliance>::_unlink(HandicappedCompliance* obj)
-		{
+		
+		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync, HandicappedCompliance>::Unlink(
+			HandicappedCompliance* obj,
+			Env* env
+		){
 
 		}
 
@@ -124,38 +130,24 @@ namespace synthese
 			addTableColumn(COL_RESERVATION_RULE, "INTEGER");
 		}
 
-		std::vector<shared_ptr<HandicappedCompliance> > HandicappedComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
+		void HandicappedComplianceTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				<< " WHERE 1 " 
 				;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
-
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<HandicappedCompliance> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<HandicappedCompliance> object(new HandicappedCompliance());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

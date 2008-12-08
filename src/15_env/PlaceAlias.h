@@ -28,10 +28,6 @@
 
 #include "IncludingPlace.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-
-
 namespace synthese
 {
 	namespace env
@@ -42,9 +38,8 @@ namespace synthese
 
 		 @ingroup m35
 		*/
-		class PlaceAlias : 
-			public synthese::util::Registrable<uid, PlaceAlias>,
-			public IncludingPlace
+		class PlaceAlias
+		:	public IncludingPlace
 		{
 
 		private:
@@ -52,7 +47,8 @@ namespace synthese
 
 		public:
 
-			PlaceAlias (const uid id = UNKNOWN_VALUE,
+			PlaceAlias(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
 				std::string name = std::string(),
 				const Place* aliasedPlace = NULL,
 				const City* city = NULL);
@@ -74,7 +70,6 @@ namespace synthese
 			 */
 			const Place* getAliasedPlace () const;
 
-			virtual uid getId() const;
 
 			void setAliasedPlace(const Place* place);
 			//@}
@@ -88,4 +83,3 @@ namespace synthese
 }
 
 #endif 	    
-

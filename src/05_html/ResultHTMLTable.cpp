@@ -22,9 +22,9 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "05_html/ResultHTMLTable.h"
+#include "ResultHTMLTable.h"
 
 using namespace std;
 

@@ -25,10 +25,9 @@
 
 #include <string>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
-#include "04_time/Date.h"
+#include "Date.h"
 
 namespace synthese
 {
@@ -48,7 +47,8 @@ namespace synthese
 				- des paramètres de personnalisation (demandes favorites...)
 
 		*/
-		class User : public util::Registrable<uid, User>
+		class User
+		:	public virtual util::Registrable
 		{
 		private:
 			const Profile*	_profile;
@@ -67,7 +67,7 @@ namespace synthese
 			time::Date		_birthDate;
 			
 		public:
-			User(uid id=0);
+			User(util::RegistryKeyType id = UNKNOWN_VALUE);
 
 			//! \name Setters
 			//@{
@@ -123,5 +123,3 @@ namespace synthese
 }
 
 #endif
-
-

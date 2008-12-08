@@ -28,7 +28,8 @@
 #include <utility>
 #include <vector>
 
-#include "01_util/Factorable.h"
+#include "Factorable.h"
+#include "Env.h"
 
 #include "12_security/Types.h"
 
@@ -81,17 +82,23 @@ namespace synthese
 
 			//! \name Right definition
 			//@{
-				virtual std::string			displayParameter()		const = 0;
+				virtual std::string	displayParameter(
+					util::Env* env = util::Env::GetOfficialEnv()
+				) const = 0;
 				virtual ParameterLabelsVector	getParametersLabels()	const = 0;
 				
 				
 				/** Perimeter inclusion test.
+					@param env Environment to read
 					@param perimeter Perimeter to include
 					@return bool True if the current perimeter includes the compared one
 					@author Hugues Romain
 					@date 2007				
 				*/
-				virtual bool perimeterIncludes(const std::string& perimeter) const = 0;
+				virtual bool perimeterIncludes(
+					const std::string& perimeter,
+					util::Env* env = util::Env::GetOfficialEnv()
+				) const = 0;
 			//@}
 
 			//! \name Getters

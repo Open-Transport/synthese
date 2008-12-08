@@ -33,8 +33,8 @@
 #include "BikeComplianceTableSync.h"
 
 using namespace std;
+using namespace boost;
 using boost::logic::tribool;
-using boost::shared_ptr;
 
 namespace synthese
 {
@@ -53,8 +53,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<BikeComplianceTableSync>::TABLE_ID = 20;
 		template<> const bool SQLiteTableSyncTemplate<BikeComplianceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::load(BikeCompliance* cmp, const db::SQLiteResultSPtr& rows)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::Load(
+			BikeCompliance* cmp,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			// Columns reading
 			tribool status = true;
 			int statusInt (rows->getInt (BikeComplianceTableSync::COL_STATUS));
@@ -70,41 +74,30 @@ namespace synthese
 			int capacity (rows->getInt (BikeComplianceTableSync::COL_CAPACITY));
 			
 			// Properties
-			cmp->setKey(rows->getLongLong (TABLE_COL_ID));
 			cmp->setCompliant (status);
 			cmp->setCapacity (capacity);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::_link(BikeCompliance* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
+
+		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::Unlink(
+			BikeCompliance* obj,
+			Env* env
+		){
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::_unlink(BikeCompliance* obj)
-		{
-
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::save(BikeCompliance* object)
+		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::Save(BikeCompliance* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					/// @todo fill fields [,]FIELD=VALUE
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
-				query
-				    << " INSERT INTO " << TABLE_NAME << " VALUES("
-				    << Conversion::ToString(object->getKey())
-				    /// @todo fill other fields separated by ,
-				    << ")";
-			}
+			query
+				<< "REPLACE " << TABLE_NAME << " VALUES("
+				<< object->getKey() << ','
+				<< Conversion::ToString(object->isCompliant()) << ","
+				<< object->getCapacity()
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -114,7 +107,7 @@ namespace synthese
 	{
 		const std::string BikeComplianceTableSync::COL_STATUS ("status");
 		const std::string BikeComplianceTableSync::COL_CAPACITY ("capacity");
-
+		
 		BikeComplianceTableSync::BikeComplianceTableSync()
 			: SQLiteRegistryTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>()
 		{
@@ -123,38 +116,24 @@ namespace synthese
 			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
-		std::vector<shared_ptr<BikeCompliance> > BikeComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
+		void BikeComplianceTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				<< " WHERE 1"
 				;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<BikeCompliance> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<BikeCompliance> object(new BikeCompliance());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

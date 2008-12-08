@@ -23,11 +23,17 @@
 #ifndef SYNTHESE_db_SQLiteInheritanceTableSyncTemplate_h__
 #define SYNTHESE_db_SQLiteInheritanceTableSyncTemplate_h__
 
-#include "02_db/SQLiteTableSyncTemplate.h"
-#include "01_util/Factorable.h"
+#include "SQLiteTableSyncTemplate.h"
+#include "Factorable.h"
+#include "02_db/Types.h"
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
 	namespace db
 	{
 		/** SQLiteInheritanceTableSyncTemplate class.
@@ -44,8 +50,78 @@ namespace synthese
 			typedef K		FactoryClass;
 
 		protected:
-			static std::string	_GetSubClassKey(const SQLiteResultSPtr& row);
+			//! \name Static methods to implement by each derived class
+			//@{
+				static std::string	_GetSubClassKey(const SQLiteResultSPtr& row);
+				static std::string	_GetSubClassKey(const T* obj);
 			
+				/** Fields load operations common to all subclasses.
+					@param obj Pointer to the object to load from the database
+					@param rows Row to read
+					@param env Environment to read
+					@param linkLevel link level
+					@author Hugues Romain
+					@date 2008
+				*/
+				static void _CommonLoad(
+					T* obj,
+					const SQLiteResultSPtr& rows,
+					util::Env* env,
+					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				);
+			//@}
+
+			//! \name Virtual template instance launchers
+			//@{
+				virtual T* _create()
+				{
+					assert(false);
+					return NULL;
+				}
+
+
+				virtual void _load(
+					T* obj,
+					const SQLiteResultSPtr& rows,
+					util::Env* env,
+					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+					){
+						assert(false);
+				}
+
+
+				virtual void _save(
+					T* obj
+				){
+						assert(false);
+				}
+
+
+
+				virtual boost::shared_ptr<const T> _get(
+					util::RegistryKeyType key,
+					util::Env* env = NULL,
+					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+					AutoCreation autoCreate = NEVER_CREATE
+					){
+						assert(false);
+						return boost::shared_ptr<const T>();
+				}
+
+
+
+
+				virtual boost::shared_ptr<T> _getEditable(
+					util::RegistryKeyType key,
+					util::Env* env = NULL,
+					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+					AutoCreation autoCreate = NEVER_CREATE
+					){
+						assert(false);
+						return boost::shared_ptr<T>();
+				}
+			//@}
+
 		public:
 			virtual bool getRegisterInSubClassMap() const
 			{
@@ -62,7 +138,7 @@ namespace synthese
 					boost::shared_ptr<K> tablesync(util::Factory<K>::create(subClassKey));
 					tablesync->rowsAdded(sqlite, sync, rows, isFirstSync);
 					if (tablesync->getRegisterInSubClassMap())
-						DBModule::AddSubClass(rows->getLongLong(TABLE_COL_ID), subClassKey);
+						DBModule::AddSubClass(rows->getKey(), subClassKey);
 				}
 			}
 
@@ -88,7 +164,8 @@ namespace synthese
 					if (!subClass.empty())
 					{
 						boost::shared_ptr<K> tablesync(util::Factory<K>::create(subClass));
-						tablesync->rowsRemoved(sqlite, sync, rows);					}
+						tablesync->rowsRemoved(sqlite, sync, rows);
+					}
 				}
 			}
 
@@ -97,27 +174,17 @@ namespace synthese
 
 			}
 
-			virtual T* create()
-			{
-				assert(false);
-				return NULL;
+
+
+			static void Load(
+				T* obj,
+				const SQLiteResultSPtr& rows,
+				util::Env* env,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			){
+				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
+				tablesync->_load(obj, rows, env, linkLevel);
 			}
-
-			virtual T* get(SQLiteResultSPtr& row, bool linked)
-			{
-				assert(false);
-				return NULL;
-			}
-
-			/** Object properties loader from the SQLite database.
-				@param obj Pointer to the object to load from the database
-				@param rows Row to read
-				@author Hugues Romain
-				@date 2007
-				@warning To complete the load when building the RAM environment, follow the properties load by the link method
-			*/
-			static void Load(T* obj, const SQLiteResultSPtr& rows);
-
 
 
 			/** Saving of the object in database.
@@ -129,13 +196,10 @@ namespace synthese
 				- if the object has already a key, then the corresponding record is replaced
 				- if the object does not have any key, then the autoincrement function generates one for it.
 			*/
-			static void Save(T* obj);
-
-
-			static T* GetUpdateable(const SQLiteResultSPtr& row, bool linked=false)
+			static void Save(T* obj)
 			{
-				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(row)));
-				return static_cast<T*>(tablesync->get(row));
+				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(obj)));
+				tablesync->_save(obj);
 			}
 
 
@@ -145,11 +209,15 @@ namespace synthese
 				@return Pointer to a new C++ object corresponding to the fetched record
 				@throw DBEmptyResultException if the object was not found
 			*/
-			static T* GetUpdateable(uid key, bool linked=false)
-			{
+			static boost::shared_ptr<T> GetEditable(
+				util::RegistryKeyType key,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			){
 				SQLiteResultSPtr rows(_GetRow(key));
 				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
-				return static_cast<T*>(tablesync->get(rows, linked));
+				return tablesync->_getEditable(key, env, linkLevel, autoCreate);
 			}
 
 
@@ -159,11 +227,15 @@ namespace synthese
 				@return Pointer to a new C++ object corresponding to the fetched record
 				@throw DBEmptyResultException if the object was not found
 			*/
-			static const T* Get(uid key, bool linked=false)
-			{
-				SQLiteResultSPtr rows(_GetRow(key));
-				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
-				return static_cast<const T*>(tablesync->get(rows, linked));
+			static boost::shared_ptr<const T> Get(
+				util::RegistryKeyType key,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			){
+					SQLiteResultSPtr rows(_GetRow(key));
+					boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
+					return tablesync->_get(key, env, linkLevel, autoCreate);
 			}
 
 		};

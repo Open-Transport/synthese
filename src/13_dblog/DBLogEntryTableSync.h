@@ -29,7 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -68,7 +68,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<DBLogEntry> > search(
+			static void Search(
+				util::Env& env,
 				const std::string& logKey
 				, const time::DateTime& startDate
 				, const time::DateTime& endDate
@@ -82,8 +83,8 @@ namespace synthese
 				, bool orderByUser = false
 				, bool orderByLevel = false
 				, bool raisingOrder = true
-				);
-
+				, util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
 	}
 }

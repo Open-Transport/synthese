@@ -22,6 +22,7 @@
 
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioTemplateInheritedTableSync.h"
+#include <sstream>
 
 using namespace std;
 
@@ -29,6 +30,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace messages;
+	using namespace util;
 
 	template<>
 	const string util::FactorableTemplate<AlarmTableSync, AlarmTemplateInheritedTableSync>::FACTORY_KEY("AlarmTemplateInheritedTableSync");
@@ -37,21 +39,54 @@ namespace synthese
 	{
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::_Link(AlarmTemplate* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			obj->setScenario(
-				ScenarioTemplateInheritedTableSync::Get(
-					rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID)
-					, obj
-					, false
-				)
-			);
+		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Load(
+			AlarmTemplate* obj,
+			const SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
+			_CommonLoad(obj, rows, env, linkLevel);
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				obj->setScenario(
+					ScenarioTemplateInheritedTableSync::Get(
+						rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID),
+						env, linkLevel
+					).get()
+				);
+			}
 		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::_Unlink(AlarmTemplate* obj)
-		{
+		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Unlink(
+			AlarmTemplate* obj,
+			Env* env
+		){
 			obj->setScenario(NULL);
+		}
+
+
+
+		template<>
+		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Save(
+			AlarmTemplate* obj
+		){
+			stringstream query;
+			if (obj->getKey() == UNKNOWN_VALUE)
+				obj->setKey(getId());
+			query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(obj->getKey())
+				<< ",1"
+				<< ",0"
+				<< "," << Conversion::ToString((int) obj->getLevel())
+				<< "," << Conversion::ToSQLiteString(obj->getShortMessage())
+				<< "," << Conversion::ToSQLiteString(obj->getLongMessage())
+				<< ",''"
+				<< ",''"
+				<< "," << Conversion::ToString(obj->getScenario()->getKey())
+				<< ")";
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 	}
 
@@ -62,6 +97,25 @@ namespace synthese
 			: SQLiteInheritedNoSyncTableSyncTemplate<AlarmTableSync, AlarmTemplateInheritedTableSync, AlarmTemplate>()
 		{
 
+		}
+
+
+
+		void AlarmTemplateInheritedTableSync::Search( util::Env& env, const ScenarioTemplate* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool raisingOrder /*= false*/, util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */ )
+		{
+			stringstream query;
+			query
+				<< " SELECT a.*"
+				<< " FROM " << TABLE_NAME << " AS a "
+				<< " WHERE "
+				<< COL_IS_TEMPLATE << "=1"
+				<< " AND " << COL_SCENARIO_ID << "=" << scenario->getKey();
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+			
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

@@ -41,6 +41,8 @@ namespace synthese
 		class RoutePlannerSheetLinesCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLinesCellInterfacePage>
 		{
 		public:
+			RoutePlannerSheetLinesCellInterfacePage();
+
 			/** Display of schedule sheet lines list cell.
 				@param stream Stream to write on
 				@param columnNumber (0) Column rank from left to right

@@ -33,6 +33,7 @@
 #include "17_messages/ScenarioFolderTableSync.h"
 
 #include "01_util/Constants.h"
+#include "Env.h"
 
 using namespace std;
 using namespace boost;
@@ -40,6 +41,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 	
 	namespace util
 	{
@@ -89,8 +91,9 @@ namespace synthese
 			if (_parentId < 0)
 				throw ActionException("Bad parent folder id");
 
-			vector<shared_ptr<ScenarioFolder> > folders = ScenarioFolderTableSync::search(_parentId, _name, 0, 1);
-			if (!folders.empty())
+			Env env;
+			ScenarioFolderTableSync::Search(env, _parentId, _name, 0, 1);
+			if (!env.template getRegistry<ScenarioFolder>().empty())
 				throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
 
 			// Anti error
@@ -106,7 +109,7 @@ namespace synthese
 			f.setParentId(_parentId);
 			f.setName(_name);
 
-			ScenarioFolderTableSync::save(&f);
+			ScenarioFolderTableSync::Save(&f);
 
 			_request->setObjectId(f.getKey());
 		}

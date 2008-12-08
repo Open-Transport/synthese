@@ -69,5 +69,13 @@ namespace synthese
 			VariablesMap vm;
 			InterfacePage::display( stream, pv, vm, NULL, request );
 		}
+
+
+
+		JourneyBoardStopCellInterfacePage::JourneyBoardStopCellInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

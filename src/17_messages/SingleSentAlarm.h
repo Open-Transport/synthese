@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_SingleSentAlarm_h__
 #define SYNTHESE_SingleSentAlarm_h__
 
-#include "17_messages/SentAlarm.h"
+#include "SentAlarm.h"
+
 
 namespace synthese
 {
@@ -33,7 +34,7 @@ namespace synthese
 			@ingroup m17
 		*/
 		class SingleSentAlarm
-			: public SentAlarm
+		:	public SentAlarm
 		{
 		private:
 			bool			_enabled;
@@ -42,7 +43,7 @@ namespace synthese
 
 		public:
 			SingleSentAlarm(const SingleSentAlarm& alarm);
-			SingleSentAlarm();
+			SingleSentAlarm(util::RegistryKeyType key = UNKNOWN_VALUE);
 			~SingleSentAlarm();
 
 			void setIsEnabled(bool value);
@@ -52,7 +53,6 @@ namespace synthese
 			bool					getIsEnabled()		const;
 			const time::DateTime&	getPeriodStart()	const;
 			const time::DateTime&	getPeriodEnd()		const;
-
 		};
 	}
 }

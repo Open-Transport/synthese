@@ -21,6 +21,7 @@
 */
 
 #include "DisplayType.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -29,7 +30,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,departurestable::DisplayType>::Registry Registrable<uid,departurestable::DisplayType>::_registry;
+		template<> const std::string Registry<departurestable::DisplayType>::KEY("DisplayType");
 	}
 
 
@@ -52,17 +53,14 @@ namespace synthese
 			return _name;
 		}
 
-		DisplayType::DisplayType( const uid& id)
-			: Registrable<uid, DisplayType>(id)
+		DisplayType::DisplayType(util::RegistryKeyType id)
+			: Registrable(id)
 		{
 			
 		}
 
-		DisplayType::DisplayType()
-			: Registrable<uid, DisplayType>()
-		{
 
-		}
+
 		void DisplayType::setRowNumber( int number )
 		{
 			_rowNumber = number;

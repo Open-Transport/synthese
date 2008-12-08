@@ -26,7 +26,7 @@
 #include "NonPermanentService.h"
 #include "Types.h"
 
-#include "Registrable.h"
+
 
 #include <string>
 
@@ -38,9 +38,8 @@ namespace synthese
 		/** Continuous service.
 			@ingroup m35
 		*/
-		class ContinuousService : 
-			public util::Registrable<uid,ContinuousService>, 
-			public NonPermanentService
+		class ContinuousService
+		:	public NonPermanentService
 		{
 		public:
 			typedef std::vector<std::pair<time::Schedule, time::Schedule> > Schedules;
@@ -56,12 +55,11 @@ namespace synthese
 		public:
 
 			ContinuousService(
-				const uid& id,
-				const std::string& serviceNumber,
-				Path* path,
-				int range,
-				int maxWaitingTime);
-			ContinuousService();
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				std::string serviceNumber = std::string(),
+				Path* path = NULL,
+				int range = 0,
+				int maxWaitingTime = 0);
 
 			~ContinuousService ();
 
@@ -70,7 +68,6 @@ namespace synthese
 			//@{
 				int getMaxWaitingTime () const;
 				int getRange () const;
-				uid	getId() const;
 			//@}
 
 			//! @name Setters

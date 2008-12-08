@@ -37,8 +37,9 @@ namespace synthese
 	{
 
 
-		ReservationTransaction::ReservationTransaction()
-			: Registrable<uid,ReservationTransaction>()
+		ReservationTransaction::ReservationTransaction(
+			RegistryKeyType key
+		):	Registrable(key)
 			, _bookingTime(TIME_CURRENT)
 			, _cancellationTime(TIME_UNKNOWN)
 			, _originDateTime(TIME_UNKNOWN)
@@ -165,11 +166,6 @@ namespace synthese
 			return _reservations;
 		}
 
-		void ReservationTransaction::setReservations( const Reservations& reservations )
-		{
-			_reservations = reservations;
-		}
-
 
 
 		synthese::resa::ReservationStatus ReservationTransaction::getStatus() const
@@ -217,6 +213,14 @@ namespace synthese
 					result = (*it)->getReservationDeadLine();
 			}
 			return result;
+		}
+
+
+
+		void ReservationTransaction::addReservation( shared_ptr<Reservation> resa )
+		{
+			resa->setTransaction(this);
+			_reservations.push_back(resa);
 		}
 	}
 }

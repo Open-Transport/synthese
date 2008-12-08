@@ -22,11 +22,11 @@
 
 #include "PhysicalStopTableSync.h"
 
-#include "01_util/Conversion.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
+#include "Conversion.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
 
-#include "15_env/ConnectionPlaceTableSync.h"
+#include "ConnectionPlaceTableSync.h"
 
 #include <assert.h>
 
@@ -48,23 +48,31 @@ namespace synthese
 		template<> const bool SQLiteTableSyncTemplate<PhysicalStopTableSync>::HAS_AUTO_INCREMENT = true;
 
 		/** Does not update the place */
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::load(PhysicalStop* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Load(
+			PhysicalStop* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			object->setName(rows->getText ( PhysicalStopTableSync::COL_NAME));
 			object->setXY (rows->getDouble ( PhysicalStopTableSync::COL_X), rows->getDouble ( PhysicalStopTableSync::COL_Y));
 			object->setOperatorCode(rows->getText ( PhysicalStopTableSync::COL_OPERATOR_CODE));
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				PublicTransportStopZoneConnectionPlace* place = ConnectionPlaceTableSync::GetEditable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), env, linkLevel).get();
+				object->setPlace(place);
+
+				place->addPhysicalStop(object);
+			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::_link(PhysicalStop* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			PublicTransportStopZoneConnectionPlace* place = ConnectionPlaceTableSync::GetUpdateable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), obj, temporary);
-			obj->setPlace(place);
 
-			place->addPhysicalStop(obj);
-		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::_unlink(PhysicalStop* obj)
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Unlink(
+			PhysicalStop* obj,
+			Env* env
+			)
 		{
 			PublicTransportStopZoneConnectionPlace* place = const_cast<PublicTransportStopZoneConnectionPlace*>(obj->getConnectionPlace());
 /// @todo	place->removePhysicalStop(obj);
@@ -72,7 +80,7 @@ namespace synthese
 			obj->setPlace(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::save(PhysicalStop* object)
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Save(PhysicalStop* object)
 		{
 			/// @todo Implementation
 		}
@@ -110,9 +118,13 @@ namespace synthese
 
 
 
-		std::vector<boost::shared_ptr<PhysicalStop> > PhysicalStopTableSync::Search( uid placeId /*= UNKNOWN_VALUE */, int first /*= 0 */, int number /*= 0 */ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
+		void PhysicalStopTableSync::Search(
+			Env& env, 
+			uid placeId /*= UNKNOWN_VALUE */,
+			int first /*= 0 */,
+			int number /*= 0 */,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -125,23 +137,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<PhysicalStop> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<PhysicalStop> object(new PhysicalStop());
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

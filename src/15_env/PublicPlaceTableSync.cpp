@@ -23,16 +23,16 @@
 
 #include <sstream>
 
-#include "15_env/PublicPlaceTableSync.h"
-#include "15_env/PublicPlace.h"
-#include "15_env/CityTableSync.h"
+#include "PublicPlaceTableSync.h"
+#include "PublicPlace.h"
+#include "CityTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -54,25 +54,28 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE_ID = 13;
 		template<> const bool SQLiteTableSyncTemplate<PublicPlaceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::load(PublicPlace* object, const db::SQLiteResultSPtr& rows )
-		{
-		    object->setKey (rows->getLongLong (TABLE_COL_ID));
-
+		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Load(
+			PublicPlace* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			std::string name (rows->getText (PublicPlaceTableSync::COL_NAME));
 			object->setName(name);
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				uid cityId (rows->getLongLong (PublicPlaceTableSync::COL_CITYID));
+				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
+				object->setCity(city);
+
+				city->getPublicPlacesMatcher ().add (object->getName (), object);
+			}
 		}
 
-
-		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::_link(PublicPlace* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			uid cityId (rows->getLongLong (PublicPlaceTableSync::COL_CITYID));
-			City* city(CityTableSync::GetUpdateable(cityId,obj,temporary));
-			obj->setCity(city);
-
-			city->getPublicPlacesMatcher ().add (obj->getName (), obj);
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::_unlink(PublicPlace* obj)
+		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Unlink(
+			PublicPlace* obj,
+			Env* env)
 		{
 			City* city(const_cast<City*>(obj->getCity()));
 			city->getPublicPlacesMatcher ().remove (obj->getName ());
@@ -81,7 +84,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::save (PublicPlace* object)
+		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Save (PublicPlace* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -111,64 +114,14 @@ namespace synthese
 			addTableColumn (COL_CITYID, "INTEGER", false);
 		}
 
-/*		void PublicPlaceTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (PublicPlace::Contains(id))
-				{
-					shared_ptr<PublicPlace> pp = PublicPlace::GetUpdateable (id);
-					city->getPublicPlacesMatcher ().remove (pp->getName ());
 
-					load(PublicPlace::GetUpdateable(id).get(), rows);
 
-				}
-				else
-				{
-					PublicPlace* object(new PublicPlace);
-					load(object, rows);
-					object->store();
-				}
-			}
-		}
-		
-		void PublicPlaceTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (PublicPlace::Contains(id))
-				{
-					shared_ptr<PublicPlace> pp = PublicPlace::GetUpdateable (id);
-					shared_ptr<City> city = City::GetUpdateable (pp->getCity ()->getKey ());
-					city->getPublicPlacesMatcher ().remove (pp->getName ());
-
-					load(PublicPlace::GetUpdateable(id).get(), rows);
-
-					city->getPublicPlacesMatcher ().add (pp->getName (), pp.get());
-				}
-			}
-		}
-
-		void PublicPlaceTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (PublicPlace::Contains(id))
-				{
-					shared_ptr<const PublicPlace> pp = PublicPlace::Get (id);
-					shared_ptr<City> city = City::GetUpdateable (pp->getCity ()->getKey ());
-					city->getPublicPlacesMatcher ().remove (pp->getName ());
-
-					PublicPlace::Remove(id);
-				}
-			}
-		}
-*/
-		vector<shared_ptr<PublicPlace> > PublicPlaceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		void PublicPlaceTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -185,22 +138,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-				vector<shared_ptr<PublicPlace> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<PublicPlace> object(new PublicPlace);
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

@@ -1,5 +1,29 @@
-#include "03_db_ring/UpdateRecord.h"
-#include "01_util/Conversion.h"
+
+/** UpdateRecord class implementation.
+	@file UpdateRecord.cpp
+	@author Hugues Romain
+	@date 2008
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "UpdateRecord.h"
+#include "Conversion.h"
 #include "01_util/iostreams/Compression.h"
 
 #include <boost/date_time/posix_time/time_formatters.hpp>
@@ -13,38 +37,36 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace util;
+	
+	namespace dbring
+	{
+		UpdateRecord::UpdateRecord ()
+			: _timestamp (min_date_time)
+			, _emitterNodeId (-1)
+			, _state (PENDING)
+			, _compressedSQL ("0#")
+		{
 
-namespace dbring
-{
-
-
-
-
-UpdateRecord::UpdateRecord ()
-    : _timestamp (min_date_time)
-    , _emitterNodeId (-1)
-    , _state (PENDING)
-    , _compressedSQL ("0#")
-{
-
-}
+		}
  
 
 
 
-UpdateRecord::UpdateRecord (const uid& key,
-			    const boost::posix_time::ptime& timestamp, 
-			    const NodeId& emitterNodeId,
-			    const RecordState& state,
-			    const std::string& compressedSQL)
-    : _key (key)
-    , _timestamp (timestamp)
-    , _emitterNodeId (emitterNodeId)
-    , _state (state)
-    , _compressedSQL ()
-{
-    _compressedSQL.assign (compressedSQL);
-}
+		UpdateRecord::UpdateRecord(
+			RegistryKeyType key,
+			const boost::posix_time::ptime& timestamp, 
+			const NodeId& emitterNodeId,
+			const RecordState& state,
+			const std::string& compressedSQL
+		):	Registrable(key),
+			_timestamp (timestamp)
+			, _emitterNodeId (emitterNodeId)
+			, _state (state)
+			, _compressedSQL ()
+		{
+			_compressedSQL.assign (compressedSQL);
+		}
 
 
 

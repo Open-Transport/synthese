@@ -26,6 +26,7 @@ namespace synthese
 {
 	using namespace security;
 	using namespace env;
+	using namespace util;
 
 	namespace routeplanner
 	{
@@ -101,8 +102,9 @@ namespace synthese
 			return _user;
 		}
 
-		UserFavoriteJourney::UserFavoriteJourney()
-			: util::Registrable<uid,UserFavoriteJourney>()
+		UserFavoriteJourney::UserFavoriteJourney(
+			RegistryKeyType key
+		):	Registrable(key)
 			, _rank(UNKNOWN_VALUE)
 			, _user(NULL)
 		{

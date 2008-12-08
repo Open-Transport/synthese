@@ -70,7 +70,7 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
+				_profile = ProfileTableSync::GetEditable(_request->getObjectId());
 			}
 			catch(...)
 			{
@@ -102,7 +102,7 @@ namespace synthese
 			_right->setPrivateLevel(_privateLevel);
 			_right->setPublicLevel(_publicLevel);
 
-			ProfileTableSync::save(_profile.get());
+			ProfileTableSync::Save(_profile.get());
 
 			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), _right->getFactoryKey() + "/" + _right->getParameter() + log.str());
 		}

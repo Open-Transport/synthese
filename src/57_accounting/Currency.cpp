@@ -8,7 +8,7 @@ namespace synthese
 	namespace accounts
 	{
 		Currency::Currency(uid id)
-			: Registrable<uid, Currency>(id)
+			: RegistrableTemplate< Currency>(id)
 		{
 
 		}

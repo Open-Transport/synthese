@@ -22,16 +22,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "UpdateDisplayTypeAction.h"
 
-#include "34_departures_table/DisplayTypeTableSync.h"
-#include "34_departures_table/ArrivalDepartureTableLog.h"
+#include "DisplayTypeTableSync.h"
+#include "ArrivalDepartureTableLog.h"
 
-#include "13_dblog/DBLogModule.h"
+#include "/DBLogModule.h"
 
-#include "11_interfaces/Interface.h"
+#include "Interface.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 #include <sstream>
 
@@ -74,45 +74,45 @@ namespace synthese
 
 		void UpdateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Display type ID
-			uid id(map.getUid(PARAMETER_ID, true, FACTORY_KEY));
 			try
 			{
-				_dt = DisplayTypeTableSync::GetUpdateable(id);
+				// Display type
+				_dt = DisplayTypeTableSync::GetEditable(map.getUid(PARAMETER_ID, true, FACTORY_KEY));
+
+				// Name
+				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+				if (_name != _dt->getName())
+				{
+					if (_name.empty())
+						throw ActionException("Le nom ne peut être vide.");
+
+					Env env;
+					DisplayTypeTableSync::Search(env, _name, 0, 1);
+					if (!env.template getRegistry<DisplayType>().empty())
+						throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
+				}
+
+				// Rows number
+				_rows_number = map.getInt(PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
+				if (_rows_number < 0)
+					throw ActionException("Un nombre positif de lignes doit être choisi");
+
+				// Interface
+				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+
+				// Max stops number
+				_max_stops_number = map.getInt(PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
+				if (_max_stops_number < UNKNOWN_VALUE)
+					throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
 			}
-			catch (DisplayType::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<DisplayType>& e)
 			{
-				throw ActionException("Display Type not found");
+				throw ActionException("Display Type not found / "+ e.getMessage());
 			}
-
-			// Name
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
-			if (_name != _dt->getName())
+			catch(ObjectNotFoundException<Interface>& e)
 			{
-				if (_name.empty())
-					throw ActionException("Le nom ne peut être vide.");
-
-				vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
-				if (!v.empty())
-					throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
+				throw ActionException("Interface not found / "+ e.getMessage());
 			}
-
-			// Rows number
-			_rows_number = map.getInt(PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
-			if (_rows_number < 0)
-				throw ActionException("Un nombre positif de lignes doit être choisi");
-
-			// Interface
-			id = map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY);
-			if (!Interface::Contains(id))
-				throw ActionException("Interface not found");
-			_interface = Interface::Get(id);
-
-			// Max stops number
-			_max_stops_number = map.getInt(PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
-			if (_max_stops_number < UNKNOWN_VALUE)
-				throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
-
 		}
 
 		void UpdateDisplayTypeAction::run()
@@ -129,7 +129,7 @@ namespace synthese
 			_dt->setInterface(_interface.get());
 			_dt->setRowNumber(_rows_number);
 			_dt->setMaxStopsNumber(_max_stops_number);
-			DisplayTypeTableSync::save(_dt.get());
+			DisplayTypeTableSync::Save(_dt.get());
 
 			// Log
 			ArrivalDepartureTableLog::addUpdateTypeEntry(_dt.get(), _request->getUser().get(), log.str());

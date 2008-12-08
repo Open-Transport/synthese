@@ -21,13 +21,15 @@
 */
 
 #include "AlarmObjectLink.h"
+#include "Registry.h"
 
 namespace synthese
 {
+	using namespace util;
 
 	namespace util
 	{
-		template<> typename Registrable<uid,messages::AlarmObjectLink>::Registry Registrable<uid,messages::AlarmObjectLink>::_registry;
+		template<> const std::string Registry<messages::AlarmObjectLink>::KEY("AlarmObjectLink");
 	}
 
 	namespace messages
@@ -62,6 +64,15 @@ namespace synthese
 		void AlarmObjectLink::setRecipientKey( const std::string& key )
 		{
 			_recipientKey = key;
+		}
+
+
+
+		AlarmObjectLink::AlarmObjectLink(
+			RegistryKeyType key /*= UNKNOWN_VALUE*/
+		):	Registrable(key)
+		{
+		
 		}
 	}
 }

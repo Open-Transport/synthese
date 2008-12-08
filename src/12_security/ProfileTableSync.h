@@ -68,24 +68,29 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<boost::shared_ptr<Profile> > Search(
+			static void Search(
+				util::Env& env,
 				std::string name = std::string()
 				, std::string right = std::string()
 				, int first = 0
 				, int number = UNKNOWN_VALUE
 				, bool orderByName = true
-				, bool raisingOrder = true
+				, bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 				);
 
 			/** Profile search by parent.
 			*/
-			static std::vector<boost::shared_ptr<Profile> > Search(
+			static void Search(
+				util::Env& env,
 				boost::shared_ptr<const Profile> parent
-				, int first = 0, int number = -1);
+				, int first = 0,
+				int number = -1,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 
 		};
 
 	}
 }
 #endif // SYNTHESE_ProfileTableSync_H__
-

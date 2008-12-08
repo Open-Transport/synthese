@@ -14,7 +14,7 @@ namespace synthese
 		/** Part of financial transaction.
 			@ingroup m37
 		*/
-		class TransactionPart : public util::Registrable<uid, TransactionPart>
+		class TransactionPart : public util::RegistrableTemplate< TransactionPart>
 		{
 		private:
 			uid				_transactionId;

@@ -25,9 +25,9 @@
 #ifndef SYNTHESE_ReservationRuleInterfacePage_H__
 #define SYNTHESE_ReservationRuleInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
+#include "InterfacePage.h"
 
-#include "01_util/FactorableTemplate.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -57,6 +57,8 @@ namespace synthese
 		class ReservationRuleInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,env::ReservationRuleInterfacePage>
 		{
 		public:
+			ReservationRuleInterfacePage();
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 			*/

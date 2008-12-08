@@ -20,32 +20,35 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "05_html/ActionResultHTMLTable.h"
-#include "05_html/HTMLForm.h"
-#include "05_html/HTMLList.h"
-#include "05_html/PropertiesHTMLTable.h"
+#include "ActionResultHTMLTable.h"
+#include "HTMLForm.h"
+#include "HTMLList.h"
+#include "PropertiesHTMLTable.h"
 
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/MessagesLibraryAdmin.h"
-#include "17_messages/MessagesScenarioAdmin.h"
-#include "17_messages/DeleteScenarioAction.h"
-#include "17_messages/AddScenarioAction.h"
-#include "17_messages/MessagesAdmin.h"
-#include "17_messages/MessagesLibraryRight.h"
-#include "17_messages/MessagesModule.h"
-#include "17_messages/ScenarioFolderAdd.h"
-#include "17_messages/ScenarioFolderTableSync.h"
-#include "17_messages/ScenarioFolder.h"
-#include "17_messages/ScenarioFolderRemoveAction.h"
-#include "17_messages/ScenarioFolderUpdateAction.h"
+#include "ScenarioTemplate.h"
+#include "ScenarioTableSync.h"
+#include "MessagesLibraryAdmin.h"
+#include "MessagesScenarioAdmin.h"
+#include "DeleteScenarioAction.h"
+#include "AddScenarioAction.h"
+#include "MessagesAdmin.h"
+#include "MessagesLibraryRight.h"
+#include "MessagesModule.h"
+#include "ScenarioFolderAdd.h"
+#include "ScenarioFolderTableSync.h"
+#include "ScenarioFolder.h"
+#include "ScenarioFolderRemoveAction.h"
+#include "ScenarioFolderUpdateAction.h"
+#include "ScenarioTemplateInheritedTableSync.h"
 
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/QueryString.h"
+#include "ActionFunctionRequest.h"
+#include "QueryString.h"
 
-#include "32_admin/AdminRequest.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminParametersException.h"
+#include "AdminRequest.h"
+#include "ModuleAdmin.h"
+#include "AdminParametersException.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -120,7 +123,9 @@ namespace synthese
 			updateFolderRequest.setObjectId(_folder.get() ? _folder->getKey() : 0);
 
 			// Search
-			vector<shared_ptr<ScenarioTemplate> > sv = ScenarioTableSync::searchTemplate(
+			Env env;
+			ScenarioTemplateInheritedTableSync::Search(
+				env,
 				_folderId
 				, string(), NULL
 				, 0, -1
@@ -128,14 +133,15 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, sv);
-			vector<shared_ptr<ScenarioFolder> > folders(ScenarioFolderTableSync::search(_folderId));
+			p.setFromResult(_requestParameters, env.template getEditableRegistry<ScenarioTemplate>());
+
+			ScenarioFolderTableSync::Search(env, _folderId);
 
 			if (_folderId > 0)
 			{
 				stream << "<h1>Répertoire</h1>";
 
-				if (sv.empty() && folders.empty())
+				if (env.template getRegistry<ScenarioTemplate>().empty() && env.template getRegistry<ScenarioFolder>().empty())
 					stream << "<p>" << HTMLModule::getLinkButton(removeFolderRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
 
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
@@ -154,9 +160,8 @@ namespace synthese
 			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, p, addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
 			stream << t3.open();
 			
-			for (vector<shared_ptr<ScenarioTemplate> >::const_iterator it = sv.begin(); it != sv.end(); ++it)
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, env.template getRegistry<ScenarioTemplate>())
 			{
-				shared_ptr<ScenarioTemplate> scenario = *it;
 				updateScenarioRequest.setObjectId(scenario->getKey());
 				deleteScenarioRequest.getAction()->setScenario(scenario);
 				stream << t3.row(Conversion::ToString(scenario->getKey()));
@@ -172,7 +177,7 @@ namespace synthese
 
 			stream << "<h1>Sous-répertoires</h1>";
 
-			if (folders.empty())
+			if (env.template getRegistry<ScenarioFolder>().empty())
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
@@ -181,11 +186,11 @@ namespace synthese
 			HTMLList l;
 			stream << f.open() << l.open();
 
-			for (vector<shared_ptr<ScenarioFolder> >::const_iterator it(folders.begin()); it != folders.end(); ++it)
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, env.template getRegistry<ScenarioFolder>())
 			{
-				static_pointer_cast<MessagesLibraryAdmin,AdminInterfaceElement>(goFolderRequest.getFunction()->getPage())->setFolderId((*it)->getKey());
+				static_pointer_cast<MessagesLibraryAdmin,AdminInterfaceElement>(goFolderRequest.getFunction()->getPage())->setFolderId(folder->getKey());
 				stream << l.element("folder");
-				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), (*it)->getName());
+				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), folder->getName());
 			}
 			
 			stream << l.element("folder");
@@ -222,28 +227,29 @@ namespace synthese
 			PageLinks links;
 
 			// Folders
-			vector<shared_ptr<ScenarioFolder> > folders(ScenarioFolderTableSync::search(_folder.get() ? _folder->getKey() : 0));
-			for (vector<shared_ptr<ScenarioFolder> >::const_iterator it(folders.begin()); it != folders.end(); ++it)
+			Env env;
+			ScenarioFolderTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, env.template getRegistry<ScenarioFolder>())
 			{
 				PageLink link;
 				link.factoryKey = MessagesLibraryAdmin::FACTORY_KEY;
 				link.icon = "folder.png";
-				link.name = (*it)->getName();
+				link.name = cfolder->getName();
 				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString((*it)->getKey());
+				link.parameterValue = Conversion::ToString(cfolder->getKey());
 				links.push_back(link);
 			}
 			
 			// Scenarios
-			vector<shared_ptr<ScenarioTemplate> > sv(ScenarioTableSync::searchTemplate(_folder.get() ? _folder->getKey() : 0));
-			for (vector<shared_ptr<ScenarioTemplate> >::const_iterator it(sv.begin()); it != sv.end(); ++it)
+			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, env.template getRegistry<ScenarioTemplate>())
 			{
 				PageLink link;
 				link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
 				link.icon = MessagesScenarioAdmin::ICON;
-				link.name = (*it)->getName();
+				link.name = tpl->getName();
 				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString((*it)->getKey());
+				link.parameterValue = Conversion::ToString(tpl->getKey());
 				links.push_back(link);
 			}
 			

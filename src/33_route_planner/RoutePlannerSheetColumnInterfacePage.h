@@ -49,6 +49,8 @@ namespace synthese
 		class RoutePlannerSheetColumnInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetColumnInterfacePage>
 		{
 		public:
+			RoutePlannerSheetColumnInterfacePage();
+
 			/** Display of schedule sheet cell.
 				@param stream Stream to write on
 				@param isItFirstLine (0) Is the cell the first departure or arrival ?

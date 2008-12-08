@@ -30,8 +30,9 @@
 #include "CommercialLine.h"
 #include "Line.h"
 #include "LineStop.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "Registry.h"
+#include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 
 struct XMLNode;
@@ -127,21 +128,23 @@ class XmlBuilder
 	 static boost::shared_ptr<City> CreateCity (XMLNode& node);
 
     
-	 static boost::shared_ptr<PublicTransportStopZoneConnectionPlace> CreateConnectionPlace (XMLNode& node, 
-						   const City::Registry& cities);
+	 static boost::shared_ptr<PublicTransportStopZoneConnectionPlace> CreateConnectionPlace(
+		 XMLNode& node, 
+		 const util::Registry<City>& cities);
 
 	 static boost::shared_ptr<CommercialLine> CreateCommercialLine (XMLNode& node);
 
 	 static boost::shared_ptr<Line> CreateLine (XMLNode& node, 
-			     const Axis::Registry& axes,
-			     const CommercialLine::Registry& commercialLines);
+		 const util::Registry<Axis>& axes,
+		 const util::Registry<CommercialLine>& commercialLines);
 
 	 static boost::shared_ptr<LineStop> CreateLineStop (XMLNode& node, 
-				     Line::Registry& lines,
-				     const PhysicalStop::Registry& physicalStops);
+		 util::Registry<Line>& lines,
+		 const util::Registry<PhysicalStop>& physicalStops);
 
 	 static boost::shared_ptr<PhysicalStop> CreatePhysicalStop (XMLNode& node, 
-					     const PublicTransportStopZoneConnectionPlace::Registry& connectionPlaces);
+		 const util::Registry<PublicTransportStopZoneConnectionPlace>& connectionPlaces
+	);
     
 	 static geometry::Point2D CreatePoint (XMLNode& node);
 

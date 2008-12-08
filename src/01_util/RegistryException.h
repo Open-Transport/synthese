@@ -32,41 +32,40 @@
 
 namespace synthese
 {
-namespace util
-{
+	namespace util
+	{
 
 
-/** Registry related exception class
-@ingroup m01Registry m01Exceptions refExceptions
-*/
-template<class K, class T>
-class RegistryException : public synthese::util::Exception
-{
- private:
+		/** Registry related exception class
+		@ingroup m01Registry m01Exceptions refExceptions
+		*/
+		template<class T>
+		class RegistryException : public synthese::util::Exception
+		{
+		 private:
 
-    const K* _key; //!< Key
+			const RegistryKeyType* _key; //!< Key
 
- public:
+		 public:
 
-    RegistryException ( const std::string& message, const K* key = 0 );
-    ~RegistryException ();
-
-
-    //! @name Getters/Setters
-    //@{
-    const K& getKey () const;
-    //@}
-    
-
- private:
+			RegistryException ( const std::string& message, const RegistryKeyType* key = 0 );
+			~RegistryException ();
 
 
-};
+			//! @name Getters/Setters
+			//@{
+			const RegistryKeyType& getKey () const;
+			//@}
+		    
+
+		 private:
+
+
+		};
 
 
 
-}
+	}
 
 }
 #endif
-

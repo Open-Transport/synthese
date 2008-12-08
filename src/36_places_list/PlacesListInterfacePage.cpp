@@ -62,5 +62,13 @@ namespace synthese
 
 			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&results), request);
 		}
+
+
+
+		PlacesListInterfacePage::PlacesListInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

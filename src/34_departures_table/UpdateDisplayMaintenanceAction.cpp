@@ -57,13 +57,13 @@ namespace synthese
 			try
 			{
 				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-				_displayScreen = DisplayScreenTableSync::GetUpdateable(id);
+				_displayScreen = DisplayScreenTableSync::GetEditable(id);
 
 				_controls = map.getInt(PARAMETER_CONTROLS, true, FACTORY_KEY);
 				_online = map.getBool(PARAMETER_ONLINE, true, false, FACTORY_KEY);
 				_message = map.getString(PARAMETER_MESSAGE, true, FACTORY_KEY);
 			}
-			catch (DisplayScreen::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Specified display screen not found");
 			}
@@ -74,7 +74,7 @@ namespace synthese
 			_displayScreen->setMaintenanceChecksPerDay(_controls);
 			_displayScreen->setMaintenanceIsOnline(_online);
 			_displayScreen->setMaintenanceMessage(_message);
-			DisplayScreenTableSync::save(_displayScreen.get());
+			DisplayScreenTableSync::Save(_displayScreen.get());
 		}
 	}
 }

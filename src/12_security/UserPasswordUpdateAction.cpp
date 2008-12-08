@@ -22,11 +22,11 @@
 
 #include "UserPasswordUpdateAction.h"
 
-#include "12_security/UserTableSync.h"
+#include "UserTableSync.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 
@@ -34,6 +34,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<Action, security::UserPasswordUpdateAction>::FACTORY_KEY("upua");
 	
@@ -54,7 +55,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::GetUpdateable(_request->getObjectId());
+				_user = UserTableSync::GetEditable(_request->getObjectId());
 
 				_password = map.getString(PARAMETER_PASS1, true, FACTORY_KEY);
 
@@ -62,7 +63,7 @@ namespace synthese
 				if (pass2 != _password)
 					throw ActionException("Les mots de passe entrés ne sont pas identiques");
 			}
-			catch (User::ObjectNotFoundException)
+			catch (ObjectNotFoundException<User>)
 			{
 				throw ActionException("Utilisateur introuvable");
 			}
@@ -71,7 +72,7 @@ namespace synthese
 		void UserPasswordUpdateAction::run()
 		{
 			_user->setPassword(_password);
-			UserTableSync::save(_user.get());
+			UserTableSync::Save(_user.get());
 		}
 	}
 }

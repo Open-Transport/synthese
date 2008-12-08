@@ -37,6 +37,8 @@
 
 #include "01_util/Conversion.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -71,7 +73,7 @@ namespace synthese
 			{
 				try
 				{
-					_template.reset(ScenarioTemplateInheritedTableSync::Get(id,true));
+					_template = ScenarioTemplateInheritedTableSync::Get(id);
 				}
 				catch(...)
 				{
@@ -86,8 +88,9 @@ namespace synthese
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			if(_name.empty())
 				throw ActionException("Le scénario doit avoir un nom.");
-			vector<shared_ptr<ScenarioTemplate> > v = ScenarioTableSync::searchTemplate(_folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1);
-			if (!v.empty())
+			Env env;
+			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1);
+			if (!env.template getRegistry<ScenarioTemplate>().empty())
 				throw ActionException("Un scénario de même nom existe déjà");
 
 			// Anti error
@@ -118,14 +121,14 @@ namespace synthese
 					shared_ptr<AlarmTemplate> alarm(new AlarmTemplate(scenario.get(), **it));
 					AlarmTableSync::Save(alarm.get());
 
-					vector<shared_ptr<AlarmObjectLink> > aols = AlarmObjectLinkTableSync::search(*it);
-					for (vector<shared_ptr<AlarmObjectLink> >::const_iterator itaol = aols.begin(); itaol != aols.end(); ++itaol)
+					Env env;
+					AlarmObjectLinkTableSync::Search(env, *it);
+					BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, env.template getRegistry<AlarmObjectLink>())
 					{
-						shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
 						aol->setAlarmId(alarm->getKey());
-						aol->setObjectId((*itaol)->getObjectId());
-						aol->setRecipientKey((*itaol)->getRecipientKey());
-						AlarmObjectLinkTableSync::save(aol.get());
+						aol->setObjectId(aol->getObjectId());
+						aol->setRecipientKey(aol->getRecipientKey());
+						AlarmObjectLinkTableSync::Save(aol.get());
 					}
 				}
 			}

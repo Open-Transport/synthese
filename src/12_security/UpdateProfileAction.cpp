@@ -63,17 +63,18 @@ namespace synthese
 			// Profile
 			try
 			{
-				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
+				_profile = ProfileTableSync::GetEditable(_request->getObjectId());
 			}
-			catch (Profile::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<Profile>& e)
 			{
 				throw ActionException(e.getMessage());
 			}
 
 			// Name
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
-			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::Search(_name, string(), 0,1);
-			if (!existingProfiles.empty())
+			Env env;
+			ProfileTableSync::Search(env, _name, string(), 0,1);
+			if (!env.template getRegistry<Profile>().empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 		}
 
@@ -85,7 +86,7 @@ namespace synthese
 
 			// Action
 			_profile->setName(_name);
-			ProfileTableSync::save(_profile.get());
+			ProfileTableSync::Save(_profile.get());
 
 			// Log
 			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), log.str());

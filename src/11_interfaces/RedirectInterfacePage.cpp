@@ -22,9 +22,9 @@
 
 #include <sstream>
 
-#include "30_server/Request.h"
+#include "Request.h"
 
-#include "11_interfaces/RedirectInterfacePage.h"
+#include "RedirectInterfacePage.h"
 
 namespace synthese
 {
@@ -45,6 +45,14 @@ namespace synthese
 		void RedirectInterfacePage::display( std::ostream& stream, VariablesMap& vars, const server::Request* request /*= NULL*/ ) const
 		{
 			display(stream, vars, request->getURL(), request);
+		}
+
+
+
+		RedirectInterfacePage::RedirectInterfacePage()
+			: Registrable()
+		{
+
 		}
 	}
 }

@@ -75,7 +75,10 @@ namespace synthese
 
 		void LinesListFunction::_run( std::ostream& stream ) const
 		{
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, CommercialLineTableSync::search(_network->getKey()))
+			Env env;
+			CommercialLineTableSync::Search(env, _network->getKey());
+			
+			BOOST_FOREACH(shared_ptr<const CommercialLine> line, env.template getRegistry<CommercialLine>())
 			{
 				stream << line->getKey() << ";" << line->getShortName() << "\n";
 			}

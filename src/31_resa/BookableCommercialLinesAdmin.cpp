@@ -24,18 +24,20 @@
 
 #include "BookableCommercialLinesAdmin.h"
 
-#include "31_resa/ResaModule.h"
-#include "31_resa/BookableCommercialLineAdmin.h"
-#include "31_resa/ResaRight.h"
+#include "ResaModule.h"
+#include "BookableCommercialLineAdmin.h"
+#include "ResaRight.h"
 
-#include "15_env/CommercialLine.h"
-#include "15_env/CommercialLineTableSync.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
 
-#include "30_server/QueryString.h"
+#include "QueryString.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminParametersException.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -75,16 +77,18 @@ namespace synthese
 		void BookableCommercialLinesAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
 			// Search
-			vector<shared_ptr<CommercialLine> > lines(CommercialLineTableSync::search(
+			Env env;
+			CommercialLineTableSync::Search(
+				env,
 				request->getUser()->getProfile()->getRightsForModuleClass<ResaRight>()
 				, request->getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
 				, READ
 				, _requestParameters.first
 				, _requestParameters.maxSize
 				, false, true, true, true
-			));
+			);
 			ResultHTMLTable::ResultParameters rp;
-			rp.setFromResult(_requestParameters, lines);
+			rp.setFromResult(_requestParameters, env.template getEditableRegistry<CommercialLine>());
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
@@ -103,13 +107,13 @@ namespace synthese
 			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, rp);
 			stream << t.open();
 
-			for (vector<shared_ptr<CommercialLine> >::const_iterator it(lines.begin()); it != lines.end(); ++it)
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
 			{
-				openRequest.setObjectId((*it)->getKey());
+				openRequest.setObjectId(line->getKey());
 
 				stream << t.row();
-				stream << t.col(1, (*it)->getStyle()) << (*it)->getShortName();
-				stream << t.col() << (*it)->getName();
+				stream << t.col(1, line->getStyle()) << line->getShortName();
+				stream << t.col() << line->getName();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "chart_line.png");
 			}
 			stream << t.close();
@@ -138,22 +142,23 @@ namespace synthese
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
-			vector<shared_ptr<CommercialLine> > lines(CommercialLineTableSync::search(
+			Env env;
+			CommercialLineTableSync::Search(
+				env,
 				request->getUser()->getProfile()->getRightsForModuleClass<ResaRight>()
 				, request->getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
 				, READ
 				, 0, 0
 				, false, true, true, true
-			));
-
-			for (vector<shared_ptr<CommercialLine> >::const_iterator it(lines.begin()); it != lines.end(); ++it)
+			);
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
 			{
 				AdminInterfaceElement::PageLink link;
 				link.factoryKey = BookableCommercialLineAdmin::FACTORY_KEY;
 				link.icon = "chart_line.png";
-				link.name = (*it)->getName();
+				link.name = line->getName();
 				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString((*it)->getKey());
+				link.parameterValue = Conversion::ToString(line->getKey());
 				links.push_back(link);
 			}
 

@@ -20,11 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/SQLiteResult.h"
+#include "SQLiteResult.h"
 
-#include "11_interfaces/InterfaceTableSync.h"
+#include "InterfaceTableSync.h"
 
 using boost::shared_ptr;
 
@@ -45,29 +45,29 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE_ID = 24;
 		template<> const bool SQLiteTableSyncTemplate<InterfaceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::load(Interface* interf, const db::SQLiteResultSPtr& rows)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Load(
+			Interface* interf,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			interf->setKey(rows->getLongLong ( TABLE_COL_ID));
 			interf->setNoSessionDefaultPageCode(rows->getText ( InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE));
 			interf->setName(rows->getText ( InterfaceTableSync::TABLE_COL_NAME));
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::save(Interface* interf)
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Unlink(
+			Interface* interf,
+			Env* env
+		){
+
+		}
+
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Save(Interface* interf)
 		{
 			/// @todo Implementation
 		}
-
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::_link(Interface* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync, Interface>::_unlink(Interface* obj)
-		{
-
-		}
-
 	}
 
 	namespace interfaces

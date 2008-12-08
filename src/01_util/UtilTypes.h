@@ -1,6 +1,6 @@
 
-/** RegistrableWithNeutralElement class header.
-	@file RegistrableWithNeutralElement.h
+/** UtilTypes class header.
+	@file UtilTypes.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,45 +20,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_util_RegistrableWithNeutralElement_h__
-#define SYNTHESE_util_RegistrableWithNeutralElement_h__
+#ifndef SYNTHESE_util_UtilTypes_h__
+#define SYNTHESE_util_UtilTypes_h__
 
-#include "01_util/Registrable.h"
+#include "UId.h"
 
 namespace synthese
 {
 	namespace util
 	{
-		/** RegistrableWithNeutralElement class.
-			@ingroup m01Registry
-		*/
-		template<class K, class T>
-		class RegistrableWithNeutralElement : public Registrable<K,T>
+		typedef uid RegistryKeyType;
+
+		typedef enum
 		{
-		private:
-			
-			static boost::shared_ptr<const T> _neutral;
-
-		public:
-			RegistrableWithNeutralElement()
-				: Registrable<K,T>()
-			{
-
-			}
-
-			static boost::shared_ptr<const T>	Get(const K& key)
-			{
-				return key ? Registrable<K,T>::Get(key) : _neutral;
-			}
-
-			static bool Contains(const K& key)
-			{
-				return key ? Registrable<K,T>::Contains(key) : true;
-			}
-
-
-		};
+			UNKNOWN_LOAD_LEVEL = -1,
+			FIELDS_ONLY_LOAD_LEVEL = 0,
+			UP_LINKS_LOAD_LEVEL = 5,
+			DOWN_LINKS_LOAD_LEVEL = 6,
+			UP_DOWN_LINKS_LOAD_LEVEL = 10,
+			RECURSIVE_LINKS_LOAD_LEVEL = 20,
+			ALGORITHMS_OPTIMIZATION_LOAD_LEVEL = 30
+		} LinkLevel;
 	}
 }
 
-#endif // SYNTHESE_util_RegistrableWithNeutralElement_h__
+#endif // SYNTHESE_util_UtilTypes_h__

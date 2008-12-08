@@ -25,6 +25,7 @@
 
 #include "Service.h"
 #include "Calendar.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -33,17 +34,21 @@ namespace synthese
 		/** NonPermanentService class.
 			@ingroup m35
 		*/
-		class NonPermanentService : public Service
+		class NonPermanentService
+		:	public Service,
+			public virtual util::Registrable
 		{
 		private:
 			Calendar		_calendar;  //!< Which days is this service available ?
 
-		public:
+		protected:
 			NonPermanentService();
 			NonPermanentService(
 				std::string serviceNumber
 				, Path* path
 			);
+
+		public:
 
 
 			Calendar&		getCalendar (); // MJ constness pb

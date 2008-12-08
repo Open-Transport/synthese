@@ -23,7 +23,10 @@
 #ifndef SYNTHESE_COMPLIANCE_H
 #define SYNTHESE_COMPLIANCE_H
 
+#include "Registrable.h"
+
 #include <boost/logic/tribool.hpp>
+#include <boost/shared_ptr.hpp>
 #include <string>
 
 namespace synthese
@@ -32,22 +35,23 @@ namespace synthese
 	{
 		class ReservationRule;
 
-		/** Compliance class.
+		/** Generic compliance value class.
 			@ingroup m35
 		*/
 		class Compliance
+		:	public virtual util::Registrable
 		{
 		private:
-			boost::logic::tribool	_compliant;
-			int						_capacity;
-			const ReservationRule*	_reservationRule;
+			boost::logic::tribool						_compliant;			//!< Value (see the derivated class for the signification of the 3 availables status)
+			int											_capacity;			//!< Maximal person number which can be served (0 = unlimited)
+			boost::shared_ptr<const ReservationRule>	_reservationRule;	//!< Link to the reservation rule to respect to use the compliance (NULL = no needed reservation, reservation service unavailable)
 
 		protected:
 
 			Compliance(
 				boost::logic::tribool compliant
 				, int capacity
-				, ReservationRule* reservationRule = NULL
+				, boost::shared_ptr<const ReservationRule> reservationRule = boost::shared_ptr<ReservationRule>()
 			);
 			
 		public:
@@ -58,14 +62,14 @@ namespace synthese
 			//@{
 				int getCapacity () const;
 				const boost::logic::tribool& isCompliant () const;
-				const ReservationRule* getReservationRule() const;
+				boost::shared_ptr<const ReservationRule> getReservationRule() const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void setCapacity (int capacity);
 				void setCompliant (const boost::logic::tribool& status);
-				void setReservationRule(const ReservationRule* value);
+				void setReservationRule(boost::shared_ptr<const ReservationRule> value);
 			//@}
 
 			//! @name Queries

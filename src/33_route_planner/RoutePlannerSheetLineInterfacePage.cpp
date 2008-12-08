@@ -50,5 +50,13 @@ namespace synthese
 
 			InterfacePage::display( stream, pv, variables, place, request );
 		}
+
+
+
+		RoutePlannerSheetLineInterfacePage::RoutePlannerSheetLineInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

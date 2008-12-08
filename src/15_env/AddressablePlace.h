@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "15_env/Place.h"
+#include "Place.h"
 #include "15_env/Types.h"
 
 namespace synthese
@@ -47,8 +47,8 @@ namespace synthese
 			Addresses _addresses; 
 
 			AddressablePlace(
-				const std::string& name
-				, const City* city
+				const std::string& name,
+				const City* city
 			);
 
 		public:
@@ -82,23 +82,16 @@ namespace synthese
 
 
 
-
 			//! @name Update methods.
 			//@{
-
 				/** Adds an address to this place.
 					@param address Address to add
 					This methods cancels the caching of the isobarycentre
 				 */
 				virtual void addAddress (const Address* address);
 			//@}
-
-
 		};
-
-
 	}
 }
 
 #endif 	    
-

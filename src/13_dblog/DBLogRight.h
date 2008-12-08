@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "12_security/RightTemplate.h"
+#include "RightTemplate.h"
 
 namespace synthese
 {
@@ -44,8 +44,13 @@ namespace synthese
 		class DBLogRight : public security::RightTemplate<DBLogRight>
 		{
 		public:
-			std::string displayParameter() const;
-			bool perimeterIncludes(const std::string& perimeter) const;
+			std::string displayParameter(
+				util::Env* env = util::Env::GetOfficialEnv()
+			) const;
+			bool perimeterIncludes(
+				const std::string& perimeter,
+				util::Env* env = util::Env::GetOfficialEnv()
+			) const;
 		};
 	}
 }

@@ -22,8 +22,9 @@
 
 #include "Crossing.h"
 
-#include "15_env/Address.h"
-#include "15_env/Road.h"
+#include "Address.h"
+#include "Road.h"
+#include "Registry.h"
 
 #include <assert.h>
 
@@ -35,16 +36,15 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::Crossing>::Registry Registrable<uid,env::Crossing>::_registry;
+		template<> const string Registry<env::Crossing>::KEY("Crossing");
 	}
 
 	namespace env
 	{
 		Crossing::Crossing(
-			const uid& key
+			util::RegistryKeyType key
 			, const City* city
-		)	: ConnectionPlace ("X", city, CONNECTION_TYPE_ROADROAD)
-			, Registrable<uid,Crossing>(key)
+		)	: ConnectionPlace (key, "X", city, CONNECTION_TYPE_ROADROAD)
 	    {
 	    }
 	    
@@ -71,11 +71,6 @@ namespace synthese
 		}
 
 
-
-		uid Crossing::getId() const
-		{
-			return getKey();
-		}
 
 		int Crossing::getMinTransferDelay() const
 		{

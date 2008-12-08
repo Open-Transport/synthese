@@ -81,22 +81,26 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<ReservationTransaction> > search(
+			static void Search(
+				util::Env& env,
 				const env::Service* service
 				, const time::Date& originDate
 				, bool withCancelled
 				, int first = 0
-				, int number = 0
+				, int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
 
-			static std::vector<boost::shared_ptr<ReservationTransaction> > search(
+			static void Search(
+				util::Env& env,
 				uid userId
 				, const time::DateTime& minDate
 				, const time::DateTime& maxDate
 				, bool withCancelled = false
 				, int first = 0
-				, int number = 0
+				, int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 	}

@@ -61,6 +61,8 @@ namespace synthese
 		class PlacesListInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, PlacesListInterfacePage>
 		{
 		public:
+			PlacesListInterfacePage();
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 			*/

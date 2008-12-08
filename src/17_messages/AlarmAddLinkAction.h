@@ -23,10 +23,9 @@
 #ifndef SYNTHESE_AlarmAddLinkAction_H__
 #define SYNTHESE_AlarmAddLinkAction_H__
 
-#include "01_util/UId.h"
-
-#include "30_server/Action.h"
-#include "01_util/FactorableTemplate.h"
+#include "UtilTypes.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -48,8 +47,8 @@ namespace synthese
 
 		private:
 			std::string		_recipientKey;
-			boost::shared_ptr<const Alarm>			_alarm;
-			uid				_objectId;
+			boost::shared_ptr<const Alarm>		_alarm;
+			util::RegistryKeyType				_objectId;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -65,7 +64,7 @@ namespace synthese
 		public:
 			void setRecipientKey(const std::string& key);
 			void setAlarm(boost::shared_ptr<const Alarm> alarm);
-			void setObjectId(uid id);
+			void setObjectId(util::RegistryKeyType id);
 
 			/** Action to run, defined by each subclass.
 			*/

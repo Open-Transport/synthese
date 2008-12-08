@@ -23,8 +23,9 @@
 #ifndef SYNTHESE_messages_ScenarioFolder_h__
 #define SYNTHESE_messages_ScenarioFolder_h__
 
-#include "01_util/UId.h"
-#include "01_util/Registrable.h"
+#include "Registrable.h"
+#include "UtilTypes.h"
+#include <string>
 
 namespace synthese
 {
@@ -33,19 +34,22 @@ namespace synthese
 		/** ScenarioFolder class.
 			@ingroup m17
 		*/
-		class ScenarioFolder : public util::Registrable<uid, ScenarioFolder>
+		class ScenarioFolder
+		:	public virtual util::Registrable
 		{
-			uid			_parentId;
+			util::RegistryKeyType	_parentId;
 			std::string	_name;
 
 		public:
-			ScenarioFolder();
+			ScenarioFolder(
+				util::RegistryKeyType key = UNKNOWN_VALUE
+			);
 
-			uid					getParentId()	const;
-			const std::string&	getName()		const;
+			util::RegistryKeyType	getParentId()	const;
+			const std::string&		getName()		const;
 
 			void	setName(const std::string& value);
-			void	setParentId(uid value);
+			void	setParentId(util::RegistryKeyType value);
 		};
 	}
 }

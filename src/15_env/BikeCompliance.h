@@ -23,10 +23,7 @@
 #ifndef SYNTHESE_BIKE_COMPLIANCE_H
 #define SYNTHESE_BIKE_COMPLIANCE_H
 
-#include "15_env/Compliance.h"
-
-#include "01_util/RegistrableWithNeutralElement.h"
-#include "01_util/UId.h"
+#include "Compliance.h"
 
 #include <boost/logic/tribool.hpp>
 #include <string>
@@ -35,27 +32,21 @@ namespace synthese
 {
 	namespace env
 	{
-
-
-
-
 		/** Bike compliance class.
-		Not present in Transmodel
-		 @ingroup m35
-		 */
-		class BikeCompliance : 
-			public util::RegistrableWithNeutralElement<uid,BikeCompliance>
-			, public Compliance
+			Not present in Transmodel
+			@ingroup m35
+		*/
+		class BikeCompliance
+		:	public Compliance
 		{
 
 		public:
 
-			BikeCompliance();
+			BikeCompliance(
+				util::RegistryKeyType key = UNKNOWN_VALUE
+			);
 			~BikeCompliance();
-
-
 		};
-
 	}
 }
 

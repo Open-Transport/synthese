@@ -47,80 +47,6 @@ namespace synthese
 				return false;
 			}
 
-			template<class C>
-			static const T* Get(uid key, C* obj, bool linked, GetSource source)
-			{
-				if (source == GET_REGISTRY || source == GET_AUTO)
-				{
-					if (!T::Contains(key))
-					{
-						SQLiteResultSPtr rows(_GetRow(key));
-						T* object(new T);
-						load(object, rows);
-						SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
-						object->store();
-					}
-					return T::Get(key).get();
-				}
-				else
-					return SQLiteDirectTableSyncTemplate<K,T>::Get(key, obj, linked);
-			}
-
-			template<class C>
-			static T* GetUpdateable(uid key, C* obj, GetSource source)
-			{
-				if (source == GET_REGISTRY || source == GET_AUTO)
-				{
-					if (!T::Contains(key))
-					{
-						SQLiteResultSPtr rows(_GetRow(key));
-						T* object(new T);
-						load(object, rows);
-						SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
-						object->store();
-					}
-					return T::GetUpdateable(key).get();
-				}
-				else
-					return SQLiteDirectTableSyncTemplate<K,T>::GetUpdateable(key, obj);
-			}
-
-			static boost::shared_ptr<const T> Get(uid key, GetSource source = GET_AUTO, bool linked = false)
-			{
-				if (source == GET_REGISTRY || source == GET_AUTO)
-				{
-					if (!T::Contains(key))
-					{
-						SQLiteResultSPtr rows(_GetRow(key));
-						T* object(new T);
-						load(object, rows);
-						SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
-						object->store();
-					}
-					return T::Get(key);
-				}
-				else
-					return boost::shared_ptr<const T>(_Get(key, linked));
-			}
-
-			static boost::shared_ptr<T> GetUpdateable(uid key, GetSource source = GET_TEMPORARY)
-			{
-				if (source == GET_REGISTRY || source == GET_AUTO)
-				{
-					if (!T::Contains(key))
-					{
-						SQLiteResultSPtr rows(_GetRow(key));
-						T* object(new T);
-						load(object, rows);
-						SQLiteDirectTableSyncTemplate<K,T>::link(object, rows, GET_REGISTRY);
-						object->store();
-					}
-					return T::GetUpdateable(key);
-				}
-				else
-					return boost::shared_ptr<T>(_Get(key, true));
-			}
-
 		protected:
 
 			/** Action to do on object creation or replacement.
@@ -132,16 +58,17 @@ namespace synthese
 				, const SQLiteResultSPtr& rows
 				, bool isFirstSync = false
 			){
+				Env* env(Env::GetOfficialEnv());
+				Registry<T>& registry(env->template getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
 					{
-						if (T::Contains(rows->getLongLong (TABLE_COL_ID)))
+						if (registry.contains(rows->getKey()))
 						{
-							boost::shared_ptr<T> address(T::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
-							SQLiteDirectTableSyncTemplate<K,T>::unlink(address.get());
-							load (address.get(), rows);
-							SQLiteDirectTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get(), env);
+							Load (address.get(), rows, env, FIELDS_ONLY_LOAD_LEVEL);
 						}
 					}
 					catch(util::Exception& e)
@@ -160,17 +87,18 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
+				Env* env(Env::GetOfficialEnv());
+				Registry<T>& registry(env->template getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
 					{
-						uid id = rows->getLongLong (TABLE_COL_ID);
-						if (T::Contains(id))
+						uid id = rows->getKey();
+						if (registry.contains(id))
 						{
-							boost::shared_ptr<T> address(T::GetUpdateable(id));
-							SQLiteDirectTableSyncTemplate<K,T>::unlink(address.get());
-							load (address.get(), rows);
-							SQLiteDirectTableSyncTemplate<K,T>::link(address.get(), rows, GET_REGISTRY);
+							boost::shared_ptr<T> address(registry.getEditable(id));
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get(), env);
+							Load (address.get(), rows, env, FIELDS_ONLY_LOAD_LEVEL);
 						}
 					}
 					catch (util::Exception& e)
@@ -190,15 +118,17 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
+				Env* env(Env::GetOfficialEnv());
+				Registry<T>& registry(env->template getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
 					{
-						uid id = rows->getLongLong (TABLE_COL_ID);
-						if (T::Contains(id))
+						uid id = rows->getKey();
+						if (registry.contains(id))
 						{
-							SQLiteDirectTableSyncTemplate<K,T>::unlink(T::GetUpdateable(id).get());
-							T::Remove(id);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get(), env);
+							registry.remove(id);
 						}
 					}
 					catch (util::Exception& e)

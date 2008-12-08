@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -93,7 +93,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<boost::shared_ptr<User> > Search(
+			static void Search(
+				util::Env& env,
 				const std::string login = std::string("%")
 				, const std::string name = std::string("%")
 				, const std::string surname = std::string("%")
@@ -106,6 +107,7 @@ namespace synthese
 				, bool orderByName = false
 				, bool orderByProfileName = false
 				, bool raisingOrder = true
+				, util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 

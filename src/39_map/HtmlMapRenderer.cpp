@@ -85,7 +85,7 @@ HtmlMapRenderer::~HtmlMapRenderer()
 std::string
 HtmlMapRenderer::render(const boost::filesystem::path& tempDir, 
 			const std::string& filenamePrefix,
-			const synthese::env::Line::Registry& lines,
+			const Registry<Line>& lines,
 			synthese::map::Map& map,
 			const synthese::map::RenderingConfig& config)
 {
@@ -126,9 +126,11 @@ HtmlMapRenderer::render(const boost::filesystem::path& tempDir,
 
 
 
-void 
-HtmlMapRenderer::renderLines (std::ostream& _output, const synthese::env::Line::Registry& lines, Map& map)
-{
+		void HtmlMapRenderer::renderLines(
+			std::ostream& _output,
+			const Registry<Line>& lines,
+			Map& map
+		){
     const std::set<DrawableLine*>& selectedLines = map.getSelectedLines ();
     
 	for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();

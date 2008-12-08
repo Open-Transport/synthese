@@ -57,6 +57,8 @@ namespace synthese
 		class JourneyBoardJunctionCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardJunctionCellInterfacePage>
 		{
 		public:
+			JourneyBoardJunctionCellInterfacePage();
+
 			/** Display.
 				@param stream Stream to display on
 				@param place Reached place

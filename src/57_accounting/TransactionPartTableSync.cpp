@@ -90,7 +90,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::save(TransactionPart* tp)
+		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::Save(TransactionPart* tp)
 		{
 			try
 			{

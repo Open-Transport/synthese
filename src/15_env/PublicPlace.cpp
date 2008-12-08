@@ -21,32 +21,28 @@
 */
 
 #include "PublicPlace.h"
+#include "Registry.h"
 
 namespace synthese
 {
 	namespace util
 	{
-		template<> typename Registrable<uid,env::PublicPlace>::Registry Registrable<uid,env::PublicPlace>::_registry;
+		template<> const std::string Registry<env::PublicPlace>::KEY("PublicPlace");
 	}
 
 	namespace env
 	{
 		PublicPlace::PublicPlace (
-			uid id
-			, std::string name
-			, const City* city
-		)	: synthese::util::Registrable<uid,PublicPlace> (id)
-			, AddressablePlace (name, city)
+			util::RegistryKeyType id,
+			std::string name,
+			const City* city
+		):	Registrable(id),
+			AddressablePlace(name, city)
 		{
 		}
 
 		PublicPlace::~PublicPlace ()
 		{
-		}
-
-		uid PublicPlace::getId() const
-		{
-			return getKey();
 		}
 	}
 }

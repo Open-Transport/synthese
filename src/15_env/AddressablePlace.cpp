@@ -20,22 +20,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/AddressablePlace.h"
-#include "15_env/Address.h"
-#include "15_env/VertexAccessMap.h"
+#include "AddressablePlace.h"
+#include "Address.h"
+#include "VertexAccessMap.h"
 
 #include <assert.h>
 
 namespace synthese
 {
 	using namespace geometry;
+	using namespace util;
 
 	namespace env
 	{
 
-		AddressablePlace::AddressablePlace (const std::string& name,
-							const City* city)
-			: Place (name, city)
+		AddressablePlace::AddressablePlace(
+			const std::string& name,
+			const City* city
+		):	Registrable(),
+			Place(name, city)
 		{
 		}
 

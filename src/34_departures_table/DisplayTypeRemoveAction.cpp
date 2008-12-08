@@ -65,8 +65,10 @@ namespace synthese
 			{
 				throw ActionException("Specified type not found");
 			}
-				
-			vector<shared_ptr<DisplayScreen> > v = DisplayScreenTableSync::search(
+			
+			Env env;
+			DisplayScreenTableSync::Search(
+				env,
 				RightsOfSameClassMap()
 				, true
 				, UNKNOWN_RIGHT_LEVEL
@@ -81,8 +83,8 @@ namespace synthese
 				, UNKNOWN_VALUE
 				, 0
 				, 1
-				);
-			if (!v.empty())
+			);
+			if (!env.template getRegistry<DisplayScreen>().empty())
 				throw ActionException("Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur.");
 		}
 

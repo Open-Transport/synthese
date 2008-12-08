@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_ENV_TRANSPORTNETWORK_H
 #define SYNTHESE_ENV_TRANSPORTNETWORK_H
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-#include "01_util/Constants.h"
+#include "Registrable.h"
+
 
 #include <string>
 
@@ -37,16 +36,17 @@ namespace synthese
 		TRIDENT OK
 			@ingroup m35
 		*/
-		class TransportNetwork : public synthese::util::Registrable<uid,TransportNetwork>
+		class TransportNetwork
+		:	public util::Registrable
 		{
 			std::string _name;
 
 		 public:
 
 			TransportNetwork (
-				uid id = UNKNOWN_VALUE
-				, std::string name = std::string()
-				);
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				std::string name = std::string()
+			);
 			~TransportNetwork ();
 
 			//! @name Getters/Setters

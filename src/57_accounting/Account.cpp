@@ -29,7 +29,7 @@ namespace synthese
 	namespace accounts
 	{
 		Account::Account(uid id)
-			: Registrable<uid, Account>(id)
+			: RegistrableTemplate<Account>(id)
 			, _leftUserId(0)
 			, _rightUserId(0)
 			, _unitPrice(0)

@@ -21,8 +21,8 @@
 */
 
 #include "PrintInterfaceElement.h"
-
-#include "11_interfaces/ValueElementList.h"
+#include "ValueElementList.h"
+#include <vector>
 
 using namespace boost;
 using namespace std;

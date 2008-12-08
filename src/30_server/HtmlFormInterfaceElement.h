@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_HtmlFormInterfaceElement_H__
 #define SYNTHESE_HtmlFormInterfaceElement_H__
 
-#include "11_interfaces/LibraryInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "LibraryInterfaceElement.h"
+#include "FactorableTemplate.h"
+#include <vector>
 
 namespace synthese
 {

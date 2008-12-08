@@ -20,35 +20,43 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/SentScenario.h"
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/ScenarioSentAlarm.h"
+#include "SentScenario.h"
+#include "ScenarioTemplate.h"
+#include "ScenarioSentAlarm.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace time;
+	using namespace util;
 
 	namespace util
 	{
-		template<> typename Registrable<uid,messages::SentScenario>::Registry Registrable<uid,messages::SentScenario>::_registry;
+		template<> const string Registry<messages::SentScenario>::KEY("SentScenario");
 	}
 
 
 	namespace messages
 	{
-		SentScenario::SentScenario()
-			: util::Registrable<uid, SentScenario>()
-			, ScenarioSubclassTemplate<ScenarioSentAlarm>()
+		SentScenario::SentScenario(
+			util::RegistryKeyType key
+		):	Registrable(key),
+			ScenarioSubclassTemplate<ScenarioSentAlarm>()
 			, _isEnabled(false)
 			, _periodStart(TIME_UNKNOWN)
 			, _periodEnd(TIME_UNKNOWN)
 		{
 		}
 
-		SentScenario::SentScenario( const ScenarioTemplate& source , time::DateTime periodStart /*= time::DateTime(time::TIME_UNKNOWN) */, time::DateTime periodEnd /*= time::DateTime(time::TIME_UNKNOWN) */ )
-			: util::Registrable<uid, SentScenario>()
-			, ScenarioSubclassTemplate<ScenarioSentAlarm>(source.getName())
-			, _isEnabled(false)
+		SentScenario::SentScenario(
+			const ScenarioTemplate& source,
+			util::RegistryKeyType key,
+			time::DateTime periodStart /*= time::DateTime(time::TIME_UNKNOWN) */
+			, time::DateTime periodEnd /*= time::DateTime(time::TIME_UNKNOWN) */
+		):	ScenarioSubclassTemplate<ScenarioSentAlarm>(source.getName()),
+			_isEnabled(false)
 			, _periodStart(periodStart)
 			, _periodEnd(periodEnd)
 		{
@@ -92,10 +100,7 @@ namespace synthese
 
 		}
 
-		uid SentScenario::getId() const
-		{
-			return getKey();
-		}
+
 
 		AlarmConflict SentScenario::getConflictStatus() const
 		{

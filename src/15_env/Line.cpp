@@ -21,27 +21,28 @@
 */
 
 #include "Line.h"
+#include "Registry.h"
 
 #include "Service.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/SubLine.h"
+#include "CommercialLine.h"
+#include "SubLine.h"
 
 namespace synthese
 {
 	namespace util
 	{
-		template<> typename Registrable<uid,env::Line>::Registry Registrable<uid,env::Line>::_registry;
+		template<> const std::string Registry<env::Line>::KEY("Line");
 	}
 
 	namespace env
 	{
 		Line::Line(
-			const uid& id
-			, const std::string& name
+			util::RegistryKeyType id
+			, std::string name
 			, const Axis* axis
-		)	: synthese::util::Registrable<uid,Line> (id)
+		)	: util::Registrable(id)
 			, Path ()
 			, _name (name)
 			, _axis (axis)
@@ -54,18 +55,6 @@ namespace synthese
 			, _wayBack(boost::logic::indeterminate)
 		{	}
 
-
-		Line::Line(
-		)	: synthese::util::Registrable<uid,Line>()
-			, Path ()
-			, _rollingStock (NULL)
-			, _isWalkingLine (false)
-			, _useInDepartureBoards (true)
-			, _useInTimetables (true)
-			, _useInRoutePlanning (true)
-			, _commercialLine(NULL)
-			, _wayBack(boost::logic::indeterminate)
-		{	}
 
 
 		Line::~Line ()
@@ -237,13 +226,6 @@ namespace synthese
 			return true;
 		}
 
-
-
-
-		uid	Line::getId () const
-		{
-			return synthese::util::Registrable<uid,Line>::getKey();
-		}
 
 
 		const PhysicalStop* Line::getOrigin() const

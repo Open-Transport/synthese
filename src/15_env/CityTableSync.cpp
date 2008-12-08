@@ -41,6 +41,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace env;
+	using namespace util;
 
 	namespace util
 	{
@@ -53,27 +54,28 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<CityTableSync>::TABLE_ID = 6;
 		template<> const bool SQLiteTableSyncTemplate<CityTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::load(City* object, const db::SQLiteResultSPtr& rows)
-		{
-		    object->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Load(
+			City* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    object->setName(rows->getText ( CityTableSync::TABLE_COL_NAME));
-		    object->setCode(rows->getText ( CityTableSync::TABLE_COL_CODE));  
-		}
+		    object->setCode(rows->getText ( CityTableSync::TABLE_COL_CODE));
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::_link(City* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			if (temporary == GET_REGISTRY)
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				EnvModule::AddToCitiesMatchers(obj);
+				EnvModule::AddToCitiesMatchers(object);
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::_unlink(City* obj)
+
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj, Env* env)
 		{
 			EnvModule::RemoveFromCitiesMatchers(obj);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::save(City* object)
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Save(City* object)
 		{
 			/// @todo Implement it
 		}

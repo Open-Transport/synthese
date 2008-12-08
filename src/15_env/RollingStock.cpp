@@ -21,22 +21,23 @@
 */
 
 #include "RollingStock.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
-
 	namespace util
 	{
-		template<> typename Registrable<uid,env::RollingStock>::Registry Registrable<uid,env::RollingStock>::_registry;
+		template<> const string Registry<env::RollingStock>::KEY("RollingStock");
 	}
 
 	namespace env
 	{
 
 
-		RollingStock::RollingStock ()
-			: synthese::util::Registrable<uid,RollingStock> ()
-			
+		RollingStock::RollingStock(util::RegistryKeyType key)
+			: util::Registrable(key)
 		{
 		}
 

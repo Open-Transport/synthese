@@ -27,26 +27,37 @@
 #include "01_util/UId.h"
 #include "01_util/T9Filter.h"
 
-#include "15_env/TransportNetworkTableSync.h"
-#include "15_env/TransportNetwork.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/Crossing.h"
-#include "15_env/Line.h"
-#include "15_env/ScheduledService.h"
-#include "15_env/ContinuousService.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/Road.h"
-#include "15_env/PublicPlace.h"
-#include "15_env/City.h"
-#include "15_env/PlaceAlias.h"
-#include "15_env/Address.h"
-#include "15_env/PhysicalStop.h"
+#include "TransportNetworkTableSync.h"
+#include "TransportNetwork.h"
+#include "CommercialLineTableSync.h"
+#include "CommercialLine.h"
+#include "Crossing.h"
+#include "CrossingTableSync.h"
+#include "Line.h"
+#include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
+#include "ContinuousService.h"
+#include "ContinuousServiceTableSync.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ConnectionPlaceTableSync.h"
+#include "Road.h"
+#include "RoadTableSync.h"
+#include "PublicPlace.h"
+#include "PublicPlaceTableSync.h"
+#include "City.h"
+#include "CityTableSync.h"
+#include "PlaceAlias.h"
+#include "PlaceAliasTableSync.h"
+#include "Address.h"
+#include "AddressTableSync.h"
+#include "PhysicalStop.h"
+#include "PhysicalStopTableSync.h"
 
 #include "12_security/Constants.h"
-#include "12_security/Right.h"
+#include "Right.h"
 
 #include <boost/iostreams/filtering_stream.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -72,13 +83,7 @@ namespace synthese
 		{
 		}
 
-		shared_ptr<Path> EnvModule::fetchPath (const uid& id)
-		{
-			if (Line::Contains (id))
-				return Line::GetUpdateable (id);
-			//		if (_roads.contains (id)) return _roads.get (id);
-			return shared_ptr<Path>();
-		}
+	
 
 		std::vector<pair<uid, std::string> > EnvModule::getCommercialLineLabels(
 			const security::RightsOfSameClassMap& rights 
@@ -89,121 +94,118 @@ namespace synthese
 			vector<pair<uid,string> > m;
 			if (withAll)
 			m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
-			
-			vector<shared_ptr<CommercialLine> > vl(CommercialLineTableSync::search(rights, totalControl, neededLevel));
-			for(vector<shared_ptr<CommercialLine> >::const_iterator it = vl.begin(); it != vl.end(); ++it)
-			m.push_back(make_pair((*it)->getKey(), (*it)->getShortName()));
+
+			Env env;
+			CommercialLineTableSync::Search(env, rights, totalControl, neededLevel);
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
+				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			return m;
 		}
 
 
 
-		shared_ptr<NonPermanentService> EnvModule::fetchService (const uid& id)
-		{
-			if (ScheduledService::Contains (id))
-				return ScheduledService::GetUpdateable (id);
-			if (ContinuousService::Contains (id))
-				return ContinuousService::GetUpdateable (id);
+		shared_ptr<NonPermanentService> EnvModule::FetchEditableService(
+			const RegistryKeyType& id,
+			util::Env& env
+		){
+			int tableId(decodeTableId(id));
+			if(tableId == ScheduledServiceTableSync::TABLE_ID)
+				return static_pointer_cast<NonPermanentService, ScheduledService>(env.template getEditableRegistry<ScheduledService>().getEditable(id));
+			if (tableId == ContinuousServiceTableSync::TABLE_ID)
+				return static_pointer_cast<NonPermanentService, ContinuousService>(env.template getEditableRegistry<ContinuousService>().getEditable(id));
+			
 			return shared_ptr<NonPermanentService>();
 		}
 
 
 		
-		shared_ptr<const Place> 
-		EnvModule::fetchPlace (const uid& id)
-		{
-			shared_ptr<const Place> place = static_pointer_cast<const Place, const AddressablePlace>(fetchAddressablePlace (id));
+		shared_ptr<const Place> EnvModule::FetchPlace(
+			const util::RegistryKeyType& id,
+			const util::Env& env
+		){
+			shared_ptr<const Place> place = static_pointer_cast<const Place, const AddressablePlace>(FetchAddressablePlace (id, env));
 			if (!place.get())
-			place = static_pointer_cast<const Place, const IncludingPlace>(fetchIncludingPlace (id));
+				place = static_pointer_cast<const Place, const IncludingPlace>(FetchIncludingPlace (id, env));
 			return place;
 		}
 
 
 
 
-		shared_ptr<const AddressablePlace> 
-		EnvModule::fetchAddressablePlace (const uid& id)
-		{
-			if (PublicTransportStopZoneConnectionPlace::Contains (id))
-				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(PublicTransportStopZoneConnectionPlace::Get (id));
-			if (PublicPlace::Contains (id))
-				return static_pointer_cast<const AddressablePlace, const PublicPlace>(PublicPlace::Get (id));
-			if (Road::Contains (id))
-				return static_pointer_cast<const AddressablePlace, const Road>(Road::Get (id));
-			if (Crossing::Contains(id))
-				return static_pointer_cast<const AddressablePlace, const Crossing>(Crossing::Get(id));
-
+		shared_ptr<const AddressablePlace> EnvModule::FetchAddressablePlace(
+			const util::RegistryKeyType& id,
+			const util::Env& env
+		){
+			int tableId(decodeTableId(id));
+			if(tableId == ConnectionPlaceTableSync::TABLE_ID)
+				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(env.template getRegistry<PublicTransportStopZoneConnectionPlace>().get(id));
+			if (tableId == PublicPlaceTableSync::TABLE_ID)
+				return static_pointer_cast<const AddressablePlace, const PublicPlace>(env.template getRegistry<PublicPlace>().get(id));
+			if (tableId == RoadTableSync::TABLE_ID)
+				return static_pointer_cast<const AddressablePlace, const Road>(env.template getRegistry<Road>().get(id));
+			if (tableId == CrossingTableSync::TABLE_ID)
+				return static_pointer_cast<const AddressablePlace, const Crossing>(env.template getRegistry<Crossing>().get(id));
 			return shared_ptr<const AddressablePlace>();
 		}
 
 
-		shared_ptr<AddressablePlace> 
-			EnvModule::fetchUpdateableAddressablePlace (const uid& id)
-		{
-			if (PublicTransportStopZoneConnectionPlace::Contains (id))
-				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(PublicTransportStopZoneConnectionPlace::GetUpdateable(id));
-			if (PublicPlace::Contains (id))
-				return static_pointer_cast<AddressablePlace, PublicPlace>(PublicPlace::GetUpdateable(id));
-			if (Road::Contains (id))
-				return static_pointer_cast<AddressablePlace, Road>(Road::GetUpdateable(id));
-			if (Crossing::Contains (id))
-				return static_pointer_cast<AddressablePlace, Crossing>(Crossing::GetUpdateable(id));
-
+		shared_ptr<AddressablePlace> EnvModule::FetchEditableAddressablePlace(
+			const util::RegistryKeyType& id,
+			util::Env& env
+		){
+			int tableId(decodeTableId(id));
+			if (tableId == ConnectionPlaceTableSync::TABLE_ID)
+				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(env.template getEditableRegistry<PublicTransportStopZoneConnectionPlace>().getEditable(id));
+			if (tableId == PublicPlaceTableSync::TABLE_ID)
+				return static_pointer_cast<AddressablePlace, PublicPlace>(env.template getEditableRegistry<PublicPlace>().getEditable(id));
+			if (tableId == RoadTableSync::TABLE_ID)
+				return static_pointer_cast<AddressablePlace, Road>(env.template getEditableRegistry<Road>().getEditable(id));
+			if (tableId == CrossingTableSync::TABLE_ID)
+				return static_pointer_cast<AddressablePlace, Crossing>(env.template getEditableRegistry<Crossing>().getEditable(id));
 			return shared_ptr<AddressablePlace>();
 		}
 
 
 
-		shared_ptr<const IncludingPlace> 
-		EnvModule::fetchIncludingPlace (const uid& id)
-		{
-			if (PlaceAlias::Contains (id))
-				return static_pointer_cast<const IncludingPlace, const PlaceAlias>(PlaceAlias::Get (id));
-			if (City::Contains (id))
-				return static_pointer_cast<const IncludingPlace, const City>(City::Get (id));
-
+		shared_ptr<const IncludingPlace> EnvModule::FetchIncludingPlace(
+			const util::RegistryKeyType& id,
+			const util::Env& env
+		){
+			int tableId(decodeTableId(id));
+			if (tableId == PlaceAliasTableSync::TABLE_ID)
+				return static_pointer_cast<const IncludingPlace, const PlaceAlias>(env.template getRegistry<PlaceAlias>().get(id));
+			if (tableId == CityTableSync::TABLE_ID)
+				return static_pointer_cast<const IncludingPlace, const City>(env.template getRegistry<City>().get(id));
 			return shared_ptr<const IncludingPlace>();
 		}
 
 
 
-		shared_ptr<const Vertex> 
-		EnvModule::fetchVertex (const uid& id)
-		{
-			if (PhysicalStop::Contains (id))
-				return static_pointer_cast<const Vertex, const PhysicalStop>(PhysicalStop::Get (id));
-			if (Address::Contains (id))
-				return static_pointer_cast<const Vertex, const Address>(Address::Get (id));
+		shared_ptr<const Vertex> EnvModule::FetchVertex(
+			const util::RegistryKeyType& id,
+			const util::Env& env
+		){
+			int tableId(decodeTableId(id));
+			if (tableId == PhysicalStopTableSync::TABLE_ID)
+				return static_pointer_cast<const Vertex, const PhysicalStop>(env.template getRegistry<PhysicalStop>().get(id));
+			if (tableId == AddressTableSync::TABLE_ID)
+				return static_pointer_cast<const Vertex, const Address>(env.template getRegistry<Address>().get(id));
 			return shared_ptr<const Vertex>();
 		}
 
 
 
-		LineSet
-		EnvModule::fetchLines (const uid& commercialLineId) 
-		{
-			LineSet result;
-			for (Line::ConstIterator it = Line::Begin ();
-				it != Line::End (); ++it)
-			{
-			if (it->second->getCommercialLine ()->getKey () == commercialLineId) 
-				result.insert (it->second);
-			}
-			return result;
-		}
-
-
-
-
 		CityList EnvModule::guessCity (const std::string& fuzzyName, int nbMatches, bool t9)
 		{
+			const Env& env(*Env::GetOfficialEnv());
+			const Registry<City>& cities(env.template getRegistry<City>());
 			CityList result;
 			LexicalMatcher<uid>::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).bestMatches (fuzzyName, nbMatches);
 			for (LexicalMatcher<uid>::MatchResult::iterator it = matches.begin ();
 			 it != matches.end (); ++it)
 			{
 				uid id = it->value;
-				result.push_back (City::Get (id));
+				result.push_back (cities.get(id));
 			}
 			return result;
 		}
@@ -212,17 +214,17 @@ namespace synthese
 
 		void EnvModule::getNetworkLinePlaceRightParameterList(ParameterLabelsVector& m)
 		{
-
+			Env env;
+			TransportNetworkTableSync::Search(env);
+			CommercialLineTableSync::Search(env);
 
 			m.push_back(make_pair(string(), "--- Réseaux ---"));
-			vector<shared_ptr<TransportNetwork> > networks(TransportNetworkTableSync::search());
-			for (vector<shared_ptr<TransportNetwork> >::const_iterator it = networks.begin(); it != networks.end(); ++it)
-			m.push_back(make_pair(Conversion::ToString((*it)->getKey()), (*it)->getName() ));
+			BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.template getRegistry<TransportNetwork>())
+				m.push_back(make_pair(Conversion::ToString(network->getKey()), network->getName() ));
 
 			m.push_back(make_pair(string(), "--- Lignes ---"));
-			vector<shared_ptr<CommercialLine> > lines(CommercialLineTableSync::search());
-			for (vector<shared_ptr<CommercialLine> >::const_iterator itl = lines.begin(); itl != lines.end(); ++itl)
-			m.push_back(make_pair(Conversion::ToString((*itl)->getKey()), (*itl)->getName() ));
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
+				m.push_back(make_pair(Conversion::ToString(line->getKey()), line->getName() ));
 
 		}
 

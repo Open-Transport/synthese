@@ -70,7 +70,7 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::save(Currency* currency)
+		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::Save(Currency* currency)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;

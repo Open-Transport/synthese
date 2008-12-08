@@ -37,6 +37,8 @@
 
 #include "11_interfaces/Interface.h"
 
+#include "Env.h"
+
 using namespace std;
 
 namespace synthese
@@ -79,9 +81,8 @@ namespace synthese
 					DisplayScreen* screen(new DisplayScreen);
 					_type.reset(new DisplayType);
 					_type->setRowNumber(10);
-					_type->setInterface(Interface::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
-					screen->setLinked(true);
-					screen->setLocalization(ConnectionPlaceTableSync::Get(screenId, screen, true, GET_AUTO));
+					_type->setInterface(Env::GetOfficialEnv()->getRegistry<Interface>().get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
+					screen->setLocalization(ConnectionPlaceTableSync::Get(screenId));
 					screen->setAllPhysicalStopsDisplayed(true);					
 					screen->setType(_type.get());
 					_screen.reset(screen);

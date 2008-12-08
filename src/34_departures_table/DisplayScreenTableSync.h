@@ -33,7 +33,7 @@
 #include "01_util/Constants.h"
 #include "01_util/UId.h"
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 #include "12_security/Types.h"
 
@@ -95,7 +95,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<DisplayScreen> > search(
+			static void Search(
+				util::Env& env,
 				const security::RightsOfSameClassMap& rights 
 				, bool totalControl 
 				, security::RightLevel neededLevel
@@ -117,7 +118,8 @@ namespace synthese
 				, bool orderByType = false
 				, bool orderByStatus = false
 				, bool orderByMessage = false
-				, bool raisingOrder = true
+				, bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 	}

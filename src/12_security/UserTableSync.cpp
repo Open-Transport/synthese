@@ -22,18 +22,18 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "12_security/Profile.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/User.h"
-#include "12_security/UserTableSyncException.h"
+#include "Profile.h"
+#include "UserTableSync.h"
+#include "ProfileTableSync.h"
+#include "User.h"
+#include "UserTableSyncException.h"
 
 using namespace std;
 using namespace boost::logic;
@@ -57,47 +57,52 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<UserTableSync>::TABLE_ID = 26;
 		template<> const bool SQLiteTableSyncTemplate<UserTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::load(User* user, const db::SQLiteResultSPtr& rows)
-		{
-				user->setKey(rows->getLongLong (TABLE_COL_ID));
-				user->setPassword(rows->getText ( UserTableSync::TABLE_COL_PASSWORD));
-				user->setName(rows->getText ( UserTableSync::TABLE_COL_NAME));
-				user->setSurname(rows->getText ( UserTableSync::TABLE_COL_SURNAME));
-				user->setLogin(rows->getText ( UserTableSync::TABLE_COL_LOGIN));
-				user->setAddress(rows->getText ( UserTableSync::TABLE_COL_ADDRESS));
-				user->setPostCode(rows->getText ( UserTableSync::TABLE_COL_POST_CODE));
-				user->setCityText(rows->getText ( UserTableSync::TABLE_COL_CITY_TEXT));
-				user->setCityId(rows->getLongLong ( UserTableSync::TABLE_COL_CITY_ID));
-				user->setCountry(rows->getText ( UserTableSync::TABLE_COL_COUNTRY));
-				user->setEMail(rows->getText ( UserTableSync::TABLE_COL_EMAIL));
-				user->setPhone(rows->getText ( UserTableSync::TABLE_COL_PHONE));
-				user->setConnectionAllowed(rows->getBool ( UserTableSync::COL_LOGIN_AUTHORIZED));
-				user->setBirthDate(Date::FromSQLDate(rows->getText ( UserTableSync::COL_BIRTH_DATE)));
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Load(
+			User* user,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
+			user->setPassword(rows->getText ( UserTableSync::TABLE_COL_PASSWORD));
+			user->setName(rows->getText ( UserTableSync::TABLE_COL_NAME));
+			user->setSurname(rows->getText ( UserTableSync::TABLE_COL_SURNAME));
+			user->setLogin(rows->getText ( UserTableSync::TABLE_COL_LOGIN));
+			user->setAddress(rows->getText ( UserTableSync::TABLE_COL_ADDRESS));
+			user->setPostCode(rows->getText ( UserTableSync::TABLE_COL_POST_CODE));
+			user->setCityText(rows->getText ( UserTableSync::TABLE_COL_CITY_TEXT));
+			user->setCityId(rows->getLongLong ( UserTableSync::TABLE_COL_CITY_ID));
+			user->setCountry(rows->getText ( UserTableSync::TABLE_COL_COUNTRY));
+			user->setEMail(rows->getText ( UserTableSync::TABLE_COL_EMAIL));
+			user->setPhone(rows->getText ( UserTableSync::TABLE_COL_PHONE));
+			user->setConnectionAllowed(rows->getBool ( UserTableSync::COL_LOGIN_AUTHORIZED));
+			user->setBirthDate(Date::FromSQLDate(rows->getText ( UserTableSync::COL_BIRTH_DATE)));
+	
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				try
+				{
+					user->setProfile(ProfileTableSync::Get(
+						rows->getLongLong(UserTableSync::TABLE_COL_PROFILE_ID),
+						env,
+						linkLevel
+					).get());
+				}
+				catch (ObjectNotFoundException<Profile>& e)
+				{
+					throw UserTableSyncException("Bad profile "+ rows->getText ( UserTableSync::TABLE_COL_PROFILE_ID)+ e.getMessage());
+				}
+			}
 		}
 
 
-
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::_link(User* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			try
-			{
-				obj->setProfile(ProfileTableSync::Get(rows->getLongLong ( UserTableSync::TABLE_COL_PROFILE_ID), obj, true, GET_AUTO));
-			}
-			catch (Profile::ObjectNotFoundException& e)
-			{
-				throw UserTableSyncException("Bad profile "+ rows->getText ( UserTableSync::TABLE_COL_PROFILE_ID)+ e.getMessage());
-			}
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::_unlink(User* obj)
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Unlink(User* obj, Env* env)
 		{
 			obj->setProfile(NULL);
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::save(User* user )
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Save(User* user )
 		{
 			try
 			{
@@ -183,6 +188,7 @@ namespace synthese
 
 		shared_ptr<User> UserTableSync::getUserFromLogin(const string& login )
 		{
+			Env* env(Env::GetOfficialEnv());
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -196,8 +202,7 @@ namespace synthese
 					throw UserTableSyncException("User "+ login + " not found in database.");
 
 				shared_ptr<User> user (new User);
-				load(user.get(), rows);
-				link(user.get(), rows, GET_AUTO);
+				Load(user.get(), rows, env, UP_LINKS_LOAD_LEVEL);
 				return user;
 			}
 			catch (SQLiteException e)
@@ -208,7 +213,8 @@ namespace synthese
 
 
 
-		vector<shared_ptr<User> > UserTableSync::Search(
+		void UserTableSync::Search(
+			Env& env,
 			const string login
 			, const string name
 			, const string surname
@@ -219,9 +225,9 @@ namespace synthese
 			, bool orderByLogin
 			, bool orderByName
 			, bool orderByProfileName
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT "
@@ -250,24 +256,8 @@ namespace synthese
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
-			
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<User> > users;
-				while (rows->next ())
-				{
-					shared_ptr<User> user(new User);
-					load(user.get(), rows);
-					link(user.get(), rows, GET_AUTO);
-					users.push_back(user);
-				}
-				return users;
-			}
-			catch(SQLiteException& e)
-			{
-				throw UserTableSyncException(e.getMessage());
-			}
+
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 

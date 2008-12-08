@@ -25,8 +25,7 @@
 
 #include <string>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -38,7 +37,8 @@ namespace synthese
 
 			@note This class is used only to permit the remove hook
 		*/
-		class AlarmObjectLink : public util::Registrable<uid, AlarmObjectLink>
+		class AlarmObjectLink
+		:	public virtual util::Registrable
 		{
 		private:
 			uid				_objectId;
@@ -46,6 +46,8 @@ namespace synthese
 			std::string		_recipientKey;
 
 		public:
+			AlarmObjectLink(util::RegistryKeyType key = UNKNOWN_VALUE);
+
 			uid getObjectId() const;
 			uid getAlarmId() const;
 			std::string getRecipientKey() const;

@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "31_resa/OnlineReservationRule.h"
+#include "OnlineReservationRule.h"
+#include "Registry.h"
 
-#include "15_env/EnvModule.h"
+#include "EnvModule.h"
 
 #include "01_util/Constants.h"
 
@@ -33,12 +34,18 @@ namespace synthese
 {
 	using namespace env;
 
+	namespace util
+	{
+		template<> const string Registry<resa::OnlineReservationRule>::KEY("OnlineReservationRule");
+	}
+
 	namespace resa
 	{
 		OnlineReservationRule::OnlineReservationRuleMap OnlineReservationRule::_onlineReservationRuleMap;
 
-		OnlineReservationRule::OnlineReservationRule()
-			: _maxSeats(UNKNOWN_VALUE)
+		OnlineReservationRule::OnlineReservationRule(util::RegistryKeyType key)
+			: util::Registrable(key)
+			, _maxSeats(UNKNOWN_VALUE)
 			, _reservationRule(NULL)
 		{
 			
@@ -155,6 +162,13 @@ namespace synthese
 		{
 			OnlineReservationRuleMap::const_iterator it(_onlineReservationRuleMap.find(rule));
 			return (it == _onlineReservationRuleMap.end()) ? NULL : it->second;
+		}
+
+
+
+		OnlineReservationRule::~OnlineReservationRule()
+		{
+
 		}
 	}
 }

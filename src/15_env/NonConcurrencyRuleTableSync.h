@@ -61,7 +61,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<NonConcurrencyRule> > Search(
+			static void Search(
+				util::Env& env,
 				int hiddenLineId = UNKNOWN_VALUE
 				, int priorityLineId = UNKNOWN_VALUE
 				, bool hiddenAndPriority = true
@@ -70,7 +71,8 @@ namespace synthese
 				, bool orderByPriorityLine = true
 				, bool orderByHiddenLine = false
 				, bool orderByDelay = false
-				, bool raisingOrder = true
+				, bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 	}

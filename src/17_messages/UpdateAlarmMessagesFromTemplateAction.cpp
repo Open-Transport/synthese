@@ -59,16 +59,16 @@ namespace synthese
 		{
 			try
 			{
-				_message.reset(AlarmTableSync::GetUpdateable(_request->getObjectId(), true));
+				_message = AlarmTableSync::GetEditable(_request->getObjectId());
 
 				uid id = map.getUid(PARAMETER_TEMPLATE_ID, true, FACTORY_KEY);
 				_template = TextTemplateTableSync::Get(id);
 			}
-			catch (ObjectNotFoundException<uid,Alarm>& e)
+			catch (ObjectNotFoundException<Alarm>& e)
 			{
 				throw ActionException("Specified message not found" + e.getMessage());
 			}
-			catch(TextTemplate::ObjectNotFoundException& e)
+			catch(ObjectNotFoundException<TextTemplate>& e)
 			{
 				throw ActionException("Specified template not found" + e.getMessage());
 			}

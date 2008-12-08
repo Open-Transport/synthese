@@ -25,13 +25,13 @@
 
 #include <assert.h>
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
-#include "01_util/Conversion.h"
-#include "01_util/XmlToolkit.h"
-#include "01_util/UId.h"
+#include "Conversion.h"
+#include "XmlToolkit.h"
+#include "UId.h"
 
-#include "06_geometry/Point2D.h"
+#include "Point2D.h"
 
 using namespace synthese::util::XmlToolkit;
 using namespace boost;
@@ -40,6 +40,8 @@ using namespace boost;
 namespace synthese
 {
 	using namespace geometry;
+	using namespace util;
+	
 
 	namespace env
 	{
@@ -76,7 +78,7 @@ namespace synthese
 		    
 		shared_ptr<PublicTransportStopZoneConnectionPlace>
 		XmlBuilder::CreateConnectionPlace (XMLNode& node, 
-						   const City::Registry& cities)
+						   const Registry<City>& cities)
 		{
 			// assert ("connectionPlace" == node.getName ());
 		    
@@ -144,8 +146,8 @@ namespace synthese
 
 		shared_ptr<Line> 
 		XmlBuilder::CreateLine (XMLNode& node, 
-					const Axis::Registry& axes,
-					const CommercialLine::Registry& commercialLines)
+					const Registry<Axis>& axes,
+					const Registry<CommercialLine>& commercialLines)
 		{
 			uid id (GetLongLongAttr (node, "id"));
 
@@ -171,8 +173,8 @@ namespace synthese
 
 		shared_ptr<LineStop> 
 		XmlBuilder::CreateLineStop (XMLNode& node, 
-						Line::Registry& lines,
-						const PhysicalStop::Registry& physicalStops)
+						Registry<Line>& lines,
+						const Registry<PhysicalStop>& physicalStops)
 		{
 			// assert ("lineStop" == node.getName ());
 
@@ -185,7 +187,7 @@ namespace synthese
 			bool isArrival (GetBoolAttr (node, "isArrival"));
 			double metricOffset (GetDoubleAttr (node, "metricOffset"));
 		   
-			shared_ptr<Line> line = lines.getUpdateable (lineId);
+			shared_ptr<Line> line = lines.getEditable (lineId);
 
 			shared_ptr<LineStop> lineStop (
 			new LineStop (
@@ -217,7 +219,9 @@ namespace synthese
 
 
 		shared_ptr<PhysicalStop> 
-		XmlBuilder::CreatePhysicalStop (XMLNode& node, const PublicTransportStopZoneConnectionPlace::Registry& connectionPlaces)
+		XmlBuilder::CreatePhysicalStop(
+			XMLNode& node,
+			const Registry<PublicTransportStopZoneConnectionPlace>& connectionPlaces)
 		{
 			// assert ("physicalStop" == node.getName ());
 			uid id (GetLongLongAttr (node, "id"));

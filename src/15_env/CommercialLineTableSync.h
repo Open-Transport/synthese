@@ -71,15 +71,17 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<CommercialLine> > search(
+			static void Search(
+				util::Env& env,
 				uid networkId = UNKNOWN_VALUE
 				, std::string name = "%"
 				, int first = 0
 				, int number = 0
 				, bool orderByNetwork = true
 				, bool orderByName = false
-				, bool raisingOrder = true
-				);
+				, bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 
 
 
@@ -105,7 +107,8 @@ totalControl = request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDep
 neededLevel = READ
 				@endcode
 			*/
-			static std::vector<boost::shared_ptr<CommercialLine> > search(
+			static void Search(
+				util::Env& env,
 				const security::RightsOfSameClassMap& rights
 				, bool totalControl
 				, security::RightLevel neededLevel
@@ -115,7 +118,8 @@ neededLevel = READ
 				, bool orderByName = false
 				, bool raisingOrder = true
 				, bool mustBeBookable = false
-				);
+				, util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 
 
 

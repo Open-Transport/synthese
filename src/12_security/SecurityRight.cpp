@@ -22,11 +22,13 @@
 
 #include "SecurityRight.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "12_security/SecurityModule.h"
+#include "SecurityModule.h"
 #include "12_security/Constants.h"
-#include "12_security/Profile.h"
+#include "Profile.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -50,35 +52,40 @@ namespace synthese
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous profils)"));
-			SecurityRight::addSubProfilesLabel(m, shared_ptr<const Profile>(), string());
+			SecurityRight::addSubProfilesLabel(m, shared_ptr<Profile>(), string());
 			return m;
 		}
 
 
-		std::string SecurityRight::displayParameter() const
-		{
+		std::string SecurityRight::displayParameter(
+			util::Env* env
+		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return "(tous profils)";
 
-			return (Profile::Contains(Conversion::ToLongLong(_parameter)))
-				? Profile::Get(Conversion::ToLongLong(_parameter))->getName()
+			return (env->getRegistry<Profile>().contains(Conversion::ToLongLong(_parameter)))
+				? env->getRegistry<Profile>().get(Conversion::ToLongLong(_parameter))->getName()
 				: "(invalide)";
 		}
 
-		bool SecurityRight::perimeterIncludes( const std::string& perimeter ) const
-		{
+		bool SecurityRight::perimeterIncludes(
+			const std::string& perimeter,
+			util::Env* env 
+		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return true;
 			if (perimeter == UNKNOWN_PERIMETER)
 				return true;
 
-			if (Profile::Contains(Conversion::ToLongLong(_parameter))
-				&& Profile::Contains(Conversion::ToLongLong(perimeter)))
-			{
-				shared_ptr<const Profile> includedProfile = Profile::Get(Conversion::ToLongLong(perimeter));
-				shared_ptr<const Profile> currentProfile = Profile::Get(Conversion::ToLongLong(_parameter));
+			const Registry<Profile>& registry(env->getRegistry<Profile>());
 
-				for (;includedProfile.get(); includedProfile = Profile::Get(includedProfile->getParentId()))
+			if (registry.contains(Conversion::ToLongLong(_parameter))
+				&& registry.contains(Conversion::ToLongLong(perimeter)))
+			{
+				shared_ptr<const Profile> includedProfile = registry.get(Conversion::ToLongLong(perimeter));
+				shared_ptr<const Profile> currentProfile = registry.get(Conversion::ToLongLong(_parameter));
+
+				for (;includedProfile.get(); includedProfile = registry.get(includedProfile->getParentId()))
 					if (currentProfile == includedProfile)
 						return true;
 			}
@@ -86,15 +93,16 @@ namespace synthese
 			return false;
 		}
 
-		void SecurityRight::addSubProfilesLabel( ParameterLabelsVector& plv, shared_ptr<const Profile> parent, std::string prefix)
-		{
-			vector<shared_ptr<const Profile> > p = SecurityModule::getSubProfiles(parent);
-
-			for (vector<shared_ptr<const Profile> >::const_iterator it = p.begin(); it != p.end(); ++it)
+		void SecurityRight::addSubProfilesLabel(
+			ParameterLabelsVector& plv,
+			shared_ptr<Profile> parent,
+			std::string prefix
+		){
+			BOOST_FOREACH(shared_ptr<Profile> profile, SecurityModule::getSubProfiles(parent))
 			{
-				plv.push_back(make_pair(Conversion::ToString((*it)->getKey()), prefix + (*it)->getName()));
+				plv.push_back(make_pair(Conversion::ToString(profile->getKey()), prefix + profile->getName()));
 
-				addSubProfilesLabel(plv, *it, "&nbsp;&nbsp;" + prefix);
+				addSubProfilesLabel(plv, profile, "&nbsp;&nbsp;" + prefix);
 			}
 		}
 	}

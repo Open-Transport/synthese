@@ -58,7 +58,7 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::GetUpdateable(_request->getObjectId());
+				_profile = ProfileTableSync::GetEditable(_request->getObjectId());
 			}
 			catch(...)
 			{
@@ -78,7 +78,7 @@ namespace synthese
 			if (_profile != NULL)
 			{
 				_profile->removeRight(_right->getFactoryKey(), _right->getParameter());
-				ProfileTableSync::save(_profile.get());
+				ProfileTableSync::Save(_profile.get());
 			}
 		}
 	}

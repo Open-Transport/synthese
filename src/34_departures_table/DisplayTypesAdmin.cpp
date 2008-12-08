@@ -74,7 +74,10 @@ namespace synthese
 			// Right
 			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 
-			vector<shared_ptr<DisplayType> > searchResult(DisplayTypeTableSync::search(string()));
+			// Env
+			Env env;
+			DisplayTypeTableSync::Search(env);
+			Registry<DisplayType>& searchResult(env.template getRegistry<DisplayType>());
 
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(request);
 			createRequest.getFunction()->setPage<DisplayTypesAdmin>();
@@ -84,7 +87,9 @@ namespace synthese
 
 			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(request);
 			deleteRequest.getFunction()->setPage<DisplayTypesAdmin>();
-			
+
+
+
 			stream
 				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
 				<< "<table class=\"adminresults\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Max arrêts intermédiaires</th>";
@@ -93,9 +98,9 @@ namespace synthese
 			stream << "</tr>";
 
 			// Display types loop
-			for (vector<shared_ptr<DisplayType> >::const_iterator it = searchResult.begin(); it != searchResult.end(); ++it)
+			for(Registry<DisplayType>::const_iterator it = searchResult.begin(); it != searchResult.end(); ++it)
 			{
-				shared_ptr<const DisplayType> dt = *it;
+				shared_ptr<const DisplayType> dt = it->second;
 				deleteRequest.getAction()->setType(dt);
 
 				HTMLForm uf(updateRequest.getHTMLForm("update" + Conversion::ToString(dt->getKey())));

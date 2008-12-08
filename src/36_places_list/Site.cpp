@@ -21,15 +21,16 @@
 */
 
 #include "Site.h"
+#include "Registry.h"
 
-#include "15_env/EnvModule.h"
-#include "15_env/City.h"
-#include "15_env/ConnectionPlace.h"
-#include "15_env/AccessParameters.h"
+#include "EnvModule.h"
+#include "City.h"
+#include "ConnectionPlace.h"
+#include "AccessParameters.h"
 
-#include "07_lex_matcher/LexicalMatcher.h"
+#include "LexicalMatcher.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 #include "01_util/Exception.h"
 
@@ -47,7 +48,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,transportwebsite::Site>::Registry Registrable<uid,transportwebsite::Site>::_registry;
+		template<> const string Registry<transportwebsite::Site>::KEY("Site");
 	}
 
 	namespace transportwebsite
@@ -55,8 +56,8 @@ namespace synthese
 		const string Site::TEMPS_MIN_CIRCULATIONS ("r");
 		const string Site::TEMPS_MAX_CIRCULATIONS ("R");
 
-		Site::Site(uid id)
-			: Registrable<uid, Site>(id)
+		Site::Site(RegistryKeyType id)
+			: Registrable(id)
 			, _startValidityDate(TIME_UNKNOWN)
 			, _endValidityDate(TIME_UNKNOWN)
 		{

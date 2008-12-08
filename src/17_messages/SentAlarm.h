@@ -23,13 +23,12 @@
 #ifndef SYNTHESE_SentAlarm_h__
 #define SYNTHESE_SentAlarm_h__
 
-#include "17_messages/Alarm.h"
+#include "Alarm.h"
 #include "17_messages/Types.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/Constants.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -40,7 +39,6 @@ namespace synthese
 		*/
 		class SentAlarm
 			: public Alarm
-			, public util::Registrable<uid, SentAlarm>
 		{
 		public:
 			struct Complements
@@ -54,7 +52,7 @@ namespace synthese
 			Complements					_complements;
 
 		public:
-			SentAlarm();
+			SentAlarm(util::RegistryKeyType key = UNKNOWN_VALUE);
 			~SentAlarm();
 			void setComplements(const Complements& complements);
 
@@ -72,7 +70,6 @@ namespace synthese
 
 			bool isApplicable(const time::DateTime& date) const;
 
-			uid getId() const;
 
 			
 			/** Conflict between two alarms detector.
@@ -106,9 +103,6 @@ namespace synthese
 				@date 2007				
 			*/
 			AlarmConflict getConflictStatus() const;
-
-			static boost::shared_ptr<const SentAlarm> Get(uid key);
-			static bool Contains(uid key);
 		};
 	}
 }

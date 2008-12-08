@@ -24,6 +24,7 @@
 #include <sstream>
 
 #include "ReservationRuleTableSync.h"
+#include "ReservationRule.h"
 
 #include "Conversion.h"
 
@@ -49,10 +50,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ReservationRuleTableSync>::TABLE_ID = 21;
 		template<> const bool SQLiteTableSyncTemplate<ReservationRuleTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::load(ReservationRule* rr, const db::SQLiteResultSPtr& rows )
-		{
-		    rr->setKey (rows->getLongLong (TABLE_COL_ID));
-		    
+		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::Load(
+			ReservationRule* rr,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    bool online (rows->getBool (ReservationRuleTableSync::COL_ONLINE));
 
 		    bool originIsReference (rows->getBool (ReservationRuleTableSync::COL_ORIGINISREFERENCE));
@@ -90,7 +93,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::save(ReservationRule* object)
+		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::Save(ReservationRule* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -113,13 +116,12 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::_link(ReservationRule* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
 
-		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::_unlink(ReservationRule* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::Unlink(
+			ReservationRule* obj,
+			Env* env
+		){
 
 		}
 
@@ -140,7 +142,7 @@ namespace synthese
 		const std::string ReservationRuleTableSync::COL_WEBSITEURL ("web_site_url");
 
 		ReservationRuleTableSync::ReservationRuleTableSync()
-			: SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>()
+			: SQLiteRegistryTableSyncTemplate<ReservationRuleTableSync,ReservationRule>()
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_TYPE, "INTEGER", true);
@@ -156,46 +158,14 @@ namespace synthese
 			addTableColumn (COL_WEBSITEURL, "TEXT", true);
 		}
 
-		void ReservationRuleTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			while (rows->next ())
-			{
-				ReservationRule* object(new ReservationRule());
-				load(object, rows);
-				object->store();
-			}
-		}
 
-		void ReservationRuleTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			while (rows->next ())
-			{
-			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    if (ReservationRule::Contains(id))
-			    {
-				shared_ptr<ReservationRule> object = ReservationRule::GetUpdateable(id);
-				load(object.get(), rows);
-			    }
-			}
-		}
 
-		void ReservationRuleTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (ReservationRule::Contains(id))
-				{
-					ReservationRule::Remove(id);
-				}
-			}
-		}
-
-		vector<shared_ptr<ReservationRule> > ReservationRuleTableSync::Search(
-			int first /*= 0*/
-			, int number /*= 0*/
+		void ReservationRuleTableSync::Search(
+			Env& env,
+			int first, /*= 0*/
+			int number, /*= 0*/
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -209,23 +179,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<ReservationRule> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<ReservationRule> object(new ReservationRule);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

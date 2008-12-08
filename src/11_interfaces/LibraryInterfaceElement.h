@@ -25,8 +25,7 @@
 
 #include<boost/shared_ptr.hpp>
 
-#include "01_util/Factorable.h"
-#include "01_util/Registrable.h"
+#include "Factorable.h"
 
 #include "11_interfaces/Types.h"
 
@@ -50,8 +49,7 @@ namespace synthese
 			@ingroup m11
 		*/
 		class LibraryInterfaceElement
-			: public util::Factorable<LibraryInterfaceElement>
-			, public util::Registrable<int, LibraryInterfaceElement>
+		:	public util::Factorable<LibraryInterfaceElement>
 		{
 		protected:
 			const InterfacePage*	_page;

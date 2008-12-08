@@ -63,16 +63,16 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
 
 				uid id(map.getUid(PARAMETER_STOP, true, FACTORY_KEY));
 				_stop = PhysicalStopTableSync::Get(id);
 			}
-			catch (DisplayScreen::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (PhysicalStop::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<PhysicalStop>&)
 			{
 				throw ActionException("Specified stop not found");
 			}
@@ -81,7 +81,7 @@ namespace synthese
 		void AddDepartureStopToDisplayScreenAction::run()
 		{
 			_screen->addPhysicalStop(_stop.get());
-			DisplayScreenTableSync::save(_screen.get());
+			DisplayScreenTableSync::Save(_screen.get());
 		}
 	}
 }

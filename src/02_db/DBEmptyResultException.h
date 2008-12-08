@@ -24,9 +24,9 @@
 #define SYNTHESE_DBEmptyResultException_H__
 
 #include "01_util/UId.h"
-#include "01_util/ObjectNotFoundException.h"
+#include "ObjectNotFoundException.h"
 
-#include "02_db/SQLiteTableSyncTemplate.h"
+#include "SQLiteTableSyncTemplate.h"
 
 #include <string>
 
@@ -40,11 +40,11 @@ namespace synthese
 			This exception occurs when the execution of a selection query returns an empty result though it should not.
 		*/
 		template <class T>
-		class DBEmptyResultException : public util::ObjectNotFoundException<uid,typename T::ObjectType>
+		class DBEmptyResultException : public util::ObjectNotFoundException<typename T::ObjectType>
 		{
 		public:
 			DBEmptyResultException (uid& id)
-				: util::ObjectNotFoundException<uid,T::ObjectType>(id, "Unable to fetch object in database table " + T::TABLE_NAME)
+				: util::ObjectNotFoundException<T::ObjectType>(id, "Unable to fetch object in database table " + T::TABLE_NAME)
 			{}
 		};
 	}

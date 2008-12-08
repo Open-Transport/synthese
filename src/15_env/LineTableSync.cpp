@@ -56,10 +56,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<LineTableSync>::TABLE_ID = 9;
 		template<> const bool SQLiteTableSyncTemplate<LineTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::load(Line* line, const db::SQLiteResultSPtr& rows )
-		{
-			line->setKey(rows->getLongLong (TABLE_COL_ID));
-
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Load(
+			Line* line,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			std::string name (
 			    rows->getText (LineTableSync::COL_NAME));
 			std::string timetableName (
@@ -81,9 +83,51 @@ namespace synthese
 			line->setUseInTimetables (useInTimetables);
 			line->setUseInRoutePlanning (useInRoutePlanning);
 			line->setWayBack(wayBack);
+
+			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
+			{
+				uid axisId (rows->getLongLong (LineTableSync::COL_AXISID));
+				uid rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
+				uid fareId (rows->getLongLong (LineTableSync::COL_FAREID));
+				uid alarmId (rows->getLongLong (LineTableSync::COL_ALARMID));
+				uid bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
+				uid pedestrianComplianceId (rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
+				uid handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+				uid reservationRuleId (rows->getLongLong (LineTableSync::COL_RESERVATIONRULEID));
+				RegistryKeyType commercialLineId(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID));
+
+				try
+				{
+					line->setAxis(AxisTableSync::Get(axisId, env, linkLevel).get());
+					if (rollingStockId > 0)
+						line->setRollingStock(RollingStockTableSync::Get(rollingStockId, env, linkLevel).get());
+					if (fareId > 0)
+						line->setFare (FareTableSync::Get (fareId, env, linkLevel));
+					line->setCommercialLine(CommercialLineTableSync::Get(commercialLineId, env, linkLevel).get());
+
+					line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,env, linkLevel, AUTO_CREATE));
+					line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,env, linkLevel, AUTO_CREATE));
+					line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
+					line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,env, linkLevel, AUTO_CREATE));
+				}
+				catch(ObjectNotFoundException<RollingStock>)
+				{
+					Log::GetInstance().warn("Bad value " + Conversion::ToString(rollingStockId) + " for rolling stock in line " + Conversion::ToString(line->getKey()));
+				}
+				catch(ObjectNotFoundException<Fare>)
+				{
+					Log::GetInstance().warn("Bad value " + Conversion::ToString(fareId) + " for fare in line " + Conversion::ToString(line->getKey()));
+				}
+				catch(ObjectNotFoundException<CommercialLine>)
+				{
+					Log::GetInstance().warn("Bad value " + Conversion::ToString(commercialLineId) + " for fare in line " + Conversion::ToString(line->getKey()));
+				}
+			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::save(Line* object)
+
+
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Save(Line* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -106,58 +150,13 @@ namespace synthese
 			sqlite->execUpdate(query.str());
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::_link(Line* line, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			uid axisId (rows->getLongLong (LineTableSync::COL_AXISID));
-			uid rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
-			uid fareId (rows->getLongLong (LineTableSync::COL_FAREID));
-			uid alarmId (rows->getLongLong (LineTableSync::COL_ALARMID));
-			uid bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
-			uid pedestrianComplianceId (rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
-			uid handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-			uid reservationRuleId (rows->getLongLong (LineTableSync::COL_RESERVATIONRULEID));
 
-			line->setAxis(AxisTableSync::Get(axisId,line,true,temporary));
 
-			try
-			{
-				if (rollingStockId > 0)
-					line->setRollingStock(RollingStockTableSync::Get(rollingStockId,line,false,temporary));
-			}
-			catch(...)
-			{
-				Log::GetInstance().warn("Bad value " + Conversion::ToString(rollingStockId) + " for rolling stock in line " + Conversion::ToString(line->getKey()));
-			}
-			// Fare
-			try
-			{
-				if (fareId > 0)
-					line->setFare (FareTableSync::Get (fareId,line,true,temporary));
-			}
-			catch(...)
-			{
-				Log::GetInstance().warn("Bad value " + Conversion::ToString(fareId) + " for fare in line " + Conversion::ToString(line->getKey()));
-			}
-
-			// GET_AUTO is used to benefit of the Neutral Element if id=0
-			line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,line,true,GET_AUTO));
-			line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,line,true,GET_AUTO));
-			line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId,line,true,GET_AUTO));
-			line->setCommercialLine(CommercialLineTableSync::Get(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID), line,true,GET_AUTO));
-			line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,line,true,GET_AUTO));
-
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::_unlink(Line* obj)
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Unlink(Line* obj, Env* env)
 		{
 			obj->setAxis(NULL);
-			obj->setFare(NULL);
-			obj->setBikeCompliance(NULL);
-			obj->setRollingStock(NULL);
-			obj->setReservationRule(NULL);
-			obj->setBikeCompliance(NULL);
-			obj->setHandicappedCompliance(NULL);
-			obj->setPedestrianCompliance(NULL);
+			obj->setRollingStock(NULL);			
+			obj->setCommercialLine(NULL);
 		}
 
 	}
@@ -211,14 +210,15 @@ namespace synthese
 		}
 
 
-		std::vector<shared_ptr<Line> > LineTableSync::search(
+		void LineTableSync::Search(
+			Env& env,
 			uid commercialLineId
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByName
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -233,23 +233,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Line> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<Line> object(new Line());
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

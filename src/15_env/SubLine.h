@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_env_SubLine_h__
 #define SYNTHESE_env_SubLine_h__
 
-#include "15_env/Line.h";
+#include "Line.h"
 
 namespace synthese
 {

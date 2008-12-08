@@ -33,6 +33,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<Action, security::DelUserAction>::FACTORY_KEY("sdu");
 	
@@ -49,7 +50,7 @@ namespace synthese
 			{
 				_user = UserTableSync::Get(_request->getObjectId());
 			}
-			catch (User::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<User>& e)
 			{
 				throw ActionException("Specified user not found" + e.getMessage());
 			}

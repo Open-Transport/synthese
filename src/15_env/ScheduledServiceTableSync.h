@@ -29,9 +29,9 @@
 #include <string>
 #include <iostream>
 
-#include "04_time/Date.h"
+#include "Date.h"
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -67,14 +67,16 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<ScheduledService> > search(
+			static void Search(
+				util::Env& env,
 				uid lineId = UNKNOWN_VALUE
 				, uid commercialLineId = UNKNOWN_VALUE
 				, time::Date date = time::Date(time::TIME_UNKNOWN)
 				, int first = 0
 				, int number = 0
 				, bool orderByOriginTime = true
-				, bool raisingOrder = true
+				, bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
 

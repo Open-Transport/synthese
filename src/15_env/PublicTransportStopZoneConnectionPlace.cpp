@@ -21,13 +21,14 @@
 */
 
 #include "PublicTransportStopZoneConnectionPlace.h"
+#include "Registry.h"
 
-#include "15_env/PhysicalStop.h"
-#include "15_env/Edge.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/Line.h"
-#include "15_env/VertexAccessMap.h"
-#include "15_env/Address.h"
+#include "PhysicalStop.h"
+#include "Edge.h"
+#include "CommercialLine.h"
+#include "Line.h"
+#include "VertexAccessMap.h"
+#include "Address.h"
 
 using namespace std;
 
@@ -37,19 +38,18 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::PublicTransportStopZoneConnectionPlace>::Registry Registrable<uid,env::PublicTransportStopZoneConnectionPlace>::_registry;
+		template<> const std::string Registry<env::PublicTransportStopZoneConnectionPlace>::KEY("PublicTransportStopZoneConnectionPlace");
 	}
 
 	namespace env
 	{
 		PublicTransportStopZoneConnectionPlace::PublicTransportStopZoneConnectionPlace(
-			uid id /*= UNKNOWN_VALUE */
+			util::RegistryKeyType id /*= UNKNOWN_VALUE */
 			, std::string name /*= std::string() */
 			, const City* city /*= NULL */
 			, ConnectionType connectionType /*= CONNECTION_TYPE_FORBIDDEN */
 			, int defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */ 
-		)	: Registrable<uid,PublicTransportStopZoneConnectionPlace>(id)
-			, ConnectionPlace(name, city, connectionType)
+		)	: ConnectionPlace(id, name, city, connectionType)
 			, _defaultTransferDelay (defaultTransferDelay)
 			, _minTransferDelay (UNKNOWN_VALUE)
 			, _score(UNKNOWN_VALUE)
@@ -108,10 +108,7 @@ namespace synthese
 			_minTransferDelay = UNKNOWN_VALUE;
 		}
 
-		uid PublicTransportStopZoneConnectionPlace::getId() const
-		{
-			return getKey();
-		}
+
 
 		void PublicTransportStopZoneConnectionPlace::clearTransferDelays()
 		{
@@ -149,7 +146,7 @@ namespace synthese
 
 		int PublicTransportStopZoneConnectionPlace::getTransferDelay( const Vertex* fromVertex  , const Vertex* toVertex ) const /*= 0*/
 		{
-			TransferDelaysMap::const_iterator it(_transferDelays.find(make_pair(fromVertex->getId(),toVertex->getId())));
+			TransferDelaysMap::const_iterator it(_transferDelays.find(make_pair(fromVertex->getKey(),toVertex->getKey())));
 
 			// If not defined in map, return default transfer delay
 			return (it == _transferDelays.end ()) ? _defaultTransferDelay : it->second;

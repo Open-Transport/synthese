@@ -20,16 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/SentAlarm.h"
-#include "17_messages/AlarmRecipient.h"
+#include "SentAlarm.h"
+#include "AlarmRecipient.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
 
+
 	namespace util
 	{
-		template<> typename Registrable<uid,messages::SentAlarm>::Registry Registrable<uid,messages::SentAlarm>::_registry;
+		template<> const string Registry<messages::SentAlarm>::KEY("SentAlarm");
 	}
 
 	namespace messages
@@ -59,19 +63,14 @@ namespace synthese
 			return isApplicable(date, date);
 		}
 
-		SentAlarm::SentAlarm()
-			: util::Registrable<uid, SentAlarm>()			
+		SentAlarm::SentAlarm(RegistryKeyType key)
+			: Alarm(key)
 		{
 		}
 
 		SentAlarm::~SentAlarm()
 		{
 
-		}
-
-		uid SentAlarm::getId() const
-		{
-			return getKey();
 		}
 
 		AlarmConflict SentAlarm::wereInConflictWith( const SentAlarm& other ) const
@@ -118,16 +117,6 @@ namespace synthese
 		void SentAlarm::setComplements( const Complements& complements )
 		{
 			_complements = complements;
-		}
-
-		boost::shared_ptr<const SentAlarm> SentAlarm::Get( uid key )
-		{
-			return Registrable<uid, SentAlarm>::Get(key);
-		}
-
-		bool SentAlarm::Contains( uid key )
-		{
-			return Registrable<uid, SentAlarm>::Contains(key);
 		}
 	}
 }

@@ -158,7 +158,7 @@ namespace synthese
 					// Customer ID
 					uid id(map.getUid(PARAMETER_CUSTOMER_ID, false, FACTORY_KEY));
 					if (id != UNKNOWN_VALUE)
-						_customer = UserTableSync::GetUpdateable(id);
+						_customer = UserTableSync::GetEditable(id);
 				}
 			}
 			else if (_request->isAuthorized<ResaRight>(FORBIDDEN, WRITE))
@@ -190,8 +190,8 @@ namespace synthese
 			// Site
 			uid id(map.getUid(PARAMETER_SITE, false, FACTORY_KEY));
 			shared_ptr<const Site> site;
-			if (id > 0 && Site::Contains(id))
-				site = Site::Get(id);
+			if (id > 0 && Env::GetOfficialEnv()->getRegistry<Site>().contains(id))
+				site = Env::GetOfficialEnv()->getRegistry<Site>().get(id);
 
 			// Seats number
 			_seatsNumber = map.getInt(PARAMETER_SEATS_NUMBER, true, FACTORY_KEY);
@@ -259,7 +259,7 @@ namespace synthese
 		{
 			// Save customer if necessary
 			if (_createCustomer)
-				UserTableSync::save(_customer.get());
+				UserTableSync::Save(_customer.get());
 
 			// New ReservationTransaction
 			const DateTime now(TIME_CURRENT);
@@ -271,17 +271,17 @@ namespace synthese
 			rt.setCustomerEMail(_customer->getEMail());
 			rt.setCustomerUserId(_customer->getKey());
 			rt.setSeats(_seatsNumber);
-			ReservationTransactionTableSync::save(&rt);
+			ReservationTransactionTableSync::Save(&rt);
 
 			// New reservation for each journey leg
 			for (Journey::ServiceUses::const_iterator su(_journey.getServiceUses().begin()); su != _journey.getServiceUses().end(); ++su)
 			{
 				shared_ptr<Reservation> r(rt.newReservation());
-				r->setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getId());
+				r->setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getKey());
 				r->setDeparturePlaceName(su->getDepartureEdge()->getPlace()->getFullName());
 				r->setDepartureTime(su->getDepartureDateTime());
 				r->setOriginDateTime(su->getOriginDateTime());
-				r->setArrivalPlaceId(su->getArrivalEdge()->getPlace()->getId());
+				r->setArrivalPlaceId(su->getArrivalEdge()->getPlace()->getKey());
 				r->setArrivalPlaceName(su->getArrivalEdge()->getPlace()->getFullName());
 				r->setArrivalTime(su->getArrivalDateTime());
 				
@@ -311,9 +311,9 @@ namespace synthese
 						, su->getDepartureDateTime()
 					));
 				}
-				r->setServiceId(su->getService()->getId());
+				r->setServiceId(su->getService()->getKey());
 				r->setServiceCode(Conversion::ToString(su->getService()->getServiceNumber()));
-				ReservationTableSync::save(r.get());
+				ReservationTableSync::Save(r.get());
 			}
 
 			// Log

@@ -34,6 +34,7 @@
 #include "30_server/Request.h"
 
 #include "01_util/Conversion.h"
+#include "Env.h"
 
 using namespace std;
 using namespace boost;
@@ -71,7 +72,7 @@ namespace synthese
 			{
 				// Text ID
 				uid id = map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY);
-				_text = TextTemplateTableSync::GetUpdateable(id);
+				_text = TextTemplateTableSync::GetEditable(id);
 		
 				id = map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY);
 				_folder = TextTemplateTableSync::Get(id);
@@ -80,8 +81,10 @@ namespace synthese
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
-				vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::Search(ALARM_LEVEL_UNKNOWN, _text->getParentId(), false, _name, _text.get(), 0, 1);
-				if (!v.empty())
+
+				Env env;
+				TextTemplateTableSync::Search(env, ALARM_LEVEL_UNKNOWN, _text->getParentId(), false, _name, _text.get(), 0, 1);
+				if (!env.template getRegistry<TextTemplate>().empty())
 					throw ActionException("Un texte portant ce nom existe déjà.");
 
 				// Short message
@@ -90,7 +93,7 @@ namespace synthese
 				// Long message
 				_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
 			}
-			catch (TextTemplate::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<TextTemplate>& e)
 			{
 				throw ActionException(e.getMessage());
 			}
@@ -109,7 +112,7 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(logChanges, "Déplacement", _text->getParentId(), _folder->getKey());
 			_text->setParentId(_folder->getKey());
 
-			TextTemplateTableSync::save(_text.get());
+			TextTemplateTableSync::Save(_text.get());
 
 			MessagesLibraryLog::AddTemplateUpdateEntry(*_text, logChanges.str(), _request->getUser().get());
 		}

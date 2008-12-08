@@ -23,21 +23,14 @@
 #ifndef SYNTHESE_ENV_FARE_H
 #define SYNTHESE_ENV_FARE_H
 
-#include "15_env/Compliance.h"
-
-#include "01_util/RegistrableWithNeutralElement.h"
-#include "01_util/UId.h"
+#include "Compliance.h"
 
 #include <string>
-
 
 namespace synthese
 {
 	namespace env
 	{
-
-
-
 		/** Fare handling class
 
 			Compliance values :
@@ -48,8 +41,7 @@ namespace synthese
 			@ingroup m35
 		*/
 		class Fare
-			: public util::RegistrableWithNeutralElement<uid,Fare>
-			, public Compliance
+		:	public Compliance
 		{
 		 public:
 		    
@@ -62,8 +54,10 @@ namespace synthese
 			std::string _name; //!< Fare name
 			FareType _type; //!< Fare type
 
-		 public:
-    			Fare();
+		public:
+			Fare(
+				util::RegistryKeyType key = UNKNOWN_VALUE
+			);
 			~Fare ();
 		    
 		    
@@ -75,12 +69,8 @@ namespace synthese
 			const FareType& getType () const;
 			void setType (const FareType& fareType);
 			//@}
-
 		};
-
-
 	}
 }
 
 #endif
-

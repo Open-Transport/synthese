@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
 #include "17_messages/Types.h"
 
@@ -62,7 +62,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<TextTemplate> > Search(
+			static void Search(
+				util::Env& env,
 				AlarmLevel level = ALARM_LEVEL_UNKNOWN
 				, uid parentId = static_cast<uid>(UNKNOWN_VALUE)
 				, bool isFolder = false
@@ -73,8 +74,9 @@ namespace synthese
 				, bool orderByName = true
 				, bool orderByShortText = false
 				, bool orderByLongText = false
-				, bool raisingOrder = true
-				);
+				, bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
 	}
 }

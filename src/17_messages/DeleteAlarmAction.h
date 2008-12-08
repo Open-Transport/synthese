@@ -23,10 +23,9 @@
 #ifndef SYNTHESE_DeleteAlarmAction_H__
 #define SYNTHESE_DeleteAlarmAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
+#include "UtilTypes.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -63,7 +62,7 @@ namespace synthese
 			*/
 			void run();
 
-			void setAlarmId(uid id);
+			void setAlarmId(util::RegistryKeyType id);
 		};
 	}
 }

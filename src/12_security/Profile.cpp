@@ -23,11 +23,13 @@
 #include <sstream>
 
 #include "01_util/Exception.h"
+#include "Registry.h"
 
-#include "12_security/Profile.h"
-#include "12_security/Right.h"
+#include "Profile.h"
+#include "Right.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -35,18 +37,18 @@ namespace synthese
 
 	namespace util
 	{
-		template<> Registrable<uid,security::Profile>::Registry Registrable<uid,security::Profile>::_registry;
+		template<> const string Registry<security::Profile>::KEY("Profile");
 	}
 
 	namespace security
 	{
 
 
-		Profile::Profile( uid id )
-			: Registrable<uid, Profile>(id)
-			, _parentId(0)
+		Profile::Profile(
+			RegistryKeyType id
+		):	Registrable(id),
+			_parentId(0)
 		{
-
 		}
 
 		void Profile::setName( const std::string& name )

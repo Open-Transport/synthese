@@ -25,7 +25,7 @@
 
 #include "01_util/Exception.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 namespace synthese
 {
@@ -34,18 +34,18 @@ namespace synthese
 		/** ObjectNotFoundException class.
 			@ingroup m01Exceptions refExceptions
 		*/
-		template<class K, class T>
+		template<class T>
 		class ObjectNotFoundException : public Exception
 		{
-			const K& _key;
+			const RegistryKeyType& _key;
 
 		public:
-			ObjectNotFoundException(const K& key, const std::string& message)
+			ObjectNotFoundException(const RegistryKeyType& key, const std::string& message)
 				: Exception(message + " (key=" + Conversion::ToString(key) + ")")
 				, _key(key)
 			{}
 
-			const K& getKey() const
+			const RegistryKeyType& getKey() const
 			{
 				return _key;
 			}

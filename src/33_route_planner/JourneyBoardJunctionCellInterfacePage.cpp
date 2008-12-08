@@ -52,7 +52,7 @@ namespace synthese
 		    , const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector pv;
-			pv.push_back(Conversion::ToString(place->getId()));
+			pv.push_back(Conversion::ToString(place->getKey()));
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(Conversion::ToString(color));
@@ -62,6 +62,14 @@ namespace synthese
 			VariablesMap vm;
 
 			InterfacePage::display(stream, pv, vm, NULL, request);
+
+		}
+
+
+
+		JourneyBoardJunctionCellInterfacePage::JourneyBoardJunctionCellInterfacePage()
+			: Registrable()
+		{
 
 		}
 	}

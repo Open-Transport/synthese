@@ -35,17 +35,19 @@
 #include "12_security/ProfileAdmin.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/AddProfileAction.h"
-#include "12_security/DeleteProfileAction.h"
-#include "12_security/Right.h"
-#include "12_security/SecurityRight.h"
-#include "12_security/SecurityModule.h"
+#include "DeleteProfileAction.h"
+#include "Right.h"
+#include "SecurityRight.h"
+#include "SecurityModule.h"
 #include "12_security/Constants.h"
 
-#include "30_server/ActionFunctionRequest.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/AdminModule.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/ModuleAdmin.h"
+#include "AdminModule.h"
+#include "AdminRequest.h"
+#include "ModuleAdmin.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using boost::shared_ptr;
@@ -90,16 +92,18 @@ namespace synthese
 		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// Search
-			vector<shared_ptr<Profile> > _searchResult(ProfileTableSync::Search(
+			Env env;
+			ProfileTableSync::Search(
+				env,
 				"%"+_searchName+"%"
 				, "%"+_searchRightName+"%"
 				, _requestParameters.first
 				, _requestParameters.maxSize
 				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
 				, _requestParameters.raisingOrder
-			));
+			);
 			ActionResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, _searchResult);
+			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<Profile>());
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
@@ -134,10 +138,8 @@ namespace synthese
 			stream << t.open();
 			
 			// Profiles loop
-			for (vector<shared_ptr<Profile> >::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
+			BOOST_FOREACH(shared_ptr<Profile> profile, env.template getRegistry<Profile>())
 			{
-				shared_ptr<Profile> profile = *it;
-
 				profileRequest.setObjectId(profile->getKey());
 				deleteProfileRequest.setObjectId(profile->getKey());
 
@@ -146,7 +148,7 @@ namespace synthese
 				stream << t.col() << "<ul>";
 
 				if (profile->getParentId())
-					stream << "<li>Fils de " << Profile::Get(profile->getParentId())->getName() << "</li>";
+					stream << "<li>Fils de " << ProfileTableSync::Get(profile->getParentId())->getName() << "</li>";
 				for (RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
 				{
 					shared_ptr<const Right> r = it->second;

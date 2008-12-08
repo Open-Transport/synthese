@@ -71,7 +71,7 @@ namespace synthese
 			uid id(_request->getObjectId());
 			try
 			{
-				_account = AccountTableSync::GetUpdateable(id);
+				_account = AccountTableSync::GetEditable(id);
 			}
 			catch (...)
 			{
@@ -84,7 +84,7 @@ namespace synthese
 		void AccountUnitPriceUpdateAction::run()
 		{
 			_account->setUnitPrice(_value);
-			AccountTableSync::save(_account.get());
+			AccountTableSync::Save(_account.get());
 		}
 	}
 }

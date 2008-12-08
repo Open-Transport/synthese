@@ -31,7 +31,8 @@
 #include "30_server/ParametersMap.h"
 #include "30_server/Request.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
+#include "Env.h"
 
 using namespace std;
 using namespace boost;
@@ -90,8 +91,9 @@ namespace synthese
 					throw ActionException("This is not a folder");
 			}
 
-			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::Search(_level, _parentId, _isFolder, _name, NULL, 0, 1);
-			if (!v.empty())
+			Env env;
+			TextTemplateTableSync::Search(env, _level, _parentId, _isFolder, _name, NULL, 0, 1);
+			if (!env.template getRegistry<TextTemplate>().empty())
 				throw ActionException("Un texte portant ce nom existe déjà.");
 
 			_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
@@ -107,7 +109,7 @@ namespace synthese
 			tt.setName(_name);
 			tt.setIsFolder(_isFolder);
 			tt.setParentId(_parentId);
-			TextTemplateTableSync::save(&tt);
+			TextTemplateTableSync::Save(&tt);
 
 			// Log
 			MessagesLibraryLog::AddTemplateCreationEntry(tt, _request->getUser().get());

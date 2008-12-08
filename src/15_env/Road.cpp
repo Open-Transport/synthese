@@ -20,27 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Road.h"
-#include "15_env/Address.h"
-#include "15_env/RoadChunk.h"
-#include "15_env/PermanentService.h"
+#include "Road.h"
+#include "Address.h"
+#include "RoadChunk.h"
+#include "PermanentService.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace util
 	{
-		template<> typename Registrable<uid,env::Road>::Registry Registrable<uid,env::Road>::_registry;
+		template<> const string Registry<env::Road>::KEY("Road");
 	}
 
 	namespace env
 	{
 
 		Road::Road (
-			uid id
+			RegistryKeyType id
 			, std::string name
 			, const City* city
 			, RoadType type
-		)	: synthese::util::Registrable<uid,Road> (id)
+		)	: Registrable(id)
 			, AddressablePlace (name, city)
 			, _type (type)
 		{
@@ -146,12 +151,6 @@ namespace synthese
 		}
 
 
-
-		uid
-		Road::getId () const
-		{
-			return synthese::util::Registrable<uid,Road>::getKey();
-		}
 
 		bool Road::isPedestrianMode() const
 		{

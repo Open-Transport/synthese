@@ -24,25 +24,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define SYNTHESE_SQLiteDirectTableSyncTemplate_H__
 
 
-#include "02_db/DBModule.h"
+#include "DBModule.h"
 #include "02_db/Types.h"
-#include "02_db/DbModuleClass.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteTableSyncTemplate.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/DBEmptyResultException.h"
-#include "02_db/SQLiteException.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "DbModuleClass.h"
+#include "SQLite.h"
+#include "SQLiteTableSyncTemplate.h"
+#include "SQLiteResult.h"
+#include "DBEmptyResultException.h"
+#include "SQLiteException.h"
 
 #include <sstream>
 #include <string>
 
 #include <boost/shared_ptr.hpp>
 
-#include "01_util/UId.h"
-#include "01_util/Constants.h"
-#include "01_util/Conversion.h"
+#include "FactorableTemplate.h"
+#include "Constants.h"
+#include "Conversion.h"
+#include "Env.h"
 #include "01_util/Log.h"
 
 
@@ -71,58 +70,71 @@ namespace synthese
 			{}
 
 
-			/** Object links loader from the SQLite database.
-				@param obj Pointer to the object to load from the database
-				@param rows Row to read
-				@param temporary Objects to link must be temporarily and recursively created from the database
-				@author Hugues Romain
-				@date 2007				
-			*/
-			static void _link(T* obj, const SQLiteResultSPtr& rows, GetSource temporary);
-
-
-
-			/** Remove all the links to the object present in the environment.
-				@author Hugues Romain
-				@date 2007				
-			*/
-			static void _unlink(T* obj);
-
-
 		public:
 
-			/** Object fetcher.
-			@param key UID of the object
-			@param linked Load on temporary linked object (recursive get)
-			@return Pointer to a new C++ object corresponding to the fetched record
-			@throw DBEmptyResultException if the object was not found
+			/** Object fetcher, with read/write permissions.
+				@param key UID of the object
+				@param env Environment to write the object and read/write the links.
+					- if Default/NULL : no environment, then object is only read from the database
+					- if non NULL : the object is read from the environment if exists, else from the database
+					- use Env::GetOfficialEnv() to use the official environment
+				@param linkLevel Level of load recursion (see each TableSync to know precisely the signification of each level for each class)
+				@param autoCreate :
+					- AUTO_CREATE : returns an empty object if the specified key was not found in the table (the returned object is <u>not</u> stored in the database).
+					- NEVER_CREATE (default) : throws a ObjectNotFound<T> exception if the specified key was not found in the table
+				@return shared pointer Pointer to an object corresponding to the fetched record.
+				@throw ObjectNotFound<T> if the object was not found and if autoCreate is deactivated
+				@todo implement upgrade of load level
 			*/
-			static T* _Get(uid key, bool linked)
-			{
-				SQLiteResultSPtr rows(_GetRow(key));
-				T* object(new T);
-				load(object, rows);
-				if (linked)
-					link(object, rows, GET_TEMPORARY);
+			static boost::shared_ptr<T> GetEditable(
+				util::RegistryKeyType key,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			){
+				if (env != NULL && env->template getRegistry<T>().contains(key))
+					return env->template getEditableRegistry<T>().getEditable(key);
+
+				boost::shared_ptr<T> object;
+				try
+				{
+					SQLiteResultSPtr rows(_GetRow(key));
+					object.reset(new T(rows->getKey()));
+					Load(object.get(), rows, env, linkLevel);
+				}
+				catch (DBEmptyResultException)
+				{
+					if (autoCreate == NEVER_CREATE)
+						throw ObjectNotFoundException<T>(key, "Object not found in "+ TABLE_NAME);
+					object.reset(new T(0));
+				}
+				
+				if (env != NULL)
+					env->template getEditableRegistry<T>().add(object);
 				return object;
 			}
 
-			static void link(T* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-			{
-				if (obj->getLinked())
-				{
-					unlink(obj);
-					if (temporary)
-						obj->clearChildTemporaryObjects();
-				}
-				_link(obj, rows, temporary);
-				obj->setLinked(true);
-			}
 
-			static void unlink(T* obj)
-			{
-				_unlink(obj);
-				obj->setLinked(false);
+
+			/** Object fetcher, with read only permissions.
+				@param key UID of the object
+				@param env Environment to write the object and read/write the links.
+					- if Default/NULL : no environment, then object is only read from the database
+					- if non NULL : the object is read from the environment if exists, else from the database
+					- use Env::GetOfficialEnv() to use the official environment
+				@param linkLevel Level of load recursion (see each TableSync to know precisely the signification of each level for each class)
+				@return shared pointer Pointer to an object corresponding to the fetched record.
+				@throw DBEmptyResultException if the object was not found
+				
+				Note : in case of writing in the environment, the object present in the environment will have read/write permissions.
+			*/
+			static boost::shared_ptr<const T> Get(
+				util::RegistryKeyType key,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			){
+				return boost::const_pointer_cast<const T>(GetEditable(key,env,linkLevel,autoCreate));
 			}
 
 			/** Object properties loader from the SQLite database.
@@ -132,8 +144,19 @@ namespace synthese
 				@date 2007
 				@warning To complete the load when building the RAM environment, follow the properties load by the link method
 			*/
-			static void load(T* obj, const SQLiteResultSPtr& rows);
+			static void Load(
+				T* obj,
+				const SQLiteResultSPtr& rows,
+				util::Env* env = NULL,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 
+
+
+			static void Unlink(
+				T* obj,
+				util::Env* env = NULL
+			);
 
 
 			/** Saving of the object in database.
@@ -145,96 +168,39 @@ namespace synthese
 				- if the object has already a key, then the corresponding record is replaced
 				- if the object does not have any key, then the autoincrement function generates one for it.
 			*/
-			static void save(T* obj);
+			static void Save(
+				T* obj
+			);
 
 
-
-			/** Gets from the database a temporary object linked by another one.
-				@param key UID of the object
-				@param obj Parent object which link to the returned object
-				@param linked recursive get
-				@return Pointer to the created object
-				@author Hugues Romain
-				@date 2007
-
-				The deletion of the object will be autoamtically done at the deletion of the parent object
+			/** Load obects into an environment, from a SQL query.
+				@param query SQL query
+				@param env Environment to write
+				@param linkLevel Link level
+				@throws Exception if the load failed
 			*/
-			template<class C>
-			static const T* Get(uid key, C* obj, bool linked)
-			{
-				const T* c(static_cast<const T*>(_Get(key, linked)));
-				obj->addChildTemporaryObject(c);
-				return c;
+			static void LoadFromQuery(
+				const std::string& query,
+				util::Env& env,
+				util::LinkLevel linkLevel
+			){
+				try
+				{
+					util::Registry<T>& registry(env.template getEditableRegistry<T>());
+					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
+					while (rows->next ())
+					{
+						boost::shared_ptr<T> object(new T(rows->getKey()));
+						Load(object.get(), rows, &env, linkLevel);
+						registry.add(object);
+					}
+				}
+				catch(SQLiteException& e)
+				{
+					throw Exception(e.getMessage());
+				}
 			}
-
-
-			/** Gets from the database a temporary object linked by another one.
-			@param key UID of the object
-			@param obj Parent object which link to the returned object
-			@param linked recursive get
-			@return Pointer to the created object
-			@author Hugues Romain
-			@date 2007
-
-			The deletion of the object will be autoamtically done at the deletion of the parent object
-			*/
-			template<class C>
-			static T* GetUpdateable(uid key, C* obj)
-			{
-				T* c(_Get(key, true));
-				obj->addChildTemporaryObject(c);
-				return c;
-			}
-
-
-
-			template<class C>
-			static const T* Get(uid key, C* obj, bool linked, GetSource source)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
-					? T::Get(key).get()
-					: Get(key, obj, linked);
-			}
-
-			template<class C>
-			static T* GetUpdateable(uid key, C* obj, GetSource source)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
-					? T::GetUpdateable(key).get()
-					: GetUpdateable(key, obj);
-			}
-
-			static boost::shared_ptr<const T> Get(uid key, GetSource source = GET_AUTO, bool linked = false)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
-					? T::Get(key)
-					: boost::shared_ptr<const T>(_Get(key, linked));
-			}
-
-			static boost::shared_ptr<T> GetUpdateable(uid key, GetSource source = GET_TEMPORARY)
-			{
-				return
-					(source == GET_REGISTRY || source == GET_AUTO && T::Contains(key))
-					? T::GetUpdateable(key)
-					: boost::shared_ptr<T>(_Get(key, true));
-			}
-
-			static boost::shared_ptr<T> createEmpty();
-
 		};
-
-
-		template <class K, class T>
-		boost::shared_ptr<T> SQLiteDirectTableSyncTemplate<K,T>::createEmpty()
-		{
-			boost::shared_ptr<T> object(new T);
-			save(object.get());
-			return object;
-		}
-
 	}
 }
 

@@ -25,23 +25,25 @@
 #include "TransportNetworkAdmin.h"
 #include "EnvModule.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
+#include "QueryString.h"
+#include "Request.h"
 
-#include "15_env/TransportNetwork.h"
-#include "15_env/TransportNetworkTableSync.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/CommercialLineAdmin.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/Line.h"
-#include "15_env/LineAdmin.h"
-#include "15_env/TransportNetworkRight.h"
+#include "TransportNetwork.h"
+#include "TransportNetworkTableSync.h"
+#include "CommercialLine.h"
+#include "CommercialLineAdmin.h"
+#include "CommercialLineTableSync.h"
+#include "Line.h"
+#include "LineAdmin.h"
+#include "TransportNetworkRight.h"
 
-#include "32_admin/AdminRequest.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminParametersException.h"
+#include "AdminRequest.h"
+#include "ModuleAdmin.h"
+#include "AdminParametersException.h"
 
-#include "05_html/SearchFormHTMLTable.h"
+#include "SearchFormHTMLTable.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -102,17 +104,19 @@ namespace synthese
 
 
 			// Results
-			vector<shared_ptr<CommercialLine> > lines(CommercialLineTableSync::search(
+			Env env;
+			CommercialLineTableSync::Search(
+				env,
 				_network->getKey()
 				, "%"+_searchName+"%"
 				, _requestParameters.first
 				, _requestParameters.maxSize
 				, false
 				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-				, _requestParameters.raisingOrder
-			));
+				, _requestParameters.raisingOrder				
+			);
 			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, lines);
+			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<CommercialLine>());
 
 
 			// Search form
@@ -134,15 +138,14 @@ namespace synthese
 			ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
 
 			stream << t.open();
-			for (vector<shared_ptr<CommercialLine> >::const_iterator it(lines.begin()); it != lines.end(); ++it)
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
 			{
-				CommercialLine& line(**it);
-				lineOpenRequest.setObjectId(line.getKey());
+				lineOpenRequest.setObjectId(line->getKey());
 				stream << t.row();
-				stream << t.col(1, line.getStyle(), true);
-				stream << line.getShortName();
+				stream << t.col(1, line->getStyle(), true);
+				stream << line->getShortName();
 				stream << t.col();
-				stream << line.getLongName();
+				stream << line->getLongName();
 				stream << t.col();
 				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 			}
@@ -166,15 +169,16 @@ namespace synthese
 			
 			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == EnvModule::FACTORY_KEY)
 			{
-				vector<shared_ptr<TransportNetwork> > nets(TransportNetworkTableSync::search());
-				for (vector<shared_ptr<TransportNetwork> >::const_iterator it(nets.begin()); it != nets.end(); ++it)
+				Env env;
+				TransportNetworkTableSync::Search(env);
+				BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.template getRegistry<TransportNetwork>())
 				{
 					PageLink link;
 					link.factoryKey = FACTORY_KEY;
 					link.icon = ICON;
-					link.name = (*it)->getName();
+					link.name = network->getName();
 					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString((*it)->getKey());
+					link.parameterValue = Conversion::ToString(network->getKey());
 					links.push_back(link);
 				}
 			}
@@ -208,15 +212,16 @@ namespace synthese
 				|| currentPage.getFactoryKey() == LineAdmin::FACTORY_KEY && _network->getKey() == static_cast<const LineAdmin&>(currentPage).getLine()->getCommercialLine()->getNetwork()->getKey()
 			)
 			{
-				vector<shared_ptr<CommercialLine> > lines(CommercialLineTableSync::search(_network->getKey()));
-				for (vector<shared_ptr<CommercialLine> >::const_iterator it(lines.begin()); it != lines.end(); ++it)
+				Env env;
+				CommercialLineTableSync::Search(env, _network->getKey());
+				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
 				{
 					PageLink link;
 					link.factoryKey = CommercialLineAdmin::FACTORY_KEY;
 					link.icon = CommercialLineAdmin::ICON;
-					link.name = (*it)->getName();
+					link.name = line->getName();
 					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString((*it)->getKey());
+					link.parameterValue = Conversion::ToString(line->getKey());
 					links.push_back(link);
 				}
 			}

@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_messages_AlarmTemplateInheritedTableSync_h__
 #define SYNTHESE_messages_AlarmTemplateInheritedTableSync_h__
 
-#include "02_db/SQLiteInheritedNoSyncTableSyncTemplate.h"
+#include "SQLiteInheritedNoSyncTableSyncTemplate.h"
 
 #include "AlarmTableSync.h"
 #include "AlarmTemplate.h"
@@ -42,6 +42,16 @@ namespace synthese
 			/** Constructor.
 			*/
 			AlarmTemplateInheritedTableSync();
+
+			static void Search(
+				util::Env& env,
+				const ScenarioTemplate* scenario
+				, int first = 0
+				, int number = 0
+				, bool orderByLevel = false
+				, bool raisingOrder = false,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
 	}
 }

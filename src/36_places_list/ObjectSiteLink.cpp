@@ -21,12 +21,17 @@
 */
 
 #include "ObjectSiteLink.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace util
 	{
-		template<> typename Registrable<uid,transportwebsite::ObjectSiteLink>::Registry Registrable<uid,transportwebsite::ObjectSiteLink>::_registry;
+		template<> const string Registry<transportwebsite::ObjectSiteLink>::KEY("ObjectSiteLink");
 	}
 
 	namespace transportwebsite
@@ -63,8 +68,9 @@ namespace synthese
 
 
 
-		ObjectSiteLink::ObjectSiteLink(uid id)
-			: util::Registrable<uid,ObjectSiteLink>(id)
+		ObjectSiteLink::ObjectSiteLink(
+			RegistryKeyType id
+		):	Registrable(id)
 		{
 	
 		}

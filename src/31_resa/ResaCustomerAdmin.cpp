@@ -24,35 +24,37 @@
 
 #include "ResaCustomerAdmin.h"
 
-#include "31_resa/ResaCustomersAdmin.h"
-#include "31_resa/ResaModule.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTableSync.h"
-#include "31_resa/ResaDBLog.h"
-#include "31_resa/CancelReservationAction.h"
-#include "31_resa/ReservationRoutePlannerAdmin.h"
-#include "31_resa/ResaRight.h"
+#include "ResaCustomersAdmin.h"
+#include "ResaModule.h"
+#include "ReservationTransaction.h"
+#include "ReservationTransactionTableSync.h"
+#include "Reservation.h"
+#include "ReservationTableSync.h"
+#include "ResaDBLog.h"
+#include "CancelReservationAction.h"
+#include "ReservationRoutePlannerAdmin.h"
+#include "ResaRight.h"
 
-#include "05_html/PropertiesHTMLTable.h"
+#include "PropertiesHTMLTable.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/Request.h"
+#include "QueryString.h"
+#include "ActionFunctionRequest.h"
+#include "Request.h"
 
-#include "13_dblog/DBLogEntry.h"
-#include "13_dblog/DBLogEntryTableSync.h"
+#include "DBLogEntry.h"
+#include "DBLogEntryTableSync.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/UserUpdateAction.h"
-#include "12_security/SecurityModule.h"
+#include "User.h"
+#include "UserTableSync.h"
+#include "UserUpdateAction.h"
+#include "SecurityModule.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -143,7 +145,9 @@ namespace synthese
 			bool writingRight(request->isAuthorized<ResaRight>(WRITE,WRITE));
 
 			// Search
-			vector<shared_ptr<DBLogEntry> > resats(DBLogEntryTableSync::search(
+			Env env;
+			DBLogEntryTableSync::Search(
+				env,
 				ResaDBLog::FACTORY_KEY
 				, DateTime(_eventDate, Hour(TIME_MIN))
 				, DateTime(TIME_MAX)
@@ -193,7 +197,7 @@ namespace synthese
 
 			ResaModule::DisplayResaDBLog(
 				stream
-				, resats
+				, env
 				, PARAMETER_EVENT_DATE
 				, searchRequest
 				, cancelRequest

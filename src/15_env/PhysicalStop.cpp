@@ -21,8 +21,9 @@
 */
 
 #include "PhysicalStop.h"
+#include "Registry.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
 
@@ -32,19 +33,19 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::PhysicalStop>::Registry Registrable<uid,env::PhysicalStop>::_registry;
+		template<> const string Registry<env::PhysicalStop>::KEY("PhysicalStop");
 	}
 
 	namespace env 
 	{
 
 		PhysicalStop::PhysicalStop(
-			uid id
+			RegistryKeyType id
 			, string name
 			, const PublicTransportStopZoneConnectionPlace* place
 			, double x
 			, double y
-		)	: Registrable<uid,PhysicalStop> (id)
+		)	: Registrable(id)
 			, Vertex (place, x, y)
 			, _name (name)
 		{
@@ -89,12 +90,6 @@ namespace synthese
 		}
 
 
-
-		const uid& 
-		PhysicalStop::getId () const
-		{
-			return synthese::util::Registrable<uid,PhysicalStop>::getKey();
-		}
 
 		const std::string& PhysicalStop::getOperatorCode() const
 		{

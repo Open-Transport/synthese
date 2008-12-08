@@ -22,7 +22,7 @@
 
 #include "ContinuousServiceTableSync.h"
 
-#include "Path.h"
+#include "Line.h"
 #include "LineTableSync.h"
 #include "BikeComplianceTableSync.h"
 #include "PedestrianComplianceTableSync.h"
@@ -66,10 +66,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE_ID = 17;
 		template<> const bool SQLiteTableSyncTemplate<ContinuousServiceTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::load(ContinuousService* cs, const db::SQLiteResultSPtr& rows )
-		{
-		    uid id (rows->getLongLong (TABLE_COL_ID));
-
+		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Load(
+			ContinuousService* cs,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
 		    int range (rows->getInt (ContinuousServiceTableSync::COL_RANGE));
 		    int maxWaitingTime (rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME));
@@ -129,46 +131,47 @@ namespace synthese
 			assert (arrivalSchedules.size () > 0);
 			assert (departureSchedules.size () == arrivalSchedules.size ());
 
-
-			cs->setKey(rows->getLongLong (TABLE_COL_ID));
 			cs->setServiceNumber(serviceNumber);
 			cs->setRange(range);
 			cs->setMaxWaitingTime(maxWaitingTime);
 			cs->setDepartureSchedules(departureSchedules);
 			cs->setArrivalSchedules(arrivalSchedules);
 			cs->setPathId(pathId);
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+
+				uid pathId (rows->getLongLong (ContinuousServiceTableSync::COL_PATHID));
+
+				Path* path = LineTableSync::GetEditable(pathId, env, linkLevel).get();
+				assert (path);
+	//			assert (path->getEdges ().size () == arrivalSchedules.size ());
+
+				uid bikeComplianceId (
+					rows->getLongLong (ContinuousServiceTableSync::COL_BIKECOMPLIANCEID));
+
+				uid handicappedComplianceId (
+					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+
+				uid pedestrianComplianceId (
+					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+
+				cs->setBikeCompliance (BikeComplianceTableSync::Get(bikeComplianceId, env, linkLevel));
+				cs->setHandicappedCompliance (HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel));
+				cs->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel));
+
+				path->addService (cs);
+			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_link(ContinuousService* cs, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			uid pathId (rows->getLongLong (ContinuousServiceTableSync::COL_PATHID));
-
-			shared_ptr<Path> path = EnvModule::fetchPath (pathId);
-			assert (path.get());
-//			assert (path->getEdges ().size () == arrivalSchedules.size ());
-
-			uid bikeComplianceId (
-				rows->getLongLong (ContinuousServiceTableSync::COL_BIKECOMPLIANCEID));
-
-			uid handicappedComplianceId (
-				rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-
-			uid pedestrianComplianceId (
-				rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
-
-			cs->setBikeCompliance (BikeCompliance::Get(bikeComplianceId).get());
-			cs->setHandicappedCompliance (HandicappedCompliance::Get(handicappedComplianceId).get());
-			cs->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
-
-			path->addService (cs);
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::_unlink(ContinuousService* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(
+			ContinuousService* obj,
+			Env* env
+		){
 			obj->getPath()->removeService(obj);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::save(ContinuousService* object)
+		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Save(ContinuousService* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -212,14 +215,15 @@ namespace synthese
 
 
 
-		std::vector<shared_ptr<ContinuousService> > ContinuousServiceTableSync::search(
+		void ContinuousServiceTableSync::Search(
+			Env& env,
 			uid lineId
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByDepartureTime
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -234,23 +238,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<ContinuousService> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<ContinuousService> object(new ContinuousService());
-					load(object.get(), rows);
-//					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 		void ContinuousServiceTableSync::afterFirstSync( SQLite* sqlite,  SQLiteSync* sync )

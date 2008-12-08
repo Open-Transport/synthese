@@ -67,7 +67,8 @@ namespace synthese
 		}
 
 		UserFavoriteInterfacePage::UserFavoriteInterfacePage()
-			: util::FactorableTemplate<interfaces::InterfacePage, UserFavoriteInterfacePage>()
+			: Registrable(),
+			util::FactorableTemplate<interfaces::InterfacePage, UserFavoriteInterfacePage>()
 		{
 	
 		}

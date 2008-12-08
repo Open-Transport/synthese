@@ -22,9 +22,9 @@
 
 #include "ConnectionPlace.h"
 
-#include "15_env/VertexAccessMap.h"
+#include "VertexAccessMap.h"
 
-#include "06_geometry/SquareDistance.h"
+#include "SquareDistance.h"
 
 #include <assert.h>
 #include <limits>
@@ -36,16 +36,19 @@ using namespace std;
 namespace synthese
 {
 	using namespace geometry;
+	using namespace util;
 
 	namespace env
 	{
 		const int ConnectionPlace::FORBIDDEN_TRANSFER_DELAY(99);
 
-		ConnectionPlace::ConnectionPlace (
-			std::string name
-			, const City* city
-			, ConnectionType type
-		)	: AddressablePlace (name, city)
+		ConnectionPlace::ConnectionPlace(
+			RegistryKeyType key,
+			const std::string& name,
+			const City* city,
+			ConnectionType type
+		):	Registrable(key),
+			AddressablePlace(name, city)
 			, _connectionType(type)
 		{
 		}

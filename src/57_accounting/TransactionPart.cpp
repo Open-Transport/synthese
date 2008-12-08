@@ -8,7 +8,7 @@ namespace synthese
 	namespace accounts
 	{
 		TransactionPart::TransactionPart(uid id)
-			: Registrable<uid, TransactionPart>(id)
+			: RegistrableTemplate< TransactionPart>(id)
 			, _transactionId(0)
 			, _accountId(0)
 			, _rateId(0)

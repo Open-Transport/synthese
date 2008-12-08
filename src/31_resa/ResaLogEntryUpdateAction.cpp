@@ -90,7 +90,7 @@ namespace synthese
 			content[ResaDBLog::COL_TYPE] = Conversion::ToString(_type);
 			_entry->setContent(content);
 
-			DBLogEntryTableSync::save(_entry.get());
+			DBLogEntryTableSync::Save(_entry.get());
 		}
 
 
@@ -99,7 +99,7 @@ namespace synthese
 		{
 			try
 			{
-				_entry = DBLogEntryTableSync::GetUpdateable(id);
+				_entry = DBLogEntryTableSync::GetEditable(id);
 				if (_entry->getLogKey() != ResaDBLog::FACTORY_KEY)
 					throw ActionException("Bad entry : does not belong to resa log");
 			}

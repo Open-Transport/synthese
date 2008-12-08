@@ -54,6 +54,8 @@
 
 #include "32_admin/AdminRequest.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -155,7 +157,7 @@ namespace synthese
 			r->setPublicLevel(FORBIDDEN);
 			_basicProfile->cleanRights();
 			_basicProfile->addRight(r);
-			ProfileTableSync::save(_basicProfile.get());
+			ProfileTableSync::Save(_basicProfile.get());
 		}
 
 
@@ -203,7 +205,7 @@ namespace synthese
 
 		void ResaModule::DisplayResaDBLog(
 			ostream& stream
-			, std::vector<boost::shared_ptr<dblog::DBLogEntry> >& resats
+			, Env& logEnv
 			, const std::string& parameterDate
 			, server::FunctionRequest<admin::AdminRequest>& searchRequest
 			, server::ActionFunctionRequest<CancelReservationAction,admin::AdminRequest>& cancelRequest
@@ -234,18 +236,18 @@ namespace synthese
 			ResultHTMLTable rt(ht, searchRequest.getHTMLForm(), _requestParameters, resultParameters);
 			stream << rt.open();
 
-			for (vector<shared_ptr<DBLogEntry> >::const_iterator itr(resats.begin()); itr != resats.end(); ++itr)
+			BOOST_FOREACH(shared_ptr<DBLogEntry> entry, env;template getRegistry<DBLogEntry>())
 			{
-				DBLogEntry::Content content((*itr)->getContent());
+				DBLogEntry::Content content(entry->getContent());
 				ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE])));
 				shared_ptr<ReservationTransaction> tr;
 				ReservationStatus status(NO_RESERVATION);
-				const User* entryUser((*itr)->getUser());
+				const User* entryUser(entry->getUser());
 				shared_ptr<const User> customer;
-				if (displayCustomer && (*itr)->getObjectId() > 0)
+				if (displayCustomer && entry->getObjectId() > 0)
 					try
 					{
-						customer = UserTableSync::Get((*itr)->getObjectId());
+						customer = UserTableSync::Get(entry->getObjectId());
 					}
 					catch(...)
 					{
@@ -254,8 +256,8 @@ namespace synthese
 
 				if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
 				{
-					tr = ReservationTransactionTableSync::GetUpdateable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]));
-					ReservationTableSync::search(tr.get());
+					tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]));
+					//ReservationTableSync::search(tr.get());
 					status = tr->getStatus();
 					cancelRequest.getAction()->setTransaction(tr);
 				}
@@ -265,7 +267,7 @@ namespace synthese
 					DateTime d(DateTime::FromSQLTimestamp(content[ResaDBLog::COL_DATE2]));
 
 					stream << rt.row();
-					stream << rt.col(1,string(),true) << (*itr)->getDate().toString();
+					stream << rt.col(1,string(),true) << entry->getDate().toString();
 					if (displayCustomer)
 					{
 						stream << rt.col(1, string(), true);
@@ -275,13 +277,13 @@ namespace synthese
 					stream << rt.col(1,string(),true) << HTMLModule::getHTMLImage("phone.png","Appel");
 					stream << rt.col(1,string(),true) << "APPEL";
 					if (!d.isUnknown())
-						stream << " jusqu'à " << d.toString() << " (" << (d.getSecondsDifference((*itr)->getDate())) << " s)";
+						stream << " jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry->getDate())) << " s)";
 					stream << rt.col(1,string(),true) << entryUser->getFullName();
 					stream << rt.col(1,string(),true);
 					if(searchRequest.isAuthorized<ResaRight>(DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
 						||	searchRequest.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE) && entryUser == searchRequest.getSession()->getUser().get()
 					){
-						editRequest.setObjectId((*itr)->getKey());
+						editRequest.setObjectId(entry->getKey());
 						stream << HTMLModule::getLinkButton(editRequest.getURL(), "Modifier", string(), "pencil.png");
 					}
 
@@ -290,7 +292,7 @@ namespace synthese
 				{
 					stream << rt.row();
 
-					stream << rt.col() << (*itr)->getDate().toString();
+					stream << rt.col() << entry->getDate().toString();
 
 					if (displayCustomer)
 					{

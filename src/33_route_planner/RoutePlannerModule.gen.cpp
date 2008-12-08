@@ -26,3 +26,6 @@ synthese::routeplanner::UserFavoriteListInterfaceElement::integrate();
 synthese::routeplanner::RoutePlannerFunction::integrate();
 
 synthese::routeplanner::UserFavoriteJourneyTableSync::integrate();
+
+// Registries
+synthese::util::Env::template Integrate<synthese::routeplanner::UserFavoriteJourney>();

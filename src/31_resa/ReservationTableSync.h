@@ -73,10 +73,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<Reservation> > search(
+			static void Search(
+				util::Env& env,
 				ReservationTransaction* transaction
 				, int first = 0
-				, int number = 0
+				, int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 	}

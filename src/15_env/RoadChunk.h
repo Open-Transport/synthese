@@ -23,11 +23,7 @@
 #ifndef SYNTHESE_ENV_ROADCHUNK_H
 #define SYNTHESE_ENV_ROADCHUNK_H
 
-
 #include "Edge.h"
-
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
 
 
 
@@ -51,9 +47,8 @@ namespace synthese
 
 		 @ingroup m35
 		*/
-		class RoadChunk : 
-			public synthese::util::Registrable<uid,RoadChunk>,
-			public Edge 
+		class RoadChunk
+		:	public Edge 
 		{
 		private:
 
@@ -61,13 +56,13 @@ namespace synthese
 
 		public:
 
-		RoadChunk(
-			uid id = UNKNOWN_VALUE,
-			Address* fromAddress = NULL,
-			int rankInRoad = UNKNOWN_VALUE,
-			bool isDeparture = false,
-			bool isArrival = false
-		);
+			RoadChunk(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				Address* fromAddress = NULL,
+				int rankInRoad = UNKNOWN_VALUE,
+				bool isDeparture = false,
+				bool isArrival = false
+			);
 
 		  
 		  virtual ~RoadChunk ();
@@ -92,4 +87,3 @@ namespace synthese
 }
 
 #endif 
-

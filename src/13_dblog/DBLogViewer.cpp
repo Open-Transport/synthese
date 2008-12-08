@@ -26,28 +26,28 @@
 
 #include "01_util/Constants.h"
 
-#include "05_html/ResultHTMLTable.h"
-#include "05_html/SearchFormHTMLTable.h"
+#include "ResultHTMLTable.h"
+#include "SearchFormHTMLTable.h"
 
-#include "11_interfaces/InterfaceModule.h"
+#include "InterfaceModule.h"
 
-#include "12_security/SecurityModule.h"
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "SecurityModule.h"
+#include "User.h"
+#include "UserTableSync.h"
 
-#include "13_dblog/DBLog.h"
-#include "13_dblog/DBLogViewer.h"
-#include "13_dblog/DBLogModule.h"
-#include "13_dblog/DBLogEntryTableSync.h"
-#include "13_dblog/DBLogRight.h"
+#include "DBLog.h"
+#include "DBLogViewer.h"
+#include "DBLogModule.h"
+#include "DBLogEntryTableSync.h"
+#include "DBLogRight.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
+#include "QueryString.h"
+#include "Request.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminModule.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/ModuleAdmin.h"
+#include "AdminParametersException.h"
+#include "AdminModule.h"
+#include "AdminRequest.h"
+#include "ModuleAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -124,7 +124,9 @@ namespace synthese
 		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// Search
-			vector<shared_ptr<DBLogEntry> >	_result(DBLogEntryTableSync::search(
+			Env env;
+			DBLogEntryTableSync::Search(
+				&env,
 				_dbLog->getFactoryKey()
 				, _searchStartDate
 				, _searchEndDate
@@ -139,6 +141,7 @@ namespace synthese
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
 				, _resultTableRequestParameters.raisingOrder
 			));
+			Registry<DBLogEntry> _result(env.template getRegistry<DBLogEntry>());
 			ResultHTMLTable::ResultParameters		_resultTableResultParameters;
 			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, _result);
 
@@ -173,9 +176,9 @@ namespace synthese
 
 			stream << t.open();
 			
-			for (vector<shared_ptr<DBLogEntry> >::const_iterator it = _result.begin(); it != _result.end(); ++it)
+			for(Registry<DBLogEntry>::const_iterator it = _result.begin(); it != _result.end(); ++it)
 			{
-				shared_ptr<DBLogEntry> dbe = *it;
+				shared_ptr<DBLogEntry> dbe = it->second;
 				stream << t.row();
 				stream << t.col() << HTMLModule::getHTMLImage(DBLogModule::getEntryIcon(dbe->getLevel()), DBLogModule::getEntryLevelLabel(dbe->getLevel()));
 				stream << t.col() << dbe->getDate().toString(true);

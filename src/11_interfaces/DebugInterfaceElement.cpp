@@ -23,8 +23,7 @@
 */
 
 #include "DebugInterfaceElement.h"
-
-#include "11_interfaces/ValueElementList.h"
+#include "ValueElementList.h"
 
 #ifdef WIN32
 	#include <CRTDBG.h>

@@ -29,10 +29,9 @@ namespace synthese
 	{
 		typedef enum
 		{
-			GET_AUTO
-			, GET_TEMPORARY
-			, GET_REGISTRY
-		} GetSource;
+			AUTO_CREATE,
+			NEVER_CREATE
+		} AutoCreation;
 	}
 }
 

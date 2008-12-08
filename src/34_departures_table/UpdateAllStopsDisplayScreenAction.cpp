@@ -22,11 +22,11 @@
 
 #include "UpdateAllStopsDisplayScreenAction.h"
 
-#include "34_departures_table/DisplayScreenTableSync.h"
+#include "DisplayScreenTableSync.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -55,12 +55,12 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
 
 				_value = map.getBool(PARAMETER_VALUE, true, false, FACTORY_KEY);
 
 			}
-			catch (DisplayScreen::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}
@@ -69,7 +69,7 @@ namespace synthese
 		void UpdateAllStopsDisplayScreenAction::run()
 		{
 			_screen->setAllPhysicalStopsDisplayed(_value);
-			DisplayScreenTableSync::save(_screen.get());
+			DisplayScreenTableSync::Save(_screen.get());
 		}
 	}
 }

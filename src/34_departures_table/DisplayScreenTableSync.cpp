@@ -20,29 +20,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DisplayTypeTableSync.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayType.h"
+#include "DisplayScreenTableSync.h"
+#include "DisplayTypeTableSync.h"
+#include "DisplayScreen.h"
+#include "DisplayType.h"
 
-#include "15_env/LineStopTableSync.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/PhysicalStopTableSync.h"
-#include "15_env/ConnectionPlaceTableSync.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/CityTableSync.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/Line.h"
+#include "LineStopTableSync.h"
+#include "LineTableSync.h"
+#include "PhysicalStopTableSync.h"
+#include "ConnectionPlaceTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "CityTableSync.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
+#include "Line.h"
 
-#include "13_dblog/DBLogEntryTableSync.h"
+#include "DBLogEntryTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 #include <sstream>
 
@@ -70,9 +70,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE_ID = 41;
 		template<> const bool SQLiteTableSyncTemplate<DisplayScreenTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->setKey (rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
+			DisplayScreen* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			object->setLocalizationComment (rows->getText ( DisplayScreenTableSync::COL_NAME));
 			object->setWiringCode (rows->getInt ( DisplayScreenTableSync::COL_WIRING_CODE));
 			object->setTitle (rows->getText ( DisplayScreenTableSync::COL_TITLE));
@@ -91,91 +94,92 @@ namespace synthese
 			object->setMaintenanceIsOnline (rows->getBool ( DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE));
 			object->setMaintenanceMessage (rows->getText ( DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE));
 			object->setDisplayTeam(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_TEAM));
-		}
 
-
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::_link(DisplayScreen* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			// Column reading
-			uid placeId(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID));
-			uid typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				// Column reading
+				uid placeId(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID));
+				uid typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
 			
-			// Localization
-			try
-			{
-				object->setLocalization(ConnectionPlaceTableSync::Get(placeId, object, true, temporary));
-			}
-			catch(PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
-			{
-				Log::GetInstance().warn("Data corrupted in "+ TABLE_NAME + " on display screen : localization "+ Conversion::ToString(placeId) + " not found");
-			}
-
-			// Type
-			if (typeId > 0)
-				object->setType(DisplayTypeTableSync::Get(typeId, object, true, temporary));
-
-			// Physical stops
-			vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
-			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-			{
+				// Localization
 				try
 				{
-					uid id(Conversion::ToLongLong(*it));
-					object->addPhysicalStop(PhysicalStopTableSync::Get(id, object, true, temporary));
+					object->setLocalization(ConnectionPlaceTableSync::Get(placeId, env, linkLevel));
 				}
-				catch (PhysicalStop::ObjectNotFoundException& e)
+				catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
+					Log::GetInstance().warn("Data corrupted in "+ TABLE_NAME + " on display screen : localization "+ Conversion::ToString(placeId) + " not found");
 				}
-			}
 
-			// Forbidden places
-			stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
-			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-			{
-				try
-				{
-					object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), object, false, temporary));
-				}
-				catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
-				}
-			}
+				// Type
+				if (typeId > 0)
+					object->setType(DisplayTypeTableSync::Get(typeId, env, linkLevel));
 
-			// Displayed places
-			stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
-			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-			{
-				try
+				// Physical stops
+				vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
+				for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				{
-					object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), object, false, temporary));
+					try
+					{
+						uid id(Conversion::ToLongLong(*it));
+						object->addPhysicalStop(PhysicalStopTableSync::Get(id, env, linkLevel));
+					}
+					catch (ObjectNotFoundException<PhysicalStop>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
+					}
 				}
-				catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
-				}
-			}
 
-			// Forced destinations
-			stops = Conversion::ToStringVector (rows->getText ( DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
-			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-			{
-				try
+				// Forbidden places
+				stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
+				for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				{
-					object->addForcedDestination(ConnectionPlaceTableSync::Get (Conversion::ToLongLong(*it), object, false, temporary));
+					try
+					{
+						object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), env, linkLevel));
+					}
+					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
+					}
 				}
-				catch (PublicTransportStopZoneConnectionPlace::ObjectNotFoundException& e)
+
+				// Displayed places
+				stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
+				for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+					try
+					{
+						object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), env, linkLevel));
+					}
+					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
+					}
+				}
+
+				// Forced destinations
+				stops = Conversion::ToStringVector (rows->getText ( DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
+				for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+				{
+					try
+					{
+						object->addForcedDestination(ConnectionPlaceTableSync::Get (Conversion::ToLongLong(*it), env, linkLevel));
+					}
+					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+					}
 				}
 			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::_unlink(DisplayScreen* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Unlink(
+			DisplayScreen* object,
+			Env* env
+		){
 			object->setLocalization(NULL);
 			object->setType(NULL);
 			object->clearPhysicalStops();
@@ -186,8 +190,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::save(DisplayScreen* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Save(
+			DisplayScreen* object
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -350,7 +355,8 @@ namespace synthese
 
 
 	    
-	    vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::search(
+	    vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::Search(
+			Env& env,
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
 			, RightLevel neededLevel
@@ -372,9 +378,9 @@ namespace synthese
 			, bool orderByType /*= false*/
 			, bool orderByStatus
 			, bool orderByMessage
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 			    << " SELECT"
@@ -460,8 +466,7 @@ namespace synthese
 			    while (rows->next ())
 			    {
 				shared_ptr<DisplayScreen> object(new DisplayScreen());
-				load(object.get(), rows);
-				link(object.get(), rows, GET_AUTO);
+				Load(object.get(), rows, env, linkLevel);
 				objects.push_back(object);
 				
 				DisplayScreen::Complements c;

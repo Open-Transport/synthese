@@ -55,7 +55,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario.reset(SentScenarioInheritedTableSync::GetUpdateable(_request->getObjectId()));
+				_scenario = SentScenarioInheritedTableSync::GetEditable(_request->getObjectId());
 			}
 			catch (...) {
 				throw ActionException("Invalid scenario");

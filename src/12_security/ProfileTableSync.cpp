@@ -19,19 +19,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "12_security/ProfileTableSync.h"
-#include "12_security/UserTableSyncException.h"
-#include "12_security/Right.h"
-#include "12_security/Profile.h"
+#include "ProfileTableSync.h"
+#include "UserTableSyncException.h"
+#include "Right.h"
+#include "Profile.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 #include "01_util/Log.h"
-#include "01_util/Factory.h"
+#include "Factory.h"
 
 #include <sstream>
 
@@ -58,9 +58,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ProfileTableSync>::TABLE_ID = 27;
 		template<> const bool SQLiteTableSyncTemplate<ProfileTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::load(Profile* profile, const db::SQLiteResultSPtr& rows )
-		{
-			profile->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Load(
+			Profile* profile,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			profile->setName(rows->getText ( ProfileTableSync::TABLE_COL_NAME));
 			profile->setParent(rows->getLongLong ( ProfileTableSync::TABLE_COL_PARENT_ID));
 			ProfileTableSync::setRightsFromString(profile, rows->getText ( ProfileTableSync::TABLE_COL_RIGHTS_STRING));
@@ -68,19 +71,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::_link(Profile* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-		}
-
-
-
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::_unlink(Profile* obj)
-		{
-		}
-
-
-
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::save(Profile* profile )
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Save(Profile* profile )
 		{
 			try
 			{
@@ -132,15 +123,16 @@ namespace synthese
 		}
 
 
-		std::vector<shared_ptr<Profile> > ProfileTableSync::Search(
+		void ProfileTableSync::Search(
+			Env& env,
 			std::string name
 			, string right
 			, int first /*= 0*/
 			, int number /*= -1*/ 
 			, bool orderByName
-			, bool raisingOrder	
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -157,29 +149,18 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Profile> > profiles;
-				while (rows->next ())
-				{
-					shared_ptr<Profile> profile(new Profile);
-					load(profile.get(), rows);
-					profiles.push_back(profile);
-				}
-				return profiles;
-			}
-			catch(SQLiteException& e)
-			{
-				throw UserTableSyncException(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
-		std::vector<shared_ptr<Profile> > ProfileTableSync::Search(
+
+
+		void ProfileTableSync::Search(
+			Env& env,
 			shared_ptr<const Profile> parent
-			, int first /*= 0*/, int number /*= -1*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			, int first /*= 0*/,
+			int number, /*= -1*/
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -191,23 +172,11 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Profile> > profiles;
-				while (rows->next ())
-				{
-					shared_ptr<Profile> profile(new Profile);
-					load(profile.get(), rows);
-					profiles.push_back(profile);
-				}
-				return profiles;
-			}
-			catch(SQLiteException& e)
-			{
-				throw UserTableSyncException(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
+
+
+
 		std::string ProfileTableSync::getRightsString(const Profile* p)
 		{
 			stringstream s;

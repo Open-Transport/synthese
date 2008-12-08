@@ -20,21 +20,26 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/SingleSentAlarm.h"
-
-#include "01_util/Registrable.h"
+#include "SingleSentAlarm.h"
+#include "Registry.h"
 
 namespace synthese
 {
 	using namespace time;
 
+	namespace util
+	{
+		template<> const std::string Registry<messages::SingleSentAlarm>::KEY("SingleSentAlarm");
+	}
+
 	namespace messages
 	{
 
 
-		SingleSentAlarm::SingleSentAlarm()
-			: SentAlarm()
-			, _enabled(false)
+		SingleSentAlarm::SingleSentAlarm(util::RegistryKeyType key)
+		:	Registrable(key),
+			SentAlarm(key),
+			_enabled(false)
 			, _periodStart(DateTime(TIME_UNKNOWN))
 			, _periodEnd(DateTime(TIME_UNKNOWN))
 		{

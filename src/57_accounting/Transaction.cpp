@@ -35,7 +35,7 @@ namespace synthese
 	namespace accounts
 	{
 		Transaction::Transaction( uid id /*= 0*/ )
-			: Registrable<uid, Transaction>(id)
+			: RegistrableTemplate< Transaction>(id)
 			, _documentId(0)
 			, _leftUserId(0)
 			, _placeId(0)

@@ -21,23 +21,30 @@
 */
 
 #include "NonConcurrencyRule.h"
+#include "Registry.h"
 
 namespace synthese
 {
 	using namespace util;
+
+	namespace util
+	{
+		template<> const std::string Registry<env::NonConcurrencyRule>::KEY("NonConcurrencyRule");
+	}
 
 	namespace env
 	{
 
 
 		NonConcurrencyRule::NonConcurrencyRule(
-			uid priorityLine /*= NULL */
-			, uid hiddenLine /*= NULL */
-			, int delay /*= UNKNOWN_VALUE  */
-		)	: Registrable<uid, NonConcurrencyRule>()
-			, _prorityLine(priorityLine)
-			, _hiddenLine(hiddenLine)
-			, _delay(delay)
+			RegistryKeyType key,
+			RegistryKeyType priorityLine, /*= NULL */
+			RegistryKeyType hiddenLine, /*= NULL */
+			int delay /*= UNKNOWN_VALUE  */
+		):	Registrable(key),
+			_prorityLine(priorityLine),
+			_hiddenLine(hiddenLine),
+			_delay(delay)
 		{}
 
 		uid NonConcurrencyRule::getPriorityLine() const

@@ -24,17 +24,17 @@
 
 #include <boost/tokenizer.hpp>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
 
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
@@ -58,9 +58,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE_ID = 45;
 		template<> const bool SQLiteTableSyncTemplate<DBLogEntryTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::load(DBLogEntry* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Load(
+			DBLogEntry* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			object->setLogKey(rows->getText ( DBLogEntryTableSync::COL_LOG_KEY));
 			object->setDate(DateTime::FromSQLTimestamp(rows->getText ( DBLogEntryTableSync::COL_DATE)));
 			object->setLevel((DBLogEntry::Level) rows->getInt ( DBLogEntryTableSync::COL_LEVEL));
@@ -76,35 +79,34 @@ namespace synthese
 			for (tokenizer::iterator it = columns.begin(); it != columns.end (); ++it)
 				v.push_back(*it);
 			object->setContent(v);
-		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::_link(DBLogEntry* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			// User ID
-			uid userId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
-
-			if (userId > 0)
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				try
+				// User ID
+				uid userId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
+
+				if (userId > 0)
 				{
-					obj->setUser(UserTableSync::Get(userId, obj, true, temporary));
-				}
-				catch (User::ObjectNotFoundException& e)
-				{					
-					/// @todo See if an exception should be thrown
+					try
+					{
+						object->setUser(UserTableSync::Get(userId, env, linkLevel));
+					}
+					catch (ObjectNotFoundException<User>& e)
+					{					
+						/// @todo See if an exception should be thrown
+					}
 				}
 			}
-
-
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::_unlink(DBLogEntry* obj)
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(DBLogEntry* obj, Env* env)
 		{
 			obj->setUser(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::save(DBLogEntry* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Save(
+			DBLogEntry* object
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 
@@ -166,7 +168,8 @@ namespace synthese
 			addTableIndex(m1);
 		}
 
-		std::vector<shared_ptr<DBLogEntry> > DBLogEntryTableSync::search(
+		void DBLogEntryTableSync::Search(
+			Env& env,
 			const std::string& logKey
 			, const time::DateTime& startDate
 			, const time::DateTime& endDate
@@ -179,9 +182,9 @@ namespace synthese
 			, bool orderByDate
 			, bool orderByUser
 			, bool orderByLevel
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -211,23 +214,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<DBLogEntry> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<DBLogEntry> object(new DBLogEntry());
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

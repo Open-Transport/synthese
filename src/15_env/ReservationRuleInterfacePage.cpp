@@ -22,12 +22,12 @@
 
 #include "ReservationRuleInterfacePage.h"
 
-#include "15_env/Journey.h"
+#include "Journey.h"
 
-#include "11_interfaces/DateTimeInterfacePage.h"
-#include "11_interfaces/Interface.h"
+#include "DateTimeInterfacePage.h"
+#include "Interface.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 #include <sstream>
 
@@ -65,6 +65,14 @@ namespace synthese
 			pv.push_back(s.str());
 
 			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&journey), request);
+		}
+
+
+
+		ReservationRuleInterfacePage::ReservationRuleInterfacePage()
+			: Registrable()
+		{
+
 		}
 	}
 }

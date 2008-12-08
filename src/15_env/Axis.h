@@ -1,12 +1,10 @@
 #ifndef SYNTHESE_ENV_AXIS_H
 #define SYNTHESE_ENV_AXIS_H
 
+#include "Registrable.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
 
 #include <string>
-
 
 namespace synthese
 {
@@ -25,7 +23,8 @@ namespace synthese
 				- <b>Forbidden axis</b> : Axe contenant des lignes ne prenant pas de voyageurs (ex : trajets haut le pied)
 
 		*/
-		class Axis : public synthese::util::Registrable<uid,Axis>
+		class Axis
+		:	public virtual util::Registrable
 		{
 
 			std::string _name;   
@@ -34,10 +33,12 @@ namespace synthese
 
 			public:
 
-			Axis (const uid& id,
-			const std::string& name,
-			bool free = true, bool allowed = false);
-			Axis();
+			Axis(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				std::string name = std::string(),
+				bool free = true,
+				bool allowed = false
+			);
 			~Axis ();
 
 			//! @name Getters/Setters
@@ -51,13 +52,8 @@ namespace synthese
 			bool isAllowed () const;
 			void setAllowed (bool isAllowed);
 			//@}
-
-
 		};
-
 	}
 }
 
-
 #endif
-

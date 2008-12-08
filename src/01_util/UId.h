@@ -45,7 +45,8 @@ namespace synthese
 		/** 
 			Encodes a universal id.
 			@param tableId (2 bytes)
-			@param gridId (4 bits)    // TO BE REMOVED : deprecated!!!
+			@param gridId (4 bits)
+    // TO BE REMOVED : deprecated!!!
 			@param gridNodeId (12 bits)
 			@param objectId (4 bytes)
 

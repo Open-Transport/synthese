@@ -65,5 +65,13 @@ namespace synthese
 				, (const void*) &ptd
 				, request);
 		}
+
+
+
+		DepartureTableRowInterfacePage::DepartureTableRowInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

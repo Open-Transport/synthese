@@ -27,9 +27,10 @@
 
 #include "01_util/Constants.h"
 
-#include "04_time/DateTime.h"
-#include "04_time/Schedule.h"
+#include "DateTime.h"
+#include "Schedule.h"
 
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -70,6 +71,7 @@ namespace synthese
 			@ingroup m35
 		*/
 		class Edge
+			:	public virtual util::Registrable
 		{
 		private:
 

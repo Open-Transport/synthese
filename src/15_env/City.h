@@ -24,10 +24,9 @@
 #define SYNTHESE_ENV_CITY_H
 
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
-#include "07_lex_matcher/LexicalMatcher.h"
+#include "LexicalMatcher.h"
 
 #include "IncludingPlace.h"
 
@@ -38,99 +37,86 @@
 
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
 
-    class ConnectionPlace;
-    class PlaceAlias;
-    class PublicPlace;
-    class Road;
-
-
-/** City class.
-
-A city holds in its included places the main connection places
- (those taken by default when no stop is explicitly chosen).
-
-@ingroup m35
-*/
-class City : public util::Registrable<uid, City>, 
-    public IncludingPlace
-{
- private:
-
-    lexmatcher::LexicalMatcher<const ConnectionPlace*> _connectionPlacesMatcher;
-    lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
-    lexmatcher::LexicalMatcher<const Road*> _roadsMatcher;
-    lexmatcher::LexicalMatcher<const PlaceAlias*> _placeAliasesMatcher;
-	lexmatcher::LexicalMatcher<const Place*> _allPlacesMatcher;
-
-    std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
-
- public:
-
-    City (const uid& key = UNKNOWN_VALUE,
-	  const std::string& name = "",
-	  const std::string& code = ""
-	);
-    
-    ~City ();
+		class ConnectionPlace;
+		class PlaceAlias;
+		class PublicPlace;
+		class Road;
 
 
-    //! @name Getters/Setters
-    //@{
-		const std::string& getCode () const { return _code; }
-		void setCode (const std::string& code) { _code = code; }
+		/** City class.
 
-		lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher ();
-		const lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher () const;
+		A city holds in its included places the main connection places
+		 (those taken by default when no stop is explicitly chosen).
 
-		lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher ();
-		const lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher () const;
-	    
-		lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher ();
-		const lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher () const;
+		@ingroup m35
+		*/
+		class City
+		:	public IncludingPlace
+		{
+		 private:
 
-		lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher ();
-		const lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher () const;
+			lexmatcher::LexicalMatcher<const ConnectionPlace*> _connectionPlacesMatcher;
+			lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
+			lexmatcher::LexicalMatcher<const Road*> _roadsMatcher;
+			lexmatcher::LexicalMatcher<const PlaceAlias*> _placeAliasesMatcher;
+			lexmatcher::LexicalMatcher<const Place*> _allPlacesMatcher;
 
-		lexmatcher::LexicalMatcher<const Place*>& getAllPlacesMatcher ();
-		const lexmatcher::LexicalMatcher<const Place*>& getAllPlacesMatcher () const;
-    //@}
+			std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
 
-    //! @name Update methods
-    //@{
+		 public:
 
-    //@}
-
-    //! @name Query methods
-    //@{
-
-    void getImmediateVertices (VertexAccessMap& result, 
-			       const AccessDirection& accessDirection,
-			       const AccessParameters& accessParameters,
-			       SearchAddresses returnAddresses
-			       , SearchPhysicalStops returnPhysicalStops
-				   , const Vertex* origin = NULL
-	) const;
-    
-    std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;
-
-	virtual uid getId() const;
-    //@}
+			City(
+				util::RegistryKeyType key = UNKNOWN_VALUE,
+				std::string name = std::string(),
+				std::string code = std::string()
+			);
+		    
+			~City ();
 
 
- private:
+			//! @name Getters/Setters
+			//@{
+				const std::string& getCode () const { return _code; }
+				void setCode (const std::string& code) { _code = code; }
 
+				lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher ();
+				const lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher () const;
 
-};
+				lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher ();
+				const lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher () const;
+			    
+				lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher ();
+				const lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher () const;
 
+				lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher ();
+				const lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher () const;
 
+				lexmatcher::LexicalMatcher<const Place*>& getAllPlacesMatcher ();
+				const lexmatcher::LexicalMatcher<const Place*>& getAllPlacesMatcher () const;
+			//@}
 
+			//! @name Update methods
+			//@{
 
+			//@}
 
+			//! @name Query methods
+			//@{
+				void getImmediateVertices (VertexAccessMap& result, 
+							   const AccessDirection& accessDirection,
+							   const AccessParameters& accessParameters,
+							   SearchAddresses returnAddresses
+							   , SearchPhysicalStops returnPhysicalStops
+							   , const Vertex* origin = NULL
+				) const;
+			    
+				std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;
+			//@}
+		};
+	}
 }
-}
+
 #endif
-
-

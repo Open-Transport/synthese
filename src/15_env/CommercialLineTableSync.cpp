@@ -68,56 +68,59 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<CommercialLineTableSync>::TABLE_ID = 42;
 		template<> const bool SQLiteTableSyncTemplate<CommercialLineTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::load(CommercialLine* object, const db::SQLiteResultSPtr& rows )
-		{
-		    object->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Load(
+			CommercialLine* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
 		    object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
 		    object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
 		    object->setColor(RGBColor(rows->getText ( CommercialLineTableSync::COL_COLOR)));
 		    object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
-		}
 
-
-
-		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::_link(CommercialLine* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			const TransportNetwork* tn = 
-				TransportNetworkTableSync::Get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID),obj,true,temporary);
-
-			obj->setNetwork (tn);
-
-			if (temporary == GET_REGISTRY)
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				typedef tokenizer<char_separator<char> > tokenizer;
-				string stops(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
+				const TransportNetwork* tn = 
+					TransportNetworkTableSync::Get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID), env, linkLevel).get();
 
-				// Parse all optional reservation places separated by ,
-				char_separator<char> sep1 (",");
-				tokenizer stopsTokens (stops, sep1);
+				object->setNetwork (tn);
 
-				for(tokenizer::iterator it(stopsTokens.begin());
-					it != stopsTokens.end ();
-					++it
+//				if (temporary == GET_REGISTRY)
+				{
+					typedef tokenizer<char_separator<char> > tokenizer;
+					string stops(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
+
+					// Parse all optional reservation places separated by ,
+					char_separator<char> sep1 (",");
+					tokenizer stopsTokens (stops, sep1);
+
+					for(tokenizer::iterator it(stopsTokens.begin());
+						it != stopsTokens.end ();
+						++it
 					){
-						uid id(Conversion::ToLongLong(*it));
-						shared_ptr<const Place> place(EnvModule::fetchPlace(id));
-						obj->addOptionalReservationPlace(place.get());
+							uid id(Conversion::ToLongLong(*it));
+							shared_ptr<const Place> place(EnvModule::FetchPlace(id, *env));
+							object->addOptionalReservationPlace(place.get());
+					}
 				}
 			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::_unlink(CommercialLine* obj)
+		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
+			CommercialLine* obj,
+			Env* env)
 		{
 
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::save(CommercialLine* object)
+		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Save(CommercialLine* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -168,16 +171,17 @@ namespace synthese
 		}
 
 
-		std::vector<shared_ptr<CommercialLine> > CommercialLineTableSync::search(
+		void CommercialLineTableSync::Search(
+			Env& env,
 			uid networkId
 			, std::string name
 			, int first
 			, int number
 			, bool orderByNetwork
 			, bool orderByName
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT l.*"
@@ -198,26 +202,11 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<CommercialLine> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<CommercialLine> object(new CommercialLine());
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
-		std::vector<boost::shared_ptr<CommercialLine> > CommercialLineTableSync::search(
+		void CommercialLineTableSync::Search(
+			Env& env,
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
 			, RightLevel neededLevel 
@@ -226,9 +215,9 @@ namespace synthese
 			, bool orderByNetwork /*= true */
 			, bool orderByName /*= false */
 			, bool raisingOrder /*= true */
-			, bool mustBeBookable
+			, bool mustBeBookable,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< getSQLLinesList(rights, totalControl, neededLevel, mustBeBookable, "*");
@@ -243,23 +232,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<CommercialLine> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<CommercialLine> object(new CommercialLine());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
-
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 		std::string CommercialLineTableSync::getSQLLinesList(
@@ -355,6 +328,5 @@ namespace synthese
 
 			return query.str();
 		}
-
 	}
 }

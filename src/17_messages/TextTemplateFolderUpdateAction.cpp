@@ -35,6 +35,7 @@
 #include "17_messages/TextTemplateTableSync.h"
 
 #include "13_dblog/DBLogModule.h"
+#include "Env.h"
 
 using namespace std;
 using namespace boost;
@@ -83,11 +84,13 @@ namespace synthese
 			if (id > 0)
 				_parent = TextTemplateTableSync::Get(id);
 
-			vector<shared_ptr<TextTemplate> >	folders(TextTemplateTableSync::Search(
+			Env env;
+			TextTemplateTableSync::Search(
+				env,
 				ALARM_LEVEL_UNKNOWN, _folder->getParentId(), true, _name, _folder.get(), 0, 1
-				));
+			);
 
-			if (!folders.empty())
+			if (!env.template getRegistry<TextTemplate>().empty())
 				throw ActionException("Un répertoire de même nom existe déjà à l'emplacement spécifié");
 		}
 		
@@ -102,7 +105,7 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(s, "Répertoire parent", Conversion::ToString(_folder->getParentId()), Conversion::ToString(_parent->getKey()));
 			_folder->setParentId(_parent.get() ? _parent->getKey() : 0);
 
-			TextTemplateTableSync::save(_folder.get());
+			TextTemplateTableSync::Save(_folder.get());
 
 			MessagesLibraryLog::AddTemplateFolderUpdateEntry(*_folder, s.str(), _request->getUser().get());
 		}
@@ -113,7 +116,7 @@ namespace synthese
 		{
 			try
 			{
-				_folder = TextTemplateTableSync::GetUpdateable(id);
+				_folder = TextTemplateTableSync::GetEditable(id);
 			}
 			catch(...)
 			{

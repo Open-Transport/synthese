@@ -23,8 +23,8 @@
 #ifndef SYNTHESE_ENV_ROLLING_STOCK_H
 #define SYNTHESE_ENV_ROLLING_STOCK_H
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
+
 
 #include <string>
 
@@ -37,7 +37,8 @@ namespace synthese
 		 TRIDENT = VehicleType
 		 @ingroup m35
 		*/
-		class RollingStock : public synthese::util::Registrable<uid,RollingStock>
+		class RollingStock
+		:	public virtual util::Registrable
 		{
 
 			std::string _name;
@@ -46,7 +47,7 @@ namespace synthese
 
 			public:
 
-				RollingStock ();
+				RollingStock(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 				~RollingStock();
 

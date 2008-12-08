@@ -23,12 +23,12 @@
 #ifndef SYNTHESE_SentScenario_h__
 #define SYNTHESE_SentScenario_h__
 
-#include "17_messages/ScenarioSubclassTemplate.h"
+#include "ScenarioSubclassTemplate.h"
 #include "17_messages/Types.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "01_util/Registrable.h"
+
 
 namespace synthese
 {
@@ -41,8 +41,7 @@ namespace synthese
 			@ingroup m17
 		*/
 		class SentScenario
-			: public ScenarioSubclassTemplate<ScenarioSentAlarm>
-			, public util::Registrable<uid, SentScenario>
+		:	public ScenarioSubclassTemplate<ScenarioSentAlarm>
 		{
 		private:
 			bool			_isEnabled;
@@ -50,10 +49,11 @@ namespace synthese
 			time::DateTime	_periodEnd;   //!< Alarm applicability period end
 
 		public:
-			SentScenario();
+			SentScenario(util::RegistryKeyType key = UNKNOWN_VALUE);
 			SentScenario(
-				const ScenarioTemplate& source
-				, time::DateTime periodStart = time::DateTime(time::TIME_UNKNOWN)
+				const ScenarioTemplate& source,
+				util::RegistryKeyType key = UNKNOWN_VALUE,
+				time::DateTime periodStart = time::DateTime(time::TIME_UNKNOWN)
 				, time::DateTime periodEnd = time::DateTime(time::TIME_UNKNOWN)
 				);
 			~SentScenario();
@@ -61,8 +61,6 @@ namespace synthese
 			const time::DateTime&	getPeriodStart()	const;
 			const time::DateTime&	getPeriodEnd()		const;
 			bool					getIsEnabled()		const;
-
-			uid getId() const;
 
 			/** Start broadcast date setter.
 				Updates the alarms too.

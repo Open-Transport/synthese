@@ -22,11 +22,12 @@
 
 #include "LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/InterfacePageException.h"
+#include "ValueElementList.h"
+#include "InterfacePageException.h"
 
-#include "01_util/Factory.h"
-#include "01_util/FactoryException.h"
+#include "Factory.h"
+#include "FactoryException.h"
+#include "Registry.h"
 
 #include <sstream>
 
@@ -36,6 +37,11 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+
+	namespace util
+	{
+		template<> const string Registry<interfaces::LibraryInterfaceElement>::KEY("LibraryInterfaceElement");
+	}
 
 	namespace interfaces
 	{

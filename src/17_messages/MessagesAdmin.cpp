@@ -21,37 +21,42 @@
 */
 
 
-#include "04_time/TimeParseException.h"
-#include "04_time/DateTime.h"
+#include "TimeParseException.h"
+#include "DateTime.h"
 
-#include "05_html/SearchFormHTMLTable.h"
-#include "05_html/ActionResultHTMLTable.h"
+#include "SearchFormHTMLTable.h"
+#include "ActionResultHTMLTable.h"
 #include "05_html/Constants.h"
 
-#include "11_interfaces/InterfaceModule.h"
+#include "InterfaceModule.h"
 
-#include "30_server/ActionFunctionRequest.h"
+#include "ActionFunctionRequest.h"
 
-#include "17_messages/SingleSentAlarm.h"
-#include "17_messages/SentScenario.h"
-#include "17_messages/AlarmRecipient.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/MessagesAdmin.h"
-#include "17_messages/MessageAdmin.h"
-#include "17_messages/MessagesScenarioAdmin.h"
-#include "17_messages/MessagesModule.h"
-#include "17_messages/NewScenarioSendAction.h"
-#include "17_messages/NewMessageAction.h"
-#include "17_messages/AlarmStopAction.h"
-#include "17_messages/ScenarioStopAction.h"
-#include "17_messages/MessagesRight.h"
-#include "17_messages/MessagesModule.h"
+#include "SingleSentAlarm.h"
+#include "SentScenario.h"
+#include "AlarmRecipient.h"
+#include "AlarmTableSync.h"
+#include "ScenarioTableSync.h"
+#include "MessagesAdmin.h"
+#include "MessageAdmin.h"
+#include "MessagesScenarioAdmin.h"
+#include "MessagesModule.h"
+#include "NewScenarioSendAction.h"
+#include "NewMessageAction.h"
+#include "AlarmStopAction.h"
+#include "ScenarioStopAction.h"
+#include "MessagesRight.h"
+#include "MessagesModule.h"
+#include "SingleSentAlarmInheritedTableSync.h"
+#include "ScenarioSentAlarmInheritedTableSync.h"
+#include "SentScenarioInheritedTableSync.h"
 
-#include "32_admin/AdminRequest.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminModule.h"
-#include "32_admin/AdminParametersException.h"
+#include "AdminRequest.h"
+#include "ModuleAdmin.h"
+#include "AdminModule.h"
+#include "AdminParametersException.h"
+
+#include <boost/foreach.hpp>
 
 using namespace boost;
 using namespace std;
@@ -156,7 +161,9 @@ namespace synthese
 			scenarioStopRequest.getFunction()->setPage<MessagesAdmin>();
 			
 			// Searches
-			vector<shared_ptr<SingleSentAlarm> >_result(AlarmTableSync::searchSingleSent(
+			Env env;
+			SingleSentAlarmInheritedTableSync::Search(
+				env,
 				_startDate
 				, _endDate
 				, _searchConflict
@@ -168,11 +175,12 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
 				, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
 				, _requestParameters.raisingOrder					
-			));
+			);
 			ActionResultHTMLTable::ResultParameters _alarmResultParameters;
-			_alarmResultParameters.setFromResult(_requestParameters, _result);
+			_alarmResultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<SentAlarm>());
 
-			vector<shared_ptr<SentScenario> > _scenarioResult(ScenarioTableSync::searchSent(
+			SentScenarioInheritedTableSync::Search(
+				env,
 				_startDate
 				, _endDate
 				, std::string()
@@ -183,9 +191,9 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
 				, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
 				, _requestParameters.raisingOrder
-			));
+			);
 			html::ActionResultHTMLTable::ResultParameters _scenarioResultParameters;
-			_scenarioResultParameters.setFromResult(_requestParameters, _scenarioResult);
+			_scenarioResultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<SentScenario>());
 
 
 			vector<pair<StatusSearch, string> > statusMap;
@@ -230,9 +238,8 @@ namespace synthese
 			
 			stream << t1.open();
 
-			for (vector<shared_ptr<SentScenario> >::const_iterator it = _scenarioResult.begin(); it != _scenarioResult.end(); ++it)
+			BOOST_FOREACH(shared_ptr<SentScenario> scenario, env.template getRegistry<SentScenario>())
 			{
-				shared_ptr<SentScenario> scenario = *it;
 				scenarioRequest.setObjectId(scenario->getKey());
 				scenarioStopRequest.setObjectId(scenario->getKey());
 
@@ -306,9 +313,8 @@ namespace synthese
 
 			stream << t.open();
 
-			for (vector<shared_ptr<SingleSentAlarm> >::const_iterator it= _result.begin(); it != _result.end(); ++it)
+			BOOST_FOREACH(shared_ptr<SingleSentAlarm> alarm, env.template getRegistry<SingleSentAlarm>())
 			{
-				shared_ptr<SingleSentAlarm> alarm = *it;
 				alarmRequest.setObjectId(alarm->getKey());
 				stopRequest.setObjectId(alarm->getKey());
 				bool alarmIsDisabled =

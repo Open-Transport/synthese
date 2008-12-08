@@ -23,11 +23,9 @@
 #ifndef SYNTHESE_ENV_PHYSICALSTOP_H
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
 #include "01_util/Constants.h"
 
-#include "15_env/Vertex.h"
+#include "Vertex.h"
 
 #include <string>
 
@@ -45,9 +43,8 @@ namespace synthese
 			RoutePoint
 		@ingroup m35
 		*/
-		class PhysicalStop : 
-			public Vertex,
-			public synthese::util::Registrable<uid, PhysicalStop>
+		class PhysicalStop
+		:	public Vertex
 		{
 
 		private:
@@ -57,8 +54,9 @@ namespace synthese
 			
 		public:
 
-			PhysicalStop (const uid id = UNKNOWN_VALUE,
-				const std::string name = std::string(), 
+			PhysicalStop(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				std::string name = std::string(), 
 				const PublicTransportStopZoneConnectionPlace* place = NULL,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE);
@@ -68,7 +66,6 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-				const uid&			getId ()			const;
 				const std::string&	getOperatorCode()	const;
 				const PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
 

@@ -22,10 +22,10 @@
 
 #include "TransportNetworkTableSync.h"
 
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
@@ -48,15 +48,18 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE_ID(22);
 		template<> const bool SQLiteTableSyncTemplate<TransportNetworkTableSync>::HAS_AUTO_INCREMENT(true);
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::load(TransportNetwork* object, const db::SQLiteResultSPtr& rows )
-		{
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Load(
+			TransportNetwork* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			std::string name (rows->getText (TransportNetworkTableSync::COL_NAME));
 
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setName(name);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::save(TransportNetwork* object)
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Save(TransportNetwork* object)
 		{
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -70,17 +73,6 @@ namespace synthese
 			
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
-
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync, TransportNetwork>::_link(TransportNetwork* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-
-		}
-
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync, TransportNetwork>::_unlink(TransportNetwork* obj)
-		{
-
-		}
-
 	}
 
 	namespace env
@@ -96,12 +88,14 @@ namespace synthese
 
 
 	    
-	    std::vector<boost::shared_ptr<TransportNetwork> > TransportNetworkTableSync::search(
+	    void TransportNetworkTableSync::Search(
+			Env& env,
 			string name
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByName
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
 			stringstream query;
 			query
@@ -117,22 +111,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-				vector<shared_ptr<TransportNetwork> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<TransportNetwork> object(new TransportNetwork());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

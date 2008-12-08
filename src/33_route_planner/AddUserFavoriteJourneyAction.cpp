@@ -22,17 +22,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/UserFavoriteJourney.h"
-#include "33_route_planner/UserFavoriteJourneyTableSync.h"
+#include "UserFavoriteJourney.h"
+#include "UserFavoriteJourneyTableSync.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
 
-#include "12_security/UserTableSync.h"
-#include "12_security/User.h"
+#include "UserTableSync.h"
+#include "User.h"
 
-#include "01_util/ObjectNotFoundException.h"
-#include "01_util/UId.h"
+#include "ObjectNotFoundException.h"
 
 #include "AddUserFavoriteJourneyAction.h"
 
@@ -82,7 +81,7 @@ namespace synthese
 			{
 				_user = UserTableSync::Get(id, GET_TEMPORARY);
 			}
-			catch (ObjectNotFoundException<uid,User>& e)
+			catch (ObjectNotFoundException<User>& e)
 			{
 				throw ActionException(e.getMessage());
 			}
@@ -102,7 +101,7 @@ namespace synthese
 			f.setOriginCityName(_originCityName);
 			f.setDestinationCityName(_destinationCityName);
 			f.setDestinationPlaceName(_destinationPlaceName);
-			UserFavoriteJourneyTableSync::save(&f);
+			UserFavoriteJourneyTableSync::Save(&f);
 		}
 	}
 }

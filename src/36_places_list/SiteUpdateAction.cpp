@@ -111,7 +111,7 @@ namespace synthese
 			_site->setUseDateRange(_useDatesRange);
 			_site->setMaxTransportConnectionsCount(_maxConnections);
 
-			SiteTableSync::save(_site.get());
+			SiteTableSync::Save(_site.get());
 		}
 
 
@@ -120,7 +120,7 @@ namespace synthese
 		{
 			try
 			{
-				_site = SiteTableSync::GetUpdateable(id);
+				_site = SiteTableSync::GetEditable(id);
 			}
 			catch(...)
 			{

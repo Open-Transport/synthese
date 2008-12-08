@@ -20,27 +20,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/RoadChunk.h"
-#include "15_env/Road.h"
-#include "15_env/Address.h"
+#include "RoadChunk.h"
+#include "Road.h"
+#include "Address.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
-
 	namespace util
 	{
-		template<> typename Registrable<uid,env::RoadChunk>::Registry Registrable<uid,env::RoadChunk>::_registry;
+		template<> const string Registry<env::RoadChunk>::KEY("RoadChunk");
 	}
 
 	namespace env
 	{
 		RoadChunk::RoadChunk (
-			uid id
+			util::RegistryKeyType id
 			, Address* fromAddress
 			, int rankInRoad
 			, bool isDeparture
 			, bool isArrival
-		)	: synthese::util::Registrable<uid,RoadChunk> (id)
+		)	: util::Registrable(id)
 			, Edge (
 				isDeparture
 				, isArrival

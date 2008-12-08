@@ -44,5 +44,13 @@ namespace synthese
 
 			InterfacePage::display(stream, pv, variables, NULL, request);
 		}
+
+
+
+		ParseDisplayReturnInterfacePage::ParseDisplayReturnInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

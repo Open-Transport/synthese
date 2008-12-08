@@ -26,17 +26,17 @@
 #include "TransportNetworkAdmin.h"
 #include "EnvModule.h"
 
-#include "15_env/CommercialLine.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/Line.h"
-#include "15_env/LineAdmin.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/TransportNetworkRight.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "Line.h"
+#include "LineAdmin.h"
+#include "LineTableSync.h"
+#include "TransportNetworkRight.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
+#include "QueryString.h"
+#include "Request.h"
 
-#include "32_admin/AdminParametersException.h"
+#include "AdminParametersException.h"
 
 using namespace std;
 using namespace boost;
@@ -121,8 +121,10 @@ namespace synthese
 				|| currentPage.getFactoryKey() == LineAdmin::FACTORY_KEY && _cline->getKey() == static_cast<const LineAdmin&>(currentPage).getLine()->getCommercialLine()->getKey()
 				)
 			{
-				vector<shared_ptr<Line> > lines(LineTableSync::search(_cline->getKey()));
-				for (vector<shared_ptr<Line> >::const_iterator it(lines.begin()); it != lines.end(); ++it)
+				Env env;
+				LineTableSync::Search(env, _cline->getKey());
+				const Registry<Line>& lines(env.template getRegistry<Line>());
+				for(Registry<Line>::const_iterator it(lines.begin()); it != lines.end(); ++it)
 				{
 					PageLink link;
 					link.factoryKey = LineAdmin::FACTORY_KEY;

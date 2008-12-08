@@ -28,12 +28,12 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
+
 
 #include "12_security/Constants.h"
 #include "12_security/Types.h"
-#include "12_security/GlobalRight.h"
+#include "GlobalRight.h"
 
 namespace synthese
 {
@@ -58,7 +58,8 @@ namespace synthese
 				- Administrateur : tous les droits
 
 		*/
-		class Profile : public util::Registrable<uid,Profile>
+		class Profile
+		:	public virtual util::Registrable
 		{
 		private:
 			std::string		_name;
@@ -72,7 +73,7 @@ namespace synthese
 			*/
 			int operator<=(const Profile& profile) const;
 
-			Profile(uid id=0);
+			Profile(util::RegistryKeyType id = UNKNOWN_VALUE);
 			
 			//!	\name Getters
 			//@{

@@ -27,7 +27,7 @@
 
 #include "17_messages/Types.h"
 
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -47,32 +47,29 @@ namespace synthese
 			The _scenario attribute points to the group if applicable.
 		*/
 		class Alarm
+			: public virtual util::Registrable
 		{
 		protected:
 			AlarmLevel					_level;
 			std::string					_shortMessage;  //!< Alarm message
 			std::string					_longMessage;  //!< Alarm message
 		    
-			Alarm();
+			Alarm(util::RegistryKeyType key);
 			Alarm(const Alarm& source);
 			
 		public:
-			~Alarm();
+			virtual ~Alarm();
 
 			//! @name Getters/Setters
 			//@{
 				const std::string&		getShortMessage()	const;
 				const std::string&		getLongMessage()	const;
 				const AlarmLevel&		getLevel()			const;
-				virtual uid				getId()				const = 0;
 
 				void setLevel (const AlarmLevel& level);
 				void setShortMessage( const std::string& message);
 				void setLongMessage( const std::string& message);
 			//@}
-
-//				static boost::shared_ptr<const Alarm> Get(uid key);
-//				static bool Contains(uid key);
 		};
 	}
 }

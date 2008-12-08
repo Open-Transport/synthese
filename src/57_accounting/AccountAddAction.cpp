@@ -124,7 +124,7 @@ namespace synthese
 			a.setLeftCurrency(_currency.get());
 			a.setRightUserId(_rightUser->getKey());
 			
-			AccountTableSync::save(&a);
+			AccountTableSync::Save(&a);
 		}
 
 		void AccountAddAction::setClass( const std::string& value )

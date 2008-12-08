@@ -25,10 +25,9 @@
 
 #include "31_resa/Types.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -42,7 +41,8 @@ namespace synthese
 		/** ReservationTransaction class.
 			@ingroup m31
 		*/
-		class ReservationTransaction : public util::Registrable<uid, ReservationTransaction>
+		class ReservationTransaction
+		:	public virtual util::Registrable
 		{
 		public:
 			typedef std::vector<boost::shared_ptr<Reservation> > Reservations;
@@ -80,7 +80,7 @@ namespace synthese
 			//@}
 
 		public:
-			ReservationTransaction();
+			ReservationTransaction(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 			void setLastReservation	(uid id);
 			void setSeats			(int seats);
@@ -92,7 +92,6 @@ namespace synthese
 			void setBookingUserId	(uid id);
 			void setCancelUserId	(uid id);
 			void setCustomerEMail	(const std::string& email);
-			void setReservations	(const Reservations& reservations);
 
 			uid						getLastReservation()	const;
 			int						getSeats()				const;
@@ -114,6 +113,7 @@ namespace synthese
 			boost::shared_ptr<Reservation> newReservation();
 
 
+			void addReservation(shared_ptr<Reservation> resa);
 
 			//! @name Queries
 			//@{				

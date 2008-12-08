@@ -23,11 +23,9 @@
 #ifndef SYNTHESE_ENV_PUBLICPLACE_H
 #define SYNTHESE_ENV_PUBLICPLACE_H
 
-#include "15_env/AddressablePlace.h"
+#include "AddressablePlace.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-#include "01_util/Constants.h"
+#include "Registrable.h"
 
 #include <string>
 
@@ -41,31 +39,18 @@ namespace synthese
 		/** Public place class.
 			@ingroup m35
 		*/
-		class PublicPlace : public synthese::util::Registrable<uid, PublicPlace>, public AddressablePlace
+		class PublicPlace
+		:	public AddressablePlace
 		{
-
-		private:
-
-		protected:
-
 		public:
 
 			PublicPlace (
-				const uid id = UNKNOWN_VALUE
+				util::RegistryKeyType id = UNKNOWN_VALUE
 				, std::string name = std::string()
 				, const City* city = NULL
-				);
+			);
 
 			virtual ~PublicPlace ();
-
-
-			//! @name Getters/Setters
-			//@{
-
-			//@}
-
-			virtual uid getId() const;
-		    
 		};
 	}
 }

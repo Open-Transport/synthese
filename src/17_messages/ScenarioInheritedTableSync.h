@@ -64,9 +64,8 @@ namespace synthese
 				db::SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				while (rows->next ())
 				{
-					typename ScenarioSubClass::AlarmType* object(new typename ScenarioSubClass::AlarmType(scenario));
-					scenario->addChildTemporaryObject(object);
-					AlarmTableSync::Load(object, rows);
+					typename ScenarioSubClass::AlarmType* object(new typename ScenarioSubClass::AlarmType(UNKNOWN_VALUE, scenario));
+					AlarmTableSync::Load(object, rows, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
 					scenario->addAlarm(object);
 				}
 			}

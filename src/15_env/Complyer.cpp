@@ -21,80 +21,84 @@
 */
 
 #include "Complyer.h"
+#include "Env.h"
+#include "BikeComplyer.h"
+#include "BikeCompliance.h"
+#include "HandicappedComplyer.h"
+#include "PedestrianComplyer.h"
+#include "PedestrianCompliance.h"
+#include "ReservationRuleComplyer.h"
+#include "ReservationRule.h"
+#include "Fare.h"
+#include "HandicappedCompliance.h"
 
-#include "15_env/BikeComplyer.h"
-#include "15_env/BikeCompliance.h"
-#include "15_env/HandicappedComplyer.h"
-#include "15_env/PedestrianComplyer.h"
-#include "15_env/PedestrianCompliance.h"
-#include "15_env/ReservationRuleComplyer.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/Fare.h"
-#include "15_env/HandicappedCompliance.h"
+using namespace boost;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace env
 	{
 		Complyer::Complyer()
-			: _bikeCompliance(BikeCompliance::Get(0).get())
-			, _fare(Fare::Get(0).get())
-			, _pedestrianCompliance(PedestrianCompliance::Get(0).get())
-			, _reservationRule(ReservationRule::Get(0).get())
-			, _handicappedCompliance(HandicappedCompliance::Get(0).get())
+			: _bikeCompliance(Env::GetOfficialEnv()->template getRegistry<BikeCompliance>().get(0))
+			, _fare(Env::GetOfficialEnv()->template getRegistry<Fare>().get(0))
+			, _pedestrianCompliance(Env::GetOfficialEnv()->template getRegistry<PedestrianCompliance>().get(0))
+			, _reservationRule(Env::GetOfficialEnv()->template getRegistry<ReservationRule>().get(0))
+			, _handicappedCompliance(Env::GetOfficialEnv()->template getRegistry<HandicappedCompliance>().get(0))
 			, _complianceParent(NULL)
 		{
 
 		}
 
-		const BikeCompliance* Complyer::getBikeCompliance() const
+		shared_ptr<const BikeCompliance> Complyer::getBikeCompliance() const
 		{
 			return _bikeCompliance;
 		}
 
-		const Fare* Complyer::getFare() const
+		shared_ptr<const Fare> Complyer::getFare() const
 		{
 			return _fare;
 		}
 
-		const HandicappedCompliance* Complyer::getHandicappedCompliance() const
+		shared_ptr<const HandicappedCompliance> Complyer::getHandicappedCompliance() const
 		{
 			return _handicappedCompliance;
 		}
 
-		const PedestrianCompliance* Complyer::getPedestrianCompliance() const
+		shared_ptr<const PedestrianCompliance> Complyer::getPedestrianCompliance() const
 		{
 			return _pedestrianCompliance;
 		}
 
-		const ReservationRule* Complyer::getReservationRule() const
+		shared_ptr<const ReservationRule> Complyer::getReservationRule() const
 		{
 			if ((_reservationRule == NULL || _reservationRule->isCompliant() == false) && _complianceParent != NULL)
 				return _complianceParent->getReservationRule();
 			return _reservationRule;
 		}
 
-		void Complyer::setHandicappedCompliance( const HandicappedCompliance* compliance )
+		void Complyer::setHandicappedCompliance(shared_ptr<const HandicappedCompliance> compliance)
 		{
 			_handicappedCompliance = compliance;
 		}
 
-		void Complyer::setPedestrianCompliance( const PedestrianCompliance* compliance )
+		void Complyer::setPedestrianCompliance(shared_ptr<const PedestrianCompliance> compliance )
 		{
 			_pedestrianCompliance = compliance;
 		}
 
-		void Complyer::setBikeCompliance( const BikeCompliance* compliance )
+		void Complyer::setBikeCompliance(shared_ptr<const BikeCompliance> compliance )
 		{
 			_bikeCompliance = compliance;
 		}
 
-		void Complyer::setFare( const Fare* fare )
+		void Complyer::setFare(shared_ptr<const Fare> fare )
 		{
 			_fare = fare;
 		}
 
-		void Complyer::setReservationRule( const ReservationRule* rule )
+		void Complyer::setReservationRule(shared_ptr<const ReservationRule> rule )
 		{
 			_reservationRule = rule;
 		}

@@ -24,9 +24,7 @@
 #define SYNTHESE_env_NonConcurrencyRule_h__
 
 #include "Registrable.h"
-#include "Constants.h"
 
-#include "UId.h"
 
 namespace synthese
 {
@@ -35,16 +33,18 @@ namespace synthese
 		/** Non-concurrency rule class.
 			@ingroup m35
 		*/
-		class NonConcurrencyRule : public util::Registrable<uid, NonConcurrencyRule>
+		class NonConcurrencyRule
+		:	public virtual util::Registrable
 		{
-			uid	_prorityLine;
-			uid	_hiddenLine;
+			util::RegistryKeyType	_prorityLine;
+			util::RegistryKeyType	_hiddenLine;
 			int	_delay;
 
 		public:
 			NonConcurrencyRule(
-				uid priorityLine = UNKNOWN_VALUE
-				, uid hiddenLine = UNKNOWN_VALUE
+				util::RegistryKeyType key,
+				util::RegistryKeyType priorityLine = UNKNOWN_VALUE
+				, util::RegistryKeyType hiddenLine = UNKNOWN_VALUE
 				, int delay = UNKNOWN_VALUE
 			);
 
@@ -52,8 +52,8 @@ namespace synthese
 			uid	getHiddenLine()		const;
 			int	getDelay()			const;
 
-			void setPriorityLine(uid value);
-			void setHiddenLine(uid value);
+			void setPriorityLine(util::RegistryKeyType value);
+			void setHiddenLine(util::RegistryKeyType value);
 			void setDelay(int value);
 
 		};

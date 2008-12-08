@@ -76,7 +76,7 @@ namespace synthese
 			object->setReservationDeadLine(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_RESERVATION_DEAD_LINE)));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::save(Reservation* object)
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Save(Reservation* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -147,12 +147,13 @@ namespace synthese
 			addTableIndex(COL_ARRIVAL_PLACE_ID);
 		}
 
-		vector<shared_ptr<Reservation> > ReservationTableSync::search(
+		void ReservationTableSync::Search(
+			Env& env,
 			ReservationTransaction* transaction
 			, int first /*= 0*/
-			, int number /*= 0*/
+			, int number /*= 0*/,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -165,22 +166,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Reservation> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<Reservation> object(transaction->newReservation());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 		ReservationTableSync::~ReservationTableSync()

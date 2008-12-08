@@ -25,28 +25,31 @@
 #include "PlaceAlias.h"
 #include "PublicPlace.h"
 #include "Road.h"
+#include "Registry.h"
 
 #include <assert.h>
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace lexmatcher;
+	using namespace util;
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::City>::Registry Registrable<uid,env::City>::_registry;
+		template<> const string Registry<env::City>::KEY("City");
 	}
 
 	namespace env
 	{
 
-		City::City (const uid& key,
-			    const std::string& name,
-			    const std::string& code
-		    )
-			: synthese::util::Registrable<uid,City> (key)
-			, IncludingPlace (name, 0)  // Note this city's city is null ?
-			, _code (code)
+		City::City(
+			RegistryKeyType key,
+			std::string name,
+			std::string code
+		):	IncludingPlace(key, name, 0),  // Note this city's city is null ?
+			_code (code)
 		{
 		}
 
@@ -207,10 +210,7 @@ namespace synthese
 			}
 		}
 
-		uid City::getId() const
-		{
-			return getKey();
-		}
+
 
 		lexmatcher::LexicalMatcher<const Place*>& City::getAllPlacesMatcher()
 		{

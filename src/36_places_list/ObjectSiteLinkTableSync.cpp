@@ -56,22 +56,18 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::load(
+		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Load(
 			ObjectSiteLink* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
 		){
-			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
-
-			// Properties
-			object->setKey(id);
-			/// @todo Set all other attributes from the row
 
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::save(
+		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Save(
 			ObjectSiteLink* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -89,17 +85,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::_link(
-			ObjectSiteLink* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
-		){
-			/// @todo Fill it
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::_unlink(
-			ObjectSiteLink* obj
+		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
+			ObjectSiteLink* obj,
+			Env* env
 		){
 			/// @todo Fill it
 		}
@@ -184,23 +172,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<ObjectSiteLink> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<ObjectSiteLink> object(new ObjectSiteLink);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_security_RightTemplate_h__
 #define SYNTHESE_security_RightTemplate_h__
 
-#include "12_security/Right.h"
+#include "Right.h"
 
-#include "01_util/FactorableTemplate.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {

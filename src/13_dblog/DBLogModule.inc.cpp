@@ -4,3 +4,6 @@
 #include "13_dblog/DBLogViewer.h"
 #include "13_dblog/DBLogRight.h"
 #include "13_dblog/DBLogEntryTableSync.h"
+
+// Registries
+#include "DBLogEntry.h"

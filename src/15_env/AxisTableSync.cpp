@@ -22,16 +22,16 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "15_env/Axis.h"
-#include "15_env/AxisTableSync.h"
-#include "15_env/EnvModule.h"
+#include "Axis.h"
+#include "AxisTableSync.h"
+#include "EnvModule.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -53,27 +53,24 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<AxisTableSync>::TABLE_ID = 4;
 		template<> const bool SQLiteTableSyncTemplate<AxisTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::load(Axis* axis, const db::SQLiteResultSPtr& rows)
-		{
-		    axis->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::Load(
+			Axis* axis,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    axis->setName (rows->getText (AxisTableSync::COL_NAME));
 		    axis->setFree (rows->getBool (AxisTableSync::COL_FREE));
 		    axis->setAllowed (rows->getBool (AxisTableSync::COL_ALLOWED));
 		}
-	    
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::_link(Axis* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::Unlink(Axis* obj, Env* env)
 		{
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::_unlink(Axis* obj)
-		{
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::save(Axis* object)
+		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::Save(Axis* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -114,9 +111,12 @@ namespace synthese
 			addTableColumn (COL_ALLOWED, "BOOLEAN", true);
 		}
 
-		std::vector<shared_ptr<Axis> > AxisTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
+		void AxisTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -130,22 +130,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Axis> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<Axis> object(new Axis());
-					load(object.get(), rows);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

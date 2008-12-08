@@ -22,7 +22,8 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Registry.h"
+#include "Conversion.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -98,7 +99,7 @@ namespace synthese
 			// Get the corresponding calendar
 			uid serviceId = rows->getLongLong (COL_SERVICEID);
 
-			shared_ptr<NonPermanentService> service (EnvModule::fetchService (serviceId));
+			shared_ptr<NonPermanentService> service (EnvModule::FetchEditableService(serviceId));
 			assert (service != 0);
 
 			// Mark the date in service calendar

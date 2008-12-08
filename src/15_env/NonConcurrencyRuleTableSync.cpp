@@ -55,18 +55,18 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::load(
+		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(
 			NonConcurrencyRule* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
 		){
 			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
 			uid hiddenLineId(rows->getLongLong(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID));
 			uid priorityLineId(rows->getLongLong(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID));
 			int delay(rows->getInt(NonConcurrencyRuleTableSync::COL_DELAY));
 
 			// Properties
-			object->setKey(id);
 			object->setDelay(delay);
 			object->setHiddenLine(hiddenLineId);
 			object->setPriorityLine(priorityLineId);
@@ -74,7 +74,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::save(
+		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Save(
 			NonConcurrencyRule* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -92,16 +92,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::_link(
-			NonConcurrencyRule* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
-		){
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::_unlink(
-			NonConcurrencyRule* obj
+		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
+			NonConcurrencyRule* obj,
+			Env* env
 		){
 			
 		}
@@ -126,7 +119,8 @@ namespace synthese
 			addTableColumn(COL_DELAY, "INTEGER", true);
 		}
 
-		vector<shared_ptr<NonConcurrencyRule> > NonConcurrencyRuleTableSync::Search(
+		void NonConcurrencyRuleTableSync::Search(
+			Env& env,
 			int hiddenLineId
 			, int priorityLineId
 			, bool hiddenAndPriority
@@ -135,10 +129,9 @@ namespace synthese
 			, bool orderByPriorityLine //= true
 			, bool orderByHiddenLine //= false
 			, bool orderByDelay //= false
-			, bool raisingOrder //= true
+			, bool raisingOrder, //= true
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -167,23 +160,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<NonConcurrencyRule> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<NonConcurrencyRule> object(new NonConcurrencyRule);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

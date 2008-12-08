@@ -60,11 +60,11 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
 				_activatePreselection =  map.getBool(PARAMETER_ACTIVATE_PRESELECTION, true, false, FACTORY_KEY);
 				_preselectionDelay = map.getInt(PARAMETER_PRESELECTION_DELAY, true, FACTORY_KEY);
 			}
-			catch (DisplayScreen::ObjectNotFoundException&)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}
@@ -80,7 +80,7 @@ namespace synthese
 			// The update
 			_screen->setDestinationForceDelay(_preselectionDelay);
 			_screen->setGenerationMethod(_activatePreselection ? DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD : DisplayScreen::STANDARD_METHOD);
-			DisplayScreenTableSync::save(_screen.get());
+			DisplayScreenTableSync::Save(_screen.get());
 
 		
 			ArrivalDepartureTableLog::addUpdateEntry(_screen.get(), t.str(), _request->getUser().get());

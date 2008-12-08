@@ -30,7 +30,7 @@
 
 #include "Line.h"
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -78,12 +78,14 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<Line> > search(
+			static void Search(
+				util::Env& env,
 				uid commercialLineId = UNKNOWN_VALUE
 				, int first = 0
 				, int number = 0
 				, bool orderByName = true
-				, bool raisingOrder = true
+				, bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 	}

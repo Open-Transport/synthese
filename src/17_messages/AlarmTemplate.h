@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_AlarmTemplate_h__
 #define SYNTHESE_AlarmTemplate_h__
 
-#include "17_messages/Alarm.h"
+#include "Alarm.h"
 
-#include "01_util/Registrable.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -37,18 +37,23 @@ namespace synthese
 			@ingroup m17
 		*/
 		class AlarmTemplate
-			: public Alarm
-			, public util::Registrable<uid, AlarmTemplate>
+		:	public Alarm
 		{
 		private:
 			const ScenarioTemplate* _scenario;
 
 		public:
-			AlarmTemplate(const ScenarioTemplate* scenario = NULL);
+			/** Constructor for reading the object from the database.
+				@param key ID of the alarm
+				@param scenario pointer to the scenario its belong
+			*/
+			AlarmTemplate(
+				util::RegistryKeyType key = UNKNOWN_VALUE,
+				const ScenarioTemplate* scenario = NULL
+			);
 			AlarmTemplate(const ScenarioTemplate* scenario, const AlarmTemplate& source);
 			AlarmTemplate(const AlarmTemplate& source);
 			~AlarmTemplate();
-			uid getId() const;
 
 			const ScenarioTemplate* getScenario() const;
 			void					setScenario(const ScenarioTemplate* scenario);

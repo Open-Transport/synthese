@@ -71,6 +71,8 @@ namespace synthese
 		class JourneyBoardInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardInterfacePage>
 		{
 		public:
+			JourneyBoardInterfacePage();
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 

@@ -97,7 +97,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 			*/
-			static std::vector<boost::shared_ptr<const Profile> > getSubProfiles(boost::shared_ptr<const Profile> profile);
+			static std::vector<boost::shared_ptr<Profile> > getSubProfiles(boost::shared_ptr<const Profile> profile);
 
 			virtual std::string getName() const;
 		};

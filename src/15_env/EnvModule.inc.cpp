@@ -1,4 +1,7 @@
 
+// ENVMODULE 35
+
+// Factories
 #include "15_env/LineMarkerInterfacePage.h"
 #include "15_env/ReservationRuleInterfacePage.h"
 
@@ -44,3 +47,28 @@
 #include "15_env/EnvModule.h"
 
 #include "15_env/TransportNetworkRight.h"
+
+// Registries
+#include "PhysicalStop.h"
+#include "Road.h"
+#include "Line.h"
+#include "Address.h"
+#include "Axis.h"
+#include "BikeCompliance.h"
+#include "LineStop.h"
+#include "Crossing.h"
+#include "HandicappedCompliance.h"
+#include "NonConcurrencyRule.h"
+#include "TransportNetwork.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ReservationRule.h"
+#include "CommercialLine.h"
+#include "PedestrianCompliance.h"
+#include "RollingStock.h"
+#include "RoadChunk.h"
+#include "City.h"
+#include "ContinuousService.h"
+#include "Fare.h"
+#include "PlaceAlias.h"
+#include "PublicPlace.h"
+#include "ScheduledService.h"

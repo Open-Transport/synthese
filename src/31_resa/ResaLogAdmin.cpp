@@ -96,7 +96,9 @@ namespace synthese
 			DateTime searchStartDate(_searchDate);
 			DateTime searchEndDate(searchStartDate);
 			searchEndDate += 1;
-			vector<shared_ptr<DBLogEntry> >	result(DBLogEntryTableSync::search(
+			Env env;
+			DBLogEntryTableSync::Search(
+				env,
 				ResaDBLog::FACTORY_KEY
 				, searchStartDate
 				, searchEndDate
@@ -112,7 +114,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			));
 			ResultHTMLTable::ResultParameters rp;
-			rp.setFromResult(_requestParameters, result);
+			rp.setFromResult(_requestParameters, env.template getEditableRegistry<DBLogEntry>());
 			
 			// Search form
 			SearchFormHTMLTable st(searchRequest.getHTMLForm());
@@ -123,7 +125,7 @@ namespace synthese
 			// Results
 			ResaModule::DisplayResaDBLog(
 				stream
-				, result
+				, env
 				, PARAMETER_DATE
 				, searchRequest
 				, cancelRequest

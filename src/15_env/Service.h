@@ -25,11 +25,9 @@
 
 #include "Complyer.h"
 #include "ServicePointer.h"
-#include "Types.h"
+#include "15_env/Types.h"
 
 #include <string>
-
-#include "UId.h"
 
 #include "Schedule.h"
 
@@ -64,7 +62,8 @@ namespace synthese
 
 			@ingroup m35
 		*/
-		class Service : public Complyer
+		class Service
+		:	public Complyer
 		{
 		private:
 			std::string	_serviceNumber;
@@ -110,10 +109,7 @@ namespace synthese
 			//@{
 				virtual bool isContinuous () const = 0;
 
-				/** Accessor to the key of the service, provided by the implementation subclass.
-				@return id of the service in the database
-				*/
-				virtual uid		getId()	const = 0;
+
 
 				virtual std::string getTeam() const;
 

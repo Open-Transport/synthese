@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_AdminInterfacePage_H__
 #define SYNTHESE_AdminInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -40,6 +39,7 @@ namespace synthese
 		class AdminInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,AdminInterfacePage>
 		{
 		public:
+			AdminInterfacePage();
 
 			/** Display of the admin page.
 			@param stream Stream to write on

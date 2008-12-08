@@ -69,10 +69,15 @@ namespace synthese
 				throw ActionException("L'utilisateur ne peut être créé car le login entré est déjà utilisé. Veuillez choisir un autre login.");
 			
 			uid id(map.getUid(PARAMETER_PROFILE_ID, true, FACTORY_KEY));
-			if (!Profile::Contains(id))
+			try
+			{
+				_profile = ProfileTableSync::Get(id);
+			}
+			catch (...)
+			{
 				throw ActionException("Profil inexistant");
-			_profile = ProfileTableSync::Get(id);
-
+			}
+			
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
@@ -82,7 +87,7 @@ namespace synthese
 			user->setLogin(_login);
 			user->setName(_name);
 			user->setProfile(_profile.get());
-			UserTableSync::save(user.get());
+			UserTableSync::Save(user.get());
 			_request->setObjectId(user->getKey());
 		}
 	}

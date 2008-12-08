@@ -21,8 +21,10 @@
 */
 
 #include "PedestrianCompliance.h"
+#include "Registry.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -30,15 +32,14 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::PedestrianCompliance>::Registry Registrable<uid,env::PedestrianCompliance>::_registry;
-		template<> boost::shared_ptr<const env::PedestrianCompliance> RegistrableWithNeutralElement<uid,env::PedestrianCompliance>::_neutral(new env::PedestrianCompliance);
+		template<> const string Registry<env::PedestrianCompliance>::KEY("PedestrianCompliance");
 	}
 
 	namespace env
 	{
-		PedestrianCompliance::PedestrianCompliance()
-		: RegistrableWithNeutralElement<uid,PedestrianCompliance> ()
-		, Compliance(true, UNKNOWN_VALUE)
+		PedestrianCompliance::PedestrianCompliance(RegistryKeyType key)
+		:	Registrable(key),
+			Compliance(true, UNKNOWN_VALUE)
 		{
 
 		}
@@ -46,10 +47,6 @@ namespace synthese
 		PedestrianCompliance::~PedestrianCompliance()
 		{
 		}
-
-
-
-
 	}
 }
 

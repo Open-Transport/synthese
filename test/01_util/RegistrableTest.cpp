@@ -10,12 +10,12 @@
 using namespace synthese::util;
 
 
-    class RegistrableForTest : public Registrable<int, RegistrableForTest>
+    class RegistrableForTest : public RegistrableTemplate<int, RegistrableForTest>
     {
     public:
 
 	RegistrableForTest (int key)
-	    : Registrable<int,RegistrableForTest> (key)
+	    : RegistrableTemplate<int,RegistrableForTest> (key)
 	    {
 	    }
 	    

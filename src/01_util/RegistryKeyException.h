@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_UTIL_REGISTRYKEYEXCEPTION_H
 #define SYNTHESE_UTIL_REGISTRYKEYEXCEPTION_H
 
-
+// Util
+#include "Registry.h"
+#include "Conversion.h"
 #include "01_util/Exception.h"
-#include "01_util/Conversion.h"
 
 #include <string>
 #include <iostream>
@@ -33,70 +34,73 @@
 
 namespace synthese
 {
-namespace util
-{
+	namespace util
+	{
 
 
-/** Registry key related exception class.
-    Should not be used directly, use Registrable::RegistryKeyException.
-@ingroup m01Registry m01Exceptions refExceptions
-*/
-template<class K, class T>
-class RegistryKeyException : public synthese::util::Exception
-{
- private:
+		/** Registry key related exception class.
+			Should not be used directly, use Registrable::RegistryKeyException.
+		@ingroup m01Registry m01Exceptions refExceptions
+		*/
+		template<class T>
+		class RegistryKeyException : public Exception
+		{
+		 private:
 
-    const K _key; //!< Key
+			const RegistryKeyType _key; //!< Key
 
- public:
+		 public:
 
-    RegistryKeyException ( const std::string& message, const K& key ) throw ();
-    ~RegistryKeyException () throw ();
-
-
-    //! @name Getters/Setters
-    //@{
-    const K& getKey () const;
-    //@}
+			RegistryKeyException(
+				const std::string& message,
+				const RegistryKeyType& key
+			) throw ();
+			~RegistryKeyException () throw ();
 
 
-    //! @name Query methods.
-    //@{
-    //@}
+			//! @name Getters/Setters
+			//@{
+			const RegistryKeyType& getKey () const;
+			//@}
 
 
- private:
-
-};
-
-
-template<class K, class T>
-RegistryKeyException<K,T>::RegistryKeyException ( const std::string& message, 
-						const K& key ) throw ()
-: synthese::util::Exception (message + " : key=" + Conversion::ToString (key))
-    , _key (key)
-{
-}
+			//! @name Query methods.
+			//@{
+			//@}
 
 
+		 private:
+
+		};
 
 
-template<class K, class T>
-RegistryKeyException<K, T>::~RegistryKeyException () throw ()
-{
-}
+		template<class T>
+		RegistryKeyException<T>::RegistryKeyException(
+			const std::string& message
+			, const RegistryKeyType& key
+		) throw ()
+		: Exception (message + " : key=" + Conversion::ToString (key))
+			, _key (key)
+		{
+		}
 
 
-template<class K, class T>
-const K& 
-RegistryKeyException<K, T>::getKey () const
-{
-    return _key;
-}
 
 
- 
-}
+		template<class T>
+		RegistryKeyException<T>::~RegistryKeyException () throw ()
+		{
+		}
+
+
+		template<class T>
+		const RegistryKeyType& RegistryKeyException<T>::getKey () const
+		{
+			return _key;
+		}
+
+
+	 
+	}
 }
 #endif
-

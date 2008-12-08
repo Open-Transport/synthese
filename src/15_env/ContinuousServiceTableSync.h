@@ -61,12 +61,14 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<ContinuousService> > search(
+			static void Search(
+				util::Env& env,
 				uid lineId = UNKNOWN_VALUE
 				, int first = 0
 				, int number = 0
 				, bool orderByDepartureTime = true
-				, bool raisingOrder = true
+				, bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
 

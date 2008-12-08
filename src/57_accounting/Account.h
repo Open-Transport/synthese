@@ -46,7 +46,7 @@ namespace synthese
 				- template account handled by an entity : all left variables are null or empty. leftUser will be specified in the transactions.
 				- internal accounts of an entity : leftUser and rightUser points to the entity.
 		*/
-		class Account : public util::Registrable<uid, Account>
+		class Account : public util::RegistrableTemplate< Account>
 		{
 		private:
 			uid				_leftUserId;

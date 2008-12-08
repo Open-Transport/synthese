@@ -21,6 +21,9 @@
 */
 
 #include "Axis.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
@@ -28,32 +31,27 @@ namespace synthese
 
 	namespace util
 	{
-		template<> Registrable<uid,env::Axis>::Registry Registrable<uid,env::Axis>::_registry;
+		template<> const string Registry<env::Axis>::KEY("Axis");
 	}
 
 	namespace env
 	{
-
-		Axis::Axis (const uid& id,
-				const std::string& name,
-				bool free, bool allowed)
-			: synthese::util::Registrable<uid,Axis> (id)
+		Axis::Axis(
+			RegistryKeyType id,
+			std::string name,
+			bool free,
+			bool allowed
+		):	Registrable(id)
 			, _name (name)
 			, _free (free)
 			, _allowed (allowed)
 		{
-
 		}
 
-		Axis::Axis() : Registrable<uid,Axis>()
-		{
-
-		}
 
 
 		Axis::~Axis ()
 		{
-
 		}
 
 
@@ -107,4 +105,3 @@ namespace synthese
 
 	}
 }
-

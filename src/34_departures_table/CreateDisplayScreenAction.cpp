@@ -66,7 +66,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY));
 			if (id > 0)
 			{
-				_template = DisplayScreenTableSync::Get(id, GET_AUTO, true);
+				_template = DisplayScreenTableSync::Get(id);
 			}
 
 			id = map.getUid(PARAMETER_LOCALIZATION_ID, true, FACTORY_KEY);
@@ -93,7 +93,7 @@ namespace synthese
 			screen->setLinked(true);
 
 			// Action
-			DisplayScreenTableSync::save(screen.get());
+			DisplayScreenTableSync::Save(screen.get());
 
 			// Request update
 			_request->setObjectId(screen->getKey());

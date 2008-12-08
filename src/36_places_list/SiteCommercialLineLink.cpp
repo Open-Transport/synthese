@@ -21,12 +21,15 @@
 */
 
 #include "SiteCommercialLineLink.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
 	namespace util
 	{
-		template<> typename Registrable<uid,transportwebsite::SiteCommercialLineLink>::Registry Registrable<uid,transportwebsite::SiteCommercialLineLink>::_registry;
+		template<> const string Registry<transportwebsite::SiteCommercialLineLink>::KEY("SiteCommercialLineLink");
 	}
 
 	namespace transportwebsite
@@ -51,6 +54,15 @@ namespace synthese
 		uid SiteCommercialLineLink::getCommercialLineId() const
 		{
 			return _commercialLineId;
+		}
+
+
+
+		SiteCommercialLineLink::SiteCommercialLineLink(
+			util::RegistryKeyType id /*= UNKNOWN_VALUE*/
+		):	Registrable(id)
+		{
+
 		}
 	}
 }

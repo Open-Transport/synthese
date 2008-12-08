@@ -61,7 +61,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY));
 				_text = TextTemplateTableSync::Get(id);
 			}
-			catch (TextTemplate::ObjectNotFoundException& e)
+			catch (ObjectNotFoundException<TextTemplate>& e)
 			{
 				throw ActionException(e.getMessage());
 			}

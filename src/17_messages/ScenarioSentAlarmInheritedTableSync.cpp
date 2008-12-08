@@ -22,6 +22,8 @@
 
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "SentScenarioInheritedTableSync.h"
+#include "Env.h"
+#include <sstream>
 
 using namespace std;
 
@@ -29,6 +31,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace messages;
+	using namespace util;
 
 	template<>
 	const string util::FactorableTemplate<AlarmTableSync, ScenarioSentAlarmInheritedTableSync>::FACTORY_KEY("ScenarioSentAlarmInheritedTableSync");
@@ -36,22 +39,52 @@ namespace synthese
 	namespace db
 	{
 
-		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::_Link(ScenarioSentAlarm* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			obj->setScenario(
-				SentScenarioInheritedTableSync::Get(
-					rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID)
-					, obj
-					, false
-				)
-			);
-		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::_Unlink(ScenarioSentAlarm* obj)
+		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::Load(
+			ScenarioSentAlarm* obj,
+			const SQLiteResultSPtr& rows, 
+			Env* env,
+			LinkLevel linkLevel
+		){
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				obj->setScenario(
+					SentScenarioInheritedTableSync::Get(
+						rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID)
+					).get()
+				);
+			}
+		}
+
+
+
+		template<>
+		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::Unlink(ScenarioSentAlarm* obj, Env* env)
 		{
 			obj->setScenario(NULL);
+		}
+
+
+		template<>
+		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::Save(ScenarioSentAlarm* obj)
+		{
+			if (obj->getKey() == UNKNOWN_VALUE)
+				obj->setKey(getId());
+			stringstream query;		
+			query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(obj->getKey())
+				<< ",0"
+				<< "," << Conversion::ToString(obj->getIsEnabled())
+				<< "," << Conversion::ToString((int) obj->getLevel())
+				<< "," << Conversion::ToSQLiteString(obj->getShortMessage())
+				<< "," << Conversion::ToSQLiteString(obj->getLongMessage())
+				<< "," << obj->getPeriodStart().toSQLString()
+				<< "," << obj->getPeriodEnd().toSQLString()
+				<< "," << Conversion::ToString(obj->getScenario()->getKey())
+				<< ")";
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 	}
 
@@ -62,6 +95,25 @@ namespace synthese
 			: SQLiteInheritedRegistryTableSync<AlarmTableSync, ScenarioSentAlarmInheritedTableSync, ScenarioSentAlarm>()
 		{
 
+		}
+
+
+
+		void ScenarioSentAlarmInheritedTableSync::Search( util::Env& env, const SentScenario* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool orderByStatus /*= false */, bool orderByConflict /*= false */, bool raisingOrder /*= false*/, util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */ )
+		{
+			stringstream query;
+			query
+				<< " SELECT a.*"
+				<< " FROM " << TABLE_NAME << " AS a "
+				<< " WHERE "
+				<< COL_IS_TEMPLATE << "=0"
+				<< " AND " << COL_SCENARIO_ID << "=" << scenario->getKey();
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

@@ -35,6 +35,8 @@
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/Interface.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -66,10 +68,13 @@ namespace synthese
 			const UserFavoriteInterfacePage* page(_page->getInterface()->getPage<UserFavoriteInterfacePage>(_elementPageCode->getValue(parameters, variables, object, request)));
 
 			const User* user(request->getUser().get());
-			vector<shared_ptr<UserFavoriteJourney> > journeys(UserFavoriteJourneyTableSync::search(user));
-
-			for (vector<boost::shared_ptr<UserFavoriteJourney> >::const_iterator it(journeys.begin()); it != journeys.end(); ++it)
-				page->display(stream, it->get(), variables, request);
+			
+			Env env;
+			UserFavoriteJourneyTableSync::Search(env, user);
+			BOOST_FOREACH(shared_ptr<UserFavoriteJourney> fav, env.template getRegistry<UserFavoriteJourney>())
+			{
+				page->display(stream, fav.get(), variables, request);
+			}
 
 			return string();
 		}

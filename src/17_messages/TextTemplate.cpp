@@ -21,21 +21,26 @@
 */
 
 #include "TextTemplate.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
+
 	namespace util
 	{
-		template<> typename Registrable<uid,messages::TextTemplate>::Registry Registrable<uid,messages::TextTemplate>::_registry;
+		template<> const string Registry<messages::TextTemplate>::KEY("TextTemplate");
 	}
 
 	namespace messages
 	{
 
 
-		TextTemplate::TextTemplate()
-			: Registrable<uid, TextTemplate>()
+		TextTemplate::TextTemplate(
+			RegistryKeyType key
+		):	Registrable(key)
 		{
 
 		}

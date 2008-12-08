@@ -22,16 +22,16 @@
 
 #include "SiteTableSync.h"
 
-#include "36_places_list/Site.h"
+#include "Site.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/SQLiteResult.h"
+#include "SQLiteResult.h"
 
-#include "04_time/Date.h"
+#include "Date.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfaceTableSync.h"
+#include "Interface.h"
+#include "InterfaceTableSync.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>
@@ -59,9 +59,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<SiteTableSync>::TABLE_ID = 25;
 		template<> const bool SQLiteTableSyncTemplate<SiteTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::load(Site* site, const SQLiteResultSPtr& rows)
-		{
-		    site->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Load(
+			Site* site,
+			const SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 		    site->setName(rows->getText (SiteTableSync::TABLE_COL_NAME));
 		    site->setStartDate(Date::FromSQLDate(rows->getText (SiteTableSync::TABLE_COL_START_DATE)));
 		    site->setEndDate(Date::FromSQLDate(rows->getText(SiteTableSync::TABLE_COL_END_DATE)));
@@ -91,27 +94,25 @@ namespace synthese
 				site->addHourPeriod(period);
 			}
 
-
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				uid id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
+				if (id != UNKNOWN_VALUE)
+					obj->setInterface(InterfaceTableSync::Get(id, obj, false, temporary));
+			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::_link(Site* obj, const db::SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			uid id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
-			if (id != UNKNOWN_VALUE)
-				obj->setInterface(InterfaceTableSync::Get(id, obj, false, temporary));
-		}
-
-
-
-		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::_unlink(Site* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Unlink(
+			Site* obj,
+			Env* env
+		){
 			obj->setInterface(NULL);
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::save(Site* site)
+		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Save(Site* site)
 		{
 			stringstream query;
 			query << " REPLACE INTO " << TABLE_NAME << " VALUES("
@@ -171,14 +172,14 @@ namespace synthese
 		}
 
 
-		vector<shared_ptr<Site> > SiteTableSync::search(
+		void SiteTableSync::Search(
+			Env* env,
 			std::string name
 			, int first /*= 0*/, int number /*= 0*/ 
 			, bool orderByName
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -194,23 +195,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Site> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<Site> object(new Site);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

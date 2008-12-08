@@ -27,8 +27,7 @@
 
 #include "15_env/AccessParameters.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -42,7 +41,8 @@ namespace synthese
 		/** UserFavoriteJourney class.
 			@ingroup m53
 		*/
-		class UserFavoriteJourney : public util::Registrable<uid,UserFavoriteJourney>
+		class UserFavoriteJourney
+		:	public util::Registrable
 		{
 		private:
 			const security::User*	_user;

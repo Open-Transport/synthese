@@ -56,32 +56,42 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE_ID = 36;
 		template<> const bool SQLiteTableSyncTemplate<DisplayTypeTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::load(DisplayType* object, const db::SQLiteResultSPtr& rows )
-		{
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
+		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Load(
+			DisplayType* object,
+			const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
+		){
 			object->setName(rows->getText ( DisplayTypeTableSync::TABLE_COL_NAME));
 			object->setRowNumber(rows->getInt ( DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER));
 			object->setMaxStopsNumber(rows->getInt ( DisplayTypeTableSync::COL_MAX_STOPS_NUMBER));
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				uid id(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID));
+
+				try
+				{
+					object->setInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
+				}
+				catch (...)
+				{
+					
+				}
+			}
 		}
 
-
-		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::_link(DisplayType* object, const db::SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			uid id(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID));
-
-			if (Interface::Contains(id))
-				object->setInterface(InterfaceTableSync::Get(id, object, false, GET_AUTO));
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::_unlink(DisplayType* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Unlink(
+			DisplayType* obj,
+			Env* env
+		){
 			obj->setInterface(NULL);
 		}
 
     
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::save(DisplayType* object)
+		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Save(
+			DisplayType* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			if (object->getKey() <= 0)
@@ -119,14 +129,15 @@ namespace synthese
 			addTableColumn(COL_MAX_STOPS_NUMBER, "INTEGER", true);
 		}
 
-		vector<shared_ptr<DisplayType> > DisplayTypeTableSync::search(
+		void DisplayTypeTableSync::Search(
+			Env& env,
 			string exactName
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByName
-			, bool raisingOrder
+			, bool raisingOrder,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -141,23 +152,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<DisplayType> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<DisplayType> object(new DisplayType);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_TEMPORARY);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

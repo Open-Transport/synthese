@@ -65,7 +65,7 @@ namespace synthese
 			if (_withBike && !complyer.getBikeCompliance()->isCompatibleWith(logic::tribool(true)))
 				return false;
 
-			if (_fare && complyer.getFare()->isCompliant() == logic::tribool(true) && complyer.getFare() != _fare)
+			if (_fare && complyer.getFare()->isCompliant() == logic::tribool(true) && complyer.getFare().get() != _fare)
 				return false;
 
 			if (_disabledUser && !complyer.getHandicappedCompliance()->isCompatibleWith(logic::tribool(true)))

@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -58,10 +58,12 @@ namespace synthese
 			PhysicalStopTableSync ();
 			~PhysicalStopTableSync ();
 
-			static std::vector<boost::shared_ptr<PhysicalStop> > Search(
+			static void Search(
+				util::Env& env,
 				uid placeId = UNKNOWN_VALUE
 				, int first = 0
-				, int number = 0
+				, int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 	}

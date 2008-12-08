@@ -38,9 +38,10 @@ namespace synthese
 
 	namespace env
 	{
-		Place::Place (const std::string& name,
-				  const City* city)
-			: _name (name)
+		Place::Place(
+			const std::string& name,
+			const City* city
+		):	_name (name)
 			, _city (city)
 			, _isoBarycentreToUpdate(false)
 		{

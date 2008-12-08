@@ -20,28 +20,36 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/ScenarioSentAlarm.h"
-#include "17_messages/AlarmTemplate.h"
-#include "17_messages/SentScenario.h"
+#include "ScenarioSentAlarm.h"
+#include "AlarmTemplate.h"
+#include "SentScenario.h"
+#include "Registry.h"
 
 namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> const std::string Registry<messages::ScenarioSentAlarm>::KEY("ScenarioSentAlarm");
+	}
+
+
 	namespace messages
 	{
 		ScenarioSentAlarm::ScenarioSentAlarm(const SentScenario* scenario, const AlarmTemplate& source )
-			: SentAlarm()
-			, _scenario(scenario)
+		:	SentAlarm(),
+			_scenario(scenario)
 		{
 			setLevel(source.getLevel());
 			setShortMessage(source.getShortMessage());
 			setLongMessage(source.getLongMessage());
 		}
 
-		ScenarioSentAlarm::ScenarioSentAlarm( const SentScenario* scenario )
-			: SentAlarm()
-			, _scenario(scenario)
+		ScenarioSentAlarm::ScenarioSentAlarm(RegistryKeyType key, const SentScenario* scenario )
+		:	Registrable(key),
+			SentAlarm(),
+			_scenario(scenario)
 		{
 
 		}

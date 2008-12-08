@@ -42,5 +42,13 @@ namespace synthese
 
 			InterfacePage::display(stream, pv, variables, object, request);
 		}
+
+
+
+		DurationInterfacePage::DurationInterfacePage()
+			: Registrable()
+		{
+
+		}
 	}
 }

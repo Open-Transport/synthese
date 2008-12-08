@@ -20,11 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/ReservationRule.h"
+#include "ReservationRule.h"
+#include "Registry.h"
 
-#include "04_time/Schedule.h"
+#include "Schedule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -33,14 +35,13 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::ReservationRule>::Registry Registrable<uid,env::ReservationRule>::_registry;
-		template<> boost::shared_ptr<const env::ReservationRule> RegistrableWithNeutralElement<uid,env::ReservationRule>::_neutral(new env::ReservationRule);
+		template<> const string Registry<env::ReservationRule>::KEY("ReservationRule");
 	}
 
 	namespace env
 	{
-		ReservationRule::ReservationRule()
-		: RegistrableWithNeutralElement<uid,ReservationRule> ()
+		ReservationRule::ReservationRule(RegistryKeyType key)
+		: Registrable(key)
 		, Compliance(false, UNKNOWN_VALUE)
 		, _online(false)
 		, _minDelayMinutes(0)
@@ -53,7 +54,6 @@ namespace synthese
 		ReservationRule::~ReservationRule()
 		{
 		}
-
 
 
 

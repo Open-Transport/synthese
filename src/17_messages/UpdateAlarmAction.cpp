@@ -64,7 +64,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm.reset(AlarmTableSync::GetUpdateable(_request->getObjectId(), true));
+				_alarm = AlarmTableSync::GetEditable(_request->getObjectId());
 				_singleSentAlarm = dynamic_pointer_cast<SingleSentAlarm, Alarm>(_alarm);
 
 				_type = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE, true, FACTORY_KEY));
@@ -76,7 +76,7 @@ namespace synthese
 					_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 				}
 			}
-			catch (ObjectNotFoundException<uid,Alarm>& e)
+			catch (ObjectNotFoundException<Alarm>& e)
 			{
 				throw ActionException(e.getMessage());
 			}

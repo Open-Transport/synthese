@@ -53,18 +53,24 @@ namespace synthese
 
 		void DeleteProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			if (!Profile::Contains(_request->getObjectId()))
+			try
+			{
+				_profile = ProfileTableSync::Get(_request->getObjectId());
+			}
+			catch(...)
+			{
 				throw ActionException("Specified Profile not found");
-			_profile = ProfileTableSync::Get(_request->getObjectId());
+			}
 
 			// Search of child profiles
-			vector<shared_ptr<Profile> > profiles = ProfileTableSync::Search(_profile, 0, 1);
-			if (!profiles.empty())
+			Env env;
+			ProfileTableSync::Search(env, _profile, 0, 1);
+			if (!env.template getRegistry<Profile>().empty())
 				throw ActionException("Au moins un profil hérite du profil spécifié. La suppression est impossible.");
 
 			// Search of users
-			vector<shared_ptr<User> > users = UserTableSync::Search("%","%","%","%", _profile->getKey(), boost::logic::indeterminate, 0, 1);
-			if (!users.empty())
+			UserTableSync::Search(env, "%","%","%","%", _profile->getKey(), boost::logic::indeterminate, 0, 1);
+			if (!env.template getRegistry<User>().empty())
 				throw ActionException("Au moins un utilisateur appartient au profil spécifié. La suppression est impossible.");
 		}
 

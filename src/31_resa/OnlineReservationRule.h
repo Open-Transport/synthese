@@ -23,8 +23,8 @@
 #ifndef SYNTHESE_CMODALITERESERVATIONENLIGNE_H
 #define SYNTHESE_CMODALITERESERVATIONENLIGNE_H
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
+
 
 #include <boost/logic/tribool.hpp>
 
@@ -46,7 +46,8 @@ namespace synthese
 			@date 2007
 			@ingroup m31
 		*/
-		class OnlineReservationRule : public util::Registrable<uid, OnlineReservationRule>
+		class OnlineReservationRule
+		:	public virtual util::Registrable
 		{
 		public:
 			typedef std::set<int> CapacityThresholds;
@@ -114,7 +115,8 @@ namespace synthese
 
 			//! \name Constructeurs et destructeurs
 			//@{
-				OnlineReservationRule();
+				OnlineReservationRule(util::RegistryKeyType key);
+				~OnlineReservationRule();
 			//@}
 
 		};

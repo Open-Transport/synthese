@@ -21,6 +21,8 @@
 */
 
 
+#define NOMINMAX
+#include <limits>
 #include "VertexAccessMap.h"
 
 #include "Vertex.h"
@@ -30,7 +32,6 @@
 
 #include <assert.h>
 #include <set>
-#include <limits>
 
 using namespace std;
 

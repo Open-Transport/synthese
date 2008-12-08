@@ -61,7 +61,7 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetUpdateable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
 
 				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
 				
@@ -76,7 +76,7 @@ namespace synthese
 		void AddForbiddenPlaceToDisplayScreen::run()
 		{
 			_screen->addForbiddenPlace(_place.get());
-			DisplayScreenTableSync::save(_screen.get());
+			DisplayScreenTableSync::Save(_screen.get());
 		}
 	}
 }

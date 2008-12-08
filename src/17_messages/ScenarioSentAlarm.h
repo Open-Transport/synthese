@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_ScenarioSentAlarm_h__
 #define SYNTHESE_ScenarioSentAlarm_h__
 
-#include "17_messages/SentAlarm.h"
+
+#include "SentAlarm.h"
 
 namespace synthese
 {
@@ -36,7 +37,7 @@ namespace synthese
 			@ingroup m17
 		*/
 		class ScenarioSentAlarm
-			: public SentAlarm
+		:	public SentAlarm
 		{
 		private:
 			const SentScenario* _scenario;
@@ -64,7 +65,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			ScenarioSentAlarm(const SentScenario* scenario = NULL);
+			ScenarioSentAlarm(
+				util::RegistryKeyType key = UNKNOWN_VALUE,
+				const SentScenario* scenario = NULL
+			);
 			
 			~ScenarioSentAlarm();
 

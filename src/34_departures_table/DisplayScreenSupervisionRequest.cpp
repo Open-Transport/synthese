@@ -20,10 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/RequestException.h"
+#include "RequestException.h"
 
-#include "34_departures_table/DisplayScreenSupervisionRequest.h"
-#include "34_departures_table/DisplayScreen.h"
+#include "DisplayScreenSupervisionRequest.h"
+#include "DisplayScreen.h"
+#include "DisplayScreenTableSync.h"
 
 using namespace std;
 
@@ -52,12 +53,12 @@ namespace synthese
 		{
 			try
 			{
-				uid id(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"));
-				if (!DisplayScreen::Contains(id))
-					throw RequestException("Display screen not found");
-				_displayScreen = DisplayScreen::Get(id);
-			
+				_displayScreen = DisplayScreenTableSync::Get(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"));
 				_text = map.getString(PARAMETER_STATUS, true, "dssr");
+			}
+			catch(ObjectNotFoundException<DisplayScreen>& e)
+			{
+				throw RequestException("Display screen not found / " + e.getMessage());
 			}
 			catch (...)
 			{

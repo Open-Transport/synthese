@@ -28,11 +28,11 @@
 #include <iostream>
 #include <map>
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-#include "01_util/Factory.h"
+#include "Registrable.h"
 
-#include "11_interfaces/InterfacePage.h"
+#include "Factory.h"
+
+#include "InterfacePage.h"
 
 namespace synthese
 {
@@ -52,7 +52,8 @@ namespace synthese
 			Les mod?les sont d?finis par la classe cElementInterface et ses d?riv?s, et sont ind?x?s dans le tableau de pointeurs vElement, selon une indexation par num?ro d'objet standard, selon la nomenclature des \ref InterfaceObjetsStandard .
 			 
 		*/
-		class Interface : public util::Registrable<uid, Interface>
+		class Interface
+		:	public virtual util::Registrable
 		{
 			private:
 				typedef std::map<std::string, std::map<std::string, InterfacePage*> >	PagesMap;
@@ -96,7 +97,9 @@ namespace synthese
 					void	setNoSessionDefaultPageCode(const std::string& classCode);
 				//@}
 
-				Interface( const uid id = UNKNOWN_VALUE);
+				Interface(
+					util::RegistryKeyType id = UNKNOWN_VALUE
+				);
 		};
 	}
 }

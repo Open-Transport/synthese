@@ -22,18 +22,20 @@
 
 #include "NewScenarioSendAction.h"
 
-#include "17_messages/SentScenario.h"
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/ScenarioTemplateInheritedTableSync.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/AlarmObjectLinkTableSync.h"
-#include "17_messages/MessagesLog.h"
+#include "SentScenario.h"
+#include "ScenarioTemplate.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "ScenarioTableSync.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "MessagesLog.h"
+#include "AlarmTemplateInheritedTableSync.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/QueryString.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "QueryString.h"
+#include "ParametersMap.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -64,7 +66,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_TEMPLATE, true, FACTORY_KEY));
 			try
 			{
-				_template.reset(ScenarioTemplateInheritedTableSync::Get(id));
+				_template = ScenarioTemplateInheritedTableSync::Get(id);
 			}
 			catch(...)
 			{
@@ -85,20 +87,21 @@ namespace synthese
 			_request->setObjectId(scenario->getKey());
 
 			// The action on the alarms
-			vector<shared_ptr<AlarmTemplate> > alarms = AlarmTableSync::searchTemplates(_template.get());
-			for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
+			Env env;
+			AlarmTemplateInheritedTableSync::Search(env, _template.get());
+			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.template getRegistry<AlarmTemplate>())
 			{
-				shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(scenario.get(), **it));
+				shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(scenario.get(), *templateAlarm));
 				AlarmTableSync::Save(alarm.get());
 
-				vector<shared_ptr<AlarmObjectLink> > aols = AlarmObjectLinkTableSync::search(it->get());
-				for (vector<shared_ptr<AlarmObjectLink> >::const_iterator itaol = aols.begin(); itaol != aols.end(); ++itaol)
+				Env lenv;
+				AlarmObjectLinkTableSync::Search(lenv, templateAlarm.get());
+				BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, lenv.template getRegistry<AlarmObjectLink>())
 				{
-					shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
 					aol->setAlarmId(alarm->getKey());
-					aol->setObjectId((*itaol)->getObjectId());
-					aol->setRecipientKey((*itaol)->getRecipientKey());
-					AlarmObjectLinkTableSync::save(aol.get());
+					aol->setObjectId(aol->getObjectId());
+					aol->setRecipientKey(aol->getRecipientKey());
+					AlarmObjectLinkTableSync::Save(aol.get());
 				}
 			}
 

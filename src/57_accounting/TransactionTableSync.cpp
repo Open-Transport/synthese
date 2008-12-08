@@ -84,7 +84,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::save(Transaction* t)
+		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::Save(Transaction* t)
 		{
 		    try
 		    {

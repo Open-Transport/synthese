@@ -56,7 +56,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm.reset(SingleSentAlarmInheritedTableSync::GetUpdateable(_request->getObjectId(), true));
+				_alarm = SingleSentAlarmInheritedTableSync::GetEditable(_request->getObjectId());
 			}
 			catch(...)
 			{

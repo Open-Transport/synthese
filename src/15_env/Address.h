@@ -23,10 +23,9 @@
 #ifndef SYNTHESE_ENV_ADDRESS_H
 #define SYNTHESE_ENV_ADDRESS_H
 
-#include "15_env/Vertex.h"
+#include "Vertex.h"
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+
 #include "01_util/Constants.h"
 
 #include <vector>
@@ -47,9 +46,8 @@ namespace synthese
 			  - The address belongs to a logical stop
 			@ingroup m35
 		*/
-		 class Address : 
-			 public synthese::util::Registrable<uid,Address>,
-			 public Vertex
+		class Address
+		:	 public Vertex
 		{
 		private:
 
@@ -58,7 +56,8 @@ namespace synthese
 
 		public:
 
-			Address (uid id = UNKNOWN_VALUE,
+			Address(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
 				 const AddressablePlace* place = NULL,
 				 const Road* road = NULL, 
 				 double metricOffset = UNKNOWN_VALUE,
@@ -70,7 +69,6 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const uid& getId () const;
 				const Road* getRoad() const;
 				double getMetricOffset () const;
 			//@}
@@ -87,11 +85,7 @@ namespace synthese
 				bool isPhysicalStop () const;
 				bool isConnectionAllowed() const;
 			//@}
-
-
-
 		};
-
 	}
 }
 

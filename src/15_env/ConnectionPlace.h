@@ -25,8 +25,8 @@
 
 #include <string>
 
-#include "15_env/AddressablePlace.h"
-#include "15_env/Types.h"
+#include "AddressablePlace.h"
+#include "Types.h"
 
 namespace synthese
 {
@@ -59,17 +59,21 @@ namespace synthese
 		protected:
 			ConnectionType		_connectionType;
 
-		public:
-
-			/** Constructor.
+		
+			/** Protected constructor.
+				@param key ID of the connection place
 				@param name Name of the connection place
 				@param city City which belongs the connection place
+				@param type Type of the connection place
 			*/
 			ConnectionPlace (
-				std::string name = std::string()
-				, const City* city = NULL
-				, ConnectionType type = CONNECTION_TYPE_FORBIDDEN
+				util::RegistryKeyType key,
+				const std::string& name,
+				const City* city,
+				ConnectionType type
 			);
+
+		public:
 			virtual ~ConnectionPlace ();
 
 			//! @name Getters

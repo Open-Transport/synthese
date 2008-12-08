@@ -66,7 +66,7 @@ namespace synthese
 			uid id(_request->getObjectId());
 			try
 			{
-				_account = AccountTableSync::GetUpdateable(id);
+				_account = AccountTableSync::GetEditable(id);
 			}
 			catch (...)
 			{
@@ -79,7 +79,7 @@ namespace synthese
 		void AccountLockAction::run()
 		{
 			_account->setLocked(true);
-			AccountTableSync::save(_account.get());
+			AccountTableSync::Save(_account.get());
 		}
 	}
 }

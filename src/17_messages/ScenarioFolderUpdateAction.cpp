@@ -22,13 +22,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/QueryString.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "QueryString.h"
 
 #include "ScenarioFolderUpdateAction.h"
-#include "17_messages/ScenarioFolder.h"
-#include "17_messages/ScenarioFolderTableSync.h"
+#include "ScenarioFolder.h"
+#include "ScenarioFolderTableSync.h"
+#include "Env.h"
 
 using namespace std;
 using namespace boost;
@@ -36,6 +37,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 	
 	namespace util
 	{
@@ -87,8 +89,9 @@ namespace synthese
 
 			if (_name != _folder->getName())
 			{
-				vector<shared_ptr<ScenarioFolder> > folders(ScenarioFolderTableSync::search(_parentFolder.get() ? _parentFolder->getKey() : 0, _name, 0, 1));
-				if (!folders.empty())
+				Env env;
+				ScenarioFolderTableSync::Search(env, _parentFolder.get() ? _parentFolder->getKey() : 0, _name, 0, 1);
+				if (!env.template getRegistry<ScenarioFolder>().empty())
 					throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
 			}
 		}
@@ -100,7 +103,7 @@ namespace synthese
 			_folder->setName(_name);
 			_folder->setParentId(_parentFolder.get() ? _parentFolder->getKey() : 0);
 
-			ScenarioFolderTableSync::save(_folder.get());
+			ScenarioFolderTableSync::Save(_folder.get());
 		}
 
 
@@ -110,7 +113,7 @@ namespace synthese
 			try
 			{
 				if (id)
-					_folder = ScenarioFolderTableSync::GetUpdateable(id);
+					_folder = ScenarioFolderTableSync::GetEditable(id);
 			}
 			catch(...)
 			{

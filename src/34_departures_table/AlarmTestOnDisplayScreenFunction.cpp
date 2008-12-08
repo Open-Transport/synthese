@@ -77,7 +77,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_alarm.get())
-				map.insert(QueryString::PARAMETER_OBJECT_ID, _alarm->getId());
+				map.insert(QueryString::PARAMETER_OBJECT_ID, _alarm->getKey());
 			return map;
 		}
 
@@ -161,7 +161,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm.reset(AlarmTableSync::Get(id));
+				_alarm = AlarmTableSync::Get(id);
 			}
 			catch (...)
 			{

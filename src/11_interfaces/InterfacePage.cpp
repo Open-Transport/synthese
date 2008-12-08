@@ -23,13 +23,16 @@
 #include "01_util/Log.h"
 
 #include "InterfacePage.h"
+#include "Registry.h"
 
-#include "11_interfaces/LineLabelInterfaceElement.h"
-#include "11_interfaces/GotoInterfaceElement.h"
-#include "11_interfaces/CommentInterfaceElement.h"
-#include "11_interfaces/InterfacePageException.h"
+#include "LineLabelInterfaceElement.h"
+#include "GotoInterfaceElement.h"
+#include "CommentInterfaceElement.h"
+#include "InterfacePageException.h"
 
 #include <sstream>
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -40,7 +43,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,interfaces::InterfacePage>::Registry Registrable<uid,interfaces::InterfacePage>::_registry;
+		template<> const string Registry<interfaces::InterfacePage>::KEY("InterfacePage");
 	}
 
 	namespace interfaces
@@ -54,11 +57,11 @@ namespace synthese
 			, const server::Request* request) const
 		{
 			string label_to_go;
-			for (LibraryInterfaceElement::Registry::const_iterator it = _components.begin(); it != _components.end(); ++it)
+			BOOST_FOREACH(shared_ptr<LibraryInterfaceElement> component, _components)
 			{
-				if (label_to_go.empty() || it->second->getLabel() == label_to_go)
+				if (label_to_go.empty() || component->getLabel() == label_to_go)
 				{
-					label_to_go = it->second->display(stream, parameters, vars, object, request);
+					label_to_go = component->display(stream, parameters, vars, object, request);
 				}
 			}
 		}
@@ -94,10 +97,8 @@ namespace synthese
 				if (dynamic_pointer_cast<CommentInterfaceElement, LibraryInterfaceElement>(lie).get())
 					continue;
 
-				lie->setKey(counter++);
-
 				// Store other types of interface elements
-				_components.add(lie);
+				_components.push_back(lie);
 			}
 		}
 
@@ -124,7 +125,9 @@ namespace synthese
 
 
 
-		InterfacePage::InterfacePage()
+		InterfacePage::InterfacePage(
+			RegistryKeyType key
+		):  Registrable(key)
 		{
 
 		}
@@ -159,4 +162,3 @@ namespace synthese
 		}
 	}
 }
-

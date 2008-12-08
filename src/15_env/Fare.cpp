@@ -21,8 +21,10 @@
 */
 
 #include "Fare.h"
+#include "Registry.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -30,29 +32,26 @@ namespace synthese
 
 	namespace util
 	{
-		template<> Registrable<uid,env::Fare>::Registry Registrable<uid,env::Fare>::_registry;
-		template<> boost::shared_ptr<const env::Fare> RegistrableWithNeutralElement<uid,env::Fare>::_neutral(new env::Fare);
+		template<> const string Registry<env::Fare>::KEY("Fare");
 	}
 	
 	namespace env
 	{
-		Fare::Fare()
-		: RegistrableWithNeutralElement<uid, Fare>()
+		Fare::Fare(RegistryKeyType key)
+		: Registrable(key)
 		, Compliance(boost::logic::indeterminate, UNKNOWN_VALUE)
 		{
-
 		}
+
 
 
 		Fare::~Fare ()
 		{
 		}
 
-
 		    
 		    
-		const std::string& 
-		Fare::getName () const
+		const std::string& Fare::getName () const
 		{
 			return _name;
 		}
@@ -80,6 +79,5 @@ namespace synthese
 		{
 			_type = type;
 		}
-
 	}
 }

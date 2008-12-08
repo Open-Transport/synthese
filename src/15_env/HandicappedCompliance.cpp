@@ -21,8 +21,10 @@
 */
 
 #include "HandicappedCompliance.h"
+#include "Registry.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -31,16 +33,13 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::HandicappedCompliance>::Registry Registrable<uid,env::HandicappedCompliance>::_registry;
-		template<> boost::shared_ptr<const env::HandicappedCompliance> RegistrableWithNeutralElement<uid,env::HandicappedCompliance>::_neutral(new env::HandicappedCompliance);
+		template<> const std::string Registry<env::HandicappedCompliance>::KEY("HandicappedCompliance");
 	}
 
 	namespace env
 	{
-		HandicappedCompliance::Registry _registry;
-
-		HandicappedCompliance::HandicappedCompliance()
-		: RegistrableWithNeutralElement<uid,HandicappedCompliance> ()
+		HandicappedCompliance::HandicappedCompliance(RegistryKeyType key)
+		: Registrable(key)
 		, Compliance(false, UNKNOWN_VALUE)
 		{
 
@@ -49,9 +48,5 @@ namespace synthese
 		HandicappedCompliance::~HandicappedCompliance()
 		{
 		}
-
-
-
 	}
 }
-
