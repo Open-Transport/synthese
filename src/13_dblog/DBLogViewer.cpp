@@ -49,6 +49,8 @@
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using boost::shared_ptr;
 
@@ -126,7 +128,7 @@ namespace synthese
 			// Search
 			Env env;
 			DBLogEntryTableSync::Search(
-				&env,
+				env,
 				_dbLog->getFactoryKey()
 				, _searchStartDate
 				, _searchEndDate
@@ -140,10 +142,9 @@ namespace synthese
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_USER
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
 				, _resultTableRequestParameters.raisingOrder
-			));
-			Registry<DBLogEntry> _result(env.template getRegistry<DBLogEntry>());
+			);
 			ResultHTMLTable::ResultParameters		_resultTableResultParameters;
-			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, _result);
+			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, env.template getEditableRegistry<DBLogEntry>());
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
@@ -176,9 +177,8 @@ namespace synthese
 
 			stream << t.open();
 			
-			for(Registry<DBLogEntry>::const_iterator it = _result.begin(); it != _result.end(); ++it)
+			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, env.template getRegistry<DBLogEntry>())
 			{
-				shared_ptr<DBLogEntry> dbe = it->second;
 				stream << t.row();
 				stream << t.col() << HTMLModule::getHTMLImage(DBLogModule::getEntryIcon(dbe->getLevel()), DBLogModule::getEntryLevelLabel(dbe->getLevel()));
 				stream << t.col() << dbe->getDate().toString(true);

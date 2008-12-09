@@ -56,11 +56,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ReservationTableSync>::TABLE_ID = 44;
 		template<> const bool SQLiteTableSyncTemplate<ReservationTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::load(
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Load(
 			Reservation* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env* env,
+			LinkLevel linkLevel
 		){
-			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setLineId(rows->getLongLong ( ReservationTableSync::COL_LINE_ID));
 			object->setLineCode(rows->getText ( ReservationTableSync::COL_LINE_CODE));
 			object->setServiceId(rows->getLongLong(ReservationTableSync::COL_SERVICE_ID));
@@ -76,11 +77,16 @@ namespace synthese
 			object->setReservationDeadLine(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_RESERVATION_DEAD_LINE)));
 		}
 
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object, Env * env)
+		{
+
+		}
+
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Save(Reservation* object)
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() <= 0)
+			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
                
 			 query

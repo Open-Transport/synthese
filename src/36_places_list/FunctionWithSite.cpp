@@ -21,12 +21,10 @@
 */
 
 #include "FunctionWithSite.h"
-
-#include "36_places_list/Site.h"
-
-#include "30_server/RequestException.h"
-
-#include "01_util/Conversion.h"
+#include "Site.h"
+#include "RequestException.h"
+#include "Conversion.h"
+#include "Env.h"
 
 using namespace std;
 using namespace boost;
@@ -51,7 +49,7 @@ namespace synthese
 		{
 			try
 			{
-				_site = Env::GetOfficialEnv()->getRegistry<Site>()::get(map.getUid(PARAMETER_SITE, true, "fws"));
+				_site = Env::GetOfficialEnv()->getRegistry<Site>().get(map.getUid(PARAMETER_SITE, true, "fws"));
 			}
 			catch (ObjectNotFoundException<Site>& e)
 			{

@@ -97,7 +97,7 @@ namespace synthese
 			pv.push_back(originPlaceName);
 			pv.push_back(Conversion::ToString(accessParameters.getBikeFilter()));
 			pv.push_back(destinationCity->getName());
-			pv.push_back(Conversion::ToString(destinationPlace->getKy()));
+			pv.push_back(Conversion::ToString(destinationPlace->getKey()));
 			pv.push_back(destinationPlaceName);
 			pv.push_back(Conversion::ToString(periodId));
 			pv.push_back(sDate.str());

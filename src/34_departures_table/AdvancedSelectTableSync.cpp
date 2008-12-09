@@ -122,7 +122,7 @@ namespace synthese
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = rows->getInt ("bc");
 					object->place.reset(new PublicTransportStopZoneConnectionPlace);
-					ConnectionPlaceTableSync::load(object->place.get(), rows);
+					ConnectionPlaceTableSync::Load(object->place.get(), rows);
 					object->cityName = rows->getText ("city_name");
 					objects.push_back(object);
 				}
@@ -160,7 +160,7 @@ namespace synthese
 				vector<shared_ptr<const CommercialLine> > objects;
 				while (rows->next ())
 				{
-					objects.push_back(CommercialLine::Get(
+					objects.push_back(Env::GetOfficialEnv()->template getRegistry<CommercialLine>().get(
 							  rows->getLongLong (TABLE_COL_ID)));
 				}
 				return objects;

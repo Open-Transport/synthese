@@ -112,7 +112,7 @@ namespace synthese
 				, false // _resultTableRequestParameters.orderField == PARAMETER_SEARCH_USER
 				, false // _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
 				, _requestParameters.raisingOrder
-			));
+			);
 			ResultHTMLTable::ResultParameters rp;
 			rp.setFromResult(_requestParameters, env.template getEditableRegistry<DBLogEntry>());
 			

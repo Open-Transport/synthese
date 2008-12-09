@@ -146,11 +146,12 @@ namespace synthese
 
 		void ResaModule::initialize()
 		{
-			vector<shared_ptr<Profile> > profiles(ProfileTableSync::Search(_BASIC_PROFILE_NAME));
-			if (profiles.size() == 0)
+			Env env;
+			ProfileTableSync::Search(env, _BASIC_PROFILE_NAME);
+			if (env.template getRegistry<Profile>().empty())
 				_basicProfile.reset(new Profile);
 			else
-				_basicProfile = profiles.front();
+				_basicProfile = env.template getEditableRegistry<Profile>().front();
 			_basicProfile->setName(_BASIC_PROFILE_NAME);
 			shared_ptr<Right> r(new GlobalRight);
 			r->setPrivateLevel(FORBIDDEN);
@@ -221,7 +222,7 @@ namespace synthese
 
 			// Results
 			ResultHTMLTable::ResultParameters resultParameters;
-			resultParameters.setFromResult(_requestParameters, resats);
+			resultParameters.setFromResult(_requestParameters, logEnv.template getEditableRegistry<DBLogEntry>());
 
 			// Display
 			DateTime now(TIME_CURRENT);
@@ -236,7 +237,7 @@ namespace synthese
 			ResultHTMLTable rt(ht, searchRequest.getHTMLForm(), _requestParameters, resultParameters);
 			stream << rt.open();
 
-			BOOST_FOREACH(shared_ptr<DBLogEntry> entry, env;template getRegistry<DBLogEntry>())
+			BOOST_FOREACH(shared_ptr<DBLogEntry> entry, logEnv.template getRegistry<DBLogEntry>())
 			{
 				DBLogEntry::Content content(entry->getContent());
 				ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE])));

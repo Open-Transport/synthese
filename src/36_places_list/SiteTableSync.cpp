@@ -98,7 +98,7 @@ namespace synthese
 			{
 				uid id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
 				if (id != UNKNOWN_VALUE)
-					obj->setInterface(InterfaceTableSync::Get(id, obj, false, temporary));
+					site->setInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
 			}
 		}
 
@@ -173,7 +173,7 @@ namespace synthese
 
 
 		void SiteTableSync::Search(
-			Env* env,
+			Env& env,
 			std::string name
 			, int first /*= 0*/, int number /*= 0*/ 
 			, bool orderByName

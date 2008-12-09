@@ -24,22 +24,24 @@
 
 #include "ResaCustomersAdmin.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
 
-#include "31_resa/ResaModule.h"
-#include "31_resa/ResaRight.h"
-#include "31_resa/ResaCustomerAdmin.h"
+#include "ResaModule.h"
+#include "ResaRight.h"
+#include "ResaCustomerAdmin.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
+#include "QueryString.h"
+#include "Request.h"
 
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "ModuleAdmin.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
-#include "05_html/SearchFormHTMLTable.h"
-#include "05_html/ResultHTMLTable.h"
+#include "SearchFormHTMLTable.h"
+#include "ResultHTMLTable.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -88,7 +90,9 @@ namespace synthese
 		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
 			// Search
-			vector<shared_ptr<security::User> >	users(UserTableSync::Search(
+			Env env;
+			UserTableSync::Search(
+				env,
 				"%" + _searchLogin + "%"
 				, "%" + _searchName + "%"
 				, "%" + _searchSurname + "%"
@@ -101,10 +105,9 @@ namespace synthese
 				, _requestParameters.orderField == PARAM_SEARCH_NAME
 				, false
 				, _requestParameters.raisingOrder
-			));
-
+			);
 			ResultHTMLTable::ResultParameters	resultParameters;
-			resultParameters.setFromResult(_requestParameters, users);
+			resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<User>());
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
@@ -126,7 +129,7 @@ namespace synthese
 			stream << "<h1>Résultats</h1>";
 
 			// Results
-			if (users.empty())
+			if (env.template getRegistry<User>().empty())
 				stream << "<p>Aucun client trouvé.</p>";
 			else
 			{
@@ -140,16 +143,16 @@ namespace synthese
 
 				stream << t.open();
 
-				for (vector<shared_ptr<User> >::const_iterator it(users.begin()); it != users.end(); ++it)
+				BOOST_FOREACH(shared_ptr<User> user, env.template getRegistry<User>())
 				{
-					openRequest.setObjectId((*it)->getKey());
+					openRequest.setObjectId(user->getKey());
 
 					stream << t.row();
 
-					stream << t.col() << (*it)->getName();
-					stream << t.col() << (*it)->getSurname();
-					stream << t.col() << (*it)->getPhone();
-					stream << t.col() << (*it)->getLogin();
+					stream << t.col() << user->getName();
+					stream << t.col() << user->getSurname();
+					stream << t.col() << user->getPhone();
+					stream << t.col() << user->getLogin();
 
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "user.png");
 				}

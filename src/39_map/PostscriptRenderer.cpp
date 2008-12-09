@@ -31,10 +31,12 @@
 #include "MapBackground.h"
 #include "MapBackgroundManager.h"
 
-#include "06_geometry/Point2D.h"
+#include "Point2D.h"
 
-#include "01_util/Log.h"
-#include "01_util/Conversion.h"
+#include "Log.h"
+#include "Conversion.h"
+#include "Registry.h"
+#include "Line.h"
 
 #include <cmath>
 #include <iostream>
@@ -47,6 +49,8 @@ namespace synthese
 	using namespace geometry;
 	using namespace util;
 	using namespace map;
+	using namespace env;
+	
 
 	namespace util
 	{
@@ -72,7 +76,7 @@ namespace synthese
 		PostscriptRenderer::render (
 		const boost::filesystem::path& tempDir, 
 		const std::string& filenamePrefix,
-		const Regitry<Line>& lines,
+		const Registry<Line>& lines,
 		synthese::map::Map& map,
 		const synthese::map::RenderingConfig& config
 		)		{

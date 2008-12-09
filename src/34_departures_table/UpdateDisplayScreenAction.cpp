@@ -20,22 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
-#include "34_departures_table/UpdateDisplayScreenAction.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/ArrivalDepartureTableLog.h"
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayScreen.h"
+#include "UpdateDisplayScreenAction.h"
+#include "DisplayScreenTableSync.h"
+#include "ArrivalDepartureTableLog.h"
+#include "DisplayType.h"
+#include "DisplayTypeTableSync.h"
+#include "DisplayScreen.h"
 
-#include "13_dblog/DBLogModule.h"
+#include "DBLogModule.h"
 
 using namespace std;
 using namespace boost;
@@ -97,7 +98,7 @@ namespace synthese
 
 				// Type
 				uid id(map.getUid(PARAMETER_TYPE, true, FACTORY_KEY));
-				_type = DisplayType::Get(id);
+				_type = DisplayTypeTableSync::Get(id);
 
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)

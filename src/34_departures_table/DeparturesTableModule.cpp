@@ -20,15 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/UId.h"
+#include "UId.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/CommercialLine.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "CommercialLine.h"
 
-#include "34_departures_table/DeparturesTableModule.h"
-#include "34_departures_table/AdvancedSelectTableSync.h"
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayScreen.h"
+#include "DeparturesTableModule.h"
+#include "AdvancedSelectTableSync.h"
+#include "DisplayType.h"
+#include "DisplayTypeTableSync.h"
+#include "DisplayScreen.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -50,8 +53,12 @@ namespace synthese
 			vector<pair<uid, string> > m;
 			if (withAll)
 				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
-			for(DisplayType::ConstIterator it(DisplayType::Begin()); it != DisplayType::End(); ++it)
-				m.push_back(make_pair(it->first, it->second->getName()));
+			Env env;
+			DisplayTypeTableSync::Search(env);
+			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.template getRegistry<DisplayType>())
+			{
+				m.push_back(make_pair(displayType->getKey(), displayType->getName()));
+			}
 			return m;
 		}
 

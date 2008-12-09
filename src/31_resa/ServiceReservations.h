@@ -26,6 +26,8 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
+#include "Env.h"
+
 namespace synthese
 {
 	namespace env
@@ -44,8 +46,8 @@ namespace synthese
 		class ServiceReservations
 		{
 		public:
-			const env::Service*			service;
-			Env						reservationsEnv;
+			const env::Service*		service;
+			util::Env				reservationsEnv;
 			int						seatsNumber;
 			bool					overflow;
 			bool					status;

@@ -1,6 +1,7 @@
-
-/** NonPermanentService class implementation.
-	@file NonPermanentService.cpp
+/** RegistryBase class implementation.
+	@file RegistryBase.cpp
+	@author Hugues Romain
+	@date 2008
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,48 +21,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "NonPermanentService.h"
-
-using namespace std;
+// util
+#include "RegistryBase.h"
 
 namespace synthese
 {
-	using namespace util;
-
-	namespace env
+	namespace util
 	{
-		NonPermanentService::NonPermanentService(
-			RegistryKeyType key
-		):	Registrable(key),
-			Service()
+		RegistryBase::RegistryBase()
 		{
-		}
 
-
-
-		NonPermanentService::NonPermanentService(
-			string serviceNumber,
-			Path* path
-		):	Service(serviceNumber, path),
-			Registrable()
-		{
-		}
-
-
-
-		bool NonPermanentService::isProvided( const time::Date& departureDate) const
-		{
-			return _calendar.isMarked ( departureDate );
-		}
-
-		Calendar& NonPermanentService::getCalendar()
-		{
-			return _calendar;
-		}
-
-		const Calendar& NonPermanentService::getCalendar() const
-		{
-			return _calendar;
 		}
 	}
 }

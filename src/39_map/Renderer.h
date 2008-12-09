@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 
+#include "Registry.h"
 #include "RenderingConfig.h"
 #include "15_env/Line.h"
 

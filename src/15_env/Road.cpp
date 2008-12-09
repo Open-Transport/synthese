@@ -50,7 +50,7 @@ namespace synthese
 			, _type (type)
 		{
 			// Creation of the permanent service
-			addService(new PermanentService(this));
+			addService(new PermanentService(id, this));
 		}
 
 

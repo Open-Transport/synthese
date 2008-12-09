@@ -20,17 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/PhysicalStop.h"
+#include "PhysicalStop.h"
+#include "PhysicalStopTableSync.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
-#include "34_departures_table/DisplayScreenRemovePhysicalStopAction.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
+#include "DisplayScreenRemovePhysicalStopAction.h"
+#include "DisplayScreen.h"
+#include "DisplayScreenTableSync.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace boost;
 using namespace std;
@@ -63,7 +64,7 @@ namespace synthese
 				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
 
 				uid id(map.getUid(PARAMETER_PHYSICAL, true, FACTORY_KEY));
-				_stop = PhysicalStop::Get(id);
+				_stop = PhysicalStopTableSync::Get(id);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{

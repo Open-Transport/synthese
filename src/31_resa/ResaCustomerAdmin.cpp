@@ -161,7 +161,7 @@ namespace synthese
 				, false
 				, false
 				, _requestParameters.raisingOrder 
-			));
+			);
 
 			// Display
 			stream << "<h1>Liens</h1>";

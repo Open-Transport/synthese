@@ -21,9 +21,17 @@
 */
 
 #include "AlarmTemplate.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> const string Registry<messages::AlarmTemplate>::KEY("AlarmTemplate");
+	}
+
 	namespace messages
 	{
 		AlarmTemplate::~AlarmTemplate()

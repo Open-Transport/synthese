@@ -29,6 +29,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace time;
+	using namespace util;
 
 	namespace env
 	{
@@ -43,11 +44,12 @@ namespace synthese
 		}
 
 
-		Service::Service()
-		: Complyer()
-		, _path(NULL)
+		Service::Service(
+			RegistryKeyType id
+		):	Complyer(),
+			_path(NULL),
+			Registrable(id)
 		{
-
 		}
 
 

@@ -20,12 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "12_security/User.h"
+#include "User.h"
 
 #include "DisplayMaintenanceLog.h"
-#include "34_departures_table/DisplayScreen.h"
+#include "DisplayScreen.h"
+#include "DisplayScreenTableSync.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 #include <sstream>
 
@@ -110,7 +111,7 @@ namespace synthese
 			// Screen
 			try
 			{
-				shared_ptr<const DisplayScreen> screen = DisplayScreen::Get(id);
+				shared_ptr<const DisplayScreen> screen = DisplayScreenTableSync::Get(id);
 				return screen->getFullName();
 			}
 			catch (...)

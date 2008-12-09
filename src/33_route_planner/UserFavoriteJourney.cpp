@@ -21,12 +21,20 @@
 */
 
 #include "UserFavoriteJourney.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace security;
 	using namespace env;
 	using namespace util;
+
+	namespace util
+	{
+		template<> const string Registry<routeplanner::UserFavoriteJourney>::KEY("UserFavoriteJourney");
+	}
 
 	namespace routeplanner
 	{

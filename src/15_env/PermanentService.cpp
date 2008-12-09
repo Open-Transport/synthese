@@ -35,6 +35,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace time;
+	using namespace util;
 
 	namespace env
 	{
@@ -99,10 +100,7 @@ namespace synthese
 			return true;
 		}
 
-		uid PermanentService::getId() const
-		{
-			return uid(UNKNOWN_VALUE);
-		}
+	
 
 		bool PermanentService::isContinuous() const
 		{
@@ -115,10 +113,14 @@ namespace synthese
 			return Schedule(Hour(TIME_MIN),0);
 		}
 
-		PermanentService::PermanentService( Path* path )
-			: Service(string(), path)
+		PermanentService::PermanentService(
+			RegistryKeyType id,
+			Path* path
+		):	Registrable(id),
+			Service(string(), path)
 		{
-			path->setAllDays(true);
+			if (path != NULL)
+				path->setAllDays(true);
 		}
 	}
 }

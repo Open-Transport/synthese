@@ -113,7 +113,7 @@ namespace synthese
 			DateTime now(TIME_CURRENT);
 			Env env;
 			ReservationTableSync::Search(env, _transaction.get());
-			for(shared_ptr<Reservation> resa, env.template getRegistry<Reservation>())
+			BOOST_FOREACH(shared_ptr<Reservation> resa, env.template getRegistry<Reservation>())
 			{
 				if (resa->getReservationRuleId() != UNKNOWN_VALUE)
 				{

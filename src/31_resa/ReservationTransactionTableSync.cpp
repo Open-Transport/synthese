@@ -36,6 +36,8 @@
 
 #include "01_util/Conversion.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -78,10 +80,10 @@ namespace synthese
 			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
 				Env senv;
-				ReservationTableSync::Search(senv, object.get());
-				BOOST_FOREACH(shared_ptr<Reservation> resa, senv.template getRegistry<Reservation>())
+				ReservationTableSync::Search(senv, object);
+				BOOST_FOREACH(shared_ptr<Reservation> reser, senv.template getRegistry<Reservation>())
 				{
-					object->addReservation(resa);
+					object->addReservation(reser);
 				}
 			}
 		}
@@ -148,7 +150,7 @@ namespace synthese
 			addTableColumn(COL_CANCEL_USER_ID, "INTEGER");
 		}
 
-		vector<shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::Search(
+		void ReservationTransactionTableSync::Search(
 			Env& env,
 			const env::Service* service
 			, const time::Date& originDate

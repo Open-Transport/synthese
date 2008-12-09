@@ -36,6 +36,8 @@ namespace synthese
 {
 	using namespace util;
 	using namespace map;
+	using namespace env;
+	
 
 	namespace util
 	{

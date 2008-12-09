@@ -21,9 +21,9 @@
 */
 
 #include "ReservationTransaction.h"
-
-#include "31_resa/Reservation.h"
-#include "31_resa/ResaModule.h"
+#include "Registry.h"
+#include "Reservation.h"
+#include "ResaModule.h"
 
 using namespace std;
 using namespace boost;
@@ -32,6 +32,11 @@ namespace synthese
 {
 	using namespace util;
 	using namespace time;
+
+	namespace util
+	{
+		template<> const string Registry<resa::ReservationTransaction>::KEY("ReservationTransaction");
+	}
 
 	namespace resa
 	{

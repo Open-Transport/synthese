@@ -36,6 +36,7 @@
 #include "11_interfaces/Interface.h"
 
 #include "01_util/Conversion.h"
+#include "Env.h"
 
 #include <sstream>
 #include <set>
@@ -87,8 +88,8 @@ namespace synthese
 			set<const ReservationRule*> resaRules;
 			for (Journey::ServiceUses::const_iterator it(journey->getServiceUses().begin()); it != journey->getServiceUses().end(); ++it)
 			{
-				if (it->getService()->getReservationRule() && it->getService()->getReservationRule() != ReservationRule::Get(0).get())
-					resaRules.insert(it->getService()->getReservationRule());
+				if (it->getService()->getReservationRule() && it->getService()->getReservationRule() != Env::GetOfficialEnv()->getRegistry<ReservationRule>().get(0))
+					resaRules.insert(it->getService()->getReservationRule().get());
 			}
 			stringstream sPhones;
 			bool onlineBooking(!resaRules.empty());
@@ -137,7 +138,7 @@ namespace synthese
 
 
 		JourneyBoardInterfacePage::JourneyBoardInterfacePage()
-			: Registrable(),
+			: Registrable()
 		{
 
 		}

@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_env_PermanentService_h__
 #define SYNTHESE_env_PermanentService_h__
 
-#include "15_env/Service.h"
+#include "Service.h"
 
 namespace synthese
 {
@@ -35,7 +35,10 @@ namespace synthese
 		class PermanentService : public Service
 		{
 		public:
-			PermanentService(Path* path);
+			PermanentService(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				Path* path = NULL
+			);
 			
 			/** Gets a departure schedule for this service.
 				@param rank Rank of the stop where to get the departure schedule.
@@ -45,8 +48,6 @@ namespace synthese
 			virtual time::Schedule getDepartureSchedule(int rank = 0) const;
 
 			virtual bool isContinuous () const;
-
-			virtual uid		getId()	const;
 
 
 			/** Is this service providen a given day ?

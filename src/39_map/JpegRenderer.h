@@ -26,9 +26,9 @@
 
 #include "Renderer.h"
 #include "PostscriptCanvas.h"
-
-#include "01_util/RGBColor.h"
-#include "01_util/FactorableTemplate.h"
+#include "Registry.h"
+#include "RGBColor.h"
+#include "FactorableTemplate.h"
 
 #include <iostream>
 #include <string>

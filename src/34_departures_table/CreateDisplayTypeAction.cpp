@@ -20,18 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "11_interfaces/Interface.h"
+#include "Interface.h"
+#include "InterfaceTableSync.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayTypeTableSync.h"
-#include "34_departures_table/CreateDisplayTypeAction.h"
-#include "34_departures_table/ArrivalDepartureTableLog.h"
+#include "DisplayType.h"
+#include "DisplayTypeTableSync.h"
+#include "CreateDisplayTypeAction.h"
+#include "ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -73,7 +74,7 @@ namespace synthese
 			if (_name.empty())
 				throw ActionException("Le nom ne peut être vide.");
 			Env env;
-			DisplayTypeTableSync::Search(env, _name, 0, 1));
+			DisplayTypeTableSync::Search(env, _name, 0, 1);
 			if (!env.template getRegistry<DisplayType>().empty())
 				throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 

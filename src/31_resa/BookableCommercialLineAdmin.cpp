@@ -179,7 +179,7 @@ namespace synthese
 			// Boucle sur les circulations
 			Env env;
 			ScheduledServiceTableSync::Search(
-				env
+				env,
 				UNKNOWN_VALUE
 				, _line->getKey()
 				, _startDateTime.getDate()
@@ -189,19 +189,21 @@ namespace synthese
 			map<const ScheduledService*, ServiceReservations> reservations;
 			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.template getRegistry<ScheduledService>())
 			{
-				const ReservationRule* rule(service->getReservationRule());
+				const ReservationRule* rule(service->getReservationRule().get());
 				ServiceReservations obj;
 
 				ReservationTransactionTableSync::Search(
 					obj.reservationsEnv,
-					service
+					service.get()
 					, _startDateTime.getDate()
 					, _displayCancelled
 					);
 				obj.seatsNumber = 0;
-				for (ServiceReservations::Reservations::const_iterator itr(obj.reservations.begin()); itr != obj.reservations.end(); ++itr)
-					if ((*itr)->getCancellationTime().isUnknown())
-						obj.seatsNumber += (*itr)->getSeats();
+				BOOST_FOREACH(shared_ptr<ReservationTransaction> resa, obj.reservationsEnv.template getRegistry<ReservationTransaction>())
+				{
+					if (resa->getCancellationTime().isUnknown())
+						obj.seatsNumber += resa->getSeats();
+				}
 
 				obj.overflow = rule->getCapacity() && (obj.seatsNumber > rule->getCapacity());
 
@@ -244,16 +246,16 @@ namespace synthese
 				if (serviceReservations.seatsNumber > 0)
 					stream << " - " << serviceReservations.seatsNumber << " place" << plural << " réservée" << plural;
 
-				if (serviceReservations.reservations.empty())
+				if (serviceReservations.reservationsEnv.template getRegistry<Reservation>().empty())
 				{
 					stream << t.row();
 					stream << t.col(8) << "Aucune réservation";
 				}
 				else
 				{
-					for (ServiceReservations::Reservations::const_iterator itr(serviceReservations.reservations.begin()); itr != serviceReservations.reservations.end(); ++itr)
+					BOOST_FOREACH(shared_ptr<ReservationTransaction> transac, serviceReservations.reservationsEnv.template getRegistry<ReservationTransaction>())
 					{
-						const Reservation* reservation(serviceReservations.getReservation(itr->get()).get());
+						const Reservation* reservation(serviceReservations.getReservation(transac.get()).get());
 						ReservationStatus status(reservation->getStatus());
 
 						customerRequest.setObjectId(reservation->getTransaction()->getCancelUserId());

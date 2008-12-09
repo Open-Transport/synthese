@@ -101,7 +101,9 @@ namespace synthese
 		}
 
 
-
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Unlink(Profile* profile, Env* env)
+		{
+		}
 	}
 
 	namespace security

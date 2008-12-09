@@ -28,15 +28,15 @@
 #include "UserFavoriteJourneyTableSync.h"
 #include "UserFavoriteJourney.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -76,7 +76,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				const User* user(UserTableSync::Get(rows->getLongLong(UserFavoriteJourneyTableSync::COL_USER_ID), env, linkLevel));
+				const User* user(UserTableSync::Get(rows->getLongLong(UserFavoriteJourneyTableSync::COL_USER_ID), env, linkLevel).get());
 				object->setUser(user);
 			}
 		}

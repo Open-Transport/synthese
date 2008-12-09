@@ -25,9 +25,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "DisplayTypeTableSync.h"
 #include "ArrivalDepartureTableLog.h"
 
-#include "/DBLogModule.h"
+#include "DBLogModule.h"
 
 #include "Interface.h"
+#include "InterfaceTableSync.h"
 
 #include "ActionException.h"
 #include "Request.h"

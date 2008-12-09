@@ -58,10 +58,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<ObjectSiteLink> > Search(
+			static void Search(
+				util::Env& env,
 				uid siteId = UNKNOWN_VALUE
 				, int first = 0
-				, int number = 0
+				, int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
 			/** Remove a link between a site and an object specified by their id.

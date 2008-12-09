@@ -113,7 +113,7 @@ namespace synthese
 			boost::shared_ptr<Reservation> newReservation();
 
 
-			void addReservation(shared_ptr<Reservation> resa);
+			void addReservation(boost::shared_ptr<Reservation> resa);
 
 			//! @name Queries
 			//@{				

@@ -30,6 +30,7 @@
 #include <string>
 
 #include "Schedule.h"
+#include "Registrable.h"
 
 namespace synthese
 {
@@ -63,12 +64,13 @@ namespace synthese
 			@ingroup m35
 		*/
 		class Service
-		:	public Complyer
+		:	public Complyer,
+			public virtual util::Registrable		
 		{
 		private:
-			std::string	_serviceNumber;
-			uid			_pathId;
-			Path*		_path;
+			std::string				_serviceNumber;
+			util::RegistryKeyType	_pathId;
+			Path*					_path;
 
 		public:
 
@@ -77,7 +79,9 @@ namespace synthese
 				Path* path
 			);
 
-			Service();
+			Service(
+				util::RegistryKeyType id = UNKNOWN_VALUE
+			);
 			~Service ();
 
 

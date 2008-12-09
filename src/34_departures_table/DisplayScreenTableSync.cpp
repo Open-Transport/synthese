@@ -104,7 +104,7 @@ namespace synthese
 				// Localization
 				try
 				{
-					object->setLocalization(ConnectionPlaceTableSync::Get(placeId, env, linkLevel));
+					object->setLocalization(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 				{
@@ -113,7 +113,7 @@ namespace synthese
 
 				// Type
 				if (typeId > 0)
-					object->setType(DisplayTypeTableSync::Get(typeId, env, linkLevel));
+					object->setType(DisplayTypeTableSync::Get(typeId, env, linkLevel).get());
 
 				// Physical stops
 				vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
@@ -122,7 +122,7 @@ namespace synthese
 					try
 					{
 						uid id(Conversion::ToLongLong(*it));
-						object->addPhysicalStop(PhysicalStopTableSync::Get(id, env, linkLevel));
+						object->addPhysicalStop(PhysicalStopTableSync::Get(id, env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PhysicalStop>& e)
 					{
@@ -136,7 +136,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), env, linkLevel));
+						object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
@@ -150,7 +150,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), env, linkLevel));
+						object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
@@ -164,7 +164,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addForcedDestination(ConnectionPlaceTableSync::Get (Conversion::ToLongLong(*it), env, linkLevel));
+						object->addForcedDestination(ConnectionPlaceTableSync::Get (Conversion::ToLongLong(*it), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
@@ -355,7 +355,7 @@ namespace synthese
 
 
 	    
-	    vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::Search(
+	    void DisplayScreenTableSync::Search(
 			Env& env,
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
@@ -461,12 +461,12 @@ namespace synthese
 			
 			try
 			{
-			    SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 			    vector<shared_ptr<DisplayScreen> > objects;
 			    while (rows->next ())
 			    {
 				shared_ptr<DisplayScreen> object(new DisplayScreen());
-				Load(object.get(), rows, env, linkLevel);
+				Load(object.get(), rows, &env, linkLevel);
 				objects.push_back(object);
 				
 				DisplayScreen::Complements c;
@@ -542,7 +542,6 @@ namespace synthese
 				
 				object->setComplements(c);
 			    }
-				return objects;
 			}
 			catch(SQLiteException& e)
 			{

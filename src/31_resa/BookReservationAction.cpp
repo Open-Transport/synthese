@@ -146,8 +146,9 @@ namespace synthese
 						throw ActionException("Le numéro de téléphone doit être rempli");
 
 					// Integrity test : the key is name + surname + phone
-					vector<shared_ptr<User> > users(UserTableSync::Search("%",_customer->getName(), _customer->getSurname(), _customer->getPhone(), UNKNOWN_VALUE, logic::indeterminate, 0, 1));
-					if (!users.empty())
+					Env env;
+					UserTableSync::Search(env, "%",_customer->getName(), _customer->getSurname(), _customer->getPhone(), UNKNOWN_VALUE, logic::indeterminate, 0, 1);
+					if (!env.template getRegistry<User>().empty())
 						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
 					
 					_customer->setEMail(map.getString(PARAMETER_CUSTOMER_EMAIL, false, FACTORY_KEY));
@@ -276,6 +277,13 @@ namespace synthese
 			// New reservation for each journey leg
 			for (Journey::ServiceUses::const_iterator su(_journey.getServiceUses().begin()); su != _journey.getServiceUses().end(); ++su)
 			{
+				assert(su->getService() != NULL);
+				assert(su->getService()->getReservationRule().get() != NULL);
+				assert(su->getDepartureEdge() != NULL);
+				assert(su->getDepartureEdge()->getPlace() != NULL);
+				assert(su->getArrivalEdge() != NULL);
+				assert(su->getArrivalEdge()->getPlace() != NULL);
+
 				shared_ptr<Reservation> r(rt.newReservation());
 				r->setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getKey());
 				r->setDeparturePlaceName(su->getDepartureEdge()->getPlace()->getFullName());
@@ -288,6 +296,8 @@ namespace synthese
 				const Line* line(dynamic_cast<const Line*>(su->getService()->getPath()));
 				if (line)
 				{
+					assert(line->getCommercialLine() != NULL);
+
 					r->setLineCode(line->getCommercialLine()->getName());
 					r->setLineId(line->getCommercialLine()->getKey());
 				}

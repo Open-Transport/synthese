@@ -161,7 +161,6 @@ namespace synthese
 
 		const PublicTransportStopZoneConnectionPlace* DisplayScreen::getLocalization() const
 		{
-			assert(getLinked());
 			return _localization;
 		}
 
@@ -329,7 +328,6 @@ namespace synthese
 
 		const PhysicalStops& DisplayScreen::getPhysicalStops(bool result) const
 		{
-			assert(getLinked());
 			return (_allPhysicalStopsDisplayed && _localization && result)
 				? _localization->getPhysicalStops()
 				: _physicalStops;
@@ -337,19 +335,16 @@ namespace synthese
 
 		const ForbiddenPlacesList& DisplayScreen::getForbiddenPlaces() const
 		{
-			assert(getLinked());
 			return _forbiddenArrivalPlaces;
 		}
 
 		const LineFilter& DisplayScreen::getForbiddenLines() const
 		{
-			assert(getLinked());
 			return _forbiddenLines;
 		}
 
 		const DisplayedPlacesList& DisplayScreen::getDisplayedPlaces() const
 		{
-			assert(getLinked());
 			return _displayedPlaces;
 		}
 

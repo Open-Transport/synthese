@@ -45,6 +45,7 @@
 // transport
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "Line.h"
+#include "LineTableSync.h"
 #include "EnvModule.h"
 
 // messages
@@ -241,8 +242,8 @@ namespace synthese
 		{
 			shared_ptr<const Line> line;
 			uid id(parameters.getUid(PARAMETER_SEARCH_LINE, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE && Line::Contains(id))
-				line  = Line::Get(id);
+			if (id != UNKNOWN_VALUE)
+				line  = LineTableSync::Get(id);
 
 			AlarmRecipientSearchFieldsMap map;
 			AlarmRecipientFilter arf;
@@ -269,7 +270,7 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, uid objectId )
 		{
-			remove(DisplayScreen::Get(objectId).get(), alarm);
+			remove(DisplayScreenTableSync::Get(objectId).get(), alarm);
 		}
 	}
 }

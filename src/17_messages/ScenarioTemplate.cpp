@@ -22,9 +22,17 @@
 
 #include "ScenarioTemplate.h"
 #include "AlarmTemplate.h"
+#include "Registry.h"
+
+using namespace std;
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> const string Registry<messages::ScenarioTemplate>::KEY("ScenarioTemplate");
+	}
+
 	namespace messages
 	{
 

@@ -22,20 +22,20 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "30_server/RequestException.h"
-#include "30_server/Request.h"
+#include "RequestException.h"
+#include "Request.h"
 
-#include "34_departures_table/DisplayScreenContentRequest.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayTypeTableSync.h"
+#include "DisplayScreenContentRequest.h"
+#include "DisplayScreen.h"
+#include "DisplayScreenTableSync.h"
+#include "DisplayType.h"
+#include "DisplayTypeTableSync.h"
 
-#include "15_env/ConnectionPlaceTableSync.h"
+#include "ConnectionPlaceTableSync.h"
 
-#include "11_interfaces/Interface.h"
+#include "Interface.h"
 
 #include "Env.h"
 
@@ -82,14 +82,14 @@ namespace synthese
 					_type.reset(new DisplayType);
 					_type->setRowNumber(10);
 					_type->setInterface(Env::GetOfficialEnv()->getRegistry<Interface>().get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
-					screen->setLocalization(ConnectionPlaceTableSync::Get(screenId));
+					screen->setLocalization(ConnectionPlaceTableSync::Get(screenId).get());
 					screen->setAllPhysicalStopsDisplayed(true);					
 					screen->setType(_type.get());
 					_screen.reset(screen);
 				}
 				else if (decodeTableId(screenId) == DisplayScreenTableSync::TABLE_ID)
 				{
-					_screen = DisplayScreen::Get(screenId);
+					_screen = DisplayScreenTableSync::Get(screenId);
 				}
 				else
 					throw RequestException("Not a display screen nor a connection place");

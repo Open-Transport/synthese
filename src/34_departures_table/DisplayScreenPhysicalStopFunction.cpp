@@ -22,23 +22,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "15_env/PhysicalStop.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ConnectionPlaceTableSync.h"
 
-#include "11_interfaces/Interface.h"
+#include "Interface.h"
+#include "InterfaceTableSync.h"
 
-#include "30_server/RequestException.h"
-#include "30_server/QueryString.h"
-#include "30_server/RequestMissingParameterException.h"
+#include "RequestException.h"
+#include "QueryString.h"
+#include "RequestMissingParameterException.h"
 
 #include "DisplayScreenPhysicalStopFunction.h"
 
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayType.h"
+#include "DisplayScreen.h"
+#include "DisplayType.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 using namespace std;
 using namespace boost;
@@ -69,12 +71,12 @@ namespace synthese
 		void DisplayScreenPhysicalStopFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			string oc(map.getString(PARAMETER_OPERATOR_CODE, true, FACTORY_KEY));
-			const PublicTransportStopZoneConnectionPlace* place(PublicTransportStopZoneConnectionPlace::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY)).get());
+			const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY)).get());
 
 			DisplayScreen* screen(new DisplayScreen);
 			_type.reset(new DisplayType);
 			_type->setRowNumber(10);
-			_type->setInterface(Interface::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
+			_type->setInterface(InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
 
 			screen->setLocalization(place);
 			screen->setAllPhysicalStopsDisplayed(false);

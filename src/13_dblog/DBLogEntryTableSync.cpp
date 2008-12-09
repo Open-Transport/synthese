@@ -89,7 +89,7 @@ namespace synthese
 				{
 					try
 					{
-						object->setUser(UserTableSync::Get(userId, env, linkLevel));
+						object->setUser(UserTableSync::Get(userId, env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<User>& e)
 					{					

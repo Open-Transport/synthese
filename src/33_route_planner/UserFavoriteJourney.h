@@ -25,8 +25,7 @@
 
 #include <string>
 
-#include "15_env/AccessParameters.h"
-
+#include "AccessParameters.h"
 #include "Registrable.h"
 
 namespace synthese
@@ -42,7 +41,7 @@ namespace synthese
 			@ingroup m53
 		*/
 		class UserFavoriteJourney
-		:	public util::Registrable
+		:	public virtual util::Registrable
 		{
 		private:
 			const security::User*	_user;
@@ -54,7 +53,9 @@ namespace synthese
 			env::AccessParameters	_accessParameters;
 
 		public:
-			UserFavoriteJourney();
+			UserFavoriteJourney(
+				util::RegistryKeyType id = UNKNOWN_VALUE
+			);
 
 			void setRank(int value);
 			void setUser(const security::User* value);

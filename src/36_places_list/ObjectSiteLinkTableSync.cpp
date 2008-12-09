@@ -149,10 +149,12 @@ namespace synthese
 
 
 
-		vector<shared_ptr<ObjectSiteLink> > ObjectSiteLinkTableSync::Search(
+		void ObjectSiteLinkTableSync::Search(
+			Env& env,
 			uid siteId
 			, int first /*= 0*/
-			, int number /*= 0*/
+			, int number, /*= 0*/
+			LinkLevel linkLevel
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 

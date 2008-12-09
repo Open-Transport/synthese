@@ -22,15 +22,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "30_server/RequestException.h"
-#include "30_server/RequestMissingParameterException.h"
+#include "RequestException.h"
+#include "RequestMissingParameterException.h"
 
 #include "ResaCustomerHtmlOptionListFunction.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
+#include "Env.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -68,11 +71,11 @@ namespace synthese
 			if (_name == "%%" && _surname == "%%")
 				return;
 
-			vector<shared_ptr<User> > users(UserTableSync::Search("%", _name, _surname, "%", UNKNOWN_VALUE, logic::indeterminate, 0, _number, false, true, false, true));
-
-			for (vector<shared_ptr<User> >::const_iterator it(users.begin()); it != users.end(); ++it)
+			Env env;
+			UserTableSync::Search(env, "%", _name, _surname, "%", UNKNOWN_VALUE, logic::indeterminate, 0, _number, false, true, false, true);
+			BOOST_FOREACH(shared_ptr<User> user, env.template getRegistry<User>())
 			{
-				stream << "<option value=\"" << (*it)->getKey() << "\">" << (*it)->getName() << " " << (*it)->getSurname() << " (" << (*it)->getPhone() << " / " << (*it)->getEMail() << ")</option>";
+				stream << "<option value=\"" << user->getKey() << "\">" << user->getName() << " " << user->getSurname() << " (" << user->getPhone() << " / " << user->getEMail() << ")</option>";
 			}
 		}
 

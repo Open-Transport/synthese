@@ -28,7 +28,6 @@
 
 #include "HTMLTable.h"
 #include "HTMLForm.h"
-#include "Registry.h"
 
 namespace synthese
 {
@@ -86,7 +85,7 @@ namespace synthese
 				int					size;
 
 				template<class T>
-				void setFromResult(const RequestParameters& p, util::Registry<T>& v)
+				void setFromResult(const RequestParameters& p, T& v)
 				{
 					if (p.maxSize != UNKNOWN_VALUE)
 					{

@@ -23,17 +23,15 @@
 */
 
 #include "UserFavoriteListInterfaceElement.h"
+#include "UserFavoriteJourney.h"
+#include "UserFavoriteJourneyTableSync.h"
+#include "UserFavoriteInterfacePage.h"
 
-#include "33_route_planner/UserFavoriteJourney.h"
-#include "33_route_planner/UserFavoriteJourneyTableSync.h"
-#include "33_route_planner/UserFavoriteInterfacePage.h"
-
-#include "30_server/Request.h"
-
-#include "12_security/User.h"
-
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/Interface.h"
+#include "Request.h"
+#include "User.h"
+#include "ValueElementList.h"
+#include "Interface.h"
+#include "Env.h"
 
 #include <boost/foreach.hpp>
 
@@ -44,6 +42,8 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace security;
+	using namespace env;
+	using namespace util;
 	
 	namespace util
 	{

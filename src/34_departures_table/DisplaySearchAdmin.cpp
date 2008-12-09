@@ -153,7 +153,7 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SEARCH_STATE
 				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
 				, _requestParameters.raisingOrder
-			)
+			);
 			ResultHTMLTable::ResultParameters	_resultParameters;
 			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<DisplayScreen>());
 

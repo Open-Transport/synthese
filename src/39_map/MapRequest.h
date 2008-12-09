@@ -23,18 +23,19 @@
 #ifndef SYNTHESE_MapRequest_H__
 #define SYNTHESE_MapRequest_H__
 
-#include "01_util/FactorableTemplate.h"
+#include "FactorableTemplate.h"
 
-#include "30_server/Function.h"
+#include "Function.h"
 
-#include "15_env/Axis.h"
-#include "15_env/City.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/Line.h"
-#include "15_env/LineStop.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
+#include "Axis.h"
+#include "City.h"
+#include "CommercialLine.h"
+#include "Line.h"
+#include "LineStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
 
+#include "Env.h"
 
 namespace synthese
 {
@@ -59,7 +60,7 @@ namespace synthese
 			//@{
 				std::string _data;
 				bool		_useEnvironment;
-				Env			_temporaryEnvironment;
+				util::Env	_temporaryEnvironment;
 			//@}
 
 			//! @name Result

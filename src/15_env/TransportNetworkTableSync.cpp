@@ -73,6 +73,10 @@ namespace synthese
 			
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
+
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(TransportNetwork* object, Env* env)
+		{
+		}
 	}
 
 	namespace env

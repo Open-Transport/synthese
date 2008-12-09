@@ -69,7 +69,7 @@ namespace synthese
 			{
 				try
 				{
-					object->setReservationRule(ReservationRuleTableSync::Get(rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID), env, linkLevel));
+					object->setReservationRule(ReservationRuleTableSync::Get(rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID), env, linkLevel).get());
 				}
 				catch (...)
 				{
@@ -137,7 +137,7 @@ namespace synthese
 
 
 		void OnlineReservationRuleTableSync::Search(
-			Env* env,
+			Env& env,
 			int first /*= 0*/,
 			int number /*= 0*/,
 			LinkLevel linkLevel

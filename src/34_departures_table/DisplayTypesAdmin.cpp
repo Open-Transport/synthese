@@ -20,24 +20,26 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "05_html/HTMLForm.h"
+#include "HTMLForm.h"
 
-#include "11_interfaces/InterfaceModule.h"
-#include "11_interfaces/Interface.h"
+#include "InterfaceModule.h"
+#include "Interface.h"
 
-#include "30_server/ActionFunctionRequest.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/AdminRequest.h"
-#include "32_admin/ModuleAdmin.h"
+#include "AdminRequest.h"
+#include "ModuleAdmin.h"
 
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DeparturesTableModule.h"
-#include "34_departures_table/DisplayTypesAdmin.h"
-#include "34_departures_table/CreateDisplayTypeAction.h"
-#include "34_departures_table/UpdateDisplayTypeAction.h"
-#include "34_departures_table/DisplayTypeTableSync.h"
-#include "34_departures_table/DisplayTypeRemoveAction.h"
-#include "34_departures_table/ArrivalDepartureTableRight.h"
+#include "DisplayType.h"
+#include "DeparturesTableModule.h"
+#include "DisplayTypesAdmin.h"
+#include "CreateDisplayTypeAction.h"
+#include "UpdateDisplayTypeAction.h"
+#include "DisplayTypeTableSync.h"
+#include "DisplayTypeRemoveAction.h"
+#include "ArrivalDepartureTableRight.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -77,8 +79,7 @@ namespace synthese
 			// Env
 			Env env;
 			DisplayTypeTableSync::Search(env);
-			Registry<DisplayType>& searchResult(env.template getRegistry<DisplayType>());
-
+			
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(request);
 			createRequest.getFunction()->setPage<DisplayTypesAdmin>();
 			
@@ -98,9 +99,8 @@ namespace synthese
 			stream << "</tr>";
 
 			// Display types loop
-			for(Registry<DisplayType>::const_iterator it = searchResult.begin(); it != searchResult.end(); ++it)
+			BOOST_FOREACH(shared_ptr<DisplayType> dt, env.template getRegistry<DisplayType>())
 			{
-				shared_ptr<const DisplayType> dt = it->second;
 				deleteRequest.getAction()->setType(dt);
 
 				HTMLForm uf(updateRequest.getHTMLForm("update" + Conversion::ToString(dt->getKey())));

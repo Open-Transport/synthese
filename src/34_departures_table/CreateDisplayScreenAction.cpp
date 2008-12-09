@@ -90,7 +90,6 @@ namespace synthese
 				screen->copy(_template.get());
 			screen->setLocalization(_place.get());
 			screen->setMaintenanceIsOnline(true);
-			screen->setLinked(true);
 
 			// Action
 			DisplayScreenTableSync::Save(screen.get());
