@@ -581,9 +581,9 @@ namespace synthese
 			boost::logic::tribool result(false);
 			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
-				if (it->getService()->getReservationRule()->isCompliant() == true)
+				if (it->getService()->getReservationRule()->getType() == RESERVATION_COMPULSORY)
 					return true;
-				if (boost::logic::indeterminate(it->getService()->getReservationRule()->isCompliant()))
+				if (it->getService()->getReservationRule()->getType() == RESERVATION_OPTIONAL)
 					result = boost::logic::indeterminate;
 			}
 			return result;
@@ -595,8 +595,8 @@ namespace synthese
 			boost::logic::tribool compliance(getReservationCompliance());
 			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
-				if ((boost::logic::indeterminate(compliance) && boost::logic::indeterminate(it->getService()->getReservationRule()->isCompliant()))
-					|| (compliance == true && it->getService()->getReservationRule()->isCompliant() == true)
+				if ((boost::logic::indeterminate(compliance) && it->getService()->getReservationRule()->getType() == RESERVATION_OPTIONAL)
+					|| (compliance == true && it->getService()->getReservationRule()->getType() == RESERVATION_COMPULSORY)
 				){
 					DateTime deadLine(it->getReservationDeadLine());
 					if (result.isUnknown() || deadLine < result)

@@ -25,10 +25,8 @@
 
 #include "Alarm.h"
 #include "17_messages/Types.h"
-
 #include "DateTime.h"
-
-#include "Registrable.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -41,6 +39,10 @@ namespace synthese
 			: public Alarm
 		{
 		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<SentAlarm>	Registry;
+
 			struct Complements
 			{
 				AlarmConflict	conflictStatus;

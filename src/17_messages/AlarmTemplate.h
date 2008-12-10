@@ -24,8 +24,7 @@
 #define SYNTHESE_AlarmTemplate_h__
 
 #include "Alarm.h"
-
-#include "Registrable.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -39,6 +38,11 @@ namespace synthese
 		class AlarmTemplate
 		:	public Alarm
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<AlarmTemplate>	Registry;
+
 		private:
 			const ScenarioTemplate* _scenario;
 

@@ -25,13 +25,10 @@
 
 #include <ostream>
 
-#include "01_util/Factorable.h"
-
+#include "FactoryBase.h"
 #include "12_security/Types.h"
-
 #include "17_messages/Types.h"
-
-#include "30_server/ActionFunctionRequest.h"
+#include "ActionFunctionRequest.h"
 
 namespace synthese
 {
@@ -57,8 +54,16 @@ namespace synthese
 
 			All the available alarm recipients are listed in the @ref refAlarmrecipients page.
 		*/
-		class AlarmRecipient : public util::Factorable<AlarmRecipient>
+		class AlarmRecipient
+		:	public util::FactoryBase<AlarmRecipient>
 		{
+		public:
+			/// Optional arguments for factory.
+			struct Args
+			{
+
+			};
+
 		public:
 			virtual const std::string& getTitle() const = 0;
 

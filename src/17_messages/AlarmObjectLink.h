@@ -26,6 +26,7 @@
 #include <string>
 
 #include "Registrable.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -40,6 +41,11 @@ namespace synthese
 		class AlarmObjectLink
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<AlarmObjectLink>	Registry;
+
 		private:
 			uid				_objectId;
 			uid				_alarmId;

@@ -24,7 +24,7 @@
 #ifndef SYNTHESE_IMPEX_TRIDENTEXPORT_H
 #define SYNTHESE_IMPEX_TRIDENTEXPORT_H
 
-#include "UId.h"
+#include "Env.h"
 
 #include <iostream>
 
@@ -39,26 +39,27 @@ namespace synthese
 	namespace impex
 	{
 
-		/** Trident/Chouette export.
-			@todo Move it into 35
-		 */
-		    
+		//////////////////////////////////////////////////////////////////////////
+		/// Trident/Chouette export.
+		/// @ingroup m16
+		//////////////////////////////////////////////////////////////////////////
 		class TridentExport
 		{
 		public:
 
 		    
 		private:
-		    
-			const env::CommercialLine* const	_commercialLine;
-			const bool							_withTisseoExtension;
+			util::Env				_env;
+			util::RegistryKeyType	_commercialLineId;
+			const bool				_withTisseoExtension;
 		    
 		public:
 
 			TridentExport(
-				const env::CommercialLine* line
-				, bool withTisseoExtension
-				);
+				util::Env& env,
+				util::RegistryKeyType lineId,
+				bool withTisseoExtension
+			);
 			~TridentExport();
 
 			/** -> ChouettePTNetwork

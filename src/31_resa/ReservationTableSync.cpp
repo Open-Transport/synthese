@@ -22,18 +22,17 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/ReservationTableSync.h"
+#include "ReservationTransaction.h"
+#include "ReservationTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -89,7 +88,7 @@ namespace synthese
 			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
                
-			 query
+			query
 				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToString(object->getTransaction()->getKey())
@@ -155,7 +154,7 @@ namespace synthese
 
 		void ReservationTableSync::Search(
 			Env& env,
-			ReservationTransaction* transaction
+			RegistryKeyType transactionId
 			, int first /*= 0*/
 			, int number /*= 0*/,
 			LinkLevel linkLevel
@@ -164,8 +163,11 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				<< COL_TRANSACTION_ID << "=" << Conversion::ToString(transaction->getKey());
+				<< " WHERE 1 ";
+			if (transactionId != UNKNOWN_VALUE)
+			{
+				query << COL_TRANSACTION_ID << "=" << transactionId;
+			}
 			query << " ORDER BY " << COL_DEPARTURE_TIME;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);

@@ -285,11 +285,11 @@ int main( int argc, char **argv )
 	    it->preInit();
 	}
     
-	for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
-	     it != Factory<ModuleClass>::end(); ++it)
+	for (Factory<ModuleClass>::Iterator iti = Factory<ModuleClass>::begin(); 
+	     iti != Factory<ModuleClass>::end(); ++iti)
 	{
-	    Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
-	    it->initialize();
+	    Log::GetInstance ().info ("Initializing module " + iti.getKey() + "...");
+	    iti->initialize();
 	}
 
 

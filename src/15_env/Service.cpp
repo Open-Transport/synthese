@@ -127,7 +127,7 @@ namespace synthese
 			const Path::Edges& edges(_path->getEdges());
 			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
 			{
-				int i((*it)->getRankInPath());
+				const int i((*it)->getRankInPath());
 
 				if ((*it)->isDeparture())
 				{

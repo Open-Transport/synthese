@@ -24,7 +24,7 @@
 #define SYNTHESE_CMODALITERESERVATIONENLIGNE_H
 
 #include "Registrable.h"
-
+#include "Registry.h"
 
 #include <boost/logic/tribool.hpp>
 
@@ -50,6 +50,10 @@ namespace synthese
 		:	public virtual util::Registrable
 		{
 		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<OnlineReservationRule>	Registry;
+
 			typedef std::set<int> CapacityThresholds;
 			typedef std::map<const env::ReservationRule*, const OnlineReservationRule*> OnlineReservationRuleMap;
 

@@ -94,9 +94,12 @@ namespace synthese
 						deadline respect.
 					@author Hugues Romain
 					@date 2007
-					
+				
+					@todo Handle mixed reservation type
 				*/
-				virtual bool isReservationRuleCompliant(const time::DateTime& computingDateTime)	const;
+				virtual bool isReservationRuleCompliant(
+					const time::DateTime& computingDateTime
+				)	const;
 				const env::Edge*	getEdge()															const;
 			//@}
 

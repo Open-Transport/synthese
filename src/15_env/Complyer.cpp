@@ -41,11 +41,10 @@ namespace synthese
 	namespace env
 	{
 		Complyer::Complyer()
-			: _bikeCompliance(Env::GetOfficialEnv()->template getRegistry<BikeCompliance>().get(0))
-			, _fare(Env::GetOfficialEnv()->template getRegistry<Fare>().get(0))
-			, _pedestrianCompliance(Env::GetOfficialEnv()->template getRegistry<PedestrianCompliance>().get(0))
-			, _reservationRule(Env::GetOfficialEnv()->template getRegistry<ReservationRule>().get(0))
-			, _handicappedCompliance(Env::GetOfficialEnv()->template getRegistry<HandicappedCompliance>().get(0))
+			: _bikeCompliance(Env::GetOfficialEnv()->template getEditableRegistry<BikeCompliance>().getWithAutoCreation(0))
+			, _fare(Env::GetOfficialEnv()->template getEditableRegistry<Fare>().getWithAutoCreation(0))
+			, _pedestrianCompliance(Env::GetOfficialEnv()->template getEditableRegistry<PedestrianCompliance>().getWithAutoCreation(0))
+			, _handicappedCompliance(Env::GetOfficialEnv()->template getEditableRegistry<HandicappedCompliance>().getWithAutoCreation(0))
 			, _complianceParent(NULL)
 		{
 
@@ -73,9 +72,7 @@ namespace synthese
 
 		shared_ptr<const ReservationRule> Complyer::getReservationRule() const
 		{
-			if ((_reservationRule == NULL || _reservationRule->isCompliant() == false) && _complianceParent != NULL)
-				return _complianceParent->getReservationRule();
-			return _reservationRule;
+			return _pedestrianCompliance->getReservationRule();
 		}
 
 		void Complyer::setHandicappedCompliance(shared_ptr<const HandicappedCompliance> compliance)
@@ -100,7 +97,7 @@ namespace synthese
 
 		void Complyer::setReservationRule(shared_ptr<const ReservationRule> rule )
 		{
-			_reservationRule = rule;
+			const_pointer_cast<PedestrianCompliance, const PedestrianCompliance>(_pedestrianCompliance)->setReservationRule(rule);
 		}
 
 

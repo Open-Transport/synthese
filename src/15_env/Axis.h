@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_AXIS_H
 
 #include "Registrable.h"
-
+#include "Registry.h"
 
 #include <string>
 
@@ -26,7 +26,12 @@ namespace synthese
 		class Axis
 		:	public virtual util::Registrable
 		{
+		public:
 
+			/// Chosen registry class.
+			typedef util::Registry<Axis>	Registry;
+
+		protected:
 			std::string _name;   
 			bool _free;   //!< Whether or not this axis is a free axis.
 			bool _allowed;  //!< Whether or not this axis is an allowed axis (opposite to forbidden axis).

@@ -24,8 +24,7 @@
 #define SYNTHESE_ENV_ADDRESS_H
 
 #include "Vertex.h"
-
-
+#include "Registry.h"
 #include "01_util/Constants.h"
 
 #include <vector>
@@ -49,6 +48,11 @@ namespace synthese
 		class Address
 		:	 public Vertex
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<Address>	Registry;
+
 		private:
 
 			const Road* _road;    //!< Address road.

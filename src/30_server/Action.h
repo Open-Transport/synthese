@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_Action_H__
 #define SYNTHESE_Action_H__
 
-#include "01_util/Factorable.h"
+#include "FactoryBase.h"
 
 #define Action_PARAMETER_PREFIX std::string("actionParam")
 
@@ -44,8 +44,16 @@ namespace synthese
 
 			@ingroup m18
 		*/
-		class Action : public util::Factorable<Action>
+		class Action
+		:	public util::FactoryBase<Action>
 		{
+		public:
+			/// Optional arguments for factory.
+			struct Args
+			{
+
+			};
+
 		protected:
 			Request* _request;
 

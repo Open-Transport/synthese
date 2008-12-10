@@ -25,8 +25,7 @@
 
 #include<boost/shared_ptr.hpp>
 
-#include "Factorable.h"
-
+#include "FactoryBase.h"
 #include "11_interfaces/Types.h"
 
 namespace synthese
@@ -49,8 +48,15 @@ namespace synthese
 			@ingroup m11
 		*/
 		class LibraryInterfaceElement
-		:	public util::Factorable<LibraryInterfaceElement>
+		:	public util::FactoryBase<LibraryInterfaceElement>
 		{
+		public:
+			/// Optional arguments for factory.
+			struct Args
+			{
+
+			};
+
 		protected:
 			const InterfacePage*	_page;
 			std::string				_label;

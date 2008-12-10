@@ -49,19 +49,21 @@ namespace synthese
 		struct VertexAccess;
 		class VertexAccessMap;
 
-
-		/** Place base class.
-
-			Place is the base for any class which is associated with a name
-			and a city. However, a place is not related to the concept
-			of geographical location in terms of coordinates; it is rather
-			a human abstraction.
-
-			@ingroup m35
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Place base class.
+		///
+		///	Place is the base for any class which is associated with a name
+		///	and a city. However, a place is not related to the concept
+		///	of geographical location in terms of coordinates; it is rather
+		///	a human abstraction.
+		///
+		///	@ingroup m35
+		//////////////////////////////////////////////////////////////////////////
 		class Place
 			: public virtual util::Registrable
 		{
+		public:
+
 		protected:
 			mutable bool _isoBarycentreToUpdate;
 			mutable geometry::IsoBarycentre _isoBarycentre;

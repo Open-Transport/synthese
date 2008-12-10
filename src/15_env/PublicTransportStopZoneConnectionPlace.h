@@ -24,7 +24,7 @@
 #define SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
 
 #include "ConnectionPlace.h"
-
+#include "Registry.h"
 #include "IsoBarycentre.h"
 
 #include <map>
@@ -52,6 +52,11 @@ namespace synthese
 		class PublicTransportStopZoneConnectionPlace
 		:	public ConnectionPlace
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<PublicTransportStopZoneConnectionPlace>	Registry;
+
 		private:
 			typedef std::map< std::pair<uid, uid>, int > TransferDelaysMap;
 

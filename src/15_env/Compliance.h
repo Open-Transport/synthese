@@ -24,7 +24,6 @@
 #define SYNTHESE_COMPLIANCE_H
 
 #include "Registrable.h"
-
 #include <boost/logic/tribool.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -41,6 +40,8 @@ namespace synthese
 		class Compliance
 		:	public virtual util::Registrable
 		{
+		public:
+
 		private:
 			boost::logic::tribool						_compliant;			//!< Value (see the derivated class for the signification of the 3 availables status)
 			int											_capacity;			//!< Maximal person number which can be served (0 = unlimited)

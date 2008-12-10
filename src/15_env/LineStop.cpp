@@ -97,7 +97,7 @@ namespace synthese
 			else
 				deltaMO = ( other.getMetricOffset () - getMetricOffset () ) / 1000;
 
-			int deltaGPS = SquareDistance ( 
+			const int deltaGPS = SquareDistance ( 
 			*getFromVertex (), 
 			*other.getFromVertex () ).getDistance(); // kilometers
 

@@ -51,5 +51,12 @@ namespace synthese
 		{
 			return _key;
 		}
+
+
+
+		Registrable::~Registrable()
+		{
+
+		}
 	}
 }

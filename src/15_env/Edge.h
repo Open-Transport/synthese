@@ -26,10 +26,8 @@
 #include <vector>
 
 #include "01_util/Constants.h"
-
 #include "DateTime.h"
 #include "Schedule.h"
-
 #include "Registrable.h"
 
 namespace synthese
@@ -73,6 +71,8 @@ namespace synthese
 		class Edge
 			:	public virtual util::Registrable
 		{
+		public:
+
 		private:
 
 			bool _isDeparture;				//!< The departure from the vertex is allowed

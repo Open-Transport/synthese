@@ -26,7 +26,6 @@
 #include <string>
 
 #include "17_messages/Types.h"
-
 #include "Registrable.h"
 
 #include <boost/shared_ptr.hpp>
@@ -49,6 +48,8 @@ namespace synthese
 		class Alarm
 			: public virtual util::Registrable
 		{
+		public:
+
 		protected:
 			AlarmLevel					_level;
 			std::string					_shortMessage;  //!< Alarm message

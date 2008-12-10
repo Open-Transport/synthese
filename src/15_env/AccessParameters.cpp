@@ -74,10 +74,10 @@ namespace synthese
 			if (_pedestrian && !complyer.getPedestrianCompliance()->isCompatibleWith(logic::tribool(true)))
 				return false;
 
-			if (_drtOnly && !complyer.getReservationRule()->isCompatibleWith(logic::tribool(true)))
+			if (_drtOnly && !complyer.getReservationRule()->getType() == RESERVATION_FORBIDDEN)
 				return false;
 
-			if (_withoutDrt && !complyer.getReservationRule()->isCompatibleWith(logic::tribool(false)))
+			if (_withoutDrt && !complyer.getReservationRule()->getType() != RESERVATION_FORBIDDEN)
 				return false;
 
 			return true;

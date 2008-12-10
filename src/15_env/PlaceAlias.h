@@ -23,10 +23,10 @@
 #ifndef SYNTHESE_ENV_PLACEALIAS_H
 #define SYNTHESE_ENV_PLACEALIAS_H
 
-
 #include <vector>
 
 #include "IncludingPlace.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -41,6 +41,11 @@ namespace synthese
 		class PlaceAlias
 		:	public IncludingPlace
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<PlaceAlias>	Registry;
+
 
 		private:
 		        

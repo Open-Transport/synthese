@@ -28,15 +28,13 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "Reservation.h"
 
 namespace synthese
 {
 	namespace resa
 	{
-		class Reservation;
-		class ReservationTransaction;
-
 		/** Reservation table synchronizer.
 			@ingroup m31LS refLS
 
@@ -75,7 +73,7 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				ReservationTransaction* transaction
+				const util::RegistryKeyType transactionId
 				, int first = 0
 				, int number = 0,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL

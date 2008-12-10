@@ -30,7 +30,7 @@ namespace synthese
 {
 	namespace util
 	{
-		shared_ptr<Env> Env::_officialRegistries(new Env);
+		shared_ptr<Env> Env::_officialRegistries;
 		Env::RegistryCreatorMap Env::_registryCreators;
 
 		Env::Env()

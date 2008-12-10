@@ -119,17 +119,39 @@ namespace synthese
 
 				/** Gets a shared pointer to a registered object with read permission.
 					@param key key of the object to find
-					@return boost::shared_ptr<T> the founded object
-					@throws ObjectNotFoundInRegistryException<T> if the key does not exists in the registry
+					@param autoCreate automatic creation of the object if not exists
+					@return boost::shared_ptr<T> the object found
+					@throws ObjectNotFoundInRegistryException<T> if the key does not exists in the registry and autoCreate is false
 				*/
-				boost::shared_ptr<const T> get (const RegistryKeyType& key) const;
+				boost::shared_ptr<const T> get(
+					const RegistryKeyType& key
+				) const;
 				
+
+				virtual boost::shared_ptr<const T> getWithAutoCreation(
+					const RegistryKeyType& key
+				)
+				{
+					return get(key);
+				}
+
+
 				/** Gets a shared pointer to a registered object with write permission.
 					@param key key of the object to find
-					@return boost::shared_ptr<T> the founded object
-					@throws ObjectNotFoundInRegistryException<T> if the key does not exists in the registry
+					@param autoCreate automatic creation of the object if not exists
+					@return boost::shared_ptr<T> the object found
+					@throws ObjectNotFoundInRegistryException<T> if the key does not exists in the registry and autoCreate is false
 				*/
-				boost::shared_ptr<T> getEditable (const RegistryKeyType& key);
+				boost::shared_ptr<T> getEditable(
+					const RegistryKeyType& key
+				);
+
+
+				virtual boost::shared_ptr<T> getEditableWithAutoCreation(
+					const RegistryKeyType& key
+				){
+					return getEditable(key);
+				}
 				
 				size_t size () const;
 
@@ -205,11 +227,12 @@ namespace synthese
 
 
 		template<class T>
-		boost::shared_ptr<T> Registry<T>::getEditable( const RegistryKeyType & key )
-		{
+		boost::shared_ptr<T> Registry<T>::getEditable(
+			const RegistryKeyType & key
+		){
 			Map::iterator it(_registry.find(key));
 
-			if(it == _registry.end()) 
+			if(it == _registry.end())
 				throw typename ObjectNotFoundInRegistryException<T>(key);
 
 			return it->second;
@@ -218,14 +241,15 @@ namespace synthese
 
 
 		template<class T>
-		boost::shared_ptr<const T> Registry<T>::get (const RegistryKeyType& key) const
-		{
+		boost::shared_ptr<const T> Registry<T>::get(
+			const RegistryKeyType& key
+		) const	{
 			Map::const_iterator it(_registry.find(key));
 			
-			if(it == _registry.end()) 
+			if(it == _registry.end())
 				throw typename ObjectNotFoundInRegistryException<T>(key);
-
-			return it->second;
+				
+			return boost::const_pointer_cast<const T, T>(it->second);
 		}
 
 

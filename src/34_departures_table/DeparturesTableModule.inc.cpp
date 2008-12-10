@@ -59,5 +59,6 @@
 #include "34_departures_table/AlarmTestOnDisplayScreenFunction.h"
 #include "34_departures_table/DisplayScreenPhysicalStopFunction.h"
 
+// Registries
 #include "DisplayType.h"
 #include "DisplayScreen.h"

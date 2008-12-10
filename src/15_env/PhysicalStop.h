@@ -24,8 +24,8 @@
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
 #include "01_util/Constants.h"
-
 #include "Vertex.h"
+#include "Registry.h"
 
 #include <string>
 
@@ -37,15 +37,19 @@ namespace synthese
 		class LineStop;
 		class PublicTransportStopZoneConnectionPlace;
 		 
-
-		/** Physical stop (bus stop, etc.).
-			A physical stop is an entry point to the transport network.
-			RoutePoint
-		@ingroup m35
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Physical stop (bus stop, etc.).
+		///	A physical stop is an entry point to the transport network.
+		///	RoutePoint
+		///	@ingroup m35
+		//////////////////////////////////////////////////////////////////////////
 		class PhysicalStop
 		:	public Vertex
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<PhysicalStop>	Registry;
 
 		private:
 

@@ -24,7 +24,7 @@
 #define SYNTHESE_SingleSentAlarm_h__
 
 #include "SentAlarm.h"
-
+#include "Registry.h"
 
 namespace synthese
 {
@@ -36,6 +36,11 @@ namespace synthese
 		class SingleSentAlarm
 		:	public SentAlarm
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<SingleSentAlarm>	Registry;
+
 		private:
 			bool			_enabled;
 			time::DateTime	_periodStart; //!< Alarm applicability period start

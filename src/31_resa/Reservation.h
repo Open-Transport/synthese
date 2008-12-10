@@ -30,6 +30,7 @@
 #include "DateTime.h"
 
 #include "Registrable.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -49,6 +50,10 @@ namespace synthese
 		:	public virtual util::Registrable
 		{
 		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<Reservation>	Registry;
+
 			Reservation(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 

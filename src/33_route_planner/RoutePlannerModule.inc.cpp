@@ -23,3 +23,6 @@
 #include "33_route_planner/UserFavoriteJourneyTableSync.h"
 #include "33_route_planner/UserFavoriteListInterfaceElement.h"
 #include "33_route_planner/UserFavoriteInterfacePage.h"
+
+// Registries
+#include "UserFavoriteJourney.h"

@@ -24,8 +24,7 @@
 #define SYNTHESE_ENV_CROSSING_H
 
 #include "ConnectionPlace.h"
-
-#include "Registrable.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -39,9 +38,11 @@ namespace synthese
 		class Crossing
 		:	public ConnectionPlace
 		{
-		 private:
+		  public:
 
-		 public:
+			  /// Chosen registry class.
+			  typedef util::Registry<Crossing>	Registry;
+
 			//! @name Virtual queries
 			//@{
 				virtual bool isConnectionAllowed(

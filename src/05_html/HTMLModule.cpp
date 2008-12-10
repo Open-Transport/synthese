@@ -30,6 +30,11 @@ using namespace std;
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> const string FactorableTemplate<ModuleClass, html::HTMLModule>::FACTORY_KEY("05_html");
+	}
+
 	namespace html
 	{
 

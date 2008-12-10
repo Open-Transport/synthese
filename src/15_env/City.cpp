@@ -49,7 +49,8 @@ namespace synthese
 			std::string name,
 			std::string code
 		):	IncludingPlace(key, name, 0),  // Note this city's city is null ?
-			_code (code)
+			_code (code),
+			Registrable(key)
 		{
 		}
 

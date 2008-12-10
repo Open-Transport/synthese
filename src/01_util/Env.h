@@ -47,6 +47,8 @@ namespace synthese
 		*/
 		class Env
 		{
+			friend class UtilModule;
+
 		private:
 			typedef std::map<std::string, boost::shared_ptr<RegistryBase> > RegistryMap;
 
@@ -69,7 +71,7 @@ namespace synthese
 
 				boost::shared_ptr<RegistryBase> create ()
 				{
-					return boost::shared_ptr<RegistryBase>(new Registry<R>);
+					return boost::shared_ptr<RegistryBase>(new typename R::Registry);
 				}
 			};
 

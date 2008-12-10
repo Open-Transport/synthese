@@ -24,7 +24,7 @@
 #define SYNTHESE_ENV_TRANSPORTNETWORK_H
 
 #include "Registrable.h"
-
+#include "Registry.h"
 
 #include <string>
 
@@ -32,13 +32,19 @@ namespace synthese
 {
 	namespace env 
 	{
-		/** Transport network.
-		TRIDENT OK
-			@ingroup m35
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Transport network class.
+		/// TRIDENT OK
+		///	@ingroup m35
+		//////////////////////////////////////////////////////////////////////////
 		class TransportNetwork
 		:	public util::Registrable
 		{
+		public:
+			/// Chosen registry class.
+			typedef util::Registry<TransportNetwork>	Registry;
+
+		protected:
 			std::string _name;
 
 		 public:

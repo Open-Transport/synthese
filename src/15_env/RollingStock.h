@@ -24,7 +24,7 @@
 #define SYNTHESE_ENV_ROLLING_STOCK_H
 
 #include "Registrable.h"
-
+#include "RegistryWithAutocreationEnabled.h"
 
 #include <string>
 
@@ -32,24 +32,29 @@ namespace synthese
 {
 	namespace env
 	{
-
-		/** Rolling stock.
-		 TRIDENT = VehicleType
-		 @ingroup m35
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Rolling stock.
+		/// TRIDENT = VehicleType
+		/// @ingroup m35
+		//////////////////////////////////////////////////////////////////////////
 		class RollingStock
 		:	public virtual util::Registrable
 		{
+		public:
 
+			/// Chosen registry class.
+			typedef util::RegistryWithAutocreationEnabled<RollingStock>	Registry;
+
+		protected:
 			std::string _name;
 			std::string _article;
 			std::string _indicator;
 
-			public:
+		public:
 
-				RollingStock(util::RegistryKeyType key = UNKNOWN_VALUE);
+			RollingStock(util::RegistryKeyType key = UNKNOWN_VALUE);
 
-				~RollingStock();
+			~RollingStock();
 
 
 			//! @name Getters

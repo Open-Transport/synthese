@@ -1,6 +1,6 @@
 
-/** Factorable class header.
-	@file Factorable.h
+/** FactoryBase class header.
+	@file FactoryBase.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,38 +20,39 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_Factorable_H__
-#define SYNTHESE_Factorable_H__
+#ifndef SYNTHESE_util_FactoryBase_h__
+#define SYNTHESE_util_FactoryBase_h__
 
 #include <string>
+#include "FactoryException.h"
 
 namespace synthese
 {
 	namespace util
 	{
-		/** Factorable class.
-			@ingroup m01Factory
+		/** Base class to be factored by Factory.
+
+			A child of FactoryBase must implement a struct called Args, corresponding to the arguments
+			that can be optionally passed through the object constructor by the factory.
+				
+			@ingroup m01
 		*/
-		template<class T>
-		class Factorable
+		template<class F>
+		class FactoryBase
 		{
+		protected:
+			FactoryBase() {}
+			virtual ~FactoryBase() {}
+
 		public:
-			typedef T FactoryClass;
+			typedef F FactoryClass;
 
-			/** Empty args definition for default constructor call if any.
-			 */
-			class Args
-			{
-			public:
-			    Args () {}
-			};
-			    
-
-
+			/** Virtual factory key getter.
+				@return the factory key of the class of the object.
+			*/
 			virtual const std::string& getFactoryKey() const = 0;
 		};
 	}
 }
 
-#endif // SYNTHESE_Factorable_H__
-
+#endif // SYNTHESE_util_FactoryBase_h__

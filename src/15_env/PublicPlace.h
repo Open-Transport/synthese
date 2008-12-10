@@ -24,8 +24,7 @@
 #define SYNTHESE_ENV_PUBLICPLACE_H
 
 #include "AddressablePlace.h"
-
-#include "Registrable.h"
+#include "Registry.h"
 
 #include <string>
 
@@ -43,6 +42,9 @@ namespace synthese
 		:	public AddressablePlace
 		{
 		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<PublicPlace>	Registry;
 
 			PublicPlace (
 				util::RegistryKeyType id = UNKNOWN_VALUE

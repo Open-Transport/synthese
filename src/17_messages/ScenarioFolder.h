@@ -24,6 +24,7 @@
 #define SYNTHESE_messages_ScenarioFolder_h__
 
 #include "Registrable.h"
+#include "Registry.h"
 #include "UtilTypes.h"
 #include <string>
 
@@ -37,6 +38,12 @@ namespace synthese
 		class ScenarioFolder
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<ScenarioFolder>	Registry;
+
+		protected:
 			util::RegistryKeyType	_parentId;
 			std::string	_name;
 

@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "Factorable.h"
+#include "FactoryBase.h"
 #include "Env.h"
 
 #include "12_security/Types.h"
@@ -60,8 +60,16 @@ namespace synthese
 
 			Chaque module contient des définitions d'habilitations (sous-classes enregistrées dans Factory<Right>) qui implémentent le contr��le des droits et la génération d'une liste de param�štres possibles.
 		*/
-		class Right : public util::Factorable<Right>
+		class Right
+		:	public util::FactoryBase<Right>
 		{
+		public:
+			/// Optional arguments for factory.
+			struct Args
+			{
+
+			};
+
 		private:
 			RightLevel _privateRightLevel;
 			RightLevel _publicRightLevel;

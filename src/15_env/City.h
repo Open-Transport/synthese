@@ -24,10 +24,8 @@
 #define SYNTHESE_ENV_CITY_H
 
 
-#include "Registrable.h"
-
+#include "Registry.h"
 #include "LexicalMatcher.h"
-
 #include "IncludingPlace.h"
 
 #include <string>
@@ -56,7 +54,12 @@ namespace synthese
 		class City
 		:	public IncludingPlace
 		{
-		 private:
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<City>	Registry;
+
+		private:
 
 			lexmatcher::LexicalMatcher<const ConnectionPlace*> _connectionPlacesMatcher;
 			lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
@@ -66,7 +69,7 @@ namespace synthese
 
 			std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
 
-		 public:
+		public:
 
 			City(
 				util::RegistryKeyType key = UNKNOWN_VALUE,

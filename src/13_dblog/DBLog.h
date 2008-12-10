@@ -26,9 +26,8 @@
 #include <string>
 #include <vector>
 
-#include "01_util/Factorable.h"
-
-#include "13_dblog/DBLogEntry.h"
+#include "FactoryBase.h"
+#include "DBLogEntry.h"
 
 namespace synthese
 {
@@ -57,11 +56,18 @@ namespace synthese
 
 			Les différents journaux sont enregistrés dans l'instance de fabrique Factory<DBLog>.
 		*/
-		class DBLog : public util::Factorable<DBLog>
+		class DBLog
+		:	public util::FactoryBase<DBLog>
 		{
 		public:
 			typedef std::vector<std::string> ColumnsVector;
 			
+			/// Optional arguments for factory.
+			struct Args
+			{
+
+			};
+
 		protected:
 			
 			/** Adds an entry to a log (generic method).

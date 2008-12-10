@@ -24,28 +24,28 @@
 #define SYNTHESE_ENV_HANDICAPPEDCOMPLIANCE_H
 
 #include "Compliance.h"
+#include "RegistryWithAutocreationEnabled.h"
 
 #include <boost/logic/tribool.hpp>
 #include <string>
-
 
 namespace synthese
 {
 	namespace env
 	{
-
-
-
-		/** Handicapped compliance class.
-			MobilityRestricted
-		 @ingroup m35
-		 */
+		//////////////////////////////////////////////////////////////////////////
+		/// Handicapped compliance class.
+		///	MobilityRestricted
+		/// @ingroup m35
+		//////////////////////////////////////////////////////////////////////////
 		class HandicappedCompliance
 		:	public Compliance
 		{
-		private:
-
 		public:
+
+			/// Chosen registry class.
+			typedef util::RegistryWithAutocreationEnabled<HandicappedCompliance>	Registry;
+
 			HandicappedCompliance(util::RegistryKeyType key = UNKNOWN_VALUE);
 			~HandicappedCompliance();
 		};

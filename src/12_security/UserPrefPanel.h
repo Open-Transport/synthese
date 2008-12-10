@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_security_UserPrefPanel_h__
 #define SYNTHESE_security_UserPrefPanel_h__
 
-#include "01_util/Factorable.h"
+#include "FactoryBase.h"
 
 #include <ostream>
 
@@ -36,13 +36,14 @@ namespace synthese
 		/** UserPrefPanel class.
 			@ingroup m12
 		*/
-		class UserPrefPanel : public util::Factorable<UserPrefPanel>
+		class UserPrefPanel
+		:	public util::FactoryBase<UserPrefPanel>
 		{
 		public:
-//			class Args
-//			{
-//				const User* _user;
-//			};
+			class Args
+			{
+				//const User* _user;
+			};
 
 //			UserPrefPanel(const User* user)
 //				: _user(user)

@@ -31,3 +31,8 @@
 #include "31_resa/ReservationRoutePlannerAdmin.h"
 #include "31_resa/ResaLogAdmin.h"
 #include "31_resa/ResaEditLogEntryAdmin.h"
+
+// Registries
+#include "Reservation.h"
+#include "ReservationTransaction.h"
+#include "OnlineReservationRule.h"

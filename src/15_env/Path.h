@@ -27,7 +27,6 @@
 #include <set>
 
 #include "Registrable.h"
-
 #include "Calendar.h"
 #include "Complyer.h"
 
@@ -85,7 +84,6 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		public:
-
 			typedef std::vector<Edge*> Edges;
 
 		protected:

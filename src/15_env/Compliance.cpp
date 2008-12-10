@@ -22,11 +22,14 @@
 
 #include "Compliance.h"
 #include "ReservationRule.h"
+#include "Env.h"
 
 using namespace boost;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace env
 	{
 		Compliance::Compliance(
@@ -39,7 +42,7 @@ namespace synthese
 		{
 			if (_reservationRule.get() == NULL)
 			{
-				_reservationRule.reset(new ReservationRule(0));
+				_reservationRule = Env::GetOfficialEnv()->template getEditableRegistry<ReservationRule>().getWithAutoCreation(0);
 			}
 		}
 

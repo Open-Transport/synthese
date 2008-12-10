@@ -24,7 +24,7 @@
 #define SYNTHESE_env_NonConcurrencyRule_h__
 
 #include "Registrable.h"
-
+#include "Registry.h"
 
 namespace synthese
 {
@@ -36,6 +36,12 @@ namespace synthese
 		class NonConcurrencyRule
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<NonConcurrencyRule>	Registry;
+
+		protected:
 			util::RegistryKeyType	_prorityLine;
 			util::RegistryKeyType	_hiddenLine;
 			int	_delay;

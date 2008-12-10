@@ -24,7 +24,7 @@
 #define SYNTHESE_PEDESTRIAN_COMPLIANCE_H
 
 #include "Compliance.h"
-
+#include "RegistryWithAutocreationEnabled.h"
 #include <boost/logic/tribool.hpp>
 #include <string>
 
@@ -40,6 +40,9 @@ namespace synthese
 		:	public Compliance
 		{
 		public:
+			/// Chosen registry class.
+			typedef util::RegistryWithAutocreationEnabled<PedestrianCompliance>	Registry;
+
 			PedestrianCompliance(util::RegistryKeyType key = UNKNOWN_VALUE);
 			~PedestrianCompliance();
 		};

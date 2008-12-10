@@ -26,6 +26,7 @@
 #include <string>
 
 #include "Registrable.h"
+#include "Registry.h"
 
 #include "17_messages/Types.h"
 
@@ -39,6 +40,11 @@ namespace synthese
 		class TextTemplate
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<TextTemplate>	Registry;
+
 		private:
 			std::string	_name;
 			std::string _short_message;

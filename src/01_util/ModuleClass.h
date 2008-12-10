@@ -26,7 +26,7 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include "01_util/Factorable.h"
+#include "FactoryBase.h"
 
 namespace synthese
 {
@@ -42,9 +42,16 @@ namespace synthese
 			Each module must implement a ModuleClass subclass and register it by the Generic Factory.
 			Chosen key indicates the order of loading and can be important in several cases.
 		*/
-		class ModuleClass : public util::Factorable<ModuleClass>
+		class ModuleClass
+		:	public util::FactoryBase<ModuleClass>
 		{
 		public:
+			/// Optional arguments for factory.
+			struct Args
+			{
+
+			};
+
 			ModuleClass();
 
 			virtual void preInit () {};

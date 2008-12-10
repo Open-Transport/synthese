@@ -25,11 +25,9 @@
 
 #include <string>
 
-#include "01_util/Factorable.h"
-
+#include "FactoryBase.h"
 #include "11_interfaces/Types.h"
-
-#include "30_server/FunctionRequest.h"
+#include "FunctionRequest.h"
 
 #include <vector>
 
@@ -44,21 +42,23 @@ namespace synthese
 	{
 	    class AdminRequest;
 
-		/** Composant d'administration.
-			@ingroup m14
-			
-			Un composant d'administration est un formulaire paramétrable, destiné à effectuer une écriture en temps réel dans la base SYNTHESE, dans un but de paramétrage de l'application (il ne s'agit pas du seul moyen d'écriture).
-			Une même donnée peut être mise à jour par autant de composants que nécessaire, défini avant tout sur la base d'une ergonomie de qualité.
-			Chaque composant est rattaché au module correspondant aux données à modifier sous forme d'une sous-classe de AdminInterfaceElement. 
-			Le comportement des composants d'administration est en général défini d'après les @ref defRight "habilitations" de l'utilisateur connecté.
-			Par exemple :
-				- un utilisateur anonyme n'a accès à aucun composant d'administration
-				- un administrateur a accès à tous les composants d'administration.
-			
-		*/
-		class AdminInterfaceElement : public util::Factorable<AdminInterfaceElement>
+		/// Composant d'administration.
+		///	@ingroup m14
+		///	
+		///	Un composant d'administration est un formulaire paramétrable, destiné à effectuer une écriture en temps réel dans la base SYNTHESE, dans un but de paramétrage de l'application (il ne s'agit pas du seul moyen d'écriture).
+		///	Une même donnée peut être mise à jour par autant de composants que nécessaire, défini avant tout sur la base d'une ergonomie de qualité.
+		///	Chaque composant est rattaché au module correspondant aux données à modifier sous forme d'une sous-classe de AdminInterfaceElement. 
+		///	Le comportement des composants d'administration est en général défini d'après les @ref defRight "habilitations" de l'utilisateur connecté.
+		///	Par exemple :
+		///		- un utilisateur anonyme n'a accès à aucun composant d'administration
+		///		- un administrateur a accès à tous les composants d'administration.
+		///
+		class AdminInterfaceElement
+		:	public util::FactoryBase<AdminInterfaceElement>
 		{
 		public:
+			
+			/// Optional arguments for factory.
 			struct Args
 			{
 				std::string defaultIcon;
@@ -119,9 +119,9 @@ namespace synthese
 
 			//! \name Virtual initialization method
 			//@{
-				/** Initialization of the parameters from a request.
-					@param request The request to use for the initialization.
-				*/
+				/// Initialization of the parameters from a request.
+				///	@param request The request to use for the initialization.
+				///
 				virtual void setFromParametersMap(const server::ParametersMap& map) = 0;
 			//@}
 

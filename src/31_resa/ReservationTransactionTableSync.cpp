@@ -80,7 +80,7 @@ namespace synthese
 			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
 				Env senv;
-				ReservationTableSync::Search(senv, object);
+				ReservationTableSync::Search(senv, object->getKey());
 				BOOST_FOREACH(shared_ptr<Reservation> reser, senv.template getRegistry<Reservation>())
 				{
 					object->addReservation(reser);

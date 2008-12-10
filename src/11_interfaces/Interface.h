@@ -29,9 +29,8 @@
 #include <map>
 
 #include "Registrable.h"
-
+#include "Registry.h"
 #include "Factory.h"
-
 #include "InterfacePage.h"
 
 namespace synthese
@@ -55,51 +54,56 @@ namespace synthese
 		class Interface
 		:	public virtual util::Registrable
 		{
-			private:
-				typedef std::map<std::string, std::map<std::string, InterfacePage*> >	PagesMap;
-				
-				std::string	_name;
-				PagesMap	_pages;
-				std::string	_noSessionDefaultPageCode;
+		public:
 
-			public:
-				//! \name Setters
-				//@{
-					void	setName(const std::string& name);
-				//@}
+			/// Chosen registry class.
+			typedef util::Registry<Interface>	Registry;
 
-				//! \name Getters
-				//@{
-					/** Gets a stored page from the class factory key.
-						@param key Key of the wanted class (pair of strings : if the second element of the pair is empty, and no element has empty page key, then the first element of the class is returned)
-						@return A pointer to the existing wanted page in the interface definition. The pointer does not know the real type of the page.
-						@exception InterfacePageException The code is not available in the factory
-					*/
-					const InterfacePage* getPage(const std::string& classCode, std::string pageCode = std::string()) const;
+		private:
+			typedef std::map<std::string, std::map<std::string, InterfacePage*> >	PagesMap;
+			
+			std::string	_name;
+			PagesMap	_pages;
+			std::string	_noSessionDefaultPageCode;
 
-					/** Gets a stored page from its class (template).
-						@return The required page, directly known as its type.
-					*/
-					template <class T>
-					const T* const getPage(std::string pageKey = std::string()) const
-					{
-						return static_cast<const T*>(getPage(T::FACTORY_KEY, pageKey));
-					}
+		public:
+			//! \name Setters
+			//@{
+				void	setName(const std::string& name);
+			//@}
 
-					const std::string& getNoSessionDefaultPageCode() const;
-					const std::string& getName() const;
-				//@}
+			//! \name Getters
+			//@{
+				/** Gets a stored page from the class factory key.
+					@param key Key of the wanted class (pair of strings : if the second element of the pair is empty, and no element has empty page key, then the first element of the class is returned)
+					@return A pointer to the existing wanted page in the interface definition. The pointer does not know the real type of the page.
+					@exception InterfacePageException The code is not available in the factory
+				*/
+				const InterfacePage* getPage(const std::string& classCode, std::string pageCode = std::string()) const;
 
-				//! \name Modifiers
-				//@{
-					void	addPage(InterfacePage* page);
-					void	removePage(const std::string& classCode, const std::string& pageCode);
-					void	setNoSessionDefaultPageCode(const std::string& classCode);
-				//@}
+				/** Gets a stored page from its class (template).
+					@return The required page, directly known as its type.
+				*/
+				template <class T>
+				const T* const getPage(std::string pageKey = std::string()) const
+				{
+					return static_cast<const T*>(getPage(T::FACTORY_KEY, pageKey));
+				}
 
-				Interface(
-					util::RegistryKeyType id = UNKNOWN_VALUE
-				);
+				const std::string& getNoSessionDefaultPageCode() const;
+				const std::string& getName() const;
+			//@}
+
+			//! \name Modifiers
+			//@{
+				void	addPage(InterfacePage* page);
+				void	removePage(const std::string& classCode, const std::string& pageCode);
+				void	setNoSessionDefaultPageCode(const std::string& classCode);
+			//@}
+
+			Interface(
+				util::RegistryKeyType id = UNKNOWN_VALUE
+			);
 		};
 	}
 }

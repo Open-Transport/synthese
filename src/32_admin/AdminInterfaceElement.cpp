@@ -1,38 +1,35 @@
 
-/** AdminInterfaceElement class implementation.
-	@file AdminInterfaceElement.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+/// AdminInterfaceElement class implementation.
+///	@file AdminInterfaceElement.cpp
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software
+///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <sstream>
 
-#include "05_html/HTMLModule.h"
+#include "HTMLModule.h"
 
-#include "30_server/FunctionRequest.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/QueryString.h"
+#include "FunctionRequest.h"
+#include "QueryString.h"
 
-#include "32_admin/AdminRequest.h"
-#include "32_admin/AdminInterfaceElement.h"
-#include "32_admin/HomeAdmin.h"
+#include "AdminRequest.h"
+#include "HomeAdmin.h"
 
-#include "11_interfaces/Interface.h"
+#include "Interface.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -47,6 +44,7 @@ namespace synthese
 	{
 
 		AdminInterfaceElement::AdminInterfaceElement(const Args& args)
+		:	FactoryBase<AdminInterfaceElement>()
 		{
 		}
 
@@ -194,8 +192,9 @@ namespace synthese
 
 
 
-		std::string AdminInterfaceElement::PageLink::getURL( const server::FunctionRequest<admin::AdminRequest>* request ) const
-		{
+		std::string AdminInterfaceElement::PageLink::getURL(
+			const server::FunctionRequest<admin::AdminRequest> const* request
+		) const	{
 			Request r;
 			r.getInternalParameters().insert(QueryString::PARAMETER_FUNCTION, AdminRequest::FACTORY_KEY);
 			r.getInternalParameters().insert(QueryString::PARAMETER_SESSION, request->getSession()->getKey());

@@ -112,7 +112,7 @@ namespace synthese
 			// Control of the date : a cancellation has no sense if after the arrival time
 			DateTime now(TIME_CURRENT);
 			Env env;
-			ReservationTableSync::Search(env, _transaction.get());
+			ReservationTableSync::Search(env, _transaction->getKey());
 			BOOST_FOREACH(shared_ptr<Reservation> resa, env.template getRegistry<Reservation>())
 			{
 				if (resa->getReservationRuleId() != UNKNOWN_VALUE)

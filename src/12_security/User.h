@@ -26,7 +26,7 @@
 #include <string>
 
 #include "Registrable.h"
-
+#include "Registry.h"
 #include "Date.h"
 
 namespace synthese
@@ -50,6 +50,11 @@ namespace synthese
 		class User
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<User>	Registry;
+
 		private:
 			const Profile*	_profile;
 			std::string		_login;

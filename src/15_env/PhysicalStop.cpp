@@ -47,7 +47,8 @@ namespace synthese
 			, double y
 		)	: Registrable(id)
 			, Vertex (place, x, y)
-			, _name (name)
+			, _name (name),
+			_operatorCode()
 		{
 		}
 

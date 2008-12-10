@@ -29,7 +29,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Registrable.h"
-
+#include "Registry.h"
 
 #include "12_security/Constants.h"
 #include "12_security/Types.h"
@@ -61,6 +61,11 @@ namespace synthese
 		class Profile
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<Profile>	Registry;
+
 		private:
 			std::string		_name;
 			RightsVector	_rights;

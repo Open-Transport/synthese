@@ -79,7 +79,9 @@ namespace synthese
 		    std::string webSiteUrl (
 			rows->getText (ReservationRuleTableSync::COL_WEBSITEURL));
 
-		    rr->setCompliant (rows->getTribool (ReservationRuleTableSync::COL_TYPE));
+			ReservationRuleType ruleType(static_cast<ReservationRuleType>(rows->getInt(ReservationRuleTableSync::COL_TYPE)));
+
+			rr->setType(ruleType);
 		    rr->setOnline (online);
 		    rr->setOriginIsReference (originIsReference);
 		    rr->setMinDelayMinutes (minDelayMinutes);
@@ -97,22 +99,22 @@ namespace synthese
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					/// @todo fill fields [,]FIELD=VALUE
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					/// @todo fill other fields separated by ,
-					<< ")";
-			}
+            query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey()) << ","
+				<< static_cast<int>(object->getType()) << ","
+				<< Conversion::ToString(object->getOnline()) << ","
+				<< object->getMinDelayMinutes() << ","
+				<< object->getMinDelayDays() << ","
+				<< object->getMaxDelayDays() << ","
+				<< object->getHourDeadLine().toSQLString() << ","
+				<< Conversion::ToSQLiteString(object->getPhoneExchangeNumber()) << ","
+				<< Conversion::ToSQLiteString(object->getPhoneExchangeOpeningHours()) << ","
+				<< Conversion::ToSQLiteString(object->getDescription()) << ","
+				<< Conversion::ToSQLiteString(object->getWebSiteUrl())
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 

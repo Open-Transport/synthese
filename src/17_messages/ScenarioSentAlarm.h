@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ScenarioSentAlarm_h__
 #define SYNTHESE_ScenarioSentAlarm_h__
 
-
+#include "Registry.h"
 #include "SentAlarm.h"
 
 namespace synthese
@@ -39,6 +39,11 @@ namespace synthese
 		class ScenarioSentAlarm
 		:	public SentAlarm
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<ScenarioSentAlarm>	Registry;
+
 		private:
 			const SentScenario* _scenario;
 

@@ -27,6 +27,7 @@
 
 #include "AddressablePlace.h"
 #include "Path.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -60,6 +61,9 @@ namespace synthese
 			ROAD_TYPE_HIGHWAY /* route secondaire */
 		  } RoadType;
 		    
+
+		  /// Chosen registry class.
+		  typedef util::Registry<Road>	Registry;
 
 		private:
 		  

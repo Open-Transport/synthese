@@ -28,9 +28,8 @@
 
 #include <boost/logic/tribool.hpp>
 
-#include "Registrable.h"
-
 #include "Path.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -70,6 +69,10 @@ namespace synthese
 		:	public Path
 		{
 		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<Line>	Registry;
+
 			typedef std::vector<SubLine*> SubLines;
 
 		private:

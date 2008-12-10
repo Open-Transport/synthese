@@ -74,8 +74,14 @@ namespace synthese
 			if (_determinationMethod == ARRIVAL_TO_DEPARTURE)
 				return true;
 
-			if (_service->getReservationRule()->isCompliant() == true)
-				return _service->getReservationRule()->isRunPossible(_originDateTime, computingDateTime, _actualTime);
+			ReservationRuleType reservationRuleType(_service->getReservationRule()->getType());
+			if(reservationRuleType != RESERVATION_FORBIDDEN)
+				return _service->getReservationRule()->isRunPossible(
+					_originDateTime,
+					(reservationRuleType == RESERVATION_MIXED_BY_DEPARTURE_PLACE) ? false : true,
+					computingDateTime,
+					_actualTime
+				);
 
 			return true;
 		}

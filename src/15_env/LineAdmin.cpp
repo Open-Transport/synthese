@@ -96,7 +96,7 @@ namespace synthese
 		void LineAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
 		{
 			// Reservation
-			bool reservation(_line->getReservationRule() && _line->getReservationRule()->isCompliant() == true);
+			bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
 
 			// Env
 			Env env;

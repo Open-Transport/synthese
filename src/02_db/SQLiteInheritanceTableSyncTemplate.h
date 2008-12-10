@@ -24,7 +24,6 @@
 #define SYNTHESE_db_SQLiteInheritanceTableSyncTemplate_h__
 
 #include "SQLiteTableSyncTemplate.h"
-#include "Factorable.h"
 #include "02_db/Types.h"
 
 namespace synthese

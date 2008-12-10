@@ -49,7 +49,8 @@ namespace synthese
 			, const City* city /*= NULL */
 			, ConnectionType connectionType /*= CONNECTION_TYPE_FORBIDDEN */
 			, int defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */ 
-		)	: ConnectionPlace(id, name, city, connectionType)
+		):	ConnectionPlace(id, name, city, connectionType),
+			Registrable(id)
 			, _defaultTransferDelay (defaultTransferDelay)
 			, _minTransferDelay (UNKNOWN_VALUE)
 			, _score(UNKNOWN_VALUE)

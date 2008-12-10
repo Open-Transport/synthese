@@ -29,7 +29,7 @@
 #include "Date.h"
 
 #include "Registrable.h"
-
+#include "Registry.h"
 #include "01_util/Constants.h"
 
 #include <string>
@@ -69,6 +69,10 @@ namespace synthese
 		:	public virtual util::Registrable
 		{
 		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<Site>	Registry;
+
 			typedef std::vector<HourPeriod> Periods;
 			
 		private:

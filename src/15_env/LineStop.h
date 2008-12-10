@@ -25,8 +25,7 @@
 
 #include <string>
 
-
-
+#include "Registry.h"
 #include "Edge.h"
 
 namespace synthese
@@ -45,6 +44,11 @@ namespace synthese
 		class LineStop
 		:	public Edge
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<LineStop>	Registry;
+
 		private:
 			const PhysicalStop*  _physicalStop;   //!< Physical stop
 

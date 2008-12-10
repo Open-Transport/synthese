@@ -1,6 +1,7 @@
-
-/** Factorable class implementation.
-	@file Factorable.cpp
+/** UtilModule class implementation.
+	@file UtilModule.cpp
+	@author Hugues Romain
+	@date 2008
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,11 +21,49 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Factorable.h"
+// util
+#include "UtilModule.h"
+#include "Env.h"
+
+using namespace std;
 
 namespace synthese
 {
 	namespace util
 	{
+		template<> const string FactorableTemplate<ModuleClass,UtilModule>::FACTORY_KEY("01_util");
+
+		void UtilModule::preInit()
+		{
+			Env::_officialRegistries.reset(new Env);
+		}
+
+
+
+		void UtilModule::initialize()
+		{
+
+		}
+
+
+
+		UtilModule::UtilModule()
+		{
+
+		}
+
+
+
+		UtilModule::~UtilModule()
+		{
+
+		}
+
+
+
+		std::string UtilModule::getName() const
+		{
+			return "Noyau SYNTHESE";
+		}
 	}
 }

@@ -24,7 +24,7 @@
 #define SYNTHESE_BIKE_COMPLIANCE_H
 
 #include "Compliance.h"
-
+#include "RegistryWithAutocreationEnabled.h"
 #include <boost/logic/tribool.hpp>
 #include <string>
 
@@ -39,8 +39,10 @@ namespace synthese
 		class BikeCompliance
 		:	public Compliance
 		{
-
 		public:
+
+			/// Chosen registry class.
+			typedef util::RegistryWithAutocreationEnabled<BikeCompliance>	Registry;
 
 			BikeCompliance(
 				util::RegistryKeyType key = UNKNOWN_VALUE

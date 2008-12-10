@@ -26,9 +26,7 @@
 #include <set>
 
 #include "Registrable.h"
-
-#include "06_geometry/Point2D.h"
-
+#include "Point2D.h"
 
 namespace synthese
 {
@@ -51,6 +49,7 @@ namespace synthese
 		{
 		public:
 			typedef std::set<const Edge*> Edges;
+
 		private:
 
 			const AddressablePlace* _addressablePlace;

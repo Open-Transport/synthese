@@ -53,7 +53,6 @@ namespace synthese
 			boost::shared_ptr<const Fare>					_fare;
 			boost::shared_ptr<const HandicappedCompliance>	_handicappedCompliance;
 			boost::shared_ptr<const PedestrianCompliance>	_pedestrianCompliance;
-			boost::shared_ptr<const ReservationRule>		_reservationRule;
 			
 			const Complyer*					_complianceParent;
 
@@ -68,6 +67,8 @@ namespace synthese
 				boost::shared_ptr<const Fare>					getFare()					const;
 				boost::shared_ptr<const HandicappedCompliance>	getHandicappedCompliance()	const;
 				boost::shared_ptr<const PedestrianCompliance>	getPedestrianCompliance()	const;
+				
+				/** Temporary pedestrian reservation rule getter. */
 				boost::shared_ptr<const ReservationRule>		getReservationRule()		const;
 			//@}
 
@@ -77,6 +78,8 @@ namespace synthese
 				void	setPedestrianCompliance(boost::shared_ptr<const PedestrianCompliance> compliance);
 				void	setBikeCompliance(boost::shared_ptr<const BikeCompliance> compliance);
 				void	setFare(boost::shared_ptr<const Fare> fare);
+				
+				/** Temporary pedestrian reservation rule setter. */
 				void	setReservationRule(boost::shared_ptr<const ReservationRule> rule);
 				void	setComplianceParent(const Complyer* parent);
 			//@}

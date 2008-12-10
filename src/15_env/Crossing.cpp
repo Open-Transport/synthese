@@ -26,8 +26,6 @@
 #include "Road.h"
 #include "Registry.h"
 
-#include <assert.h>
-
 using namespace std;
 
 namespace synthese

@@ -24,8 +24,8 @@
 #include "TridentExport.h"
 
 // 35 Env
-#include "EnvModule.h"
 #include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
 #include "PhysicalStop.h"
@@ -85,9 +85,13 @@ namespace synthese
 
 	namespace impex
 	{
-		TridentExport::TridentExport(const CommercialLine* line, bool _withTisseoExtension)
-			: _commercialLine(line)
-			, _withTisseoExtension(_withTisseoExtension)
+		TridentExport::TridentExport(
+			Env& env,
+			RegistryKeyType lineId,
+			bool withTisseoExtension
+		):	_env(env),
+			_commercialLineId(lineId),
+			_withTisseoExtension(withTisseoExtension)
 		{ }
 
 
@@ -137,46 +141,38 @@ namespace synthese
 		void TridentExport::run(
 			ostream& os
 		){
-
 			static const string peerid ("SYNTHESE");
 
 			os.imbue (locale(""));
-
 			// os.imbue (locale("en_US.ISO-8859-15"));
 			cerr << "locale = " << os.getloc ().name () << "\n";
 
-
-
-			os << "<?xml version='1.0' encoding='ISO-8859-15'?>" << "\n" << "\n";
-
-			const TransportNetwork* tn = _commercialLine->getNetwork ();
-		    
-
 			// Collect all data related to selected commercial line
-			Env env;
-			LineTableSync::Search(env, _commercialLine->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-			NonConcurrencyRuleTableSync::Search(env, _commercialLine->getKey(), _commercialLine->getKey(), false);
+			shared_ptr<CommercialLine> _commercialLine(CommercialLineTableSync::GetEditable(_commercialLineId, &_env, UP_LINKS_LOAD_LEVEL));
+			LineTableSync::Search(_env, _commercialLine->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+			NonConcurrencyRuleTableSync::Search(_env, _commercialLine->getKey(), _commercialLine->getKey(), false);
 
 			// Lines
-			const RollingStock* rollingStock;
-			BOOST_FOREACH(shared_ptr<Line> line, env.template getRegistry<Line>())
+			const RollingStock* rollingStock(NULL);
+			BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
 			{
 				if (line->getRollingStock())
 					rollingStock = line->getRollingStock();
-				LineStopTableSync::Search(env, line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ScheduledServiceTableSync::Search(env, line->getKey(), UNKNOWN_VALUE, DATE(TIME_UNKNOWN), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ContinuousServiceTableSync::Search(env, line->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				LineStopTableSync::Search(_env, line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				ScheduledServiceTableSync::Search(_env, line->getKey(), UNKNOWN_VALUE, DATE(TIME_UNKNOWN), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				ContinuousServiceTableSync::Search(_env, line->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 			}    
 
 
 			// Writing of the header
+			os << "<?xml version='1.0' encoding='ISO-8859-15'?>" << "\n" << "\n";
 		    if (_withTisseoExtension)
 				os << "<TisseoPTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident http://www.reseaux-conseil.com/trident/tisseo-chouette-extension.xsd'>" << "\n";
 			else
 				os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident Chouette.xsd'>" << "\n";
 
 			// --------------------------------------------------- PTNetwork 
-			{
+			const TransportNetwork* tn(_commercialLine->getNetwork());
 			os << "<PTNetwork>" << "\n";
 			os << "<objectId>" << TridentId (peerid, "PTNetwork", tn->getKey ()) << "</objectId>" << "\n";
 			os << "<versionDate>" << ToXsdDate (Date (TIME_CURRENT)) << "</versionDate>" << "\n";
@@ -187,7 +183,6 @@ namespace synthese
 			os << "<lineId>" << TridentId (peerid, "Line", _commercialLine->getKey ()) << "</lineId>" << "\n";
 			os << "<comment/>" << "\n";
 			os << "</PTNetwork>" << "\n";
-			}
 
 			// --------------------------------------------------- GroupOfLine
 
@@ -213,7 +208,7 @@ namespace synthese
 			// Not implemented right now.
 
 			// --------------------------------------------------- StopArea (type = Quay) <=> PhysicalStop
-			BOOST_FOREACH(shared_ptr<PhysicalStop> ps, env.template getRegistry<PhysicalStop>())
+			BOOST_FOREACH(shared_ptr<PhysicalStop> ps, _env.template getRegistry<PhysicalStop>())
 			{
 				if ((ps->getDepartureEdges ().size () == 0) && (ps->getArrivalEdges ().size () == 0)) continue;
 
@@ -246,7 +241,7 @@ namespace synthese
 			}
 		    
 			// --------------------------------------------------- StopArea (type = CommercialStopPoint)
-			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, env.template getRegistry<PublicTransportStopZoneConnectionPlace>())
+			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, _env.template getRegistry<PublicTransportStopZoneConnectionPlace>())
 			{
 				os << "<StopArea>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopArea", cp->getKey ()) << "</objectId>" << "\n";
@@ -277,7 +272,7 @@ namespace synthese
 
 
 			// --------------------------------------------------- AreaCentroid
-			BOOST_FOREACH(shared_ptr<PhysicalStop> ps, env.template getRegistry<PhysicalStop>())
+			BOOST_FOREACH(shared_ptr<PhysicalStop> ps, _env.template getRegistry<PhysicalStop>())
 			{
 				os << "<AreaCentroid>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</objectId>" << "\n";
@@ -308,7 +303,7 @@ namespace synthese
 			os << "</ChouetteArea>" << "\n";
 
 			// --------------------------------------------------- ConnectionLink
-			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, env.template getRegistry<PublicTransportStopZoneConnectionPlace>())
+			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, _env.template getRegistry<PublicTransportStopZoneConnectionPlace>())
 			{
 				// Contained physical stops
 				const PhysicalStops& stops(cp->getPhysicalStops());
@@ -331,7 +326,7 @@ namespace synthese
 		    
 			// --------------------------------------------------- Timetable
 			// One timetable per service
-			BOOST_FOREACH(shared_ptr<ScheduledService> srv, env.template getRegistry<ScheduledService>())
+			BOOST_FOREACH(shared_ptr<ScheduledService> srv, _env.template getRegistry<ScheduledService>())
 			{
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", srv.get()) << "</objectId>" << "\n";
@@ -344,7 +339,7 @@ namespace synthese
 
 				os << "</Timetable>" << "\n";
 			}
-			BOOST_FOREACH(shared_ptr<ContinuousService> srv, env.template getRegistry<ContinuousService>())
+			BOOST_FOREACH(shared_ptr<ContinuousService> srv, _env.template getRegistry<ContinuousService>())
 			{
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", srv.get()) << "</objectId>" << "\n";
@@ -360,7 +355,7 @@ namespace synthese
 
 
 			// --------------------------------------------------- TimeSlot
-			BOOST_FOREACH(shared_ptr<ContinuousService> csrv, env.template getRegistry<ContinuousService>())
+			BOOST_FOREACH(shared_ptr<ContinuousService> csrv, _env.template getRegistry<ContinuousService>())
 			{
 				string timeSlotId;
 				timeSlotId = TridentId(peerid, "TimeSlot", csrv.get());
@@ -414,7 +409,7 @@ namespace synthese
 				}
 				os << "<transportModeName>" << tm << "</transportModeName>" << "\n";
 			    
-				BOOST_FOREACH(shared_ptr<Line> line, env.template getRegistry<Line>())
+				BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
 				{
 					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << "\n";
 				}
@@ -426,7 +421,7 @@ namespace synthese
 			}
 
 			// --------------------------------------------------- ChouetteRoute
-			BOOST_FOREACH(shared_ptr<Line> line, env.template getRegistry<Line>())
+			BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
 			{
 				os << "<ChouetteRoute>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << "\n";
@@ -467,7 +462,7 @@ namespace synthese
 			}
 		
 			// --------------------------------------------------- StopPoint
-			BOOST_FOREACH(shared_ptr<LineStop> ls, env.template getRegistry<LineStop>())
+			BOOST_FOREACH(shared_ptr<LineStop> ls, _env.template getRegistry<LineStop>())
 			{
 				const PhysicalStop* ps = static_cast<const PhysicalStop*>(ls->getFromVertex());
 
@@ -515,12 +510,12 @@ namespace synthese
 
 
 			// --------------------------------------------------- PtLink
-			BOOST_FOREACH(shared_ptr<Line> line, env.template getRegistry<Line>())
+			BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
 			{
 				Env lenv;
 				LineStopTableSync::Search(lenv, line->getKey());
 				shared_ptr<LineStop> from;
-				BOOST_FOREACH(shared_ptr<LineStop> to, env.template getRegistry<LineStop>())
+				BOOST_FOREACH(shared_ptr<LineStop> to, _env.template getRegistry<LineStop>())
 				{
 					if (from.get())
 					{
@@ -537,7 +532,7 @@ namespace synthese
 
 			// --------------------------------------------------- JourneyPattern
 			// One per route 
-			BOOST_FOREACH(shared_ptr<Line> line, env.template getRegistry<Line>())
+			BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
 			{
 				if (line->getEdges().empty())
 					continue;
@@ -562,9 +557,9 @@ namespace synthese
 			}
 		
 			// --------------------------------------------------- VehicleJourney
-			BOOST_FOREACH(shared_ptr<ScheduledService> srv, env.template getRegistry<ScheduledService>())
+			BOOST_FOREACH(shared_ptr<ScheduledService> srv, _env.template getRegistry<ScheduledService>())
 			{
-				bool isDRT(srv->getReservationRule()->isCompliant() != false);
+				bool isDRT(srv->getReservationRule()->getType() != RESERVATION_FORBIDDEN);
 
 				os << "<VehicleJourney";
 				if (_withTisseoExtension)
@@ -626,9 +621,9 @@ namespace synthese
 				os << "</VehicleJourney>" << "\n";
 			}
 
-			BOOST_FOREACH(shared_ptr<ContinuousService> srv, env.template getRegistry<ContinuousService>())
+			BOOST_FOREACH(shared_ptr<ContinuousService> srv, _env.template getRegistry<ContinuousService>())
 			{
-				bool isDRT(srv->getReservationRule()->isCompliant() != false);
+				bool isDRT(srv->getReservationRule()->getType() != RESERVATION_FORBIDDEN);
 
 				os << "<VehicleJourney";
 				if (_withTisseoExtension)
@@ -691,15 +686,15 @@ namespace synthese
 			{
 				// Reservation Rules -----------------------------------------------------------------------
 
-				BOOST_FOREACH(shared_ptr<ReservationRule> r, env.template getRegistry<ReservationRule>())
+				BOOST_FOREACH(shared_ptr<ReservationRule> r, _env.template getRegistry<ReservationRule>())
 				{
 					const ReservationRule& rule(*r);
 
-					if (rule.isCompliant() == false || (rule.getMinDelayDays() == 0 && rule.getMinDelayMinutes() == 0))	continue;
+					if (rule.getType() == RESERVATION_FORBIDDEN || (rule.getMinDelayDays() == 0 && rule.getMinDelayMinutes() == 0))	continue;
 
 					os << "<ReservationRule>" << "\n";
 					os << "<objectId>" << TridentId (peerid, "ReservationRule", rule.getKey ()) << "</objectId>" << "\n";
-					os << "<ReservationCompulsory>" << (rule.isCompliant() == true ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
+					os << "<ReservationCompulsory>" << ((rule.getType() == RESERVATION_COMPULSORY) ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
 					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << "\n";
 					if (rule.getMinDelayMinutes() > 0)
 					{
@@ -730,7 +725,7 @@ namespace synthese
 				}
 
 				// Non concurrency -----------------------------------------------------------------------
-				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, env.template getRegistry<NonConcurrencyRule>())
+				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, _env.template getRegistry<NonConcurrencyRule>())
 				{
 					os << "<LineConflict>" << "\n";
 					os << "<objectId>" << TridentId (peerid, "LineConflict", rule->getKey ()) << "</objectId>" << "\n";
@@ -742,7 +737,7 @@ namespace synthese
 
 
 				// CityMainStops --------------------------------------------------- 
-				BOOST_FOREACH(shared_ptr<City> city, env.template getRegistry<City>())
+				BOOST_FOREACH(shared_ptr<City> city, _env.template getRegistry<City>())
 				{
 					vector<string> containedStopAreas;
 
@@ -752,7 +747,7 @@ namespace synthese
 					BOOST_FOREACH(shared_ptr<const PublicTransportStopZoneConnectionPlace> cp, senv.template getRegistry<PublicTransportStopZoneConnectionPlace>())
 					{
 						// filter physical stops not concerned by this line.
-						if(!env.template getRegistry<PublicTransportStopZoneConnectionPlace>().contains(cp->getKey())) continue;
+						if(!_env.template getRegistry<PublicTransportStopZoneConnectionPlace>().contains(cp->getKey())) continue;
 
 						containedStopAreas.push_back (TridentId (peerid, "StopArea", cp->getKey()));
 

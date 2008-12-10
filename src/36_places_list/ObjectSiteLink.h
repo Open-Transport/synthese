@@ -24,6 +24,7 @@
 #define SYNTHESE_transportwebsite_ObjectSiteLink_h__
 
 #include "Registrable.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -37,6 +38,12 @@ namespace synthese
 		class ObjectSiteLink
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<ObjectSiteLink>	Registry;
+
+		protected:
 			uid			_objectId;
 			const Site*	_site;
 

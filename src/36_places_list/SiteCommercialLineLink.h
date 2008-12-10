@@ -24,7 +24,7 @@
 #define SYNTHESE_routeplanner_SiteCommercialLineLink_h__
 
 #include "Registrable.h"
-
+#include "Registry.h"
 #include "01_util/Constants.h"
 
 namespace synthese
@@ -37,6 +37,12 @@ namespace synthese
 		class SiteCommercialLineLink
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<SiteCommercialLineLink>	Registry;
+
+		protected:
 			uid _siteId;
 			uid _commercialLineId;
 

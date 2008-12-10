@@ -40,14 +40,15 @@ namespace synthese
 
 	namespace env
 	{
-		ReservationRule::ReservationRule(RegistryKeyType key)
-		: Registrable(key)
-		, Compliance(false, UNKNOWN_VALUE)
-		, _online(false)
-		, _minDelayMinutes(0)
-		, _minDelayDays(0)
-		, _maxDelayDays(0)
-		, _hourDeadLine(TIME_UNKNOWN)
+		ReservationRule::ReservationRule(
+			RegistryKeyType key
+		):	Registrable(key),
+			_type(RESERVATION_FORBIDDEN),
+			_online(false),
+			_minDelayMinutes(0),
+			_minDelayDays(0),
+			_maxDelayDays(0),
+			_hourDeadLine(TIME_UNKNOWN)
 		{
 		}
 
@@ -176,18 +177,18 @@ namespace synthese
 
 
 
-
-
-		bool ReservationRule::isRunPossible (
-			const DateTime& originDateTime
-			, const DateTime& reservationTime
-			, const DateTime& departureTime
+		bool ReservationRule::isRunPossible(
+			const DateTime& originDateTime,
+			bool stopBelongsToOptionalReservationPlaces,
+			const DateTime& reservationTime,
+			const DateTime& departureTime
 		) const {
-			return (isCompliant() != true)
-			|| isReservationPossible (originDateTime, reservationTime, departureTime );
-
+			return	_type == RESERVATION_FORBIDDEN
+				||	_type == RESERVATION_OPTIONAL
+				||	(_type == RESERVATION_MIXED_BY_DEPARTURE_PLACE && stopBelongsToOptionalReservationPlaces)
+				||	isReservationPossible(originDateTime, reservationTime, departureTime)
+			;
 		}
-
 
 
 
@@ -196,7 +197,7 @@ namespace synthese
 			, const DateTime& reservationTime
 			, const DateTime& departureTime
 		) const {
-			return	isCompliant() != false
+			return	_type != RESERVATION_FORBIDDEN
 				&&	reservationTime <= getReservationDeadLine(originDateTime, departureTime )
 				&&	reservationTime >= getReservationStartTime (reservationTime)
 			;
@@ -204,13 +205,10 @@ namespace synthese
 
 
 
-
-		const std::string& 
-		ReservationRule::getDescription () const
+		const std::string& ReservationRule::getDescription() const
 		{
 			return _description;
 		}
-
 
 
 
@@ -279,6 +277,27 @@ namespace synthese
 		int ReservationRule::getMaxDelayDays() const
 		{
 			return _maxDelayDays;
+		}
+
+
+
+		synthese::ReservationRuleType ReservationRule::getType() const
+		{
+			return _type;
+		}
+
+
+
+		void ReservationRule::setType( ReservationRuleType value )
+		{
+			_type = value;
+		}
+
+
+
+		bool ReservationRule::getOnline() const
+		{
+			return _online;
 		}
 	}
 }

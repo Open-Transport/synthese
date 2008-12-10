@@ -36,6 +36,11 @@ namespace synthese
 			As this class is very much used, it is dangerous to derivate directly from it.
 			Use a virtual derivation to ensure that there is always only one instantiation of the
 			class in a sub-class instantiation.
+
+			Each Registrable class must determinate its Registry class by a typedef called Registry.
+			Two ways are possible :
+				- util::Registry : standard registry, allows abstract classes, but auto creation is forbidden
+				- util::RegistryWithAutocreationEnabled : allows auto creation but incompatible with abstract classes
 		
 			@ingroup m01Registry
 		*/
@@ -52,6 +57,8 @@ namespace synthese
 			Registrable(RegistryKeyType key = UNKNOWN_VALUE);
 
 		public:
+			virtual ~Registrable();
+
 			//! \name Getters
 			//@{
 				/** ID of the object getter.

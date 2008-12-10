@@ -75,7 +75,8 @@ namespace synthese
 
 		void TridentExportFunction::_run( std::ostream& stream ) const
 		{
-			TridentExport t(_line.get(), _withTisseoExtension);
+			Env env;
+			TridentExport t(env, _line->getKey(), _withTisseoExtension);
 			t.run(stream);
 		}
 	}

@@ -28,6 +28,7 @@
 #include "15_env/Types.h"
 
 #include "Registrable.h"
+#include "Registry.h"
 
 #include "RGBColor.h"
 
@@ -44,6 +45,11 @@ namespace synthese
 		class CommercialLine
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<CommercialLine>	Registry;
+
 		private:
 			std::string			_name;		//!< Name (code)
 			std::string			_shortName;	//!< Name (cartouche)

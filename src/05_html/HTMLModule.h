@@ -25,7 +25,8 @@
 
 #include <string>
 
-#include "01_util/ModuleClass.h"
+#include "ModuleClass.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -41,7 +42,8 @@ namespace synthese
 
 		/** HTML module class.
 		*/
-		class HTMLModule : public util::ModuleClass
+		class HTMLModule
+		:	public util::FactorableTemplate<util::ModuleClass, HTMLModule>
 		{
 		public:
 			/** Link displayed as a button.

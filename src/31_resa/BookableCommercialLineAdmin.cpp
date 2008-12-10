@@ -205,7 +205,7 @@ namespace synthese
 						obj.seatsNumber += resa->getSeats();
 				}
 
-				obj.overflow = rule->getCapacity() && (obj.seatsNumber > rule->getCapacity());
+				obj.overflow = false; // rule->getCapacity() && (obj.seatsNumber > rule->getCapacity());
 
 				int lastDepartureLineStop(getRankOfLastDepartureLineStop(service->getPathId()));
 

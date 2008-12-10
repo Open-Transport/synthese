@@ -22,9 +22,8 @@
 #ifndef SYNTHESE_Function_h__
 #define SYNTHESE_Function_h__
 
-#include "01_util/Factorable.h"
-
-#include "30_server/ParametersMap.h"
+#include "FactoryBase.h"
+#include "ParametersMap.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -41,8 +40,16 @@ namespace synthese
 		/** Function abstract class to use in a Request.
 			@ingroup m18
 		*/
-		class Function : public util::Factorable<Function>
+		class Function
+		:	public util::FactoryBase<Function>
 		{
+		public:
+			/// Optional arguments for factory.
+			struct Args
+			{
+
+			};
+
 		protected:
 			Request* _request;
 

@@ -25,7 +25,6 @@
 
 #include "Complyer.h"
 #include "ServicePointer.h"
-#include "15_env/Types.h"
 
 #include <string>
 
@@ -67,6 +66,8 @@ namespace synthese
 		:	public Complyer,
 			public virtual util::Registrable		
 		{
+		public:
+
 		private:
 			std::string				_serviceNumber;
 			util::RegistryKeyType	_pathId;

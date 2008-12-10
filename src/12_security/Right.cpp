@@ -31,7 +31,7 @@ namespace synthese
 	namespace security
 	{
 		Right::Right()
-		    : Factorable<Right>()
+		    : FactoryBase()
 			, _privateRightLevel(FORBIDDEN)
 			, _publicRightLevel(FORBIDDEN)
 		{	}

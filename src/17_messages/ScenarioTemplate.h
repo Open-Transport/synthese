@@ -24,6 +24,7 @@
 #define SYNTHESE_ScenarioTemplate_h__
 
 #include "ScenarioSubclassTemplate.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -37,6 +38,12 @@ namespace synthese
 		class ScenarioTemplate
 		:	public ScenarioSubclassTemplate<AlarmTemplate>
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<ScenarioTemplate>	Registry;
+
+		private:
 			uid	_folderId;
 
 		public:

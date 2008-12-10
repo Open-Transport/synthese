@@ -25,7 +25,8 @@
 #ifndef SYNTHESE_UtilModule_H__
 #define SYNTHESE_UtilModule_H__
 
-#include "01_util/ModuleClass.h"
+#include "ModuleClass.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -51,20 +52,24 @@ namespace synthese
 			@author Hugues Romain
 			@date 2008
 		*/
-		class UtilModule : public util::ModuleClass
+		class UtilModule
+		:	public FactorableTemplate<ModuleClass, UtilModule>
 		{
-		private:
-			// static Object::Registry _registry;	//!< Objects registry
-			
-			
 		public:
+			UtilModule();
+			~UtilModule();
+
 			/** Initialization of the 01 Various utilities module after the automatic database loads.
 				@author Hugues Romain
 				@date 2008
 			*/			
 			void initialize();
-			
-			// static Object::Registry& getObjects();
+
+
+			void preInit();
+
+
+			std::string getName() const;
 		};
 	}
 	/** @} */

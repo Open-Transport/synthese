@@ -29,7 +29,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "Factorable.h"
+#include "FactoryBase.h"
 
 #include "11_interfaces/Types.h"
 #include "LibraryInterfaceElement.h"
@@ -57,11 +57,21 @@ namespace synthese
 			@ingroup m11
 		*/
 		class InterfacePage
-		:	public util::Factorable<InterfacePage>,
+		:	public util::FactoryBase<InterfacePage>,
 			public virtual util::Registrable
 		{
 		public:
 			typedef std::vector<boost::shared_ptr<LibraryInterfaceElement> >	Components;
+
+			/// Optional arguments for factory.
+			struct Args
+			{
+
+			};
+
+			/// Chosen registry class.
+			typedef util::Registry<InterfacePage>	Registry;
+
 		private:
 			std::string			_pageCode;
 			const Interface*	_interface;

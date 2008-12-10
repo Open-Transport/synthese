@@ -28,6 +28,7 @@
 #include "DateTime.h"
 
 #include "Registrable.h"
+#include "Registry.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -45,6 +46,10 @@ namespace synthese
 		:	public virtual util::Registrable
 		{
 		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<ReservationTransaction>	Registry;
+
 			typedef std::vector<boost::shared_ptr<Reservation> > Reservations;
 			
 		private:

@@ -27,7 +27,7 @@
 #include <string>
 
 #include "Registrable.h"
-
+#include "Registry.h"
 #include "DateTime.h"
 
 namespace synthese
@@ -46,6 +46,10 @@ namespace synthese
 		: public virtual util::Registrable
 		{
 		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<DBLogEntry>	Registry;
+
 			typedef enum 
 			{
 				DB_LOG_UNKNOWN = 0

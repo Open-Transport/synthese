@@ -24,6 +24,7 @@
 #define SYNTHESE_ENV_FARE_H
 
 #include "Compliance.h"
+#include "RegistryWithAutocreationEnabled.h"
 
 #include <string>
 
@@ -48,6 +49,9 @@ namespace synthese
 			typedef enum { FARE_TYPE_ZONING = 0, 
 				   FARE_TYPE_SECTION = 1, 
 				   FARE_TYPE_DISTANCE = 2 } FareType;
+
+			/// Chosen registry class.
+			typedef util::RegistryWithAutocreationEnabled<Fare>	Registry;
 
 		 private:
 		    

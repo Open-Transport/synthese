@@ -23,18 +23,16 @@
 #ifndef SYNTHESE_DB_SQLITETABLESYNC_H
 #define SYNTHESE_DB_SQLITETABLESYNC_H
 
-#include "02_db/SQLiteTableFormat.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteStatement.h"
+#include "SQLiteTableFormat.h"
+#include "SQLiteResult.h"
+#include "SQLiteStatement.h"
 
-#include "01_util/Factorable.h"
-#include "01_util/UId.h"
+#include "FactoryBase.h"
+#include "UId.h"
 
 #include <string>
 #include <vector>
 #include <iostream>
-
-
 
 #define UPDATEABLE true;
 #define NON_UPDATEABLE false;
@@ -52,13 +50,13 @@ namespace synthese
 			@ingroup ref
 		*/
 
-		/** Base class for an SQLite table synchronizer.
-			By convention, the table name must always start with the t letter
-			followed by a unique 3 digits integer (SQLite does not allow ids starting with number).
-
-			@ingroup m10
-		*/
-		class SQLiteTableSync : public util::Factorable<SQLiteTableSync>
+		/// Base class for an SQLite table synchronizer.
+		///	By convention, the table name must always start with the t letter
+		///	followed by a unique 3 digits integer (SQLite does not allow ids starting with number).
+		///
+		///	@ingroup m10
+		///
+		class SQLiteTableSync : public util::FactoryBase<SQLiteTableSync>
 		{
 		private:
 
@@ -77,10 +75,9 @@ namespace synthese
 
 			virtual void initAutoIncrement();
 
-			class Args
+			/// Optional arguments for factory.
+			struct Args
 			{
-			public:
-
 			    bool allowInsert;
 			    bool allowRemove;
 			    std::string triggerOverrideClause;
@@ -92,9 +89,7 @@ namespace synthese
 				  const std::string& triggerOverrideClauseArg = "1",
 				  bool ignoreCallbacksOnFirstSyncArg = false,
 				  bool enableTriggersArg = true
-				) 
-
-				: allowInsert (allowInsertArg)
+				):	allowInsert (allowInsertArg)
 				, allowRemove (allowRemoveArg)
 				, triggerOverrideClause (triggerOverrideClauseArg)
 				, ignoreCallbacksOnFirstSync (ignoreCallbacksOnFirstSyncArg)

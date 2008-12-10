@@ -27,6 +27,7 @@
 
 #include "AccessParameters.h"
 #include "Registrable.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -43,6 +44,11 @@ namespace synthese
 		class UserFavoriteJourney
 		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<UserFavoriteJourney>	Registry;
+
 		private:
 			const security::User*	_user;
 			int						_rank;

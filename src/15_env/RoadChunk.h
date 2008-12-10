@@ -24,8 +24,7 @@
 #define SYNTHESE_ENV_ROADCHUNK_H
 
 #include "Edge.h"
-
-
+#include "Registry.h"
 
 namespace synthese
 {
@@ -35,21 +34,24 @@ namespace synthese
 		class Address;
 		class Road;
 
-
-
-		/** Association class between road and address.
-		A road chunk is always delimited by two adresses, with no other
-		address in between.
-		These delimiting addresses can correspond to :
-		- a crossing address
-		- a physical stop address
-		- a public place address
-
-		 @ingroup m35
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Association class between road and address.
+		///	A road chunk is always delimited by two adresses, with no other
+		///	address in between.
+		///	These delimiting addresses can correspond to :
+		///		- a crossing address
+		///		- a physical stop address
+		///		- a public place address
+		///	@ingroup m35
+		//////////////////////////////////////////////////////////////////////////
 		class RoadChunk
 		:	public Edge 
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<RoadChunk>	Registry;
+
 		private:
 
 			Address* _fromAddress;

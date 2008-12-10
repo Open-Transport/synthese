@@ -23,16 +23,17 @@
 #ifndef SYNTHESE_ENV_RESERVATIONRULE_H
 #define SYNTHESE_ENV_RESERVATIONRULE_H
 
-#include "Compliance.h"
-
+#include "Registrable.h"
+#include "RegistryWithAutocreationEnabled.h"
 #include "Hour.h"
 #include "DateTime.h"
+
+#include "15_env/Types.h"
 
 namespace synthese
 {
 	namespace env
 	{
-
 		/** Reservation rule.
 			A reservation rule is seen as a compliance :
 				- compliant = reservation compulsory
@@ -41,9 +42,16 @@ namespace synthese
 			@ingroup m35
 		*/
 		class ReservationRule
-		:	public Compliance
+		:	public virtual util::Registrable
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::RegistryWithAutocreationEnabled<ReservationRule>	Registry;
+
 		private:
+			ReservationRuleType		_type;	//!< Type of the reservation rule
+
 			bool _online;  //!< Reservation via SYNTHESE active
 			
 			bool _originIsReference; //!< Whether reference departure time is the line run departure time at its origin (true) or client departure time (false)
@@ -65,15 +73,17 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				bool getOriginIsReference() const;
-				const time::Hour& getHourDeadLine() const;
-				const std::string& getPhoneExchangeNumber()			const;
-				const std::string& getPhoneExchangeOpeningHours()	const;
-				const std::string& getWebSiteUrl () const;
-				const std::string& getDescription () const;
-				int getMinDelayDays() const;
-				int getMinDelayMinutes() const;
-				int getMaxDelayDays()								const;
+				bool				getOriginIsReference()			const;
+				const time::Hour&	getHourDeadLine()				const;
+				const std::string&	getPhoneExchangeNumber()		const;
+				const std::string&	getPhoneExchangeOpeningHours()	const;
+				const std::string&	getWebSiteUrl ()				const;
+				const std::string&	getDescription ()				const;
+				int					getMinDelayDays()				const;
+				int					getMinDelayMinutes()			const;
+				int					getMaxDelayDays()				const;
+				ReservationRuleType	getType()						const;
+				bool				getOnline()						const;
 			//@}
 
 			//! @name Setters
@@ -88,6 +98,7 @@ namespace synthese
 				void setMaxDelayDays (int maxDelayDays);
 				void setOnline (bool online);
 				void setOriginIsReference (bool originIsReference);
+				void setType(ReservationRuleType value);
 			//@}
 
 
@@ -145,10 +156,11 @@ namespace synthese
 					dead line and be after reservation opening time.
 				*/
 				bool isRunPossible (
-					const time::DateTime& originTime
-					, const synthese::time::DateTime& reservationTime
-					,  const synthese::time::DateTime& departureTime
-					) const;
+					const time::DateTime& originTime,
+					bool stopBelongsToOptionalReservationPlaces,
+					const synthese::time::DateTime& reservationTime,
+					const synthese::time::DateTime& departureTime
+				) const;
 			    
 
 

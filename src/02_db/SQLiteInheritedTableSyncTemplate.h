@@ -84,26 +84,32 @@ namespace synthese
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-					if (env != NULL && env->template getRegistry<ObjectClass>().contains(key))
-						return env->template getEditableRegistry<ObjectClass>().getEditable(key);
+				if(env != NULL)
+				{
+					util::Registry<ObjectClass>& registry(env->template getEditableRegistry<ObjectClass>());
+					if (registry.contains(key))
+						return registry.getEditable(key);
+				}
 
-					boost::shared_ptr<ObjectClass> object;
-					try
-					{
-						SQLiteResultSPtr rows(_GetRow(key));
-						object.reset(new ObjectClass(rows->getKey()));
-						Load(object.get(), rows, env, linkLevel);
-					}
-					catch (DBEmptyResultException)
-					{
-						if (autoCreate == NEVER_CREATE)
-							throw ObjectNotFoundException<ObjectClass>(key, "Object not found in "+ TABLE_NAME);
-						object.reset(new ObjectClass(0));
-					}
+				boost::shared_ptr<ObjectClass> object;
+				try
+				{
+					SQLiteResultSPtr rows(_GetRow(key));
+					object.reset(new ObjectClass(rows->getKey()));
+					Load(object.get(), rows, env, linkLevel);
+				}
+				catch (DBEmptyResultException)
+				{
+					if (autoCreate == NEVER_CREATE)
+						throw util::ObjectNotFoundException<ObjectClass>(key, "Object not found in "+ TABLE_NAME);
+					object.reset(new ObjectClass(key));
+				}
 
-					if (env != NULL)
-						env->template getEditableRegistry<ObjectClass>().add(object);
-					return object;
+				if (env != NULL)
+				{
+					env->template getEditableRegistry<ObjectClass>().add(object);
+				}
+				return object;
 			}
 
 

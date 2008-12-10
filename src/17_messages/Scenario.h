@@ -43,6 +43,8 @@ namespace synthese
 		class Scenario
 			:	public virtual util::Registrable
 		{
+		public:
+
 		private:
 			std::string					_name;
 

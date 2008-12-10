@@ -99,29 +99,29 @@ namespace synthese
 				try
 				{
 					line->setAxis(AxisTableSync::Get(axisId, env, linkLevel).get());
-					if (rollingStockId > 0)
-						line->setRollingStock(RollingStockTableSync::Get(rollingStockId, env, linkLevel).get());
-					if (fareId > 0)
-						line->setFare (FareTableSync::Get (fareId, env, linkLevel));
-					line->setCommercialLine(CommercialLineTableSync::Get(commercialLineId, env, linkLevel).get());
+				}
+				catch(ObjectNotFoundException<Axis>)
+				{
+					Log::GetInstance().warn("Bad value " + Conversion::ToString(axisId) + " for axis in line " + Conversion::ToString(line->getKey()));
+				}
 
-					line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,env, linkLevel, AUTO_CREATE));
-					line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,env, linkLevel, AUTO_CREATE));
-					line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
-					line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,env, linkLevel, AUTO_CREATE));
-				}
-				catch(ObjectNotFoundException<RollingStock>)
+				try
 				{
-					Log::GetInstance().warn("Bad value " + Conversion::ToString(rollingStockId) + " for rolling stock in line " + Conversion::ToString(line->getKey()));
-				}
-				catch(ObjectNotFoundException<Fare>)
-				{
-					Log::GetInstance().warn("Bad value " + Conversion::ToString(fareId) + " for fare in line " + Conversion::ToString(line->getKey()));
+					line->setCommercialLine(CommercialLineTableSync::Get(commercialLineId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<CommercialLine>)
 				{
 					Log::GetInstance().warn("Bad value " + Conversion::ToString(commercialLineId) + " for fare in line " + Conversion::ToString(line->getKey()));
 				}
+
+
+				line->setRollingStock(RollingStockTableSync::Get(rollingStockId, env, linkLevel, AUTO_CREATE).get());
+				line->setFare (FareTableSync::Get (fareId, env, linkLevel, AUTO_CREATE));
+				line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,env, linkLevel, AUTO_CREATE));
+				line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,env, linkLevel, AUTO_CREATE));
+				line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
+				line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,env, linkLevel, AUTO_CREATE));
+				
 			}
 		}
 

@@ -68,6 +68,19 @@ namespace synthese
 	*/
 	typedef enum { ARRIVAL_TO_DEPARTURE, DEPARTURE_TO_ARRIVAL } AccessDirection ;
 
+
+	/** Reservation rule type.
+		- FORBIDDEN : it is impossible to book a seat on the service
+		- COMPULSORY : it is impossible to use the service without having booked a seat
+		- OPTIONAL : is is possible to book a place on the service, but it is possible to use the service without having booked a seat
+		- MIXED_BY_DEPARTURE_PLACE : it is impossible to use the service without having booked a place, except for journeys beginning at several places, defined in the commercial line.
+	*/
+	typedef enum {
+		RESERVATION_FORBIDDEN = 0,
+		RESERVATION_COMPULSORY = 1,
+		RESERVATION_OPTIONAL = 2,
+		RESERVATION_MIXED_BY_DEPARTURE_PLACE = 3
+	} ReservationRuleType;
 	/** @} */
 
 }

@@ -25,8 +25,7 @@
 
 #include "NonPermanentService.h"
 #include "Types.h"
-
-
+#include "Registry.h"
 
 #include <string>
 
@@ -43,6 +42,9 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<std::pair<time::Schedule, time::Schedule> > Schedules;
+
+			/// Chosen registry class.
+			typedef util::Registry<ContinuousService>	Registry;
 
 		private:
 

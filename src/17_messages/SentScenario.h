@@ -25,10 +25,8 @@
 
 #include "ScenarioSubclassTemplate.h"
 #include "17_messages/Types.h"
-
+#include "Registry.h"
 #include "DateTime.h"
-
-
 
 namespace synthese
 {
@@ -43,6 +41,11 @@ namespace synthese
 		class SentScenario
 		:	public ScenarioSubclassTemplate<ScenarioSentAlarm>
 		{
+		public:
+
+			/// Chosen registry class.
+			typedef util::Registry<SentScenario>	Registry;
+
 		private:
 			bool			_isEnabled;
 			time::DateTime	_periodStart; //!< Alarm applicability period start

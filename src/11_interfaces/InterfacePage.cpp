@@ -127,7 +127,8 @@ namespace synthese
 
 		InterfacePage::InterfacePage(
 			RegistryKeyType key
-		):  Registrable(key)
+		):  Registrable(key),
+			FactoryBase()
 		{
 
 		}

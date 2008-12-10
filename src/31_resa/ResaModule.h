@@ -134,10 +134,11 @@ namespace synthese
 	@{
 	*/
 
-	/** 31 Reservation Module namespace.
-		@author Hugues Romain
-		@date 2008
-	*/
+	//////////////////////////////////////////////////////////////////////////
+	/// 31 Reservation Module namespace.
+	///	@author Hugues Romain
+	///	@date 2008
+	//////////////////////////////////////////////////////////////////////////
 	namespace resa
 	{
 		class ReservationTransaction;

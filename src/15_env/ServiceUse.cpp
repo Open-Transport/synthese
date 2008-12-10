@@ -90,7 +90,7 @@ namespace synthese
 
 		int ServiceUse::getDistance() const
 		{
-			return getArrivalEdge()->getMetricOffset() - getDepartureEdge()->getMetricOffset();
+			return static_cast<int>(getArrivalEdge()->getMetricOffset() - getDepartureEdge()->getMetricOffset());
 		}
 
 		void ServiceUse::shift( int duration)
@@ -106,8 +106,13 @@ namespace synthese
 
 		bool ServiceUse::isReservationRuleCompliant( const time::DateTime& computingDateTime ) const
 		{
-			if (_service->getReservationRule()->isCompliant() == true)
-				return _service->getReservationRule()->isRunPossible(_originDateTime, computingDateTime, getDepartureDateTime());
+			if (_service->getReservationRule()->getType() != RESERVATION_FORBIDDEN)
+				return _service->getReservationRule()->isRunPossible(
+					_originDateTime,
+					(_service->getReservationRule()->getType() == RESERVATION_MIXED_BY_DEPARTURE_PLACE) ? false : true,
+					computingDateTime,
+					getDepartureDateTime()
+				);
 
 			return true;
 
@@ -115,7 +120,7 @@ namespace synthese
 
 		time::DateTime ServiceUse::getReservationDeadLine() const
 		{
-			if (_service->getReservationRule()->isCompliant() || boost::logic::indeterminate(_service->getReservationRule()->isCompliant()))
+			if (_service->getReservationRule()->getType() != RESERVATION_FORBIDDEN)
 				return _service->getReservationRule()->getReservationDeadLine(_originDateTime, getDepartureDateTime());
 
 			return DateTime(TIME_UNKNOWN);
