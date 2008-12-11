@@ -90,7 +90,7 @@ namespace synthese
 				ALARM_LEVEL_UNKNOWN, _folder->getParentId(), true, _name, _folder.get(), 0, 1
 			);
 
-			if (!env.template getRegistry<TextTemplate>().empty())
+			if (!env.getRegistry<TextTemplate>().empty())
 				throw ActionException("Un répertoire de même nom existe déjà à l'emplacement spécifié");
 		}
 		

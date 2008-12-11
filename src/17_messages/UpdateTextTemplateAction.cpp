@@ -84,7 +84,7 @@ namespace synthese
 
 				Env env;
 				TextTemplateTableSync::Search(env, ALARM_LEVEL_UNKNOWN, _text->getParentId(), false, _name, _text.get(), 0, 1);
-				if (!env.template getRegistry<TextTemplate>().empty())
+				if (!env.getRegistry<TextTemplate>().empty())
 					throw ActionException("Un texte portant ce nom existe déjà.");
 
 				// Short message

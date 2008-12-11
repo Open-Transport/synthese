@@ -148,7 +148,7 @@ namespace synthese
 					// Integrity test : the key is name + surname + phone
 					Env env;
 					UserTableSync::Search(env, "%",_customer->getName(), _customer->getSurname(), _customer->getPhone(), UNKNOWN_VALUE, logic::indeterminate, 0, 1);
-					if (!env.template getRegistry<User>().empty())
+					if (!env.getRegistry<User>().empty())
 						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
 					
 					_customer->setEMail(map.getString(PARAMETER_CUSTOMER_EMAIL, false, FACTORY_KEY));

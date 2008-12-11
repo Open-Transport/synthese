@@ -116,7 +116,7 @@ namespace synthese
 				, _requestParameters.raisingOrder				
 			);
 			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<CommercialLine>());
+			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<CommercialLine>());
 
 
 			// Search form
@@ -138,7 +138,7 @@ namespace synthese
 			ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
 
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 			{
 				lineOpenRequest.setObjectId(line->getKey());
 				stream << t.row();
@@ -171,7 +171,7 @@ namespace synthese
 			{
 				Env env;
 				TransportNetworkTableSync::Search(env);
-				BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.template getRegistry<TransportNetwork>())
+				BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.getRegistry<TransportNetwork>())
 				{
 					PageLink link;
 					link.factoryKey = FACTORY_KEY;
@@ -214,7 +214,7 @@ namespace synthese
 			{
 				Env env;
 				CommercialLineTableSync::Search(env, _network->getKey());
-				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
+				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 				{
 					PageLink link;
 					link.factoryKey = CommercialLineAdmin::FACTORY_KEY;

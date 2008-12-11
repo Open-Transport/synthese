@@ -90,7 +90,7 @@ namespace synthese
 				throw ActionException("Le scénario doit avoir un nom.");
 			Env env;
 			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1);
-			if (!env.template getRegistry<ScenarioTemplate>().empty())
+			if (!env.getRegistry<ScenarioTemplate>().empty())
 				throw ActionException("Un scénario de même nom existe déjà");
 
 			// Anti error
@@ -123,7 +123,7 @@ namespace synthese
 
 					Env env;
 					AlarmObjectLinkTableSync::Search(env, *it);
-					BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, env.template getRegistry<AlarmObjectLink>())
+					BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, env.getRegistry<AlarmObjectLink>())
 					{
 						aol->setAlarmId(alarm->getKey());
 						aol->setObjectId(aol->getObjectId());

@@ -99,7 +99,7 @@ namespace synthese
 			stream << "</tr>";
 
 			// Display types loop
-			BOOST_FOREACH(shared_ptr<DisplayType> dt, env.template getRegistry<DisplayType>())
+			BOOST_FOREACH(shared_ptr<DisplayType> dt, env.getRegistry<DisplayType>())
 			{
 				deleteRequest.getAction()->setType(dt);
 

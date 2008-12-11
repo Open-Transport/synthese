@@ -3,5 +3,5 @@ Import ('s3env')
 CppLibProject(
 	s3env, 's3-server', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
-	dependencies = ['s3-security.cpplib', 's3-dblog.cpplib', 's3-interfaces.cpplib', 's3-db.cpplib', 's3-html.cpplib']
+	dependencies = ['s3-util.cpplib', 's3-util-threads.cpplib', 's3-tcp.cpplib', 's3-security.cpplib', 's3-dblog.cpplib', 's3-interfaces.cpplib', 's3-db.cpplib', 's3-html.cpplib']
 )

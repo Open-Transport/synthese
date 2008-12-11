@@ -8,4 +8,4 @@ synthese::dblog::DBLogRight::integrate();
 synthese::dblog::DBLogEntryTableSync::integrate();
 
 // Registries
-synthese::util::Env::template Integrate<synthese::dblog::DBLogEntry>();
+synthese::util::Env::Integrate<synthese::dblog::DBLogEntry>();

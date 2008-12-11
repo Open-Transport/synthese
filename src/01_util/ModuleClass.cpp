@@ -29,7 +29,7 @@ namespace synthese
 	namespace util
 	{
 		ModuleClass::ModuleClass()
-			: FactoryBase()
+			: FactoryBase<ModuleClass>()
 		{
 
 		}

@@ -123,7 +123,7 @@ namespace synthese
 			{
 				Env env;
 				LineTableSync::Search(env, _cline->getKey());
-				const Registry<Line>& lines(env.template getRegistry<Line>());
+				const Registry<Line>& lines(env.getRegistry<Line>());
 				for(Registry<Line>::const_iterator it(lines.begin()); it != lines.end(); ++it)
 				{
 					PageLink link;

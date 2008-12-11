@@ -55,7 +55,7 @@ namespace synthese
 				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
 			Env env;
 			DisplayTypeTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.template getRegistry<DisplayType>())
+			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.getRegistry<DisplayType>())
 			{
 				m.push_back(make_pair(displayType->getKey(), displayType->getName()));
 			}

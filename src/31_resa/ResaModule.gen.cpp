@@ -33,6 +33,6 @@ synthese::resa::ResaEditLogEntryAdmin::integrate();
 synthese::resa::ResaDBLog::integrate();
 
 // Registries
-synthese::util::Env::template Integrate<synthese::resa::Reservation>();
-synthese::util::Env::template Integrate<synthese::resa::ReservationTransaction>();
-synthese::util::Env::template Integrate<synthese::resa::OnlineReservationRule>();
+synthese::util::Env::Integrate<synthese::resa::Reservation>();
+synthese::util::Env::Integrate<synthese::resa::ReservationTransaction>();
+synthese::util::Env::Integrate<synthese::resa::OnlineReservationRule>();

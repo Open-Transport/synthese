@@ -154,12 +154,12 @@ namespace synthese
 
 			// Lines
 			const RollingStock* rollingStock(NULL);
-			BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
+			BOOST_FOREACH(shared_ptr<Line> line, _env.getRegistry<Line>())
 			{
 				if (line->getRollingStock())
 					rollingStock = line->getRollingStock();
 				LineStopTableSync::Search(_env, line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ScheduledServiceTableSync::Search(_env, line->getKey(), UNKNOWN_VALUE, DATE(TIME_UNKNOWN), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				ScheduledServiceTableSync::Search(_env, line->getKey(), UNKNOWN_VALUE, Date(TIME_UNKNOWN), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 				ContinuousServiceTableSync::Search(_env, line->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 			}    
 
@@ -208,7 +208,7 @@ namespace synthese
 			// Not implemented right now.
 
 			// --------------------------------------------------- StopArea (type = Quay) <=> PhysicalStop
-			BOOST_FOREACH(shared_ptr<PhysicalStop> ps, _env.template getRegistry<PhysicalStop>())
+			BOOST_FOREACH(shared_ptr<PhysicalStop> ps, _env.getRegistry<PhysicalStop>())
 			{
 				if ((ps->getDepartureEdges ().size () == 0) && (ps->getArrivalEdges ().size () == 0)) continue;
 
@@ -224,7 +224,7 @@ namespace synthese
 
 				Env lsenv;
 				LineStopTableSync::Search(lsenv, UNKNOWN_VALUE,ps->getKey());
-				BOOST_FOREACH(shared_ptr<LineStop> ls, lsenv.template getRegistry<LineStop>())
+				BOOST_FOREACH(shared_ptr<LineStop> ls, lsenv.getRegistry<LineStop>())
 				{
 					os << "<contains>" << TridentId (peerid, "StopPoint", ls->getKey ())  << "</contains>" << "\n";
 				}
@@ -241,7 +241,7 @@ namespace synthese
 			}
 		    
 			// --------------------------------------------------- StopArea (type = CommercialStopPoint)
-			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, _env.template getRegistry<PublicTransportStopZoneConnectionPlace>())
+			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, _env.getRegistry<PublicTransportStopZoneConnectionPlace>())
 			{
 				os << "<StopArea>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopArea", cp->getKey ()) << "</objectId>" << "\n";
@@ -272,7 +272,7 @@ namespace synthese
 
 
 			// --------------------------------------------------- AreaCentroid
-			BOOST_FOREACH(shared_ptr<PhysicalStop> ps, _env.template getRegistry<PhysicalStop>())
+			BOOST_FOREACH(shared_ptr<PhysicalStop> ps, _env.getRegistry<PhysicalStop>())
 			{
 				os << "<AreaCentroid>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</objectId>" << "\n";
@@ -303,7 +303,7 @@ namespace synthese
 			os << "</ChouetteArea>" << "\n";
 
 			// --------------------------------------------------- ConnectionLink
-			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, _env.template getRegistry<PublicTransportStopZoneConnectionPlace>())
+			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, _env.getRegistry<PublicTransportStopZoneConnectionPlace>())
 			{
 				// Contained physical stops
 				const PhysicalStops& stops(cp->getPhysicalStops());
@@ -326,7 +326,7 @@ namespace synthese
 		    
 			// --------------------------------------------------- Timetable
 			// One timetable per service
-			BOOST_FOREACH(shared_ptr<ScheduledService> srv, _env.template getRegistry<ScheduledService>())
+			BOOST_FOREACH(shared_ptr<ScheduledService> srv, _env.getRegistry<ScheduledService>())
 			{
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", srv.get()) << "</objectId>" << "\n";
@@ -339,7 +339,7 @@ namespace synthese
 
 				os << "</Timetable>" << "\n";
 			}
-			BOOST_FOREACH(shared_ptr<ContinuousService> srv, _env.template getRegistry<ContinuousService>())
+			BOOST_FOREACH(shared_ptr<ContinuousService> srv, _env.getRegistry<ContinuousService>())
 			{
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", srv.get()) << "</objectId>" << "\n";
@@ -355,7 +355,7 @@ namespace synthese
 
 
 			// --------------------------------------------------- TimeSlot
-			BOOST_FOREACH(shared_ptr<ContinuousService> csrv, _env.template getRegistry<ContinuousService>())
+			BOOST_FOREACH(shared_ptr<ContinuousService> csrv, _env.getRegistry<ContinuousService>())
 			{
 				string timeSlotId;
 				timeSlotId = TridentId(peerid, "TimeSlot", csrv.get());
@@ -409,7 +409,7 @@ namespace synthese
 				}
 				os << "<transportModeName>" << tm << "</transportModeName>" << "\n";
 			    
-				BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
+				BOOST_FOREACH(shared_ptr<Line> line, _env.getRegistry<Line>())
 				{
 					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeId>" << "\n";
 				}
@@ -421,7 +421,7 @@ namespace synthese
 			}
 
 			// --------------------------------------------------- ChouetteRoute
-			BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
+			BOOST_FOREACH(shared_ptr<Line> line, _env.getRegistry<Line>())
 			{
 				os << "<ChouetteRoute>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << "\n";
@@ -443,7 +443,7 @@ namespace synthese
 				
 				Env lenv;
 				LineStopTableSync::Search(lenv,line->getKey());
-				BOOST_FOREACH(shared_ptr<LineStop> lineStop, lenv.template getRegistry<LineStop>())
+				BOOST_FOREACH(shared_ptr<LineStop> lineStop, lenv.getRegistry<LineStop>())
 				{
 					os << "<ptLinkId>" << TridentId (peerid, "PtLink", lineStop->getKey ()) << "</ptLinkId>" << "\n";
 				}
@@ -462,7 +462,7 @@ namespace synthese
 			}
 		
 			// --------------------------------------------------- StopPoint
-			BOOST_FOREACH(shared_ptr<LineStop> ls, _env.template getRegistry<LineStop>())
+			BOOST_FOREACH(shared_ptr<LineStop> ls, _env.getRegistry<LineStop>())
 			{
 				const PhysicalStop* ps = static_cast<const PhysicalStop*>(ls->getFromVertex());
 
@@ -510,12 +510,12 @@ namespace synthese
 
 
 			// --------------------------------------------------- PtLink
-			BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
+			BOOST_FOREACH(shared_ptr<Line> line, _env.getRegistry<Line>())
 			{
 				Env lenv;
 				LineStopTableSync::Search(lenv, line->getKey());
 				shared_ptr<LineStop> from;
-				BOOST_FOREACH(shared_ptr<LineStop> to, _env.template getRegistry<LineStop>())
+				BOOST_FOREACH(shared_ptr<LineStop> to, _env.getRegistry<LineStop>())
 				{
 					if (from.get())
 					{
@@ -532,7 +532,7 @@ namespace synthese
 
 			// --------------------------------------------------- JourneyPattern
 			// One per route 
-			BOOST_FOREACH(shared_ptr<Line> line, _env.template getRegistry<Line>())
+			BOOST_FOREACH(shared_ptr<Line> line, _env.getRegistry<Line>())
 			{
 				if (line->getEdges().empty())
 					continue;
@@ -557,7 +557,7 @@ namespace synthese
 			}
 		
 			// --------------------------------------------------- VehicleJourney
-			BOOST_FOREACH(shared_ptr<ScheduledService> srv, _env.template getRegistry<ScheduledService>())
+			BOOST_FOREACH(shared_ptr<ScheduledService> srv, _env.getRegistry<ScheduledService>())
 			{
 				bool isDRT(srv->getReservationRule()->getType() != RESERVATION_FORBIDDEN);
 
@@ -581,7 +581,7 @@ namespace synthese
 				// --------------------------------------------------- VehicleJourneyAtStop
 				Env lenv;
 				LineStopTableSync::Search(lenv, srv->getPathId());
-				BOOST_FOREACH(shared_ptr<LineStop> ls, lenv.template getRegistry<LineStop>())
+				BOOST_FOREACH(shared_ptr<LineStop> ls, lenv.getRegistry<LineStop>())
 				{
 					os << "<vehicleJourneyAtStop>" << "\n";
 					os << "<stopPointId>" << TridentId (peerid, "StopPoint", ls->getKey ()) << "</stopPointId>" << "\n";
@@ -592,7 +592,7 @@ namespace synthese
 						<< "</arrivalTime>" << "\n";
 
 					os	<< "<departureTime>";
-					if (ls->getRankInPath() != lenv.template getRegistry<LineStop>().size () - 1 && ls->isDeparture())
+					if (ls->getRankInPath() != lenv.getRegistry<LineStop>().size () - 1 && ls->isDeparture())
 					{
 						os << ToXsdTime (srv->getDepartureBeginScheduleToIndex (ls->getRankInPath()).getHour());
 					}
@@ -621,7 +621,7 @@ namespace synthese
 				os << "</VehicleJourney>" << "\n";
 			}
 
-			BOOST_FOREACH(shared_ptr<ContinuousService> srv, _env.template getRegistry<ContinuousService>())
+			BOOST_FOREACH(shared_ptr<ContinuousService> srv, _env.getRegistry<ContinuousService>())
 			{
 				bool isDRT(srv->getReservationRule()->getType() != RESERVATION_FORBIDDEN);
 
@@ -646,7 +646,7 @@ namespace synthese
 				{
 					Env lenv;
 					LineStopTableSync::Search(lenv, srv->getPathId());
-					BOOST_FOREACH(shared_ptr<LineStop> ls, lenv.template getRegistry<LineStop>())
+					BOOST_FOREACH(shared_ptr<LineStop> ls, lenv.getRegistry<LineStop>())
 					{
 						os << "<vehicleJourneyAtStop>" << "\n";
 						os << "<stopPointId>" << TridentId (peerid, "StopPoint", ls->getKey ()) << "</stopPointId>" << "\n";
@@ -686,7 +686,7 @@ namespace synthese
 			{
 				// Reservation Rules -----------------------------------------------------------------------
 
-				BOOST_FOREACH(shared_ptr<ReservationRule> r, _env.template getRegistry<ReservationRule>())
+				BOOST_FOREACH(shared_ptr<ReservationRule> r, _env.getRegistry<ReservationRule>())
 				{
 					const ReservationRule& rule(*r);
 
@@ -725,7 +725,7 @@ namespace synthese
 				}
 
 				// Non concurrency -----------------------------------------------------------------------
-				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, _env.template getRegistry<NonConcurrencyRule>())
+				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, _env.getRegistry<NonConcurrencyRule>())
 				{
 					os << "<LineConflict>" << "\n";
 					os << "<objectId>" << TridentId (peerid, "LineConflict", rule->getKey ()) << "</objectId>" << "\n";
@@ -737,17 +737,17 @@ namespace synthese
 
 
 				// CityMainStops --------------------------------------------------- 
-				BOOST_FOREACH(shared_ptr<City> city, _env.template getRegistry<City>())
+				BOOST_FOREACH(shared_ptr<City> city, _env.getRegistry<City>())
 				{
 					vector<string> containedStopAreas;
 
 					// Contained connection places
 					Env senv;
 					ConnectionPlaceTableSync::Search(senv, city->getKey(), true);
-					BOOST_FOREACH(shared_ptr<const PublicTransportStopZoneConnectionPlace> cp, senv.template getRegistry<PublicTransportStopZoneConnectionPlace>())
+					BOOST_FOREACH(shared_ptr<const PublicTransportStopZoneConnectionPlace> cp, senv.getRegistry<PublicTransportStopZoneConnectionPlace>())
 					{
 						// filter physical stops not concerned by this line.
-						if(!_env.template getRegistry<PublicTransportStopZoneConnectionPlace>().contains(cp->getKey())) continue;
+						if(!_env.getRegistry<PublicTransportStopZoneConnectionPlace>().contains(cp->getKey())) continue;
 
 						containedStopAreas.push_back (TridentId (peerid, "StopArea", cp->getKey()));
 

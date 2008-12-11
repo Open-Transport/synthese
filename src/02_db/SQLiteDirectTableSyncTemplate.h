@@ -98,15 +98,15 @@ namespace synthese
 				boost::shared_ptr<T> object;
 				try
 				{
-					SQLiteResultSPtr rows(_GetRow(key));
+					SQLiteResultSPtr rows(SQLiteTableSyncTemplate<K>::_GetRow(key));
 					object.reset(new T(rows->getKey()));
 					Load(object.get(), rows, env, linkLevel);
 				}
-				catch (DBEmptyResultException)
+				catch (typename db::DBEmptyResultException<K>& e)
 				{
 					if (autoCreate == NEVER_CREATE)
-						throw ObjectNotFoundException<T>(key, "Object not found in "+ TABLE_NAME);
-					object.reset(new T(0));
+						throw util::ObjectNotFoundException<T>(key, "Object not found in "+ SQLiteTableSyncTemplate<K>::TABLE_NAME);
+					object.reset(new T(key));
 				}
 				
 				if (env != NULL)
@@ -197,7 +197,7 @@ namespace synthese
 				}
 				catch(SQLiteException& e)
 				{
-					throw Exception(e.getMessage());
+					throw util::Exception(e.getMessage());
 				}
 			}
 		};

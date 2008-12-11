@@ -65,12 +65,12 @@ namespace synthese
 			// Search of child profiles
 			Env env;
 			ProfileTableSync::Search(env, _profile, 0, 1);
-			if (!env.template getRegistry<Profile>().empty())
+			if (!env.getRegistry<Profile>().empty())
 				throw ActionException("Au moins un profil hérite du profil spécifié. La suppression est impossible.");
 
 			// Search of users
 			UserTableSync::Search(env, "%","%","%","%", _profile->getKey(), boost::logic::indeterminate, 0, 1);
-			if (!env.template getRegistry<User>().empty())
+			if (!env.getRegistry<User>().empty())
 				throw ActionException("Au moins un utilisateur appartient au profil spécifié. La suppression est impossible.");
 		}
 

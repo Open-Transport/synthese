@@ -25,7 +25,10 @@
 
 #include "02_db/Types.h"
 #include "SQLiteResult.h"
-
+#include "SQLiteTableSyncTemplate.h"
+#include "SQLiteException.h"
+#include "DBEmptyResultException.h"
+#include "DBModule.h"
 #include "FactorableTemplate.h"
 #include "Env.h"
 
@@ -94,14 +97,14 @@ namespace synthese
 				boost::shared_ptr<ObjectClass> object;
 				try
 				{
-					SQLiteResultSPtr rows(_GetRow(key));
+					SQLiteResultSPtr rows(SQLiteTableSyncTemplate<ParentTableSyncClass>::_GetRow(key));
 					object.reset(new ObjectClass(rows->getKey()));
 					Load(object.get(), rows, env, linkLevel);
 				}
-				catch (DBEmptyResultException)
+				catch (typename db::DBEmptyResultException<TableSyncClass>& e)
 				{
 					if (autoCreate == NEVER_CREATE)
-						throw util::ObjectNotFoundException<ObjectClass>(key, "Object not found in "+ TABLE_NAME);
+						throw util::ObjectNotFoundException<ObjectClass>(key, "Object not found in "+ ParentTableSyncClass::TABLE_NAME);
 					object.reset(new ObjectClass(key));
 				}
 
@@ -154,7 +157,7 @@ namespace synthese
 				}
 				catch(SQLiteException& e)
 				{
-					throw Exception(e.getMessage());
+					throw util::Exception(e.getMessage());
 				}
 			}
 

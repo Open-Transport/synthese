@@ -65,7 +65,7 @@ namespace synthese
 				while (rows->next ())
 				{
 					typename ScenarioSubClass::AlarmType* object(new typename ScenarioSubClass::AlarmType(UNKNOWN_VALUE, scenario));
-					AlarmTableSync::Load(object, rows, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
+					AlarmTableSync::Load(object, rows, util::Env::GetOfficialEnv(), util::UP_LINKS_LOAD_LEVEL);
 					scenario->addAlarm(object);
 				}
 			}

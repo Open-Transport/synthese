@@ -144,7 +144,7 @@ namespace synthese
 				, _resultTableRequestParameters.raisingOrder
 			);
 			ResultHTMLTable::ResultParameters		_resultTableResultParameters;
-			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, env.template getEditableRegistry<DBLogEntry>());
+			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, env.getEditableRegistry<DBLogEntry>());
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
@@ -177,7 +177,7 @@ namespace synthese
 
 			stream << t.open();
 			
-			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, env.template getRegistry<DBLogEntry>())
+			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, env.getRegistry<DBLogEntry>())
 			{
 				stream << t.row();
 				stream << t.col() << HTMLModule::getHTMLImage(DBLogModule::getEntryIcon(dbe->getLevel()), DBLogModule::getEntryLevelLabel(dbe->getLevel()));

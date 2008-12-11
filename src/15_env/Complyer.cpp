@@ -41,10 +41,10 @@ namespace synthese
 	namespace env
 	{
 		Complyer::Complyer()
-			: _bikeCompliance(Env::GetOfficialEnv()->template getEditableRegistry<BikeCompliance>().getWithAutoCreation(0))
-			, _fare(Env::GetOfficialEnv()->template getEditableRegistry<Fare>().getWithAutoCreation(0))
-			, _pedestrianCompliance(Env::GetOfficialEnv()->template getEditableRegistry<PedestrianCompliance>().getWithAutoCreation(0))
-			, _handicappedCompliance(Env::GetOfficialEnv()->template getEditableRegistry<HandicappedCompliance>().getWithAutoCreation(0))
+			: _bikeCompliance(Env::GetOfficialEnv()->getEditableRegistry<BikeCompliance>().getWithAutoCreation(0))
+			, _fare(Env::GetOfficialEnv()->getEditableRegistry<Fare>().getWithAutoCreation(0))
+			, _pedestrianCompliance(Env::GetOfficialEnv()->getEditableRegistry<PedestrianCompliance>().getWithAutoCreation(0))
+			, _handicappedCompliance(Env::GetOfficialEnv()->getEditableRegistry<HandicappedCompliance>().getWithAutoCreation(0))
 			, _complianceParent(NULL)
 		{
 

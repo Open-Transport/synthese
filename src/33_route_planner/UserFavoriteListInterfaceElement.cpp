@@ -71,7 +71,7 @@ namespace synthese
 			
 			Env env;
 			UserFavoriteJourneyTableSync::Search(env, user);
-			BOOST_FOREACH(shared_ptr<UserFavoriteJourney> fav, env.template getRegistry<UserFavoriteJourney>())
+			BOOST_FOREACH(shared_ptr<UserFavoriteJourney> fav, env.getRegistry<UserFavoriteJourney>())
 			{
 				page->display(stream, fav.get(), variables, request);
 			}

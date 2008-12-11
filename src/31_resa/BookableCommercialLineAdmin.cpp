@@ -187,7 +187,7 @@ namespace synthese
 
 			// Download reservations
 			map<const ScheduledService*, ServiceReservations> reservations;
-			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.template getRegistry<ScheduledService>())
+			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.getRegistry<ScheduledService>())
 			{
 				const ReservationRule* rule(service->getReservationRule().get());
 				ServiceReservations obj;
@@ -199,7 +199,7 @@ namespace synthese
 					, _displayCancelled
 					);
 				obj.seatsNumber = 0;
-				BOOST_FOREACH(shared_ptr<ReservationTransaction> resa, obj.reservationsEnv.template getRegistry<ReservationTransaction>())
+				BOOST_FOREACH(shared_ptr<ReservationTransaction> resa, obj.reservationsEnv.getRegistry<ReservationTransaction>())
 				{
 					if (resa->getCancellationTime().isUnknown())
 						obj.seatsNumber += resa->getSeats();
@@ -220,7 +220,7 @@ namespace synthese
 
 			}
 
-			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.template getRegistry<ScheduledService>())
+			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.getRegistry<ScheduledService>())
 			{
 				const ServiceReservations& serviceReservations (reservations[service.get()]);
 				string plural((serviceReservations.seatsNumber > 1) ? "s" : "");
@@ -246,14 +246,14 @@ namespace synthese
 				if (serviceReservations.seatsNumber > 0)
 					stream << " - " << serviceReservations.seatsNumber << " place" << plural << " réservée" << plural;
 
-				if (serviceReservations.reservationsEnv.template getRegistry<Reservation>().empty())
+				if (serviceReservations.reservationsEnv.getRegistry<Reservation>().empty())
 				{
 					stream << t.row();
 					stream << t.col(8) << "Aucune réservation";
 				}
 				else
 				{
-					BOOST_FOREACH(shared_ptr<ReservationTransaction> transac, serviceReservations.reservationsEnv.template getRegistry<ReservationTransaction>())
+					BOOST_FOREACH(shared_ptr<ReservationTransaction> transac, serviceReservations.reservationsEnv.getRegistry<ReservationTransaction>())
 					{
 						const Reservation* reservation(serviceReservations.getReservation(transac.get()).get());
 						ReservationStatus status(reservation->getStatus());

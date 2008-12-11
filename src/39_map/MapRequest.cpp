@@ -126,7 +126,7 @@ namespace synthese
 			ptime timems (boost::date_time::microsec_clock<ptime>::local_time ());
 			std::string filePrefix = "map_" + to_iso_string (timems);
 
-			std::string resultFilename = renderer->render (tempDir, filePrefix, _temporaryEnvironment.template getRegistry<Line>(), *_map, conf);
+			std::string resultFilename = renderer->render (tempDir, filePrefix, _temporaryEnvironment.getRegistry<Line>(), *_map, conf);
 
 			// Broadcast of the result
 			std::string resultURL = MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_URL) 
@@ -161,7 +161,7 @@ namespace synthese
 			for (int i=0; i<nbCities; ++i) 
 			{
 				XMLNode cityNode = GetChildNode (citiesNode, "city", i);
-				_temporaryEnvironment.template getEditableRegistry<City>().add (env::XmlBuilder::CreateCity (cityNode));
+				_temporaryEnvironment.getEditableRegistry<City>().add (env::XmlBuilder::CreateCity (cityNode));
 			}
 
 			XMLNode axesNode = GetChildNode (dataNode, "axes", 0);
@@ -169,7 +169,7 @@ namespace synthese
 			for (int i=0; i<nbAxes; ++i) 
 			{
 				XMLNode axisNode = GetChildNode (axesNode, "axis", i);
-				_temporaryEnvironment.template getEditableRegistry<Axis>().add (env::XmlBuilder::CreateAxis (axisNode));
+				_temporaryEnvironment.getEditableRegistry<Axis>().add (env::XmlBuilder::CreateAxis (axisNode));
 			}
 
 			XMLNode connectionPlacesNode = GetChildNode (dataNode, "connectionPlaces", 0);
@@ -177,7 +177,7 @@ namespace synthese
 			for (int i=0; i<nbConnectionPlaces; ++i) 
 			{
 				XMLNode connectionPlaceNode = GetChildNode (connectionPlacesNode, "connectionPlace", i);
-				_temporaryEnvironment.template getEditableRegistry<PublicTransportStopZoneConnectionPlace>().add (synthese::env::XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _temporaryEnvironment.template getEditableRegistry<City>()));
+				_temporaryEnvironment.getEditableRegistry<PublicTransportStopZoneConnectionPlace>().add (synthese::env::XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _temporaryEnvironment.getEditableRegistry<City>()));
 			}
 
 			XMLNode physicalStopsNode = GetChildNode (dataNode, "physicalStops", 0);
@@ -185,7 +185,7 @@ namespace synthese
 			for (int i=0; i<nbPhysicalStops; ++i) 
 			{
 				XMLNode physicalStopNode = GetChildNode (physicalStopsNode, "physicalStop", i);
-				_temporaryEnvironment.template getEditableRegistry<PhysicalStop>().add (synthese::env::XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.template getEditableRegistry<PublicTransportStopZoneConnectionPlace>()));
+				_temporaryEnvironment.getEditableRegistry<PhysicalStop>().add (synthese::env::XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.getEditableRegistry<PublicTransportStopZoneConnectionPlace>()));
 			}
 
 			XMLNode commercialLinesNode = GetChildNode (dataNode, "commercialLines", 0);
@@ -193,7 +193,7 @@ namespace synthese
 			for (int i=0; i<nbCommercialLines; ++i) 
 			{
 				XMLNode commercialLineNode = GetChildNode (commercialLinesNode, "commercialLine", i);
-				_temporaryEnvironment.template getEditableRegistry<CommercialLine>().add (synthese::env::XmlBuilder::CreateCommercialLine (commercialLineNode));
+				_temporaryEnvironment.getEditableRegistry<CommercialLine>().add (synthese::env::XmlBuilder::CreateCommercialLine (commercialLineNode));
 			}
 
 			XMLNode linesNode = GetChildNode (dataNode, "lines", 0);
@@ -201,7 +201,7 @@ namespace synthese
 			for (int i=0; i<nbLines; ++i) 
 			{
 				XMLNode lineNode = GetChildNode (linesNode, "line", i);
-				_temporaryEnvironment.template getEditableRegistry<Line>().add (synthese::env::XmlBuilder::CreateLine (lineNode, _temporaryEnvironment.template getEditableRegistry<Axis>(), _temporaryEnvironment.template getEditableRegistry<CommercialLine>()));
+				_temporaryEnvironment.getEditableRegistry<Line>().add (synthese::env::XmlBuilder::CreateLine (lineNode, _temporaryEnvironment.getEditableRegistry<Axis>(), _temporaryEnvironment.getEditableRegistry<CommercialLine>()));
 			}
 
 			XMLNode lineStopsNode = GetChildNode (dataNode, "lineStops", 0);
@@ -209,7 +209,7 @@ namespace synthese
 			for (int i=0; i<nbLineStops; ++i) 
 			{
 				XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
-				_temporaryEnvironment.template getEditableRegistry<LineStop>().add (synthese::env::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.template getEditableRegistry<Line>(), _temporaryEnvironment.template getEditableRegistry<PhysicalStop>()));
+				_temporaryEnvironment.getEditableRegistry<LineStop>().add (synthese::env::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<Line>(), _temporaryEnvironment.getEditableRegistry<PhysicalStop>()));
 			}
 		}
 
@@ -222,7 +222,7 @@ namespace synthese
 			/// @todo Throw an exception if xml parsing fails
 			XMLNode mapNode = XMLNode::parseString (_query.c_str (), "map");
 
-			_map.reset(map::XmlBuilder::CreateMap (mapNode, (_useEnvironment ? *Env::GetOfficialEnv() : _temporaryEnvironment).template getRegistry<Line>() ));
+			_map.reset(map::XmlBuilder::CreateMap (mapNode, (_useEnvironment ? *Env::GetOfficialEnv() : _temporaryEnvironment).getRegistry<Line>() ));
 		}
 
 

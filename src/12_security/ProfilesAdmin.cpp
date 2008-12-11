@@ -103,7 +103,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			ActionResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<Profile>());
+			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<Profile>());
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
@@ -138,7 +138,7 @@ namespace synthese
 			stream << t.open();
 			
 			// Profiles loop
-			BOOST_FOREACH(shared_ptr<Profile> profile, env.template getRegistry<Profile>())
+			BOOST_FOREACH(shared_ptr<Profile> profile, env.getRegistry<Profile>())
 			{
 				profileRequest.setObjectId(profile->getKey());
 				deleteProfileRequest.setObjectId(profile->getKey());

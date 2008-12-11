@@ -146,7 +146,7 @@ namespace synthese
 			if (_sentScenario.get())
 			{
 				ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get());
-				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.template getRegistry<ScenarioSentAlarm>())
+				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.getRegistry<ScenarioSentAlarm>())
 				{
 					v.push_back(static_pointer_cast<Alarm, ScenarioSentAlarm>(alarm));
 				}
@@ -154,7 +154,7 @@ namespace synthese
 			else
 			{
 				AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get());
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.template getRegistry<AlarmTemplate>())
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 				{
 					v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
 				}
@@ -239,7 +239,7 @@ namespace synthese
 			if (_sentScenario.get())
 			{
 				ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get());
-				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.template getRegistry<ScenarioSentAlarm>())
+				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.getRegistry<ScenarioSentAlarm>())
 				{
 					AdminInterfaceElement::PageLink link;
 					link.factoryKey = MessageAdmin::FACTORY_KEY;
@@ -253,7 +253,7 @@ namespace synthese
 			else if (_templateScenario.get())
 			{
 				AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get());
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.template getRegistry<AlarmTemplate>())
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 				{
 					AdminInterfaceElement::PageLink link;
 					link.factoryKey = MessageAdmin::FACTORY_KEY;

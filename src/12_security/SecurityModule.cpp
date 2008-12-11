@@ -59,10 +59,10 @@ namespace synthese
 		{
 			Env env;
 			ProfileTableSync::Search(env, ROOT_PROFILE);
-			if (env.template getRegistry<Profile>().empty())
+			if (env.getRegistry<Profile>().empty())
 				_rootProfile.reset(new Profile);
 			else
-				_rootProfile = env.template getEditableRegistry<Profile>().front();
+				_rootProfile = env.getEditableRegistry<Profile>().front();
 	
 			_rootProfile->setName(ROOT_PROFILE);
 			shared_ptr<Right> r(new GlobalRight);
@@ -73,14 +73,14 @@ namespace synthese
 			ProfileTableSync::Save(_rootProfile.get());
 
 			UserTableSync::Search(env, ROOT_USER, ROOT_USER, "%","%", _rootProfile->getKey());
-			if (env.template getRegistry<User>().empty())
+			if (env.getRegistry<User>().empty())
 			{
 				_rootUser.reset(new User);
 				_rootUser->setLogin(ROOT_USER);
 				_rootUser->setPassword(ROOT_USER);
 			}
 			else
-				_rootUser = env.template getEditableRegistry<User>().front();
+				_rootUser = env.getEditableRegistry<User>().front();
 			_rootUser->setName(ROOT_USER);
 			_rootUser->setProfile(_rootProfile.get());
 			_rootUser->setConnectionAllowed(true);
@@ -105,7 +105,7 @@ namespace synthese
 			
 			Env env;
 			ProfileTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<Profile> profile, env.template getRegistry<Profile>())
+			BOOST_FOREACH(shared_ptr<Profile> profile, env.getRegistry<Profile>())
 				m.push_back(make_pair(profile->getKey(), profile->getName()));
 			return m;
 		}
@@ -118,7 +118,7 @@ namespace synthese
 
 			Env env;
 			UserTableSync::Search(env, "%","%","%","%",UNKNOWN_VALUE, false);
-			BOOST_FOREACH(shared_ptr<User> user, env.template getRegistry<User>())
+			BOOST_FOREACH(shared_ptr<User> user, env.getRegistry<User>())
 				m.push_back(make_pair(user->getKey(), user->getSurname() + " " + user->getName()));
 			return m;
 		}
@@ -138,7 +138,7 @@ namespace synthese
 			vector<shared_ptr<Profile> > v;
 			Env env;
 			ProfileTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<Profile> cprofile, env.template getRegistry<Profile>())
+			BOOST_FOREACH(shared_ptr<Profile> cprofile, env.getRegistry<Profile>())
 			{
 				if (!profile.get())
 				{

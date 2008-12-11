@@ -78,7 +78,7 @@ namespace synthese
 			Env env;
 			CommercialLineTableSync::Search(env, _network->getKey());
 			
-			BOOST_FOREACH(shared_ptr<const CommercialLine> line, env.template getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<const CommercialLine> line, env.getRegistry<CommercialLine>())
 			{
 				stream << line->getKey() << ";" << line->getShortName() << "\n";
 			}

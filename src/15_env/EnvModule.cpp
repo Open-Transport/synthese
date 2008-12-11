@@ -90,14 +90,14 @@ namespace synthese
 			, bool totalControl 
 			, RightLevel neededLevel
 			, bool withAll
-			){
+		){
 			vector<pair<uid,string> > m;
 			if (withAll)
 			m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
 
 			Env env;
 			CommercialLineTableSync::Search(env, rights, totalControl, neededLevel);
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			return m;
 		}
@@ -110,9 +110,9 @@ namespace synthese
 		){
 			int tableId(decodeTableId(id));
 			if(tableId == ScheduledServiceTableSync::TABLE_ID)
-				return static_pointer_cast<NonPermanentService, ScheduledService>(env.template getEditableRegistry<ScheduledService>().getEditable(id));
+				return static_pointer_cast<NonPermanentService, ScheduledService>(env.getEditableRegistry<ScheduledService>().getEditable(id));
 			if (tableId == ContinuousServiceTableSync::TABLE_ID)
-				return static_pointer_cast<NonPermanentService, ContinuousService>(env.template getEditableRegistry<ContinuousService>().getEditable(id));
+				return static_pointer_cast<NonPermanentService, ContinuousService>(env.getEditableRegistry<ContinuousService>().getEditable(id));
 			
 			return shared_ptr<NonPermanentService>();
 		}
@@ -138,13 +138,13 @@ namespace synthese
 		){
 			int tableId(decodeTableId(id));
 			if(tableId == ConnectionPlaceTableSync::TABLE_ID)
-				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(env.template getRegistry<PublicTransportStopZoneConnectionPlace>().get(id));
+				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(env.getRegistry<PublicTransportStopZoneConnectionPlace>().get(id));
 			if (tableId == PublicPlaceTableSync::TABLE_ID)
-				return static_pointer_cast<const AddressablePlace, const PublicPlace>(env.template getRegistry<PublicPlace>().get(id));
+				return static_pointer_cast<const AddressablePlace, const PublicPlace>(env.getRegistry<PublicPlace>().get(id));
 			if (tableId == RoadTableSync::TABLE_ID)
-				return static_pointer_cast<const AddressablePlace, const Road>(env.template getRegistry<Road>().get(id));
+				return static_pointer_cast<const AddressablePlace, const Road>(env.getRegistry<Road>().get(id));
 			if (tableId == CrossingTableSync::TABLE_ID)
-				return static_pointer_cast<const AddressablePlace, const Crossing>(env.template getRegistry<Crossing>().get(id));
+				return static_pointer_cast<const AddressablePlace, const Crossing>(env.getRegistry<Crossing>().get(id));
 			return shared_ptr<const AddressablePlace>();
 		}
 
@@ -155,13 +155,13 @@ namespace synthese
 		){
 			int tableId(decodeTableId(id));
 			if (tableId == ConnectionPlaceTableSync::TABLE_ID)
-				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(env.template getEditableRegistry<PublicTransportStopZoneConnectionPlace>().getEditable(id));
+				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(env.getEditableRegistry<PublicTransportStopZoneConnectionPlace>().getEditable(id));
 			if (tableId == PublicPlaceTableSync::TABLE_ID)
-				return static_pointer_cast<AddressablePlace, PublicPlace>(env.template getEditableRegistry<PublicPlace>().getEditable(id));
+				return static_pointer_cast<AddressablePlace, PublicPlace>(env.getEditableRegistry<PublicPlace>().getEditable(id));
 			if (tableId == RoadTableSync::TABLE_ID)
-				return static_pointer_cast<AddressablePlace, Road>(env.template getEditableRegistry<Road>().getEditable(id));
+				return static_pointer_cast<AddressablePlace, Road>(env.getEditableRegistry<Road>().getEditable(id));
 			if (tableId == CrossingTableSync::TABLE_ID)
-				return static_pointer_cast<AddressablePlace, Crossing>(env.template getEditableRegistry<Crossing>().getEditable(id));
+				return static_pointer_cast<AddressablePlace, Crossing>(env.getEditableRegistry<Crossing>().getEditable(id));
 			return shared_ptr<AddressablePlace>();
 		}
 
@@ -173,9 +173,9 @@ namespace synthese
 		){
 			int tableId(decodeTableId(id));
 			if (tableId == PlaceAliasTableSync::TABLE_ID)
-				return static_pointer_cast<const IncludingPlace, const PlaceAlias>(env.template getRegistry<PlaceAlias>().get(id));
+				return static_pointer_cast<const IncludingPlace, const PlaceAlias>(env.getRegistry<PlaceAlias>().get(id));
 			if (tableId == CityTableSync::TABLE_ID)
-				return static_pointer_cast<const IncludingPlace, const City>(env.template getRegistry<City>().get(id));
+				return static_pointer_cast<const IncludingPlace, const City>(env.getRegistry<City>().get(id));
 			return shared_ptr<const IncludingPlace>();
 		}
 
@@ -187,9 +187,9 @@ namespace synthese
 		){
 			int tableId(decodeTableId(id));
 			if (tableId == PhysicalStopTableSync::TABLE_ID)
-				return static_pointer_cast<const Vertex, const PhysicalStop>(env.template getRegistry<PhysicalStop>().get(id));
+				return static_pointer_cast<const Vertex, const PhysicalStop>(env.getRegistry<PhysicalStop>().get(id));
 			if (tableId == AddressTableSync::TABLE_ID)
-				return static_pointer_cast<const Vertex, const Address>(env.template getRegistry<Address>().get(id));
+				return static_pointer_cast<const Vertex, const Address>(env.getRegistry<Address>().get(id));
 			return shared_ptr<const Vertex>();
 		}
 
@@ -198,7 +198,7 @@ namespace synthese
 		CityList EnvModule::guessCity (const std::string& fuzzyName, int nbMatches, bool t9)
 		{
 			const Env& env(*Env::GetOfficialEnv());
-			const Registry<City>& cities(env.template getRegistry<City>());
+			const Registry<City>& cities(env.getRegistry<City>());
 			CityList result;
 			LexicalMatcher<uid>::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).bestMatches (fuzzyName, nbMatches);
 			for (LexicalMatcher<uid>::MatchResult::iterator it = matches.begin ();
@@ -219,11 +219,11 @@ namespace synthese
 			CommercialLineTableSync::Search(env);
 
 			m.push_back(make_pair(string(), "--- Réseaux ---"));
-			BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.template getRegistry<TransportNetwork>())
+			BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.getRegistry<TransportNetwork>())
 				m.push_back(make_pair(Conversion::ToString(network->getKey()), network->getName() ));
 
 			m.push_back(make_pair(string(), "--- Lignes ---"));
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 				m.push_back(make_pair(Conversion::ToString(line->getKey()), line->getName() ));
 
 		}

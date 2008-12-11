@@ -146,7 +146,7 @@ namespace synthese
 
 			stream << "<h1>Répertoires</h1>";
 			HTMLList l;
-			BOOST_FOREACH(shared_ptr<TextTemplate> folder, fenv.template getRegistry<TextTemplate>())
+			BOOST_FOREACH(shared_ptr<TextTemplate> folder, fenv.getRegistry<TextTemplate>())
 			{
 			}
 
@@ -154,7 +154,7 @@ namespace synthese
 			{
 				stream << "<h2>Propriétés</h2>";
 
-				if (tenv.template getRegistry<TextTemplate>().empty() && fenv.template getRegistry<TextTemplate>().empty())
+				if (tenv.getRegistry<TextTemplate>().empty() && fenv.getRegistry<TextTemplate>().empty())
 					stream << "<p>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
 
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
@@ -166,7 +166,7 @@ namespace synthese
 
 
 			stream << "<h1>Modèles de texte</h1>";
-			BOOST_FOREACH(shared_ptr<TextTemplate> tt, tenv.template getRegistry<TextTemplate>())
+			BOOST_FOREACH(shared_ptr<TextTemplate> tt, tenv.getRegistry<TextTemplate>())
 			{
 				// Variables
 				deleteRequest.getAction()->setTemplate(tt);

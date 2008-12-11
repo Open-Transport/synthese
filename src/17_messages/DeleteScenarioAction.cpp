@@ -77,7 +77,7 @@ namespace synthese
 			// The action on the alarms
 			Env env;
 			AlarmTemplateInheritedTableSync::Search(env,_scenario.get());
-			BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.template getRegistry<AlarmTemplate>())
+			BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 			{
 				AlarmObjectLinkTableSync::Remove(alarm->getKey());
 				AlarmTableSync::Remove(alarm->getKey());

@@ -74,7 +74,7 @@ namespace synthese
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			Env env;
 			ProfileTableSync::Search(env, _name, string(), 0,1);
-			if (!env.template getRegistry<Profile>().empty())
+			if (!env.getRegistry<Profile>().empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 		}
 

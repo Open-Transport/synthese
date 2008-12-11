@@ -68,4 +68,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_UpdateAlarmMessagesFromTemplateAction_H__
- 

@@ -67,4 +67,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_UpdateDisplayPreselectionParametersAction_H__
- 

@@ -52,7 +52,7 @@ namespace synthese
 			){
 				try
 				{
-					return get(key);
+					return Registry<T>::get(key);
 				}
 				catch(ObjectNotFoundException<T>)
 				{
@@ -68,7 +68,7 @@ namespace synthese
 			){
 				try
 				{
-					return getEditable(key);
+					return Registry<T>::	getEditable(key);
 				}
 				catch(ObjectNotFoundException<T>)
 				{

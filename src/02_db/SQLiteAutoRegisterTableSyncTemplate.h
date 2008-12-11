@@ -58,8 +58,8 @@ namespace synthese
 				, const SQLiteResultSPtr& rows
 				, bool isFirstSync = false
 			){
-				Env* env(Env::GetOfficialEnv());
-				Registry<T>& registry(env->template getEditableRegistry<T>());
+				util::Env* env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env->getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
@@ -68,7 +68,7 @@ namespace synthese
 						{
 							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
 							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get(), env);
-							Load (address.get(), rows, env, FIELDS_ONLY_LOAD_LEVEL);
+							Load (address.get(), rows, env, util::FIELDS_ONLY_LOAD_LEVEL);
 						}
 					}
 					catch(util::Exception& e)
@@ -87,8 +87,8 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
-				Env* env(Env::GetOfficialEnv());
-				Registry<T>& registry(env->template getEditableRegistry<T>());
+				util::Env* env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env->getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
@@ -98,7 +98,7 @@ namespace synthese
 						{
 							boost::shared_ptr<T> address(registry.getEditable(id));
 							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get(), env);
-							Load (address.get(), rows, env, FIELDS_ONLY_LOAD_LEVEL);
+							Load (address.get(), rows, env, util::FIELDS_ONLY_LOAD_LEVEL);
 						}
 					}
 					catch (util::Exception& e)
@@ -118,8 +118,8 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
-				Env* env(Env::GetOfficialEnv());
-				Registry<T>& registry(env->template getEditableRegistry<T>());
+				util::Env* env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env->getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try

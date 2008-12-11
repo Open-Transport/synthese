@@ -81,7 +81,7 @@ namespace synthese
 			{
 				Env senv;
 				ReservationTableSync::Search(senv, object->getKey());
-				BOOST_FOREACH(shared_ptr<Reservation> reser, senv.template getRegistry<Reservation>())
+				BOOST_FOREACH(shared_ptr<Reservation> reser, senv.getRegistry<Reservation>())
 				{
 					object->addReservation(reser);
 				}

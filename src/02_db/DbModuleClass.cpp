@@ -34,7 +34,7 @@ namespace synthese
 	{
 	    boost::filesystem::path DbModuleClass::_DatabasePath;
 
-	    std::map<std::string, typename DbModuleClass::PtrCallback> DbModuleClass::_Callbacks;
+	    std::map<std::string, DbModuleClass::PtrCallback> DbModuleClass::_Callbacks;
 	    std::map<std::string, std::string> DbModuleClass::_Parameters;
 	    std::map<std::string, std::string> DbModuleClass::_DefaultParameters;
 

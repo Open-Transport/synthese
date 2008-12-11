@@ -118,7 +118,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<LineStop> lineStop, env.template getRegistry<LineStop>())
+			BOOST_FOREACH(shared_ptr<LineStop> lineStop, env.getRegistry<LineStop>())
 			{
 				stream << t.row();
 				stream << t.col() << lineStop->getRankInPath();
@@ -134,7 +134,7 @@ namespace synthese
 
 			stream << "<h1>Services à horaires</h1>";
 
-			const Registry<ScheduledService>& services(env.template getRegistry<ScheduledService>());
+			const Registry<ScheduledService>& services(env.getRegistry<ScheduledService>());
 			if (services.empty())
 				stream << "<p>Aucun service à horaire</p>";
 			else
@@ -171,7 +171,7 @@ namespace synthese
 
 			stream << "<h1>Services continus</h1>";
 
-			const Registry<ContinuousService>& cservices(env.template getRegistry<ContinuousService>());
+			const Registry<ContinuousService>& cservices(env.getRegistry<ContinuousService>());
 			if (cservices.empty())
 				stream << "<p>Aucun service continu</p>";
 			else

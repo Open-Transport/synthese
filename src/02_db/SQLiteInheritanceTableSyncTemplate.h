@@ -214,7 +214,7 @@ namespace synthese
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				SQLiteResultSPtr rows(_GetRow(key));
+				SQLiteResultSPtr rows(SQLiteTableSyncTemplate<K>::_GetRow(key));
 				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
 				return tablesync->_getEditable(key, env, linkLevel, autoCreate);
 			}
@@ -232,7 +232,7 @@ namespace synthese
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-					SQLiteResultSPtr rows(_GetRow(key));
+					SQLiteResultSPtr rows(SQLiteTableSyncTemplate<K>::_GetRow(key));
 					boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
 					return tablesync->_get(key, env, linkLevel, autoCreate);
 			}

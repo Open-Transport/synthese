@@ -88,7 +88,7 @@ namespace synthese
 				, string(), NULL
 				, 0, 1
 			);
-			if (!env.template getRegistry<ScenarioTemplate>().empty())
+			if (!env.getRegistry<ScenarioTemplate>().empty())
 				throw ActionException("Non empty folder");
 		}
 		

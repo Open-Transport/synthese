@@ -31,5 +31,5 @@ synthese::interfaces::SimplePageRequest::integrate();
 synthese::interfaces::RedirRequest::integrate();
 
 // Registries
-synthese::util::Env::template Integrate<synthese::interfaces::Interface>();
-synthese::util::Env::template Integrate<synthese::interfaces::InterfacePage>();
+synthese::util::Env::Integrate<synthese::interfaces::Interface>();
+synthese::util::Env::Integrate<synthese::interfaces::InterfacePage>();

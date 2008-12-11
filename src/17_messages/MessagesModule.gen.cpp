@@ -47,10 +47,10 @@ synthese::messages::ScenarioFolderRemoveAction::integrate();
 synthese::messages::ScenarioFolderUpdateAction::integrate();
 
 // Registries
-synthese::util::Env::template Integrate<synthese::messages::AlarmObjectLink>();
-synthese::util::Env::template Integrate<synthese::messages::AlarmTemplate>();
-synthese::util::Env::template Integrate<synthese::messages::SentAlarm>();
-synthese::util::Env::template Integrate<synthese::messages::ScenarioSentAlarm>();
-synthese::util::Env::template Integrate<synthese::messages::SingleSentAlarm>();
-synthese::util::Env::template Integrate<synthese::messages::TextTemplate>();
-synthese::util::Env::template Integrate<synthese::messages::ScenarioFolder>();
+synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
+synthese::util::Env::Integrate<synthese::messages::AlarmTemplate>();
+synthese::util::Env::Integrate<synthese::messages::SentAlarm>();
+synthese::util::Env::Integrate<synthese::messages::ScenarioSentAlarm>();
+synthese::util::Env::Integrate<synthese::messages::SingleSentAlarm>();
+synthese::util::Env::Integrate<synthese::messages::TextTemplate>();
+synthese::util::Env::Integrate<synthese::messages::ScenarioFolder>();

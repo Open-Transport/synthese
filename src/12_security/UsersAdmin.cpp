@@ -84,7 +84,7 @@ namespace synthese
 
 			// Searched profile
 			uid id(map.getUid(PARAM_SEARCH_PROFILE_ID, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE && Env::GetOfficialEnv()->template getRegistry<Profile>().contains(id))
+			if (id != UNKNOWN_VALUE && Env::GetOfficialEnv()->getRegistry<Profile>().contains(id))
 				_searchProfile = ProfileTableSync::Get(id);
 
 			// Table Parameters
@@ -116,7 +116,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<User>());
+			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<User>());
 
 
 			// Request for search form
@@ -149,7 +149,7 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			if (env.template getRegistry<User>().empty())
+			if (env.getRegistry<User>().empty())
 				stream << "Aucun utilisateur trouvé";
 
 
@@ -162,7 +162,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<User> user, env.template getRegistry<User>())
+			BOOST_FOREACH(shared_ptr<User> user, env.getRegistry<User>())
 			{
 				userRequest.setObjectId(user->getKey());
 				deleteUserRequest.setObjectId(user->getKey());

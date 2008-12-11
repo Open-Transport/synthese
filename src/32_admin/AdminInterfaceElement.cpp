@@ -193,7 +193,7 @@ namespace synthese
 
 
 		std::string AdminInterfaceElement::PageLink::getURL(
-			const server::FunctionRequest<admin::AdminRequest> const* request
+			server::FunctionRequest<admin::AdminRequest> const* request
 		) const	{
 			Request r;
 			r.getInternalParameters().insert(QueryString::PARAMETER_FUNCTION, AdminRequest::FACTORY_KEY);

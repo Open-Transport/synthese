@@ -117,6 +117,7 @@ namespace synthese
 					_searchConflict = static_cast<AlarmConflict>(num);
 
 				num = map.getInt(PARAMETER_SEARCH_STATUS, false, FACTORY_KEY);
+
 				if (num != UNKNOWN_VALUE)
 					_searchStatus = static_cast<StatusSearch>(num);
 
@@ -177,7 +178,7 @@ namespace synthese
 				, _requestParameters.raisingOrder					
 			);
 			ActionResultHTMLTable::ResultParameters _alarmResultParameters;
-			_alarmResultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<SentAlarm>());
+			_alarmResultParameters.setFromResult(_requestParameters, env.getEditableRegistry<SentAlarm>());
 
 			SentScenarioInheritedTableSync::Search(
 				env,
@@ -193,7 +194,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			html::ActionResultHTMLTable::ResultParameters _scenarioResultParameters;
-			_scenarioResultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<SentScenario>());
+			_scenarioResultParameters.setFromResult(_requestParameters, env.getEditableRegistry<SentScenario>());
 
 
 			vector<pair<StatusSearch, string> > statusMap;
@@ -238,7 +239,7 @@ namespace synthese
 			
 			stream << t1.open();
 
-			BOOST_FOREACH(shared_ptr<SentScenario> scenario, env.template getRegistry<SentScenario>())
+			BOOST_FOREACH(shared_ptr<SentScenario> scenario, env.getRegistry<SentScenario>())
 			{
 				scenarioRequest.setObjectId(scenario->getKey());
 				scenarioStopRequest.setObjectId(scenario->getKey());
@@ -313,7 +314,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<SingleSentAlarm> alarm, env.template getRegistry<SingleSentAlarm>())
+			BOOST_FOREACH(shared_ptr<SingleSentAlarm> alarm, env.getRegistry<SingleSentAlarm>())
 			{
 				alarmRequest.setObjectId(alarm->getKey());
 				stopRequest.setObjectId(alarm->getKey());

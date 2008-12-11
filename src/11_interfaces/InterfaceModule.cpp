@@ -55,7 +55,7 @@ namespace synthese
 		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels()
 		{
 			vector<pair<uid, string> > m;
-			BOOST_FOREACH(shared_ptr<Interface> interf, Env::GetOfficialEnv()->template getRegistry<Interface>())
+			BOOST_FOREACH(shared_ptr<Interface> interf, Env::GetOfficialEnv()->getRegistry<Interface>())
 				m.push_back(make_pair(interf->getKey(), interf->getName()));
 			return m;
 		}

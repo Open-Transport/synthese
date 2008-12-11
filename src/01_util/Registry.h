@@ -219,7 +219,7 @@ namespace synthese
 		{
 			if (empty())
 				return;
-			shared_ptr<T> item(*(_orderedVector.end() - 1));
+			boost::shared_ptr<T> item(*(_orderedVector.end() - 1));
 			_registry.erase(item->getKey());
 			_orderedVector.pop_back();
 		}
@@ -230,10 +230,10 @@ namespace synthese
 		boost::shared_ptr<T> Registry<T>::getEditable(
 			const RegistryKeyType & key
 		){
-			Map::iterator it(_registry.find(key));
+			typename Map::iterator it(_registry.find(key));
 
 			if(it == _registry.end())
-				throw typename ObjectNotFoundInRegistryException<T>(key);
+				throw typename util::ObjectNotFoundInRegistryException<T>(key);
 
 			return it->second;
 		}
@@ -244,10 +244,10 @@ namespace synthese
 		boost::shared_ptr<const T> Registry<T>::get(
 			const RegistryKeyType& key
 		) const	{
-			Map::const_iterator it(_registry.find(key));
+			typename Map::const_iterator it(_registry.find(key));
 			
 			if(it == _registry.end())
-				throw typename ObjectNotFoundInRegistryException<T>(key);
+				throw typename util::ObjectNotFoundInRegistryException<T>(key);
 				
 			return boost::const_pointer_cast<const T, T>(it->second);
 		}
@@ -311,10 +311,10 @@ namespace synthese
 		void Registry<T>::add (boost::shared_ptr<T> ptr)
 		{
 			if (ptr->getKey() == UNKNOWN_VALUE)
-				throw typename RegistryKeyException<T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
+				throw typename util::RegistryKeyException<T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
 
 			if (contains (ptr->getKey ())) 
-				throw typename RegistryKeyException<T>("Duplicate key in registry", ptr->getKey ());
+				throw typename util::RegistryKeyException<T>("Duplicate key in registry", ptr->getKey ());
 		    
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
 			_orderedVector.push_back(ptr);
@@ -335,10 +335,10 @@ namespace synthese
 		void Registry<T>::remove (const RegistryKeyType& key)
 		{
 			if (key == 0)
-				throw typename RegistryKeyException<T>("Neutral object cannot be removed at execution time", 0);
+				throw typename util::RegistryKeyException<T>("Neutral object cannot be removed at execution time", 0);
 
 			if (contains (key) == false) 
-				throw typename ObjectNotFoundInRegistryException<T>(key);
+				throw typename util::ObjectNotFoundInRegistryException<T>(key);
 
 			_registry.erase (key);
 			_orderedVector.clear();

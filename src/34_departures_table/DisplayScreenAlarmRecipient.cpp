@@ -218,7 +218,7 @@ namespace synthese
 				, searchState
 				, searchMessage
 			);
-			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, env.template getRegistry<DisplayScreen>())
+			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, env.getRegistry<DisplayScreen>())
 			{
 				if (screen->getLocalization() == NULL)
 					continue;
@@ -260,7 +260,7 @@ namespace synthese
 		{
 			try
 			{
-				add(Env::GetOfficialEnv()->template getRegistry<DisplayScreen>().get(objectId).get(), alarm);
+				add(Env::GetOfficialEnv()->getRegistry<DisplayScreen>().get(objectId).get(), alarm);
 			}
 			catch(...)
 			{

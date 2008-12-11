@@ -141,7 +141,7 @@ namespace synthese
 				, Conversion::ToInt(_number->getValue(parameters, variables, object, request))
 				, DOWN_LINKS_LOAD_LEVEL
 			);
-			BOOST_FOREACH(shared_ptr<ReservationTransaction> tran, env.template getRegistry<ReservationTransaction>())
+			BOOST_FOREACH(shared_ptr<ReservationTransaction> tran, env.getRegistry<ReservationTransaction>())
 			{
 				const ReservationItemInterfacePage* page(_page->getInterface()->getPage<ReservationItemInterfacePage>());
 				page->display(stream, *tran, variables, request);

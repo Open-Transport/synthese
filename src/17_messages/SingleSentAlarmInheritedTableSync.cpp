@@ -132,7 +132,7 @@ namespace synthese
 
 			try
 			{
-				Registry<SingleSentAlarm>& registry(env.template getEditableRegistry<SingleSentAlarm>());
+				Registry<SingleSentAlarm>& registry(env.getEditableRegistry<SingleSentAlarm>());
 				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				while (rows->next ())
 				{

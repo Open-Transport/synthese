@@ -88,7 +88,7 @@ namespace synthese
 				, false, true, true, true
 			);
 			ResultHTMLTable::ResultParameters rp;
-			rp.setFromResult(_requestParameters, env.template getEditableRegistry<CommercialLine>());
+			rp.setFromResult(_requestParameters, env.getEditableRegistry<CommercialLine>());
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
@@ -107,7 +107,7 @@ namespace synthese
 			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, rp);
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 			{
 				openRequest.setObjectId(line->getKey());
 
@@ -151,7 +151,7 @@ namespace synthese
 				, 0, 0
 				, false, true, true, true
 			);
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.template getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 			{
 				AdminInterfaceElement::PageLink link;
 				link.factoryKey = BookableCommercialLineAdmin::FACTORY_KEY;

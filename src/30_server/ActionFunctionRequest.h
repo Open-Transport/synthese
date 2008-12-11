@@ -53,20 +53,20 @@ namespace synthese
 		template<class A, class F>
 		boost::shared_ptr<A> synthese::server::ActionFunctionRequest<A, F>::getAction()
 		{
-			return boost::static_pointer_cast<A, Action> (_getAction());
+			return boost::static_pointer_cast<A, Action> (Request::_getAction());
 		}
 
 		template<class A, class F>
 		boost::shared_ptr<const A> synthese::server::ActionFunctionRequest<A, F>::getAction() const
 		{
-			return boost::static_pointer_cast<const A, const Action> (_getAction());
+			return boost::static_pointer_cast<const A, const Action> (Request::_getAction());
 		}
 
 		template<class A, class F>
 		ActionFunctionRequest<A, F>::ActionFunctionRequest(const Request* request)
 			: FunctionRequest<F>(request)
 		{
-			_setAction(boost::shared_ptr<Action>(new A));
+			Request::_setAction(boost::shared_ptr<Action>(new A));
 		}
 	}
 }

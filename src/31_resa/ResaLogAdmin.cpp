@@ -114,7 +114,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			ResultHTMLTable::ResultParameters rp;
-			rp.setFromResult(_requestParameters, env.template getEditableRegistry<DBLogEntry>());
+			rp.setFromResult(_requestParameters, env.getEditableRegistry<DBLogEntry>());
 			
 			// Search form
 			SearchFormHTMLTable st(searchRequest.getHTMLForm());

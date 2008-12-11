@@ -89,14 +89,14 @@ namespace synthese
 			// The action on the alarms
 			Env env;
 			AlarmTemplateInheritedTableSync::Search(env, _template.get());
-			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.template getRegistry<AlarmTemplate>())
+			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
 			{
 				shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(scenario.get(), *templateAlarm));
 				AlarmTableSync::Save(alarm.get());
 
 				Env lenv;
 				AlarmObjectLinkTableSync::Search(lenv, templateAlarm.get());
-				BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, lenv.template getRegistry<AlarmObjectLink>())
+				BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, lenv.getRegistry<AlarmObjectLink>())
 				{
 					aol->setAlarmId(alarm->getKey());
 					aol->setObjectId(aol->getObjectId());

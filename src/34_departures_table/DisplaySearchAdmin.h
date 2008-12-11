@@ -150,7 +150,7 @@ namespace synthese
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
 
 
-			static std::string DisplaySearchAdmin::getHtmlSearchForm(
+			static std::string getHtmlSearchForm(
 				const html::HTMLForm& form
 				, const std::string& cityName
 				, const std::string& stopName

@@ -160,7 +160,7 @@ namespace synthese
 				vector<shared_ptr<const CommercialLine> > objects;
 				while (rows->next ())
 				{
-					objects.push_back(Env::GetOfficialEnv()->template getRegistry<CommercialLine>().get(
+					objects.push_back(Env::GetOfficialEnv()->getRegistry<CommercialLine>().get(
 							  rows->getLongLong (TABLE_COL_ID)));
 				}
 				return objects;

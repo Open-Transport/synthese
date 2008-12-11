@@ -70,4 +70,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AddPreselectionPlaceToDisplayScreen_H__
- 

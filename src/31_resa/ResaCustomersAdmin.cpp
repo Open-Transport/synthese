@@ -107,7 +107,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			ResultHTMLTable::ResultParameters	resultParameters;
-			resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<User>());
+			resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<User>());
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
@@ -129,7 +129,7 @@ namespace synthese
 			stream << "<h1>Résultats</h1>";
 
 			// Results
-			if (env.template getRegistry<User>().empty())
+			if (env.getRegistry<User>().empty())
 				stream << "<p>Aucun client trouvé.</p>";
 			else
 			{
@@ -143,7 +143,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<User> user, env.template getRegistry<User>())
+				BOOST_FOREACH(shared_ptr<User> user, env.getRegistry<User>())
 				{
 					openRequest.setObjectId(user->getKey());
 

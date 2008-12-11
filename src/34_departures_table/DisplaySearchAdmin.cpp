@@ -110,6 +110,7 @@ namespace synthese
 				_searchState = map.getInt(PARAMETER_SEARCH_STATE, false, FACTORY_KEY);
 				_searchMessage = map.getInt(PARAMETER_SEARCH_MESSAGE, false, FACTORY_KEY);
 			}
+
 			else
 			{
 				try
@@ -155,7 +156,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, env.template getEditableRegistry<DisplayScreen>());
+			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<DisplayScreen>());
 
 
 			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);
@@ -209,7 +210,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, env.template getRegistry<DisplayScreen>())
+			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, env.getRegistry<DisplayScreen>())
 			{
 				updateRequest.setObjectId(screen->getKey());
 				viewRequest.setObjectId(screen->getKey());

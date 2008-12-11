@@ -67,7 +67,7 @@ namespace synthese
 			uid id = map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY);
 			if (id != UNKNOWN_VALUE)
 			{
-				if (!Env::GetOfficialEnv()->template getRegistry<Profile>().contains(id))
+				if (!Env::GetOfficialEnv()->getRegistry<Profile>().contains(id))
 					throw ActionException("Specified root profile not found.");
 				_templateProfile = ProfileTableSync::Get(id);
 			}
@@ -75,7 +75,7 @@ namespace synthese
 			// Name unicity
 			Env env;
 			ProfileTableSync::Search(env, _name, string(),0,1);
-			if (!env.template getRegistry<Profile>().empty())
+			if (!env.getRegistry<Profile>().empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);

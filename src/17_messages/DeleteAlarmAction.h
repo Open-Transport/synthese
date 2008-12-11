@@ -68,4 +68,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_DeleteAlarmAction_H__
- 

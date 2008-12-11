@@ -165,7 +165,7 @@ namespace synthese
 			{
 				Env env;
 				SiteTableSync::Search(env);
-				BOOST_FOREACH(shared_ptr<Site> site, env.template getRegistry<Site>())
+				BOOST_FOREACH(shared_ptr<Site> site, env.getRegistry<Site>())
 				{
 					PageLink link;
 					link.factoryKey = FACTORY_KEY;

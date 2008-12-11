@@ -78,7 +78,7 @@ namespace synthese
 
 					Env env;
 					ScenarioTemplateInheritedTableSync::Search(env, folderId, _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
-					if (!env.template getRegistry<ScenarioTemplate>().empty())
+					if (!env.getRegistry<ScenarioTemplate>().empty())
 						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
 
 				}

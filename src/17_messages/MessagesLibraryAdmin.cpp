@@ -133,7 +133,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, env.template getEditableRegistry<ScenarioTemplate>());
+			p.setFromResult(_requestParameters, env.getEditableRegistry<ScenarioTemplate>());
 
 			ScenarioFolderTableSync::Search(env, _folderId);
 
@@ -141,7 +141,7 @@ namespace synthese
 			{
 				stream << "<h1>Répertoire</h1>";
 
-				if (env.template getRegistry<ScenarioTemplate>().empty() && env.template getRegistry<ScenarioFolder>().empty())
+				if (env.getRegistry<ScenarioTemplate>().empty() && env.getRegistry<ScenarioFolder>().empty())
 					stream << "<p>" << HTMLModule::getLinkButton(removeFolderRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
 
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
@@ -160,7 +160,7 @@ namespace synthese
 			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, p, addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
 			stream << t3.open();
 			
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, env.template getRegistry<ScenarioTemplate>())
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, env.getRegistry<ScenarioTemplate>())
 			{
 				updateScenarioRequest.setObjectId(scenario->getKey());
 				deleteScenarioRequest.getAction()->setScenario(scenario);
@@ -177,7 +177,7 @@ namespace synthese
 
 			stream << "<h1>Sous-répertoires</h1>";
 
-			if (env.template getRegistry<ScenarioFolder>().empty())
+			if (env.getRegistry<ScenarioFolder>().empty())
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
@@ -186,7 +186,7 @@ namespace synthese
 			HTMLList l;
 			stream << f.open() << l.open();
 
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, env.template getRegistry<ScenarioFolder>())
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, env.getRegistry<ScenarioFolder>())
 			{
 				static_pointer_cast<MessagesLibraryAdmin,AdminInterfaceElement>(goFolderRequest.getFunction()->getPage())->setFolderId(folder->getKey());
 				stream << l.element("folder");
@@ -229,7 +229,7 @@ namespace synthese
 			// Folders
 			Env env;
 			ScenarioFolderTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, env.template getRegistry<ScenarioFolder>())
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, env.getRegistry<ScenarioFolder>())
 			{
 				PageLink link;
 				link.factoryKey = MessagesLibraryAdmin::FACTORY_KEY;
@@ -242,7 +242,7 @@ namespace synthese
 			
 			// Scenarios
 			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, env.template getRegistry<ScenarioTemplate>())
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, env.getRegistry<ScenarioTemplate>())
 			{
 				PageLink link;
 				link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;

@@ -1,4 +1,4 @@
-
+	
 /** SQLiteInheritedRegistryTableSync class header.
 	@file SQLiteInheritedRegistryTableSync.h
 
@@ -59,20 +59,20 @@ namespace synthese
 				SQLiteSync* sync,
 				const SQLiteResultSPtr& rows, bool isFirstSync = false)
 			{
-				Env* env(util::Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env->template getEditableRegistry<ObjectClass>());
+				util::Env* env(util::Env::GetOfficialEnv());
+				util::Registry<ObjectClass>& registry(env->getEditableRegistry<ObjectClass>());
 				try
 				{
 					if (registry.contains(rows->getKey()))
 					{
 						boost::shared_ptr<ObjectClass> address(registry.getEditable(rows->getKey()));
 						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(address.get(), env);
-						Load (address.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+						Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 					else
 					{
 						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
-						Load(object.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+						Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						registry.add(object);
 					}
 				}
@@ -86,8 +86,8 @@ namespace synthese
 				SQLiteSync* sync,
 				const SQLiteResultSPtr& rows)
 			{
-				util::Env* env(Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env->template getEditableRegistry<ObjectClass>());
+				util::Env* env(util::Env::GetOfficialEnv());
+				util::Registry<ObjectClass>& registry(env->getEditableRegistry<ObjectClass>());
 				try
 				{
 					util::RegistryKeyType id(rows->getKey());
@@ -95,7 +95,7 @@ namespace synthese
 					{
 						boost::shared_ptr<ObjectClass> address(registry.getEditable(id));
 						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(address.get(), env);
-						Load(address.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+						Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 				}
 				catch (util::Exception& e)
@@ -108,8 +108,8 @@ namespace synthese
 				SQLiteSync* sync,
 				const SQLiteResultSPtr& rows)
 			{
-				util::Env* env(Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env->template getEditableRegistry<ObjectClass>());
+				util::Env* env(util::Env::GetOfficialEnv());
+				util::Registry<ObjectClass>& registry(env->getEditableRegistry<ObjectClass>());
 				try
 				{
 					uid id = rows->getKey();

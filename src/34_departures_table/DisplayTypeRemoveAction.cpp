@@ -84,7 +84,7 @@ namespace synthese
 				, 0
 				, 1
 			);
-			if (!env.template getRegistry<DisplayScreen>().empty())
+			if (!env.getRegistry<DisplayScreen>().empty())
 				throw ActionException("Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur.");
 		}
 
