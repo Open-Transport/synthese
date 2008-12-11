@@ -160,7 +160,7 @@ namespace synthese
 				cs->setHandicappedCompliance (HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel));
 				cs->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel));
 
-				path->addService (cs);
+				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 

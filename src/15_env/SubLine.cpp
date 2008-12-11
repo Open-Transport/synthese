@@ -79,7 +79,7 @@ namespace synthese
 			if (!respectsLineTheory(*service))
 				return false;
 
-			Path::addService(service);
+			Path::addService(service, false);
 			
 			return true;
 		}

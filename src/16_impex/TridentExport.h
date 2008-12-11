@@ -30,10 +30,9 @@
 
 namespace synthese
 {
-	namespace env
+	namespace util
 	{
-		class NonPermanentService;
-		class CommercialLine;
+		class Registrable;
 	}
 
 	namespace impex
@@ -70,7 +69,7 @@ namespace synthese
 		    
 			static std::string TridentId (const std::string& peer, const std::string clazz, const uid& id);
 			static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
-			static std::string TridentId (const std::string& peer, const std::string clazz, const env::NonPermanentService* srv);
+			static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
 		};
 	}
 }

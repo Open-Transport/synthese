@@ -270,13 +270,15 @@ namespace synthese
 			return (it - _subLines.begin());
 		}
 
-		void Line::addService( Service* service )
-		{
+		void Line::addService(
+			Service* service,
+			bool ensureLineTheory
+		){
 			/// Test of the respect of the line theory
 			/// If OK call the normal Path service insertion
-			if (respectsLineTheory(*service))
+			if (!ensureLineTheory || respectsLineTheory(*service))
 			{
-				Path::addService(service);
+				Path::addService(service, ensureLineTheory);
 				return;
 			}
 

@@ -152,7 +152,10 @@ namespace synthese
 				ss->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
 				ss->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel, AUTO_CREATE));
 
-				path->addService(ss);
+				path->addService(
+					ss,
+					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+				);
 			}
 		}
 

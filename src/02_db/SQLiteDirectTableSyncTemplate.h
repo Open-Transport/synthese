@@ -102,7 +102,7 @@ namespace synthese
 					object.reset(new T(rows->getKey()));
 					Load(object.get(), rows, env, linkLevel);
 				}
-				catch (typename db::DBEmptyResultException<K>& e)
+				catch (typename db::DBEmptyResultException<K>&)
 				{
 					if (autoCreate == NEVER_CREATE)
 						throw util::ObjectNotFoundException<T>(key, "Object not found in "+ SQLiteTableSyncTemplate<K>::TABLE_NAME);

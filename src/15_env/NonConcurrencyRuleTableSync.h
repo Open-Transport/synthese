@@ -30,14 +30,14 @@
 #include <string>
 #include <iostream>
 
-#include "NonConcurrencyRule.h"
-
 #include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
+		class NonConcurrencyRule;
+
 		/** NonConcurrencyRule table synchronizer.
 			@ingroup m35LS refLS
 		*/
@@ -63,8 +63,8 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				int hiddenLineId = UNKNOWN_VALUE
-				, int priorityLineId = UNKNOWN_VALUE
+				util::RegistryKeyType hiddenLineId = UNKNOWN_VALUE
+				, util::RegistryKeyType priorityLineId = UNKNOWN_VALUE
 				, bool hiddenAndPriority = true
 				, int first = 0
 				, int number = 0

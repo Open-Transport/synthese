@@ -25,6 +25,7 @@
 #include <sstream>
 
 #include "NonConcurrencyRuleTableSync.h"
+#include "NonConcurrencyRule.h"
 
 #include "DBModule.h"
 #include "SQLiteResult.h"
@@ -121,8 +122,8 @@ namespace synthese
 
 		void NonConcurrencyRuleTableSync::Search(
 			Env& env,
-			int hiddenLineId
-			, int priorityLineId
+			util::RegistryKeyType hiddenLineId
+			, util::RegistryKeyType priorityLineId
 			, bool hiddenAndPriority
 			, int first /*= 0*/
 			, int number /*= 0*/ 

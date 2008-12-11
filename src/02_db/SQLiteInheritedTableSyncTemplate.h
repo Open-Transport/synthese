@@ -101,7 +101,7 @@ namespace synthese
 					object.reset(new ObjectClass(rows->getKey()));
 					Load(object.get(), rows, env, linkLevel);
 				}
-				catch (typename db::DBEmptyResultException<TableSyncClass>& e)
+				catch (typename db::DBEmptyResultException<TableSyncClass>&)
 				{
 					if (autoCreate == NEVER_CREATE)
 						throw util::ObjectNotFoundException<ObjectClass>(key, "Object not found in "+ ParentTableSyncClass::TABLE_NAME);

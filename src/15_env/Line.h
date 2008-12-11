@@ -157,15 +157,18 @@ namespace synthese
 
 				/** Adds a service to a line.
 					@param service Service to add
+					@param ensureLineTheory If true, the method verifies if the service is compatible 
+							with the other ones, by the way of the lines theory. If not, then it attempts 
+							to register the service in an existing SubLine, or creates one if necessary.
+							Note : in this case, the service is NOT added to the current line.
+
 					@author Hugues Romain
 					@date 2007
-
-					The method verifies if the service is compatible with the other ones, by the way of the lines theory.
-					If not, then it attempts to register the service in an existing SubLine, or creates one if necessary.
-
-					Note : in this case, the service is NOT added to the current line.
 				*/
-				virtual void addService (Service* service);
+				virtual void addService(
+					Service* service,
+					bool ensureLineTheory
+				);
 			//@}
 		    
 			//! @name Query methods

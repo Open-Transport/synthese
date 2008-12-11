@@ -82,8 +82,10 @@ namespace synthese
 
 
 
-		void Path::addService (Service* service)
-		{
+		void Path::addService(
+			Service* service,
+			bool ensureLineTheory
+		){
 			if (_services.find(service) != _services.end())
 				throw Exception("The service already exists.");
 
