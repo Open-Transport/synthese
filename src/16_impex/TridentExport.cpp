@@ -521,7 +521,7 @@ namespace synthese
 						os << "<objectId>" << TridentId (peerid, "PtLink", *from) << "</objectId>" << "\n";
 						os << "<startOfLink>" << TridentId (peerid, "StopPoint", *from) << "</startOfLink>" << "\n";
 						os << "<endOfLink>" << TridentId (peerid, "StopPoint", *to) << "</endOfLink>" << "\n";
-						os << "<linkDistance>" << from->getLength() << "</linkDistance>" << "\n";   // in meters!
+						os << "<linkDistance>" << Conversion::ToString(from->getLength()) << "</linkDistance>" << "\n";   // in meters!
 						os << "</PtLink>" << "\n";
 					}
 					from = to;
@@ -606,14 +606,14 @@ namespace synthese
 				if (_withTisseoExtension)
 				{
 					os << "<mobilityRestrictedSuitability>" << Conversion::ToString(srv->getHandicappedCompliance()->isCompliant() != false) << "</mobilityRestrictedSuitability>" << "\n";
-					if (srv->getHandicappedCompliance()->getReservationRule())
-						os << "<mobilityRestrictedSuitabilityReservationRule>" <<  TridentId(peerid, "ReservationRule", srv->getHandicappedCompliance()->getReservationRule()->getKey()) << "</mobilityRestrictedSuitabilityReservationRule>" << "\n";
+					if (srv->getHandicappedCompliance()->getReservationRule()->getType() != RESERVATION_FORBIDDEN)
+						os << "<mobilityRestrictedReservationRule>" <<  TridentId(peerid, "ReservationRule", *srv->getHandicappedCompliance()->getReservationRule()) << "</mobilityRestrictedReservationRule>" << "\n";
 					os << "<bikeSuitability>" << Conversion::ToString(srv->getBikeCompliance()->isCompliant() != false) << "</bikeSuitability>" << "\n";
-					if (srv->getBikeCompliance()->getReservationRule())
-						os << "<bikeReservationRule>" << TridentId(peerid, "ReservationRule", srv->getBikeCompliance()->getReservationRule()->getKey()) << "</bikeReservationRule>" << "\n";
+					if (srv->getBikeCompliance()->getReservationRule()->getType() != RESERVATION_FORBIDDEN)
+						os << "<bikeReservationRule>" << TridentId(peerid, "ReservationRule", *srv->getBikeCompliance()->getReservationRule()) << "</bikeReservationRule>" << "\n";
 					if (isDRT)
 					{
-						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", srv->getReservationRule()->getKey()) << "</reservationRule>" << "\n";
+						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", *srv->getReservationRule()) << "</reservationRule>" << "\n";
 					}
 				}
 				os << "</VehicleJourney>" << "\n";
@@ -662,10 +662,10 @@ namespace synthese
 				if (_withTisseoExtension)
 				{
 					os << "<mobilityRestrictedSuitability>" << Conversion::ToString(srv->getHandicappedCompliance()->isCompliant() != false) << "</mobilityRestrictedSuitability>" << "\n";
-					if (srv->getHandicappedCompliance()->getReservationRule())
-						os << "<mobilityRestrictedSuitabilityReservationRule>" <<  TridentId(peerid, "ReservationRule", srv->getHandicappedCompliance()->getReservationRule()->getKey()) << "</mobilityRestrictedSuitabilityReservationRule>" << "\n";
+					if (srv->getHandicappedCompliance()->getReservationRule()->getType() != RESERVATION_FORBIDDEN)
+						os << "<mobilityRestrictedReservationRule>" <<  TridentId(peerid, "ReservationRule", *srv->getHandicappedCompliance()->getReservationRule()) << "</mobilityRestrictedReservationRule>" << "\n";
 					os << "<bikeSuitability>" << Conversion::ToString(srv->getBikeCompliance()->isCompliant() != false) << "</bikeSuitability>" << "\n";
-					if (srv->getBikeCompliance()->getReservationRule())
+					if (srv->getBikeCompliance()->getReservationRule()->getType() != RESERVATION_FORBIDDEN)
 						os << "<bikeReservationRule>" << TridentId(peerid, "ReservationRule", *srv->getBikeCompliance()->getReservationRule()) << "</bikeReservationRule>" << "\n";
 					if (isDRT)
 					{
