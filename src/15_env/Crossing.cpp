@@ -42,7 +42,8 @@ namespace synthese
 		Crossing::Crossing(
 			util::RegistryKeyType key
 			, const City* city
-		)	: ConnectionPlace (key, "X", city, CONNECTION_TYPE_ROADROAD)
+		):	ConnectionPlace (key, "X", city, CONNECTION_TYPE_ROADROAD)
+			, Registrable(key)
 	    {
 	    }
 	    

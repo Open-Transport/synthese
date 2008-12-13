@@ -59,7 +59,6 @@ namespace synthese
 			Env* env,
 			LinkLevel linkLevel
 		){
-			page->setKey(rows->getLongLong (TABLE_COL_ID));
 			page->setPageCode(rows->getText(InterfacePageTableSync::TABLE_COL_PAGE));
 			page->setDirectDisplayAllowed(rows->getBool(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED));
 			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
@@ -114,7 +113,9 @@ namespace synthese
 			    // Search the specified interface
 			    try
 			    {
-					shared_ptr<InterfacePage> page(Factory<InterfacePage>::create(rows->getText(TABLE_COL_CLASS)));
+					InterfacePage::Args arg;
+					arg.key = rows->getKey();
+					shared_ptr<InterfacePage> page(Factory<InterfacePage>::create(rows->getText(TABLE_COL_CLASS), arg));
 
 					Load(page.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					registry.add(page);

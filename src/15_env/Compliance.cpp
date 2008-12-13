@@ -36,7 +36,8 @@ namespace synthese
 			boost::logic::tribool compliant
 			, int capacity
 			, shared_ptr<const ReservationRule> reservationRule
-		)	: _compliant (compliant)
+		):	_compliant (compliant),
+			Registrable(UNKNOWN_VALUE)
 			, _capacity (capacity)
 			, _reservationRule(reservationRule)
 		{

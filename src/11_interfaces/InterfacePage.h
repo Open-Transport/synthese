@@ -66,7 +66,8 @@ namespace synthese
 			/// Optional arguments for factory.
 			struct Args
 			{
-
+				util::RegistryKeyType key;
+				Args(util::RegistryKeyType vkey = UNKNOWN_VALUE) : key(vkey) {}
 			};
 
 			/// Chosen registry class.
@@ -81,6 +82,9 @@ namespace synthese
 		public:
 			InterfacePage(
 				util::RegistryKeyType key = UNKNOWN_VALUE
+			);
+			InterfacePage(
+				Args args
 			);
 			virtual ~InterfacePage();
 

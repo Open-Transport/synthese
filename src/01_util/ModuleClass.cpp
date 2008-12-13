@@ -28,7 +28,7 @@ namespace synthese
 {
 	namespace util
 	{
-		ModuleClass::ModuleClass()
+		ModuleClass::ModuleClass(ModuleClass::Args args)
 			: FactoryBase<ModuleClass>()
 		{
 

@@ -30,13 +30,16 @@ namespace synthese
 {
 	namespace util
 	{
-		/** Base class to be factored by Factory.
-
-			A child of FactoryBase must implement a struct called Args, corresponding to the arguments
-			that can be optionally passed through the object constructor by the factory.
-				
-			@ingroup m01
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Base class to be factored by Factory.
+		///
+		/// A child of FactoryBase must implement a struct called Args, corresponding to the arguments
+		///	that can be optionally passed through the object constructor by the factory.
+		///
+		/// It stores 
+		///		
+		///	@ingroup m01
+		//////////////////////////////////////////////////////////////////////////
 		template<class F>
 		class FactoryBase
 		{
@@ -51,6 +54,10 @@ namespace synthese
 				@return the factory key of the class of the object.
 			*/
 			virtual const std::string& getFactoryKey() const = 0;
+
+
+			//////////////////////////////////////////////////////////////////////////
+			///	Args
 		};
 	}
 }

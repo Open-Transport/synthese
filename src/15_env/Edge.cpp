@@ -39,9 +39,10 @@ namespace synthese
 		Edge::Edge (bool isDeparture,
 				bool isArrival,
 				const Path* parentPath,
-				int rankInPath) 
-		: _isDeparture (isDeparture)
-		, _isArrival (isArrival)
+				int rankInPath
+		):	_isDeparture (isDeparture),
+			Registrable(UNKNOWN_VALUE),
+			_isArrival (isArrival)
 		, _parentPath (parentPath)
 		, _rankInPath (rankInPath)
 		, _nextInPath(NULL)
@@ -50,6 +51,7 @@ namespace synthese
 		, _followingConnectionArrival(NULL)
 		, _followingArrivalForFineSteppingOnly(NULL)
 		, _serviceIndexUpdateNeeded (true)
+
 		{ }
 
 

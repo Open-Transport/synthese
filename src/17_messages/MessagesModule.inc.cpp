@@ -54,3 +54,4 @@
 #include "ScenarioSentAlarm.h"
 #include "TextTemplate.h"
 #include "ScenarioFolder.h"
+#include "ScenarioTemplate.h"

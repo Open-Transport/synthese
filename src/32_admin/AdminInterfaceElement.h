@@ -109,8 +109,6 @@ namespace synthese
 			) const;
 
 		public:
-			AdminInterfaceElement(const Args& args);
-
 			const PageLinks&		getTreePosition(const server::FunctionRequest<admin::AdminRequest>* request) const;
 			const PageLinksTree&	getTree(const server::FunctionRequest<admin::AdminRequest>* request)	const;
 

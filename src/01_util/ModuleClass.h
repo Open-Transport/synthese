@@ -49,10 +49,9 @@ namespace synthese
 			/// Optional arguments for factory.
 			struct Args
 			{
-
 			};
 
-			ModuleClass();
+			ModuleClass(Args = Args());
 
 			virtual void preInit () {};
 			virtual void initialize () {};

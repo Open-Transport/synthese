@@ -38,12 +38,12 @@ namespace synthese
 		class Request;
 		class ParametersMap;
 
-		/** Action abstract class to run before the display of a function result.
-
-			A factory of actions is handled by 30_server module.
-
-			@ingroup m18
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Action abstract class to run before the display of a function result.
+		///	A factory of actions is handled by 30_server module.
+		///
+		///	@ingroup m18
+		//////////////////////////////////////////////////////////////////////////
 		class Action
 		:	public util::FactoryBase<Action>
 		{
@@ -56,6 +56,12 @@ namespace synthese
 
 		protected:
 			Request* _request;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			/// @param args arguments
+			//////////////////////////////////////////////////////////////////////////
+			Action(Args args = Args());
 
 		private:
 

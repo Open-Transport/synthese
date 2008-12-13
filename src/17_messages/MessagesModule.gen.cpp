@@ -54,3 +54,4 @@ synthese::util::Env::Integrate<synthese::messages::ScenarioSentAlarm>();
 synthese::util::Env::Integrate<synthese::messages::SingleSentAlarm>();
 synthese::util::Env::Integrate<synthese::messages::TextTemplate>();
 synthese::util::Env::Integrate<synthese::messages::ScenarioFolder>();
+synthese::util::Env::Integrate<synthese::messages::ScenarioTemplate>();

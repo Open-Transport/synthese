@@ -207,13 +207,6 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::Args::Args(const std::string& _defaultIcon, const std::string& _defaultName )
-			: defaultIcon(_defaultIcon)
-			, defaultName(_defaultName)
-		{
-		
-		}
-
 		AdminInterfaceElement::Args::Args()
 
 		{

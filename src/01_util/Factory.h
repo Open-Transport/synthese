@@ -65,7 +65,6 @@ namespace synthese
 			{
 			private:
 				virtual RootObject* create() = 0;
-				virtual RootObject* create(const typename RootObject::Args& args) = 0;
 				friend class Factory;
 				friend class Factory::Iterator;
 			};
@@ -79,17 +78,13 @@ namespace synthese
 				friend class Factory;
 
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Creation of a child object without arguments.
+				/// @return a RootObject pointer to the created object.
+				//////////////////////////////////////////////////////////////////////////
 				RootObject* create ()
 				{
-					typename T::Args defaultArgs;
-				    return create (defaultArgs);
-				}
-
-
-				RootObject* create (const typename T::Args& args)
-				{
-					T* obj(new T);
-				    return static_cast<RootObject*>(obj);
+					return static_cast<RootObject*>(new T);
 				}
 			};
 
@@ -148,21 +143,6 @@ namespace synthese
 			}
 
 
-		
-			/** Creation of an object from the key of its class, without arguments, returned as a pointer to an instantiation of the factory root class.
-				@param key Key of the class to instantiate
-				@return RootObject* Pointer to the instantiated object
-				@author Hugues Romain
-
-				Default arguments are used to instantiate the object.
-			*/
-			static RootObject* create(const typename Map::key_type& key)
-			{
-				typename RootObject::Args defaultArgs;
-				return create (key, defaultArgs);
-			}
-
-
 
 			/** Creation of an object from the key of its class, with arguments, returned as a pointer to an instantiation of the factory root class.
 				@param key Key of the class to instantiate
@@ -170,8 +150,7 @@ namespace synthese
 				@return RootObject* Pointer to the instantiated object
 				@author Hugues Romain
 			*/
-			static RootObject* create(const typename Map::key_type& key, 
-						  const typename RootObject::Args& args)
+			static RootObject* create(const typename Map::key_type& key)
 			{
 				// The factory "single object" was never filled
 				if (size () == 0)
@@ -185,7 +164,7 @@ namespace synthese
 				    throw FactoryException<RootObject>("Unable to factor "+ key +" object (class not found)");
 
 				// The key is found : return of an instance of the object
-				return it->second->create(args);
+				return it->second->create();
 			}
 
 

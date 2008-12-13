@@ -37,7 +37,7 @@ namespace synthese
 		AddressablePlace::AddressablePlace(
 			const std::string& name,
 			const City* city
-		):	Registrable(),
+		):	Registrable(UNKNOWN_VALUE),
 			Place(name, city)
 		{
 		}

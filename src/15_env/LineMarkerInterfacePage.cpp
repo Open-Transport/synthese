@@ -57,7 +57,8 @@ namespace synthese
 
 
 		LineMarkerInterfacePage::LineMarkerInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE),
+			InterfacePage()
 		{
 
 		}

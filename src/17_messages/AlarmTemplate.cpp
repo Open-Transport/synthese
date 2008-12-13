@@ -45,6 +45,7 @@ namespace synthese
 			util::RegistryKeyType key,
 			const ScenarioTemplate* scenario
 		):	Alarm(key),
+			Registrable(key)
 			_scenario(scenario)
 		{
 

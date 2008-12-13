@@ -54,7 +54,7 @@ namespace synthese
 			/** Constructor.
 				@param key ID of the object.
 			*/
-			Registrable(RegistryKeyType key = UNKNOWN_VALUE);
+			Registrable(RegistryKeyType key);
 
 		public:
 			virtual ~Registrable();
