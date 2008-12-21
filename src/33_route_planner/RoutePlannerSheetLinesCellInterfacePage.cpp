@@ -49,7 +49,7 @@ namespace synthese
 
 
 		RoutePlannerSheetLinesCellInterfacePage::RoutePlannerSheetLinesCellInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

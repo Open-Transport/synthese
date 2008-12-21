@@ -94,7 +94,7 @@ namespace synthese
 			//@{
 				bool isValid () const;
 				bool isUnknown() const;
-				std::string toSQLString(bool withApostrophes = true) const;
+				virtual std::string toSQLString(bool withApostrophes = true) const;
 				std::string toString(bool withSeconds = false) const;
 			//@}
 

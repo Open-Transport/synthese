@@ -94,6 +94,11 @@ namespace synthese
 				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 
+			virtual PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage
+				, const server::FunctionRequest<admin::AdminRequest>* request
+			) const;
+
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible
 				@author Hugues Romain

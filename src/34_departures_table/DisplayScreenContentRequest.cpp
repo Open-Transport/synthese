@@ -76,18 +76,18 @@ namespace synthese
 				else
 					screenId = map.getUid(PARAMETER_TB, true, FACTORY_KEY);
 
-				if (decodeTableId(screenId) == ConnectionPlaceTableSync::TABLE_ID)
+				if (decodeTableId(screenId) == ConnectionPlaceTableSync::TABLE.ID)
 				{
 					DisplayScreen* screen(new DisplayScreen);
 					_type.reset(new DisplayType);
 					_type->setRowNumber(10);
-					_type->setInterface(Env::GetOfficialEnv()->getRegistry<Interface>().get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
+					_type->setDisplayInterface(Env::GetOfficialEnv()->getRegistry<Interface>().get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
 					screen->setLocalization(ConnectionPlaceTableSync::Get(screenId).get());
 					screen->setAllPhysicalStopsDisplayed(true);					
 					screen->setType(_type.get());
 					_screen.reset(screen);
 				}
-				else if (decodeTableId(screenId) == DisplayScreenTableSync::TABLE_ID)
+				else if (decodeTableId(screenId) == DisplayScreenTableSync::TABLE.ID)
 				{
 					_screen = DisplayScreenTableSync::Get(screenId);
 				}

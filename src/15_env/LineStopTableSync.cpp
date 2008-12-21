@@ -49,12 +49,39 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("15.57.01 Line stops");
 
+	namespace env
+	{
+		const std::string LineStopTableSync::COL_PHYSICALSTOPID ("physical_stop_id");
+		const std::string LineStopTableSync::COL_LINEID ("line_id");
+		const std::string LineStopTableSync::COL_RANKINPATH ("rank_in_path");
+		const std::string LineStopTableSync::COL_ISDEPARTURE ("is_departure");
+		const std::string LineStopTableSync::COL_ISARRIVAL ("is_arrival");
+		const std::string LineStopTableSync::COL_METRICOFFSET ("metric_offset");
+		const std::string LineStopTableSync::COL_SCHEDULEINPUT ("schedule_input");
+		const std::string LineStopTableSync::COL_VIAPOINTS ("via_points");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<LineStopTableSync>::TABLE_NAME = "t010_line_stops";
-		template<> const int SQLiteTableSyncTemplate<LineStopTableSync>::TABLE_ID = 10;
-		template<> const bool SQLiteTableSyncTemplate<LineStopTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<LineStopTableSync>::TABLE(
+			LineStopTableSync::CreateFormat(
+				"t010_line_stops",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(LineStopTableSync::COL_PHYSICALSTOPID, INTEGER, false),
+					SQLiteTableFormat::Field(LineStopTableSync::COL_LINEID, INTEGER, false),
+					SQLiteTableFormat::Field(LineStopTableSync::COL_RANKINPATH, INTEGER),
+					SQLiteTableFormat::Field(LineStopTableSync::COL_ISDEPARTURE, BOOLEAN),
+					SQLiteTableFormat::Field(LineStopTableSync::COL_ISARRIVAL, BOOLEAN),
+					SQLiteTableFormat::Field(LineStopTableSync::COL_METRICOFFSET, DOUBLE),
+					SQLiteTableFormat::Field(LineStopTableSync::COL_VIAPOINTS, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(LineStopTableSync::COL_LINEID),
+					SQLiteTableFormat::Index(LineStopTableSync::COL_PHYSICALSTOPID),
+					SQLiteTableFormat::Index()
+		)	)	);
 
+		
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Load(
 			LineStop* ls,
 			const db::SQLiteResultSPtr& rows,
@@ -125,7 +152,7 @@ namespace synthese
 				object->setKey(getId());	/// @todo Use grid ID
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -136,29 +163,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string LineStopTableSync::COL_PHYSICALSTOPID ("physical_stop_id");
-		const std::string LineStopTableSync::COL_LINEID ("line_id");
-		const std::string LineStopTableSync::COL_RANKINPATH ("rank_in_path");
-		const std::string LineStopTableSync::COL_ISDEPARTURE ("is_departure");
-		const std::string LineStopTableSync::COL_ISARRIVAL ("is_arrival");
-		const std::string LineStopTableSync::COL_METRICOFFSET ("metric_offset");
-		const std::string LineStopTableSync::COL_SCHEDULEINPUT ("schedule_input");
-		const std::string LineStopTableSync::COL_VIAPOINTS ("via_points");
-
 		LineStopTableSync::LineStopTableSync()
 			: SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_PHYSICALSTOPID, "INTEGER", false);
-			addTableColumn (COL_LINEID, "INTEGER", false);
-			addTableColumn (COL_RANKINPATH, "INTEGER", false);
-			addTableColumn (COL_ISDEPARTURE, "BOOLEAN", false);
-			addTableColumn (COL_ISARRIVAL, "BOOLEAN", false);
-			addTableColumn (COL_METRICOFFSET, "DOUBLE", true);
-			addTableColumn (COL_VIAPOINTS, "TEXT", true);
-
-			addTableIndex(COL_LINEID);
-			addTableIndex(COL_PHYSICALSTOPID);
 		}
 
 
@@ -175,7 +182,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (lineId != UNKNOWN_VALUE)
 				query << " AND " << COL_LINEID << "=" << lineId;

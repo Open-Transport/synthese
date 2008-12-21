@@ -50,8 +50,8 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AccountTableSync>::TABLE_NAME = "t028_account";
-		template<> const int SQLiteTableSyncTemplate<AccountTableSync>::TABLE_ID = 28;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AccountTableSync>::TABLE.NAME = "t028_account";
+		template<> const int SQLiteTableSyncTemplate<AccountTableSync>::TABLE.ID = 28;
 		template<> const bool SQLiteTableSyncTemplate<AccountTableSync>::HAS_AUTO_INCREMENT = true;
 
 		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::load(Account* account, const db::SQLiteResultSPtr& rows )
@@ -107,7 +107,7 @@ namespace synthese
 			if (account->getKey() <= 0)
 				account->setKey(getId());
 			query
-				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(account->getKey())
 				<< "," << Conversion::ToSQLiteString(account->getName())
 				<< "," << Conversion::ToString(account->getLeftUserId())
@@ -177,7 +177,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " << TABLE_COL_RIGHT_USER_ID << "=" << Conversion::ToString(rightUserId)
 				<< " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
 				<< " AND (" << TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(leftUserId) << " OR " << TABLE_COL_LEFT_USER_ID << "=0 OR " << TABLE_COL_LEFT_USER_ID << "=\"\")"
@@ -215,7 +215,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT MAX(" << TABLE_COL_RIGHT_CLASS_NUMBER << ") AS nu"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " << TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE '" << basisCode << "%'";
 			try
 			{

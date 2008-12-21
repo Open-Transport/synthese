@@ -50,11 +50,33 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,DisplayTypeTableSync>::FACTORY_KEY("34.00 Display Types");
 	}
 
+	namespace departurestable
+	{
+		const string DisplayTypeTableSync::COL_NAME = "name";
+		const string DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID = "interface_id";
+		const string DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID = "audio_interface_id";
+		const string DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID = "monitoring_interface_id";
+		const string DisplayTypeTableSync::COL_ROWS_NUMBER = "rows_number";
+		const string DisplayTypeTableSync::COL_MAX_STOPS_NUMBER("max_stops_number");
+		const string DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS("time_between_checks");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE_NAME = "t036_display_types";
-		template<> const int SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE_ID = 36;
-		template<> const bool SQLiteTableSyncTemplate<DisplayTypeTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE(
+			DisplayTypeTableSync::CreateFormat(
+				"t036_display_types",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, INTEGER),
+					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, INTEGER),
+					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, INTEGER),
+					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_ROWS_NUMBER, INTEGER),
+					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER, INTEGER),
+					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Load(
 			DisplayType* object,
@@ -62,21 +84,48 @@ namespace synthese
 			Env* env,
 			LinkLevel linkLevel
 		){
-			object->setName(rows->getText ( DisplayTypeTableSync::TABLE_COL_NAME));
-			object->setRowNumber(rows->getInt ( DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER));
+			object->setName(rows->getText ( DisplayTypeTableSync::COL_NAME));
+			object->setRowNumber(rows->getInt ( DisplayTypeTableSync::COL_ROWS_NUMBER));
 			object->setMaxStopsNumber(rows->getInt ( DisplayTypeTableSync::COL_MAX_STOPS_NUMBER));
+			object->setTimeBetweenChecks(rows->getInt(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				uid id(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID));
-
 				try
 				{
-					object->setInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
+					uid id(rows->getLongLong(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID));
+					if (id > 0)
+					{
+						object->setDisplayInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
+					}
 				}
-				catch (...)
+				catch (ObjectNotFoundException<Interface>& e)
 				{
-					
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, e);
+				}
+				try
+				{
+					uid id(rows->getLongLong(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID));
+					if (id > 0)
+					{
+						object->setAudioInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
+					}
+				}
+				catch (ObjectNotFoundException<Interface>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, e);
+				}
+				try
+				{
+					uid id(rows->getLongLong(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID));
+					if (id > 0)
+					{
+						object->setMonitoringInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
+					}
+				}
+				catch (ObjectNotFoundException<Interface>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, e);
 				}
 			}
 		}
@@ -85,7 +134,9 @@ namespace synthese
 			DisplayType* obj,
 			Env* env
 		){
-			obj->setInterface(NULL);
+			obj->setDisplayInterface(NULL);
+			obj->setAudioInterface(NULL);
+			obj->setMonitoringInterface(NULL);
 		}
 
     
@@ -98,12 +149,15 @@ namespace synthese
 				object->setKey(getId());
 			stringstream query;
 			query
-				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << Conversion::ToString(object->getInterface()->getKey())
+				<< "," << ((object->getDisplayInterface() != NULL) ? Conversion::ToString(object->getDisplayInterface()->getKey()) : "0")
+				<< "," << ((object->getAudioInterface() != NULL) ? Conversion::ToString(object->getAudioInterface()->getKey()) : "0")
+				<< "," << ((object->getMonitoringInterface() != NULL) ? Conversion::ToString(object->getMonitoringInterface()->getKey()) : "0")
 				<< "," << Conversion::ToString(object->getRowNumber())
 				<< "," << Conversion::ToString(object->getMaxStopsNumber())
+				<< "," << Conversion::ToString(object->getTimeBetweenChecks())
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -112,21 +166,9 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const string DisplayTypeTableSync::TABLE_COL_NAME = "name";
-		const string DisplayTypeTableSync::TABLE_COL_INTERFACE_ID = "interface_id";
-		const string DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER = "rows_number";
-		const string DisplayTypeTableSync::COL_MAX_STOPS_NUMBER("max_stops_number");
-
-		/// @todo Other fields
-
 		DisplayTypeTableSync::DisplayTypeTableSync()
 			: SQLiteRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
-			addTableColumn(TABLE_COL_INTERFACE_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_ROWS_NUMBER, "INTEGER", true);
-			addTableColumn(COL_MAX_STOPS_NUMBER, "INTEGER", true);
 		}
 
 		void DisplayTypeTableSync::Search(
@@ -141,12 +183,12 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1";
 			if (!exactName.empty())
-				query << " AND " << TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(exactName);
+				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(exactName);
 			if (orderByName)
-				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

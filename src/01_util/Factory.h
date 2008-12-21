@@ -239,7 +239,10 @@ namespace synthese
 			{
 				return Iterator( _registeredCreator.end() );
 			}
+
+			typedef Iterator iterator;
 		};
+
 
 		/** @} */
 

@@ -50,11 +50,56 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,LineTableSync>::FACTORY_KEY("15.30.01 Lines");
 
+	namespace env
+	{
+		const std::string LineTableSync::COL_AXISID ("axis_id");
+		const std::string LineTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
+		const std::string LineTableSync::COL_NAME ("name");
+		const std::string LineTableSync::COL_TIMETABLENAME ("timetable_name");
+		const std::string LineTableSync::COL_DIRECTION ("direction");
+		const std::string LineTableSync::COL_ISWALKINGLINE ("is_walking_line");
+		const std::string LineTableSync::COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
+		const std::string LineTableSync::COL_USEINTIMETABLES ("use_in_timetables");
+		const std::string LineTableSync::COL_USEINROUTEPLANNING ("use_in_routeplanning");
+		const std::string LineTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
+		const std::string LineTableSync::COL_FAREID ("fare_id");
+		const std::string LineTableSync::COL_ALARMID ("alarm_id");
+		const std::string LineTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
+		const std::string LineTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+		const std::string LineTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+		const std::string LineTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
+		const std::string LineTableSync::COL_WAYBACK("wayback");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<LineTableSync>::TABLE_NAME = "t009_lines";
-		template<> const int SQLiteTableSyncTemplate<LineTableSync>::TABLE_ID = 9;
-		template<> const bool SQLiteTableSyncTemplate<LineTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<LineTableSync>::TABLE(
+			LineTableSync::CreateFormat(
+				"t009_lines",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(LineTableSync::COL_COMMERCIAL_LINE_ID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_AXISID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(LineTableSync::COL_TIMETABLENAME, TEXT),
+					SQLiteTableFormat::Field(LineTableSync::COL_DIRECTION, TEXT),
+					SQLiteTableFormat::Field(LineTableSync::COL_ISWALKINGLINE, BOOLEAN),
+					SQLiteTableFormat::Field(LineTableSync::COL_USEINDEPARTUREBOARDS, BOOLEAN),
+					SQLiteTableFormat::Field(LineTableSync::COL_USEINTIMETABLES, BOOLEAN),
+					SQLiteTableFormat::Field(LineTableSync::COL_USEINROUTEPLANNING, BOOLEAN),
+					SQLiteTableFormat::Field(LineTableSync::COL_ROLLINGSTOCKID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_FAREID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_ALARMID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_BIKECOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_HANDICAPPEDCOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_PEDESTRIANCOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_RESERVATIONRULEID, INTEGER),
+					SQLiteTableFormat::Field(LineTableSync::COL_WAYBACK, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(LineTableSync::COL_COMMERCIAL_LINE_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
+
 
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Load(
 			Line* line,
@@ -134,7 +179,7 @@ namespace synthese
 			if (object->getKey() > 0)
 			{
 				query
-					<< "UPDATE " << TABLE_NAME << " SET "
+					<< "UPDATE " << TABLE.NAME << " SET "
 					/// @todo fill fields [,]FIELD=VALUE
 					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
 			}
@@ -142,7 +187,7 @@ namespace synthese
 			{
 				object->setKey(getId());
                 query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< " INSERT INTO " << TABLE.NAME << " VALUES("
 					<< Conversion::ToString(object->getKey())
 					/// @todo fill other fields separated by ,
 					<< ")";
@@ -163,50 +208,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string LineTableSync::COL_AXISID ("axis_id");
-		const std::string LineTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
-		const std::string LineTableSync::COL_NAME ("name");
-		const std::string LineTableSync::COL_TIMETABLENAME ("timetable_name");
-		const std::string LineTableSync::COL_DIRECTION ("direction");
-		const std::string LineTableSync::COL_ISWALKINGLINE ("is_walking_line");
-		const std::string LineTableSync::COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
-		const std::string LineTableSync::COL_USEINTIMETABLES ("use_in_timetables");
-		const std::string LineTableSync::COL_USEINROUTEPLANNING ("use_in_routeplanning");
-		const std::string LineTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
-		const std::string LineTableSync::COL_FAREID ("fare_id");
-		const std::string LineTableSync::COL_ALARMID ("alarm_id");
-		const std::string LineTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const std::string LineTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const std::string LineTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const std::string LineTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
-		const std::string LineTableSync::COL_WAYBACK("wayback");
-
 		LineTableSync::LineTableSync()
 			: SQLiteRegistryTableSyncTemplate<LineTableSync,Line>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_COMMERCIAL_LINE_ID, "INTEGER", false);
-			addTableColumn (COL_AXISID, "INTEGER", false);
-			
-			addTableColumn (COL_NAME, "TEXT");
-			addTableColumn (COL_TIMETABLENAME, "TEXT");
-			addTableColumn (COL_DIRECTION, "TEXT");
-			addTableColumn (COL_ISWALKINGLINE, "BOOLEAN");
-			addTableColumn (COL_USEINDEPARTUREBOARDS, "BOOLEAN");
-			addTableColumn (COL_USEINTIMETABLES, "BOOLEAN");
-			addTableColumn (COL_USEINROUTEPLANNING, "BOOLEAN");
-
-			addTableColumn (COL_ROLLINGSTOCKID, "INTEGER");
-			addTableColumn (COL_FAREID, "INTEGER");
-			addTableColumn (COL_ALARMID, "INTEGER");
-			addTableColumn (COL_BIKECOMPLIANCEID, "INTEGER");
-			addTableColumn (COL_HANDICAPPEDCOMPLIANCEID, "INTEGER");
-			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER");
-			addTableColumn (COL_RESERVATIONRULEID, "INTEGER");
-
-			addTableColumn(COL_WAYBACK, "INTEGER");
-
-			addTableIndex(COL_COMMERCIAL_LINE_ID);
 		}
 
 
@@ -222,7 +226,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (commercialLineId != UNKNOWN_VALUE)
 				query << " AND " << COL_COMMERCIAL_LINE_ID << "=" << commercialLineId;

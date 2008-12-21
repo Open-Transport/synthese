@@ -48,15 +48,21 @@ namespace synthese
 			static const std::string PARAMETER_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_INTERFACE_ID;
+			static const std::string PARAMETER_AUDIO_INTERFACE_ID;
+			static const std::string PARAMETER_MONITORING_INTERFACE_ID;
 			static const std::string PARAMETER_ROWS_NUMBER;
 			static const std::string PARAMETER_MAX_STOPS_NUMBER;
+			static const std::string PARAMETER_TIME_BETWEEN_CHECKS;
 
 		private:
 			boost::shared_ptr<DisplayType> _dt;
 			std::string _name;
 			boost::shared_ptr<const interfaces::Interface>	_interface;
+			boost::shared_ptr<const interfaces::Interface>	_monitoringInterface;
+			boost::shared_ptr<const interfaces::Interface>	_audioInterface;
 			int	_rows_number;
 			int	_max_stops_number;
+			int	_timeBetweenChecks;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -72,6 +78,9 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+
+			void setTypeId(util::RegistryKeyType id);
 		};
 	}
 }

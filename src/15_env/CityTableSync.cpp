@@ -21,21 +21,16 @@
 */
 
 #include "CityTableSync.h"
-
-#include "01_util/Conversion.h"
-
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-
-#include "15_env/EnvModule.h"
+#include "Conversion.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "EnvModule.h"
 
 #include <sqlite3.h>
 #include <assert.h>
 
-
-using synthese::util::Conversion;
-using synthese::db::SQLiteResult;
-using boost::shared_ptr;
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -45,14 +40,30 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync,CityTableSync>::FACTORY_KEY("15.20.01 Cities");
+		template<> const string FactorableTemplate<SQLiteTableSync,CityTableSync>::FACTORY_KEY("15.20.01 Cities");
+	}
+
+	namespace env
+	{
+		const string CityTableSync::TABLE_COL_NAME("name");
+		const string CityTableSync::TABLE_COL_CODE("code");
 	}
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<CityTableSync>::TABLE_NAME = "t006_cities";
-		template<> const int SQLiteTableSyncTemplate<CityTableSync>::TABLE_ID = 6;
-		template<> const bool SQLiteTableSyncTemplate<CityTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<CityTableSync>::TABLE(
+			CityTableSync::CreateFormat(
+				"t006_cities",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(CityTableSync::TABLE_COL_NAME, TEXT),
+					SQLiteTableFormat::Field(CityTableSync::TABLE_COL_CODE, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(CityTableSync::TABLE_COL_NAME),
+					SQLiteTableFormat::Index(CityTableSync::TABLE_COL_CODE),
+					SQLiteTableFormat::Index()
+				)
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Load(
 			City* object,
@@ -83,18 +94,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string CityTableSync::TABLE_COL_NAME = "name";
-		const std::string CityTableSync::TABLE_COL_CODE = "code";
-		
 		CityTableSync::CityTableSync ()
 			: SQLiteAutoRegisterTableSyncTemplate<CityTableSync,City> ()
 		{
-			addTableColumn (TABLE_COL_ID, "INTEGER");
-			addTableColumn (TABLE_COL_NAME, "TEXT");
-			addTableColumn (TABLE_COL_CODE, "TEXT");
-
-			addTableIndex(TABLE_COL_NAME);
-			addTableIndex(TABLE_COL_CODE);
 		}
 
 

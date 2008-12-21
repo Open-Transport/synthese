@@ -61,11 +61,36 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ScheduledServiceTableSync>::FACTORY_KEY("15.60.03 Scheduled services");
 
+	namespace env
+	{
+		const string ScheduledServiceTableSync::COL_SERVICENUMBER ("service_number");
+		const string ScheduledServiceTableSync::COL_SCHEDULES ("schedules");
+		const string ScheduledServiceTableSync::COL_PATHID ("path_id");
+		const string ScheduledServiceTableSync::COL_RANKINPATH ("rank_in_path");
+		const string ScheduledServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
+		const string ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+		const string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+		const string ScheduledServiceTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
+		const string ScheduledServiceTableSync::COL_TEAM("team");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE_NAME = "t016_scheduled_services";
-		template<> const int SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE_ID = 16;
-		template<> const bool SQLiteTableSyncTemplate<ScheduledServiceTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE(
+			ScheduledServiceTableSync::CreateFormat(
+				"t016_scheduled_services",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_SERVICENUMBER, TEXT),
+					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_SCHEDULES, TEXT),
+					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_PATHID, INTEGER, false),
+					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_RESERVATIONRULEID, INTEGER),
+					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_TEAM, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Load(
 			ScheduledService* ss,
@@ -177,7 +202,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -188,28 +213,9 @@ namespace synthese
 
 	namespace env
 	{
-		const string ScheduledServiceTableSync::COL_SERVICENUMBER ("service_number");
-		const string ScheduledServiceTableSync::COL_SCHEDULES ("schedules");
-		const string ScheduledServiceTableSync::COL_PATHID ("path_id");
-		const string ScheduledServiceTableSync::COL_RANKINPATH ("rank_in_path");
-		const string ScheduledServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const string ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string ScheduledServiceTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
-		const string ScheduledServiceTableSync::COL_TEAM("team");
-
 		ScheduledServiceTableSync::ScheduledServiceTableSync()
 			: SQLiteRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_SERVICENUMBER, "TEXT", true);
-			addTableColumn (COL_SCHEDULES, "TEXT", true);
-			addTableColumn (COL_PATHID, "INTEGER", false);
-			addTableColumn (COL_BIKECOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_HANDICAPPEDCOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_RESERVATIONRULEID, "INTEGER", true);
-			addTableColumn (COL_TEAM, "TEXT");
 		}
 
 
@@ -228,11 +234,11 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME;
+				<< " FROM " << TABLE.NAME;
 			if (commercialLineId != UNKNOWN_VALUE)
-				query << " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
+				query << " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
 			if (!date.isUnknown())
-				query << " INNER JOIN " << ServiceDateTableSync::TABLE_NAME << " AS d ON d." << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE_NAME << "." << TABLE_COL_ID;
+				query << " INNER JOIN " << ServiceDateTableSync::TABLE.NAME << " AS d ON d." << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " WHERE 1 ";
 			if (lineId != UNKNOWN_VALUE)
 				query << " AND " << ScheduledServiceTableSync::COL_PATHID << "=" << lineId;
@@ -241,7 +247,7 @@ namespace synthese
 			if (!date.isUnknown())
 				query << " AND d." << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString();
 			if (!date.isUnknown())
-				query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
+				query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY ";
 			if (orderByOriginTime)
 				query << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
@@ -253,26 +259,5 @@ namespace synthese
 
 			LoadFromQuery(query.str(), env, linkLevel);
 		}
-
-		void ScheduledServiceTableSync::afterFirstSync( SQLite* sqlite,  SQLiteSync* sync )
-		{
-/*
-		    // Lines
-		    for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)
-		    {
-			shared_ptr<Line> line = EnvModule::getLines().getEditable(it->first);
-			line ->updateScheduleIndexes();
-		    }
-
-		    
-		    // Roads
-			for (Road::Registry::const_iterator it = EnvModule::getRoads().begin(); it != EnvModule::getLines().end(); it++)
-			{
-			(*it)->updateSchedulesIndexes();
-			}
-*/
-
-		}
 	}
 }
-

@@ -21,15 +21,11 @@
 */
 
 #include "HTMLForm.h"
-
-#include "InterfaceModule.h"
 #include "Interface.h"
-
+#include "InterfaceModule.h"
 #include "ActionFunctionRequest.h"
-
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
-
 #include "DisplayType.h"
 #include "DeparturesTableModule.h"
 #include "DisplayTypesAdmin.h"
@@ -38,6 +34,8 @@
 #include "DisplayTypeTableSync.h"
 #include "DisplayTypeRemoveAction.h"
 #include "ArrivalDepartureTableRight.h"
+#include "DisplayTypeAdmin.h"
+#include "QueryString.h"
 
 #include <boost/foreach.hpp>
 
@@ -69,57 +67,51 @@ namespace synthese
 	{
 		void DisplayTypesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
+			DisplayTypeTableSync::Search(_env, string(), 0, UNKNOWN_VALUE, true, true, UP_LINKS_LOAD_LEVEL);
 		}
 
 		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// Right
 			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
-
-			// Env
-			Env env;
-			DisplayTypeTableSync::Search(env);
 			
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(request);
 			createRequest.getFunction()->setPage<DisplayTypesAdmin>();
 			
-			ActionFunctionRequest<UpdateDisplayTypeAction,AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage<DisplayTypesAdmin>();
-
 			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(request);
 			deleteRequest.getFunction()->setPage<DisplayTypesAdmin>();
 
-
+			FunctionRequest<AdminRequest> openRequest(request);
+			openRequest.getFunction()->setPage<DisplayTypeAdmin>();
+			
 
 			stream
 				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
-				<< "<table class=\"adminresults\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Max arrêts intermédiaires</th>";
+				<< "<table class=\"adminresults\"><tr><th>Nom</th><th>Interface d'affichage</th><th>Rangées</th><th>Max arrêts intermédiaires</th>"
+				<< "<th>Accès</th>";
 			if (writeRight)
-				stream << "<th colspan=\"2\">Actions</th>";
+				stream << "<th>Actions</th>";
 			stream << "</tr>";
 
 			// Display types loop
-			BOOST_FOREACH(shared_ptr<DisplayType> dt, env.getRegistry<DisplayType>())
+			BOOST_FOREACH(shared_ptr<DisplayType> dt, _env.getRegistry<DisplayType>())
 			{
 				deleteRequest.getAction()->setType(dt);
+				openRequest.setObjectId(dt->getKey());
 
-				HTMLForm uf(updateRequest.getHTMLForm("update" + Conversion::ToString(dt->getKey())));
-				uf.setUpdateRight(writeRight);
-				uf.addHiddenField(UpdateDisplayTypeAction::PARAMETER_ID, Conversion::ToString(dt->getKey()));
-				stream << uf.open();
+//				uf.setUpdateRight(writeRight);
 				stream
 					<< "<tr>"
-					<< "<td>" << uf.getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, dt->getName()) << "</td>"
-					<< "<td>" << uf.getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), dt->getInterface() ? dt->getInterface()->getKey() : uid(0)) << "</td>"
-					<< "<td>" << uf.getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99, dt->getRowNumber()) << "</td>"
-					<< "<td>" << uf.getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER, UNKNOWN_VALUE, 99, dt->getMaxStopsNumber()) << "</td>";
+					<< "<td>" << dt->getName() << "</td>"
+					<< "<td>" << ((dt->getDisplayInterface() == NULL) ? "" : dt->getDisplayInterface()->getName()) << "</td>"
+					<< "<td>" << dt->getRowNumber() << "</td>"
+					<< "<td>" << dt->getMaxStopsNumber() << "</td>"
+					<< "<td>" << openRequest.getHTMLForm().getLinkButton("Modifier", string(), "monitor_edit.png") << "</td>"
 					;
 				if (writeRight)
 					stream
-						<< "<td>" << uf.getSubmitButton("Modifier") << "</td>"
 						<< "<td>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?", "monitor_delete.png");
 				stream << "</tr>";
-				stream << uf.close();
 			}
 
 			// New type
@@ -163,9 +155,32 @@ namespace synthese
 			return links;
 		}
 
+
+
 		bool DisplayTypesAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
 		{
 			return true;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPages(
+			const AdminInterfaceElement& currentPage , const server::FunctionRequest<admin::AdminRequest>* request
+		) const {
+			Env env;
+			DisplayTypeTableSync::Search(env, string(), 0, UNKNOWN_VALUE, true, true);
+			AdminInterfaceElement::PageLinks links;
+			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.getRegistry<DisplayType>())
+			{
+				PageLink link;
+				link.factoryKey = DisplayTypeAdmin::FACTORY_KEY;
+				link.icon = DisplayTypeAdmin::ICON;
+				link.name = displayType->getName();
+				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				link.parameterValue = Conversion::ToString(displayType->getKey());
+				links.push_back(link);
+			}
+			return links;
 		}
 	}
 }

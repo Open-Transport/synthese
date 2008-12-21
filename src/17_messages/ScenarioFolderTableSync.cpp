@@ -47,12 +47,26 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,ScenarioFolderTableSync>::FACTORY_KEY("17 ScenarioFolder");
 	}
-	
+
+	namespace messages
+	{
+		const string ScenarioFolderTableSync::COL_NAME("name");
+		const string ScenarioFolderTableSync::COL_PARENT_ID("parent_id");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ScenarioFolderTableSync>::TABLE_NAME("t051_scenario_folder");
-		template<> const int SQLiteTableSyncTemplate<ScenarioFolderTableSync>::TABLE_ID(51);
-		template<> const bool SQLiteTableSyncTemplate<ScenarioFolderTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ScenarioFolderTableSync>::TABLE(
+			ScenarioFolderTableSync::CreateFormat(
+				"t051_scenario_folder",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ScenarioFolderTableSync::COL_NAME, INTEGER),
+					SQLiteTableFormat::Field(ScenarioFolderTableSync::COL_PARENT_ID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(ScenarioFolderTableSync::COL_PARENT_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
 
 
 
@@ -77,7 +91,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getName())
 				<< "," << Conversion::ToString(object->getParentId())
@@ -98,17 +112,9 @@ namespace synthese
 	
 	namespace messages
 	{
-		const std::string ScenarioFolderTableSync::COL_NAME("name");
-		const std::string ScenarioFolderTableSync::COL_PARENT_ID("parent_id");
-		
-
-
 		ScenarioFolderTableSync::ScenarioFolderTableSync()
 			: SQLiteNoSyncTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_NAME, "INTEGER", false);
-			addTableColumn(COL_PARENT_ID, "INTEGER", false);
 		}
 
 
@@ -117,7 +123,7 @@ namespace synthese
 		void ScenarioFolderTableSync::Search(
 			Env& env,
 			uid parentFolderId
-			, std::string name
+			, string name
 			, int first /*= 0*/
 			, int number, /*= 0*/
 			LinkLevel linkLevel
@@ -125,7 +131,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE "
 				<< COL_NAME << " LIKE " << Conversion::ToSQLiteString(name)	
 			;

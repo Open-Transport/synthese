@@ -80,25 +80,13 @@ namespace synthese
 		{
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_DATE, 50, false);
 			_searchDate = map.getDate(PARAMETER_DATE, false, FACTORY_KEY);
-		}
-		
-		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
-		{
-			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage<ResaLogAdmin>();
-
-			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(request);
-			cancelRequest.getFunction()->setPage<ResaLogAdmin>();
-			cancelRequest.setObjectId(request->getObjectId());
 
 			// Search
 			DateTime searchStartDate(_searchDate);
 			DateTime searchEndDate(searchStartDate);
 			searchEndDate += 1;
-			Env env;
 			DBLogEntryTableSync::Search(
-				env,
+				_env,
 				ResaDBLog::FACTORY_KEY
 				, searchStartDate
 				, searchEndDate
@@ -113,8 +101,20 @@ namespace synthese
 				, false // _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
 				, _requestParameters.raisingOrder
 			);
+		}
+		
+		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		{
+			// Requests
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<ResaLogAdmin>();
+
+			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(request);
+			cancelRequest.getFunction()->setPage<ResaLogAdmin>();
+			cancelRequest.setObjectId(request->getObjectId());
+
 			ResultHTMLTable::ResultParameters rp;
-			rp.setFromResult(_requestParameters, env.getEditableRegistry<DBLogEntry>());
+			rp.setFromResult(_requestParameters, _env.getEditableRegistry<DBLogEntry>());
 			
 			// Search form
 			SearchFormHTMLTable st(searchRequest.getHTMLForm());
@@ -125,7 +125,7 @@ namespace synthese
 			// Results
 			ResaModule::DisplayResaDBLog(
 				stream
-				, env
+				, _env
 				, PARAMETER_DATE
 				, searchRequest
 				, cancelRequest

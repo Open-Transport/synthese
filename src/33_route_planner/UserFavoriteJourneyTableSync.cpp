@@ -1,5 +1,4 @@
 
-
 /** UserFavoriteJourneyTableSync class implementation.
 	@file UserFavoriteJourneyTableSync.cpp
 	@author Hugues Romain
@@ -52,12 +51,32 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,UserFavoriteJourneyTableSync>::FACTORY_KEY("53.1 User favorite journey");
 	}
-	
+
+	namespace routeplanner
+	{
+		const std::string UserFavoriteJourneyTableSync::COL_USER_ID("user_id");
+		const std::string UserFavoriteJourneyTableSync::COL_RANK("rank");
+		const std::string UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME("origin_city_name");
+		const std::string UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME("origin_place_name");
+		const std::string UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME("destination_city_name");
+		const std::string UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME("destination_place_name");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE_NAME("t048_user_favorite_journey");
-		template<> const int SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE_ID(48);
-		template<> const bool SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE(
+			UserFavoriteJourneyTableSync::CreateFormat(
+				"t048_user_favorite_journey",
+				SQLiteTableFormat::CreateFields(						
+					SQLiteTableFormat::Field(UserFavoriteJourneyTableSync::COL_USER_ID, INTEGER),
+					SQLiteTableFormat::Field(UserFavoriteJourneyTableSync::COL_RANK, INTEGER),
+					SQLiteTableFormat::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME, TEXT),
+					SQLiteTableFormat::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME, TEXT),
+					SQLiteTableFormat::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME, TEXT),
+					SQLiteTableFormat::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, TEXT),
+					SQLiteTableFormat::Field()
+				),SQLiteTableFormat::Indexes()
+		)	);
 
 
 
@@ -94,12 +113,12 @@ namespace synthese
 			assert(object->getUser());
             
 			query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToString(object->getUser()->getKey())
 				<< ",";
 			if (object->getRank() == UNKNOWN_VALUE)
-				query << "(SELECT MAX(" << UserFavoriteJourneyTableSync::COL_RANK << ") +1 FROM " << UserFavoriteJourneyTableSync::TABLE_NAME << " WHERE " << UserFavoriteJourneyTableSync::COL_USER_ID << "=" << object->getUser()->getKey() << ")";
+				query << "(SELECT MAX(" << UserFavoriteJourneyTableSync::COL_RANK << ") +1 FROM " << UserFavoriteJourneyTableSync::TABLE.NAME << " WHERE " << UserFavoriteJourneyTableSync::COL_USER_ID << "=" << object->getUser()->getKey() << ")";
 			else
 				query << Conversion::ToString(object->getRank());
 			query
@@ -125,25 +144,9 @@ namespace synthese
 	
 	namespace routeplanner
 	{
-		const std::string UserFavoriteJourneyTableSync::COL_USER_ID("user_id");
-		const std::string UserFavoriteJourneyTableSync::COL_RANK("rank");
-		const std::string UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME("origin_city_name");
-		const std::string UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME("origin_place_name");
-		const std::string UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME("destination_city_name");
-		const std::string UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME("destination_place_name");
-
-
-
 		UserFavoriteJourneyTableSync::UserFavoriteJourneyTableSync()
 			: SQLiteNoSyncTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_USER_ID, "INTEGER");
-			addTableColumn(COL_RANK, "INTEGER");
-			addTableColumn(COL_ORIGIN_CITY_NAME, "TEXT");
-			addTableColumn(COL_ORIGIN_PLACE_NAME, "TEXT");
-			addTableColumn(COL_DESTINATION_CITY_NAME, "TEXT");
-			addTableColumn(COL_DESTINATION_PLACE_NAME, "TEXT");
 		}
 
 
@@ -159,7 +162,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE "
 				<< COL_USER_ID << "=" << user->getKey()
 				<< " ORDER BY " << COL_RANK << (raisingOrder ? " ASC" : " DESC");

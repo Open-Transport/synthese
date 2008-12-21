@@ -57,11 +57,46 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,AlarmTableSync>::FACTORY_KEY("17.10.01 Alarms");
 	}
 
+	namespace messages
+	{
+		const string AlarmTableSync::_COL_CONFLICT_LEVEL = "conflict_level";
+		const string AlarmTableSync::_COL_RECIPIENTS_NUMBER = "recipients";
+
+		const string AlarmTableSync::COL_IS_TEMPLATE = "is_template";
+		const string AlarmTableSync::COL_ENABLED = "is_enabled";
+		const string AlarmTableSync::COL_LEVEL = "level";
+		const string AlarmTableSync::COL_SHORT_MESSAGE = "short_message"; 
+		const string AlarmTableSync::COL_LONG_MESSAGE = "long_message";
+		const string AlarmTableSync::COL_PERIODSTART = "period_start";
+		const string AlarmTableSync::COL_PERIODEND = "period_end"; 
+		const string AlarmTableSync::COL_SCENARIO_ID = "scenario_id"; 
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AlarmTableSync>::TABLE_NAME = "t003_alarms";
-		template<> const int SQLiteTableSyncTemplate<AlarmTableSync>::TABLE_ID = 3;
-		template<> const bool SQLiteTableSyncTemplate<AlarmTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AlarmTableSync>::TABLE(
+			AlarmTableSync::CreateFormat(
+				"t003_alarms",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(AlarmTableSync::COL_IS_TEMPLATE, INTEGER),
+					SQLiteTableFormat::Field(AlarmTableSync::COL_ENABLED, INTEGER),
+					SQLiteTableFormat::Field(AlarmTableSync::COL_LEVEL, INTEGER),
+					SQLiteTableFormat::Field(AlarmTableSync::COL_SHORT_MESSAGE, TEXT),
+					SQLiteTableFormat::Field(AlarmTableSync::COL_LONG_MESSAGE, TEXT),
+					SQLiteTableFormat::Field(AlarmTableSync::COL_PERIODSTART, TIMESTAMP),
+					SQLiteTableFormat::Field(AlarmTableSync::COL_PERIODEND, TIMESTAMP),
+					SQLiteTableFormat::Field(AlarmTableSync::COL_SCENARIO_ID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(
+						"scenariostart",
+						SQLiteTableFormat::Index::CreateFieldsList(
+							AlarmTableSync::COL_SCENARIO_ID,
+							AlarmTableSync::COL_PERIODSTART,
+							string()
+					)	),
+					SQLiteTableFormat::Index()
+		)	)	);
 	    
 		template<>
 		string SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const SQLiteResultSPtr& row)
@@ -101,35 +136,9 @@ namespace synthese
 
 	namespace messages
 	{
-		const std::string AlarmTableSync::_COL_CONFLICT_LEVEL = "conflict_level";
-		const std::string AlarmTableSync::_COL_RECIPIENTS_NUMBER = "recipients";
-
-		const std::string AlarmTableSync::COL_IS_TEMPLATE = "is_template";
-		const std::string AlarmTableSync::COL_ENABLED = "is_enabled";
-		const std::string AlarmTableSync::COL_LEVEL = "level";
-		const std::string AlarmTableSync::COL_SHORT_MESSAGE = "short_message"; 
-		const std::string AlarmTableSync::COL_LONG_MESSAGE = "long_message";
-		const std::string AlarmTableSync::COL_PERIODSTART = "period_start";
-		const std::string AlarmTableSync::COL_PERIODEND = "period_end"; 
-		const std::string AlarmTableSync::COL_SCENARIO_ID = "scenario_id"; 
-		
 		AlarmTableSync::AlarmTableSync ()
 		: SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_IS_TEMPLATE, "INTEGER", true);
-			addTableColumn(COL_ENABLED, "INTEGER");
-			addTableColumn (COL_LEVEL, "INTEGER", true);
-			addTableColumn (COL_SHORT_MESSAGE, "TEXT", true);
-			addTableColumn (COL_LONG_MESSAGE, "TEXT", true);
-			addTableColumn (COL_PERIODSTART, "TIMESTAMP", true);
-			addTableColumn (COL_PERIODEND, "TIMESTAMP", true);
-			addTableColumn(COL_SCENARIO_ID, "INTEGER");
-
-			vector<string> cols;
-			cols.push_back(COL_SCENARIO_ID);
-			cols.push_back(COL_PERIODSTART);
-			addTableIndex(cols);
 		}
 
 

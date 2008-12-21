@@ -85,7 +85,10 @@ namespace synthese
 		{
 			try
 			{
-				_line = LineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+				_line = LineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), &_env, UP_LINKS_LOAD_LEVEL);
+				LineStopTableSync::Search(_env, _line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				ScheduledServiceTableSync::Search(_env, _line->getKey(), UNKNOWN_VALUE, TIME_UNKNOWN, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				ContinuousServiceTableSync::Search(_env, _line->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -97,12 +100,6 @@ namespace synthese
 		{
 			// Reservation
 			bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
-
-			// Env
-			Env env;
-			LineStopTableSync::Search(env, _line->getKey());
-			ScheduledServiceTableSync::Search(env, _line->getKey());
-			ContinuousServiceTableSync::Search(env, _line->getKey());
 
 			stream << "<h1>Arrêts desservis</h1>";
 
@@ -118,7 +115,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<LineStop> lineStop, env.getRegistry<LineStop>())
+			BOOST_FOREACH(shared_ptr<LineStop> lineStop, _env.getRegistry<LineStop>())
 			{
 				stream << t.row();
 				stream << t.col() << lineStop->getRankInPath();
@@ -134,7 +131,7 @@ namespace synthese
 
 			stream << "<h1>Services à horaires</h1>";
 
-			const Registry<ScheduledService>& services(env.getRegistry<ScheduledService>());
+			const Registry<ScheduledService>& services(_env.getRegistry<ScheduledService>());
 			if (services.empty())
 				stream << "<p>Aucun service à horaire</p>";
 			else
@@ -171,7 +168,7 @@ namespace synthese
 
 			stream << "<h1>Services continus</h1>";
 
-			const Registry<ContinuousService>& cservices(env.getRegistry<ContinuousService>());
+			const Registry<ContinuousService>& cservices(_env.getRegistry<ContinuousService>());
 			if (cservices.empty())
 				stream << "<p>Aucun service continu</p>";
 			else

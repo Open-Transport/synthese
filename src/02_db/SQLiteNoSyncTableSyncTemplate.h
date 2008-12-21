@@ -36,16 +36,27 @@ namespace synthese
 		class SQLiteNoSyncTableSyncTemplate : public SQLiteDirectTableSyncTemplate<K,T>
 		{
 		public:
-		SQLiteNoSyncTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>(
-		    typename SQLiteTableSyncTemplate<K>::Args(true, true, TRIGGERS_ENABLED_CLAUSE, true, true))
-			{}
+			SQLiteNoSyncTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>()
+				{}
 
-		virtual bool getRegisterInSubClassMap() const
-		{
-			return false;
-		}
+			virtual bool getRegisterInSubClassMap() const
+			{
+				return false;
+			}
 
-		protected:
+			static SQLiteTableFormat CreateFormat(
+				std::string name,
+				SQLiteTableFormat::Fields fields,
+				SQLiteTableFormat::Indexes indexes = SQLiteTableFormat::Indexes()
+			){
+				return SQLiteDirectTableSyncTemplate<K,T>::CreateFormat(
+					name,
+					fields,
+					indexes,
+					true
+				);
+			}
+
 
 			/** Action to do on DisplayType creation.
 			This method loads a new object in ram.

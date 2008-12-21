@@ -52,11 +52,28 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,ProfileTableSync>::FACTORY_KEY("12.01 Profile");
 	}
 
+	namespace security
+	{
+		const string ProfileTableSync::RIGHT_SEPARATOR = "|";
+		const string ProfileTableSync::RIGHT_VALUE_SEPARATOR = ",";
+
+		const string ProfileTableSync::TABLE_COL_NAME = "name";
+		const string ProfileTableSync::TABLE_COL_PARENT_ID = "parent";
+		const string ProfileTableSync::TABLE_COL_RIGHTS_STRING = "rights";
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ProfileTableSync>::TABLE_NAME = "t027_profiles";
-		template<> const int SQLiteTableSyncTemplate<ProfileTableSync>::TABLE_ID = 27;
-		template<> const bool SQLiteTableSyncTemplate<ProfileTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ProfileTableSync>::TABLE(
+			ProfileTableSync::CreateFormat(
+				"t027_profiles",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ProfileTableSync::TABLE_COL_NAME, TEXT),
+					SQLiteTableFormat::Field(ProfileTableSync::TABLE_COL_PARENT_ID, INTEGER),
+					SQLiteTableFormat::Field(ProfileTableSync::TABLE_COL_RIGHTS_STRING, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Load(
 			Profile* profile,
@@ -81,7 +98,7 @@ namespace synthese
 				
 				stringstream query;
 				query
-					<< "REPLACE INTO " << TABLE_NAME
+					<< "REPLACE INTO " << TABLE.NAME
 					<< " VALUES(" 
 					<< Conversion::ToString(profile->getKey())
 					<< "," << Conversion::ToSQLiteString(profile->getName())
@@ -108,26 +125,15 @@ namespace synthese
 
 	namespace security
 	{
-		const std::string ProfileTableSync::RIGHT_SEPARATOR = "|";
-		const std::string ProfileTableSync::RIGHT_VALUE_SEPARATOR = ",";
-
-		const std::string ProfileTableSync::TABLE_COL_NAME = "name";
-		const std::string ProfileTableSync::TABLE_COL_PARENT_ID = "parent";
-		const std::string ProfileTableSync::TABLE_COL_RIGHTS_STRING = "rights";
-
 		ProfileTableSync::ProfileTableSync()
 			: db::SQLiteRegistryTableSyncTemplate<ProfileTableSync,Profile>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
-			addTableColumn(TABLE_COL_PARENT_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_RIGHTS_STRING, "TEXT", true);
 		}
 
 
 		void ProfileTableSync::Search(
 			Env& env,
-			std::string name
+			string name
 			, string right
 			, int first /*= 0*/
 			, int number /*= -1*/ 
@@ -138,7 +144,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME					
+				<< " FROM " << TABLE.NAME					
 				<< " WHERE 1 ";
 			if (!name.empty())
 				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(name);
@@ -166,7 +172,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME					
+				<< " FROM " << TABLE.NAME					
 				<< " WHERE " 
 				<< TABLE_COL_PARENT_ID << "=" << (parent.get() ? Conversion::ToString(parent->getKey()) : "0");
 			if (number > 0)
@@ -179,7 +185,7 @@ namespace synthese
 
 
 
-		std::string ProfileTableSync::getRightsString(const Profile* p)
+		string ProfileTableSync::getRightsString(const Profile* p)
 		{
 			stringstream s;
 			
@@ -197,7 +203,7 @@ namespace synthese
 			return s.str();
 		}
 
-		void ProfileTableSync::setRightsFromString(Profile* profile, const std::string& text )
+		void ProfileTableSync::setRightsFromString(Profile* profile, const string& text )
 		{
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 			boost::char_separator<char> sep(RIGHT_SEPARATOR.c_str ());

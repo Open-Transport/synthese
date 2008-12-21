@@ -103,7 +103,7 @@ namespace synthese
 		{
 			shared_ptr<DisplayType> dt(new DisplayType);
 			dt->setName(_name);
-			dt->setInterface(_interface.get());
+			dt->setDisplayInterface(_interface.get());
 			dt->setRowNumber(_rows_number);
 			dt->setMaxStopsNumber(_max_stops_number);
 			DisplayTypeTableSync::Save(dt.get());

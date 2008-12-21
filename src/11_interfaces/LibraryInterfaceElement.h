@@ -51,11 +51,6 @@ namespace synthese
 		:	public util::FactoryBase<LibraryInterfaceElement>
 		{
 		public:
-			/// Optional arguments for factory.
-			struct Args
-			{
-
-			};
 
 		protected:
 			const InterfacePage*	_page;

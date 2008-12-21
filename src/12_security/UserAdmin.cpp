@@ -118,7 +118,7 @@ namespace synthese
 				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
-					_user = UserTableSync::Get(id);
+					_user = UserTableSync::Get(id, &_env, UP_LINKS_LOAD_LEVEL);
 				}
 			}
 			catch (ObjectNotFoundException<User>& e)

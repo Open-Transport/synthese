@@ -20,24 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/SentScenario.h"
-#include "17_messages/SentScenarioInheritedTableSync.h"
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/ScenarioTemplateInheritedTableSync.h"
-#include "17_messages/AlarmTableSync.h"
+#include "ScenarioTableSync.h"
+#include "SentScenario.h"
+#include "SentScenarioInheritedTableSync.h"
+#include "ScenarioTemplate.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "AlarmTableSync.h"
+#include "Conversion.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
+#include "DateTime.h"
 
 #include <sstream>
-
-#include "01_util/Conversion.h"
-
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
-
-#include "04_time/DateTime.h"
-
 
 using namespace std;
 using namespace boost;
@@ -54,11 +50,40 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,ScenarioTableSync>::FACTORY_KEY("17.00.01 Alarm scenarii");
 	}
 
+	namespace messages
+	{
+		const string ScenarioTableSync::COL_IS_TEMPLATE = "is_template";
+		const string ScenarioTableSync::COL_ENABLED = "is_enabled";
+		const string ScenarioTableSync::COL_NAME = "name";
+		const string ScenarioTableSync::COL_PERIODSTART = "period_start";
+		const string ScenarioTableSync::COL_PERIODEND = "period_end"; 
+		const string ScenarioTableSync::COL_FOLDER_ID("folder_id");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE_NAME = "t039_scenarios";
-		template<> const int SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE_ID = 39;
-		template<> const bool SQLiteTableSyncTemplate<ScenarioTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE(
+			ScenarioTableSync::CreateFormat(
+				"t039_scenarios",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ScenarioTableSync::COL_IS_TEMPLATE, INTEGER),
+					SQLiteTableFormat::Field(ScenarioTableSync::COL_ENABLED, INTEGER),
+					SQLiteTableFormat::Field(ScenarioTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(ScenarioTableSync::COL_PERIODSTART, TIMESTAMP),
+					SQLiteTableFormat::Field(ScenarioTableSync::COL_PERIODEND, TIMESTAMP),
+					SQLiteTableFormat::Field(ScenarioTableSync::COL_FOLDER_ID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(
+						"templateperiod",
+						SQLiteTableFormat::Index::CreateFieldsList(
+							ScenarioTableSync::COL_IS_TEMPLATE,
+							ScenarioTableSync::COL_PERIODSTART,
+							string()
+					)	),
+					SQLiteTableFormat::Index(ScenarioTableSync::COL_FOLDER_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
 
 
 		template<>
@@ -95,31 +120,9 @@ namespace synthese
 
 	namespace messages
 	{
-		const std::string ScenarioTableSync::COL_IS_TEMPLATE = "is_template";
-		const std::string ScenarioTableSync::COL_ENABLED = "is_enabled";
-		const std::string ScenarioTableSync::COL_NAME = "name";
-		const std::string ScenarioTableSync::COL_PERIODSTART = "period_start";
-		const std::string ScenarioTableSync::COL_PERIODEND = "period_end"; 
-		const std::string ScenarioTableSync::COL_FOLDER_ID("folder_id");
-
-		
 		ScenarioTableSync::ScenarioTableSync()
 			: SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_IS_TEMPLATE, "INTEGER");
-			addTableColumn(COL_ENABLED, "INTEGER");
-			addTableColumn(COL_NAME, "TEXT");
-			addTableColumn (COL_PERIODSTART, "TIMESTAMP", true);
-			addTableColumn (COL_PERIODEND, "TIMESTAMP", true);
-			addTableColumn(COL_FOLDER_ID, "INTEGER");
-
-			vector<string> cols;
-			cols.push_back(COL_IS_TEMPLATE);
-			cols.push_back(COL_PERIODSTART);
-			addTableIndex(cols);
-
-			addTableIndex(COL_FOLDER_ID);
 		}
 	}
 }

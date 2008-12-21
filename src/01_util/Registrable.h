@@ -51,10 +51,23 @@ namespace synthese
 
 		protected:
 
-			/** Constructor.
-				@param key ID of the object.
-			*/
+			////////////////////////////////////////////////////////////////////
+			///	Registrable constructor.
+			///	@param key ID of the object (use UNKNOWN_VALUE if not determined)
+			///	@author Hugues Romain
+			///	@date 2008
+			////////////////////////////////////////////////////////////////////
 			Registrable(RegistryKeyType key);
+						
+			
+			
+			////////////////////////////////////////////////////////////////////
+			///	Registrable default constructor for building purpose only.
+			///	@throws RegistryException<void> always (should not be used)
+			///	@author Hugues Romain
+			///	@date 2008
+			////////////////////////////////////////////////////////////////////
+			Registrable();
 
 		public:
 			virtual ~Registrable();

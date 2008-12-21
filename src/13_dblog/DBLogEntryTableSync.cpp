@@ -52,11 +52,41 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,DBLogEntryTableSync>::FACTORY_KEY("13.01 DB Log entries");
 
+	namespace dblog
+	{
+		const string DBLogEntryTableSync::CONTENT_SEPARATOR("|");
+		const std::string DBLogEntryTableSync::COL_LOG_KEY = "log_key";
+		const std::string DBLogEntryTableSync::COL_DATE = "date";
+		const std::string DBLogEntryTableSync::COL_USER_ID = "user_id";
+		const std::string DBLogEntryTableSync::COL_LEVEL = "level";
+		const std::string DBLogEntryTableSync::COL_CONTENT = "content";
+		const std::string DBLogEntryTableSync::COL_OBJECT_ID = "object_id";
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE_NAME = "t045_log_entries";
-		template<> const int SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE_ID = 45;
-		template<> const bool SQLiteTableSyncTemplate<DBLogEntryTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE(
+			DBLogEntryTableSync::CreateFormat(
+				"t045_log_entries",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_LOG_KEY, TEXT),
+					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_DATE, TIMESTAMP),
+					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_USER_ID, INTEGER),
+					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_LEVEL, INTEGER),
+					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_CONTENT, TEXT),
+					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_OBJECT_ID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(
+						"keyobjectdate",
+						SQLiteTableFormat::Index::CreateFieldsList(
+							DBLogEntryTableSync::COL_LOG_KEY,
+							DBLogEntryTableSync::COL_OBJECT_ID,
+							DBLogEntryTableSync::COL_DATE,
+							string()
+					)	),
+					SQLiteTableFormat::Index()
+		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Load(
 			DBLogEntry* object,
@@ -114,7 +144,7 @@ namespace synthese
 				object->setKey(getId());
 
 			query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getLogKey())
 				<< "," << object->getDate().toSQLString()
@@ -142,30 +172,9 @@ namespace synthese
 
 	namespace dblog
 	{
-		const string DBLogEntryTableSync::CONTENT_SEPARATOR("|");
-		const std::string DBLogEntryTableSync::COL_LOG_KEY = "log_key";
-		const std::string DBLogEntryTableSync::COL_DATE = "date";
-		const std::string DBLogEntryTableSync::COL_USER_ID = "user_id";
-		const std::string DBLogEntryTableSync::COL_LEVEL = "level";
-		const std::string DBLogEntryTableSync::COL_CONTENT = "content";
-		const std::string DBLogEntryTableSync::COL_OBJECT_ID = "object_id";
-
 		DBLogEntryTableSync::DBLogEntryTableSync()
 			: SQLiteNoSyncTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_LOG_KEY, "TEXT");
-			addTableColumn(COL_DATE, "TIMESTAMP");
-			addTableColumn(COL_USER_ID, "INTEGER");
-			addTableColumn(COL_LEVEL, "INTEGER");
-			addTableColumn(COL_CONTENT, "TEXT");
-			addTableColumn(COL_OBJECT_ID, "INTEGER");
-
-			vector<string> m1;
-			m1.push_back(COL_LOG_KEY);
-			m1.push_back(COL_OBJECT_ID);
-			m1.push_back(COL_DATE);
-			addTableIndex(m1);
 		}
 
 		void DBLogEntryTableSync::Search(
@@ -188,7 +197,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE "
 					<< COL_LOG_KEY << " LIKE " << Conversion::ToSQLiteString(logKey);
 			if (!startDate.isUnknown())

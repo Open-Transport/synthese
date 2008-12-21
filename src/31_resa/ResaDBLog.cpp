@@ -74,7 +74,7 @@ namespace synthese
 		{
 			int tableId = decodeTableId(id);
 
-			if (tableId == UserTableSync::TABLE_ID)
+			if (tableId == UserTableSync::TABLE.ID)
 			{
 				shared_ptr<const User> user(UserTableSync::Get(id));
 				return user->getFullName();

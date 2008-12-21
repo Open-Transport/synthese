@@ -29,6 +29,18 @@ namespace synthese
 	{
 		typedef enum
 		{
+			INTEGER,
+			DOUBLE,
+			TEXT,
+			REAL,
+			BOOLEAN,
+			TIME,
+			DATE,
+			TIMESTAMP
+		} FieldType;
+
+		typedef enum
+		{
 			AUTO_CREATE,
 			NEVER_CREATE
 		} AutoCreation;

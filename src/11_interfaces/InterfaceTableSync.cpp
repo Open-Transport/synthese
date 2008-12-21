@@ -39,11 +39,23 @@ namespace synthese
 		template<> const std::string FactorableTemplate<SQLiteTableSync,InterfaceTableSync>::FACTORY_KEY("16.01 Interfaces");
 	}
 
+	namespace interfaces
+	{
+		const std::string InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE = "no_session_default_page";
+		const std::string InterfaceTableSync::TABLE_COL_NAME = "name";
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE_NAME = "t024_interfaces";
-		template<> const int SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE_ID = 24;
-		template<> const bool SQLiteTableSyncTemplate<InterfaceTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE(
+			InterfaceTableSync::CreateFormat(
+				"t024_interfaces",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE, TEXT),
+					SQLiteTableFormat::Field(InterfaceTableSync::TABLE_COL_NAME, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Load(
 			Interface* interf,
@@ -72,15 +84,9 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE = "no_session_default_page";
-		const std::string InterfaceTableSync::TABLE_COL_NAME = "name";
-
 		InterfaceTableSync::InterfaceTableSync()
 			: db::SQLiteRegistryTableSyncTemplate<InterfaceTableSync,Interface> ()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NO_SESSION_DEFAULT_PAGE, "TEXT", true);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 		}
 	}
 }

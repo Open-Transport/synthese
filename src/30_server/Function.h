@@ -27,6 +27,7 @@
 
 #include "FactoryBase.h"
 #include "ParametersMap.h"
+#include "Env.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -68,20 +69,15 @@ namespace synthese
 		:	public util::FactoryBase<Function>
 		{
 		public:
-			/// Optional arguments for factory.
-			struct Args
-			{
-
-			};
 
 		protected:
 			Request* _request;
+			mutable util::Env	_env;
 
 			//////////////////////////////////////////////////////////////////////////
 			///	Constructor.
-			/// @param args Arguments
 			//////////////////////////////////////////////////////////////////////////
-			Function(Args args = Args());
+			Function();
 
 		public:
 			/** Conversion from fixed attributes to generic parameter map.

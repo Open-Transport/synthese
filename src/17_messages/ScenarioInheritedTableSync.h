@@ -57,7 +57,7 @@ namespace synthese
 			std::stringstream query;
 			query
 				<< " SELECT a.*"
-				<< " FROM " << AlarmTableSync::TABLE_NAME << " AS a "
+				<< " FROM " << AlarmTableSync::TABLE.NAME << " AS a "
 				<< " WHERE " << AlarmTableSync::COL_SCENARIO_ID << "=" << scenario->getKey();
 			try
 			{

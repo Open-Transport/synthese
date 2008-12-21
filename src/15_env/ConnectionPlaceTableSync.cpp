@@ -44,11 +44,45 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,env::ConnectionPlaceTableSync>::FACTORY_KEY("15.40.01 Connection places");
 
+	namespace env
+	{
+		const string ConnectionPlaceTableSync::TABLE_COL_NAME = "name";
+		const string ConnectionPlaceTableSync::TABLE_COL_CITYID = "city_id";
+		const string ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE = "connection_type";
+		const string ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
+		const string ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
+		const string ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
+		const string ConnectionPlaceTableSync::COL_NAME13("short_display_name");
+		const string ConnectionPlaceTableSync::COL_NAME26("long_display_name");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::TABLE_NAME = "t007_connection_places";
-		template<> const int SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::TABLE_ID = 7;
-		template<> const bool SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::TABLE(
+			ConnectionPlaceTableSync::CreateFormat(
+				"t007_connection_places",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_NAME, TEXT),
+					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_CITYID, INTEGER),
+					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE, INTEGER),
+					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION, BOOLEAN),
+					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, INTEGER),
+					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS, TEXT),
+					SQLiteTableFormat::Field(ConnectionPlaceTableSync::COL_NAME13, TEXT),
+					SQLiteTableFormat::Field(ConnectionPlaceTableSync::COL_NAME26, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(
+						"cityname",
+						SQLiteTableFormat::Index::CreateFieldsList(
+							ConnectionPlaceTableSync::TABLE_COL_CITYID,
+							ConnectionPlaceTableSync::TABLE_COL_NAME,
+							string()
+					)	),
+					SQLiteTableFormat::Index()
+		)	)	);
+
+
 
 		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Load(
 			PublicTransportStopZoneConnectionPlace* cp,
@@ -131,44 +165,21 @@ namespace synthese
 			PublicTransportStopZoneConnectionPlace* cp,
 			Env* env
 		){
-			shared_ptr<City> city = CityTableSync::GetEditable (cp->getCity ()->getKey (), env);
-
-			city->getConnectionPlacesMatcher ().remove (cp->getName ());
-			city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
-
-			cp->setCity(NULL);
+			City* city(const_cast<City*>(cp->getCity()));
+			if (city != NULL)
+			{
+				city->getConnectionPlacesMatcher().remove (cp->getName ());
+				city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
+				cp->setCity(NULL);
+			}
 		}
 	}
 
 	namespace env
 	{
-		const string ConnectionPlaceTableSync::TABLE_COL_NAME = "name";
-		const string ConnectionPlaceTableSync::TABLE_COL_CITYID = "city_id";
-		const string ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE = "connection_type";
-		const string ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
-		const string ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
-		const string ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
-		const string ConnectionPlaceTableSync::COL_NAME13("short_display_name");
-		const string ConnectionPlaceTableSync::COL_NAME26("long_display_name");
-
-
 		ConnectionPlaceTableSync::ConnectionPlaceTableSync ()
 		: SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace> ()
 		{
-			addTableColumn (TABLE_COL_ID, "INTEGER", true);
-			addTableColumn (TABLE_COL_NAME, "TEXT", true);
-			addTableColumn (TABLE_COL_CITYID, "INTEGER", false);
-			addTableColumn (TABLE_COL_CONNECTIONTYPE, "INTEGER", true);
-			addTableColumn (TABLE_COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
-			addTableColumn (TABLE_COL_DEFAULTTRANSFERDELAY, "INTEGER", true);
-			addTableColumn (TABLE_COL_TRANSFERDELAYS, "TEXT", true);
-			addTableColumn (COL_NAME13, "TEXT");
-			addTableColumn (COL_NAME26, "TEXT");
-
-			vector<string> c;
-			c.push_back(TABLE_COL_CITYID);
-			c.push_back(TABLE_COL_NAME);
-			addTableIndex(c);
 		}
 
 
@@ -194,7 +205,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE "
 				<< TABLE_COL_CONNECTIONTYPE << ">=" << static_cast<int>(minConnectionType);
 			if (cityId != UNKNOWN_VALUE)

@@ -35,10 +35,6 @@ namespace synthese
 
 		Env::Env()
 		{
-			for (RegistryCreatorMap::const_iterator it(_registryCreators.begin()); it != _registryCreators.end(); ++it)
-			{
-				_map.insert(make_pair(it->first, it->second->create()));
-			}
 		}
 
 		Env::~Env()

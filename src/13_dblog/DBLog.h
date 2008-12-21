@@ -62,12 +62,6 @@ namespace synthese
 		public:
 			typedef std::vector<std::string> ColumnsVector;
 			
-			/// Optional arguments for factory.
-			struct Args
-			{
-
-			};
-
 		protected:
 			
 			/** Adds an entry to a log (generic method).

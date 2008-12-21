@@ -59,17 +59,17 @@ namespace synthese
 			int tableId = decodeTableId(id);
 			try
 			{
-				if (tableId == ScenarioTableSync::TABLE_ID)
+				if (tableId == ScenarioTableSync::TABLE.ID)
 				{
 					shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id));
 					return scenario->getName();
 				}
-				else if (tableId == AlarmTableSync::TABLE_ID)
+				else if (tableId == AlarmTableSync::TABLE.ID)
 				{
 					shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id));
 					return alarm->getShortMessage();
 				}
-				else if (tableId == TextTemplateTableSync::TABLE_ID)
+				else if (tableId == TextTemplateTableSync::TABLE.ID)
 				{
 					shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id));
 					return text->getName();

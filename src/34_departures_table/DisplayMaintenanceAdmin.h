@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_DisplayMaintenanceAdmin_H__
 #define SYNTHESE_DisplayMaintenanceAdmin_H__
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "AdminInterfaceElementTemplate.h"
+#include "DateTime.h"
 
 namespace synthese
 {
@@ -87,6 +88,7 @@ namespace synthese
 		class DisplayMaintenanceAdmin : public admin::AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>
 		{
 			boost::shared_ptr<const DisplayScreen>	_displayScreen;
+			time::DateTime							_now;
 
 		public:
 			DisplayMaintenanceAdmin();
@@ -116,7 +118,7 @@ namespace synthese
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
-				) const;
+			) const;
 
 			/** Sub pages getter.
 				@param request User request

@@ -45,7 +45,18 @@ namespace synthese
 		public:
 			SQLiteRegistryTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>() {}
 
-		protected:
+			static SQLiteTableFormat CreateFormat(
+				std::string name,
+				SQLiteTableFormat::Fields fields,
+				SQLiteTableFormat::Indexes indexes = SQLiteTableFormat::Indexes()
+			){
+				return SQLiteDirectTableSyncTemplate<K,T>::CreateFormat(
+					name,
+					fields,
+					indexes,
+					false
+				);
+			}
 
 			/** Action to do on DisplayType creation.
 			This method loads a new object in ram.

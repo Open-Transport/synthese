@@ -63,13 +63,6 @@ namespace synthese
 		public:
 			typedef std::vector<boost::shared_ptr<LibraryInterfaceElement> >	Components;
 
-			/// Optional arguments for factory.
-			struct Args
-			{
-				util::RegistryKeyType key;
-				Args(util::RegistryKeyType vkey = UNKNOWN_VALUE) : key(vkey) {}
-			};
-
 			/// Chosen registry class.
 			typedef util::Registry<InterfacePage>	Registry;
 
@@ -82,9 +75,6 @@ namespace synthese
 		public:
 			InterfacePage(
 				util::RegistryKeyType key = UNKNOWN_VALUE
-			);
-			InterfacePage(
-				Args args
 			);
 			virtual ~InterfacePage();
 

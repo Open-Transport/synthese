@@ -238,7 +238,7 @@ namespace synthese
 			Env env;
 			if (_sentScenario.get())
 			{
-				ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get());
+				ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get(), 0, 0, false, false, false, false, UP_LINKS_LOAD_LEVEL);
 				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.getRegistry<ScenarioSentAlarm>())
 				{
 					AdminInterfaceElement::PageLink link;
@@ -252,7 +252,7 @@ namespace synthese
 			}
 			else if (_templateScenario.get())
 			{
-				AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get());
+				AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get(), 0, 0, false, false, UP_LINKS_LOAD_LEVEL);
 				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 				{
 					AdminInterfaceElement::PageLink link;

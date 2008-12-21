@@ -55,8 +55,8 @@ namespace synthese
 
     namespace db
     {
-	template<> const std::string SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE_NAME = "t997_update_log";
-	template<> const int SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE_ID = 997;
+	template<> const SQLiteTableFormat SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE.NAME = "t997_update_log";
+	template<> const int SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE.ID = 997;
 	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync>::HAS_AUTO_INCREMENT = true;
 
 
@@ -98,7 +98,7 @@ namespace synthese
 	    assert (object->getKey() != 0);
 	    assert (object->hasCompressedSQL ());
 
-		query << "REPLACE INTO " << TABLE_NAME << " VALUES (:key, :timestamp, :emitter_node_id, :state, :sql)";
+		query << "REPLACE INTO " << TABLE.NAME << " VALUES (:key, :timestamp, :emitter_node_id, :state, :sql)";
 
 	    SQLiteStatementSPtr statement (sqlite->compileStatement (query.str ()));
 	    
@@ -200,7 +200,7 @@ namespace synthese
 	    
 	    {
 		std::stringstream query;
-		query << "SELECT * FROM " << TABLE_NAME << " WHERE " ;
+		query << "SELECT * FROM " << TABLE.NAME << " WHERE " ;
 
 		query << "((" << TABLE_COL_TIMESTAMP << " > " << Conversion::ToSQLiteString (to_iso_string (clientLastAcknowledgedTimestamp)) << ") OR ";
 		query << "(" << TABLE_COL_STATE << "=" << PENDING << ")) AND";
@@ -234,7 +234,7 @@ namespace synthese
 		std::stringstream query;
 		query << "SELECT " <<
 		    TABLE_COL_ID << "," << TABLE_COL_TIMESTAMP << "," << TABLE_COL_EMITTERNODEID << "," << TABLE_COL_STATE
-		      << " FROM " << TABLE_NAME << " WHERE (" 
+		      << " FROM " << TABLE.NAME << " WHERE (" 
 		      << TABLE_COL_TIMESTAMP << " > " << Conversion::ToSQLiteString (to_iso_string (clientLastAcknowledgedTimestamp)) << ") AND (";
 
 		query << "(" << TABLE_COL_ID << " IN (";
@@ -270,7 +270,7 @@ namespace synthese
 	UpdateRecordTableSync::LoadPendingRecordIds (std::set<uid>& updateRecordIds)
 	{
 	    std::stringstream query;
-	    query << "SELECT " << TABLE_COL_ID << " FROM " << TABLE_NAME << " WHERE " << TABLE_COL_STATE << "=" << PENDING;
+	    query << "SELECT " << TABLE_COL_ID << " FROM " << TABLE.NAME << " WHERE " << TABLE_COL_STATE << "=" << PENDING;
 
 	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
 	    if (result->next ())
@@ -290,10 +290,10 @@ namespace synthese
 				      "," + TABLE_COL_EMITTERNODEID + "," + TABLE_COL_STATE);
 
 	    std::stringstream query;
-	    query << "SELECT " << selectClause << " FROM " << TABLE_NAME << " WHERE " << TABLE_COL_STATE << "=" << PENDING << " AND " 
+	    query << "SELECT " << selectClause << " FROM " << TABLE.NAME << " WHERE " << TABLE_COL_STATE << "=" << PENDING << " AND " 
 		  << TABLE_COL_TIMESTAMP << (lateOnes ? "<=" : ">") 
 		  << Conversion::ToSQLiteString (to_iso_string (lastAcknowledgedTimestamp))
-		// << "(SELECT MAX(" << TABLE_COL_TIMESTAMP << ") FROM " << TABLE_NAME << " WHERE " << TABLE_COL_STATE << "=" << ACKNOWLEDGED << ")"
+		// << "(SELECT MAX(" << TABLE_COL_TIMESTAMP << ") FROM " << TABLE.NAME << " WHERE " << TABLE_COL_STATE << "=" << ACKNOWLEDGED << ")"
 		  << " ORDER BY " << TABLE_COL_TIMESTAMP;
 	    
 	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
@@ -345,7 +345,7 @@ namespace synthese
 		Compression::ZlibDecompress (compressedSQL, decompressedSQL);
 
 		// Update state, and always override timestamp with one from record received from authority.
-		decompressedSQL << "UPDATE " << TABLE_NAME << " SET " << TABLE_COL_STATE << "=" << ((int) ACKNOWLEDGED)
+		decompressedSQL << "UPDATE " << TABLE.NAME << " SET " << TABLE_COL_STATE << "=" << ((int) ACKNOWLEDGED)
 				<< "," << TABLE_COL_TIMESTAMP << "=" << Conversion::ToSQLiteString (to_iso_string (ur->getTimestamp ()));
 
 		decompressedSQL  << " WHERE " << TABLE_COL_ID << "='" << urp->getKey () << "';";
@@ -385,7 +385,7 @@ namespace synthese
 	{
 	    std::stringstream query;
 	    // Update state, and always override timestamp with one from record received from authority.
-	    query << "UPDATE " << TABLE_NAME << " SET " << TABLE_COL_STATE << "=" << FAILED
+	    query << "UPDATE " << TABLE.NAME << " SET " << TABLE_COL_STATE << "=" << FAILED
 		  << "," << TABLE_COL_TIMESTAMP << "=" << Conversion::ToSQLiteString (to_iso_string (ur->getTimestamp ()));
 
 	    query  << " WHERE " << TABLE_COL_ID << "='" << ur->getKey () << "';";
@@ -401,7 +401,7 @@ namespace synthese
 	{
 	    boost::posix_time::ptime now (boost::date_time::microsec_clock<ptime>::universal_time ());
 	    std::stringstream query;
-	    query << "UPDATE " << TABLE_NAME << " SET " << TABLE_COL_TIMESTAMP << "=" << Conversion::ToSQLiteString (to_iso_string (now));
+	    query << "UPDATE " << TABLE.NAME << " SET " << TABLE_COL_TIMESTAMP << "=" << Conversion::ToSQLiteString (to_iso_string (now));
 	    query  << " WHERE " << TABLE_COL_ID << "='" << ur->getKey () << "';";
 	    DBModule::GetSQLite()->execUpdate (query.str ());
 	}
@@ -416,7 +416,7 @@ namespace synthese
 	    std::stringstream query;
 
 	    query << "SELECT MAX(" << TABLE_COL_TIMESTAMP << ") AS ts FROM " 
-		  << TABLE_NAME << " WHERE " << TABLE_COL_STATE << "=" << recordState;
+		  << TABLE.NAME << " WHERE " << TABLE_COL_STATE << "=" << recordState;
 
 	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
 	    if (result->next () && (result->getText ("ts") != ""))
@@ -435,7 +435,7 @@ namespace synthese
 	{
 	    std::stringstream query;
 
-	    query << "SELECT COUNT(*) AS lui FROM " << TABLE_NAME <<  " WHERE " 
+	    query << "SELECT COUNT(*) AS lui FROM " << TABLE.NAME <<  " WHERE " 
 		  << TABLE_COL_EMITTERNODEID << "=" << nodeId;
 	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
 	    if (result->next () && (result->getText ("lui") != ""))
@@ -457,7 +457,7 @@ namespace synthese
 							  std::vector<uid>& result)
 	{
 	    std::stringstream query;
-	    query << "SELECT " << TABLE_COL_ID << " FROM " << TABLE_NAME << " WHERE " 
+	    query << "SELECT " << TABLE_COL_ID << " FROM " << TABLE.NAME << " WHERE " 
 		  << TABLE_COL_TIMESTAMP << " > " << Conversion::ToSQLiteString (to_iso_string (startTimestamp)) << " AND "
 		  << TABLE_COL_TIMESTAMP << " < " << Conversion::ToSQLiteString (to_iso_string (endTimestamp)) ;
 	    

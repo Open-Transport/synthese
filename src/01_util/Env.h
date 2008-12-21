@@ -64,7 +64,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			///	Map containing all data of the environment.
 			//////////////////////////////////////////////////////////////////////////
-			RegistryMap _map;
+			mutable RegistryMap _map;
 
 
 
@@ -154,12 +154,7 @@ namespace synthese
 			template<class R>
 			const Registry<R>& getRegistry() const
 			{
-				RegistryMap::const_iterator it(_map.find(Registry<R>::KEY));
-				if (it == _map.end())
-				{
-					throw util::EnvException(Registry<R>::KEY);
-				}
-				return * boost::static_pointer_cast<const Registry<R>, RegistryBase>(it->second);
+				return const_cast<const Registry<R>& >(this->getEditableRegistry<R>());
 			}
 
 
@@ -173,13 +168,23 @@ namespace synthese
 			///	class.
 			//////////////////////////////////////////////////////////////////////////
 			template<class R>
-			Registry<R>& getEditableRegistry()
+			Registry<R>& getEditableRegistry() const
 			{
-				RegistryMap::iterator it(_map.find(Registry<R>::KEY));
-				if (it == _map.end())
+				RegistryMap::const_iterator it(_map.find(Registry<R>::KEY));
+				if (it != _map.end())
+				{
+					return * boost::static_pointer_cast<Registry<R>, RegistryBase>(it->second);
+				}
+
+				RegistryCreatorMap::const_iterator itc(_registryCreators.find(Registry<R>::KEY));
+				if (itc == _registryCreators.end())
 				{
 					throw util::EnvException(Registry<R>::KEY);
 				}
+
+				_map.insert(make_pair(Registry<R>::KEY, itc->second->create()));
+
+				it = _map.find(Registry<R>::KEY);
 				return * boost::static_pointer_cast<Registry<R>, RegistryBase>(it->second);
 			}
 

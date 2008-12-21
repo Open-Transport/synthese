@@ -62,11 +62,35 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,CommercialLineTableSync>::FACTORY_KEY("15.25.01 Commercial lines");
 	}
+	namespace env
+	{
+		const string CommercialLineTableSync::COL_NETWORK_ID ("network_id");
+		const string CommercialLineTableSync::COL_NAME ("name");
+		const string CommercialLineTableSync::COL_SHORT_NAME ("short_name");
+		const string CommercialLineTableSync::COL_LONG_NAME ("long_name");
+		const string CommercialLineTableSync::COL_COLOR ("color");
+		const string CommercialLineTableSync::COL_STYLE ("style");
+		const string CommercialLineTableSync::COL_IMAGE ("image");
+		const string CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES("optional_reservation_places");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<CommercialLineTableSync>::TABLE_NAME = "t042_commercial_lines";
-		template<> const int SQLiteTableSyncTemplate<CommercialLineTableSync>::TABLE_ID = 42;
-		template<> const bool SQLiteTableSyncTemplate<CommercialLineTableSync>::HAS_AUTO_INCREMENT = true;
+		const SQLiteTableFormat CommercialLineTableSync::TABLE(
+			CommercialLineTableSync::CreateFormat(
+				"t042_commercial_lines",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(CommercialLineTableSync::COL_NETWORK_ID, INTEGER),
+					SQLiteTableFormat::Field(CommercialLineTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(CommercialLineTableSync::COL_SHORT_NAME, TEXT),
+					SQLiteTableFormat::Field(CommercialLineTableSync::COL_LONG_NAME, TEXT),
+					SQLiteTableFormat::Field(CommercialLineTableSync::COL_COLOR, TEXT),
+					SQLiteTableFormat::Field(CommercialLineTableSync::COL_STYLE, TEXT),
+					SQLiteTableFormat::Field(CommercialLineTableSync::COL_IMAGE, TEXT),
+					SQLiteTableFormat::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes(
+		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Load(
 			CommercialLine* object,
@@ -127,7 +151,7 @@ namespace synthese
 			if (object->getKey() > 0)
 			{
 				query
-					<< "UPDATE " << TABLE_NAME << " SET "
+					<< "UPDATE " << TABLE.NAME << " SET "
 					/// @todo fill fields [,]FIELD=VALUE
 					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
 			}
@@ -135,7 +159,7 @@ namespace synthese
 			{
 				object->setKey(getId());
                 query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< " INSERT INTO " << TABLE.NAME << " VALUES("
 					<< Conversion::ToString(object->getKey())
 					/// @todo fill other fields separated by ,
 					<< ")";
@@ -147,27 +171,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string CommercialLineTableSync::COL_NETWORK_ID ("network_id");
-		const std::string CommercialLineTableSync::COL_NAME ("name");
-		const std::string CommercialLineTableSync::COL_SHORT_NAME ("short_name");
-		const std::string CommercialLineTableSync::COL_LONG_NAME ("long_name");
-		const std::string CommercialLineTableSync::COL_COLOR ("color");
-		const std::string CommercialLineTableSync::COL_STYLE ("style");
-		const std::string CommercialLineTableSync::COL_IMAGE ("image");
-		const string CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES("optional_reservation_places");
-
 		CommercialLineTableSync::CommercialLineTableSync()
 			: SQLiteRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_NETWORK_ID, "INTEGER", true);
-			addTableColumn(COL_NAME, "TEXT", true);
-			addTableColumn(COL_SHORT_NAME, "TEXT", true);
-			addTableColumn(COL_LONG_NAME, "TEXT", true);
-			addTableColumn(COL_COLOR, "TEXT", true);
-			addTableColumn(COL_STYLE, "TEXT", true);
-			addTableColumn(COL_IMAGE, "TEXT", true);
-			addTableColumn(COL_OPTIONAL_RESERVATION_PLACES, "TEXT", true);
 		}
 
 
@@ -185,7 +191,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT l.*"
-				<< " FROM " << TABLE_NAME << " AS l "
+				<< " FROM " << TABLE.NAME << " AS l "
 				<< " WHERE 1 ";
 			if (networkId != UNKNOWN_VALUE)
 				query << " AND l." << COL_NETWORK_ID << "=" << networkId;
@@ -193,7 +199,7 @@ namespace synthese
 				query << " AND l." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(name);
 			if (orderByNetwork)
 				query << " ORDER BY "
-					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE_NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
+					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
 					<< ",l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
 				query << " ORDER BY l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
@@ -223,10 +229,10 @@ namespace synthese
 				<< getSQLLinesList(rights, totalControl, neededLevel, mustBeBookable, "*");
 			if (orderByNetwork)
 				query << " ORDER BY "
-				<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE_NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE_NAME << "." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
-				<< "," << TABLE_NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
+				<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
+				<< "," << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
-				query << " ORDER BY " << TABLE_NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY " << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -258,14 +264,14 @@ namespace synthese
 
 			for (RightsOfSameClassMap::const_iterator it = rights.begin(); it != rights.end(); ++it)
 			{
-				if (decodeTableId(Conversion::ToLongLong(it->first)) == TransportNetworkTableSync::TABLE_ID)
+				if (decodeTableId(Conversion::ToLongLong(it->first)) == TransportNetworkTableSync::TABLE.ID)
 				{
 					if (it->second->getPublicRightLevel() < neededLevel)
 						forbiddenNetworks.insert(Conversion::ToLongLong(it->first));
 					else
 						allowedNetworks.insert(Conversion::ToLongLong(it->first));
 				}
-				else if (decodeTableId(Conversion::ToLongLong(it->first)) == CommercialLineTableSync::TABLE_ID)
+				else if (decodeTableId(Conversion::ToLongLong(it->first)) == CommercialLineTableSync::TABLE.ID)
 				{
 					if (it->second->getPublicRightLevel() < neededLevel)
 						forbiddenLines.insert(Conversion::ToLongLong(it->first));
@@ -275,7 +281,7 @@ namespace synthese
 			}
 
 			stringstream query;
-			query << " SELECT " << selectedColumns << " FROM " << TABLE_NAME << " WHERE 1 ";
+			query << " SELECT " << selectedColumns << " FROM " << TABLE.NAME << " WHERE 1 ";
 
 			if (all && !forbiddenNetworks.empty())
 			{
@@ -323,7 +329,7 @@ namespace synthese
 			}
 			if (mustBeBookable)
 			{
-				query << " AND EXISTS(SELECT " << TABLE_COL_ID << " FROM " << LineTableSync::TABLE_NAME << " AS l WHERE l." << LineTableSync::COL_RESERVATIONRULEID << ">0 AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID << ")";
+				query << " AND EXISTS(SELECT " << TABLE_COL_ID << " FROM " << LineTableSync::TABLE.NAME << " AS l WHERE l." << LineTableSync::COL_RESERVATIONRULEID << ">0 AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID << ")";
 			}
 
 			return query.str();

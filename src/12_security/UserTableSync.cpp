@@ -51,11 +51,51 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,UserTableSync>::FACTORY_KEY("12.02 User");
 	}
 
+	namespace security
+	{
+		const string UserTableSync::TABLE_COL_NAME = "name";
+		const string UserTableSync::TABLE_COL_SURNAME = "surname";
+		const string UserTableSync::TABLE_COL_LOGIN = "login";
+		const string UserTableSync::TABLE_COL_PASSWORD = "password";
+		const string UserTableSync::TABLE_COL_PROFILE_ID = "profile_id";
+		const string UserTableSync::TABLE_COL_ADDRESS = "address";
+		const string UserTableSync::TABLE_COL_POST_CODE = "post_code";
+		const string UserTableSync::TABLE_COL_CITY_TEXT = "city_text";
+		const string UserTableSync::TABLE_COL_CITY_ID = "city_id";
+		const string UserTableSync::TABLE_COL_COUNTRY = "country";
+		const string UserTableSync::TABLE_COL_EMAIL = "email";
+		const string UserTableSync::TABLE_COL_PHONE = "phone";
+		const string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
+		const string UserTableSync::COL_BIRTH_DATE = "birth_date";
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<UserTableSync>::TABLE_NAME = "t026_users";
-		template<> const int SQLiteTableSyncTemplate<UserTableSync>::TABLE_ID = 26;
-		template<> const bool SQLiteTableSyncTemplate<UserTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<UserTableSync>::TABLE(
+			UserTableSync::CreateFormat(
+				"t026_users",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_NAME, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_SURNAME, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_LOGIN, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_PASSWORD, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_PROFILE_ID, INTEGER),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_ADDRESS, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_POST_CODE, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_CITY_TEXT, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_CITY_ID, INTEGER),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_COUNTRY, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_EMAIL, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_PHONE, TEXT),
+					SQLiteTableFormat::Field(UserTableSync::COL_LOGIN_AUTHORIZED, INTEGER),
+					SQLiteTableFormat::Field(UserTableSync::COL_BIRTH_DATE, TIMESTAMP),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(UserTableSync::TABLE_COL_NAME),
+					SQLiteTableFormat::Index(UserTableSync::TABLE_COL_LOGIN),
+					SQLiteTableFormat::Index(UserTableSync::TABLE_COL_PROFILE_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Load(
 			User* user,
@@ -111,7 +151,7 @@ namespace synthese
 				if (user->getKey() <= 0)
 					user->setKey(getId());
 				query
-					<< "REPLACE INTO " << TABLE_NAME
+					<< "REPLACE INTO " << TABLE.NAME
 					<< " VALUES(" 
 					<< Conversion::ToString(user->getKey())
 					<< "," << Conversion::ToSQLiteString(user->getName())
@@ -143,45 +183,9 @@ namespace synthese
 	}
 	namespace security
 	{
-		const string UserTableSync::TABLE_COL_NAME = "name";
-		const string UserTableSync::TABLE_COL_SURNAME = "surname";
-		const string UserTableSync::TABLE_COL_LOGIN = "login";
-		const string UserTableSync::TABLE_COL_PASSWORD = "password";
-		const string UserTableSync::TABLE_COL_PROFILE_ID = "profile_id";
-		const string UserTableSync::TABLE_COL_ADDRESS = "address";
-		const string UserTableSync::TABLE_COL_POST_CODE = "post_code";
-		const string UserTableSync::TABLE_COL_CITY_TEXT = "city_text";
-		const string UserTableSync::TABLE_COL_CITY_ID = "city_id";
-		const string UserTableSync::TABLE_COL_COUNTRY = "country";
-		const string UserTableSync::TABLE_COL_EMAIL = "email";
-		const string UserTableSync::TABLE_COL_PHONE = "phone";
-		const string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
-		const string UserTableSync::COL_BIRTH_DATE = "birth_date";
-
 		UserTableSync::UserTableSync()
 			: db::SQLiteNoSyncTableSyncTemplate<UserTableSync,User>()
 		{
-			// Columns
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
-			addTableColumn(TABLE_COL_SURNAME, "TEXT", true);
-			addTableColumn(TABLE_COL_LOGIN, "TEXT", true);
-			addTableColumn(TABLE_COL_PASSWORD, "TEXT", true);
-			addTableColumn(TABLE_COL_PROFILE_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_ADDRESS, "TEXT", true);
-			addTableColumn(TABLE_COL_POST_CODE, "TEXT", true);
-			addTableColumn(TABLE_COL_CITY_TEXT, "TEXT", true);
-			addTableColumn(TABLE_COL_CITY_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_COUNTRY, "TEXT", true);
-			addTableColumn(TABLE_COL_EMAIL, "TEXT", true);
-			addTableColumn(TABLE_COL_PHONE, "TEXT", true);
-			addTableColumn(COL_LOGIN_AUTHORIZED, "INTEGER");
-			addTableColumn(COL_BIRTH_DATE, "TIMESTAMP");
-
-			// Indexes
-			addTableIndex(TABLE_COL_NAME);
-			addTableIndex(TABLE_COL_LOGIN);
-			addTableIndex(TABLE_COL_PROFILE_ID);
 		}
 
 
@@ -193,7 +197,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< "SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(login);
 			try
 			{
@@ -232,9 +236,9 @@ namespace synthese
 			query
 				<< " SELECT "
 				<< "t.*"
-				<< " FROM " << TABLE_NAME << " AS t";
+				<< " FROM " << TABLE.NAME << " AS t";
 			if (orderByProfileName)
-				query << " INNER JOIN " << ProfileTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=t." << TABLE_COL_PROFILE_ID;
+				query << " INNER JOIN " << ProfileTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=t." << TABLE_COL_PROFILE_ID;
 			query
 				<< " WHERE " 
 				<< " t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToSQLiteString(login)
@@ -270,7 +274,7 @@ namespace synthese
 				stringstream query;
 				query
 					<< "SELECT " << TABLE_COL_ID
-					<< " FROM " << TABLE_NAME
+					<< " FROM " << TABLE.NAME
 					<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(login)
 					<< " LIMIT 1 ";
 				

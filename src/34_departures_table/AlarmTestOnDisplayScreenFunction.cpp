@@ -136,7 +136,10 @@ namespace synthese
 				alarm->setIsEnabled(true);
 
 				displayedObject.alarm = alarm.get();
-				const DeparturesTableInterfacePage* page(_type->getInterface()->getPage<DeparturesTableInterfacePage>());
+				if (_type->getDisplayInterface() == NULL) return;
+				const DeparturesTableInterfacePage* page(_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>());
+				if (page == NULL) return;
+
 				VariablesMap variables;
 
 				page->display(

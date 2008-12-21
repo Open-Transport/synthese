@@ -441,12 +441,17 @@ namespace synthese
 				}
 				os << "</publishedName>" << "\n";
 				
-				Env lenv;
-				LineStopTableSync::Search(lenv,line->getKey());
-				BOOST_FOREACH(shared_ptr<LineStop> lineStop, lenv.getRegistry<LineStop>())
+				const Edge* from(NULL);
+				BOOST_FOREACH(const Edge* to, line->getEdges())
 				{
-					os << "<ptLinkId>" << TridentId (peerid, "PtLink", *lineStop) << "</ptLinkId>" << "\n";
+					if (from != NULL)
+					{
+						os << "<ptLinkId>" << TridentId (peerid, "PtLink", *from) << "</ptLinkId>" << "\n";
+					}
+					from = to;
 				}
+
+
 				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", *line) << "</journeyPatternId>" << "\n";
 				
 				// Wayback

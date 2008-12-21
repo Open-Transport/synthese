@@ -55,8 +55,8 @@ namespace synthese
 
     namespace db
     {
-	template<> const std::string SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE_NAME = "t998_nodes_infos";
-	template<> const int SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE_ID = 998;
+	template<> const SQLiteTableFormat SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE.NAME = "t998_nodes_infos";
+	template<> const int SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE.ID = 998;
 	template<> const bool SQLiteTableSyncTemplate<NodeInfoTableSync>::HAS_AUTO_INCREMENT = true;
 
 	template<> void SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo>::load (NodeInfo* object, const db::SQLiteResultSPtr& rows)
@@ -82,12 +82,12 @@ namespace synthese
 	    SQLite* sqlite = DBModule::GetSQLite();
 	    std::stringstream query;
 
-	    uid key = util::encodeUId (TABLE_ID, 
+	    uid key = util::encodeUId (TABLE.ID, 
 				 object->getRingId (),
 				 object->getNodeId (),
 				 object->getNodeId ());
 
-	    query << "REPLACE INTO " << TABLE_NAME << " VALUES ("
+	    query << "REPLACE INTO " << TABLE.NAME << " VALUES ("
 		  << key << "," << object->getNodeId () << ","  << object->getRingId () << "," << Conversion::ToSQLiteString (object->getHost ()) << "," 
 		  << object->getPort () << ")";	    
 	    

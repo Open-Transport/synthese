@@ -28,6 +28,7 @@
 #include "FactoryBase.h"
 #include "11_interfaces/Types.h"
 #include "FunctionRequest.h"
+#include "Env.h"
 
 #include <vector>
 
@@ -42,6 +43,7 @@ namespace synthese
 	{
 	    class AdminRequest;
 
+		////////////////////////////////////////////////////////////////////
 		/// Composant d'administration.
 		///	@ingroup m14
 		///	
@@ -52,21 +54,11 @@ namespace synthese
 		///	Par exemple :
 		///		- un utilisateur anonyme n'a accès à aucun composant d'administration
 		///		- un administrateur a accès à tous les composants d'administration.
-		///
+		////////////////////////////////////////////////////////////////////
 		class AdminInterfaceElement
 		:	public util::FactoryBase<AdminInterfaceElement>
 		{
 		public:
-			
-			/// Optional arguments for factory.
-			struct Args
-			{
-				std::string defaultIcon;
-				std::string defaultName;
-				
-				Args(const std::string& _defaultIcon, const std::string& defaultName);
-				Args();
-			};
 			
 			struct PageLink
 			{
@@ -97,6 +89,7 @@ namespace synthese
 		protected:
 			mutable PageLinks		_treePosition;
 			mutable PageLinksTree	_tree;
+			util::Env				_env;
 
 			PageLinksTree	_buildTreeRecursion(
 				const AdminInterfaceElement* page

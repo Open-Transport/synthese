@@ -84,6 +84,19 @@ namespace synthese
 		{
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
 			setFolderId(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+
+			ScenarioTemplateInheritedTableSync::Search(
+				_env,
+				_folderId
+				, string(), NULL
+				, 0, -1
+				, _requestParameters.orderField == PARAMETER_NAME
+				, _requestParameters.raisingOrder
+			);
+			ScenarioFolderTableSync::Search(
+				_env,
+				_folderId
+			);
 		}
 
 		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -123,25 +136,14 @@ namespace synthese
 			updateFolderRequest.setObjectId(_folder.get() ? _folder->getKey() : 0);
 
 			// Search
-			Env env;
-			ScenarioTemplateInheritedTableSync::Search(
-				env,
-				_folderId
-				, string(), NULL
-				, 0, -1
-				, _requestParameters.orderField == PARAMETER_NAME
-				, _requestParameters.raisingOrder
-			);
 			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, env.getEditableRegistry<ScenarioTemplate>());
-
-			ScenarioFolderTableSync::Search(env, _folderId);
+			p.setFromResult(_requestParameters, _env.getEditableRegistry<ScenarioTemplate>());
 
 			if (_folderId > 0)
 			{
 				stream << "<h1>Répertoire</h1>";
 
-				if (env.getRegistry<ScenarioTemplate>().empty() && env.getRegistry<ScenarioFolder>().empty())
+				if (_env.getRegistry<ScenarioTemplate>().empty() && _env.getRegistry<ScenarioFolder>().empty())
 					stream << "<p>" << HTMLModule::getLinkButton(removeFolderRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
 
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
@@ -160,7 +162,7 @@ namespace synthese
 			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, p, addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
 			stream << t3.open();
 			
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, env.getRegistry<ScenarioTemplate>())
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, _env.getRegistry<ScenarioTemplate>())
 			{
 				updateScenarioRequest.setObjectId(scenario->getKey());
 				deleteScenarioRequest.getAction()->setScenario(scenario);
@@ -177,7 +179,7 @@ namespace synthese
 
 			stream << "<h1>Sous-répertoires</h1>";
 
-			if (env.getRegistry<ScenarioFolder>().empty())
+			if (_env.getRegistry<ScenarioFolder>().empty())
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
@@ -186,7 +188,7 @@ namespace synthese
 			HTMLList l;
 			stream << f.open() << l.open();
 
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, env.getRegistry<ScenarioFolder>())
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, _env.getRegistry<ScenarioFolder>())
 			{
 				static_pointer_cast<MessagesLibraryAdmin,AdminInterfaceElement>(goFolderRequest.getFunction()->getPage())->setFolderId(folder->getKey());
 				stream << l.element("folder");

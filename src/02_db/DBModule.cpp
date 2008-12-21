@@ -20,28 +20,30 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteSync.h"
-#include "02_db/SQLiteTableSync.h"
-#include "02_db/SQLiteHandle.h"
-
-#include "01_util/Conversion.h"
-#include "01_util/Log.h"
-#include "01_util/Factory.h"
-
-#include "00_tcp/TcpService.h"
-
+#include "DBModule.h"
+#include "SQLiteSync.h"
+#include "SQLiteTableSync.h"
+#include "SQLiteHandle.h"
+#include "SQLiteException.h"
+#include "Conversion.h"
+#include "Log.h"
+#include "Factory.h"
+#include "TcpService.h"
 
 #include <iostream>
+
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace util;
 
-	template<> const std::string util::FactorableTemplate<db::DbModuleClass, db::DBModule>::FACTORY_KEY("02_db");
+	template<> const string util::FactorableTemplate<db::DbModuleClass, db::DBModule>::FACTORY_KEY("02_db");
 	
 	namespace db
 	{
+		map<string,string>	DBModule::_tableSyncMap;
 
 	    SQLiteHandle* DBModule::_sqlite = 0;
 		DBModule::SubClassMap DBModule::_subClassMap;
@@ -55,55 +57,58 @@ namespace synthese
 
 	    void DBModule::initialize()
 	    {
-		
-		_sqlite = new SQLiteHandle (GetDatabasePath ());
+			_sqlite = new SQLiteHandle (GetDatabasePath ());
 
-		Log::GetInstance ().info ("Using lib SQLite version " + SQLite::GetLibVersion ());
-		
-		bool autorespawn (true);
+			Log::GetInstance ().info ("Using lib SQLite version " + SQLite::GetLibVersion ());
+			
+			bool autorespawn (true);
 
-		SQLiteSync* syncHook = new SQLiteSync ();
-		
-		// Register all table syncs
-		for (Factory<SQLiteTableSync>::Iterator it = 
-			 Factory<SQLiteTableSync>::begin(); 
-		     it != Factory<SQLiteTableSync>::end(); 
-		     ++it)
-		{
-		    syncHook->addTableSynchronizer(it.getKey(), *it);
-		}
-		
-		_sqlite->registerUpdateHook (syncHook);
+			SQLiteSync* syncHook = new SQLiteSync ();
+			_sqlite->registerUpdateHook(syncHook);
 
+			_tableSyncMap.clear();
+			for(Factory<SQLiteTableSync>::Iterator it(Factory<SQLiteTableSync>::begin()); it != Factory<SQLiteTableSync>::end(); ++it)
+			{
+				_tableSyncMap[it->getFormat().NAME] = it.getKey();
+			}
 	    }
 	    
+
+		boost::shared_ptr<SQLiteTableSync> DBModule::GetTableSync(const std::string& tableName)
+		{
+			map<string,string>::const_iterator it(_tableSyncMap.find(tableName));
+			if (it == _tableSyncMap.end())
+			{
+				throw SQLiteException("Table not found in database");
+			}
+			return shared_ptr<SQLiteTableSync>(Factory<SQLiteTableSync>::create(it->second));
+		}
 	    
 
-	    SQLite*
-	    DBModule::GetSQLite ()
+	    SQLite* DBModule::GetSQLite ()
 	    {
-		return _sqlite;
+			return _sqlite;
 	    }
 
 
 	    void 
-		DBModule::ParameterCallback (const std::string& name, 
-						 const std::string& value)
+		DBModule::ParameterCallback (const string& name, 
+						 const string& value)
 	    {
 	    }
 
-		void DBModule::AddSubClass( uid id, const std::string& subclass)
+		void DBModule::AddSubClass( uid id, const string& subclass)
 		{
 			_subClassMap[id] = subclass;
 		}
 
-		std::string DBModule::GetSubClass(uid id )
+		string DBModule::GetSubClass(uid id )
 		{
 			SubClassMap::const_iterator it(_subClassMap.find(id));
-			return (it == _subClassMap.end()) ? std::string() : it->second;
+			return (it == _subClassMap.end()) ? string() : it->second;
 		}
 
-		std::string DBModule::getName() const
+		string DBModule::getName() const
 		{
 			return "Base de données SQLite";
 		}

@@ -49,14 +49,32 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync, RoadChunkTableSync>::FACTORY_KEY("15.60.01 Road chunks");
+		template<> const string FactorableTemplate<SQLiteTableSync, RoadChunkTableSync>::FACTORY_KEY("15.60.01 Road chunks");
 	}
-	
+
+	namespace env
+	{
+		const string RoadChunkTableSync::COL_ADDRESSID ("address_id");
+		const string RoadChunkTableSync::COL_RANKINPATH ("rank_in_path");
+		const string RoadChunkTableSync::COL_ISDEPARTURE ("is_departure");
+		const string RoadChunkTableSync::COL_ISARRIVAL ("is_arrival");
+		const string RoadChunkTableSync::COL_VIAPOINTS ("via_points");  // list of ids
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE_NAME = "t014_road_chunks";
-		template<> const int SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE_ID = 14;
-		template<> const bool SQLiteTableSyncTemplate<RoadChunkTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE(
+			RoadChunkTableSync::CreateFormat(
+				"t014_road_chunks",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(RoadChunkTableSync::COL_ADDRESSID, INTEGER, false),
+					SQLiteTableFormat::Field(RoadChunkTableSync::COL_RANKINPATH, INTEGER),
+					SQLiteTableFormat::Field(RoadChunkTableSync::COL_ISDEPARTURE, BOOLEAN),
+					SQLiteTableFormat::Field(RoadChunkTableSync::COL_ISARRIVAL, BOOLEAN),
+					SQLiteTableFormat::Field(RoadChunkTableSync::COL_VIAPOINTS, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::Load(
 			RoadChunk* object,
@@ -78,7 +96,7 @@ namespace synthese
 		    
 		    // Via points
 		    object->clearViaPoints ();
-		    std::string viaPointsStr (rows->getText (RoadChunkTableSync::COL_VIAPOINTS));
+		    string viaPointsStr (rows->getText (RoadChunkTableSync::COL_VIAPOINTS));
 		    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		    boost::char_separator<char> sep1 (",");
 		    boost::char_separator<char> sep2 (":");
@@ -132,7 +150,7 @@ namespace synthese
 		    object->setKey(getId());	/// @todo Use grid ID
 		
 		query
-		    << " REPLACE INTO " << TABLE_NAME << " VALUES("
+		    << " REPLACE INTO " << TABLE.NAME << " VALUES("
 		    << Conversion::ToString(object->getKey())
 		    /// @todo fill other fields separated by ,
 		    << ")";
@@ -143,21 +161,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string RoadChunkTableSync::COL_ADDRESSID ("address_id");
-		const std::string RoadChunkTableSync::COL_RANKINPATH ("rank_in_path");
-		const std::string RoadChunkTableSync::COL_ISDEPARTURE ("is_departure");
-		const std::string RoadChunkTableSync::COL_ISARRIVAL ("is_arrival");
-		const std::string RoadChunkTableSync::COL_VIAPOINTS ("via_points");  // list of ids
-
 		RoadChunkTableSync::RoadChunkTableSync()
 			: SQLiteRegistryTableSyncTemplate<RoadChunkTableSync,RoadChunk>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_ADDRESSID, "INTEGER", false);
-			addTableColumn (COL_RANKINPATH, "INTEGER", false);
-			addTableColumn (COL_ISDEPARTURE, "BOOLEAN", false);
-			addTableColumn (COL_ISARRIVAL, "BOOLEAN", false);
-			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
 
@@ -171,7 +177,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())

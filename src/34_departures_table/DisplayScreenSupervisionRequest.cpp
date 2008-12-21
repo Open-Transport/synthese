@@ -21,10 +21,18 @@
 */
 
 #include "RequestException.h"
-
 #include "DisplayScreenSupervisionRequest.h"
+#include "ParseDisplayReturnInterfacePage.h"
 #include "DisplayScreen.h"
+#include "DisplayType.h"
 #include "DisplayScreenTableSync.h"
+#include "DisplayMaintenanceLog.h"
+#include "DisplayMonitoringStatus.h"
+#include "DisplayMonitoringStatusTableSync.h"
+#include "Interface.h"
+
+#include <assert.h>
+#include <sstream>
 
 using namespace std;
 
@@ -33,6 +41,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace dblog;
+	using namespace interfaces;
 
 	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenSupervisionRequest>::FACTORY_KEY("tds");
 
@@ -53,7 +62,7 @@ namespace synthese
 		{
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"));
+				_displayScreen = DisplayScreenTableSync::Get(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"), &_env, UP_LINKS_LOAD_LEVEL);
 				_text = map.getString(PARAMETER_STATUS, true, "dssr");
 			}
 			catch(ObjectNotFoundException<DisplayScreen>& e)
@@ -64,11 +73,63 @@ namespace synthese
 			{
 				throw RequestException("Unknown error");
 			}
+
+			if (_displayScreen->getType()->getMonitoringInterface() == NULL)
+			{
+				throw RequestException("This screen cannot be monitored because its type do not have monitoring interface");
+			}
+			if (_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>() == NULL)
+			{
+				throw RequestException("This screen cannot be monitored because its monitoring interface does not contain the parsing rules");
+			}
+
+			// Last monitoring status
+			DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), true, false, 0, 1);
 		}
 
 		void DisplayScreenSupervisionRequest::_run( std::ostream& stream ) const
 		{
-			_displayScreen->recordSupervision(_text);
+			// Assertions
+			assert(_displayScreen.get() != NULL);
+			assert(_displayScreen->getType() != NULL);
+			assert(_displayScreen->getType()->getMonitoringInterface() != NULL);
+			assert(_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>() != NULL);
+			
+			// Parsing
+			stringstream s;
+			const ParseDisplayReturnInterfacePage* page(_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>());
+			VariablesMap v;
+			page->display(s, _text, v, _request);
+
+			// Standard status object creation
+			DisplayMonitoringStatus status(s.str(), _displayScreen.get());
+
+			// Last monitoring message
+			if (_env.getRegistry<DisplayMonitoringStatus>().empty())
+			{
+				// First contact
+				DisplayMaintenanceLog::AddMonitoringFirstEntry(_displayScreen.get(), status);
+			}
+			else
+			{
+				boost::shared_ptr<DisplayMonitoringStatus> lastStatus(_env.getEditableRegistry<DisplayMonitoringStatus>().front());
+				status.setKey(lastStatus->getKey());
+
+				// Up contact?
+				if (status.getTime() - lastStatus->getTime() > _displayScreen->getType()->getTimeBetweenChecks())
+				{
+					DisplayMaintenanceLog::AddMonitoringUpEntry(_displayScreen.get(), lastStatus->getTime());
+				}
+
+				// Status change ?
+				if (status.getGlobalStatus() != lastStatus->getGlobalStatus())
+				{
+					DisplayMaintenanceLog::AddStatusChangeEntry(_displayScreen.get(), *lastStatus, status);
+				}
+			}
+
+			// Saving
+			DisplayMonitoringStatusTableSync::Save(&status);
 		}
 	}
 }

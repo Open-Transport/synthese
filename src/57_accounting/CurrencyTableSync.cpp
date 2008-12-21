@@ -49,8 +49,8 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE_NAME = "t029_currencies";
-		template<> const int SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE_ID = 29;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE.NAME = "t029_currencies";
+		template<> const int SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE.ID = 29;
 		template<> const bool SQLiteTableSyncTemplate<CurrencyTableSync>::HAS_AUTO_INCREMENT = true;
 
 		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::load(Currency* currency, const db::SQLiteResultSPtr& rows )
@@ -77,7 +77,7 @@ namespace synthese
 			if (currency->getKey() <= 0)
 				currency->setKey(getId());
             query
-				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(currency->getKey())
 				<< "," << Conversion::ToSQLiteString(currency->getName())
 				<< "," << Conversion::ToSQLiteString(currency->getSymbol())
@@ -109,7 +109,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
 				<< " AND " << TABLE_COL_SYMBOL << " LIKE '%" << Conversion::ToSQLiteString(symbol, false) << "%'";
 			if (number > 0)

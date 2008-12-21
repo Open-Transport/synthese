@@ -44,7 +44,7 @@ namespace synthese
 		{
 		public:
 			DBEmptyResultException (uid& id)
-				: util::ObjectNotFoundException<typename T::ObjectType>(id, "Unable to fetch object in database table " + T::TABLE_NAME)
+				: util::ObjectNotFoundException<typename T::ObjectType>(id, "Unable to fetch object in database table " + T::TABLE.NAME)
 			{}
 		};
 	}

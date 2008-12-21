@@ -73,13 +73,13 @@ namespace synthese
 				<< " SELECT "
 					<< "p.*"
 					<< ",c." << CityTableSync::TABLE_COL_NAME << " AS city_name"
-					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE_NAME << " AS b WHERE b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
+					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE.NAME << " AS b WHERE b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
 				<< " FROM " // Tables
-					<< ConnectionPlaceTableSync::TABLE_NAME << " AS p"
-					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
-					<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS ps ON " 	<< " ps." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
-					<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
-					<< " INNER JOIN " << LineTableSync::TABLE_NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
+					<< ConnectionPlaceTableSync::TABLE.NAME << " AS p"
+					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
+					<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS ps ON " 	<< " ps." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
+					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+					<< " INNER JOIN " << LineTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
 			// Where	
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
@@ -141,11 +141,11 @@ namespace synthese
 			stringstream query;
 			query << " SELECT "
 				<< "c." << TABLE_COL_ID << " AS " << TABLE_COL_ID
-				<< " FROM " << CommercialLineTableSync::TABLE_NAME << " AS c "
-				<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
-				<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS s ON s." << LineStopTableSync::COL_LINEID << "=l." << TABLE_COL_ID
-				<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineStopTableSync::COL_PHYSICALSTOPID
-				<< " INNER JOIN " << DisplayScreenTableSync::TABLE_NAME << " AS b ON b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID
+				<< " FROM " << CommercialLineTableSync::TABLE.NAME << " AS c "
+				<< " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
+				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS s ON s." << LineStopTableSync::COL_LINEID << "=l." << TABLE_COL_ID
+				<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineStopTableSync::COL_PHYSICALSTOPID
+				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID
 				<< " GROUP BY c." << TABLE_COL_ID
 				<< " ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME;
 			if (number > 0)

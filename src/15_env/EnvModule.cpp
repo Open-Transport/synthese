@@ -106,12 +106,12 @@ namespace synthese
 
 		shared_ptr<NonPermanentService> EnvModule::FetchEditableService(
 			const RegistryKeyType& id,
-			util::Env& env
+			Env& env
 		){
 			int tableId(decodeTableId(id));
-			if(tableId == ScheduledServiceTableSync::TABLE_ID)
+			if(tableId == ScheduledServiceTableSync::TABLE.ID)
 				return static_pointer_cast<NonPermanentService, ScheduledService>(env.getEditableRegistry<ScheduledService>().getEditable(id));
-			if (tableId == ContinuousServiceTableSync::TABLE_ID)
+			if (tableId == ContinuousServiceTableSync::TABLE.ID)
 				return static_pointer_cast<NonPermanentService, ContinuousService>(env.getEditableRegistry<ContinuousService>().getEditable(id));
 			
 			return shared_ptr<NonPermanentService>();
@@ -121,7 +121,7 @@ namespace synthese
 		
 		shared_ptr<const Place> EnvModule::FetchPlace(
 			const util::RegistryKeyType& id,
-			const util::Env& env
+			Env& env
 		){
 			shared_ptr<const Place> place = static_pointer_cast<const Place, const AddressablePlace>(FetchAddressablePlace (id, env));
 			if (!place.get())
@@ -134,17 +134,17 @@ namespace synthese
 
 		shared_ptr<const AddressablePlace> EnvModule::FetchAddressablePlace(
 			const util::RegistryKeyType& id,
-			const util::Env& env
+			Env& env
 		){
 			int tableId(decodeTableId(id));
-			if(tableId == ConnectionPlaceTableSync::TABLE_ID)
-				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(env.getRegistry<PublicTransportStopZoneConnectionPlace>().get(id));
-			if (tableId == PublicPlaceTableSync::TABLE_ID)
-				return static_pointer_cast<const AddressablePlace, const PublicPlace>(env.getRegistry<PublicPlace>().get(id));
-			if (tableId == RoadTableSync::TABLE_ID)
-				return static_pointer_cast<const AddressablePlace, const Road>(env.getRegistry<Road>().get(id));
-			if (tableId == CrossingTableSync::TABLE_ID)
-				return static_pointer_cast<const AddressablePlace, const Crossing>(env.getRegistry<Crossing>().get(id));
+			if(tableId == ConnectionPlaceTableSync::TABLE.ID)
+				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(ConnectionPlaceTableSync::Get(id, &env));
+			if (tableId == PublicPlaceTableSync::TABLE.ID)
+				return static_pointer_cast<const AddressablePlace, const PublicPlace>(PublicPlaceTableSync::Get(id, &env));
+			if (tableId == RoadTableSync::TABLE.ID)
+				return static_pointer_cast<const AddressablePlace, const Road>(RoadTableSync::Get(id, &env));
+			if (tableId == CrossingTableSync::TABLE.ID)
+				return static_pointer_cast<const AddressablePlace, const Crossing>(CrossingTableSync::Get(id, &env));
 			return shared_ptr<const AddressablePlace>();
 		}
 
@@ -154,13 +154,13 @@ namespace synthese
 			util::Env& env
 		){
 			int tableId(decodeTableId(id));
-			if (tableId == ConnectionPlaceTableSync::TABLE_ID)
+			if (tableId == ConnectionPlaceTableSync::TABLE.ID)
 				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(env.getEditableRegistry<PublicTransportStopZoneConnectionPlace>().getEditable(id));
-			if (tableId == PublicPlaceTableSync::TABLE_ID)
+			if (tableId == PublicPlaceTableSync::TABLE.ID)
 				return static_pointer_cast<AddressablePlace, PublicPlace>(env.getEditableRegistry<PublicPlace>().getEditable(id));
-			if (tableId == RoadTableSync::TABLE_ID)
+			if (tableId == RoadTableSync::TABLE.ID)
 				return static_pointer_cast<AddressablePlace, Road>(env.getEditableRegistry<Road>().getEditable(id));
-			if (tableId == CrossingTableSync::TABLE_ID)
+			if (tableId == CrossingTableSync::TABLE.ID)
 				return static_pointer_cast<AddressablePlace, Crossing>(env.getEditableRegistry<Crossing>().getEditable(id));
 			return shared_ptr<AddressablePlace>();
 		}
@@ -169,12 +169,12 @@ namespace synthese
 
 		shared_ptr<const IncludingPlace> EnvModule::FetchIncludingPlace(
 			const util::RegistryKeyType& id,
-			const util::Env& env
+			Env& env
 		){
 			int tableId(decodeTableId(id));
-			if (tableId == PlaceAliasTableSync::TABLE_ID)
+			if (tableId == PlaceAliasTableSync::TABLE.ID)
 				return static_pointer_cast<const IncludingPlace, const PlaceAlias>(env.getRegistry<PlaceAlias>().get(id));
-			if (tableId == CityTableSync::TABLE_ID)
+			if (tableId == CityTableSync::TABLE.ID)
 				return static_pointer_cast<const IncludingPlace, const City>(env.getRegistry<City>().get(id));
 			return shared_ptr<const IncludingPlace>();
 		}
@@ -183,12 +183,12 @@ namespace synthese
 
 		shared_ptr<const Vertex> EnvModule::FetchVertex(
 			const util::RegistryKeyType& id,
-			const util::Env& env
+			Env& env
 		){
 			int tableId(decodeTableId(id));
-			if (tableId == PhysicalStopTableSync::TABLE_ID)
+			if (tableId == PhysicalStopTableSync::TABLE.ID)
 				return static_pointer_cast<const Vertex, const PhysicalStop>(env.getRegistry<PhysicalStop>().get(id));
-			if (tableId == AddressTableSync::TABLE_ID)
+			if (tableId == AddressTableSync::TABLE.ID)
 				return static_pointer_cast<const Vertex, const Address>(env.getRegistry<Address>().get(id));
 			return shared_ptr<const Vertex>();
 		}
@@ -197,7 +197,7 @@ namespace synthese
 
 		CityList EnvModule::guessCity (const std::string& fuzzyName, int nbMatches, bool t9)
 		{
-			const Env& env(*Env::GetOfficialEnv());
+			Env& env(*Env::GetOfficialEnv());
 			const Registry<City>& cities(env.getRegistry<City>());
 			CityList result;
 			LexicalMatcher<uid>::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).bestMatches (fuzzyName, nbMatches);

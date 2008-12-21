@@ -63,12 +63,12 @@ namespace synthese
 		{
 			try
 			{
-				if (decodeTableId(id) == DisplayScreenTableSync::TABLE_ID)
+				if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 				{
 					shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id);
 					return ds->getFullName();
 				}
-				else if (decodeTableId(id) == DisplayTypeTableSync::TABLE_ID)
+				else if (decodeTableId(id) == DisplayTypeTableSync::TABLE.ID)
 				{
 					shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id));
 					return dt->getName();

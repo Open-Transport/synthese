@@ -60,11 +60,35 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("15.60.02 Continuous services");
 
+	namespace env
+	{
+		const std::string ContinuousServiceTableSync::COL_SERVICENUMBER ("service_number");
+		const std::string ContinuousServiceTableSync::COL_SCHEDULES ("schedules");
+		const std::string ContinuousServiceTableSync::COL_PATHID ("path_id");
+		const std::string ContinuousServiceTableSync::COL_RANGE ("range");
+		const std::string ContinuousServiceTableSync::COL_MAXWAITINGTIME ("max_waiting_time");
+		const std::string ContinuousServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
+		const std::string ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+		const std::string ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE_NAME = "t017_continuous_services";
-		template<> const int SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE_ID = 17;
-		template<> const bool SQLiteTableSyncTemplate<ContinuousServiceTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE(
+			ContinuousServiceTableSync::CreateFormat(
+				"t017_continuous_services",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_SERVICENUMBER, TEXT),
+					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_SCHEDULES, TEXT),
+					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_PATHID, INTEGER),
+					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_RANGE, INTEGER),
+					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, INTEGER),
+					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_BIKECOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Load(
 			ContinuousService* cs,
@@ -179,7 +203,7 @@ namespace synthese
 				object->setKey(getId());	/// @todo Use grid ID
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -190,27 +214,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string ContinuousServiceTableSync::COL_SERVICENUMBER ("service_number");
-		const std::string ContinuousServiceTableSync::COL_SCHEDULES ("schedules");
-		const std::string ContinuousServiceTableSync::COL_PATHID ("path_id");
-		const std::string ContinuousServiceTableSync::COL_RANGE ("range");
-		const std::string ContinuousServiceTableSync::COL_MAXWAITINGTIME ("max_waiting_time");
-		const std::string ContinuousServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const std::string ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const std::string ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-
 		ContinuousServiceTableSync::ContinuousServiceTableSync()
 			: SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_SERVICENUMBER, "TEXT", true);
-			addTableColumn (COL_SCHEDULES, "TEXT", true);
-			addTableColumn (COL_PATHID, "INTEGER", false);
-			addTableColumn (COL_RANGE, "INTEGER", true);
-			addTableColumn (COL_MAXWAITINGTIME, "INTEGER", true);
-			addTableColumn (COL_BIKECOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_HANDICAPPEDCOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
 		}
 
 
@@ -227,7 +233,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (lineId != UNKNOWN_VALUE)
 				query << " AND " << COL_PATHID << "=" << lineId;
@@ -239,10 +245,6 @@ namespace synthese
 				query << " OFFSET " << Conversion::ToString(first);
 
 			LoadFromQuery(query.str(), env, linkLevel);
-		}
-
-		void ContinuousServiceTableSync::afterFirstSync( SQLite* sqlite,  SQLiteSync* sync )
-		{
 		}
 	}
 }

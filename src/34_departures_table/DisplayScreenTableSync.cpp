@@ -64,12 +64,78 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync, DisplayScreenTableSync>::FACTORY_KEY("34.50 Display Screens");
 	}
 
+	namespace departurestable
+	{
+		const string DisplayScreenTableSync::_COL_LINE_EXISTS = "line_exists";
+		const string DisplayScreenTableSync::_COL_LAST_MAINTENANCE_CONTROL = "last_maintenance_control";
+		const string DisplayScreenTableSync::_COL_LAST_OK_MAINTENANCE_CONTROL = "last_ok_maintenance_control";
+		const string DisplayScreenTableSync::_COL_CORRUPTED_DATA_START_DATE = "corrupted_data_start_date";
+		const string DisplayScreenTableSync::_COL_TYPE_NAME = "type_name";
+
+		const string DisplayScreenTableSync::COL_PLACE_ID = "broadcast_point_id";
+		const string DisplayScreenTableSync::COL_NAME = "broadcast_point_comment";
+		const string DisplayScreenTableSync::COL_TYPE_ID = "type_id";
+		const string DisplayScreenTableSync::COL_WIRING_CODE = "wiring_code";
+		const string DisplayScreenTableSync::COL_TITLE = "title";
+		const string DisplayScreenTableSync::COL_BLINKING_DELAY = "blinking_delay";
+		const string DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY = "track_number_display";
+		const string DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY = "service_number_display";
+		const string DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS = "physical_stops_ids";	// List of physical stops uids, separated by comas
+		const string DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED = "all_physicals";
+		const string DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS = "forbidden_arrival_places_ids";	// List of forbidden connection places uids, separated by comas
+		const string DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS = "forbidden_lines_ids";	// List of forbidden lines uids, separated by comas
+		const string DisplayScreenTableSync::COL_DIRECTION = "direction";
+		const string DisplayScreenTableSync::COL_ORIGINS_ONLY = "origins_only";
+		const string DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS = "displayed_places_ids";	// List of displayed places uids, separated by comas
+		const string DisplayScreenTableSync::COL_MAX_DELAY = "max_delay";
+		const string DisplayScreenTableSync::COL_CLEARING_DELAY = "clearing_delay";
+		const string DisplayScreenTableSync::COL_FIRST_ROW = "first_row";
+		const string DisplayScreenTableSync::COL_GENERATION_METHOD = "generation_method";
+		const string DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS = "forced_destinations_ids";	// List of forced destination uids in preselection, separated by comas
+		const string DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY = "destination_force_delay";
+		const string DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY = "maintenance_checks";
+		const string DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE = "is_online";
+		const string DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE = "maintenance_message";
+		const string DisplayScreenTableSync::COL_DISPLAY_TEAM("display_team");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE_NAME = "t041_display_screens";
-		template<> const int SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE_ID = 41;
-		template<> const bool SQLiteTableSyncTemplate<DisplayScreenTableSync>::HAS_AUTO_INCREMENT = true;
-
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE(
+			DisplayScreenTableSync::CreateFormat(
+				"t041_display_screens",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_PLACE_ID, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_TYPE_ID, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_WIRING_CODE, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_TITLE, TEXT),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_BLINKING_DELAY, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, TEXT),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, TEXT),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS, TEXT),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_DIRECTION, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, TEXT),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_MAX_DELAY, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_CLEARING_DELAY, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_FIRST_ROW, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_GENERATION_METHOD, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, TEXT),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, INTEGER),
+					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(DisplayScreenTableSync::COL_PLACE_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
+					
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
 			DisplayScreen* object,
 			const db::SQLiteResultSPtr& rows,
@@ -90,7 +156,6 @@ namespace synthese
 			object->setFirstRow (rows->getInt ( DisplayScreenTableSync::COL_FIRST_ROW));
 			object->setGenerationMethod(static_cast<DisplayScreen::GenerationMethod>(rows->getInt(DisplayScreenTableSync::COL_GENERATION_METHOD)));
 			object->setDestinationForceDelay (rows->getInt ( DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY));
-			object->setMaintenanceChecksPerDay (rows->getInt ( DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY));
 			object->setMaintenanceIsOnline (rows->getBool ( DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE));
 			object->setMaintenanceMessage (rows->getText ( DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE));
 			object->setDisplayTeam(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_TEAM));
@@ -108,7 +173,7 @@ namespace synthese
 				}
 				catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in "+ TABLE_NAME + " on display screen : localization "+ Conversion::ToString(placeId) + " not found");
+					Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ Conversion::ToString(placeId) + " not found");
 				}
 
 				// Type
@@ -126,7 +191,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<PhysicalStop>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
+						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 					}
 				}
 
@@ -140,7 +205,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
 					}
 				}
 
@@ -154,7 +219,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
 					}
 				}
 
@@ -168,7 +233,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
 					}
 				}
 			}
@@ -199,7 +264,7 @@ namespace synthese
 				object->setKey(getId());
 
             query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << (object->getLocalization() ? Conversion::ToString(object->getLocalization()->getKey()) : "0")
 				<< "," << Conversion::ToSQLiteString(object->getLocalizationComment())
@@ -278,7 +343,7 @@ namespace synthese
 
 			query
 				<< "'," << Conversion::ToString(object->getForceDestinationDelay())
-				<< "," << Conversion::ToString(object->getMaintenanceChecksPerDay())
+				<< ",''"
 				<< "," << Conversion::ToString(object->getIsOnline())
 				<< "," << Conversion::ToSQLiteString(object->getMaintenanceMessage())
 				<< ")";
@@ -290,67 +355,9 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const string DisplayScreenTableSync::_COL_LINE_EXISTS = "line_exists";
-		const string DisplayScreenTableSync::_COL_LAST_MAINTENANCE_CONTROL = "last_maintenance_control";
-		const string DisplayScreenTableSync::_COL_LAST_OK_MAINTENANCE_CONTROL = "last_ok_maintenance_control";
-		const string DisplayScreenTableSync::_COL_CORRUPTED_DATA_START_DATE = "corrupted_data_start_date";
-		const string DisplayScreenTableSync::_COL_TYPE_NAME = "type_name";
-
-		const string DisplayScreenTableSync::COL_PLACE_ID = "broadcast_point_id";
-		const string DisplayScreenTableSync::COL_NAME = "broadcast_point_comment";
-		const string DisplayScreenTableSync::COL_TYPE_ID = "type_id";
-		const string DisplayScreenTableSync::COL_WIRING_CODE = "wiring_code";
-		const string DisplayScreenTableSync::COL_TITLE = "title";
-		const string DisplayScreenTableSync::COL_BLINKING_DELAY = "blinking_delay";
-		const string DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY = "track_number_display";
-		const string DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY = "service_number_display";
-		const string DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS = "physical_stops_ids";	// List of physical stops uids, separated by comas
-		const string DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED = "all_physicals";
-		const string DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS = "forbidden_arrival_places_ids";	// List of forbidden connection places uids, separated by comas
-		const string DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS = "forbidden_lines_ids";	// List of forbidden lines uids, separated by comas
-		const string DisplayScreenTableSync::COL_DIRECTION = "direction";
-		const string DisplayScreenTableSync::COL_ORIGINS_ONLY = "origins_only";
-		const string DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS = "displayed_places_ids";	// List of displayed places uids, separated by comas
-		const string DisplayScreenTableSync::COL_MAX_DELAY = "max_delay";
-		const string DisplayScreenTableSync::COL_CLEARING_DELAY = "clearing_delay";
-		const string DisplayScreenTableSync::COL_FIRST_ROW = "first_row";
-		const string DisplayScreenTableSync::COL_GENERATION_METHOD = "generation_method";
-		const string DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS = "forced_destinations_ids";	// List of forced destination uids in preselection, separated by comas
-		const string DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY = "destination_force_delay";
-		const string DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY = "maintenance_checks";
-		const string DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE = "is_online";
-		const string DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE = "maintenance_message";
-		const string DisplayScreenTableSync::COL_DISPLAY_TEAM("display_team");
-
 		DisplayScreenTableSync::DisplayScreenTableSync()
 			: SQLiteRegistryTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_PLACE_ID, "INTEGER");
-			addTableColumn(COL_NAME, "TEXT");
-			addTableColumn(COL_TYPE_ID, "INTEGER");
-			addTableColumn(COL_WIRING_CODE, "INTEGER");
-			addTableColumn(COL_TITLE, "TEXT");
-			addTableColumn(COL_BLINKING_DELAY, "INTEGER");
-			addTableColumn(COL_TRACK_NUMBER_DISPLAY, "INTEGER");
-			addTableColumn(COL_SERVICE_NUMBER_DISPLAY, "INTEGER");
-			addTableColumn(COL_DISPLAY_TEAM, "INTEGER");
-			addTableColumn(COL_PHYSICAL_STOPS_IDS, "TEXT");
-			addTableColumn(COL_ALL_PHYSICAL_DISPLAYED, "INTEGER");
-			addTableColumn(COL_FORBIDDEN_ARRIVAL_PLACES_IDS, "TEXT");
-			addTableColumn(COL_FORBIDDEN_LINES_IDS, "TEXT");
-			addTableColumn(COL_DIRECTION, "INTEGER");
-			addTableColumn(COL_ORIGINS_ONLY, "INTEGER");
-			addTableColumn(COL_DISPLAYED_PLACES_IDS, "TEXT");
-			addTableColumn(COL_MAX_DELAY, "INTEGER");
-			addTableColumn(COL_CLEARING_DELAY, "INTEGER");
-			addTableColumn(COL_FIRST_ROW, "INTEGER");
-			addTableColumn(COL_GENERATION_METHOD, "INTEGER");
-			addTableColumn(COL_FORCED_DESTINATIONS_IDS, "TEXT");
-			addTableColumn(COL_DESTINATION_FORCE_DELAY, "INTEGER");
-			addTableColumn(COL_MAINTENANCE_CHECKS_PER_DAY, "INTEGER");
-			addTableColumn(COL_MAINTENANCE_IS_ONLINE, "INTEGER");
-			addTableColumn(COL_MAINTENANCE_MESSAGE, "TEXT");
 		}
 
 
@@ -385,21 +392,15 @@ namespace synthese
 			query
 			    << " SELECT"
 			    << " d.*"
-			    << ", EXISTS(SELECT ls." << TABLE_COL_ID << " FROM " << LineStopTableSync::TABLE_NAME << " AS ls INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID << " WHERE p." << PhysicalStopTableSync::COL_PLACEID << "=d." << COL_PLACE_ID << ") AS " << _COL_LINE_EXISTS
-			    << ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_LAST_MAINTENANCE_CONTROL
-			    << ", (SELECT MAX(l." << DBLogEntryTableSync::COL_DATE << ") FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_INFO) << ") AS " << _COL_LAST_OK_MAINTENANCE_CONTROL
-			    << ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_ERROR) << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_CORRUPTED_DATA_START_DATE
-			    << ", (SELECT t." << DisplayTypeTableSync::TABLE_COL_NAME << " FROM " << DisplayTypeTableSync::TABLE_NAME << " AS t WHERE t." << TABLE_COL_ID << "=d." << COL_TYPE_ID << ") AS " << _COL_TYPE_NAME
 			    << " FROM "
-			    << TABLE_NAME << " AS d"
-			    << " INNER JOIN " << ConnectionPlaceTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
-			    << " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
-			    << " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
+			    << TABLE.NAME << " AS d"
+			    << " INNER JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
+			    << " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
 			    ;
 			if (lineid != UNKNOWN_VALUE || neededLevel > FORBIDDEN)
 			    query
-				<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
-				<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
+				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+				<< " INNER JOIN " << LineTableSync::TABLE.NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
 				;
 			
 			// Filtering
@@ -458,95 +459,8 @@ namespace synthese
 			    if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 			}
-			
-			try
-			{
-				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-			    vector<shared_ptr<DisplayScreen> > objects;
-			    while (rows->next ())
-			    {
-				shared_ptr<DisplayScreen> object(new DisplayScreen());
-				Load(object.get(), rows, &env, linkLevel);
-				objects.push_back(object);
-				
-				DisplayScreen::Complements c;
-				DateTime now (TIME_CURRENT);
-				
-				// No news test
-				if (object->getMaintenanceChecksPerDay())
-				{
-				    if (rows->getLongLong(_COL_LAST_MAINTENANCE_CONTROL))
-				    {
-					shared_ptr<const DBLogEntry> le = DBLogEntryTableSync::Get(rows->getLongLong(_COL_LAST_MAINTENANCE_CONTROL));
-					if ((now - le->getDate()) > ((1440 / object->getMaintenanceChecksPerDay()) * 2))
-					{
-					    if ((now - le->getDate()) < ((1440 / object->getMaintenanceChecksPerDay()) * 5))
-						c.status = DISPLAY_STATUS_NO_NEWS_WARNING;
-					    else
-						c.status = DISPLAY_STATUS_NO_NEWS_ERROR;
-					    c.statusText = string("L'afficheur n'a pas envoyé de message de maintenance depuis ") + 
-						Conversion::ToString(now - le->getDate()) + string(" minutes.");
-					    c.lastControl = le->getDate();
-					}
-					else
-					{
-					    c.status = DISPLAY_STATUS_OK;
-					    c.statusText = "OK";
-					}
-				    }
-				    else
-				    {
-					c.status = DISPLAY_STATUS_NO_NEWS_WARNING;
-					c.statusText = "L'afficheur n'a jamais envoyé de message de maintenance.";
-				    }
-				}
 
-				// Bad news test
-				if (rows->getLongLong (_COL_LAST_MAINTENANCE_CONTROL))
-				{
-				    shared_ptr<const DBLogEntry> le = DBLogEntryTableSync::Get(
-					rows->getLongLong (_COL_LAST_MAINTENANCE_CONTROL));
-
-				    if (le->getLevel() == DBLogEntry::DB_LOG_ERROR)
-					c.status = DISPLAY_STATUS_HARDWARE_ERROR;
-				    else
-					c.status = DISPLAY_STATUS_HARDWARE_WARNING;
-				    
-				    c.statusText = le->getStringContent();
-					}
-
-				// Last OK control
-				c.lastOKStatus = DateTime::FromSQLTimestamp(rows->getText (_COL_LAST_OK_MAINTENANCE_CONTROL));
-
-					// Data control
-//					if (!Conversion::ToLongLong(rows->getText(_COL_BROADCAST_POINT_ID)))
-//					{
-//						c.dataControl = DISPLAY_DATA_CORRUPTED;
-//						c.dataControlText = "L'afficheur est relié à un point de diffusion inexistant.";
-						/// @todo Put here a dblog entry writing
-						/// @todo Put a control of the link between broadcast point and its place
-//					}
-				/*		else*/ if (!rows->getInt (_COL_LINE_EXISTS))
-					{
-						c.dataControl = DISPLAY_DATA_NO_LINES;
-						c.dataControlText = "Aucune ligne ne dessert l'afficheur.";
-					}
-					else
-					{
-						c.dataControl = DISPLAY_DATA_OK;
-						c.dataControlText = "OK";
-						/// @todo Put here a dblog entry writing if the last entry was negative
-					}
-				
-				c.lastOKDataControl = DateTime::FromSQLTimestamp(rows->getText (_COL_LAST_OK_MAINTENANCE_CONTROL));
-				
-				object->setComplements(c);
-			    }
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

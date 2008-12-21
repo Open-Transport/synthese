@@ -55,10 +55,13 @@ namespace synthese
 	namespace departurestable
 	{
 		const string UpdateDisplayTypeAction::PARAMETER_ID = Action_PARAMETER_PREFIX + "dtu_id";
-		const string UpdateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "dtu_name";
-		const string UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "dtu_interf";
-		const string UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtu_rows";
-		const string UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER(Action_PARAMETER_PREFIX + "dtu_stops");
+		const string UpdateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "dtu_na";
+		const string UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "dtu_di";
+		const string UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID(Action_PARAMETER_PREFIX + "dtu_ai");
+		const string UpdateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID(Action_PARAMETER_PREFIX + "dtu_mi");
+		const string UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtu_ro";
+		const string UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER(Action_PARAMETER_PREFIX + "dtu_st");
+		const string UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS(Action_PARAMETER_PREFIX + "dtu_tc");
 
 		ParametersMap UpdateDisplayTypeAction::getParametersMap() const
 		{
@@ -75,11 +78,9 @@ namespace synthese
 
 		void UpdateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			setTypeId(map.getUid(PARAMETER_ID, true, FACTORY_KEY));
 			try
 			{
-				// Display type
-				_dt = DisplayTypeTableSync::GetEditable(map.getUid(PARAMETER_ID, true, FACTORY_KEY));
-
 				// Name
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 				if (_name != _dt->getName())
@@ -96,19 +97,40 @@ namespace synthese
 				// Rows number
 				_rows_number = map.getInt(PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
 				if (_rows_number < 0)
-					throw ActionException("Un nombre positif de lignes doit être choisi");
+				{
+					throw ActionException("Un nombre positif de rangées doit être choisi");
+				}
 
 				// Interface
-				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+				RegistryKeyType id(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+				if (id > 0)
+				{
+					_interface = InterfaceTableSync::Get(id, &_env);
+				}
+				id = map.getUid(PARAMETER_AUDIO_INTERFACE_ID, true, FACTORY_KEY);
+				if (id > 0)
+				{
+					_audioInterface = InterfaceTableSync::Get(id, &_env);
+				}
+				id = map.getUid(PARAMETER_MONITORING_INTERFACE_ID, true, FACTORY_KEY);
+				if (id > 0)
+				{
+					_monitoringInterface = InterfaceTableSync::Get(id, &_env);
+				}
 
 				// Max stops number
 				_max_stops_number = map.getInt(PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
 				if (_max_stops_number < UNKNOWN_VALUE)
+				{
 					throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
-			}
-			catch (ObjectNotFoundException<DisplayType>& e)
-			{
-				throw ActionException("Display Type not found / "+ e.getMessage());
+				}
+
+				// Time between checks
+				_timeBetweenChecks = map.getInt(PARAMETER_TIME_BETWEEN_CHECKS, true, FACTORY_KEY);
+				if (_timeBetweenChecks < 0)
+				{
+					throw ActionException("La durée entre les tests de supervision doit être positive.");
+				}
 			}
 			catch(ObjectNotFoundException<Interface>& e)
 			{
@@ -121,19 +143,41 @@ namespace synthese
 			// Log entry content
 			stringstream log;
 			DBLogModule::appendToLogIfChange(log, "Nom", _dt->getName(), _name);
-			DBLogModule::appendToLogIfChange(log, "Interface", _dt->getInterface()->getName(), _interface->getName());
+			DBLogModule::appendToLogIfChange(log, "Interface d'affichage", (_dt->getDisplayInterface() != NULL) ? _dt->getDisplayInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
+			DBLogModule::appendToLogIfChange(log, "Interface de supervision", (_dt->getMonitoringInterface() != NULL) ? _dt->getMonitoringInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
+			DBLogModule::appendToLogIfChange(log, "Interface audio", (_dt->getAudioInterface() != NULL) ? _dt->getAudioInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
 			DBLogModule::appendToLogIfChange(log, "Nombre de lignes", _dt->getRowNumber(), _rows_number);
 			DBLogModule::appendToLogIfChange(log, "Nombre d'arrêts intermédiaires", _dt->getMaxStopsNumber(), _max_stops_number);
+			DBLogModule::appendToLogIfChange(log, "Temps entre les contrôles de supervision", _dt->getTimeBetweenChecks(), _timeBetweenChecks);
 
 			// Update
 			_dt->setName(_name);
-			_dt->setInterface(_interface.get());
+			_dt->setDisplayInterface(_interface.get());
+			_dt->setMonitoringInterface(_monitoringInterface.get());
+			_dt->setAudioInterface(_audioInterface.get());
 			_dt->setRowNumber(_rows_number);
 			_dt->setMaxStopsNumber(_max_stops_number);
+			_dt->setTimeBetweenChecks(_timeBetweenChecks);
 			DisplayTypeTableSync::Save(_dt.get());
 
 			// Log
 			ArrivalDepartureTableLog::addUpdateTypeEntry(_dt.get(), _request->getUser().get(), log.str());
+		}
+
+
+
+		void UpdateDisplayTypeAction::setTypeId(
+			util::RegistryKeyType id
+		){
+			try
+			{
+				// Display type
+				_dt = DisplayTypeTableSync::GetEditable(id, &_env, UP_LINKS_LOAD_LEVEL);
+			}			
+			catch (ObjectNotFoundException<DisplayType>& e)
+			{
+				throw ActionException("Display Type not found / "+ e.getMessage());
+			}
 		}
 	}
 }

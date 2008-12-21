@@ -45,8 +45,8 @@ namespace synthese
 			
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const DisplayScreen>		_displayScreen;
-				std::string					_text;
+				boost::shared_ptr<const DisplayScreen>	_displayScreen;
+				std::string								_text;
 			//@}
 
 

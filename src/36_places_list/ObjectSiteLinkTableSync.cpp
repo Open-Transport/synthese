@@ -47,12 +47,25 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,ObjectSiteLinkTableSync>::FACTORY_KEY("36.11 Object Site Links");
 	}
-	
+
+	namespace transportwebsite
+	{
+		const string ObjectSiteLinkTableSync::COL_OBJECT_ID("object_id");
+		const string ObjectSiteLinkTableSync::COL_SITE_ID("site_id");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE_NAME("t001_object_site_links");
-		template<> const int SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE_ID(1);
-		template<> const bool SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE(
+			ObjectSiteLinkTableSync::CreateFormat(
+				"t001_object_site_links",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ObjectSiteLinkTableSync::COL_OBJECT_ID, INTEGER),
+					SQLiteTableFormat::Field(ObjectSiteLinkTableSync::COL_SITE_ID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes(),
+				false
+		)	);
 
 
 
@@ -76,7 +89,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -97,17 +110,9 @@ namespace synthese
 	
 	namespace transportwebsite
 	{
-		const std::string ObjectSiteLinkTableSync::COL_OBJECT_ID("object_id");
-		const std::string ObjectSiteLinkTableSync::COL_SITE_ID("site_id");
-
-
-
 		ObjectSiteLinkTableSync::ObjectSiteLinkTableSync()
 			: SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync, ObjectSiteLink>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_OBJECT_ID, "INTEGER");
-			addTableColumn(COL_SITE_ID, "INTEGER");
 		}
 
 
@@ -161,7 +166,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())

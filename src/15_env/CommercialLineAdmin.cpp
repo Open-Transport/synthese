@@ -71,7 +71,7 @@ namespace synthese
 		{
 			try
 			{
-				_cline = CommercialLineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+				_cline = CommercialLineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), &_env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{

@@ -70,7 +70,7 @@ namespace synthese
 
 
 		ReservationRuleInterfacePage::ReservationRuleInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

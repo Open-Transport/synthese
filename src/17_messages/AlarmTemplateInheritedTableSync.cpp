@@ -75,7 +75,7 @@ namespace synthese
 			if (obj->getKey() == UNKNOWN_VALUE)
 				obj->setKey(getId());
 			query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(obj->getKey())
 				<< ",1"
 				<< ",0"
@@ -106,7 +106,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT a.*"
-				<< " FROM " << TABLE_NAME << " AS a "
+				<< " FROM " << TABLE.NAME << " AS a "
 				<< " WHERE "
 				<< COL_IS_TEMPLATE << "=1"
 				<< " AND " << COL_SCENARIO_ID << "=" << scenario->getKey();

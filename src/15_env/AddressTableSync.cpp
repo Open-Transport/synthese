@@ -52,11 +52,31 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,AddressTableSync>::FACTORY_KEY("15.50.02 Addresses");
 	}
 
+	namespace env
+	{
+		const std::string AddressTableSync::COL_PLACEID ("place_id");  // NU
+		const std::string AddressTableSync::COL_ROADID ("road_id");  // NU
+		const std::string AddressTableSync::COL_METRICOFFSET ("metric_offset");  // U ??
+		const std::string AddressTableSync::COL_X ("x");  // U ??
+		const std::string AddressTableSync::COL_Y ("y");  // U ??
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AddressTableSync>::TABLE_NAME = "t002_addresses";
-		template<> const int SQLiteTableSyncTemplate<AddressTableSync>::TABLE_ID = 2;
-		template<> const bool SQLiteTableSyncTemplate<AddressTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AddressTableSync>::TABLE(
+			AddressTableSync::CreateFormat(
+				"t002_addresses",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(AddressTableSync::COL_PLACEID, INTEGER, false),
+					SQLiteTableFormat::Field(AddressTableSync::COL_ROADID, INTEGER, false),
+					SQLiteTableFormat::Field(AddressTableSync::COL_METRICOFFSET, DOUBLE, false),
+					SQLiteTableFormat::Field(AddressTableSync::COL_X, DOUBLE),
+					SQLiteTableFormat::Field(AddressTableSync::COL_Y, DOUBLE),
+					SQLiteTableFormat::Field()
+				),
+				SQLiteTableFormat::Indexes()
+			)
+		);
 
 		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Load(
 			Address* object
@@ -78,9 +98,9 @@ namespace synthese
 				// Links from the object
 				try
 				{
-					if (tableId == CrossingTableSync::TABLE_ID)
+					if (tableId == CrossingTableSync::TABLE.ID)
 						object->setPlace(CrossingTableSync::Get(placeId, env, linkLevel).get());
-					else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
+					else if (tableId == ConnectionPlaceTableSync::TABLE.ID)
 						object->setPlace(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
 
 					object->setRoad (RoadTableSync::Get (roadId, env, linkLevel).get());
@@ -113,11 +133,17 @@ namespace synthese
 			Address* obj,
 			Env* env
 		){
-			shared_ptr<AddressablePlace> place(EnvModule::FetchEditableAddressablePlace(obj->getPlace()->getKey(), *env));
-//			place->removeAddress(obj);
+			AddressablePlace* place(const_cast<AddressablePlace*>(obj->getPlace()));
+			if (place != NULL)
+			{
+//				place->removeAddress(obj);
+			}
 
-			shared_ptr<Road> road(RoadTableSync::GetEditable(obj->getRoad()->getKey(), env));
-//			road->removeAddress(obj);
+			Road* road(const_cast<Road*>(obj->getRoad()));
+			if (road != NULL)
+			{
+//				road->removeAddress(obj);
+			}
 		}
 
 
@@ -130,7 +156,7 @@ namespace synthese
 				object->setKey(getId());	/// @todo Use grid ID
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -141,21 +167,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string AddressTableSync::COL_PLACEID ("place_id");  // NU
-		const std::string AddressTableSync::COL_ROADID ("road_id");  // NU
-		const std::string AddressTableSync::COL_METRICOFFSET ("metric_offset");  // U ??
-		const std::string AddressTableSync::COL_X ("x");  // U ??
-		const std::string AddressTableSync::COL_Y ("y");  // U ??
-
 		AddressTableSync::AddressTableSync()
 			: SQLiteRegistryTableSyncTemplate<AddressTableSync,Address>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_PLACEID, "INTEGER", false);
-			addTableColumn (COL_ROADID, "INTEGER", false);
-			addTableColumn (COL_METRICOFFSET, "DOUBLE", false);
-			addTableColumn (COL_X, "DOUBLE", true);
-			addTableColumn (COL_Y, "DOUBLE", true);
 		}
 
 		AddressTableSync::~AddressTableSync()
@@ -172,7 +186,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"

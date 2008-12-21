@@ -138,7 +138,7 @@ namespace synthese
 
 
 		JourneyBoardInterfacePage::JourneyBoardInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

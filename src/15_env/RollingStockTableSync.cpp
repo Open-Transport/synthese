@@ -46,13 +46,26 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,RollingStockTableSync>::FACTORY_KEY("15.10.07 Rolling Stock");
 	}
-	
+
+	namespace env
+	{
+		const string RollingStockTableSync::COL_NAME("name");
+		const string RollingStockTableSync::COL_ARTICLE("article");
+		const string RollingStockTableSync::COL_INDICATOR("indicator_label");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE_NAME("t049_rolling_stock");
-		template<> const int SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE_ID(49);
-		template<> const bool SQLiteTableSyncTemplate<RollingStockTableSync>::HAS_AUTO_INCREMENT(true);
-
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE(
+			RollingStockTableSync::CreateFormat(
+				"t049_rolling_stock",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(RollingStockTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(RollingStockTableSync::COL_ARTICLE, TEXT),
+					SQLiteTableFormat::Field(RollingStockTableSync::COL_INDICATOR, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 
 		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Load(
@@ -78,7 +91,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -98,18 +111,9 @@ namespace synthese
 	
 	namespace env
 	{
-		const std::string RollingStockTableSync::COL_NAME("name");
-		const std::string RollingStockTableSync::COL_ARTICLE("article");
-		const std::string RollingStockTableSync::COL_INDICATOR("indicator_label");
-		
-
 		RollingStockTableSync::RollingStockTableSync()
 			: SQLiteRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_NAME, "TEXT");
-			addTableColumn(COL_ARTICLE, "TEXT");
-			addTableColumn(COL_INDICATOR, "TEXT");
 		}
 
 
@@ -123,7 +127,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())

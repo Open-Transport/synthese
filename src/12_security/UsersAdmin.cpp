@@ -113,7 +113,8 @@ namespace synthese
 				, _requestParameters.orderField == PARAM_SEARCH_LOGIN
 				, _requestParameters.orderField == PARAM_SEARCH_NAME
 				, _requestParameters.orderField == PARAM_SEARCH_PROFILE_ID
-				, _requestParameters.raisingOrder
+				, _requestParameters.raisingOrder,
+				UP_LINKS_LOAD_LEVEL
 			);
 			ResultHTMLTable::ResultParameters	_resultParameters;
 			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<User>());

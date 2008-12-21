@@ -48,11 +48,41 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,OnlineReservationRuleTableSync>::FACTORY_KEY("31.5 Online Reservation Rule Table Sync");
 	}
 
+	namespace resa
+	{
+		const string OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
+		const string OnlineReservationRuleTableSync::COL_EMAIL = "email";
+		const string OnlineReservationRuleTableSync::COL_COPY_EMAIL = "copy_email";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_SURNAME = "needs_surname";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS = "needs_address";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_PHONE = "needs_phone";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_EMAIL = "needs_email";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER = "needs_customer_number";
+		const string OnlineReservationRuleTableSync::COL_MAX_SEATS = "max_seat";
+		const string OnlineReservationRuleTableSync::COL_THRESHOLDS = "thresholds";
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE_NAME = "t047_online_reservation_rules";
-		template<> const int SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE_ID = 47;
-		template<> const bool SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE(
+			OnlineReservationRuleTableSync::CreateFormat(
+				"t047_online_reservation_rules",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID, INTEGER),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_EMAIL, TEXT),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_COPY_EMAIL, TEXT),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_NEEDS_SURNAME, INTEGER),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS, INTEGER),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_NEEDS_PHONE, INTEGER),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_NEEDS_EMAIL, INTEGER),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER, INTEGER),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_MAX_SEATS, INTEGER),
+					SQLiteTableFormat::Field(OnlineReservationRuleTableSync::COL_THRESHOLDS, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
 			OnlineReservationRule* object,
@@ -94,7 +124,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -105,33 +135,9 @@ namespace synthese
 
 	namespace resa
 	{
-		const string OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
-		const string OnlineReservationRuleTableSync::COL_EMAIL = "email";
-		const string OnlineReservationRuleTableSync::COL_COPY_EMAIL = "copy_email";
-		const string OnlineReservationRuleTableSync::COL_NEEDS_SURNAME = "needs_surname";
-		const string OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS = "needs_address";
-		const string OnlineReservationRuleTableSync::COL_NEEDS_PHONE = "needs_phone";
-		const string OnlineReservationRuleTableSync::COL_NEEDS_EMAIL = "needs_email";
-		const string OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER = "needs_customer_number";
-		const string OnlineReservationRuleTableSync::COL_MAX_SEATS = "max_seat";
-		const string OnlineReservationRuleTableSync::COL_THRESHOLDS = "thresholds";
-
 		OnlineReservationRuleTableSync::OnlineReservationRuleTableSync()
 			: SQLiteRegistryTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_RESERVATION_RULE_ID, "INTEGER");
-			addTableColumn(COL_EMAIL, "TEXT");
-			addTableColumn(COL_COPY_EMAIL, "TEXT");
-			addTableColumn(COL_NEEDS_SURNAME, "INTEGER");
-			addTableColumn(COL_NEEDS_ADDRESS, "INTEGER");
-			addTableColumn(COL_NEEDS_PHONE, "INTEGER");
-			addTableColumn(COL_NEEDS_EMAIL, "INTEGER");
-			addTableColumn(COL_NEEDS_CUSTOMER_NUMBER, "INTEGER");
-			addTableColumn(COL_MAX_SEATS, "INTEGER");
-			addTableColumn(COL_THRESHOLDS, "INTEGER");
-
-			addTableIndex(COL_RESERVATION_RULE_ID);
 		}
 
 
@@ -145,7 +151,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"

@@ -41,11 +41,34 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,AlarmObjectLinkTableSync>::FACTORY_KEY("99.00.01 Alarm links");
 	}
 
+	namespace messages
+	{
+		const string AlarmObjectLinkTableSync::COL_RECIPIENT_KEY("recipient_key");
+		const string AlarmObjectLinkTableSync::COL_OBJECT_ID("object_id");
+		const string AlarmObjectLinkTableSync::COL_ALARM_ID("alarm_id");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE_NAME = "t040_alarm_object_links";
-		template<> const int SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE_ID = 40;
-		template<> const bool SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE(
+			AlarmObjectLinkTableSync::CreateFormat(
+				"t040_alarm_object_links",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, TEXT),
+					SQLiteTableFormat::Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, INTEGER),
+					SQLiteTableFormat::Field(AlarmObjectLinkTableSync::COL_ALARM_ID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(
+						"objectalarm",
+						SQLiteTableFormat::Index::CreateFieldsList(
+							AlarmObjectLinkTableSync::COL_OBJECT_ID,
+							AlarmObjectLinkTableSync::COL_ALARM_ID,
+							string()
+					)	),
+					SQLiteTableFormat::Index(AlarmObjectLinkTableSync::COL_ALARM_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
 			AlarmObjectLink* object,
@@ -91,7 +114,7 @@ namespace synthese
 			if (object->getKey() <= 0)
 				object->setKey(getId());
             query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getRecipientKey())
 				<< "," << Conversion::ToString(object->getObjectId())
@@ -104,24 +127,9 @@ namespace synthese
 
 	namespace messages
 	{
-		const std::string AlarmObjectLinkTableSync::COL_RECIPIENT_KEY = "recipient_key";
-		const std::string AlarmObjectLinkTableSync::COL_OBJECT_ID = "object_id";
-		const std::string AlarmObjectLinkTableSync::COL_ALARM_ID = "alarm_id";
-
-
 		AlarmObjectLinkTableSync::AlarmObjectLinkTableSync()
 			: SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_RECIPIENT_KEY, "TEXT");
-			addTableColumn(COL_OBJECT_ID, "INTEGER");
-			addTableColumn(COL_ALARM_ID, "INTEGER");
-
-			vector<string> c;
-			c.push_back(COL_OBJECT_ID);
-			c.push_back(COL_ALARM_ID);
-			addTableIndex(c);
-			addTableIndex(COL_ALARM_ID);
 		}
 
 		void AlarmObjectLinkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
@@ -158,9 +166,9 @@ namespace synthese
 
 		void AlarmObjectLinkTableSync::Remove( uid alarmId, uid objectId )
 		{
-			std::stringstream query;
+			stringstream query;
 			query
-				<< "DELETE FROM " << TABLE_NAME
+				<< "DELETE FROM " << TABLE.NAME
 				<< " WHERE " 
 				<< COL_ALARM_ID << "=" << Conversion::ToString(alarmId);
 			if (objectId != UNKNOWN_VALUE)
@@ -176,10 +184,10 @@ namespace synthese
 			int number, /*= 0*/
 			LinkLevel linkLevel
 		){
-			std::stringstream query;
+			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getKey());
 			if (number > 0)

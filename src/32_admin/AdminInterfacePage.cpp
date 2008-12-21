@@ -56,7 +56,7 @@ namespace synthese
 
 
 		AdminInterfacePage::AdminInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

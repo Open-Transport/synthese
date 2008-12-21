@@ -99,7 +99,6 @@ namespace synthese
 			*/
 			static void Remove(uid alarmId, uid objectId = UNKNOWN_VALUE);
 
-		protected:
 
 			/** Action to do on  creation.
 				This method loads a new object in ram.
@@ -132,7 +131,7 @@ namespace synthese
 			query
 				<< " SELECT "
 					<< AlarmObjectLinkTableSync::COL_OBJECT_ID
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getKey())
 					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToSQLiteString(recipientKey);

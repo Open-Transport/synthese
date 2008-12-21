@@ -42,7 +42,7 @@ namespace synthese
 			static const std::string DEFAULT_TITLE;
 
 			AdminInterfaceElementTemplate()
-				: util::FactorableTemplate<AdminInterfaceElement, T>(AdminInterfaceElement::Args(ICON, DEFAULT_TITLE))
+				: util::FactorableTemplate<AdminInterfaceElement, T>()
 			{
 			}
 

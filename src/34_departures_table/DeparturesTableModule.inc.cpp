@@ -12,9 +12,11 @@
 #include "34_departures_table/DisplayTypesAdmin.h"
 #include "34_departures_table/BroadcastPointsAdmin.h"
 #include "34_departures_table/DisplayAdmin.h"
+#include "DisplayTypeAdmin.h"
 
-#include "34_departures_table/DisplayTypeTableSync.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
+#include "DisplayTypeTableSync.h"
+#include "DisplayScreenTableSync.h"
+#include "DisplayMonitoringStatusTableSync.h"
 
 #include "34_departures_table/CreateDisplayTypeAction.h"
 #include "34_departures_table/UpdateDisplayTypeAction.h"
@@ -28,7 +30,6 @@
 
 #include "34_departures_table/ArrivalDepartureTableLog.h"
 #include "34_departures_table/DisplayMaintenanceLog.h"
-#include "34_departures_table/DisplayDataControlLog.h"
 
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
 
@@ -62,3 +63,4 @@
 // Registries
 #include "DisplayType.h"
 #include "DisplayScreen.h"
+#include "DisplayMonitoringStatus.h"

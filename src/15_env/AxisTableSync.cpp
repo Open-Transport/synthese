@@ -47,11 +47,25 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,AxisTableSync>::FACTORY_KEY("15.20.03 Axes");
 	}
 
+	namespace env
+	{
+		const std::string AxisTableSync::COL_NAME ("name");
+		const std::string AxisTableSync::COL_FREE ("free");
+		const std::string AxisTableSync::COL_ALLOWED ("allowed");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<AxisTableSync>::TABLE_NAME = "t004_axes";
-		template<> const int SQLiteTableSyncTemplate<AxisTableSync>::TABLE_ID = 4;
-		template<> const bool SQLiteTableSyncTemplate<AxisTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AxisTableSync>::TABLE(
+			AxisTableSync::CreateFormat(
+				"t004_axes",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(AxisTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(AxisTableSync::COL_FREE, BOOLEAN),
+					SQLiteTableFormat::Field(AxisTableSync::COL_ALLOWED, BOOLEAN),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::Load(
 			Axis* axis,
@@ -77,7 +91,7 @@ namespace synthese
 			if (object->getKey() > 0)
 			{
 				query
-					<< "UPDATE " << TABLE_NAME << " SET "
+					<< "UPDATE " << TABLE.NAME << " SET "
 					/// @todo fill fields [,]FIELD=VALUE
 					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
 			}
@@ -85,7 +99,7 @@ namespace synthese
 			{
 				object->setKey(getId());
                 query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< " INSERT INTO " << TABLE.NAME << " VALUES("
 					<< Conversion::ToString(object->getKey())
 					/// @todo fill other fields separated by ,
 					<< ")";
@@ -97,18 +111,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string AxisTableSync::COL_NAME ("name");
-		const std::string AxisTableSync::COL_FREE ("free");
-		const std::string AxisTableSync::COL_ALLOWED ("allowed");
-
-
 		AxisTableSync::AxisTableSync()
 			: SQLiteRegistryTableSyncTemplate<AxisTableSync,Axis>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_NAME, "TEXT", true);
-			addTableColumn (COL_FREE, "BOOLEAN", true);
-			addTableColumn (COL_ALLOWED, "BOOLEAN", true);
 		}
 
 		void AxisTableSync::Search(
@@ -120,7 +125,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"

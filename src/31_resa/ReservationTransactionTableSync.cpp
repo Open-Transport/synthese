@@ -53,12 +53,40 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync, ReservationTransactionTableSync>::FACTORY_KEY("31.2 Reservation Transaction Table Sync");
 	}
-	
+
+	namespace resa
+	{
+		const string ReservationTransactionTableSync::COL_LAST_RESERVATION_ID = "last_reservation_id";
+		const string ReservationTransactionTableSync::COL_SEATS = "seats";
+		const string ReservationTransactionTableSync::COL_BOOKING_TIME = "booking_time";
+		const string ReservationTransactionTableSync::COL_CANCELLATION_TIME = "cancellation_time";
+		const string ReservationTransactionTableSync::COL_CUSTOMER_ID = "customer_id";
+		const string ReservationTransactionTableSync::COL_CUSTOMER_NAME = "customer_name";
+		const string ReservationTransactionTableSync::COL_CUSTOMER_PHONE = "customer_phone";
+		const string ReservationTransactionTableSync::COL_CUSTOMER_EMAIL = "customer_email";
+		const string ReservationTransactionTableSync::COL_BOOKING_USER_ID = "booking_user_id";
+		const string ReservationTransactionTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE_NAME("t046_reservation_transactions");
-		template<> const int SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE_ID(46);
-		template<> const bool SQLiteTableSyncTemplate<ReservationTransactionTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE(
+			ReservationTransactionTableSync::CreateFormat(
+				"t046_reservation_transactions",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_SEATS, INTEGER),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_BOOKING_TIME, TIMESTAMP),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, TIMESTAMP),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, TEXT),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, TEXT),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, TEXT),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Load(
 			ReservationTransaction* object
@@ -96,7 +124,7 @@ namespace synthese
 				object->setKey(getId());
 
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToString(object->getLastReservation())
 				<< "," << Conversion::ToString(object->getSeats())
@@ -122,32 +150,9 @@ namespace synthese
 
 	namespace resa
 	{
-		// const std::string ReservationTransactionTableSync::COL_xx("xx");
-		const string ReservationTransactionTableSync::COL_LAST_RESERVATION_ID = "last_reservation_id";
-		const string ReservationTransactionTableSync::COL_SEATS = "seats";
-		const string ReservationTransactionTableSync::COL_BOOKING_TIME = "booking_time";
-		const string ReservationTransactionTableSync::COL_CANCELLATION_TIME = "cancellation_time";
-		const string ReservationTransactionTableSync::COL_CUSTOMER_ID = "customer_id";
-		const string ReservationTransactionTableSync::COL_CUSTOMER_NAME = "customer_name";
-		const string ReservationTransactionTableSync::COL_CUSTOMER_PHONE = "customer_phone";
-		const string ReservationTransactionTableSync::COL_CUSTOMER_EMAIL = "customer_email";
-		const string ReservationTransactionTableSync::COL_BOOKING_USER_ID = "booking_user_id";
-		const string ReservationTransactionTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
-
 		ReservationTransactionTableSync::ReservationTransactionTableSync()
 			: SQLiteNoSyncTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_LAST_RESERVATION_ID, "INTEGER");
-			addTableColumn(COL_SEATS, "INTEGER");
-			addTableColumn(COL_BOOKING_TIME, "TIMESTAMP");
-			addTableColumn(COL_CANCELLATION_TIME, "TIMESTAMP");
-			addTableColumn(COL_CUSTOMER_ID, "INTEGER");
-			addTableColumn(COL_CUSTOMER_NAME, "TEXT");
-			addTableColumn(COL_CUSTOMER_PHONE, "TEXT");
-			addTableColumn(COL_CUSTOMER_EMAIL, "TEXT");
-			addTableColumn(COL_BOOKING_USER_ID, "INTEGER");
-			addTableColumn(COL_CANCEL_USER_ID, "INTEGER");
 		}
 
 		void ReservationTransactionTableSync::Search(
@@ -161,17 +166,17 @@ namespace synthese
 		){
 			stringstream query;
 			query
-				<< " SELECT " << TABLE_NAME << ".*"
-				<< " FROM " << TABLE_NAME
-				<< " INNER JOIN " << ReservationTableSync::TABLE_NAME << " AS r ON "
-				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
+				<< " SELECT " << TABLE.NAME << ".*"
+				<< " FROM " << TABLE.NAME
+				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
+				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
 				<< " WHERE " 
 				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << Conversion::ToString(service->getKey())
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << originDate.toSQLString(false) << " 00:00'"
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << originDate.toSQLString(false) << " 23:59'";
 			if (!withCancelled)
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
-			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
+			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
@@ -193,10 +198,10 @@ namespace synthese
 		){
 			stringstream query;
 			query
-				<< " SELECT " << TABLE_NAME << ".*"
-				<< " FROM " << TABLE_NAME
-				<< " INNER JOIN " << ReservationTableSync::TABLE_NAME << " AS r ON "
-				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
+				<< " SELECT " << TABLE.NAME << ".*"
+				<< " FROM " << TABLE.NAME
+				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
+				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
 				<< " WHERE " << COL_CANCEL_USER_ID << "=" << userId;
 			if (!minDate.isUnknown())
 				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << ">=" << minDate.toSQLString();
@@ -204,7 +209,7 @@ namespace synthese
 				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << "<=" << maxDate.toSQLString();
 			if (!withCancelled)
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
-			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
+			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME << " DESC";
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);

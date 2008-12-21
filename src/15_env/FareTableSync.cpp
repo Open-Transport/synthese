@@ -42,11 +42,23 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync, env::FareTableSync>::FACTORY_KEY("15.10.02 Fares");
 
+	namespace env
+	{
+		const std::string FareTableSync::COL_NAME ("name");
+		const std::string FareTableSync::COL_FARETYPE ("fare_type");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<FareTableSync>::TABLE_NAME = "t008_fares";
-		template<> const int SQLiteTableSyncTemplate<FareTableSync>::TABLE_ID = 8;
-		template<> const bool SQLiteTableSyncTemplate<FareTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<FareTableSync>::TABLE(
+			FareTableSync::CreateFormat(
+				"t008_fares",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(FareTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(FareTableSync::COL_FARETYPE, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Load(
 			Fare* fare,
@@ -65,7 +77,7 @@ namespace synthese
 			if (object->getKey() > 0)
 			{
 				query
-					<< "UPDATE " << TABLE_NAME << " SET "
+					<< "UPDATE " << TABLE.NAME << " SET "
 					/// @todo fill fields [,]FIELD=VALUE
 					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
 			}
@@ -73,7 +85,7 @@ namespace synthese
 			{
 				object->setKey(getId());
                 query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< " INSERT INTO " << TABLE.NAME << " VALUES("
 					<< Conversion::ToString(object->getKey())
 					/// @todo fill other fields separated by ,
 					<< ")";
@@ -91,15 +103,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string FareTableSync::COL_NAME ("name");
-		const std::string FareTableSync::COL_FARETYPE ("fare_type");
-
 		FareTableSync::FareTableSync()
 			: SQLiteRegistryTableSyncTemplate<FareTableSync,Fare>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_NAME, "TEXT", true);
-			addTableColumn (COL_FARETYPE, "INTEGER", true);
 		}
 
 		void FareTableSync::Search(
@@ -111,7 +117,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"

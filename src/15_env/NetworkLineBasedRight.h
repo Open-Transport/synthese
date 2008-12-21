@@ -97,13 +97,13 @@ namespace synthese
 			{
 				int tableId(util::decodeTableId(id));
 				
-				if (tableId == TransportNetworkTableSync::TABLE_ID)
+				if (tableId == TransportNetworkTableSync::TABLE.ID)
 				{
 					boost::shared_ptr<const TransportNetwork> network(TransportNetworkTableSync::Get(id, env));
 					return network->getName();
 				}
 
-				if (tableId == CommercialLineTableSync::TABLE_ID)
+				if (tableId == CommercialLineTableSync::TABLE.ID)
 				{
 					boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(id, env));
 					return line->getName();
@@ -129,26 +129,26 @@ namespace synthese
 			try
 			{
 				int tableId1(util::decodeTableId(id1));
-				if (tableId1 == TransportNetworkTableSync::TABLE_ID)
+				if (tableId1 == TransportNetworkTableSync::TABLE.ID)
 				{
 					int tableId2(util::decodeTableId(id2));
-					if (tableId2 == TransportNetworkTableSync::TABLE_ID)
+					if (tableId2 == TransportNetworkTableSync::TABLE.ID)
 						return id1 == id2;
-					if (tableId2 == CommercialLineTableSync::TABLE_ID)
+					if (tableId2 == CommercialLineTableSync::TABLE.ID)
 					{
 						boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(id2, env, UP_LINKS_LOAD_LEVEL));
 						boost::shared_ptr<const TransportNetwork> network(TransportNetworkTableSync::Get(id1, env));
 						return line->getNetwork() == network.get();
 					}
-					if (tableId2 == ConnectionPlaceTableSync::TABLE_ID)
+					if (tableId2 == ConnectionPlaceTableSync::TABLE.ID)
 						return isPlaceServedByNetwork(id1, id2);
 				}
-				if (tableId1 == CommercialLineTableSync::TABLE_ID)
+				if (tableId1 == CommercialLineTableSync::TABLE.ID)
 				{
 					int tableId2(util::decodeTableId(id2));
-					if (tableId2 == CommercialLineTableSync::TABLE_ID)
+					if (tableId2 == CommercialLineTableSync::TABLE.ID)
 						return id1 == id2;
-					if (tableId2 == ConnectionPlaceTableSync::TABLE_ID)
+					if (tableId2 == ConnectionPlaceTableSync::TABLE.ID)
 						return isPlaceServedByCommercialLine(id1, id2);
 				}
 			}

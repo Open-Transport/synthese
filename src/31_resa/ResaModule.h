@@ -184,7 +184,7 @@ namespace synthese
 
 			static void DisplayResaDBLog(
 				std::ostream& stream
-				, util::Env& resaEnv
+				, const util::Env& resaEnv
 				, const std::string& parameterDate
 				, server::FunctionRequest<admin::AdminRequest>& searchRequest
 				, server::ActionFunctionRequest<CancelReservationAction,admin::AdminRequest>& cancelRequest

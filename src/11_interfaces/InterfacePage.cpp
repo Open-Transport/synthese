@@ -135,15 +135,6 @@ namespace synthese
 
 
 
-		InterfacePage::InterfacePage( Args args )
-		:	Registrable(args.key),
-			FactoryBase<InterfacePage>()
-		{
-
-		}
-
-
-
 		string InterfacePage::getValue( const ParametersVector& parameters , VariablesMap& variables , const void* object /*= NULL */, const server::Request* request /*= NULL  */ ) const
 		{
 			stringstream s;

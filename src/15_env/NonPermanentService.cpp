@@ -43,7 +43,7 @@ namespace synthese
 			string serviceNumber,
 			Path* path
 		):	Service(serviceNumber, path),
-			Registrable()
+			Registrable(UNKNOWN_VALUE)
 		{
 		}
 

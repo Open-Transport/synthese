@@ -58,13 +58,6 @@ namespace synthese
 		:	public util::FactoryBase<AlarmRecipient>
 		{
 		public:
-			/// Optional arguments for factory.
-			struct Args
-			{
-
-			};
-
-		public:
 			virtual const std::string& getTitle() const = 0;
 
 			virtual void displayBroadcastListEditor(

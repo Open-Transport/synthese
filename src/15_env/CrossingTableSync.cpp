@@ -25,9 +25,8 @@
 
 #include "02_db/LinkException.h"
 
-#include "01_util/Conversion.h"
-
-#include "15_env/CityTableSync.h"
+#include "Conversion.h"
+#include "CityTableSync.h"
 
 #include <assert.h>
 
@@ -42,11 +41,24 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,CrossingTableSync>::FACTORY_KEY("15.40.02 Crossings");
 
+	namespace env
+	{
+		const std::string CrossingTableSync::TABLE_COL_CITYID = "city_id";
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<CrossingTableSync>::TABLE_NAME = "t043_crossings";
-		template<> const int SQLiteTableSyncTemplate<CrossingTableSync>::TABLE_ID = 43;
-		template<> const bool SQLiteTableSyncTemplate<CrossingTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<CrossingTableSync>::TABLE(
+			CrossingTableSync::CreateFormat(
+				"t043_crossings",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(CrossingTableSync::TABLE_COL_CITYID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(CrossingTableSync::TABLE_COL_CITYID),
+					SQLiteTableFormat::Index()
+		)	)	);
+
 
 		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::Load(
 			Crossing* obj,
@@ -84,15 +96,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string CrossingTableSync::TABLE_COL_CITYID = "city_id";
-
 		CrossingTableSync::CrossingTableSync ()
 		: SQLiteRegistryTableSyncTemplate<CrossingTableSync,Crossing> ()
 		{
-			addTableColumn (TABLE_COL_ID, "INTEGER", true);
-			addTableColumn (TABLE_COL_CITYID, "INTEGER", false);
-
-			addTableIndex(TABLE_COL_CITYID);
 		}
 
 

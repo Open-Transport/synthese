@@ -42,10 +42,6 @@ namespace synthese
 				: F()
 			{}
 
-			FactorableTemplate(const typename F::Args& args)
-				: F(args)
-			{}
-
 			static const std::string FACTORY_KEY;
 
 			virtual const std::string& getFactoryKey() const;

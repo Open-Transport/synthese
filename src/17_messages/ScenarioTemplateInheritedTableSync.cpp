@@ -50,11 +50,6 @@ namespace synthese
 			_CommonLoad(obj, rows, env, linkLevel);
 
 			obj->setFolderId(rows->getLongLong(ScenarioTableSync::COL_FOLDER_ID));
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				LoadScenarioAlarms<ScenarioTemplate>(obj);
-			}
 		}
 
 		template<>
@@ -74,7 +69,7 @@ namespace synthese
 				obj->setKey(getId());
 
 			query
-				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(obj->getKey())
 				<< ",1"
 				<< ",0" 
@@ -103,7 +98,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				<< COL_IS_TEMPLATE << "=1";
 			if (folderId > 0)

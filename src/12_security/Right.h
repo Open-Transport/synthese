@@ -64,11 +64,6 @@ namespace synthese
 		:	public util::FactoryBase<Right>
 		{
 		public:
-			/// Optional arguments for factory.
-			struct Args
-			{
-
-			};
 
 		private:
 			RightLevel _privateRightLevel;

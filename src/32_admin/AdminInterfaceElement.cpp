@@ -20,19 +20,17 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <sstream>
+#include <boost/foreach.hpp>
 
 #include "HTMLModule.h"
-
 #include "FunctionRequest.h"
 #include "QueryString.h"
-
 #include "AdminRequest.h"
 #include "HomeAdmin.h"
-
 #include "Interface.h"
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -42,12 +40,6 @@ namespace synthese
 
 	namespace admin
 	{
-
-		AdminInterfaceElement::AdminInterfaceElement(const Args& args)
-		:	FactoryBase<AdminInterfaceElement>()
-		{
-		}
-
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
 			const AdminInterfaceElement& currentPage
 			, const server::FunctionRequest<admin::AdminRequest>* request
@@ -123,22 +115,23 @@ namespace synthese
 			
 			// Tree
 			tree.pageLink = adminPage->getPageLink();
+			PageLink currentLink = getPageLink();
 			
 			// Recursion
 			PageLinks pages = adminPage->getSubPages(*this, request);
-			for (AdminInterfaceElement::PageLinks::const_iterator it = pages.begin(); it != pages.end(); ++it)
+			BOOST_FOREACH(AdminInterfaceElement::PageLink link, pages)
 			{
-				position.push_back(*it);
-				if (*it == getPageLink())
+				position.push_back(link);
+				if (link == currentLink)
 				{
 					_treePosition = position;
 					tree.isNodeOpened = true;
 				}
 				
-				auto_ptr<AdminInterfaceElement>			subPage(GetAdminPage(*it));
+				auto_ptr<AdminInterfaceElement>			subPage(GetAdminPage(link));
 				AdminInterfaceElement::PageLinksTree	subTree(_buildTreeRecursion(subPage.get(), request, position));
 
-				if (*it == getPageLink())
+				if (link == currentLink)
 					subTree.isNodeOpened = true;
 
 				tree.subPages.push_back(subTree);
@@ -203,14 +196,6 @@ namespace synthese
 			if (!parameterName.empty())
 				r.getInternalParameters().insert(parameterName, parameterValue);
 			return r.getURL();
-		}
-
-
-
-		AdminInterfaceElement::Args::Args()
-
-		{
-
 		}
 	}
 }

@@ -69,7 +69,7 @@ namespace synthese
 
 
 		DepartureTableRowInterfacePage::DepartureTableRowInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

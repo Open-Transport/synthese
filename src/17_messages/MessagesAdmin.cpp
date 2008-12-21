@@ -126,6 +126,35 @@ namespace synthese
 					_searchLevel = static_cast<AlarmLevel>(num);
 
 				_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_LEVEL, 15, false);
+
+
+				SingleSentAlarmInheritedTableSync::Search(
+					_env,
+					_startDate
+					, _endDate
+					, _searchConflict
+					, _searchLevel
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAMETER_SEARCH_START
+					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
+					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
+					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
+					, _requestParameters.raisingOrder					
+				);
+				SentScenarioInheritedTableSync::Search(
+					_env,
+					_startDate
+					, _endDate
+					, std::string()
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAMETER_SEARCH_START
+					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
+					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
+					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
+					, _requestParameters.raisingOrder
+				);
 			}
 			catch (TimeParseException e)
 			{
@@ -162,39 +191,11 @@ namespace synthese
 			scenarioStopRequest.getFunction()->setPage<MessagesAdmin>();
 			
 			// Searches
-			Env env;
-			SingleSentAlarmInheritedTableSync::Search(
-				env,
-				_startDate
-				, _endDate
-				, _searchConflict
-				, _searchLevel
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAMETER_SEARCH_START
-				, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
-				, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
-				, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
-				, _requestParameters.raisingOrder					
-			);
 			ActionResultHTMLTable::ResultParameters _alarmResultParameters;
-			_alarmResultParameters.setFromResult(_requestParameters, env.getEditableRegistry<SentAlarm>());
+			_alarmResultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<SentAlarm>());
 
-			SentScenarioInheritedTableSync::Search(
-				env,
-				_startDate
-				, _endDate
-				, std::string()
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAMETER_SEARCH_START
-				, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
-				, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
-				, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
-				, _requestParameters.raisingOrder
-			);
 			html::ActionResultHTMLTable::ResultParameters _scenarioResultParameters;
-			_scenarioResultParameters.setFromResult(_requestParameters, env.getEditableRegistry<SentScenario>());
+			_scenarioResultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<SentScenario>());
 
 
 			vector<pair<StatusSearch, string> > statusMap;
@@ -239,7 +240,7 @@ namespace synthese
 			
 			stream << t1.open();
 
-			BOOST_FOREACH(shared_ptr<SentScenario> scenario, env.getRegistry<SentScenario>())
+			BOOST_FOREACH(shared_ptr<SentScenario> scenario, _env.getRegistry<SentScenario>())
 			{
 				scenarioRequest.setObjectId(scenario->getKey());
 				scenarioStopRequest.setObjectId(scenario->getKey());
@@ -314,7 +315,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<SingleSentAlarm> alarm, env.getRegistry<SingleSentAlarm>())
+			BOOST_FOREACH(shared_ptr<SingleSentAlarm> alarm, _env.getRegistry<SingleSentAlarm>())
 			{
 				alarmRequest.setObjectId(alarm->getKey());
 				stopRequest.setObjectId(alarm->getKey());

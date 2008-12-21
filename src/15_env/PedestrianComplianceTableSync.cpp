@@ -43,11 +43,23 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,PedestrianComplianceTableSync>::FACTORY_KEY("15.10.05 Pedestrian compliances");
 
+	namespace env
+	{
+		const std::string PedestrianComplianceTableSync::COL_STATUS ("status");
+		const std::string PedestrianComplianceTableSync::COL_CAPACITY ("capacity");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE_NAME = "t018_pedestrian_compliances";
-		template<> const int SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE_ID = 18;
-		template<> const bool SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE(
+			PedestrianComplianceTableSync::CreateFormat(
+				"t018_pedestrian_compliances",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(PedestrianComplianceTableSync::COL_STATUS, INTEGER),
+					SQLiteTableFormat::Field(PedestrianComplianceTableSync::COL_CAPACITY, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::Load(
 			PedestrianCompliance* cmp,
@@ -81,7 +93,7 @@ namespace synthese
 			if (object->getKey() > 0)
 			{
 				query
-					<< "UPDATE " << TABLE_NAME << " SET "
+					<< "UPDATE " << TABLE.NAME << " SET "
 					/// @todo fill fields [,]FIELD=VALUE
 					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
 			}
@@ -89,7 +101,7 @@ namespace synthese
 			{
 				object->setKey(getId());
                 query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< " INSERT INTO " << TABLE.NAME << " VALUES("
 					<< Conversion::ToString(object->getKey())
 					/// @todo fill other fields separated by ,
 					<< ")";
@@ -110,15 +122,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string PedestrianComplianceTableSync::COL_STATUS ("status");
-		const std::string PedestrianComplianceTableSync::COL_CAPACITY ("capacity");
-
 		PedestrianComplianceTableSync::PedestrianComplianceTableSync()
 			: SQLiteRegistryTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_STATUS, "INTEGER");
-			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
 		void PedestrianComplianceTableSync::Search(
@@ -129,7 +135,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"

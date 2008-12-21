@@ -1,4 +1,4 @@
-
+////////////////////////////////////////////////////////////////////
 /// DisplayType class header.
 ///	@file DisplayType.h
 ///	@author Hugues Romain
@@ -20,6 +20,7 @@
 ///	You should have received a copy of the GNU General Public License
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_DisplayType_H__
 #define SYNTHESE_DisplayType_H__
@@ -38,9 +39,16 @@ namespace synthese
 
 	namespace departurestable
 	{
-		/** Type of display screen, describing the input and output facilities.
-			@ingroup m54
-		*/
+		////////////////////////////////////////////////////////////////////
+		/// Type of display screen, describing the input and output facilities.
+		///	@ingroup m54
+		///
+		/// NULL pointers on interface attributes seems that the display type
+		/// is not able to use the corresponding media :
+		///		- display : No display can be produced
+		///		- audio : No audio reading can be produced
+		///		- monitoring : The display type cannot be monitored
+		////////////////////////////////////////////////////////////////////
 		class DisplayType
 		:	public virtual util::Registrable
 		{
@@ -51,23 +59,47 @@ namespace synthese
 
 		private:
 			std::string						_name;
-			const interfaces::Interface*	_interf;
+			const interfaces::Interface*	_displayInterface;				//!< On screen display Interface
+			const interfaces::Interface*	_audioInterface;		//!< Interface providing exchange with a vocal reading system
+			const interfaces::Interface*	_monitoringInterface;	//!< Interface used to parse monitoring outputs (see DisplayMonitoringStatus)
 			int								_rowNumber;
 			int								_maxStopsNumber;
+			int								_timeBetweenChecks;		//!< Time between monitoring checks (0 = no value)
 
 		public:
+			
+			
+			////////////////////////////////////////////////////////////////////
+			///	DisplayType constructor.
+			///	@param key ID of the object
+			///	@author Hugues Romain
+			///	@date 2008
+			///
+			/// Initializes all interface pointers to NULL
+			////////////////////////////////////////////////////////////////////
 			DisplayType(util::RegistryKeyType key = UNKNOWN_VALUE);
 
-			const std::string& getName() const;
-			const interfaces::Interface* getInterface() const;
-			int getRowNumber() const;
-			int getMaxStopsNumber() const;
+			//! @name Getters
+			//@{
+				const std::string&				getName()					const;
+				const interfaces::Interface*	getDisplayInterface()		const;
+				const interfaces::Interface*	getAudioInterface()			const;
+				const interfaces::Interface*	getMonitoringInterface()	const;
+				int								getRowNumber()				const;
+				int								getMaxStopsNumber()			const;
+				int								getTimeBetweenChecks()		const;
+			//@}
 
-			void setName(const std::string& name);
-			void setInterface(const interfaces::Interface* interf);
-			void setRowNumber(int number);
-			void setMaxStopsNumber(int number);
-
+			//! @name Setters
+			//@{
+				void setName(const std::string& name);
+				void setDisplayInterface(const interfaces::Interface* interf);
+				void setAudioInterface(const interfaces::Interface* value);
+				void setMonitoringInterface(const interfaces::Interface* value);
+				void setRowNumber(int number);
+				void setMaxStopsNumber(int number);
+				void setTimeBetweenChecks(int value);
+			//@}
 		};
 	}
 }

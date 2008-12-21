@@ -40,7 +40,7 @@ namespace synthese
 
 
 		RoutePlannerNoSolutionInterfacePage::RoutePlannerNoSolutionInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

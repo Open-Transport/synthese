@@ -47,11 +47,24 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,BikeComplianceTableSync>::FACTORY_KEY("15.10.03 Bike compliances");
 	}
 
+	namespace env
+	{
+		const std::string BikeComplianceTableSync::COL_STATUS ("status");
+		const std::string BikeComplianceTableSync::COL_CAPACITY ("capacity");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<BikeComplianceTableSync>::TABLE_NAME = "t020_bike_compliances";
-		template<> const int SQLiteTableSyncTemplate<BikeComplianceTableSync>::TABLE_ID = 20;
-		template<> const bool SQLiteTableSyncTemplate<BikeComplianceTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<BikeComplianceTableSync>::TABLE(
+			BikeComplianceTableSync::CreateFormat(
+				"t020_bike_compliances",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(BikeComplianceTableSync::COL_STATUS, INTEGER),
+					SQLiteTableFormat::Field(BikeComplianceTableSync::COL_CAPACITY, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+			)
+		);
 
 		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::Load(
 			BikeCompliance* cmp,
@@ -93,7 +106,7 @@ namespace synthese
 			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
 			query
-				<< "REPLACE " << TABLE_NAME << " VALUES("
+				<< "REPLACE " << TABLE.NAME << " VALUES("
 				<< object->getKey() << ','
 				<< Conversion::ToString(object->isCompliant()) << ","
 				<< object->getCapacity()
@@ -105,15 +118,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string BikeComplianceTableSync::COL_STATUS ("status");
-		const std::string BikeComplianceTableSync::COL_CAPACITY ("capacity");
-		
 		BikeComplianceTableSync::BikeComplianceTableSync()
 			: SQLiteRegistryTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_STATUS, "INTEGER");
-			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
 		void BikeComplianceTableSync::Search(
@@ -125,7 +132,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1"
 				;
 			if (number > 0)

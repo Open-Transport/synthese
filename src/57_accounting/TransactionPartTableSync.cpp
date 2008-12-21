@@ -59,8 +59,8 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE_NAME = "t030_transaction_parts";
-		template<> const int SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE_ID = 30;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE.NAME = "t030_transaction_parts";
+		template<> const int SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE.ID = 30;
 		template<> const bool SQLiteTableSyncTemplate<TransactionPartTableSync>::HAS_AUTO_INCREMENT = true;
 
 		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::load(TransactionPart* tp, const db::SQLiteResultSPtr& rows )
@@ -98,7 +98,7 @@ namespace synthese
 				if (!tp->getKey())
 					tp->setKey(getId());
 				stringstream query;
-				query << "REPLACE INTO " << TABLE_NAME << " VALUES("
+				query << "REPLACE INTO " << TABLE.NAME << " VALUES("
 					<< Conversion::ToString(tp->getKey())
 					<< "," << Conversion::ToString(tp->getTransactionId())
 					<< "," << Conversion::ToString(tp->getLeftCurrencyAmount())
@@ -162,7 +162,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT * "
-				<< " FROM " << TABLE_NAME << " AS p "
+				<< " FROM " << TABLE.NAME << " AS p "
 				<< " WHERE "
 				<< " p." << TABLE_COL_TRANSACTION_ID << "=" << Conversion::ToString(transaction->getKey());
 			if (account != NULL)
@@ -196,9 +196,9 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT * "
-				<< " FROM " << TABLE_NAME << " AS p "
-				<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
-				<< " INNER JOIN " << AccountTableSync::TABLE_NAME << " AS a ON a." << TABLE_COL_ID << "=p." << TABLE_COL_ACCOUNT_ID
+				<< " FROM " << TABLE.NAME << " AS p "
+				<< " INNER JOIN " << TransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
+				<< " INNER JOIN " << AccountTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=p." << TABLE_COL_ACCOUNT_ID
 				<< " WHERE "
 				<< " a." << AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE " << Conversion::ToSQLiteString(accountCode)
 			;
@@ -233,8 +233,8 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT * "
-				<< " FROM " << TABLE_NAME << " AS p "
-				<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
+				<< " FROM " << TABLE.NAME << " AS p "
+				<< " INNER JOIN " << TransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
 				<< " WHERE "
 				<< " p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
 			;
@@ -264,8 +264,8 @@ namespace synthese
 			query
 				<< " SELECT strftime('%H', t.start_date_time) AS hours,"
 					<< " count(t." << TABLE_COL_ID << ") AS numbers "
-				<< " FROM " << TABLE_NAME << " AS p "
-					<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
+				<< " FROM " << TABLE.NAME << " AS p "
+					<< " INNER JOIN " << TransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
 				<< " WHERE "
 					<< " p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
 					<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<=" << endDate.toSQLString()
@@ -291,8 +291,8 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT sum(p." << TABLE_COL_LEFT_CURRENCY_AMOUNT << ") AS sum"
-				<< " FROM " << TABLE_NAME << " AS p "
-				<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
+				<< " FROM " << TABLE.NAME << " AS p "
+				<< " INNER JOIN " << TransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
 				<< " WHERE "
 				<< " p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
 				<< " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user.get() ? user->getKey() : 0)

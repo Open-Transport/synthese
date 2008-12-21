@@ -52,11 +52,17 @@ namespace synthese
 		{
 		}
 
-		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels()
+		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels(bool withNo)
 		{
 			vector<pair<uid, string> > m;
+			if (withNo)
+			{
+				m.push_back(make_pair(uid(0), "(aucune)"));
+			}
 			BOOST_FOREACH(shared_ptr<Interface> interf, Env::GetOfficialEnv()->getRegistry<Interface>())
+			{
 				m.push_back(make_pair(interf->getKey(), interf->getName()));
+			}
 			return m;
 		}
 

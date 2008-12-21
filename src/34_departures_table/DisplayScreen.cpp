@@ -67,7 +67,6 @@ namespace synthese
 			, _blinkingDelay(1)
 			, _clearingDelay(0)
 			, _firstRow(0)
-			, _maintenanceChecksPerDay(24 * 60)		// default = 1 check per minute
 			, _allPhysicalStopsDisplayed(false)
 			, _trackNumberDisplay(false)
 			, _serviceNumberDisplay(false)
@@ -239,10 +238,6 @@ namespace synthese
 			_generationMethod = method;
 		}
 
-		void DisplayScreen::setMaintenanceChecksPerDay( int number )
-		{
-			_maintenanceChecksPerDay = number;
-		}
 
 		void DisplayScreen::setMaintenanceIsOnline( bool value )
 		{
@@ -256,7 +251,7 @@ namespace synthese
 
 		void DisplayScreen::display( std::ostream& stream, const DateTime& date ) const
 		{
-			if (!_displayType || !_displayType->getInterface() || !_maintenanceIsOnline)
+			if (!_displayType || !_displayType->getDisplayInterface() || !_maintenanceIsOnline)
 				return;
 
 			try
@@ -265,7 +260,7 @@ namespace synthese
 				ArrivalDepartureListWithAlarm displayedObject;
 				displayedObject.map = generator->generate();
 				displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
-				const DeparturesTableInterfacePage* page(_displayType->getInterface()->getPage<DeparturesTableInterfacePage>());
+				const DeparturesTableInterfacePage* page(_displayType->getDisplayInterface()->getPage<DeparturesTableInterfacePage>());
 				VariablesMap variables;
 				
 				page->display(
@@ -368,10 +363,7 @@ namespace synthese
 			return _destinationForceDelay;
 		}
 
-		int DisplayScreen::getMaintenanceChecksPerDay() const
-		{
-			return _maintenanceChecksPerDay;
-		}
+
 
 		bool DisplayScreen::getIsOnline() const
 		{
@@ -388,13 +380,6 @@ namespace synthese
 			return _displayType;
 		}
 
-		void DisplayScreen::recordSupervision(const std::string& text ) const
-		{
-
-			const Interface* interf(_displayType->getInterface());
-//			DisplayMaintenanceLog::addControlEntry(this, level, text);
-			
-		}
 
 		void DisplayScreen::setAllPhysicalStopsDisplayed( bool value )
 		{
@@ -499,7 +484,6 @@ namespace synthese
 			setFirstRow(other->getFirstRow());
 			setGenerationMethod(other->getGenerationMethod());
 			setLocalization(other->getLocalization());
-			setMaintenanceChecksPerDay(other->getMaintenanceChecksPerDay());
 			setMaxDelay(other->getMaxDelay());
 			setOriginsOnly(other->getEndFilter());
 			setServiceNumberDisplay(other->getServiceNumberDisplay());
@@ -517,15 +501,6 @@ namespace synthese
 				addPhysicalStop(it->second);
 		}
 
-		const DisplayScreen::Complements& DisplayScreen::getComplements() const
-		{
-			return _complements;
-		}
-
-		void DisplayScreen::setComplements( const Complements& complements )
-		{
-			_complements = complements;
-		}
 
 		void DisplayScreen::setDisplayTeam( bool value )
 		{

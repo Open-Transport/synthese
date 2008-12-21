@@ -43,9 +43,9 @@ namespace synthese
 			return _rowNumber;
 		}
 
-		const Interface* DisplayType::getInterface() const
+		const Interface* DisplayType::getDisplayInterface() const
 		{
-			return _interf;
+			return _displayInterface;
 		}
 
 		const std::string& DisplayType::getName() const
@@ -54,9 +54,14 @@ namespace synthese
 		}
 
 		DisplayType::DisplayType(util::RegistryKeyType id)
-			: Registrable(id)
+		:	Registrable(id),
+			_displayInterface(NULL),
+			_audioInterface(NULL),
+			_monitoringInterface(NULL),
+			_timeBetweenChecks(0),
+			_rowNumber(1),
+			_maxStopsNumber(UNKNOWN_VALUE)
 		{
-			
 		}
 
 
@@ -66,9 +71,9 @@ namespace synthese
 			_rowNumber = number;
 		}
 
-		void DisplayType::setInterface(const Interface* interf )
+		void DisplayType::setDisplayInterface(const Interface* interf )
 		{
-			_interf = interf;
+			_displayInterface = interf;
 		}
 
 		void DisplayType::setName( const std::string& name )
@@ -84,6 +89,53 @@ namespace synthese
 		int DisplayType::getMaxStopsNumber() const
 		{
 			return _maxStopsNumber;
+		}
+
+
+
+		void DisplayType::setMonitoringInterface(
+			const interfaces::Interface* value
+			) {
+			_monitoringInterface = value;
+		}
+
+
+
+		void DisplayType::setAudioInterface(
+			const interfaces::Interface* value
+			) {
+			_audioInterface = value;
+		}
+
+
+
+		const interfaces::Interface* DisplayType::getMonitoringInterface(
+
+			) const {
+			return _monitoringInterface;
+		}
+
+
+
+		const interfaces::Interface* DisplayType::getAudioInterface(
+
+			) const {
+			return _audioInterface;
+		}
+
+
+
+		void DisplayType::setTimeBetweenChecks(
+			int value
+		) {
+			_timeBetweenChecks = value;
+		}
+
+
+
+		int DisplayType::getTimeBetweenChecks(
+		) const {
+			return _timeBetweenChecks;
 		}
 	}
 }

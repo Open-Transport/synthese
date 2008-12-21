@@ -24,6 +24,7 @@
 #define SYNTHESE_Action_H__
 
 #include "FactoryBase.h"
+#include "Env.h"
 
 #define Action_PARAMETER_PREFIX std::string("actionParam")
 
@@ -48,20 +49,15 @@ namespace synthese
 		:	public util::FactoryBase<Action>
 		{
 		public:
-			/// Optional arguments for factory.
-			struct Args
-			{
-
-			};
 
 		protected:
 			Request* _request;
+			mutable util::Env	_env;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
-			/// @param args arguments
 			//////////////////////////////////////////////////////////////////////////
-			Action(Args args = Args());
+			Action();
 
 		private:
 

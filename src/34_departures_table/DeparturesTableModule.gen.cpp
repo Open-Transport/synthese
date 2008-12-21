@@ -20,11 +20,11 @@ synthese::departurestable::DisplayTypesAdmin::integrate();
 synthese::departurestable::BroadcastPointsAdmin::integrate();
 synthese::departurestable::DisplayAdmin::integrate();
 synthese::departurestable::DisplayMaintenanceAdmin::integrate();
-
+synthese::departurestable::DisplayTypeAdmin::integrate();
 
 synthese::departurestable::DisplayTypeTableSync::integrate();
 synthese::departurestable::DisplayScreenTableSync::integrate();
-
+synthese::departurestable::DisplayMonitoringStatusTableSync::integrate();
 
 synthese::departurestable::CreateDisplayTypeAction::integrate();
 synthese::departurestable::UpdateDisplayTypeAction::integrate();
@@ -54,10 +54,10 @@ synthese::departurestable::DisplayMaintenanceRight::integrate();
 
 synthese::departurestable::ArrivalDepartureTableLog::integrate();
 synthese::departurestable::DisplayMaintenanceLog::integrate();
-synthese::departurestable::DisplayDataControlLog::integrate();
 
 synthese::departurestable::DisplayScreenAlarmRecipient::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::departurestable::DisplayScreen>();
 synthese::util::Env::Integrate<synthese::departurestable::DisplayType>();
+synthese::util::Env::Integrate<synthese::departurestable::DisplayMonitoringStatus>();

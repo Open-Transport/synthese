@@ -77,7 +77,7 @@ namespace synthese
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(obj->getKey())
 				<< ",0"
 				<< "," << Conversion::ToString(obj->getIsEnabled())
@@ -91,7 +91,7 @@ namespace synthese
 			stringstream alarmquery;
 			alarmquery
 				<< "UPDATE "
-				<< AlarmTableSync::TABLE_NAME
+				<< AlarmTableSync::TABLE.NAME
 				<< " SET "
 				<< AlarmTableSync::COL_PERIODSTART << "=" << obj->getPeriodStart().toSQLString()
 				<< "," << AlarmTableSync::COL_PERIODEND << "=" << obj->getPeriodEnd().toSQLString()
@@ -126,7 +126,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				<< COL_IS_TEMPLATE << "=0";
 			if (!startDate.isUnknown())

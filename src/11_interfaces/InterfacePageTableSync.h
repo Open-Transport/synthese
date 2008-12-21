@@ -50,7 +50,6 @@ namespace synthese
 			*/
 			InterfacePageTableSync();
 
-		protected:
 
 			void rowsAdded (db::SQLite* sqlite, 
 				db::SQLiteSync* sync,

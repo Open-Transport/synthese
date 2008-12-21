@@ -74,7 +74,7 @@ namespace synthese
 
 
 		DateTimeInterfacePage::DateTimeInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

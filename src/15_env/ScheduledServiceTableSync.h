@@ -78,18 +78,6 @@ namespace synthese
 				, bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
-
-
-
-			/** The schedules indexes of each linestop are updated after the whole first sync.
-				@param sqlite SQLite thread
-				@param sync SQLite synchonizer
-				@author Hugues Romain
-				@date 2007				
-			*/
-			void afterFirstSync (db::SQLite* sqlite, 
-				db::SQLiteSync* sync);
-
 		};
 	}
 }

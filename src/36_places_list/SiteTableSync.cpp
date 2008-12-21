@@ -21,15 +21,10 @@
 */
 
 #include "SiteTableSync.h"
-
 #include "Site.h"
-
 #include "Conversion.h"
-
 #include "SQLiteResult.h"
-
 #include "Date.h"
-
 #include "Interface.h"
 #include "InterfaceTableSync.h"
 
@@ -53,11 +48,38 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,SiteTableSync>::FACTORY_KEY("36.01 Site");
 	}
 
+	namespace transportwebsite
+	{
+		const string SiteTableSync::TABLE_COL_NAME = "name";
+		const string SiteTableSync::COL_INTERFACE_ID = "interface_id";
+		const string SiteTableSync::TABLE_COL_START_DATE = "start_date";
+		const string SiteTableSync::TABLE_COL_END_DATE = "end_date";
+		const string SiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
+		const string SiteTableSync::TABLE_COL_USE_OLD_DATA = "use_old_data";
+		const string SiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
+		const string SiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
+		const string SiteTableSync::COL_PERIODS("periods");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<SiteTableSync>::TABLE_NAME = "t025_sites";
-		template<> const int SQLiteTableSyncTemplate<SiteTableSync>::TABLE_ID = 25;
-		template<> const bool SQLiteTableSyncTemplate<SiteTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<SiteTableSync>::TABLE(
+			SiteTableSync::CreateFormat(
+				"t025_sites",
+				SQLiteTableFormat::CreateFields(
+				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_NAME, TEXT),
+				SQLiteTableFormat::Field(SiteTableSync::COL_INTERFACE_ID, INTEGER),
+				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_START_DATE, DATE),
+				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_END_DATE, DATE),
+				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_ONLINE_BOOKING, INTEGER),
+				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_USE_OLD_DATA, INTEGER),
+				SQLiteTableFormat::Field(SiteTableSync::COL_MAX_CONNECTIONS, INTEGER),
+				SQLiteTableFormat::Field(SiteTableSync::COL_USE_DATES_RANGE, INTEGER),
+				SQLiteTableFormat::Field(SiteTableSync::COL_PERIODS, TEXT),
+				SQLiteTableFormat::Field()
+			), SQLiteTableFormat::Indexes()
+		)	);
+
 
 		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Load(
 			Site* site,
@@ -115,7 +137,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Save(Site* site)
 		{
 			stringstream query;
-			query << " REPLACE INTO " << TABLE_NAME << " VALUES("
+			query << " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< site->getKey()
 				<< "," << Conversion::ToSQLiteString(site->getName())
 				<< "," << (site->getInterface() ? site->getInterface()->getKey() : static_cast<uid>(UNKNOWN_VALUE))
@@ -144,31 +166,9 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		const string SiteTableSync::TABLE_COL_NAME = "name";
-		const string SiteTableSync::COL_INTERFACE_ID = "interface_id";
-		const string SiteTableSync::TABLE_COL_START_DATE = "start_date";
-		const string SiteTableSync::TABLE_COL_END_DATE = "end_date";
-		const string SiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
-		const string SiteTableSync::TABLE_COL_USE_OLD_DATA = "use_old_data";
-		const string SiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
-		const string SiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
-		const string SiteTableSync::COL_PERIODS("periods");
-
-		
-
 		SiteTableSync::SiteTableSync()
 			: db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
-			addTableColumn(COL_INTERFACE_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_START_DATE, "DATE", true);
-			addTableColumn(TABLE_COL_END_DATE, "DATE", true);
-			addTableColumn(TABLE_COL_ONLINE_BOOKING, "INTEGER", true);
-			addTableColumn(TABLE_COL_USE_OLD_DATA, "INTEGER", true);
-			addTableColumn(COL_MAX_CONNECTIONS, "INTEGER", true);
-			addTableColumn(COL_USE_DATES_RANGE, "INTEGER", true);
-			addTableColumn(COL_PERIODS, "TEXT", true);
 		}
 
 
@@ -183,7 +183,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (!name.empty())
 			 	query << " AND " << TABLE_COL_NAME << " LIKE '" << Conversion::ToSQLiteString(name, false) << "'";

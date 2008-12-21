@@ -72,19 +72,6 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
     
     void eventCallback (SQLiteHandle* emitter,
 			const SQLiteEvent& event);
-
-    /** Adds a new table synchronizer to this global synchronizer update hook.
-	This method is thread-safe.
-		@param rank Rank of the synchroniser in the load procedure
-		@param synchroniser The synchronizer singleton to store
-    */
-	void addTableSynchronizer (const std::string& rank, boost::shared_ptr<SQLiteTableSync> synchronizer);
-
-    bool hasTableSynchronizer (const std::string& tableName) const;
-	boost::shared_ptr<SQLiteTableSync> getTableSynchronizer (const std::string& tableName) const;
-	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > getTableSynchronizers () const;
-
-
 };
 
 

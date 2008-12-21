@@ -50,11 +50,6 @@ namespace synthese
 		:	public util::FactoryBase<Renderer>
 		{
 		public:
-			/// Optional arguments for factory.
-			struct Args
-			{
-
-			};
 
 		protected:
 

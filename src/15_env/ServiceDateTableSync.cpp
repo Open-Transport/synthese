@@ -47,30 +47,43 @@ namespace synthese
 	using namespace time;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,env::ServiceDateTableSync>::FACTORY_KEY("15.70.01 Service dates");
-	
+
+	namespace env
+	{
+		const string ServiceDateTableSync::COL_SERVICEID ("service_id");
+		const string ServiceDateTableSync::COL_DATE("date");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ServiceDateTableSync>::TABLE_NAME = "t005_service_dates";
-		template<> const int SQLiteTableSyncTemplate<ServiceDateTableSync>::TABLE_ID = 5;
-		template<> const bool SQLiteTableSyncTemplate<ServiceDateTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ServiceDateTableSync>::TABLE(
+			"t005_service_dates",
+			true,
+			TRIGGERS_ENABLED_CLAUSE,
+			false,
+			true,
+			SQLiteTableFormat::CreateFields(
+				SQLiteTableFormat::Field(TABLE_COL_ID, INTEGER, false),
+				SQLiteTableFormat::Field(ServiceDateTableSync::COL_SERVICEID, INTEGER, false),
+				SQLiteTableFormat::Field(ServiceDateTableSync::COL_DATE, DATE, false),
+				SQLiteTableFormat::Field()
+			), SQLiteTableFormat::CreateIndexes(
+				SQLiteTableFormat::Index(
+					"servicedate",
+					SQLiteTableFormat::Index::CreateFieldsList(
+						ServiceDateTableSync::COL_SERVICEID,
+						ServiceDateTableSync::COL_DATE,
+						string()
+				)	),
+				SQLiteTableFormat::Index()
+		)	);
 	}
 
 	namespace env
 	{
-		const std::string ServiceDateTableSync::COL_SERVICEID ("service_id");
-		const std::string ServiceDateTableSync::COL_DATE("date");
-
 		ServiceDateTableSync::ServiceDateTableSync()
 			: SQLiteTableSyncTemplate<ServiceDateTableSync>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_SERVICEID, "INTEGER", false);
-			addTableColumn (COL_DATE , "DATE", false);
-			
-			vector<string> cols;
-			cols.push_back(COL_SERVICEID);
-			cols.push_back(COL_DATE);
-			addTableIndex(cols);
 		}
 
 		void ServiceDateTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
@@ -136,7 +149,7 @@ namespace synthese
 				object->key = getId();	
 
 			query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->key)
 				<< "," << Conversion::ToString(object->service->getId())
 				<< "," << object->date.toSQLString()
@@ -147,12 +160,12 @@ namespace synthese
 
 
 
-		std::vector<time::Date> ServiceDateTableSync::GetDatesOfService( uid serviceId )
+		vector<time::Date> ServiceDateTableSync::GetDatesOfService( uid serviceId )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 
-			query << "SELECT " << COL_DATE << " FROM " << TABLE_NAME << " WHERE " << COL_SERVICEID << "=" << serviceId << " ORDER BY " << COL_DATE;
+			query << "SELECT " << COL_DATE << " FROM " << TABLE.NAME << " WHERE " << COL_SERVICEID << "=" << serviceId << " ORDER BY " << COL_DATE;
 			
 			try
 			{

@@ -206,7 +206,7 @@ namespace synthese
 
 		void ResaModule::DisplayResaDBLog(
 			ostream& stream
-			, Env& logEnv
+			, const Env& logEnv
 			, const std::string& parameterDate
 			, server::FunctionRequest<admin::AdminRequest>& searchRequest
 			, server::ActionFunctionRequest<CancelReservationAction,admin::AdminRequest>& cancelRequest

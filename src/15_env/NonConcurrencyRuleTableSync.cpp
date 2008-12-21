@@ -48,17 +48,30 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,NonConcurrencyRuleTableSync>::FACTORY_KEY("15.25.02 Non concurrency rules");
 	}
 	
+	namespace env
+	{
+		const std::string NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID("priority_line_id");
+		const std::string NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID("hidden_line_id");
+		const std::string NonConcurrencyRuleTableSync::COL_DELAY("delay");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE_NAME("t056_non_concurrency_rules");
-		template<> const int SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE_ID(56);
-		template<> const bool SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::HAS_AUTO_INCREMENT(true);
-
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE(
+			NonConcurrencyRuleTableSync::CreateFormat(
+				"t056_non_concurrency_rules",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, INTEGER, false),
+					SQLiteTableFormat::Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, INTEGER, false),
+					SQLiteTableFormat::Field(NonConcurrencyRuleTableSync::COL_DELAY, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 
 		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(
-			NonConcurrencyRule* object
-			, const db::SQLiteResultSPtr& rows,
+			NonConcurrencyRule* object,
+			const db::SQLiteResultSPtr& rows,
 			Env* env,
 			LinkLevel linkLevel
 		){
@@ -84,7 +97,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -105,19 +118,9 @@ namespace synthese
 	
 	namespace env
 	{
-		const std::string NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID("priority_line_id");
-		const std::string NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID("hidden_line_id");
-		const std::string NonConcurrencyRuleTableSync::COL_DELAY("delay");
-
-
-
 		NonConcurrencyRuleTableSync::NonConcurrencyRuleTableSync()
 			: SQLiteRegistryTableSyncTemplate<NonConcurrencyRuleTableSync, NonConcurrencyRule>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_PRIORITY_LINE_ID, "INTEGER", false);
-			addTableColumn(COL_HIDDEN_LINE_ID, "INTEGER", false);
-			addTableColumn(COL_DELAY, "INTEGER", true);
 		}
 
 		void NonConcurrencyRuleTableSync::Search(
@@ -136,7 +139,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
 				query << " AND (";

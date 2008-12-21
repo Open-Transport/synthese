@@ -50,100 +50,86 @@ namespace synthese
 			@ingroup ref
 		*/
 
-		/// Base class for an SQLite table synchronizer.
+		////////////////////////////////////////////////////////////////////
+		/// Interface for an SQLite table synchronizer.
 		///	By convention, the table name must always start with the t letter
 		///	followed by a unique 3 digits integer (SQLite does not allow ids starting with number).
 		///
 		///	@ingroup m10
-		///
+		////////////////////////////////////////////////////////////////////
 		class SQLiteTableSync : public util::FactoryBase<SQLiteTableSync>
 		{
+		protected:
+			////////////////////////////////////////////////////////////////////
+			///	SQLiteTableSync constructor.
+			////////////////////////////////////////////////////////////////////
+			SQLiteTableSync();
+
+
+
+
 		private:
-
-		    const bool _allowInsert;
-		    const bool _allowRemove;
-		    const std::string _triggerOverrideClause;
-		    bool _ignoreCallbacksOnFirstSync;
-		    bool _enableTriggers;
-		    
-		    const std::string _tableName;
-		    SQLiteTableFormat _tableFormat;
-
+	
 		    std::vector<std::string> _selectOnCallbackColumns;
 
 		public:
 
-			virtual void initAutoIncrement();
-
-			/// Optional arguments for factory.
-			struct Args
-			{
-			    bool allowInsert;
-			    bool allowRemove;
-			    std::string triggerOverrideClause;
-			    bool ignoreCallbacksOnFirstSync;
-			    bool enableTriggers;
-
-			    Args (bool allowInsertArg = true, 
-				  bool allowRemoveArg = true,
-				  const std::string& triggerOverrideClauseArg = "1",
-				  bool ignoreCallbacksOnFirstSyncArg = false,
-				  bool enableTriggersArg = true
-				):	allowInsert (allowInsertArg)
-				, allowRemove (allowRemoveArg)
-				, triggerOverrideClause (triggerOverrideClauseArg)
-				, ignoreCallbacksOnFirstSync (ignoreCallbacksOnFirstSyncArg)
-				, enableTriggers (enableTriggersArg)
-			    {}
-
-			};
-
-
-			SQLiteTableSync (const Args& args = Args ());
-
+			////////////////////////////////////////////////////////////////////
+			///	SQLiteTableSync destructor.
+			////////////////////////////////////////////////////////////////////
 			~SQLiteTableSync ();
 
-			virtual const std::string& getTableName () const = 0;
+			//! @name Virtual access to static methods
+			//@{
+				////////////////////////////////////////////////////////////////////
+				///	Table format virtual getter.
+				///	@return const SQLiteTableFormat& Format of the table
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				virtual const SQLiteTableFormat& getFormat() const = 0;
 
-			/** Returns the unique integer identifying a table.
-				@return The unique integer identifying a table
-			*/
-			int getTableId () const;
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	Auto increment initializer.
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				virtual void initAutoIncrement() const = 0;
 
-			const SQLiteTableFormat& getTableFormat () const;
+				
 
-			bool getIgnoreCallbacksOnFirstSync () const;
-			void setIgnoreCallbacksOnFirstSync (bool ignoreCallbacksOnFirstSync);
+				////////////////////////////////////////////////////////////////////
+				///	Launch of the first synchronization between the tables and the
+				/// memory.
+				///
+				/// This method is called when the synchronizer is created
+				///	to synchronize it with pre-existing data in db.
+				///
+				///	It creates ou updates all the needed tables and indexes.
+				/// Note : It does not delete any useless table present in the database.
+				///
+				///	@param sqlite
+				///	@param sync
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				virtual void firstSync(SQLite* sqlite, SQLiteSync* sync) const = 0;
 
-			void setEnableTriggers (bool enableTriggers);
 
-			void updateSchema (synthese::db::SQLite* sqlite);
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	Updates the schema of the tables at the program launch.
+				///	@param sqlite
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				virtual void updateSchema(SQLite* sqlite) const = 0;
+			//@}
 
-			/** First synchronisation.
-				This method is called when the synchronizer is created
-				to synchronize it with pre-existing data in db.
-
-				It creates ou updates all the needed tables and indexes.
-
-				Note : It does not delete any useless table present in the database.
-			*/
-			void firstSync (synthese::db::SQLite* sqlite, 
-					synthese::db::SQLiteSync* sync);
 			
-			/** This method can be overriden to invoke some code before
-			    executing firstSync body.
-			    Default implementation is doing nothing.
-			*/
-			virtual void beforeFirstSync (SQLite* sqlite, 
-						      SQLiteSync* sync);
-
-			/** This method can be overriden to invoke some code after
-			    having executed firstSync body.
-			    Default implementation is doing nothing.
-			*/
-			virtual void afterFirstSync (SQLite* sqlite, 
-						     SQLiteSync* sync);
-
 			virtual void rowsAdded (SQLite* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResultSPtr& rows, bool isFirstSync = false) = 0;
@@ -159,105 +145,13 @@ namespace synthese
 			/** Utility method to get a row by id.
 			    This uses a precompiled statement for performance 
 			*/
-			SQLiteResultSPtr getRowById (synthese::db::SQLite* sqlite, const uid& id) const;
+			virtual SQLiteResultSPtr getRowById(
+				SQLite* sqlite,
+				util::RegistryKeyType id
+			) const = 0;
 
-		protected:
-
-			/** By default, return first column name.
-			 */
-			virtual const std::string& getPrimaryKey () const;
-
-
-			void addTableColumn (const std::string& columnName, 
-					     const std::string& columnType, 
-					     bool updatable = true,
-					     bool selectOnCallback = true
-			    );
-
-			/** Adds a multi-column index in the table description.
-				@param columns Vector of column names
-				@param name Name of the index. Optional : if not specified or empty, the name is the concatenation of the columns names
-			*/
-			void addTableIndex(const std::vector<std::string>& columns, std::string name = "");
-
-			/** Adds a single column index in the table description.
-				@param column column name
-				@param name Name of the index. Optional : if not specified or empty, the name is identical to the column name.
-			*/
-			void addTableIndex(const std::string& column, std::string name = "");
-
-		protected:
-
-			static int ParseTableId (const std::string& tableName);
-
-
-		private:
-
-			std::string getTriggerOverrideClause () const;
-
-
-			/** Creates table in SQLite db according to this class
-			 * table format.
-			 *
-			 * @param tableSchema Required table schema.
-			 */
-			void createTable (synthese::db::SQLite* sqlite,
-					  const std::string& tableSchema,
-					  const std::string& triggerNoInsert,
-					  const std::string& triggerNoRemove,
-					  const std::string& triggerNoUpdate);
-
-			/** Adapts table in SQLite db to conform to this class 
-			 * table format.
-			 * Right now, only new column addition/insertion is supported.
-			 * Any other change to table schema is not supported yet.
-			 *
-			 * @param tableSchema Required table schema.
-			 * @param dbSchema Actual table schema in db.
-			 */
-			void adaptTable (synthese::db::SQLite* sqlite,
-					 const std::string& tableSchema,
-					 const std::string& triggerNoInsert,
-					 const std::string& triggerNoRemove,
-					 const std::string& triggerNoUpdate);
 			
-
-			std::string getSelectOnCallbackColumnsClause () const;
-
-
 		public:
-
-			/** Creates the SQL statement to create a table in db
-			 * given a certain format.
-			 */
-			static std::string CreateSQLSchema (const std::string& tableName,
-							    const SQLiteTableFormat& format);
-
-			/** Creates the SQL statement to crate an index in the database given a certain format.
-				@param tableName The table name
-				@param format The format of the table containing the indexes description
-				@return std::string The SQL statement
-				@author Hugues Romain
-				@date 2007
-
-				Note : the real index name in the database is the concatenation of the table name and the name specified in the table format separated by a _ character.
-			*/
-			static std::string CreateIndexSQLSchema(const std::string& tableName, const SQLiteTableIndexFormat& format);
-			
-			static std::string CreateTriggerNoInsert (
-			    const std::string& tableName,
-			    const std::string& triggerOverrideClause);
-			
-			static std::string CreateTriggerNoRemove (
-			    const std::string& tableName,
-			    const std::string& triggerOverrideClause);
-			
-			static std::string CreateTriggerNoUpdate (
-			    const std::string& tableName,
-			    const SQLiteTableFormat& format,
-			    const std::string& triggerOverrideClause);
-			
-
 
 
 			static std::vector<std::string> 
@@ -267,13 +161,6 @@ namespace synthese
 			static std::string GetSQLSchemaDb (synthese::db::SQLite* sqlite,
 							   const std::string& tableName);
 			
-			static std::string GetTriggerNoInsertDb (
-			    synthese::db::SQLite* sqlite,
-			    const std::string& tableName);
-
-			static std::string GetTriggerNoRemoveDb (
-			    synthese::db::SQLite* sqlite,
-			    const std::string& tableName);
 
 			static std::string GetTriggerNoUpdateDb (
 			    synthese::db::SQLite* sqlite,

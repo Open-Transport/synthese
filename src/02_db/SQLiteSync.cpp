@@ -22,16 +22,18 @@
 
 #include <sqlite3.h>
 #include <assert.h>
+#include <boost/foreach.hpp>
 
-#include "01_util/Conversion.h"
-#include "01_util/Log.h"
-
+#include "Conversion.h"
+#include "Log.h"
+#include "Factory.h"
 #include "02_db/Constants.h"
-#include "02_db/SQLiteHandle.h"
-#include "02_db/SQLiteTableSync.h"
-#include "02_db/SQLiteCachedResult.h"
-#include "02_db/SQLiteException.h"
-#include "02_db/SQLiteSync.h"
+#include "SQLiteHandle.h"
+#include "SQLiteTableSync.h"
+#include "SQLiteCachedResult.h"
+#include "SQLiteException.h"
+#include "SQLiteSync.h"
+#include "DBModule.h"
 
 using namespace std;
 using namespace boost;
@@ -55,49 +57,6 @@ namespace synthese
 		SQLiteSync::~SQLiteSync ()
 		{
 		}
-
-		 
-
-		void 
-		SQLiteSync::addTableSynchronizer (const string& rank, shared_ptr<SQLiteTableSync> synchronizer)
-		{
-			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
-
-			// assert (synchronizer->getTableFormat ().empty () == false);
-			_tableSynchronizers.insert (std::make_pair (synchronizer->getTableName (), synchronizer));
-			_rankedTableSynchronizers.insert(make_pair(rank, synchronizer));
-		}
-
-
-
-		bool 
-		SQLiteSync::hasTableSynchronizer (const std::string& tableName) const
-		{
-			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
-			return _tableSynchronizers.find (tableName) != _tableSynchronizers.end ();
-		}
-
-
-		   
-		shared_ptr<SQLiteTableSync>
-		SQLiteSync::getTableSynchronizer (const std::string& tableName) const
-		{
-			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
-			if (hasTableSynchronizer (tableName) == false)
-			{
-			throw SQLiteException ("No synchronizer for table '" + tableName + "'");
-			}
-			return _tableSynchronizers.find (tableName)->second;
-		}
-
-	    
-	    
-	    std::map<std::string, shared_ptr<SQLiteTableSync> >
-	    SQLiteSync::getTableSynchronizers () const
-	    {
-		boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
-		return _tableSynchronizers;
-	    }
 	    
 
 
@@ -107,45 +66,44 @@ namespace synthese
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
 			// Call the update schema step on all synchronizers.
-			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = 
-				 _rankedTableSynchronizers.begin (); 
-			     it != _rankedTableSynchronizers.end (); ++it)
-			{
-			    Log::GetInstance().info("Updating schema for table " + it->first);
+			for(Factory<SQLiteTableSync>::Iterator it(Factory<SQLiteTableSync>::begin());
+				it != Factory<SQLiteTableSync>::end();
+				++it
+			){
+				Log::GetInstance().info("Updating schema for table " + it.getKey());
 			    try 
 			    {
-					it->second->updateSchema (emitter);
+					it->updateSchema (emitter);
 			    }
 			    catch (std::exception& e)
 			    {
-				Log::GetInstance().error ("Error during schema update of " + it->first + 
-							  ".", e);
+				Log::GetInstance().error ("Error during schema update of " + it.getKey() + ".", e);
 			    }
 			}
 
 			_isRegistered = true;
 
 
-			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = 
-				_rankedTableSynchronizers.begin (); 
-				it != _rankedTableSynchronizers.end (); ++it)
-			{
-				it->second->initAutoIncrement ();
+			for(Factory<SQLiteTableSync>::Iterator it(Factory<SQLiteTableSync>::begin());
+				it != Factory<SQLiteTableSync>::end();
+				++it
+			){
+				it->initAutoIncrement ();
 			}
 			
 			// Call the first sync step on all synchronizers.
-			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = 
-				 _rankedTableSynchronizers.begin (); 
-			     it != _rankedTableSynchronizers.end (); ++it)
-			{
-			    Log::GetInstance().info("Loading table " + it->first);
+			for(Factory<SQLiteTableSync>::Iterator it(Factory<SQLiteTableSync>::begin());
+				it != Factory<SQLiteTableSync>::end();
+				++it
+			){
+			    Log::GetInstance().info("Loading table " + it.getKey());
 			    try 
 			    {
-					it->second->firstSync (emitter, this);
+					it->firstSync (emitter, this);
 			    }
 			    catch (std::exception& e)
 			    {
-					Log::GetInstance().error ("Unattended error during first sync of " + it->first + 
+					Log::GetInstance().error ("Unattended error during first sync of " + it.getKey() + 
 							  ". In-memory data might be inconsistent.", e);
 			    }
 			}
@@ -154,46 +112,36 @@ namespace synthese
 		 
 
 
-		   
-		void 
-		SQLiteSync::eventCallback (SQLiteHandle* emitter,
-					const SQLiteEvent& event)
-		{
+		void SQLiteSync::eventCallback(
+			SQLiteHandle* emitter,
+			const SQLiteEvent& event
+		){
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 			if (_isRegistered == false) return;
 
-			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it 
-				 = _tableSynchronizers.begin ();
-			     it != _tableSynchronizers.end (); ++it)
-			{
-			    shared_ptr<SQLiteTableSync> tableSync = it->second;
-			    if (tableSync->getTableName () != event.tbName) continue;
-			    
-			    if (event.opType == SQLITE_INSERT) 
-			    {
+			shared_ptr<SQLiteTableSync> tableSync(DBModule::GetTableSync(event.tbName));
+
+		    if (event.opType == SQLITE_INSERT) 
+		    {
 				tableSync->rowsAdded (emitter, this, tableSync->getRowById (emitter, event.rowId));
-			    }
-			    else if (event.opType == SQLITE_UPDATE) 
-			    {
+		    }
+		    else if (event.opType == SQLITE_UPDATE) 
+		    {
 				// Query for the modified row
 				tableSync->rowsUpdated (emitter, this, tableSync->getRowById (emitter, event.rowId));
-			    }
-			    else if (event.opType == SQLITE_DELETE) 
-			    {
+		    }
+		    else if (event.opType == SQLITE_DELETE) 
+		    {
 				std::vector<std::string> columnNames;
 				columnNames.push_back (TABLE_COL_ID);
 				SQLiteCachedResult* cachedResult = new SQLiteCachedResult (columnNames);
 				
 				SQLiteResultRow values;
 				values.push_back (new SQLiteValue (Conversion::ToString (event.rowId)));
-                                cachedResult->addRow (values);
+								cachedResult->addRow (values);
 				
 				tableSync->rowsRemoved (emitter, this, SQLiteResultSPtr (cachedResult));
-			    }
-			}
-			
+		    }
 		}
-	    
 	}
 }
-

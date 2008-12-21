@@ -45,14 +45,32 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync, PlaceAliasTableSync>::FACTORY_KEY("15.50.01 Places Alias");
+		template<> const string FactorableTemplate<SQLiteTableSync, PlaceAliasTableSync>::FACTORY_KEY("15.50.01 Places Alias");
 	}
 	
+	namespace env
+	{
+		const string PlaceAliasTableSync::COL_NAME ("name");
+		const string PlaceAliasTableSync::COL_ALIASEDPLACEID ("aliased_place_id");
+		const string PlaceAliasTableSync::COL_CITYID ("city_id");
+		const string PlaceAliasTableSync::COL_ISCITYMAINCONNECTION ("is_city_main_connection");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE_NAME = "t011_place_aliases";
-		template<> const int SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE_ID = 11;
-		template<> const bool SQLiteTableSyncTemplate<PlaceAliasTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE(
+			PlaceAliasTableSync::CreateFormat(
+				"t011_place_aliases",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(PlaceAliasTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, INTEGER, false),
+					SQLiteTableFormat::Field(PlaceAliasTableSync::COL_CITYID, INTEGER, false),
+					SQLiteTableFormat::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, BOOLEAN),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
+
+
 
 		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Load(
 			PlaceAlias* obj,
@@ -92,10 +110,11 @@ namespace synthese
 			)
 		{
 			City* city(const_cast<City*>(obj->getCity()));
-
-			city->getPlaceAliasesMatcher ().remove (obj->getName ());
-			
-			obj->setCity(NULL);
+			if (city != NULL)
+			{
+				city->getPlaceAliasesMatcher().remove (obj->getName ());
+				obj->setCity(NULL);
+			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Save(PlaceAlias* object)
@@ -106,7 +125,7 @@ namespace synthese
 				object->setKey(getId());	/// @todo Use grid ID
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -117,19 +136,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string PlaceAliasTableSync::COL_NAME ("name");
-		const std::string PlaceAliasTableSync::COL_ALIASEDPLACEID ("aliased_place_id");
-		const std::string PlaceAliasTableSync::COL_CITYID ("city_id");
-		const std::string PlaceAliasTableSync::COL_ISCITYMAINCONNECTION ("is_city_main_connection");
-
 		PlaceAliasTableSync::PlaceAliasTableSync()
 			: SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_NAME, "TEXT", true);
-			addTableColumn (COL_ALIASEDPLACEID, "INTEGER", false);
-			addTableColumn (COL_CITYID, "INTEGER", false);
-			addTableColumn (COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
 		}
 
 
@@ -143,7 +152,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())

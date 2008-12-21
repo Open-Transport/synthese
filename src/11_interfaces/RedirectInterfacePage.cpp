@@ -50,7 +50,7 @@ namespace synthese
 
 
 		RedirectInterfacePage::RedirectInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

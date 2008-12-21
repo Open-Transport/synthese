@@ -90,12 +90,12 @@ namespace synthese
 		{
 			int tableId = decodeTableId(id);
 
-			if (tableId == AlarmTableSync::TABLE_ID)
+			if (tableId == AlarmTableSync::TABLE.ID)
 			{
 				shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id));
 				return alarm->getShortMessage();
 			}
-			else if (tableId == ScenarioTableSync::TABLE_ID)
+			else if (tableId == ScenarioTableSync::TABLE.ID)
 			{
 				shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id));
 				return scenario->getName();

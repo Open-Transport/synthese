@@ -68,7 +68,7 @@ namespace synthese
 
 
 		JourneyBoardJunctionCellInterfacePage::JourneyBoardJunctionCellInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

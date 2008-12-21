@@ -33,11 +33,6 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Base class to be factored by Factory.
 		///
-		/// A child of FactoryBase must implement a struct called Args, corresponding to the arguments
-		///	that can be optionally passed through the object constructor by the factory.
-		///
-		/// It stores 
-		///		
 		///	@ingroup m01
 		//////////////////////////////////////////////////////////////////////////
 		template<class F>

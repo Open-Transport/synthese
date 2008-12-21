@@ -54,7 +54,7 @@ namespace synthese
 
 
 		RoutePlannerSheetLineInterfacePage::RoutePlannerSheetLineInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

@@ -45,14 +45,26 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync, PublicPlaceTableSync>::FACTORY_KEY("15.40.03 Public places");
+		template<> const string FactorableTemplate<SQLiteTableSync, PublicPlaceTableSync>::FACTORY_KEY("15.40.03 Public places");
 	}
-	
+
+	namespace env
+	{
+		const string PublicPlaceTableSync::COL_NAME ("name");
+		const string PublicPlaceTableSync::COL_CITYID ("city_id");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE_NAME = "t013_public_places";
-		template<> const int SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE_ID = 13;
-		template<> const bool SQLiteTableSyncTemplate<PublicPlaceTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE(
+			PublicPlaceTableSync::CreateFormat(
+				"t013_public_places",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(PublicPlaceTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(PublicPlaceTableSync::COL_CITYID, INTEGER, false),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Load(
 			PublicPlace* object,
@@ -60,7 +72,7 @@ namespace synthese
 			Env* env,
 			LinkLevel linkLevel
 		){
-			std::string name (rows->getText (PublicPlaceTableSync::COL_NAME));
+			string name (rows->getText (PublicPlaceTableSync::COL_NAME));
 			object->setName(name);
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -78,9 +90,11 @@ namespace synthese
 			Env* env)
 		{
 			City* city(const_cast<City*>(obj->getCity()));
-			city->getPublicPlacesMatcher ().remove (obj->getName ());
-
-			obj->setCity(NULL);
+			if (city != NULL)
+			{
+				city->getPublicPlacesMatcher ().remove (obj->getName ());
+				obj->setCity(NULL);
+			}
 		}
 
 
@@ -92,7 +106,7 @@ namespace synthese
 				object->setKey(getId());	/// @todo Use grid ID
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -103,15 +117,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string PublicPlaceTableSync::COL_NAME ("name");
-		const std::string PublicPlaceTableSync::COL_CITYID ("city_id");
-
 		PublicPlaceTableSync::PublicPlaceTableSync()
 			: SQLiteRegistryTableSyncTemplate<PublicPlaceTableSync,PublicPlace>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_NAME, "TEXT", true);
-			addTableColumn (COL_CITYID, "INTEGER", false);
 		}
 
 
@@ -125,7 +133,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())

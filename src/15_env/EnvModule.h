@@ -104,7 +104,7 @@ namespace synthese
 			*/
 			static boost::shared_ptr<const AddressablePlace> FetchAddressablePlace(
 				const util::RegistryKeyType& id,
-				const util::Env& env = *util::Env::GetOfficialEnv()
+				util::Env& env = *util::Env::GetOfficialEnv()
 			);
 
 			static boost::shared_ptr<AddressablePlace> FetchEditableAddressablePlace(
@@ -114,12 +114,12 @@ namespace synthese
 
 			static boost::shared_ptr<const IncludingPlace> FetchIncludingPlace(
 				const util::RegistryKeyType& id,
-				const util::Env& env = *util::Env::GetOfficialEnv()
+				util::Env& env = *util::Env::GetOfficialEnv()
 			);
 
 			static boost::shared_ptr<const Place> FetchPlace(
 				const util::RegistryKeyType& id,
-				const util::Env& env = *util::Env::GetOfficialEnv()
+				util::Env& env = *util::Env::GetOfficialEnv()
 			);
 
 			static const Place* FetchPlace(const std::string& city, const std::string& place);
@@ -127,7 +127,7 @@ namespace synthese
 
  		    static boost::shared_ptr<const Vertex> FetchVertex(
 				const util::RegistryKeyType& id,
-				const util::Env& env = *util::Env::GetOfficialEnv()
+				util::Env& env = *util::Env::GetOfficialEnv()
 			);
 
 

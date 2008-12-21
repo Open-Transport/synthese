@@ -49,10 +49,18 @@ namespace synthese
 {
 	namespace db
 	{
-
-		/** Table synchronizer template.
-			@ingroup m10
-		*/
+		////////////////////////////////////////////////////////////////////////
+		///	Table synchronizer template (abstract class) for standard SYNTHESE
+		///	tables.
+		///	
+		/// A standard SYNTHESE table has the following properties :
+		///		- Removal allowed
+		///		- Autoincrement activated
+		///		- an internal class corresponds to the records of the table
+		///		- a Load and a Save function convert records into class object
+		///			and vice versa 
+		///	@ingroup m10
+		////////////////////////////////////////////////////////////////////////
 		template <class K, class T>
 		class SQLiteDirectTableSyncTemplate : public SQLiteTableSyncTemplate<K>
 		{
@@ -60,17 +68,32 @@ namespace synthese
 			typedef T		ObjectType;
 
 		protected:
-
-			SQLiteDirectTableSyncTemplate()	
-				: SQLiteTableSyncTemplate<K>() 
-			{}
-
-			SQLiteDirectTableSyncTemplate(const SQLiteTableSync::Args& args)
-				: SQLiteTableSyncTemplate<K>(args)
-			{}
-
+			////////////////////////////////////////////////////////////////////
+			///	SQLiteDirectTableSyncTemplate constructor.
+			////////////////////////////////////////////////////////////////////
+			SQLiteDirectTableSyncTemplate()
+			{
+			}
 
 		public:
+			static SQLiteTableFormat CreateFormat(
+				std::string name,
+				SQLiteTableFormat::Fields fields,
+				SQLiteTableFormat::Indexes indexes = SQLiteTableFormat::Indexes(),
+				bool ignoreCallbacksAtFirstSync = false
+			){
+				fields.insert(fields.begin(), SQLiteTableFormat::Field(TABLE_COL_ID, INTEGER, false));
+				return SQLiteTableFormat(
+					name,
+					true,
+					TRIGGERS_ENABLED_CLAUSE,
+					ignoreCallbacksAtFirstSync,
+					true,
+					fields,
+					indexes
+				);
+			}
+
 
 			/** Object fetcher, with read/write permissions.
 				@param key UID of the object
@@ -92,8 +115,10 @@ namespace synthese
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				if (env != NULL && env->template getRegistry<T>().contains(key))
-					return env->template getEditableRegistry<T>().getEditable(key);
+				if (env != NULL && env->getRegistry<T>().contains(key))
+				{
+					return env->getEditableRegistry<T>().getEditable(key);
+				}
 
 				boost::shared_ptr<T> object;
 				try
@@ -105,12 +130,14 @@ namespace synthese
 				catch (typename db::DBEmptyResultException<K>&)
 				{
 					if (autoCreate == NEVER_CREATE)
-						throw util::ObjectNotFoundException<T>(key, "Object not found in "+ SQLiteTableSyncTemplate<K>::TABLE_NAME);
+						throw util::ObjectNotFoundException<T>(key, "Object not found in "+ SQLiteTableSyncTemplate<K>::TABLE.NAME);
 					object.reset(new T(key));
 				}
 				
 				if (env != NULL)
-					env->template getEditableRegistry<T>().add(object);
+				{
+					env->getEditableRegistry<T>().add(object);
+				}
 				return object;
 			}
 

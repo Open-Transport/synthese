@@ -46,12 +46,7 @@ namespace synthese
 		:	public util::FactoryBase<ModuleClass>
 		{
 		public:
-			/// Optional arguments for factory.
-			struct Args
-			{
-			};
-
-			ModuleClass(Args = Args());
+			ModuleClass();
 
 			virtual void preInit () {};
 			virtual void initialize () {};

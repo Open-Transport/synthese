@@ -40,7 +40,7 @@ namespace synthese
 		{
 		public:
 			LinkException(uid currentId, const std::string& field, const util::Exception& e)
-			    : Exception("There was an error in "+ C::TABLE_NAME +" table at row "+ util::Conversion::ToString(currentId) +" in field "+ field +" : "+ e.getMessage())
+			    : Exception("There was an error in "+ C::TABLE.NAME +" table at row "+ util::Conversion::ToString(currentId) +" in field "+ field +" : "+ e.getMessage())
 			{	}
 
 		};

@@ -34,7 +34,7 @@ namespace synthese
 
 
 		NonPredefinedInterfacePage::NonPredefinedInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

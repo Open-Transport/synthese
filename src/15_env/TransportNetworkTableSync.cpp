@@ -42,11 +42,21 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,TransportNetworkTableSync>::FACTORY_KEY("15.20.02 Network transport");
 
+	namespace env
+	{
+		const string TransportNetworkTableSync::COL_NAME("name");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE_NAME("t022_transport_networks");
-		template<> const int SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE_ID(22);
-		template<> const bool SQLiteTableSyncTemplate<TransportNetworkTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE(
+			TransportNetworkTableSync::CreateFormat(
+				"t022_transport_networks",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(TransportNetworkTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Load(
 			TransportNetwork* object,
@@ -66,7 +76,7 @@ namespace synthese
 				object->setKey(getId());
 
 			query
-				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getName())
 				<< ")";
@@ -81,13 +91,9 @@ namespace synthese
 
 	namespace env
 	{
-		const string TransportNetworkTableSync::COL_NAME("name");
-
 		TransportNetworkTableSync::TransportNetworkTableSync ()
 		: SQLiteRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_NAME, "TEXT");
 		}
 
 
@@ -104,7 +110,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (!name.empty())
 				query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";

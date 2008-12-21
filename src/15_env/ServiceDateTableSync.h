@@ -38,7 +38,8 @@ namespace synthese
 		/** Service dates table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class ServiceDateTableSync : public db::SQLiteTableSyncTemplate<ServiceDateTableSync>
+		class ServiceDateTableSync
+		:	public db::SQLiteTableSyncTemplate<ServiceDateTableSync>
 		{
 		private:
 			static void _updateServiceCalendar (const db::SQLiteResultSPtr& rows, bool marked) ;
@@ -58,8 +59,6 @@ namespace synthese
 			ServiceDateTableSync();
 
 			static std::vector<time::Date> GetDatesOfService(uid serviceId);
-
-		protected:
 
 			/** Action to do on Service Date creation.
 				This method loads a new object in ram.

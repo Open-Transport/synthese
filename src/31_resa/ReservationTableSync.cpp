@@ -49,11 +49,51 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,ReservationTableSync>::FACTORY_KEY("31.1 Reservation Table Sync");
 	}
 
+	namespace resa
+	{
+		const string ReservationTableSync::COL_TRANSACTION_ID("transaction_id");
+		const string ReservationTableSync::COL_LINE_ID = "line_id";
+		const string ReservationTableSync::COL_LINE_CODE = "line_code";
+		const string ReservationTableSync::COL_SERVICE_ID = "service_id";
+		const string ReservationTableSync::COL_SERVICE_CODE = "service_code";
+		const string ReservationTableSync::COL_DEPARTURE_PLACE_ID = "departure_place_id";
+		const string ReservationTableSync::COL_DEPARTURE_PLACE_NAME = "departure_place_name";
+		const string ReservationTableSync::COL_DEPARTURE_TIME = "departure_time";
+		const string ReservationTableSync::COL_ARRIVAL_PLACE_ID = "arrival_place_id";
+		const string ReservationTableSync::COL_ARRIVAL_PLACE_NAME = "arrival_place_name";
+		const string ReservationTableSync::COL_ARRIVAL_TIME = "arrival_time";
+		const string ReservationTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
+		const string ReservationTableSync::COL_ORIGIN_DATE_TIME = "origin_date_time";
+		const string ReservationTableSync::COL_RESERVATION_DEAD_LINE("reservation_dead_line");
+	}
+
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<ReservationTableSync>::TABLE_NAME = "t044_reservations";
-		template<> const int SQLiteTableSyncTemplate<ReservationTableSync>::TABLE_ID = 44;
-		template<> const bool SQLiteTableSyncTemplate<ReservationTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ReservationTableSync>::TABLE(
+			ReservationTableSync::CreateFormat(
+				"t044_reservations",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(ReservationTableSync::COL_TRANSACTION_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_LINE_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_LINE_CODE, TEXT),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_SERVICE_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_SERVICE_CODE, TEXT),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_DEPARTURE_PLACE_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_DEPARTURE_PLACE_NAME, TEXT),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_DEPARTURE_TIME, TIMESTAMP),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_ARRIVAL_PLACE_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_ARRIVAL_PLACE_NAME, TEXT),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_ARRIVAL_TIME, TIMESTAMP),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_RESERVATION_RULE_ID, INTEGER),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_ORIGIN_DATE_TIME, TIMESTAMP),
+					SQLiteTableFormat::Field(ReservationTableSync::COL_RESERVATION_DEAD_LINE, TIMESTAMP),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(ReservationTableSync::COL_LINE_ID),
+					SQLiteTableFormat::Index(ReservationTableSync::COL_DEPARTURE_PLACE_ID),
+					SQLiteTableFormat::Index(ReservationTableSync::COL_ARRIVAL_PLACE_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Load(
 			Reservation* object
@@ -89,7 +129,7 @@ namespace synthese
 				object->setKey(getId());
                
 			query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToString(object->getTransaction()->getKey())
 				<< "," << Conversion::ToString(object->getLineId())
@@ -113,43 +153,9 @@ namespace synthese
 
 	namespace resa
 	{
-		const string ReservationTableSync::COL_TRANSACTION_ID("transaction_id");
-		const string ReservationTableSync::COL_LINE_ID = "line_id";
-		const string ReservationTableSync::COL_LINE_CODE = "line_code";
-		const string ReservationTableSync::COL_SERVICE_ID = "service_id";
-		const string ReservationTableSync::COL_SERVICE_CODE = "service_code";
-		const string ReservationTableSync::COL_DEPARTURE_PLACE_ID = "departure_place_id";
-		const string ReservationTableSync::COL_DEPARTURE_PLACE_NAME = "departure_place_name";
-		const string ReservationTableSync::COL_DEPARTURE_TIME = "departure_time";
-		const string ReservationTableSync::COL_ARRIVAL_PLACE_ID = "arrival_place_id";
-		const string ReservationTableSync::COL_ARRIVAL_PLACE_NAME = "arrival_place_name";
-		const string ReservationTableSync::COL_ARRIVAL_TIME = "arrival_time";
-		const string ReservationTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
-		const string ReservationTableSync::COL_ORIGIN_DATE_TIME = "origin_date_time";
-		const string ReservationTableSync::COL_RESERVATION_DEAD_LINE("reservation_dead_line");
-
 		ReservationTableSync::ReservationTableSync()
 			: SQLiteNoSyncTableSyncTemplate<ReservationTableSync,Reservation>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_TRANSACTION_ID, "INTEGER");
-			addTableColumn(COL_LINE_ID, "INTEGER");
-			addTableColumn(COL_LINE_CODE, "TEXT");
-			addTableColumn(COL_SERVICE_ID, "INTEGER");
-			addTableColumn(COL_SERVICE_CODE, "TEXT");
-			addTableColumn(COL_DEPARTURE_PLACE_ID, "INTEGER");
-			addTableColumn(COL_DEPARTURE_PLACE_NAME, "TEXT");
-			addTableColumn(COL_DEPARTURE_TIME, "TIMESTAMP");
-			addTableColumn(COL_ARRIVAL_PLACE_ID, "INTEGER");
-			addTableColumn(COL_ARRIVAL_PLACE_NAME, "TEXT");
-			addTableColumn(COL_ARRIVAL_TIME, "TIMESTAMP");
-			addTableColumn(COL_RESERVATION_RULE_ID, "INTEGER");
-			addTableColumn(COL_ORIGIN_DATE_TIME, "TIMESTAMP");
-			addTableColumn(COL_RESERVATION_DEAD_LINE, "TIMESTAMP");
-			
-			addTableIndex(COL_LINE_ID);
-			addTableIndex(COL_DEPARTURE_PLACE_ID);
-			addTableIndex(COL_ARRIVAL_PLACE_ID);
 		}
 
 		void ReservationTableSync::Search(
@@ -162,7 +168,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (transactionId != UNKNOWN_VALUE)
 			{

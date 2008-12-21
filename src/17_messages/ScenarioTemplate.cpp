@@ -38,7 +38,7 @@ namespace synthese
 
 		ScenarioTemplate::ScenarioTemplate( const ScenarioTemplate& source, const std::string& name)
 			: ScenarioSubclassTemplate<AlarmTemplate>(name)
-			, util::Registrable()
+			, util::Registrable(UNKNOWN_VALUE)
 		{
 			for (AlarmsSet::const_iterator it = source.getAlarms().begin(); it != source.getAlarms().end(); ++it)
 				addAlarm(new AlarmTemplate(this,**it ));
@@ -46,7 +46,7 @@ namespace synthese
 
 		ScenarioTemplate::ScenarioTemplate(const std::string name)
 			: ScenarioSubclassTemplate<AlarmTemplate>(name)
-			, util::Registrable()
+			, util::Registrable(UNKNOWN_VALUE)
 			, _folderId(UNKNOWN_VALUE)
 		{
 

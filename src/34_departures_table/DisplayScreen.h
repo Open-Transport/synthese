@@ -86,21 +86,6 @@ namespace synthese
 				, WITH_FORCED_DESTINATIONS_METHOD = 1
 			} GenerationMethod;
 
-			struct Complements
-			{
-				DisplayStatus				status;
-				std::string					statusText;
-				time::DateTime				lastOKStatus;
-				time::DateTime				lastControl;
-				DisplayDataControlResult	dataControl;
-				std::string					dataControlText;
-				time::DateTime				lastOKDataControl;
-				Complements()
-					: status(DISPLAY_STATUS_UNKNOWN), lastOKStatus(time::TIME_UNKNOWN)
-					, lastControl(time::TIME_UNKNOWN), dataControl(DISPLAY_DATA_UNKNOWN)
-					, lastOKDataControl(time::TIME_UNKNOWN) {}
-			};
-
 		protected:
 			//! \name Localization
 			//@{
@@ -147,10 +132,8 @@ namespace synthese
 
 			//! \name Maintenance
 			//@{
-				int							_maintenanceChecksPerDay;
 				bool						_maintenanceIsOnline;
 				std::string					_maintenanceMessage;
-				Complements					_complements;
 			//@}
 
 
@@ -176,7 +159,6 @@ namespace synthese
 				void	setGenerationMethod(GenerationMethod method);
 				void	setLocalization(const env::PublicTransportStopZoneConnectionPlace*);
 				void	setLocalizationComment(const std::string&);
-				void	setMaintenanceChecksPerDay(int number);
 				void	setMaintenanceIsOnline(bool value);
 				void	setMaintenanceMessage(const std::string& message);
 				void	setMaxDelay(int);
@@ -186,7 +168,6 @@ namespace synthese
 				void	setTrackNumberDisplay(bool value);
 				void	setType(const DisplayType*);
 				void	setWiringCode(int);				
-				void	setComplements(const Complements& complements);
 				void	setDisplayTeam(bool value);
 			//@}
 
@@ -229,10 +210,8 @@ namespace synthese
 				GenerationMethod				getGenerationMethod()			const;
 				const DisplayedPlacesList&		getForcedDestinations()			const;
 				int								getForceDestinationDelay()		const;
-				int								getMaintenanceChecksPerDay()	const;
 				bool							getIsOnline()					const;
 				const std::string&				getMaintenanceMessage()			const;
-				const Complements&				getComplements()				const;
 				bool							getDisplayTeam()				const;
 			//@}
 
@@ -240,7 +219,6 @@ namespace synthese
 			//@{
 				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const time::DateTime& startTime)		const;
 				void												display(std::ostream& stream, const time::DateTime& date)				const;
-				void												recordSupervision(const std::string&)	const;
 				std::string											getFullName()															const;
 				const env::PhysicalStops&							getPhysicalStops(bool result=true)										const;
 

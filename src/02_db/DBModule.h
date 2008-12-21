@@ -56,7 +56,7 @@ namespace synthese
 
 	    class SQLite;
 	    class SQLiteHandle;
-	    
+		class SQLiteTableSync;	    
 
 //		static const std::string TRIGGERS_ENABLED_CLAUSE;
 
@@ -69,6 +69,7 @@ namespace synthese
 		    
 		    static SQLiteHandle*	_sqlite;
 			static SubClassMap		_subClassMap;
+			static std::map<std::string,std::string>	_tableSyncMap;
 
 		public:
 
@@ -76,6 +77,8 @@ namespace synthese
 		    void initialize();
 
 		    static SQLite* GetSQLite ();
+
+			static boost::shared_ptr<SQLiteTableSync> GetTableSync(const std::string& tableName);
 
 		    /** Called whenever a parameter registered by this module is changed
 		     */

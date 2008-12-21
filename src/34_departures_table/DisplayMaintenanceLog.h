@@ -23,10 +23,9 @@
 #ifndef SYNTHESE_DISPLAY_MAINTENANCE_LOG
 #define SYNTHESE_DISPLAY_MAINTENANCE_LOG
 
-#include "13_dblog/DBLog.h"
-#include "13_dblog/DBLogEntry.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "DBLog.h"
+#include "DBLogEntry.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -38,37 +37,43 @@ namespace synthese
 	namespace departurestable
 	{
 		class DisplayScreen;
-		
-		/** Journal relatif à la maintenance des afficheurs.
+		class DisplayMonitoringStatus;
 
-			Ce journal contient deux types d'entrée :
-				- Les entrées relatives aux manipulations effectuées sur la console d'administration
-				- Les entrées issues de remontées d'alarmes par la fonction SendLogEntry issues des clients de supervision des afficheurs.
-
-			Le brassage des deux informations permet d'exploiter directement le journal pour connaître l'état d'un afficheur en observant la dernière entrée de type contrôle.
-
-			Colonnes :
-				- UID de l'afficheur concerné
-				- Type d'entrée : 
-					- contrôle : l'entrée est issue d'une requête de contrôle de bon fonctionnement (une requete sur la dernière entrée connue de ce type donne l'état de l'afficheur, et l'absence d'entrée de ce type depuis un certain délai peut également être interprétée comme une absence de fonctionnement)
-					- admin : l'entrée trace une manipulation faite dans la console d'administration
-					- state : l'entrée trace un basculement manuel en service / hors service (une requete sur la dernière entrée connue de ce type donne l'état de l'afficheur)
-				- Contrôle positif :
-					- 1 : Contrôle positif
-					- 0 : Contrôle négatif
-					- -1 : Pas de contrôle
-				- Description de l'entrée
-				
-		*/
-		class DisplayMaintenanceLog : public util::FactorableTemplate<dblog::DBLog, DisplayMaintenanceLog>
+		////////////////////////////////////////////////////////////////////
+		/// Displays maintenance log.
+		///
+		///	This log stores all the events concerning maintenance :
+		///		- History of the user actions on the administrative console
+		///		- History of monitoring status changes
+		///		- History of detection of stop of monitoring
+		///
+		/// The DBLog fields are :
+		///		- object : ID of the concerned display
+		///		- level :
+		///			- INFO : user action or monitoring status changing to OK value or restart of monitoring
+		///			- WARNING : monitoring status changing to a WARNING value
+		///			- ERROR : monitoring status changing to an ERROR value or detection of stop of monitoring
+		///		- content :
+		///			-# type of entry (DisplayMaintenanceLog::EntryType) :
+		///				- DISPLAY_MAINTENANCE_ADMIN
+		///				- DISPLAY_MONITORING_STATUS_CHANGE
+		///				- DISPLAY_MONITORING_UP_DOWN_CHANGE
+		///			-# Summary text
+		///			-# Detailed text
+		///		- user :
+		///			- UNKNOWN_VALUE for status change entries
+		///			- ID of the user who made the action for admin action entries
+		////////////////////////////////////////////////////////////////////
+		class DisplayMaintenanceLog
+		:	public util::FactorableTemplate<dblog::DBLog, DisplayMaintenanceLog>
 		{
 		public:
 			typedef enum
 			{
-				DISPLAY_MAINTENANCE_DISPLAY_CONTROL = 10
-				, DISPLAY_MAINTENANCE_DATA_CONTROL = 15
-				, DISPLAY_MAINTENANCE_ADMIN = 20
-				, DISPLAY_MAINTENANCE_STATUS = 30
+				DISPLAY_MAINTENANCE_ADMIN = 20,
+				DISPLAY_MONITORING_STATUS_CHANGE = 30,
+				DISPLAY_MONITORING_UP = 40,
+				DISPLAY_MONITORING_DOWN = 45,
 			} EntryType;
 			
 			std::string getName() const;
@@ -76,29 +81,98 @@ namespace synthese
 			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
 			std::string getObjectName(uid id) const;
 			
-			static void	addAdminEntry(
+			
+			
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for administration console uses logging.
+			///	@param screen The edited screen
+			///	@param user User who has made the edition
+			///	@param field Edited field
+			///	@param oldValue Old value of a field
+			///	@param newValue New value of a field
+			///	@param level Level of the entry (default Info)
+			///	@author Hugues Romain
+			///	@date 2008
+			///
+			/// The log entry is created only if oldValue and newValue are
+			/// different.
+			////////////////////////////////////////////////////////////////////
+			static void	AddAdminEntry(
 				const DisplayScreen* screen
-				, const dblog::DBLogEntry::Level& level
 				, const security::User* user
 				, const std::string& field
 				, const std::string& oldValue
 				, const std::string& newValue
+				, const dblog::DBLogEntry::Level level = dblog::DBLogEntry::DB_LOG_INFO
 			);
-			static void	addStatusEntry(
-				const DisplayScreen* screen
-				, bool status
+
+
+			
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for status change.
+			///	@param screen The monitored screen
+			///	@param oldValue old status value
+			///	@param newValue new status value
+			///	@author Hugues Romain
+			///	@date 2008
+			/// Level : generated from the new global status (see 
+			///	DisplayMonitoringStatus::getGlobalStatus() :
+			///		- to OK status : Info
+			///		- to WARNING or UNKNOWN status : Warning
+			///		- to ERROR status : Error
+			/// User : none
+			///	Text : generated by DisplayMonitoringStatus::getDetail()
+			////////////////////////////////////////////////////////////////////
+			static void	AddStatusChangeEntry(
+				const DisplayScreen* screen,
+				const DisplayMonitoringStatus& oldValue,
+				const DisplayMonitoringStatus& newValue
 			);
-			static void addControlEntry(
+
+
+			
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for monitoring contact up.
+			///	@param screen The monitored screen
+			///	@param downTime time of the contact down
+			///	@author Hugues Romain
+			///	@date 2008
+			/// Level : Info
+			/// User : none
+			/// Text : informations about duration of the contact loss period
+			////////////////////////////////////////////////////////////////////
+			static void AddMonitoringUpEntry(
+				const DisplayScreen* screen,
+				const time::DateTime& downTime
+			);
+
+
+			
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for the first monitoring check.
+			///	@param screen The monitored screen
+			///	@param value Status of the display screen
+			///	@author Hugues Romain
+			///	@date 2008
+			////////////////////////////////////////////////////////////////////
+			static void AddMonitoringFirstEntry(
+				const DisplayScreen* screen,
+				const DisplayMonitoringStatus& value
+			);
+
+
+
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for monitoring contact down.
+			///	@param screen The monitored screen
+			///	@author Hugues Romain
+			///	@date 2008
+			/// Level : Error
+			/// User : none
+			/// Text : nothing
+			////////////////////////////////////////////////////////////////////
+			static void AddMonitorDownEntry(
 				const DisplayScreen* screen
-				, bool messageOK
-				, bool cpuOK
-				, std::string cpuCode
-				, bool peripheralsOK
-				, std::string peripheralsCode
-				, bool driverOK
-				, std::string driverCode
-				, bool lightOK
-				, std::string lightCode
 			);
 		};
 	}

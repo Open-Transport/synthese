@@ -75,8 +75,6 @@ namespace synthese
 			static void Remove(uid siteId, uid objectId = UNKNOWN_VALUE);
 
 
-		protected:
-
 			/** Action to do on ObjectSiteLink creation.
 				This method loads a new object in ram.
 			*/

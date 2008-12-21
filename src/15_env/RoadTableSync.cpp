@@ -49,14 +49,40 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync, RoadTableSync>::FACTORY_KEY("15.30.02 Roads");
+		template<> const string FactorableTemplate<SQLiteTableSync, RoadTableSync>::FACTORY_KEY("15.30.02 Roads");
 	}
-	
+
+	namespace env
+	{
+		const string RoadTableSync::COL_NAME ("name");
+		const string RoadTableSync::COL_CITYID ("city_id");
+		const string RoadTableSync::COL_ROADTYPE ("road_type");
+		const string RoadTableSync::COL_FAREID ("fare_id");
+		const string RoadTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
+		const string RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+		const string RoadTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+		const string RoadTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
+		const string RoadTableSync::COL_VIAPOINTS ("via_points");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<RoadTableSync>::TABLE_NAME = "t015_roads";
-		template<> const int SQLiteTableSyncTemplate<RoadTableSync>::TABLE_ID = 15;
-		template<> const bool SQLiteTableSyncTemplate<RoadTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<RoadTableSync>::TABLE(
+			RoadTableSync::CreateFormat(
+				"t015_roads",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(RoadTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(RoadTableSync::COL_CITYID, INTEGER, false),
+					SQLiteTableFormat::Field(RoadTableSync::COL_ROADTYPE, INTEGER),
+					SQLiteTableFormat::Field(RoadTableSync::COL_FAREID, INTEGER),
+					SQLiteTableFormat::Field(RoadTableSync::COL_BIKECOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, INTEGER),
+					SQLiteTableFormat::Field(RoadTableSync::COL_RESERVATIONRULEID, INTEGER),
+					SQLiteTableFormat::Field(RoadTableSync::COL_VIAPOINTS, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Load(
 			Road* object,
@@ -110,10 +136,12 @@ namespace synthese
 			Env* env
 		){
 			City* city = const_cast<City*>(obj->getCity ());
-			city->getRoadsMatcher ().remove (obj->getName ());
-			city->getAllPlacesMatcher().remove(obj->getName() + " [voie]");
-
-			obj->setCity(NULL);
+			if (city != NULL)
+			{
+				city->getRoadsMatcher ().remove (obj->getName ());
+				city->getAllPlacesMatcher().remove(obj->getName() + " [voie]");
+				obj->setCity(NULL);
+			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Save(Road* object)
@@ -124,7 +152,7 @@ namespace synthese
 				object->setKey(getId());	/// @todo Use grid ID
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
@@ -135,29 +163,9 @@ namespace synthese
 
 	namespace env
 	{
-		const string RoadTableSync::COL_NAME ("name");
-		const string RoadTableSync::COL_CITYID ("city_id");
-		const string RoadTableSync::COL_ROADTYPE ("road_type");
-		const string RoadTableSync::COL_FAREID ("fare_id");
-		const string RoadTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const string RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const string RoadTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string RoadTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
-		const string RoadTableSync::COL_VIAPOINTS ("via_points");
-
 		RoadTableSync::RoadTableSync()
 			: SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_NAME, "TEXT", true);
-			addTableColumn (COL_CITYID, "INTEGER", false);
-			addTableColumn (COL_ROADTYPE, "INTEGER", true);
-			addTableColumn (COL_FAREID, "INTEGER", true);
-			addTableColumn (COL_BIKECOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_HANDICAPPEDCOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
-			addTableColumn (COL_RESERVATIONRULEID, "INTEGER", true);
-			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
 		void RoadTableSync::Search(
@@ -169,7 +177,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())

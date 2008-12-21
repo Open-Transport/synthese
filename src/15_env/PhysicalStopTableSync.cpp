@@ -41,11 +41,32 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,PhysicalStopTableSync>::FACTORY_KEY("15.55.01 Physical stops");
 
+	namespace env
+	{
+		const string PhysicalStopTableSync::COL_NAME = "name";
+		const string PhysicalStopTableSync::COL_PLACEID = "place_id";
+		const string PhysicalStopTableSync::COL_X = "x";
+		const string PhysicalStopTableSync::COL_Y = "y";
+		const string PhysicalStopTableSync::COL_OPERATOR_CODE("operator_code");
+	}
+
     namespace db
     {
-		template<> const std::string SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE_NAME = "t012_physical_stops";
-		template<> const int SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE_ID = 12;
-		template<> const bool SQLiteTableSyncTemplate<PhysicalStopTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE(
+			PhysicalStopTableSync::CreateFormat(
+				"t012_physical_stops",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_PLACEID, INTEGER, false),
+					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_X, DOUBLE),
+					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_Y, DOUBLE),
+					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_OPERATOR_CODE, TEXT),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(PhysicalStopTableSync::COL_PLACEID),
+					SQLiteTableFormat::Index()
+		)	)	);
+
 
 		/** Does not update the place */
 		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Load(
@@ -88,25 +109,9 @@ namespace synthese
 
     namespace env
     {
-		const std::string PhysicalStopTableSync::COL_NAME = "name";
-		const std::string PhysicalStopTableSync::COL_PLACEID = "place_id";
-		const std::string PhysicalStopTableSync::COL_X = "x";
-		const std::string PhysicalStopTableSync::COL_Y = "y";
-		const string PhysicalStopTableSync::COL_OPERATOR_CODE("operator_code");
-
-
-
 		PhysicalStopTableSync::PhysicalStopTableSync ()
 			: SQLiteRegistryTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>()
 		{
-			addTableColumn (TABLE_COL_ID, "INTEGER", true);
-			addTableColumn (COL_NAME, "TEXT", true);
-			addTableColumn (COL_PLACEID, "INTEGER", false);
-			addTableColumn (COL_X, "DOUBLE", true);
-			addTableColumn (COL_Y, "DOUBLE", true);
-			addTableColumn(COL_OPERATOR_CODE, "TEXT", true);
-
-			addTableIndex(COL_PLACEID);
 		}
 
 
@@ -128,7 +133,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (placeId != UNKNOWN_VALUE)
 				query << " AND " << COL_PLACEID << "=" << placeId;

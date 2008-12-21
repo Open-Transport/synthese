@@ -81,7 +81,7 @@ namespace synthese
 		{
 			try
 			{
-				_network = TransportNetworkTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+				_network = TransportNetworkTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), &_env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -90,6 +90,17 @@ namespace synthese
 
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
+
+			CommercialLineTableSync::Search(
+				_env,
+				_network->getKey()
+				, "%"+_searchName+"%"
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, false
+				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+				, _requestParameters.raisingOrder				
+			);
 		}
 		
 		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
@@ -102,22 +113,8 @@ namespace synthese
 			FunctionRequest<AdminRequest> lineOpenRequest(request);
 			lineOpenRequest.getFunction()->setPage<CommercialLineAdmin>();
 
-
-			// Results
-			Env env;
-			CommercialLineTableSync::Search(
-				env,
-				_network->getKey()
-				, "%"+_searchName+"%"
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, false
-				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-				, _requestParameters.raisingOrder				
-			);
 			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<CommercialLine>());
-
+			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<CommercialLine>());
 
 			// Search form
 			stream << "<h1>Recherche</h1>";
@@ -138,7 +135,7 @@ namespace synthese
 			ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
 
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, _env.getRegistry<CommercialLine>())
 			{
 				lineOpenRequest.setObjectId(line->getKey());
 				stream << t.row();
@@ -150,9 +147,6 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 			}
 			stream << t.close();
-
-
-
 		}
 
 		bool TransportNetworkAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
@@ -213,7 +207,7 @@ namespace synthese
 			)
 			{
 				Env env;
-				CommercialLineTableSync::Search(env, _network->getKey());
+				CommercialLineTableSync::Search(env, _network->getKey(), "%", 0, 0, true, false, true, UP_LINKS_LOAD_LEVEL);
 				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 				{
 					PageLink link;

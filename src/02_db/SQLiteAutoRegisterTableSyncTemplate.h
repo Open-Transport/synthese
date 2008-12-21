@@ -38,16 +38,28 @@ namespace synthese
 		class SQLiteAutoRegisterTableSyncTemplate : public SQLiteDirectTableSyncTemplate<K,T>
 		{
 		public:
-			SQLiteAutoRegisterTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>(
-				typename SQLiteTableSyncTemplate<K>::Args(true, true, TRIGGERS_ENABLED_CLAUSE, true, true))
-				{}
+			SQLiteAutoRegisterTableSyncTemplate()
+			:	SQLiteDirectTableSyncTemplate<K,T>()
+			{}
 
 			virtual bool getRegisterInSubClassMap() const
 			{
 				return false;
 			}
 
-		protected:
+			static SQLiteTableFormat CreateFormat(
+				std::string name,
+				SQLiteTableFormat::Fields fields,
+				SQLiteTableFormat::Indexes indexes = SQLiteTableFormat::Indexes()
+			){
+				return SQLiteDirectTableSyncTemplate<K,T>::CreateFormat(
+					name,
+					fields,
+					indexes,
+					true
+				);
+			}
+
 
 			/** Action to do on object creation or replacement.
 				Only if the event is a replacement, and if the concerned object is already loaded into the registry, then it is updated.

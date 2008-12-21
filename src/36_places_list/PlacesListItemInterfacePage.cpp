@@ -59,7 +59,7 @@ namespace synthese
 
 
 		PlacesListItemInterfacePage::PlacesListItemInterfacePage()
-			: Registrable()
+			: Registrable(UNKNOWN_VALUE)
 		{
 
 		}

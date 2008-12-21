@@ -46,11 +46,26 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,env::HandicappedComplianceTableSync>::FACTORY_KEY("15.10.04 Handicapped compliances");
 
+	namespace env
+	{
+		const std::string HandicappedComplianceTableSync::COL_STATUS ("status");
+		const std::string HandicappedComplianceTableSync::COL_CAPACITY ("capacity");
+		const std::string HandicappedComplianceTableSync::COL_RESERVATION_RULE("reservation_rule");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE_NAME = "t019_handicapped_compliances";
-		template<> const int SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE_ID = 19;
-		template<> const bool SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::HAS_AUTO_INCREMENT = true;
+			template<> const SQLiteTableFormat SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE(
+			HandicappedComplianceTableSync::CreateFormat(
+				"t019_handicapped_compliances",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(HandicappedComplianceTableSync::COL_STATUS, INTEGER),
+					SQLiteTableFormat::Field(HandicappedComplianceTableSync::COL_CAPACITY, INTEGER),
+					SQLiteTableFormat::Field(HandicappedComplianceTableSync::COL_RESERVATION_RULE, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::Indexes()
+		)	);
+
 
 		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::Load(
 			HandicappedCompliance* cmp,
@@ -96,7 +111,7 @@ namespace synthese
 			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
 			query
-				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< object->getKey() << ','
 				<< Conversion::ToString(object->isCompliant()) << ","
 				<< object->getCapacity() << ","
@@ -117,17 +132,9 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string HandicappedComplianceTableSync::COL_STATUS ("status");
-		const std::string HandicappedComplianceTableSync::COL_CAPACITY ("capacity");
-		const std::string HandicappedComplianceTableSync::COL_RESERVATION_RULE("reservation_rule");
-
 		HandicappedComplianceTableSync::HandicappedComplianceTableSync()
 			: SQLiteRegistryTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_STATUS, "INTEGER");
-			addTableColumn(COL_CAPACITY, "INTEGER");
-			addTableColumn(COL_RESERVATION_RULE, "INTEGER");
 		}
 
 		void HandicappedComplianceTableSync::Search(
@@ -139,7 +146,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 " 
 				;
 			if (number > 0)

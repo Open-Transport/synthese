@@ -28,25 +28,35 @@
 #include "DbModuleClass.h"
 #include "Constants.h"
 
-
+using namespace std;
 
 namespace synthese
 {
-	template<> const std::string util::FactorableTemplate<db::SQLiteTableSync, db::DbModuleConfigTableSync>::FACTORY_KEY("999 db config");
+	template<> const string util::FactorableTemplate<db::SQLiteTableSync, db::DbModuleConfigTableSync>::FACTORY_KEY("999 db config");
 
 	namespace db
 	{
+		const string DbModuleConfigTableSync::COL_PARAMNAME("param_name");
+		const string DbModuleConfigTableSync::COL_PARAMVALUE("param_value");
 
-	    const std::string DbModuleConfigTableSync::TABLE_NAME ("t999_config");
-	    const std::string DbModuleConfigTableSync::COL_PARAMNAME ("param_name");
-	    const std::string DbModuleConfigTableSync::COL_PARAMVALUE ("param_value");
+	    const SQLiteTableFormat DbModuleConfigTableSync::TABLE(
+			"t999_config",
+			false,
+			TRIGGERS_ENABLED_CLAUSE,
+			true,
+			true,
+			SQLiteTableFormat::CreateFields(
+				SQLiteTableFormat::Field(COL_PARAMNAME, TEXT),
+				SQLiteTableFormat::Field(COL_PARAMVALUE, TIMESTAMP),
+				SQLiteTableFormat::Field()
+			), SQLiteTableFormat::Indexes()
+		);
+
 
 
 		DbModuleConfigTableSync::DbModuleConfigTableSync ()
-			: util::FactorableTemplate<synthese::db::SQLiteTableSync,DbModuleConfigTableSync>()// (TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<DbModuleConfigTableSync>()
 		{
-			addTableColumn (COL_PARAMNAME, "TEXT", false);
-			addTableColumn (COL_PARAMVALUE, "TIMESTAMP", true);
 		}
 
 
@@ -57,7 +67,6 @@ namespace synthese
 		}
 
 		    
-
 
 		void 
 		DbModuleConfigTableSync::rowsAdded (SQLite* sqlite, 
@@ -94,7 +103,7 @@ namespace synthese
 
 		const std::string& DbModuleConfigTableSync::getTableName() const
 		{
-			return TABLE_NAME;
+			return TABLE.NAME;
 		}
 
 

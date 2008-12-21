@@ -46,11 +46,34 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,TextTemplateTableSync>::FACTORY_KEY("17.10.10 Text templates");
 	}
 
+	namespace messages
+	{
+		const string TextTemplateTableSync::COL_NAME = "name";
+		const string TextTemplateTableSync::COL_SHORT_TEXT = "short_text";
+		const string TextTemplateTableSync::COL_LONG_TEXT = "long_text";
+		const string TextTemplateTableSync::COL_LEVEL = "level";
+		const string TextTemplateTableSync::COL_IS_FOLDER("is_folder");
+		const string TextTemplateTableSync::COL_PARENT_ID("parent_id");
+	}
+
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE_NAME = "t038_text_templates";
-		template<> const int SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE_ID = 38;
-		template<> const bool SQLiteTableSyncTemplate<TextTemplateTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE(
+			TextTemplateTableSync::CreateFormat(
+				"t038_text_templates",
+				SQLiteTableFormat::CreateFields(
+					SQLiteTableFormat::Field(TextTemplateTableSync::COL_NAME, TEXT),
+					SQLiteTableFormat::Field(TextTemplateTableSync::COL_SHORT_TEXT, TEXT),
+					SQLiteTableFormat::Field(TextTemplateTableSync::COL_LONG_TEXT, TEXT),
+					SQLiteTableFormat::Field(TextTemplateTableSync::COL_LEVEL, INTEGER),
+					SQLiteTableFormat::Field(TextTemplateTableSync::COL_IS_FOLDER, INTEGER),
+					SQLiteTableFormat::Field(TextTemplateTableSync::COL_PARENT_ID, INTEGER),
+					SQLiteTableFormat::Field()
+				), SQLiteTableFormat::CreateIndexes(
+					SQLiteTableFormat::Index(TextTemplateTableSync::COL_LEVEL),
+					SQLiteTableFormat::Index(TextTemplateTableSync::COL_PARENT_ID),
+					SQLiteTableFormat::Index()
+		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(
 			TextTemplate* object,
@@ -79,7 +102,7 @@ namespace synthese
 			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
             query
-				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getName())
 				<< "," << Conversion::ToSQLiteString(object->getShortMessage())
@@ -95,27 +118,9 @@ namespace synthese
 
 	namespace messages
 	{
-		const string TextTemplateTableSync::COL_NAME = "name";
-		const string TextTemplateTableSync::COL_SHORT_TEXT = "short_text";
-		const string TextTemplateTableSync::COL_LONG_TEXT = "long_text";
-		const string TextTemplateTableSync::COL_LEVEL = "level";
-		const string TextTemplateTableSync::COL_IS_FOLDER("is_folder");
-		const string TextTemplateTableSync::COL_PARENT_ID("parent_id");
-			
-
 		TextTemplateTableSync::TextTemplateTableSync()
 			: SQLiteNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_NAME, "TEXT");
-			addTableColumn(COL_SHORT_TEXT, "TEXT");
-			addTableColumn(COL_LONG_TEXT, "TEXT");
-			addTableColumn(COL_LEVEL, "INTEGER");
-			addTableColumn(COL_IS_FOLDER, "INTEGER");
-			addTableColumn(COL_PARENT_ID, "INTEGER");
-
-			addTableIndex(COL_LEVEL);
-			addTableIndex(COL_PARENT_ID);
 		}
 
 
@@ -137,7 +142,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE "
 
 			// Filtering

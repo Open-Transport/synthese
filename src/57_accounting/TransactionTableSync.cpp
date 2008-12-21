@@ -54,8 +54,8 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<TransactionTableSync>::TABLE_NAME = "t031_transactions";
-		template<> const int SQLiteTableSyncTemplate<TransactionTableSync>::TABLE_ID = 31;
+		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<TransactionTableSync>::TABLE.NAME = "t031_transactions";
+		template<> const int SQLiteTableSyncTemplate<TransactionTableSync>::TABLE.ID = 31;
 		template<> const bool SQLiteTableSyncTemplate<TransactionTableSync>::HAS_AUTO_INCREMENT = true;
 
 		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::load(Transaction* t, const db::SQLiteResultSPtr& rows )
@@ -93,7 +93,7 @@ namespace synthese
 				if (t->getKey() <= 0)
 					t->setKey(getId());
 				query
-					<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+					<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 					<< Conversion::ToString(t->getKey())
 					<< "," << Conversion::ToSQLiteString(t->getName())
 					<< "," << Conversion::ToString(t->getDocumentId())
