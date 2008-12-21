@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_DISPLAY_TYPES_ADMIN_H
 #define SYNTHESE_DISPLAY_TYPES_ADMIN_H
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "AdminInterfaceElementTemplate.h"
+#include "ResultHTMLTable.h"
 
 namespace synthese
 {
@@ -66,7 +67,15 @@ namespace synthese
 		*/
 		class DisplayTypesAdmin : public admin::AdminInterfaceElementTemplate<DisplayTypesAdmin>
 		{
+			std::string									_searchName;
+			util::RegistryKeyType						_searchInterfaceId;
+			html::ResultHTMLTable::ResultParameters		_resultParameters;
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+			
 		public:
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_INTERFACE_ID;
+			
 			DisplayTypesAdmin();
 			
 			/** Initialization of the parameters from a request.

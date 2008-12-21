@@ -173,22 +173,48 @@ namespace synthese
 
 		void DisplayTypeTableSync::Search(
 			Env& env,
-			string exactName
-			, int first /*= 0*/
-			, int number /*= 0*/
-			, bool orderByName
-			, bool raisingOrder,
+			string exactName,
+			RegistryKeyType interfaceId,
+			int first, /*= 0*/
+			int number, /*= 0*/
+			bool orderByName,
+			bool orderByInterfaceName,
+			bool orderByRows,
+			bool raisingOrder,
 			LinkLevel linkLevel
 		){
 			stringstream query;
 			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1";
+				<< " SELECT t.*"
+				<< " FROM " << TABLE.NAME << " AS t";
+			if (orderByInterfaceName)
+			{
+				query << " INNER JOIN " << InterfaceTableSync::TABLE.NAME << " AS i ON i." << TABLE_COL_ID  << "=t." << DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID;
+			}
+
+			query << " WHERE 1";
 			if (!exactName.empty())
-				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(exactName);
+			{
+				query << " AND t." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(exactName);
+			}
+			if (interfaceId != UNKNOWN_VALUE)
+			{
+				query << " AND t." << COL_DISPLAY_INTERFACE_ID << "=" << Conversion::ToString(interfaceId);
+			}
+
 			if (orderByName)
-				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			{
+				query << " ORDER BY t." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			}
+			else if(orderByInterfaceName)
+			{
+				query << " ORDER BY i." << InterfaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			}
+			else if(orderByRows)
+			{
+				query << " ORDER BY t." << COL_ROWS_NUMBER << (raisingOrder ? " ASC" : " DESC");
+			}
+
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

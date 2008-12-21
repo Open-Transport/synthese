@@ -65,11 +65,14 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				std::string exactName = std::string()
-				, int first = 0
-				, int number = UNKNOWN_VALUE
-				, bool orderByName = true
-				, bool raisingOrder = true,
+				std::string nameLike = std::string(),
+				util::RegistryKeyType interfaceId = UNKNOWN_VALUE,
+				int first = 0,
+				int number = UNKNOWN_VALUE,
+				bool orderByName = true,
+				bool orderByInterfaceName = false,
+				bool orderByRows = false,
+				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};

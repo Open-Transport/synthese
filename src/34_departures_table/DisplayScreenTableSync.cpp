@@ -396,6 +396,7 @@ namespace synthese
 			    << TABLE.NAME << " AS d"
 			    << " INNER JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
 			    << " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
+			    << " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
 			    ;
 			if (lineid != UNKNOWN_VALUE || neededLevel > FORBIDDEN)
 			    query
@@ -436,7 +437,7 @@ namespace synthese
 				;
 			else if (orderByStopName)
 			    query
-				<< " ORDER BY s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< " ORDER BY s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				;
@@ -444,13 +445,13 @@ namespace synthese
 			    query
 				<< " ORDER BY d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				;
 			else if (orderByType)
 			    query
 				<< " ORDER BY " << _COL_TYPE_NAME << (raisingOrder ? " ASC" : " DESC")
 				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				;
 			if (number > 0)

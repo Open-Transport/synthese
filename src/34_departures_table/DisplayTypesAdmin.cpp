@@ -36,6 +36,8 @@
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayTypeAdmin.h"
 #include "QueryString.h"
+#include "SearchFormHTMLTable.h"
+#include "ActionResultHTMLTable.h"
 
 #include <boost/foreach.hpp>
 
@@ -65,16 +67,42 @@ namespace synthese
 
 	namespace departurestable
 	{
+		const string DisplayTypesAdmin::PARAMETER_NAME("na");
+		const string DisplayTypesAdmin::PARAMETER_INTERFACE_ID("ii");
+
 		void DisplayTypesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			DisplayTypeTableSync::Search(_env, string(), 0, UNKNOWN_VALUE, true, true, UP_LINKS_LOAD_LEVEL);
+			_requestParameters.setFromParametersMap(map.getMap(), DisplayTypeTableSync::COL_NAME, 20);
+			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
+			_searchInterfaceId = map.getUid(PARAMETER_INTERFACE_ID, false, FACTORY_KEY);
+
+			DisplayTypeTableSync::Search(
+				_env,
+				"%"+ _searchName +"%",
+				_searchInterfaceId,
+				_requestParameters.first,
+				_requestParameters.maxSize + 1,
+				_requestParameters.orderField == DisplayTypeTableSync::COL_NAME,
+				_requestParameters.orderField == DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID,
+				_requestParameters.orderField == DisplayTypeTableSync::COL_ROWS_NUMBER,
+				_requestParameters.raisingOrder,
+				UP_LINKS_LOAD_LEVEL
+			);
+
+			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayType>());
 		}
 
-		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
+		void DisplayTypesAdmin::display(
+			ostream& stream,
+			interfaces::VariablesMap& variables,
+			const server::FunctionRequest<admin::AdminRequest>* request
+		) const	{
 			// Right
 			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 			
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<DisplayTypesAdmin>();
+
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(request);
 			createRequest.getFunction()->setPage<DisplayTypesAdmin>();
 			
@@ -84,53 +112,55 @@ namespace synthese
 			FunctionRequest<AdminRequest> openRequest(request);
 			openRequest.getFunction()->setPage<DisplayTypeAdmin>();
 			
+			stream << "<h1>Recherche</h1>";
 
-			stream
-				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
-				<< "<table class=\"adminresults\"><tr><th>Nom</th><th>Interface d'affichage</th><th>Rangées</th><th>Max arrêts intermédiaires</th>"
-				<< "<th>Accès</th>";
+			SearchFormHTMLTable f(searchRequest.getHTMLForm());
+			stream << f.open();
+			stream << f.cell("Nom", f.getForm().getTextInput(PARAMETER_NAME, _searchName));
+			stream << f.cell("Interface d'affichage", f.getForm().getSelectInput(PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true), _searchInterfaceId));
+			stream << f.close();
+
+			stream << "<h1>Résultat de la recherche</h1>";
+
+			ResultHTMLTable::HeaderVector v;
+			v.push_back(make_pair(DisplayTypeTableSync::COL_NAME, "Nom"));
+			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Interface d'affichage"));
+			v.push_back(make_pair(DisplayTypeTableSync::COL_ROWS_NUMBER, "Nombre de rangées"));
+			v.push_back(make_pair(string(), "Actions"));
 			if (writeRight)
-				stream << "<th>Actions</th>";
-			stream << "</tr>";
+			{
+				v.push_back(make_pair(string(), "Actions"));
+			}
+			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _resultParameters, createRequest.getHTMLForm("create"));
 
 			// Display types loop
+			stream << t.open();
 			BOOST_FOREACH(shared_ptr<DisplayType> dt, _env.getRegistry<DisplayType>())
 			{
 				deleteRequest.getAction()->setType(dt);
 				openRequest.setObjectId(dt->getKey());
 
-//				uf.setUpdateRight(writeRight);
-				stream
-					<< "<tr>"
-					<< "<td>" << dt->getName() << "</td>"
-					<< "<td>" << ((dt->getDisplayInterface() == NULL) ? "" : dt->getDisplayInterface()->getName()) << "</td>"
-					<< "<td>" << dt->getRowNumber() << "</td>"
-					<< "<td>" << dt->getMaxStopsNumber() << "</td>"
-					<< "<td>" << openRequest.getHTMLForm().getLinkButton("Modifier", string(), "monitor_edit.png") << "</td>"
-					;
+				stream << t.row();
+				stream << t.col() << dt->getName();
+				stream << t.col() << ((dt->getDisplayInterface() == NULL) ? "" : dt->getDisplayInterface()->getName());
+				stream << t.col() << dt->getRowNumber();
+				stream << t.col() << openRequest.getHTMLForm().getLinkButton("Modifier", string(), "monitor_edit.png");
 				if (writeRight)
-					stream
-						<< "<td>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?", "monitor_delete.png");
-				stream << "</tr>";
+				{
+					stream << t.col() << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?", "monitor_delete.png");
+				}
 			}
 
 			// New type
 			if (writeRight)
 			{
-				HTMLForm cf(createRequest.getHTMLForm("create"));
-				stream << cf.open();
-				stream
-					<< "<tr>"
-					<< "<td>" << cf.getTextInput(CreateDisplayTypeAction::PARAMETER_NAME, "", "(Entrez le nom ici)") << "</td>"
-					<< "<td>" << cf.getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), (uid) 0) << "</td>"
-					<< "<td>" << cf.getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99) << "</td>"
-					<< "<td>" << cf.getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER, UNKNOWN_VALUE, 99) << "</td>"
-					<< "<td colspan=\"2\">" << cf.getSubmitButton("Ajouter") << "</td>"
-					<< "</tr>";
-				stream << cf.close();
+				stream << t.row();
+				stream << t.col() << t.getActionForm().getTextInput(CreateDisplayTypeAction::PARAMETER_NAME, "", "(Entrez le nom ici)");
+				stream << t.col() << t.getActionForm().getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true), RegistryKeyType(0));
+				stream << t.col() << t.getActionForm().getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99);
+				stream << t.col(2) << t.getActionForm().getSubmitButton("Ajouter");
 			}
-
-			stream << "</table>";
+			stream << t.close();
 		}
 
 		bool DisplayTypesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
