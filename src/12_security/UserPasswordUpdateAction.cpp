@@ -55,7 +55,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::GetEditable(_request->getObjectId());
+				_user = UserTableSync::GetEditable(_request->getObjectId(), _env);
 
 				_password = map.getString(PARAMETER_PASS1, true, FACTORY_KEY);
 

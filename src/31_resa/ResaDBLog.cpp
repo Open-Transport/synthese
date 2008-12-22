@@ -76,7 +76,8 @@ namespace synthese
 
 			if (tableId == UserTableSync::TABLE.ID)
 			{
-				shared_ptr<const User> user(UserTableSync::Get(id));
+				Env env;
+				shared_ptr<const User> user(UserTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 				return user->getFullName();
 			}
 
@@ -132,7 +133,8 @@ namespace synthese
 
 		void ResaDBLog::UpdateCallEntryDate( uid callId )
 		{
-			shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId));
+			Env env;
+			shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
 			DBLogEntry::Content content(entry->getContent());
 			DateTime now(TIME_CURRENT);
 			content[COL_DATE2] = now.toSQLString(false);
@@ -145,7 +147,8 @@ namespace synthese
 		{
 			try
 			{
-				shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId));
+				Env env;
+				shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
 				entry->setObjectId(customerId);
 
 				DBLogEntryTableSync::Save(entry.get());
@@ -212,10 +215,11 @@ namespace synthese
 			ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE])));
 			shared_ptr<ReservationTransaction> tr;
 			ReservationStatus status(NO_RESERVATION);
+			Env env;
 			
 			if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
 			{
-				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]));
+				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), env);
 				//ReservationTableSync::search(tr.get());
 				status = tr->getStatus();
 			}

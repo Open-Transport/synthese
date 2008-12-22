@@ -75,7 +75,7 @@ namespace synthese
 
 			try
 			{
-				_type = DisplayTypeTableSync::GetEditable(id, &_env, UP_LINKS_LOAD_LEVEL);
+				_type = DisplayTypeTableSync::GetEditable(id, _env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (ObjectNotFoundException<DisplayType>& e)
 			{

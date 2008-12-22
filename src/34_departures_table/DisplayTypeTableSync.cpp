@@ -81,7 +81,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Load(
 			DisplayType* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText ( DisplayTypeTableSync::COL_NAME));
@@ -131,8 +131,7 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Unlink(
-			DisplayType* obj,
-			Env* env
+			DisplayType* obj
 		){
 			obj->setDisplayInterface(NULL);
 			obj->setAudioInterface(NULL);

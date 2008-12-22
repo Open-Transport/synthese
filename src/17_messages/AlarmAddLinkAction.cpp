@@ -76,7 +76,7 @@ namespace synthese
 			RegistryKeyType id(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
 			try
 			{
-				_alarm = AlarmTableSync::Get(id);
+				_alarm = AlarmTableSync::Get(id, _env);
 			}
 			catch (ObjectNotFoundException<Alarm>)
 			{

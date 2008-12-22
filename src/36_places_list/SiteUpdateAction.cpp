@@ -84,7 +84,7 @@ namespace synthese
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			try
 			{
-				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY), _env);
 			}
 			catch (...)
 			{
@@ -120,7 +120,7 @@ namespace synthese
 		{
 			try
 			{
-				_site = SiteTableSync::GetEditable(id);
+				_site = SiteTableSync::GetEditable(id, _env);
 			}
 			catch(...)
 			{

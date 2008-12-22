@@ -30,8 +30,6 @@
 
 namespace synthese
 {
-	using namespace util;
-
 	namespace db
 	{
 		/** SQLiteRegistryTableSyncTemplate class.
@@ -67,8 +65,8 @@ namespace synthese
 				, const SQLiteResultSPtr& rows
 				, bool isFirstSync = false
 			){
-				Env* env(Env::GetOfficialEnv());
-				Registry<T>& registry(env->template getEditableRegistry<T>());
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
@@ -76,13 +74,13 @@ namespace synthese
 						if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
 						{
 							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
-							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get(), env);
-							Load (address.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get());
+							Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 						else
 						{
 							boost::shared_ptr<T> object(new T(rows->getKey()));
-							Load(object.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 							registry.add(object);
 						}
 					}
@@ -102,8 +100,8 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
-				Env* env(Env::GetOfficialEnv());
-				Registry<T>& registry(env->template getEditableRegistry<T>());
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
@@ -111,8 +109,8 @@ namespace synthese
 						if (registry.contains(rows->getKey()))
 						{
 							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
-							Unlink(address.get(), env);
-							Load(address.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							Unlink(address.get());
+							Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 					}
 					catch (util::Exception& e)
@@ -132,8 +130,8 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
-				Env* env(Env::GetOfficialEnv());
-				Registry<T>& registry(env->template getEditableRegistry<T>());
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
@@ -141,7 +139,7 @@ namespace synthese
 						util::RegistryKeyType id(rows->getKey());
 						if (registry.contains(id))
 						{
-							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get(), env);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get());
 							registry.remove(id);
 						}
 					}

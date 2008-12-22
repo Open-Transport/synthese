@@ -1,44 +1,48 @@
-
-/** DisplayScreenTableSync class header.
-	@file DisplayScreenTableSync.h
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// DisplayScreenTableSync class header.
+///	@file DisplayScreenTableSync.h
+///	@author Hugues Romain
+///	@date 2008-12-21 21:17
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_DisplayScreenTableSync_H__
 #define SYNTHESE_DisplayScreenTableSync_H__
-
 
 #include <vector>
 #include <string>
 #include <iostream>
 
 #include "DisplayScreen.h"
-
 #include "01_util/Constants.h"
 #include "01_util/UId.h"
-
 #include "SQLiteRegistryTableSyncTemplate.h"
-
 #include "12_security/Types.h"
 
 namespace synthese
 {
+	namespace messages
+	{
+		class SentAlarm;
+	}
+
 	namespace departurestable
 	{
 		/** DisplayScreen table synchronizer.
@@ -46,12 +50,6 @@ namespace synthese
 		*/
 		class DisplayScreenTableSync : public db::SQLiteRegistryTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>
 		{
-			static const std::string _COL_LINE_EXISTS;
-			static const std::string _COL_LAST_MAINTENANCE_CONTROL;
-			static const std::string _COL_LAST_OK_MAINTENANCE_CONTROL;
-			static const std::string _COL_CORRUPTED_DATA_START_DATE;
-			static const std::string _COL_TYPE_NAME;
-
 		public:
 			//! \name Columns
 			//@{
@@ -119,7 +117,40 @@ namespace synthese
 				, bool orderByStatus = false
 				, bool orderByMessage = false
 				, bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+
+			////////////////////////////////////////////////////////////////////
+			///	Gets the message currently displayed on a screen.
+			/// @param env Environment to populate
+			///	@param screenId id of the screen
+			///	@return pointer to the message
+			///	@author Hugues Romain
+			///	@date 2008
+			/// @warning The message is returned even if the screen is deactivated.
+			/// If there is no message, a null pointer is returned.
+			////////////////////////////////////////////////////////////////////
+			static boost::shared_ptr<messages::SentAlarm> GetCurrentDisplayedMessage(
+				util::Env& env,
+				util::RegistryKeyType screenId
+			);
+
+
+			
+			////////////////////////////////////////////////////////////////////
+			///	Tests if at least a line is displayed on the screen.
+			///	@param screenId id of the screen
+			///	@return bool true if at least a line is displayed on the screen
+			///	@author Hugues Romain
+			///	@date 2008
+			/// @warning This function does not verify if the line has any
+			/// active service
+			/// @todo work only for departures table : rewrite inverted query
+			////////////////////////////////////////////////////////////////////
+			static bool GetIsAtLeastALineDisplayed(
+				util::RegistryKeyType screenId
 			);
 		};
 	}

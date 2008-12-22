@@ -593,9 +593,31 @@ namespace synthese
 
 
 		DisplayMonitoringStatus::~DisplayMonitoringStatus(
+		) {
 
-			) {
+		}
 
+
+
+		std::string DisplayMonitoringStatus::GetStatusIcon(
+			Status value
+		) {
+			switch(value)
+			{
+			case DISPLAY_MONITORING_OK:
+				return "accept.png";
+
+			case DISPLAY_MONITORING_ERROR:
+				return "exclamation.png";
+
+			case DISPLAY_MONITORING_UNKNOWN:
+				return "help.png";
+
+			case DISPLAY_MONITORING_WARNING:
+				return "error.png";
+			}
+			assert(false);
+			return string();
 		}
 	}
 }

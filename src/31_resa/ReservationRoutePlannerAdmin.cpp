@@ -125,7 +125,7 @@ namespace synthese
 			{
 				try
 				{
-					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(id);
+					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(id, _env);
 					//ReservationTableSync::Search(_confirmedTransaction.get());
 				}
 				catch (...)
@@ -139,7 +139,7 @@ namespace synthese
 			{
 				try
 				{
-					_customer = UserTableSync::Get(id);
+					_customer = UserTableSync::Get(id, _env);
 				}
 				catch (...)
 				{

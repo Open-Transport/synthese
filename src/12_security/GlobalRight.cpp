@@ -55,14 +55,14 @@ namespace synthese
 		}
 
 		std::string GlobalRight::displayParameter(
-			util::Env* env
+			util::Env& env
 		) const	{
 			return "par défaut";
 		}
 
 		bool GlobalRight::perimeterIncludes(
 			const std::string& perimeter,
-			util::Env* env
+			util::Env& env
 		) const	{
 			return true;
 		}

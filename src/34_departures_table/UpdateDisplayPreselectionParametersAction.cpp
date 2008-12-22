@@ -60,7 +60,7 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
 				_activatePreselection =  map.getBool(PARAMETER_ACTIVATE_PRESELECTION, true, false, FACTORY_KEY);
 				_preselectionDelay = map.getInt(PARAMETER_PRESELECTION_DELAY, true, FACTORY_KEY);
 			}

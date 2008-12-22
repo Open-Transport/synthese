@@ -67,9 +67,9 @@ namespace synthese
 			uid id = map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY);
 			if (id != UNKNOWN_VALUE)
 			{
-				if (!Env::GetOfficialEnv()->getRegistry<Profile>().contains(id))
+				if (!Env::GetOfficialEnv().getRegistry<Profile>().contains(id))
 					throw ActionException("Specified root profile not found.");
-				_templateProfile = ProfileTableSync::Get(id);
+				_templateProfile = ProfileTableSync::Get(id, _env);
 			}
 
 			// Name unicity
@@ -87,7 +87,7 @@ namespace synthese
 			profile->setName(_name);
 			if (_templateProfile.get())
 			{
-				profile->setParent(_templateProfile->getKey());
+				profile->setParent(_templateProfile.get());
 				const RightsVector& rights(_templateProfile->getRights());
 				for (RightsVector::const_iterator it(rights.begin()); it != rights.end(); ++it)
 					profile->addRight(it->second);

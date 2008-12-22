@@ -45,7 +45,7 @@ namespace synthese
 		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,SingleSentAlarmInheritedTableSync,SingleSentAlarm>::Load(
 			SingleSentAlarm* obj,
 			const SQLiteResultSPtr& rows, 
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			_CommonLoad(obj, rows, env, linkLevel);
@@ -55,7 +55,7 @@ namespace synthese
 		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,SingleSentAlarmInheritedTableSync,SingleSentAlarm>::Unlink(SingleSentAlarm* obj, Env* env)
+		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,SingleSentAlarmInheritedTableSync,SingleSentAlarm>::Unlink(SingleSentAlarm* obj)
 		{
 		}
 
@@ -137,7 +137,7 @@ namespace synthese
 				while (rows->next ())
 				{
 					shared_ptr<SingleSentAlarm> object(new SingleSentAlarm);
-					Load(object.get(), rows, &env, linkLevel);
+					Load(object.get(), rows, env, linkLevel);
 					SingleSentAlarm::Complements c;
 					c.recipientsNumber = rows->getInt (_COL_RECIPIENTS_NUMBER);
 

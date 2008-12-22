@@ -63,7 +63,7 @@ namespace synthese
 
 			try
 			{
-				_line = CommercialLineTableSync::Get(id);
+				_line = CommercialLineTableSync::Get(id, _env);
 			}
 			catch (...)
 			{

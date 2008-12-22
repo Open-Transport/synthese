@@ -111,13 +111,13 @@ namespace synthese
 			*/
 			static boost::shared_ptr<T> GetEditable(
 				util::RegistryKeyType key,
-				util::Env* env = NULL,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				if (env != NULL && env->getRegistry<T>().contains(key))
+				if (env.getRegistry<T>().contains(key))
 				{
-					return env->getEditableRegistry<T>().getEditable(key);
+					return env.getEditableRegistry<T>().getEditable(key);
 				}
 
 				boost::shared_ptr<T> object;
@@ -134,10 +134,7 @@ namespace synthese
 					object.reset(new T(key));
 				}
 				
-				if (env != NULL)
-				{
-					env->getEditableRegistry<T>().add(object);
-				}
+				env.getEditableRegistry<T>().add(object);
 				return object;
 			}
 
@@ -157,8 +154,8 @@ namespace synthese
 			*/
 			static boost::shared_ptr<const T> Get(
 				util::RegistryKeyType key,
-				util::Env* env = NULL,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
 				return boost::const_pointer_cast<const T>(GetEditable(key,env,linkLevel,autoCreate));
@@ -174,15 +171,14 @@ namespace synthese
 			static void Load(
 				T* obj,
 				const SQLiteResultSPtr& rows,
-				util::Env* env = NULL,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 
 
 			static void Unlink(
-				T* obj,
-				util::Env* env = NULL
+				T* obj
 			);
 
 
@@ -218,7 +214,7 @@ namespace synthese
 					while (rows->next ())
 					{
 						boost::shared_ptr<T> object(new T(rows->getKey()));
-						Load(object.get(), rows, &env, linkLevel);
+						Load(object.get(), rows, env, linkLevel);
 						registry.add(object);
 					}
 				}
@@ -232,4 +228,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_SQLiteTableSyncTemplate_H__
-

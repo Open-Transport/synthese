@@ -71,7 +71,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Load(
 			RollingStock* object
 			, const db::SQLiteResultSPtr& rows
-			, Env* env,
+			, Env& env,
 			LinkLevel linkLevel
 		){
 			// Properties
@@ -101,8 +101,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Unlink(
-			RollingStock* obj,
-			Env* env
+			RollingStock* obj
 		){
 		}
 	}

@@ -84,24 +84,17 @@ namespace synthese
 
 			// Searched profile
 			uid id(map.getUid(PARAM_SEARCH_PROFILE_ID, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE && Env::GetOfficialEnv()->getRegistry<Profile>().contains(id))
-				_searchProfile = ProfileTableSync::Get(id);
+			if (id != UNKNOWN_VALUE && _env.getRegistry<Profile>().contains(id))
+			{
+				_searchProfile = ProfileTableSync::Get(id, _env);
+			}
 
 			// Table Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_LOGIN, 30);
-		}
 
-		bool UsersAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
-		{
-			return request->isAuthorized<SecurityRight>(READ);
-		}
-
-		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
 			// Search
-			Env env;
 			UserTableSync::Search(
-				env,
+				_env,
 				"%"+_searchLogin+"%"
 				, "%"+_searchName+"%"
 				, "%"+_searchSurname+"%"
@@ -116,10 +109,17 @@ namespace synthese
 				, _requestParameters.raisingOrder,
 				UP_LINKS_LOAD_LEVEL
 			);
-			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<User>());
+			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<User>());
 
+		}
 
+		bool UsersAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return request->isAuthorized<SecurityRight>(READ);
+		}
+
+		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		{
 			// Request for search form
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<UsersAdmin>();
@@ -150,7 +150,7 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			if (env.getRegistry<User>().empty())
+			if (_env.getRegistry<User>().empty())
 				stream << "Aucun utilisateur trouvé";
 
 
@@ -163,7 +163,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<User> user, env.getRegistry<User>())
+			BOOST_FOREACH(shared_ptr<User> user, _env.getRegistry<User>())
 			{
 				userRequest.setObjectId(user->getKey());
 				deleteUserRequest.setObjectId(user->getKey());

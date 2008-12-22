@@ -86,7 +86,7 @@ namespace synthese
 			//! \name Right definition
 			//@{
 				virtual std::string	displayParameter(
-					util::Env* env = util::Env::GetOfficialEnv()
+					util::Env& env = util::Env::GetOfficialEnv()
 				) const = 0;
 				virtual ParameterLabelsVector	getParametersLabels()	const = 0;
 				
@@ -100,7 +100,7 @@ namespace synthese
 				*/
 				virtual bool perimeterIncludes(
 					const std::string& perimeter,
-					util::Env* env = util::Env::GetOfficialEnv()
+					util::Env& env = util::Env::GetOfficialEnv()
 				) const = 0;
 			//@}
 

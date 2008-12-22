@@ -35,6 +35,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
@@ -63,6 +68,7 @@ namespace synthese
 			@result vector of the founded searched connection places from the live data objects (do not delete the objects after use). 
 		*/
 		std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
+			util::Env& env,
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl = true
 			, security::RightLevel neededLevel = security::FORBIDDEN
@@ -84,7 +90,11 @@ namespace synthese
 		/** Line searcher.
 			@result map founded searched physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
 		*/
-		std::vector<boost::shared_ptr<const env::CommercialLine> > getCommercialLineWithBroadcastPoints(int number=UNKNOWN_VALUE, int first=0);
+		std::vector<boost::shared_ptr<const env::CommercialLine> > getCommercialLineWithBroadcastPoints(
+			util::Env& env,
+			int number = UNKNOWN_VALUE,
+			int first = 0
+		);
 	}
 }
 

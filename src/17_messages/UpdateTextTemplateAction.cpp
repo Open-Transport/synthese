@@ -72,10 +72,10 @@ namespace synthese
 			{
 				// Text ID
 				uid id = map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY);
-				_text = TextTemplateTableSync::GetEditable(id);
+				_text = TextTemplateTableSync::GetEditable(id, _env);
 		
 				id = map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY);
-				_folder = TextTemplateTableSync::Get(id);
+				_folder = TextTemplateTableSync::Get(id, _env);
 
 				// Name
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);

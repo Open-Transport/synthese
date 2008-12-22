@@ -79,7 +79,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::Load(
 			RoadChunk* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    // Is departure
@@ -136,8 +136,7 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::Unlink(
-			RoadChunk* obj,
-			Env* env
+			RoadChunk* obj
 		){
 		}
 

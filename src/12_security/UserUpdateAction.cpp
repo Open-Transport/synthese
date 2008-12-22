@@ -35,6 +35,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<Action, security::UserUpdateAction>::FACTORY_KEY("uua");
 	
@@ -63,7 +64,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::GetEditable(_request->getObjectId());
+				_user = UserTableSync::GetEditable(_request->getObjectId(), _env);
 
 				_login = map.getString(PARAMETER_LOGIN, true, FACTORY_KEY);
 				if (_login.empty())
@@ -89,7 +90,7 @@ namespace synthese
 				_authorizedLogin = map.getBool(PARAMETER_AUTHORIZED_LOGIN, true, false, FACTORY_KEY);
 
 				uid id(map.getUid(PARAMETER_PROFILE_ID, true, FACTORY_KEY));
-				_profile = ProfileTableSync::Get(id);
+				_profile = ProfileTableSync::Get(id, _env);
 			}
 			catch (ObjectNotFoundException<Profile>& e)
 			{

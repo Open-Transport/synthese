@@ -43,6 +43,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace db;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<util::ModuleClass, interfaces::InterfaceModule>::FACTORY_KEY("11_interfaces");
 
@@ -59,7 +60,7 @@ namespace synthese
 			{
 				m.push_back(make_pair(uid(0), "(aucune)"));
 			}
-			BOOST_FOREACH(shared_ptr<Interface> interf, Env::GetOfficialEnv()->getRegistry<Interface>())
+			BOOST_FOREACH(shared_ptr<Interface> interf, Env::GetOfficialEnv().getRegistry<Interface>())
 			{
 				m.push_back(make_pair(interf->getKey(), interf->getName()));
 			}

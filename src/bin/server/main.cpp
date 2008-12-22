@@ -191,10 +191,10 @@ int main( int argc, char **argv )
 	    return 1;
 	}
 #ifndef WIN32
-	bool daemonMode (vm.count("daemon"));
+	bool daemonMode (vm.count("daemon") != 0);
 #endif        
 #ifdef DEBUG
-	bool monothread (vm.count("monothread"));
+	bool monothread (vm.count("monothread") != 0);
     if (monothread)
     {
         ThreadManager::SetMonothreadEmulation (monothread);

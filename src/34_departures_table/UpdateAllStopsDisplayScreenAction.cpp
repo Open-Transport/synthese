@@ -55,7 +55,7 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
 
 				_value = map.getBool(PARAMETER_VALUE, true, false, FACTORY_KEY);
 

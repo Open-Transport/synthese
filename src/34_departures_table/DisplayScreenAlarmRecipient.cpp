@@ -126,7 +126,8 @@ namespace synthese
 			, server::ActionFunctionRequest<messages::AlarmAddLinkAction,admin::AdminRequest>& addRequest
 			, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
 		){
-			vector<shared_ptr<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreenTableSync,DisplayScreen> (alarm, this->getFactoryKey());
+			Env env;
+			vector<shared_ptr<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreenTableSync,DisplayScreen> (env, alarm, this->getFactoryKey());
 			set<uid> usedDisplayScreens;
 
 			FunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(&addRequest);
@@ -202,7 +203,6 @@ namespace synthese
 
 			stream << t1.open();
 
-			Env env;
 			DisplayScreenTableSync::Search(
 				env,
 				searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>()
@@ -241,9 +241,12 @@ namespace synthese
 		AlarmRecipientSearchFieldsMap DisplayScreenAlarmRecipient::getSearchFields(HTMLForm& form, const ParametersMap& parameters) const
 		{
 			shared_ptr<const Line> line;
+			Env env;
 			uid id(parameters.getUid(PARAMETER_SEARCH_LINE, false, FACTORY_KEY));
 			if (id != UNKNOWN_VALUE)
-				line  = LineTableSync::Get(id);
+			{
+				line  = LineTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL);
+			}
 
 			AlarmRecipientSearchFieldsMap map;
 			AlarmRecipientFilter arf;
@@ -260,7 +263,7 @@ namespace synthese
 		{
 			try
 			{
-				add(Env::GetOfficialEnv()->getRegistry<DisplayScreen>().get(objectId).get(), alarm);
+				add(Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(objectId).get(), alarm);
 			}
 			catch(...)
 			{
@@ -270,7 +273,8 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, uid objectId )
 		{
-			remove(DisplayScreenTableSync::Get(objectId).get(), alarm);
+			Env env;
+			remove(DisplayScreenTableSync::Get(objectId, env).get(), alarm);
 		}
 	}
 }

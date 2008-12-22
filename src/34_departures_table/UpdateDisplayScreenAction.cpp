@@ -81,7 +81,7 @@ namespace synthese
 			try
 			{
 				// The screen
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
 
 				// Properties
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
@@ -98,7 +98,7 @@ namespace synthese
 
 				// Type
 				uid id(map.getUid(PARAMETER_TYPE, true, FACTORY_KEY));
-				_type = DisplayTypeTableSync::Get(id);
+				_type = DisplayTypeTableSync::Get(id, _env);
 
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)

@@ -96,7 +96,8 @@ namespace synthese
 			std::string									_searchSurname;
 			boost::shared_ptr<const Profile>			_searchProfile;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			
+			html::ResultHTMLTable::ResultParameters		_resultParameters;
+
 		public:
 			UsersAdmin();
 

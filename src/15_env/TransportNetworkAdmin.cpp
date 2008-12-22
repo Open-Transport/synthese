@@ -81,7 +81,7 @@ namespace synthese
 		{
 			try
 			{
-				_network = TransportNetworkTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), &_env, UP_LINKS_LOAD_LEVEL);
+				_network = TransportNetworkTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{

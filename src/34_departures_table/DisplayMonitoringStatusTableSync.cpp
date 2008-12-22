@@ -105,7 +105,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Load(
 			DisplayMonitoringStatus* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setTime(DateTime::FromSQLTimestamp(rows->getText(DisplayMonitoringStatusTableSync::COL_TIME)));
@@ -175,8 +175,7 @@ namespace synthese
 
 		
 		template<> void SQLiteDirectTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Unlink(
-			DisplayMonitoringStatus* obj,
-			Env* env
+			DisplayMonitoringStatus* obj
 		){
 			obj->setScreen(NULL);
 		}
@@ -221,6 +220,18 @@ namespace synthese
 				query << " OFFSET " << Conversion::ToString(first);
 
 			LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		boost::shared_ptr<DisplayMonitoringStatus> DisplayMonitoringStatusTableSync::GetStatus(
+			util::RegistryKeyType screenId
+		){
+			Env env;
+			Search(env, screenId, 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL);
+			return env.getRegistry<DisplayMonitoringStatus>().empty() ?
+				shared_ptr<DisplayMonitoringStatus>(new DisplayMonitoringStatus()) :
+				env.getEditableRegistry<DisplayMonitoringStatus>().front();
 		}
 	}
 }

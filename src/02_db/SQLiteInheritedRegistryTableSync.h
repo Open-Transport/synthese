@@ -57,16 +57,17 @@ namespace synthese
 
 			void rowsAdded (SQLite* sqlite, 
 				SQLiteSync* sync,
-				const SQLiteResultSPtr& rows, bool isFirstSync = false)
-			{
-				util::Env* env(util::Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env->getEditableRegistry<ObjectClass>());
+				const SQLiteResultSPtr& rows,
+				bool isFirstSync = false
+			){
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
 				try
 				{
 					if (registry.contains(rows->getKey()))
 					{
 						boost::shared_ptr<ObjectClass> address(registry.getEditable(rows->getKey()));
-						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(address.get(), env);
+						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(address.get());
 						Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 					else
@@ -86,15 +87,15 @@ namespace synthese
 				SQLiteSync* sync,
 				const SQLiteResultSPtr& rows)
 			{
-				util::Env* env(util::Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env->getEditableRegistry<ObjectClass>());
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
 				try
 				{
 					util::RegistryKeyType id(rows->getKey());
 					if (registry.contains(id))
 					{
 						boost::shared_ptr<ObjectClass> address(registry.getEditable(id));
-						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(address.get(), env);
+						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(address.get());
 						Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 				}
@@ -108,14 +109,14 @@ namespace synthese
 				SQLiteSync* sync,
 				const SQLiteResultSPtr& rows)
 			{
-				util::Env* env(util::Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env->getEditableRegistry<ObjectClass>());
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
 				try
 				{
 					uid id = rows->getKey();
 					if (registry.contains(id))
 					{
-						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(registry.getEditable(id).get(), env);
+						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(registry.getEditable(id).get());
 						registry.remove(id);
 					}
 				}

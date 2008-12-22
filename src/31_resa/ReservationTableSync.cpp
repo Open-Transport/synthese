@@ -98,7 +98,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Load(
 			Reservation* object
 			, const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setLineId(rows->getLongLong ( ReservationTableSync::COL_LINE_ID));
@@ -116,7 +116,7 @@ namespace synthese
 			object->setReservationDeadLine(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_RESERVATION_DEAD_LINE)));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object, Env * env)
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object)
 		{
 
 		}

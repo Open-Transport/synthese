@@ -20,24 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DBModule.h"
+#include "SQLite.h"
+#include "ConnectionPlaceTableSync.h"
+#include "CityTableSync.h"
+#include "PhysicalStopTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "LineStopTableSync.h"
+#include "LineTableSync.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "CommercialLine.h"
+#include "AdvancedSelectTableSync.h"
+#include "DisplayScreenTableSync.h"
+#include "Env.h"
+#include "Conversion.h"
+
 #include <sstream>
-
-#include "02_db/DBModule.h"
-#include "02_db/SQLite.h"
-
-#include "15_env/ConnectionPlaceTableSync.h"
-#include "15_env/CityTableSync.h"
-#include "15_env/PhysicalStopTableSync.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/LineStopTableSync.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/CommercialLine.h"
-
-#include "34_departures_table/AdvancedSelectTableSync.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-
-#include "01_util/Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -52,7 +50,8 @@ namespace synthese
 	namespace departurestable
 	{
 
-		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints( 
+		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
+			Env& env,
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
 			, RightLevel neededLevel
@@ -121,8 +120,8 @@ namespace synthese
 				{
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = rows->getInt ("bc");
-					object->place.reset(new PublicTransportStopZoneConnectionPlace);
-					ConnectionPlaceTableSync::Load(object->place.get(), rows);
+					object->place.reset(new PublicTransportStopZoneConnectionPlace(rows->getKey()));
+					ConnectionPlaceTableSync::Load(object->place.get(), rows, env);
 					object->cityName = rows->getText ("city_name");
 					objects.push_back(object);
 				}
@@ -136,7 +135,9 @@ namespace synthese
 
 		
 		
-		std::vector<shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints( int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
+		std::vector<shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints(
+			Env& env,
+			int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
 		{
 			stringstream query;
 			query << " SELECT "
@@ -160,8 +161,10 @@ namespace synthese
 				vector<shared_ptr<const CommercialLine> > objects;
 				while (rows->next ())
 				{
-					objects.push_back(Env::GetOfficialEnv()->getRegistry<CommercialLine>().get(
-							  rows->getLongLong (TABLE_COL_ID)));
+					objects.push_back(CommercialLineTableSync::Get(
+							rows->getLongLong (TABLE_COL_ID),
+							env
+					)	);
 				}
 				return objects;
 			}

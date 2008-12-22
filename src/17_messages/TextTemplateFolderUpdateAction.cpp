@@ -82,7 +82,9 @@ namespace synthese
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 			uid id(map.getUid(PARAMETER_PARENT_ID, true, FACTORY_KEY));
 			if (id > 0)
-				_parent = TextTemplateTableSync::Get(id);
+			{
+				_parent = TextTemplateTableSync::Get(id, _env);
+			}
 
 			Env env;
 			TextTemplateTableSync::Search(
@@ -116,7 +118,7 @@ namespace synthese
 		{
 			try
 			{
-				_folder = TextTemplateTableSync::GetEditable(id);
+				_folder = TextTemplateTableSync::GetEditable(id, _env);
 			}
 			catch(...)
 			{

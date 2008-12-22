@@ -69,7 +69,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Load(
 			PublicPlace* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			string name (rows->getText (PublicPlaceTableSync::COL_NAME));
@@ -86,9 +86,8 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Unlink(
-			PublicPlace* obj,
-			Env* env)
-		{
+			PublicPlace* obj
+		){
 			City* city(const_cast<City*>(obj->getCity()));
 			if (city != NULL)
 			{

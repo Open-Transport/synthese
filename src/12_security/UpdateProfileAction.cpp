@@ -21,16 +21,13 @@
 */
 
 #include "UpdateProfileAction.h"
-
-#include "12_security/SecurityModule.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/SecurityLog.h"
-
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
-
-#include "13_dblog/DBLogModule.h"
+#include "SecurityModule.h"
+#include "ProfileTableSync.h"
+#include "SecurityLog.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
+#include "DBLogModule.h"
 
 using namespace std;
 using namespace boost;
@@ -40,6 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace dblog;
+	using namespace util;	
 
 	namespace util
 	{
@@ -63,7 +61,7 @@ namespace synthese
 			// Profile
 			try
 			{
-				_profile = ProfileTableSync::GetEditable(_request->getObjectId());
+				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), _env);
 			}
 			catch (ObjectNotFoundException<Profile>& e)
 			{

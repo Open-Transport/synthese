@@ -104,7 +104,7 @@ namespace synthese
 			{
 				try
 				{
-					_line = CommercialLineTableSync::Get(lineId);
+					_line = CommercialLineTableSync::Get(lineId, _env);
 				}
 				catch (...)
 				{
@@ -118,7 +118,7 @@ namespace synthese
 			{
 				try
 				{
-					_user = UserTableSync::Get(customerId);
+					_user = UserTableSync::Get(customerId, _env);
 				}
 				catch (...)
 				{

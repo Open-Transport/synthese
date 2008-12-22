@@ -88,7 +88,25 @@ namespace synthese
 				int number = 0,
 				bool orderByScreenId = true,
 				bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+			
+			////////////////////////////////////////////////////////////////////
+			///	Gets the monitoring status of a screen.
+			///	@param screenId id of the screen to describe
+			///	@return Pointer to the corresponding status
+			/// @warning The returned object is incomplete : the _screen pointer
+			///		has NULL value. Use it to read the monitored properties
+			///		only
+			///	@author Hugues Romain
+			///	@date 2008
+			///	If the screen has never sent monitoring messages, then a
+			///	UNKWNOWN status is returned (no exception)
+			////////////////////////////////////////////////////////////////////
+			static boost::shared_ptr<DisplayMonitoringStatus> GetStatus(
+				util::RegistryKeyType screenId
 			);
 		};
 	}

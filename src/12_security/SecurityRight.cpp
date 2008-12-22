@@ -58,36 +58,38 @@ namespace synthese
 
 
 		std::string SecurityRight::displayParameter(
-			util::Env* env
+			util::Env& env
 		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return "(tous profils)";
 
-			return (env->getRegistry<Profile>().contains(Conversion::ToLongLong(_parameter)))
-				? env->getRegistry<Profile>().get(Conversion::ToLongLong(_parameter))->getName()
+			return (env.getRegistry<Profile>().contains(Conversion::ToLongLong(_parameter)))
+				? env.getRegistry<Profile>().get(Conversion::ToLongLong(_parameter))->getName()
 				: "(invalide)";
 		}
 
 		bool SecurityRight::perimeterIncludes(
 			const std::string& perimeter,
-			util::Env* env 
+			util::Env& env 
 		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return true;
 			if (perimeter == UNKNOWN_PERIMETER)
 				return true;
 
-			const Registry<Profile>& registry(env->getRegistry<Profile>());
+			const Registry<Profile>& registry(env.getRegistry<Profile>());
 
 			if (registry.contains(Conversion::ToLongLong(_parameter))
-				&& registry.contains(Conversion::ToLongLong(perimeter)))
-			{
-				shared_ptr<const Profile> includedProfile = registry.get(Conversion::ToLongLong(perimeter));
-				shared_ptr<const Profile> currentProfile = registry.get(Conversion::ToLongLong(_parameter));
-
-				for (;includedProfile.get(); includedProfile = registry.get(includedProfile->getParentId()))
+				&& registry.contains(Conversion::ToLongLong(perimeter))
+			){
+				const Profile* currentProfile(registry.get(Conversion::ToLongLong(_parameter)).get());
+				for(const Profile* includedProfile(registry.get(Conversion::ToLongLong(perimeter)).get()); includedProfile; includedProfile = includedProfile = includedProfile->getParent())
+				{
 					if (currentProfile == includedProfile)
+					{
 						return true;
+					}
+				}
 			}
 
 			return false;

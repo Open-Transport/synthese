@@ -76,7 +76,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_INTERFACE, false, "RWI"));
 				if (id != UNKNOWN_VALUE)
 				{
-					_interface = Env::GetOfficialEnv()->getRegistry<Interface>().get(id);
+					_interface = Env::GetOfficialEnv().getRegistry<Interface>().get(id);
 				}
 
 				_redirectAfterAction = !map.getBool(PARAMETER_NO_REDIRECT_AFTER_ACTION, false, false, "RWI");

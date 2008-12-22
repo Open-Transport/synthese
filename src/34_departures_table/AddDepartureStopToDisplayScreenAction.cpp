@@ -63,10 +63,10 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
 
 				uid id(map.getUid(PARAMETER_STOP, true, FACTORY_KEY));
-				_stop = PhysicalStopTableSync::Get(id);
+				_stop = PhysicalStopTableSync::Get(id, _env);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
 			{

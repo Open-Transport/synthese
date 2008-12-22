@@ -111,7 +111,7 @@ namespace synthese
 		template<> void SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::_CommonLoad(
 			Scenario* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText ( ScenarioTableSync::COL_NAME));

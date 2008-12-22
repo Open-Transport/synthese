@@ -62,7 +62,7 @@ namespace synthese
 		{
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"), &_env, UP_LINKS_LOAD_LEVEL);
+				_displayScreen = DisplayScreenTableSync::Get(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"), _env, UP_LINKS_LOAD_LEVEL);
 				_text = map.getString(PARAMETER_STATUS, true, "dssr");
 			}
 			catch(ObjectNotFoundException<DisplayScreen>& e)

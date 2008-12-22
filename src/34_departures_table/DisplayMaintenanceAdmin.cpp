@@ -75,7 +75,7 @@ namespace synthese
 
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(id, &_env, UP_LINKS_LOAD_LEVEL);
+				_displayScreen = DisplayScreenTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
 				DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 			}
 			catch(...)
@@ -111,7 +111,16 @@ namespace synthese
 			HTMLList l;
 			stream << l.open();
 
-			stream << l.element() << "Durée théorique entre les contacts de supervision : " << _displayScreen->getType()->getTimeBetweenChecks() << " min";
+			stream << l.element() << "Type d'afficheur : ";
+			if (_displayScreen->getType() != NULL)
+			{
+				stream << _displayScreen->getType()->getName();
+				stream << l.element() << "Durée théorique entre les contacts de supervision : " << _displayScreen->getType()->getTimeBetweenChecks() << " min";
+			}
+			else
+			{
+				stream << "ATTENTION : veuillez définir le type d'afficheur dans l'écran de configuration.";
+			}
 
 			if (_env.getRegistry<DisplayMonitoringStatus>().empty())
 			{

@@ -98,6 +98,7 @@ namespace synthese
 		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(searchConnectionPlacesWithBroadcastPoints(
+				_env,
 				request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 				, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 				, READ

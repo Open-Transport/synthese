@@ -100,7 +100,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Load(
 			User* user,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			user->setPassword(rows->getText ( UserTableSync::TABLE_COL_PASSWORD));
@@ -135,8 +135,9 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Unlink(User* obj, Env* env)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Unlink(
+			User* obj
+		){
 			obj->setProfile(NULL);
 		}
 
@@ -192,7 +193,7 @@ namespace synthese
 
 		shared_ptr<User> UserTableSync::getUserFromLogin(const string& login )
 		{
-			Env* env(Env::GetOfficialEnv());
+			Env& env(Env::GetOfficialEnv());
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -205,7 +206,7 @@ namespace synthese
 				if (rows->next () == false)
 					throw UserTableSyncException("User "+ login + " not found in database.");
 
-				shared_ptr<User> user (new User);
+				shared_ptr<User> user (new User(rows->getKey()));
 				Load(user.get(), rows, env, UP_LINKS_LOAD_LEVEL);
 				return user;
 			}

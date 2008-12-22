@@ -47,7 +47,7 @@ namespace synthese
 		Profile::Profile(
 			RegistryKeyType id
 		):	Registrable(id),
-			_parentId(0)
+			_parent(NULL)
 		{
 		}
 
@@ -68,9 +68,9 @@ namespace synthese
 			_rights.clear();
 		}
 
-		void Profile::setParent(uid id)
+		void Profile::setParent(const Profile* value)
 		{
-			_parentId = id;
+			_parent = value;
 		}
 
 		const std::string& Profile::getName() const
@@ -78,9 +78,9 @@ namespace synthese
 			return _name;
 		}
 
-		const uid Profile::getParentId() const
+		const Profile* Profile::getParent() const
 		{
-			return _parentId;
+			return _parent;
 		}
 
 		void Profile::removeRight( const std::string& key, const std::string& parameter)

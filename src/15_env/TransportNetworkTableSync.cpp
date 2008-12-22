@@ -61,7 +61,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Load(
 			TransportNetwork* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			std::string name (rows->getText (TransportNetworkTableSync::COL_NAME));
@@ -84,7 +84,7 @@ namespace synthese
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(TransportNetwork* object, Env* env)
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(TransportNetwork* object)
 		{
 		}
 	}

@@ -68,7 +68,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = SentScenarioInheritedTableSync::GetEditable(_request->getObjectId());
+				_scenario = SentScenarioInheritedTableSync::GetEditable(_request->getObjectId(), _env);
 
 				_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 

@@ -114,7 +114,7 @@ namespace synthese
 			uid lineId(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
-				_line = CommercialLineTableSync::Get(lineId);
+				_line = CommercialLineTableSync::Get(lineId, _env);
 			}
 			catch (...)
 			{
@@ -259,7 +259,8 @@ namespace synthese
 						ReservationStatus status(reservation->getStatus());
 
 						customerRequest.setObjectId(reservation->getTransaction()->getCancelUserId());
-						cancelRequest.getAction()->setTransaction(ReservationTransactionTableSync::GetEditable(reservation->getTransaction()->getKey()));
+						
+						cancelRequest.getAction()->setTransaction(ReservationTransactionTableSync::GetEditable(reservation->getTransaction()->getKey(), _env));
 
 						stream << t.row();
 						stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());

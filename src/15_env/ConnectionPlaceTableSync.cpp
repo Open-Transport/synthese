@@ -87,7 +87,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Load(
 			PublicTransportStopZoneConnectionPlace* cp,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			// Reading of the row
@@ -162,8 +162,7 @@ namespace synthese
 
 		
 		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Unlink(
-			PublicTransportStopZoneConnectionPlace* cp,
-			Env* env
+			PublicTransportStopZoneConnectionPlace* cp
 		){
 			City* city(const_cast<City*>(cp->getCity()));
 			if (city != NULL)

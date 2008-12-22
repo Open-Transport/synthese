@@ -68,7 +68,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Load(
 			City* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    object->setName(rows->getText ( CityTableSync::TABLE_COL_NAME));
@@ -81,7 +81,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj, Env* env)
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj)
 		{
 			EnvModule::RemoveFromCitiesMatchers(obj);
 		}

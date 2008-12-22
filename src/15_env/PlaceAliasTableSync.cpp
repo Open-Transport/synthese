@@ -75,7 +75,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Load(
 			PlaceAlias* obj,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			obj->setName (rows->getText (PlaceAliasTableSync::COL_NAME));
@@ -92,7 +92,7 @@ namespace synthese
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 
 				obj->setCity(city);
-				obj->setAliasedPlace(EnvModule::FetchPlace(aliasedPlaceId, *env).get());
+				obj->setAliasedPlace(EnvModule::FetchPlace(aliasedPlaceId, env).get());
 
 
 				bool isCityMainConnection (rows->getBool ( PlaceAliasTableSync::COL_ISCITYMAINCONNECTION));
@@ -105,10 +105,8 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Unlink(
-			PlaceAlias* obj,
-			Env* env
-			)
-		{
+			PlaceAlias* obj
+		){
 			City* city(const_cast<City*>(obj->getCity()));
 			if (city != NULL)
 			{

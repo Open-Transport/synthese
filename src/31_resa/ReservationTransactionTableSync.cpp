@@ -91,7 +91,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Load(
 			ReservationTransaction* object
 			, const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setLastReservation(rows->getLongLong ( ReservationTransactionTableSync::COL_LAST_RESERVATION_ID));
@@ -141,8 +141,7 @@ namespace synthese
 		}
 
 		template<> void  SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Unlink(
-			ReservationTransaction* obj,
-			Env* env
+			ReservationTransaction* obj
 		){
 
 		}

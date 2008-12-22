@@ -83,7 +83,7 @@ namespace synthese
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
-				_entry = DBLogEntryTableSync::Get(id);
+				_entry = DBLogEntryTableSync::Get(id, _env);
 			}
 			catch (...)
 			{
@@ -127,7 +127,9 @@ namespace synthese
 			stream << t.cell("Durée", Conversion::ToString(d.getSecondsDifference(_entry->getDate())) + " s");
 			shared_ptr<const User> customer;
 			if (_entry->getObjectId() > 0)
-				customer = UserTableSync::Get(_entry->getObjectId());
+			{
+				customer = UserTableSync::Get(_entry->getObjectId(), _env);
+			}
 			stream << t.cell("Client", customer.get() ? customer->getFullName() : "inconnu");
 			stream << t.cell("Opérateur", _entry->getUser() ? _entry->getUser()->getFullName() : "inconnu");
 			stream << t.cell("Type d'appel", t.getForm().getRadioInput(ResaLogEntryUpdateAction::PARAMETER_TYPE, choices, static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE]))));

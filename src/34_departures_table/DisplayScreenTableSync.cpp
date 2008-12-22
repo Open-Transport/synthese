@@ -1,48 +1,51 @@
-
-/** DisplayScreenTableSync class implementation.
-	@file DisplayScreenTableSync.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// DisplayScreenTableSync class implementation.
+///	@file DisplayScreenTableSync.cpp
+///	@author Hugues Romain
+///	@date 2008-12-21 20:16
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayScreenTableSync.h"
 #include "DisplayTypeTableSync.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
-
+#include "AlarmObjectLinkTableSync.h"
+#include "AlarmTableSync.h"
 #include "LineStopTableSync.h"
 #include "LineTableSync.h"
-#include "PhysicalStopTableSync.h"
 #include "ConnectionPlaceTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
+#include "PhysicalStopTableSync.h"
 #include "Line.h"
-
+#include "DateTime.h"
 #include "DBLogEntryTableSync.h"
-
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
 #include "Conversion.h"
+#include "SentAlarm.h"
 
 #include <sstream>
 
@@ -58,6 +61,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace time;
 	using namespace security;
+	using namespace messages;
 
 	namespace util
 	{
@@ -66,12 +70,6 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const string DisplayScreenTableSync::_COL_LINE_EXISTS = "line_exists";
-		const string DisplayScreenTableSync::_COL_LAST_MAINTENANCE_CONTROL = "last_maintenance_control";
-		const string DisplayScreenTableSync::_COL_LAST_OK_MAINTENANCE_CONTROL = "last_ok_maintenance_control";
-		const string DisplayScreenTableSync::_COL_CORRUPTED_DATA_START_DATE = "corrupted_data_start_date";
-		const string DisplayScreenTableSync::_COL_TYPE_NAME = "type_name";
-
 		const string DisplayScreenTableSync::COL_PLACE_ID = "broadcast_point_id";
 		const string DisplayScreenTableSync::COL_NAME = "broadcast_point_comment";
 		const string DisplayScreenTableSync::COL_TYPE_ID = "type_id";
@@ -139,7 +137,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
 			DisplayScreen* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setLocalizationComment (rows->getText ( DisplayScreenTableSync::COL_NAME));
@@ -159,7 +157,7 @@ namespace synthese
 			object->setMaintenanceIsOnline (rows->getBool ( DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE));
 			object->setMaintenanceMessage (rows->getText ( DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE));
 			object->setDisplayTeam(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_TEAM));
-
+			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Column reading
@@ -242,8 +240,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Unlink(
-			DisplayScreen* object,
-			Env* env
+			DisplayScreen* object
 		){
 			object->setLocalization(NULL);
 			object->setType(NULL);
@@ -397,7 +394,7 @@ namespace synthese
 			    << " INNER JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
 			    << " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
 			    << " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
-			    ;
+				;
 			if (lineid != UNKNOWN_VALUE || neededLevel > FORBIDDEN)
 			    query
 				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
@@ -449,7 +446,7 @@ namespace synthese
 				;
 			else if (orderByType)
 			    query
-				<< " ORDER BY " << _COL_TYPE_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< " ORDER BY (SELECT " << DisplayTypeTableSync::COL_NAME << " FROM " << DisplayTypeTableSync::TABLE.NAME << " WHERE " << DisplayTypeTableSync::TABLE.NAME << "." << TABLE_COL_ID << " = d." << COL_TYPE_ID << (raisingOrder ? ") ASC" : ") DESC")
 				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
 				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
@@ -462,6 +459,55 @@ namespace synthese
 			}
 
 			LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		boost::shared_ptr<SentAlarm> DisplayScreenTableSync::GetCurrentDisplayedMessage(
+			util::Env& env,
+			util::RegistryKeyType screenId
+		) {
+			DateTime now(TIME_CURRENT);
+			stringstream q;
+			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
+				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
+				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
+				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << Conversion::ToString(screenId)
+				<< " AND a." << AlarmTableSync::COL_ENABLED
+				<< " AND NOT a." << AlarmTableSync::COL_IS_TEMPLATE
+				<< " AND (a." << AlarmTableSync::COL_PERIODSTART << " IS NULL OR a." << AlarmTableSync::COL_PERIODSTART << "<" << now.toSQLString() << ")"
+				<< " AND (a." << AlarmTableSync::COL_PERIODEND << " IS NULL OR a." << AlarmTableSync::COL_PERIODEND << ">" << now.toSQLString() << ")"
+				<< " ORDER BY a." << AlarmTableSync::COL_LEVEL << " DESC, a." << AlarmTableSync::COL_PERIODSTART << " DESC"
+				<< " LIMIT 1";
+			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());
+			return rows->next() ?
+				static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)) :
+				shared_ptr<SentAlarm>();
+		}
+
+
+
+		bool DisplayScreenTableSync::GetIsAtLeastALineDisplayed(
+			util::RegistryKeyType screenId
+		) {
+			stringstream q;
+			q	<< "SELECT l." << TABLE_COL_ID
+				<< " FROM " << TABLE.NAME << " AS d"
+				<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=d." << COL_PLACE_ID
+				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l ON l." << LineStopTableSync::COL_PHYSICALSTOPID << "=s." << TABLE_COL_ID
+				<< " WHERE d." << TABLE_COL_ID << "=" << Conversion::ToString(screenId)
+				<< " AND (d." << COL_ALL_PHYSICAL_DISPLAYED << " OR d." << COL_PHYSICAL_STOPS_IDS << " LIKE ('%'|| s." << TABLE_COL_ID << " ||'%'))"
+				<< " AND (l." << LineStopTableSync::COL_ISDEPARTURE << " AND d." << COL_DIRECTION << " OR l." << LineStopTableSync::COL_ISARRIVAL << " AND NOT d." << COL_DIRECTION << ")"
+				<< " AND (NOT d." << COL_ORIGINS_ONLY << " OR l." << LineStopTableSync::COL_RANKINPATH << "=0)"
+				<< " AND NOT EXISTS(SELECT p2." << PhysicalStopTableSync::COL_PLACEID << " FROM " << PhysicalStopTableSync::TABLE.NAME << " AS p2 INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l2 ON l2." << LineStopTableSync::COL_PHYSICALSTOPID << "=p2." << TABLE_COL_ID
+				<< " WHERE l2." << LineStopTableSync::COL_LINEID << "=l." << LineStopTableSync::COL_LINEID
+				<< " AND l2." << LineStopTableSync::COL_RANKINPATH << ">l." << LineStopTableSync::COL_RANKINPATH
+				<< " AND l2." << LineStopTableSync::COL_ISARRIVAL
+				<< " AND ('%'|| p2." << PhysicalStopTableSync::COL_PLACEID << " ||'%') LIKE d." << COL_FORBIDDEN_ARRIVAL_PLACES_IDS
+				<< ")"
+				<< " LIMIT 1";
+			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());
+			return rows->next();
 		}
 	}
 }

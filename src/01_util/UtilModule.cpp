@@ -35,7 +35,6 @@ namespace synthese
 
 		void UtilModule::preInit()
 		{
-			Env::_officialRegistries.reset(new Env);
 		}
 
 

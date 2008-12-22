@@ -87,13 +87,13 @@ namespace synthese
 		DBLog::ColumnsVector SecurityLog::parse( const dblog::DBLogEntry::Content& cols ) const
 		{
 			DBLog::ColumnsVector v;
-
+			Env env;
 			switch ((_EntryType) Conversion::ToInt(cols[0]))
 			{
 			case LOGIN_ENTRY:
 				try
 				{
-					shared_ptr<const User> user(UserTableSync::Get(Conversion::ToLongLong(cols[1])));
+					shared_ptr<const User> user(UserTableSync::Get(Conversion::ToLongLong(cols[1]), env, FIELDS_ONLY_LOAD_LEVEL));
 					v.push_back(user->getLogin());
 				}
 				catch(...)
@@ -107,7 +107,7 @@ namespace synthese
 			case USER_ADMIN_ENTRY:
 				try
 				{
-					shared_ptr<const User> user(UserTableSync::Get(Conversion::ToLongLong(cols[1])));
+					shared_ptr<const User> user(UserTableSync::Get(Conversion::ToLongLong(cols[1]), env, FIELDS_ONLY_LOAD_LEVEL));
 					v.push_back(user->getLogin());
 				}
 				catch(...)
@@ -121,7 +121,7 @@ namespace synthese
 			case PROFILE_ADMIN_ENTRY:
 				try
 				{
-					shared_ptr<const Profile> profile(ProfileTableSync::Get(Conversion::ToLongLong(cols[1])));
+					shared_ptr<const Profile> profile(ProfileTableSync::Get(Conversion::ToLongLong(cols[1]), env, FIELDS_ONLY_LOAD_LEVEL));
 					v.push_back(profile->getName());
 				}
 				catch(...)

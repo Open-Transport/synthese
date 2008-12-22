@@ -81,7 +81,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<const ScenarioFolder> folder(ScenarioFolderTableSync::Get(_parentId));
+					shared_ptr<const ScenarioFolder> folder(ScenarioFolderTableSync::Get(_parentId, _env));
 				}
 				catch(...)
 				{

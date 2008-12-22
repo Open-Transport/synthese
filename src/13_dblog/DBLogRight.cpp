@@ -59,7 +59,7 @@ namespace synthese
 	namespace dblog
 	{
 		std::string DBLogRight::displayParameter(
-			util::Env* env
+			util::Env& env
 		) const	{
 			if (Factory<DBLog>::contains(_parameter))
 				return Factory<DBLog>::create(_parameter)->getName();
@@ -69,7 +69,7 @@ namespace synthese
 
 		bool DBLogRight::perimeterIncludes(
 			const std::string& perimeter,
-			util::Env* env
+			util::Env& env
 		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return true;

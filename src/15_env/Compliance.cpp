@@ -43,7 +43,7 @@ namespace synthese
 		{
 			if (_reservationRule.get() == NULL)
 			{
-				_reservationRule = Env::GetOfficialEnv()->getEditableRegistry<ReservationRule>().getWithAutoCreation(0);
+				_reservationRule = Env::GetOfficialEnv().getEditableRegistry<ReservationRule>().getWithAutoCreation(0);
 			}
 		}
 

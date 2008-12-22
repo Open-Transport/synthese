@@ -44,7 +44,7 @@ namespace synthese
 		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Load(
 			ScenarioTemplate* obj, 
 			const SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			_CommonLoad(obj, rows, env, linkLevel);
@@ -53,7 +53,7 @@ namespace synthese
 		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Unlink(ScenarioTemplate* obj, Env* env)
+		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Unlink(ScenarioTemplate* obj)
 		{
 
 		}

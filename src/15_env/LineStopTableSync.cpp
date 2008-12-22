@@ -85,7 +85,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Load(
 			LineStop* ls,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			int rankInPath(rows->getInt (LineStopTableSync::COL_RANKINPATH));
@@ -135,8 +135,7 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Unlink(
-			LineStop* obj,
-			Env* env
+			LineStop* obj
 		){
 			/// @todo line remove edge
 

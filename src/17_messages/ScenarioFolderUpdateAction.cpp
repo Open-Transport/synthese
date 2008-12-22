@@ -74,8 +74,10 @@ namespace synthese
 			try
 			{
 				uid id(map.getUid(PARAMETER_PARENT_FOLDER_ID, true, FACTORY_KEY));
-				if (id)
-					_parentFolder = ScenarioFolderTableSync::Get(id);
+				if (id > 0)
+				{
+					_parentFolder = ScenarioFolderTableSync::Get(id, _env);
+				}
 			}
 			catch(...)
 			{
@@ -112,8 +114,10 @@ namespace synthese
 		{
 			try
 			{
-				if (id)
-					_folder = ScenarioFolderTableSync::GetEditable(id);
+				if (id > 0)
+				{
+					_folder = ScenarioFolderTableSync::GetEditable(id, _env);
+				}
 			}
 			catch(...)
 			{

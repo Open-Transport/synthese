@@ -69,7 +69,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::Load(
 			BikeCompliance* cmp,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			// Columns reading
@@ -93,8 +93,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::Unlink(
-			BikeCompliance* obj,
-			Env* env
+			BikeCompliance* obj
 		){
 
 		}

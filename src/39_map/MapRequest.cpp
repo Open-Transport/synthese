@@ -222,7 +222,7 @@ namespace synthese
 			/// @todo Throw an exception if xml parsing fails
 			XMLNode mapNode = XMLNode::parseString (_query.c_str (), "map");
 
-			_map.reset(map::XmlBuilder::CreateMap (mapNode, (_useEnvironment ? *Env::GetOfficialEnv() : _temporaryEnvironment).getRegistry<Line>() ));
+			_map.reset(map::XmlBuilder::CreateMap (mapNode, (_useEnvironment ? Env::GetOfficialEnv() : _temporaryEnvironment).getRegistry<Line>() ));
 		}
 
 

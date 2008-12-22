@@ -58,7 +58,7 @@ namespace synthese
 				@return description of the perimeter
 			*/
 			std::string	displayParameter(
-				util::Env* env = util::Env::GetOfficialEnv()
+				util::Env& env = util::Env::GetOfficialEnv()
 			)	const;
 			
 
@@ -68,7 +68,7 @@ namespace synthese
 			*/
 			bool perimeterIncludes(
 				const std::string& perimeter,
-				util::Env* env = util::Env::GetOfficialEnv()
+				util::Env& env = util::Env::GetOfficialEnv()
 			) const;
 		};
 	}

@@ -86,7 +86,15 @@ namespace synthese
 		{
 			uid id(map.getUid(PARAMETER_FOLDER_ID, false, FACTORY_KEY));
 			if (id > 0)
-				_folder = TextTemplateTableSync::Get(id);
+			{
+				try
+				{
+					_folder = TextTemplateTableSync::Get(id, _env);
+				}
+				catch(ObjectNotFoundException<TextTemplate>& e)
+				{
+				}
+			}
 		}
 		
 

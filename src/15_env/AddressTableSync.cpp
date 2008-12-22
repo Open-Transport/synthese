@@ -81,7 +81,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Load(
 			Address* object
 			, const db::SQLiteResultSPtr& rows
-			, Env* env
+			, Env& env
 			, LinkLevel linkLevel
 		){
 			// Properties
@@ -106,7 +106,7 @@ namespace synthese
 					object->setRoad (RoadTableSync::Get (roadId, env, linkLevel).get());
 
 					// Links to the object
-					shared_ptr<AddressablePlace> place(EnvModule::FetchEditableAddressablePlace(placeId, *env));
+					shared_ptr<AddressablePlace> place(EnvModule::FetchEditableAddressablePlace(placeId, env));
 					shared_ptr<Road> road(RoadTableSync::GetEditable(roadId, env, linkLevel));
 
 					place->addAddress(object);
@@ -130,8 +130,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Unlink(
-			Address* obj,
-			Env* env
+			Address* obj
 		){
 			AddressablePlace* place(const_cast<AddressablePlace*>(obj->getPlace()));
 			if (place != NULL)

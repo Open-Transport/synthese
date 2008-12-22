@@ -72,7 +72,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(
 			NonConcurrencyRule* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			// Columns reading
@@ -107,8 +107,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
-			NonConcurrencyRule* obj,
-			Env* env
+			NonConcurrencyRule* obj
 		){
 			
 		}

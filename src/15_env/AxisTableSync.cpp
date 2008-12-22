@@ -70,7 +70,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::Load(
 			Axis* axis,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    axis->setName (rows->getText (AxisTableSync::COL_NAME));
@@ -79,7 +79,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::Unlink(Axis* obj, Env* env)
+		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::Unlink(Axis* obj)
 		{
 		}
 

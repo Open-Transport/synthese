@@ -49,7 +49,7 @@ namespace synthese
 		{
 			try
 			{
-				_site = Env::GetOfficialEnv()->getRegistry<Site>().get(map.getUid(PARAMETER_SITE, true, "fws"));
+				_site = Env::GetOfficialEnv().getRegistry<Site>().get(map.getUid(PARAMETER_SITE, true, "fws"));
 			}
 			catch (ObjectNotFoundException<Site>& e)
 			{

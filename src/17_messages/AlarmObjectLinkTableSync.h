@@ -71,9 +71,13 @@ namespace synthese
 			*/
 			template<class K, class T>
 			static std::vector<boost::shared_ptr<T> > search(
+				util::Env& env,
 				const Alarm* alarm,
 				const std::string& recipientKey,
-				int first = 0, int number = 0);
+				int first = 0,
+				int number = 0,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 
 			/** Search of alarm object links for a specified alarm in all the recipient types.
 				@param alarm Alarm to the object must be liked with
@@ -88,7 +92,7 @@ namespace synthese
 				const Alarm* alarm,
 				int first = 0,
 				int number = 0,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 			/** Remove a link between an alarm and an object specified by their id.
@@ -125,8 +129,14 @@ namespace synthese
 		};
 
 		template<class K, class T>
-		std::vector< boost::shared_ptr<T> > AlarmObjectLinkTableSync::search(const Alarm* alarm, const std::string& recipientKey, int first /*= 0*/, int number /*= 0*/ )
-		{
+		std::vector< boost::shared_ptr<T> > AlarmObjectLinkTableSync::search(
+			util::Env& env,
+			const Alarm* alarm,
+			const std::string& recipientKey,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			util::LinkLevel linkLevel
+		){
 			std::stringstream query;
 			query
 				<< " SELECT "
@@ -146,8 +156,12 @@ namespace synthese
 				std::vector< boost::shared_ptr<T> > objects;
 				while (rows->next ())
 				{
-				    objects.push_back (db::SQLiteDirectTableSyncTemplate<K,T>::GetEditable(
-							   rows->getLongLong (COL_OBJECT_ID)));
+				    objects.push_back(
+						db::SQLiteDirectTableSyncTemplate<K,T>::GetEditable(
+						   rows->getLongLong (COL_OBJECT_ID),
+						   env,
+						   linkLevel
+					)	);
 				}
 				return objects;
 			}

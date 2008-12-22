@@ -60,7 +60,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_NETWORK_ID, false, FACTORY_KEY));
 			try
 			{
-				_network = TransportNetworkTableSync::Get(id);
+				_network = TransportNetworkTableSync::Get(id, _env);
 			}
 			catch (...)
 			{

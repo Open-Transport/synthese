@@ -70,7 +70,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::Load(
 			HandicappedCompliance* cmp,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    tribool status = true;
@@ -78,11 +78,11 @@ namespace synthese
 
 		    if (statusInt < 0)
 		    {
-			status = boost::logic::indeterminate;
+				status = boost::logic::indeterminate;
 		    }
 		    else if (statusInt == 0)
 		    {
-			status = false;
+				status = false;
 		    }
 		    
 		    int capacity (
@@ -122,8 +122,7 @@ namespace synthese
 
 		
 		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync, HandicappedCompliance>::Unlink(
-			HandicappedCompliance* obj,
-			Env* env
+			HandicappedCompliance* obj
 		){
 
 		}

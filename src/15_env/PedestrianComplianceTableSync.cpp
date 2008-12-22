@@ -64,7 +64,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::Load(
 			PedestrianCompliance* cmp,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			tribool status = true;
@@ -112,9 +112,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::Unlink(
-			PedestrianCompliance* obj,
-			Env* env)
-		{
+			PedestrianCompliance* obj
+		){
 
 		}
 

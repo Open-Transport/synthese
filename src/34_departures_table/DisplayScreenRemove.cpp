@@ -62,7 +62,7 @@ namespace synthese
 			
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(id);
+				_displayScreen = DisplayScreenTableSync::Get(id, _env);
 			}
 			catch (...)
 			{

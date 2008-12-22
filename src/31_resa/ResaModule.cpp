@@ -94,7 +94,8 @@ namespace synthese
 				stream << "<li>";
 				try
 				{
-					shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get((*itrs)->getLineId()));
+					Env env;
+					shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get((*itrs)->getLineId(), env));
 					stream << "<span class=\"" << line->getStyle() << "\"><span class=\"linesmall\">" << line->getShortName() << "</span></span> ";
 				}
 				catch (...)
@@ -236,6 +237,7 @@ namespace synthese
 			ht.push_back(make_pair(string(), "Actions"));
 			ResultHTMLTable rt(ht, searchRequest.getHTMLForm(), _requestParameters, resultParameters);
 			stream << rt.open();
+			Env userEnv;
 
 			BOOST_FOREACH(shared_ptr<DBLogEntry> entry, logEnv.getRegistry<DBLogEntry>())
 			{
@@ -248,7 +250,7 @@ namespace synthese
 				if (displayCustomer && entry->getObjectId() > 0)
 					try
 					{
-						customer = UserTableSync::Get(entry->getObjectId());
+						customer = UserTableSync::Get(entry->getObjectId(), userEnv);
 					}
 					catch(...)
 					{
@@ -257,7 +259,7 @@ namespace synthese
 
 				if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
 				{
-					tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]));
+					tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), userEnv);
 					//ReservationTableSync::search(tr.get());
 					status = tr->getStatus();
 					cancelRequest.getAction()->setTransaction(tr);

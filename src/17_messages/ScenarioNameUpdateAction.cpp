@@ -62,7 +62,7 @@ namespace synthese
 			try
 			{
 				// Scenario
-				_scenario = ScenarioTableSync::GetEditable(_request->getObjectId());
+				_scenario = ScenarioTableSync::GetEditable(_request->getObjectId(), _env);
 
 				// Name
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
@@ -74,7 +74,9 @@ namespace synthese
 					uid folderId(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
 
 					if (folderId != 0)
-						_folder = ScenarioFolderTableSync::Get(folderId);
+					{
+						_folder = ScenarioFolderTableSync::Get(folderId, _env);
+					}
 
 					Env env;
 					ScenarioTemplateInheritedTableSync::Search(env, folderId, _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);

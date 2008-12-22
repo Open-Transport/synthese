@@ -66,7 +66,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_TEMPLATE, true, FACTORY_KEY));
 			try
 			{
-				_template = ScenarioTemplateInheritedTableSync::Get(id);
+				_template = ScenarioTemplateInheritedTableSync::Get(id, _env);
 			}
 			catch(...)
 			{

@@ -73,7 +73,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
 			AlarmObjectLink* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setAlarmId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_ALARM_ID));
@@ -83,7 +83,7 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
-				shared_ptr<SentAlarm> alarm(env->getEditableRegistry<SentAlarm>().getEditable(object->getAlarmId()));
+				shared_ptr<SentAlarm> alarm(env.getEditableRegistry<SentAlarm>().getEditable(object->getAlarmId()));
 				try
 				{
 					ar->addObject(alarm.get(), object->getObjectId());
@@ -98,11 +98,11 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
-			AlarmObjectLink* aol,
-			Env* env
+			AlarmObjectLink* aol
 		){
+			Env env;
 			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(aol->getRecipientKey()));
-			shared_ptr<SentAlarm> alarm = env->getEditableRegistry<SentAlarm>().getEditable(aol->getAlarmId());
+			shared_ptr<SentAlarm> alarm = env.getEditableRegistry<SentAlarm>().getEditable(aol->getAlarmId());
 			ar->removeObject(alarm.get(), aol->getObjectId());
 		}
 
@@ -134,8 +134,8 @@ namespace synthese
 
 		void AlarmObjectLinkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			Env* env(Env::GetOfficialEnv());
-			Registry<AlarmObjectLink>& registry(env->getEditableRegistry<AlarmObjectLink>());
+			Env& env(Env::GetOfficialEnv());
+			Registry<AlarmObjectLink>& registry(env.getEditableRegistry<AlarmObjectLink>());
 			while (rows->next ())
 			{
 				shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
@@ -153,14 +153,14 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (!Env::GetOfficialEnv()->getRegistry<AlarmObjectLink>().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (!Env::GetOfficialEnv().getRegistry<AlarmObjectLink>().contains(rows->getLongLong (TABLE_COL_ID)))
 					continue;
 
-				shared_ptr<AlarmObjectLink> aol = Env::GetOfficialEnv()->getEditableRegistry<AlarmObjectLink>().getEditable(rows->getLongLong (TABLE_COL_ID));
+				shared_ptr<AlarmObjectLink> aol = Env::GetOfficialEnv().getEditableRegistry<AlarmObjectLink>().getEditable(rows->getLongLong (TABLE_COL_ID));
 				
 				// Alarm not found in ram : this is not a template
 				Unlink(aol.get());
-				Env::GetOfficialEnv()->getEditableRegistry<AlarmObjectLink>().remove(rows->getLongLong (TABLE_COL_ID));
+				Env::GetOfficialEnv().getEditableRegistry<AlarmObjectLink>().remove(rows->getLongLong (TABLE_COL_ID));
 			}
 		}
 

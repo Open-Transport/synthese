@@ -93,7 +93,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Load(
 			ContinuousService* cs,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
@@ -189,8 +189,7 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(
-			ContinuousService* obj,
-			Env* env
+			ContinuousService* obj
 		){
 			obj->getPath()->removeService(obj);
 		}

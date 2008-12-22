@@ -83,7 +83,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Load(
 			UserFavoriteJourney* object
 			, const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			// Properties
@@ -133,8 +133,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Unlink(
-			UserFavoriteJourney* object,
-			Env* env
+			UserFavoriteJourney* object
 		){
 			object->setUser(NULL);
 		}

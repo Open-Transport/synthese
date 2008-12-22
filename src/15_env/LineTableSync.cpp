@@ -104,7 +104,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Load(
 			Line* line,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			std::string name (
@@ -197,7 +197,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Unlink(Line* obj, Env* env)
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Unlink(Line* obj)
 		{
 			obj->setAxis(NULL);
 			obj->setRollingStock(NULL);			

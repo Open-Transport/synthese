@@ -63,7 +63,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Load(
 			Fare* fare,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel		
 		){
 			fare->setName (rows->getText (FareTableSync::COL_NAME));
@@ -94,7 +94,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Unlink(Fare* obj, Env* env)
+		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Unlink(Fare* obj)
 		{
 
 		}

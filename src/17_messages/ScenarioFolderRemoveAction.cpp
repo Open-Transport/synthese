@@ -75,20 +75,20 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
 			try
 			{
-				_folder = ScenarioFolderTableSync::Get(id);
+				_folder = ScenarioFolderTableSync::Get(id, _env);
 			}
 			catch (...)
 			{
 				throw ActionException("No such folder");
 			}
 
-			Env env;
-			ScenarioTemplateInheritedTableSync::Search(env, 
+			ScenarioTemplateInheritedTableSync::Search(
+				_env, 
 				_folder->getKey()
 				, string(), NULL
 				, 0, 1
 			);
-			if (!env.getRegistry<ScenarioTemplate>().empty())
+			if (!_env.getRegistry<ScenarioTemplate>().empty())
 				throw ActionException("Non empty folder");
 		}
 		

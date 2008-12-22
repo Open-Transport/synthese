@@ -138,13 +138,13 @@ namespace synthese
 		){
 			int tableId(decodeTableId(id));
 			if(tableId == ConnectionPlaceTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(ConnectionPlaceTableSync::Get(id, &env));
+				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(ConnectionPlaceTableSync::Get(id, env));
 			if (tableId == PublicPlaceTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const PublicPlace>(PublicPlaceTableSync::Get(id, &env));
+				return static_pointer_cast<const AddressablePlace, const PublicPlace>(PublicPlaceTableSync::Get(id, env));
 			if (tableId == RoadTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const Road>(RoadTableSync::Get(id, &env));
+				return static_pointer_cast<const AddressablePlace, const Road>(RoadTableSync::Get(id, env));
 			if (tableId == CrossingTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const Crossing>(CrossingTableSync::Get(id, &env));
+				return static_pointer_cast<const AddressablePlace, const Crossing>(CrossingTableSync::Get(id, env));
 			return shared_ptr<const AddressablePlace>();
 		}
 
@@ -197,7 +197,7 @@ namespace synthese
 
 		CityList EnvModule::guessCity (const std::string& fuzzyName, int nbMatches, bool t9)
 		{
-			Env& env(*Env::GetOfficialEnv());
+			Env& env(Env::GetOfficialEnv());
 			const Registry<City>& cities(env.getRegistry<City>());
 			CityList result;
 			LexicalMatcher<uid>::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).bestMatches (fuzzyName, nbMatches);

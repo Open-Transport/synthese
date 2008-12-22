@@ -79,7 +79,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_USER_ID, true, FACTORY_KEY));
 			try
 			{
-				_user = UserTableSync::Get(id);
+				_user = UserTableSync::Get(id, _env);
 			}
 			catch (ObjectNotFoundException<User>& e)
 			{

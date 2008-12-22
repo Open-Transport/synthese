@@ -91,7 +91,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Load(
 			DBLogEntry* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setLogKey(rows->getText ( DBLogEntryTableSync::COL_LOG_KEY));
@@ -129,7 +129,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(DBLogEntry* obj, Env* env)
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(DBLogEntry* obj)
 		{
 			obj->setUser(NULL);
 		}

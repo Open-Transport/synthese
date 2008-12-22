@@ -74,7 +74,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Load(
 			InterfacePage* page,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			page->setPageCode(rows->getText(InterfacePageTableSync::TABLE_COL_PAGE));
@@ -93,8 +93,8 @@ namespace synthese
 
 		void InterfacePageTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
-			Env* env(Env::GetOfficialEnv());
-			Registry<InterfacePage>& registry(env->getEditableRegistry<InterfacePage>());
+			Env& env(Env::GetOfficialEnv());
+			Registry<InterfacePage>& registry(env.getEditableRegistry<InterfacePage>());
 			while (rows->next ())
 			{
 			    shared_ptr<InterfacePage> page(registry.getEditable(rows->getKey()));
@@ -105,9 +105,9 @@ namespace synthese
 
 		void InterfacePageTableSync::rowsAdded( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			Env* env(Env::GetOfficialEnv());
-			Registry<InterfacePage>& registry(env->getEditableRegistry<InterfacePage>());
-			Registry<Interface>& interfRegistry(env->getEditableRegistry<Interface>());
+			Env& env(Env::GetOfficialEnv());
+			Registry<InterfacePage>& registry(env.getEditableRegistry<InterfacePage>());
+			Registry<Interface>& interfRegistry(env.getEditableRegistry<Interface>());
 			while (rows->next ())
 			{
 				if (!Factory<InterfacePage>::contains(rows->getText(TABLE_COL_CLASS)))
@@ -141,9 +141,9 @@ namespace synthese
 
 		void InterfacePageTableSync::rowsRemoved( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
-			Env* env(Env::GetOfficialEnv());
-			Registry<InterfacePage>& registry(env->getEditableRegistry<InterfacePage>());
-			Registry<Interface>& interfRegistry(env->getEditableRegistry<Interface>());
+			Env& env(Env::GetOfficialEnv());
+			Registry<InterfacePage>& registry(env.getEditableRegistry<InterfacePage>());
+			Registry<Interface>& interfRegistry(env.getEditableRegistry<Interface>());
 			while (rows->next ())
 			{
 				/// @todo to be reimplemented

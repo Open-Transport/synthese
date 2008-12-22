@@ -64,11 +64,11 @@ namespace synthese
 			);
 
 			std::string	displayParameter(
-				util::Env* env = util::Env::GetOfficialEnv()
+				util::Env& env = util::Env::GetOfficialEnv()
 			) const;
 			bool perimeterIncludes(
 				const std::string& perimeter,
-				util::Env* env = util::Env::GetOfficialEnv()
+				util::Env& env = util::Env::GetOfficialEnv()
 			) const;
 		};
 	}

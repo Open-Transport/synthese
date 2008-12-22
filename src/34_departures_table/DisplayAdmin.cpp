@@ -362,7 +362,7 @@ namespace synthese
 
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(id);
+				_displayScreen = DisplayScreenTableSync::Get(id, _env);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
@@ -381,7 +381,8 @@ namespace synthese
 
 			try
 			{
-				shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(request->getObjectId()));
+				Env env;
+				shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(request->getObjectId(), env, UP_LINKS_LOAD_LEVEL));
 				return request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(screen->getLocalization()->getKey()));
 			}
 			catch (...)

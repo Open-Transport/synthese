@@ -103,7 +103,7 @@ namespace synthese
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
-				_user = UserTableSync::Get(id);
+				_user = UserTableSync::Get(id, _env);
 			}
 			catch (...)
 			{

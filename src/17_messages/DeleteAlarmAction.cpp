@@ -79,7 +79,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::Get(id);
+				_alarm = AlarmTableSync::Get(id, _env);
 			}
 			catch (...)
 			{

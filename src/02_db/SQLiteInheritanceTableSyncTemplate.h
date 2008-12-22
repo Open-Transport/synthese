@@ -83,7 +83,7 @@ namespace synthese
 				static void _CommonLoad(
 					T* obj,
 					const SQLiteResultSPtr& rows,
-					util::Env* env,
+					util::Env& env,
 					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 				);
 			//@}
@@ -100,7 +100,7 @@ namespace synthese
 				virtual void _load(
 					T* obj,
 					const SQLiteResultSPtr& rows,
-					util::Env* env,
+					util::Env& env,
 					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 					){
 						assert(false);
@@ -117,8 +117,8 @@ namespace synthese
 
 				virtual boost::shared_ptr<const T> _get(
 					util::RegistryKeyType key,
-					util::Env* env = NULL,
-					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+					util::Env& env,
+					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 					AutoCreation autoCreate = NEVER_CREATE
 					){
 						assert(false);
@@ -130,8 +130,8 @@ namespace synthese
 
 				virtual boost::shared_ptr<T> _getEditable(
 					util::RegistryKeyType key,
-					util::Env* env = NULL,
-					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+					util::Env& env,
+					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 					AutoCreation autoCreate = NEVER_CREATE
 					){
 						assert(false);
@@ -196,8 +196,8 @@ namespace synthese
 			static void Load(
 				T* obj,
 				const SQLiteResultSPtr& rows,
-				util::Env* env,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			){
 				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
 				tablesync->_load(obj, rows, env, linkLevel);
@@ -228,8 +228,8 @@ namespace synthese
 			*/
 			static boost::shared_ptr<T> GetEditable(
 				util::RegistryKeyType key,
-				util::Env* env = NULL,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
 				SQLiteResultSPtr rows(SQLiteTableSyncTemplate<K>::_GetRow(key));
@@ -246,8 +246,8 @@ namespace synthese
 			*/
 			static boost::shared_ptr<const T> Get(
 				util::RegistryKeyType key,
-				util::Env* env = NULL,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
 					SQLiteResultSPtr rows(SQLiteTableSyncTemplate<K>::_GetRow(key));

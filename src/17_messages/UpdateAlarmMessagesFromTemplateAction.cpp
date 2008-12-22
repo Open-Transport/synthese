@@ -59,10 +59,10 @@ namespace synthese
 		{
 			try
 			{
-				_message = AlarmTableSync::GetEditable(_request->getObjectId());
+				_message = AlarmTableSync::GetEditable(_request->getObjectId(), _env);
 
 				uid id = map.getUid(PARAMETER_TEMPLATE_ID, true, FACTORY_KEY);
-				_template = TextTemplateTableSync::Get(id);
+				_template = TextTemplateTableSync::Get(id, _env);
 			}
 			catch (ObjectNotFoundException<Alarm>& e)
 			{

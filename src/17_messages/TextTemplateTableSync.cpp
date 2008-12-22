@@ -78,7 +78,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(
 			TextTemplate* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText (TextTemplateTableSync::COL_NAME));
@@ -90,8 +90,7 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Unlink(
-			TextTemplate* obj,
-			Env* env
+			TextTemplate* obj
 		){
 		}
 

@@ -42,7 +42,7 @@ namespace synthese
 		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Load(
 			AlarmTemplate* obj,
 			const SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			_CommonLoad(obj, rows, env, linkLevel);
@@ -59,8 +59,7 @@ namespace synthese
 
 		template<>
 		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Unlink(
-			AlarmTemplate* obj,
-			Env* env
+			AlarmTemplate* obj
 		){
 			obj->setScenario(NULL);
 		}

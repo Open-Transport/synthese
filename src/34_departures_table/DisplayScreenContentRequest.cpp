@@ -81,15 +81,15 @@ namespace synthese
 					DisplayScreen* screen(new DisplayScreen);
 					_type.reset(new DisplayType);
 					_type->setRowNumber(10);
-					_type->setDisplayInterface(Env::GetOfficialEnv()->getRegistry<Interface>().get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
-					screen->setLocalization(ConnectionPlaceTableSync::Get(screenId).get());
+					_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
+					screen->setLocalization(ConnectionPlaceTableSync::Get(screenId, _env).get());
 					screen->setAllPhysicalStopsDisplayed(true);					
 					screen->setType(_type.get());
 					_screen.reset(screen);
 				}
 				else if (decodeTableId(screenId) == DisplayScreenTableSync::TABLE.ID)
 				{
-					_screen = DisplayScreenTableSync::Get(screenId);
+					_screen = DisplayScreenTableSync::Get(screenId, _env);
 				}
 				else
 					throw RequestException("Not a display screen nor a connection place");

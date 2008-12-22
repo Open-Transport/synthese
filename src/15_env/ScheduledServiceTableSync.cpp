@@ -95,7 +95,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Load(
 			ScheduledService* ss,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    string serviceNumber (rows->getText(ScheduledServiceTableSync::COL_SERVICENUMBER));
@@ -187,10 +187,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Unlink(
-			ScheduledService* ss,
-			Env* env
-		)
-		{
+			ScheduledService* ss
+		){
 			ss->getPath()->removeService(ss);
 		}
 

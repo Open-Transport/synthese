@@ -57,7 +57,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::GetEditable(_request->getObjectId());
+				_alarm = AlarmTableSync::GetEditable(_request->getObjectId(), _env);
 			}
 			catch (...)
 			{

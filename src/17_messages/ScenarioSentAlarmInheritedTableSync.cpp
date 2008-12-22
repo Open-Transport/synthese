@@ -44,14 +44,16 @@ namespace synthese
 		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::Load(
 			ScenarioSentAlarm* obj,
 			const SQLiteResultSPtr& rows, 
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				obj->setScenario(
 					SentScenarioInheritedTableSync::Get(
-						rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID)
+						rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID),
+						env,
+						linkLevel
 					).get()
 				);
 			}
@@ -60,7 +62,7 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::Unlink(ScenarioSentAlarm* obj, Env* env)
+		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::Unlink(ScenarioSentAlarm* obj)
 		{
 			obj->setScenario(NULL);
 		}

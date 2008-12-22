@@ -87,7 +87,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
 			OnlineReservationRule* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setEMail(rows->getText(OnlineReservationRuleTableSync::COL_EMAIL));
@@ -110,8 +110,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Unlink(
-			OnlineReservationRule* object,
-			Env* env
+			OnlineReservationRule* object
 		){
 		}
 

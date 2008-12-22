@@ -20,14 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/MessagesLog.h"
-#include "17_messages/SingleSentAlarm.h"
-#include "17_messages/ScenarioSentAlarm.h"
-#include "17_messages/SentScenario.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/ScenarioTableSync.h"
-
-#include "01_util/Conversion.h"
+#include "MessagesLog.h"
+#include "SingleSentAlarm.h"
+#include "ScenarioSentAlarm.h"
+#include "SentScenario.h"
+#include "AlarmTableSync.h"
+#include "ScenarioTableSync.h"
+#include "Env.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -88,16 +88,17 @@ namespace synthese
 
 		std::string MessagesLog::getObjectName( uid id ) const
 		{
+			Env env;
 			int tableId = decodeTableId(id);
 
 			if (tableId == AlarmTableSync::TABLE.ID)
 			{
-				shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id));
+				shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 				return alarm->getShortMessage();
 			}
 			else if (tableId == ScenarioTableSync::TABLE.ID)
 			{
-				shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id));
+				shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 				return scenario->getName();
 			}
 

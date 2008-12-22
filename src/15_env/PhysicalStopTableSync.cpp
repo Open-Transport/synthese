@@ -72,7 +72,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Load(
 			PhysicalStop* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText ( PhysicalStopTableSync::COL_NAME));
@@ -91,10 +91,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Unlink(
-			PhysicalStop* obj,
-			Env* env
-			)
-		{
+			PhysicalStop* obj
+		){
 			PublicTransportStopZoneConnectionPlace* place = const_cast<PublicTransportStopZoneConnectionPlace*>(obj->getConnectionPlace());
 /// @todo	place->removePhysicalStop(obj);
 

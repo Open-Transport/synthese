@@ -71,9 +71,9 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Load(
-			ScenarioFolder* object
-			, const db::SQLiteResultSPtr& rows,
-			Env* env,
+			ScenarioFolder* object,
+			const db::SQLiteResultSPtr& rows,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText(ScenarioFolderTableSync::COL_NAME));
@@ -102,8 +102,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Unlink(
-			ScenarioFolder* obj,
-			Env* env
+			ScenarioFolder* obj
 		){
 		}
 	}

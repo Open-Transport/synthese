@@ -78,12 +78,27 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Load(
 			Profile* profile,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			profile->setName(rows->getText ( ProfileTableSync::TABLE_COL_NAME));
-			profile->setParent(rows->getLongLong ( ProfileTableSync::TABLE_COL_PARENT_ID));
 			ProfileTableSync::setRightsFromString(profile, rows->getText ( ProfileTableSync::TABLE_COL_RIGHTS_STRING));
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				RegistryKeyType id(rows->getLongLong(ProfileTableSync::TABLE_COL_PARENT_ID));
+				if(id > 0 && id != profile->getKey())
+				{
+					try
+					{
+						profile->setParent(ProfileTableSync::Get(id, env, linkLevel).get());
+					}
+					catch(ObjectNotFoundException<Profile>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + ProfileTableSync::TABLE_COL_PARENT_ID, e);
+					}
+				}
+			}
 		}
 
 
@@ -102,7 +117,7 @@ namespace synthese
 					<< " VALUES(" 
 					<< Conversion::ToString(profile->getKey())
 					<< "," << Conversion::ToSQLiteString(profile->getName())
-					<< "," << Conversion::ToString(profile->getParentId())
+					<< "," << ((profile == NULL) ? "0" : Conversion::ToString(profile->getKey()))
 					<< "," << Conversion::ToSQLiteString(ProfileTableSync::getRightsString(profile))
 					<< ")";
 				sqlite->execUpdate(query.str());
@@ -118,8 +133,9 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Unlink(Profile* profile, Env* env)
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Unlink(Profile* profile)
 		{
+			profile->setParent(NULL);
 		}
 	}
 

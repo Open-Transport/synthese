@@ -82,7 +82,7 @@ namespace synthese
 
 			try
 			{
-				_scenario = ScenarioTableSync::Get(id);
+				_scenario = ScenarioTableSync::Get(id, _env);
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
 				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
 			}

@@ -89,7 +89,7 @@ namespace synthese
 			id = map.getUid(PARAMETER_DISPLAY_TYPE_ID, true, FACTORY_KEY);
 			try
 			{
-				_type = DisplayTypeTableSync::Get(id);
+				_type = DisplayTypeTableSync::Get(id, _env);
 			}
 			catch (...)
 			{
@@ -164,7 +164,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::Get(id);
+				_alarm = AlarmTableSync::Get(id, _env);
 			}
 			catch (...)
 			{

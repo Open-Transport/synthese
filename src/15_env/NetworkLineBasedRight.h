@@ -71,7 +71,7 @@ namespace synthese
 				@return description of the perimeter
 			*/
 			std::string	displayParameter(
-				util::Env* env = util::Env::GetOfficialEnv()
+				util::Env& env = util::Env::GetOfficialEnv()
 			) const;
 			
 
@@ -81,13 +81,13 @@ namespace synthese
 			*/
 			bool perimeterIncludes(
 				const std::string& perimeter,
-				util::Env* env = util::Env::GetOfficialEnv()
+				util::Env& env = util::Env::GetOfficialEnv()
 			) const;
 		};
 
 		template<class T>
 		std::string NetworkLineBasedRight<T>::displayParameter(
-			util::Env* env
+			util::Env& env
 		) const	{
 			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return "all";
@@ -119,7 +119,7 @@ namespace synthese
 		template<class T>
 		bool NetworkLineBasedRight<T>::perimeterIncludes(
 			const std::string& perimeter,
-			util::Env* env
+			util::Env& env
 		) const	{
 			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return true;
@@ -136,7 +136,7 @@ namespace synthese
 						return id1 == id2;
 					if (tableId2 == CommercialLineTableSync::TABLE.ID)
 					{
-						boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(id2, env, UP_LINKS_LOAD_LEVEL));
+						boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(id2, env, util::UP_LINKS_LOAD_LEVEL));
 						boost::shared_ptr<const TransportNetwork> network(TransportNetworkTableSync::Get(id1, env));
 						return line->getNetwork() == network.get();
 					}

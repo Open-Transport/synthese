@@ -137,19 +137,10 @@ namespace synthese
 		{
 			vector<shared_ptr<Profile> > v;
 			Env env;
-			ProfileTableSync::Search(env);
+			ProfileTableSync::Search(env, profile);
 			BOOST_FOREACH(shared_ptr<Profile> cprofile, env.getRegistry<Profile>())
 			{
-				if (!profile.get())
-				{
-					if (!cprofile->getParentId())
-						v.push_back(cprofile);
-				}
-				else
-				{
-					 if (cprofile->getParentId() == profile->getKey())
-						v.push_back(cprofile);
-				}
+				 v.push_back(cprofile);
 			}
 			return v;
 		}

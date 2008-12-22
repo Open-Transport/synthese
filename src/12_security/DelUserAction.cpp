@@ -48,7 +48,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::Get(_request->getObjectId());
+				_user = UserTableSync::Get(_request->getObjectId(), _env);
 			}
 			catch (ObjectNotFoundException<User>& e)
 			{

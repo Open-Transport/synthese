@@ -87,7 +87,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Load(
 			Road* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			// Name
@@ -132,8 +132,7 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Unlink(
-			Road* obj,
-			Env* env
+			Road* obj
 		){
 			City* city = const_cast<City*>(obj->getCity ());
 			if (city != NULL)

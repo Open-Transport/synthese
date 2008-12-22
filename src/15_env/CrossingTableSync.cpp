@@ -63,7 +63,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::Load(
 			Crossing* obj,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel)
 		{
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -81,8 +81,7 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Crossing>::Unlink(
-			Crossing* obj,
-			Env* env
+			Crossing* obj
 		){
 			obj->setCity(NULL);
 		}

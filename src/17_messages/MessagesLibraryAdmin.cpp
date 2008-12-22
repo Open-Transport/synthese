@@ -273,7 +273,7 @@ namespace synthese
 				try
 				{
 					_folderId = id;
-					_folder = ScenarioFolderTableSync::Get(_folderId);
+					_folder = ScenarioFolderTableSync::Get(_folderId, _env);
 				}
 				catch (...)
 				{

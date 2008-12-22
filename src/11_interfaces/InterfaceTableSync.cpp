@@ -60,7 +60,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Load(
 			Interface* interf,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			interf->setKey(rows->getLongLong ( TABLE_COL_ID));
@@ -70,8 +70,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Unlink(
-			Interface* interf,
-			Env* env
+			Interface* interf
 		){
 
 		}

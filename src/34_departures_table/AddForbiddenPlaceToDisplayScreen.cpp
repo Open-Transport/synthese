@@ -61,11 +61,11 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId());
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
 
 				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
 				
-				_place = ConnectionPlaceTableSync::Get(id);
+				_place = ConnectionPlaceTableSync::Get(id, _env);
 			}
 			catch (...)
 			{

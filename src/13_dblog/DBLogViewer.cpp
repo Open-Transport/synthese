@@ -105,7 +105,7 @@ namespace synthese
 			// User
 			uid id(map.getUid(PARAMETER_SEARCH_USER, false, FACTORY_KEY));
 			if (id > 0)
-				_searchUser = UserTableSync::Get(id);
+				_searchUser = UserTableSync::Get(id, _env);
 
 			// Level
 			int num(map.getInt(PARAMETER_SEARCH_TYPE, false, FACTORY_KEY));

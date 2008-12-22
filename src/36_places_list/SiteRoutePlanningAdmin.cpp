@@ -95,7 +95,7 @@ namespace synthese
 		{
 			try
 			{
-				_site = SiteTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+				_site = SiteTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env);
 			}
 			catch (...)
 			{

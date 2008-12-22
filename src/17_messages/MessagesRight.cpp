@@ -62,14 +62,14 @@ namespace synthese
 	namespace messages
 	{
 		std::string MessagesRight::displayParameter(
-			util::Env* env
+			util::Env& env
 		) const	{
 			return _parameter;
 		}
 
 		bool MessagesRight::perimeterIncludes(
 			const std::string& perimeter,
-			util::Env* env
+			util::Env& env
 		) const	{
 			return true;
 		}

@@ -70,9 +70,9 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Load(
-			ObjectSiteLink* object
-			, const db::SQLiteResultSPtr& rows,
-			Env* env,
+			ObjectSiteLink* object,
+			const db::SQLiteResultSPtr& rows,
+			Env& env,
 			LinkLevel linkLevel
 		){
 
@@ -99,8 +99,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
-			ObjectSiteLink* obj,
-			Env* env
+			ObjectSiteLink* obj
 		){
 			/// @todo Fill it
 		}

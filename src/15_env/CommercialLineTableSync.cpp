@@ -95,7 +95,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Load(
 			CommercialLine* object,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
@@ -126,7 +126,7 @@ namespace synthese
 						++it
 					){
 							uid id(Conversion::ToLongLong(*it));
-							shared_ptr<const Place> place(EnvModule::FetchPlace(id, *env));
+							shared_ptr<const Place> place(EnvModule::FetchPlace(id, env));
 							object->addOptionalReservationPlace(place.get());
 					}
 				}
@@ -136,9 +136,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
-			CommercialLine* obj,
-			Env* env)
-		{
+			CommercialLine* obj
+		){
 
 		}
 

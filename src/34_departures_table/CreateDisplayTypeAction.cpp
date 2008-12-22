@@ -83,7 +83,7 @@ namespace synthese
 			// Interface
 			try
 			{
-				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY), _env);
 			}
 			catch (...)
 			{

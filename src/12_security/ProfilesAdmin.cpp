@@ -20,37 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <map>
-#include <string>
-
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 #include "01_util/Constants.h"
-
-#include "05_html/ActionResultHTMLTable.h"
-#include "05_html/SearchFormHTMLTable.h"
-
-#include "11_interfaces/InterfaceModule.h"
-
-#include "12_security/ProfilesAdmin.h"
-#include "12_security/ProfileAdmin.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/AddProfileAction.h"
+#include "ActionResultHTMLTable.h"
+#include "SearchFormHTMLTable.h"
+#include "HTMLList.h"
+#include "InterfaceModule.h"
+#include "ProfilesAdmin.h"
+#include "ProfileAdmin.h"
+#include "ProfileTableSync.h"
+#include "AddProfileAction.h"
 #include "DeleteProfileAction.h"
 #include "Right.h"
 #include "SecurityRight.h"
 #include "SecurityModule.h"
 #include "12_security/Constants.h"
-
 #include "ActionFunctionRequest.h"
-
 #include "AdminModule.h"
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
 
 #include <boost/foreach.hpp>
+#include <map>
+#include <string>
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -87,24 +82,23 @@ namespace synthese
 
 			// Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
-		}
 
-		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
 			// Search
-			Env env;
 			ProfileTableSync::Search(
-				env,
+				_env,
 				"%"+_searchName+"%"
 				, "%"+_searchRightName+"%"
 				, _requestParameters.first
 				, _requestParameters.maxSize
 				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
 				, _requestParameters.raisingOrder
-			);
+				);
 			ActionResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<Profile>());
+			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<Profile>());
+		}
 
+		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage<ProfilesAdmin>();
@@ -132,33 +126,44 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
 			v.push_back(make_pair(string(), string("Résumé")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t(v, s.getForm(), _requestParameters, _resultParameters, addProfileRequest.getHTMLForm("add"), AddProfileAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(
+				v,
+				s.getForm(),
+				_requestParameters,
+				_resultParameters,
+				addProfileRequest.getHTMLForm("add"),
+				AddProfileAction::PARAMETER_TEMPLATE_ID,
+				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+			);
 			t.getActionForm().addHiddenField(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE));
 
 			stream << t.open();
 			
 			// Profiles loop
-			BOOST_FOREACH(shared_ptr<Profile> profile, env.getRegistry<Profile>())
+			BOOST_FOREACH(shared_ptr<Profile> profile, _env.getRegistry<Profile>())
 			{
 				profileRequest.setObjectId(profile->getKey());
 				deleteProfileRequest.setObjectId(profile->getKey());
 
 				stream << t.row(Conversion::ToString(profile->getKey()));
 				stream << t.col() << profile->getName();
-				stream << t.col() << "<ul>";
+				stream << t.col();
 
-				if (profile->getParentId())
-					stream << "<li>Fils de " << ProfileTableSync::Get(profile->getParentId())->getName() << "</li>";
-				for (RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
+				HTMLList l;
+				stream << l.open();
+				if (profile->getParent() != NULL)
 				{
-					shared_ptr<const Right> r = it->second;
-					stream << "<li>Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getName();
+					stream << l.element() << "Fils de " << profile->getParent()->getName();
+				}
+				for(RightsVector::const_iterator it(profile->getRights().begin()); it != profile->getRights().end(); ++it)
+				{
+					shared_ptr<Right> r(it->second);
+					stream << l.element() << "Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getName();
 					if (r->getParameter() != GLOBAL_PERIMETER)
 						stream << "/" << r->displayParameter();
-					stream << "</li>";
 				}
-
 				stream
+					<< l.close()
 					<< t.col()
 					<< profileRequest.getHTMLForm().getLinkButton("Modifier", string(), "group_edit.png")
 					<< deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
@@ -182,9 +187,11 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage 		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfParent(
+			const PageLink& parentLink,
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>* request
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == SecurityModule::FACTORY_KEY)
 			{

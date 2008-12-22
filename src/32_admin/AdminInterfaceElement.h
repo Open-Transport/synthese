@@ -89,7 +89,7 @@ namespace synthese
 		protected:
 			mutable PageLinks		_treePosition;
 			mutable PageLinksTree	_tree;
-			util::Env				_env;
+			mutable util::Env		_env;
 
 			PageLinksTree	_buildTreeRecursion(
 				const AdminInterfaceElement* page

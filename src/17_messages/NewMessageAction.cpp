@@ -78,7 +78,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
 				try
 				{
-					_scenarioTemplate = ScenarioTemplateInheritedTableSync::Get(id);
+					_scenarioTemplate = ScenarioTemplateInheritedTableSync::Get(id, _env);
 				}
 				catch (...)
 				{
@@ -92,7 +92,7 @@ namespace synthese
 				{
 					try
 					{
-						_sentScenario = SentScenarioInheritedTableSync::Get(id);
+						_sentScenario = SentScenarioInheritedTableSync::Get(id, _env);
 					}
 					catch (...)
 					{
@@ -106,7 +106,7 @@ namespace synthese
 			if (id != UNKNOWN_VALUE)
 			try
 			{
-				_messageTemplate = AlarmTableSync::Get(id);
+				_messageTemplate = AlarmTableSync::Get(id, _env);
 			}
 			catch (...)
 			{
@@ -160,7 +160,7 @@ namespace synthese
 
 		void NewMessageAction::setScenarioId(uid key)
 		{
-			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(key));
+			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(key, _env));
 			_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
 			_scenarioTemplate = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
 		}

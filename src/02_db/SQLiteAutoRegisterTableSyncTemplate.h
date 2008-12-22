@@ -70,8 +70,8 @@ namespace synthese
 				, const SQLiteResultSPtr& rows
 				, bool isFirstSync = false
 			){
-				util::Env* env(util::Env::GetOfficialEnv());
-				util::Registry<T>& registry(env->getEditableRegistry<T>());
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
@@ -79,7 +79,7 @@ namespace synthese
 						if (registry.contains(rows->getKey()))
 						{
 							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
-							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get(), env);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get());
 							Load (address.get(), rows, env, util::FIELDS_ONLY_LOAD_LEVEL);
 						}
 					}
@@ -99,8 +99,8 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
-				util::Env* env(util::Env::GetOfficialEnv());
-				util::Registry<T>& registry(env->getEditableRegistry<T>());
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
@@ -109,7 +109,7 @@ namespace synthese
 						if (registry.contains(id))
 						{
 							boost::shared_ptr<T> address(registry.getEditable(id));
-							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get(), env);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get());
 							Load (address.get(), rows, env, util::FIELDS_ONLY_LOAD_LEVEL);
 						}
 					}
@@ -130,8 +130,8 @@ namespace synthese
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
-				util::Env* env(util::Env::GetOfficialEnv());
-				util::Registry<T>& registry(env->getEditableRegistry<T>());
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
 				while (rows->next ())
 				{
 					try
@@ -139,7 +139,7 @@ namespace synthese
 						uid id = rows->getKey();
 						if (registry.contains(id))
 						{
-							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get(), env);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get());
 							registry.remove(id);
 						}
 					}

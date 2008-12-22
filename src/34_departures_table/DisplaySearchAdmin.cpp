@@ -32,24 +32,21 @@
 #include "ArrivalDepartureTableRight.h"
 #include "DeparturesTableModule.h"
 #include "BroadcastPointsAdmin.h"
-
+#include "DisplayMonitoringStatus.h"
+#include "DisplayMonitoringStatusTableSync.h"
 #include "InterfaceModule.h"
-
 #include "Conversion.h"
-
 #include "ActionResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
-
 #include "ActionFunctionRequest.h"
-
 #include "AdminModule.h"
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
-
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
+#include "SentAlarm.h"
 
 #include <boost/foreach.hpp>
 
@@ -66,6 +63,8 @@ namespace synthese
 	using namespace html;
 	using namespace departurestable;
 	using namespace security;
+	using namespace messages;
+	
 
 	namespace util
 	{
@@ -115,7 +114,7 @@ namespace synthese
 			{
 				try
 				{
-					_place = ConnectionPlaceTableSync::Get(placeId);
+					_place = ConnectionPlaceTableSync::Get(placeId, _env);
 				}
 				catch (...)
 				{
@@ -193,7 +192,7 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
 			v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
-			v.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
+			v.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Contenu"));
 			v.push_back(make_pair(string(), "Actions"));
 			v.push_back(make_pair(string(), "Actions"));
 			v.push_back(make_pair(string(), "Actions"));
@@ -215,7 +214,9 @@ namespace synthese
 				updateRequest.setObjectId(screen->getKey());
 				viewRequest.setObjectId(screen->getKey());
 				maintRequest.setObjectId(screen->getKey());
-
+				shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(screen->getKey()));
+				shared_ptr<SentAlarm> alarm(DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey()));
+				
 				stream << t.row(Conversion::ToString(screen->getKey()));
 				if (!_place.get())
 				{
@@ -224,8 +225,33 @@ namespace synthese
 				}
 				stream << t.col() << screen->getLocalizationComment();
 				stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
-				stream << t.col(); // Bullets showing the states of the display
-				stream << t.col(); // Bullet showing the message status
+				stream << t.col() << HTMLModule::getHTMLImage(DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()), status->getDetail());
+				stream << t.col();
+				if (!screen->getIsOnline())
+				{
+					stream << HTMLModule::getHTMLImage("cross.png", "Désactivé par la maintenance : "+ screen->getMaintenanceMessage());
+				}
+				else
+				{
+					if (alarm.get() != NULL)
+					{
+						stream << HTMLModule::getHTMLImage(
+							(alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",
+							"Message : " + alarm->getShortMessage()
+						);
+					}
+					else
+					{
+						if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(screen->getKey()))
+						{
+							stream << HTMLModule::getHTMLImage("times_display.png", "Affichage d'horaires en cours");
+						}
+						else
+						{
+							stream << HTMLModule::getHTMLImage("empty_display.png", "Aucune ligne affichée, écran vide");
+						}
+					}
+				}
 				stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
 				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png");
 				stream << t.col() << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision", string(), "monitor_lightning.png");

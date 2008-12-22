@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_DISPLAY_SEARCH_ADMIN_H
 #define SYNTHESE_DISPLAY_SEARCH_ADMIN_H
 
-#include "05_html/ResultHTMLTable.h"
-
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "ResultHTMLTable.h"
+#include "AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {

@@ -64,7 +64,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::GetEditable(_request->getObjectId());
+				_alarm = AlarmTableSync::GetEditable(_request->getObjectId(), _env);
 				_singleSentAlarm = dynamic_pointer_cast<SingleSentAlarm, Alarm>(_alarm);
 
 				_type = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE, true, FACTORY_KEY));

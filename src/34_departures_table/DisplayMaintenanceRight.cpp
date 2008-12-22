@@ -59,14 +59,14 @@ namespace synthese
 	namespace departurestable
 	{
 		std::string DisplayMaintenanceRight::displayParameter(
-			util::Env* env
+			util::Env& env
 		) const {
 			return _parameter;
 		}
 
 		bool DisplayMaintenanceRight::perimeterIncludes(
 			const std::string& perimeter,
-			util::Env* env
+			util::Env& env
 		) const	{
 			return true;
 		}

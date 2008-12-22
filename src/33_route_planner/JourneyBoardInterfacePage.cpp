@@ -88,7 +88,7 @@ namespace synthese
 			set<const ReservationRule*> resaRules;
 			for (Journey::ServiceUses::const_iterator it(journey->getServiceUses().begin()); it != journey->getServiceUses().end(); ++it)
 			{
-				if (it->getService()->getReservationRule() && it->getService()->getReservationRule() != Env::GetOfficialEnv()->getRegistry<ReservationRule>().get(0))
+				if (it->getService()->getReservationRule() && it->getService()->getReservationRule() != Env::GetOfficialEnv().getRegistry<ReservationRule>().get(0))
 					resaRules.insert(it->getService()->getReservationRule().get());
 			}
 			stringstream sPhones;

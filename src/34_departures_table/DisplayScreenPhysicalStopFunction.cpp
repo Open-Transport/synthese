@@ -71,12 +71,12 @@ namespace synthese
 		void DisplayScreenPhysicalStopFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			string oc(map.getString(PARAMETER_OPERATOR_CODE, true, FACTORY_KEY));
-			const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY)).get());
+			const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env).get());
 
 			DisplayScreen* screen(new DisplayScreen);
 			_type.reset(new DisplayType);
 			_type->setRowNumber(10);
-			_type->setDisplayInterface(InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
+			_type->setDisplayInterface(InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY), _env).get());
 
 			screen->setLocalization(place);
 			screen->setAllPhysicalStopsDisplayed(false);

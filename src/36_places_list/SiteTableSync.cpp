@@ -84,7 +84,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Load(
 			Site* site,
 			const SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    site->setName(rows->getText (SiteTableSync::TABLE_COL_NAME));
@@ -120,15 +120,16 @@ namespace synthese
 			{
 				uid id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
 				if (id != UNKNOWN_VALUE)
+				{
 					site->setInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
+				}
 			}
 		}
 
 
 
 		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Unlink(
-			Site* obj,
-			Env* env
+			Site* obj
 		){
 			obj->setInterface(NULL);
 		}

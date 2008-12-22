@@ -235,6 +235,17 @@ namespace synthese
 				///	@date 2008
 				////////////////////////////////////////////////////////////////////
 				static std::string GetStatusString(Status value);
+
+
+				
+				////////////////////////////////////////////////////////////////////
+				///	Translates a status code into a standardized icon.
+				///	@param value status code
+				///	@return std::string standardized icon file name
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				static std::string GetStatusIcon(Status value);
 			//@}
 		};
 	}

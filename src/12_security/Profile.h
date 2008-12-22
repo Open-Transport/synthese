@@ -69,7 +69,7 @@ namespace synthese
 		private:
 			std::string		_name;
 			RightsVector	_rights;
-			uid				_parentId;
+			const Profile*	_parent;
 
 		public:
 			/** Comparison operator between profiles.
@@ -82,9 +82,9 @@ namespace synthese
 			
 			//!	\name Getters
 			//@{
-				const std::string&	getName()														const;
-				const uid			getParentId()													const;
-				const RightsVector&	getRights()														const;
+				const std::string&	getName()	const;
+				const Profile*		getParent()	const;
+				const RightsVector&	getRights()	const;
 			//@}
 
 
@@ -95,7 +95,7 @@ namespace synthese
 				void cleanRights();
 				void removeRight(const std::string& key, const std::string& parameter);
 				void addRight(boost::shared_ptr<Right> right);
-				void setParent(uid id);
+				void setParent(const Profile* value);
 			//@}
 
 			//! \name Calculators

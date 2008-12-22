@@ -159,7 +159,7 @@ namespace synthese
 					// Customer ID
 					uid id(map.getUid(PARAMETER_CUSTOMER_ID, false, FACTORY_KEY));
 					if (id != UNKNOWN_VALUE)
-						_customer = UserTableSync::GetEditable(id);
+						_customer = UserTableSync::GetEditable(id, _env);
 				}
 			}
 			else if (_request->isAuthorized<ResaRight>(FORBIDDEN, WRITE))
@@ -191,8 +191,8 @@ namespace synthese
 			// Site
 			uid id(map.getUid(PARAMETER_SITE, false, FACTORY_KEY));
 			shared_ptr<const Site> site;
-			if (id > 0 && Env::GetOfficialEnv()->getRegistry<Site>().contains(id))
-				site = Env::GetOfficialEnv()->getRegistry<Site>().get(id);
+			if (id > 0 && Env::GetOfficialEnv().getRegistry<Site>().contains(id))
+				site = Env::GetOfficialEnv().getRegistry<Site>().get(id);
 
 			// Seats number
 			_seatsNumber = map.getInt(PARAMETER_SEATS_NUMBER, true, FACTORY_KEY);

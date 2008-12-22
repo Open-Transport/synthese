@@ -84,7 +84,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::Load(
 			ReservationRule* rr,
 			const db::SQLiteResultSPtr& rows,
-			Env* env,
+			Env& env,
 			LinkLevel linkLevel
 		){
 		    bool online (rows->getBool (ReservationRuleTableSync::COL_ONLINE));
@@ -152,8 +152,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationRuleTableSync,ReservationRule>::Unlink(
-			ReservationRule* obj,
-			Env* env
+			ReservationRule* obj
 		){
 
 		}

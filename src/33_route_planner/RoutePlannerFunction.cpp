@@ -87,9 +87,11 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(_favoriteId));
+					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(_favoriteId, _env));
 					if (favorite->getUser()->getKey() != _request->getUser()->getKey())
+					{
 						throw RequestException("Forbidden favorite");
+					}
 					_originCityText = favorite->getOriginCityName();
 					_originPlaceText = favorite->getOriginPlaceName();
 					_destinationCityText = favorite->getDestinationCityName();

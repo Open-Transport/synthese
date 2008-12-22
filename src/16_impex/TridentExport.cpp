@@ -148,7 +148,7 @@ namespace synthese
 			cerr << "locale = " << os.getloc ().name () << "\n";
 
 			// Collect all data related to selected commercial line
-			shared_ptr<CommercialLine> _commercialLine(CommercialLineTableSync::GetEditable(_commercialLineId, &_env, UP_LINKS_LOAD_LEVEL));
+			shared_ptr<CommercialLine> _commercialLine(CommercialLineTableSync::GetEditable(_commercialLineId, _env, UP_LINKS_LOAD_LEVEL));
 			LineTableSync::Search(_env, _commercialLine->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 			NonConcurrencyRuleTableSync::Search(_env, _commercialLine->getKey(), _commercialLine->getKey(), false);
 

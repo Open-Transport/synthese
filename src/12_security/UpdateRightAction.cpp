@@ -70,7 +70,7 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::GetEditable(_request->getObjectId());
+				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), _env);
 			}
 			catch(...)
 			{

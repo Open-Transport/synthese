@@ -56,7 +56,7 @@ namespace synthese
 	namespace env
 	{
 		string TransportNetworkRight::displayParameter(
-			util::Env* env
+			util::Env& env
 		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return "all";
@@ -66,7 +66,7 @@ namespace synthese
 
 		bool TransportNetworkRight::perimeterIncludes(
 			const string& perimeter,
-			util::Env* env
+			util::Env& env
 		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return true;

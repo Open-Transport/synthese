@@ -58,7 +58,7 @@ namespace synthese
 			static void Load(
 				ObjectClass* obj,
 				const SQLiteResultSPtr& rows,
-				util::Env* env,
+				util::Env& env,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
@@ -75,7 +75,7 @@ namespace synthese
 
 				This method must be implemented by each template instantiation
 			*/
-			static void Unlink(ObjectClass* obj, util::Env* env);
+			static void Unlink(ObjectClass* obj);
 
 
 		public:
@@ -83,16 +83,13 @@ namespace synthese
 
 			static boost::shared_ptr<ObjectClass> GetEditable(
 				util::RegistryKeyType key,
-				util::Env* env = NULL,
+				util::Env& env,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				if(env != NULL)
-				{
-					util::Registry<ObjectClass>& registry(env->template getEditableRegistry<ObjectClass>());
-					if (registry.contains(key))
-						return registry.getEditable(key);
-				}
+				util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
+				if (registry.contains(key))
+					return registry.getEditable(key);
 
 				boost::shared_ptr<ObjectClass> object;
 				try
@@ -108,10 +105,8 @@ namespace synthese
 					object.reset(new ObjectClass(key));
 				}
 
-				if (env != NULL)
-				{
-					env->template getEditableRegistry<ObjectClass>().add(object);
-				}
+				env.getEditableRegistry<ObjectClass>().add(object);
+
 				return object;
 			}
 
@@ -124,7 +119,7 @@ namespace synthese
 			*/
 			static boost::shared_ptr<const ObjectClass> Get(
 				util::RegistryKeyType key,
-				util::Env* env = NULL,
+				util::Env& env,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
@@ -146,12 +141,12 @@ namespace synthese
 			){
 				try
 				{
-					util::Registry<ObjectClass>& registry(env.template getEditableRegistry<ObjectClass>());
+					util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
 					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 					while (rows->next ())
 					{
 						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
-						Load(object.get(), rows, &env, linkLevel);
+						Load(object.get(), rows, env, linkLevel);
 						registry.add(object);
 					}
 				}
@@ -176,7 +171,7 @@ namespace synthese
 
 			virtual boost::shared_ptr<typename ParentTableSyncClass::ObjectType> _getEditable(
 				util::RegistryKeyType key,
-				util::Env* env = NULL,
+				util::Env& env = NULL,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
@@ -193,7 +188,7 @@ namespace synthese
 
 			virtual boost::shared_ptr<const typename ParentTableSyncClass::ObjectType> _get(
 				util::RegistryKeyType key,
-				util::Env* env = NULL,
+				util::Env& env = NULL,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
@@ -210,7 +205,7 @@ namespace synthese
 			virtual void _load(
 				typename ParentTableSyncClass::ObjectType* obj,
 				const SQLiteResultSPtr& rows,
-				util::Env* env,
+				util::Env& env,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			){
 				Load(static_cast<ObjectClass*>(obj), rows, env, linkLevel);

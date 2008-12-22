@@ -56,22 +56,23 @@ namespace synthese
 
 		std::string MessagesLibraryLog::getObjectName( uid id ) const
 		{
-			int tableId = decodeTableId(id);
 			try
 			{
+				int tableId = decodeTableId(id);
+				Env env;
 				if (tableId == ScenarioTableSync::TABLE.ID)
 				{
-					shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id));
+					shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return scenario->getName();
 				}
 				else if (tableId == AlarmTableSync::TABLE.ID)
 				{
-					shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id));
+					shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return alarm->getShortMessage();
 				}
 				else if (tableId == TextTemplateTableSync::TABLE.ID)
 				{
-					shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id));
+					shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return text->getName();
 				}
 			}
