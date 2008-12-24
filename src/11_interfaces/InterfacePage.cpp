@@ -89,7 +89,7 @@ namespace synthese
 				// Jump interface elements with parse errors
 				catch (InterfacePageException& e)
 				{
-					Log::GetInstance().warn("Interface page parsing error on " + line + "\n", e);
+					Log::GetInstance().warn("Interface page "+ Conversion::ToString(getKey()) +" error on " + line, e);
 					continue;
 				}
 
@@ -128,7 +128,8 @@ namespace synthese
 		InterfacePage::InterfacePage(
 			RegistryKeyType key
 		):  Registrable(key),
-			FactoryBase<InterfacePage>()
+			FactoryBase<InterfacePage>(),
+			_interface(NULL)
 		{
 
 		}

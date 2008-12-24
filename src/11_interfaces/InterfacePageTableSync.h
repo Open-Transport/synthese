@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteDirectTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -37,7 +37,7 @@ namespace synthese
 		/** InterfacePageTableSync SQLite table synchronizer.
 			@ingroup m11LS refLS
 		*/
-		class InterfacePageTableSync : public db::SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>
+		class InterfacePageTableSync : public db::SQLiteRegistryTableSyncTemplate<InterfacePageTableSync,InterfacePage>
 		{
 		public:
 			static const std::string TABLE_COL_INTERFACE;
@@ -50,21 +50,8 @@ namespace synthese
 			*/
 			InterfacePageTableSync();
 
-
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
+			static boost::shared_ptr<InterfacePage> GetNewObject(const db::SQLiteResultSPtr& row);
 		};
-
 	}
 }
 

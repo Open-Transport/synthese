@@ -196,12 +196,30 @@ namespace synthese
 			);
 
 
-			/** Load obects into an environment, from a SQL query.
-				@param query SQL query
-				@param env Environment to write
-				@param linkLevel Link level
-				@throws Exception if the load failed
-			*/
+
+			////////////////////////////////////////////////////////////////////
+			///	Object creator helper.
+			///	@param row data row
+			///	@return boost::shared_ptr<T> The created object
+			///	@author Hugues Romain
+			///	@date 2008
+			/// This static method can be overloaded.
+			////////////////////////////////////////////////////////////////////
+			static boost::shared_ptr<T> GetNewObject(
+				const SQLiteResultSPtr& row
+			){
+				return boost::shared_ptr<T>(new T(row->getKey()));
+			}
+
+
+			
+			////////////////////////////////////////////////////////////////////
+			/// Load objects into an environment, from a SQL query.
+			///	@param query SQL query
+			///	@param env Environment to write
+			///	@param linkLevel Link level
+			///	@throws Exception if the load failed
+			////////////////////////////////////////////////////////////////////
 			static void LoadFromQuery(
 				const std::string& query,
 				util::Env& env,
@@ -213,7 +231,7 @@ namespace synthese
 					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 					while (rows->next ())
 					{
-						boost::shared_ptr<T> object(new T(rows->getKey()));
+						boost::shared_ptr<T> object(K::GetNewObject(rows));
 						Load(object.get(), rows, env, linkLevel);
 						registry.add(object);
 					}

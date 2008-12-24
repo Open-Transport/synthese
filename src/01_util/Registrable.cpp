@@ -26,6 +26,8 @@
 #include "RegistryKeyException.h"
 #include "ObjectNotFoundException.h"
 
+#include <assert.h>
+
 using namespace boost;
 
 namespace synthese
@@ -42,7 +44,7 @@ namespace synthese
 
 		Registrable::Registrable(
 		){
-			throw RegistryKeyException<void>("Forbidden use of default constructor of Registrable", UNKNOWN_VALUE);
+			assert(false);
 		}
 
 

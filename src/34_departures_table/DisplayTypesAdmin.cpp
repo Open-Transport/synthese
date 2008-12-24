@@ -198,7 +198,7 @@ namespace synthese
 			const AdminInterfaceElement& currentPage , const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			Env env;
-			DisplayTypeTableSync::Search(env, string(), 0, UNKNOWN_VALUE, true, true);
+			DisplayTypeTableSync::Search(env, "%", UNKNOWN_VALUE, 0, UNKNOWN_VALUE, true, false, false, true, FIELDS_ONLY_LOAD_LEVEL);
 			AdminInterfaceElement::PageLinks links;
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.getRegistry<DisplayType>())
 			{

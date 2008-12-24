@@ -55,3 +55,4 @@
 #include "TextTemplate.h"
 #include "ScenarioFolder.h"
 #include "ScenarioTemplate.h"
+#include "SentScenario.h"

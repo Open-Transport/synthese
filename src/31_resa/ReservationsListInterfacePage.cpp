@@ -75,6 +75,7 @@ namespace synthese
 		}
 
 		ReservationsListInterfacePage::ReservationsListInterfacePage()
+		:	Registrable(UNKNOWN_VALUE)
 		{
 
 		}

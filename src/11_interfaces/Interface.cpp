@@ -73,10 +73,11 @@ namespace synthese
 
 		void Interface::addPage(InterfacePage* page )
 		{
-			page->setInterface(this);
 			PagesMap::iterator it(_pages.find(page->getFactoryKey()));
 			if (it == _pages.end())
+			{
 				it = _pages.insert(make_pair(page->getFactoryKey(), PagesMap::mapped_type())).first;
+			}
 			it->second.insert(make_pair(page->getPageCode(), page));
 		}
 

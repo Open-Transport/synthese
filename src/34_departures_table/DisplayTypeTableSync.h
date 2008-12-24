@@ -55,17 +55,34 @@ namespace synthese
 			DisplayTypeTableSync();
 
 
-			/** DisplayType search.
-				(other search parameters)
-				@param first First user to answer
-				@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<DisplayType*> Founded currencies.
-				@author Hugues Romain
-				@date 2006
-			*/
+			////////////////////////////////////////////////////////////////////
+			/// DisplayType search.
+			///	@param env Environment to populate
+			/// @param nameLike SQL LIKE mask to filter on display type name (do
+			///		not forget the % command) (default/% = deactivate the filter)
+			/// @param interfaceId id of display interface to use as filter
+			///		(default/UNKNOWN_VALUE = deactivate the filter)
+			/// @param first First user to answer
+			///	@param number Number of users to answer (default/UNKNOWN_VALUE = all)
+			///		The size of the result registry is less or equal to number, then all 
+			///		users were returned despite of the number limit. If the size 
+			///		is greater than number (actually equal to number + 1) then 
+			///		there is others accounts to show. Test it to know if the 
+			///		situation needs a "click for more" button.
+			/// @param orderByName Order the results alphabetically by the name
+			/// @param orderByInterfaceName Order the results alphabetically by
+			///		the name of the interface, then by the name of the type
+			/// @param orderByRows Order the result by the rows number
+			///	@param raisingOrder Ascending or descending order
+			/// @param linkLevel Level of link of the objects stored in the result
+			///		registry
+			/// @throws Exception if the load of objects failed
+			///	@author Hugues Romain
+			///	@date 2006
+			////////////////////////////////////////////////////////////////////
 			static void Search(
 				util::Env& env,
-				std::string nameLike = std::string(),
+				std::string nameLike = "%",
 				util::RegistryKeyType interfaceId = UNKNOWN_VALUE,
 				int first = 0,
 				int number = UNKNOWN_VALUE,
@@ -73,7 +90,7 @@ namespace synthese
 				bool orderByInterfaceName = false,
 				bool orderByRows = false,
 				bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}

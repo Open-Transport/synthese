@@ -20,16 +20,15 @@
 */
 
 #include "InterfacePageTableSync.h"
-
+#include "InterfaceTableSync.h"
 #include "InterfacePage.h"
 #include "Interface.h"
-
 #include "Conversion.h"
-#include "01_util/Log.h"
+#include "Log.h"
 #include "Factory.h"
-
 #include "02_db/Constants.h"
 #include "SQLiteResult.h"
+#include "InterfacePageException.h"
 
 using namespace boost;
 using namespace std;
@@ -79,78 +78,70 @@ namespace synthese
 		){
 			page->setPageCode(rows->getText(InterfacePageTableSync::TABLE_COL_PAGE));
 			page->setDirectDisplayAllowed(rows->getBool(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED));
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				try
+				{
+					shared_ptr<Interface> interf(InterfaceTableSync::GetEditable(
+							rows->getLongLong(InterfacePageTableSync::TABLE_COL_INTERFACE),
+							env,
+							linkLevel
+					)	);
+					page->setInterface(interf.get());
+					if (linkLevel >= UP_DOWN_LINKS_LOAD_LEVEL)
+					{
+						interf->addPage(page);
+					}
+				}
+				catch(ObjectNotFoundException<Interface>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + InterfacePageTableSync::TABLE_COL_INTERFACE, e);
+				}
+			}
 			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
+		}
+
+
+		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Save(
+			InterfacePage* page
+		){
+			/// @todo Implementation
+		}
+
+
+		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync, InterfacePage>::Unlink(
+			InterfacePage* obj
+		){
+			if (obj->getInterface() != NULL)
+			{
+				try
+				{
+					const_cast<Interface*>(obj->getInterface())->removePage(obj->getFactoryKey(), obj->getPageCode());
+				}
+				catch(InterfacePageException& e)
+				{
+
+				}
+				obj->setInterface(NULL);
+			}
 		}
 	}
 
 	namespace interfaces
 	{
 		InterfacePageTableSync::InterfacePageTableSync()
-			: SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
+			: SQLiteRegistryTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
 		{
 		}
 
 
-		void InterfacePageTableSync::rowsUpdated( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
-		{
-			Env& env(Env::GetOfficialEnv());
-			Registry<InterfacePage>& registry(env.getEditableRegistry<InterfacePage>());
-			while (rows->next ())
-			{
-			    shared_ptr<InterfacePage> page(registry.getEditable(rows->getKey()));
-				Load(page.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
 
-
-		void InterfacePageTableSync::rowsAdded( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			Env& env(Env::GetOfficialEnv());
-			Registry<InterfacePage>& registry(env.getEditableRegistry<InterfacePage>());
-			Registry<Interface>& interfRegistry(env.getEditableRegistry<Interface>());
-			while (rows->next ())
-			{
-				if (!Factory<InterfacePage>::contains(rows->getText(TABLE_COL_CLASS)))
-				{
-					Log::GetInstance().warn("Corrupted data on "+ TABLE.NAME +" table : Interface page class not found : " + rows->getText(TABLE_COL_CLASS));
-					continue;
-				}
-
-			    // Search the specified interface
-			    try
-			    {
-					shared_ptr<InterfacePage> page(Factory<InterfacePage>::create(rows->getText(TABLE_COL_CLASS)));
-					page->setKey(rows->getKey());
-
-					Load(page.get(), rows, env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-					registry.add(page);
-				
-					shared_ptr<Interface> interf(interfRegistry.getEditable(
-						rows->getLongLong ( TABLE_COL_INTERFACE )
-					));
-					
-					interf->addPage(page.get());
-				}
-				catch (ObjectNotFoundException<Interface>& e)
-				{
-					Log::GetInstance().warn("Corrupted data on "+ TABLE.NAME +" table : Interface not found", e);
-				}
-			}
-		}
-
-
-		void InterfacePageTableSync::rowsRemoved( SQLite* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
-		{
-			Env& env(Env::GetOfficialEnv());
-			Registry<InterfacePage>& registry(env.getEditableRegistry<InterfacePage>());
-			Registry<Interface>& interfRegistry(env.getEditableRegistry<Interface>());
-			while (rows->next ())
-			{
-				/// @todo to be reimplemented
-				interfRegistry.getEditable(rows->getLongLong ( TABLE_COL_INTERFACE))
-				    ->removePage(rows->getText(TABLE_COL_CLASS), rows->getText ( TABLE_COL_PAGE) );
-				registry.remove(rows->getKey());
-			}
+		boost::shared_ptr<InterfacePage> InterfacePageTableSync::GetNewObject(
+			const SQLiteResultSPtr& row
+		){
+			shared_ptr<InterfacePage> page(Factory<InterfacePage>::create(row->getText(InterfacePageTableSync::TABLE_COL_CLASS)));
+			page->setKey(row->getKey());
+			return page;
 		}
 	}
 }

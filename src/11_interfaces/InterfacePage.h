@@ -65,6 +65,7 @@ namespace synthese
 
 			/// Chosen registry class.
 			typedef util::Registry<InterfacePage>	Registry;
+			typedef InterfacePage FactoryClass;
 
 		private:
 			std::string			_pageCode;

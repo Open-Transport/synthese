@@ -89,7 +89,7 @@ namespace synthese
 				}
 				else if (decodeTableId(screenId) == DisplayScreenTableSync::TABLE.ID)
 				{
-					_screen = DisplayScreenTableSync::Get(screenId, _env);
+					_screen = DisplayScreenTableSync::Get(screenId, Env::GetOfficialEnv());
 				}
 				else
 					throw RequestException("Not a display screen nor a connection place");

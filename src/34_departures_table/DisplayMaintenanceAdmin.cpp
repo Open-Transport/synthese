@@ -107,7 +107,7 @@ namespace synthese
 			stream << t.close();
 
 			stream << "<h1>Informations de supervision</h1>";
-			
+
 			HTMLList l;
 			stream << l.open();
 
@@ -119,6 +119,8 @@ namespace synthese
 			}
 			else
 			{
+				stream << "<p class=\"info\">Les terminus de lignes sont automatiquement présélectionnés.</p>";
+
 				stream << "ATTENTION : veuillez définir le type d'afficheur dans l'écran de configuration.";
 			}
 
