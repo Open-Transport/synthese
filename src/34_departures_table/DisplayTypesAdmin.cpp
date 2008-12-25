@@ -94,22 +94,21 @@ namespace synthese
 
 		void DisplayTypesAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>* request
+			interfaces::VariablesMap& variables
 		) const	{
 			// Right
-			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
+			bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 			
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<DisplayTypesAdmin>();
 
-			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(request);
+			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(_request);
 			createRequest.getFunction()->setPage<DisplayTypesAdmin>();
 			
-			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(request);
+			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(_request);
 			deleteRequest.getFunction()->setPage<DisplayTypesAdmin>();
 
-			FunctionRequest<AdminRequest> openRequest(request);
+			FunctionRequest<AdminRequest> openRequest(_request);
 			openRequest.getFunction()->setPage<DisplayTypeAdmin>();
 			
 			stream << "<h1>Recherche</h1>";
@@ -163,9 +162,9 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool DisplayTypesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		bool DisplayTypesAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER);
+			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER);
 		}
 
 		DisplayTypesAdmin::DisplayTypesAdmin()
@@ -174,9 +173,10 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfParent(
+			const PageLink& parentLink,
+			const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
 			{
@@ -195,14 +195,14 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage , const server::FunctionRequest<admin::AdminRequest>* request
+			const AdminInterfaceElement& currentPage
 		) const {
 			Env env;
 			DisplayTypeTableSync::Search(env, "%", UNKNOWN_VALUE, 0, UNKNOWN_VALUE, true, false, false, true, FIELDS_ONLY_LOAD_LEVEL);
 			AdminInterfaceElement::PageLinks links;
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.getRegistry<DisplayType>())
 			{
-				PageLink link;
+				PageLink link(getPageLink());
 				link.factoryKey = DisplayTypeAdmin::FACTORY_KEY;
 				link.icon = DisplayTypeAdmin::ICON;
 				link.name = displayType->getName();

@@ -103,14 +103,14 @@ namespace synthese
 			);
 		}
 		
-		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<TransportNetworkAdmin>();
 			searchRequest.setObjectId(_network->getKey());
 
-			FunctionRequest<AdminRequest> lineOpenRequest(request);
+			FunctionRequest<AdminRequest> lineOpenRequest(_request);
 			lineOpenRequest.getFunction()->setPage<CommercialLineAdmin>();
 
 			ResultHTMLTable::ResultParameters	_resultParameters;
@@ -149,15 +149,14 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool TransportNetworkAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool TransportNetworkAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<TransportNetworkRight>(READ);
+			return _request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -167,9 +166,7 @@ namespace synthese
 				TransportNetworkTableSync::Search(env);
 				BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.getRegistry<TransportNetwork>())
 				{
-					PageLink link;
-					link.factoryKey = FACTORY_KEY;
-					link.icon = ICON;
+					PageLink link(getPageLink());
 					link.name = network->getName();
 					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(network->getKey());
@@ -197,7 +194,6 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -210,7 +206,7 @@ namespace synthese
 				CommercialLineTableSync::Search(env, _network->getKey(), "%", 0, 0, true, false, true, UP_LINKS_LOAD_LEVEL);
 				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 				{
-					PageLink link;
+					PageLink link(getPageLink());
 					link.factoryKey = CommercialLineAdmin::FACTORY_KEY;
 					link.icon = CommercialLineAdmin::ICON;
 					link.name = line->getName();

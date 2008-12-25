@@ -98,6 +98,7 @@ namespace synthese
 					? new HomeAdmin
 					: Factory<AdminInterfaceElement>::create(pageKey)
 				);
+				page->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 				page->setFromParametersMap(map);
 				_page = page;
 				
@@ -126,7 +127,7 @@ namespace synthese
 				else
 				{
 					VariablesMap variables;
-					_page->display(stream, variables, (const FunctionRequest<AdminRequest>*) _request);
+					_page->display(stream, variables);
 				}
 			}
 			catch (Exception e)
@@ -158,7 +159,7 @@ namespace synthese
 
 		bool AdminRequest::_isAuthorized() const
 		{
-			return _page->isAuthorized(static_cast<const FunctionRequest<AdminRequest>* >(_request));
+			return _page->isAuthorized();
 		}
 	}
 }

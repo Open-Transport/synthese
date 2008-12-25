@@ -120,15 +120,10 @@ namespace synthese
 
 			// table parameters
 			_resultTableRequestParameters.setFromParametersMap(map.getMap(), PARAMETER_START_DATE, 30, false);
-		}
 
-
-		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
 			// Search
-			Env env;
 			DBLogEntryTableSync::Search(
-				env,
+				_env,
 				_dbLog->getFactoryKey()
 				, _searchStartDate
 				, _searchEndDate
@@ -142,12 +137,15 @@ namespace synthese
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_USER
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
 				, _resultTableRequestParameters.raisingOrder
-			);
-			ResultHTMLTable::ResultParameters		_resultTableResultParameters;
-			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, env.getEditableRegistry<DBLogEntry>());
+				);
+			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, _env.getEditableRegistry<DBLogEntry>());
+		}
 
+
+		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables) const
+		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<DBLogViewer>();
 
 			stream << "<h1>Recherche d'entrées</h1>";
@@ -177,7 +175,7 @@ namespace synthese
 
 			stream << t.open();
 			
-			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, env.getRegistry<DBLogEntry>())
+			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, _env.getRegistry<DBLogEntry>())
 			{
 				stream << t.row();
 				stream << t.col() << HTMLModule::getHTMLImage(DBLogModule::getEntryIcon(dbe->getLevel()), DBLogModule::getEntryLevelLabel(dbe->getLevel()));
@@ -193,9 +191,9 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool DBLogViewer::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		bool DBLogViewer::isAuthorized() const
 		{
-			return request->isAuthorized<DBLogRight>(READ);
+			return _request->isAuthorized<DBLogRight>(READ);
 		}
 
 
@@ -203,7 +201,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DBLogModule::FACTORY_KEY)
@@ -220,7 +217,7 @@ namespace synthese
 			return links;
 		}
 
-		AdminInterfaceElement::PageLinks DBLogViewer::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
+		AdminInterfaceElement::PageLinks DBLogViewer::getSubPages( const AdminInterfaceElement& currentPage) const
 		{
 			return AdminInterfaceElement::PageLinks();
 		}

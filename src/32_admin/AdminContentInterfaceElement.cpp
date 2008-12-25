@@ -20,13 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "11_interfaces/ValueElementList.h"
-
-#include "30_server/FunctionRequest.h"
-
-#include "32_admin/AdminInterfaceElement.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/AdminContentInterfaceElement.h"
+#include "ValueElementList.h"
+#include "FunctionRequest.h"
+#include "AdminInterfaceElement.h"
+#include "AdminRequest.h"
+#include "AdminContentInterfaceElement.h"
 
 using namespace std;
 using namespace boost;
@@ -48,11 +46,17 @@ namespace synthese
 			std::ostream& stream
 			, const interfaces::ParametersVector& parameters
 			, interfaces::VariablesMap& variables
-			, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+			, const void* rootObject /*= NULL*/,
+			const server::Request* request /*= NULL*/ ) const
 		{
-			const shared_ptr<const AdminInterfaceElement>* aie = (const shared_ptr<const AdminInterfaceElement>*) rootObject;
-			(*aie)->display(stream, variables, (const FunctionRequest<AdminRequest>*) request);
-			return "";
+			const shared_ptr<const AdminInterfaceElement>* aie = static_cast<const shared_ptr<const AdminInterfaceElement>* >(rootObject);
+			assert(aie != NULL && aie->get() != NULL);
+
+			if(aie != NULL && aie->get() != NULL)
+			{
+				(*aie)->display(stream, variables);
+			}
+			return string();
 		}
 	}
 }

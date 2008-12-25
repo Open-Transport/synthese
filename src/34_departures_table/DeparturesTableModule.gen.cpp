@@ -19,7 +19,6 @@ synthese::departurestable::DisplaySearchAdmin::integrate();
 synthese::departurestable::DisplayTypesAdmin::integrate();
 synthese::departurestable::BroadcastPointsAdmin::integrate();
 synthese::departurestable::DisplayAdmin::integrate();
-synthese::departurestable::DisplayMaintenanceAdmin::integrate();
 synthese::departurestable::DisplayTypeAdmin::integrate();
 
 synthese::departurestable::DisplayTypeTableSync::integrate();

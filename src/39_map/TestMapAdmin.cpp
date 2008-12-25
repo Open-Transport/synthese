@@ -105,10 +105,10 @@ namespace synthese
 			}
 		}
 		
-		void TestMapAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void TestMapAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> testMapRequest(request);
+			FunctionRequest<AdminRequest> testMapRequest(_request);
 			testMapRequest.getFunction()->setPage<TestMapAdmin>();
 			
 			// Form
@@ -133,7 +133,7 @@ namespace synthese
 			stream << _postScript;
 		}
 
-		bool TestMapAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool TestMapAdmin::isAuthorized() const
 		{
 			return true;
 		}
@@ -141,7 +141,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MapModule::FACTORY_KEY)
@@ -151,7 +150,6 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			return links;

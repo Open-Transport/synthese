@@ -91,9 +91,8 @@ namespace synthese
 			_closedFolderLastSubpageIntroducer = _closedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
 
 			stream << getSubPages(
-				(*page)->getTree(static_cast<const server::FunctionRequest<AdminRequest>*>(request))
+				(*page)->getTree()
 				, **page
-				, static_cast<const server::FunctionRequest<AdminRequest>*>(request)
 				, 0
 				, string()
 				, true
@@ -105,7 +104,6 @@ namespace synthese
 		std::string AdminPagesTreeInterfaceElement::getSubPages(
 			const AdminInterfaceElement::PageLinksTree& pages
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 			, int level
 			, string prefix
 			, bool last
@@ -138,13 +136,13 @@ namespace synthese
 			else
 			{
 				str << HTMLModule::getHTMLImage(pages.pageLink.icon, std::string())
-					<< HTMLModule::getHTMLLink(pages.pageLink.getURL(request), pages.pageLink.name);
+					<< HTMLModule::getHTMLLink(pages.pageLink.getURL(), pages.pageLink.name);
 			}
 			str << (pages.isNodeOpened ? _subpagesIntroducerIfOpened : _subpagesIntroducerIfClosed);
 
 			for (vector<AdminInterfaceElement::PageLinksTree>::const_iterator it = pages.subPages.begin(); it != pages.subPages.end(); ++it)
 			{
-				str << getSubPages(*it, currentPage, request, level+1, curPrefix, it==(pages.subPages.end()-1) );
+				str << getSubPages(*it, currentPage, level+1, curPrefix, it==(pages.subPages.end()-1) );
 			}
 			str << _ending;
 

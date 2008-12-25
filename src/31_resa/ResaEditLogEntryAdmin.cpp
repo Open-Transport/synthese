@@ -91,10 +91,10 @@ namespace synthese
 			}
 		}
 		
-		void ResaEditLogEntryAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
-		{
+		void ResaEditLogEntryAdmin::display(ostream& stream, VariablesMap& variables
+		) const	{
 			// Requests
-			ActionFunctionRequest<ResaLogEntryUpdateAction,AdminRequest> updateRequest(request);
+			ActionFunctionRequest<ResaLogEntryUpdateAction,AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<ResaEditLogEntryAdmin>();
 			updateRequest.setObjectId(_entry->getKey());
 			updateRequest.getAction()->setEntryId(_entry->getKey());
@@ -139,19 +139,18 @@ namespace synthese
 			stream << t.close();
 
 			stream << "<h1>Historique</h1>";
-			//ResultHTMLTable t(request->getHTMLForm());
+			//ResultHTMLTable t(_request->getHTMLForm());
 			//stream <<
 		}
 
-		bool ResaEditLogEntryAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool ResaEditLogEntryAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 		AdminInterfaceElement::PageLinks ResaEditLogEntryAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == ResaLogAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
@@ -162,7 +161,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ResaEditLogEntryAdmin::getSubPages(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			return links;

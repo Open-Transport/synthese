@@ -40,6 +40,12 @@ namespace synthese
 		*/
 		class LineAdmin : public admin::AdminInterfaceElementTemplate<LineAdmin>
 		{
+		public:
+			static const std::string TAB_STOPS;
+			static const std::string TAB_SCHEDULED_SERVICES;
+			static const std::string TAB_CONTINUOUS_SERVICES;
+
+		private:
 			boost::shared_ptr<const Line>	_line;
 
 		public:
@@ -55,19 +61,17 @@ namespace synthese
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
-				@param request The current request
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
 			
 			/** Authorization control.
-				@param request The current request
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
 				@date 2008
 			*/
-			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			bool isAuthorized() const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
@@ -79,7 +83,6 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 			
 			
@@ -108,6 +111,8 @@ namespace synthese
 			virtual std::string getParameterValue() const;
 
 			boost::shared_ptr<const Line> getLine() const;
+
+			virtual void _buildTabs() const;
 		};
 	}
 }

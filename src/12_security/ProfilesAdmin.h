@@ -91,12 +91,15 @@ namespace synthese
 		public:
 			ProfilesAdmin();
 			void setFromParametersMap(const server::ParametersMap& map);
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
-			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			
+			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			) const;
+			
+			bool isAuthorized(
+			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
-				@param request User request
 				@return PageLinks A link to the page if the parent is Users
 				@author Hugues Romain
 				@date 2008
@@ -104,8 +107,7 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
-				) const;
+			) const;
 		};
 	}
 }

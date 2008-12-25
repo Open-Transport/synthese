@@ -122,27 +122,26 @@ namespace synthese
 		void ResaCustomerAdmin::display(
 			ostream& stream
 			, VariablesMap& variables
-			, const FunctionRequest<AdminRequest>* request
 		) const	{
 
 			// Requests
-			ActionFunctionRequest<UserUpdateAction,AdminRequest> updateRequest(request);
+			ActionFunctionRequest<UserUpdateAction,AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<ResaCustomerAdmin>();
-			updateRequest.setObjectId(request->getObjectId());
+			updateRequest.setObjectId(_request->getObjectId());
 
-			FunctionRequest<AdminRequest> routeplannerRequest(request);
+			FunctionRequest<AdminRequest> routeplannerRequest(_request);
 			routeplannerRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
 			routeplannerRequest.getFunction()->setParameter(ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID, Conversion::ToString(_user->getKey()));
 
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<ResaCustomerAdmin>();
-			searchRequest.setObjectId(request->getObjectId());
+			searchRequest.setObjectId(_request->getObjectId());
 
-			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(request);
+			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
 			cancelRequest.getFunction()->setPage<ResaCustomerAdmin>();
-			cancelRequest.setObjectId(request->getObjectId());
+			cancelRequest.setObjectId(_request->getObjectId());
 
-			bool writingRight(request->isAuthorized<ResaRight>(WRITE,WRITE));
+			bool writingRight(_request->isAuthorized<ResaRight>(WRITE,WRITE));
 
 			// Search
 			Env env;
@@ -206,15 +205,14 @@ namespace synthese
 			);
 		}
 
-		bool ResaCustomerAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool ResaCustomerAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<ResaRight>(READ, READ);
+			return _request->isAuthorized<ResaRight>(READ, READ);
 		}
 		
 		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == ResaCustomersAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
@@ -225,7 +223,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPages(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			return links;

@@ -95,12 +95,12 @@ namespace synthese
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
 		}
 
-		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(searchConnectionPlacesWithBroadcastPoints(
 				_env,
-				request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-				, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+				_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+				, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 				, READ
 				, _cityName
 				, _placeName
@@ -117,10 +117,10 @@ namespace synthese
 			ResultHTMLTable::ResultParameters resultParameters;
 			resultParameters.setFromResult(_requestParameters, searchResult);
 
-			FunctionRequest<AdminRequest> goRequest(request);
+			FunctionRequest<AdminRequest> goRequest(_request);
 			goRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage(shared_ptr<AdminInterfaceElement>(new BroadcastPointsAdmin));
 
 			vector<pair<int, string> > m;
@@ -138,8 +138,8 @@ namespace synthese
 			stream << st.cell("Ligne", st.getForm().getSelectInput(
 				PARAMETER_LINE_ID
 				, EnvModule::getCommercialLineLabels(
-					request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-					, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+					_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+					, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 					, READ
 					, true)
 				, _lineUId)
@@ -179,14 +179,13 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool BroadcastPointsAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		bool BroadcastPointsAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<ArrivalDepartureTableRight>(READ);
+			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 
-		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
 			{

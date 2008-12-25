@@ -99,38 +99,38 @@ namespace synthese
 			);
 		}
 
-		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			searchRequest.setObjectId(_folderId);
 
-			FunctionRequest<AdminRequest> updateScenarioRequest(request);
+			FunctionRequest<AdminRequest> updateScenarioRequest(_request);
 			updateScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			
-			ActionFunctionRequest<DeleteScenarioAction,AdminRequest> deleteScenarioRequest(request);
+			ActionFunctionRequest<DeleteScenarioAction,AdminRequest> deleteScenarioRequest(_request);
 			deleteScenarioRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			deleteScenarioRequest.setObjectId(_folderId);
 			
-			ActionFunctionRequest<AddScenarioAction,AdminRequest> addScenarioRequest(request);
+			ActionFunctionRequest<AddScenarioAction,AdminRequest> addScenarioRequest(_request);
 			addScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
 			addScenarioRequest.getAction()->setFolderId(_folderId);
 
-			ActionFunctionRequest<ScenarioFolderAdd,AdminRequest> addFolderRequest(request);
+			ActionFunctionRequest<ScenarioFolderAdd,AdminRequest> addFolderRequest(_request);
 			addFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			addFolderRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
 			addFolderRequest.getAction()->setParentId(_folderId);
 
-			FunctionRequest<AdminRequest> goFolderRequest(request);
+			FunctionRequest<AdminRequest> goFolderRequest(_request);
 			goFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 
-			ActionFunctionRequest<ScenarioFolderRemoveAction,AdminRequest> removeFolderRequest(request);
+			ActionFunctionRequest<ScenarioFolderRemoveAction,AdminRequest> removeFolderRequest(_request);
 			removeFolderRequest.getAction()->setFolder(_folder);
 			removeFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 
-			ActionFunctionRequest<ScenarioFolderUpdateAction,AdminRequest> updateFolderRequest(request);
+			ActionFunctionRequest<ScenarioFolderUpdateAction,AdminRequest> updateFolderRequest(_request);
 			updateFolderRequest.getAction()->setFolderId(_folder.get() ? _folder->getKey() : 0);
 			updateFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			updateFolderRequest.setObjectId(_folder.get() ? _folder->getKey() : 0);
@@ -202,9 +202,9 @@ namespace synthese
 
 		}
 
-		bool MessagesLibraryAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		bool MessagesLibraryAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<MessagesLibraryRight>(READ);
+			return _request->isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessagesLibraryAdmin::MessagesLibraryAdmin()
@@ -213,9 +213,8 @@ namespace synthese
 			
 		}
 
-		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
 			{
@@ -224,7 +223,7 @@ namespace synthese
 			return links;
 		}
 
-		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
+		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages( const AdminInterfaceElement& currentPage) const
 		{
 			PageLinks links;
 
@@ -233,7 +232,7 @@ namespace synthese
 			ScenarioFolderTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
 			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, env.getRegistry<ScenarioFolder>())
 			{
-				PageLink link;
+				PageLink link(getPageLink());
 				link.factoryKey = MessagesLibraryAdmin::FACTORY_KEY;
 				link.icon = "folder.png";
 				link.name = cfolder->getName();
@@ -246,7 +245,7 @@ namespace synthese
 			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, env.getRegistry<ScenarioTemplate>())
 			{
-				PageLink link;
+				PageLink link(getPageLink());
 				link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
 				link.icon = MessagesScenarioAdmin::ICON;
 				link.name = tpl->getName();

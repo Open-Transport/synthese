@@ -74,8 +74,8 @@ namespace synthese
 			}
 		}
 		
-		void ModuleAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
-		{
+		void ModuleAdmin::display(ostream& stream, VariablesMap& variables
+		) const	{
 			stream << "<h1>Informations sur le module</h1>";
 
 			stream << "<ul>";
@@ -89,17 +89,17 @@ namespace synthese
 			
 			stream << "<ul>";
 
-			AdminInterfaceElement::PageLinks links(getSubPages(*this, request));
+			AdminInterfaceElement::PageLinks links(getSubPages(*this));
 			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
 			{
 				stream << "<li>" << HTMLModule::getHTMLImage(it->icon, it->name);
-				stream << HTMLModule::getHTMLLink(it->getURL(static_cast<const server::FunctionRequest<AdminRequest>*>(request)), it->name);
+				stream << HTMLModule::getHTMLLink(it->getURL(), it->name);
 				stream << "</li>";
 			}
 			stream << "</ul>";
 		}
 
-		bool ModuleAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool ModuleAdmin::isAuthorized() const
 		{
 			return true;
 		}
@@ -107,7 +107,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
@@ -115,14 +114,12 @@ namespace synthese
 				for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
 					it != Factory<ModuleClass>::end(); ++it)
 				{
-					AdminInterfaceElement::PageLink link;
-					link.factoryKey = FACTORY_KEY;
-					link.icon = ICON;
+					AdminInterfaceElement::PageLink link(getPageLink());
 					link.parameterValue = it.getKey();
 					link.parameterName = PARAMETER_MODULE;
 					link.name = it->getName();
 
-					if (!AdminInterfaceElement::GetAdminPage(link)->getSubPages(currentPage, request).empty())
+					if (!link.getAdminPage()->getSubPages(currentPage).empty())
 						links.insert(links.begin(), link);
 				}
 			}

@@ -59,7 +59,9 @@ namespace synthese
 		:	public util::FactoryBase<AdminInterfaceElement>
 		{
 		public:
-			
+			////////////////////////////////////////////////////////////////////
+			/// Link to the administrative page.
+			////////////////////////////////////////////////////////////////////
 			struct PageLink
 			{
 				std::string name;
@@ -67,14 +69,38 @@ namespace synthese
 				std::string parameterName;
 				std::string parameterValue;
 				std::string icon;
+				const server::FunctionRequest<admin::AdminRequest>* request;
 
 				bool operator==(const PageLink& other) const;
 
-				std::string getURL(const server::FunctionRequest<admin::AdminRequest>* request) const;
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	URL generator.
+				///	@return std::string the URL to access to the page
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				std::string getURL(
+				) const;
+
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	Admin Page generator.
+				///	@return AdminInterfaceElement* the page (delete after use)
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				AdminInterfaceElement* getAdminPage(
+				) const;
 			};
 			
 			typedef std::vector<PageLink> PageLinks;
 			
+			////////////////////////////////////////////////////////////////////
+			/// Tree of links to administrative pages.
+			////////////////////////////////////////////////////////////////////
 			struct PageLinksTree
 			{
 				PageLink					pageLink;
@@ -86,26 +112,249 @@ namespace synthese
 			};
 
 
+
+			////////////////////////////////////////////////////////////////////
+			/// Tab and its corresponding div in content of administrative page.
+			///
+			///	To use tabs :
+			///		- call begin method to start displaying the div corresponding
+			///			to the first tab. Test the output of the method to decide if 
+			///			the content can be displayed. 
+			///		- call begin for each following tab (the ending of the
+			///			preceding one is automatic
+			///		- call end to close the last div.
+			///	
+			///	The tabs list is displayed by the library interface element
+			///	AdminTabsInterfaceElement
+			///
+			/// The generated HTML code is a div element by tab containing its
+			/// corresponding content. The class of the div is @c tabdiv.
+			/// The id of the div is @c tab_(id)_content.
+			////////////////////////////////////////////////////////////////////
+			class Tab
+			{
+			private:
+				std::string	_title;
+				std::string	_id;
+				bool		_writePermission;
+
+
+
+			public:
+				////////////////////////////////////////////////////////////////////
+				///	Tab constructor.
+				///	@param title Title of the tab
+				/// @param id ID of the tab
+				/// @param writePermission the user has write permissions on the 
+				///		content of the tab
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				Tab(
+					std::string title = std::string(),
+					std::string id = std::string(),
+					bool writePermission = true
+				);
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	Title getter.
+				///	@return Title of the tab.
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				const std::string& getTitle() const;
+
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	ID getter.
+				///	@return ID of the tab.
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				const std::string& getId() const;
+
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	Write permission getter.
+				///	@return bool true if the user can use the content of the tab
+				///		with write permissions
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				bool getWritePermission() const;
+			};
+
+			////////////////////////////////////////////////////////////////////
+			/// Tab vector type.
+			////////////////////////////////////////////////////////////////////
+			typedef std::vector<Tab>	Tabs;
+
+			static const std::string PARAMETER_TAB;
+
+		private:
+			mutable const Tab*	_currentTab;
+
 		protected:
-			mutable PageLinks		_treePosition;
-			mutable PageLinksTree	_tree;
-			mutable util::Env		_env;
+
+			//! \name Cache
+			//@{
+				mutable PageLinks		_treePosition;
+				mutable PageLinksTree	_tree;
+				mutable	Tabs			_tabs;
+				mutable bool			_tabBuilded;
+			//@}
+
+			//! \name Temporary data
+			//@{
+				mutable util::Env	_env;
+			//@}
+
+			//! \name Properties
+			//@{
+				const server::FunctionRequest<admin::AdminRequest>*		_request;
+			//@}
 
 			PageLinksTree	_buildTreeRecursion(
-				const AdminInterfaceElement* page
-				, const server::FunctionRequest<admin::AdminRequest>* request
-				, const PageLinks position
+				const AdminInterfaceElement* page,
+				const PageLinks position
 			) const;
 
+			
+			
+			////////////////////////////////////////////////////////////////////
+			///	Tree generator.
+			///	@author Hugues Romain
+			///	@date 2008
+			/// Generates the whole tree depending on the context.
+			/// This method has to be called by the current displayed admin page.
+			////////////////////////////////////////////////////////////////////
 			void _buildTree(
-				const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
+
+			
+			
+			//! \name Tabs management
+			//@{
+				////////////////////////////////////////////////////////////////////
+				///	Tabs generator.
+				///	@author Hugues Romain
+				///	@date 2008
+				/// Virtual method :
+				///		- default behavior : creates nothing
+				///		- can be overloaded : tabs creation depending on the context
+				/// The _buildTabs method is in charge of : 
+				///		- the control of the profile of the user to determine the 
+				///			tabs list. 
+				///		- to set _tabBuilded at true to avoid the method to be
+				///			relaunched
+				////////////////////////////////////////////////////////////////////
+				virtual void _buildTabs() const;
+
+
+
+				////////////////////////////////////////////////////////////////////
+				///	Displays a begin of a content linked by a tab.
+				/// @param stream Stream to display the code on.
+				///	@param id ID of the tab
+				/// @return true if the content must be displayed
+				///	@author Hugues Romain
+				///	@date 2008
+				/// The code is displayed only if the tab is present in the tabs
+				/// list of the page (depending of the rights of the user)
+				/// 
+				/// If necessary, this method closes automatically the last displayed
+				/// tab.
+				////////////////////////////////////////////////////////////////////
+				bool openTabContent(
+					std::ostream& stream,
+					const std::string& id
+				) const;
+
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	Displays the end of a content linked by a tab.
+				/// @param stream Stream to display the code on.
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				void closeTabContent(
+					std::ostream& stream
+				) const;
+
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	Test if the user has write permissions on the currently
+				///	displayed tab.
+				///	@return bool True if the user has write permissions
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				bool tabHasWritePermissions() const;
+			//@}
+				
+
 
 		public:
-			const PageLinks&		getTreePosition(const server::FunctionRequest<admin::AdminRequest>* request) const;
-			const PageLinksTree&	getTree(const server::FunctionRequest<admin::AdminRequest>* request)	const;
+			////////////////////////////////////////////////////////////////////
+			///	AdminInterfaceElement constructor.
+			///	@author Hugues Romain
+			///	@date 2008
+			////////////////////////////////////////////////////////////////////
+			AdminInterfaceElement();
 
-			static AdminInterfaceElement*	GetAdminPage(const PageLink& pageLink);
+			//! \name Setters
+			//@{
+				////////////////////////////////////////////////////////////////////
+				///	Request setter.
+				///	@param value the request calling the page
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				void setRequest(const server::FunctionRequest<admin::AdminRequest>*	value);
+			//@}
+
+
+			//! \name Getters
+			//@{
+				const PageLinks&		getTreePosition()	const;
+				const PageLinksTree&	getTree()			const;
+				const Tabs&				getTabs()			const;
+			//@}
+
+
+			//! \name Queries
+			//@{
+				////////////////////////////////////////////////////////////////////
+				///	Tab getter.
+				///	@param key key of the tab
+				///	@return const Tab& the found tab
+				///	@author Hugues Romain
+				///	@date 2008
+				/// @throw Exception if tab was not found
+				////////////////////////////////////////////////////////////////////
+				const Tab&	getTab(const std::string& key) const;
+			//@}
+			
+			
+			////////////////////////////////////////////////////////////////////
+			///	displayTabs.
+			///	@param stream
+			///	@param variables
+			///	@param request
+			///	@return void
+			///	@author Hugues Romain
+			///	@date 2008
+			////////////////////////////////////////////////////////////////////
+			void displayTabs(
+				std::ostream& stream,
+				interfaces::VariablesMap& variables
+			) const;
+
 
 
 			//! \name Virtual initialization method
@@ -131,14 +380,17 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 				*/
-				virtual bool isAuthorized(const server::FunctionRequest<AdminRequest>* request) const = 0;
+				virtual bool isAuthorized() const = 0;
 
 				/** Display of the content of the admin element.
 					@param stream Stream to write on.
 					@param variables Execution variables
 					@param request Current request
 				*/
-				virtual void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<AdminRequest>* request=NULL) const = 0;
+				virtual void display(
+					std::ostream& stream,
+					interfaces::VariablesMap& variables
+				) const = 0;
 
 				virtual std::string getIcon() const = 0;
 				virtual std::string getTitle() const = 0;
@@ -163,7 +415,6 @@ namespace synthese
 				virtual PageLinks getSubPagesOfParent(
 					const PageLink& parentLink
 					, const AdminInterfaceElement& currentPage
-					, const server::FunctionRequest<admin::AdminRequest>* request
 				) const = 0;
 
 
@@ -178,17 +429,18 @@ namespace synthese
 				*/
 				virtual PageLinks getSubPages(
 					const AdminInterfaceElement& currentPage
-					, const server::FunctionRequest<admin::AdminRequest>* request
 				) const;
 
 
 
 				/** Gets the opening position of the node in the tree view.
-					@return bool true = the page is visble, all the superior nodes are open, false = the page must not be visible, and will be hidden if no one another page of the same level must be visible.
+					@return bool true = the page is visible, all the superior nodes are open, false = the page must not be visible, and will be hidden if no one another page of the same level must be visible.
 					@author Hugues Romain
 					@date 2008					
 				*/
-				virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
+				virtual bool isPageVisibleInTree(
+					const AdminInterfaceElement& currentPage
+				) const;
 			//@}
 		};
 	}

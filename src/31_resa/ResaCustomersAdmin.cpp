@@ -85,14 +85,10 @@ namespace synthese
 			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
 			
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
-		}
-		
-		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
-		{
+
 			// Search
-			Env env;
 			UserTableSync::Search(
-				env,
+				_env,
 				"%" + _searchLogin + "%"
 				, "%" + _searchName + "%"
 				, "%" + _searchSurname + "%"
@@ -106,14 +102,16 @@ namespace synthese
 				, false
 				, _requestParameters.raisingOrder
 			);
-			ResultHTMLTable::ResultParameters	resultParameters;
-			resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<User>());
-
+			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<User>());
+		}
+		
+		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables) const
+		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<ResaCustomersAdmin>();
 
-			FunctionRequest<AdminRequest> openRequest(request);
+			FunctionRequest<AdminRequest> openRequest(_request);
 			openRequest.getFunction()->setPage<ResaCustomerAdmin>();
 			
 			// Form
@@ -129,7 +127,7 @@ namespace synthese
 			stream << "<h1>Résultats</h1>";
 
 			// Results
-			if (env.getRegistry<User>().empty())
+			if (_env.getRegistry<User>().empty())
 				stream << "<p>Aucun client trouvé.</p>";
 			else
 			{
@@ -139,11 +137,11 @@ namespace synthese
 				h.push_back(make_pair(string(), "Téléphone"));
 				h.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
 				h.push_back(make_pair(string(), "Action"));
-				ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, resultParameters);
+				ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, _resultParameters);
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<User> user, env.getRegistry<User>())
+				BOOST_FOREACH(shared_ptr<User> user, _env.getRegistry<User>())
 				{
 					openRequest.setObjectId(user->getKey());
 
@@ -163,15 +161,13 @@ namespace synthese
 		}
 
 		bool ResaCustomersAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>* request
 		) const	{
-			return request->isAuthorized<ResaRight>(READ);
+			return _request->isAuthorized<ResaRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)

@@ -79,21 +79,20 @@ namespace synthese
 			}
 		}
 		
-		void CommercialLineAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void CommercialLineAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			/// @todo Implement the display by streaming the output to the stream variable
 			stream << "Not yet implemented, use treeview to navigate";
 		}
 
-		bool CommercialLineAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool CommercialLineAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<TransportNetworkRight>(READ);
+			return _request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			return links;
@@ -114,8 +113,8 @@ namespace synthese
 			return _cline.get() ? Conversion::ToString(_cline->getKey()) : string();
 		}
 
-		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages( const AdminInterfaceElement& currentPage , const server::FunctionRequest<admin::AdminRequest>* request ) const
-		{
+		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages( const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (currentPage.getFactoryKey() == CommercialLineAdmin::FACTORY_KEY && _cline->getKey() == static_cast<const CommercialLineAdmin&>(currentPage).getCommercialLine()->getKey()
 				|| currentPage.getFactoryKey() == LineAdmin::FACTORY_KEY && _cline->getKey() == static_cast<const LineAdmin&>(currentPage).getLine()->getCommercialLine()->getKey()
@@ -126,7 +125,7 @@ namespace synthese
 				const Registry<Line>& lines(env.getRegistry<Line>());
 				for(Registry<Line>::const_iterator it(lines.begin()); it != lines.end(); ++it)
 				{
-					PageLink link;
+					PageLink link(getPageLink());
 					link.factoryKey = LineAdmin::FACTORY_KEY;
 					link.icon = LineAdmin::ICON;
 					link.name = (*it)->getName();

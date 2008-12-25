@@ -70,19 +70,19 @@ namespace synthese
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
-				@param request The current request
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			) const;
 			
 			/** Authorization control.
-				@param request The current request
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
 				@date 2008
 			*/
-			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			bool isAuthorized(
+			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
@@ -94,29 +94,23 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 			
 			/** Sub pages getter.
 				@param currentPage Currently displayed page
-				@param request User request
 				@return PageLinks each subpage of the current page
 				@author Hugues Romain
 				@date 2008
-				REMOVE IF YOU WANT TO USE THE STANDARD INHERITANCE METHOD DESIGNED IN ADMININTERFACEELEMENT
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
-				
 			) const;
 			
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
 				@date 2008
-				REMOVE IF YOU WANT ALWAYS USE THE DEFAULT_TITLE
 			*/
 			virtual std::string getTitle() const;
 			
@@ -124,7 +118,6 @@ namespace synthese
 				@return The name of the parameter of the page
 				@author Hugues Romain
 				@date 2008
-				REMOVE IF YOU DONT USE A PARAMETER
 			*/
 			virtual std::string getParameterName() const;
 			
@@ -132,7 +125,6 @@ namespace synthese
 				@return The value of the parameter of the page
 				@author Hugues Romain
 				@date 2008
-				REMOVE IF YOU DONT USE A PARAMETER
 			*/
 			virtual std::string getParameterValue() const;
 		};

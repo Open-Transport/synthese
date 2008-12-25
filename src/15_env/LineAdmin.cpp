@@ -77,6 +77,10 @@ namespace synthese
 
 	namespace env
 	{
+		const string LineAdmin::TAB_STOPS("stops");
+		const string LineAdmin::TAB_SCHEDULED_SERVICES("sserv");
+		const string LineAdmin::TAB_CONTINUOUS_SERVICES("cserv");
+
 		LineAdmin::LineAdmin()
 			: AdminInterfaceElementTemplate<LineAdmin>()
 		{ }
@@ -96,132 +100,143 @@ namespace synthese
 			}
 		}
 		
-		void LineAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void LineAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
-			// Reservation
-			bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
-
-			stream << "<h1>Arrêts desservis</h1>";
-
-			HTMLTable::ColsVector v;
-			v.push_back("Rang");
-			v.push_back("Arrêt");
-			v.push_back("A");
-			v.push_back("D");
-			v.push_back("Hor");
-			if (reservation)
-				v.push_back("Resa");
-			HTMLTable t(v,"adminresults");
-
-			stream << t.open();
-
-			BOOST_FOREACH(shared_ptr<LineStop> lineStop, _env.getRegistry<LineStop>())
+			////////////////////////////////////////////////////////////////////
+			// TAB STOPS
+			if (openTabContent(stream, TAB_STOPS))
 			{
-				stream << t.row();
-				stream << t.col() << lineStop->getRankInPath();
-				stream << t.col() << lineStop->getConnectionPlace()->getFullName();
-				stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
-				stream << t.col() << (lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
-				stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
+				// Reservation
+				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
+
+				HTMLTable::ColsVector v;
+				v.push_back("Rang");
+				v.push_back("Arrêt");
+				v.push_back("A");
+				v.push_back("D");
+				v.push_back("Hor");
 				if (reservation)
-					stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");
-			}
+					v.push_back("Resa");
+				HTMLTable t(v,"adminresults");
 
-			stream << t.close();
+				stream << t.open();
 
-			stream << "<h1>Services à horaires</h1>";
-
-			const Registry<ScheduledService>& services(_env.getRegistry<ScheduledService>());
-			if (services.empty())
-				stream << "<p>Aucun service à horaire</p>";
-			else
-			{
-				HTMLTable::ColsVector vs;
-				vs.push_back("Numéro");
-				vs.push_back("Départ");
-				vs.push_back("Arrivée");
-				vs.push_back("Durée");
-				vs.push_back("Dernier jour");
-				HTMLTable ts(vs,"adminresults");
-
-				stream << ts.open();
-
-				BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
+				BOOST_FOREACH(shared_ptr<LineStop> lineStop, _env.getRegistry<LineStop>())
 				{
-					Schedule ds(service->getDepartureSchedule());
-					Schedule as(service->getLastArrivalSchedule());
-					
-					stream << ts.row();
-					stream << ts.col() << service->getServiceNumber();
-					
-					stream << ts.col() << ds.toString();
-					stream << ts.col() << as.toString();
-
-					stream << ts.col() << (as - ds);
-
-					stream << ts.col();
+					stream << t.row();
+					stream << t.col() << lineStop->getRankInPath();
+					stream << t.col() << lineStop->getConnectionPlace()->getFullName();
+					stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
+					stream << t.col() << (lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
+					stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
+					if (reservation)
+						stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");
 				}
 
-				stream << ts.close();
+				stream << t.close();
 			}
 
-
-			stream << "<h1>Services continus</h1>";
-
-			const Registry<ContinuousService>& cservices(_env.getRegistry<ContinuousService>());
-			if (cservices.empty())
-				stream << "<p>Aucun service continu</p>";
-			else
+			////////////////////////////////////////////////////////////////////
+			// TAB SCHEDULED SERVICES
+			if (openTabContent(stream, TAB_SCHEDULED_SERVICES))
 			{
-				HTMLTable::ColsVector vc;
-				vc.push_back("Départ premier");
-				vc.push_back("Départ dernier");
-				vc.push_back("Arrivée premier");
-				vc.push_back("Arrivée dernier");
-				vc.push_back("Durée");
-				vc.push_back("Amplitude");
-				vc.push_back("Fréquence");
-				vc.push_back("Dernier jour");
-				HTMLTable tc(vc,"adminresults");
-
-				stream << tc.open();
-
-				BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
+				const Registry<ScheduledService>& services(_env.getRegistry<ScheduledService>());
+				if (services.empty())
+					stream << "<p>Aucun service à horaire</p>";
+				else
 				{
-					stream << tc.row();
+					HTMLTable::ColsVector vs;
+					vs.push_back("Numéro");
+					vs.push_back("Départ");
+					vs.push_back("Arrivée");
+					vs.push_back("Durée");
+					vs.push_back("Dernier jour");
+					HTMLTable ts(vs,"adminresults");
 
-					Schedule ds(service->getDepartureSchedule());
-					Schedule as(service->getLastArrivalSchedule());
+					stream << ts.open();
 
-					stream << tc.col() << ds.toString();
-					ds += service->getRange();
-					stream << tc.col() << ds.toString();
+					BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
+					{
+						Schedule ds(service->getDepartureSchedule());
+						Schedule as(service->getLastArrivalSchedule());
 
-					stream << tc.col() << as.toString();
-					as += service->getRange();
-					stream << tc.col() << as.toString();
-					
-					stream << tc.col() << (as - ds);
+						stream << ts.row();
+						stream << ts.col() << service->getServiceNumber();
 
-					stream << tc.col() << service->getRange();
-					stream << tc.col() << service->getMaxWaitingTime();
-					
-					stream << tc.col();
+						stream << ts.col() << ds.toString();
+						stream << ts.col() << as.toString();
+
+						stream << ts.col() << (as - ds);
+
+						stream << ts.col();
+					}
+
+					stream << ts.close();
 				}
-
-				stream << tc.close();
 			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB CONTINUOUS SERVICES
+			if (openTabContent(stream, TAB_CONTINUOUS_SERVICES))
+			{
+				const Registry<ContinuousService>& cservices(_env.getRegistry<ContinuousService>());
+				if (cservices.empty())
+					stream << "<p>Aucun service continu</p>";
+				else
+				{
+					HTMLTable::ColsVector vc;
+					vc.push_back("Départ premier");
+					vc.push_back("Départ dernier");
+					vc.push_back("Arrivée premier");
+					vc.push_back("Arrivée dernier");
+					vc.push_back("Durée");
+					vc.push_back("Amplitude");
+					vc.push_back("Fréquence");
+					vc.push_back("Dernier jour");
+					HTMLTable tc(vc,"adminresults");
+
+					stream << tc.open();
+
+					BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
+					{
+						stream << tc.row();
+
+						Schedule ds(service->getDepartureSchedule());
+						Schedule as(service->getLastArrivalSchedule());
+
+						stream << tc.col() << ds.toString();
+						ds += service->getRange();
+						stream << tc.col() << ds.toString();
+
+						stream << tc.col() << as.toString();
+						as += service->getRange();
+						stream << tc.col() << as.toString();
+
+						stream << tc.col() << (as - ds);
+
+						stream << tc.col() << service->getRange();
+						stream << tc.col() << service->getMaxWaitingTime();
+
+						stream << tc.col();
+					}
+
+					stream << tc.close();
+				}
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// END TABS
+			closeTabContent(stream);
 		}
 
-		bool LineAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool LineAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<TransportNetworkRight>(READ);
+			return _request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks LineAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			return links;
@@ -246,6 +261,19 @@ namespace synthese
 		boost::shared_ptr<const Line> LineAdmin::getLine() const
 		{
 			return _line;
+		}
+
+
+
+		void LineAdmin::_buildTabs(
+		) const {
+			_tabs.clear();
+
+			_tabs.push_back(Tab("Arrêts desservis", TAB_STOPS, true));
+			_tabs.push_back(Tab("Services à horaire", TAB_SCHEDULED_SERVICES, true));
+			_tabs.push_back(Tab("Services continus", TAB_CONTINUOUS_SERVICES, true));
+
+			_tabBuilded = true;
 		}
 	}
 }

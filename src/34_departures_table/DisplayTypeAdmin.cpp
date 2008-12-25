@@ -83,15 +83,15 @@ namespace synthese
 			}
 		}
 		
-		void DisplayTypeAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void DisplayTypeAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			ActionFunctionRequest<UpdateDisplayTypeAction,AdminRequest> updateRequest(request);
+			ActionFunctionRequest<UpdateDisplayTypeAction,AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<DisplayTypeAdmin>();
 			updateRequest.setObjectId(_type->getKey());
 			updateRequest.getAction()->setTypeId(_type->getKey());
 
-			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(request);
+			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(_request);
 			deleteRequest.getFunction()->setPage<DisplayTypesAdmin>();
 			deleteRequest.getAction()->setType(_type);
 
@@ -113,7 +113,7 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool DisplayTypeAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool DisplayTypeAdmin::isAuthorized() const
 		{
 			return true;
 		}
@@ -121,7 +121,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DisplayTypeAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == DisplayTypesAdmin::FACTORY_KEY && parentLink.parameterValue == Conversion::ToString(_type->getKey()))

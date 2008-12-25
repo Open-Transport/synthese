@@ -103,15 +103,15 @@ namespace synthese
 			);
 		}
 		
-		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<ResaLogAdmin>();
 
-			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(request);
+			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
 			cancelRequest.getFunction()->setPage<ResaLogAdmin>();
-			cancelRequest.setObjectId(request->getObjectId());
+			cancelRequest.setObjectId(_request->getObjectId());
 
 			ResultHTMLTable::ResultParameters rp;
 			rp.setFromResult(_requestParameters, _env.getEditableRegistry<DBLogEntry>());
@@ -134,15 +134,14 @@ namespace synthese
 			);
 		}
 
-		bool ResaLogAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
-		{
-			return request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+		bool ResaLogAdmin::isAuthorized(
+		) const	{
+			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)

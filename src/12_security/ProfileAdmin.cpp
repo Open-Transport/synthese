@@ -77,21 +77,21 @@ namespace synthese
 		}
 
 
-		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
 		{
-			ActionFunctionRequest<UpdateProfileAction, AdminRequest> updateRequest(request);
+			ActionFunctionRequest<UpdateProfileAction, AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<ProfileAdmin>();
 			updateRequest.setObjectId(_profile->getKey());
 
-			ActionFunctionRequest<UpdateRightAction, AdminRequest> updateRightRequest(request);
+			ActionFunctionRequest<UpdateRightAction, AdminRequest> updateRightRequest(_request);
 			updateRightRequest.getFunction()->setPage<ProfileAdmin>();
 			updateRightRequest.setObjectId(_profile->getKey());
 			
-			ActionFunctionRequest<DeleteRightAction,AdminRequest> deleteRightRequest(request);
+			ActionFunctionRequest<DeleteRightAction,AdminRequest> deleteRightRequest(_request);
 			deleteRightRequest.getFunction()->setPage<ProfileAdmin>();
 			deleteRightRequest.setObjectId(_profile->getKey());
 			
-			ActionFunctionRequest<AddRightAction,AdminRequest> addRightRequest(request);
+			ActionFunctionRequest<AddRightAction,AdminRequest> addRightRequest(_request);
 			addRightRequest.getFunction()->setPage<ProfileAdmin>();
 			addRightRequest.setObjectId(_profile->getKey());
 			
@@ -215,14 +215,13 @@ namespace synthese
 			}
 		}
 
-		bool ProfileAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		bool ProfileAdmin::isAuthorized() const
 		{
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage 		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ProfilesAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
 			{

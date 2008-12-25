@@ -164,30 +164,30 @@ namespace synthese
 		}
 
 
-		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<MessagesAdmin>();
 
-			ActionFunctionRequest<NewMessageAction,AdminRequest> newMessageRequest(request);
+			ActionFunctionRequest<NewMessageAction,AdminRequest> newMessageRequest(_request);
 			newMessageRequest.getFunction()->setPage<MessageAdmin>();
 			newMessageRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
 
-			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(request);
+			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			newScenarioRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
 
-			FunctionRequest<AdminRequest> alarmRequest(request);
+			FunctionRequest<AdminRequest> alarmRequest(_request);
 			alarmRequest.getFunction()->setPage<MessageAdmin>();
 
-			FunctionRequest<AdminRequest> scenarioRequest(request);
+			FunctionRequest<AdminRequest> scenarioRequest(_request);
 			scenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 
-			ActionFunctionRequest<AlarmStopAction,AdminRequest> stopRequest(request);
+			ActionFunctionRequest<AlarmStopAction,AdminRequest> stopRequest(_request);
 			stopRequest.getFunction()->setPage<MessagesAdmin>();
 			
-			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(request);
+			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(_request);
 			scenarioStopRequest.getFunction()->setPage<MessagesAdmin>();
 			
 			// Searches
@@ -399,14 +399,13 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool MessagesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
-		{
-			return request->isAuthorized<MessagesRight>(READ);
+		bool MessagesAdmin::isAuthorized(
+		) const	{
+			return _request->isAuthorized<MessagesRight>(READ);
 		}
 
-		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage 		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
 			{

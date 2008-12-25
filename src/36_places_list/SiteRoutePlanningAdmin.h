@@ -68,53 +68,48 @@ namespace synthese
 			SiteRoutePlanningAdmin();
 
 			/** Initialization of the parameters from a parameters map.
-			@param map The parameters map to use for the initialization.
-			@throw AdminParametersException if a parameter has incorrect value.
-			@author Hugues Romain
-			@date 2008
+				@param map The parameters map to use for the initialization.
+				@throw AdminParametersException if a parameter has incorrect value.
+				@author Hugues Romain
+				@date 2008
 			*/
 			void setFromParametersMap(const server::ParametersMap& map);
 
 			/** Display of the content of the admin element.
-			@param stream Stream to write on.
-			@param request The current request
-			@author Hugues Romain
-			@date 2008
+				@param stream Stream to write on.
+				@author Hugues Romain
+				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
 
 			/** Authorization control.
-			@param request The current request
-			@return bool True if the displayed page can be displayed
-			@author Hugues Romain
-			@date 2008
+				@return bool True if the displayed page can be displayed
+				@author Hugues Romain
+				@date 2008
 			*/
-			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			bool isAuthorized() const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.
-			@param parentLink Link to the parent page
-			@param currentPage Currently displayed page
-			@return PageLinks each subpage of the parent page designed in parentLink
-			@author Hugues Romain
-			@date 2008
+				@param parentLink Link to the parent page
+				@param currentPage Currently displayed page
+				@return PageLinks each subpage of the parent page designed in parentLink
+				@author Hugues Romain
+				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 
 			/** Sub pages getter.
-			@param currentPage Currently displayed page
-			@param request User request
-			@return PageLinks No subpages
-			@author Hugues Romain
-			@date 2008
+				@param currentPage Currently displayed page
+				@return PageLinks No subpages
+				@author Hugues Romain
+				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 
 			/** Parameter name getter.

@@ -126,22 +126,22 @@ namespace synthese
 
 		}
 		
-		void BookableCommercialLineAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void BookableCommercialLineAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Rights
-			bool globalReadRight(request->isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL));
-			bool globalDeleteRight(request->isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL));
+			bool globalReadRight(_request->isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL));
+			bool globalDeleteRight(_request->isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL));
 
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
 			searchRequest.setObjectId(_line->getKey());
 
-			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(request);
+			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
 			cancelRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
 			cancelRequest.setObjectId(_line->getKey());
 
-			FunctionRequest<AdminRequest> customerRequest(request);
+			FunctionRequest<AdminRequest> customerRequest(_request);
 			customerRequest.getFunction()->setPage<ResaCustomerAdmin>();
 			
 			// Local variables
@@ -466,18 +466,17 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool BookableCommercialLineAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool BookableCommercialLineAdmin::isAuthorized() const
 		{
 			if (!_line.get())
 				return false;
 
-			return request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_line->getKey()));
+			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_line->getKey()));
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			/// @todo Implement it or leave empty
@@ -490,7 +489,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPages(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			/// @todo Implement it or remove the method to get the default behaviour

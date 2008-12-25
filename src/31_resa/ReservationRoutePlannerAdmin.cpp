@@ -148,15 +148,15 @@ namespace synthese
 			}
 		}
 		
-		void ReservationRoutePlannerAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void ReservationRoutePlannerAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
 
-			ActionFunctionRequest<BookReservationAction,AdminRequest> resaRequest(request);
+			ActionFunctionRequest<BookReservationAction,AdminRequest> resaRequest(_request);
 			resaRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
 
-			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(request);
+			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
 			customerSearchRequest.getFunction()->setNumber(20);
 
 			stream << HTMLModule::GetHTMLJavascriptOpen("resa.js");
@@ -400,15 +400,14 @@ namespace synthese
 			}
 		}
 
-		bool ReservationRoutePlannerAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool ReservationRoutePlannerAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
@@ -419,7 +418,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPages(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			return links;

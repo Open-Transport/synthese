@@ -25,7 +25,6 @@
 #include "DisplayScreenTableSync.h"
 #include "CreateDisplayScreenAction.h"
 #include "DisplayAdmin.h"
-#include "DisplayMaintenanceAdmin.h"
 #include "DisplayScreenContentRequest.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
@@ -123,16 +122,11 @@ namespace synthese
 			}
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_CITY, 30);
-		}
 
-
-		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
-			Env env;
 			DisplayScreenTableSync::Search(
-				env,
-				request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-				, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+				_env,
+				_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+				, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 				, READ
 				, UNKNOWN_VALUE
 				, _place.get() ? _place->getKey() : UNKNOWN_VALUE
@@ -154,25 +148,24 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
 				, _requestParameters.raisingOrder
 			);
-			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, env.getEditableRegistry<DisplayScreen>());
+			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayScreen>());
+		}
 
 
-			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);
+		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables
+		) const	{
+			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(_request);
 			createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
 			createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 			createDisplayRequest.getAction()->setPlace(_place);
 
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
-			FunctionRequest<AdminRequest> updateRequest(request);
+			FunctionRequest<AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<DisplayAdmin>();
 
-			FunctionRequest<DisplayScreenContentRequest> viewRequest(request);
-
-			FunctionRequest<AdminRequest> maintRequest(request);
-			maintRequest.getFunction()->setPage<DisplayMaintenanceAdmin>();
+			FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
 
 			if (!_place.get())
 			{
@@ -195,7 +188,6 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Contenu"));
 			v.push_back(make_pair(string(), "Actions"));
 			v.push_back(make_pair(string(), "Actions"));
-			v.push_back(make_pair(string(), "Actions"));
 
 			ActionResultHTMLTable t(
 				v
@@ -209,11 +201,10 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, env.getRegistry<DisplayScreen>())
+			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, _env.getRegistry<DisplayScreen>())
 			{
 				updateRequest.setObjectId(screen->getKey());
 				viewRequest.setObjectId(screen->getKey());
-				maintRequest.setObjectId(screen->getKey());
 				shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(screen->getKey()));
 				shared_ptr<SentAlarm> alarm(DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey()));
 				
@@ -254,7 +245,6 @@ namespace synthese
 				}
 				stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
 				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png");
-				stream << t.col() << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision", string(), "monitor_lightning.png");
 			}
 
 			if (_place.get())
@@ -301,15 +291,14 @@ namespace synthese
 			return stream.str();
 		}
 
-		bool DisplaySearchAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
-		{
-			return request->isAuthorized<ArrivalDepartureTableRight>(READ);
+		bool DisplaySearchAdmin::isAuthorized(
+		) const	{
+			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 

@@ -1,11 +1,12 @@
 
-#include "32_admin/AdminInterfacePage.h"
+// 32 ADMIN
+#include "AdminInterfacePage.h"
 
-#include "32_admin/HomeAdmin.h"
-#include "32_admin/ModuleAdmin.h"
+#include "HomeAdmin.h"
+#include "ModuleAdmin.h"
 
-#include "32_admin/AdminRequest.h"
-#include "32_admin/AdminPagesTreeInterfaceElement.h"
-#include "32_admin/AdminPagePositionInterfaceElement.h"
-#include "32_admin/AdminContentInterfaceElement.h"
-
+#include "AdminRequest.h"
+#include "AdminPagesTreeInterfaceElement.h"
+#include "AdminPagePositionInterfaceElement.h"
+#include "AdminContentInterfaceElement.h"
+#include "AdminTabsInterfaceElement.h"

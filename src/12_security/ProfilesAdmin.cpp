@@ -97,19 +97,19 @@ namespace synthese
 			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<Profile>());
 		}
 
-		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<ProfilesAdmin>();
 
-			FunctionRequest<AdminRequest> profileRequest(request);
+			FunctionRequest<AdminRequest> profileRequest(_request);
 			profileRequest.getFunction()->setPage<ProfileAdmin>();
 
-			ActionFunctionRequest<DeleteProfileAction, AdminRequest> deleteProfileRequest(request);
+			ActionFunctionRequest<DeleteProfileAction, AdminRequest> deleteProfileRequest(_request);
 			deleteProfileRequest.getFunction()->setPage<ProfilesAdmin>();
 			
-			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(request);
+			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(_request);
 			addProfileRequest.getFunction()->setPage<ProfileAdmin>();
 			addProfileRequest.getFunction()->setActionFailedPage<ProfilesAdmin>();
 			
@@ -176,9 +176,9 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool ProfilesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		bool ProfilesAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<SecurityRight>(READ);
+			return _request->isAuthorized<SecurityRight>(READ);
 		}
 
 		ProfilesAdmin::ProfilesAdmin()
@@ -189,8 +189,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfParent(
 			const PageLink& parentLink,
-			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>* request
+			const AdminInterfaceElement& currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == SecurityModule::FACTORY_KEY)

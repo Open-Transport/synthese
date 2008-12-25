@@ -89,12 +89,14 @@ namespace synthese
 		void AdminRequest::setActionFailedPage()
 		{
 		    _actionFailedPage.reset(new T);
+			_actionFailedPage->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 		}
 
 		template<class T>
 		void AdminRequest::setPage()
 		{
 			_page.reset(new T);
+			_page->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 		}
 	}
 }

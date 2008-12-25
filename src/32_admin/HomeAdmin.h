@@ -59,11 +59,10 @@ namespace synthese
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
-				@param request User request
 				@return PageLinks Nothing
 				@author Hugues Romain
 				@date 2008
@@ -71,10 +70,9 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 
-			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			bool isAuthorized() const;
 		};
 	}
 }

@@ -68,7 +68,7 @@ namespace synthese
 			string normalSeparator(_normalSeparator->getValue(parameters, variables, object, request));
 			string lastSeparator(_lastSeparator->getValue(parameters, variables, object, request));
 
-			const AdminInterfaceElement::PageLinks& links((*page)->getTreePosition(static_cast<const server::FunctionRequest<AdminRequest>*>(request)));
+			const AdminInterfaceElement::PageLinks& links((*page)->getTreePosition());
 
 			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
 			{
@@ -79,7 +79,7 @@ namespace synthese
 
 				stream << HTMLModule::getHTMLImage(it->icon, it->name);
 				if (it != (links.end() -1))
-					stream << HTMLModule::getHTMLLink(it->getURL(static_cast<const server::FunctionRequest<AdminRequest>*>(request)), it->name);
+					stream << HTMLModule::getHTMLLink(it->getURL(), it->name);
 				else
 					stream << it->name;
 			}

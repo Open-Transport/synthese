@@ -9,4 +9,5 @@ synthese::admin::AdminRequest::integrate();
 synthese::admin::AdminPagesTreeInterfaceElement::integrate();
 synthese::admin::AdminPagePositionInterfaceElement::integrate();
 synthese::admin::AdminContentInterfaceElement::integrate();
+synthese::admin::AdminTabsInterfaceElement::integrate();
 

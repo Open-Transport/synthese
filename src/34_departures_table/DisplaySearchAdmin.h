@@ -125,6 +125,7 @@ namespace synthese
 			int												_searchState;
 			int												_searchMessage;
 			html::ResultHTMLTable::RequestParameters		_requestParameters;
+			html::ResultHTMLTable::ResultParameters			_resultParameters;
 
 		public:
 			static const std::string PARAMETER_SEARCH_CITY;
@@ -146,7 +147,8 @@ namespace synthese
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			) const;
 
 
 			static std::string getHtmlSearchForm(
@@ -156,7 +158,7 @@ namespace synthese
 				, const std::string& displayName
 				, uid lineUid, uid typeUid, int state, int message );
 
-			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			bool isAuthorized() const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
@@ -168,7 +170,6 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
 			) const;
 
 			virtual std::string getIcon() const;

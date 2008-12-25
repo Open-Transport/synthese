@@ -113,29 +113,29 @@ namespace synthese
 
 		}
 
-		bool UsersAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		bool UsersAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<SecurityRight>(READ);
+			return _request->isAuthorized<SecurityRight>(READ);
 		}
 
-		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
+		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables
+		) const	{
 			// Request for search form
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<UsersAdmin>();
 			SearchFormHTMLTable searchTable(searchRequest.getHTMLForm("search"));
 			
 			// Request for add user action form
-			ActionFunctionRequest<AddUserAction, AdminRequest> addUserRequest(request);
+			ActionFunctionRequest<AddUserAction, AdminRequest> addUserRequest(_request);
 			addUserRequest.getFunction()->setPage<UserAdmin>();
 			addUserRequest.getFunction()->setActionFailedPage<UsersAdmin>();
 			
 			// Request for delete action form
-			ActionFunctionRequest<DelUserAction, AdminRequest> deleteUserRequest(request);
+			ActionFunctionRequest<DelUserAction, AdminRequest> deleteUserRequest(_request);
 			deleteUserRequest.getFunction()->setPage<UsersAdmin>();
 			
 			// Request for user link
-			FunctionRequest<AdminRequest> userRequest(request);
+			FunctionRequest<AdminRequest> userRequest(_request);
 			userRequest.getFunction()->setPage<UserAdmin>();
 
 			// Search form
@@ -189,9 +189,8 @@ namespace synthese
 		
 		}
 
-		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage 		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == SecurityModule::FACTORY_KEY)
 			{

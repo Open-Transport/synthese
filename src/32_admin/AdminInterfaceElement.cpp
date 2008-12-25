@@ -21,6 +21,7 @@
 
 #include <sstream>
 #include <boost/foreach.hpp>
+#include <assert.h>
 
 #include "HTMLModule.h"
 #include "FunctionRequest.h"
@@ -28,6 +29,9 @@
 #include "AdminRequest.h"
 #include "HomeAdmin.h"
 #include "Interface.h"
+#include "Profile.h"
+#include "User.h"
+#include "Session.h"
 
 using namespace std;
 using namespace boost;
@@ -37,20 +41,25 @@ namespace synthese
 	using namespace server;
 	using namespace html;
 	using namespace util;
+	using namespace security;
+	
 
 	namespace admin
 	{
+		const string AdminInterfaceElement::PARAMETER_TAB("ta");
+
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
 			const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			PageLink currentPageLink(getPageLink());
 			for (Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); it != Factory<AdminInterfaceElement>::end(); ++it)
 			{
-				if (it->isAuthorized(static_cast<const FunctionRequest<AdminRequest>* >(request)))
+				shared_ptr<AdminInterfaceElement> page(*it);
+				page->setRequest(_request);
+				if (page->isAuthorized())
 				{
-					PageLinks l(it->getSubPagesOfParent(currentPageLink, currentPage, static_cast<const FunctionRequest<AdminRequest>* >(request)));
+					PageLinks l(page->getSubPagesOfParent(currentPageLink, currentPage));
 					links.insert(links.end(), l.begin(), l.end());
 				}
 			}
@@ -66,27 +75,13 @@ namespace synthese
 			link.name = getTitle();
 			link.parameterName = getParameterName();
 			link.parameterValue = getParameterValue();
+			link.request = _request;
 			return link;
 		}
 		
 		
 		
-		AdminInterfaceElement* AdminInterfaceElement::GetAdminPage( const PageLink& pageLink )
-		{
-			AdminInterfaceElement* page(Factory<AdminInterfaceElement>::create(pageLink.factoryKey));
-			if (!pageLink.parameterName.empty())
-			{
-				ParametersMap parameter;
-				parameter.insert(pageLink.parameterName, pageLink.parameterValue);
-				page->setFromParametersMap(parameter);
-			}
-			return page;
-		}
-
-
-
 		void AdminInterfaceElement::_buildTree(
-			const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			// Cleaning
 			_tree.subPages.clear();
@@ -94,10 +89,11 @@ namespace synthese
 
 			// Initialisation
 			auto_ptr<HomeAdmin> homeAdmin(new HomeAdmin);
+			homeAdmin->setRequest(_request);
 			PageLinks position;
 			PageLink homeLink(homeAdmin->getPageLink());
 			position.push_back(homeLink);
-			_tree = _buildTreeRecursion(homeAdmin.get(), request, position);
+			_tree = _buildTreeRecursion(homeAdmin.get(), position);
 			if (homeLink == getPageLink())
 				_treePosition = position;
 		}
@@ -105,9 +101,8 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinksTree AdminInterfaceElement::_buildTreeRecursion(
-			const AdminInterfaceElement* adminPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
-			, PageLinks position
+			const AdminInterfaceElement* adminPage,
+			PageLinks position
 		) const {
 
 			// Local variables
@@ -118,7 +113,7 @@ namespace synthese
 			PageLink currentLink = getPageLink();
 			
 			// Recursion
-			PageLinks pages = adminPage->getSubPages(*this, request);
+			PageLinks pages = adminPage->getSubPages(*this);
 			BOOST_FOREACH(AdminInterfaceElement::PageLink link, pages)
 			{
 				position.push_back(link);
@@ -128,8 +123,8 @@ namespace synthese
 					tree.isNodeOpened = true;
 				}
 				
-				auto_ptr<AdminInterfaceElement>			subPage(GetAdminPage(link));
-				AdminInterfaceElement::PageLinksTree	subTree(_buildTreeRecursion(subPage.get(), request, position));
+				auto_ptr<AdminInterfaceElement>			subPage(link.getAdminPage());
+				AdminInterfaceElement::PageLinksTree	subTree(_buildTreeRecursion(subPage.get(), position));
 
 				if (link == currentLink)
 					subTree.isNodeOpened = true;
@@ -144,17 +139,21 @@ namespace synthese
 			return tree;
 		}
 
-		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getTreePosition(const server::FunctionRequest<admin::AdminRequest>* request) const
+		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getTreePosition() const
 		{
 			if (_treePosition.empty())
-				_buildTree(request);
+			{
+				_buildTree();
+			}
 			return _treePosition;
 		}
 
-		const AdminInterfaceElement::PageLinksTree& AdminInterfaceElement::getTree(const server::FunctionRequest<admin::AdminRequest>* request) const
+		const AdminInterfaceElement::PageLinksTree& AdminInterfaceElement::getTree() const
 		{
 			if (_treePosition.empty())
-				_buildTree(request);
+			{
+				_buildTree();
+			}
 			return _tree;
 		}
 
@@ -178,16 +177,138 @@ namespace synthese
 		}
 
 
+
+		void AdminInterfaceElement::setRequest(
+			const server::FunctionRequest<admin::AdminRequest>* value
+		) {
+			_request = value;
+		}
+
+
+
+		void AdminInterfaceElement::displayTabs(
+			std::ostream& stream, interfaces::VariablesMap& variables
+		) const {
+			assert(_request != NULL);
+
+			if (!_tabBuilded) _buildTabs();
+
+			if (_tabs.empty()) return;
+
+//			string currentTab(_request->_getParametersMap()->getString(PARAMETER_TAB, false, getFactoryKey()));
+			bool first(true);
+			stream << "<div id=\"admin_tabs\">";
+			BOOST_FOREACH(const Tab& tab, _tabs)
+			{
+				stream << "<span id=\"tab_" << tab.getId() << "\"";
+//				if(currentTab.empty() && first || tab.getId() == currentTab)
+				if(first)
+				{
+					stream << " class=\"active_tab\"";
+				}
+				stream << " onclick=\"activateTab(this);\">" << tab.getTitle() << "</span>";
+				first = false;
+			}
+			stream << "</div>";
+			stream << HTMLModule::GetHTMLJavascriptOpen();
+			stream << "function activateTab(tab) {";
+			stream << "var nodes = document.getElementById('admin_tabs').childNodes;";
+			stream << "for(var i=0; i<nodes.length; ++i) {";
+			stream << "if(nodes[i] == tab) { nodes[i].className = 'active_tab';";
+			stream << "document.getElementById(nodes[i].id+'_content').style.display='block'; }";
+			stream << "else { nodes[i].className = '';";
+			stream << "document.getElementById(nodes[i].id+'_content').style.display='none'; }";
+			stream << "}";
+			stream << "}" << HTMLModule::GetHTMLJavascriptClose();
+		}
+
+
+
+		AdminInterfaceElement::AdminInterfaceElement(
+		):	_request(NULL),
+			_tabBuilded(false),
+			_currentTab(NULL)
+		{
+		}
+
+
+
+		void AdminInterfaceElement::_buildTabs(
+		) const {
+			_tabBuilded = true;
+		}
+
+
+
+		bool AdminInterfaceElement::openTabContent(
+			ostream& stream,
+			const std::string& key
+		) const {
+			closeTabContent(stream);
+
+			if (!_tabBuilded)
+			{
+				_buildTabs();
+			}
+
+			bool first(true);
+			BOOST_FOREACH(const Tab& rtab, _tabs)
+			{
+				if(rtab.getId() == key)
+				{
+					_currentTab = &rtab;
+					break;
+				}
+				first = false;
+			}
+			if (_currentTab == NULL)
+			{
+				return false;
+			}
+
+			stream << "<div class=\"tabdiv " << (first ? "active_tab_content" : "") 
+				<< "\" id=\"tab_" << _currentTab->getId() << "_content\">";
+			return true;
+		}
+
+
+
+		void AdminInterfaceElement::closeTabContent(
+			std::ostream& stream
+		) const {
+			if (_currentTab != NULL)
+			{
+				stream << "</div>";
+				_currentTab = NULL;
+			}
+		}
+
+
+
+		bool AdminInterfaceElement::tabHasWritePermissions(
+		) const {
+			assert(_currentTab != NULL);
+			return _currentTab->getWritePermission();
+		}
+
+
 		bool AdminInterfaceElement::PageLink::operator==(const AdminInterfaceElement::PageLink& other) const
 		{
-			return factoryKey == other.factoryKey && parameterName == other.parameterName && parameterValue == other.parameterValue;
+			return
+				factoryKey == other.factoryKey &&
+				parameterName == other.parameterName &&
+				parameterValue == other.parameterValue;
 		}
 
 
 
 		std::string AdminInterfaceElement::PageLink::getURL(
-			server::FunctionRequest<admin::AdminRequest> const* request
 		) const	{
+			assert(request);
+			assert(request->getSession());
+			assert(request->getFunction());
+			assert(request->getFunction()->getInterface());
+
 			Request r;
 			r.getInternalParameters().insert(QueryString::PARAMETER_FUNCTION, AdminRequest::FACTORY_KEY);
 			r.getInternalParameters().insert(QueryString::PARAMETER_SESSION, request->getSession()->getKey());
@@ -196,6 +317,54 @@ namespace synthese
 			if (!parameterName.empty())
 				r.getInternalParameters().insert(parameterName, parameterValue);
 			return r.getURL();
+		}
+
+
+
+		AdminInterfaceElement* AdminInterfaceElement::PageLink::getAdminPage(
+		) const {
+			AdminInterfaceElement* page(Factory<AdminInterfaceElement>::create(factoryKey));
+			page->setRequest(request);
+			if (!parameterName.empty())
+			{
+				ParametersMap parameter;
+				parameter.insert(parameterName, parameterValue);
+				page->setFromParametersMap(parameter);
+			}
+			return page;
+		}
+
+
+
+		AdminInterfaceElement::Tab::Tab(
+			std::string title,
+			std::string id,
+			bool writePermission
+		):	_title(title),
+			_id(id),
+			_writePermission(writePermission)
+		{
+		}
+
+
+
+		const std::string& AdminInterfaceElement::Tab::getTitle(
+		) const {
+			return _title;
+		}
+
+
+
+		const std::string& AdminInterfaceElement::Tab::getId(
+		) const {
+			return _id;
+		}
+
+
+
+		bool AdminInterfaceElement::Tab::getWritePermission(
+		) const {
+			return _writePermission;
 		}
 	}
 }

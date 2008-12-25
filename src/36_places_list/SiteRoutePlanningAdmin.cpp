@@ -115,9 +115,9 @@ namespace synthese
 			);
 		}
 		
-		void SiteRoutePlanningAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void SiteRoutePlanningAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<SiteRoutePlanningAdmin>();
 			searchRequest.setObjectId(_site->getKey());
 
@@ -261,23 +261,19 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool SiteRoutePlanningAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool SiteRoutePlanningAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<TransportWebsiteRight>(READ);
+			return _request->isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks SiteRoutePlanningAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == TransportSiteAdmin::FACTORY_KEY)
 			{
-				PageLink link;
-				link.factoryKey = FACTORY_KEY;
-				link.icon = ICON;
-				link.name = DEFAULT_TITLE;
+				PageLink link(getPageLink());
 				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
 				link.parameterValue = parentLink.parameterValue;
 				links.push_back(link);
@@ -288,7 +284,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks SiteRoutePlanningAdmin::getSubPages(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			return links;

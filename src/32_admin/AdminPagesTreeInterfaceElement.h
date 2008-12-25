@@ -60,7 +60,6 @@ namespace synthese
 			std::string getSubPages(
 				const AdminInterfaceElement::PageLinksTree& pages
 				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
 				, int level
 				, std::string prefix
 				, bool last

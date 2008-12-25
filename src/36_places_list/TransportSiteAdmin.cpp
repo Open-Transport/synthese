@@ -92,19 +92,19 @@ namespace synthese
 			}
 		}
 		
-		void TransportSiteAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void TransportSiteAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			ActionFunctionRequest<SiteUpdateAction,AdminRequest> updateRequest(request);
+			ActionFunctionRequest<SiteUpdateAction,AdminRequest> updateRequest(_request);
 			updateRequest.getAction()->setSiteId(_site->getKey());
 			updateRequest.getFunction()->setPage<TransportSiteAdmin>();
 			updateRequest.setObjectId(_site->getKey());
 
-			FunctionRequest<AdminRequest> routeplannerRequest(request);
+			FunctionRequest<AdminRequest> routeplannerRequest(_request);
 			routeplannerRequest.getFunction()->setPage<SiteRoutePlanningAdmin>();
 			routeplannerRequest.setObjectId(_site->getKey());
 
-			FunctionRequest<RoutePlannerFunction> rpHomeRequest(request);
+			FunctionRequest<RoutePlannerFunction> rpHomeRequest(_request);
 			rpHomeRequest.getFunction()->setSite(_site);
 
 			// Display
@@ -150,15 +150,14 @@ namespace synthese
 			stream << "<h1>Périmètre de la base transport</h1>";
 		}
 
-		bool TransportSiteAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool TransportSiteAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<TransportWebsiteRight>(READ);
+			return _request->isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == PlacesListModule::FACTORY_KEY)
@@ -167,9 +166,7 @@ namespace synthese
 				SiteTableSync::Search(env);
 				BOOST_FOREACH(shared_ptr<Site> site, env.getRegistry<Site>())
 				{
-					PageLink link;
-					link.factoryKey = FACTORY_KEY;
-					link.icon = ICON;
+					PageLink link(getPageLink());
 					link.name = site->getName();
 					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(site->getKey());

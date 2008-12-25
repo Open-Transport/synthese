@@ -93,20 +93,20 @@ namespace synthese
 		}
 
 
-		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
-			ActionFunctionRequest<ScenarioNameUpdateAction,AdminRequest> updateRequest(request);
+		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables
+		) const	{
+			ActionFunctionRequest<ScenarioNameUpdateAction,AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			updateRequest.setObjectId(_scenario->getKey());
 
-			FunctionRequest<AdminRequest> messRequest(request);
+			FunctionRequest<AdminRequest> messRequest(_request);
 			messRequest.getFunction()->setPage<MessageAdmin>();
 
-			ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(request);
+			ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(_request);
 			deleteRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			deleteRequest.setObjectId(_scenario->getKey());
 
-			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(request);
+			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(_request);
 			addRequest.getFunction()->setPage<MessageAdmin>();
 			addRequest.getAction()->setScenarioId(_scenario->getKey());
 			addRequest.getAction()->setIsTemplate(_templateScenario.get() != NULL);
@@ -123,7 +123,7 @@ namespace synthese
 
 			if (_sentScenario.get())
 			{
-				ActionFunctionRequest<ScenarioUpdateDatesAction, AdminRequest> updateDatesRequest(request);
+				ActionFunctionRequest<ScenarioUpdateDatesAction, AdminRequest> updateDatesRequest(_request);
 				updateDatesRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 				updateDatesRequest.setObjectId(_scenario->getKey());
 
@@ -188,7 +188,7 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool MessagesScenarioAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		bool MessagesScenarioAdmin::isAuthorized() const
 		{
 			return true;
 		}
@@ -199,8 +199,8 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
+		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			if (currentPage.getFactoryKey() == FACTORY_KEY)
@@ -219,7 +219,7 @@ namespace synthese
 				if (alarm.get())
 				{
 					const SentScenario* scenario(alarm->getScenario());
-					AdminInterfaceElement::PageLink link;
+					AdminInterfaceElement::PageLink link(getPageLink());
 					link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
 					link.name = scenario->getName();
 					link.icon = MessagesScenarioAdmin::ICON;
@@ -232,7 +232,7 @@ namespace synthese
 			return links;
 		}
 
-		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
+		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages( const AdminInterfaceElement& currentPage) const
 		{
 			AdminInterfaceElement::PageLinks links;
 			Env env;
@@ -241,7 +241,7 @@ namespace synthese
 				ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get(), 0, 0, false, false, false, false, UP_LINKS_LOAD_LEVEL);
 				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.getRegistry<ScenarioSentAlarm>())
 				{
-					AdminInterfaceElement::PageLink link;
+					AdminInterfaceElement::PageLink link(getPageLink());
 					link.factoryKey = MessageAdmin::FACTORY_KEY;
 					link.name = alarm->getShortMessage();
 					link.icon = MessageAdmin::ICON;
@@ -255,7 +255,7 @@ namespace synthese
 				AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get(), 0, 0, false, false, UP_LINKS_LOAD_LEVEL);
 				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 				{
-					AdminInterfaceElement::PageLink link;
+					AdminInterfaceElement::PageLink link(getPageLink());
 					link.factoryKey = MessageAdmin::FACTORY_KEY;
 					link.name = alarm->getShortMessage();
 					link.icon = MessageAdmin::ICON;

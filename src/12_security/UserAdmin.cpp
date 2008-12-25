@@ -69,15 +69,15 @@ namespace synthese
 		}
 
 
-		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
 		{
-			ActionFunctionRequest<UserUpdateAction, AdminRequest> updateRequest(request);
+			ActionFunctionRequest<UserUpdateAction, AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<UserAdmin>();
-			updateRequest.setObjectId(request->getObjectId());
+			updateRequest.setObjectId(_request->getObjectId());
 
-			ActionFunctionRequest<UserPasswordUpdateAction, AdminRequest> userPasswordUpdateRequest(request);
+			ActionFunctionRequest<UserPasswordUpdateAction, AdminRequest> userPasswordUpdateRequest(_request);
 			userPasswordUpdateRequest.getFunction()->setPage<UserAdmin>();
-			userPasswordUpdateRequest.setObjectId(request->getObjectId());
+			userPasswordUpdateRequest.setObjectId(_request->getObjectId());
 
 			{
 				stream << "<h1>Propriétés</h1>";
@@ -127,14 +127,13 @@ namespace synthese
 			}
 		}
 
-		bool UserAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		bool UserAdmin::isAuthorized() const
 		{
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks UserAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage 		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks UserAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == UsersAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
 			{

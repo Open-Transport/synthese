@@ -99,25 +99,25 @@ namespace synthese
 		
 
 
-		void MessagesTemplateLibraryAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
+		void MessagesTemplateLibraryAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			ActionFunctionRequest<UpdateTextTemplateAction,AdminRequest> updateRequest(request);
+			ActionFunctionRequest<UpdateTextTemplateAction,AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
 			
-			ActionFunctionRequest<DeleteTextTemplateAction,AdminRequest> deleteRequest(request);
+			ActionFunctionRequest<DeleteTextTemplateAction,AdminRequest> deleteRequest(_request);
 			deleteRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
 			
-			ActionFunctionRequest<TextTemplateAddAction,AdminRequest> addRequest(request);
+			ActionFunctionRequest<TextTemplateAddAction,AdminRequest> addRequest(_request);
 			addRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
 			
-			ActionFunctionRequest<TextTemplateFolderUpdateAction,AdminRequest> updateFolderRequest(request);
+			ActionFunctionRequest<TextTemplateFolderUpdateAction,AdminRequest> updateFolderRequest(_request);
 			updateFolderRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
 			
 
 			// Rights
-			bool updateRight(request->isAuthorized<MessagesLibraryRight>(WRITE));
-			bool deleteRight(request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
+			bool updateRight(_request->isAuthorized<MessagesLibraryRight>(WRITE));
+			bool deleteRight(_request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
 
 			// Search
 			Env tenv;
@@ -209,9 +209,9 @@ namespace synthese
 
 
 
-		bool MessagesTemplateLibraryAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool MessagesTemplateLibraryAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<MessagesLibraryRight>(READ);
+			return _request->isAuthorized<MessagesLibraryRight>(READ);
 		}
 		
 
@@ -219,12 +219,12 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
 			{
 				MessagesTemplateLibraryAdmin a;
+				a.setRequest(_request);
 				links.push_back(a.getPageLink());
 			}
 			return links;
@@ -232,7 +232,6 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			return links;

@@ -93,11 +93,11 @@ namespace synthese
 			_parameters = map;
 		}
 
-		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
-			ActionFunctionRequest<UpdateAlarmAction,AdminRequest> updateRequest(request);
+			ActionFunctionRequest<UpdateAlarmAction,AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setPage<MessageAdmin>();
-			updateRequest.setObjectId(request->getObjectId());
+			updateRequest.setObjectId(_request->getObjectId());
 
 			shared_ptr<const SingleSentAlarm> salarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
 			
@@ -119,9 +119,9 @@ namespace synthese
 			{
 				stream << "<h1>Contenu</h1>";
 
-				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(request);
+				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
 				templateRequest.getFunction()->setPage<MessageAdmin>();
-				templateRequest.setObjectId(request->getObjectId());
+				templateRequest.setObjectId(_request->getObjectId());
 
 				HTMLForm fc(templateRequest.getHTMLForm("template"));
 				stream << fc.open() << "<p>";
@@ -130,9 +130,9 @@ namespace synthese
 				stream << fc.getSubmitButton("Copier contenu");
 				stream << "</p>" << fc.close();
 
-				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(request);
+				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
 				updateMessagesRequest.getFunction()->setPage<MessageAdmin>();
-				updateMessagesRequest.setObjectId(request->getObjectId());
+				updateMessagesRequest.setObjectId(_request->getObjectId());
 
 				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
 				stream << tu.open();
@@ -140,18 +140,18 @@ namespace synthese
 				stream << tu.cell("Message long", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
 				stream << tu.close();
 
-				FunctionRequest<AdminRequest> searchRequest(request);
+				FunctionRequest<AdminRequest> searchRequest(_request);
 				searchRequest.getFunction()->setPage<MessageAdmin>();
-				searchRequest.setObjectId(request->getObjectId());
+				searchRequest.setObjectId(_request->getObjectId());
 
-				ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(request);
+				ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(_request);
 				addRequest.getFunction()->setPage<MessageAdmin>();
-				addRequest.setObjectId(request->getObjectId());
+				addRequest.setObjectId(_request->getObjectId());
 				addRequest.getAction()->setAlarm(_alarm);
 
-				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(request);
+				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
 				removeRequest.getFunction()->setPage<MessageAdmin>();
-				removeRequest.setObjectId(request->getObjectId());
+				removeRequest.setObjectId(_request->getObjectId());
 				removeRequest.getAction()->setAlarmId(_alarm->getKey());
 				
 				// Alarm messages destinations loop
@@ -166,7 +166,7 @@ namespace synthese
 			}
 		}
 
-		bool MessageAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		bool MessageAdmin::isAuthorized() const
 		{
 			return true;
 		}
@@ -177,9 +177,8 @@ namespace synthese
 		
 		}
 
-		AdminInterfaceElement::PageLinks MessageAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage 		, const server::FunctionRequest<admin::AdminRequest>* request
-			) const
-		{
+		AdminInterfaceElement::PageLinks MessageAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (currentPage.getFactoryKey() == FACTORY_KEY)
 			{
@@ -194,8 +193,8 @@ namespace synthese
 			return links;
 		}
 
-		AdminInterfaceElement::PageLinks MessageAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>* request ) const
-		{
+		AdminInterfaceElement::PageLinks MessageAdmin::getSubPages( const AdminInterfaceElement& currentPage
+		) const	{
 			return AdminInterfaceElement::PageLinks();
 		}
 
