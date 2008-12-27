@@ -478,7 +478,7 @@ static NextToken GetNextToken(XML *pXML, int *pcbToken, enum TokenTypeTag *pType
             nIsText = TRUE;
         }
 
-        // If this is a TEXT node
+        // If this is a SQL_TEXT node
         if (nIsText)
         {
             // Indicate we are dealing with text

@@ -27,7 +27,7 @@
 #include "30_server/RequestException.h"
 #include "30_server/RequestMissingParameterException.h"
 #include "30_server/QueryString.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "17_messages/Alarm.h"
 #include "17_messages/SingleSentAlarm.h"
 #include "17_messages/AlarmTableSync.h"
@@ -62,6 +62,7 @@ namespace synthese
 	using namespace env;
 	using namespace interfaces;
 	using namespace time;
+	using namespace security;
 
 	namespace util
 	{
@@ -170,6 +171,13 @@ namespace synthese
 			{
 				throw RequestException("No such alarm");
 			}
+		}
+
+
+
+		bool AlarmTestOnDisplayScreenFunction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 	}
 }

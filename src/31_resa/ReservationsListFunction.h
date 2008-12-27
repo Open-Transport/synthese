@@ -92,6 +92,8 @@ namespace synthese
 			void setLine(boost::shared_ptr<const env::CommercialLine> line);
 
 			ReservationsListFunction();
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

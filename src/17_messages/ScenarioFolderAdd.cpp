@@ -26,7 +26,7 @@
 #include "30_server/ParametersMap.h"
 #include "30_server/QueryString.h"
 #include "30_server/Request.h"
-
+#include "MessagesLibraryRight.h"
 #include "ScenarioFolderAdd.h"
 #include "ScenarioFolder.h"
 
@@ -42,6 +42,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace security;
+	
 	
 	namespace util
 	{
@@ -117,6 +119,13 @@ namespace synthese
 		void ScenarioFolderAdd::setParentId( uid value )
 		{
 			_parentId = value;
+		}
+
+
+
+		bool ScenarioFolderAdd::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

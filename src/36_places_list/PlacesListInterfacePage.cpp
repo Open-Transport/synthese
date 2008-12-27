@@ -60,7 +60,7 @@ namespace synthese
 			pv.push_back((isCities || !city.get()) ? string() : Conversion::ToString(city->getKey()));
 			pv.push_back((isCities || !city.get()) ? string() : Conversion::ToString(city->getName()));
 
-			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&results), request);
+			InterfacePage::_display(stream, pv, variables, static_cast<const void*>(&results), request);
 		}
 
 

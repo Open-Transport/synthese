@@ -37,6 +37,7 @@ namespace synthese
 	namespace env
 	{
 		class TransportNetwork;
+		class Place;
 
 		/** Commercial line class.
 			TRIDENT = Line

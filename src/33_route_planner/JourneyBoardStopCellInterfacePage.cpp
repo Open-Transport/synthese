@@ -67,7 +67,7 @@ namespace synthese
 			pv.push_back( (continuousServiceRange > 0) ? endRangeTime.getHour().toString() : string() );
 
 			VariablesMap vm;
-			InterfacePage::display( stream, pv, vm, NULL, request );
+			InterfacePage::_display( stream, pv, vm, NULL, request );
 		}
 
 

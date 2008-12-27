@@ -72,7 +72,7 @@ private:
 
 public:
 
-    typedef enum { NONE, SINGLE, DOUBLE } PointShiftingMode;
+    typedef enum { NONE, SINGLE, SQL_DOUBLE } PointShiftingMode;
     
     DrawableLine (const synthese::env::Line* line,
 		  int fromLineStopIndex,
@@ -123,7 +123,7 @@ public:
     bool isReverseWayAt (const geometry::Point2D& p, const DrawableLine* dbl) const;
     int numberOfCommonPointsWith (const DrawableLine* dbl) const;
 
-    virtual void prepare (Map& map, double spacing, PointShiftingMode shiftMode = DOUBLE) const;
+    virtual void prepare (Map& map, double spacing, PointShiftingMode shiftMode = SQL_DOUBLE) const;
     
     /** Find first point in this line points
 	which is equal (by value) to a given point.

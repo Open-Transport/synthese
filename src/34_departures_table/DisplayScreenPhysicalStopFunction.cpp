@@ -93,5 +93,12 @@ namespace synthese
 			DateTime date(TIME_CURRENT);
 			_screen->display(stream, date);
 		}
+
+
+
+		bool DisplayScreenPhysicalStopFunction::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

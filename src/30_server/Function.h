@@ -1,11 +1,11 @@
-
-
+////////////////////////////////////////////////////////////////////////////////
 /// Function class header.
 ///	@file Function.h
 ///	@author Hugues Romain
-///	@date 2008
+///	@date 2008-12-26 18:00
 ///
-///	This file belongs to the SYNTHESE project (public transportation specialized software)
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
 ///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
 ///
 ///	This program is free software; you can redistribute it and/or
@@ -19,8 +19,9 @@
 ///	GNU General Public License for more details.
 ///
 ///	You should have received a copy of the GNU General Public License
-///	along with this program; if not, write to the Free Software
-///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_Function_h__
 #define SYNTHESE_Function_h__
@@ -31,9 +32,9 @@
 
 #include <boost/shared_ptr.hpp>
 
-/** @defgroup refFunctions Functions
-	@ingroup ref
-*/
+////////////////////////////////////////////////////////////////////
+/// @defgroup refFunctions Functions
+///	@ingroup ref
 
 namespace synthese
 {
@@ -125,7 +126,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			virtual bool _isAuthorized() const { return true; }
+			virtual bool _isAuthorized() const = 0;
 
 			/** Copy of the function parameters.
 				@param function

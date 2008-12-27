@@ -65,28 +65,32 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE(
-			DBLogEntryTableSync::CreateFormat(
-				"t045_log_entries",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_LOG_KEY, TEXT),
-					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_DATE, TIMESTAMP),
-					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_USER_ID, INTEGER),
-					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_LEVEL, INTEGER),
-					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_CONTENT, TEXT),
-					SQLiteTableFormat::Field(DBLogEntryTableSync::COL_OBJECT_ID, INTEGER),
-					SQLiteTableFormat::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(
-						"keyobjectdate",
-						SQLiteTableFormat::Index::CreateFieldsList(
-							DBLogEntryTableSync::COL_LOG_KEY,
-							DBLogEntryTableSync::COL_OBJECT_ID,
-							DBLogEntryTableSync::COL_DATE,
-							string()
-					)	),
-					SQLiteTableFormat::Index()
-		)	)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE(
+			"t045_log_entries"
+		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DBLogEntryTableSync>::_FIELDS[] =
+		{
+			SQLiteTableSync::Field(DBLogEntryTableSync::COL_LOG_KEY, SQL_TEXT),
+			SQLiteTableSync::Field(DBLogEntryTableSync::COL_DATE, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(DBLogEntryTableSync::COL_USER_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DBLogEntryTableSync::COL_LEVEL, SQL_INTEGER),
+			SQLiteTableSync::Field(DBLogEntryTableSync::COL_CONTENT, SQL_TEXT),
+			SQLiteTableSync::Field(DBLogEntryTableSync::COL_OBJECT_ID, SQL_INTEGER),
+			SQLiteTableSync::Field()
+
+		};
+		
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DBLogEntryTableSync>::_INDEXES[] = 
+		{
+			SQLiteTableSync::Index(
+				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
+				DBLogEntryTableSync::COL_OBJECT_ID.c_str(),
+				DBLogEntryTableSync::COL_DATE.c_str(),
+				""
+			),
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Load(
 			DBLogEntry* object,

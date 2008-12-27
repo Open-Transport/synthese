@@ -71,30 +71,30 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<UserTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<UserTableSync>::TABLE(
 			UserTableSync::CreateFormat(
 				"t026_users",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_NAME, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_SURNAME, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_LOGIN, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_PASSWORD, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_PROFILE_ID, INTEGER),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_ADDRESS, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_POST_CODE, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_CITY_TEXT, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_CITY_ID, INTEGER),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_COUNTRY, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_EMAIL, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::TABLE_COL_PHONE, TEXT),
-					SQLiteTableFormat::Field(UserTableSync::COL_LOGIN_AUTHORIZED, INTEGER),
-					SQLiteTableFormat::Field(UserTableSync::COL_BIRTH_DATE, TIMESTAMP),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_SURNAME, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_LOGIN, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_PASSWORD, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_PROFILE_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_ADDRESS, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_POST_CODE, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_CITY_TEXT, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_CITY_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_COUNTRY, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
+					SQLiteTableSync::Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
+					SQLiteTableSync::Field(UserTableSync::COL_BIRTH_DATE, SQL_TIMESTAMP),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(UserTableSync::TABLE_COL_NAME),
-					SQLiteTableFormat::Index(UserTableSync::TABLE_COL_LOGIN),
-					SQLiteTableFormat::Index(UserTableSync::TABLE_COL_PROFILE_ID),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(UserTableSync::TABLE_COL_NAME),
+					SQLiteTableSync::Index(UserTableSync::TABLE_COL_LOGIN),
+					SQLiteTableSync::Index(UserTableSync::TABLE_COL_PROFILE_ID),
+					SQLiteTableSync::Index()
 		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Load(

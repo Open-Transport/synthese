@@ -91,6 +91,8 @@ namespace synthese
 			SiteUpdateAction();
 
 			void setSiteId(uid id);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

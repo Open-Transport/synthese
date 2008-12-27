@@ -40,7 +40,7 @@ namespace synthese
 		{
 		public:
 
-			RequestMissingParameterException(const std::string& fieldName, const std::string& actionFunctionCode);
+			RequestMissingParameterException(const std::string& fieldName, const std::string& actionFunctionCode) throw();
 			~RequestMissingParameterException() throw ();
 		};
 	}

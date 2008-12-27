@@ -61,7 +61,7 @@ namespace synthese
 
 			VariablesMap vm;
 
-			InterfacePage::display(stream, pv, vm, NULL, request);
+			InterfacePage::_display(stream, pv, vm, NULL, request);
 
 		}
 

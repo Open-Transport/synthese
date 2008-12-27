@@ -79,6 +79,8 @@ namespace synthese
 				@param stream Stream to write the output on
 			*/
 			void _run(std::ostream& stream) const;
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

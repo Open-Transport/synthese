@@ -1,24 +1,26 @@
-
-/** ConnectionPlaceTableSync class implementation.
-	@file ConnectionPlaceTableSync.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// ConnectionPlaceTableSync class implementation.
+///	@file ConnectionPlaceTableSync.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "ConnectionPlaceTableSync.h"
 
@@ -58,30 +60,27 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::TABLE(
-			ConnectionPlaceTableSync::CreateFormat(
-				"t007_connection_places",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_NAME, TEXT),
-					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_CITYID, INTEGER),
-					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE, INTEGER),
-					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION, BOOLEAN),
-					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, INTEGER),
-					SQLiteTableFormat::Field(ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS, TEXT),
-					SQLiteTableFormat::Field(ConnectionPlaceTableSync::COL_NAME13, TEXT),
-					SQLiteTableFormat::Field(ConnectionPlaceTableSync::COL_NAME26, TEXT),
-					SQLiteTableFormat::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(
-						"cityname",
-						SQLiteTableFormat::Index::CreateFieldsList(
-							ConnectionPlaceTableSync::TABLE_COL_CITYID,
-							ConnectionPlaceTableSync::TABLE_COL_NAME,
-							string()
-					)	),
-					SQLiteTableFormat::Index()
-		)	)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::TABLE(
+			"t007_connection_places"
+		);
 
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::_FIELDS[] =
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_CITYID, SQL_INTEGER),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE, SQL_INTEGER),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::COL_NAME13, SQL_TEXT),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::COL_NAME26, SQL_TEXT)
+		};
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::_INDEXES[] =
+		{
+			SQLiteTableSync::Index(ConnectionPlaceTableSync::TABLE_COL_CITYID.c_str(), ConnectionPlaceTableSync::TABLE_COL_NAME.c_str())
+		};
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Load(

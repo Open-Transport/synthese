@@ -1,24 +1,26 @@
-
-/** Log class header.
-	@file Log.h
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// Log class header.
+///	@file Log.h
+///	@author Marc Jambert
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_UTIL_LOG_H
 #define SYNTHESE_UTIL_LOG_H
@@ -36,15 +38,17 @@ namespace synthese
 {
 	namespace util
 	{
-		/** Thread-safe logging class.
-			To get an instance of this class, the statis GetLog method must
-			be invoked. With no argument, the default log is returned.
+		//lint --e{1704}
 
-			Be careful : this class is not designed for efficiency,
-			so log carefully...
-
-			@ingroup m01
-		*/
+		////////////////////////////////////////////////////////////////////
+		/// Thread-safe logging class.
+		///	To get an instance of this class, the statis GetLog method must
+		///	be invoked. With no argument, the default log is returned.
+		///
+		///	Be careful : this class is not designed for efficiency,
+		///	so log carefully...
+		///
+		///	@ingroup m01
 		class Log
 		{
 		 public:

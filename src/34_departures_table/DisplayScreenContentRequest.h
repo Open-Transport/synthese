@@ -23,11 +23,9 @@
 #ifndef SYNTHESE_DisplayScreenContentRequest_H__
 #define SYNTHESE_DisplayScreenContentRequest_H__
 
-#include "04_time/DateTime.h"
-
-#include "30_server/Function.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "DateTime.h"
+#include "Function.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -67,6 +65,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

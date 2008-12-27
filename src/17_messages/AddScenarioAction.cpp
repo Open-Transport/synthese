@@ -29,7 +29,7 @@
 #include "17_messages/AlarmObjectLinkTableSync.h"
 #include "17_messages/ScenarioFolder.h"
 #include "17_messages/ScenarioFolderTableSync.h"
-
+#include "MessagesLibraryRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/QueryString.h"
@@ -156,6 +156,13 @@ namespace synthese
 				_folderId = 0;
 			}
 
+		}
+
+
+
+		bool AddScenarioAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

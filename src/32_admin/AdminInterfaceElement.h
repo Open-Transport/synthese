@@ -136,6 +136,7 @@ namespace synthese
 			private:
 				std::string	_title;
 				std::string	_id;
+				std::string _icon;
 				bool		_writePermission;
 
 
@@ -153,7 +154,8 @@ namespace synthese
 				Tab(
 					std::string title = std::string(),
 					std::string id = std::string(),
-					bool writePermission = true
+					bool writePermission = true,
+					std::string icon = std::string()
 				);
 				
 				
@@ -185,6 +187,16 @@ namespace synthese
 				///	@date 2008
 				////////////////////////////////////////////////////////////////////
 				bool getWritePermission() const;
+
+
+				
+				////////////////////////////////////////////////////////////////////
+				///	Icon getter.
+				///	@return Icon URL
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				std::string getIcon() const;
 			};
 
 			////////////////////////////////////////////////////////////////////
@@ -192,7 +204,6 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			typedef std::vector<Tab>	Tabs;
 
-			static const std::string PARAMETER_TAB;
 
 		private:
 			mutable const Tab*	_currentTab;
@@ -215,6 +226,7 @@ namespace synthese
 			//! \name Properties
 			//@{
 				const server::FunctionRequest<admin::AdminRequest>*		_request;
+				std::string												_activeTab;
 			//@}
 
 			PageLinksTree	_buildTreeRecursion(
@@ -295,6 +307,19 @@ namespace synthese
 				///	@date 2008
 				////////////////////////////////////////////////////////////////////
 				bool tabHasWritePermissions() const;
+
+
+
+				////////////////////////////////////////////////////////////////////
+				///	Generator of page internal link button to the tab content.
+				/// @param tab ID of the tab to link
+				///	@return the Link button HTML code if the tab exists, else nothing
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				std::string getTabLinkButton(
+					const std::string& tab
+				) const;
 			//@}
 				
 
@@ -316,6 +341,17 @@ namespace synthese
 				///	@date 2008
 				////////////////////////////////////////////////////////////////////
 				void setRequest(const server::FunctionRequest<admin::AdminRequest>*	value);
+
+
+				
+				////////////////////////////////////////////////////////////////////
+				///	Active tab setter.
+				///	@param value ID of the active tab at the page load. 
+				///		Empty = first tab.
+				///	@author Hugues Romain
+				///	@date 2008
+				////////////////////////////////////////////////////////////////////
+				void setActiveTab(const std::string& value);
 			//@}
 
 
@@ -324,6 +360,9 @@ namespace synthese
 				const PageLinks&		getTreePosition()	const;
 				const PageLinksTree&	getTree()			const;
 				const Tabs&				getTabs()			const;
+				const std::string&		getCurrentTab()		const;
+				const std::string&		getActiveTab()		const;
+				const server::Request*	getRequest()		const;
 			//@}
 
 

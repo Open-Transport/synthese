@@ -116,5 +116,13 @@ namespace synthese
 			_user->setSurname(_surname);
 			UserTableSync::Save(_user.get());
 		}
+
+
+
+		bool UserUpdateAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<SecurityRight>() ||
+				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
+		}
 	}
 }

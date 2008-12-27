@@ -79,41 +79,43 @@ namespace synthese
 
 	    public:
 			
-		static const std::string OUTPUT_PARAMETER;
-		static const std::string DATA_PARAMETER;
-		static const std::string MAP_PARAMETER;
-			static const std::string PARAMETER_USE_ENVIRONMENT;
+			static const std::string OUTPUT_PARAMETER;
+			static const std::string DATA_PARAMETER;
+			static const std::string MAP_PARAMETER;
+				static const std::string PARAMETER_USE_ENVIRONMENT;
 
-		MapRequest();
-		~MapRequest();
+			MapRequest();
+			~MapRequest();
+			
+			//! @name Setters
+			//@{
+				
+				
+				/** Sets and parse the data to be used for drawing the map.
+					The call of this setter is useless if _useEnvironment is set to true / default.
+					@param value the data provided in XML format
+					@author Hugues Romain
+					@date 2008
+				*/
+				void setData(const std::string& value);
+				
+				
+				/** Sets and parse the map XML query.
+					@warning the setUseEnvironment and/or the setData method must be launched before setQuery.
+					@param value the XML Query
+					@author Hugues Romain
+					@date 2008			
+				*/
+				void setQuery(const std::string& value);
+				void setOutput(const std::string& value);
+				void setUseEnvironment(bool value);
+			//@}
 		
-		//! @name Setters
-		//@{
-			
-			
-			/** Sets and parse the data to be used for drawing the map.
-				The call of this setter is useless if _useEnvironment is set to true / default.
-				@param value the data provided in XML format
-				@author Hugues Romain
-				@date 2008
-			*/
-			void setData(const std::string& value);
-			
-			
-			/** Sets and parse the map XML query.
-				@warning the setUseEnvironment and/or the setData method must be launched before setQuery.
-				@param value the XML Query
-				@author Hugues Romain
-				@date 2008			
-			*/
-			void setQuery(const std::string& value);
-			void setOutput(const std::string& value);
-			void setUseEnvironment(bool value);
-		//@}
-		
-		/** Action to run, defined by each subclass.
-		 */
-		void _run(std::ostream& stream) const;
+			/** Action to run, defined by each subclass.
+			 */
+			void _run(std::ostream& stream) const;
+
+			virtual bool _isAuthorized() const;
 	    };
 	}
 }

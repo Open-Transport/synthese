@@ -69,6 +69,8 @@ namespace synthese
 			void run();
 
 			void setPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> place);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

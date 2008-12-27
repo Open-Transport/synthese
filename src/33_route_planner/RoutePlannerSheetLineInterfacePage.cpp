@@ -48,7 +48,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(isOrigin));
 			pv.push_back(Conversion::ToString(isDestination));
 
-			InterfacePage::display( stream, pv, variables, place, request );
+			InterfacePage::_display( stream, pv, variables, place, request );
 		}
 
 

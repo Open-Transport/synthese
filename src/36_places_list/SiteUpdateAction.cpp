@@ -127,5 +127,13 @@ namespace synthese
 				throw ActionException("No such site");	
 			}
 		}
+
+
+
+		bool SiteUpdateAction::_isAuthorized(
+
+			) const {
+			return true;
+		}
 	}
 }

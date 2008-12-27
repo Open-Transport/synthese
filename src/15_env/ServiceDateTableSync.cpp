@@ -56,26 +56,26 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ServiceDateTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ServiceDateTableSync>::TABLE(
 			"t005_service_dates",
 			true,
 			TRIGGERS_ENABLED_CLAUSE,
 			false,
 			true,
 			SQLiteTableFormat::CreateFields(
-				SQLiteTableFormat::Field(TABLE_COL_ID, INTEGER, false),
-				SQLiteTableFormat::Field(ServiceDateTableSync::COL_SERVICEID, INTEGER, false),
-				SQLiteTableFormat::Field(ServiceDateTableSync::COL_DATE, DATE, false),
-				SQLiteTableFormat::Field()
+				SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+				SQLiteTableSync::Field(ServiceDateTableSync::COL_SERVICEID, SQL_INTEGER, false),
+				SQLiteTableSync::Field(ServiceDateTableSync::COL_DATE, SQL_DATE, false),
+				SQLiteTableSync::Field()
 			), SQLiteTableFormat::CreateIndexes(
-				SQLiteTableFormat::Index(
+				SQLiteTableSync::Index(
 					"servicedate",
-					SQLiteTableFormat::Index::CreateFieldsList(
+					SQLiteTableSync::Index::CreateFieldsList(
 						ServiceDateTableSync::COL_SERVICEID,
 						ServiceDateTableSync::COL_DATE,
 						string()
 				)	),
-				SQLiteTableFormat::Index()
+				SQLiteTableSync::Index()
 		)	);
 	}
 

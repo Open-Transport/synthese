@@ -62,27 +62,27 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE(
 			ScenarioTableSync::CreateFormat(
 				"t039_scenarios",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ScenarioTableSync::COL_IS_TEMPLATE, INTEGER),
-					SQLiteTableFormat::Field(ScenarioTableSync::COL_ENABLED, INTEGER),
-					SQLiteTableFormat::Field(ScenarioTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(ScenarioTableSync::COL_PERIODSTART, TIMESTAMP),
-					SQLiteTableFormat::Field(ScenarioTableSync::COL_PERIODEND, TIMESTAMP),
-					SQLiteTableFormat::Field(ScenarioTableSync::COL_FOLDER_ID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(ScenarioTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
+					SQLiteTableSync::Field(ScenarioTableSync::COL_ENABLED, SQL_INTEGER),
+					SQLiteTableSync::Field(ScenarioTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
+					SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_TIMESTAMP),
+					SQLiteTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(
+					SQLiteTableSync::Index(
 						"templateperiod",
-						SQLiteTableFormat::Index::CreateFieldsList(
+						SQLiteTableSync::Index::CreateFieldsList(
 							ScenarioTableSync::COL_IS_TEMPLATE,
 							ScenarioTableSync::COL_PERIODSTART,
 							string()
 					)	),
-					SQLiteTableFormat::Index(ScenarioTableSync::COL_FOLDER_ID),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(ScenarioTableSync::COL_FOLDER_ID),
+					SQLiteTableSync::Index()
 		)	)	);
 
 

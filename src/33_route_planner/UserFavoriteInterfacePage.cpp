@@ -57,7 +57,7 @@ namespace synthese
 			pv.push_back(fav->getDestinationCityName());
 			pv.push_back(fav->getDestinationPlaceName());
 
-			InterfacePage::display(
+			InterfacePage::_display(
 				stream
 				, pv
 				, variables

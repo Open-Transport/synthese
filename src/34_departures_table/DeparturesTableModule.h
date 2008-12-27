@@ -26,8 +26,8 @@
 #include <utility>
 #include <string>
 
-#include "01_util/ModuleClass.h"
-#include "01_util/FactorableTemplate.h"
+#include "ModuleClass.h"
+#include "FactorableTemplate.h"
 
 #include "12_security/Types.h"
 

@@ -42,6 +42,7 @@ namespace synthese
 		class UpdateAlarmMessagesFromTemplateAction : public util::FactorableTemplate<server::Action, UpdateAlarmMessagesFromTemplateAction>
 		{
 		public:
+			static const std::string PARAMETER_ALARM_ID;
 			static const std::string PARAMETER_TEMPLATE_ID;
 
 		private:
@@ -57,12 +58,21 @@ namespace synthese
 				Removes the used parameters from the map.
 				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(
+				const server::ParametersMap& map
+			) throw(server::ActionException);
 
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(
+			) throw(server::ActionException);
+
+			void setAlarmId(
+				util::RegistryKeyType id
+			) throw(server::ActionException);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

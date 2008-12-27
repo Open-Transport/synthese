@@ -51,17 +51,17 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<CityTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CityTableSync>::TABLE(
 			CityTableSync::CreateFormat(
 				"t006_cities",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(CityTableSync::TABLE_COL_NAME, TEXT),
-					SQLiteTableFormat::Field(CityTableSync::TABLE_COL_CODE, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(CityTableSync::TABLE_COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(CityTableSync::TABLE_COL_CODE, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(CityTableSync::TABLE_COL_NAME),
-					SQLiteTableFormat::Index(CityTableSync::TABLE_COL_CODE),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(CityTableSync::TABLE_COL_NAME),
+					SQLiteTableSync::Index(CityTableSync::TABLE_COL_CODE),
+					SQLiteTableSync::Index()
 				)
 		)	);
 

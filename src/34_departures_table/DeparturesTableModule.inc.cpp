@@ -1,65 +1,70 @@
 
-#include "34_departures_table/DeparturesTableModule.h"
-
-#include "34_departures_table/DeparturesTableInterfaceElement.h"
-
-
-#include "34_departures_table/DepartureTableRowInterfacePage.h"
-#include "34_departures_table/ParseDisplayReturnInterfacePage.h"
-
-#include "34_departures_table/DisplaySearchAdmin.h"
-#include "34_departures_table/DisplayTypesAdmin.h"
-#include "34_departures_table/BroadcastPointsAdmin.h"
-#include "34_departures_table/DisplayAdmin.h"
-#include "DisplayTypeAdmin.h"
-
-#include "DisplayTypeTableSync.h"
-#include "DisplayScreenTableSync.h"
-#include "DisplayMonitoringStatusTableSync.h"
-
-#include "34_departures_table/CreateDisplayTypeAction.h"
-#include "34_departures_table/UpdateDisplayTypeAction.h"
-#include "34_departures_table/UpdateDisplayScreenAction.h"
-#include "34_departures_table/CreateDisplayScreenAction.h"
-#include "34_departures_table/DisplayTypeRemoveAction.h"
-#include "34_departures_table/DisplayScreenRemove.h"
-
-#include "34_departures_table/ArrivalDepartureTableRight.h"
-#include "34_departures_table/DisplayMaintenanceRight.h"
-
-#include "34_departures_table/ArrivalDepartureTableLog.h"
-#include "34_departures_table/DisplayMaintenanceLog.h"
-
-#include "34_departures_table/DisplayScreenAlarmRecipient.h"
-
-#include "34_departures_table/AddPreselectionPlaceToDisplayScreen.h"
-#include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
-#include "34_departures_table/RemovePreselectionPlaceFromDisplayScreenAction.h"
-#include "34_departures_table/UpdateAllStopsDisplayScreenAction.h"
-#include "34_departures_table/AddDepartureStopToDisplayScreenAction.h"
-#include "34_departures_table/AddForbiddenPlaceToDisplayScreen.h"
-#include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
-#include "34_departures_table/DisplayScreenAddDisplayedPlace.h"
-#include "34_departures_table/DeparturesTableInterfacePage.h"
-#include "34_departures_table/DeparturesTableTrackCell.h"
-#include "34_departures_table/DeparturesTableTeamCell.h"
-#include "34_departures_table/DeparturesTableTimeContentInterfaceElement.h"
-#include "34_departures_table/DeparturesTableLineContentInterfaceElement.h"
-#include "34_departures_table/DeparturesTableDestinationContentInterfaceElement.h"
-#include "34_departures_table/DeparturesTableRowServiceNumberInterfaceElement.h"
-#include "34_departures_table/DisplayScreenRemovePhysicalStopAction.h"
-#include "34_departures_table/DisplayScreenRemoveDisplayedPlaceAction.h"
-#include "34_departures_table/DisplayScreenRemoveForbiddenPlaceAction.h"
-#include "34_departures_table/UpdateDisplayMaintenanceAction.h"
-#include "34_departures_table/DisplayScreenHasAlarmValueInterfaceElement.h"
-#include "34_departures_table/DisplayScreenAlarmContentValueInterfaceElement.h"
-
-#include "34_departures_table/DisplayScreenSupervisionRequest.h"
-#include "34_departures_table/DisplayScreenContentRequest.h"
-#include "34_departures_table/AlarmTestOnDisplayScreenFunction.h"
-#include "34_departures_table/DisplayScreenPhysicalStopFunction.h"
+// 54 Departure tables
 
 // Registries
 #include "DisplayType.h"
 #include "DisplayScreen.h"
 #include "DisplayMonitoringStatus.h"
+#include "DisplayScreenCPU.h"
+
+// Factories
+#include "DeparturesTableModule.h"
+
+#include "DeparturesTableInterfaceElement.h"
+#include "DisplayScreenHasAlarmValueInterfaceElement.h"
+#include "DisplayScreenAlarmContentValueInterfaceElement.h"
+#include "DeparturesTableTrackCell.h"
+#include "DeparturesTableTeamCell.h"
+#include "DeparturesTableTimeContentInterfaceElement.h"
+#include "DeparturesTableLineContentInterfaceElement.h"
+#include "DeparturesTableDestinationContentInterfaceElement.h"
+#include "DeparturesTableRowServiceNumberInterfaceElement.h"
+
+#include "DepartureTableRowInterfacePage.h"
+#include "ParseDisplayReturnInterfacePage.h"
+#include "DeparturesTableInterfacePage.h"
+
+#include "DisplaySearchAdmin.h"
+#include "DisplayTypesAdmin.h"
+#include "BroadcastPointsAdmin.h"
+#include "DisplayAdmin.h"
+#include "DisplayTypeAdmin.h"
+#include "DisplayScreenCPUAdmin.h"
+
+#include "DisplayTypeTableSync.h"
+#include "DisplayScreenTableSync.h"
+#include "DisplayMonitoringStatusTableSync.h"
+#include "DisplayScreenCPUTableSync.h"
+
+#include "CreateDisplayTypeAction.h"
+#include "UpdateDisplayTypeAction.h"
+#include "UpdateDisplayScreenAction.h"
+#include "CreateDisplayScreenAction.h"
+#include "DisplayTypeRemoveAction.h"
+#include "DisplayScreenRemove.h"
+#include "DisplayScreenAppearanceUpdateAction.h"
+#include "AddPreselectionPlaceToDisplayScreen.h"
+#include "UpdateDisplayPreselectionParametersAction.h"
+#include "RemovePreselectionPlaceFromDisplayScreenAction.h"
+#include "UpdateAllStopsDisplayScreenAction.h"
+#include "AddDepartureStopToDisplayScreenAction.h"
+#include "AddForbiddenPlaceToDisplayScreen.h"
+#include "UpdateDisplayPreselectionParametersAction.h"
+#include "DisplayScreenRemovePhysicalStopAction.h"
+#include "DisplayScreenRemoveDisplayedPlaceAction.h"
+#include "DisplayScreenRemoveForbiddenPlaceAction.h"
+#include "UpdateDisplayMaintenanceAction.h"
+#include "DisplayScreenAddDisplayedPlace.h"
+
+#include "ArrivalDepartureTableRight.h"
+#include "DisplayMaintenanceRight.h"
+
+#include "ArrivalDepartureTableLog.h"
+#include "DisplayMaintenanceLog.h"
+
+#include "DisplayScreenAlarmRecipient.h"
+
+#include "DisplayScreenSupervisionRequest.h"
+#include "DisplayScreenContentRequest.h"
+#include "AlarmTestOnDisplayScreenFunction.h"
+#include "DisplayScreenPhysicalStopFunction.h"

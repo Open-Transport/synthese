@@ -49,12 +49,12 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE(
 			TransportNetworkTableSync::CreateFormat(
 				"t022_transport_networks",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(TransportNetworkTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(TransportNetworkTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

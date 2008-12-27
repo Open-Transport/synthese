@@ -68,6 +68,8 @@ namespace synthese
 			ScenarioFolderAdd();
 
 			void setParentId(uid value);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

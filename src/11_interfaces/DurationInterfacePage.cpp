@@ -40,7 +40,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(duration / 60));
 			pv.push_back(Conversion::ToString(duration % 60));
 
-			InterfacePage::display(stream, pv, variables, object, request);
+			InterfacePage::_display(stream, pv, variables, object, request);
 		}
 
 

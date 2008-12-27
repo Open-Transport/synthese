@@ -25,7 +25,7 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/ArrivalDepartureTableLog.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/ParametersMap.h"
 #include "30_server/Request.h"
@@ -45,6 +45,7 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace db;
+	using namespace security;
 	
 	template<> const string FactorableTemplate<Action, departurestable::CreateDisplayScreenAction>::FACTORY_KEY("createdisplayscreen");
 
@@ -104,6 +105,13 @@ namespace synthese
 		void CreateDisplayScreenAction::setPlace( boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> place )
 		{
 			_place = place;
+		}
+
+
+
+		bool CreateDisplayScreenAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey()));
 		}
 	}
 }

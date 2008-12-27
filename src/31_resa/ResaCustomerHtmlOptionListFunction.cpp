@@ -26,7 +26,7 @@
 
 #include "RequestException.h"
 #include "RequestMissingParameterException.h"
-
+#include "ResaRight.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
 
 #include "User.h"
@@ -82,6 +82,13 @@ namespace synthese
 		void ResaCustomerHtmlOptionListFunction::setNumber( int number )
 		{
 			_number = number;
+		}
+
+
+
+		bool ResaCustomerHtmlOptionListFunction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<ResaRight>(READ);
 		}
 	}
 }

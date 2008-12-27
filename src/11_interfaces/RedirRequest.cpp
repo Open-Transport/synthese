@@ -80,5 +80,12 @@ namespace synthese
 		{
 			return _url;
 		}
+
+
+
+		bool RedirRequest::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

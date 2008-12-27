@@ -58,15 +58,15 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE(
 			PlaceAliasTableSync::CreateFormat(
 				"t011_place_aliases",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(PlaceAliasTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, INTEGER, false),
-					SQLiteTableFormat::Field(PlaceAliasTableSync::COL_CITYID, INTEGER, false),
-					SQLiteTableFormat::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, BOOLEAN),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(PlaceAliasTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(PlaceAliasTableSync::COL_CITYID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

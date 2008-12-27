@@ -38,45 +38,32 @@ namespace synthese
 
 	namespace departurestable
 	{
-		class BroadcastPoint;
 		class DisplayScreen;
 		class DisplayType;
+		class DisplayScreenCPU;
 		
-		/** UpdateDisplayScreenAction action class.
+		/** Display screen technical properties update action class.
 			@ingroup m54Actions refActions
 		*/
 		class UpdateDisplayScreenAction : public util::FactorableTemplate<server::Action, UpdateDisplayScreenAction>
 		{
 		public:
+			static const std::string PARAMETER_DISPLAY_SCREEN;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_WIRING_CODE;
-			static const std::string PARAMETER_BLINKING_DELAY;
-			static const std::string PARAMETER_CLEANING_DELAY;
-			static const std::string PARAMETER_DISPLAY_PLATFORM;
-			static const std::string PARAMETER_DISPLAY_SERVICE_NUMBER;
-			static const std::string PARAMETER_DISPLAY_DEPARTURE_ARRIVAL;
-			static const std::string PARAMETER_DISPLAY_TEAM;
-			static const std::string PARAMETER_DISPLAY_END_FILTER;
-			static const std::string PARAMETER_DISPLAY_MAX_DELAY;
 			static const std::string PARAMETER_TYPE;
-			static const std::string PARAMETER_TITLE;
+			static const std::string PARAMETER_COM_PORT;
+			static const std::string PARAMETER_CPU;
 
 		private:
 			std::string									_name;
 			boost::shared_ptr<DisplayScreen>			_screen;
-			std::string									_title;
 			int											_wiringCode;
-			int											_blinkingDelay;
-			int											_cleaningDelay;
-			bool										_displayPlatform;
-			bool										_displayServiceNumber;
-			bool										_displayTeam;
-			DeparturesTableDirection					_direction;
-			EndFilter									_endFilter;
-			int											_maxDelay;
 			boost::shared_ptr<const DisplayType>		_type;
-			std::map<boost::shared_ptr<const env::PhysicalStop>, bool>	_physicalStopServe;
+			boost::shared_ptr<const DisplayScreenCPU>	_cpu;
+			int											_comPort;
 
+			
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 				@warning Not yet implemented;
@@ -92,6 +79,10 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			void setScreenId(util::RegistryKeyType id);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

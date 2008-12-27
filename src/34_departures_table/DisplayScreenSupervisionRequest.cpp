@@ -131,5 +131,12 @@ namespace synthese
 			// Saving
 			DisplayMonitoringStatusTableSync::Save(&status);
 		}
+
+
+
+		bool DisplayScreenSupervisionRequest::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

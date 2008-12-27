@@ -1,24 +1,27 @@
-
-/** SQLiteRegistryTableSyncTemplate class header.
-	@file SQLiteRegistryTableSyncTemplate.h
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// SQLiteRegistryTableSyncTemplate class header.
+///	@file SQLiteRegistryTableSyncTemplate.h
+///	@author Hugues Romain
+///	@date 2008-12-26 18:56
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_db_SQLiteRegistryTableSyncTemplate_h__
 #define SYNTHESE_db_SQLiteRegistryTableSyncTemplate_h__
@@ -32,29 +35,17 @@ namespace synthese
 {
 	namespace db
 	{
-		/** SQLiteRegistryTableSyncTemplate class.
-				- class K : Class of the table sync
-				- class T : Class of the corresponding objects
-			@ingroup m10
-		*/
+		////////////////////////////////////////////////////////////////////
+		/// SQLiteRegistryTableSyncTemplate class.
+		///		- class K : Class of the table sync
+		///		- class T : Class of the corresponding objects
+		///	@ingroup m10
 		template<class K, class T>
 		class SQLiteRegistryTableSyncTemplate : public SQLiteDirectTableSyncTemplate<K,T>
 		{
 		public:
 			SQLiteRegistryTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>() {}
 
-			static SQLiteTableFormat CreateFormat(
-				std::string name,
-				SQLiteTableFormat::Fields fields,
-				SQLiteTableFormat::Indexes indexes = SQLiteTableFormat::Indexes()
-			){
-				return SQLiteDirectTableSyncTemplate<K,T>::CreateFormat(
-					name,
-					fields,
-					indexes,
-					false
-				);
-			}
 
 			/** Action to do on DisplayType creation.
 			This method loads a new object in ram.

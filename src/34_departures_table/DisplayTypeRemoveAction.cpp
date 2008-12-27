@@ -25,7 +25,7 @@
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/ArrivalDepartureTableLog.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -97,6 +97,14 @@ namespace synthese
 		void DisplayTypeRemoveAction::setType( boost::shared_ptr<const DisplayType> type )
 		{
 			_type = type;
+		}
+
+
+
+		bool DisplayTypeRemoveAction::_isAuthorized(
+
+			) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

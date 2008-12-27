@@ -63,20 +63,25 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AddressTableSync>::TABLE(
-			AddressTableSync::CreateFormat(
-				"t002_addresses",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(AddressTableSync::COL_PLACEID, INTEGER, false),
-					SQLiteTableFormat::Field(AddressTableSync::COL_ROADID, INTEGER, false),
-					SQLiteTableFormat::Field(AddressTableSync::COL_METRICOFFSET, DOUBLE, false),
-					SQLiteTableFormat::Field(AddressTableSync::COL_X, DOUBLE),
-					SQLiteTableFormat::Field(AddressTableSync::COL_Y, DOUBLE),
-					SQLiteTableFormat::Field()
-				),
-				SQLiteTableFormat::Indexes()
-			)
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AddressTableSync>::TABLE(
+			"t002_addresses"
 		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<AddressTableSync>::_FIELDS[] =
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(AddressTableSync::COL_PLACEID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(AddressTableSync::COL_ROADID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(AddressTableSync::COL_METRICOFFSET, SQL_DOUBLE, false),
+			SQLiteTableSync::Field(AddressTableSync::COL_X, SQL_DOUBLE),
+			SQLiteTableSync::Field(AddressTableSync::COL_Y, SQL_DOUBLE),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<AddressTableSync>::_INDEXES[] =
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Load(
 			Address* object

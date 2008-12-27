@@ -63,6 +63,8 @@ namespace synthese
 			void run();
 
 			void setScenario(boost::shared_ptr<const ScenarioTemplate> scenario);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

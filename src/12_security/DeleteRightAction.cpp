@@ -25,7 +25,7 @@
 #include "12_security/Right.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
-
+#include "SecurityRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -80,6 +80,13 @@ namespace synthese
 				_profile->removeRight(_right->getFactoryKey(), _right->getParameter());
 				ProfileTableSync::Save(_profile.get());
 			}
+		}
+
+
+
+		bool DeleteRightAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<SecurityRight>(WRITE);
 		}
 	}
 }

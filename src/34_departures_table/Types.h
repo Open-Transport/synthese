@@ -28,11 +28,9 @@
 #include <vector>
 #include <map>
 
-#include "15_env/ServicePointer.h"
-
-#include "04_time/DateTime.h"
-
-#include "01_util/UId.h"
+#include "ServicePointer.h"
+#include "DateTime.h"
+#include "UId.h"
 
 
 namespace synthese
@@ -52,6 +50,8 @@ namespace synthese
 	/** @addtogroup m54
 	@{
 	*/
+
+	//lint --e{1509}
 
 	typedef enum {
 		AT_LEAST_ONE_BROADCASTPOINT,

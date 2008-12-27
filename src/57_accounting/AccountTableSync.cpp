@@ -50,7 +50,7 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AccountTableSync>::TABLE.NAME = "t028_account";
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AccountTableSync>::TABLE.NAME = "t028_account";
 		template<> const int SQLiteTableSyncTemplate<AccountTableSync>::TABLE.ID = 28;
 		template<> const bool SQLiteTableSyncTemplate<AccountTableSync>::HAS_AUTO_INCREMENT = true;
 
@@ -146,19 +146,19 @@ namespace synthese
 		AccountTableSync::AccountTableSync()
 			: SQLiteNoSyncTableSyncTemplate<AccountTableSync,Account>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
-			addTableColumn(TABLE_COL_LEFT_USER_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_LEFT_NUMBER, "TEXT", true);
-			addTableColumn(TABLE_COL_LEFT_CLASS_NUMBER, "TEXT", true);
-			addTableColumn(TABLE_COL_LEFT_CURRENCY_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_RIGHT_USER_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_RIGHT_NUMBER, "TEXT", true);
-			addTableColumn(TABLE_COL_RIGHT_CLASS_NUMBER, "TEXT", true);
-			addTableColumn(TABLE_COL_RIGHT_CURRENCY_ID, "INTEGER", true);
-			addTableColumn(COL_LOCKED, "INTEGER", true);
-			addTableColumn(COL_STOCK_ACCOUNT_ID, "INTEGER", true);
-			addTableColumn(COL_UNIT_PRICE, "REAL", true);
+			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
+			addTableColumn(TABLE_COL_NAME, "SQL_TEXT", true);
+			addTableColumn(TABLE_COL_LEFT_USER_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_LEFT_NUMBER, "SQL_TEXT", true);
+			addTableColumn(TABLE_COL_LEFT_CLASS_NUMBER, "SQL_TEXT", true);
+			addTableColumn(TABLE_COL_LEFT_CURRENCY_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_RIGHT_USER_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_RIGHT_NUMBER, "SQL_TEXT", true);
+			addTableColumn(TABLE_COL_RIGHT_CLASS_NUMBER, "SQL_TEXT", true);
+			addTableColumn(TABLE_COL_RIGHT_CURRENCY_ID, "SQL_INTEGER", true);
+			addTableColumn(COL_LOCKED, "SQL_INTEGER", true);
+			addTableColumn(COL_STOCK_ACCOUNT_ID, "SQL_INTEGER", true);
+			addTableColumn(COL_UNIT_PRICE, "SQL_REAL", true);
 		}
 
 

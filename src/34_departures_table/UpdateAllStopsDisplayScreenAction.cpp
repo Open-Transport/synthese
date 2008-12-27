@@ -23,7 +23,7 @@
 #include "UpdateAllStopsDisplayScreenAction.h"
 
 #include "DisplayScreenTableSync.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
@@ -36,6 +36,7 @@ namespace synthese
 	using namespace db;
 	using namespace server;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, departurestable::UpdateAllStopsDisplayScreenAction>::FACTORY_KEY("uasdsa");
 
@@ -70,6 +71,13 @@ namespace synthese
 		{
 			_screen->setAllPhysicalStopsDisplayed(_value);
 			DisplayScreenTableSync::Save(_screen.get());
+		}
+
+
+
+		bool UpdateAllStopsDisplayScreenAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

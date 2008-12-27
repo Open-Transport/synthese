@@ -81,6 +81,8 @@ namespace synthese
 
 
 			void setTypeId(util::RegistryKeyType id);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

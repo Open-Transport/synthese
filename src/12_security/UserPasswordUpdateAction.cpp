@@ -74,5 +74,13 @@ namespace synthese
 			_user->setPassword(_password);
 			UserTableSync::Save(_user.get());
 		}
+
+
+
+		bool UserPasswordUpdateAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<SecurityRight>(WRITE) ||
+				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
+		}
 	}
 }

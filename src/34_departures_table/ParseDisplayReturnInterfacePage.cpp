@@ -42,7 +42,7 @@ namespace synthese
 			ParametersVector pv;
 			pv.push_back(text);
 
-			InterfacePage::display(stream, pv, variables, NULL, request);
+			InterfacePage::_display(stream, pv, variables, NULL, request);
 		}
 
 

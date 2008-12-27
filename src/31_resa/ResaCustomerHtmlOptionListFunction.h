@@ -72,6 +72,8 @@ namespace synthese
 			void _run(std::ostream& stream) const;
 
 			void setNumber(int number);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

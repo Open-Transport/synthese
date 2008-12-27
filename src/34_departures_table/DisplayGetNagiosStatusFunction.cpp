@@ -107,5 +107,12 @@ namespace synthese
 				}
 			}
 		}
+
+
+
+		void DisplayGetNagiosStatusFunction::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

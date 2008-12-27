@@ -72,6 +72,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

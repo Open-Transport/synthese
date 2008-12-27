@@ -50,9 +50,12 @@ namespace synthese
 		
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
-			ParametersMap map;
-			map.insert(PARAMETER_NETWORK_ID, _network->getKey());
-			return map;
+			ParametersMap result;
+			if (_network.get() != NULL)
+			{
+				result.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
+			return result;
 		}
 
 		void LinesListFunction::_setFromParametersMap(const ParametersMap& map)
@@ -70,13 +73,19 @@ namespace synthese
 
 		void LinesListFunction::_run( std::ostream& stream ) const
 		{
-			Env env;
-			CommercialLineTableSync::Search(env, _network->getKey());
+			CommercialLineTableSync::Search(_env, _network->getKey());
 			
-			BOOST_FOREACH(shared_ptr<const CommercialLine> line, env.getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<const CommercialLine> line, _env.getRegistry<CommercialLine>())
 			{
 				stream << line->getKey() << ";" << line->getShortName() << "\n";
 			}
+		}
+
+
+
+		bool LinesListFunction::_isAuthorized(
+		) const {
+			return true;
 		}
 	}
 }

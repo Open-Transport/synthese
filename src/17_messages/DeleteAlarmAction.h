@@ -35,9 +35,9 @@ namespace synthese
 	{
 		class Alarm;
 
-		/** DeleteAlarmAction action class.
-			@ingroup m17Actions refActions
-		*/
+		////////////////////////////////////////////////////////////////////
+		/// DeleteAlarmAction action class.
+		///	@ingroup m17Actions refActions
 		class DeleteAlarmAction : public util::FactorableTemplate<server::Action, DeleteAlarmAction>
 		{
 		public:
@@ -53,16 +53,24 @@ namespace synthese
 
 			/** Conversion from generic parameters map to attributes.
 				Removes the used parameters from the map.
-				@exception ActionException Occurs when some parameters are missing or incorrect.
+				@throws ActionException Occurs when some parameters are missing or incorrect.
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(
+				const server::ParametersMap& map
+			) throw(server::ActionException);
 
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(
+			) throw(server::ActionException);
 
-			void setAlarmId(util::RegistryKeyType id);
+			void setAlarmId(
+				util::RegistryKeyType id
+			) throw(server::ActionException);
+
+			virtual bool _isAuthorized(
+			) const;
 		};
 	}
 }

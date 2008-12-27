@@ -75,6 +75,8 @@ namespace synthese
 			void _run(std::ostream& stream) const;
 
 			void setAlarmId(uid id);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

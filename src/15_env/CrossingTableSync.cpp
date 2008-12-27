@@ -48,15 +48,15 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<CrossingTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CrossingTableSync>::TABLE(
 			CrossingTableSync::CreateFormat(
 				"t043_crossings",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(CrossingTableSync::TABLE_COL_CITYID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(CrossingTableSync::TABLE_COL_CITYID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(CrossingTableSync::TABLE_COL_CITYID),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(CrossingTableSync::TABLE_COL_CITYID),
+					SQLiteTableSync::Index()
 		)	)	);
 
 

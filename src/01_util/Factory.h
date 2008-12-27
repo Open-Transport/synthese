@@ -1,57 +1,57 @@
-
-/** Factory class header.
-	@file Factory.h
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// Factory class header.
+///	@file Factory.h
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_util_Factory_h__
 #define SYNTHESE_util_Factory_h__
 
+#include "FactoryException.h"
+#include "Log.h"
+
+#include <vector>
 #include <map>
 #include <string>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
-#include "01_util/FactoryException.h"
-#include "01_util/Log.h"
-
-
 namespace synthese
 {
 	namespace util
 	{
-		/** @defgroup m01Factory Factory
-			@ingroup m01
-			@{
-		*/
+		/// @defgroup m01Factory Factory
+		///	@ingroup m01
+		//@{
 
-		/** Generic class factory.
-
-			The features of the generic class factory are :
-				- Auto instantiation of the factory at the fist class registration
-				- Iterator for accessing to the registered subclasses list
-				- Creation of objects from the iterator or directly from a string key
-
-			Possible uses :
-				- Factory<FactoryClass>::create("class_key") -> Creates an object from the string key of the class
-				- Factory<FactoryClass>::contains("class_key") -> Answers if a class is registered with the specified key
-		*/
+		////////////////////////////////////////////////////////////////////////
+		/// Generic class factory.
+		///
+		///	The features of the generic class factory are :
+		///		- Auto instantiation of the factory at the fist class registration
+		///		- Creation of objects from the iterator or directly from a string key
+		///
+		///	Possible uses :
+		///		- Factory<FactoryClass>::create("class_key") -> Creates an object from the string key of the class
+		///		- Factory<FactoryClass>::contains("class_key") -> Answers if a class is registered with the specified key
 		template <class RootObject>
 		class Factory
 		{
@@ -175,76 +175,25 @@ namespace synthese
                             //delete _registeredCreator;
 			}
 
-			class Iterator
+			
+			
+			////////////////////////////////////////////////////////////////////
+			///	Builds a collection of new elements of each factorable subclass.
+			///	@return a collection of new elements of each factorable subclass.
+			///	@author Hugues Romain
+			///	@date 2008
+			static std::vector<boost::shared_ptr<RootObject> > GetNewCollection()
 			{
-			private:
-				typename Factory::Map::const_iterator _it;
-				
-			public:
-				Iterator(const typename Factory::Map::const_iterator& it)
-					: _it(it)
-				{	}
-
-				/** Object creator.
-					@return Shared Pointer to a temporary object of the current subclass, which will be deleted when unused.
-				*/
-				boost::shared_ptr<RootObject> operator*()
+				std::vector<boost::shared_ptr<RootObject> > result;
+				for(typename Map::iterator it = _registeredCreator.begin(); it != _registeredCreator.end(); ++it)
 				{
-					return boost::shared_ptr<RootObject>(_it->second->create());
+					result.push_back(boost::shared_ptr<RootObject>(it->second->create()));
 				}
-
-				boost::shared_ptr<RootObject> operator->()
-				{
-					return operator*();
-				}
-
-				/** Iteration.
-				*/
-				void operator++()
-				{
-					++_it;
-				}
-
-				bool operator==(const Iterator& obj)
-				{
-					return obj._it == _it;
-				}
-
-				bool operator!=(const Iterator& obj)
-				{
-					return obj._it != _it;
-				}
-
-				/** Key getter.
-					@return The key of the current subclass.
-				*/
-				const typename Factory::Map::key_type& getKey()
-				{
-					return _it->first;
-				}
-			};
-
-			/** First iterator on the subclasses.
-			@return First iterator on the subclasses.
-			*/
-			static Iterator begin()
-			{		
-				return Iterator( _registeredCreator.begin() );
+				return result;
 			}
-
-			/** Last iterator on the subclasses.
-			@return Last iterator on the subclasses.
-			*/
-			static Iterator end()
-			{
-				return Iterator( _registeredCreator.end() );
-			}
-
-			typedef Iterator iterator;
 		};
 
-
-		/** @} */
+		//@}
 
 		template <class T>
 			typename Factory<T>::Map Factory<T>::_registeredCreator;

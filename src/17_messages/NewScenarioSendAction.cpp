@@ -29,7 +29,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "MessagesLog.h"
 #include "AlarmTemplateInheritedTableSync.h"
-
+#include "MessagesRight.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "QueryString.h"
@@ -45,6 +45,8 @@ namespace synthese
 	using namespace server;
 	using namespace dblog;
 	using namespace util;
+	using namespace security;
+	
 
 	template<> const string util::FactorableTemplate<Action, messages::NewScenarioSendAction>::FACTORY_KEY("nssa");
 	
@@ -107,6 +109,13 @@ namespace synthese
 
 			// The log
 			MessagesLog::addUpdateEntry(scenario.get(), "Diffusion", _request->getUser().get());
+		}
+
+
+
+		bool NewScenarioSendAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

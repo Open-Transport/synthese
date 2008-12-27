@@ -67,20 +67,20 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<RoadTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadTableSync>::TABLE(
 			RoadTableSync::CreateFormat(
 				"t015_roads",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(RoadTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(RoadTableSync::COL_CITYID, INTEGER, false),
-					SQLiteTableFormat::Field(RoadTableSync::COL_ROADTYPE, INTEGER),
-					SQLiteTableFormat::Field(RoadTableSync::COL_FAREID, INTEGER),
-					SQLiteTableFormat::Field(RoadTableSync::COL_BIKECOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field(RoadTableSync::COL_RESERVATIONRULEID, INTEGER),
-					SQLiteTableFormat::Field(RoadTableSync::COL_VIAPOINTS, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(RoadTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(RoadTableSync::COL_CITYID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
+					SQLiteTableSync::Field(RoadTableSync::COL_FAREID, SQL_INTEGER),
+					SQLiteTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field(RoadTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
+					SQLiteTableSync::Field(RoadTableSync::COL_VIAPOINTS, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

@@ -73,32 +73,39 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<DisplayMonitoringStatusTableSync>::TABLE(
-			DisplayMonitoringStatusTableSync::CreateFormat(
-				"t057_display_monitoring_status",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_SCREEN_ID, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_TIME, TIMESTAMP),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_GENERAL_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_MEMORY_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_CLOCK_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_EEPROM_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_TEMP_SENSOR_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_LIGHT_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_LIGHT_DETAIL, TEXT),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_DISPLAY_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_DISPLAY_DETAIL, TEXT),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_SOUND_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_SOUND_DETAIL, TEXT),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_TEMPERATURE_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_TEMPERATURE_VALUE, DOUBLE),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_COMMUNICATION_STATUS, INTEGER),
-					SQLiteTableFormat::Field(DisplayMonitoringStatusTableSync::COL_LOCALIZATION_STATUS, INTEGER),
-					SQLiteTableFormat::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(DisplayMonitoringStatusTableSync::COL_SCREEN_ID),
-					SQLiteTableFormat::Index()
-		)	)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DisplayMonitoringStatusTableSync>::TABLE(
+			"t057_display_monitoring_status",
+			true
+		);
+
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayMonitoringStatusTableSync>::_FIELDS[] =
+		{
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_SCREEN_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_TIME, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_GENERAL_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_MEMORY_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_CLOCK_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_EEPROM_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_TEMP_SENSOR_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_LIGHT_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_LIGHT_DETAIL, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_DISPLAY_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_DISPLAY_DETAIL, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_SOUND_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_SOUND_DETAIL, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_TEMPERATURE_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_TEMPERATURE_VALUE, SQL_DOUBLE),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_COMMUNICATION_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_LOCALIZATION_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayMonitoringStatusTableSync>::_INDEXES[] =
+		{
+			SQLiteTableSync::Index(DisplayMonitoringStatusTableSync::COL_SCREEN_ID.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 
 
 

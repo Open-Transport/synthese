@@ -37,7 +37,7 @@ namespace synthese
 		{
 		public:
 
-			ObjectNotFoundInRegistryException(const RegistryKeyType& key) throw ()
+			ObjectNotFoundInRegistryException(const RegistryKeyType& key)
 				: ObjectNotFoundException<T>(key, "Object not found in registry " + Conversion::ToString(decodeTableId(key)))
 			{}
 

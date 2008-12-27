@@ -58,21 +58,21 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE(
 			TextTemplateTableSync::CreateFormat(
 				"t038_text_templates",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(TextTemplateTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(TextTemplateTableSync::COL_SHORT_TEXT, TEXT),
-					SQLiteTableFormat::Field(TextTemplateTableSync::COL_LONG_TEXT, TEXT),
-					SQLiteTableFormat::Field(TextTemplateTableSync::COL_LEVEL, INTEGER),
-					SQLiteTableFormat::Field(TextTemplateTableSync::COL_IS_FOLDER, INTEGER),
-					SQLiteTableFormat::Field(TextTemplateTableSync::COL_PARENT_ID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(TextTemplateTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(TextTemplateTableSync::COL_SHORT_TEXT, SQL_TEXT),
+					SQLiteTableSync::Field(TextTemplateTableSync::COL_LONG_TEXT, SQL_TEXT),
+					SQLiteTableSync::Field(TextTemplateTableSync::COL_LEVEL, SQL_INTEGER),
+					SQLiteTableSync::Field(TextTemplateTableSync::COL_IS_FOLDER, SQL_INTEGER),
+					SQLiteTableSync::Field(TextTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(TextTemplateTableSync::COL_LEVEL),
-					SQLiteTableFormat::Index(TextTemplateTableSync::COL_PARENT_ID),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(TextTemplateTableSync::COL_LEVEL),
+					SQLiteTableSync::Index(TextTemplateTableSync::COL_PARENT_ID),
+					SQLiteTableSync::Index()
 		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(

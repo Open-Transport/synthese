@@ -25,14 +25,14 @@
 #include "ReservationsListFunction.h"
 
 #include "36_places_list/Site.h"
-
+#include "ResaRight.h"
 #include "31_resa/ReservationsListInterfacePage.h"
 
 #include "30_server/RequestException.h"
 #include "30_server/RequestMissingParameterException.h"
 #include "30_server/LoginInterfacePage.h"
 #include "30_server/Request.h"
-
+#include "Conversion.h"
 #include "15_env/CommercialLine.h"
 #include "15_env/CommercialLineTableSync.h"
 
@@ -179,6 +179,13 @@ namespace synthese
 		void ReservationsListFunction::setLine(shared_ptr<const CommercialLine> line )
 		{
 			_line = line;
+		}
+
+
+
+		bool ReservationsListFunction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(line->getKey()));
 		}
 	}
 }

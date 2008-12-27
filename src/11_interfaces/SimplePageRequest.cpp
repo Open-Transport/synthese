@@ -111,5 +111,12 @@ namespace synthese
 		{
 			return false;
 		}
+
+
+
+		bool SimplePageRequest::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

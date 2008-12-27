@@ -243,5 +243,13 @@ namespace synthese
 		{
 			_useEnvironment = value;
 		}
+
+
+
+		bool MapRequest::_isAuthorized(
+
+			) const {
+			return true;
+		}
 	}
 }

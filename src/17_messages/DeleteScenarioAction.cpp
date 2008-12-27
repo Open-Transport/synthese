@@ -21,7 +21,7 @@
 */
 
 #include "DeleteScenarioAction.h"
-
+#include "MessagesLibraryRight.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
@@ -41,6 +41,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace security;
+	
 
 	template<> const string util::FactorableTemplate<Action,messages::DeleteScenarioAction>::FACTORY_KEY("mdsca");
 	
@@ -93,6 +95,13 @@ namespace synthese
 		void DeleteScenarioAction::setScenario( boost::shared_ptr<const ScenarioTemplate> scenario )
 		{
 			_scenario = scenario;
+		}
+
+
+
+		bool DeleteScenarioAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 		}
 	}
 }

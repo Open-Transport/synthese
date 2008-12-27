@@ -1,24 +1,27 @@
-
-/** Registry class header.
-	@file Registry.h
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// Registry class header.
+///	@file Registry.h
+///	@author Hugues Romain
+///	@date 2008-12-26 19:29
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_UTIL_REGISTRY_H
 #define SYNTHESE_UTIL_REGISTRY_H
@@ -88,6 +91,8 @@ namespace synthese
 		template<class T>
 		class Registry : public RegistryBase
 		{
+			//lint --e{1704}
+
 		public:
 			typedef std::map<RegistryKeyType, boost::shared_ptr<T> > Map;
 			typedef std::vector<boost::shared_ptr<T> > Vector;
@@ -112,6 +117,18 @@ namespace synthese
 			*/
 			static const std::string KEY;
 		
+			/// @name Getters
+			//@{
+				////////////////////////////////////////////////////////////////////
+				///	Ordered vector getter.
+				///	@return Vector of the objects.
+				///	@author Hugues Romain
+				///	@date 2008
+				/// Use it to access to the registry following the order of insertion
+				/// (e.g. to take into account of order clause in an SQL search)
+				Vector getOrderedVector() const { return _orderedVector; }
+			//@}
+
 
 			//! @name Query methods
 			//@{
@@ -233,7 +250,7 @@ namespace synthese
 			typename Map::iterator it(_registry.find(key));
 
 			if(it == _registry.end())
-				throw typename util::ObjectNotFoundInRegistryException<T>(key);
+				throw util::ObjectNotFoundInRegistryException<T>(key);
 
 			return it->second;
 		}
@@ -247,7 +264,7 @@ namespace synthese
 			typename Map::const_iterator it(_registry.find(key));
 			
 			if(it == _registry.end())
-				throw typename util::ObjectNotFoundInRegistryException<T>(key);
+				throw util::ObjectNotFoundInRegistryException<T>(key);
 				
 			return boost::const_pointer_cast<const T, T>(it->second);
 		}
@@ -311,10 +328,14 @@ namespace synthese
 		void Registry<T>::add (boost::shared_ptr<T> ptr)
 		{
 			if (ptr->getKey() == UNKNOWN_VALUE)
-				throw typename util::RegistryKeyException<T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
+			{
+				throw util::RegistryKeyException<T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
+			}
 
 			if (contains (ptr->getKey ())) 
-				throw typename util::RegistryKeyException<T>("Duplicate key in registry", ptr->getKey ());
+			{
+				throw util::RegistryKeyException<T>("Duplicate key in registry", ptr->getKey ());
+			}
 		    
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
 			_orderedVector.push_back(ptr);

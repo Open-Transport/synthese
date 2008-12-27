@@ -1,42 +1,42 @@
-
-/** DisplayScreen class implementation.
-	@file DisplayScreen.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include <sstream>
+////////////////////////////////////////////////////////////////////////////////
+/// DisplayScreen class implementation.
+///	@file DisplayScreen.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "Registry.h"
-
 #include "Interface.h"
 #include "InterfacePageException.h"
-
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
 #include "Edge.h"
 #include "15_env/Types.h"
-
 #include "DisplayScreen.h"
 #include "DisplayType.h"
 #include "DisplayMaintenanceLog.h"
 #include "DeparturesTableInterfacePage.h"
 #include "DisplayScreenAlarmRecipient.h"
+#include "DisplayScreenCPU.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -57,22 +57,26 @@ namespace synthese
 	namespace departurestable
 	{
 		DisplayScreen::DisplayScreen(RegistryKeyType key)
-			: Registrable(key)
-			, _direction(DISPLAY_DEPARTURES)
-			, _generationMethod(STANDARD_METHOD)
-			, _originsOnly(WITH_PASSING)
-			, _destinationForceDelay(120)	// default = 2 hours
-			, _maxDelay(24 * 60)			// default = 24 hours
-			, _wiringCode(0)
-			, _blinkingDelay(1)
-			, _clearingDelay(0)
-			, _firstRow(0)
-			, _allPhysicalStopsDisplayed(false)
-			, _trackNumberDisplay(false)
-			, _serviceNumberDisplay(false)
-			, _displayType(NULL)
-			, _localization(NULL)
-			, _maintenanceIsOnline(true)
+		:	Registrable(key),
+			_localization(NULL),
+			_displayType(NULL),
+			_wiringCode(0),
+			_comPort(0),
+			_cpu(NULL),
+			_blinkingDelay(1),
+			_trackNumberDisplay(false),
+			_serviceNumberDisplay(false),
+			_displayTeam(false),
+			_displayClock(true),
+			_allPhysicalStopsDisplayed(true),
+			_direction(DISPLAY_DEPARTURES),
+			_originsOnly(WITH_PASSING),
+			_maxDelay(24 * 60),			// default = 24 hours
+			_clearingDelay(0),
+			_firstRow(0),
+			_generationMethod(STANDARD_METHOD),
+			_destinationForceDelay(120),	// default = 2 hours
+			_maintenanceIsOnline(true)
 		{
 		}
 
@@ -117,6 +121,11 @@ namespace synthese
 
 		shared_ptr<ArrivalDepartureTableGenerator> DisplayScreen::getGenerator(const DateTime& startDateTime) const
 		{
+			if (_displayType == NULL)
+			{
+				throw Exception("Display type must be defined to build the generator of the display screen");
+			}
+
 			// End time
 			DateTime realStartDateTime(startDateTime);
 			realStartDateTime += (-_clearingDelay + 1);
@@ -156,6 +165,8 @@ namespace synthese
 					, _blinkingDelay
 				));
 			}
+			assert(false);
+			return shared_ptr<ArrivalDepartureTableGenerator>();
 		}
 
 		const PublicTransportStopZoneConnectionPlace* DisplayScreen::getLocalization() const
@@ -424,8 +435,10 @@ namespace synthese
 				}
 			}
 			vector<pair<uid, string> > v;
-			for (map<string, pair<uid, string> >::const_iterator it = m.begin(); it != m.end(); ++it)
-				v.push_back(it->second);
+			for (map<string, pair<uid, string> >::const_iterator it2 = m.begin(); it2 != m.end(); ++it2)
+			{
+				v.push_back(it2->second);
+			}
 			return v;
 		}
 
@@ -492,13 +505,21 @@ namespace synthese
 			setType(other->getType());
 			setWiringCode(other->getWiringCode());
 			for (DisplayedPlacesList::const_iterator it = other->getDisplayedPlaces().begin(); it != other->getDisplayedPlaces().end(); ++it)
+			{
 				addDisplayedPlace(it->second);
-			for (DisplayedPlacesList::const_iterator it = other->getForcedDestinations().begin(); it != other->getForcedDestinations().end(); ++it)
-				addForcedDestination(it->second);
-			for (ForbiddenPlacesList::const_iterator it = other->getForbiddenPlaces().begin(); it != other->getForbiddenPlaces().end(); ++it)
-				addForbiddenPlace(it->second);
-			for (PhysicalStops::const_iterator it = other->getPhysicalStops(false).begin(); it != other->getPhysicalStops(false).end(); ++it)
-				addPhysicalStop(it->second);
+			}
+			for (DisplayedPlacesList::const_iterator it2 = other->getForcedDestinations().begin(); it2 != other->getForcedDestinations().end(); ++it2)
+			{
+				addForcedDestination(it2->second);
+			}
+			for (ForbiddenPlacesList::const_iterator it3 = other->getForbiddenPlaces().begin(); it3 != other->getForbiddenPlaces().end(); ++it3)
+			{
+				addForbiddenPlace(it3->second);
+			}
+			for (PhysicalStops::const_iterator it4 = other->getPhysicalStops(false).begin(); it4 != other->getPhysicalStops(false).end(); ++it4)
+			{
+				addPhysicalStop(it4->second);
+			}
 		}
 
 
@@ -510,6 +531,62 @@ namespace synthese
 		bool DisplayScreen::getDisplayTeam() const
 		{
 			return _displayTeam;
+		}
+
+
+
+		DisplayScreen::~DisplayScreen(
+		){
+			_localization = NULL;
+			_displayType = NULL;
+			_cpu = NULL;
+		}
+
+
+
+		void DisplayScreen::setCPU(
+			const DisplayScreenCPU* value
+		){
+			assert(value == NULL || value->getPlace() == _localization);
+
+			_cpu = value;
+		}
+
+
+
+		void DisplayScreen::setDisplayClock(
+			bool value
+		){
+			_displayClock = value;
+		}
+
+
+
+		void DisplayScreen::setComPort(
+			int value
+		) {
+			_comPort = value;
+		}
+
+
+
+		const DisplayScreenCPU* DisplayScreen::getCPU(
+		) const {
+			return _cpu;
+		}
+
+
+
+		int DisplayScreen::getComPort(
+		) const {
+			return _comPort;
+		}
+
+
+
+		bool DisplayScreen::getDisplayClock(
+		) const {
+			return _displayClock;
 		}
 	}
 }

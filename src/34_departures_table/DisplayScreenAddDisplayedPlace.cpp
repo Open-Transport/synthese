@@ -25,7 +25,7 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 
 #include "15_env/ConnectionPlaceTableSync.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -39,6 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace env;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action,departurestable::DisplayScreenAddDisplayedPlace>::FACTORY_KEY("dsadp");
 	
@@ -73,6 +74,13 @@ namespace synthese
 		{
 			_screen->addDisplayedPlace(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
+		}
+
+
+
+		bool DisplayScreenAddDisplayedPlace::_isAuthorized(
+		) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

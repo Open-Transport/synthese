@@ -1,33 +1,35 @@
-
-/** DateTime class header.
-	@file DateTime.h
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// DateTime class header.
+///	@file DateTime.h
+///	@author Hugues Romain
+///	@date 2008-12-26 21:19
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_TIME_DATETIME_H
 #define SYNTHESE_TIME_DATETIME_H
 
-
 #include "module.h"
 
-#include "04_time/Date.h"
-#include "04_time/Hour.h"
+#include "Date.h"
+#include "Hour.h"
 
 #include <iostream>
 #include <string>
@@ -36,11 +38,9 @@ namespace synthese
 {
 	namespace time
 	{
-		class Schedule;
-
-		/** A date and a time.
-			@ingroup m04
-		*/
+		////////////////////////////////////////////////////////////////////
+		/// A date and a time.
+		///	@ingroup m04
 		class DateTime
 		{
 		public:
@@ -155,4 +155,3 @@ namespace synthese
 }
 
 #endif
-

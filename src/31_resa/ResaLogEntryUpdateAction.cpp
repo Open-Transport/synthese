@@ -26,7 +26,7 @@
 #include "30_server/ParametersMap.h"
 
 #include "ResaLogEntryUpdateAction.h"
-
+#include "ResaRight.h"
 #include "13_dblog/DBLogEntry.h"
 #include "13_dblog/DBLogEntryTableSync.h"
 
@@ -37,6 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace dblog;
 	using namespace util;
+	using namespace security;
 	
 	namespace util
 	{
@@ -107,6 +108,13 @@ namespace synthese
 			{
 				throw ActionException("No such log entry");
 			}
+		}
+
+
+
+		bool ResaLogEntryUpdateAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<ResaRight>(WRITE);
 		}
 	}
 }

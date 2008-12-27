@@ -47,19 +47,6 @@ namespace synthese
 				return false;
 			}
 
-			static SQLiteTableFormat CreateFormat(
-				std::string name,
-				SQLiteTableFormat::Fields fields,
-				SQLiteTableFormat::Indexes indexes = SQLiteTableFormat::Indexes()
-			){
-				return SQLiteDirectTableSyncTemplate<K,T>::CreateFormat(
-					name,
-					fields,
-					indexes,
-					true
-				);
-			}
-
 
 			/** Action to do on object creation or replacement.
 				Only if the event is a replacement, and if the concerned object is already loaded into the registry, then it is updated.

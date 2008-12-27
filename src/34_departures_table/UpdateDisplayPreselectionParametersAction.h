@@ -23,9 +23,11 @@
 #ifndef SYNTHESE_UpdateDisplayPreselectionParametersAction_H__
 #define SYNTHESE_UpdateDisplayPreselectionParametersAction_H__
 
-#include "30_server/Action.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
-#include "01_util/FactorableTemplate.h"
+#include <map>
+#include <string>
 
 namespace synthese
 {
@@ -33,19 +35,35 @@ namespace synthese
 	{
 		class DisplayScreen;
 
-		/** UpdateDisplayPreselectionParametersAction action class.
+		/** Display screen content properties update action class.
 			@ingroup m54Actions refActions
 		*/
 		class UpdateDisplayPreselectionParametersAction : public util::FactorableTemplate<server::Action, UpdateDisplayPreselectionParametersAction>
 		{
 		public:
-			static const std::string PARAMETER_ACTIVATE_PRESELECTION;
+			typedef enum
+			{
+				DEPARTURES_CHRONOLOGICAL,
+				DEPARTURES_PRESELECTION,
+				ARRIVAL_CHRONOLOGICAL,
+				ARRIVAL_PRESELECTION,
+				ROUTE_PLANNING
+			} DisplayFunction;
+
+			static const std::string PARAMETER_DISPLAY_SCREEN;
 			static const std::string PARAMETER_PRESELECTION_DELAY;
+			static const std::string PARAMETER_DISPLAY_FUNCTION;
+			static const std::string PARAMETER_CLEANING_DELAY;
+			static const std::string PARAMETER_DISPLAY_END_FILTER;
+			static const std::string PARAMETER_DISPLAY_MAX_DELAY;
 
 		private:
-			bool			_activatePreselection;
-			int				_preselectionDelay;
 			boost::shared_ptr<DisplayScreen>	_screen;
+			int									_preselectionDelay;
+			DisplayFunction						_function;
+			int									_cleaningDelay;
+			EndFilter							_endFilter;
+			int									_maxDelay;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -62,6 +80,22 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			static std::map<DisplayFunction, std::string> GetFunctionList();
+			static std::map<int, std::string> GetClearDelaysList();
+			static DisplayFunction GetFunction(const DisplayScreen& screen);
+
+			virtual bool _isAuthorized() const;
+
+			
+			
+			////////////////////////////////////////////////////////////////////
+			///	Screen loader.
+			///	@param id ID of the screen
+			///	@author Hugues Romain
+			///	@date 2008
+			/// @throws ActionException if the screen does not exist
+			void setScreenId(const util::RegistryKeyType id);
 		};
 	}
 }

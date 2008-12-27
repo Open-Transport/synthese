@@ -57,6 +57,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

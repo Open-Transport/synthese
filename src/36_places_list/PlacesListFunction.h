@@ -85,6 +85,8 @@ namespace synthese
 			void setNumber(int number);
 			void setIsForOrigin(bool isForOrigin);
 			void setCityTextInput(const std::string& text);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

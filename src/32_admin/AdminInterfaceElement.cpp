@@ -46,8 +46,6 @@ namespace synthese
 
 	namespace admin
 	{
-		const string AdminInterfaceElement::PARAMETER_TAB("ta");
-
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
 			const AdminInterfaceElement& currentPage
 		) const	{
@@ -195,18 +193,21 @@ namespace synthese
 
 			if (_tabs.empty()) return;
 
-//			string currentTab(_request->_getParametersMap()->getString(PARAMETER_TAB, false, getFactoryKey()));
 			bool first(true);
 			stream << "<div id=\"admin_tabs\">";
 			BOOST_FOREACH(const Tab& tab, _tabs)
 			{
 				stream << "<span id=\"tab_" << tab.getId() << "\"";
-//				if(currentTab.empty() && first || tab.getId() == currentTab)
-				if(first)
+				if(_activeTab.empty() && first || tab.getId() == _activeTab)
 				{
 					stream << " class=\"active_tab\"";
 				}
-				stream << " onclick=\"activateTab(this);\">" << tab.getTitle() << "</span>";
+				stream << " onclick=\"activateTab(this);\">";
+				if (!tab.getIcon().empty())
+				{
+					stream  << HTMLModule::getHTMLImage(tab.getIcon(), tab.getTitle()) << "&nbsp;";
+				}
+				stream << tab.getTitle() << "</span>";
 				first = false;
 			}
 			stream << "</div>";
@@ -266,8 +267,12 @@ namespace synthese
 				return false;
 			}
 
-			stream << "<div class=\"tabdiv " << (first ? "active_tab_content" : "") 
-				<< "\" id=\"tab_" << _currentTab->getId() << "_content\">";
+			stream << "<div class=\"tabdiv ";
+			if (_activeTab.empty() && first || _activeTab == _currentTab->getId())
+			{
+				stream << "active_tab_content";
+			}
+			stream << "\" id=\"tab_" << _currentTab->getId() << "_content\">";
 			return true;
 		}
 
@@ -289,6 +294,14 @@ namespace synthese
 		) const {
 			assert(_currentTab != NULL);
 			return _currentTab->getWritePermission();
+		}
+
+
+
+		void AdminInterfaceElement::setActiveTab(
+			const std::string& value
+		){
+			_activeTab = value;
 		}
 
 
@@ -339,10 +352,12 @@ namespace synthese
 		AdminInterfaceElement::Tab::Tab(
 			std::string title,
 			std::string id,
-			bool writePermission
+			bool writePermission,
+			string icon
 		):	_title(title),
 			_id(id),
-			_writePermission(writePermission)
+			_writePermission(writePermission),
+			_icon(icon)
 		{
 		}
 
@@ -365,6 +380,54 @@ namespace synthese
 		bool AdminInterfaceElement::Tab::getWritePermission(
 		) const {
 			return _writePermission;
+		}
+
+
+
+		std::string AdminInterfaceElement::Tab::getIcon(
+		) const {
+			return _icon;
+		}
+
+
+
+		std::string AdminInterfaceElement::getTabLinkButton(
+			const string& tab
+		) const {
+			if (!_tabBuilded)
+			{
+				_buildTabs();
+			}
+
+			BOOST_FOREACH(const Tab& rtab, _tabs)
+			{
+				if(rtab.getId() == tab)
+				{
+					return HTMLModule::getLinkButton("activateTab(document.getElementById('tab_"+ rtab.getId() +"'));", rtab.getTitle(), string(), rtab.getIcon(), true);
+				}
+			}
+			return string();
+		}
+
+
+
+		const std::string& AdminInterfaceElement::getCurrentTab(
+		) const {
+			return (_currentTab == NULL) ? string() : _currentTab->getId();
+		}
+
+
+
+		const std::string& AdminInterfaceElement::getActiveTab(
+		) const {
+			return _activeTab;
+		}
+
+
+
+		const Request* AdminInterfaceElement::getRequest(
+		) const {
+			return _request;
 		}
 	}
 }

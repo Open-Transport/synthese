@@ -54,7 +54,7 @@ namespace synthese
 			pv.push_back(functionIfSucceed->_getParametersMap().getQueryString(true).getContent());
 			pv.push_back(title);
 
-			InterfacePage::display(
+			InterfacePage::_display(
 				stream
 				, pv
 				, variables

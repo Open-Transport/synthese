@@ -39,7 +39,7 @@ namespace synthese
 			ParametersVector pv;
 			pv.push_back(url);
 
-			InterfacePage::display(stream, pv, vars, NULL, request);
+			InterfacePage::_display(stream, pv, vars, NULL, request);
 		}
 
 		void RedirectInterfacePage::display( std::ostream& stream, VariablesMap& vars, const server::Request* request /*= NULL*/ ) const

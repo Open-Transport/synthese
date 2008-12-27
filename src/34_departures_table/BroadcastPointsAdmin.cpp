@@ -65,7 +65,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::ICON("building.png");
-		template<> const string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::DEFAULT_TITLE("Points de diffusion");
+		template<> const string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::DEFAULT_TITLE("Lieux de diffusion");
 	}
 
 	namespace departurestable
@@ -105,12 +105,14 @@ namespace synthese
 				, _cityName
 				, _placeName
 				, _displayNumber
+				, _cpuNumber
 				, _lineUId
 				, _requestParameters.maxSize
 				, _requestParameters.first
 				, _requestParameters.orderField == PARAMETER_CITY_NAME
 				, _requestParameters.orderField == PARAMETER_PLACE_NAME
 				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
+				, _requestParameters.orderField == PARAMETER_CPU_NUMBER
 				, _requestParameters.raisingOrder
 			));
 
@@ -152,6 +154,7 @@ namespace synthese
 			h.push_back(make_pair(PARAMETER_CITY_NAME, "Commune"));
 			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
 			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
+			h.push_back(make_pair(PARAMETER_CPU_NUMBER, "Unités centrales"));
 			h.push_back(make_pair(string(), "Actions"));
 			ResultHTMLTable t(h,st.getForm(), _requestParameters, resultParameters);
 

@@ -28,16 +28,15 @@
 #include "33_route_planner/RoutePlanner.h"
 #include "33_route_planner/JourneysResult.h"
 
-#include "31_resa/ResaRight.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/ReservationTableSync.h"
-#include "31_resa/ResaDBLog.h"
-#include "31_resa/ResaModule.h"
-
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "ResaRight.h"
+#include "ReservationTransaction.h"
+#include "Reservation.h"
+#include "ReservationTransactionTableSync.h"
+#include "ReservationTableSync.h"
+#include "ResaDBLog.h"
+#include "ResaModule.h"
+#include "ActionException.h"
+#include "Request.h"
 
 #include "15_env/Place.h"
 #include "15_env/City.h"
@@ -345,6 +344,15 @@ namespace synthese
 		void BookReservationAction::setJourney( const env::Journey& journey )
 		{
 			_journey = journey;
+		}
+
+
+
+		bool BookReservationAction::_isAuthorized(
+		) const {
+			return
+				_request->isAuthorized<ResaRight>(WRITE) ||
+				_customer->getKey() == _request->getUser()->getKey() && _request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
 		}
 	}
 }

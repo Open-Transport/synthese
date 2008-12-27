@@ -43,7 +43,7 @@ namespace synthese
 			ParametersVector pv;
 			pv.push_back( synthese::util::Conversion::ToString( columnNumber ) );
 			
-			InterfacePage::display( stream, pv, variables, (const void*) object, request );
+			InterfacePage::_display( stream, pv, variables, (const void*) object, request );
 		}
 
 

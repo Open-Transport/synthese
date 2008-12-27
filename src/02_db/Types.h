@@ -27,16 +27,18 @@ namespace synthese
 {
 	namespace db
 	{
+		////////////////////////////////////////////////////////////////////
+		/// SQLite data types (see http://www.sqlite.org/datatype3.html)
 		typedef enum
 		{
-			INTEGER,
-			DOUBLE,
-			TEXT,
-			REAL,
-			BOOLEAN,
-			TIME,
-			DATE,
-			TIMESTAMP
+			SQL_INTEGER,
+			SQL_DOUBLE,
+			SQL_TEXT,
+			SQL_REAL,
+			SQL_BOOLEAN,
+			SQL_TIME,
+			SQL_DATE,
+			SQL_TIMESTAMP
 		} FieldType;
 
 		typedef enum

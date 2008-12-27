@@ -115,5 +115,13 @@ namespace synthese
 		{
 	
 		}
+
+
+
+		bool DisplayScreenContentRequest::_isAuthorized(
+
+			) const {
+			return true;
+		}
 	}
 }

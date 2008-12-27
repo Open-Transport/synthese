@@ -28,7 +28,7 @@
 
 #include "04_time/TimeParseException.h"
 #include "04_time/DateTime.h"
-
+#include "MessagesRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -42,6 +42,8 @@ namespace synthese
 	using namespace time;
 	using namespace db;
 	using namespace util;
+	using namespace security;
+	
 
 	template<> const string util::FactorableTemplate<Action, messages::UpdateAlarmAction>::FACTORY_KEY("updatealarm");
 	
@@ -105,6 +107,13 @@ namespace synthese
 				_singleSentAlarm->setIsEnabled(_enabled);
 			}
 			AlarmTableSync::Save(_alarm.get());
+		}
+
+
+
+		bool UpdateAlarmAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

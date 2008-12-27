@@ -31,7 +31,8 @@
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesLibraryLog.h"
 #include "17_messages/MessagesLog.h"
-
+#include "MessagesLibraryRight.h"
+#include "MessagesRight.h"
 #include "01_util/Conversion.h"
 
 #include "30_server/ActionException.h"
@@ -127,6 +128,20 @@ namespace synthese
 		void AlarmAddLinkAction::setObjectId(RegistryKeyType id )
 		{
 			_objectId = id;
+		}
+
+
+
+		bool AlarmAddLinkAction::_isAuthorized(
+		) const {
+			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
+			{
+				return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+			}
+			else
+			{
+				return _request->isAuthorized<MessagesRight>(WRITE);
+			}
 		}
 	}
 }

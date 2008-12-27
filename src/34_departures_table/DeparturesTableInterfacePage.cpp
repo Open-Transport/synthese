@@ -62,7 +62,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(displayTeam));
 			pv.push_back(place->getFullName());
 
-			InterfacePage::display(
+			InterfacePage::_display(
 				stream
 				, pv
 				, vars

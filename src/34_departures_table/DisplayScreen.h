@@ -1,4 +1,7 @@
+#ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
+#define SYNTHESE_CTABLEAUAFFICHAGE_H
 
+////////////////////////////////////////////////////////////////////
 /// DisplayScreen class header.
 ///	@file DisplayScreen.h
 ///	@author Hugues Romain
@@ -20,9 +23,7 @@
 ///	You should have received a copy of the GNU General Public License
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-#ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
-#define SYNTHESE_CTABLEAUAFFICHAGE_H
+////////////////////////////////////////////////////////////////////
 
 #include <set>
 #include <string>
@@ -31,7 +32,6 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "DateTime.h"
 #include "DBLog.h"
 #include "15_env/Types.h"
 #include "34_departures_table/Types.h"
@@ -49,6 +49,7 @@ namespace synthese
 	namespace departurestable
 	{
 		class DisplayType;
+		class DisplayScreenCPU;
 
 		/** Terminal d'affichage.
 			@ingroup m54
@@ -82,21 +83,20 @@ namespace synthese
 			typedef util::Registry<DisplayScreen>	Registry;
 
 			typedef enum {
-				STANDARD_METHOD = 0
-				, WITH_FORCED_DESTINATIONS_METHOD = 1
+				STANDARD_METHOD = 0,
+				WITH_FORCED_DESTINATIONS_METHOD = 1,
+				ROUTE_PLANNING = 2
 			} GenerationMethod;
 
 		protected:
-			//! \name Localization
+			//! \name Technical data
 			//@{
 				const env::PublicTransportStopZoneConnectionPlace*	_localization;		//!< Localization of the display screen (belongs to a place)
 				std::string											_localizationComment;
-			//@}
-
-			//! \name Technical data
-			//@{
-				const DisplayType*	_displayType;
-				int					_wiringCode;	// Display ID in a bus
+				const DisplayType*									_displayType;
+				int													_wiringCode;	// Display ID in a bus
+				int													_comPort;
+				const DisplayScreenCPU*								_cpu;
 			//@}
 
 			//! \name Appearance
@@ -106,6 +106,7 @@ namespace synthese
 				bool				_trackNumberDisplay;
 				bool				_serviceNumberDisplay;
 				bool				_displayTeam;
+				bool				_displayClock;
 			//@}
 
 			//! \name Content
@@ -137,15 +138,16 @@ namespace synthese
 			//@}
 
 
-			//!	\name Méthodes protégées
+			//!	\name Protected
 			//@{
 				time::DateTime	_MomentFin(const time::DateTime& __MomentDebut)			const;
 			//@}
 
 		public:
-			//!	\name Constructors/Destructors
+			//!	\name Constructor/Destructor
 			//@{
 				DisplayScreen(util::RegistryKeyType key = UNKNOWN_VALUE);
+				~DisplayScreen();
 			//@}
 
 			//!	\name Setters
@@ -169,6 +171,9 @@ namespace synthese
 				void	setType(const DisplayType*);
 				void	setWiringCode(int);				
 				void	setDisplayTeam(bool value);
+				void	setCPU(const DisplayScreenCPU* value);
+				void	setDisplayClock(bool value);
+				void	setComPort(int value);
 			//@}
 
 			//! \name Modifiers
@@ -213,6 +218,9 @@ namespace synthese
 				bool							getIsOnline()					const;
 				const std::string&				getMaintenanceMessage()			const;
 				bool							getDisplayTeam()				const;
+				const DisplayScreenCPU*			getCPU()						const;
+				int								getComPort()					const;
+				bool							getDisplayClock()				const;
 			//@}
 
 			//! \name Queries

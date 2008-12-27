@@ -31,6 +31,8 @@
 #include "ParametersMap.h"
 #include "DisplayMaintenanceLog.h"
 #include "Request.h"
+#include "DisplayMaintenanceRight.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
 using namespace boost;
@@ -41,6 +43,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace dblog;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, departurestable::UpdateDisplayMaintenanceAction>::FACTORY_KEY("udm");
 
@@ -106,6 +109,20 @@ namespace synthese
 			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Specified display screen not found");
+			}
+		}
+
+
+
+		bool UpdateDisplayMaintenanceAction::_isAuthorized(
+		) const {
+			if (_displayScreen->getLocalization().get() != NULL)
+			{
+				return _request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
+			}
+			else
+			{
+				return _request->isAuthorized<DisplayMaintenanceRight>(WRITE);
 			}
 		}
 	}

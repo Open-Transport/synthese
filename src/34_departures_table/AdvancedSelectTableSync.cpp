@@ -34,6 +34,7 @@
 #include "DisplayScreenTableSync.h"
 #include "Env.h"
 #include "Conversion.h"
+#include "DisplayScreenCPUTableSync.h"
 
 #include <sstream>
 
@@ -58,12 +59,14 @@ namespace synthese
 			, std::string cityName /*= ""*/
 			, std::string placeName /*= ""*/
 			, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
+			, BroadcastPointsPresence cpuPresence
 			, uid lineId /*= UNKNOWN_VALUE*/
 			, int number/*=UNKNOWN_VALUE*/
 			, int first/*=0*/ 
 			, bool orderByCity
 			, bool orderByName
 			, bool orderByNumber
+			, bool orderByCPUNumber
 			, bool raisingOrder
 		){
 			stringstream query;
@@ -73,6 +76,7 @@ namespace synthese
 					<< "p.*"
 					<< ",c." << CityTableSync::TABLE_COL_NAME << " AS city_name"
 					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE.NAME << " AS b WHERE b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
+					<< ",(SELECT COUNT(s." << TABLE_COL_ID << ") FROM " << DisplayScreenCPUTableSync::TABLE.NAME << " AS s WHERE s." << DisplayScreenCPUTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS cc"
 				<< " FROM " // Tables
 					<< ConnectionPlaceTableSync::TABLE.NAME << " AS p"
 					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
@@ -97,15 +101,33 @@ namespace synthese
 				if (bpPresence == NO_BROADCASTPOINT)
 					query << "=0";
 			}
+			if (cpuPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
+			{
+				query << " AND cc ";
+				if (cpuPresence == AT_LEAST_ONE_BROADCASTPOINT)
+					query << ">0";
+				if (cpuPresence == NO_BROADCASTPOINT)
+					query << "=0";
+			}
 			// Grouping
 			query << " GROUP BY p." << TABLE_COL_ID;
 			// Order
 			if (orderByCity)
+			{
 				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (orderByName)
+			}
+			else if (orderByName)
+			{
 				query << " ORDER BY p." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (orderByNumber)
+			}
+			else if (orderByNumber)
+			{
 				query << " ORDER BY bc" << (raisingOrder ? " ASC" : " DESC");
+			}
+			else if (orderByCPUNumber)
+			{
+				query << " ORDER BY cc" << (raisingOrder ? " ASC" : " DESC");
+			}
 			// Limits
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
@@ -120,6 +142,7 @@ namespace synthese
 				{
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = rows->getInt ("bc");
+					object->cpuNumber = rows->getInt("cc");
 					object->place.reset(new PublicTransportStopZoneConnectionPlace(rows->getKey()));
 					ConnectionPlaceTableSync::Load(object->place.get(), rows, env);
 					object->cityName = rows->getText ("city_name");

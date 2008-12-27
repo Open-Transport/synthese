@@ -422,5 +422,13 @@ namespace synthese
 		{
 			return _internalParameters;
 		}
+
+
+
+		Request::~Request(
+
+			) {
+
+		}
 	}
 }

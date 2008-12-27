@@ -65,7 +65,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(withCanceledReservations));
 			pv.push_back(line.get() ? line->getShortName() : string());
 
-			InterfacePage::display(
+			InterfacePage::_display(
 				stream
 				, pv
 				, variables

@@ -48,6 +48,7 @@
 #include "SentAlarm.h"
 
 #include <sstream>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -99,40 +100,45 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE(
-			DisplayScreenTableSync::CreateFormat(
-				"t041_display_screens",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_PLACE_ID, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_TYPE_ID, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_WIRING_CODE, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_TITLE, TEXT),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_BLINKING_DELAY, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, TEXT),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, TEXT),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS, TEXT),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_DIRECTION, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, TEXT),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_MAX_DELAY, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_CLEARING_DELAY, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_FIRST_ROW, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_GENERATION_METHOD, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, TEXT),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, INTEGER),
-					SQLiteTableFormat::Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, TEXT),
-					SQLiteTableFormat::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(DisplayScreenTableSync::COL_PLACE_ID),
-					SQLiteTableFormat::Index()
-		)	)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE(
+			"t041_display_screens"
+		);
+		
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayScreenTableSync>::_FIELDS[] =
+		{
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_PLACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TYPE_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_WIRING_CODE, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_TITLE, SQL_TEXT),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_BLINKING_DELAY, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, SQL_TEXT),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, SQL_TEXT),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS, SQL_TEXT),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_DIRECTION, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, SQL_TEXT),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAX_DELAY, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_CLEARING_DELAY, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_FIRST_ROW, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_GENERATION_METHOD, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, SQL_TEXT),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, SQL_INTEGER),
+					SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
+					SQLiteTableSync::Field()
+		};
+		
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayScreenTableSync>::_INDEXES[] =
+		{
+					SQLiteTableSync::Index(DisplayScreenTableSync::COL_PLACE_ID.c_str(), ""),
+					SQLiteTableSync::Index()
+		};
 					
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
 			DisplayScreen* object,
@@ -180,11 +186,11 @@ namespace synthese
 
 				// Physical stops
 				vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
-				for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+				BOOST_FOREACH(const string& stop, stops)
 				{
 					try
 					{
-						uid id(Conversion::ToLongLong(*it));
+						uid id(Conversion::ToLongLong(stop));
 						object->addPhysicalStop(PhysicalStopTableSync::Get(id, env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PhysicalStop>& e)
@@ -195,11 +201,11 @@ namespace synthese
 
 				// Forbidden places
 				stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
-				for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+				BOOST_FOREACH(const string& stop, stops)
 				{
 					try
 					{
-						object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), env, linkLevel).get());
+						object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
@@ -209,11 +215,11 @@ namespace synthese
 
 				// Displayed places
 				stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
-				for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+				BOOST_FOREACH(const string& stop, stops)
 				{
 					try
 					{
-						object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(*it), env, linkLevel).get());
+						object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
@@ -223,11 +229,11 @@ namespace synthese
 
 				// Forced destinations
 				stops = Conversion::ToStringVector (rows->getText ( DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
-				for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
+				BOOST_FOREACH(const string& stop, stops)
 				{
 					try
 					{
-						object->addForcedDestination(ConnectionPlaceTableSync::Get (Conversion::ToLongLong(*it), env, linkLevel).get());
+						object->addForcedDestination(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stops), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
@@ -330,12 +336,12 @@ namespace synthese
 				<< ",'";
 
 			count = 0;
-			for (DisplayedPlacesList::const_iterator itd = object->getForcedDestinations().begin(); itd != object->getForcedDestinations().end(); ++itd)
+			for (DisplayedPlacesList::const_iterator itd2 = object->getForcedDestinations().begin(); itd2 != object->getForcedDestinations().end(); ++itd2)
 			{
-				assert(itd->second->getKey() > 0);
+				assert(itd2->second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itd->first);
+				query << Conversion::ToString(itd2->first);
 			}
 
 			query
@@ -463,9 +469,10 @@ namespace synthese
 
 
 
-		boost::shared_ptr<SentAlarm> DisplayScreenTableSync::GetCurrentDisplayedMessage(
+		vector<boost::shared_ptr<SentAlarm> > DisplayScreenTableSync::GetCurrentDisplayedMessage(
 			util::Env& env,
-			util::RegistryKeyType screenId
+			util::RegistryKeyType screenId,
+			int limit
 		) {
 			DateTime now(TIME_CURRENT);
 			stringstream q;
@@ -477,12 +484,18 @@ namespace synthese
 				<< " AND NOT a." << AlarmTableSync::COL_IS_TEMPLATE
 				<< " AND (a." << AlarmTableSync::COL_PERIODSTART << " IS NULL OR a." << AlarmTableSync::COL_PERIODSTART << "<" << now.toSQLString() << ")"
 				<< " AND (a." << AlarmTableSync::COL_PERIODEND << " IS NULL OR a." << AlarmTableSync::COL_PERIODEND << ">" << now.toSQLString() << ")"
-				<< " ORDER BY a." << AlarmTableSync::COL_LEVEL << " DESC, a." << AlarmTableSync::COL_PERIODSTART << " DESC"
-				<< " LIMIT 1";
+				<< " ORDER BY a." << AlarmTableSync::COL_LEVEL << " DESC, a." << AlarmTableSync::COL_PERIODSTART << " DESC";
+			if (limit > 0)
+			{
+				q << " LIMIT 1";
+			}
 			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());
-			return rows->next() ?
-				static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)) :
-				shared_ptr<SentAlarm>();
+			vector<shared_ptr<SentAlarm> > result;
+			while(rows->next())
+			{
+				result.push_back(static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)));
+			}
+			return result;
 		}
 
 

@@ -52,19 +52,19 @@ namespace synthese
 
     namespace db
     {
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE(
 			PhysicalStopTableSync::CreateFormat(
 				"t012_physical_stops",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_PLACEID, INTEGER, false),
-					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_X, DOUBLE),
-					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_Y, DOUBLE),
-					SQLiteTableFormat::Field(PhysicalStopTableSync::COL_OPERATOR_CODE, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(PhysicalStopTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(PhysicalStopTableSync::COL_PLACEID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(PhysicalStopTableSync::COL_X, SQL_DOUBLE),
+					SQLiteTableSync::Field(PhysicalStopTableSync::COL_Y, SQL_DOUBLE),
+					SQLiteTableSync::Field(PhysicalStopTableSync::COL_OPERATOR_CODE, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(PhysicalStopTableSync::COL_PLACEID),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(PhysicalStopTableSync::COL_PLACEID),
+					SQLiteTableSync::Index()
 		)	)	);
 
 

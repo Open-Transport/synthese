@@ -70,6 +70,8 @@ namespace synthese
 			CancelReservationAction();
 
 			void setTransaction(boost::shared_ptr<ReservationTransaction> transaction);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

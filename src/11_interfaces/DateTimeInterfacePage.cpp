@@ -54,7 +54,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(dateTime.getMinutes()));
 			pv.push_back(Conversion::ToString(dateTime.getDate().getWeekDay()));
 
-			InterfacePage::display(stream, pv, variables, NULL, request);
+			InterfacePage::_display(stream, pv, variables, NULL, request);
 		}
 
 		void DateTimeInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const time::Date& date , const server::Request* request /*= NULL  */ ) const
@@ -68,7 +68,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(UNKNOWN_VALUE));
 			pv.push_back(Conversion::ToString(date.getWeekDay()));
 
-			InterfacePage::display(stream, pv, variables, NULL, request);
+			InterfacePage::_display(stream, pv, variables, NULL, request);
 		}
 
 

@@ -132,7 +132,7 @@ namespace synthese
 			pv.push_back(journey->getDepartureTime().toSQLString(false));
 			pv.push_back(Conversion::ToString(isTheLast));
 			
-			InterfacePage::display(stream, pv, variables, static_cast<const void*>(journey), request);
+			InterfacePage::_display(stream, pv, variables, static_cast<const void*>(journey), request);
 		}
 
 

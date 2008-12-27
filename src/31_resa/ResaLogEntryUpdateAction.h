@@ -79,6 +79,8 @@ namespace synthese
 			ResaLogEntryUpdateAction();
 
 			void setEntryId(uid id);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

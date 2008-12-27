@@ -25,7 +25,7 @@
 #include "17_messages/SingleSentAlarm.h"
 #include "17_messages/SingleSentAlarmInheritedTableSync.h"
 #include "17_messages/MessagesLog.h"
-
+#include "MessagesRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -53,19 +53,22 @@ namespace synthese
 		}
 
 		void AlarmStopAction::_setFromParametersMap(const ParametersMap& map)
+			throw(ActionException)
 		{
 			try
 			{
 				_alarm = SingleSentAlarmInheritedTableSync::GetEditable(_request->getObjectId(), _env);
 			}
-			catch(...)
+			catch(ObjectNotFoundException<SingleSentAlarm>& e)
 			{
-				throw ActionException("Specified alarm not found.");
+				throw ActionException("alarm", FACTORY_KEY, e);
 			}
 
 			DateTime now(TIME_CURRENT);
 			if (!_alarm->getPeriodEnd().isUnknown() && _alarm->getPeriodEnd() < now)
+			{
 				throw ActionException("This alarm has not to be stopped.");
+			}
 		}
 
 		AlarmStopAction::AlarmStopAction()
@@ -82,6 +85,13 @@ namespace synthese
 
 			// Log
 			MessagesLog::addUpdateEntry(dynamic_pointer_cast<const SingleSentAlarm, SingleSentAlarm>(_alarm).get(), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser().get());
+		}
+
+
+
+		bool AlarmStopAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

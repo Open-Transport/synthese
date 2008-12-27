@@ -119,6 +119,8 @@ namespace synthese
 			BookReservationAction();
 			
 			void setJourney(const env::Journey& journey);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

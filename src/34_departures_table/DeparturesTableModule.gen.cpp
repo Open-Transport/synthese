@@ -20,10 +20,12 @@ synthese::departurestable::DisplayTypesAdmin::integrate();
 synthese::departurestable::BroadcastPointsAdmin::integrate();
 synthese::departurestable::DisplayAdmin::integrate();
 synthese::departurestable::DisplayTypeAdmin::integrate();
+synthese::departurestable::DisplayScreenCPUAdmin::integrate();
 
 synthese::departurestable::DisplayTypeTableSync::integrate();
 synthese::departurestable::DisplayScreenTableSync::integrate();
 synthese::departurestable::DisplayMonitoringStatusTableSync::integrate();
+synthese::departurestable::DisplayScreenCPUTableSync::integrate();
 
 synthese::departurestable::CreateDisplayTypeAction::integrate();
 synthese::departurestable::UpdateDisplayTypeAction::integrate();
@@ -42,6 +44,7 @@ synthese::departurestable::DisplayScreenRemoveForbiddenPlaceAction::integrate();
 synthese::departurestable::UpdateDisplayMaintenanceAction::integrate();
 synthese::departurestable::DisplayTypeRemoveAction::integrate();
 synthese::departurestable::DisplayScreenRemove::integrate();
+synthese::departurestable::DisplayScreenAppearanceUpdateAction::integrate();
 
 synthese::departurestable::DisplayScreenContentRequest::integrate();
 synthese::departurestable::DisplayScreenSupervisionRequest::integrate();
@@ -60,3 +63,4 @@ synthese::departurestable::DisplayScreenAlarmRecipient::integrate();
 synthese::util::Env::Integrate<synthese::departurestable::DisplayScreen>();
 synthese::util::Env::Integrate<synthese::departurestable::DisplayType>();
 synthese::util::Env::Integrate<synthese::departurestable::DisplayMonitoringStatus>();
+synthese::util::Env::Integrate<synthese::departurestable::DisplayScreenCPU>();

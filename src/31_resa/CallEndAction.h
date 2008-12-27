@@ -58,6 +58,8 @@ namespace synthese
 			void run();
 			
 			CallEndAction();
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

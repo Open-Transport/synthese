@@ -28,8 +28,8 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#include "01_util/Constants.h"
-#include "01_util/UId.h"
+#include "Constants.h"
+#include "UId.h"
 
 namespace synthese
 {

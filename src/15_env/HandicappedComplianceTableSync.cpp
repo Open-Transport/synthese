@@ -55,14 +55,14 @@ namespace synthese
 
 	namespace db
 	{
-			template<> const SQLiteTableFormat SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE(
+			template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE(
 			HandicappedComplianceTableSync::CreateFormat(
 				"t019_handicapped_compliances",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(HandicappedComplianceTableSync::COL_STATUS, INTEGER),
-					SQLiteTableFormat::Field(HandicappedComplianceTableSync::COL_CAPACITY, INTEGER),
-					SQLiteTableFormat::Field(HandicappedComplianceTableSync::COL_RESERVATION_RULE, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_STATUS, SQL_INTEGER),
+					SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_CAPACITY, SQL_INTEGER),
+					SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_RESERVATION_RULE, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

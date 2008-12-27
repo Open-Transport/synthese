@@ -1,37 +1,41 @@
-
-/** HTMLForm class header.
-	@file HTMLForm.h
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// HTMLForm class header.
+///	@file HTMLForm.h
+///	@author Hugues Romain
+///	@date 2008-12-26 19:13
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_HTMLForm_h__
 #define SYNTHESE_HTMLForm_h__
+
+#include "01_util/Constants.h"
+#include "HTMLModule.h"
+#include "Registry.h"
 
 #include <map>
 #include <vector>
 #include <utility>
 #include <string>
 #include <sstream>
-
-#include "01_util/Constants.h"
-
-#include "05_html/HTMLModule.h"
+#include <boost/foreach.hpp>
 
 namespace synthese
 {
@@ -126,12 +130,12 @@ namespace synthese
 
 			
 		public:
-			/** HTML Form constructor.
-				@param name Name of the form in the HTML document
-				@param action Action to run at the form submit
-				@author Hugues Romain
-				@date 2007				
-			*/
+			////////////////////////////////////////////////////////////////////
+			/// HTML Form constructor.
+			///	@param name Name of the form in the HTML document
+			///	@param action Action to run at the form submit
+			///	@author Hugues Romain
+			///	@date 2007
 			HTMLForm(const std::string& name, const std::string& action);
 
 
@@ -298,17 +302,64 @@ namespace synthese
 
 			//! @name Fields generators
 			//@{
-				/** Externally sorted selection list HTML field (select)
-					@param name Name of the field
-					@param choices List of choices : a map sorted by elements of S (the sort value is not read), giving pairs "value => text"
-					@param value Default selected value
-					@return Selection list HTML input field
-					@author Hugues Romain
-					@date 2007					
-				*/
+				////////////////////////////////////////////////////////////////////
+				/// Builds a select input HTML field from a generic vector
+				///	@param name Name of the field
+				///	@param choices List of choices : a map sorted by elements of S (the sort value is not read), giving pairs "value => text"
+				///	@param value Default selected value
+				///	@return Selection list HTML input field
+				///	@author Hugues Romain
+				///	@date 2007
+				/// K : type of the keys
+				/// T : type of the objects
 				template<class K, class T>
-				std::string getSelectInput(const std::string& name, const std::vector<std::pair<K, T> >& choices, const K& value);
+				std::string getSelectInput(
+					const std::string& name,
+					const std::vector<std::pair<K, T> >& choices,
+					const K& value
+				);
 
+
+
+				////////////////////////////////////////////////////////////////////
+				/// Builds a select input HTML field from a generic map
+				///	@param name Name of the field
+				///	@param choices List of choices : a map sorted by elements of S (the sort value is not read), giving pairs "value => text"
+				///	@param value Default selected value
+				///	@return Selection list HTML input field
+				///	@author Hugues Romain
+				///	@date 2007
+				/// K : type of the keys
+				/// T : type of the objects
+				template<class K, class T>
+				std::string getSelectInput(
+					const std::string& name,
+					const std::map<K, T>& choices,
+					const K& value
+				);
+
+				
+				
+				////////////////////////////////////////////////////////////////////
+				///	Builds select input from a registry.
+				///	@param name Name of the field
+				///	@param registry Registry to display
+				///	@param value Default selected value
+				/// @param zeroLabel Label for the zero value (if empty : no zero value)
+				/// @param zeroLabel Label for the -1 value (if empty : no -1 value)
+				///	@return std::string
+				///	@author Hugues Romain
+				///	@date 2008
+				/// T : type of the objects
+				/// @warning The objects must have a getName() method
+				template<class T>
+				std::string getSelectInput(
+					const std::string& name,
+					const util::Registry<T>& registry,
+					const util::RegistryKeyType value,
+					const std::string& zeroLabel = std::string(),
+					const std::string& unknownLabel = std::string()
+				);
 				
 				
 				/** Radio input element generator (input type=radio).
@@ -336,6 +387,19 @@ namespace synthese
 				*/
 				template<class K>
 				std::string getRadioInput(const std::string& name, const std::vector<std::pair<K, std::string> >& choices, const K& value);
+
+
+
+				////////////////////////////////////////////////////////////////////
+				/// Radio input collection generated upon a vector of values (input type=radio).
+				///	@param name name of the field
+				///	@param choices map : first is the value of an element, second is the corresponding label
+				///	@param value default value of the field that determinate which radio element is checked at the page load
+				///	@return std::string the HTML generated code
+				///	@author Hugues Romain
+				///	@date 2008
+				template<class K>
+				std::string getRadioInput(const std::string& name, const std::map<K, std::string>& choices, const K& value);
 
 
 
@@ -542,20 +606,76 @@ namespace synthese
 			//@}
 		};
 
+
+
 // Method templates implementations ---------------------------------------------------------------
 
 
+		template<class T>
+		std::string HTMLForm::getSelectInput(
+			const std::string& name,
+			const util::Registry<T>& registry,
+			const util::RegistryKeyType value,
+			const std::string& zeroLabel /*= std::string()*/,
+			const std::string& unknownLabel /*= std::string()*/
+		){
+			std::stringstream s;
+
+			if (!_updateRight)
+			{
+				try
+				{
+					s << registry.get(value)->getName();
+				}
+				catch(ObjectNotFoundException<T>&)
+				{
+					s << "(inconnu)";
+				}
+			}
+			else
+			{
+				s << "<select name=\"" << name << "\" id=\"" << _getFieldId(name) << "\" >";
+				if (!unknownLabel.empty())
+				{
+					s << "<option value=\"" << UNKNOWN_VALUE << "\"";
+					if (value == static_cast<RegistryKeyType>(UNKNOWN_VALUE))
+						s << " selected=\"selected\"";
+					s << ">" << unknownLabel << "</option>";
+				}
+				if (!zeroLabel.empty())
+				{
+					s << "<option value=\"0\"";
+					if (value == static_cast<RegistryKeyType>(0))
+						s << " selected=\"selected\"";
+					s << ">" << zeroLabel << "</option>";
+				}
+				BOOST_FOREACH(shared_ptr<const T> object, registry.getOrderedVector())
+				{
+					s << "<option value=\"" << object->getKey() << "\"";
+					if (object->getKey() == value)
+						s << " selected=\"selected\"";
+					s << ">" << object->getName() << "</option>";
+				}
+				s << "</select>";
+			}
+			return s.str();
+		}
+
 
 		template<class K, class T>
-		std::string HTMLForm::getSelectInput( const std::string& name, const std::vector<std::pair<K, T> >& choices, const K& value )
-		{
+		std::string HTMLForm::getSelectInput(
+			const std::string& name,
+			const std::vector<std::pair<K, T> >& choices,
+			const K& value
+		){
 			std::stringstream s;
 
 			if (!_updateRight)
 			{
 				for (typename std::vector<std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
-					if (it->first == value)
-						s << it->second;
+				{
+					if (it->first == value)	s << it->second;
+				}
 			}
 			else
 			{
@@ -563,13 +683,42 @@ namespace synthese
 				for (typename std::vector<std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
 				{
 					s << "<option value=\"" << it->first << "\"";
-					if (it->first == value)
-						s << " selected=\"selected\"";
+					if (it->first == value)	s << " selected=\"selected\"";
 					s << ">" << it->second << "</option>";
 				}
 				s << "</select>";
 			}
 			return s.str();
+		}
+
+
+		template<class K, class T>
+		std::string HTMLForm::getSelectInput(
+			const std::string& name,
+			const std::map<K, T>& choices,
+			const K& value
+			){
+				std::stringstream s;
+
+				if (!_updateRight)
+				{
+					for (typename std::map<K,T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+					{
+						if (it->first == value)	s << it->second;
+					}
+				}
+				else
+				{
+					s << "<select name=\"" << name << "\" id=\"" << _getFieldId(name) << "\" >";
+					for (typename std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+					{
+						s << "<option value=\"" << it->first << "\"";
+						if (it->first == value)	s << " selected=\"selected\"";
+						s << ">" << it->second << "</option>";
+					}
+					s << "</select>";
+				}
+				return s.str();
 		}
 
 		template<class K>
@@ -608,6 +757,18 @@ namespace synthese
 			return s.str();
 		}
 
+
+
+		template<class K>
+		std::string HTMLForm::getRadioInput(const std::string& name, const std::map<K, std::string>& choices, const K& value)
+		{
+			std::stringstream s;
+			for (typename std::map<K, std::string>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			{
+				s << getRadioInput(name, it->first, value, it->second);
+			}
+			return s.str();
+		}
 	}
 }
 

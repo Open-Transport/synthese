@@ -76,7 +76,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(obj->getLongMessage())
 				<< ",''"
 				<< ",''"
-				<< ",O"
+				<< ",0"
 				<< ")";
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}

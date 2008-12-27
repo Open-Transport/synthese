@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DisplayTypeTableSync.h"
 #include "ArrivalDepartureTableLog.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "DBLogModule.h"
 
 #include "Interface.h"
@@ -46,6 +46,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace db;
 	using namespace dblog;
+	using namespace security;
+	
 
 	namespace util
 	{
@@ -178,6 +180,14 @@ namespace synthese
 			{
 				throw ActionException("Display Type not found / "+ e.getMessage());
 			}
+		}
+
+
+
+		bool UpdateDisplayTypeAction::_isAuthorized(
+
+			) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

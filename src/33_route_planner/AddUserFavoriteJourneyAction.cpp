@@ -27,7 +27,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-
+#include "GlobalRight.h"
 #include "UserTableSync.h"
 #include "User.h"
 
@@ -102,6 +102,16 @@ namespace synthese
 			f.setDestinationCityName(_destinationCityName);
 			f.setDestinationPlaceName(_destinationPlaceName);
 			UserFavoriteJourneyTableSync::Save(&f);
+		}
+
+
+
+		bool AddUserFavoriteJourneyAction::_isAuthorized(
+		) const {
+			return 
+				_request->isAuthorized<GlobalRight>(WRITE) ||
+				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
+
 		}
 	}
 }

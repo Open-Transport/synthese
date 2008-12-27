@@ -63,22 +63,22 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<LineStopTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<LineStopTableSync>::TABLE(
 			LineStopTableSync::CreateFormat(
 				"t010_line_stops",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(LineStopTableSync::COL_PHYSICALSTOPID, INTEGER, false),
-					SQLiteTableFormat::Field(LineStopTableSync::COL_LINEID, INTEGER, false),
-					SQLiteTableFormat::Field(LineStopTableSync::COL_RANKINPATH, INTEGER),
-					SQLiteTableFormat::Field(LineStopTableSync::COL_ISDEPARTURE, BOOLEAN),
-					SQLiteTableFormat::Field(LineStopTableSync::COL_ISARRIVAL, BOOLEAN),
-					SQLiteTableFormat::Field(LineStopTableSync::COL_METRICOFFSET, DOUBLE),
-					SQLiteTableFormat::Field(LineStopTableSync::COL_VIAPOINTS, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(LineStopTableSync::COL_PHYSICALSTOPID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(LineStopTableSync::COL_LINEID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(LineStopTableSync::COL_RANKINPATH, SQL_INTEGER),
+					SQLiteTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
+					SQLiteTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
+					SQLiteTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
+					SQLiteTableSync::Field(LineStopTableSync::COL_VIAPOINTS, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(LineStopTableSync::COL_LINEID),
-					SQLiteTableFormat::Index(LineStopTableSync::COL_PHYSICALSTOPID),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(LineStopTableSync::COL_LINEID),
+					SQLiteTableSync::Index(LineStopTableSync::COL_PHYSICALSTOPID),
+					SQLiteTableSync::Index()
 		)	)	);
 
 		

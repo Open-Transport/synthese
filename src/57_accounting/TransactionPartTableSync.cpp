@@ -59,7 +59,7 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE.NAME = "t030_transaction_parts";
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE.NAME = "t030_transaction_parts";
 		template<> const int SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE.ID = 30;
 		template<> const bool SQLiteTableSyncTemplate<TransactionPartTableSync>::HAS_AUTO_INCREMENT = true;
 
@@ -135,15 +135,15 @@ namespace synthese
 			: SQLiteNoSyncTableSyncTemplate<TransactionPartTableSync,TransactionPart>()
 		{
 			// Columns
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_TRANSACTION_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_LEFT_CURRENCY_AMOUNT, "REAL", true);
-			addTableColumn(TABLE_COL_RIGHT_CURRENCY_AMOUNT, "REAL", true);
-			addTableColumn(TABLE_COL_ACCOUNT_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_RATE_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_TRADED_OBJECT_ID, "TEXT", true);
-			addTableColumn(TABLE_COL_COMMENT, "TEXT", true);
-			addTableColumn(COL_STOCK_ID, "INTEGER", true);
+			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
+			addTableColumn(TABLE_COL_TRANSACTION_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_LEFT_CURRENCY_AMOUNT, "SQL_REAL", true);
+			addTableColumn(TABLE_COL_RIGHT_CURRENCY_AMOUNT, "SQL_REAL", true);
+			addTableColumn(TABLE_COL_ACCOUNT_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_RATE_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_TRADED_OBJECT_ID, "SQL_TEXT", true);
+			addTableColumn(TABLE_COL_COMMENT, "SQL_TEXT", true);
+			addTableColumn(COL_STOCK_ID, "SQL_INTEGER", true);
 
 			// Indexes
 			addTableIndex(TABLE_COL_TRANSACTION_ID);

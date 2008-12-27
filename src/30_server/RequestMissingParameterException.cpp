@@ -26,8 +26,11 @@ namespace synthese
 {
 	namespace server
 	{
-		RequestMissingParameterException::RequestMissingParameterException( const std::string& fieldName, const std::string& actionFunctionCode)
-			: util::Exception("Missing parameter " + fieldName + " in action/function " + actionFunctionCode)
+		RequestMissingParameterException::RequestMissingParameterException(
+			const std::string& fieldName,
+			const std::string& actionFunctionCode
+		) throw() :
+			util::Exception("Missing parameter " + fieldName + " in action/function " + actionFunctionCode)
 		{
 
 		}

@@ -102,5 +102,13 @@ namespace synthese
 		{
 			_isForOrigin = isForOrigin;
 		}
+
+
+
+		bool CityListRequest::_isAuthorized(
+
+			) const {
+		return true;
+		}
 	}
 }

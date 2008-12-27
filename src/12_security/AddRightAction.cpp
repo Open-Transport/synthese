@@ -27,7 +27,7 @@
 #include "12_security/ProfileTableSync.h"
 #include "12_security/Right.h"
 #include "12_security/SecurityLog.h"
-
+#include "SecurityRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -91,6 +91,14 @@ namespace synthese
 			ProfileTableSync::Save(_profile.get());
 
 			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), "Ajout habilitation " + _rightName + "/" + _parameter);
+		}
+
+
+
+		bool AddRightAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<SecurityRight>(WRITE);
+			/// @todo Add a control on the profile on the user who creates the new profile
 		}
 	}
 }

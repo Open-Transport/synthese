@@ -79,5 +79,12 @@ namespace synthese
 			TridentExport t(env, _line->getKey(), _withTisseoExtension);
 			t.run(stream);
 		}
+
+
+
+		bool TridentExportFunction::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

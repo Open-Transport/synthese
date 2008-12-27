@@ -1,24 +1,27 @@
-
-/** HTMLModule class header.
-	@file HTMLModule.h
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// HTMLModule class header.
+///	@file HTMLModule.h
+///	@author Hugues Romain
+///	@date 2008-12-26 19:41
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SYNTHESE_HTMLModule_H__
 #define SYNTHESE_HTMLModule_H__
@@ -50,6 +53,10 @@ namespace synthese
 				@param url URL to go on click on the link
 				@param caption Caption on the link
 				@param confirm Confirmation message : if empty, the link goes directly to the url. If non empty, then a confirm popup asks the user to validate the click after reading the provided message. Warning : the confirm message must not contain any " or ' character. Use &quot; and &#39; or \' instead
+				@param icon Path to the icon to display on the button
+				@param useOnclick pass the url field content to the onclick tag instead of href (use it
+					to launch javascript function). Warning : In this case, the url field must containt the ending
+					semicolon, and must not contain any unescaped " character.
 				@return HTML code of the link
 
 				To use the button displayed link in an HTML page, be aware to define 3 css styles :
@@ -74,7 +81,13 @@ input[type=submit] {background-color:#C0C0C0; font-family:verdana,helvetica; bor
 input[type=submit]:hover {background-color:#0080E0;}
 				@endcode
 			*/
-			static std::string getLinkButton(const std::string& url, const std::string& caption, const std::string confirm="", const std::string icon="");
+			static std::string getLinkButton(
+				const std::string& url,
+				const std::string& caption,
+				const std::string confirm = std::string(),
+				const std::string icon = std::string(),
+				bool useOnclick = false
+			);
 
 			/** Simple HTML link generator.
 				@param url URL to link

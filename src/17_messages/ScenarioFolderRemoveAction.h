@@ -70,6 +70,8 @@ namespace synthese
 			ScenarioFolderRemoveAction();
 
 			void setFolder(boost::shared_ptr<const ScenarioFolder> value);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

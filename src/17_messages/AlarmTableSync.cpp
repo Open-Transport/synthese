@@ -74,28 +74,28 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AlarmTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AlarmTableSync>::TABLE(
 			AlarmTableSync::CreateFormat(
 				"t003_alarms",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(AlarmTableSync::COL_IS_TEMPLATE, INTEGER),
-					SQLiteTableFormat::Field(AlarmTableSync::COL_ENABLED, INTEGER),
-					SQLiteTableFormat::Field(AlarmTableSync::COL_LEVEL, INTEGER),
-					SQLiteTableFormat::Field(AlarmTableSync::COL_SHORT_MESSAGE, TEXT),
-					SQLiteTableFormat::Field(AlarmTableSync::COL_LONG_MESSAGE, TEXT),
-					SQLiteTableFormat::Field(AlarmTableSync::COL_PERIODSTART, TIMESTAMP),
-					SQLiteTableFormat::Field(AlarmTableSync::COL_PERIODEND, TIMESTAMP),
-					SQLiteTableFormat::Field(AlarmTableSync::COL_SCENARIO_ID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(AlarmTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
+					SQLiteTableSync::Field(AlarmTableSync::COL_ENABLED, SQL_INTEGER),
+					SQLiteTableSync::Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
+					SQLiteTableSync::Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
+					SQLiteTableSync::Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
+					SQLiteTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
+					SQLiteTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_TIMESTAMP),
+					SQLiteTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(
+					SQLiteTableSync::Index(
 						"scenariostart",
-						SQLiteTableFormat::Index::CreateFieldsList(
+						SQLiteTableSync::Index::CreateFieldsList(
 							AlarmTableSync::COL_SCENARIO_ID,
 							AlarmTableSync::COL_PERIODSTART,
 							string()
 					)	),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index()
 		)	)	);
 	    
 		template<>

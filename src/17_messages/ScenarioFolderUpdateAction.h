@@ -72,6 +72,8 @@ namespace synthese
 			ScenarioFolderUpdateAction();
 
 			void setFolderId(uid id);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

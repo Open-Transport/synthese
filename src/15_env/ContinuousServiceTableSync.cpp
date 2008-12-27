@@ -74,19 +74,19 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE(
 			ContinuousServiceTableSync::CreateFormat(
 				"t017_continuous_services",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_SERVICENUMBER, TEXT),
-					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_SCHEDULES, TEXT),
-					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_PATHID, INTEGER),
-					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_RANGE, INTEGER),
-					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, INTEGER),
-					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_BIKECOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field(ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(ContinuousServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
+					SQLiteTableSync::Field(ContinuousServiceTableSync::COL_SCHEDULES, SQL_TEXT),
+					SQLiteTableSync::Field(ContinuousServiceTableSync::COL_PATHID, SQL_INTEGER),
+					SQLiteTableSync::Field(ContinuousServiceTableSync::COL_RANGE, SQL_INTEGER),
+					SQLiteTableSync::Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, SQL_INTEGER),
+					SQLiteTableSync::Field(ContinuousServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field(ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field(ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

@@ -27,7 +27,7 @@
 #include "17_messages/SentScenarioInheritedTableSync.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesLog.h"
-
+#include "MessagesRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -40,6 +40,7 @@ namespace synthese
 	using namespace server;
 	using namespace time;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::ScenarioStopAction>::FACTORY_KEY("scenariostop");
 	
@@ -77,6 +78,13 @@ namespace synthese
 			: FactorableTemplate<Action, ScenarioStopAction>(), _stopDateTime(TIME_CURRENT)
 		{
 	
+		}
+
+
+
+		bool ScenarioStopAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

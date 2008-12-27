@@ -101,7 +101,7 @@ namespace synthese
 			pv.push_back( Conversion::ToString( color ) ); // 21
 
 			VariablesMap vm;
-			InterfacePage::display( stream, pv, vm, static_cast<const void*>(commercialLine), request );
+			InterfacePage::_display( stream, pv, vm, static_cast<const void*>(commercialLine), request );
 		}
 
 

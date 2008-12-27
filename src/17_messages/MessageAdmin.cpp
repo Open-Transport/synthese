@@ -48,6 +48,7 @@
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
 
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -120,8 +121,8 @@ namespace synthese
 				stream << "<h1>Contenu</h1>";
 
 				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
-				templateRequest.getFunction()->setPage<MessageAdmin>();
-				templateRequest.setObjectId(_request->getObjectId());
+				templateRequest.getFunction()->setSamePage();
+				templateRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				HTMLForm fc(templateRequest.getHTMLForm("template"));
 				stream << fc.open() << "<p>";
@@ -131,8 +132,8 @@ namespace synthese
 				stream << "</p>" << fc.close();
 
 				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
-				updateMessagesRequest.getFunction()->setPage<MessageAdmin>();
-				updateMessagesRequest.setObjectId(_request->getObjectId());
+				updateMessagesRequest.getFunction()->setSamePage();
+				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
 				stream << tu.open();
@@ -141,27 +142,25 @@ namespace synthese
 				stream << tu.close();
 
 				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setPage<MessageAdmin>();
-				searchRequest.setObjectId(_request->getObjectId());
+				searchRequest.getFunction()->setSamePage();
 
 				ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(_request);
-				addRequest.getFunction()->setPage<MessageAdmin>();
-				addRequest.setObjectId(_request->getObjectId());
+				addRequest.getFunction()->setSamePage();
 				addRequest.getAction()->setAlarm(_alarm);
 
 				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
-				removeRequest.getFunction()->setPage<MessageAdmin>();
-				removeRequest.setObjectId(_request->getObjectId());
+				removeRequest.getFunction()->setSamePage();
 				removeRequest.getAction()->setAlarmId(_alarm->getKey());
 				
 				// Alarm messages destinations loop
-				for (Factory<AlarmRecipient>::Iterator arit = Factory<AlarmRecipient>::begin(); arit != Factory<AlarmRecipient>::end(); ++arit)
+				vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
+				BOOST_FOREACH(shared_ptr<AlarmRecipient> recipient, recipients)
 				{
-					addRequest.getAction()->setRecipientKey(arit.getKey());
+					addRequest.getAction()->setRecipientKey(recipient->getFactoryKey());
 				
-					stream << "<h1>Diffusion sur " << arit->getTitle() << "</h1>";
+					stream << "<h1>Diffusion sur " << recipient->getTitle() << "</h1>";
 
-					arit->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
+					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
 				}
 			}
 		}

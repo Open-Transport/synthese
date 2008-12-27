@@ -64,14 +64,14 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ProfileTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ProfileTableSync>::TABLE(
 			ProfileTableSync::CreateFormat(
 				"t027_profiles",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ProfileTableSync::TABLE_COL_NAME, TEXT),
-					SQLiteTableFormat::Field(ProfileTableSync::TABLE_COL_PARENT_ID, INTEGER),
-					SQLiteTableFormat::Field(ProfileTableSync::TABLE_COL_RIGHTS_STRING, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(ProfileTableSync::TABLE_COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(ProfileTableSync::TABLE_COL_PARENT_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(ProfileTableSync::TABLE_COL_RIGHTS_STRING, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

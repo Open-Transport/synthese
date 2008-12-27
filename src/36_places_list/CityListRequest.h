@@ -68,6 +68,8 @@ namespace synthese
 			void setTextInput(const std::string& text);
 			void setNumber(int number);
 			void setIsForOrigin(bool isForOrigin);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

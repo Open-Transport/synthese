@@ -56,9 +56,10 @@ namespace synthese
 			time::DateTime periodStart /*= time::DateTime(time::TIME_UNKNOWN) */
 			, time::DateTime periodEnd /*= time::DateTime(time::TIME_UNKNOWN) */
 		):	ScenarioSubclassTemplate<ScenarioSentAlarm>(source.getName()),
-			_isEnabled(false)
-			, _periodStart(periodStart)
-			, _periodEnd(periodEnd)
+			Registrable(UNKNOWN_VALUE),
+			_isEnabled(false),
+			_periodStart(periodStart),
+			_periodEnd(periodEnd)
 		{
 			for (ScenarioTemplate::AlarmsSet::const_iterator it = source.getAlarms().begin(); it != source.getAlarms().end(); ++it)
 				addAlarm(new ScenarioSentAlarm(this, **it));

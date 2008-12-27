@@ -21,7 +21,7 @@
 */
 
 #include "NewMessageAction.h"
-
+#include "MessagesRight.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTemplateInheritedTableSync.h"
 #include "17_messages/SentScenario.h"
@@ -45,6 +45,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace security;
 	
 	template<> const string util::FactorableTemplate<Action, messages::NewMessageAction>::FACTORY_KEY("nmes");
 
@@ -163,6 +164,13 @@ namespace synthese
 			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(key, _env));
 			_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
 			_scenarioTemplate = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
+		}
+
+
+
+		bool NewMessageAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

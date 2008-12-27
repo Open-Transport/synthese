@@ -1,39 +1,36 @@
-
-/** DisplayTypeTableSync class implementation.
-	@file DisplayTypeTableSync.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// DisplayTypeTableSync class implementation.
+///	@file DisplayTypeTableSync.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayTypeTableSync.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
+#include "InterfaceTableSync.h"
+#include "Conversion.h"
 
 #include <sstream>
-
-#include "01_util/Conversion.h"
-
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
-
-#include "11_interfaces/InterfaceTableSync.h"
-
-#include "01_util/Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -63,20 +60,26 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE(
-			DisplayTypeTableSync::CreateFormat(
-				"t036_display_types",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, INTEGER),
-					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, INTEGER),
-					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, INTEGER),
-					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_ROWS_NUMBER, INTEGER),
-					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER, INTEGER),
-					SQLiteTableFormat::Field(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS, INTEGER),
-					SQLiteTableFormat::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE(
+			"t036_display_types"
+			);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayTypeTableSync>::_FIELDS[] =
+		{
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_ROWS_NUMBER, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayTypeTableSync>::_INDEXES[] =
+		{
+			SQLiteTableSyncTemplate::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Load(
 			DisplayType* object,

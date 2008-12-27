@@ -76,19 +76,19 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE(
 			ScheduledServiceTableSync::CreateFormat(
 				"t016_scheduled_services",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_SERVICENUMBER, TEXT),
-					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_SCHEDULES, TEXT),
-					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_PATHID, INTEGER, false),
-					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, INTEGER),
-					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_RESERVATIONRULEID, INTEGER),
-					SQLiteTableFormat::Field(ScheduledServiceTableSync::COL_TEAM, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(ScheduledServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
+					SQLiteTableSync::Field(ScheduledServiceTableSync::COL_SCHEDULES, SQL_TEXT),
+					SQLiteTableSync::Field(ScheduledServiceTableSync::COL_PATHID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+					SQLiteTableSync::Field(ScheduledServiceTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
+					SQLiteTableSync::Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

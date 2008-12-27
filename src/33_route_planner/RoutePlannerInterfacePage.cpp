@@ -107,7 +107,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(site->getKey()));
 			pv.push_back(Conversion::ToString(samePlaces));
 
-			InterfacePage::display(stream, pv, variables, vobj, request);
+			InterfacePage::_display(stream, pv, variables, vobj, request);
 		}
 
 		void RoutePlannerInterfacePage::display(
@@ -149,7 +149,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(site->getKey()));
 			pv.push_back("0");
 
-			InterfacePage::display(stream, pv, variables, NULL, request);
+			InterfacePage::_display(stream, pv, variables, NULL, request);
 
 		}
 

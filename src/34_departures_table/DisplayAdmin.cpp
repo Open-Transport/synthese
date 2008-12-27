@@ -1,44 +1,39 @@
-
-/** DisplayAdmin class implementation.
-	@file DisplayAdmin.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include <vector>
-#include <utility>
-#include <sstream>
+////////////////////////////////////////////////////////////////////////////////
+/// DisplayAdmin class implementation.
+///	@file DisplayAdmin.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "HTMLForm.h"
 #include "HTMLTable.h"
 #include "HTMLList.h"
 #include "PropertiesHTMLTable.h"
-
 #include "ConnectionPlaceTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
-
 #include "ActionFunctionRequest.h"
 #include "QueryString.h"
-
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
-
+#include "SentAlarm.h"
 #include "DisplayAdmin.h"
 #include "DeparturesTableModule.h"
 #include "DisplayScreen.h"
@@ -67,6 +62,12 @@
 #include "DBLogViewer.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
+#include "DisplayScreenCPUTableSync.h"
+#include "DisplayScreenCPU.h"
+#include "DisplayScreenAppearanceUpdateAction.h"
+
+#include <utility>
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -83,6 +84,7 @@ namespace synthese
 	using namespace security;
 	using namespace time;
 	using namespace dblog;
+	using namespace messages;
 
 	namespace util
 	{
@@ -99,6 +101,9 @@ namespace synthese
 	{
 		const string DisplayAdmin::TAB_TECHNICAL("tech");
 		const string DisplayAdmin::TAB_MAINTENANCE("maint");
+		const string DisplayAdmin::TAB_CONTENT("content");
+		const string DisplayAdmin::TAB_APPEARANCE("appear");
+		const string DisplayAdmin::TAB_RESULT("result");
 
 		void DisplayAdmin::display(
 			std::ostream& stream,
@@ -110,99 +115,13 @@ namespace synthese
 			{
 				// Update request
 				ActionFunctionRequest<UpdateDisplayScreenAction,AdminRequest> updateDisplayRequest(_request);
-				updateDisplayRequest.getFunction()->setPage<DisplayAdmin>();
-				updateDisplayRequest.setObjectId(_request->getObjectId());
-
-				// Update request
-				ActionFunctionRequest<UpdateAllStopsDisplayScreenAction,AdminRequest> updateAllDisplayRequest(_request);
-				updateAllDisplayRequest.getFunction()->setPage<DisplayAdmin>();
-				updateAllDisplayRequest.setObjectId(_request->getObjectId());
-
-				// Add physical request
-				ActionFunctionRequest<AddDepartureStopToDisplayScreenAction,AdminRequest> addPhysicalRequest(_request);
-				addPhysicalRequest.getFunction()->setPage<DisplayAdmin>();
-				addPhysicalRequest.setObjectId(_request->getObjectId());
-
-				// Add preselection request
-				ActionFunctionRequest<AddPreselectionPlaceToDisplayScreen,AdminRequest> addPreselRequest(_request);
-				addPreselRequest.getFunction()->setPage<DisplayAdmin>();
-				addPreselRequest.setObjectId(_request->getObjectId());
-
-				// Add display request
-				ActionFunctionRequest<DisplayScreenAddDisplayedPlace,AdminRequest> addDisplayRequest(_request);
-				addDisplayRequest.getFunction()->setPage<DisplayAdmin>();
-				addDisplayRequest.setObjectId(_request->getObjectId());
-
-				// Add not to serve request
-				ActionFunctionRequest<AddForbiddenPlaceToDisplayScreen,AdminRequest> addNSRequest(_request);
-				addNSRequest.getFunction()->setPage<DisplayAdmin>();
-				addNSRequest.setObjectId(_request->getObjectId());
-
-				// Update preselection request
-				ActionFunctionRequest<UpdateDisplayPreselectionParametersAction,AdminRequest> updPreselRequest(_request);
-				updPreselRequest.getFunction()->setPage<DisplayAdmin>();
-				updPreselRequest.setObjectId(_request->getObjectId());
-
-				// Remove preselection stop request
-				ActionFunctionRequest<RemovePreselectionPlaceFromDisplayScreenAction,AdminRequest> rmPreselRequest(_request);
-				rmPreselRequest.getFunction()->setPage<DisplayAdmin>();
-				rmPreselRequest.setObjectId(_request->getObjectId());
-
-				// Remove physical stop request
-				ActionFunctionRequest<DisplayScreenRemovePhysicalStopAction,AdminRequest> rmPhysicalRequest(_request);
-				rmPhysicalRequest.getFunction()->setPage<DisplayAdmin>();
-				rmPhysicalRequest.setObjectId(_request->getObjectId());
-
-				// Remove displayed place request
-				ActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,AdminRequest> rmDisplayedRequest(_request);
-				rmDisplayedRequest.getFunction()->setPage<DisplayAdmin>();
-				rmDisplayedRequest.setObjectId(_request->getObjectId());
-
-				// Remove Forbidden place request
-				ActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,AdminRequest> rmForbiddenRequest(_request);
-				rmForbiddenRequest.getFunction()->setPage<DisplayAdmin>();
-				rmForbiddenRequest.setObjectId(_request->getObjectId());
+				updateDisplayRequest.getFunction()->setSamePage(this);
+				updateDisplayRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Delete the screen request
 				ActionFunctionRequest<DisplayScreenRemove, AdminRequest> deleteRequest(_request);
 				deleteRequest.getFunction()->setPage<DisplaySearchAdmin>();
 				deleteRequest.getAction()->setDisplayScreen(_displayScreen);
-
-				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
-				viewRequest.setObjectId(_displayScreen->getKey());
-
-				// Maps for particular select fields
-				vector<pair<int, string> > blinkingDelaysMap;
-				blinkingDelaysMap.push_back(make_pair(0, "Pas de clignotement"));
-				blinkingDelaysMap.push_back(make_pair(1, "1 minute avant disparition"));
-				for (int i=2; i<6; ++i)
-					blinkingDelaysMap.push_back(make_pair(i, Conversion::ToString(i) + " minutes avant disparition"));
-
-				vector<pair<DeparturesTableDirection, string> > directionMap;
-				directionMap.push_back(make_pair(DISPLAY_ARRIVALS, "Arrivées"));
-				directionMap.push_back(make_pair(DISPLAY_DEPARTURES, "Départs"));
-
-				vector<pair<EndFilter, string> > endFilterMap;
-				endFilterMap.push_back(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
-				endFilterMap.push_back(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
-
-				vector<pair<int, string> > clearDelayMap;
-				for (int i=-5; i<-1; ++i)
-					clearDelayMap.push_back(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));
-				clearDelayMap.push_back(make_pair(-1, "1 minute avant le départ"));
-				clearDelayMap.push_back(make_pair(0, "heure du départ"));
-				clearDelayMap.push_back(make_pair(1, "1 minute après le départ"));
-				for (int i=2; i<6; ++i)
-					clearDelayMap.push_back(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
-
-				stream << "<h1>Actions</h1>";
-
-				stream << "<p>";
-				if (deleteRequest.isActionFunctionAuthorized())
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l\\'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
-				stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png") << " ";
-				stream << "</p>";
-
 
 				stream << "<h1>Propriétés</h1>";
 
@@ -211,153 +130,32 @@ namespace synthese
 
 				stream << t.open();
 				stream << t.title("Emplacement");
-				stream << t.cell("Lieu logique", _displayScreen->getLocalization()->getFullName());
+				stream << t.cell("Zone d'arrêt", _displayScreen->getLocalization()->getFullName());
 				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getLocalizationComment()));
 
 				stream << t.title("Données techniques");
-				stream << t.cell("Type d'afficheur", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_TYPE, DeparturesTableModule::getDisplayTypeLabels(), _displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE));
-				stream << t.cell("Code de branchement", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()));
 				stream << t.cell("UID", Conversion::ToString(_displayScreen->getKey()));
-
-				stream << t.title("Apparence");
-				stream << t.cell("Titre", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_TITLE, _displayScreen->getTitle()));
-				stream << t.cell("Clignotement", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY, blinkingDelaysMap, _displayScreen->getBlinkingDelay()));
-				stream << t.cell("Affichage numéro de quai", t.getForm().getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()));
-				stream << t.cell("Affichage numéro de service", t.getForm().getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()));
-				stream << t.cell("Affichage numéro d'équipe", t.getForm().getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
-
-				stream << t.title("Contenu");
-				stream << t.cell("Horaires", t.getForm().getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL, directionMap, _displayScreen->getDirection()));
-				stream << t.cell("Sélection", t.getForm().getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER, endFilterMap, _displayScreen->getEndFilter()));
-				stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
-				stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY, clearDelayMap, _displayScreen->getClearingDelay()));
-
+				stream << t.cell("Type d'afficheur", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_TYPE, DeparturesTableModule::getDisplayTypeLabels(), _displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE));
+				
+				stream << t.title("Connexion");
+				stream << t.cell("Code de branchement bus RS485", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()));
+				
+				if (_displayScreen->getLocalization() != NULL && !_env.getRegistry<DisplayScreenCPU>().empty())
+				{
+					stream << t.cell("Unité centrale", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_CPU, _env.getRegistry<DisplayScreenCPU>(), (_displayScreen->getCPU() != NULL) ? RegistryKeyType(0) : _displayScreen->getCPU()->getKey()));
+				}
+				stream << t.cell("Port COM", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_COM_PORT, 0, 99, _displayScreen->getComPort()));
+				
 				stream << t.close();
 
 				stream << "<p class=\"info\">Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalités proposées. Selon le type de l'afficheur, certains champs peuvent donc être sans effet sur l'affichage.</p>";
 
-				// Used physical stops
-				stream << "<h1>Arrêts de desserte</h1>";
-
-				HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
-				uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()));
-				stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
-				stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
-				stream << "</p>";
-				HTMLList l;
-
-				if (!_displayScreen->getAllPhysicalStopsDisplayed())
+				if (deleteRequest.isActionFunctionAuthorized())
 				{
-					bool withAddForm(_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getPhysicalStops().size());
-					HTMLForm ap(addPhysicalRequest.getHTMLForm("addphy"));
-
-					// Opening
-					if (withAddForm)
-						stream << ap.open();
-					stream << l.open();
-
-					// Loop on linked stops
-					for (PhysicalStops::const_iterator it = _displayScreen->getPhysicalStops().begin(); it != _displayScreen->getPhysicalStops().end(); ++it)
-					{
-						const PhysicalStop* ps(it->second);
-						HTMLForm rs(rmPhysicalRequest.getHTMLForm("rm" + Conversion::ToString(ps->getKey())));
-						rs.addHiddenField(DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()));
-
-						stream << l.element("broadcastpoint");
-						stream << HTMLModule::getHTMLLink(rs.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << ps->getOperatorCode() << " / " << ps->getName();
-					}
-
-					// Add a link
-					if (withAddForm)
-					{
-						stream << l.element("broadcastpoint");
-						stream << ap.getImageSubmitButton("add.png", "Ajouter");
-						stream << ap.getSelectInput(AddDepartureStopToDisplayScreenAction::PARAMETER_STOP, _displayScreen->getLocalization()->getPhysicalStopLabels(_displayScreen->getPhysicalStops()) , uid(0));
-					}
-
-					// Closing
-					stream << l.close();
-					if (withAddForm)
-						stream << ap.close();
-				}
-
-				// Intermediate stops to display
-				stream << "<h1>Arrêts intermédiaires à afficher</h1>";
-
-				HTMLForm amf(addDisplayRequest.getHTMLForm("adddispl"));
-
-				stream << amf.open();
-				stream << l.open();
-
-				for (DisplayedPlacesList::const_iterator it(_displayScreen->getDisplayedPlaces().begin()); it != _displayScreen->getDisplayedPlaces().end(); ++it)
-				{
-					HTMLForm mf(rmDisplayedRequest.getHTMLForm("rmdp" + Conversion::ToString(it->second->getKey())));
-					mf.addHiddenField(DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
-
-					stream << l.element("broadcastpoint");
-					stream << HTMLModule::getHTMLLink(mf.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
-				}
-
-				stream << l.element("broadcastpoint");
-				stream << amf.getImageSubmitButton("add.png", "Ajouter");
-				stream << amf.getSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
-
-				stream << l.close();
-				stream << amf.close();
-
-				// Forbidden places
-				stream << "<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>";
-
-				HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
-				stream << ant.open() << l.open();
-
-				for (DisplayedPlacesList::const_iterator it = _displayScreen->getForbiddenPlaces().begin(); it != _displayScreen->getForbiddenPlaces().end(); ++it)
-				{
-					HTMLForm ntu(rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString(it->second->getKey())));
-					ntu.addHiddenField(DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
-					stream << l.element("broadcastpoint");
-					stream << HTMLModule::getHTMLLink(ntu.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
-				}
-
-				stream << l.element("broadcastpoint");
-				stream << ant.getImageSubmitButton("add.png", "Ajouter");
-				stream << ant.getSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0));
-				stream << l.close() << ant.close();
-
-				// Preselection
-				stream << "<h1>Présélection</h1>";
-
-				PropertiesHTMLTable tt(updPreselRequest.getHTMLForm("updpresel"));
-				tt.getForm().setUpdateRight(tabHasWritePermissions());
-
-				stream << tt.open();
-				stream << tt.title("Paramètres de présélection");
-				stream << tt.cell("Activer", tt.getForm().getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION, _displayScreen->getGenerationMethod() != DisplayScreen::STANDARD_METHOD));
-				stream << tt.cell("Délai maximum présélection", tt.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay())));
-				stream << tt.close();
-
-				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
-				{
-					// Additional preselection stops
-					stream << "<p>Arrêts de présélection</p>";
-
-					HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
-					stream << psaf.open() << l.open();
-
-					for (DisplayedPlacesList::const_iterator it = _displayScreen->getForcedDestinations().begin(); it != _displayScreen->getForcedDestinations().end(); ++it)
-					{
-						HTMLForm psdf(rmPreselRequest.getHTMLForm("rmpres" + Conversion::ToString(it->second->getKey())));
-						psdf.addHiddenField(RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
-						stream << l.element("broadcastpoint");
-						stream << HTMLModule::getHTMLLink(psdf.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
-					}
-
-					stream << l.element("broadcastpoint");
-					stream << psaf.getImageSubmitButton("add.png", "Ajouter");
-					stream << psaf.getSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0));
-					stream << l.close() << psaf.close();
-
-					stream << "<p class=\"info\">Les terminus de lignes sont automatiquement présélectionnés.</p>";
+					stream << "<h1>Suppression</h1>";
+					stream << "<p>";
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l\\'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
+					stream << "</p>";
 				}
 			}
 
@@ -366,10 +164,9 @@ namespace synthese
 			if (openTabContent(stream, TAB_MAINTENANCE))
 			{
 				ActionFunctionRequest<UpdateDisplayMaintenanceAction,AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setPage<DisplayAdmin>();
+				updateRequest.getFunction()->setSamePage(this);
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
-				updateRequest.setObjectId(_displayScreen->getKey());
-
+				
 				FunctionRequest<AdminRequest> goToLogRequest(_request);
 				goToLogRequest.getFunction()->setPage<DBLogViewer>();
 				static_pointer_cast<DBLogViewer,AdminInterfaceElement>(goToLogRequest.getFunction()->getPage())->setLogKey(DisplayMaintenanceLog::FACTORY_KEY);
@@ -430,6 +227,298 @@ namespace synthese
 			}
 
 			////////////////////////////////////////////////////////////////////
+			// CONTENT TAB
+			if (openTabContent(stream, TAB_CONTENT))
+			{
+
+				// Update request
+				ActionFunctionRequest<UpdateAllStopsDisplayScreenAction,AdminRequest> updateAllDisplayRequest(_request);
+				updateAllDisplayRequest.getFunction()->setSamePage(this);
+
+				// Add physical request
+				ActionFunctionRequest<AddDepartureStopToDisplayScreenAction,AdminRequest> addPhysicalRequest(_request);
+				addPhysicalRequest.getFunction()->setSamePage(this);
+
+				// Add preselection request
+				ActionFunctionRequest<AddPreselectionPlaceToDisplayScreen,AdminRequest> addPreselRequest(_request);
+				addPreselRequest.getFunction()->setSamePage(this);
+
+				// Add not to serve request
+				ActionFunctionRequest<AddForbiddenPlaceToDisplayScreen,AdminRequest> addNSRequest(_request);
+				addNSRequest.getFunction()->setSamePage(this);
+
+				// Update preselection request
+				ActionFunctionRequest<UpdateDisplayPreselectionParametersAction,AdminRequest> updPreselRequest(_request);
+				updPreselRequest.getFunction()->setSamePage(this);
+				updPreselRequest.getAction()->setScreenId(_displayScreen->getKey());
+
+				// Remove preselection stop request
+				ActionFunctionRequest<RemovePreselectionPlaceFromDisplayScreenAction,AdminRequest> rmPreselRequest(_request);
+				rmPreselRequest.getFunction()->setSamePage(this);
+
+				// Remove physical stop request
+				ActionFunctionRequest<DisplayScreenRemovePhysicalStopAction,AdminRequest> rmPhysicalRequest(_request);
+				rmPhysicalRequest.getFunction()->setSamePage(this);
+
+				// Remove Forbidden place request
+				ActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,AdminRequest> rmForbiddenRequest(_request);
+				rmForbiddenRequest.getFunction()->setSamePage(this);
+
+				vector<pair<EndFilter, string> > endFilterMap;
+				endFilterMap.push_back(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
+				endFilterMap.push_back(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
+
+				// Propriétés
+				stream << "<h1>Propriétés</h1>";
+
+				PropertiesHTMLTable t(updPreselRequest.getHTMLForm("updpresel"));
+				t.getForm().setUpdateRight(tabHasWritePermissions());
+
+				stream << t.open();
+				stream << t.title("Contenu");
+				stream << t.cell("Type de contenu", t.getForm().getRadioInput(
+					UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_FUNCTION,
+					UpdateDisplayPreselectionParametersAction::GetFunctionList(),
+					UpdateDisplayPreselectionParametersAction::GetFunction(*_displayScreen)
+				));
+				stream << t.cell("Terminus", t.getForm().getRadioInput(
+					UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_END_FILTER,
+					endFilterMap,
+					_displayScreen->getEndFilter()
+				));
+				stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
+				stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
+					UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
+					UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
+					_displayScreen->getClearingDelay()
+				));
+
+				stream << t.title("Présélection");
+				stream << t.cell("Délai maximum présélection", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay())));
+				stream << t.close();
+
+				// Used physical stops
+				stream << "<h1>Arrêts de desserte</h1>";
+
+				HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
+				uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()));
+				stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
+				stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
+				stream << "</p>";
+				HTMLList l;
+
+				if (!_displayScreen->getAllPhysicalStopsDisplayed())
+				{
+					bool withAddForm(_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getPhysicalStops().size());
+					HTMLForm ap(addPhysicalRequest.getHTMLForm("addphy"));
+
+					// Opening
+					if (withAddForm)
+						stream << ap.open();
+					stream << l.open();
+
+					// Loop on linked stops
+					for (PhysicalStops::const_iterator it = _displayScreen->getPhysicalStops().begin(); it != _displayScreen->getPhysicalStops().end(); ++it)
+					{
+						const PhysicalStop* ps(it->second);
+						HTMLForm rs(rmPhysicalRequest.getHTMLForm("rm" + Conversion::ToString(ps->getKey())));
+						rs.addHiddenField(DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()));
+
+						stream << l.element("broadcastpoint");
+						stream << HTMLModule::getHTMLLink(rs.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << ps->getOperatorCode() << " / " << ps->getName();
+					}
+
+					// Add a link
+					if (withAddForm)
+					{
+						stream << l.element("broadcastpoint");
+						stream << ap.getImageSubmitButton("add.png", "Ajouter");
+						stream << ap.getSelectInput(AddDepartureStopToDisplayScreenAction::PARAMETER_STOP, _displayScreen->getLocalization()->getPhysicalStopLabels(_displayScreen->getPhysicalStops()) , uid(0));
+					}
+
+					// Closing
+					stream << l.close();
+					if (withAddForm)
+						stream << ap.close();
+				}
+
+				// Forbidden places
+				stream << "<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>";
+
+				HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
+				stream << ant.open() << l.open();
+
+				for (DisplayedPlacesList::const_iterator it = _displayScreen->getForbiddenPlaces().begin(); it != _displayScreen->getForbiddenPlaces().end(); ++it)
+				{
+					HTMLForm ntu(rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString(it->second->getKey())));
+					ntu.addHiddenField(DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
+					stream << l.element("broadcastpoint");
+					stream << HTMLModule::getHTMLLink(ntu.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
+				}
+
+				stream << l.element("broadcastpoint");
+				stream << ant.getImageSubmitButton("add.png", "Ajouter");
+				stream << ant.getSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0));
+				stream << l.close() << ant.close();
+
+				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
+				{
+					// Additional preselection stops
+					stream << "<p>Arrêts de présélection</p>";
+
+					HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
+					stream << psaf.open() << l.open();
+
+					for (DisplayedPlacesList::const_iterator it = _displayScreen->getForcedDestinations().begin(); it != _displayScreen->getForcedDestinations().end(); ++it)
+					{
+						HTMLForm psdf(rmPreselRequest.getHTMLForm("rmpres" + Conversion::ToString(it->second->getKey())));
+						psdf.addHiddenField(RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
+						stream << l.element("broadcastpoint");
+						stream << HTMLModule::getHTMLLink(psdf.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
+					}
+
+					stream << l.element("broadcastpoint");
+					stream << psaf.getImageSubmitButton("add.png", "Ajouter");
+					stream << psaf.getSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0));
+					stream << l.close() << psaf.close();
+
+					stream << "<p class=\"info\">Les terminus de lignes sont automatiquement présélectionnés.</p>";
+				}
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// APPEARANCE TAB
+			if (openTabContent(stream, TAB_APPEARANCE))
+			{
+
+				// Add display request
+				ActionFunctionRequest<DisplayScreenAddDisplayedPlace,AdminRequest> addDisplayRequest(_request);
+				addDisplayRequest.getFunction()->setSamePage(this);
+
+				// Remove displayed place request
+				ActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,AdminRequest> rmDisplayedRequest(_request);
+				rmDisplayedRequest.getFunction()->setSamePage(this);
+
+				// Properties Update request
+				ActionFunctionRequest<DisplayScreenAppearanceUpdateAction,AdminRequest> updateRequest(_request);
+				updateRequest.getFunction()->setSamePage(this);
+				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
+
+				// Maps for particular select fields
+				vector<pair<int, string> > blinkingDelaysMap;
+				blinkingDelaysMap.push_back(make_pair(0, "Pas de clignotement"));
+				blinkingDelaysMap.push_back(make_pair(1, "1 minute avant disparition"));
+				for (int i=2; i<6; ++i)
+				{
+					blinkingDelaysMap.push_back(make_pair(i, Conversion::ToString(i) + " minutes avant disparition"));
+				}
+
+				stream << "<h1>Propriétés</h1>";
+
+				PropertiesHTMLTable t(updateRequest.getHTMLForm());
+
+				stream << t.open();
+				stream << t.cell("Titre", t.getForm().getTextInput(DisplayScreenAppearanceUpdateAction::PARAMETER_TITLE, _displayScreen->getTitle()));
+				stream << t.cell("Clignotement", t.getForm().getSelectInput(DisplayScreenAppearanceUpdateAction::PARAMETER_BLINKING_DELAY, blinkingDelaysMap, _displayScreen->getBlinkingDelay()));
+				stream << t.cell("Affichage numéro de quai", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()));
+				stream << t.cell("Affichage numéro de service", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()));
+				stream << t.cell("Affichage numéro d'équipe", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
+				stream << t.cell("Affichage horloge", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
+
+				stream << t.close();
+
+				HTMLList l;
+
+				// Intermediate stops to display
+				stream << "<h1>Affichage arrêts intermédiaires</h1>";
+
+				HTMLForm amf(addDisplayRequest.getHTMLForm("adddispl"));
+
+				stream << amf.open();
+				stream << l.open();
+
+				for (DisplayedPlacesList::const_iterator it(_displayScreen->getDisplayedPlaces().begin()); it != _displayScreen->getDisplayedPlaces().end(); ++it)
+				{
+					HTMLForm mf(rmDisplayedRequest.getHTMLForm("rmdp" + Conversion::ToString(it->second->getKey())));
+					mf.addHiddenField(DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
+
+					stream << l.element("broadcastpoint");
+					stream << HTMLModule::getHTMLLink(mf.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
+				}
+
+				stream << l.element("broadcastpoint");
+				stream << amf.getImageSubmitButton("add.png", "Ajouter");
+				stream << amf.getSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
+
+				stream << l.close();
+				stream << amf.close();
+
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// RESULT TAB
+			if (openTabContent(stream, TAB_RESULT))
+			{
+				// Requests
+				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
+				viewRequest.setObjectId(_displayScreen->getKey());
+
+				// Output
+				stream << "<h1>Contenus actifs</h1>";
+
+				int priority(1);
+				HTMLTable::ColsVector h;
+				h.push_back("Priorité");
+				h.push_back("Contenu");
+				h.push_back("Contenu");
+				h.push_back("Date fin");
+				h.push_back("Admin");
+				HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+
+				if (!_displayScreen->getIsOnline())
+				{
+					stream << t.row();
+					stream << t.col() << priority++;
+					stream << t.col() << HTMLModule::getHTMLImage("cross.png", "Afficheur désactivé pour maintenance");
+					stream << t.col() << "Afficheur désactivé pour maintenance";
+					stream << t.col() << "(inconnu)";
+					stream << t.col() << getTabLinkButton(TAB_MAINTENANCE);
+				}
+
+				vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, _displayScreen->getKey()));
+				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
+				{
+					stream << t.row();
+					stream << t.col() << priority++;
+					stream << t.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
+					stream << t.col() << "Message : " + alarm->getShortMessage();
+					stream << t.col() << (alarm->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getPeriodEnd().toString());
+					stream << t.col();
+				}
+
+				if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(_displayScreen->getKey()))
+				{
+					stream << t.row();
+					stream << t.col() << priority++;
+					stream << t.col() << HTMLModule::getHTMLImage("times_display.png", "Affichage de lignes");
+					stream << t.col() << "Horaires " << ((_displayScreen->getDirection() == DISPLAY_DEPARTURES) ? "de départ" : "d'arrivée")
+						<< ((_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD) ? " avec présélection" : " chronologiques");
+					stream << t.col() << "(illimité)";
+					stream << t.col() << getTabLinkButton(TAB_CONTENT);
+				}
+				stream << t.close();
+
+				stream << "<h1>Contenus en attente</h1>";
+
+				stream << "<h1>Visualisation</h1>";
+
+				stream << "<p>";
+				stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "monitor_go.png") << " ";
+				stream << "</p>";
+			}
+
+			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
 		}
@@ -437,9 +526,10 @@ namespace synthese
 		void DisplayAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			
+
 			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
+
 
 			try
 			{
@@ -455,6 +545,12 @@ namespace synthese
 			}
 
 			DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+
+			// CPU search
+			if (_displayScreen->getLocalization() != NULL)
+			{
+				DisplayScreenCPUTableSync::Search(_env, _displayScreen->getLocalization()->getKey());
+			}
 		}
 
 		bool DisplayAdmin::isAuthorized() const
@@ -529,13 +625,21 @@ namespace synthese
 			if (_request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
 			{
 				bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
-				_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writeRight));
+				_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writeRight, "cog.png"));
 			}
 
 			if (_request->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
 			{
 				bool writeRight(_request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
-				_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writeRight));
+				_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writeRight, "wrench_orange.png"));
+			}
+
+			if (_request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
+			{
+				bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+				_tabs.push_back(Tab("Contenu", TAB_CONTENT, writeRight, "times_display.png"));
+				_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
+				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));
 			}
 
 			_tabBuilded = true;

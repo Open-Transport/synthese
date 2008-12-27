@@ -507,7 +507,7 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point2D>& points,
 	    }	
 	    if (!previouslyShifted)	{
                 
-                if (shiftMode == DOUBLE) 
+                if (shiftMode == SQL_DOUBLE) 
 		{
                     
                     int shift0 = _shifts[i];

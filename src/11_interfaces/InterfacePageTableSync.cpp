@@ -1,23 +1,26 @@
-/** InterfacePageTableSync class implementation.
-	@file InterfacePageTableSync.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// InterfacePageTableSync class implementation.
+///	@file InterfacePageTableSync.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "InterfacePageTableSync.h"
 #include "InterfaceTableSync.h"
@@ -55,16 +58,16 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<InterfacePageTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<InterfacePageTableSync>::TABLE(
 			InterfacePageTableSync::CreateFormat(
 				"t023_interface_pages",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(InterfacePageTableSync::TABLE_COL_INTERFACE, INTEGER, false),
-					SQLiteTableFormat::Field(InterfacePageTableSync::TABLE_COL_CLASS, TEXT, false),
-					SQLiteTableFormat::Field(InterfacePageTableSync::TABLE_COL_PAGE, TEXT, false),
-					SQLiteTableFormat::Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, INTEGER),
-					SQLiteTableFormat::Field(InterfacePageTableSync::TABLE_COL_CONTENT, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_INTERFACE, SQL_INTEGER, false),
+					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CLASS, SQL_TEXT, false),
+					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_PAGE, SQL_TEXT, false),
+					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, SQL_INTEGER),
+					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CONTENT, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 
@@ -98,7 +101,7 @@ namespace synthese
 					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + InterfacePageTableSync::TABLE_COL_INTERFACE, e);
 				}
 			}
-			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
+			page->_parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
 		}
 
 

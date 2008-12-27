@@ -56,13 +56,13 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE(
 			PublicPlaceTableSync::CreateFormat(
 				"t013_public_places",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(PublicPlaceTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(PublicPlaceTableSync::COL_CITYID, INTEGER, false),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(PublicPlaceTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(PublicPlaceTableSync::COL_CITYID, SQL_INTEGER, false),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

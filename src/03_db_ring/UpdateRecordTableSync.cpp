@@ -55,7 +55,7 @@ namespace synthese
 
     namespace db
     {
-	template<> const SQLiteTableFormat SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE.NAME = "t997_update_log";
+	template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE.NAME = "t997_update_log";
 	template<> const int SQLiteTableSyncTemplate<UpdateRecordTableSync>::TABLE.ID = 997;
 	template<> const bool SQLiteTableSyncTemplate<UpdateRecordTableSync>::HAS_AUTO_INCREMENT = true;
 
@@ -126,10 +126,10 @@ namespace synthese
 	UpdateRecordTableSync::UpdateRecordTableSync ()
 	    : SQLiteDirectTableSyncTemplate<UpdateRecordTableSync,UpdateRecord> ()
 	{
-	    addTableColumn (TABLE_COL_ID, "INTEGER", false);
-	    addTableColumn (TABLE_COL_TIMESTAMP, "TEXT", true);
-	    addTableColumn (TABLE_COL_EMITTERNODEID, "INTEGER", false);
-	    addTableColumn (TABLE_COL_STATE, "INTEGER", true);
+	    addTableColumn (TABLE_COL_ID, "SQL_INTEGER", false);
+	    addTableColumn (TABLE_COL_TIMESTAMP, "SQL_TEXT", true);
+	    addTableColumn (TABLE_COL_EMITTERNODEID, "SQL_INTEGER", false);
+	    addTableColumn (TABLE_COL_STATE, "SQL_INTEGER", true);
 	    addTableColumn (TABLE_COL_SQL, "BLOB", false, false);  // Not loaded on callback
 	    
 	    addTableIndex(TABLE_COL_EMITTERNODEID);

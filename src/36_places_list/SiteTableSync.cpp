@@ -63,22 +63,28 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<SiteTableSync>::TABLE(
-			SiteTableSync::CreateFormat(
-				"t025_sites",
-				SQLiteTableFormat::CreateFields(
-				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_NAME, TEXT),
-				SQLiteTableFormat::Field(SiteTableSync::COL_INTERFACE_ID, INTEGER),
-				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_START_DATE, DATE),
-				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_END_DATE, DATE),
-				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_ONLINE_BOOKING, INTEGER),
-				SQLiteTableFormat::Field(SiteTableSync::TABLE_COL_USE_OLD_DATA, INTEGER),
-				SQLiteTableFormat::Field(SiteTableSync::COL_MAX_CONNECTIONS, INTEGER),
-				SQLiteTableFormat::Field(SiteTableSync::COL_USE_DATES_RANGE, INTEGER),
-				SQLiteTableFormat::Field(SiteTableSync::COL_PERIODS, TEXT),
-				SQLiteTableFormat::Field()
-			), SQLiteTableFormat::Indexes()
-		)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<SiteTableSync>::TABLE(
+				"t025_sites"
+		);
+		
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<SiteTableSync>::_FIELDS[] =
+		{
+			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(SiteTableSync::COL_INTERFACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_START_DATE, SQL_DATE),
+			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_END_DATE, SQL_DATE),
+			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_ONLINE_BOOKING, SQL_INTEGER),
+			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_USE_OLD_DATA, SQL_INTEGER),
+			SQLiteTableSync::Field(SiteTableSync::COL_MAX_CONNECTIONS, SQL_INTEGER),
+			SQLiteTableSync::Field(SiteTableSync::COL_USE_DATES_RANGE, SQL_INTEGER),
+			SQLiteTableSync::Field(SiteTableSync::COL_PERIODS, SQL_TEXT),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<SiteTableSync>::_INDEXES[] =
+		{
+			SQLiteTableSync::Index()
+		};
 
 
 		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Load(

@@ -54,7 +54,7 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<TransactionTableSync>::TABLE.NAME = "t031_transactions";
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TransactionTableSync>::TABLE.NAME = "t031_transactions";
 		template<> const int SQLiteTableSyncTemplate<TransactionTableSync>::TABLE.ID = 31;
 		template<> const bool SQLiteTableSyncTemplate<TransactionTableSync>::HAS_AUTO_INCREMENT = true;
 
@@ -128,14 +128,14 @@ namespace synthese
 		TransactionTableSync::TransactionTableSync()
 			: SQLiteNoSyncTableSyncTemplate<TransactionTableSync,Transaction>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
-			addTableColumn(TABLE_COL_DOCUMENT_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_START_DATE_TIME, "TIMESTAMP", true);
-			addTableColumn(TABLE_COL_END_DATE_TIME, "TIMESTAMP", true);
-			addTableColumn(TABLE_COL_LEFT_USER_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_PLACE_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_COMMENT, "TEXT", true);
+			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
+			addTableColumn(TABLE_COL_NAME, "SQL_TEXT", true);
+			addTableColumn(TABLE_COL_DOCUMENT_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_START_DATE_TIME, "SQL_TIMESTAMP", true);
+			addTableColumn(TABLE_COL_END_DATE_TIME, "SQL_TIMESTAMP", true);
+			addTableColumn(TABLE_COL_LEFT_USER_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_PLACE_ID, "SQL_INTEGER", true);
+			addTableColumn(TABLE_COL_COMMENT, "SQL_TEXT", true);
 
 			addTableIndex(TABLE_COL_START_DATE_TIME);
 			vector<string> v;

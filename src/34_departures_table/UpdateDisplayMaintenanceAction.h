@@ -84,6 +84,9 @@ namespace synthese
 			///	@date 2008
 			////////////////////////////////////////////////////////////////////
 			void setScreenId(util::RegistryKeyType id);
+
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

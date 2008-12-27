@@ -159,6 +159,9 @@ namespace synthese
 		public:
 			static const std::string TAB_TECHNICAL;
 			static const std::string TAB_MAINTENANCE;
+			static const std::string TAB_CONTENT;
+			static const std::string TAB_APPEARANCE;
+			static const std::string TAB_RESULT;
 
 		private:
 			boost::shared_ptr<const DisplayScreen>	_displayScreen;

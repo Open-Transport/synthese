@@ -56,16 +56,16 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ScenarioFolderTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScenarioFolderTableSync>::TABLE(
 			ScenarioFolderTableSync::CreateFormat(
 				"t051_scenario_folder",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ScenarioFolderTableSync::COL_NAME, INTEGER),
-					SQLiteTableFormat::Field(ScenarioFolderTableSync::COL_PARENT_ID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(ScenarioFolderTableSync::COL_NAME, SQL_INTEGER),
+					SQLiteTableSync::Field(ScenarioFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(ScenarioFolderTableSync::COL_PARENT_ID),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(ScenarioFolderTableSync::COL_PARENT_ID),
+					SQLiteTableSync::Index()
 		)	)	);
 
 

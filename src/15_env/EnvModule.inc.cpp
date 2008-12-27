@@ -2,8 +2,8 @@
 // ENVMODULE 35
 
 // Factories
-#include "15_env/LineMarkerInterfacePage.h"
-#include "15_env/ReservationRuleInterfacePage.h"
+#include "LineMarkerInterfacePage.h"
+#include "ReservationRuleInterfacePage.h"
 
 #include "15_env/LogicalStopNameValueInterfaceElement.h"
 #include "15_env/CityNameValueInterfaceElement.h"

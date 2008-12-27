@@ -1,5 +1,5 @@
 
-/** SQLiteTableFormat class implementation.
+/** SQLiteTableSync::Formatclass implementation.
 	@file SQLiteTableFormat.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -36,45 +36,6 @@ namespace synthese
 	
 	namespace db
 	{
-		SQLiteTableFormat::SQLiteTableFormat(
-			const std::string& name,
-			bool hasAutoIncrement,
-			const std::string& triggerOverrideClause,
-			bool ignoreCallbacksOnFirstSync,
-			bool enableTriggers,
-			const Fields& fields,
-			const Indexes& indexes
-		):	NAME(name),
-			ID(_ParseTableId(name)),
-			HAS_AUTO_INCREMENT(hasAutoIncrement),
-			TRIGGER_OVERRIDE_CLAUSE(triggerOverrideClause),
-			IGNORE_CALLBACKS_ON_FIRST_SYNC(ignoreCallbacksOnFirstSync),
-			ENABLE_TRIGGERS(enableTriggers),
-			FIELDS(fields),
-			INDEXES(indexes)
-		{
-			if (FIELDS.empty())
-			{
-				throw SQLiteException("Table "+ NAME +" has no field.");
-			}
-			
-			BOOST_FOREACH(const Field& field, FIELDS)
-			{
-				if (field.name.empty())
-				{
-					throw SQLiteException("Table "+ NAME +" has at least a field without name.");
-					break;
-				}
-			}
-		}
-
-
-
-		SQLiteTableFormat::~SQLiteTableFormat ()
-		{
-
-		}
-
 
 
 		bool SQLiteTableFormat::hasTableColumn(
@@ -98,126 +59,6 @@ namespace synthese
 					return true;
 			}
 			return false;
-		}
-
-
-
-		SQLiteTableFormat::Fields SQLiteTableFormat::CreateFields(
-			Field first, ...
-		){
-			Fields result;
-			Field col(first);
-			va_list marker;
-			va_start(marker, first);
-			while(!col.name.empty())
-			{
-				result.push_back(col);
-				col = va_arg( marker, Field);
-			}
-			va_end( marker );
-			return result;
-		}
-
-
-
-		SQLiteTableFormat::Indexes SQLiteTableFormat::CreateIndexes(
-			Index first, ...
-		) {
-			Indexes result;
-			Index col(first);
-			va_list marker;
-			va_start(marker, first);
-			while(!col.name.empty())
-			{
-				result.push_back(col);
-				col = va_arg( marker, Index);
-			}
-			va_end( marker );
-			return result;
-		}
-
-
-
-		SQLiteTableFormat::Index::Index(
-			std::string nameA,
-			std::vector<std::string> fieldsA
-		):	name(nameA),
-			fields(fieldsA.empty() ? CreateFieldsList(nameA, string()) : fieldsA)
-		{
-
-		}
-
-
-
-		SQLiteTableFormat::Field::Field(
-			std::string nameA,
-			FieldType typeA,
-			bool updatableA
-		):	name(nameA),
-			type(typeA),
-			updatable(updatableA)
-		{
-
-		}
-
-
-
-		SQLiteTableFormat::TableId SQLiteTableFormat::_ParseTableId(
-			const std::string& tableName
-		){
-			if(tableName.size() < 6)
-				throw SQLiteException("Inconsistent table name in parse table id");
-			
-			TableId id(Conversion::ToInt(tableName.substr (1, 4)));
-			
-			if (id <= 0)
-				throw SQLiteException("Inconsistent table name in parse table id");
-
-			return id;
-		}
-
-
-
-		std::string SQLiteTableFormat::getSQLFieldsSchema(
-		) const {
-			stringstream sql;
-			sql << "CREATE TABLE " << NAME << " ("
-				<< FIELDS[0].name << " " << _GetSQLType(FIELDS[0].type)
-				<< " UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK";
-
-			for (size_t i=1; i<FIELDS.size(); ++i)
-			{
-				sql << ", " << FIELDS[i].name << " " << _GetSQLType(FIELDS[i].type);
-			}
-			sql << ")";
-			return sql.str();
-		}
-
-
-
-		std::string SQLiteTableFormat::_GetSQLType(
-			FieldType type
-		){
-			switch(type)
-			{
-			case INTEGER:
-				return "INTEGER";
-			case DOUBLE:
-				return "DOUBLE";
-			case REAL:
-				return "REAL";
-			case TEXT:
-				return "TEXT";
-			case BOOLEAN:
-				return "BOOLEAN";
-			case TIME:
-				return "TIME";
-			case DATE:
-				return "DATE";
-			case TIMESTAMP:
-				return "TIMESTAMP";
-			}
-			return string();
 		}
 
 
@@ -283,24 +124,6 @@ namespace synthese
 			stringstream s;
 			s << NAME << "_" << index.name;
 			return s.str();
-		}
-
-
-
-		SQLiteTableFormat::Index::Fields SQLiteTableFormat::Index::CreateFieldsList(
-			std::string first, ...
-		){
-			Fields result;
-			string col(first);
-			va_list marker;
-			va_start(marker, first);
-			while(!col.empty())
-			{
-				result.push_back(col);
-				col = va_arg( marker, string);
-			}
-			va_end( marker );
-			return result;
 		}
 	}
 }

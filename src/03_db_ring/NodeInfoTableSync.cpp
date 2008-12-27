@@ -55,7 +55,7 @@ namespace synthese
 
     namespace db
     {
-	template<> const SQLiteTableFormat SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE.NAME = "t998_nodes_infos";
+	template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE.NAME = "t998_nodes_infos";
 	template<> const int SQLiteTableSyncTemplate<NodeInfoTableSync>::TABLE.ID = 998;
 	template<> const bool SQLiteTableSyncTemplate<NodeInfoTableSync>::HAS_AUTO_INCREMENT = true;
 
@@ -109,11 +109,11 @@ namespace synthese
 	    : SQLiteDirectTableSyncTemplate<NodeInfoTableSync,NodeInfo> ()
 	{
 	    // TODO : make host, port, updatables.
-	    addTableColumn (TABLE_COL_ID, "INTEGER", false);
-	    addTableColumn (TABLE_COL_NODEID, "INTEGER", false);
-	    addTableColumn (TABLE_COL_RINGID, "INTEGER", false);
-	    addTableColumn (TABLE_COL_HOST, "TEXT", false);
-	    addTableColumn (TABLE_COL_PORT, "INTEGER", false);
+	    addTableColumn (TABLE_COL_ID, "SQL_INTEGER", false);
+	    addTableColumn (TABLE_COL_NODEID, "SQL_INTEGER", false);
+	    addTableColumn (TABLE_COL_RINGID, "SQL_INTEGER", false);
+	    addTableColumn (TABLE_COL_HOST, "SQL_TEXT", false);
+	    addTableColumn (TABLE_COL_PORT, "SQL_INTEGER", false);
 	    
 	    std::vector<std::string> indexColumns;
 	    indexColumns.push_back (TABLE_COL_NODEID);

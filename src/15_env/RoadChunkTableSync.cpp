@@ -63,16 +63,16 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE(
 			RoadChunkTableSync::CreateFormat(
 				"t014_road_chunks",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(RoadChunkTableSync::COL_ADDRESSID, INTEGER, false),
-					SQLiteTableFormat::Field(RoadChunkTableSync::COL_RANKINPATH, INTEGER),
-					SQLiteTableFormat::Field(RoadChunkTableSync::COL_ISDEPARTURE, BOOLEAN),
-					SQLiteTableFormat::Field(RoadChunkTableSync::COL_ISARRIVAL, BOOLEAN),
-					SQLiteTableFormat::Field(RoadChunkTableSync::COL_VIAPOINTS, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(RoadChunkTableSync::COL_ADDRESSID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
+					SQLiteTableSync::Field(RoadChunkTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
+					SQLiteTableSync::Field(RoadChunkTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
+					SQLiteTableSync::Field(RoadChunkTableSync::COL_VIAPOINTS, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

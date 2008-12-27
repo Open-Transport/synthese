@@ -51,13 +51,13 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE(
 			PedestrianComplianceTableSync::CreateFormat(
 				"t018_pedestrian_compliances",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(PedestrianComplianceTableSync::COL_STATUS, INTEGER),
-					SQLiteTableFormat::Field(PedestrianComplianceTableSync::COL_CAPACITY, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(PedestrianComplianceTableSync::COL_STATUS, SQL_INTEGER),
+					SQLiteTableSync::Field(PedestrianComplianceTableSync::COL_CAPACITY, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

@@ -25,7 +25,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "QueryString.h"
-
+#include "MessagesLibraryRight.h"
 #include "ScenarioFolderUpdateAction.h"
 #include "ScenarioFolder.h"
 #include "ScenarioFolderTableSync.h"
@@ -38,6 +38,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace security;
+	
 	
 	namespace util
 	{
@@ -124,6 +126,13 @@ namespace synthese
 				throw ActionException("No such folder");
 			}
 
+		}
+
+
+
+		bool ScenarioFolderUpdateAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

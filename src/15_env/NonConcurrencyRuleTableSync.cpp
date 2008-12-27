@@ -57,14 +57,14 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE(
 			NonConcurrencyRuleTableSync::CreateFormat(
 				"t056_non_concurrency_rules",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, INTEGER, false),
-					SQLiteTableFormat::Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, INTEGER, false),
-					SQLiteTableFormat::Field(NonConcurrencyRuleTableSync::COL_DELAY, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, SQL_INTEGER, false),
+					SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

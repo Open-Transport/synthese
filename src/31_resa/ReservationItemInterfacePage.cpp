@@ -64,7 +64,7 @@ namespace synthese
 				pv.push_back(string());
 			pv.push_back(Conversion::ToString(static_cast<int>(transaction.getStatus())));
 			
-			InterfacePage::display(
+			InterfacePage::_display(
 				stream
 				, pv
 				, variables

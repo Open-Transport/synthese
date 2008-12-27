@@ -23,6 +23,7 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "01_util/Constants.h"
 #include "02_db/Constants.h"
 #include "SQLite.h"
 #include "SQLiteTableSync.h"
@@ -41,7 +42,8 @@ namespace synthese
     namespace db
     {
 		SQLiteTableSync::SQLiteTableSync(
-		){
+		):	FactoryBase<SQLiteTableSync>()
+		{
 
 		}
 
@@ -78,7 +80,7 @@ namespace synthese
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='table' and name='" +
 			tableName + "'";
 			SQLiteResultSPtr result = sqlite->execQuery (sql);
-			if (result->next() == false) return "";
+			if (!result->next()) return "";
 			return result->getText (0);
 		}
 
@@ -91,9 +93,110 @@ namespace synthese
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
 			tableName + "_no_update" + "'";
 			SQLiteResultSPtr result = sqlite->execQuery (sql);
-			if (result->next () == false) return "";
+			if (!result->next()) return "";
 			return result->getText (0);
 		}
-    }
+
+
+
+		SQLiteTableSync::Field::Field(
+			const std::string nameA, // std::string()
+			const FieldType typeA, // SQL_TEXT
+			const bool updatableA // true 
+		):	name(nameA),
+			type(typeA),
+			updatable(updatableA)
+		{
+		}
+
+
+
+		std::string SQLiteTableSync::Field::getSQLType(
+		) const {
+			switch(type)
+			{
+			case SQL_INTEGER:
+				return "INTEGER";
+			case SQL_DOUBLE:
+				return "DOUBLE";
+			case SQL_REAL:
+				return "REAL";
+			case SQL_TEXT:
+				return "TEXT";
+			case SQL_BOOLEAN:
+				return "BOOLEAN";
+			case SQL_TIME:
+				return "TIME";
+			case SQL_DATE:
+				return "DATE";
+			case SQL_TIMESTAMP:
+				return "TIMESTAMP";
+			}
+			return string();
+		}
+
+
+
+		bool SQLiteTableSync::Field::empty(
+		) const {
+			return name.empty();
+		}
+
+
+		SQLiteTableSync::Index::Index(
+			const char* first,
+			...
+		){
+			stringstream names;
+			const char* col(first);
+			const va_list marker;
+			va_start(marker, first);
+			while(col[0])
+			{
+				col = va_arg(marker, const char*);
+				fields.push_back(string(col));
+			}
+		}
+
+
+
+		SQLiteTableSync::Index::Index(
+		){
+		}
+
+
+
+		bool SQLiteTableSync::Index::empty(
+		) const {
+			return fields.empty() || fields[0].empty();
+		}
+
+		SQLiteTableSync::Format::Format(
+			const std::string& name,
+			const bool ignoreCallbacksOnFirstSync, // false
+			const bool enableTriggers, // true
+			const std::string& triggerOverrideClause, // TRIGGERS_ENABLED_CLAUSE
+			const bool hasAutoIncrement // true
+		):
+			NAME(name),
+			ID(UNKNOWN_VALUE),
+			HAS_AUTO_INCREMENT(hasAutoIncrement),
+			TRIGGER_OVERRIDE_CLAUSE(triggerOverrideClause),
+			IGNORE_CALLBACKS_ON_FIRST_SYNC(ignoreCallbacksOnFirstSync),
+			ENABLE_TRIGGERS(enableTriggers)
+		{
+			if(name.size() < 6)
+			{
+				throw SQLiteException("Inconsistent table name in parse table id");
+			}
+
+			ID = Conversion::ToInt(name.substr(1, 4));
+
+			if (ID <= 0)
+			{
+				throw SQLiteException("Inconsistent table name in parse table id");
+			}
+		}
+	}
 }
 

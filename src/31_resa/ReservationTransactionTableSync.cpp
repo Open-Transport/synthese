@@ -70,21 +70,21 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE(
 			ReservationTransactionTableSync::CreateFormat(
 				"t046_reservation_transactions",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, INTEGER),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_SEATS, INTEGER),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_BOOKING_TIME, TIMESTAMP),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, TIMESTAMP),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, INTEGER),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, TEXT),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, TEXT),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, TEXT),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, INTEGER),
-					SQLiteTableFormat::Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_SEATS, SQL_INTEGER),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_TIME, SQL_TIMESTAMP),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, SQL_TIMESTAMP),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, SQL_TEXT),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

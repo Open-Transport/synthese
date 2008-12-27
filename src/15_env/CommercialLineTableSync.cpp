@@ -76,19 +76,19 @@ namespace synthese
 
 	namespace db
 	{
-		const SQLiteTableFormat CommercialLineTableSync::TABLE(
+		const SQLiteTableSync::FormatCommercialLineTableSync::TABLE(
 			CommercialLineTableSync::CreateFormat(
 				"t042_commercial_lines",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(CommercialLineTableSync::COL_NETWORK_ID, INTEGER),
-					SQLiteTableFormat::Field(CommercialLineTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(CommercialLineTableSync::COL_SHORT_NAME, TEXT),
-					SQLiteTableFormat::Field(CommercialLineTableSync::COL_LONG_NAME, TEXT),
-					SQLiteTableFormat::Field(CommercialLineTableSync::COL_COLOR, TEXT),
-					SQLiteTableFormat::Field(CommercialLineTableSync::COL_STYLE, TEXT),
-					SQLiteTableFormat::Field(CommercialLineTableSync::COL_IMAGE, TEXT),
-					SQLiteTableFormat::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(CommercialLineTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
+					SQLiteTableSync::Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
+					SQLiteTableSync::Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
+					SQLiteTableSync::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes(
 		)	)	);
 

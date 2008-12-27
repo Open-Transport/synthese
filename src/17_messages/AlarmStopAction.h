@@ -56,7 +56,7 @@ namespace synthese
 				Removes the used parameters from the map.
 				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const server::ParametersMap& map) throw(ActionException);
 
 		public:
 			/** Constructor.
@@ -66,6 +66,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

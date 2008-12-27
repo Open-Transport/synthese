@@ -25,12 +25,10 @@
 
 #include <vector>
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
-
-#include "34_departures_table/AdvancedSelectTableSync.h"
+#include "AdminInterfaceElementTemplate.h"
+#include "AdvancedSelectTableSync.h"
 #include "34_departures_table/Types.h"
-
-#include "05_html/ResultHTMLTable.h"
+#include "ResultHTMLTable.h"
 
 namespace synthese
 {
@@ -81,6 +79,7 @@ namespace synthese
 			std::string									_placeName;
 			uid											_lineUId;
 			BroadcastPointsPresence						_displayNumber;
+			BroadcastPointsPresence						_cpuNumber;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
@@ -88,6 +87,7 @@ namespace synthese
 			static const std::string PARAMETER_PLACE_NAME;
 			static const std::string PARAMETER_LINE_ID;
 			static const std::string PARAMETER_DISPLAY_NUMBER;
+			static const std::string PARAMETER_CPU_NUMBER;
 
 			BroadcastPointsAdmin();
 			

@@ -1,55 +1,55 @@
+////////////////////////////////////////////////////////////////////////////////
+/// SYNTHESE main file.
+///	@file main.cpp
+///	@author Marc Jambert
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-/*	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "01_util/Conversion.h"
-#include "01_util/Exception.h"
-#include "01_util/Log.h"
-#include "01_util/Factory.h"
-#include "01_util/ModuleClass.h"
+#include "Conversion.h"
+#include "Exception.h"
+#include "Log.h"
+#include "Factory.h"
+#include "ModuleClass.h"
 #include "01_util/threads/Thread.h"
 #include "01_util/threads/ThreadManager.h"
-
-#include "02_db/DbModuleClass.h"
-
-#include "30_server/ServerModule.h"
-
+#include "DbModuleClass.h"
+#include "ServerModule.h"
 
 #include <csignal>
 #include <string>
 #include <map>
 #include <iostream>
 #include <fstream>
-
 #include <fcntl.h> // umask...
-
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-
+#include <boost/foreach.hpp>
 
 // included auto generated code
 #include "includes.cpp.inc"
 
+using namespace boost;
 using namespace synthese::util;
 using namespace synthese::db;
-
-using synthese::server::ServerModule;
+using namespace synthese::server;
 
 namespace po = boost::program_options;
 
@@ -158,167 +158,162 @@ int main( int argc, char **argv )
 
     try 
     {
-	std::string db;
-	std::string pidf;
-	std::string logf;
-	std::vector<std::string> params;
+		std::string db;
+		std::string pidf;
+		std::string logf;
+		std::vector<std::string> params;
 
-	// To define several params on the command line, the syntax is --param name1=val1 --param name2=val2 ....
+		// To define several params on the command line, the syntax is --param name1=val1 --param name2=val2 ....
 
-	po::options_description desc("Allowed options");
-	desc.add_options()
-	    ("help", "produce this help message")
-	    ("db", po::value<std::string>(&db)->default_value (std::string ("config.db3")), "SQLite database file")
+		po::options_description desc("Allowed options");
+		desc.add_options()
+			("help", "produce this help message")
+			("db", po::value<std::string>(&db)->default_value (std::string ("config.db3")), "SQLite database file")
 #ifndef WIN32
-	    ("daemon", "Run server in daemon mode")
+			("daemon", "Run server in daemon mode")
 #endif        
-	    ("logfile", po::value<std::string>(&logf)->default_value (std::string ("-")), "Log file path or - for standard output)")
+			("logfile", po::value<std::string>(&logf)->default_value (std::string ("-")), "Log file path or - for standard output)")
 #ifndef WIN32
-	    ("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file")
+			("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file")
 #endif        
 #ifdef DEBUG
-	    ("monothread", "Enable monothread emulation")
+			("monothread", "Enable monothread emulation")
 #endif        
-	    ("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
-	 
-	po::variables_map vm;
-	po::store(po::parse_command_line(argc, argv, desc), vm);
-	po::notify(vm);    
-    
-	if (vm.count("help"))
-	{
-	    std::cout << desc << std::endl;
-	    return 1;
-	}
+			("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
+		 
+		po::variables_map vm;
+		po::store(po::parse_command_line(argc, argv, desc), vm);
+		po::notify(vm);    
+	    
+		if (vm.count("help"))
+		{
+			std::cout << desc << std::endl;
+			return 1;
+		}
 #ifndef WIN32
-	bool daemonMode (vm.count("daemon") != 0);
+		bool daemonMode (vm.count("daemon") != 0);
 #endif        
 #ifdef DEBUG
-	bool monothread (vm.count("monothread") != 0);
-    if (monothread)
-    {
-        ThreadManager::SetMonothreadEmulation (monothread);
-    }
+		bool monothread (vm.count("monothread") != 0);
+		if (monothread)
+		{
+			ThreadManager::SetMonothreadEmulation (monothread);
+		}
 #endif        
     
-	DbModuleClass::Parameters defaultParams;
-	for (std::vector<std::string>::const_iterator it = params.begin (); 
-	     it != params.end (); ++it)
-	{
-	    int index = it->find ("=");
-	
-	    std::string paramName (it->substr (0, index));
-	    std::string paramValue (it->substr (index+1));
+		DbModuleClass::Parameters defaultParams;
+		for (std::vector<std::string>::const_iterator it = params.begin (); 
+			 it != params.end (); ++it)
+		{
+			int index = it->find ("=");
+		
+			std::string paramName (it->substr (0, index));
+			std::string paramValue (it->substr (index+1));
 
-	    defaultParams.insert (std::make_pair (paramName, paramValue));
-	}
+			defaultParams.insert (std::make_pair (paramName, paramValue));
+		}
 
 #ifndef WIN32
-	pid_t pid = getpid ();
+		pid_t pid = getpid ();
 
-	// Check if a daemon instance is already running (PID file existence)
-	pidFile = new boost::filesystem::path (createCompletePath (pidf));
-	if (boost::filesystem::exists (*pidFile) == true)
-	{
-	    std::ifstream is (pidFile->string ().c_str (), std::ios_base::in);
-	    is >> pid;
-	    is.close ();
-	    std::cerr << "Process s3_server is already running with PID " << pid << "." << std::endl;
-	    exit (1);
-	}
+		// Check if a daemon instance is already running (PID file existence)
+		pidFile = new boost::filesystem::path (createCompletePath (pidf));
+		if (boost::filesystem::exists (*pidFile) == true)
+		{
+			std::ifstream is (pidFile->string ().c_str (), std::ios_base::in);
+			is >> pid;
+			is.close ();
+			std::cerr << "Process s3_server is already running with PID " << pid << "." << std::endl;
+			exit (1);
+		}
 #endif        
 
-	boost::filesystem::path dbpath (createCompletePath (db));
-	boost::filesystem::path logFile (createCompletePath (logf));
+		boost::filesystem::path dbpath (createCompletePath (db));
+		boost::filesystem::path logFile (createCompletePath (logf));
 
 #ifndef WIN32
-	ensureWritablePath (*pidFile, true);
+		ensureWritablePath (*pidFile, true);
 #endif        
-	ensureWritablePath (dbpath, false);
-	std::ostream* logStream = &std::cout;
-	if (logf != "-")
-	{
-	    ensureWritablePath (logFile, false);
-	    // Create log file output stream
-	    logStream = new std::ofstream (logFile.string ().c_str (), std::ios_base::app);
-	    if (logStream->good () == false)
-	    {
-		std::cerr << "Cannot open " << logFile.string () << " for writing." << std::endl;
-		exit (1);
-	    }
-	    else
-	    {
-		Log::GetInstance ().setOutputStream (logStream);
-	    }
-	}
+		ensureWritablePath (dbpath, false);
+		std::ostream* logStream = &std::cout;
+		if (logf != "-")
+		{
+			ensureWritablePath (logFile, false);
+			// Create log file output stream
+			logStream = new std::ofstream (logFile.string ().c_str (), std::ios_base::app);
+			if (logStream->good () == false)
+			{
+			std::cerr << "Cannot open " << logFile.string () << " for writing." << std::endl;
+			exit (1);
+			}
+			else
+			{
+			Log::GetInstance ().setOutputStream (logStream);
+			}
+		}
 
-
-
-#ifndef WIN32
-	if (daemonMode)
-	{
-	    pid = daemonize ();
-	}
-	Log::GetInstance ().info ("Process PID = " + Conversion::ToString (pid) + (daemonMode ? " (daemon mode)" : ""));
-#endif        
-
-	// included auto generated code
-#include "generated.cpp.inc"
-
-
-
-	const boost::filesystem::path& workingDir = boost::filesystem::current_path();
-	Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
-
-	DbModuleClass::SetDefaultParameters (defaultParams);
-	DbModuleClass::SetDatabasePath (dbpath);
-    
-	// Initialize modules
-	if (Factory<ModuleClass>::size() == 0)
-	    throw Exception("No registered module !");
-    
-
-	for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
-	     it != Factory<ModuleClass>::end(); ++it)
-	{
-	    Log::GetInstance ().info ("Pre-initializing module " + it.getKey() + "...");
-	    it->preInit();
-	}
-    
-	for (Factory<ModuleClass>::Iterator iti = Factory<ModuleClass>::begin(); 
-	     iti != Factory<ModuleClass>::end(); ++iti)
-	{
-	    Log::GetInstance ().info ("Initializing module " + iti.getKey() + "...");
-	    iti->initialize();
-	}
 
 
 #ifndef WIN32
-	// Create the real PID file
-	std::ofstream os (pidFile->string ().c_str (), std::ios_base::out);
-	os << pid << std::endl;
-	os.close ();
+		if (daemonMode)
+		{
+			pid = daemonize ();
+		}
+		Log::GetInstance ().info ("Process PID = " + Conversion::ToString (pid) + (daemonMode ? " (daemon mode)" : ""));
+#endif        
 
-	if (daemonMode)
-	{
-	    // redirect I/O streams to /dev/null
-	    freopen ("/dev/null", "r", stdin);
-	    freopen ("/dev/null", "w", stdout);
-	    freopen ("/dev/null", "w", stderr);
-	}
+		// included auto generated code
+		#include "generated.cpp.inc"
+
+
+		const boost::filesystem::path& workingDir = boost::filesystem::current_path();
+		Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
+
+		DbModuleClass::SetDefaultParameters (defaultParams);
+		DbModuleClass::SetDatabasePath (dbpath);
+	    
+		// Initialize modules
+		if (Factory<ModuleClass>::size() == 0)
+			throw Exception("No registered module !");
+	    
+
+		vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
+		BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
+		{
+			Log::GetInstance ().info ("Pre-initializing module " + module->getFactoryKey() + "...");
+			module->preInit();
+		}
+	    
+		BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
+		{
+			Log::GetInstance ().info ("Initializing module " + module->getFactoryKey() + "...");
+			module->initialize();
+		}
+
+
+#ifndef WIN32
+		// Create the real PID file
+		std::ofstream os (pidFile->string ().c_str (), std::ios_base::out);
+		os << pid << std::endl;
+		os.close ();
+
+		if (daemonMode)
+		{
+			// redirect I/O streams to /dev/null
+			freopen ("/dev/null", "r", stdin);
+			freopen ("/dev/null", "w", stdout);
+			freopen ("/dev/null", "w", stderr);
+		}
 #endif    
 
-	ThreadManager::Instance ()->run ();
+		ThreadManager::Instance ()->run ();
     }
     catch (std::exception& e)
     {
-	Log::GetInstance ().fatal (std::string ("Fatal error : ") + e.what ());
+		Log::GetInstance ().fatal (std::string ("Fatal error : ") + e.what ());
     }
     catch (...)
     {
-	Log::GetInstance ().fatal ("Unexpected exception.");
+		Log::GetInstance ().fatal ("Unexpected exception.");
     }
-    
 }
-
-

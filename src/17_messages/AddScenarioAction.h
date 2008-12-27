@@ -70,6 +70,8 @@ namespace synthese
 			void run();
 
 			void setFolderId(uid value);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

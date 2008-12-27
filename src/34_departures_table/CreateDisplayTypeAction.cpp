@@ -28,7 +28,7 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
 #include "CreateDisplayTypeAction.h"
@@ -41,6 +41,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace interfaces;
+	using namespace security;
+	
 
 	namespace util
 	{
@@ -101,6 +103,13 @@ namespace synthese
 
 			// Log
 			ArrivalDepartureTableLog::addCreateTypeEntry(&dt, _request->getUser().get());
+		}
+
+
+
+		bool CreateDisplayTypeAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

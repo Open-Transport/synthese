@@ -117,5 +117,13 @@ namespace synthese
 		{
 			_cityText = text;
 		}
+
+
+
+		bool PlacesListFunction::_isAuthorized(
+
+			) const {
+			return true;
+		}
 	}
 }

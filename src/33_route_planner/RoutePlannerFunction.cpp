@@ -244,5 +244,12 @@ namespace synthese
 		{
 			_maxSolutionsNumber = number;
 		}
+
+
+
+		bool RoutePlannerFunction::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

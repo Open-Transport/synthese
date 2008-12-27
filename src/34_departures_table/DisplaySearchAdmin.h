@@ -124,6 +124,7 @@ namespace synthese
 			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
 			int												_searchState;
 			int												_searchMessage;
+			//
 			html::ResultHTMLTable::RequestParameters		_requestParameters;
 			html::ResultHTMLTable::ResultParameters			_resultParameters;
 
@@ -136,6 +137,9 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_STATE;
 			static const std::string PARAMETER_SEARCH_MESSAGE;
 			static const std::string PARAMETER_SEARCH_LOCALIZATION_ID;
+
+			static const std::string TAB_DISPLAY_SCREENS;
+			static const std::string TAB_CPU;
 
 			DisplaySearchAdmin();
 			
@@ -172,7 +176,6 @@ namespace synthese
 				, const AdminInterfaceElement& currentPage
 			) const;
 
-			virtual std::string getIcon() const;
 			virtual std::string getTitle() const;
 			virtual std::string getParameterName() const;
 			virtual std::string getParameterValue() const;
@@ -183,6 +186,8 @@ namespace synthese
 				@date 2008					
 			*/
 			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
+
+			virtual void _buildTabs() const;
 		};
 	}
 }

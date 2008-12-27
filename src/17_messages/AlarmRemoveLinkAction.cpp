@@ -1,38 +1,48 @@
+////////////////////////////////////////////////////////////////////////////////
+/// AlarmRemoveLinkAction class implementation.
+///	@file AlarmRemoveLinkAction.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-/** AlarmRemoveLinkAction class implementation.
-	@file AlarmRemoveLinkAction.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
-
-#include "17_messages/AlarmRemoveLinkAction.h"
-#include "17_messages/AlarmObjectLinkTableSync.h"
+#include "Alarm.h"
+#include "AlarmTableSync.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
+#include "MessagesLibraryRight.h"
+#include "MessagesRight.h"
+#include "AlarmRemoveLinkAction.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "RequestMissingParameterException.h"
+#include "MessagesLog.h"
+#include "MessagesLibraryLog.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::AlarmRemoveLinkAction>::FACTORY_KEY("marla");
 
@@ -45,30 +55,77 @@ namespace synthese
 		ParametersMap AlarmRemoveLinkAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_ALARM_ID, _alarmId);
+			if (_alarm.get() != NULL) map.insert(PARAMETER_ALARM_ID, _alarm->getKey());
 			map.insert(PARAMETER_OBJECT_ID, _objectId);
 			return map;
 		}
 
-		void AlarmRemoveLinkAction::_setFromParametersMap(const ParametersMap& map)
+		void AlarmRemoveLinkAction::_setFromParametersMap(
+			const ParametersMap& map
+		) throw(ActionException)
 		{
-			_objectId = map.getUid(PARAMETER_OBJECT_ID, true, FACTORY_KEY);
-			_alarmId = map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY);
+			try
+			{
+				setAlarmId(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
+				setObjectId(map.getUid(PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			}
+			catch (RequestMissingParameterException& e)
+			{
+				throw ActionException(e.getMessage());
+			}
 		}
 
-		void AlarmRemoveLinkAction::run()
+		void AlarmRemoveLinkAction::run(
+		) throw (ActionException)
 		{
-			AlarmObjectLinkTableSync::Remove(_alarmId, _objectId);
+			AlarmObjectLinkTableSync::Remove(_alarm->getKey(), _objectId);
+
+			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
+			{
+				shared_ptr<const AlarmTemplate> talarm(dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm));
+				MessagesLibraryLog::addUpdateEntry(talarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), _request->getUser().get());
+			}
+			else if(dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm).get() != NULL)
+			{
+				shared_ptr<const ScenarioSentAlarm> salarm(dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm));
+				MessagesLog::addUpdateEntry(salarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), _request->getUser().get());
+			}
+			else
+			{
+				shared_ptr<const SingleSentAlarm> salarm(dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm));
+				MessagesLog::addUpdateEntry(salarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), _request->getUser().get());
+			}
 		}
 
-		void AlarmRemoveLinkAction::setAlarmId( uid id )
+		void AlarmRemoveLinkAction::setAlarmId(RegistryKeyType id )
 		{
-			_alarmId = id;
+			try
+			{
+				_alarm = AlarmTableSync::Get(id, _env);
+			}
+			catch(ObjectNotFoundException<Alarm>& e)
+			{
+				throw ActionException("message", id, FACTORY_KEY, e);
+			}
 		}
 
-		void AlarmRemoveLinkAction::setObjectId( uid id )
+		void AlarmRemoveLinkAction::setObjectId(RegistryKeyType id )
 		{
 			_objectId = id;
+		}
+
+
+
+		bool AlarmRemoveLinkAction::_isAuthorized(
+		) const {
+			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
+			{
+				return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+			}
+			else
+			{
+				return _request->isAuthorized<MessagesRight>(WRITE);
+			}
 		}
 	}
 }

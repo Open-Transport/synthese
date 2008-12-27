@@ -44,19 +44,6 @@ namespace synthese
 				return false;
 			}
 
-			static SQLiteTableFormat CreateFormat(
-				std::string name,
-				SQLiteTableFormat::Fields fields,
-				SQLiteTableFormat::Indexes indexes = SQLiteTableFormat::Indexes()
-			){
-				return SQLiteDirectTableSyncTemplate<K,T>::CreateFormat(
-					name,
-					fields,
-					indexes,
-					true
-				);
-			}
-
 
 			/** Action to do on DisplayType creation.
 			This method loads a new object in ram.

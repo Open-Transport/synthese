@@ -48,23 +48,6 @@ namespace synthese
 			typedef T		ObjectType;
 			typedef K		FactoryClass;
 
-			static SQLiteTableFormat CreateFormat(
-				std::string name,
-				SQLiteTableFormat::Fields fields,
-				SQLiteTableFormat::Indexes indexes = SQLiteTableFormat::Indexes(),
-				bool ignoreCallbacksAtFirstSync = false
-			){
-				fields.insert(fields.begin(), SQLiteTableFormat::Field(TABLE_COL_ID, INTEGER, false));
-				return SQLiteTableFormat(
-					name,
-					true,
-					TRIGGERS_ENABLED_CLAUSE,
-					ignoreCallbacksAtFirstSync,
-					true,
-					fields,
-					indexes
-					);
-			}
 
 		protected:
 			//! \name Static methods to implement by each derived class

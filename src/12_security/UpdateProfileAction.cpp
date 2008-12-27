@@ -28,6 +28,7 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include "DBLogModule.h"
+#include "SecurityRight.h"
 
 using namespace std;
 using namespace boost;
@@ -88,6 +89,14 @@ namespace synthese
 
 			// Log
 			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), log.str());
+		}
+
+
+
+		bool UpdateProfileAction::_isAuthorized(
+		) const {
+			/// @todo add a control on the users profile
+			return _request->isAuthorized<SecurityRight>(WRITE);
 		}
 	}
 }

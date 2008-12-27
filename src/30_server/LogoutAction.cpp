@@ -50,5 +50,12 @@ namespace synthese
 		{
 			return true;
 		}
+
+
+
+		bool LogoutAction::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

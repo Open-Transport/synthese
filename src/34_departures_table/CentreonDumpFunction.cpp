@@ -75,5 +75,12 @@ namespace synthese
 		{
 			// Hostgroups
 		}
+
+
+
+		bool CentreonDumpFunction::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

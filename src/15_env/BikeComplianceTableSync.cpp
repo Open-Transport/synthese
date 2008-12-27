@@ -55,16 +55,22 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<BikeComplianceTableSync>::TABLE(
-			BikeComplianceTableSync::CreateFormat(
-				"t020_bike_compliances",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(BikeComplianceTableSync::COL_STATUS, INTEGER),
-					SQLiteTableFormat::Field(BikeComplianceTableSync::COL_CAPACITY, INTEGER),
-					SQLiteTableFormat::Field()
-				), SQLiteTableFormat::Indexes()
-			)
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<BikeComplianceTableSync>::TABLE(
+			"t020_bike_compliances"
 		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<BikeComplianceTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(BikeComplianceTableSync::COL_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(BikeComplianceTableSync::COL_CAPACITY, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<BikeComplianceTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<BikeComplianceTableSync,BikeCompliance>::Load(
 			BikeCompliance* cmp,

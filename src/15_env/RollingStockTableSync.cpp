@@ -56,14 +56,14 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE(
 			RollingStockTableSync::CreateFormat(
 				"t049_rolling_stock",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(RollingStockTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(RollingStockTableSync::COL_ARTICLE, TEXT),
-					SQLiteTableFormat::Field(RollingStockTableSync::COL_INDICATOR, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(RollingStockTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(RollingStockTableSync::COL_ARTICLE, SQL_TEXT),
+					SQLiteTableSync::Field(RollingStockTableSync::COL_INDICATOR, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

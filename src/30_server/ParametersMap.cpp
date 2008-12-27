@@ -1,24 +1,26 @@
-
-/** ParametersMap class implementation.
-	@file ParametersMap.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// ParametersMap class implementation.
+///	@file ParametersMap.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "ParametersMap.h"
 
@@ -30,7 +32,7 @@
 #include "01_util/Conversion.h"
 
 #include <boost/tokenizer.hpp>
-
+#include <boost/foreach.hpp>
 #include <sstream>
 
 using namespace std;
@@ -47,19 +49,18 @@ namespace synthese
 
 		ParametersMap::ParametersMap( const QueryString& text )
 		{
-			typedef tokenizer<char_separator<char> > tokenizer;
+			typedef tokenizer<char_separator<char> > _tokenizer;
 			char_separator<char> sep(QueryString::PARAMETER_SEPARATOR.c_str ());
 
 			// Parsing
-			tokenizer parametersTokens (text.getContent(), sep);
-			for (tokenizer::iterator parameterToken = parametersTokens.begin();
-				parameterToken != parametersTokens.end (); ++ parameterToken)
+			_tokenizer parametersTokens (text.getContent(), sep);
+			BOOST_FOREACH(const string& parameterToken, parametersTokens)
 			{
-				size_t pos = parameterToken->find (QueryString::PARAMETER_ASSIGNMENT);
+				size_t pos = parameterToken.find (QueryString::PARAMETER_ASSIGNMENT);
 				if (pos == string::npos) continue;
 
-				string parameterName (parameterToken->substr (0, pos));
-				string parameterValue (parameterToken->substr (pos+1));
+				string parameterName (parameterToken.substr (0, pos));
+				string parameterValue (parameterToken.substr (pos+1));
 
 				_map.insert (make_pair (parameterName, parameterValue));
 			}
@@ -76,7 +77,11 @@ namespace synthese
 
 		}
 
-		std::string ParametersMap::getString( const std::string& parameterName , bool neededParameter , const std::string& source ) const
+		std::string ParametersMap::getString(
+			const std::string& parameterName,
+			bool neededParameter,
+			const std::string& source 
+		) const throw(RequestMissingParameterException)
 		{
 			Map::const_iterator it(_map.find(parameterName));
 			if (it == _map.end())

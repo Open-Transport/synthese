@@ -50,13 +50,13 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<FareTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<FareTableSync>::TABLE(
 			FareTableSync::CreateFormat(
 				"t008_fares",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(FareTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(FareTableSync::COL_FARETYPE, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(FareTableSync::COL_NAME, SQL_TEXT),
+					SQLiteTableSync::Field(FareTableSync::COL_FARETYPE, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 

@@ -54,7 +54,7 @@ namespace synthese
 			RegistryKeyException(
 				const std::string& message,
 				const RegistryKeyType& key
-			) throw ();
+			);
 			~RegistryKeyException () throw ();
 
 
@@ -78,8 +78,7 @@ namespace synthese
 		RegistryKeyException<T>::RegistryKeyException(
 			const std::string& message
 			, const RegistryKeyType& key
-		) throw ()
-		: Exception (message + " : key=" + Conversion::ToString (key))
+		): Exception (message + " : key=" + Conversion::ToString (key))
 			, _key (key)
 		{
 		}

@@ -38,8 +38,13 @@ namespace synthese
 	namespace html
 	{
 
-		std::string HTMLModule::getLinkButton( const std::string& url, const std::string& caption, const string confirm, const string icon)
-		{
+		std::string HTMLModule::getLinkButton(
+			const std::string& url,
+			const std::string& caption,
+			const string confirm,
+			const string icon,
+			bool useOnclick
+		){
 			stringstream s;
 			s	<< "<a class=\"linkbutton\" "
 				<< "onmouseover=\"this.className='activatedlinkbutton';\" "
@@ -47,9 +52,29 @@ namespace synthese
 				<< "onmousedown=\"this.className='clickedlinkbutton';\" "
 				<< "onmouseup=\"this.className='activatedlinkbutton';\" ";
 			if (confirm.empty())
-				s << "href=\"" << url << "\"";
+			{
+				if (useOnclick)
+				{
+					s << "href=\"#\" onclick=\"" << url << " return false;\"";
+				}
+				else
+				{
+					s << "href=\"" << url << "\"";
+				}
+			}
 			else
-				s << "href=\"#\" onclick=\"if (window.confirm('" << confirm << "')) window.location='" << url << "';\"";
+			{
+				s << "href=\"#\" onclick=\"if (window.confirm('" << confirm << "')) ";
+				if (useOnclick)
+				{
+					s << url;
+				}
+				else
+				{
+					s << "window.location='" << url << "';";
+				}
+				s << "return false;\"";
+			}
 			s	<< ">";
 			if (!icon.empty())
 				s << getHTMLImage(icon, caption) << "&nbsp;";

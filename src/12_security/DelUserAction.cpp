@@ -23,7 +23,7 @@
 #include "DelUserAction.h"
 
 #include "12_security/UserTableSync.h"
-
+#include "SecurityRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -60,6 +60,13 @@ namespace synthese
 		void DelUserAction::run()
 		{
 			UserTableSync::Remove(_user->getKey());
+		}
+
+
+
+		bool DelUserAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<SecurityRight>(DELETE_RIGHT)
 		}
 	}
 }

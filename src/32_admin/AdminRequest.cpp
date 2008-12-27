@@ -54,19 +54,30 @@ namespace synthese
 
 	namespace admin
 	{
-		const std::string AdminRequest::PARAMETER_PAGE = "rub";
-		const std::string AdminRequest::PARAMETER_ACTION_FAILED_PAGE = "afp";
+		const string AdminRequest::PARAMETER_PAGE("rub");
+		const string AdminRequest::PARAMETER_TAB("tab");
+		const string AdminRequest::PARAMETER_ACTION_FAILED_PAGE("afp");
+		const string AdminRequest::PARAMETER_ACTION_FAILED_TAB("aft");
 		
 		ParametersMap AdminRequest::_getParametersMap() const
 		{
 			ParametersMap result(RequestWithInterfaceAndRequiredSession::_getParametersMap());
 
-			result.insert(PARAMETER_PAGE, _page->getFactoryKey());
+			if (_page.get())
+			{
+				result.insert(PARAMETER_PAGE, _page->getFactoryKey());
+				result.insert(PARAMETER_TAB, _page->getActiveTab());
+			}
 			if (_actionFailedPage.get())
+			{
 				result.insert(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey());
+				result.insert(PARAMETER_ACTION_FAILED_TAB, _actionFailedPage->getActiveTab());
+			}
 			const map<string,string> adminMap(_page->getParametersMap().getMap());
 			for (map<string,string>::const_iterator it(adminMap.begin()); it != adminMap.end(); ++it)
+			{
 				result.insert(it->first,it->second);
+			}
 			return result;
 		}
 
@@ -90,7 +101,11 @@ namespace synthese
 					// Saving of the action failed page for url output purposes
 					pageKey = map.getString(PARAMETER_ACTION_FAILED_PAGE, false, FACTORY_KEY);
 					if (!pageKey.empty())
+					{
 						_actionFailedPage.reset(Factory<AdminInterfaceElement>::create(pageKey));
+						_actionFailedPage->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
+						_actionFailedPage->setActiveTab(map.getString(PARAMETER_ACTION_FAILED_TAB, false, FACTORY_KEY));
+					}
 
 					pageKey = map.getString(PARAMETER_PAGE, false, FACTORY_KEY);
 				}
@@ -100,6 +115,7 @@ namespace synthese
 				);
 				page->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 				page->setFromParametersMap(map);
+				page->setActiveTab(map.getString(PARAMETER_TAB, false, FACTORY_KEY));
 				_page = page;
 				
 				// Parameters saving
@@ -160,6 +176,17 @@ namespace synthese
 		bool AdminRequest::_isAuthorized() const
 		{
 			return _page->isAuthorized();
+		}
+
+
+
+		void AdminRequest::setSamePage(
+			const AdminInterfaceElement* page
+		) {
+			_page.reset(Factory<AdminInterfaceElement>::create(page->getFactoryKey()));
+			_page->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
+			_request->setObjectId(page->getRequest()->getObjectId());
+			_page->setActiveTab(page->getCurrentTab());
 		}
 	}
 }

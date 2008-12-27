@@ -34,7 +34,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
-
+#include "User.h"
 #include "Conversion.h"
 
 #include <boost/foreach.hpp>
@@ -146,6 +146,16 @@ namespace synthese
 		void CancelReservationAction::setTransaction( boost::shared_ptr<ReservationTransaction> transaction )
 		{
 			_transaction = transaction;
+		}
+
+
+
+		bool CancelReservationAction::_isAuthorized(
+
+			) const {
+				_request->isAuthorized<ResaRight>(WRITE) ||
+					_customer->getKey() == _request->getUser()->getKey() && _request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+
 		}
 	}
 }

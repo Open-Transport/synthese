@@ -62,7 +62,6 @@ namespace synthese
 		/// ERRORS DETAILS |
 		/// @endcode
 		///
-		////////////////////////////////////////////////////////////////////////
 		class DisplayGetNagiosStatusFunction
 		:	public util::FactorableTemplate<server::Function,DisplayGetNagiosStatusFunction>
 		{
@@ -79,7 +78,6 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			///	Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
-			////////////////////////////////////////////////////////////////////
 			server::ParametersMap _getParametersMap() const;
 			
 			
@@ -87,7 +85,6 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
-			////////////////////////////////////////////////////////////////////
 			void _setFromParametersMap(const server::ParametersMap& map);
 			
 			
@@ -95,8 +92,16 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
 			///	@param stream Stream to write the output on
-			////////////////////////////////////////////////////////////////////
 			void _run(std::ostream& stream) const;
+
+			
+			
+			////////////////////////////////////////////////////////////////////
+			///	Defines the security policy of the action.
+			///	@author Hugues Romain
+			///	@date 2008
+			/// At the time, the function can be used without restrictions.
+			virtual void _isAuthorized() const;
 		};
 	}
 }

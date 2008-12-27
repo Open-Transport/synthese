@@ -25,7 +25,7 @@
 #include "12_security/ProfileTableSync.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/Profile.h"
-
+#include "SecurityRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/QueryString.h"
 #include "30_server/Request.h"
@@ -89,6 +89,14 @@ namespace synthese
 			user->setProfile(_profile.get());
 			UserTableSync::Save(user.get());
 			_request->setObjectId(user->getKey());
+		}
+
+
+
+		bool AddUserAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<SecurityRight>(WRITE);
+			/// @todo Add a control on the profile on the user who creates the new user, depending on the new user profile
 		}
 	}
 }

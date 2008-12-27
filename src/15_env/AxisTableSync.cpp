@@ -56,16 +56,23 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AxisTableSync>::TABLE(
-			AxisTableSync::CreateFormat(
-				"t004_axes",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(AxisTableSync::COL_NAME, TEXT),
-					SQLiteTableFormat::Field(AxisTableSync::COL_FREE, BOOLEAN),
-					SQLiteTableFormat::Field(AxisTableSync::COL_ALLOWED, BOOLEAN),
-					SQLiteTableFormat::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AxisTableSync>::TABLE(
+			"t004_axes"
+		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<AxisTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),				
+			SQLiteTableSync::Field(AxisTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(AxisTableSync::COL_FREE, SQL_BOOLEAN),
+			SQLiteTableSync::Field(AxisTableSync::COL_ALLOWED, SQL_BOOLEAN),
+			SQLiteTableSync::Field()
+		};
+		
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<AxisTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<AxisTableSync,Axis>::Load(
 			Axis* axis,

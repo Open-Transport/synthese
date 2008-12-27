@@ -56,6 +56,7 @@ namespace synthese
 						if (colspan > 1)
 							s << " colspan=\"" << colspan << "\"";
 						s << ">" << lastHeader << "</th>";
+						colspan=1;
 						++_cols;
 					}
 				}
@@ -160,6 +161,13 @@ namespace synthese
 		int HTMLTable::_getColsNumber() const
 		{
 			return _cols;
+		}
+
+
+
+		HTMLTable::~HTMLTable(
+		) {
+
 		}
 	}
 }

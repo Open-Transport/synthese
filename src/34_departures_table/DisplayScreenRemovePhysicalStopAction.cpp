@@ -26,7 +26,7 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "DisplayScreenRemovePhysicalStopAction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
@@ -42,6 +42,7 @@ namespace synthese
 	using namespace server;
 	using namespace env;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemovePhysicalStopAction>::FACTORY_KEY("dsrps");
 	
@@ -80,6 +81,14 @@ namespace synthese
 		{
 			_screen->removePhysicalStop(_stop.get());
 			DisplayScreenTableSync::Save(_screen.get());
+		}
+
+
+
+		bool DisplayScreenRemovePhysicalStopAction::_isAuthorized(
+
+			) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE)
 		}
 	}
 }

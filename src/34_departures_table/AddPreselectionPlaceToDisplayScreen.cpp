@@ -23,7 +23,7 @@
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "34_departures_table/AddPreselectionPlaceToDisplayScreen.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
@@ -39,6 +39,7 @@ namespace synthese
 	using namespace env;
 	using namespace db;
 	using namespace util;
+	using namespace security;
 
 	namespace util
 	{
@@ -81,6 +82,14 @@ namespace synthese
 		{
 			_screen->addForcedDestination(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
+		}
+
+
+
+		bool AddPreselectionPlaceToDisplayScreen::_isAuthorized(
+
+			) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

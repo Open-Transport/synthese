@@ -49,7 +49,7 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE.NAME = "t029_currencies";
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE.NAME = "t029_currencies";
 		template<> const int SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE.ID = 29;
 		template<> const bool SQLiteTableSyncTemplate<CurrencyTableSync>::HAS_AUTO_INCREMENT = true;
 
@@ -96,9 +96,9 @@ namespace synthese
 		CurrencyTableSync::CurrencyTableSync()
 			: SQLiteRegistryTableSyncTemplate<CurrencyTableSync,Currency>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
-			addTableColumn(TABLE_COL_SYMBOL, "TEXT", true);
+			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
+			addTableColumn(TABLE_COL_NAME, "SQL_TEXT", true);
+			addTableColumn(TABLE_COL_SYMBOL, "SQL_TEXT", true);
 		}
 
 

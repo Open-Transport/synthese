@@ -25,11 +25,11 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "01_util/UId.h"
-#include "01_util/FactorableTemplate.h"
+#include "UId.h"
+#include "FactorableTemplate.h"
 
-#include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
-#include "32_admin/AdminInterfaceElement.h"
+#include "RequestWithInterfaceAndRequiredSession.h"
+#include "AdminInterfaceElement.h"
 
 namespace synthese
 {
@@ -44,7 +44,9 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_PAGE;
+			static const std::string PARAMETER_TAB;
 			static const std::string PARAMETER_ACTION_FAILED_PAGE;
+			static const std::string PARAMETER_ACTION_FAILED_TAB;
 			
 		protected:
 			//! \name Page parameters
@@ -67,9 +69,23 @@ namespace synthese
 			*/
 			void _run(std::ostream& stream) const;
 
-			bool _isAuthorized() const;
+			virtual bool _isAuthorized() const;
+
+
 
 		public:
+			////////////////////////////////////////////////////////////////////
+			///	Sets the function to display the same page with same parameters.
+			///	@param page the current page (always use this)
+			///	@author Hugues Romain
+			///	@date 2008
+			/// The following parameters are copied :
+			///		- page key
+			///		- object id
+			///		- active tab = current tab of this at the method call
+			////////////////////////////////////////////////////////////////////
+			void setSamePage(const AdminInterfaceElement* page);
+
 			void setPage(boost::shared_ptr<AdminInterfaceElement> aie);
 
 			template<class T>

@@ -65,6 +65,8 @@ namespace synthese
 			void run();
 
 			void setType(boost::shared_ptr<const DisplayType> type);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

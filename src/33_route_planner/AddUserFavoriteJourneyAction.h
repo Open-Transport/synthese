@@ -79,6 +79,9 @@ namespace synthese
 			void run();
 			
 			AddUserFavoriteJourneyAction();
+
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

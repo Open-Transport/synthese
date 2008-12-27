@@ -25,7 +25,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
-
+#include "MessagesLibraryRight.h"
 #include "ScenarioFolderRemoveAction.h"
 #include "ScenarioFolderTableSync.h"
 #include "ScenarioTableSync.h"
@@ -41,6 +41,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace security;
+	
 	
 	namespace util
 	{
@@ -107,6 +109,13 @@ namespace synthese
 		void ScenarioFolderRemoveAction::setFolder( boost::shared_ptr<const ScenarioFolder> value )
 		{
 			_folder = value;
+		}
+
+
+
+		bool ScenarioFolderRemoveAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 		}
 	}
 }

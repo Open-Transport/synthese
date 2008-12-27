@@ -28,7 +28,7 @@
 #include "17_messages/ScenarioFolder.h"
 #include "17_messages/ScenarioFolderTableSync.h"
 #include "ScenarioTemplateInheritedTableSync.h"
-
+#include "MessagesLibraryRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -43,6 +43,8 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace util;
+	using namespace security;
+	
 
 	template<> const string util::FactorableTemplate<Action, messages::ScenarioNameUpdateAction>::FACTORY_KEY("snu");
 
@@ -100,6 +102,13 @@ namespace synthese
 				tscenario->setFolderId(_folder.get() ? _folder->getKey() : 0);
 
 			ScenarioTableSync::Save(_scenario.get());
+		}
+
+
+
+		bool ScenarioNameUpdateAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

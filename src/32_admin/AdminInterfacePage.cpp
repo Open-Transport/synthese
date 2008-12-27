@@ -45,7 +45,7 @@ namespace synthese
 			parameters.push_back(Conversion::ToString(objectId));
 			VariablesMap vars;
 
-			InterfacePage::display(
+			InterfacePage::_display(
 				stream
 				, parameters
 				, vars

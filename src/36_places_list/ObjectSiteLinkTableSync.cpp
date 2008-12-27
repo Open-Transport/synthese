@@ -56,13 +56,13 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE(
 			ObjectSiteLinkTableSync::CreateFormat(
 				"t001_object_site_links",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ObjectSiteLinkTableSync::COL_OBJECT_ID, INTEGER),
-					SQLiteTableFormat::Field(ObjectSiteLinkTableSync::COL_SITE_ID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(ObjectSiteLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(ObjectSiteLinkTableSync::COL_SITE_ID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes(),
 				false
 		)	);

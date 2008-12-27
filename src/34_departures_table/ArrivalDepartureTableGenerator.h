@@ -34,7 +34,6 @@ namespace synthese
 	namespace env
 	{
 		class Line;
-		class LineStop;
 	}
 
 	namespace departurestable

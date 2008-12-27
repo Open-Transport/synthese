@@ -53,7 +53,7 @@ namespace synthese
 			pv.push_back(name);
 			pv.push_back(Conversion::ToString(id));
 
-			InterfacePage::display(stream, pv, variables, NULL, request);
+			InterfacePage::_display(stream, pv, variables, NULL, request);
 		}
 
 

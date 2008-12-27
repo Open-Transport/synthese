@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "34_departures_table/DisplayScreenTableSync.h"
 
 #include "15_env/ConnectionPlaceTableSync.h"
-
+#include "ArrivalDepartureTableRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -39,6 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace env;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemoveForbiddenPlaceAction>::FACTORY_KEY("dsrfp");
 
@@ -78,6 +79,14 @@ namespace synthese
 		{
 			_screen->removeForbiddenPlace(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
+		}
+
+
+
+		bool DisplayScreenRemoveForbiddenPlaceAction::_isAuthorized(
+
+			) const {
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

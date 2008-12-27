@@ -49,7 +49,7 @@ namespace synthese
 	namespace interfaces
 	{
 
-		void InterfacePage::display(
+		void InterfacePage::_display(
 			std::ostream& stream
 			, const ParametersVector& parameters
 			, VariablesMap& vars
@@ -68,7 +68,7 @@ namespace synthese
 
 
 
-		void InterfacePage::parse( const std::string& text )
+		void InterfacePage::_parse( const std::string& text )
 		{
 			int counter = 0;
 			size_t start_pos;
@@ -129,7 +129,8 @@ namespace synthese
 			RegistryKeyType key
 		):  Registrable(key),
 			FactoryBase<InterfacePage>(),
-			_interface(NULL)
+			_interface(NULL),
+			_directDisplayAllowed(false)
 		{
 
 		}
@@ -139,7 +140,7 @@ namespace synthese
 		string InterfacePage::getValue( const ParametersVector& parameters , VariablesMap& variables , const void* object /*= NULL */, const server::Request* request /*= NULL  */ ) const
 		{
 			stringstream s;
-			display(s, parameters, variables, object, request);
+			_display(s, parameters, variables, object, request);
 			return s.str();
 		}
 

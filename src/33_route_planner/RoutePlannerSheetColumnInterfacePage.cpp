@@ -65,7 +65,7 @@ namespace synthese
 			pv.push_back( Conversion::ToString( isFirstFoot ) );
 
 			VariablesMap vm;
-			InterfacePage::display( stream, pv, vm, NULL, request );
+			InterfacePage::_display( stream, pv, vm, NULL, request );
 			
 		}
 

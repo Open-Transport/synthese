@@ -72,8 +72,8 @@ namespace synthese
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::ICON("monitor.png");
-		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::DEFAULT_TITLE("Afficheurs");
+		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::ICON("computer.png");
+		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::DEFAULT_TITLE("Equipements");
 	}
 
 	namespace departurestable
@@ -154,107 +154,117 @@ namespace synthese
 
 		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables
 		) const	{
-			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(_request);
-			createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
-			createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
-			createDisplayRequest.getAction()->setPlace(_place);
-
-			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<DisplaySearchAdmin>();
-
-			FunctionRequest<AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<DisplayAdmin>();
-
-			FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
-
-			if (!_place.get())
+			if (openTabContent(stream, TAB_DISPLAY_SCREENS))
 			{
-				stream << "<h1>Recherche</h1>";
+				ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(_request);
+				createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
+				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
+				createDisplayRequest.getAction()->setPlace(_place);
 
-				stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
-			}
+				FunctionRequest<AdminRequest> searchRequest(_request);
+				searchRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
-			stream << "<h1>" << (_place.get() ? "Afficheurs" : "Résultats de la recherche") << "</h1>";
+				FunctionRequest<AdminRequest> updateRequest(_request);
+				updateRequest.getFunction()->setPage<DisplayAdmin>();
 
-			ActionResultHTMLTable::HeaderVector v;
-			if (!_place.get())
-			{
-				v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
-				v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
-			}
-			v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
-			v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
-			v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
-			v.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Contenu"));
-			v.push_back(make_pair(string(), "Actions"));
-			v.push_back(make_pair(string(), "Actions"));
+				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
 
-			ActionResultHTMLTable t(
-				v
-				, searchRequest.getHTMLForm("search")
-				, _requestParameters
-				, _resultParameters
-				, createDisplayRequest.getHTMLForm("create")
-				, CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID
-				, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
-			);
-
-			stream << t.open();
-
-			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, _env.getRegistry<DisplayScreen>())
-			{
-				updateRequest.setObjectId(screen->getKey());
-				viewRequest.setObjectId(screen->getKey());
-				shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(screen->getKey()));
-				shared_ptr<SentAlarm> alarm(DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey()));
-				
-				stream << t.row(Conversion::ToString(screen->getKey()));
 				if (!_place.get())
 				{
-					stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getCity()->getName() : "(indéterminé)");
-					stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getName() : "(indéterminé)");
+					stream << "<h1>Recherche</h1>";
+
+					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
 				}
-				stream << t.col() << screen->getLocalizationComment();
-				stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
-				stream << t.col() << HTMLModule::getHTMLImage(DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()), status->getDetail());
-				stream << t.col();
-				if (!screen->getIsOnline())
+
+				stream << "<h1>" << (_place.get() ? "Afficheurs" : "Résultats de la recherche") << "</h1>";
+
+				ActionResultHTMLTable::HeaderVector v;
+				if (!_place.get())
 				{
-					stream << HTMLModule::getHTMLImage("cross.png", "Désactivé par la maintenance : "+ screen->getMaintenanceMessage());
+					v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
+					v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
 				}
-				else
+				v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
+				v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
+				v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
+				v.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Contenu"));
+				v.push_back(make_pair(string(), "Actions"));
+				v.push_back(make_pair(string(), "Actions"));
+
+				ActionResultHTMLTable t(
+					v
+					, searchRequest.getHTMLForm("search")
+					, _requestParameters
+					, _resultParameters
+					, createDisplayRequest.getHTMLForm("create")
+					, CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID
+					, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+				);
+				t.getActionForm().setUpdateRight(tabHasWritePermissions());
+
+				stream << t.open();
+
+				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, _env.getRegistry<DisplayScreen>())
 				{
-					if (alarm.get() != NULL)
+					updateRequest.setObjectId(screen->getKey());
+					viewRequest.setObjectId(screen->getKey());
+					shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(screen->getKey()));
+					vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey(), 1));
+					shared_ptr<SentAlarm> alarm(alarms.empty() ? shared_ptr<SentAlarm>() : alarms.front());
+
+					stream << t.row(Conversion::ToString(screen->getKey()));
+					if (!_place.get())
 					{
-						stream << HTMLModule::getHTMLImage(
-							(alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",
-							"Message : " + alarm->getShortMessage()
-						);
+						stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getCity()->getName() : "(indéterminé)");
+						stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getName() : "(indéterminé)");
+					}
+					stream << t.col() << screen->getLocalizationComment();
+					stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
+					stream << t.col() << HTMLModule::getHTMLImage(DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()), status->getDetail());
+					stream << t.col();
+					if (!screen->getIsOnline())
+					{
+						stream << HTMLModule::getHTMLImage("cross.png", "Désactivé par la maintenance : "+ screen->getMaintenanceMessage());
 					}
 					else
 					{
-						if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(screen->getKey()))
+						if (alarm.get() != NULL)
 						{
-							stream << HTMLModule::getHTMLImage("times_display.png", "Affichage d'horaires en cours");
+							stream << HTMLModule::getHTMLImage(
+								(alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",
+								"Message : " + alarm->getShortMessage()
+								);
 						}
 						else
 						{
-							stream << HTMLModule::getHTMLImage("empty_display.png", "Aucune ligne affichée, écran vide");
+							if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(screen->getKey()))
+							{
+								stream << HTMLModule::getHTMLImage("times_display.png", "Affichage d'horaires en cours");
+							}
+							else
+							{
+								stream << HTMLModule::getHTMLImage("empty_display.png", "Aucune ligne affichée, écran vide");
+							}
 						}
 					}
+					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
+					stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png");
 				}
-				stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
-				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png");
-			}
 
-			if (_place.get())
+				if (tabHasWritePermissions())
+				{
+					stream << t.row();
+					stream << t.col(_place.get() ? 4 : 6) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
+					stream << t.col(3) << t.getActionForm().getSubmitButton("Créer un nouvel afficheur");
+				}
+
+				stream << t.close();
+			}
+			if (openTabContent(stream, TAB_CPU))
 			{
-				stream << t.row();
-				stream << t.col(_place.get() ? 4 : 6) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
-				stream << t.col(3) << t.getActionForm().getSubmitButton("Créer un nouvel afficheur");
-			}
 
-			stream << t.close();
+			}
+			closeTabContent(stream);
 		}
 
 		std::string DisplaySearchAdmin::getHtmlSearchForm(const HTMLForm& form
@@ -331,14 +341,24 @@ namespace synthese
 			return _place.get() ? Conversion::ToString(_place->getKey()) : string();
 		}
 
-		std::string DisplaySearchAdmin::getIcon() const
-		{
-			return _place.get() ? BroadcastPointsAdmin::ICON : ICON;
-		}
-
 		bool DisplaySearchAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
 		{
 			return true;
+		}
+
+
+
+		void DisplaySearchAdmin::_buildTabs(
+		) const {
+			bool writeRight(
+				(_place.get() != NULL) ?
+				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey()) :
+				false
+			)
+			_tabs.clear();
+			_tabs.push_back(Tab("Afficheurs", TAB_DISPLAY_SCREENS, writeRight, "monitor.png"));
+			_tabs.push_back(Tab("Unités centrales", TAB_CPU, writeRight, "server.png"));
+			_tabBuilded = true;
 		}
 	}
 }

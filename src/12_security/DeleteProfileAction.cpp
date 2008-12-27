@@ -27,7 +27,7 @@
 #include "12_security/UserTableSync.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/SecurityLog.h"
-
+#include "SecurityRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -79,6 +79,13 @@ namespace synthese
 
 			// Log
 			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), "Suppression de " + _profile->getName());
+		}
+
+
+
+		bool DeleteProfileAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<SecurityRight>(DELETE);
 		}
 	}
 }

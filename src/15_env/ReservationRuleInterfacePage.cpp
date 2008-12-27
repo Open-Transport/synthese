@@ -64,7 +64,7 @@ namespace synthese
 			datePage->display(s, variables, deadLine, request);
 			pv.push_back(s.str());
 
-			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&journey), request);
+			InterfacePage::_display(stream, pv, variables, static_cast<const void*>(&journey), request);
 		}
 
 

@@ -106,5 +106,12 @@ namespace synthese
 		{
 			_password = password;
 		}
+
+
+
+		bool LoginAction::_isAuthorized(
+		) const {
+			return true;
+		}
 	}
 }

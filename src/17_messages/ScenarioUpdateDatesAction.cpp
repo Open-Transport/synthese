@@ -27,7 +27,7 @@
 #include "17_messages/SentScenario.h"
 #include "17_messages/SentScenarioInheritedTableSync.h"
 #include "17_messages/MessagesLog.h"
-
+#include "MessagesRight.h"
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
@@ -47,6 +47,7 @@ namespace synthese
 	using namespace db;
 	using namespace time;
 	using namespace util;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action,messages::ScenarioUpdateDatesAction>::FACTORY_KEY("ScenarioUpdateDatesAction");
 		
@@ -112,6 +113,13 @@ namespace synthese
 
 			// Log
 			MessagesLog::addUpdateEntry(_scenario.get(), text.str(), _request->getUser().get());
+		}
+
+
+
+		bool ScenarioUpdateDatesAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

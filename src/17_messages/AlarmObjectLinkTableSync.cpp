@@ -50,24 +50,24 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE(
 			AlarmObjectLinkTableSync::CreateFormat(
 				"t040_alarm_object_links",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, TEXT),
-					SQLiteTableFormat::Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, INTEGER),
-					SQLiteTableFormat::Field(AlarmObjectLinkTableSync::COL_ALARM_ID, INTEGER),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, SQL_TEXT),
+					SQLiteTableSync::Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
+					SQLiteTableSync::Field(AlarmObjectLinkTableSync::COL_ALARM_ID, SQL_INTEGER),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableFormat::Index(
+					SQLiteTableSync::Index(
 						"objectalarm",
-						SQLiteTableFormat::Index::CreateFieldsList(
+						SQLiteTableSync::Index::CreateFieldsList(
 							AlarmObjectLinkTableSync::COL_OBJECT_ID,
 							AlarmObjectLinkTableSync::COL_ALARM_ID,
 							string()
 					)	),
-					SQLiteTableFormat::Index(AlarmObjectLinkTableSync::COL_ALARM_ID),
-					SQLiteTableFormat::Index()
+					SQLiteTableSync::Index(AlarmObjectLinkTableSync::COL_ALARM_ID),
+					SQLiteTableSync::Index()
 		)	)	);
 
 		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(

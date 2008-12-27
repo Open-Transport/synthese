@@ -51,17 +51,19 @@ namespace synthese
 	{
 		class BroadcastPoint;
 
-		typedef struct {
+		struct ConnectionPlaceWithBroadcastPoint
+		{
 			boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> place;
 			std::string	cityName;
 			int broadCastPointsNumber;
-			} ConnectionPlaceWithBroadcastPoint;
+			int cpuNumber;
+		};
 		
 		typedef enum {
 			AT_LEAST_ONE_BROADCASTPOINT,
 			NO_BROADCASTPOINT,
 			WITH_OR_WITHOUT_ANY_BROADCASTPOINT
-			} BroadcastPointsPresence;
+		} BroadcastPointsPresence;
 
 		/** Connection place searcher.
 			@param broadCastPointsNumber Filter on broadcast points number : 0 = no broadcast points, 1 = at least one broadcast point
@@ -75,12 +77,14 @@ namespace synthese
 			, std::string cityName = std::string()
 			, std::string placeName = std::string()
 			, BroadcastPointsPresence bpPresence = WITH_OR_WITHOUT_ANY_BROADCASTPOINT
+			, BroadcastPointsPresence cpuPresence = WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 			, uid lineId = UNKNOWN_VALUE
 			, int number = UNKNOWN_VALUE
 			, int first = 0
 			, bool orderByCity = true
 			, bool orderByName = false
 			, bool orderByNumber = false
+			, bool orderByCPUNumber = false
 			, bool raisingOrder = true
 		);
 

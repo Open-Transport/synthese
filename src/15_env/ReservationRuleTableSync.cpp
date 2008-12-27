@@ -61,22 +61,22 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableFormat SQLiteTableSyncTemplate<ReservationRuleTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationRuleTableSync>::TABLE(
 			ReservationRuleTableSync::CreateFormat(
 				"t021_reservation_rules",
 				SQLiteTableFormat::CreateFields(
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_TYPE, INTEGER),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_ONLINE, BOOLEAN),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_ORIGINISREFERENCE, BOOLEAN),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_MINDELAYMINUTES, INTEGER),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_MINDELAYDAYS, INTEGER),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_MAXDELAYDAYS, INTEGER),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_HOURDEADLINE, TIME),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_PHONEEXCHANGENUMBER, TEXT),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_PHONEEXCHANGEOPENINGHOURS, TEXT),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_DESCRIPTION, TEXT),
-					SQLiteTableFormat::Field(ReservationRuleTableSync::COL_WEBSITEURL, TEXT),
-					SQLiteTableFormat::Field()
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_TYPE, SQL_INTEGER),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_ONLINE, SQL_BOOLEAN),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_PHONEEXCHANGENUMBER, SQL_TEXT),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_PHONEEXCHANGEOPENINGHOURS, SQL_TEXT),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_DESCRIPTION, SQL_TEXT),
+					SQLiteTableSync::Field(ReservationRuleTableSync::COL_WEBSITEURL, SQL_TEXT),
+					SQLiteTableSync::Field()
 				), SQLiteTableFormat::Indexes()
 		)	);
 
