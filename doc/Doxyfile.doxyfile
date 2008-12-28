@@ -1,4 +1,4 @@
-# Doxyfile 1.5.5
+# Doxyfile 1.5.6
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -43,6 +43,7 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 BUILTIN_STL_SUPPORT    = YES
 CPP_CLI_SUPPORT        = NO
 SIP_SUPPORT            = NO
+IDL_PROPERTY_SUPPORT   = YES
 DISTRIBUTE_GROUP_DOC   = YES
 SUBGROUPING            = YES
 TYPEDEF_HIDES_STRUCT   = NO
@@ -76,6 +77,8 @@ ENABLED_SECTIONS       =
 MAX_INITIALIZER_LINES  = 10
 SHOW_USED_FILES        = YES
 SHOW_DIRECTORIES       = YES
+SHOW_FILES             = YES
+SHOW_NAMESPACES        = YES
 FILE_VERSION_FILTER    = 
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
@@ -90,9 +93,9 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ../src \
-                         pages \
-                         customer_specs \
+INPUT                  = src \
+                         ../src \
+                         ../utils
                          ../../../doc/res
 INPUT_ENCODING         = ISO-8859-15
 FILE_PATTERNS          = *.c \
@@ -103,8 +106,7 @@ FILE_PATTERNS          = *.c \
                          *.py \
                          *.sql
 RECURSIVE              = YES
-EXCLUDE                = exemples \
-                         ../test
+EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = *.inc.cpp \
                          *.gen.cpp
@@ -112,14 +114,12 @@ EXCLUDE_SYMBOLS        = FACTORY_KEY \
                          _registry \
                          DEFAULT_TITLE \
                          ICON
-EXAMPLE_PATH           = exemples \
-                         ../main \
+EXAMPLE_PATH           = ../main \
                          ../test
 EXAMPLE_PATTERNS       = *.xml \
                          *.cpp
 EXAMPLE_RECURSIVE      = YES
-IMAGE_PATH             = images \
-                         backoffice_manuals \
+IMAGE_PATH             = img
                          ../../../doc/res
 INPUT_FILTER           = 
 FILTER_PATTERNS        = 
@@ -159,12 +159,14 @@ HTML_DYNAMIC_SECTIONS  = NO
 CHM_FILE               = 
 HHC_LOCATION           = 
 GENERATE_CHI           = NO
+CHM_INDEX_ENCODING     = 
 BINARY_TOC             = NO
 TOC_EXPAND             = NO
 DISABLE_INDEX          = YES
 ENUM_VALUES_PER_LINE   = 1
 GENERATE_TREEVIEW      = YES
 TREEVIEW_WIDTH         = 250
+FORMULA_FONTSIZE       = 10
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
@@ -294,6 +296,8 @@ CLASS_DIAGRAMS         = YES
 MSCGEN_PATH            = "C:\Program Files\MSCGen  "
 HIDE_UNDOC_RELATIONS   = NO
 HAVE_DOT               = YES
+DOT_FONTNAME           = FreeSans
+DOT_FONTPATH           = 
 CLASS_GRAPH            = YES
 COLLABORATION_GRAPH    = YES
 GROUP_GRAPHS           = YES
