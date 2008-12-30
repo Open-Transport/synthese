@@ -1,58 +1,52 @@
-
-/** DBLogViewer class implementation.
-	@file DBLogViewer.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include <sstream>
-
-#include <boost/shared_ptr.hpp>
+////////////////////////////////////////////////////////////////////////////////
+/// DBLogViewer class implementation.
+///	@file DBLogViewer.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "01_util/Constants.h"
-
 #include "ResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
-
 #include "InterfaceModule.h"
-
 #include "SecurityModule.h"
 #include "User.h"
 #include "UserTableSync.h"
-
 #include "DBLog.h"
 #include "DBLogViewer.h"
 #include "DBLogModule.h"
 #include "DBLogEntryTableSync.h"
 #include "DBLogRight.h"
-
 #include "QueryString.h"
 #include "Request.h"
-
 #include "AdminParametersException.h"
 #include "AdminModule.h"
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
 
+#include <sstream>
+#include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -205,12 +199,13 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DBLogModule::FACTORY_KEY)
 			{
-				for (Factory<DBLog>::Iterator it = Factory<DBLog>::begin(); it != Factory<DBLog>::end(); ++it)
+				vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
+				BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
 				{
 					AdminInterfaceElement::PageLink link(getPageLink());
-					link.name = it->getName();
+					link.name = loge->getName();
 					link.parameterName = PARAMETER_LOG_KEY;
-					link.parameterValue = it.getKey();
+					link.parameterValue = loge->getFactoryKey();
 					links.push_back(link);
 				}
 			}

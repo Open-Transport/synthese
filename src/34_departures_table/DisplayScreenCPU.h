@@ -27,6 +27,7 @@
 #define SYNTHESE_departurestable_DisplayScreenCPU_h__
 
 #include "Registrable.h"
+#include "Registry.h"
 
 #include <string>
 
@@ -51,7 +52,7 @@ namespace synthese
 		:	public util::Registrable
 		{
 		public:
-			typedef Registry<DisplayScreenCPU> Registry;
+			typedef util::Registry<DisplayScreenCPU> Registry;
 			
 		protected:
 			// Attributes

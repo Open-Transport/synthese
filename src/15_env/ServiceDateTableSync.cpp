@@ -57,26 +57,22 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ServiceDateTableSync>::TABLE(
-			"t005_service_dates",
-			true,
-			TRIGGERS_ENABLED_CLAUSE,
-			false,
-			true,
-			SQLiteTableFormat::CreateFields(
-				SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-				SQLiteTableSync::Field(ServiceDateTableSync::COL_SERVICEID, SQL_INTEGER, false),
-				SQLiteTableSync::Field(ServiceDateTableSync::COL_DATE, SQL_DATE, false),
-				SQLiteTableSync::Field()
-			), SQLiteTableFormat::CreateIndexes(
-				SQLiteTableSync::Index(
-					"servicedate",
-					SQLiteTableSync::Index::CreateFieldsList(
-						ServiceDateTableSync::COL_SERVICEID,
-						ServiceDateTableSync::COL_DATE,
-						string()
-				)	),
-				SQLiteTableSync::Index()
-		)	);
+			"t005_service_dates"
+			);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ServiceDateTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(ServiceDateTableSync::COL_SERVICEID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(ServiceDateTableSync::COL_DATE, SQL_DATE, false),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ServiceDateTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(ServiceDateTableSync::COL_SERVICEID.c_str(), ServiceDateTableSync::COL_DATE.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 	}
 
 	namespace env

@@ -45,7 +45,7 @@ namespace synthese
 			, const server::Request* request) const
 		{
 			const InterfacePage* page_to_include = _page->getInterface()->getPage(_class_code->getValue(parameters, variables, object, request), _page_code->getValue(parameters, variables, object, request));
-			page_to_include->display(stream, _parameters.fillParameters( parameters, variables, object, request ), variables, object, request);
+			page_to_include->_display(stream, _parameters.fillParameters( parameters, variables, object, request ), variables, object, request);
 			return string();
 		}
 

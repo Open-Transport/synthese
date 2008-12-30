@@ -30,6 +30,11 @@ using namespace std;
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> const string Registry<departurestable::DisplayScreenCPU>::KEY("DisplayScreenCPU");
+	}
+
 	namespace departurestable
 	{
 		using namespace util;

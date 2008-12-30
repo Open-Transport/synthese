@@ -58,15 +58,22 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE(
-			NonConcurrencyRuleTableSync::CreateFormat(
-				"t056_non_concurrency_rules",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, SQL_INTEGER, false),
-					SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, SQL_INTEGER, false),
-					SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+			"t056_non_concurrency_rules"
+		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+		
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 
 		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(

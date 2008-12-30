@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE (testSQLiteValueWrapping)
       
     // Create test_table
     SQLite::ExecUpdate (db, 
-			"CREATE TABLE IF NOT EXISTS test_table (col1 INT64 PRIMARY KEY, col2 INTEGER, col3 DOUBLE, col4 TEXT, col5 BLOB)"
+			"CREATE TABLE IF NOT EXISTS test_table (col1 INT64 PRIMARY KEY, col2 SQL_INTEGER, col3 SQL_DOUBLE, col4 SQL_TEXT, col5 BLOB)"
 	);
 
     // Insert some values
@@ -85,11 +85,11 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetSchema)
     SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
-    SQLiteTableFormat format;
-    format.addTableColumn ("col1", "INTEGER", true);
-    format.addTableColumn ("col2", "TEXT", true);
+    SQLiteTableSync::Formatformat;
+    format.addTableColumn ("col1", "SQL_INTEGER", true);
+    format.addTableColumn ("col2", "SQL_TEXT", true);
      
-    std::string expected ("CREATE TABLE test_table (col1 INTEGER UNIQUE PRIMARY KEY, col2 TEXT)");
+    std::string expected ("CREATE TABLE test_table (col1 SQL_INTEGER UNIQUE PRIMARY KEY, col2 SQL_TEXT)");
     BOOST_CHECK_EQUAL (expected, SQLiteTableSync::CreateSQLSchema ("test_table", format));
       
     sqlite->execUpdate (expected);

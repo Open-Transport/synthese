@@ -1,38 +1,38 @@
+////////////////////////////////////////////////////////////////////////////////
+/// SecurityModule class implementation.
+///	@file SecurityModule.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-/** SecurityModule class implementation.
-	@file SecurityModule.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include <vector>
 
 #include "SecurityModule.h"
-
 #include "Factory.h"
 #include "01_util/Constants.h"
-
 #include "ProfileTableSync.h"
 #include "UserTableSync.h"
 #include "User.h"
 #include "Profile.h"
 #include "GlobalRight.h"
 
+#include <vector>
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -92,8 +92,11 @@ namespace synthese
 		std::vector<pair<string, string> > SecurityModule::getRightsTemplates()
 		{
 			vector<pair<string, string> > m;
-			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
-				m.push_back(make_pair(it.getKey(), it.getKey()));
+			vector<shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<Right> right, rights)
+			{
+				m.push_back(make_pair(right->getFactoryKey(), right->getFactoryKey()));
+			}
 			return m;
 		}
 
@@ -106,7 +109,9 @@ namespace synthese
 			Env env;
 			ProfileTableSync::Search(env);
 			BOOST_FOREACH(shared_ptr<Profile> profile, env.getRegistry<Profile>())
+			{
 				m.push_back(make_pair(profile->getKey(), profile->getName()));
+			}
 			return m;
 		}
 
@@ -119,7 +124,9 @@ namespace synthese
 			Env env;
 			UserTableSync::Search(env, "%","%","%","%",UNKNOWN_VALUE, false);
 			BOOST_FOREACH(shared_ptr<User> user, env.getRegistry<User>())
+			{
 				m.push_back(make_pair(user->getKey(), user->getSurname() + " " + user->getName()));
+			}
 			return m;
 		}
 
@@ -128,8 +135,11 @@ namespace synthese
 			vector<pair<string, string> > m;
 			if (withAll)
 				m.push_back(make_pair("", "(toutes)"));
-			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
-				m.push_back(make_pair(it.getKey(), it->getName()));
+			vector<shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<Right> right, rights)
+			{
+				m.push_back(make_pair(right->getFactoryKey(), right->getName()));
+			}
 			return m;
 		}
 

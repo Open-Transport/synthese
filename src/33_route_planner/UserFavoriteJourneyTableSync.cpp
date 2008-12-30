@@ -65,18 +65,25 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE(
-			UserFavoriteJourneyTableSync::CreateFormat(
-				"t048_user_favorite_journey",
-				SQLiteTableFormat::CreateFields(						
-					SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_USER_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_RANK, SQL_INTEGER),
-					SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, SQL_TEXT),
-					SQLiteTableSync::Field()
-				),SQLiteTableFormat::Indexes()
-		)	);
+				"t048_user_favorite_journey"
+				);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_USER_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_RANK, SQL_INTEGER),
+			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, SQL_TEXT),
+			SQLiteTableSync::Field()
+		};
+		
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 
 

@@ -55,21 +55,19 @@ namespace synthese
 		template <class RootObject>
 		class Factory
 		{
-		public:
-			class Iterator;
-
-		private:
-
-			/** Interface for auto-generated creators. */
+			////////////////////////////////////////////////////////////////////
+			/// Interface for auto-generated creators.
 			class CreatorInterface
 			{
 			private:
 				virtual RootObject* create() = 0;
 				friend class Factory;
-				friend class Factory::Iterator;
 			};
 
-			/** Auto-generated creator for each registered subclass. */
+
+
+			////////////////////////////////////////////////////////////////////
+			/// Auto-generated creator for each registered subclass.
 			template <class T>
 			class Creator : public CreatorInterface
 			{
@@ -90,13 +88,14 @@ namespace synthese
 
 
 
-			/** Registered subclasses map type. */
+			////////////////////////////////////////////////////////////////////
+			/// Registered subclasses map type.
 			typedef std::map<std::string, CreatorInterface*> Map;
 
 
 
-			/** The registered subclasses map.
-			*/
+			////////////////////////////////////////////////////////////////////
+			/// The registered subclasses map.
 			static Map _registeredCreator;
 
 
@@ -108,9 +107,9 @@ namespace synthese
 				return _registeredCreator.size();
 			}
 
-			/** Subclass automatic registration.
-				@return the key if ok, empty string if the subclass is already registered
-			*/
+			////////////////////////////////////////////////////////////////////
+			/// Subclass automatic registration.
+			///	@return the key if ok, empty string if the subclass is already registered
 			template <class T>
 				static void integrate()
 			{
@@ -128,11 +127,11 @@ namespace synthese
 
 
 
-			/** Tests if the factory contains a class registered with the specified key.
-				@param key Key to search
-				@return bool true if a class is already registered with the specified key
-				@author Hugues Romain
-			*/
+			////////////////////////////////////////////////////////////////////
+			/// Tests if the factory contains a class registered with the specified key.
+			///	@param key Key to search
+			///	@return bool true if a class is already registered with the specified key
+			///	@author Hugues Romain
 			static bool contains( const typename Map::key_type& key )
 			{
 				// Search of the key of the wished class in the map
@@ -144,12 +143,12 @@ namespace synthese
 
 
 
-			/** Creation of an object from the key of its class, with arguments, returned as a pointer to an instantiation of the factory root class.
-				@param key Key of the class to instantiate
-				@param args Arguments to transmit to the constructor
-				@return RootObject* Pointer to the instantiated object
-				@author Hugues Romain
-			*/
+			////////////////////////////////////////////////////////////////////
+			/// Creation of an object from the key of its class, with arguments, returned as a pointer to an instantiation of the factory root class.
+			///	@param key Key of the class to instantiate
+			///	@param args Arguments to transmit to the constructor
+			///	@return RootObject* Pointer to the instantiated object
+			///	@author Hugues Romain
 			static RootObject* create(const typename Map::key_type& key)
 			{
 				// The factory "single object" was never filled

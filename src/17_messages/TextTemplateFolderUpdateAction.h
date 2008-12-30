@@ -73,6 +73,8 @@ namespace synthese
 			TextTemplateFolderUpdateAction();
 
 			void setFolderId(uid id);
+
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

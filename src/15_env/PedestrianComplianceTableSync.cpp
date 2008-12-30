@@ -52,14 +52,21 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::TABLE(
-			PedestrianComplianceTableSync::CreateFormat(
-				"t018_pedestrian_compliances",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(PedestrianComplianceTableSync::COL_STATUS, SQL_INTEGER),
-					SQLiteTableSync::Field(PedestrianComplianceTableSync::COL_CAPACITY, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+				"t018_pedestrian_compliances"
+				);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(PedestrianComplianceTableSync::COL_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(PedestrianComplianceTableSync::COL_CAPACITY, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<PedestrianComplianceTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<PedestrianComplianceTableSync,PedestrianCompliance>::Load(
 			PedestrianCompliance* cmp,

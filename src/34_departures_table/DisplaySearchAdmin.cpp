@@ -78,6 +78,8 @@ namespace synthese
 
 	namespace departurestable
 	{
+		const string DisplaySearchAdmin::TAB_CPU("cp");
+		const string DisplaySearchAdmin::TAB_DISPLAY_SCREENS("ds");
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_CITY = "dsascity";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_STOP = "dsaslid";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_NAME = "dsasloc";
@@ -352,9 +354,9 @@ namespace synthese
 		) const {
 			bool writeRight(
 				(_place.get() != NULL) ?
-				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey()) :
+				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
 				false
-			)
+			);
 			_tabs.clear();
 			_tabs.push_back(Tab("Afficheurs", TAB_DISPLAY_SCREENS, writeRight, "monitor.png"));
 			_tabs.push_back(Tab("Unités centrales", TAB_CPU, writeRight, "server.png"));

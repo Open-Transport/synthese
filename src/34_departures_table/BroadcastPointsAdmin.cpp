@@ -1,48 +1,45 @@
+////////////////////////////////////////////////////////////////////////////////
+/// BroadcastPointsAdmin class implementation.
+///	@file BroadcastPointsAdmin.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-/** BroadcastPointsAdmin class implementation.
-	@file BroadcastPointsAdmin.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "34_departures_table/BroadcastPointsAdmin.h"
-#include "34_departures_table/DisplaySearchAdmin.h"
-#include "34_departures_table/ArrivalDepartureTableRight.h"
-#include "34_departures_table/DeparturesTableModule.h"
+#include "BroadcastPointsAdmin.h"
+#include "DisplaySearchAdmin.h"
+#include "ArrivalDepartureTableRight.h"
+#include "DeparturesTableModule.h"
+#include "SearchFormHTMLTable.h"
+#include "ResultHTMLTable.h"
+#include "ConnectionPlaceTableSync.h"
+#include "City.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "EnvModule.h"
+#include "FunctionRequest.h"
+#include "Session.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
+#include "User.h"
+#include "Profile.h"
 
 #include <map>
-
-#include "05_html/SearchFormHTMLTable.h"
-#include "05_html/ResultHTMLTable.h"
-
-#include "15_env/ConnectionPlaceTableSync.h"
-#include "15_env/City.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/EnvModule.h"
-
-#include "30_server/FunctionRequest.h"
-#include "30_server/Session.h"
-
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
-
-#include "12_security/User.h"
-#include "12_security/Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -70,10 +67,11 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string BroadcastPointsAdmin::PARAMETER_CITY_NAME = "city";
-		const std::string BroadcastPointsAdmin::PARAMETER_PLACE_NAME = "place";
-		const std::string BroadcastPointsAdmin::PARAMETER_LINE_ID = "line";
-		const std::string BroadcastPointsAdmin::PARAMETER_DISPLAY_NUMBER = "dpln";
+		const string BroadcastPointsAdmin::PARAMETER_CPU_NUMBER("cn");
+		const string BroadcastPointsAdmin::PARAMETER_CITY_NAME = "city";
+		const string BroadcastPointsAdmin::PARAMETER_PLACE_NAME = "place";
+		const string BroadcastPointsAdmin::PARAMETER_LINE_ID = "line";
+		const string BroadcastPointsAdmin::PARAMETER_DISPLAY_NUMBER = "dpln";
 
 		BroadcastPointsAdmin::BroadcastPointsAdmin()
 			: AdminInterfaceElementTemplate<BroadcastPointsAdmin>() 

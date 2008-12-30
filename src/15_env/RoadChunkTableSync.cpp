@@ -64,17 +64,24 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE(
-			RoadChunkTableSync::CreateFormat(
-				"t014_road_chunks",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(RoadChunkTableSync::COL_ADDRESSID, SQL_INTEGER, false),
-					SQLiteTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
-					SQLiteTableSync::Field(RoadChunkTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
-					SQLiteTableSync::Field(RoadChunkTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
-					SQLiteTableSync::Field(RoadChunkTableSync::COL_VIAPOINTS, SQL_TEXT),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+			"t014_road_chunks"
+			);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadChunkTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_ADDRESSID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_VIAPOINTS, SQL_TEXT),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RoadChunkTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::Load(
 			RoadChunk* object,

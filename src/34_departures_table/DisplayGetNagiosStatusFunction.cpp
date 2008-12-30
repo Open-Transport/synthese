@@ -110,7 +110,7 @@ namespace synthese
 
 
 
-		void DisplayGetNagiosStatusFunction::_isAuthorized(
+		bool DisplayGetNagiosStatusFunction::_isAuthorized(
 		) const {
 			return true;
 		}

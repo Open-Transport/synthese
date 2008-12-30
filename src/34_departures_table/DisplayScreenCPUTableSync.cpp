@@ -67,7 +67,7 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayScreenCPUTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_TEXT),
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_TEXT, false),
 			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_PLACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_MAC_ADDRESS, SQL_TEXT),

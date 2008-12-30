@@ -45,7 +45,8 @@ namespace synthese
 	{
 		class Interface;
 		class SimplePageRequest;
-		class InterfacePageTableSync;
+		class IncludePageInterfaceElement;
+		class RequestWithInterfaceAndRequiredSession;
 
 		////////////////////////////////////////////////////////////////////
 		/// Definition of a page, coming from the database. Page are elements of an interface.
@@ -59,7 +60,8 @@ namespace synthese
 			public virtual util::Registrable
 		{
 			friend class SimplePageRequest;
-			friend class InterfacePageTableSync;
+			friend class IncludePageInterfaceElement;
+			friend class RequestWithInterfaceAndRequiredSession;
 
 		public:
 			typedef std::vector<boost::shared_ptr<LibraryInterfaceElement> >	Components;
@@ -88,9 +90,10 @@ namespace synthese
 				const server::Request* request = NULL
 			) const;
 
-			void _parse( const std::string& text );
 
 		public:
+			void parse( const std::string& text );
+
 			InterfacePage(
 				util::RegistryKeyType key = UNKNOWN_VALUE
 			);

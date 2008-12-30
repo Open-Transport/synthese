@@ -89,7 +89,7 @@ namespace synthese
 
 		bool AddDepartureStopToDisplayScreenAction::_isAuthorized(
 		) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE));
+			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

@@ -31,6 +31,7 @@
 #include "TcpService.h"
 
 #include <iostream>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -67,9 +68,10 @@ namespace synthese
 			_sqlite->registerUpdateHook(syncHook);
 
 			_tableSyncMap.clear();
-			for(Factory<SQLiteTableSync>::Iterator it(Factory<SQLiteTableSync>::begin()); it != Factory<SQLiteTableSync>::end(); ++it)
+			vector<shared_ptr<SQLiteTableSync> > tableSyncs(Factory<SQLiteTableSync>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<SQLiteTableSync>& sync, tableSyncs)
 			{
-				_tableSyncMap[it->getFormat().NAME] = it.getKey();
+				_tableSyncMap[sync->getFormat().NAME] = sync->getFactoryKey();
 			}
 	    }
 	    

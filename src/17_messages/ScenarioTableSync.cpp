@@ -63,27 +63,27 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE(
-			ScenarioTableSync::CreateFormat(
-				"t039_scenarios",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(ScenarioTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
-					SQLiteTableSync::Field(ScenarioTableSync::COL_ENABLED, SQL_INTEGER),
-					SQLiteTableSync::Field(ScenarioTableSync::COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableSync::Index(
-						"templateperiod",
-						SQLiteTableSync::Index::CreateFieldsList(
-							ScenarioTableSync::COL_IS_TEMPLATE,
-							ScenarioTableSync::COL_PERIODSTART,
-							string()
-					)	),
-					SQLiteTableSync::Index(ScenarioTableSync::COL_FOLDER_ID),
-					SQLiteTableSync::Index()
-		)	)	);
+			"t039_scenarios"
+			);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ScenarioTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(ScenarioTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
+			SQLiteTableSync::Field(ScenarioTableSync::COL_ENABLED, SQL_INTEGER),
+			SQLiteTableSync::Field(ScenarioTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ScenarioTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(ScenarioTableSync::COL_IS_TEMPLATE.c_str(), ScenarioTableSync::COL_PERIODSTART.c_str(), ""),
+			SQLiteTableSync::Index(ScenarioTableSync::COL_FOLDER_ID.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 
 
 		template<>

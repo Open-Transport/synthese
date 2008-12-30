@@ -343,7 +343,7 @@ namespace synthese
 			const SQLiteTableSync::Index& index
 		){
 			// Creation of the statement
-			stringstream s;
+			std::stringstream s;
 			s	<< "CREATE INDEX " << _GetIndexName(index)
 				<< " ON " << TABLE.NAME << "(";
 			BOOST_FOREACH(const std::string& field, index.fields)
@@ -384,17 +384,17 @@ namespace synthese
 			}
 
 			// If no non updatable field, return empty trigger
-			if (nonUpdatableColumns.empty()) return string();
+			if (nonUpdatableColumns.empty()) return std::string();
 
-			stringstream columnList;
-			BOOST_FOREACH(const string& field, nonUpdatableColumns)
+			std::stringstream columnList;
+			BOOST_FOREACH(const std::string& field, nonUpdatableColumns)
 			{
 				if (!columnList.str().empty())
 					columnList << ", ";
 				columnList << field;
 			}
 
-			stringstream sql;
+			std::stringstream sql;
 			sql << "CREATE TRIGGER "
 				<< TABLE.NAME << "_no_update"
 				<< " BEFORE UPDATE OF "

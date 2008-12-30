@@ -28,13 +28,16 @@
 #include "RequestMissingParameterException.h"
 #include "MessagesModule.h"
 #include "Alarm.h"
+#include "AlarmTemplate.h"
+#include "SingleSentAlarm.h"
+#include "ScenarioSentAlarm.h"
 #include "AlarmTableSync.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
-#include "DBModule.h"
+#include "DBLogModule.h"
 #include "MessagesLibraryLog.h"
 #include "MessagesLog.h"
 
@@ -61,7 +64,7 @@ namespace synthese
 		ParametersMap UpdateAlarmMessagesAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_alarm.get() != NULL) map.insert(make_pair(PARAMETER_ALARM_ID, _alarm->getKey()));
+			if (_alarm.get() != NULL) map.insert(PARAMETER_ALARM_ID, _alarm->getKey());
 			return map;
 		}
 
@@ -75,7 +78,7 @@ namespace synthese
 			}
 			catch (RequestMissingParameterException& e)
 			{
-				throw ActionException(e->getMessage());
+				throw ActionException(e.getMessage());
 			}
 		}
 

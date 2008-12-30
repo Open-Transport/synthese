@@ -81,6 +81,7 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayMonitoringStatusTableSync>::_FIELDS[] =
 		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_SCREEN_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_TIME, SQL_TIMESTAMP),
 			SQLiteTableSync::Field(DisplayMonitoringStatusTableSync::COL_GENERAL_STATUS, SQL_INTEGER),

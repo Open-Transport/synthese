@@ -52,18 +52,23 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CityTableSync>::TABLE(
-			CityTableSync::CreateFormat(
-				"t006_cities",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(CityTableSync::TABLE_COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(CityTableSync::TABLE_COL_CODE, SQL_TEXT),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableSync::Index(CityTableSync::TABLE_COL_NAME),
-					SQLiteTableSync::Index(CityTableSync::TABLE_COL_CODE),
-					SQLiteTableSync::Index()
-				)
-		)	);
+			"t006_cities"
+		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CityTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(CityTableSync::TABLE_COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(CityTableSync::TABLE_COL_CODE, SQL_TEXT),
+			SQLiteTableSync::Field()
+
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CityTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(CityTableSync::TABLE_COL_NAME.c_str(), ""),
+			SQLiteTableSync::Index(CityTableSync::TABLE_COL_CODE.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Load(
 			City* object,

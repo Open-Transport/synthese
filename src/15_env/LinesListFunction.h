@@ -68,6 +68,10 @@ namespace synthese
 			*/
 			void _run(std::ostream& stream) const;
 
+			void setNetworkId(
+				util::RegistryKeyType id
+			) throw(server::RequestException);
+
 			virtual bool _isAuthorized() const;
 		};
 	}

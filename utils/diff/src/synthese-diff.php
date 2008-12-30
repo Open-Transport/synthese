@@ -37,7 +37,7 @@ while ($nstop = $nstops->fetch())
 	$ostops = $db->query('SELECT * FROM t010_line_stops WHERE id='. $nstop['id']);
 	$row = $ostops->fetch();
 	if(!$row)
-		print '<StopPoint Id="'. $nstop['id'] .'" update="Delete" />';
+		print '<StopPoint Id="SYNTHESE:StopPoint:'. $nstop['id'] .'" update="Delete" />';
 }
 
 

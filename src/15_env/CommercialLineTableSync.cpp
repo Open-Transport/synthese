@@ -76,21 +76,29 @@ namespace synthese
 
 	namespace db
 	{
-		const SQLiteTableSync::FormatCommercialLineTableSync::TABLE(
-			CommercialLineTableSync::CreateFormat(
-				"t042_commercial_lines",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(CommercialLineTableSync::COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
-					SQLiteTableSync::Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
-					SQLiteTableSync::Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
-					SQLiteTableSync::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes(
-		)	)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CommercialLineTableSync>::TABLE(
+			"t042_commercial_lines"
+		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CommercialLineTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
+			SQLiteTableSync::Field()
+
+		};
+		
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CommercialLineTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Load(
 			CommercialLine* object,

@@ -42,7 +42,7 @@ namespace synthese
 		class DisplayScreenCPUAdmin
 		:	public admin::AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>
 		{
-			boost::shared_ptr<DisplayScreenCPU>	_cpu;
+			boost::shared_ptr<const DisplayScreenCPU>	_cpu;
 
 		public:
 			static const std::string TAB_TECHNICAL;

@@ -50,7 +50,7 @@ namespace synthese
 					const InterfacePage* page = _interface->getPage(NonPredefinedInterfacePage::FACTORY_KEY, _interface->getNoSessionDefaultPageCode());
 					ParametersVector pv;
 					VariablesMap vm;
-					page->display(stream, pv, vm, NULL, _request);
+					page->_display(stream, pv, vm, NULL, _request);
 				}
 				catch (InterfacePageException& e)
 				{

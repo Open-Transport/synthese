@@ -70,30 +70,36 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationTableSync>::TABLE(
-			ReservationTableSync::CreateFormat(
-				"t044_reservations",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(ReservationTableSync::COL_TRANSACTION_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTableSync::COL_LINE_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTableSync::COL_LINE_CODE, SQL_TEXT),
-					SQLiteTableSync::Field(ReservationTableSync::COL_SERVICE_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTableSync::COL_SERVICE_CODE, SQL_TEXT),
-					SQLiteTableSync::Field(ReservationTableSync::COL_DEPARTURE_PLACE_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTableSync::COL_DEPARTURE_PLACE_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(ReservationTableSync::COL_DEPARTURE_TIME, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(ReservationTableSync::COL_ARRIVAL_PLACE_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTableSync::COL_ARRIVAL_PLACE_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(ReservationTableSync::COL_ARRIVAL_TIME, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(ReservationTableSync::COL_RESERVATION_RULE_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTableSync::COL_ORIGIN_DATE_TIME, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(ReservationTableSync::COL_RESERVATION_DEAD_LINE, SQL_TIMESTAMP),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableSync::Index(ReservationTableSync::COL_LINE_ID),
-					SQLiteTableSync::Index(ReservationTableSync::COL_DEPARTURE_PLACE_ID),
-					SQLiteTableSync::Index(ReservationTableSync::COL_ARRIVAL_PLACE_ID),
-					SQLiteTableSync::Index()
-		)	)	);
+				"t044_reservations"
+				);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ReservationTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(ReservationTableSync::COL_TRANSACTION_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTableSync::COL_LINE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTableSync::COL_LINE_CODE, SQL_TEXT),
+			SQLiteTableSync::Field(ReservationTableSync::COL_SERVICE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTableSync::COL_SERVICE_CODE, SQL_TEXT),
+			SQLiteTableSync::Field(ReservationTableSync::COL_DEPARTURE_PLACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTableSync::COL_DEPARTURE_PLACE_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(ReservationTableSync::COL_DEPARTURE_TIME, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(ReservationTableSync::COL_ARRIVAL_PLACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTableSync::COL_ARRIVAL_PLACE_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(ReservationTableSync::COL_ARRIVAL_TIME, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(ReservationTableSync::COL_RESERVATION_RULE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTableSync::COL_ORIGIN_DATE_TIME, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(ReservationTableSync::COL_RESERVATION_DEAD_LINE, SQL_TIMESTAMP),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ReservationTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(ReservationTableSync::COL_LINE_ID.c_str(), ""),
+			SQLiteTableSync::Index(ReservationTableSync::COL_DEPARTURE_PLACE_ID.c_str(), ""),
+			SQLiteTableSync::Index(ReservationTableSync::COL_ARRIVAL_PLACE_ID.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Load(
 			Reservation* object

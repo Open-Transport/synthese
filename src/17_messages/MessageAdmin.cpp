@@ -121,7 +121,7 @@ namespace synthese
 				stream << "<h1>Contenu</h1>";
 
 				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
-				templateRequest.getFunction()->setSamePage();
+				templateRequest.getFunction()->setSamePage(this);
 				templateRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				HTMLForm fc(templateRequest.getHTMLForm("template"));
@@ -132,7 +132,7 @@ namespace synthese
 				stream << "</p>" << fc.close();
 
 				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
-				updateMessagesRequest.getFunction()->setSamePage();
+				updateMessagesRequest.getFunction()->setSamePage(this);
 				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
@@ -142,14 +142,14 @@ namespace synthese
 				stream << tu.close();
 
 				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage();
+				searchRequest.getFunction()->setSamePage(this);
 
 				ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(_request);
-				addRequest.getFunction()->setSamePage();
+				addRequest.getFunction()->setSamePage(this);
 				addRequest.getAction()->setAlarm(_alarm);
 
 				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
-				removeRequest.getFunction()->setSamePage();
+				removeRequest.getFunction()->setSamePage(this);
 				removeRequest.getAction()->setAlarmId(_alarm->getKey());
 				
 				// Alarm messages destinations loop

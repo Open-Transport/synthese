@@ -1,33 +1,36 @@
-
-/** UserUpdateAction class implementation.
-	@file UserUpdateAction.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// UserUpdateAction class implementation.
+///	@file UserUpdateAction.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "UserUpdateAction.h"
-
-#include "12_security/UserTableSync.h"
-#include "12_security/ProfileTableSync.h"
-
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "SecurityRight.h"
+#include "UserTableSync.h"
+#include "ProfileTableSync.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
+#include "SecurityLog.h"
+#include "DBLogModule.h"
 
 using namespace std;
 
@@ -36,6 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace util;
+	using namespace dblog;
 
 	template<> const string util::FactorableTemplate<Action, security::UserUpdateAction>::FACTORY_KEY("uua");
 	
@@ -104,6 +108,18 @@ namespace synthese
 
 		void UserUpdateAction::run()
 		{
+			stringstream s;
+			DBLogModule::appendToLogIfChange(s, "Login", _user->getLogin(), _login);
+			DBLogModule::appendToLogIfChange(s, "Adresse", _user->getAddress(), _address);
+			DBLogModule::appendToLogIfChange(s, "E-mail", _user->getEMail(), _email);
+			DBLogModule::appendToLogIfChange(s, "Code postal", _user->getPostCode(), _postalCode);
+			DBLogModule::appendToLogIfChange(s, "Ville", _user->getCityText(), _city);
+			DBLogModule::appendToLogIfChange(s, "Téléphone", _user->getPhone(), _phone);
+			DBLogModule::appendToLogIfChange(s, "Profil", (_user->getProfile() != NULL) ? _user->getProfile()->getName() : string(), (_profile != NULL) ? _profile->getName() : string());
+			DBLogModule::appendToLogIfChange(s, "Autorisation de connexion", Conversion::ToString(_user->getConnectionAllowed()), Conversion::ToString(_authorizedLogin));
+			DBLogModule::appendToLogIfChange(s, "Nom", _user->getName(), _name);
+			DBLogModule::appendToLogIfChange(s, "Prénom", _user->getSurname(), _surname);
+
 			_user->setLogin(_login);
 			_user->setAddress(_address);
 			_user->setEMail(_email);
@@ -114,14 +130,17 @@ namespace synthese
 			_user->setConnectionAllowed(_authorizedLogin);
 			_user->setName(_name);
 			_user->setSurname(_surname);
+
 			UserTableSync::Save(_user.get());
+
+			SecurityLog::addUserAdmin(_request->getUser().get(), _user.get(), s.str());
 		}
 
 
 
 		bool UserUpdateAction::_isAuthorized(
 		) const {
-			return _request->isAuthorized<SecurityRight>() ||
+			return _request->isAuthorized<SecurityRight>(WRITE) ||
 				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
 		}
 	}

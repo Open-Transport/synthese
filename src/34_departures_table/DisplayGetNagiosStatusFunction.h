@@ -101,7 +101,7 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2008
 			/// At the time, the function can be used without restrictions.
-			virtual void _isAuthorized() const;
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

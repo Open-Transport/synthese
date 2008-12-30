@@ -55,16 +55,23 @@ namespace synthese
 
 	namespace db
 	{
-			template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE(
-			HandicappedComplianceTableSync::CreateFormat(
-				"t019_handicapped_compliances",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_STATUS, SQL_INTEGER),
-					SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_CAPACITY, SQL_INTEGER),
-					SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_RESERVATION_RULE, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::TABLE(
+			"t019_handicapped_compliances"
+		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_STATUS, SQL_INTEGER),
+			SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_CAPACITY, SQL_INTEGER),
+			SQLiteTableSync::Field(HandicappedComplianceTableSync::COL_RESERVATION_RULE, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<HandicappedComplianceTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 
 		template<> void SQLiteDirectTableSyncTemplate<HandicappedComplianceTableSync,HandicappedCompliance>::Load(

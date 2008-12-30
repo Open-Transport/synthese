@@ -23,7 +23,7 @@
 #include "UserPasswordUpdateAction.h"
 
 #include "UserTableSync.h"
-
+#include "SecurityRight.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
@@ -35,7 +35,7 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace util;
-
+	
 	template<> const string util::FactorableTemplate<Action, security::UserPasswordUpdateAction>::FACTORY_KEY("upua");
 	
 	namespace security

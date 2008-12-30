@@ -149,13 +149,14 @@ namespace synthese
 		){
 			stringstream names;
 			const char* col(first);
-			const va_list marker;
+			va_list marker;
 			va_start(marker, first);
 			while(col[0])
 			{
 				col = va_arg(marker, const char*);
 				fields.push_back(string(col));
 			}
+			va_end(marker);
 		}
 
 

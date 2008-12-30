@@ -39,18 +39,21 @@ namespace synthese
 		const string DbModuleConfigTableSync::COL_PARAMNAME("param_name");
 		const string DbModuleConfigTableSync::COL_PARAMVALUE("param_value");
 
-	    const SQLiteTableSync::FormatDbModuleConfigTableSync::TABLE(
-			"t999_config",
-			false,
-			TRIGGERS_ENABLED_CLAUSE,
-			true,
-			true,
-			SQLiteTableFormat::CreateFields(
-				SQLiteTableSync::Field(COL_PARAMNAME, SQL_TEXT),
-				SQLiteTableSync::Field(COL_PARAMVALUE, SQL_TIMESTAMP),
-				SQLiteTableSync::Field()
-			), SQLiteTableFormat::Indexes()
-		);
+	    const SQLiteTableSync::Format DbModuleConfigTableSync::TABLE(
+			"t999_config"
+			);
+
+		const SQLiteTableSync::Field DbModuleConfigTableSync::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(COL_PARAMNAME, SQL_TEXT),
+			SQLiteTableSync::Field(COL_PARAMVALUE, SQL_TIMESTAMP),
+			SQLiteTableSync::Field()
+		};
+		
+		const SQLiteTableSync::Index DbModuleConfigTableSync::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 
 

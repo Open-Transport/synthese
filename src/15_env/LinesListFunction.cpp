@@ -60,16 +60,9 @@ namespace synthese
 
 		void LinesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_NETWORK_ID, false, FACTORY_KEY));
-			try
-			{
-				_network = TransportNetworkTableSync::Get(id, _env);
-			}
-			catch (...)
-			{
-				throw RequestException("Transport network " + Conversion::ToString(id) + " not found");
-			}
+			setNetworkId(map.getUid(PARAMETER_NETWORK_ID, false, FACTORY_KEY));
 		}
+
 
 		void LinesListFunction::_run( std::ostream& stream ) const
 		{
@@ -86,6 +79,21 @@ namespace synthese
 		bool LinesListFunction::_isAuthorized(
 		) const {
 			return true;
+		}
+
+
+
+		void LinesListFunction::setNetworkId(
+			util::RegistryKeyType id
+		) throw(RequestException) {
+			try
+			{
+				_network = TransportNetworkTableSync::Get(id, _env);
+			}
+			catch (...)
+			{
+				throw RequestException("Transport network " + Conversion::ToString(id) + " not found");
+			}
 		}
 	}
 }

@@ -24,7 +24,7 @@ class RequestException : public synthese::util::Exception
 
  public:
 
-    RequestException ( const std::string& message);
+    RequestException ( const std::string& message) throw();
     ~RequestException () throw ();
 
  private:

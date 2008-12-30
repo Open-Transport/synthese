@@ -1,55 +1,50 @@
+////////////////////////////////////////////////////////////////////////////////
+/// AlarmTestOnDisplayScreenFunction class implementation.
+///	@file AlarmTestOnDisplayScreenFunction.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-/** AlarmTestOnDisplayScreenFunction class implementation.
-	@file AlarmTestOnDisplayScreenFunction.cpp
-	@author Hugues Romain
-	@date 2008
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "01_util/Conversion.h"
-
-#include "30_server/RequestException.h"
-#include "30_server/RequestMissingParameterException.h"
-#include "30_server/QueryString.h"
+#include "Conversion.h"
+#include "RequestException.h"
+#include "RequestMissingParameterException.h"
+#include "QueryString.h"
+#include "Request.h"
 #include "ArrivalDepartureTableRight.h"
-#include "17_messages/Alarm.h"
-#include "17_messages/SingleSentAlarm.h"
-#include "17_messages/AlarmTableSync.h"
-
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayTypeTableSync.h"
+#include "Alarm.h"
+#include "SingleSentAlarm.h"
+#include "AlarmTableSync.h"
+#include "DisplayType.h"
+#include "DisplayTypeTableSync.h"
 #include "34_departures_table/Types.h"
-#include "34_departures_table/DeparturesTableInterfacePage.h"
-
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfacePage.h"
-#include "11_interfaces/InterfacePageException.h"
-
-#include "04_time/DateTime.h"
-
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/ServicePointer.h"
-#include "15_env/Line.h"
-#include "15_env/LineStop.h"
-#include "15_env/City.h"
-#include "15_env/CommercialLine.h"
-
+#include "DeparturesTableInterfacePage.h"
+#include "Interface.h"
+#include "InterfacePage.h"
+#include "InterfacePageException.h"
+#include "DateTime.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ServicePointer.h"
+#include "Line.h"
+#include "LineStop.h"
+#include "City.h"
+#include "CommercialLine.h"
 #include "AlarmTestOnDisplayScreenFunction.h"
 
 using namespace std;

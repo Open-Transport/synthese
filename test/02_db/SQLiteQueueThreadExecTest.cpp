@@ -32,7 +32,7 @@ createTestDb (const std::string& dbFile, bool prefilled)
       
     // Create test_table
     SQLite::ExecUpdate (db, 
-			"CREATE TABLE IF NOT EXISTS test_table (id INTEGER, label VARCHAR(20), primary key (id))"
+			"CREATE TABLE IF NOT EXISTS test_table (id SQL_INTEGER, label VARCHAR(20), primary key (id))"
 	);
 
     if (prefilled)

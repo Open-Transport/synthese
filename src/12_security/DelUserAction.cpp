@@ -66,7 +66,7 @@ namespace synthese
 
 		bool DelUserAction::_isAuthorized(
 		) const {
-			return _request->isAuthorized<SecurityRight>(DELETE_RIGHT)
+			return _request->isAuthorized<SecurityRight>(DELETE_RIGHT);
 		}
 	}
 }

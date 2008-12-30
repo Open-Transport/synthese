@@ -71,22 +71,28 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE(
-			ReservationTransactionTableSync::CreateFormat(
-				"t046_reservation_transactions",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_SEATS, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_TIME, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, SQL_TEXT),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+				"t046_reservation_transactions"
+				);
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ReservationTransactionTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_SEATS, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_TIME, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, SQL_TEXT),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ReservationTransactionTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Load(
 			ReservationTransaction* object

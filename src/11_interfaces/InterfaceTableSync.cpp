@@ -48,14 +48,21 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE(
-			InterfaceTableSync::CreateFormat(
-				"t024_interfaces",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE, SQL_TEXT),
-					SQLiteTableSync::Field(InterfaceTableSync::TABLE_COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+				"t024_interfaces"
+				);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<InterfaceTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE, SQL_TEXT),
+			SQLiteTableSync::Field(InterfaceTableSync::TABLE_COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<InterfaceTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Load(
 			Interface* interf,

@@ -75,28 +75,28 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AlarmTableSync>::TABLE(
-			AlarmTableSync::CreateFormat(
-				"t003_alarms",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(AlarmTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
-					SQLiteTableSync::Field(AlarmTableSync::COL_ENABLED, SQL_INTEGER),
-					SQLiteTableSync::Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
-					SQLiteTableSync::Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
-					SQLiteTableSync::Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
-					SQLiteTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_TIMESTAMP),
-					SQLiteTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableSync::Index(
-						"scenariostart",
-						SQLiteTableSync::Index::CreateFieldsList(
-							AlarmTableSync::COL_SCENARIO_ID,
-							AlarmTableSync::COL_PERIODSTART,
-							string()
-					)	),
-					SQLiteTableSync::Index()
-		)	)	);
+			"t003_alarms"
+			);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<AlarmTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(AlarmTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
+			SQLiteTableSync::Field(AlarmTableSync::COL_ENABLED, SQL_INTEGER),
+			SQLiteTableSync::Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
+			SQLiteTableSync::Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
+			SQLiteTableSync::Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
+			SQLiteTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<AlarmTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(AlarmTableSync::COL_SCENARIO_ID.c_str(),	AlarmTableSync::COL_PERIODSTART.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 	    
 		template<>
 		string SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const SQLiteResultSPtr& row)

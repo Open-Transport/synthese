@@ -1,24 +1,26 @@
-
-/** UpdateDisplayPreselectionParametersAction class implementation.
-	@file UpdateDisplayPreselectionParametersAction.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// UpdateDisplayPreselectionParametersAction class implementation.
+///	@file UpdateDisplayPreselectionParametersAction.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "UpdateDisplayPreselectionParametersAction.h"
 #include "DisplayScreenTableSync.h"
@@ -47,6 +49,7 @@ namespace synthese
 
 	namespace departurestable
 	{
+		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_SCREEN(Action_PARAMETER_PREFIX + "ds");
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY = Action_PARAMETER_PREFIX + "pd";
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY = Action_PARAMETER_PREFIX + "cd";
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_FUNCTION(Action_PARAMETER_PREFIX + "fu");
@@ -58,7 +61,7 @@ namespace synthese
 		ParametersMap UpdateDisplayPreselectionParametersAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_screen.get() != NULL) map.insert(make_pair(PARAMETER_DISPLAY_SCREEN, _screen->getKey()));
+			if (_screen.get() != NULL) map.insert(PARAMETER_DISPLAY_SCREEN, _screen->getKey());
 			return map;
 		}
 
@@ -151,9 +154,9 @@ namespace synthese
 			{
 				clearDelayMap.insert(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));
 			}
-			clearDelayMap.push_back(make_pair(-1, "1 minute avant le départ"));
-			clearDelayMap.push_back(make_pair(0, "heure du départ"));
-			clearDelayMap.push_back(make_pair(1, "1 minute après le départ"));
+			clearDelayMap.insert(make_pair(-1, "1 minute avant le départ"));
+			clearDelayMap.insert(make_pair(0, "heure du départ"));
+			clearDelayMap.insert(make_pair(1, "1 minute après le départ"));
 			for (int i=2; i<6; ++i)
 			{
 				clearDelayMap.insert(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
@@ -166,9 +169,9 @@ namespace synthese
 		UpdateDisplayPreselectionParametersAction::DisplayFunction UpdateDisplayPreselectionParametersAction::GetFunction(
 			const DisplayScreen& screen
 		){
-			if(_screen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING) return UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING;
-			if(_screen->getGenerationMethod() == DisplayScreen::STANDARD_METHOD) return (_screen->getDirection() == DISPLAY_DEPARTURES) ? return DEPARTURES_CHRONOLOGICAL : ARRIVAL_CHRONOLOGICAL;
-			return (_screen->getDirection() == DISPLAY_DEPARTURES) ? return DEPARTURES_PRESELECTION : ARRIVAL_PRESELECTION;
+			if(screen.getGenerationMethod() == DisplayScreen::ROUTE_PLANNING) return UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING;
+			if(screen.getGenerationMethod() == DisplayScreen::STANDARD_METHOD) return (screen.getDirection() == DISPLAY_DEPARTURES) ? DEPARTURES_CHRONOLOGICAL : ARRIVAL_CHRONOLOGICAL;
+			return (screen.getDirection() == DISPLAY_DEPARTURES) ? DEPARTURES_PRESELECTION : ARRIVAL_PRESELECTION;
 		}
 
 
@@ -194,7 +197,7 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
-				throw ActionException("display screen", FACTORY_KEY, id, e);
+				throw ActionException("display screen", id, FACTORY_KEY, e);
 			}
 		}
 	}

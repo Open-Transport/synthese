@@ -30,11 +30,11 @@ BOOST_AUTO_TEST_CASE (testGetTableColumnsDb)
     SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
-    SQLiteTableFormat format;
-    format.addTableColumn ("col1", "INTEGER", true);
-    format.addTableColumn ("col2", "TEXT", true);
+    SQLiteTableSync::Formatformat;
+    format.addTableColumn ("col1", "SQL_INTEGER", true);
+    format.addTableColumn ("col2", "SQL_TEXT", true);
      
-    std::string sql ("CREATE TABLE test_table (col1 INTEGER UNIQUE PRIMARY KEY, col2 TEXT)");
+    std::string sql ("CREATE TABLE test_table (col1 SQL_INTEGER UNIQUE PRIMARY KEY, col2 SQL_TEXT)");
     sqlite->execUpdate (sql);
 
     std::vector<std::string> expected;
@@ -60,11 +60,11 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetSchema)
     SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
-    SQLiteTableFormat format;
-    format.addTableColumn ("col1", "INTEGER", true);
-    format.addTableColumn ("col2", "TEXT", true);
+    SQLiteTableSync::Formatformat;
+    format.addTableColumn ("col1", "SQL_INTEGER", true);
+    format.addTableColumn ("col2", "SQL_TEXT", true);
      
-    std::string expected ("CREATE TABLE test_table (col1 INTEGER UNIQUE PRIMARY KEY, col2 TEXT)");
+    std::string expected ("CREATE TABLE test_table (col1 SQL_INTEGER UNIQUE PRIMARY KEY, col2 SQL_TEXT)");
     BOOST_CHECK_EQUAL (expected, SQLiteTableSync::CreateSQLSchema ("test_table", format));
       
     sqlite->execUpdate (expected);
@@ -88,9 +88,9 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetTriggerNoInsert)
     SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
-    SQLiteTableFormat format;
-    format.addTableColumn ("col1", "INTEGER", true);
-    format.addTableColumn ("col2", "TEXT", true);
+    SQLiteTableSync::Formatformat;
+    format.addTableColumn ("col1", "SQL_INTEGER", true);
+    format.addTableColumn ("col2", "SQL_TEXT", true);
 
     sqlite->execUpdate (SQLiteTableSync::CreateSQLSchema ("test_table", format));
       
@@ -115,9 +115,9 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetTriggerNoRemove)
     SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
-    SQLiteTableFormat format;
-    format.addTableColumn ("col1", "INTEGER", true);
-    format.addTableColumn ("col2", "TEXT", true);
+    SQLiteTableSync::Formatformat;
+    format.addTableColumn ("col1", "SQL_INTEGER", true);
+    format.addTableColumn ("col2", "SQL_TEXT", true);
 
     sqlite->execUpdate (SQLiteTableSync::CreateSQLSchema ("test_table", format));
       
@@ -142,9 +142,9 @@ BOOST_AUTO_TEST_CASE (testCreateAndGetTriggerNoUpdate)
     SQLite* sqlite = new SQLite ("test_db.s3db");
     sqlite->initialize ();
 
-    SQLiteTableFormat format;
-    format.addTableColumn ("col1", "INTEGER", true);
-    format.addTableColumn ("col2", "TEXT", false);
+    SQLiteTableSync::Formatformat;
+    format.addTableColumn ("col1", "SQL_INTEGER", true);
+    format.addTableColumn ("col2", "SQL_TEXT", false);
 
     sqlite->execUpdate (SQLiteTableSync::CreateSQLSchema ("test_table", format));
       
@@ -202,8 +202,8 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnAddition)
 	SQLite* sqlite = new SQLite ("test_db.s3db");
 	SQLiteSync* syncHook = new SQLiteSync ("col1");
 	SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
-	tabsync->addTableColumnForTest ("col1", "INTEGER", true);
-	tabsync->addTableColumnForTest ("col2", "TEXT", true);
+	tabsync->addTableColumnForTest ("col1", "SQL_INTEGER", true);
+	tabsync->addTableColumnForTest ("col2", "SQL_TEXT", true);
 
 	syncHook->addTableSynchronizer ("1", boost::shared_ptr<SQLiteTableSync> (tabsync));
 	sqlite->registerUpdateHook (syncHook);
@@ -227,9 +227,9 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnAddition)
 	SQLite* sqlite = new SQLite ("test_db.s3db");
 	SQLiteSync* syncHook = new SQLiteSync ("col1");
 	SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
-	tabsync->addTableColumnForTest ("col1", "INTEGER", true);
-	tabsync->addTableColumnForTest ("col2", "TEXT", true);
-	tabsync->addTableColumnForTest ("col3", "TEXT", true);
+	tabsync->addTableColumnForTest ("col1", "SQL_INTEGER", true);
+	tabsync->addTableColumnForTest ("col2", "SQL_TEXT", true);
+	tabsync->addTableColumnForTest ("col3", "SQL_TEXT", true);
 
 	syncHook->addTableSynchronizer ("1", boost::shared_ptr<SQLiteTableSync> (tabsync));
 	sqlite->registerUpdateHook (syncHook);
@@ -276,9 +276,9 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnDeletion)
 	SQLite* sqlite = new SQLite ("test_db.s3db");
 	SQLiteSync* syncHook = new SQLiteSync ("col1");
 	SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
-	tabsync->addTableColumnForTest ("col1", "INTEGER", true);
-	tabsync->addTableColumnForTest ("col2", "TEXT", true);
-	tabsync->addTableColumnForTest ("col3", "TEXT", true);
+	tabsync->addTableColumnForTest ("col1", "SQL_INTEGER", true);
+	tabsync->addTableColumnForTest ("col2", "SQL_TEXT", true);
+	tabsync->addTableColumnForTest ("col3", "SQL_TEXT", true);
 
 	syncHook->addTableSynchronizer ("1", boost::shared_ptr<SQLiteTableSync> (tabsync));
 	sqlite->registerUpdateHook (syncHook);
@@ -302,8 +302,8 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnDeletion)
 	SQLite* sqlite = new SQLite ("test_db.s3db");
 	SQLiteSync* syncHook = new SQLiteSync ("col1");
 	SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
-	tabsync->addTableColumnForTest ("col1", "INTEGER", true);
-	tabsync->addTableColumnForTest ("col3", "TEXT", true);
+	tabsync->addTableColumnForTest ("col1", "SQL_INTEGER", true);
+	tabsync->addTableColumnForTest ("col3", "SQL_TEXT", true);
 
 	syncHook->addTableSynchronizer ("1", boost::shared_ptr<SQLiteTableSync> (tabsync));
 	sqlite->registerUpdateHook (syncHook);

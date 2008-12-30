@@ -51,14 +51,21 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<FareTableSync>::TABLE(
-			FareTableSync::CreateFormat(
-				"t008_fares",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(FareTableSync::COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(FareTableSync::COL_FARETYPE, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+			"t008_fares"
+		);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<FareTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(FareTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(FareTableSync::COL_FARETYPE, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<FareTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Load(
 			Fare* fare,

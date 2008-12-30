@@ -116,7 +116,7 @@ namespace synthese
 
 		bool UpdateDisplayMaintenanceAction::_isAuthorized(
 		) const {
-			if (_displayScreen->getLocalization().get() != NULL)
+			if (_displayScreen->getLocalization() != NULL)
 			{
 				return _request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
 			}

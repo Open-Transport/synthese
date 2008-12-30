@@ -36,6 +36,7 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
+#include "AlarmTemplate.h"
 
 using namespace std;
 using namespace boost;

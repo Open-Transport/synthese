@@ -153,7 +153,7 @@ namespace synthese
 
 		bool UpdateDisplayScreenAction::_isAuthorized(
 		) const {
-			if (_screen->getLocalization().get() != NULL)
+			if (_screen->getLocalization() != NULL)
 			{
 				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_screen->getLocalization()->getKey()));
 			}

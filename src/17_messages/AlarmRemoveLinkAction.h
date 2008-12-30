@@ -47,7 +47,7 @@ namespace synthese
 			static const std::string PARAMETER_OBJECT_ID;
 			
 		private:
-			boost::shared_ptr<Alarm>	_alarm;
+			boost::shared_ptr<const Alarm>	_alarm;
 			util::RegistryKeyType		_objectId;
 
 		protected:

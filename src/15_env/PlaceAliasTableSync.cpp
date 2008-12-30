@@ -59,16 +59,23 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE(
-			PlaceAliasTableSync::CreateFormat(
-				"t011_place_aliases",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(PlaceAliasTableSync::COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, SQL_INTEGER, false),
-					SQLiteTableSync::Field(PlaceAliasTableSync::COL_CITYID, SQL_INTEGER, false),
-					SQLiteTableSync::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+			"t011_place_aliases"
+			);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<PlaceAliasTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(PlaceAliasTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(PlaceAliasTableSync::COL_CITYID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
+			SQLiteTableSync::Field()
+		};
+		
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<PlaceAliasTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 
 

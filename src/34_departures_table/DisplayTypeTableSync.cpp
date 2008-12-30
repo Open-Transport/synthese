@@ -66,6 +66,7 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayTypeTableSync>::_FIELDS[] =
 		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, SQL_INTEGER),

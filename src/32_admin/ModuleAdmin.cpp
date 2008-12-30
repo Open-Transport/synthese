@@ -1,37 +1,37 @@
-
-/** ModuleAdmin class implementation.
-	@file ModuleAdmin.cpp
-	@author Hugues Romain
-	@date 2008
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// ModuleAdmin class implementation.
+///	@file ModuleAdmin.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "ModuleAdmin.h"
 #include "HomeAdmin.h"
+#include "ModuleClass.h"
+#include "HTMLModule.h"
+#include "AdminParametersException.h"
 
-#include "01_util/ModuleClass.h"
-
-#include "05_html/HTMLModule.h"
-
-#include "32_admin/AdminParametersException.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -111,13 +111,13 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
 			{
-				for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
-					it != Factory<ModuleClass>::end(); ++it)
+				vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
+				BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
 				{
 					AdminInterfaceElement::PageLink link(getPageLink());
-					link.parameterValue = it.getKey();
+					link.parameterValue = module->getFactoryKey();
 					link.parameterName = PARAMETER_MODULE;
-					link.name = it->getName();
+					link.name = module->getName();
 
 					if (!link.getAdminPage()->getSubPages(currentPage).empty())
 						links.insert(links.begin(), link);

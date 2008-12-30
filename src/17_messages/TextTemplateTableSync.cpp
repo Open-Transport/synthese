@@ -59,21 +59,27 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE(
-			TextTemplateTableSync::CreateFormat(
-				"t038_text_templates",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(TextTemplateTableSync::COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(TextTemplateTableSync::COL_SHORT_TEXT, SQL_TEXT),
-					SQLiteTableSync::Field(TextTemplateTableSync::COL_LONG_TEXT, SQL_TEXT),
-					SQLiteTableSync::Field(TextTemplateTableSync::COL_LEVEL, SQL_INTEGER),
-					SQLiteTableSync::Field(TextTemplateTableSync::COL_IS_FOLDER, SQL_INTEGER),
-					SQLiteTableSync::Field(TextTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableSync::Index(TextTemplateTableSync::COL_LEVEL),
-					SQLiteTableSync::Index(TextTemplateTableSync::COL_PARENT_ID),
-					SQLiteTableSync::Index()
-		)	)	);
+				"t038_text_templates"
+				);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TextTemplateTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(TextTemplateTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(TextTemplateTableSync::COL_SHORT_TEXT, SQL_TEXT),
+			SQLiteTableSync::Field(TextTemplateTableSync::COL_LONG_TEXT, SQL_TEXT),
+			SQLiteTableSync::Field(TextTemplateTableSync::COL_LEVEL, SQL_INTEGER),
+			SQLiteTableSync::Field(TextTemplateTableSync::COL_IS_FOLDER, SQL_INTEGER),
+			SQLiteTableSync::Field(TextTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TextTemplateTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(TextTemplateTableSync::COL_LEVEL.c_str(), ""),
+			SQLiteTableSync::Index(TextTemplateTableSync::COL_PARENT_ID.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(
 			TextTemplate* object,

@@ -1,43 +1,43 @@
-
-/** AlarmAddLinkAction class implementation.
-	@file AlarmAddLinkAction.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// AlarmAddLinkAction class implementation.
+///	@file AlarmAddLinkAction.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "AlarmAddLinkAction.h"
-
-#include "17_messages/SingleSentAlarm.h"
-#include "17_messages/ScenarioSentAlarm.h"
-#include "17_messages/AlarmTemplate.h"
-#include "17_messages/AlarmRecipient.h"
-#include "17_messages/AlarmObjectLink.h"
-#include "17_messages/AlarmObjectLinkTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesLibraryLog.h"
-#include "17_messages/MessagesLog.h"
+#include "SingleSentAlarm.h"
+#include "ScenarioSentAlarm.h"
+#include "AlarmTemplate.h"
+#include "AlarmRecipient.h"
+#include "AlarmObjectLink.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "AlarmTableSync.h"
+#include "MessagesLibraryLog.h"
+#include "MessagesLog.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
-#include "01_util/Conversion.h"
-
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "Conversion.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -47,6 +47,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace dblog;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::AlarmAddLinkAction>::FACTORY_KEY("maala");
 	

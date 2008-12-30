@@ -185,7 +185,11 @@ namespace synthese
 
 		bool ReservationsListFunction::_isAuthorized(
 		) const {
-			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(line->getKey()));
+			if (_line.get() != NULL)
+			{
+				return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_line->getKey()));
+			}
+			return false;
 		}
 	}
 }

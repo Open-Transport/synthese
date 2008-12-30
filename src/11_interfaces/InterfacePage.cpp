@@ -68,7 +68,7 @@ namespace synthese
 
 
 
-		void InterfacePage::_parse( const std::string& text )
+		void InterfacePage::parse( const std::string& text )
 		{
 			int counter = 0;
 			size_t start_pos;

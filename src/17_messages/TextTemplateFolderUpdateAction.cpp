@@ -1,41 +1,39 @@
+////////////////////////////////////////////////////////////////////////////////
+/// TextTemplateFolderUpdateAction class implementation.
+///	@file TextTemplateFolderUpdateAction.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-/** TextTemplateFolderUpdateAction class implementation.
-	@file TextTemplateFolderUpdateAction.cpp
-	@author Hugues Romain
-	@date 2008
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Request.h"
+#include "TextTemplateFolderUpdateAction.h"
+#include "MessagesLibraryLog.h"
+#include "TextTemplate.h"
+#include "TextTemplateTableSync.h"
+#include "DBLogModule.h"
+#include "Env.h"
+#include "MessagesLibraryRight.h"
 
 #include <sstream>
-
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/Request.h"
-
-#include "TextTemplateFolderUpdateAction.h"
-
-#include "17_messages/MessagesLibraryLog.h"
-#include "17_messages/TextTemplate.h"
-#include "17_messages/TextTemplateTableSync.h"
-
-#include "13_dblog/DBLogModule.h"
-#include "Env.h"
 
 using namespace std;
 using namespace boost;
@@ -45,6 +43,8 @@ namespace synthese
 	using namespace server;
 	using namespace dblog;
 	using namespace util;
+	using namespace security;
+	
 	
 	namespace util
 	{
@@ -124,6 +124,13 @@ namespace synthese
 			{
 				throw ActionException("No such folder");
 			}
+		}
+
+
+
+		bool TextTemplateFolderUpdateAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

@@ -151,10 +151,9 @@ namespace synthese
 
 
 		bool CancelReservationAction::_isAuthorized(
-
-			) const {
-				_request->isAuthorized<ResaRight>(WRITE) ||
-					_customer->getKey() == _request->getUser()->getKey() && _request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+		) const {
+			return _request->isAuthorized<ResaRight>(WRITE) ||
+					_transaction->getCustomerUserId() == _request->getUser()->getKey() && _request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
 
 		}
 	}

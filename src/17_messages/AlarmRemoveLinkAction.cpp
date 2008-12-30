@@ -34,6 +34,9 @@
 #include "RequestMissingParameterException.h"
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
+#include "AlarmTemplate.h"
+#include "ScenarioSentAlarm.h"
+#include "SingleSentAlarm.h"
 
 using namespace std;
 using namespace boost;

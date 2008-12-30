@@ -1,25 +1,26 @@
-
-
-/** LineStopTableSync class implementation.
-	@file LineStopTableSync.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// LineStopTableSync class implementation.
+///	@file LineStopTableSync.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "LineStopTableSync.h"
 
@@ -64,22 +65,28 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<LineStopTableSync>::TABLE(
-			LineStopTableSync::CreateFormat(
-				"t010_line_stops",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(LineStopTableSync::COL_PHYSICALSTOPID, SQL_INTEGER, false),
-					SQLiteTableSync::Field(LineStopTableSync::COL_LINEID, SQL_INTEGER, false),
-					SQLiteTableSync::Field(LineStopTableSync::COL_RANKINPATH, SQL_INTEGER),
-					SQLiteTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
-					SQLiteTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
-					SQLiteTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
-					SQLiteTableSync::Field(LineStopTableSync::COL_VIAPOINTS, SQL_TEXT),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableSync::Index(LineStopTableSync::COL_LINEID),
-					SQLiteTableSync::Index(LineStopTableSync::COL_PHYSICALSTOPID),
-					SQLiteTableSync::Index()
-		)	)	);
+			"t010_line_stops"
+			);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<LineStopTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(LineStopTableSync::COL_PHYSICALSTOPID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(LineStopTableSync::COL_LINEID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(LineStopTableSync::COL_RANKINPATH, SQL_INTEGER),
+			SQLiteTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
+			SQLiteTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
+			SQLiteTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
+			SQLiteTableSync::Field(LineStopTableSync::COL_VIAPOINTS, SQL_TEXT),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<LineStopTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(LineStopTableSync::COL_LINEID.c_str(), ""),
+			SQLiteTableSync::Index(LineStopTableSync::COL_PHYSICALSTOPID.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 
 		
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Load(

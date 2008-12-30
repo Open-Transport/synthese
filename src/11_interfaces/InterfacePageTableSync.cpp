@@ -59,17 +59,24 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<InterfacePageTableSync>::TABLE(
-			InterfacePageTableSync::CreateFormat(
-				"t023_interface_pages",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_INTERFACE, SQL_INTEGER, false),
-					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CLASS, SQL_TEXT, false),
-					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_PAGE, SQL_TEXT, false),
-					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, SQL_INTEGER),
-					SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CONTENT, SQL_TEXT),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+				"t023_interface_pages"
+				);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<InterfacePageTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_INTERFACE, SQL_INTEGER, false),
+			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CLASS, SQL_TEXT, false),
+			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_PAGE, SQL_TEXT, false),
+			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, SQL_INTEGER),
+			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CONTENT, SQL_TEXT),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<InterfacePageTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 
 
@@ -101,7 +108,7 @@ namespace synthese
 					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + InterfacePageTableSync::TABLE_COL_INTERFACE, e);
 				}
 			}
-			page->_parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
+			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
 		}
 
 

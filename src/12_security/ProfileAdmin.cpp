@@ -1,46 +1,46 @@
+////////////////////////////////////////////////////////////////////////////////
+/// ProfileAdmin class implementation.
+///	@file ProfileAdmin.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-/** ProfileAdmin class implementation.
-	@file ProfileAdmin.cpp
+#include "PropertiesHTMLTable.h"
+#include "HTMLTable.h"
+#include "HTMLForm.h"
+#include "Profile.h"
+#include "ProfileAdmin.h"
+#include "ProfileTableSync.h"
+#include "UpdateProfileAction.h"
+#include "UpdateRightAction.h"
+#include "Right.h"
+#include "AddRightAction.h"
+#include "DeleteRightAction.h"
+#include "Constants.h"
+#include "ProfilesAdmin.h"
+#include "ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "05_html/PropertiesHTMLTable.h"
-#include "05_html/HTMLTable.h"
-#include "05_html/HTMLForm.h"
-
-#include "12_security/Profile.h"
-#include "12_security/ProfileAdmin.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/UpdateProfileAction.h"
-#include "12_security/UpdateRightAction.h"
-#include "12_security/Right.h"
-#include "12_security/AddRightAction.h"
-#include "12_security/DeleteRightAction.h"
-#include "12_security/Constants.h"
-#include "12_security/ProfilesAdmin.h"
-
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/QueryString.h"
-
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
-
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -166,15 +166,16 @@ namespace synthese
 
 			stream << t.open();
 
-			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
+			vector<shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<Right> right, rights)
 			{
-				ParameterLabelsVector pl = it->getParametersLabels();
-				HTMLForm form(addRightRequest.getHTMLForm("add" + it.getKey()));
-				form.addHiddenField(AddRightAction::PARAMETER_RIGHT, it.getKey());
+				ParameterLabelsVector pl(right->getParametersLabels());
+				HTMLForm form(addRightRequest.getHTMLForm("add" + right->getFactoryKey()));
+				form.addHiddenField(AddRightAction::PARAMETER_RIGHT, right->getFactoryKey());
 				stream
 					<< "<tr>"
 					<< form.open()
-					<< "<td>" << it->getName() << "</td>"
+					<< "<td>" << right->getName() << "</td>"
 					<< "<td>";
 				if (pl.size() == 1)
 				{
@@ -187,7 +188,7 @@ namespace synthese
 					<< "</td>"
 					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) USE) << "</td>"
 					<< "<td>";
-				if ((*it)->getUsePrivateRights())
+				if (right->getUsePrivateRights())
 					stream << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) USE);
 				stream
 					<< "</td>"

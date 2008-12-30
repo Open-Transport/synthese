@@ -59,7 +59,7 @@ namespace synthese
 
 			VariablesMap vm;
 
-			_page->display(stream, pv, vm, NULL, _request);
+			_page->_display(stream, pv, vm, NULL, _request);
 		}
 
 		void SimplePageRequest::_setFromParametersMap(const ParametersMap& map )

@@ -106,6 +106,7 @@ namespace synthese
 		
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayScreenTableSync>::_FIELDS[] =
 		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_PLACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TYPE_ID, SQL_INTEGER),
@@ -233,7 +234,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addForcedDestination(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stops), env, linkLevel).get());
+						object->addForcedDestination(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{

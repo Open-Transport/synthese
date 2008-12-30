@@ -74,31 +74,36 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<LineTableSync>::TABLE(
-			LineTableSync::CreateFormat(
-				"t009_lines",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(LineTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_AXISID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(LineTableSync::COL_TIMETABLENAME, SQL_TEXT),
-					SQLiteTableSync::Field(LineTableSync::COL_DIRECTION, SQL_TEXT),
-					SQLiteTableSync::Field(LineTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
-					SQLiteTableSync::Field(LineTableSync::COL_USEINDEPARTUREBOARDS, SQL_BOOLEAN),
-					SQLiteTableSync::Field(LineTableSync::COL_USEINTIMETABLES, SQL_BOOLEAN),
-					SQLiteTableSync::Field(LineTableSync::COL_USEINROUTEPLANNING, SQL_BOOLEAN),
-					SQLiteTableSync::Field(LineTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_FAREID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_ALARMID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
-					SQLiteTableSync::Field(LineTableSync::COL_WAYBACK, SQL_INTEGER),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::CreateIndexes(
-					SQLiteTableSync::Index(LineTableSync::COL_COMMERCIAL_LINE_ID),
-					SQLiteTableSync::Index()
-		)	)	);
+			"t009_lines"
+			);
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<LineTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(LineTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_AXISID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(LineTableSync::COL_TIMETABLENAME, SQL_TEXT),
+			SQLiteTableSync::Field(LineTableSync::COL_DIRECTION, SQL_TEXT),
+			SQLiteTableSync::Field(LineTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
+			SQLiteTableSync::Field(LineTableSync::COL_USEINDEPARTUREBOARDS, SQL_BOOLEAN),
+			SQLiteTableSync::Field(LineTableSync::COL_USEINTIMETABLES, SQL_BOOLEAN),
+			SQLiteTableSync::Field(LineTableSync::COL_USEINROUTEPLANNING, SQL_BOOLEAN),
+			SQLiteTableSync::Field(LineTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_FAREID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_ALARMID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_WAYBACK, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<LineTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(LineTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""),
+			SQLiteTableSync::Index()
+		};
 
 
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Load(

@@ -51,9 +51,9 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			PageLink currentPageLink(getPageLink());
-			for (Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); it != Factory<AdminInterfaceElement>::end(); ++it)
+			vector<shared_ptr<AdminInterfaceElement> > pages(Factory<AdminInterfaceElement>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement> page, pages)
 			{
-				shared_ptr<AdminInterfaceElement> page(*it);
 				page->setRequest(_request);
 				if (page->isAuthorized())
 				{

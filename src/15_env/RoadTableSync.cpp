@@ -68,21 +68,28 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadTableSync>::TABLE(
-			RoadTableSync::CreateFormat(
-				"t015_roads",
-				SQLiteTableFormat::CreateFields(
-					SQLiteTableSync::Field(RoadTableSync::COL_NAME, SQL_TEXT),
-					SQLiteTableSync::Field(RoadTableSync::COL_CITYID, SQL_INTEGER, false),
-					SQLiteTableSync::Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
-					SQLiteTableSync::Field(RoadTableSync::COL_FAREID, SQL_INTEGER),
-					SQLiteTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-					SQLiteTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-					SQLiteTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-					SQLiteTableSync::Field(RoadTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
-					SQLiteTableSync::Field(RoadTableSync::COL_VIAPOINTS, SQL_TEXT),
-					SQLiteTableSync::Field()
-				), SQLiteTableFormat::Indexes()
-		)	);
+				"t015_roads"
+				);
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(RoadTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(RoadTableSync::COL_CITYID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadTableSync::COL_FAREID, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadTableSync::COL_VIAPOINTS, SQL_TEXT),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RoadTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Load(
 			Road* object,

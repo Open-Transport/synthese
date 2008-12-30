@@ -34,6 +34,7 @@
 #include "DisplayScreenTableSync.h"
 #include "Env.h"
 #include "Conversion.h"
+#include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
 
 #include <sstream>

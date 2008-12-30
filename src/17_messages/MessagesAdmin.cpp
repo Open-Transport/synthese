@@ -1,37 +1,34 @@
-
-/** MessagesAdmin class implementation.
-	@file MessagesAdmin.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
+////////////////////////////////////////////////////////////////////////////////
+/// MessagesAdmin class implementation.
+///	@file MessagesAdmin.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "TimeParseException.h"
 #include "DateTime.h"
-
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "05_html/Constants.h"
-
 #include "InterfaceModule.h"
-
 #include "ActionFunctionRequest.h"
-
 #include "SingleSentAlarm.h"
 #include "SentScenario.h"
 #include "AlarmRecipient.h"
@@ -50,7 +47,6 @@
 #include "SingleSentAlarmInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "SentScenarioInheritedTableSync.h"
-
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
 #include "AdminModule.h"
@@ -215,11 +211,14 @@ namespace synthese
 			stream << s.cell("Date début", s.getForm().getCalendarInput(PARAMETER_SEARCH_START, _startDate));
 			stream << s.cell("Date fin", s.getForm().getCalendarInput(PARAMETER_SEARCH_END, _endDate));
 
-			for (Factory<AlarmRecipient>::Iterator it = Factory<AlarmRecipient>::begin(); it != Factory<AlarmRecipient>::end(); ++it)
+			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
 			{
-				AlarmRecipientSearchFieldsMap m = it->getSearchFields(s.getForm(), _parametersMap);
+				AlarmRecipientSearchFieldsMap m(recipient->getSearchFields(s.getForm(), _parametersMap));
 				for (AlarmRecipientSearchFieldsMap::iterator itm = m.begin(); itm != m.end(); ++itm)
-                    stream << s.cell(itm->second.label, itm->second.htmlField);
+				{
+					stream << s.cell(itm->second.label, itm->second.htmlField);
+				}
 			}
 
 			stream << s.cell("Statut", s.getForm().getSelectInput(PARAMETER_SEARCH_STATUS, statusMap, _searchStatus));
