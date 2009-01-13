@@ -92,7 +92,7 @@ namespace synthese
 			/** Conversion from generic parameters map to attributes.
 				@param map Map to analyse
 			*/
-			virtual void _setFromParametersMap(const ParametersMap& map) throw(ActionException) = 0;
+			virtual void _setFromParametersMap(const ParametersMap& map) = 0;
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -100,7 +100,7 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			virtual void run() throw(ActionException) = 0;
+			virtual void run() = 0;
 
 			friend class Request;
 		};

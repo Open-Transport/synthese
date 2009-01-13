@@ -26,7 +26,7 @@
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/NonPredefinedInterfacePage.h"
-
+#include "RequestMissingParameterException.h"
 #include "30_server/RequestException.h"
 
 #include "01_util/Factory.h"

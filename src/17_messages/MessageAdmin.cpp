@@ -48,6 +48,7 @@
 #include "QueryString.h"
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
+#include "ActionException.h"
 
 #include <boost/foreach.hpp>
 

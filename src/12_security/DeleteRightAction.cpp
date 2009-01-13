@@ -21,7 +21,7 @@
 */
 
 #include "DeleteRightAction.h"
-
+#include "RequestMissingParameterException.h"
 #include "12_security/Right.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"

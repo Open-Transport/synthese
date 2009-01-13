@@ -69,7 +69,7 @@ namespace synthese
 			return map;
 		}
 
-		void NewMessageAction::_setFromParametersMap(const ParametersMap& map)
+		void NewMessageAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
 			// Template alarm ?
 			_isTemplate = map.getBool(PARAMETER_IS_TEMPLATE, false, false, FACTORY_KEY);
@@ -118,7 +118,7 @@ namespace synthese
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
-		void NewMessageAction::run()
+		void NewMessageAction::run() throw(ActionException)
 		{
 			if (_isTemplate)
 			{

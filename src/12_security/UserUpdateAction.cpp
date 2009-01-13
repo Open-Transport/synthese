@@ -31,6 +31,7 @@
 #include "ParametersMap.h"
 #include "SecurityLog.h"
 #include "DBLogModule.h"
+#include "RequestMissingParameterException.h"
 
 using namespace std;
 

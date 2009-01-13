@@ -25,7 +25,7 @@
 #include "11_interfaces/RedirectInterfacePage.h"
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/RedirRequest.h"
-
+#include "RequestMissingParameterException.h"
 #include "30_server/RequestException.h"
 
 using namespace std;

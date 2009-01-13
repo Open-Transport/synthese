@@ -34,6 +34,7 @@
 #include "SQLiteResult.h"
 #include "DBEmptyResultException.h"
 #include "SQLiteException.h"
+#include "01_util/Exception.h"
 
 #include <sstream>
 #include <string>
@@ -213,8 +214,8 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
-				try
-				{
+//				try
+//				{
 					util::Registry<T>& registry(env.template getEditableRegistry<T>());
 					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 					while (rows->next ())
@@ -223,11 +224,11 @@ namespace synthese
 						Load(object.get(), rows, env, linkLevel);
 						registry.add(object);
 					}
-				}
-				catch(SQLiteException& e)
-				{
-					throw util::Exception(e.getMessage());
-				}
+//				}
+//				catch(SQLiteException& e)
+//				{
+//					throw util::Exception(e.getMessage());
+//				}
 			}
 		};
 	}

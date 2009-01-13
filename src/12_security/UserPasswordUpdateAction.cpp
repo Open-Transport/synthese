@@ -21,7 +21,7 @@
 */
 
 #include "UserPasswordUpdateAction.h"
-
+#include "RequestMissingParameterException.h"
 #include "UserTableSync.h"
 #include "SecurityRight.h"
 #include "ActionException.h"

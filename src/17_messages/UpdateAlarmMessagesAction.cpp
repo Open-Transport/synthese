@@ -68,7 +68,7 @@ namespace synthese
 			return map;
 		}
 
-		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map)
+		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
 			try
 			{
@@ -82,7 +82,7 @@ namespace synthese
 			}
 		}
 
-		void UpdateAlarmMessagesAction::run()
+		void UpdateAlarmMessagesAction::run() throw(ActionException)
 		{
 			stringstream s;
 			DBLogModule::appendToLogIfChange(s, "message court", _alarm->getShortMessage(), _shortMessage);

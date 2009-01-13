@@ -100,7 +100,7 @@ namespace synthese
 			}
 		}
 
-		void AlarmRemoveLinkAction::setAlarmId(RegistryKeyType id )
+		void AlarmRemoveLinkAction::setAlarmId(RegistryKeyType id ) throw(ActionException)
 		{
 			try
 			{

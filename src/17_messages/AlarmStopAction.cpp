@@ -79,7 +79,7 @@ namespace synthese
 			, _stopDateTime(TIME_CURRENT)
 		{}
 
-		void AlarmStopAction::run()
+		void AlarmStopAction::run() throw(ActionException)
 		{
 			// Action
 			_alarm->setPeriodEnd(_stopDateTime);

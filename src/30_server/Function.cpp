@@ -25,6 +25,8 @@
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace server
 	{
 		Function::Function()

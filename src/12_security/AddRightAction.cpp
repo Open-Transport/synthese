@@ -21,7 +21,7 @@
 */
 
 #include "01_util/Conversion.h"
-
+#include "RequestMissingParameterException.h"
 #include "12_security/AddRightAction.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"

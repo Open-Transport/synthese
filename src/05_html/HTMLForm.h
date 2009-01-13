@@ -627,7 +627,7 @@ namespace synthese
 				{
 					s << registry.get(value)->getName();
 				}
-				catch(ObjectNotFoundException<T>&)
+				catch(util::ObjectNotFoundException<T>&)
 				{
 					s << "(inconnu)";
 				}
@@ -638,18 +638,18 @@ namespace synthese
 				if (!unknownLabel.empty())
 				{
 					s << "<option value=\"" << UNKNOWN_VALUE << "\"";
-					if (value == static_cast<RegistryKeyType>(UNKNOWN_VALUE))
+					if (value == static_cast<util::RegistryKeyType>(UNKNOWN_VALUE))
 						s << " selected=\"selected\"";
 					s << ">" << unknownLabel << "</option>";
 				}
 				if (!zeroLabel.empty())
 				{
 					s << "<option value=\"0\"";
-					if (value == static_cast<RegistryKeyType>(0))
+					if (value == static_cast<util::RegistryKeyType>(0))
 						s << " selected=\"selected\"";
 					s << ">" << zeroLabel << "</option>";
 				}
-				BOOST_FOREACH(shared_ptr<const T> object, registry.getOrderedVector())
+				BOOST_FOREACH(boost::shared_ptr<const T> object, registry.getOrderedVector())
 				{
 					s << "<option value=\"" << object->getKey() << "\"";
 					if (object->getKey() == value)

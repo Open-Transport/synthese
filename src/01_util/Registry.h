@@ -329,12 +329,12 @@ namespace synthese
 		{
 			if (ptr->getKey() == UNKNOWN_VALUE)
 			{
-				throw util::RegistryKeyException<T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
+				throw RegistryKeyException<T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
 			}
 
 			if (contains (ptr->getKey ())) 
 			{
-				throw util::RegistryKeyException<T>("Duplicate key in registry", ptr->getKey ());
+				throw RegistryKeyException<T>("Duplicate key in registry", ptr->getKey ());
 			}
 		    
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));

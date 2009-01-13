@@ -60,7 +60,7 @@ namespace synthese
 			return map;
 		}
 
-		void DeleteAlarmAction::_setFromParametersMap(const ParametersMap& map)
+		void DeleteAlarmAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
 			try
 			{
@@ -72,7 +72,7 @@ namespace synthese
 			}
 		}
 
-		void DeleteAlarmAction::run()
+		void DeleteAlarmAction::run() throw(ActionException)
 		{
 			// Action
 			AlarmObjectLinkTableSync::Remove(_alarm->getKey());
@@ -89,7 +89,7 @@ namespace synthese
 			}
 		}
 
-		void DeleteAlarmAction::setAlarmId(RegistryKeyType id )
+		void DeleteAlarmAction::setAlarmId(RegistryKeyType id ) throw(ActionException)
 		{
 			try
 			{

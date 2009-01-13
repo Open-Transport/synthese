@@ -81,7 +81,7 @@ namespace synthese
 			const std::string& parameterName,
 			bool neededParameter,
 			const std::string& source 
-		) const throw(RequestMissingParameterException)
+		) const
 		{
 			Map::const_iterator it(_map.find(parameterName));
 			if (it == _map.end())

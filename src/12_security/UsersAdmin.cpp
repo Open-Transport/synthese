@@ -23,7 +23,7 @@
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "HTMLModule.h"
-
+#include "RequestMissingParameterException.h"
 #include "InterfaceModule.h"
 
 #include "SecurityModule.h"

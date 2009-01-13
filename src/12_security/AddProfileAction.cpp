@@ -21,7 +21,7 @@
 */
 
 #include "AddProfileAction.h"
-
+#include "RequestMissingParameterException.h"
 #include "12_security/Profile.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/GlobalRight.h"

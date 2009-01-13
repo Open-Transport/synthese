@@ -39,6 +39,7 @@
 #include "QueryString.h"
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
+#include "RequestMissingParameterException.h"
 
 #include <boost/foreach.hpp>
 

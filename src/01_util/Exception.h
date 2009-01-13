@@ -49,8 +49,8 @@ namespace synthese
 
 		 public:
 
-			explicit Exception(const std::string& message ) throw ();
-			explicit Exception(const Exception& ref );
+			Exception(const std::string& message ) throw ();
+			Exception(const synthese::util::Exception& ref );
 
 			virtual ~Exception () throw ();
 		    

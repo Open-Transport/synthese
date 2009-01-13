@@ -29,6 +29,7 @@
 #include "ParametersMap.h"
 #include "DBLogModule.h"
 #include "SecurityRight.h"
+#include "RequestMissingParameterException.h"
 
 using namespace std;
 using namespace boost;

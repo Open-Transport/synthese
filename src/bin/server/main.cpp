@@ -273,8 +273,8 @@ int main( int argc, char **argv )
 		DbModuleClass::SetDatabasePath (dbpath);
 	    
 		// Initialize modules
-		if (Factory<ModuleClass>::size() == 0)
-			throw Exception("No registered module !");
+//		if (Factory<ModuleClass>::size() == 0)
+//			throw std::exception("No registered module !");
 	    
 
 		vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());

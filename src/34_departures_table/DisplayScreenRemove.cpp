@@ -56,7 +56,7 @@ namespace synthese
 			return map;
 		}
 
-		void DisplayScreenRemove::_setFromParametersMap(const ParametersMap& map)
+		void DisplayScreenRemove::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
 			uid id(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, FACTORY_KEY));
 			
@@ -70,7 +70,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenRemove::run()
+		void DisplayScreenRemove::run() throw(ActionException)
 		{
 			DisplayScreenTableSync::Remove(_displayScreen->getKey());
 

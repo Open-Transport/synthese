@@ -32,7 +32,6 @@
 
 using namespace std;
 using namespace boost;
-using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -61,10 +60,10 @@ namespace synthese
 			obj->setPeriodStart(DateTime::FromSQLTimestamp (rows->getText ( ScenarioTableSync::COL_PERIODSTART)));
 			obj->setPeriodEnd(DateTime::FromSQLTimestamp (rows->getText ( ScenarioTableSync::COL_PERIODEND)));
 
-			const string txtVariables();
+			const string txtVariables(rows->getText(ScenarioTableSync::COL_VARIABLES));
 			SentScenario::VariablesMap variables;
 			vector<string> tokens;
-			split(tokens, rows->getText(ScenarioTableSync::COL_VARIABLES), is_any_of("|"));
+			split(tokens, txtVariables, is_any_of("|"));
 			BOOST_FOREACH(const string& token, tokens)
 			{
 				typedef split_iterator<string::const_iterator> string_split_iterator;

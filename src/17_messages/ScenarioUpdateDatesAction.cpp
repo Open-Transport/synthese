@@ -145,7 +145,7 @@ namespace synthese
 
 		void ScenarioUpdateDatesAction::setScenarioId(
 			const util::RegistryKeyType id
-		){
+		) throw(ActionException) {
 			try
 			{
 				_scenario = SentScenarioInheritedTableSync::GetEditable(id, _env, UP_LINKS_LOAD_LEVEL);

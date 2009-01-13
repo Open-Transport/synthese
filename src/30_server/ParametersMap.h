@@ -81,7 +81,7 @@ namespace synthese
 					const std::string& parameterName
 					, bool neededParameter
 					, const std::string& source
-				) const throw(RequestMissingParameterException);
+				) const;
 
 				/** Search for the value of a parameter in a ParameterMap object and converts into an uid.
 					@param parameterName Name of the searched parameter

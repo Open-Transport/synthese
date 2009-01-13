@@ -21,7 +21,7 @@
 */
 
 #include "LoginAction.h"
-
+#include "RequestMissingParameterException.h"
 #include "30_server/ActionException.h"
 #include "30_server/Session.h"
 #include "30_server/Request.h"

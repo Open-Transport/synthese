@@ -24,7 +24,6 @@
 #define SYNTHESE_UTIL_REGISTRYKEYEXCEPTION_H
 
 // Util
-#include "Registry.h"
 #include "Conversion.h"
 #include "01_util/Exception.h"
 
