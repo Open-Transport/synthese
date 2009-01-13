@@ -67,16 +67,16 @@ namespace synthese
 			{
 				result.insert(PARAMETER_PAGE, _page->getFactoryKey());
 				result.insert(PARAMETER_TAB, _page->getActiveTab());
+				const map<string,string> adminMap(_page->getParametersMap().getMap());
+				for (map<string,string>::const_iterator it(adminMap.begin()); it != adminMap.end(); ++it)
+				{
+					result.insert(it->first,it->second);
+				}
 			}
 			if (_actionFailedPage.get())
 			{
 				result.insert(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey());
 				result.insert(PARAMETER_ACTION_FAILED_TAB, _actionFailedPage->getActiveTab());
-			}
-			const map<string,string> adminMap(_page->getParametersMap().getMap());
-			for (map<string,string>::const_iterator it(adminMap.begin()); it != adminMap.end(); ++it)
-			{
-				result.insert(it->first,it->second);
 			}
 			return result;
 		}
@@ -87,6 +87,8 @@ namespace synthese
 
 			try
 			{
+				if (_request->getUser().get() == NULL) return;
+
 				// Page
 				string pageKey;
 				if (_request->getActionException())

@@ -138,5 +138,35 @@ namespace synthese
 		{
 			return isApplicable(date, date);
 		}
+
+
+
+		const ScenarioTemplate* SentScenario::getTemplate(
+		) const {
+			return _template;
+		}
+
+
+
+		void SentScenario::setTemplate(
+			const ScenarioTemplate* value
+		) {
+			_template = value;
+		}
+
+
+
+		const SentScenario::VariablesMap& SentScenario::getVariables(
+		) const {
+			return _variables;
+		}
+
+
+
+		void SentScenario::setVariables(
+			const VariablesMap& value
+		) {
+			_variables = value;
+		}
 	}
 }

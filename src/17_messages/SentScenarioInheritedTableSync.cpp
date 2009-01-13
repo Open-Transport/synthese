@@ -1,33 +1,38 @@
-
-/** SentScenarioInheritedTableSync class implementation.
-	@file SentScenarioInheritedTableSync.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// SentScenarioInheritedTableSync class implementation.
+///	@file SentScenarioInheritedTableSync.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "SentScenarioInheritedTableSync.h"
 #include "SentScenario.h"
-
 #include "ScenarioInheritedTableSync.h"
 #include "DateTime.h"
 
+#include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -56,9 +61,29 @@ namespace synthese
 			obj->setPeriodStart(DateTime::FromSQLTimestamp (rows->getText ( ScenarioTableSync::COL_PERIODSTART)));
 			obj->setPeriodEnd(DateTime::FromSQLTimestamp (rows->getText ( ScenarioTableSync::COL_PERIODEND)));
 
+			const string txtVariables();
+			SentScenario::VariablesMap variables;
+			vector<string> tokens;
+			split(tokens, rows->getText(ScenarioTableSync::COL_VARIABLES), is_any_of("|"));
+			BOOST_FOREACH(const string& token, tokens)
+			{
+				typedef split_iterator<string::const_iterator> string_split_iterator;
+				string_split_iterator it = make_split_iterator(token, first_finder("$", is_iequal()));
+				string code = copy_range<string>(*it);
+				++it;
+				if (it == string_split_iterator())
+				{
+					Log::GetInstance().warn("Bad value for variable definition on scenario table");
+					continue;
+				}
+				variables.insert(make_pair(code, copy_range<string>(*it)));
+			}
+			obj->setVariables(variables);
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				LoadScenarioAlarms<SentScenario>(obj);
+				
 			}
 		}
 
@@ -84,7 +109,19 @@ namespace synthese
 				<< "," << obj->getPeriodStart().toSQLString()
 				<< "," << obj->getPeriodEnd().toSQLString()
 				<< "," << UNKNOWN_VALUE
-				<< ")";
+				<< ",";
+			const SentScenario::VariablesMap& variables(obj->getVariables());
+			bool firstVar(true);
+			BOOST_FOREACH(const SentScenario::VariablesMap::value_type& variable, variables)
+			{
+				if (firstVar)
+				{
+					query << "|";
+					firstVar = false;
+				}
+				query << variable.first << "$" << variable.second;
+			}
+			query << ")";
 			sqlite->execUpdate(query.str());
 
 			stringstream alarmquery;

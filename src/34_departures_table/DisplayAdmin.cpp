@@ -555,19 +555,11 @@ namespace synthese
 
 		bool DisplayAdmin::isAuthorized() const
 		{
-			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				return true;
-
-			try
-			{
-				Env env;
-				shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(_request->getObjectId(), env, UP_LINKS_LOAD_LEVEL));
-				return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(screen->getLocalization()->getKey()));
-			}
-			catch (...)
-			{
-				return false;
-			}
+			if (_displayScreen.get() == NULL) return false;
+			if (_displayScreen->getLocalization() == NULL) return  _request->isAuthorized<ArrivalDepartureTableRight>(READ) || _request->isAuthorized<DisplayMaintenanceRight>(READ);
+			return
+				_request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
+				_request->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
 		}
 
 		DisplayAdmin::DisplayAdmin(

@@ -71,6 +71,7 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DBLogEntryTableSync>::_FIELDS[] =
 		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(DBLogEntryTableSync::COL_LOG_KEY, SQL_TEXT),
 			SQLiteTableSync::Field(DBLogEntryTableSync::COL_DATE, SQL_TIMESTAMP),
 			SQLiteTableSync::Field(DBLogEntryTableSync::COL_USER_ID, SQL_INTEGER),

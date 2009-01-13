@@ -37,6 +37,7 @@
 #include "AdminRequest.h"
 #include "DisplayTypeRemoveAction.h"
 #include "Interface.h"
+#include "ArrivalDepartureTableRight.h"
 
 using namespace std;
 
@@ -48,6 +49,7 @@ namespace synthese
 	using namespace util;
 	using namespace departurestable;
 	using namespace html;
+	using namespace security;
 
 	namespace util
 	{
@@ -115,7 +117,8 @@ namespace synthese
 
 		bool DisplayTypeAdmin::isAuthorized() const
 		{
-			return true;
+			if (_type.get() == NULL) return false;
+			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks DisplayTypeAdmin::getSubPagesOfParent(

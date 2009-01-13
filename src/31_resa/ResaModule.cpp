@@ -281,7 +281,7 @@ namespace synthese
 					stream << rt.col(1,string(),true) << "APPEL";
 					if (!d.isUnknown())
 						stream << " jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry->getDate())) << " s)";
-					stream << rt.col(1,string(),true) << entryUser->getFullName();
+					stream << rt.col(1,string(),true) << ((entryUser != NULL) ? entryUser->getFullName() : "(inconnu)");
 					stream << rt.col(1,string(),true);
 					if(searchRequest.isAuthorized<ResaRight>(DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
 						||	searchRequest.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE) && entryUser == searchRequest.getSession()->getUser().get()
@@ -347,7 +347,7 @@ namespace synthese
 						break;
 					}
 
-					stream << rt.col() << entryUser->getFullName();
+					stream << rt.col() << ((entryUser != NULL) ? entryUser->getFullName() : "(inconnu)");
 
 
 					stream << rt.col();

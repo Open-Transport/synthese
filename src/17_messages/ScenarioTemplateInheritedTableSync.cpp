@@ -1,31 +1,38 @@
-
-/** ScenarioTemplateInheritedTableSync class implementation.
-	@file ScenarioTemplateInheritedTableSync.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+////////////////////////////////////////////////////////////////////////////////
+/// ScenarioTemplateInheritedTableSync class implementation.
+///	@file ScenarioTemplateInheritedTableSync.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateInheritedTableSync.h"
+#include "ScenarioInheritedTableSync.h"
+#include "AlarmTemplate.h"
+#include "AlarmTemplateInheritedTableSync.h"
 
-#include "17_messages/ScenarioInheritedTableSync.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
+
 
 namespace synthese
 {
@@ -50,6 +57,17 @@ namespace synthese
 			_CommonLoad(obj, rows, env, linkLevel);
 
 			obj->setFolderId(rows->getLongLong(ScenarioTableSync::COL_FOLDER_ID));
+
+			if (linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			{
+				Env senv;
+				AlarmTemplateInheritedTableSync::Search(senv, obj, 0, 0, false, false, FIELDS_ONLY_LOAD_LEVEL);
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, senv.getRegistry<AlarmTemplate>())
+				{
+					obj->addAlarm(AlarmTemplateInheritedTableSync::GetEditable(alarm->getKey(), env, linkLevel).get());
+				}
+				obj->setVariablesFromAlarms();
+			}
 		}
 
 		template<>
@@ -77,6 +95,7 @@ namespace synthese
 				<< ",NULL"
 				<< ",NULL"
 				<< "," << Conversion::ToString(obj->getFolderId())
+				<< ",''"
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}

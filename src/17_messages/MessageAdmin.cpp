@@ -1,52 +1,53 @@
+////////////////////////////////////////////////////////////////////////////////
+/// MessageAdmin class implementation.
+///	@file MessageAdmin.cpp
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-/** MessageAdmin class implementation.
-	@file MessageAdmin.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "05_html/PropertiesHTMLTable.h"
-#include "05_html/HTMLTable.h"
-
-#include "17_messages/MessageAdmin.h"
-#include "17_messages/MessagesModule.h"
+#include "PropertiesHTMLTable.h"
+#include "HTMLTable.h"
+#include "MessageAdmin.h"
+#include "MessagesModule.h"
 #include "17_messages/Types.h"
-#include "17_messages/AlarmRecipient.h"
-#include "17_messages/UpdateAlarmAction.h"
-#include "17_messages/UpdateAlarmMessagesFromTemplateAction.h"
-#include "17_messages/UpdateAlarmMessagesAction.h"
-#include "17_messages/AlarmAddLinkAction.h"
-#include "17_messages/AlarmRemoveLinkAction.h"
-#include "17_messages/SingleSentAlarm.h"
-#include "17_messages/ScenarioSentAlarm.h"
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/SentScenario.h"
-#include "17_messages/AlarmTemplate.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesAdmin.h"
-#include "17_messages/MessagesLibraryAdmin.h"
-#include "17_messages/MessagesScenarioAdmin.h"
-
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/QueryString.h"
-
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "AlarmRecipient.h"
+#include "UpdateAlarmAction.h"
+#include "UpdateAlarmMessagesFromTemplateAction.h"
+#include "UpdateAlarmMessagesAction.h"
+#include "AlarmAddLinkAction.h"
+#include "AlarmRemoveLinkAction.h"
+#include "AlarmTemplate.h"
+#include "SingleSentAlarm.h"
+#include "ScenarioSentAlarm.h"
+#include "ScenarioTemplate.h"
+#include "SentScenario.h"
+#include "AlarmTableSync.h"
+#include "MessagesAdmin.h"
+#include "MessagesLibraryAdmin.h"
+#include "MessagesScenarioAdmin.h"
+#include "MessagesRight.h"
+#include "MessagesLibraryRight.h"
+#include "ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
 #include <boost/foreach.hpp>
 
@@ -61,6 +62,7 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace messages;
+	using namespace security;
 
 	namespace util
 	{
@@ -167,7 +169,9 @@ namespace synthese
 
 		bool MessageAdmin::isAuthorized() const
 		{
-			return true;
+			if (_alarm.get() == NULL) return false;
+			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() == NULL) return _request->isAuthorized<MessagesRight>(READ);
+			return _request->isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessageAdmin::MessageAdmin()

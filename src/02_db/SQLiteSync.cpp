@@ -65,7 +65,7 @@ namespace synthese
 		SQLiteSync::registerCallback (SQLiteHandle* emitter)
 		{
 			recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
-			vector<shared_ptr<SQLiteTableSync> > tableSyncs;
+			vector<shared_ptr<SQLiteTableSync> > tableSyncs(Factory<SQLiteTableSync>::GetNewCollection());
 
 			// Call the update schema step on all synchronizers.
 			BOOST_FOREACH(const shared_ptr<SQLiteTableSync> tableSync, tableSyncs)

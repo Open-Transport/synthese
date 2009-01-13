@@ -50,6 +50,8 @@ namespace synthese
 			const AdminInterfaceElement& currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
+			if (!currentPage.isAuthorized()) return links;
+
 			PageLink currentPageLink(getPageLink());
 			vector<shared_ptr<AdminInterfaceElement> > pages(Factory<AdminInterfaceElement>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement> page, pages)
@@ -58,6 +60,11 @@ namespace synthese
 				if (page->isAuthorized())
 				{
 					PageLinks l(page->getSubPagesOfParent(currentPageLink, currentPage));
+					links.insert(links.end(), l.begin(), l.end());
+				}
+				else if(currentPage.getFactoryKey() == page->getFactoryKey())
+				{
+					PageLinks l(currentPage.getSubPagesOfParent(currentPageLink, currentPage));
 					links.insert(links.end(), l.begin(), l.end());
 				}
 			}

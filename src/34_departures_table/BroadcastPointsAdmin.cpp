@@ -74,9 +74,10 @@ namespace synthese
 		const string BroadcastPointsAdmin::PARAMETER_DISPLAY_NUMBER = "dpln";
 
 		BroadcastPointsAdmin::BroadcastPointsAdmin()
-			: AdminInterfaceElementTemplate<BroadcastPointsAdmin>() 
-			, _displayNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
-			, _lineUId(UNKNOWN_VALUE)
+			: AdminInterfaceElementTemplate<BroadcastPointsAdmin>(),
+			_displayNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT),
+			_cpuNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT),
+			_lineUId(UNKNOWN_VALUE)
 		{}
 
 		void BroadcastPointsAdmin::setFromParametersMap(const ParametersMap& map)
@@ -85,8 +86,10 @@ namespace synthese
 			_placeName = map.getString(PARAMETER_PLACE_NAME, false, FACTORY_KEY);
 			
 			int i(map.getInt(PARAMETER_DISPLAY_NUMBER, false, FACTORY_KEY));
-			if (i != UNKNOWN_VALUE)
-				_displayNumber = static_cast<BroadcastPointsPresence>(i);
+			if (i != UNKNOWN_VALUE)	_displayNumber = static_cast<BroadcastPointsPresence>(i);
+
+			i = map.getInt(PARAMETER_CPU_NUMBER, false, FACTORY_KEY);
+			if (i != UNKNOWN_VALUE) _cpuNumber = static_cast<BroadcastPointsPresence>(i);
 
 			_lineUId = map.getUid(PARAMETER_LINE_ID, false, FACTORY_KEY);
 

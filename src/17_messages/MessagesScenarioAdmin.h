@@ -73,6 +73,11 @@ namespace synthese
 		*/
 		class MessagesScenarioAdmin : public admin::AdminInterfaceElementTemplate<MessagesScenarioAdmin>
 		{
+		public:
+			static const std::string	TAB_MESSAGES;
+			static const std::string	TAB_PARAMETERS;
+			static const std::string	TAB_VARIABLES;
+
 		private:
 			boost::shared_ptr<const SentScenario>		_sentScenario;
 			boost::shared_ptr<const ScenarioTemplate>	_templateScenario;
@@ -119,6 +124,7 @@ namespace synthese
 			virtual std::string getParameterName() const;
 			virtual std::string getParameterValue() const;
 
+			virtual void _buildTabs() const;
 		};
 	}
 }

@@ -428,7 +428,7 @@ namespace synthese
 			}
 			else if(
 				(GetSQLSchemaDb(sqlite, TABLE.NAME) != tableSchema) ||
-				GetTriggerNoUpdateDb(sqlite, TABLE.NAME) == triggerNoUpdate
+				GetTriggerNoUpdateDb(sqlite, TABLE.NAME) != triggerNoUpdate
 			){
 				std::vector<std::string> dbCols = SQLiteTableSync::GetTableColumnsDb(sqlite, TABLE.NAME);
 
@@ -511,7 +511,7 @@ namespace synthese
 				<< _FIELDS[0].name << " " << _FIELDS[0].getSQLType()
 				<< " UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK";
 
-			for(size_t i(0); !_FIELDS[i].empty(); ++i)
+			for(size_t i(1); !_FIELDS[i].empty(); ++i)
 			{
 				sql << ", " << _FIELDS[i].name << " " << _FIELDS[i].getSQLType();
 			}

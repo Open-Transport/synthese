@@ -57,6 +57,7 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CityTableSync>::_FIELDS[]=
 		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(CityTableSync::TABLE_COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(CityTableSync::TABLE_COL_CODE, SQL_TEXT),
 			SQLiteTableSync::Field()

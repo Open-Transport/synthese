@@ -102,6 +102,9 @@ namespace synthese
 
 		bool DisplayScreenCPUAdmin::isAuthorized() const
 		{
+			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return true;
+			if (_cpu.get() == NULL) return false;
+			if (_cpu->getPlace() == NULL) return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_cpu->getPlace()->getKey()));
 		}
 		

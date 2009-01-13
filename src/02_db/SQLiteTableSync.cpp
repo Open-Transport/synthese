@@ -150,10 +150,8 @@ namespace synthese
 			stringstream names;
 			const char* col(first);
 			va_list marker;
-			va_start(marker, first);
-			while(col[0])
+			for(va_start(marker, first); col[0]; col = va_arg(marker, const char*))
 			{
-				col = va_arg(marker, const char*);
 				fields.push_back(string(col));
 			}
 			va_end(marker);

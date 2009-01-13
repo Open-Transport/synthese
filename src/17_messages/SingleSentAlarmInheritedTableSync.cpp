@@ -69,7 +69,7 @@ namespace synthese
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(obj->getKey())
-				<< ",1"
+				<< ",0"
 				<< ",0"
 				<< "," << Conversion::ToString(static_cast<int>(obj->getLevel()))
 				<< "," << Conversion::ToSQLiteString(obj->getShortMessage())

@@ -40,7 +40,7 @@ namespace synthese
 		const string DbModuleConfigTableSync::COL_PARAMVALUE("param_value");
 
 	    const SQLiteTableSync::Format DbModuleConfigTableSync::TABLE(
-			"t999_config"
+			"t999_config", true, true, TRIGGERS_ENABLED_CLAUSE, false
 			);
 
 		const SQLiteTableSync::Field DbModuleConfigTableSync::_FIELDS[]=
