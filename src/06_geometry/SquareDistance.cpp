@@ -85,14 +85,14 @@ namespace synthese
 
 		int SquareDistance::operator < ( const SquareDistance& op ) const
 		{
-			return abs(op.getSquareDistance () - getSquareDistance ()) > 4;
+			return abs(static_cast<float>(op.getSquareDistance () - getSquareDistance ())) > 4;
 		}
 
 
 
 		int SquareDistance::operator == ( const SquareDistance& op ) const
 		{
-			return abs(op.getSquareDistance () - getSquareDistance ()) <= 4;
+			return abs(static_cast<float>(op.getSquareDistance () - getSquareDistance ())) <= 4;
 		}
 
 

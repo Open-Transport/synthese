@@ -4,10 +4,10 @@
 */
 
 #include "Socket.h"
-#include <string>
+#include <string.h>
 #include <iostream>
 
-
+using namespace std;
 
 namespace synthese
 {
