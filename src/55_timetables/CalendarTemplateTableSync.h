@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 #include "CalendarTemplate.h"
 
@@ -41,7 +41,8 @@ namespace synthese
 		/** CalendarTemplate table synchronizer.
 			@ingroup m55LS refLS
 		*/
-		class CalendarTemplateTableSync : public db::SQLiteRegistryTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>
+		class CalendarTemplateTableSync
+		:	public db::SQLiteRegistryTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>
 		{
 		public:
 			static const std::string COL_TEXT;
@@ -58,8 +59,11 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<CalendarTemplate> > Search(
+				util::Env& env,
 				// other search parameters ,
-				int first = 0, int number = 0);
+				int first = 0, int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
 	}
 }

@@ -58,17 +58,18 @@ namespace synthese
 				(other search parameters)
 				@param first First Timetable object to answer
 				@param number Number of Timetable objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<Timetable> Founded Timetable objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<Timetable> > Search(
+			static void Search(
+				util::Env& env,
 				uid bookId = UNKNOWN_VALUE
 				, bool orderByParent = true
 				, bool orderByTitle = false
 				, bool raisingOrder = true
 				, int first = 0
-				, int number = 0
+				, int number = 0,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
 

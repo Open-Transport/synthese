@@ -1,19 +1,24 @@
 
-#include "35_timetables/TimetableModule.h"
+#include "TimetableModule.h"
 
-#include "35_timetables/TimetableRowTableSync.h"
-#include "35_timetables/TimetableTableSync.h"
-#include "35_timetables/CalendarTemplateTableSync.h"
-#include "35_timetables/CalendarTemplateElementTableSync.h"
+#include "TimetableRowTableSync.h"
+#include "TimetableTableSync.h"
+#include "CalendarTemplateTableSync.h"
+#include "CalendarTemplateElementTableSync.h"
 
-#include "35_timetables/CalendarTemplateAdmin.h"
-#include "35_timetables/CalendarTemplatesAdmin.h"
-#include "35_timetables/TimetableAdmin.h"
-#include "35_timetables/TimetableBookAdmin.h"
+#include "CalendarTemplateAdmin.h"
+#include "CalendarTemplatesAdmin.h"
+#include "TimetableAdmin.h"
+#include "TimetableBookAdmin.h"
 
-#include "35_timetables/TimetableAddAction.h"
-#include "35_timetables/TimetableRowAddAction.h"
-#include "35_timetables/TimetableUpdateAction.h"
-#include "35_timetables/CalendarTemplateAddAction.h"
+#include "TimetableAddAction.h"
+#include "TimetableRowAddAction.h"
+#include "TimetableUpdateAction.h"
+#include "CalendarTemplateAddAction.h"
 
-#include "35_timetables/TimetableRight.h"
+#include "TimetableRight.h"
+
+#include "CalendarTemplate.h"
+#include "CalendarTemplateElement.h"
+#include "Timetable.h"
+#include "TimetableRow.h"

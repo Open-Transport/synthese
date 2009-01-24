@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_CalendarTemplateAddAction_H__
 #define SYNTHESE_CalendarTemplateAddAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -64,6 +63,8 @@ namespace synthese
 			void run();
 			
 			CalendarTemplateAddAction();
+			
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

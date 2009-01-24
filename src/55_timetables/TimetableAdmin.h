@@ -66,7 +66,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
+			void display(
+				std::ostream& stream,
+				interfaces::VariablesMap& variables
+			) const;
 			
 			/** Authorization control.
 				@param request The current request
@@ -74,7 +77,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
+			virtual bool isAuthorized() const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
@@ -84,9 +87,8 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
+				const PageLink& parentLink,
+				const AdminInterfaceElement& currentPage
 			) const;
 			
 			/** Sub pages getter.
@@ -98,8 +100,6 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage
-				, const server::FunctionRequest<admin::AdminRequest>* request
-				
 			) const;
 			
 			/** Title generator.

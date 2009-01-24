@@ -23,12 +23,12 @@
 #ifndef SYNTHESE_timetables_CalendarTemplate_h__
 #define SYNTHESE_timetables_CalendarTemplate_h__
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "Registrable.h"
+#include "UId.h"
+#include "Registry.h"
+#include "CalendarTemplateElement.h"
 
-#include "35_timetables/CalendarTemplateElement.h"
-
-#include "15_env/Calendar.h"
+#include "Calendar.h"
 
 namespace synthese
 {
@@ -36,18 +36,56 @@ namespace synthese
 	{
 		/** CalendarTemplate class.
 			@ingroup m55
+			
+			<h3>Calendar template category</h3>
+
+			@todo Reactivate calendar category
+
+			Pour choisir le calendrier le plus simple d'affichage, pour l'edition des renvois d'indicateur par exemple, les calendriers sont ranges par categorie, selon le format binaire suivant&nbsp;:</p>
+
+			<table class="tableau">
+			<tr><td colspan="2">Plage de dates</td><td></td><td></td><td>Influence periode scolaire</td><td></td><td></td><td>Tout/partiel</td></tr>
+			<tr><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
+			<tr><td>7</td><td colspan="6"></td><td>0</td></tr>
+			</table>
+
+			On obtient la classification de catégories suivante :
+			<table class="tableau">
+			<tr><th>Plage de dates</th><th>Influence periode scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code décimal</th></tr>
+			<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>Totalite de la periode</td><td>00000000</td><td>0</td></tr>
+			<tr><td>Restriction</td><td>00000001</td><td>1</td></tr>
+			<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>00001000</td><td>0</td></tr>
+			<tr><td>Restriction</td><td>00001001</td><td>1</td></tr>
+			<tr><td rowspan="4">Service de transporteur (ete, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>Totalite de la periode</td><td>01000000</td><td>0</td></tr>
+			<tr><td>Restriction</td><td>01000001</td><td>1</td></tr>
+			<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>01001000</td><td>0</td></tr>
+			<tr><td>Restriction</td><td>01001001</td><td>1</td></tr>
+			<tr><td rowspan="4">Plage restreinte (ski...)</td><td rowspan="2">Non</td><td>Totalite de la periode</td><td>10000000</td><td>0</td></tr>
+			<tr><td>Restriction</td><td>10000001</td><td>1</td></tr>
+			<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>10001000</td><td>0</td></tr>
+			<tr><td>Restriction</td><td>10001001</td><td>1</td></tr>
+			<tr><td colspan="3">Autres calendriers (defaut)</td><td>11111111</td><td>255</td></tr>
+			</table>
 		*/
-		class CalendarTemplate : public util::Registrable<uid,CalendarTemplate>
+		class CalendarTemplate
+		:	public virtual util::Registrable
 		{
+		public:
+			/// Chosen registry class.
+			typedef util::Registry<CalendarTemplate>	Registry;
+			
+		private:
 			std::vector<CalendarTemplateElement>	_elements;
 			std::string								_text;
 
 		public:
-			CalendarTemplate();
+			CalendarTemplate(
+				util::RegistryKeyType id = UNKNOWN_VALUE
+			);
 
 			//! @name Queries
 			//@{
-				env::Calendar	getCalendar(const env::Calendar& mask)	const;
+				time::Calendar	getCalendar(const time::Calendar& mask)	const;
 			//@}
 
 			//! @name Getters

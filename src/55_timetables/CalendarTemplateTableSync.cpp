@@ -27,15 +27,15 @@
 #include "CalendarTemplateTableSync.h"
 #include "CalendarTemplate.h"
 
-#include "35_timetables/CalendarTemplateElement.h"
-#include "35_timetables/CalendarTemplateElementTableSync.h"
+#include "CalendarTemplateElement.h"
+#include "CalendarTemplateElementTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -51,17 +51,37 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,CalendarTemplateTableSync>::FACTORY_KEY("55.10 Calendar templates");
 	}
 	
+	namespace timetables
+	{
+		const std::string CalendarTemplateTableSync::COL_TEXT("name");
+	}
+	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<CalendarTemplateTableSync>::TABLE_NAME("t054_calendar_templates");
-		template<> const int SQLiteTableSyncTemplate<CalendarTemplateTableSync>::TABLE_ID(54);
-		template<> const bool SQLiteTableSyncTemplate<CalendarTemplateTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CalendarTemplateTableSync>::TABLE(
+			"t054_calendar_templates"
+		);
+		
+
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CalendarTemplateTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
+			SQLiteTableSync::Field()
+		};
 
 
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CalendarTemplateTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::load(
+
+		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Load(
 			CalendarTemplate* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env& env,
+			LinkLevel linkLevel
 		){
 			// Columns reading
 			uid id(rows->getLongLong(TABLE_COL_ID));
@@ -69,11 +89,24 @@ namespace synthese
 			// Properties
 			object->setKey(id);
 			object->setText(rows->getText(CalendarTemplateTableSync::COL_TEXT));
+			
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				Env env;
+				CalendarTemplateElementTableSync::Search(
+					env,
+					object->getKey()
+				);
+				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> e, env.getRegistry<CalendarTemplateElement>())
+				{
+					object->addElement(*e);
+				}
+			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::save(
+		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Save(
 			CalendarTemplate* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -82,7 +115,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getText())
 				<< ")";
@@ -90,19 +123,8 @@ namespace synthese
 		}
 
 
-
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::_link(
-			CalendarTemplate* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
-		){
-			vector<shared_ptr<CalendarTemplateElement> > elements(CalendarTemplateElementTableSync::Search(object->getKey()));
-			for (vector<shared_ptr<CalendarTemplateElement> >::const_iterator it(elements.begin()); it != elements.end(); ++it)
-				object->addElement(**it);
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::_unlink(
+		
+		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Unlink(
 			CalendarTemplate* obj
 		){
 		}
@@ -112,27 +134,23 @@ namespace synthese
 	
 	namespace timetables
 	{
-		const std::string CalendarTemplateTableSync::COL_TEXT("name");
-
-
-
 		CalendarTemplateTableSync::CalendarTemplateTableSync()
 			: SQLiteRegistryTableSyncTemplate<CalendarTemplateTableSync, CalendarTemplate>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_TEXT, "TEXT");
 		}
 
 
 
-		vector<shared_ptr<CalendarTemplate> > CalendarTemplateTableSync::Search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
-
+		vector<shared_ptr<CalendarTemplate> > CalendarTemplateTableSync::Search(
+			Env& env,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			LinkLevel linkLevel
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())
@@ -145,23 +163,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<CalendarTemplate> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<CalendarTemplate> object(new CalendarTemplate);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

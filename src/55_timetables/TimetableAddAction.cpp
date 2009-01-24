@@ -22,22 +22,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "QueryString.h"
+#include "Request.h"
 
 #include "TimetableAddAction.h"
-
-#include "35_timetables/TimetableRow.h"
-#include "35_timetables/Timetable.h"
-#include "35_timetables/TimetableTableSync.h"
+#include "TimetableRight.h"
+#include "TimetableRow.h"
+#include "Timetable.h"
+#include "TimetableTableSync.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace security;
 	
 	namespace util
 	{
@@ -74,7 +75,7 @@ namespace synthese
 			if (id > 0)
 			try
 			{
-				_book = TimetableTableSync::Get(id);
+				_book = TimetableTableSync::Get(id, _env);
 			}
 			catch (...)
 			{
@@ -106,7 +107,7 @@ namespace synthese
 			TimetableTableSync::Shift(_book.get() ? _book->getKey() : 0, _rank, 1);
 
 			// Saving
-			TimetableTableSync::save(&t);
+			TimetableTableSync::Save(&t);
 
 			// ID update
 			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
@@ -120,6 +121,12 @@ namespace synthese
 			assert(!book.get() || book->getIsBook());
 
 			_book = book;
+		}
+		
+		
+		bool TimetableAddAction::_isAuthorized() const
+		{
+			return _request->isAuthorized<TimetableRight>(WRITE);
 		}
 	}
 }

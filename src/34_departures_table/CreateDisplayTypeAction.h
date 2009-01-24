@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_CreateDisplayTypeAction_H__
 #define SYNTHESE_CreateDisplayTypeAction_H__
 
-#include "01_util/UId.h"
+#include "UId.h"
 
-#include "30_server/Action.h"
+#include "Action.h"
 
 namespace synthese
 {

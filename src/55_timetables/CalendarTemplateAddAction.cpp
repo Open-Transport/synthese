@@ -22,11 +22,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
-
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "QueryString.h"
+#include "Request.h"
+#include "TimetableRight.h"
 #include "CalendarTemplateAddAction.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
@@ -36,6 +36,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
+	using namespace security;
 	
 	namespace util
 	{
@@ -77,10 +78,20 @@ namespace synthese
 			CalendarTemplate c;
 			c.setText(_text);
 
-			CalendarTemplateTableSync::save(&c);
+			CalendarTemplateTableSync::Save(&c);
 
 			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				_request->setObjectId(c.getKey());
+		}
+	
+		
+		
+		/*!
+			\fn synthese::timetables::CalendarTemplateAddAction::_isAuthorized()
+		*/
+		bool CalendarTemplateAddAction::_isAuthorized(
+		) const {
+			return _request->isAuthorized<TimetableRight>(WRITE);
 		}
 	}
 }

@@ -22,18 +22,18 @@
 
 #include "TimetableColumn.h"
 
-#include "04_time/Schedule.h"
+#include "Schedule.h"
 
-#include "35_timetables/TimetableRow.h"
-#include "35_timetables/TimetableGenerator.h"
+#include "TimetableRow.h"
+#include "TimetableGenerator.h"
 
-#include "15_env/NonPermanentService.h"
-#include "15_env/Path.h"
-#include "15_env/Line.h"
-#include "15_env/Edge.h"
-#include "15_env/Vertex.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "NonPermanentService.h"
+#include "Path.h"
+#include "Line.h"
+#include "Edge.h"
+#include "Vertex.h"
+#include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
 
@@ -44,10 +44,12 @@ namespace synthese
 
 	namespace timetables
 	{
-		TimetableColumn::TimetableColumn(const TimetableGenerator& timetablegenerator, const env::NonPermanentService& service)
-			: _warning(timetablegenerator.getWarnings().end())
+		TimetableColumn::TimetableColumn(
+			const TimetableGenerator& timetablegenerator,
+			const env::NonPermanentService& service
+		):	_warning(timetablegenerator.getWarnings().end())
 			, _line(static_cast<const Line*>(service.getPath()))
-			, _calendar(service.getCalendar())
+			, _calendar(service)
 		{
 			const TimetableGenerator::Rows& rows(timetablegenerator.getRows());
 			const Path::Edges& edges(service.getPath()->getEdges());
@@ -59,7 +61,7 @@ namespace synthese
 				Path::Edges::const_iterator itEdge2;
 				for (itEdge2 = itEdge; itEdge2 != edges.end(); ++itEdge2)
 				{
-					if(	(*itEdge2)->getFromVertex()->getConnectionPlace()->getId() == itRow->getPlace()->getId()
+					if(	(*itEdge2)->getFromVertex()->getConnectionPlace()->getKey() == itRow->getPlace()->getKey()
 						&&(	(*itEdge2)->isDeparture() == itRow->getIsDeparture()
 							|| (*itEdge2)->isArrival() == itRow->getIsArrival()
 						)
@@ -146,10 +148,15 @@ namespace synthese
 		{
 			assert(col == *this);
 
-			if( _line->getOrigin()->getPlace()->getId() != col._line->getOrigin()->getPlace()->getId())
+			if( _line->getOrigin()->getPlace()->getKey() != col._line->getOrigin()->getPlace()->getKey()
+			){
 				_originType = Indetermine;
-			if(	_line->getDestination()->getPlace()->getId() != col._line->getDestination()->getPlace()->getId())
+			}
+			if(	_line->getDestination()->getPlace()->getKey() !=
+				 col._line->getDestination()->getPlace()->getKey()
+			){
 				_destinationType = Indetermine;
+			}
 			
 			_calendar |= col._calendar;
 		}
@@ -173,7 +180,7 @@ namespace synthese
 
 
 
-		const env::Calendar& TimetableColumn::getCalendar() const
+		const Calendar& TimetableColumn::getCalendar() const
 		{
 			return _calendar;
 		}

@@ -24,11 +24,15 @@
 
 namespace synthese
 {
+	using namespace time;
+	
 	namespace timetables
 	{
-		TimetableWarning::TimetableWarning( const env::Calendar& calendar, int number )
-			: _calendar(calendar)
-			, _number(number)
+		TimetableWarning::TimetableWarning(
+			const Calendar& calendar,
+			int number
+		):	_calendar(calendar),
+			_number(number)
 		{		}
 
 
@@ -40,7 +44,7 @@ namespace synthese
 
 
 
-		const env::Calendar& TimetableWarning::getCalendar() const
+		const Calendar& TimetableWarning::getCalendar() const
 		{
 			return _calendar;
 		}

@@ -21,7 +21,6 @@
 */
 
 #include "TransportNetwork.h"
-#include "Registry.h"
 
 namespace synthese
 {

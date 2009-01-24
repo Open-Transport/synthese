@@ -50,17 +50,56 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,TimetableTableSync>::FACTORY_KEY("55.01 Timetables");
 	}
 	
+	
+	namespace timetables
+	{
+		const std::string TimetableTableSync::COL_BOOK_ID("book_id");
+		const std::string TimetableTableSync::COL_RANK("rank");
+		const std::string TimetableTableSync::COL_TITLE("title");
+		const std::string TimetableTableSync::COL_MUST_BEGIN_A_PAGE("must_begin_a_page");
+		const std::string TimetableTableSync::COL_CALENDAR_ID("calendar_id");
+		const std::string TimetableTableSync::COL_IS_BOOK("is_book");
+	}
+	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<TimetableTableSync>::TABLE_NAME("t052_timetables");
-		template<> const int SQLiteTableSyncTemplate<TimetableTableSync>::TABLE_ID(52);
-		template<> const bool SQLiteTableSyncTemplate<TimetableTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TimetableTableSync>::TABLE(
+			"t052_timetables"
+		);
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::load(
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TimetableTableSync>::_FIELDS[]=
+		{
+
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(TimetableTableSync::COL_BOOK_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_RANK, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_TITLE, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_MUST_BEGIN_A_PAGE, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_IS_BOOK, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		
+		
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TimetableTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(
+				TimetableTableSync::COL_BOOK_ID.c_str(),
+				TimetableTableSync::COL_RANK.c_str(),
+				""),
+			SQLiteTableSync::Index()
+		};
+
+
+
+		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::Load(
 			Timetable* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env& env,
+			LinkLevel linkLevel
 		){
 			// Columns reading
 			uid id(rows->getLongLong(TABLE_COL_ID));
@@ -73,11 +112,21 @@ namespace synthese
 			object->setMustBeginAPage(rows->getBool(TimetableTableSync::COL_MUST_BEGIN_A_PAGE));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
 			object->setIsBook(rows->getBool(TimetableTableSync::COL_IS_BOOK));
+			
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				Env env;
+				TimetableRowTableSync::Search(env, object->getKey());
+				BOOST_FOREACH(shared_ptr<TimetableRow> row, env.getRegistry<TimetableRow>())
+				{
+					object->addRow(*row);
+				}
+			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::save(
+		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::Save(
 			Timetable* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -86,7 +135,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << object->getBookId()
 				<< "," << object->getRank()
@@ -100,18 +149,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::_link(
-			Timetable* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
-		){
-			vector<shared_ptr<TimetableRow> > grows(TimetableRowTableSync::Search(object->getKey()));
-			for (vector<shared_ptr<TimetableRow> >::const_iterator it(grows.begin()); it != grows.end(); ++it)
-				object->addRow(**it);
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::_unlink(
+		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::Unlink(
 			Timetable* obj
 		){
 		}
@@ -121,51 +159,29 @@ namespace synthese
 	
 	namespace timetables
 	{
-		const std::string TimetableTableSync::COL_BOOK_ID("book_id");
-		const std::string TimetableTableSync::COL_RANK("rank");
-		const std::string TimetableTableSync::COL_TITLE("title");
-		const std::string TimetableTableSync::COL_MUST_BEGIN_A_PAGE("must_begin_a_page");
-		const std::string TimetableTableSync::COL_CALENDAR_ID("calendar_id");
-		const std::string TimetableTableSync::COL_IS_BOOK("is_book");
-
-
-
 		TimetableTableSync::TimetableTableSync()
 			: SQLiteNoSyncTableSyncTemplate<TimetableTableSync, Timetable>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_BOOK_ID, "INTEGER");
-			addTableColumn(COL_RANK, "INTEGER");
-			addTableColumn(COL_TITLE, "TEXT");
-			addTableColumn(COL_MUST_BEGIN_A_PAGE, "INTEGER");
-			addTableColumn(COL_CALENDAR_ID, "INTEGER");
-			addTableColumn(COL_IS_BOOK, "INTEGER");
-
-			vector<string> c;
-			c.push_back(COL_BOOK_ID);
-			c.push_back(COL_RANK);
-			addTableIndex(c);
 		}
 
 
 
-
-		vector<shared_ptr<Timetable> > TimetableTableSync::Search(
+		void TimetableTableSync::Search(
+			Env& env,
 			uid bookId
 			, bool orderByParent
 			, bool orderByTitle
 			, bool raisingOrder
 			, int first
-			, int number
+			, int number,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 
 			// Content
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			
 			// Selection
@@ -185,23 +201,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<Timetable> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<Timetable> object(new Timetable);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
@@ -214,7 +214,7 @@ namespace synthese
 
 			// Content
 			query
-				<< "UPDATE " << TABLE_NAME
+				<< "UPDATE " << TABLE.NAME
 				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
 				<< " WHERE " << COL_BOOK_ID << "=" << bookId
 				<< " AND " << COL_RANK << ((delta > 0) ? ">=" : "<=") << rank
@@ -234,7 +234,7 @@ namespace synthese
 			// Content
 			query
 				<< "SELECT MAX(" << COL_RANK << ") AS mr "
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " << COL_BOOK_ID << "=" << bookId
 			;
 

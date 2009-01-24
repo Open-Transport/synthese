@@ -23,10 +23,10 @@
 #ifndef SYNTHESE_timetables_TimetableRow_h__
 #define SYNTHESE_timetables_TimetableRow_h__
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-
-#include "35_timetables/types.h"
+#include "Registrable.h"
+#include "UId.h"
+#include "Registry.h"
+#include "55_timetables/types.h"
 
 namespace synthese
 {
@@ -48,8 +48,13 @@ namespace synthese
 			@date 2001
 			@ingroup m55
 		*/
-		class TimetableRow : public util::Registrable<uid, TimetableRow>
+		class TimetableRow
+		:	public virtual util::Registrable
 		{
+		public:
+			/// Chosen registry class.
+			typedef util::Registry<TimetableRow>	Registry;
+		
 		private:
 			// Variables
 			const env::PublicTransportStopZoneConnectionPlace*	_place;
@@ -61,7 +66,9 @@ namespace synthese
 
 		public:
 			// Constructor
-			TimetableRow();
+			TimetableRow(
+				util::RegistryKeyType id = UNKNOWN_VALUE
+			);
 
 			//! @name Getters
 			//@{

@@ -32,6 +32,7 @@ namespace synthese
 {
 	using namespace timetables;
 	using namespace security;
+	using namespace util;
 
 	namespace util
 	{
@@ -55,16 +56,19 @@ namespace synthese
 
 	namespace timetables
 	{
-		string TimetableRight::displayParameter() const
-		{
+		string TimetableRight::displayParameter(
+			Env& env
+		) const {
 			if (_parameter == GLOBAL_PERIMETER)
 				return "all";
 			
 			return _parameter;
 		}
 
-		bool TimetableRight::perimeterIncludes(const string& perimeter) const
-		{
+		bool TimetableRight::perimeterIncludes(
+			const string& perimeter,
+			Env& env
+		) const {
 			if (_parameter == GLOBAL_PERIMETER)
 				return true;
 

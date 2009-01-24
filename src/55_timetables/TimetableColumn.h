@@ -25,10 +25,10 @@
 
 #include <vector>
 
-#include "04_time/Schedule.h"
+#include "Schedule.h"
 
-#include "35_timetables/types.h"
-#include "35_timetables/TimetableWarning.h"
+#include "55_timetables/types.h"
+#include "TimetableWarning.h"
 
 namespace synthese
 {
@@ -58,7 +58,7 @@ namespace synthese
 		private:
 			// Variables
 			std::vector<time::Schedule>						_timeContent;
-			env::Calendar									_calendar;
+			time::Calendar									_calendar;
 			std::vector<TimetableWarning>::const_iterator	_warning;
 			const env::Line*								_line;
 			tTypeOD											_originType;
@@ -86,7 +86,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const env::Calendar&							getCalendar()			const;
+				const time::Calendar&							getCalendar()			const;
 				const std::vector<time::Schedule>&				getContent()			const;
 				const env::Line*								getLine()				const;
 				tTypeOD											getOriginType()			const;

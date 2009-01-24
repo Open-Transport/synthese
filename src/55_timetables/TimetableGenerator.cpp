@@ -21,24 +21,30 @@
 */
 
 #include "TimetableGenerator.h"
+#include "Line.h"
+#include "LineStop.h"
+#include "Vertex.h"
+#include "NonPermanentService.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "Env.h"
 
-#include "15_env/Line.h"
-#include "15_env/LineStop.h"
-#include "15_env/Vertex.h"
-#include "15_env/NonPermanentService.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace env;
 	using namespace time;
+	using namespace util;
 
 	namespace timetables
 	{
-		TimetableGenerator::TimetableGenerator()
-			: _withContinuousServices(true)
+		TimetableGenerator::TimetableGenerator(
+			const Env& env
+		):	_withContinuousServices(true),
+			_env(env)
 			, _maxColumnsNumber(UNKNOWN_VALUE)
 		{
 
@@ -58,24 +64,23 @@ namespace synthese
 			assert(_columns.empty());
 
 			// Loop on each line of the database
-			for (Line::Registry::const_iterator itLine(Line::Begin()); itLine != Line::End(); ++itLine)
+			BOOST_FOREACH(shared_ptr<const Line> linePtr, _env.getRegistry<Line>())
 			{
 				// Line selection
-				const Line& line(*itLine->second);
+				const Line& line(*linePtr);
 				if (!_isLineSelected(line))
 					continue;
 
 				// Loop on each service
-				const ServiceSet& services(line.getServices());
-				for (ServiceSet::const_iterator itService(services.begin()); itService != services.end(); ++itService)
+				BOOST_FOREACH(Service* servicePtr, line.getServices())
 				{
 					// Permanent service filter
-					NonPermanentService* service(dynamic_cast<NonPermanentService*>(*itService));
+					NonPermanentService* service(dynamic_cast<NonPermanentService*>(servicePtr));
 					if (service == NULL)
 						continue;
 
 					// Calendar filter
-					if(	!(_baseCalendar || service->getCalendar())
+					if(	!(_baseCalendar || *service)
 						|| !_withContinuousServices && service->isContinuous()
 					)	continue;
 
@@ -152,7 +157,7 @@ namespace synthese
 
 
 			// A0: Line selection upon calendar
-			if (!line.getAllDays() && !(_baseCalendar || line.getCalendar()))
+			if (!line.getAllDays() && !(_baseCalendar || line))
 				return false;
 
 
@@ -165,7 +170,7 @@ namespace synthese
 
 				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
-					if ((*itEdge)->isDeparture() && (*itEdge)->getConnectionPlace()->getId() == itRow->getPlace()->getId())
+					if((*itEdge)->isDeparture() && (*itEdge)->getConnectionPlace()->getKey() == itRow->getPlace()->getKey())
 					{
 						lineIsSelected = true;
 						if (itRow->getIsArrival() || itRow->getCompulsory() == PassageSuffisant)
@@ -194,10 +199,13 @@ namespace synthese
 					&& itRow->getIsArrival()
 					)
 				){
-					for (const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly()); arrivalLinestop != NULL; arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly())
-					{
-						if (arrivalLinestop->getFromVertex()->getConnectionPlace()->getId() == itRow->getPlace()->getId())
-						{
+					for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
+						arrivalLinestop != NULL;
+						arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
+					){
+						if(	arrivalLinestop->getFromVertex()->getConnectionPlace()->getKey() ==
+							itRow->getPlace()->getKey()
+						){
 							lineIsSelected = true;
 							break;
 						}
@@ -233,8 +241,9 @@ namespace synthese
 
 
 
-		void TimetableGenerator::setBaseCalendar( const env::Calendar& value )
-		{
+		void TimetableGenerator::setBaseCalendar(
+			const Calendar& value
+		){
 			_baseCalendar = value;
 		}
 

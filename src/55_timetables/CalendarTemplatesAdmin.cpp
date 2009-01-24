@@ -25,22 +25,24 @@
 #include "CalendarTemplatesAdmin.h"
 #include "TimetableModule.h"
 
-#include "05_html/ResultHTMLTable.h"
-#include "05_html/HTMLModule.h"
-#include "05_html/HTMLForm.h"
+#include "ResultHTMLTable.h"
+#include "HTMLModule.h"
+#include "HTMLForm.h"
 
-#include "35_timetables/CalendarTemplateAdmin.h"
-#include "35_timetables/CalendarTemplateTableSync.h"
-#include "35_timetables/CalendarTemplateAddAction.h"
-#include "35_timetables/TimetableRight.h"
+#include "CalendarTemplateAdmin.h"
+#include "CalendarTemplateTableSync.h"
+#include "CalendarTemplateAddAction.h"
+#include "TimetableRight.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "Request.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/AdminParametersException.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
+#include "AdminParametersException.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -74,22 +76,23 @@ namespace synthese
 		
 		void CalendarTemplatesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
+			CalendarTemplateTableSync::Search(_env);
 		}
 		
-		void CalendarTemplatesAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
-		{
+		void CalendarTemplatesAdmin::display(
+			ostream& stream,
+			VariablesMap& variables
+		) const {
 			// Requests
-			FunctionRequest<AdminRequest> editCalendar(request);
+			FunctionRequest<AdminRequest> editCalendar(_request);
 			editCalendar.getFunction()->setPage<CalendarTemplateAdmin>();
 
-			ActionFunctionRequest<CalendarTemplateAddAction,AdminRequest> addCalendar(request);
+			ActionFunctionRequest<CalendarTemplateAddAction,AdminRequest> addCalendar(_request);
 			addCalendar.getFunction()->setPage<CalendarTemplateAdmin>();
 			addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
 			addCalendar.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			
-			// Search
-			vector<shared_ptr<CalendarTemplate> > calendars(CalendarTemplateTableSync::Search());
-
+			
 			// Display
 			stream << "<h1>Calendriers</h1>";
 
@@ -100,31 +103,41 @@ namespace synthese
 			HTMLTable t(c,ResultHTMLTable::CSS_CLASS);
 			stream << f.open() << t.open();
 
-			for (vector<shared_ptr<CalendarTemplate> >::const_iterator it(calendars.begin()); it != calendars.end(); ++it)
+			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, _env.getRegistry<CalendarTemplate>())
 			{
-				editCalendar.setObjectId((*it)->getKey());
+				editCalendar.setObjectId(ct->getKey());
 
 				stream << t.row();
-				stream << t.col() << (*it)->getText();
-				stream << t.col() << HTMLModule::getLinkButton(editCalendar.getURL(), "Modifier", string(), "calendar_edit.png");
+				stream << t.col() << ct->getText();
+				stream <<
+					t.col() <<
+					HTMLModule::getLinkButton(
+						editCalendar.getURL(),
+						"Modifier",
+						string(),
+						"calendar_edit.png"
+					)
+				;
 			}
 
 			stream << t.row();
-			stream << t.col() << f.getTextInput(CalendarTemplateAddAction::PARAMETER_TEXT, string(), "(nom du calendrier)");
+			stream <<
+				t.col() <<
+				f.getTextInput(CalendarTemplateAddAction::PARAMETER_TEXT, string(), "(nom du calendrier)")
+			;
 			stream << t.col() << f.getSubmitButton("Ajouter");
 
 			stream << t.close() << f.close();
 		}
 
-		bool CalendarTemplatesAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool CalendarTemplatesAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<TimetableRight>(READ);
+			return _request->isAuthorized<TimetableRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == TimetableModule::FACTORY_KEY)
@@ -134,19 +147,19 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
-			vector<shared_ptr<CalendarTemplate> > calendars(CalendarTemplateTableSync::Search());
-			for (vector<shared_ptr<CalendarTemplate> >::const_iterator it(calendars.begin()); it != calendars.end(); ++it)
+			Env env;
+			CalendarTemplateTableSync::Search(env);
+			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, env.getRegistry<CalendarTemplate>())
 			{
 				AdminInterfaceElement::PageLink link;
 				link.factoryKey = CalendarTemplateAdmin::FACTORY_KEY;
 				link.icon = CalendarTemplateAdmin::ICON;
-				link.name = (*it)->getText();
+				link.name = ct->getText();
 				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString((*it)->getKey());
+				link.parameterValue = Conversion::ToString(ct->getKey());
 				links.push_back(link);
 			}
 

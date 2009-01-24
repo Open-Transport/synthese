@@ -24,24 +24,24 @@
 
 #include "TimetableBookAdmin.h"
 
-#include "05_html/ActionResultHTMLTable.h"
-#include "05_html/HTMLModule.h"
-#include "05_html/HTMLList.h"
+#include "ActionResultHTMLTable.h"
+#include "HTMLModule.h"
+#include "HTMLList.h"
 
-#include "35_timetables/TimetableModule.h"
-#include "35_timetables/Timetable.h"
-#include "35_timetables/TimetableTableSync.h"
-#include "35_timetables/TimetableAdmin.h"
-#include "35_timetables/TimetableAddAction.h"
-#include "35_timetables/TimetableRight.h"
+#include "TimetableModule.h"
+#include "Timetable.h"
+#include "TimetableTableSync.h"
+#include "TimetableAdmin.h"
+#include "TimetableAddAction.h"
+#include "TimetableRight.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/Request.h"
+#include "QueryString.h"
+#include "ActionFunctionRequest.h"
+#include "Request.h"
 
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/AdminParametersException.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
+#include "AdminParametersException.h"
 
 using namespace std;
 using namespace boost;
@@ -84,7 +84,7 @@ namespace synthese
 			{
 				try
 				{
-					_book = TimetableTableSync::Get(id);
+					_book = TimetableTableSync::Get(id, _env);
 				}
 				catch(...)
 				{
@@ -92,13 +92,24 @@ namespace synthese
 				}
 				if (!_book->getIsBook())
 					throw AdminParametersException("Timetable is not a book");
+				
+				// Search
+				TimetableTableSync::Search(
+					_env,
+					_book->getKey()
+					, _requestParameters.orderField == PARAMETER_RANK
+					, _requestParameters.orderField == PARAMETER_TITLE
+					, _requestParameters.raisingOrder
+				);
 			}
 		}
 		
-		void TimetableBookAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
-		{
+		void TimetableBookAdmin::display(
+			ostream& stream,
+			VariablesMap& variables
+		) const {
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(request);
+			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<TimetableBookAdmin>();
 			searchRequest.setObjectId(_book.get() ? _book->getKey() : 0);
 
@@ -111,25 +122,18 @@ namespace synthese
 //			updateFolderRequest.getFunction()->setPage<TimetableBookAdmin>();
 //			updateFolderRequest.setObjectId(_book.get() ? _book->getKey() : 0);
 
-			ActionFunctionRequest<TimetableAddAction,AdminRequest> addTimetableRequest(request);
+			ActionFunctionRequest<TimetableAddAction,AdminRequest> addTimetableRequest(_request);
 			addTimetableRequest.getAction()->setBook(_book);
 			addTimetableRequest.getFunction()->setPage<TimetableAdmin>();
 
-			FunctionRequest<AdminRequest> editTimetableRequest(request);
+			FunctionRequest<AdminRequest> editTimetableRequest(_request);
 			editTimetableRequest.getFunction()->setPage<TimetableAdmin>();
 
-			FunctionRequest<AdminRequest> goFolderRequest(request);
+			FunctionRequest<AdminRequest> goFolderRequest(_request);
 			goFolderRequest.getFunction()->setPage<TimetableBookAdmin>();
 
-			// Search
-			vector<shared_ptr<Timetable> > tt(TimetableTableSync::Search(
-				_book.get() ? _book->getKey() : 0
-				, _requestParameters.orderField == PARAMETER_RANK
-				, _requestParameters.orderField == PARAMETER_TITLE
-				, _requestParameters.raisingOrder
-			));
 			ResultHTMLTable::ResultParameters tt_rp;
-			tt_rp.setFromResult(_requestParameters, tt);
+			tt_rp.setFromResult(_requestParameters, _env.getEditableRegistry<Timetable>());
 
 
 			// Folder properties
@@ -163,30 +167,55 @@ namespace synthese
 			stream << t3.open();
 			int lastRank(UNKNOWN_VALUE);
 			int maxRank(TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0));
-			for (vector<shared_ptr<Timetable> >::const_iterator ittt(tt.begin()); ittt != tt.end(); ++ittt)
+			
+			BOOST_FOREACH(shared_ptr<Timetable> tt, _env.getRegistry<Timetable>())
 			{
-				if ((*ittt)->getIsBook())
-					goFolderRequest.setObjectId((*ittt)->getKey());
+				if (tt->getIsBook())
+					goFolderRequest.setObjectId(tt->getKey());
 				else
-					editTimetableRequest.setObjectId((*ittt)->getKey());
+					editTimetableRequest.setObjectId(tt->getKey());
 
-				lastRank = (*ittt)->getRank();
+				lastRank = tt->getRank();
 
 				stream << t3.row(Conversion::ToString(lastRank));
-				stream << t3.col() << HTMLModule::getHTMLImage((*ittt)->getIsBook() ? "table_multiple.png" : "table.png", (*ittt)->getIsBook() ? "Document" : "Fiche horaire");
+				stream <<
+					t3.col() <<
+					HTMLModule::getHTMLImage(
+						tt->getIsBook() ? "table_multiple.png" : "table.png",
+						tt->getIsBook() ? "Document" : "Fiche horaire"
+					);
 				stream << t3.col();
 				if (lastRank > 0)
+				{
 					stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_up.png", "^"));
+				}
 				stream << t3.col();
 				if (lastRank < maxRank)
-					stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));;
+				{
+					stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));
+				}
 				stream << t3.col() << lastRank;
-				stream << t3.col() << (*ittt)->getTitle();
-				stream << t3.col() << HTMLModule::getLinkButton((*ittt)->getIsBook() ? goFolderRequest.getURL() : editTimetableRequest.getURL(), "Modifier", string(), "table_edit.png");
+				stream << t3.col() << tt->getTitle();
+				stream <<
+					t3.col() <<
+					HTMLModule::getLinkButton(
+						tt->getIsBook() ? goFolderRequest.getURL() : editTimetableRequest.getURL(),
+						"Modifier",
+						string(),
+						"table_edit.png"
+					);
 				stream << t3.col();
-				if ((*ittt)->getIsBook())
+				if (tt->getIsBook())
+				{
 					stream << HTMLModule::getLinkButton(string(), "Dupliquer", string(), "table_add.png");
-				stream << t3.col() << HTMLModule::getLinkButton(string(), "Supprimer", "Etes-vous sûr de vouloir supprimer la fiche horaire "+ (*ittt)->getTitle() +" ?", "table_delete.png");
+				}
+				stream <<
+					t3.col() <<
+					HTMLModule::getLinkButton(
+						string(),
+						"Supprimer",
+						"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "table_delete.png"
+					);
 			}
 			stream << t3.row(Conversion::ToString(++lastRank));
 			vector<pair<bool, string> > booknotbook;
@@ -200,40 +229,40 @@ namespace synthese
 			stream << t3.close();
 		}
 
-		bool TimetableBookAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
-		{
-			return request->isAuthorized<TimetableRight>(READ);
-		}
+		
 		
 		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
+			const PageLink& parentLink,
+			const AdminInterfaceElement& currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == TimetableModule::FACTORY_KEY)
+			if(	parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY &&
+				parentLink.parameterValue == TimetableModule::FACTORY_KEY
+			){
 				links.push_back(getPageLink());
-
+			}
 			return links;
 		}
 		
+		
+		
 		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
 			// Subpages
-			vector<shared_ptr<Timetable> > sv(TimetableTableSync::Search(_book.get() ? _book->getKey() : 0));
-			for (vector<shared_ptr<Timetable> >::const_iterator it(sv.begin()); it != sv.end(); ++it)
+			Env env;
+			TimetableTableSync::Search(env, _book.get() ? _book->getKey() : 0);
+			BOOST_FOREACH(shared_ptr<Timetable> tt, env.getRegistry<Timetable>())
 			{
 				PageLink link;
-				link.factoryKey = (*it)->getIsBook() ? TimetableBookAdmin::FACTORY_KEY : TimetableAdmin::FACTORY_KEY;
-				link.icon = (*it)->getIsBook() ? TimetableBookAdmin::ICON :  TimetableAdmin::ICON;
-				link.name = (*it)->getTitle();
+				link.factoryKey = tt->getIsBook() ? TimetableBookAdmin::FACTORY_KEY : TimetableAdmin::FACTORY_KEY;
+				link.icon = tt->getIsBook() ? TimetableBookAdmin::ICON :  TimetableAdmin::ICON;
+				link.name = tt->getTitle();
 				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString((*it)->getKey());
+				link.parameterValue = Conversion::ToString(tt->getKey());
 				links.push_back(link);
 			}
 
@@ -255,6 +284,11 @@ namespace synthese
 		std::string TimetableBookAdmin::getParameterValue() const
 		{
 			return _book.get() ? Conversion::ToString(_book->getKey()) : string();
+		}
+		
+		bool TimetableBookAdmin::isAuthorized() const
+		{
+			return _request->isAuthorized<TimetableRight>(READ);
 		}
 	}
 }

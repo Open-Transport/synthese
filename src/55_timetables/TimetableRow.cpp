@@ -20,23 +20,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <stdlib.h>
+
 #include "TimetableRow.h"
+
+using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+	
+	namespace util
+	{
+		template<> const std::string Registry<timetables::TimetableRow>::KEY("TimetableRow");
+	}
+
 	namespace timetables
 	{
-		TimetableRow::TimetableRow()
-			: _isArrival(true)
+		TimetableRow::TimetableRow(
+			RegistryKeyType id
+		):	Registrable(id),
+			_isArrival(true)
 			, _isDeparture(true)
 			, _place(NULL)
 			, _compulsory(PassageFacultatif)
 			, _rank(UNKNOWN_VALUE)
 			, _timetableId(UNKNOWN_VALUE)
 		{
-
 		}
-
 
 
 

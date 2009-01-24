@@ -22,15 +22,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "TimetableRight.h"
 #include "CalendarTemplateElementAddAction.h"
-
-#include "35_timetables/CalendarTemplate.h"
-#include "35_timetables/CalendarTemplateTableSync.h"
-#include "35_timetables/CalendarTemplateElement.h"
-#include "35_timetables/CalendarTemplateELementTableSync.h"
+#include "Request.h"
+#include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
+#include "CalendarTemplateElement.h"
+#include "CalendarTemplateElementTableSync.h"
 
 using namespace std;
 
@@ -39,6 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace time;
 	using namespace db;
+	using namespace security;
 	
 	namespace util
 	{
@@ -104,11 +105,11 @@ namespace synthese
 
 			CalendarTemplateElementTableSync::Shift(_calendar->getKey(), _rank, 1);
 
-			CalendarTemplateElementTableSync::save(&e);
+			CalendarTemplateElementTableSync::Save(&e);
 
 			_calendar->addElement(e);
 
-			CalendarTemplateTableSync::save(_calendar.get());
+			CalendarTemplateTableSync::Save(_calendar.get());
 		}
 
 
@@ -117,12 +118,18 @@ namespace synthese
 		{
 			try
 			{
-				_calendar = CalendarTemplateTableSync::GetUpdateable(id);
+				_calendar = CalendarTemplateTableSync::GetEditable(id, _env);
 			}
 			catch (...)
 			{
 				throw ActionException("No such calendar");
 			}
+		}
+		
+		
+		bool CalendarTemplateElementAddAction::_isAuthorized() const
+		{
+			return _request->isAuthorized<TimetableRight>(WRITE);
 		}
 	}
 }

@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_TimetableRowAddAction_H__
 #define SYNTHESE_TimetableRowAddAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -89,6 +88,8 @@ namespace synthese
 			TimetableRowAddAction();
 
 			void setTimetable(boost::shared_ptr<const Timetable> timetable);
+			
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

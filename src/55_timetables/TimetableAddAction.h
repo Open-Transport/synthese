@@ -74,6 +74,8 @@ namespace synthese
 			void setBook(boost::shared_ptr<const Timetable> book);
 			
 			TimetableAddAction();
+			
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

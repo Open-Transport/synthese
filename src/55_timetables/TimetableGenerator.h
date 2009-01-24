@@ -26,17 +26,21 @@
 #include <vector>
 #include <set>
 
-#include "15_env/Calendar.h"
-
-#include "35_timetables/TimetableColumn.h"
-#include "35_timetables/TimetableWarning.h"
-#include "35_timetables/TimetableRow.h"
+#include "Calendar.h"
+#include "TimetableColumn.h"
+#include "TimetableWarning.h"
+#include "TimetableRow.h"
 
 namespace synthese
 {
 	namespace time
 	{
 		class Schedule;
+	}
+	
+	namespace util
+	{
+		class Env;
 	}
 
 	namespace env
@@ -62,10 +66,11 @@ namespace synthese
 
 			//! @name Content definition
 			//@{
-				Rows			_rows;
-				env::Calendar	_baseCalendar;
-				Lines			_excludedLines;
-				bool			_withContinuousServices;
+				Rows				_rows;
+				time::Calendar		_baseCalendar;
+				Lines				_excludedLines;
+				bool				_withContinuousServices;
+				const util::Env&	_env;
 			//@}
 
 			//! @name Rendering parameters
@@ -88,7 +93,9 @@ namespace synthese
 			//@}
 
 		public:
-			TimetableGenerator();
+			TimetableGenerator(
+				const util::Env& env
+			);
 
 			//! @name Getters
 			//@{
@@ -113,7 +120,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setRows(const Rows& rows);
-				void setBaseCalendar(const env::Calendar& value);
+				void setBaseCalendar(const time::Calendar& value);
 			//@}
 		};
 	}

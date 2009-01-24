@@ -27,14 +27,14 @@
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateElement.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "04_time/Date.h"
+#include "Date.h"
 
 using namespace std;
 using namespace boost;
@@ -51,17 +51,52 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,CalendarTemplateElementTableSync>::FACTORY_KEY("55.11 Calendar Template Elements");
 	}
 	
+	namespace timetables
+	{
+		const std::string CalendarTemplateElementTableSync::COL_CALENDAR_ID("calendar_id");
+		const std::string CalendarTemplateElementTableSync::COL_RANK("rank");
+		const std::string CalendarTemplateElementTableSync::COL_MIN_DATE("min_date");
+		const std::string CalendarTemplateElementTableSync::COL_MAX_DATE("max_date");
+		const std::string CalendarTemplateElementTableSync::COL_INTERVAL("interval");
+		const std::string CalendarTemplateElementTableSync::COL_POSITIVE("positive");
+		const std::string CalendarTemplateElementTableSync::COL_INCLUDE_ID("include_id");
+	}
+	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::TABLE_NAME("t055_calendar_template_elements");
-		template<> const int SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::TABLE_ID(55);
-		template<> const bool SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::TABLE(
+			"t055_calendar_template_elements"
+		);
+		
+		
+		
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_CALENDAR_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_RANK, SQL_INTEGER),
+			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_MIN_DATE, SQL_DATE),
+			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_MAX_DATE, SQL_DATE),
+			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_INTERVAL, SQL_INTEGER),
+			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_POSITIVE, SQL_INTEGER),
+			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_INCLUDE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::load(
-			CalendarTemplateElement* object
-			, const db::SQLiteResultSPtr& rows
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index()
+		};
+
+
+
+		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Load(
+			CalendarTemplateElement* object,
+			const db::SQLiteResultSPtr& rows,
+			Env& env,
+			LinkLevel linkLevel
 		){
 			// Columns reading
 			uid id(rows->getLongLong(TABLE_COL_ID));
@@ -78,7 +113,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::save(
+		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Save(
 			CalendarTemplateElement* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -87,7 +122,7 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << object->getRank()
 				<< "," << object->getMinDate().toSQLString()
@@ -100,15 +135,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::_link(
-			CalendarTemplateElement* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
-		){
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::_unlink(
+		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Unlink(
 			CalendarTemplateElement* obj
 		){
 		}
@@ -118,43 +145,24 @@ namespace synthese
 	
 	namespace timetables
 	{
-		const std::string CalendarTemplateElementTableSync::COL_CALENDAR_ID("calendar_id");
-		const std::string CalendarTemplateElementTableSync::COL_RANK("rank");
-		const std::string CalendarTemplateElementTableSync::COL_MIN_DATE("min_date");
-		const std::string CalendarTemplateElementTableSync::COL_MAX_DATE("max_date");
-		const std::string CalendarTemplateElementTableSync::COL_INTERVAL("interval");
-		const std::string CalendarTemplateElementTableSync::COL_POSITIVE("positive");
-		const std::string CalendarTemplateElementTableSync::COL_INCLUDE_ID("include_id");
-
-
-
-
 		CalendarTemplateElementTableSync::CalendarTemplateElementTableSync()
 			: SQLiteNoSyncTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_CALENDAR_ID, "INTEGER");
-			addTableColumn(COL_RANK, "INTEGER");
-			addTableColumn(COL_MIN_DATE, "DATE");
-			addTableColumn(COL_MAX_DATE, "DATE");
-			addTableColumn(COL_INTERVAL, "INTEGER");
-			addTableColumn(COL_POSITIVE, "INTEGER");
-			addTableColumn(COL_INCLUDE_ID, "INTEGER");
 		}
 
 
 
-		vector<shared_ptr<CalendarTemplateElement> > CalendarTemplateElementTableSync::Search(
+		void CalendarTemplateElementTableSync::Search(
+			Env& env,
 			uid calendarId
 			, int first /*= 0*/
-			, int number /*= 0*/
+			, int number /*= 0*/,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (calendarId != UNKNOWN_VALUE)
 			 	query << " AND " << COL_CALENDAR_ID << "=" << calendarId
@@ -165,23 +173,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<CalendarTemplateElement> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<CalendarTemplateElement> object(new CalendarTemplateElement);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
@@ -194,7 +186,7 @@ namespace synthese
 
 			// Content
 			query
-				<< "UPDATE " << TABLE_NAME
+				<< "UPDATE " << TABLE.NAME
 				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
 				<< " WHERE " << COL_CALENDAR_ID << "=" << calendarId
 				<< " AND " << COL_RANK << ((delta > 0) ? ">=" : "<=") << rank
@@ -214,7 +206,7 @@ namespace synthese
 			// Content
 			query
 				<< "SELECT MAX(" << COL_RANK << ") AS mr "
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " << COL_CALENDAR_ID << "=" << calendarId
 				;
 

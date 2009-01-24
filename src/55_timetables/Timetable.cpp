@@ -21,22 +21,27 @@
 */
 
 #include "Timetable.h"
-
-#include "35_timetables/TimetableRow.h"
+#include "TimetableRow.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
+
+	namespace util
+	{
+		template<> const std::string Registry<timetables::Timetable>::KEY("Timetable");
+	}
 
 	namespace timetables
 	{
-		Timetable::Timetable()
-			: Registrable<uid,Timetable>()
-			, _mustBeginAPage(false)
-			, _bookId(0)
-			, _templateCalendarId(UNKNOWN_VALUE)
+		Timetable::Timetable(RegistryKeyType id)
+		:	Registrable(id),
+			_mustBeginAPage(false),
+			_bookId(0),
+			_templateCalendarId(UNKNOWN_VALUE)
 		{
 
 		}
@@ -57,7 +62,7 @@ namespace synthese
 
 
 
-		void Timetable::setBaseCalendar( const env::Calendar& calendar )
+		void Timetable::setBaseCalendar( const Calendar& calendar )
 		{
 			_baseCalendar = calendar;
 		}
@@ -78,7 +83,7 @@ namespace synthese
 
 
 
-		const env::Calendar& Timetable::getBaseCalendar() const
+		const Calendar& Timetable::getBaseCalendar() const
 		{
 			return _baseCalendar;
 		}
@@ -141,9 +146,10 @@ namespace synthese
 
 
 
-		auto_ptr<TimetableGenerator> Timetable::getGenerator() const
-		{
-			auto_ptr<TimetableGenerator> g(new TimetableGenerator);
+		auto_ptr<TimetableGenerator> Timetable::getGenerator(
+			const Env& env
+		) const {
+			auto_ptr<TimetableGenerator> g(new TimetableGenerator(env));
 			g->setRows(_rows);
 			return g;
 		}

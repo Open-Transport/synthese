@@ -22,18 +22,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Request.h"
 #include "TimetableRowAddAction.h"
 
-#include "35_timetables/Timetable.h"
-#include "35_timetables/TimetableTableSync.h"
-#include "35_timetables/TimetableRow.h"
-#include "35_timetables/TimetableRowTableSync.h"
+#include "Timetable.h"
+#include "TimetableRight.h"
+#include "TimetableTableSync.h"
+#include "TimetableRow.h"
+#include "TimetableRowTableSync.h"
 
-#include "15_env/EnvModule.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "EnvModule.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
 
@@ -41,6 +42,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace env;
+	using namespace security;
 	
 	namespace util
 	{
@@ -82,7 +84,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_TIMETABLE_ID, true, FACTORY_KEY));
 			try
 			{
-				_timetable = TimetableTableSync::Get(id);
+				_timetable = TimetableTableSync::Get(id, _env);
 			}
 			catch (...)
 			{
@@ -123,7 +125,7 @@ namespace synthese
 			// rank shifting
 			TimetableRowTableSync::Shift(_timetable->getKey(), _rank, 1);
 
-			TimetableRowTableSync::save(&r);
+			TimetableRowTableSync::Save(&r);
 		}
 
 
@@ -132,5 +134,12 @@ namespace synthese
 		{
 			_timetable = timetable;
 		}
+		
+		
+		bool TimetableRowAddAction::_isAuthorized() const
+		{
+			return _request->isAuthorized<TimetableRight>(WRITE);
+		}
+
 	}
 }

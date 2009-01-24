@@ -27,14 +27,14 @@
 #include "TimetableRowTableSync.h"
 #include "TimetableRow.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
-
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "Conversion.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ConnectionPlaceTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -51,17 +51,51 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,TimetableRowTableSync>::FACTORY_KEY("55.02 Timetable rows");
 	}
 	
+	namespace timetables
+	{
+		const string TimetableRowTableSync::COL_TIMETABLE_ID("timetable_id");
+		const string TimetableRowTableSync::COL_RANK("rank");
+		const string TimetableRowTableSync::COL_PLACE_ID("place_id");
+		const string TimetableRowTableSync::COL_IS_DEPARTURE("is_departure");
+		const string TimetableRowTableSync::COL_IS_ARRIVAL("is_arrival");
+		const string TimetableRowTableSync::COL_IS_COMPULSORY("is_compulsory");
+	}
+	
 	namespace db
 	{
-		template<> const string SQLiteTableSyncTemplate<TimetableRowTableSync>::TABLE_NAME("t053_timetable_rows");
-		template<> const int SQLiteTableSyncTemplate<TimetableRowTableSync>::TABLE_ID(53);
-		template<> const bool SQLiteTableSyncTemplate<TimetableRowTableSync>::HAS_AUTO_INCREMENT(true);
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TimetableRowTableSync>::TABLE(
+			"t053_timetable_rows"
+		);
+		
+		
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TimetableRowTableSync>::_FIELDS[]=
+		{
+			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(TimetableRowTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableRowTableSync::COL_RANK, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableRowTableSync::COL_PLACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableRowTableSync::COL_IS_DEPARTURE, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableRowTableSync::COL_IS_ARRIVAL, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableRowTableSync::COL_IS_COMPULSORY, SQL_INTEGER),
+			SQLiteTableSync::Field()
+		};
+
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TimetableRowTableSync>::_INDEXES[]=
+		{
+			SQLiteTableSync::Index(
+				TimetableRowTableSync::COL_TIMETABLE_ID.c_str()
+				, TimetableRowTableSync::COL_RANK.c_str()
+			, ""),
+			SQLiteTableSync::Index()
+		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::load(
+		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Load(
 			TimetableRow* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::SQLiteResultSPtr& rows,
+			Env& env,
+			LinkLevel linkLevel
 		){
 			// Columns reading
 			uid id(rows->getLongLong(TABLE_COL_ID));
@@ -74,7 +108,12 @@ namespace synthese
 			
 			try
 			{
-				object->setPlace(PublicTransportStopZoneConnectionPlace::Get(rows->getLongLong(TimetableRowTableSync::COL_PLACE_ID)).get());
+				object->setPlace(
+					ConnectionPlaceTableSync::GetEditable(
+						rows->getLongLong(TimetableRowTableSync::COL_PLACE_ID),
+						env, linkLevel
+					).get()
+				);
 			}
 			catch (...)
 			{
@@ -88,7 +127,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::save(
+		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Save(
 			TimetableRow* object
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
@@ -97,11 +136,11 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << object->getTimetableId()
 				<< "," << object->getRank()
-				<< "," << (object->getPlace() ? object->getPlace()->getId() : uid(0))
+				<< "," << (object->getPlace() ? object->getPlace()->getKey() : uid(0))
 				<< "," << Conversion::ToString(object->getIsDeparture())
 				<< "," << Conversion::ToString(object->getIsArrival())
 				<< "," << static_cast<int>(object->getCompulsory())
@@ -111,15 +150,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::_link(
-			TimetableRow* object
-			, const SQLiteResultSPtr& rows
-			, GetSource temporary
-		){
-		}
-
-
-		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::_unlink(
+		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Unlink(
 			TimetableRow* obj
 		){
 		}
@@ -129,49 +160,28 @@ namespace synthese
 	
 	namespace timetables
 	{
-		const std::string TimetableRowTableSync::COL_TIMETABLE_ID("timetable_id");
-		const std::string TimetableRowTableSync::COL_RANK("rank");
-		const std::string TimetableRowTableSync::COL_PLACE_ID("place_id");
-		const std::string TimetableRowTableSync::COL_IS_DEPARTURE("is_departure");
-		const std::string TimetableRowTableSync::COL_IS_ARRIVAL("is_arrival");
-		const std::string TimetableRowTableSync::COL_IS_COMPULSORY("is_compulsory");
-
-
-
 		TimetableRowTableSync::TimetableRowTableSync()
 			: SQLiteNoSyncTableSyncTemplate<TimetableRowTableSync,TimetableRow>()
 		{
-			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_TIMETABLE_ID, "INTEGER");
-			addTableColumn(COL_RANK, "INTEGER");
-			addTableColumn(COL_PLACE_ID, "INTEGER");
-			addTableColumn(COL_IS_DEPARTURE, "INTEGER");
-			addTableColumn(COL_IS_ARRIVAL, "INTEGER");
-			addTableColumn(COL_IS_COMPULSORY, "INTEGER");
-
-			vector<string> c;
-			c.push_back(COL_TIMETABLE_ID);
-			c.push_back(COL_RANK);
-			addTableIndex(c);
 		}
 
 
 
-		vector<shared_ptr<TimetableRow> > TimetableRowTableSync::Search(
+		void TimetableRowTableSync::Search(
+			Env& env,
 			uid timetableId
 			, bool orderByTimetable
 			, bool raisingOrder
 			, int first
-			, int number
+			, int number,
+			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			
 			// Content
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			
 			// Selection
@@ -189,23 +199,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			try
-			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<shared_ptr<TimetableRow> > objects;
-				while (rows->next ())
-				{
-					shared_ptr<TimetableRow> object(new TimetableRow);
-					load(object.get(), rows);
-					link(object.get(), rows, GET_AUTO);
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
+			LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
@@ -218,7 +212,7 @@ namespace synthese
 
 			// Content
 			query
-				<< "UPDATE " << TABLE_NAME
+				<< "UPDATE " << TABLE.NAME
 				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
 				<< " WHERE " << COL_TIMETABLE_ID << "=" << timetableId
 				<< " AND " << COL_RANK << ((delta > 0) ? ">=" : "<=") << rank
@@ -239,7 +233,7 @@ namespace synthese
 			// Content
 			query
 				<< "SELECT MAX(" << COL_RANK << ") AS mr "
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE.NAME
 				<< " WHERE " << COL_TIMETABLE_ID << "=" << timetableId
 				;
 

@@ -23,22 +23,35 @@
 #ifndef SYNTHESE_timetables_CalendarTemplateElement_h__
 #define SYNTHESE_timetables_CalendarTemplateElement_h__
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-
-#include "04_time/Date.h"
-
-#include "15_env/Calendar.h"
+#include "Registrable.h"
+#include "UId.h"
+#include "Date.h"
+#include "Calendar.h"
+#include "Registry.h"
 
 namespace synthese
 {
 	namespace timetables
 	{
-		/** CalendarTemplateElement class.
+		/** Element of calendar template class.
 			@ingroup m55
+			
+			An element of a calendar describes a range of dates by several ways :
+				- single date d : minDate=d, maxDate=d
+				- date range from s to e : minDate=s, maxDate=e, interval=1
+				- day of a week from s to e : minDate=s, maxDate=e, interval=7
+				- the maxDate can be unknown date (unlimited range)
+			
+			ddd
 		*/
-		class CalendarTemplateElement : public util::Registrable<uid, CalendarTemplateElement>
+		class CalendarTemplateElement
+		:	public virtual util::Registrable
 		{
+		public:
+			/// Chosen registry class.
+			typedef util::Registry<CalendarTemplateElement>	Registry;
+			
+		private:
 			int			_rank;
 			time::Date	_minDate;
 			time::Date	_maxDate;
@@ -47,11 +60,13 @@ namespace synthese
 			uid			_includeId;
 
 		public:
-			CalendarTemplateElement();
+			CalendarTemplateElement(
+				util::RegistryKeyType id = UNKNOWN_VALUE
+			);
 
 			//! @name Queries
 			//@{
-				env::Calendar	getCalendar(const env::Calendar& mask)	const;
+				time::Calendar	getCalendar(const time::Calendar& mask)	const;
 			//@}
 
 			//! @name Getters

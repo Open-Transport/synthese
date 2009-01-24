@@ -82,6 +82,8 @@ namespace synthese
 			CalendarTemplateElementAddAction();
 
 			void setCalendarId(uid id);
+			
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

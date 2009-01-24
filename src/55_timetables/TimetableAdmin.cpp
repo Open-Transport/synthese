@@ -25,33 +25,35 @@
 #include "TimetableAdmin.h"
 #include "TimetableModule.h"
 
-#include "04_time/Date.h"
+#include "Date.h"
 
-#include "05_html/PropertiesHTMLTable.h"
-#include "05_html/ActionResultHTMLTable.h"
-#include "05_html/HTMLModule.h"
+#include "PropertiesHTMLTable.h"
+#include "ActionResultHTMLTable.h"
+#include "HTMLModule.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/City.h"
-#include "15_env/Calendar.h"
-#include "15_env/Line.h"
-#include "15_env/CommercialLine.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "City.h"
+#include "Calendar.h"
+#include "Line.h"
+#include "CommercialLine.h"
 
-#include "35_timetables/Timetable.h"
-#include "35_timetables/TimetableRight.h"
-#include "35_timetables/TimetableTableSync.h"
-#include "35_timetables/TimetableRow.h"
-#include "35_timetables/TimetableRowTableSync.h"
-#include "35_timetables/TimetableUpdateAction.h"
-#include "35_timetables/TimetableRowAddAction.h"
+#include "Timetable.h"
+#include "TimetableRight.h"
+#include "TimetableTableSync.h"
+#include "TimetableRow.h"
+#include "TimetableRowTableSync.h"
+#include "TimetableUpdateAction.h"
+#include "TimetableRowAddAction.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "Request.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/AdminParametersException.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
+#include "AdminParametersException.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -67,6 +69,7 @@ namespace synthese
 	using namespace db;
 	using namespace time;
 	using namespace security;
+	using namespace env;
 
 	namespace util
 	{
@@ -95,7 +98,7 @@ namespace synthese
 
 			try
 			{
-				_timetable = TimetableTableSync::Get(id, GET_TEMPORARY, true);
+				_timetable = TimetableTableSync::Get(id, _env);
 			}
 			catch(...)
 			{
@@ -104,34 +107,38 @@ namespace synthese
 			if (_timetable->getIsBook())
 				throw AdminParametersException("Timetable is document");
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK);
-		}
-		
-		void TimetableAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
-		{
-			// Requests
-			ActionFunctionRequest<TimetableUpdateAction,AdminRequest> updateRequest(request);
-			updateRequest.setObjectId(_timetable->getKey());
-			updateRequest.getFunction()->setPage<TimetableAdmin>();
 			
-			ActionFunctionRequest<TimetableRowAddAction,AdminRequest> addRowRequest(request);
-			addRowRequest.setObjectId(_timetable->getKey());
-			addRowRequest.getAction()->setTimetable(_timetable);
-			addRowRequest.getFunction()->setPage<TimetableAdmin>();
-
-			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage<TimetableAdmin>();
-			searchRequest.setObjectId(_timetable->getKey());
-
-			// Search
-			vector<shared_ptr<TimetableRow> > rows(TimetableRowTableSync::Search(
+			TimetableRowTableSync::Search(
+				_env,
 				_timetable->getKey()
 				, _requestParameters.orderField == PARAMETER_RANK
 				, _requestParameters.raisingOrder
 				, _requestParameters.first
 				, _requestParameters.maxSize
-			));
+			);
+		}
+		
+		void TimetableAdmin::display(
+			ostream& stream,
+			VariablesMap& variables
+		) const	{
+			// Requests
+			ActionFunctionRequest<TimetableUpdateAction,AdminRequest> updateRequest(_request);
+			updateRequest.setObjectId(_timetable->getKey());
+			updateRequest.getFunction()->setPage<TimetableAdmin>();
+			
+			ActionFunctionRequest<TimetableRowAddAction,AdminRequest> addRowRequest(_request);
+			addRowRequest.setObjectId(_timetable->getKey());
+			addRowRequest.getAction()->setTimetable(_timetable);
+			addRowRequest.getFunction()->setPage<TimetableAdmin>();
+
+			FunctionRequest<AdminRequest> searchRequest(_request);
+			searchRequest.getFunction()->setPage<TimetableAdmin>();
+			searchRequest.setObjectId(_timetable->getKey());
+
+			// Search
 			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, rows);
+			p.setFromResult(_requestParameters, _env.getEditableRegistry<TimetableRow>());
 
 			// Display
 			stream << "<h1>Propriétés</h1>";
@@ -161,9 +168,9 @@ namespace synthese
 
 			int maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
 			int lastRank(UNKNOWN_VALUE);
-			for (vector<shared_ptr<TimetableRow> >::const_iterator it(rows.begin()); it != rows.end(); ++it)
+			BOOST_FOREACH(shared_ptr<TimetableRow> row, _env.getRegistry<TimetableRow>())
 			{
-				lastRank = (*it)->getRank();
+				lastRank = row->getRank();
 
 				stream << t.row(Conversion::ToString(lastRank));
 				stream << t.col();
@@ -173,13 +180,43 @@ namespace synthese
 				if (lastRank < maxRank)
 					stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));;
 				stream << t.col() << lastRank;
-				stream << t.col() << (*it)->getPlace()->getCity()->getName();
-				stream << t.col() << (*it)->getPlace()->getName();
-				stream << t.col() << ((*it)->getIsArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
-				stream << t.col() << ((*it)->getIsDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
-				stream << t.col() << (((*it)->getCompulsory() == PassageObligatoire) ? HTMLModule::getHTMLImage("bullet_green.png", "Obligatoire") : HTMLModule::getHTMLImage("bullet_white.png", "Non obligatoire"));
-				stream << t.col() << (((*it)->getCompulsory() == PassageSuffisant) ? HTMLModule::getHTMLImage("bullet_green.png", "Suffisant") : HTMLModule::getHTMLImage("bullet_white.png", "Non suffisant"));
-				stream << t.col() << ((false) ? HTMLModule::getHTMLImage("bullet_green.png", "Affiché") : HTMLModule::getHTMLImage("bullet_white.png", "Non affiché"));
+				stream << t.col() << row->getPlace()->getCity()->getName();
+				stream << t.col() << row->getPlace()->getName();
+				stream <<
+					t.col() <<
+					(	row->getIsArrival() ?
+						HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") :
+						HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible")
+					)
+				;
+				stream <<
+					t.col() <<
+					(	row->getIsDeparture() ?
+						HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") :
+						HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible")
+					)
+				;
+				stream <<
+					t.col() <<
+					(	(row->getCompulsory() == PassageObligatoire) ?
+						HTMLModule::getHTMLImage("bullet_green.png", "Obligatoire") :
+						HTMLModule::getHTMLImage("bullet_white.png", "Non obligatoire")
+					)
+				;
+				stream <<
+					t.col() <<
+					(	(row->getCompulsory() == PassageSuffisant) ?
+						HTMLModule::getHTMLImage("bullet_green.png", "Suffisant") :
+						HTMLModule::getHTMLImage("bullet_white.png", "Non suffisant")
+					)
+				;
+				stream <<
+					t.col() <<
+					(	(false) ?
+						HTMLModule::getHTMLImage("bullet_green.png", "Affiché") :
+						HTMLModule::getHTMLImage("bullet_white.png", "Non affiché")
+					)
+				;
 				stream << t.col() << HTMLModule::getLinkButton(string(), "Supprimer", "Etes-vous sûr de vouloir supprimer l\\'arrêt ?");
 			}
 			stream << t.row(Conversion::ToString(UNKNOWN_VALUE));
@@ -199,12 +236,12 @@ namespace synthese
 
 			stream << "<h1>Résultat simulé</h1>";
 
-			auto_ptr<TimetableGenerator> g(_timetable->getGenerator());
+			auto_ptr<TimetableGenerator> g(_timetable->getGenerator(_env));
 			Calendar c;
 			Date d(TIME_CURRENT);
 			for (int i(0); i<60; ++i)
 			{
-				c.mark(d);
+				c.setActive(d);
 				d++;
 			}
 			g->setBaseCalendar(c);
@@ -216,9 +253,14 @@ namespace synthese
 			stream << tf.open();
 			stream << tf.row();
 			stream << tf.col() << "Ligne";
-			vector<const Line*> lines(g->getLines());
-			for (vector<const Line*>::const_iterator it(lines.begin()); it != lines.end(); ++it)
-				stream << tf.col(1, (*it)->getCommercialLine()->getStyle()) << (*it)->getCommercialLine()->getShortName();
+			
+			BOOST_FOREACH(const Line* line, g->getLines())
+			{
+				stream <<
+					tf.col(1, line->getCommercialLine()->getStyle()) <<
+					line->getCommercialLine()->getShortName()
+				;
+			}
 
 			const TimetableGenerator::Rows& grows(g->getRows());
 			for (TimetableGenerator::Rows::const_iterator it(grows.begin()); it !=grows.end(); ++it)
@@ -239,15 +281,14 @@ namespace synthese
 
 		}
 
-		bool TimetableAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
+		bool TimetableAdmin::isAuthorized() const
 		{
-			return request->isAuthorized<TimetableRight>(READ);
+			return _request->isAuthorized<TimetableRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			return links;
@@ -255,7 +296,6 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			return links;

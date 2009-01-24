@@ -26,13 +26,18 @@ namespace synthese
 {
 	using namespace util;
 	using namespace time;
-	using namespace env;
+
+	namespace util
+	{
+		template<> const std::string Registry<timetables::CalendarTemplateElement>::KEY("CalendarTemplateElement");
+	}
 
 	namespace timetables
 	{
-		CalendarTemplateElement::CalendarTemplateElement()
-			: Registrable<uid, CalendarTemplateElement>()
-			, _minDate(TIME_UNKNOWN)
+		CalendarTemplateElement::CalendarTemplateElement(
+			RegistryKeyType id
+		):	Registrable(id),
+			_minDate(TIME_UNKNOWN)
 			, _maxDate(TIME_UNKNOWN)
 			, _interval(0)
 			, _positive(true)
@@ -43,22 +48,22 @@ namespace synthese
 
 
 
-		env::Calendar CalendarTemplateElement::getCalendar( const env::Calendar& mask ) const
+		Calendar CalendarTemplateElement::getCalendar( const Calendar& mask ) const
 		{
 			Calendar result;
 
 			if (_includeId == UNKNOWN_VALUE)
 			{
 				Date minDate(_minDate);
-				if(minDate.isUnknown() || minDate < mask.getFirstMarkedDate())
-					minDate = mask.getFirstMarkedDate();
+				if(minDate.isUnknown() || minDate < mask.getFirstActiveDate())
+					minDate = mask.getFirstActiveDate();
 				Date maxDate(_maxDate);
-				if (maxDate.isUnknown() || maxDate > mask.getLastMarkedDate())
-					maxDate = mask.getLastMarkedDate();
+				if (maxDate.isUnknown() || maxDate > mask.getLastActiveDate())
+					maxDate = mask.getLastActiveDate();
 
 				for (Date date = minDate; date <= maxDate; date += _interval)
-					if (mask.isMarked(date))
-						result.mark(date);
+					if (mask.isActive(date))
+						result.setActive(date);
 			}
 			return result;
 		}

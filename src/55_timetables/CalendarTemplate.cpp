@@ -22,45 +22,59 @@
 
 #include "CalendarTemplate.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace time;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const std::string Registry<timetables::CalendarTemplate>::KEY("CalendarTemplate");
+	}
 
 	namespace timetables
 	{
-		Calendar CalendarTemplate::getCalendar( const env::Calendar& mask ) const
-		{
+		Calendar CalendarTemplate::getCalendar(
+			const Calendar& mask
+		) const {
 			Calendar result;
-			for (vector<CalendarTemplateElement>::const_iterator it(_elements.begin()); it != _elements.end(); ++it)
+			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
 			{
-				if (it->getPositive())
-					result |= it->getCalendar(mask);
-				else
-					result.subDates(it->getCalendar(mask));
+				if (element.getPositive())
+				{
+					result |= element.getCalendar(mask);
+				} else {
+					result.subDates(element.getCalendar(mask));
+				}
 			}
 			return result;
 		}
 
 
 
-		std::string CalendarTemplate::getText() const
+		string CalendarTemplate::getText() const
 		{
 			return _text;
 		}
 
 
 
-		void CalendarTemplate::setText( const std::string& text )
-		{
+		void CalendarTemplate::setText(
+			const string& text
+		){
 			_text = text;
 		}
 
 
 
-		CalendarTemplate::CalendarTemplate()
-			: util::Registrable<uid,CalendarTemplate>()
+		CalendarTemplate::CalendarTemplate(
+			RegistryKeyType id
+		):	util::Registrable(id)
 		{
 
 		}

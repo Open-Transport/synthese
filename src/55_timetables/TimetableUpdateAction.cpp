@@ -22,9 +22,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Request.h"
+#include "TimetableRight.h"
 #include "TimetableUpdateAction.h"
 
 using namespace std;
@@ -32,6 +33,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
+	using namespace security;
 	
 	namespace util
 	{
@@ -73,6 +75,12 @@ namespace synthese
 		
 		void TimetableUpdateAction::run()
 		{
+		}
+		
+		
+		bool TimetableUpdateAction::_isAuthorized() const
+		{
+			return _request->isAuthorized<TimetableRight>(WRITE);
 		}
 	}
 }

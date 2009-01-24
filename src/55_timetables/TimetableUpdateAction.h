@@ -65,6 +65,8 @@ namespace synthese
 			void run();
 			
 			TimetableUpdateAction();
+			
+			virtual bool _isAuthorized() const;
 		};
 	}
 }

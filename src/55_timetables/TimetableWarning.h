@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "15_env/Calendar.h"
+#include "Calendar.h"
 
 namespace synthese
 {
@@ -47,7 +47,7 @@ namespace synthese
 		private:
 			// Variables
 			int				_number;
-			env::Calendar	_calendar;
+			time::Calendar	_calendar;
 
 		public:
 			/** Constructor.
@@ -56,14 +56,14 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008				
 			*/
-			TimetableWarning(const env::Calendar& calendar, int number);
+			TimetableWarning(const time::Calendar& calendar, int number);
 
 		
 
 			//! @name Getters
 			//@{
 				size_t					getNumber()			const;
-				const env::Calendar&	getCalendar()		const;
+				const time::Calendar&	getCalendar()		const;
 			//@}
 		};
 	}

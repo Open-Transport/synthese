@@ -23,19 +23,21 @@
 #ifndef SYNTHESE_timetables_Timetable_h__
 #define SYNTHESE_timetables_Timetable_h__
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-
-#include "15_env/Calendar.h"
-
-#include "35_timetables/TimetableGenerator.h"
+#include "Registrable.h"
+#include "UId.h"
+#include "Calendar.h"
+#include "Registry.h"
+#include "TimetableGenerator.h"
 
 #include <string>
 
 namespace synthese
 {
-	using namespace env;
-
+	namespace util
+	{
+		class Env;
+	}
+	
 	namespace timetables
 	{
 		class TimetableRow;
@@ -50,16 +52,20 @@ namespace synthese
 			@date 2001
 			@ingroup m55
 		*/
-		class Timetable : public util::Registrable<uid, Timetable>
+		class Timetable
+		:	public virtual util::Registrable
 		{
 		public:
 			typedef std::vector<TimetableRow>	Rows;
+			
+			/// Chosen registry class.
+			typedef util::Registry<Timetable>	Registry;
 
 		private:
 			// Variables
 			bool					_mustBeginAPage;
 			Rows					_rows;
-			env::Calendar			_baseCalendar;
+			time::Calendar			_baseCalendar;
 			std::string				_title;
 			uid						_bookId;
 			int						_rank;
@@ -68,7 +74,7 @@ namespace synthese
 
 		public:
 			// Constructeur
-			Timetable();
+			Timetable(util::RegistryKeyType id = UNKNOWN_VALUE);
 
 
 
@@ -76,7 +82,7 @@ namespace synthese
 			//@{
 				void setTitle(const std::string& title);
 				void setMustBeginAPage(bool newVal);
-				void setBaseCalendar(const env::Calendar& calendar);
+				void setBaseCalendar(const time::Calendar& calendar);
 				void setBookId(uid id);
 				void setTemplateCalendarId(uid id);
 				void setRank(int value);
@@ -91,7 +97,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				bool					getMustBeginAPage()		const;
-				const env::Calendar&	getBaseCalendar()		const;
+				const time::Calendar&	getBaseCalendar()		const;
 				const std::string&		getTitle()				const;
 				const Rows&				getRows()				const;
 				uid						getBookId()				const;
@@ -102,7 +108,9 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				std::auto_ptr<TimetableGenerator>	getGenerator()	const;
+				std::auto_ptr<TimetableGenerator> getGenerator(
+					const util::Env& env
+				)	const;
 			//@}
 		};
 	}
