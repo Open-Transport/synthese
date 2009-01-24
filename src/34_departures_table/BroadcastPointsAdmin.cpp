@@ -40,6 +40,7 @@
 #include "Profile.h"
 
 #include <map>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -72,7 +73,7 @@ namespace synthese
 		const string BroadcastPointsAdmin::PARAMETER_PLACE_NAME = "place";
 		const string BroadcastPointsAdmin::PARAMETER_LINE_ID = "line";
 		const string BroadcastPointsAdmin::PARAMETER_DISPLAY_NUMBER = "dpln";
-
+		
 		BroadcastPointsAdmin::BroadcastPointsAdmin()
 			: AdminInterfaceElementTemplate<BroadcastPointsAdmin>(),
 			_displayNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT),
@@ -137,16 +138,24 @@ namespace synthese
 			stream << st.open();
 			stream << st.cell("Commune", st.getForm().getTextInput(PARAMETER_CITY_NAME, _cityName));
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAMETER_PLACE_NAME, _placeName));
-			stream << st.cell("Terminaux d'affichage", st.getForm().getSelectInput(PARAMETER_DISPLAY_NUMBER, m, static_cast<int>(_displayNumber)));
+			stream << st.cell(
+				"Terminaux d'affichage",
+				st.getForm().getSelectInput(PARAMETER_DISPLAY_NUMBER, m, static_cast<int>(_displayNumber))
+			);
+			stream << st.cell(
+				"Unités centrales",
+				st.getForm().getSelectInput(PARAMETER_CPU_NUMBER, m, static_cast<int>(_cpuNumber))
+			);
 			stream << st.cell("Ligne", st.getForm().getSelectInput(
-				PARAMETER_LINE_ID
-				, EnvModule::getCommercialLineLabels(
+				PARAMETER_LINE_ID,
+				EnvModule::getCommercialLineLabels(
 					_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 					, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 					, READ
-					, true)
-				, _lineUId)
-				);
+					, true
+				),
+				_lineUId)
+			);
 			stream << st.close();
 
 			stream << "<h1>Résultats de la recherche</h1>";
@@ -162,17 +171,17 @@ namespace synthese
 			stream << t.open();
 
 
-			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = searchResult.begin(); it != searchResult.end(); ++it)
+			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> pl, searchResult)
 			{
 				stream << t.row();
 				try
 				{
-					shared_ptr<PublicTransportStopZoneConnectionPlace> place((*it)->place);
-					stream << t.col() << (*it)->cityName;
-					stream << t.col() << place->getName();
-					stream << t.col() << (*it)->broadCastPointsNumber;
+					stream << t.col() << pl->cityName;
+					stream << t.col() << pl->place->getName();
+					stream << t.col() << pl->broadCastPointsNumber;
+					stream << t.col() << pl->cpuNumber;
 					HTMLForm gf(goRequest.getHTMLForm());
-					gf.addHiddenField(DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID, Conversion::ToString(place->getKey()));
+					gf.addHiddenField(DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID, Conversion::ToString(pl->place->getKey()));
 					stream << t.col() << gf.getLinkButton("Editer", string(), "building_edit.png");
 				}
 				catch (...)

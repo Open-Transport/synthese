@@ -111,7 +111,7 @@ namespace synthese
 			ptr.setOriginDateTime(originDateTime);
 
 			// Date control
-			if (!isProvided(originDateTime.getDate()))
+			if (!isActive(originDateTime.getDate()))
 				return ServicePointer(method);
 
 			// Reservation control

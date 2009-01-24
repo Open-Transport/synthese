@@ -174,13 +174,13 @@ int main( int argc, char **argv )
 #endif        
 			("logfile", po::value<std::string>(&logf)->default_value (std::string ("-")), "Log file path or - for standard output)")
 #ifndef WIN32
-			("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file")
+			("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file ( - = no pid file )")
 #endif        
 #ifdef DEBUG
 			("monothread", "Enable monothread emulation")
 #endif        
 			("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
-		 
+		
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		po::notify(vm);    
@@ -215,25 +215,25 @@ int main( int argc, char **argv )
 
 #ifndef WIN32
 		pid_t pid = getpid ();
-
-		// Check if a daemon instance is already running (PID file existence)
-		pidFile = new boost::filesystem::path (createCompletePath (pidf));
-		if (boost::filesystem::exists (*pidFile) == true)
+		if(pidf != "-")
 		{
-			std::ifstream is (pidFile->string ().c_str (), std::ios_base::in);
-			is >> pid;
-			is.close ();
-			std::cerr << "Process s3_server is already running with PID " << pid << "." << std::endl;
-			exit (1);
+			// Check if a daemon instance is already running (PID file existence)
+			pidFile = new boost::filesystem::path (createCompletePath (pidf));
+			if (boost::filesystem::exists (*pidFile) == true)
+			{
+				std::ifstream is (pidFile->string ().c_str (), std::ios_base::in);
+				is >> pid;
+				is.close ();
+				std::cerr << "Process s3_server is already running with PID " << pid << "." << std::endl;
+				exit (1);
+			}
+			ensureWritablePath (*pidFile, true);
 		}
 #endif        
 
 		boost::filesystem::path dbpath (createCompletePath (db));
 		boost::filesystem::path logFile (createCompletePath (logf));
 
-#ifndef WIN32
-		ensureWritablePath (*pidFile, true);
-#endif        
 		ensureWritablePath (dbpath, false);
 		std::ostream* logStream = &std::cout;
 		if (logf != "-")
@@ -293,9 +293,12 @@ int main( int argc, char **argv )
 
 #ifndef WIN32
 		// Create the real PID file
-		std::ofstream os (pidFile->string ().c_str (), std::ios_base::out);
-		os << pid << std::endl;
-		os.close ();
+		if(pidf != "-")
+		{
+			std::ofstream os (pidFile->string ().c_str (), std::ios_base::out);
+			os << pid << std::endl;
+			os.close ();
+		}
 
 		if (daemonMode)
 		{

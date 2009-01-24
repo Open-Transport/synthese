@@ -81,6 +81,7 @@ namespace synthese
 		*/
 		class Path
 		:	public Complyer,
+			public Calendar,
 			public virtual util::Registrable
 		{
 		public:
@@ -90,11 +91,12 @@ namespace synthese
 			Edges			_edges; 
 			ServiceSet		_services;
 			
-			Calendar		_calendar; //!< Calendar indicating if there is at least one service running on each day. (move it in Complyer)
 			bool			_allDays;	//!< A permanent service is present : the calendar is ignored
 
+			/** Constructor.
+			*/
 			Path();
-
+			
 		public:
 
 			virtual ~Path ();
@@ -104,8 +106,6 @@ namespace synthese
 			//@{
 				const ServiceSet&			getServices()	const;
 				const std::vector<Edge*>&	getEdges()		const;
-				const Calendar&				getCalendar()	const;
-				Calendar&					getCalendar();
 				bool						getAllDays()	const;
 			//@}
 
@@ -131,15 +131,16 @@ namespace synthese
 					- vertices (address/physical stops)
 					- via points
 				*/
-				std::vector<const geometry::Point2D*> getPoints (int fromEdgeIndex = 0,
-								int toEdgeIndex = -1) const;
-
-				bool isInService (const synthese::time::Date& date) const;
+				std::vector<const geometry::Point2D*> getPoints(
+					int fromEdgeIndex = 0,
+					int toEdgeIndex = -1
+				) const;
 
 				Edge*	getLastEdge()	const;
-
+				
+				virtual bool isActive(const time::Date& date) const;
 			//@}
-		    
+			
 			//! @name Update methods.
 			//@{
 
@@ -149,7 +150,8 @@ namespace synthese
 					All the pointer links necessary to the graph exploration are created :
 						- the links between edges (describing the path)
 
-					The order of addEdge calls can be random : the rankinpath attribute of edge is used to insert the new object at the good position.
+					The order of addEdge calls can be random : the rankinpath attribute of edge
+					is used to insert the new object at the good position.
 				*/
 				void addEdge (Edge* edge);
 
@@ -161,7 +163,10 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 
-					The method is virtual to avoid subclasses to have a different behavior than the simple add to the services list (see SubLine).
+					The method is virtual to avoid subclasses to have a different behavior than 
+					the simple add to the services list (see SubLine).
+					
+					@todo Update dates of the path
 				*/
 				virtual void addService (Service* service, bool ensureLineTheory);
 

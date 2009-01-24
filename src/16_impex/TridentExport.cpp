@@ -158,10 +158,28 @@ namespace synthese
 			{
 				if (line->getRollingStock())
 					rollingStock = line->getRollingStock();
-				LineStopTableSync::Search(_env, line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ScheduledServiceTableSync::Search(_env, line->getKey(), UNKNOWN_VALUE, Date(TIME_UNKNOWN), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ContinuousServiceTableSync::Search(_env, line->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-			}    
+				LineStopTableSync::Search(
+					_env,
+					line->getKey(),
+					UNKNOWN_VALUE,
+					0, 0, true, true,
+					UP_LINKS_LOAD_LEVEL
+				);
+				ScheduledServiceTableSync::Search(
+					_env,
+					line->getKey(),
+					UNKNOWN_VALUE,
+					Date(TIME_UNKNOWN),
+					0, 0, true, true,
+					UP_DOWN_LINKS_LOAD_LEVEL
+				);
+				ContinuousServiceTableSync::Search(
+					_env,
+					line->getKey(),
+					0, 0, true, true,
+					UP_DOWN_LINKS_LOAD_LEVEL
+				);
+			}
 
 
 			// Writing of the header
@@ -331,7 +349,7 @@ namespace synthese
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
 
-				BOOST_FOREACH(Date date, ServiceDateTableSync::GetDatesOfService(srv->getKey()))
+				BOOST_FOREACH(const Date& date, srv->getActiveDates())
 				{
 					os << "<calendarDay>" << ToXsdDate (date) << "</calendarDay>" << "\n";
 				}
@@ -344,7 +362,7 @@ namespace synthese
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
 
-				BOOST_FOREACH(Date date, ServiceDateTableSync::GetDatesOfService(srv->getKey()))
+				BOOST_FOREACH(const Date& date, srv->getActiveDates())
 				{
 					os << "<calendarDay>" << ToXsdDate (date) << "</calendarDay>" << "\n";
 				}

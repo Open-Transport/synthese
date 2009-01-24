@@ -155,6 +155,7 @@ namespace synthese
 				util::Env& env = util::Env::GetOfficialEnv()
 			);
 
+			
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(
 				const security::RightsOfSameClassMap& rights 
 				, bool totalControl 

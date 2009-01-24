@@ -116,7 +116,10 @@ namespace synthese
 			SearchFormHTMLTable f(searchRequest.getHTMLForm());
 			stream << f.open();
 			stream << f.cell("Nom", f.getForm().getTextInput(PARAMETER_NAME, _searchName));
-			stream << f.cell("Interface d'affichage", f.getForm().getSelectInput(PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true), _searchInterfaceId));
+			stream << f.cell(
+				"Interface d'affichage",
+				f.getForm().getSelectInput(PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true, true), _searchInterfaceId)
+			);
 			stream << f.close();
 
 			stream << "<h1>Résultat de la recherche</h1>";
@@ -141,7 +144,7 @@ namespace synthese
 
 				stream << t.row();
 				stream << t.col() << dt->getName();
-				stream << t.col() << ((dt->getDisplayInterface() == NULL) ? "" : dt->getDisplayInterface()->getName());
+				stream << t.col() << ((dt->getDisplayInterface() == NULL) ? "(aucune)" : dt->getDisplayInterface()->getName());
 				stream << t.col() << dt->getRowNumber();
 				stream << t.col() << openRequest.getHTMLForm().getLinkButton("Modifier", string(), "monitor_edit.png");
 				if (writeRight)

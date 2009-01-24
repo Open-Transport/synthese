@@ -64,38 +64,57 @@ namespace synthese
 
 		private:
 
-			synthese::time::Date _firstMarkedDate;
-			synthese::time::Date _lastMarkedDate;
+			time::Date _firstMarkedDate;
+			time::Date _lastMarkedDate;
 
-			boost::dynamic_bitset<> _markedDates;    
+			boost::dynamic_bitset<> _markedDates;
 
 		public:
 
 			Calendar();
-		    
+		 
 			~Calendar();
 
 
 			//! @name Getters/Setters
 			//@{
-			synthese::time::Date getFirstMarkedDate () const;
-			synthese::time::Date getLastMarkedDate () const;
+			time::Date getFirstActiveDate () const;
+			time::Date getLastActiveDate () const;
 			//@}
 
 
 			//! @name Query methods
 			//@{
-			int getNbMarkedDates () const;
-			bool isMarked (time::Date date) const;
-			std::vector<time::Date> getMarkedDates () const;
+				int getNbActiveDates () const;
+				
+				
+				
+				/** Tests if a date is active according to the calendar.
+				 * This method can be overloaded by subclasses to do additional controls.
+				 * @param date date to test
+				 * @return true if the calendar is active at the specified date
+				 */
+				virtual bool isActive(
+					const time::Date& date
+				) const;
+				
+				
+				
+				/** Gets all the active dates of the calendar.
+				 * 
+				 * @return vector containing the active dates of the calendar
+				 */
+				std::vector<time::Date> getActiveDates () const;
 			//@}
 
 
 
 			//! @name Update methods
 			//@{
-				void mark (time::Date date, bool state = true);
+				virtual void setActive(const time::Date& date);
+				virtual void setInactive(const time::Date& date);
 				void subDates(const Calendar& calendar);
+				void clearDates();
 			//@}
 
 

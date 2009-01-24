@@ -95,11 +95,6 @@ namespace synthese
 			return Schedule(Hour(TIME_MAX),0);
 		}
 
-		bool PermanentService::isProvided( const time::Date& originDate ) const
-		{
-			return true;
-		}
-
 	
 
 		bool PermanentService::isContinuous() const

@@ -73,10 +73,10 @@ namespace synthese
 
 
 
-		std::string 
-		SQLiteTableSync::GetSQLSchemaDb (synthese::db::SQLite* sqlite,
-						 const std::string& tableName)
-		{
+		std::string SQLiteTableSync::GetSQLSchemaDb(
+			SQLite* sqlite,
+			 const std::string& tableName
+		){
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='table' and name='" +
 			tableName + "'";
 			SQLiteResultSPtr result = sqlite->execQuery (sql);

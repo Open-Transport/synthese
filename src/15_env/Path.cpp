@@ -22,16 +22,14 @@
 
 #include "Path.h"
 
-#include "15_env/ConnectionPlace.h"
-#include "15_env/Edge.h"
-#include "15_env/Vertex.h"
-#include "15_env/Service.h"
-#include "15_env/Road.h"
-#include "15_env/Exception.h"
+#include "ConnectionPlace.h"
+#include "Edge.h"
+#include "Vertex.h"
+#include "Service.h"
+#include "Road.h"
+#include "Exception.h"
 
-#include "01_util/Conversion.h"
-
-#include "17_messages/Alarm.h"
+#include "Conversion.h"
 
 #include <assert.h>
 
@@ -42,13 +40,14 @@ namespace synthese
 	using namespace messages;
 	using namespace util;
 	using namespace geometry;
+	using namespace time;
 
 	namespace env
 	{
 
-		Path::Path ()
+		Path::Path()
 			: Complyer()
-			, _calendar ()
+			, Calendar()
 			, _allDays(false)
 		{
 		}
@@ -68,12 +67,9 @@ namespace synthese
 
 
 
-
-
-
-		const Service* 
-		Path::getService (int serviceIndex) const
-		{
+		const Service* Path::getService(
+			int serviceIndex
+		) const {
 			ServiceSet::const_iterator it(_services.begin ());
 			advance (it, serviceIndex);
 			return (*it);
@@ -92,8 +88,10 @@ namespace synthese
 			std::pair<ServiceSet::iterator, bool> result = _services.insert (service);
 			if (result.second == false)
 			{
-				throw Exception ("Service number " + Conversion::ToString (service->getServiceNumber ())
-						+ " is already defined in path " + Conversion::ToString (getKey()));
+				throw Exception(
+					"Service number " + Conversion::ToString (service->getServiceNumber ())
+					+ " is already defined in path " + Conversion::ToString (getKey())
+				);
 			}
 			markScheduleIndexesUpdateNeeded ();
 			service->setPath(this);
@@ -114,15 +112,14 @@ namespace synthese
 
 
 
-		bool Path::isInService (const synthese::time::Date& date) const
+		bool Path::isActive(const Date& date) const
 		{
-			return _allDays || _calendar.isMarked ( date );
+			return _allDays || Calendar::isActive(date);
 		}
 
 
 
-		const Edge* 
-		Path::getEdge (int index) const
+		const Edge* Path::getEdge (int index) const
 		{
 			return _edges[index];
 		}
@@ -321,17 +318,6 @@ namespace synthese
 			return (it != _edges.end()) ? *it : NULL;
 		}
 
-		Calendar& Path::getCalendar()
-		{
-			return _calendar;
-		}
-
-
-
-		const Calendar& Path::getCalendar() const
-		{
-			return _calendar;
-		}
 
 
 	    void 

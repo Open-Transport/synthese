@@ -223,20 +223,6 @@ namespace synthese
 
 
 
-		bool Edge::isRunning(
-			const DateTime& startMoment
-			, const DateTime& endMoment
-		) const	{
-			const Date& endDate(endMoment.getDate());
-
-			for (Date startDate(startMoment.getDate()); startDate <= endDate; startDate++ )
-				if ( getParentPath ()->isInService ( startDate ) )
-					return true;
-			return false;
-		}
-
-
-
 /*		int 
 		Edge::getBestRunTime (const Edge& other ) const
 		{
@@ -306,7 +292,7 @@ namespace synthese
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
 				// Look in schedule for when the line is in service
-				if (getParentPath ()->isInService( departureMoment.getDate()))
+				if (getParentPath()->isActive(departureMoment.getDate()))
 				{
 					for (; next < getParentPath ()->getServices().size(); ++next)  // boucle sur les services
 					{
@@ -361,7 +347,7 @@ namespace synthese
 			
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{
-				if (getParentPath ()->isInService( arrivalMoment.getDate()))
+				if (getParentPath()->isActive(arrivalMoment.getDate()))
 				{
 					for (; previous >= 0; --previous)  // Loop over services
 					{

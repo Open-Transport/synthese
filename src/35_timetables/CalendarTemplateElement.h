@@ -37,7 +37,8 @@ namespace synthese
 		/** CalendarTemplateElement class.
 			@ingroup m55
 		*/
-		class CalendarTemplateElement : public util::Registrable<uid, CalendarTemplateElement>
+		class CalendarTemplateElement
+		:	public util::Registrable<uid, CalendarTemplateElement>
 		{
 			int			_rank;
 			time::Date	_minDate;

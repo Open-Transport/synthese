@@ -112,7 +112,10 @@ namespace synthese
 		class InterfaceModule : public util::FactorableTemplate<util::ModuleClass, InterfaceModule>
 		{
 		public:
-			static std::vector<std::pair<uid, std::string> > getInterfaceLabels(bool withNo = false);
+			static std::vector<std::pair<uid, std::string> > getInterfaceLabels(
+				bool withNo = false,
+				bool withUnknown = false
+			);
 
 			void initialize();
 

@@ -32,13 +32,16 @@ namespace synthese
 	{
 		/** NonPermanentService class.
 			@ingroup m35
+			
+			Use isActive to deternminate if this service is providen a given day.
+			The date parameter corresponds tp the departure date of the service from its origin
+			(warning: do not test the customer departure date which can be one or more days later;
+			use getOriginDateTime to compute the origin date)
 		*/
 		class NonPermanentService
-		:	public Service
+		:	public Service,
+			public Calendar
 		{
-		private:
-			Calendar		_calendar;  //!< Which days is this service available ?
-
 		protected:
 			NonPermanentService(
 				util::RegistryKeyType id = UNKNOWN_VALUE
@@ -50,17 +53,22 @@ namespace synthese
 
 		public:
 
-
-			Calendar&		getCalendar (); // MJ constness pb
-			const Calendar&		getCalendar () const; // MJ constness pb
-
-			virtual bool isProvided(const time::Date& originDate) const;
-
 			/** Latest schedule of the service : the last arrival at the last vertex.
-			@return The latest schedule of the service
+				@return The latest schedule of the service
 			*/
 			virtual const time::Schedule& getLastArrivalSchedule() const = 0;
 
+			/** Marks a date on the calendar of the service.
+			 * Updates the calendar of the path too.
+			 * @param date the date to mark 
+			 */
+			virtual void setActive(const time::Date& date);
+			
+			/** Unmarks a date on the calendar of the service.
+			 * Updates the calendar of the path too.
+			 * @param date the date to unmark 
+			 */
+			virtual void setInactive(const time::Date& date);
 		};
 	}
 }

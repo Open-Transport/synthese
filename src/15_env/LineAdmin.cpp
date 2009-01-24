@@ -91,8 +91,8 @@ namespace synthese
 			{
 				_line = LineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
 				LineStopTableSync::Search(_env, _line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ScheduledServiceTableSync::Search(_env, _line->getKey(), UNKNOWN_VALUE, TIME_UNKNOWN, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ContinuousServiceTableSync::Search(_env, _line->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				ScheduledServiceTableSync::Search(_env, _line->getKey(), UNKNOWN_VALUE, TIME_UNKNOWN, 0, 0, true, true, UP_DOWN_LINKS_LOAD_LEVEL);
+				ContinuousServiceTableSync::Search(_env, _line->getKey(), 0, 0, true, true, UP_DOWN_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -168,7 +168,7 @@ namespace synthese
 
 						stream << ts.col() << (as - ds);
 
-						stream << ts.col();
+						stream << ts.col() << service->getLastActiveDate().toString();
 					}
 
 					stream << ts.close();
@@ -217,7 +217,7 @@ namespace synthese
 						stream << tc.col() << service->getRange();
 						stream << tc.col() << service->getMaxWaitingTime();
 
-						stream << tc.col();
+						stream << tc.col() << service->getLastActiveDate().toString();
 					}
 
 					stream << tc.close();

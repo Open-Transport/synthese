@@ -83,13 +83,15 @@ namespace synthese
 				throw ActionException("Un nombre positif de lignes doit être choisi");
 
 			// Interface
+			RegistryKeyType id(map.getUid(PARAMETER_INTERFACE_ID, false, FACTORY_KEY));
+			if(id > 0)
 			try
 			{
-				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY), _env);
+				_interface = InterfaceTableSync::Get(id, _env);
 			}
-			catch (...)
+			catch (ObjectNotFoundException<Interface>& e)
 			{
-				throw ActionException("Interface not found");
+				throw ActionException("Interface d'affichage", id, FACTORY_KEY, e);
 			}
 		}
 

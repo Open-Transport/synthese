@@ -50,15 +50,15 @@ namespace synthese
 			if (_includeId == UNKNOWN_VALUE)
 			{
 				Date minDate(_minDate);
-				if(minDate.isUnknown() || minDate < mask.getFirstMarkedDate())
-					minDate = mask.getFirstMarkedDate();
+				if(minDate.isUnknown() || minDate < mask.getFirstActiveDate())
+					minDate = mask.getFirstActiveDate();
 				Date maxDate(_maxDate);
-				if (maxDate.isUnknown() || maxDate > mask.getLastMarkedDate())
-					maxDate = mask.getLastMarkedDate();
+				if (maxDate.isUnknown() || maxDate > mask.getLastActiveDate())
+					maxDate = mask.getLastActiveDate();
 
 				for (Date date = minDate; date <= maxDate; date += _interval)
-					if (mask.isMarked(date))
-						result.mark(date);
+					if (mask.isActive(date))
+						result.markActive(date);
 			}
 			return result;
 		}

@@ -118,12 +118,6 @@ namespace synthese
 
 				virtual std::string getTeam() const;
 
-				/** Is this service providen a given day ?
-					@param originDate Departure date of the service from its origin (warning: do not test the customer departure date which can be one or more days later; use getOriginDateTime to compute the origin date)
-					@return true if the service runs at the specified date according to its Calendar
-				*/
-				virtual bool isProvided(const time::Date& originDate) const = 0;
-
 				virtual time::Schedule getDepartureBeginScheduleToIndex(int rankInPath) const = 0;
 				virtual time::Schedule getDepartureEndScheduleToIndex(int rankInPath) const = 0;
 				virtual time::Schedule getArrivalBeginScheduleToIndex(int rankInPath) const = 0;

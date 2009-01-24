@@ -53,9 +53,15 @@ namespace synthese
 		{
 		}
 
-		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels(bool withNo)
-		{
+		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels(
+			bool withNo,
+			bool withUnknown
+		){
 			vector<pair<uid, string> > m;
+			if (withUnknown)
+			{
+				m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
+			}
 			if (withNo)
 			{
 				m.push_back(make_pair(uid(0), "(aucune)"));

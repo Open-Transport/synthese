@@ -35,15 +35,14 @@ namespace synthese
 {
 	namespace env
 	{
+		class NonPermanentService;
+		
 		/** Service dates table synchronizer.
 			@ingroup m35LS refLS
 		*/
 		class ServiceDateTableSync
 		:	public db::SQLiteTableSyncTemplate<ServiceDateTableSync>
 		{
-		private:
-			static void _updateServiceCalendar (const db::SQLiteResultSPtr& rows, bool marked) ;
-
 		public:
 			/** Writing of the dates of a service.
 				@param service pointer to the service from which save the dates
@@ -58,14 +57,25 @@ namespace synthese
 			
 			ServiceDateTableSync();
 
-			static std::vector<time::Date> GetDatesOfService(uid serviceId);
 
+			/** Sets all active dates on a service.
+			 * 
+			 * @param service The service to update
+			 */
+			static void SetActiveDates(
+				NonPermanentService& service
+			);
+			
+			
+			
 			/** Action to do on Service Date creation.
 				This method loads a new object in ram.
 			*/
 			void rowsAdded (db::SQLite* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
+
+
 
 			/** Action to do on Service Date creation.
 				This method updates the corresponding object in ram.
@@ -74,6 +84,8 @@ namespace synthese
 				db::SQLiteSync* sync,
 				const db::SQLiteResultSPtr& rows);
 
+
+
 			/** Action to do on Service Date deletion.
 				This method deletes the corresponding object in ram and runs 
 				all necessary cleaning actions.
@@ -81,7 +93,6 @@ namespace synthese
 			void rowsRemoved (db::SQLite* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResultSPtr& rows);
-
 		};
 	}
 }

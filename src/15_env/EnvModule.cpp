@@ -23,9 +23,9 @@
 #include "EnvModule.h"
 
 #include "01_util/Constants.h"
-#include "01_util/Conversion.h"
-#include "01_util/UId.h"
-#include "01_util/T9Filter.h"
+#include "Conversion.h"
+#include "UId.h"
+#include "T9Filter.h"
 
 #include "TransportNetworkTableSync.h"
 #include "TransportNetwork.h"

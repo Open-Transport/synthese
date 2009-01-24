@@ -25,16 +25,16 @@
 #include "Registry.h"
 #include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "15_env/ServiceDate.h"
-#include "15_env/ServiceDateTableSync.h"
-#include "15_env/NonPermanentService.h"
-#include "15_env/Path.h"
-#include "15_env/EnvModule.h"
+#include "ServiceDate.h"
+#include "ServiceDateTableSync.h"
+#include "NonPermanentService.h"
+#include "Path.h"
+#include "EnvModule.h"
 
 using namespace std;
 using namespace boost;
@@ -84,56 +84,38 @@ namespace synthese
 
 		void ServiceDateTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-		    while (rows->next ())
+			while (rows->next ())
 		    {
-			_updateServiceCalendar (rows, true);
+				shared_ptr<NonPermanentService> service(
+					EnvModule::FetchEditableService(
+						rows->getLongLong(COL_SERVICEID)
+				)	);
+				service->setActive(Date::FromSQLDate (rows->getText (COL_DATE)));
 		    }
 		}
+		
+		
 		
 		void ServiceDateTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 		}
 
+
+
 		void ServiceDateTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 			while (rows->next ())
 			{
-				_updateServiceCalendar (rows, false);
+				shared_ptr<NonPermanentService> service(
+					EnvModule::FetchEditableService(
+						rows->getLongLong(COL_SERVICEID)
+				)	);
+				service->setInactive(Date::FromSQLDate (rows->getText (COL_DATE)));
 			}
 		}
 
-
-		void ServiceDateTableSync::_updateServiceCalendar (const SQLiteResultSPtr& rows, bool marked) 
-		{
-			// Get the corresponding calendar
-			uid serviceId = rows->getLongLong (COL_SERVICEID);
-
-			shared_ptr<NonPermanentService> service (EnvModule::FetchEditableService(serviceId));
-			assert (service != 0);
-
-			// Mark the date in service calendar
-			Date newDate = Date::FromSQLDate (rows->getText (COL_DATE));
-			service->getCalendar ().mark (newDate, marked);
-			
-			if (marked)
-			{
-			    for (int i = service->getDepartureSchedule().getDaysSinceDeparture(); 
-				 i<= service->getLastArrivalSchedule().getDaysSinceDeparture(); ++i)
-			    {
-				service->getPath()->getCalendar().mark(newDate, marked);
-				newDate++;
-			    }
-			}
-			else
-			{
-			    /// @todo Implement it : 
-                            // see in each date if there is at least an other service which runs. If not unmark the date and see the following one.
-			}
-
-			//environment.updateMinMaxDatesInUse (newDate, marked);
-
-		}
-
+		
+		
 		void ServiceDateTableSync::Save( env::NonPermanentService* service )
 		{
 //////////////////////////////////////////////////////////////////////////
@@ -156,22 +138,22 @@ namespace synthese
 
 
 
-		vector<time::Date> ServiceDateTableSync::GetDatesOfService( uid serviceId )
-		{
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-
-			query << "SELECT " << COL_DATE << " FROM " << TABLE.NAME << " WHERE " << COL_SERVICEID << "=" << serviceId << " ORDER BY " << COL_DATE;
-			
+		void ServiceDateTableSync::SetActiveDates(
+			NonPermanentService& service
+		){
 			try
 			{
+				stringstream query;
+				query
+					<< "SELECT " << COL_DATE << " FROM " << TABLE.NAME << " WHERE " << COL_SERVICEID << "="
+					<< service.getKey() << " ORDER BY " << COL_DATE;
+				
 				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-				vector<Date> objects;
-				while (rows->next ())
+				service.clearDates();
+				while(rows->next())
 				{
-					objects.push_back(Date::FromSQLDate(rows->getText(COL_DATE)));
+					service.setActive(Date::FromSQLDate(rows->getText(COL_DATE)));
 				}
-				return objects;
 			}
 			catch(SQLiteException& e)
 			{

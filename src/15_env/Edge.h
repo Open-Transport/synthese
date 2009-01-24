@@ -165,9 +165,7 @@ namespace synthese
 
 				bool isArrival () const;
 				bool isDeparture () const;
-			    
-				bool isRunning( const synthese::time::DateTime& startMoment, 
-						const synthese::time::DateTime& endMoment ) const;
+				
 
 //				int getBestRunTime (const Edge& other ) const;
 			    

@@ -91,7 +91,7 @@ namespace synthese
 						throw ActionException("Le nom ne peut être vide.");
 
 					Env env;
-					DisplayTypeTableSync::Search(env, _name, 0, 1);
+					DisplayTypeTableSync::Search(env, _name, UNKNOWN_VALUE, 0, 1);
 					if (!env.getRegistry<DisplayType>().empty())
 						throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 				}

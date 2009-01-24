@@ -21,19 +21,22 @@
 */
 
 #include "NonPermanentService.h"
+#include "Path.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
 
 	namespace env
 	{
 		NonPermanentService::NonPermanentService(
 			RegistryKeyType key
 		):	Registrable(key),
-			Service()
+			Service(),
+			Calendar()
 		{
 		}
 
@@ -43,25 +46,40 @@ namespace synthese
 			string serviceNumber,
 			Path* path
 		):	Service(serviceNumber, path),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(UNKNOWN_VALUE),
+			Calendar()
 		{
 		}
 
 
-
-		bool NonPermanentService::isProvided( const time::Date& departureDate) const
-		{
-			return _calendar.isMarked ( departureDate );
+		
+		void NonPermanentService::setInactive(
+			const Date& date
+		){
+			// Mark the date in service calendar
+			Calendar::setInactive(date);
+		
+		    /// @todo Implement it : 
+			// see in each date if there is at least an other service which runs.
+			// If not unmark the date and see the following one.
 		}
-
-		Calendar& NonPermanentService::getCalendar()
-		{
-			return _calendar;
-		}
-
-		const Calendar& NonPermanentService::getCalendar() const
-		{
-			return _calendar;
+		
+		
+		void NonPermanentService::setActive(
+			const Date& date
+		){
+			// Mark the date in service calendar
+			Calendar::setActive(date);
+			
+			Date newDate(date);
+			for(int i(getDepartureSchedule().getDaysSinceDeparture());
+				i<= getLastArrivalSchedule().getDaysSinceDeparture();
+				++i, newDate++
+			){
+				getPath()->setActive(newDate);
+			}
+		
+			//environment.updateMinMaxDatesInUse (newDate, marked);
 		}
 	}
 }

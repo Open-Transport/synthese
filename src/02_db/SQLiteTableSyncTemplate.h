@@ -427,8 +427,8 @@ namespace synthese
 				if (!triggerNoUpdate.empty()) sqlite->execUpdate (triggerNoUpdate);
 			}
 			else if(
-				(GetSQLSchemaDb(sqlite, TABLE.NAME) != tableSchema) ||
-				GetTriggerNoUpdateDb(sqlite, TABLE.NAME) != triggerNoUpdate
+				(SQLiteTableSync::GetSQLSchemaDb(sqlite, TABLE.NAME) != tableSchema) ||
+				SQLiteTableSync::GetTriggerNoUpdateDb(sqlite, TABLE.NAME) != triggerNoUpdate
 			){
 				std::vector<std::string> dbCols = SQLiteTableSync::GetTableColumnsDb(sqlite, TABLE.NAME);
 
@@ -453,7 +453,10 @@ namespace synthese
 				str << "BEGIN TRANSACTION; ";
 
 				// Drop triggers
-				if (!GetTriggerNoUpdateDb(sqlite, TABLE.NAME).empty()) str << "DROP TRIGGER " << K::TABLE.NAME << "_no_update ;";
+				if (!SQLiteTableSync::GetTriggerNoUpdateDb(sqlite, TABLE.NAME).empty())
+				{
+					str << "DROP TRIGGER " << K::TABLE.NAME << "_no_update ;";
+				}
 
 				// Convert table schema (through temporary table)
 				str << "CREATE TEMPORARY TABLE " << buTableName << " (" 

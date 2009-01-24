@@ -189,6 +189,10 @@ namespace synthese
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				);
 			}
+			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			{
+				ServiceDateTableSync::SetActiveDates(*ss);
+			}
 		}
 
 

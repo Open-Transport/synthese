@@ -41,7 +41,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
+#include "ServiceDateTableSync.h"
 #include "Schedule.h"
 
 #include "Point2D.h"
@@ -180,20 +180,29 @@ namespace synthese
 				assert (path);
 	//			assert (path->getEdges ().size () == arrivalSchedules.size ());
 
-				uid bikeComplianceId (
-					rows->getLongLong (ContinuousServiceTableSync::COL_BIKECOMPLIANCEID));
-
-				uid handicappedComplianceId (
-					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-
-				uid pedestrianComplianceId (
-					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+				uid bikeComplianceId(
+					rows->getLongLong (ContinuousServiceTableSync::COL_BIKECOMPLIANCEID)
+				);
+				uid handicappedComplianceId(
+					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID)
+				);
+				uid pedestrianComplianceId(
+					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID)
+				);
 
 				cs->setBikeCompliance (BikeComplianceTableSync::Get(bikeComplianceId, env, linkLevel));
-				cs->setHandicappedCompliance (HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel));
-				cs->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel));
+				cs->setHandicappedCompliance(
+					HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel)
+				);
+				cs->setPedestrianCompliance(
+					PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel)
+				);
 
 				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+			}
+			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			{
+				ServiceDateTableSync::SetActiveDates(*cs);
 			}
 		}
 

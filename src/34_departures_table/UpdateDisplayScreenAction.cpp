@@ -90,7 +90,7 @@ namespace synthese
 
 				_comPort = map.getInt(PARAMETER_COM_PORT, true, FACTORY_KEY);
 
-				id = map.getUid(PARAMETER_CPU, true, FACTORY_KEY);
+				id = map.getUid(PARAMETER_CPU, false, FACTORY_KEY);
 				if (id > 0)
 				{
 					_cpu = DisplayScreenCPUTableSync::Get(id, _env);
