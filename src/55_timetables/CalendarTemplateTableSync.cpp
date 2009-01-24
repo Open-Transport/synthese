@@ -141,7 +141,7 @@ namespace synthese
 
 
 
-		vector<shared_ptr<CalendarTemplate> > CalendarTemplateTableSync::Search(
+		void CalendarTemplateTableSync::Search(
 			Env& env,
 			int first /*= 0*/,
 			int number /*= 0*/,

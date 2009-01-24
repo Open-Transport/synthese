@@ -58,7 +58,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<CalendarTemplate> > Search(
+			static void Search(
 				util::Env& env,
 				// other search parameters ,
 				int first = 0, int number = 0,
