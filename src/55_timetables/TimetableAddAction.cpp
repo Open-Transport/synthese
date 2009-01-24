@@ -1,0 +1,125 @@
+
+/** TimetableAddAction class implementation.
+	@file TimetableAddAction.cpp
+	@author Hugues Romain
+	@date 2008
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "30_server/ActionException.h"
+#include "30_server/ParametersMap.h"
+#include "30_server/QueryString.h"
+#include "30_server/Request.h"
+
+#include "TimetableAddAction.h"
+
+#include "35_timetables/TimetableRow.h"
+#include "35_timetables/Timetable.h"
+#include "35_timetables/TimetableTableSync.h"
+
+using namespace std;
+
+namespace synthese
+{
+	using namespace server;
+	
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, timetables::TimetableAddAction>::FACTORY_KEY("TimetableAddAction");
+	}
+
+	namespace timetables
+	{
+		const string TimetableAddAction::PARAMETER_BOOK_ID = Action_PARAMETER_PREFIX + "bi";
+		const string TimetableAddAction::PARAMETER_RANK = Action_PARAMETER_PREFIX + "rk";
+		const string TimetableAddAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "ti";
+		const string TimetableAddAction::PARAMETER_IS_BOOK = Action_PARAMETER_PREFIX + "ib";
+		
+		
+		TimetableAddAction::TimetableAddAction()
+			: util::FactorableTemplate<Action, TimetableAddAction>()
+		{
+		}
+		
+		
+		
+		ParametersMap TimetableAddAction::getParametersMap() const
+		{
+			ParametersMap map;
+			map.insert(PARAMETER_BOOK_ID, _book.get() ? _book->getKey() : uid(0));
+			return map;
+		}
+		
+		
+		
+		void TimetableAddAction::_setFromParametersMap(const ParametersMap& map)
+		{
+			uid id(map.getUid(PARAMETER_BOOK_ID, true, FACTORY_KEY));
+			if (id > 0)
+			try
+			{
+				_book = TimetableTableSync::Get(id);
+			}
+			catch (...)
+			{
+				throw ActionException("No such book");
+			}
+			_rank = map.getInt(PARAMETER_RANK, false, FACTORY_KEY);
+			if (_rank < 0)
+				_rank = TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0) + 1;
+			_title = map.getString(PARAMETER_TITLE, false, FACTORY_KEY);
+			_isBook = map.getBool(PARAMETER_IS_BOOK, true, false, FACTORY_KEY);
+
+			// Anti error
+			if (map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY) == UNKNOWN_VALUE)
+				_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+		}
+		
+		
+		
+		void TimetableAddAction::run()
+		{
+			// timetable creation
+			Timetable t;
+			t.setIsBook(_isBook);
+			t.setBookId(_book.get() ? _book->getKey() : 0);
+			t.setRank(_rank);
+			t.setTitle(_title);
+
+			// rank shifting
+			TimetableTableSync::Shift(_book.get() ? _book->getKey() : 0, _rank, 1);
+
+			// Saving
+			TimetableTableSync::save(&t);
+
+			// ID update
+			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				_request->setObjectId(t.getKey());
+		}
+
+
+
+		void TimetableAddAction::setBook( boost::shared_ptr<const Timetable> book )
+		{
+			assert(!book.get() || book->getIsBook());
+
+			_book = book;
+		}
+	}
+}
