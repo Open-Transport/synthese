@@ -26,22 +26,24 @@
 #include "CalendarTemplatesAdmin.h"
 #include "TimetableModule.h"
 
-#include "05_html/HTMLForm.h"
-#include "05_html/ResultHTMLTable.h"
+#include "HTMLForm.h"
+#include "ResultHTMLTable.h"
 
-#include "35_timetables/TimetableRight.h"
-#include "35_timetables/CalendarTemplate.h"
-#include "35_timetables/CalendarTemplateTableSync.h"
-#include "35_timetables/CalendarTemplateElement.h"
-#include "35_timetables/CalendarTemplateElementTableSync.h"
-#include "35_timetables/CalendarTemplateElementAddAction.h"
+#include "TimetableRight.h"
+#include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
+#include "CalendarTemplateElement.h"
+#include "CalendarTemplateElementTableSync.h"
+#include "CalendarTemplateElementAddAction.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "Request.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -82,24 +84,27 @@ namespace synthese
 
 			try
 			{
-				_calendar = CalendarTemplateTableSync::Get(id);
+				_calendar = CalendarTemplateTableSync::Get(id, _env);
 			}
 			catch(...)
 			{
 				throw AdminParametersException("No such calendar");
 			}
+			
+			CalendarTemplateElementTableSync::Search(_env, _calendar->getKey());
 		}
 		
-		void CalendarTemplateAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>* request) const
-		{
+		
+		
+		void CalendarTemplateAdmin::display(
+			ostream& stream,
+			VariablesMap& variables
+		) const {
 			// Requests
-			ActionFunctionRequest<CalendarTemplateElementAddAction,AdminRequest> addRequest(request);
+			ActionFunctionRequest<CalendarTemplateElementAddAction,AdminRequest> addRequest(_request);
 			addRequest.getFunction()->setPage<CalendarTemplateAdmin>();
 			addRequest.setObjectId(_calendar->getKey());
 			addRequest.getAction()->setCalendarId(_calendar->getKey());
-
-			// Search
-			vector<shared_ptr<CalendarTemplateElement> > elements(CalendarTemplateElementTableSync::Search(_calendar->getKey()));
 
 			// Display
 			HTMLForm f(addRequest.getHTMLForm("add"));
@@ -114,22 +119,22 @@ namespace synthese
 
 			stream << f.open() << t.open();
 
-			for (vector<shared_ptr<CalendarTemplateElement> >::const_iterator it(elements.begin()); it != elements.end(); ++it)
+			BOOST_FOREACH(shared_ptr<CalendarTemplateElement> ct, _env.getRegistry<CalendarTemplateElement>()) 
 			{
 				stream << t.row();
 
-				stream << t.col() << (*it)->getRank();
-				stream << t.col() << (*it)->getPositive();
+				stream << t.col() << ct->getRank();
+				stream << t.col() << ct->getPositive();
 				
-				if ((*it)->getIncludeId() != UNKNOWN_VALUE)
+				if (ct->getIncludeId() != UNKNOWN_VALUE)
 				{
-					stream << t.col() << (*it)->getMinDate().toString();
-					stream << t.col() << (*it)->getMaxDate().toString();
-					stream << t.col() << (*it)->getInterval();
+					stream << t.col() << ct->getMinDate().toString();
+					stream << t.col() << ct->getMaxDate().toString();
+					stream << t.col() << ct->getInterval();
 				}
 				else
 				{
-					stream << t.col(3) << "Inclusion de " << (*it)->getIncludeId();
+					stream << t.col(3) << "Inclusion de " << ct->getIncludeId();
 				}
 				stream << t.col() << HTMLModule::getLinkButton(string(), "Supprimer");
 			}
@@ -144,15 +149,14 @@ namespace synthese
 			stream << t.close() << f.close();
 		}
 
-		bool CalendarTemplateAdmin::isAuthorized(const FunctionRequest<AdminRequest>* request) const
-		{
-			return request->isAuthorized<TimetableRight>(READ);
+		bool CalendarTemplateAdmin::isAuthorized(
+		) const {
+			return _request->isAuthorized<TimetableRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::getSubPagesOfParent(
 			const PageLink& parentLink
 			, const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			return links;
@@ -160,7 +164,6 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage
-			, const server::FunctionRequest<admin::AdminRequest>* request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			return links;
