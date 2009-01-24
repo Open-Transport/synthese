@@ -1,9 +1,31 @@
+////////////////////////////////////////////////////////////////////////////////
+///	Calendar class header.
+///	@file Calendar.h
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
+
 #ifndef SYNTHESE_ENV_CALENDAR_H
 #define SYNTHESE_ENV_CALENDAR_H
 
-
-
-#include "04_time/Date.h"
+#include "Date.h"
 
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
@@ -11,50 +33,16 @@
 
 namespace synthese
 {
-	namespace env
+	namespace time
 	{
+		/** Calendar described by an array of booleans (one per day).
+			@ingroup m04
 
-		/** Calendar.
-			@ingroup m35
-
-			Les services ne circulent pas tous tous les jours. Ils suivent un calendrier de circulation, indiquant les jours o�¹ sont effectués des départs de l'origine des services qui le respectent.
-
-			The Calendar class implements the service calendar, holding a bitset representing year days.
-			Each year day can be marked or not.
+			The Calendar class implements the service calendar, holding a 
+			bitset representing year days. Each year day can be activated or not.
 
 			The first bit of the internal bitset corresponds to the first
 			marked date. The last bit corresponds to the last date marked.
-
-
-			<h3>Catégorie de calendrier</h3>
-
-			@todo Reactivate calendar category
-
-			Pour choisir le calendrier le plus simple d'affichage, pour l'édition des renvois d'indicateur par exemple, les calendriers sont rangés par catégorie, selon le format binaire suivant&nbsp;:</p>
-
-			<table class="tableau">
-			<tr><td colspan="2">Plage de dates</td><td></td><td></td><td>Influence période scolaire</td><td></td><td></td><td>Tout/partiel</td></tr>
-			<tr><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-			<tr><td>7</td><td colspan="6"></td><td>0</td></tr>
-			</table>
-
-			On obtient la classification de catégories suivante :
-			<table class="tableau">
-			<tr><th>Plage de dates</th><th>Influence période scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code décimal</th></tr>
-			<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>00000000</td><td>0</td></tr>
-			<tr><td>Restriction</td><td>00000001</td><td>1</td></tr>
-			<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>00001000</td><td>0</td></tr>
-			<tr><td>Restriction</td><td>00001001</td><td>1</td></tr>
-			<tr><td rowspan="4">Service de transporteur (été, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>01000000</td><td>0</td></tr>
-			<tr><td>Restriction</td><td>01000001</td><td>1</td></tr>
-			<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>01001000</td><td>0</td></tr>
-			<tr><td>Restriction</td><td>01001001</td><td>1</td></tr>
-			<tr><td rowspan="4">Plage restreinte (ski...)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>10000000</td><td>0</td></tr>
-			<tr><td>Restriction</td><td>10000001</td><td>1</td></tr>
-			<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>10001000</td><td>0</td></tr>
-			<tr><td>Restriction</td><td>10001001</td><td>1</td></tr>
-			<tr><td colspan="3">Autres calendriers (défaut)</td><td>11111111</td><td>255</td></tr>
-			</table>
 
 		*/
 		class Calendar 
@@ -64,8 +52,8 @@ namespace synthese
 
 		private:
 
-			time::Date _firstMarkedDate;
-			time::Date _lastMarkedDate;
+			Date _firstMarkedDate;
+			Date _lastMarkedDate;
 
 			boost::dynamic_bitset<> _markedDates;
 
@@ -78,8 +66,8 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-			time::Date getFirstActiveDate () const;
-			time::Date getLastActiveDate () const;
+				Date getFirstActiveDate () const;
+				Date getLastActiveDate () const;
 			//@}
 
 
@@ -95,7 +83,7 @@ namespace synthese
 				 * @return true if the calendar is active at the specified date
 				 */
 				virtual bool isActive(
-					const time::Date& date
+					const Date& date
 				) const;
 				
 				
@@ -104,15 +92,15 @@ namespace synthese
 				 * 
 				 * @return vector containing the active dates of the calendar
 				 */
-				std::vector<time::Date> getActiveDates () const;
+				std::vector<Date> getActiveDates () const;
 			//@}
 
 
 
 			//! @name Update methods
 			//@{
-				virtual void setActive(const time::Date& date);
-				virtual void setInactive(const time::Date& date);
+				virtual void setActive(const Date& date);
+				virtual void setInactive(const Date& date);
 				void subDates(const Calendar& calendar);
 				void clearDates();
 			//@}
@@ -133,8 +121,16 @@ namespace synthese
 
 			bool operator==(const Calendar& op) const;
 
-			static void LogicalAnd (Calendar& dest, const Calendar& op1, const Calendar& op2);
-			static void LogicalOr (Calendar& dest, const Calendar& op1, const Calendar& op2);
+			static void LogicalAnd(
+				Calendar& dest,
+				const Calendar& op1,
+				const Calendar& op2
+			);
+			static void LogicalOr(
+				Calendar& dest,
+				const Calendar& op1,
+				const Calendar& op2
+			);
 
 		private:
 
@@ -147,18 +143,25 @@ namespace synthese
 			void updateFirstMark ();
 			void updateLastMark ();
 
-			static time::Date DateAfter (time::Date date, unsigned int nbBits);
-			static time::Date DateBefore (time::Date date, unsigned int nbBits);
+			static Date DateAfter(
+				Date date,
+				unsigned int nbBits
+			);
+			static Date DateBefore(
+				Date date,
+				unsigned int nbBits
+			);
 
-			static int NbBitsBetweenDates (time::Date date1, time::Date date2);
+			static int NbBitsBetweenDates(
+				Date date1,
+				Date date2
+			);
 		};
 
 
 		Calendar operator& (const Calendar& op1, const Calendar& op2);
 		Calendar operator| (const Calendar& op1, const Calendar& op2);
-
 	}
 }
 
 #endif
-

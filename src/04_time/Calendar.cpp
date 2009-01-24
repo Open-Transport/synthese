@@ -4,9 +4,7 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace time;
-	
-    namespace env
+    namespace time
     {
 		Calendar::Calendar()
 			: _firstMarkedDate (Date::UNKNOWN_DATE)
@@ -161,7 +159,7 @@ namespace synthese
 		void Calendar::pop_front (int nbBits)
 		{
 			_markedDates >>= nbBits;
-			_markedDates.resize (_markedDates.size () - nbBits);    
+			_markedDates.resize (_markedDates.size () - nbBits);
 		}
 	
 	
@@ -355,11 +353,20 @@ namespace synthese
 		
 		bool Calendar::operator||( const Calendar& op ) const
 		{
-			if (_firstMarkedDate.isUnknown() || _lastMarkedDate.isUnknown() || op._firstMarkedDate.isUnknown() || op._lastMarkedDate.isUnknown())
+			if(	_firstMarkedDate.isUnknown() ||
+				_lastMarkedDate.isUnknown() ||
+				op._firstMarkedDate.isUnknown() ||
+				op._lastMarkedDate.isUnknown()
+			){
 				return false;
+			}
 
-			const Date& firstMarkedDate(_firstMarkedDate < op._firstMarkedDate ? op._firstMarkedDate : _firstMarkedDate);
-			const Date& lastMarkedDate(_lastMarkedDate < op._lastMarkedDate ? _lastMarkedDate : op._lastMarkedDate);
+			const Date& firstMarkedDate(
+				_firstMarkedDate < op._firstMarkedDate ? op._firstMarkedDate : _firstMarkedDate
+			);
+			const Date& lastMarkedDate(
+				_lastMarkedDate < op._lastMarkedDate ? _lastMarkedDate : op._lastMarkedDate
+			);
 
 			int thisShifting(NbBitsBetweenDates(_firstMarkedDate, firstMarkedDate));
 			int opShifting(NbBitsBetweenDates(op._firstMarkedDate, firstMarkedDate));
@@ -393,5 +400,3 @@ namespace synthese
 		}
     }
 }
-    
-

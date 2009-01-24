@@ -40,7 +40,7 @@ namespace synthese
 		*/
 		class NonPermanentService
 		:	public Service,
-			public Calendar
+			public time::Calendar
 		{
 		protected:
 			NonPermanentService(

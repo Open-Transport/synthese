@@ -81,7 +81,7 @@ namespace synthese
 		*/
 		class Path
 		:	public Complyer,
-			public Calendar,
+			public time::Calendar,
 			public virtual util::Registrable
 		{
 		public:
