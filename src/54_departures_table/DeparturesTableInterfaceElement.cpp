@@ -1,0 +1,157 @@
+
+/** DeparturesTableInterfaceElement class implementation.
+	@file DeparturesTableInterfaceElement.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include <vector>
+
+#include "Conversion.h"
+#include "Interface.h"
+#include "ValueElementList.h"
+#include "InterfacePageException.h"
+#include "Request.h"
+#include "DeparturesTableTypes.h"
+#include "DeparturesTableInterfaceElement.h"
+#include "DepartureTableRowInterfacePage.h"
+
+using namespace std;
+using namespace boost;
+
+namespace synthese
+{
+	using namespace interfaces;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<interfaces::LibraryInterfaceElement, departurestable::DeparturesTableInterfaceElement>::FACTORY_KEY("departurestable");
+	}
+
+	namespace departurestable
+	{
+		void DeparturesTableInterfaceElement::storeParameters( ValueElementList& vel )
+		{
+			if (vel.size() < 3)
+				throw interfaces::InterfacePageException("Malformed departure table declaration");
+
+			_multiplicateurRangeeVIE = vel.front();
+			_pagesVIE = vel.front();
+			_pageSeparator = vel.front();
+
+			if (!vel.isEmpty())
+				_departuresToHide = vel.front();
+
+			if (!vel.isEmpty())
+				_message = vel.front();
+
+			if (!vel.isEmpty())
+				_displayServiceNumber = vel.front();
+
+			if (!vel.isEmpty())
+				_displayQuai = vel.front();
+
+			if (!vel.isEmpty())
+				_numberOfIntermediatesStops = vel.front();
+
+			if (!vel.isEmpty())
+				_displayTeam = vel.front();
+		}
+
+		string DeparturesTableInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
+		{
+			const ArrivalDepartureList& ptds(static_cast<const ArrivalDepartureListWithAlarm*>(object)->map);
+			
+			int __MultiplicateurRangee(_multiplicateurRangeeVIE->isFalse(parameters, variables, object, request)
+				? 1 
+				: Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request))
+			);
+			int __Pages = Conversion::ToInt(_pagesVIE->getValue(parameters, variables, object, request));
+			const string& __SeparateurPage = _pageSeparator->getValue(parameters, variables, object, request);
+			int departuresToHide(_departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
+			const string message (_message ? _message->getValue(parameters, variables, object, request) : string());
+			bool displayServiceNumber(_displayServiceNumber ? Conversion::ToBool(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
+			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);
+			bool displayTeam(_displayTeam ? Conversion::ToBool(_displayTeam->getValue(parameters, variables, object, request)) : false);
+			int numberOfIntermediatesStops(_numberOfIntermediatesStops ? Conversion::ToInt(_numberOfIntermediatesStops->getValue(parameters, variables, object, request)) : UNKNOWN_VALUE);
+
+			// Gestion des pages
+			int __NombrePages(1);
+			if (__Pages != 0)
+			{
+				int departuresNumber = ptds.size() - departuresToHide;
+				for (ArrivalDepartureList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
+				{
+					const ActualDisplayedArrivalsList& displayedList = it->second;
+					if (displayedList.size () - 2 > __NombrePages )
+						__NombrePages = displayedList.size () - 2;
+				}
+				if (__Pages != UNKNOWN_VALUE && __NombrePages > __Pages)
+					__NombrePages = __Pages;
+			}
+
+			// Boucle sur les pages
+			for ( int __NumeroPage = 1; __NumeroPage <= __NombrePages; __NumeroPage++ )
+			{
+				// Separateur de page
+				if ( __NumeroPage > 1 )
+					stream << __SeparateurPage;
+
+				// Boucle sur les rangees
+				int __Rangee = __MultiplicateurRangee;
+				int departuresNumber = ptds.size() - departuresToHide;
+				for (ArrivalDepartureList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
+				{
+					const ArrivalDepartureRow& ___DP = *it;
+
+					int __NombrePagesRangee = ___DP.second.size () - 2;
+					int pageNumber = ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )
+						? __NumeroPage
+						: (1 + __NumeroPage % __NombrePagesRangee);     // 1 : Numero de page
+
+					// Lancement de l'affichage de la rangee
+					const DepartureTableRowInterfacePage* page(_page->getInterface()->getPage<DepartureTableRowInterfacePage>());
+					page->display(
+						stream
+						, variables
+						, __Rangee
+						, pageNumber
+						, displayQuai
+						, displayServiceNumber
+						, displayTeam
+						, numberOfIntermediatesStops
+						, ___DP
+						, request
+					);
+
+					// Incrementation du numero de rangee
+					__Rangee += __MultiplicateurRangee;
+				}
+
+				stream << message;
+			}
+			return string();
+		}
+	}
+}
