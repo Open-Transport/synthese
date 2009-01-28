@@ -21,37 +21,36 @@
 */
 
 #include "Edge.h"
-
-#include "15_env/Path.h"
-#include "15_env/Service.h"
-#include "15_env/Vertex.h"
-#include "15_env/ContinuousService.h"
-
-#include "04_time/Schedule.h"
+#include "Path.h"
+#include "Service.h"
+#include "Vertex.h"
+#include "Schedule.h"
 
 namespace synthese
 {
 	using namespace time;
 	using namespace geometry;
 
-	namespace env
+	namespace graph
 	{
-		Edge::Edge (bool isDeparture,
-				bool isArrival,
-				const Path* parentPath,
-				int rankInPath
+		Edge::Edge(
+			bool isDeparture,
+			bool isArrival,
+			const Path* parentPath,
+			int rankInPath,
+			const Vertex* fromVertex
 		):	_isDeparture (isDeparture),
 			Registrable(UNKNOWN_VALUE),
-			_isArrival (isArrival)
-		, _parentPath (parentPath)
-		, _rankInPath (rankInPath)
-		, _nextInPath(NULL)
-		, _previousConnectionDeparture(NULL)
-		, _previousDepartureForFineSteppingOnly(NULL)
-		, _followingConnectionArrival(NULL)
-		, _followingArrivalForFineSteppingOnly(NULL)
-		, _serviceIndexUpdateNeeded (true)
-
+			_isArrival (isArrival),
+			_parentPath (parentPath),
+			_rankInPath (rankInPath),
+			_nextInPath(NULL),
+			_previousConnectionDeparture(NULL),
+			_previousDepartureForFineSteppingOnly(NULL),
+			_followingConnectionArrival(NULL),
+			_followingArrivalForFineSteppingOnly(NULL),
+			_serviceIndexUpdateNeeded (true),
+			_fromVertex(fromVertex)
 		{ }
 
 
@@ -83,6 +82,12 @@ namespace synthese
 			return _isDeparture;
 		}
 
+
+
+		const Vertex* Edge::getFromVertex() const
+		{
+			return _fromVertex;
+		}
 
 
 		const Edge* 
@@ -272,7 +277,8 @@ namespace synthese
 
 
 
-		ServicePointer Edge::getNextService (
+		ServicePointer Edge::getNextService(
+			UserClassCode userClass,
 			DateTime departureMoment
 			, const DateTime& maxDepartureMoment
 			, const DateTime& calculationMoment
@@ -299,7 +305,8 @@ namespace synthese
 						// Saving of the used service
 						ServicePointer servicePointer(
 							getParentPath ()->getService(next)->getFromPresenceTime(
-								DEPARTURE_TO_ARRIVAL
+								DEPARTURE_TO_ARRIVAL,
+								userClass
 								, this
 								, departureMoment
 								, calculationMoment
@@ -313,7 +320,7 @@ namespace synthese
 
 						// Control of validity of departure date time
 						if (servicePointer.getActualDateTime() > maxDepartureMoment )
-							return ServicePointer(DEPARTURE_TO_ARRIVAL);
+							return ServicePointer(DEPARTURE_TO_ARRIVAL, userClass);
 
 						// Store the service rank in edge
 						servicePointer.setServiceIndex(next);
@@ -330,12 +337,13 @@ namespace synthese
 				next = _departureIndex[ 0 ];
 			}
 
-			return ServicePointer(DEPARTURE_TO_ARRIVAL);
+			return ServicePointer(DEPARTURE_TO_ARRIVAL, userClass);
 		}
 
 
 
 		ServicePointer Edge::getPreviousService(
+			UserClassCode userClass,
 			DateTime arrivalMoment
 			, const DateTime& minArrivalMoment
 			, const DateTime& computingDateTime
@@ -354,7 +362,8 @@ namespace synthese
 						// Saving of the used service
 						ServicePointer servicePointer(
 							getParentPath ()->getService(previous)->getFromPresenceTime(
-								ARRIVAL_TO_DEPARTURE
+								ARRIVAL_TO_DEPARTURE,
+								userClass
 								, this
 								, arrivalMoment
 								, computingDateTime
@@ -368,7 +377,7 @@ namespace synthese
 
 						// Control of validity of departure date time
 						if (servicePointer.getActualDateTime() < minArrivalMoment)
-							return ServicePointer(ARRIVAL_TO_DEPARTURE);
+							return ServicePointer(ARRIVAL_TO_DEPARTURE, userClass);
 
 						// Store service rank in edge
 						servicePointer.setServiceIndex(previous);
@@ -383,7 +392,7 @@ namespace synthese
 				previous = _arrivalIndex[ 23 ];
 			}
 
-			return ServicePointer(ARRIVAL_TO_DEPARTURE);
+			return ServicePointer(ARRIVAL_TO_DEPARTURE, userClass);
 		}
 
 
@@ -455,19 +464,12 @@ namespace synthese
 
 
 
-		const AddressablePlace* 
-		Edge::getPlace () const
+		const Hub* Edge::getPlace () const
 		{
 			return getFromVertex ()->getPlace ();
 		}
 
 
-
-		const ConnectionPlace* 
-		Edge::getConnectionPlace () const
-		{
-			return getFromVertex ()->getConnectionPlace ();
-		}
 
 		void Edge::setIsArrival( bool value )
 		{

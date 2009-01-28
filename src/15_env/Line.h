@@ -33,13 +33,16 @@
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Service;
+	}
+	
 	namespace env
 	{
 		class PhysicalStop;
-		class Axis;
 		class LineStop;
 		class RollingStock;
-		class Service;
 		class LineAlarmBroadcast;
 		class CommercialLine;
 		class TransportNetwork;
@@ -66,7 +69,7 @@ namespace synthese
 			If a service is responsible of a break of the preceding rules, then the line is copied as a SubLine, and the service is linked to the new line. The _sublines container keeps a pointer on each SubLine.
 		*/
 		class Line
-		:	public Path
+		:	public graph::Path
 		{
 		public:
 
@@ -76,10 +79,6 @@ namespace synthese
 			typedef std::vector<SubLine*> SubLines;
 
 		private:
-
-			const Axis*				_axis;
-			const CommercialLine*	_commercialLine;
-		    
 			const RollingStock* _rollingStock;
 
 			std::string _name;			//!< Name (code)
@@ -100,8 +99,7 @@ namespace synthese
 
 			Line(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
-				std::string name = std::string(), 
-				const Axis* axis = NULL
+				std::string name = std::string()
 			);
 
 			virtual ~Line();
@@ -114,7 +112,6 @@ namespace synthese
 				bool					getUseInDepartureBoards ()	const;
 				bool					getUseInTimetables ()		const;
 				bool					getUseInRoutePlanning ()	const;
-				const Axis*				getAxis ()					const;
 				const std::string&		getDirection ()				const;
 				const std::string&		getTimetableName ()			const;
 				const TransportNetwork* getNetwork ()				const;
@@ -134,7 +131,6 @@ namespace synthese
 				void setRollingStock(const RollingStock*);
 				void setTimetableName (const std::string& timetableName);
 				void setDirection (const std::string& direction);
-				void setAxis(const Axis* axis);
 				void setUseInRoutePlanning (bool useInRoutePlanning);
 				void setUseInTimetables (bool useInTimetables);
 				void setCommercialLine(const CommercialLine* commercialLine);
@@ -166,7 +162,7 @@ namespace synthese
 					@date 2007
 				*/
 				virtual void addService(
-					Service* service,
+					graph::Service* service,
 					bool ensureLineTheory
 				);
 			//@}
@@ -188,7 +184,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008					
 				*/
-				bool respectsLineTheory(const Service& service) const;
+				bool respectsLineTheory(const graph::Service& service) const;
 			//@}
 		    
 		};

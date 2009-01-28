@@ -20,13 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		class Journey;
 	}
@@ -38,7 +37,8 @@ namespace synthese
 			@code schedule_sheet_lines_cell @endcode
 			@ingroup m53Pages refPages
 		*/
-		class RoutePlannerSheetLinesCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLinesCellInterfacePage>
+		class RoutePlannerSheetLinesCellInterfacePage
+		:	public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLinesCellInterfacePage>
 		{
 		public:
 			RoutePlannerSheetLinesCellInterfacePage();
@@ -53,7 +53,7 @@ namespace synthese
 				std::ostream& stream
 				, size_t columnNumber
 				, interfaces::VariablesMap& variables
-				, const env::Journey* object
+				, const graph::Journey* object
 				, const server::Request* request= NULL ) const;
 		};
 	}

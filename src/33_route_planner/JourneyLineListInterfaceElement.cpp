@@ -20,22 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/JourneyLineListInterfaceElement.h"
+#include "JourneyLineListInterfaceElement.h"
+#include "Request.h"
+#include "Road.h"
+#include "Line.h"
+#include "LineMarkerInterfacePage.h"
+#include "ServiceUse.h"
+#include "Journey.h"
+#include "Service.h"
+#include "Interface.h"
+#include "ValueElementList.h"
+#include "Conversion.h"
 
-#include "30_server/Request.h"
-
-#include "15_env/Road.h"
-#include "15_env/Line.h"
-#include "15_env/LineMarkerInterfacePage.h"
-#include "15_env/ServiceUse.h"
-#include "15_env/Journey.h"
-#include "15_env/Service.h"
-
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
-
-
-#include "01_util/Conversion.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -45,8 +42,11 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace env;
+	using namespace graph;
 
-	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyLineListInterfaceElement>::FACTORY_KEY("journey_line_list");
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyLineListInterfaceElement>::FACTORY_KEY(
+		"journey_line_list"
+	);
 
 	namespace routeplanner
 	{
@@ -59,14 +59,18 @@ namespace synthese
 		{
 			// Parameters
 			const Journey* journey = static_cast<const Journey*>(object);
-			bool __AfficherLignesPied = Conversion::ToBool(_displayPedestrianLines->getValue(parameters, variables, object, request));
-			const LineMarkerInterfacePage* lineMarkerInterfacePage = _page->getInterface()->getPage<LineMarkerInterfacePage>();
+			bool __AfficherLignesPied = Conversion::ToBool(
+				_displayPedestrianLines->getValue(parameters, variables, object, request)
+			);
+			const LineMarkerInterfacePage* lineMarkerInterfacePage(
+				_page->getInterface()->getPage<LineMarkerInterfacePage>()
+			);
 
 			// Fabrication de l'affichage
-			for (Journey::ServiceUses::const_iterator it(journey->getServiceUses().begin()); it != journey->getServiceUses().end(); ++it)
+			BOOST_FOREACH(const ServiceUse& leg, journey->getServiceUses())
 			{
-				const ServiceUse& leg(*it);
 				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg.getService()->getPath ()) )
+				{
 					lineMarkerInterfacePage->display(
 						stream
 						, variables
@@ -75,7 +79,9 @@ namespace synthese
 						, Conversion::ToInt(_pixelWidth->getValue(parameters, variables, object, request))
 						, Conversion::ToInt(_pixelHeight->getValue(parameters, variables, object, request))
 						, static_cast<const Line*>(leg.getService()->getPath ())->getCommercialLine()
-						, request);
+						, request
+					);
+				}
 			}
 
 			return string();

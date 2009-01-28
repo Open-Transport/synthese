@@ -39,7 +39,7 @@ namespace synthese
 			use getOriginDateTime to compute the origin date)
 		*/
 		class NonPermanentService
-		:	public Service,
+		:	public graph::Service,
 			public time::Calendar
 		{
 		protected:
@@ -48,7 +48,7 @@ namespace synthese
 			);
 			NonPermanentService(
 				std::string serviceNumber
-				, Path* path
+				, graph::Path* path
 			);
 
 		public:

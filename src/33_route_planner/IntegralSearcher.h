@@ -23,13 +23,13 @@
 #ifndef SYNTHESE_routeplanner_IntegralSearcher_h__
 #define SYNTHESE_routeplanner_IntegralSearcher_h__
 
-#include "01_util/Log.h"
+#include "Log.h"
 
 #include "15_env/Types.h"
-#include "15_env/AccessParameters.h"
+#include "AccessParameters.h"
 
 #include "33_route_planner/Types.h"
-#include "33_route_planner/JourneysResult.h"
+#include "JourneysResult.h"
 
 #include <map>
 #include <list>
@@ -37,7 +37,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		class Vertex;
 		class VertexAccessMap;
@@ -67,25 +67,25 @@ namespace synthese
 		class IntegralSearcher
 		{
 		private:
-			typedef const env::Edge* (env::Edge::*PtrEdgeStep) () const;
+			typedef const graph::Edge* (graph::Edge::*PtrEdgeStep) () const;
 
 			class _JourneyComparator
 			{
 			public:
-				bool operator()(const env::Journey* j1, const env::Journey* j2) const;
+				bool operator()(const graph::Journey* j1, const graph::Journey* j2) const;
 			};
 
 			//! @name Parameters
 			//@{
 				const env::AccessParameters				_accessParameters;
-				const AccessDirection					_accessDirection;
+				const graph::AccessDirection			_accessDirection;
 				const SearchAddresses					_searchAddresses;
 				const SearchPhysicalStops				_searchPhysicalStops;
 				const UseRoads							_useRoads;
 				const UseLines							_useLines;
-				JourneysResult<env::JourneyComparator>&	_result;
+				JourneysResult<graph::JourneyComparator>&	_result;
 				BestVertexReachesMap&					_bestVertexReachesMap;
-				const env::VertexAccessMap&				_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
+				const graph::VertexAccessMap&			_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
 				const time::DateTime&					_calculationTime;
 				time::DateTime&							_minMaxDateTimeAtDestination;
 				const int								_previousContinuousServiceDuration;
@@ -100,15 +100,15 @@ namespace synthese
 
 		public:
 			IntegralSearcher(
-				AccessDirection					accessDirection
+				graph::AccessDirection			accessDirection
 				, const env::AccessParameters&	accessParameters
 				, SearchAddresses				searchAddresses
 				, SearchPhysicalStops			searchPhysicalStops
 				, UseRoads						useRoads
 				, UseLines									useLines
-				, JourneysResult<env::JourneyComparator>&	result
+				, JourneysResult<graph::JourneyComparator>&	result
 				, BestVertexReachesMap&			bestVertexReachesMap
-				, const env::VertexAccessMap&	destinationVam
+				, const graph::VertexAccessMap&	destinationVam
 				, const time::DateTime&			calculationTime
 				, time::DateTime&				minMaxDateTimeAtDestination
 				, int							previousContinuousServiceDuration
@@ -129,9 +129,9 @@ namespace synthese
 				@param strictTime Must the departure time be strictly equal to desired time ?
 			 */
 			void integralSearch(
-				const env::VertexAccessMap& vertices
+				const graph::VertexAccessMap& vertices
 				, const time::DateTime& desiredTime
-				, const env::Journey& currentJourney
+				, const graph::Journey& currentJourney
 				, int maxDepth
 				, bool strictTime = false
 			);
@@ -149,7 +149,7 @@ namespace synthese
 				@date 2007				
 			*/
 			std::pair<bool,bool> evaluateJourney(
-				const env::Journey& journey
+				const graph::Journey& journey
 				, bool optim
 			) const;
 

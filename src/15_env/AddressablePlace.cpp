@@ -23,6 +23,7 @@
 #include "AddressablePlace.h"
 #include "Address.h"
 #include "VertexAccessMap.h"
+#include "Exception.h"
 
 #include <assert.h>
 
@@ -30,6 +31,7 @@ namespace synthese
 {
 	using namespace geometry;
 	using namespace util;
+	using namespace graph;
 
 	namespace env
 	{
@@ -67,13 +69,13 @@ namespace synthese
 
 
 
-		void
-		AddressablePlace::getImmediateVertices (VertexAccessMap& result, 
-							const AccessDirection& accessDirection,
-							const AccessParameters& accessParameters,
-							SearchAddresses returnAddresses,
-							SearchPhysicalStops returnPhysicalStops
-							, const Vertex* origin
+		void AddressablePlace::getImmediateVertices(
+			VertexAccessMap& result, 
+			const AccessDirection& accessDirection,
+			const AccessParameters& accessParameters,
+			SearchAddresses returnAddresses,
+			SearchPhysicalStops returnPhysicalStops
+			, const Vertex* origin
 		) const {
 			if (returnAddresses == SEARCH_ADDRESSES)
 			{
@@ -108,6 +110,13 @@ namespace synthese
 		bool AddressablePlace::hasPhysicalStops() const
 		{
 			return false;
+		}
+		
+		const AddressablePlace* AddressablePlace::GetPlace(const graph::Hub* hub)
+		{
+			const AddressablePlace* place(dynamic_cast<const AddressablePlace*>(hub));
+			if(place == NULL) throw Exception("bad conversion");
+			return place;
 		}
 	}
 }

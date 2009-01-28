@@ -21,11 +21,11 @@
 */
 
 #include "City.h"
-#include "ConnectionPlace.h"
 #include "PlaceAlias.h"
 #include "PublicPlace.h"
 #include "Road.h"
 #include "Registry.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 #include <assert.h>
 
@@ -35,6 +35,7 @@ namespace synthese
 {
 	using namespace lexmatcher;
 	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{
@@ -64,18 +65,16 @@ namespace synthese
 
 
 
-		synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*>& 
-		City::getConnectionPlacesMatcher ()
-		{
+		LexicalMatcher<const PublicTransportStopZoneConnectionPlace*>& City::getConnectionPlacesMatcher(
+		){
 			return _connectionPlacesMatcher;
 		}
 
 
 
 
-		const synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*>& 
-		City::getConnectionPlacesMatcher () const
-		{
+		const LexicalMatcher<const PublicTransportStopZoneConnectionPlace*>& City::getConnectionPlacesMatcher(
+		) const {
 			return _connectionPlacesMatcher;
 		}
 
@@ -134,11 +133,6 @@ namespace synthese
 		{
 			return _placeAliasesMatcher;
 		}
-
-
-
-
-
 
 
 

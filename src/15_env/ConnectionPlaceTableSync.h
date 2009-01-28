@@ -61,7 +61,6 @@ namespace synthese
 				util::Env& env,
 				util::RegistryKeyType cityId = UNKNOWN_VALUE
 				, boost::logic::tribool mainConnection = boost::logic::indeterminate
-				, ConnectionPlace::ConnectionType minConnectionType = ConnectionPlace::CONNECTION_TYPE_FORBIDDEN
 				, bool orderByCityNameAndName = true
 				, bool raisingOrder = true
 				, int first = 0

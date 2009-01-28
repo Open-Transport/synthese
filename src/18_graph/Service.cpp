@@ -31,22 +31,21 @@ namespace synthese
 	using namespace time;
 	using namespace util;
 
-	namespace env
+	namespace graph
 	{
 		Service::Service(
 			const string& serviceNumber
 			, Path* path
-		)	: Complyer () 
+		)	: RuleUser() 
 			, _serviceNumber (serviceNumber)
 			, _path (path)
 		{
-			setComplianceParent(path);
 		}
 
 
 		Service::Service(
 			RegistryKeyType id
-		):	Complyer(),
+		):	RuleUser(),
 			_path(NULL),
 			Registrable(id)
 		{
@@ -58,6 +57,11 @@ namespace synthese
 		}
 
 
+
+		const RuleUser* Service::_getParentRuleUser() const
+		{
+			return _path;
+		}
 
 		const string& Service::getServiceNumber () const
 		{
@@ -91,7 +95,6 @@ namespace synthese
 		{
 			_path = path;
 			setPathId(path->getKey());
-			setComplianceParent(path);
 		}
 
 		DateTime Service::getOriginDateTime(const Date& departureDate, const Schedule& departureTime) const

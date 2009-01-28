@@ -21,12 +21,13 @@
 */
 
 #include "JourneyComparator.h"
+#include "Journey.h"
 
-#include "15_env/Journey.h"
+#include <assert.h>
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		bool JourneyComparator::operator() (const Journey* j1, const Journey* j2) const
 		{

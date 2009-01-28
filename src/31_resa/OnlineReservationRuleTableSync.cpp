@@ -22,7 +22,7 @@
 
 #include "OnlineReservationRuleTableSync.h"
 
-#include "ReservationRuleTableSync.h"
+#include "ReservationContactTableSync.h"
 
 #include "DBModule.h"
 #include "SQLiteResult.h"
@@ -45,7 +45,9 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,OnlineReservationRuleTableSync>::FACTORY_KEY("31.5 Online Reservation Rule Table Sync");
+		template<> const string FactorableTemplate<SQLiteTableSync,OnlineReservationRuleTableSync>::FACTORY_KEY(
+			"31.5 Online Reservation Rule Table Sync"
+		);
 	}
 
 	namespace resa
@@ -105,7 +107,13 @@ namespace synthese
 			{
 				try
 				{
-					object->setReservationRule(ReservationRuleTableSync::Get(rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID), env, linkLevel).get());
+					object->setReservationContact(
+						ReservationContactTableSync::Get(
+							rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID),
+							env,
+							linkLevel
+						).get()
+					);
 				}
 				catch (...)
 				{

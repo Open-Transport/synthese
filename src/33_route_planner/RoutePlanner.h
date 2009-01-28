@@ -27,14 +27,14 @@
 #include <vector>
 #include <map>
 
-#include "01_util/Log.h"
+#include "Log.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "15_env/Place.h"
-#include "15_env/VertexAccessMap.h"
-#include "15_env/ServiceUse.h"
-#include "15_env/AccessParameters.h"
+#include "Place.h"
+#include "VertexAccessMap.h"
+#include "ServiceUse.h"
+#include "AccessParameters.h"
 
 #include "33_route_planner/Types.h"
 
@@ -46,7 +46,7 @@ namespace synthese
 		class DateTime;
 	}
 
-	namespace env
+	namespace graph
 	{
 		class Edge;
 		class Path;
@@ -96,8 +96,8 @@ namespace synthese
 			
 			//! @name Parameters
 			//@{
-				env::VertexAccessMap		_originVam;
-				env::VertexAccessMap		_destinationVam;
+				graph::VertexAccessMap		_originVam;
+				graph::VertexAccessMap		_destinationVam;
 				const env::AccessParameters	_accessParameters;
 				const time::DateTime		_journeySheetStartTime;  //!< Start time of schedule sheet.
 				const time::DateTime		_journeySheetEndTime;    //!< End time of schedule sheet.
@@ -163,18 +163,18 @@ namespace synthese
 					- false :solutions allowing a time saving are only selected
 			*/
 			void findBestJourney(
-				env::Journey& result
-				, const env::VertexAccessMap& startVam
-				, const env::VertexAccessMap& endVam
+				graph::Journey& result
+				, const graph::VertexAccessMap& startVam
+				, const graph::VertexAccessMap& endVam
 				, const time::DateTime& startTime
 				, bool strictTime
 				, bool inverted
 			);
 
 			void computeRoutePlanningDepartureArrival(
-				env::Journey& result
-				, const env::VertexAccessMap& ovam
-				, const env::VertexAccessMap& dvam
+				graph::Journey& result
+				, const graph::VertexAccessMap& ovam
+				, const graph::VertexAccessMap& dvam
 			);
 
 			/** Launch of the route planning, applying the "from the departure to the arrival" method.

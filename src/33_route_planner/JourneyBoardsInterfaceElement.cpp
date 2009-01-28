@@ -22,12 +22,12 @@
 
 #include "JourneyBoardsInterfaceElement.h"
 
-#include "33_route_planner/JourneyBoardInterfacePage.h"
+#include "JourneyBoardInterfacePage.h"
 #include "33_route_planner/Types.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/InterfacePageException.h"
+#include "Interface.h"
+#include "ValueElementList.h"
+#include "InterfacePageException.h"
 
 #include <boost/logic/tribool.hpp>
 
@@ -62,9 +62,18 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			const RoutePlannerResult* result(static_cast<const RoutePlannerResult*>(object));
-			const JourneyBoardInterfacePage* page(_page->getInterface()->getPage<JourneyBoardInterfacePage>(_pageCode ? _pageCode->getValue(parameters, variables, object, request) : string()));
-			logic::tribool hFilter(Conversion::ToTribool(_handicappedFilter->getValue(parameters, variables, object, request)));
-			logic::tribool bFilter(Conversion::ToTribool(_bikeFilter->getValue(parameters, variables, object, request)));
+			const JourneyBoardInterfacePage* page(
+				_page->getInterface()->getPage<JourneyBoardInterfacePage>(
+					_pageCode ?
+					_pageCode->getValue(parameters, variables, object, request) :
+					string()
+			)	);
+			logic::tribool hFilter(
+				Conversion::ToTribool(_handicappedFilter->getValue(parameters, variables, object, request))
+			);
+			logic::tribool bFilter(
+				Conversion::ToTribool(_bikeFilter->getValue(parameters, variables, object, request))
+			);
 			
 
 			if (result == NULL || result->result.empty())  // No solution or type error

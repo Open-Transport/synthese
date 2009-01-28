@@ -35,7 +35,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ReservationRule;
+		class ReservationContact;
 	}
 
 	namespace resa
@@ -55,12 +55,12 @@ namespace synthese
 			typedef util::Registry<OnlineReservationRule>	Registry;
 
 			typedef std::set<int> CapacityThresholds;
-			typedef std::map<const env::ReservationRule*, const OnlineReservationRule*> OnlineReservationRuleMap;
+			typedef std::map<const env::ReservationContact*, const OnlineReservationRule*> OnlineReservationRuleMap;
 
 		private:
 			//! \name Link with env reservation rules
 			//@{
-				const env::ReservationRule* _reservationRule;
+				const env::ReservationContact* _reservationRule;
 				static OnlineReservationRuleMap _onlineReservationRuleMap;
 			//@}
 
@@ -87,25 +87,25 @@ namespace synthese
 
 		public:
 
-			static const OnlineReservationRule* GetOnlineReservationRule(const env::ReservationRule* rule);
+			static const OnlineReservationRule* GetOnlineReservationRule(const env::ReservationContact* rule);
 
 			//! \name Getters
 			//@{
-				const env::ReservationRule*	getReservationRule()		const;
-				const std::string&			getEMail()					const;
-				const std::string&			getCopyEMail()				const;
-				boost::logic::tribool		getNeedsSurname()			const;
-				boost::logic::tribool		getNeedsAddress()			const;
-				boost::logic::tribool		getNeedsPhone()				const;
-				boost::logic::tribool		getNeedsCustomerNumber()	const;
-				boost::logic::tribool		getNeedsEMail()				const;
-				int							getMaxSeats()				const;
-				const CapacityThresholds&	getThresholds()				const;
+				const env::ReservationContact*	getReservationContact()		const;
+				const std::string&				getEMail()					const;
+				const std::string&				getCopyEMail()				const;
+				boost::logic::tribool			getNeedsSurname()			const;
+				boost::logic::tribool			getNeedsAddress()			const;
+				boost::logic::tribool			getNeedsPhone()				const;
+				boost::logic::tribool			getNeedsCustomerNumber()	const;
+				boost::logic::tribool			getNeedsEMail()				const;
+				int								getMaxSeats()				const;
+				const CapacityThresholds&		getThresholds()				const;
 			//@}
 
 			//! \name Setters
 			//@{
-				void	setReservationRule(const env::ReservationRule*);
+				void	setReservationContact(const env::ReservationContact* value);
 				void	setEMail(const std::string& email);
 				void	setCopyEMail(const std::string& email);
 				void	setNeedsSurname(boost::logic::tribool value);

@@ -20,9 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/ServicePointer.h"
-#include "15_env/Service.h"
-#include "15_env/ReservationRule.h"
+#include "ServicePointer.h"
+#include "Service.h"
+#include "UseRule.h"
 
 #include "04_time/module.h"
 
@@ -32,22 +32,33 @@ namespace synthese
 {
 	using namespace time;
 
-	namespace env
+	namespace graph
 	{
 
-		ServicePointer::ServicePointer(AccessDirection method, const Edge* edge)
-			: _service(NULL)
+		ServicePointer::ServicePointer(
+			AccessDirection method,
+			UserClassCode userClassCode,
+			const Edge* edge
+		):	_service(NULL)
 			, _originDateTime(TIME_UNKNOWN)
 			, _serviceIndex(UNKNOWN_VALUE)
 			, _determinationMethod(method)
 			, _actualTime(TIME_UNKNOWN)
 			, _range(0)
-			, _edge(edge)
+			, _edge(edge),
+			_userClass(userClassCode),
+			_useRule(UseRule::ACCESS_UNKNOWN)
 		{
-
 		}
 
 
+
+		const UseRule& ServicePointer::getUseRule(
+		) const {
+			return _useRule;
+		}
+		
+		
 
 		void ServicePointer::setActualTime( const time::DateTime& dateTime )
 		{
@@ -57,6 +68,7 @@ namespace synthese
 		void ServicePointer::setService( const Service* service )
 		{
 			_service = service;
+			_useRule = service->getUseRule(_userClass);
 		}
 
 		void ServicePointer::setOriginDateTime( const time::DateTime& dateTime )
@@ -69,20 +81,22 @@ namespace synthese
 			_serviceIndex = index;
 		}
 
-		bool ServicePointer::isReservationRuleCompliant(const DateTime& computingDateTime) const
-		{
+		bool ServicePointer::isReservationRuleCompliant(
+			const DateTime& computingDateTime
+		) const	{
 			if (_determinationMethod == ARRIVAL_TO_DEPARTURE)
 				return true;
 
-			ReservationRuleType reservationRuleType(_service->getReservationRule()->getType());
-			if(reservationRuleType != RESERVATION_FORBIDDEN)
-				return _service->getReservationRule()->isRunPossible(
+			UseRule::ReservationRuleType reservationRuleType(_useRule.getReservationType());
+			if(reservationRuleType != UseRule::RESERVATION_FORBIDDEN)
+			{
+				return _useRule.isRunPossible(
 					_originDateTime,
-					(reservationRuleType == RESERVATION_MIXED_BY_DEPARTURE_PLACE) ? false : true,
+					(reservationRuleType == UseRule::RESERVATION_MIXED_BY_DEPARTURE_PLACE) ? false : true,
 					computingDateTime,
 					_actualTime
 				);
-
+			}
 			return true;
 		}
 
@@ -106,7 +120,7 @@ namespace synthese
 			return _determinationMethod;
 		}
 
-		const env::Edge* ServicePointer::getEdge() const
+		const Edge* ServicePointer::getEdge() const
 		{
 			return _edge;
 		}
@@ -124,6 +138,11 @@ namespace synthese
 		int ServicePointer::getServiceRange() const
 		{
 			return _range;
+		}
+		
+		UserClassCode ServicePointer::getUserClass() const
+		{
+			return _userClass;
 		}
 	}
 }

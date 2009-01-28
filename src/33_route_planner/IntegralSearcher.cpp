@@ -20,27 +20,27 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/IntegralSearcher.h"
-#include "33_route_planner/BestVertexReachesMap.h"
-#include "33_route_planner/JourneysResult.h"
+#include "IntegralSearcher.h"
+#include "BestVertexReachesMap.h"
+#include "JourneysResult.h"
 
-#include "15_env/VertexAccessMap.h"
-#include "15_env/Vertex.h"
-#include "15_env/Edge.h"
-#include "15_env/Path.h"
-#include "15_env/ConnectionPlace.h"
-#include "15_env/Journey.h"
-#include "15_env/JourneyComparator.h"
-
+#include "VertexAccessMap.h"
+#include "Vertex.h"
+#include "Edge.h"
+#include "Path.h"
+#include "Hub.h"
+#include "Journey.h"
+#include "JourneyComparator.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 // To be removed by a log class
-#include "15_env/LineStop.h"
-#include "15_env/Road.h"
-#include "15_env/Line.h"
-#include "15_env/CommercialLine.h"
+#include "LineStop.h"
+#include "Road.h"
+#include "Line.h"
+#include "CommercialLine.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "01_util/Log.h"
+#include "Log.h"
 
 #include <sstream>
 
@@ -51,6 +51,7 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace util;
+	using namespace graph;
 
 	namespace routeplanner
 	{
@@ -64,7 +65,7 @@ namespace synthese
 			, SearchPhysicalStops searchPhysicalStops
 			, UseRoads useRoads
 			, UseLines useLines
-			, JourneysResult<env::JourneyComparator>&				result
+			, JourneysResult<graph::JourneyComparator>&				result
 			, BestVertexReachesMap& bestVertexReachesMap
 			, const VertexAccessMap& destinationVam
 			, const DateTime& calculationDateTime
@@ -99,7 +100,7 @@ namespace synthese
 
 
 		void IntegralSearcher::integralSearch(
-			const env::VertexAccessMap& startVam
+			const graph::VertexAccessMap& startVam
 			, const time::DateTime& startTime
 			, const Journey& startJourney
 			, int maxDepth
@@ -175,7 +176,11 @@ namespace synthese
 							stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
 
 							// Place
-							stream << "<td>" << its->getArrivalEdge()->getPlace()->getFullName() << "</td>";
+							stream <<
+								"<td>" <<
+								AddressablePlace::GetPlace(its->getArrivalEdge()->getPlace())->getFullName() << 
+								"</td>"
+							;
 
 							// Next service use
 							++its;
@@ -232,7 +237,11 @@ namespace synthese
 				}
 				else
 				{
-					journey->getEndEdge()->getFromVertex()->getConnectionPlace()->getImmediateVertices(
+					const PublicTransportStopZoneConnectionPlace* cp(
+						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(
+							journey->getEndEdge()->getFromVertex()->getPlace()
+					)	);
+					cp->getImmediateVertices(
 						vam,
 						_accessDirection,
 						_accessParameters
@@ -278,11 +287,7 @@ namespace synthese
 					){
 						const Edge* edge = (*itEdge);
 
-						if (!_accessParameters.isCompatibleWith(*edge->getParentPath()))
-							continue;
-
-						/// @todo reintroduce optimization on following axis departure/arrival ?
-						if (!currentJourney.verifyAxisConstraints(edge->getParentPath()->getAxis()))
+						if (!_accessParameters.isCompatibleWith(edge->getParentPath()->getActualRules()))
 							continue;
 
 						int serviceNumber(UNKNOWN_VALUE);
@@ -292,7 +297,8 @@ namespace synthese
 							DateTime departureMoment(correctedDesiredTime);
 							ServicePointer serviceInstance(
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
-								?	edge->getNextService (
+								?	edge->getNextService(
+										_accessParameters.getUserClass(),
 										departureMoment
 										, _minMaxDateTimeAtDestination
 										, _calculationTime
@@ -301,6 +307,7 @@ namespace synthese
 										, _inverted
 									)
 								:	edge->getPreviousService(
+										_accessParameters.getUserClass(),
 										departureMoment
 										, _minMaxDateTimeAtDestination
 										, _calculationTime
@@ -348,8 +355,12 @@ namespace synthese
 								bool isGoalReached(_destinationVam.contains(reachedVertex));
 								
 								// In road integral search, all nodes are potential connection points
-								if (_useRoads != USE_ROADS && !reachedVertex->isConnectionAllowed() && !isGoalReached)
+								if(	_useRoads != USE_ROADS &&
+									!reachedVertex->getPlace()->getScore() > 0 &&
+									!isGoalReached
+								){
 									continue;
+								}
 
 								// Storage of the useful solution
 								Journey* resultJourney(new Journey(fullApproachJourney));
@@ -389,10 +400,11 @@ namespace synthese
 								}
 
 								// Storage of the journey as a result
+								AddressablePlace* aplace(AddressablePlace::GetPlace(reachedVertex->getPlace()));
 								if(	(	_searchAddresses == SEARCH_ADDRESSES
-										&&	reachedVertex->getConnectionPlace()->hasAddresses()
+										&&	aplace->hasAddresses()
 									)||(_searchPhysicalStops == SEARCH_PHYSICALSTOPS
-										&&	reachedVertex->getConnectionPlace()->hasPhysicalStops()
+										&&	aplace->hasPhysicalStops()
 									)||	isGoalReached
 								)	_result.add(resultJourney);
 
@@ -502,7 +514,7 @@ namespace synthese
 				@todo Replace the third value (1 minute) by a more accurate value ("VMAX algorithm")
 			*/
 			if(	!_destinationVam.contains(reachedVertex)
-				&& reachedVertex->isConnectionAllowed()
+				&& reachedVertex->getPlace()->getScore() > 0
 			){
 
 /* Extract of the old VMAX code
@@ -516,7 +528,7 @@ namespace synthese
 */
 				DateTime bestHopedGoalAccessDateTime (reachDateTime);
 				int minimalGoalReachDuration(
-					reachedVertex->getConnectionPlace()->getMinTransferDelay()	// Minimal time to transfer
+					reachedVertex->getPlace()->getMinTransferDelay()	// Minimal time to transfer
 					+ 1															// Minimal time to reach the goal
 				);
 

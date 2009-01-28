@@ -20,11 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/JourneyBoardStopCellInterfacePage.h"
-
-#include "17_messages/SentAlarm.h"
-
-#include "15_env/ConnectionPlace.h"
+#include "JourneyBoardStopCellInterfacePage.h"
+#include "SentAlarm.h"
+#include "AddressablePlace.h"
 
 using namespace std;
 
@@ -45,7 +43,7 @@ namespace synthese
 			, bool isItArrival
 			, const SentAlarm* alarm
 			, bool isItTerminus
-			, const ConnectionPlace* place
+			, const AddressablePlace* place
 			, bool color
 			, const DateTime& time
 			, int continuousServiceRange

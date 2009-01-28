@@ -41,7 +41,6 @@
 #include "CommercialLineTableSync.h"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
-#include "ReservationRule.h"
 
 #include "QueryString.h"
 #include "RequestException.h"
@@ -68,6 +67,7 @@ namespace synthese
 	using namespace env;
 	using namespace html;
 	using namespace security;
+	using namespace graph;
 
 	namespace util
 	{
@@ -189,12 +189,11 @@ namespace synthese
 			map<const ScheduledService*, ServiceReservations> reservations;
 			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.getRegistry<ScheduledService>())
 			{
-				const ReservationRule* rule(service->getReservationRule().get());
 				ServiceReservations obj;
 
 				ReservationTransactionTableSync::Search(
 					obj.reservationsEnv,
-					service.get()
+					service->getKey()
 					, _startDateTime.getDate()
 					, _displayCancelled
 					);
@@ -209,11 +208,12 @@ namespace synthese
 
 				int lastDepartureLineStop(getRankOfLastDepartureLineStop(service->getPathId()));
 
-				obj.status = rule->isReservationPossible(
-					DateTime(_startDateTime.getDate(), service->getDepartureSchedule())
-					, now
-					, DateTime(_startDateTime.getDate(), service->getDepartureSchedule(lastDepartureLineStop))
-					);
+// 				const ReservationRule* rule(service->getReservationRule().get());
+// 				obj.status = rule->isReservationPossible(
+// 					DateTime(_startDateTime.getDate(), service->getDepartureSchedule())
+// 					, now
+// 					, DateTime(_startDateTime.getDate(), service->getDepartureSchedule(lastDepartureLineStop))
+// 					);
 				obj.service = service.get();
 
 				reservations.insert(make_pair(service.get(), obj));

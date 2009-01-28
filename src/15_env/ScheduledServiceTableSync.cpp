@@ -24,10 +24,6 @@
 
 #include "Path.h"
 #include "EnvModule.h"
-#include "BikeComplianceTableSync.h"
-#include "HandicappedComplianceTableSync.h"
-#include "PedestrianComplianceTableSync.h"
-#include "ReservationRuleTableSync.h"
 #include "LineTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "ServiceDateTableSync.h"
@@ -58,6 +54,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace time;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ScheduledServiceTableSync>::FACTORY_KEY("15.60.03 Scheduled services");
 
@@ -179,10 +176,10 @@ namespace synthese
 
 				uid reservationRuleId (rows->getLongLong (ScheduledServiceTableSync::COL_RESERVATIONRULEID));
 
-				ss->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel, AUTO_CREATE));
-				ss->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId, env, linkLevel, AUTO_CREATE));
-				ss->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
-				ss->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel, AUTO_CREATE));
+// 				ss->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel, AUTO_CREATE));
+// 				ss->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId, env, linkLevel, AUTO_CREATE));
+// 				ss->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
+// 				ss->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel, AUTO_CREATE));
 
 				path->addService(
 					ss,

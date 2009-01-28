@@ -93,9 +93,9 @@ namespace synthese
 			pv.push_back(date.toSQLString(false));
 			pv.push_back("0");
 			pv.push_back(originCity->getName());
-			pv.push_back(Conversion::ToString(accessParameters.getHandicappedFilter()));
+			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_HANDICAPPED));
 			pv.push_back(originPlaceName);
-			pv.push_back(Conversion::ToString(accessParameters.getBikeFilter()));
+			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_BIKE_IN_PT));
 			pv.push_back(destinationCity->getName());
 			pv.push_back(Conversion::ToString(destinationPlace->getKey()));
 			pv.push_back(destinationPlaceName);
@@ -135,9 +135,9 @@ namespace synthese
 			pv.push_back(date.toSQLString(false));
 			pv.push_back(Conversion::ToString(home));
 			pv.push_back(originCity);
-			pv.push_back(Conversion::ToString(accessParameters.getHandicappedFilter()));
+			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_HANDICAPPED));
 			pv.push_back(originPlace);
-			pv.push_back(Conversion::ToString(accessParameters.getBikeFilter()));
+			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_BIKE_IN_PT));
 			pv.push_back(destinationCity);
 			pv.push_back(string());
 			pv.push_back(destinationPlace);

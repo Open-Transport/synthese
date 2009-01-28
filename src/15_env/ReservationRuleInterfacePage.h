@@ -40,11 +40,14 @@ namespace synthese
 	{
 		class DateTime;
 	}
+	
+	namespace graph
+	{
+		class Journey;
+	}
 
 	namespace env
 	{
-		class Journey;
-
 		/** ReservationRuleInterfacePage Interface Page Class.
 			@ingroup m35Pages refPages
 
@@ -65,7 +68,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
-				, const Journey& journey
+				, const graph::Journey& journey
 				, const server::Request* request = NULL
 			) const;
 		};

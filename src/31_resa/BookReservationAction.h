@@ -25,11 +25,9 @@
 #ifndef SYNTHESE_BookReservationAction_H__
 #define SYNTHESE_BookReservationAction_H__
 
-#include "30_server/Action.h"
-
-#include "15_env/Journey.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "Journey.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -91,7 +89,7 @@ namespace synthese
 			static const std::string PARAMETER_SEATS_NUMBER;
 
 		private:
-			env::Journey						_journey;
+			graph::Journey						_journey;
 			boost::shared_ptr<security::User>	_customer;
 			bool								_createCustomer;
 			bool								_disabledCustomer;
@@ -118,7 +116,7 @@ namespace synthese
 
 			BookReservationAction();
 			
-			void setJourney(const env::Journey& journey);
+			void setJourney(const graph::Journey& journey);
 
 			virtual bool _isAuthorized() const;
 		};

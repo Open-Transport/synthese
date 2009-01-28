@@ -164,14 +164,6 @@ namespace synthese
 				_temporaryEnvironment.getEditableRegistry<City>().add (env::XmlBuilder::CreateCity (cityNode));
 			}
 
-			XMLNode axesNode = GetChildNode (dataNode, "axes", 0);
-			int nbAxes = GetChildNodeCount (axesNode, "axis");
-			for (int i=0; i<nbAxes; ++i) 
-			{
-				XMLNode axisNode = GetChildNode (axesNode, "axis", i);
-				_temporaryEnvironment.getEditableRegistry<Axis>().add (env::XmlBuilder::CreateAxis (axisNode));
-			}
-
 			XMLNode connectionPlacesNode = GetChildNode (dataNode, "connectionPlaces", 0);
 			int nbConnectionPlaces = GetChildNodeCount (connectionPlacesNode, "connectionPlace");
 			for (int i=0; i<nbConnectionPlaces; ++i) 
@@ -201,7 +193,11 @@ namespace synthese
 			for (int i=0; i<nbLines; ++i) 
 			{
 				XMLNode lineNode = GetChildNode (linesNode, "line", i);
-				_temporaryEnvironment.getEditableRegistry<Line>().add (synthese::env::XmlBuilder::CreateLine (lineNode, _temporaryEnvironment.getEditableRegistry<Axis>(), _temporaryEnvironment.getEditableRegistry<CommercialLine>()));
+				_temporaryEnvironment.getEditableRegistry<Line>().add(
+					env::XmlBuilder::CreateLine(
+						lineNode,
+						_temporaryEnvironment.getEditableRegistry<CommercialLine>()
+				)	);
 			}
 
 			XMLNode lineStopsNode = GetChildNode (dataNode, "lineStops", 0);

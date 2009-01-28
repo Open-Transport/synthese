@@ -26,19 +26,16 @@
 #include <deque>
 #include <boost/logic/tribool.hpp>
 
-#include "15_env/ServiceUse.h"
-#include "15_env/Types.h"
-
-#include "06_geometry/SquareDistance.h"
-
-#include "04_time/DateTime.h"
+#include "ServiceUse.h"
+#include "SquareDistance.h"
+#include "DateTime.h"
+#include "GraphTypes.h"
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		class Edge;
-		class Axis;
 		class VertexAccessMap;
 
 		/** Journey class.
@@ -51,8 +48,8 @@ namespace synthese
 			typedef std::deque<ServiceUse>	ServiceUses;
 
 		private:
-			typedef const env::ServiceUse& (Journey::*ServiceUseGetter) () const;
-			typedef const env::Edge* (Journey::*EdgeGetter) () const;
+			typedef const ServiceUse& (Journey::*ServiceUseGetter) () const;
+			typedef const Edge* (Journey::*EdgeGetter) () const;
 			typedef time::DateTime (Journey::*DateTimeGetter) () const;
 			typedef void (Journey::*JourneyPusher) (const Journey& journey);
 			typedef void (Journey::*ServiceUsePusher) (const ServiceUse& serviceUse);
@@ -100,10 +97,12 @@ namespace synthese
 
 				void _setMethod(AccessDirection method);
 				void _prependServiceUse(const ServiceUse& leg);
-				void _appendServiceUse(const env::ServiceUse& leg);
+				void _appendServiceUse(const ServiceUse& leg);
 
 		 public:
-			Journey(AccessDirection method);
+			Journey(
+				AccessDirection method
+			);
 			~Journey ();
 
 
@@ -155,12 +154,12 @@ namespace synthese
 				bool empty()	const;
 				int getJourneyLegCount () const;
 				
-				const env::ServiceUse& getJourneyLeg (int index) const;
-				const env::ServiceUse& getFirstJourneyLeg () const;
-				const env::ServiceUse& getLastJourneyLeg () const;
+				const ServiceUse& getJourneyLeg (int index) const;
+				const ServiceUse& getFirstJourneyLeg () const;
+				const ServiceUse& getLastJourneyLeg () const;
 				
-				const env::Edge* getOrigin() const;
-				const env::Edge* getDestination() const;
+				const Edge* getOrigin() const;
+				const Edge* getDestination() const;
 
 				const Edge* getEndEdge() const;
 				time::DateTime getEndTime() const;
@@ -192,7 +191,7 @@ namespace synthese
 				bool isBestThan(const Journey& other) const;
 
 
-				bool verifyAxisConstraints(const env::Axis* axis) const;
+// 				bool verifyAxisConstraints(const env::Axis* axis) const;
 
 
 				boost::logic::tribool	getReservationCompliance() const;

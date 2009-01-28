@@ -42,7 +42,7 @@ namespace synthese
 			@ingroup m35
 		*/
 		class LineStop
-		:	public Edge
+		:	public graph::Edge
 		{
 		public:
 
@@ -50,8 +50,6 @@ namespace synthese
 			typedef util::Registry<LineStop>	Registry;
 
 		private:
-			const PhysicalStop*  _physicalStop;   //!< Physical stop
-
 			double _metricOffset;      //!< Metric offset of stop on line
 			bool	_scheduleInput;
 
@@ -98,10 +96,6 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				const PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
-
-				const Vertex*		getFromVertex () const;
-
 				/*! Estimates consistency of line stops sequence according to 
 					metric offsets and physical stops coordinates.
 					@param other Other line stop to compare.

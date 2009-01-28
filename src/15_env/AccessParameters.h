@@ -23,8 +23,16 @@
 #ifndef SYNTHESE_env_AccessParameters_h__
 #define SYNTHESE_env_AccessParameters_h__
 
+#include "GraphTypes.h"
+#include "15_env/Types.h"
+
 namespace synthese
 {
+	namespace graph
+	{
+		class UseRules;
+	}
+	
 	namespace env
 	{
 		class Fare;
@@ -43,12 +51,10 @@ namespace synthese
 			double		_maxApproachTime;
 			double		_approachSpeed;
 			int			_maxTransportConnectionCount;
-			bool		_disabledUser;
 			bool		_drtOnly;
 			bool		_withoutDrt;
-			bool		_withBike;
-			bool		_pedestrian;
 			Fare*		_fare;
+			graph::UserClassCode	_userClass;
 
 		public:
 
@@ -67,10 +73,8 @@ namespace synthese
 				@date 2008
 			*/
 			AccessParameters(
-				bool					bikeCompliance = false
+				graph::UserClassCode	userClass = USER_PEDESTRIAN
 				, Fare*					fare = NULL
-				, bool					handicappedCompliance = false
-				, bool					pedestrianCompliance = false
 				, bool					drtOnly = false
 				, bool					withoutDrt = false
 				, double				maxApproachDistance = 1000
@@ -83,14 +87,14 @@ namespace synthese
 			//! @name Controls
 			//@{
 				/** Controls if a complyer object respects the filter rules contained in the current object.
-					@param complyer object to test
+					@param rules object to test
 					@return bool true if the object can be used according to the current rules
 					@author Hugues Romain
 					@date 2008				
 				*/
-				bool isCompatibleWith(
-					const Complyer& complyer
-				) const;
+ 				bool isCompatibleWith(
+ 					const graph::UseRules* rules
+ 				) const;
 
 
 
@@ -107,8 +111,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				bool	getBikeFilter()			const;
-				bool	getHandicappedFilter()	const;
+				graph::UserClassCode	getUserClass()	const;
 				double	getApproachSpeed()		const;
 			//@}
 		};

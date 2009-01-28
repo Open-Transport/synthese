@@ -24,33 +24,33 @@
 
 #include "ReservationsListInterfaceElement.h"
 
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/ReservationTableSync.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationItemInterfacePage.h"
+#include "ReservationTransactionTableSync.h"
+#include "ReservationTableSync.h"
+#include "ReservationTransaction.h"
+#include "Reservation.h"
+#include "ReservationItemInterfacePage.h"
 
-#include "15_env/CommercialLine.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/ScheduledService.h"
-#include "15_env/ScheduledServiceTableSync.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/AdvancedSelectTableSync.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
+#include "UseRule.h"
+#include "AdvancedSelectTableSync.h"
 
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/Interface.h"
+#include "ValueElementList.h"
+#include "InterfacePageException.h"
+#include "Interface.h"
 
-#include "05_html/HTMLTable.h"
+#include "HTMLTable.h"
 
-#include "04_time/Date.h"
+#include "Date.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "30_server/Request.h"
-#include "30_server/Session.h"
+#include "Request.h"
+#include "Session.h"
 
-#include "12_security/User.h"
+#include "User.h"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -66,6 +66,7 @@ namespace synthese
 	using namespace time;
 	using namespace env;
 	using namespace util;
+	using namespace graph;
 	
 	namespace util
 	{

@@ -20,13 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/ReservationRule.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/PedestrianCompliance.h"
-#include "15_env/BikeCompliance.h"
-#include "15_env/Fare.h"
-#include "15_env/Complyer.h"
-
+#include "Fare.h"
+#include "UseRules.h"
 #include "AccessParameters.h"
 
 using namespace std;
@@ -34,13 +29,13 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace graph;
+	
 	namespace env
 	{
 		AccessParameters::AccessParameters(
-			bool bikeCompliance /*= boost::logic::indeterminate */
-			, Fare*  fare /*= NULL */
-			, bool handicappedCompliance /*= boost::logic::indeterminate */
-			, bool pedestrianCompliance /*= boost::logic::indeterminate */
+			UserClassCode userClass,
+			Fare*  fare /*= NULL */
 			, bool drtOnly /*= boost::logic::indeterminate */
 			, bool withoutDrt
 			, double maxApproachDistance /*= 1000 */
@@ -51,34 +46,28 @@ namespace synthese
 			, _maxApproachTime(maxApproachTime)
 			, _approachSpeed(approachSpeed)
 			, _maxTransportConnectionCount(maxTransportConnectionCount)
-			, _withBike(bikeCompliance)
-			, _pedestrian(pedestrianCompliance)
 			, _drtOnly(drtOnly)
 			, _withoutDrt(withoutDrt)
-			, _disabledUser(handicappedCompliance)
-			, _fare(fare)
+			, _fare(fare),
+			_userClass(userClass)
 		{
 		}
 
-		bool AccessParameters::isCompatibleWith( const Complyer& complyer ) const
-		{
-			if (_withBike && !complyer.getBikeCompliance()->isCompatibleWith(logic::tribool(true)))
-				return false;
+		bool AccessParameters::isCompatibleWith(
+			const UseRules* rules
+		) const {
+			if (rules == NULL) return true;
+			
+			const UseRule& rule(rules->getUseRule(_userClass));
+			
+			if(!rule.getAccess()) return false;
+			
+// 			if (_fare && complyer.getFare()->isCompliant() == logic::tribool(true) && complyer.getFare().get() != _fare)
+// 				return false;
 
-			if (_fare && complyer.getFare()->isCompliant() == logic::tribool(true) && complyer.getFare().get() != _fare)
-				return false;
+ 			if (_drtOnly && rule.getReservationType() == UseRule::RESERVATION_FORBIDDEN) return false;
 
-			if (_disabledUser && !complyer.getHandicappedCompliance()->isCompatibleWith(logic::tribool(true)))
-				return false;
-
-			if (_pedestrian && !complyer.getPedestrianCompliance()->isCompatibleWith(logic::tribool(true)))
-				return false;
-
-			if (_drtOnly && !complyer.getReservationRule()->getType() == RESERVATION_FORBIDDEN)
-				return false;
-
-			if (_withoutDrt && !complyer.getReservationRule()->getType() != RESERVATION_FORBIDDEN)
-				return false;
+ 			if (_withoutDrt && rule.getReservationType() != UseRule::RESERVATION_FORBIDDEN) return false;
 
 			return true;
 		}
@@ -88,19 +77,16 @@ namespace synthese
 			return distance < _maxApproachDistance && duration < _maxApproachTime;
 		}
 
-		bool AccessParameters::getBikeFilter() const
-		{
-			return _withBike;
-		}
-
-		bool AccessParameters::getHandicappedFilter() const
-		{
-			return _disabledUser;
-		}
-
 		double AccessParameters::getApproachSpeed() const
 		{
 			return _approachSpeed;
+		}
+		
+		
+		
+		UserClassCode AccessParameters::getUserClass() const
+		{
+			return _userClass;
 		}
 	}
 }

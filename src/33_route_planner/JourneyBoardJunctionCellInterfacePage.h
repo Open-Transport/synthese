@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_JourneyBoardJunctionCellInterfacePage_H__
 #define SYNTHESE_JourneyBoardJunctionCellInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {

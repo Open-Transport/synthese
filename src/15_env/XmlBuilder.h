@@ -25,7 +25,6 @@
 #define SYNTHESE_ENV_XMLBUILDER_H
 
 
-#include "Axis.h"
 #include "City.h"
 #include "CommercialLine.h"
 #include "Line.h"
@@ -63,12 +62,6 @@ Sample XML format :
    <!-- ... -->
  </cities>
 
- <axes>
-   <axis id="a1" free="true" authorized="false">  
-   <axis id="a2" free="true" authorized="false">  
-   <!-- ... -->
- </axes>
-
  <connectionPlaces>
    <connectionPlace id="1" name="Matabiau" cityId="1"/>
    <!-- ... -->
@@ -82,7 +75,7 @@ Sample XML format :
  </physicalStops>
 
  <lines>
-   <line id="l1" axisId="a1" firstYear="2006" lastYear="2007">
+   <line id="l1" firstYear="2006" lastYear="2007">
 
      <lineStop id="1" metricOffset="0"
 	       type="departure" physicalStopId="1" scheduleInput="true">
@@ -123,8 +116,6 @@ class XmlBuilder
  public:
 
 
-	 static boost::shared_ptr<Axis> CreateAxis (XMLNode& node);
-
 	 static boost::shared_ptr<City> CreateCity (XMLNode& node);
 
     
@@ -135,7 +126,6 @@ class XmlBuilder
 	 static boost::shared_ptr<CommercialLine> CreateCommercialLine (XMLNode& node);
 
 	 static boost::shared_ptr<Line> CreateLine (XMLNode& node, 
-		 const util::Registry<Axis>& axes,
 		 const util::Registry<CommercialLine>& commercialLines);
 
 	 static boost::shared_ptr<LineStop> CreateLineStop (XMLNode& node, 

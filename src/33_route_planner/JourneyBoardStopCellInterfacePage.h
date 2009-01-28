@@ -23,16 +23,15 @@
 #ifndef SYNTHESE_JourneyBoardStopCellInterfacePage_H__
 #define SYNTHESE_JourneyBoardStopCellInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-#include "04_time/DateTime.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "DateTime.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class AddressablePlace;
 	}
 
 	namespace messages
@@ -77,7 +76,7 @@ namespace synthese
 				, bool isItArrival
 				, const messages::SentAlarm* alarm
 				, bool isItTerminus
-				, const env::ConnectionPlace* place
+				, const env::AddressablePlace* place
 				, bool color
 				, const time::DateTime& time
 				, int continuousServiceRange

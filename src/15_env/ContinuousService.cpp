@@ -34,6 +34,7 @@ namespace synthese
 {
 	using namespace time;
 	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{
@@ -102,7 +103,8 @@ namespace synthese
 
 
 		ServicePointer ContinuousService::getFromPresenceTime(
-			AccessDirection method
+			AccessDirection method,
+			UserClassCode userClass
 			, const Edge* edge
 			, const time::DateTime& presenceDateTime
 			, const time::DateTime& computingTime
@@ -110,7 +112,7 @@ namespace synthese
 			, bool inverted
 		) const	{
 
-			ServicePointer ptr(method, edge);
+			ServicePointer ptr(method, userClass, edge);
 			ptr.setService(this);
 			Schedule schedule;
 			DateTime actualDateTime(presenceDateTime);
@@ -124,7 +126,7 @@ namespace synthese
 				if (_departureSchedules.at(edgeIndex).first.getHour() <= _departureSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() > _departureSchedules.at(edgeIndex).second.getHour())
-						return ServicePointer(DEPARTURE_TO_ARRIVAL);
+						return ServicePointer(DEPARTURE_TO_ARRIVAL, userClass);
 					if (presenceDateTime.getHour() < schedule.getHour())
 						actualDateTime.setHour(schedule.getHour());
 				}
@@ -151,7 +153,7 @@ namespace synthese
 				if (_arrivalSchedules.at(edgeIndex).first.getHour() <= _arrivalSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() < _arrivalSchedules.at(edgeIndex).first.getHour())
-						return ServicePointer(ARRIVAL_TO_DEPARTURE);
+						return ServicePointer(ARRIVAL_TO_DEPARTURE, userClass);
 					if (presenceDateTime.getHour() > _arrivalSchedules.at(edgeIndex).second.getHour())
 						actualDateTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
 				}
@@ -183,13 +185,13 @@ namespace synthese
 
 			// Date control
 			if (!isActive(originDateTime.getDate()))
-				return ServicePointer(method);
+				return ServicePointer(method, userClass);
 
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
 				if (!ptr.isReservationRuleCompliant(computingTime))
-					return ServicePointer(method);
+					return ServicePointer(method, userClass);
 			}
 			else
 			{

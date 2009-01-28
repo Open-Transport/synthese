@@ -24,39 +24,39 @@
 
 #include "ReservationRoutePlannerAdmin.h"
 
-#include "31_resa/ResaModule.h"
-#include "31_resa/ResaRight.h"
-#include "31_resa/BookReservationAction.h"
-#include "31_resa/ResaCustomerHtmlOptionListFunction.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTableSync.h"
+#include "ResaModule.h"
+#include "ResaRight.h"
+#include "BookReservationAction.h"
+#include "ResaCustomerHtmlOptionListFunction.h"
+#include "ReservationTransaction.h"
+#include "ReservationTransactionTableSync.h"
+#include "Reservation.h"
+#include "ReservationTableSync.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "ModuleAdmin.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
-#include "33_route_planner/RoutePlanner.h"
+#include "RoutePlanner.h"
 
-#include "05_html/SearchFormHTMLTable.h"
+#include "SearchFormHTMLTable.h"
 
-#include "15_env/Journey.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/ServiceUse.h"
-#include "15_env/Line.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/LineStop.h"
-#include "15_env/Road.h"
-#include "15_env/RoadChunk.h"
-#include "15_env/EnvModule.h"
-#include "15_env/AccessParameters.h"
+#include "Journey.h"
+#include "UseRules.h"
+#include "ServiceUse.h"
+#include "Line.h"
+#include "CommercialLine.h"
+#include "LineStop.h"
+#include "Road.h"
+#include "RoadChunk.h"
+#include "EnvModule.h"
+#include "AccessParameters.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -73,6 +73,7 @@ namespace synthese
 	using namespace html;
 	using namespace routeplanner;
 	using namespace security;
+	using namespace graph;
 
 	namespace util
 	{
@@ -197,7 +198,11 @@ namespace synthese
 			DateTime now(TIME_CURRENT);
 
 			// Route planning
-			AccessParameters ap(false, NULL, _disabledPassenger, false, _drtOnly ? logic::tribool(true) : logic::indeterminate);
+			AccessParameters ap(
+				_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
+				NULL, 
+				_drtOnly
+			);
 			const Place* startPlace(EnvModule::FetchPlace(_startCity, _startPlace));
 			const Place* endPlace(EnvModule::FetchPlace(_endCity, _endPlace));
 			stringstream trace;
@@ -297,7 +302,12 @@ namespace synthese
 						stream << t.col() << its->getArrivalDateTime().toString();
 
 						// Place
-						stream << t.col() << its->getArrivalEdge()->getPlace()->getFullName();
+						stream <<
+							t.col() <<
+							static_cast<const PublicTransportStopZoneConnectionPlace*>(
+								its->getArrivalEdge()->getPlace()
+							)->getFullName()
+						;
 
 						// Next service use
 						++its;

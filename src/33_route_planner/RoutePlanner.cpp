@@ -22,29 +22,28 @@
 
 #include "RoutePlanner.h"
 
-#include "33_route_planner/IntegralSearcher.h"
-#include "33_route_planner/BestVertexReachesMap.h"
+#include "IntegralSearcher.h"
+#include "BestVertexReachesMap.h"
 
-#include "15_env/Axis.h"
-#include "15_env/ConnectionPlace.h"
-#include "15_env/Edge.h"
-#include "15_env/Line.h"
-#include "15_env/Service.h"
-#include "15_env/Vertex.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/Journey.h"
-#include "15_env/VertexAccessMap.h"
-#include "15_env/JourneyComparator.h"
+#include "Hub.h"
+#include "Edge.h"
+#include "Line.h"
+#include "Service.h"
+#include "Vertex.h"
+#include "PhysicalStop.h"
+#include "Journey.h"
+#include "VertexAccessMap.h"
+#include "JourneyComparator.h"
 
 // To be removed by a log class
-#include "15_env/LineStop.h"
-#include "15_env/Road.h"
-#include "15_env/Line.h"
-#include "15_env/CommercialLine.h"
+#include "LineStop.h"
+#include "Road.h"
+#include "Line.h"
+#include "CommercialLine.h"
 
-#include "06_geometry/SquareDistance.h"
+#include "SquareDistance.h"
 
-#include "01_util/Log.h"
+#include "Log.h"
 
 #include <algorithm>
 #include <set>
@@ -62,6 +61,7 @@ namespace synthese
 	using namespace env;
 	using namespace geometry;
 	using namespace util;
+	using namespace graph;
 
 	namespace routeplanner
 	{
@@ -206,7 +206,7 @@ namespace synthese
 					+ oj.getDistance ()
 				);
 				VertexAccessMap vam;
-				const ConnectionPlace* cp(oj.getDestination()->getConnectionPlace());
+				const AddressablePlace* cp(AddressablePlace::GetPlace(oj.getDestination()->getPlace()));
 				const Vertex* v(oj.getDestination()->getFromVertex());
 				cp->getImmediateVertices(
 					vam
@@ -250,8 +250,17 @@ namespace synthese
 					stringstream s;
 					s << "<h3>Origins</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
 
-					for (VertexAccessMap::VamMap::const_iterator it(ovam.getMap().begin()); it != ovam.getMap().end(); ++it)
-						s << "<tr><td>" << it->first->getConnectionPlace()->getFullName() << "</td><td>" << static_cast<const PhysicalStop*>(it->first)->getName() << "</td><td>" << it->second.approachDistance << "</td><td>" << it->second.approachTime << "</td></tr>";
+					BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, ovam.getMap())
+					{
+						s	<<
+							"<tr><td>" <<
+							AddressablePlace::GetPlace(it.first->getPlace())->getFullName() <<
+							"</td><td>" << static_cast<const PhysicalStop*>(it.first)->getName() <<
+							"</td><td>" << it.second.approachDistance <<
+							"</td><td>" << it.second.approachTime <<
+							"</td></tr>"
+						;
+					}
 					s << "</table>";
 
 					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
@@ -336,7 +345,7 @@ namespace synthese
 					+ j.getDistance ()
 				);
 				VertexAccessMap vam;
-				const ConnectionPlace* cp(j.getOrigin()->getConnectionPlace());
+				const AddressablePlace* cp(AddressablePlace::GetPlace(j.getOrigin()->getPlace()));
 				const Vertex* v(j.getOrigin()->getFromVertex());
 				cp->getImmediateVertices(
 					vam
@@ -367,8 +376,20 @@ namespace synthese
 					stringstream s;
 					s << "<h3>Destinations</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
 
-					for (VertexAccessMap::VamMap::const_iterator it(dvam.getMap().begin()); it != dvam.getMap().end(); ++it)
-						s << "<tr><td>" << it->first->getConnectionPlace()->getFullName() << "</td><td>" << static_cast<const PhysicalStop* const>(it->first)->getName() << "</td><td>" << it->second.approachDistance << "</td><td>" << it->second.approachTime << "</td></tr>";
+					BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, dvam.getMap())
+					{
+						s	<<
+							"<tr><td>" <<
+							AddressablePlace::GetPlace(it.first->getPlace())->getFullName() <<
+							"</td><td>" <<
+							static_cast<const PhysicalStop* const>(it.first)->getName() <<
+							"</td><td>" <<
+							it.second.approachDistance <<
+							"</td><td>" <<
+							it.second.approachTime <<
+							"</td></tr>"
+						;
+					}
 					s << "</table>";
 
 					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
@@ -501,17 +522,19 @@ namespace synthese
 			if (result.getStartApproachDuration())
 			{
 				result.setStartApproachDuration(0);
-				Journey goalApproachJourney(dvam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney);
+				Journey goalApproachJourney(
+					dvam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney
+				);
 				if (!goalApproachJourney.empty())
 				{
 					goalApproachJourney.shift(
-						(result.getArrivalTime() - goalApproachJourney.getDepartureTime())
-						+ result.getDestination()->getFromVertex()->getConnectionPlace()->getTransferDelay(
-						result.getDestination()->getFromVertex()
-						, goalApproachJourney.getOrigin()->getFromVertex()
-						)
-						, result.getContinuousServiceRange()
-						);
+						(result.getArrivalTime() - goalApproachJourney.getDepartureTime()) +
+						result.getDestination()->getFromVertex()->getPlace()->getTransferDelay(
+							result.getDestination()->getFromVertex(),
+							goalApproachJourney.getOrigin()->getFromVertex()
+						),
+						result.getContinuousServiceRange()
+					);
 					goalApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
 					result.append(goalApproachJourney);
 				}
@@ -522,18 +545,20 @@ namespace synthese
 			if (result.getStartApproachDuration())
 			{
 				result.setStartApproachDuration(0);
-				Journey originApproachJourney(ovam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney);
+				Journey originApproachJourney(
+					ovam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney
+				);
 				if (!originApproachJourney.empty())
 				{
 					originApproachJourney.shift(
-						(result.getDepartureTime() - originApproachJourney.getDepartureTime())
-						- originApproachJourney.getDuration()
-						- result.getOrigin()->getFromVertex()->getConnectionPlace()->getTransferDelay(
-						originApproachJourney.getDestination()->getFromVertex()
-						, result.getOrigin()->getFromVertex()
-						)
-						, result.getContinuousServiceRange()
-						);
+						(result.getDepartureTime() - originApproachJourney.getDepartureTime()) -
+						originApproachJourney.getDuration() -
+						result.getOrigin()->getFromVertex()->getPlace()->getTransferDelay(
+							originApproachJourney.getDestination()->getFromVertex(),
+							result.getOrigin()->getFromVertex()
+						),
+						result.getContinuousServiceRange()
+					);
 					originApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
 					result.prepend(originApproachJourney);
 				}
@@ -543,9 +568,9 @@ namespace synthese
 // -------------------------------------------------------------------------- Recursion
 
 		void RoutePlanner::findBestJourney(
-			env::Journey& result
-			, const env::VertexAccessMap& startVam
-			, const env::VertexAccessMap& endVam
+			Journey& result
+			, const VertexAccessMap& startVam
+			, const VertexAccessMap& endVam
 			, const time::DateTime& startTime
 			, bool strictTime
 			, bool inverted
@@ -645,9 +670,21 @@ namespace synthese
 
 					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
 					{
-						Log::GetInstance().trace(reachedVertex->getConnectionPlace()->getFullName() + " was found at " + journey.getEndTime().toString() + (saved ? " (accepted)" : " (rejected)"));
+						Log::GetInstance().trace(
+							AddressablePlace::GetPlace(reachedVertex->getPlace())->getFullName() +
+							" was found at " +
+							journey.getEndTime().toString() +
+							(saved ? " (accepted)" : " (rejected)")
+						);
 						if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-							*_logStream << "<p>" << reachedVertex->getConnectionPlace()->getFullName() << " was found at " << journey.getEndTime().toString() << (saved ? " (accepted)" : " (rejected)") << "</p>";
+						{
+							*_logStream <<
+								"<p>" <<
+								AddressablePlace::GetPlace(reachedVertex->getPlace())->getFullName() <<
+								" was found at " << journey.getEndTime().toString() <<
+								(saved ? " (accepted)" : " (rejected)") << "</p>"
+							;
+						}
 					}
 
 					if (va.approachTime == 0)
@@ -732,7 +769,11 @@ namespace synthese
 								stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
 
 								// Place
-								stream << "<td>" << its->getArrivalEdge()->getPlace()->getFullName() << "</td>";
+								stream <<
+									"<td>" <<
+									AddressablePlace::GetPlace(its->getArrivalEdge()->getPlace())->getFullName() <<
+									"</td>"
+								;
 
 								// Next service use
 								++its;
@@ -783,7 +824,7 @@ namespace synthese
 
 				VertexAccessMap vertices;
 				const Vertex* vertex(journey->getEndEdge()->getFromVertex());
-				vertex->getPlace()->getImmediateVertices(
+				AddressablePlace::GetPlace(vertex->getPlace())->getImmediateVertices(
 					vertices
 					, accessDirection
 					, _accessParameters

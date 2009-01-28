@@ -29,6 +29,7 @@
 #include "DateTime.h"
 #include "Schedule.h"
 #include "Registrable.h"
+#include "GraphTypes.h"
 
 namespace synthese
 {
@@ -37,13 +38,12 @@ namespace synthese
 		class Point2D;
 	}
 
-	namespace env
+	namespace graph
 	{
 		class Path;
 		class Vertex;
-		class AddressablePlace;
-		class ConnectionPlace;
 		class ServicePointer;
+		class Hub;
 
 		/** Edge abstract base class.
 
@@ -66,19 +66,21 @@ namespace synthese
 				- a passage edge if it can be considered both as a departure edge 
 				and as an arrival edge.
 
-			@ingroup m35
+			@ingroup m18
 		*/
 		class Edge
 			:	public virtual util::Registrable
 		{
 		public:
 
+		protected:
+			const Vertex*	_fromVertex;
+			const Path*		_parentPath;		//!< The path the edge belongs
+		
 		private:
-
 			bool _isDeparture;				//!< The departure from the vertex is allowed
 			bool _isArrival;				//!< The arrival at the vertex is allowed
 
-			const Path*	_parentPath;		//!< The path the edge belongs
 			int			_rankInPath;		//!< Rank in path.
 
 			const Edge* _nextInPath;		//!< Next edge in path.
@@ -97,8 +99,13 @@ namespace synthese
 			mutable bool _serviceIndexUpdateNeeded;
 
 		protected:
-			Edge (bool isDeparture = true, bool isArrival = true,
-			const Path* parentPath = NULL, int rankInPath = UNKNOWN_VALUE);
+			Edge(
+				bool isDeparture = true,
+				bool isArrival = true,
+				const Path* parentPath = NULL,
+				int rankInPath = UNKNOWN_VALUE,
+				const Vertex* fromVertex = NULL
+			);
 
 		public:
 			virtual ~Edge ();
@@ -123,7 +130,7 @@ namespace synthese
 
 				/** Returns this edge origin vertex.
 				*/
-				virtual const Vertex* getFromVertex () const = 0;
+				const Vertex* getFromVertex () const;
 
 				/** Returns metric offset of this edge from
 				parent path origin vertex.
@@ -157,10 +164,8 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				const AddressablePlace* getPlace () const;
-				const ConnectionPlace* getConnectionPlace () const;
-				const ConnectionPlace* getToConnectionPlace() const;
-
+				const Hub* getPlace () const;
+				
 				int getRankInPath () const;
 
 				bool isArrival () const;
@@ -194,6 +199,7 @@ namespace synthese
 					@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
 				*/
 				ServicePointer getNextService (
+					UserClassCode userClass,
 					time::DateTime departureMoment
 					, const time::DateTime& maxDepartureMoment
 					, const time::DateTime& calculationMoment
@@ -217,6 +223,7 @@ namespace synthese
 					@retval arrivalMoment Accurate departure moment. Meaningless if -1 returned.
 				*/
 				ServicePointer getPreviousService(
+					UserClassCode userClass,
 					time::DateTime arrivalMoment
 					, const time::DateTime& minArrivalMoment
 					, const time::DateTime& calculationMoment
@@ -242,4 +249,4 @@ namespace synthese
 	}
 }
 
-#endif 	    
+#endif

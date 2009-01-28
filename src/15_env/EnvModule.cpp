@@ -21,12 +21,13 @@
 */
 
 #include "EnvModule.h"
-
+#include "Journey.h"
 #include "01_util/Constants.h"
 #include "Conversion.h"
 #include "UId.h"
 #include "T9Filter.h"
-
+#include "SentAlarm.h"
+#include "17_messages/Types.h"
 #include "TransportNetworkTableSync.h"
 #include "TransportNetwork.h"
 #include "CommercialLineTableSync.h"
@@ -52,7 +53,6 @@
 #include "AddressTableSync.h"
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
-
 #include "12_security/Constants.h"
 #include "Right.h"
 
@@ -67,6 +67,8 @@ namespace synthese
     using namespace lexmatcher;
 	using namespace security;
 	using namespace util;
+	using namespace graph;
+	using namespace time;
 
 	namespace util
 	{
@@ -287,5 +289,75 @@ namespace synthese
 		
 
 		}
+		
+		
+				
+		
+		
+		int EnvModule::GetMaxAlarmLevel(
+			const Journey& journey
+		){
+			DateTime alarmStart(TIME_UNKNOWN);
+			DateTime alarmStop(TIME_UNKNOWN);
+			DateTime now(TIME_CURRENT);
+			int maxAlarmLevel(0);
+		 
+			BOOST_FOREACH(const ServiceUse& leg, journey.getServiceUses())
+			{
+				const Service* service(leg.getService());
+//				bool legIsConnection = (it < _journeyLegs.end() - 2);
+
+					// -- Alarm on origin --
+					// Alarm start = first departure
+					// Alarm stop = last departure
+					alarmStart = leg.getDepartureDateTime();
+					alarmStop = alarmStart;
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
+				
+	/*				if ( leg->getOrigin ()->getFromVertex ()->getConnectionPlace ()
+					 ->hasApplicableAlarm (alarmStart, alarmStop)
+					 && maxAlarmLevel < leg->getOrigin()->getFromVertex ()->
+					 getConnectionPlace ()->getAlarm ()->getLevel () )
+						maxAlarmLevel = leg->getOrigin()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
+	*/			
+				
+
+					// -- Service alarm --
+					// Alarm start = first departure
+					// Alarm stop = last arrival
+					alarmStart = leg.getDepartureDateTime();
+					alarmStop = leg.getArrivalDateTime();
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
+
+	/*				if ( (leg->getService ()->getPath ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
+					 (maxAlarmLevel < leg->getService ()->getPath ()->getAlarm ()->getLevel ()) )
+				{
+						maxAlarmLevel = leg->getService ()->getPath ()->getAlarm ()->getLevel ();
+				}
+	*/			
+					// -- Alarm on arrival --
+					// Alarm start = first arrival
+					// Alarm stop = last arrival if connection, last arrival otherwise
+					alarmStart = leg.getArrivalDateTime();
+					alarmStop = alarmStart;
+//					if (legIsConnection)
+//				{
+//						alarmStop = (it+1)->getDepartureDateTime ();
+//				}
+
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
+
+	/*				if ( (leg->getDestination ()->getFromVertex ()->getConnectionPlace ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
+						 (maxAlarmLevel < leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ()) )
+				{
+					maxAlarmLevel = leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
+				}
+*/			}
+			return maxAlarmLevel;
+		}
+
     }
 }

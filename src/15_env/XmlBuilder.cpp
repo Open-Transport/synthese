@@ -60,22 +60,6 @@ namespace synthese
 
 
 
-		 shared_ptr<Axis>
-		 XmlBuilder::CreateAxis (XMLNode& node)
-		 {
-			uid id (GetLongLongAttr (node, "id"));
-
-			std::string name (GetStringAttr (node, "name"));
-
-			bool free (GetBoolAttr (node, "free"));
-			bool authorized (GetBoolAttr (node, "authorized"));
-		    
-			return shared_ptr<Axis>(new synthese::env::Axis (id, name, free, authorized));
-		 }
-
-
-
-		    
 		shared_ptr<PublicTransportStopZoneConnectionPlace>
 		XmlBuilder::CreateConnectionPlace (XMLNode& node, 
 						   const Registry<City>& cities)
@@ -89,31 +73,19 @@ namespace synthese
 		    
 			std::string typeStr (GetStringAttr (node, "connectionType"));
 
-			ConnectionPlace::ConnectionType type = ConnectionPlace::CONNECTION_TYPE_FORBIDDEN;
-			if (typeStr == "road-road") 
-			type = ConnectionPlace::CONNECTION_TYPE_ROADROAD;
-			else if (typeStr == "road-line") 
-			type = ConnectionPlace::CONNECTION_TYPE_ROADLINE;
-			else if (typeStr == "line-line") 
-			type = ConnectionPlace::CONNECTION_TYPE_LINELINE;
-			else if (typeStr == "recommendedShort") 
-			type = ConnectionPlace::CONNECTION_TYPE_RECOMMENDED_SHORT;
-			else if (typeStr == "recommended") 
-			type = ConnectionPlace::CONNECTION_TYPE_RECOMMENDED;
+			bool type(Conversion::ToBool(typeStr));
 
-
-			int defaultTransferDelay (GetIntAttr (node, 
-							  "defaultTransferDelay", 
-							  ConnectionPlace::FORBIDDEN_TRANSFER_DELAY));
+			int defaultTransferDelay(GetIntAttr(
+					node, 
+					"defaultTransferDelay", 
+					PublicTransportStopZoneConnectionPlace::FORBIDDEN_TRANSFER_DELAY
+			)	);
 
 			shared_ptr<const City> city = cities.get (cityId);
 
 			return shared_ptr<PublicTransportStopZoneConnectionPlace>(
-						new PublicTransportStopZoneConnectionPlace(id, name, city.get(),
-										type, defaultTransferDelay))
-						;
-		    
-
+				new PublicTransportStopZoneConnectionPlace(id, name, city.get(),type, defaultTransferDelay)
+			);
 		}
 
 
@@ -146,18 +118,13 @@ namespace synthese
 
 		shared_ptr<Line> 
 		XmlBuilder::CreateLine (XMLNode& node, 
-					const Registry<Axis>& axes,
 					const Registry<CommercialLine>& commercialLines)
 		{
 			uid id (GetLongLongAttr (node, "id"));
 
 			std::string name (GetStringAttr (node, "name"));
-			uid axisId (GetLongLongAttr (node, "axisId"));
 
-			shared_ptr<Line> line (
-									 new synthese::env::Line (id, name, 
-							 									 axes.get (axisId).get()))
-									 ;
+			shared_ptr<Line> line(new Line(id, name));
 
 			uid commercialLineId (GetLongLongAttr (node, "commercialLineId"));
 			line->setCommercialLine (commercialLines.get (commercialLineId).get());

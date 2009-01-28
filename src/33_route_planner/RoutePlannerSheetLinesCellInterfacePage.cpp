@@ -20,14 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/RoutePlannerSheetLinesCellInterfacePage.h"
-
-#include "30_server/Request.h"
-
+#include "RoutePlannerSheetLinesCellInterfacePage.h"
+#include "Request.h"
 
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace graph;
 
 	template<> const std::string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerSheetLinesCellInterfacePage>::FACTORY_KEY("schedule_sheet_lines_cell");
 
@@ -37,7 +36,7 @@ namespace synthese
 		    std::ostream& stream, 
 		    size_t columnNumber, 
 			VariablesMap& variables,
-		    const env::Journey* object, 
+		    const Journey* object, 
 		    const server::Request* request /*= NULL */ ) const
 		{
 			ParametersVector pv;

@@ -20,14 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/PhysicalStop.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/LineStop.h"
-#include "15_env/Line.h"
-#include "15_env/Edge.h"
+#include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "LineStop.h"
+#include "Line.h"
+#include "ForcedDestinationsArrivalDepartureTableGenerator.h"
+#include "StandardArrivalDepartureTableGenerator.h"
 
-#include "34_departures_table/ForcedDestinationsArrivalDepartureTableGenerator.h"
-#include "34_departures_table/StandardArrivalDepartureTableGenerator.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -35,6 +35,7 @@ namespace synthese
 {
 	using namespace env;
 	using namespace time;
+	using namespace graph;
 
 	namespace departurestable
 	{
@@ -52,22 +53,34 @@ namespace synthese
 			, const ForcedDestinationsSet& forcedDestinations
 			, int persistanceDuration
 			, int blinkingDelay
-		) : ArrivalDepartureTableGenerator(physicalStops, direction, endfilter, lineFilter
-										, displayedPlacesList, forbiddenPlaces, startTime, endDateTime, blinkingDelay, maxSize)
-			, _forcedDestinations(forcedDestinations)
-			, _persistanceDuration(persistanceDuration)
+		):	ArrivalDepartureTableGenerator(
+				physicalStops,
+				direction,
+				endfilter,
+				lineFilter,
+				displayedPlacesList,
+				forbiddenPlaces,
+				startTime,
+				endDateTime,
+				blinkingDelay,
+				maxSize
+			),
+			_forcedDestinations(forcedDestinations),
+			_persistanceDuration(persistanceDuration)
 		{
 			// Add terminuses to forced destinations
-			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
 			{
-				for (set<const Edge*>::const_iterator eit = it->second->getDepartureEdges().begin(); eit != it->second->getDepartureEdges().end(); ++eit)
+				BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
 				{
-					const LineStop* ls = static_cast<const LineStop*>(*eit);
+					const LineStop* ls = static_cast<const LineStop*>(edge);
 
 					if (!_allowedLineStop(ls))
 						continue;
 
-					const PublicTransportStopZoneConnectionPlace* place(ls->getLine()->getDestination()->getConnectionPlace());
+					const PublicTransportStopZoneConnectionPlace* place(
+						ls->getLine()->getDestination()->getConnectionPlace()
+					);
 					_forcedDestinations.insert(make_pair(place->getKey(), place));
 					_displayedPlaces.insert(make_pair(place->getKey(), place));
 				}
@@ -83,11 +96,11 @@ namespace synthese
 			typedef map<const PublicTransportStopZoneConnectionPlace*, ArrivalDepartureList::iterator> ReachedDestinationMap;
 			ReachedDestinationMap reachedDestination;
 			
-			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
 			{
-				for (set<const Edge*>::const_iterator eit = it->second->getDepartureEdges().begin(); eit != it->second->getDepartureEdges().end(); ++eit)
+				BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
 				{
-					const LineStop* ls = static_cast<const LineStop*>(*eit);
+					const LineStop* ls = static_cast<const LineStop*>(edge);
 
 					// Selection of the line
 					if (!_allowedLineStop(ls))
@@ -99,6 +112,7 @@ namespace synthese
 
 					// Next service
 					ServicePointer serviceInstance = ls->getNextService(
+						USER_PEDESTRIAN,
 						_startDateTime
 						, maxTimeForForcedDestination
 						, _calculationDateTime
@@ -112,9 +126,15 @@ namespace synthese
 					bool insertionIsDone = false;
 
 					// Exploration of the line
-					for (const LineStop* curGLA = static_cast<const LineStop*>(ls->getFollowingArrivalForFineSteppingOnly()); curGLA != NULL; curGLA = (const LineStop*) curGLA->getFollowingArrivalForFineSteppingOnly())
-					{
-						const PublicTransportStopZoneConnectionPlace* connectionPlace(curGLA->getConnectionPlace());
+					for(const LineStop* curGLA(
+							static_cast<const LineStop*>(ls->getFollowingArrivalForFineSteppingOnly())
+						);
+						curGLA != NULL;
+						curGLA = static_cast<const LineStop*>(curGLA->getFollowingArrivalForFineSteppingOnly())
+					){
+						const PublicTransportStopZoneConnectionPlace* connectionPlace(
+							curGLA->getPhysicalStop()->getConnectionPlace()
+						);
 
 						// Attempting to select the destination
 						if (_forcedDestinations.find(connectionPlace->getKey()) == _forcedDestinations.end())
@@ -127,16 +147,17 @@ namespace synthese
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
 
 							// Links
-							reachedDestination[curGLA->getConnectionPlace()] = itr;
+							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
 						}
 						// Else optimizing a previously founded ptd
-						else if(serviceInstance.getActualDateTime() < reachedDestination[connectionPlace]->first.servicePointer.getActualDateTime())
-						{
+						else if(serviceInstance.getActualDateTime() <
+							reachedDestination[connectionPlace]->first.servicePointer.getActualDateTime()
+						){
 							// Allocation
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
 							ArrivalDepartureList::iterator oldIt = reachedDestination[connectionPlace];
 
-							reachedDestination[curGLA->getConnectionPlace()] = itr;
+							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
 
 								// If the preceding ptd is not used for an other place, deletion
 							ReachedDestinationMap::iterator it;

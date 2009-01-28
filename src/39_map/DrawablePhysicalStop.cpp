@@ -22,10 +22,10 @@
 
 #include "DrawablePhysicalStop.h"
 
-#include "15_env/PhysicalStop.h"
-#include "15_env/AddressablePlace.h"
-
-#include "01_util/RGBColor.h"
+#include "PhysicalStop.h"
+#include "AddressablePlace.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "RGBColor.h"
 
 #include "Map.h"
 #include "PostscriptCanvas.h"
@@ -35,59 +35,57 @@ using synthese::env::PhysicalStop;
 namespace synthese
 {
 	using namespace geometry;
+	using namespace env;
 	
-namespace map
-{
-
-
-DrawablePhysicalStop::DrawablePhysicalStop (const synthese::env::PhysicalStop* physicalStop)
-: _physicalStopId (physicalStop->getKey())
-, _name (physicalStop->getPlace()->getName ())
-, _point (*physicalStop)
-{
-
-}
-
-
-DrawablePhysicalStop::~DrawablePhysicalStop ()
-{
-
-}
-
-
-
-int 
-DrawablePhysicalStop::getPhysicalStopId () const
-{
-    return _physicalStopId;
-}
-
-
-const std::string& 
-DrawablePhysicalStop::getName () const
-{
-	return _name;
-}
-
-
-const Point2D& 
-DrawablePhysicalStop::getPoint () const
-{
-	return _point;
-}
-
-
-
-void 
-DrawablePhysicalStop::prepare (Map& map)
-{
-    _point = map.toOutputFrame (_point);
-}
-
-
-
-
-
-}
+	namespace map
+	{
+		DrawablePhysicalStop::DrawablePhysicalStop(
+			const PhysicalStop* physicalStop
+		): _physicalStopId(physicalStop->getKey())
+			, _name(physicalStop->getConnectionPlace()->getName ())
+			, _point (*physicalStop)
+		{
+		}
+		
+		
+		DrawablePhysicalStop::~DrawablePhysicalStop ()
+		{
+		}
+		
+		
+		
+		int 
+		DrawablePhysicalStop::getPhysicalStopId () const
+		{
+			return _physicalStopId;
+		}
+		
+		
+		const std::string& 
+		DrawablePhysicalStop::getName () const
+		{
+			return _name;
+		}
+		
+		
+		const Point2D& 
+		DrawablePhysicalStop::getPoint () const
+		{
+			return _point;
+		}
+		
+		
+		
+		void 
+		DrawablePhysicalStop::prepare (Map& map)
+		{
+			_point = map.toOutputFrame (_point);
+		}
+		
+		
+		
+		
+		
+	}
 }
 

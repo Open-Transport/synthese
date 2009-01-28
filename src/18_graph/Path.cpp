@@ -21,15 +21,13 @@
 */
 
 #include "Path.h"
-
-#include "ConnectionPlace.h"
+#include "PathGroup.h"
 #include "Edge.h"
 #include "Vertex.h"
 #include "Service.h"
-#include "Road.h"
 #include "Exception.h"
-
 #include "Conversion.h"
+#include "Hub.h"
 
 #include <assert.h>
 
@@ -37,18 +35,18 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace messages;
 	using namespace util;
 	using namespace geometry;
 	using namespace time;
 
-	namespace env
+	namespace graph
 	{
 
 		Path::Path()
-			: Complyer()
+			: RuleUser()
 			, Calendar()
 			, _allDays(false)
+			, _pathGroup(NULL)
 		{
 		}
 		    
@@ -59,12 +57,17 @@ namespace synthese
 
 
 
-		const ServiceSet& 
-		Path::getServices () const
-		{
+		const ServiceSet& Path::getServices(
+		) const {
 			return _services;
 		}
 
+
+
+		const RuleUser* Path::_getParentRuleUser() const
+		{
+			return _pathGroup;
+		}
 
 
 		const Service* Path::getService(
@@ -183,13 +186,6 @@ namespace synthese
 			if (insertionPosition != _edges.end())
 				edge->setNextInPath(*insertionPosition);
 
-			// Chaining departure/arrival
-			ConnectionPlace::ConnectionType neededConnectionTypeToStep(
-				edge->getParentPath ()->isRoad ()
-				? ConnectionPlace::CONNECTION_TYPE_ROADROAD 
-				: ConnectionPlace::CONNECTION_TYPE_LINELINE
-			);
-
 			// Connection Links before the new edge
 			const Edge* oldNormalEdge((insertionPosition == _edges.begin()) ? NULL : (*(insertionPosition-1))->getFollowingArrivalForFineSteppingOnly());
 			const Edge* oldConnectionEdge((insertionPosition == _edges.begin()) ? NULL : (*(insertionPosition-1))->getFollowingConnectionArrival());
@@ -222,10 +218,10 @@ namespace synthese
 
 					// Chain following connecting arrivals
 					if(	currentEdge->getFollowingConnectionArrival () == oldConnectionEdge
-						&& edge->getConnectionPlace()
-						&& edge->getConnectionPlace()->getConnectionType () >= neededConnectionTypeToStep
+						&& edge->getPlace()
+						&& edge->getPlace()->getScore() > 0
 					){
-							currentEdge->setFollowingConnectionArrival (edge);
+						currentEdge->setFollowingConnectionArrival (edge);
 					} 
 				}
 
@@ -240,8 +236,8 @@ namespace synthese
 
 					// Chain previous connecting departures
 					if(	edge->getPreviousConnectionDeparture () == NULL
-						&& currentEdge->getConnectionPlace()
-						&& currentEdge->getConnectionPlace()->getConnectionType () >= neededConnectionTypeToStep
+						&& currentEdge->getPlace()
+						&& currentEdge->getPlace()->getScore() > 0
 					){
 							edge->setPreviousConnectionDeparture (currentEdge);
 					}
@@ -280,8 +276,8 @@ namespace synthese
 
 					// Chain following connecting arrivals
 					if(	currentEdge->getPreviousConnectionDeparture() == oldConnectionEdge
-						&& edge->getConnectionPlace()
-						&& edge->getConnectionPlace()->getConnectionType () >= neededConnectionTypeToStep
+						&& edge->getPlace()
+						&& edge->getPlace()->getScore() > 0
 					){
 							currentEdge->setPreviousConnectionDeparture(edge);
 					} 
@@ -298,8 +294,8 @@ namespace synthese
 
 					// Chain previous connecting departures
 					if(	edge->getFollowingConnectionArrival() == NULL
-						&& currentEdge->getConnectionPlace()
-						&& currentEdge->getConnectionPlace()->getConnectionType () >= neededConnectionTypeToStep
+						&& currentEdge->getPlace()
+						&& currentEdge->getPlace()->getScore() > 0
 					){
 							edge->setFollowingConnectionArrival(currentEdge);
 					}

@@ -137,7 +137,11 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Unlink(
 			Address* obj
 		){
-			AddressablePlace* place(const_cast<AddressablePlace*>(obj->getPlace()));
+			AddressablePlace* place(
+				const_cast<AddressablePlace*>(
+					static_cast<const AddressablePlace*>(
+						obj->getPlace()
+			)	)	);
 			if (place != NULL)
 			{
 //				place->removeAddress(obj);

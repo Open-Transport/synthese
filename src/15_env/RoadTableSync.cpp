@@ -26,10 +26,6 @@
 
 #include "CityTableSync.h"
 #include "FareTableSync.h"
-#include "BikeComplianceTableSync.h"
-#include "HandicappedComplianceTableSync.h"
-#include "PedestrianComplianceTableSync.h"
-#include "ReservationRuleTableSync.h"
 
 #include "DBModule.h"
 #include "SQLiteResult.h"
@@ -112,20 +108,20 @@ namespace synthese
 				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 
 				// Fare
-				uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));
-				object->setFare(FareTableSync::Get (fareId, env, linkLevel));
+// 				uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));
+// 				object->setFare(FareTableSync::Get (fareId, env, linkLevel));
 
-				uid bikeComplianceId (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID));
-				object->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel));
+// 				uid bikeComplianceId (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID));
+// 				object->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel));
 
-				uid handicappedComplianceId (rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-				object->setHandicappedCompliance(HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel));
+// 				uid handicappedComplianceId (rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+// 				object->setHandicappedCompliance(HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel));
 
-				uid pedestrianComplianceId (rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID));
-				object->setPedestrianCompliance(PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel));
+// 				uid pedestrianComplianceId (rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID));
+// 				object->setPedestrianCompliance(PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel));
 
-				uid reservationRuleId (rows->getLongLong (RoadTableSync::COL_RESERVATIONRULEID));
-				object->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel));
+// 				uid reservationRuleId (rows->getLongLong (RoadTableSync::COL_RESERVATIONRULEID));
+// 				object->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel));
 
 
 				// Links to the loaded object

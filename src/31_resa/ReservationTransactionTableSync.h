@@ -34,7 +34,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		class Service;
 	}
@@ -83,7 +83,7 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				const env::Service* service
+				const util::RegistryKeyType serviceId
 				, const time::Date& originDate
 				, bool withCancelled
 				, int first = 0

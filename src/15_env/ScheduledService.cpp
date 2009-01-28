@@ -23,7 +23,6 @@
 #include "ScheduledService.h"
 #include "Path.h"
 #include "Edge.h"
-#include "ReservationRule.h"
 #include "Registry.h"
 
 using namespace std;
@@ -32,6 +31,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace time;
+	using namespace graph;
 
 	namespace util
 	{
@@ -73,7 +73,8 @@ namespace synthese
 
 
 		ServicePointer ScheduledService::getFromPresenceTime(
-			AccessDirection method
+			AccessDirection method,
+			UserClassCode userClass
 			, const Edge* edge
 			, const time::DateTime& presenceDateTime
 			, const time::DateTime& computingTime
@@ -82,7 +83,7 @@ namespace synthese
 		) const {
 
 			// Initializations
-			ServicePointer ptr(method, edge);
+			ServicePointer ptr(method, userClass, edge);
 			ptr.setService(this);
 			DateTime actualTime(presenceDateTime);
 			Schedule schedule;
@@ -93,13 +94,13 @@ namespace synthese
 			{
 				schedule = _departureSchedules.at(edgeIndex);
 				if (presenceDateTime.getHour() > schedule.getHour())
-					return ServicePointer(DEPARTURE_TO_ARRIVAL);
+					return ServicePointer(DEPARTURE_TO_ARRIVAL, userClass);
 			}
 			if (method == ARRIVAL_TO_DEPARTURE)
 			{
 				schedule = _arrivalSchedules.at(edgeIndex);
 				if (presenceDateTime.getHour() < schedule.getHour())
-					return ServicePointer(ARRIVAL_TO_DEPARTURE);
+					return ServicePointer(ARRIVAL_TO_DEPARTURE, userClass);
 			}
 			actualTime.setHour(schedule.getHour());
 			ptr.setActualTime(actualTime);
@@ -112,13 +113,13 @@ namespace synthese
 
 			// Date control
 			if (!isActive(originDateTime.getDate()))
-				return ServicePointer(method);
+				return ServicePointer(method, userClass);
 
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
 				if (!ptr.isReservationRuleCompliant(computingTime))
-					return ServicePointer(method);
+					return ServicePointer(method, userClass);
 			}
 			else
 			{

@@ -30,17 +30,18 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "ReservationRule.h"
+#include "ReservationContact.h"
 #include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		/** ReservationRule table synchronizer.
+		/** Reservation contact table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class ReservationRuleTableSync : public db::SQLiteRegistryTableSyncTemplate<ReservationRuleTableSync,ReservationRule>
+		class ReservationContactTableSync
+		:	public db::SQLiteRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>
 		{
 		public:
 			static const std::string COL_TYPE;
@@ -56,7 +57,7 @@ namespace synthese
 			static const std::string COL_WEBSITEURL;
 
 
-			ReservationRuleTableSync();
+			ReservationContactTableSync();
 
 
 			/** ReservationRule search.
@@ -78,4 +79,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_ReservationRuleTableSync_H__
-

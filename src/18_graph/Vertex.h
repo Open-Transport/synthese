@@ -30,10 +30,9 @@
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
-		class AddressablePlace;
-		class ConnectionPlace;
+		class Hub;
 		class Edge;
 		class Path;
 
@@ -41,7 +40,7 @@ namespace synthese
 
 			A vertex is the abstract graph node used for route planning.
 			A vertex is necessarily connected to its corresponding path.
-		@ingroup m35
+			@ingroup m35
 		*/
 		class Vertex
 		:	public geometry::Point2D,
@@ -50,18 +49,19 @@ namespace synthese
 		public:
 			typedef std::set<const Edge*> Edges;
 
-		private:
-
-			const AddressablePlace* _addressablePlace;
+		protected:
+			const Hub*	_place;
 
 			Edges _departureEdges; //!< Departure edges from this physical stop
 			Edges _arrivalEdges; //!< Arrival edges to this physical stop
 
 		protected:
 
-			Vertex (const AddressablePlace* place,
+			Vertex(
+				const Hub* place,
 				double x = UNKNOWN_VALUE,
-				double y = UNKNOWN_VALUE);
+				double y = UNKNOWN_VALUE
+			);
 
 		public:
 
@@ -70,15 +70,14 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const AddressablePlace*		getPlace ()				const;  
-				const ConnectionPlace*		getConnectionPlace ()	const;  
-				const Edges&				getDepartureEdges ()	const;
-				const Edges&				getArrivalEdges ()		const;
+				const Hub*		getPlace ()				const;  
+				const Edges&	getDepartureEdges ()	const;
+				const Edges&	getArrivalEdges ()		const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void					setPlace(const AddressablePlace* place);
+				void			setPlace(const Hub* place);
 			//@}
 
 
@@ -93,10 +92,9 @@ namespace synthese
 			//@{
 				virtual bool isAddress () const = 0;
 				virtual bool isPhysicalStop () const = 0;
-				virtual bool isConnectionAllowed() const = 0;
 			//@}
 		};
 	}
 }
 
-#endif 	    
+#endif

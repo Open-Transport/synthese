@@ -27,6 +27,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace graph;
 
 	namespace env
 	{

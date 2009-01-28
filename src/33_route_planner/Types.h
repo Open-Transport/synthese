@@ -31,9 +31,13 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
-		class Journey;
+		class PublicTransportStopZoneConnectionPlace;
 		class Place;
+	}
+	
+	namespace graph
+	{
+		class Journey;
 	}
 
 	namespace routeplanner
@@ -43,8 +47,8 @@ namespace synthese
 			@{
 		*/
 
-		typedef std::vector<env::Journey*>			JourneyBoardJourneys;
-		typedef std::vector<const env::ConnectionPlace*>	JourneyBoardPlaces;
+		typedef std::vector<graph::Journey*>			JourneyBoardJourneys;
+		typedef std::vector<const env::PublicTransportStopZoneConnectionPlace*>	JourneyBoardPlaces;
 
 		struct RoutePlannerResult
 		{

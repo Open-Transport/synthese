@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_ForcedDestinationsArrivalDepartureTableGenerator_H
 #define SYNTHESE_ForcedDestinationsArrivalDepartureTableGenerator_H
 
-#include "34_departures_table/ArrivalDepartureTableGenerator.h"
-
-#include "01_util/UId.h"
+#include "ArrivalDepartureTableGenerator.h"
+#include "UId.h"
 
 namespace synthese
 {
@@ -37,7 +36,8 @@ namespace synthese
 	namespace departurestable
 	{
 
-		class ForcedDestinationsArrivalDepartureTableGenerator : public ArrivalDepartureTableGenerator
+		class ForcedDestinationsArrivalDepartureTableGenerator
+		:	public ArrivalDepartureTableGenerator
 		{
 		public:
 			typedef std::map<uid, const env::PublicTransportStopZoneConnectionPlace*> ForcedDestinationsSet;

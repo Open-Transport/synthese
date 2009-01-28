@@ -41,6 +41,7 @@ namespace synthese
 {
 	using namespace env;
 	using namespace time;
+	using namespace graph;
 
 	namespace timetables
 	{
@@ -61,7 +62,7 @@ namespace synthese
 				Path::Edges::const_iterator itEdge2;
 				for (itEdge2 = itEdge; itEdge2 != edges.end(); ++itEdge2)
 				{
-					if(	(*itEdge2)->getFromVertex()->getConnectionPlace()->getKey() == itRow->getPlace()->getKey()
+					if(	(*itEdge2)->getFromVertex()->getPlace() == itRow->getPlace()
 						&&(	(*itEdge2)->isDeparture() == itRow->getIsDeparture()
 							|| (*itEdge2)->isArrival() == itRow->getIsArrival()
 						)
@@ -148,12 +149,11 @@ namespace synthese
 		{
 			assert(col == *this);
 
-			if( _line->getOrigin()->getPlace()->getKey() != col._line->getOrigin()->getPlace()->getKey()
+			if( _line->getOrigin()->getPlace() != col._line->getOrigin()->getPlace()
 			){
 				_originType = Indetermine;
 			}
-			if(	_line->getDestination()->getPlace()->getKey() !=
-				 col._line->getDestination()->getPlace()->getKey()
+			if(	_line->getDestination()->getPlace() != col._line->getDestination()->getPlace()
 			){
 				_destinationType = Indetermine;
 			}

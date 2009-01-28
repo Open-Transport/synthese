@@ -23,13 +23,13 @@
 #ifndef SYNTHESE_ENV_SERVICE_H
 #define SYNTHESE_ENV_SERVICE_H
 
-#include "Complyer.h"
 #include "ServicePointer.h"
-
-#include <string>
-
 #include "Schedule.h"
 #include "Registrable.h"
+#include "Registry.h"
+#include "RuleUser.h"
+
+#include <string>
 
 namespace synthese
 {
@@ -39,7 +39,7 @@ namespace synthese
 		class DateTime;
 	}
 
-	namespace env
+	namespace graph
 	{
 		class Path;
 
@@ -60,10 +60,10 @@ namespace synthese
 			but also self-provided by the traveller himself 
 			(walking, cycling...).
 
-			@ingroup m35
+			@ingroup m18
 		*/
 		class Service
-		:	public Complyer,
+		:	public RuleUser,
 			public virtual util::Registrable		
 		{
 		public:
@@ -72,6 +72,9 @@ namespace synthese
 			std::string				_serviceNumber;
 			util::RegistryKeyType	_pathId;
 			Path*					_path;
+			
+		protected:
+			virtual const RuleUser* _getParentRuleUser() const;
 
 		public:
 
@@ -153,7 +156,8 @@ namespace synthese
 					@warning The service index is unknown in the generated ServicePointer.					
 				*/
 				virtual ServicePointer getFromPresenceTime(
-					AccessDirection method
+					AccessDirection method,
+					UserClassCode userClass
 					, const Edge* edge
 					, const time::DateTime& presenceDateTime
 					, const time::DateTime& computingTime

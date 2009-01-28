@@ -25,17 +25,20 @@
 #ifndef SYNTHESE_JourneyBoardInterfacePage_H__
 #define SYNTHESE_JourneyBoardInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 #include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		class Journey;
+	}
+	
+	namespace env
+	{
 		class Place;
 	}
 
@@ -83,7 +86,7 @@ namespace synthese
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
 				, int n
-				, const env::Journey* journey
+				, const graph::Journey* journey
 				, const env::Place* departurePlace
 				, const env::Place* arrivalPlace
 				, boost::logic::tribool handicappedFilter

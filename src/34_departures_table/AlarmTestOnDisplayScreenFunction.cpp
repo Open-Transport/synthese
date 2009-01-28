@@ -58,6 +58,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace time;
 	using namespace security;
+	using namespace graph;
 
 	namespace util
 	{
@@ -118,7 +119,7 @@ namespace synthese
 
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
-					ServicePointer sp(DEPARTURE_TO_ARRIVAL,lineStop.get());
+					ServicePointer sp(DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN, lineStop.get());
 					sp.setActualTime(d);
 					DeparturesTableElement dte(sp, false);
 					displayedObject.map.insert(make_pair(dte, places));

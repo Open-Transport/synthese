@@ -23,16 +23,16 @@
 #ifndef SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 #define SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 
-#include "15_env/Types.h"
+#include "GraphTypes.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 #include <map>
 
 namespace synthese
 {
 
-	namespace env
+	namespace graph
 	{
 		class Vertex;
 		class ServiceUse;
@@ -49,9 +49,9 @@ namespace synthese
 		 private:
 
 
-			typedef std::map<const env::Vertex*, time::DateTime> TimeMap;
+			typedef std::map<const graph::Vertex*, time::DateTime> TimeMap;
 		    
-			const AccessDirection _accessDirection;
+			const graph::AccessDirection _accessDirection;
 			TimeMap _bestTimeMap;
 
 			time::DateTime::ComparisonOperator	_comparison;
@@ -62,8 +62,8 @@ namespace synthese
 
 
 			BestVertexReachesMap(
-				AccessDirection accessDirection
-				, bool optim
+				graph::AccessDirection accessDirection,
+				bool optim
 			);
 			~BestVertexReachesMap();
 
@@ -75,19 +75,19 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				bool contains (const env::Vertex* vertex) const;
+				bool contains (const graph::Vertex* vertex) const;
 
 				const time::DateTime& getBestTime(
-					const env::Vertex* vertex
+					const graph::Vertex* vertex
 					, const time::DateTime& defaultValue
 				) const;
 
 				bool isUseless(
-					const env::Vertex* vertex
+					const graph::Vertex* vertex
 					, const time::DateTime& dateTime
 				) const;
 				bool mustBeCleared(
-					const env::Vertex* vertex
+					const graph::Vertex* vertex
 					, const time::DateTime& dateTime
 					, const time::DateTime& bestEndTime
 				) const;
@@ -98,10 +98,10 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
-				void insert(const env::ServiceUse& journeyLeg);
+				void insert(const graph::ServiceUse& journeyLeg);
 			    
 				void insert(
-					const env::Vertex* vertex
+					const graph::Vertex* vertex
 					, const time::DateTime& dateTime
 					, bool propagateInConnectionPlace = true
 				);

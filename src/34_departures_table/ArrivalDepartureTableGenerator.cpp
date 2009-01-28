@@ -20,12 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/LineStop.h"
-#include "15_env/Line.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
+#include "LineStop.h"
+#include "Line.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
 
-#include "34_departures_table/ArrivalDepartureTableGenerator.h"
+#include "ArrivalDepartureTableGenerator.h"
 
 using namespace std;
 
@@ -33,6 +33,7 @@ namespace synthese
 {
 	using namespace env;
 	using namespace time;
+	using namespace graph;
 
 	namespace departurestable
 	{
@@ -65,9 +66,16 @@ namespace synthese
 		{
 			/** - If a forbidden place is served, the the line is not allowed */
 			if (!_forbiddenPlaces.empty())
-				for (const LineStop* curLinestop = linestop; curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrivalForFineSteppingOnly())
-					if (_forbiddenPlaces.find(curLinestop->getConnectionPlace()->getKey()) != _forbiddenPlaces.end())
+				for(const LineStop* curLinestop(linestop);
+					curLinestop != NULL;
+					curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
+				){
+					if(	_forbiddenPlaces.find(curLinestop->getPhysicalStop()->getConnectionPlace()->getKey()) !=
+						_forbiddenPlaces.end()
+					){
 						return false;
+					}
+				}
 
 			return 	linestop->getLine()->getUseInDepartureBoards()
 				&&	_lineFilter.find(linestop->getLine()->getKey()) == _lineFilter.end()
@@ -91,16 +99,27 @@ namespace synthese
 
 			ActualDisplayedArrivalsList arrivals;
 			set<const PublicTransportStopZoneConnectionPlace*> encounteredPlaces;
-			const PublicTransportStopZoneConnectionPlace* destinationPlace = static_cast<const Line*>(servicePointer.getEdge()->getParentPath())->getDestination()->getConnectionPlace();
-			for (const LineStop* curLinestop = static_cast<const LineStop*>(servicePointer.getEdge()); curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrivalForFineSteppingOnly())
-			{
-				const PublicTransportStopZoneConnectionPlace* place(curLinestop->getConnectionPlace());
+			const PublicTransportStopZoneConnectionPlace* destinationPlace(
+				static_cast<const Line*>(
+					servicePointer.getEdge()->getParentPath()
+				)->getDestination()->getConnectionPlace()
+			);
+			for(const LineStop* curLinestop = static_cast<const LineStop*>(servicePointer.getEdge());
+				curLinestop != NULL;
+				curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
+			){
+				const PublicTransportStopZoneConnectionPlace* place(
+					curLinestop->getPhysicalStop()->getConnectionPlace()
+				);
 				
-				if(		_displayedPlaces.find(place->getKey()) != _displayedPlaces.end()
-					&&	encounteredPlaces.find(place) == encounteredPlaces.end()	// If the place must be displayed according to the display rules (only once per place)
-					&&	place != destinationPlace
-				|| curLinestop->getFollowingArrivalForFineSteppingOnly() == NULL		// or if the place is the terminus
-				|| curLinestop == servicePointer.getEdge()			// or if the place is the origin
+				if(	(	_displayedPlaces.find(place->getKey()) != _displayedPlaces.end() &&
+						// If the place must be displayed according to the display rules (only once per place)
+						encounteredPlaces.find(place) == encounteredPlaces.end() &&
+						place != destinationPlace
+					)||
+					// or if the place is the terminus
+					curLinestop->getFollowingArrivalForFineSteppingOnly() == NULL ||
+					curLinestop == servicePointer.getEdge()			// or if the place is the origin
 				){
 					arrivals.push_back(place);
 					encounteredPlaces.insert(place);

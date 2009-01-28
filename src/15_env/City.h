@@ -37,8 +37,7 @@ namespace synthese
 {
 	namespace env
 	{
-
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 		class PlaceAlias;
 		class PublicPlace;
 		class Road;
@@ -60,8 +59,7 @@ namespace synthese
 			typedef util::Registry<City>	Registry;
 
 		private:
-
-			lexmatcher::LexicalMatcher<const ConnectionPlace*> _connectionPlacesMatcher;
+			lexmatcher::LexicalMatcher<const PublicTransportStopZoneConnectionPlace*> _connectionPlacesMatcher;
 			lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
 			lexmatcher::LexicalMatcher<const Road*> _roadsMatcher;
 			lexmatcher::LexicalMatcher<const PlaceAlias*> _placeAliasesMatcher;
@@ -85,8 +83,8 @@ namespace synthese
 				const std::string& getCode () const { return _code; }
 				void setCode (const std::string& code) { _code = code; }
 
-				lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher ();
-				const lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher () const;
+				lexmatcher::LexicalMatcher<const PublicTransportStopZoneConnectionPlace*>& getConnectionPlacesMatcher ();
+				const lexmatcher::LexicalMatcher<const PublicTransportStopZoneConnectionPlace*>& getConnectionPlacesMatcher () const;
 
 				lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher ();
 				const lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher () const;
@@ -108,12 +106,13 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				void getImmediateVertices (VertexAccessMap& result, 
-							   const AccessDirection& accessDirection,
-							   const AccessParameters& accessParameters,
-							   SearchAddresses returnAddresses
-							   , SearchPhysicalStops returnPhysicalStops
-							   , const Vertex* origin = NULL
+				void getImmediateVertices(
+					graph::VertexAccessMap& result, 
+					const graph::AccessDirection& accessDirection,
+					const AccessParameters& accessParameters,
+					SearchAddresses returnAddresses
+					, SearchPhysicalStops returnPhysicalStops
+					, const graph::Vertex* origin = NULL
 				) const;
 			    
 				std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;

@@ -29,9 +29,8 @@
 #include <vector>
 
 #include "Registrable.h"
-
+#include "GraphTypes.h"
 #include "15_env/Types.h"
-
 #include "IsoBarycentre.h"
 
 namespace synthese
@@ -41,14 +40,18 @@ namespace synthese
 		class Point2D;
 	}
 
+	namespace graph
+	{
+		class VertexAccessMap;
+		class Vertex;
+		struct VertexAccess;
+	}
+
 	namespace env
 	{
 		class AccessParameters;
 		class City;
-		class Vertex;
-		struct VertexAccess;
-		class VertexAccessMap;
-
+	
 		//////////////////////////////////////////////////////////////////////////
 		/// Place base class.
 		///
@@ -124,21 +127,21 @@ namespace synthese
 			//! @name Query methods
 			//@{
 
-			virtual VertexAccess getVertexAccess (
-				const AccessDirection& accessDirection
+			virtual graph::VertexAccess getVertexAccess (
+				const graph::AccessDirection& accessDirection
 				, const AccessParameters& accessParameters
-				, const Vertex* destination
-				, const Vertex* origin
+				, const graph::Vertex* destination
+				, const graph::Vertex* origin
 			) const;
 
 
 			virtual void getImmediateVertices(
-				VertexAccessMap& result
-				, const AccessDirection& accessDirection
+				graph::VertexAccessMap& result
+				, const graph::AccessDirection& accessDirection
 				, const AccessParameters& accessParameters
 				, SearchAddresses returnAddresses
 				, SearchPhysicalStops returnPhysicalStops
-				, const Vertex* origin = NULL
+				, const graph::Vertex* origin = NULL
 			) const = 0;
 
 			virtual const geometry::Point2D& getPoint() const = 0;

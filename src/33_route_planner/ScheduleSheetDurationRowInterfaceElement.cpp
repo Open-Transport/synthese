@@ -20,14 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/ScheduleSheetDurationRowInterfaceElement.h"
+#include "ScheduleSheetDurationRowInterfaceElement.h"
 #include "33_route_planner/Types.h"
 
-#include "15_env/Journey.h"
+#include "Journey.h"
 
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/DurationInterfacePage.h"
-#include "11_interfaces/Interface.h"
+#include "ValueElementList.h"
+#include "DurationInterfacePage.h"
+#include "Interface.h"
 
 
 using namespace std;

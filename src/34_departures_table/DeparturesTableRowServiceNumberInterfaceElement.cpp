@@ -21,11 +21,9 @@
 */
 
 #include "34_departures_table/Types.h"
-#include "34_departures_table/DeparturesTableRowServiceNumberInterfaceElement.h"
-
-#include "15_env/Service.h"
-
-#include "11_interfaces/ValueElementList.h"
+#include "DeparturesTableRowServiceNumberInterfaceElement.h"
+#include "Service.h"
+#include "ValueElementList.h"
 
 using namespace std;
 

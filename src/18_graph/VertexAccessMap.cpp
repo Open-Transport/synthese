@@ -27,8 +27,7 @@
 
 #include "Vertex.h"
 #include "Edge.h"
-#include "Line.h"
-#include "ConnectionPlace.h"
+#include "Hub.h"
 
 #include <assert.h>
 #include <set>
@@ -39,7 +38,7 @@ namespace synthese
 {
 	using namespace geometry;
 
-	namespace env
+	namespace graph
 	{
 
 
@@ -99,10 +98,10 @@ namespace synthese
 
 
 
-		void 
-		VertexAccessMap::insert (const Vertex* vertex, 
-					 const VertexAccess& vertexAccess)
-		{
+		void VertexAccessMap::insert(
+			const Vertex* vertex,
+			const VertexAccess& vertexAccess
+		){
 			VamMap::iterator it(_map.find(vertex));
 
 			if (it == _map.end())
@@ -113,7 +112,7 @@ namespace synthese
 				_isobarycenterMaxSquareDistanceUpToDate = false;
 
 				// Updating the paths which needs fine stepping set
-				if (!vertex->isConnectionAllowed())
+				if (!vertex->getPlace()->getScore() > 0)
 				{
 					// Departure vertices
 					for (set<const Edge*>::const_iterator itEdge(vertex->getDepartureEdges().begin());

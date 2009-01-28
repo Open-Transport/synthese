@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "Place.h"
+#include "Hub.h"
 #include "15_env/Types.h"
 
 namespace synthese
@@ -41,7 +42,9 @@ namespace synthese
 
 			@ingroup m35
 		*/
-		class AddressablePlace : public Place
+		class AddressablePlace
+		:	public Place,
+			public graph::Hub
 		{
 		protected:
 			Addresses _addresses; 
@@ -66,12 +69,12 @@ namespace synthese
 			//! @name Query methods
 			//@{
 				virtual void getImmediateVertices (
-					VertexAccessMap& result, 
-					const AccessDirection& accessDirection,
+					graph::VertexAccessMap& result, 
+					const graph::AccessDirection& accessDirection,
 					const AccessParameters& accessParameters
 					, SearchAddresses returnAddresses
 					, SearchPhysicalStops returnPhysicalStops
-					, const Vertex* origin = NULL
+					, const graph::Vertex* origin = NULL
 				) const;
 
 				virtual const geometry::Point2D& getPoint() const;
@@ -90,6 +93,8 @@ namespace synthese
 				 */
 				virtual void addAddress (const Address* address);
 			//@}
+			
+			static const AddressablePlace* GetPlace(const graph::Hub* hub);
 		};
 	}
 }

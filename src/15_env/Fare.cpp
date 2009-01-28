@@ -39,7 +39,6 @@ namespace synthese
 	{
 		Fare::Fare(RegistryKeyType key)
 		: Registrable(key)
-		, Compliance(boost::logic::indeterminate, UNKNOWN_VALUE)
 		{
 		}
 

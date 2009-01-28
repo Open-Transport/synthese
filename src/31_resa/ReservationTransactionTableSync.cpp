@@ -24,17 +24,18 @@
 
 #include "ReservationTransactionTableSync.h"
 #include "ReservationTransaction.h"
-#include "31_resa/ReservationTableSync.h"
-#include "31_resa/ResaModule.h"
+#include "ReservationTableSync.h"
+#include "ResaModule.h"
+#include "UseRules.h"
 
-#include "15_env/Service.h"
+#include "Service.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 #include <boost/foreach.hpp>
 
@@ -162,7 +163,7 @@ namespace synthese
 
 		void ReservationTransactionTableSync::Search(
 			Env& env,
-			const env::Service* service
+			util::RegistryKeyType serviceId
 			, const time::Date& originDate
 			, bool withCancelled
 			, int first /*= 0*/
@@ -176,7 +177,7 @@ namespace synthese
 				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
 				<< " WHERE " 
-				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << Conversion::ToString(service->getKey())
+				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << Conversion::ToString(serviceId)
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << originDate.toSQLString(false) << " 00:00'"
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << originDate.toSQLString(false) << " 23:59'";
 			if (!withCancelled)

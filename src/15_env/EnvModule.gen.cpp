@@ -12,15 +12,11 @@ synthese::env::LineShortNameInterfaceElement::integrate();
 synthese::env::LineImageURLInterfaceElement::integrate();
 
 synthese::env::FareTableSync::integrate();
-synthese::env::BikeComplianceTableSync::integrate();
-synthese::env::HandicappedComplianceTableSync::integrate();
-synthese::env::PedestrianComplianceTableSync::integrate();
-synthese::env::ReservationRuleTableSync::integrate();
+synthese::env::ReservationContactTableSync::integrate();
 synthese::env::RollingStockTableSync::integrate();
 
 synthese::env::CityTableSync::integrate();
 synthese::env::TransportNetworkTableSync::integrate();
-synthese::env::AxisTableSync::integrate();
 
 synthese::env::CommercialLineTableSync::integrate();
 
@@ -61,17 +57,13 @@ synthese::util::Env::Integrate<synthese::env::PhysicalStop>();
 synthese::util::Env::Integrate<synthese::env::Line>();
 synthese::util::Env::Integrate<synthese::env::Road>();
 synthese::util::Env::Integrate<synthese::env::Address>();
-synthese::util::Env::Integrate<synthese::env::Axis>();
-synthese::util::Env::Integrate<synthese::env::BikeCompliance>();
 synthese::util::Env::Integrate<synthese::env::Crossing>();
 synthese::util::Env::Integrate<synthese::env::LineStop>();
-synthese::util::Env::Integrate<synthese::env::HandicappedCompliance>();
 synthese::util::Env::Integrate<synthese::env::NonConcurrencyRule>();
 synthese::util::Env::Integrate<synthese::env::TransportNetwork>();
 synthese::util::Env::Integrate<synthese::env::PublicTransportStopZoneConnectionPlace>();
-synthese::util::Env::Integrate<synthese::env::ReservationRule>();
+synthese::util::Env::Integrate<synthese::env::ReservationContact>();
 synthese::util::Env::Integrate<synthese::env::CommercialLine>();
-synthese::util::Env::Integrate<synthese::env::PedestrianCompliance>();
 synthese::util::Env::Integrate<synthese::env::RollingStock>();
 synthese::util::Env::Integrate<synthese::env::RoadChunk>();
 synthese::util::Env::Integrate<synthese::env::City>();

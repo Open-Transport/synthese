@@ -23,10 +23,9 @@
 #ifndef SYNTHESE_JourneyBoardServiceCellInterfacePage_H__
 #define SYNTHESE_JourneyBoardServiceCellInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-#include "04_time/DateTime.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "DateTime.h"
+#include "FactorableTemplate.h"
 
 #include <boost/logic/tribool.hpp>
 
@@ -39,7 +38,11 @@ namespace synthese
 
 	namespace env
 	{
-		class ReservationRule;
+		class ReservationContact;
+	}
+	
+	namespace graph
+	{
 		class ServiceUse;
 	}
 
@@ -93,7 +96,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream
-				, const env::ServiceUse& serviceUse
+				, const graph::ServiceUse& serviceUse
 				, int continuousServiceRange
 				, boost::logic::tribool handicappedFilterStatus
 				, boost::logic::tribool bikeFilterStatus

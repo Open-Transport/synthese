@@ -22,104 +22,105 @@
 
 #include "TemporaryPlace.h"
 
-#include "15_env/Address.h"
-#include "15_env/Road.h"
-#include "15_env/VertexAccessMap.h"
-#include "15_env/AccessParameters.h"
-
+#include "Address.h"
+#include "Road.h"
+#include "VertexAccessMap.h"
+#include "AccessParameters.h"
 
 namespace synthese
 {
-namespace env
-{
-
-
-TemporaryPlace::TemporaryPlace (const Road* road, double metricOffset)
-    : Place ("", road->getCity ())
-    , _road (road)
-    , _metricOffset (metricOffset)
-{
-}
-
-
-
-TemporaryPlace::~TemporaryPlace ()
-{
-}
-
-
-const Road* 
-TemporaryPlace::getRoad () const
-{
-    return _road;
-}
-
-
-
-
-double 
-TemporaryPlace::getMetricOffset () const
-{
-    return _metricOffset;
-}
-
-
-
-
-
-
-
-VertexAccess 
-TemporaryPlace::getVertexAccess (const AccessDirection& accessDirection,
-				 const AccessParameters& accessParameters,
-				 const Vertex* destination,
-				 const Vertex* origin) const
-{
-    VertexAccess access(accessDirection);
-    access.approachDistance = _metricOffset - ((Address*) destination)->getMetricOffset ();
-    access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
-	return access;
-}
-    
-
-
-
-
-
-
-
-void
-TemporaryPlace::getImmediateVertices (VertexAccessMap& result, 
-				      const AccessDirection& accessDirection,
-				      const AccessParameters& accessParameters,
-				      const Vertex* origin,
-				      bool returnAddresses,
-				      bool returnPhysicalStops) const
-{
-    // Find closest addresses on both sides and run search from here.
-    const Address* closestBefore = _road->findClosestAddressBefore (_metricOffset);
-    const Address* closestAfter = _road->findClosestAddressAfter (_metricOffset);
-
-    if (closestBefore != 0)
-    {
-		VertexAccess access(accessDirection);
-		access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
-		access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
+	using namespace graph;
+	
+	namespace env
+	{
+		TemporaryPlace::TemporaryPlace(
+			const Road* road,
+			double metricOffset
+		):	Place ("", road->getCity()),
+			_road (road),
+			_metricOffset (metricOffset)
+		{
+		}
 		
-		result.insert (closestBefore, access);
-    }
-
-    if ( (closestAfter != 0) && (closestAfter != closestBefore) )
-    {
-		VertexAccess access(accessDirection);
-		access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
-		access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
 		
-		result.insert (closestAfter, access);
-    }
-}
-
-
+		
+		TemporaryPlace::~TemporaryPlace ()
+		{
+		}
+		
+		
+		const Road* 
+		TemporaryPlace::getRoad () const
+		{
+			return _road;
+		}
+		
+		
+		
+		
+		double 
+		TemporaryPlace::getMetricOffset () const
+		{
+			return _metricOffset;
+		}
+		
+		
+		
+		
+		
+		
+		
+		VertexAccess 
+		TemporaryPlace::getVertexAccess (const AccessDirection& accessDirection,
+						const AccessParameters& accessParameters,
+						const Vertex* destination,
+						const Vertex* origin) const
+		{
+			VertexAccess access(accessDirection);
+			access.approachDistance = _metricOffset - ((Address*) destination)->getMetricOffset ();
+			access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
+			return access;
+		}
+			
+		
+		
+		
+		
+		
+		
+		
+		void
+		TemporaryPlace::getImmediateVertices (VertexAccessMap& result, 
+							const AccessDirection& accessDirection,
+							const AccessParameters& accessParameters,
+							const Vertex* origin,
+							bool returnAddresses,
+							bool returnPhysicalStops) const
+		{
+			// Find closest addresses on both sides and run search from here.
+			const Address* closestBefore = _road->findClosestAddressBefore (_metricOffset);
+			const Address* closestAfter = _road->findClosestAddressAfter (_metricOffset);
+		
+			if (closestBefore != 0)
+			{
+				VertexAccess access(accessDirection);
+				access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
+				access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
+				
+				result.insert (closestBefore, access);
+			}
+		
+			if ( (closestAfter != 0) && (closestAfter != closestBefore) )
+			{
+				VertexAccess access(accessDirection);
+				access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
+				access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
+				
+				result.insert (closestAfter, access);
+			}
+		}
+		
+	
 
 		uid TemporaryPlace::getId() const
 		{

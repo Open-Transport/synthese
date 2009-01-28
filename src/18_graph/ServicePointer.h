@@ -23,19 +23,19 @@
 #ifndef SYNTHESE_env_ServicePointer_h__
 #define SYNTHESE_env_ServicePointer_h__
 
-#include "04_time/DateTime.h"
-
-#include "15_env/Types.h"
+#include "DateTime.h"
+#include "GraphTypes.h"
+#include "UseRule.h"
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		class Service;
 		class Edge;
 
 		/** Service Pointer class.
-			@ingroup m35
+			@ingroup m18
 
 			A service pointer determinates :
 				- a service
@@ -48,22 +48,28 @@ namespace synthese
 		protected:
 			//! @name Initial parameters
 			//@{
-				AccessDirection				_determinationMethod;
-				const env::Edge*			_edge;
+				AccessDirection		_determinationMethod;
+				const Edge*			_edge;
+				UserClassCode		_userClass;
 			//@}
 
 			//! @name Result elements
 			//@{
-				const Service*				_service;
-				time::DateTime				_originDateTime;
-				time::DateTime				_actualTime;
-				int							_serviceIndex;
+				const Service*		_service;
+				time::DateTime		_originDateTime;
+				time::DateTime		_actualTime;
+				int					_serviceIndex;
+				UseRule				_useRule;
 			//@}
 
 				int							_range;
 
 		public:
-			ServicePointer(AccessDirection method, const env::Edge* edge = NULL);
+			ServicePointer(
+				AccessDirection method,
+				UserClassCode userclass,
+				const Edge* edge = NULL
+			);
 
 			//! @name Setters
 			//@{
@@ -82,6 +88,8 @@ namespace synthese
 				AccessDirection			getMethod()				const;
 				int						getServiceIndex()		const;
 				int						getServiceRange()		const;
+				const UseRule&			getUseRule()			const;
+				UserClassCode			getUserClass()			const;
 			//@}
 
 			//! @name Queries
@@ -100,7 +108,7 @@ namespace synthese
 				virtual bool isReservationRuleCompliant(
 					const time::DateTime& computingDateTime
 				)	const;
-				const env::Edge*	getEdge()															const;
+				const Edge*	getEdge() const;
 			//@}
 
 

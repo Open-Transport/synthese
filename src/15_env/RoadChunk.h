@@ -30,7 +30,6 @@ namespace synthese
 {
 	namespace env
 	{
-
 		class Address;
 		class Road;
 
@@ -45,16 +44,12 @@ namespace synthese
 		///	@ingroup m35
 		//////////////////////////////////////////////////////////////////////////
 		class RoadChunk
-		:	public Edge 
+		:	public graph::Edge
 		{
 		public:
 
 			/// Chosen registry class.
 			typedef util::Registry<RoadChunk>	Registry;
-
-		private:
-
-			Address* _fromAddress;
 
 		public:
 
@@ -70,17 +65,17 @@ namespace synthese
 		  virtual ~RoadChunk ();
 
 
-		  //! @name Getters/Setters
-		  //@{
-		  const Vertex* getFromVertex () const;
-		  double getMetricOffset () const;
+		//! @name Getters/Setters
+		//@{
+			const Address* getFromAddress() const;
+			double getMetricOffset () const;
 			void setFromAddress(Address* fromAddress);
-		  //@}
-		    
+		//@}
+		
 
-		  //! @name Query methods.
-		  //@{
-		  //@}
+		//! @name Query methods.
+		//@{
+		//@}
 
 		};
 

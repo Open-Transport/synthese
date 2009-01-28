@@ -20,14 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/ScheduleSheetLinesListLineInterfaceElement.h"
-#include "33_route_planner/RoutePlanner.h"
-#include "33_route_planner/RoutePlannerSheetLinesCellInterfacePage.h"
+#include "ScheduleSheetLinesListLineInterfaceElement.h"
+#include "RoutePlanner.h"
+#include "RoutePlannerSheetLinesCellInterfacePage.h"
 #include "33_route_planner/Types.h"
 
-#include "30_server/Request.h"
+#include "Request.h"
 
-#include "11_interfaces/Interface.h"
+#include "Interface.h"
 
 using namespace boost;
 using namespace std;

@@ -20,38 +20,33 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/SentAlarm.h"
-#include "17_messages/Types.h"
-
-#include "15_env/Journey.h"
-#include "15_env/ReservationRuleComplyer.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/Path.h"
-#include "15_env/Service.h"
-#include "15_env/ContinuousService.h"
-#include "15_env/ConnectionPlace.h"
-#include "15_env/Vertex.h"
-#include "15_env/Edge.h"
-#include "15_env/Axis.h"
-#include "15_env/VertexAccessMap.h"
-
-#include "04_time/DateTime.h"
+#include "Journey.h"
+#include "UseRule.h"
+#include "Path.h"
+#include "Service.h"
+#include "Vertex.h"
+#include "Edge.h"
+#include "VertexAccessMap.h"
+#include "Hub.h"
+#include "DateTime.h"
 
 #include "01_util/Constants.h"
+
+#include <boost/foreach.hpp>
 
 using namespace boost;
 
 namespace synthese
 {
-	using namespace messages;
 	using namespace time;
 	using namespace geometry;
 
-	namespace env
+	namespace graph
 	{
 
-		Journey::Journey (AccessDirection method)
-			: _continuousServiceRange (UNKNOWN_VALUE)
+		Journey::Journey(
+			AccessDirection method
+		):	_continuousServiceRange (UNKNOWN_VALUE)
 			, _effectiveDuration (0)
 			, _transportConnectionCount (0)
 			, _distance (0)
@@ -103,17 +98,15 @@ namespace synthese
 
 
 
-		const synthese::env::Edge* 
-		Journey::getOrigin() const
-		{
+		const Edge* Journey::getOrigin(
+		) const {
 			return getFirstJourneyLeg ().getDepartureEdge();
 		}
 
 
 
-		const synthese::env::Edge* 
-		Journey::getDestination() const
-		{
+		const Edge* Journey::getDestination(
+		) const {
 			return getLastJourneyLeg ().getArrivalEdge();
 		}
 
@@ -213,77 +206,6 @@ namespace synthese
 			}
 			else
 				_startApproachDuration = journey._startApproachDuration;
-		}
-
-
-
-
-
-		int 
-		Journey::getMaxAlarmLevel () const
-		{
-			DateTime alarmStart(TIME_UNKNOWN);
-			DateTime alarmStop(TIME_UNKNOWN);
-			DateTime now(TIME_CURRENT);
-			int maxAlarmLevel(0);
-		    
-			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
-			{
-				const ServiceUse& leg(*it);
-				const Service* service(leg.getService());
-				bool legIsConnection = (it < _journeyLegs.end() - 2);
-
-					// -- Alarm on origin --
-					// Alarm start = first departure
-					// Alarm stop = last departure
-					alarmStart = leg.getDepartureDateTime();
-					alarmStop = alarmStart;
-				if (service->isContinuous ()) 
-					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
-				
-	/*				if ( leg->getOrigin ()->getFromVertex ()->getConnectionPlace ()
-					 ->hasApplicableAlarm (alarmStart, alarmStop)
-					 && maxAlarmLevel < leg->getOrigin()->getFromVertex ()->
-					 getConnectionPlace ()->getAlarm ()->getLevel () )
-						maxAlarmLevel = leg->getOrigin()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
-	*/			
-				
-
-					// -- Service alarm --
-					// Alarm start = first departure
-					// Alarm stop = last arrival
-					alarmStart = leg.getDepartureDateTime();
-					alarmStop = leg.getArrivalDateTime();
-				if (service->isContinuous ()) 
-					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
-
-	/*				if ( (leg->getService ()->getPath ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
-					 (maxAlarmLevel < leg->getService ()->getPath ()->getAlarm ()->getLevel ()) )
-				{
-						maxAlarmLevel = leg->getService ()->getPath ()->getAlarm ()->getLevel ();
-				}
-	*/			
-					// -- Alarm on arrival --
-					// Alarm start = first arrival
-					// Alarm stop = last arrival if connection, last arrival otherwise
-					alarmStart = leg.getArrivalDateTime();
-					alarmStop = alarmStart;
-					if (legIsConnection)
-				{
-						alarmStop = (it+1)->getDepartureDateTime ();
-				}
-
-				if (service->isContinuous ()) 
-					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
-
-	/*				if ( (leg->getDestination ()->getFromVertex ()->getConnectionPlace ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
-						 (maxAlarmLevel < leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ()) )
-				{
-					maxAlarmLevel = leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
-				}
-	*/			}
-
-				return maxAlarmLevel;
 		}
 
 
@@ -406,32 +328,32 @@ namespace synthese
 			return _journeyLegs.empty();
 		}
 
-		bool Journey::verifyAxisConstraints( const Axis* axis ) const
-		{
-			// Null Axis is allowed
-			if (axis == NULL)
-				return true;
-
-			// Check if axis is allowed.
-			if (!axis->isAllowed())
-				return false;
-			
-			// Check if axis is free
-			if (axis->isFree())
-				return true;
-
-			// Check if current journey is empty
-			if (_journeyLegs.empty())
-				return true;
-
-			// Check axis against already followed axes
-			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
-			{
-				if (it->getEdge()->getParentPath()->getAxis () == axis)
-					return false;
-			}
-			return true;
-		}
+// 		bool Journey::verifyAxisConstraints( const Axis* axis ) const
+// 		{
+// 			// Null Axis is allowed
+// 			if (axis == NULL)
+// 				return true;
+//
+// 			// Check if axis is allowed.
+// 			if (!axis->isAllowed())
+// 				return false;
+// 			
+// 			// Check if axis is free
+// 			if (axis->isFree())
+// 				return true;
+// 
+// 			// Check if current journey is empty
+// 			if (_journeyLegs.empty())
+// 				return true;
+// 
+// 			// Check axis against already followed axes
+// 			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+// 			{
+// 				if (it->getEdge()->getParentPath()->getAxis () == axis)
+// 					return false;
+// 			}
+// 			return true;
+// 		}
 
 		void Journey::setEndApproachDuration(int duration)
 		{
@@ -452,12 +374,12 @@ namespace synthese
 			_startApproachDuration = duration;
 		}
 
-		const env::ServiceUse& Journey::getEndServiceUse() const
+		const ServiceUse& Journey::getEndServiceUse() const
 		{
 			return (this->*_endServiceUseGetter)();
 		}
 
-		const env::ServiceUse& Journey::getStartServiceUse() const
+		const ServiceUse& Journey::getStartServiceUse() const
 		{
 			return (this->*_beginServiceUseGetter)();
 		}
@@ -477,7 +399,7 @@ namespace synthese
 			_setMethod((_method == DEPARTURE_TO_ARRIVAL) ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL);
 		}
 
-		synthese::AccessDirection Journey::getMethod() const
+		AccessDirection Journey::getMethod() const
 		{
 			return _method;
 		}
@@ -492,7 +414,7 @@ namespace synthese
 			if (_endReached)
 				_squareDistanceToEnd = 0;
 			else
-				_squareDistanceToEnd.setFromPoints(vam.getIsobarycenter(), getEndEdge()->getFromVertex()->getConnectionPlace()->getPoint());
+				_squareDistanceToEnd.setFromPoints(vam.getIsobarycenter(), getEndEdge()->getFromVertex()->getPlace()->getPoint());
 		}
 
 		const Edge* Journey::getEndEdge() const
@@ -500,12 +422,12 @@ namespace synthese
 			return (this->*_endEdgeGetter)();
 		}
 
-		time::DateTime Journey::getEndTime() const
+		DateTime Journey::getEndTime() const
 		{
 			return (this->*_endDateTimeGetter)();
 		}
 
-		void Journey::setMinSpeedToEnd( const time::DateTime& dateTime )
+		void Journey::setMinSpeedToEnd( const DateTime& dateTime )
 		{
 			if (_endReached)
 				_minSpeedToEnd = 0;
@@ -518,7 +440,7 @@ namespace synthese
 				_score = _minSpeedToEnd;
 				if (_score < 100)
 					_score = 100;
-				_score /= getEndEdge()->getFromVertex()->getConnectionPlace()->getScore();
+				_score /= getEndEdge()->getFromVertex()->getPlace()->getScore();
 			}
 		}
 
@@ -579,11 +501,12 @@ namespace synthese
 		boost::logic::tribool Journey::getReservationCompliance() const
 		{
 			boost::logic::tribool result(false);
-			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			BOOST_FOREACH(const ServiceUse& su, _journeyLegs)
 			{
-				if (it->getService()->getReservationRule()->getType() == RESERVATION_COMPULSORY)
+				const UseRule& rule(su.getUseRule());
+				if (rule.getReservationType() == UseRule::RESERVATION_COMPULSORY)
 					return true;
-				if (it->getService()->getReservationRule()->getType() == RESERVATION_OPTIONAL)
+				if (rule.getReservationType() == UseRule::RESERVATION_OPTIONAL)
 					result = boost::logic::indeterminate;
 			}
 			return result;
@@ -593,12 +516,15 @@ namespace synthese
 		{
 			DateTime result(TIME_UNKNOWN);
 			boost::logic::tribool compliance(getReservationCompliance());
-			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			BOOST_FOREACH(const ServiceUse& su, _journeyLegs)
 			{
-				if ((boost::logic::indeterminate(compliance) && it->getService()->getReservationRule()->getType() == RESERVATION_OPTIONAL)
-					|| (compliance == true && it->getService()->getReservationRule()->getType() == RESERVATION_COMPULSORY)
-				){
-					DateTime deadLine(it->getReservationDeadLine());
+				const UseRule& rule(su.getUseRule());
+				if(	(	boost::logic::indeterminate(compliance) &&
+						rule.getReservationType() == UseRule::RESERVATION_OPTIONAL
+					)||(compliance == true &&
+						rule.getReservationType() == UseRule::RESERVATION_COMPULSORY
+				)	){
+					DateTime deadLine(su.getReservationDeadLine());
 					if (result.isUnknown() || deadLine < result)
 						result = deadLine;
 				}

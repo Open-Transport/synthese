@@ -26,9 +26,6 @@
 
 #include "Line.h"
 #include "LineTableSync.h"
-#include "BikeComplianceTableSync.h"
-#include "PedestrianComplianceTableSync.h"
-#include "HandicappedComplianceTableSync.h"
 #include "EnvModule.h"
 
 #include <sstream>
@@ -59,6 +56,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace time;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("15.60.02 Continuous services");
 
@@ -176,7 +174,7 @@ namespace synthese
 
 				uid pathId (rows->getLongLong (ContinuousServiceTableSync::COL_PATHID));
 
-				Path* path = LineTableSync::GetEditable(pathId, env, linkLevel).get();
+				Path* path(LineTableSync::GetEditable(pathId, env, linkLevel).get());
 				assert (path);
 	//			assert (path->getEdges ().size () == arrivalSchedules.size ());
 
@@ -190,13 +188,13 @@ namespace synthese
 					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID)
 				);
 
-				cs->setBikeCompliance (BikeComplianceTableSync::Get(bikeComplianceId, env, linkLevel));
-				cs->setHandicappedCompliance(
-					HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel)
-				);
-				cs->setPedestrianCompliance(
-					PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel)
-				);
+// 				cs->setBikeCompliance (BikeComplianceTableSync::Get(bikeComplianceId, env, linkLevel));
+// 				cs->setHandicappedCompliance(
+// 					HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel)
+// 				);
+// 				cs->setPedestrianCompliance(
+// 					PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel)
+// 				);
 
 				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}

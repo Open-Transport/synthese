@@ -20,20 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/ServiceUse.h"
-#include "15_env/Service.h"
-#include "15_env/Edge.h"
-#include "15_env/ReservationRule.h"
+#include "ServiceUse.h"
+#include "Service.h"
+#include "Edge.h"
+#include "UseRule.h"
 
 namespace synthese
 {
 	using namespace time;
 
-	namespace env
+	namespace graph
 	{
-
-		ServiceUse::ServiceUse( const ServicePointer& servicePointer, const Edge* edge)
-			: ServicePointer(servicePointer)
+		ServiceUse::ServiceUse(
+			const ServicePointer& servicePointer,
+			const Edge* edge
+		):	ServicePointer(servicePointer)
 			, _secondEdge(edge)
 			, _secondActualDateTime(servicePointer.getService()->getLeaveTime(servicePointer, edge))
 		{
@@ -41,7 +42,7 @@ namespace synthese
 
 
 
-		const env::Edge* ServiceUse::getDepartureEdge() const
+		const Edge* ServiceUse::getDepartureEdge() const
 		{
 			return (_determinationMethod == DEPARTURE_TO_ARRIVAL)
 				? _edge
@@ -49,7 +50,7 @@ namespace synthese
 				;
 		}
 
-		const env::Edge* ServiceUse::getArrivalEdge() const
+		const Edge* ServiceUse::getArrivalEdge() const
 		{
 			return (_determinationMethod == ARRIVAL_TO_DEPARTURE)
 				? _edge
@@ -57,7 +58,7 @@ namespace synthese
 				;
 		}
 
-		const time::DateTime& ServiceUse::getDepartureDateTime() const
+		const DateTime& ServiceUse::getDepartureDateTime() const
 		{
 			return  (_determinationMethod == DEPARTURE_TO_ARRIVAL)
 				? _actualTime
@@ -65,7 +66,7 @@ namespace synthese
 				;
 		}
 
-		const time::DateTime& ServiceUse::getArrivalDateTime() const
+		const DateTime& ServiceUse::getArrivalDateTime() const
 		{
 			return  (_determinationMethod == ARRIVAL_TO_DEPARTURE)
 				? _actualTime
@@ -73,12 +74,12 @@ namespace synthese
 				;
 		}
 
-		const env::Edge* ServiceUse::getSecondEdge() const
+		const Edge* ServiceUse::getSecondEdge() const
 		{
 			return _secondEdge;
 		}
 
-		const time::DateTime& ServiceUse::getSecondActualDateTime() const
+		const DateTime& ServiceUse::getSecondActualDateTime() const
 		{
 			return _secondActualDateTime;
 		}
@@ -106,23 +107,29 @@ namespace synthese
 
 		bool ServiceUse::isReservationRuleCompliant( const time::DateTime& computingDateTime ) const
 		{
-			if (_service->getReservationRule()->getType() != RESERVATION_FORBIDDEN)
-				return _service->getReservationRule()->isRunPossible(
+			if (_useRule.getReservationType() != UseRule::RESERVATION_FORBIDDEN)
+			{
+				return _useRule.isRunPossible(
 					_originDateTime,
-					(_service->getReservationRule()->getType() == RESERVATION_MIXED_BY_DEPARTURE_PLACE) ? false : true,
+					(_useRule.getReservationType() == UseRule::RESERVATION_MIXED_BY_DEPARTURE_PLACE) ?
+						false :
+						true,
 					computingDateTime,
 					getDepartureDateTime()
 				);
-
+			}
 			return true;
-
 		}
 
-		time::DateTime ServiceUse::getReservationDeadLine() const
+		DateTime ServiceUse::getReservationDeadLine() const
 		{
-			if (_service->getReservationRule()->getType() != RESERVATION_FORBIDDEN)
-				return _service->getReservationRule()->getReservationDeadLine(_originDateTime, getDepartureDateTime());
-
+			if (_useRule.getReservationType() != UseRule::RESERVATION_FORBIDDEN)
+			{
+				return _useRule.getReservationDeadLine(
+					_originDateTime,
+					getDepartureDateTime()
+				);
+			}
 			return DateTime(TIME_UNKNOWN);
 		}
 

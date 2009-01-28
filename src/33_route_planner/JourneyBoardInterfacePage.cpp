@@ -22,24 +22,25 @@
 
 #include "JourneyBoardInterfacePage.h"
 
-#include "31_resa/OnlineReservationRule.h"
+#include "OnlineReservationRule.h"
 
-#include "15_env/Journey.h"
-#include "15_env/Edge.h"
-#include "15_env/AddressablePlace.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/Service.h"
-#include "15_env/Crossing.h"
-
-#include "11_interfaces/DurationInterfacePage.h"
-#include "11_interfaces/DateTimeInterfacePage.h"
-#include "11_interfaces/Interface.h"
-
-#include "01_util/Conversion.h"
+#include "Journey.h"
+#include "Edge.h"
+#include "AddressablePlace.h"
+#include "ReservationContact.h"
+#include "Service.h"
+#include "Crossing.h"
+#include "Line.h"
+#include "DurationInterfacePage.h"
+#include "DateTimeInterfacePage.h"
+#include "Interface.h"
+#include "CommercialLine.h"
+#include "Conversion.h"
 #include "Env.h"
 
 #include <sstream>
 #include <set>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -52,6 +53,7 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace resa;
+	using namespace graph;
 
 	namespace util
 	{
@@ -85,31 +87,42 @@ namespace synthese
 			stringstream sResa;
 			dateInterfacePage->display(sResa, variables, journey->getReservationDeadLine(), request);
 
-			set<const ReservationRule*> resaRules;
-			for (Journey::ServiceUses::const_iterator it(journey->getServiceUses().begin()); it != journey->getServiceUses().end(); ++it)
+			set<const ReservationContact*> resaRules;
+			BOOST_FOREACH(const ServiceUse& su, journey->getServiceUses())
 			{
-				if (it->getService()->getReservationRule() && it->getService()->getReservationRule() != Env::GetOfficialEnv().getRegistry<ReservationRule>().get(0))
-					resaRules.insert(it->getService()->getReservationRule().get());
+				const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
+				if(line == NULL) continue;
+				
+				if(	line->getCommercialLine()->getReservationContact(su.getUserClass()) &&
+					su.getUseRule().getReservationType() != UseRule::RESERVATION_FORBIDDEN
+				){
+					resaRules.insert(line->getCommercialLine()->getReservationContact(su.getUserClass()));
+				}
 			}
 			stringstream sPhones;
 			bool onlineBooking(!resaRules.empty());
-			for (set<const ReservationRule*>::const_iterator it(resaRules.begin()); it != resaRules.end(); ++it)
+			BOOST_FOREACH(const ReservationContact* rc, resaRules)
 			{
-				sPhones << (*it)->getPhoneExchangeNumber() << " (" << (*it)->getPhoneExchangeOpeningHours() << ") ";
-				if (!OnlineReservationRule::GetOnlineReservationRule(*it))
+				sPhones <<
+					rc->getPhoneExchangeNumber() <<
+					" (" << rc->getPhoneExchangeOpeningHours() << ") "
+				;
+				if (!OnlineReservationRule::GetOnlineReservationRule(rc))
+				{
 					onlineBooking = false;
+				}
 			}
 
 			// Determination of the displayed place names
 			string displayedDeparturePlace(
 				dynamic_cast<const Crossing*>(journey->getOrigin()->getPlace())
 				? departurePlace->getFullName()
-				: journey->getOrigin()->getPlace()->getFullName()
+				: AddressablePlace::GetPlace(journey->getOrigin()->getPlace())->getFullName()
 			);
 			string displayedArrivalPlace(
 				dynamic_cast<const Crossing*>(journey->getDestination()->getPlace())
 				? arrivalPlace->getFullName()
-				: journey->getDestination()->getPlace()->getFullName()
+				: AddressablePlace::GetPlace(journey->getDestination()->getPlace())->getFullName()
 			);
 
 

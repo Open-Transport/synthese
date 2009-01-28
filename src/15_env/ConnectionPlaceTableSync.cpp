@@ -95,8 +95,7 @@ namespace synthese
 			string name (rows->getText (ConnectionPlaceTableSync::TABLE_COL_NAME));
 			string name13(rows->getText(ConnectionPlaceTableSync::COL_NAME13));
 			string name26(rows->getText(ConnectionPlaceTableSync::COL_NAME26));
-			ConnectionPlace::ConnectionType connectionType = 
-			    static_cast<ConnectionPlace::ConnectionType>(rows->getInt (ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
+			bool connectionType(rows->getBool(ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
 			int defaultTransferDelay (rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY));
 			string transferDelaysStr (rows->getText (ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
 
@@ -106,7 +105,7 @@ namespace synthese
 				cp->setName13(name13);
 			if (!name26.empty())
 				cp->setName26(name26);
-			cp->setConnectionType (connectionType);
+			cp->setAllowedConnection(connectionType);
 			
 			cp->clearTransferDelays ();    
 			cp->setDefaultTransferDelay (defaultTransferDelay);
@@ -195,7 +194,6 @@ namespace synthese
 			Env& env,
 			RegistryKeyType cityId /*= UNKNOWN_VALUE */
 			, logic::tribool mainConnectionOnly
-			, ConnectionPlace::ConnectionType minConnectionType
 			, bool orderByCityNameAndName /*= true */
 			, bool raisingOrder /*= true */
 			, int first /*= 0 */
@@ -206,12 +204,16 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE "
-				<< TABLE_COL_CONNECTIONTYPE << ">=" << static_cast<int>(minConnectionType);
+				<< " WHERE 1 "
+			;
 			if (cityId != UNKNOWN_VALUE)
 				query << " AND " << TABLE_COL_CITYID << "=" << cityId;
 			if (!logic::indeterminate(mainConnectionOnly))
-				query << " AND " << TABLE_COL_ISCITYMAINCONNECTION << "=" << Conversion::ToString(mainConnectionOnly);
+			{
+				query << " AND " << TABLE_COL_ISCITYMAINCONNECTION << "=" <<
+					Conversion::ToString(mainConnectionOnly)
+				;
+			}
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

@@ -22,11 +22,9 @@
 
 #include "ServiceReservations.h"
 
-#include "15_env/Service.h"
-
-
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTransaction.h"
+#include "Service.h"
+#include "Reservation.h"
+#include "ReservationTransaction.h"
 
 namespace synthese
 {

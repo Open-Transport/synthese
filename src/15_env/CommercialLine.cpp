@@ -26,6 +26,7 @@
 namespace synthese
 {
 	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{
@@ -47,9 +48,13 @@ namespace synthese
 		}
 
 		CommercialLine::CommercialLine(RegistryKeyType key)
-			: util::Registrable(key)
+		:	util::Registrable(key),
+			graph::PathGroup(key)
 			, _color (0, 0, 0)
-			, _network(NULL)
+			, _network(NULL),
+			_generalReservationContact(NULL),
+			_bikeReservationContact(NULL),
+			_handicappedReservationContact(NULL)
 		{
 		}
 
@@ -118,5 +123,54 @@ namespace synthese
 			_optionalReservationPlaces.insert(place);
 		}
 
+		const ReservationContact* CommercialLine::getReservationContact(
+			const UserClassCode userClass
+		) const {
+			if(userClass == USER_BIKE_IN_PT && _bikeReservationContact != NULL)
+			{
+				return _bikeReservationContact;
+			}
+			else if(userClass == USER_HANDICAPPED && _handicappedReservationContact != NULL)
+			{
+				return _handicappedReservationContact;
+			} else {
+				return _generalReservationContact;
+			}
+		}
+		
+		const ReservationContact* CommercialLine::getGeneralReservationContact() const
+		{
+			return _generalReservationContact;
+		}
+		
+		const ReservationContact* CommercialLine::getBikeReservationContact() const
+		{
+			return _bikeReservationContact;
+		}
+		
+		const ReservationContact* CommercialLine::getHandicappedReservationContact() const
+		{
+			return _handicappedReservationContact;
+		}
+		
+		void CommercialLine::setGeneralReservationContact(
+			const ReservationContact* value
+		){
+			_generalReservationContact = value;
+		}
+		
+		
+		void CommercialLine::setBikeReservationContact(
+			const ReservationContact* value
+		){
+			_bikeReservationContact = value;
+		}
+		
+		
+		void CommercialLine::setHandicappedReservationContact(
+			const ReservationContact* value
+		){
+			_handicappedReservationContact = value;
+		}
 	}
 }

@@ -26,11 +26,9 @@
 #include <string>
 
 #include "15_env/Types.h"
-
-#include "Registrable.h"
-#include "Registry.h"
-
+#include "PathGroup.h"
 #include "RGBColor.h"
+#include "GraphTypes.h"
 
 namespace synthese
 {
@@ -38,13 +36,14 @@ namespace synthese
 	{
 		class TransportNetwork;
 		class Place;
+		class ReservationContact;
 
 		/** Commercial line class.
 			TRIDENT = Line
 			@ingroup m35
 		*/
 		class CommercialLine
-		:	public virtual util::Registrable
+		:	public graph::PathGroup
 		{
 		public:
 
@@ -61,34 +60,56 @@ namespace synthese
 			std::string			_image;		//!< Display image (cartouche)
 
 			const TransportNetwork*	_network;	//!< Network
+			const ReservationContact*	_generalReservationContact;	//!< Reservation contact
+			const ReservationContact*	_bikeReservationContact;	//!< Bike user dedicated reservation contact
+			const ReservationContact*	_handicappedReservationContact;	//!< Handicapped user dedicated Reservation contact
 
 			PlacesSet	_optionalReservationPlaces;
 
 		public:
 			CommercialLine(util::RegistryKeyType key = UNKNOWN_VALUE);
 
-			const std::string& getStyle () const;
-			void setStyle (const std::string& style);
+			//! @name Getters
+			//@{
+				const std::string& getStyle () const;
+				const TransportNetwork* getNetwork () const;
+				const std::string& getShortName () const;
+				const std::string& getLongName () const;
+				const std::string& getImage () const;
+				const util::RGBColor& getColor () const;
+				const std::string& getName () const;
+				const ReservationContact* getGeneralReservationContact() const;
+				const ReservationContact* getBikeReservationContact() const;
+				const ReservationContact* getHandicappedReservationContact() const;
+			//@}
+			
+			//! @name Setters
+			//@{
+				void setStyle (const std::string& style);
+				void setNetwork (const TransportNetwork* network);
+				void setShortName (const std::string& shortName);
+				void setLongName (const std::string& longName);
+				void setImage (const std::string& image);
+				void setColor (const util::RGBColor& color);
+				void setName (const std::string& name);
+				void setGeneralReservationContact(const ReservationContact* value);
+				void setBikeReservationContact(const ReservationContact* value);
+				void setHandicappedReservationContact(const ReservationContact* value);
+			//@}
 
-			const TransportNetwork* getNetwork () const;
-			void setNetwork (const TransportNetwork* network);
-
-			const std::string& getShortName () const;
-			void setShortName (const std::string& shortName);
-
-			const std::string& getLongName () const;
-			void setLongName (const std::string& longName);
-
-			const std::string& getImage () const;
-			void setImage (const std::string& image);
-
-			const util::RGBColor& getColor () const;
-			void setColor (const util::RGBColor& color);
-
-			const std::string& getName () const;
-			void setName (const std::string& name);
-
-			void addOptionalReservationPlace(const Place* place);
+			//! @name Queries
+			//@{
+				const ReservationContact* getReservationContact(
+					const graph::UserClassCode userClass
+				) const;
+			//@}
+			
+			//! @name Modifiers
+			//@{
+				void addOptionalReservationPlace(
+					const Place* place
+				);
+			//@}
 		};
 	}
 }

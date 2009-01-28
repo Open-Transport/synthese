@@ -20,14 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/BestVertexReachesMap.h"
+#include "BestVertexReachesMap.h"
 
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/Address.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/Vertex.h"
-#include "15_env/Edge.h"
-#include "15_env/ServiceUse.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "Address.h"
+#include "PhysicalStop.h"
+#include "Vertex.h"
+#include "Edge.h"
+#include "ServiceUse.h"
 
 #include <assert.h>
 
@@ -38,6 +38,7 @@ namespace synthese
 {
 	using namespace env;
 	using namespace time;
+	using namespace graph;
 
 	namespace routeplanner
 	{
@@ -105,29 +106,28 @@ namespace synthese
 				itc->second = bestTime;
 			}
 
-			if (propagateInConnectionPlace && vertex->isConnectionAllowed())
+			if (propagateInConnectionPlace && vertex->getPlace()->getScore() > 0)
 			{
-				const Place* p(vertex->getPlace());
+				const Hub* p(vertex->getPlace());
 				assert (p != 0);
 
 				if (vertex->isAddress())
 				{
-					const ConnectionPlace* cp(static_cast<const ConnectionPlace*>(p));
-					const Addresses& ads(cp->getAddresses());
+					const Addresses& ads(AddressablePlace::GetPlace(p)->getAddresses());
 					for (Addresses::const_iterator ita(ads.begin()); ita != ads.end(); ++ita)
 					{
 						DateTime bestTimeAtAddress(bestTime);
 						if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 						{
-							int transferDelay(cp->getTransferDelay(vertex, *ita));
-							if (transferDelay == ConnectionPlace::FORBIDDEN_TRANSFER_DELAY)
+							int transferDelay(p->getTransferDelay(vertex, *ita));
+							if (transferDelay == Hub::FORBIDDEN_TRANSFER_DELAY)
 								continue;
 							bestTimeAtAddress += transferDelay;
 						}
 						else
 						{
-							int transferDelay(cp->getTransferDelay(*ita, vertex));
-							if (transferDelay == ConnectionPlace::FORBIDDEN_TRANSFER_DELAY)
+							int transferDelay(p->getTransferDelay(*ita, vertex));
+							if (transferDelay == Hub::FORBIDDEN_TRANSFER_DELAY)
 								continue;
 							bestTimeAtAddress -= transferDelay;
 						}
@@ -143,15 +143,15 @@ namespace synthese
 						DateTime bestTimeAtStop(bestTime);
 						if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 						{
-							int transferDelay(cp->getTransferDelay(vertex, itp->second));
-							if (transferDelay == ConnectionPlace::FORBIDDEN_TRANSFER_DELAY)
+							int transferDelay(p->getTransferDelay(vertex, itp->second));
+							if (transferDelay == Hub::FORBIDDEN_TRANSFER_DELAY)
 								continue;
 							bestTimeAtStop += transferDelay;
 						}
 						else
 						{
-							int transferDelay(cp->getTransferDelay(itp->second, vertex));
-							if (transferDelay == ConnectionPlace::FORBIDDEN_TRANSFER_DELAY)
+							int transferDelay(p->getTransferDelay(itp->second, vertex));
+							if (transferDelay == Hub::FORBIDDEN_TRANSFER_DELAY)
 								continue;
 							bestTimeAtStop -= transferDelay;
 						}
@@ -178,16 +178,21 @@ namespace synthese
 			return defaultValue;
 		}
 
-		bool BestVertexReachesMap::isUseless( const env::Vertex* vertex , const time::DateTime& dateTime) const
-		{
+		bool BestVertexReachesMap::isUseless(
+			const Vertex* vertex,
+			const DateTime& dateTime
+		) const {
 			TimeMap::const_iterator itc(_bestTimeMap.find (vertex));
 			if (itc != _bestTimeMap.end ())
 				return (dateTime.*_comparison)(itc->second);
 			return false;
 		}
 
-		bool BestVertexReachesMap::mustBeCleared( const env::Vertex* vertex , const time::DateTime& dateTime, const time::DateTime& bestEndTime  ) const
-		{
+		bool BestVertexReachesMap::mustBeCleared(
+			const Vertex* vertex,
+			const DateTime& dateTime,
+			const DateTime& bestEndTime
+		) const {
 			if ((dateTime.*_strictWeakCTimeComparison)(bestEndTime))
 				return true;
 			TimeMap::const_iterator itc(_bestTimeMap.find (vertex));

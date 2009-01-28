@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENV_FARE_H
 #define SYNTHESE_ENV_FARE_H
 
-#include "Compliance.h"
+#include "Registrable.h"
 #include "RegistryWithAutocreationEnabled.h"
 
 #include <string>
@@ -42,7 +42,7 @@ namespace synthese
 			@ingroup m35
 		*/
 		class Fare
-		:	public Compliance
+		:	public virtual util::Registrable
 		{
 		 public:
 		    

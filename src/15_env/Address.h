@@ -36,6 +36,7 @@ namespace synthese
 	{
 		class LogicalPlace;
 		class Road;
+		class AddressablePlace;
 
 		/** Address (road + metric offset)
 			 An address is a position on a road given a metric offset from the start of the road.
@@ -46,12 +47,12 @@ namespace synthese
 			@ingroup m35
 		*/
 		class Address
-		:	 public Vertex
+		:	 public graph::Vertex
 		{
 		public:
 
 			/// Chosen registry class.
-			typedef util::Registry<Address>	Registry;
+			typedef util::Registry<Address> Registry;
 
 		private:
 
@@ -62,11 +63,12 @@ namespace synthese
 
 			Address(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
-				 const AddressablePlace* place = NULL,
-				 const Road* road = NULL, 
-				 double metricOffset = UNKNOWN_VALUE,
-				 double x = UNKNOWN_VALUE,
-				 double y = UNKNOWN_VALUE);
+				const AddressablePlace* place = NULL,
+				const Road* road = NULL, 
+				double metricOffset = UNKNOWN_VALUE,
+				double x = UNKNOWN_VALUE,
+				double y = UNKNOWN_VALUE
+			);
 
 			~Address();
 
@@ -75,6 +77,7 @@ namespace synthese
 			//@{
 				const Road* getRoad() const;
 				double getMetricOffset () const;
+				const AddressablePlace* getAddressablePlace() const;
 			//@}
 
 			//! @name Setters
@@ -87,7 +90,6 @@ namespace synthese
 			//@{
 				bool isAddress () const;
 				bool isPhysicalStop () const;
-				bool isConnectionAllowed() const;
 			//@}
 		};
 	}

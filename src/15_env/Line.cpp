@@ -31,6 +31,9 @@
 
 namespace synthese
 {
+	using namespace graph;
+	using namespace util;
+	
 	namespace util
 	{
 		template<> const std::string Registry<env::Line>::KEY("Line");
@@ -39,19 +42,16 @@ namespace synthese
 	namespace env
 	{
 		Line::Line(
-			util::RegistryKeyType id
-			, std::string name
-			, const Axis* axis
-		)	: util::Registrable(id)
-			, Path ()
+			util::RegistryKeyType id,
+			std::string name
+		):	util::Registrable(id)
+			, Path()
 			, _name (name)
-			, _axis (axis)
 			, _rollingStock (NULL)
 			, _isWalkingLine (false)
 			, _useInDepartureBoards (true)
 			, _useInTimetables (true)
 			, _useInRoutePlanning (true)
-			, _commercialLine(NULL)
 			, _wayBack(boost::logic::indeterminate)
 		{	}
 
@@ -128,19 +128,6 @@ namespace synthese
 
 
 
-
-
-		const Axis* 
-		Line::getAxis () const
-		{
-			return _axis;
-		}
-
-
-
-
-
-
 		const std::string& 
 		Line::getDirection () const
 		{
@@ -176,7 +163,7 @@ namespace synthese
 		const TransportNetwork* 
 		Line::getNetwork () const
 		{
-			return _commercialLine->getNetwork();
+			return getCommercialLine()->getNetwork();
 		}
 
 
@@ -244,19 +231,16 @@ namespace synthese
 			return static_cast<const PhysicalStop*>(edge->getFromVertex());
 		}
 
-		void Line::setAxis( const Axis* axis )
-		{
-			_axis = axis;
-		}
+
 
 		void Line::setCommercialLine( const CommercialLine* commercialLine )
 		{
-			_commercialLine = commercialLine;
+			_pathGroup = commercialLine;
 		}
 
 		const CommercialLine* Line::getCommercialLine() const
 		{
-			return _commercialLine;
+			return static_cast<const CommercialLine*>(_pathGroup);
 		}
 
 		bool Line::isPedestrianMode() const

@@ -37,6 +37,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace geometry;
+	using namespace graph;
 
 	namespace util
 	{
@@ -54,28 +55,18 @@ namespace synthese
 			double metricOffset,
 			PhysicalStop* physicalStop
 		):	Registrable(id)
-			, Edge (isDeparture, isArrival, line, rankInPath)
+			, Edge (isDeparture, isArrival, line, rankInPath, physicalStop)
 			, _metricOffset (metricOffset)
 			, _scheduleInput(true)
 		{
 			if (physicalStop)
 				setPhysicalStop(physicalStop);
-			else
-				_physicalStop = NULL;
 		}
 
 
 
 		LineStop::~LineStop()
 		{
-		}
-
-
-
-		const Vertex* 
-		LineStop::getFromVertex () const
-		{
-			return _physicalStop;
 		}
 
 
@@ -128,29 +119,24 @@ namespace synthese
 
 		const PhysicalStop* LineStop::getPhysicalStop() const
 		{
-			return (const PhysicalStop*) _physicalStop;
+			return static_cast<const PhysicalStop*>(_fromVertex);
 		}
 
 		void LineStop::setLine( const Line* line )
 		{
-			setParentPath((Path*) line);
+			setParentPath(static_cast<const Path*>(line));
 		}
 
 		void LineStop::setPhysicalStop(PhysicalStop* stop )
 		{
 			// Saving of the attribute
-			_physicalStop = stop;
+			_fromVertex = static_cast<const Vertex*>(stop);
 
 			// Links from stop to the linestop
 			if (isArrival())
 				stop->addArrivalEdge((Edge*) this);
 			if (isDeparture())
 				stop->addDepartureEdge((Edge*) this);
-		}
-
-		const PublicTransportStopZoneConnectionPlace* LineStop::getConnectionPlace() const
-		{
-			return static_cast<const PublicTransportStopZoneConnectionPlace*>(Edge::getConnectionPlace());
 		}
 
 		void LineStop::setScheduleInput( bool value )

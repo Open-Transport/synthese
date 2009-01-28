@@ -29,6 +29,8 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace graph;
+	
 	namespace util
 	{
 		template<> const string Registry<env::RoadChunk>::KEY("RoadChunk");
@@ -47,8 +49,9 @@ namespace synthese
 				isDeparture
 				, isArrival
 				, (fromAddress == NULL) ? NULL : fromAddress->getRoad ()
-				, rankInRoad
-			), _fromAddress (fromAddress)
+				, rankInRoad,
+				fromAddress
+			)
 		{
 		}
 
@@ -62,10 +65,9 @@ namespace synthese
 
 
 
-		const Vertex* 
-		RoadChunk::getFromVertex () const
+		const Address* RoadChunk::getFromAddress() const
 		{
-			return _fromAddress;
+			return static_cast<const Address*>(_fromVertex);
 		}
 
 
@@ -74,18 +76,18 @@ namespace synthese
 		double
 		RoadChunk::getMetricOffset () const
 		{
-			return _fromAddress->getMetricOffset ();
+			return getFromAddress()->getMetricOffset ();
 		}
 
 		void RoadChunk::setFromAddress(Address* fromAddress )
 		{
-			_fromAddress = fromAddress;
+			_fromVertex = static_cast<const Vertex*>(fromAddress);
 
 			// Links from stop to the linestop
 			if (isArrival())
-				_fromAddress->addArrivalEdge(static_cast<Edge*>(this));
+				fromAddress->addArrivalEdge(static_cast<Edge*>(this));
 			if (isDeparture())
-				_fromAddress->addDepartureEdge(static_cast<Edge*>(this));
+				fromAddress->addDepartureEdge(static_cast<Edge*>(this));
 
 			markServiceIndexUpdateNeeded();
 		}

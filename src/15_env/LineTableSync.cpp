@@ -29,12 +29,7 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 
-#include "AxisTableSync.h"
 #include "CommercialLineTableSync.h"
-#include "ReservationRuleTableSync.h"
-#include "BikeComplianceTableSync.h"
-#include "HandicappedComplianceTableSync.h"
-#include "PedestrianComplianceTableSync.h"
 #include "LineTableSync.h"
 #include "FareTableSync.h"
 #include "RollingStockTableSync.h"
@@ -136,7 +131,6 @@ namespace synthese
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
-				uid axisId (rows->getLongLong (LineTableSync::COL_AXISID));
 				uid rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
 				uid fareId (rows->getLongLong (LineTableSync::COL_FAREID));
 				uid alarmId (rows->getLongLong (LineTableSync::COL_ALARMID));
@@ -145,15 +139,6 @@ namespace synthese
 				uid handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
 				uid reservationRuleId (rows->getLongLong (LineTableSync::COL_RESERVATIONRULEID));
 				RegistryKeyType commercialLineId(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID));
-
-				try
-				{
-					line->setAxis(AxisTableSync::Get(axisId, env, linkLevel).get());
-				}
-				catch(ObjectNotFoundException<Axis>)
-				{
-					Log::GetInstance().warn("Bad value " + Conversion::ToString(axisId) + " for axis in line " + Conversion::ToString(line->getKey()));
-				}
 
 				try
 				{
@@ -166,11 +151,11 @@ namespace synthese
 
 
 				line->setRollingStock(RollingStockTableSync::Get(rollingStockId, env, linkLevel, AUTO_CREATE).get());
-				line->setFare (FareTableSync::Get (fareId, env, linkLevel, AUTO_CREATE));
-				line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,env, linkLevel, AUTO_CREATE));
-				line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,env, linkLevel, AUTO_CREATE));
-				line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
-				line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,env, linkLevel, AUTO_CREATE));
+// 				line->setFare (FareTableSync::Get (fareId, env, linkLevel, AUTO_CREATE));
+// 				line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,env, linkLevel, AUTO_CREATE));
+// 				line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,env, linkLevel, AUTO_CREATE));
+// 				line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
+// 				line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,env, linkLevel, AUTO_CREATE));
 				
 			}
 		}
@@ -204,7 +189,6 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Unlink(Line* obj)
 		{
-			obj->setAxis(NULL);
 			obj->setRollingStock(NULL);			
 			obj->setCommercialLine(NULL);
 		}

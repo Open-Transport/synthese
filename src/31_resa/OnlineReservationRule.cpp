@@ -51,7 +51,7 @@ namespace synthese
 			
 		}
 
-		const env::ReservationRule* OnlineReservationRule::getReservationRule() const
+		const env::ReservationContact* OnlineReservationRule::getReservationContact() const
 		{
 			return _reservationRule;
 		}
@@ -101,7 +101,7 @@ namespace synthese
 			return _thresholds;
 		}
 
-		void OnlineReservationRule::setReservationRule(const ReservationRule* rule)
+		void OnlineReservationRule::setReservationContact(const ReservationContact* rule)
 		{
 			if (_reservationRule != NULL)
 			{
@@ -158,8 +158,9 @@ namespace synthese
 			_thresholds = thresholds;
 		}
 
-		const OnlineReservationRule* OnlineReservationRule::GetOnlineReservationRule( const env::ReservationRule* rule )
-		{
+		const OnlineReservationRule* OnlineReservationRule::GetOnlineReservationRule(
+			const env::ReservationContact* rule
+		){
 			OnlineReservationRuleMap::const_iterator it(_onlineReservationRuleMap.find(rule));
 			return (it == _onlineReservationRuleMap.end()) ? NULL : it->second;
 		}

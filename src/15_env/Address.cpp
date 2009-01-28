@@ -21,7 +21,7 @@
 */
 
 #include "Address.h"
-#include "ConnectionPlace.h"
+#include "AddressablePlace.h"
 #include "Edge.h"
 #include "Registry.h"
 
@@ -29,6 +29,8 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace graph;
+	
 	namespace util
 	{
 		template<> const string Registry<env::Address>::KEY("Address");
@@ -52,6 +54,12 @@ namespace synthese
 
 		}
 
+
+
+		const AddressablePlace* Address::getAddressablePlace() const
+		{
+			return static_cast<const AddressablePlace*>(_place);
+		}
 
 
 		Address::~Address()
@@ -101,12 +109,5 @@ namespace synthese
 		{
 			_metricOffset = value;
 		}
-
-		bool Address::isConnectionAllowed() const
-		{
-			return getConnectionPlace()->getConnectionType() >= ConnectionPlace::CONNECTION_TYPE_ROADROAD;
-		}
 	}
 }
-
-

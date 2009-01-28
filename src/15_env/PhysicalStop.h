@@ -44,7 +44,7 @@ namespace synthese
 		///	@ingroup m35
 		//////////////////////////////////////////////////////////////////////////
 		class PhysicalStop
-		:	public Vertex
+		:	public graph::Vertex
 		{
 		public:
 
@@ -83,7 +83,6 @@ namespace synthese
 			//@{
 				bool isAddress () const;
 				bool isPhysicalStop () const;
-				bool isConnectionAllowed() const;
 			//@}
 
 		};

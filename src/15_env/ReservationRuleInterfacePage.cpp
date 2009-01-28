@@ -39,6 +39,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace time;
+	using namespace graph;
 
 	namespace util
 	{

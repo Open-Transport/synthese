@@ -25,7 +25,7 @@
 
 #include "EnvModule.h"
 #include "City.h"
-#include "ConnectionPlace.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 #include "AccessParameters.h"
 
 #include "LexicalMatcher.h"
@@ -167,13 +167,19 @@ namespace synthese
 			switch(parameter)
 			{
 			case HANDICCAPED_ACCESSIBILITY:
-				return AccessParameters(false, NULL, true, true, false, false, 300, 23, 34, _maxTransportConnectionsCount);
+				return AccessParameters(
+					USER_HANDICAPPED, NULL, false, false, 300, 23, 34, _maxTransportConnectionsCount
+				);
 
 			case BIKE_ACCESSIBILITY:
-				return AccessParameters(true, NULL, false, true, false, false, 3000, 23, 201, _maxTransportConnectionsCount);
+				return AccessParameters(
+					USER_BIKE_IN_PT, NULL, false, false, 3000, 23, 201, _maxTransportConnectionsCount
+				);
 
 			default:
-				return AccessParameters(false, NULL, false, true, false, false, 1000, 23, 67, _maxTransportConnectionsCount);
+				return AccessParameters(
+					USER_PEDESTRIAN, NULL, false, false, 1000, 23, 67, _maxTransportConnectionsCount
+				);
 			}
 		}
 

@@ -20,21 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/JourneyBoardServiceCellInterfacePage.h"
+#include "JourneyBoardServiceCellInterfacePage.h"
 
-#include "17_messages/SentAlarm.h"
+#include "SentAlarm.h"
 
-#include "15_env/ReservationRule.h"
-#include "15_env/ServiceUse.h"
-#include "15_env/Service.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/BikeCompliance.h"
-#include "15_env/Line.h"
-#include "15_env/RollingStock.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/ContinuousService.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "ReservationContact.h"
+#include "ServiceUse.h"
+#include "Service.h"
+#include "Line.h"
+#include "RollingStock.h"
+#include "CommercialLine.h"
+#include "ContinuousService.h"
+#include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
 using namespace boost;
@@ -46,6 +44,7 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace time;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardServiceCellInterfacePage>::FACTORY_KEY("journey_board_service_cell");
 
@@ -86,9 +85,13 @@ namespace synthese
 			pv.push_back( line->getRollingStock() ? line->getRollingStock()->getArticle() : string()  ); // 6
 			pv.push_back( line->getDirection().empty() ? line->getDestination()->getConnectionPlace()->getFullName() : line->getDirection() ); // 7
 			pv.push_back( Conversion::ToString( handicappedFilterStatus ) );
-			pv.push_back( Conversion::ToString( serviceUse.getService()->getHandicappedCompliance ()->getCapacity () ) );
+			pv.push_back( Conversion::ToString(
+					serviceUse.getUseRule().getCapacity ()
+			)	);
 			pv.push_back( Conversion::ToString( bikeFilterStatus) );
-			pv.push_back( Conversion::ToString( serviceUse.getService()->getBikeCompliance ()->getCapacity())); // 11
+			pv.push_back( Conversion::ToString(
+					serviceUse.getUseRule().getCapacity()
+			)	); // 11
 			pv.push_back( commercialLine->getShortName() ); // 12
 			pv.push_back( commercialLine->getLongName() ); // 13
 			pv.push_back( continuousService ? Conversion::ToString(continuousService->getMaxWaitingTime()) : string() ); // 14

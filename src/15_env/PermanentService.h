@@ -32,12 +32,13 @@ namespace synthese
 		/** PermanentService class.
 			@ingroup m35
 		*/
-		class PermanentService : public Service
+		class PermanentService
+		:	public graph::Service
 		{
 		public:
 			PermanentService(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
-				Path* path = NULL
+				graph::Path* path = NULL
 			);
 			
 			/** Gets a departure schedule for this service.
@@ -69,9 +70,10 @@ namespace synthese
 				@date 2007
 				@warning The service index is unknown in the generated ServicePointer.					
 			*/
-			virtual ServicePointer getFromPresenceTime(
-				AccessDirection method
-				, const Edge* edge
+			virtual graph::ServicePointer getFromPresenceTime(
+				graph::AccessDirection method,
+				graph::UserClassCode userClass
+				, const graph::Edge* edge
 				, const time::DateTime& presenceDateTime
 				, const time::DateTime& computingTime
 				, bool controlIfTheServiceIsReachable
@@ -79,9 +81,9 @@ namespace synthese
 			) const;
 
 			virtual time::DateTime getLeaveTime(
-				const ServicePointer& servicePointer
-				, const Edge* edge
-				) const;
+				const graph::ServicePointer& servicePointer
+				, const graph::Edge* edge
+			) const;
 
 		};
 	}

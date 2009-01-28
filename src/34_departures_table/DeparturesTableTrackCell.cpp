@@ -26,12 +26,11 @@
 
 #include "34_departures_table/Types.h"
 
-#include "15_env/ServicePointer.h"
-#include "15_env/Edge.h"
-#include "15_env/AddressablePlace.h"
-#include "15_env/PhysicalStop.h"
-
-#include "11_interfaces/ValueElementList.h"
+#include "ServicePointer.h"
+#include "Edge.h"
+#include "AddressablePlace.h"
+#include "PhysicalStop.h"
+#include "ValueElementList.h"
 
 using namespace std;
 
@@ -61,7 +60,9 @@ namespace synthese
 
 			const ArrivalDepartureRow* row(static_cast<const ArrivalDepartureRow*>(object));
 
-			stream << static_cast<const PhysicalStop*>(row->first.servicePointer.getEdge()->getFromVertex())->getName();
+			stream <<
+				static_cast<const PhysicalStop*>(row->first.servicePointer.getEdge()->getFromVertex())->getName()
+			;
 
 			return string();
 		}

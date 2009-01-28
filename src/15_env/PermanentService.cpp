@@ -36,19 +36,21 @@ namespace synthese
 {
 	using namespace time;
 	using namespace util;
+	using namespace graph;
 
 	namespace env
 	{
 
 		ServicePointer PermanentService::getFromPresenceTime(
-			AccessDirection method
+			AccessDirection method,
+			UserClassCode userClass
 			, const Edge* edge
 			, const DateTime& presenceDateTime
 			, const DateTime& computingTime
 			, bool controlIfTheServiceIsReachable
 			, bool inverted
 		) const	{
-			ServicePointer sp(method,edge);
+			ServicePointer sp(method,userClass,edge);
 			sp.setActualTime(presenceDateTime);
 			sp.setOriginDateTime(DateTime(presenceDateTime.getDate(), Hour(TIME_MIN)));
 			sp.setService(this);

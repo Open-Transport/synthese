@@ -28,31 +28,25 @@
 
 #include "Registrable.h"
 #include "Calendar.h"
-#include "Complyer.h"
+#include "RuleUser.h"
 
 namespace synthese
 {
-
 	namespace time
 	{
 		class DateTime;
 	}
 
-	namespace messages
-	{
-		class Alarm;
-	}
 	namespace geometry
 	{
 		class Point2D;
 	}
-
-	namespace env
+	
+	namespace graph
 	{
 		class Service;
-		class Axis;
 		class Edge;
-		class Fare;
+		class PathGroup;
 
 		struct cmpService
 		{
@@ -77,10 +71,10 @@ namespace synthese
 				- a ferry line is compliant with cars, bikes, pedestrian
 				- ...
 
-			@ingroup m35
+			@ingroup m18
 		*/
 		class Path
-		:	public Complyer,
+		:	public RuleUser,
 			public time::Calendar,
 			public virtual util::Registrable
 		{
@@ -88,14 +82,17 @@ namespace synthese
 			typedef std::vector<Edge*> Edges;
 
 		protected:
-			Edges			_edges; 
-			ServiceSet		_services;
+			Edges				_edges; 
+			ServiceSet			_services;
 			
-			bool			_allDays;	//!< A permanent service is present : the calendar is ignored
+			bool				_allDays;	//!< A permanent service is present : the calendar is ignored
+			const PathGroup*	_pathGroup;
 
 			/** Constructor.
 			*/
 			Path();
+			
+			virtual const RuleUser* _getParentRuleUser() const;
 			
 		public:
 
@@ -114,8 +111,6 @@ namespace synthese
 				const Service*				getService (int serviceIndex) const;
 
 				const Edge*					getEdge (int index) const;
-
-				virtual const Axis*			getAxis () const = 0;
 
 				virtual bool isRoad () const = 0;
 				virtual bool isLine () const = 0;

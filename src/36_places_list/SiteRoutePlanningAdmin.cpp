@@ -24,29 +24,29 @@
 
 #include "SiteRoutePlanningAdmin.h"
 
-#include "15_env/Journey.h"
-#include "15_env/ServiceUse.h"
-#include "15_env/Line.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/LineStop.h"
-#include "15_env/Road.h"
-#include "15_env/RoadChunk.h"
+#include "Journey.h"
+#include "ServiceUse.h"
+#include "Line.h"
+#include "CommercialLine.h"
+#include "LineStop.h"
+#include "Road.h"
+#include "RoadChunk.h"
+#include "AddressablePlace.h"
+#include "PlacesListModule.h"
+#include "Site.h"
+#include "SiteTableSync.h"
+#include "TransportSiteAdmin.h"
+#include "TransportWebsiteRight.h"
 
-#include "36_places_list/PlacesListModule.h"
-#include "36_places_list/Site.h"
-#include "36_places_list/SiteTableSync.h"
-#include "36_places_list/TransportSiteAdmin.h"
-#include "36_places_list/TransportWebsiteRight.h"
+#include "RoutePlanner.h"
 
-#include "33_route_planner/RoutePlanner.h"
+#include "SearchFormHTMLTable.h"
 
-#include "05_html/SearchFormHTMLTable.h"
+#include "QueryString.h"
+#include "Request.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
-
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
 using namespace std;
 
@@ -61,6 +61,7 @@ namespace synthese
 	using namespace html;
 	using namespace env;
 	using namespace security;
+	using namespace graph;
 
 	namespace util
 	{
@@ -227,7 +228,8 @@ namespace synthese
 						stream << t.col() << its->getArrivalDateTime().toString();
 
 						// Place
-						stream << t.col() << its->getArrivalEdge()->getPlace()->getFullName();
+						stream << t.col() << 
+							AddressablePlace::GetPlace(its->getArrivalEdge()->getPlace())->getFullName();
 
 						// Next service use
 						++its;

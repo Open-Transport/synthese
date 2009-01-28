@@ -20,25 +20,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/SchedulesTableInterfaceElement.h"
-#include "33_route_planner/RoutePlannerNoSolutionInterfacePage.h"
-#include "33_route_planner/RoutePlannerSheetColumnInterfacePage.h"
-#include "33_route_planner/RoutePlannerSheetLineInterfacePage.h"
+#include "SchedulesTableInterfaceElement.h"
+#include "RoutePlannerNoSolutionInterfacePage.h"
+#include "RoutePlannerSheetColumnInterfacePage.h"
+#include "RoutePlannerSheetLineInterfacePage.h"
 
-#include "30_server/Request.h"
+#include "Request.h"
+#include "Hub.h"
+#include "Service.h"
+#include "Road.h"
+#include "Edge.h"
+#include "Vertex.h"
+#include "ServiceUse.h"
+#include "Line.h"
+#include "Journey.h"
+#include "Crossing.h"
 
-#include "15_env/Service.h"
-#include "15_env/Road.h"
-#include "15_env/Edge.h"
-#include "15_env/Vertex.h"
-#include "15_env/ServiceUse.h"
-#include "15_env/Line.h"
-#include "15_env/Journey.h"
-#include "15_env/Crossing.h"
+#include "Interface.h"
 
-#include "11_interfaces/Interface.h"
-
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 #include <vector>
 
@@ -51,8 +51,11 @@ namespace synthese
 	using namespace time;
 	using namespace env;
 	using namespace interfaces;
+	using namespace graph;
 
-	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::SchedulesTableInterfaceElement>::FACTORY_KEY("schedules_table");
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::SchedulesTableInterfaceElement>::FACTORY_KEY(
+		"schedules_table"
+	);
 	
 	namespace routeplanner
 	{
@@ -61,21 +64,29 @@ namespace synthese
 			, const ParametersVector& parameters
 			, VariablesMap& variables
 			, const void* object /*= NULL*/
-			, const server::Request* request /*= NULL*/ ) const
-		{
+			, const server::Request* request /*= NULL*/
+		) const {
 			const RoutePlannerResult* jv(static_cast<const RoutePlannerResult*>(object));
 
 			if ( jv == NULL || jv->result.empty())  // No solution or type error
 			{
-				const RoutePlannerNoSolutionInterfacePage* noSolutionPage = _page->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>();
+				const RoutePlannerNoSolutionInterfacePage* noSolutionPage( 
+					_page->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>()
+				);
 				noSolutionPage->display(stream, request);
 			}
 			else
 			{
-				const PlaceList placesList(getStopsListForScheduleTable(jv->result, jv->departurePlace, jv->arrivalPlace));
+				const PlaceList placesList(
+					getStopsListForScheduleTable(jv->result, jv->departurePlace, jv->arrivalPlace)
+				);
 				Hour unknownTime( TIME_UNKNOWN );
-				const RoutePlannerSheetColumnInterfacePage* columnInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>());
-				const RoutePlannerSheetLineInterfacePage* lineInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>());
+				const RoutePlannerSheetColumnInterfacePage* columnInterfacePage(
+					_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>()
+				);
+				const RoutePlannerSheetLineInterfacePage* lineInterfacePage(
+					_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>()
+				);
 				
 				// Cells
 				
@@ -96,12 +107,16 @@ namespace synthese
 					{
 						const ServiceUse& curET(*itl);
 
-						if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode() || lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode())
-						{
+						if(	itl == jl.begin() ||
+							!curET.getEdge()->getParentPath()->isPedestrianMode() ||
+							lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode()
+						){
 							const Place* placeToSearch(
-								(itl == jl.begin() && dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getPlace()))
-								? jv->departurePlace
-								: curET.getDepartureEdge()->getPlace()
+								(itl == jl.begin() && dynamic_cast<const Crossing*>(
+									curET.getDepartureEdge()->getPlace())
+								)?
+								jv->departurePlace :
+								AddressablePlace::GetPlace(curET.getDepartureEdge()->getPlace())
 							);
 
 							DateTime lastDateTime(curET.getDepartureDateTime());
@@ -151,7 +166,7 @@ namespace synthese
 							const Place* placeToSearch(
 								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getPlace())
 								? jv->arrivalPlace
-								: curET.getArrivalEdge()->getPlace()
+								: AddressablePlace::GetPlace(curET.getArrivalEdge()->getPlace())
 							);
 							
 							for (; placesList[ __Ligne ].place != placeToSearch; __Ligne++ )
@@ -433,8 +448,8 @@ namespace synthese
 			const ServiceUse* curET((l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l));
 			for (int i(0); i <= LigneMax && pl[ i ].place != NULL; i++ )
 			{
-				if ( curET != NULL && pl[ i ].place == curET->getDepartureEdge()->getPlace() )
-				{
+				if(curET != NULL && pl[ i ].place == AddressablePlace::GetPlace(curET->getDepartureEdge()->getPlace())
+				){
 					result.push_back(true);
 					++l;
 					curET = (l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l);
@@ -761,9 +776,11 @@ namespace synthese
 					if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode())
 					{
 						const Place* placeToSearch(
-							(itl == jl.begin() && dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getPlace()))
-							? departurePlace
-							: curET.getDepartureEdge()->getPlace()
+							(	itl == jl.begin() &&
+								dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getPlace())
+							)?
+							departurePlace :
+							AddressablePlace::GetPlace(curET.getDepartureEdge()->getPlace())
 						);
 						
 						if (OrdrePARechercheGare( pl, i, placeToSearch))
@@ -785,7 +802,7 @@ namespace synthese
 						const Place* placeToSearch(
 							itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getPlace())
 							? arrivalPlace
-							: curET.getArrivalEdge()->getPlace()
+							: AddressablePlace::GetPlace(curET.getArrivalEdge()->getPlace())
 						);
 						
 						if (OrdrePARechercheGare(pl, i, placeToSearch))

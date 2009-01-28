@@ -102,10 +102,6 @@ namespace synthese
 			_operatorCode = code;
 		}
 
-		bool PhysicalStop::isConnectionAllowed() const
-		{
-			return getConnectionPlace()->getConnectionType() >= ConnectionPlace::CONNECTION_TYPE_LINELINE;
-		}
 
 		const PublicTransportStopZoneConnectionPlace* PhysicalStop::getConnectionPlace() const
 		{

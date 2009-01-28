@@ -22,20 +22,20 @@
 
 #include "PlacesListFunction.h"
 
-#include "36_places_list/PlacesListInterfacePage.h"
-#include "36_places_list/Types.h"
-#include "36_places_list/Site.h"
-#include "36_places_list/PlacesListModule.h"
+#include "PlacesListInterfacePage.h"
+#include "Types.h"
+#include "Site.h"
+#include "PlacesListModule.h"
 
-#include "30_server/RequestException.h"
+#include "RequestException.h"
 
-#include "15_env/City.h"
-#include "15_env/EnvModule.h"
-#include "15_env/ConnectionPlace.h"
+#include "City.h"
+#include "EnvModule.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
-#include "11_interfaces/Interface.h"
+#include "Interface.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;

@@ -20,11 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Edge.h"
-#include "15_env/LineStop.h"
-#include "15_env/PhysicalStop.h"
+#include "LineStop.h"
+#include "PhysicalStop.h"
+#include "StandardArrivalDepartureTableGenerator.h"
 
-#include "34_departures_table/StandardArrivalDepartureTableGenerator.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -32,6 +32,7 @@ namespace synthese
 {
 	using namespace env;
 	using namespace time;
+	using namespace graph;
 
 	namespace departurestable
 	{
@@ -53,11 +54,11 @@ namespace synthese
 
 		const ArrivalDepartureList& StandardArrivalDepartureTableGenerator::generate()
 		{
-			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			BOOST_FOREACH(PhysicalStops::value_type it, _physicalStops)
 			{
-				for (set<const Edge*>::const_iterator eit = it->second->getDepartureEdges().begin(); eit != it->second->getDepartureEdges().end(); ++eit)
+				BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
 				{
-					const LineStop* ls = (const LineStop*) (*eit);
+					const LineStop* ls = static_cast<const LineStop*>(edge);
 
 					if (!_allowedLineStop(ls))
 						continue;
@@ -67,13 +68,15 @@ namespace synthese
 					int index(UNKNOWN_VALUE);
 					while(true)
 					{
-						ServicePointer servicePointer(ls->getNextService(
-							departureDateTime
-							, _endDateTime
-							, _calculationDateTime
-							, false
-							, index
-						));
+						ServicePointer servicePointer(
+							ls->getNextService(
+								USER_PEDESTRIAN,
+								departureDateTime
+								, _endDateTime
+								, _calculationDateTime
+								, false
+								, index
+						)	);
 						if (!servicePointer.getService())
 							break;
 						_insert(servicePointer);
@@ -83,7 +86,6 @@ namespace synthese
 				}
 			}
 			return _result;
-
 		}
 	}
 }

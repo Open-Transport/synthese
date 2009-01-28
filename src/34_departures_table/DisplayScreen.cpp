@@ -37,6 +37,7 @@
 #include "DisplayScreenCPU.h"
 
 #include <sstream>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -48,6 +49,7 @@ namespace synthese
 	using namespace time;
 	using namespace dblog;
 	using namespace interfaces;
+	using namespace graph;
 
 	namespace util
 	{
@@ -428,10 +430,20 @@ namespace synthese
 			{
 				const PhysicalStop* p(it->second);
 				const std::set<const Edge*>& edges = p->getDepartureEdges();
-				for (std::set<const Edge*>::const_iterator ite = edges.begin(); ite != edges.end(); ++ite)
+				BOOST_FOREACH(const Edge* e, edges)
 				{
-					for (const Edge* edge= (*ite)->getFollowingArrivalForFineSteppingOnly(); edge != NULL; edge = edge->getFollowingArrivalForFineSteppingOnly())
-						m.insert(make_pair(edge->getConnectionPlace()->getFullName(), make_pair(edge->getConnectionPlace()->getKey(), edge->getConnectionPlace()->getFullName())));
+					for(const Edge* edge= e->getFollowingArrivalForFineSteppingOnly();
+						edge != NULL;
+						edge = edge->getFollowingArrivalForFineSteppingOnly()
+					){
+						m.insert(
+							make_pair(
+								AddressablePlace::GetPlace(edge->getPlace())->getFullName(),
+								make_pair(
+									AddressablePlace::GetPlace(edge->getPlace())->getKey(),
+									AddressablePlace::GetPlace(edge->getPlace())->getFullName()
+						)	)	);
+					}
 				}
 			}
 			vector<pair<uid, string> > v;

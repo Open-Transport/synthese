@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
 #define SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
 
-#include "ConnectionPlace.h"
+#include "AddressablePlace.h"
 #include "Registry.h"
 #include "IsoBarycentre.h"
 
@@ -50,7 +50,7 @@ namespace synthese
 			@ingroup m35
 		*/
 		class PublicTransportStopZoneConnectionPlace
-		:	public ConnectionPlace
+		:	public AddressablePlace
 		{
 		public:
 
@@ -58,13 +58,15 @@ namespace synthese
 			typedef util::Registry<PublicTransportStopZoneConnectionPlace>	Registry;
 
 		private:
-			typedef std::map< std::pair<uid, uid>, int > TransferDelaysMap;
+			bool		_allowedConnection;
+
+			typedef std::map< std::pair<uid, uid>, graph::MinutesDuration> TransferDelaysMap;
 
 			//! @name Data
 			//@{
-				PhysicalStops		_physicalStops; 
-				TransferDelaysMap	_transferDelays; //!< Transfer delays between vertices (in minutes)
-				int					_defaultTransferDelay;
+				PhysicalStops			_physicalStops; 
+				TransferDelaysMap		_transferDelays; //!< Transfer delays between vertices (in minutes)
+				graph::MinutesDuration	_defaultTransferDelay;
 			//@}
 			
 			//! @name Caching
@@ -81,28 +83,30 @@ namespace synthese
 				util::RegistryKeyType id = UNKNOWN_VALUE
 				, std::string name = std::string()
 				, const City* city = NULL
-				, ConnectionType connectionType = CONNECTION_TYPE_FORBIDDEN
-				, int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY
+				, bool allowedConnection = false
+				, graph::MinutesDuration defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY
 			);
 
 			//! @name Getters
 			//@{
-				const PhysicalStops&			getPhysicalStops() const;
-				int								getDefaultTransferDelay() const;
-				virtual int						getMinTransferDelay() const;
+				const PhysicalStops&	getPhysicalStops() const;
+				graph::MinutesDuration			getDefaultTransferDelay() const;
+				virtual graph::MinutesDuration	getMinTransferDelay() const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void	setDefaultTransferDelay (int defaultTransferDelay);
-				void	setConnectionType (const ConnectionType& connectionType);
+				void	setDefaultTransferDelay(
+					graph::MinutesDuration defaultTransferDelay
+				);
+				void	setAllowedConnection(bool value);
 			//@}
 
 
 			//! @name Update methods.
 			//@{
 				void addPhysicalStop (const PhysicalStop* physicalStop);
-				void addTransferDelay (uid departureId, uid arrivalId, int transferDelay);
+				void addTransferDelay(uid departureId, uid arrivalId, graph::MinutesDuration transferDelay);
 				void clearTransferDelays ();
 			//@}
 
@@ -110,13 +114,13 @@ namespace synthese
 			//! @name Virtual queries
 			//@{
 				virtual bool isConnectionAllowed(
-					const Vertex* fromVertex
-					, const Vertex* toVertex
+					const graph::Vertex* fromVertex
+					, const graph::Vertex* toVertex
 				) const;
 
-				virtual int getTransferDelay(
-					const Vertex* fromVertex
-					, const Vertex* toVertex
+				virtual graph::MinutesDuration getTransferDelay(
+					const graph::Vertex* fromVertex
+					, const graph::Vertex* toVertex
 				) const;
 
 				/** Score getter.
@@ -132,17 +136,24 @@ namespace synthese
 							- much than 100 services lines gives 5 points
 						- if the score is bigger than 100 points, then the score is 100
 				*/
-				virtual int getScore() const;
+				virtual graph::HubScore getScore() const;
 
 				virtual const geometry::Point2D& getPoint() const;
 
 				virtual void getImmediateVertices(
-					VertexAccessMap& result
-					, const AccessDirection& accessDirection
+					graph::VertexAccessMap& result
+					, const graph::AccessDirection& accessDirection
 					, const AccessParameters& accessParameters
 					, SearchAddresses returnAddresses
 					, SearchPhysicalStops returnPhysicalStops
-					, const Vertex* origin = NULL
+					, const graph::Vertex* origin = NULL
+				) const;
+
+				graph::VertexAccess getVertexAccess(
+					const graph::AccessDirection& accessDirection,
+					const AccessParameters& accessParameters,
+					const graph::Vertex* destination,
+					const graph::Vertex* origin
 				) const;
 
 				virtual bool hasPhysicalStops()	const;

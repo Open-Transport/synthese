@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_ENV_INCLUDINGPLACE_H
 #define SYNTHESE_ENV_INCLUDINGPLACE_H
 
-
 #include <vector>
 
 #include "Place.h"
@@ -32,12 +31,12 @@ namespace synthese
 {
 	namespace env
 	{
-
 		/** Base class for a place including other places.
 
 			@ingroup m35
 		*/
-		class IncludingPlace : public Place
+		class IncludingPlace
+		:	public Place
 		{
 		public:
 			typedef std::vector<const Place*> IncludedPlaces;
@@ -69,13 +68,14 @@ namespace synthese
 			//! @name Query methods
 			//@{
 
-				void getImmediateVertices (VertexAccessMap& result, 
-						   const AccessDirection& accessDirection,
-						   const AccessParameters& accessParameters,
-						   SearchAddresses returnAddresses
-						   , SearchPhysicalStops returnPhysicalStops
-						   , const Vertex* origin = 0
-						   ) const;
+				void getImmediateVertices(
+					graph::VertexAccessMap& result,
+					const graph::AccessDirection& accessDirection,
+					const AccessParameters& accessParameters,
+					SearchAddresses returnAddresses,
+					SearchPhysicalStops returnPhysicalStops,
+					const graph::Vertex* origin = 0
+				) const;
 
 				virtual const geometry::Point2D& getPoint() const;
 

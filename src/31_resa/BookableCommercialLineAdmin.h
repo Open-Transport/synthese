@@ -25,9 +25,9 @@
 #ifndef SYNTHESE_BookableCommercialLineAdmin_H__
 #define SYNTHESE_BookableCommercialLineAdmin_H__
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "AdminInterfaceElementTemplate.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 namespace synthese
 {

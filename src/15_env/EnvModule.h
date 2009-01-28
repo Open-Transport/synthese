@@ -40,6 +40,12 @@
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Vertex;
+		class Journey;
+	}
+	
 	/**	@defgroup m35Actions 35 Actions
 		@ingroup m35
 
@@ -74,11 +80,9 @@ namespace synthese
 	*/
 	namespace env
 	{
-		class Path;
 		class AddressablePlace;
 		class IncludingPlace;
 		class Place;
-		class Vertex;
 		class NonPermanentService;
 		
 
@@ -125,7 +129,7 @@ namespace synthese
 			static const Place* FetchPlace(const std::string& city, const std::string& place);
 
 
- 		    static boost::shared_ptr<const Vertex> FetchVertex(
+ 		    static boost::shared_ptr<const graph::Vertex> FetchVertex(
 				const util::RegistryKeyType& id,
 				util::Env& env = util::Env::GetOfficialEnv()
 			);
@@ -166,6 +170,10 @@ namespace synthese
 			static void getNetworkLinePlaceRightParameterList(security::ParameterLabelsVector& m);
 
 			virtual std::string getName() const;
+			
+			static int GetMaxAlarmLevel(
+				const graph::Journey&
+			);
 		};
 	}
 	/** @} */

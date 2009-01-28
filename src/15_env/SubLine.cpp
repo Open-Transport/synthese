@@ -22,17 +22,16 @@
 */
 
 #include "SubLine.h"
-
-#include "01_util/Conversion.h"
-
-#include "15_env/Edge.h"
-#include "15_env/LineStop.h"
+#include "Conversion.h"
+#include "Edge.h"
+#include "LineStop.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace graph;
 
 	namespace env
 	{
@@ -46,7 +45,6 @@ namespace synthese
 			int rank(line->addSubLine(this));
 
 			// Copy of the properties
-			setAxis(line->getAxis());
 			setCommercialLine(line->getCommercialLine());
 			setRollingStock(line->getRollingStock());
 			setName(line->getName() + " (subline " + Conversion::ToString(rank) + ")");

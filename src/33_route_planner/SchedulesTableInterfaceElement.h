@@ -22,28 +22,32 @@
 
 #include "33_route_planner/Types.h"
 
-#include "11_interfaces/LibraryInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "LibraryInterfaceElement.h"
+#include "FactorableTemplate.h"
 
 #include <vector>
 #include <sstream>
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Journey;
+	}
+	
 	namespace env
 	{
 		class Place;
-		class Journey;
 	}
-
+	
 	namespace routeplanner
 	{
 		/** Timetable generator.
 			@code schedules_table @endcode
 			@ingroup m53Library refLibrary
 		*/
-		class SchedulesTableInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,SchedulesTableInterfaceElement>
+		class SchedulesTableInterfaceElement
+		:	public util::FactorableTemplate<interfaces::LibraryInterfaceElement,SchedulesTableInterfaceElement>
 		{
 		private:
 			static const bool _registered;
@@ -81,7 +85,7 @@ namespace synthese
 			/** Contr√≈le de la compatibilit√© entre l'ordre des arr√™ts dans la grille horaire et les arr√™ts du trajet. */
 			static std::vector<bool> OrdrePAConstruitLignesAPermuter(
 				const PlaceList&
-				, const env::Journey& __TrajetATester
+				, const graph::Journey& __TrajetATester
 				, int LigneMax
 			);
 			
@@ -113,10 +117,6 @@ namespace synthese
 				@param vel list of parameters :
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
-
 		};
-
 	}
 }
-
-

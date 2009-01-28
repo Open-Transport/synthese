@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		class Service;
 	}
@@ -46,7 +46,7 @@ namespace synthese
 		class ServiceReservations
 		{
 		public:
-			const env::Service*		service;
+			const graph::Service*	service;
 			util::Env				reservationsEnv;
 			int						seatsNumber;
 			bool					overflow;

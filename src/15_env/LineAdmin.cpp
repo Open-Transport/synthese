@@ -30,8 +30,7 @@
 
 #include "HTMLTable.h"
 #include "HTMLModule.h"
-
-#include "ReservationRule.h"
+#include "PhysicalStop.h"
 #include "Line.h"
 #include "LineTableSync.h"
 #include "LineStop.h"
@@ -107,7 +106,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_STOPS))
 			{
 				// Reservation
-				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
+// 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
 
 				HTMLTable::ColsVector v;
 				v.push_back("Rang");
@@ -115,8 +114,8 @@ namespace synthese
 				v.push_back("A");
 				v.push_back("D");
 				v.push_back("Hor");
-				if (reservation)
-					v.push_back("Resa");
+// 				if (reservation)
+// 					v.push_back("Resa");
 				HTMLTable t(v,"adminresults");
 
 				stream << t.open();
@@ -125,12 +124,12 @@ namespace synthese
 				{
 					stream << t.row();
 					stream << t.col() << lineStop->getRankInPath();
-					stream << t.col() << lineStop->getConnectionPlace()->getFullName();
+					stream << t.col() << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
 					stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
 					stream << t.col() << (lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
 					stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
-					if (reservation)
-						stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");
+// 					if (reservation)
+// 						stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");
 				}
 
 				stream << t.close();

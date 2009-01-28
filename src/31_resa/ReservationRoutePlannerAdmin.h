@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_ReservationRoutePlannerAdmin_H__
 #define SYNTHESE_ReservationRoutePlannerAdmin_H__
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {

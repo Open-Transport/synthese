@@ -31,6 +31,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{
@@ -59,33 +60,8 @@ namespace synthese
 		{
 		}
 
-
-		bool 
-		Road::hasReservationRule () const
-		{
-			return false;
-		}
-
-
-
-		const ReservationRule* 
-		Road::getReservationRule () const
-		{
-			return 0;
-		}
-
-
-
-		const Axis* 
-		Road::getAxis () const
-		{
-			return 0;
-		}
-
-
-
-
-
+		
+		
 		const Road::RoadType& 
 		Road::getType () const
 		{
@@ -157,15 +133,23 @@ namespace synthese
 			return true;
 		}
 
-		void Road::getImmediateVertices( VertexAccessMap& result,  const AccessDirection& accessDirection,  const AccessParameters& accessParameters,  SearchAddresses returnAddresses  , SearchPhysicalStops returnPhysicalStops  , const Vertex* origin /*= 0 */ ) const
-		{
+
+
+		void Road::getImmediateVertices(
+			VertexAccessMap& result,
+			const AccessDirection& accessDirection,
+			const AccessParameters& accessParameters,
+			SearchAddresses returnAddresses,
+			SearchPhysicalStops returnPhysicalStops,
+			const Vertex* origin /*= 0 */
+		) const {
 			for (Addresses::const_iterator it = _addresses.begin ();
 				it != _addresses.end (); ++it
 			){
-				(*it)->getPlace()->getImmediateVertices(
-						result, accessDirection, accessParameters
-						, returnAddresses, returnPhysicalStops
-						, origin
+				(*it)->getAddressablePlace()->getImmediateVertices(
+					result, accessDirection, accessParameters
+					, returnAddresses, returnPhysicalStops
+					, origin
 				);
 			}
 		}

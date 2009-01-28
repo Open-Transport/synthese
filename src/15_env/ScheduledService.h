@@ -56,7 +56,7 @@ namespace synthese
 			ScheduledService(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
 				std::string serviceNumber = std::string(),
-				Path* path = NULL
+				graph::Path* path = NULL
 			);
 
 			~ScheduledService ();
@@ -69,7 +69,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void	setPath(Path* path);
+				void	setPath(graph::Path* path);
 				void	setDepartureSchedules(const Schedules& schedules);
 				void	setArrivalSchedules(const Schedules& schedules);
 				void	setTeam(const std::string& team);
@@ -94,9 +94,10 @@ namespace synthese
 					@date 2007
 					@warning The service index is unknown in the generated ServicePointer.					
 				*/
-				virtual ServicePointer getFromPresenceTime(
-					AccessDirection method
-					, const Edge* edge
+				virtual graph::ServicePointer getFromPresenceTime(
+					graph::AccessDirection method,
+					graph::UserClassCode userClass
+					, const graph::Edge* edge
 					, const time::DateTime& presenceDateTime
 					, const time::DateTime& computingTime
 					, bool controlIfTheServiceIsReachable
@@ -104,8 +105,8 @@ namespace synthese
 				) const;
 				
 				virtual time::DateTime getLeaveTime(
-					const ServicePointer& servicePointer
-					, const Edge* edge
+					const graph::ServicePointer& servicePointer
+					, const graph::Edge* edge
 					) const;
 
 				

@@ -38,6 +38,7 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace util;
+	using namespace graph;
 
 	namespace timetables
 	{
@@ -72,10 +73,10 @@ namespace synthese
 					continue;
 
 				// Loop on each service
-				BOOST_FOREACH(Service* servicePtr, line.getServices())
+				BOOST_FOREACH(const Service* servicePtr, line.getServices())
 				{
 					// Permanent service filter
-					NonPermanentService* service(dynamic_cast<NonPermanentService*>(servicePtr));
+					const NonPermanentService* service(dynamic_cast<const NonPermanentService*>(servicePtr));
 					if (service == NULL)
 						continue;
 
@@ -170,7 +171,7 @@ namespace synthese
 
 				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
-					if((*itEdge)->isDeparture() && (*itEdge)->getConnectionPlace()->getKey() == itRow->getPlace()->getKey())
+					if((*itEdge)->isDeparture() && (*itEdge)->getPlace() == itRow->getPlace())
 					{
 						lineIsSelected = true;
 						if (itRow->getIsArrival() || itRow->getCompulsory() == PassageSuffisant)
@@ -203,8 +204,7 @@ namespace synthese
 						arrivalLinestop != NULL;
 						arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
 					){
-						if(	arrivalLinestop->getFromVertex()->getConnectionPlace()->getKey() ==
-							itRow->getPlace()->getKey()
+						if(	arrivalLinestop->getFromVertex()->getPlace() == itRow->getPlace()
 						){
 							lineIsSelected = true;
 							break;

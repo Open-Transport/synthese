@@ -41,7 +41,7 @@ namespace synthese
 		*/
 		class Road
 		:	public AddressablePlace,
-			public Path
+			public graph::Path
 		{
 		public:
 			
@@ -59,64 +59,58 @@ namespace synthese
 			ROAD_TYPE_PEDESTRIANPATH, /* chemin pieton */
 			ROAD_TYPE_TUNNEL, /* tunnel */
 			ROAD_TYPE_HIGHWAY /* route secondaire */
-		  } RoadType;
-		    
+		} RoadType;
+		
 
-		  /// Chosen registry class.
-		  typedef util::Registry<Road>	Registry;
+		/// Chosen registry class.
+		typedef util::Registry<Road>	Registry;
 
 		private:
-		  
-		  RoadType _type;
+			RoadType _type;
 
 		public:
 
-		  Road (
-			  util::RegistryKeyType key = UNKNOWN_VALUE,
-			  std::string name = std::string(),
-			  const City* city = NULL,
-			  RoadType type = ROAD_TYPE_UNKNOWN
-		  );
+			Road(
+				util::RegistryKeyType key = UNKNOWN_VALUE,
+				std::string name = std::string(),
+				const City* city = NULL,
+				RoadType type = ROAD_TYPE_UNKNOWN
+			);
 
-		  virtual ~Road();
+		virtual ~Road();
 
 
-		  //! @name Getters/Setters
-		  //@{
-			  bool hasReservationRule () const;
-			  const ReservationRule* getReservationRule () const;
-
-			  const Axis* getAxis () const;
-
+		//! @name Getters/Setters
+		//@{
 			  const RoadType& getType () const;
 			  void setType (const RoadType& type);
-		  //@}
-		    
+		//@}
+		
 
-		  //! @name Query methods.
-		  //@{
+		//! @name Query methods.
+		//@{
+			bool isRoad () const;
+			bool isLine () const;
+			virtual bool isPedestrianMode() const;
 
-		  bool isRoad () const;
-		  bool isLine () const;
-		  virtual bool isPedestrianMode() const;
-
-		  /** getImmediateVertices.
-		  	@param result : all the vertices of all places traversed by the road
-		  	@param accessDirection
-		  	@param accessParameters
-		  	@param returnAddresses
-		  	@param returnPhysicalStops
-		  	@param origin
-		  	@author Hugues Romain
-		  	@date 2008		  	
-		  */
-		  void getImmediateVertices (VertexAccessMap& result, 
-			  const AccessDirection& accessDirection,
-			  const AccessParameters& accessParameters,
-			  SearchAddresses returnAddresses
-			  , SearchPhysicalStops returnPhysicalStops
-			  , const Vertex* origin = 0
-		  ) const;
+		/** getImmediateVertices.
+			@param result : all the vertices of all places traversed by the road
+			@param accessDirection
+			@param accessParameters
+			@param returnAddresses
+			@param returnPhysicalStops
+			@param origin
+			@author Hugues Romain
+			@date 2008		  	
+		*/
+		void getImmediateVertices(
+			graph::VertexAccessMap& result, 
+			const graph::AccessDirection& accessDirection,
+			const AccessParameters& accessParameters,
+			SearchAddresses returnAddresses
+			, SearchPhysicalStops returnPhysicalStops
+			, const graph::Vertex* origin = 0
+		) const;
 
 
 		  /** Find closest address of this road, before a given metric offset.

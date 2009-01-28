@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENV_CROSSING_H
 #define SYNTHESE_ENV_CROSSING_H
 
-#include "ConnectionPlace.h"
+#include "AddressablePlace.h"
 #include "Registry.h"
 
 namespace synthese
@@ -33,10 +33,13 @@ namespace synthese
 		/** Crossing class.
 			Special kind of ConnectionPlace between roads, with a zero transfer delay between them.
 
+			Score getter is not overloaded : all the crossing are considered interesting in routing.
+			@todo See later if this assertion is the best choice.
+
 			@ingroup m35
 		*/
 		class Crossing
-		:	public ConnectionPlace
+		:	public AddressablePlace
 		{
 		  public:
 
@@ -46,31 +49,17 @@ namespace synthese
 			//! @name Virtual queries
 			//@{
 				virtual bool isConnectionAllowed(
-					const Vertex* fromVertex
-					, const Vertex* toVertex
+					const graph::Vertex* fromVertex
+					, const graph::Vertex* toVertex
 				) const;
 
 				virtual int getTransferDelay(
-					const Vertex* fromVertex
-					, const Vertex* toVertex
+					const graph::Vertex* fromVertex
+					, const graph::Vertex* toVertex
 				) const;
+				
 
-				/** Score getter.
-					@return int the score of the place
-					@author Hugues Romain
-					@date 2007
-
-					The vertex score is calculated by the following way :
-						- each commercial line gives some points, depending of the number of services which belongs to the line :
-							- 1 to 10 services lines gives 2 point
-							- 10 to 50 services lines gives 3 points
-							- 50 to 100 services lines gives 4 points
-							- much than 100 services lines gives 5 points
-						- if the score is bigger than 100 points, then the score is 100
-				*/
-				virtual int getScore() const;
-
-				virtual int						getMinTransferDelay() const;
+				virtual int	getMinTransferDelay() const;
 
 				/** Adds an address to this place.
 					@param address Address to add

@@ -21,23 +21,21 @@
 */
 
 #include "Vertex.h"
-
 #include "Edge.h"
-#include "ConnectionPlace.h"
 
 namespace synthese
 {
 	using namespace geometry;
 
-	namespace env
+	namespace graph
 	{
-		Vertex::Vertex (const AddressablePlace* place,
-				double x,
-				double y) 
-			: Point2D (x, y) // By default geolocation is unknown.
-			, _addressablePlace (place)
+		Vertex::Vertex(
+			const Hub* place,
+			double x,
+			double y) 
+		:	Point2D (x, y), // By default geolocation is unknown.
+			_place(place)
 		{
-		    
 		}
 
 
@@ -48,22 +46,13 @@ namespace synthese
 
 
 
-		const ConnectionPlace* 
-		Vertex::getConnectionPlace () const
-		{
-			return dynamic_cast<const ConnectionPlace*> (_addressablePlace);
+		const Hub* Vertex::getPlace(
+		) const {
+			return _place;
 		}
 
 
-
-		const AddressablePlace* 
-		Vertex::getPlace () const
-		{
-			return _addressablePlace;
-		}
-
-
-		    
+		
 		const Vertex::Edges& 
 		Vertex::getDepartureEdges () const
 		{
@@ -94,9 +83,10 @@ namespace synthese
 			_arrivalEdges.insert (edge);    
 		}
 
-		void Vertex::setPlace( const AddressablePlace* place )
-		{
-			_addressablePlace = place;
+		void Vertex::setPlace(
+			const Hub* place
+		){
+			_place = place;
 		}
 	}
 }

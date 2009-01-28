@@ -21,30 +21,30 @@
 */
 
 
-#include "33_route_planner/JourneyBoardInterfaceElement.h"
-#include "33_route_planner/JourneyBoardStopCellInterfacePage.h"
-#include "33_route_planner/JourneyBoardServiceCellInterfacePage.h"
-#include "33_route_planner/JourneyBoardJunctionCellInterfacePage.h"
-#include "33_route_planner/RoutePlannerModule.h"
+#include "JourneyBoardInterfaceElement.h"
+#include "JourneyBoardStopCellInterfacePage.h"
+#include "JourneyBoardServiceCellInterfacePage.h"
+#include "JourneyBoardJunctionCellInterfacePage.h"
+#include "RoutePlannerModule.h"
 
-#include "30_server/Request.h"
+#include "Request.h"
 
-#include "15_env/Edge.h"
-#include "15_env/Vertex.h"
-#include "15_env/ConnectionPlace.h"
-#include "15_env/Road.h"
-#include "15_env/ServiceUse.h"
-#include "15_env/Journey.h"
-#include "15_env/Service.h"
+#include "Edge.h"
+#include "Vertex.h"
+#include "AddressablePlace.h"
+#include "Road.h"
+#include "ServiceUse.h"
+#include "Journey.h"
+#include "Service.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
+#include "Interface.h"
+#include "ValueElementList.h"
 
-#include "11_interfaces/InterfacePageException.h"
+#include "InterfacePageException.h"
 
 #include "04_time/module.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -55,6 +55,7 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 	using namespace env;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyBoardInterfaceElement>::FACTORY_KEY("journey_board");
 
@@ -83,7 +84,10 @@ namespace synthese
 			// Loop on lines of the board
 			bool __Couleur = false;
 
-			const Place* lastPlace(journey->getOrigin()->getFromVertex()->getPlace());
+			const AddressablePlace* lastPlace(
+				AddressablePlace::GetPlace(
+					journey->getOrigin()->getFromVertex()->getPlace()
+			)	);
 			int distance(0);
 
 			const Journey::ServiceUses& services(journey->getServiceUses());
@@ -95,9 +99,14 @@ namespace synthese
 				if (road == NULL)
 				{
 					distance = 0;
+					
+					const AddressablePlace* place(
+						AddressablePlace::GetPlace(
+							leg.getDepartureEdge()->getFromVertex()->getPlace()
+					)	);
 
 					// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
-					if (leg.getDepartureEdge()->getConnectionPlace() != lastPlace)
+					if (place != lastPlace)
 					{
 						/*					DateTime debutPrem(leg.getDepartureDateTime());
 						DateTime finPrem(debutPrem);
@@ -110,14 +119,14 @@ namespace synthese
 							, false
 							, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 							, false
-							, leg.getDepartureEdge()->getConnectionPlace()
+							, place
 							, __Couleur
 							, leg.getDepartureDateTime()
 							, journey->getContinuousServiceRange()
 							, request
 							);
 
-						lastPlace = leg.getDepartureEdge()->getConnectionPlace();
+						lastPlace = place;
 						__Couleur = !__Couleur;
 					}
 
@@ -153,18 +162,22 @@ namespace synthese
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();
 */
-					
+					const AddressablePlace* aPlace(
+						AddressablePlace::GetPlace(
+							leg.getArrivalEdge()->getFromVertex()->getPlace()
+					)	);
+
 					stopCellInterfacePage->display( stream, true
 						, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
-						, leg.getArrivalEdge()->getConnectionPlace() == leg.getService()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
-						, leg.getArrivalEdge()->getConnectionPlace()
+						, leg.getArrivalEdge()->getFromVertex()->getPlace() == leg.getService()->getPath ()->getEdges ().back()->getFromVertex()->getPlace()
+						, aPlace
 						, __Couleur
 						, leg.getArrivalDateTime()
 						, journey->getContinuousServiceRange()
 						, request
 					);
 
-					lastPlace = leg.getArrivalEdge()->getConnectionPlace();
+					lastPlace = aPlace;
 					__Couleur = !__Couleur;
 
 				}
@@ -189,9 +202,13 @@ namespace synthese
 							continue;
 					}
 
+					const AddressablePlace* aPlace(
+						AddressablePlace::GetPlace(
+							leg.getArrivalEdge()->getFromVertex()->getPlace()
+					)	);
 					junctionCellInterfacePage->display(
 						stream
-						, leg.getArrivalEdge()->getConnectionPlace()
+						, aPlace
 						, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, __Couleur
 						, road

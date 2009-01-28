@@ -31,6 +31,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{
@@ -42,8 +43,8 @@ namespace synthese
 		Crossing::Crossing(
 			util::RegistryKeyType key
 			, const City* city
-		):	ConnectionPlace (key, "X", city, CONNECTION_TYPE_ROADROAD)
-			, Registrable(key)
+		):	AddressablePlace("X", city),
+			Registrable(key)
 	    {
 	    }
 	    
@@ -64,10 +65,6 @@ namespace synthese
 			return 0;
 		}
 
-		int Crossing::getScore() const
-		{
-			return 50;
-		}
 
 
 

@@ -84,7 +84,7 @@ namespace synthese
 				@return iterator on the element.
 			*/
 				ArrivalDepartureList::iterator _insert(
-					const env::ServicePointer& servicePointer
+					const graph::ServicePointer& servicePointer
 					, UnlimitedSize unlimitedSize=SIZE_AS_DEFINED
 					);
 

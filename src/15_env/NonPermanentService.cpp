@@ -29,6 +29,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace time;
+	using namespace graph;
 
 	namespace env
 	{

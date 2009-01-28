@@ -22,11 +22,11 @@
 
 #include "BookReservationAction.h"
 
-#include "36_places_list/Site.h"
+#include "Site.h"
 
-#include "33_route_planner/RoutePlannerFunction.h"
-#include "33_route_planner/RoutePlanner.h"
-#include "33_route_planner/JourneysResult.h"
+#include "RoutePlannerFunction.h"
+#include "RoutePlanner.h"
+#include "JourneysResult.h"
 
 #include "ResaRight.h"
 #include "ReservationTransaction.h"
@@ -38,22 +38,24 @@
 #include "ActionException.h"
 #include "Request.h"
 
-#include "15_env/Place.h"
-#include "15_env/City.h"
-#include "15_env/Journey.h"
-#include "15_env/Service.h"
-#include "15_env/Edge.h"
-#include "15_env/Line.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/Road.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/AddressablePlace.h"
+#include "Place.h"
+#include "City.h"
+#include "Journey.h"
+#include "Service.h"
+#include "Edge.h"
+#include "Line.h"
+#include "CommercialLine.h"
+#include "Road.h"
+#include "UseRule.h"
+#include "AddressablePlace.h"
 
-#include "12_security/Types.h"
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "Types.h"
+#include "User.h"
+#include "UserTableSync.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -67,7 +69,7 @@ namespace synthese
 	using namespace transportwebsite;
 	using namespace time;
 	using namespace util;
-	
+	using namespace graph;
 
 	namespace util
 	{
@@ -108,16 +110,20 @@ namespace synthese
 			{
 				if (_journey.getOrigin())
 				{
-					map.insert(PARAMETER_ORIGIN_CITY, _journey.getOrigin()->getPlace()->getCity()->getName());
-					map.insert(PARAMETER_ORIGIN_PLACE, _journey.getOrigin()->getPlace()->getName());
+					const AddressablePlace* place(AddressablePlace::GetPlace(_journey.getOrigin()->getPlace()));
+					map.insert(PARAMETER_ORIGIN_CITY, place->getCity()->getName());
+					map.insert(PARAMETER_ORIGIN_PLACE, place->getName());
 				}
 				if (_journey.getDestination())
 				{
-					map.insert(PARAMETER_DESTINATION_CITY, _journey.getDestination()->getPlace()->getCity()->getName());
-					map.insert(PARAMETER_DESTINATION_PLACE, _journey.getOrigin()->getPlace()->getName());
+					const AddressablePlace* place(AddressablePlace::GetPlace(_journey.getDestination()->getPlace()));
+					map.insert(PARAMETER_DESTINATION_CITY, place->getCity()->getName());
+					map.insert(PARAMETER_DESTINATION_PLACE, place->getName());
 				}
 				if (!_journey.getDepartureTime().isUnknown())
+				{
 					map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
+				}
 			}
 			return map;
 		}
@@ -274,25 +280,40 @@ namespace synthese
 			ReservationTransactionTableSync::Save(&rt);
 
 			// New reservation for each journey leg
-			for (Journey::ServiceUses::const_iterator su(_journey.getServiceUses().begin()); su != _journey.getServiceUses().end(); ++su)
+			BOOST_FOREACH(const ServiceUse& su, _journey.getServiceUses())
 			{
-				assert(su->getService() != NULL);
-				assert(su->getService()->getReservationRule().get() != NULL);
-				assert(su->getDepartureEdge() != NULL);
-				assert(su->getDepartureEdge()->getPlace() != NULL);
-				assert(su->getArrivalEdge() != NULL);
-				assert(su->getArrivalEdge()->getPlace() != NULL);
+				assert(su.getService() != NULL);
+				assert(su.getDepartureEdge() != NULL);
+				assert(su.getDepartureEdge()->getPlace() != NULL);
+				assert(su.getArrivalEdge() != NULL);
+				assert(su.getArrivalEdge()->getPlace() != NULL);
 
 				shared_ptr<Reservation> r(rt.newReservation());
-				r->setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getKey());
-				r->setDeparturePlaceName(su->getDepartureEdge()->getPlace()->getFullName());
-				r->setDepartureTime(su->getDepartureDateTime());
-				r->setOriginDateTime(su->getOriginDateTime());
-				r->setArrivalPlaceId(su->getArrivalEdge()->getPlace()->getKey());
-				r->setArrivalPlaceName(su->getArrivalEdge()->getPlace()->getFullName());
-				r->setArrivalTime(su->getArrivalDateTime());
+				r->setDeparturePlaceId(
+					AddressablePlace::GetPlace(
+						su.getDepartureEdge()->getPlace()
+					)->getKey()
+				);
+				r->setDeparturePlaceName(
+					AddressablePlace::GetPlace(
+						su.getDepartureEdge()->getPlace()
+					)->getFullName()
+				);
+				r->setDepartureTime(su.getDepartureDateTime());
+				r->setOriginDateTime(su.getOriginDateTime());
+				r->setArrivalPlaceId(
+					AddressablePlace::GetPlace(
+						su.getArrivalEdge()->getPlace()
+					)->getKey()
+				);
+				r->setArrivalPlaceName(
+					AddressablePlace::GetPlace(
+						su.getArrivalEdge()->getPlace()
+					)->getFullName()
+				);
+				r->setArrivalTime(su.getArrivalDateTime());
 				
-				const Line* line(dynamic_cast<const Line*>(su->getService()->getPath()));
+				const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
 				if (line)
 				{
 					assert(line->getCommercialLine() != NULL);
@@ -300,7 +321,7 @@ namespace synthese
 					r->setLineCode(line->getCommercialLine()->getName());
 					r->setLineId(line->getCommercialLine()->getKey());
 				}
-				const Road* road(dynamic_cast<const Road*>(su->getService()->getPath()));
+				const Road* road(dynamic_cast<const Road*>(su.getService()->getPath()));
 				if (road)
 				{
 					r->setLineCode(road->getName());
@@ -308,20 +329,20 @@ namespace synthese
 				}
 
 
-				if(	su->getService()->getReservationRule()->isReservationPossible(
-					su->getOriginDateTime()
+				if(	su.getUseRule().isReservationPossible(
+					su.getOriginDateTime()
 					, now
-					, su->getDepartureDateTime()
+					, su.getDepartureDateTime()
 				))
 				{
-					r->setReservationRuleId(su->getService()->getReservationRule()->getKey());
-					r->setReservationDeadLine(su->getService()->getReservationRule()->getReservationDeadLine(
-						su->getOriginDateTime()
-						, su->getDepartureDateTime()
+					r->setReservationRuleId(su.getService()->getActualRulesId());
+					r->setReservationDeadLine(su.getUseRule().getReservationDeadLine(
+						su.getOriginDateTime()
+						, su.getDepartureDateTime()
 					));
 				}
-				r->setServiceId(su->getService()->getKey());
-				r->setServiceCode(Conversion::ToString(su->getService()->getServiceNumber()));
+				r->setServiceId(su.getService()->getKey());
+				r->setServiceCode(Conversion::ToString(su.getService()->getServiceNumber()));
 				ReservationTableSync::Save(r.get());
 			}
 
@@ -341,7 +362,7 @@ namespace synthese
 
 		}
 
-		void BookReservationAction::setJourney( const env::Journey& journey )
+		void BookReservationAction::setJourney( const Journey& journey )
 		{
 			_journey = journey;
 		}

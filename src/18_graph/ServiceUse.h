@@ -23,16 +23,16 @@
 #ifndef SYNTHESE_env_ServiceUse_h__
 #define SYNTHESE_env_ServiceUse_h__
 
-#include "15_env/ServicePointer.h"
+#include "ServicePointer.h"
 
 namespace synthese
 {
-	namespace env
+	namespace graph
 	{
 		class Edge;
 
 		/** ServiceUse class.
-			@ingroup m35
+			@ingroup m18
 		*/
 		class ServiceUse : public ServicePointer
 		{

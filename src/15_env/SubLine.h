@@ -73,7 +73,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008				
 			*/
-			bool addServiceIfCompatible(Service* service);
+			bool addServiceIfCompatible(graph::Service* service);
 
 
 			/** Main line getter.

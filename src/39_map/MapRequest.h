@@ -27,7 +27,6 @@
 
 #include "Function.h"
 
-#include "Axis.h"
 #include "City.h"
 #include "CommercialLine.h"
 #include "Line.h"

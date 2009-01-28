@@ -27,18 +27,22 @@
 #include <set>
 #include <vector>
 #include <sstream>
+#include <boost/foreach.hpp>
 
-#include "33_route_planner/BestVertexReachesMap.h"
+#include "BestVertexReachesMap.h"
 
-#include "15_env/Journey.h"
-#include "15_env/Edge.h"
-#include "15_env/Vertex.h"
-#include "15_env/ConnectionPlace.h"
+#include "Journey.h"
+#include "Edge.h"
+#include "Vertex.h"
+#include "Hub.h"
+#include "AddressablePlace.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 namespace synthese
 {
+	using namespace env;
+	
 	namespace routeplanner
 	{
 		/** JourneysResult class.
@@ -48,10 +52,10 @@ namespace synthese
 		class JourneysResult
 		{			
 		public:
-			typedef std::set<env::Journey*, JourneyComparator> ResultSet;
+			typedef std::set<graph::Journey*, JourneyComparator> ResultSet;
 
 		private:
-			typedef std::map<const env::Vertex*, typename ResultSet::iterator> IndexMap;
+			typedef std::map<const graph::Vertex*, typename ResultSet::iterator> IndexMap;
 			
 			ResultSet	_result;
 			IndexMap	_index;
@@ -81,21 +85,21 @@ namespace synthese
 					@param journey the journey to remove
 					@author Hugues Romain
 				*/
-				void remove(const env::Journey* journey)
+				void remove(const graph::Journey* journey)
 				{
-					const env::Vertex* vertex(journey->getEndEdge()->getFromVertex());
+					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
 					remove(vertex);
 				}
 
 
 
-				void remove(const env::Vertex* vertex)
+				void remove(const graph::Vertex* vertex)
 				{
 					typename IndexMap::iterator it(_index.find(vertex));
 					if (it != _index.end())
 					{
 						typename ResultSet::iterator its(it->second);
-						const env::Journey* ptr = *its;
+						const graph::Journey* ptr = *its;
 						_result.erase(its);
 						_index.erase(it);
 						delete ptr;
@@ -108,9 +112,9 @@ namespace synthese
 					@param journey the journey to add
 					@author Hugues Romain
 				*/
-				void add(env::Journey* journey)
+				void add(graph::Journey* journey)
 				{
-					const env::Vertex* vertex(journey->getEndEdge()->getFromVertex());
+					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
 					remove(vertex);
 					_index.insert(make_pair(vertex, _result.insert(journey).first));
 				}
@@ -122,10 +126,10 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008					
 				*/
-				void addEmptyJourney(AccessDirection method)
+				void addEmptyJourney(graph::AccessDirection method)
 				{
-					env::Vertex* nullVertex(NULL);
-					_index.insert(make_pair(nullVertex, _result.insert(new env::Journey(method)).first));
+					graph::Vertex* nullVertex(NULL);
+					_index.insert(make_pair(nullVertex, _result.insert(new graph::Journey(method)).first));
 				}
 
 
@@ -134,11 +138,11 @@ namespace synthese
 					@return Pointer to the first journey
 					@warning The returned pointer must be deleted after use
 				*/
-				const env::Journey* front()
+				const graph::Journey* front()
 				{
 					assert(!empty());
 
-					const env::Journey* ptr(*_result.begin());
+					const graph::Journey* ptr(*_result.begin());
 					_index.erase(ptr->empty() ? NULL : ptr->getEndEdge()->getFromVertex());
 					_result.erase(_result.begin());
 					return ptr;
@@ -157,11 +161,11 @@ namespace synthese
 					, const time::DateTime& newMaxTime
 					, const BestVertexReachesMap& bvrm
 				){
-					std::vector<env::Journey*> journeysToAdd;
-					std::vector<env::Journey*> journeysToRemove;
+					std::vector<graph::Journey*> journeysToAdd;
+					std::vector<graph::Journey*> journeysToRemove;
 					for (typename IndexMap::iterator it(_index.begin()); it != _index.end();)
 					{
-						env::Journey* journey(*it->second);
+						graph::Journey* journey(*it->second);
 						typename IndexMap::iterator next(it);
 						++next;
 						if (bvrm.mustBeCleared(it->first, journey->getEndTime(), newMaxTime))
@@ -175,10 +179,14 @@ namespace synthese
 						}
 						it = next;
 					}
-					for (std::vector<env::Journey*>::const_iterator it(journeysToRemove.begin()); it != journeysToRemove.end(); ++it)
-						remove(*it);
-					for (std::vector<env::Journey*>::const_iterator it(journeysToAdd.begin()); it != journeysToAdd.end(); ++it)
-						add(*it);
+					BOOST_FOREACH(graph::Journey* journey, journeysToRemove)
+					{
+						remove(journey);
+					}
+					BOOST_FOREACH(graph::Journey* journey, journeysToAdd)
+					{
+						add(journey);
+					}
 				}
 			//@}
 
@@ -191,7 +199,7 @@ namespace synthese
 					@return const env::Journey* const The result journey that reaches the specified vertex
 					@author Hugues Romain
 				*/
-				const env::Journey* const get(const env::Vertex* vertex) const
+				const graph::Journey* const get(const graph::Vertex* vertex) const
 				{
 					typename IndexMap::const_iterator it(_index.find(vertex));
 					if (it != _index.end())
@@ -226,22 +234,26 @@ namespace synthese
 					s	<< "<tr><th colspan=\"7\">Exploration queue (size=" << _result.size() << ")</th></tr>"
 						<< "<tr><th>Place</th><th>Time</th><th>Score</th><th>Dist</th><th>Min spd</th><th>Dist.MinSpd</th><th>Place score</th></tr>"
 						;
-					for (typename ResultSet::const_iterator it(_result.begin()); it != _result.end(); ++it)
+					BOOST_FOREACH(const graph::Journey* journey, _result)
 					{
-						const env::Journey& journey(**it);
-						if (journey.empty())
+						if (journey->empty())
 						{
 							s << "<tr><td colspan=\"7\">Empty fake journey</td></tr>";
 							continue;
 						}
 
-						s	<< "<tr><td>" << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName() << "</td>"
-							<< "<td>" << journey.getEndTime().toString() << "</td>"
-							<< "<td>" << journey.getScore() << "</td>"
-							<< "<td>" << journey.getSquareDistanceToEnd().getDistance() << "</td>"
-							<< "<td>" << (journey.getSquareDistanceToEnd().getDistance() ? (0.06 * journey.getMinSpeedToEnd() / journey.getSquareDistanceToEnd().getDistance()) : -1) << "</td>"
-							<< "<td>" << journey.getMinSpeedToEnd() << "</td>"
-							<< "<td>" << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getScore() << "</td>"
+						s	<<
+							"<tr><td>" <<
+							AddressablePlace::GetPlace(
+								journey->getEndEdge()->getFromVertex()->getPlace()
+							)->getFullName() <<
+							"</td><td>" <<
+							journey->getEndTime().toString() << "</td>"
+							<< "<td>" << journey->getScore() << "</td>"
+							<< "<td>" << journey->getSquareDistanceToEnd().getDistance() << "</td>"
+							<< "<td>" << (journey->getSquareDistanceToEnd().getDistance() ? (0.06 * journey->getMinSpeedToEnd() / journey->getSquareDistanceToEnd().getDistance()) : -1) << "</td>"
+							<< "<td>" << journey->getMinSpeedToEnd() << "</td>"
+							<< "<td>" << journey->getEndEdge()->getFromVertex()->getPlace()->getScore() << "</td>"
 							<< "</tr>";
 					}
 					return s.str();
