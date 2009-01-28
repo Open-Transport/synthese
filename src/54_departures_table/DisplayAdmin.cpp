@@ -65,6 +65,11 @@
 #include "DisplayScreenCPUTableSync.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenAppearanceUpdateAction.h"
+#include "DisplayTypeAdmin.h"
+#include "PhysicalStopTableSync.h"
+#include "LineStopTableSync.h"
+#include "Line.h"
+#include "CommercialLine.h"
 
 #include <utility>
 #include <sstream>
@@ -85,6 +90,7 @@ namespace synthese
 	using namespace time;
 	using namespace dblog;
 	using namespace messages;
+	using namespace graph;
 
 	namespace util
 	{
@@ -122,7 +128,7 @@ namespace synthese
 				ActionFunctionRequest<DisplayScreenRemove, AdminRequest> deleteRequest(_request);
 				deleteRequest.getFunction()->setPage<DisplaySearchAdmin>();
 				deleteRequest.getAction()->setDisplayScreen(_displayScreen);
-
+				
 				stream << "<h1>Propriétés</h1>";
 
 				PropertiesHTMLTable t(updateDisplayRequest.getHTMLForm("updateprops"));
@@ -135,7 +141,15 @@ namespace synthese
 
 				stream << t.title("Données techniques");
 				stream << t.cell("UID", Conversion::ToString(_displayScreen->getKey()));
-				stream << t.cell("Type d'afficheur", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_TYPE, DeparturesTableModule::getDisplayTypeLabels(), _displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE));
+				stream <<
+					t.cell(
+						"Type d'afficheur",
+						t.getForm().getSelectInput(
+							UpdateDisplayScreenAction::PARAMETER_TYPE,
+							DeparturesTableModule::getDisplayTypeLabels(false, _displayScreen->getType() == NULL),
+							_displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE
+					)	)
+				;
 				
 				stream << t.title("Connexion");
 				stream << t.cell("Code de branchement bus RS485", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()));
@@ -144,7 +158,17 @@ namespace synthese
 				{
 					stream << t.cell("Unité centrale", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_CPU, _env.getRegistry<DisplayScreenCPU>(), (_displayScreen->getCPU() != NULL) ? RegistryKeyType(0) : _displayScreen->getCPU()->getKey()));
 				}
-				stream << t.cell("Port COM", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_COM_PORT, 0, 99, _displayScreen->getComPort()));
+				stream <<
+					t.cell(
+						"Port COM",
+						t.getForm().getSelectNumberInput(
+							UpdateDisplayScreenAction::PARAMETER_COM_PORT,
+							0, 99,
+							_displayScreen->getComPort(),
+							1,
+							"(inutilisé)"
+					)	)
+				;
 				
 				stream << t.close();
 
@@ -163,14 +187,25 @@ namespace synthese
 			// MAINTENANCE TAB
 			if (openTabContent(stream, TAB_MAINTENANCE))
 			{
+				// Update action
 				ActionFunctionRequest<UpdateDisplayMaintenanceAction,AdminRequest> updateRequest(_request);
 				updateRequest.getFunction()->setSamePage(this);
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
 				
+				// Go to maintenance log
 				FunctionRequest<AdminRequest> goToLogRequest(_request);
 				goToLogRequest.getFunction()->setPage<DBLogViewer>();
-				static_pointer_cast<DBLogViewer,AdminInterfaceElement>(goToLogRequest.getFunction()->getPage())->setLogKey(DisplayMaintenanceLog::FACTORY_KEY);
+				static_pointer_cast<DBLogViewer,AdminInterfaceElement>(
+					goToLogRequest.getFunction()->getPage()
+				)->setLogKey(DisplayMaintenanceLog::FACTORY_KEY);
 				goToLogRequest.setObjectId(_request->getObjectId());
+
+				// View the display type
+				FunctionRequest<AdminRequest> displayTypeRequest(_request);
+				displayTypeRequest.getFunction()->setPage<DisplayTypeAdmin>();
+				displayTypeRequest.setObjectId(
+					_displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE
+				);
 
 				stream << "<h1>Paramètres de maintenance</h1>";
 
@@ -178,47 +213,95 @@ namespace synthese
 				t.getForm().setUpdateRight(tabHasWritePermissions());
 
 				stream << t.open();
-				stream << t.cell("Afficheur déclaré en service", t.getForm().getOuiNonRadioInput(UpdateDisplayMaintenanceAction::PARAMETER_ONLINE, _displayScreen->getIsOnline()));
-				stream << t.cell("Message de maintenance", t.getForm().getTextAreaInput(UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE, _displayScreen->getMaintenanceMessage(), 3, 30));
+				stream <<
+					t.cell(
+						"Afficheur déclaré en service",
+						t.getForm().getOuiNonRadioInput(
+							UpdateDisplayMaintenanceAction::PARAMETER_ONLINE,
+							_displayScreen->getIsOnline()
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Message de maintenance",
+						t.getForm().getTextAreaInput(
+							UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE,
+							_displayScreen->getMaintenanceMessage(),
+							3, 30
+					)	)
+				;
 				stream << t.close();
 
 				stream << "<h1>Informations de supervision</h1>";
 
+				bool monitored(
+					_displayScreen->getType() != NULL &&
+					_displayScreen->getType()->getMonitoringInterface() != NULL &&
+					_displayScreen->getType()->getTimeBetweenChecks() > 0
+				);
+				
 				HTMLList l;
 				stream << l.open();
-
-				stream << l.element() << "Type d'afficheur : ";
 				if (_displayScreen->getType() != NULL)
 				{
-					stream << _displayScreen->getType()->getName();
-					stream << l.element() << "Durée théorique entre les contacts de supervision : " << _displayScreen->getType()->getTimeBetweenChecks() << " min";
-				}
-				else
-				{
-					stream << "<p class=\"info\">Les terminus de lignes sont automatiquement présélectionnés.</p>";
-
-					stream << "ATTENTION : veuillez définir le type d'afficheur dans l'écran de configuration.";
-				}
-
-				if (_env.getRegistry<DisplayMonitoringStatus>().empty())
-				{
-					stream << l.element() << "ATTENTION : Cet afficheur n'est jamais entré en contact.";
-				}
-				else
-				{
-					shared_ptr<DisplayMonitoringStatus> status(_env.getEditableRegistry<DisplayMonitoringStatus>().front());
-					if (_displayScreen->getIsOnline() && _now - status->getTime() > _displayScreen->getType()->getTimeBetweenChecks())
+					stream <<
+						l.element() <<
+						"Type d'afficheur : " <<
+						HTMLModule::getHTMLLink(
+							displayTypeRequest.getURL(),
+							_displayScreen->getType()->getName()
+						)
+					;
+					if(!monitored)
 					{
-						stream << l.element() << "ERREUR : Cet afficheur n'est plus en contact alors qu'il est déclaré online.";
+						stream <<
+							l.element() <<
+							"Ce type d'afficheur n'est pas supervisé."
+						;
+					} else {
+						stream <<
+							l.element() <<
+							"Durée théorique entre les contacts de supervision : " <<
+							_displayScreen->getType()->getTimeBetweenChecks() << " min"
+						;
 					}
-
-					stream << l.element() << "Dernière mesure le " << status->getTime().toString();
-					stream << l.element() << "Dernier état mesuré : "
-						<< DisplayMonitoringStatus::GetStatusString(status->getGlobalStatus());
-					stream << l.element() << "Température : "
-						<< status->getTemperatureValue();
-					stream << l.element() << "Détail anomalies : "
-						<< status->getDetail();
+				}
+				else
+				{
+					stream <<
+						l.element() <<
+						"ATTENTION : veuillez définir le type d'afficheur dans l'écran de configuration."
+					;
+				}
+				
+				if(monitored)
+				{
+					if(_env.getRegistry<DisplayMonitoringStatus>().empty())
+					{
+						stream << l.element() << "ATTENTION : Cet afficheur n'est jamais entré en contact.";
+					}
+					else
+					{
+						shared_ptr<DisplayMonitoringStatus> status(
+							_env.getEditableRegistry<DisplayMonitoringStatus>().front()
+						);
+						if(	_displayScreen->getIsOnline() && _now - status->getTime() >
+							_displayScreen->getType()->getTimeBetweenChecks()
+						){
+							stream <<
+								l.element() <<
+								"ERREUR : Cet afficheur n'est plus en contact alors qu'il est déclaré online."
+							;
+						}
+	
+						stream << l.element() << "Dernière mesure le " << status->getTime().toString();
+						stream << l.element() << "Dernier état mesuré : "
+							<< DisplayMonitoringStatus::GetStatusString(status->getGlobalStatus());
+						stream << l.element() << "Température : "
+							<< status->getTemperatureValue();
+						stream << l.element() << "Détail anomalies : "
+							<< status->getDetail();
+					}
 				}
 
 				stream << l.element("log") << HTMLModule::getHTMLLink(goToLogRequest.getURL(), "Accéder au journal de maintenance de l'afficheur");
@@ -309,7 +392,41 @@ namespace synthese
 
 				if (!_displayScreen->getAllPhysicalStopsDisplayed())
 				{
-					bool withAddForm(_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getPhysicalStops().size());
+					if(_displayScreen->getLocalization() == NULL)
+					{
+						stream << "Afficheur non localisé, aucun arrêt à sélectionner.";
+					}
+					else
+					{
+						HTMLTable t(4, ResultHTMLTable::CSS_CLASS);
+						stream << t.open();
+						stream << t.row();
+						stream << t.col(1, string(), true) << "Nom";
+						stream << t.col(1, string(), true) << "Code exploitant";
+						stream << t.col(1, string(), true) << "Lignes";
+						stream << t.col(1, string(), true) << "Actions";
+						BOOST_FOREACH(
+							const PhysicalStops::value_type& it,
+							_displayScreen->getLocalization()->getPhysicalStops()
+						){
+							stream << t.row();
+							stream << t.col() << it.second->getName();
+							stream << t.col() << it.second->getOperatorCode();
+							stream << t.col();
+							
+							BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
+							{
+								stream <<
+									static_cast<const LineStop*>(edge)->getLine()->getCommercialLine()->getShortName() <<
+									" "
+								;
+							}
+							
+							stream << t.col();
+						}
+						stream << t.close();
+					}
+/*					bool withAddForm(_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getPhysicalStops().size());
 					HTMLForm ap(addPhysicalRequest.getHTMLForm("addphy"));
 
 					// Opening
@@ -339,7 +456,7 @@ namespace synthese
 					// Closing
 					stream << l.close();
 					if (withAddForm)
-						stream << ap.close();
+						stream << ap.close();*/
 				}
 
 				// Forbidden places
@@ -423,7 +540,14 @@ namespace synthese
 				stream << t.cell("Affichage numéro de quai", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()));
 				stream << t.cell("Affichage numéro de service", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()));
 				stream << t.cell("Affichage numéro d'équipe", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
-				stream << t.cell("Affichage horloge", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
+				stream <<
+					t.cell(
+						"Affichage horloge",
+						t.getForm().getOuiNonRadioInput(
+							DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_CLOCK,
+							_displayScreen->getDisplayClock()
+					)	)
+				;
 
 				stream << t.close();
 
@@ -534,6 +658,24 @@ namespace synthese
 			try
 			{
 				_displayScreen = DisplayScreenTableSync::Get(id, _env);
+				if(_displayScreen->getLocalization() != NULL)
+				{
+					PhysicalStopTableSync::Search(_env, _displayScreen->getLocalization()->getKey(), 0, 0, UP_LINKS_LOAD_LEVEL);
+					
+					BOOST_FOREACH(
+						const PhysicalStops::value_type& it,
+						_displayScreen->getLocalization()->getPhysicalStops()
+					){
+						LineStopTableSync::Search(
+							_env,
+							UNKNOWN_VALUE,
+							it.first,
+							0, 0,
+							true, true,
+							UP_LINKS_LOAD_LEVEL
+						);
+					}
+				}
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
@@ -629,7 +771,7 @@ namespace synthese
 			if (_request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
 			{
 				bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
-				_tabs.push_back(Tab("Contenu", TAB_CONTENT, writeRight, "times_display.png"));
+				_tabs.push_back(Tab("Sélection", TAB_CONTENT, writeRight, "times_display.png"));
 				_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
 				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));
 			}

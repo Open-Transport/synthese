@@ -49,11 +49,19 @@ namespace synthese
 
 	namespace departurestable
 	{
-		std::vector<pair<uid, std::string> > DeparturesTableModule::getDisplayTypeLabels( bool withAll /*= false*/ )
-		{
+		std::vector<pair<uid, std::string> > DeparturesTableModule::getDisplayTypeLabels(
+			bool withAll, /*= false*/
+			bool withNone
+		){
 			vector<pair<uid, string> > m;
 			if (withAll)
+			{
 				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+			}
+			if (withNone)
+			{
+				m.push_back(make_pair(0, "(non défini)"));
+			}
 			Env env;
 			DisplayTypeTableSync::Search(env);
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.getRegistry<DisplayType>())

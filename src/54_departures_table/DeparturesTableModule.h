@@ -92,7 +92,10 @@ namespace synthese
 		class DeparturesTableModule : public util::FactorableTemplate<util::ModuleClass, DeparturesTableModule>
 		{
 		public:
-			static std::vector<std::pair<uid, std::string> >	getDisplayTypeLabels(bool withAll = false);
+			static std::vector<std::pair<uid, std::string> > getDisplayTypeLabels(
+				bool withAll = false,
+				bool withNone = false
+			);
 			static std::vector<std::pair<uid, std::string> >	getPlacesWithBroadcastPointsLabels(
 				const security::RightsOfSameClassMap& rights 
 				, bool totalControl 

@@ -529,8 +529,9 @@ namespace synthese
 					, int mini
 					, int maxi
 					, int value=UNKNOWN_VALUE
-					, int step=1
-					, std::string unknownValueText = std::string()
+					, int step=1,
+					std::string unknownValueText = std::string("-1"),
+					std::string nulValueText = std::string("0")
 				);
 
 

@@ -46,6 +46,8 @@
 #include "SQLiteException.h"
 #include "Conversion.h"
 #include "SentAlarm.h"
+#include "DisplayScreenCPU.h"
+#include "DisplayScreenCPUTableSync.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -96,6 +98,9 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE = "is_online";
 		const string DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE = "maintenance_message";
 		const string DisplayScreenTableSync::COL_DISPLAY_TEAM("display_team");
+		const string DisplayScreenTableSync::COL_DISPLAY_CLOCK("display_clock");
+		const string DisplayScreenTableSync::COL_COM_PORT("com_port");
+		const string DisplayScreenTableSync::COL_CPU_HOST_ID("cpu_host_id");
 	}
 
 	namespace db
@@ -110,35 +115,38 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_PLACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TYPE_ID, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_WIRING_CODE, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_TITLE, SQL_TEXT),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_BLINKING_DELAY, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, SQL_TEXT),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, SQL_TEXT),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS, SQL_TEXT),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_DIRECTION, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, SQL_TEXT),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAX_DELAY, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_CLEARING_DELAY, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_FIRST_ROW, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_GENERATION_METHOD, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, SQL_TEXT),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, SQL_INTEGER),
-					SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
-					SQLiteTableSync::Field()
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_WIRING_CODE, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TITLE, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_BLINKING_DELAY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DIRECTION, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAX_DELAY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_CLEARING_DELAY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_FIRST_ROW, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_GENERATION_METHOD, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_CLOCK, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_COM_PORT, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_CPU_HOST_ID, SQL_INTEGER),
+			SQLiteTableSync::Field()
 		};
 		
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayScreenTableSync>::_INDEXES[] =
 		{
-					SQLiteTableSync::Index(DisplayScreenTableSync::COL_PLACE_ID.c_str(), ""),
-					SQLiteTableSync::Index()
+			SQLiteTableSync::Index(DisplayScreenTableSync::COL_PLACE_ID.c_str(), ""),
+			SQLiteTableSync::Index()
 		};
 					
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
@@ -164,14 +172,13 @@ namespace synthese
 			object->setMaintenanceIsOnline (rows->getBool ( DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE));
 			object->setMaintenanceMessage (rows->getText ( DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE));
 			object->setDisplayTeam(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_TEAM));
+			object->setDisplayClock(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_CLOCK));
+			object->setComPort(rows->getInt(DisplayScreenTableSync::COL_COM_PORT));
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Column reading
-				uid placeId(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID));
-				uid typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
-			
 				// Localization
+				uid placeId(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID));
 				try
 				{
 					object->setLocalization(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
@@ -180,8 +187,26 @@ namespace synthese
 				{
 					Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ Conversion::ToString(placeId) + " not found");
 				}
+				
+				// CPU
+				RegistryKeyType cpuId(rows->getLongLong(DisplayScreenTableSync::COL_CPU_HOST_ID));
+				if (cpuId > 0)
+				{
+					try
+					{
+						object->setCPU(DisplayScreenCPUTableSync::Get(cpuId, env, linkLevel).get());
+					}
+					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					{
+						Log::GetInstance().warn(
+							"Data corrupted in "+ TABLE.NAME + " on display screen : cpu host " +
+							Conversion::ToString(cpuId) + " not found"
+						);
+					}
+				}
 
 				// Type
+				uid typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
 				if (typeId > 0)
 					object->setType(DisplayTypeTableSync::Get(typeId, env, linkLevel).get());
 
@@ -345,12 +370,16 @@ namespace synthese
 				query << Conversion::ToString(itd2->first);
 			}
 
-			query
-				<< "'," << Conversion::ToString(object->getForceDestinationDelay())
-				<< ",''"
-				<< "," << Conversion::ToString(object->getIsOnline())
-				<< "," << Conversion::ToSQLiteString(object->getMaintenanceMessage())
-				<< ")";
+			query <<
+				"'," << Conversion::ToString(object->getForceDestinationDelay()) <<
+				",''" <<
+				"," << Conversion::ToString(object->getIsOnline()) <<
+				"," << Conversion::ToSQLiteString(object->getMaintenanceMessage()) << "," <<
+				Conversion::ToString(object->getDisplayClock()) << "," <<
+				Conversion::ToString(object->getComPort()) << "," <<
+				(object->getCPU() != NULL ? Conversion::ToString(object->getCPU()->getKey()) : "0") <<
+				")"
+			;
 			
 			sqlite->execUpdate(query.str());
 		}

@@ -128,6 +128,7 @@ namespace synthese
 			v.push_back(make_pair(DisplayTypeTableSync::COL_NAME, "Nom"));
 			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Interface d'affichage"));
 			v.push_back(make_pair(DisplayTypeTableSync::COL_ROWS_NUMBER, "Nombre de rangées"));
+			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Protocole supervision"));
 			v.push_back(make_pair(string(), "Actions"));
 			if (writeRight)
 			{
@@ -146,10 +147,31 @@ namespace synthese
 				stream << t.col() << dt->getName();
 				stream << t.col() << ((dt->getDisplayInterface() == NULL) ? "(aucune)" : dt->getDisplayInterface()->getName());
 				stream << t.col() << dt->getRowNumber();
-				stream << t.col() << openRequest.getHTMLForm().getLinkButton("Modifier", string(), "monitor_edit.png");
+				
+				stream << t.col();
+				if(	dt->getMonitoringInterface() != NULL &&
+					dt->getTimeBetweenChecks() > 0
+				){
+					stream << dt->getMonitoringInterface()->getName();
+				} else {
+					stream << "(non supervisé)";
+				}
+				
+				stream <<
+					t.col() <<
+					openRequest.getHTMLForm().getLinkButton("Modifier", string(), "monitor_edit.png")
+				;
 				if (writeRight)
 				{
-					stream << t.col() << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?", "monitor_delete.png");
+					stream <<
+						t.col() <<
+						HTMLModule::getLinkButton(
+							deleteRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?",
+							"monitor_delete.png"
+						)
+					;
 				}
 			}
 

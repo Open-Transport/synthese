@@ -104,8 +104,24 @@ namespace synthese
 			stream << t.title("Propriétés");
 			stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, _type->getName()));
 			stream << t.title("Paramètres d'affichage");
-			stream << t.cell("Interface d'affichage", t.getForm().getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true), _type->getDisplayInterface() ? _type->getDisplayInterface()->getKey() : uid(0)));
-			stream << t.cell("Rangées", t.getForm().getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99, _type->getRowNumber()));
+			stream <<
+				t.cell(
+					"Interface d'affichage",
+					t.getForm().getSelectInput(
+						UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID,
+						InterfaceModule::getInterfaceLabels(true),
+						_type->getDisplayInterface() ? _type->getDisplayInterface()->getKey() : uid(0)
+				)	)
+			;
+			stream <<
+				t.cell(
+					"Rangées",
+					t.getForm().getSelectNumberInput(
+						UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER,
+						1, 99,
+						_type->getRowNumber()
+				)	)
+			;
 			stream << t.cell(
 				"Max arrêts intermédiaires",
 				t.getForm().getSelectNumberInput(
@@ -118,8 +134,25 @@ namespace synthese
 			stream << t.title("Paramètres sonores");
 			stream << t.cell("Interface vocale", t.getForm().getSelectInput(UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true), _type->getAudioInterface() ? _type->getAudioInterface()->getKey() : uid(0)));
 			stream << t.title("Paramètres de supervision");
-			stream << t.cell("Protocole de supervision", t.getForm().getSelectInput(UpdateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true), _type->getMonitoringInterface() ? _type->getMonitoringInterface()->getKey() : uid(0)));
-			stream << t.cell("Durée entre les contrôles", t.getForm().getTextInput(UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS, Conversion::ToString(_type->getTimeBetweenChecks())));
+			stream <<
+				t.cell(
+					"Protocole de supervision",
+					t.getForm().getSelectInput(
+						UpdateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
+						InterfaceModule::getInterfaceLabels(true),
+						_type->getMonitoringInterface() ? _type->getMonitoringInterface()->getKey() : uid(0)
+				)	)
+			;
+			stream <<
+				t.cell(
+					"Durée entre les contrôles",
+					t.getForm().getSelectNumberInput(
+						UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS,
+						1, 120,
+						_type->getTimeBetweenChecks(),
+						1
+				)	)
+			;
 			stream << t.close();
 		}
 

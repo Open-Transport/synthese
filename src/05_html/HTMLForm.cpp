@@ -68,24 +68,40 @@ namespace synthese
 			, int maxi
 			, int value/*=UNKNOWN_VALUE*/
 			, int step
-			, std::string unknownValueText /*= std::string() */
+			, std::string unknownValueText,
+			string nulValueText
 		){
 			// Right control
 			if (!_updateRight)
-				return Conversion::ToString(value);
+			{
+				return 
+					(	value == 0 ?
+						nulValueText :
+						(	value == UNKNOWN_VALUE ?
+							unknownValueText :
+							Conversion::ToString(value)
+					)	)
+				;
+			}
 
 			// Init
 			std::vector<pair<int, string> > m;
 			
-			// Unknown_value choice
-			if (!unknownValueText.empty())
-				m.push_back(make_pair(UNKNOWN_VALUE, unknownValueText));
-
 			// Generation of the suite
-			for (int i((step > 0) ? mini : maxi);
+			for(int i((step > 0) ? mini : maxi);
 				(step > 0) ? (i <= maxi) : (i >= mini);
-				i += step)
-				m.push_back(make_pair(i, Conversion::ToString(i)));
+				i += step
+			){
+				m.push_back(
+					make_pair(
+						i,
+						(	i==0 ?
+							nulValueText :
+							(	i == UNKNOWN_VALUE ?
+								unknownValueText :
+								Conversion::ToString(i)
+				)	)	)	);
+			}
 
 			// HTML Code
 			return getSelectInput(name, m, value);

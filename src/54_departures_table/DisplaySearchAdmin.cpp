@@ -210,42 +210,100 @@ namespace synthese
 				{
 					updateRequest.setObjectId(screen->getKey());
 					viewRequest.setObjectId(screen->getKey());
-					shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(screen->getKey()));
-					vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey(), 1));
+					
+					shared_ptr<DisplayMonitoringStatus> status(
+						DisplayMonitoringStatusTableSync::GetStatus(screen->getKey())
+					);
+					vector<shared_ptr<SentAlarm> > alarms(
+						DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey(), 1)
+					);
 					shared_ptr<SentAlarm> alarm(alarms.empty() ? shared_ptr<SentAlarm>() : alarms.front());
 
 					stream << t.row(Conversion::ToString(screen->getKey()));
 					if (!_place.get())
 					{
-						stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getCity()->getName() : "(indéterminé)");
-						stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getName() : "(indéterminé)");
+						stream <<
+							t.col() <<
+							(	screen->getLocalization() ?
+								screen->getLocalization()->getCity()->getName() :
+								"(indéterminé)"
+							)
+						;
+						stream <<
+							t.col() <<
+							(	screen->getLocalization() ?
+								screen->getLocalization()->getName() :
+								"(indéterminé)"
+							)
+						;
 					}
 					stream << t.col() << screen->getLocalizationComment();
-					stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
-					stream << t.col() << HTMLModule::getHTMLImage(DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()), status->getDetail());
+					stream <<
+						t.col() <<
+						(	screen->getType() ?
+							screen->getType()->getName() :
+							HTMLModule::getHTMLImage("error.png", "Type non défini")
+						)
+					;
+					stream <<
+						t.col();
+					if(screen->getType() == NULL)
+					{
+						stream << HTMLModule::getHTMLImage(
+							"help.png",
+							"Type d'afficheur non défini, supervision impossible."
+						);
+					} else {
+						if(screen->getType()->getMonitoringInterface() == NULL)
+						{
+							stream << HTMLModule::getHTMLImage(
+								"help.png",
+								"Afficheur non supervisé"
+							);
+						} else {
+							HTMLModule::getHTMLImage(
+								DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()),
+								status->getDetail()
+							);
+						}
+					}
 					stream << t.col();
 					if (!screen->getIsOnline())
 					{
-						stream << HTMLModule::getHTMLImage("cross.png", "Désactivé par la maintenance : "+ screen->getMaintenanceMessage());
+						stream <<
+							HTMLModule::getHTMLImage(
+								"cross.png",
+								"Désactivé par la maintenance : "+ screen->getMaintenanceMessage()
+							)
+						;
 					}
 					else
 					{
 						if (alarm.get() != NULL)
 						{
-							stream << HTMLModule::getHTMLImage(
-								(alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",
-								"Message : " + alarm->getShortMessage()
-								);
+							stream <<
+								HTMLModule::getHTMLImage(
+									(	(alarm->getLevel() == ALARM_LEVEL_WARNING) ?
+										"full_screen_message_display.png" :
+										"partial_message_display.png"
+									),
+									"Message : " + alarm->getShortMessage()
+								)
+							;
 						}
 						else
 						{
 							if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(screen->getKey()))
 							{
-								stream << HTMLModule::getHTMLImage("times_display.png", "Affichage d'horaires en cours");
+								stream <<
+									HTMLModule::getHTMLImage("times_display.png", "Affichage d'horaires en cours")
+								;
 							}
 							else
 							{
-								stream << HTMLModule::getHTMLImage("empty_display.png", "Aucune ligne affichée, écran vide");
+								stream <<
+									HTMLModule::getHTMLImage("empty_display.png", "Aucune ligne affichée, écran vide")
+								;
 							}
 						}
 					}
@@ -295,7 +353,7 @@ namespace synthese
 			stream << s.cell("Arrêt", s.getForm().getTextInput(PARAMETER_SEARCH_STOP, stopName));
 			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, displayName));
 			stream << s.cell("Ligne", s.getForm().getSelectInput(PARAMETER_SEARCH_LINE_ID, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), lineUid));
-			stream << s.cell("Type", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(true), typeUid));
+			stream << s.cell("Type", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(true, true), typeUid));
 			stream << s.cell("Etat", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, states, state));
 			stream << s.cell("Message", s.getForm().getSelectInput(PARAMETER_SEARCH_MESSAGE, messages, message));
 			stream << s.close();

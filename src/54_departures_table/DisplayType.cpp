@@ -58,7 +58,7 @@ namespace synthese
 			_displayInterface(NULL),
 			_audioInterface(NULL),
 			_monitoringInterface(NULL),
-			_timeBetweenChecks(0),
+			_timeBetweenChecks(1),
 			_rowNumber(1),
 			_maxStopsNumber(UNKNOWN_VALUE)
 		{
