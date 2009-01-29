@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_DisplayScreenRemovePhysicalStopAction_H__
 #define SYNTHESE_DisplayScreenRemovePhysicalStopAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -38,7 +37,7 @@ namespace synthese
 	{
 		class DisplayScreen;
 
-		/** DisplayScreenRemovePhysicalStopAction action class.
+		/** Action class : removes a stop to the selection of a departures table.
 			@ingroup m54Actions refActions
 		*/
 		class DisplayScreenRemovePhysicalStopAction : public util::FactorableTemplate<server::Action, departurestable::DisplayScreenRemovePhysicalStopAction>
@@ -67,6 +66,10 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setStopId(
+				util::RegistryKeyType id
+			);
 		};
 	}
 }

@@ -404,7 +404,7 @@ namespace synthese
 						stream << t.col(1, string(), true) << "Nom";
 						stream << t.col(1, string(), true) << "Code exploitant";
 						stream << t.col(1, string(), true) << "Lignes";
-						stream << t.col(1, string(), true) << "Actions";
+						stream << t.col(1, string(), true) << "Affiché";
 						BOOST_FOREACH(
 							const PhysicalStops::value_type& it,
 							_displayScreen->getLocalization()->getPhysicalStops()
@@ -412,51 +412,53 @@ namespace synthese
 							stream << t.row();
 							stream << t.col() << it.second->getName();
 							stream << t.col() << it.second->getOperatorCode();
-							stream << t.col();
 							
+							// Lines column
+							stream << t.col();
+							set<const CommercialLine*> lines;
 							BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
 							{
+								lines.insert(
+									static_cast<const LineStop*>(edge)->getLine()->getCommercialLine()
+								);
+							}
+							BOOST_FOREACH(const CommercialLine* line, lines)
+							{
 								stream <<
-									static_cast<const LineStop*>(edge)->getLine()->getCommercialLine()->getShortName() <<
-									" "
+									"<span class=\"line " << line->getStyle() << "\">" <<
+									line->getShortName() <<
+									"</span>"
 								;
 							}
 							
-							stream << t.col();
+							// Activated column
+							stream << t.col();							
+							if(	_displayScreen->getPhysicalStops().find(it.first) ==
+								_displayScreen->getPhysicalStops().end()
+							){
+								addPhysicalRequest.getAction()->setStopId(it.first);
+								stream <<
+									HTMLModule::getHTMLLink(
+										addPhysicalRequest.getHTMLForm().getURL(),
+										HTMLModule::getHTMLImage(
+											"cross.png",
+											"Arrêt non affiché, cliquer pour afficher"
+									)	)
+								;
+							} else {
+								rmPhysicalRequest.getAction()->setStopId(it.first);
+								stream <<
+									HTMLModule::getHTMLLink(
+										rmPhysicalRequest.getHTMLForm().getURL(),
+										HTMLModule::getHTMLImage(
+											"tick.png",
+											"Arrêt affiché, cliquer pour enlever"
+									)	)
+								;
+							}
 						}
 						stream << t.close();
 					}
-/*					bool withAddForm(_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getPhysicalStops().size());
-					HTMLForm ap(addPhysicalRequest.getHTMLForm("addphy"));
-
-					// Opening
-					if (withAddForm)
-						stream << ap.open();
-					stream << l.open();
-
-					// Loop on linked stops
-					for (PhysicalStops::const_iterator it = _displayScreen->getPhysicalStops().begin(); it != _displayScreen->getPhysicalStops().end(); ++it)
-					{
-						const PhysicalStop* ps(it->second);
-						HTMLForm rs(rmPhysicalRequest.getHTMLForm("rm" + Conversion::ToString(ps->getKey())));
-						rs.addHiddenField(DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()));
-
-						stream << l.element("broadcastpoint");
-						stream << HTMLModule::getHTMLLink(rs.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << ps->getOperatorCode() << " / " << ps->getName();
-					}
-
-					// Add a link
-					if (withAddForm)
-					{
-						stream << l.element("broadcastpoint");
-						stream << ap.getImageSubmitButton("add.png", "Ajouter");
-						stream << ap.getSelectInput(AddDepartureStopToDisplayScreenAction::PARAMETER_STOP, _displayScreen->getLocalization()->getPhysicalStopLabels(_displayScreen->getPhysicalStops()) , uid(0));
-					}
-
-					// Closing
-					stream << l.close();
-					if (withAddForm)
-						stream << ap.close();*/
 				}
 
 				// Forbidden places

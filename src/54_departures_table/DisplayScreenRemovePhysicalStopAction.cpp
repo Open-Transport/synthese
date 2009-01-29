@@ -31,7 +31,7 @@
 #include "DisplayScreenRemovePhysicalStopAction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
-
+#include "ArrivalDepartureTableLog.h"
 #include "Conversion.h"
 
 using namespace boost;
@@ -55,9 +55,14 @@ namespace synthese
 		ParametersMap DisplayScreenRemovePhysicalStopAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if (_stop.get())
+			{
+				map.insert(PARAMETER_PHYSICAL, _stop->getKey());
+			}
 			return map;
 		}
+
+
 
 		void DisplayScreenRemovePhysicalStopAction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -65,22 +70,26 @@ namespace synthese
 			{
 				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
 
-				uid id(map.getUid(PARAMETER_PHYSICAL, true, FACTORY_KEY));
-				_stop = PhysicalStopTableSync::Get(id, _env);
+				setStopId(map.getUid(PARAMETER_PHYSICAL, true, FACTORY_KEY));
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
 				throw ActionException("Display screen not found" + e.getMessage());
 			}
-			catch (ObjectNotFoundException<PhysicalStop>& e)
-			{
-				throw ActionException("Specified stop not found" + e.getMessage());
-			}
 		}
 
 		void DisplayScreenRemovePhysicalStopAction::run()
 		{
+			// Preparation
 			_screen->removePhysicalStop(_stop.get());
+			
+			// Log
+			ArrivalDepartureTableLog::addUpdateEntry(
+				_screen.get(),
+				"Retrait de l'arrêt de départ "+ _stop->getOperatorCode() +"/"+ _stop->getName(),
+				_request->getUser().get()
+			);
+
 			DisplayScreenTableSync::Save(_screen.get());
 		}
 
@@ -89,6 +98,21 @@ namespace synthese
 		bool DisplayScreenRemovePhysicalStopAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		}
+		
+		
+		
+		void DisplayScreenRemovePhysicalStopAction::setStopId(
+			RegistryKeyType id
+		){
+			try
+			{
+				_stop = PhysicalStopTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+			}
+			catch (ObjectNotFoundException<PhysicalStop>&)
+			{
+				throw ActionException("Departure physical stop", id, FACTORY_KEY);
+			}
 		}
 	}
 }

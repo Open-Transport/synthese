@@ -28,6 +28,8 @@
 #include "DisplayScreenTableSync.h"
 #include "PhysicalStopTableSync.h"
 #include "Conversion.h"
+#include "ArrivalDepartureTableLog.h"
+#include "PhysicalStop.h"
 
 using namespace std;
 using namespace boost;
@@ -53,7 +55,10 @@ namespace synthese
 		ParametersMap AddDepartureStopToDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_stop.get())
+			{
+				map.insert(PARAMETER_STOP, _stop->getKey());
+			}
 			return map;
 		}
 
@@ -62,23 +67,29 @@ namespace synthese
 			try
 			{
 				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
-
-				uid id(map.getUid(PARAMETER_STOP, true, FACTORY_KEY));
-				_stop = PhysicalStopTableSync::Get(id, _env);
+				setStopId(map.getUid(PARAMETER_STOP, true, FACTORY_KEY));
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (ObjectNotFoundException<PhysicalStop>&)
-			{
-				throw ActionException("Specified stop not found");
-			}
 		}
+
+
 
 		void AddDepartureStopToDisplayScreenAction::run()
 		{
+			// Preparation
 			_screen->addPhysicalStop(_stop.get());
+			
+			// Log
+			ArrivalDepartureTableLog::addUpdateEntry(
+				_screen.get(),
+				"Ajout de l'arrêt de départ "+ _stop->getOperatorCode() +"/"+ _stop->getName(),
+				_request->getUser().get()
+			);
+			
+			// Action
 			DisplayScreenTableSync::Save(_screen.get());
 		}
 
@@ -87,6 +98,19 @@ namespace synthese
 		bool AddDepartureStopToDisplayScreenAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		}
+		
+		void AddDepartureStopToDisplayScreenAction::setStopId(
+			RegistryKeyType id
+		){
+			try
+			{
+				_stop = PhysicalStopTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+			}
+			catch (ObjectNotFoundException<PhysicalStop>&)
+			{
+				throw ActionException("Departure physical stop", id, FACTORY_KEY);
+			}
 		}
 	}
 }
