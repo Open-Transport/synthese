@@ -107,9 +107,9 @@ namespace synthese
 			{
 				_stop = PhysicalStopTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
 			}
-			catch (ObjectNotFoundException<PhysicalStop>&)
+			catch (ObjectNotFoundException<PhysicalStop>& e)
 			{
-				throw ActionException("Departure physical stop", id, FACTORY_KEY);
+				throw ActionException("Departure physical stop", id, FACTORY_KEY, e);
 			}
 		}
 	}

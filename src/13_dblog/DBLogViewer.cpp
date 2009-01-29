@@ -73,152 +73,37 @@ namespace synthese
 	namespace dblog
 	{
 		const string DBLogViewer::PARAMETER_LOG_KEY = "dlvk";
-		const string DBLogViewer::PARAMETER_SEARCH_USER = "dlvsu";
-		const string DBLogViewer::PARAMETER_SEARCH_TYPE = "dlvst";
-		const string DBLogViewer::PARAMETER_START_DATE = "dlvsd";
-		const string DBLogViewer::PARAMETER_END_DATE = "dlved";
-		const string DBLogViewer::PARAMETER_SEARCH_TEXT = "dlvsx";
+
 
 		DBLogViewer::DBLogViewer()
-			: AdminInterfaceElementTemplate<DBLogViewer>()
-			, _searchLevel(DBLogEntry::DB_LOG_UNKNOWN), _searchStartDate(TIME_UNKNOWN)
-			, _searchEndDate(TIME_UNKNOWN), _searchObjectId(UNKNOWN_VALUE)
+		:	AdminInterfaceElementTemplate<DBLogViewer>(),
+			_viewer(FACTORY_KEY)
 		{}
 
 		void DBLogViewer::setFromParametersMap(const ParametersMap& map)
 		{
-			// Log key
-			setLogKey(map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY));
-
-			// Start Date
-			_searchStartDate = map.getDateTime(PARAMETER_START_DATE, false, FACTORY_KEY);
-
-			// End Date
-			_searchEndDate = map.getDateTime(PARAMETER_END_DATE, false, FACTORY_KEY);
-
-			// User
-			uid id(map.getUid(PARAMETER_SEARCH_USER, false, FACTORY_KEY));
-			if (id > 0)
-				_searchUser = UserTableSync::Get(id, _env);
-
-			// Level
-			int num(map.getInt(PARAMETER_SEARCH_TYPE, false, FACTORY_KEY));
-			if (num != UNKNOWN_VALUE)
-				_searchLevel = static_cast<DBLogEntry::Level>(num);
-
-			// Text
-			_searchText = map.getString(PARAMETER_SEARCH_TEXT, false, FACTORY_KEY);
-
-			// Object
-			_searchObjectId = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
-
-			// table parameters
-			_resultTableRequestParameters.setFromParametersMap(map.getMap(), PARAMETER_START_DATE, 30, false);
-
-			// Search
-			DBLogEntryTableSync::Search(
-				_env,
-				_dbLog->getFactoryKey()
-				, _searchStartDate
-				, _searchEndDate
-				, _searchUser.get() ? _searchUser->getKey() : UNKNOWN_VALUE
-				, _searchLevel
-				, _searchObjectId
-				, _searchText
-				, _resultTableRequestParameters.first
-				, _resultTableRequestParameters.maxSize
-				, _resultTableRequestParameters.orderField == PARAMETER_START_DATE
-				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_USER
-				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
-				, _resultTableRequestParameters.raisingOrder,
-				UP_LINKS_LOAD_LEVEL
-			);
-			_resultTableResultParameters.setFromResult(
-				_resultTableRequestParameters,
-				_env.getEditableRegistry<DBLogEntry>()
+			_viewer.set(
+				map,
+				map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY)
 			);
 		}
 
 
-		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables) const
-		{
+		void DBLogViewer::display(
+			ostream& stream,
+			interfaces::VariablesMap& variables
+		) const {
+			stream << "<h1>Journal</h1>";
+
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<DBLogViewer>();
 
-			stream << "<h1>Recherche d'entrées</h1>";
-
-			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
-			st.getForm().addHiddenField(PARAMETER_LOG_KEY, _dbLog->getFactoryKey());
-			stream << st.open();
-			stream << st.cell(
-					"Date début",
-					st.getForm().getCalendarInput(PARAMETER_START_DATE, _searchStartDate)
-				)
-			;
-			stream << st.cell("Date fin", st.getForm().getCalendarInput(PARAMETER_END_DATE, _searchEndDate));
-			stream << st.cell(
-					"Utilisateur",
-					st.getForm().getSelectInput(
-						PARAMETER_SEARCH_USER,
-						SecurityModule::getUserLabels(true),
-						_searchUser ? _searchUser->getKey() : 0
-				)	)
-			;
-			stream << st.cell(
-					"Type",
-					st.getForm().getSelectInput(
-						PARAMETER_SEARCH_TYPE,
-						DBLogModule::getEntryLevelLabels(true),
-						static_cast<int>(_searchLevel)
-				)	)
-			;
-			stream << st.cell("Texte", st.getForm().getTextInput(PARAMETER_SEARCH_TEXT, _searchText));
-			stream << st.close();
-			
-			stream << "<h1>Résultat de la recherche</h1>";
-
-			ResultHTMLTable::HeaderVector v;
-			v.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
-			v.push_back(make_pair(PARAMETER_START_DATE, "Date"));
-			v.push_back(make_pair(PARAMETER_SEARCH_USER, "Utilisateur"));
-			v.push_back(make_pair(string(), "Objet"));
-			DBLog::ColumnsVector customCols = _dbLog->getColumnNames();
-			for (DBLog::ColumnsVector::const_iterator it = customCols.begin(); it != customCols.end(); ++it)
-				v.push_back(make_pair(string(), *it));
-
-			ResultHTMLTable t(v, st.getForm(), _resultTableRequestParameters, _resultTableResultParameters, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
-
-			stream << t.open();
-			
-			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, _env.getRegistry<DBLogEntry>())
-			{
-				stream << t.row();
-				stream <<
-					t.col() <<
-					HTMLModule::getHTMLImage(
-						DBLogModule::getEntryIcon(dbe->getLevel()),
-						DBLogModule::getEntryLevelLabel(dbe->getLevel())
-					)
-				;
-				stream << t.col() << dbe->getDate().toString(true);
-				stream << t.col() << (dbe->getUser() ? dbe->getUser()->getLogin() : "(supprimé)");
-				stream <<
-					t.col() <<
-					(	(dbe->getObjectId() > 0) ?
-						_dbLog->getObjectName(dbe->getObjectId()) :
-						string()
-					)
-				;
-
-				DBLog::ColumnsVector cols = _dbLog->parse(*dbe);
-				BOOST_FOREACH(const DBLog::ColumnsVector::value_type& col, cols)
-				{
-					stream << t.col() << col;
-				}
-			}
-			
-			stream << t.close();
+			_viewer.display(
+				stream,
+				searchRequest,
+				true, false
+			);
 		}
 
 		bool DBLogViewer::isAuthorized() const

@@ -31,6 +31,7 @@
 #include "ResultHTMLTable.h"
 #include "DBLogEntry.h"
 #include "AdminInterfaceElementTemplate.h"
+#include "DBLogHTMLView.h"
 
 namespace synthese
 {
@@ -88,29 +89,18 @@ namespace synthese
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 		*/
-		class DBLogViewer : public admin::AdminInterfaceElementTemplate<DBLogViewer>
+		class DBLogViewer
+		:	public admin::AdminInterfaceElementTemplate<DBLogViewer>
 		{
 			//! \name Stored parameters
 			//@{
-				time::DateTime							_searchStartDate;
-				time::DateTime							_searchEndDate;
-				DBLogEntry::Level						_searchLevel;
-				boost::shared_ptr<const security::User>	_searchUser;
-				std::string								_searchText;
+				DBLogHTMLView							_viewer;
 				boost::shared_ptr<DBLog>				_dbLog;
-				uid										_searchObjectId;
-				html::ResultHTMLTable::RequestParameters	_resultTableRequestParameters;
-				html::ResultHTMLTable::ResultParameters		_resultTableResultParameters;
 			//@}
 
 		public:
 			static const std::string PARAMETER_LOG_KEY;
-			static const std::string PARAMETER_SEARCH_USER;
-			static const std::string PARAMETER_SEARCH_TYPE;
-			static const std::string PARAMETER_START_DATE;
-			static const std::string PARAMETER_END_DATE;
-			static const std::string PARAMETER_SEARCH_TEXT;
-
+			
 			DBLogViewer();
 			
 			/** Initialization of the parameters from a request.
@@ -123,6 +113,10 @@ namespace synthese
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
 
+			/** Authorization test.
+			 * @todo Add a right control by log file
+			 * @return 
+			 */
 			bool isAuthorized() const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.

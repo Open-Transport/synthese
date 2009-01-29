@@ -115,28 +115,13 @@ namespace synthese
 				v.push_back(*it);
 			object->setContent(v);
 
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				// User ID
-				uid userId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
-
-				if (userId > 0)
-				{
-					try
-					{
-						object->setUser(UserTableSync::Get(userId, env, linkLevel).get());
-					}
-					catch (ObjectNotFoundException<User>& e)
-					{					
-						/// @todo See if an exception should be thrown
-					}
-				}
-			}
+			uid userId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
+			object->setUserId(userId);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(DBLogEntry* obj)
-		{
-			obj->setUser(NULL);
+		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(
+			DBLogEntry* obj
+		){
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Save(
@@ -153,8 +138,8 @@ namespace synthese
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getLogKey())
 				<< "," << object->getDate().toSQLString()
-				<< "," << (object->getUser() ? Conversion::ToString(object->getUser()->getKey()) : "0")
-				<< "," << Conversion::ToString((int) object->getLevel())
+				<< "," << Conversion::ToString(object->getUserId())
+				<< "," << Conversion::ToString(static_cast<int>(object->getLevel()))
 				<< ",'";
 
 			DBLogEntry::Content c = object->getContent();

@@ -20,8 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "13_dblog/DBLog.h"
-#include "13_dblog/DBLogEntryTableSync.h"
+#include "DBLog.h"
+#include "DBLogEntryTableSync.h"
+#include "User.h"
 
 namespace synthese
 {
@@ -39,7 +40,7 @@ namespace synthese
 		){
 			DBLogEntry e;
 			e.setLevel(level);
-			e.setUser(user);
+			e.setUserId(user ? user->getKey() : 0);
 			e.setLogKey(logKey);
 			e.setContent(content);
 			e.setObjectId(objectId);

@@ -45,9 +45,9 @@ namespace synthese
 			_date = date;
 		}
 
-		void DBLogEntry::setUser(const security::User* user)
+		void DBLogEntry::setUserId(util::RegistryKeyType value)
 		{
-			_user = user;
+			_userId = value;
 		}
 
 		void DBLogEntry::setLogKey( const std::string& key )
@@ -64,9 +64,9 @@ namespace synthese
 			return _date;
 		}
 
-		const security::User* DBLogEntry::getUser() const
+		util::RegistryKeyType DBLogEntry::getUserId() const
 		{
-			return _user;
+			return _userId;
 		}
 
 		const DBLogEntry::Content& DBLogEntry::getContent() const
@@ -89,12 +89,12 @@ namespace synthese
 			_level = level;
 		}
 
-		uid DBLogEntry::getObjectId() const
+		util::RegistryKeyType DBLogEntry::getObjectId() const
 		{
 			return _objectId;
 		}
 
-		void DBLogEntry::setObjectId( uid id )
+		void DBLogEntry::setObjectId(util::RegistryKeyType id )
 		{
 			_objectId = id;
 		}
@@ -112,7 +112,7 @@ namespace synthese
 		DBLogEntry::DBLogEntry(RegistryKeyType key)
 		:	Registrable(key),
 			_date(TIME_CURRENT)
-			, _user(NULL)
+			, _userId(UNKNOWN_VALUE)
 		{
 
 		}

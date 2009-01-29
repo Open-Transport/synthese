@@ -245,7 +245,7 @@ namespace synthese
 				ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE])));
 				shared_ptr<ReservationTransaction> tr;
 				ReservationStatus status(NO_RESERVATION);
-				const User* entryUser(entry->getUser());
+// 				const User* entryUser(entry->getUserId());
 				shared_ptr<const User> customer;
 				if (displayCustomer && entry->getObjectId() > 0)
 					try
@@ -281,14 +281,14 @@ namespace synthese
 					stream << rt.col(1,string(),true) << "APPEL";
 					if (!d.isUnknown())
 						stream << " jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry->getDate())) << " s)";
-					stream << rt.col(1,string(),true) << ((entryUser != NULL) ? entryUser->getFullName() : "(inconnu)");
+// 					stream << rt.col(1,string(),true) << ((entryUser != NULL) ? entryUser->getFullName() : "(inconnu)");
 					stream << rt.col(1,string(),true);
-					if(searchRequest.isAuthorized<ResaRight>(DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
-						||	searchRequest.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE) && entryUser == searchRequest.getSession()->getUser().get()
-					){
-						editRequest.setObjectId(entry->getKey());
-						stream << HTMLModule::getLinkButton(editRequest.getURL(), "Modifier", string(), "pencil.png");
-					}
+// 					if(searchRequest.isAuthorized<ResaRight>(DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
+// 						||	searchRequest.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE) && entryUser == searchRequest.getSession()->getUser().get()
+// 					){
+// 						editRequest.setObjectId(entry->getKey());
+// 						stream << HTMLModule::getLinkButton(editRequest.getURL(), "Modifier", string(), "pencil.png");
+// 					}
 
 				}
 				else
@@ -347,7 +347,9 @@ namespace synthese
 						break;
 					}
 
-					stream << rt.col() << ((entryUser != NULL) ? entryUser->getFullName() : "(inconnu)");
+					stream << rt.col()
+// 						<< ((entryUser != NULL) ? entryUser->getFullName() : "(inconnu)")
+					;
 
 
 					stream << rt.col();

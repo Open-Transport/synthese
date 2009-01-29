@@ -131,7 +131,7 @@ namespace synthese
 				customer = UserTableSync::Get(_entry->getObjectId(), _env);
 			}
 			stream << t.cell("Client", customer.get() ? customer->getFullName() : "inconnu");
-			stream << t.cell("Opérateur", _entry->getUser() ? _entry->getUser()->getFullName() : "inconnu");
+// 			stream << t.cell("Opérateur", _entry->getUser() ? _entry->getUser()->getFullName() : "inconnu");
 			stream << t.cell("Type d'appel", t.getForm().getRadioInput(ResaLogEntryUpdateAction::PARAMETER_TYPE, choices, static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE]))));
 			stream << t.title("Ajout d'information sur l'appel");
 			stream << t.cell("Type d'ajout", t.getForm().getRadioInput(ResaLogEntryUpdateAction::PARAMETER_TYPE, addChoices, ResaDBLog::CALL_ENTRY));

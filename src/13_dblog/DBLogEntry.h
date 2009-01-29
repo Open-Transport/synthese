@@ -32,18 +32,13 @@
 
 namespace synthese
 {
-	namespace security
-	{
-		class User;
-	}
-
 	namespace dblog
 	{
 		/** DBLogEntry class.
 			@ingroup m13
 		*/
 		class DBLogEntry
-		: public virtual util::Registrable
+		:	public virtual util::Registrable
 		{
 		public:
 
@@ -63,28 +58,28 @@ namespace synthese
 		private:
 			std::string				_logKey;
 			time::DateTime			_date;
-			const security::User*	_user;
+			util::RegistryKeyType	_userId;
 			Content					_content;
 			Level					_level;
-			uid						_objectId;
+			util::RegistryKeyType	_objectId;
 
 		public:
 			DBLogEntry(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 			void					setLogKey(const std::string& key);
 			void					setDate(const time::DateTime& date);
-			void					setUser(const security::User* user);
+			void					setUserId(util::RegistryKeyType value);
 			void					setContent(const Content& content);
 			void					setLevel(Level level);
-			void					setObjectId(uid id);
+			void					setObjectId(util::RegistryKeyType id);
 
 			const std::string&		getLogKey()			const;
 			time::DateTime			getDate()			const;
-			const security::User*	getUser()			const;
+			util::RegistryKeyType	getUserId()			const;
 			const Content&			getContent()		const;
 			std::string				getStringContent()	const;
 			Level					getLevel()			const;
-			uid						getObjectId()		const;
+			util::RegistryKeyType	getObjectId()		const;
 		};
 	}
 }
