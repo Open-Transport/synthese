@@ -130,9 +130,13 @@ namespace synthese
 				, _resultTableRequestParameters.orderField == PARAMETER_START_DATE
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_USER
 				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
-				, _resultTableRequestParameters.raisingOrder
-				);
-			_resultTableResultParameters.setFromResult(_resultTableRequestParameters, _env.getEditableRegistry<DBLogEntry>());
+				, _resultTableRequestParameters.raisingOrder,
+				UP_LINKS_LOAD_LEVEL
+			);
+			_resultTableResultParameters.setFromResult(
+				_resultTableRequestParameters,
+				_env.getEditableRegistry<DBLogEntry>()
+			);
 		}
 
 
@@ -147,10 +151,28 @@ namespace synthese
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			st.getForm().addHiddenField(PARAMETER_LOG_KEY, _dbLog->getFactoryKey());
 			stream << st.open();
-			stream << st.cell("Date début", st.getForm().getCalendarInput(PARAMETER_START_DATE, _searchStartDate));
+			stream << st.cell(
+					"Date début",
+					st.getForm().getCalendarInput(PARAMETER_START_DATE, _searchStartDate)
+				)
+			;
 			stream << st.cell("Date fin", st.getForm().getCalendarInput(PARAMETER_END_DATE, _searchEndDate));
-			stream << st.cell("Utilisateur", st.getForm().getSelectInput(PARAMETER_SEARCH_USER, SecurityModule::getUserLabels(true), _searchUser ? _searchUser->getKey() : 0));
-			stream << st.cell("Type", st.getForm().getSelectInput(PARAMETER_SEARCH_TYPE, DBLogModule::getEntryLevelLabels(true), (int) _searchLevel));
+			stream << st.cell(
+					"Utilisateur",
+					st.getForm().getSelectInput(
+						PARAMETER_SEARCH_USER,
+						SecurityModule::getUserLabels(true),
+						_searchUser ? _searchUser->getKey() : 0
+				)	)
+			;
+			stream << st.cell(
+					"Type",
+					st.getForm().getSelectInput(
+						PARAMETER_SEARCH_TYPE,
+						DBLogModule::getEntryLevelLabels(true),
+						static_cast<int>(_searchLevel)
+				)	)
+			;
 			stream << st.cell("Texte", st.getForm().getTextInput(PARAMETER_SEARCH_TEXT, _searchText));
 			stream << st.close();
 			
@@ -172,14 +194,28 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, _env.getRegistry<DBLogEntry>())
 			{
 				stream << t.row();
-				stream << t.col() << HTMLModule::getHTMLImage(DBLogModule::getEntryIcon(dbe->getLevel()), DBLogModule::getEntryLevelLabel(dbe->getLevel()));
+				stream <<
+					t.col() <<
+					HTMLModule::getHTMLImage(
+						DBLogModule::getEntryIcon(dbe->getLevel()),
+						DBLogModule::getEntryLevelLabel(dbe->getLevel())
+					)
+				;
 				stream << t.col() << dbe->getDate().toString(true);
 				stream << t.col() << (dbe->getUser() ? dbe->getUser()->getLogin() : "(supprimé)");
-				stream << t.col() << ((dbe->getObjectId() > 0) ? _dbLog->getObjectName(dbe->getObjectId()) : string());
+				stream <<
+					t.col() <<
+					(	(dbe->getObjectId() > 0) ?
+						_dbLog->getObjectName(dbe->getObjectId()) :
+						string()
+					)
+				;
 
 				DBLog::ColumnsVector cols = _dbLog->parse(*dbe);
-				for (DBLog::ColumnsVector::const_iterator it = cols.begin(); it != cols.end(); ++it)
-					stream << t.col() << *it;
+				BOOST_FOREACH(const DBLog::ColumnsVector::value_type& col, cols)
+				{
+					stream << t.col() << col;
+				}
 			}
 			
 			stream << t.close();

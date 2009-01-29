@@ -220,9 +220,14 @@ namespace synthese
 					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 					while (rows->next ())
 					{
-						boost::shared_ptr<T> object(K::GetNewObject(rows));
-						Load(object.get(), rows, env, linkLevel);
-						registry.add(object);
+						if(registry.contains(rows->getKey()))
+						{
+							Load(registry.getEditable(rows->getKey()).get(), rows, env, linkLevel);
+						} else {
+							boost::shared_ptr<T> object(K::GetNewObject(rows));
+							Load(object.get(), rows, env, linkLevel);
+							registry.add(object);
+						}
 					}
 //				}
 //				catch(SQLiteException& e)

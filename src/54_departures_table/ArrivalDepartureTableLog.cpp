@@ -51,8 +51,10 @@ namespace synthese
 			return v;
 		}
 
-		void ArrivalDepartureTableLog::addUpdateEntry(const DisplayScreen* screen , const std::string& text, const User* user )
-		{
+		void ArrivalDepartureTableLog::addUpdateEntry(
+			const DisplayScreen* screen,
+			const std::string& text, const User* user
+		){
 			DBLogEntry::Content content;
 			content.push_back(text);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());

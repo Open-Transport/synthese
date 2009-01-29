@@ -27,13 +27,10 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "04_time/DateTime.h"
-
-#include "05_html/ResultHTMLTable.h"
-
-#include "13_dblog/DBLogEntry.h"
-
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "DateTime.h"
+#include "ResultHTMLTable.h"
+#include "DBLogEntry.h"
+#include "AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {

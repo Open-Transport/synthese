@@ -423,12 +423,13 @@ namespace synthese
 			}
 		}
 
-		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const DisplayedPlacesList& placesToAvoid) const
-		{
+		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(
+			const DisplayedPlacesList& placesToAvoid
+		) const {
 			map<std::string, std::pair<uid, string> > m;
-			for (PhysicalStops::const_iterator it = getPhysicalStops().begin(); it != getPhysicalStops().end(); ++it)
+			BOOST_FOREACH(const PhysicalStops::value_type& it, getPhysicalStops())
 			{
-				const PhysicalStop* p(it->second);
+				const PhysicalStop* p(it.second);
 				const std::set<const Edge*>& edges = p->getDepartureEdges();
 				BOOST_FOREACH(const Edge* e, edges)
 				{

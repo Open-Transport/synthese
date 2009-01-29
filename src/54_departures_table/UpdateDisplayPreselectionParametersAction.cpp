@@ -73,7 +73,7 @@ namespace synthese
 				_cleaningDelay = map.getInt(PARAMETER_CLEANING_DELAY, true, FACTORY_KEY);
 				_maxDelay = map.getInt(PARAMETER_DISPLAY_MAX_DELAY, true, FACTORY_KEY);
 				_function = static_cast<DisplayFunction>(map.getInt(PARAMETER_DISPLAY_FUNCTION, true, FACTORY_KEY));
-				_preselectionDelay = map.getInt(PARAMETER_PRESELECTION_DELAY, true, FACTORY_KEY);
+				_preselectionDelay = map.getInt(PARAMETER_PRESELECTION_DELAY, false, FACTORY_KEY);
 				_endFilter = static_cast<EndFilter>(map.getInt(PARAMETER_DISPLAY_END_FILTER, true, FACTORY_KEY));
 			}
 			catch (RequestMissingParameterException& e)
@@ -84,16 +84,10 @@ namespace synthese
 
 		void UpdateDisplayPreselectionParametersAction::run()
 		{
-			// Log
 			stringstream t;
+			
+			// Function
 			DBLogModule::appendToLogIfChange(t, "Fonction", GetFunctionList()[GetFunction(*_screen)], GetFunctionList()[_function]);
-			DBLogModule::appendToLogIfChange(t, "Délai de préselection", _screen->getForceDestinationDelay(), _preselectionDelay);
-			DBLogModule::appendToLogIfChange(t, "Affichage des terminus seulement", _screen->getEndFilter(), _endFilter);
-			DBLogModule::appendToLogIfChange(t, "Délai d'effacement", _screen->getClearingDelay(), _cleaningDelay);
-			DBLogModule::appendToLogIfChange(t, "Délai d'apparition", _screen->getMaxDelay(), _maxDelay);
-
-			// The update
-			_screen->setDestinationForceDelay(_preselectionDelay);
 			switch (_function)
 			{
 			case DEPARTURES_CHRONOLOGICAL:
@@ -123,12 +117,37 @@ namespace synthese
 				_screen->setDirection(DISPLAY_ARRIVALS);
 				break;
 			}
+			
+			// Preselection delay
+			if (_preselectionDelay > 0)
+			{
+				DBLogModule::appendToLogIfChange(
+					t,
+					"Délai de préselection",
+					_screen->getForceDestinationDelay(),
+					_preselectionDelay
+				);
+				_screen->setDestinationForceDelay(_preselectionDelay);
+			}
+			
+			// Terminus
+			DBLogModule::appendToLogIfChange(
+				t, "Affichage des terminus seulement", _screen->getEndFilter(), _endFilter
+			);
 			_screen->setOriginsOnly(_endFilter);
+			
+			// Cleaning delay
+			DBLogModule::appendToLogIfChange(
+				t, "Délai d'effacement", _screen->getClearingDelay(), _cleaningDelay
+			);
 			_screen->setClearingDelay(_cleaningDelay);
+			
+			// Max delay
+			DBLogModule::appendToLogIfChange(t, "Délai d'apparition", _screen->getMaxDelay(), _maxDelay);
 			_screen->setMaxDelay(_maxDelay);
+			
+			// Saving
 			DisplayScreenTableSync::Save(_screen.get());
-
-			// Log		
 			ArrivalDepartureTableLog::addUpdateEntry(_screen.get(), t.str(), _request->getUser().get());
 		}
 

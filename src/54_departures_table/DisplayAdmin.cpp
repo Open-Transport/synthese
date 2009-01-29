@@ -73,6 +73,7 @@
 
 #include <utility>
 #include <sstream>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -115,6 +116,11 @@ namespace synthese
 			std::ostream& stream,
 			interfaces::VariablesMap& variables
 		) const	{
+			// Display screen read in the main environment
+			shared_ptr<const DisplayScreen> _prodScreen(
+				Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(_displayScreen->getKey())
+			);
+			
 			////////////////////////////////////////////////////////////////////
 			// TECHNICAL TAB
 			if (openTabContent(stream, TAB_TECHNICAL))
@@ -376,8 +382,20 @@ namespace synthese
 					_displayScreen->getClearingDelay()
 				));
 
-				stream << t.title("Présélection");
-				stream << t.cell("Délai maximum présélection", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay())));
+				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
+				{
+					stream << t.title("Présélection");
+					stream <<
+						t.cell(
+							"Délai maximum présélection",
+							t.getForm().getTextInput(
+								UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY,
+								Conversion::ToString(_displayScreen->getForceDestinationDelay())
+							) + " minutes"
+						)
+					;
+				}
+				
 				stream << t.close();
 
 				// Used physical stops
@@ -462,43 +480,85 @@ namespace synthese
 				}
 
 				// Forbidden places
-				stream << "<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>";
+				stream <<
+					"<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>"
+				;
 
 				HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
 				stream << ant.open() << l.open();
 
-				for (DisplayedPlacesList::const_iterator it = _displayScreen->getForbiddenPlaces().begin(); it != _displayScreen->getForbiddenPlaces().end(); ++it)
-				{
-					HTMLForm ntu(rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString(it->second->getKey())));
-					ntu.addHiddenField(DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
+				BOOST_FOREACH(
+					const DisplayedPlacesList::value_type& it,
+					_displayScreen->getForbiddenPlaces()
+				){
+					HTMLForm ntu(
+						rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString(it.second->getKey()))
+					);
+					ntu.addHiddenField(
+						DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE,
+						Conversion::ToString(it.second->getKey())
+					);
 					stream << l.element("broadcastpoint");
-					stream << HTMLModule::getHTMLLink(ntu.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
+					stream <<
+						HTMLModule::getHTMLLink(
+							ntu.getURL(),
+							HTMLModule::getHTMLImage("delete.png","Supprimer")
+						) <<
+						it.second->getFullName()
+					;
 				}
 
 				stream << l.element("broadcastpoint");
 				stream << ant.getImageSubmitButton("add.png", "Ajouter");
-				stream << ant.getSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0));
+				stream << ant.getSelectInput(
+					AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE,
+					_prodScreen->getSortedAvaliableDestinationsLabels(
+						_displayScreen->getForbiddenPlaces()
+					),
+					uid(0)
+				);
 				stream << l.close() << ant.close();
 
 				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
 				{
 					// Additional preselection stops
-					stream << "<p>Arrêts de présélection</p>";
+					stream << "<h1>Arrêts de présélection</h1>";
 
 					HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
 					stream << psaf.open() << l.open();
 
-					for (DisplayedPlacesList::const_iterator it = _displayScreen->getForcedDestinations().begin(); it != _displayScreen->getForcedDestinations().end(); ++it)
-					{
-						HTMLForm psdf(rmPreselRequest.getHTMLForm("rmpres" + Conversion::ToString(it->second->getKey())));
-						psdf.addHiddenField(RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
+					BOOST_FOREACH(
+						const DisplayedPlacesList::value_type& it,
+						_displayScreen->getForcedDestinations()
+					){
+						HTMLForm psdf(
+							rmPreselRequest.getHTMLForm("rmpres" + Conversion::ToString(it.second->getKey()))
+						);
+						psdf.addHiddenField(
+							RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE,
+							Conversion::ToString(it.second->getKey())
+						);
 						stream << l.element("broadcastpoint");
-						stream << HTMLModule::getHTMLLink(psdf.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
+						stream <<
+							HTMLModule::getHTMLLink(
+								psdf.getURL(),
+								HTMLModule::getHTMLImage("delete.png","Supprimer")
+							) <<
+							it.second->getFullName()
+						;
 					}
 
 					stream << l.element("broadcastpoint");
 					stream << psaf.getImageSubmitButton("add.png", "Ajouter");
-					stream << psaf.getSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0));
+					stream <<
+						psaf.getSelectInput(
+							AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE,
+							_prodScreen->getSortedAvaliableDestinationsLabels(
+								_displayScreen->getForcedDestinations()
+							),
+							uid(0)
+						)
+					;
 					stream << l.close() << psaf.close();
 
 					stream << "<p class=\"info\">Les terminus de lignes sont automatiquement présélectionnés.</p>";
@@ -574,7 +634,7 @@ namespace synthese
 
 				stream << l.element("broadcastpoint");
 				stream << amf.getImageSubmitButton("add.png", "Ajouter");
-				stream << amf.getSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
+				stream << amf.getSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _prodScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
 
 				stream << l.close();
 				stream << amf.close();
