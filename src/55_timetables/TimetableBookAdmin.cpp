@@ -257,7 +257,7 @@ namespace synthese
 			TimetableTableSync::Search(env, _book.get() ? _book->getKey() : 0);
 			BOOST_FOREACH(shared_ptr<Timetable> tt, env.getRegistry<Timetable>())
 			{
-				PageLink link;
+				PageLink link(currentPage.getPageLink());
 				link.factoryKey = tt->getIsBook() ? TimetableBookAdmin::FACTORY_KEY : TimetableAdmin::FACTORY_KEY;
 				link.icon = tt->getIsBook() ? TimetableBookAdmin::ICON :  TimetableAdmin::ICON;
 				link.name = tt->getTitle();
