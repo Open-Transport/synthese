@@ -28,11 +28,15 @@
 
 namespace synthese
 {
+	namespace road
+	{
+		class Road;
+	}
+	
 	namespace env
 	{
 		class Address;
-		class Road;
-
+	
 		//////////////////////////////////////////////////////////////////////////
 		/// Association class between road and address.
 		///	A road chunk is always delimited by two adresses, with no other

@@ -97,9 +97,11 @@ namespace synthese
 			{
 				int tableId(util::decodeTableId(id));
 				
-				if (tableId == TransportNetworkTableSync::TABLE.ID)
+				if (tableId == pt::TransportNetworkTableSync::TABLE.ID)
 				{
-					boost::shared_ptr<const TransportNetwork> network(TransportNetworkTableSync::Get(id, env));
+					boost::shared_ptr<const pt::TransportNetwork> network(
+						pt::TransportNetworkTableSync::Get(id, env)
+					);
 					return network->getName();
 				}
 
@@ -129,15 +131,17 @@ namespace synthese
 			try
 			{
 				int tableId1(util::decodeTableId(id1));
-				if (tableId1 == TransportNetworkTableSync::TABLE.ID)
+				if (tableId1 == pt::TransportNetworkTableSync::TABLE.ID)
 				{
 					int tableId2(util::decodeTableId(id2));
-					if (tableId2 == TransportNetworkTableSync::TABLE.ID)
+					if (tableId2 == pt::TransportNetworkTableSync::TABLE.ID)
 						return id1 == id2;
 					if (tableId2 == CommercialLineTableSync::TABLE.ID)
 					{
 						boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(id2, env, util::UP_LINKS_LOAD_LEVEL));
-						boost::shared_ptr<const TransportNetwork> network(TransportNetworkTableSync::Get(id1, env));
+						boost::shared_ptr<const pt::TransportNetwork> network(
+							pt::TransportNetworkTableSync::Get(id1, env)
+						);
 						return line->getNetwork() == network.get();
 					}
 					if (tableId2 == ConnectionPlaceTableSync::TABLE.ID)

@@ -28,10 +28,14 @@
 
 namespace synthese
 {
+	namespace road
+	{
+		class Road;
+	}
+	
 	namespace env
 	{
 		class Place;
-		class Road;
 	}
 
 	namespace messages
@@ -53,7 +57,8 @@ namespace synthese
 				- 4 : Road name
 				- 5 : Length of the junction
 		*/
-		class JourneyBoardJunctionCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardJunctionCellInterfacePage>
+		class JourneyBoardJunctionCellInterfacePage
+		:	public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardJunctionCellInterfacePage>
 		{
 		public:
 			JourneyBoardJunctionCellInterfacePage();
@@ -72,7 +77,7 @@ namespace synthese
 				, const env::Place* place
 				, const messages::SentAlarm* alarm
 				, bool color
-				, const env::Road* road
+				, const road::Road* road
 				, int distance
 				, const server::Request* request = NULL
 			) const;

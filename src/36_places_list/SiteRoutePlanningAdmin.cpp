@@ -62,6 +62,7 @@ namespace synthese
 	using namespace env;
 	using namespace security;
 	using namespace graph;
+	using namespace road;
 
 	namespace util
 	{

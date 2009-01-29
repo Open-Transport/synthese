@@ -36,6 +36,7 @@ namespace synthese
 	using namespace lexmatcher;
 	using namespace util;
 	using namespace graph;
+	using namespace road;
 
 	namespace util
 	{

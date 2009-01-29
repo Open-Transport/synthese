@@ -26,10 +26,10 @@ namespace synthese
 {
 	namespace util
 	{
-		template<> const std::string Registry<env::TransportNetwork>::KEY("TransportNetwork");
+		template<> const std::string Registry<pt::TransportNetwork>::KEY("TransportNetwork");
 	}
 
-	namespace env
+	namespace pt
 	{
 		TransportNetwork::TransportNetwork(
 			util::RegistryKeyType id,

@@ -43,6 +43,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace graph;
+	using namespace road;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyLineListInterfaceElement>::FACTORY_KEY(
 		"journey_line_list"

@@ -32,10 +32,14 @@
 
 namespace synthese
 {
+	namespace road
+	{
+		class Road;
+	}
+	
 	namespace env
 	{
 		class LogicalPlace;
-		class Road;
 		class AddressablePlace;
 
 		/** Address (road + metric offset)
@@ -56,7 +60,7 @@ namespace synthese
 
 		private:
 
-			const Road* _road;    //!< Address road.
+			const road::Road* _road;    //!< Address road.
 			double _metricOffset;  //!< Metric offset (meters)
 
 		public:
@@ -64,7 +68,7 @@ namespace synthese
 			Address(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
 				const AddressablePlace* place = NULL,
-				const Road* road = NULL, 
+				const road::Road* road = NULL, 
 				double metricOffset = UNKNOWN_VALUE,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE
@@ -75,14 +79,14 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const Road* getRoad() const;
+				const road::Road* getRoad() const;
 				double getMetricOffset () const;
 				const AddressablePlace* getAddressablePlace() const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void setRoad(const Road* road);
+				void setRoad(const road::Road* road);
 				void setMetricOffset(double value);
 			//@}
 

@@ -69,6 +69,8 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace time;
+	using namespace road;
+	using namespace pt;
 
 	namespace util
 	{

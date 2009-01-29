@@ -30,6 +30,7 @@
 namespace synthese
 {
 	using namespace graph;
+	using namespace road;
 	
 	namespace env
 	{

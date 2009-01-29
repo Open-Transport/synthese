@@ -38,11 +38,13 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,TransportNetworkTableSync>::FACTORY_KEY("15.20.02 Network transport");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,TransportNetworkTableSync>::FACTORY_KEY(
+		"15.20.02 Network transport"
+	);
 
-	namespace env
+	namespace pt
 	{
 		const string TransportNetworkTableSync::COL_NAME("name");
 	}
@@ -91,12 +93,13 @@ namespace synthese
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(TransportNetwork* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(
+			TransportNetwork* object
+		){
 		}
 	}
 
-	namespace env
+	namespace pt
 	{
 		TransportNetworkTableSync::TransportNetworkTableSync ()
 		: SQLiteRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>()

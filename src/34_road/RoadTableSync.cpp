@@ -42,13 +42,16 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace env;
+	using namespace road;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, RoadTableSync>::FACTORY_KEY("15.30.02 Roads");
+		template<> const string FactorableTemplate<SQLiteTableSync, RoadTableSync>::FACTORY_KEY(
+			"15.30.02 Roads"
+		);
 	}
 
-	namespace env
+	namespace road
 	{
 		const string RoadTableSync::COL_NAME ("name");
 		const string RoadTableSync::COL_CITYID ("city_id");
@@ -163,7 +166,7 @@ namespace synthese
 
 	}
 
-	namespace env
+	namespace road
 	{
 		RoadTableSync::RoadTableSync()
 			: SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>()

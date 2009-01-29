@@ -41,8 +41,11 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
+	using namespace pt;
 
-	template<> const string util::FactorableTemplate<Function,env::LinesListFunction>::FACTORY_KEY("LinesListFunction");
+	template<> const string util::FactorableTemplate<Function,env::LinesListFunction>::FACTORY_KEY(
+		"LinesListFunction"
+	);
 	
 	namespace env
 	{

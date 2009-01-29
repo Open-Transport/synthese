@@ -32,13 +32,14 @@ namespace synthese
 {
 	using namespace util;
 	using namespace graph;
+	using namespace env;
 
 	namespace util
 	{
-		template<> const string Registry<env::Road>::KEY("Road");
+		template<> const string Registry<road::Road>::KEY("Road");
 	}
 
-	namespace env
+	namespace road
 	{
 
 		Road::Road (

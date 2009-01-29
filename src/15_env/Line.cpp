@@ -160,14 +160,6 @@ namespace synthese
 
 
 
-		const TransportNetwork* 
-		Line::getNetwork () const
-		{
-			return getCommercialLine()->getNetwork();
-		}
-
-
-
 		const RollingStock*
 		Line::getRollingStock () const
 		{

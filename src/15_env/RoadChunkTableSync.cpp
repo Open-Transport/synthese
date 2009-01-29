@@ -46,6 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace geometry;
+	using namespace road;
 
 	namespace util
 	{

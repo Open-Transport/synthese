@@ -38,6 +38,11 @@ namespace synthese
 		class Service;
 	}
 	
+	namespace pt
+	{
+		class TransportNetwork;
+	}
+	
 	namespace env
 	{
 		class PhysicalStop;
@@ -45,7 +50,6 @@ namespace synthese
 		class RollingStock;
 		class LineAlarmBroadcast;
 		class CommercialLine;
-		class TransportNetwork;
 		class SubLine;
 
 
@@ -114,7 +118,6 @@ namespace synthese
 				bool					getUseInRoutePlanning ()	const;
 				const std::string&		getDirection ()				const;
 				const std::string&		getTimetableName ()			const;
-				const TransportNetwork* getNetwork ()				const;
 				const RollingStock*		getRollingStock()			const;
 				bool					getWalkingLine ()			const;
 				const CommercialLine*	getCommercialLine()			const;

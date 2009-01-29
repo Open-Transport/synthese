@@ -74,6 +74,7 @@ namespace synthese
 	using namespace routeplanner;
 	using namespace security;
 	using namespace graph;
+	using namespace road;
 
 	namespace util
 	{

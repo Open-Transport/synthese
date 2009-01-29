@@ -81,6 +81,7 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace graph;
+	using namespace pt;
 
 	namespace impex
 	{

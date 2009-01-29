@@ -14,6 +14,8 @@ CppLibProject(
 		's3-geometry.cpplib',
 		's3-db.cpplib',
 		's3-time.cpplib',
-		's3-messages.cpplib'
+		's3-messages.cpplib',
+		's3-pt.cpplib',
+		's3-road.cpplib'
 	]
 )

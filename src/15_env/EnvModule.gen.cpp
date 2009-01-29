@@ -16,12 +16,10 @@ synthese::env::ReservationContactTableSync::integrate();
 synthese::env::RollingStockTableSync::integrate();
 
 synthese::env::CityTableSync::integrate();
-synthese::env::TransportNetworkTableSync::integrate();
 
 synthese::env::CommercialLineTableSync::integrate();
 
 synthese::env::LineTableSync::integrate();
-synthese::env::RoadTableSync::integrate();
 
 synthese::env::ConnectionPlaceTableSync::integrate();
 synthese::env::CrossingTableSync::integrate();
@@ -48,19 +46,17 @@ synthese::env::LineAdmin::integrate();
 
 synthese::env::EnvModule::integrate();
 
-synthese::env::TransportNetworkRight::integrate();
-
 synthese::env::LinesListFunction::integrate();
+
+synthese::env::TransportNetworkRight::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::env::PhysicalStop>();
 synthese::util::Env::Integrate<synthese::env::Line>();
-synthese::util::Env::Integrate<synthese::env::Road>();
 synthese::util::Env::Integrate<synthese::env::Address>();
 synthese::util::Env::Integrate<synthese::env::Crossing>();
 synthese::util::Env::Integrate<synthese::env::LineStop>();
 synthese::util::Env::Integrate<synthese::env::NonConcurrencyRule>();
-synthese::util::Env::Integrate<synthese::env::TransportNetwork>();
 synthese::util::Env::Integrate<synthese::env::PublicTransportStopZoneConnectionPlace>();
 synthese::util::Env::Integrate<synthese::env::ReservationContact>();
 synthese::util::Env::Integrate<synthese::env::CommercialLine>();

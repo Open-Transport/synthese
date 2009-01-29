@@ -25,18 +25,18 @@
 
 #include "AddressTableSync.h"
 
-#include "15_env/EnvModule.h"
-#include "15_env/RoadTableSync.h"
-#include "15_env/CrossingTableSync.h"
-#include "15_env/ConnectionPlaceTableSync.h"
+#include "EnvModule.h"
+#include "RoadTableSync.h"
+#include "CrossingTableSync.h"
+#include "ConnectionPlaceTableSync.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
-#include "02_db/LinkException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
+#include "LinkException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -46,6 +46,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace env;
+	using namespace road;
 
 	namespace util
 	{

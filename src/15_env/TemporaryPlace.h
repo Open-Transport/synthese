@@ -28,12 +28,13 @@
 
 namespace synthese
 {
+	namespace road
+	{
+		class Road;
+	}
+	
 	namespace env
 	{
-	
-		class Road;
-		
-		
 		/** Temporary place on the road network.
 			@ingroup m35
 			
@@ -46,21 +47,21 @@ namespace synthese
 		
 		private:
 		
-			const Road* _road;
+			const road::Road* _road;
 			double _metricOffset;
 		
 		protected:
 		
 		public:
 		
-			TemporaryPlace (const Road* road, double metricOffset);
+			TemporaryPlace (const road::Road* road, double metricOffset);
 		
 			virtual ~TemporaryPlace ();
 		
 		
 			//! @name Getters/Setters
 			//@{
-			const Road* getRoad () const;
+			const road::Road* getRoad () const;
 			double getMetricOffset () const;
 			//@}
 		

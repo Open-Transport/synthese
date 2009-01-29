@@ -34,13 +34,15 @@ namespace synthese
 	namespace env
 	{
 		class City;
-		class RoadChunk;
-
+	}
+	
+	namespace road
+	{
 		/** Road class.
-			@ingroup m35
+			@ingroup m34
 		*/
 		class Road
-		:	public AddressablePlace,
+		:	public env::AddressablePlace,
 			public graph::Path
 		{
 		public:
@@ -73,7 +75,7 @@ namespace synthese
 			Road(
 				util::RegistryKeyType key = UNKNOWN_VALUE,
 				std::string name = std::string(),
-				const City* city = NULL,
+				const env::City* city = NULL,
 				RoadType type = ROAD_TYPE_UNKNOWN
 			);
 
@@ -106,7 +108,7 @@ namespace synthese
 		void getImmediateVertices(
 			graph::VertexAccessMap& result, 
 			const graph::AccessDirection& accessDirection,
-			const AccessParameters& accessParameters,
+			const env::AccessParameters& accessParameters,
 			SearchAddresses returnAddresses
 			, SearchPhysicalStops returnPhysicalStops
 			, const graph::Vertex* origin = 0
@@ -117,14 +119,14 @@ namespace synthese
 			  @param metricOffset The reference point.
 			  @return Closest address before reference, or 0 if none.
 		  */
-		  const Address* findClosestAddressBefore (double metricOffset) const;
+		  const env::Address* findClosestAddressBefore (double metricOffset) const;
 
 		  
 		  /** Find closest address of this road, after a given metric offset.
 			  @param metricOffset The reference point.
 			  @return Closest address after reference, or 0 if none.
 		  */
-		  const Address* findClosestAddressAfter (double metricOffset) const;
+		  const env::Address* findClosestAddressAfter (double metricOffset) const;
 		  
 		  //@}
 

@@ -31,10 +31,13 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class TransportNetwork;
-
+	}
+	
+	namespace env
+	{
 		/** TransportNetworkAdmin Class.
 			@ingroup m35Admin refAdmin
 			@author Hugues Romain
@@ -42,7 +45,7 @@ namespace synthese
 		*/
 		class TransportNetworkAdmin : public admin::AdminInterfaceElementTemplate<TransportNetworkAdmin>
 		{
-			boost::shared_ptr<const TransportNetwork>	_network;
+			boost::shared_ptr<const pt::TransportNetwork>	_network;
 
 			std::string	_searchName;
 

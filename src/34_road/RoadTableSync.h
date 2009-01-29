@@ -29,17 +29,17 @@
 #include <iostream>
 
 #include "Road.h"
-
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
-	namespace env
+	namespace road
 	{
 		/** Road table synchronizer.
-			@ingroup m35LS refLS
+			@ingroup m34LS refLS
 		*/
-		class RoadTableSync : public db::SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>
+		class RoadTableSync
+		:	public db::SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>
 		{
 		public:
 			/** Roads table :

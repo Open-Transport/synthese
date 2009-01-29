@@ -32,10 +32,13 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class TransportNetwork;
-
+	}
+	
+	namespace env
+	{
 		////////////////////////////////////////////////////////////////////
 		/// Lines list public Function class.
 		/// @author Hugues Romain
@@ -49,7 +52,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const TransportNetwork> _network;
+				boost::shared_ptr<const pt::TransportNetwork> _network;
 			//@}
 
 

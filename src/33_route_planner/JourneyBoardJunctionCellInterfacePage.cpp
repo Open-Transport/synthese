@@ -20,14 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/JourneyBoardJunctionCellInterfacePage.h"
-
-#include "17_messages/SentAlarm.h"
-
-#include "15_env/Place.h"
-#include "15_env/Road.h"
-
-#include "01_util/Conversion.h"
+#include "JourneyBoardJunctionCellInterfacePage.h"
+#include "SentAlarm.h"
+#include "Place.h"
+#include "Road.h"
+#include "Conversion.h"
 
 using namespace std;
 
@@ -37,6 +34,7 @@ namespace synthese
 	using namespace messages;
 	using namespace env;
 	using namespace util;
+	using namespace road;
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardJunctionCellInterfacePage>::FACTORY_KEY("journey_board_junction_cell");
 	

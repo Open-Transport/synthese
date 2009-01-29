@@ -57,6 +57,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace security;
+	using namespace pt;
 
 	namespace util
 	{

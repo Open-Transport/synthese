@@ -32,9 +32,13 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class TransportNetwork;
+	}
+	
+	namespace env
+	{
 		class Place;
 		class ReservationContact;
 
@@ -59,7 +63,7 @@ namespace synthese
 			std::string			_style;		//!< CSS style (cartouche)
 			std::string			_image;		//!< Display image (cartouche)
 
-			const TransportNetwork*	_network;	//!< Network
+			const pt::TransportNetwork*	_network;	//!< Network
 			const ReservationContact*	_generalReservationContact;	//!< Reservation contact
 			const ReservationContact*	_bikeReservationContact;	//!< Bike user dedicated reservation contact
 			const ReservationContact*	_handicappedReservationContact;	//!< Handicapped user dedicated Reservation contact
@@ -72,7 +76,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const std::string& getStyle () const;
-				const TransportNetwork* getNetwork () const;
+				const pt::TransportNetwork* getNetwork () const;
 				const std::string& getShortName () const;
 				const std::string& getLongName () const;
 				const std::string& getImage () const;
@@ -86,7 +90,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setStyle (const std::string& style);
-				void setNetwork (const TransportNetwork* network);
+				void setNetwork (const pt::TransportNetwork* network);
 				void setShortName (const std::string& shortName);
 				void setLongName (const std::string& longName);
 				void setImage (const std::string& image);

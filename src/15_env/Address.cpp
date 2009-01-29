@@ -30,6 +30,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace graph;
+	using namespace road;
 	
 	namespace util
 	{
