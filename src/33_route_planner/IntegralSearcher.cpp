@@ -401,7 +401,7 @@ namespace synthese
 								}
 
 								// Storage of the journey as a result
-								AddressablePlace* aplace(AddressablePlace::GetPlace(reachedVertex->getPlace()));
+								const AddressablePlace* aplace(AddressablePlace::GetPlace(reachedVertex->getPlace()));
 								if(	(	_searchAddresses == SEARCH_ADDRESSES
 										&&	aplace->hasAddresses()
 									)||(_searchPhysicalStops == SEARCH_PHYSICALSTOPS

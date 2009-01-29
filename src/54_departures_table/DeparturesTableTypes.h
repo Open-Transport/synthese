@@ -65,9 +65,9 @@ namespace synthese
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 0, WITH_PASSING = 1 } EndFilter;
 	struct DeparturesTableElement { 
-		const env::ServicePointer servicePointer;
+		const graph::ServicePointer servicePointer;
 		bool blinking;
-		DeparturesTableElement(const env::ServicePointer& __servicePointer, bool __blinking)
+		DeparturesTableElement(const graph::ServicePointer& __servicePointer, bool __blinking)
 			: servicePointer(__servicePointer), blinking(__blinking) {}
 	};
 	struct DeparturesTableElementLess : public std::binary_function<DeparturesTableElement, DeparturesTableElement, bool>
