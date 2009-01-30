@@ -30,6 +30,7 @@
 #include "Conversion.h"
 #include "MessagesRight.h"
 #include "Request.h"
+#include "ScenarioTemplate.h"
 
 using namespace std;
 using namespace boost;
@@ -62,6 +63,74 @@ namespace synthese
 		) const {
 			return request.isAuthorized<MessagesRight>(READ);
 		}
+
+		void MessagesLog::AddNewSingleMessageEntry(
+			const SingleSentAlarm& alarm,
+			const security::User* user
+		){
+			DBLog::ColumnsVector content;
+			content.push_back(string());
+			content.push_back("Création");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm.getKey());
+		}
+
+
+
+		void MessagesLog::AddNewSingleMessageEntry(
+			const SingleSentAlarm& alarm,
+			const SingleSentAlarm& copiedAlarm,
+			const security::User* user
+		){
+			DBLog::ColumnsVector content;
+			content.push_back(string());
+			content.push_back(
+				"Création par copie de "+ copiedAlarm.getShortMessage()
+			);
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm.getKey());
+		}
+
+
+		
+		void MessagesLog::AddNewScenarioMessageEntry(
+			const Alarm& alarm,
+			const Scenario& scenario,
+			const security::User* user
+		){
+			DBLog::ColumnsVector content;
+			content.push_back(Conversion::ToString(alarm.getKey()));
+			content.push_back("Ajout de message");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
+		}
+
+
+
+		void MessagesLog::AddNewSentScenarioEntry(
+			const ScenarioTemplate& scenarioTemplate,
+			const SentScenario& sentScenario,
+			const security::User* user
+		){
+			DBLog::ColumnsVector content;
+			content.push_back(string());
+			content.push_back("Création d'après le modèle "+ scenarioTemplate.getName());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, sentScenario.getKey());
+		}
+
+
+
+		void MessagesLog::AddNewSentScenarioEntry(
+			const SentScenario& scenarioTemplate,
+			const SentScenario& sentScenario,
+			const security::User* user
+		){
+			DBLog::ColumnsVector content;
+			content.push_back(string());
+			content.push_back(
+				"Création par copie de "+ scenarioTemplate.getName() +
+				" (modèle "+ scenarioTemplate.getTemplate()->getName() +")"
+			);
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, sentScenario.getKey());
+		}
+
 
 		void MessagesLog::addUpdateEntry(
 			const SingleSentAlarm* alarm

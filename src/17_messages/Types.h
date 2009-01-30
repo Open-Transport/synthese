@@ -48,6 +48,7 @@ namespace synthese
 			, ALARM_LEVEL_UNKNOWN = 1
 			, ALARM_LEVEL_INFO = 10
 			, ALARM_LEVEL_WARNING = 50
+			, ALARM_LEVEL_SCENARIO = 100
 		} AlarmLevel;
 
 		typedef enum

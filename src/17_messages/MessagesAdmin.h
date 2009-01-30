@@ -23,13 +23,11 @@
 #ifndef SYNTHESE_MessagesAdmin_H__
 #define SYNTHESE_MessagesAdmin_H__
 
-#include "04_time/DateTime.h"
-
-#include "05_html/ActionResultHTMLTable.h"
-
-#include "32_admin/AdminInterfaceElementTemplate.h"
-
+#include "DateTime.h"
+#include "ActionResultHTMLTable.h"
+#include "AdminInterfaceElementTemplate.h"
 #include "17_messages/Types.h"
+#include "MessagesAdvancedSelectTableSync.h"
 
 namespace synthese
 {
@@ -131,6 +129,8 @@ namespace synthese
 			AlarmLevel											_searchLevel;
 			AlarmConflict										_searchConflict;
 			html::ActionResultHTMLTable::RequestParameters		_requestParameters;
+			
+			SentMessages					_messages;
 			
 			server::ParametersMap	_parametersMap;
 			

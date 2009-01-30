@@ -54,7 +54,7 @@ namespace synthese
 			void initialize();
 
 			/** Labels list containing each scenario template ordered by folder, indicating the full path in the folder tree.
-				@param withAll true = add a link "all scenarios"
+				@param withAllLabel if non empty, add an option "all scenarios" (value -1) with the specified label
 				@param folderId id of the main parent folder (optional) :
 					- 0/default value is the root folder
 					- UNKWNOWN_VALUE = do not use this criteria : return all templates without their full path
@@ -64,7 +64,7 @@ namespace synthese
 				@date 2008
 			*/
 			static std::vector<std::pair<uid, std::string> > GetScenarioTemplatesLabels(
-				bool withAll = false
+				std::string withAllLabel = std::string()
 				, uid folderId = 0
 				, std::string prefix = std::string()
 			);

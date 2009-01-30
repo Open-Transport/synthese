@@ -120,20 +120,12 @@ namespace synthese
 			if (_template.get())
 			{
 				const ScenarioTemplate::AlarmsSet& alarms(_template->getAlarms());
-				for (ScenarioTemplate::AlarmsSet::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
+				BOOST_FOREACH(const AlarmTemplate* sourceAlarm, alarms)
 				{
-					shared_ptr<AlarmTemplate> alarm(new AlarmTemplate(scenario.get(), **it));
-					AlarmTableSync::Save(alarm.get());
+					AlarmTemplate alarm(scenario.get(), *sourceAlarm);
+					AlarmTableSync::Save(&alarm);
 
-					Env env;
-					AlarmObjectLinkTableSync::Search(env, *it);
-					BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, env.getRegistry<AlarmObjectLink>())
-					{
-						aol->setAlarmId(alarm->getKey());
-						aol->setObjectId(aol->getObjectId());
-						aol->setRecipientKey(aol->getRecipientKey());
-						AlarmObjectLinkTableSync::Save(aol.get());
-					}
+					AlarmObjectLinkTableSync::CopyRecipients(sourceAlarm->getKey(), alarm.getKey());
 				}
 			}
 

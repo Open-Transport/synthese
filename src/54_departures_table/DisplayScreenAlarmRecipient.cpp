@@ -127,7 +127,12 @@ namespace synthese
 			, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
 		){
 			Env env;
-			vector<shared_ptr<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreenTableSync,DisplayScreen> (env, alarm, this->getFactoryKey());
+			vector<shared_ptr<DisplayScreen> > dsv(
+				AlarmObjectLinkTableSync::search<DisplayScreenTableSync,DisplayScreen>(
+					env,
+					alarm->getKey(),
+					this->getFactoryKey()
+			)	);
 			set<uid> usedDisplayScreens;
 
 			FunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(&addRequest);

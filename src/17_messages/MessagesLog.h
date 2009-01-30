@@ -23,18 +23,20 @@
 #ifndef SYNTHESE_MESSAGES_LOG
 #define SYNTHESE_MESSAGES_LOG
 
-#include "13_dblog/DBLog.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "DBLog.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
 	namespace messages
 	{
+		class Alarm;
 		class SingleSentAlarm;
 		class ScenarioSentAlarm;
+		class ScenarioTemplate;
 		class SentScenario;
 		class SentAlarm;
+		class Scenario;
 
 		/** Journal des envois de messages.
 
@@ -60,6 +62,37 @@ namespace synthese
 				const server::Request& request
 			) const;
 			
+			static void AddNewSingleMessageEntry(
+				const SingleSentAlarm& alarm,
+				const security::User* user
+			);
+			
+			static void AddNewSingleMessageEntry(
+				const SingleSentAlarm& alarm,
+				const SingleSentAlarm& copiedAlarm,
+				const security::User* user
+			);
+
+			static void AddNewScenarioMessageEntry(
+				const Alarm& alarm,
+				const Scenario& scenario,
+				const security::User* user
+			);
+
+			static void AddNewSentScenarioEntry(
+				const ScenarioTemplate& scenarioTemplate,
+				const SentScenario& sentScenario,
+				const security::User* user
+			);
+
+
+			static void AddNewSentScenarioEntry(
+				const SentScenario& scenarioTemplate,
+				const SentScenario& sentScenario,
+				const security::User* user
+			);
+
+
 			static void	addUpdateEntry(
 				const SingleSentAlarm* alarm
 				, const std::string& text

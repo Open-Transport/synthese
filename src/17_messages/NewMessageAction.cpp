@@ -38,6 +38,7 @@
 #include "Request.h"
 #include "QueryString.h"
 #include "ParametersMap.h"
+#include "MessagesLog.h"
 
 using namespace std;
 using namespace boost;
@@ -52,119 +53,70 @@ namespace synthese
 
 	namespace messages
 	{
-		const string NewMessageAction::PARAMETER_IS_TEMPLATE = Action_PARAMETER_PREFIX + "tpl";
 		const string NewMessageAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "tps";
-		const string NewMessageAction::PARAMETER_MESSAGE_TEMPLATE(Action_PARAMETER_PREFIX + "mt");
 
 		ParametersMap NewMessageAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_IS_TEMPLATE, _isTemplate);
 			if (_sentScenario.get())
 				map.insert(PARAMETER_SCENARIO_ID, _sentScenario->getKey());
 			if (_scenarioTemplate.get())
 				map.insert(PARAMETER_SCENARIO_ID, _scenarioTemplate->getKey());
-			if (_messageTemplate.get())
-				map.insert(PARAMETER_MESSAGE_TEMPLATE, _messageTemplate->getKey());
 			return map;
 		}
 
 		void NewMessageAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
-			// Template alarm ?
-			_isTemplate = map.getBool(PARAMETER_IS_TEMPLATE, false, false, FACTORY_KEY);
-
-			// Case template alarm
-			if (_isTemplate)
-			{
-				uid id(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
-				try
-				{
-					_scenarioTemplate = ScenarioTemplateInheritedTableSync::Get(id, _env);
-				}
-				catch (...)
-				{
-					throw ActionException("Specified scenario not found");
-				}
-			}
-			else
-			{
-				uid id(map.getUid(PARAMETER_SCENARIO_ID, false, FACTORY_KEY));
-				if (id != UNKNOWN_VALUE)
-				{
-					try
-					{
-						_sentScenario = SentScenarioInheritedTableSync::Get(id, _env);
-					}
-					catch (...)
-					{
-						throw ActionException("Specified scenario not found");
-					}
-				}
-			}
-
-			// Message template
-			uid id(map.getUid(PARAMETER_MESSAGE_TEMPLATE, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE)
-			try
-			{
-				_messageTemplate = AlarmTableSync::Get(id, _env);
-			}
-			catch (...)
-			{
-				throw ActionException("Specified template message not found");
-			}
-
+			setScenarioId(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
+			
 			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void NewMessageAction::run() throw(ActionException)
 		{
-			if (_isTemplate)
+			if (_scenarioTemplate.get())
 			{
-				shared_ptr<AlarmTemplate> alarm(
-					_messageTemplate.get()
-					? new AlarmTemplate(*static_cast<const AlarmTemplate*>(_messageTemplate.get()))
-					: new AlarmTemplate(UNKNOWN_VALUE, _scenarioTemplate.get())
+				AlarmTemplate alarm(UNKNOWN_VALUE, _scenarioTemplate.get());
+				AlarmTableSync::Save(&alarm);
+				
+				_request->setObjectId(alarm.getKey());
+				
+				MessagesLog::AddNewScenarioMessageEntry(
+					alarm,
+					*_scenarioTemplate,
+					_request->getUser().get()
 				);
-				AlarmTableSync::Save(alarm.get());
-				_request->setObjectId(alarm->getKey());
 			}
 			else
 			{
-				if (_sentScenario.get())
-				{
-					shared_ptr<ScenarioSentAlarm> alarm(
-						_messageTemplate.get()
-						? new ScenarioSentAlarm(*static_cast<const ScenarioSentAlarm*>(_messageTemplate.get()))
-						: new ScenarioSentAlarm(UNKNOWN_VALUE, _sentScenario.get())
-					);
-					AlarmTableSync::Save(alarm.get());
-					_request->setObjectId(alarm->getKey());
-				}
-				else
-				{
-					shared_ptr<SingleSentAlarm> alarm(
-						_messageTemplate.get()
-						? new SingleSentAlarm(*static_cast<const SingleSentAlarm*>(_messageTemplate.get()))
-						: new SingleSentAlarm()
-					);
-					AlarmTableSync::Save(alarm.get());
-					_request->setObjectId(alarm->getKey());
-				}
+				ScenarioSentAlarm alarm(UNKNOWN_VALUE, _sentScenario.get());
+					
+				AlarmTableSync::Save(&alarm);
+				
+				_request->setObjectId(alarm.getKey());
+			
+				MessagesLog::AddNewScenarioMessageEntry(
+					alarm,
+					*_sentScenario,
+					_request->getUser().get()
+				);
 			}
 		}
 
-		void NewMessageAction::setIsTemplate( bool value )
-		{
-			_isTemplate = value;
-		}
+
 
 		void NewMessageAction::setScenarioId(uid key)
 		{
-			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(key, _env));
-			_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
-			_scenarioTemplate = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
+			try
+			{
+				boost::shared_ptr<Scenario> scenario(ScenarioTableSync::Get(key, _env));
+				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
+				_scenarioTemplate = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
+			}
+			catch(Exception& e)
+			{
+				throw ActionException("Scenario", key, FACTORY_KEY, e);
+			}
 		}
 
 

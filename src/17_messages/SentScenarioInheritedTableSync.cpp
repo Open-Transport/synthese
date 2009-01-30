@@ -147,15 +147,16 @@ namespace synthese
 
 		void SentScenarioInheritedTableSync::Search(
 			Env& env,
-			time::DateTime startDate
-			, time::DateTime endDate
-			, const std::string name
-			, int first /*= 0*/, int number /*= 0*/
-			, bool orderByDate
-			, bool orderByName
-			, bool orderByStatus
-			, bool orderByConflict
-			, bool raisingOrder,
+			time::DateTime startDate,
+			time::DateTime endDate,
+			const std::string name,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			bool orderByDate,
+			bool orderByName,
+			bool orderByStatus,
+			bool orderByConflict,
+			bool raisingOrder,
 			LinkLevel linkLevel
 		){
 			stringstream query;

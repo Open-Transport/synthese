@@ -47,10 +47,11 @@ namespace synthese
 		}
 
 		SingleSentAlarm::SingleSentAlarm( const SingleSentAlarm& source)
-			: SentAlarm()
-			, _enabled(false)
-			, _periodStart(source.getPeriodStart())
-			, _periodEnd(source.getPeriodEnd())
+		:	Registrable(UNKNOWN_VALUE),
+			SentAlarm(),
+			_enabled(false),
+			_periodStart(DateTime(TIME_UNKNOWN)),
+			_periodEnd(DateTime(TIME_UNKNOWN))
 		{			
 			setLevel(source.getLevel());
 			setShortMessage(source.getShortMessage());

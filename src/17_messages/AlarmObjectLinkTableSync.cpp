@@ -177,9 +177,26 @@ namespace synthese
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
+		
+		
+		void AlarmObjectLinkTableSync::CopyRecipients(
+			util::RegistryKeyType sourceId,
+			util::RegistryKeyType destId
+		){
+			Env lenv;
+			Search(lenv, sourceId);
+			BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, lenv.getRegistry<AlarmObjectLink>())
+			{
+				aol->setAlarmId(destId);
+				aol->setObjectId(aol->getObjectId());
+				aol->setRecipientKey(aol->getRecipientKey());
+				Save(aol.get());
+			}
+		}
+
 		void AlarmObjectLinkTableSync::Search(
 			Env& env,
-			const Alarm* alarm,
+			util::RegistryKeyType alarmId,
 			int first /*= 0*/,
 			int number, /*= 0*/
 			LinkLevel linkLevel
@@ -189,7 +206,7 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
-				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getKey());
+				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId);
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

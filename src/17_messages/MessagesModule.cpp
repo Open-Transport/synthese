@@ -50,25 +50,29 @@ namespace synthese
 	namespace messages
 	{
 		std::vector<pair<uid, std::string> > MessagesModule::GetScenarioTemplatesLabels(
-			bool withAll /*= false*/
+			string withAllLabel
 			, uid folderId
 			, string prefix
 		){
 			vector<pair<uid,string> > m;
-			if (withAll)
-				m.push_back(make_pair(0, "(tous)"));
+			if (!withAllLabel.empty())
+			{
+				m.push_back(make_pair(UNKNOWN_VALUE, withAllLabel));
+			}
 
 			Env env;
 			ScenarioTemplateInheritedTableSync::Search(env, folderId);
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> st, env.getRegistry<ScenarioTemplate>())
+			{
 				m.push_back(make_pair(st->getKey(), prefix + st->getName()));
+			}
 
 			if (folderId != UNKNOWN_VALUE)
 			{
 				ScenarioFolderTableSync::Search(env, folderId);
 				BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, env.getRegistry<ScenarioFolder>())
 				{
-					std::vector<pair<uid, std::string> > r(GetScenarioTemplatesLabels(false, folder->getKey(), prefix + folder->getName() +"/"));
+					std::vector<pair<uid, std::string> > r(GetScenarioTemplatesLabels(string(), folder->getKey(), prefix + folder->getName() +"/"));
 					m.insert(m.end(),r.begin(), r.end());
 				}
 			}
@@ -110,6 +114,7 @@ namespace synthese
 				m.push_back(make_pair(ALARM_LEVEL_UNKNOWN, "(tous)"));
 			m.push_back(make_pair(ALARM_LEVEL_INFO, getLevelLabel(ALARM_LEVEL_INFO)));
 			m.push_back(make_pair(ALARM_LEVEL_WARNING, getLevelLabel(ALARM_LEVEL_WARNING)));
+			m.push_back(make_pair(ALARM_LEVEL_SCENARIO, getLevelLabel(ALARM_LEVEL_SCENARIO)));
 			return m;
 		}
 
@@ -143,6 +148,7 @@ namespace synthese
 			{
 			case ALARM_LEVEL_INFO : return "Complémentaire";
 			case ALARM_LEVEL_WARNING : return "Prioritaire";
+			case ALARM_LEVEL_SCENARIO: return "Scénario";
 			default: return "Inconnu";
 			}
 		}

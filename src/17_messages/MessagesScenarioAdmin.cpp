@@ -115,7 +115,6 @@ namespace synthese
 			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(_request);
 			addRequest.getFunction()->setPage<MessageAdmin>();
 			addRequest.getAction()->setScenarioId(_scenario->getKey());
-			addRequest.getAction()->setIsTemplate(_templateScenario.get() != NULL);
 
 			stream << "<h1>Propriétés</h1>";
 			PropertiesHTMLTable tp(updateRequest.getHTMLForm("update"));
@@ -194,7 +193,7 @@ namespace synthese
 				h.push_back(make_pair(string(), "Emplacement"));
 				h.push_back(make_pair(string(), "Actions"));
 				h.push_back(make_pair(string(), "Actions"));
-				ActionResultHTMLTable t(h, HTMLForm(string(), string()), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addRequest.getHTMLForm("add"), NewMessageAction::PARAMETER_MESSAGE_TEMPLATE);
+				ActionResultHTMLTable t(h, HTMLForm(string(), string()), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addRequest.getHTMLForm("add"));
 
 				stream << t.open();
 

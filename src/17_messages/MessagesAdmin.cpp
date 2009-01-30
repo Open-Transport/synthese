@@ -39,7 +39,6 @@
 #include "MessagesScenarioAdmin.h"
 #include "MessagesModule.h"
 #include "NewScenarioSendAction.h"
-#include "NewMessageAction.h"
 #include "AlarmStopAction.h"
 #include "ScenarioStopAction.h"
 #include "MessagesRight.h"
@@ -123,27 +122,12 @@ namespace synthese
 
 				_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_LEVEL, 15, false);
 
-
-				SingleSentAlarmInheritedTableSync::Search(
-					_env,
-					_startDate
-					, _endDate
-					, _searchConflict
-					, _searchLevel
-					, _requestParameters.first
-					, _requestParameters.maxSize
-					, _requestParameters.orderField == PARAMETER_SEARCH_START
-					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
-					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
-					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
-					, _requestParameters.raisingOrder					
-				);
-				SentScenarioInheritedTableSync::Search(
-					_env,
-					_startDate
-					, _endDate
-					, std::string()
-					, _requestParameters.first
+				_messages = GetSentMessages(
+					_startDate,
+					_endDate,
+					_searchConflict,
+					_searchLevel,
+					_requestParameters.first
 					, _requestParameters.maxSize
 					, _requestParameters.orderField == PARAMETER_SEARCH_START
 					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
@@ -165,10 +149,6 @@ namespace synthese
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<MessagesAdmin>();
-
-			ActionFunctionRequest<NewMessageAction,AdminRequest> newMessageRequest(_request);
-			newMessageRequest.getFunction()->setPage<MessageAdmin>();
-			newMessageRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
 
 			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
@@ -227,86 +207,131 @@ namespace synthese
 
 			stream << s.close();
 
-			stream << "<h1>Résultats de la recherche : messages selon scénario</h1>";
+			stream << "<h1>Résultats de la recherche</h1>";
 
 			ActionResultHTMLTable::HeaderVector v1;
 			v1.push_back(make_pair(PARAMETER_SEARCH_START, string("Dates")));
-			v1.push_back(make_pair(string(), string("Scénario")));
+			v1.push_back(make_pair(PARAMETER_SEARCH_LEVEL, string("Type")));
+			v1.push_back(make_pair(string(), string("Message")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v1.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t1(v1, searchRequest.getHTMLForm(), _requestParameters, _scenarioResultParameters, newScenarioRequest.getHTMLForm("newscen"), string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t1(
+				v1,
+				searchRequest.getHTMLForm(),
+				_requestParameters,
+				_scenarioResultParameters,
+				newScenarioRequest.getHTMLForm("newscen"),
+				NewScenarioSendAction::PARAMETER_MESSAGE_TO_COPY,
+				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+			);
 			
 			stream << t1.open();
 
-			BOOST_FOREACH(shared_ptr<SentScenario> scenario, _env.getRegistry<SentScenario>())
+			BOOST_FOREACH(SentMessage message, _messages)
 			{
-				scenarioRequest.setObjectId(scenario->getKey());
-				scenarioStopRequest.setObjectId(scenario->getKey());
-
-				bool scenarioIsDisabled =
-					!scenario->getIsEnabled();
-				bool scenarioIsDisplayedWithEndDate = 
-					(scenario->getPeriodStart().isUnknown() || scenario->getPeriodStart() <= now)
-					&& !scenario->getPeriodEnd().isUnknown()
-					&& scenario->getPeriodEnd() >= now
-					&& scenario->getIsEnabled();
-				bool scenarioIsDisplayedWithoutEndDate =
-					(scenario->getPeriodStart().isUnknown() || scenario->getPeriodStart() <= now)
-					&& scenario->getPeriodEnd().isUnknown()
-					&& scenario->getIsEnabled();
-				bool scenarioWillBeDisplayed =
-					!scenario->getPeriodStart().isUnknown()
-					&& scenario->getPeriodStart() > now
-					&& scenario->getIsEnabled();
+				bool isDisplayedWithEndDate(
+					(message.startTime.isUnknown() || message.startTime <= now)
+					&& !message.endTime.isUnknown()
+					&& message.endTime >= now
+					&& message.enabled
+				);
+				bool isDisplayedWithoutEndDate(
+					(message.startTime.isUnknown() || message.startTime <= now)
+					&& message.endTime.isUnknown()
+					&& message.enabled
+				);
+				bool willBeDisplayed(
+					!message.startTime.isUnknown()
+					&& message.startTime > now
+					&& message.enabled
+				);
 				string rowColorCSS;
-				if (scenarioIsDisabled)
+				if (!message.enabled)
+				{
 					rowColorCSS = CSS_ALARM_DISABLED;
-				if (scenarioIsDisplayedWithoutEndDate)
+				}
+				if(isDisplayedWithoutEndDate)
+				{
 					rowColorCSS = CSS_ALARM_DISPLAYED_WITHOUT_END_DATE;
-				if (scenarioWillBeDisplayed)
+				}
+				if (willBeDisplayed)
+				{
 					rowColorCSS = CSS_ALARM_WILL_BE_DISPLAYED;
-				if (scenarioIsDisplayedWithEndDate)
+				}
+				if (isDisplayedWithEndDate)
+				{
 					rowColorCSS = CSS_ALARM_DISPLAYED_WITH_END_DATE;
-				stream << t1.row(Conversion::ToString(scenario->getKey()), rowColorCSS);
+				}
+				stream << t1.row(Conversion::ToString(message.id), rowColorCSS);
 
+				// Dates
 				stream << t1.col();
-				
-				if (!scenario->getIsEnabled())
+				if (!message.enabled)
+				{
 					stream << "Non diffusé";
+				}
 				else
 				{
-					if (scenario->getPeriodStart().isUnknown() && scenario->getPeriodEnd().isUnknown())
+					if (message.startTime.isUnknown() && message.endTime.isUnknown())
+					{
 						stream << "Diffusion permanente";
-					if (scenario->getPeriodStart().isUnknown() && !scenario->getPeriodEnd().isUnknown())
-						stream << "Jusqu'au " << scenario->getPeriodEnd().toString();
-					if (!scenario->getPeriodStart().isUnknown() && scenario->getPeriodEnd().isUnknown())
-						stream << "A compter du " << scenario->getPeriodStart().toString();
-					if (!scenario->getPeriodStart().isUnknown() && !scenario->getPeriodEnd().isUnknown())
-						stream << "Du " << scenario->getPeriodStart().toString() << " au " << scenario->getPeriodEnd().toString();
+					}
+					if (message.startTime.isUnknown() && !message.endTime.isUnknown())
+					{
+						stream << "Jusqu'au " << message.endTime.toString();
+					}
+					if (!message.startTime.isUnknown() && message.endTime.isUnknown())
+					{
+						stream << "A compter du " << message.startTime.toString();
+					}
+					if (!message.startTime.isUnknown() && !message.endTime.isUnknown())
+					{
+						stream << "Du " << message.startTime.toString() << " au " << message.endTime.toString();
+					}
 				}
 
-				stream << t1.col() << scenario->getName();
+				// Type
+				stream << t1.col() << MessagesModule::getLevelLabel(message.level);
+				
+				stream << t1.col() << message.name;
 				stream << t1.col(); // Bullet
-				stream << t1.col() << MessagesModule::getConflictLabel(scenario->getConflictStatus()); /// @todo put a graphic bullet
-				stream << t1.col() << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Modifier");
-				if (scenario->isApplicable(DateTime(TIME_CURRENT)))
-					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");
+				stream << t1.col() << MessagesModule::getConflictLabel(message.conflict); /// @todo put a graphic bullet
+				stream << t1.col();
+				if(message.level == ALARM_LEVEL_SCENARIO)
+				{
+					scenarioRequest.setObjectId(message.id);
+				//scenarioStopRequest.setObjectId(scenario->getKey());
+
+					stream << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Modifier");
+				/*if (scenario->isApplicable(DateTime(TIME_CURRENT)))
+					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");*/
+				} else {
+					alarmRequest.setObjectId(message.id);
+					stream << HTMLModule::getLinkButton(alarmRequest.getURL(), "Modifier");
+				}
 			}
 			stream << t1.row();
 			stream << t1.col();
-			stream << t1.col() << t1.getActionForm().getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::GetScenarioTemplatesLabels(), uid(0));
-			stream << t1.col(3) << t1.getActionForm().getSubmitButton("Nouvelle diffusion de scénario");
+			stream << t1.col();
+			stream <<
+				t1.col() <<
+				t1.getActionForm().getSelectInput(
+					NewScenarioSendAction::PARAMETER_TEMPLATE,
+					MessagesModule::GetScenarioTemplatesLabels("(message seul)"),
+					uid(UNKNOWN_VALUE)
+				)
+			;
+			stream << t1.col(3) << t1.getActionForm().getSubmitButton("Nouvelle diffusion");
 
 			stream << t1.close();
 
 			
-			stream << "<h1>Résultats de la recherche : messages seuls</h1>";
+/*			stream << "<h1>Résultats de la recherche : messages seuls</h1>";
 
 			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_START, string("Dates")));
 			v.push_back(make_pair(string(), string("Message")));
-			v.push_back(make_pair(PARAMETER_SEARCH_LEVEL, string("Type")));
 			v.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v.push_back(make_pair(string(), string("Actions")));
@@ -391,11 +416,8 @@ namespace synthese
 				if (alarm->isApplicable(DateTime(TIME_CURRENT)))
 					stream << "&nbsp;" << HTMLModule::getLinkButton(stopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion du message ?", "stop.png");
 			}
-			stream << t.row();
-			stream << t.col(2) << "(Sélectionnez un message pour le copier)";
-			stream << t.col(4) << t.getActionForm().getSubmitButton("Nouvelle diffusion de message");
 
-			stream << t.close();
+			stream << t.close();*/
 		}
 
 		bool MessagesAdmin::isAuthorized(

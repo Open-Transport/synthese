@@ -33,27 +33,22 @@ namespace synthese
 {
 	namespace messages
 	{
-		class Scenario;
 		class SentScenario;
 		class ScenarioTemplate;
-		class Alarm;
-
-		/** Alarm creation action class.
+		
+		/** Action class : Creation of a new message, part of a scenario.
 			@ingroup m17Actions refActions
 		*/
-		class NewMessageAction : public util::FactorableTemplate<server::Action, NewMessageAction>
+		class NewMessageAction
+		:	public util::FactorableTemplate<server::Action, NewMessageAction>
 		{
 		public:
-			static const std::string PARAMETER_IS_TEMPLATE;
 			static const std::string PARAMETER_SCENARIO_ID;
-			static const std::string PARAMETER_MESSAGE_TEMPLATE;
 
 		private:
 			boost::shared_ptr<const SentScenario>		_sentScenario;
 			boost::shared_ptr<const ScenarioTemplate>	_scenarioTemplate;
-			bool										_isTemplate;
-			boost::shared_ptr<const Alarm>				_messageTemplate;
-
+		
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -67,7 +62,6 @@ namespace synthese
 
 		public:
 			void setScenarioId(uid scenarioId);
-			void setIsTemplate(bool value);
 
 			/** Action to run, defined by each subclass.
 			*/

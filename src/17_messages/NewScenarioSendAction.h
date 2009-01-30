@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_NewScenarioSendAction_H__
 #define SYNTHESE_NewScenarioSendAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -34,17 +33,36 @@ namespace synthese
 	namespace messages
 	{
 		class ScenarioTemplate;
+		class SingleSentAlarm;
+		class SentScenario;
 
-		/** New scenario send action class.
+		/** Action class : sends a new message.
 			@ingroup m17Actions refActions
+			
+			The new message can be created by 3 ways :
+				- copy of an existent message (single message or scenario)
+				- creation of a sent scenario, according to a scenario template
+				- creation of a blank single message (no text predefined, no recipient)
+			
+			The action method is determinated by two parameters :
+			
+			<table><tr><th>PARAMETER_TEMPLATE=-1</th><th>PARAMETER_TEMPLATE>0</th></tr>
+			<tr><th>PARAMETER_MESSAGE_TO_COPY=-1</th><td>Blank single message</td><td>Sent scenario from the template</td></tr>
+			<tr><th>PARAMETER_MESSAGE_TO_COPY>0</th><td colspan="2">Copy of the selected message or scenario</td></tr>
+			</table>
 		*/
-		class NewScenarioSendAction : public util::FactorableTemplate<server::Action, NewScenarioSendAction>
+		class NewScenarioSendAction
+		:	public util::FactorableTemplate<server::Action, NewScenarioSendAction>
 		{
 		public:
 			static const std::string PARAMETER_TEMPLATE;
+			static const std::string PARAMETER_MESSAGE_TO_COPY;
 
 		private:
 			boost::shared_ptr<const ScenarioTemplate>	_template;
+			
+			boost::shared_ptr<const SentScenario>		_scenarioToCopy;
+			boost::shared_ptr<const SingleSentAlarm>	_messageToCopy;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

@@ -21,10 +21,11 @@
 */
 
 #include "NewScenarioSendAction.h"
-
+#include "SingleSentAlarmInheritedTableSync.h"
 #include "SentScenario.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateInheritedTableSync.h"
+#include "SentScenarioInheritedTableSync.h"
 #include "ScenarioTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "MessagesLog.h"
@@ -34,6 +35,8 @@
 #include "Request.h"
 #include "QueryString.h"
 #include "ParametersMap.h"
+#include "SingleSentAlarm.h"
+#include "AlarmTemplate.h"
 
 #include <boost/foreach.hpp>
 
@@ -48,11 +51,14 @@ namespace synthese
 	using namespace security;
 	
 
-	template<> const string util::FactorableTemplate<Action, messages::NewScenarioSendAction>::FACTORY_KEY("nssa");
+	template<> const string util::FactorableTemplate<Action, messages::NewScenarioSendAction>::FACTORY_KEY(
+		"nssa"
+	);
 	
 	namespace messages
 	{
 		const string NewScenarioSendAction::PARAMETER_TEMPLATE = Action_PARAMETER_PREFIX + "tpl";
+		const string NewScenarioSendAction::PARAMETER_MESSAGE_TO_COPY(Action_PARAMETER_PREFIX + "mt");
 
 
 		ParametersMap NewScenarioSendAction::getParametersMap() const
@@ -64,15 +70,43 @@ namespace synthese
 
 		void NewScenarioSendAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Template to source
-			uid id(map.getUid(PARAMETER_TEMPLATE, true, FACTORY_KEY));
-			try
+			RegistryKeyType id(map.getUid(PARAMETER_MESSAGE_TO_COPY, false, FACTORY_KEY));
+			if(id > 0)
 			{
-				_template = ScenarioTemplateInheritedTableSync::Get(id, _env);
-			}
-			catch(...)
-			{
-				throw ActionException("specified scenario template not found");
+				if(decodeTableId(id) == ScenarioTableSync::TABLE.ID)
+				{
+					try
+					{
+						_scenarioToCopy = SentScenarioInheritedTableSync::Get(id, _env);
+					}
+					catch(Exception& e)
+					{
+						throw ActionException("scenario to copy", id, FACTORY_KEY, e);
+					}
+				} else {
+					try
+					{
+						_messageToCopy = SingleSentAlarmInheritedTableSync::Get(id, _env);
+					}
+					catch(Exception& e)
+					{
+						throw ActionException("message to copy", id, FACTORY_KEY, e);
+					}
+				}
+			} else {
+				// Template to source
+				id = map.getUid(PARAMETER_TEMPLATE, false, FACTORY_KEY);
+				if(id > 0)
+				{
+					try
+					{
+						_template = ScenarioTemplateInheritedTableSync::Get(id, _env);
+					}
+					catch(Exception& e)
+					{
+						throw ActionException("scenario template", id, FACTORY_KEY, e);
+					}
+				}
 			}
 			
 			// Anti error
@@ -81,34 +115,96 @@ namespace synthese
 
 		void NewScenarioSendAction::run()
 		{
-			// The action on the scenario
-			shared_ptr<SentScenario> scenario(new SentScenario(_template->getName()));
-			ScenarioTableSync::Save (scenario.get());
-
-			// Remember of the id of created object to view it after the action
-			_request->setObjectId(scenario->getKey());
-
-			// The action on the alarms
-			Env env;
-			AlarmTemplateInheritedTableSync::Search(env, _template.get());
-			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
+			if(_scenarioToCopy.get()) // Copy of an existing scenario
 			{
-				shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(scenario.get(), *templateAlarm));
-				AlarmTableSync::Save(alarm.get());
-
-				Env lenv;
-				AlarmObjectLinkTableSync::Search(lenv, templateAlarm.get());
-				BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, lenv.getRegistry<AlarmObjectLink>())
+				// The action on the scenario
+				SentScenario scenario(_scenarioToCopy->getTemplate()->getName());
+				ScenarioTableSync::Save(&scenario);
+	
+				// Remember of the id of created object to view it after the action
+				_request->setObjectId(scenario.getKey());
+	
+				// The action on the alarms
+				Env env;
+				AlarmTemplateInheritedTableSync::Search(env, _scenarioToCopy->getTemplate());
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
 				{
-					aol->setAlarmId(alarm->getKey());
-					aol->setObjectId(aol->getObjectId());
-					aol->setRecipientKey(aol->getRecipientKey());
-					AlarmObjectLinkTableSync::Save(aol.get());
+					ScenarioSentAlarm alarm(&scenario, *templateAlarm);
+					AlarmTableSync::Save(&alarm);
+	
+					AlarmObjectLinkTableSync::CopyRecipients(
+						templateAlarm->getKey(),
+						alarm.getKey()
+					);
 				}
+				
+				/// TODO add variables copy here
+			
+				// The log
+				MessagesLog::AddNewSentScenarioEntry(
+					*_scenarioToCopy, scenario, _request->getUser().get()
+				);
 			}
+			else if(_messageToCopy.get()) // Copy of an existing message
+			{
+				SingleSentAlarm alarm(*_messageToCopy);
+				
+				AlarmTableSync::Save(&alarm);
+				
+				AlarmObjectLinkTableSync::CopyRecipients(
+					_messageToCopy->getKey(),
+					alarm.getKey()
+				);
 
-			// The log
-			MessagesLog::addUpdateEntry(scenario.get(), "Diffusion", _request->getUser().get());
+				_request->setObjectId(alarm.getKey());
+
+				MessagesLog::AddNewSingleMessageEntry(
+					alarm,
+					*_messageToCopy,
+					_request->getUser().get()
+				);
+			}
+			else if(_template.get()) // New scenario from template
+			{
+				// The action on the scenario
+				SentScenario scenario(_template->getName());
+				ScenarioTableSync::Save(&scenario);
+	
+				// Remember of the id of created object to view it after the action
+				_request->setObjectId(scenario.getKey());
+	
+				// The action on the alarms
+				Env env;
+				AlarmTemplateInheritedTableSync::Search(env, _template.get());
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
+				{
+					ScenarioSentAlarm alarm(&scenario, *templateAlarm);
+					AlarmTableSync::Save(&alarm);
+	
+					AlarmObjectLinkTableSync::CopyRecipients(
+						templateAlarm->getKey(),
+						alarm.getKey()
+					);
+				}
+			
+				// The log
+				MessagesLog::AddNewSentScenarioEntry(
+					*_template, scenario, _request->getUser().get()
+				);
+			}
+			else	// New message from scratch
+			{
+				SingleSentAlarm alarm;
+				
+				AlarmTableSync::Save(&alarm);
+				
+				_request->setObjectId(alarm.getKey());
+				
+				MessagesLog::AddNewSingleMessageEntry(
+					alarm,
+					_request->getUser().get()
+				);
+			}
 		}
 
 

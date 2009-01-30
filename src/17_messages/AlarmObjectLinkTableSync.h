@@ -39,7 +39,6 @@
 #include "SQLiteDirectTableSyncTemplate.h"
 
 #include "AlarmObjectLink.h"
-#include "Alarm.h"
 #include "MessagesModule.h"
 
 namespace synthese
@@ -51,7 +50,8 @@ namespace synthese
 			
 			Only the links concerning the sent alarms are loaded in ram.
 		*/
-		class AlarmObjectLinkTableSync : public db::SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
+		class AlarmObjectLinkTableSync
+		:	public db::SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;
@@ -72,7 +72,7 @@ namespace synthese
 			template<class K, class T>
 			static std::vector<boost::shared_ptr<T> > search(
 				util::Env& env,
-				const Alarm* alarm,
+				util::RegistryKeyType alarmId,
 				const std::string& recipientKey,
 				int first = 0,
 				int number = 0,
@@ -89,7 +89,7 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				const Alarm* alarm,
+				util::RegistryKeyType alarmId,
 				int first = 0,
 				int number = 0,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
@@ -103,6 +103,11 @@ namespace synthese
 			*/
 			static void Remove(uid alarmId, uid objectId = UNKNOWN_VALUE);
 
+
+			static void CopyRecipients(
+				util::RegistryKeyType sourceId,
+				util::RegistryKeyType destId
+			);
 
 			/** Action to do on  creation.
 				This method loads a new object in ram.
@@ -131,7 +136,7 @@ namespace synthese
 		template<class K, class T>
 		std::vector< boost::shared_ptr<T> > AlarmObjectLinkTableSync::search(
 			util::Env& env,
-			const Alarm* alarm,
+			util::RegistryKeyType alarmId,
 			const std::string& recipientKey,
 			int first /*= 0*/,
 			int number /*= 0*/,
@@ -143,7 +148,7 @@ namespace synthese
 					<< AlarmObjectLinkTableSync::COL_OBJECT_ID
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
-					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getKey())
+					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId)
 					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToSQLiteString(recipientKey);
 			if (number > 0)
 			    query << " LIMIT " << util::Conversion::ToString(number + 1);
