@@ -67,11 +67,17 @@ namespace synthese
 			mutable util::Env				_env;
 			boost::shared_ptr<DBLog>		_dbLog;
 			time::DateTime					_searchStartDate;
+			bool							_fixedStartDate;
 			time::DateTime					_searchEndDate;
+			bool							_fixedEndDate;
 			DBLogEntry::Level				_searchLevel;
+			bool							_fixedLevel;
 			util::RegistryKeyType			_searchUserId;
+			bool							_fixedUserId;
 			std::string						_searchText;
+			bool							_fixedText;
 			util::RegistryKeyType			_searchObjectId;
+			bool							_fixedObjectId;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 			html::ResultHTMLTable::ResultParameters		_resultParameters;
 			
@@ -112,12 +118,12 @@ namespace synthese
 				void set(
 					const server::ParametersMap& map,
 					std::string logKey,
+					util::RegistryKeyType searchObjectId = UNKNOWN_VALUE,
+					util::RegistryKeyType searchUserId = UNKNOWN_VALUE,
+					DBLogEntry::Level searchLevel = DBLogEntry::DB_LOG_UNKNOWN,
 					time::DateTime searchStartDate = time::TIME_UNKNOWN,
 					time::DateTime searchEndDate = time::TIME_UNKNOWN,
-					DBLogEntry::Level searchLevel = DBLogEntry::DB_LOG_UNKNOWN,
-					util::RegistryKeyType searchUserId = UNKNOWN_VALUE,
-					std::string searchText = std::string(),
-					util::RegistryKeyType searchObjectId = UNKNOWN_VALUE
+					std::string searchText = std::string()
 				);
 			//@}
 

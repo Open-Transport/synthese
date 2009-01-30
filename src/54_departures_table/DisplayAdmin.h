@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_DISPLAY_ADMIN_H
 #define SYNTHESE_DISPLAY_ADMIN_H
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "AdminInterfaceElementTemplate.h"
+#include "DBLogHTMLView.h"
 
 namespace synthese
 {
@@ -162,10 +163,13 @@ namespace synthese
 			static const std::string TAB_CONTENT;
 			static const std::string TAB_APPEARANCE;
 			static const std::string TAB_RESULT;
+			static const std::string TAB_LOG;
 
 		private:
 			boost::shared_ptr<const DisplayScreen>	_displayScreen;
 			time::DateTime							_now;
+			dblog::DBLogHTMLView					_maintenanceLogView;
+			dblog::DBLogHTMLView					_generalLogView;
 
 		public:
 			DisplayAdmin();

@@ -70,6 +70,7 @@
 #include "LineStopTableSync.h"
 #include "Line.h"
 #include "CommercialLine.h"
+#include "ArrivalDepartureTableLog.h"
 
 #include <utility>
 #include <sstream>
@@ -111,6 +112,7 @@ namespace synthese
 		const string DisplayAdmin::TAB_CONTENT("content");
 		const string DisplayAdmin::TAB_APPEARANCE("appear");
 		const string DisplayAdmin::TAB_RESULT("result");
+		const string DisplayAdmin::TAB_LOG("log");
 
 		void DisplayAdmin::display(
 			std::ostream& stream,
@@ -212,6 +214,10 @@ namespace synthese
 				displayTypeRequest.setObjectId(
 					_displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE
 				);
+				
+				// Log search
+				FunctionRequest<AdminRequest> searchRequest(_request);
+				searchRequest.getFunction()->setSamePage(this);
 
 				stream << "<h1>Paramètres de maintenance</h1>";
 
@@ -310,9 +316,14 @@ namespace synthese
 					}
 				}
 
-				stream << l.element("log") << HTMLModule::getHTMLLink(goToLogRequest.getURL(), "Accéder au journal de maintenance de l'afficheur");
-
 				stream << l.close();
+
+				stream << "<h1>Journal de maintenance</h1>";
+
+				_maintenanceLogView.display(
+					stream,
+					searchRequest
+				);
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -703,6 +714,22 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "monitor_go.png") << " ";
 				stream << "</p>";
 			}
+			
+			
+			////////////////////////////////////////////////////////////////////
+			// LOG TAB
+			if (openTabContent(stream, TAB_LOG))
+			{
+				// Log search
+				FunctionRequest<AdminRequest> searchRequest(_request);
+				searchRequest.getFunction()->setSamePage(this);
+
+				_generalLogView.display(
+					stream,
+					searchRequest
+				);
+			}
+
 
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
@@ -738,6 +765,9 @@ namespace synthese
 						);
 					}
 				}
+				
+				_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
+				_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
@@ -768,7 +798,9 @@ namespace synthese
 
 		DisplayAdmin::DisplayAdmin(
 		): AdminInterfaceElementTemplate<DisplayAdmin>(),
-			_now(TIME_CURRENT)
+			_now(TIME_CURRENT),
+			_maintenanceLogView(TAB_MAINTENANCE),
+			_generalLogView(TAB_LOG)
 		{
 		}
 
@@ -836,6 +868,7 @@ namespace synthese
 				_tabs.push_back(Tab("Sélection", TAB_CONTENT, writeRight, "times_display.png"));
 				_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
 				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));
+				_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
 			}
 
 			_tabBuilded = true;

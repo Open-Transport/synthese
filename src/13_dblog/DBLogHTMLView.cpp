@@ -65,7 +65,13 @@ namespace synthese
 			_searchStartDate(TIME_UNKNOWN),
 			_searchEndDate(TIME_UNKNOWN),
 			_searchObjectId(UNKNOWN_VALUE),
-			_searchUserId(UNKNOWN_VALUE)
+			_searchUserId(UNKNOWN_VALUE),
+			_fixedLevel(true),
+			_fixedStartDate(true),
+			_fixedEndDate(true),
+			_fixedObjectId(true),
+			_fixedUserId(true),
+			_fixedText(true)
 		{
 		}
 
@@ -73,12 +79,12 @@ namespace synthese
 		void DBLogHTMLView::set(
 			const server::ParametersMap& map,
 			std::string logKey,
+			util::RegistryKeyType searchObjectId,
+			util::RegistryKeyType searchUserId,
+			DBLogEntry::Level searchLevel,
 			time::DateTime searchStartDate,
 			time::DateTime searchEndDate,
-			DBLogEntry::Level searchLevel,
-			util::RegistryKeyType searchUserId,
-			std::string searchText,
-			util::RegistryKeyType searchObjectId
+			std::string searchText
 		){
 			const string FACTORY_KEY("LogViewer");
 			
@@ -91,6 +97,7 @@ namespace synthese
 				searchStartDate = map.getDateTime(
 					_getParameterName(PARAMETER_START_DATE), false, FACTORY_KEY
 				);
+				_fixedStartDate = false;
 			}
 			_searchStartDate = searchStartDate;
 
@@ -100,6 +107,7 @@ namespace synthese
 				searchEndDate = map.getDateTime(
 					_getParameterName(PARAMETER_END_DATE), false, FACTORY_KEY
 				);
+				_fixedEndDate = false;
 			}
 			_searchEndDate = searchEndDate;
 
@@ -109,6 +117,7 @@ namespace synthese
 				searchUserId = map.getUid(
 					_getParameterName(PARAMETER_SEARCH_USER), false, FACTORY_KEY
 				);
+				_fixedUserId = false;
 			}
 			_searchUserId = searchUserId;
 
@@ -122,6 +131,7 @@ namespace synthese
 				{
 					searchLevel = static_cast<DBLogEntry::Level>(id);
 				}
+				_fixedLevel = false;
 			}
 			_searchLevel = searchLevel;
 			
@@ -131,6 +141,7 @@ namespace synthese
 				searchText = map.getString(
 					_getParameterName(PARAMETER_SEARCH_TEXT), false, FACTORY_KEY
 				);
+				_fixedText = false;
 			}
 			_searchText = searchText;
 
@@ -140,6 +151,7 @@ namespace synthese
 				searchObjectId = map.getUid(
 					_getParameterName(PARAMETER_OBJECT_ID), false, FACTORY_KEY
 				);
+				_fixedObjectId = false;
 			}
 			_searchObjectId = searchObjectId;
 
@@ -190,51 +202,72 @@ namespace synthese
 			if(withForm)
 			{
 				stream << st.open();
-				stream <<
-					st.cell(
-						"Date début",
+				if(!_fixedStartDate)
+				{
+					stream <<
+						st.cell(
+							"Date début",
+							st.getForm().getCalendarInput(
+								_getParameterName(PARAMETER_START_DATE),
+								_searchStartDate
+						)	)
+					;
+				}
+				if(!_fixedEndDate)
+				{
+					stream << st.cell(
+						"Date fin",
 						st.getForm().getCalendarInput(
-							_getParameterName(PARAMETER_START_DATE),
-							_searchStartDate
-					)	)
-				;
-				stream << st.cell(
-					"Date fin",
-					st.getForm().getCalendarInput(
-						_getParameterName(PARAMETER_END_DATE),
-						_searchEndDate
-					)	)
-				;
-				stream << st.cell(
-						"Utilisateur",
-						st.getForm().getSelectInput(
-							_getParameterName(PARAMETER_SEARCH_USER),
-							SecurityModule::getUserLabels(true),
-							_searchUserId
-					)	)
-				;
-				stream << st.cell(
-						"Type",
-						st.getForm().getSelectInput(
-							_getParameterName(PARAMETER_SEARCH_TYPE),
-							DBLogModule::getEntryLevelLabels(true),
-							static_cast<int>(_searchLevel)
-					)	)
-				;
-				stream << st.cell(
-						"Texte",
-						st.getForm().getTextInput(
-							_getParameterName(PARAMETER_SEARCH_TEXT), _searchText
-					)	)
-				;
+							_getParameterName(PARAMETER_END_DATE),
+							_searchEndDate
+						)	)
+					;
+				}
+				if(!_fixedUserId)
+				{
+					stream << st.cell(
+							"Utilisateur",
+							st.getForm().getSelectInput(
+								_getParameterName(PARAMETER_SEARCH_USER),
+								SecurityModule::getUserLabels(true),
+								_searchUserId
+						)	)
+					;
+				}
+				if(!_fixedLevel)
+				{
+					stream << st.cell(
+							"Type",
+							st.getForm().getSelectInput(
+								_getParameterName(PARAMETER_SEARCH_TYPE),
+								DBLogModule::getEntryLevelLabels(true),
+								static_cast<int>(_searchLevel)
+						)	)
+					;
+				}
+				if(!_fixedText)
+				{
+					stream << st.cell(
+							"Texte",
+							st.getForm().getTextInput(
+								_getParameterName(PARAMETER_SEARCH_TEXT), _searchText
+						)	)
+					;
+				}
 				stream << st.close();
 			}
 			
 			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
 			v.push_back(make_pair(PARAMETER_START_DATE, "Date"));
-			v.push_back(make_pair(PARAMETER_SEARCH_USER, "Utilisateur"));
-			v.push_back(make_pair(string(), "Objet"));
+			if(!_fixedUserId)
+			{
+				v.push_back(make_pair(PARAMETER_SEARCH_USER, "Utilisateur"));
+			}
+			if(!_fixedObjectId)
+			{
+				v.push_back(make_pair(string(), "Objet"));
+			}
 			DBLog::ColumnsVector customCols = _dbLog->getColumnNames();
 			BOOST_FOREACH(
 				const DBLog::ColumnsVector::value_type& col,
@@ -266,14 +299,20 @@ namespace synthese
 					)
 				;
 				stream << t.col() << dbe->getDate().toString(true);
-				stream << t.col() << (user.get() ? user->getLogin() : "(supprimé)");
-				stream <<
-					t.col() <<
-					(	(dbe->getObjectId() > 0) ?
-						_dbLog->getObjectName(dbe->getObjectId()) :
-						string()
-					)
-				;
+				if(!_fixedUserId)
+				{
+					stream << t.col() << (user.get() ? user->getLogin() : "(supprimé)");
+				}
+				if(!_fixedObjectId)
+				{
+					stream <<
+						t.col() <<
+						(	(dbe->getObjectId() > 0) ?
+							_dbLog->getObjectName(dbe->getObjectId()) :
+							string()
+						)
+					;
+				}
 
 				DBLog::ColumnsVector cols = _dbLog->parse(*dbe);
 				BOOST_FOREACH(const DBLog::ColumnsVector::value_type& col, cols)
