@@ -91,6 +91,12 @@ namespace synthese
 		
 			//! @name Setters
 			//@{
+			//@}
+
+			//! @name Modifiers
+			//@{
+				void setLogKey(const std::string& value);
+				
 				/** Global Modifier.
 				* 
 				* @param map Map containing the parameters described by the user query
@@ -115,17 +121,23 @@ namespace synthese
 				);
 			//@}
 
-			//! @name Modifiers
-			//@{
-			//@}
-
 			//! @name Queries
 			//@{
+				std::string getLogKey() const;
+				std::string getLogName() const;
+
 				void display(
 					std::ostream& stream,
 					const server::Request& searchRequest,
 					bool withForm = true,
 					bool withLinkToAdminPage = false
+				) const;
+				
+				bool isAuthorized(
+					const server::Request& request
+				) const;
+				
+				server::ParametersMap getParametersMap(
 				) const;
 			//@}
 		

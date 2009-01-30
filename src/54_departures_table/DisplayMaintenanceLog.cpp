@@ -24,6 +24,8 @@
 
 #include "User.h"
 #include "DisplayMaintenanceLog.h"
+#include "DisplayMaintenanceRight.h"
+#include "Request.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayMonitoringStatus.h"
@@ -41,6 +43,7 @@ namespace synthese
 	using namespace departurestable;
 	using namespace util;
 	using namespace time;
+	using namespace server;
 
 	namespace util
 	{
@@ -58,6 +61,15 @@ namespace synthese
 			v.push_back("Détail");
 			return v;
 		}
+
+
+		bool DisplayMaintenanceLog::isAuthorized(
+			const Request& request
+		) const {
+			return request.isAuthorized<DisplayMaintenanceRight>(READ);
+		}
+
+
 
 		void DisplayMaintenanceLog::AddAdminEntry(
 			const DisplayScreen* screen

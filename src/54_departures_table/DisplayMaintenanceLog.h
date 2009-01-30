@@ -77,6 +77,12 @@ namespace synthese
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			
+			
+			virtual bool isAuthorized(
+				const server::Request& request
+			) const;
+			
+			
 			DBLog::ColumnsVector parse(
 				const dblog::DBLogEntry& entry
 			) const;

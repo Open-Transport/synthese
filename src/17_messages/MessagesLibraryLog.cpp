@@ -20,15 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/MessagesLibraryLog.h"
-#include "17_messages/AlarmTemplate.h"
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/TextTemplate.h"
-#include "17_messages/TextTemplateTableSync.h"
-
-#include "01_util/Conversion.h"
+#include "MessagesLibraryLog.h"
+#include "AlarmTemplate.h"
+#include "ScenarioTemplate.h"
+#include "ScenarioTableSync.h"
+#include "AlarmTableSync.h"
+#include "TextTemplate.h"
+#include "TextTemplateTableSync.h"
+#include "Conversion.h"
+#include "MessagesLibraryRight.h"
+#include "Request.h"
 
 using namespace boost;
 using namespace std;
@@ -38,6 +39,8 @@ namespace synthese
 	using namespace dblog;
 	using namespace util;
 	using namespace messages;
+	using namespace server;
+	using namespace security;
 
 	namespace util
 	{
@@ -52,6 +55,12 @@ namespace synthese
 			v.push_back("Message");
 			v.push_back("Action");
 			return v;
+		}
+
+		bool MessagesLibraryLog::isAuthorized(
+			const Request& request
+		) const {
+			return request.isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		std::string MessagesLibraryLog::getObjectName( uid id ) const

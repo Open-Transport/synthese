@@ -27,9 +27,8 @@
 
 #include "31_resa/Types.h"
 
-#include "13_dblog/DBLog.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "DBLog.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -111,6 +110,10 @@ namespace synthese
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			virtual std::string getObjectName(uid id) const;
+			
+			virtual bool isAuthorized(
+				const server::Request& request
+			) const;
 
 			virtual DBLog::ColumnsVector parse(const dblog::DBLogEntry& entry) const;
 

@@ -28,6 +28,8 @@
 #include "ScenarioTableSync.h"
 #include "Env.h"
 #include "Conversion.h"
+#include "MessagesRight.h"
+#include "Request.h"
 
 using namespace std;
 using namespace boost;
@@ -37,6 +39,8 @@ namespace synthese
 	using namespace dblog;
 	using namespace util;
 	using namespace messages;
+	using namespace server;
+	using namespace security;
 
 	namespace util
 	{
@@ -51,6 +55,12 @@ namespace synthese
 			v.push_back("Message");
 			v.push_back("Action");
 			return v;
+		}
+
+		bool MessagesLog::isAuthorized(
+			const Request& request
+		) const {
+			return request.isAuthorized<MessagesRight>(READ);
 		}
 
 		void MessagesLog::addUpdateEntry(

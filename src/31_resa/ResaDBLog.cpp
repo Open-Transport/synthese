@@ -22,27 +22,22 @@
 */
 
 #include "ResaDBLog.h"
-
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/ResaModule.h"
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/ReservationTableSync.h"
-
-#include "04_time/DateTime.h"
-
-#include "05_html/HTMLModule.h"
-
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
-
-#include "01_util/Conversion.h"
-
-#include "13_dblog/DBLogEntry.h"
-#include "13_dblog/DBLogEntryTableSync.h"
-
-#include "30_server/Session.h"
+#include "ResaRight.h"
+#include "Request.h"
+#include "Reservation.h"
+#include "ReservationTransaction.h"
+#include "ResaModule.h"
+#include "ReservationTransactionTableSync.h"
+#include "ReservationTransaction.h"
+#include "ReservationTableSync.h"
+#include "DateTime.h"
+#include "HTMLModule.h"
+#include "User.h"
+#include "UserTableSync.h"
+#include "Conversion.h"
+#include "DBLogEntry.h"
+#include "DBLogEntryTableSync.h"
+#include "Session.h"
 
 using namespace std;
 using namespace boost;
@@ -55,6 +50,7 @@ namespace synthese
 	using namespace security;
 	using namespace time;
 	using namespace html;
+	using namespace server;
 
 	namespace util
 	{
@@ -92,6 +88,11 @@ namespace synthese
 		}
 
 
+		bool ResaDBLog::isAuthorized(
+			const Request& request
+		) const {
+			return request.isAuthorized<ResaRight>(READ);
+		}
 
 		DBLog::ColumnsVector resa::ResaDBLog::getColumnNames() const
 		{

@@ -25,9 +25,8 @@
 
 #include <string>
 
-#include "13_dblog/DBLog.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "DBLog.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -75,6 +74,10 @@ namespace synthese
 				, const Profile* subject
 				, const std::string& text
 			);
+			
+			virtual bool isAuthorized(
+				const server::Request& request
+			) const;
 		};
 	}
 }

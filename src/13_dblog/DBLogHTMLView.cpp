@@ -83,11 +83,7 @@ namespace synthese
 			const string FACTORY_KEY("LogViewer");
 			
 			// Log key
-			if (!Factory<DBLog>::contains(logKey))
-			{
-				throw Exception("Invalid log key : " + logKey);
-			}
-			_dbLog.reset(Factory<DBLog>::create(logKey));
+			setLogKey(logKey);
 
 			// Start Date
 			if(searchStartDate.isUnknown())
@@ -119,10 +115,13 @@ namespace synthese
 			// Level
 			if(searchLevel == DBLogEntry::DB_LOG_UNKNOWN)
 			{
-				searchLevel = static_cast<DBLogEntry::Level>(
-					map.getInt(
-						_getParameterName(PARAMETER_SEARCH_TYPE), false, FACTORY_KEY
-				)	);
+				int id(
+					map.getInt(_getParameterName(PARAMETER_SEARCH_TYPE), false, FACTORY_KEY)
+				);
+				if (id > 0)
+				{
+					searchLevel = static_cast<DBLogEntry::Level>(id);
+				}
 			}
 			_searchLevel = searchLevel;
 			
@@ -285,6 +284,50 @@ namespace synthese
 			
 			stream << t.close();
 
+		}
+		
+		string DBLogHTMLView::getLogKey() const
+		{
+			return
+				_dbLog.get() ?
+				_dbLog->getFactoryKey() :
+				string();
+		}
+		
+		
+		
+		string DBLogHTMLView::getLogName() const
+		{
+			return
+				_dbLog.get() ?
+				_dbLog->getName() :
+				string();
+		}
+		
+		
+		
+		void DBLogHTMLView::setLogKey(const string& value)
+		{
+			if (!Factory<DBLog>::contains(value))
+			{
+				_dbLog.reset();
+				throw Exception("Invalid log key : " + value);
+			}
+			_dbLog.reset(Factory<DBLog>::create(value));
+		}
+		
+		bool DBLogHTMLView::isAuthorized(
+			const Request& request
+		) const {
+			return _dbLog.get() && _dbLog->isAuthorized(request);
+		}
+		
+		
+		
+		ParametersMap DBLogHTMLView::getParametersMap(
+		) const {
+			ParametersMap m;
+			return m;
 		}
 	}
 }

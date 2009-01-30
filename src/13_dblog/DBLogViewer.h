@@ -42,9 +42,6 @@ namespace synthese
 
 	namespace dblog
 	{
-		class DBLog;
-		class DBLogEntry;
-
 		/** Visualisation de journal d'événements.
 			@ingroup m13Admin refAdmin
 		
@@ -95,7 +92,6 @@ namespace synthese
 			//! \name Stored parameters
 			//@{
 				DBLogHTMLView							_viewer;
-				boost::shared_ptr<DBLog>				_dbLog;
 			//@}
 
 		public:

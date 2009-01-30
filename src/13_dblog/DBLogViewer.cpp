@@ -29,7 +29,6 @@
 #include "SecurityModule.h"
 #include "User.h"
 #include "UserTableSync.h"
-#include "DBLog.h"
 #include "DBLogViewer.h"
 #include "DBLogModule.h"
 #include "DBLogEntryTableSync.h"
@@ -40,6 +39,7 @@
 #include "AdminModule.h"
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
+#include "DBLog.h"
 
 #include <sstream>
 #include <boost/shared_ptr.hpp>
@@ -98,6 +98,9 @@ namespace synthese
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setPage<DBLogViewer>();
+			static_cast<DBLogViewer*>(
+				searchRequest.getFunction()->getPage().get()
+			)->setLogKey(_viewer.getLogKey());
 
 			_viewer.display(
 				stream,
@@ -108,7 +111,12 @@ namespace synthese
 
 		bool DBLogViewer::isAuthorized() const
 		{
-			return _request->isAuthorized<DBLogRight>(READ);
+			return
+				_request->isAuthorized<DBLogRight>(READ) &&
+				(	_viewer.getLogKey().empty() ||
+					_viewer.isAuthorized(*_request)
+				)
+			;
 		}
 
 
@@ -118,8 +126,9 @@ namespace synthese
 			, const AdminInterfaceElement& currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DBLogModule::FACTORY_KEY)
-			{
+			if(	parentLink.factoryKey == ModuleAdmin::FACTORY_KEY &&
+				parentLink.parameterValue == DBLogModule::FACTORY_KEY
+			){
 				vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
 				BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
 				{
@@ -133,38 +142,63 @@ namespace synthese
 			return links;
 		}
 
-		AdminInterfaceElement::PageLinks DBLogViewer::getSubPages( const AdminInterfaceElement& currentPage) const
-		{
+
+
+		AdminInterfaceElement::PageLinks DBLogViewer::getSubPages(
+			const AdminInterfaceElement& currentPage
+		) const {
 			return AdminInterfaceElement::PageLinks();
 		}
+		
+		
 
 		std::string DBLogViewer::getTitle() const
 		{
-			return _dbLog.get() ? _dbLog->getName() : DEFAULT_TITLE;
+			return
+				_viewer.getLogKey().empty() ?
+				DEFAULT_TITLE :
+				_viewer.getLogName()
+			;
 		}
+
+
 
 		std::string DBLogViewer::getParameterName() const
 		{
-			return _dbLog.get() ? PARAMETER_LOG_KEY : string();
+			return
+				_viewer.getLogKey().empty() ?
+				string() :
+				PARAMETER_LOG_KEY
+			;
 		}
+
+
 
 		std::string DBLogViewer::getParameterValue() const
 		{
-			return _dbLog.get() ? _dbLog->getFactoryKey() : string();
+			return _viewer.getLogKey();
 		}
+
+
 
 		void DBLogViewer::setLogKey( const std::string& key )
 		{
-			if (!Factory<DBLog>::contains(key))
+			try
+			{
+				_viewer.setLogKey(key);
+			}
+			catch(Exception& e)
+			{
 				throw AdminParametersException("Invalid log key : " + key);
-			_dbLog.reset(Factory<DBLog>::create(key));
+			}
 		}
 
-		server::ParametersMap DBLogViewer::getParametersMap() const
+
+
+		ParametersMap DBLogViewer::getParametersMap() const
 		{
-			server::ParametersMap m;
-			if (_dbLog.get())
-				m.insert(PARAMETER_LOG_KEY, _dbLog->getFactoryKey());
+			ParametersMap m(_viewer.getParametersMap());
+			m.insert(PARAMETER_LOG_KEY, _viewer.getLogKey());
 			return m;
 		}
 	}

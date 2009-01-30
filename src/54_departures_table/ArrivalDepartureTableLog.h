@@ -46,6 +46,11 @@ namespace synthese
 		public:
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
+			
+			virtual bool isAuthorized(
+				const server::Request& request
+			) const;
+			
 			static void	addUpdateEntry(
 				const DisplayScreen* screen
 				, const std::string& text

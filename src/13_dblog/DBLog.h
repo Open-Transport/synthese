@@ -35,6 +35,11 @@ namespace synthese
 	{
 		class User;
 	}
+	
+	namespace server
+	{
+		class Request;
+	}
 
 	namespace dblog
 	{
@@ -88,6 +93,16 @@ namespace synthese
 
 			virtual std::string getName() const = 0;
 			virtual ColumnsVector getColumnNames() const = 0;
+			
+			
+			/** Authorization tester.
+			 * Each subclass of DBLog must implement an authorization method depending on the request.
+			 * @param request the request which generated the display of the log
+			 * @return true if the log can be displayed
+			 */
+			virtual bool isAuthorized(
+				const server::Request& request
+			) const = 0;
 
 			virtual ColumnsVector parse(const DBLogEntry& entry) const;
 			virtual std::string getObjectName(uid id) const;

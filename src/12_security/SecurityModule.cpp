@@ -104,7 +104,7 @@ namespace synthese
 		{
 			vector<pair<uid, string> > m;
 			if (withAll)
-				m.push_back(make_pair(0, "(tous)"));
+				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
 			
 			Env env;
 			ProfileTableSync::Search(env);
@@ -119,7 +119,7 @@ namespace synthese
 		{
 			vector<pair<uid, string> > m;
 			if (withAll)
-				m.push_back(make_pair(uid(0), "(tous)"));
+				m.push_back(make_pair(uid(UNKNOWN_VALUE), "(tous)"));
 
 			Env env;
 			UserTableSync::Search(env, "%","%","%","%",UNKNOWN_VALUE, false);

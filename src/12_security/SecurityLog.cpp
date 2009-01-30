@@ -22,15 +22,15 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "01_util/Conversion.h"
-
-#include "12_security/SecurityLog.h"
-#include "12_security/User.h"
-#include "12_security/Profile.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/ProfileTableSync.h"
-
-#include "13_dblog/DBLogEntry.h"
+#include "Conversion.h"
+#include "SecurityLog.h"
+#include "User.h"
+#include "Profile.h"
+#include "UserTableSync.h"
+#include "ProfileTableSync.h"
+#include "DBLogEntry.h"
+#include "Request.h"
+#include "SecurityRight.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -40,6 +40,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace util;
 	using namespace security;
+	using namespace server;
 
 	namespace util
 	{
@@ -56,6 +57,15 @@ namespace synthese
 			v.push_back("Action");
 			return v;
 		}
+		
+		
+		bool SecurityLog::isAuthorized(
+			const Request& request
+		) const {
+			return request.isAuthorized<SecurityRight>(READ);
+		}
+
+
 
 		void SecurityLog::addUserLogin(const User* user )
 		{

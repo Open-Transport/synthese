@@ -26,6 +26,8 @@
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
 #include "User.h"
+#include "ArrivalDepartureTableRight.h"
+#include "Request.h"
 
 using namespace boost;
 
@@ -36,6 +38,7 @@ namespace synthese
 	using namespace security;
 	using namespace departurestable;
 	using namespace util;
+	using namespace server;
 
 	namespace util
 	{
@@ -50,6 +53,16 @@ namespace synthese
 			v.push_back("Action");
 			return v;
 		}
+
+
+
+		bool ArrivalDepartureTableLog::isAuthorized(
+			const Request& request
+		) const {
+			return request.isAuthorized<ArrivalDepartureTableRight>(READ);
+		}
+
+
 
 		void ArrivalDepartureTableLog::addUpdateEntry(
 			const DisplayScreen* screen,
