@@ -132,20 +132,11 @@ namespace synthese
 					MessagesScenarioAdmin::FACTORY_KEY
 				);
 					
-				// The action on the alarms
-				Env env;
-				AlarmTemplateInheritedTableSync::Search(env, _scenarioToCopy->getTemplate());
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
-				{
-					ScenarioSentAlarm alarm(&scenario, *templateAlarm);
-					AlarmTableSync::Save(&alarm);
-	
-					AlarmObjectLinkTableSync::CopyRecipients(
-						templateAlarm->getKey(),
-						alarm.getKey()
-					);
-				}
-				
+				SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
+	 				_scenarioToCopy->getTemplate()->getKey(),
+	 				scenario
+	 			);
+	 			
 				/// TODO add variables copy here
 			
 				// The log
@@ -192,18 +183,10 @@ namespace synthese
 				);
 				
 				// The action on the alarms
-				Env env;
-				AlarmTemplateInheritedTableSync::Search(env, _template.get());
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
-				{
-					ScenarioSentAlarm alarm(&scenario, *templateAlarm);
-					AlarmTableSync::Save(&alarm);
-	
-					AlarmObjectLinkTableSync::CopyRecipients(
-						templateAlarm->getKey(),
-						alarm.getKey()
-					);
-				}
+				SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
+	 				_template->getKey(),
+	 				scenario
+	 			);
 			
 				// The log
 				MessagesLog::AddNewSentScenarioEntry(

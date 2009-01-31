@@ -55,7 +55,10 @@ namespace synthese
 				util::RegistryKeyType key = UNKNOWN_VALUE,
 				const ScenarioTemplate* scenario = NULL
 			);
-			AlarmTemplate(const ScenarioTemplate* scenario, const AlarmTemplate& source);
+			AlarmTemplate(
+				const ScenarioTemplate& scenario,
+				const AlarmTemplate& source
+			);
 			AlarmTemplate(const AlarmTemplate& source);
 			~AlarmTemplate();
 

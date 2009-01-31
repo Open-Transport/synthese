@@ -84,6 +84,7 @@ namespace synthese
 				<< ",''"
 				<< ",''"
 				<< "," << Conversion::ToString(obj->getScenario()->getKey())
+				<< ",0"
 				<< ")";
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
@@ -100,15 +101,22 @@ namespace synthese
 
 
 
-		void AlarmTemplateInheritedTableSync::Search( util::Env& env, const ScenarioTemplate* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool raisingOrder /*= false*/, util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */ )
-		{
+		void AlarmTemplateInheritedTableSync::Search(
+			Env& env,
+			RegistryKeyType scenarioId,
+			int first /*= 0 */,
+			int number /*= 0 */,
+			bool orderByLevel /*= false */,
+			bool raisingOrder /*= false*/,
+			LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+		){
 			stringstream query;
 			query
 				<< " SELECT a.*"
 				<< " FROM " << TABLE.NAME << " AS a "
 				<< " WHERE "
 				<< COL_IS_TEMPLATE << "=1"
-				<< " AND " << COL_SCENARIO_ID << "=" << scenario->getKey();
+				<< " AND " << COL_SCENARIO_ID << "=" << scenarioId;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

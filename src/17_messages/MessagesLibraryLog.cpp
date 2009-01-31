@@ -131,18 +131,35 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
 		}
 
-		void MessagesLibraryLog::addCreateEntry( const ScenarioTemplate* scenario , const ScenarioTemplate* scenarioTemplate, const security::User* user )
-		{
+		void MessagesLibraryLog::addCreateEntry(
+			const ScenarioTemplate& scenario,
+			const ScenarioTemplate& scenarioTemplate,
+			const security::User* user
+		){
 			DBLogEntry::Content content;
 			content.push_back(string());
 			stringstream text;
-			text << "Création du scénario " << scenario->getName();
-			if (scenarioTemplate != NULL)
-				text << " par copie du scénario " << scenarioTemplate->getName();
+			text
+				<< "Création du scénario " << scenario.getName()
+				<< " par copie du scénario " << scenarioTemplate.getName();
 			content.push_back(text.str());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
 		}
+
+		void MessagesLibraryLog::addCreateEntry(
+			const ScenarioTemplate& scenario,
+			const security::User* user
+		){
+			DBLogEntry::Content content;
+			content.push_back(string());
+			stringstream text;
+			text << "Création du scénario " << scenario.getName();
+			content.push_back(text.str());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
+		}
+		
 
 		void MessagesLibraryLog::AddDeleteEntry( const AlarmTemplate* alarm , const security::User* user )
 		{

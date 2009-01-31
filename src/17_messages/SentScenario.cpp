@@ -43,27 +43,38 @@ namespace synthese
 		SentScenario::SentScenario(
 			util::RegistryKeyType key
 		):	Registrable(key),
-			ScenarioSubclassTemplate<ScenarioSentAlarm>()
+			Scenario()
 			, _isEnabled(false)
 			, _periodStart(TIME_UNKNOWN)
 			, _periodEnd(TIME_UNKNOWN)
+			, _template(NULL)
 		{
 		}
 
 		SentScenario::SentScenario(
-			const ScenarioTemplate& source,
-			util::RegistryKeyType key,
-			time::DateTime periodStart /*= time::DateTime(time::TIME_UNKNOWN) */
-			, time::DateTime periodEnd /*= time::DateTime(time::TIME_UNKNOWN) */
-		):	ScenarioSubclassTemplate<ScenarioSentAlarm>(source.getName()),
+			const ScenarioTemplate& source
+		):	Scenario(source.getName()),
 			Registrable(UNKNOWN_VALUE),
 			_isEnabled(false),
-			_periodStart(periodStart),
-			_periodEnd(periodEnd)
+			_periodStart(TIME_UNKNOWN),
+			_periodEnd(TIME_UNKNOWN),
+			_template(&source)
 		{
-			for (ScenarioTemplate::AlarmsSet::const_iterator it = source.getAlarms().begin(); it != source.getAlarms().end(); ++it)
-				addAlarm(new ScenarioSentAlarm(this, **it));
 		}
+
+
+		SentScenario::SentScenario(
+			const SentScenario& source
+		):	Scenario(source._template ? source._template->getName() : source.getName()),
+			Registrable(UNKNOWN_VALUE),
+			_isEnabled(false),
+			_periodStart(TIME_UNKNOWN),
+			_periodEnd(TIME_UNKNOWN),
+			_template(source._template),
+			_variables(source._variables)
+		{
+		}
+
 
 		void SentScenario::setPeriodStart( const synthese::time::DateTime& periodStart )
 		{
@@ -106,14 +117,14 @@ namespace synthese
 		AlarmConflict SentScenario::getConflictStatus() const
 		{
 			AlarmConflict conflictStatus(ALARM_NO_CONFLICT);
-			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
+/*			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
 			{
 				AlarmConflict thisConflictStatus = (*it)->getConflictStatus();
 				if (thisConflictStatus > conflictStatus)
 					conflictStatus = thisConflictStatus;
 				if (conflictStatus == ALARM_CONFLICT)
 					return conflictStatus;
-			}
+			}*/
 			return conflictStatus;
 		}
 

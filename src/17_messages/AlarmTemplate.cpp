@@ -58,9 +58,11 @@ namespace synthese
 
 		}
 
-		AlarmTemplate::AlarmTemplate( const ScenarioTemplate* scenario, const AlarmTemplate& source )
-			: Alarm(source)
-			, _scenario(scenario)
+		AlarmTemplate::AlarmTemplate(
+			const ScenarioTemplate& scenario,
+			const AlarmTemplate& source
+		):	Alarm(source)
+			, _scenario(&scenario)
 		{
 
 		}

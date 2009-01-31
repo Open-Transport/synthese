@@ -36,7 +36,9 @@ namespace synthese
 			@ingroup m17ILS refILS
 		*/
 		class AlarmTemplateInheritedTableSync
-			: public db::SQLiteInheritedNoSyncTableSyncTemplate<AlarmTableSync, AlarmTemplateInheritedTableSync, AlarmTemplate>
+		:	public db::SQLiteInheritedNoSyncTableSyncTemplate<
+				AlarmTableSync, AlarmTemplateInheritedTableSync, AlarmTemplate
+			>
 		{
 		public:
 			/** Constructor.
@@ -45,7 +47,7 @@ namespace synthese
 
 			static void Search(
 				util::Env& env,
-				const ScenarioTemplate* scenario
+				util::RegistryKeyType scenarioTemplateId = UNKNOWN_VALUE
 				, int first = 0
 				, int number = 0
 				, bool orderByLevel = false

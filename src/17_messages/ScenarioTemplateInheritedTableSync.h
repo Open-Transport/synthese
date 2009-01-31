@@ -23,10 +23,9 @@
 #ifndef SYNTHESE_messages_ScenarioTemplateInheritedTableSync_h__
 #define SYNTHESE_messages_ScenarioTemplateInheritedTableSync_h__
 
-#include "02_db/SQLiteInheritedNoSyncTableSyncTemplate.h"
-
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/ScenarioTemplate.h"
+#include "SQLiteInheritedNoSyncTableSyncTemplate.h"
+#include "ScenarioTableSync.h"
+#include "ScenarioTemplate.h"
 
 namespace synthese
 {
@@ -36,18 +35,24 @@ namespace synthese
 			@ingroup m17
 		*/
 		class ScenarioTemplateInheritedTableSync
-			: public db::SQLiteInheritedNoSyncTableSyncTemplate<ScenarioTableSync, ScenarioTemplateInheritedTableSync, ScenarioTemplate>
+		:	public db::SQLiteInheritedNoSyncTableSyncTemplate<
+				ScenarioTableSync, ScenarioTemplateInheritedTableSync, ScenarioTemplate
+			>
 		{
 		public:
 			ScenarioTemplateInheritedTableSync();
 
 			/** Template scenario search.
-			@param name Name of the template
-			@param first First Scenario object to answer
-			@param number Number of Scenario objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-			@return vector<Scenario*> Founded Scenario objects.
-			@author Hugues Romain
-			@date 2006
+				@param env Environment to populate
+				@param name Name of the template
+				@param first First Scenario object to answer
+				@param number Number of Scenario objects to answer (0 = all)
+				The size of the vector is less or equal to number, then all users were returned despite of 
+				the number limit. If the size is greater than number (actually equal to number + 1) then 
+				there is others accounts to show. Test it to know if the situation needs a "click for more"
+				button.
+				@author Hugues Romain
+				@date 2006
 			*/
 			static void Search(
 				util::Env& env,
@@ -59,6 +64,19 @@ namespace synthese
 				, bool orderByName = true
 				, bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
+			
+			
+			
+			static ScenarioTemplate::VariablesMap GetVariables(
+				util::RegistryKeyType scenarioId
+			);
+			
+			
+			
+			static void CopyMessagesFromOther(
+				util::RegistryKeyType sourceId,
+				const ScenarioTemplate& dest
 			);
 		};
 	}

@@ -36,7 +36,9 @@ namespace synthese
 			@ingroup m17ILS refILS
 		*/
 		class ScenarioSentAlarmInheritedTableSync
-			: public db::SQLiteInheritedRegistryTableSync<AlarmTableSync, ScenarioSentAlarmInheritedTableSync, ScenarioSentAlarm>
+		:	public db::SQLiteInheritedRegistryTableSync<
+				AlarmTableSync, ScenarioSentAlarmInheritedTableSync, ScenarioSentAlarm
+			>
 		{
 		public:
 			/** Constructor.
@@ -46,8 +48,8 @@ namespace synthese
 
 			static void Search(
 				util::Env& env,
-				const SentScenario* scenario
-				, int first = 0
+				util::RegistryKeyType scenarioId,
+				int first = 0
 				, int number = 0
 				, bool orderByLevel = false
 				, bool orderByStatus = false

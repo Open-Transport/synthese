@@ -104,33 +104,39 @@ namespace synthese
 
 		void AddScenarioAction::run()
 		{
-			// The action on the scenario
-			shared_ptr<ScenarioTemplate> scenario;
-			if (_template.get())
-				scenario.reset(new ScenarioTemplate(*_template, _name));
-			else
-				scenario.reset(new ScenarioTemplate(_name));
-			scenario->setFolderId(_folder.get() ? _folder->getKey() : 0);
-			ScenarioTableSync::Save (scenario.get());
-
-			// Remember of the id of created object to view it after the action
-			_request->setObjectId(scenario->getKey());
-
-			// The action on the alarms
 			if (_template.get())
 			{
-				const ScenarioTemplate::AlarmsSet& alarms(_template->getAlarms());
-				BOOST_FOREACH(const AlarmTemplate* sourceAlarm, alarms)
-				{
-					AlarmTemplate alarm(scenario.get(), *sourceAlarm);
-					AlarmTableSync::Save(&alarm);
+				ScenarioTemplate scenario(*_template, _name);
+				
+				ScenarioTableSync::Save(&scenario);
+				
+				ScenarioTemplateInheritedTableSync::CopyMessagesFromOther(
+					_template->getKey(), scenario
+				);
 
-					AlarmObjectLinkTableSync::CopyRecipients(sourceAlarm->getKey(), alarm.getKey());
-				}
+				// Remember of the id of created object to view it after the action
+				_request->setObjectId(scenario.getKey());
+
+				// Log
+				MessagesLibraryLog::addCreateEntry(
+					scenario, *_template, _request->getUser().get()
+				);
+
+			} else {
+				ScenarioTemplate scenario(
+					_name,
+					_folder.get() ? _folder->getKey() : 0
+				);
+				
+				ScenarioTableSync::Save(&scenario);
+
+				// Remember of the id of created object to view it after the action
+				_request->setObjectId(scenario.getKey());
+
+				MessagesLibraryLog::addCreateEntry(
+					scenario, _request->getUser().get()
+				);
 			}
-
-			// Log
-			MessagesLibraryLog::addCreateEntry(scenario.get(), _template.get(), _request->getUser().get());
 		}
 
 		void AddScenarioAction::setFolderId( uid id)

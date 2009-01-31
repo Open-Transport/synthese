@@ -26,6 +26,10 @@
 #include "SentScenario.h"
 #include "ScenarioInheritedTableSync.h"
 #include "DateTime.h"
+#include "AlarmTemplateInheritedTableSync.h"
+#include "ScenarioSentAlarmInheritedTableSync.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "AlarmObjectLinkTableSync.h"
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -81,8 +85,14 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				LoadScenarioAlarms<SentScenario>(obj);
-				
+				RegistryKeyType id(rows->getLongLong(ScenarioTableSync::COL_TEMPLATE));
+				try
+				{
+					obj->setTemplate(ScenarioTemplateInheritedTableSync::Get(id, env, linkLevel).get());
+				}
+				catch(Exception& e)
+				{
+				}
 			}
 		}
 
@@ -123,7 +133,10 @@ namespace synthese
 				}
 				query << variable.first << "$" << variable.second;
 			}
-			query << "\")";
+			query << "\""
+				<< "," << (obj->getTemplate() ? Conversion::ToString(obj->getTemplate()->getKey()) : "0")
+				<< ")"
+			;
 			sqlite->execUpdate(query.str());
 
 			stringstream alarmquery;
@@ -184,6 +197,48 @@ namespace synthese
 				query << " OFFSET " << Conversion::ToString(first);
 
 			LoadFromQuery(query.str(), env, linkLevel);
+		}
+		
+		
+		
+		void SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
+			util::RegistryKeyType sourceId,
+			const SentScenario& dest
+		){
+			// The action on the alarms
+			Env env;
+			AlarmTemplateInheritedTableSync::Search(env, sourceId);
+			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
+			{
+				ScenarioSentAlarm alarm(dest, *templateAlarm);
+				AlarmTableSync::Save(&alarm);
+
+				AlarmObjectLinkTableSync::CopyRecipients(
+					templateAlarm->getKey(),
+					alarm.getKey()
+				);
+			}
+		}
+		
+		
+		
+		void SentScenarioInheritedTableSync::CopyMessagesFromOther(
+			util::RegistryKeyType sourceId,
+			const SentScenario& dest
+		){
+			// The action on the alarms
+			Env env;
+			ScenarioSentAlarmInheritedTableSync::Search(env, sourceId);
+			BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> templateAlarm, env.getRegistry<ScenarioSentAlarm>())
+			{
+				ScenarioSentAlarm alarm(dest, *templateAlarm);
+				AlarmTableSync::Save(&alarm);
+
+				AlarmObjectLinkTableSync::CopyRecipients(
+					templateAlarm->getKey(),
+					alarm.getKey()
+				);
+			}
 		}
 	}
 }

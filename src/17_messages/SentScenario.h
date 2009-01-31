@@ -44,7 +44,7 @@ namespace synthese
 		/// Sent scenario instance class.
 		///	@ingroup m17
 		class SentScenario
-		:	public ScenarioSubclassTemplate<ScenarioSentAlarm>
+		:	public Scenario
 		{
 		public:
 
@@ -64,13 +64,29 @@ namespace synthese
 			VariablesMap			_variables;
 
 		public:
+			/** Basic constructor
+			 * 
+			 * @param key id of the sent scenario 
+			 */
 			SentScenario(util::RegistryKeyType key = UNKNOWN_VALUE);
+			
+			/** Template instanciation constructor.
+			 * 
+			 * @param source the template
+			 */
 			SentScenario(
-				const ScenarioTemplate& source,
-				util::RegistryKeyType key = UNKNOWN_VALUE,
-				time::DateTime periodStart = time::DateTime(time::TIME_UNKNOWN)
-				, time::DateTime periodEnd = time::DateTime(time::TIME_UNKNOWN)
-				);
+				const ScenarioTemplate& source
+			);
+			
+			
+			/** Copy constructor.
+				@param source Scenario to copy
+				The dates are not copied
+			*/
+			SentScenario(
+				const SentScenario& source
+			);
+			
 			~SentScenario();
 
 			const time::DateTime&	getPeriodStart()	const;

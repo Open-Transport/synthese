@@ -70,6 +70,7 @@ namespace synthese
 			static const std::string COL_PERIODEND;
 			static const std::string COL_FOLDER_ID;
 			static const std::string COL_VARIABLES;
+			static const std::string COL_TEMPLATE;
 
 			ScenarioTableSync();
 		};

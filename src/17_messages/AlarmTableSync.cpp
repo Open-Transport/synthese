@@ -70,6 +70,7 @@ namespace synthese
 		const string AlarmTableSync::COL_PERIODSTART = "period_start";
 		const string AlarmTableSync::COL_PERIODEND = "period_end"; 
 		const string AlarmTableSync::COL_SCENARIO_ID = "scenario_id"; 
+		const string AlarmTableSync::COL_TEMPLATE_ID("template_id");
 	}
 
 	namespace db
@@ -89,6 +90,7 @@ namespace synthese
 			SQLiteTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
 			SQLiteTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_TIMESTAMP),
 			SQLiteTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 

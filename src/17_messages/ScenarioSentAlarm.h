@@ -47,7 +47,8 @@ namespace synthese
 			typedef util::Registry<ScenarioSentAlarm>	Registry;
 
 		private:
-			const SentScenario* _scenario;
+			const SentScenario* 	_scenario;
+			const AlarmTemplate*	_template;
 
 		public:
 			/** Copy constructor.
@@ -56,16 +57,22 @@ namespace synthese
 				@date 2007				
 				@warning the recipients are not copied. Do it at the table synchronization.
 			*/
-			ScenarioSentAlarm(const ScenarioSentAlarm& source);
+			ScenarioSentAlarm(
+				const SentScenario& scenario,
+				const ScenarioSentAlarm& source
+			);
 			
-			/** Alarm template copy constructor.
+			/** Alarm template instanciation constructor.
 				@param scenario Scenario which belongs the new alarm
 				@param source Alarm template to copy
 				@author Hugues Romain
 				@date 2007				
 				@warning the recipients are not copied. Do it at the table synchronization.
 			*/
-			ScenarioSentAlarm(const SentScenario* scenario, const AlarmTemplate& source);
+			ScenarioSentAlarm(
+				const SentScenario& scenario,
+				const AlarmTemplate& source
+			);
 			
 			/** Basic constructor.
 				@param scenario Scenario which belongs the new alarm
@@ -82,10 +89,13 @@ namespace synthese
 			bool					getIsEnabled()		const;
 			const time::DateTime&	getPeriodStart()	const;
 			const time::DateTime&	getPeriodEnd()		const;
-
+			
 			const SentScenario*		getScenario()		const;
+			const AlarmTemplate*	getTemplate()		const;
+			
 			
 			void					setScenario(const SentScenario* scenario);
+			void					setTemplate(const AlarmTemplate* value);
 		};
 	}
 }

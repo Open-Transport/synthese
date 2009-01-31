@@ -59,6 +59,7 @@ namespace synthese
 		const string ScenarioTableSync::COL_PERIODEND = "period_end"; 
 		const string ScenarioTableSync::COL_FOLDER_ID("folder_id");
 		const string ScenarioTableSync::COL_VARIABLES("variables");
+		const string ScenarioTableSync::COL_TEMPLATE("template_id");
 	}
 
 	namespace db
@@ -77,12 +78,16 @@ namespace synthese
 			SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_TIMESTAMP),
 			SQLiteTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(ScenarioTableSync::COL_VARIABLES, SQL_TEXT),
+			SQLiteTableSync::Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ScenarioTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(ScenarioTableSync::COL_IS_TEMPLATE.c_str(), ScenarioTableSync::COL_PERIODSTART.c_str(), ""),
+			SQLiteTableSync::Index(
+				ScenarioTableSync::COL_IS_TEMPLATE.c_str(),
+				ScenarioTableSync::COL_PERIODSTART.c_str(),
+			""),
 			SQLiteTableSync::Index(ScenarioTableSync::COL_FOLDER_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};

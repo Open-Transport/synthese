@@ -37,41 +37,58 @@ namespace synthese
 
 	namespace messages
 	{
-		ScenarioSentAlarm::ScenarioSentAlarm(const SentScenario* scenario, const AlarmTemplate& source )
-		:	SentAlarm(),
-			_scenario(scenario)
+		ScenarioSentAlarm::ScenarioSentAlarm(
+			const SentScenario& scenario,
+			const AlarmTemplate& source
+		):	SentAlarm(),
+			_scenario(&scenario),
+			_template(&source)
 		{
 			setLevel(source.getLevel());
 			setShortMessage(source.getShortMessage());
 			setLongMessage(source.getLongMessage());
 		}
 
-		ScenarioSentAlarm::ScenarioSentAlarm(RegistryKeyType key, const SentScenario* scenario )
-		:	Registrable(key),
+
+
+		ScenarioSentAlarm::ScenarioSentAlarm(
+			RegistryKeyType key,
+			const SentScenario* scenario
+		):	Registrable(key),
 			SentAlarm(),
-			_scenario(scenario)
+			_scenario(scenario),
+			_template(NULL)
 		{
-
 		}
 
-		ScenarioSentAlarm::ScenarioSentAlarm( const ScenarioSentAlarm& source )
-			: SentAlarm()
-			, _scenario(source._scenario)
+
+
+		ScenarioSentAlarm::ScenarioSentAlarm(
+			const SentScenario& scenario,
+			const ScenarioSentAlarm& source
+		):	SentAlarm(),
+			_scenario(&scenario),
+			_template(source._template)
 		{
 			setLevel(source.getLevel());
 			setShortMessage(source.getShortMessage());
 			setLongMessage(source.getLongMessage());
 		}
+
+
 
 		ScenarioSentAlarm::~ScenarioSentAlarm()
 		{
-
 		}
+
+
 
 		bool ScenarioSentAlarm::getIsEnabled() const
 		{
 			return _scenario->getIsEnabled();
 		}
+
+
 
 		const time::DateTime& ScenarioSentAlarm::getPeriodStart() const
 		{
@@ -91,6 +108,16 @@ namespace synthese
 		void ScenarioSentAlarm::setScenario( const SentScenario* scenario )
 		{
 			_scenario = scenario;
+		}
+		
+		const AlarmTemplate* ScenarioSentAlarm::getTemplate(
+		) const {
+			return _template;
+		}
+		
+		void ScenarioSentAlarm::setTemplate(const AlarmTemplate* value
+		){
+			_template = value;
 		}
 	}
 }

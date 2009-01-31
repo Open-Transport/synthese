@@ -73,6 +73,17 @@ namespace synthese
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
+			
+			static void CopyMessagesFromTemplate(
+				util::RegistryKeyType sourceId,
+				const SentScenario& dest
+			);
+		
+		
+			static void CopyMessagesFromOther(
+				util::RegistryKeyType sourceId,
+				const SentScenario& dest
+			);
 		};
 	}
 }

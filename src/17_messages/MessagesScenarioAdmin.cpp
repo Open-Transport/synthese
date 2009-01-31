@@ -88,7 +88,7 @@ namespace synthese
 
 			try
 			{
-				_scenario = ScenarioTableSync::Get(id, _env);
+				_scenario = ScenarioTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
 				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
 			}
@@ -173,7 +173,7 @@ namespace synthese
 
 				if (_sentScenario.get())
 				{
-					ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get());
+					ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario->getKey());
 					BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.getRegistry<ScenarioSentAlarm>())
 					{
 						v.push_back(static_pointer_cast<Alarm, ScenarioSentAlarm>(alarm));
@@ -181,7 +181,7 @@ namespace synthese
 				}
 				else
 				{
-					AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get());
+					AlarmTemplateInheritedTableSync::Search(env, _templateScenario->getKey());
 					BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 					{
 						v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
@@ -276,7 +276,9 @@ namespace synthese
 			Env env;
 			if (_sentScenario.get())
 			{
-				ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario.get(), 0, 0, false, false, false, false, UP_LINKS_LOAD_LEVEL);
+				ScenarioSentAlarmInheritedTableSync::Search(
+					env, _sentScenario->getKey(), 0, 0, false, false, false, false, UP_LINKS_LOAD_LEVEL
+				);
 				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.getRegistry<ScenarioSentAlarm>())
 				{
 					AdminInterfaceElement::PageLink link(getPageLink());
@@ -290,7 +292,9 @@ namespace synthese
 			}
 			else if (_templateScenario.get())
 			{
-				AlarmTemplateInheritedTableSync::Search(env, _templateScenario.get(), 0, 0, false, false, UP_LINKS_LOAD_LEVEL);
+				AlarmTemplateInheritedTableSync::Search(
+					env, _templateScenario->getKey(), 0, 0, false, false, UP_LINKS_LOAD_LEVEL
+				);
 				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 				{
 					AdminInterfaceElement::PageLink link(getPageLink());

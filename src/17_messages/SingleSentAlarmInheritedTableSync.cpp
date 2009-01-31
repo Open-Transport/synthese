@@ -77,6 +77,7 @@ namespace synthese
 				<< ",''"
 				<< ",''"
 				<< ",0"
+				<< ",0" // Template id
 				<< ")";
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}

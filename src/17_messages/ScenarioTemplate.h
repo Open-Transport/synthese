@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_ScenarioTemplate_h__
 #define SYNTHESE_ScenarioTemplate_h__
 
-#include "ScenarioSubclassTemplate.h"
+#include "Scenario.h"
 #include "Registry.h"
 
 #include <map>
@@ -44,7 +44,7 @@ namespace synthese
 		/// Variables handling : scan all the contained messages to find all 
 		/// variables declarations and fill in the _variables attribute
 		class ScenarioTemplate
-		:	public ScenarioSubclassTemplate<AlarmTemplate>
+		:	public Scenario
 		{
 		public:
 
@@ -64,14 +64,35 @@ namespace synthese
 			typedef std::map<std::string, Variable> VariablesMap;
 
 		private:
-			uid				_folderId;
-			VariablesMap	_variables;
+			util::RegistryKeyType	_folderId;
+			VariablesMap			_variables;
 
 		public:
 			/// @name constructors and destructor
 			//@{
-				ScenarioTemplate(const std::string name = std::string());
-				ScenarioTemplate(const ScenarioTemplate& source, const std::string& name);
+			
+				/** Basic constructor.
+				 * 
+				 * @param name Name of the scenario template
+				 * @param folderId ID of the folder of the scenario
+				 */
+				ScenarioTemplate(
+					const std::string name = std::string(),
+					util::RegistryKeyType folderId = 0
+				);
+				
+				
+				/** Copy constructor.
+				 * 
+				 * @param source 
+				 * @param name 
+				 * @param folderId ID of the folder of the scenario
+				 */
+				ScenarioTemplate(
+					const ScenarioTemplate& source,
+					const std::string& name
+				);
+				
 				ScenarioTemplate(util::RegistryKeyType key);
 				~ScenarioTemplate();
 			//@}
@@ -85,15 +106,11 @@ namespace synthese
 			/// @name Setters
 			//@{
 				void setFolderId(uid value);
+				void setVariablesMap(const VariablesMap& value);
 			//@}
 
 			/// @name Modifiers
 			//@{
-				////////////////////////////////////////////////////////////////////
-				///	Scans each contained messages to find variables definitions.
-				///	@author Hugues Romain
-				///	@date 2009
-				void setVariablesFromAlarms();
 			//@}
 		};
 	}

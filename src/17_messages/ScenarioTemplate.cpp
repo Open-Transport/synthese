@@ -33,6 +33,8 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace util;
+	
 	namespace util
 	{
 		template<> const string Registry<messages::ScenarioTemplate>::KEY("ScenarioTemplate");
@@ -41,26 +43,33 @@ namespace synthese
 	namespace messages
 	{
 
-		ScenarioTemplate::ScenarioTemplate( const ScenarioTemplate& source, const std::string& name)
-			: ScenarioSubclassTemplate<AlarmTemplate>(name)
-			, util::Registrable(UNKNOWN_VALUE)
+		ScenarioTemplate::ScenarioTemplate(
+			const ScenarioTemplate& source,
+			const std::string& name
+		):	Scenario(name),
+			Registrable(UNKNOWN_VALUE),
+			_folderId(source._folderId),
+			_variables(source._variables)
 		{
-			for (AlarmsSet::const_iterator it = source.getAlarms().begin(); it != source.getAlarms().end(); ++it)
-				addAlarm(new AlarmTemplate(this,**it ));
-		}
-
-		ScenarioTemplate::ScenarioTemplate(const std::string name)
-			: ScenarioSubclassTemplate<AlarmTemplate>(name)
-			, util::Registrable(UNKNOWN_VALUE)
-			, _folderId(UNKNOWN_VALUE)
-		{
-
 		}
 
 
 
-		ScenarioTemplate::ScenarioTemplate( util::RegistryKeyType key )
-			: util::Registrable(key)
+		ScenarioTemplate::ScenarioTemplate(
+			const std::string name,
+			RegistryKeyType folderId
+		):	Scenario(name)
+			, util::Registrable(UNKNOWN_VALUE)
+			, _folderId(folderId)
+		{
+		}
+
+
+
+		ScenarioTemplate::ScenarioTemplate(
+			util::RegistryKeyType key
+		):	util::Registrable(key)
+			, Scenario()
 			, _folderId(UNKNOWN_VALUE)
 		{
 
@@ -78,6 +87,8 @@ namespace synthese
 			return _folderId;
 		}
 
+
+
 		void ScenarioTemplate::setFolderId( uid value )
 		{
 			_folderId = value;
@@ -92,49 +103,10 @@ namespace synthese
 
 
 
-		void ScenarioTemplate::setVariablesFromAlarms(
+		void ScenarioTemplate::setVariablesMap(
+			const VariablesMap& value
 		){
-			_variables.clear();
-			BOOST_FOREACH(AlarmTemplate* alarm, getAlarms())
-			{
-				string text(alarm->getLongMessage());
-				for(string::const_iterator it(text.begin()); it != text.end(); ++it)
-				{
-					if (*it == '$')
-					{
-						if (it+1 != text.end() && *(it+1) == '$' && it+2 != text.end() && *(it+2) == '$')
-						{
-							it += 2;
-							continue;
-						}
-						Variable v;
-						if (*(it+1) == '$')
-						{
-							++it;
-							v.compulsory = true;
-						}
-						else
-						{
-							v.compulsory = false;
-						}
-						string::const_iterator it2(it);
-						for(; it != text.end() && *it != '|' && *it != '$'; ++it);
-						if (it == text.end()) continue;
-						v.code = text.substr(it2-text.begin(), it-it2);
-
-						if (*it == '|')
-						{
-							++it;
-							it2 = it;
-							for(; it != text.end() && *it != '$'; ++it);
-							if (it == text.end()) continue;
-							v.helpMessage = text.substr(it2-text.begin(), it-it2);
-						}
-						_variables.insert(make_pair(v.code, v));
-						if (v.compulsory) ++it;
-					}
-				}
-			}
+			_variables = value;
 		}
 	}
 }

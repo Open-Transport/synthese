@@ -62,15 +62,21 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::Unlink(ScenarioSentAlarm* obj)
-		{
+		void SQLiteInheritedTableSyncTemplate<
+			AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm
+		>::Unlink(
+			ScenarioSentAlarm* obj
+		){
 			obj->setScenario(NULL);
 		}
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm>::Save(ScenarioSentAlarm* obj)
-		{
+		void SQLiteInheritedTableSyncTemplate<
+			AlarmTableSync,ScenarioSentAlarmInheritedTableSync,ScenarioSentAlarm
+		>::Save(
+			ScenarioSentAlarm* obj
+		){
 			if (obj->getKey() == UNKNOWN_VALUE)
 				obj->setKey(getId());
 			stringstream query;		
@@ -79,12 +85,13 @@ namespace synthese
 				<< Conversion::ToString(obj->getKey())
 				<< ",0"
 				<< "," << Conversion::ToString(obj->getIsEnabled())
-				<< "," << Conversion::ToString((int) obj->getLevel())
+				<< "," << Conversion::ToString(static_cast<int>(obj->getLevel()))
 				<< "," << Conversion::ToSQLiteString(obj->getShortMessage())
 				<< "," << Conversion::ToSQLiteString(obj->getLongMessage())
 				<< "," << obj->getPeriodStart().toSQLString()
 				<< "," << obj->getPeriodEnd().toSQLString()
-				<< "," << Conversion::ToString(obj->getScenario()->getKey())
+				<< "," << (obj->getScenario() ? Conversion::ToString(obj->getScenario()->getKey()) : "0")
+				<< "," << (obj->getTemplate() ? Conversion::ToString(obj->getTemplate()->getKey()) : "0")
 				<< ")";
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
@@ -93,23 +100,34 @@ namespace synthese
 	namespace messages
 	{
 
-		ScenarioSentAlarmInheritedTableSync::ScenarioSentAlarmInheritedTableSync()
-			: SQLiteInheritedRegistryTableSync<AlarmTableSync, ScenarioSentAlarmInheritedTableSync, ScenarioSentAlarm>()
+		ScenarioSentAlarmInheritedTableSync::ScenarioSentAlarmInheritedTableSync(
+		):	SQLiteInheritedRegistryTableSync<
+				AlarmTableSync, ScenarioSentAlarmInheritedTableSync, ScenarioSentAlarm
+			>()
 		{
 
 		}
 
 
 
-		void ScenarioSentAlarmInheritedTableSync::Search( util::Env& env, const SentScenario* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool orderByStatus /*= false */, bool orderByConflict /*= false */, bool raisingOrder /*= false*/, util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */ )
-		{
+		void ScenarioSentAlarmInheritedTableSync::Search(
+			Env& env,
+			RegistryKeyType scenarioId,
+			int first /*= 0 */,
+			int number /*= 0 */,
+			bool orderByLevel /*= false */,
+			bool orderByStatus /*= false */,
+			bool orderByConflict /*= false */,
+			bool raisingOrder /*= false*/,
+			LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+		){
 			stringstream query;
 			query
 				<< " SELECT a.*"
 				<< " FROM " << TABLE.NAME << " AS a "
 				<< " WHERE "
 				<< COL_IS_TEMPLATE << "=0"
-				<< " AND " << COL_SCENARIO_ID << "=" << scenario->getKey();
+				<< " AND " << COL_SCENARIO_ID << "=" << scenarioId;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

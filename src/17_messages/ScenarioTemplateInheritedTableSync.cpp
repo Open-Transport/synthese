@@ -27,6 +27,7 @@
 #include "ScenarioInheritedTableSync.h"
 #include "AlarmTemplate.h"
 #include "AlarmTemplateInheritedTableSync.h"
+#include "AlarmObjectLinkTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -48,7 +49,9 @@ namespace synthese
 	{
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Load(
+		void SQLiteInheritedTableSyncTemplate<
+			ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate
+		>::Load(
 			ScenarioTemplate* obj, 
 			const SQLiteResultSPtr& rows,
 			Env& env,
@@ -58,15 +61,9 @@ namespace synthese
 
 			obj->setFolderId(rows->getLongLong(ScenarioTableSync::COL_FOLDER_ID));
 
-			if (linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			if (linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == DOWN_LINKS_LOAD_LEVEL)
 			{
-				Env senv;
-				AlarmTemplateInheritedTableSync::Search(senv, obj, 0, 0, false, false, FIELDS_ONLY_LOAD_LEVEL);
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, senv.getRegistry<AlarmTemplate>())
-				{
-					obj->addAlarm(AlarmTemplateInheritedTableSync::GetEditable(alarm->getKey(), env, linkLevel).get());
-				}
-				obj->setVariablesFromAlarms();
+				obj->setVariablesMap(ScenarioTemplateInheritedTableSync::GetVariables(obj->getKey()));
 			}
 		}
 
@@ -96,6 +93,7 @@ namespace synthese
 				<< ",NULL"
 				<< "," << Conversion::ToString(obj->getFolderId())
 				<< ",''"
+				<< ",0"
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -136,6 +134,77 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 			LoadFromQuery(query.str(), env, linkLevel);
+		}
+		
+		
+		
+		ScenarioTemplate::VariablesMap ScenarioTemplateInheritedTableSync::GetVariables(
+			util::RegistryKeyType scenarioId
+		){
+			Env env;
+			ScenarioTemplate::VariablesMap result;
+			AlarmTemplateInheritedTableSync::Search(env, scenarioId);
+			BOOST_FOREACH(shared_ptr<const AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
+			{
+				string text(alarm->getLongMessage());
+				for(string::const_iterator it(text.begin()); it != text.end(); ++it)
+				{
+					if (*it == '$')
+					{
+						if (it+1 != text.end() && *(it+1) == '$' && it+2 != text.end() && *(it+2) == '$')
+						{
+							it += 2;
+							continue;
+						}
+						ScenarioTemplate::Variable v;
+						if (*(it+1) == '$')
+						{
+							++it;
+							v.compulsory = true;
+						}
+						else
+						{
+							v.compulsory = false;
+						}
+						string::const_iterator it2(it);
+						for(; it != text.end() && *it != '|' && *it != '$'; ++it);
+						if (it == text.end()) continue;
+						v.code = text.substr(it2-text.begin(), it-it2);
+
+						if (*it == '|')
+						{
+							++it;
+							it2 = it;
+							for(; it != text.end() && *it != '$'; ++it);
+							if (it == text.end()) continue;
+							v.helpMessage = text.substr(it2-text.begin(), it-it2);
+						}
+						result.insert(make_pair(v.code, v));
+						if (v.compulsory) ++it;
+					}
+				}
+			}
+		}
+	
+	
+	
+		void ScenarioTemplateInheritedTableSync::CopyMessagesFromOther(
+			util::RegistryKeyType sourceId,
+			const ScenarioTemplate& dest
+		){
+			// The action on the alarms
+			Env env;
+			AlarmTemplateInheritedTableSync::Search(env, sourceId);
+			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
+			{
+				AlarmTemplate alarm(dest, *templateAlarm);
+				AlarmTableSync::Save(&alarm);
+
+				AlarmObjectLinkTableSync::CopyRecipients(
+					templateAlarm->getKey(),
+					alarm.getKey()
+				);
+			}
 		}
 	}
 }

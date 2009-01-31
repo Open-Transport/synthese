@@ -100,10 +100,16 @@ namespace synthese
 			);
 
 			static void addCreateEntry(
-				const ScenarioTemplate* scenario
-				, const ScenarioTemplate* scenarioTemplate
+				const ScenarioTemplate& scenario
+				, const ScenarioTemplate& scenarioTemplate
 				, const security::User* user
 			);
+			
+			static void addCreateEntry(
+				const ScenarioTemplate& scenario
+				, const security::User* user
+			);
+
 			std::string getObjectName(uid id) const;
 		};
 	}
