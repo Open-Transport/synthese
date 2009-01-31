@@ -98,6 +98,9 @@ namespace synthese
 			SentScenario* obj
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
+			if (obj->getKey() == UNKNOWN_VALUE)
+				obj->setKey(getId());
+
 			stringstream query;
 			query
 				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
@@ -108,7 +111,7 @@ namespace synthese
 				<< "," << obj->getPeriodStart().toSQLString()
 				<< "," << obj->getPeriodEnd().toSQLString()
 				<< "," << UNKNOWN_VALUE
-				<< ",";
+				<< ",\"";
 			const SentScenario::VariablesMap& variables(obj->getVariables());
 			bool firstVar(true);
 			BOOST_FOREACH(const SentScenario::VariablesMap::value_type& variable, variables)
@@ -120,7 +123,7 @@ namespace synthese
 				}
 				query << variable.first << "$" << variable.second;
 			}
-			query << ")";
+			query << "\")";
 			sqlite->execUpdate(query.str());
 
 			stringstream alarmquery;

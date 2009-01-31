@@ -21,9 +21,14 @@
 */
 
 #include "AdminModule.h"
+#include "AdminRequest.h"
+
+using namespace boost;
 
 namespace synthese
 {
+	using namespace util;
+	
 	namespace admin
 	{
 		const std::string AdminModule::TABLE_COL_ID = "id";
@@ -39,7 +44,22 @@ namespace synthese
 		}
 
 
-
+		void AdminModule::ChangePageInRequest(
+			server::Request& request,
+			const std::string& oldPage,
+			const std::string& newPage
+		){
+			AdminRequest* ar(dynamic_cast<AdminRequest*>(request._getFunction().get()));
+			if(ar != NULL)
+			{
+				if(ar->getPage()->getFactoryKey() == oldPage)
+				{
+					ar->setPage(
+						shared_ptr<AdminInterfaceElement>(Factory<AdminInterfaceElement>::create(newPage))
+					);
+				}
+			}
+		}
 	}
 }
 

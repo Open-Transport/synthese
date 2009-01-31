@@ -37,6 +37,9 @@
 #include "ParametersMap.h"
 #include "SingleSentAlarm.h"
 #include "AlarmTemplate.h"
+#include "AdminModule.h"
+#include "MessagesScenarioAdmin.h"
+#include "MessageAdmin.h"
 
 #include <boost/foreach.hpp>
 
@@ -49,7 +52,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace util;
 	using namespace security;
-	
+	using namespace admin;
 
 	template<> const string util::FactorableTemplate<Action, messages::NewScenarioSendAction>::FACTORY_KEY(
 		"nssa"
@@ -123,7 +126,12 @@ namespace synthese
 	
 				// Remember of the id of created object to view it after the action
 				_request->setObjectId(scenario.getKey());
-	
+				AdminModule::ChangePageInRequest(
+					*_request,
+					MessageAdmin::FACTORY_KEY,
+					MessagesScenarioAdmin::FACTORY_KEY
+				);
+					
 				// The action on the alarms
 				Env env;
 				AlarmTemplateInheritedTableSync::Search(env, _scenarioToCopy->getTemplate());
@@ -157,7 +165,12 @@ namespace synthese
 				);
 
 				_request->setObjectId(alarm.getKey());
-
+				AdminModule::ChangePageInRequest(
+					*_request,
+					MessagesScenarioAdmin::FACTORY_KEY,
+					MessageAdmin::FACTORY_KEY
+				);
+				
 				MessagesLog::AddNewSingleMessageEntry(
 					alarm,
 					*_messageToCopy,
@@ -167,12 +180,17 @@ namespace synthese
 			else if(_template.get()) // New scenario from template
 			{
 				// The action on the scenario
-				SentScenario scenario(_template->getName());
+				SentScenario scenario(*_template);
 				ScenarioTableSync::Save(&scenario);
 	
 				// Remember of the id of created object to view it after the action
 				_request->setObjectId(scenario.getKey());
-	
+				AdminModule::ChangePageInRequest(
+					*_request,
+					MessageAdmin::FACTORY_KEY,
+					MessagesScenarioAdmin::FACTORY_KEY
+				);
+				
 				// The action on the alarms
 				Env env;
 				AlarmTemplateInheritedTableSync::Search(env, _template.get());
@@ -199,6 +217,12 @@ namespace synthese
 				AlarmTableSync::Save(&alarm);
 				
 				_request->setObjectId(alarm.getKey());
+				
+				AdminModule::ChangePageInRequest(
+					*_request,
+					MessagesScenarioAdmin::FACTORY_KEY,
+					MessageAdmin::FACTORY_KEY
+				);
 				
 				MessagesLog::AddNewSingleMessageEntry(
 					alarm,

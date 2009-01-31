@@ -27,7 +27,12 @@
 
 namespace synthese
 {
-/**	@defgroup m14Actions 14 Actions
+	namespace server
+	{
+		class Request;
+	}
+
+	/**	@defgroup m14Actions 14 Actions
 		@ingroup m14
 
 		@defgroup m14Pages 14 Pages
@@ -67,6 +72,12 @@ namespace synthese
 			void initialize();
 
 			virtual std::string getName() const;
+			
+			static void ChangePageInRequest(
+				server::Request& request,
+				const std::string& oldPage,
+				const std::string& newPage
+			);
 		};
 	}
 	/** @} */
