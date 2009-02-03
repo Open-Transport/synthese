@@ -25,11 +25,9 @@
 #ifndef SYNTHESE_ResaLogAdmin_H__
 #define SYNTHESE_ResaLogAdmin_H__
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
-
-#include "05_html/ResultHTMLTable.h"
-
-#include "04_time/Date.h"
+#include "AdminInterfaceElementTemplate.h"
+#include "ResultHTMLTable.h"
+#include "Date.h"
 
 namespace synthese
 {
@@ -56,7 +54,20 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void setFromParametersMap(const server::ParametersMap& map);
+			void setFromParametersMap(
+				const server::ParametersMap& map,
+				bool doDisplayPreparationActions = true
+			);
+
+
+
+			/** Parameters map generator, used when building an url to the admin page.
+					@return server::ParametersMap The generated parameters map
+					@author Hugues Romain
+					@date 2007					
+				*/
+			virtual server::ParametersMap getParametersMap() const;
+			
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.

@@ -47,6 +47,8 @@
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
 #include "ActionException.h"
+#include "MessagesLog.h"
+#include "MessagesLibraryLog.h"
 
 #include <boost/foreach.hpp>
 
@@ -79,9 +81,12 @@ namespace synthese
 		const string MessagesScenarioAdmin::TAB_MESSAGES("m");
 		const string MessagesScenarioAdmin::TAB_PARAMETERS("p");
 		const string MessagesScenarioAdmin::TAB_VARIABLES("v");
+		const string MessagesScenarioAdmin::TAB_LOG("l");
 
-		void MessagesScenarioAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void MessagesScenarioAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
@@ -96,7 +101,25 @@ namespace synthese
 			{
 				throw AdminParametersException("Specified scenario not found");
 			}
+			
+			if(_sentScenario.get())
+			{
+				_generalLogView.set(map, MessagesLog::FACTORY_KEY, _scenario->getKey());
+			}
+			else
+			{
+				_generalLogView.set(map, MessagesLibraryLog::FACTORY_KEY, _scenario->getKey());
+			}
 		}
+
+
+
+		server::ParametersMap MessagesScenarioAdmin::getParametersMap() const
+		{
+			ParametersMap m(_generalLogView.getParametersMap());
+			return m;
+		}
+
 
 
 		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables
@@ -116,16 +139,6 @@ namespace synthese
 			addRequest.getFunction()->setPage<MessageAdmin>();
 			addRequest.getAction()->setScenarioId(_scenario->getKey());
 
-			stream << "<h1>Propriétés</h1>";
-			PropertiesHTMLTable tp(updateRequest.getHTMLForm("update"));
-			stream << tp.open();
-			stream << tp.cell("Nom", tp.getForm().getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()));
-			if (_templateScenario.get())
-			{
-				stream << tp.cell("Répertoire", tp.getForm().getSelectInput(ScenarioNameUpdateAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(), _templateScenario->getFolderId()));
-			}
-			stream << tp.close();
-
 			////////////////////////////////////////////////////////////////////
 			// TAB PARAMETERS
 			if (openTabContent(stream, TAB_PARAMETERS))
@@ -135,15 +148,26 @@ namespace synthese
 				updateDatesRequest.setObjectId(_scenario->getKey());
 
 				stream << "<h1>Propriétés</h1>";
+				PropertiesHTMLTable tp(updateRequest.getHTMLForm("update"));
+				stream << tp.open();
+				stream << tp.cell("Nom", tp.getForm().getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()));
+				if (_templateScenario.get())
+				{
+					stream << tp.cell("Répertoire", tp.getForm().getSelectInput(ScenarioNameUpdateAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(), _templateScenario->getFolderId()));
+				}
+				stream << tp.close();
+
+				stream << "<h1>Diffusion</h1>";
 				PropertiesHTMLTable udt(updateDatesRequest.getHTMLForm("update_dates"));
 
 				stream << udt.open();
 				stream << udt.title("Paramètres");
 				stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
 				stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd()));
+				
 				stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
 
-				if (!_sentScenario->getTemplate()->getVariables().empty())
+				if (_sentScenario->getTemplate() && !_sentScenario->getTemplate()->getVariables().empty())
 				{
 					stream << udt.title("Variables (* = champ obligatoire)");
 					const ScenarioTemplate::VariablesMap& variables(_sentScenario->getTemplate()->getVariables());
@@ -222,6 +246,23 @@ namespace synthese
 			{
 				
 			}
+			
+			////////////////////////////////////////////////////////////////////
+			// TAB LOG
+			if (openTabContent(stream, TAB_LOG))
+			{
+				// Log search
+				FunctionRequest<AdminRequest> searchRequest(_request);
+				searchRequest.getFunction()->setSamePage(this);
+
+				_generalLogView.display(
+					stream,
+					searchRequest
+				);
+
+			}
+
+			closeTabContent(stream);
 		}
 
 		bool MessagesScenarioAdmin::isAuthorized() const
@@ -231,8 +272,9 @@ namespace synthese
 			return _request->isAuthorized<MessagesLibraryRight>(READ);
 		}
 
-		MessagesScenarioAdmin::MessagesScenarioAdmin()
-			: AdminInterfaceElementTemplate<MessagesScenarioAdmin>()
+		MessagesScenarioAdmin::MessagesScenarioAdmin(
+		):	AdminInterfaceElementTemplate<MessagesScenarioAdmin>(),
+			_generalLogView("g")
 		{
 
 		}
@@ -333,13 +375,14 @@ namespace synthese
 
 			if (_sentScenario.get() != NULL)
 			{
-				_tabs.push_back(Tab("Paramètres de diffusion", TAB_PARAMETERS, true));
+				_tabs.push_back(Tab("Paramètres de diffusion", TAB_PARAMETERS, true, "table.png"));
 			}
-			_tabs.push_back(Tab("Messages diffusés", TAB_MESSAGES, true));
+			_tabs.push_back(Tab("Messages diffusés", TAB_MESSAGES, true, "note.png"));
 			if (_templateScenario.get() != NULL)
 			{
 				_tabs.push_back(Tab("Variables", TAB_VARIABLES, true));
 			}
+			_tabs.push_back(Tab("Journal", TAB_LOG, true, "book.png"));
 
 			_tabBuilded = true;
 		}

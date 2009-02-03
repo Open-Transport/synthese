@@ -98,8 +98,20 @@ namespace synthese
 			_eventDate -= 14;
 		}
 		
-		void ResaCustomerAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void ResaCustomerAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
+			_displayEvents = map.getBool(PARAMETER_DISPLAY_EVENTS, false, false, FACTORY_KEY);
+			Date da = map.getDate(PARAMETER_EVENT_DATE, false, FACTORY_KEY);
+			if (!da.isUnknown())
+				_eventDate = da;
+
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_EVENT_DATE, 50, false);
+			
+			if(!doDisplayPreparationActions) return;
+			
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
@@ -109,15 +121,19 @@ namespace synthese
 			{
 				throw AdminParametersException("Bad user id");
 			}
-
-			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
-			_displayEvents = map.getBool(PARAMETER_DISPLAY_EVENTS, false, false, FACTORY_KEY);
-			Date da = map.getDate(PARAMETER_EVENT_DATE, false, FACTORY_KEY);
-			if (!da.isUnknown())
-				_eventDate = da;
-
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_EVENT_DATE, 50, false);
 		}
+		
+		
+		
+		server::ParametersMap ResaCustomerAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAMETER_DISPLAY_CANCELLED, _displayCancelled);
+			m.insert(PARAMETER_DISPLAY_EVENTS, _displayEvents);
+			m.insert(PARAMETER_EVENT_DATE, _eventDate);
+			return m;
+		}
+
 		
 		void ResaCustomerAdmin::display(
 			ostream& stream

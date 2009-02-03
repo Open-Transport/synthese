@@ -326,7 +326,7 @@ namespace synthese
 		DateTime // AAAA/(M)M/(J)J hh:mm
 		DateTime::FromSQLTimestamp (const string& sqlTimestamp)
 		{
-			if (sqlTimestamp.empty())
+			if (sqlTimestamp.empty() || sqlTimestamp == "NULL")
 				return DateTime(time::TIME_UNKNOWN);
 
 			if (sqlTimestamp.size() == 1)

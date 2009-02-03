@@ -70,28 +70,44 @@ namespace synthese
 		const string DisplayTypesAdmin::PARAMETER_NAME("na");
 		const string DisplayTypesAdmin::PARAMETER_INTERFACE_ID("ii");
 
-		void DisplayTypesAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void DisplayTypesAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_requestParameters.setFromParametersMap(map.getMap(), DisplayTypeTableSync::COL_NAME, 20);
 			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
 			_searchInterfaceId = map.getUid(PARAMETER_INTERFACE_ID, false, FACTORY_KEY);
 
-			DisplayTypeTableSync::Search(
-				_env,
-				"%"+ _searchName +"%",
-				_searchInterfaceId,
-				_requestParameters.first,
-				_requestParameters.maxSize + 1,
-				_requestParameters.orderField == DisplayTypeTableSync::COL_NAME,
-				_requestParameters.orderField == DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID,
-				_requestParameters.orderField == DisplayTypeTableSync::COL_ROWS_NUMBER,
-				_requestParameters.raisingOrder,
-				UP_LINKS_LOAD_LEVEL
-			);
-
-			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayType>());
+			if(doDisplayPreparationActions)
+			{
+				DisplayTypeTableSync::Search(
+					_env,
+					"%"+ _searchName +"%",
+					_searchInterfaceId,
+					_requestParameters.first,
+					_requestParameters.maxSize + 1,
+					_requestParameters.orderField == DisplayTypeTableSync::COL_NAME,
+					_requestParameters.orderField == DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID,
+					_requestParameters.orderField == DisplayTypeTableSync::COL_ROWS_NUMBER,
+					_requestParameters.raisingOrder,
+					UP_LINKS_LOAD_LEVEL
+				);
+				_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayType>());
+			}
 		}
 
+
+
+		ParametersMap DisplayTypesAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAMETER_NAME, _searchName);
+			m.insert(PARAMETER_INTERFACE_ID, _searchInterfaceId);
+			return m;
+		}
+		
+			
+			
 		void DisplayTypesAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables
@@ -100,13 +116,13 @@ namespace synthese
 			bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 			
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<DisplayTypesAdmin>();
+			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(_request);
-			createRequest.getFunction()->setPage<DisplayTypesAdmin>();
+			createRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(_request);
-			deleteRequest.getFunction()->setPage<DisplayTypesAdmin>();
+			deleteRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> openRequest(_request);
 			openRequest.getFunction()->setPage<DisplayTypeAdmin>();
@@ -193,7 +209,8 @@ namespace synthese
 		}
 
 		DisplayTypesAdmin::DisplayTypesAdmin()
-			: AdminInterfaceElementTemplate<DisplayTypesAdmin>()
+			: AdminInterfaceElementTemplate<DisplayTypesAdmin>(),
+			_searchInterfaceId(UNKNOWN_VALUE)
 		{
 
 		}

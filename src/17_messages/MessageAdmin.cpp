@@ -78,8 +78,10 @@ namespace synthese
 
 	namespace messages
 	{
-		void MessageAdmin::setFromParametersMap( const ParametersMap& map )
-		{
+		void MessageAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 
 			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
@@ -96,12 +98,22 @@ namespace synthese
 
 			_parameters = map;
 		}
+		
+		
+
+
+		server::ParametersMap MessageAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
+
 
 		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			ActionFunctionRequest<UpdateAlarmAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<MessageAdmin>();
-			updateRequest.setObjectId(_request->getObjectId());
+			updateRequest.getFunction()->setSamePage(this);
 
 			shared_ptr<const SingleSentAlarm> salarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
 			

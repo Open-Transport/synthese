@@ -75,12 +75,14 @@ namespace synthese
 			: AdminInterfaceElementTemplate<CalendarTemplateAdmin>()
 		{ }
 		
-		void CalendarTemplateAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void CalendarTemplateAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+			
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				return;
+			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
 
 			try
 			{
@@ -94,6 +96,14 @@ namespace synthese
 			CalendarTemplateElementTableSync::Search(_env, _calendar->getKey());
 		}
 		
+		
+		
+		server::ParametersMap CalendarTemplateAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
 		
 		
 		void CalendarTemplateAdmin::display(

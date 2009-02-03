@@ -23,14 +23,14 @@
 #ifndef SYNTHESE_MESSAGES_LIBRARY_LOG
 #define SYNTHESE_MESSAGES_LIBRARY_LOG
 
-#include "13_dblog/DBLog.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "DBLog.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
 	namespace messages
 	{
+		class SentScenario;
 		class AlarmTemplate;
 		class ScenarioTemplate;
 		class TextTemplate;
@@ -107,6 +107,11 @@ namespace synthese
 			
 			static void addCreateEntry(
 				const ScenarioTemplate& scenario
+				, const security::User* user
+			);
+			
+			static void AddTemplateInstanciationEntry(
+				const SentScenario& scenario
 				, const security::User* user
 			);
 

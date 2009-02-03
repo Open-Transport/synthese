@@ -98,8 +98,10 @@ namespace synthese
 			, _searchConflict(ALARM_CONFLICT_UNKNOWN)
 		{}
 
-		void MessagesAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void MessagesAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			try
 			{
 				_parametersMap = map;
@@ -122,6 +124,8 @@ namespace synthese
 
 				_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_LEVEL, 15, false);
 
+				if(!doDisplayPreparationActions) return;
+
 				_messages = GetSentMessages(
 					_startDate,
 					_endDate,
@@ -135,20 +139,34 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
 					, _requestParameters.raisingOrder
 				);
+				_resultParameters.setFromResult(_requestParameters, _messages);
 			}
 			catch (TimeParseException e)
 			{
 				throw AdminParametersException("Date invalide");
 			}
-
 		}
+
+
+
+		server::ParametersMap MessagesAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAMETER_SEARCH_START, _startDate);
+			m.insert(PARAMETER_SEARCH_END, _endDate);
+			m.insert(PARAMETER_SEARCH_CONFLICT, static_cast<int>(_searchConflict));
+			m.insert(PARAMETER_SEARCH_STATUS, static_cast<int>(_searchStatus));
+			m.insert(PARAMETER_SEARCH_LEVEL, static_cast<int>(_searchLevel));
+			return m;
+		}
+
 
 
 		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<MessagesAdmin>();
+			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
@@ -161,19 +179,11 @@ namespace synthese
 			scenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 
 			ActionFunctionRequest<AlarmStopAction,AdminRequest> stopRequest(_request);
-			stopRequest.getFunction()->setPage<MessagesAdmin>();
+			stopRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(_request);
-			scenarioStopRequest.getFunction()->setPage<MessagesAdmin>();
+			scenarioStopRequest.getFunction()->setSamePage(this);
 			
-			// Searches
-			ActionResultHTMLTable::ResultParameters _alarmResultParameters;
-			_alarmResultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<SentAlarm>());
-
-			html::ActionResultHTMLTable::ResultParameters _scenarioResultParameters;
-			_scenarioResultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<SentScenario>());
-
-
 			vector<pair<StatusSearch, string> > statusMap;
 			statusMap.push_back(make_pair(ALL_STATUS, "(tous les états)"));
 			statusMap.push_back(make_pair(BROADCAST_OVER, "Diffusion terminée"));
@@ -202,8 +212,14 @@ namespace synthese
 			}
 
 			stream << s.cell("Statut", s.getForm().getSelectInput(PARAMETER_SEARCH_STATUS, statusMap, _searchStatus));
-			stream << s.cell("Conflit", s.getForm().getSelectInput(PARAMETER_SEARCH_CONFLICT, MessagesModule::getConflictLabels(true), _searchConflict));
-			stream << s.cell("Type", s.getForm().getSelectInput(PARAMETER_SEARCH_LEVEL, MessagesModule::getLevelLabels(true), _searchLevel));
+			stream << s.cell(
+				"Conflit",
+				s.getForm().getSelectInput(PARAMETER_SEARCH_CONFLICT, MessagesModule::getConflictLabels(true), _searchConflict)
+			);
+			stream << s.cell(
+				"Type",
+				s.getForm().getSelectInput(PARAMETER_SEARCH_LEVEL, MessagesModule::getLevelLabels(true), _searchLevel)
+			);
 
 			stream << s.close();
 
@@ -220,7 +236,7 @@ namespace synthese
 				v1,
 				searchRequest.getHTMLForm(),
 				_requestParameters,
-				_scenarioResultParameters,
+				_resultParameters,
 				newScenarioRequest.getHTMLForm("newscen"),
 				NewScenarioSendAction::PARAMETER_MESSAGE_TO_COPY,
 				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)

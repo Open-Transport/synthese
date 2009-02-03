@@ -65,17 +65,36 @@ namespace synthese
 			: AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>()
 		{ }
 		
-		void DisplayScreenCPUAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		
+		
+		void DisplayScreenCPUAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+			
+			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
+			
 			try
 			{
-				_cpu = DisplayScreenCPUTableSync::Get(_request->getObjectId(), _env);
+				_cpu = DisplayScreenCPUTableSync::Get(id, _env);
 			}
 			catch (ObjectNotFoundException<DisplayScreenCPU>& e)
 			{
 				throw AdminParametersException("Specified central unit "+ FACTORY_KEY +" not found "+ e.getMessage());
 			}
 		}
+		
+		
+		
+		server::ParametersMap DisplayScreenCPUAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+		
+		
 		
 		void DisplayScreenCPUAdmin::display(
 			ostream& stream,

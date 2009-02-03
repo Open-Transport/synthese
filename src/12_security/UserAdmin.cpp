@@ -20,23 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "05_html/PropertiesHTMLTable.h"
+#include "PropertiesHTMLTable.h"
 #include "RequestMissingParameterException.h"
-#include "12_security/UserAdmin.h"
-#include "12_security/UsersAdmin.h"
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/SecurityModule.h"
-#include "12_security/UserUpdateAction.h"
-#include "12_security/UserPasswordUpdateAction.h"
-
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/QueryString.h"
-
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
-
-#include "01_util/Conversion.h"
+#include "UserAdmin.h"
+#include "UsersAdmin.h"
+#include "User.h"
+#include "UserTableSync.h"
+#include "SecurityModule.h"
+#include "UserUpdateAction.h"
+#include "UserPasswordUpdateAction.h"
+#include "ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
+#include "Conversion.h"
 
 using namespace std;
 
@@ -67,6 +64,37 @@ namespace synthese
 			, _userError(false)
 		{
 		}
+
+
+		
+		void UserAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+			
+			try
+			{
+				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_user = UserTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+				}
+			}
+			catch (ObjectNotFoundException<User>& e)
+			{
+				throw AdminParametersException(e.getMessage());
+			}
+		}
+
+
+
+		server::ParametersMap UserAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
 
 
 		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
@@ -111,21 +139,7 @@ namespace synthese
 			}
 		}
 
-		void UserAdmin::setFromParametersMap(const ParametersMap& map)
-		{
-			try
-			{
-				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
-				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_user = UserTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
-				}
-			}
-			catch (ObjectNotFoundException<User>& e)
-			{
-				throw AdminParametersException(e.getMessage());
-			}
-		}
+
 
 		bool UserAdmin::isAuthorized() const
 		{

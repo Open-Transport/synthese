@@ -61,11 +61,16 @@ namespace synthese
 			: AdminInterfaceElementTemplate<ModuleAdmin>()
 		{ }
 		
-		void ModuleAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void ModuleAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			try
 			{
 				_moduleKey = map.getString(PARAMETER_MODULE, true, FACTORY_KEY);
+				
+				if(!doDisplayPreparationActions) return;
+					
 				_moduleClass.reset(Factory<ModuleClass>::create(_moduleKey));
 			}
 			catch(...)
@@ -74,7 +79,20 @@ namespace synthese
 			}
 		}
 		
-		void ModuleAdmin::display(ostream& stream, VariablesMap& variables
+		
+		
+		server::ParametersMap ModuleAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			m.insert(PARAMETER_MODULE, _moduleKey);
+			return m;
+		}
+		
+		
+		
+		void ModuleAdmin::display(
+			ostream& stream,
+			VariablesMap& variables
 		) const	{
 			stream << "<h1>Informations sur le module</h1>";
 

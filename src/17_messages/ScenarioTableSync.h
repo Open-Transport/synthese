@@ -26,7 +26,6 @@
 #define SYNTHESE_ScenarioTableSync_H__
 
 #include "Scenario.h"
-#include "ScenarioSubclassTemplate.h"
 #include "AlarmTableSync.h"
 #include "AlarmTemplate.h"
 #include "ScenarioSentAlarm.h"

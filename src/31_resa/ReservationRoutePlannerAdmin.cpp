@@ -107,8 +107,10 @@ namespace synthese
 			, _dateTime(TIME_CURRENT)
 		{ }
 		
-		void ReservationRoutePlannerAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void ReservationRoutePlannerAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_startCity = map.getString(PARAMETER_START_CITY, false, FACTORY_KEY);
 			_startPlace = map.getString(PARAMETER_START_PLACE, false, FACTORY_KEY);
 			_endCity = map.getString(PARAMETER_END_CITY, false, FACTORY_KEY);
@@ -150,13 +152,35 @@ namespace synthese
 			}
 		}
 		
+		
+		
+		server::ParametersMap ReservationRoutePlannerAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			m.insert(PARAMETER_START_CITY, _startCity);
+			m.insert(PARAMETER_START_PLACE, _startPlace);
+			m.insert(PARAMETER_END_CITY, _endCity);
+			m.insert(PARAMETER_END_PLACE, _endPlace);
+			m.insert(PARAMETER_DATE_TIME, _dateTime);
+			m.insert(PARAMETER_RESULTS_NUMBER, _resultsNumber);
+			m.insert(PARAMETER_DISABLED_PASSENGER, _disabledPassenger);
+			m.insert(PARAMETER_DRT_ONLY, _drtOnly);
+			if(_customer.get())
+			{
+				m.insert(PARAMETER_CUSTOMER_ID, _customer->getKey());
+			}
+			return m;
+		}
+
+		
+		
 		void ReservationRoutePlannerAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
+			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<BookReservationAction,AdminRequest> resaRequest(_request);
-			resaRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
+			resaRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
 			customerSearchRequest.getFunction()->setNumber(20);

@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_PROFILES_ADMIN_H
 #define SYNTHESE_PROFILES_ADMIN_H
 
-#include "05_html/ResultHTMLTable.h"
-
-#include "32_admin/AdminInterfaceElementTemplate.h"
+#include "ResultHTMLTable.h"
+#include "AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -90,7 +89,21 @@ namespace synthese
 
 		public:
 			ProfilesAdmin();
-			void setFromParametersMap(const server::ParametersMap& map);
+			void setFromParametersMap(
+				const server::ParametersMap& map,
+				bool doDisplayPreparationActions = true
+			);
+			
+			
+			
+			/** Parameters map generator, used when building an url to the admin page.
+					@return server::ParametersMap The generated parameters map
+					@author Hugues Romain
+					@date 2007					
+				*/
+			virtual server::ParametersMap getParametersMap() const;
+			
+			
 			
 			void display(std::ostream& stream, interfaces::VariablesMap& variables
 			) const;

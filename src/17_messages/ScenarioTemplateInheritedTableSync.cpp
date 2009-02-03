@@ -24,7 +24,6 @@
 
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateInheritedTableSync.h"
-#include "ScenarioInheritedTableSync.h"
 #include "AlarmTemplate.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "AlarmObjectLinkTableSync.h"

@@ -157,7 +157,11 @@ namespace synthese
 
 			// table parameters
 			_requestParameters.setFromParametersMap(
-				map.getMap(), _getParameterName(PARAMETER_START_DATE), 30, false
+				map.getMap(),
+				_getParameterName(PARAMETER_START_DATE),
+				30,
+				false,
+				PARAMETER_PREFIX  + _code
 			);
 
 			// Search
@@ -172,9 +176,9 @@ namespace synthese
 				, _searchText
 				, _requestParameters.first
 				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAMETER_START_DATE
-				, _requestParameters.orderField == PARAMETER_SEARCH_USER
-				, _requestParameters.orderField == PARAMETER_SEARCH_TYPE
+				, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
+				, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
+				, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
 				, _requestParameters.raisingOrder
 			);
 			_resultParameters.setFromResult(
@@ -258,11 +262,11 @@ namespace synthese
 			}
 			
 			ResultHTMLTable::HeaderVector v;
-			v.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
-			v.push_back(make_pair(PARAMETER_START_DATE, "Date"));
+			v.push_back(make_pair(_getParameterName(PARAMETER_SEARCH_TYPE), "Type"));
+			v.push_back(make_pair(_getParameterName(PARAMETER_START_DATE), "Date"));
 			if(!_fixedUserId)
 			{
-				v.push_back(make_pair(PARAMETER_SEARCH_USER, "Utilisateur"));
+				v.push_back(make_pair(_getParameterName(PARAMETER_SEARCH_USER), "Utilisateur"));
 			}
 			if(!_fixedObjectId)
 			{
@@ -355,6 +359,8 @@ namespace synthese
 			_dbLog.reset(Factory<DBLog>::create(value));
 		}
 		
+		
+		
 		bool DBLogHTMLView::isAuthorized(
 			const Request& request
 		) const {
@@ -365,7 +371,13 @@ namespace synthese
 		
 		ParametersMap DBLogHTMLView::getParametersMap(
 		) const {
-			ParametersMap m;
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(_getParameterName(PARAMETER_SEARCH_USER), _searchUserId);
+			m.insert(_getParameterName(PARAMETER_SEARCH_TYPE), static_cast<int>(_searchLevel));
+			m.insert(_getParameterName(PARAMETER_START_DATE), _searchStartDate);
+			m.insert(_getParameterName(PARAMETER_END_DATE), _searchEndDate);
+			m.insert(_getParameterName(PARAMETER_SEARCH_TEXT), _searchText);
+			m.insert(_getParameterName(PARAMETER_OBJECT_ID), _searchObjectId);
 			return m;
 		}
 	}

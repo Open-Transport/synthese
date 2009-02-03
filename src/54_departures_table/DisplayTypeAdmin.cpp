@@ -68,12 +68,14 @@ namespace synthese
 			: AdminInterfaceElementTemplate<DisplayTypeAdmin>()
 		{ }
 		
-		void DisplayTypeAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void DisplayTypeAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+	
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				return;
+			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
 
 			try
 			{
@@ -84,6 +86,16 @@ namespace synthese
 				throw AdminParametersException("Display type not found by "+ FACTORY_KEY +" : "+ e.getMessage());
 			}
 		}
+		
+		
+		
+		ParametersMap DisplayTypeAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+		
+		
 		
 		void DisplayTypeAdmin::display(ostream& stream, VariablesMap& variables) const
 		{

@@ -102,7 +102,21 @@ namespace synthese
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
-			void setFromParametersMap(const server::ParametersMap& map);
+			void setFromParametersMap(
+				const server::ParametersMap& map,
+				bool doDisplayPreparationActions = true
+			);
+			
+			
+			
+			/** Parameters map generator, used when building an url to the admin page.
+					@return server::ParametersMap The generated parameters map
+					@author Hugues Romain
+					@date 2007					
+				*/
+			virtual server::ParametersMap getParametersMap() const;
+
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -144,8 +158,6 @@ namespace synthese
 				@date 2008				
 			*/
 			void setLogKey(const std::string& key);
-
-			virtual server::ParametersMap getParametersMap() const;
 		};
 	}
 }

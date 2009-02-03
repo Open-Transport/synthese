@@ -24,7 +24,6 @@
 
 #include "SentScenarioInheritedTableSync.h"
 #include "SentScenario.h"
-#include "ScenarioInheritedTableSync.h"
 #include "DateTime.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"

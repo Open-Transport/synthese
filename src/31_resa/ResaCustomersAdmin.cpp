@@ -78,13 +78,17 @@ namespace synthese
 			: AdminInterfaceElementTemplate<ResaCustomersAdmin>()
 		{ }
 		
-		void ResaCustomersAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void ResaCustomersAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
 			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
 			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
 			
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
+
+			if(!doDisplayPreparationActions) return;
 
 			// Search
 			UserTableSync::Search(
@@ -105,11 +109,23 @@ namespace synthese
 			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<User>());
 		}
 		
+		
+		
+		server::ParametersMap ResaCustomersAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAM_SEARCH_NAME, _searchName);
+			m.insert(PARAM_SEARCH_SURNAME, _searchSurname);
+			m.insert(PARAM_SEARCH_LOGIN, _searchLogin);
+			return m;
+		}
+
+		
 		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<ResaCustomersAdmin>();
+			searchRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> openRequest(_request);
 			openRequest.getFunction()->setPage<ResaCustomerAdmin>();

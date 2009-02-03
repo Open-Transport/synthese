@@ -78,8 +78,16 @@ namespace synthese
 			: AdminInterfaceElementTemplate<TransportNetworkAdmin>()
 		{ }
 		
-		void TransportNetworkAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void TransportNetworkAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+
+			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
+
+			if(!doDisplayPreparationActions) return;
+
 			try
 			{
 				_network = TransportNetworkTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
@@ -88,9 +96,6 @@ namespace synthese
 			{
 				throw AdminParametersException("No such network");
 			}
-
-			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
 
 			CommercialLineTableSync::Search(
 				_env,
@@ -103,6 +108,17 @@ namespace synthese
 				, _requestParameters.raisingOrder				
 			);
 		}
+		
+		
+		
+		server::ParametersMap TransportNetworkAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAMETER_SEARCH_NAME,_searchName);
+			return m;
+		}
+
+
 		
 		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables) const
 		{

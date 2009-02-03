@@ -93,16 +93,10 @@ namespace synthese
 			, _log(false)
 		{ }
 		
-		void SiteRoutePlanningAdmin::setFromParametersMap(const ParametersMap& map)
-		{
-			try
-			{
-				_site = SiteTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env);
-			}
-			catch (...)
-			{
-				throw AdminParametersException("No such site");
-			}
+		void SiteRoutePlanningAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_startCity = map.getString(PARAMETER_START_CITY, false, FACTORY_KEY);
 			_startPlace = map.getString(PARAMETER_START_PLACE, false, FACTORY_KEY);
 			_endCity = map.getString(PARAMETER_END_CITY, false, FACTORY_KEY);
@@ -115,13 +109,41 @@ namespace synthese
 			_accessibility = static_cast<AccessibilityParameter>(
 				map.getInt(PARAMETER_ACCESSIBILITY, false, string())
 			);
+		
+			if(!doDisplayPreparationActions) return;
+			
+			try
+			{
+				_site = SiteTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env);
+			}
+			catch (...)
+			{
+				throw AdminParametersException("No such site");
+			}
 		}
 		
+		
+		
+		server::ParametersMap SiteRoutePlanningAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			m.insert(PARAMETER_START_CITY, _startCity);
+			m.insert(PARAMETER_START_PLACE, _startPlace);
+			m.insert(PARAMETER_END_CITY, _endCity);
+			m.insert(PARAMETER_END_PLACE, _endPlace);
+			m.insert(PARAMETER_DATE_TIME, _dateTime);
+			m.insert(PARAMETER_LOG, _log);
+			m.insert(PARAMETER_RESULTS_NUMBER, _resultsNumber);
+			m.insert(PARAMETER_ACCESSIBILITY, static_cast<int>(_accessibility));
+			return m;
+		}
+
+
+
 		void SiteRoutePlanningAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<SiteRoutePlanningAdmin>();
-			searchRequest.setObjectId(_site->getKey());
+			searchRequest.getFunction()->setSamePage(this);
 
 			// Search form
 			stream << "<h1>Recherche</h1>";

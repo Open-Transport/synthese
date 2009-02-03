@@ -23,13 +23,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ParametersMap.h"
-
-#include "30_server/QueryString.h"
-#include "30_server/RequestMissingParameterException.h"
-
-#include "04_time/DateTime.h"
-
-#include "01_util/Conversion.h"
+#include "QueryString.h"
+#include "RequestMissingParameterException.h"
+#include "DateTime.h"
+#include "Conversion.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
@@ -182,6 +179,17 @@ namespace synthese
 			}
 
 			return QueryString(ss.str(), normalize);
+		}
+		
+		
+		
+		void ParametersMap::merge(const ParametersMap& other)
+		{
+			BOOST_FOREACH(ParametersMap::Map::value_type it, other._map)
+			{
+				if(_map.find(it.first) != _map.end()) continue;
+				_map.insert(make_pair(it.first,it.second));
+			}
 		}
 	}
 }

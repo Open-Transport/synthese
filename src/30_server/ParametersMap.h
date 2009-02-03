@@ -201,6 +201,13 @@ namespace synthese
 				void insert(const std::string& parameterName, bool value);
 				void insert(const std::string& parameterName, const time::DateTime& value);
 				void insert(const std::string& parameterName, const time::Date& value);
+				
+				
+				/** Merge this map with an other, with priority to the current one.
+				 * 
+				 * @param other map to read an integrate into the current one
+				 */
+				void merge(const ParametersMap& other);
 			//@}
 		};
 	}

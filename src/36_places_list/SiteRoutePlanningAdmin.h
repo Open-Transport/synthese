@@ -27,9 +27,8 @@
 
 #include "36_places_list/Types.h"
 
-#include "32_admin/AdminInterfaceElementTemplate.h"
-
-#include "04_time/DateTime.h"
+#include "AdminInterfaceElementTemplate.h"
+#include "DateTime.h"
 
 namespace synthese
 {
@@ -73,7 +72,21 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void setFromParametersMap(const server::ParametersMap& map);
+			void setFromParametersMap(
+				const server::ParametersMap& map,
+				bool doDisplayPreparationActions = true
+			);
+			
+			
+			
+			/** Parameters map generator, used when building an url to the admin page.
+					@return server::ParametersMap The generated parameters map
+					@author Hugues Romain
+					@date 2007					
+				*/
+			virtual server::ParametersMap getParametersMap() const;
+
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.

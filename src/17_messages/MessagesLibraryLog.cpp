@@ -30,6 +30,7 @@
 #include "Conversion.h"
 #include "MessagesLibraryRight.h"
 #include "Request.h"
+#include "SentScenario.h"
 
 using namespace boost;
 using namespace std;
@@ -160,6 +161,26 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
 		}
 		
+		
+		void MessagesLibraryLog::AddTemplateInstanciationEntry(
+			const SentScenario& scenario
+			, const security::User* user
+		){
+			DBLogEntry::Content content;
+			content.push_back(string());
+			stringstream text;
+			text << "Déclenchement du scénario (id=" << scenario.getKey() << ")";
+			content.push_back(text.str());
+
+			_addEntry(
+				FACTORY_KEY,
+				DBLogEntry::DB_LOG_INFO,
+				content,
+				user,
+				scenario.getTemplate() ? scenario.getTemplate()->getKey() : 0
+			);
+		}
+
 
 		void MessagesLibraryLog::AddDeleteEntry( const AlarmTemplate* alarm , const security::User* user )
 		{

@@ -62,17 +62,28 @@ namespace synthese
 				int					first;
 				std::string			orderField;
 				bool				raisingOrder;
+				std::string			_prefix;
+				
 				RequestParameters() 
 					: first(0)
 					, maxSize(30)
 					, raisingOrder(true)
 				{}
 
+
+				/** Reads the parameters of the request from the map representing the query.
+					@param map the map
+					@param defaultOrderField column on which sort the table, if none is specified in the map
+					@param defaultMaxSiwe maximum size of the table if not specified in the map
+					@param defaultRaisingOrder default direction of sorting if not specified in the map
+					@param prefix prefix of the field codes in the map (default = none)
+				*/
 				void setFromParametersMap(
-					const std::map<std::string, std::string>& map
-					, const std::string defaultOrderField = std::string()
-					, int defaultMaxSize = UNLIMITED_SIZE
-					, bool defaultRaisingOrder = true
+					const std::map<std::string, std::string>& map,
+					const std::string defaultOrderField = std::string(),
+					int defaultMaxSize = UNLIMITED_SIZE,
+					bool defaultRaisingOrder = true,
+					const std::string& prefix = std::string()
 				);
 
 				std::map<std::string, std::string> getParametersMap() const;

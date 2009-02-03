@@ -74,10 +74,23 @@ namespace synthese
 			: AdminInterfaceElementTemplate<CalendarTemplatesAdmin>()
 		{ }
 		
-		void CalendarTemplatesAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void CalendarTemplatesAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+
 			CalendarTemplateTableSync::Search(_env);
 		}
+		
+		
+		
+		ParametersMap CalendarTemplatesAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}		
+		
 		
 		void CalendarTemplatesAdmin::display(
 			ostream& stream,

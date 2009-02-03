@@ -22,22 +22,18 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
-#include "01_util/FactoryException.h"
-
-#include "05_html/HTMLForm.h"
-
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfacePage.h"
-
-#include "30_server/RequestException.h"
-#include "30_server/Action.h"
-
-#include "32_admin/HomeAdmin.h"
-#include "32_admin/AdminInterfacePage.h"
-#include "32_admin/AdminInterfaceElement.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/AdminParametersException.h"
+#include "Conversion.h"
+#include "FactoryException.h"
+#include "HTMLForm.h"
+#include "Interface.h"
+#include "InterfacePage.h"
+#include "RequestException.h"
+#include "Action.h"
+#include "HomeAdmin.h"
+#include "AdminInterfacePage.h"
+#include "AdminInterfaceElement.h"
+#include "AdminRequest.h"
+#include "AdminParametersException.h"
 
 using namespace std;
 using namespace boost;
@@ -189,6 +185,7 @@ namespace synthese
 			_page->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 			_request->setObjectId(page->getRequest()->getObjectId());
 			_page->setActiveTab(page->getCurrentTab());
+			_page->setFromParametersMap(page->getParametersMap(), false);
 		}
 	}
 }

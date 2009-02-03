@@ -192,7 +192,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME << " AS t";
 			if (orderByInterfaceName)
 			{
-				query << " INNER JOIN " << InterfaceTableSync::TABLE.NAME << " AS i ON i." << TABLE_COL_ID  << "=t." << DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID;
+				query << " LEFT JOIN " << InterfaceTableSync::TABLE.NAME << " AS i ON i." << TABLE_COL_ID  << "=t." << DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID;
 			}
 
 			query << " WHERE 1";

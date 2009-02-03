@@ -80,13 +80,25 @@ namespace synthese
 			_viewer(FACTORY_KEY)
 		{}
 
-		void DBLogViewer::setFromParametersMap(const ParametersMap& map)
-		{
+		void DBLogViewer::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_viewer.set(
 				map,
 				map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY)
 			);
 		}
+		
+		
+		
+		server::ParametersMap DBLogViewer::getParametersMap() const
+		{
+			ParametersMap m(_viewer.getParametersMap());
+			m.insert(PARAMETER_LOG_KEY, _viewer.getLogKey());
+			return m;
+		}
+
 
 
 		void DBLogViewer::display(
@@ -97,10 +109,7 @@ namespace synthese
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<DBLogViewer>();
-			static_cast<DBLogViewer*>(
-				searchRequest.getFunction()->getPage().get()
-			)->setLogKey(_viewer.getLogKey());
+			searchRequest.getFunction()->setSamePage(this);
 
 			_viewer.display(
 				stream,
@@ -191,15 +200,6 @@ namespace synthese
 			{
 				throw AdminParametersException("Invalid log key : " + key);
 			}
-		}
-
-
-
-		ParametersMap DBLogViewer::getParametersMap() const
-		{
-			ParametersMap m(_viewer.getParametersMap());
-			m.insert(PARAMETER_LOG_KEY, _viewer.getLogKey());
-			return m;
 		}
 	}
 }

@@ -81,8 +81,10 @@ namespace synthese
 			_lineUId(UNKNOWN_VALUE)
 		{}
 
-		void BroadcastPointsAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void BroadcastPointsAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_cityName = map.getString(PARAMETER_CITY_NAME, false, FACTORY_KEY);
 			_placeName = map.getString(PARAMETER_PLACE_NAME, false, FACTORY_KEY);
 			
@@ -95,11 +97,10 @@ namespace synthese
 			_lineUId = map.getUid(PARAMETER_LINE_ID, false, FACTORY_KEY);
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
-		}
-
-		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
-		{
-			vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(searchConnectionPlacesWithBroadcastPoints(
+			
+			if(!doDisplayPreparationActions) return;
+			
+			_searchResult = searchConnectionPlacesWithBroadcastPoints(
 				_env,
 				_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 				, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
@@ -116,16 +117,32 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
 				, _requestParameters.orderField == PARAMETER_CPU_NUMBER
 				, _requestParameters.raisingOrder
-			));
+			);
+			_resultParameters.setFromResult(_requestParameters, _searchResult);
+		}
+		
+		
+		
+		server::ParametersMap BroadcastPointsAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAMETER_CITY_NAME, _cityName);
+			m.insert(PARAMETER_PLACE_NAME, _placeName);
+			m.insert(PARAMETER_DISPLAY_NUMBER, static_cast<int>(_displayNumber));
+			m.insert(PARAMETER_CPU_NUMBER, static_cast<int>(_cpuNumber));
+			m.insert(PARAMETER_LINE_ID, _lineUId);
+			return m;
+		}
 
-			ResultHTMLTable::ResultParameters resultParameters;
-			resultParameters.setFromResult(_requestParameters, searchResult);
 
+
+		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
+		{
 			FunctionRequest<AdminRequest> goRequest(_request);
 			goRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage(shared_ptr<AdminInterfaceElement>(new BroadcastPointsAdmin));
+			searchRequest.getFunction()->setSamePage(this);
 
 			vector<pair<int, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
@@ -166,12 +183,10 @@ namespace synthese
 			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
 			h.push_back(make_pair(PARAMETER_CPU_NUMBER, "Unités centrales"));
 			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h,st.getForm(), _requestParameters, resultParameters);
+			ResultHTMLTable t(h,st.getForm(), _requestParameters, _resultParameters);
 
 			stream << t.open();
-
-
-			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> pl, searchResult)
+			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> pl, _searchResult)
 			{
 				stream << t.row();
 				try

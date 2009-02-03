@@ -25,24 +25,24 @@
 #include "MessagesTemplateLibraryAdmin.h"
 #include "MessagesModule.h"
 
-#include "05_html/PropertiesHTMLTable.h"
-#include "05_html/HTMLList.h"
+#include "PropertiesHTMLTable.h"
+#include "HTMLList.h"
 
-#include "30_server/ActionFunctionRequest.h"
-#include "30_server/QueryString.h"
+#include "ActionFunctionRequest.h"
+#include "QueryString.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminParametersException.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
 
-#include "17_messages/TextTemplate.h"
-#include "17_messages/TextTemplateTableSync.h"
-#include "17_messages/UpdateTextTemplateAction.h"
-#include "17_messages/DeleteTextTemplateAction.h"
-#include "17_messages/TextTemplateAddAction.h"
-#include "17_messages/MessagesLibraryRight.h"
-#include "17_messages/MessagesModule.h"
-#include "17_messages/TextTemplateFolderUpdateAction.h"
+#include "TextTemplate.h"
+#include "TextTemplateTableSync.h"
+#include "UpdateTextTemplateAction.h"
+#include "DeleteTextTemplateAction.h"
+#include "TextTemplateAddAction.h"
+#include "MessagesLibraryRight.h"
+#include "MessagesModule.h"
+#include "TextTemplateFolderUpdateAction.h"
 
 #include <boost/foreach.hpp>
 
@@ -82,8 +82,10 @@ namespace synthese
 		
 
 
-		void MessagesTemplateLibraryAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void MessagesTemplateLibraryAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			uid id(map.getUid(PARAMETER_FOLDER_ID, false, FACTORY_KEY));
 			if (id > 0)
 			{
@@ -97,22 +99,34 @@ namespace synthese
 			}
 		}
 		
+		
+		
+		server::ParametersMap MessagesTemplateLibraryAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			if(_folder.get())
+			{
+				m.insert(PARAMETER_FOLDER_ID, _folder->getKey());
+			}
+			return m;
+		}
+
 
 
 		void MessagesTemplateLibraryAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
 			ActionFunctionRequest<UpdateTextTemplateAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
+			updateRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<DeleteTextTemplateAction,AdminRequest> deleteRequest(_request);
-			deleteRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
+			deleteRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<TextTemplateAddAction,AdminRequest> addRequest(_request);
-			addRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
+			addRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<TextTemplateFolderUpdateAction,AdminRequest> updateFolderRequest(_request);
-			updateFolderRequest.getFunction()->setPage<MessagesTemplateLibraryAdmin>();
+			updateFolderRequest.getFunction()->setSamePage(this);
 			
 
 			// Rights

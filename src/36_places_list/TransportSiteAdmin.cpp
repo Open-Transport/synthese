@@ -80,8 +80,12 @@ namespace synthese
 			: AdminInterfaceElementTemplate<TransportSiteAdmin>()
 		{ }
 		
-		void TransportSiteAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void TransportSiteAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+			
 			try
 			{
 				_site = SiteTableSync::GetEditable(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
@@ -92,13 +96,22 @@ namespace synthese
 			}
 		}
 		
+		
+		
+		server::ParametersMap TransportSiteAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
+
+		
 		void TransportSiteAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
 			ActionFunctionRequest<SiteUpdateAction,AdminRequest> updateRequest(_request);
 			updateRequest.getAction()->setSiteId(_site->getKey());
-			updateRequest.getFunction()->setPage<TransportSiteAdmin>();
-			updateRequest.setObjectId(_site->getKey());
+			updateRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> routeplannerRequest(_request);
 			routeplannerRequest.getFunction()->setPage<SiteRoutePlanningAdmin>();

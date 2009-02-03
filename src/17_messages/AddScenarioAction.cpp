@@ -22,22 +22,20 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "17_messages/AddScenarioAction.h"
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/ScenarioTemplateInheritedTableSync.h"
-#include "17_messages/ScenarioInheritedTableSync.h"
-#include "17_messages/MessagesLibraryLog.h"
-#include "17_messages/AlarmObjectLink.h"
-#include "17_messages/AlarmObjectLinkTableSync.h"
-#include "17_messages/ScenarioFolder.h"
-#include "17_messages/ScenarioFolderTableSync.h"
+#include "AddScenarioAction.h"
+#include "ScenarioTemplate.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "MessagesLibraryLog.h"
+#include "AlarmObjectLink.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "ScenarioFolder.h"
+#include "ScenarioFolderTableSync.h"
 #include "MessagesLibraryRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/QueryString.h"
-#include "30_server/ParametersMap.h"
-
-#include "01_util/Conversion.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "QueryString.h"
+#include "ParametersMap.h"
+#include "Conversion.h"
 
 #include <boost/foreach.hpp>
 

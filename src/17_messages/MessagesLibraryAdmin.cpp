@@ -80,9 +80,14 @@ namespace synthese
 		const std::string MessagesLibraryAdmin::PARAMETER_NAME = "nam";
 
 		
-		void MessagesLibraryAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void MessagesLibraryAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions			
+		){
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
+			
+			if(!doDisplayPreparationActions) return;
+			
 			setFolderId(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 
 			ScenarioTemplateInheritedTableSync::Search(
@@ -98,6 +103,17 @@ namespace synthese
 				_folderId
 			);
 		}
+
+
+
+		server::ParametersMap MessagesLibraryAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			return m;
+		}
+
+
+
 
 		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
@@ -257,13 +273,7 @@ namespace synthese
 			return links;
 		}
 
-		server::ParametersMap MessagesLibraryAdmin::getParametersMap() const
-		{
-			server::ParametersMap map;
-			if (_folder.get())
-				map.insert(QueryString::PARAMETER_OBJECT_ID, _folder->getKey());
-			return map;
-		}
+
 
 		void MessagesLibraryAdmin::setFolderId( uid id)
 		{

@@ -73,8 +73,10 @@ namespace synthese
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_NAME = "pasn";
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_RIGHT = "pasr";
 		
-		void ProfilesAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void ProfilesAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			// Profile name
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
 
@@ -83,6 +85,8 @@ namespace synthese
 
 			// Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
+			
+			if(!doDisplayPreparationActions) return;
 
 			// Search
 			ProfileTableSync::Search(
@@ -97,18 +101,28 @@ namespace synthese
 			ActionResultHTMLTable::ResultParameters	_resultParameters;
 			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<Profile>());
 		}
+		
+		
+		server::ParametersMap ProfilesAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAMETER_SEARCH_NAME, _searchName);
+			m.insert(PARAMETER_SEARCH_RIGHT, _searchRightName);
+			return m;
+		}
+
 
 		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<ProfilesAdmin>();
+			searchRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> profileRequest(_request);
 			profileRequest.getFunction()->setPage<ProfileAdmin>();
 
 			ActionFunctionRequest<DeleteProfileAction, AdminRequest> deleteProfileRequest(_request);
-			deleteProfileRequest.getFunction()->setPage<ProfilesAdmin>();
+			deleteProfileRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(_request);
 			addProfileRequest.getFunction()->setPage<ProfileAdmin>();

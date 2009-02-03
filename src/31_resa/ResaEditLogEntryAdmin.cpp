@@ -24,27 +24,27 @@
 
 #include "ResaEditLogEntryAdmin.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
 
-#include "31_resa/ResaLogAdmin.h"
-#include "31_resa/ResaRight.h"
-#include "31_resa/ResaModule.h"
-#include "31_resa/ResaLogEntryUpdateAction.h"
+#include "ResaLogAdmin.h"
+#include "ResaRight.h"
+#include "ResaModule.h"
+#include "ResaLogEntryUpdateAction.h"
 
-#include "13_dblog/DBLog.h"
-#include "13_dblog/DBLogEntry.h"
-#include "13_dblog/DBLogEntryTableSync.h"
+#include "DBLog.h"
+#include "DBLogEntry.h"
+#include "DBLogEntryTableSync.h"
 
-#include "30_server/QueryString.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "QueryString.h"
+#include "ActionFunctionRequest.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
-#include "05_html/PropertiesHTMLTable.h"
+#include "PropertiesHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -78,8 +78,12 @@ namespace synthese
 			: AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>()
 		{ }
 		
-		void ResaEditLogEntryAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void ResaEditLogEntryAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+			
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
@@ -91,6 +95,16 @@ namespace synthese
 			}
 		}
 		
+		
+		
+		server::ParametersMap ResaEditLogEntryAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
+
+
 		void ResaEditLogEntryAdmin::display(ostream& stream, VariablesMap& variables
 		) const	{
 			// Requests

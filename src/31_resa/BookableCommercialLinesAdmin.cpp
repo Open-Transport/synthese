@@ -70,9 +70,20 @@ namespace synthese
 			: AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>()
 		{ }
 		
-		void BookableCommercialLinesAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void BookableCommercialLinesAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 		}
+		
+		
+		server::ParametersMap BookableCommercialLinesAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
+
 		
 		void BookableCommercialLinesAdmin::display(ostream& stream, VariablesMap& variables) const
 		{

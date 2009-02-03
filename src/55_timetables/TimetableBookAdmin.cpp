@@ -76,33 +76,48 @@ namespace synthese
 			: AdminInterfaceElementTemplate<TimetableBookAdmin>()
 		{ }
 		
-		void TimetableBookAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void TimetableBookAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK, ResultHTMLTable::UNLIMITED_SIZE);
+			
+			if(!doDisplayPreparationActions) return;
+			
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
-			if (id > 0)
+			
+			if(id <= 0) return;
+			
+			try
 			{
-				try
-				{
-					_book = TimetableTableSync::Get(id, _env);
-				}
-				catch(...)
-				{
-					throw AdminParametersException("No such book");
-				}
-				if (!_book->getIsBook())
-					throw AdminParametersException("Timetable is not a book");
-				
-				// Search
-				TimetableTableSync::Search(
-					_env,
-					_book->getKey()
-					, _requestParameters.orderField == PARAMETER_RANK
-					, _requestParameters.orderField == PARAMETER_TITLE
-					, _requestParameters.raisingOrder
-				);
+				_book = TimetableTableSync::Get(id, _env);
 			}
+			catch(...)
+			{
+				throw AdminParametersException("No such book");
+			}
+			if (!_book->getIsBook())
+				throw AdminParametersException("Timetable is not a book");
+			
+			// Search
+			TimetableTableSync::Search(
+				_env,
+				_book->getKey()
+				, _requestParameters.orderField == PARAMETER_RANK
+				, _requestParameters.orderField == PARAMETER_TITLE
+				, _requestParameters.raisingOrder
+			);
 		}
+		
+		
+		
+		server::ParametersMap TimetableBookAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			return m;
+		}
+		
+
 		
 		void TimetableBookAdmin::display(
 			ostream& stream,

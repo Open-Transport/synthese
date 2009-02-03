@@ -84,8 +84,12 @@ namespace synthese
 			: AdminInterfaceElementTemplate<LineAdmin>()
 		{ }
 		
-		void LineAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void LineAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+		
 			try
 			{
 				_line = LineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
@@ -98,6 +102,16 @@ namespace synthese
 				throw AdminParametersException("No such line");
 			}
 		}
+		
+		
+		
+		server::ParametersMap LineAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
+
 		
 		void LineAdmin::display(ostream& stream, VariablesMap& variables) const
 		{

@@ -90,10 +90,12 @@ namespace synthese
 			: AdminInterfaceElementTemplate<TimetableAdmin>()
 		{ }
 		
-		void TimetableAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void TimetableAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION || !doDisplayPreparationActions)
 				return;
 
 			try
@@ -117,6 +119,16 @@ namespace synthese
 				, _requestParameters.maxSize
 			);
 		}
+		
+		
+		
+		server::ParametersMap TimetableAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			return m;
+		}
+		
+		
 		
 		void TimetableAdmin::display(
 			ostream& stream,

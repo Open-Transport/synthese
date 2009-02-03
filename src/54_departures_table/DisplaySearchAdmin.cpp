@@ -97,8 +97,10 @@ namespace synthese
 			, _searchMessage(UNKNOWN_VALUE)
 		{}
 
-		void DisplaySearchAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void DisplaySearchAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			uid placeId(map.getUid(PARAMETER_SEARCH_LOCALIZATION_ID, false, FACTORY_KEY));
 			if (placeId == UNKNOWN_VALUE)
 			{
@@ -125,6 +127,8 @@ namespace synthese
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_CITY, 30);
 
+			if(!doDisplayPreparationActions) return;
+			
 			DisplayScreenTableSync::Search(
 				_env,
 				_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
@@ -152,10 +156,33 @@ namespace synthese
 			);
 			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayScreen>());
 		}
+		
+		
+		
+		server::ParametersMap DisplaySearchAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			if(_place.get())
+			{
+				m.insert(PARAMETER_SEARCH_LOCALIZATION_ID, _place->getKey());
+			} else {
+				m.insert(PARAMETER_SEARCH_CITY, _searchCity);
+				m.insert(PARAMETER_SEARCH_STOP, _searchStop);
+				m.insert(PARAMETER_SEARCH_NAME, _searchName);
+				m.insert(PARAMETER_SEARCH_LINE_ID, _searchLineId);
+				m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId);
+				m.insert(PARAMETER_SEARCH_STATE, _searchState);
+				m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage);
+			}
+			return m;
+		}
 
 
 		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables
 		) const	{
+			
+			///////////////////////////////////////////////
+			/// TAB SCREENS
 			if (openTabContent(stream, TAB_DISPLAY_SCREENS))
 			{
 				ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(_request);
@@ -164,7 +191,7 @@ namespace synthese
 				createDisplayRequest.getAction()->setPlace(_place);
 
 				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setPage<DisplaySearchAdmin>();
+				searchRequest.getFunction()->setSamePage(this);
 
 				FunctionRequest<AdminRequest> updateRequest(_request);
 				updateRequest.getFunction()->setPage<DisplayAdmin>();
@@ -320,6 +347,9 @@ namespace synthese
 
 				stream << t.close();
 			}
+			
+			///////////////////////////////////////////////
+			/// TAB CPU
 			if (openTabContent(stream, TAB_CPU))
 			{
 

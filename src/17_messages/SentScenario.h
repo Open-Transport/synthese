@@ -25,10 +25,10 @@
 #ifndef SYNTHESE_SentScenario_h__
 #define SYNTHESE_SentScenario_h__
 
-#include "ScenarioSubclassTemplate.h"
 #include "17_messages/Types.h"
 #include "Registry.h"
 #include "DateTime.h"
+#include "Scenario.h"
 
 #include <map>
 #include <string>

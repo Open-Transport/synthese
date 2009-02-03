@@ -76,8 +76,10 @@ namespace synthese
 		const std::string UsersAdmin::PARAM_SEARCH_SURNAME = "ss";
 
 
-		void UsersAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void UsersAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
 			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
 			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
@@ -92,6 +94,8 @@ namespace synthese
 			// Table Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_LOGIN, 30);
 
+			if(!doDisplayPreparationActions) return;
+			
 			// Search
 			UserTableSync::Search(
 				_env,
@@ -110,19 +114,37 @@ namespace synthese
 				UP_LINKS_LOAD_LEVEL
 			);
 			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<User>());
-
 		}
+		
+		
+		
+		server::ParametersMap UsersAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAM_SEARCH_LOGIN, _searchLogin);
+			m.insert(PARAM_SEARCH_NAME, _searchName);
+			m.insert(PARAM_SEARCH_SURNAME, _searchSurname);
+			if(_searchProfile.get())
+			{
+				m.insert(PARAM_SEARCH_PROFILE_ID, _searchProfile->getKey());
+			}
+			return m;
+		}
+
+
 
 		bool UsersAdmin::isAuthorized() const
 		{
 			return _request->isAuthorized<SecurityRight>(READ);
 		}
 
+
+
 		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables
 		) const	{
 			// Request for search form
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<UsersAdmin>();
+			searchRequest.getFunction()->setSamePage(this);
 			SearchFormHTMLTable searchTable(searchRequest.getHTMLForm("search"));
 			
 			// Request for add user action form
@@ -132,7 +154,7 @@ namespace synthese
 			
 			// Request for delete action form
 			ActionFunctionRequest<DelUserAction, AdminRequest> deleteUserRequest(_request);
-			deleteUserRequest.getFunction()->setPage<UsersAdmin>();
+			deleteUserRequest.getFunction()->setSamePage(this);
 			
 			// Request for user link
 			FunctionRequest<AdminRequest> userRequest(_request);

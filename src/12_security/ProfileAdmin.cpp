@@ -76,6 +76,37 @@ namespace synthese
 		{
 
 		}
+		
+		
+		
+		void ProfileAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+			
+			try
+			{
+				uid id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
+				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_profile = ProfileTableSync::Get(id,_env);
+				}
+			}
+			catch (ObjectNotFoundException<Profile>& e)
+			{
+				throw AdminParametersException("Bad profile" + e.getMessage());
+			}
+		}
+
+		
+		
+		server::ParametersMap ProfileAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
 
 
 		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
@@ -201,21 +232,7 @@ namespace synthese
 			stream << "</table>";
 		}
 
-		void ProfileAdmin::setFromParametersMap(const ParametersMap& map)
-		{
-			try
-			{
-				uid id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
-				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_profile = ProfileTableSync::Get(id,_env);
-				}
-			}
-			catch (ObjectNotFoundException<Profile>& e)
-			{
-				throw AdminParametersException("Bad profile" + e.getMessage());
-			}
-		}
+
 
 		bool ProfileAdmin::isAuthorized() const
 		{

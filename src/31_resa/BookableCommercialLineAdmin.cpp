@@ -92,8 +92,10 @@ namespace synthese
 			, _endDateTime(TIME_CURRENT, TIME_CURRENT, TIME_CURRENT, TIME_MAX, TIME_MAX)
 		{ }
 		
-		void BookableCommercialLineAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void BookableCommercialLineAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 
 			// Date
 			try
@@ -109,7 +111,9 @@ namespace synthese
 			{
 				throw RequestException("Bad value for date");
 			}
+			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
 
+			if(!doDisplayPreparationActions) return;
 
 			uid lineId(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
@@ -120,12 +124,20 @@ namespace synthese
 			{
 				throw RequestException("Bad value for line ID");
 			}
-		
-			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
-
-
 		}
 		
+		
+		
+		server::ParametersMap BookableCommercialLineAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			m.insert(PARAMETER_DATE, _startDateTime);
+			m.insert(PARAMETER_DISPLAY_CANCELLED, _displayCancelled);
+			return m;
+		}
+
+
+
 		void BookableCommercialLineAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Rights
@@ -134,12 +146,10 @@ namespace synthese
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
-			searchRequest.setObjectId(_line->getKey());
+			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
-			cancelRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
-			cancelRequest.setObjectId(_line->getKey());
+			cancelRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> customerRequest(_request);
 			customerRequest.getFunction()->setPage<ResaCustomerAdmin>();

@@ -67,8 +67,12 @@ namespace synthese
 			: AdminInterfaceElementTemplate<CommercialLineAdmin>()
 		{ }
 		
-		void CommercialLineAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void CommercialLineAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			if(!doDisplayPreparationActions) return;
+
 			try
 			{
 				_cline = CommercialLineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
@@ -79,6 +83,16 @@ namespace synthese
 			}
 		}
 		
+		
+		
+		server::ParametersMap CommercialLineAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
+
+
 		void CommercialLineAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			/// @todo Implement the display by streaming the output to the stream variable

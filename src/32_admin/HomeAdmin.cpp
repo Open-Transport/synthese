@@ -44,10 +44,21 @@ namespace synthese
 			stream << "Bienvenue sur le panneau de configuration de SYNTHESE";
 		}
 
-		void HomeAdmin::setFromParametersMap(const ParametersMap& map)
-		{
-
+		void HomeAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 		}
+		
+		
+		
+		server::ParametersMap HomeAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			return m;
+		}
+
+
 
 		bool HomeAdmin::isAuthorized() const
 		{

@@ -400,8 +400,21 @@ namespace synthese
 			//@{
 				/// Initialization of the parameters from a request.
 				///	@param request The request to use for the initialization.
+				/// @param doDisplayPreparationActions if true, runs the long actions. put false if the object yill never
+				/// display anything, to avoid long useless requests.
 				///
-				virtual void setFromParametersMap(const server::ParametersMap& map) = 0;
+				/// Note to AdminInterfaceElement subclasses developers : the setFromParamtersMap method is intended to
+				/// load all parameters from the map, in two ways :
+				///  - storage of the parameters (directly or not)
+				///  - running of several actions to prepare the display (such searching results of a SQL request)
+				/// The second way can populate the default environment of the page (_env) of use other result storage
+				/// methods. If the method is used only to build URLs or forms, the second way is useless.
+				/// If the search request running time is not so short, put it in a section depending of the parameter
+				/// doDisplayPreparationActions.
+				virtual void setFromParametersMap(
+					const server::ParametersMap& map,
+					bool doDisplayPreparationActions = true
+				) = 0;
 			//@}
 
 			//! \name Virtual output methods
@@ -411,7 +424,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 				*/
-				virtual server::ParametersMap getParametersMap() const { return server::ParametersMap(); }
+				virtual server::ParametersMap getParametersMap() const = 0;
 
 				/** Authorization control.
 					@param request The current request

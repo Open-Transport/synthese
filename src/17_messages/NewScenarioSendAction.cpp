@@ -40,6 +40,7 @@
 #include "AdminModule.h"
 #include "MessagesScenarioAdmin.h"
 #include "MessageAdmin.h"
+#include "MessagesLibraryLog.h"
 
 #include <boost/foreach.hpp>
 
@@ -137,11 +138,12 @@ namespace synthese
 	 				scenario
 	 			);
 	 			
-				/// TODO add variables copy here
-			
 				// The log
 				MessagesLog::AddNewSentScenarioEntry(
 					*_scenarioToCopy, scenario, _request->getUser().get()
+				);
+				MessagesLibraryLog::AddTemplateInstanciationEntry(
+					scenario, _request->getUser().get()
 				);
 			}
 			else if(_messageToCopy.get()) // Copy of an existing message
@@ -191,6 +193,9 @@ namespace synthese
 				// The log
 				MessagesLog::AddNewSentScenarioEntry(
 					*_template, scenario, _request->getUser().get()
+				);
+				MessagesLibraryLog::AddTemplateInstanciationEntry(
+					scenario, _request->getUser().get()
 				);
 			}
 			else	// New message from scratch

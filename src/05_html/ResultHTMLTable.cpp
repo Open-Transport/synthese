@@ -99,20 +99,27 @@ namespace synthese
 			_searchForm.addHiddenField(_PARAMETER_MAX_SIZE, Conversion::ToString(_maxSize));
 		}
 
-		void ResultHTMLTable::RequestParameters::setFromParametersMap(const map<string, string>& m, const string defaultOrderField, int defaultMaxSize, bool defaultRaisingOrder)
-		{
+		void ResultHTMLTable::RequestParameters::setFromParametersMap(
+			const map<string, string>& m,
+			const string defaultOrderField,
+			int defaultMaxSize,
+			bool defaultRaisingOrder,
+			const string& prefix
+		){
 			map<string, string>::const_iterator it;
+			
+			_prefix = prefix;
 
-			it = m.find(_PARAMETER_FIRST);
+			it = m.find(_prefix + _PARAMETER_FIRST);
 			first = (it == m.end()) ? 0 : Conversion::ToInt(it->second);
 
-			it = m.find(_PARAMETER_ORDER_FIELD);
+			it = m.find(_prefix + _PARAMETER_ORDER_FIELD);
 			orderField = (it == m.end()) ? defaultOrderField : it->second;
 
-			it = m.find(_PARAMETER_RAISING_ORDER);
+			it = m.find(_prefix + _PARAMETER_RAISING_ORDER);
 			raisingOrder = (it == m.end()) ? defaultRaisingOrder : Conversion::ToBool(it->second);
 
-			it = m.find(_PARAMETER_MAX_SIZE);
+			it = m.find(_prefix + _PARAMETER_MAX_SIZE);
 			maxSize = (it == m.end()) ? defaultMaxSize : Conversion::ToInt(it->second);
 		}
 
@@ -148,10 +155,10 @@ namespace synthese
 		std::map<std::string, std::string> ResultHTMLTable::RequestParameters::getParametersMap() const
 		{
 			std::map<std::string, std::string> map;
-			map.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString(first)));
-			map.insert(make_pair(_PARAMETER_MAX_SIZE, Conversion::ToString(maxSize)));
-			map.insert(make_pair(_PARAMETER_ORDER_FIELD, orderField));
-			map.insert(make_pair(_PARAMETER_RAISING_ORDER, Conversion::ToString(raisingOrder)));
+			map.insert(make_pair(_prefix + _PARAMETER_FIRST, Conversion::ToString(first)));
+			map.insert(make_pair(_prefix + _PARAMETER_MAX_SIZE, Conversion::ToString(maxSize)));
+			map.insert(make_pair(_prefix + _PARAMETER_ORDER_FIELD, orderField));
+			map.insert(make_pair(_prefix + _PARAMETER_RAISING_ORDER, Conversion::ToString(raisingOrder)));
 			return map;
 		}
 	}

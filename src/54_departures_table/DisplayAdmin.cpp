@@ -114,6 +114,72 @@ namespace synthese
 		const string DisplayAdmin::TAB_RESULT("result");
 		const string DisplayAdmin::TAB_LOG("log");
 
+
+
+		void DisplayAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
+			_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
+			_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
+
+			if(!doDisplayPreparationActions) return;
+			
+			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			if(	id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
+
+			try
+			{
+				_displayScreen = DisplayScreenTableSync::Get(id, _env);
+				
+				if(_displayScreen->getLocalization() != NULL)
+				{
+					PhysicalStopTableSync::Search(_env, _displayScreen->getLocalization()->getKey(), 0, 0, UP_LINKS_LOAD_LEVEL);
+					
+					BOOST_FOREACH(
+						const PhysicalStops::value_type& it,
+						_displayScreen->getLocalization()->getPhysicalStops()
+					){
+						LineStopTableSync::Search(
+							_env,
+							UNKNOWN_VALUE,
+							it.first,
+							0, 0,
+							true, true,
+							UP_LINKS_LOAD_LEVEL
+						);
+					}
+				}
+							}
+			catch (ObjectNotFoundException<DisplayScreen>& e)
+			{
+				throw AdminParametersException("Display screen not found");
+			}
+			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+			{
+				throw AdminParametersException("Place not found");
+			}
+
+			DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+
+			// CPU search
+			if (_displayScreen->getLocalization() != NULL)
+			{
+				DisplayScreenCPUTableSync::Search(_env, _displayScreen->getLocalization()->getKey());
+			}
+		}
+		
+		
+		
+		ParametersMap DisplayAdmin::getParametersMap() const
+		{
+			ParametersMap m(_maintenanceLogView.getParametersMap());
+			m.merge(_generalLogView.getParametersMap());
+			return m;
+		}
+
+
+
 		void DisplayAdmin::display(
 			std::ostream& stream,
 			interfaces::VariablesMap& variables
@@ -736,56 +802,7 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
-		void DisplayAdmin::setFromParametersMap(const ParametersMap& map)
-		{
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				return;
-
-
-			try
-			{
-				_displayScreen = DisplayScreenTableSync::Get(id, _env);
-				if(_displayScreen->getLocalization() != NULL)
-				{
-					PhysicalStopTableSync::Search(_env, _displayScreen->getLocalization()->getKey(), 0, 0, UP_LINKS_LOAD_LEVEL);
-					
-					BOOST_FOREACH(
-						const PhysicalStops::value_type& it,
-						_displayScreen->getLocalization()->getPhysicalStops()
-					){
-						LineStopTableSync::Search(
-							_env,
-							UNKNOWN_VALUE,
-							it.first,
-							0, 0,
-							true, true,
-							UP_LINKS_LOAD_LEVEL
-						);
-					}
-				}
-				
-				_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
-				_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
-			}
-			catch (ObjectNotFoundException<DisplayScreen>& e)
-			{
-				throw AdminParametersException("Display screen not found");
-			}
-			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
-			{
-				throw AdminParametersException("Place not found");
-			}
-
-			DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-
-			// CPU search
-			if (_displayScreen->getLocalization() != NULL)
-			{
-				DisplayScreenCPUTableSync::Search(_env, _displayScreen->getLocalization()->getKey());
-			}
-		}
 
 		bool DisplayAdmin::isAuthorized() const
 		{

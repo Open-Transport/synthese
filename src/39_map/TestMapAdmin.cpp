@@ -24,20 +24,16 @@
 
 #include "TestMapAdmin.h"
 #include "MapModule.h"
-
-#include "39_map/MapRequest.h"
-#include "39_map/JpegRenderer.h"
-#include "39_map/PostscriptRenderer.h"
-
-#include "05_html/PropertiesHTMLTable.h"
-
-#include "30_server/QueryString.h"
-#include "30_server/FunctionRequest.h"
-#include "30_server/Request.h"
-
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
+#include "MapRequest.h"
+#include "JpegRenderer.h"
+#include "PostscriptRenderer.h"
+#include "PropertiesHTMLTable.h"
+#include "QueryString.h"
+#include "FunctionRequest.h"
+#include "Request.h"
+#include "ModuleAdmin.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
 
 using namespace std;
 
@@ -73,11 +69,15 @@ namespace synthese
 			, _error(false)
 		{ }
 		
-		void TestMapAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void TestMapAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_dataXml = map.getString(PARAMETER_DATA_XML, false, FACTORY_KEY);
 			_queryXml = map.getString(PARAMETER_QUERY_XML, false, FACTORY_KEY);
 			_useEnvironment = map.getBool(PARAMETER_USE_ENVIRONMENT, false, true, FACTORY_KEY);
+			
+			if(!doDisplayPreparationActions) return;
 
 			if (!_queryXml.empty())
 			{
@@ -104,6 +104,19 @@ namespace synthese
 				}
 			}
 		}
+		
+		
+		
+		server::ParametersMap TestMapAdmin::getParametersMap() const
+		{
+			ParametersMap m;
+			m.insert(PARAMETER_DATA_XML, _dataXml);
+			m.insert(PARAMETER_QUERY_XML, _queryXml);
+			m.insert(PARAMETER_USE_ENVIRONMENT, _useEnvironment);
+			return m;
+		}
+
+
 		
 		void TestMapAdmin::display(ostream& stream, VariablesMap& variables) const
 		{

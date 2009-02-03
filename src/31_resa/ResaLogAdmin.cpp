@@ -24,22 +24,18 @@
 
 #include "ResaLogAdmin.h"
 
-#include "31_resa/ResaModule.h"
-#include "31_resa/ResaDBLog.h"
-#include "31_resa/ResaRight.h"
-#include "31_resa/CancelReservationAction.h"
-
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
-
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/ModuleAdmin.h"
-#include "32_admin/AdminRequest.h"
-
-#include "05_html/SearchFormHTMLTable.h"
-
-#include "13_dblog/DBLogEntry.h"
-#include "13_dblog/DBLogEntryTableSync.h"
+#include "ResaModule.h"
+#include "ResaDBLog.h"
+#include "ResaRight.h"
+#include "CancelReservationAction.h"
+#include "QueryString.h"
+#include "Request.h"
+#include "AdminParametersException.h"
+#include "ModuleAdmin.h"
+#include "AdminRequest.h"
+#include "SearchFormHTMLTable.h"
+#include "DBLogEntry.h"
+#include "DBLogEntryTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -76,10 +72,14 @@ namespace synthese
 			, _searchDate(TIME_CURRENT)
 		{ }
 		
-		void ResaLogAdmin::setFromParametersMap(const ParametersMap& map)
-		{
+		void ResaLogAdmin::setFromParametersMap(
+			const ParametersMap& map,
+			bool doDisplayPreparationActions
+		){
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_DATE, 50, false);
 			_searchDate = map.getDate(PARAMETER_DATE, false, FACTORY_KEY);
+
+			if(!doDisplayPreparationActions) return;
 
 			// Search
 			DateTime searchStartDate(_searchDate);
@@ -103,15 +103,24 @@ namespace synthese
 			);
 		}
 		
+		
+		
+		server::ParametersMap ResaLogAdmin::getParametersMap() const
+		{
+			ParametersMap m(_requestParameters.getParametersMap());
+			m.insert(PARAMETER_DATE, _searchDate);
+			return m;
+		}
+
+		
 		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<ResaLogAdmin>();
+			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
-			cancelRequest.getFunction()->setPage<ResaLogAdmin>();
-			cancelRequest.setObjectId(_request->getObjectId());
+			cancelRequest.getFunction()->setSamePage(this);
 
 			ResultHTMLTable::ResultParameters rp;
 			rp.setFromResult(_requestParameters, _env.getEditableRegistry<DBLogEntry>());
