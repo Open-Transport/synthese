@@ -183,6 +183,7 @@ namespace synthese
 					}
 				}
 			}
+			return result;
 		}
 	
 	
