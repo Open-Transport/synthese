@@ -418,7 +418,7 @@ namespace synthese
 
 
 
-		const std::string& AdminInterfaceElement::getCurrentTab(
+		std::string AdminInterfaceElement::getCurrentTab(
 		) const {
 			return (_currentTab == NULL) ? string() : _currentTab->getId();
 		}

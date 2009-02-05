@@ -38,19 +38,6 @@ namespace synthese
 		*/
 		class ResultHTMLTable : public HTMLTable
 		{
-		private:
-			static const std::string _PARAMETER_FIRST;
-			static const std::string _PARAMETER_ORDER_FIELD;
-			static const std::string _PARAMETER_RAISING_ORDER;
-			static const std::string _PARAMETER_MAX_SIZE;
-
-			const int			_maxSize;
-			const int			_first;
-			const std::string	_orderField;
-			const bool			_raisingOrder;
-			const bool			_next;
-			const int			_size;
-			
 		public:
 			typedef std::vector<std::pair<std::string, std::string> > HeaderVector;
 			static const int			UNLIMITED_SIZE;
@@ -58,6 +45,18 @@ namespace synthese
 
 			struct RequestParameters
 			{
+			public:
+
+				////////////////////////////////////////////////////////////////////
+				///	getParameterMap.
+				///	@param parameter
+				///	@return std::string
+				///	@author Hugues Romain
+				///	@date 2009
+				std::string _getParameterCode(
+					const std::string& parameter
+				) const;
+
 				int					maxSize;
 				int					first;
 				std::string			orderField;
@@ -108,6 +107,15 @@ namespace synthese
 				}
 			};
 
+		private:
+			static const std::string _PARAMETER_FIRST;
+			static const std::string _PARAMETER_ORDER_FIELD;
+			static const std::string _PARAMETER_RAISING_ORDER;
+			static const std::string _PARAMETER_MAX_SIZE;
+
+			RequestParameters	_requestParameters;
+			ResultParameters	_resultParameters;
+
 		protected:
 			HTMLForm		_searchForm;
 			
@@ -118,12 +126,13 @@ namespace synthese
 				@param actionRequest A request to launch by the table content (NULL = no action request)
 				@param selectFieldName A first col with radio buttons will be drawn, named by the parameter. If empty then no radio button.
 			*/
-			ResultHTMLTable(const HeaderVector& header
+			ResultHTMLTable(
+				const HeaderVector& header
 				, const HTMLForm& searchForm
 				, const RequestParameters& requestParameters
 				, const ResultParameters& resultParameters
 				, std::string iconPath = std::string()
-				);
+			);
 
 			virtual std::string close();			
 		};

@@ -282,7 +282,7 @@ namespace synthese
 
 			ResultHTMLTable t(
 				v,
-				st.getForm(),
+				searchRequest.getHTMLForm(),
 				_requestParameters,
 				_resultParameters
 			);

@@ -360,7 +360,7 @@ namespace synthese
 				const PageLinks&		getTreePosition()	const;
 				const PageLinksTree&	getTree()			const;
 				const Tabs&				getTabs()			const;
-				const std::string&		getCurrentTab()		const;
+				std::string				getCurrentTab()		const;
 				const std::string&		getActiveTab()		const;
 				const server::Request*	getRequest()		const;
 			//@}

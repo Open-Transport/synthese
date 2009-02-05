@@ -49,15 +49,11 @@ namespace synthese
 			, const HTMLForm& searchForm
 			, const RequestParameters& requestParameters
 			, const ResultParameters& resultParameters
-			, std::string iconPath )
-			: HTMLTable(header.size(), CSS_CLASS)
-			, _searchForm(searchForm)
-			, _maxSize(requestParameters.maxSize)
-			, _first(requestParameters.first)
-			, _orderField(requestParameters.orderField)
-			, _raisingOrder(requestParameters.raisingOrder)
-			, _next(resultParameters.next)
-			, _size(resultParameters.size)
+			, std::string iconPath
+		): HTMLTable(header.size(), CSS_CLASS),
+			_searchForm(searchForm),
+			_requestParameters(requestParameters),
+			_resultParameters(resultParameters)
 		{
 			stringstream s;
 			int colspan(1);
@@ -76,13 +72,13 @@ namespace synthese
 					if (!it->first.empty())
 					{
 						HTMLForm::HiddenFieldsMap h;
-						h.insert(make_pair(_PARAMETER_ORDER_FIELD, it->first));
-						h.insert(make_pair(_PARAMETER_RAISING_ORDER, Conversion::ToString((_orderField == it->first) ? !_raisingOrder : true)));
+						h.insert(make_pair(_requestParameters._getParameterCode(_PARAMETER_ORDER_FIELD), it->first));
+						h.insert(make_pair(_requestParameters._getParameterCode(_PARAMETER_RAISING_ORDER), Conversion::ToString((_requestParameters.orderField == it->first) ? !_requestParameters.raisingOrder : true)));
 						s << HTMLModule::getHTMLLink(_searchForm.getURL(h), it->second);
 
-						if (it->first == _orderField)
+						if (it->first == _requestParameters.orderField)
 						{
-							s << "&nbsp;" << HTMLModule::getHTMLImage(iconPath + (_raisingOrder ? "up" : "down") + ".png", _raisingOrder ? "V" : "^");
+							s << "&nbsp;" << HTMLModule::getHTMLImage(iconPath + (_requestParameters.raisingOrder ? "up" : "down") + ".png", _requestParameters.raisingOrder ? "V" : "^");
 						}						
 					}
 					else
@@ -93,10 +89,10 @@ namespace synthese
 			}
 			_headers = s.str();
 
-			_searchForm.addHiddenField(_PARAMETER_FIRST, Conversion::ToString(_first));
-			_searchForm.addHiddenField(_PARAMETER_ORDER_FIELD, Conversion::ToString(_orderField));
-			_searchForm.addHiddenField(_PARAMETER_RAISING_ORDER, Conversion::ToString(_raisingOrder));
-			_searchForm.addHiddenField(_PARAMETER_MAX_SIZE, Conversion::ToString(_maxSize));
+			_searchForm.addHiddenField(_requestParameters._getParameterCode(_PARAMETER_FIRST), Conversion::ToString(_requestParameters.first));
+			_searchForm.addHiddenField(_requestParameters._getParameterCode(_PARAMETER_ORDER_FIELD), Conversion::ToString(_requestParameters.orderField));
+			_searchForm.addHiddenField(_requestParameters._getParameterCode(_PARAMETER_RAISING_ORDER), Conversion::ToString(_requestParameters.raisingOrder));
+			_searchForm.addHiddenField(_requestParameters._getParameterCode(_PARAMETER_MAX_SIZE), Conversion::ToString(_requestParameters.maxSize));
 		}
 
 		void ResultHTMLTable::RequestParameters::setFromParametersMap(
@@ -110,16 +106,16 @@ namespace synthese
 			
 			_prefix = prefix;
 
-			it = m.find(_prefix + _PARAMETER_FIRST);
+			it = m.find(_getParameterCode(_PARAMETER_FIRST));
 			first = (it == m.end()) ? 0 : Conversion::ToInt(it->second);
 
-			it = m.find(_prefix + _PARAMETER_ORDER_FIELD);
+			it = m.find(_getParameterCode(_PARAMETER_ORDER_FIELD));
 			orderField = (it == m.end()) ? defaultOrderField : it->second;
 
-			it = m.find(_prefix + _PARAMETER_RAISING_ORDER);
+			it = m.find(_getParameterCode(_PARAMETER_RAISING_ORDER));
 			raisingOrder = (it == m.end()) ? defaultRaisingOrder : Conversion::ToBool(it->second);
 
-			it = m.find(_prefix + _PARAMETER_MAX_SIZE);
+			it = m.find(_getParameterCode(_PARAMETER_MAX_SIZE));
 			maxSize = (it == m.end()) ? defaultMaxSize : Conversion::ToInt(it->second);
 		}
 
@@ -127,24 +123,28 @@ namespace synthese
 		{
 			stringstream s;
 
-			if (_maxSize != UNLIMITED_SIZE && _size != UNLIMITED_SIZE)
+			if (_requestParameters.maxSize != UNLIMITED_SIZE && _resultParameters.size != UNLIMITED_SIZE)
 			{
 				s << row();
 				s << col(_getColsNumber(), string(), true);
-				if (_first)
+				if (_requestParameters.first)
 				{
 					HTMLForm::HiddenFieldsMap f;
-					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString((_first > _maxSize) ? _first - _maxSize - 1: 0)));
+					f.insert(
+						make_pair(
+							_requestParameters._getParameterCode(_PARAMETER_FIRST),
+							Conversion::ToString((_requestParameters.first > _requestParameters.maxSize) ? _requestParameters.first - _requestParameters.maxSize - 1: 0)
+					)	);
 					s << HTMLModule::getHTMLLink(_searchForm.getURL(f), HTMLModule::getHTMLImage("resultset_previous.png", "<<")) << "&nbsp;|&nbsp;";
 				}
-				if (_size > 0)
-					s << "Résultats&nbsp;" << (_first + 1) << "&nbspà&nbsp;" << (_first + _size);
+				if (_resultParameters.size > 0)
+					s << "Résultats&nbsp;" << (_requestParameters.first + 1) << "&nbspà&nbsp;" << (_requestParameters.first + _resultParameters.size);
 				else
 					s << "Aucun résultat";
-				if (_next)
+				if (_resultParameters.next)
 				{
 					HTMLForm::HiddenFieldsMap f;
-					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString(_first + _size)));
+					f.insert(make_pair(_requestParameters._getParameterCode(_PARAMETER_FIRST), Conversion::ToString(_requestParameters.first + _resultParameters.size)));
 					s << "&nbsp;|&nbsp;" << HTMLModule::getHTMLLink(_searchForm.getURL(f), HTMLModule::getHTMLImage("resultset_next.png", ">>"));
 				}
 			}
@@ -155,11 +155,19 @@ namespace synthese
 		std::map<std::string, std::string> ResultHTMLTable::RequestParameters::getParametersMap() const
 		{
 			std::map<std::string, std::string> map;
-			map.insert(make_pair(_prefix + _PARAMETER_FIRST, Conversion::ToString(first)));
-			map.insert(make_pair(_prefix + _PARAMETER_MAX_SIZE, Conversion::ToString(maxSize)));
-			map.insert(make_pair(_prefix + _PARAMETER_ORDER_FIELD, orderField));
-			map.insert(make_pair(_prefix + _PARAMETER_RAISING_ORDER, Conversion::ToString(raisingOrder)));
+			map.insert(make_pair(_getParameterCode(_PARAMETER_FIRST), Conversion::ToString(first)));
+			map.insert(make_pair(_getParameterCode(_PARAMETER_MAX_SIZE), Conversion::ToString(maxSize)));
+			map.insert(make_pair(_getParameterCode(_PARAMETER_ORDER_FIELD), orderField));
+			map.insert(make_pair(_getParameterCode(_PARAMETER_RAISING_ORDER), Conversion::ToString(raisingOrder)));
 			return map;
+		}
+
+
+
+		std::string ResultHTMLTable::RequestParameters::_getParameterCode(
+			const std::string& parameter
+		) const {
+			return _prefix + parameter;
 		}
 	}
 }
