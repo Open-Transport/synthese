@@ -120,18 +120,20 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
-			_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
 
-			if(!doDisplayPreparationActions) return;
-			
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+		
+			uid id(_request->getObjectId());
 			if(	id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
 
 			try
 			{
 				_displayScreen = DisplayScreenTableSync::Get(id, _env);
 				
+				_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
+				_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
+
+				if(!doDisplayPreparationActions) return;
+
 				if(_displayScreen->getLocalization() != NULL)
 				{
 					PhysicalStopTableSync::Search(_env, _displayScreen->getLocalization()->getKey(), 0, 0, UP_LINKS_LOAD_LEVEL);

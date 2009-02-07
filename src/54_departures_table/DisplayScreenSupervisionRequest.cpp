@@ -62,7 +62,7 @@ namespace synthese
 		{
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"), _env, UP_LINKS_LOAD_LEVEL);
+				_displayScreen = DisplayScreenTableSync::Get(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, "dssr"), Env::GetOfficialEnv());
 				_text = map.getString(PARAMETER_STATUS, true, "dssr");
 			}
 			catch(ObjectNotFoundException<DisplayScreen>& e)
@@ -84,7 +84,7 @@ namespace synthese
 			}
 
 			// Last monitoring status
-			DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), true, false, 0, 1);
+			DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), 0, 1, true, false);
 		}
 
 		void DisplayScreenSupervisionRequest::_run( std::ostream& stream ) const

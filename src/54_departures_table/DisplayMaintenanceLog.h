@@ -65,6 +65,10 @@ namespace synthese
 		class DisplayMaintenanceLog
 		:	public util::FactorableTemplate<dblog::DBLog, DisplayMaintenanceLog>
 		{
+			static const int _COL_TYPE;
+			static const int _COL_FIELD;
+			static const int _COL_TEXT;
+
 		public:
 			typedef enum
 			{

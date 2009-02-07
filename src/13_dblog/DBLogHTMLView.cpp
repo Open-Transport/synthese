@@ -291,9 +291,14 @@ namespace synthese
 			
 			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, _env.getRegistry<DBLogEntry>())
 			{
-				shared_ptr<const User> user(
-					UserTableSync::Get(dbe->getUserId(), _env)
-				);
+				shared_ptr<const User> user;
+				try
+				{
+					user = UserTableSync::Get(dbe->getUserId(), _env);
+				}
+				catch (...)
+				{
+				}
 				stream << t.row();
 				stream <<
 					t.col() <<
@@ -305,7 +310,13 @@ namespace synthese
 				stream << t.col() << dbe->getDate().toString(true);
 				if(!_fixedUserId)
 				{
-					stream << t.col() << (user.get() ? user->getLogin() : "(supprimé)");
+					stream <<
+						t.col() <<
+						(	user.get() ?
+							user->getLogin() :
+							((dbe->getUserId() > 0) ? "(supprimé)" : "(robot)")
+						)
+					;
 				}
 				if(!_fixedObjectId)
 				{

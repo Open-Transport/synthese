@@ -52,6 +52,11 @@ namespace synthese
     
 	namespace departurestable
 	{
+		const int DisplayMaintenanceLog::_COL_TYPE(0);
+		const int DisplayMaintenanceLog::_COL_FIELD(1);
+		const int DisplayMaintenanceLog::_COL_TEXT(2);
+
+
 
 		DBLog::ColumnsVector DisplayMaintenanceLog::getColumnNames() const
 		{
@@ -97,9 +102,10 @@ namespace synthese
 		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry& cols ) const
 		{
 			ColumnsVector v;
+			const DBLogEntry::Content& c(cols.getContent());
 
 			// Type
-			switch ((EntryType) Conversion::ToInt(cols.getContent().front()))
+			switch (static_cast<EntryType>(Conversion::ToInt(c[_COL_TYPE])))
 			{
 			case DISPLAY_MONITORING_STATUS_CHANGE: v.push_back("Changement d'état"); break;
 			case DISPLAY_MAINTENANCE_ADMIN: v.push_back("Administration"); break;
@@ -109,7 +115,8 @@ namespace synthese
 			}
 
 			// Text
-			v.push_back(cols.getContent().front());
+			v.push_back(c[_COL_FIELD]);
+			v.push_back(c[_COL_TEXT]);
 
 			return v;
 		}
