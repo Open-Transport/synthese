@@ -17,12 +17,7 @@ CppSynthese3BinProject(
 		's3-env.cpplib',
 		's3-util-iostreams.cpplib',
 		's3-timetables.cpplib',
-		'boost-filesystem.cpplib',
-		'boost-program-options.cpplib',
-		'boost-system.cpplib',
-		'boost-thread.cpplib',
-		'boost-date-time.cpplib',
-		'boost-regex.cpplib',
-		'boost.cppinc'
+		'boost.cppinc',
+		('boost-program-options.cpplib',s3env['BOOSTVERSION'])
 	],
 )

@@ -3,5 +3,9 @@ Import ('s3env')
 CppLibProject(
 	s3env, 's3-util-iostreams', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
-	dependencies = ['s3-util.cpplib', 'boost-iostreams.cpplib', 'boost.cppinc'],
+	dependencies = [
+		's3-util.cpplib',
+		('boost-iostreams.cpplib',s3env['BOOSTVERSION']),
+		'boost.cppinc'
+	],
 )

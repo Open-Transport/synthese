@@ -5,8 +5,12 @@ CppLibProject(
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = [
 		'boost.cppinc',
-		'boost-iostreams.cpplib', 'boost-system.cpplib', 'boost-thread.cpplib', 
-		'boost-date-time.cpplib', 'boost-filesystem.cpplib', 'boost-regex.cpplib'
+		('boost-iostreams.cpplib',s3env['BOOSTVERSION']),
+		('boost-system.cpplib',s3env['BOOSTVERSION']),
+		('boost-thread.cpplib',s3env['BOOSTVERSION']), 
+		('boost-date-time.cpplib',s3env['BOOSTVERSION']),
+		('boost-filesystem.cpplib',s3env['BOOSTVERSION']),
+		('boost-regex.cpplib',s3env['BOOSTVERSION'])
 	],
 )
 
