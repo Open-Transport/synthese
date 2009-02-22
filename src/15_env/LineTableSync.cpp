@@ -187,15 +187,30 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Save(Line* object)
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			if(!object->getCommercialLine()) throw Exception("Line save error. Missing commercial line");
 			stringstream query;
 			if (object->getKey() <= 0) object->setKey(getId());
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
-			sqlite->execUpdate(query.str());
+				<< Conversion::ToString(object->getKey()) <<
+				"," << object->getCommercialLine()->getKey() <<
+				",0" <<
+				"," << Conversion::ToSQLiteString(object->getName()) <<
+				"," << Conversion::ToSQLiteString(object->getTimetableName()) <<
+				"," << Conversion::ToSQLiteString(object->getDirection()) <<
+				"," << Conversion::ToString(object->getWalkingLine()) <<
+				"," << Conversion::ToString(object->getUseInDepartureBoards()) <<
+				"," << Conversion::ToString(object->getUseInTimetables()) <<
+				"," << Conversion::ToString(object->getUseInRoutePlanning()) <<
+				"," << (
+					object->getRollingStock() ? Conversion::ToString(object->getRollingStock()->getKey()) :
+					"0") <<
+				",0" <<
+				",0,0,0,0,0" <<
+				"," << Conversion::ToString(object->getWayBack()) <<
+				"," << (object->getDataSource() ? Conversion::ToString(object->getDataSource()->getKey()) : "0") <<
+			")";
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
 

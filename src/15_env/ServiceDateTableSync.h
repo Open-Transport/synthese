@@ -36,6 +36,7 @@ namespace synthese
 	namespace env
 	{
 		class NonPermanentService;
+		class ServiceDate;
 		
 		/** Service dates table synchronizer.
 			@ingroup m35LS refLS
@@ -44,13 +45,8 @@ namespace synthese
 		:	public db::SQLiteTableSyncTemplate<ServiceDateTableSync>
 		{
 		public:
-			/** Writing of the dates of a service.
-				@param service pointer to the service from which save the dates
-				@author Hugues Romain
-				@date 2008
-				@todo implement it
-			*/
-			static void Save(env::NonPermanentService* service);
+		
+			static void Save(ServiceDate* sd);
 
 			static const std::string COL_SERVICEID;
 			static const std::string COL_DATE;
@@ -66,7 +62,9 @@ namespace synthese
 				NonPermanentService& service
 			);
 			
-			
+			static void DeleteDatesFromNow(
+				util::RegistryKeyType serviceId
+			);
 			
 			/** Action to do on Service Date creation.
 				This method loads a new object in ram.

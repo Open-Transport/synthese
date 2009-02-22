@@ -23,9 +23,10 @@
 #include "Schedule.h"
 #include "assert.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -211,6 +212,32 @@ namespace synthese
 			result += (_daysSinceDeparture - op2._daysSinceDeparture - retain) * MINUTES_PER_DAY;
 
 			return result;
+		}
+
+
+
+		std::string Schedule::toSQLString( bool withApostrophes /*= true*/ ) const
+		{
+			if(!isValid())
+				return "";
+
+			std::stringstream os;
+
+			if (withApostrophes)
+				os << "'"; 
+
+			os << std::setw( 2 ) << std::setfill ( '0' )
+				<< (_daysSinceDeparture * 24 + _hour.getHours()) << ":"
+				<< std::setw( 2 ) << std::setfill ( '0' )
+				<< _hour.getMinutes() << ":"
+				<< std::setw( 2 ) << std::setfill ( '0' )
+				<< _hour.getSeconds()
+				;
+
+			if (withApostrophes)
+				os << "'"; 
+
+			return os.str ();
 		}
 
 

@@ -42,6 +42,8 @@ namespace synthese
 		class ServiceDate
 		{
 		public:
+			ServiceDate() : date(time::TIME_UNKNOWN), service(NULL), key(UNKNOWN_VALUE) { }
+			
 			uid			key;
 			NonPermanentService*	service;
 			time::Date	date;

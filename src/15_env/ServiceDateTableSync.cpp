@@ -115,25 +115,37 @@ namespace synthese
 		}
 
 		
-		
-		void ServiceDateTableSync::Save( env::NonPermanentService* service )
-		{
-//////////////////////////////////////////////////////////////////////////
-			/// @todo Loop on each date of the service
 
-/*			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
+		void ServiceDateTableSync::Save(ServiceDate* object)
+		{
+			if(!object->service) return;
+			
 			if (object->key <= 0)
 				object->key = getId();	
 
+			stringstream query;
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->key)
-				<< "," << Conversion::ToString(object->service->getId())
+				<< "," << Conversion::ToString(object->service->getKey())
 				<< "," << object->date.toSQLString()
 				<< ")";
-			sqlite->execUpdate(query.str());
-*/
+			DBModule::GetSQLite()->execUpdate(query.str());
+		}
+		
+		
+
+		void ServiceDateTableSync::DeleteDatesFromNow(
+			util::RegistryKeyType serviceId
+		){
+			Date now(TIME_CURRENT);
+			stringstream query;
+			query <<
+				"DELETE FROM " << TABLE.NAME <<
+				" WHERE " << COL_SERVICEID << "=" << serviceId <<
+				" AND " << COL_DATE << ">" << now.toSQLString()
+			;
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
 

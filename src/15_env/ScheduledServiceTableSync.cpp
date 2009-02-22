@@ -202,17 +202,30 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(ScheduledService* object)
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
-               
+			
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
-			sqlite->execUpdate(query.str());
+				<< "," << Conversion::ToSQLiteString(object->getServiceNumber())
+				<< ",'"
+			;
+			for(int i(0); i<object->getDepartureSchedules().size(); ++i)
+			{
+				if(i) query << ",";
+				query << object->getArrivalSchedules()[i].toSQLString(false) << "#" << object->getDepartureSchedules()[i].toSQLString(false);
+			}
+			query <<
+				"'," << object->getPathId() <<
+				",0" <<
+				",0" <<
+				",0" <<
+				",0" <<
+				",''" <<
+			")";
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
 	}
@@ -228,20 +241,21 @@ namespace synthese
 
 		void ScheduledServiceTableSync::Search(
 			Env& env,
-			uid lineId
-			, uid commercialLineId
-			, Date date
-			, int first /*= 0*/
-			, int number /*= 0*/
-			, bool orderByOriginTime
-			, bool raisingOrder,
+			RegistryKeyType lineId,
+			RegistryKeyType commercialLineId,
+			RegistryKeyType dataSourceId,
+			Date date,
+			int first, /*= 0*/
+			int number, /*= 0*/
+			bool orderByOriginTime,
+			bool raisingOrder,
 			LinkLevel linkLevel
 		){
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME;
-			if (commercialLineId != UNKNOWN_VALUE)
+			if (commercialLineId != UNKNOWN_VALUE || dataSourceId != UNKNOWN_VALUE)
 				query << " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
 			if (!date.isUnknown())
 				query << " INNER JOIN " << ServiceDateTableSync::TABLE.NAME << " AS d ON d." << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE.NAME << "." << TABLE_COL_ID;
@@ -250,6 +264,8 @@ namespace synthese
 				query << " AND " << ScheduledServiceTableSync::COL_PATHID << "=" << lineId;
 			if (commercialLineId != UNKNOWN_VALUE)
 				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId;
+			if (dataSourceId != UNKNOWN_VALUE)
+				query << " AND l." << LineTableSync::COL_DATASOURCE_ID << "=" << dataSourceId;
 			if (!date.isUnknown())
 				query << " AND d." << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString();
 			if (!date.isUnknown())

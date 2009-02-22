@@ -51,6 +51,8 @@
 #include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
 #include "UseRules.h"
+#include "ServiceDate.h"
+
 // 06 Geometry
 #include "Projection.h"
 #include "Point2D.h"
@@ -191,6 +193,7 @@ namespace synthese
 					*_env,
 					line->getKey(),
 					UNKNOWN_VALUE,
+					_dataSource->getKey(),
 					Date(TIME_UNKNOWN),
 					0, 0, true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
@@ -931,6 +934,13 @@ namespace synthese
 		){
 			XMLNode allNode = XMLNode::parseString (text.c_str (), "ChouettePTNetwork");
 			
+			// Title
+			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
+			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
+			XMLNode clineNameNode = lineNode.getChildNode("name");
+				
+			os << "<h2>Trident import of " << clineNameNode.getText() << "</h2>";
+			
 			// Network
 			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
 			XMLNode networkIdNode = networkNode.getChildNode("objectId", 0);
@@ -966,9 +976,7 @@ namespace synthese
 				_env->getEditableRegistry<TransportNetwork>().add(network);
 			}
 			
-						// Commercial lines
-			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
-			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
+			// Commercial lines
 			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
 			
 			string ckey(networkIdNode.getText());
@@ -994,7 +1002,6 @@ namespace synthese
 			else
 			{
 				cline.reset(new CommercialLine);
-				XMLNode clineNameNode = lineNode.getChildNode("name", 0);
 				XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
 				
 				os << "CREA : Creation of the commercial line with key " << ckey << " (" << clineNameNode.getText() <<  ")<br />";
@@ -1060,7 +1067,7 @@ namespace synthese
 		
 			if(failure)
 			{
-				os << "ERROR : At least a stop is missing : load interrupted<br />";
+				os << "<b>FAILURE : At least a stop is missing : load interrupted</b><br />";
 				return;
 			}
 
@@ -1238,14 +1245,37 @@ namespace synthese
 			
 			// Calendars
 			int calendarNumber(allNode.nChildNode("Timetable"));
+			Date today(TIME_CURRENT);
 			for(int calendarRank(0); calendarRank < calendarNumber; ++calendarRank)
 			{
 				XMLNode calendarNode(allNode.getChildNode("Timetable", calendarRank));
+				
+				int daysNumber(calendarNode.nChildNode("calendarDay"));
+				int servicesNumber(calendarNode.nChildNode("vehicleJourneyId"));
+				for(int dayRank(0); dayRank < daysNumber; ++dayRank)
+				{
+					XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
+					Date date(Date::FromSQLDate(dayNode.getText()));
+					if(date < today) continue;
+					
+					for(int serviceRank(0); serviceRank < servicesNumber; ++serviceRank)
+					{
+						XMLNode serviceNode(calendarNode.getChildNode("vehicleJourneyId", serviceRank));
+						shared_ptr<ServiceDate> sd(new ServiceDate);
+						sd->service = services[serviceNode.getText()];
+						sd->date = date;
+						sd->key = ServiceDateTableSync::getId();
+						_serviceDates.push_back(sd);
+					}
+				}
 			}
+			
+			os << "<b>SUCCESS : Data loaded</b><br />";
 		}
 		
 		void TridentFileFormat::save(std::ostream& os) const
 		{
+			// Saving of each created or altered objects
 			BOOST_FOREACH(shared_ptr<TransportNetwork> network, _env->getRegistry<TransportNetwork>())
 			{
 				TransportNetworkTableSync::Save(network.get());
@@ -1262,6 +1292,19 @@ namespace synthese
 			{
 				LineStopTableSync::Save(lineStop.get());
 			}
+			BOOST_FOREACH(shared_ptr<ScheduledService> service, _env->getRegistry<ScheduledService>())
+			{
+				ServiceDateTableSync::DeleteDatesFromNow(service->getKey());
+				ScheduledServiceTableSync::Save(service.get());
+			}
+			BOOST_FOREACH(shared_ptr<ServiceDate> date, _serviceDates)
+			{
+				ServiceDateTableSync::Save(date.get());
+			}
+			
+			//TODO cleaning : delete services without dates and routes without service
+			
+			os << "<b>SUCCESS : Data saved.</b><br />";
 		}
 
 

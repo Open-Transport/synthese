@@ -39,7 +39,8 @@ namespace synthese
 
 		SubLine::SubLine( Line* line )
 			: Line()
-			, _mainLine(line)
+			, _mainLine(line),
+			Registrable(UNKNOWN_VALUE)
 		{
 			// Registration
 			int rank(line->addSubLine(this));

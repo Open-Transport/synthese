@@ -190,6 +190,7 @@ namespace synthese
 			Env env;
 			ScheduledServiceTableSync::Search(
 				env,
+				UNKNOWN_VALUE,
 				UNKNOWN_VALUE
 				, _line->getKey()
 				, _startDateTime.getDate()

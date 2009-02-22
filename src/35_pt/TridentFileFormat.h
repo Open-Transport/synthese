@@ -29,11 +29,18 @@
 
 #include <iostream>
 
+#include <vector>
+
 namespace synthese
 {
 	namespace util
 	{
 		class Registrable;
+	}
+	
+	namespace env
+	{
+		class ServiceDate;
 	}
 
 	namespace pt
@@ -52,6 +59,7 @@ namespace synthese
 		private:
 			util::RegistryKeyType	_commercialLineId;
 			const bool				_withTisseoExtension;
+			std::vector<boost::shared_ptr<env::ServiceDate> > _serviceDates;
 		
 		protected:
 				

@@ -137,7 +137,6 @@ namespace synthese
 				*/
 				virtual double getMetricOffset () const = 0;
 
-
 				/** Returns length of this edge, in meters. from
 				*/
 				double getLength () const;
@@ -157,8 +156,11 @@ namespace synthese
 				*/
 				const std::vector<const geometry::Point2D*>& getViaPoints () const;
 
-				int getDepartureFromIndex (int hour) const;
-				int getArrivalFromIndex (int hour) const;
+			
+				int getRankInPath () const;
+				bool isArrival () const;
+				bool isDeparture () const;
+
 			//@}
 
 
@@ -166,10 +168,8 @@ namespace synthese
 			//@{
 				const Hub* getPlace () const;
 				
-				int getRankInPath () const;
-
-				bool isArrival () const;
-				bool isDeparture () const;
+				int getDepartureFromIndex (int hour) const;
+				int getArrivalFromIndex (int hour) const;
 				
 
 //				int getBestRunTime (const Edge& other ) const;

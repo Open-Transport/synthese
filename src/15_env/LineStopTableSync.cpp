@@ -38,6 +38,8 @@
 
 #include "Point2D.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -152,18 +154,36 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Save(LineStop* object)
 		{
-/*			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
+			
+			if(!object->getPhysicalStop()) throw Exception("Linestop save error. Missing physical stop");
+			if(!object->getLine()) throw Exception("Linestop Save error. Missing line");
+			
 			if (object->getKey() <= 0)
-				object->setKey(getId());	/// @todo Use grid ID
-               
-			 query
+				object->setKey(getId());
+			
+			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
-			sqlite->execUpdate(query.str());
-*/		}
+				<< "," << Conversion::ToString(object->getPhysicalStop()->getKey())
+				<< "," << Conversion::ToString(object->getLine()->getKey())
+				<< "," << object->getRankInPath()
+				<< "," << Conversion::ToString(object->isDeparture())
+				<< "," << Conversion::ToString(object->isArrival())
+				<< "," << object->getMetricOffset()
+				<< ",'";
+			bool first(true);
+			BOOST_FOREACH(const geometry::Point2D* viaPoint, object->getViaPoints())
+			{
+				if(!first) query << ",";
+				query << viaPoint->getX() << ":" << viaPoint->getY();
+				first = false;
+			}
+			query <<
+				"'" <<
+			")";
+			DBModule::GetSQLite()->execUpdate(query.str());
+		}
 
 	}
 
