@@ -66,6 +66,7 @@ namespace synthese
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_RESERVATIONRULEID;
 			static const std::string COL_WAYBACK;
+			static const std::string COL_DATASOURCE_ID;
 
 			LineTableSync();
 
@@ -85,7 +86,8 @@ namespace synthese
 				, int number = 0
 				, bool orderByName = true
 				, bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				uid dataSourceId = UNKNOWN_VALUE
 			);
 		};
 	}

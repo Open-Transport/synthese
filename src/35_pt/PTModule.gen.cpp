@@ -4,6 +4,8 @@
 // Factories
 
 synthese::pt::TransportNetworkTableSync::integrate();
+synthese::pt::TridentExportFunction::integrate ();
+synthese::pt::TridentFileFormat::integrate ();
 
 // Registries
 

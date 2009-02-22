@@ -33,6 +33,7 @@ namespace synthese
 {
 	using namespace graph;
 	using namespace util;
+	using namespace impex;
 	
 	namespace util
 	{
@@ -52,7 +53,8 @@ namespace synthese
 			, _useInDepartureBoards (true)
 			, _useInTimetables (true)
 			, _useInRoutePlanning (true)
-			, _wayBack(boost::logic::indeterminate)
+			, _wayBack(boost::logic::indeterminate),
+			_dataSource(NULL)
 		{	}
 
 
@@ -62,6 +64,21 @@ namespace synthese
 			for (SubLines::const_iterator it(_subLines.begin()); it != _subLines.end(); ++it)
 				delete *it;
 		}
+
+
+
+		const DataSource* Line::getDataSource() const
+		{
+			return _dataSource;
+		}
+		
+		
+		
+		void Line::setDataSource(const DataSource* value)
+		{
+			_dataSource = value;
+		}
+		
 
 
 		const std::string& Line::getName() const

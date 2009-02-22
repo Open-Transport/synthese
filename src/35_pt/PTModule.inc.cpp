@@ -4,6 +4,8 @@
 // Factories
 
 #include "TransportNetworkTableSync.h"
+#include "TridentExportFunction.h"
+#include "TridentFileFormat.h"
 
 // Registries
 

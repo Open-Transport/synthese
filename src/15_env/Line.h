@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace impex
+	{
+		class DataSource;
+	}
+	
 	namespace graph
 	{
 		class Service;
@@ -98,6 +103,7 @@ namespace synthese
 			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
 			boost::logic::tribool		_wayBack;	//!< true if back route, false if forward route, indeterminate if unknown
+			const impex::DataSource*	_dataSource;
 
 		public:
 
@@ -112,17 +118,18 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string&		getName ()					const;
-				bool					getUseInDepartureBoards ()	const;
-				bool					getUseInTimetables ()		const;
-				bool					getUseInRoutePlanning ()	const;
-				const std::string&		getDirection ()				const;
-				const std::string&		getTimetableName ()			const;
-				const RollingStock*		getRollingStock()			const;
-				bool					getWalkingLine ()			const;
-				const CommercialLine*	getCommercialLine()			const;
-				const SubLines			getSubLines()				const;
-				boost::logic::tribool	getWayBack()				const;
+				const std::string&			getName ()					const;
+				bool						getUseInDepartureBoards ()	const;
+				bool						getUseInTimetables ()		const;
+				bool						getUseInRoutePlanning ()	const;
+				const std::string&			getDirection ()				const;
+				const std::string&			getTimetableName ()			const;
+				const RollingStock*			getRollingStock()			const;
+				bool						getWalkingLine ()			const;
+				const CommercialLine*		getCommercialLine()			const;
+				const SubLines				getSubLines()				const;
+				boost::logic::tribool		getWayBack()				const;
+				const impex::DataSource*	getDataSource()				const;
 			//@}
 
 
@@ -138,6 +145,7 @@ namespace synthese
 				void setUseInTimetables (bool useInTimetables);
 				void setCommercialLine(const CommercialLine* commercialLine);
 				void setWayBack(boost::logic::tribool value);
+				void setDataSource(const impex::DataSource* value);
 			//@}
 
 

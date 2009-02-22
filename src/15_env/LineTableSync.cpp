@@ -33,6 +33,7 @@
 #include "LineTableSync.h"
 #include "FareTableSync.h"
 #include "RollingStockTableSync.h"
+#include "DataSourceTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -42,8 +43,12 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace env;
+	using namespace impex;
+	
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,LineTableSync>::FACTORY_KEY("15.30.01 Lines");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,LineTableSync>::FACTORY_KEY(
+		"15.30.01 Lines"
+	);
 
 	namespace env
 	{
@@ -64,6 +69,7 @@ namespace synthese
 		const std::string LineTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 		const std::string LineTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
 		const std::string LineTableSync::COL_WAYBACK("wayback");
+		const string LineTableSync::COL_DATASOURCE_ID("data_source");
 	}
 
 	namespace db
@@ -91,12 +97,14 @@ namespace synthese
 			SQLiteTableSync::Field(LineTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(LineTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
 			SQLiteTableSync::Field(LineTableSync::COL_WAYBACK, SQL_INTEGER),
+			SQLiteTableSync::Field(LineTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<LineTableSync>::_INDEXES[]=
 		{
 			SQLiteTableSync::Index(LineTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""),
+			SQLiteTableSync::Index(LineTableSync::COL_DATASOURCE_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -149,6 +157,21 @@ namespace synthese
 					Log::GetInstance().warn("Bad value " + Conversion::ToString(commercialLineId) + " for fare in line " + Conversion::ToString(line->getKey()));
 				}
 
+				RegistryKeyType dataSourceId(rows->getLongLong(LineTableSync::COL_DATASOURCE_ID));
+				if(dataSourceId > 0)
+				{
+					try
+					{
+						line->setDataSource(
+							DataSourceTableSync::Get(dataSourceId, env, linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<DataSource>)
+					{
+						Log::GetInstance().warn("Bad value " + Conversion::ToString(dataSourceId) + " for data source in line " + Conversion::ToString(line->getKey()));
+					}
+				}
+
 
 				line->setRollingStock(RollingStockTableSync::Get(rollingStockId, env, linkLevel, AUTO_CREATE).get());
 // 				line->setFare (FareTableSync::Get (fareId, env, linkLevel, AUTO_CREATE));
@@ -166,22 +189,12 @@ namespace synthese
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE.NAME << " SET "
-					/// @todo fill fields [,]FIELD=VALUE
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
-				object->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE.NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					/// @todo fill other fields separated by ,
-					<< ")";
-			}
+			if (object->getKey() <= 0) object->setKey(getId());
+			query
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				/// @todo fill other fields separated by ,
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -189,8 +202,9 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Unlink(Line* obj)
 		{
-			obj->setRollingStock(NULL);			
+			obj->setRollingStock(NULL);
 			obj->setCommercialLine(NULL);
+			obj->setDataSource(NULL);
 		}
 
 	}
@@ -210,7 +224,8 @@ namespace synthese
 			, int number /*= 0*/
 			, bool orderByName
 			, bool raisingOrder,
-			LinkLevel linkLevel
+			LinkLevel linkLevel,
+			uid dataSourceId
 		){
 			stringstream query;
 			query
@@ -219,6 +234,8 @@ namespace synthese
 				<< " WHERE 1 ";
 			if (commercialLineId != UNKNOWN_VALUE)
 				query << " AND " << COL_COMMERCIAL_LINE_ID << "=" << commercialLineId;
+			if (dataSourceId != UNKNOWN_VALUE)
+				query << " AND " << COL_DATASOURCE_ID << "=" << dataSourceId;
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)

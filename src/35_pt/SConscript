@@ -5,6 +5,7 @@ CppLibProject(
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = [
 		's3-graph.cpplib',
-		's3-env.cpplib'
+		's3-env.cpplib',
+		's3-impex.cpplib'
 	]
 )
