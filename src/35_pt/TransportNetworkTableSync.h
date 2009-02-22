@@ -42,6 +42,7 @@ namespace synthese
 		{
 		 public:
 			 static const std::string COL_NAME;
+			 static const std::string COL_CREATOR_ID;
 
 			TransportNetworkTableSync ();
 
@@ -58,7 +59,8 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				std::string name = std::string()
+				std::string name = std::string(),
+				std::string creatorId = std::string()
 				, int first = 0
 				, int number = 0
 				, bool orderByName = true

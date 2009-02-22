@@ -28,8 +28,6 @@
 #include "Function.h"
 #include "FactorableTemplate.h"
 
-#include <set>
-
 namespace synthese
 {
 	namespace impex
@@ -70,9 +68,10 @@ do_import=0|1
 		protected:
 			//! \name Page parameters
 			//@{
-				std::set<std::string>	_paths; //!< Path to each file to read
-				bool					_doImport;
+				bool								_doImport;
 				boost::shared_ptr<const DataSource>	_dataSource;
+				boost::shared_ptr<FileFormat>		_fileFormat;
+				std::string							_output;
 			//@}
 			
 			

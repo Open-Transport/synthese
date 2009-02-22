@@ -62,5 +62,21 @@ namespace synthese
 
 
 
+		const std::string& 
+		TransportNetwork::getCreatorId() const
+		{
+			return _creatorId;
+		}
+
+
+
+		void 
+		TransportNetwork::setCreatorId( const std::string& name)
+		{
+			_creatorId = name;
+		}
+
+
+
 	}
 }

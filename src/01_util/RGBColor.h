@@ -50,6 +50,7 @@ struct RGBColor
 
 	bool operator == (const synthese::util::RGBColor& op2 ) const;
 
+	std::string toString() const;
 };
 
 

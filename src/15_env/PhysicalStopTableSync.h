@@ -60,7 +60,8 @@ namespace synthese
 
 			static void Search(
 				util::Env& env,
-				uid placeId = UNKNOWN_VALUE
+				uid placeId = UNKNOWN_VALUE,
+				std::string operatorCode = std::string("%")
 				, int first = 0
 				, int number = 0,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL

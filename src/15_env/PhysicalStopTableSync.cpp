@@ -130,15 +130,18 @@ namespace synthese
 		void PhysicalStopTableSync::Search(
 			Env& env, 
 			uid placeId /*= UNKNOWN_VALUE */,
+			string operatorCode,
 			int first /*= 0 */,
 			int number /*= 0 */,
 			LinkLevel linkLevel
 		){
 			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			query <<
+				" SELECT *" <<
+				" FROM " << TABLE.NAME <<
+				" WHERE " <<
+				COL_OPERATOR_CODE << " LIKE " << Conversion::ToSQLiteString(operatorCode)
+			;
 			if (placeId != UNKNOWN_VALUE)
 				query << " AND " << COL_PLACEID << "=" << placeId;
 			if (number > 0)

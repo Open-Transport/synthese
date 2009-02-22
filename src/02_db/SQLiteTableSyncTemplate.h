@@ -137,6 +137,8 @@ namespace synthese
 				SQLite* sqlite
 			);
 
+
+
 		protected:
 
 			//! @name Table run variables
@@ -198,22 +200,6 @@ namespace synthese
 					}
 				}
 			//@}
-
-
-			/** Unique ID generator for autoincremented tables.
-			*/
-			static util::RegistryKeyType getId()
-			{			
-				boost::mutex::scoped_lock mutex(*_idMutex);
-
-				//	if (it == _autoIncrementValues.end())
-				//		throw Exception("Autoincrement not initialized for table "+ getTableName());
-
-				//	int retval = it->second++;
-				int retval = _autoIncrementValue++;
-
-				return encodeUId(retval);
-			}
 
 
 
@@ -289,6 +275,22 @@ namespace synthese
 			}
 
 		public:
+			/** Unique ID generator for autoincremented tables.
+			*/
+			static util::RegistryKeyType getId()
+			{			
+				boost::mutex::scoped_lock mutex(*_idMutex);
+
+				//	if (it == _autoIncrementValues.end())
+				//		throw Exception("Autoincrement not initialized for table "+ getTableName());
+
+				//	int retval = it->second++;
+				int retval = _autoIncrementValue++;
+
+				return encodeUId(retval);
+			}
+
+
 
 			static std::string GetFieldValue(
 				util::RegistryKeyType id,

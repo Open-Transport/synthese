@@ -72,26 +72,41 @@ namespace synthese
 			}
 			
 			// Paths
-			string paths(map.getString(PARAMETER_PATH, true, FACTORY_KEY));
-			char_separator<char> sep(",");
-			tokenizer<char_separator<char> > pathsTokens(paths,sep);
+			set<string> paths;
+			string text(map.getString(PARAMETER_PATH, true, FACTORY_KEY));
+			tokenizer<char_separator<char> > pathsTokens(text, char_separator<char>(","));
 			BOOST_FOREACH(const string& token, pathsTokens)
 			{
 				if(token.empty()) continue;
-				_paths.insert(token);
+				paths.insert(token);
 			}
 			
 			// Do import ?
 			_doImport = map.getBool(PARAMETER_DO_IMPORT, false, false, FACTORY_KEY);
+			
+			// Input parsing
+			try
+			{
+				stringstream output;
+				_fileFormat.reset(Factory<FileFormat>::create(_dataSource->getFormat()));
+				_fileFormat->setEnv(&_env);
+				_fileFormat->setDataSource(_dataSource.get());
+				_fileFormat->parseFiles(paths, output);
+				_output = output.str();
+			}
+			catch(Exception e)
+			{
+				throw RequestException("Load failed : " + e.getMessage());
+			}
 		}
 
 		void ImportFunction::_run( std::ostream& stream ) const
 		{
-			shared_ptr<FileFormat> ff(Factory<FileFormat>::create(_dataSource->getFormat()));
-			
-			ff->setDoImport(_doImport);
-			ff->setDataSource(_dataSource.get());
-			ff->parseFiles(_paths);
+			stream << _output;
+			if(_doImport)
+			{
+				_fileFormat->save(stream);
+			}
 		}
 		
 		

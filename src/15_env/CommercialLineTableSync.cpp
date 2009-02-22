@@ -47,6 +47,7 @@
 
 // Boost
 #include <boost/tokenizer.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -73,6 +74,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_STYLE ("style");
 		const string CommercialLineTableSync::COL_IMAGE ("image");
 		const string CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES("optional_reservation_places");
+		const string CommercialLineTableSync::COL_CREATOR_ID("creator_id");
 	}
 
 	namespace db
@@ -92,6 +94,7 @@ namespace synthese
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_CREATOR_ID, SQL_TEXT),
 			SQLiteTableSync::Field()
 
 		};
@@ -113,6 +116,7 @@ namespace synthese
 		    object->setColor(RGBColor(rows->getText ( CommercialLineTableSync::COL_COLOR)));
 		    object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
+		    object->setCreatorId(rows->getText ( CommercialLineTableSync::COL_CREATOR_ID));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -157,21 +161,35 @@ namespace synthese
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE.NAME << " SET "
-					/// @todo fill fields [,]FIELD=VALUE
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
 				object->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE.NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					/// @todo fill other fields separated by ,
-					<< ")";
+			query
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				<< "," << (object->getNetwork() ? Conversion::ToString(object->getNetwork()->getKey()) : "0")
+				<< "," << Conversion::ToSQLiteString(object->getName())
+				<< "," << Conversion::ToSQLiteString(object->getShortName())
+				<< "," << Conversion::ToSQLiteString(object->getLongName())
+				<< "," << Conversion::ToSQLiteString(object->getColor().toString())
+				<< "," << Conversion::ToSQLiteString(object->getStyle())
+				<< "," << Conversion::ToSQLiteString(object->getImage())
+				<< ",'"
+			;
+			bool first(true);
+			BOOST_FOREACH(const Place* place, object->getOptionalReservationPlaces())
+			{
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					query << ",";
+				}
+				query << place->getKey();
 			}
+			query << "'"
+				<< "," << Conversion::ToSQLiteString(object->getCreatorId())
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -188,7 +206,8 @@ namespace synthese
 		void CommercialLineTableSync::Search(
 			Env& env,
 			uid networkId
-			, std::string name
+			, std::string name,
+			string creatorId
 			, int first
 			, int number
 			, bool orderByNetwork
@@ -200,11 +219,11 @@ namespace synthese
 			query
 				<< " SELECT l.*"
 				<< " FROM " << TABLE.NAME << " AS l "
-				<< " WHERE 1 ";
+				<< " WHERE l." << COL_CREATOR_ID << " LIKE " << Conversion::ToSQLiteString(creatorId)
+				<< " AND l." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(name)
+			;
 			if (networkId != UNKNOWN_VALUE)
 				query << " AND l." << COL_NETWORK_ID << "=" << networkId;
-			if (name.empty())
-				query << " AND l." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(name);
 			if (orderByNetwork)
 				query << " ORDER BY "
 					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")

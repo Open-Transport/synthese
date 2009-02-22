@@ -100,7 +100,8 @@ namespace synthese
 			CommercialLineTableSync::Search(
 				_env,
 				_network->getKey()
-				, "%"+_searchName+"%"
+				, "%"+_searchName+"%",
+				"%"
 				, _requestParameters.first
 				, _requestParameters.maxSize
 				, false
@@ -220,7 +221,7 @@ namespace synthese
 			)
 			{
 				Env env;
-				CommercialLineTableSync::Search(env, _network->getKey(), "%", 0, 0, true, false, true, UP_LINKS_LOAD_LEVEL);
+				CommercialLineTableSync::Search(env, _network->getKey(), "%", "%", 0, 0, true, false, true, UP_LINKS_LOAD_LEVEL);
 				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 				{
 					PageLink link(getPageLink());

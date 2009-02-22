@@ -41,15 +41,14 @@ namespace synthese
 			Env* env
 		):	FactoryBase<FileFormat>(),
 			_env(env),
-			_doImport(false),
 			_dataSource(NULL)
 		{}
 
 
 
-		void FileFormat::setDoImport(bool value)
+		void FileFormat::setEnv(Env* value)
 		{
-			_doImport = value;
+			_env = value;
 		}
 
 		void FileFormat::setDataSource(const DataSource* value)
@@ -58,10 +57,9 @@ namespace synthese
 		}
 		
 		void FileFormat::parseFiles(
-			const std::set<std::string>& paths
+			const std::set<std::string>& paths,
+			std::ostream& os
 		){
-			_preImport();
-			
 			BOOST_FOREACH(const std::string& path, paths)
 			{
 				ifstream ifs(path.c_str());
@@ -75,12 +73,7 @@ namespace synthese
 				ss << ifs.rdbuf();
 				ifs.close();
 				
-				_parse(ss.str());
-			}
-			
-			if(_doImport)
-			{
-				_postImport();
+				_parse(ss.str(), os);
 			}
 		}
 	}

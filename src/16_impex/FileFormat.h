@@ -46,18 +46,14 @@ namespace synthese
 			);
 			
 			util::Env*				_env;
-			bool					_doImport;
 			const DataSource*		_dataSource;
 			
 			
-			virtual void _preImport() = 0;
-			
 			virtual void _parse(
-				const std::string& text
+				const std::string& text,
+				std::ostream& os
 			) = 0;
 			
-			virtual void _postImport() = 0;
-
 			
 		public:
 			/** Generic export method.
@@ -70,11 +66,16 @@ namespace synthese
 			) = 0;
 			
 			void parseFiles(
-				const std::set<std::string>& paths
+				const std::set<std::string>& paths,
+				std::ostream& os
 			);
 			
-			void setDoImport(bool value);
+			virtual void save(
+				std::ostream& os
+			) const = 0;
+			
 			void setDataSource(const DataSource* value);
+			void setEnv(util::Env* value);
 		};
 	}
 }

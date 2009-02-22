@@ -69,6 +69,25 @@ namespace synthese
 			_name = name;
 		}
 
+
+
+		const std::string& CommercialLine::getCreatorId() const
+		{
+			return _creatorId;
+		}
+
+		void CommercialLine::setCreatorId( const std::string& name )
+		{
+			_creatorId = name;
+		}
+
+
+		const PlacesSet& CommercialLine::getOptionalReservationPlaces() const
+		{
+			return _optionalReservationPlaces;
+		}
+
+
 		const std::string& CommercialLine::getStyle() const
 		{
 			return _style;

@@ -47,6 +47,7 @@ namespace synthese
 	namespace pt
 	{
 		const string TransportNetworkTableSync::COL_NAME("name");
+		const string TransportNetworkTableSync::COL_CREATOR_ID("creator_id");
 	}
 
 	namespace db
@@ -59,6 +60,7 @@ namespace synthese
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(TransportNetworkTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -74,8 +76,10 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			std::string name (rows->getText (TransportNetworkTableSync::COL_NAME));
+			std::string creatorId(rows->getText (TransportNetworkTableSync::COL_CREATOR_ID));
 
 			object->setName(name);
+			object->setCreatorId(creatorId);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Save(TransportNetwork* object)
@@ -88,6 +92,7 @@ namespace synthese
 				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getName())
+				<< "," << Conversion::ToSQLiteString(object->getCreatorId())
 				<< ")";
 			
 			DBModule::GetSQLite()->execUpdate(query.str());
@@ -110,11 +115,12 @@ namespace synthese
 	    
 	    void TransportNetworkTableSync::Search(
 			Env& env,
-			string name
-			, int first /*= 0*/
-			, int number /*= 0*/
-			, bool orderByName
-			, bool raisingOrder,
+			string name,
+			string creatorId,
+			int first, /*= 0*/
+			int number, /*= 0*/
+			bool orderByName,
+			bool raisingOrder,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -123,7 +129,9 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (!name.empty())
-				query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(name);
+			if (!creatorId.empty())
+				query << " AND " << COL_CREATOR_ID << " LIKE " << Conversion::ToSQLiteString(creatorId);
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)

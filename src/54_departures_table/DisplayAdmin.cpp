@@ -136,7 +136,12 @@ namespace synthese
 
 				if(_displayScreen->getLocalization() != NULL)
 				{
-					PhysicalStopTableSync::Search(_env, _displayScreen->getLocalization()->getKey(), 0, 0, UP_LINKS_LOAD_LEVEL);
+					PhysicalStopTableSync::Search(
+						_env,
+						_displayScreen->getLocalization()->getKey(),
+						string("%"),
+						0, 0, UP_LINKS_LOAD_LEVEL
+					);
 					
 					BOOST_FOREACH(
 						const PhysicalStops::value_type& it,

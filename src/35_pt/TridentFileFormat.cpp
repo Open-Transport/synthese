@@ -40,6 +40,7 @@
 #include "LineStop.h"
 #include "LineStopTableSync.h"
 #include "TransportNetwork.h"
+#include "TransportNetworkTableSync.h"
 #include "City.h"
 #include "Service.h"
 #include "RollingStock.h"
@@ -58,6 +59,7 @@
 
 // 01 Util
 #include "Conversion.h"
+#include "XmlToolkit.h"
 
 // Std
 #include <iomanip>
@@ -79,6 +81,7 @@ namespace synthese
 	using namespace geometry;
 	using namespace time;
 	using namespace env;
+	using namespace util::XmlToolkit;
 	using namespace util;
 	using namespace graph;
 	using namespace impex;
@@ -919,17 +922,91 @@ namespace synthese
 
 
 
-		void TridentFileFormat::_preImport()
-		{
-		}
-		
 		void TridentFileFormat::_parse(
-			const std::string& text
+			const std::string& text,
+			std::ostream& os
 		){
+			XMLNode allNode = XMLNode::parseString (text.c_str (), "ChouettePTNetwork");
+			
+			// Network
+			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
+			XMLNode networkIdNode = networkNode.getChildNode("objectId", 0);
+			string key(networkIdNode.getText());
+			
+			
+			shared_ptr<TransportNetwork> network;
+			Env nenv;
+			TransportNetworkTableSync::Search(nenv, string(), key);
+			if(!nenv.getRegistry<TransportNetwork>().empty())
+			{
+				if(!nenv.getRegistry<TransportNetwork>().size() > 1)
+				{
+					os << "WARN : more than one network with key " << key << "<br />";
+				}
+				network = TransportNetworkTableSync::GetEditable(
+					nenv.getEditableRegistry<TransportNetwork>().front()->getKey(),
+					*_env
+				);
+			}
+			else
+			{
+				network.reset(new TransportNetwork);
+				XMLNode networkNameNode = networkNode.getChildNode("name", 0);
+				network->setName(networkNameNode.getText());
+				network->setCreatorId(key);
+				network->setKey(TransportNetworkTableSync::getId());
+				_env->getEditableRegistry<TransportNetwork>().add(network);
+			}
+			
+			// Stops
+			map<string, PhysicalStop*> stops;
+			XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
+			int stopsNumber(chouetteAreaNode.nChildNode("StopArea"));
+			bool failure(false);
+			for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
+			{
+				XMLNode stopAreaNode(chouetteAreaNode.getChildNode("StopArea", stopRank));
+				XMLNode extensionNode(stopAreaNode.getChildNode("StopAreaExtension", 0));
+				XMLNode areaTypeNode(extensionNode.getChildNode("areaType",0));
+				if(string(areaTypeNode.getText()) != string("BoardingPosition")) continue;
+				
+				XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
+				XMLNode nameNode(stopAreaNode.getChildNode("name", 0));
+				string stopKey(keyNode.getText());
+			
+				Env nenv;
+				PhysicalStopTableSync::Search(nenv, UNKNOWN_VALUE, key);
+				if(nenv.getRegistry<PhysicalStop>().empty())
+				{
+					os << "ERR  : stop not found " << stopKey << " (" << nameNode.getText() << ")<br />";
+					failure = true;
+					continue;
+				}
+				
+				if(!nenv.getRegistry<PhysicalStop>().size() > 1)
+				{
+					os << "WARN : more than one stop with key" << key << "<br />";
+				}
+				PhysicalStopTableSync::GetEditable(
+					nenv.getEditableRegistry<PhysicalStop>().front()->getKey(),
+					*_env
+				);
+			}
+			if(failure) return;
+			
+			// Commercial lines
+			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
+			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
+			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
+			
 		}
 		
-		void TridentFileFormat::_postImport()
+		void TridentFileFormat::save(std::ostream& os) const
 		{
+			BOOST_FOREACH(shared_ptr<TransportNetwork> network, _env->getRegistry<TransportNetwork>())
+			{
+				TransportNetworkTableSync::Save(network.get());
+			}
 		}
 
 

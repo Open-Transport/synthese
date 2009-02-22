@@ -55,6 +55,7 @@ namespace synthese
 			static const std::string COL_STYLE;
 			static const std::string COL_IMAGE;
 			static const std::string COL_OPTIONAL_RESERVATION_PLACES;
+			static const std::string COL_CREATOR_ID;
 
 			CommercialLineTableSync();
 
@@ -74,7 +75,8 @@ namespace synthese
 			static void Search(
 				util::Env& env,
 				uid networkId = UNKNOWN_VALUE
-				, std::string name = "%"
+				, std::string name = "%",
+				std::string creatorId = "%"
 				, int first = 0
 				, int number = 0
 				, bool orderByNetwork = true

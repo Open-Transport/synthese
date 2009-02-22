@@ -55,13 +55,11 @@ namespace synthese
 		
 		protected:
 				
-			virtual void _preImport();
 			
 			virtual void _parse(
-				const std::string& text
+				const std::string& text,
+				std::ostream& os
 			);
-			
-			virtual void _postImport();
 
 	
 		
@@ -77,6 +75,8 @@ namespace synthese
 			/** -> ChouettePTNetwork
 			 */
 			virtual void build(std::ostream& os);
+			
+			virtual void save(std::ostream& os) const;
 
 		private:
 		    

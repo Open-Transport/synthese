@@ -69,6 +69,8 @@ namespace synthese
 			const ReservationContact*	_handicappedReservationContact;	//!< Handicapped user dedicated Reservation contact
 
 			PlacesSet	_optionalReservationPlaces;
+			
+			std::string _creatorId;
 
 		public:
 			CommercialLine(util::RegistryKeyType key = UNKNOWN_VALUE);
@@ -85,6 +87,8 @@ namespace synthese
 				const ReservationContact* getGeneralReservationContact() const;
 				const ReservationContact* getBikeReservationContact() const;
 				const ReservationContact* getHandicappedReservationContact() const;
+				const std::string& getCreatorId() const;
+				const PlacesSet& getOptionalReservationPlaces() const;
 			//@}
 			
 			//! @name Setters
@@ -99,6 +103,7 @@ namespace synthese
 				void setGeneralReservationContact(const ReservationContact* value);
 				void setBikeReservationContact(const ReservationContact* value);
 				void setHandicappedReservationContact(const ReservationContact* value);
+				void setCreatorId(const std::string& value);
 			//@}
 
 			//! @name Queries

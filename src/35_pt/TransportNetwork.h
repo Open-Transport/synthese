@@ -46,6 +46,7 @@ namespace synthese
 
 		protected:
 			std::string _name;
+			std::string _creatorId;
 
 		 public:
 
@@ -58,7 +59,10 @@ namespace synthese
 			//! @name Getters/Setters
 			//@{
 				const std::string& getName () const;
+				const std::string& getCreatorId() const;
+				
 				void setName( const std::string& name);
+				void setCreatorId( const std::string& value);
 			//@}
 		};
 	}
