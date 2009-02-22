@@ -81,13 +81,13 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				uid commercialLineId = UNKNOWN_VALUE
+				uid commercialLineId = UNKNOWN_VALUE,
+				uid dataSourceId = UNKNOWN_VALUE
 				, int first = 0
 				, int number = 0
 				, bool orderByName = true
 				, bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
-				uid dataSourceId = UNKNOWN_VALUE
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};
 	}

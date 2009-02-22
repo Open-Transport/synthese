@@ -219,13 +219,13 @@ namespace synthese
 
 		void LineTableSync::Search(
 			Env& env,
-			uid commercialLineId
+			uid commercialLineId,
+			uid dataSourceId
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByName
 			, bool raisingOrder,
-			LinkLevel linkLevel,
-			uid dataSourceId
+			LinkLevel linkLevel
 		){
 			stringstream query;
 			query

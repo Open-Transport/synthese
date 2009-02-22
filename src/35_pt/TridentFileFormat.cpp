@@ -21,9 +21,11 @@
 */
 
 // 36 Impex
+#include "DataSource.h"
+
+// 35 PT
 #include "TridentFileFormat.h"
 
-// 35 Env
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
@@ -165,6 +167,7 @@ namespace synthese
 			LineTableSync::Search(
 				*_env,
 				_commercialLine->getKey(),
+				UNKNOWN_VALUE,
 				0, 0, true, true, UP_LINKS_LOAD_LEVEL
 			);
 			NonConcurrencyRuleTableSync::Search(
@@ -945,19 +948,77 @@ namespace synthese
 				}
 				network = TransportNetworkTableSync::GetEditable(
 					nenv.getEditableRegistry<TransportNetwork>().front()->getKey(),
-					*_env
+					*_env,
+					UP_LINKS_LOAD_LEVEL
 				);
+				
+				os << "LOAD : use of existing network " << network->getKey() << " (" << network->getName() << ")<br />";
 			}
 			else
 			{
-				network.reset(new TransportNetwork);
 				XMLNode networkNameNode = networkNode.getChildNode("name", 0);
+				os << "CREA : Creation of the network with key " << key << " (" << networkNameNode.getText() <<  ")<br />";
+
+				network.reset(new TransportNetwork);
 				network->setName(networkNameNode.getText());
 				network->setCreatorId(key);
 				network->setKey(TransportNetworkTableSync::getId());
 				_env->getEditableRegistry<TransportNetwork>().add(network);
 			}
 			
+						// Commercial lines
+			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
+			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
+			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
+			
+			string ckey(networkIdNode.getText());
+			
+			shared_ptr<CommercialLine> cline;
+			Env cenv;
+			CommercialLineTableSync::Search(cenv, network->getKey(), string("%"), ckey);
+			if(!cenv.getRegistry<CommercialLine>().empty())
+			{
+				if(!cenv.getRegistry<CommercialLine>().size() > 1)
+				{
+					os << "WARN : more than one commercial line with key " << key << "<br />";
+				}
+				cline = CommercialLineTableSync::GetEditable(
+					cenv.getEditableRegistry<CommercialLine>().front()->getKey(),
+					*_env,
+					UP_LINKS_LOAD_LEVEL
+				);
+				
+				os << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
+
+			}
+			else
+			{
+				cline.reset(new CommercialLine);
+				XMLNode clineNameNode = lineNode.getChildNode("name", 0);
+				XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
+				
+				os << "CREA : Creation of the commercial line with key " << ckey << " (" << clineNameNode.getText() <<  ")<br />";
+				
+				cline->setNetwork(network.get());
+				cline->setName(clineNameNode.getText());
+				cline->setCreatorId(ckey);
+				cline->setShortName(clineShortNameNode.getText());
+				cline->setKey(CommercialLineTableSync::getId());
+				_env->getEditableRegistry<CommercialLine>().add(cline);
+			}
+			
+			// Transport mode
+			RegistryKeyType rollingStockId(UNKNOWN_VALUE);
+			XMLNode rollingStockNode = lineNode.getChildNode("transportModeName");
+			if(lineNode.getText() == "RapidTransit") rollingStockId = 13792273858822590LL;
+			else if(lineNode.getText() == "LocalTrain") rollingStockId = 13792273858822159LL;
+			else if(lineNode.getText() == "LongDistanceTrain") rollingStockId = 13792273858822160LL;
+			else if(lineNode.getText() == "Coach") rollingStockId = 13792273858822584LL;
+			else if(lineNode.getText() == "Bus") rollingStockId = 13792273858822585LL;
+			else if(lineNode.getText() == "Metro") rollingStockId = 13792273858822586LL;
+			else if(lineNode.getText() == "Train") rollingStockId = 13792273858822587LL;
+			else if(lineNode.getText() == "Tramway") rollingStockId = 13792273858822588LL;
+
 			// Stops
 			map<string, PhysicalStop*> stops;
 			XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
@@ -975,7 +1036,7 @@ namespace synthese
 				string stopKey(keyNode.getText());
 			
 				Env nenv;
-				PhysicalStopTableSync::Search(nenv, UNKNOWN_VALUE, key);
+				PhysicalStopTableSync::Search(nenv, UNKNOWN_VALUE, stopKey);
 				if(nenv.getRegistry<PhysicalStop>().empty())
 				{
 					os << "ERR  : stop not found " << stopKey << " (" << nameNode.getText() << ")<br />";
@@ -985,20 +1046,202 @@ namespace synthese
 				
 				if(!nenv.getRegistry<PhysicalStop>().size() > 1)
 				{
-					os << "WARN : more than one stop with key" << key << "<br />";
+					os << "WARN : more than one stop with key" << stopKey << "<br />";
 				}
-				PhysicalStopTableSync::GetEditable(
-					nenv.getEditableRegistry<PhysicalStop>().front()->getKey(),
-					*_env
+				
+				RegistryKeyType stopId(nenv.getEditableRegistry<PhysicalStop>().front()->getKey());
+				stops[stopKey] = PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL).get();
+				
+				os << "LOAD : link between stops " << stopKey << " (" << nameNode.getText() << ") and "
+					<< stops[stopKey]->getKey() << " (" << stops[stopKey]->getConnectionPlace()->getName() << ")<br />";
+				
+			}
+			
+		
+			if(failure)
+			{
+				os << "ERROR : At least a stop is missing : load interrupted<br />";
+				return;
+			}
+
+			// Line stops
+			int stopPointsNumber(chouetteLineDescriptionNode.nChildNode("StopPoint"));
+			map<string,PhysicalStop*> stopPoints;
+			for(int stopPointRank(0); stopPointRank < stopPointsNumber; ++stopPointRank)
+			{
+				XMLNode stopPointNode(chouetteLineDescriptionNode.getChildNode("StopPoint", stopPointRank));
+				XMLNode spKeyNode(stopPointNode.getChildNode("objectId"));
+				XMLNode containedNode(stopPointNode.getChildNode("containedIn"));
+				stopPoints[spKeyNode.getText()] = stops[containedNode.getText()];
+			}
+			
+			// Load of existing routes
+			LineTableSync::Search(*_env, cline->getKey(), _dataSource->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+			BOOST_FOREACH(shared_ptr<Line> line, _env->getRegistry<Line>())
+			{
+				LineStopTableSync::Search(*_env, line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				ScheduledServiceTableSync::Search(*_env, line->getKey());
+			}
+			
+			// Chouette routes
+			map<string,string> routeNames;
+			map<string,bool> routeWaybacks;
+			int croutesNumber(chouetteLineDescriptionNode.nChildNode("ChouetteRoute"));
+			for(int crouteRank(0); crouteRank < croutesNumber; ++crouteRank)
+			{
+				XMLNode routeNode(chouetteLineDescriptionNode.getChildNode("ChouetteRoute",crouteRank));
+				XMLNode crouteKeyNode(routeNode.getChildNode("objectId"));
+				XMLNode extNode(routeNode.getChildNode("RouteExtension"));
+				XMLNode waybackNode(extNode.getChildNode("wayBack"));
+				XMLNode nameNode(routeNode.getChildNode("name"));
+				routeNames[crouteKeyNode.getText()] = nameNode.getText();
+				routeWaybacks[crouteKeyNode.getText()] = (
+					waybackNode.getText() == "R" ||
+					waybackNode.getText() == "1"
 				);
 			}
-			if(failure) return;
 			
-			// Commercial lines
-			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
-			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
-			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
 			
+			// Routes
+			map<string,Line*> routes;
+			int routesNumber(chouetteLineDescriptionNode.nChildNode("JourneyPattern"));
+			for(int routeRank(0); routeRank < routesNumber; ++routeRank)
+			{
+				XMLNode routeNode(chouetteLineDescriptionNode.getChildNode("JourneyPattern",routeRank));
+				XMLNode jpKeyNode(routeNode.getChildNode("objectId"));
+				XMLNode routeIdNode(routeNode.getChildNode("routeId"));
+				
+				// Reading stops list
+				vector<PhysicalStop*> routeStops;
+				int lineStopsNumber(routeNode.nChildNode("stopPointList"));
+				for(int lineStopRank(0); lineStopRank < lineStopsNumber; ++lineStopRank)
+				{
+					XMLNode lineStopNode(routeNode.getChildNode("stopPointList", lineStopRank));
+					routeStops.push_back(stopPoints[lineStopNode.getText()]);
+				}
+				
+				// Attempting to find an existing route
+				shared_ptr<Line> route;
+				BOOST_FOREACH(shared_ptr<Line> line, _env->getRegistry<Line>())
+				{
+					if(*line == routeStops)
+					{
+						route = line;
+						continue;
+					}
+				}
+				
+				// Create a new route if necessary
+				if(!route.get())
+				{
+					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] <<  "<br />";
+					route.reset(new Line);
+					route->setCommercialLine(cline.get());
+					route->setName(routeNames[routeIdNode.getText()]);
+					route->setWayBack(routeWaybacks[routeIdNode.getText()]);
+					route->setDataSource(_dataSource);
+					route->setKey(LineTableSync::getId());
+					_env->getEditableRegistry<Line>().add(route);
+					
+					int rank(0);
+					BOOST_FOREACH(PhysicalStop* stop, routeStops)
+					{
+						shared_ptr<LineStop> ls(new LineStop);
+						ls->setPhysicalStop(stop);
+						ls->setRankInPath(rank);
+						ls->setIsArrival(rank > 0);
+						ls->setIsDeparture(rank < routeStops.size() - 1);
+						ls->setLine(route.get());
+						ls->setMetricOffset(0);
+						ls->setKey(LineStopTableSync::getId());
+						route->addEdge(ls.get());
+						_env->getEditableRegistry<LineStop>().add(ls);
+						
+						++rank;
+					}
+				}
+				
+				// Link with the route
+				routes[jpKeyNode.getText()] = route.get();
+			}
+			
+			// Services
+			map<string, ScheduledService*> services;
+			int servicesNumber(chouetteLineDescriptionNode.nChildNode("VehicleJourney"));
+			for(int serviceRank(0); serviceRank < servicesNumber; ++serviceRank)
+			{
+				XMLNode serviceNode(chouetteLineDescriptionNode.getChildNode("VehicleJourney",serviceRank));
+				XMLNode keyNode(serviceNode.getChildNode("objectId"));
+				XMLNode jpKeyNode(serviceNode.getChildNode("journeyPatternId"));
+				XMLNode numberNode(serviceNode.getChildNode("publishedJourneyName"));
+				
+				// Creation of the service
+				Line* line(routes[jpKeyNode.getText()]);
+				shared_ptr<ScheduledService> service(new ScheduledService);
+				service->setPath(line);
+				service->setServiceNumber(numberNode.getText());
+				ScheduledService::Schedules deps;
+				ScheduledService::Schedules arrs;
+				int stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
+				Schedule lastDep(Hour(0,0,0),0);
+				Schedule lastArr(Hour(0,0,0),0);
+				for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
+				{
+					XMLNode vjsNode(serviceNode.getChildNode("VehicleJourneyAtStop", stopRank));
+					XMLNode depNode(vjsNode.getChildNode("departureTime"));
+					XMLNode arrNode(vjsNode.getChildNode("arrivalTime"));
+					Hour depHour(Hour::FromSQLTime(depNode.getText()));
+					Hour arrHour(Hour::FromSQLTime(arrNode.getText()));
+					Schedule depSchedule(depHour, lastDep.getDaysSinceDeparture() + (depHour < lastDep.getHour() ? 1 : 0));
+					Schedule arrSchedule(arrHour, lastArr.getDaysSinceDeparture() + (arrHour < lastArr.getHour() ? 1 : 0));
+					lastDep = depSchedule;
+					lastArr = arrSchedule;
+					deps.push_back(depSchedule);
+					arrs.push_back(arrSchedule);
+				}
+				service->setDepartureSchedules(deps);
+				service->setArrivalSchedules(arrs);
+				
+				// Search for a corresponding service
+				ScheduledService* existingService(NULL);
+				BOOST_FOREACH(Service* tservice, line->getServices())
+				{
+					ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
+					
+					if(!curService) continue;
+					
+					if (*curService == *service)
+					{
+						existingService = curService;
+						break;
+					}
+				}
+				
+				// If not found creation
+				if(!existingService)
+				{
+					service->setKey(ScheduledServiceTableSync::getId());
+					line->addService(service.get(), false);
+					_env->getEditableRegistry<ScheduledService>().add(service);
+					services[keyNode.getText()] = service.get();
+					
+					os << "CREA : Creation of service " << service->getServiceNumber() << " for " << keyNode.getText() << " (" << deps[0].toString() << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
+				}
+				else
+				{
+					services[keyNode.getText()] = existingService;
+					
+					os << "LOAD : Use of service " << existingService->getKey() << " (" << existingService->getServiceNumber() << ") for " << keyNode.getText() << " (" << deps[0].toString() << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
+
+				}
+			}
+			
+			// Calendars
+			int calendarNumber(allNode.nChildNode("Timetable"));
+			for(int calendarRank(0); calendarRank < calendarNumber; ++calendarRank)
+			{
+				XMLNode calendarNode(allNode.getChildNode("Timetable", calendarRank));
+			}
 		}
 		
 		void TridentFileFormat::save(std::ostream& os) const
@@ -1006,6 +1249,18 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<TransportNetwork> network, _env->getRegistry<TransportNetwork>())
 			{
 				TransportNetworkTableSync::Save(network.get());
+			}
+			BOOST_FOREACH(shared_ptr<CommercialLine> cline, _env->getRegistry<CommercialLine>())
+			{
+				CommercialLineTableSync::Save(cline.get());
+			}
+			BOOST_FOREACH(shared_ptr<Line> line, _env->getRegistry<Line>())
+			{
+				LineTableSync::Save(line.get());
+			}
+			BOOST_FOREACH(shared_ptr<LineStop> lineStop, _env->getRegistry<LineStop>())
+			{
+				LineStopTableSync::Save(lineStop.get());
 			}
 		}
 

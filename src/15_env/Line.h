@@ -196,6 +196,13 @@ namespace synthese
 					@date 2008					
 				*/
 				bool respectsLineTheory(const graph::Service& service) const;
+
+				/** Content comparison operator.
+					@param stops Array of physical stops
+					@return true if the line serves exactly the stops in the same order.
+					@warning There is no test on the departure/arrival attributes
+				*/
+				bool operator==(const std::vector<PhysicalStop*> stops) const;
 			//@}
 		    
 		};

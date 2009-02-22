@@ -65,6 +65,8 @@ namespace synthese
 			//! @name Getters
 			//@{
 				virtual std::string getTeam() const;
+				const Schedules& getDepartureSchedules() const;
+				const Schedules& getArrivalSchedules() const;
 			//@}
 
 			//! @name Setters
@@ -125,10 +127,11 @@ namespace synthese
 				virtual time::Schedule getArrivalBeginScheduleToIndex(int rankInPath) const;
 				virtual time::Schedule getArrivalEndScheduleToIndex(int rankInPath) const;
 
-				
 			//@}
 
 		};
+	
+		bool operator==(const ScheduledService& first, const ScheduledService& second);
 	}
 }
 

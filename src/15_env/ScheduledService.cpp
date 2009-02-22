@@ -71,6 +71,17 @@ namespace synthese
 		}
 
 
+		bool operator==(const ScheduledService& first, const ScheduledService& second)
+		{
+			return
+				first.getPath() == second.getPath() &&
+				first.getServiceNumber() == second.getServiceNumber() &&
+				first.getDepartureSchedules() == second.getDepartureSchedules() &&
+				first.getArrivalSchedules() == second.getArrivalSchedules()
+			;
+		};
+
+
 
 		ServicePointer ScheduledService::getFromPresenceTime(
 			AccessDirection method,
@@ -202,5 +213,15 @@ namespace synthese
 		{
 			return _team;
 		}
+		
+		const ScheduledService::Schedules& ScheduledService::getDepartureSchedules() const
+		{
+			return _departureSchedules;
+		}
+		const ScheduledService::Schedules& ScheduledService::getArrivalSchedules() const
+		{
+			return _arrivalSchedules;
+		}
+
 	}
 }

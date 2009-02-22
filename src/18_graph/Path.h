@@ -101,9 +101,9 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const ServiceSet&			getServices()	const;
-				const std::vector<Edge*>&	getEdges()		const;
-				bool						getAllDays()	const;
+				const ServiceSet&	getServices()	const;
+				const Edges&		getEdges()		const;
+				bool				getAllDays()	const;
 			//@}
 
 			//! @name Query methods.

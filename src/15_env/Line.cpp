@@ -29,6 +29,8 @@
 #include "CommercialLine.h"
 #include "SubLine.h"
 
+#include <boost/foreach.hpp>
+
 namespace synthese
 {
 	using namespace graph;
@@ -327,6 +329,22 @@ namespace synthese
 		void Line::setWayBack( boost::logic::tribool value )
 		{
 			_wayBack = value;
+		}
+		
+		
+		
+		bool Line::operator==(const std::vector<PhysicalStop*> stops) const
+		{
+			if(getEdges().size() != stops.size()) return false;
+			
+			size_t rank(0);
+			BOOST_FOREACH(const Edge* edge, getEdges())
+			{
+				if(static_cast<const LineStop*>(edge)->getFromVertex() != stops[rank]) return false;
+				++rank;
+			}
+			
+			return true;
 		}
 	}
 }
