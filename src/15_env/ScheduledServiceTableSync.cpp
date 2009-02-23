@@ -55,6 +55,7 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace graph;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ScheduledServiceTableSync>::FACTORY_KEY("15.60.03 Scheduled services");
 
@@ -186,11 +187,11 @@ namespace synthese
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				);
 			}
-			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+/*			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
 				ServiceDateTableSync::SetActiveDates(*ss);
 			}
-		}
+*/		}
 
 
 
@@ -203,7 +204,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(ScheduledService* object)
 		{
 			stringstream query;
-			if (object->getKey() == UNKNOWN_VALUE)
+			if (object->getKey() <= 0)
 				object->setKey(getId());
 			
 			 query

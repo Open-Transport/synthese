@@ -38,13 +38,9 @@ namespace synthese
 		class Registrable;
 	}
 	
-	namespace env
-	{
-		class ServiceDate;
-	}
-
 	namespace pt
 	{
+		class ServiceDate;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Trident/Chouette file format.
@@ -59,7 +55,7 @@ namespace synthese
 		private:
 			util::RegistryKeyType	_commercialLineId;
 			const bool				_withTisseoExtension;
-			std::vector<boost::shared_ptr<env::ServiceDate> > _serviceDates;
+			std::vector<boost::shared_ptr<pt::ServiceDate> > _serviceDates;
 		
 		protected:
 				

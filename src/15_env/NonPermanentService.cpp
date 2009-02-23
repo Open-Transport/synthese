@@ -53,7 +53,7 @@ namespace synthese
 		}
 
 
-		
+
 		void NonPermanentService::setInactive(
 			const Date& date
 		){

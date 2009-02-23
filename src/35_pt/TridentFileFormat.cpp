@@ -22,7 +22,8 @@
 
 // 36 Impex
 #include "DataSource.h"
-
+#include "SQLite.h"
+#include "DBModule.h"
 // 35 PT
 #include "TridentFileFormat.h"
 
@@ -89,6 +90,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace impex;
+	using namespace db;
 
 	namespace util
 	{
@@ -952,7 +954,7 @@ namespace synthese
 			TransportNetworkTableSync::Search(nenv, string(), key);
 			if(!nenv.getRegistry<TransportNetwork>().empty())
 			{
-				if(!nenv.getRegistry<TransportNetwork>().size() > 1)
+				if(nenv.getRegistry<TransportNetwork>().size() > 1)
 				{
 					os << "WARN : more than one network with key " << key << "<br />";
 				}
@@ -986,9 +988,9 @@ namespace synthese
 			CommercialLineTableSync::Search(cenv, network->getKey(), string("%"), ckey);
 			if(!cenv.getRegistry<CommercialLine>().empty())
 			{
-				if(!cenv.getRegistry<CommercialLine>().size() > 1)
+				if(cenv.getRegistry<CommercialLine>().size() > 1)
 				{
-					os << "WARN : more than one commercial line with key " << key << "<br />";
+					os << "WARN : more than one commercial line with key " << ckey << "<br />";
 				}
 				cline = CommercialLineTableSync::GetEditable(
 					cenv.getEditableRegistry<CommercialLine>().front()->getKey(),
@@ -1017,14 +1019,14 @@ namespace synthese
 			// Transport mode
 			RegistryKeyType rollingStockId(UNKNOWN_VALUE);
 			XMLNode rollingStockNode = lineNode.getChildNode("transportModeName");
-			if(lineNode.getText() == "RapidTransit") rollingStockId = 13792273858822590LL;
-			else if(lineNode.getText() == "LocalTrain") rollingStockId = 13792273858822159LL;
-			else if(lineNode.getText() == "LongDistanceTrain") rollingStockId = 13792273858822160LL;
-			else if(lineNode.getText() == "Coach") rollingStockId = 13792273858822584LL;
-			else if(lineNode.getText() == "Bus") rollingStockId = 13792273858822585LL;
-			else if(lineNode.getText() == "Metro") rollingStockId = 13792273858822586LL;
-			else if(lineNode.getText() == "Train") rollingStockId = 13792273858822587LL;
-			else if(lineNode.getText() == "Tramway") rollingStockId = 13792273858822588LL;
+			if(rollingStockNode.getText() == "RapidTransit") rollingStockId = 13792273858822590LL;
+			else if(rollingStockNode.getText() == "LocalTrain") rollingStockId = 13792273858822159LL;
+			else if(rollingStockNode.getText() == "LongDistanceTrain") rollingStockId = 13792273858822160LL;
+			else if(rollingStockNode.getText() == "Coach") rollingStockId = 13792273858822584LL;
+			else if(rollingStockNode.getText() == "Bus") rollingStockId = 13792273858822585LL;
+			else if(rollingStockNode.getText() == "Metro") rollingStockId = 13792273858822586LL;
+			else if(rollingStockNode.getText() == "Train") rollingStockId = 13792273858822587LL;
+			else if(rollingStockNode.getText() == "Tramway") rollingStockId = 13792273858822588LL;
 
 			// Stops
 			map<string, PhysicalStop*> stops;
@@ -1051,7 +1053,7 @@ namespace synthese
 					continue;
 				}
 				
-				if(!nenv.getRegistry<PhysicalStop>().size() > 1)
+				if(nenv.getRegistry<PhysicalStop>().size() > 1)
 				{
 					os << "WARN : more than one stop with key" << stopKey << "<br />";
 				}
@@ -1141,7 +1143,7 @@ namespace synthese
 				// Create a new route if necessary
 				if(!route.get())
 				{
-					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] <<  "<br />";
+					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << routeNode.getText() << "<br />";
 					route.reset(new Line);
 					route->setCommercialLine(cline.get());
 					route->setName(routeNames[routeIdNode.getText()]);
@@ -1166,6 +1168,11 @@ namespace synthese
 						
 						++rank;
 					}
+				}
+				else
+				{
+					os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ") for " << routeNode.getText() << " (" << routeNames[routeIdNode.getText()] << ")<br />";
+
 				}
 				
 				// Link with the route
@@ -1262,9 +1269,9 @@ namespace synthese
 					{
 						XMLNode serviceNode(calendarNode.getChildNode("vehicleJourneyId", serviceRank));
 						shared_ptr<ServiceDate> sd(new ServiceDate);
-						sd->service = services[serviceNode.getText()];
-						sd->date = date;
-						sd->key = ServiceDateTableSync::getId();
+						sd->setService(services[serviceNode.getText()]);
+						sd->setDate(date);
+						sd->setKey(ServiceDateTableSync::getId());
 						_serviceDates.push_back(sd);
 					}
 				}
@@ -1275,6 +1282,8 @@ namespace synthese
 		
 		void TridentFileFormat::save(std::ostream& os) const
 		{
+			DBModule::GetSQLite()->execUpdate("BEGIN TRANSACTION;");
+
 			// Saving of each created or altered objects
 			BOOST_FOREACH(shared_ptr<TransportNetwork> network, _env->getRegistry<TransportNetwork>())
 			{
@@ -1303,7 +1312,9 @@ namespace synthese
 			}
 			
 			//TODO cleaning : delete services without dates and routes without service
-			
+						
+			DBModule::GetSQLite()->execUpdate("COMMIT;");
+
 			os << "<b>SUCCESS : Data saved.</b><br />";
 		}
 

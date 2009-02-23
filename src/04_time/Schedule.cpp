@@ -227,11 +227,11 @@ namespace synthese
 				os << "'"; 
 
 			os << std::setw( 2 ) << std::setfill ( '0' )
-				<< (_daysSinceDeparture * 24 + _hour.getHours()) << ":"
+				<< _daysSinceDeparture << ":"
 				<< std::setw( 2 ) << std::setfill ( '0' )
-				<< _hour.getMinutes() << ":"
+				<< _hour.getHours() << ":"
 				<< std::setw( 2 ) << std::setfill ( '0' )
-				<< _hour.getSeconds()
+				<< _hour.getMinutes()
 				;
 
 			if (withApostrophes)

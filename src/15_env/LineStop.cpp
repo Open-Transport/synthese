@@ -133,10 +133,13 @@ namespace synthese
 			_fromVertex = static_cast<const Vertex*>(stop);
 
 			// Links from stop to the linestop
-			if (isArrival())
-				stop->addArrivalEdge((Edge*) this);
-			if (isDeparture())
-				stop->addDepartureEdge((Edge*) this);
+			if(stop)
+			{
+				if (isArrival())
+					stop->addArrivalEdge((Edge*) this);
+				if (isDeparture())
+					stop->addDepartureEdge((Edge*) this);
+			}
 		}
 
 		void LineStop::setScheduleInput( bool value )

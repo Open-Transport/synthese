@@ -47,7 +47,7 @@ namespace synthese
 		Hour::Hour ( int hours, int minutes, int seconds )
 				: _hours (UNKNOWN_VALUE)
 				, _minutes (UNKNOWN_VALUE)
-				, _seconds(UNKNOWN_VALUE)
+				, _seconds(0)
 		{
 			time_t rawtime;
 			struct tm * timeinfo = 0;
@@ -82,7 +82,7 @@ namespace synthese
 				_minutes = 0;
 			else if ( _minutes == TIME_UNKNOWN || minutes == TIME_SAME && hours == TIME_UNKNOWN )
 				_minutes = UNKNOWN_VALUE;
-			else if ( minutes != TIME_UNCHANGED && ( minutes != TIME_SAME || hours != TIME_UNCHANGED ) )
+			else if ( minutes != TIME_UNCHANGED && minutes != TIME_SAME)
 				_minutes = minutes;
 
 			if ( seconds == TIME_CURRENT || seconds == TIME_SAME && hours == TIME_CURRENT )
@@ -93,7 +93,7 @@ namespace synthese
 				_seconds = 0;
 			else if ( _seconds == TIME_UNKNOWN || seconds == TIME_SAME && hours == TIME_UNKNOWN )
 				_seconds = UNKNOWN_VALUE;
-			else if ( seconds != TIME_UNCHANGED && ( seconds != TIME_SAME || hours != TIME_UNCHANGED ) )
+			else if ( seconds != TIME_UNCHANGED && seconds != TIME_SAME)
 				_seconds = seconds;
 		}
 

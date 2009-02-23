@@ -38,8 +38,6 @@ synthese::env::RoadChunkTableSync::integrate();
 synthese::env::ContinuousServiceTableSync::integrate();
 synthese::env::ScheduledServiceTableSync::integrate();
 
-synthese::env::ServiceDateTableSync::integrate();
-
 synthese::env::TransportNetworkAdmin::integrate();
 synthese::env::CommercialLineAdmin::integrate();
 synthese::env::LineAdmin::integrate();

@@ -160,7 +160,7 @@ namespace synthese
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
+			if (object->getKey() <= 0)
 				object->setKey(getId());
 			query
 				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
