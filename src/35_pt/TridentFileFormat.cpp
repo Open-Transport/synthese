@@ -1143,7 +1143,7 @@ namespace synthese
 				// Create a new route if necessary
 				if(!route.get())
 				{
-					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << routeNode.getText() << "<br />";
+					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << routeIdNode.getText() << "<br />";
 					route.reset(new Line);
 					route->setCommercialLine(cline.get());
 					route->setName(routeNames[routeIdNode.getText()]);
@@ -1171,7 +1171,7 @@ namespace synthese
 				}
 				else
 				{
-					os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ") for " << routeNode.getText() << " (" << routeNames[routeIdNode.getText()] << ")<br />";
+					os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ") for " << routeIdNode.getText() << " (" << routeNames[routeIdNode.getText()] << ")<br />";
 
 				}
 				
