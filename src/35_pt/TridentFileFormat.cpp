@@ -981,7 +981,7 @@ namespace synthese
 			// Commercial lines
 			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
 			
-			string ckey(networkIdNode.getText());
+			string ckey(lineKeyNode.getText());
 			
 			shared_ptr<CommercialLine> cline;
 			Env cenv;
@@ -1089,7 +1089,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<Line> line, _env->getRegistry<Line>())
 			{
 				LineStopTableSync::Search(*_env, line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ScheduledServiceTableSync::Search(*_env, line->getKey());
+				ScheduledServiceTableSync::Search(*_env, line->getKey(), UNKNOWN_VALUE, UNKNOWN_VALUE, Date(TIME_UNKNOWN), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 			}
 			
 			// Chouette routes

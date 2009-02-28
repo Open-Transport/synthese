@@ -238,8 +238,8 @@ namespace synthese
 				}
 				else
 				{
-					const PublicTransportStopZoneConnectionPlace* cp(
-						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(
+					const AddressablePlace* cp(
+						dynamic_cast<const AddressablePlace*>(
 							journey->getEndEdge()->getFromVertex()->getPlace()
 					)	);
 					cp->getImmediateVertices(

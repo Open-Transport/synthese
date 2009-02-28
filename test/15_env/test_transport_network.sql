@@ -1,5 +1,4 @@
 BEGIN TRANSACTION;
-DELETE FROM t004_axes;
 DELETE FROM t005_service_dates;
 DELETE FROM t006_cities;
 DELETE FROM t043_crossings;
@@ -14,9 +13,6 @@ DELETE FROM t016_scheduled_services;
 DELETE FROM t017_continuous_services;
 DELETE FROM t011_place_aliases;
 DELETE FROM t013_public_places;
-DELETE FROM t018_pedestrian_compliances;
-DELETE FROM t019_handicapped_compliances;
-DELETE FROM t020_bike_compliances;
 DELETE FROM t021_reservation_rules;
 DELETE FROM t047_online_reservation_rules;
 DELETE FROM t022_transport_networks;
@@ -28,11 +24,6 @@ COMMIT;
 VACUUM;
 
 BEGIN TRANSACTION;
-INSERT INTO t004_axes VALUES(1125899906844436,'Test axis 1, non free, allowed',0,1);
-INSERT INTO t004_axes VALUES(1125899906844499,'Test axis 2, non free, allowed',0,1);
-INSERT INTO t004_axes VALUES(1125899906844501,'Test axis 3, free, allowed',1,1);
-INSERT INTO t004_axes VALUES(1125899906844502,'Test axis 4, non free, non allowed',0,0);
-
 INSERT INTO t006_cities(id,name) VALUES(1688849860508968,'City68é');
 INSERT INTO t006_cities(id,name) VALUES(1688849860509006,'City6');
 INSERT INTO t006_cities(id,name) VALUES(1688849860509012,'City12ç');

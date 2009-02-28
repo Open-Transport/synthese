@@ -38,6 +38,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
+#include "ServiceDate.h"
 #include "ServiceDateTableSync.h"
 #include "Schedule.h"
 

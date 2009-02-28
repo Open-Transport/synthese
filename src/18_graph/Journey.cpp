@@ -440,7 +440,8 @@ namespace synthese
 				_score = _minSpeedToEnd;
 				if (_score < 100)
 					_score = 100;
-				_score /= getEndEdge()->getFromVertex()->getPlace()->getScore();
+				if (getEndEdge()->getFromVertex()->getPlace()->getScore())
+					_score /= getEndEdge()->getFromVertex()->getPlace()->getScore();
 			}
 		}
 

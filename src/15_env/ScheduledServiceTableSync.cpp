@@ -26,6 +26,7 @@
 #include "EnvModule.h"
 #include "LineTableSync.h"
 #include "CommercialLineTableSync.h"
+#include "ServiceDate.h"
 #include "ServiceDateTableSync.h"
 
 #include <sstream>
