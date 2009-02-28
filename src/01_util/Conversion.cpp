@@ -31,20 +31,17 @@
 #include <boost/tokenizer.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	namespace util
 	{
-
-
-
-		bool 
-		Conversion::ToBool (const std::string& s)
+		bool Conversion::ToBool (const std::string& s)
 		{
-			std::string str = boost::to_lower_copy (s);
-			boost::trim (str);
-			if ((str == "true") || (str == "yes") || (str == "1")) return true;
+			string str(to_lower_copy(s));
+			trim(str);
+			if((ToInt(str) > 0) || (str == "true") || (str == "yes")) return true;
 			return false;
 		}
 
@@ -56,7 +53,7 @@ namespace synthese
 		{
 			std::string str = boost::to_lower_copy (s);
 			boost::trim (str);
-			if ((str == "true") || (str == "yes") || (str == "1")) return true;
+			if ((str == "true") || (str == "yes") || (ToInt(str)>0)) return true;
 			if ((str == "false") || (str == "no") || (str == "0")) return false;
 			return boost::logic::indeterminate;
 		    
