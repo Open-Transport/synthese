@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_CityListRequest_H__
 #define SYNTHESE_CityListRequest_H__
 
-#include "36_places_list/FunctionWithSite.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "FunctionWithSite.h"
+#include "FactorableTemplate.h"
 
 #include <string>
 
@@ -50,12 +49,11 @@ namespace synthese
 			static const std::string PARAMETER_INPUT;
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_IS_FOR_ORIGIN;
-
+			
 		private:
 			std::string _input;
 			int _n;
 			bool _isForOrigin;
-			boost::shared_ptr<const env::City>					_city;
 			const PlacesListInterfacePage*	_page;
 
 		protected:

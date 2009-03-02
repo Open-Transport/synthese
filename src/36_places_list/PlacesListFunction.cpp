@@ -34,8 +34,9 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 
 #include "Interface.h"
-
 #include "Conversion.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -79,19 +80,21 @@ namespace synthese
 
 		void PlacesListFunction::_run( std::ostream& stream ) const
 		{
-			CityList cities(EnvModule::guessCity(_cityText, 1));
+			LexicalMatcher<const City*>::MatchResult cities(
+				_site->getCitiesMatcher().bestMatches(_cityText, 1)
+			);
 			if (cities.empty())
 			{
 				return;
 			}
-			shared_ptr<const City> city(cities.front());
+			const City* city(cities.front().value);
 
 			PlacesList placesList;
 			LexicalMatcher<const Place*>::MatchResult places(city->getAllPlacesMatcher().bestMatches(_input, _n));
 			
-			for(LexicalMatcher<const Place*>::MatchResult::const_iterator it(places.begin()); it != places.end(); ++it)
+			BOOST_FOREACH(LexicalMatcher<const Place*>::MatchHit it, places)
 			{
-				placesList.push_back(make_pair(it->value->getKey(), it->key));
+				placesList.push_back(make_pair(it.value->getKey(), it.key));
 			}
 
 			VariablesMap vm;

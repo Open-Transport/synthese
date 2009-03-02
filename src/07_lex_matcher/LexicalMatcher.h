@@ -64,8 +64,9 @@ namespace synthese
 				std::string key;
 				T value;
 			} MatchHit;
-		    
+			
 			typedef typename std::vector<MatchHit> MatchResult;
+			typedef std::map<std::string, T> Map;
 
 		 private:
 
@@ -102,7 +103,7 @@ namespace synthese
 
 
 
-			std::map<std::string, T> _map;
+			Map _map;
 			std::map<std::string, PreprocessedKey > _ppKeys;
 
 			bool _ignoreCase;
@@ -125,45 +126,38 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-			const std::map<std::string, T >& entries () const;
+				const Map& entries () const;
 			//@}
 
 
 			//! @name Query methods
 			//@{
-			size_t size () const;
-
-			MatchHit bestMatch (const std::string& fuzzyKey) const;
-			MatchResult	bestMatches (const std::string& fuzzyKey, int nbMatches = 10) const;
-			MatchResult	match (const std::string& fuzzyKey, double minScore = 0.0, int maxNbValues = -1) const;
+				size_t size () const;
+	
+				MatchHit bestMatch (const std::string& fuzzyKey) const;
+				MatchResult	bestMatches (const std::string& fuzzyKey, int nbMatches = 10) const;
+				MatchResult	match (const std::string& fuzzyKey, double minScore = 0.0, int maxNbValues = -1) const;
 
 
 		    
 			//! @name Update methods
 			//@{
-
-			/** Removes and destroy all the values in map.
-			 */
-			void clear ();
-
-			void add (const std::string& key, T value);
-			void remove (const std::string& key);
-
+				/** Removes and destroy all the values in map.
+				*/
+				void clear ();
+	
+				void add (const std::string& key, T value);
+				void remove (const std::string& key);
 			//@}
-		    
+			
 
 		 private:
-		    
 			PreprocessedKey preprocessKey (const std::string& key) const;
 			int getWwmLwdThreshold (int nbLetters) const;
 			int getWwmBonus (int wordLwd, int nbLetters) const;
 			int computeLWD (const std::string& s, const std::string& t) const;
 			double computeScore (const PreprocessedKey& key, const PreprocessedKey& candidate) const;
-
-
 		};
-
-		 
 		 
 		 
 	/** @} */		 
@@ -249,9 +243,6 @@ namespace synthese
 
 
 
-
-
-
 		template<class T>
 		size_t 
 		LexicalMatcher<T>::size () const
@@ -267,6 +258,7 @@ namespace synthese
 		{
 			return bestMatches (fuzzyKey).front ();
 		}
+
 
 
 		template<class T>
@@ -285,7 +277,6 @@ namespace synthese
 			}
 			return result;
 		}
-
 
 
 
@@ -318,8 +309,6 @@ namespace synthese
 			return result;
 
 		}
-
-
 
 
 
@@ -378,8 +367,6 @@ namespace synthese
 
 
 
-
-
 		template<class T>
 		int
 		LexicalMatcher<T>::getWwmLwdThreshold (int nbLetters) const
@@ -399,10 +386,6 @@ namespace synthese
 			// an exact match give maximal bonus. approximate match decrease bonus very quickly (^2).
 			return (int) (WWM_BONUS[nbLetters] * weight * weight);
 		}
-
-
-
-
 
 
 
@@ -535,9 +518,6 @@ namespace synthese
 
 
 
-
-
-
 		template<class T>
 		int 
 		LexicalMatcher<T>::computeLWD (const std::string& s, const std::string& t) const
@@ -574,9 +554,6 @@ namespace synthese
 
 
 
-
-
-
 		template<class T>
 		void 
 		LexicalMatcher<T>::clear ()
@@ -584,8 +561,6 @@ namespace synthese
 			_map.clear ();
 			_ppKeys.clear ();
 		}
-
-
 
 
 
@@ -600,8 +575,6 @@ namespace synthese
 
 
 
-
-
 		template<class T>
 		void 
 		LexicalMatcher<T>::remove (const std::string& key)
@@ -613,16 +586,10 @@ namespace synthese
 
 
 		template<class T>
-		const std::map<std::string, T>&
-		LexicalMatcher<T>::entries () const
-		{
+		const typename LexicalMatcher<T>::Map& LexicalMatcher<T>::entries(
+		) const {
 			return _map;
 		}
-
-
-
-
-
 	}
 }
 

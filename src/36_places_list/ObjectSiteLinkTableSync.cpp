@@ -31,7 +31,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
+#include "CityTableSync.h"
 #include "Conversion.h"
 
 using namespace std;
@@ -42,6 +42,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace transportwebsite;
+	using namespace env;
 
 	namespace util
 	{
@@ -88,6 +89,16 @@ namespace synthese
 			}
 			catch(Exception e)
 			{
+			}
+			
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				if(decodeTableId(object->getObjectId()) == CityTableSync::TABLE.ID)
+				{
+					shared_ptr<Site> site(SiteTableSync::GetEditable(id, env, linkLevel));
+					shared_ptr<const City> city(CityTableSync::Get(object->getObjectId(), env, linkLevel));
+					site->addCity(city.get());
+				}
 			}
 		}
 

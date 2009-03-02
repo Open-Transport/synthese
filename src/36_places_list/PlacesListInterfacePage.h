@@ -72,7 +72,7 @@ namespace synthese
 				, const PlacesList& results
 				, bool isCities
 				, bool isForOrigin
-				, boost::shared_ptr<const env::City> city
+				, const env::City* city
 				, const server::Request* request = NULL
 			) const;
 		};

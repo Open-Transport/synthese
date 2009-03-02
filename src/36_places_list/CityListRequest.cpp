@@ -22,19 +22,16 @@
 
 #include "CityListRequest.h"
 
-#include "36_places_list/PlacesListInterfacePage.h"
-#include "36_places_list/Types.h"
-#include "36_places_list/Site.h"
-#include "36_places_list/PlacesListModule.h"
+#include "PlacesListInterfacePage.h"
+#include "Types.h"
+#include "Site.h"
+#include "PlacesListModule.h"
+#include "RequestException.h"
+#include "City.h"
+#include "Interface.h"
+#include "Conversion.h"
 
-#include "30_server/RequestException.h"
-
-#include "15_env/EnvModule.h"
-#include "15_env/City.h"
-
-#include "11_interfaces/Interface.h"
-
-#include "01_util/Conversion.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -45,25 +42,33 @@ namespace synthese
 	using namespace server;
 	using namespace interfaces;
 	using namespace util;
+	using namespace lexmatcher;
+	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,transportwebsite::CityListRequest>::FACTORY_KEY("lc");
+	template<> const string util::FactorableTemplate<FunctionWithSite,CityListRequest>::FACTORY_KEY("lc");
 	
 	namespace transportwebsite
 	{
 		const string CityListRequest::PARAMETER_INPUT("t");
 		const string CityListRequest::PARAMETER_NUMBER("n");
 		const string CityListRequest::PARAMETER_IS_FOR_ORIGIN("o");
-
+		
 		void CityListRequest::_run( ostream& stream ) const
 		{
-			/// @todo Read city list from site
-			CityList tbCommunes(EnvModule::guessCity(_input, _n ));
 			PlacesList placesList;
-			for(CityList::const_iterator it(tbCommunes.begin()); it != tbCommunes.end(); ++it)
-				placesList.push_back(make_pair((*it)->getKey(), (*it)->getName()));
+			LexicalMatcher<const City*>::MatchResult matches(
+				_site->getCitiesMatcher().bestMatches(_input, _n)
+			);
+			//for(LexicalMatcher<const City*>::MatchResult::iterator it(matches.begin());
+			//	it != matches.end();
+			//	++it
+			BOOST_FOREACH(LexicalMatcher<const City*>::MatchHit it, matches)
+			{
+				placesList.push_back(make_pair(it.value->getKey(), it.key));
+			}
 
 			VariablesMap vm;
-			_page->display(stream, vm, placesList, true, _isForOrigin, shared_ptr<City>(), _request);
+			_page->display(stream, vm, placesList, true, _isForOrigin, NULL, _request);
 		}
 
 		ParametersMap CityListRequest::_getParametersMap() const
@@ -82,7 +87,7 @@ namespace synthese
 			_page = _site->getInterface()->getPage<PlacesListInterfacePage>();
 			_input = map.getString(PARAMETER_INPUT, true, FACTORY_KEY);
 			_isForOrigin = map.getBool(PARAMETER_IS_FOR_ORIGIN, false, false, FACTORY_KEY);
-
+		
 			_n = map.getInt(PARAMETER_NUMBER, true, FACTORY_KEY);
 			if (_n < 0)
 				throw RequestException("Bad value for number");
@@ -106,9 +111,8 @@ namespace synthese
 
 
 		bool CityListRequest::_isAuthorized(
-
-			) const {
-		return true;
+		) const {
+			return true;
 		}
 	}
 }

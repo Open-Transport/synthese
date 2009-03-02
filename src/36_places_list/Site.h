@@ -27,7 +27,7 @@
 #include "Types.h"
 
 #include "Date.h"
-
+#include "LexicalMatcher.h"
 #include "Registrable.h"
 #include "Registry.h"
 #include "01_util/Constants.h"
@@ -47,6 +47,7 @@ namespace synthese
 		class CommercialLine;
 		class Place;
 		class AccessParameters;
+		class City;
 	}
 
 	namespace interfaces
@@ -75,6 +76,7 @@ namespace synthese
 
 			typedef std::vector<HourPeriod> Periods;
 			
+			
 		private:
 			//! \name Properties
 			//@{
@@ -87,6 +89,7 @@ namespace synthese
 			//! \name Environment
 			//@{
 				std::set<env::CommercialLine*>	_lines;
+				lexmatcher::LexicalMatcher<const env::City*> _citiesMatcher;
 			//@}
 
 			//! \name Parameters
@@ -137,11 +140,13 @@ namespace synthese
 				int								getUseDatesRange()					const;
 				const time::Date&				getStartDate()						const;
 				const time::Date&				getEndDate()						const;
+				const lexmatcher::LexicalMatcher<const env::City*>& getCitiesMatcher () const;
 			//@}
 
 			// \name Modifiers
 			//@{
 				void addHourPeriod(const HourPeriod& hourPeriod);
+				void addCity(const env::City* value);
 			//@}
 
 			//! \name Queries

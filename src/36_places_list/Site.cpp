@@ -230,7 +230,31 @@ namespace synthese
 			const std::string& cityName
 			, const std::string& placeName
 		) const {
-			return EnvModule::FetchPlace(cityName, placeName);
+			const Place* place(NULL);
+
+			if (cityName.empty())
+				throw Exception("Empty city name");
+
+			LexicalMatcher<const City*>::MatchResult cities(
+				_citiesMatcher.bestMatches(cityName,1)
+			);
+			if(cities.empty()) throw Exception("An error has occured in city name search");
+			const City* city(cities.front().value);
+			place = city;
+			assert(place != NULL);
+
+			if (!placeName.empty())
+			{
+				LexicalMatcher<const Place*>::MatchResult places(
+					city->getAllPlacesMatcher().bestMatches(placeName, 1)
+				);
+				if (!places.empty())
+				{
+					place = places.front().value;
+				}
+			}
+
+			return place;
 		}
 
 		const std::string& Site::getName() const
@@ -257,6 +281,47 @@ namespace synthese
 		const time::Date& Site::getEndDate() const
 		{
 			return _endValidityDate;
+		}
+		
+		
+		
+		const lexmatcher::LexicalMatcher<const env::City*>& Site::getCitiesMatcher () const
+		{
+			return _citiesMatcher;
+		}
+		
+		
+		
+		void Site::addCity(const City* city)
+		{
+			if(!city) return;
+			
+			// Conflict control
+			string name(city->getName());
+			LexicalMatcher<const City*>::Map::const_iterator it(_citiesMatcher.entries().find(name));
+			if(it != _citiesMatcher.entries().end())
+			{
+				string oldName(it->first);
+				const City* oldCity(it->second);
+				_citiesMatcher.remove(oldName);
+				_citiesMatcher.add(oldName + " (" + oldCity->getCode().substr(0,2) + ")", oldCity);
+				name += " (" + city->getCode().substr(0,2) + ")";
+			}
+			
+			// Already resolved conflict control
+			//TODO Implement it
+			
+			_citiesMatcher.add(name, city);
+			
+						
+/*			stringstream ss;
+			boost::iostreams::filtering_ostream out;
+			out.push (T9Filter());
+			out.push (ss);
+			out << city->getName() << flush;
+			
+			_citiesT9Matcher.add(ss.str(), city->getKey());
+*/
 		}
 	}
 }
