@@ -24,15 +24,15 @@
 
 #include <sstream>
 
-#include "ObjectSiteLinkTableSync.h"
 #include "ObjectSiteLink.h"
+#include "ObjectSiteLinkTableSync.h"
+#include "SiteTableSync.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
-
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -80,7 +80,15 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-
+			object->setObjectId(rows->getLongLong(ObjectSiteLinkTableSync::COL_OBJECT_ID));
+			uid id(rows->getLongLong(ObjectSiteLinkTableSync::COL_SITE_ID));
+			try
+			{
+				object->setSite(SiteTableSync::Get(id, env, linkLevel).get());
+			}
+			catch(Exception e)
+			{
+			}
 		}
 
 
@@ -106,7 +114,6 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
 			ObjectSiteLink* obj
 		){
-			/// @todo Fill it
 		}
 	}
 	
@@ -115,45 +122,8 @@ namespace synthese
 	namespace transportwebsite
 	{
 		ObjectSiteLinkTableSync::ObjectSiteLinkTableSync()
-			: SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync, ObjectSiteLink>()
+			: SQLiteRegistryTableSyncTemplate<ObjectSiteLinkTableSync, ObjectSiteLink>()
 		{
-		}
-
-
-
-		void ObjectSiteLinkTableSync::rowsAdded(
-			db::SQLite* sqlite
-			, db::SQLiteSync* sync
-			, const SQLiteResultSPtr& rows
-			, bool isItFirstSync
-		){
-			while(rows->next())
-			{
-			}
-		}
-
-
-		
-		void ObjectSiteLinkTableSync::rowsUpdated(
-			db::SQLite* sqlite
-			, SQLiteSync* sync
-			, const SQLiteResultSPtr& rows
-		){
-			while(rows->next())
-			{
-			}
-		}
-
-
-
-		void ObjectSiteLinkTableSync::rowsRemoved(
-			db::SQLite* sqlite
-			, SQLiteSync* sync
-			, const SQLiteResultSPtr& rows
-		){
-			while(rows->next())
-			{
-			}
 		}
 
 
@@ -172,12 +142,10 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (siteId != UNKNOWN_VALUE)
+			{
+				query << " AND " << COL_SITE_ID << "=" << siteId;
+			}
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

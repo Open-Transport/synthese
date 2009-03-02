@@ -1,24 +1,29 @@
 
-#include "36_places_list/TransportSiteAdmin.h"
-#include "36_places_list/SiteRoutePlanningAdmin.h"
+// Transport website module
 
-#include "36_places_list/PlacesListModule.h"
+// Factories
 
-#include "36_places_list/CityListInterfaceElement.h"
-#include "36_places_list/CityListRequestInterfaceElement.h"
-#include "36_places_list/PlacesListRequestInterfaceElement.h"
+#include "TransportSiteAdmin.h"
+#include "SiteRoutePlanningAdmin.h"
 
-#include "36_places_list/CityListRequest.h"
-#include "36_places_list/PlacesListFunction.h"
+#include "PlacesListModule.h"
 
-#include "36_places_list/PlacesListInterfacePage.h"
-#include "36_places_list/PlacesListItemInterfacePage.h"
+#include "CityListInterfaceElement.h"
+#include "CityListRequestInterfaceElement.h"
+#include "PlacesListRequestInterfaceElement.h"
 
-#include "36_places_list/SiteTableSync.h"
+#include "CityListRequest.h"
+#include "PlacesListFunction.h"
 
-#include "36_places_list/SiteUpdateAction.h"
+#include "PlacesListInterfacePage.h"
+#include "PlacesListItemInterfacePage.h"
 
-#include "36_places_list/TransportWebsiteRight.h"
+#include "SiteTableSync.h"
+#include "ObjectSiteLinkTableSync.h"
+
+#include "SiteUpdateAction.h"
+
+#include "TransportWebsiteRight.h"
 
 // Registries
 #include "ObjectSiteLink.h"
