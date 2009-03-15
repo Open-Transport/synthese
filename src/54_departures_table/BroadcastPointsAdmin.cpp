@@ -183,7 +183,7 @@ namespace synthese
 			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
 			h.push_back(make_pair(PARAMETER_CPU_NUMBER, "Unités centrales"));
 			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h,st.getForm(), _requestParameters, _resultParameters);
+			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, _resultParameters);
 
 			stream << t.open();
 			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> pl, _searchResult)

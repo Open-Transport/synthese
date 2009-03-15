@@ -105,6 +105,7 @@ namespace synthese
 		server::ParametersMap MessageAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			m.insert(QueryString::PARAMETER_OBJECT_ID, _request->getObjectId());
 			return m;
 		}
 

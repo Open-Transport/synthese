@@ -181,7 +181,7 @@ namespace synthese
 			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
 			v.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t(v, searchTable.getForm(), _requestParameters, _resultParameters, addUserRequest.getHTMLForm("add"),"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _resultParameters, addUserRequest.getHTMLForm("add"),"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 

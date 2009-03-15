@@ -146,7 +146,7 @@ namespace synthese
 			}
 			catch (Exception e)
 			{
-				throw RequestException("Admin interface page not implemented in database");
+				throw RequestException("Admin interface page not implemented in database"+ e.getMessage());
 			}
 		}
 
