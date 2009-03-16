@@ -77,8 +77,6 @@ namespace synthese
 			ProfileTableSync::Search(env, _name, string(),0,1);
 			if (!env.getRegistry<Profile>().empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
-
-			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void AddProfileAction::run()
@@ -100,7 +98,11 @@ namespace synthese
 				profile->addRight(r);
 			}
 			ProfileTableSync::Save(profile.get());
-			_request->setObjectId(profile->getKey());
+			
+			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			{
+				_request->setObjectId(profile->getKey());
+			}
 
 			// DBLog
 			SecurityLog::addProfileAdmin(_request->getUser().get(), profile.get(), "Création du profil" + (_templateProfile.get() ? " à partir de " + _templateProfile->getName() : string()));

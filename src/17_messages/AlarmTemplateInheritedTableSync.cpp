@@ -83,7 +83,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(obj->getLongMessage())
 				<< ",''"
 				<< ",''"
-				<< "," << Conversion::ToString(obj->getScenario()->getKey())
+				<< "," << (obj->getScenario() ? Conversion::ToString(obj->getScenario()->getKey()) : "")
 				<< ",0"
 				<< ")";
 			DBModule::GetSQLite()->execUpdate(query.str());

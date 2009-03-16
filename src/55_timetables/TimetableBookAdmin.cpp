@@ -140,6 +140,8 @@ namespace synthese
 			ActionFunctionRequest<TimetableAddAction,AdminRequest> addTimetableRequest(_request);
 			addTimetableRequest.getAction()->setBook(_book);
 			addTimetableRequest.getFunction()->setPage<TimetableAdmin>();
+			addTimetableRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+
 
 			FunctionRequest<AdminRequest> editTimetableRequest(_request);
 			editTimetableRequest.getFunction()->setPage<TimetableAdmin>();

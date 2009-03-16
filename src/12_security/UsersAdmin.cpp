@@ -34,7 +34,7 @@
 #include "UserTableSync.h"
 #include "UsersAdmin.h"
 #include "SecurityRight.h"
-
+#include "QueryString.h"
 #include "Session.h"
 #include "ServerModule.h"
 #include "ActionFunctionRequest.h"
@@ -151,7 +151,8 @@ namespace synthese
 			ActionFunctionRequest<AddUserAction, AdminRequest> addUserRequest(_request);
 			addUserRequest.getFunction()->setPage<UserAdmin>();
 			addUserRequest.getFunction()->setActionFailedPage<UsersAdmin>();
-			
+			addUserRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+
 			// Request for delete action form
 			ActionFunctionRequest<DelUserAction, AdminRequest> deleteUserRequest(_request);
 			deleteUserRequest.getFunction()->setSamePage(this);

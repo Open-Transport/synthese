@@ -23,11 +23,11 @@
 #ifndef SYNTHESE_MessagesModule_H__
 #define SYNTHESE_MessagesModule_H__
 
-#include "01_util/ModuleClass.h"
-#include "01_util/UId.h"
+#include "ModuleClass.h"
+#include "UId.h"
 #include "01_util/Constants.h"
-#include "01_util/FactorableTemplate.h"
-
+#include "FactorableTemplate.h"
+#include "Registry.h"
 #include "17_messages/Types.h"
 
 #include <vector>
@@ -86,6 +86,10 @@ namespace synthese
 			);
 
 			static std::vector<std::pair<AlarmLevel, std::string> >		getLevelLabels(bool withAll = false);
+			
+			static std::vector<std::pair<util::RegistryKeyType, std::string> > GetLevelLabelsWithScenarios(
+				bool withAll
+			);
 			static std::vector<std::pair<AlarmConflict, std::string> >	getConflictLabels(bool withAll = false);
 			static std::vector<std::pair<uid, std::string> >			getTextTemplateLabels(const AlarmLevel& level);
 

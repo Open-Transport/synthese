@@ -45,11 +45,14 @@
 #include "MessagesModule.h"
 #include "SingleSentAlarmInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "ScenarioTemplate.h"
 #include "SentScenarioInheritedTableSync.h"
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
 #include "AdminModule.h"
 #include "AdminParametersException.h"
+#include "QueryString.h"
 
 #include <boost/foreach.hpp>
 
@@ -80,11 +83,10 @@ namespace synthese
 
 	namespace messages
 	{
-		const std::string MessagesAdmin::PARAMETER_SEARCH_START = "mass";
-		const std::string MessagesAdmin::PARAMETER_SEARCH_END = "mase";
-		const std::string MessagesAdmin::PARAMETER_SEARCH_LEVEL = "masl";
-		const std::string MessagesAdmin::PARAMETER_SEARCH_STATUS = "mast";
-		const std::string MessagesAdmin::PARAMETER_SEARCH_CONFLICT = "masc";
+		const std::string MessagesAdmin::PARAMETER_SEARCH_DATE = "sd";
+		const std::string MessagesAdmin::PARAMETER_SEARCH_LEVEL = "sl";
+		const std::string MessagesAdmin::PARAMETER_SEARCH_STATUS = "st";
+		const std::string MessagesAdmin::PARAMETER_SEARCH_CONFLICT = "sc";
 
 		const std::string MessagesAdmin::CSS_ALARM_DISABLED = "alarmdisabled";
 		const std::string MessagesAdmin::CSS_ALARM_DISPLAYED_WITHOUT_END_DATE = "alarmdisplayedwithoutenddate";
@@ -93,8 +95,9 @@ namespace synthese
 
 		MessagesAdmin::MessagesAdmin()
 			: AdminInterfaceElementTemplate<MessagesAdmin>()
-			, _startDate(TIME_UNKNOWN), _endDate(TIME_UNKNOWN)
-			, _searchStatus(ALL_STATUS), _searchLevel(ALARM_LEVEL_UNKNOWN)
+			, _date(TIME_UNKNOWN)
+			, _searchStatus(BROADCAST_RUNNING),
+			_searchLevel(ALARM_LEVEL_UNKNOWN)
 			, _searchConflict(ALARM_CONFLICT_UNKNOWN)
 		{}
 
@@ -106,8 +109,7 @@ namespace synthese
 			{
 				_parametersMap = map;
 
-				_startDate = map.getDateTime(PARAMETER_SEARCH_START, false, FACTORY_KEY);
-				_endDate = map.getDateTime(PARAMETER_SEARCH_END, false, FACTORY_KEY);
+				_date = map.getDate(PARAMETER_SEARCH_DATE, false, FACTORY_KEY);
 
 				int num = map.getInt(PARAMETER_SEARCH_CONFLICT, false, FACTORY_KEY);
 				if (num != UNKNOWN_VALUE)
@@ -118,22 +120,32 @@ namespace synthese
 				if (num != UNKNOWN_VALUE)
 					_searchStatus = static_cast<StatusSearch>(num);
 
-				num = map.getInt(PARAMETER_SEARCH_LEVEL, false, FACTORY_KEY);
-				if (num != UNKNOWN_VALUE)
-					_searchLevel = static_cast<AlarmLevel>(num);
+				RegistryKeyType id(map.getUid(PARAMETER_SEARCH_LEVEL, false, FACTORY_KEY));
+				if(id > encodeUId(ScenarioTableSync::TABLE.ID, 0, 0, 0))
+				{
+					_searchLevel = ALARM_LEVEL_SCENARIO;
+					_searchScenario = ScenarioTemplateInheritedTableSync::Get(id, _env);
+				}
+				else if (id != UNKNOWN_VALUE)
+				{
+					_searchLevel = static_cast<AlarmLevel>(
+						map.getInt(PARAMETER_SEARCH_LEVEL, false, FACTORY_KEY)
+					);
+				}
 
 				_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_LEVEL, 15, false);
 
 				if(!doDisplayPreparationActions) return;
 
 				_messages = GetSentMessages(
-					_startDate,
-					_endDate,
+					_date,
+					_searchStatus,
 					_searchConflict,
 					_searchLevel,
+					_searchScenario.get() ? _searchScenario->getKey() : UNKNOWN_VALUE,
 					_requestParameters.first
 					, _requestParameters.maxSize
-					, _requestParameters.orderField == PARAMETER_SEARCH_START
+					, _requestParameters.orderField == PARAMETER_SEARCH_DATE
 					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
 					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
 					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
@@ -152,8 +164,7 @@ namespace synthese
 		server::ParametersMap MessagesAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
-			m.insert(PARAMETER_SEARCH_START, _startDate);
-			m.insert(PARAMETER_SEARCH_END, _endDate);
+			m.insert(PARAMETER_SEARCH_DATE, _date);
 			m.insert(PARAMETER_SEARCH_CONFLICT, static_cast<int>(_searchConflict));
 			m.insert(PARAMETER_SEARCH_STATUS, static_cast<int>(_searchStatus));
 			m.insert(PARAMETER_SEARCH_LEVEL, static_cast<int>(_searchLevel));
@@ -171,7 +182,8 @@ namespace synthese
 			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			newScenarioRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
-
+			newScenarioRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			
 			FunctionRequest<AdminRequest> alarmRequest(_request);
 			alarmRequest.getFunction()->setPage<MessageAdmin>();
 
@@ -185,21 +197,20 @@ namespace synthese
 			scenarioStopRequest.getFunction()->setSamePage(this);
 			
 			vector<pair<StatusSearch, string> > statusMap;
-			statusMap.push_back(make_pair(ALL_STATUS, "(tous les états)"));
-			statusMap.push_back(make_pair(BROADCAST_OVER, "Diffusion terminée"));
-			statusMap.push_back(make_pair(BROADCAST_RUNNING, "En cours de diffusion"));
-			statusMap.push_back(make_pair(BROADCAST_RUNNING_WITH_END, "En cours avec date de fin"));
-			statusMap.push_back(make_pair(BROADCAST_RUNNING_WITHOUT_END, "En cours sans date de fin"));
-			statusMap.push_back(make_pair(FUTURE_BROADCAST, "Diffusion ultérieure"));
-
+			statusMap.push_back(make_pair(BROADCAST_RUNNING, "En diffusion / prévu"));
+			statusMap.push_back(make_pair(BROADCAST_RUNNING_WITH_END, "&nbsp;&gt;&nbsp;En cours avec date de fin"));
+			statusMap.push_back(make_pair(BROADCAST_RUNNING_WITHOUT_END, "&nbsp;&gt;&nbsp;En cours sans date de fin"));
+			statusMap.push_back(make_pair(FUTURE_BROADCAST, "&nbsp;&gt;&nbsp;Diffusion ultérieure"));
+			statusMap.push_back(make_pair(BROADCAST_OVER, "Archivés"));
+			statusMap.push_back(make_pair(BROADCAST_DRAFT, "Brouillons"));
+			
 			DateTime now(TIME_CURRENT);
 
 			stream << "<h1>Recherche</h1>";
 
 			SearchFormHTMLTable s(searchRequest.getHTMLForm());
 			stream << s.open();
-			stream << s.cell("Date début", s.getForm().getCalendarInput(PARAMETER_SEARCH_START, _startDate));
-			stream << s.cell("Date fin", s.getForm().getCalendarInput(PARAMETER_SEARCH_END, _endDate));
+			stream << s.cell("Date", s.getForm().getCalendarInput(PARAMETER_SEARCH_DATE, _date));
 
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
@@ -218,7 +229,13 @@ namespace synthese
 			);
 			stream << s.cell(
 				"Type",
-				s.getForm().getSelectInput(PARAMETER_SEARCH_LEVEL, MessagesModule::getLevelLabels(true), _searchLevel)
+				s.getForm().getSelectInput(
+					PARAMETER_SEARCH_LEVEL,
+					MessagesModule::GetLevelLabelsWithScenarios(true),
+					(_searchLevel == ALARM_LEVEL_SCENARIO) ?
+						(_searchScenario.get() ? _searchScenario->getKey() : 0) :
+						static_cast<RegistryKeyType>(_searchLevel)
+				)
 			);
 
 			stream << s.close();
@@ -226,10 +243,11 @@ namespace synthese
 			stream << "<h1>Résultats de la recherche</h1>";
 
 			ActionResultHTMLTable::HeaderVector v1;
-			v1.push_back(make_pair(PARAMETER_SEARCH_START, string("Dates")));
+			v1.push_back(make_pair(string(), string("Statut")));
+			v1.push_back(make_pair(PARAMETER_SEARCH_DATE, string("Dates")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_LEVEL, string("Type")));
 			v1.push_back(make_pair(string(), string("Message")));
-			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
+			//v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v1.push_back(make_pair(string(), string("Actions")));
 			ActionResultHTMLTable t1(
@@ -285,33 +303,51 @@ namespace synthese
 				stream << t1.col();
 				if (!message.enabled)
 				{
-					stream << "Non diffusé";
+					if (!message.endTime.isUnknown() && message.endTime < now)
+					{
+						stream << "Archivé";
+					}
+					else
+					{
+						stream << "Brouillon";
+					}
 				}
 				else
 				{
-					if (message.startTime.isUnknown() && message.endTime.isUnknown())
+					if(message.startTime.isUnknown() || message.startTime <= now)
 					{
-						stream << "Diffusion permanente";
+						stream << "En cours";
 					}
-					if (message.startTime.isUnknown() && !message.endTime.isUnknown())
+					else
 					{
-						stream << "Jusqu'au " << message.endTime.toString();
+						stream << "Prévu";
 					}
-					if (!message.startTime.isUnknown() && message.endTime.isUnknown())
-					{
-						stream << "A compter du " << message.startTime.toString();
-					}
-					if (!message.startTime.isUnknown() && !message.endTime.isUnknown())
-					{
-						stream << "Du " << message.startTime.toString() << " au " << message.endTime.toString();
-					}
+				}
+				
+				
+				stream << t1.col();
+				if (message.startTime.isUnknown() && message.endTime.isUnknown())
+				{
+					stream << "Diffusion permanente";
+				}
+				if (message.startTime.isUnknown() && !message.endTime.isUnknown())
+				{
+					stream << "Jusqu'au " << message.endTime.toString();
+				}
+				if (!message.startTime.isUnknown() && message.endTime.isUnknown())
+				{
+					stream << "A compter du " << message.startTime.toString();
+				}
+				if (!message.startTime.isUnknown() && !message.endTime.isUnknown())
+				{
+					stream << "Du " << message.startTime.toString() << " au " << message.endTime.toString();
 				}
 
 				// Type
 				stream << t1.col() << MessagesModule::getLevelLabel(message.level);
 				
 				stream << t1.col() << message.name;
-				stream << t1.col(); // Bullet
+				//stream << t1.col(); // Bullet
 				stream << t1.col() << MessagesModule::getConflictLabel(message.conflict); /// @todo put a graphic bullet
 				stream << t1.col();
 				if(message.level == ALARM_LEVEL_SCENARIO)

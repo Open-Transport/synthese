@@ -24,7 +24,7 @@
 
 #include "Interface.h"
 #include "InterfaceTableSync.h"
-
+#include "QueryString.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
@@ -51,9 +51,13 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const string CreateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "dtc_name";
-		const string CreateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "dtc_interf";
-		const string CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtc_rows";
+		const string CreateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string CreateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "di";
+		const string CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "ro";
+		const string CreateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID(
+			Action_PARAMETER_PREFIX + "mi"
+		);
+		
 
 
 		ParametersMap CreateDisplayTypeAction::getParametersMap() const
@@ -62,9 +66,13 @@ namespace synthese
 			map.insert(PARAMETER_NAME, _name);
 			if (_interface.get())
 				map.insert(PARAMETER_INTERFACE_ID, _interface->getKey());
+			if(_monitoringInterface.get())
+				map.insert(PARAMETER_MONITORING_INTERFACE_ID, _monitoringInterface->getKey());
 			map.insert(PARAMETER_ROWS_NUMBER, _rows_number);
 			return map;
 		}
+
+
 
 		void CreateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -93,6 +101,18 @@ namespace synthese
 			{
 				throw ActionException("Interface d'affichage", id, FACTORY_KEY, e);
 			}
+		
+			// Monitoring Interface
+			id = map.getUid(PARAMETER_MONITORING_INTERFACE_ID, false, FACTORY_KEY);
+			if(id > 0)
+			try
+			{
+				_monitoringInterface = InterfaceTableSync::Get(id, _env);
+			}
+			catch (ObjectNotFoundException<Interface>& e)
+			{
+				throw ActionException("Interface de supervision", id, FACTORY_KEY, e);
+			}
 		}
 
 		void CreateDisplayTypeAction::run()
@@ -100,8 +120,15 @@ namespace synthese
 			DisplayType dt;
 			dt.setName(_name);
 			dt.setDisplayInterface(_interface.get());
+			dt.setMonitoringInterface(_monitoringInterface.get());
 			dt.setRowNumber(_rows_number);
 			DisplayTypeTableSync::Save(&dt);
+
+			// Request update
+			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			{
+				_request->setObjectId(dt.getKey());
+			}
 
 			// Log
 			ArrivalDepartureTableLog::addCreateTypeEntry(&dt, _request->getUser().get());

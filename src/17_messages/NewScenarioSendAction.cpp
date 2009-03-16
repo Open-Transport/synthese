@@ -112,9 +112,6 @@ namespace synthese
 					}
 				}
 			}
-			
-			// Anti error
-			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void NewScenarioSendAction::run()

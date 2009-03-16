@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_MessagesAdmin_H__
 #define SYNTHESE_MessagesAdmin_H__
 
-#include "DateTime.h"
+#include "Date.h"
 #include "ActionResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
 #include "17_messages/Types.h"
@@ -35,6 +35,7 @@ namespace synthese
 	{
 		class SingleSentAlarm;
 		class SentScenario;
+		class ScenarioTemplate;
 
 		/** Ecran de recherche et de liste de message.
 			@ingroup m17Admin refAdmin
@@ -121,13 +122,11 @@ namespace synthese
 			static const std::string CSS_ALARM_DISPLAYED_WITH_END_DATE;
 
 		private:
-			typedef enum { ALL_STATUS, BROADCAST_OVER, BROADCAST_RUNNING, BROADCAST_RUNNING_WITH_END, BROADCAST_RUNNING_WITHOUT_END, FUTURE_BROADCAST } StatusSearch;
-
-			time::DateTime										_startDate;
-			time::DateTime										_endDate;
+			time::Date											_date;
 			StatusSearch										_searchStatus;
 			AlarmLevel											_searchLevel;
 			AlarmConflict										_searchConflict;
+			boost::shared_ptr<const ScenarioTemplate>			_searchScenario;
 			html::ActionResultHTMLTable::RequestParameters		_requestParameters;
 			html::ActionResultHTMLTable::ResultParameters 		_resultParameters;
 
@@ -136,8 +135,7 @@ namespace synthese
 			server::ParametersMap	_parametersMap;
 			
 		public:
-			static const std::string PARAMETER_SEARCH_START;
-			static const std::string PARAMETER_SEARCH_END;
+			static const std::string PARAMETER_SEARCH_DATE;
 			static const std::string PARAMETER_SEARCH_LEVEL;
 			static const std::string PARAMETER_SEARCH_STATUS;
 			static const std::string PARAMETER_SEARCH_CONFLICT;

@@ -82,14 +82,12 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
 			try
 			{
-				_alarm = AlarmTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+				_alarm = AlarmTableSync::Get(_request->getObjectId(), _env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch(...)
 			{
@@ -105,7 +103,6 @@ namespace synthese
 		server::ParametersMap MessageAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			m.insert(QueryString::PARAMETER_OBJECT_ID, _request->getObjectId());
 			return m;
 		}
 
@@ -115,6 +112,7 @@ namespace synthese
 		{
 			ActionFunctionRequest<UpdateAlarmAction,AdminRequest> updateRequest(_request);
 			updateRequest.getFunction()->setSamePage(this);
+			updateRequest.getAction()->setAlarmId(_alarm->getKey());
 
 			shared_ptr<const SingleSentAlarm> salarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
 			
@@ -140,12 +138,16 @@ namespace synthese
 				templateRequest.getFunction()->setSamePage(this);
 				templateRequest.getAction()->setAlarmId(_alarm->getKey());
 
-				HTMLForm fc(templateRequest.getHTMLForm("template"));
-				stream << fc.open() << "<p>";
-				stream << "Modèle : ";
-				stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, MessagesModule::getTextTemplateLabels(_alarm->getLevel()), uid());
-				stream << fc.getSubmitButton("Copier contenu");
-				stream << "</p>" << fc.close();
+				vector<pair<uid, string> > tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
+				if(!tl.empty())
+				{
+					HTMLForm fc(templateRequest.getHTMLForm("template"));
+					stream << fc.open() << "<p>";
+					stream << "Modèle : ";
+					stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, uid());
+					stream << fc.getSubmitButton("Copier contenu");
+					stream << "</p>" << fc.close();
+				}
 
 				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
 				updateMessagesRequest.getFunction()->setSamePage(this);

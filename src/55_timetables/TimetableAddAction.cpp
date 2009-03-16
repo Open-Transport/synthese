@@ -86,10 +86,6 @@ namespace synthese
 				_rank = TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0) + 1;
 			_title = map.getString(PARAMETER_TITLE, false, FACTORY_KEY);
 			_isBook = map.getBool(PARAMETER_IS_BOOK, true, false, FACTORY_KEY);
-
-			// Anti error
-			if (map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY) == UNKNOWN_VALUE)
-				_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 		
 		

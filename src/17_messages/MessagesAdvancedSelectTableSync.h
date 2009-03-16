@@ -31,6 +31,7 @@
 #include "17_messages/Types.h"
 
 #include <vector>
+#include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
@@ -57,11 +58,31 @@ namespace synthese
 		
 		typedef std::vector<SentMessage> SentMessages;
 		
+		typedef enum
+		{
+			BROADCAST_OVER,
+			BROADCAST_RUNNING,
+			BROADCAST_RUNNING_WITH_END,
+			BROADCAST_RUNNING_WITHOUT_END,
+			FUTURE_BROADCAST,
+			BROADCAST_DRAFT
+		} StatusSearch;
+
+		/** Messages selector.
+			Typical uses :
+				- BROADCAST_OVER : endDate in past
+				- BROADCAST_RUNNING : startDate in past or unknown + activated,
+				- BROADCAST_RUNNING_WITH_END : startDate in past or unknown + endTime in future + activated
+				- BROADCAST_RUNNING_WITHOUT_END : startDate in past or unknown + endTime unknown + activated,
+				- FUTURE_BROADCAST : startDate in future + activated,
+				- BROADCAST_DRAFT : endDate in future or unknown + not activated 
+		*/
 		SentMessages GetSentMessages(
-			time::DateTime startDate,
-			time::DateTime endDate,
+			const time::Date& date,
+			StatusSearch status,
 			AlarmConflict conflict,
 			AlarmLevel level,
+			util::RegistryKeyType scenarioId = UNKNOWN_VALUE,
 			int first = 0,
 			int number = 0,
 			bool orderByDate = true,

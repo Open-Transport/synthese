@@ -94,11 +94,9 @@ namespace synthese
 			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1);
 			if (!env.getRegistry<ScenarioTemplate>().empty())
 				throw ActionException("Un scénario de même nom existe déjà");
-
-			// Anti error
-			if (map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY) == UNKNOWN_VALUE)
-				_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
+
+
 
 		void AddScenarioAction::run()
 		{
@@ -113,7 +111,10 @@ namespace synthese
 				);
 
 				// Remember of the id of created object to view it after the action
-				_request->setObjectId(scenario.getKey());
+				if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_request->setObjectId(scenario.getKey());
+				}
 
 				// Log
 				MessagesLibraryLog::addCreateEntry(
@@ -129,7 +130,10 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 
 				// Remember of the id of created object to view it after the action
-				_request->setObjectId(scenario.getKey());
+				if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_request->setObjectId(scenario.getKey());
+				}
 
 				MessagesLibraryLog::addCreateEntry(
 					scenario, _request->getUser().get()

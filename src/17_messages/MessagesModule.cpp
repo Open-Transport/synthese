@@ -107,16 +107,37 @@ namespace synthese
 
 
 
-		std::vector<pair<AlarmLevel, std::string> > MessagesModule::getLevelLabels( bool withAll /*= false*/ )
-		{
+		std::vector<pair<AlarmLevel, std::string> > MessagesModule::getLevelLabels(
+			bool withAll /*= false*/
+		){
 			vector<pair<AlarmLevel, string> > m;
 			if (withAll)
 				m.push_back(make_pair(ALARM_LEVEL_UNKNOWN, "(tous)"));
 			m.push_back(make_pair(ALARM_LEVEL_INFO, getLevelLabel(ALARM_LEVEL_INFO)));
 			m.push_back(make_pair(ALARM_LEVEL_WARNING, getLevelLabel(ALARM_LEVEL_WARNING)));
-			m.push_back(make_pair(ALARM_LEVEL_SCENARIO, getLevelLabel(ALARM_LEVEL_SCENARIO)));
 			return m;
 		}
+
+
+
+		std::vector<pair<RegistryKeyType, std::string> > MessagesModule::GetLevelLabelsWithScenarios(
+			bool withAll /*= false*/
+		){
+			vector<pair<RegistryKeyType, string> > m;
+			if (withAll)
+				m.push_back(make_pair(static_cast<RegistryKeyType>(ALARM_LEVEL_UNKNOWN), "(tous)"));
+			m.push_back(make_pair(static_cast<RegistryKeyType>(ALARM_LEVEL_INFO), getLevelLabel(ALARM_LEVEL_INFO)));
+			m.push_back(make_pair(static_cast<RegistryKeyType>(ALARM_LEVEL_WARNING), getLevelLabel(ALARM_LEVEL_WARNING)));
+			
+			vector<pair<uid, string> > s(MessagesModule::GetScenarioTemplatesLabels());
+			for(vector<pair<uid, string> >::const_iterator it(s.begin()); it != s.end(); ++it)
+			{
+				m.push_back(make_pair(it->first, "Scénario " + it->second));
+			}
+			return m;
+		}
+
+
 
 		std::vector<pair<AlarmConflict, std::string> > MessagesModule::getConflictLabels( bool withAll /*= false*/ )
 		{

@@ -46,6 +46,7 @@
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
 #include "SentAlarm.h"
+#include "QueryString.h"
 
 #include <boost/foreach.hpp>
 
@@ -185,10 +186,14 @@ namespace synthese
 			/// TAB SCREENS
 			if (openTabContent(stream, TAB_DISPLAY_SCREENS))
 			{
-				ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(_request);
+				ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(
+					_request
+				);
 				createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
 				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 				createDisplayRequest.getAction()->setPlace(_place);
+				createDisplayRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+
 
 				FunctionRequest<AdminRequest> searchRequest(_request);
 				searchRequest.getFunction()->setSamePage(this);

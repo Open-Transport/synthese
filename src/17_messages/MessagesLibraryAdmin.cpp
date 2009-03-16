@@ -133,11 +133,13 @@ namespace synthese
 			addScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
 			addScenarioRequest.getAction()->setFolderId(_folderId);
+			addScenarioRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
 			ActionFunctionRequest<ScenarioFolderAdd,AdminRequest> addFolderRequest(_request);
 			addFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			addFolderRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
 			addFolderRequest.getAction()->setParentId(_folderId);
+			addFolderRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
 			FunctionRequest<AdminRequest> goFolderRequest(_request);
 			goFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();

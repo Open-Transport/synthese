@@ -68,8 +68,6 @@ namespace synthese
 		void NewMessageAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
 			setScenarioId(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
-			
-			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void NewMessageAction::run() throw(ActionException)
@@ -79,7 +77,10 @@ namespace synthese
 				AlarmTemplate alarm(UNKNOWN_VALUE, _scenarioTemplate.get());
 				AlarmTableSync::Save(&alarm);
 				
-				_request->setObjectId(alarm.getKey());
+				if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_request->setObjectId(alarm.getKey());
+				}
 				
 				MessagesLog::AddNewScenarioMessageEntry(
 					alarm,

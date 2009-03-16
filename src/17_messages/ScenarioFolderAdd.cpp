@@ -97,10 +97,6 @@ namespace synthese
 			ScenarioFolderTableSync::Search(env, _parentId, _name, 0, 1);
 			if (!env.getRegistry<ScenarioFolder>().empty())
 				throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
-
-			// Anti error
-			if (map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY) == UNKNOWN_VALUE)
-				_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 		
 		
@@ -113,8 +109,13 @@ namespace synthese
 
 			ScenarioFolderTableSync::Save(&f);
 
-			_request->setObjectId(f.getKey());
+			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			{
+				_request->setObjectId(f.getKey());
+			}
 		}
+
+
 
 		void ScenarioFolderAdd::setParentId( uid value )
 		{

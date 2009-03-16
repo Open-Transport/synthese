@@ -48,6 +48,7 @@ namespace synthese
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_ENABLED;
+			static const std::string PARAMETER_ALARM_ID;
 
 		private:
 			AlarmLevel		_type;
@@ -76,6 +77,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+			
+			void setAlarmId(const util::RegistryKeyType id);
 
 			virtual bool _isAuthorized() const;
 		};

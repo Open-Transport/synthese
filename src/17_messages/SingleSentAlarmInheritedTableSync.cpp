@@ -70,12 +70,12 @@ namespace synthese
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(obj->getKey())
 				<< ",0"
-				<< ",0"
+				<< "," << Conversion::ToString(obj->getIsEnabled())
 				<< "," << Conversion::ToString(static_cast<int>(obj->getLevel()))
 				<< "," << Conversion::ToSQLiteString(obj->getShortMessage())
 				<< "," << Conversion::ToSQLiteString(obj->getLongMessage())
-				<< ",''"
-				<< ",''"
+				<< "," << obj->getPeriodStart().toSQLString()
+				<< "," << obj->getPeriodEnd().toSQLString()
 				<< ",0"
 				<< ",0" // Template id
 				<< ")";

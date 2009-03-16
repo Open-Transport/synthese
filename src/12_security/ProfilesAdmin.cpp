@@ -40,6 +40,7 @@
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
 #include "RequestMissingParameterException.h"
+#include "QueryString.h"
 
 #include <boost/foreach.hpp>
 #include <map>
@@ -127,6 +128,8 @@ namespace synthese
 			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(_request);
 			addProfileRequest.getFunction()->setPage<ProfileAdmin>();
 			addProfileRequest.getFunction()->setActionFailedPage<ProfilesAdmin>();
+			addProfileRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+
 			
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();

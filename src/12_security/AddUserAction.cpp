@@ -77,8 +77,6 @@ namespace synthese
 			{
 				throw ActionException("Profil inexistant");
 			}
-			
-			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void AddUserAction::run()
@@ -88,7 +86,12 @@ namespace synthese
 			user->setName(_name);
 			user->setProfile(_profile.get());
 			UserTableSync::Save(user.get());
-			_request->setObjectId(user->getKey());
+			
+						
+			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			{
+				_request->setObjectId(user->getKey());
+			}
 		}
 
 

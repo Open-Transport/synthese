@@ -103,6 +103,7 @@ namespace synthese
 			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAMETER_NAME, _searchName);
 			m.insert(PARAMETER_INTERFACE_ID, _searchInterfaceId);
+			
 			return m;
 		}
 		
@@ -119,7 +120,8 @@ namespace synthese
 			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(_request);
-			createRequest.getFunction()->setSamePage(this);
+			createRequest.getFunction()->setPage<DisplayTypeAdmin>();
+			createRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			
 			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(_request);
 			deleteRequest.getFunction()->setSamePage(this);
@@ -195,9 +197,37 @@ namespace synthese
 			if (writeRight)
 			{
 				stream << t.row();
-				stream << t.col() << t.getActionForm().getTextInput(CreateDisplayTypeAction::PARAMETER_NAME, "", "(Entrez le nom ici)");
-				stream << t.col() << t.getActionForm().getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true), RegistryKeyType(0));
-				stream << t.col() << t.getActionForm().getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99);
+				
+				stream <<
+					t.col() <<
+					t.getActionForm().getTextInput(
+						CreateDisplayTypeAction::PARAMETER_NAME,
+						"", "(Entrez le nom ici)"
+					)
+				;
+				stream <<
+					t.col() <<
+					t.getActionForm().getSelectInput(
+						CreateDisplayTypeAction::PARAMETER_INTERFACE_ID,
+						InterfaceModule::getInterfaceLabels(true),
+						RegistryKeyType(0)
+					)
+				;
+				stream <<
+					t.col() <<
+					t.getActionForm().getSelectNumberInput(
+						CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER,
+						1, 99
+					)
+				;
+				stream <<
+					t.col() <<
+					t.getActionForm().getSelectInput(
+						CreateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
+						InterfaceModule::getInterfaceLabels(true),
+						RegistryKeyType(0)
+					)
+				;
 				stream << t.col(2) << t.getActionForm().getSubmitButton("Ajouter");
 			}
 			stream << t.close();

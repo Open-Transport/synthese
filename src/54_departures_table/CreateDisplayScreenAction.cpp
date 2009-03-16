@@ -77,8 +77,6 @@ namespace synthese
 			{
 				throw ActionException("Specified localization not found");
 			}
-
-			_request->setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void CreateDisplayScreenAction::run()
@@ -94,7 +92,10 @@ namespace synthese
 			DisplayScreenTableSync::Save(screen.get());
 
 			// Request update
-			_request->setObjectId(screen->getKey());
+			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			{
+				_request->setObjectId(screen->getKey());
+			}
 
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(screen.get(), "Création", _request->getUser().get());

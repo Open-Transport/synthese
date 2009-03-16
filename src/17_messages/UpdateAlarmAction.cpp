@@ -22,16 +22,16 @@
 
 #include "UpdateAlarmAction.h"
 
-#include "17_messages/SingleSentAlarm.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
+#include "SingleSentAlarm.h"
+#include "AlarmTableSync.h"
+#include "MessagesModule.h"
 
-#include "04_time/TimeParseException.h"
-#include "04_time/DateTime.h"
+#include "TimeParseException.h"
+#include "DateTime.h"
 #include "MessagesRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 using namespace boost;
@@ -49,26 +49,42 @@ namespace synthese
 	
 	namespace messages
 	{
-		const string UpdateAlarmAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "typ";
-		const string UpdateAlarmAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sda";
-		const string UpdateAlarmAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
-		const string UpdateAlarmAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "ena";
+		const string UpdateAlarmAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
+		const string UpdateAlarmAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sd";
+		const string UpdateAlarmAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "ed";
+		const string UpdateAlarmAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "en";
+		const string UpdateAlarmAction::PARAMETER_ALARM_ID(Action_PARAMETER_PREFIX + "ai");
 
 
 		ParametersMap UpdateAlarmAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_alarm.get())
+			{
+				map.insert(PARAMETER_ALARM_ID, _alarm->getKey());
+			}
 			return map;
+		}
+		
+		void UpdateAlarmAction::setAlarmId(
+			const util::RegistryKeyType id
+		){
+			try
+			{
+				_alarm = AlarmTableSync::GetEditable(id, _env);
+				_singleSentAlarm = dynamic_pointer_cast<SingleSentAlarm, Alarm>(_alarm);
+			}
+			catch (ObjectNotFoundException<Alarm>& e)
+			{
+				throw ActionException("Message", id, FACTORY_KEY, e);
+			}
 		}
 
 		void UpdateAlarmAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				_alarm = AlarmTableSync::GetEditable(_request->getObjectId(), _env);
-				_singleSentAlarm = dynamic_pointer_cast<SingleSentAlarm, Alarm>(_alarm);
-
+				setAlarmId(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
 				_type = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE, true, FACTORY_KEY));
 
 				if (_singleSentAlarm.get())
@@ -78,17 +94,9 @@ namespace synthese
 					_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 				}
 			}
-			catch (ObjectNotFoundException<Alarm>& e)
-			{
-				throw ActionException(e.getMessage());
-			}
 			catch(TimeParseException& e)
 			{
 				throw ActionException("Une date ou une heure est mal formée");
-			}
-			catch(...)
-			{
-				throw ActionException("Unknown error");
 			}
 		}
 
