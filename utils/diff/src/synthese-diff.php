@@ -103,7 +103,7 @@ while ($nstop = $nstops->fetch())
 	$ostops = $db->query('SELECT * FROM t007_connection_places WHERE id='. $nstop['id']);
 	$row = $ostops->fetch();
 	if(!$row)
-		print '<ConnectionLink Id="'. $nstop['id'] .'" update="Delete" />';
+		print '<ConnectionLink Id="SYNTHESE:ConnectionLink:'. $nstop['id'] .'" update="Delete" />';
 }
 
 
