@@ -34,7 +34,7 @@
 #include "Journey.h"
 #include "VertexAccessMap.h"
 #include "JourneyComparator.h"
-
+#include "RoadPlace.h"
 // To be removed by a log class
 #include "LineStop.h"
 #include "Road.h"
@@ -755,7 +755,7 @@ namespace synthese
 						if (ls)
 							stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
 						stream << ">";
-						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName()) << "</td>";
+						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
 
 						// Transfers
 						if (its == journey->getServiceUses().end() -1)
@@ -789,7 +789,7 @@ namespace synthese
 								if (ls)
 									stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
 								stream << ">";
-								stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName()) << "</td>";
+								stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
 
 								// Exit if last service use
 								if (its == journey->getServiceUses().end() -1)

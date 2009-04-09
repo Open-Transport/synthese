@@ -105,7 +105,7 @@ namespace synthese
 				);
 				ContinuousServiceTableSync::Search(_env, _line->getKey(), 0, 0, true, true, UP_DOWN_LINKS_LOAD_LEVEL);
 			}
-			catch (...)
+			catch (Exception& e)
 			{
 				throw AdminParametersException("No such line");
 			}

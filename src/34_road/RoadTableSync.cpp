@@ -23,7 +23,7 @@
 #include <sstream>
 
 #include "RoadTableSync.h"
-
+#include "RoadPlaceTableSync.h"
 #include "CityTableSync.h"
 #include "FareTableSync.h"
 
@@ -54,7 +54,6 @@ namespace synthese
 	namespace road
 	{
 		const string RoadTableSync::COL_NAME ("name");
-		const string RoadTableSync::COL_CITYID ("city_id");
 		const string RoadTableSync::COL_ROADTYPE ("road_type");
 		const string RoadTableSync::COL_FAREID ("fare_id");
 		const string RoadTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
@@ -62,6 +61,7 @@ namespace synthese
 		const string RoadTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 		const string RoadTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
 		const string RoadTableSync::COL_VIAPOINTS ("via_points");
+		const string RoadTableSync::COL_ROAD_PLACE_ID("road_place_id");
 	}
 
 	namespace db
@@ -74,7 +74,6 @@ namespace synthese
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(RoadTableSync::COL_CITYID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_FAREID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
@@ -82,6 +81,7 @@ namespace synthese
 			SQLiteTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_VIAPOINTS, SQL_TEXT),
+			SQLiteTableSync::Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -96,20 +96,15 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Name
-			std::string name (rows->getText (RoadTableSync::COL_NAME));
-			object->setName(name);
-
 			// Type
 			Road::RoadType roadType = (Road::RoadType) rows->getInt (RoadTableSync::COL_ROADTYPE);
 			object->setType(roadType);
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// City
-				uid cityId (rows->getLongLong (RoadTableSync::COL_CITYID));
-				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
-
+				RegistryKeyType roadPlaceId(rows->getLongLong(RoadTableSync::COL_ROAD_PLACE_ID));
+				object->setRoadPlace(RoadPlaceTableSync::Get(roadPlaceId, env, linkLevel).get());
+				
 				// Fare
 // 				uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));
 // 				object->setFare(FareTableSync::Get (fareId, env, linkLevel));
@@ -125,28 +120,12 @@ namespace synthese
 
 // 				uid reservationRuleId (rows->getLongLong (RoadTableSync::COL_RESERVATIONRULEID));
 // 				object->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel));
-
-
-				// Links to the loaded object
-//				if (temporary == GET_REGISTRY)
-				{
-					City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
-					city->getRoadsMatcher ().add (object->getName (), object);
-					city->getAllPlacesMatcher().add(object->getName() + " [voie]", static_cast<const Place*>(object));
-				}
 			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Unlink(
 			Road* obj
 		){
-			City* city = const_cast<City*>(obj->getCity ());
-			if (city != NULL)
-			{
-				city->getRoadsMatcher ().remove (obj->getName ());
-				city->getAllPlacesMatcher().remove(obj->getName() + " [voie]");
-				obj->setCity(NULL);
-			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Save(Road* object)

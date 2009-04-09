@@ -24,6 +24,7 @@
 
 #include "Address.h"
 #include "Road.h"
+#include "RoadPlace.h"
 #include "VertexAccessMap.h"
 #include "AccessParameters.h"
 
@@ -37,7 +38,7 @@ namespace synthese
 		TemporaryPlace::TemporaryPlace(
 			const Road* road,
 			double metricOffset
-		):	Place ("", road->getCity()),
+		):	Place ("", road->getRoadPlace()->getCity()),
 			_road (road),
 			_metricOffset (metricOffset)
 		{
@@ -78,7 +79,7 @@ namespace synthese
 						const Vertex* origin) const
 		{
 			VertexAccess access(accessDirection);
-			access.approachDistance = _metricOffset - ((Address*) destination)->getMetricOffset ();
+			//access.approachDistance = _metricOffset - ((Address*) destination)->getMetricOffset ();
 			access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
 			return access;
 		}
@@ -104,20 +105,20 @@ namespace synthese
 		
 			if (closestBefore != 0)
 			{
-				VertexAccess access(accessDirection);
-				access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
-				access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
+//				VertexAccess access(accessDirection);
+	//			access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
+//				access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
 				
-				result.insert (closestBefore, access);
+//				result.insert (closestBefore, access);
 			}
 		
 			if ( (closestAfter != 0) && (closestAfter != closestBefore) )
 			{
-				VertexAccess access(accessDirection);
-				access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
-				access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
+	//			VertexAccess access(accessDirection);
+		//		access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
+			//	access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
 				
-				result.insert (closestAfter, access);
+		//		result.insert (closestAfter, access);
 			}
 		}
 		

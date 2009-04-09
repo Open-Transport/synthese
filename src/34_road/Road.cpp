@@ -21,6 +21,7 @@
 */
 
 #include "Road.h"
+#include "RoadPlace.h"
 #include "Address.h"
 #include "RoadChunk.h"
 #include "PermanentService.h"
@@ -43,13 +44,10 @@ namespace synthese
 	{
 
 		Road::Road (
-			RegistryKeyType id
-			, std::string name
-			, const City* city
-			, RoadType type
-		)	: Registrable(id)
-			, AddressablePlace (name, city)
-			, _type (type)
+			RegistryKeyType id,
+			RoadType type
+		):	Registrable(id),
+			_type (type)
 		{
 			// Creation of the permanent service
 			addService(new PermanentService(id, this), false);
@@ -82,7 +80,7 @@ namespace synthese
 		Road::findClosestAddressBefore (double metricOffset) const
 		{
 			const Address* address = 0;
-			for (Addresses::const_iterator it = getAddresses ().begin ();
+/*			for (Addresses::const_iterator it = getAddresses ().begin ();
 			 it != getAddresses ().end (); ++it)
 			{
 			if ( ((*it)->getMetricOffset () <= metricOffset) &&
@@ -91,7 +89,7 @@ namespace synthese
 				address = (*it);
 			}
 			}
-			return address;
+*/			return address;
 		}
 
 
@@ -99,7 +97,7 @@ namespace synthese
 		Road::findClosestAddressAfter (double metricOffset) const
 		{
 			const Address* address = 0;
-			for (Addresses::const_iterator it = getAddresses ().begin ();
+/*			for (Addresses::const_iterator it = getAddresses ().begin ();
 			 it != getAddresses ().end (); ++it)
 			{
 			if ( ((*it)->getMetricOffset () >= metricOffset) &&
@@ -108,7 +106,7 @@ namespace synthese
 				address = (*it);
 			}
 			}
-			return address;
+*/			return address;
 		}
 
 
@@ -129,30 +127,32 @@ namespace synthese
 
 
 
+		void Road::addRoadChunk(
+			const RoadChunk* chunk
+		){
+			if(_pathGroup)
+			{
+				static_cast<RoadPlace*>(_pathGroup)->addAddress(chunk->getFromAddress());
+			}
+			addEdge(static_cast<const Edge*>(chunk));
+		}
+
+
 		bool Road::isPedestrianMode() const
 		{
 			return true;
 		}
-
-
-
-		void Road::getImmediateVertices(
-			VertexAccessMap& result,
-			const AccessDirection& accessDirection,
-			const AccessParameters& accessParameters,
-			SearchAddresses returnAddresses,
-			SearchPhysicalStops returnPhysicalStops,
-			const Vertex* origin /*= 0 */
+		
+		
+		const RoadPlace* Road::getRoadPlace(
 		) const {
-			for (Addresses::const_iterator it = _addresses.begin ();
-				it != _addresses.end (); ++it
-			){
-				(*it)->getAddressablePlace()->getImmediateVertices(
-					result, accessDirection, accessParameters
-					, returnAddresses, returnPhysicalStops
-					, origin
-				);
-			}
+			return static_cast<const RoadPlace*>(_pathGroup);
+		}
+		
+		
+		void Road::setRoadPlace(const RoadPlace* value)
+		{
+			_pathGroup = value;
 		}
 	}
 }

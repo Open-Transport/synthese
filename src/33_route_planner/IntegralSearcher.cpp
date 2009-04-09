@@ -23,7 +23,7 @@
 #include "IntegralSearcher.h"
 #include "BestVertexReachesMap.h"
 #include "JourneysResult.h"
-
+#include "RoadPlace.h"
 #include "VertexAccessMap.h"
 #include "Vertex.h"
 #include "Edge.h"
@@ -162,7 +162,13 @@ namespace synthese
 					if (ls)
 						stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
 					stream << ">";
-					stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName()) << "</td>";
+					stream << (
+							ls ?
+							ls->getLine()->getCommercialLine()->getShortName() :
+							road->getRoadPlace()->getName()
+						) <<
+						"</td>"
+					;
 
 					// Transfers
 					if (its == journey->getServiceUses().end() -1)
@@ -196,7 +202,13 @@ namespace synthese
 							if (ls)
 								stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
 							stream << ">";
-							stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName()) << "</td>";
+							stream <<
+								(	ls ?
+									ls->getLine()->getCommercialLine()->getShortName() :
+									road->getRoadPlace()->getName()
+								) <<
+								"</td>"
+							;
 
 							// Exit if last service use
 							if (its == journey->getServiceUses().end() -1)

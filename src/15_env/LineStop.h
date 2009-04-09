@@ -50,9 +50,14 @@ namespace synthese
 			typedef util::Registry<LineStop>	Registry;
 
 		private:
-			double _metricOffset;      //!< Metric offset of stop on line
 			bool	_scheduleInput;
+			bool	_isDeparture;		//!< The departure from the vertex is allowed
+			bool	_isArrival;			//!< The arrival at the vertex is allowed
 
+
+		protected:
+			virtual bool _isDepartureAllowed() const;
+			virtual bool _isArrivalAllowed() const;
 
 		public:
 
@@ -72,9 +77,10 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const PhysicalStop*	getPhysicalStop()	const;
-				double				getMetricOffset ()	const;
 				Line*				getLine()			const;
 				bool				getScheduleInput()	const;
+				bool				getIsDeparture()	const;
+				bool				getIsArrival()		const;
 			//@}
 				
 			//!	@name Setters
@@ -89,8 +95,9 @@ namespace synthese
 				void				setPhysicalStop(PhysicalStop* stop);
 
 				void				setScheduleInput(bool value);
-				void				setMetricOffset (double metricOffset);
 				void				setLine(const Line* line);
+				void				setIsDeparture(bool value);
+				void				setIsArrival(bool value);
 			//@}
 
 

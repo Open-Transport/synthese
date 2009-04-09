@@ -85,7 +85,11 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<LineStopTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(LineStopTableSync::COL_LINEID.c_str(), ""),
+			SQLiteTableSync::Index(
+				LineStopTableSync::COL_LINEID.c_str(),
+				LineStopTableSync::COL_RANKINPATH.c_str(),
+				""
+			),
 			SQLiteTableSync::Index(LineStopTableSync::COL_PHYSICALSTOPID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};

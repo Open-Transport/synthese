@@ -50,6 +50,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace interfaces;
 	using namespace graph;
+	using namespace road;
 
 	namespace util
 	{

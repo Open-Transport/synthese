@@ -75,12 +75,17 @@ namespace synthese
 	@{
 	*/
 
+
+	namespace road
+	{
+		class AddressablePlace;
+	}
+
 	/** 35 Transport network module namespace.
 		The env name is due to historical reasons.
 	*/
 	namespace env
 	{
-		class AddressablePlace;
 		class IncludingPlace;
 		class Place;
 		class NonPermanentService;
@@ -106,12 +111,12 @@ namespace synthese
 				All the containers storong objects typed (or subtyped) as AddressablePlace
 				are inspected.
 			*/
-			static boost::shared_ptr<const AddressablePlace> FetchAddressablePlace(
+			static boost::shared_ptr<const road::AddressablePlace> FetchAddressablePlace(
 				const util::RegistryKeyType& id,
 				util::Env& env = util::Env::GetOfficialEnv()
 			);
 
-			static boost::shared_ptr<AddressablePlace> FetchEditableAddressablePlace(
+			static boost::shared_ptr<road::AddressablePlace> FetchEditableAddressablePlace(
 				const util::RegistryKeyType& id,
 				util::Env& env = util::Env::GetOfficialEnv()
 			);

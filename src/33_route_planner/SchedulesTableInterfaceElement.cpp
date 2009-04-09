@@ -35,7 +35,7 @@
 #include "Line.h"
 #include "Journey.h"
 #include "Crossing.h"
-
+#include "AddressablePlace.h"
 #include "Interface.h"
 
 #include "DateTime.h"
@@ -52,8 +52,10 @@ namespace synthese
 	using namespace env;
 	using namespace interfaces;
 	using namespace graph;
+	using namespace road;
+	
 
-	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::SchedulesTableInterfaceElement>::FACTORY_KEY(
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement,SchedulesTableInterfaceElement>::FACTORY_KEY(
 		"schedules_table"
 	);
 	
@@ -112,9 +114,9 @@ namespace synthese
 							lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode()
 						){
 							const Place* placeToSearch(
-								(itl == jl.begin() && dynamic_cast<const Crossing*>(
-									curET.getDepartureEdge()->getPlace())
-								)?
+								(	itl == jl.begin() &&
+									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getPlace())
+								) ?
 								jv->departurePlace :
 								AddressablePlace::GetPlace(curET.getDepartureEdge()->getPlace())
 							);

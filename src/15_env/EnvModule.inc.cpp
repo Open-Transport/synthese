@@ -15,11 +15,9 @@
 
 #include "LinesListFunction.cpp"
 
-#include "AddressTableSync.h"
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "ConnectionPlaceTableSync.h"
-#include "CrossingTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "FareTableSync.h"
 #include "LineStopTableSync.h"
@@ -28,7 +26,6 @@
 #include "PlaceAliasTableSync.h"
 #include "PublicPlaceTableSync.h"
 #include "ReservationContactTableSync.h"
-#include "RoadChunkTableSync.h"
 #include "RollingStockTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
@@ -46,7 +43,6 @@
 #include "Line.h"
 #include "Address.h"
 #include "LineStop.h"
-#include "Crossing.h"
 #include "NonConcurrencyRule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ReservationContact.h"

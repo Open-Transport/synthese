@@ -42,6 +42,7 @@
 namespace synthese
 {
 	using namespace env;
+	using namespace road;
 	
 	namespace routeplanner
 	{

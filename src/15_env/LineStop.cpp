@@ -54,10 +54,11 @@ namespace synthese
 			bool isArrival,		
 			double metricOffset,
 			PhysicalStop* physicalStop
-		):	Registrable(id)
-			, Edge (isDeparture, isArrival, line, rankInPath, physicalStop)
-			, _metricOffset (metricOffset)
-			, _scheduleInput(true)
+		):	Registrable(id),
+			_isDeparture(isDeparture),
+			_isArrival(isArrival),
+			Edge(line, rankInPath, physicalStop, metricOffset),
+			_scheduleInput(true)
 		{
 			if (physicalStop)
 				setPhysicalStop(physicalStop);
@@ -67,14 +68,6 @@ namespace synthese
 
 		LineStop::~LineStop()
 		{
-		}
-
-
-
-		double
-		LineStop::getMetricOffset () const
-		{
-			return _metricOffset;
 		}
 
 
@@ -106,11 +99,6 @@ namespace synthese
 		}
 
 
-		void 
-		LineStop::setMetricOffset (double metricOffset)
-		{
-			_metricOffset = metricOffset;
-		}
 
 		Line* LineStop::getLine() const
 		{
@@ -135,12 +123,40 @@ namespace synthese
 			// Links from stop to the linestop
 			if(stop)
 			{
-				if (isArrival())
+				if(getIsArrival())
 					stop->addArrivalEdge((Edge*) this);
-				if (isDeparture())
+				if(getIsDeparture())
 					stop->addDepartureEdge((Edge*) this);
 			}
 		}
+		
+		
+		
+		void LineStop::setIsArrival( bool value )
+		{
+			_isArrival = value;
+		}
+
+		void LineStop::setIsDeparture( bool value )
+		{
+			_isDeparture = value;
+		}
+
+
+
+		bool LineStop::_isDepartureAllowed() const
+		{
+			return _isDeparture;
+		}
+		
+		
+		
+		bool LineStop::_isArrivalAllowed() const
+		{
+			return _isArrival;
+		}
+		
+		
 
 		void LineStop::setScheduleInput( bool value )
 		{
@@ -150,6 +166,20 @@ namespace synthese
 		bool LineStop::getScheduleInput() const
 		{
 			return _scheduleInput;
+		}
+		
+		
+		
+		bool LineStop::getIsDeparture() const
+		{
+			return _isDeparture;
+		}
+		
+		
+		
+		bool LineStop::getIsArrival() const
+		{
+			return _isArrival;
 		}
 	}
 }

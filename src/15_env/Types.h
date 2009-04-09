@@ -39,15 +39,13 @@ namespace synthese
 		class PhysicalStop;
 		class City;
 		class Line;
-		class Address;
 		class Place;
 
 		/** @addtogroup m35
 		@{
 		*/
 		typedef std::map<uid,const PhysicalStop*> PhysicalStops;
-		typedef std::vector<const Address*> Addresses;
-
+		
 		typedef std::vector<boost::shared_ptr<const City> > CityList;
 		typedef std::set<boost::shared_ptr<const Line> > LineSet;
 

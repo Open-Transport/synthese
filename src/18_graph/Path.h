@@ -82,11 +82,11 @@ namespace synthese
 			typedef std::vector<Edge*> Edges;
 
 		protected:
-			Edges				_edges; 
-			ServiceSet			_services;
+			PathGroup*		_pathGroup;	//!< Up link : path group
+			Edges			_edges; 	//!< Down link 1 : edges
+			ServiceSet		_services;	//!< Down link 2 : services
 			
-			bool				_allDays;	//!< A permanent service is present : the calendar is ignored
-			const PathGroup*	_pathGroup;
+			bool			_allDays;	//!< A permanent service is present : the calendar is ignored
 
 			/** Constructor.
 			*/

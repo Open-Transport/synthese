@@ -54,7 +54,7 @@
 #include "RoadChunk.h"
 #include "EnvModule.h"
 #include "AccessParameters.h"
-
+#include "RoadPlace.h"
 #include "User.h"
 #include "UserTableSync.h"
 
@@ -312,7 +312,7 @@ namespace synthese
 				const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
 				const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
 				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName());
+				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
 
 				// Transfers
 				if (its == (*it)->getServiceUses().end() -1)
@@ -344,7 +344,7 @@ namespace synthese
 						const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
 						const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
 						stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getName());
+						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
 
 						// Exit if last service use
 						if (its == (*it)->getServiceUses().end() -1)

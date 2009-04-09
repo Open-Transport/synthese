@@ -23,7 +23,7 @@
 #include "City.h"
 #include "PlaceAlias.h"
 #include "PublicPlace.h"
-#include "Road.h"
+#include "RoadPlace.h"
 #include "Registry.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 
@@ -102,8 +102,7 @@ namespace synthese
 
 
 
-		synthese::lexmatcher::LexicalMatcher<const Road*>& 
-		City::getRoadsMatcher ()
+		lexmatcher::LexicalMatcher<const RoadPlace*>& City::getRoadsMatcher()
 		{
 			return _roadsMatcher;
 		}
@@ -111,7 +110,7 @@ namespace synthese
 
 
 
-		const synthese::lexmatcher::LexicalMatcher<const Road*>& 
+		const synthese::lexmatcher::LexicalMatcher<const RoadPlace*>& 
 		City::getRoadsMatcher () const
 		{
 			return _roadsMatcher;
@@ -137,15 +136,18 @@ namespace synthese
 
 
 
-		std::vector<const Road*> 
-		City::searchRoad (const std::string& fuzzyName, int nbMatches) const
-		{
-			std::vector<const Road*> result;
-			LexicalMatcher<const Road*>::MatchResult matches =  _roadsMatcher.bestMatches (fuzzyName, nbMatches);
-			for (LexicalMatcher<const Road*>::MatchResult::iterator it = matches.begin ();
+		vector<const RoadPlace*> City::searchRoad(
+			const string& fuzzyName,
+			int nbMatches
+		) const {
+			std::vector<const RoadPlace*> result;
+			LexicalMatcher<const RoadPlace*>::MatchResult matches =  _roadsMatcher.bestMatches (
+				fuzzyName, nbMatches
+			);
+			for (LexicalMatcher<const RoadPlace*>::MatchResult::iterator it = matches.begin ();
 			 it != matches.end (); ++it)
 			{
-			result.push_back (it->value);
+				result.push_back (it->value);
 			}
 			return result;
 		}

@@ -48,7 +48,6 @@ namespace synthese
 			- on delete : X
 			*/
 			static const std::string COL_NAME;
-			static const std::string COL_CITYID;
 			static const std::string COL_ROADTYPE;
 			static const std::string COL_FAREID;
 			static const std::string COL_BIKECOMPLIANCEID;
@@ -56,7 +55,7 @@ namespace synthese
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_RESERVATIONRULEID;
 			static const std::string COL_VIAPOINTS;
-			// list of chunk ids
+			static const std::string COL_ROAD_PLACE_ID;
 			
 			RoadTableSync();
 

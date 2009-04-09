@@ -54,6 +54,7 @@ namespace synthese
 	using namespace time;
 	using namespace resa;
 	using namespace graph;
+	using namespace road;
 
 	namespace util
 	{

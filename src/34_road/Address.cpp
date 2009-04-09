@@ -1,6 +1,6 @@
 
-/** PublicPlace class header.
-	@file PublicPlace.h
+/** Address class implementation.
+	@file Address.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,41 +20,63 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENV_PUBLICPLACE_H
-#define SYNTHESE_ENV_PUBLICPLACE_H
-
+#include "Address.h"
 #include "AddressablePlace.h"
+#include "Edge.h"
 #include "Registry.h"
 
-#include <string>
+using namespace std;
 
 namespace synthese
 {
-	namespace env
+	using namespace graph;
+	using namespace env;
+	
+	namespace util
 	{
-		class City;
+		template<> const string Registry<road::Address>::KEY("Address");
+	}
+
+	namespace road
+	{
 
 
-		/** Public place class.
-			@ingroup m35
-		*/
-		class PublicPlace
-		:	public road::AddressablePlace
+		Address::Address (const uid id,
+				  const AddressablePlace* place,
+				  double x,
+				  double y)
+		:	util::Registrable(id)
+			, Vertex (place, x, y)
 		{
-		public:
 
-			/// Chosen registry class.
-			typedef util::Registry<PublicPlace>	Registry;
+		}
 
-			PublicPlace (
-				util::RegistryKeyType id = UNKNOWN_VALUE
-				, std::string name = std::string()
-				, const City* city = NULL
-			);
 
-			virtual ~PublicPlace ();
-		};
+
+		const AddressablePlace* Address::getAddressablePlace() const
+		{
+			return static_cast<const AddressablePlace*>(_place);
+		}
+
+
+		Address::~Address()
+		{
+		}
+
+
+
+		bool 
+		Address::isAddress () const
+		{
+			return true;
+		}
+
+
+
+		bool 
+		Address::isPhysicalStop () const
+		{
+			return false;
+		}
 	}
 }
-
-#endif 	    

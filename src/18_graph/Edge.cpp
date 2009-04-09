@@ -34,14 +34,11 @@ namespace synthese
 	namespace graph
 	{
 		Edge::Edge(
-			bool isDeparture,
-			bool isArrival,
 			const Path* parentPath,
 			int rankInPath,
-			const Vertex* fromVertex
-		):	_isDeparture (isDeparture),
-			Registrable(UNKNOWN_VALUE),
-			_isArrival (isArrival),
+			const Vertex* fromVertex,
+			double metricOffset
+		):	Registrable(UNKNOWN_VALUE),
 			_parentPath (parentPath),
 			_rankInPath (rankInPath),
 			_nextInPath(NULL),
@@ -50,7 +47,8 @@ namespace synthese
 			_followingConnectionArrival(NULL),
 			_followingArrivalForFineSteppingOnly(NULL),
 			_serviceIndexUpdateNeeded (true),
-			_fromVertex(fromVertex)
+			_fromVertex(fromVertex),
+			_metricOffset(metricOffset)
 		{ }
 
 
@@ -69,17 +67,31 @@ namespace synthese
 
 
 
-		bool Edge::isArrival () const
+		double Edge::getMetricOffset () const
 		{
-			return _isArrival;
+			return _metricOffset;
 		}
 
 
 
-		bool 
-		Edge::isDeparture () const
+		void Edge::setMetricOffset(
+			double metricOffset
+		){
+			_metricOffset = metricOffset;
+		}
+
+
+
+		bool Edge::isArrival () const
 		{
-			return _isDeparture;
+			return _previousDepartureForFineSteppingOnly && _isArrivalAllowed();
+		}
+
+
+
+		bool Edge::isDeparture () const
+		{
+			return _followingArrivalForFineSteppingOnly && _isDepartureAllowed();
 		}
 
 
@@ -103,8 +115,6 @@ namespace synthese
 		{
 			_nextInPath = nextInPath;
 		}
-
-
 
 
 
@@ -141,8 +151,6 @@ namespace synthese
 
 
 
-
-
 		void 
 		Edge::setPreviousConnectionDeparture( const Edge* previousConnectionDeparture)
 		{
@@ -150,14 +158,12 @@ namespace synthese
 		}
 
 
+
 		void 
 		Edge::setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture)
 		{
 			_previousDepartureForFineSteppingOnly = previousDeparture;
 		}
-
-
-
 
 
 
@@ -470,16 +476,6 @@ namespace synthese
 		}
 
 
-
-		void Edge::setIsArrival( bool value )
-		{
-			_isArrival = value;
-		}
-
-		void Edge::setIsDeparture( bool value )
-		{
-			_isDeparture = value;
-		}
 
 		void Edge::setRankInPath( int value )
 		{

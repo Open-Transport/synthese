@@ -39,6 +39,7 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace graph;
+	using namespace road;
 
 	namespace routeplanner
 	{
@@ -113,8 +114,8 @@ namespace synthese
 
 				if (vertex->isAddress())
 				{
-					const Addresses& ads(AddressablePlace::GetPlace(p)->getAddresses());
-					for (Addresses::const_iterator ita(ads.begin()); ita != ads.end(); ++ita)
+					const AddressablePlace::Addresses& ads(AddressablePlace::GetPlace(p)->getAddresses());
+					for(AddressablePlace::Addresses::const_iterator ita(ads.begin()); ita != ads.end(); ++ita)
 					{
 						DateTime bestTimeAtAddress(bestTime);
 						if (_accessDirection == DEPARTURE_TO_ARRIVAL)

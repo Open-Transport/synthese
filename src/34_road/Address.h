@@ -1,6 +1,6 @@
 
-/** PublicPlace class header.
-	@file PublicPlace.h
+/** Address class header.
+	@file Address.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,41 +20,67 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENV_PUBLICPLACE_H
-#define SYNTHESE_ENV_PUBLICPLACE_H
+#ifndef SYNTHESE_ENV_ADDRESS_H
+#define SYNTHESE_ENV_ADDRESS_H
 
-#include "AddressablePlace.h"
+#include "Vertex.h"
 #include "Registry.h"
+#include "01_util/Constants.h"
 
-#include <string>
+#include <vector>
+#include <set>
 
 namespace synthese
 {
-	namespace env
+	namespace road
 	{
-		class City;
+		class AddressablePlace;
+		
+		/** Address.
 
-
-		/** Public place class.
-			@ingroup m35
+			An address may be associated with a connection place in the following cases :
+			  - The address belongs to a logical stop
+			@ingroup m34
 		*/
-		class PublicPlace
-		:	public road::AddressablePlace
+		class Address
+		:	 public graph::Vertex
 		{
 		public:
 
 			/// Chosen registry class.
-			typedef util::Registry<PublicPlace>	Registry;
+			typedef util::Registry<Address> Registry;
 
-			PublicPlace (
-				util::RegistryKeyType id = UNKNOWN_VALUE
-				, std::string name = std::string()
-				, const City* city = NULL
+		private:
+
+
+		public:
+
+			Address(
+				util::RegistryKeyType id = UNKNOWN_VALUE,
+				const AddressablePlace* place = NULL,
+				double x = UNKNOWN_VALUE,
+				double y = UNKNOWN_VALUE
 			);
 
-			virtual ~PublicPlace ();
+			~Address();
+
+
+			//! @name Getters
+			//@{
+				const AddressablePlace* getAddressablePlace() const;
+			//@}
+
+			//! @name Setters
+			//@{
+			//@}
+
+			//! @name Query methods
+			//@{
+				bool isAddress () const;
+				bool isPhysicalStop () const;
+			//@}
 		};
 	}
 }
 
-#endif 	    
+#endif

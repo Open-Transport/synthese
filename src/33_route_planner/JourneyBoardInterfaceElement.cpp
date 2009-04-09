@@ -201,7 +201,7 @@ namespace synthese
 						const ServiceUse& nextLeg(*(it+1));
 						const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
 
-						if (nextRoad && nextRoad->getName() == road->getName())
+						if (nextRoad && nextRoad->getRoadPlace() == road->getRoadPlace())
 							continue;
 					}
 

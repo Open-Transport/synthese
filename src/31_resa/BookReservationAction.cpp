@@ -48,7 +48,7 @@
 #include "Road.h"
 #include "UseRule.h"
 #include "AddressablePlace.h"
-
+#include "RoadPlace.h"
 #include "Types.h"
 #include "User.h"
 #include "UserTableSync.h"
@@ -325,7 +325,7 @@ namespace synthese
 				const Road* road(dynamic_cast<const Road*>(su.getService()->getPath()));
 				if (road)
 				{
-					r->setLineCode(road->getName());
+					r->setLineCode(road->getRoadPlace()->getName());
 					r->setLineId(road->getKey());
 				}
 

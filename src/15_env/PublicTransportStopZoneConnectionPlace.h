@@ -41,16 +41,19 @@ namespace synthese
 	{
 		class SquareDistance; 
 	}
+	
+	namespace road
+	{
+		class Address;
+	}
 
 	namespace env
 	{
-		class Address;
-
 		/** PublicTransportStopZoneConnectionPlace class.
 			@ingroup m35
 		*/
 		class PublicTransportStopZoneConnectionPlace
-		:	public AddressablePlace
+		:	public road::AddressablePlace
 		{
 		public:
 

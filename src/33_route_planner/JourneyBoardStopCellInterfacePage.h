@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace road
 	{
 		class AddressablePlace;
 	}
@@ -76,7 +76,7 @@ namespace synthese
 				, bool isItArrival
 				, const messages::SentAlarm* alarm
 				, bool isItTerminus
-				, const env::AddressablePlace* place
+				, const road::AddressablePlace* place
 				, bool color
 				, const time::DateTime& time
 				, int continuousServiceRange

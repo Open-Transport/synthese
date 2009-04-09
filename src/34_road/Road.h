@@ -25,25 +25,22 @@
 
 #include <string>
 
-#include "AddressablePlace.h"
 #include "Path.h"
 #include "Registry.h"
 
 namespace synthese
 {
-	namespace env
-	{
-		class City;
-	}
-	
 	namespace road
 	{
+		class RoadPlace;
+		class RoadChunk;
+		class Address;
+		
 		/** Road class.
 			@ingroup m34
 		*/
 		class Road
-		:	public env::AddressablePlace,
-			public graph::Path
+		:	public graph::Path
 		{
 		public:
 			
@@ -74,8 +71,6 @@ namespace synthese
 
 			Road(
 				util::RegistryKeyType key = UNKNOWN_VALUE,
-				std::string name = std::string(),
-				const env::City* city = NULL,
 				RoadType type = ROAD_TYPE_UNKNOWN
 			);
 
@@ -86,6 +81,8 @@ namespace synthese
 		//@{
 			  const RoadType& getType () const;
 			  void setType (const RoadType& type);
+			  const RoadPlace* getRoadPlace() const;
+			  void setRoadPlace(const RoadPlace* value);
 		//@}
 		
 
@@ -95,50 +92,28 @@ namespace synthese
 			bool isLine () const;
 			virtual bool isPedestrianMode() const;
 
-		/** getImmediateVertices.
-			@param result : all the vertices of all places traversed by the road
-			@param accessDirection
-			@param accessParameters
-			@param returnAddresses
-			@param returnPhysicalStops
-			@param origin
-			@author Hugues Romain
-			@date 2008		  	
-		*/
-		void getImmediateVertices(
-			graph::VertexAccessMap& result, 
-			const graph::AccessDirection& accessDirection,
-			const env::AccessParameters& accessParameters,
-			SearchAddresses returnAddresses
-			, SearchPhysicalStops returnPhysicalStops
-			, const graph::Vertex* origin = 0
-		) const;
-
 
 		  /** Find closest address of this road, before a given metric offset.
 			  @param metricOffset The reference point.
 			  @return Closest address before reference, or 0 if none.
 		  */
-		  const env::Address* findClosestAddressBefore (double metricOffset) const;
+		  const Address* findClosestAddressBefore (double metricOffset) const;
 
 		  
 		  /** Find closest address of this road, after a given metric offset.
 			  @param metricOffset The reference point.
 			  @return Closest address after reference, or 0 if none.
 		  */
-		  const env::Address* findClosestAddressAfter (double metricOffset) const;
+		  const Address* findClosestAddressAfter (double metricOffset) const;
 		  
 		  //@}
 
-		  //! @name Update methods.
-		  //@{
-
-		  //@}
-
+		//! @name Update methods.
+		//@{
+			void addRoadChunk(const RoadChunk* address);
+		//@}
 		};
-
-
 	}
 }
 
-#endif 
+#endif

@@ -37,7 +37,7 @@ namespace synthese
 {
 	namespace road
 	{
-		class Road;
+		class RoadPlace;
 	}
 	
 	namespace env
@@ -64,7 +64,7 @@ namespace synthese
 		private:
 			lexmatcher::LexicalMatcher<const PublicTransportStopZoneConnectionPlace*> _connectionPlacesMatcher;
 			lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
-			lexmatcher::LexicalMatcher<const road::Road*> _roadsMatcher;
+			lexmatcher::LexicalMatcher<const road::RoadPlace*> _roadsMatcher;
 			lexmatcher::LexicalMatcher<const PlaceAlias*> _placeAliasesMatcher;
 			lexmatcher::LexicalMatcher<const Place*> _allPlacesMatcher;
 
@@ -92,8 +92,8 @@ namespace synthese
 				lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher ();
 				const lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher () const;
 			    
-				lexmatcher::LexicalMatcher<const road::Road*>& getRoadsMatcher ();
-				const lexmatcher::LexicalMatcher<const road::Road*>& getRoadsMatcher () const;
+				lexmatcher::LexicalMatcher<const road::RoadPlace*>& getRoadsMatcher ();
+				const lexmatcher::LexicalMatcher<const road::RoadPlace*>& getRoadsMatcher () const;
 
 				lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher ();
 				const lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher () const;
@@ -117,9 +117,10 @@ namespace synthese
 					, SearchPhysicalStops returnPhysicalStops
 					, const graph::Vertex* origin = NULL
 				) const;
-			    
-				std::vector<const road::Road*> searchRoad(
-					const std::string& fuzzyName, int nbMatches = 10
+				
+				std::vector<const road::RoadPlace*> searchRoad(
+					const std::string& fuzzyName,
+					int nbMatches = 10
 				) const;
 			//@}
 		};

@@ -76,11 +76,9 @@ namespace synthese
 		protected:
 			const Vertex*	_fromVertex;
 			const Path*		_parentPath;		//!< The path the edge belongs
+			double			_metricOffset;		//!< Metric offset
 		
 		private:
-			bool _isDeparture;				//!< The departure from the vertex is allowed
-			bool _isArrival;				//!< The arrival at the vertex is allowed
-
 			int			_rankInPath;		//!< Rank in path.
 
 			const Edge* _nextInPath;		//!< Next edge in path.
@@ -100,13 +98,15 @@ namespace synthese
 
 		protected:
 			Edge(
-				bool isDeparture = true,
-				bool isArrival = true,
 				const Path* parentPath = NULL,
 				int rankInPath = UNKNOWN_VALUE,
-				const Vertex* fromVertex = NULL
+				const Vertex* fromVertex = NULL,
+				double metricOffset = UNKNOWN_VALUE
 			);
 
+			virtual bool _isDepartureAllowed() const = 0;
+			virtual bool _isArrivalAllowed() const = 0;
+			
 		public:
 			virtual ~Edge ();
 
@@ -122,6 +122,7 @@ namespace synthese
 				void	setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture);
 				void	setFollowingConnectionArrival( const Edge* followingConnectionArrival);
 				void	setFollowingArrivalForFineSteppingOnly ( const Edge* followingArrival);
+				void	setMetricOffset (double metricOffset);
 			//@}
 
 			//! @name Getters
@@ -135,7 +136,7 @@ namespace synthese
 				/** Returns metric offset of this edge from
 				parent path origin vertex.
 				*/
-				virtual double getMetricOffset () const = 0;
+				double getMetricOffset () const;
 
 				/** Returns length of this edge, in meters. from
 				*/
@@ -158,9 +159,6 @@ namespace synthese
 
 			
 				int getRankInPath () const;
-				bool isArrival () const;
-				bool isDeparture () const;
-
 			//@}
 
 
@@ -171,6 +169,8 @@ namespace synthese
 				int getDepartureFromIndex (int hour) const;
 				int getArrivalFromIndex (int hour) const;
 				
+				bool isArrival() const;
+				bool isDeparture() const;
 
 //				int getBestRunTime (const Edge& other ) const;
 			    

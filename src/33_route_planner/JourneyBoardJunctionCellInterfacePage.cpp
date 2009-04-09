@@ -25,6 +25,7 @@
 #include "Place.h"
 #include "Road.h"
 #include "Conversion.h"
+#include "RoadPlace.h"
 
 using namespace std;
 
@@ -54,7 +55,7 @@ namespace synthese
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(Conversion::ToString(color));
-			pv.push_back(road ? road->getName() : string());
+			pv.push_back((road && road->getRoadPlace()) ? road->getRoadPlace()->getName() : string());
 			pv.push_back(Conversion::ToString(distance));
 
 			VariablesMap vm;

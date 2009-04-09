@@ -33,8 +33,12 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace time;
+	using namespace road;
+	using namespace routeplanner;
 
-	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardStopCellInterfacePage>::FACTORY_KEY("journey_board_stop_cell");
+	template<> const string util::FactorableTemplate<InterfacePage, JourneyBoardStopCellInterfacePage>::FACTORY_KEY(
+		"journey_board_stop_cell"
+	);
 
 	namespace routeplanner
 	{

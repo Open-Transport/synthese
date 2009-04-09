@@ -33,7 +33,6 @@
 #include "CommercialLineTableSync.h"
 #include "CommercialLine.h"
 #include "Crossing.h"
-#include "CrossingTableSync.h"
 #include "Line.h"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
@@ -41,8 +40,8 @@
 #include "ContinuousServiceTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
-#include "Road.h"
-#include "RoadTableSync.h"
+#include "RoadPlace.h"
+#include "RoadPlaceTableSync.h"
 #include "PublicPlace.h"
 #include "PublicPlaceTableSync.h"
 #include "City.h"
@@ -145,10 +144,8 @@ namespace synthese
 				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(ConnectionPlaceTableSync::Get(id, env));
 			if (tableId == PublicPlaceTableSync::TABLE.ID)
 				return static_pointer_cast<const AddressablePlace, const PublicPlace>(PublicPlaceTableSync::Get(id, env));
-			if (tableId == RoadTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const Road>(RoadTableSync::Get(id, env));
-			if (tableId == CrossingTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const Crossing>(CrossingTableSync::Get(id, env));
+			if (tableId == RoadPlaceTableSync::TABLE.ID)
+				return static_pointer_cast<const AddressablePlace, const RoadPlace>(RoadPlaceTableSync::Get(id, env));
 			return shared_ptr<const AddressablePlace>();
 		}
 
@@ -162,10 +159,8 @@ namespace synthese
 				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(env.getEditableRegistry<PublicTransportStopZoneConnectionPlace>().getEditable(id));
 			if (tableId == PublicPlaceTableSync::TABLE.ID)
 				return static_pointer_cast<AddressablePlace, PublicPlace>(env.getEditableRegistry<PublicPlace>().getEditable(id));
-			if (tableId == RoadTableSync::TABLE.ID)
-				return static_pointer_cast<AddressablePlace, Road>(env.getEditableRegistry<Road>().getEditable(id));
-			if (tableId == CrossingTableSync::TABLE.ID)
-				return static_pointer_cast<AddressablePlace, Crossing>(env.getEditableRegistry<Crossing>().getEditable(id));
+			if (tableId == RoadPlaceTableSync::TABLE.ID)
+				return static_pointer_cast<AddressablePlace, RoadPlace>(env.getEditableRegistry<RoadPlace>().getEditable(id));
 			return shared_ptr<AddressablePlace>();
 		}
 
