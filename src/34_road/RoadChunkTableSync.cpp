@@ -130,12 +130,10 @@ namespace synthese
 				try
 				{
 					object->setRoad(RoadTableSync::Get (roadId, env, linkLevel).get());
-					shared_ptr<Road> road(RoadTableSync::GetEditable(roadId, env, linkLevel));
-					road->addRoadChunk(object);
-					
-					
 					Address* fromAddress(AddressTableSync::GetEditable (fromAddressId, env, linkLevel).get());
 					object->setFromAddress(fromAddress);
+					shared_ptr<Road> road(RoadTableSync::GetEditable(roadId, env, linkLevel));
+					road->addRoadChunk(object);
 				}
 				catch (ObjectNotFoundException<Road>& e)
 				{

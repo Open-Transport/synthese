@@ -55,10 +55,6 @@ namespace synthese
 			bool	_isArrival;			//!< The arrival at the vertex is allowed
 
 
-		protected:
-			virtual bool _isDepartureAllowed() const;
-			virtual bool _isArrivalAllowed() const;
-
 		public:
 
 			LineStop(
@@ -110,7 +106,8 @@ namespace synthese
 				*/
 				bool seemsGeographicallyConsistent (const LineStop& other) const;
 
-
+				virtual bool isDepartureAllowed() const;
+				virtual bool isArrivalAllowed() const;
 			//@}
 
 

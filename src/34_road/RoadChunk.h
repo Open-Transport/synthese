@@ -51,11 +51,6 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<RoadChunk>	Registry;
 
-		protected:
-			virtual bool _isDepartureAllowed() const;
-			virtual bool _isArrivalAllowed() const;
-
-		public:
 
 			RoadChunk(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
@@ -77,6 +72,9 @@ namespace synthese
 
 		//! @name Query methods.
 		//@{
+			virtual bool isDepartureAllowed() const;
+			virtual bool isArrivalAllowed() const;
+
 			const Road* getRoad() const;
 		//@}
 

@@ -67,14 +67,14 @@ namespace synthese
 		
 		
 
-		bool RoadChunk::_isDepartureAllowed() const
+		bool RoadChunk::isDepartureAllowed() const
 		{
 			return true;
 		}
 		
 		
 		
-		bool RoadChunk::_isArrivalAllowed() const
+		bool RoadChunk::isArrivalAllowed() const
 		{
 			return true;
 		}
@@ -100,9 +100,5 @@ namespace synthese
 
 			markServiceIndexUpdateNeeded();
 		}
-
-
-
-
 	}
 }

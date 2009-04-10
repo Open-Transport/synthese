@@ -67,7 +67,7 @@ namespace synthese
 		class IntegralSearcher
 		{
 		private:
-			typedef const graph::Edge* (graph::Edge::*PtrEdgeStep) () const;
+			typedef graph::Edge* (graph::Edge::*PtrEdgeStep) () const;
 
 			class _JourneyComparator
 			{

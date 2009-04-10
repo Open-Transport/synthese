@@ -43,5 +43,10 @@ namespace synthese
 		) const {
 			return 1;
 		}
+
+		bool Hub::isConnectionPossible() const
+		{
+			return getScore() > 0;
+		}
 	}
 }

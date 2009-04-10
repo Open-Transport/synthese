@@ -144,14 +144,14 @@ namespace synthese
 
 
 
-		bool LineStop::_isDepartureAllowed() const
+		bool LineStop::isDepartureAllowed() const
 		{
 			return _isDeparture;
 		}
 		
 		
 		
-		bool LineStop::_isArrivalAllowed() const
+		bool LineStop::isArrivalAllowed() const
 		{
 			return _isArrival;
 		}

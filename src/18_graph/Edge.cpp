@@ -20,6 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "Hub.h"
 #include "Edge.h"
 #include "Path.h"
 #include "Service.h"
@@ -41,7 +42,6 @@ namespace synthese
 		):	Registrable(UNKNOWN_VALUE),
 			_parentPath (parentPath),
 			_rankInPath (rankInPath),
-			_nextInPath(NULL),
 			_previousConnectionDeparture(NULL),
 			_previousDepartureForFineSteppingOnly(NULL),
 			_followingConnectionArrival(NULL),
@@ -84,14 +84,14 @@ namespace synthese
 
 		bool Edge::isArrival () const
 		{
-			return _previousDepartureForFineSteppingOnly && _isArrivalAllowed();
+			return _previousDepartureForFineSteppingOnly && isArrivalAllowed();
 		}
 
 
 
 		bool Edge::isDeparture () const
 		{
-			return _followingArrivalForFineSteppingOnly && _isDepartureAllowed();
+			return _followingArrivalForFineSteppingOnly && isDepartureAllowed();
 		}
 
 
@@ -102,32 +102,15 @@ namespace synthese
 		}
 
 
-		const Edge* 
-		Edge::getNextInPath () const
-		{
-			return _nextInPath;
-		}
 
-
-
-		void 
-		Edge::setNextInPath (const Edge* nextInPath)
-		{
-			_nextInPath = nextInPath;
-		}
-
-
-
-		const Edge* 
-		Edge::getPreviousConnectionDeparture () const
+		Edge* Edge::getPreviousConnectionDeparture () const
 		{
 			return _previousConnectionDeparture;
 		}
 
 
 
-		const Edge* 
-		Edge::getPreviousDepartureForFineSteppingOnly () const
+		Edge* Edge::getPreviousDepartureForFineSteppingOnly () const
 		{
 			return _previousDepartureForFineSteppingOnly;
 		}
@@ -135,53 +118,45 @@ namespace synthese
 
 
 
-		const Edge* 
-		Edge::getFollowingConnectionArrival () const
+		Edge* Edge::getFollowingConnectionArrival () const
 		{
 			return _followingConnectionArrival;
 		}
 
 
 
-		const Edge* 
-		Edge::getFollowingArrivalForFineSteppingOnly () const
+		Edge* Edge::getFollowingArrivalForFineSteppingOnly () const
 		{
 			return _followingArrivalForFineSteppingOnly;
 		}
 
 
 
-		void 
-		Edge::setPreviousConnectionDeparture( const Edge* previousConnectionDeparture)
+		void Edge::setPreviousConnectionDeparture(Edge* previousConnectionDeparture)
 		{
 			_previousConnectionDeparture = previousConnectionDeparture;
 		}
 
 
 
-		void 
-		Edge::setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture)
+		void Edge::setPreviousDepartureForFineSteppingOnly(Edge* previousDeparture)
 		{
 			_previousDepartureForFineSteppingOnly = previousDeparture;
 		}
 
 
 
-		void 
-		Edge::setFollowingConnectionArrival( const Edge* followingConnectionArrival)
+		void Edge::setFollowingConnectionArrival(Edge* followingConnectionArrival)
 		{
 			_followingConnectionArrival = followingConnectionArrival;
 		}
 
 
 
-
-		void 
-		Edge::setFollowingArrivalForFineSteppingOnly ( const Edge* followingArrival)
+		void Edge::setFollowingArrivalForFineSteppingOnly(Edge* followingArrival)
 		{
 			_followingArrivalForFineSteppingOnly = followingArrival;
 		}
-
 
 
 
@@ -220,16 +195,6 @@ namespace synthese
 		Edge::getParentPath () const
 		{
 			return _parentPath;
-		}
-
-
-
-
-		double 
-		Edge::getLength () const
-		{
-			if (_nextInPath == 0) return 0;
-			return _nextInPath->getMetricOffset () - getMetricOffset (); 
 		}
 
 
@@ -510,5 +475,11 @@ namespace synthese
 		return _arrivalIndex[hour];
 	    }
 
+		bool Edge::isConnectingEdge() const
+		{
+			assert(_fromVertex);
+			assert(_fromVertex->getPlace());
+			return _fromVertex->getPlace()->isConnectionPossible();
+		}
 	}
 }

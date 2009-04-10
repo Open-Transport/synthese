@@ -180,128 +180,112 @@ namespace synthese
 				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() <= edge->getRankInPath();
 				++insertionPosition);
 
-			// Next in path field
-			if (insertionPosition != _edges.begin())
-				(*(insertionPosition - 1))->setNextInPath(edge);
-			if (insertionPosition != _edges.end())
-				edge->setNextInPath(*insertionPosition);
+			// Next arrival and next in path of the previous
+			if(insertionPosition != _edges.begin())
+			{
+				Edge* previousEdge(*(insertionPosition - 1));
+				Edge* nextArrival(previousEdge->getFollowingArrivalForFineSteppingOnly());
+				Edge* nextConnectingArrival(previousEdge->getFollowingConnectionArrival());
 
-			// Connection Links before the new edge
-			const Edge* oldNormalEdge((insertionPosition == _edges.begin()) ? NULL : (*(insertionPosition-1))->getFollowingArrivalForFineSteppingOnly());
-			const Edge* oldConnectionEdge((insertionPosition == _edges.begin()) ? NULL : (*(insertionPosition-1))->getFollowingConnectionArrival());
-			for(Edges::reverse_iterator it(insertionPosition); 
-				it != _edges.rend()
-				&& ((*it)->getFollowingConnectionArrival () == oldConnectionEdge
-					|| (*it)->getFollowingArrivalForFineSteppingOnly () == oldNormalEdge
-					|| edge->getPreviousDepartureForFineSteppingOnly () == NULL
-					|| edge->getPreviousConnectionDeparture () == NULL
-				);
-				++it
-			){
-				Edge* currentEdge = *it;
-
-				/* TODO : Check later on if the following block should be re-introduced
-				// Chain only relations between A and A, D and D, A and D 
-				// if different stops, D and A if different stops
-				if ((currentEdge->getFromVertex ()->getPlace () == 
-				edge->getFromVertex ()->getPlace ()) && 
-				(currentEdge->getType () != edge->getType ()) ) continue;
-				*/
-
-				if (edge->isArrival())
+				// Next arrival of previous edges
+				if(edge->isArrivalAllowed())
 				{
-					// Chain following arrivals
-					if( currentEdge->getFollowingArrivalForFineSteppingOnly () == oldNormalEdge)
+					for(Edges::reverse_iterator it(insertionPosition-1); 
+						it != _edges.rend()	&& (*it)->getFollowingArrivalForFineSteppingOnly() == nextArrival;
+						++it
+					){
+						(*it)->setFollowingArrivalForFineSteppingOnly(edge);
+					}
+
+					if(edge->isConnectingEdge())
 					{
-						currentEdge->setFollowingArrivalForFineSteppingOnly (edge);
+						for(Edges::reverse_iterator it(insertionPosition-1); 
+							it != _edges.rend()	&& (*it)->getFollowingConnectionArrival() == nextConnectingArrival;
+							++it
+						){
+								(*it)->setFollowingConnectionArrival(edge);
+						}
 					}
 
-					// Chain following connecting arrivals
-					if(	currentEdge->getFollowingConnectionArrival () == oldConnectionEdge
-						&& edge->getPlace()
-						&& edge->getPlace()->getScore() > 0
-					){
-						currentEdge->setFollowingConnectionArrival (edge);
-					} 
+					edge->setFollowingArrivalForFineSteppingOnly(nextArrival);
+					edge->setFollowingConnectionArrival(nextConnectingArrival);
 				}
-
-
-				// Chain previous departures
-				if (currentEdge->isDeparture ())
+			}
+			else
+			{
+				// First edge : next arrival is the old first one or its next arrival
+				Edge* firstEdge(*insertionPosition);
+				if(firstEdge->isArrivalAllowed())
 				{
-					if (edge->getPreviousDepartureForFineSteppingOnly () == NULL)
-					{   
-						edge->setPreviousDepartureForFineSteppingOnly (currentEdge);
-					}
-
-					// Chain previous connecting departures
-					if(	edge->getPreviousConnectionDeparture () == NULL
-						&& currentEdge->getPlace()
-						&& currentEdge->getPlace()->getScore() > 0
-					){
-							edge->setPreviousConnectionDeparture (currentEdge);
-					}
+					edge->setFollowingArrivalForFineSteppingOnly(firstEdge);
+				}
+				else
+				{
+					edge->setFollowingArrivalForFineSteppingOnly(firstEdge->getFollowingArrivalForFineSteppingOnly());
+				}
+				if(firstEdge->isArrivalAllowed() && firstEdge->isConnectingEdge())
+				{
+					edge->setFollowingConnectionArrival(firstEdge);
+				}
+				else
+				{
+					edge->setFollowingConnectionArrival(firstEdge->getFollowingConnectionArrival());
 				}
 			}
 		
-			// Connection Links after the new edge
-			oldNormalEdge = (insertionPosition == _edges.end()) ? NULL : (*insertionPosition)->getPreviousDepartureForFineSteppingOnly();
-			oldConnectionEdge = (insertionPosition == _edges.end()) ? NULL : (*insertionPosition)->getPreviousConnectionDeparture();
-			for(Edges::iterator it(insertionPosition); 
-				it != _edges.end()
-				&& ((*it)->getPreviousConnectionDeparture() == oldConnectionEdge
-					|| (*it)->getPreviousDepartureForFineSteppingOnly () == oldNormalEdge
-					|| edge->getFollowingConnectionArrival() == NULL
-					|| edge->getFollowingArrivalForFineSteppingOnly() == NULL
-				);
-				++it
-			){
-				Edge* currentEdge = *it;
+			// Previous departure
+			if(insertionPosition != _edges.end())
+			{
+				Edge* nextEdge(*insertionPosition);
+				Edge* previousDeparture(nextEdge->getPreviousDepartureForFineSteppingOnly());
+				Edge* previousConnectingDeparture(nextEdge->getPreviousConnectionDeparture());
 
-				/* TODO : Check later on if the following block should be re-introduced
-				// Chain only relations between A and A, D and D, A and D 
-				// if different stops, D and A if different stops
-				if ((currentEdge->getFromVertex ()->getPlace () == 
-				edge->getFromVertex ()->getPlace ()) && 
-				(currentEdge->getType () != edge->getType ()) ) continue;
-				*/
-
-				if (edge->isDeparture())
+				// Previous departure of next edges
+				if(edge->isDepartureAllowed())
 				{
-					// Chain following arrivals
-					if( currentEdge->getPreviousDepartureForFineSteppingOnly () == oldNormalEdge)
+					for(Edges::iterator it(insertionPosition); 
+						it != _edges.end() && (*it)->getPreviousDepartureForFineSteppingOnly() == previousDeparture;
+						++it
+					){
+						(*it)->setPreviousDepartureForFineSteppingOnly(edge);
+					}
+
+					if(edge->isConnectingEdge())
 					{
-						currentEdge->setPreviousDepartureForFineSteppingOnly (edge);
+						for(Edges::iterator it(insertionPosition); 
+							it != _edges.end() && (*it)->getPreviousConnectionDeparture() == previousConnectingDeparture;
+							++it
+						){
+							(*it)->setPreviousConnectionDeparture(edge);
+						}
 					}
 
-					// Chain following connecting arrivals
-					if(	currentEdge->getPreviousConnectionDeparture() == oldConnectionEdge
-						&& edge->getPlace()
-						&& edge->getPlace()->getScore() > 0
-					){
-							currentEdge->setPreviousConnectionDeparture(edge);
-					} 
-				}
-
-
-				// Chain previous departures
-				if (currentEdge->isArrival())
-				{
-					if (edge->getFollowingArrivalForFineSteppingOnly() == NULL)
-					{   
-						edge->setFollowingArrivalForFineSteppingOnly(currentEdge);
-					}
-
-					// Chain previous connecting departures
-					if(	edge->getFollowingConnectionArrival() == NULL
-						&& currentEdge->getPlace()
-						&& currentEdge->getPlace()->getScore() > 0
-					){
-							edge->setFollowingConnectionArrival(currentEdge);
-					}
+					edge->setPreviousDepartureForFineSteppingOnly(previousDeparture);
+					edge->setPreviousConnectionDeparture(previousConnectingDeparture);
 				}
 			}
-		
+			else
+			{
+				// Last edge : previous departure is the old last one or its previous departure
+				Edge* lastEdge(*(insertionPosition - 1));
+				if(lastEdge->isDepartureAllowed())
+				{
+					edge->setPreviousDepartureForFineSteppingOnly(lastEdge);
+				}
+				else
+				{
+					edge->setPreviousDepartureForFineSteppingOnly(lastEdge->getPreviousDepartureForFineSteppingOnly());
+				}
+				if(lastEdge->isDepartureAllowed() && lastEdge->isConnectingEdge())
+				{
+					edge->setPreviousConnectionDeparture(lastEdge);
+				}
+				else
+				{
+					edge->setPreviousConnectionDeparture(lastEdge->getPreviousConnectionDeparture());
+				}
+			}
+
 			// Insertion of the new edges
 			_edges.insert(insertionPosition, edge);
 		}

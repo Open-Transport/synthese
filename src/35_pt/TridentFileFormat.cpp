@@ -579,7 +579,7 @@ namespace synthese
 						os << "<objectId>" << TridentId (peerid, "PtLink", *from) << "</objectId>" << "\n";
 						os << "<startOfLink>" << TridentId (peerid, "StopPoint", *from) << "</startOfLink>" << "\n";
 						os << "<endOfLink>" << TridentId (peerid, "StopPoint", *to) << "</endOfLink>" << "\n";
-						os << "<linkDistance>" << Conversion::ToString(from->getLength()) << "</linkDistance>" << "\n";   // in meters!
+						os << "<linkDistance>" << Conversion::ToString(to->getMetricOffset() - from->getMetricOffset()) << "</linkDistance>" << "\n";   // in meters!
 						os << "</PtLink>" << "\n";
 					}
 					from = to;

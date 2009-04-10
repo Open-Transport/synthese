@@ -81,13 +81,10 @@ namespace synthese
 		private:
 			int			_rankInPath;		//!< Rank in path.
 
-			const Edge* _nextInPath;		//!< Next edge in path.
-
-			const Edge* _previousConnectionDeparture;			//!< Previous connection departure edge along path.
-			const Edge* _previousDepartureForFineSteppingOnly;	//!< Previous departure edge with or without connection
-
-			const Edge* _followingConnectionArrival;			//!< Next connection arrival edge along path.
-			const Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
+			Edge* _previousConnectionDeparture;			//!< Previous connection departure edge along path.
+			Edge* _previousDepartureForFineSteppingOnly;	//!< Previous departure edge with or without connection
+			Edge* _followingConnectionArrival;			//!< Next connection arrival edge along path.
+			Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
 
 			std::vector<const geometry::Point2D*> _viaPoints;				//!< Intermediate points along the edge (for map drawing)
 
@@ -104,12 +101,9 @@ namespace synthese
 				double metricOffset = UNKNOWN_VALUE
 			);
 
-			virtual bool _isDepartureAllowed() const = 0;
-			virtual bool _isArrivalAllowed() const = 0;
 			
 		public:
 			virtual ~Edge ();
-
 
 			//! @name Setters
 			//@{
@@ -117,11 +111,10 @@ namespace synthese
 				void	setIsDeparture(bool value);
 				void	setRankInPath(int value);
 				void	setParentPath(const Path* path);
-				void	setNextInPath (const Edge* nextInPath);
-				void	setPreviousConnectionDeparture( const Edge* previousConnectionDeparture);
-				void	setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture);
-				void	setFollowingConnectionArrival( const Edge* followingConnectionArrival);
-				void	setFollowingArrivalForFineSteppingOnly ( const Edge* followingArrival);
+				void	setPreviousConnectionDeparture(Edge* previousConnectionDeparture);
+				void	setPreviousDepartureForFineSteppingOnly (Edge* previousDeparture);
+				void	setFollowingConnectionArrival(Edge* followingConnectionArrival);
+				void	setFollowingArrivalForFineSteppingOnly(Edge* followingArrival);
 				void	setMetricOffset (double metricOffset);
 			//@}
 
@@ -138,19 +131,10 @@ namespace synthese
 				*/
 				double getMetricOffset () const;
 
-				/** Returns length of this edge, in meters. from
-				*/
-				double getLength () const;
-
-				const Edge* getNextInPath () const;
-
-				const Edge* getPreviousConnectionDeparture () const;
-
-				const Edge* getPreviousDepartureForFineSteppingOnly () const;
-
-				const Edge* getFollowingConnectionArrival () const;
-			    
-				const Edge* getFollowingArrivalForFineSteppingOnly () const;
+				Edge* getPreviousConnectionDeparture () const;
+				Edge* getPreviousDepartureForFineSteppingOnly () const;
+				Edge* getFollowingConnectionArrival () const;
+			    Edge* getFollowingArrivalForFineSteppingOnly () const;
 			    
 				/** Gets intermediate points 
 				* between this line stop and the next in path.
@@ -164,6 +148,11 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
+				virtual bool isDepartureAllowed() const = 0;
+				virtual bool isArrivalAllowed() const = 0;
+				
+				bool isConnectingEdge() const;
+
 				const Hub* getPlace () const;
 				
 				int getDepartureFromIndex (int hour) const;

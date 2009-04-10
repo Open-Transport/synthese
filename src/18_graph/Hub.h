@@ -79,6 +79,8 @@ namespace synthese
 				/// @return the score of the hub				
 				virtual HubScore getScore(
 				) const;
+
+				bool isConnectionPossible() const;
 				
 				virtual const geometry::Point2D& getPoint() const = 0;
 			//@}
