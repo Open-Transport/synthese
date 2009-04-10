@@ -128,13 +128,13 @@ namespace synthese
 
 
 		void Road::addRoadChunk(
-			const RoadChunk* chunk
+			RoadChunk* chunk
 		){
 			if(_pathGroup)
 			{
 				static_cast<RoadPlace*>(_pathGroup)->addAddress(chunk->getFromAddress());
 			}
-			addEdge(static_cast<const Edge*>(chunk));
+			addEdge(static_cast<Edge*>(chunk));
 		}
 
 
@@ -144,13 +144,13 @@ namespace synthese
 		}
 		
 		
-		const RoadPlace* Road::getRoadPlace(
+		RoadPlace* Road::getRoadPlace(
 		) const {
-			return static_cast<const RoadPlace*>(_pathGroup);
+			return static_cast<RoadPlace*>(_pathGroup);
 		}
 		
 		
-		void Road::setRoadPlace(const RoadPlace* value)
+		void Road::setRoadPlace(RoadPlace* value)
 		{
 			_pathGroup = value;
 		}

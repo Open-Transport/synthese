@@ -46,7 +46,7 @@ namespace synthese
 			int rank(line->addSubLine(this));
 
 			// Copy of the properties
-			setCommercialLine(line->getCommercialLine());
+			setCommercialLine(const_cast<CommercialLine*>(line->getCommercialLine()));
 			setRollingStock(line->getRollingStock());
 			setName(line->getName() + " (subline " + Conversion::ToString(rank) + ")");
 			setTimetableName(line->getTimetableName());

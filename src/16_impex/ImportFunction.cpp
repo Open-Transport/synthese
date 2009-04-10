@@ -71,16 +71,6 @@ namespace synthese
 				throw RequestException("Datasource not found");
 			}
 			
-			// Paths
-			set<string> paths;
-			string text(map.getString(PARAMETER_PATH, true, FACTORY_KEY));
-			tokenizer<char_separator<char> > pathsTokens(text, char_separator<char>(","));
-			BOOST_FOREACH(const string& token, pathsTokens)
-			{
-				if(token.empty()) continue;
-				paths.insert(token);
-			}
-			
 			// Do import ?
 			_doImport = map.getBool(PARAMETER_DO_IMPORT, false, false, FACTORY_KEY);
 			
@@ -89,9 +79,33 @@ namespace synthese
 			{
 				stringstream output;
 				_fileFormat.reset(Factory<FileFormat>::create(_dataSource->getFormat()));
+
+				// Paths
+				FileFormat::Files::FilesVector files(_fileFormat->getFiles());
 				_fileFormat->setEnv(&_env);
 				_fileFormat->setDataSource(_dataSource.get());
-				_fileFormat->parseFiles(paths, output);
+
+				if(files.empty())
+				{
+					FileFormat::FilePathsSet paths;
+					string text(map.getString(PARAMETER_PATH, true, FACTORY_KEY));
+					tokenizer<char_separator<char> > pathsTokens(text, char_separator<char>(","));
+					BOOST_FOREACH(const string& token, pathsTokens)
+					{
+						if(token.empty()) continue;
+						paths.insert(token);
+					}
+					_fileFormat->parseFiles(paths, output);
+				}
+				else
+				{
+					FileFormat::FilePathsMap paths;
+					BOOST_FOREACH(const string& key, files)
+					{
+						paths.insert(make_pair(key, map.getString(PARAMETER_PATH, false, FACTORY_KEY)));
+					}
+					_fileFormat->parseFiles(paths, output);
+				}
 				_output = output.str();
 			}
 			catch(Exception e)

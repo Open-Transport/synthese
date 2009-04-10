@@ -103,7 +103,7 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				RegistryKeyType roadPlaceId(rows->getLongLong(RoadTableSync::COL_ROAD_PLACE_ID));
-				object->setRoadPlace(RoadPlaceTableSync::Get(roadPlaceId, env, linkLevel).get());
+				object->setRoadPlace(RoadPlaceTableSync::GetEditable(roadPlaceId, env, linkLevel).get());
 				
 				// Fare
 // 				uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));

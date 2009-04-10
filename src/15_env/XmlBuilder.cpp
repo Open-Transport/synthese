@@ -127,7 +127,7 @@ namespace synthese
 			shared_ptr<Line> line(new Line(id, name));
 
 			uid commercialLineId (GetLongLongAttr (node, "commercialLineId"));
-			line->setCommercialLine (commercialLines.get (commercialLineId).get());
+			line->setCommercialLine (const_cast<CommercialLine*>(commercialLines.get(commercialLineId).get()));
 		 
 			std::string direction (GetStringAttr (node, "direction"));
 			line->setDirection (direction);

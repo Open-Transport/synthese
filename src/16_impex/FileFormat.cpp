@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "FileFormat.h"
-
+#include <stdarg.h>
 #include <boost/foreach.hpp>
 #include <sstream>
 #include <fstream>
@@ -45,6 +45,22 @@ namespace synthese
 		{}
 
 
+		FileFormat::Files::Files( const char* value, ... )
+		{
+			const char* col(value);
+			va_list marker;
+			for(va_start(marker, value); col[0]; col = va_arg(marker, const char*))
+			{
+				_files.push_back(string(col));
+			}
+			va_end(marker);
+		}
+
+		const FileFormat::Files::FilesVector& FileFormat::Files::getFiles() const
+		{
+			return _files;
+		}
+
 
 		void FileFormat::setEnv(Env* value)
 		{
@@ -55,9 +71,17 @@ namespace synthese
 		{
 			_dataSource = value;
 		}
-		
+
+
+		bool FileFormat::_controlPathsMap(
+			const FileFormat::FilePathsMap& paths
+		){
+			return true;
+		}
+
+
 		void FileFormat::parseFiles(
-			const std::set<std::string>& paths,
+			const FilePathsSet& paths,
 			std::ostream& os
 		){
 			BOOST_FOREACH(const std::string& path, paths)
@@ -74,6 +98,39 @@ namespace synthese
 				ifs.close();
 				
 				_parse(ss.str(), os);
+			}
+		}
+
+
+
+		void FileFormat::parseFiles(
+			const FilePathsMap& paths,
+			std::ostream& os
+		){
+			if (!_controlPathsMap(paths))
+			{
+				throw Exception("At least a bad or missing file name");
+			}
+			const Files::FilesVector& files(getFiles());
+			BOOST_FOREACH(const string& key, files)
+			{
+				FilePathsMap::const_iterator it(paths.find(key));
+				if(it == paths.end())
+					continue;
+				const string& path(it->second);
+
+				ifstream ifs(path.c_str());
+				if (!ifs)
+				{
+					throw Exception("Could no open the "+ key +" file" + path);
+				}
+			
+				// Read the whole file into a string
+				stringstream ss;
+				ss << ifs.rdbuf();
+				ifs.close();
+				
+				_parse(ss.str(), os, key);
 			}
 		}
 	}

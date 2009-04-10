@@ -24,8 +24,7 @@
 #ifndef SYNTHESE_IMPEX_TRIDENTEXPORT_H
 #define SYNTHESE_IMPEX_TRIDENTEXPORT_H
 
-#include "FactorableTemplate.h"
-#include "FileFormat.h"
+#include "FileFormatTemplate.h"
 
 #include <iostream>
 
@@ -47,7 +46,7 @@ namespace synthese
 		/// @ingroup m35
 		//////////////////////////////////////////////////////////////////////////
 		class TridentFileFormat
-		:	public util::FactorableTemplate<impex::FileFormat,TridentFileFormat>
+		:	public impex::FileFormatTemplate<TridentFileFormat>
 		{
 		public:
 
@@ -62,7 +61,8 @@ namespace synthese
 			
 			virtual void _parse(
 				const std::string& text,
-				std::ostream& os
+				std::ostream& os,
+				std::string key = std::string()
 			);
 
 	

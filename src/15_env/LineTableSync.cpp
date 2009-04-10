@@ -150,7 +150,7 @@ namespace synthese
 
 				try
 				{
-					line->setCommercialLine(CommercialLineTableSync::Get(commercialLineId, env, linkLevel).get());
+					line->setCommercialLine(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<CommercialLine>)
 				{

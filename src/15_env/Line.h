@@ -143,7 +143,7 @@ namespace synthese
 				void setDirection (const std::string& direction);
 				void setUseInRoutePlanning (bool useInRoutePlanning);
 				void setUseInTimetables (bool useInTimetables);
-				void setCommercialLine(const CommercialLine* commercialLine);
+				void setCommercialLine(CommercialLine* value);
 				void setWayBack(boost::logic::tribool value);
 				void setDataSource(const impex::DataSource* value);
 			//@}

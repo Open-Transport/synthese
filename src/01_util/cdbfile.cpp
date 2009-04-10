@@ -36,6 +36,10 @@ MA 02139, USA.
 
 #include "cdbfile.h" 
 
+namespace synthese
+{
+	namespace util
+	{
 
 /* Implementation of the member functions for CField		*/
 
@@ -98,8 +102,8 @@ CDBFile::CDBFile()	// Classical init procedure
 	HeaderSize=0;
 	FieldCount=0;
 	RecordCount=0;
-	ModifiedFlag=FALSE;
-	FullFileInMemory=FALSE;
+	ModifiedFlag=false;
+	FullFileInMemory=false;
 	RecordLength=0;
 
 	RecordList=NULL;
@@ -109,11 +113,11 @@ CDBFile::CDBFile()	// Classical init procedure
 CDBFile::CDBFile(char* Path)  // Creating the object with a path as argument
 // Automatically opens the file
 {
-if (OpenFile(Path)==FALSE) Path[0]=0;
+if (OpenFile(Path)==false) Path[0]=0;
 }
 
 
-BOOL CDBFile::Clean() 	
+bool CDBFile::Clean() 	
 // Resets the CDBFile object, regardless of any modifications to be written
 {
 CField *Delendum;
@@ -127,8 +131,8 @@ Record *DelRec;
 	HeaderSize=0;
 	FieldCount=0;
 	RecordCount=0;
-	ModifiedFlag=FALSE;
-	FullFileInMemory=FALSE;
+	ModifiedFlag=false;
+	FullFileInMemory=false;
 	RecordLength=0;
 
 	if (FirstField!=NULL)	// Delete the dynamic list of fields
@@ -154,7 +158,7 @@ Record *DelRec;
 		delete RecordList;
 		RecordList=NULL;
 	}
-	return TRUE;
+	return true;
 
 }
 
@@ -187,7 +191,7 @@ void CDBFile::ClearAllRecords()
 	}
 }	
 
-BOOL CDBFile::OpenFile(char* Path)
+bool CDBFile::OpenFile(char* Path)
 {
 
 unsigned char dBaseVersion,NLength,NDecCount;
@@ -202,11 +206,11 @@ CField *Tail, *Current;
 
 	if (strlen(Path)>256)
 	{	fprintf (stderr, "File path too long : %s \n", Path);
-		return FALSE;
+		return false;
 	}
 	strcpy (PathName, Path);
 	FileHandle = fopen (PathName, "r+");
-	if (FileHandle==NULL) return FALSE;	// error opening the file
+	if (FileHandle==NULL) return false;	// error opening the file
 	fseek (FileHandle, 0L, SEEK_SET);
 	fread (&dBaseVersion, 1, sizeof (char), FileHandle);
 	
@@ -214,7 +218,7 @@ CField *Tail, *Current;
 							// case of a DBF file with an associated DBT file
 	{
 		fprintf (stderr, "%s is not a dBASE III file!\n", Path);
-		return FALSE;
+		return false;
 	}
 	
 	// Reading the header:
@@ -258,11 +262,11 @@ CField *Tail, *Current;
 		Offst+=NLength;
 	}// end for
 
-return TRUE;
+return true;
 }
 
 
-BOOL CDBFile::CloseFile()	// If anybody finds any use to it...  
+bool CDBFile::CloseFile()	// If anybody finds any use to it...  
 {							
 	return Clean();
 }		  
@@ -276,18 +280,18 @@ unsigned long CDBFile::LoadFileToMemory()
 	Record *Current;
 
 	// If the file is closed or the records are already loaded, return.
-	if ((FileHandle==NULL)||(FullFileInMemory==TRUE)) return FALSE;
+	if ((FileHandle==NULL)||(FullFileInMemory==true)) return false;
 	else
 	{
 		for (i=1;i<=RecordCount;i++)
 		{
 			Current=ReadRecord(i);
 			Append(Current);	// This will overwrite the records with the
-			// same numbers, unless their ModifFlag is set to TRUE
+			// same numbers, unless their ModifFlag is set to true
 			// (see the Append function)
 			if (Current==NULL) return i-1;
 		}
- 		FullFileInMemory=TRUE;
+ 		FullFileInMemory=true;
 		return i;
 	}
 }		 	
@@ -301,10 +305,10 @@ unsigned long CDBFile::WriteAllToFile(char* Path)
 	Record *CurRec;
 
 	// If the file is closed or not all the records are loaded, return.
-	if ((FileHandle==NULL)||(FullFileInMemory==FALSE)) return 0L;
+	if ((FileHandle==NULL)||(FullFileInMemory==false)) return 0L;
 	else
 	{
-		if (WriteHeader(Path)==TRUE)	// Writes the header of the file.
+		if (WriteHeader(Path)==true)	// Writes the header of the file.
 		{
 			CurRec = RecordList;
 			for (i=1;i<=RecordCount;i++)
@@ -327,11 +331,11 @@ unsigned long CDBFile::WriteModified()
 {
 	unsigned long i=0;
 	Record* CurRec;
-	if ((FileHandle==NULL)||(FullFileInMemory==TRUE)) return FALSE;
+	if ((FileHandle==NULL)||(FullFileInMemory==true)) return false;
  	else
 	{	CurRec=RecordList;
 		do
-		{	if(CurRec->ModifFlag==TRUE)
+		{	if(CurRec->ModifFlag==true)
 			{
 				if (WriteRecord(CurRec, CurRec->RecordNumber)) i++;
 				else return i;
@@ -412,7 +416,7 @@ void CDBFile::SortOn(unsigned short Criterium1/* , unsigned short Criterium2*/)
 	Record *Head, *Tail, *CurRec;
 	CField *Crit1 /*, *Crit2*/;	/* Crit2 : optional secundary field */
 
-	if (FullFileInMemory!=TRUE) return;
+	if (FullFileInMemory!=true) return;
 	CurRec=RecordList;
 	while (CurRec->Next!=NULL) CurRec=CurRec->Next;
 
@@ -482,10 +486,10 @@ void* CDBFile::GetFieldValue(Record* Rec, CField* Field)
 		case 'L': // Here I decided that Logical values should be converted to
 			      // booleans. I could have kept it as a single character.
 				char c;
-				BOOL* Result3;
-				Result3=new BOOL;
+				bool* Result3;
+				Result3=new bool;
 				sscanf(Data, "%c", c);
-				*Result3=(BOOL)((c=='Y')||(c=='y')||(c=='T')||(c=='t'));
+				*Result3= (c=='Y')||(c=='y')||(c=='T')||(c=='t');
 				delete []Data;
 				return (void*)Result3;
 		case 'M':
@@ -569,10 +573,10 @@ Record* CDBFile::CreateNewRecord()
 	Current->Contents=new char[RecordLength];
 	for (int i=0; i<RecordLength; i++)
 		Current->Contents[i]=0x20;
-	Current->ModifFlag=FALSE;
+	Current->ModifFlag=false;
 	Current->RecordNumber=RecordCount+1;
 	RecordCount++;
-	ModifiedFlag=TRUE;
+	ModifiedFlag=true;
 	return Current;	
 }
 
@@ -604,12 +608,12 @@ void CDBFile::Append(Record* Rec, Record* Tail)
 				else RecordList=Rec;
 				Rec->Previous=Current->Previous;
 				Current->Previous=Rec;
-				ModifiedFlag=TRUE;
+				ModifiedFlag=true;
 				return;
 			}
 			else if (Current->RecordNumber==Rec->RecordNumber)	
 			{
-				if(Current->ModifFlag==TRUE)
+				if(Current->ModifFlag==true)
 				// Current has been modified, but not saved yet
 				{
 					delete Rec->Contents;
@@ -625,7 +629,7 @@ void CDBFile::Append(Record* Rec, Record* Tail)
 					delete Rec;
 				}
 				// The file has been modified (by adding this record:)
-				ModifiedFlag=TRUE;
+				ModifiedFlag=true;
 				return;
 			}
 			else if (Current->Next==NULL)
@@ -660,8 +664,8 @@ void CDBFile::DeleteRecord(Record* Rec)
 	{	RecordList=RecordList->Next;
 		if (RecordList) RecordList->Previous=NULL;
 		delete(Rec);
-		if (FullFileInMemory==TRUE) RecordCount--;
-		ModifiedFlag=TRUE;
+		if (FullFileInMemory==true) RecordCount--;
+		ModifiedFlag=true;
 		return;
 	}
 	else
@@ -669,12 +673,12 @@ void CDBFile::DeleteRecord(Record* Rec)
 		(Rec->Previous)->Next=Rec->Next;
 		if (Rec->Next) (Rec->Next)->Previous=Rec->Previous;
 		delete(Rec);
-		ModifiedFlag=TRUE;
-		if (FullFileInMemory==TRUE) RecordCount--;
+		ModifiedFlag=true;
+		if (FullFileInMemory==true) RecordCount--;
 	}
 }
 
-void CDBFile::AddField(CField* NewField);	// Not implemented in this version
+//void CDBFile::AddField(CField* NewField);	// Not implemented in this version
 
 void CDBFile::SetFieldValue(Record* Rec, CField* Field, void* Value)
 // Here we have the same problems as in GetFieldValue(), see above. 
@@ -730,10 +734,10 @@ void CDBFile::SetFieldValue(Record* Rec, CField* Field, void* Value)
 				strncpy(Data, (char *)Value, ResLength);
 				strncpy(RecContents, Data, FLength);
 				break;
-		case 'L': 	// Logical : conversion from 'BOOL' type
-				BOOL* Result3;
-				Result3=(BOOL *)Value;
-				if (*Result3==TRUE) Data[0]='Y';
+		case 'L': 	// Logical : conversion from 'bool' type
+				bool* Result3;
+				Result3=(bool *)Value;
+				if (*Result3==true) Data[0]='Y';
 				else Data[0]='N';
 				strncpy(RecContents, Data, FLength);
 				break;
@@ -742,7 +746,7 @@ void CDBFile::SetFieldValue(Record* Rec, CField* Field, void* Value)
 				break;
 	}// end switch;
 	delete []Data;
-	Rec->ModifFlag=TRUE;
+	Rec->ModifFlag=true;
 }	
 
 
@@ -784,7 +788,7 @@ Record* CDBFile::ReadRecord(unsigned long RecNum)
 		if (Res==0) return NULL;
 		NewRec=new Record;
 		NewRec->Contents=Buffer;
-		NewRec->ModifFlag=FALSE;
+		NewRec->ModifFlag=false;
 		NewRec->RecordNumber=RecNum;
 		NewRec->Next=NULL;
 		NewRec->Previous=NULL;
@@ -792,7 +796,7 @@ Record* CDBFile::ReadRecord(unsigned long RecNum)
 	}		
 }
 
-BOOL CDBFile::WriteHeader(char* Path)
+bool CDBFile::WriteHeader(char* Path)
 // Use that function to rewrite or to save the current file under another 
 // name. It writes the header of the current CDBFile. In order to update the
 // "date of last update" field, I introduced two structures : time_t Date, and
@@ -819,7 +823,7 @@ char Day, Year, Month;
 		if (strlen(Path)>256)
 		{
 			fprintf (stderr, "File path too long : %s \n", Path);
-			return FALSE;
+			return false;
 		}
 		strcpy (PathName, Path);
 	}
@@ -827,7 +831,7 @@ char Day, Year, Month;
 	// Close the currently open file
 	if (FileHandle!=NULL) fclose(FileHandle);
 	FileHandle = fopen (PathName, "w");
-	if (FileHandle==NULL) return FALSE;
+	if (FileHandle==NULL) return false;
 	fseek (FileHandle, 0L, SEEK_SET);
 	Written=fwrite (&dBaseVersion, 1, sizeof (char), FileHandle);
 
@@ -864,35 +868,35 @@ char Day, Year, Month;
 	}// end for
 	fwrite (&FieldTerm, sizeof (char), 1, FileHandle);
 
-return TRUE;
+return true;
 
 }
 
-BOOL CDBFile::WriteRecord(Record* Current, unsigned long RecNum)
+bool CDBFile::WriteRecord(Record* Current, unsigned long RecNum)
 // Writes a record at the specified place,using RecNum to calculate the offset
 {	
 	size_t Res;
 
-	if ((FileHandle==NULL)||(RecNum>RecordCount)||(RecNum<1)) return FALSE;
+	if ((FileHandle==NULL)||(RecNum>RecordCount)||(RecNum<1)) return false;
 	else
 	{
 		fseek(FileHandle,(long)(HeaderSize+(RecNum-1)*RecordLength),SEEK_SET);
 		Res=fwrite (Current->Contents, RecordLength, 1, FileHandle);
 		if (Res==1) 
 		{
-			Current->ModifFlag=FALSE;
+			Current->ModifFlag=false;
 			// now that it has been written to file, it's no longer modified.
-			return TRUE;
+			return true;
 		}
-		else return FALSE;
+		else return false;
 	}		
 }	
 
-BOOL CDBFile::Swap(Record* Rec1, Record* Rec2)
+bool CDBFile::Swap(Record* Rec1, Record* Rec2)
 // swaps the contents of Rec1 and Rec2 (used in the SortAll function)
 {
 	char* BufCont;
-	BOOL BufFlag;
+	bool BufFlag;
 
 
 	BufCont=Rec1->Contents;
@@ -901,11 +905,11 @@ BOOL CDBFile::Swap(Record* Rec1, Record* Rec2)
 	Rec1->ModifFlag=Rec2->ModifFlag;
 	Rec2->Contents=BufCont;
 	Rec2->ModifFlag=BufFlag;
-	return TRUE;
+	return true;
 	
 }
 
-BOOL CDBFile::IsBigger(void *v1, void *v2, CField* Criterium)
+bool CDBFile::IsBigger(void *v1, void *v2, CField* Criterium)
 // Compares v1 and v2 using Criterium to determine their type.
 {
 	switch(Criterium->GetType())
@@ -913,17 +917,17 @@ BOOL CDBFile::IsBigger(void *v1, void *v2, CField* Criterium)
 	case 'N':	  // Numeric
 		double *val1, *val2;
 		val1=(double*)v1; val2=(double*)v2;
-		return(BOOL)(*val1>*val2);
+		return *val1>*val2;
 	case 'C':
 	default :	  // Caracter
 		char *str1, *str2;
 		str1=(char*)v1; str2=(char*)v2;
-		return(BOOL)(strcmp(str1, str2)>0);
+		return strcmp(str1, str2)>0;
 	}
 }
 
 
-BOOL CDBFile::IsSmaller(void *v1, void *v2, CField* Criterium)
+bool CDBFile::IsSmaller(void *v1, void *v2, CField* Criterium)
 // Compares v1 and v2 using Criterium to determine their type.
 {
 	switch(Criterium->GetType())
@@ -931,11 +935,13 @@ BOOL CDBFile::IsSmaller(void *v1, void *v2, CField* Criterium)
 	case 'N':		// Numeric
 		double *val1, *val2;
 		val1=(double*)v1; val2=(double*)v2;
-		return(BOOL)(*val1<*val2);
+		return *val1<*val2;
 	case 'C':
 	default :		// Caracter
 		char *str1, *str2;
 		str1=(char*)v1; str2=(char*)v2;
-		return(BOOL)(strcmp(str2, str1)>0);
+		return strcmp(str2, str1)>0;
 	}
+}
+}
 }

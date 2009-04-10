@@ -81,8 +81,8 @@ namespace synthese
 		//@{
 			  const RoadType& getType () const;
 			  void setType (const RoadType& type);
-			  const RoadPlace* getRoadPlace() const;
-			  void setRoadPlace(const RoadPlace* value);
+			  RoadPlace* getRoadPlace() const;
+			  void setRoadPlace(RoadPlace* value);
 		//@}
 		
 
@@ -110,7 +110,7 @@ namespace synthese
 
 		//! @name Update methods.
 		//@{
-			void addRoadChunk(const RoadChunk* address);
+			void addRoadChunk(RoadChunk* address);
 		//@}
 		};
 	}

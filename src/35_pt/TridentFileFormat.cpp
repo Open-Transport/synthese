@@ -91,12 +91,20 @@ namespace synthese
 	using namespace graph;
 	using namespace impex;
 	using namespace db;
+	using namespace pt;
+	
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<FileFormat,pt::TridentFileFormat>::FACTORY_KEY("Trident");
 	}
 
+	namespace impex
+	{
+		template<> const FileFormat::Files FileFormatTemplate<TridentFileFormat>::FILES(
+			""
+		);
+	}
 
 	namespace pt
 	{
@@ -104,7 +112,7 @@ namespace synthese
 			Env* env,
 			RegistryKeyType lineId,
 			bool withTisseoExtension
-		):	FactorableTemplate<FileFormat,TridentFileFormat>(),
+		):	FileFormatTemplate<TridentFileFormat>(),
 			_commercialLineId(lineId),
 			_withTisseoExtension(withTisseoExtension)
 		{
@@ -931,8 +939,9 @@ namespace synthese
 
 
 		void TridentFileFormat::_parse(
-			const std::string& text,
-			std::ostream& os
+			const string& text,
+			ostream& os,
+			string fileKey
 		){
 			XMLNode allNode = XMLNode::parseString (text.c_str (), "ChouettePTNetwork");
 			

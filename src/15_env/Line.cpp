@@ -244,7 +244,7 @@ namespace synthese
 
 
 
-		void Line::setCommercialLine( const CommercialLine* commercialLine )
+		void Line::setCommercialLine(CommercialLine* commercialLine )
 		{
 			_pathGroup = commercialLine;
 		}

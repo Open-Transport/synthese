@@ -1,5 +1,5 @@
-/** Import class header.
-	@file Import.h
+/** Import/export file format class header.
+	@file FileFormat.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -19,12 +19,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_impex_Import_h__
-#define SYNTHESE_impex_Import_h__
+#ifndef SYNTHESE_impex_FileFormat_h__
+#define SYNTHESE_impex_FileFormat_h__
 
 #include "FactoryBase.h"
 #include "Env.h"
 #include <set>
+#include <map>
 
 namespace synthese
 {
@@ -32,14 +33,46 @@ namespace synthese
 	{
 		class DataSource;
 		
-		/** Import factorable base class.
+		/** Import/export file format factorable base class.
 			
 			Each import subclass defines a format which can be imported.
 			
 			@ingroup m16
+
+			Import
+
+			There is two ways to launch the data import upon file paths :
+				- run parseFiles with a paths set argument : there is only one file type to read, 
+					but the data can be provided in more than one file. The set contains
+					all the paths.
+				- run parseFiles with a paths map argument : there is more than one file type, each
+					type contains a part of the fields to import and is identified by a key.
+					The key is also the parameter code Request field containing the file path.
+					The files are loaded respecting the key alphabetical order.
 		*/
 		class FileFormat : public util::FactoryBase<FileFormat>
 		{
+		public:
+			typedef std::set<std::string> FilePathsSet;
+			typedef std::map<std::string,std::string> FilePathsMap;
+
+			class Files
+			{
+			public:
+				typedef std::vector<std::string> FilesVector;
+
+			private:
+				FilesVector _files;
+
+			public:
+				Files(
+					const char* value,
+					...
+				);
+
+				const FilesVector& getFiles() const;
+			};
+
 		protected:
 			FileFormat(
 				util::Env* env = NULL
@@ -48,14 +81,20 @@ namespace synthese
 			util::Env*				_env;
 			const DataSource*		_dataSource;
 			
-			
+			virtual bool _controlPathsMap(
+				const FilePathsMap& paths
+			);
+
 			virtual void _parse(
 				const std::string& text,
-				std::ostream& os
+				std::ostream& os,
+				std::string key = std::string()
 			) = 0;
 			
 			
 		public:
+			virtual const Files::FilesVector& getFiles() const = 0;
+
 			/** Generic export method.
 				The generic export consists in the export of each registered exportable class
 				@author Hugues Romain
@@ -66,7 +105,12 @@ namespace synthese
 			) = 0;
 			
 			void parseFiles(
-				const std::set<std::string>& paths,
+				const FilePathsSet& paths,
+				std::ostream& os
+			);
+
+			void parseFiles(
+				const FilePathsMap& paths,
 				std::ostream& os
 			);
 			
