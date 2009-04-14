@@ -30,11 +30,11 @@ namespace synthese
 	namespace graph
 	{
 		Vertex::Vertex(
-			const Hub* place,
+			const Hub* hub,
 			double x,
 			double y) 
 		:	Point2D (x, y), // By default geolocation is unknown.
-			_place(place)
+			_hub(hub)
 		{
 		}
 
@@ -46,9 +46,9 @@ namespace synthese
 
 
 
-		const Hub* Vertex::getPlace(
+		const Hub* Vertex::getHub(
 		) const {
-			return _place;
+			return _hub;
 		}
 
 
@@ -83,10 +83,10 @@ namespace synthese
 			_arrivalEdges.insert (edge);    
 		}
 
-		void Vertex::setPlace(
-			const Hub* place
+		void Vertex::setHub(
+			const Hub* hub
 		){
-			_place = place;
+			_hub = hub;
 		}
 	}
 }

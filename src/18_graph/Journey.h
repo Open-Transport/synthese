@@ -100,10 +100,8 @@ namespace synthese
 				void _appendServiceUse(const ServiceUse& leg);
 
 		 public:
-			Journey(
-				AccessDirection method
-			);
-			~Journey ();
+			Journey();
+			~Journey();
 
 
 			//! @name Getters

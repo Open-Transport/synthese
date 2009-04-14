@@ -29,6 +29,7 @@
 #include "Edge.h"
 #include "Hub.h"
 
+#include <boost/foreach.hpp>
 #include <assert.h>
 #include <set>
 
@@ -40,24 +41,18 @@ namespace synthese
 
 	namespace graph
 	{
-
-
 		VertexAccessMap::VertexAccessMap ()
 			: _isobarycentreToUpdate (false)
 			, _isobarycenterMaxSquareDistanceUpToDate (false)
 			, _minApproachTime (std::numeric_limits<int>::max ())
 		{
-		    
 		}
-
 
 
 
 		VertexAccessMap::~VertexAccessMap ()
 		{
-
 		}
-
 
 
 
@@ -67,9 +62,6 @@ namespace synthese
 			assert (contains (vertex));
 			return _map.find (vertex)->second;
 		}
-
-
-
 
 
 
@@ -97,7 +89,6 @@ namespace synthese
 
 
 
-
 		void VertexAccessMap::insert(
 			const Vertex* vertex,
 			const VertexAccess& vertexAccess
@@ -112,20 +103,18 @@ namespace synthese
 				_isobarycenterMaxSquareDistanceUpToDate = false;
 
 				// Updating the paths which needs fine stepping set
-				if (!vertex->getPlace()->getScore() > 0)
+				if (!vertex->getHub()->isConnectionPossible())
 				{
 					// Departure vertices
-					for (set<const Edge*>::const_iterator itEdge(vertex->getDepartureEdges().begin());
-						itEdge != vertex->getDepartureEdges().end (); ++itEdge)
+					BOOST_FOREACH(const Edge* edge, vertex->getDepartureEdges())
 					{
-						_pathOnWhichFineSteppingForDeparture.insert((*itEdge)->getParentPath());
+						_pathOnWhichFineSteppingForDeparture.insert(edge->getParentPath());
 					}
 
 					// Arrival vertices
-					for (set<const Edge*>::const_iterator itEdge(vertex->getArrivalEdges().begin());
-						itEdge != vertex->getArrivalEdges().end (); ++itEdge)
+					BOOST_FOREACH(const Edge* edge, vertex->getArrivalEdges())
 					{
-						_pathOnWhichFineSteppingForArrival.insert((*itEdge)->getParentPath());
+						_pathOnWhichFineSteppingForArrival.insert(edge->getParentPath());
 					}
 				}
 			}
@@ -145,17 +134,16 @@ namespace synthese
 
 
 
-
-
 		const IsoBarycentre& 
 		VertexAccessMap::getIsobarycenter () const
 		{
 			if (_isobarycentreToUpdate)
 			{
 				_isobarycentre.clear();
-				for (VamMap::const_iterator it = _map.begin ();
-					 it != _map.end (); ++it)
-					_isobarycentre.add(*it->first);
+				BOOST_FOREACH(VamMap::value_type it, _map)
+				{
+					_isobarycentre.add(*it.first);
+				}
 				_isobarycentreToUpdate = false;
 			}
 			return _isobarycentre;
@@ -163,20 +151,19 @@ namespace synthese
 		}
 
 
-		const SquareDistance&
-		VertexAccessMap::getIsobarycenterMaxSquareDistance () const
-		{
+
+		const SquareDistance& VertexAccessMap::getIsobarycenterMaxSquareDistance(
+		) const	{
 			if (_isobarycenterMaxSquareDistanceUpToDate == false)
 			{
 				_isobarycenterMaxSquareDistance.setSquareDistance (0);
 				if (!_isobarycentre.isUnknown())
 				{
-					for (VamMap::const_iterator it = _map.begin ();
-						it != _map.end (); ++it)
+					BOOST_FOREACH(const VamMap::value_type& it, _map)
 					{
-						if (it->first->getX() > 0 && it->first->getY() > 0)
+						if (it.first->getX() > 0 && it.first->getY() > 0)
 						{
-							SquareDistance sqd (*(it->first), _isobarycentre);
+							SquareDistance sqd (*it.first, _isobarycentre);
 							if (_isobarycenterMaxSquareDistance < sqd)
 							{
 								_isobarycenterMaxSquareDistance.setSquareDistance (sqd.getSquareDistance ());
@@ -199,7 +186,6 @@ namespace synthese
 
 
 
-
 		const VertexAccessMap::VamMap& VertexAccessMap::getMap () const
 		{
 			return _map;
@@ -207,27 +193,19 @@ namespace synthese
 
 
 
-		void 
-		VertexAccessMap::merge (const VertexAccessMap& vam,
-					MergeAddresses mergeAddresses,
-					MergePhysicalStops mergePhysicalStops)
-		{
-			for (VamMap::const_iterator itps = vam.getMap ().begin ();
-			 itps != vam.getMap ().end (); ++itps)
+		void VertexAccessMap::mergeWithFilter(
+			const VertexAccessMap& vam,
+			GraphIdType graphFilter
+		){
+			BOOST_FOREACH(const VamMap::value_type& itps, vam.getMap())
 			{
-			if ( (mergeAddresses == MERGE_ADDRESSES) && 
-				 (itps->first->isAddress () == true) )
-			{
-				insert (itps->first, itps->second);
-			}
-			if ( (mergePhysicalStops == MERGE_PHYSICALSTOPS) && 
-				 (itps->first->isAddress () == false) )
-			{
-				insert (itps->first, itps->second);
-			}
-			}
+				const Vertex* vertex(itps.first);
 
+				if(vertex->getGraphType() == graphFilter)
+				{
+					insert(vertex, itps.second);
+				}
+			}
 		}
 	}
 }
-

@@ -63,6 +63,7 @@ namespace synthese
 	using namespace security;
 	using namespace graph;
 	using namespace road;
+	using namespace geography;
 
 	namespace util
 	{
@@ -188,20 +189,23 @@ namespace synthese
 
 			stream << "<h1>Résultats</h1>";
 
+			const NamedPlace* dsp(dynamic_cast<const NamedPlace*>(startPlace));
+			const NamedPlace* dep(dynamic_cast<const NamedPlace*>(endPlace));
+
 			if (jv.journeys.empty())
 			{
-				stream << "Aucun résultat trouvé de " << startPlace->getFullName() << " à " << endPlace->getFullName();
+				stream << "Aucun résultat trouvé de " << dsp->getFullName() << " à " << dep->getFullName();
 				return;
 			}
 			
 			HTMLTable::ColsVector v;
-			v.push_back("Départ<br />" + startPlace->getFullName());
+			v.push_back("Départ<br />" + dsp->getFullName());
 			v.push_back("Ligne");
 			v.push_back("Arrivée");
 			v.push_back("Correspondance");
 			v.push_back("Départ");
 			v.push_back("Ligne");
-			v.push_back("Arrivée<br />" + endPlace->getFullName());
+			v.push_back("Arrivée<br />" + dep->getFullName());
 			HTMLTable t(v,"adminresults");
 
 			int solution(1);
@@ -252,7 +256,7 @@ namespace synthese
 
 						// Place
 						stream << t.col() << 
-							AddressablePlace::GetPlace(its->getArrivalEdge()->getPlace())->getFullName();
+							dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName();
 
 						// Next service use
 						++its;

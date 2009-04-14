@@ -20,7 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Fare.h"
 #include "UseRules.h"
 #include "AccessParameters.h"
 
@@ -31,12 +30,11 @@ namespace synthese
 {
 	using namespace graph;
 	
-	namespace env
+	namespace graph
 	{
 		AccessParameters::AccessParameters(
 			UserClassCode userClass,
-			Fare*  fare /*= NULL */
-			, bool drtOnly /*= boost::logic::indeterminate */
+			bool drtOnly /*= boost::logic::indeterminate */
 			, bool withoutDrt
 			, double maxApproachDistance /*= 1000 */
 			, double maxApproachTime /*= 23 */
@@ -47,8 +45,7 @@ namespace synthese
 			, _approachSpeed(approachSpeed)
 			, _maxTransportConnectionCount(maxTransportConnectionCount)
 			, _drtOnly(drtOnly)
-			, _withoutDrt(withoutDrt)
-			, _fare(fare),
+			, _withoutDrt(withoutDrt),
 			_userClass(userClass)
 		{
 		}

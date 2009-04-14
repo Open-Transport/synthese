@@ -24,8 +24,12 @@
 #include "Address.h"
 #include "VertexAccessMap.h"
 #include "Exception.h"
+#include "RoadModule.h"
 
+#include <boost/foreach.hpp>
 #include <assert.h>
+
+using namespace std;
 
 namespace synthese
 {
@@ -33,17 +37,104 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace env;
+	using namespace time;
 
 	namespace road
 	{
+		const MinutesDuration AddressablePlace::FORBIDDEN_TRANSFER_DELAY(99);
 
 		AddressablePlace::AddressablePlace(
-			const std::string& name,
-			const City* city
-		):	Registrable(UNKNOWN_VALUE),
-			Place(name, city)
+			bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
+			, MinutesDuration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
+		):	Place(),
+			_allowedConnection(allowedConnection),
+			_defaultTransferDelay(defaultTransferDelay),
+			_minTransferDelay (UNKNOWN_VALUE)
 		{
 		}
+
+
+		MinutesDuration AddressablePlace::getDefaultTransferDelay(
+			) const {
+				return _defaultTransferDelay;
+		}
+
+		MinutesDuration AddressablePlace::getMinTransferDelay() const
+		{
+			if (_minTransferDelay == UNKNOWN_VALUE)
+			{
+				_minTransferDelay = _defaultTransferDelay;
+				for (TransferDelaysMap::const_iterator it(_transferDelays.begin()); it != _transferDelays.end(); ++it)
+					if (it->second < _minTransferDelay)
+						_minTransferDelay = it->second;
+			}
+			return _minTransferDelay;
+		}
+
+
+
+		void AddressablePlace::setDefaultTransferDelay(
+			MinutesDuration defaultTransferDelay
+			){
+				assert(defaultTransferDelay >= 0 && defaultTransferDelay <= FORBIDDEN_TRANSFER_DELAY);
+
+				_defaultTransferDelay = defaultTransferDelay;
+				_minTransferDelay = UNKNOWN_VALUE;
+		}
+
+		void AddressablePlace::setAllowedConnection(
+			bool value
+			){
+				_allowedConnection = value;
+		}
+
+
+
+		void AddressablePlace::addTransferDelay(
+			uid departureId,
+			uid arrivalId,
+			MinutesDuration transferDelay
+		){
+			assert(transferDelay >= 0 && transferDelay <= FORBIDDEN_TRANSFER_DELAY);
+
+			_transferDelays[std::make_pair (departureId, arrivalId)] = transferDelay;
+			_minTransferDelay = UNKNOWN_VALUE;
+		}
+
+
+
+		void AddressablePlace::clearTransferDelays()
+		{
+			_transferDelays.clear ();
+			_defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY;
+			_minTransferDelay = UNKNOWN_VALUE;
+		}
+
+
+
+		bool AddressablePlace::isConnectionAllowed(
+			const Vertex& fromVertex,
+			const Vertex& toVertex
+			) const {
+				if(!_allowedConnection) return false;
+
+				return getTransferDelay(fromVertex,	toVertex) != FORBIDDEN_TRANSFER_DELAY;
+		}
+
+
+
+		MinutesDuration AddressablePlace::getTransferDelay(
+			const Vertex& fromVertex,
+			const Vertex& toVertex
+			) const {
+				TransferDelaysMap::const_iterator it(
+					_transferDelays.find(make_pair(fromVertex.getKey(), toVertex.getKey()))
+				);
+
+				// If not defined in map, return default transfer delay
+				return (it == _transferDelays.end ()) ? _defaultTransferDelay : it->second;
+		}
+
 
 
 
@@ -58,11 +149,10 @@ namespace synthese
 		{
 			return _addresses;
 		}
-		    
 
 
-		void 
-		AddressablePlace::addAddress (const Address* address)
+
+		void AddressablePlace::addAddress (const Address* address)
 		{
 			_isoBarycentreToUpdate = true;
 			_addresses.push_back (address);
@@ -70,26 +160,58 @@ namespace synthese
 
 
 
-		void AddressablePlace::getImmediateVertices(
+		void AddressablePlace::getVertexAccessMap(
 			VertexAccessMap& result, 
 			const AccessDirection& accessDirection,
-			const AccessParameters& accessParameters,
-			SearchAddresses returnAddresses,
-			SearchPhysicalStops returnPhysicalStops
-			, const Vertex* origin
+			GraphIdType whatToSearch,
+			const Vertex& origin
 		) const {
-			if (returnAddresses == SEARCH_ADDRESSES)
+			if (whatToSearch != RoadModule::GRAPH_ID) return;
+
+			if(accessDirection == DEPARTURE_TO_ARRIVAL)
 			{
-				for (Addresses::const_iterator it = _addresses.begin ();
-					 it != _addresses.end (); ++it)
+				BOOST_FOREACH(const Address* address, _addresses)
 				{
-					if (origin == (*it)) continue;
-					result.insert ((*it), getVertexAccess (accessDirection,
-									   accessParameters,
-									   (*it), origin));
+					if(!isConnectionAllowed(origin, *address)) continue;
+
+					result.insert(
+						address,
+						VertexAccess(getTransferDelay(origin, *address))
+					);
+				}
+			} else {
+				BOOST_FOREACH(const Address* address, _addresses)
+				{
+					if(!isConnectionAllowed(*address, origin)) continue;
+
+					result.insert(
+						address,
+						VertexAccess(getTransferDelay(*address, origin))
+					);
 				}
 			}
 		}
+
+
+
+		void AddressablePlace::getVertexAccessMap(
+			VertexAccessMap& result, 
+			const AccessDirection& accessDirection,
+			const AccessParameters& accessParameters,
+			GraphIdType whatToSearch
+		) const {
+			if (whatToSearch == RoadModule::GRAPH_ID)
+			{
+				BOOST_FOREACH(const Address* address, _addresses)
+				{
+					result.insert(
+						address,
+						VertexAccess()
+					);
+				}
+			}
+		}
+
 
 		const geometry::Point2D& AddressablePlace::getPoint() const
 		{
@@ -103,21 +225,31 @@ namespace synthese
 			return _isoBarycentre;
 		}
 
-		bool AddressablePlace::hasAddresses() const
-		{
-			return !_addresses.empty();
-		}
 
-		bool AddressablePlace::hasPhysicalStops() const
-		{
-			return false;
-		}
-		
+
 		const AddressablePlace* AddressablePlace::GetPlace(const graph::Hub* hub)
 		{
 			const AddressablePlace* place(dynamic_cast<const AddressablePlace*>(hub));
 			if(place == NULL) throw util::Exception("bad conversion");
 			return place;
+		}
+
+
+
+		bool AddressablePlace::containsAnyVertex( graph::GraphIdType graphType ) const
+		{
+			if(graphType == RoadModule::GRAPH_ID)
+			{
+				return !_addresses.empty();
+			}
+			return false;
+		}
+
+
+
+		graph::HubScore AddressablePlace::getScore() const
+		{
+			return MIN_HUB_SCORE;
 		}
 	}
 }

@@ -24,8 +24,8 @@
 #define SYNTHESE_CommercialLine_h__
 
 #include <string>
+#include <set>
 
-#include "15_env/Types.h"
 #include "PathGroup.h"
 #include "RGBColor.h"
 #include "GraphTypes.h"
@@ -39,7 +39,11 @@ namespace synthese
 	
 	namespace env
 	{
-		class Place;
+		class PublicTransportStopZoneConnectionPlace;
+	}
+
+	namespace env
+	{
 		class ReservationContact;
 
 		/** Commercial line class.
@@ -53,6 +57,8 @@ namespace synthese
 
 			/// Chosen registry class.
 			typedef util::Registry<CommercialLine>	Registry;
+
+			typedef std::set<const env::PublicTransportStopZoneConnectionPlace*> PlacesSet;
 
 		private:
 			std::string			_name;		//!< Name (code)
@@ -116,7 +122,7 @@ namespace synthese
 			//! @name Modifiers
 			//@{
 				void addOptionalReservationPlace(
-					const Place* place
+					const PublicTransportStopZoneConnectionPlace* place
 				);
 			//@}
 		};

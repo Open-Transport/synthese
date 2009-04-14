@@ -29,10 +29,14 @@
 
 namespace synthese
 {
+	namespace geography
+	{
+		class Place;
+	}
+
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
-		class Place;
 	}
 	
 	namespace graph
@@ -53,8 +57,8 @@ namespace synthese
 		struct RoutePlannerResult
 		{
 			JourneyBoardJourneys	result;
-			const env::Place*		departurePlace;
-			const env::Place*		arrivalPlace;
+			const geography::Place*		departurePlace;
+			const geography::Place*		arrivalPlace;
 		};
 
 		typedef enum { USE_ROADS, DO_NOT_USE_ROADS } UseRoads;

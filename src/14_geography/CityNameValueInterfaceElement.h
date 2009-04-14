@@ -34,10 +34,11 @@ namespace synthese
 	{
 		class ValueElementList;
 	}
-	namespace env
+
+	namespace geography
 	{
 		/** City Name.
-			@ingroup m35Values refLibrary
+			@ingroup m14Values refLibrary
 		*/
 		class CityNameValueInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, CityNameValueInterfaceElement>

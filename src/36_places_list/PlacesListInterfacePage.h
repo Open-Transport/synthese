@@ -33,7 +33,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace geography
 	{
 		class City;
 	}
@@ -72,7 +72,7 @@ namespace synthese
 				, const PlacesList& results
 				, bool isCities
 				, bool isForOrigin
-				, const env::City* city
+				, const geography::City* city
 				, const server::Request* request = NULL
 			) const;
 		};

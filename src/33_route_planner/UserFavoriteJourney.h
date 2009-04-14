@@ -56,7 +56,7 @@ namespace synthese
 			std::string				_originPlaceName;
 			std::string				_destinationCityName;
 			std::string				_destinationPlaceName;
-			env::AccessParameters	_accessParameters;
+			graph::AccessParameters	_accessParameters;
 
 		public:
 			UserFavoriteJourney(
@@ -69,7 +69,7 @@ namespace synthese
 			void setOriginPlaceName(const std::string& value);
 			void setDestinationCityName(const std::string& value);
 			void setDestinationPlaceName(const std::string& value);
-			void setAccessParameters(const env::AccessParameters& value);
+			void setAccessParameters(const graph::AccessParameters& value);
 
 			int								getRank()					const;
 			const security::User*			getUser()					const;
@@ -77,7 +77,7 @@ namespace synthese
 			const std::string&				getOriginPlaceName()		const;
 			const std::string&				getDestinationCityName()	const;
 			const std::string&				getDestinationPlaceName()	const;
-			const env::AccessParameters&	getAccessParameters()		const;
+			const graph::AccessParameters&	getAccessParameters()		const;
 
 		};
 	}

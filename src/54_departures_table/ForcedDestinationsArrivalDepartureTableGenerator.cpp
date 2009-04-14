@@ -26,6 +26,7 @@
 #include "Line.h"
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "StandardArrivalDepartureTableGenerator.h"
+#include "GraphConstants.h"
 
 #include <boost/foreach.hpp>
 

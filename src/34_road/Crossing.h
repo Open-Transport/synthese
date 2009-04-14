@@ -55,16 +55,40 @@ namespace synthese
 		public:
 			//! @name Virtual queries
 			//@{
-				virtual bool isConnectionAllowed(
-					const graph::Vertex* fromVertex
-					, const graph::Vertex* toVertex
+
+				virtual void getVertexAccessMap(
+					graph::VertexAccessMap& result
+					, const graph::AccessDirection& accessDirection
+					, graph::GraphIdType whatToSearch,
+					const graph::Vertex& origin
 				) const;
 
-				virtual int getTransferDelay(
-					const graph::Vertex* fromVertex
-					, const graph::Vertex* toVertex
+				virtual bool isConnectionAllowed(
+					const graph::Vertex& origin,
+					const graph::Vertex& destination
+				) const;
+
+				///////////////////////////////////////////////////////////////
+				/// Score getter.
+				/// The score of a hub represents its capacity to provide some
+				/// connections.
+				/// The score range is from 0 to 100.
+				/// Several special values are :
+				///  - 0 : connection is never possible, jump over the hub in
+				///		a routing procedure, except if the hub is near the goal
+				///  - 1 : connection is possible, lowest score. This is the
+				///		default score of a hub
+				///  - 100 : maximum value for a score
+				/// @return the score of the hub				
+				virtual graph::HubScore getScore(
 				) const;
 				
+				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;
+
+				virtual time::MinutesDuration getTransferDelay(
+					const graph::Vertex& fromVertex
+					, const graph::Vertex& toVertex
+				) const;
 
 				virtual int	getMinTransferDelay() const;
 

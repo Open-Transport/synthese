@@ -22,13 +22,13 @@
 
 #include <string>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
+#include "Interface.h"
+#include "ValueElementList.h"
 
-#include "15_env/Place.h"
-#include "15_env/LogicalStopNameValueInterfaceElement.h"
+#include "NamedPlace.h"
+#include "LogicalStopNameValueInterfaceElement.h"
 
 using namespace boost;
 using namespace std;
@@ -38,6 +38,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace env;
+	using namespace geography;
 
 	namespace util
 	{
@@ -52,7 +53,7 @@ namespace synthese
 		{
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
-*/				const Place* place(static_cast<const Place*>(object));
+*/				const NamedPlace* place(static_cast<const NamedPlace*>(object));
 				stream << place->getFullName();
 /*			}
 			else

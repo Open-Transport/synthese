@@ -36,8 +36,8 @@ namespace synthese
 	{
 		class Journey;
 	}
-	
-	namespace env
+
+	namespace geography
 	{
 		class Place;
 	}
@@ -87,8 +87,8 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, int n
 				, const graph::Journey* journey
-				, const env::Place* departurePlace
-				, const env::Place* arrivalPlace
+				, const geography::Place* departurePlace
+				, const geography::Place* arrivalPlace
 				, boost::logic::tribool handicappedFilter
 				, boost::logic::tribool bikeFilter
 				, bool isTheLast

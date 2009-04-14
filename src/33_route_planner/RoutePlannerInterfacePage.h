@@ -49,10 +49,14 @@ namespace synthese
 		class Request;
 	}
 
-	namespace env
+	namespace geography
+	{
+		class Place;
+	}
+
+	namespace graph
 	{
 		class Journey;
-		class Place;
 		class AccessParameters;
 	}
 
@@ -94,10 +98,10 @@ namespace synthese
 				, const RoutePlannerResult& object
 				, const time::Date& date
 				, int periodId
-				, const env::Place* originPlace
-				, const env::Place* destinationPlace
+				, const geography::Place* originPlace
+				, const geography::Place* destinationPlace
 				, const transportwebsite::HourPeriod* period
-				, const env::AccessParameters& accessParameters
+				, const graph::AccessParameters& accessParameters
 				, const server::Request* request
 				, const transportwebsite::AccessibilityParameter& accessibility
 				, const transportwebsite::Site* site
@@ -115,7 +119,7 @@ namespace synthese
 				, const std::string& destinationCity
 				, const std::string& destinationPlace
 				, const transportwebsite::HourPeriod* period
-				, const env::AccessParameters& accessParameters
+				, const graph::AccessParameters& accessParameters
 				, const server::Request* request
 				, const transportwebsite::AccessibilityParameter& accessibility
 				, const transportwebsite::Site* site

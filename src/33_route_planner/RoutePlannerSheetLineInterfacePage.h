@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace geography
 	{
 		class Place;
 	}
@@ -76,7 +76,7 @@ namespace synthese
 				, bool isOrigin
 				, bool isDestination
 				, interfaces::VariablesMap& variables
-				, const env::Place* place
+				, const geography::Place* place
 				, const server::Request* request = NULL
 			) const;
 

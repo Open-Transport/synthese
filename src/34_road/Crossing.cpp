@@ -21,11 +21,12 @@
 */
 
 #include "Crossing.h"
-
+#include "RoadModule.h"
 #include "Address.h"
 #include "AddressablePlace.h"
 #include "Road.h"
 #include "Registry.h"
+#include "VertexAccessMap.h"
 
 using namespace std;
 
@@ -55,14 +56,11 @@ namespace synthese
 		
 		}
 
-		bool Crossing::isConnectionAllowed( const Vertex* fromVertex  , const Vertex* toVertex ) const
-		{
+		bool Crossing::isConnectionAllowed(
+			const Vertex& fromVertex,
+			const Vertex& toVertex
+		) const	{
 			return true;
-		}
-
-		int Crossing::getTransferDelay( const Vertex* fromVertex  , const Vertex* toVertex ) const
-		{
-			return 0;
 		}
 
 
@@ -89,6 +87,42 @@ namespace synthese
 		Address* Crossing::getAddress() const
 		{
 			return _address;
+		}
+
+		bool Crossing::containsAnyVertex( graph::GraphIdType graphType ) const
+		{
+			return graphType == RoadModule::GRAPH_ID;
+		}
+
+
+
+		void Crossing::getVertexAccessMap(
+			graph::VertexAccessMap& result,
+			const graph::AccessDirection& accessDirection,
+			graph::GraphIdType whatToSearch,
+			const graph::Vertex& origin
+		) const	{
+			if(whatToSearch == RoadModule::GRAPH_ID)
+			{
+				result.insert(
+					_address,
+					VertexAccess()
+				);
+			}
+		}
+
+
+
+		synthese::graph::HubScore Crossing::getScore() const
+		{
+			return 1;
+		}
+
+
+
+		time::MinutesDuration Crossing::getTransferDelay( const graph::Vertex& fromVertex , const graph::Vertex& toVertex ) const
+		{
+			return 0;
 		}
 	}
 }

@@ -41,7 +41,8 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace road;
-	using namespace env;
+	using namespace geography;
+	
 
 	namespace util
 	{
@@ -98,11 +99,7 @@ namespace synthese
 				// City
 				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
-				city->getRoadsMatcher ().add (object->getName (), object);
-				city->getAllPlacesMatcher().add(
-					object->getName() + " [voie]",
-					static_cast<const Place*>(object)
-				);
+				city->addPlaceToMatcher<RoadPlace>(object);
 			}
 		}
 
@@ -136,8 +133,7 @@ namespace synthese
 			City* city = const_cast<City*>(obj->getCity ());
 			if (city != NULL)
 			{
-				city->getRoadsMatcher ().remove (obj->getName ());
-				city->getAllPlacesMatcher().remove(obj->getName() + " [voie]");
+				city->removePlaceFromMatcher<RoadPlace>(obj);
 				obj->setCity(NULL);
 			}
 		}

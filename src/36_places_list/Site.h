@@ -25,8 +25,7 @@
 
 #include "HourPeriod.h"
 #include "Types.h"
-
-#include "Date.h"
+#include "DateTime.h"
 #include "LexicalMatcher.h"
 #include "Registrable.h"
 #include "Registry.h"
@@ -42,12 +41,20 @@ namespace synthese
 		class DateTime;
 	}
 
+	namespace geography
+	{
+		class Place;
+		class City;
+	}
+	
+	namespace graph
+	{
+		class AccessParameters;
+	}
+
 	namespace env
 	{
 		class CommercialLine;
-		class Place;
-		class AccessParameters;
-		class City;
 	}
 
 	namespace interfaces
@@ -76,6 +83,7 @@ namespace synthese
 
 			typedef std::vector<HourPeriod> Periods;
 			
+			typedef lexmatcher::LexicalMatcher<const geography::City*> CitiesMatcher;
 			
 		private:
 			//! \name Properties
@@ -89,7 +97,7 @@ namespace synthese
 			//! \name Environment
 			//@{
 				std::set<env::CommercialLine*>	_lines;
-				lexmatcher::LexicalMatcher<const env::City*> _citiesMatcher;
+				CitiesMatcher _citiesMatcher;
 			//@}
 
 			//! \name Parameters
@@ -140,13 +148,13 @@ namespace synthese
 				int								getUseDatesRange()					const;
 				const time::Date&				getStartDate()						const;
 				const time::Date&				getEndDate()						const;
-				const lexmatcher::LexicalMatcher<const env::City*>& getCitiesMatcher () const;
+				const CitiesMatcher&			getCitiesMatcher () const;
 			//@}
 
 			// \name Modifiers
 			//@{
 				void addHourPeriod(const HourPeriod& hourPeriod);
-				void addCity(const env::City* value);
+				void addCity(const geography::City* value);
 			//@}
 
 			//! \name Queries
@@ -158,7 +166,7 @@ namespace synthese
 					@date 2007
 					@todo Modify the generated object to avoid memory leaks due to the use of new operator
 				*/
-				env::AccessParameters	getAccessParameters(AccessibilityParameter parameter)	const;
+				graph::AccessParameters	getAccessParameters(AccessibilityParameter parameter)	const;
 	
 				bool dateControl() const;
 
@@ -213,7 +221,7 @@ namespace synthese
 					@throw Exception if no place can be found
 					@todo Implement a true place fetcher which takes into account the place selection of the site
 				*/
-				const env::Place* fetchPlace(
+				const geography::Place* fetchPlace(
 					const std::string& cityName
 					, const std::string& placeName
 				) const;

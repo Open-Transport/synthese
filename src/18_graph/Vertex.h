@@ -27,6 +27,7 @@
 
 #include "Registrable.h"
 #include "Point2D.h"
+#include "GraphTypes.h"
 
 namespace synthese
 {
@@ -50,7 +51,7 @@ namespace synthese
 			typedef std::set<const Edge*> Edges;
 
 		protected:
-			const Hub*	_place;
+			const Hub*	_hub;
 
 			Edges _departureEdges; //!< Departure edges from this physical stop
 			Edges _arrivalEdges; //!< Arrival edges to this physical stop
@@ -58,7 +59,7 @@ namespace synthese
 		protected:
 
 			Vertex(
-				const Hub* place,
+				const Hub* hub,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE
 			);
@@ -70,14 +71,14 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const Hub*		getPlace ()				const;  
+				const Hub*		getHub()				const;  
 				const Edges&	getDepartureEdges ()	const;
 				const Edges&	getArrivalEdges ()		const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void			setPlace(const Hub* place);
+				void			setHub(const Hub* place);
 			//@}
 
 
@@ -90,8 +91,7 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				virtual bool isAddress () const = 0;
-				virtual bool isPhysicalStop () const = 0;
+				virtual GraphIdType getGraphType() const = 0;
 			//@}
 		};
 	}

@@ -118,7 +118,7 @@ namespace synthese
 		void LineStop::setPhysicalStop(PhysicalStop* stop )
 		{
 			// Saving of the attribute
-			_fromVertex = static_cast<const Vertex*>(stop);
+			_fromVertex = static_cast<Vertex*>(stop);
 
 			// Links from stop to the linestop
 			if(stop)

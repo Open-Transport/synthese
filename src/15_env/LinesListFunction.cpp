@@ -44,7 +44,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Function,env::LinesListFunction>::FACTORY_KEY(
-		"LinesListFunction"
+		"LinesListFunction2"
 	);
 	
 	namespace env

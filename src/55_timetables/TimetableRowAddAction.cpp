@@ -101,10 +101,10 @@ namespace synthese
 			_isSufficient = map.getBool(PARAMETER_IS_SUFFICIENT, false, true, FACTORY_KEY);
 			_isDisplayed = map.getBool(PARAMETER_IS_DISPLAYED, false, true, FACTORY_KEY);
 
-			_place = dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(EnvModule::FetchPlace(
-				map.getString(PARAMETER_CITY_NAME, true, FACTORY_KEY)
-				, map.getString(PARAMETER_PLACE_NAME, true, FACTORY_KEY)
-			));
+//			_place = dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(EnvModule::FetchPlace(
+//				map.getString(PARAMETER_CITY_NAME, true, FACTORY_KEY)
+//				, map.getString(PARAMETER_PLACE_NAME, true, FACTORY_KEY)
+//			));
 
 			if (_place == NULL)
 				throw ActionException("No such place");

@@ -23,12 +23,10 @@
 #ifndef SYNTHESE_ENV_ADDRESSABLEPLACE_H
 #define SYNTHESE_ENV_ADDRESSABLEPLACE_H
 
-
 #include <vector>
 
 #include "Place.h"
 #include "Hub.h"
-#include "15_env/Types.h"
 
 namespace synthese
 {
@@ -45,47 +43,98 @@ namespace synthese
 			@ingroup m34
 		*/
 		class AddressablePlace
-		:	public env::Place,
+		:	public virtual geography::Place,
 			public graph::Hub
 		{
 		public:
 			typedef std::vector<const Address*> Addresses;
 
+		private:
+			typedef std::map< std::pair<uid, uid>, time::MinutesDuration> TransferDelaysMap;
+
 		protected:
-			Addresses _addresses; 
+			static const time::MinutesDuration FORBIDDEN_TRANSFER_DELAY;
+
+			//! @name Content
+			//@{
+				Addresses _addresses; 
+			//@}
+
+			//! @name Transfer parameters
+			//@{
+				bool					_allowedConnection;
+				TransferDelaysMap		_transferDelays; //!< Transfer delays between vertices (in minutes)
+				time::MinutesDuration	_defaultTransferDelay;
+			//@}
+
+			//! @name Caching
+			//@{
+				mutable int _minTransferDelay;
+			//@}
 
 			AddressablePlace(
-				const std::string& name,
-				const env::City* city
+				bool allowedConnection= false,
+				time::MinutesDuration defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY
 			);
 
 		public:
 
 			virtual ~AddressablePlace ();
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
 				/** Gets addresses of this place.
 				 */
-				const Addresses& getAddresses () const;
+				const Addresses&				getAddresses () const;
+				time::MinutesDuration			getDefaultTransferDelay() const;
+				virtual time::MinutesDuration	getMinTransferDelay() const;
 			//@}
 
+			//! @name Setters
+			//@{
+				void	setDefaultTransferDelay(
+					time::MinutesDuration defaultTransferDelay
+				);
+				void	setAllowedConnection(bool value);
+			//@}
+
+			//! @name Update methods.
+			//@{
+				void addTransferDelay(uid departureId, uid arrivalId, time::MinutesDuration transferDelay);
+				void clearTransferDelays ();
+			//@}
 
 			//! @name Query methods
 			//@{
-				virtual void getImmediateVertices (
+				virtual bool isConnectionAllowed(
+					const graph::Vertex& fromVertex
+					, const graph::Vertex& toVertex
+				) const;
+
+				virtual time::MinutesDuration getTransferDelay(
+					const graph::Vertex& fromVertex
+					, const graph::Vertex& toVertex
+				) const;
+
+				virtual void getVertexAccessMap(
 					graph::VertexAccessMap& result, 
 					const graph::AccessDirection& accessDirection,
-					const env::AccessParameters& accessParameters
-					, SearchAddresses returnAddresses
-					, SearchPhysicalStops returnPhysicalStops
-					, const graph::Vertex* origin = NULL
+					const graph::AccessParameters& accessParameters,
+					graph::GraphIdType whatToSearch
 				) const;
+
+				virtual void getVertexAccessMap(
+					graph::VertexAccessMap& result, 
+					const graph::AccessDirection& accessDirection,
+					graph::GraphIdType whatToSearch,
+					const graph::Vertex& origin
+				) const;
+
+				virtual graph::HubScore getScore() const;
 
 				virtual const geometry::Point2D& getPoint() const;
 
-				bool hasAddresses() const;
-				virtual bool hasPhysicalStops()	const;
+				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;
 			//@}
 
 

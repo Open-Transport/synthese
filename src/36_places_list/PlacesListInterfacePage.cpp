@@ -32,7 +32,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace transportwebsite;
 	using namespace util;
-	using namespace env;
+	using namespace geography;
 
 	namespace util
 	{

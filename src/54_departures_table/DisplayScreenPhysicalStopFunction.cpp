@@ -42,6 +42,8 @@
 
 #include "DateTime.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -80,10 +82,12 @@ namespace synthese
 
 			screen->setLocalization(place);
 			screen->setAllPhysicalStopsDisplayed(false);
-			const PhysicalStops& stops(place->getPhysicalStops());
-			for (PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
-				if (it->second->getOperatorCode() == oc)
-					screen->addPhysicalStop(it->second);
+			const ArrivalDepartureTableGenerator::PhysicalStops& stops(place->getPhysicalStops());
+			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, stops)
+			{
+				if(it.second->getOperatorCode() == oc)
+					screen->addPhysicalStop(it.second);
+			}
 			screen->setType(_type.get());
 			_screen.reset(screen);
 		}

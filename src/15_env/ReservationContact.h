@@ -28,8 +28,6 @@
 #include "Hour.h"
 #include "DateTime.h"
 
-#include "15_env/Types.h"
-
 namespace synthese
 {
 	namespace env

@@ -65,6 +65,8 @@ namespace synthese
 	using namespace time;
 	using namespace security;
 	using namespace messages;
+	using namespace geography;
+	
 
 	namespace util
 	{
@@ -307,13 +309,14 @@ namespace synthese
 				<< ",'";
 
 			int count=0;
-			const PhysicalStops& pss = object->getPhysicalStops(false);
-			for (PhysicalStops::const_iterator itp = pss.begin(); itp != pss.end(); ++itp)
+			const ArrivalDepartureTableGenerator::PhysicalStops& pss = object->getPhysicalStops(false);
+			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& itp, pss)
 			{
-				assert(itp->second->getKey() > 0);
+				assert(itp.second->getKey() > 0);
+
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itp->first);
+				query << Conversion::ToString(itp.first);
 			}
 
 			query

@@ -53,7 +53,7 @@ namespace synthese
 			if (!currentPage.isAuthorized()) return links;
 
 			PageLink currentPageLink(getPageLink());
-			vector<shared_ptr<AdminInterfaceElement> > pages(Factory<AdminInterfaceElement>::GetNewCollection());
+			Factory<AdminInterfaceElement>::ObjectsCollection pages(Factory<AdminInterfaceElement>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement> page, pages)
 			{
 				page->setRequest(_request);

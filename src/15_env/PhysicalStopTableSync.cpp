@@ -88,9 +88,9 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				PublicTransportStopZoneConnectionPlace* place = ConnectionPlaceTableSync::GetEditable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), env, linkLevel).get();
-				object->setPlace(place);
+				object->setHub(place);
 
-				place->addPhysicalStop(object);
+				place->addPhysicalStop(*object);
 			}
 		}
 
@@ -102,7 +102,7 @@ namespace synthese
 			PublicTransportStopZoneConnectionPlace* place = const_cast<PublicTransportStopZoneConnectionPlace*>(obj->getConnectionPlace());
 /// @todo	place->removePhysicalStop(obj);
 
-			obj->setPlace(NULL);
+			obj->setHub(NULL);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Save(PhysicalStop* object)

@@ -22,7 +22,7 @@
 
 #include "PhysicalStop.h"
 #include "Registry.h"
-
+#include "PTModule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
@@ -30,6 +30,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace pt;
 
 	namespace util
 	{
@@ -76,22 +77,6 @@ namespace synthese
 
 
 
-		bool 
-		PhysicalStop::isAddress () const
-		{
-			return false;
-		}
-
-
-
-		bool 
-		PhysicalStop::isPhysicalStop () const
-		{
-			return true;
-		}
-
-
-
 		const std::string& PhysicalStop::getOperatorCode() const
 		{
 			return _operatorCode;
@@ -105,7 +90,12 @@ namespace synthese
 
 		const PublicTransportStopZoneConnectionPlace* PhysicalStop::getConnectionPlace() const
 		{
-			return static_cast<const PublicTransportStopZoneConnectionPlace*>(Vertex::getPlace());
+			return static_cast<const PublicTransportStopZoneConnectionPlace*>(Vertex::getHub());
+		}
+
+		graph::GraphIdType PhysicalStop::getGraphType() const
+		{
+			return PTModule::GRAPH_ID;
 		}
 	}
 }

@@ -28,11 +28,12 @@
 #include "FactoryException.h"
 #include "Log.h"
 
-#include <vector>
 #include <map>
 #include <string>
-#include <iostream>
+#include <vector>
+#include <set>
 #include <boost/shared_ptr.hpp>
+#include <boost/foreach.hpp>
 
 namespace synthese
 {
@@ -92,8 +93,6 @@ namespace synthese
 			/// Registered subclasses map type.
 			typedef std::map<std::string, CreatorInterface*> Map;
 
-
-
 			////////////////////////////////////////////////////////////////////
 			/// The registered subclasses map.
 			static Map _registeredCreator;
@@ -101,6 +100,10 @@ namespace synthese
 
 
 		public:
+
+			typedef typename Map::key_type KeyType;
+			typedef std::set<typename KeyType> Keys;
+			typedef std::vector<boost::shared_ptr<RootObject> > ObjectsCollection;
 
 			static size_t size()
 			{
@@ -111,18 +114,18 @@ namespace synthese
 			/// Subclass automatic registration.
 			///	@return the key if ok, empty string if the subclass is already registered
 			template <class T>
-				static void integrate()
-			{
-				Log::GetInstance ().debug ("Registering compound... " + T::FACTORY_KEY);
+			static void Integrate(
+				const std::string& key
+			){
+				Log::GetInstance ().debug ("Registering compound... " + key);
 
 				// If the key is already used then return false (it would be better to use exceptions)
-				if(_registeredCreator.find(T::FACTORY_KEY) != _registeredCreator.end())
-					throw FactoryException<RootObject>("Attempted to integrate a class twice");
+				if(_registeredCreator.find(key) != _registeredCreator.end())
+					throw FactoryException<RootObject>("Attempted to integrate a class twice : "+ key);
 
 				// Saving of the auto generated builder
 				CreatorInterface* creator = new Creator<T>;
-				_registeredCreator.insert(std::pair<typename Map::key_type, 
-					CreatorInterface*>(T::FACTORY_KEY, creator));
+				_registeredCreator.insert(make_pair(key, creator));
 			}
 
 
@@ -168,10 +171,13 @@ namespace synthese
 
 
 			
-			static void destroy()
+			static void Destroy()
 			{
-			    // MJ : never called; review memory management...
-                            //delete _registeredCreator;
+				BOOST_FOREACH(const Map::value_type& it, _registeredCreator)
+				{
+					delete it.second;
+				}
+				_registeredCreator.clear();
 			}
 
 			
@@ -181,12 +187,29 @@ namespace synthese
 			///	@return a collection of new elements of each factorable subclass.
 			///	@author Hugues Romain
 			///	@date 2008
-			static std::vector<boost::shared_ptr<RootObject> > GetNewCollection()
+			static typename ObjectsCollection GetNewCollection()
 			{
-				std::vector<boost::shared_ptr<RootObject> > result;
-				for(typename Map::iterator it = _registeredCreator.begin(); it != _registeredCreator.end(); ++it)
+				typename ObjectsCollection result;
+				BOOST_FOREACH(const typename Map::value_type& it, _registeredCreator)
 				{
-					result.push_back(boost::shared_ptr<RootObject>(it->second->create()));
+					result.push_back(boost::shared_ptr<RootObject>(it.second->create()));
+				}
+				return result;
+			}
+
+
+
+			////////////////////////////////////////////////////////////////////
+			///	Builds a set containing all registered keys.
+			///	@return a set containing all registered keys
+			///	@author Hugues Romain
+			///	@date 2009
+			static typename Keys GetKeys()
+			{
+				typename Keys result;
+				BOOST_FOREACH(const typename Map::value_type& it, _registeredCreator)
+				{
+					result.insert(it.first);
 				}
 				return result;
 			}

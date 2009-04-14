@@ -28,8 +28,8 @@ using namespace std;
 namespace synthese
 {
 	using namespace security;
-	using namespace env;
 	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{

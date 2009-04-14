@@ -46,6 +46,7 @@
 #include "City.h"
 #include "CommercialLine.h"
 #include "AlarmTestOnDisplayScreenFunction.h"
+#include "GraphConstants.h"
 
 using namespace std;
 
@@ -59,6 +60,7 @@ namespace synthese
 	using namespace time;
 	using namespace security;
 	using namespace graph;
+	using namespace geography;
 
 	namespace util
 	{

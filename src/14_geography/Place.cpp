@@ -1,6 +1,6 @@
 
-/** CityTableSync class header.
-	@file CityTableSync.h
+/** Place class implementation.
+	@file Place.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,39 +20,39 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENVLSSQL_CITYTABLESYNC_H
-#define SYNTHESE_ENVLSSQL_CITYTABLESYNC_H
+#include "Place.h"
+#include "VertexAccessMap.h"
 
-#include "City.h"
+#include "WithoutAccentsFilter.h"
+#include "PlainCharFilter.h"
 
-#include <string>
-#include <iostream>
+#include <sstream>
+#include <boost/iostreams/filtering_stream.hpp>
 
-#include "SQLiteAutoRegisterTableSyncTemplate.h"
+using namespace std;
 
 namespace synthese
 {
-	namespace env
+	using namespace util;
+	using namespace graph;
+
+	namespace geography
 	{
-		class City;
-
-		/** City SQLite table synchronizer.
-			@ingroup m35LS refLS
-
-			- on insert : insert entry in associator
-			- on update : update entry in associator
-			- on delete : X
-		*/
-		class CityTableSync : public db::SQLiteAutoRegisterTableSyncTemplate<CityTableSync,City>
+		Place::Place(
+		):	_isoBarycentreToUpdate(false)
 		{
-		public:
-			static const std::string TABLE_COL_NAME;
-			static const std::string TABLE_COL_CODE;
+		}
 
-			CityTableSync ();
-			~CityTableSync ();
-		};
+
+		Place::~Place ()
+		{
+
+		}
+
+		bool Place::includes( const Place* place ) const
+		{
+			return place == this;
+		}
+
 	}
 }
-
-#endif

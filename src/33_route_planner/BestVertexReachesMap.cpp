@@ -29,6 +29,9 @@
 #include "Edge.h"
 #include "ServiceUse.h"
 
+#include "RoadModule.h"
+#include "PTModule.h"
+
 #include <assert.h>
 
 using namespace std;
@@ -40,6 +43,8 @@ namespace synthese
 	using namespace time;
 	using namespace graph;
 	using namespace road;
+	using namespace pt;
+	
 
 	namespace routeplanner
 	{
@@ -107,54 +112,49 @@ namespace synthese
 				itc->second = bestTime;
 			}
 
-			if (propagateInConnectionPlace && vertex->getPlace()->getScore() > 0)
+			if (propagateInConnectionPlace && vertex->getHub()->isConnectionPossible())
 			{
-				const Hub* p(vertex->getPlace());
+				const Hub* p(vertex->getHub());
 				assert (p != 0);
 
-				if (vertex->isAddress())
+				if (vertex->getGraphType() == RoadModule::GRAPH_ID)
 				{
-					const AddressablePlace::Addresses& ads(AddressablePlace::GetPlace(p)->getAddresses());
-					for(AddressablePlace::Addresses::const_iterator ita(ads.begin()); ita != ads.end(); ++ita)
+					if(dynamic_cast<const AddressablePlace*>(p))
 					{
-						DateTime bestTimeAtAddress(bestTime);
-						if (_accessDirection == DEPARTURE_TO_ARRIVAL)
+						const AddressablePlace::Addresses& ads(AddressablePlace::GetPlace(p)->getAddresses());
+						for(AddressablePlace::Addresses::const_iterator ita(ads.begin()); ita != ads.end(); ++ita)
 						{
-							int transferDelay(p->getTransferDelay(vertex, *ita));
-							if (transferDelay == Hub::FORBIDDEN_TRANSFER_DELAY)
-								continue;
-							bestTimeAtAddress += transferDelay;
+							DateTime bestTimeAtAddress(bestTime);
+							if (_accessDirection == DEPARTURE_TO_ARRIVAL)
+							{
+								if (!p->isConnectionAllowed(*vertex, **ita)) continue;
+								bestTimeAtAddress += p->getTransferDelay(*vertex, **ita);
+							}
+							else
+							{
+								if (!p->isConnectionAllowed(**ita, *vertex)) continue;
+								bestTimeAtAddress -= p->getTransferDelay(**ita, *vertex);
+							}
+							insert (*ita, bestTimeAtAddress, false);
 						}
-						else
-						{
-							int transferDelay(p->getTransferDelay(*ita, vertex));
-							if (transferDelay == Hub::FORBIDDEN_TRANSFER_DELAY)
-								continue;
-							bestTimeAtAddress -= transferDelay;
-						}
-						insert (*ita, bestTimeAtAddress, false);
 					}
 				}
 				else
 				{
 					const PublicTransportStopZoneConnectionPlace* cp(static_cast<const PublicTransportStopZoneConnectionPlace*>(p));
-					const PhysicalStops& ps(cp->getPhysicalStops());
-					for (PhysicalStops::const_iterator itp(ps.begin()); itp != ps.end(); ++itp)
+					const PublicTransportStopZoneConnectionPlace::PhysicalStops& ps(cp->getPhysicalStops());
+					for (PublicTransportStopZoneConnectionPlace::PhysicalStops::const_iterator itp(ps.begin()); itp != ps.end(); ++itp)
 					{
 						DateTime bestTimeAtStop(bestTime);
 						if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 						{
-							int transferDelay(p->getTransferDelay(vertex, itp->second));
-							if (transferDelay == Hub::FORBIDDEN_TRANSFER_DELAY)
-								continue;
-							bestTimeAtStop += transferDelay;
+							if (!p->isConnectionAllowed(*vertex, *itp->second)) continue;
+							bestTimeAtStop += p->getTransferDelay(*vertex, *itp->second);
 						}
 						else
 						{
-							int transferDelay(p->getTransferDelay(itp->second, vertex));
-							if (transferDelay == Hub::FORBIDDEN_TRANSFER_DELAY)
-								continue;
-							bestTimeAtStop -= transferDelay;
+							if (!p->isConnectionAllowed(*itp->second,*vertex)) continue;
+							bestTimeAtStop -= p->getTransferDelay(*itp->second, *vertex);
 						}
 						insert (itp->second, bestTimeAtStop, false);
 					}

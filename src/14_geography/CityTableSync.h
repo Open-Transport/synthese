@@ -1,6 +1,6 @@
 
-/** PublicPlace class header.
-	@file PublicPlace.h
+/** CityTableSync class header.
+	@file CityTableSync.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,41 +20,37 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENV_PUBLICPLACE_H
-#define SYNTHESE_ENV_PUBLICPLACE_H
+#ifndef SYNTHESE_ENVLSSQL_CITYTABLESYNC_H
+#define SYNTHESE_ENVLSSQL_CITYTABLESYNC_H
 
-#include "AddressablePlace.h"
-#include "Registry.h"
+#include "City.h"
 
 #include <string>
+#include <iostream>
+
+#include "SQLiteAutoRegisterTableSyncTemplate.h"
 
 namespace synthese
 {
-	namespace env
+	namespace geography
 	{
-		class City;
+		/** City SQLite table synchronizer.
+			@ingroup m14LS refLS
 
-
-		/** Public place class.
-			@ingroup m35
+			- on insert : insert entry in associator
+			- on update : update entry in associator
+			- on delete : X
 		*/
-		class PublicPlace
-		:	public road::AddressablePlace
+		class CityTableSync : public db::SQLiteAutoRegisterTableSyncTemplate<CityTableSync,City>
 		{
 		public:
+			static const std::string TABLE_COL_NAME;
+			static const std::string TABLE_COL_CODE;
 
-			/// Chosen registry class.
-			typedef util::Registry<PublicPlace>	Registry;
-
-			PublicPlace (
-				util::RegistryKeyType id = UNKNOWN_VALUE
-				, std::string name = std::string()
-				, const City* city = NULL
-			);
-
-			virtual ~PublicPlace ();
+			CityTableSync ();
+			~CityTableSync ();
 		};
 	}
 }
 
-#endif 	    
+#endif

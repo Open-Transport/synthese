@@ -23,11 +23,11 @@
 #include "BookReservationAction.h"
 
 #include "Site.h"
-
+#include "PublicTransportStopZoneConnectionPlace.h"
 #include "RoutePlannerFunction.h"
 #include "RoutePlanner.h"
 #include "JourneysResult.h"
-
+#include "NamedPlace.h"
 #include "ResaRight.h"
 #include "ReservationTransaction.h"
 #include "Reservation.h"
@@ -47,12 +47,12 @@
 #include "CommercialLine.h"
 #include "Road.h"
 #include "UseRule.h"
-#include "AddressablePlace.h"
+#include "NamedPlace.h"
 #include "RoadPlace.h"
 #include "Types.h"
 #include "User.h"
 #include "UserTableSync.h"
-
+#include "GeographyModule.h"
 #include "Conversion.h"
 
 #include <boost/foreach.hpp>
@@ -71,6 +71,8 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace road;
+	using namespace geography;
+	
 
 	namespace util
 	{
@@ -111,13 +113,13 @@ namespace synthese
 			{
 				if (_journey.getOrigin())
 				{
-					const AddressablePlace* place(AddressablePlace::GetPlace(_journey.getOrigin()->getPlace()));
+					const NamedPlace* place(dynamic_cast<const NamedPlace*>(_journey.getOrigin()->getHub()));
 					map.insert(PARAMETER_ORIGIN_CITY, place->getCity()->getName());
 					map.insert(PARAMETER_ORIGIN_PLACE, place->getName());
 				}
 				if (_journey.getDestination())
 				{
-					const AddressablePlace* place(AddressablePlace::GetPlace(_journey.getDestination()->getPlace()));
+					const NamedPlace* place(dynamic_cast<const NamedPlace*>(_journey.getDestination()->getHub()));
 					map.insert(PARAMETER_DESTINATION_CITY, place->getCity()->getName());
 					map.insert(PARAMETER_DESTINATION_PLACE, place->getName());
 				}
@@ -210,7 +212,7 @@ namespace synthese
 				? site->fetchPlace(
 					map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
 					, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
-				) : EnvModule::FetchPlace(
+				) : GeographyModule::FetchPlace(
 					map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
 					, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
 				)
@@ -219,7 +221,7 @@ namespace synthese
 				? site->fetchPlace(
 					map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
 					, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
-				) : EnvModule::FetchPlace(
+				) : GeographyModule::FetchPlace(
 					map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
 					, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
 				)
@@ -285,31 +287,31 @@ namespace synthese
 			{
 				assert(su.getService() != NULL);
 				assert(su.getDepartureEdge() != NULL);
-				assert(su.getDepartureEdge()->getPlace() != NULL);
+				assert(su.getDepartureEdge()->getHub() != NULL);
 				assert(su.getArrivalEdge() != NULL);
-				assert(su.getArrivalEdge()->getPlace() != NULL);
+				assert(su.getArrivalEdge()->getHub() != NULL);
 
 				shared_ptr<Reservation> r(rt.newReservation());
 				r->setDeparturePlaceId(
-					AddressablePlace::GetPlace(
-						su.getDepartureEdge()->getPlace()
+					dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(
+						su.getDepartureEdge()->getHub()
 					)->getKey()
 				);
 				r->setDeparturePlaceName(
-					AddressablePlace::GetPlace(
-						su.getDepartureEdge()->getPlace()
+					dynamic_cast<const NamedPlace*>(
+						su.getDepartureEdge()->getHub()
 					)->getFullName()
 				);
 				r->setDepartureTime(su.getDepartureDateTime());
 				r->setOriginDateTime(su.getOriginDateTime());
 				r->setArrivalPlaceId(
-					AddressablePlace::GetPlace(
-						su.getArrivalEdge()->getPlace()
+					dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(
+						su.getArrivalEdge()->getHub()
 					)->getKey()
 				);
 				r->setArrivalPlaceName(
-					AddressablePlace::GetPlace(
-						su.getArrivalEdge()->getPlace()
+					dynamic_cast<const NamedPlace*>(
+						su.getArrivalEdge()->getHub()
 					)->getFullName()
 				);
 				r->setArrivalTime(su.getArrivalDateTime());
@@ -356,7 +358,7 @@ namespace synthese
 
 		BookReservationAction::BookReservationAction()
 			: FactorableTemplate<Action, BookReservationAction>()
-			, _journey(DEPARTURE_TO_ARRIVAL)
+			, _journey()
 			, _disabledCustomer(false)
 			, _drtOnly(false)
 		{

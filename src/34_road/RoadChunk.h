@@ -55,7 +55,8 @@ namespace synthese
 			RoadChunk(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
 				Address* fromAddress = NULL,
-				int rankInRoad = UNKNOWN_VALUE
+				int rankInRoad = UNKNOWN_VALUE,
+				Road* street = NULL
 			);
 
 		  
@@ -64,7 +65,7 @@ namespace synthese
 
 		//! @name Getters/Setters
 		//@{
-			const Address* getFromAddress() const;
+			Address* getFromAddress() const;
 			void setFromAddress(Address* fromAddress);
 			void setRoad(const Road* road);
 		//@}

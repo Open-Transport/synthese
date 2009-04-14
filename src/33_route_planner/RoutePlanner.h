@@ -98,7 +98,7 @@ namespace synthese
 			//@{
 				graph::VertexAccessMap		_originVam;
 				graph::VertexAccessMap		_destinationVam;
-				const env::AccessParameters	_accessParameters;
+				const graph::AccessParameters	_accessParameters;
 				const time::DateTime		_journeySheetStartTime;  //!< Start time of schedule sheet.
 				const time::DateTime		_journeySheetEndTime;    //!< End time of schedule sheet.
 				const PlanningOrder			_planningOrder;  //!< Define planning sequence.
@@ -131,9 +131,9 @@ namespace synthese
 				@date 2007
 			*/
 			RoutePlanner(
-				 const env::Place* origin,
-				 const env::Place* destination,
-				 const env::AccessParameters& accessParameters,
+				 const geography::Place* origin,
+				 const geography::Place* destination,
+				 const graph::AccessParameters& accessParameters,
 				 const PlanningOrder& planningOrder,
 				 const time::DateTime& journeySheetStartTime,
 				 const time::DateTime& journeySheetEndTime

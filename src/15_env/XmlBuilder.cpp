@@ -77,15 +77,18 @@ namespace synthese
 
 			int defaultTransferDelay(GetIntAttr(
 					node, 
-					"defaultTransferDelay", 
-					PublicTransportStopZoneConnectionPlace::FORBIDDEN_TRANSFER_DELAY
+					"defaultTransferDelay"
 			)	);
 
 			shared_ptr<const City> city = cities.get (cityId);
 
-			return shared_ptr<PublicTransportStopZoneConnectionPlace>(
-				new PublicTransportStopZoneConnectionPlace(id, name, city.get(),type, defaultTransferDelay)
+			shared_ptr<PublicTransportStopZoneConnectionPlace> p(
+				new PublicTransportStopZoneConnectionPlace(id, type, defaultTransferDelay)
 			);
+			p->setCity(city.get());
+			p->setName(name);
+
+			return p;
 		}
 
 

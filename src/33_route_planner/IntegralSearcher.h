@@ -25,11 +25,12 @@
 
 #include "Log.h"
 
-#include "15_env/Types.h"
+#include "GraphTypes.h"
 #include "AccessParameters.h"
 
 #include "33_route_planner/Types.h"
 #include "JourneysResult.h"
+#include "GraphModuleTemplate.h"
 
 #include <map>
 #include <list>
@@ -77,35 +78,31 @@ namespace synthese
 
 			//! @name Parameters
 			//@{
-				const env::AccessParameters				_accessParameters;
-				const graph::AccessDirection			_accessDirection;
-				const SearchAddresses					_searchAddresses;
-				const SearchPhysicalStops				_searchPhysicalStops;
-				const UseRoads							_useRoads;
-				const UseLines							_useLines;
+				const graph::AccessParameters					_accessParameters;
+				const graph::AccessDirection				_accessDirection;
+				const graph::GraphIdType							_whatToSearch;
+				const graph::GraphIdType							_graphToUse;
 				JourneysResult<graph::JourneyComparator>&	_result;
-				BestVertexReachesMap&					_bestVertexReachesMap;
-				const graph::VertexAccessMap&			_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
-				const time::DateTime&					_calculationTime;
-				time::DateTime&							_minMaxDateTimeAtDestination;
-				const int								_previousContinuousServiceDuration;
-				const time::DateTime&					_previousContinuousServiceLastDeparture;
-				const int								_maxDepth;
-				const bool								_optim;
-				const bool								_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
-				std::ostream* const						_logStream;
-				const util::Log::Level					_logLevel;
+				BestVertexReachesMap&						_bestVertexReachesMap;
+				const graph::VertexAccessMap&				_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
+				const time::DateTime&						_calculationTime;
+				time::DateTime&								_minMaxDateTimeAtDestination;
+				const int									_previousContinuousServiceDuration;
+				const time::DateTime&						_previousContinuousServiceLastDeparture;
+				const int									_maxDepth;
+				const bool									_optim;
+				const bool									_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
+				std::ostream* const							_logStream;
+				const util::Log::Level						_logLevel;
 			//@}
 
 
 		public:
 			IntegralSearcher(
 				graph::AccessDirection			accessDirection
-				, const env::AccessParameters&	accessParameters
-				, SearchAddresses				searchAddresses
-				, SearchPhysicalStops			searchPhysicalStops
-				, UseRoads						useRoads
-				, UseLines									useLines
+				, const graph::AccessParameters&	accessParameters
+				, graph::GraphIdType			whatToSearch
+				, graph::GraphIdType			graphToUse
 				, JourneysResult<graph::JourneyComparator>&	result
 				, BestVertexReachesMap&			bestVertexReachesMap
 				, const graph::VertexAccessMap&	destinationVam
@@ -122,7 +119,7 @@ namespace synthese
 
 
 			/** Integral search of objects within the network.
-				@param vertices
+				@param startVam the search is launched at this vertices
 				@param desiredTime Desired time.
 				@param currentJourney Journey currently being built.
 				@param maxDepth Maximum recursion depth.

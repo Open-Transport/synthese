@@ -20,6 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "NamedPlace.h"
 #include "IntegralSearcher.h"
 #include "BestVertexReachesMap.h"
 #include "JourneysResult.h"
@@ -37,7 +38,7 @@
 #include "Road.h"
 #include "Line.h"
 #include "CommercialLine.h"
-
+#include "RoadModule.h"
 #include "DateTime.h"
 
 #include "Log.h"
@@ -53,6 +54,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace road;
+	using namespace geography;
 
 	namespace routeplanner
 	{
@@ -62,10 +64,8 @@ namespace synthese
 		IntegralSearcher::IntegralSearcher(
 			AccessDirection accessDirection
 			, const AccessParameters&	accessParameters
-			, SearchAddresses searchAddresses
-			, SearchPhysicalStops searchPhysicalStops
-			, UseRoads useRoads
-			, UseLines useLines
+			, GraphIdType whatToSearch
+			, GraphIdType graphToUse
 			, JourneysResult<graph::JourneyComparator>&				result
 			, BestVertexReachesMap& bestVertexReachesMap
 			, const VertexAccessMap& destinationVam
@@ -78,13 +78,11 @@ namespace synthese
 			, bool inverted
 			, ostream* const logStream
 			, Log::Level logLevel
-		)	: _accessDirection(accessDirection)
-			, _accessParameters(accessParameters)
-			, _searchAddresses(searchAddresses)
-			, _searchPhysicalStops(searchPhysicalStops)
-			, _useRoads(useRoads)
-			, _useLines(useLines)
-			, _result(result)
+		):	_accessDirection(accessDirection),
+			_accessParameters(accessParameters),
+			_whatToSearch(whatToSearch),
+			_graphToUse(graphToUse),
+			_result(result)
 			, _bestVertexReachesMap(bestVertexReachesMap)
 			, _destinationVam(destinationVam)
 			, _calculationTime(calculationDateTime)
@@ -109,7 +107,7 @@ namespace synthese
 		){
 			// Recusrions to do
 			JourneysResult<_JourneyComparator> todo;
-			todo.addEmptyJourney(startJourney.getMethod());
+			todo.addEmptyJourney();
 
 			string s("<table class=\"adminresults\">");
 			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
@@ -185,7 +183,7 @@ namespace synthese
 							// Place
 							stream <<
 								"<td>" <<
-								AddressablePlace::GetPlace(its->getArrivalEdge()->getPlace())->getFullName() << 
+								dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName() << 
 								"</td>"
 							;
 
@@ -252,15 +250,13 @@ namespace synthese
 				{
 					const AddressablePlace* cp(
 						dynamic_cast<const AddressablePlace*>(
-							journey->getEndEdge()->getFromVertex()->getPlace()
+							journey->getEndEdge()->getHub()
 					)	);
-					cp->getImmediateVertices(
+					cp->getVertexAccessMap(
 						vam,
 						_accessDirection,
-						_accessParameters
-						, (_useRoads == USE_ROADS) ? SEARCH_ADDRESSES : DO_NOT_SEARCH_ADDRESSES
-						, (_useLines == USE_LINES) ? SEARCH_PHYSICALSTOPS : DO_NOT_SEARCH_PHYSICALSTOPS
-						, journey->getEndEdge()->getFromVertex()
+						_graphToUse,
+						*journey->getEndEdge()->getFromVertex()
 					);
 					desiredTime = journey->getEndTime();
 				}
@@ -276,8 +272,8 @@ namespace synthese
 					// Initialization of loop local variables
 					const Vertex* origin(itVertex->first);
 
-					if (origin->isAddress() && _useRoads != USE_ROADS
-						|| origin->isPhysicalStop() && _useLines != USE_LINES)
+					// TODO Ensure that this test is not useless
+					if(origin->getGraphType() != _graphToUse)
 						continue;
 
 					// Approach to the vertex
@@ -348,10 +344,10 @@ namespace synthese
 
 							PtrEdgeStep step(	
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
-								?(	_useRoads == USE_ROADS || _destinationVam.needFineSteppingForArrival (edge->getParentPath ())
+								?(	_destinationVam.needFineSteppingForArrival (edge->getParentPath())
 									? (&Edge::getFollowingArrivalForFineSteppingOnly)
 									: (&Edge::getFollowingConnectionArrival)
-								):(	_useRoads == USE_ROADS || _destinationVam.needFineSteppingForDeparture (edge->getParentPath ())
+								):(	_destinationVam.needFineSteppingForDeparture (edge->getParentPath())
 									? (&Edge::getPreviousDepartureForFineSteppingOnly)
 									: (&Edge::getPreviousConnectionDeparture)
 								)
@@ -368,8 +364,7 @@ namespace synthese
 								bool isGoalReached(_destinationVam.contains(reachedVertex));
 								
 								// In road integral search, all nodes are potential connection points
-								if(	_useRoads != USE_ROADS &&
-									!reachedVertex->getPlace()->getScore() > 0 &&
+								if(	!reachedVertex->getHub()->isConnectionPossible() &&
 									!isGoalReached
 								){
 									continue;
@@ -413,13 +408,11 @@ namespace synthese
 								}
 
 								// Storage of the journey as a result
-								const AddressablePlace* aplace(AddressablePlace::GetPlace(reachedVertex->getPlace()));
-								if(	(	_searchAddresses == SEARCH_ADDRESSES
-										&&	aplace->hasAddresses()
-									)||(_searchPhysicalStops == SEARCH_PHYSICALSTOPS
-										&&	aplace->hasPhysicalStops()
-									)||	isGoalReached
-								)	_result.add(resultJourney);
+								if(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) ||
+									isGoalReached
+								){
+									_result.add(resultJourney);
+								}
 
 								// Storage of the reach time at the vertex in the best vertex reaches map
 								_bestVertexReachesMap.insert (serviceUse);
@@ -486,7 +479,7 @@ namespace synthese
 			/// <h2>Control of the compliance with the current filters</h2>
 			const ServiceUse& serviceUse(journey.getEndServiceUse());
 			const Vertex* reachedVertex(serviceUse.getSecondEdge()->getFromVertex());
-			if (reachedVertex->isAddress ())
+			if (reachedVertex->getGraphType() == RoadModule::GRAPH_ID)
 			{
 				/** - If the edge is an address, the currentJourney necessarily contains
 					only road legs, filter approach (= walk distance and duration).
@@ -527,7 +520,7 @@ namespace synthese
 				@todo Replace the third value (1 minute) by a more accurate value ("VMAX algorithm")
 			*/
 			if(	!_destinationVam.contains(reachedVertex)
-				&& reachedVertex->getPlace()->getScore() > 0
+				&& reachedVertex->getHub()->isConnectionPossible()
 			){
 
 /* Extract of the old VMAX code
@@ -541,7 +534,7 @@ namespace synthese
 */
 				DateTime bestHopedGoalAccessDateTime (reachDateTime);
 				int minimalGoalReachDuration(
-					reachedVertex->getPlace()->getMinTransferDelay()	// Minimal time to transfer
+					reachedVertex->getHub()->getMinTransferDelay()	// Minimal time to transfer
 					+ 1															// Minimal time to reach the goal
 				);
 

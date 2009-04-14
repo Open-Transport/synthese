@@ -22,7 +22,7 @@
 
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "Registry.h"
-
+#include "PTModule.h"
 #include "PhysicalStop.h"
 #include "Edge.h"
 #include "CommercialLine.h"
@@ -38,115 +38,41 @@ namespace synthese
 {
 	using namespace util;
 	using namespace graph;
+	using namespace pt;
+	using namespace time;
+	using namespace road;
 
 	namespace util
 	{
-		template<> const std::string Registry<env::PublicTransportStopZoneConnectionPlace>::KEY("PublicTransportStopZoneConnectionPlace");
+		template<> const string Registry<env::PublicTransportStopZoneConnectionPlace>::KEY("PublicTransportStopZoneConnectionPlace");
+		template<> const string FactorableTemplate<geography::NamedPlace,env::PublicTransportStopZoneConnectionPlace>::FACTORY_KEY("PublicTransportStopZoneConnectionPlace");
 	}
 
 	namespace env
 	{
 		PublicTransportStopZoneConnectionPlace::PublicTransportStopZoneConnectionPlace(
 			util::RegistryKeyType id /*= UNKNOWN_VALUE */
-			, std::string name /*= std::string() */
-			, const City* city /*= NULL */
 			, bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
 			, MinutesDuration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
-		):	AddressablePlace(name, city),
-			Registrable(id)
-			, _defaultTransferDelay (defaultTransferDelay)
-			, _minTransferDelay (UNKNOWN_VALUE)
-			, _score(UNKNOWN_VALUE),
-			_allowedConnection(allowedConnection)
+		):	AddressablePlace(allowedConnection, defaultTransferDelay),
+			Registrable(id),
+			NamedPlaceTemplate<PublicTransportStopZoneConnectionPlace>()
+			, _score(UNKNOWN_VALUE)
 		{
 
 		}
 
-		const PhysicalStops& PublicTransportStopZoneConnectionPlace::getPhysicalStops() const
+		const PublicTransportStopZoneConnectionPlace::PhysicalStops& PublicTransportStopZoneConnectionPlace::getPhysicalStops() const
 		{
 			return _physicalStops;
 		}
 
-		MinutesDuration PublicTransportStopZoneConnectionPlace::getDefaultTransferDelay(
-		) const {
-			return _defaultTransferDelay;
-		}
-
-		MinutesDuration PublicTransportStopZoneConnectionPlace::getMinTransferDelay() const
-		{
-			if (_minTransferDelay == UNKNOWN_VALUE)
-			{
-				_minTransferDelay = _defaultTransferDelay;
-				for (TransferDelaysMap::const_iterator it(_transferDelays.begin()); it != _transferDelays.end(); ++it)
-					if (it->second < _minTransferDelay)
-						_minTransferDelay = it->second;
-			}
-			return _minTransferDelay;
-		}
-
-
-
-		void PublicTransportStopZoneConnectionPlace::setDefaultTransferDelay(
-			MinutesDuration defaultTransferDelay
+		void PublicTransportStopZoneConnectionPlace::addPhysicalStop(
+			const PhysicalStop& physicalStop
 		){
-			assert(defaultTransferDelay >= 0 && defaultTransferDelay <= FORBIDDEN_TRANSFER_DELAY);
-
-			_defaultTransferDelay = defaultTransferDelay;
-			_minTransferDelay = UNKNOWN_VALUE;
-		}
-
-		void PublicTransportStopZoneConnectionPlace::setAllowedConnection(
-			bool value
-		){
-			_allowedConnection = value;
-		}
-
-		void PublicTransportStopZoneConnectionPlace::addPhysicalStop( const PhysicalStop* physicalStop )
-		{
 			_isoBarycentreToUpdate = true;
-			_physicalStops.insert(make_pair(physicalStop->getKey(),physicalStop));
+			_physicalStops.insert(make_pair(physicalStop.getKey(), &physicalStop));
 		}
-
-		void PublicTransportStopZoneConnectionPlace::addTransferDelay(
-			uid departureId,
-			uid arrivalId,
-			MinutesDuration transferDelay
-		){
-			assert(transferDelay >= 0 && transferDelay <= FORBIDDEN_TRANSFER_DELAY);
-
-			_transferDelays[std::make_pair (departureId, arrivalId)] = transferDelay;
-			_minTransferDelay = UNKNOWN_VALUE;
-		}
-
-
-
-		void PublicTransportStopZoneConnectionPlace::clearTransferDelays()
-		{
-			_transferDelays.clear ();
-			_defaultTransferDelay = Hub::FORBIDDEN_TRANSFER_DELAY;
-			_minTransferDelay = UNKNOWN_VALUE;
-		}
-
-		bool PublicTransportStopZoneConnectionPlace::isConnectionAllowed(
-			const Vertex* fromVertex,
-			const Vertex* toVertex
-		) const {
-			if(!_allowedConnection) return false;
-
-			return getTransferDelay(fromVertex,	toVertex) != Hub::FORBIDDEN_TRANSFER_DELAY;
-		}
-
-		MinutesDuration PublicTransportStopZoneConnectionPlace::getTransferDelay(
-			const Vertex* fromVertex,
-			const Vertex* toVertex
-		) const {
-			TransferDelaysMap::const_iterator it(_transferDelays.find(make_pair(fromVertex->getKey(),toVertex->getKey())));
-
-			// If not defined in map, return default transfer delay
-			return (it == _transferDelays.end ()) ? _defaultTransferDelay : it->second;
-		}
-
-
 		PublicTransportStopZoneConnectionPlace::PhysicalStopsLabels PublicTransportStopZoneConnectionPlace::getPhysicalStopLabels( bool withAll /*= false*/ ) const
 		{
 			PhysicalStopsLabels m;
@@ -168,19 +94,21 @@ namespace synthese
 
 		HubScore PublicTransportStopZoneConnectionPlace::getScore() const
 		{
+			typedef map<const CommercialLine*, int> ScoresMap;
+
 			if (_score == UNKNOWN_VALUE)
 			{
 				if(!_allowedConnection)
 				{
-					_score = 0;
+					_score = NO_TRANSFER_HUB_SCORE;
 				} else {
-					map<const CommercialLine*, int> scores;
+					ScoresMap scores;
 					BOOST_FOREACH(PhysicalStops::value_type its, _physicalStops)
 					{
 						BOOST_FOREACH(const Edge* edge, its.second->getDepartureEdges())
 						{
 							const Line* route(static_cast<const Line*>(edge->getParentPath()));
-							map<const CommercialLine*, int>::iterator itl(
+							ScoresMap::iterator itl(
 								scores.find(route->getCommercialLine())
 							);
 							if (itl == scores.end())
@@ -191,13 +119,13 @@ namespace synthese
 							}
 						}
 	
-						for (map<const CommercialLine*, int>::const_iterator itc(scores.begin()); itc != scores.end(); ++itc)
+						BOOST_FOREACH(ScoresMap::value_type itc, scores)
 						{
-							if (itc->second <= 10)
+							if (itc.second <= 10)
 								_score += 2;
-							else if (itc->second <= 50)
+							else if (itc.second <= 50)
 								_score += 3;
-							else if (itc->second <= 100)
+							else if (itc.second <= 100)
 								_score += 4;
 							else
 								_score += 5;
@@ -208,41 +136,80 @@ namespace synthese
 							}
 						}
 					}
+					if(_score < NO_TRANSFER_HUB_SCORE)
+					{
+						_score = NO_TRANSFER_HUB_SCORE;
+					}
 				}
 			}
 			return _score;
 		}
 
-		void PublicTransportStopZoneConnectionPlace::getImmediateVertices(
+		void PublicTransportStopZoneConnectionPlace::getVertexAccessMap(
+			VertexAccessMap& result,
+			const AccessDirection& accessDirection,
+			GraphIdType whatToSearch,
+			const Vertex& origin
+		) const {
+			AddressablePlace::getVertexAccessMap(
+				result, accessDirection, whatToSearch, origin
+			);
+		    
+			if (whatToSearch != PTModule::GRAPH_ID) return;
+
+			if(accessDirection == DEPARTURE_TO_ARRIVAL)
+			{
+				BOOST_FOREACH(
+					const PhysicalStops::value_type& it,
+					_physicalStops
+				){
+					
+					if(!isConnectionAllowed(origin, *it.second)) continue;
+
+					result.insert(
+						it.second,
+						VertexAccess(getTransferDelay(origin, *it.second))
+					);
+				}
+			} else {
+				BOOST_FOREACH(
+					const PhysicalStops::value_type& it,
+					_physicalStops
+				){
+
+					if(!isConnectionAllowed(*it.second, origin)) continue;
+
+					result.insert(
+						it.second,
+						VertexAccess(getTransferDelay(*it.second, origin))
+					);
+				}
+			}
+		} 
+
+
+
+		void PublicTransportStopZoneConnectionPlace::getVertexAccessMap(
 			VertexAccessMap& result,
 			const AccessDirection& accessDirection,
 			const AccessParameters& accessParameters,
-			SearchAddresses returnAddresses,
-			SearchPhysicalStops returnPhysicalStops,
-			const Vertex* origin /*= NULL */
+			GraphIdType whatToSearch
 		) const {
-			AddressablePlace::getImmediateVertices(
+			AddressablePlace::getVertexAccessMap(
 				result, accessDirection, accessParameters
-				, returnAddresses, returnPhysicalStops
-				, origin
+				, whatToSearch
 			);
 		    
-			if (returnPhysicalStops == SEARCH_PHYSICALSTOPS)
-			{
-				for(PhysicalStops::const_iterator it(_physicalStops.begin());
-					it != _physicalStops.end();
-					++it
-				){
-					result.insert(
-						it->second
-						, getVertexAccess(
-							accessDirection
-							, accessParameters
-							, it->second
-							, origin
-						)
-					);
-				}
+			if (whatToSearch != PTModule::GRAPH_ID) return;
+
+			BOOST_FOREACH(
+				const PhysicalStops::value_type& it,
+				_physicalStops
+			){
+				result.insert(
+					it.second,
+					VertexAccess()
+				);
 			}
 		}
 
@@ -251,50 +218,37 @@ namespace synthese
 			if (_isoBarycentreToUpdate)
 			{
 				_isoBarycentre.clear();
-				for (PhysicalStops::const_iterator it(_physicalStops.begin()); it != _physicalStops.end(); ++it)
-					_isoBarycentre.add(*it->second);
-				for (Addresses::const_iterator it(_addresses.begin()); it != _addresses.end(); ++it)
-					_isoBarycentre.add(**it);
+				BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
+				{
+					_isoBarycentre.add(*it.second);
+				}
+				BOOST_FOREACH(const Address* address, _addresses)
+				{
+					_isoBarycentre.add(*address);
+				}
 				_isoBarycentreToUpdate = false;
 			}
 			return _isoBarycentre;
 		}
 
-		bool PublicTransportStopZoneConnectionPlace::hasPhysicalStops() const
-		{
-			return !_physicalStops.empty();
-		}
-		
-				
-		
-		VertexAccess PublicTransportStopZoneConnectionPlace::getVertexAccess(
-			const AccessDirection& accessDirection,
-			const AccessParameters& accessParameters,
-			const Vertex* destination,
-			const Vertex* origin
+
+
+		bool PublicTransportStopZoneConnectionPlace::containsAnyVertex(
+			GraphIdType graphType
 		) const	{
-			VertexAccess access(accessDirection);
-
-			if (origin != 0)
+			if(graphType == PTModule::GRAPH_ID)
 			{
-				access.approachDistance = 0;
-				if (accessDirection == ARRIVAL_TO_DEPARTURE)
-				{
-					access.approachTime = getTransferDelay (origin, destination);
-				} 
-				else
-				{
-					access.approachTime = getTransferDelay (destination, origin);
-				}
+				return !_physicalStops.empty();
 			}
-			else
-			{
-				access.approachDistance = 0;
-				access.approachTime = 0;
-			}
-
-			return access;
+			return AddressablePlace::containsAnyVertex(graphType);
 		}
 
+
+
+		std::string PublicTransportStopZoneConnectionPlace::getNameForAllPlacesMatcher(
+			std::string text
+		) const	{
+			return (text.empty() ? getName() : text) + " [arrêt]";
+		}
 	}
 }

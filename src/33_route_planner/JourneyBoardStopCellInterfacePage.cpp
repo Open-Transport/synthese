@@ -23,6 +23,7 @@
 #include "JourneyBoardStopCellInterfacePage.h"
 #include "SentAlarm.h"
 #include "AddressablePlace.h"
+#include "NamedPlace.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ namespace synthese
 	using namespace messages;
 	using namespace interfaces;
 	using namespace util;
-	using namespace env;
+	using namespace geography;
 	using namespace time;
 	using namespace road;
 	using namespace routeplanner;
@@ -63,7 +64,7 @@ namespace synthese
 			pv.push_back( alarm ? alarm->getLongMessage() : string() );
 			pv.push_back( alarm ? Conversion::ToString(alarm->getLevel()) : string() );
 			pv.push_back( Conversion::ToString( isItTerminus ));
-			pv.push_back( place->getFullName() );
+			pv.push_back( dynamic_cast<const NamedPlace*>(place)->getFullName() );
 			pv.push_back( Conversion::ToString( color ));
 			pv.push_back( time.isUnknown() ? string() : time.getHour().toString() );
 			pv.push_back( (continuousServiceRange > 0) ? endRangeTime.getHour().toString() : string() );

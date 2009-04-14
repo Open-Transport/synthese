@@ -27,7 +27,6 @@
 
 #include "FunctionWithSite.h"
 #include "36_places_list/Types.h"
-#include "15_env/Types.h"
 #include "AccessParameters.h"
 #include "DateTime.h"
 #include "FactorableTemplate.h"
@@ -39,7 +38,7 @@ namespace synthese
 		class HourPeriod;
 	}
 
-	namespace env
+	namespace geography
 	{
 		class Place;
 	}
@@ -70,15 +69,15 @@ namespace synthese
 			//! \name Parameters
 			//@{
 				const RoutePlannerInterfacePage*			_page;
-				const env::Place*							_departure_place;
-				const env::Place*							_arrival_place;
+				const geography::Place*						_departure_place;
+				const geography::Place*						_arrival_place;
 				std::string									_originCityText;
 				std::string									_destinationCityText;
 				std::string									_originPlaceText;
 				std::string									_destinationPlaceText;
 				time::DateTime								_startDate;
 				time::DateTime								_endDate;
-				env::AccessParameters						_accessParameters;
+				graph::AccessParameters						_accessParameters;
 				int											_maxSolutionsNumber;
 				int											_periodId;
 				const transportwebsite::HourPeriod*			_period;

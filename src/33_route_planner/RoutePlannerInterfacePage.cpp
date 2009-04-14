@@ -22,19 +22,19 @@
 
 #include "RoutePlannerInterfacePage.h"
 
-#include "36_places_list/HourPeriod.h"
-#include "36_places_list/Site.h"
+#include "HourPeriod.h"
+#include "Site.h"
 
-#include "15_env/City.h"
-#include "15_env/Place.h"
-#include "15_env/AccessParameters.h"
+#include "City.h"
+#include "Place.h"
+#include "AccessParameters.h"
+#include "PTConstants.h"
+#include "DateTimeInterfacePage.h"
+#include "Interface.h"
 
-#include "11_interfaces/DateTimeInterfacePage.h"
-#include "11_interfaces/Interface.h"
-
-#include "04_time/Date.h"
-
-#include "01_util/Conversion.h"
+#include "Date.h"
+#include "NamedPlace.h"
+#include "Conversion.h"
 
 #include <sstream>
 
@@ -47,6 +47,8 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace transportwebsite;
+	using namespace geography;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerInterfacePage>::FACTORY_KEY("route_planner");
 
@@ -59,8 +61,8 @@ namespace synthese
 			, const RoutePlannerResult& object
 			, const time::Date& date
 			, int periodId
-			, const env::Place* originPlace
-			, const env::Place* destinationPlace
+			, const Place* originPlace
+			, const Place* destinationPlace
 			, const HourPeriod* period
 			, const AccessParameters& accessParameters
 			, const server::Request* request /*= NULL*/
@@ -73,15 +75,15 @@ namespace synthese
 			string originPlaceName;
 			if (originCity == NULL)
 			{
-				originCity = originPlace->getCity();
-				originPlaceName = originPlace->getName();
+				originCity = dynamic_cast<const NamedPlace*>(originPlace)->getCity();
+				originPlaceName = dynamic_cast<const NamedPlace*>(originPlace)->getName();
 			}
 			const City* destinationCity(dynamic_cast<const City*>(destinationPlace));
 			string destinationPlaceName;
 			if (destinationCity == NULL)
 			{
-				destinationCity = destinationPlace->getCity();
-				destinationPlaceName = destinationPlace->getName();
+				destinationCity = dynamic_cast<const NamedPlace*>(destinationPlace)->getCity();
+				destinationPlaceName = dynamic_cast<const NamedPlace*>(destinationPlace)->getName();
 			}
 			
 			// Text formatted date
@@ -97,7 +99,7 @@ namespace synthese
 			pv.push_back(originPlaceName);
 			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_BIKE_IN_PT));
 			pv.push_back(destinationCity->getName());
-			pv.push_back(Conversion::ToString(destinationPlace->getKey()));
+			pv.push_back("" /*Conversion::ToString(destinationPlace->getKey())*/);
 			pv.push_back(destinationPlaceName);
 			pv.push_back(Conversion::ToString(periodId));
 			pv.push_back(sDate.str());

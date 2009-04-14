@@ -46,7 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace lexmatcher;
-	using namespace env;
+	using namespace geography;
 	using namespace interfaces;
 
 	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,transportwebsite::PlacesListFunction>::FACTORY_KEY("lp");
@@ -90,11 +90,11 @@ namespace synthese
 			const City* city(cities.front().value);
 
 			PlacesList placesList;
-			LexicalMatcher<const Place*>::MatchResult places(city->getAllPlacesMatcher().bestMatches(_input, _n));
+			City::LexicalMatcher::MatchResult places(city->getAllPlacesMatcher().bestMatches(_input, _n));
 			
-			BOOST_FOREACH(LexicalMatcher<const Place*>::MatchHit it, places)
+			BOOST_FOREACH(const City::LexicalMatcher::MatchHit it, places)
 			{
-				placesList.push_back(make_pair(it.value->getKey(), it.key));
+				placesList.push_back(make_pair(UNKNOWN_VALUE /*it.value->getKey()*/, it.key));
 			}
 
 			VariablesMap vm;

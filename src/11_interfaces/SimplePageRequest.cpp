@@ -22,14 +22,13 @@
 
 #include "SimplePageRequest.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfacePage.h"
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/NonPredefinedInterfacePage.h"
+#include "Interface.h"
+#include "InterfacePage.h"
+#include "InterfacePageException.h"
+#include "NonPredefinedInterfacePage.h"
 #include "RequestMissingParameterException.h"
-#include "30_server/RequestException.h"
-
-#include "01_util/Factory.h"
+#include "RequestException.h"
+#include "Factory.h"
 
 using namespace boost;
 using namespace std;

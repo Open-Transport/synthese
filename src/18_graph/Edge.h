@@ -74,7 +74,7 @@ namespace synthese
 		public:
 
 		protected:
-			const Vertex*	_fromVertex;
+			Vertex*	_fromVertex;
 			const Path*		_parentPath;		//!< The path the edge belongs
 			double			_metricOffset;		//!< Metric offset
 		
@@ -97,7 +97,7 @@ namespace synthese
 			Edge(
 				const Path* parentPath = NULL,
 				int rankInPath = UNKNOWN_VALUE,
-				const Vertex* fromVertex = NULL,
+				Vertex* fromVertex = NULL,
 				double metricOffset = UNKNOWN_VALUE
 			);
 
@@ -153,7 +153,7 @@ namespace synthese
 				
 				bool isConnectingEdge() const;
 
-				const Hub* getPlace () const;
+				const Hub* getHub() const;
 				
 				int getDepartureFromIndex (int hour) const;
 				int getArrivalFromIndex (int hour) const;

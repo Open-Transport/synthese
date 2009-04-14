@@ -28,13 +28,13 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
 #include "Edge.h"
-#include "15_env/Types.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
 #include "DisplayMaintenanceLog.h"
 #include "DeparturesTableInterfacePage.h"
 #include "DisplayScreenAlarmRecipient.h"
 #include "DisplayScreenCPU.h"
+#include "NamedPlace.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -51,6 +51,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace graph;
 	using namespace road;
+	using namespace geography;
 
 	namespace util
 	{
@@ -335,7 +336,7 @@ namespace synthese
 			return _blinkingDelay;
 		}
 
-		const PhysicalStops& DisplayScreen::getPhysicalStops(bool result) const
+		const ArrivalDepartureTableGenerator::PhysicalStops& DisplayScreen::getPhysicalStops(bool result) const
 		{
 			return (_allPhysicalStopsDisplayed && _localization && result)
 				? _localization->getPhysicalStops()
@@ -428,7 +429,7 @@ namespace synthese
 			const DisplayedPlacesList& placesToAvoid
 		) const {
 			map<std::string, std::pair<uid, string> > m;
-			BOOST_FOREACH(const PhysicalStops::value_type& it, getPhysicalStops())
+			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, getPhysicalStops())
 			{
 				const PhysicalStop* p(it.second);
 				const std::set<const Edge*>& edges = p->getDepartureEdges();
@@ -440,10 +441,10 @@ namespace synthese
 					){
 						m.insert(
 							make_pair(
-								AddressablePlace::GetPlace(edge->getPlace())->getFullName(),
+								dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName(),
 								make_pair(
-									AddressablePlace::GetPlace(edge->getPlace())->getKey(),
-									AddressablePlace::GetPlace(edge->getPlace())->getFullName()
+									dynamic_cast<const env::PublicTransportStopZoneConnectionPlace*>(edge->getHub())->getKey(),
+									dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName()
 						)	)	);
 					}
 				}
@@ -482,7 +483,7 @@ namespace synthese
 
 		void DisplayScreen::removePhysicalStop(const PhysicalStop* stop)
 		{
-			PhysicalStops::iterator it = _physicalStops.find(stop->getKey());
+			ArrivalDepartureTableGenerator::PhysicalStops::iterator it = _physicalStops.find(stop->getKey());
 			if (it != _physicalStops.end())
 				_physicalStops.erase(it);
 		}
@@ -530,9 +531,9 @@ namespace synthese
 			{
 				addForbiddenPlace(it3->second);
 			}
-			for (PhysicalStops::const_iterator it4 = other->getPhysicalStops(false).begin(); it4 != other->getPhysicalStops(false).end(); ++it4)
+			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it4, other->getPhysicalStops(false))
 			{
-				addPhysicalStop(it4->second);
+				addPhysicalStop(it4.second);
 			}
 		}
 

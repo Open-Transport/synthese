@@ -21,7 +21,7 @@
 */
 
 #include "TemporaryPlace.h"
-
+#include "RoadModule.h"
 #include "Address.h"
 #include "Road.h"
 #include "RoadPlace.h"
@@ -31,14 +31,14 @@
 namespace synthese
 {
 	using namespace graph;
-	using namespace road;
+	using namespace geography;
 	
-	namespace env
+	namespace road
 	{
 		TemporaryPlace::TemporaryPlace(
-			const Road* road,
+			const RoadPlace* road,
 			double metricOffset
-		):	Place ("", road->getRoadPlace()->getCity()),
+		):	Place (),
 			_road (road),
 			_metricOffset (metricOffset)
 		{
@@ -51,7 +51,7 @@ namespace synthese
 		}
 		
 		
-		const Road* 
+		const RoadPlace* 
 		TemporaryPlace::getRoad () const
 		{
 			return _road;
@@ -72,7 +72,7 @@ namespace synthese
 		
 		
 		
-		VertexAccess 
+/*		VertexAccess 
 		TemporaryPlace::getVertexAccess (const AccessDirection& accessDirection,
 						const AccessParameters& accessParameters,
 						const Vertex* destination,
@@ -83,7 +83,7 @@ namespace synthese
 			access.approachTime = access.approachDistance / accessParameters.getApproachSpeed();
 			return access;
 		}
-			
+*/			
 		
 		
 		
@@ -91,19 +91,20 @@ namespace synthese
 		
 		
 		
-		void
-		TemporaryPlace::getImmediateVertices (VertexAccessMap& result, 
-							const AccessDirection& accessDirection,
-							const AccessParameters& accessParameters,
-							const Vertex* origin,
-							bool returnAddresses,
-							bool returnPhysicalStops) const
-		{
+		void TemporaryPlace::getVertexAccessMap(
+			VertexAccessMap& result, 
+			const AccessDirection& accessDirection,
+			const AccessParameters& accessParameters,
+			GraphIdType whatToSearch
+		) const	{
+
+			if(whatToSearch != RoadModule::GRAPH_ID) return;
+
 			// Find closest addresses on both sides and run search from here.
-			const Address* closestBefore = _road->findClosestAddressBefore (_metricOffset);
-			const Address* closestAfter = _road->findClosestAddressAfter (_metricOffset);
+//			const Address* closestBefore = _road->findClosestAddressBefore (_metricOffset);
+//			const Address* closestAfter = _road->findClosestAddressAfter (_metricOffset);
 		
-			if (closestBefore != 0)
+//			if (closestBefore != 0)
 			{
 //				VertexAccess access(accessDirection);
 	//			access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
@@ -112,7 +113,7 @@ namespace synthese
 //				result.insert (closestBefore, access);
 			}
 		
-			if ( (closestAfter != 0) && (closestAfter != closestBefore) )
+//			if ( (closestAfter != 0) && (closestAfter != closestBefore) )
 			{
 	//			VertexAccess access(accessDirection);
 		//		access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
@@ -122,12 +123,6 @@ namespace synthese
 			}
 		}
 		
-	
-
-		uid TemporaryPlace::getId() const
-		{
-			return static_cast<uid>(UNKNOWN_VALUE);
-		}
 	}
 }
 

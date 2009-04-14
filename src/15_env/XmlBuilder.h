@@ -39,7 +39,8 @@ struct XMLNode;
 
 namespace synthese
 {
-
+	using namespace geography;
+	
 
 
 

@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
 #define SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
 
+#include "NamedPlaceTemplate.h"
 #include "AddressablePlace.h"
 #include "Registry.h"
 #include "IsoBarycentre.h"
@@ -47,85 +48,65 @@ namespace synthese
 		class Address;
 	}
 
+	namespace graph
+	{
+		class Vertex;
+	}
+
 	namespace env
 	{
+		class PhysicalStop;
+
 		/** PublicTransportStopZoneConnectionPlace class.
 			@ingroup m35
 		*/
-		class PublicTransportStopZoneConnectionPlace
-		:	public road::AddressablePlace
+		class PublicTransportStopZoneConnectionPlace:
+			public road::AddressablePlace,
+			public geography::NamedPlaceTemplate<PublicTransportStopZoneConnectionPlace>
 		{
 		public:
 
 			/// Chosen registry class.
 			typedef util::Registry<PublicTransportStopZoneConnectionPlace>	Registry;
 
+			typedef std::map<util::RegistryKeyType,const PhysicalStop*> PhysicalStops;
+			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > PhysicalStopsLabels;
+
 		private:
-			bool		_allowedConnection;
 
-			typedef std::map< std::pair<uid, uid>, graph::MinutesDuration> TransferDelaysMap;
-
-			//! @name Data
+			//! @name Content
 			//@{
 				PhysicalStops			_physicalStops; 
-				TransferDelaysMap		_transferDelays; //!< Transfer delays between vertices (in minutes)
-				graph::MinutesDuration	_defaultTransferDelay;
 			//@}
-			
+
 			//! @name Caching
 			//@{
 				mutable int _score;
-				mutable int _minTransferDelay;
 			//@}
+
 			
 
 		public:
-			typedef std::vector<std::pair<uid, std::string> > PhysicalStopsLabels;
 
 			PublicTransportStopZoneConnectionPlace(
 				util::RegistryKeyType id = UNKNOWN_VALUE
-				, std::string name = std::string()
-				, const City* city = NULL
 				, bool allowedConnection = false
-				, graph::MinutesDuration defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY
+				, time::MinutesDuration defaultTransferDelay = AddressablePlace::FORBIDDEN_TRANSFER_DELAY
 			);
 
 			//! @name Getters
 			//@{
 				const PhysicalStops&	getPhysicalStops() const;
-				graph::MinutesDuration			getDefaultTransferDelay() const;
-				virtual graph::MinutesDuration	getMinTransferDelay() const;
 			//@}
-
-			//! @name Setters
-			//@{
-				void	setDefaultTransferDelay(
-					graph::MinutesDuration defaultTransferDelay
-				);
-				void	setAllowedConnection(bool value);
-			//@}
-
 
 			//! @name Update methods.
 			//@{
-				void addPhysicalStop (const PhysicalStop* physicalStop);
-				void addTransferDelay(uid departureId, uid arrivalId, graph::MinutesDuration transferDelay);
-				void clearTransferDelays ();
+				void addPhysicalStop(const PhysicalStop& physicalStop);
 			//@}
 
 
 			//! @name Virtual queries
 			//@{
-				virtual bool isConnectionAllowed(
-					const graph::Vertex* fromVertex
-					, const graph::Vertex* toVertex
-				) const;
-
-				virtual graph::MinutesDuration getTransferDelay(
-					const graph::Vertex* fromVertex
-					, const graph::Vertex* toVertex
-				) const;
-
 				/** Score getter.
 					@return int the score of the place
 					@author Hugues Romain
@@ -143,23 +124,26 @@ namespace synthese
 
 				virtual const geometry::Point2D& getPoint() const;
 
-				virtual void getImmediateVertices(
+				virtual std::string getNameForAllPlacesMatcher(
+					std::string text = std::string()
+				) const;
+
+				virtual void getVertexAccessMap(
 					graph::VertexAccessMap& result
 					, const graph::AccessDirection& accessDirection
-					, const AccessParameters& accessParameters
-					, SearchAddresses returnAddresses
-					, SearchPhysicalStops returnPhysicalStops
-					, const graph::Vertex* origin = NULL
+					, graph::GraphIdType whatToSearch,
+					const graph::Vertex& origin
 				) const;
 
-				graph::VertexAccess getVertexAccess(
-					const graph::AccessDirection& accessDirection,
-					const AccessParameters& accessParameters,
-					const graph::Vertex* destination,
-					const graph::Vertex* origin
+
+				virtual void getVertexAccessMap(
+					graph::VertexAccessMap& result
+					, const graph::AccessDirection& accessDirection
+					, const graph::AccessParameters& accessParameters
+					, graph::GraphIdType whatToSearch
 				) const;
 
-				virtual bool hasPhysicalStops()	const;
+				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;
 			//@}
 
 			//! @name Queries

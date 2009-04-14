@@ -22,15 +22,15 @@
 
 #include "CityNameValueInterfaceElement.h"
 
-#include "15_env/City.h"
+#include "City.h"
 
 #include <string>
 
-#include "01_util/UId.h"
-#include "01_util/Conversion.h"
+#include "UId.h"
+#include "Conversion.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
+#include "Interface.h"
+#include "ValueElementList.h"
 
 using namespace boost;
 using namespace std;
@@ -39,14 +39,14 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using namespace env;
+	using namespace geography;
 
 	namespace util
 	{
 		template<> const std::string FactorableTemplate<LibraryInterfaceElement, CityNameValueInterfaceElement>::FACTORY_KEY = "city_name";
 	}
 
-	namespace env
+	namespace geography
 	{
 		string CityNameValueInterfaceElement::display(
 			ostream& stream

@@ -89,7 +89,7 @@ namespace synthese
 
 			const AddressablePlace* lastPlace(
 				AddressablePlace::GetPlace(
-					journey->getOrigin()->getFromVertex()->getPlace()
+					journey->getOrigin()->getHub()
 			)	);
 			int distance(0);
 
@@ -105,7 +105,7 @@ namespace synthese
 					
 					const AddressablePlace* place(
 						AddressablePlace::GetPlace(
-							leg.getDepartureEdge()->getFromVertex()->getPlace()
+							leg.getDepartureEdge()->getHub()
 					)	);
 
 					// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
@@ -167,12 +167,12 @@ namespace synthese
 */
 					const AddressablePlace* aPlace(
 						AddressablePlace::GetPlace(
-							leg.getArrivalEdge()->getFromVertex()->getPlace()
+							leg.getArrivalEdge()->getHub()
 					)	);
 
 					stopCellInterfacePage->display( stream, true
 						, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
-						, leg.getArrivalEdge()->getFromVertex()->getPlace() == leg.getService()->getPath ()->getEdges ().back()->getFromVertex()->getPlace()
+						, leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub()
 						, aPlace
 						, __Couleur
 						, leg.getArrivalDateTime()
@@ -207,7 +207,7 @@ namespace synthese
 
 					const AddressablePlace* aPlace(
 						AddressablePlace::GetPlace(
-							leg.getArrivalEdge()->getFromVertex()->getPlace()
+							leg.getArrivalEdge()->getHub()
 					)	);
 					junctionCellInterfacePage->display(
 						stream

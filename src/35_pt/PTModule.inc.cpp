@@ -7,6 +7,7 @@
 #include "TridentExportFunction.h"
 #include "TridentFileFormat.h"
 #include "ServiceDateTableSync.h"
+#include "PTModule.h"
 
 // Registries
 

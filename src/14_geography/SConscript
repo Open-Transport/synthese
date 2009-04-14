@@ -3,5 +3,10 @@ Import ('s3env')
 CppLibProject(
 	s3env, 's3-geography', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
-	dependencies = ['s3-geometry.cpplib']
+	dependencies = [
+		's3-geometry.cpplib',
+		's3-lex-matcher.cpplib',
+		's3-graph.cpplib',
+		's3-interfaces.cpplib'
+	]
 )

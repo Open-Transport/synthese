@@ -35,14 +35,14 @@
 #include "Edge.h"
 #include "Vertex.h"
 #include "Hub.h"
-#include "AddressablePlace.h"
+#include "NamedPlace.h"
 
 #include "DateTime.h"
 
 namespace synthese
 {
 	using namespace env;
-	using namespace road;
+	using namespace geography;
 	
 	namespace routeplanner
 	{
@@ -127,10 +127,10 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008					
 				*/
-				void addEmptyJourney(graph::AccessDirection method)
+				void addEmptyJourney()
 				{
 					graph::Vertex* nullVertex(NULL);
-					_index.insert(make_pair(nullVertex, _result.insert(new graph::Journey(method)).first));
+					_index.insert(make_pair(nullVertex, _result.insert(new graph::Journey()).first));
 				}
 
 
@@ -245,8 +245,8 @@ namespace synthese
 
 						s	<<
 							"<tr><td>" <<
-							AddressablePlace::GetPlace(
-								journey->getEndEdge()->getFromVertex()->getPlace()
+							dynamic_cast<const NamedPlace*>(
+								journey->getEndEdge()->getHub()
 							)->getFullName() <<
 							"</td><td>" <<
 							journey->getEndTime().toString() << "</td>"
@@ -254,7 +254,7 @@ namespace synthese
 							<< "<td>" << journey->getSquareDistanceToEnd().getDistance() << "</td>"
 							<< "<td>" << (journey->getSquareDistanceToEnd().getDistance() ? (0.06 * journey->getMinSpeedToEnd() / journey->getSquareDistanceToEnd().getDistance()) : -1) << "</td>"
 							<< "<td>" << journey->getMinSpeedToEnd() << "</td>"
-							<< "<td>" << journey->getEndEdge()->getFromVertex()->getPlace()->getScore() << "</td>"
+							<< "<td>" << journey->getEndEdge()->getHub()->getScore() << "</td>"
 							<< "</tr>";
 					}
 					return s.str();

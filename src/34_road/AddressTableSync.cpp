@@ -25,7 +25,8 @@
 
 #include "AddressTableSync.h"
 
-#include "EnvModule.h"
+#include "PublicPlace.h"
+#include "PublicPlaceTableSync.h"
 #include "RoadTableSync.h"
 #include "ConnectionPlaceTableSync.h"
 #include "Crossing.h"
@@ -99,11 +100,20 @@ namespace synthese
 				{
 					if(tableId == ConnectionPlaceTableSync::TABLE.ID)
 					{
-						object->setPlace(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
+						object->setHub(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
 						
 						// Links to the object
-						shared_ptr<AddressablePlace> place(EnvModule::FetchEditableAddressablePlace(placeId, env));
+						PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::GetEditable(placeId, env, linkLevel).get());
 				
+						place->addAddress(object);
+					}
+					else if(tableId == PublicPlaceTableSync::TABLE.ID)
+					{
+						object->setHub(PublicPlaceTableSync::Get(placeId, env, linkLevel).get());
+
+						// Links to the object
+						PublicPlace* place(PublicPlaceTableSync::GetEditable(placeId, env, linkLevel).get());
+
 						place->addAddress(object);
 					}
 					else
@@ -114,7 +124,7 @@ namespace synthese
 						shared_ptr<Crossing> crossing(new Crossing(crossingId));
 						crossing->setAddress(object);
 						env.getEditableRegistry<Crossing>().add(crossing);
-						object->setPlace(crossing.get());
+						object->setHub(crossing.get());
 					}
 				}
 				catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
@@ -132,7 +142,7 @@ namespace synthese
 			AddressablePlace* place(
 				const_cast<AddressablePlace*>(
 					static_cast<const AddressablePlace*>(
-						obj->getPlace()
+						obj->getHub()
 			)	)	);
 			if (place != NULL)
 			{

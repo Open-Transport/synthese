@@ -24,15 +24,14 @@
 
 #include "PlaceAliasTableSync.h"
 
-#include "15_env/CityTableSync.h"
-#include "15_env/EnvModule.h"
+#include "CityTableSync.h"
+#include "Fetcher.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
-
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -41,14 +40,14 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace geography;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, PlaceAliasTableSync>::FACTORY_KEY("15.50.01 Places Alias");
+		template<> const string FactorableTemplate<SQLiteTableSync, PlaceAliasTableSync>::FACTORY_KEY("14.10.01 Places Alias");
 	}
 	
-	namespace env
+	namespace geography
 	{
 		const string PlaceAliasTableSync::COL_NAME ("name");
 		const string PlaceAliasTableSync::COL_ALIASEDPLACEID ("aliased_place_id");
@@ -99,7 +98,7 @@ namespace synthese
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 
 				obj->setCity(city);
-				obj->setAliasedPlace(EnvModule::FetchPlace(aliasedPlaceId, env).get());
+				obj->setAliasedPlace(Fetcher<NamedPlace>::Fetch(aliasedPlaceId, env, linkLevel).get());
 
 
 				bool isCityMainConnection (rows->getBool ( PlaceAliasTableSync::COL_ISCITYMAINCONNECTION));
@@ -107,7 +106,7 @@ namespace synthese
 				{
 					city->addIncludedPlace (obj);
 				}
-				city->getPlaceAliasesMatcher ().add (obj->getName (), obj);
+				city->addPlaceToMatcher<PlaceAlias>(obj);
 			}
 		}
 
@@ -117,7 +116,7 @@ namespace synthese
 			City* city(const_cast<City*>(obj->getCity()));
 			if (city != NULL)
 			{
-				city->getPlaceAliasesMatcher().remove (obj->getName ());
+				city->removePlaceFromMatcher<PlaceAlias>(obj);
 				obj->setCity(NULL);
 			}
 		}
@@ -139,7 +138,7 @@ namespace synthese
 
 	}
 
-	namespace env
+	namespace geography
 	{
 		PlaceAliasTableSync::PlaceAliasTableSync()
 			: SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>()

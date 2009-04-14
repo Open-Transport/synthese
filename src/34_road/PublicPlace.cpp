@@ -1,6 +1,6 @@
 
-/** PlaceAlias class implementation.
-	@file PlaceAlias.cpp
+/** PublicPlace class implementation.
+	@file PublicPlace.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,61 +20,42 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PlaceAlias.h"
+#include "PublicPlace.h"
 #include "Registry.h"
 
 using namespace std;
 
 namespace synthese
 {
-	using namespace util;
+	using namespace road;
+	using namespace geography;
 
 	namespace util
 	{
-		template<> const string Registry<env::PlaceAlias>::KEY("PlaceAlias");
+		template<> const string Registry<PublicPlace>::KEY("PublicPlace");
+		template<> const string FactorableTemplate<NamedPlace, PublicPlace>::FACTORY_KEY("PublicPlace");
 	}
 
-	namespace env
+	namespace road
 	{
-
-
-		PlaceAlias::PlaceAlias(
-			RegistryKeyType id,
-			std::string name,
-			const Place* aliasedPlace,
-			const City* city
+		PublicPlace::PublicPlace (
+			util::RegistryKeyType id
 		):	Registrable(id),
-			IncludingPlace(id, name, city)
+			AddressablePlace(),
+			NamedPlaceTemplate<PublicPlace>()
 		{
-			addIncludedPlace (aliasedPlace);
+		}
+
+		PublicPlace::~PublicPlace ()
+		{
 		}
 
 
 
-		PlaceAlias::~PlaceAlias ()
-		{
-
-		}
-
-
-
-		const Place* 
-		PlaceAlias::getAliasedPlace () const
-		{
-			return _includedPlaces[0];
-		}
-
-
-		const std::string& 
-		PlaceAlias::getOfficialName () const
-		{
-			return getAliasedPlace ()->getOfficialName ();
-		}
-
-		void PlaceAlias::setAliasedPlace( const Place* place )
-		{
-			_includedPlaces.clear();
-			addIncludedPlace(place);
+		std::string PublicPlace::getNameForAllPlacesMatcher(
+			std::string text
+		) const	{
+			return (text.empty() ? getName() : text) + " [lieu public]";
 		}
 	}
 }

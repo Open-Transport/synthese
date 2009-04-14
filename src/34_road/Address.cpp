@@ -24,13 +24,14 @@
 #include "AddressablePlace.h"
 #include "Edge.h"
 #include "Registry.h"
+#include "Crossing.h"
+#include "RoadModule.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace graph;
-	using namespace env;
 	
 	namespace util
 	{
@@ -41,23 +42,23 @@ namespace synthese
 	{
 
 
-		Address::Address (const uid id,
-				  const AddressablePlace* place,
-				  double x,
-				  double y)
-		:	util::Registrable(id)
-			, Vertex (place, x, y)
+		Address::Address (
+			const uid id,
+			const AddressablePlace* place,
+			double x,
+			double y
+		):	util::Registrable(id),
+			Vertex (place, x, y)
 		{
-
 		}
 
 
 
-		const AddressablePlace* Address::getAddressablePlace() const
+/*		const AddressablePlace* Address::getAddressablePlace() const
 		{
 			return static_cast<const AddressablePlace*>(_place);
 		}
-
+*/
 
 		Address::~Address()
 		{
@@ -65,18 +66,9 @@ namespace synthese
 
 
 
-		bool 
-		Address::isAddress () const
+		graph::GraphIdType Address::getGraphType() const
 		{
-			return true;
-		}
-
-
-
-		bool 
-		Address::isPhysicalStop () const
-		{
-			return false;
+			return RoadModule::GRAPH_ID;
 		}
 	}
 }

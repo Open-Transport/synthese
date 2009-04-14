@@ -22,6 +22,7 @@
 
 #include "CommercialLine.h"
 #include "Registry.h"
+#include "PTConstants.h"
 
 namespace synthese
 {
@@ -82,7 +83,7 @@ namespace synthese
 		}
 
 
-		const PlacesSet& CommercialLine::getOptionalReservationPlaces() const
+		const CommercialLine::PlacesSet& CommercialLine::getOptionalReservationPlaces() const
 		{
 			return _optionalReservationPlaces;
 		}
@@ -138,7 +139,7 @@ namespace synthese
 			_color = color;
 		}
 
-		void CommercialLine::addOptionalReservationPlace( const Place* place )
+		void CommercialLine::addOptionalReservationPlace(const PublicTransportStopZoneConnectionPlace* place )
 		{
 			_optionalReservationPlaces.insert(place);
 		}

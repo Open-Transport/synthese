@@ -50,10 +50,14 @@ namespace synthese
 			static void integrate ();
 		};
 
+
+
 		template<class F, class C>
 		void synthese::util::FactorableTemplate<F, C>::integrate ()
 		{
-			synthese::util::Factory<typename F::FactoryClass>::template integrate<C> ();
+			synthese::util::Factory<typename F::FactoryClass>::template Integrate<C>(
+				FactorableTemplate<F,C>::FACTORY_KEY
+			);
 		}
 
 		template<class F, class C>

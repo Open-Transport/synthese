@@ -26,6 +26,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
+	using namespace geography;
 
 	template<> const std::string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerSheetLineInterfacePage>::FACTORY_KEY("schedule_sheet_row");
 
@@ -39,7 +40,7 @@ namespace synthese
 			, bool isOrigin
 			, bool isDestination
 			, VariablesMap& variables,
-		    const env::Place* place, 
+		    const Place* place, 
 		    const server::Request* request /*= NULL */
 		) const {
 			ParametersVector pv;

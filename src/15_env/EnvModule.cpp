@@ -70,6 +70,8 @@ namespace synthese
 	using namespace time;
 	using namespace road;
 	using namespace pt;
+	using namespace geography;
+	
 
 	namespace util
 	{
@@ -79,9 +81,6 @@ namespace synthese
 
     namespace env
     {
-		LexicalMatcher<uid>				EnvModule::_citiesMatcher; //!< @todo To be moved in transportwebsite::Site
-		LexicalMatcher<uid>				EnvModule::_citiesT9Matcher; //!< @todo To be moved in transportwebsite::Site
-
 		void EnvModule::initialize()
 		{
 		}
@@ -121,95 +120,6 @@ namespace synthese
 		}
 
 
-		
-		shared_ptr<const Place> EnvModule::FetchPlace(
-			const util::RegistryKeyType& id,
-			Env& env
-		){
-			shared_ptr<const Place> place = static_pointer_cast<const Place, const AddressablePlace>(FetchAddressablePlace (id, env));
-			if (!place.get())
-				place = static_pointer_cast<const Place, const IncludingPlace>(FetchIncludingPlace (id, env));
-			return place;
-		}
-
-
-
-
-		shared_ptr<const AddressablePlace> EnvModule::FetchAddressablePlace(
-			const util::RegistryKeyType& id,
-			Env& env
-		){
-			int tableId(decodeTableId(id));
-			if(tableId == ConnectionPlaceTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(ConnectionPlaceTableSync::Get(id, env));
-			if (tableId == PublicPlaceTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const PublicPlace>(PublicPlaceTableSync::Get(id, env));
-			if (tableId == RoadPlaceTableSync::TABLE.ID)
-				return static_pointer_cast<const AddressablePlace, const RoadPlace>(RoadPlaceTableSync::Get(id, env));
-			return shared_ptr<const AddressablePlace>();
-		}
-
-
-		shared_ptr<AddressablePlace> EnvModule::FetchEditableAddressablePlace(
-			const util::RegistryKeyType& id,
-			util::Env& env
-		){
-			int tableId(decodeTableId(id));
-			if (tableId == ConnectionPlaceTableSync::TABLE.ID)
-				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(env.getEditableRegistry<PublicTransportStopZoneConnectionPlace>().getEditable(id));
-			if (tableId == PublicPlaceTableSync::TABLE.ID)
-				return static_pointer_cast<AddressablePlace, PublicPlace>(env.getEditableRegistry<PublicPlace>().getEditable(id));
-			if (tableId == RoadPlaceTableSync::TABLE.ID)
-				return static_pointer_cast<AddressablePlace, RoadPlace>(env.getEditableRegistry<RoadPlace>().getEditable(id));
-			return shared_ptr<AddressablePlace>();
-		}
-
-
-
-		shared_ptr<const IncludingPlace> EnvModule::FetchIncludingPlace(
-			const util::RegistryKeyType& id,
-			Env& env
-		){
-			int tableId(decodeTableId(id));
-			if (tableId == PlaceAliasTableSync::TABLE.ID)
-				return static_pointer_cast<const IncludingPlace, const PlaceAlias>(env.getRegistry<PlaceAlias>().get(id));
-			if (tableId == CityTableSync::TABLE.ID)
-				return static_pointer_cast<const IncludingPlace, const City>(env.getRegistry<City>().get(id));
-			return shared_ptr<const IncludingPlace>();
-		}
-
-
-
-		shared_ptr<const Vertex> EnvModule::FetchVertex(
-			const util::RegistryKeyType& id,
-			Env& env
-		){
-			int tableId(decodeTableId(id));
-			if (tableId == PhysicalStopTableSync::TABLE.ID)
-				return static_pointer_cast<const Vertex, const PhysicalStop>(env.getRegistry<PhysicalStop>().get(id));
-			if (tableId == AddressTableSync::TABLE.ID)
-				return static_pointer_cast<const Vertex, const Address>(env.getRegistry<Address>().get(id));
-			return shared_ptr<const Vertex>();
-		}
-
-
-
-		CityList EnvModule::guessCity (const std::string& fuzzyName, int nbMatches, bool t9)
-		{
-			Env& env(Env::GetOfficialEnv());
-			const Registry<City>& cities(env.getRegistry<City>());
-			CityList result;
-			LexicalMatcher<uid>::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).bestMatches (fuzzyName, nbMatches);
-			for (LexicalMatcher<uid>::MatchResult::iterator it = matches.begin ();
-			 it != matches.end (); ++it)
-			{
-				uid id = it->value;
-				result.push_back (cities.get(id));
-			}
-			return result;
-		}
-
-
 
 		void EnvModule::getNetworkLinePlaceRightParameterList(ParameterLabelsVector& m)
 		{
@@ -232,63 +142,6 @@ namespace synthese
 			return  "Réseaux de transport public";
 		}
 
-		void EnvModule::AddToCitiesMatchers( City* city )
-		{
-			_citiesMatcher.add(city->getName (), city->getKey ());
-			
-			stringstream ss;
-			boost::iostreams::filtering_ostream out;
-			out.push (T9Filter());
-			out.push (ss);
-			out << city->getName() << flush;
-			
-			_citiesT9Matcher.add(ss.str(), city->getKey());
-		}
-
-		void EnvModule::RemoveFromCitiesMatchers( City* city )
-		{
-			_citiesMatcher.remove(city->getName());
-
-			stringstream ss;
-			boost::iostreams::filtering_ostream out;
-			out.push (T9Filter());
-			out.push (ss);
-			out << city->getName() << flush;
-
-			_citiesT9Matcher.remove(ss.str());
-		}
-
-		const Place* EnvModule::FetchPlace( const std::string& cityName, const std::string& placeName )
-		{
-				const Place* place(NULL);
-
-				if (cityName.empty())
-					throw Exception("Empty city name");
-
-				shared_ptr<const City> city;
-				CityList cityList = guessCity(cityName, 1);
-				if (cityName.empty())
-					throw Exception("An error has occured in city name search");
-				city = cityList.front();
-				place = city.get();
-				assert(place != NULL);
-
-				if (!placeName.empty())
-				{
-					LexicalMatcher<const Place*>::MatchResult places = city->getAllPlacesMatcher().bestMatches(placeName, 1);
-					if (!places.empty())
-					{
-						place = places.front().value;
-					}
-				}
-
-				return place;		
-		
-
-		}
-		
-		
-				
 		
 		
 		int EnvModule::GetMaxAlarmLevel(

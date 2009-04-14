@@ -34,6 +34,7 @@
 #include "DeparturesTableTypes.h"
 #include "DeparturesTableDestinationContentInterfaceElement.h"
 #include "DepartureTableRowInterfacePage.h"
+#include "NamedPlace.h"
 
 using namespace std;
 using namespace boost;
@@ -43,6 +44,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace env;
 	using namespace util;
+	using namespace geography;
 
 	namespace util
 	{
@@ -87,7 +89,7 @@ namespace synthese
 			string __AvantCommune = _beforeCityVIE->getValue(parameters, variables, object, request);
 			string __ApresCommune = _afterCityVIE->getValue(parameters, variables, object, request);
 			
-			const City* __DerniereCommune = __DP->second.at(0)->getCity();
+			const City* __DerniereCommune = dynamic_cast<const NamedPlace*>(__DP->second.at(0))->getCity();
 
 			int terminusRank(__DP->second.size() - 1);
 			for(int i((numberOfIntermediatesStops != 0) ? firstIntermediatesStops : terminusRank);

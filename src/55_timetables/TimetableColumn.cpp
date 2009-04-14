@@ -62,7 +62,7 @@ namespace synthese
 				Path::Edges::const_iterator itEdge2;
 				for (itEdge2 = itEdge; itEdge2 != edges.end(); ++itEdge2)
 				{
-					if(	(*itEdge2)->getFromVertex()->getPlace() == itRow->getPlace()
+					if(	(*itEdge2)->getFromVertex()->getHub() == itRow->getPlace()
 						&&(	(*itEdge2)->isDeparture() == itRow->getIsDeparture()
 							|| (*itEdge2)->isArrival() == itRow->getIsArrival()
 						)
@@ -149,11 +149,11 @@ namespace synthese
 		{
 			assert(col == *this);
 
-			if( _line->getOrigin()->getPlace() != col._line->getOrigin()->getPlace()
+			if( _line->getOrigin()->getHub() != col._line->getOrigin()->getHub()
 			){
 				_originType = Indetermine;
 			}
-			if(	_line->getDestination()->getPlace() != col._line->getDestination()->getPlace()
+			if(	_line->getDestination()->getHub() != col._line->getDestination()->getHub()
 			){
 				_destinationType = Indetermine;
 			}

@@ -26,7 +26,11 @@
 #ifndef SYNTHESE_GeographyModule_H__
 #define SYNTHESE_GeographyModule_H__
 
-#include "01_util/ModuleClass.h"
+#include "FactorableTemplate.h"
+#include "ModuleClass.h"
+#include "LexicalMatcher.h"
+
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
@@ -44,17 +48,26 @@ namespace synthese
 	*/
 	namespace geography
 	{
+		class City;
+		class Place;
 
 		/** 09 Geography Module class.
 			@author Hugues Romain
 			@date 2008
 		*/
-		class GeographyModule : public util::ModuleClass
+		class GeographyModule:
+			public util::FactorableTemplate<util::ModuleClass, GeographyModule>
 		{
+		public:
+			typedef std::vector<City*> CityList;
+
+			typedef lexmatcher::LexicalMatcher<City*> CitiesMatcher;
+
 		private:
-			// static Object::Registry _registry;	//!< Objects registry
-			
-			
+
+			static CitiesMatcher _citiesMatcher; //!< @todo To be moved in 36_transport_website
+			static CitiesMatcher _citiesT9Matcher;
+
 		public:
 			/** Initialization of the 09 Geography module after the automatic database loads.
 				@author Hugues Romain
@@ -62,7 +75,32 @@ namespace synthese
 			*/			
 			void initialize();
 			
-			// static Object::Registry& getObjects();
+			virtual std::string getName() const;
+
+
+			static const geography::Place* FetchPlace(const std::string& city, const std::string& place);
+
+
+			/** Find the best matches in the city list comparing to a text entry.
+			@param fuzzyName The text entry to compare
+			@param nbMatches The number of matches to return
+			@param t9 true indicates that the text entry follows the t9 format (optional : default = false)
+			@return synthese::env::CityList The list of results
+			@author Hugues Romain
+			@date 2008
+
+			*/
+			static CityList GuessCity(
+				const std::string& fuzzyName
+				, int nbMatches = 10
+				, bool t9 = false
+				);
+
+			static void AddToCitiesMatchers(geography::City* city);
+			static void RemoveFromCitiesMatchers(geography::City* city);
+
+
+
 		};
 	}
 	/** @} */

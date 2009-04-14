@@ -6,7 +6,6 @@ synthese::env::LineMarkerInterfacePage::integrate();
 synthese::env::ReservationRuleInterfacePage::integrate();
 
 synthese::env::LogicalStopNameValueInterfaceElement::integrate();
-synthese::env::CityNameValueInterfaceElement::integrate();
 synthese::env::LineStyleInterfaceElement::integrate();
 synthese::env::LineShortNameInterfaceElement::integrate();
 synthese::env::LineImageURLInterfaceElement::integrate();
@@ -15,16 +14,11 @@ synthese::env::FareTableSync::integrate();
 synthese::env::ReservationContactTableSync::integrate();
 synthese::env::RollingStockTableSync::integrate();
 
-synthese::env::CityTableSync::integrate();
-
 synthese::env::CommercialLineTableSync::integrate();
 
 synthese::env::LineTableSync::integrate();
 
 synthese::env::ConnectionPlaceTableSync::integrate();
-synthese::env::PublicPlaceTableSync::integrate();
-
-synthese::env::PlaceAliasTableSync::integrate();
 
 synthese::env::PhysicalStopTableSync::integrate();
 
@@ -45,6 +39,8 @@ synthese::env::LinesListFunction::integrate();
 
 synthese::env::TransportNetworkRight::integrate();
 
+synthese::env::PublicTransportStopZoneConnectionPlace::integrate();
+
 // Registries
 synthese::util::Env::Integrate<synthese::env::PhysicalStop>();
 synthese::util::Env::Integrate<synthese::env::Line>();
@@ -54,9 +50,6 @@ synthese::util::Env::Integrate<synthese::env::PublicTransportStopZoneConnectionP
 synthese::util::Env::Integrate<synthese::env::ReservationContact>();
 synthese::util::Env::Integrate<synthese::env::CommercialLine>();
 synthese::util::Env::Integrate<synthese::env::RollingStock>();
-synthese::util::Env::Integrate<synthese::env::City>();
 synthese::util::Env::Integrate<synthese::env::ContinuousService>();
 synthese::util::Env::Integrate<synthese::env::Fare>();
-synthese::util::Env::Integrate<synthese::env::PlaceAlias>();
-synthese::util::Env::Integrate<synthese::env::PublicPlace>();
 synthese::util::Env::Integrate<synthese::env::ScheduledService>();

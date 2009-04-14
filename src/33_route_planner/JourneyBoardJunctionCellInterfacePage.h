@@ -33,7 +33,7 @@ namespace synthese
 		class Road;
 	}
 	
-	namespace env
+	namespace geography
 	{
 		class Place;
 	}
@@ -74,7 +74,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream
-				, const env::Place* place
+				, const geography::Place* place
 				, const messages::SentAlarm* alarm
 				, bool color
 				, const road::Road* road

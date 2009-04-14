@@ -28,6 +28,8 @@
 #include "LineTableSync.h"
 #include "Place.h"
 #include "EnvModule.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ConnectionPlaceTableSync.h"
 
 // Db
 #include "DBModule.h"
@@ -59,6 +61,7 @@ namespace synthese
 	using namespace env;
 	using namespace security;
 	using namespace pt;
+	using namespace geography;
 
 	namespace util
 	{
@@ -138,9 +141,9 @@ namespace synthese
 						it != stopsTokens.end ();
 						++it
 					){
-							uid id(Conversion::ToLongLong(*it));
-							shared_ptr<const Place> place(EnvModule::FetchPlace(id, env));
-							object->addOptionalReservationPlace(place.get());
+						uid id(Conversion::ToLongLong(*it));
+						const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(id,env,linkLevel).get());
+						object->addOptionalReservationPlace(place);
 					}
 				}
 			}
@@ -175,7 +178,7 @@ namespace synthese
 				<< ",'"
 			;
 			bool first(true);
-			BOOST_FOREACH(const Place* place, object->getOptionalReservationPlaces())
+			BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace* place, object->getOptionalReservationPlaces())
 			{
 				if (first)
 				{

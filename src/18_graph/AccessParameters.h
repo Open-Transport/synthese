@@ -24,22 +24,16 @@
 #define SYNTHESE_env_AccessParameters_h__
 
 #include "GraphTypes.h"
-#include "15_env/Types.h"
+#include "GraphConstants.h"
 
 namespace synthese
 {
 	namespace graph
 	{
 		class UseRules;
-	}
-	
-	namespace env
-	{
-		class Fare;
-		class Complyer;
 
 		/** Network access parameters class.
-			@ingroup m35
+			@ingroup m18
 
 			This class stores two types of information about how to use the transportation network :
 				- numeric parameters : speeds, maximums, etc.
@@ -53,8 +47,8 @@ namespace synthese
 			int			_maxTransportConnectionCount;
 			bool		_drtOnly;
 			bool		_withoutDrt;
-			Fare*		_fare;
-			graph::UserClassCode	_userClass;
+//			Fare*		_fare;
+			UserClassCode	_userClass;
 
 		public:
 
@@ -73,14 +67,13 @@ namespace synthese
 				@date 2008
 			*/
 			AccessParameters(
-				graph::UserClassCode	userClass = USER_PEDESTRIAN
-				, Fare*					fare = NULL
-				, bool					drtOnly = false
-				, bool					withoutDrt = false
-				, double				maxApproachDistance = 1000
-				, double				maxApproachTime = 23
-				, double				approachSpeed = 67
-				, int					maxTransportConnectionCount = 10
+				UserClassCode	userClass = USER_PEDESTRIAN
+				, bool			drtOnly = false
+				, bool			withoutDrt = false
+				, double		maxApproachDistance = 1000
+				, double		maxApproachTime = 23
+				, double		approachSpeed = 67
+				, int			maxTransportConnectionCount = 10
 			);
 
 

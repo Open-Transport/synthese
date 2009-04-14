@@ -144,7 +144,7 @@ namespace synthese
 					);
 					
 					BOOST_FOREACH(
-						const PhysicalStops::value_type& it,
+						const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
 						_displayScreen->getLocalization()->getPhysicalStops()
 					){
 						LineStopTableSync::Search(
@@ -508,7 +508,7 @@ namespace synthese
 						stream << t.col(1, string(), true) << "Lignes";
 						stream << t.col(1, string(), true) << "Affiché";
 						BOOST_FOREACH(
-							const PhysicalStops::value_type& it,
+							const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
 							_displayScreen->getLocalization()->getPhysicalStops()
 						){
 							stream << t.row();

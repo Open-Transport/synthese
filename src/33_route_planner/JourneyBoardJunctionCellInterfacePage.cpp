@@ -33,9 +33,10 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace messages;
-	using namespace env;
 	using namespace util;
+	using namespace geography;
 	using namespace road;
+	
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardJunctionCellInterfacePage>::FACTORY_KEY("journey_board_junction_cell");
 	
@@ -51,7 +52,7 @@ namespace synthese
 		    , const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector pv;
-			pv.push_back(Conversion::ToString(place->getKey()));
+			pv.push_back("" /*Conversion::ToString(place->getKey())*/);
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(Conversion::ToString(color));

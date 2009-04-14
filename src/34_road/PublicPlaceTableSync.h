@@ -26,6 +26,7 @@
 #include "PublicPlace.h"
 
 #include "SQLiteRegistryTableSyncTemplate.h"
+#include "FetcherTemplate.h"
 
 #include <vector>
 #include <string>
@@ -33,12 +34,14 @@
 
 namespace synthese
 {
-	namespace env
+	namespace road
 	{
 		/** PublicPlace table synchronizer.
-			@ingroup m35LS refLS
+			@ingroup m34LS refLS
 		*/
-		class PublicPlaceTableSync : public db::SQLiteRegistryTableSyncTemplate<PublicPlaceTableSync,PublicPlace>
+		class PublicPlaceTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<PublicPlaceTableSync, PublicPlace>,
+			public db::FetcherTemplate<geography::NamedPlace, PublicPlaceTableSync>
 		{
 		public:
 			static const std::string COL_NAME;

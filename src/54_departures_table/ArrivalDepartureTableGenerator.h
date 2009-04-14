@@ -24,9 +24,9 @@
 #define SYNTHESE_DEPARTURESTABLE_ARRIVALDEPARTURETABLEGENERATOR_H
 
 #include <set>
+#include <map>
 
-#include "15_env/Types.h"
-
+#include "UtilTypes.h"
 #include "DeparturesTableTypes.h"
 
 namespace synthese
@@ -34,6 +34,7 @@ namespace synthese
 	namespace env
 	{
 		class Line;
+		class PhysicalStop;
 	}
 
 	namespace departurestable
@@ -50,6 +51,7 @@ namespace synthese
 			typedef enum { FORCE_UNLIMITED_SIZE, SIZE_AS_DEFINED } UnlimitedSize;
 			static const size_t UNLIMITED_SIZE = 0;
 
+			typedef std::map<util::RegistryKeyType, const env::PhysicalStop*> PhysicalStops;
 		private:
 
 		protected:
@@ -57,7 +59,7 @@ namespace synthese
 
 			//! \name Parameters
 			//@{
-				const env::PhysicalStops		_physicalStops;
+				const PhysicalStops				_physicalStops;
 				const DeparturesTableDirection	_direction;
 				const EndFilter					_endFilter;
 				const LineFilter				_lineFilter;
@@ -92,7 +94,7 @@ namespace synthese
 				@param maxSize Maximal size of the departure table (default = unlimited).
 			*/
 			ArrivalDepartureTableGenerator(
-				const env::PhysicalStops&
+				const PhysicalStops&
 				, const DeparturesTableDirection&
 				, const EndFilter&
 				, const LineFilter&

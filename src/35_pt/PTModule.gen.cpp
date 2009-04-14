@@ -7,7 +7,7 @@ synthese::pt::TransportNetworkTableSync::integrate();
 synthese::pt::TridentExportFunction::integrate ();
 synthese::pt::TridentFileFormat::integrate ();
 synthese::pt::ServiceDateTableSync::integrate();
-
+synthese::pt::PTModule::integrate();
 
 // Registries
 

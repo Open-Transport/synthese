@@ -51,6 +51,14 @@ namespace synthese
 		{
 			// Creation of the permanent service
 			addService(new PermanentService(id, this), false);
+			_reverseRoad = new Road(*this);
+		}
+
+		Road::Road(const Road& reverseRoad
+		):	Registrable(UNKNOWN_VALUE),
+			_type(reverseRoad.getType()),
+			_reverseRoad(NULL)
+		{
 		}
 
 
@@ -72,6 +80,7 @@ namespace synthese
 		Road::setType (const RoadType& type)
 		{
 			_type = type;
+			if(_reverseRoad) _reverseRoad->setType(type);
 		}
 
 
@@ -130,11 +139,19 @@ namespace synthese
 		void Road::addRoadChunk(
 			RoadChunk* chunk
 		){
-			if(_pathGroup)
-			{
-				static_cast<RoadPlace*>(_pathGroup)->addAddress(chunk->getFromAddress());
-			}
 			addEdge(static_cast<Edge*>(chunk));
+
+			if(_reverseRoad)
+			{
+				RoadChunk* reverseChunk(
+					new RoadChunk(
+						UNKNOWN_VALUE,
+						chunk->getFromAddress(),
+						-chunk->getRankInPath(),
+						_reverseRoad
+				)	);
+				_reverseRoad->addEdge(reverseChunk);
+			}
 		}
 
 
@@ -153,6 +170,7 @@ namespace synthese
 		void Road::setRoadPlace(RoadPlace* value)
 		{
 			_pathGroup = value;
+			if(_reverseRoad) _reverseRoad->setRoadPlace(value);
 		}
 	}
 }

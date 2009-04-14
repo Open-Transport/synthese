@@ -22,6 +22,8 @@
 
 #include "IncludingPlace.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 
 namespace synthese
@@ -29,14 +31,10 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 
-	namespace env
+	namespace geography
 	{
 		IncludingPlace::IncludingPlace(
-			RegistryKeyType key,
-			const string& name,
-			const City* city
-		):	Registrable(key),
-			Place(name, city)			
+		):	Place()			
 		{
 		}
 
@@ -65,23 +63,18 @@ namespace synthese
 
 
 
-		void IncludingPlace::getImmediateVertices(
+		void IncludingPlace::getVertexAccessMap(
 			VertexAccessMap& result
 			, const AccessDirection& accessDirection
 			, const AccessParameters& accessParameters
-			, SearchAddresses returnAddresses
-			, SearchPhysicalStops returnPhysicalStops
-			, const Vertex* origin
+			, GraphIdType whatToSearch
 		) const	{
-
-			for(IncludedPlaces::const_iterator it(_includedPlaces.begin());
-				it != _includedPlaces.end();
-				++it
+			BOOST_FOREACH(
+				const Place* place, _includedPlaces
 			){
-				(*it)->getImmediateVertices(
+				place->getVertexAccessMap(
 					result, accessDirection, accessParameters
-					, returnAddresses, returnPhysicalStops
-					, origin
+					, whatToSearch
 				);
 			}
 		}
@@ -91,8 +84,10 @@ namespace synthese
 			if (_isoBarycentreToUpdate)
 			{
 				_isoBarycentre.clear();
-				for (IncludedPlaces::const_iterator it(_includedPlaces.begin()); it != _includedPlaces.end(); ++it)
-					_isoBarycentre.add((*it)->getPoint());
+				BOOST_FOREACH(const Place* place, _includedPlaces)
+				{
+					_isoBarycentre.add(place->getPoint());
+				}
 				_isoBarycentreToUpdate = false;
 			}
 			return _isoBarycentre;

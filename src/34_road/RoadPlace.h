@@ -26,18 +26,14 @@
 #ifndef SYNTHESE_RoadPlace_h__
 #define SYNTHESE_RoadPlace_h__
 
-#include "AddressablePlace.h"
+#include "Place.h"
+#include "NamedPlaceTemplate.h"
 #include "PathGroup.h"
 #include "Registrable.h"
 #include "Registry.h"
 
 namespace synthese
 {
-	namespace env
-	{
-		class City;
-	}
-	
 	namespace road
 	{
 		class Road;
@@ -45,9 +41,10 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////////
 		/// Road place class.
 		/// @ingroup m34
-		class RoadPlace
-		:	public AddressablePlace,
-			public graph::PathGroup
+		class RoadPlace:
+			public virtual geography::Place,
+			public graph::PathGroup,
+			public geography::NamedPlaceTemplate<RoadPlace>
 		{
 		public:
 			// Typedefs
@@ -65,9 +62,7 @@ namespace synthese
 			/////////////////////////////////////////////////////////////////////
 			/// RoadModule Constructor.
 			RoadPlace(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
-				std::string name = std::string(),
-				const env::City* city = NULL
+				util::RegistryKeyType id = UNKNOWN_VALUE
 			);
 
 			//! @name Getters
@@ -81,30 +76,23 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				void addRoad(const Road* road);
-				void removeRoad(const Road* road);
+				void addRoad(const Road& road);
+				void removeRoad(const Road& road);
 			//@}
 
 			//! @name Queries
 			//@{
-			
-				/** getImmediateVertices.
-					@param result : all the vertices of all places traversed by the road
-					@param accessDirection
-					@param accessParameters
-					@param returnAddresses
-					@param returnPhysicalStops
-					@param origin
-					@author Hugues Romain
-					@date 2008		  	
-				*/
-				void getImmediateVertices(
+				virtual void getVertexAccessMap(
 					graph::VertexAccessMap& result, 
 					const graph::AccessDirection& accessDirection,
-					const env::AccessParameters& accessParameters,
-					SearchAddresses returnAddresses,
-					SearchPhysicalStops returnPhysicalStops,
-					const graph::Vertex* origin = 0
+					const graph::AccessParameters& accessParameters,
+					graph::GraphIdType whatToSearch
+				) const;
+
+				virtual const geometry::Point2D& getPoint() const;
+
+				virtual std::string getNameForAllPlacesMatcher(
+					std::string text = std::string()
 				) const;
 
 			//@}

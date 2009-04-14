@@ -66,7 +66,9 @@ namespace synthese
 
 		private:
 			RoadType _type;
+			Road*	_reverseRoad;
 
+			Road(const Road& reverseRoad);
 		public:
 
 			Road(

@@ -171,7 +171,7 @@ namespace synthese
 
 				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
-					if((*itEdge)->isDeparture() && (*itEdge)->getPlace() == itRow->getPlace())
+					if((*itEdge)->isDeparture() && (*itEdge)->getHub() == itRow->getPlace())
 					{
 						lineIsSelected = true;
 						if (itRow->getIsArrival() || itRow->getCompulsory() == PassageSuffisant)
@@ -204,7 +204,7 @@ namespace synthese
 						arrivalLinestop != NULL;
 						arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
 					){
-						if(	arrivalLinestop->getFromVertex()->getPlace() == itRow->getPlace()
+						if(	arrivalLinestop->getFromVertex()->getHub() == itRow->getPlace()
 						){
 							lineIsSelected = true;
 							break;

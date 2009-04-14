@@ -24,7 +24,8 @@
 
 #include "IntegralSearcher.h"
 #include "BestVertexReachesMap.h"
-
+#include "RoadModule.h"
+#include "PTModule.h"
 #include "Hub.h"
 #include "Edge.h"
 #include "Line.h"
@@ -58,11 +59,14 @@ using namespace std;
 namespace synthese
 {
 	using namespace time;
-	using namespace env;
+	using namespace env;	
+	using namespace geography;
 	using namespace geometry;
 	using namespace util;
 	using namespace graph;
 	using namespace road;
+	using namespace pt;
+	
 
 	namespace routeplanner
 	{
@@ -89,19 +93,29 @@ namespace synthese
 			, _logStream(logStream)
 			, _logLevel(logLevel)
 		{
-			origin->getImmediateVertices (
+			origin->getVertexAccessMap(
 				_originVam
 				, DEPARTURE_TO_ARRIVAL
 				, accessParameters
-				, SEARCH_ADDRESSES
-				, SEARCH_PHYSICALSTOPS
+				, RoadModule::GRAPH_ID
 			);
-			destination->getImmediateVertices(
+			origin->getVertexAccessMap(
+				_originVam
+				, DEPARTURE_TO_ARRIVAL
+				, accessParameters
+				, PTModule::GRAPH_ID
+			);
+			destination->getVertexAccessMap(
 				_destinationVam
 				, ARRIVAL_TO_DEPARTURE
 				, accessParameters
-				, SEARCH_ADDRESSES
-				, SEARCH_PHYSICALSTOPS
+				, RoadModule::GRAPH_ID
+			);
+			destination->getVertexAccessMap(
+				_destinationVam
+				, ARRIVAL_TO_DEPARTURE
+				, accessParameters
+				, PTModule::GRAPH_ID
 			);
 		}
 
@@ -135,7 +149,7 @@ namespace synthese
 			_result.samePlaces = false;
 			for (VertexAccessMap::VamMap::const_iterator itd(_originVam.getMap().begin()); itd != _originVam.getMap().end(); ++itd)
 				for (VertexAccessMap::VamMap::const_iterator ita(_destinationVam.getMap().begin()); ita != _destinationVam.getMap().end(); ++ita)
-					if (itd->first->getPlace() == ita->first->getPlace())
+					if (itd->first->getHub() == ita->first->getHub())
 					{
 						_result.samePlaces = true;
 						return _result;
@@ -151,10 +165,8 @@ namespace synthese
 			IntegralSearcher iso(
 				DEPARTURE_TO_ARRIVAL
 				, _accessParameters
-				, DO_NOT_SEARCH_ADDRESSES
-				, SEARCH_PHYSICALSTOPS
-				, USE_ROADS
-				, DO_NOT_USE_LINES
+				, PTModule::GRAPH_ID
+				, RoadModule::GRAPH_ID
 				, originJourneys
 				, bvrmd
 				, _destinationVam
@@ -176,18 +188,16 @@ namespace synthese
 			iso.integralSearch (
 				_originVam
 				, _journeySheetStartTime
-				, Journey(DEPARTURE_TO_ARRIVAL)
+				, Journey()
 				, std::numeric_limits<int>::max ()
 			);
 			
 			VertexAccessMap ovam;
 			// Include physical stops from originVam into result of integral search
 			// (cos not taken into account in returned journey vector).
-			ovam.merge (_originVam, 
-				VertexAccessMap::DO_NOT_MERGE_ADDRESSES,
-				VertexAccessMap::MERGE_PHYSICALSTOPS);
+			ovam.mergeWithFilter(_originVam, PTModule::GRAPH_ID);
 
-			Journey* candidate(new Journey(DEPARTURE_TO_ARRIVAL));
+			Journey* candidate(new Journey());
 			for(JourneysResult<JourneyComparator>::ResultSet::const_iterator itoj(originJourneys.getJourneys().begin());
 				itoj != originJourneys.getJourneys().end ();
 				++itoj
@@ -207,14 +217,12 @@ namespace synthese
 					+ oj.getDistance ()
 				);
 				VertexAccessMap vam;
-				const AddressablePlace* cp(AddressablePlace::GetPlace(oj.getDestination()->getPlace()));
-				const Vertex* v(oj.getDestination()->getFromVertex());
-				cp->getImmediateVertices(
+				const Hub* cp(oj.getDestination()->getHub());
+				const Vertex& v(*oj.getDestination()->getFromVertex());
+				cp->getVertexAccessMap(
 					vam
 					, DEPARTURE_TO_ARRIVAL
-					, _accessParameters
-					, DO_NOT_SEARCH_ADDRESSES
-					, SEARCH_PHYSICALSTOPS
+					, PTModule::GRAPH_ID
 					, v
 				);
 				for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
@@ -225,7 +233,7 @@ namespace synthese
 					ovam.insert(
 						it->first
 						, VertexAccess(
-							commonApproachTime + cp->getTransferDelay(v, it->first)
+							commonApproachTime + cp->getTransferDelay(v, *it->first)
 							, commonApproachDistance
 							, oj
 						)
@@ -255,7 +263,7 @@ namespace synthese
 					{
 						s	<<
 							"<tr><td>" <<
-							AddressablePlace::GetPlace(it.first->getPlace())->getFullName() <<
+							dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
 							"</td><td>" << static_cast<const PhysicalStop*>(it.first)->getName() <<
 							"</td><td>" << it.second.approachDistance <<
 							"</td><td>" << it.second.approachTime <<
@@ -291,10 +299,8 @@ namespace synthese
 			IntegralSearcher isd(
 				ARRIVAL_TO_DEPARTURE
 				, _accessParameters
-				, DO_NOT_SEARCH_ADDRESSES
-				, SEARCH_PHYSICALSTOPS
-				, USE_ROADS
-				, DO_NOT_USE_LINES
+				, PTModule::GRAPH_ID
+				, RoadModule::GRAPH_ID
 				, destinationJourneys
 				, bvrmo
 				, _originVam
@@ -316,16 +322,14 @@ namespace synthese
 			isd.integralSearch (
 				_destinationVam
 				, _journeySheetEndTime
-				, Journey(ARRIVAL_TO_DEPARTURE)
+				, Journey()
 				, std::numeric_limits<int>::max ()
 			);
 
 			VertexAccessMap dvam;
 			// Include physical stops from destinationVam into result of integral search
 			// (cos not taken into account in returned journey vector).
-			dvam.merge (_destinationVam, 
-				VertexAccessMap::DO_NOT_MERGE_ADDRESSES,
-				VertexAccessMap::MERGE_PHYSICALSTOPS);
+			dvam.mergeWithFilter(_destinationVam, PTModule::GRAPH_ID);
 
 			for(JourneysResult<JourneyComparator>::ResultSet::const_iterator itdj(destinationJourneys.getJourneys().begin());
 				itdj != destinationJourneys.getJourneys().end ();
@@ -346,23 +350,21 @@ namespace synthese
 					+ j.getDistance ()
 				);
 				VertexAccessMap vam;
-				const AddressablePlace* cp(AddressablePlace::GetPlace(j.getOrigin()->getPlace()));
-				const Vertex* v(j.getOrigin()->getFromVertex());
-				cp->getImmediateVertices(
-					vam
-					, ARRIVAL_TO_DEPARTURE
-					, _accessParameters
-					, DO_NOT_SEARCH_ADDRESSES
-					, SEARCH_PHYSICALSTOPS
-					, v
-					);
+				const Hub* cp(j.getOrigin()->getHub());
+				const Vertex& v(*j.getOrigin()->getFromVertex());
+				cp->getVertexAccessMap(
+					vam,
+					ARRIVAL_TO_DEPARTURE,
+					PTModule::GRAPH_ID,
+					v
+				);
 				for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
 				{
 					if (!_originVam.contains(it->first))
 						dvam.insert(
 							it->first
 							, VertexAccess(
-								commonApproachTime + cp->getTransferDelay(it->first, v)
+								commonApproachTime + cp->getTransferDelay(*it->first, v)
 								, commonApproachDistance
 								, j
 							)
@@ -381,7 +383,7 @@ namespace synthese
 					{
 						s	<<
 							"<tr><td>" <<
-							AddressablePlace::GetPlace(it.first->getPlace())->getFullName() <<
+							dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
 							"</td><td>" <<
 							static_cast<const PhysicalStop* const>(it.first)->getName() <<
 							"</td><td>" <<
@@ -434,7 +436,7 @@ namespace synthese
 				}
 
 
-				Journey* journey(new Journey(DEPARTURE_TO_ARRIVAL));
+				Journey* journey(new Journey());
 				computeRoutePlanningDepartureArrival(*journey, ovam, dvam);
 				
 				//! <li> If no journey was found and last service is continuous, 
@@ -530,9 +532,9 @@ namespace synthese
 				{
 					goalApproachJourney.shift(
 						(result.getArrivalTime() - goalApproachJourney.getDepartureTime()) +
-						result.getDestination()->getFromVertex()->getPlace()->getTransferDelay(
-							result.getDestination()->getFromVertex(),
-							goalApproachJourney.getOrigin()->getFromVertex()
+						result.getDestination()->getHub()->getTransferDelay(
+							*result.getDestination()->getFromVertex(),
+							*goalApproachJourney.getOrigin()->getFromVertex()
 						),
 						result.getContinuousServiceRange()
 					);
@@ -554,9 +556,9 @@ namespace synthese
 					originApproachJourney.shift(
 						(result.getDepartureTime() - originApproachJourney.getDepartureTime()) -
 						originApproachJourney.getDuration() -
-						result.getOrigin()->getFromVertex()->getPlace()->getTransferDelay(
-							originApproachJourney.getDestination()->getFromVertex(),
-							result.getOrigin()->getFromVertex()
+						result.getOrigin()->getHub()->getTransferDelay(
+							*originApproachJourney.getDestination()->getFromVertex(),
+							*result.getOrigin()->getFromVertex()
 						),
 						result.getContinuousServiceRange()
 					);
@@ -625,10 +627,8 @@ namespace synthese
 			IntegralSearcher is(
 				accessDirection
 				, _accessParameters
-				, DO_NOT_SEARCH_ADDRESSES
-				, SEARCH_PHYSICALSTOPS
-				, DO_NOT_USE_ROADS
-				, USE_LINES
+				, PTModule::GRAPH_ID
+				, PTModule::GRAPH_ID
 				, todo
 				, bestVertexReachesMap
 				, endVam
@@ -643,7 +643,7 @@ namespace synthese
 				, _logLevel
 			);
 
-			is.integralSearch(startVam, startTime, Journey(accessDirection), 0, strictTime);
+			is.integralSearch(startVam, startTime, Journey(), 0, strictTime);
 			++integralSerachsNumber;
 			
 			while(true)
@@ -672,7 +672,7 @@ namespace synthese
 					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
 					{
 						Log::GetInstance().trace(
-							AddressablePlace::GetPlace(reachedVertex->getPlace())->getFullName() +
+							dynamic_cast<const NamedPlace*>(reachedVertex->getHub())->getFullName() +
 							" was found at " +
 							journey.getEndTime().toString() +
 							(saved ? " (accepted)" : " (rejected)")
@@ -681,7 +681,7 @@ namespace synthese
 						{
 							*_logStream <<
 								"<p>" <<
-								AddressablePlace::GetPlace(reachedVertex->getPlace())->getFullName() <<
+								dynamic_cast<const NamedPlace*>(reachedVertex->getHub())->getFullName() <<
 								" was found at " << journey.getEndTime().toString() <<
 								(saved ? " (accepted)" : " (rejected)") << "</p>"
 							;
@@ -772,7 +772,7 @@ namespace synthese
 								// Place
 								stream <<
 									"<td>" <<
-									AddressablePlace::GetPlace(its->getArrivalEdge()->getPlace())->getFullName() <<
+									dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName() <<
 									"</td>"
 								;
 
@@ -824,15 +824,13 @@ namespace synthese
 				}
 
 				VertexAccessMap vertices;
-				const Vertex* vertex(journey->getEndEdge()->getFromVertex());
-				AddressablePlace::GetPlace(vertex->getPlace())->getImmediateVertices(
+				const Vertex& vertex(*journey->getEndEdge()->getFromVertex());
+				vertex.getHub()->getVertexAccessMap(
 					vertices
 					, accessDirection
-					, _accessParameters
-					, DO_NOT_SEARCH_ADDRESSES
-					, SEARCH_PHYSICALSTOPS
+					, PTModule::GRAPH_ID
 					, vertex
-					);
+				);
 
 				is.integralSearch(
 					vertices

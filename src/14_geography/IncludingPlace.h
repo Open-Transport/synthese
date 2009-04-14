@@ -29,14 +29,14 @@
 
 namespace synthese
 {
-	namespace env
+	namespace geography
 	{
 		/** Base class for a place including other places.
 
-			@ingroup m35
+			@ingroup m14
 		*/
-		class IncludingPlace
-		:	public Place
+		class IncludingPlace:
+			public virtual Place
 		{
 		public:
 			typedef std::vector<const Place*> IncludedPlaces;
@@ -45,9 +45,6 @@ namespace synthese
 			IncludedPlaces _includedPlaces; 
 
 			IncludingPlace(
-				util::RegistryKeyType key,
-				const std::string& name,
-				const City* city
 			);
 
 		public:
@@ -68,13 +65,11 @@ namespace synthese
 			//! @name Query methods
 			//@{
 
-				void getImmediateVertices(
+				virtual void getVertexAccessMap(
 					graph::VertexAccessMap& result,
 					const graph::AccessDirection& accessDirection,
-					const AccessParameters& accessParameters,
-					SearchAddresses returnAddresses,
-					SearchPhysicalStops returnPhysicalStops,
-					const graph::Vertex* origin = 0
+					const graph::AccessParameters& accessParameters,
+					graph::GraphIdType whatToSearch
 				) const;
 
 				virtual const geometry::Point2D& getPoint() const;

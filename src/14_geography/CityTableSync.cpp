@@ -24,7 +24,7 @@
 #include "Conversion.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
-#include "EnvModule.h"
+#include "GeographyModule.h"
 
 #include <sqlite3.h>
 #include <assert.h>
@@ -35,15 +35,15 @@ using namespace std;
 namespace synthese
 {
 	using namespace db;
-	using namespace env;
+	using namespace geography;
 	using namespace util;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,CityTableSync>::FACTORY_KEY("15.20.01 Cities");
+		template<> const string FactorableTemplate<SQLiteTableSync,CityTableSync>::FACTORY_KEY("14.00.01 Cities");
 	}
 
-	namespace env
+	namespace geography
 	{
 		const string CityTableSync::TABLE_COL_NAME("name");
 		const string CityTableSync::TABLE_COL_CODE("code");
@@ -82,14 +82,14 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				EnvModule::AddToCitiesMatchers(object);
+				GeographyModule::AddToCitiesMatchers(object);
 			}
 		}
 
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj)
 		{
-			EnvModule::RemoveFromCitiesMatchers(obj);
+			GeographyModule::RemoveFromCitiesMatchers(obj);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Save(City* object)
@@ -98,7 +98,7 @@ namespace synthese
 		}
 	}
 
-	namespace env
+	namespace geography
 	{
 		CityTableSync::CityTableSync ()
 			: SQLiteAutoRegisterTableSyncTemplate<CityTableSync,City> ()

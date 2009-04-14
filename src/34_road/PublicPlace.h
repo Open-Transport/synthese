@@ -1,6 +1,6 @@
 
-/** PlaceAlias class header.
-	@file PlaceAlias.h
+/** PublicPlace class header.
+	@file PublicPlace.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,70 +20,41 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENV_PLACEALIAS_H
-#define SYNTHESE_ENV_PLACEALIAS_H
+#ifndef SYNTHESE_road_PUBLICPLACE_H
+#define SYNTHESE_road_PUBLICPLACE_H
 
-#include <vector>
-
-#include "IncludingPlace.h"
+#include "AddressablePlace.h"
 #include "Registry.h"
+#include "NamedPlaceTemplate.h"
+
+#include <string>
 
 namespace synthese
 {
-	namespace env
+	namespace road
 	{
-
-
-		/** Place alias.
-
-		 @ingroup m35
+		/** Public place class.
+			@ingroup m34
 		*/
-		class PlaceAlias
-		:	public IncludingPlace
+		class PublicPlace:
+			public road::AddressablePlace,
+			public geography::NamedPlaceTemplate<PublicPlace>
 		{
 		public:
 
 			/// Chosen registry class.
-			typedef util::Registry<PlaceAlias>	Registry;
+			typedef util::Registry<PublicPlace>	Registry;
 
+			PublicPlace (
+				util::RegistryKeyType id = UNKNOWN_VALUE
+			);
 
-		private:
-		        
+			virtual ~PublicPlace ();
 
-		public:
-
-			PlaceAlias(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
-				std::string name = std::string(),
-				const Place* aliasedPlace = NULL,
-				const City* city = NULL);
-
-			virtual ~PlaceAlias ();
-
-
-			//! @name Getters/Setters
-			//@{
-
-			/** Gets official name of this place.
-		     
-				@return aliased place official name.
-			 */
-			const std::string& getOfficialName () const;
-
-
-			/** Gets aliased place.
-			 */
-			const Place* getAliasedPlace () const;
-
-
-			void setAliasedPlace(const Place* place);
-			//@}
-
-
-
+			virtual std::string getNameForAllPlacesMatcher(
+				std::string text = std::string()
+			) const;
 		};
-
-
 	}
 }
 

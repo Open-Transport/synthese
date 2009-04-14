@@ -27,21 +27,21 @@
 #define SYNTHESE_HUB_H
 
 #include "GraphTypes.h"
-#include "Point2D.h"
+#include "TimeTypes.h"
 
 namespace synthese
 {
-	namespace env
+	namespace geometry
 	{
-		class AccessParameters;
+		class Point2D;
 	}
-	
+
 	namespace graph
 	{
 		class Vertex;
+		class VertexAccessMap;
 		
-		/** Generic hub class.
-			The default behaviour is forbidden connection between vertexes.
+		/** Generic hub interface.
 			@ingroup m18
 		*/
 		class Hub
@@ -49,20 +49,27 @@ namespace synthese
 		public:
 			//! @name Interface for query methods
 			//@{
-				virtual MinutesDuration getMinTransferDelay(
-				) const;
+				virtual time::MinutesDuration getMinTransferDelay(
+				) const = 0;
 				
+
+				virtual void getVertexAccessMap(
+					VertexAccessMap& result,
+					const AccessDirection& accessDirection,
+					GraphIdType whatToSearch,
+					const Vertex& vertex
+				) const = 0;
+
 				virtual bool isConnectionAllowed(
-					const Vertex* fromVertex
-					, const Vertex* toVertex
-				) const;
+					const Vertex& origin
+					, const Vertex& destination
+				) const = 0;
 
-				virtual MinutesDuration getTransferDelay(
-					const Vertex* fromVertex
-					, const Vertex* toVertex
-				) const;
+				virtual time::MinutesDuration getTransferDelay(
+					const Vertex& origin
+					, const Vertex& destination
+				) const = 0;
 
-				static const MinutesDuration FORBIDDEN_TRANSFER_DELAY;
 
 
 				///////////////////////////////////////////////////////////////
@@ -78,11 +85,13 @@ namespace synthese
 				///  - 100 : maximum value for a score
 				/// @return the score of the hub				
 				virtual HubScore getScore(
-				) const;
+				) const = 0;
+
+				virtual const geometry::Point2D& getPoint() const = 0;
+
+				virtual bool containsAnyVertex(GraphIdType graphType) const = 0;
 
 				bool isConnectionPossible() const;
-				
-				virtual const geometry::Point2D& getPoint() const = 0;
 			//@}
 		};
 	}

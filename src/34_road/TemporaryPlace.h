@@ -30,61 +30,47 @@ namespace synthese
 {
 	namespace road
 	{
-		class Road;
-	}
+		class RoadPlace;
 	
-	namespace env
-	{
 		/** Temporary place on the road network.
-			@ingroup m35
+			@ingroup m34
 			
 			Temporary means it is not a part of the graph definition and can just
 			be used as an entry point on this graph.
 			
 		*/
-		class TemporaryPlace : public Place
+		class TemporaryPlace:
+			public virtual geography::Place
 		{
 		
 		private:
 		
-			const road::Road* _road;
+			const RoadPlace* _road;
 			double _metricOffset;
 		
 		protected:
 		
 		public:
 		
-			TemporaryPlace (const road::Road* road, double metricOffset);
+			TemporaryPlace (const RoadPlace* road, double metricOffset);
 		
 			virtual ~TemporaryPlace ();
 		
 		
 			//! @name Getters/Setters
 			//@{
-			const road::Road* getRoad () const;
-			double getMetricOffset () const;
+				const RoadPlace* getRoad () const;
+				double getMetricOffset () const;
 			//@}
 		
 			//! @name Query methods
 			//@{
-		
-			graph::VertexAccess getVertexAccess(
-				const graph::AccessDirection& accessDirection,
-				const AccessParameters& accessParameters,
-				const graph::Vertex* destination,
-				const graph::Vertex* origin = 0
-			) const;
-			
-			void getImmediateVertices(
-				graph::VertexAccessMap& result,
-				const graph::AccessDirection& accessDirection,
-				const AccessParameters& accessParameters,
-				const graph::Vertex* origin = 0,
-				bool returnAddresses = true,
-				bool returnPhysicalStops = true
-			) const;
-		
-			virtual uid getId() const;
+				void getVertexAccessMap(
+					graph::VertexAccessMap& result,
+					const graph::AccessDirection& accessDirection,
+					const graph::AccessParameters& accessParameters,
+					graph::GraphIdType whatToSearch
+				) const;
 			//@}
 			
 		};

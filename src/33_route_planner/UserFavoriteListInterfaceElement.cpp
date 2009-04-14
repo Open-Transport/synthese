@@ -42,8 +42,9 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace security;
-	using namespace env;
 	using namespace util;
+	using namespace graph;
+	
 	
 	namespace util
 	{

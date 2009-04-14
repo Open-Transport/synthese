@@ -1,6 +1,6 @@
 
-/** PublicPlace class implementation.
-	@file PublicPlace.cpp
+/** RoadModule class implementation.
+	@file RoadModule.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,29 +20,37 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PublicPlace.h"
-#include "Registry.h"
+#include "RoadModule.h"
+
+using namespace std;
 
 namespace synthese
 {
-	namespace util
+	using namespace road;
+
+	namespace graph
 	{
-		template<> const std::string Registry<env::PublicPlace>::KEY("PublicPlace");
+		template<> const GraphIdType GraphModuleTemplate<RoadModule>::GRAPH_ID(1);
 	}
 
-	namespace env
+	namespace util
 	{
-		PublicPlace::PublicPlace (
-			util::RegistryKeyType id,
-			std::string name,
-			const City* city
-		):	Registrable(id),
-			AddressablePlace(name, city)
+		template<>
+		const string FactorableTemplate<ModuleClass,RoadModule>::FACTORY_KEY("34_road");
+	}
+
+	namespace road
+	{
+
+
+		void RoadModule::initialize()
 		{
+
 		}
 
-		PublicPlace::~PublicPlace ()
+		std::string RoadModule::getName() const
 		{
+			return "Voirie";
 		}
 	}
 }

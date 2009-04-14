@@ -23,7 +23,7 @@
 */
 
 #include "ReservationRoutePlannerAdmin.h"
-
+#include "GeographyModule.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
 #include "BookReservationAction.h"
@@ -32,7 +32,7 @@
 #include "ReservationTransactionTableSync.h"
 #include "Reservation.h"
 #include "ReservationTableSync.h"
-
+#include "NamedPlace.h"
 #include "QueryString.h"
 #include "ActionFunctionRequest.h"
 
@@ -43,7 +43,7 @@
 #include "RoutePlanner.h"
 
 #include "SearchFormHTMLTable.h"
-
+#include "PTConstants.h"
 #include "Journey.h"
 #include "UseRules.h"
 #include "ServiceUse.h"
@@ -75,6 +75,7 @@ namespace synthese
 	using namespace security;
 	using namespace graph;
 	using namespace road;
+	using namespace geography;
 
 	namespace util
 	{
@@ -228,8 +229,8 @@ namespace synthese
 				NULL, 
 				_drtOnly
 			);
-			const Place* startPlace(EnvModule::FetchPlace(_startCity, _startPlace));
-			const Place* endPlace(EnvModule::FetchPlace(_endCity, _endPlace));
+			const Place* startPlace(GeographyModule::FetchPlace(_startCity, _startPlace));
+			const Place* endPlace(GeographyModule::FetchPlace(_endCity, _endPlace));
 			stringstream trace;
 			RoutePlanner r(
 				startPlace
@@ -244,18 +245,19 @@ namespace synthese
 
 			if (jv.journeys.empty())
 			{
-				stream << "Aucun résultat trouvé de " << startPlace->getFullName() << " à " << endPlace->getFullName();
+				stream << "Aucun résultat trouvé de " << dynamic_cast<const NamedPlace*>(startPlace)->getFullName() 
+					<< " à " << dynamic_cast<const NamedPlace*>(endPlace)->getFullName();
 				return;
 			}
 
 			HTMLTable::ColsVector v;
-			v.push_back("Départ<br />" + startPlace->getFullName());
+			v.push_back("Départ<br />" + dynamic_cast<const NamedPlace*>(startPlace)->getFullName());
 			v.push_back("Ligne");
 			v.push_back("Arrivée");
 			v.push_back("Correspondance");
 			v.push_back("Départ");
 			v.push_back("Ligne");
-			v.push_back("Arrivée<br />" + endPlace->getFullName());
+			v.push_back("Arrivée<br />" + dynamic_cast<const NamedPlace*>(endPlace)->getFullName());
 			HTMLTable t(v,"adminresults");
 
 			// Reservation
@@ -330,7 +332,7 @@ namespace synthese
 						stream <<
 							t.col() <<
 							static_cast<const PublicTransportStopZoneConnectionPlace*>(
-								its->getArrivalEdge()->getPlace()
+								its->getArrivalEdge()->getHub()
 							)->getFullName()
 						;
 

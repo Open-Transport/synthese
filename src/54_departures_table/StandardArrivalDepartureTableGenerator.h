@@ -37,7 +37,7 @@ namespace synthese
 
 		public:
 			StandardArrivalDepartureTableGenerator(
-				const env::PhysicalStops&
+				const PhysicalStops&
 				, const DeparturesTableDirection&
 				, const EndFilter&
 				, const LineFilter&

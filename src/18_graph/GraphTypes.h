@@ -35,15 +35,23 @@ namespace synthese
 				The arrival will be chosen in the following edges.
 			- ARRIVAL_TO_DEPARTURE = the service is chosen from a presence time after an arrival.
 				The departure will be chosen in the preceding edges.
+			- UNDEFINED_DIRECTION = the direction is not defined, generally because no service is chosen
+				at this stage
 		*/
-		typedef enum { ARRIVAL_TO_DEPARTURE, DEPARTURE_TO_ARRIVAL } AccessDirection ;
-		
+		typedef enum {
+			ARRIVAL_TO_DEPARTURE,
+			DEPARTURE_TO_ARRIVAL,
+			UNDEFINED_DIRECTION
+		} AccessDirection ;
+
+		typedef unsigned short int GraphIdType;
+
 		typedef unsigned int UserClassCode;
 		
 		typedef unsigned int HubScore;
 		
-		typedef int MinutesDuration;
-		
+		const HubScore NO_TRANSFER_HUB_SCORE(0);
+		const HubScore MIN_HUB_SCORE(1);
 		const HubScore MAX_HUB_SCORE(100);
 	}
 }

@@ -9,7 +9,6 @@ CppLibProject(
 		's3-security.cpplib',
 		's3-util.cpplib',
 		's3-interfaces.cpplib',
-		's3-lex-matcher.cpplib',
 		's3-graph.cpplib',
 		's3-geometry.cpplib',
 		's3-db.cpplib',

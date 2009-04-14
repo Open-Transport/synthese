@@ -45,7 +45,6 @@ namespace synthese
 	{
 
 		Journey::Journey(
-			AccessDirection method
 		):	_continuousServiceRange (UNKNOWN_VALUE)
 			, _effectiveDuration (0)
 			, _transportConnectionCount (0)
@@ -54,9 +53,9 @@ namespace synthese
 			, _endApproachDuration(0)
 			, _endReached(false)
 			, _squareDistanceToEnd(UNKNOWN_VALUE)
-			, _minSpeedToEnd(UNKNOWN_VALUE)
+			, _minSpeedToEnd(UNKNOWN_VALUE),
+			_method(UNDEFINED_DIRECTION)
 		{
-			_setMethod(method);
 		}
 		
 
@@ -67,17 +66,19 @@ namespace synthese
 
 
 
-		int 
-		Journey::getJourneyLegCount () const
-		{
+		int Journey::getJourneyLegCount(
+		) const	{
 			return static_cast<int>(_journeyLegs.size());
 		}
 
 
 
 
-		const ServiceUse& Journey::getJourneyLeg (int index) const
-		{
+		const ServiceUse& Journey::getJourneyLeg(
+			int index
+		) const	{
+			assert(!empty());
+
 			return _journeyLegs.at (index);
 		}
 
@@ -86,6 +87,8 @@ namespace synthese
 
 		const ServiceUse& Journey::getFirstJourneyLeg () const
 		{
+			assert(!empty());
+
 			return *_journeyLegs.begin();
 		}
 
@@ -93,6 +96,8 @@ namespace synthese
 
 		const ServiceUse& Journey::getLastJourneyLeg () const
 		{
+			assert(!empty());
+
 			return *_journeyLegs.rbegin();
 		}
 
@@ -100,6 +105,8 @@ namespace synthese
 
 		const Edge* Journey::getOrigin(
 		) const {
+			assert(!empty());
+
 			return getFirstJourneyLeg ().getDepartureEdge();
 		}
 
@@ -107,6 +114,8 @@ namespace synthese
 
 		const Edge* Journey::getDestination(
 		) const {
+			assert(!empty());
+
 			return getLastJourneyLeg ().getArrivalEdge();
 		}
 
@@ -134,8 +143,14 @@ namespace synthese
 
 
 
-		void Journey::_prependServiceUse(const ServiceUse& leg)
-		{
+		void Journey::_prependServiceUse(
+			const ServiceUse& leg
+		){
+			if(_method == UNDEFINED_DIRECTION)
+			{
+				_setMethod(leg.getMethod());
+			}
+
 			assert(leg.getMethod() == _method);
 
 			_journeyLegs.push_front (leg);
@@ -151,9 +166,14 @@ namespace synthese
 
 
 
-		void 
-		Journey::prepend (const Journey& journey)
-		{
+		void Journey::prepend(
+			const Journey& journey
+		){
+			if (_method == UNDEFINED_DIRECTION)
+			{
+				_setMethod(journey.getMethod());
+			}
+
 			assert(_method == journey._method);
 
 			for(ServiceUses::const_reverse_iterator it(journey._journeyLegs.rbegin());
@@ -172,8 +192,14 @@ namespace synthese
 
 
 
-		void Journey::_appendServiceUse(const ServiceUse& leg)
-		{
+		void Journey::_appendServiceUse(
+			const ServiceUse& leg
+		){
+			if(_method == UNDEFINED_DIRECTION)
+			{
+				_setMethod(leg.getMethod());
+			}
+
 			assert(leg.getMethod() == _method);
 
 			_journeyLegs.push_back (leg);
@@ -189,9 +215,14 @@ namespace synthese
 
 
 
+		void Journey::append(
+			const Journey& journey
+		){
+			if(_method == UNDEFINED_DIRECTION)
+			{
+				_setMethod(journey.getMethod());
+			}
 
-		void Journey::append (const Journey& journey)
-		{
 			assert(_method == journey._method);
 
 			for(ServiceUses::const_iterator it(journey._journeyLegs.begin());
@@ -220,15 +251,13 @@ namespace synthese
 
 
 
-		int 
-		Journey::getContinuousServiceRange () const
-		{
+		int Journey::getContinuousServiceRange(
+		) const	{
 			if (_continuousServiceRange == UNKNOWN_VALUE)
 			{
 				int continuousServiceRange = UNKNOWN_VALUE;
-				for (ServiceUses::const_iterator it = _journeyLegs.begin();	it != _journeyLegs.end(); ++it)
+				BOOST_FOREACH(const ServiceUse& leg, _journeyLegs)
 				{
-					const ServiceUse& leg(*it);
 					if ( (continuousServiceRange == UNKNOWN_VALUE) ||
 						(leg.getServiceRange() < continuousServiceRange) )
 					{
@@ -242,19 +271,16 @@ namespace synthese
 
 
 
-
-
-		void 
-		Journey::setContinuousServiceRange (int continuousServiceRange)
-		{
+		void Journey::setContinuousServiceRange(
+			int continuousServiceRange
+		){
 			_continuousServiceRange = continuousServiceRange;
 		}
 
 
 
-		void 
-		Journey::clear ()
-		{
+		void Journey::clear(
+		){
 			_continuousServiceRange = UNKNOWN_VALUE;
 			_effectiveDuration = 0;
 			_transportConnectionCount = 0;
@@ -263,6 +289,7 @@ namespace synthese
 			_startApproachDuration = 0;
 			_endReached = false;
 			_journeyLegs.clear();
+			_method = UNDEFINED_DIRECTION;
 		}
 
 
@@ -323,6 +350,8 @@ namespace synthese
 			return false;
 		}
 
+
+
 		bool Journey::empty() const
 		{
 			return _journeyLegs.empty();
@@ -360,6 +389,8 @@ namespace synthese
 			_endApproachDuration = duration;
 		}
 
+
+
 		void Journey::shift( int duration, int continuousServiceRange /*= UNKNOWN_VALUE*/ )
 		{
 			for(ServiceUses::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
@@ -369,6 +400,8 @@ namespace synthese
 			_continuousServiceRange = (continuousServiceRange == UNKNOWN_VALUE) ? _continuousServiceRange - duration : continuousServiceRange;
 		}
 
+
+
 		void Journey::setStartApproachDuration( int duration )
 		{
 			_startApproachDuration = duration;
@@ -376,16 +409,22 @@ namespace synthese
 
 		const ServiceUse& Journey::getEndServiceUse() const
 		{
+			assert(_method != UNDEFINED_DIRECTION);
+
 			return (this->*_endServiceUseGetter)();
 		}
 
 		const ServiceUse& Journey::getStartServiceUse() const
 		{
+			assert(_method != UNDEFINED_DIRECTION);
+
 			return (this->*_beginServiceUseGetter)();
 		}
 
 		void Journey::reverse()
 		{
+			if(_method == UNDEFINED_DIRECTION) return;
+
 			int duration(_startApproachDuration);
 			_startApproachDuration = _endApproachDuration;
 			_endApproachDuration = duration;
@@ -414,16 +453,23 @@ namespace synthese
 			if (_endReached)
 				_squareDistanceToEnd = 0;
 			else
-				_squareDistanceToEnd.setFromPoints(vam.getIsobarycenter(), getEndEdge()->getFromVertex()->getPlace()->getPoint());
+				_squareDistanceToEnd.setFromPoints(
+					vam.getIsobarycenter(),
+					getEndEdge()->getHub()->getPoint()
+				);
 		}
 
 		const Edge* Journey::getEndEdge() const
 		{
+			assert(_method != UNDEFINED_DIRECTION);
+
 			return (this->*_endEdgeGetter)();
 		}
 
 		DateTime Journey::getEndTime() const
 		{
+			assert(_method != UNDEFINED_DIRECTION);
+
 			return (this->*_endDateTimeGetter)();
 		}
 
@@ -440,8 +486,10 @@ namespace synthese
 				_score = _minSpeedToEnd;
 				if (_score < 100)
 					_score = 100;
-				if (getEndEdge()->getFromVertex()->getPlace()->getScore())
-					_score /= getEndEdge()->getFromVertex()->getPlace()->getScore();
+				if (getEndEdge()->getHub()->getScore())
+				{
+					_score /= getEndEdge()->getHub()->getScore();
+				}
 			}
 		}
 
@@ -467,6 +515,8 @@ namespace synthese
 
 		void Journey::_setMethod( AccessDirection method )
 		{
+			assert(method != UNDEFINED_DIRECTION);
+
 			_method = method;
 			if (_method == DEPARTURE_TO_ARRIVAL)
 			{
@@ -537,6 +587,11 @@ namespace synthese
 
 		void Journey::push( const ServiceUse& leg )
 		{
+			if(_method == UNDEFINED_DIRECTION)
+			{
+				_setMethod(leg.getMethod());
+			}
+
 			(this->*_serviceUsePusher)(leg);
 		}
 
@@ -544,6 +599,11 @@ namespace synthese
 
 		void Journey::push( const Journey& journey )
 		{
+			if(_method == UNDEFINED_DIRECTION)
+			{
+				_setMethod(journey.getMethod());
+			}
+			
 			(this->*_journeyPusher)(journey);
 		}
 

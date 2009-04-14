@@ -42,6 +42,7 @@ namespace synthese
 	using namespace db;
 	using namespace env;
 	using namespace util;
+	using namespace geography;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,env::ConnectionPlaceTableSync>::FACTORY_KEY("15.40.01 Connection places");
 
@@ -142,8 +143,7 @@ namespace synthese
 						{
 							city->addIncludedPlace (cp);
 						}
-						city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
-						city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
+						city->addPlaceToMatcher<PublicTransportStopZoneConnectionPlace>(cp);
 					}
 				}
 				catch(ObjectNotFoundException<City>& e)
@@ -166,8 +166,7 @@ namespace synthese
 			City* city(const_cast<City*>(cp->getCity()));
 			if (city != NULL)
 			{
-				city->getConnectionPlacesMatcher().remove (cp->getName ());
-				city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
+				city->removePlaceFromMatcher<PublicTransportStopZoneConnectionPlace>(cp);
 				cp->setCity(NULL);
 			}
 		}

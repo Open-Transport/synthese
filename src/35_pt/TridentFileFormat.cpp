@@ -26,7 +26,7 @@
 #include "DBModule.h"
 // 35 PT
 #include "TridentFileFormat.h"
-
+#include "GraphConstants.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
@@ -53,7 +53,7 @@
 #include "ReservationContactTableSync.h"
 #include "UseRules.h"
 #include "ServiceDate.h"
-
+#include "PTConstants.h"
 // 06 Geometry
 #include "Projection.h"
 #include "Point2D.h"
@@ -301,8 +301,8 @@ namespace synthese
 				os << "<name>" << cp->getCity ()->getName () << " " << cp->getName () << "</name>" << "\n";
 
 				// Contained physical stops
-				const PhysicalStops& stops(cp->getPhysicalStops());
-				for(PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
+				const PublicTransportStopZoneConnectionPlace::PhysicalStops& stops(cp->getPhysicalStops());
+				for(PublicTransportStopZoneConnectionPlace::PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
 				{
 					os << "<contains>" << TridentId (peerid, "StopArea", *it->second)  << "</contains>" << "\n";
 				}
@@ -359,18 +359,18 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> cp, _env->getRegistry<PublicTransportStopZoneConnectionPlace>())
 			{
 				// Contained physical stops
-				const PhysicalStops& stops(cp->getPhysicalStops());
-				for(PhysicalStops::const_iterator it1(stops.begin()); it1 != stops.end(); ++it1)
+				const PublicTransportStopZoneConnectionPlace::PhysicalStops& stops(cp->getPhysicalStops());
+				BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it1, stops)
 				{
-					for(PhysicalStops::const_iterator it2(stops.begin()); it2 != stops.end(); ++it2)
+					BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it2, stops)
 					{
 						os << "<ConnectionLink>" << "\n";
 						stringstream clkey;
-						clkey << it1->second->getKey () << "t" << it2->second->getKey ();
+						clkey << it1.second->getKey () << "t" << it2.second->getKey ();
 						os << "<objectId>" << TridentId (peerid, "ConnectionLink", clkey.str ()) << "</objectId>" << "\n";
-						os << "<startOfLink>" << TridentId (peerid, "StopArea", it1->second->getKey ()) << "</startOfLink>" << "\n";
-						os << "<endOfLink>" << TridentId (peerid, "StopArea", it2->second->getKey ()) << "</endOfLink>" << "\n";
-						os << "<defaultDuration>" << ToXsdDuration (cp->getTransferDelay (it1->second, it2->second)) << "</defaultDuration>" << "\n";
+						os << "<startOfLink>" << TridentId (peerid, "StopArea", it1.first) << "</startOfLink>" << "\n";
+						os << "<endOfLink>" << TridentId (peerid, "StopArea", it2.first) << "</endOfLink>" << "\n";
+						os << "<defaultDuration>" << ToXsdDuration (cp->getTransferDelay (*it1.second, *it2.second)) << "</defaultDuration>" << "\n";
 						os << "</ConnectionLink>" << "\n";
 					}
 

@@ -33,12 +33,13 @@
 
 namespace synthese
 {
-	namespace env
+	namespace geography
 	{
 		/** PlaceAlias table synchronizer.
-			@ingroup m35LS refLS
+			@ingroup m14LS refLS
 		*/
-		class PlaceAliasTableSync : public db::SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>
+		class PlaceAliasTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>
 		{
 		public:
 			static const std::string COL_NAME;

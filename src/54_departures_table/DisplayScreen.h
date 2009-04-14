@@ -33,7 +33,6 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "DBLog.h"
-#include "15_env/Types.h"
 #include "DeparturesTableTypes.h"
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "StandardArrivalDepartureTableGenerator.h"
@@ -111,7 +110,7 @@ namespace synthese
 
 			//! \name Content
 			//@{
-				env::PhysicalStops			_physicalStops;				//!< Quai(s) affichés
+				ArrivalDepartureTableGenerator::PhysicalStops	_physicalStops;				//!< Quai(s) affichés
 				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
 				LineFilter					_forbiddenLines;
@@ -228,7 +227,7 @@ namespace synthese
 				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const time::DateTime& startTime)		const;
 				void												display(std::ostream& stream, const time::DateTime& date)				const;
 				std::string											getFullName()															const;
-				const env::PhysicalStops&							getPhysicalStops(bool result=true)										const;
+				const ArrivalDepartureTableGenerator::PhysicalStops&	getPhysicalStops(bool result=true)										const;
 
 				std::vector<std::pair<uid, std::string> > 
 					getSortedAvaliableDestinationsLabels(const DisplayedPlacesList& placesToAvoid)	const;

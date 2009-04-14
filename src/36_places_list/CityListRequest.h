@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace geography
 	{
 		class City;
 	}

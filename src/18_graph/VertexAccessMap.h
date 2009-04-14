@@ -43,17 +43,29 @@ namespace synthese
 			int approachTime;
 			double approachDistance;
 			Journey approachJourney;
-			VertexAccess(int __approachTime, double __approachDistance, const Journey& __approachJourney)
-			: approachTime(__approachTime), approachDistance(__approachDistance), approachJourney(__approachJourney)
-			{
-
-			}
-			VertexAccess(AccessDirection method)
-				: approachJourney(method)
-			{}
 			
+			VertexAccess(
+				int __approachTime,
+				double __approachDistance,
+				const Journey& __approachJourney
+			):	approachTime(__approachTime),
+				approachDistance(__approachDistance),
+				approachJourney(__approachJourney)
+			{}
+
+
+			VertexAccess(
+				int __approachTime = 0,
+				double __approachDistance = 0
+			):	approachTime(__approachTime),
+				approachDistance(__approachDistance),
+				approachJourney()
+			{}
 		};
-		 
+
+
+
+
 		/** 
 TRIDENT : VertexAccess => AccesPoint
 		@ingroup m35
@@ -61,9 +73,6 @@ TRIDENT : VertexAccess => AccesPoint
 		class VertexAccessMap
 		{
 		public:
-		    
-			typedef enum { MERGE_ADDRESSES, DO_NOT_MERGE_ADDRESSES } MergeAddresses;
-			typedef enum { MERGE_PHYSICALSTOPS, DO_NOT_MERGE_PHYSICALSTOPS } MergePhysicalStops;
 			typedef std::map<const Vertex*, VertexAccess> VamMap;
 	    
 		private:
@@ -112,9 +121,10 @@ TRIDENT : VertexAccess => AccesPoint
 			*/
 			void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
 		    
-			void merge (const VertexAccessMap& vam,
-				MergeAddresses mergeAddresses = MERGE_ADDRESSES,
-				MergePhysicalStops mergePhysicalStops = MERGE_PHYSICALSTOPS);
+			void mergeWithFilter(
+				const VertexAccessMap& vam,
+				GraphIdType graphFilter
+			);
 
 			const geometry::IsoBarycentre& getIsobarycenter () const;
 			const geometry::SquareDistance& getIsobarycenterMaxSquareDistance () const;

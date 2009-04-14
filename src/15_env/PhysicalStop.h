@@ -81,8 +81,7 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				bool isAddress () const;
-				bool isPhysicalStop () const;
+				virtual graph::GraphIdType getGraphType() const;
 			//@}
 
 		};

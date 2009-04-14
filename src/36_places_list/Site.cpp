@@ -22,7 +22,7 @@
 
 #include "Site.h"
 #include "Registry.h"
-
+#include "PTConstants.h"
 #include "EnvModule.h"
 #include "City.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
@@ -42,9 +42,11 @@ namespace synthese
 	using namespace time;
 	using namespace std;
 	using namespace util;
-	using namespace env;
+	using namespace geography;
 	using namespace interfaces;
 	using namespace lexmatcher;
+	using namespace env;
+	using namespace graph;
 
 	namespace util
 	{
@@ -160,7 +162,7 @@ namespace synthese
 
 
 
-		AccessParameters Site::getAccessParameters(AccessibilityParameter parameter) const
+		graph::AccessParameters Site::getAccessParameters(AccessibilityParameter parameter) const
 		{
 			AccessParameters ap;
 
@@ -168,17 +170,17 @@ namespace synthese
 			{
 			case HANDICCAPED_ACCESSIBILITY:
 				return AccessParameters(
-					USER_HANDICAPPED, NULL, false, false, 300, 23, 34, _maxTransportConnectionsCount
+					USER_HANDICAPPED, false, false, 300, 23, 34, _maxTransportConnectionsCount
 				);
 
 			case BIKE_ACCESSIBILITY:
 				return AccessParameters(
-					USER_BIKE_IN_PT, NULL, false, false, 3000, 23, 201, _maxTransportConnectionsCount
+					USER_BIKE_IN_PT, false, false, 3000, 23, 201, _maxTransportConnectionsCount
 				);
 
 			default:
 				return AccessParameters(
-					USER_PEDESTRIAN, NULL, false, false, 1000, 23, 67, _maxTransportConnectionsCount
+					USER_PEDESTRIAN, false, false, 1000, 23, 67, _maxTransportConnectionsCount
 				);
 			}
 		}
@@ -226,16 +228,16 @@ namespace synthese
 			_useDateRange = range;
 		}
 
-		const env::Place* Site::fetchPlace(
-			const std::string& cityName
-			, const std::string& placeName
+		const Place* Site::fetchPlace(
+			const string& cityName,
+			const string& placeName
 		) const {
 			const Place* place(NULL);
 
 			if (cityName.empty())
 				throw Exception("Empty city name");
 
-			LexicalMatcher<const City*>::MatchResult cities(
+			CitiesMatcher::MatchResult cities(
 				_citiesMatcher.bestMatches(cityName,1)
 			);
 			if(cities.empty()) throw Exception("An error has occured in city name search");
@@ -245,7 +247,7 @@ namespace synthese
 
 			if (!placeName.empty())
 			{
-				LexicalMatcher<const Place*>::MatchResult places(
+				City::LexicalMatcher::MatchResult places(
 					city->getAllPlacesMatcher().bestMatches(placeName, 1)
 				);
 				if (!places.empty())
@@ -285,7 +287,7 @@ namespace synthese
 		
 		
 		
-		const lexmatcher::LexicalMatcher<const env::City*>& Site::getCitiesMatcher () const
+		const Site::CitiesMatcher& Site::getCitiesMatcher () const
 		{
 			return _citiesMatcher;
 		}
@@ -298,7 +300,7 @@ namespace synthese
 			
 			// Conflict control
 			string name(city->getName());
-			LexicalMatcher<const City*>::Map::const_iterator it(_citiesMatcher.entries().find(name));
+			CitiesMatcher::Map::const_iterator it(_citiesMatcher.entries().find(name));
 			if(it != _citiesMatcher.entries().end())
 			{
 				string oldName(it->first);

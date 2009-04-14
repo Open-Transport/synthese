@@ -37,7 +37,7 @@ namespace synthese
 		Edge::Edge(
 			const Path* parentPath,
 			int rankInPath,
-			const Vertex* fromVertex,
+			Vertex* fromVertex,
 			double metricOffset
 		):	Registrable(UNKNOWN_VALUE),
 			_parentPath (parentPath),
@@ -435,9 +435,9 @@ namespace synthese
 
 
 
-		const Hub* Edge::getPlace () const
+		const Hub* Edge::getHub() const
 		{
-			return getFromVertex ()->getPlace ();
+			return getFromVertex()->getHub();
 		}
 
 
@@ -478,8 +478,8 @@ namespace synthese
 		bool Edge::isConnectingEdge() const
 		{
 			assert(_fromVertex);
-			assert(_fromVertex->getPlace());
-			return _fromVertex->getPlace()->isConnectionPossible();
+			assert(_fromVertex->getHub());
+			return _fromVertex->getHub()->isConnectionPossible();
 		}
 	}
 }

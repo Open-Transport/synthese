@@ -35,7 +35,7 @@ namespace synthese
 		class Journey;
 	}
 	
-	namespace env
+	namespace geography
 	{
 		class Place;
 	}
@@ -54,7 +54,7 @@ namespace synthese
 
 			struct PlaceInformation
 			{
-				const env::Place* place;
+				const geography::Place* place;
 				bool isOrigin;
 				bool isDestination;
 				std::ostringstream* content;
@@ -66,7 +66,7 @@ namespace synthese
 				, PlaceList&
 				, int PositionOrigine
 				, int PositionSouhaitee
-				);
+			);
 			
 			/** Insertion d'un arrêt de passage dans la liste des arrêts d'une fiche horaire.
 				@param ArretLogique Arrêt �  insérer
@@ -76,7 +76,7 @@ namespace synthese
 			*/
 			static int OrdrePAInsere(
 				PlaceList&
-				, const env::Place*
+				, const geography::Place*
 				, int Position
 				, bool isLockedAtTheTop
 				, bool isLockedAtTheEnd
@@ -93,13 +93,13 @@ namespace synthese
 			static bool OrdrePARechercheGare(
 				const PlaceList&
 				, int& i
-				, const env::Place* GareAChercher
+				, const geography::Place* GareAChercher
 			);
 
 			static PlaceList getStopsListForScheduleTable(
 				const JourneyBoardJourneys&
-				, const env::Place* departurePlace
-				, const env::Place* arrivalPlace
+				, const geography::Place* departurePlace
+				, const geography::Place* arrivalPlace
 			);
 
 		public:

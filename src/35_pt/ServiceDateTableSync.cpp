@@ -34,7 +34,7 @@
 #include "ServiceDateTableSync.h"
 #include "NonPermanentService.h"
 #include "Path.h"
-#include "EnvModule.h"
+#include "Fetcher.h"
 
 using namespace std;
 using namespace boost;
@@ -86,8 +86,9 @@ namespace synthese
 			ss->setDate(date);
 			
 			shared_ptr<NonPermanentService> service(
-				EnvModule::FetchEditableService(
-					rows->getLongLong(ServiceDateTableSync::COL_SERVICEID)
+				Fetcher<NonPermanentService>::FetchEditable(
+					rows->getLongLong(ServiceDateTableSync::COL_SERVICEID),
+					env, linkLevel
 			)	);
 
 			ss->setService(service.get());

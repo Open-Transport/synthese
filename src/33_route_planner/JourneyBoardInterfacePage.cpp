@@ -23,7 +23,7 @@
 #include "JourneyBoardInterfacePage.h"
 
 #include "OnlineReservationRule.h"
-
+#include "NamedPlace.h"
 #include "Journey.h"
 #include "Edge.h"
 #include "AddressablePlace.h"
@@ -55,6 +55,7 @@ namespace synthese
 	using namespace resa;
 	using namespace graph;
 	using namespace road;
+	using namespace geography;
 
 	namespace util
 	{
@@ -116,14 +117,16 @@ namespace synthese
 
 			// Determination of the displayed place names
 			string displayedDeparturePlace(
-				dynamic_cast<const Crossing*>(journey->getOrigin()->getPlace())
-				? departurePlace->getFullName()
-				: AddressablePlace::GetPlace(journey->getOrigin()->getPlace())->getFullName()
+				(dynamic_cast<const Crossing*>(journey->getOrigin()->getHub())
+					? dynamic_cast<const NamedPlace*>(departurePlace)
+					: dynamic_cast<const NamedPlace*>(journey->getOrigin()->getHub())
+				)->getFullName()
 			);
 			string displayedArrivalPlace(
-				dynamic_cast<const Crossing*>(journey->getDestination()->getPlace())
-				? arrivalPlace->getFullName()
-				: AddressablePlace::GetPlace(journey->getDestination()->getPlace())->getFullName()
+				(dynamic_cast<const Crossing*>(journey->getDestination()->getHub())
+					? dynamic_cast<const NamedPlace*>(arrivalPlace)
+					: dynamic_cast<const NamedPlace*>(journey->getDestination()->getHub())
+				)->getFullName()
 			);
 
 

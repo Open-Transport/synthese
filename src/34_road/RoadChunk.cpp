@@ -41,15 +41,16 @@ namespace synthese
 		RoadChunk::RoadChunk(
 			util::RegistryKeyType id,
 			Address* fromAddress,
-			int rankInRoad			
+			int rankInRoad,
+			Road* street
 		):	util::Registrable(id),
-			Edge (
-				//(fromAddress == NULL) ? NULL : fromAddress->getRoad ()
-				NULL
-				, rankInRoad,
+			Edge(
+				street,
+				rankInRoad,
 				fromAddress
 			)
 		{
+			if(fromAddress) setFromAddress(fromAddress);
 		}
 
 		
@@ -81,22 +82,20 @@ namespace synthese
 		
 
 
-		const Address* RoadChunk::getFromAddress() const
+		Address* RoadChunk::getFromAddress() const
 		{
-			return static_cast<const Address*>(_fromVertex);
+			return static_cast<Address*>(_fromVertex);
 		}
 
 
 
 		void RoadChunk::setFromAddress(Address* fromAddress )
 		{
-			_fromVertex = static_cast<const Vertex*>(fromAddress);
+			_fromVertex = static_cast<Vertex*>(fromAddress);
 
 			// Links from stop to the linestop
-			if (isArrival())
-				fromAddress->addArrivalEdge(static_cast<Edge*>(this));
-			if (isDeparture())
-				fromAddress->addDepartureEdge(static_cast<Edge*>(this));
+			fromAddress->addArrivalEdge(static_cast<Edge*>(this));
+			fromAddress->addDepartureEdge(static_cast<Edge*>(this));
 
 			markServiceIndexUpdateNeeded();
 		}

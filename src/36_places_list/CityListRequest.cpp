@@ -38,7 +38,7 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace geography;
 	using namespace server;
 	using namespace interfaces;
 	using namespace util;
@@ -56,7 +56,7 @@ namespace synthese
 		void CityListRequest::_run( ostream& stream ) const
 		{
 			PlacesList placesList;
-			LexicalMatcher<const City*>::MatchResult matches(
+			Site::CitiesMatcher::MatchResult matches(
 				_site->getCitiesMatcher().bestMatches(_input, _n)
 			);
 			//for(LexicalMatcher<const City*>::MatchResult::iterator it(matches.begin());

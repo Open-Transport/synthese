@@ -41,14 +41,16 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace road;
+	using namespace geography;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, PublicPlaceTableSync>::FACTORY_KEY("15.40.03 Public places");
+		template<> const string FactorableTemplate<SQLiteTableSync, PublicPlaceTableSync>::FACTORY_KEY("34.40.03 Public places");
+		template<> const string FetcherTemplate<NamedPlace, PublicPlaceTableSync>::FACTORY_KEY("13");
 	}
 
-	namespace env
+	namespace road
 	{
 		const string PublicPlaceTableSync::COL_NAME ("name");
 		const string PublicPlaceTableSync::COL_CITYID ("city_id");
@@ -88,7 +90,7 @@ namespace synthese
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 				object->setCity(city);
 
-				city->getPublicPlacesMatcher ().add (object->getName (), object);
+				city->addPlaceToMatcher<PublicPlace>(object);
 			}
 		}
 
@@ -98,7 +100,7 @@ namespace synthese
 			City* city(const_cast<City*>(obj->getCity()));
 			if (city != NULL)
 			{
-				city->getPublicPlacesMatcher ().remove (obj->getName ());
+				city->removePlaceFromMatcher<PublicPlace>(obj);
 				obj->setCity(NULL);
 			}
 		}
@@ -121,7 +123,7 @@ namespace synthese
 
 	}
 
-	namespace env
+	namespace road
 	{
 		PublicPlaceTableSync::PublicPlaceTableSync()
 			: SQLiteRegistryTableSyncTemplate<PublicPlaceTableSync,PublicPlace>()

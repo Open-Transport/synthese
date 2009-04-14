@@ -190,20 +190,22 @@ namespace synthese
 				// Next arrival of previous edges
 				if(edge->isArrivalAllowed())
 				{
-					for(Edges::reverse_iterator it(insertionPosition-1); 
-						it != _edges.rend()	&& (*it)->getFollowingArrivalForFineSteppingOnly() == nextArrival;
-						++it
+					for(Edges::iterator it(insertionPosition-1); 
+						(*it)->getFollowingArrivalForFineSteppingOnly() == nextArrival;
+						--it
 					){
 						(*it)->setFollowingArrivalForFineSteppingOnly(edge);
+						if (it == _edges.begin()) break;
 					}
 
 					if(edge->isConnectingEdge())
 					{
-						for(Edges::reverse_iterator it(insertionPosition-1); 
-							it != _edges.rend()	&& (*it)->getFollowingConnectionArrival() == nextConnectingArrival;
-							++it
+						for(Edges::iterator it(insertionPosition-1); 
+							(*it)->getFollowingConnectionArrival() == nextConnectingArrival;
+							--it
 						){
-								(*it)->setFollowingConnectionArrival(edge);
+							(*it)->setFollowingConnectionArrival(edge);
+							if (it == _edges.begin()) break;
 						}
 					}
 

@@ -49,7 +49,7 @@ namespace synthese
 {
 	using namespace routeplanner;
 	using namespace time;
-	using namespace env;
+	using namespace geography;
 	using namespace interfaces;
 	using namespace graph;
 	using namespace road;
@@ -115,10 +115,10 @@ namespace synthese
 						){
 							const Place* placeToSearch(
 								(	itl == jl.begin() &&
-									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getPlace())
+									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
 								) ?
 								jv->departurePlace :
-								AddressablePlace::GetPlace(curET.getDepartureEdge()->getPlace())
+								AddressablePlace::GetPlace(curET.getDepartureEdge()->getHub())
 							);
 
 							DateTime lastDateTime(curET.getDepartureDateTime());
@@ -166,9 +166,9 @@ namespace synthese
 						||	!curET.getEdge()->getParentPath()->isPedestrianMode()
 						){
 							const Place* placeToSearch(
-								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getPlace())
+								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub())
 								? jv->arrivalPlace
-								: AddressablePlace::GetPlace(curET.getArrivalEdge()->getPlace())
+								: AddressablePlace::GetPlace(curET.getArrivalEdge()->getHub())
 							);
 							
 							for (; placesList[ __Ligne ].place != placeToSearch; __Ligne++ )
@@ -450,7 +450,7 @@ namespace synthese
 			const ServiceUse* curET((l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l));
 			for (int i(0); i <= LigneMax && pl[ i ].place != NULL; i++ )
 			{
-				if(curET != NULL && pl[ i ].place == AddressablePlace::GetPlace(curET->getDepartureEdge()->getPlace())
+				if(curET != NULL && pl[ i ].place == AddressablePlace::GetPlace(curET->getDepartureEdge()->getHub())
 				){
 					result.push_back(true);
 					++l;
@@ -779,10 +779,10 @@ namespace synthese
 					{
 						const Place* placeToSearch(
 							(	itl == jl.begin() &&
-								dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getPlace())
+								dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
 							)?
 							departurePlace :
-							AddressablePlace::GetPlace(curET.getDepartureEdge()->getPlace())
+							AddressablePlace::GetPlace(curET.getDepartureEdge()->getHub())
 						);
 						
 						if (OrdrePARechercheGare( pl, i, placeToSearch))
@@ -802,9 +802,9 @@ namespace synthese
 					if (itl == jl.end()-1 || !curET.getEdge()->getParentPath()->isPedestrianMode())
 					{
 						const Place* placeToSearch(
-							itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getPlace())
+							itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub())
 							? arrivalPlace
-							: AddressablePlace::GetPlace(curET.getArrivalEdge()->getPlace())
+							: AddressablePlace::GetPlace(curET.getArrivalEdge()->getHub())
 						);
 						
 						if (OrdrePARechercheGare(pl, i, placeToSearch))
