@@ -117,6 +117,8 @@ namespace synthese
 		server::ParametersMap MessagesScenarioAdmin::getParametersMap() const
 		{
 			ParametersMap m(_generalLogView.getParametersMap());
+			if(_scenario.get())
+				m.insert(QueryString::PARAMETER_OBJECT_ID, _scenario->getKey());
 			return m;
 		}
 
@@ -167,7 +169,7 @@ namespace synthese
 
 							stream << udt.cell(
 								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" ("+ HTMLModule::getHTMLImage("info.png", "Info : ") + variable.second.helpMessage + ")"))
-								, udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_VARIABLE, value)
+								, udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_VARIABLE + variable.second.code, value)
 							);
 						}
 					}
@@ -245,7 +247,32 @@ namespace synthese
 			// TAB VARIABLES
 			if (openTabContent(stream, TAB_VARIABLES))
 			{
-				
+				stream << "<h1>Récapitulatif des variables du scénario</h1>";
+
+				const ScenarioTemplate::VariablesMap& variables(_templateScenario->getVariables());
+
+				if(variables.empty())
+				{
+					stream << "<p>Aucune variable définie.</p>";
+				}
+				else
+				{
+					HTMLTable::ColsVector h;
+					h.push_back("Code");
+					h.push_back("Info");
+					h.push_back("Obligatoire");
+					HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
+					{
+						string value;
+						stream << t.row();
+						stream << t.col() << variable.second.code;
+						stream << t.col() << variable.second.helpMessage;
+						stream << t.col() << (variable.second.compulsory ? "OUI" : "NON");
+					}
+					stream << t.close();
+				}
 			}
 			
 			////////////////////////////////////////////////////////////////////
@@ -364,6 +391,13 @@ namespace synthese
 			_tabs.push_back(Tab("Journal", TAB_LOG, true, "book.png"));
 
 			_tabBuilded = true;
+		}
+
+
+
+		boost::shared_ptr<const Scenario> MessagesScenarioAdmin::getScenario() const
+		{
+			return _scenario;
 		}
 	}
 }

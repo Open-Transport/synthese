@@ -406,20 +406,25 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if(currentPage.getFactoryKey() == MessagesScenarioAdmin::FACTORY_KEY)
 			{
-				links.push_back(currentPage.getPageLink());
+				const MessagesScenarioAdmin& currentSPage(static_cast<const MessagesScenarioAdmin&>(currentPage));
+				if (dynamic_cast<const SentScenario*>(currentSPage.getScenario().get()))
+					links.push_back(currentPage.getPageLink());
 			}
 			else if(currentPage.getFactoryKey() == MessageAdmin::FACTORY_KEY)
 			{
 				const MessageAdmin& currentSPage(static_cast<const MessageAdmin&>(currentPage));
 				shared_ptr<const Alarm> alarm(currentSPage.getAlarm());
 				const Scenario* scenario(alarm->getScenario());
-				AdminInterfaceElement::PageLink link(getPageLink());
-				link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
-				link.name = scenario->getName();
-				link.icon = MessagesScenarioAdmin::ICON;
-				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString(scenario->getKey());
-				links.push_back(link);
+				if (dynamic_cast<const SentScenario*>(scenario))
+				{
+					AdminInterfaceElement::PageLink link(getPageLink());
+					link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
+					link.name = scenario->getName();
+					link.icon = MessagesScenarioAdmin::ICON;
+					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterValue = Conversion::ToString(scenario->getKey());
+					links.push_back(link);
+				}
 			}
 			return links;
 		}

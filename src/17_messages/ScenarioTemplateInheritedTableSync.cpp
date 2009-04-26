@@ -172,9 +172,9 @@ namespace synthese
 							v.compulsory = false;
 						}
 						string::const_iterator it2(it);
-						for(; it != text.end() && *it != '|' && *it != '$'; ++it);
+						for(++it; it != text.end() && *it != '|' && *it != '$'; ++it);
 						if (it == text.end()) continue;
-						v.code = text.substr(it2-text.begin(), it-it2);
+						v.code = text.substr(it2-text.begin()+1, it-it2-1);
 
 						if (*it == '|')
 						{

@@ -127,9 +127,12 @@ namespace synthese
 			bool firstVar(true);
 			BOOST_FOREACH(const SentScenario::VariablesMap::value_type& variable, variables)
 			{
-				if (firstVar)
+				if(!firstVar)
 				{
 					query << "|";
+				}
+				else
+				{
 					firstVar = false;
 				}
 				query << variable.first << "$" << variable.second;

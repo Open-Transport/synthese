@@ -142,6 +142,8 @@ namespace synthese
 			virtual std::string getParameterValue() const;
 
 			virtual void _buildTabs() const;
+
+			boost::shared_ptr<const Scenario> getScenario() const;
 		};
 	}
 }
