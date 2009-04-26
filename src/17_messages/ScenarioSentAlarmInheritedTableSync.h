@@ -26,7 +26,7 @@
 #include "SQLiteInheritedRegistryTableSync.h"
 
 #include "AlarmTableSync.h"
-#include "ScenarioSentAlarm.h"
+#include "SentAlarm.h"
 
 namespace synthese
 {
@@ -37,7 +37,7 @@ namespace synthese
 		*/
 		class ScenarioSentAlarmInheritedTableSync
 		:	public db::SQLiteInheritedRegistryTableSync<
-				AlarmTableSync, ScenarioSentAlarmInheritedTableSync, ScenarioSentAlarm
+				AlarmTableSync, ScenarioSentAlarmInheritedTableSync, SentAlarm
 			>
 		{
 		public:

@@ -48,7 +48,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<ScenarioFolder>		_folder;
-			boost::shared_ptr<const ScenarioFolder>	_parentFolder;
+			boost::shared_ptr<ScenarioFolder>	_parentFolder;
 			std::string								_name;
 
 		protected:

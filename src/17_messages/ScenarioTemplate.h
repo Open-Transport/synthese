@@ -36,6 +36,7 @@ namespace synthese
 	namespace messages
 	{
 		class AlarmTemplate;
+		class ScenarioFolder;
 
 		////////////////////////////////////////////////////////////////////
 		/// Scenario template class.
@@ -64,8 +65,8 @@ namespace synthese
 			typedef std::map<std::string, Variable> VariablesMap;
 
 		private:
-			util::RegistryKeyType	_folderId;
-			VariablesMap			_variables;
+			ScenarioFolder*		_folder;
+			VariablesMap		_variables;
 
 		public:
 			/// @name constructors and destructor
@@ -78,7 +79,7 @@ namespace synthese
 				 */
 				ScenarioTemplate(
 					const std::string name = std::string(),
-					util::RegistryKeyType folderId = 0
+					ScenarioFolder* folder = NULL
 				);
 				
 				
@@ -86,7 +87,6 @@ namespace synthese
 				 * 
 				 * @param source 
 				 * @param name 
-				 * @param folderId ID of the folder of the scenario
 				 */
 				ScenarioTemplate(
 					const ScenarioTemplate& source,
@@ -99,13 +99,13 @@ namespace synthese
 
 			/// @name Getters
 			//@{
-				uid	getFolderId()	const;
+				ScenarioFolder*	getFolder()	const;
 				const VariablesMap& getVariables() const;
 			//@}
 
 			/// @name Setters
 			//@{
-				void setFolderId(uid value);
+				void setFolder(ScenarioFolder* value);
 				void setVariablesMap(const VariablesMap& value);
 			//@}
 

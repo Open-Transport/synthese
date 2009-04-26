@@ -32,6 +32,9 @@ namespace synthese
 {
 	namespace messages
 	{
+		class AlarmTemplate;
+		class SentScenario;
+
 		/** Sent Alarm Interface.
 			@ingroup m17
 		*/
@@ -43,35 +46,68 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<SentAlarm>	Registry;
 
-			struct Complements
-			{
-				AlarmConflict	conflictStatus;
-				int				recipientsNumber;
-				Complements() : conflictStatus(ALARM_CONFLICT_UNKNOWN), recipientsNumber(UNKNOWN_VALUE) {}
-			};
+//			struct Complements
+//			{
+//				AlarmConflict	conflictStatus;
+//				int				recipientsNumber;
+//				Complements() : conflictStatus(ALARM_CONFLICT_UNKNOWN), recipientsNumber(UNKNOWN_VALUE) {}
+//			};
 
 		private:
-			Complements					_complements;
+//			Complements					_complements;
+			const AlarmTemplate*	_template;
 
 		public:
-			SentAlarm(util::RegistryKeyType key = UNKNOWN_VALUE);
-			~SentAlarm();
-			void setComplements(const Complements& complements);
-
-			virtual bool					getIsEnabled()		const = 0;
-			virtual const time::DateTime&	getPeriodStart()	const = 0;
-			virtual const time::DateTime&	getPeriodEnd()		const = 0;
-			Complements						getComplements()	const;
-
-			/** Applicability test.
-				@param start Start of applicability period
-				@param end End of applicability period
-				@return true if the message is not empty and is valid for the whole period given as argument.
+			/** Copy constructor.
+				@param source Alarm template to copy (should be of the same scenario)
+				@author Hugues Romain
+				@date 2007				
+				@warning the recipients are not copied. Do it at the table synchronization.
 			*/
-			bool isApplicable ( const time::DateTime& start, const time::DateTime& end ) const;
+			SentAlarm(
+				const SentScenario& scenario,
+				const SentAlarm& source
+			);
+			
 
-			bool isApplicable(const time::DateTime& date) const;
 
+			/** Alarm template instantiation constructor.
+				@param scenario Scenario which belongs the new alarm
+				@param source Alarm template to copy
+				@author Hugues Romain
+				@date 2007				
+				@warning the recipients are not copied. Do it at the table synchronization.
+			*/
+			SentAlarm(
+				const SentScenario& scenario,
+				const AlarmTemplate& source
+			);
+			
+			/** Basic constructor.
+				@param scenario Scenario which belongs the new alarm
+				@author Hugues Romain
+				@date 2007				
+			*/
+			SentAlarm(
+				util::RegistryKeyType key = UNKNOWN_VALUE,
+				const SentScenario* scenario = NULL
+			);
+
+			~SentAlarm();
+//			void setComplements(const Complements& complements);
+
+//			Complements						getComplements()	const;
+
+			//! @name Getters
+			//@{
+				const AlarmTemplate*	getTemplate()		const;
+				const SentScenario*		getScenario()		const;
+			//@}
+
+			//! @name Setters
+			//@{
+				void					setTemplate(const AlarmTemplate* value);
+			//@}
 
 			
 			/** Conflict between two alarms detector.

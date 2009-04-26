@@ -28,7 +28,7 @@
 #include "Scenario.h"
 #include "AlarmTableSync.h"
 #include "AlarmTemplate.h"
-#include "ScenarioSentAlarm.h"
+#include "SentAlarm.h"
 
 #include "DateTime.h"
 

@@ -23,8 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "AlarmAddLinkAction.h"
-#include "SingleSentAlarm.h"
-#include "ScenarioSentAlarm.h"
+#include "SentAlarm.h"
 #include "AlarmTemplate.h"
 #include "AlarmRecipient.h"
 #include "AlarmObjectLink.h"
@@ -104,15 +103,10 @@ namespace synthese
 				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
 				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), "Ajout de destinataire " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser().get());
 			}
-			else if (dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm).get())
-			{
-				shared_ptr<const SingleSentAlarm> singleSentAlarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(singleSentAlarm.get(), "Ajout de destinataire à message simple " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser().get());
-			}
 			else
 			{
-				shared_ptr<const ScenarioSentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(scenarioSentAlarm.get(), "Ajout de destinataire à message de scénario " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser().get());
+				shared_ptr<const SentAlarm> sentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
+				MessagesLog::addUpdateEntry(sentAlarm.get(), "Ajout de destinataire à message diffusé " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser().get());
 			}
 		}
 

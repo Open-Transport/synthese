@@ -31,6 +31,8 @@
 #include "MessagesLibraryRight.h"
 #include "Request.h"
 #include "SentScenario.h"
+#include "ScenarioFolder.h"
+#include "ScenarioFolderTableSync.h"
 
 using namespace boost;
 using namespace std;
@@ -84,6 +86,11 @@ namespace synthese
 				{
 					shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return text->getName();
+				}
+				else if (tableId == ScenarioFolderTableSync::TABLE.ID)
+				{
+					shared_ptr<const ScenarioFolder> folder(ScenarioFolderTableSync::Get(id, env));
+					return folder->getFullName();
 				}
 			}
 			catch (...)
@@ -196,6 +203,15 @@ namespace synthese
 
 
 
+		void MessagesLibraryLog::AddDeleteEntry( const ScenarioFolder& folder , const security::User* user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back("Répertoire de scénarios");
+			content.push_back("Suppression de "+ folder.getFullName());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, folder.getKey());
+		}
+
+
 		void MessagesLibraryLog::AddTemplateDeleteEntry( const TextTemplate& text , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
@@ -232,6 +248,16 @@ namespace synthese
 			content.push_back("Répertoire de modèles de textes" + text.getName());
 			content.push_back("Modification : " + changes);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
+		}
+
+
+
+		void MessagesLibraryLog::AddCreateEntry( const ScenarioFolder& folder , const security::User* user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back("Répertoire de scénarios");
+			content.push_back("Création");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, folder.getKey());
 		}
 	}
 }

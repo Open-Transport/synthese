@@ -22,7 +22,6 @@
 
 #include "SentScenario.h"
 #include "ScenarioTemplate.h"
-#include "ScenarioSentAlarm.h"
 #include "Registry.h"
 
 using namespace std;

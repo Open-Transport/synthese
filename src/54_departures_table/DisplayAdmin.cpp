@@ -72,8 +72,8 @@
 #include "CommercialLine.h"
 #include "ArrivalDepartureTableLog.h"
 #include "MessageAdmin.h"
+#include "SentScenario.h"
 #include "MessagesScenarioAdmin.h"
-#include "SingleSentAlarm.h"
 
 #include <utility>
 #include <sstream>
@@ -772,19 +772,13 @@ namespace synthese
 					stream << t.col() << priority++;
 					stream << t.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 					stream << t.col() << "Message : " + alarm->getShortMessage();
-					stream << t.col() << (alarm->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getPeriodEnd().toString());
+					stream << t.col() <<
+						(alarm->getScenario()->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getScenario()->getPeriodEnd().toString())
+					;
 					stream << t.col();
 
-					if(dynamic_cast<SingleSentAlarm*>(alarm.get()))
-					{
-						viewMessageRequest.setObjectId(alarm->getKey());
-						stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Editer", string(), "note.png");
-					}
-					else
-					{
-						viewScenarioRequest.setObjectId(alarm->getKey());
-						stream << HTMLModule::getLinkButton(viewScenarioRequest.getURL(), "Editer", string(), "note.png");
-					}
+					viewScenarioRequest.setObjectId(alarm->getKey());
+					stream << HTMLModule::getLinkButton(viewScenarioRequest.getURL(), "Editer", string(), "note.png");
 				}
 
 				if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(_displayScreen->getKey()))
@@ -820,20 +814,12 @@ namespace synthese
 						stream << t2.row();
 						stream << t2.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 						stream << t2.col() << "Message : " + alarm->getShortMessage();
-						stream << t2.col() << alarm->getPeriodStart().toString();
-						stream << t2.col() << (alarm->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getPeriodEnd().toString());
+						stream << t2.col() << alarm->getScenario()->getPeriodStart().toString();
+						stream << t2.col() << (alarm->getScenario()->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getScenario()->getPeriodEnd().toString());
 						stream << t2.col();
 
-						if(dynamic_cast<SingleSentAlarm*>(alarm.get()))
-						{
-							viewMessageRequest.setObjectId(alarm->getKey());
-							stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Editer", string(), "note.png");
-						}
-						else
-						{
-							viewScenarioRequest.setObjectId(alarm->getKey());
-							stream << HTMLModule::getLinkButton(viewScenarioRequest.getURL(), "Editer", string(), "note.png");
-						}
+						viewScenarioRequest.setObjectId(alarm->getKey());
+						stream << HTMLModule::getLinkButton(viewScenarioRequest.getURL(), "Editer", string(), "note.png");
 					}
 					stream << t2.close();
 				}

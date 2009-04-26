@@ -28,8 +28,7 @@
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "SentScenario.h"
 #include "SentScenarioInheritedTableSync.h"
-#include "ScenarioSentAlarm.h"
-#include "SingleSentAlarm.h"
+#include "SentAlarm.h"
 #include "AlarmTemplate.h"
 #include "AlarmTableSync.h"
 #include "ScenarioTableSync.h"
@@ -90,7 +89,7 @@ namespace synthese
 			}
 			else
 			{
-				ScenarioSentAlarm alarm(UNKNOWN_VALUE, _sentScenario.get());
+				SentAlarm alarm(UNKNOWN_VALUE, _sentScenario.get());
 					
 				AlarmTableSync::Save(&alarm);
 				

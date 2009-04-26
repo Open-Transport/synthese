@@ -33,6 +33,7 @@
 #include "SentAlarm.h"
 #include "DateTime.h"
 #include "FactorableTemplate.h"
+#include "SentScenario.h"
 
 namespace synthese
 {
@@ -165,12 +166,12 @@ namespace synthese
 	    for (LinkedAlarmsSet::const_iterator its = it->second.begin(); its != it->second.end(); ++its)
 	    {
 			const SentAlarm* candidateAlarm = *its;
-			if (candidateAlarm->isApplicable(date) && (
+			if (candidateAlarm->getScenario()->isApplicable(date) && (
 				alarm == NULL ||
 				candidateAlarm->getLevel() > alarm->getLevel() ||
 				candidateAlarm->getLevel() == alarm->getLevel() &&
-				!candidateAlarm->getPeriodStart().isUnknown() &&
-				candidateAlarm->getPeriodStart() > alarm->getPeriodStart()
+				!candidateAlarm->getScenario()->getPeriodStart().isUnknown() &&
+				candidateAlarm->getScenario()->getPeriodStart() > alarm->getScenario()->getPeriodStart()
 				)) alarm = candidateAlarm;
 
 	    }

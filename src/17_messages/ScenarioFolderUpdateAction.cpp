@@ -79,7 +79,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_PARENT_FOLDER_ID, true, FACTORY_KEY));
 				if (id > 0)
 				{
-					_parentFolder = ScenarioFolderTableSync::Get(id, _env);
+					_parentFolder = ScenarioFolderTableSync::GetEditable(id, _env);
 				}
 			}
 			catch(...)
@@ -106,7 +106,7 @@ namespace synthese
 		void ScenarioFolderUpdateAction::run()
 		{
 			_folder->setName(_name);
-			_folder->setParentId(_parentFolder.get() ? _parentFolder->getKey() : 0);
+			_folder->setParent(_parentFolder.get());
 
 			ScenarioFolderTableSync::Save(_folder.get());
 		}

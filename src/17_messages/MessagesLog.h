@@ -31,8 +31,7 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
-		class SingleSentAlarm;
-		class ScenarioSentAlarm;
+		class SentAlarm;
 		class ScenarioTemplate;
 		class SentScenario;
 		class SentAlarm;
@@ -62,16 +61,7 @@ namespace synthese
 				const server::Request& request
 			) const;
 			
-			static void AddNewSingleMessageEntry(
-				const SingleSentAlarm& alarm,
-				const security::User* user
-			);
-			
-			static void AddNewSingleMessageEntry(
-				const SingleSentAlarm& alarm,
-				const SingleSentAlarm& copiedAlarm,
-				const security::User* user
-			);
+
 
 			static void AddNewScenarioMessageEntry(
 				const Alarm& alarm,
@@ -94,17 +84,12 @@ namespace synthese
 
 
 			static void	addUpdateEntry(
-				const SingleSentAlarm* alarm
-				, const std::string& text
-				, const security::User* user
-				);
-			static void	addUpdateEntry(
 				const SentScenario* scenario
 				, const std::string& text
 				, const security::User* user
 				);
 			static void	addUpdateEntry(
-				const ScenarioSentAlarm* alarm
+				const SentAlarm* alarm
 				, const std::string& text
 				, const security::User* user
 				);

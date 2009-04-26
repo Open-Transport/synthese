@@ -32,7 +32,8 @@ namespace synthese
 {
 	namespace messages
 	{
-		/** ScenarioFolder class.
+		/** Scenario Folder class.
+			
 			@ingroup m17
 		*/
 		class ScenarioFolder
@@ -44,7 +45,7 @@ namespace synthese
 			typedef util::Registry<ScenarioFolder>	Registry;
 
 		protected:
-			util::RegistryKeyType	_parentId;
+			ScenarioFolder* _parent;
 			std::string	_name;
 
 		public:
@@ -52,11 +53,28 @@ namespace synthese
 				util::RegistryKeyType key = UNKNOWN_VALUE
 			);
 
-			util::RegistryKeyType	getParentId()	const;
-			const std::string&		getName()		const;
+			//! @name Getters
+			//@{
+				ScenarioFolder*		getParent()	const;
+				const std::string&	getName()	const;
+			//@}
 
-			void	setName(const std::string& value);
-			void	setParentId(util::RegistryKeyType value);
+			//! @name Setters
+			//@{
+				void	setName(const std::string& value);
+				void	setParent(ScenarioFolder* value);
+			//@}
+
+			//! @name Queries
+			//@{
+				/** Full path getter.
+					@return std::string The name of the folder and its parent separated by /
+					@author Hugues Romain
+					@date 2009					
+				*/
+				std::string getFullName() const;
+			//@}
+
 		};
 	}
 }

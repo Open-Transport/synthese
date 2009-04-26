@@ -29,8 +29,7 @@
 #include "MessagesModule.h"
 #include "Alarm.h"
 #include "AlarmTemplate.h"
-#include "SingleSentAlarm.h"
-#include "ScenarioSentAlarm.h"
+#include "SentAlarm.h"
 #include "AlarmTableSync.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
@@ -59,6 +58,7 @@ namespace synthese
 		const string UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE = Action_PARAMETER_PREFIX + "sme";
 		const string UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lme";
 		const string UpdateAlarmMessagesAction::PARAMETER_ALARM_ID(Action_PARAMETER_PREFIX + "id");
+		const string UpdateAlarmMessagesAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
 
 
 		ParametersMap UpdateAlarmMessagesAction::getParametersMap() const
@@ -73,6 +73,7 @@ namespace synthese
 			try
 			{
 				setAlarmId(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
+				_type = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE, true, FACTORY_KEY));
 				_shortMessage = map.getString(PARAMETER_SHORT_MESSAGE, true, FACTORY_KEY);
 				_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
 			}
@@ -85,9 +86,15 @@ namespace synthese
 		void UpdateAlarmMessagesAction::run() throw(ActionException)
 		{
 			stringstream s;
+			DBLogModule::appendToLogIfChange(s,
+				"type",
+				MessagesModule::getLevelLabel(_alarm->getLevel()),
+				MessagesModule::getLevelLabel(_type)
+			);
 			DBLogModule::appendToLogIfChange(s, "message court", _alarm->getShortMessage(), _shortMessage);
 			DBLogModule::appendToLogIfChange(s, "message long", _alarm->getLongMessage(), _longMessage);
 
+			_alarm->setLevel(_type);
 			_alarm->setShortMessage(_shortMessage);
 			_alarm->setLongMessage(_longMessage);
 			AlarmTableSync::Save(_alarm.get());
@@ -98,14 +105,9 @@ namespace synthese
 				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
 				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), s.str(), _request->getUser().get());
 			}
-			else if (dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm).get())
-			{
-				shared_ptr<const SingleSentAlarm> singleSentAlarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(singleSentAlarm.get(), s.str(), _request->getUser().get());
-			}
 			else
 			{
-				shared_ptr<const ScenarioSentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm);
+				shared_ptr<const SentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
 				MessagesLog::addUpdateEntry(scenarioSentAlarm.get(), s.str(), _request->getUser().get());
 			}
 		}

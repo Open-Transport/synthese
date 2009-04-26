@@ -69,6 +69,8 @@ namespace synthese
 			split(tokens, txtVariables, is_any_of("|"));
 			BOOST_FOREACH(const string& token, tokens)
 			{
+				if(token.empty()) continue;
+
 				typedef split_iterator<string::const_iterator> string_split_iterator;
 				string_split_iterator it = make_split_iterator(token, first_finder("$", is_iequal()));
 				string code = copy_range<string>(*it);
@@ -160,19 +162,24 @@ namespace synthese
 
 		}
 
+
+
 		void SentScenarioInheritedTableSync::Search(
-			Env& env,
-			time::DateTime startDate,
-			time::DateTime endDate,
-			const std::string name,
-			int first /*= 0*/,
-			int number /*= 0*/,
-			bool orderByDate,
-			bool orderByName,
-			bool orderByStatus,
-			bool orderByConflict,
-			bool raisingOrder,
-			LinkLevel linkLevel
+			util::Env& env,
+			boost::optional<std::string> name /*= boost::optional<std::string>()*/,
+			/*AlarmConflict conflict, */
+			/*AlarmLevel level, */
+			boost::optional<StatusSearch> status /*= boost::optional<StatusSearch>()*/,
+			boost::optional<time::DateTime> date /*= boost::optional<time::DateTime>()*/,
+			boost::optional<util::RegistryKeyType> scenarioId /*= boost::optional<util::RegistryKeyType>()*/,
+			boost::optional<int> first /*= boost::optional<int>()*/,
+			boost::optional<int> number /*= boost::optional<int>()*/,
+			bool orderByDate /*= true*/,
+			bool orderByName /*= false*/,
+			bool orderByStatus /*= false*/,
+			//bool orderByConflict /*= false*/,
+			bool raisingOrder /*= false*/,
+			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
 		){
 			stringstream query;
 			query
@@ -180,24 +187,120 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				<< COL_IS_TEMPLATE << "=0";
-			if (!startDate.isUnknown())
-				query << " AND " << ScenarioTableSync::COL_PERIODEND << "<=" << startDate.toSQLString();
-			if (!endDate.isUnknown())
-				query << " AND " << ScenarioTableSync::COL_PERIODSTART << "<=" << endDate.toSQLString();
-			if (!name.empty())
-				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
-			if (orderByDate)
-				query << " ORDER BY " << COL_PERIODSTART << (raisingOrder ? " ASC" : " DESC") << "," << COL_PERIODEND  << (raisingOrder ? " ASC" : " DESC");
+
+			if (name)
+			{
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+			}
+
+			if(status && date)
+			{
+				switch(*status)
+				{
+				case BROADCAST_OVER:
+					query << " AND " << ScenarioTableSync::COL_PERIODEND << " IS NOT NULL "
+						<< " AND " << ScenarioTableSync::COL_PERIODEND << "<" << date->toSQLString()
+						;
+					break;
+
+				case BROADCAST_RUNNING:
+					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL "
+						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">" << date->toSQLString()
+						<< ") AND " << ScenarioTableSync::COL_ENABLED
+						;
+					break;
+
+				case BROADCAST_RUNNING_WITH_END:
+					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL "
+						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<=" << date->toSQLString()
+						<< ") AND " << ScenarioTableSync::COL_ENABLED
+						<<  " AND " << ScenarioTableSync::COL_PERIODEND << " IS NOT NULL "
+						<< " AND " << ScenarioTableSync::COL_PERIODEND << ">" << date->toSQLString()
+						;
+					break;
+
+				case BROADCAST_RUNNING_WITHOUT_END:
+					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL "
+						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<=" << date->toSQLString()
+						<< ") AND " << ScenarioTableSync::COL_ENABLED
+						<<  " AND " << ScenarioTableSync::COL_PERIODEND << " IS NULL "
+						;
+					break;
+
+				case FUTURE_BROADCAST:
+					query << " AND " << ScenarioTableSync::COL_PERIODSTART << " IS NOT NULL "
+						<< " AND " << ScenarioTableSync::COL_PERIODSTART << ">" << date->toSQLString()
+						<< " AND " << ScenarioTableSync::COL_ENABLED
+						;
+					break;
+
+				case BROADCAST_DRAFT:
+					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL "
+						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">" << date->toSQLString()
+						<< ") AND NOT " << ScenarioTableSync::COL_ENABLED
+						;
+					break;
+				}
+			}
+
+			if(!status && date)
+			{
+				query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " <<
+					ScenarioTableSync::COL_PERIODSTART << " <= " << date->toSQLString() <<
+					") AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " <<
+					ScenarioTableSync::COL_PERIODEND << " >= " << date->toSQLString() <<
+					")"
+				;
+			}
+
+			if(scenarioId)
+			{
+				query << " AND " << ScenarioTableSync::COL_TEMPLATE << "=" << *scenarioId;
+			}
+
+
+			/*				<< ",(SELECT COUNT(" << AlarmObjectLinkTableSync::COL_OBJECT_ID << ") FROM " <<
+			AlarmObjectLinkTableSync::TABLE.NAME << " AS aol3 WHERE aol3." <<
+			AlarmObjectLinkTableSync::COL_ALARM_ID << "=a." << TABLE_COL_ID << ") AS " <<
+			_COL_RECIPIENTS_NUMBER*/
+
+			/*				<< ",(SELECT MAX(al2."  << COL_LEVEL << ") FROM " << AlarmObjectLinkTableSync::TABLE.NAME <<
+			" AS aol1 INNER JOIN " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol2 ON aol1." <<
+			AlarmObjectLinkTableSync::COL_OBJECT_ID << "=aol2." <<
+			AlarmObjectLinkTableSync::COL_OBJECT_ID << " AND aol1." <<
+			AlarmObjectLinkTableSync::COL_ALARM_ID << " != aol2." <<
+			AlarmObjectLinkTableSync::COL_ALARM_ID << " INNER JOIN " << TABLE.NAME << " AS al2 ON al2." <<
+			TABLE_COL_ID << " = aol2." << AlarmObjectLinkTableSync::COL_ALARM_ID << " WHERE "
+			<< " aol1." << AlarmObjectLinkTableSync::COL_ALARM_ID << "=a." << TABLE_COL_ID
+			<< " AND al2." << COL_IS_TEMPLATE << "=0 "
+			<< " AND (al2." << COL_PERIODSTART << " IS NULL OR a." << COL_PERIODEND << " IS NULL OR al2." <<
+			COL_PERIODSTART << " <= a." << COL_PERIODEND << ")"
+			<< " AND (al2." << COL_PERIODEND << " IS NULL OR a." << COL_PERIODSTART << " IS NULL OR al2." <<
+			COL_PERIODEND <<" >= a." << COL_PERIODSTART << ")"
+			<< ") AS " << _COL_CONFLICT_LEVEL*/
+
+			if(orderByDate)
+			{
+				query <<
+					" ORDER BY" <<
+					" start IS NULL " << (raisingOrder ? "DESC" : "ASC") << "," <<
+					" start " << (raisingOrder ? "ASC" : "DESC") << "," <<
+					" end IS NULL " << (raisingOrder ? "ASC" : "DESC") << "," <<
+					" end " << (raisingOrder ? "ASC" : "DESC")
+					;
+			}
+
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
+			if (first)
+				query << " OFFSET " << Conversion::ToString(*first);
 
 			LoadFromQuery(query.str(), env, linkLevel);
 		}
-		
+
 		
 		
 		void SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
@@ -209,7 +312,7 @@ namespace synthese
 			AlarmTemplateInheritedTableSync::Search(env, sourceId);
 			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
 			{
-				ScenarioSentAlarm alarm(dest, *templateAlarm);
+				SentAlarm alarm(dest, *templateAlarm);
 				AlarmTableSync::Save(&alarm);
 
 				AlarmObjectLinkTableSync::CopyRecipients(
@@ -230,7 +333,7 @@ namespace synthese
 			ScenarioSentAlarmInheritedTableSync::Search(env, sourceId);
 			BOOST_FOREACH(shared_ptr<SentAlarm> templateAlarm, env.getRegistry<SentAlarm>())
 			{
-				ScenarioSentAlarm alarm(dest, static_cast<ScenarioSentAlarm&>(*templateAlarm));
+				SentAlarm alarm(static_cast<SentAlarm&>(*templateAlarm));
 				AlarmTableSync::Save(&alarm);
 
 				AlarmObjectLinkTableSync::CopyRecipients(

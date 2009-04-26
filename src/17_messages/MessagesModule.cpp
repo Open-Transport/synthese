@@ -126,8 +126,6 @@ namespace synthese
 			vector<pair<RegistryKeyType, string> > m;
 			if (withAll)
 				m.push_back(make_pair(static_cast<RegistryKeyType>(ALARM_LEVEL_UNKNOWN), "(tous)"));
-			m.push_back(make_pair(static_cast<RegistryKeyType>(ALARM_LEVEL_INFO), getLevelLabel(ALARM_LEVEL_INFO)));
-			m.push_back(make_pair(static_cast<RegistryKeyType>(ALARM_LEVEL_WARNING), getLevelLabel(ALARM_LEVEL_WARNING)));
 			
 			vector<pair<uid, string> > s(MessagesModule::GetScenarioTemplatesLabels());
 			for(vector<pair<uid, string> >::const_iterator it(s.begin()); it != s.end(); ++it)

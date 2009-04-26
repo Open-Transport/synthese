@@ -32,7 +32,6 @@
 #include "SentScenario.h"
 #include "ScenarioTableSync.h"
 #include "AlarmTableSync.h"
-#include "ScenarioNameUpdateAction.h"
 #include "ScenarioUpdateDatesAction.h"
 #include "DeleteAlarmAction.h"
 #include "NewMessageAction.h"
@@ -49,6 +48,7 @@
 #include "ActionException.h"
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
+#include "ScenarioFolder.h"
 
 #include <boost/foreach.hpp>
 
@@ -122,12 +122,10 @@ namespace synthese
 
 
 
-		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables
+		void MessagesScenarioAdmin::display(
+			ostream& stream,
+			interfaces::VariablesMap& variables
 		) const	{
-			ActionFunctionRequest<ScenarioNameUpdateAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<MessagesScenarioAdmin>();
-			updateRequest.setObjectId(_scenario->getKey());
-
 
 			////////////////////////////////////////////////////////////////////
 			// TAB PARAMETERS
@@ -136,41 +134,42 @@ namespace synthese
 				ActionFunctionRequest<ScenarioUpdateDatesAction, AdminRequest> updateDatesRequest(_request);
 				updateDatesRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 				updateDatesRequest.setObjectId(_scenario->getKey());
+				updateDatesRequest.getAction()->setScenarioId(_scenario->getKey());
 
-				stream << "<h1>Propriétés</h1>";
-				PropertiesHTMLTable tp(updateRequest.getHTMLForm("update"));
-				stream << tp.open();
-				stream << tp.cell("Nom", tp.getForm().getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()));
-				if (_templateScenario.get())
-				{
-					stream << tp.cell("Répertoire", tp.getForm().getSelectInput(ScenarioNameUpdateAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(), _templateScenario->getFolderId()));
-				}
-				stream << tp.close();
-
-				stream << "<h1>Diffusion</h1>";
+				stream << "<h1>Paramètres</h1>";
 				PropertiesHTMLTable udt(updateDatesRequest.getHTMLForm("update_dates"));
 
 				stream << udt.open();
-				stream << udt.title("Paramètres");
-				stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
-				stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd()));
-				
-				stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
-
-				if (_sentScenario->getTemplate() && !_sentScenario->getTemplate()->getVariables().empty())
+				stream << udt.title("Propriétés");
+				stream << udt.cell("Nom", udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_NAME, _scenario->getName()));
+				if (_templateScenario.get())
 				{
-					stream << udt.title("Variables (* = champ obligatoire)");
-					const ScenarioTemplate::VariablesMap& variables(_sentScenario->getTemplate()->getVariables());
-					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
-					{
-						string value;
-						SentScenario::VariablesMap::const_iterator it(_sentScenario->getVariables().find(variable.second.code));
-						if (it != _sentScenario->getVariables().end()) value = it->second;
+					stream << udt.cell("Répertoire", udt.getForm().getSelectInput(ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(), _templateScenario->getFolder() ? _templateScenario->getFolder()->getKey() : 0));
+				}
+				if(_sentScenario.get())
+				{
+					stream << udt.title("Diffusion");
+					stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
+					stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd()));
 
-						stream << udt.cell(
-							variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" ("+ HTMLModule::getHTMLImage("info.png", "Info : ") + variable.second.helpMessage + ")"))
-							, udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_VARIABLE, value)
-						);
+					stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
+				
+
+					if (_sentScenario->getTemplate() && !_sentScenario->getTemplate()->getVariables().empty())
+					{
+						stream << udt.title("Variables (* = champ obligatoire)");
+						const ScenarioTemplate::VariablesMap& variables(_sentScenario->getTemplate()->getVariables());
+						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
+						{
+							string value;
+							SentScenario::VariablesMap::const_iterator it(_sentScenario->getVariables().find(variable.second.code));
+							if (it != _sentScenario->getVariables().end()) value = it->second;
+
+							stream << udt.cell(
+								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" ("+ HTMLModule::getHTMLImage("info.png", "Info : ") + variable.second.helpMessage + ")"))
+								, udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_VARIABLE, value)
+							);
+						}
 					}
 				}
 				stream << udt.close();
@@ -281,38 +280,17 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
-		) const
-		{
+
+
+		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPagesOfParent(
+			const PageLink& parentLink,
+			const AdminInterfaceElement& currentPage
+		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (currentPage.getFactoryKey() == FACTORY_KEY)
-			{
-				const MessagesScenarioAdmin& currentSPage(static_cast<const MessagesScenarioAdmin&>(currentPage));
-				if (parentLink.factoryKey == (currentSPage._sentScenario.get() ? MessagesAdmin::FACTORY_KEY : MessagesLibraryAdmin::FACTORY_KEY))
-				{
-					links.push_back(currentPage.getPageLink());
-				}
-			}
-
-			if (currentPage.getFactoryKey() == MessageAdmin::FACTORY_KEY && parentLink.factoryKey == MessagesAdmin::FACTORY_KEY)
-			{
-				const MessageAdmin& currentSPage(static_cast<const MessageAdmin&>(currentPage));
-				shared_ptr<const ScenarioSentAlarm> alarm(dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(currentSPage.getAlarm()));
-				if (alarm.get())
-				{
-					const SentScenario* scenario(alarm->getScenario());
-					AdminInterfaceElement::PageLink link(getPageLink());
-					link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
-					link.name = scenario->getName();
-					link.icon = MessagesScenarioAdmin::ICON;
-					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString(scenario->getKey());
-					links.push_back(link);
-				}
-			}
-
 			return links;
 		}
+
+
 
 		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages( const AdminInterfaceElement& currentPage) const
 		{
@@ -354,6 +332,8 @@ namespace synthese
 			return links;
 		}
 
+
+
 		std::string MessagesScenarioAdmin::getTitle() const
 		{
 			return _scenario.get() ? _scenario->getName() : DEFAULT_TITLE;
@@ -375,12 +355,9 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			if (_sentScenario.get() != NULL)
-			{
-				_tabs.push_back(Tab("Paramètres de diffusion", TAB_PARAMETERS, true, "table.png"));
-			}
-			_tabs.push_back(Tab("Messages diffusés", TAB_MESSAGES, true, "note.png"));
-			if (_templateScenario.get() != NULL)
+			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, true, "table.png"));
+			_tabs.push_back(Tab("Messages", TAB_MESSAGES, true, "note.png"));
+			if(_templateScenario.get())
 			{
 				_tabs.push_back(Tab("Variables", TAB_VARIABLES, true));
 			}

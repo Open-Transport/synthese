@@ -23,10 +23,9 @@
 #ifndef SYNTHESE_AddScenarioAction_H__
 #define SYNTHESE_AddScenarioAction_H__
 
-#include "30_server/Action.h"
+#include "Action.h"
 
-#include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -50,8 +49,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<const ScenarioTemplate>	_template;
 			std::string									_name;
-			boost::shared_ptr<const ScenarioFolder>		_folder;
-			uid											_folderId;
+			boost::shared_ptr<ScenarioFolder>		_folder;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

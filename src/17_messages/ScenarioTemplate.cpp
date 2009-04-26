@@ -48,7 +48,7 @@ namespace synthese
 			const std::string& name
 		):	Scenario(name),
 			Registrable(UNKNOWN_VALUE),
-			_folderId(source._folderId),
+			_folder(source._folder),
 			_variables(source._variables)
 		{
 		}
@@ -57,10 +57,10 @@ namespace synthese
 
 		ScenarioTemplate::ScenarioTemplate(
 			const std::string name,
-			RegistryKeyType folderId
+			ScenarioFolder* folder
 		):	Scenario(name)
 			, util::Registrable(UNKNOWN_VALUE)
-			, _folderId(folderId)
+			, _folder(folder)
 		{
 		}
 
@@ -70,10 +70,12 @@ namespace synthese
 			util::RegistryKeyType key
 		):	util::Registrable(key)
 			, Scenario()
-			, _folderId(UNKNOWN_VALUE)
+			, _folder(NULL)
 		{
 
 		}
+
+
 
 		ScenarioTemplate::~ScenarioTemplate()
 		{
@@ -82,16 +84,16 @@ namespace synthese
 
 
 
-		uid ScenarioTemplate::getFolderId() const
+		ScenarioFolder* ScenarioTemplate::getFolder() const
 		{
-			return _folderId;
+			return _folder;
 		}
 
 
 
-		void ScenarioTemplate::setFolderId( uid value )
+		void ScenarioTemplate::setFolder(ScenarioFolder* value )
 		{
-			_folderId = value;
+			_folder = value;
 		}
 
 

@@ -33,6 +33,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class ScenarioFolder;
+
 		/** ScenarioFolderAdd action class.
 			@ingroup m17Actions refActions
 		*/
@@ -44,7 +46,7 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 
 		private:
-			uid			_parentId;
+			boost::shared_ptr<ScenarioFolder>			_parent;
 			std::string	_name;
 
 		protected:

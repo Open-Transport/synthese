@@ -22,8 +22,7 @@
 #include "AlarmTableSync.h"
 
 #include "AlarmTemplate.h"
-#include "ScenarioSentAlarm.h"
-#include "SingleSentAlarm.h"
+#include "SentAlarm.h"
 #include "AlarmTemplate.h"
 #include "SentScenario.h"
 #include "SentScenarioInheritedTableSync.h"
@@ -32,7 +31,6 @@
 #include "17_messages/Types.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
-#include "SingleSentAlarmInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
 
 #include "Conversion.h"
@@ -105,22 +103,18 @@ namespace synthese
 		{
 			return row->getBool(AlarmTableSync::COL_IS_TEMPLATE)
 				? AlarmTemplateInheritedTableSync::FACTORY_KEY
-				: (row->getLongLong(AlarmTableSync::COL_SCENARIO_ID) > 0) 
-				? ScenarioSentAlarmInheritedTableSync::FACTORY_KEY
-				: SingleSentAlarmInheritedTableSync::FACTORY_KEY
-				;
+				: ScenarioSentAlarmInheritedTableSync::FACTORY_KEY
+			;
 		}
 
 
 		template<>
 		string SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const Alarm* obj)
 		{
-			return	(dynamic_cast<const SingleSentAlarm*>(obj) != NULL)
-				?	SingleSentAlarmInheritedTableSync::FACTORY_KEY
-				:	(dynamic_cast<const ScenarioSentAlarm*>(obj) != NULL)
+			return	(dynamic_cast<const SentAlarm*>(obj) != NULL)
 				?	ScenarioSentAlarmInheritedTableSync::FACTORY_KEY
 				:	AlarmTemplateInheritedTableSync::FACTORY_KEY
-				;
+			;
 		}
 
 		template<> void SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_CommonLoad(

@@ -101,7 +101,7 @@ namespace synthese
 			ScenarioFolderTableSync::Remove(_folder->getKey());
 
 			if (_request->getObjectId() == _folder->getKey())
-				_request->setObjectId(_folder->getParentId());
+				_request->setObjectId(_folder->getParent() ? _folder->getParent()->getKey() : 0);
 		}
 
 

@@ -36,12 +36,26 @@ namespace synthese
 {
 	namespace messages
 	{
-		class SentScenario;
+		class Scenario;
+		class ScenarioFolder;
+		class ScenarioTemplate;
 
 		////////////////////////////////////////////////////////////////////
-		/// Scenario Update dates and variables action class.
+		/// Scenario parameters update action class.
+		///
+		/// This action updates :
+		///  - for a scenario template :
+		///    - the scenario name
+		///    - the scenario folder
+		///  - for a sent scenario :
+		///    - the scenario name
+		///    - the broadcast dates
+		///    - the activation status
+		///    - the content of the variables
+		///
 		///	@ingroup m17Actions refActions
-		class ScenarioUpdateDatesAction : public util::FactorableTemplate<server::Action, ScenarioUpdateDatesAction>
+		class ScenarioUpdateDatesAction:
+			public util::FactorableTemplate<server::Action, ScenarioUpdateDatesAction>
 		{
 		public:
 			static const std::string PARAMETER_START_DATE;
@@ -49,13 +63,19 @@ namespace synthese
 			static const std::string PARAMETER_ENABLED;
 			static const std::string PARAMETER_VARIABLE;
 			static const std::string PARAMETER_SCENARIO_ID;
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_FOLDER_ID;
 
 		private:
-			bool								_enabled;
-			time::DateTime						_startDate;
-			time::DateTime						_endDate;
-			boost::shared_ptr<SentScenario>		_scenario;
-			SentScenario::VariablesMap			_variables;
+			std::string								_name;
+			boost::shared_ptr<ScenarioFolder>		_folder;
+			bool									_enabled;
+			time::DateTime							_startDate;
+			time::DateTime							_endDate;
+			boost::shared_ptr<Scenario>				_scenario;
+			boost::shared_ptr<SentScenario>			_sscenario;
+			boost::shared_ptr<ScenarioTemplate>		_tscenario;
+			SentScenario::VariablesMap				_variables;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

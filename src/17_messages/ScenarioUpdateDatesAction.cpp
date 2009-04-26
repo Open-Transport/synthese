@@ -26,10 +26,10 @@
 #include "RequestMissingParameterException.h"
 #include "MessagesModule.h"
 #include "ScenarioTableSync.h"
-#include "SentScenario.h"
 #include "ScenarioTemplate.h"
 #include "SentScenarioInheritedTableSync.h"
 #include "MessagesLog.h"
+#include "MessagesLibraryLog.h"
 #include "MessagesRight.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -37,6 +37,9 @@
 #include "TimeParseException.h"
 #include "Conversion.h"
 #include "DBLogModule.h"
+#include "ScenarioFolder.h"
+#include "ScenarioFolderTableSync.h"
+#include "ScenarioTemplateInheritedTableSync.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -62,6 +65,8 @@ namespace synthese
 		const string ScenarioUpdateDatesAction::PARAMETER_END_DATE(Action_PARAMETER_PREFIX + "eda");
 		const string ScenarioUpdateDatesAction::PARAMETER_VARIABLE(Action_PARAMETER_PREFIX + "var");
 		const string ScenarioUpdateDatesAction::PARAMETER_SCENARIO_ID(Action_PARAMETER_PREFIX + "sid");
+		const string ScenarioUpdateDatesAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
+		const string ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
 
 		ParametersMap ScenarioUpdateDatesAction::getParametersMap() const
 		{
@@ -75,17 +80,39 @@ namespace synthese
 			try
 			{
 				setScenarioId(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
-				
-				_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
 
-				_startDate = map.getDateTime(PARAMETER_START_DATE, true, FACTORY_KEY);
+				// Name
+				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 
-				_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
-
-				const ScenarioTemplate::VariablesMap& variables(_scenario->getTemplate()->getVariables());
-				BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+				if(_tscenario.get())
 				{
-					_variables.insert(make_pair(variable.second.code, map.getString(PARAMETER_VARIABLE + variable.second.code, variable.second.compulsory, FACTORY_KEY)));
+					uid folderId(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
+
+					if (folderId != 0)
+					{
+						_folder = ScenarioFolderTableSync::GetEditable(folderId, _env);
+					}
+
+					// Uniqueness control
+					Env env;
+					ScenarioTemplateInheritedTableSync::Search(env, folderId, _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
+					if (!env.getRegistry<ScenarioTemplate>().empty())
+						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
+				}
+
+				if(_sscenario.get())
+				{
+					_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
+
+					_startDate = map.getDateTime(PARAMETER_START_DATE, true, FACTORY_KEY);
+
+					_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
+
+					const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
+					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+					{
+						_variables.insert(make_pair(variable.second.code, map.getString(PARAMETER_VARIABLE + variable.second.code, variable.second.compulsory, FACTORY_KEY)));
+					}
 				}
 			}
 			catch(RequestMissingParameterException& e)
@@ -96,8 +123,9 @@ namespace synthese
 			{
 				throw ActionException("Une date ou une heure est mal formée");
 			}
-
 		}
+
+
 
 		ScenarioUpdateDatesAction::ScenarioUpdateDatesAction()
 			: FactorableTemplate<Action, ScenarioUpdateDatesAction>()
@@ -105,33 +133,64 @@ namespace synthese
 			, _endDate(TIME_UNKNOWN)
 		{}
 
+
+
 		void ScenarioUpdateDatesAction::run()
 		{
 			// Log message
 			stringstream text;
-			DBLogModule::appendToLogIfChange(text, "Affichage ", _scenario->getIsEnabled() ? "activé" : "désactivé", _enabled ? "activé" : "désactivé");
-			DBLogModule::appendToLogIfChange(text, "Date de début", _scenario->getPeriodStart().toString(), _startDate.toString());
-			DBLogModule::appendToLogIfChange(text, "Date de fin", _scenario->getPeriodEnd().toString(), _endDate.toString());
-
-			const ScenarioTemplate::VariablesMap& variables(_scenario->getTemplate()->getVariables());
-			BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+			DBLogModule::appendToLogIfChange(text, "Nom", _scenario->getName(), _name);
+			if(_tscenario.get())
 			{
-				string value;
-				SentScenario::VariablesMap::const_iterator it(_scenario->getVariables().find(variable.second.code));
-				if (it != _scenario->getVariables().end()) value = it->second;
+				DBLogModule::appendToLogIfChange(
+					text,
+					"Dossier",
+					_tscenario->getFolder() ? "/" : _tscenario->getFolder()->getFullName(),
+					_folder.get() ? _folder->getFullName() : "/"
+				);
+			}
+			if(_sscenario.get())
+			{
+				DBLogModule::appendToLogIfChange(text, "Affichage ", _sscenario->getIsEnabled() ? "activé" : "désactivé", _enabled ? "activé" : "désactivé");
+				DBLogModule::appendToLogIfChange(text, "Date de début", _sscenario->getPeriodStart().toString(), _startDate.toString());
+				DBLogModule::appendToLogIfChange(text, "Date de fin", _sscenario->getPeriodEnd().toString(), _endDate.toString());
+			
+				const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
+				BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+				{
+					string value;
+					SentScenario::VariablesMap::const_iterator it(_sscenario->getVariables().find(variable.second.code));
+					if (it != _sscenario->getVariables().end()) value = it->second;
 
-				DBLogModule::appendToLogIfChange(text, variable.second.code, value, _variables[variable.second.code]);
+					DBLogModule::appendToLogIfChange(text, variable.second.code, value, _variables[variable.second.code]);
+				}
 			}
 
+
 			// Action
-			_scenario->setIsEnabled(_enabled);
-			_scenario->setPeriodStart(_startDate);
-			_scenario->setPeriodEnd(_endDate);
-			_scenario->setVariables(_variables);
+			_scenario->setName(_name);
+			if(_tscenario.get())
+			{
+				_tscenario->setFolder(_folder.get());
+			}
+			if(_sscenario.get())
+			{
+				_sscenario->setIsEnabled(_enabled);
+				_sscenario->setPeriodStart(_startDate);
+				_sscenario->setPeriodEnd(_endDate);
+				_sscenario->setVariables(_variables);
+			}
 			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
-			MessagesLog::addUpdateEntry(_scenario.get(), text.str(), _request->getUser().get());
+			if(_sscenario.get())
+			{
+				MessagesLog::addUpdateEntry(_sscenario.get(), text.str(), _request->getUser().get());
+			}
+			else
+			{
+				MessagesLibraryLog::addUpdateEntry(_tscenario.get(), text.str(), _request->getUser().get());
+			}
 		}
 
 
@@ -148,7 +207,9 @@ namespace synthese
 		) throw(ActionException) {
 			try
 			{
-				_scenario = SentScenarioInheritedTableSync::GetEditable(id, _env, UP_LINKS_LOAD_LEVEL);
+				_scenario = ScenarioTableSync::GetEditable(id, _env, UP_LINKS_LOAD_LEVEL);
+				_sscenario = dynamic_pointer_cast<SentScenario, Scenario>(_scenario);
+				_tscenario = dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario);
 			}
 			catch(ObjectNotFoundException<Scenario>& e)
 			{

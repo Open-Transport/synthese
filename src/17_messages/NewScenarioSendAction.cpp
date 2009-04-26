@@ -21,7 +21,6 @@
 */
 
 #include "NewScenarioSendAction.h"
-#include "SingleSentAlarmInheritedTableSync.h"
 #include "SentScenario.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateInheritedTableSync.h"
@@ -35,7 +34,6 @@
 #include "Request.h"
 #include "QueryString.h"
 #include "ParametersMap.h"
-#include "SingleSentAlarm.h"
 #include "AlarmTemplate.h"
 #include "AdminModule.h"
 #include "MessagesScenarioAdmin.h"
@@ -77,25 +75,13 @@ namespace synthese
 			RegistryKeyType id(map.getUid(PARAMETER_MESSAGE_TO_COPY, false, FACTORY_KEY));
 			if(id > 0)
 			{
-				if(decodeTableId(id) == ScenarioTableSync::TABLE.ID)
+				try
 				{
-					try
-					{
-						_scenarioToCopy = SentScenarioInheritedTableSync::Get(id, _env);
-					}
-					catch(Exception& e)
-					{
-						throw ActionException("scenario to copy", id, FACTORY_KEY, e);
-					}
-				} else {
-					try
-					{
-						_messageToCopy = SingleSentAlarmInheritedTableSync::Get(id, _env);
-					}
-					catch(Exception& e)
-					{
-						throw ActionException("message to copy", id, FACTORY_KEY, e);
-					}
+					_scenarioToCopy = SentScenarioInheritedTableSync::Get(id, _env);
+				}
+				catch(Exception& e)
+				{
+					throw ActionException("scenario to copy", id, FACTORY_KEY, e);
 				}
 			} else {
 				// Template to source
@@ -143,30 +129,6 @@ namespace synthese
 					scenario, _request->getUser().get()
 				);
 			}
-			else if(_messageToCopy.get()) // Copy of an existing message
-			{
-				SingleSentAlarm alarm(*_messageToCopy);
-				
-				AlarmTableSync::Save(&alarm);
-				
-				AlarmObjectLinkTableSync::CopyRecipients(
-					_messageToCopy->getKey(),
-					alarm.getKey()
-				);
-
-				_request->setObjectId(alarm.getKey());
-				AdminModule::ChangePageInRequest(
-					*_request,
-					MessagesScenarioAdmin::FACTORY_KEY,
-					MessageAdmin::FACTORY_KEY
-				);
-				
-				MessagesLog::AddNewSingleMessageEntry(
-					alarm,
-					*_messageToCopy,
-					_request->getUser().get()
-				);
-			}
 			else if(_template.get()) // New scenario from template
 			{
 				// The action on the scenario
@@ -193,25 +155,6 @@ namespace synthese
 				);
 				MessagesLibraryLog::AddTemplateInstanciationEntry(
 					scenario, _request->getUser().get()
-				);
-			}
-			else	// New message from scratch
-			{
-				SingleSentAlarm alarm;
-				
-				AlarmTableSync::Save(&alarm);
-				
-				_request->setObjectId(alarm.getKey());
-				
-				AdminModule::ChangePageInRequest(
-					*_request,
-					MessagesScenarioAdmin::FACTORY_KEY,
-					MessageAdmin::FACTORY_KEY
-				);
-				
-				MessagesLog::AddNewSingleMessageEntry(
-					alarm,
-					_request->getUser().get()
 				);
 			}
 		}

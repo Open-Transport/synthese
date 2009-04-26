@@ -63,7 +63,7 @@ namespace synthese
 		ParametersMap AddScenarioAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_FOLDER_ID, _folderId);
+			map.insert(PARAMETER_FOLDER_ID, _folder.get() ? _folder->getKey() : 0);
 			return map;
 		}
 
@@ -124,7 +124,7 @@ namespace synthese
 			} else {
 				ScenarioTemplate scenario(
 					_name,
-					_folder.get() ? _folder->getKey() : 0
+					_folder.get()
 				);
 				
 				ScenarioTableSync::Save(&scenario);
@@ -147,19 +147,13 @@ namespace synthese
 			{
 				try
 				{
-					_folderId = id;
-					_folder = ScenarioFolderTableSync::Get(_folderId, _env);
+					_folder = ScenarioFolderTableSync::GetEditable(id, _env);
 				}
 				catch (...)
 				{
 					throw ActionException("Bad folder ID");
 				}
 			}
-			else
-			{
-				_folderId = 0;
-			}
-
 		}
 
 

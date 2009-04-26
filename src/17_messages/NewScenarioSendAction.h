@@ -33,7 +33,6 @@ namespace synthese
 	namespace messages
 	{
 		class ScenarioTemplate;
-		class SingleSentAlarm;
 		class SentScenario;
 
 		/** Action class : sends a new message.
@@ -62,7 +61,6 @@ namespace synthese
 			boost::shared_ptr<const ScenarioTemplate>	_template;
 			
 			boost::shared_ptr<const SentScenario>		_scenarioToCopy;
-			boost::shared_ptr<const SingleSentAlarm>	_messageToCopy;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

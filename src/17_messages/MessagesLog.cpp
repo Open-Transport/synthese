@@ -21,8 +21,7 @@
 */
 
 #include "MessagesLog.h"
-#include "SingleSentAlarm.h"
-#include "ScenarioSentAlarm.h"
+#include "SentAlarm.h"
 #include "SentScenario.h"
 #include "AlarmTableSync.h"
 #include "ScenarioTableSync.h"
@@ -62,31 +61,6 @@ namespace synthese
 			const Request& request
 		) const {
 			return request.isAuthorized<MessagesRight>(READ);
-		}
-
-		void MessagesLog::AddNewSingleMessageEntry(
-			const SingleSentAlarm& alarm,
-			const security::User* user
-		){
-			DBLog::ColumnsVector content;
-			content.push_back(string());
-			content.push_back("Création");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm.getKey());
-		}
-
-
-
-		void MessagesLog::AddNewSingleMessageEntry(
-			const SingleSentAlarm& alarm,
-			const SingleSentAlarm& copiedAlarm,
-			const security::User* user
-		){
-			DBLog::ColumnsVector content;
-			content.push_back(string());
-			content.push_back(
-				"Création par copie de "+ copiedAlarm.getShortMessage()
-			);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm.getKey());
 		}
 
 
@@ -133,17 +107,6 @@ namespace synthese
 
 
 		void MessagesLog::addUpdateEntry(
-			const SingleSentAlarm* alarm
-			, const std::string& text
-			, const security::User* user
-		){
-			DBLog::ColumnsVector content;
-			content.push_back(string());
-			content.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getKey());
-		}
-
-		void MessagesLog::addUpdateEntry(
 			const SentScenario* scenario
 			, const std::string& text
 			, const security::User* user
@@ -155,7 +118,7 @@ namespace synthese
 		}
 
 		void MessagesLog::addUpdateEntry(
-			const ScenarioSentAlarm* alarm
+			const SentAlarm* alarm
 			, const std::string& text
 			, const security::User* user
 		){
@@ -194,12 +157,11 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			stringstream text;
-			text << "Suppression du message " << alarm->getShortMessage();
-			const ScenarioSentAlarm* salarm(dynamic_cast<const ScenarioSentAlarm*>(alarm));
-			if (salarm)
-				text << " du scénario " << salarm->getScenario()->getName();
+			text
+				<< "Suppression du message " << alarm->getShortMessage()
+				<< " du scénario " << alarm->getScenario()->getName();
 			content.push_back(text.str());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
 	}
 }

@@ -44,7 +44,6 @@ namespace synthese
 			typedef util::Registry<AlarmTemplate>	Registry;
 
 		private:
-			const ScenarioTemplate* _scenario;
 
 		public:
 			/** Constructor for reading the object from the database.
@@ -63,7 +62,6 @@ namespace synthese
 			~AlarmTemplate();
 
 			const ScenarioTemplate* getScenario() const;
-			void					setScenario(const ScenarioTemplate* scenario);
 		};
 	}
 }

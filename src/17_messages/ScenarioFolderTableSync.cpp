@@ -27,12 +27,12 @@
 #include "ScenarioFolderTableSync.h"
 #include "ScenarioFolder.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -83,7 +83,22 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText(ScenarioFolderTableSync::COL_NAME));
-			object->setParentId(rows->getLongLong(ScenarioFolderTableSync::COL_PARENT_ID));
+
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				RegistryKeyType id(rows->getLongLong(ScenarioFolderTableSync::COL_PARENT_ID));
+
+				if(id > 0)
+				{
+					object->setParent(
+						ScenarioFolderTableSync::GetEditable(
+							id,
+							env,
+							linkLevel
+						).get()
+					);
+				}
+			}
 		}
 
 
@@ -100,7 +115,7 @@ namespace synthese
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << Conversion::ToString(object->getParentId())
+				<< "," << (object->getParent() ? Conversion::ToString(object->getParent()->getKey()) : "0")
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -124,11 +139,10 @@ namespace synthese
 
 
 
-
 		void ScenarioFolderTableSync::Search(
 			Env& env,
-			uid parentFolderId
-			, string name
+			optional<RegistryKeyType> parentFolderId
+			, optional<string> name
 			, int first /*= 0*/
 			, int number, /*= 0*/
 			LinkLevel linkLevel
@@ -137,18 +151,22 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE "
-				<< COL_NAME << " LIKE " << Conversion::ToSQLiteString(name)	
+				<< " WHERE 1 "
 			;
-			if (parentFolderId > 0)
-				query << " AND " << COL_PARENT_ID << "=" << Conversion::ToString(parentFolderId);
-			else
-				query << " AND " << COL_PARENT_ID << "<=0";
+			if(parentFolderId)
+			{
+				query << " AND " << COL_PARENT_ID << "=" << Conversion::ToString(*parentFolderId);
+			}
+			if(name)
+			{
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+			}
 			query << " ORDER BY " << COL_NAME << " ASC";
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
+
 			LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}

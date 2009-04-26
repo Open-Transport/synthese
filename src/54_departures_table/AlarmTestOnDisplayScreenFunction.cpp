@@ -28,8 +28,7 @@
 #include "QueryString.h"
 #include "Request.h"
 #include "ArrivalDepartureTableRight.h"
-#include "Alarm.h"
-#include "SingleSentAlarm.h"
+#include "SentAlarm.h"
 #include "AlarmTableSync.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
@@ -48,6 +47,7 @@
 #include "AlarmTestOnDisplayScreenFunction.h"
 #include "GraphConstants.h"
 #include "InterfacePageTableSync.h"
+#include "SentScenario.h"
 
 using namespace std;
 using namespace boost;
@@ -139,11 +139,14 @@ namespace synthese
 					d += 1;
 				}
 
-				SingleSentAlarm alarm;
+				SentScenario scenario;
+				scenario.setIsEnabled(true);
+
+				SentAlarm alarm;
 				alarm.setShortMessage(_alarm->getShortMessage());
 				alarm.setLongMessage(_alarm->getLongMessage());
 				alarm.setLevel(_alarm->getLevel());
-				alarm.setIsEnabled(true);
+				alarm.setScenario(&scenario);
 
 				displayedObject.alarm = &alarm;
 				const DeparturesTableInterfacePage* page(

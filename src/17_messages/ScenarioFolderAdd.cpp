@@ -22,15 +22,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/QueryString.h"
-#include "30_server/Request.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "QueryString.h"
+#include "Request.h"
 #include "MessagesLibraryRight.h"
 #include "ScenarioFolderAdd.h"
 #include "ScenarioFolder.h"
-
-#include "17_messages/ScenarioFolderTableSync.h"
+#include "ScenarioFolderTableSync.h"
+#include "MessagesLibraryLog.h"
 
 #include "01_util/Constants.h"
 #include "Env.h"
@@ -68,7 +68,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_NAME, _name);
-			map.insert(PARAMETER_PARENT_ID, _parentId);
+			map.insert(PARAMETER_PARENT_ID, _parent.get() ? _parent->getKey() : 0);
 			return map;
 		}
 		
@@ -76,25 +76,11 @@ namespace synthese
 		
 		void ScenarioFolderAdd::_setFromParametersMap(const ParametersMap& map)
 		{
-			_parentId = map.getUid(PARAMETER_PARENT_ID, false, FACTORY_KEY);
+			setParentId(map.getUid(PARAMETER_PARENT_ID, false, FACTORY_KEY));
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 
-			if (_parentId > 0)
-			{
-				try
-				{
-					shared_ptr<const ScenarioFolder> folder(ScenarioFolderTableSync::Get(_parentId, _env));
-				}
-				catch(...)
-				{
-					throw ActionException("Le répertoire parent désigné n'existe pas.");
-				}
-			}
-			if (_parentId < 0)
-				throw ActionException("Bad parent folder id");
-
 			Env env;
-			ScenarioFolderTableSync::Search(env, _parentId, _name, 0, 1);
+			ScenarioFolderTableSync::Search(env, _parent.get() ? _parent->getKey() : 0, _name, 0, 1);
 			if (!env.getRegistry<ScenarioFolder>().empty())
 				throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
 		}
@@ -104,7 +90,7 @@ namespace synthese
 		void ScenarioFolderAdd::run()
 		{
 			ScenarioFolder f;
-			f.setParentId(_parentId);
+			f.setParent(_parent.get());
 			f.setName(_name);
 
 			ScenarioFolderTableSync::Save(&f);
@@ -113,13 +99,27 @@ namespace synthese
 			{
 				_request->setObjectId(f.getKey());
 			}
+
+			MessagesLibraryLog::AddCreateEntry(f, _request->getUser().get());
 		}
 
 
 
-		void ScenarioFolderAdd::setParentId( uid value )
+		void ScenarioFolderAdd::setParentId( uid id)
 		{
-			_parentId = value;
+			if (id > 0)
+			{
+				try
+				{
+					_parent = ScenarioFolderTableSync::GetEditable(id, _env);
+				}
+				catch(...)
+				{
+					throw ActionException("Le répertoire parent désigné n'existe pas.");
+				}
+			}
+			if (id < 0)
+				throw ActionException("Bad parent folder id");
 		}
 
 

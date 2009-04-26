@@ -21,10 +21,7 @@
 */
 
 #include "Alarm.h"
-
 #include "Scenario.h"
-#include "SingleSentAlarm.h"
-#include "ScenarioSentAlarm.h"
 #include "AlarmTemplate.h"
 
 using namespace boost;
@@ -36,16 +33,34 @@ namespace synthese
 	namespace messages
 	{
 
-		Alarm::Alarm(util::RegistryKeyType key)
-		:	_level(ALARM_LEVEL_INFO)
+		Alarm::Alarm(
+			util::RegistryKeyType key,
+			const Scenario* scenario
+		):	_level(ALARM_LEVEL_INFO),
+			_scenario(scenario)
 		{
 		}
 
-		Alarm::Alarm( const Alarm& source )
-			: _level(source._level)
-			, _shortMessage(source._shortMessage)
-			, _longMessage(source._longMessage)
+		Alarm::Alarm(
+			const Alarm& source
+		):	_level(source._level),
+			_shortMessage(source._shortMessage),
+			_longMessage(source._longMessage),
+			_scenario(source._scenario)
 		{
+		}
+
+
+
+		Alarm::Alarm(
+			const Alarm& source,
+			const Scenario* scenario
+		):	_level(source._level),
+			_shortMessage(source._shortMessage),
+			_longMessage(source._longMessage),
+			_scenario(scenario)
+		{
+
 		}
 
 		const AlarmLevel& Alarm::getLevel () const
@@ -83,6 +98,20 @@ namespace synthese
 		Alarm::~Alarm()
 		{
 
+		}
+
+
+
+		void Alarm::setScenario( const Scenario* scenario )
+		{
+			_scenario = scenario;
+		}
+
+
+
+		const Scenario* Alarm::getScenario() const
+		{
+			return _scenario;
 		}
 	}
 }

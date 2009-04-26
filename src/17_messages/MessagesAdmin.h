@@ -23,17 +23,16 @@
 #ifndef SYNTHESE_MessagesAdmin_H__
 #define SYNTHESE_MessagesAdmin_H__
 
-#include "Date.h"
+#include "DateTime.h"
 #include "ActionResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
 #include "17_messages/Types.h"
-#include "MessagesAdvancedSelectTableSync.h"
+#include "SentScenarioInheritedTableSync.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class SingleSentAlarm;
 		class SentScenario;
 		class ScenarioTemplate;
 
@@ -122,16 +121,15 @@ namespace synthese
 			static const std::string CSS_ALARM_DISPLAYED_WITH_END_DATE;
 
 		private:
-			time::Date											_date;
-			StatusSearch										_searchStatus;
-			AlarmLevel											_searchLevel;
-			AlarmConflict										_searchConflict;
-			boost::shared_ptr<const ScenarioTemplate>			_searchScenario;
+			time::DateTime										_date;
+			SentScenarioInheritedTableSync::StatusSearch		_searchStatus;
+//			AlarmLevel											_searchLevel;
+//			AlarmConflict										_searchConflict;
+			boost::optional<std::string>						_searchName;
+			boost::optional<const ScenarioTemplate*>			_searchScenario;
 			html::ActionResultHTMLTable::RequestParameters		_requestParameters;
 			html::ActionResultHTMLTable::ResultParameters 		_resultParameters;
 
-			SentMessages					_messages;
-			
 			server::ParametersMap	_parametersMap;
 			
 		public:
@@ -139,6 +137,7 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_LEVEL;
 			static const std::string PARAMETER_SEARCH_STATUS;
 			static const std::string PARAMETER_SEARCH_CONFLICT;
+			static const std::string PARAMETER_SEARCH_NAME;
 
 			MessagesAdmin();
 			
@@ -176,6 +175,15 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
 				const PageLink& parentLink
 				, const AdminInterfaceElement& currentPage
+			) const;
+
+
+			/** Sub pages getter.
+				@return PageLinks Ordered vector of sub pages links
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual PageLinks getSubPages(const AdminInterfaceElement& currentPage
 			) const;
 
 			/** Gets the opening position of the node in the tree view.

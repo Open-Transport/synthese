@@ -167,7 +167,7 @@ namespace synthese
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.cell("Nom", t.getForm().getTextInput(ScenarioFolderUpdateAction::PARAMETER_NAME, _folder->getName()));
-				stream << t.cell("Répertoire parent", t.getForm().getSelectInput(ScenarioFolderUpdateAction::PARAMETER_PARENT_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()), _folder->getParentId()));
+				stream << t.cell("Répertoire parent", t.getForm().getSelectInput(ScenarioFolderUpdateAction::PARAMETER_PARENT_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()), _folder->getParent() ? _folder->getParent()->getKey() : 0));
 				stream << t.close();
 			}
 

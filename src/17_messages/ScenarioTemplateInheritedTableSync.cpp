@@ -27,6 +27,8 @@
 #include "AlarmTemplate.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
+#include "ScenarioFolderTableSync.h"
+#include "ScenarioFolder.h"
 
 #include <boost/foreach.hpp>
 
@@ -58,11 +60,15 @@ namespace synthese
 		){
 			_CommonLoad(obj, rows, env, linkLevel);
 
-			obj->setFolderId(rows->getLongLong(ScenarioTableSync::COL_FOLDER_ID));
-
-			if (linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == DOWN_LINKS_LOAD_LEVEL)
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				obj->setVariablesMap(ScenarioTemplateInheritedTableSync::GetVariables(obj->getKey()));
+
+				RegistryKeyType id(rows->getLongLong(ScenarioTableSync::COL_FOLDER_ID));
+				if(id > 0)
+				{
+					obj->setFolder(ScenarioFolderTableSync::GetEditable(id, env, linkLevel).get());
+				}
 			}
 		}
 
@@ -90,7 +96,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(obj->getName())
 				<< ",NULL"
 				<< ",NULL"
-				<< "," << Conversion::ToString(obj->getFolderId())
+				<< "," << (obj->getFolder() ? Conversion::ToString(obj->getFolder()->getKey()) : "0")
 				<< ",''"
 				<< ",0"
 				<< ")";

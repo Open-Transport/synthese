@@ -28,14 +28,12 @@
 #include "MessagesModule.h"
 #include "17_messages/Types.h"
 #include "AlarmRecipient.h"
-#include "UpdateAlarmAction.h"
 #include "UpdateAlarmMessagesFromTemplateAction.h"
 #include "UpdateAlarmMessagesAction.h"
 #include "AlarmAddLinkAction.h"
 #include "AlarmRemoveLinkAction.h"
 #include "AlarmTemplate.h"
-#include "SingleSentAlarm.h"
-#include "ScenarioSentAlarm.h"
+#include "SentAlarm.h"
 #include "ScenarioTemplate.h"
 #include "SentScenario.h"
 #include "AlarmTableSync.h"
@@ -119,56 +117,35 @@ namespace synthese
 			// TAB PARAMETERS
 			if (openTabContent(stream, TAB_PARAMS))
 			{
-				ActionFunctionRequest<UpdateAlarmAction,AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setSamePage(this);
-				updateRequest.getAction()->setAlarmId(_alarm->getKey());
+				stream << "<h1>Contenu</h1>";
 
-				shared_ptr<const SingleSentAlarm> salarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
-				
-				stream << "<h1>Paramètres</h1>";
-				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
-				
-				stream << t.open();
-				stream << t.cell("Type", t.getForm().getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()));
+				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
+				templateRequest.getFunction()->setSamePage(this);
+				templateRequest.getAction()->setAlarmId(_alarm->getKey());
 
-				if (salarm.get())
+				vector<pair<uid, string> > tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
+				if(!tl.empty())
 				{
-					stream << t.cell("Début diffusion", t.getForm().getCalendarInput(UpdateAlarmAction::PARAMETER_START_DATE, salarm->getPeriodStart()));
-					stream << t.cell("Fin diffusion", t.getForm().getCalendarInput(UpdateAlarmAction::PARAMETER_END_DATE, salarm->getPeriodEnd()));
-					stream << t.cell("Actif", t.getForm().getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, salarm->getIsEnabled()));
+					HTMLForm fc(templateRequest.getHTMLForm("template"));
+					stream << fc.open() << "<p>";
+					stream << "Modèle : ";
+					stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, uid());
+					stream << fc.getSubmitButton("Copier contenu");
+					stream << "</p>" << fc.close();
 				}
-				stream << t.close();
 
-				if (_alarm->getLevel() != ALARM_LEVEL_UNKNOWN)
-				{
-					stream << "<h1>Contenu</h1>";
+				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
+				updateMessagesRequest.getFunction()->setSamePage(this);
+				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
 
-					ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
-					templateRequest.getFunction()->setSamePage(this);
-					templateRequest.getAction()->setAlarmId(_alarm->getKey());
-
-					vector<pair<uid, string> > tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
-					if(!tl.empty())
-					{
-						HTMLForm fc(templateRequest.getHTMLForm("template"));
-						stream << fc.open() << "<p>";
-						stream << "Modèle : ";
-						stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, uid());
-						stream << fc.getSubmitButton("Copier contenu");
-						stream << "</p>" << fc.close();
-					}
-
-					ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
-					updateMessagesRequest.getFunction()->setSamePage(this);
-					updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
-
-					PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
-					stream << tu.open();
-					stream << tu.cell("Message court", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 60));
-					stream << tu.cell("Message long", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
-					stream << tu.close();
-				}
+				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
+				stream << tu.open();
+				stream << tu.cell("Type", tu.getForm().getRadioInput(UpdateAlarmMessagesAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()));
+				stream << tu.cell("Message court", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 60));
+				stream << tu.cell("Message long", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
+				stream << tu.close();
 			}
+
 			// Alarm messages destinations loop
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
 			BOOST_FOREACH(shared_ptr<AlarmRecipient> recipient, recipients)
@@ -199,11 +176,13 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
+
+
 		void MessageAdmin::_buildTabs(
 		) const {
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Paramètres", TAB_PARAMS, true));
+			_tabs.push_back(Tab("Contenu", TAB_PARAMS, true));
 
 			// Alarm messages destinations loop
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
@@ -231,16 +210,6 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessageAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (currentPage.getFactoryKey() == FACTORY_KEY)
-			{
-				const MessageAdmin& currentSPage(static_cast<const MessageAdmin&>(currentPage));
-				shared_ptr<const SingleSentAlarm> alarm(dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(currentSPage._alarm));
-				if (alarm.get())
-				{
-					if (parentLink.factoryKey == MessagesAdmin::FACTORY_KEY)
-						links.push_back(currentPage.getPageLink());
-				}
-			}
 			return links;
 		}
 
@@ -274,15 +243,11 @@ namespace synthese
 			if (currentPage.getFactoryKey() != MessagesScenarioAdmin::FACTORY_KEY)
 				return false;
 
-			const shared_ptr<const ScenarioSentAlarm> salarm(dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm));
-			if (salarm.get())
-				return salarm->getScenario()->getKey() == Conversion::ToLongLong(currentPage.getPageLink().parameterValue);
+			assert(_alarm->getScenario());
+			if(!_alarm->getScenario())
+				return false;
 
-			const shared_ptr<const AlarmTemplate> talarm(dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm));
-			if (talarm.get())
-				return talarm->getScenario()->getKey() == Conversion::ToLongLong(currentPage.getPageLink().parameterValue);
-
-			return false;
+			return _alarm->getScenario()->getKey() == Conversion::ToLongLong(currentPage.getPageLink().parameterValue);
 		}
 	}
 }

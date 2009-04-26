@@ -34,6 +34,7 @@ namespace synthese
 		class AlarmTemplate;
 		class ScenarioTemplate;
 		class TextTemplate;
+		class ScenarioFolder;
 
 		/** Journal concernant la bibliothèque de messages.
 
@@ -99,6 +100,11 @@ namespace synthese
 				, const security::User* user
 			);
 
+			static void	AddDeleteEntry(
+				const ScenarioFolder& folder
+				, const security::User* user
+			);
+
 			static void addCreateEntry(
 				const ScenarioTemplate& scenario
 				, const ScenarioTemplate& scenarioTemplate
@@ -109,7 +115,12 @@ namespace synthese
 				const ScenarioTemplate& scenario
 				, const security::User* user
 			);
-			
+
+			static void AddCreateEntry(
+				const ScenarioFolder& folder
+				, const security::User* user
+			);
+
 			static void AddTemplateInstanciationEntry(
 				const SentScenario& scenario
 				, const security::User* user

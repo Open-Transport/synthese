@@ -35,8 +35,7 @@
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
 #include "AlarmTemplate.h"
-#include "ScenarioSentAlarm.h"
-#include "SingleSentAlarm.h"
+#include "SentAlarm.h"
 
 using namespace std;
 using namespace boost;
@@ -88,14 +87,9 @@ namespace synthese
 				shared_ptr<const AlarmTemplate> talarm(dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm));
 				MessagesLibraryLog::addUpdateEntry(talarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), _request->getUser().get());
 			}
-			else if(dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm).get() != NULL)
+			else if(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm).get() != NULL)
 			{
-				shared_ptr<const ScenarioSentAlarm> salarm(dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm));
-				MessagesLog::addUpdateEntry(salarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), _request->getUser().get());
-			}
-			else
-			{
-				shared_ptr<const SingleSentAlarm> salarm(dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm));
+				shared_ptr<const SentAlarm> salarm(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm));
 				MessagesLog::addUpdateEntry(salarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), _request->getUser().get());
 			}
 		}

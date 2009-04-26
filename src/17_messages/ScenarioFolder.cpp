@@ -21,7 +21,6 @@
 */
 
 #include "ScenarioFolder.h"
-#include "Registry.h"
 
 using namespace std;
 
@@ -38,9 +37,9 @@ namespace synthese
 	{
 
 
-		RegistryKeyType ScenarioFolder::getParentId() const
+		ScenarioFolder* ScenarioFolder::getParent() const
 		{
-			return _parentId;
+			return _parent;
 		}
 
 		const std::string& ScenarioFolder::getName() const
@@ -53,15 +52,28 @@ namespace synthese
 			_name = value;
 		}
 
-		void ScenarioFolder::setParentId(RegistryKeyType value )
+		void ScenarioFolder::setParent(ScenarioFolder* value)
 		{
-			_parentId = value;
+			_parent = value;
 		}
 
 		ScenarioFolder::ScenarioFolder(RegistryKeyType key)
-		:	Registrable(key)
+		:	Registrable(key),
+			_parent(NULL)
 		{
 	
+		}
+
+
+
+		std::string ScenarioFolder::getFullName() const
+		{
+			string result;
+			for(const ScenarioFolder* folder(this); folder != NULL; folder = folder->getParent())
+			{
+				result = "/" + folder->getName() + result;
+			}
+			return result;
 		}
 	}
 }

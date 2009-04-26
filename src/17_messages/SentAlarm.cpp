@@ -25,6 +25,8 @@
 #include "SentAlarm.h"
 #include "AlarmRecipient.h"
 #include "Registry.h"
+#include "SentScenario.h"
+#include "AlarmTemplate.h"
 
 #include <boost/foreach.hpp>
 
@@ -43,34 +45,38 @@ namespace synthese
 	namespace messages
 	{
 
-		bool SentAlarm::isApplicable (
-			const synthese::time::DateTime& start
-			, const synthese::time::DateTime& end ) const
-		{
-			// Disabled alarm is never applicable
-			if (!getIsEnabled())
-				return false;
-
-			// Start date control
-			if (!getPeriodStart().isUnknown() && end < getPeriodStart())
-				return false;
-
-			// End date control
-			if (!getPeriodEnd().isUnknown() && start >= getPeriodEnd())
-				return false;
-
-			return true;
-		}
-
-		bool SentAlarm::isApplicable( const time::DateTime& date ) const
-		{
-			return isApplicable(date, date);
-		}
-
-		SentAlarm::SentAlarm(RegistryKeyType key)
-			: Alarm(key)
+		SentAlarm::SentAlarm(
+			util::RegistryKeyType key /*= UNKNOWN_VALUE*/,
+			const SentScenario* scenario /*= NULL */
+		):	Alarm(key, scenario),
+			Registrable(key),
+			_template(NULL)
 		{
 		}
+
+
+
+		SentAlarm::SentAlarm(
+			const SentScenario& scenario,
+			const AlarmTemplate& source
+		):	Alarm(source, &scenario),
+			Registrable(UNKNOWN_VALUE),
+			_template(&source)
+		{
+		}
+
+
+
+		SentAlarm::SentAlarm(
+			const SentScenario& scenario,
+			const SentAlarm& source
+		):	Alarm(source, &scenario),
+			Registrable(UNKNOWN_VALUE),
+			_template(source._template)			
+		{
+		}
+
+
 
 		SentAlarm::~SentAlarm()
 		{
@@ -79,7 +85,7 @@ namespace synthese
 
 		AlarmConflict SentAlarm::wereInConflictWith( const SentAlarm& other ) const
 		{
-			// If one of the two alarms are not enabled, no conflict
+/*			// If one of the two alarms are not enabled, no conflict
 			if (!getIsEnabled() || !other.getIsEnabled())
 				return ALARM_NO_CONFLICT;
 
@@ -95,8 +101,9 @@ namespace synthese
 			// Common period : different level gives priority to an alarm
 			if (other.getLevel() != getLevel())
 				return ALARM_WARNING_ON_INFO;
-			
-			return ALARM_CONFLICT;
+*/			
+//			return ALARM_CONFLICT;
+			return ALARM_NO_CONFLICT;
 		}
 
 		AlarmConflict SentAlarm::getConflictStatus() const
@@ -114,7 +121,28 @@ namespace synthese
 			return conflictStatus;
 		}
 
-		SentAlarm::Complements SentAlarm::getComplements() const
+
+
+		const SentScenario* SentAlarm::getScenario() const
+		{
+			return static_cast<const SentScenario*>(Alarm::getScenario());
+		}
+
+
+
+		const AlarmTemplate* SentAlarm::getTemplate() const
+		{
+			return _template;
+		}
+
+
+
+		void SentAlarm::setTemplate( const AlarmTemplate* value )
+		{
+			_template = value;
+		}
+
+/*		SentAlarm::Complements SentAlarm::getComplements() const
 		{
 			return _complements;
 		}
@@ -123,5 +151,5 @@ namespace synthese
 		{
 			_complements = complements;
 		}
-	}
+*/	}
 }

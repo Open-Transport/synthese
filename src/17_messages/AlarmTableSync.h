@@ -37,8 +37,7 @@ namespace synthese
 {
 	namespace messages
 	{
-		class ScenarioSentAlarm;
-		class SingleSentAlarm;
+		class SentAlarm;
 		class AlarmTemplate;
 		class SentScenario;
 		class ScenarioTemplate;

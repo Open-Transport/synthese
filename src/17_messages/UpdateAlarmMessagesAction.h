@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "17_messages/Types.h"
 
 namespace synthese
 {
@@ -34,17 +35,24 @@ namespace synthese
 	{
 		class Alarm;
 
-		/** UpdateAlarmMessagesAction action class.
+		/** Message content update action class.
+	
+			This action updates :
+				- alarm type
+				- alarm texts
+
 			@ingroup m17Actions refActions
 		*/
 		class UpdateAlarmMessagesAction : public util::FactorableTemplate<server::Action, UpdateAlarmMessagesAction>
 		{
 		public:
+			static const std::string PARAMETER_TYPE;
 			static const std::string PARAMETER_SHORT_MESSAGE;
 			static const std::string PARAMETER_LONG_MESSAGE;
 			static const std::string PARAMETER_ALARM_ID;
 
 		private:
+			AlarmLevel		_type;
 			std::string _shortMessage;
 			std::string _longMessage;
 			boost::shared_ptr<Alarm>		_alarm;

@@ -29,8 +29,9 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <boost/optional.hpp>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -60,10 +61,10 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				uid parentFolderId = UNKNOWN_VALUE
-				, std::string name = "%"
-				, int first = 0
-				, int number = 0,
+				boost::optional<util::RegistryKeyType> parentFolderId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::string> name = boost::optional<std::string>(),
+				int first = 0,
+				int number = 0,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};

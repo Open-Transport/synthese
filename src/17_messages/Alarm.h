@@ -34,6 +34,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Scenario;
+
 		/** Alarm message.
 			@ingroup m17
 
@@ -42,7 +44,7 @@ namespace synthese
 				- route planner results
 				- etc.
 
-			An alarm can be sent individually (single alarm) or in a group builded from a scenario (grouped alarm)
+			An alarm can be sent individually (single alarm) or in a group built from a scenario (grouped alarm)
 			The _scenario attribute points to the group if applicable.
 		*/
 		class Alarm
@@ -51,25 +53,38 @@ namespace synthese
 		public:
 
 		protected:
-			AlarmLevel					_level;
-			std::string					_shortMessage;  //!< Alarm message
-			std::string					_longMessage;  //!< Alarm message
+			AlarmLevel			_level;
+			std::string			_shortMessage;  //!< Alarm message
+			std::string			_longMessage;  //!< Alarm message
+			const Scenario* 	_scenario;
 		    
-			Alarm(util::RegistryKeyType key);
+			Alarm(
+				util::RegistryKeyType key,
+				const Scenario* scenario
+			);
 			Alarm(const Alarm& source);
+			Alarm(
+				const Alarm& source,
+				const Scenario* scenario
+			);
 			
 		public:
 			virtual ~Alarm();
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
 				const std::string&		getShortMessage()	const;
 				const std::string&		getLongMessage()	const;
 				const AlarmLevel&		getLevel()			const;
+				const Scenario*			getScenario()		const;
+			//@}
 
+			//! @name Setters
+			//@{
 				void setLevel (const AlarmLevel& level);
 				void setShortMessage( const std::string& message);
 				void setLongMessage( const std::string& message);
+				void setScenario(const Scenario* scenario);
 			//@}
 		};
 	}
