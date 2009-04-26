@@ -32,6 +32,7 @@
 #include "Date.h"
 
 #include "SQLiteRegistryTableSyncTemplate.h"
+#include "FetcherTemplate.h"
 
 namespace synthese
 {
@@ -40,7 +41,9 @@ namespace synthese
 		/** ScheduledService table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class ScheduledServiceTableSync : public db::SQLiteRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>
+		class ScheduledServiceTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>,
+			public db::FetcherTemplate<env::NonPermanentService, ScheduledServiceTableSync>
 		{
 		public:
 			static const std::string COL_SERVICENUMBER;

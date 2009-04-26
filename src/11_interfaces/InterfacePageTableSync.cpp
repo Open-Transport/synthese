@@ -153,6 +153,31 @@ namespace synthese
 			page->setKey(row->getKey());
 			return page;
 		}
+
+
+
+		void InterfacePageTableSync::Search(
+			util::Env& env,
+			boost::optional<util::RegistryKeyType> interfaceId /*= boost::optional<util::RegistryKeyType>()*/,
+			boost::optional<int> first /*= 0*/,
+			boost::optional<int> number /*= boost::optional<int>()*/,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE.NAME
+				<< " WHERE 1";
+			if (interfaceId)
+				query << " AND " << TABLE_COL_INTERFACE << "=" << *interfaceId;
+
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
+			if (first)
+				query << " OFFSET " << Conversion::ToString(*first);
+
+			LoadFromQuery(query.str(), env, linkLevel);
+		}
 	}
 }
 

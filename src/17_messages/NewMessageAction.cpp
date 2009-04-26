@@ -94,7 +94,8 @@ namespace synthese
 					
 				AlarmTableSync::Save(&alarm);
 				
-				_request->setObjectId(alarm.getKey());
+				if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+					_request->setObjectId(alarm.getKey());
 			
 				MessagesLog::AddNewScenarioMessageEntry(
 					alarm,

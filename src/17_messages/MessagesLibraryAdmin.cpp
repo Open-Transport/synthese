@@ -86,9 +86,9 @@ namespace synthese
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
 			
-			if(!doDisplayPreparationActions) return;
-			
 			setFolderId(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+
+			if(!doDisplayPreparationActions) return;
 
 			ScenarioTemplateInheritedTableSync::Search(
 				_env,
@@ -197,7 +197,7 @@ namespace synthese
 
 			stream << "<h1>Sous-répertoires</h1>";
 
-			if (_env.getRegistry<ScenarioFolder>().empty())
+			if (_env.getRegistry<ScenarioFolder>().size() <= 1)
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
@@ -208,6 +208,8 @@ namespace synthese
 
 			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, _env.getRegistry<ScenarioFolder>())
 			{
+				if(folder == _folder) continue;
+
 				static_pointer_cast<MessagesLibraryAdmin,AdminInterfaceElement>(goFolderRequest.getFunction()->getPage())->setFolderId(folder->getKey());
 				stream << l.element("folder");
 				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), folder->getName());

@@ -157,12 +157,15 @@ namespace synthese
 		SQLite* sqlite = DBModule::GetSQLite();
 		stringstream query;
 		if (object->getKey() <= 0)
-		    object->setKey(getId());	/// @todo Use grid ID
-		
+		    object->setKey(getId());	
 		query
 		    << " REPLACE INTO " << TABLE.NAME << " VALUES("
 		    << Conversion::ToString(object->getKey())
-		    /// @todo fill other fields separated by ,
+			<< (object->getFromAddress() ? Conversion::ToString(object->getFromAddress()->getKey()) : "0")
+			<< Conversion::ToString(object->getRankInPath())
+			<< ""
+			<< (object->getRoad() ? Conversion::ToString(object->getRoad()->getKey()) : "0")
+			<< Conversion::ToString(object->getMetricOffset())
 		    << ")";
 		sqlite->execUpdate(query.str());
 	    }

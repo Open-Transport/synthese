@@ -30,6 +30,8 @@
 #include <iostream>
 #include <string>
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace time
@@ -152,6 +154,10 @@ namespace synthese
 			*/
 			static Date FromSQLDate (const std::string& sqlDate);
 
+
+			static boost::optional<Date> FromSQLOptionalDate(
+				const std::string& sqlDate
+			);
 
 			static Date FromString (const std::string& sqlString);
 

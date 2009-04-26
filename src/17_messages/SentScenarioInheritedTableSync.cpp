@@ -228,9 +228,9 @@ namespace synthese
 			// The action on the alarms
 			Env env;
 			ScenarioSentAlarmInheritedTableSync::Search(env, sourceId);
-			BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> templateAlarm, env.getRegistry<ScenarioSentAlarm>())
+			BOOST_FOREACH(shared_ptr<SentAlarm> templateAlarm, env.getRegistry<SentAlarm>())
 			{
-				ScenarioSentAlarm alarm(dest, *templateAlarm);
+				ScenarioSentAlarm alarm(dest, static_cast<ScenarioSentAlarm&>(*templateAlarm));
 				AlarmTableSync::Save(&alarm);
 
 				AlarmObjectLinkTableSync::CopyRecipients(

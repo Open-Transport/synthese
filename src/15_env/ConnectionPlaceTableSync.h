@@ -26,6 +26,7 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 
 #include "SQLiteRegistryTableSyncTemplate.h"
+#include "FetcherTemplate.h"
 
 #include <string>
 #include <iostream>
@@ -42,7 +43,9 @@ namespace synthese
 				- on update : 
 				- on delete : X
 		*/
-		class ConnectionPlaceTableSync : public db::SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>
+		class ConnectionPlaceTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>,
+			public db::FetcherTemplate<geography::NamedPlace, ConnectionPlaceTableSync>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;

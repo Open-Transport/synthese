@@ -72,8 +72,6 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			if(!doDisplayPreparationActions) return;
-	
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
 
@@ -163,8 +161,8 @@ namespace synthese
 						1, 120,
 						_type->getTimeBetweenChecks(),
 						1
-				)	)
-			;
+					)+ " minutes"	
+				);
 			stream << t.close();
 		}
 

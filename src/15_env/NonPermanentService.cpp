@@ -72,12 +72,15 @@ namespace synthese
 			// Mark the date in service calendar
 			Calendar::setActive(date);
 			
-			Date newDate(date);
-			for(int i(getDepartureSchedule().getDaysSinceDeparture());
-				i<= getLastArrivalSchedule().getDaysSinceDeparture();
-				++i, newDate++
-			){
-				getPath()->setActive(newDate);
+			if(getPath())
+			{
+				Date newDate(date);
+				for(int i(getDepartureSchedule().getDaysSinceDeparture());
+					i<= getLastArrivalSchedule().getDaysSinceDeparture();
+					++i, newDate++
+					){
+						getPath()->setActive(newDate);
+				}
 			}
 		
 			//environment.updateMinMaxDatesInUse (newDate, marked);

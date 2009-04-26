@@ -166,7 +166,7 @@ namespace synthese
 				, true
 			);
 
-			stream << "<h1>Répertoires</h1>";
+/*			stream << "<h1>Répertoires</h1>";
 			HTMLList l;
 			BOOST_FOREACH(shared_ptr<TextTemplate> folder, fenv.getRegistry<TextTemplate>())
 			{
@@ -185,28 +185,31 @@ namespace synthese
 				stream << t.cell("Répertoire parent", t.getForm().getSelectInput(UpdateTextTemplateAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()), _folder->getParentId()));
 				stream << t.close();
 			}
+*/
 
-
-			stream << "<h1>Modèles de texte</h1>";
-			BOOST_FOREACH(shared_ptr<TextTemplate> tt, tenv.getRegistry<TextTemplate>())
+			if(!tenv.getRegistry<TextTemplate>().empty())
 			{
-				// Variables
-				deleteRequest.getAction()->setTemplate(tt);
-				updateRequest.getAction()->setTemplate(tt);
+				stream << "<h1>Modèles de texte</h1>";
+				BOOST_FOREACH(shared_ptr<TextTemplate> tt, tenv.getRegistry<TextTemplate>())
+				{
+					// Variables
+					deleteRequest.getAction()->setTemplate(tt);
+					updateRequest.getAction()->setTemplate(tt);
 
-				// Display
-				stream << "<h2>";
-				if (deleteRight)
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ tt->getName()+" ?", "page_delete.png") << " ";
-				stream << tt->getName() << "</h2>";
+					// Display
+					stream << "<h2>";
+					if (deleteRight)
+						stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ tt->getName()+" ?", "page_delete.png") << " ";
+					stream << tt->getName() << "</h2>";
 
-				PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+Conversion::ToString(tt->getKey())));
-				t.getForm().setUpdateRight(updateRight);
-				stream << t.open();
-				stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, tt->getName()));
-				stream << t.cell("Texte court", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, tt->getShortMessage(), 2, 60));
-				stream << t.cell("Texte long", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, tt->getLongMessage(), 6, 60));
-				stream << t.close();
+					PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+Conversion::ToString(tt->getKey())));
+					t.getForm().setUpdateRight(updateRight);
+					stream << t.open();
+					stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, tt->getName()));
+					stream << t.cell("Texte court", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, tt->getShortMessage(), 2, 60));
+					stream << t.cell("Texte long", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, tt->getLongMessage(), 6, 60));
+					stream << t.close();
+				}
 			}
 
 			if (updateRight)

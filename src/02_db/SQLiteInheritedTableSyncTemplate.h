@@ -87,9 +87,9 @@ namespace synthese
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
+				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
 				if (registry.contains(key))
-					return registry.getEditable(key);
+					return boost::static_pointer_cast<ObjectClass,typename ObjectClass::Registry::ObjectsClass>(registry.getEditable(key));
 
 				boost::shared_ptr<ObjectClass> object;
 				try
@@ -105,7 +105,9 @@ namespace synthese
 					object.reset(new ObjectClass(key));
 				}
 
-				env.getEditableRegistry<ObjectClass>().add(object);
+				env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>().add(
+					boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass, ObjectClass>(object)
+				);
 
 				return object;
 			}
@@ -128,9 +130,9 @@ namespace synthese
 
 
 
-			/** Load obects into an environment, from a SQL query.
+			/** Load objects into an environment, from a SQL query.
 				@param query SQL query
-				@param env Environment to write
+				@param env Environment to populate
 				@param linkLevel Link level
 				@throws Exception if the load failed
 			*/
@@ -141,13 +143,15 @@ namespace synthese
 			){
 				try
 				{
-					util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
+					ObjectClass::Registry& registry(env.getEditableRegistry<ObjectClass::Registry::ObjectsClass>());
 					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 					while (rows->next ())
 					{
 						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
 						Load(object.get(), rows, env, linkLevel);
-						registry.add(object);
+						registry.add(
+							boost::static_pointer_cast<ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
+						);
 					}
 				}
 				catch(SQLiteException& e)

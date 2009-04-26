@@ -18,7 +18,8 @@ synthese::env::CommercialLineTableSync::integrate();
 
 synthese::env::LineTableSync::integrate();
 
-synthese::env::ConnectionPlaceTableSync::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::ConnectionPlaceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::env::ConnectionPlaceTableSync>::integrate();
 
 synthese::env::PhysicalStopTableSync::integrate();
 
@@ -26,8 +27,11 @@ synthese::env::LineStopTableSync::integrate();
 
 synthese::env::NonConcurrencyRuleTableSync::integrate();
 
-synthese::env::ContinuousServiceTableSync::integrate();
-synthese::env::ScheduledServiceTableSync::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::ContinuousServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::env::NonPermanentService>, synthese::env::ContinuousServiceTableSync>::integrate();
+
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::ScheduledServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::env::NonPermanentService>, synthese::env::ScheduledServiceTableSync>::integrate();
 
 synthese::env::TransportNetworkAdmin::integrate();
 synthese::env::CommercialLineAdmin::integrate();

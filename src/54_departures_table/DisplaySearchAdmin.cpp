@@ -227,7 +227,7 @@ namespace synthese
 
 				ActionResultHTMLTable t(
 					v
-					, searchRequest.getHTMLForm("search")
+					, searchRequest.getHTMLForm()
 					, _requestParameters
 					, _resultParameters
 					, createDisplayRequest.getHTMLForm("create")

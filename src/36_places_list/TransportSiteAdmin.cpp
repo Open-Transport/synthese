@@ -84,8 +84,6 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			if(!doDisplayPreparationActions) return;
-			
 			try
 			{
 				_site = SiteTableSync::GetEditable(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
@@ -101,6 +99,8 @@ namespace synthese
 		server::ParametersMap TransportSiteAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_site.get())
+				m.insert(QueryString::PARAMETER_OBJECT_ID, _site->getKey());
 			return m;
 		}
 

@@ -95,7 +95,7 @@ namespace synthese
 			bool doDisplayPreparationActions
 		){
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION || !doDisplayPreparationActions)
+			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
 			try
@@ -110,6 +110,8 @@ namespace synthese
 				throw AdminParametersException("Timetable is document");
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK);
 			
+			if (!doDisplayPreparationActions) return;
+
 			TimetableRowTableSync::Search(
 				_env,
 				_timetable->getKey()

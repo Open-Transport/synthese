@@ -555,5 +555,35 @@ namespace synthese
 			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());
 			return rows->next();
 		}
+
+
+
+		vector<shared_ptr<SentAlarm> > DisplayScreenTableSync::GetFutureDisplayedMessages(
+			Env& env,
+			RegistryKeyType screenId,
+			optional<int> number /*= UNKNOWN_VALUE */
+		){
+			DateTime now(TIME_CURRENT);
+			stringstream q;
+			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
+				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
+				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
+				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << Conversion::ToString(screenId)
+				<< " AND a." << AlarmTableSync::COL_ENABLED
+				<< " AND NOT a." << AlarmTableSync::COL_IS_TEMPLATE
+				<< " AND a." << AlarmTableSync::COL_PERIODSTART << ">" << now.toSQLString()
+				<< " ORDER BY a." << AlarmTableSync::COL_PERIODSTART;
+			if (number)
+			{
+				q << " LIMIT " << *number;
+			}
+			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());
+			vector<shared_ptr<SentAlarm> > result;
+			while(rows->next())
+			{
+				result.push_back(static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)));
+			}
+			return result;
+		}
 	}
 }

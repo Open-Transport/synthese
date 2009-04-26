@@ -29,18 +29,13 @@ namespace synthese
 {
 	using namespace util;
 
-	namespace util
-	{
-		template<> const std::string Registry<messages::ScenarioSentAlarm>::KEY("ScenarioSentAlarm");
-	}
-
-
 	namespace messages
 	{
 		ScenarioSentAlarm::ScenarioSentAlarm(
 			const SentScenario& scenario,
 			const AlarmTemplate& source
 		):	SentAlarm(),
+			Registrable(UNKNOWN_VALUE),
 			_scenario(&scenario),
 			_template(&source)
 		{

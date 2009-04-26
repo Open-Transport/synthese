@@ -94,6 +94,7 @@ namespace synthese
 			//lint --e{1704}
 
 		public:
+			typedef T ObjectsClass;
 			typedef std::map<RegistryKeyType, boost::shared_ptr<T> > Map;
 			typedef std::vector<boost::shared_ptr<T> > Vector;
 			typedef typename Vector::const_iterator const_iterator;

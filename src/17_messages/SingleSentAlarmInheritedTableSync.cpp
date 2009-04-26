@@ -133,7 +133,7 @@ namespace synthese
 
 			try
 			{
-				Registry<SingleSentAlarm>& registry(env.getEditableRegistry<SingleSentAlarm>());
+				Registry<SentAlarm>& registry(env.getEditableRegistry<SentAlarm>());
 				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				while (rows->next ())
 				{
@@ -168,7 +168,7 @@ namespace synthese
 						}
 					}
 					object->setComplements(c);
-					registry.add(object);
+					registry.add(static_pointer_cast<SentAlarm,SingleSentAlarm>(object));
 				}
 			}
 			catch(SQLiteException& e)

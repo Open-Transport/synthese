@@ -113,8 +113,6 @@ namespace synthese
 			}
 			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
 
-			if(!doDisplayPreparationActions) return;
-
 			uid lineId(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{

@@ -138,7 +138,7 @@ namespace synthese
 			FunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(&addRequest);
 			testRequest.getFunction()->setAlarmId(alarm->getKey());
 
-			stream << "<h2>Test du message</h2>";
+			stream << "<h1>Test du message</h1>";
 			
 			HTMLForm testForm(testRequest.getHTMLForm("testForm"));
 			stream << testForm.open() << "<p>";
@@ -146,7 +146,7 @@ namespace synthese
 			stream << testForm.getSubmitOnPopupLink(HTMLModule::getHTMLImage("accept.png", "OK"), 800, 600);
 			stream << "</p>" << testForm.close();
 
-			stream << "<h2>Afficheurs destinataires</h2>";
+			stream << "<h1>Afficheurs destinataires</h1>";
 
 			if (dsv.empty())
 			{
@@ -174,7 +174,7 @@ namespace synthese
 				stream << l.close();
 			}
 
-			stream << "<h2>Recherche d'afficheur à ajouter</h2>";
+			stream << "<h1>Ajout d'afficheur</h1>";
 
 			string searchCity(parameters.getString(PARAMETER_SEARCH_CITY_NAME, false, FACTORY_KEY));
 			string searchStop(parameters.getString(PARAMETER_SEARCH_STOP_NAME, false, FACTORY_KEY));
@@ -201,10 +201,8 @@ namespace synthese
 			v1.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, "Etat"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
-			v1.push_back(make_pair(string(), "Add"));
+			v1.push_back(make_pair(string(), "Ajout"));
 			ResultHTMLTable t1(v1,searchRequest.getHTMLForm(), ResultHTMLTable::RequestParameters(), ResultHTMLTable::ResultParameters());
-
-			stream << "<h2>Résultats de la recherche :</h2>";
 
 			stream << t1.open();
 

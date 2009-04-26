@@ -111,8 +111,6 @@ namespace synthese
 				map.getInt(PARAMETER_ACCESSIBILITY, false, string())
 			);
 		
-			if(!doDisplayPreparationActions) return;
-			
 			try
 			{
 				_site = SiteTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env);
@@ -136,6 +134,8 @@ namespace synthese
 			m.insert(PARAMETER_LOG, _log);
 			m.insert(PARAMETER_RESULTS_NUMBER, _resultsNumber);
 			m.insert(PARAMETER_ACCESSIBILITY, static_cast<int>(_accessibility));
+			if(_site.get())
+				m.insert(QueryString::PARAMETER_OBJECT_ID, _site->getKey());
 			return m;
 		}
 

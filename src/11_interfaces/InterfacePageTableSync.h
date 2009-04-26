@@ -28,6 +28,8 @@
 
 #include "SQLiteRegistryTableSyncTemplate.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace interfaces
@@ -51,6 +53,14 @@ namespace synthese
 			InterfacePageTableSync();
 
 			static boost::shared_ptr<InterfacePage> GetNewObject(const db::SQLiteResultSPtr& row);
+
+			static void Search(
+				util::Env& env,
+				boost::optional<util::RegistryKeyType> interfaceId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<int> first = boost::optional<int>(),
+				boost::optional<int> number = boost::optional<int>(),
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 		};
 	}
 }

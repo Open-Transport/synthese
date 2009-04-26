@@ -60,6 +60,7 @@ namespace synthese
 	using namespace graph;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("15.60.02 Continuous services");
+	template<> const string FetcherTemplate<NonPermanentService, ContinuousServiceTableSync>::FACTORY_KEY("17");
 
 	namespace env
 	{
@@ -239,8 +240,9 @@ namespace synthese
 
 		void ContinuousServiceTableSync::Search(
 			Env& env,
-			uid lineId
-			, int first /*= 0*/
+			boost::optional<util::RegistryKeyType> lineId,
+			boost::optional<util::RegistryKeyType> commercialLineId,
+			int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByDepartureTime
 			, bool raisingOrder,
@@ -249,10 +251,20 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			if (lineId != UNKNOWN_VALUE)
-				query << " AND " << COL_PATHID << "=" << lineId;
+				<< " FROM " << TABLE.NAME;
+			if (commercialLineId)
+			{
+				query << " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
+			}
+			query << " WHERE 1 ";
+			if (lineId)
+			{
+				query << " AND " << COL_PATHID << "=" << *lineId;
+			}
+			if (commercialLineId)
+			{
+				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
+			}
 			if (orderByDepartureTime)
 				query << " ORDER BY " << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)

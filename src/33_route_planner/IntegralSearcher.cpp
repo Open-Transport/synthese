@@ -248,11 +248,7 @@ namespace synthese
 				}
 				else
 				{
-					const AddressablePlace* cp(
-						dynamic_cast<const AddressablePlace*>(
-							journey->getEndEdge()->getHub()
-					)	);
-					cp->getVertexAccessMap(
+					journey->getEndEdge()->getHub()->getVertexAccessMap(
 						vam,
 						_accessDirection,
 						_graphToUse,

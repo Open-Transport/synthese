@@ -50,8 +50,7 @@
 // Registries
 #include "AlarmObjectLink.h"
 #include "AlarmTemplate.h"
-#include "SingleSentAlarm.h"
-#include "ScenarioSentAlarm.h"
+#include "SentAlarm.h"
 #include "TextTemplate.h"
 #include "ScenarioFolder.h"
 #include "ScenarioTemplate.h"

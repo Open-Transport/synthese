@@ -36,6 +36,8 @@
 #include "SQLiteRegistryTableSyncTemplate.h"
 #include "12_security/Types.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace messages
@@ -140,6 +142,25 @@ namespace synthese
 				util::Env& env,
 				util::RegistryKeyType screenId,
 				int number = UNKNOWN_VALUE
+			);
+
+
+
+			////////////////////////////////////////////////////////////////////
+			///	Gets the message later displayed on a screen.
+			/// @param env Environment to populate
+			///	@param screenId id of the screen
+			/// @param number Number of results (<=0 : unlimited)
+			///	@return pointer to the message
+			///	@author Hugues Romain
+			///	@date 2008
+			/// @warning The message is returned even if the screen is deactivated.
+			/// If there is no message, a null pointer is returned.
+			////////////////////////////////////////////////////////////////////
+			static std::vector<boost::shared_ptr<messages::SentAlarm> > GetFutureDisplayedMessages(
+				util::Env& env,
+				util::RegistryKeyType screenId,
+				boost::optional<int> number = boost::optional<int>()
 			);
 
 

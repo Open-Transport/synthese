@@ -21,21 +21,13 @@
 */
 
 #include "SingleSentAlarm.h"
-#include "Registry.h"
 
 namespace synthese
 {
 	using namespace time;
 
-	namespace util
-	{
-		template<> const std::string Registry<messages::SingleSentAlarm>::KEY("SingleSentAlarm");
-	}
-
 	namespace messages
 	{
-
-
 		SingleSentAlarm::SingleSentAlarm(util::RegistryKeyType key)
 		:	Registrable(key),
 			SentAlarm(key),

@@ -128,16 +128,6 @@ namespace synthese
 			updateRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			updateRequest.setObjectId(_scenario->getKey());
 
-			FunctionRequest<AdminRequest> messRequest(_request);
-			messRequest.getFunction()->setPage<MessageAdmin>();
-
-			ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(_request);
-			deleteRequest.getFunction()->setPage<MessagesScenarioAdmin>();
-			deleteRequest.setObjectId(_scenario->getKey());
-
-			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(_request);
-			addRequest.getFunction()->setPage<MessageAdmin>();
-			addRequest.getAction()->setScenarioId(_scenario->getKey());
 
 			////////////////////////////////////////////////////////////////////
 			// TAB PARAMETERS
@@ -190,6 +180,18 @@ namespace synthese
 			// TAB MESSAGES
 			if (openTabContent(stream, TAB_MESSAGES))
 			{
+				FunctionRequest<AdminRequest> messRequest(_request);
+				messRequest.getFunction()->setPage<MessageAdmin>();
+
+				ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(_request);
+				deleteRequest.getFunction()->setPage<MessagesScenarioAdmin>();
+				deleteRequest.setObjectId(_scenario->getKey());
+
+				ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(_request);
+				addRequest.getFunction()->setPage<MessageAdmin>();
+				addRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+				addRequest.getAction()->setScenarioId(_scenario->getKey());
+
 				stream << "<h1>Messages</h1>";
 
 				vector<shared_ptr<Alarm> > v;
@@ -198,9 +200,9 @@ namespace synthese
 				if (_sentScenario.get())
 				{
 					ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario->getKey());
-					BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.getRegistry<ScenarioSentAlarm>())
+					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, env.getRegistry<SentAlarm>())
 					{
-						v.push_back(static_pointer_cast<Alarm, ScenarioSentAlarm>(alarm));
+						v.push_back(static_pointer_cast<Alarm, SentAlarm>(alarm));
 					}
 				}
 				else
@@ -321,7 +323,7 @@ namespace synthese
 				ScenarioSentAlarmInheritedTableSync::Search(
 					env, _sentScenario->getKey(), 0, 0, false, false, false, false, UP_LINKS_LOAD_LEVEL
 				);
-				BOOST_FOREACH(shared_ptr<ScenarioSentAlarm> alarm, env.getRegistry<ScenarioSentAlarm>())
+				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, env.getRegistry<SentAlarm>())
 				{
 					AdminInterfaceElement::PageLink link(getPageLink());
 					link.factoryKey = MessageAdmin::FACTORY_KEY;

@@ -69,9 +69,8 @@ namespace synthese
 			{
 				_moduleKey = map.getString(PARAMETER_MODULE, true, FACTORY_KEY);
 				
-				if(!doDisplayPreparationActions) return;
-					
 				_moduleClass.reset(Factory<ModuleClass>::create(_moduleKey));
+
 			}
 			catch(...)
 			{

@@ -50,6 +50,7 @@ namespace synthese
 			std::string	_searchName;
 
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
+			html::ResultHTMLTable::ResultParameters		_resultParameters;
 
 		public:
 			static const std::string PARAMETER_SEARCH_NAME;

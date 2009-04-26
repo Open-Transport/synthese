@@ -99,5 +99,12 @@ namespace synthese
 
 			markServiceIndexUpdateNeeded();
 		}
+
+
+
+		const Road* RoadChunk::getRoad() const
+		{
+			return static_cast<const Road*>(_parentPath);
+		}
 	}
 }

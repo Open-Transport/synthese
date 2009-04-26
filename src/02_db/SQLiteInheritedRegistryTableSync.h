@@ -55,26 +55,32 @@ namespace synthese
 
 			}
 
+
+
 			void rowsAdded (SQLite* sqlite, 
 				SQLiteSync* sync,
 				const SQLiteResultSPtr& rows,
 				bool isFirstSync = false
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
+				ObjectClass::Registry& registry(env.getEditableRegistry<ObjectClass::Registry::ObjectsClass>());
 				try
 				{
 					if (registry.contains(rows->getKey()))
 					{
-						boost::shared_ptr<ObjectClass> address(registry.getEditable(rows->getKey()));
-						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(address.get());
-						Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+						ObjectClass* object(static_cast<ObjectClass*>(registry.getEditable(rows->getKey()).get()));
+						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(
+							object
+						);
+						Load(object, rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 					else
 					{
 						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
 						Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-						registry.add(object);
+						registry.add(
+							boost::static_pointer_cast<ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
+						);
 					}
 				}
 				catch(util::Exception& e)
@@ -83,20 +89,25 @@ namespace synthese
 				}
 			}
 
-			void rowsUpdated (SQLite* sqlite, 
+
+
+			void rowsUpdated(
+				SQLite* sqlite, 
 				SQLiteSync* sync,
-				const SQLiteResultSPtr& rows)
-			{
+				const SQLiteResultSPtr& rows
+			){
 				util::Env& env(util::Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
+				ObjectClass::Registry& registry(env.getEditableRegistry<ObjectClass::Registry::ObjectsClass>());
 				try
 				{
 					util::RegistryKeyType id(rows->getKey());
 					if (registry.contains(id))
 					{
-						boost::shared_ptr<ObjectClass> address(registry.getEditable(id));
-						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(address.get());
-						Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+						ObjectClass* object(static_cast<ObjectClass*>(registry.getEditable(rows->getKey()).get()));
+						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(
+							object
+						);
+						Load(object, rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 				}
 				catch (util::Exception& e)
@@ -105,18 +116,23 @@ namespace synthese
 				}
 			}
 
-			void rowsRemoved (SQLite* sqlite, 
+
+
+			void rowsRemoved(
+				SQLite* sqlite, 
 				SQLiteSync* sync,
-				const SQLiteResultSPtr& rows)
-			{
+				const SQLiteResultSPtr& rows
+			){
 				util::Env& env(util::Env::GetOfficialEnv());
-				util::Registry<ObjectClass>& registry(env.getEditableRegistry<ObjectClass>());
+				ObjectClass::Registry& registry(env.getEditableRegistry<ObjectClass::Registry::ObjectsClass>());
 				try
 				{
 					uid id = rows->getKey();
 					if (registry.contains(id))
 					{
-						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(registry.getEditable(id).get());
+						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(
+							static_cast<ObjectClass*>(registry.getEditable(id).get())
+						);
 						registry.remove(id);
 					}
 				}

@@ -25,7 +25,14 @@
 #ifndef SYNTHESE_CommercialLineAdmin_H__
 #define SYNTHESE_CommercialLineAdmin_H__
 
+#include "ResultHTMLTable.h"
+#include "Date.h"
+
 #include "AdminInterfaceElementTemplate.h"
+
+#include "15_env/AdvancedSelectTableSync.h"
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -40,7 +47,24 @@ namespace synthese
 		*/
 		class CommercialLineAdmin : public admin::AdminInterfaceElementTemplate<CommercialLineAdmin>
 		{
+		public:
+			static const std::string TAB_ROUTES;
+			static const std::string TAB_DATES;
+			static const std::string PARAMETER_SEARCH_NAME;
+			static const std::string PARAMETER_DATES_START;
+			static const std::string PARAMETER_DATES_END;
+
+		protected:
 			boost::shared_ptr<const CommercialLine>	_cline;
+
+			std::string _searchName;
+			boost::optional<time::Date>	_startDate;
+			boost::optional<time::Date>	_endDate;
+
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+			html::ResultHTMLTable::ResultParameters		_resultParameters;
+
+			RunHours _runHours;
 
 		public:
 			CommercialLineAdmin();
@@ -128,6 +152,8 @@ namespace synthese
 				REMOVE IF YOU DONT USE A PARAMETER
 			*/
 			virtual std::string getParameterValue() const;
+
+			virtual void _buildTabs() const;
 
 			boost::shared_ptr<const CommercialLine> getCommercialLine() const;
 		};

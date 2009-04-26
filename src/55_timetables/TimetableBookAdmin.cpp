@@ -81,9 +81,7 @@ namespace synthese
 			bool doDisplayPreparationActions
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK, ResultHTMLTable::UNLIMITED_SIZE);
-			
-			if(!doDisplayPreparationActions) return;
-			
+						
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 			
 			if(id <= 0) return;
@@ -99,6 +97,9 @@ namespace synthese
 			if (!_book->getIsBook())
 				throw AdminParametersException("Timetable is not a book");
 			
+
+			if(!doDisplayPreparationActions) return;
+
 			// Search
 			TimetableTableSync::Search(
 				_env,

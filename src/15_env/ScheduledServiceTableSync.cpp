@@ -21,7 +21,7 @@
 */
 
 #include "ScheduledServiceTableSync.h"
-
+#include "LoadException.h"
 #include "Path.h"
 #include "EnvModule.h"
 #include "LineTableSync.h"
@@ -59,6 +59,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ScheduledServiceTableSync>::FACTORY_KEY("15.60.03 Scheduled services");
+	template<> const string FetcherTemplate<NonPermanentService, ScheduledServiceTableSync>::FACTORY_KEY("16");
 
 	namespace env
 	{
@@ -151,10 +152,12 @@ namespace synthese
 				arrivalSchedules.push_back (arrivalSchedule);
 		    }
 		    
-		    assert (departureSchedules.size () > 0);
-		    assert (arrivalSchedules.size () > 0);
-		    assert (departureSchedules.size () == arrivalSchedules.size ());
-		    
+		    if(	departureSchedules.size () <= 0 ||
+				arrivalSchedules.size () <= 0 ||
+				departureSchedules.size() != arrivalSchedules.size ()
+			){
+				throw LoadException<ScheduledServiceTableSync>(ss->getKey(), ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
+			}
 		    
 		    ss->setServiceNumber(serviceNumber);
 		    ss->setDepartureSchedules(departureSchedules);
@@ -167,8 +170,11 @@ namespace synthese
 				uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
 
 				Path* path = LineTableSync::GetEditable(pathId, env, linkLevel).get();
-				assert (path);
-				//			assert (path->getEdges ().size () == ss-> arrivalSchedules.size ());
+				
+				if(	path->getEdges ().size () != arrivalSchedules.size ()
+				){
+					throw LoadException<ScheduledServiceTableSync>(ss->getKey(), ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
+				}
 
 				uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
 

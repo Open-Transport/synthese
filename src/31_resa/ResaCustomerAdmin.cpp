@@ -110,8 +110,6 @@ namespace synthese
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_EVENT_DATE, 50, false);
 			
-			if(!doDisplayPreparationActions) return;
-			
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{

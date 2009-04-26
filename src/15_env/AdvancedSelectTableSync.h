@@ -23,12 +23,27 @@
 #ifndef SYNTHESE_env_AdvancedSelectTableSync_h__
 #define SYNTHESE_env_AdvancedSelectTableSync_h__
 
-#include "01_util/UId.h"
+#include "UId.h"
+#include "Date.h"
+#include "Registry.h"
+
+#include <map>
+#include <utility>
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
 	namespace env
 	{
+		typedef std::map<std::pair<time::Date, int>, int> RunHours;
+
+		RunHours getCommercialLineRunHours(
+			util::RegistryKeyType id,
+			const boost::optional<time::Date>& startDate,
+			const boost::optional<time::Date>& endDate
+		);
+
 		bool isPlaceServedByCommercialLine(uid Line, uid place);
 		bool isPlaceServedByNetwork(uid networkId, uid place);
 		

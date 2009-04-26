@@ -37,6 +37,8 @@
 // Security
 #include "12_security/Types.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace env
@@ -74,10 +76,10 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				uid networkId = UNKNOWN_VALUE
-				, std::string name = "%",
-				std::string creatorId = "%"
-				, int first = 0
+				boost::optional<util::RegistryKeyType> networkId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::string> name = boost::optional<std::string>(),
+				boost::optional<std::string> creatorId = boost::optional<std::string>(),
+				int first = 0
 				, int number = 0
 				, bool orderByNetwork = true
 				, bool orderByName = false

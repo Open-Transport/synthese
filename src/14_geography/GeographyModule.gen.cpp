@@ -7,6 +7,7 @@ synthese::geography::CityTableSync::integrate();
 synthese::geography::CityNameValueInterfaceElement::integrate();
 synthese::geography::GeographyModule::integrate();
 synthese::geography::PlaceAliasTableSync::integrate();
+synthese::geography::PlaceAlias::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::geography::City>();

@@ -169,6 +169,8 @@ namespace synthese
 		void Journey::prepend(
 			const Journey& journey
 		){
+			if(journey.empty()) return;
+
 			if (_method == UNDEFINED_DIRECTION)
 			{
 				_setMethod(journey.getMethod());
@@ -218,6 +220,8 @@ namespace synthese
 		void Journey::append(
 			const Journey& journey
 		){
+			if(journey.empty()) return;
+
 			if(_method == UNDEFINED_DIRECTION)
 			{
 				_setMethod(journey.getMethod());
@@ -515,9 +519,10 @@ namespace synthese
 
 		void Journey::_setMethod( AccessDirection method )
 		{
-			assert(method != UNDEFINED_DIRECTION);
-
 			_method = method;
+
+			if(method == UNDEFINED_DIRECTION) return;
+
 			if (_method == DEPARTURE_TO_ARRIVAL)
 			{
 				_bestTimeStrictOperator = &DateTime::operator<;
@@ -599,6 +604,8 @@ namespace synthese
 
 		void Journey::push( const Journey& journey )
 		{
+			if(journey.empty()) return;
+
 			if(_method == UNDEFINED_DIRECTION)
 			{
 				_setMethod(journey.getMethod());

@@ -30,6 +30,9 @@
 #include <iostream>
 
 #include "SQLiteRegistryTableSyncTemplate.h"
+#include "FetcherTemplate.h"
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -38,7 +41,9 @@ namespace synthese
 		/** ContinuousService table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class ContinuousServiceTableSync : public db::SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>
+		class ContinuousServiceTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>,
+			public db::FetcherTemplate<env::NonPermanentService, ContinuousServiceTableSync>
 		{
 		public:
 			static const std::string COL_SERVICENUMBER;
@@ -63,11 +68,12 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				uid lineId = UNKNOWN_VALUE
-				, int first = 0
-				, int number = 0
-				, bool orderByDepartureTime = true
-				, bool raisingOrder = true,
+				boost::optional<util::RegistryKeyType> lineId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> commercialLineId = boost::optional<util::RegistryKeyType>(),
+				int first = 0,
+				int number = 0,
+				bool orderByDepartureTime = true,
+				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};

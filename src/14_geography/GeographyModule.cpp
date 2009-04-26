@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<ModuleClass,GeographyModule>::FACTORY_KEY("Geographie");
+		template<> const string FactorableTemplate<ModuleClass,GeographyModule>::FACTORY_KEY("14_geography");
 	}
 
 

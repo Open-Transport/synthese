@@ -1,6 +1,6 @@
 
-/** SingleSentAlarm class header.
-	@file SingleSentAlarm.h
+/** LoadException class header.
+	@file LoadException.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,42 +20,35 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_SingleSentAlarm_h__
-#define SYNTHESE_SingleSentAlarm_h__
+#ifndef SYNTHESE_db_LinkException_h__
+#define SYNTHESE_db_LinkException_h__
 
-#include "SentAlarm.h"
+#include "01_util/Exception.h"
+#include "01_util/UId.h"
+#include "01_util/Conversion.h"
 
 namespace synthese
 {
-	namespace messages
+	namespace db
 	{
-		/** SingleSentAlarm class.
-			@ingroup m17
+		/** LoadException class template.
+				- class C : Class of the table sync of the current object
+			@ingroup m10Exceptions refExceptions
 		*/
-		class SingleSentAlarm
-		:	public SentAlarm
+		template<class C>
+		class LoadException : public util::Exception
 		{
 		public:
-
-		private:
-			bool			_enabled;
-			time::DateTime	_periodStart; //!< Alarm applicability period start
-			time::DateTime	_periodEnd;   //!< Alarm applicability period end
-
-		public:
-			SingleSentAlarm(const SingleSentAlarm& alarm);
-			SingleSentAlarm(util::RegistryKeyType key = UNKNOWN_VALUE);
-			~SingleSentAlarm();
-
-			void setIsEnabled(bool value);
-			void setPeriodStart ( const time::DateTime& periodStart);
-			void setPeriodEnd ( const time::DateTime& periodEnd);
-
-			bool					getIsEnabled()		const;
-			const time::DateTime&	getPeriodStart()	const;
-			const time::DateTime&	getPeriodEnd()		const;
+			LoadException(
+				uid currentId,
+				const std::string& field,
+				const std::string& text
+			):	util::Exception(
+				"There was an error in "+ C::TABLE.NAME +" table at row "+ util::Conversion::ToString(currentId) +" in field "+ field +" : "+ text
+			)
+			{}
 		};
 	}
 }
 
-#endif // SYNTHESE_SingleSentAlarm_h__
+#endif // SYNTHESE_db_LinkException_h__

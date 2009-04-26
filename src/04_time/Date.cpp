@@ -26,13 +26,14 @@
 #include <ctime>
 #include <assert.h>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "04_time/Date.h"
-#include "04_time/DateTime.h"
-#include "04_time/TimeParseException.h"
+#include "Date.h"
+#include "DateTime.h"
+#include "TimeParseException.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -521,6 +522,32 @@ namespace synthese
 
 			assert(false);
 			return 0;
+		}
+
+
+
+		boost::optional<Date> Date::FromSQLOptionalDate( const std::string& sqlTimestamp)
+		{
+			if (sqlTimestamp.empty())
+				return optional<Date>();
+
+			if(	sqlTimestamp.size() == 1)
+			{
+				if (sqlTimestamp[0] == TIME_UNKNOWN)
+					return optional<Date>();
+				else
+					return Date(sqlTimestamp[0]);
+			}
+
+			int firstSlash = (int) sqlTimestamp.find('-');
+			int secondSlash = (int) sqlTimestamp.find('-', firstSlash+1);
+
+			if (firstSlash == -1 || secondSlash == -1)
+				return optional<Date>();
+
+			return Date(Conversion::ToInt (sqlTimestamp.substr (secondSlash+1, sqlTimestamp.length() - secondSlash)),
+				Conversion::ToInt (sqlTimestamp.substr (firstSlash+1, secondSlash - firstSlash)),
+				Conversion::ToInt (sqlTimestamp.substr (0, firstSlash+1)));
 		}
 	}
 }

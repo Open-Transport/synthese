@@ -211,6 +211,7 @@ namespace synthese
 				ContinuousServiceTableSync::Search(
 					*_env,
 					line->getKey(),
+					optional<RegistryKeyType>(),
 					0, 0, true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);

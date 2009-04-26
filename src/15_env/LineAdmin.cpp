@@ -88,11 +88,12 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			if(!doDisplayPreparationActions) return;
-		
 			try
 			{
 				_line = LineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+
+				if(!doDisplayPreparationActions) return;
+
 				LineStopTableSync::Search(_env, _line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 				ScheduledServiceTableSync::Search(
 					_env,
@@ -103,7 +104,16 @@ namespace synthese
 					0, 0, true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);
-				ContinuousServiceTableSync::Search(_env, _line->getKey(), 0, 0, true, true, UP_DOWN_LINKS_LOAD_LEVEL);
+				ContinuousServiceTableSync::Search(
+					_env,
+					_line->getKey(),
+					optional<RegistryKeyType>(),
+					0,
+					0,
+					true,
+					true,
+					UP_DOWN_LINKS_LOAD_LEVEL
+				);
 			}
 			catch (Exception& e)
 			{

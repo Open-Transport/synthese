@@ -208,10 +208,10 @@ namespace synthese
 
 		void CommercialLineTableSync::Search(
 			Env& env,
-			uid networkId
-			, std::string name,
-			string creatorId
-			, int first
+			optional<RegistryKeyType> networkId,
+			optional<string> name,
+			optional<string> creatorId,
+			int first
 			, int number
 			, bool orderByNetwork
 			, bool orderByName
@@ -222,11 +222,23 @@ namespace synthese
 			query
 				<< " SELECT l.*"
 				<< " FROM " << TABLE.NAME << " AS l "
-				<< " WHERE l." << COL_CREATOR_ID << " LIKE " << Conversion::ToSQLiteString(creatorId)
-				<< " AND l." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(name)
-			;
-			if (networkId != UNKNOWN_VALUE)
-				query << " AND l." << COL_NETWORK_ID << "=" << networkId;
+				<< " WHERE 1";
+			if(creatorId && *creatorId != "%%" && *creatorId != "%")
+			{
+				if (creatorId->empty())
+					query << " AND (l." << COL_CREATOR_ID << " IS NULL OR l." << COL_CREATOR_ID << "='')";
+				else
+					query << " AND l." << COL_CREATOR_ID << " LIKE " << Conversion::ToSQLiteString(*creatorId);
+			}
+			if(name && *name != "%%" && *name != "%")
+			{
+				if (name->empty())
+					query << " AND (l." << COL_NAME << " IS NULL OR l." << COL_NAME << "='')";
+				else
+					query << " AND l." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+			}
+			if (networkId && *networkId != UNKNOWN_VALUE)
+				query << " AND l." << COL_NETWORK_ID << "=" << *networkId;
 			if (orderByNetwork)
 				query << " ORDER BY "
 					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")

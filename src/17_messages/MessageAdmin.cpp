@@ -78,16 +78,19 @@ namespace synthese
 
 	namespace messages
 	{
+		const string MessageAdmin::TAB_PARAMS("tp");
+
 		void MessageAdmin::setFromParametersMap(
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
 			try
 			{
-				_alarm = AlarmTableSync::Get(_request->getObjectId(), _env, UP_LINKS_LOAD_LEVEL);
+				_alarm = AlarmTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch(...)
 			{
@@ -103,6 +106,8 @@ namespace synthese
 		server::ParametersMap MessageAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_alarm.get())
+				m.insert(QueryString::PARAMETER_OBJECT_ID, _alarm->getKey());
 			return m;
 		}
 
@@ -110,77 +115,104 @@ namespace synthese
 
 		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
-			ActionFunctionRequest<UpdateAlarmAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setSamePage(this);
-			updateRequest.getAction()->setAlarmId(_alarm->getKey());
-
-			shared_ptr<const SingleSentAlarm> salarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
-			
-			stream << "<h1>Paramètres</h1>";
-			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
-			
-			stream << t.open();
-			stream << t.cell("Type", t.getForm().getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()));
-
-			if (salarm.get())
+			////////////////////////////////////////////////////////////////////
+			// TAB PARAMETERS
+			if (openTabContent(stream, TAB_PARAMS))
 			{
-				stream << t.cell("Début diffusion", t.getForm().getCalendarInput(UpdateAlarmAction::PARAMETER_START_DATE, salarm->getPeriodStart()));
-				stream << t.cell("Fin diffusion", t.getForm().getCalendarInput(UpdateAlarmAction::PARAMETER_END_DATE, salarm->getPeriodEnd()));
-				stream << t.cell("Actif", t.getForm().getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, salarm->getIsEnabled()));
-			}
-			stream << t.close();
+				ActionFunctionRequest<UpdateAlarmAction,AdminRequest> updateRequest(_request);
+				updateRequest.getFunction()->setSamePage(this);
+				updateRequest.getAction()->setAlarmId(_alarm->getKey());
 
-			if (_alarm->getLevel() != ALARM_LEVEL_UNKNOWN)
-			{
-				stream << "<h1>Contenu</h1>";
+				shared_ptr<const SingleSentAlarm> salarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
+				
+				stream << "<h1>Paramètres</h1>";
+				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
+				
+				stream << t.open();
+				stream << t.cell("Type", t.getForm().getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()));
 
-				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
-				templateRequest.getFunction()->setSamePage(this);
-				templateRequest.getAction()->setAlarmId(_alarm->getKey());
-
-				vector<pair<uid, string> > tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
-				if(!tl.empty())
+				if (salarm.get())
 				{
-					HTMLForm fc(templateRequest.getHTMLForm("template"));
-					stream << fc.open() << "<p>";
-					stream << "Modèle : ";
-					stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, uid());
-					stream << fc.getSubmitButton("Copier contenu");
-					stream << "</p>" << fc.close();
+					stream << t.cell("Début diffusion", t.getForm().getCalendarInput(UpdateAlarmAction::PARAMETER_START_DATE, salarm->getPeriodStart()));
+					stream << t.cell("Fin diffusion", t.getForm().getCalendarInput(UpdateAlarmAction::PARAMETER_END_DATE, salarm->getPeriodEnd()));
+					stream << t.cell("Actif", t.getForm().getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, salarm->getIsEnabled()));
 				}
+				stream << t.close();
 
-				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
-				updateMessagesRequest.getFunction()->setSamePage(this);
-				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
-
-				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
-				stream << tu.open();
-				stream << tu.cell("Message court", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 60));
-				stream << tu.cell("Message long", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
-				stream << tu.close();
-
-				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
-
-				ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(_request);
-				addRequest.getFunction()->setSamePage(this);
-				addRequest.getAction()->setAlarm(_alarm);
-
-				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
-				removeRequest.getFunction()->setSamePage(this);
-				removeRequest.getAction()->setAlarmId(_alarm->getKey());
-				
-				// Alarm messages destinations loop
-				vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
-				BOOST_FOREACH(shared_ptr<AlarmRecipient> recipient, recipients)
+				if (_alarm->getLevel() != ALARM_LEVEL_UNKNOWN)
 				{
+					stream << "<h1>Contenu</h1>";
+
+					ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
+					templateRequest.getFunction()->setSamePage(this);
+					templateRequest.getAction()->setAlarmId(_alarm->getKey());
+
+					vector<pair<uid, string> > tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
+					if(!tl.empty())
+					{
+						HTMLForm fc(templateRequest.getHTMLForm("template"));
+						stream << fc.open() << "<p>";
+						stream << "Modèle : ";
+						stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, uid());
+						stream << fc.getSubmitButton("Copier contenu");
+						stream << "</p>" << fc.close();
+					}
+
+					ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
+					updateMessagesRequest.getFunction()->setSamePage(this);
+					updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
+
+					PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
+					stream << tu.open();
+					stream << tu.cell("Message court", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 60));
+					stream << tu.cell("Message long", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
+					stream << tu.close();
+				}
+			}
+			// Alarm messages destinations loop
+			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
+			BOOST_FOREACH(shared_ptr<AlarmRecipient> recipient, recipients)
+			{
+				////////////////////////////////////////////////////////////////////
+				// TAB STOPS
+				if (openTabContent(stream, recipient->getFactoryKey()))
+				{
+					FunctionRequest<AdminRequest> searchRequest(_request);
+					searchRequest.getFunction()->setSamePage(this);
+
+					ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(_request);
+					addRequest.getFunction()->setSamePage(this);
+					addRequest.getAction()->setAlarm(_alarm);
 					addRequest.getAction()->setRecipientKey(recipient->getFactoryKey());
-				
-					stream << "<h1>Diffusion sur " << recipient->getTitle() << "</h1>";
+
+					ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
+					removeRequest.getFunction()->setSamePage(this);
+					removeRequest.getAction()->setAlarmId(_alarm->getKey());
 
 					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
 				}
 			}
+			
+
+			////////////////////////////////////////////////////////////////////
+			// END TABS
+			closeTabContent(stream);
+		}
+
+		void MessageAdmin::_buildTabs(
+		) const {
+			_tabs.clear();
+
+			_tabs.push_back(Tab("Paramètres", TAB_PARAMS, true));
+
+			// Alarm messages destinations loop
+			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
+			BOOST_FOREACH(shared_ptr<AlarmRecipient> recipient, recipients)
+			{
+				_tabs.push_back(Tab(recipient->getTitle(), recipient->getFactoryKey(), true));
+			}
+
+			_tabBuilded = true;
 		}
 
 		bool MessageAdmin::isAuthorized() const

@@ -191,5 +191,21 @@ namespace synthese
 				_map.insert(make_pair(it.first,it.second));
 			}
 		}
+
+
+
+		boost::optional<time::Date> ParametersMap::getOptionalDate( const std::string& parameterName ) const
+		{
+			optional<string> result(getOptionalString(parameterName));
+			return result ? Date::FromSQLOptionalDate(*result) : optional<Date>();
+		}
+
+
+
+		boost::optional<std::string> ParametersMap::getOptionalString( const std::string& parameterName ) const
+		{
+			Map::const_iterator it(_map.find(parameterName));
+			return (it == _map.end()) ? optional<string>() : optional<string>(it->second);
+		}
 	}
 }

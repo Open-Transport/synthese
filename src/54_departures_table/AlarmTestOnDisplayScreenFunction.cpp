@@ -47,8 +47,10 @@
 #include "CommercialLine.h"
 #include "AlarmTestOnDisplayScreenFunction.h"
 #include "GraphConstants.h"
+#include "InterfacePageTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -89,6 +91,15 @@ namespace synthese
 			try
 			{
 				_type = DisplayTypeTableSync::Get(id, _env);
+				if (!_type->getDisplayInterface())
+					throw RequestException("The specified type has no display interface");
+				InterfacePageTableSync::Search(
+					_env,
+					_type->getDisplayInterface()->getKey(),
+					optional<int>(),
+					optional<int>(),
+					UP_DOWN_LINKS_LOAD_LEVEL
+				);
 			}
 			catch (...)
 			{
@@ -102,41 +113,42 @@ namespace synthese
 			{
 				ArrivalDepartureListWithAlarm displayedObject;
 
-				auto_ptr<City> city(new City);
-				city->setName("CITY");
-				auto_ptr<PublicTransportStopZoneConnectionPlace> place(new PublicTransportStopZoneConnectionPlace);
-				place->setName("TEST");
-				place->setCity(city.get());
+				City city;
+				city.setName("CITY");
+				PublicTransportStopZoneConnectionPlace place;
+				place.setName("TEST");
+				place.setCity(&city);
 				vector<const PublicTransportStopZoneConnectionPlace*> places;
-				places.push_back(place.get());
-				places.push_back(place.get());
-				auto_ptr<CommercialLine> cline(new CommercialLine);
-				cline->setShortName("00");
-				auto_ptr<Line> line(new Line);
-				line->setCommercialLine(cline.get());
-				auto_ptr<LineStop> lineStop(new LineStop);
-				lineStop->setLine(line.get());
+				places.push_back(&place);
+				places.push_back(&place);
+				CommercialLine cline;
+				cline.setShortName("00");
+				Line line;
+				line.setCommercialLine(&cline);
+				LineStop lineStop;
+				lineStop.setLine(&line);
 				DateTime d(TIME_CURRENT);
 				
 
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
-					ServicePointer sp(DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN, lineStop.get());
+					ServicePointer sp(DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN, &lineStop);
 					sp.setActualTime(d);
 					DeparturesTableElement dte(sp, false);
 					displayedObject.map.insert(make_pair(dte, places));
 					d += 1;
 				}
 
-				auto_ptr<SingleSentAlarm> alarm(new SingleSentAlarm);
-				alarm->setShortMessage(_alarm->getShortMessage());
-				alarm->setLongMessage(_alarm->getLongMessage());
-				alarm->setLevel(_alarm->getLevel());
-				alarm->setIsEnabled(true);
+				SingleSentAlarm alarm;
+				alarm.setShortMessage(_alarm->getShortMessage());
+				alarm.setLongMessage(_alarm->getLongMessage());
+				alarm.setLevel(_alarm->getLevel());
+				alarm.setIsEnabled(true);
 
-				displayedObject.alarm = alarm.get();
-				if (_type->getDisplayInterface() == NULL) return;
-				const DeparturesTableInterfacePage* page(_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>());
+				displayedObject.alarm = &alarm;
+				const DeparturesTableInterfacePage* page(
+					_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
+				);
 				if (page == NULL) return;
 
 				VariablesMap variables;
@@ -150,7 +162,7 @@ namespace synthese
 					, false
 					, false
 					, _type->getMaxStopsNumber()
-					, place.get()
+					, &place
 					, displayedObject
 				);
 			}

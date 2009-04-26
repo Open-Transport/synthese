@@ -98,8 +98,7 @@ namespace synthese
 				, _requestParameters.maxSize
 				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
 				, _requestParameters.raisingOrder
-				);
-			ActionResultHTMLTable::ResultParameters	_resultParameters;
+			);
 			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<Profile>());
 		}
 		
@@ -146,7 +145,7 @@ namespace synthese
 			v.push_back(make_pair(string(), string("Actions")));
 			ActionResultHTMLTable t(
 				v,
-				s.getForm(),
+				searchRequest.getHTMLForm(),
 				_requestParameters,
 				_resultParameters,
 				addProfileRequest.getHTMLForm("add"),

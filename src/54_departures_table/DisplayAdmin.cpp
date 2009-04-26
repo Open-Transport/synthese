@@ -71,6 +71,9 @@
 #include "Line.h"
 #include "CommercialLine.h"
 #include "ArrivalDepartureTableLog.h"
+#include "MessageAdmin.h"
+#include "MessagesScenarioAdmin.h"
+#include "SingleSentAlarm.h"
 
 #include <utility>
 #include <sstream>
@@ -733,6 +736,12 @@ namespace synthese
 				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
 				viewRequest.setObjectId(_displayScreen->getKey());
 
+				FunctionRequest<AdminRequest> viewMessageRequest(_request);
+				viewMessageRequest.getFunction()->setPage<MessageAdmin>();
+
+				FunctionRequest<AdminRequest> viewScenarioRequest(_request);
+				viewScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
+
 				// Output
 				stream << "<h1>Contenus actifs</h1>";
 
@@ -765,6 +774,17 @@ namespace synthese
 					stream << t.col() << "Message : " + alarm->getShortMessage();
 					stream << t.col() << (alarm->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getPeriodEnd().toString());
 					stream << t.col();
+
+					if(dynamic_cast<SingleSentAlarm*>(alarm.get()))
+					{
+						viewMessageRequest.setObjectId(alarm->getKey());
+						stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Editer", string(), "note.png");
+					}
+					else
+					{
+						viewScenarioRequest.setObjectId(alarm->getKey());
+						stream << HTMLModule::getLinkButton(viewScenarioRequest.getURL(), "Editer", string(), "note.png");
+					}
 				}
 
 				if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(_displayScreen->getKey()))
@@ -780,6 +800,47 @@ namespace synthese
 				stream << t.close();
 
 				stream << "<h1>Contenus en attente</h1>";
+
+				vector<shared_ptr<SentAlarm> > futures(DisplayScreenTableSync::GetFutureDisplayedMessages(
+					_env,
+					_displayScreen->getKey()
+				)	);
+				if(!futures.empty())
+				{
+					HTMLTable::ColsVector h2;
+					h2.push_back("Contenu");
+					h2.push_back("Contenu");
+					h2.push_back("Date début");
+					h2.push_back("Date fin");
+					h2.push_back("Admin");
+					HTMLTable t2(h2, ResultHTMLTable::CSS_CLASS);
+					stream << t2.open();
+					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, futures)
+					{
+						stream << t2.row();
+						stream << t2.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
+						stream << t2.col() << "Message : " + alarm->getShortMessage();
+						stream << t2.col() << alarm->getPeriodStart().toString();
+						stream << t2.col() << (alarm->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getPeriodEnd().toString());
+						stream << t2.col();
+
+						if(dynamic_cast<SingleSentAlarm*>(alarm.get()))
+						{
+							viewMessageRequest.setObjectId(alarm->getKey());
+							stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Editer", string(), "note.png");
+						}
+						else
+						{
+							viewScenarioRequest.setObjectId(alarm->getKey());
+							stream << HTMLModule::getLinkButton(viewScenarioRequest.getURL(), "Editer", string(), "note.png");
+						}
+					}
+					stream << t2.close();
+				}
+				else
+				{
+					stream << "<p>Aucun contenu en attente</p>";
+				}
 
 				stream << "<h1>Visualisation</h1>";
 

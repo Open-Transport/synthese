@@ -22,23 +22,34 @@
 
 #include "AdvancedSelectTableSync.h"
 
-#include "15_env/LineStopTableSync.h"
-#include "15_env/LineTableSync.h"
-#include "15_env/PhysicalStopTableSync.h"
-#include "15_env/CommercialLineTableSync.h"
+#include "Schedule.h"
 
-#include "02_db/DBModule.h"
+#include "LineStopTableSync.h"
+#include "LineTableSync.h"
+#include "PhysicalStopTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
+#include "ContinuousService.h"
+#include "ContinuousServiceTableSync.h"
+#include "ServiceDate.h"
+#include "ServiceDateTableSync.h"
+
+#include "DBModule.h"
 
 #include "01_util/Exception.h"
 
 #include <sstream>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
+	using namespace time;
+	using namespace pt;
 
 	namespace env
 	{
@@ -92,6 +103,134 @@ namespace synthese
 			if (!rows->next())
 				throw Exception("The line does not exists or does not contains any line stop");
 			return rows->getInt(LineStopTableSync::COL_RANKINPATH);
+		}
+
+
+
+		env::RunHours getCommercialLineRunHours(
+			util::RegistryKeyType id,
+			const boost::optional<time::Date>& startDate,
+			const boost::optional<time::Date>& endDate
+		){
+			RunHours result;
+			Env env;
+			ScheduledServiceTableSync::Search(env, UNKNOWN_VALUE, id);
+			BOOST_FOREACH(shared_ptr<ScheduledService> serv, env.getRegistry<ScheduledService>())
+			{
+				ServiceDateTableSync::SetActiveDates(*serv);
+				BOOST_FOREACH(const Date& date, serv->getActiveDates())
+				{
+					if(startDate && date < *startDate) continue;
+					if(endDate && date > *endDate) continue;
+
+					const int startHour(serv->getDepartureBeginScheduleToIndex(0).getHour().getHours());
+					const int endHour(serv->getDepartureEndScheduleToIndex(0).getHour().getHours());
+					if (startHour <= endHour)
+					{
+						for(int h(startHour); h <= endHour; ++h)
+						{
+							RunHours::key_type key(make_pair(date, h));
+							RunHours::iterator it(result.find(key));
+							if (it == result.end())
+							{
+								result.insert(make_pair(key, 1));
+							}
+							else
+							{
+								++it->second;
+							}
+						}
+					}
+					else
+					{
+						for(int h(0); h <= endHour; ++h)
+						{
+							RunHours::key_type key(make_pair(date, h));
+							RunHours::iterator it(result.find(key));
+							if (it == result.end())
+							{
+								result.insert(make_pair(key, 1));
+							}
+							else
+							{
+								++it->second;
+							}
+						}
+						for(int h(startHour); h <= 23; ++h)
+						{
+							RunHours::key_type key(make_pair(date, h));
+							RunHours::iterator it(result.find(key));
+							if (it == result.end())
+							{
+								result.insert(make_pair(key, 1));
+							}
+							else
+							{
+								++it->second;
+							}
+						}
+					}
+				}
+			}
+			ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), id);
+			BOOST_FOREACH(shared_ptr<ContinuousService> serv, env.getRegistry<ContinuousService>())
+			{
+				ServiceDateTableSync::SetActiveDates(*serv);
+				BOOST_FOREACH(const Date& date, serv->getActiveDates())
+				{
+					if(startDate && date < *startDate) continue;
+					if(endDate && date > *endDate) continue;
+
+					const int startHour(serv->getDepartureBeginScheduleToIndex(0).getHour().getHours());
+					const int endHour(serv->getDepartureEndScheduleToIndex(0).getHour().getHours());
+					if (startHour <= endHour)
+					{
+						for(int h(startHour); h <= endHour; ++h)
+						{
+							RunHours::key_type key(make_pair(date, h));
+							RunHours::iterator it(result.find(key));
+							if (it == result.end())
+							{
+								result.insert(make_pair(key, 1));
+							}
+							else
+							{
+								++it->second;
+							}
+						}
+					}
+					else
+					{
+						for(int h(0); h <= endHour; ++h)
+						{
+							RunHours::key_type key(make_pair(date, h));
+							RunHours::iterator it(result.find(key));
+							if (it == result.end())
+							{
+								result.insert(make_pair(key, 1));
+							}
+							else
+							{
+								++it->second;
+							}
+						}
+						for(int h(startHour); h <= 23; ++h)
+						{
+							RunHours::key_type key(make_pair(date, h));
+							RunHours::iterator it(result.find(key));
+							if (it == result.end())
+							{
+								result.insert(make_pair(key, 1));
+							}
+							else
+							{
+								++it->second;
+							}
+						}
+					}
+				}
+			}
+			return result;
 		}
 	}
 }

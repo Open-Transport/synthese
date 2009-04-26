@@ -84,9 +84,7 @@ namespace synthese
 		){
 
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
-
-			if(!doDisplayPreparationActions) return;
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
 
 			try
 			{
@@ -97,17 +95,20 @@ namespace synthese
 				throw AdminParametersException("No such network");
 			}
 
+			if(!doDisplayPreparationActions) return;
+
 			CommercialLineTableSync::Search(
 				_env,
 				_network->getKey()
-				, "%"+_searchName+"%",
-				"%"
-				, _requestParameters.first
+				, string("%"+_searchName+"%"),
+				optional<string>(),
+				_requestParameters.first
 				, _requestParameters.maxSize
 				, false
 				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
 				, _requestParameters.raisingOrder				
 			);
+			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<CommercialLine>());
 		}
 		
 		
@@ -131,9 +132,6 @@ namespace synthese
 			FunctionRequest<AdminRequest> lineOpenRequest(_request);
 			lineOpenRequest.getFunction()->setPage<CommercialLineAdmin>();
 
-			ResultHTMLTable::ResultParameters	_resultParameters;
-			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<CommercialLine>());
-
 			// Search form
 			stream << "<h1>Recherche</h1>";
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
@@ -144,7 +142,7 @@ namespace synthese
 
 
 			// Results display
-			stream << "<h1>Résultat de la recherche</h1>";
+			stream << "<h1>Lignes du réseau</h1>";
 			
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(), "N°"));
@@ -221,7 +219,15 @@ namespace synthese
 			)
 			{
 				Env env;
-				CommercialLineTableSync::Search(env, _network->getKey(), "%", "%", 0, 0, true, false, true, UP_LINKS_LOAD_LEVEL);
+				CommercialLineTableSync::Search(
+					env,
+					_network->getKey(),
+					optional<string>(),
+					optional<string>(),
+					0, 0,
+					true, false, true,
+					UP_LINKS_LOAD_LEVEL
+				);
 				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 				{
 					PageLink link(getPageLink());

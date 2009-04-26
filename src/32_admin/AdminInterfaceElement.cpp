@@ -349,7 +349,7 @@ namespace synthese
 			{
 				ParametersMap parameter;
 				parameter.insert(parameterName, parameterValue);
-				page->setFromParametersMap(parameter);
+				page->setFromParametersMap(parameter, false);
 			}
 			return page;
 		}

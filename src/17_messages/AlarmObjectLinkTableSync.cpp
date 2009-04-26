@@ -26,6 +26,7 @@
 #include "AlarmObjectLink.h"
 #include "SentAlarm.h"
 #include "Registry.h"
+#include "AlarmTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -83,10 +84,17 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
-				shared_ptr<SentAlarm> alarm(env.getEditableRegistry<SentAlarm>().getEditable(object->getAlarmId()));
+				shared_ptr<SentAlarm> alarm(dynamic_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(
+					object->getAlarmId(),
+					env
+				)	)	);
+				if(!ar.get())
+					Log::GetInstance().error ("Alarm object link error (t040_alarm_object_links table) : alarm "+ Conversion::ToString(object->getAlarmId()) + " is not sent alarm");
+
 				try
 				{
-					ar->addObject(alarm.get(), object->getObjectId());
+					if(alarm.get())
+						ar->addObject(alarm.get(), object->getObjectId());
 				}
 				catch (AlarmObjectLinkException e)
 				{
@@ -100,9 +108,8 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
 			AlarmObjectLink* aol
 		){
-			Env env;
 			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(aol->getRecipientKey()));
-			shared_ptr<SentAlarm> alarm = env.getEditableRegistry<SentAlarm>().getEditable(aol->getAlarmId());
+			shared_ptr<SentAlarm> alarm = Env::GetOfficialEnv().getEditableRegistry<SentAlarm>().getEditable(aol->getAlarmId());
 			ar->removeObject(alarm.get(), aol->getObjectId());
 		}
 
@@ -139,6 +146,7 @@ namespace synthese
 			while (rows->next ())
 			{
 				shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
+				aol->setKey(rows->getLongLong(TABLE_COL_ID));
 				Load(aol.get(), rows, env);
 				registry.add(aol);
 			}

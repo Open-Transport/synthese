@@ -98,6 +98,9 @@ namespace synthese
 		*/
 		class MessageAdmin : public admin::AdminInterfaceElementTemplate<MessageAdmin>
 		{
+		public:
+			static const std::string TAB_PARAMS;
+
 		private:
 			boost::shared_ptr<const Alarm>	_alarm;
 			server::ParametersMap			_parameters;
@@ -122,7 +125,7 @@ namespace synthese
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 
-
+			virtual void _buildTabs() const;
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.

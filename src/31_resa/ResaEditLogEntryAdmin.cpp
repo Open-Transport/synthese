@@ -82,8 +82,6 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			if(!doDisplayPreparationActions) return;
-			
 			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
