@@ -175,12 +175,24 @@ namespace synthese
 			}
 			if(_sscenario.get())
 			{
-				_sscenario->setIsEnabled(_enabled);
+				if(	_sscenario->getTemplate() &&
+					!ScenarioTemplate::ControlCompulsoryVariables(_sscenario->getTemplate()->getVariables(), _variables)
+				){
+					_sscenario->setIsEnabled(false);
+				}
+				else
+				{
+					_sscenario->setIsEnabled(_enabled);
+				}
 				_sscenario->setPeriodStart(_startDate);
 				_sscenario->setPeriodEnd(_endDate);
 				_sscenario->setVariables(_variables);
 			}
 			ScenarioTableSync::Save(_scenario.get());
+			if(	_sscenario->getTemplate())
+			{
+				SentScenarioInheritedTableSync::WriteVariablesIntoMessages(*_sscenario);
+			}
 
 			// Log
 			if(_sscenario.get())

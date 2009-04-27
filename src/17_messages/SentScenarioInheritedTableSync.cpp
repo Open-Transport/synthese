@@ -29,6 +29,7 @@
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
+#include "SentAlarm.h"
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -343,6 +344,30 @@ namespace synthese
 					templateAlarm->getKey(),
 					alarm.getKey()
 				);
+			}
+		}
+
+
+
+		void SentScenarioInheritedTableSync::WriteVariablesIntoMessages( const SentScenario& scenario )
+		{
+			Env env;
+			ScenarioSentAlarmInheritedTableSync::Search(env, scenario.getKey());
+
+			const SentScenario::VariablesMap& values(scenario.getVariables());
+			
+			BOOST_FOREACH(shared_ptr<SentAlarm> alarm, env.getEditableRegistry<SentAlarm>())
+			{
+				if (!alarm->getTemplate()) continue;
+
+				alarm->setShortMessage(
+					ScenarioTemplate::WriteTextFromVariables(alarm->getTemplate()->getShortMessage(), values)
+				);
+				alarm->setLongMessage(
+					ScenarioTemplate::WriteTextFromVariables(alarm->getTemplate()->getLongMessage(), values)
+				);
+
+				AlarmTableSync::Save(alarm.get());
 			}
 		}
 	}

@@ -105,6 +105,17 @@ namespace synthese
 				util::RegistryKeyType sourceId,
 				const SentScenario& dest
 			);
+
+			
+			
+			/** Rewrites the messages of a sent scenario considering the values of the variables.
+				@param scenario sent scenario to rewrite
+				@author Hugues Romain
+				@date 2009
+			*/
+			static void WriteVariablesIntoMessages(
+				const SentScenario& scenario
+			);
 		};
 	}
 }

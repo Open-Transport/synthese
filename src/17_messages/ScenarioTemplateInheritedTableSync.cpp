@@ -151,43 +151,8 @@ namespace synthese
 			AlarmTemplateInheritedTableSync::Search(env, scenarioId);
 			BOOST_FOREACH(shared_ptr<const AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 			{
-				string text(alarm->getLongMessage());
-				for(string::const_iterator it(text.begin()); it != text.end(); ++it)
-				{
-					if (*it == '$')
-					{
-						if (it+1 != text.end() && *(it+1) == '$' && it+2 != text.end() && *(it+2) == '$')
-						{
-							it += 2;
-							continue;
-						}
-						ScenarioTemplate::Variable v;
-						if (*(it+1) == '$')
-						{
-							++it;
-							v.compulsory = true;
-						}
-						else
-						{
-							v.compulsory = false;
-						}
-						string::const_iterator it2(it);
-						for(++it; it != text.end() && *it != '|' && *it != '$'; ++it);
-						if (it == text.end()) continue;
-						v.code = text.substr(it2-text.begin()+1, it-it2-1);
-
-						if (*it == '|')
-						{
-							++it;
-							it2 = it;
-							for(; it != text.end() && *it != '$'; ++it);
-							if (it == text.end()) continue;
-							v.helpMessage = text.substr(it2-text.begin(), it-it2);
-						}
-						result.insert(make_pair(v.code, v));
-						if (v.compulsory) ++it;
-					}
-				}
+				ScenarioTemplate::GetVariablesInformations(alarm->getShortMessage(), result);
+				ScenarioTemplate::GetVariablesInformations(alarm->getLongMessage(), result);
 			}
 			return result;
 		}

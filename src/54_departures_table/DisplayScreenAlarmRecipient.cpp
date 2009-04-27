@@ -230,7 +230,7 @@ namespace synthese
 
 				addRequest.getAction()->setObjectId(screen->getKey());
 
-				stream << t1.row(Conversion::ToString(screen->getKey()));
+				stream << t1.row();
 				stream << t1.col() << screen->getFullName();
 				stream << t1.col() << (screen->getType() ? screen->getType()->getName() : "inconnu");
 				stream << t1.col();

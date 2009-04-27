@@ -98,6 +98,7 @@ namespace synthese
 			typedef std::map<RegistryKeyType, boost::shared_ptr<T> > Map;
 			typedef std::vector<boost::shared_ptr<T> > Vector;
 			typedef typename Vector::const_iterator const_iterator;
+			typedef typename Vector::iterator iterator;
 //			typedef typename Map::const_iterator map_const_iterator;
 
 		 private:
@@ -183,6 +184,14 @@ namespace synthese
 				*/
 				const_iterator end() const;
 
+				/** Gets the first element according to the ordered vector.
+				*/
+				iterator begin();
+
+				/** Gets the end element according to the ordered vector.
+				*/
+				iterator end();
+
 				boost::shared_ptr<T> front() { return _orderedVector.front(); }
 			//@}
 
@@ -228,9 +237,21 @@ namespace synthese
 		};
 
 
-
-		
 		/** @} */
+
+
+		template<class T>
+		typename Registry<T>::iterator synthese::util::Registry<T>::begin()
+		{
+			return _orderedVector.begin();
+		}
+
+		template<class T>
+		typename Registry<T>::iterator synthese::util::Registry<T>::end()
+		{
+			return _orderedVector.end();
+		}
+
 
 		template<class T>
 		void Registry<T>::pop_back()

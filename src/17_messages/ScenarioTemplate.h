@@ -27,6 +27,7 @@
 
 #include "Scenario.h"
 #include "Registry.h"
+#include "SentScenario.h"
 
 #include <map>
 #include <string>
@@ -112,6 +113,64 @@ namespace synthese
 			/// @name Modifiers
 			//@{
 			//@}
+
+			
+			
+			/** Parses a string to find variables informations and stores it into a variables list.
+				@param text text to parse
+				@param result variables list to populate
+				@author Hugues Romain
+				@date 2009
+
+				The method searches a special pattern in the text :
+				 - $xxx$ = optional variable named xxx
+				 - $$xxx$ = compulsory variable named xxx
+				 - $$$ = $ character
+				 - $xxx|yyy$ = optional variable named xxx, with additional informations to display yyy
+				 - $$xxx|yyy$ = compulsory variable named xxx with additional informations to display yyy
+			*/
+			static void GetVariablesInformations(
+				const std::string& text,
+				ScenarioTemplate::VariablesMap& result
+			);
+
+		
+			
+			/** Creates a string from the template text and the variables content.
+				@param text text to parse
+				@param values variables values
+				@return std::string generated text
+				@author Hugues Romain
+				@date 2009
+				
+				The following replacements are done by the method:
+				 - $xxx$ => value of the xxx variable (nothing if undefined)
+				 - $$xxx$ => value of the xxx variable (nothing if undefined)
+				 - $$$ => $
+				 - $xxx|yyy$ => value of the xxx variable (nothing if undefined)
+				 - $$xxx|yyy$ => value of the xxx variable (nothing if undefined)
+				
+				@warning the presence of compulsory variables is not controlled by this method. Use ControlCompulsoryVariables to do it.
+			*/
+			static std::string WriteTextFromVariables(
+				const std::string& text,
+				const SentScenario::VariablesMap& values
+			);
+
+
+			
+			
+			/** Controls that all compulsory variables are valued.
+				@param variables variables informations
+				@param values values of the variables
+				@return bool true if each compulsory variable is defined and non empty
+				@author Hugues Romain
+				@date 2009
+			*/
+			static bool ControlCompulsoryVariables(
+				const ScenarioTemplate::VariablesMap& variables,
+				const SentScenario::VariablesMap& values
+			);
 		};
 	}
 }

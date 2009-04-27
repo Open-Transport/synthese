@@ -26,6 +26,7 @@
 #include "AlarmTemplate.h"
 #include "Registry.h"
 
+#include <sstream>
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -109,6 +110,144 @@ namespace synthese
 			const VariablesMap& value
 		){
 			_variables = value;
+		}
+
+
+
+		void ScenarioTemplate::GetVariablesInformations(
+			const std::string& text,
+			ScenarioTemplate::VariablesMap& result
+		){
+			for(string::const_iterator it(text.begin()); it != text.end(); ++it)
+			{
+				// jump over other characters than $
+				if (*it != '$') continue;
+
+				++it;
+
+				// $$$ = $
+				if (it != text.end() && *it== '$' && it+1 != text.end() && *(it+1) == '$')
+				{
+					++it;
+					continue;
+				}
+
+				// this is a variable definition
+				ScenarioTemplate::Variable v;
+
+				// compulsory variable
+				if (*it == '$')
+				{
+					++it;
+					v.compulsory = true;
+				}
+				else
+				{
+					v.compulsory = false;
+				}
+
+				// variable code
+				string::const_iterator it2(it);
+				for(; it != text.end() && *it != '|' && *it != '$'; ++it);
+				if (it == text.end()) continue;
+				v.code = text.substr(it2-text.begin(), it-it2);
+
+				// variable information
+				if (*it == '|')
+				{
+					++it;
+					it2 = it;
+					for(; it != text.end() && *it != '$'; ++it);
+					if (it == text.end()) continue;
+					v.helpMessage = text.substr(it2-text.begin(), it-it2);
+				}
+
+				// storage
+				ScenarioTemplate::VariablesMap::iterator vmit(result.find(v.code));
+				if(vmit == result.end())
+				{
+					result.insert(make_pair(v.code, v));
+				}
+				else
+				{
+					vmit->second.helpMessage += v.helpMessage;
+					if(v.compulsory) vmit->second.compulsory = true;
+				}
+			}
+		}
+
+
+
+		std::string ScenarioTemplate::WriteTextFromVariables(
+			const std::string& text,
+			const SentScenario::VariablesMap& variables
+		){
+			stringstream stream;
+
+			for(string::const_iterator it(text.begin()); it != text.end(); ++it)
+			{
+				// jump over other characters than $
+				if (*it != '$')
+				{
+					stream << *it;
+					continue;
+				}
+
+				++it;
+
+				// $$$ = $
+				if (it != text.end() && *it== '$' && it+1 != text.end() && *(it+1) == '$')
+				{
+					stream << "$";
+					++it;
+					continue;
+				}
+
+				// compulsory variable
+				if (*it == '$')
+				{
+					++it;
+				}
+
+				// variable code
+				string code;
+				string::const_iterator it2(it);
+				for(; it != text.end() && *it != '|' && *it != '$'; ++it);
+				if (it == text.end()) continue;
+				code = text.substr(it2-text.begin(), it-it2);
+
+				// variable information
+				if (*it == '|')
+				{
+					++it;
+					it2 = it;
+					for(; it != text.end() && *it != '$'; ++it);
+					if (it == text.end()) continue;
+				}
+
+				// writing
+				SentScenario::VariablesMap::const_iterator vmit(variables.find(code));
+				if(vmit != variables.end())
+				{
+					stream << vmit->second;
+				}
+			}
+			return stream.str();
+		}
+
+
+
+		bool ScenarioTemplate::ControlCompulsoryVariables(
+			const ScenarioTemplate::VariablesMap& variables,
+			const SentScenario::VariablesMap& values
+		){
+			BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+			{
+				if(!variable.second.compulsory) continue;
+
+				if(values.find(variable.second.code) == values.end()) return false;
+			}
+			return true;
 		}
 	}
 }
