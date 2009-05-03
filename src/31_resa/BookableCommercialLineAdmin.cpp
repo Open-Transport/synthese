@@ -42,7 +42,7 @@
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "RequestException.h"
 #include "ActionFunctionRequest.h"
 
@@ -113,7 +113,7 @@ namespace synthese
 			}
 			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
 
-			uid lineId(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			uid lineId(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
 				_line = CommercialLineTableSync::Get(lineId, _env);
@@ -512,7 +512,7 @@ namespace synthese
 
 		std::string BookableCommercialLineAdmin::getParameterName() const
 		{
-			return _line.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _line.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string BookableCommercialLineAdmin::getParameterValue() const

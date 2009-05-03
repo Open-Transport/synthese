@@ -28,14 +28,14 @@
 #include "12_security/Types.h"
 #include "12_security/Constants.h"
 
-#include "12_security/User.h"
-#include "12_security/Profile.h"
-#include "12_security/Right.h"
+#include "User.h"
+#include "Profile.h"
+#include "Right.h"
 
-#include "30_server/Session.h"
-#include "30_server/ParametersMap.h"
+#include "Session.h"
+#include "ParametersMap.h"
 
-#include "01_util/Factory.h"
+#include "Factory.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -53,7 +53,7 @@ namespace synthese
 	{
 		class Action;
 		class Function;
-		class QueryString;
+		class HTTPRequest;
 
 		/** Parsed request.
 			@ingroup m18
@@ -77,7 +77,7 @@ namespace synthese
 
 			The available output methods are  :
 				- execution of the action and/or the display from the specified parameters
-				- build of a query string (method getQueryString)
+				- build of a query string (method getRequest)
 				- build of an URL (method getURL)
 				- build of an HTML form (method getHTMLForm, build of a class html::HTMLForm object)
 
@@ -104,6 +104,21 @@ namespace synthese
 		{
 		public:
 			typedef enum { REQUEST_ERROR_NONE, REQUEST_ERROR_INFO, REQUEST_ERROR_WARNING, REQUEST_ERROR_FATAL } ErrorLevel;
+
+			static const std::string PARAMETER_SEPARATOR;
+			static const std::string PARAMETER_ASSIGNMENT;
+			static const uid UID_WILL_BE_GENERATED_BY_THE_ACTION;
+
+			static const std::string PARAMETER_STARTER;
+			static const std::string PARAMETER_FUNCTION;
+			static const std::string PARAMETER_SESSION;
+			static const std::string PARAMETER_CLIENT_URL;
+			static const std::string PARAMETER_OBJECT_ID;
+			static const std::string PARAMETER_ACTION;
+			static const std::string PARAMETER_ACTION_FAILED;
+			static const std::string PARAMETER_ERROR_MESSAGE;
+			static const std::string PARAMETER_ERROR_LEVEL;
+
 
 		private:
 
@@ -156,45 +171,33 @@ namespace synthese
 			//@}
 
 		public:
-			/** Construction of an empty request from an other one.
+
+			//! \name Constructor and destructor
+			//@{
+				/** Construction from a HTTP request object to parse.
+					@param httpRequest The HTTP request to parse
+					@throw RequestException if the string is incomplete or contains refused values according to the parameters validators
+					@author Hugues Romain
+					@date 2007-2009		
+				*/
+				Request(const HTTPRequest& httpRequest);
+
+
+				/** Construction of an empty request from an other one.
 					@param request Request to copy (default/NULL = no copy)
 					@param function Function to link with
 					@param action Action to link with
 					@author Hugues Romain
 					@date 2007
 					Use the public setters to fill the request.					
-			*/
-			explicit Request(
-				const Request* request=NULL
-				, boost::shared_ptr<Function> function=boost::shared_ptr<Function>()
-				, boost::shared_ptr<Action> action=boost::shared_ptr<Action>()
-			);
-
-			virtual ~Request();
-
-			ParametersMap&					getInternalParameters();
-
-			boost::shared_ptr<Function> _getFunction();
-			boost::shared_ptr<const Function> _getFunction() const;
-
-
-
-			void _setErrorMessage(const std::string& message);
-			void _setActionException(bool value);
-			void _setErrorLevel(const ErrorLevel& level);
-
-			boost::shared_ptr<const security::User> getUser() const;
-
-			//! \name Constructor and destructor
-			//@{
-				
-				/** Construction from a query string to parse, using the factory to choose the right subclass.
-					@param querystring The query string to parse
-					@throw RequestException if the string is incomplete or contains refused values according to the parameters validators
-					@author Hugues Romain
-					@date 2007					
 				*/
-				Request(const QueryString& querystring);
+				explicit Request(
+					const Request* request=NULL
+					, boost::shared_ptr<Function> function=boost::shared_ptr<Function>()
+					, boost::shared_ptr<Action> action=boost::shared_ptr<Action>()
+				);
+
+				virtual ~Request();
 			//@}
 
 			//! \name Getters
@@ -208,14 +211,21 @@ namespace synthese
 				bool getActionException() const;
 				const Session*		getSession()		const;
 
+				ParametersMap&					getInternalParameters();
 				const std::string&	getClientURL()		const;
 				const std::string&	getIP()				const;
 				uid					getObjectId()		const;
 				const std::string&	getErrorMessage()	const;
+
+				boost::shared_ptr<Function> _getFunction();
+				boost::shared_ptr<const Function> _getFunction() const;
 			//@}
 
 			//! \name Setters
 			//@{
+				void _setErrorMessage(const std::string& message);
+				void _setActionException(bool value);
+				void _setErrorLevel(const ErrorLevel& level);
 				virtual void setObjectId(uid id);
 				void setSession(Session* session);
 
@@ -255,13 +265,17 @@ namespace synthese
 				) const;
 
 				bool isActionFunctionAuthorized() const;
+
+				boost::shared_ptr<const security::User> getUser() const;
+
+				std::string getOutputMimeType();
 			//@}
 
 			//! \name Output methods
 			//@{
 				/** URL generator.
 					@return std::string The URL corresponding to the request (= client URL + query string)
-					@param normalize true|default = converts the url considering it is generated by a web browser (see @ref _normalizeQueryString), false = do not transform the URL.
+					@param normalize true|default = converts the url considering it is generated by a web browser (see @ref _normalizeRequest), false = do not transform the URL.
 						The second option is available if the Request object is used for building virtual urls containing scripts command (eg : synthese?id='+ document.getElementById("toto").value+'&...)
 					@author Hugues Romain
 					@date 2007
@@ -277,11 +291,9 @@ namespace synthese
 				html::HTMLForm getHTMLForm(std::string name=std::string()) const;
 
 				/** Query string getter for building links.
-					@param normalize true|default = converts the url considering it is generated by a web browser (see @ref _normalizeQueryString), false = do not transform the URL.
-						The second option is available if the Request object is used for building virtual urls containing scripts command (eg : synthese?id='+ document.getElementById("toto").value+'&...)
 					@return The query string corresponding to the request.
 				*/
-				QueryString getQueryString(bool normalize = true) const;
+				std::string getURI() const;
 
 
 				template <class F>

@@ -76,6 +76,9 @@ namespace synthese
 			) throw(server::RequestException);
 
 			virtual bool _isAuthorized() const;
+
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

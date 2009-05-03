@@ -129,5 +129,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string ImportFunction::getOutputMimeType() const
+		{
+			return "text/html";
+		}
 	}
 }

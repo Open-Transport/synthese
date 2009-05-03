@@ -255,5 +255,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string RoutePlannerFunction::getOutputMimeType() const
+		{
+			return _page->getMimeType();
+		}
 	}
 }

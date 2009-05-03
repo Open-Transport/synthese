@@ -30,7 +30,7 @@
 #include "SiteRoutePlanningAdmin.h"
 #include "TransportWebsiteRight.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 
@@ -87,7 +87,7 @@ namespace synthese
 		){
 			try
 			{
-				_site = SiteTableSync::GetEditable(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+				_site = SiteTableSync::GetEditable(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -101,7 +101,7 @@ namespace synthese
 		{
 			ParametersMap m;
 			if(_site.get())
-				m.insert(QueryString::PARAMETER_OBJECT_ID, _site->getKey());
+				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
 			return m;
 		}
 
@@ -186,7 +186,7 @@ namespace synthese
 				{
 					PageLink link(getPageLink());
 					link.name = site->getName();
-					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterName = Request::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(site->getKey());
 					links.push_back(link);
 				}
@@ -202,7 +202,7 @@ namespace synthese
 
 		std::string TransportSiteAdmin::getParameterName() const
 		{
-			return _site.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _site.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string TransportSiteAdmin::getParameterValue() const

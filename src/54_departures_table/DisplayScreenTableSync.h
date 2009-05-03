@@ -100,9 +100,9 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				const security::RightsOfSameClassMap& rights 
-				, bool totalControl 
-				, security::RightLevel neededLevel
+				boost::optional<const security::RightsOfSameClassMap&> rights = boost::optional<const security::RightsOfSameClassMap&>()
+				, bool totalControl = true
+				, security::RightLevel neededLevel = security::FORBIDDEN
 				, uid duid = UNKNOWN_VALUE
 				, uid localizationid = UNKNOWN_VALUE
 				, uid lineid = UNKNOWN_VALUE

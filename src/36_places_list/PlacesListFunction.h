@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_PlacesListFunction_H__
 #define SYNTHESE_PlacesListFunction_H__
 
-#include "36_places_list/FunctionWithSite.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "FunctionWithSite.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -87,6 +86,8 @@ namespace synthese
 			void setCityTextInput(const std::string& text);
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

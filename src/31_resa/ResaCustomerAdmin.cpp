@@ -37,7 +37,7 @@
 
 #include "PropertiesHTMLTable.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 
@@ -110,7 +110,7 @@ namespace synthese
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_EVENT_DATE, 50, false);
 			
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
 				_user = UserTableSync::Get(id, _env);
@@ -250,7 +250,7 @@ namespace synthese
 
 		std::string ResaCustomerAdmin::getParameterName() const
 		{
-			return _user.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _user.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string ResaCustomerAdmin::getParameterValue() const

@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 #include "MessagesLibraryRight.h"
 #include "ScenarioFolderAdd.h"
@@ -95,7 +95,7 @@ namespace synthese
 
 			ScenarioFolderTableSync::Save(&f);
 
-			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 			{
 				_request->setObjectId(f.getKey());
 			}

@@ -4,7 +4,7 @@
 #include "00_tcp/TcpClientSocket.h"
 #include "01_util/Conversion.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "ClientException.h"
 
 #include <boost/iostreams/stream.hpp>
@@ -45,15 +45,11 @@ namespace server
 	std::stringstream req;
 	req << request ;
 
-	// Append client IP
-	req << QueryString::PARAMETER_SEPARATOR 
-	    << QueryString::PARAMETER_IP << QueryString::PARAMETER_ASSIGNMENT << ip;
-	
 	if (clientUrl.size () > 0)
 	{
 	    // Append client URL
-	    req << QueryString::PARAMETER_SEPARATOR 
-		<< QueryString::PARAMETER_CLIENT_URL << QueryString::PARAMETER_ASSIGNMENT << clientUrl; 
+	    req << Request::PARAMETER_SEPARATOR 
+		<< Request::PARAMETER_CLIENT_URL << Request::PARAMETER_ASSIGNMENT << clientUrl; 
 	}
 
 	TcpClientSocket clientSock (_serverHost, _serverPort, _timeOut);

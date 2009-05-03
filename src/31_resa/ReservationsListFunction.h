@@ -25,11 +25,9 @@
 #ifndef SYNTHESE_ReservationsListFunction_H__
 #define SYNTHESE_ReservationsListFunction_H__
 
-#include "36_places_list/FunctionWithSite.h"
-
-#include "04_time/DateTime.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "FunctionWithSite.h"
+#include "DateTime.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -94,6 +92,8 @@ namespace synthese
 			ReservationsListFunction();
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

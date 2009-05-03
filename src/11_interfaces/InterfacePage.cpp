@@ -163,5 +163,15 @@ namespace synthese
 		{
 			return _directDisplayAllowed;
 		}
+
+		const std::string& InterfacePage::getMimeType() const
+		{
+			return _mimeType;
+		}
+
+		void InterfacePage::setMimeType( const std::string& value )
+		{
+			_mimeType = value;
+		}
 	}
 }

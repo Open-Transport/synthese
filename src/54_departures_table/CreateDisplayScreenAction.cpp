@@ -29,7 +29,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
 #include "Conversion.h"
@@ -92,7 +92,7 @@ namespace synthese
 			DisplayScreenTableSync::Save(screen.get());
 
 			// Request update
-			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 			{
 				_request->setObjectId(screen->getKey());
 			}

@@ -32,7 +32,7 @@
 #include "DisplayScreenTableSync.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
-
+#include "DeparturesTableInterfacePage.h"
 #include "ConnectionPlaceTableSync.h"
 
 #include "Interface.h"
@@ -122,6 +122,19 @@ namespace synthese
 
 			) const {
 			return true;
+		}
+
+		std::string DisplayScreenContentRequest::getOutputMimeType() const
+		{
+			return
+				(	_screen.get() &&
+					_screen->getType() &&
+					_screen->getType()->getDisplayInterface() &&
+					_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
+				) ?
+				_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->getMimeType() :
+				"text/plain"
+			;
 		}
 	}
 }

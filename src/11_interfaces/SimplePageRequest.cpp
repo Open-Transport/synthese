@@ -117,5 +117,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string SimplePageRequest::getOutputMimeType() const
+		{
+			return (_page == NULL) ? "text/plain" : _page->getMimeType();
+		}
 	}
 }

@@ -25,7 +25,7 @@
 #include "TransportNetworkAdmin.h"
 #include "EnvModule.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 #include "RequestMissingParameterException.h"
 #include "TransportNetwork.h"
@@ -88,7 +88,7 @@ namespace synthese
 
 			try
 			{
-				_network = TransportNetworkTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+				_network = TransportNetworkTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -184,7 +184,7 @@ namespace synthese
 				{
 					PageLink link(getPageLink());
 					link.name = network->getName();
-					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterName = Request::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(network->getKey());
 					links.push_back(link);
 				}
@@ -200,7 +200,7 @@ namespace synthese
 
 		std::string TransportNetworkAdmin::getParameterName() const
 		{
-			return _network.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _network.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string TransportNetworkAdmin::getParameterValue() const
@@ -234,7 +234,7 @@ namespace synthese
 					link.factoryKey = CommercialLineAdmin::FACTORY_KEY;
 					link.icon = CommercialLineAdmin::ICON;
 					link.name = line->getName();
-					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterName = Request::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(line->getKey());
 					links.push_back(link);
 				}

@@ -69,3 +69,4 @@
 #include "AlarmTestOnDisplayScreenFunction.h"
 #include "DisplayScreenPhysicalStopFunction.h"
 #include "DisplayGetNagiosStatusFunction.h"
+#include "CentreonConfigExportFunction.h"

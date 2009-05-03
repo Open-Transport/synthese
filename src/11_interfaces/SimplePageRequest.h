@@ -79,6 +79,8 @@ namespace synthese
 			void setPage(const interfaces::InterfacePage* page);
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

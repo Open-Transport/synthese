@@ -187,5 +187,10 @@ namespace synthese
 			_page->setActiveTab(page->getCurrentTab());
 			_page->setFromParametersMap(page->getParametersMap(), false);
 		}
+
+		std::string AdminRequest::getOutputMimeType() const
+		{
+			return "text/html";
+		}
 	}
 }

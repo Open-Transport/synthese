@@ -114,5 +114,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string CityListRequest::getOutputMimeType() const
+		{
+			return _page->getMimeType();
+		}
 	}
 }

@@ -35,7 +35,7 @@
 #include "MessagesModule.h"
 #include "ActionException.h"
 #include "Request.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "ParametersMap.h"
 #include "MessagesLog.h"
 
@@ -76,7 +76,7 @@ namespace synthese
 				AlarmTemplate alarm(UNKNOWN_VALUE, _scenarioTemplate.get());
 				AlarmTableSync::Save(&alarm);
 				
-				if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
 					_request->setObjectId(alarm.getKey());
 				}
@@ -93,7 +93,7 @@ namespace synthese
 					
 				AlarmTableSync::Save(&alarm);
 				
-				if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 					_request->setObjectId(alarm.getKey());
 			
 				MessagesLog::AddNewScenarioMessageEntry(

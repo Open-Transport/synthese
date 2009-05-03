@@ -52,6 +52,7 @@ namespace synthese
 		const string InterfacePageTableSync::TABLE_COL_INTERFACE("interface_id");
 		const string InterfacePageTableSync::TABLE_COL_CLASS = "class_code";
 		const string InterfacePageTableSync::TABLE_COL_PAGE = "page_code";
+		const string InterfacePageTableSync::COL_MIME_TYPE = "mime_type";
 		const string InterfacePageTableSync::TABLE_COL_CONTENT = "content";
 		const string InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED("direct_display_allowed");
 	}
@@ -69,6 +70,7 @@ namespace synthese
 			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CLASS, SQL_TEXT, false),
 			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_PAGE, SQL_TEXT, false),
 			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, SQL_INTEGER),
+			SQLiteTableSync::Field(InterfacePageTableSync::COL_MIME_TYPE, SQL_TEXT),
 			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CONTENT, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
@@ -88,6 +90,7 @@ namespace synthese
 		){
 			page->setPageCode(rows->getText(InterfacePageTableSync::TABLE_COL_PAGE));
 			page->setDirectDisplayAllowed(rows->getBool(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED));
+			page->setMimeType(rows->getText(InterfacePageTableSync::COL_MIME_TYPE));
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				try

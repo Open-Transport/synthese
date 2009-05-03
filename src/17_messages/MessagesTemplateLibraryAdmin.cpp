@@ -29,7 +29,7 @@
 #include "HTMLList.h"
 
 #include "ActionFunctionRequest.h"
-#include "QueryString.h"
+#include "Request.h"
 
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
@@ -270,7 +270,7 @@ namespace synthese
 
 		std::string MessagesTemplateLibraryAdmin::getParameterName() const
 		{
-			return _folder.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _folder.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 

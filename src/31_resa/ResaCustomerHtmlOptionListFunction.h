@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_ResaCustomerHtmlOptionListFunction_H__
 #define SYNTHESE_ResaCustomerHtmlOptionListFunction_H__
 
-#include "01_util/FactorableTemplate.h"
-
-#include "30_server/Function.h"
+#include "FactorableTemplate.h"
+#include "Function.h"
 
 namespace synthese
 {
@@ -74,6 +73,8 @@ namespace synthese
 			void setNumber(int number);
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

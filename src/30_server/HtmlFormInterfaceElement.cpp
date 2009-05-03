@@ -22,19 +22,19 @@
 
 #include "HtmlFormInterfaceElement.h"
 
-#include "30_server/Request.h"
-#include "30_server/QueryString.h"
-#include "30_server/Action.h"
+#include "Request.h"
+#include "HTTPRequest.hpp"
+#include "Action.h"
 
-#include "01_util/FactoryException.h"
+#include "FactoryException.h"
 
-#include "05_html/HTMLForm.h"
+#include "HTMLForm.h"
 
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/RequestWithInterface.h"
-#include "11_interfaces/InterfacePage.h"
-#include "11_interfaces/Interface.h"
+#include "ValueElementList.h"
+#include "InterfacePageException.h"
+#include "RequestWithInterface.h"
+#include "InterfacePage.h"
+#include "Interface.h"
 
 using namespace std;
 using namespace boost;
@@ -103,27 +103,28 @@ namespace synthese
 				if (_function_parameters.get())
 					functionParameters = _function_parameters->getValue(parameters, variables, object, request);
 				if (functionParameters.empty() && functionKey == request->_getFunction()->getFactoryKey())
-					functionParameters = request->_getFunction()->getFixedParametersMap().getQueryString(true).getContent();
+					functionParameters = request->_getFunction()->getFixedParametersMap().getURI();
 				
 				stringstream s;
-				s	<< QueryString::PARAMETER_FUNCTION << QueryString::PARAMETER_ASSIGNMENT << functionKey
-					<< QueryString::PARAMETER_SEPARATOR << QueryString::PARAMETER_IP << QueryString::PARAMETER_ASSIGNMENT << request->getIP()
-					<< QueryString::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << QueryString::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
+				s	<< Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT << functionKey
+					<< Request::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << Request::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
 					;
 					
 
 				if (!functionParameters.empty())
-					s << QueryString::PARAMETER_SEPARATOR << functionParameters;
+					s << Request::PARAMETER_SEPARATOR << functionParameters;
 				if (!actionKey.empty())
 				{
-					s << QueryString::PARAMETER_SEPARATOR << QueryString::PARAMETER_ACTION << QueryString::PARAMETER_ASSIGNMENT << actionKey;
+					s << Request::PARAMETER_SEPARATOR << Request::PARAMETER_ACTION << Request::PARAMETER_ASSIGNMENT << actionKey;
 					if (!actionParameters.empty())
-						s << QueryString::PARAMETER_SEPARATOR << actionParameters;
+						s << Request::PARAMETER_SEPARATOR << actionParameters;
 				}
 				if (request->getSession())
-					s << QueryString::PARAMETER_SEPARATOR << QueryString::PARAMETER_SESSION << QueryString::PARAMETER_ASSIGNMENT << request->getSession()->getKey();
+					s << Request::PARAMETER_SEPARATOR << Request::PARAMETER_SESSION << Request::PARAMETER_ASSIGNMENT << request->getSession()->getKey();
 
-				QueryString q(s.str(), true);
+				HTTPRequest q;
+				q.uri = s.str();
+				q.ipaddr = request->getIP();
 				Request r(q);
 				r.setClientURL(request->getClientURL());
 				

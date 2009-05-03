@@ -91,6 +91,8 @@ do_import=0|1
 			void _run(std::ostream& stream) const;
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

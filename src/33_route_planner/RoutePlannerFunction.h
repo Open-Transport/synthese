@@ -109,6 +109,8 @@ namespace synthese
 			RoutePlannerFunction();
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

@@ -33,7 +33,7 @@
 #include "Reservation.h"
 #include "ReservationTableSync.h"
 #include "NamedPlace.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "ActionFunctionRequest.h"
 
 #include "ModuleAdmin.h"
@@ -125,7 +125,7 @@ namespace synthese
 			_disabledPassenger = map.getBool(PARAMETER_DISABLED_PASSENGER, false, false, FACTORY_KEY);
 			_drtOnly = map.getBool(PARAMETER_DRT_ONLY, false, false, FACTORY_KEY);
 
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 			if (id != UNKNOWN_VALUE)
 			{
 				try

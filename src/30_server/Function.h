@@ -96,6 +96,12 @@ namespace synthese
 			*/
 			virtual ParametersMap _getParametersMap() const = 0;
 
+
+			/** Gets the Mime type of the data produced by the function.
+				@return Mime type of the data produced by the function
+			*/
+			virtual std::string getOutputMimeType() const = 0;
+
 		private:
 
 			/** Conversion from generic parameters map to attributes.

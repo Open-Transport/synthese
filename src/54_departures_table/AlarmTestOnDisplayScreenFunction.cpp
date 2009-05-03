@@ -25,7 +25,7 @@
 #include "Conversion.h"
 #include "RequestException.h"
 #include "RequestMissingParameterException.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 #include "ArrivalDepartureTableRight.h"
 #include "SentAlarm.h"
@@ -78,13 +78,13 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_alarm.get())
-				map.insert(QueryString::PARAMETER_OBJECT_ID, _alarm->getKey());
+				map.insert(Request::PARAMETER_OBJECT_ID, _alarm->getKey());
 			return map;
 		}
 
 		void AlarmTestOnDisplayScreenFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			setAlarmId(id);
 
 			id = map.getUid(PARAMETER_DISPLAY_TYPE_ID, true, FACTORY_KEY);
@@ -191,6 +191,14 @@ namespace synthese
 		bool AlarmTestOnDisplayScreenFunction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
+		}
+
+		std::string AlarmTestOnDisplayScreenFunction::getOutputMimeType() const
+		{
+			const DeparturesTableInterfacePage* page(
+				_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
+				);
+			return (page == NULL) ? "text/plain" : page->getMimeType();
 		}
 	}
 }

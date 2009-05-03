@@ -33,7 +33,7 @@
 #include "MessagesLibraryRight.h"
 #include "ActionException.h"
 #include "Request.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "ParametersMap.h"
 #include "Conversion.h"
 
@@ -111,7 +111,7 @@ namespace synthese
 				);
 
 				// Remember of the id of created object to view it after the action
-				if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
 					_request->setObjectId(scenario.getKey());
 				}
@@ -130,7 +130,7 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 
 				// Remember of the id of created object to view it after the action
-				if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
 					_request->setObjectId(scenario.getKey());
 				}

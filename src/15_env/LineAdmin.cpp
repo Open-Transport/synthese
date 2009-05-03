@@ -42,7 +42,7 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "TransportNetworkRight.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 
 #include "AdminParametersException.h"
@@ -90,7 +90,7 @@ namespace synthese
 		){
 			try
 			{
-				_line = LineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+				_line = LineTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
 
 				if(!doDisplayPreparationActions) return;
 
@@ -282,7 +282,7 @@ namespace synthese
 
 		std::string LineAdmin::getParameterName() const
 		{
-			return _line.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _line.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string LineAdmin::getParameterValue() const

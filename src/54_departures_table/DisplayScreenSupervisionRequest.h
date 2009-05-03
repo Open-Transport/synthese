@@ -23,11 +23,11 @@
 #ifndef SYNTHESE_DisplayScreenSupervisionRequest_H__
 #define SYNTHESE_DisplayScreenSupervisionRequest_H__
 
-#include "13_dblog/DBLogEntry.h"
+#include "DBLogEntry.h"
 
-#include "30_server/Function.h"
+#include "Function.h"
 
-#include "01_util/FactorableTemplate.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -64,6 +64,8 @@ namespace synthese
 			void _run(std::ostream& stream) const;
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

@@ -76,6 +76,8 @@ namespace synthese
 			void setAlarmId(uid id);
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

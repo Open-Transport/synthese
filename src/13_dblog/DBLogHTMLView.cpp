@@ -33,7 +33,7 @@
 #include "DBLogModule.h"
 #include "DBLogEntryTableSync.h"
 #include "DBLogRight.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 #include "SecurityModule.h"
 

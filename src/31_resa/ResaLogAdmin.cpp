@@ -28,7 +28,7 @@
 #include "ResaDBLog.h"
 #include "ResaRight.h"
 #include "CancelReservationAction.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"

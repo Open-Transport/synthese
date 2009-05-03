@@ -25,7 +25,6 @@
 
 #include "HTMLModule.h"
 #include "FunctionRequest.h"
-#include "QueryString.h"
 #include "AdminRequest.h"
 #include "HomeAdmin.h"
 #include "Interface.h"
@@ -330,8 +329,8 @@ namespace synthese
 			assert(request->getFunction()->getInterface());
 
 			Request r;
-			r.getInternalParameters().insert(QueryString::PARAMETER_FUNCTION, AdminRequest::FACTORY_KEY);
-			r.getInternalParameters().insert(QueryString::PARAMETER_SESSION, request->getSession()->getKey());
+			r.getInternalParameters().insert(Request::PARAMETER_FUNCTION, AdminRequest::FACTORY_KEY);
+			r.getInternalParameters().insert(Request::PARAMETER_SESSION, request->getSession()->getKey());
 			r.getInternalParameters().insert(AdminRequest::PARAMETER_PAGE, factoryKey);
 			r.getInternalParameters().insert(AdminRequest::PARAMETER_INTERFACE, request->getFunction()->getInterface()->getKey());
 			if (!parameterName.empty())

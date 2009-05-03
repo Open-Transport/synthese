@@ -27,7 +27,7 @@
 #include "12_security/Profile.h"
 #include "SecurityRight.h"
 #include "30_server/ActionException.h"
-#include "30_server/QueryString.h"
+#include "30_server/Request.h"
 #include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
 
@@ -88,7 +88,7 @@ namespace synthese
 			UserTableSync::Save(user.get());
 			
 						
-			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 			{
 				_request->setObjectId(user->getKey());
 			}

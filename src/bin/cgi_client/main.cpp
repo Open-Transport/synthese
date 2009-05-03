@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-#include "30_server/QueryString.h"
+#include "30_server/Request.h"
 
 #include "00_tcp/TcpClientSocket.h"
 #include "00_tcp/SocketException.h"
@@ -130,14 +130,14 @@ int main(int argc, char **argv)
     }
 
     // Adding of the client IP address to the request
-    strcat(buffer, QueryString::PARAMETER_SEPARATOR.c_str());
-    strcat(buffer, QueryString::PARAMETER_IP.c_str());
-    strcat(buffer, QueryString::PARAMETER_ASSIGNMENT.c_str());
+    strcat(buffer, Request::PARAMETER_SEPARATOR.c_str());
+    strcat(buffer, Request::PARAMETER_IP.c_str());
+    strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
     strcat(buffer, ip);
     // Adding of the client url prefix to the request
-    strcat(buffer, QueryString::PARAMETER_SEPARATOR.c_str());
-    strcat(buffer, QueryString::PARAMETER_CLIENT_URL.c_str());
-    strcat(buffer, QueryString::PARAMETER_ASSIGNMENT.c_str());
+    strcat(buffer, Request::PARAMETER_SEPARATOR.c_str());
+    strcat(buffer, Request::PARAMETER_CLIENT_URL.c_str());
+    strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
     strcat(buffer, script);
     // Adding end of line to close the request
     strcat(buffer, "\n");

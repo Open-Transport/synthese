@@ -138,5 +138,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string DisplayScreenSupervisionRequest::getOutputMimeType() const
+		{
+			return "text/plain";
+		}
 	}
 }

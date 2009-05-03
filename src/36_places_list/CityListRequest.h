@@ -68,6 +68,8 @@ namespace synthese
 			void setIsForOrigin(bool isForOrigin);
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

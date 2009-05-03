@@ -65,6 +65,9 @@ namespace synthese
 			const std::string&	getRedirURL()	const;
 
 			virtual bool _isAuthorized() const;
+
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

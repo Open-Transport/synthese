@@ -28,7 +28,7 @@
 #include "12_security/SecurityLog.h"
 #include "SecurityRight.h"
 #include "30_server/ActionException.h"
-#include "30_server/QueryString.h"
+#include "30_server/Request.h"
 #include "30_server/ParametersMap.h"
 #include "30_server/Request.h"
 
@@ -99,7 +99,7 @@ namespace synthese
 			}
 			ProfileTableSync::Save(profile.get());
 			
-			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 			{
 				_request->setObjectId(profile->getKey());
 			}

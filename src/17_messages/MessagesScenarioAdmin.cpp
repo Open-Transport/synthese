@@ -42,7 +42,7 @@
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ActionFunctionRequest.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
 #include "ActionException.h"
@@ -87,8 +87,8 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
 			try
@@ -118,7 +118,7 @@ namespace synthese
 		{
 			ParametersMap m(_generalLogView.getParametersMap());
 			if(_scenario.get())
-				m.insert(QueryString::PARAMETER_OBJECT_ID, _scenario->getKey());
+				m.insert(Request::PARAMETER_OBJECT_ID, _scenario->getKey());
 			return m;
 		}
 
@@ -190,7 +190,7 @@ namespace synthese
 
 				ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(_request);
 				addRequest.getFunction()->setPage<MessageAdmin>();
-				addRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+				addRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 				addRequest.getAction()->setScenarioId(_scenario->getKey());
 
 				stream << "<h1>Messages</h1>";
@@ -334,7 +334,7 @@ namespace synthese
 					link.factoryKey = MessageAdmin::FACTORY_KEY;
 					link.name = alarm->getShortMessage();
 					link.icon = MessageAdmin::ICON;
-					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterName = Request::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(alarm->getKey());
 					links.push_back(link);
 				}
@@ -350,7 +350,7 @@ namespace synthese
 					link.factoryKey = MessageAdmin::FACTORY_KEY;
 					link.name = alarm->getShortMessage();
 					link.icon = MessageAdmin::ICON;
-					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterName = Request::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(alarm->getKey());
 					links.push_back(link);
 				}
@@ -368,7 +368,7 @@ namespace synthese
 
 		std::string MessagesScenarioAdmin::getParameterName() const
 		{
-			return _scenario.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _scenario.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string MessagesScenarioAdmin::getParameterValue() const

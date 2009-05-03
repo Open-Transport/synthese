@@ -34,7 +34,7 @@
 #include "DisplayTypeRemoveAction.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayTypeAdmin.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "DeparturesTableInterfacePage.h"
@@ -123,7 +123,7 @@ namespace synthese
 
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(_request);
 			createRequest.getFunction()->setPage<DisplayTypeAdmin>();
-			createRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			createRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			
 			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(_request);
 			deleteRequest.getFunction()->setSamePage(this);
@@ -284,7 +284,7 @@ namespace synthese
 				link.factoryKey = DisplayTypeAdmin::FACTORY_KEY;
 				link.icon = DisplayTypeAdmin::ICON;
 				link.name = displayType->getName();
-				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				link.parameterName = Request::PARAMETER_OBJECT_ID;
 				link.parameterValue = Conversion::ToString(displayType->getKey());
 				links.push_back(link);
 			}

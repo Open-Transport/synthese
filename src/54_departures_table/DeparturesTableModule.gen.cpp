@@ -61,6 +61,8 @@ synthese::departurestable::DisplayScreenAlarmRecipient::integrate();
 
 synthese::departurestable::DisplayGetNagiosStatusFunction::integrate();
 
+synthese::departurestable::CentreonConfigExportFunction::integrate();
+
 // Registries
 synthese::util::Env::Integrate<synthese::departurestable::DisplayScreen>();
 synthese::util::Env::Integrate<synthese::departurestable::DisplayType>();

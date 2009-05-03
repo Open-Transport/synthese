@@ -30,7 +30,7 @@
 #include "UserUpdateAction.h"
 #include "UserPasswordUpdateAction.h"
 #include "ActionFunctionRequest.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
 #include "Conversion.h"
@@ -73,8 +73,8 @@ namespace synthese
 		){
 			try
 			{
-				uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
-				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+				if (id != UNKNOWN_VALUE && id != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
 					_user = UserTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
 				}
@@ -90,7 +90,7 @@ namespace synthese
 		server::ParametersMap UserAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			m.insert(QueryString::PARAMETER_OBJECT_ID, _request->getObjectId());
+			m.insert(Request::PARAMETER_OBJECT_ID, _request->getObjectId());
 			return m;
 		}
 
@@ -162,7 +162,7 @@ namespace synthese
 
 		std::string UserAdmin::getParameterName() const
 		{
-			return _user.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _user.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string UserAdmin::getParameterValue() const

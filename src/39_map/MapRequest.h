@@ -115,6 +115,8 @@ namespace synthese
 			void _run(std::ostream& stream) const;
 
 			virtual bool _isAuthorized() const;
+
+			virtual std::string getOutputMimeType() const;
 	    };
 	}
 }

@@ -30,7 +30,7 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
 #include "ActionFunctionRequest.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
 #include "SentAlarm.h"
@@ -126,7 +126,7 @@ namespace synthese
 
 		
 			uid id(_request->getObjectId());
-			if(	id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
+			if(	id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
 
 			try
 			{
@@ -914,7 +914,7 @@ namespace synthese
 
 		std::string DisplayAdmin::getParameterName() const
 		{
-			return _displayScreen.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _displayScreen.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string DisplayAdmin::getParameterValue() const

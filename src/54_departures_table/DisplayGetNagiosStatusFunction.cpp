@@ -111,5 +111,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string DisplayGetNagiosStatusFunction::getOutputMimeType() const
+		{
+			return "text/plain";
+		}
 	}
 }

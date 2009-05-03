@@ -31,7 +31,7 @@
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 
-#include "QueryString.h"
+#include "Request.h"
 
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
@@ -166,7 +166,7 @@ namespace synthese
 				link.factoryKey = BookableCommercialLineAdmin::FACTORY_KEY;
 				link.icon = "chart_line.png";
 				link.name = line->getName();
-				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				link.parameterName = Request::PARAMETER_OBJECT_ID;
 				link.parameterValue = Conversion::ToString(line->getKey());
 				links.push_back(link);
 			}

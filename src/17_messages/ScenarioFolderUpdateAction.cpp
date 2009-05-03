@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "MessagesLibraryRight.h"
 #include "ScenarioFolderUpdateAction.h"
 #include "ScenarioFolder.h"
@@ -64,7 +64,7 @@ namespace synthese
 		ParametersMap ScenarioFolderUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(QueryString::PARAMETER_OBJECT_ID, _folder.get() ? _folder->getKey() : 0);
+			map.insert(Request::PARAMETER_OBJECT_ID, _folder.get() ? _folder->getKey() : 0);
 			return map;
 		}
 		
@@ -72,7 +72,7 @@ namespace synthese
 		
 		void ScenarioFolderUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setFolderId(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			setFolderId(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 
 			try
 			{

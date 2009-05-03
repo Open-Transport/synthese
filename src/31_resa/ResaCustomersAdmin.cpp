@@ -31,7 +31,7 @@
 #include "ResaRight.h"
 #include "ResaCustomerAdmin.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 
 #include "ModuleAdmin.h"

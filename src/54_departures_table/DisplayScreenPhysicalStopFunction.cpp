@@ -32,11 +32,11 @@
 #include "InterfaceTableSync.h"
 
 #include "RequestException.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "RequestMissingParameterException.h"
 
 #include "DisplayScreenPhysicalStopFunction.h"
-
+#include "DeparturesTableInterfacePage.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
 
@@ -73,7 +73,7 @@ namespace synthese
 		void DisplayScreenPhysicalStopFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			string oc(map.getString(PARAMETER_OPERATOR_CODE, true, FACTORY_KEY));
-			const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env).get());
+			const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env).get());
 
 			DisplayScreen* screen(new DisplayScreen);
 			_type.reset(new DisplayType);
@@ -103,6 +103,17 @@ namespace synthese
 		bool DisplayScreenPhysicalStopFunction::_isAuthorized(
 		) const {
 			return true;
+		}
+
+		std::string DisplayScreenPhysicalStopFunction::getOutputMimeType() const
+		{
+			return
+				(	_type &&
+					_type->getDisplayInterface() &&
+					_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
+				) ?
+				_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->getMimeType() :
+				"text/plain";
 		}
 	}
 }

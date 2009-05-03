@@ -400,7 +400,7 @@ namespace synthese
 	    
 	    void DisplayScreenTableSync::Search(
 			Env& env,
-			const security::RightsOfSameClassMap& rights 
+			optional<const security::RightsOfSameClassMap&> rights 
 			, bool totalControl 
 			, RightLevel neededLevel
 			, uid duid
@@ -442,8 +442,8 @@ namespace synthese
 			
 			// Filtering
 			query << " WHERE 1 ";
-			if (neededLevel > FORBIDDEN)
-			    query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
+			if (neededLevel > FORBIDDEN && rights)
+			    query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(*rights, totalControl, neededLevel, false) << ")";
 			if (!cityName.empty())
 			    query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
 			if (!stopName.empty())

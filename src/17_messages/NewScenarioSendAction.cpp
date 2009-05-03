@@ -32,7 +32,7 @@
 #include "MessagesRight.h"
 #include "ActionException.h"
 #include "Request.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "ParametersMap.h"
 #include "AlarmTemplate.h"
 #include "AdminModule.h"

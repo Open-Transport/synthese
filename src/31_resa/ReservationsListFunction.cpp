@@ -195,5 +195,12 @@ namespace synthese
 			}
 			return false;
 		}
+
+		std::string ReservationsListFunction::getOutputMimeType() const
+		{
+			return (_site.get() && _site->getInterface() && _site->getInterface()->getPage<LoginInterfacePage>()) ?
+				_site->getInterface()->getPage<LoginInterfacePage>()->getMimeType():
+				"text/plain";
+		}
 	}
 }

@@ -98,5 +98,10 @@ namespace synthese
 				throw RequestException("Transport network " + Conversion::ToString(id) + " not found");
 			}
 		}
+
+		std::string LinesListFunction::getOutputMimeType() const
+		{
+			return "text/csv";
+		}
 	}
 }

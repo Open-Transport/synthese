@@ -102,6 +102,10 @@ namespace synthese
 			///	@date 2008
 			/// At the time, the function can be used without restrictions.
 			virtual bool _isAuthorized() const;
+
+
+
+			virtual std::string getOutputMimeType() const;
 		};
 	}
 }

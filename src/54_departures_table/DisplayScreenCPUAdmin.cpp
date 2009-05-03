@@ -28,7 +28,7 @@
 #include "DisplayScreenCPUTableSync.h"
 #include "DisplaySearchAdmin.h"
 #include "DeparturesTableModule.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "AdminParametersException.h"
 #include "ArrivalDepartureTableRight.h"
 
@@ -71,8 +71,8 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
 			
 			try
 			{
@@ -119,7 +119,7 @@ namespace synthese
 
 		bool DisplayScreenCPUAdmin::isAuthorized() const
 		{
-			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION) return true;
+			if (_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return true;
 			if (_cpu.get() == NULL) return false;
 			if (_cpu->getPlace() == NULL) return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_cpu->getPlace()->getKey()));
@@ -156,7 +156,7 @@ namespace synthese
 
 		std::string DisplayScreenCPUAdmin::getParameterName() const
 		{
-			return _cpu.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _cpu.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string DisplayScreenCPUAdmin::getParameterValue() const

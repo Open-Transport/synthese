@@ -72,6 +72,7 @@ namespace synthese
 
 		private:
 			std::string			_pageCode;
+			std::string			_mimeType;
 			const Interface*	_interface;
 			Components			_components;
 			bool				_directDisplayAllowed;
@@ -106,6 +107,7 @@ namespace synthese
 				void				setInterface(const Interface*);
 				void				setPageCode(const std::string& code);
 				void				setDirectDisplayAllowed(bool value);
+				void				setMimeType(const std::string& value);
 			//@}
 
 			/// @name Getters
@@ -113,6 +115,7 @@ namespace synthese
 				const Interface*	getInterface()				const;
 				const std::string&	getPageCode()				const;
 				bool				getDirectDisplayAllowed()	const;
+				const std::string&	getMimeType()				const;
 			//@}
 
 			std::string getValue(

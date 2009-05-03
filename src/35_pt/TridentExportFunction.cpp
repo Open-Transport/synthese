@@ -88,5 +88,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string TridentExportFunction::getOutputMimeType() const
+		{
+			return "text/xml";
+		}
 	}
 }

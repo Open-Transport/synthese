@@ -24,7 +24,7 @@
 
 #include "Interface.h"
 #include "InterfaceTableSync.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
@@ -125,7 +125,7 @@ namespace synthese
 			DisplayTypeTableSync::Save(&dt);
 
 			// Request update
-			if(_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 			{
 				_request->setObjectId(dt.getKey());
 			}

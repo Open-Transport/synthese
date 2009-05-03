@@ -43,7 +43,7 @@
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
 #include "ActionFunctionRequest.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
 #include "ActionException.h"
@@ -82,8 +82,8 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
 			try
@@ -105,7 +105,7 @@ namespace synthese
 		{
 			ParametersMap m;
 			if(_alarm.get())
-				m.insert(QueryString::PARAMETER_OBJECT_ID, _alarm->getKey());
+				m.insert(Request::PARAMETER_OBJECT_ID, _alarm->getKey());
 			return m;
 		}
 
@@ -230,7 +230,7 @@ namespace synthese
 
 		std::string MessageAdmin::getParameterName() const
 		{
-			return _alarm.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _alarm.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string MessageAdmin::getParameterValue() const

@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ParametersMap.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "RequestMissingParameterException.h"
 #include "DateTime.h"
 #include "Conversion.h"
@@ -44,16 +44,16 @@ namespace synthese
 	{
 
 
-		ParametersMap::ParametersMap( const QueryString& text )
+		ParametersMap::ParametersMap( const std::string& text )
 		{
 			typedef tokenizer<char_separator<char> > _tokenizer;
-			char_separator<char> sep(QueryString::PARAMETER_SEPARATOR.c_str ());
+			char_separator<char> sep(Request::PARAMETER_SEPARATOR.c_str ());
 
 			// Parsing
-			_tokenizer parametersTokens (text.getContent(), sep);
+			_tokenizer parametersTokens (text, sep);
 			BOOST_FOREACH(const string& parameterToken, parametersTokens)
 			{
-				size_t pos = parameterToken.find (QueryString::PARAMETER_ASSIGNMENT);
+				size_t pos = parameterToken.find (Request::PARAMETER_ASSIGNMENT);
 				if (pos == string::npos) continue;
 
 				string parameterName (parameterToken.substr (0, pos));
@@ -166,7 +166,7 @@ namespace synthese
 			return _map;
 		}
 
-		QueryString ParametersMap::getQueryString(bool normalize)
+		string ParametersMap::getURI()
 		{
 			stringstream ss;
 			for (Map::const_iterator iter = _map.begin(); 
@@ -174,11 +174,11 @@ namespace synthese
 				++iter
 				){
 					if (iter != _map.begin ())
-						ss << QueryString::PARAMETER_SEPARATOR;
-					ss << iter->first << QueryString::PARAMETER_ASSIGNMENT << iter->second;
+						ss << Request::PARAMETER_SEPARATOR;
+					ss << iter->first << Request::PARAMETER_ASSIGNMENT << iter->second;
 			}
 
-			return QueryString(ss.str(), normalize);
+			return ss.str();
 		}
 		
 		

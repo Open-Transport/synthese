@@ -99,6 +99,8 @@ namespace synthese
 			boost::shared_ptr<AdminInterfaceElement> getPage() const;
 
 			void setParameter(const std::string& name, const std::string value);
+
+			virtual std::string getOutputMimeType() const;
 		};
 
 		template<class T>

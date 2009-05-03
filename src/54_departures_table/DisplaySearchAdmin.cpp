@@ -46,7 +46,7 @@
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
 #include "SentAlarm.h"
-#include "QueryString.h"
+#include "Request.h"
 
 #include <boost/foreach.hpp>
 
@@ -192,7 +192,7 @@ namespace synthese
 				createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
 				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 				createDisplayRequest.getAction()->setPlace(_place);
-				createDisplayRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+				createDisplayRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
 
 				FunctionRequest<AdminRequest> searchRequest(_request);

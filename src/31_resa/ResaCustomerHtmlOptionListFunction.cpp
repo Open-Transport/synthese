@@ -89,5 +89,10 @@ namespace synthese
 		) const {
 			return _request->isAuthorized<ResaRight>(READ);
 		}
+
+		std::string ResaCustomerHtmlOptionListFunction::getOutputMimeType() const
+		{
+			return "text/html";
+		}
 	}
 }

@@ -45,7 +45,7 @@
 #include "TimetableUpdateAction.h"
 #include "TimetableRowAddAction.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 #include "ActionFunctionRequest.h"
 
@@ -94,8 +94,8 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			if (id == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
 			try
@@ -323,7 +323,7 @@ namespace synthese
 
 		std::string TimetableAdmin::getParameterName() const
 		{
-			return _timetable.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _timetable.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string TimetableAdmin::getParameterValue() const

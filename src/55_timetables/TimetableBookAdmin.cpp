@@ -35,7 +35,7 @@
 #include "TimetableAddAction.h"
 #include "TimetableRight.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 
@@ -82,7 +82,7 @@ namespace synthese
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK, ResultHTMLTable::UNLIMITED_SIZE);
 						
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 			
 			if(id <= 0) return;
 			
@@ -141,7 +141,7 @@ namespace synthese
 			ActionFunctionRequest<TimetableAddAction,AdminRequest> addTimetableRequest(_request);
 			addTimetableRequest.getAction()->setBook(_book);
 			addTimetableRequest.getFunction()->setPage<TimetableAdmin>();
-			addTimetableRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addTimetableRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
 
 			FunctionRequest<AdminRequest> editTimetableRequest(_request);
@@ -279,7 +279,7 @@ namespace synthese
 				link.factoryKey = tt->getIsBook() ? TimetableBookAdmin::FACTORY_KEY : TimetableAdmin::FACTORY_KEY;
 				link.icon = tt->getIsBook() ? TimetableBookAdmin::ICON :  TimetableAdmin::ICON;
 				link.name = tt->getTitle();
-				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				link.parameterName = Request::PARAMETER_OBJECT_ID;
 				link.parameterValue = Conversion::ToString(tt->getKey());
 				links.push_back(link);
 			}
@@ -296,7 +296,7 @@ namespace synthese
 
 		std::string TimetableBookAdmin::getParameterName() const
 		{
-			return _book.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _book.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string TimetableBookAdmin::getParameterValue() const

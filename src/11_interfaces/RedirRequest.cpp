@@ -87,5 +87,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string RedirRequest::getOutputMimeType() const
+		{
+			return _interface->getPage<RedirectInterfacePage>()->getMimeType();
+		}
 	}
 }

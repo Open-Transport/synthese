@@ -19,18 +19,18 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-#include "39_map/MapRequest.h"
+#include "MapRequest.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 #include "01_util/XmlToolkit.h"
 
 #include "15_env/XmlBuilder.h"
-#include "15_env/Line.h"
+#include "Line.h"
 
-#include "30_server/RequestException.h"
+#include "RequestException.h"
 
-#include "39_map/MapModule.h"
-#include "39_map/XmlBuilder.h"
+#include "MapModule.h"
+#include "XmlBuilder.h"
 #include "39_map/Map.h"
 #include "39_map/RenderingConfig.h"
 #include "39_map/Renderer.h"
@@ -246,6 +246,13 @@ namespace synthese
 
 			) const {
 			return true;
+		}
+
+
+
+		string MapRequest::getOutputMimeType() const
+		{
+			return "text/plain";
 		}
 	}
 }

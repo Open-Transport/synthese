@@ -42,7 +42,7 @@
 
 #include "SearchFormHTMLTable.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 
 #include "AdminParametersException.h"
@@ -113,7 +113,7 @@ namespace synthese
 		
 			try
 			{
-				_site = SiteTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env);
+				_site = SiteTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env);
 			}
 			catch (...)
 			{
@@ -135,7 +135,7 @@ namespace synthese
 			m.insert(PARAMETER_RESULTS_NUMBER, _resultsNumber);
 			m.insert(PARAMETER_ACCESSIBILITY, static_cast<int>(_accessibility));
 			if(_site.get())
-				m.insert(QueryString::PARAMETER_OBJECT_ID, _site->getKey());
+				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
 			return m;
 		}
 
@@ -303,7 +303,7 @@ namespace synthese
 			if(parentLink.factoryKey == TransportSiteAdmin::FACTORY_KEY)
 			{
 				PageLink link(getPageLink());
-				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				link.parameterName = Request::PARAMETER_OBJECT_ID;
 				link.parameterValue = parentLink.parameterValue;
 				links.push_back(link);
 			}
@@ -321,7 +321,7 @@ namespace synthese
 
 		std::string SiteRoutePlanningAdmin::getParameterName() const
 		{
-			return _site.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _site.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string SiteRoutePlanningAdmin::getParameterValue() const

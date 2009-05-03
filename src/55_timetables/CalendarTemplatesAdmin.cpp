@@ -34,7 +34,7 @@
 #include "CalendarTemplateAddAction.h"
 #include "TimetableRight.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 #include "ActionFunctionRequest.h"
 
@@ -103,7 +103,7 @@ namespace synthese
 			ActionFunctionRequest<CalendarTemplateAddAction,AdminRequest> addCalendar(_request);
 			addCalendar.getFunction()->setPage<CalendarTemplateAdmin>();
 			addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
-			addCalendar.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addCalendar.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			
 			
 			// Display
@@ -171,7 +171,7 @@ namespace synthese
 				link.factoryKey = CalendarTemplateAdmin::FACTORY_KEY;
 				link.icon = CalendarTemplateAdmin::ICON;
 				link.name = ct->getText();
-				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				link.parameterName = Request::PARAMETER_OBJECT_ID;
 				link.parameterValue = Conversion::ToString(ct->getKey());
 				links.push_back(link);
 			}

@@ -42,7 +42,7 @@
 #include "ScenarioTemplateInheritedTableSync.h"
 
 #include "ActionFunctionRequest.h"
-#include "QueryString.h"
+#include "Request.h"
 
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
@@ -86,7 +86,7 @@ namespace synthese
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
 			
-			setFolderId(map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+			setFolderId(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 
 			if(!doDisplayPreparationActions) return;
 
@@ -133,13 +133,13 @@ namespace synthese
 			addScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
 			addScenarioRequest.getAction()->setFolderId(_folderId);
-			addScenarioRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addScenarioRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
 			ActionFunctionRequest<ScenarioFolderAdd,AdminRequest> addFolderRequest(_request);
 			addFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			addFolderRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
 			addFolderRequest.getAction()->setParentId(_folderId);
-			addFolderRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addFolderRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
 			FunctionRequest<AdminRequest> goFolderRequest(_request);
 			goFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
@@ -256,7 +256,7 @@ namespace synthese
 				link.factoryKey = MessagesLibraryAdmin::FACTORY_KEY;
 				link.icon = "folder.png";
 				link.name = cfolder->getName();
-				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				link.parameterName = Request::PARAMETER_OBJECT_ID;
 				link.parameterValue = Conversion::ToString(cfolder->getKey());
 				links.push_back(link);
 			}
@@ -269,7 +269,7 @@ namespace synthese
 				link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
 				link.icon = MessagesScenarioAdmin::ICON;
 				link.name = tpl->getName();
-				link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+				link.parameterName = Request::PARAMETER_OBJECT_ID;
 				link.parameterValue = Conversion::ToString(tpl->getKey());
 				links.push_back(link);
 			}
@@ -306,7 +306,7 @@ namespace synthese
 
 		std::string MessagesLibraryAdmin::getParameterName() const
 		{
-			return _folder.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _folder.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string MessagesLibraryAdmin::getParameterValue() const

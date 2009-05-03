@@ -36,7 +36,7 @@
 #include "Constants.h"
 #include "ProfilesAdmin.h"
 #include "ActionFunctionRequest.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
 #include "RequestMissingParameterException.h"
@@ -85,8 +85,8 @@ namespace synthese
 		){
 			try
 			{
-				uid id = map.getUid(QueryString::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
-				if (id != UNKNOWN_VALUE && id != QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				uid id = map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
+				if (id != UNKNOWN_VALUE && id != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
 					_profile = ProfileTableSync::Get(id,_env);
 				}
@@ -254,7 +254,7 @@ namespace synthese
 
 		std::string ProfileAdmin::getParameterName() const
 		{
-			return _profile.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _profile.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string ProfileAdmin::getParameterValue() const

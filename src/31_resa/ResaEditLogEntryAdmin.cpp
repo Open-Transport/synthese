@@ -38,7 +38,7 @@
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
 
-#include "QueryString.h"
+#include "Request.h"
 #include "ActionFunctionRequest.h"
 
 #include "AdminParametersException.h"
@@ -82,7 +82,7 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
 				_entry = DBLogEntryTableSync::Get(id, _env);
@@ -186,7 +186,7 @@ namespace synthese
 
 		std::string ResaEditLogEntryAdmin::getParameterName() const
 		{
-			return _entry.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _entry.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string ResaEditLogEntryAdmin::getParameterValue() const

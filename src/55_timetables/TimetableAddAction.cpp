@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "Request.h"
 
 #include "TimetableAddAction.h"
@@ -106,7 +106,7 @@ namespace synthese
 			TimetableTableSync::Save(&t);
 
 			// ID update
-			if (_request->getObjectId() == QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if (_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				_request->setObjectId(t.getKey());
 		}
 

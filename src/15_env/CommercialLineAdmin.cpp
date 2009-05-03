@@ -34,7 +34,7 @@
 #include "TransportNetworkRight.h"
 
 #include "AdminRequest.h"
-#include "QueryString.h"
+#include "Request.h"
 
 #include "AdminParametersException.h"
 #include "SearchFormHTMLTable.h"
@@ -90,7 +90,7 @@ namespace synthese
 
 			try
 			{
-				_cline = CommercialLineTableSync::Get(map.getUid(QueryString::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+				_cline = CommercialLineTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -249,7 +249,7 @@ namespace synthese
 
 		std::string CommercialLineAdmin::getParameterName() const
 		{
-			return _cline.get() ? QueryString::PARAMETER_OBJECT_ID : string();
+			return _cline.get() ? Request::PARAMETER_OBJECT_ID : string();
 		}
 
 		std::string CommercialLineAdmin::getParameterValue() const
@@ -273,7 +273,7 @@ namespace synthese
 					link.factoryKey = LineAdmin::FACTORY_KEY;
 					link.icon = LineAdmin::ICON;
 					link.name = (*it)->getName();
-					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterName = Request::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString((*it)->getKey());
 					links.push_back(link);
 				}

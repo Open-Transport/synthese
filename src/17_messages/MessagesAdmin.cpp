@@ -47,7 +47,7 @@
 #include "ModuleAdmin.h"
 #include "AdminModule.h"
 #include "AdminParametersException.h"
-#include "QueryString.h"
+#include "Request.h"
 #include "MessageAdmin.h"
 
 #include <boost/foreach.hpp>
@@ -183,7 +183,7 @@ namespace synthese
 			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			newScenarioRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
-			newScenarioRequest.setObjectId(QueryString::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			newScenarioRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			
 			FunctionRequest<AdminRequest> scenarioRequest(_request);
 			scenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
@@ -421,7 +421,7 @@ namespace synthese
 					link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
 					link.name = scenario->getName();
 					link.icon = MessagesScenarioAdmin::ICON;
-					link.parameterName = QueryString::PARAMETER_OBJECT_ID;
+					link.parameterName = Request::PARAMETER_OBJECT_ID;
 					link.parameterValue = Conversion::ToString(scenario->getKey());
 					links.push_back(link);
 				}
