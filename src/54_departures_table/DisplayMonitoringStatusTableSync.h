@@ -42,6 +42,7 @@ namespace synthese
 	namespace departurestable
 	{
 		class DisplayMonitoringStatus;
+		class DisplayScreen;
 
 		////////////////////////////////////////////////////////////////////////
 		/// DisplayMonitoringStatus table synchronizer class.
@@ -95,7 +96,7 @@ namespace synthese
 			
 			////////////////////////////////////////////////////////////////////
 			///	Gets the monitoring status of a screen.
-			///	@param screenId id of the screen to describe
+			///	@param screen the screen to describe
 			///	@return Pointer to the corresponding status
 			/// @warning The returned object is incomplete : the _screen pointer
 			///		has NULL value. Use it to read the monitored properties
@@ -104,9 +105,11 @@ namespace synthese
 			///	@date 2008
 			///	If the screen has never sent monitoring messages, then a
 			///	UNKWNOWN status is returned (no exception)
+			/// Writes a log if the screen is down according to the delay
+			/// between checks
 			////////////////////////////////////////////////////////////////////
 			static boost::shared_ptr<DisplayMonitoringStatus> GetStatus(
-				util::RegistryKeyType screenId
+				const DisplayScreen& screen
 			);
 		};
 	}

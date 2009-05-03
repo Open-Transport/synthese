@@ -70,7 +70,6 @@ namespace synthese
 			try
 			{
 				_screen = DisplayScreenTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
-				DisplayMonitoringStatusTableSync::Search(_env, _screen->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -81,24 +80,22 @@ namespace synthese
 
 		void DisplayGetNagiosStatusFunction::_run( std::ostream& stream ) const
 		{
-			if (!_screen->getIsOnline())
-			{
+			if(	!_screen->getIsOnline()
+			){
 				stream << "3\nCheck deactivated.|-1\n";
-			}
-			else if (_env.getRegistry<DisplayMonitoringStatus>().empty())
-			{
-				stream << "1\nNever successfully checked.|-1\n";
-			}
-			else
-			{
-				shared_ptr<DisplayMonitoringStatus> status(_env.getEditableRegistry<DisplayMonitoringStatus>().front());
-				DateTime now(TIME_CURRENT);
-				if (now - status->getTime() > _screen->getType()->getTimeBetweenChecks())
-				{
+			} else if(	!_screen->isMonitored()
+			){
+				stream << "3\nUnmonitored.|-1\n";
+			} else {
+				shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(_screen->getKey()));
+
+				if(	status.get() == NULL
+				){
+					stream << "1\nNever successfully checked.|-1\n";
+				} else if(	_screen->isDown(*status)
+				){
 					stream << "2\nContact lost.|-1\n";
-				}
-				else
-				{
+				} else {
 					string returnCode("2");
 					if (status->getGlobalStatus() == DisplayMonitoringStatus::DISPLAY_MONITORING_OK) returnCode = "0";
 					if (status->getGlobalStatus() == DisplayMonitoringStatus::DISPLAY_MONITORING_WARNING) returnCode = "1";

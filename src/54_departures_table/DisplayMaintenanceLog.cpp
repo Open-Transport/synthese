@@ -77,18 +77,13 @@ namespace synthese
 
 
 		void DisplayMaintenanceLog::AddAdminEntry(
-			const DisplayScreen* screen
-			, const security::User* user
+			const DisplayScreen& screen
+			, const security::User& user
 			, const std::string& field
 			, const std::string& oldValue
 			, const std::string& newValue
 			, const DBLogEntry::Level level
 		){
-			if (screen == NULL)
-			{
-				throw Exception("Screen must be non null to add admin entry to log");
-			}
-			
 			if (oldValue == newValue)
 				return;
 
@@ -96,7 +91,7 @@ namespace synthese
 			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MAINTENANCE_ADMIN)));
 			c.push_back(field);
 			c.push_back(oldValue + " => " + newValue);
-			DBLog::_addEntry(FACTORY_KEY, level, c, user, screen->getKey());
+			DBLog::_addEntry(FACTORY_KEY, level, c, &user, screen.getKey());
 		}
 
 		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry& cols ) const
@@ -144,15 +139,10 @@ namespace synthese
 
 
 		void DisplayMaintenanceLog::AddStatusChangeEntry(
-			const DisplayScreen* screen,
+			const DisplayScreen& screen,
 			const DisplayMonitoringStatus& oldValue,
 			const DisplayMonitoringStatus& newValue
 		) {
-			if (screen == NULL)
-			{
-				throw Exception("Screen must be non null to add admin entry to log");
-			}
-
 			DisplayMonitoringStatus::Status newStatus(newValue.getGlobalStatus());
 
 			stringstream s;
@@ -179,21 +169,16 @@ namespace synthese
 				level,
 				c,
 				NULL,
-				screen->getKey()
+				screen.getKey()
 			);
 		}
 
 
 
 		void DisplayMaintenanceLog::AddMonitoringUpEntry(
-			const DisplayScreen* screen,
+			const DisplayScreen& screen,
 			const DateTime& downTime
 		){
-			if (screen == NULL)
-			{
-				throw Exception("Screen must be non null to add admin entry to log");
-			}
-
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_UP)));
 			c.push_back(string());
@@ -204,20 +189,24 @@ namespace synthese
 				DBLogEntry::DB_LOG_INFO,
 				c,
 				NULL,
-				screen->getKey()
+				screen.getKey()
 			);
 		}
 
 
 
 		void DisplayMaintenanceLog::AddMonitorDownEntry(
-			const DisplayScreen* screen
-		) {
-			if (screen == NULL)
-			{
-				throw Exception("Screen must be non null to add admin entry to log");
+			const DisplayScreen& screen
+		){
+			// Control last entry : if already a down entry, do not reyrite any identical entry
+			shared_ptr<const DBLogEntry> lastEntry(DBLog::_getLastEntry(FACTORY_KEY, screen.getKey()));
+			if(	lastEntry.get() == NULL ||
+				lastEntry->getContent()[0] == Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_DOWN))
+			){
+				return;
 			}
 
+			// Write the entry
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_DOWN)));
 			c.push_back(string());
@@ -225,24 +214,19 @@ namespace synthese
 
 			DBLog::_addEntry(
 				FACTORY_KEY,
-				DBLogEntry::DB_LOG_INFO,
+				DBLogEntry::DB_LOG_ERROR,
 				c,
 				NULL,
-				screen->getKey()
+				screen.getKey()
 			);
 		}
 
 
 
 		void DisplayMaintenanceLog::AddMonitoringFirstEntry(
-			const DisplayScreen* screen,
+			const DisplayScreen& screen,
 			const DisplayMonitoringStatus& value
 		) {
-			if (screen == NULL)
-			{
-				throw Exception("Screen must be non null to add admin entry to log");
-			}
-
 			DisplayMonitoringStatus::Status newStatus(value.getGlobalStatus());
 
 			{
@@ -256,8 +240,8 @@ namespace synthese
 					DBLogEntry::DB_LOG_INFO,
 					c,
 					NULL,
-					screen->getKey()
-					);
+					screen.getKey()
+				);
 			}
 
 			{
@@ -284,8 +268,8 @@ namespace synthese
 					level,
 					c,
 					NULL,
-					screen->getKey()
-					);
+					screen.getKey()
+				);
 			}
 		}
 	}

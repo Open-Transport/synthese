@@ -74,8 +74,8 @@ namespace synthese
 		{
 			// Online
 			DisplayMaintenanceLog::AddAdminEntry(
-				_displayScreen.get(),
-				_request->getUser().get(),
+				*_displayScreen,
+				*_request->getUser(),
 				"Etat en ligne de l'afficheur",
 				Conversion::ToString(_displayScreen->getIsOnline()),
 				Conversion::ToString(_online),
@@ -85,8 +85,8 @@ namespace synthese
 
 			// Message
 			DisplayMaintenanceLog::AddAdminEntry(
-				_displayScreen.get(),
-				_request->getUser().get(),
+				*_displayScreen,
+				*_request->getUser(),
 				"Message de maintenance",
 				string(),
 				_message

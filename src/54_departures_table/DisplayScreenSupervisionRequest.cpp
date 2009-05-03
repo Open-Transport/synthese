@@ -108,7 +108,7 @@ namespace synthese
 			if (_env.getRegistry<DisplayMonitoringStatus>().empty())
 			{
 				// First contact
-				DisplayMaintenanceLog::AddMonitoringFirstEntry(_displayScreen.get(), status);
+				DisplayMaintenanceLog::AddMonitoringFirstEntry(*_displayScreen, status);
 			}
 			else
 			{
@@ -118,13 +118,13 @@ namespace synthese
 				// Up contact?
 				if (status.getTime() - lastStatus->getTime() > _displayScreen->getType()->getTimeBetweenChecks())
 				{
-					DisplayMaintenanceLog::AddMonitoringUpEntry(_displayScreen.get(), lastStatus->getTime());
+					DisplayMaintenanceLog::AddMonitoringUpEntry(*_displayScreen, lastStatus->getTime());
 				}
 
 				// Status change ?
 				if (status.getGlobalStatus() != lastStatus->getGlobalStatus())
 				{
-					DisplayMaintenanceLog::AddStatusChangeEntry(_displayScreen.get(), *lastStatus, status);
+					DisplayMaintenanceLog::AddStatusChangeEntry(*_displayScreen, *lastStatus, status);
 				}
 			}
 

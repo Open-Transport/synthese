@@ -243,9 +243,6 @@ namespace synthese
 					updateRequest.setObjectId(screen->getKey());
 					viewRequest.setObjectId(screen->getKey());
 					
-					shared_ptr<DisplayMonitoringStatus> status(
-						DisplayMonitoringStatusTableSync::GetStatus(screen->getKey())
-					);
 					vector<shared_ptr<SentAlarm> > alarms(
 						DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey(), 1)
 					);
@@ -277,28 +274,68 @@ namespace synthese
 							HTMLModule::getHTMLImage("error.png", "Type non défini")
 						)
 					;
+
+					// Monitoring status
+					bool monitored(screen->isMonitored());
 					stream <<
 						t.col();
+
 					if(screen->getType() == NULL)
 					{
-						stream << HTMLModule::getHTMLImage(
-							"help.png",
-							"Type d'afficheur non défini, supervision impossible."
-						);
-					} else {
-						if(screen->getType()->getMonitoringInterface() == NULL)
-						{
-							stream << HTMLModule::getHTMLImage(
-								"help.png",
-								"Afficheur non supervisé"
-							);
-						} else {
+						stream <<
 							HTMLModule::getHTMLImage(
-								DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()),
-								status->getDetail()
-							);
+								"error.png",
+								"Veuillez définir le type d'afficheur dans l'écran de configuration."
+							)
+						;
+					}
+					else if(!screen->getIsOnline())
+					{
+						stream <<
+							HTMLModule::getHTMLImage(
+								"cross.png",
+								"Désactivé par la maintenance : "+ screen->getMaintenanceMessage()
+							)
+						;
+					}
+					else if(!monitored)
+					{
+						stream << HTMLModule::getHTMLImage(
+								"help.png",
+								"Ce type d'afficheur n'est pas supervisé. Voir la définition du type."
+							)
+						;
+					}
+					else
+					{
+						shared_ptr<DisplayMonitoringStatus> status(
+							DisplayMonitoringStatusTableSync::GetStatus(screen->getKey())
+						);
+
+						if(status.get() == NULL)
+						{
+							stream <<
+								HTMLModule::getHTMLImage("exclamation.png", "Cet afficheur n'est jamais entré en contact.")
+							;
+						}
+						else if(screen->isDown(*status)
+						){
+							stream <<
+								HTMLModule::getHTMLImage("exclamation.png", "Cet afficheur n'est plus en contact alors qu'il est déclaré online.")
+							;
+						}
+						else
+						{
+							stream <<
+								HTMLModule::getHTMLImage(
+									DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()),
+									DisplayMonitoringStatus::GetStatusString(status->getGlobalStatus())
+								)
+							;
 						}
 					}
+
+					// Content
 					stream << t.col();
 					if (!screen->getIsOnline())
 					{

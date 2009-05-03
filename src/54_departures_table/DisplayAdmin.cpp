@@ -132,6 +132,7 @@ namespace synthese
 			{
 				_displayScreen = DisplayScreenTableSync::Get(id, _env);
 				
+				_status = DisplayMonitoringStatusTableSync::GetStatus(_displayScreen->getKey());
 				_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
 				_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
 
@@ -169,8 +170,6 @@ namespace synthese
 			{
 				throw AdminParametersException("Place not found");
 			}
-
-			DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 
 			// CPU search
 			if (_displayScreen->getLocalization() != NULL)
@@ -315,81 +314,90 @@ namespace synthese
 						t.getForm().getTextAreaInput(
 							UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE,
 							_displayScreen->getMaintenanceMessage(),
-							3, 30
+							3, 60
 					)	)
 				;
 				stream << t.close();
 
 				stream << "<h1>Informations de supervision</h1>";
 
-				bool monitored(
-					_displayScreen->getType() != NULL &&
-					_displayScreen->getType()->getMonitoringInterface() != NULL &&
-					_displayScreen->getType()->getTimeBetweenChecks() > 0
-				);
+				bool monitored(_displayScreen->isMonitored());
 				
 				HTMLList l;
 				stream << l.open();
-				if (_displayScreen->getType() != NULL)
+
+
+				stream << l.element();
+				if(_displayScreen->getType() == NULL)
 				{
 					stream <<
-						l.element() <<
+						HTMLModule::getHTMLImage("error.png", "Erreur") <<
+						" KO : Veuillez définir le type d'afficheur dans l'écran de configuration."
+					;
+				}
+				else
+				{
+					stream <<
 						"Type d'afficheur : " <<
 						HTMLModule::getHTMLLink(
 							displayTypeRequest.getURL(),
 							_displayScreen->getType()->getName()
 						)
 					;
-					if(!monitored)
-					{
-						stream <<
-							l.element() <<
-							"Ce type d'afficheur n'est pas supervisé."
-						;
-					} else {
-						stream <<
-							l.element() <<
-							"Durée théorique entre les contacts de supervision : " <<
-							_displayScreen->getType()->getTimeBetweenChecks() << " min"
-						;
-					}
 				}
-				else
+
+
+				
+				if(!monitored)
 				{
 					stream <<
 						l.element() <<
-						"ATTENTION : veuillez définir le type d'afficheur dans l'écran de configuration."
+						HTMLModule::getHTMLImage("help.png", "Information") <<
+						" Ce type d'afficheur n'est pas supervisé."
 					;
-				}
-				
-				if(monitored)
-				{
-					if(_env.getRegistry<DisplayMonitoringStatus>().empty())
+				} else {
+					stream <<
+						l.element() <<
+						"Durée théorique entre les contacts de supervision : " <<
+						_displayScreen->getType()->getTimeBetweenChecks() << " min"
+					;
+
+					if(_status.get() == NULL)
 					{
-						stream << l.element() << "ATTENTION : Cet afficheur n'est jamais entré en contact.";
+						stream <<
+							l.element() <<
+							HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
+							" KO : Cet afficheur n'est jamais entré en contact.";
 					}
 					else
 					{
-						shared_ptr<DisplayMonitoringStatus> status(
-							_env.getEditableRegistry<DisplayMonitoringStatus>().front()
-						);
-						if(	_displayScreen->getIsOnline() && _now - status->getTime() >
-							_displayScreen->getType()->getTimeBetweenChecks()
+						if(	_displayScreen->isDown(*_status)
 						){
 							stream <<
 								l.element() <<
-								"ERREUR : Cet afficheur n'est plus en contact alors qu'il est déclaré online."
+								HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
+								" KO : Cet afficheur n'est plus en contact alors qu'il est déclaré online."
 							;
 						}
-	
-						stream << l.element() << "Dernière mesure le " << status->getTime().toString();
-						stream << l.element() << "Dernier état mesuré : "
-							<< DisplayMonitoringStatus::GetStatusString(status->getGlobalStatus());
-						stream << l.element() << "Température : "
-							<< status->getTemperatureValue();
-						stream << l.element() << "Détail anomalies : "
-							<< status->getDetail();
 					}
+				}
+
+				if(_status.get() != NULL)
+				{
+					DisplayMonitoringStatus::Status globalStatus(_status->getGlobalStatus());
+					stream << l.element() << "Dernière mesure le " << _status->getTime().toString();
+					stream << l.element() << "Dernier état mesuré : " <<
+						HTMLModule::getHTMLImage(
+							DisplayMonitoringStatus::GetStatusIcon(globalStatus),
+							DisplayMonitoringStatus::GetStatusString(globalStatus)
+						) <<
+						" " <<
+						DisplayMonitoringStatus::GetStatusString(globalStatus)
+					;
+					stream << l.element() << "Température : "
+						<< _status->getTemperatureValue();
+					stream << l.element() << "Détail : "
+						<< _status->getDetail();
 				}
 
 				stream << l.close();
@@ -869,7 +877,6 @@ namespace synthese
 
 		DisplayAdmin::DisplayAdmin(
 		): AdminInterfaceElementTemplate<DisplayAdmin>(),
-			_now(TIME_CURRENT),
 			_maintenanceLogView(TAB_MAINTENANCE),
 			_generalLogView(TAB_LOG)
 		{

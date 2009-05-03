@@ -24,9 +24,13 @@
 #include "DBLogEntryTableSync.h"
 #include "User.h"
 
+using namespace boost;
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
 
 	namespace dblog
 	{
@@ -36,7 +40,7 @@ namespace synthese
 			, DBLogEntry::Level level
 			, const DBLogEntry::Content& content
 			, const security::User* user /*= NULL*/ 
-			, uid objectId
+			, util::RegistryKeyType objectId
 		){
 			DBLogEntry e;
 			e.setLevel(level);
@@ -48,6 +52,39 @@ namespace synthese
 
 			return e.getKey();
 		}
+
+
+
+		/** Reads the last entry of a log.
+			@param logKey key of the DBLog to write
+			@param objectId id of the referring object (can be undefined)
+			@return The last log entry of the specified log, referring the specified object if any
+		*/
+		boost::shared_ptr<DBLogEntry> DBLog::_getLastEntry(
+			const std::string& logKey,
+			boost::optional<util::RegistryKeyType> objectId
+		){
+			Env env;
+			DBLogEntryTableSync::Search(
+				env,
+				logKey,
+				DateTime(TIME_UNKNOWN),
+				DateTime(TIME_UNKNOWN),
+				UNKNOWN_VALUE,
+				DBLogEntry::DB_LOG_UNKNOWN,
+				objectId ? *objectId : UNKNOWN_VALUE,
+				string(),
+				0, 1,
+				true, false, false,false
+			);
+			return
+				env.getRegistry<DBLogEntry>().empty() ?
+				shared_ptr<DBLogEntry>() :
+				env.getEditableRegistry<DBLogEntry>().front()
+			;
+		}
+
+
 
 		DBLog::ColumnsVector DBLog::parse(const DBLogEntry& entry) const
 		{

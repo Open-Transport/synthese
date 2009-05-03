@@ -32,6 +32,7 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 #include "Conversion.h"
+#include "DisplayMaintenanceLog.h"
 
 #include <sstream>
 
@@ -233,13 +234,23 @@ namespace synthese
 
 
 		boost::shared_ptr<DisplayMonitoringStatus> DisplayMonitoringStatusTableSync::GetStatus(
-			util::RegistryKeyType screenId
+			const DisplayScreen& screen
 		){
 			Env env;
-			Search(env, screenId, 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL);
-			return env.getRegistry<DisplayMonitoringStatus>().empty() ?
-				shared_ptr<DisplayMonitoringStatus>(new DisplayMonitoringStatus()) :
-				env.getEditableRegistry<DisplayMonitoringStatus>().front();
+			Search(env, screen.getKey(), 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL);
+
+			if(env.getRegistry<DisplayMonitoringStatus>().empty())
+			{
+				return shared_ptr<DisplayMonitoringStatus>();
+			}
+
+			shared_ptr<DisplayMonitoringStatus> status(env.getEditableRegistry<DisplayMonitoringStatus>().front());
+			if(screen.isDown(*status))
+			{
+				DisplayMaintenanceLog::AddMonitorDownEntry(screen);
+			}
+
+			return status;
 		}
 	}
 }

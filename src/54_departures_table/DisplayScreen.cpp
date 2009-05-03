@@ -35,6 +35,7 @@
 #include "DisplayScreenAlarmRecipient.h"
 #include "DisplayScreenCPU.h"
 #include "NamedPlace.h"
+#include "DisplayMonitoringStatus.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -602,6 +603,33 @@ namespace synthese
 		bool DisplayScreen::getDisplayClock(
 		) const {
 			return _displayClock;
+		}
+
+
+		bool DisplayScreen::isDown(
+			const DisplayMonitoringStatus& status
+		) const {
+			if(	!isMonitored()
+			){
+				return false;
+			}
+		
+			DateTime now(TIME_CURRENT);
+			if(now - status.getTime() <= getType()->getTimeBetweenChecks())
+			{
+				return false;
+			}
+			return true;
+		}
+
+
+		bool DisplayScreen::isMonitored(
+		) const {
+			return getIsOnline() &&
+				getType() != NULL &&
+				getType()->getMonitoringInterface() != NULL &&
+				getType()->getTimeBetweenChecks() > 0
+			;
 		}
 	}
 }

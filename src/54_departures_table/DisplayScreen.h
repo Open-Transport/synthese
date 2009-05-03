@@ -49,6 +49,7 @@ namespace synthese
 	{
 		class DisplayType;
 		class DisplayScreenCPU;
+		class DisplayMonitoringStatus;
 
 		/** Terminal d'affichage.
 			@ingroup m54
@@ -231,6 +232,25 @@ namespace synthese
 
 				std::vector<std::pair<uid, std::string> > 
 					getSortedAvaliableDestinationsLabels(const DisplayedPlacesList& placesToAvoid)	const;
+
+				/** Analyzes a monitoring status to determinate if the display is down or up.
+					@param status Status to read
+					@return true if the status is too old for the display screen
+					If the status is too old, a log entry is writen.
+					If the screen is not monitored for any reason, then the method always returns false.
+					@warning This method checks only if the status is too old. It does not read the status itself.
+				*/
+				bool isDown(const DisplayMonitoringStatus& status) const;
+
+
+				/** Returns if the screen should sens monitoring status.
+					@return true if :
+						- the screen has a display type
+						- the screen is online
+						- the type has a monitoring interface
+						- the type defines a positive time between monitoring checks
+				*/
+				bool isMonitored() const;
 			//@}
 
 		};

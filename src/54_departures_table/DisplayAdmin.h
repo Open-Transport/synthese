@@ -36,6 +36,7 @@ namespace synthese
 	namespace departurestable
 	{
 		class DisplayScreen;
+		class DisplayMonitoringStatus;
 
 		/** Ecran de paramétrage d'un afficheur.
 			@ingroup m54Admin refAdmin
@@ -155,7 +156,8 @@ namespace synthese
 				- NB : Ces deux entrées apparaissent à la première visualisation d'un problème de ce type dans une console d'administration, afin de suppléer à l'absence de démon de surveillance. Un passage en contrôle continu avec alerte pourrait être implémenté.
 				- NB : Des entrées INFO/WARNING/ERROR sont entrées dans le journal de maintenance directement par les clients de supervision via une requête SendLogEntry.
 		*/
-		class DisplayAdmin : public admin::AdminInterfaceElementTemplate<DisplayAdmin>
+		class DisplayAdmin:
+			public admin::AdminInterfaceElementTemplate<DisplayAdmin>
 		{
 		public:
 			static const std::string TAB_TECHNICAL;
@@ -166,10 +168,10 @@ namespace synthese
 			static const std::string TAB_LOG;
 
 		private:
-			boost::shared_ptr<const DisplayScreen>	_displayScreen;
-			time::DateTime							_now;
-			dblog::DBLogHTMLView					_maintenanceLogView;
-			dblog::DBLogHTMLView					_generalLogView;
+			boost::shared_ptr<const DisplayScreen>				_displayScreen;
+			boost::shared_ptr<const DisplayMonitoringStatus>	_status;
+			dblog::DBLogHTMLView								_maintenanceLogView;
+			dblog::DBLogHTMLView								_generalLogView;
 
 		public:
 			DisplayAdmin();

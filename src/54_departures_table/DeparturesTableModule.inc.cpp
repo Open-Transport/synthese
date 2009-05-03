@@ -68,3 +68,4 @@
 #include "DisplayScreenContentRequest.h"
 #include "AlarmTestOnDisplayScreenFunction.h"
 #include "DisplayScreenPhysicalStopFunction.h"
+#include "DisplayGetNagiosStatusFunction.h"

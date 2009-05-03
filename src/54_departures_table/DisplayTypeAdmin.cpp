@@ -147,7 +147,7 @@ namespace synthese
 			stream << t.title("Paramètres sonores");
 			stream << t.cell("Interface vocale", t.getForm().getSelectInput(
 					UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID,
-					InterfaceTableSync::_GetInterfaceLabels(string("undefined"), optional<string>()),
+					InterfaceTableSync::_GetInterfaceLabels(optional<string>(), string("(aucune)"), string("undefined")),
 					_type->getAudioInterface() ? _type->getAudioInterface()->getKey() : uid(0)
 			)	);
 			stream << t.title("Paramètres de supervision");

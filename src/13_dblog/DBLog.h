@@ -28,6 +28,9 @@
 
 #include "FactoryBase.h"
 #include "DBLogEntry.h"
+#include "Registry.h"
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -86,7 +89,19 @@ namespace synthese
 				, DBLogEntry::Level level
 				, const DBLogEntry::Content& content
 				, const security::User* user
-				, uid objectId = 0
+				, util::RegistryKeyType objectId = 0
+			);
+
+
+
+			/** Reads the last entry of a log.
+				@param logKey key of the DBLog to write
+				@param objectId id of the referring object (can be undefined)
+				@return The last log entry of the specified log, referring the specified object if any
+			*/
+			static boost::shared_ptr<DBLogEntry> _getLastEntry(
+				const std::string& logKey,
+				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>()
 			);
 
 		public:
