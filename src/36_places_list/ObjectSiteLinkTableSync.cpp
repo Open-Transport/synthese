@@ -70,6 +70,7 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::_INDEXES[]=
 		{
+			SQLiteTableSync::Index(ObjectSiteLinkTableSync::COL_SITE_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
