@@ -22,16 +22,16 @@
 
 #include <sstream>
 
-#include "05_html/HTMLModule.h"
+#include "HTMLModule.h"
 
-#include "11_interfaces/ValueElementList.h"
+#include "ValueElementList.h"
 
-#include "30_server/FunctionRequest.h"
-
-#include "32_admin/AdminRequest.h"
-#include "32_admin/AdminInterfaceElement.h"
-#include "32_admin/AdminPagePositionInterfaceElement.h"
-#include "32_admin/AdminParametersException.h"
+#include "FunctionRequest.h"
+#include "Conversion.h"
+#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
+#include "AdminPagePositionInterfaceElement.h"
+#include "AdminParametersException.h"
 
 using namespace boost;
 using namespace std;
@@ -53,10 +53,14 @@ namespace synthese
 	{
 		void AdminPagePositionInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
 		{
-			if (vel.size() < 2)
-				throw AdminParametersException("2 arguments needed");
+			if (vel.size() < 6)
+				throw AdminParametersException("6 arguments needed");
 			_normalSeparator = vel.front();
 			_lastSeparator = vel.front();
+			_withImages = vel.front();
+			_withLinks = vel.front();
+			_withFirst = vel.front();
+			_lastSeparatorIfFirst = vel.front();
 		}
 
 		std::string AdminPagePositionInterfaceElement::display(
@@ -67,18 +71,34 @@ namespace synthese
 			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
 			string normalSeparator(_normalSeparator->getValue(parameters, variables, object, request));
 			string lastSeparator(_lastSeparator->getValue(parameters, variables, object, request));
+			bool withImages(Conversion::ToBool(_withImages->getValue(parameters, variables, object, request)));
+			bool withLinks(Conversion::ToBool(_withLinks->getValue(parameters, variables, object, request)));
+			bool withFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
+			bool lastSeparatorIfFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
 
 			const AdminInterfaceElement::PageLinks& links((*page)->getTreePosition());
 
+			bool first(true);
 			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
 			{
+				if(!withFirst && it == links.begin() && it != links.end()-1) continue;
+
 				if (it == links.end()-1)
-					stream << lastSeparator;
-				else if (it != links.begin())
+				{
+					if(lastSeparatorIfFirst || it != links.begin())
+						stream << lastSeparator;
+				}
+				else if(first)
+					first = false;
+				else
 					stream << normalSeparator;
 
-				stream << HTMLModule::getHTMLImage(it->icon, it->name);
-				if (it != (links.end() -1))
+				if(withImages)
+				{
+					stream << HTMLModule::getHTMLImage(it->icon, it->name);
+				}
+
+				if (withLinks && it != (links.end() -1))
 					stream << HTMLModule::getHTMLLink(it->getURL(), it->name);
 				else
 					stream << it->name;

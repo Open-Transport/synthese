@@ -26,9 +26,9 @@
 #include <vector>
 #include <utility>
 
-#include "01_util/ModuleClass.h"
-#include "01_util/UId.h"
-#include "01_util/FactorableTemplate.h"
+#include "ModuleClass.h"
+#include "UId.h"
+#include "FactorableTemplate.h"
 
 #include "11_interfaces/Types.h"
 
@@ -112,11 +112,6 @@ namespace synthese
 		class InterfaceModule : public util::FactorableTemplate<util::ModuleClass, InterfaceModule>
 		{
 		public:
-			static std::vector<std::pair<uid, std::string> > getInterfaceLabels(
-				bool withNo = false,
-				bool withUnknown = false
-			);
-
 			void initialize();
 
 			static std::string getVariableFromMap(const VariablesMap& variables, const std::string& varName);

@@ -25,9 +25,8 @@
 
 #include <string>
 
-#include "11_interfaces/LibraryInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "LibraryInterfaceElement.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -43,10 +42,14 @@ namespace synthese
 		{
 			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_normalSeparator;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_lastSeparator;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_withImages;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_withLinks;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_withFirst;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_lastSeparatorIfFirst;
 
 		public:
 			/** Controls and store the internals parameters.
-			@param vel Parameters list to read
+				@param vel Parameters list to read
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 

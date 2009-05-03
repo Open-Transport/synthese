@@ -25,8 +25,12 @@
 #include "SQLiteResult.h"
 
 #include "InterfaceTableSync.h"
+#include "InterfacePageTableSync.h"
 
-using boost::shared_ptr;
+#include <sstream>
+
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -94,6 +98,62 @@ namespace synthese
 			: db::SQLiteRegistryTableSyncTemplate<InterfaceTableSync,Interface> ()
 		{
 		}
+
+
+		void InterfaceTableSync::Search(
+			util::Env& env,
+			boost::optional<std::string> interfacePageKey,
+			bool orderByName,
+			bool raisingOrder,
+			boost::optional<int> first,
+			boost::optional<int> number,
+			util::LinkLevel linkLevel
+		){
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE.NAME
+				<< " WHERE 1";
+			if (interfacePageKey)
+				query << " AND EXISTS(SELECT * FROM " << InterfacePageTableSync::TABLE.NAME << " p"
+					<< " WHERE p." << InterfacePageTableSync::TABLE_COL_INTERFACE << "=" << TABLE.NAME << "." << TABLE_COL_ID
+					<< " AND p." << InterfacePageTableSync::TABLE_COL_CLASS << "=" << Conversion::ToSQLiteString(*interfacePageKey)
+					<< ")";
+			if(orderByName)
+				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
+			if (first)
+				query << " OFFSET " << Conversion::ToString(*first);
+
+			LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+		InterfaceTableSync::OrderedInterfaceLabels InterfaceTableSync::_GetInterfaceLabels(
+			boost::optional<std::string> textWithNo,
+			boost::optional<std::string> textWithUnknown,
+			boost::optional<std::string> pageFilter
+		){
+			OrderedInterfaceLabels m;
+			if (textWithUnknown)
+			{
+				m.push_back(make_pair(UNKNOWN_VALUE, *textWithUnknown));
+			}
+			if (textWithNo)
+			{
+				m.push_back(make_pair(0, *textWithNo));
+			}
+			Env env;
+			Search(env, pageFilter);
+			BOOST_FOREACH(shared_ptr<Interface> interf, env.getRegistry<Interface>())
+			{
+				m.push_back(make_pair(interf->getKey(), interf->getName()));
+			}
+			return m;
+		}
+
 	}
 }
 

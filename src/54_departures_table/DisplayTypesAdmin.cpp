@@ -22,7 +22,6 @@
 
 #include "HTMLForm.h"
 #include "Interface.h"
-#include "InterfaceModule.h"
 #include "ActionFunctionRequest.h"
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
@@ -38,6 +37,9 @@
 #include "QueryString.h"
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
+#include "DeparturesTableInterfacePage.h"
+#include "ParseDisplayReturnInterfacePage.h"
+#include "InterfaceTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -136,7 +138,11 @@ namespace synthese
 			stream << f.cell("Nom", f.getForm().getTextInput(PARAMETER_NAME, _searchName));
 			stream << f.cell(
 				"Interface d'affichage",
-				f.getForm().getSelectInput(PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true, true), _searchInterfaceId)
+				f.getForm().getSelectInput(
+					PARAMETER_INTERFACE_ID,
+					InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(),
+					_searchInterfaceId
+				)
 			);
 			stream << f.close();
 
@@ -209,7 +215,7 @@ namespace synthese
 					t.col() <<
 					t.getActionForm().getSelectInput(
 						CreateDisplayTypeAction::PARAMETER_INTERFACE_ID,
-						InterfaceModule::getInterfaceLabels(true),
+						InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(optional<string>()),
 						RegistryKeyType(0)
 					)
 				;
@@ -224,7 +230,7 @@ namespace synthese
 					t.col() <<
 					t.getActionForm().getSelectInput(
 						CreateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
-						InterfaceModule::getInterfaceLabels(true),
+						InterfaceTableSync::GetInterfaceLabels<ParseDisplayReturnInterfacePage>(optional<string>()),
 						RegistryKeyType(0)
 					)
 				;

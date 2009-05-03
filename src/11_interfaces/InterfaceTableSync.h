@@ -30,6 +30,8 @@
 
 #include "SQLiteRegistryTableSyncTemplate.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace interfaces
@@ -47,6 +49,39 @@ namespace synthese
 			/** Interface page SQLite table constructor.
 			*/
 			InterfaceTableSync();
+
+			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > OrderedInterfaceLabels;
+
+
+			/** Gets the label of the interfaces ordered alphabetically.
+				@param pageFilter filter on interfaces which contains the specified page
+			*/
+			static OrderedInterfaceLabels _GetInterfaceLabels(
+				boost::optional<std::string> textWithUnknown = boost::optional<std::string>("(inconnue)"),
+				boost::optional<std::string> textWithNo = boost::optional<std::string>("(aucune)"),
+				boost::optional<std::string> pageFilter = boost::optional<std::string>()
+			);
+
+
+			template<class T>
+			static OrderedInterfaceLabels GetInterfaceLabels(
+				boost::optional<std::string> textWithUnknown = boost::optional<std::string>("(inconnue)"),
+				boost::optional<std::string> textWithNo = boost::optional<std::string>("(aucune)")
+			){
+				return _GetInterfaceLabels(textWithNo, textWithUnknown, T::FACTORY_KEY);
+			}
+
+
+			static void Search(
+				util::Env& env,
+				boost::optional<std::string> interfacePageKey = boost::optional<std::string>(),
+				bool orderByName = true,
+				bool raisingOrder = true,
+				boost::optional<int> first = boost::optional<int>(),
+				boost::optional<int> number = boost::optional<int>(),
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
 		};
 
 	}

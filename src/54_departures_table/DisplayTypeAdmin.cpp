@@ -32,14 +32,17 @@
 #include "DisplayTypeTableSync.h"
 #include "PropertiesHTMLTable.h"
 #include "UpdateDisplayTypeAction.h"
-#include "InterfaceModule.h"
 #include "ActionFunctionRequest.h"
 #include "AdminRequest.h"
 #include "DisplayTypeRemoveAction.h"
 #include "Interface.h"
 #include "ArrivalDepartureTableRight.h"
+#include "DeparturesTableInterfacePage.h"
+#include "ParseDisplayReturnInterfacePage.h"
+#include "InterfaceTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -119,7 +122,7 @@ namespace synthese
 					"Interface d'affichage",
 					t.getForm().getSelectInput(
 						UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID,
-						InterfaceModule::getInterfaceLabels(true),
+						InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(optional<string>()),
 						_type->getDisplayInterface() ? _type->getDisplayInterface()->getKey() : uid(0)
 				)	)
 			;
@@ -142,14 +145,18 @@ namespace synthese
 					"(pas de limite)"
 			)	);
 			stream << t.title("Paramètres sonores");
-			stream << t.cell("Interface vocale", t.getForm().getSelectInput(UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID, InterfaceModule::getInterfaceLabels(true), _type->getAudioInterface() ? _type->getAudioInterface()->getKey() : uid(0)));
+			stream << t.cell("Interface vocale", t.getForm().getSelectInput(
+					UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID,
+					InterfaceTableSync::_GetInterfaceLabels(string("undefined"), optional<string>()),
+					_type->getAudioInterface() ? _type->getAudioInterface()->getKey() : uid(0)
+			)	);
 			stream << t.title("Paramètres de supervision");
 			stream <<
 				t.cell(
 					"Protocole de supervision",
 					t.getForm().getSelectInput(
 						UpdateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
-						InterfaceModule::getInterfaceLabels(true),
+						InterfaceTableSync::GetInterfaceLabels<ParseDisplayReturnInterfacePage>(optional<string>()),
 						_type->getMonitoringInterface() ? _type->getMonitoringInterface()->getKey() : uid(0)
 				)	)
 			;

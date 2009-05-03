@@ -40,7 +40,7 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<LibraryInterfaceElement, EqualsValueInterfaceElement>::FACTORY_KEY("=");
+		template<> const string FactorableTemplate<LibraryInterfaceElement, EqualsValueInterfaceElement>::FACTORY_KEY("==");
 	}
 
 	namespace interfaces

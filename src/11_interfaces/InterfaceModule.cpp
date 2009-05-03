@@ -53,26 +53,6 @@ namespace synthese
 		{
 		}
 
-		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels(
-			bool withNo,
-			bool withUnknown
-		){
-			vector<pair<uid, string> > m;
-			if (withUnknown)
-			{
-				m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
-			}
-			if (withNo)
-			{
-				m.push_back(make_pair(uid(0), "(aucune)"));
-			}
-			BOOST_FOREACH(shared_ptr<Interface> interf, Env::GetOfficialEnv().getRegistry<Interface>())
-			{
-				m.push_back(make_pair(interf->getKey(), interf->getName()));
-			}
-			return m;
-		}
-
 		std::string InterfaceModule::getVariableFromMap(const VariablesMap& variables, const std::string& varName )
 		{
 			VariablesMap::const_iterator it = variables.find(varName);
