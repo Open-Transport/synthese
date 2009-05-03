@@ -135,7 +135,7 @@ namespace synthese
 			stream << pt.cell("Début validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_START_DATE, _site->getStartDate()));
 			stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_END_DATE, _site->getEndDate()));
 			stream << pt.title("Apparence");
-			stream << pt.cell("Interface", pt.getForm().getSelectInput(SiteUpdateAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), _site->getInterface()->getKey()));
+			stream << pt.cell("Interface", pt.getForm().getSelectInput(SiteUpdateAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), _site->getInterface() ? _site->getInterface()->getKey() : 0));
 			stream << pt.title("Recherche d'itinéraires");
 			stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _site->getMaxTransportConnectionsCount(), 1, "illimité"));
 			stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _site->getOnlineBookingAllowed()));

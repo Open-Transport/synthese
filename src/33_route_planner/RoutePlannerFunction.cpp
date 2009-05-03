@@ -78,6 +78,10 @@ namespace synthese
 		void RoutePlannerFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			FunctionWithSite::_setFromParametersMap(map);
+			if(!_site->getInterface())
+			{
+				throw RequestException("Site "+ Conversion::ToString(_site->getKey()) + " is corrupted : it has no interface");
+			}
 
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 

@@ -82,6 +82,10 @@ namespace synthese
 		{
 			// Site
 			FunctionWithSite::_setFromParametersMap(map);
+			if(!_site->getInterface())
+			{
+				throw RequestException("Site "+ Conversion::ToString(_site->getKey()) + " is corrupted : it has no interface");
+			}
 
 			// Date
 			try

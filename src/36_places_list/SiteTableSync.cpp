@@ -128,7 +128,17 @@ namespace synthese
 				uid id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
 				if (id != UNKNOWN_VALUE)
 				{
-					site->setInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
+					try
+					{
+						site->setInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
+					}
+					catch(ObjectNotFoundException<Interface>& e)
+					{
+						Log::GetInstance().warn(
+							"Data corrupted in "+ TABLE.NAME + " on site " + Conversion::ToString(site->getKey()) +" : interface " +
+							Conversion::ToString(id) + " not found"
+						);
+					}
 				}
 			}
 		}
