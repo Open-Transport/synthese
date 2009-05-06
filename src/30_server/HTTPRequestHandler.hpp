@@ -14,31 +14,31 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
-namespace synthese {
-namespace server {
-
-struct HTTPReply;
-struct HTTPRequest;
-
-/// The common handler for all incoming requests.
-class HTTPRequestHandler
-  : private boost::noncopyable
+namespace synthese
 {
-public:
-  /// Construct with a directory containing files to be served.
-  explicit HTTPRequestHandler();
+	namespace server
+	{
+		struct HTTPReply;
+		struct HTTPRequest;
 
-  /// Handle a request and produce a reply.
-  void handle_request(const HTTPRequest& req, HTTPReply& rep);
+		/// The common handler for all incoming requests.
+		/// @ingroup m18
+		class HTTPRequestHandler:
+			private boost::noncopyable
+		{
+		public:
+			/// Construct with a directory containing files to be served.
+			explicit HTTPRequestHandler();
 
-private:
+			/// Handle a request and produce a reply.
+			void handle_request(const HTTPRequest& req, HTTPReply& rep);
 
-  /// Perform URL-decoding on a string. Returns false if the encoding was
-  /// invalid.
-  static bool url_decode(const std::string& in, std::string& out);
-};
+			/// Perform URL-decoding on a string. 
+			/// @return false if the encoding was invalid.
+			static bool url_decode(const std::string& in, std::string& out);
+		};
 
-} // namespace server3
+	} // namespace server3
 } // namespace http
 
 #endif // HTTP_SERVER3_REQUEST_HANDLER_HPP

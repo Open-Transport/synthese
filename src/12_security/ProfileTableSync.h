@@ -76,7 +76,7 @@ namespace synthese
 				, int number = UNKNOWN_VALUE
 				, bool orderByName = true
 				, bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
 
 			/** Profile search by parent.
@@ -86,7 +86,7 @@ namespace synthese
 				boost::shared_ptr<const Profile> parent
 				, int first = 0,
 				int number = -1,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 		};

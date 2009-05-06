@@ -28,6 +28,8 @@
 #include "Profile.h"
 #include "Right.h"
 
+#include <boost/foreach.hpp>
+
 using namespace boost;
 using namespace std;
 
@@ -113,7 +115,7 @@ namespace synthese
 			_rights.insert(make_pair(make_pair(right->getFactoryKey(), right->getParameter()), right));
 		}
 
-		bool Profile::isAuthorized(shared_ptr<const Right> right ) const
+		bool Profile::_isAuthorized(const Right& right ) const
 		{
 			// 0 Default values : forbidden
 			bool privateAuthorization = false;
@@ -123,27 +125,27 @@ namespace synthese
 			shared_ptr<const Right> sright = getRight();
 			if (sright != NULL)
 			{
-				privateAuthorization = (sright->getPrivateRightLevel() >= right->getPrivateRightLevel());
-				publicAuthorization = (sright->getPublicRightLevel() >= right->getPublicRightLevel());
+				privateAuthorization = (sright->getPrivateRightLevel() >= right.getPrivateRightLevel());
+				publicAuthorization = (sright->getPublicRightLevel() >= right.getPublicRightLevel());
 			}
 
 			// 1 Attempting to find same right with global perimeter
-			sright = getRight(right->getFactoryKey());
+			sright = getRight(right.getFactoryKey());
 			if (sright != NULL)
 			{
-				privateAuthorization = (sright->getPrivateRightLevel() >= right->getPrivateRightLevel());
-				publicAuthorization = (sright->getPublicRightLevel() >= right->getPublicRightLevel());
+				privateAuthorization = (sright->getPrivateRightLevel() >= right.getPrivateRightLevel());
+				publicAuthorization = (sright->getPublicRightLevel() >= right.getPublicRightLevel());
 			}
 			
 			// 2 Attempting to find same right with compatible perimeter : the more favorable is selected
-			RightsOfSameClassMap m = getRights(right->getFactoryKey());
-			for (RightsOfSameClassMap::const_iterator it = m.begin(); it != m.end(); ++it)
+			RightsOfSameClassMap m = getRights(right.getFactoryKey());
+			BOOST_FOREACH(const RightsOfSameClassMap::value_type& it, m)
 			{
-				if (it->second->perimeterIncludes(right->getParameter()))
+				if (it.second->perimeterIncludes(right.getParameter()))
 				{
-					if (it->second->getPrivateRightLevel() >= right->getPrivateRightLevel())
+					if (it.second->getPrivateRightLevel() >= right.getPrivateRightLevel())
 						privateAuthorization = true;
-					if (it->second->getPublicRightLevel() >= right->getPublicRightLevel())
+					if (it.second->getPublicRightLevel() >= right.getPublicRightLevel())
 						publicAuthorization = true;
 				}
 			}
@@ -154,10 +156,12 @@ namespace synthese
 		RightsOfSameClassMap Profile::getRights( const std::string& key ) const
 		{
 			RightsOfSameClassMap m;
-			for (RightsVector::const_iterator it = _rights.begin(); it != _rights.end(); ++it)
-				if (it->first.first == key)
-					m.insert(make_pair(it->first.second, it->second));
-			return m;			
+			BOOST_FOREACH(RightsVector::value_type it, _rights)
+			{
+				if (it.first.first == key)
+					m.insert(make_pair(it.first.second, it.second));
+			}
+			return m;
 		}
 
 	}

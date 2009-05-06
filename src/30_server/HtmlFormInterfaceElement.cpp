@@ -106,7 +106,9 @@ namespace synthese
 					functionParameters = request->_getFunction()->getFixedParametersMap().getURI();
 				
 				stringstream s;
-				s	<< Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT << functionKey
+				s	<<
+					request->getClientURL() << Request::PARAMETER_STARTER <<
+					Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT << functionKey
 					<< Request::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << Request::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
 					;
 					

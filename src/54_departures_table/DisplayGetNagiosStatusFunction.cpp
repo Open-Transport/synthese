@@ -82,25 +82,25 @@ namespace synthese
 		{
 			if(	!_screen->getIsOnline()
 			){
-				stream << "3\nCheck deactivated.|-1\n";
+				stream << "3\nCheck deactivated.|temp=-1\n";
 			} else if(	!_screen->isMonitored()
 			){
-				stream << "3\nUnmonitored.|-1\n";
+				stream << "3\nUnmonitored.|temp=-1\n";
 			} else {
 				shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(_screen->getKey()));
 
 				if(	status.get() == NULL
 				){
-					stream << "1\nNever successfully checked.|-1\n";
+					stream << "1\nNever successfully checked.|temp=-1\n";
 				} else if(	_screen->isDown(*status)
 				){
-					stream << "2\nContact lost.|-1\n";
+					stream << "2\nContact lost.|temp=-1\n";
 				} else {
 					string returnCode("2");
 					if (status->getGlobalStatus() == DisplayMonitoringStatus::DISPLAY_MONITORING_OK) returnCode = "0";
 					if (status->getGlobalStatus() == DisplayMonitoringStatus::DISPLAY_MONITORING_WARNING) returnCode = "1";
 					stream << returnCode << "\n";
-					stream << status->getDetail() << "|" << status->getTemperatureValue() << "\n";
+					stream << status->getDetail() << "|temp=" << status->getTemperatureValue() << "\n";
 				}
 			}
 		}

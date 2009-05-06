@@ -61,7 +61,6 @@ namespace synthese
 		const string Request::PARAMETER_ACTION ("a");
 		const string Request::PARAMETER_FUNCTION = "fonction";
 		const string Request::PARAMETER_SESSION = "sid";
-		const string Request::PARAMETER_CLIENT_URL = "clienturl";
 		const string Request::PARAMETER_OBJECT_ID = "roid";
 		const string Request::PARAMETER_ACTION_FAILED = "raf";
 		const string Request::PARAMETER_ERROR_MESSAGE = "rem";
@@ -105,16 +104,39 @@ namespace synthese
 				throw RequestException("Client IP not found in parameters.");
 			}
 
+			// Host
+			HTTPRequest::Headers::const_iterator it(httpRequest.headers.find("X-Forwarded-Host"));
+			if(it != httpRequest.headers.end() && !it->second.empty())
+			{
+				_hostName = it->second;
+			} else {
+				it = httpRequest.headers.find("Host");
+				if(it != httpRequest.headers.end())
+				{
+					_hostName = it->second;
+				}
+			}
+
+			// Client URL
 			const string& uri(httpRequest.uri);
 
-			size_t separator(uri.find_first_of("?"));
+			size_t separator(uri.find_first_of(PARAMETER_STARTER));
 			if(separator == string::npos)
 			{
-				throw RequestException("No function is defined : ? character missing.");
+				_clientURL = uri;
 			}
-			_clientURL = uri.substr(0, separator);
+			else
+			{
+				_clientURL = uri.substr(0, separator);
+			}
 
-			ParametersMap map(uri.substr(separator+1));
+			// Parameters
+			ParametersMap map(httpRequest.postData);
+			if(separator+1 < uri.length())
+			{
+				ParametersMap getMap(uri.substr(separator+1));
+				map.merge(getMap);
+			}
 
 			// Session
 			string sid(map.getString(Request::PARAMETER_SESSION, false, "Request"));
@@ -181,9 +203,6 @@ namespace synthese
 					_errorMessage = "Action error : "+ e.getMessage();
 				}
 			}
-
-			// Client URL
-			_clientURL = map.getString(Request::PARAMETER_CLIENT_URL, false, "Request");
 
 			// Last action error
 			int num = map.getInt(Request::PARAMETER_ERROR_LEVEL, false, string());
@@ -463,6 +482,16 @@ namespace synthese
 		{
 			if(_function.get())
 				return _function->getOutputMimeType();
+		}
+
+		void Request::setHostName( const std::string& value )
+		{
+			_hostName = value;
+		}
+
+		const std::string& Request::getHostName() const
+		{
+			return _hostName;
 		}
 	}
 }

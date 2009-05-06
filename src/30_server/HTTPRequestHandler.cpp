@@ -35,14 +35,6 @@ namespace synthese
 
 		void HTTPRequestHandler::handle_request(const HTTPRequest& req, HTTPReply& rep)
 		{
-		  // Decode url to path.
-		  std::string request_path;
-		  if (!url_decode(req.uri, request_path))
-		  {
-			rep = HTTPReply::stock_reply(HTTPReply::bad_request);
-			return;
-		  }
-
 		  Log::GetInstance ().debug ("Received request : " + 
 			  req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)");
 
@@ -53,10 +45,8 @@ namespace synthese
 			  request.run(output);
 			  rep.status = HTTPReply::ok;
 			  rep.content.append(output.str());
-			  rep.headers[0].name = "Content-Length";
-			  rep.headers[0].value = lexical_cast<string>(rep.content.size());
-			  rep.headers[1].name = "Content-Type";
-			  rep.headers[1].value = request.getOutputMimeType();
+			  rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
+			  rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType()));
 		  }
 		  catch (RequestException& e)
 		  {

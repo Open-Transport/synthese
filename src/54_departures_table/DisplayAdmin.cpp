@@ -888,14 +888,11 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if (parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY)
-			{
-				if (currentPage.getFactoryKey() == FACTORY_KEY)
-				{
-					links.push_back(currentPage.getPageLink());
-				}
+			if (parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY &&
+				currentPage.getFactoryKey() == FACTORY_KEY
+			){
+				links.push_back(currentPage.getPageLink());
 			}
-
 			return links;
 		}
 

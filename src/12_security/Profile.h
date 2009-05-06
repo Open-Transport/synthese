@@ -108,9 +108,28 @@ namespace synthese
 						- Or if the profile contains a right of the same class with a sufficient perimeter, and with a sufficient level in public and private domains
 					@author Hugues Romain
 					@date 2007
-					
 				*/
-				bool isAuthorized(boost::shared_ptr<const Right> right) const;
+				bool _isAuthorized(const Right& right) const;
+
+
+				/** Control of authorization.
+					@param publicr Needed right level for public actions
+					@param privater Needed right level for private actions
+					@param perimeter Needed Right Perimeter according to the Right class definition.
+					@return bool True if the needed right is respected :
+						- If the profile contains a global right with a sufficient level in public and private domains
+						- Or If the profile contains a right of the same class with a global perimeter, and with a sufficient level in public and private domains
+						- Or if the profile contains a right of the same class with a sufficient perimeter, and with a sufficient level in public and private domains
+					@author Hugues Romain
+					@date 2009
+				*/
+				template<class R>
+				bool isAuthorized(
+					security::RightLevel publicr = security::USE
+					, security::RightLevel privater = security::UNKNOWN_RIGHT_LEVEL
+					, std::string parameter = security::UNKNOWN_PERIMETER
+				) const;
+
 
 				/** Search of a contained right in the right vector, from the class key and the perimeter string.
 					@param key Class key to search (default : the global right)
@@ -145,6 +164,17 @@ namespace synthese
 				RightLevel	getGlobalPublicRight()	const;
 			//@}
 		};
+
+		template<class R>
+		bool Profile::isAuthorized( security::RightLevel publicr /*= security::USE */, security::RightLevel privater /*= security::UNKNOWN_RIGHT_LEVEL */, std::string parameter /*= security::UNKNOWN_PERIMETER */ ) const
+		{
+			R neededRight;
+			neededRight.setPublicLevel(publicr);
+			neededRight.setPrivateLevel(privater);
+			neededRight.setParameter(parameter);
+			return _isAuthorized(neededRight);
+		}
+
 
 		template<class T>
 		RightLevel Profile::getGlobalPublicRight() const

@@ -25,6 +25,7 @@
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -114,14 +115,16 @@ namespace synthese
 				- ERROR : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai supérieur à 500% de la durée présupposée entre deux contrôles. 
 				- NB : Ces deux entrées apparaissent à la première visualisation d'un problème de ce type dans une console d'administration, afin de suppléer à l'absence de démon de surveillance. Un passage en contrôle continu avec alerte pourrait être implémenté.
 		*/
-		class DisplaySearchAdmin : public admin::AdminInterfaceElementTemplate<DisplaySearchAdmin>
+		class DisplaySearchAdmin :
+			public admin::AdminInterfaceElementTemplate<DisplaySearchAdmin>
 		{
 			std::string										_searchCity;
 			std::string										_searchStop;
 			std::string										_searchName;
 			uid												_searchLineId;
 			uid												_searchTypeId;
-			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
+			boost::optional<boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> >
+															_place;
 			int												_searchState;
 			int												_searchMessage;
 			html::ResultHTMLTable::RequestParameters		_requestParameters;

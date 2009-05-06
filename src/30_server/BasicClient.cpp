@@ -45,13 +45,7 @@ namespace server
 	std::stringstream req;
 	req << request ;
 
-	if (clientUrl.size () > 0)
-	{
-	    // Append client URL
-	    req << Request::PARAMETER_SEPARATOR 
-		<< Request::PARAMETER_CLIENT_URL << Request::PARAMETER_ASSIGNMENT << clientUrl; 
-	}
-
+	
 	TcpClientSocket clientSock (_serverHost, _serverPort, _timeOut);
 	boost::iostreams::stream<TcpClientSocket> cliSocketStream;
 

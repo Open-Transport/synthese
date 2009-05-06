@@ -12,24 +12,29 @@
 #define HTTP_SERVER3_REQUEST_HPP
 
 #include <string>
-#include <vector>
-#include "HTTPHeader.hpp"
+#include <map>
 
-namespace synthese {
-namespace server {
-
-/// A request received from a client.
-struct HTTPRequest
+namespace synthese
 {
-  std::string method;
-  std::string uri;
-  std::string ipaddr;
-  int http_version_major;
-  int http_version_minor;
-  std::vector<HTTPHeader> headers;
-};
+	namespace server
+	{
 
-} // namespace server3
+		/// A request received from a client.
+		struct HTTPRequest
+		{
+			typedef std::map<std::string, std::string> Headers;
+			typedef Headers::value_type Header;
+
+			std::string method;
+			std::string uri;
+			std::string ipaddr;
+			int http_version_major;
+			int http_version_minor;
+			Headers headers;
+			std::string postData;
+		};
+
+	} // namespace server3
 } // namespace http
 
 #endif // HTTP_SERVER3_REQUEST_HPP

@@ -49,6 +49,7 @@
 #include "Request.h"
 
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 using namespace std;
@@ -136,7 +137,7 @@ namespace synthese
 				, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 				, READ
 				, UNKNOWN_VALUE
-				, _place.get() ? _place->getKey() : UNKNOWN_VALUE
+				, _place ? (*_place ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
 				, _searchLineId
 				, _searchTypeId
 				, _searchCity
@@ -163,18 +164,18 @@ namespace synthese
 		server::ParametersMap DisplaySearchAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
-			if(_place.get())
+			if(_place)
 			{
-				m.insert(PARAMETER_SEARCH_LOCALIZATION_ID, _place->getKey());
+				m.insert(PARAMETER_SEARCH_LOCALIZATION_ID, _place->get() ? (*_place)->getKey() : 0);
 			} else {
 				m.insert(PARAMETER_SEARCH_CITY, _searchCity);
 				m.insert(PARAMETER_SEARCH_STOP, _searchStop);
 				m.insert(PARAMETER_SEARCH_NAME, _searchName);
 				m.insert(PARAMETER_SEARCH_LINE_ID, _searchLineId);
-				m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId);
-				m.insert(PARAMETER_SEARCH_STATE, _searchState);
-				m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage);
 			}
+			m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId);
+			m.insert(PARAMETER_SEARCH_STATE, _searchState);
+			m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage);
 			return m;
 		}
 
@@ -191,7 +192,10 @@ namespace synthese
 				);
 				createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
 				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
-				createDisplayRequest.getAction()->setPlace(_place);
+				if(_place)
+				{
+					createDisplayRequest.getAction()->setPlace(*_place);
+				}
 				createDisplayRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
 
@@ -450,6 +454,16 @@ namespace synthese
 				links.push_back(getPageLink());
 			}
 
+
+			// Spare store page
+			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY &&
+				parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY
+				){
+					DisplayAdmin page;
+					links.push_back(page.getPageLink());
+			}
+
+
 			// Broadcast points search
 			if (parentLink.factoryKey == BroadcastPointsAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY && static_cast<const DisplaySearchAdmin&>(currentPage)._place.get())
 			{
@@ -460,17 +474,17 @@ namespace synthese
 
 		std::string DisplaySearchAdmin::getTitle() const
 		{
-			return _place.get() ? _place->getFullName() : DEFAULT_TITLE;
+			return _place ? (_place.get() ? (*_place)->getFullName() : "Equipements en stock") : DEFAULT_TITLE;
 		}
 
 		std::string DisplaySearchAdmin::getParameterName() const
 		{
-			return _place.get() ? PARAMETER_SEARCH_LOCALIZATION_ID : string();
+			return _place ? PARAMETER_SEARCH_LOCALIZATION_ID : string();
 		}
 
 		std::string DisplaySearchAdmin::getParameterValue() const
 		{
-			return _place.get() ? Conversion::ToString(_place->getKey()) : string();
+			return _place ? (_place->get() ? lexical_cast<string>((*_place)->getKey()) : "0") : string();
 		}
 
 		bool DisplaySearchAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
@@ -483,8 +497,11 @@ namespace synthese
 		void DisplaySearchAdmin::_buildTabs(
 		) const {
 			bool writeRight(
-				(_place.get() != NULL) ?
-				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
+				(_place && _place->get()) ?
+				_request->isAuthorized<ArrivalDepartureTableRight>(
+					WRITE,
+					UNKNOWN_RIGHT_LEVEL,
+					lexical_cast<string>((*_place)->getKey())) :
 				false
 			);
 			_tabs.clear();

@@ -112,7 +112,6 @@ namespace synthese
 			static const std::string PARAMETER_STARTER;
 			static const std::string PARAMETER_FUNCTION;
 			static const std::string PARAMETER_SESSION;
-			static const std::string PARAMETER_CLIENT_URL;
 			static const std::string PARAMETER_OBJECT_ID;
 			static const std::string PARAMETER_ACTION;
 			static const std::string PARAMETER_ACTION_FAILED;
@@ -128,6 +127,7 @@ namespace synthese
 			bool						_sessionBroken;
 			std::string					_ip;
 			std::string					_clientURL;
+			std::string					_hostName;
 			bool						_actionException;
 			std::string					_errorMessage;
 			ErrorLevel					_errorLevel;
@@ -216,6 +216,7 @@ namespace synthese
 				const std::string&	getIP()				const;
 				uid					getObjectId()		const;
 				const std::string&	getErrorMessage()	const;
+				const std::string&	getHostName()		const;
 
 				boost::shared_ptr<Function> _getFunction();
 				boost::shared_ptr<const Function> _getFunction() const;
@@ -228,6 +229,7 @@ namespace synthese
 				void _setErrorLevel(const ErrorLevel& level);
 				virtual void setObjectId(uid id);
 				void setSession(Session* session);
+				void setHostName(const std::string& value);
 
 				/** Client URL setter.
 					@param url URL to store.
@@ -259,7 +261,7 @@ namespace synthese
 
 				template<class R>
 				bool isAuthorized(
-					security::RightLevel publicr
+					security::RightLevel publicr = security::USE
 					, security::RightLevel privater = security::UNKNOWN_RIGHT_LEVEL
 					, std::string parameter = security::UNKNOWN_PERIMETER
 				) const;
@@ -311,16 +313,12 @@ namespace synthese
 		template<class R>
 		bool Request::isAuthorized(security::RightLevel publicr, security::RightLevel privater, std::string parameter /*= security::GLOBAL_PERIMETER*/ ) const
 		{
-			if (_session == NULL)
-				return false;
+			if (_session == NULL ||
+				_session->getUser() == NULL ||
+				_session->getUser()->getProfile() == NULL
+			)	return false;
 
-			const security::Profile* profile(_session->getUser()->getProfile());
-			boost::shared_ptr<security::Right> neededRight(new R);
-			neededRight->setPublicLevel(publicr);
-			neededRight->setPrivateLevel(privater);
-			neededRight->setParameter(parameter);
-			return profile->isAuthorized(neededRight);
-
+			return _session->getUser()->getProfile()->isAuthorized<R>(publicr, privater, parameter);
 		}
 	}
 }
