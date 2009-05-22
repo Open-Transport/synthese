@@ -95,5 +95,18 @@ namespace synthese
 		{
 			return Conversion::ToString(id);
 		}
+
+		uid DBLog::AddSimpleEntry( const std::string& logKey, DBLogEntry::Level level, const std::string& content, const security::User* user, util::RegistryKeyType objectId /*= 0 */ )
+		{
+			shared_ptr<DBLog> dbLog(Factory<DBLog>::create(logKey));
+			int cols(dbLog->getColumnNames().size());
+			DBLogEntry::Content c;
+			c.push_back(content);
+			for(int i(1); i<cols; ++i)
+			{
+				c.push_back(string());
+			}
+			return _addEntry(logKey, level, c, user, objectId);
+		}
 	}
 }

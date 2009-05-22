@@ -27,6 +27,7 @@
 #define SYNTHESE_DisplayScreenCPUAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
+#include "DBLogHTMLView.h"
 
 namespace synthese
 {
@@ -43,6 +44,7 @@ namespace synthese
 		:	public admin::AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>
 		{
 			boost::shared_ptr<const DisplayScreenCPU>	_cpu;
+			dblog::DBLogHTMLView								_generalLogView;
 
 		public:
 			static const std::string TAB_TECHNICAL;

@@ -35,9 +35,6 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include "AlarmTemplate.h"
-#include "AdminModule.h"
-#include "MessagesScenarioAdmin.h"
-#include "MessageAdmin.h"
 #include "MessagesLibraryLog.h"
 
 #include <boost/foreach.hpp>
@@ -51,7 +48,6 @@ namespace synthese
 	using namespace dblog;
 	using namespace util;
 	using namespace security;
-	using namespace admin;
 
 	template<> const string util::FactorableTemplate<Action, messages::NewScenarioSendAction>::FACTORY_KEY(
 		"nssa"
@@ -109,12 +105,10 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 	
 				// Remember of the id of created object to view it after the action
-				_request->setObjectId(scenario.getKey());
-				AdminModule::ChangePageInRequest(
-					*_request,
-					MessageAdmin::FACTORY_KEY,
-					MessagesScenarioAdmin::FACTORY_KEY
-				);
+				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_request->setObjectId(scenario.getKey());
+				}
 					
 				SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
 	 				_scenarioToCopy->getTemplate()->getKey(),
@@ -136,12 +130,10 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 	
 				// Remember of the id of created object to view it after the action
-				_request->setObjectId(scenario.getKey());
-				AdminModule::ChangePageInRequest(
-					*_request,
-					MessageAdmin::FACTORY_KEY,
-					MessagesScenarioAdmin::FACTORY_KEY
-				);
+				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_request->setObjectId(scenario.getKey());
+				}
 				
 				// The action on the alarms
 				SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
@@ -155,6 +147,23 @@ namespace synthese
 				);
 				MessagesLibraryLog::AddTemplateInstanciationEntry(
 					scenario, _request->getUser().get()
+				);
+			}
+			else
+			{
+				// The action on the scenario
+				SentScenario scenario;
+				ScenarioTableSync::Save(&scenario);
+
+				// Remember of the id of created object to view it after the action
+				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_request->setObjectId(scenario.getKey());
+				}
+
+				// The log
+				MessagesLog::AddNewSentScenarioEntry(
+					scenario, *_request->getUser().get()
 				);
 			}
 		}

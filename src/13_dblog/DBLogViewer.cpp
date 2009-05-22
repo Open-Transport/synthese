@@ -33,13 +33,14 @@
 #include "DBLogModule.h"
 #include "DBLogEntryTableSync.h"
 #include "DBLogRight.h"
-#include "Request.h"
-#include "Request.h"
 #include "AdminParametersException.h"
 #include "AdminModule.h"
 #include "AdminRequest.h"
+#include "ActionFunctionRequest.h"
 #include "ModuleAdmin.h"
 #include "DBLog.h"
+#include "DBLogPurgeAction.h"
+#include "PropertiesHTMLTable.h"
 
 #include <sstream>
 #include <boost/shared_ptr.hpp>
@@ -111,11 +112,25 @@ namespace synthese
 			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setSamePage(this);
 
+			ActionFunctionRequest<DBLogPurgeAction, AdminRequest> purgeRequest(_request);
+			purgeRequest.getFunction()->setSamePage(this);
+			purgeRequest.getAction()->setDBLog(_viewer.getLogKey());
+
 			_viewer.display(
 				stream,
 				searchRequest,
 				true, false
 			);
+
+			if(purgeRequest.getAction()->_isAuthorized())
+			{
+				stream << "<h1>Purge</h1>";
+
+				PropertiesHTMLTable t(purgeRequest.getHTMLForm("purge"));
+				stream << t.open();
+				stream << t.cell("Date max", t.getForm().getCalendarInput(DBLogPurgeAction::PARAMETER_END_DATE, DateTime(TIME_CURRENT)));
+				stream << t.close();
+			}
 		}
 
 		bool DBLogViewer::isAuthorized() const

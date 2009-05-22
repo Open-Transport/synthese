@@ -33,6 +33,8 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
 #include "Conversion.h"
+#include "DisplayScreenCPU.h"
+#include "DisplayScreenCPUTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -51,12 +53,20 @@ namespace synthese
 	{
 		const std::string CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "pti";
 		const string CreateDisplayScreenAction::PARAMETER_LOCALIZATION_ID(Action_PARAMETER_PREFIX + "pli");
+		const string CreateDisplayScreenAction::PARAMETER_CPU_ID(Action_PARAMETER_PREFIX + "cp");
 
 		ParametersMap CreateDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_TEMPLATE_ID, _template ? _template->getKey() : uid(0));
-			map.insert(PARAMETER_LOCALIZATION_ID, _place.get() ? _place->getKey() : uid(UNKNOWN_VALUE));
+			if(_cpu.get())
+			{
+				map.insert(PARAMETER_CPU_ID, _cpu->getKey());
+			}
+			else if(_place.get())
+			{
+				map.insert(PARAMETER_LOCALIZATION_ID, _place->getKey());
+			}
 			return map;
 		}
 
@@ -68,7 +78,49 @@ namespace synthese
 				_template = DisplayScreenTableSync::Get(id, _env);
 			}
 
-			id = map.getUid(PARAMETER_LOCALIZATION_ID, true, FACTORY_KEY);
+			id = map.getUid(PARAMETER_CPU_ID, false, FACTORY_KEY);
+			if (id > 0)
+			{
+				setCPU(id);
+			}
+			else
+			{
+				id = map.getUid(PARAMETER_LOCALIZATION_ID, false, FACTORY_KEY);
+				if (id > 0)
+				{
+					setPlace(id);
+				}
+			}
+		}
+
+		void CreateDisplayScreenAction::run()
+		{
+			// Preparation
+			DisplayScreen screen;
+			if (_template.get())
+				screen.copy(_template.get());
+			screen.setLocalization(_place.get());
+			if(_cpu.get())
+			{
+				screen.setCPU(_cpu.get());
+			}
+			screen.setMaintenanceIsOnline(true);
+
+			// Action
+			DisplayScreenTableSync::Save(&screen);
+
+			// Request update
+			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			{
+				_request->setObjectId(screen.getKey());
+			}
+
+			// Log
+			ArrivalDepartureTableLog::addCreateEntry(screen, *_request->getUser());
+		}
+
+		void CreateDisplayScreenAction::setPlace(RegistryKeyType id)
+		{
 			try
 			{
 				_place = ConnectionPlaceTableSync::Get(id, _env);
@@ -79,38 +131,27 @@ namespace synthese
 			}
 		}
 
-		void CreateDisplayScreenAction::run()
-		{
-			// Preparation
-			shared_ptr<DisplayScreen> screen(new DisplayScreen);
-			if (_template)
-				screen->copy(_template.get());
-			screen->setLocalization(_place.get());
-			screen->setMaintenanceIsOnline(true);
-
-			// Action
-			DisplayScreenTableSync::Save(screen.get());
-
-			// Request update
-			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-			{
-				_request->setObjectId(screen->getKey());
-			}
-
-			// Log
-			ArrivalDepartureTableLog::addUpdateEntry(screen.get(), "Création", _request->getUser().get());
-		}
-
-		void CreateDisplayScreenAction::setPlace( boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> place )
-		{
-			_place = place;
-		}
-
 
 
 		bool CreateDisplayScreenAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey()));
+		}
+
+		void CreateDisplayScreenAction::setCPU( util::RegistryKeyType id )
+		{
+			try
+			{
+				_cpu = DisplayScreenCPUTableSync::Get(id, _env);
+				if(_cpu->getPlace())
+				{
+					setPlace(_cpu->getPlace()->getKey());
+				}
+			}
+			catch (...)
+			{
+				throw ActionException("Specified CPU not found");
+			}
 		}
 	}
 }

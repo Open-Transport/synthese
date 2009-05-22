@@ -1,9 +1,10 @@
 
-#include "13_dblog/DBLogModule.h"
+#include "DBLogModule.h"
 
-#include "13_dblog/DBLogViewer.h"
-#include "13_dblog/DBLogRight.h"
-#include "13_dblog/DBLogEntryTableSync.h"
+#include "DBLogViewer.h"
+#include "DBLogRight.h"
+#include "DBLogEntryTableSync.h"
+#include "DBLogPurgeAction.h"
 
 // Registries
 #include "DBLogEntry.h"

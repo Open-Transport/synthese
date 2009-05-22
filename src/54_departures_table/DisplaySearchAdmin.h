@@ -204,6 +204,8 @@ namespace synthese
 			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
 
 			virtual void _buildTabs() const;
+
+			void setPlace(const util::RegistryKeyType id);
 		};
 	}
 }

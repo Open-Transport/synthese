@@ -119,7 +119,7 @@ namespace synthese
 			DisplayScreenTableSync::Save(_screen.get());
 
 			// Log
-			ArrivalDepartureTableLog::addUpdateEntry(_screen.get(), log.str(), _request->getUser().get());
+			ArrivalDepartureTableLog::addUpdateEntry(*_screen, log.str(), *_request->getUser());
 		}
 
 

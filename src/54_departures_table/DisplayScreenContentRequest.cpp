@@ -67,29 +67,29 @@ namespace synthese
 
 		void DisplayScreenContentRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid screenId = 0;
+			uid id(0);
 			try
 			{
 				// Screen
 				if (_request->getObjectId() > 0)
-					screenId = _request->getObjectId();
+					id = _request->getObjectId();
 				else
-					screenId = map.getUid(PARAMETER_TB, true, FACTORY_KEY);
+					id = map.getUid(PARAMETER_TB, true, FACTORY_KEY);
 
-				if (decodeTableId(screenId) == ConnectionPlaceTableSync::TABLE.ID)
+				if (decodeTableId(id) == ConnectionPlaceTableSync::TABLE.ID)
 				{
 					DisplayScreen* screen(new DisplayScreen);
 					_type.reset(new DisplayType);
 					_type->setRowNumber(10);
 					_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
-					screen->setLocalization(ConnectionPlaceTableSync::Get(screenId, _env).get());
+					screen->setLocalization(Env::GetOfficialEnv().getRegistry<PublicTransportStopZoneConnectionPlace>().get(id).get());
 					screen->setAllPhysicalStopsDisplayed(true);					
 					screen->setType(_type.get());
 					_screen.reset(screen);
 				}
-				else if (decodeTableId(screenId) == DisplayScreenTableSync::TABLE.ID)
+				else if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 				{
-					_screen = DisplayScreenTableSync::Get(screenId, Env::GetOfficialEnv());
+					setDisplay(id);
 				}
 				else
 					throw RequestException("Not a display screen nor a connection place");
@@ -101,7 +101,7 @@ namespace synthese
 			}
 			catch (...)
 			{
-				throw RequestException("Display screen " + Conversion::ToString(screenId) + " not found");
+				throw RequestException("Display screen " + Conversion::ToString(id) + " not found");
 			}
 		}
 
@@ -135,6 +135,11 @@ namespace synthese
 				_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->getMimeType() :
 				"text/plain"
 			;
+		}
+
+		void DisplayScreenContentRequest::setDisplay( const util::RegistryKeyType id )
+		{
+			_screen = Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(id);
 		}
 	}
 }

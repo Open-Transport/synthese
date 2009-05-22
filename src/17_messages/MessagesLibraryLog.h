@@ -51,7 +51,8 @@ namespace synthese
 			DBLog::ColumnsVector getColumnNames() const;
 			
 			virtual bool isAuthorized(
-				const server::Request& request
+				const server::Request& request,
+				const security::RightLevel& level
 			) const;
 			
 			static void	addUpdateEntry(

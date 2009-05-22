@@ -74,8 +74,8 @@ namespace synthese
 				uid id = map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY);
 				_text = TextTemplateTableSync::GetEditable(id, _env);
 		
-				id = map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY);
-				_folder = TextTemplateTableSync::Get(id, _env);
+				//id = map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY);
+				//_folder = TextTemplateTableSync::Get(id, _env);
 
 				// Name
 				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
@@ -109,8 +109,8 @@ namespace synthese
 			_text->setShortMessage(_shortMessage);
 			DBLogModule::appendToLogIfChange(logChanges, "Message long", _text->getLongMessage(), _longMessage);
 			_text->setLongMessage(_longMessage);
-			DBLogModule::appendToLogIfChange(logChanges, "Déplacement", _text->getParentId(), _folder->getKey());
-			_text->setParentId(_folder->getKey());
+			//DBLogModule::appendToLogIfChange(logChanges, "Déplacement", _text->getParentId(), _folder->getKey());
+			//_text->setParentId(_folder->getKey());
 
 			TextTemplateTableSync::Save(_text.get());
 

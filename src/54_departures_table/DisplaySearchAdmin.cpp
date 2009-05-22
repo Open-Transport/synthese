@@ -47,6 +47,10 @@
 #include "City.h"
 #include "SentAlarm.h"
 #include "Request.h"
+#include "DisplayScreenCPU.h"
+#include "DisplayScreenCPUAdmin.h"
+#include "DisplayScreenCPUCreateAction.h"
+#include "DisplayScreenCPUTableSync.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -90,7 +94,7 @@ namespace synthese
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_STATE = "dsass";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_MESSAGE = "dsasm";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID("dsapsli");
-
+		
 		DisplaySearchAdmin::DisplaySearchAdmin()
 			: AdminInterfaceElementTemplate<DisplaySearchAdmin>()
 			, _searchLineId(UNKNOWN_VALUE)
@@ -103,8 +107,8 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid placeId(map.getUid(PARAMETER_SEARCH_LOCALIZATION_ID, false, FACTORY_KEY));
-			if (placeId == UNKNOWN_VALUE)
+			setPlace(map.getUid(PARAMETER_SEARCH_LOCALIZATION_ID, false, FACTORY_KEY));
+			if (!_place)
 			{
 				_searchCity = map.getString(PARAMETER_SEARCH_CITY, false, FACTORY_KEY);
 				_searchStop = map.getString(PARAMETER_SEARCH_STOP, false, FACTORY_KEY);
@@ -115,48 +119,46 @@ namespace synthese
 				_searchMessage = map.getInt(PARAMETER_SEARCH_MESSAGE, false, FACTORY_KEY);
 			}
 
-			else
-			{
-				try
-				{
-					_place = ConnectionPlaceTableSync::Get(placeId, _env);
-				}
-				catch (...)
-				{
-					throw AdminParametersException("Specified place not found");
-				}
-			}
-
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_CITY, 30);
 
 			if(!doDisplayPreparationActions) return;
 			
-			DisplayScreenTableSync::Search(
-				_env,
-				_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-				, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-				, READ
-				, UNKNOWN_VALUE
-				, _place ? (*_place ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
-				, _searchLineId
-				, _searchTypeId
-				, _searchCity
-				, _searchStop
-				, _searchName
-				, _searchState
-				, _searchMessage
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, false
-				, _requestParameters.orderField == PARAMETER_SEARCH_CITY
-				, _requestParameters.orderField == PARAMETER_SEARCH_STOP
-				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-				, _requestParameters.orderField == PARAMETER_SEARCH_TYPE_ID
-				, _requestParameters.orderField == PARAMETER_SEARCH_STATE
-				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
-				, _requestParameters.raisingOrder
-			);
-			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayScreen>());
+				DisplayScreenTableSync::Search(
+					_env,
+					_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+					, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+					, READ
+					, UNKNOWN_VALUE
+					, _place ? (*_place ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
+					, _searchLineId
+					, _searchTypeId
+					, _searchCity
+					, _searchStop
+					, _searchName
+					, _searchState
+					, _searchMessage
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, false
+					, _requestParameters.orderField == PARAMETER_SEARCH_CITY
+					, _requestParameters.orderField == PARAMETER_SEARCH_STOP
+					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+					, _requestParameters.orderField == PARAMETER_SEARCH_TYPE_ID
+					, _requestParameters.orderField == PARAMETER_SEARCH_STATE
+					, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
+					, _requestParameters.raisingOrder
+					);
+				_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayScreen>());
+
+				DisplayScreenCPUTableSync::Search(
+					_env,
+					_place ? (_place->get() ? (*_place)->getKey() : 0) : optional<RegistryKeyType>(),
+					optional<string>(),
+					_requestParameters.first,
+					_requestParameters.maxSize,
+					_requestParameters.orderField == PARAMETER_SEARCH_NAME,
+					_requestParameters.raisingOrder
+				);
 		}
 		
 		
@@ -194,7 +196,7 @@ namespace synthese
 				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 				if(_place)
 				{
-					createDisplayRequest.getAction()->setPlace(*_place);
+					createDisplayRequest.getAction()->setPlace((*_place)->getKey());
 				}
 				createDisplayRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
@@ -207,17 +209,17 @@ namespace synthese
 
 				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
 
-				if (!_place.get())
+				if (!_place)
 				{
 					stream << "<h1>Recherche</h1>";
 
 					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
 				}
 
-				stream << "<h1>" << (_place.get() ? "Afficheurs" : "Résultats de la recherche") << "</h1>";
+				stream << "<h1>" << (_place ? "Afficheurs" : "Résultats de la recherche") << "</h1>";
 
 				ActionResultHTMLTable::HeaderVector v;
-				if (!_place.get())
+				if (!_place)
 				{
 					v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
 					v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
@@ -253,7 +255,7 @@ namespace synthese
 					shared_ptr<SentAlarm> alarm(alarms.empty() ? shared_ptr<SentAlarm>() : alarms.front());
 
 					stream << t.row(Conversion::ToString(screen->getKey()));
-					if (!_place.get())
+					if (!_place || !_place->get())
 					{
 						stream <<
 							t.col() <<
@@ -387,7 +389,7 @@ namespace synthese
 				if (tabHasWritePermissions())
 				{
 					stream << t.row();
-					stream << t.col(_place.get() ? 4 : 6) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
+					stream << t.col(_place.get() ? 4 : 6) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel élément)";
 					stream << t.col(3) << t.getActionForm().getSubmitButton("Créer un nouvel afficheur");
 				}
 
@@ -398,6 +400,94 @@ namespace synthese
 			/// TAB CPU
 			if (openTabContent(stream, TAB_CPU))
 			{
+				ActionFunctionRequest<DisplayScreenCPUCreateAction,AdminRequest> createCPURequest(
+					_request
+				);
+				createCPURequest.getFunction()->setPage<DisplayScreenCPUAdmin>();
+				createCPURequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
+				if(_place)
+				{
+					createCPURequest.getAction()->setPlace(*_place);
+				}
+				createCPURequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+
+
+				FunctionRequest<AdminRequest> searchRequest(_request);
+				searchRequest.getFunction()->setSamePage(this);
+
+				FunctionRequest<AdminRequest> updateRequest(_request);
+				updateRequest.getFunction()->setPage<DisplayScreenCPUAdmin>();
+
+				if (!_place)
+				{
+					stream << "<h1>Recherche</h1>";
+
+					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
+				}
+
+				stream << "<h1>" << (_place && _place->get() ? "Unités centrales" : "Résultats de la recherche") << "</h1>";
+
+				ActionResultHTMLTable::HeaderVector v;
+				if (!_place)
+				{
+					v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
+					v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
+				}
+				v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
+				v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
+				v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
+				v.push_back(make_pair(string(), "Actions"));
+				v.push_back(make_pair(string(), "Actions"));
+
+				ActionResultHTMLTable t(
+					v
+					, searchRequest.getHTMLForm()
+					, _requestParameters
+					, _resultParameters
+					, createCPURequest.getHTMLForm("createCPU")
+					, DisplayScreenCPUCreateAction::PARAMETER_TEMPLATE_ID
+					, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+				);
+				t.getActionForm().setUpdateRight(tabHasWritePermissions());
+
+				stream << t.open();
+
+				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, _env.getRegistry<DisplayScreenCPU>())
+				{
+					updateRequest.setObjectId(cpu->getKey());
+					
+					stream << t.row(Conversion::ToString(cpu->getKey()));
+					if (!_place)
+					{
+						stream <<
+							t.col() <<
+							(	cpu->getPlace() ?
+							cpu->getPlace()->getCity()->getName() :
+						"(indéterminé)"
+							)
+							;
+						stream <<
+							t.col() <<
+							(	cpu->getPlace() ?
+							cpu->getPlace()->getName() :
+						"(indéterminé)"
+							)
+							;
+					}
+					stream << t.col() << cpu->getName();
+					
+					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
+					
+				}
+
+				if (tabHasWritePermissions())
+				{
+					stream << t.row();
+					stream << t.col(_place.get() ? 4 : 6) << "(sélectionner une unité centrale existante pour copier ses&nbsp;propriétés dans le nouvel élément)";
+					stream << t.col(3) << t.getActionForm().getSubmitButton("Créer une nouvelle unité centrale");
+				}
+
+				stream << t.close();
 
 			}
 			closeTabContent(stream);
@@ -458,14 +548,16 @@ namespace synthese
 			// Spare store page
 			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY &&
 				parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY
-				){
-					DisplayAdmin page;
-					links.push_back(page.getPageLink());
+			){
+				DisplaySearchAdmin page;
+				page.setPlace(0);
+				page.setRequest(_request);
+				links.push_back(page.getPageLink());
 			}
 
 
 			// Broadcast points search
-			if (parentLink.factoryKey == BroadcastPointsAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY && static_cast<const DisplaySearchAdmin&>(currentPage)._place.get())
+			if (parentLink.factoryKey == BroadcastPointsAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY && static_cast<const DisplaySearchAdmin&>(currentPage)._place && static_cast<const DisplaySearchAdmin&>(currentPage)._place->get())
 			{
 				links.push_back(currentPage.getPageLink());
 			}
@@ -474,7 +566,7 @@ namespace synthese
 
 		std::string DisplaySearchAdmin::getTitle() const
 		{
-			return _place ? (_place.get() ? (*_place)->getFullName() : "Equipements en stock") : DEFAULT_TITLE;
+			return _place ? (_place->get() ? (*_place)->getFullName() : "Equipements en stock") : DEFAULT_TITLE;
 		}
 
 		std::string DisplaySearchAdmin::getParameterName() const
@@ -497,17 +589,40 @@ namespace synthese
 		void DisplaySearchAdmin::_buildTabs(
 		) const {
 			bool writeRight(
-				(_place && _place->get()) ?
+				_place ?
 				_request->isAuthorized<ArrivalDepartureTableRight>(
 					WRITE,
 					UNKNOWN_RIGHT_LEVEL,
-					lexical_cast<string>((*_place)->getKey())) :
+					(_place->get() ? lexical_cast<string>((*_place)->getKey()) : string("0"))) :
 				false
 			);
 			_tabs.clear();
 			_tabs.push_back(Tab("Afficheurs", TAB_DISPLAY_SCREENS, writeRight, "monitor.png"));
 			_tabs.push_back(Tab("Unités centrales", TAB_CPU, writeRight, "server.png"));
 			_tabBuilded = true;
+		}
+
+		void DisplaySearchAdmin::setPlace( const util::RegistryKeyType id )
+		{
+			if(id == UNKNOWN_VALUE)
+			{
+				return;
+			}
+			if(id == 0)
+			{
+				_place = shared_ptr<const PublicTransportStopZoneConnectionPlace>();
+			}
+			else
+			{
+				try
+				{
+					_place = ConnectionPlaceTableSync::Get(id, _env);
+				}
+				catch (...)
+				{
+					throw AdminParametersException("Specified place not found");
+				}
+			}
 		}
 	}
 }

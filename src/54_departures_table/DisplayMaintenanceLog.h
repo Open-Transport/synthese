@@ -83,7 +83,8 @@ namespace synthese
 			
 			
 			virtual bool isAuthorized(
-				const server::Request& request
+				const server::Request& request,
+				const security::RightLevel& level
 			) const;
 			
 			

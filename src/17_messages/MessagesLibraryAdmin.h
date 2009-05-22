@@ -82,6 +82,7 @@ namespace synthese
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 			uid											_folderId;
 			boost::shared_ptr<const ScenarioFolder>		_folder;
+			util::Env									_subFoldersEnv;
 
 			
 		public:

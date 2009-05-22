@@ -21,6 +21,7 @@ synthese::departurestable::BroadcastPointsAdmin::integrate();
 synthese::departurestable::DisplayAdmin::integrate();
 synthese::departurestable::DisplayTypeAdmin::integrate();
 synthese::departurestable::DisplayScreenCPUAdmin::integrate();
+synthese::departurestable::DeparturesTableBenchmarkAdmin::integrate();
 
 synthese::departurestable::DisplayTypeTableSync::integrate();
 synthese::departurestable::DisplayScreenTableSync::integrate();
@@ -45,6 +46,8 @@ synthese::departurestable::UpdateDisplayMaintenanceAction::integrate();
 synthese::departurestable::DisplayTypeRemoveAction::integrate();
 synthese::departurestable::DisplayScreenRemove::integrate();
 synthese::departurestable::DisplayScreenAppearanceUpdateAction::integrate();
+synthese::departurestable::DisplayScreenCPUCreateAction::integrate();
+synthese::departurestable::DisplayScreenCPUUpdateAction::integrate();
 
 synthese::departurestable::DisplayScreenContentRequest::integrate();
 synthese::departurestable::DisplayScreenSupervisionRequest::integrate();
@@ -62,6 +65,7 @@ synthese::departurestable::DisplayScreenAlarmRecipient::integrate();
 synthese::departurestable::DisplayGetNagiosStatusFunction::integrate();
 
 synthese::departurestable::CentreonConfigExportFunction::integrate();
+synthese::departurestable::CPUGetWiredScreensFunction::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::departurestable::DisplayScreen>();

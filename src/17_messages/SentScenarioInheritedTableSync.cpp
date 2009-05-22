@@ -88,6 +88,7 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				RegistryKeyType id(rows->getLongLong(ScenarioTableSync::COL_TEMPLATE));
+				if(id > 0)
 				try
 				{
 					obj->setTemplate(ScenarioTemplateInheritedTableSync::Get(id, env, linkLevel).get());

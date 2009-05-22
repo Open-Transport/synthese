@@ -47,19 +47,21 @@ namespace synthese
 	{
 		const std::string InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE = "no_session_default_page";
 		const std::string InterfaceTableSync::TABLE_COL_NAME = "name";
+		const string InterfaceTableSync::COL_DEFAULT_CLIENT_URL("default_client_url");
 	}
 
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE(
-				"t024_interfaces"
-				);
+			"t024_interfaces"
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<InterfaceTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE, SQL_TEXT),
 			SQLiteTableSync::Field(InterfaceTableSync::TABLE_COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(InterfaceTableSync::COL_DEFAULT_CLIENT_URL, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -77,6 +79,7 @@ namespace synthese
 			interf->setKey(rows->getLongLong ( TABLE_COL_ID));
 			interf->setNoSessionDefaultPageCode(rows->getText ( InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE));
 			interf->setName(rows->getText ( InterfaceTableSync::TABLE_COL_NAME));
+			interf->setDefaultClientURL(rows->getText(InterfaceTableSync::COL_DEFAULT_CLIENT_URL));
 		}
 
 
@@ -86,9 +89,20 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Save(Interface* interf)
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Save(Interface* object)
 		{
-			/// @todo Implementation
+			stringstream query;
+			if (object->getKey() <= 0)
+				object->setKey(getId());
+
+			query <<
+				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				Conversion::ToString(object->getKey()) << "," <<
+				Conversion::ToSQLiteString(object->getNoSessionDefaultPageCode()) << "," <<
+				Conversion::ToSQLiteString(object->getName()) << "," <<
+				Conversion::ToSQLiteString(object->getDefaultClientURL()) <<
+			")";
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 	}
 

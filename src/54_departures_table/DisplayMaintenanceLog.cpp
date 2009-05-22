@@ -69,9 +69,10 @@ namespace synthese
 
 
 		bool DisplayMaintenanceLog::isAuthorized(
-			const Request& request
+			const Request& request,
+			const security::RightLevel& level
 		) const {
-			return request.isAuthorized<DisplayMaintenanceRight>(READ);
+			return request.isAuthorized<DisplayMaintenanceRight>(level);
 		}
 
 

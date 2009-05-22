@@ -148,12 +148,12 @@ namespace synthese
 			
 			// Saving
 			DisplayScreenTableSync::Save(_screen.get());
-			ArrivalDepartureTableLog::addUpdateEntry(_screen.get(), t.str(), _request->getUser().get());
+			ArrivalDepartureTableLog::addUpdateEntry(*_screen, t.str(), *_request->getUser());
 		}
 
 
 
-		map<UpdateDisplayPreselectionParametersAction::DisplayFunction, string> UpdateDisplayPreselectionParametersAction::GetFunctionList(
+		UpdateDisplayPreselectionParametersAction::DisplayFunctionNames UpdateDisplayPreselectionParametersAction::GetFunctionList(
 		){
 			map<DisplayFunction, string> directionMap;
 			directionMap.insert(make_pair(DEPARTURES_CHRONOLOGICAL, "Départs chronologiques"));

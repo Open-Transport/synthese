@@ -64,7 +64,8 @@ namespace synthese
 				@date 2008
 			*/
 			static std::vector<std::pair<uid, std::string> > GetScenarioTemplatesLabels(
-				std::string withAllLabel = std::string()
+				std::string withAllLabel = std::string(),
+				std::string withNoLabel = std::string()
 				, uid folderId = 0
 				, std::string prefix = std::string()
 			);

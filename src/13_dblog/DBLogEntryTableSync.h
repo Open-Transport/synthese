@@ -85,6 +85,12 @@ namespace synthese
 				, bool raisingOrder = true
 				, util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
+
+
+			static void Purge(
+				const std::string& logKey,
+				const time::DateTime& endDate
+			);
 		};
 	}
 }

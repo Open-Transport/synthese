@@ -63,7 +63,7 @@ namespace synthese
 	typedef std::map<uid,const env::Line*> LineFilter;
 	typedef std::map<uid,const env::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
-	typedef enum { ENDS_ONLY = 0, WITH_PASSING = 1 } EndFilter;
+	typedef enum { ENDS_ONLY = 1, WITH_PASSING = 0 } EndFilter;
 	struct DeparturesTableElement { 
 		const graph::ServicePointer servicePointer;
 		bool blinking;

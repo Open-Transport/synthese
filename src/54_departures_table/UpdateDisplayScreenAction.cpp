@@ -67,6 +67,7 @@ namespace synthese
 		const string UpdateDisplayScreenAction::PARAMETER_TYPE(Action_PARAMETER_PREFIX + "ty");
 		const string UpdateDisplayScreenAction::PARAMETER_COM_PORT(Action_PARAMETER_PREFIX + "cp");
 		const string UpdateDisplayScreenAction::PARAMETER_CPU(Action_PARAMETER_PREFIX + "cu");
+		const string UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS(Action_PARAMETER_PREFIX + "ma");
 		
 
 		ParametersMap UpdateDisplayScreenAction::getParametersMap() const
@@ -89,6 +90,8 @@ namespace synthese
 				_type = DisplayTypeTableSync::Get(id, _env);
 
 				_comPort = map.getInt(PARAMETER_COM_PORT, true, FACTORY_KEY);
+
+				_macAddress = map.getString(PARAMETER_MAC_ADDRESS, false, FACTORY_KEY);
 
 				id = map.getUid(PARAMETER_CPU, false, FACTORY_KEY);
 				if (id > 0)
@@ -119,6 +122,8 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(log, "Type de panneau", ((_screen->getType() != NULL) ? _screen->getType()->getName() : string()), ((_type.get() != NULL) ? _type->getName() : string()));
 			DBLogModule::appendToLogIfChange(log, "Port COM", _screen->getComPort(), _comPort);
 			DBLogModule::appendToLogIfChange(log, "Unité centrale hôte", ((_screen->getCPU() != NULL) ? _screen->getCPU()->getName() : string()), ((_cpu.get() != NULL) ? _cpu->getName() : string()));
+			DBLogModule::appendToLogIfChange(log, "Adresse MAC", _screen->getMacAddress(), _macAddress);
+
 
 			// Preparation of the action
 			_screen->setLocalizationComment(_name);
@@ -126,12 +131,13 @@ namespace synthese
 			_screen->setType(_type.get());
 			_screen->setComPort(_comPort);
 			_screen->setCPU(_cpu.get());
+			_screen->setMacAddress(_macAddress);
 
 			// The action
 			DisplayScreenTableSync::Save(_screen.get());
 
 			// Log
-			ArrivalDepartureTableLog::addUpdateEntry(_screen.get(), log.str(), _request->getUser().get());
+			ArrivalDepartureTableLog::addUpdateEntry(*_screen, log.str(), *_request->getUser());
 		}
 
 

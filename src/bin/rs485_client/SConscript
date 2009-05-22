@@ -1,0 +1,15 @@
+Import ('s3env')
+
+CppBinProject(
+	s3env,
+	's3-rs485-client',
+	s3env['S3VERSION'], 
+	include_dir = s3env.SrcDir('.'),
+	source_files = s3env.Glob ('main.cpp'),
+	dependencies = [
+		's3-departures-table.cpplib',
+		's3-server.cpplib',
+		'boost.cppinc',
+		('boost-program-options.cpplib',s3env['BOOSTVERSION'])
+	],
+)

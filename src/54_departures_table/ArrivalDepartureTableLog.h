@@ -33,6 +33,7 @@ namespace synthese
 	{
 		class DisplayScreen;
 		class DisplayType;
+		class DisplayScreenCPU;
 
 		/** Journal relatif à la gestion des paramètres du téléaffichage.
 
@@ -48,14 +49,32 @@ namespace synthese
 			DBLog::ColumnsVector getColumnNames() const;
 			
 			virtual bool isAuthorized(
-				const server::Request& request
+				const server::Request& request,
+				const security::RightLevel& level
 			) const;
 			
 			static void	addUpdateEntry(
-				const DisplayScreen* screen
+				const DisplayScreen& screen
 				, const std::string& text
-				, const security::User* user
-				);
+				, const security::User& user
+			);
+			static void	addUpdateEntry(
+				const DisplayScreenCPU& cpu
+				, const std::string& text
+				, const security::User& user
+			);
+			static void	addCreateEntry(
+				const DisplayScreenCPU& cpu
+				, const security::User& user
+			);
+			static void	addCreateEntry(
+				const DisplayScreen& screen
+				, const security::User& user
+			);
+			static void addCreateEntry(
+				const DisplayType& type
+				, const security::User& user
+			);
 			static void addRemoveEntry(
 				const DisplayScreen* screen
 				, const security::User* user
@@ -64,10 +83,6 @@ namespace synthese
 				const DisplayType* type
 				, const security::User* user
 				, const std::string& text
-				);
-			static void addCreateTypeEntry(
-				const DisplayType* type
-				, const security::User* user
 				);
 			static void addDeleteTypeEntry(
 				const DisplayType* type

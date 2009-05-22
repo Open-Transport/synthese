@@ -32,6 +32,7 @@
 #include <string>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -71,7 +72,8 @@ namespace synthese
 			///	@date 2008
 			static void Search(
 				util::Env& env,
-				util::RegistryKeyType placeId = UNKNOWN_VALUE,
+				boost::optional<util::RegistryKeyType> placeId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::string> macAddress = boost::optional<std::string>(),
 				int first = 0,
 				int number = 0,
 				bool orderByName = true,

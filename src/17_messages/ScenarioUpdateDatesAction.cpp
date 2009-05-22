@@ -108,10 +108,13 @@ namespace synthese
 
 					_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
 
-					const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
-					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+					if(_sscenario->getTemplate())
 					{
-						_variables.insert(make_pair(variable.second.code, map.getString(PARAMETER_VARIABLE + variable.second.code, variable.second.compulsory, FACTORY_KEY)));
+						const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
+						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+						{
+							_variables.insert(make_pair(variable.second.code, map.getString(PARAMETER_VARIABLE + variable.second.code, variable.second.compulsory, FACTORY_KEY)));
+						}
 					}
 				}
 			}
@@ -155,14 +158,17 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(text, "Date de début", _sscenario->getPeriodStart().toString(), _startDate.toString());
 				DBLogModule::appendToLogIfChange(text, "Date de fin", _sscenario->getPeriodEnd().toString(), _endDate.toString());
 			
-				const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
-				BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+				if(_sscenario->getTemplate())
 				{
-					string value;
-					SentScenario::VariablesMap::const_iterator it(_sscenario->getVariables().find(variable.second.code));
-					if (it != _sscenario->getVariables().end()) value = it->second;
+					const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
+					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+					{
+						string value;
+						SentScenario::VariablesMap::const_iterator it(_sscenario->getVariables().find(variable.second.code));
+						if (it != _sscenario->getVariables().end()) value = it->second;
 
-					DBLogModule::appendToLogIfChange(text, variable.second.code, value, _variables[variable.second.code]);
+						DBLogModule::appendToLogIfChange(text, variable.second.code, value, _variables[variable.second.code]);
+					}
 				}
 			}
 
@@ -189,7 +195,7 @@ namespace synthese
 				_sscenario->setVariables(_variables);
 			}
 			ScenarioTableSync::Save(_scenario.get());
-			if(	_sscenario->getTemplate())
+			if(_sscenario.get() &&	_sscenario->getTemplate())
 			{
 				SentScenarioInheritedTableSync::WriteVariablesIntoMessages(*_sscenario);
 			}

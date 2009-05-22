@@ -487,7 +487,7 @@ namespace synthese
 			stringstream s;
 			s	<< HTMLModule::GetHTMLJavascriptOpen()
 				<< "function pop_" << _name << "() {"
-				<< "my_form = eval(" << _name << ");"
+				<< "my_form = eval('document.forms." << _name << "');"
 				<< "window.open(\"" << _action << "?\",\"" << _name << "popup\",\"height=" << height << ",width=" << width << ",menubar='no',toolbar='no',location='no',status='no',scrollbars='no',resizable=1\");"
 				<< "my_form.target = \"" << _name << "popup\";"
 				<< "my_form.submit();}"

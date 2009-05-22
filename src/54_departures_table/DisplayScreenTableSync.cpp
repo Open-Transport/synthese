@@ -48,6 +48,7 @@
 #include "SentAlarm.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
+#include "ScenarioTableSync.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -103,6 +104,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_DISPLAY_CLOCK("display_clock");
 		const string DisplayScreenTableSync::COL_COM_PORT("com_port");
 		const string DisplayScreenTableSync::COL_CPU_HOST_ID("cpu_host_id");
+		const string DisplayScreenTableSync::COL_MAC_ADDRESS("mac_address");
 	}
 
 	namespace db
@@ -142,12 +144,14 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_CLOCK, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_COM_PORT, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_CPU_HOST_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAC_ADDRESS, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 		
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayScreenTableSync>::_INDEXES[] =
 		{
 			SQLiteTableSync::Index(DisplayScreenTableSync::COL_PLACE_ID.c_str(), ""),
+			SQLiteTableSync::Index(DisplayScreenTableSync::COL_MAC_ADDRESS.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 					
@@ -176,7 +180,8 @@ namespace synthese
 			object->setDisplayTeam(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_TEAM));
 			object->setDisplayClock(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_CLOCK));
 			object->setComPort(rows->getInt(DisplayScreenTableSync::COL_COM_PORT));
-			
+			object->setMacAddress(rows->getText(DisplayScreenTableSync::COL_MAC_ADDRESS));
+
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Localization
@@ -197,6 +202,7 @@ namespace synthese
 					try
 					{
 						object->setCPU(DisplayScreenCPUTableSync::Get(cpuId, env, linkLevel).get());
+						DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel)->addWiredScreen(object);
 					}
 					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
@@ -276,6 +282,10 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Unlink(
 			DisplayScreen* object
 		){
+			if(object->getCPU())
+			{
+				const_cast<DisplayScreenCPU*>(object->getCPU())->removeWiredScreen(object);
+			}
 			object->setLocalization(NULL);
 			object->setType(NULL);
 			object->clearPhysicalStops();
@@ -380,7 +390,8 @@ namespace synthese
 				"," << Conversion::ToSQLiteString(object->getMaintenanceMessage()) << "," <<
 				Conversion::ToString(object->getDisplayClock()) << "," <<
 				Conversion::ToString(object->getComPort()) << "," <<
-				(object->getCPU() != NULL ? Conversion::ToString(object->getCPU()->getKey()) : "0") <<
+				(object->getCPU() != NULL ? Conversion::ToString(object->getCPU()->getKey()) : "0") << "," <<
+				Conversion::ToSQLiteString(object->getMacAddress()) <<
 				")"
 			;
 			
@@ -502,6 +513,30 @@ namespace synthese
 
 
 
+		void DisplayScreenTableSync::SearchFromCPU(
+			util::Env& env,
+			util::RegistryKeyType cpuId,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			stringstream query;
+			query
+				<< " SELECT"
+				<< " *"
+				<< " FROM "
+				<< TABLE.NAME <<
+				" WHERE " <<
+				COL_CPU_HOST_ID << "=" << cpuId <<
+				" ORDER BY " <<
+				COL_COM_PORT << "," << COL_WIRING_CODE
+
+			;
+
+
+			LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
 		vector<boost::shared_ptr<SentAlarm> > DisplayScreenTableSync::GetCurrentDisplayedMessage(
 			util::Env& env,
 			util::RegistryKeyType screenId,
@@ -512,12 +547,13 @@ namespace synthese
 			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
 				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
 				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
+				<< " INNER JOIN " << ScenarioTableSync::TABLE.NAME << " AS s ON s." << TABLE_COL_ID << "=a." << AlarmTableSync::COL_SCENARIO_ID
 				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << Conversion::ToString(screenId)
-				<< " AND a." << AlarmTableSync::COL_ENABLED
-				<< " AND NOT a." << AlarmTableSync::COL_IS_TEMPLATE
-				<< " AND (a." << AlarmTableSync::COL_PERIODSTART << " IS NULL OR a." << AlarmTableSync::COL_PERIODSTART << "<" << now.toSQLString() << ")"
-				<< " AND (a." << AlarmTableSync::COL_PERIODEND << " IS NULL OR a." << AlarmTableSync::COL_PERIODEND << ">" << now.toSQLString() << ")"
-				<< " ORDER BY a." << AlarmTableSync::COL_LEVEL << " DESC, a." << AlarmTableSync::COL_PERIODSTART << " DESC";
+				<< " AND s." << ScenarioTableSync::COL_ENABLED
+				<< " AND NOT s." << ScenarioTableSync::COL_IS_TEMPLATE
+				<< " AND (s." << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR s." << ScenarioTableSync::COL_PERIODSTART << "<" << now.toSQLString() << ")"
+				<< " AND (s." << ScenarioTableSync::COL_PERIODEND << " IS NULL OR s." << ScenarioTableSync::COL_PERIODEND << ">" << now.toSQLString() << ")"
+				<< " ORDER BY a." << AlarmTableSync::COL_LEVEL << " DESC, s." << ScenarioTableSync::COL_PERIODSTART << " DESC";
 			if (limit > 0)
 			{
 				q << " LIMIT 1";
@@ -568,11 +604,12 @@ namespace synthese
 			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
 				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
 				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
+				<< " INNER JOIN " << ScenarioTableSync::TABLE.NAME << " AS s ON s." << TABLE_COL_ID << "=a." << AlarmTableSync::COL_SCENARIO_ID
 				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << Conversion::ToString(screenId)
-				<< " AND a." << AlarmTableSync::COL_ENABLED
-				<< " AND NOT a." << AlarmTableSync::COL_IS_TEMPLATE
-				<< " AND a." << AlarmTableSync::COL_PERIODSTART << ">" << now.toSQLString()
-				<< " ORDER BY a." << AlarmTableSync::COL_PERIODSTART;
+				<< " AND s." << ScenarioTableSync::COL_ENABLED
+				<< " AND NOT s." << ScenarioTableSync::COL_IS_TEMPLATE
+				<< " AND s." << ScenarioTableSync::COL_PERIODSTART << ">" << now.toSQLString()
+				<< " ORDER BY s." << ScenarioTableSync::COL_PERIODSTART;
 			if (number)
 			{
 				q << " LIMIT " << *number;

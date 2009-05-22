@@ -85,9 +85,9 @@ namespace synthese
 			
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
-				_screen.get(),
+				*_screen,
 				"Retrait de l'arrêt de départ "+ _stop->getOperatorCode() +"/"+ _stop->getName(),
-				_request->getUser().get()
+				*_request->getUser()
 			);
 
 			DisplayScreenTableSync::Save(_screen.get());

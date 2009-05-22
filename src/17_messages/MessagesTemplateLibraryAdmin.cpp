@@ -124,6 +124,7 @@ namespace synthese
 			
 			ActionFunctionRequest<TextTemplateAddAction,AdminRequest> addRequest(_request);
 			addRequest.getFunction()->setSamePage(this);
+			addRequest.getAction()->setParentId(_folder.get() ? _folder->getKey() : uid(0));
 			
 			ActionFunctionRequest<TextTemplateFolderUpdateAction,AdminRequest> updateFolderRequest(_request);
 			updateFolderRequest.getFunction()->setSamePage(this);
@@ -215,6 +216,7 @@ namespace synthese
 			if (updateRight)
 			{
 				stream << "<h1>Nouveau modèle de textes</h1>"; 
+				addRequest.getAction()->setIsFolder(false);
 				PropertiesHTMLTable ta(addRequest.getHTMLForm("add"));
 				stream << ta.open();
 				stream << ta.cell("Nom", ta.getForm().getTextInput(TextTemplateAddAction::PARAMETER_NAME, string()));

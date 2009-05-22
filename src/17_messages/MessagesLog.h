@@ -58,7 +58,8 @@ namespace synthese
 			DBLog::ColumnsVector getColumnNames() const;
 			
 			virtual bool isAuthorized(
-				const server::Request& request
+				const server::Request& request,
+				const security::RightLevel& level
 			) const;
 			
 
@@ -80,6 +81,12 @@ namespace synthese
 				const SentScenario& scenarioTemplate,
 				const SentScenario& sentScenario,
 				const security::User* user
+			);
+
+
+			static void AddNewSentScenarioEntry(
+				const SentScenario& sentScenario,
+				const security::User& user
 			);
 
 

@@ -375,7 +375,7 @@ namespace synthese
 		bool DBLogHTMLView::isAuthorized(
 			const Request& request
 		) const {
-			return _dbLog.get() && _dbLog->isAuthorized(request);
+			return _dbLog.get() && _dbLog->isAuthorized(request, READ);
 		}
 		
 		

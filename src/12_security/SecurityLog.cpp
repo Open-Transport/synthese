@@ -60,9 +60,10 @@ namespace synthese
 		
 		
 		bool SecurityLog::isAuthorized(
-			const Request& request
+			const Request& request,
+			const security::RightLevel& level
 		) const {
-			return request.isAuthorized<SecurityRight>(READ);
+			return request.isAuthorized<SecurityRight>(level);
 		}
 
 

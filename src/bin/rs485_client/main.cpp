@@ -25,14 +25,12 @@
 	#include "Windows.h"
 #endif
 
-#include "00_tcp/TcpClientSocket.h"
-#include "00_tcp/SocketException.h"
-
 #include "01_util/threads/Thread.h"
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 #include "01_util/Log.h"
 
+#include "BasicClient.h"
 
 #include <iostream>
 #include <iomanip>
@@ -45,6 +43,28 @@
 
 #define MAX_QUERY_SIZE 4096
 #define STATUS_MESSAGE_SIZE 17
+
+	/** @defgroup m92 92 RS485 Client
+		@ingroup m9
+
+		Le client RS485 assure en service continu les opérations suivantes :
+			- demande du contenu au serveur, en spécifiant la clé de l'afficheur, ce qui détermine à la fois le protocole et le contenu
+			- stockage du contenu reçu
+			- transmission du contenu au port RS485
+			- attente minute suivante
+
+		Lorsque l'architecture matérielle le nécessite, le client RS485 doit gérer l'alimentation de plusieurs dispositifs branchés en parallèle sur le même port. La boucle de fonctionnement est alors la suivante :
+			- demande des contenus au serveur, en spécifiant la clé de chaque afficheur
+			- stockage des contenus reçus
+			- transmission des contenus au port RS485, afficheur par afficheur
+			- attente minute suivante
+
+		@image html 1195572.2.000.png
+		@image latex 1195572_1_000.eps "Schéma d'architecture cible d'une installation RS485" height=10cm
+
+		@{
+	*/
+
 
 
 using namespace synthese::util;
@@ -284,3 +304,4 @@ int main(int argc, char* argv[])
 }
 
 
+/** @} */

@@ -97,6 +97,7 @@ namespace synthese
 				int													_wiringCode;	// Display ID in a bus
 				int													_comPort;
 				const DisplayScreenCPU*								_cpu;
+				std::string											_macAddress;
 			//@}
 
 			//! \name Appearance
@@ -174,6 +175,7 @@ namespace synthese
 				void	setCPU(const DisplayScreenCPU* value);
 				void	setDisplayClock(bool value);
 				void	setComPort(int value);
+				void	setMacAddress(const std::string& value);
 			//@}
 
 			//! \name Modifiers
@@ -221,6 +223,7 @@ namespace synthese
 				const DisplayScreenCPU*			getCPU()						const;
 				int								getComPort()					const;
 				bool							getDisplayClock()				const;
+				std::string						getMacAddress()					const;
 			//@}
 
 			//! \name Queries

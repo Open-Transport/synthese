@@ -58,9 +58,10 @@ namespace synthese
 		}
 
 		bool MessagesLog::isAuthorized(
-			const Request& request
+			const Request& request,
+			const security::RightLevel& level
 		) const {
-			return request.isAuthorized<MessagesRight>(READ);
+			return request.isAuthorized<MessagesRight>(level);
 		}
 
 
@@ -105,6 +106,13 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, sentScenario.getKey());
 		}
 
+		void MessagesLog::AddNewSentScenarioEntry( const SentScenario& sentScenario, const security::User& user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back(string());
+			content.push_back("Création");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, sentScenario.getKey());
+		}
 
 		void MessagesLog::addUpdateEntry(
 			const SentScenario* scenario

@@ -1,6 +1,6 @@
 Import ('s3env')
 
-CppLibProject(
+CppSynthese3LibProject(
 	s3env,
 	's3-db-ring',
 	s3env['S3VERSION'], 

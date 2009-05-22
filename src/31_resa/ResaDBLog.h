@@ -112,7 +112,8 @@ namespace synthese
 			virtual std::string getObjectName(uid id) const;
 			
 			virtual bool isAuthorized(
-				const server::Request& request
+				const server::Request& request,
+				const security::RightLevel& level
 			) const;
 
 			virtual DBLog::ColumnsVector parse(const dblog::DBLogEntry& entry) const;

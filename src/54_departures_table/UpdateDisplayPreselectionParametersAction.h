@@ -53,6 +53,8 @@ namespace synthese
 				ROUTE_PLANNING
 			} DisplayFunction;
 
+			typedef std::map<DisplayFunction, std::string> DisplayFunctionNames;
+
 			static const std::string PARAMETER_DISPLAY_SCREEN;
 			static const std::string PARAMETER_PRESELECTION_DELAY;
 			static const std::string PARAMETER_DISPLAY_FUNCTION;
@@ -84,7 +86,7 @@ namespace synthese
 			*/
 			void run();
 
-			static std::map<DisplayFunction, std::string> GetFunctionList();
+			static DisplayFunctionNames GetFunctionList();
 			static std::map<int, std::string> GetClearDelaysList();
 			static DisplayFunction GetFunction(const DisplayScreen& screen);
 

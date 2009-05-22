@@ -99,7 +99,7 @@ namespace synthese
 				, _requestParameters.raisingOrder
 			);
 			ScenarioFolderTableSync::Search(
-				_env,
+				_subFoldersEnv,
 				_folderId
 			);
 		}
@@ -197,7 +197,7 @@ namespace synthese
 
 			stream << "<h1>Sous-répertoires</h1>";
 
-			if (_env.getRegistry<ScenarioFolder>().size() <= 1)
+			if (_subFoldersEnv.getRegistry<ScenarioFolder>().empty())
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
@@ -206,11 +206,11 @@ namespace synthese
 			HTMLList l;
 			stream << f.open() << l.open();
 
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, _env.getRegistry<ScenarioFolder>())
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, _subFoldersEnv.getRegistry<ScenarioFolder>())
 			{
 				if(folder == _folder) continue;
 
-				static_pointer_cast<MessagesLibraryAdmin,AdminInterfaceElement>(goFolderRequest.getFunction()->getPage())->setFolderId(folder->getKey());
+				goFolderRequest.setObjectId(folder->getKey());
 				stream << l.element("folder");
 				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), folder->getName());
 			}

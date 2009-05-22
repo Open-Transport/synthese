@@ -415,7 +415,7 @@ namespace synthese
 		std::string DisplayScreen::getFullName() const
 		{
 			if (!_localization)
-				return "(not localized)";
+				return _localizationComment + " (not localized)";
 			else
 			{
 				stringstream s;
@@ -630,6 +630,16 @@ namespace synthese
 				getType()->getMonitoringInterface() != NULL &&
 				getType()->getTimeBetweenChecks() > 0
 			;
+		}
+
+		void DisplayScreen::setMacAddress( const std::string& value )
+		{
+			_macAddress = value;
+		}
+
+		std::string DisplayScreen::getMacAddress() const
+		{
+			return _macAddress;
 		}
 	}
 }

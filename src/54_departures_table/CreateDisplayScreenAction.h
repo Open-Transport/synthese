@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_CreateDisplayScreenAction_H__
 #define SYNTHESE_CreateDisplayScreenAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -39,6 +38,7 @@ namespace synthese
 	namespace departurestable
 	{
 		class DisplayScreen;
+		class DisplayScreenCPU;
 
 		/** Display screen creation action class.
 			@ingroup m54Actions refActions
@@ -48,10 +48,12 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_LOCALIZATION_ID;
 			static const std::string PARAMETER_TEMPLATE_ID;
+			static const std::string PARAMETER_CPU_ID;
 
 		private:
 			boost::shared_ptr<const DisplayScreen>			_template;
 			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
+			boost::shared_ptr<const DisplayScreenCPU>		_cpu;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -68,7 +70,8 @@ namespace synthese
 			*/
 			void run();
 
-			void setPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> place);
+			void setPlace(util::RegistryKeyType id);
+			void setCPU(util::RegistryKeyType id);
 
 			virtual bool _isAuthorized() const;
 		};

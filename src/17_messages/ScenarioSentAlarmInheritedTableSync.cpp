@@ -58,9 +58,11 @@ namespace synthese
 						linkLevel
 					).get()
 				);
+				uid id(rows->getLongLong(AlarmTableSync::COL_TEMPLATE_ID));
+				if(id > 0)
 				obj->setTemplate(
 					AlarmTemplateInheritedTableSync::Get(
-						rows->getLongLong(AlarmTableSync::COL_TEMPLATE_ID),
+						id,
 						env,
 						linkLevel
 					).get()

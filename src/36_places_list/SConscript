@@ -1,6 +1,6 @@
 Import ('s3env')
 
-CppLibProject(
+CppSynthese3LibProject(
 	s3env, 's3-places-list', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = ['s3-security.cpplib', 's3-route-planner.cpplib', 's3-env.cpplib']

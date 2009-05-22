@@ -30,6 +30,7 @@
 #include "Registry.h"
 
 #include <string>
+#include <set>
 
 namespace synthese
 {
@@ -40,6 +41,8 @@ namespace synthese
 
 	namespace departurestable
 	{
+		class DisplayScreen;
+
 		////////////////////////////////////////////////////////////////////////
 		///	Display screen CPU class.
 		///	
@@ -53,6 +56,7 @@ namespace synthese
 		{
 		public:
 			typedef util::Registry<DisplayScreenCPU> Registry;
+			typedef std::set<const DisplayScreen*> WiredScreens;
 			
 		protected:
 			// Attributes
@@ -62,6 +66,9 @@ namespace synthese
 			int													_monitoring_delay;
 			bool												_is_online;
 			std::string											_maintenance_message;
+
+			// Linked objects
+			WiredScreens										_wiredScreens;
 			
 		public:
 			////////////////////////////////////////////////////////////////////
@@ -86,6 +93,7 @@ namespace synthese
 				int													getMonitoringDelay()	const;
 				bool												getIsOnline()			const;
 				const std::string&									getMaintenanceMessage()	const;
+				const WiredScreens&									getWiredScreens()		const;
 			//@}
 			
 			//! @name Setters
@@ -96,14 +104,18 @@ namespace synthese
 				void setMonitoringDelay(const int value);
 				void setIsOnline(const bool value);
 				void setMaintenanceMessage(const std::string& value);
+				void addWiredScreen(const DisplayScreen* value);
+				void removeWiredScreen(const DisplayScreen* value);
 			//@}
 			
 			//! @name Queries
 			//@{
+				std::string getFullName() const;
 			//@}
 			
 			//! @name Others
 			//@{
+				void copy(const DisplayScreenCPU& e);
 			//@}
 		};
 	}

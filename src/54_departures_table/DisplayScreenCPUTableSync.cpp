@@ -79,6 +79,7 @@ namespace synthese
 		template<>  const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayScreenCPUTableSync>::_INDEXES[] =
 		{
 			SQLiteTableSync::Index(DisplayScreenCPUTableSync::COL_PLACE_ID.c_str(), ""),
+			SQLiteTableSync::Index(DisplayScreenCPUTableSync::COL_MAC_ADDRESS.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -121,11 +122,11 @@ namespace synthese
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey()) << ","
-				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << ((object->getPlace() != NULL) ? Conversion::ToString(object->getPlace()->getKey()) : "0")
-				<< "," << Conversion::ToSQLiteString(object->getMacAddress())
-				<< "," << Conversion::ToString(object->getMonitoringDelay())
-				<< "," << Conversion::ToSQLiteString(object->getMaintenanceMessage())
+				<< Conversion::ToSQLiteString(object->getName()) << ","
+				<< ((object->getPlace() != NULL) ? Conversion::ToString(object->getPlace()->getKey()) : "0") << ","
+				<< Conversion::ToSQLiteString(object->getMacAddress()) << ","
+				<< Conversion::ToString(object->getMonitoringDelay()) << ","
+				<< Conversion::ToSQLiteString(object->getMaintenanceMessage())
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -152,7 +153,8 @@ namespace synthese
 
 		void DisplayScreenCPUTableSync::Search(
 			Env& env,
-			RegistryKeyType placeId,
+			boost::optional<RegistryKeyType> placeId,
+			boost::optional<std::string> macAddress,
 			int first /*= 0*/,
 			int number /*= 0*/,
 			bool orderByName,
@@ -164,9 +166,13 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			if (placeId != UNKNOWN_VALUE)
+			if (placeId)
 			{
-				query << " AND " << COL_PLACE_ID << "=" << Conversion::ToString(placeId);
+				query << " AND " << COL_PLACE_ID << "=" << *placeId;
+			}
+			if(macAddress)
+			{
+				query << " AND " << COL_MAC_ADDRESS << "=" << Conversion::ToSQLiteString(*macAddress);
 			}
 			if (orderByName)
 			{

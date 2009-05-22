@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string PARAMETER_TYPE;
 			static const std::string PARAMETER_COM_PORT;
 			static const std::string PARAMETER_CPU;
+			static const std::string PARAMETER_MAC_ADDRESS;
 
 		private:
 			std::string									_name;
@@ -61,6 +62,7 @@ namespace synthese
 			boost::shared_ptr<const DisplayType>		_type;
 			boost::shared_ptr<const DisplayScreenCPU>	_cpu;
 			int											_comPort;
+			std::string									_macAddress;
 
 			
 		protected:

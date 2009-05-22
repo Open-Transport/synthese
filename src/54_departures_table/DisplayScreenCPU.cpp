@@ -23,8 +23,9 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-// departurestable
 #include "DisplayScreenCPU.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include <sstream>
 
 using namespace std;
 
@@ -150,8 +151,45 @@ namespace synthese
 
 		void DisplayScreenCPU::setMaintenanceMessage(
 			const std::string& value
-			) {
+		) {
 			_maintenance_message = value;
+		}
+
+		void DisplayScreenCPU::copy( const DisplayScreenCPU& e )
+		{
+			_mac_address = e._mac_address;
+			_name = e._name;
+			_place = e._place;
+			_monitoring_delay = e._monitoring_delay;
+		}
+
+		std::string DisplayScreenCPU::getFullName() const
+		{
+			if (!_place)
+				return _name + " (not localized)";
+			else
+			{
+				stringstream s;
+				s << _place->getFullName();
+				if (!_name.empty())
+					s << "/" << _name;
+				return s.str();
+			}
+		}
+
+		void DisplayScreenCPU::addWiredScreen( const DisplayScreen* value )
+		{
+			_wiredScreens.insert(value);
+		}
+
+		const DisplayScreenCPU::WiredScreens& DisplayScreenCPU::getWiredScreens() const
+		{
+			return _wiredScreens;
+		}
+
+		void DisplayScreenCPU::removeWiredScreen( const DisplayScreen* value )
+		{
+			_wiredScreens.erase(value);
 		}
 	}
 }

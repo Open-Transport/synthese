@@ -29,6 +29,7 @@
 #include "FactoryBase.h"
 #include "DBLogEntry.h"
 #include "Registry.h"
+#include "12_security/Types.h"
 
 #include <boost/optional.hpp>
 
@@ -113,14 +114,25 @@ namespace synthese
 			/** Authorization tester.
 			 * Each subclass of DBLog must implement an authorization method depending on the request.
 			 * @param request the request which generated the display of the log
+			 * @param level needed level
 			 * @return true if the log can be displayed
 			 */
 			virtual bool isAuthorized(
-				const server::Request& request
+				const server::Request& request,
+				const security::RightLevel& level
 			) const = 0;
 
 			virtual ColumnsVector parse(const DBLogEntry& entry) const;
 			virtual std::string getObjectName(uid id) const;
+
+			static uid AddSimpleEntry(
+				const std::string& logKey,
+				DBLogEntry::Level level,
+				const std::string& content,
+				const security::User* user,
+				util::RegistryKeyType objectId = 0
+			);
+
 		};
 	}
 }

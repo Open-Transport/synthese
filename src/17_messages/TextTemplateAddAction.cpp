@@ -24,12 +24,12 @@
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 
-#include "17_messages/MessagesLibraryLog.h"
-#include "17_messages/MessagesLibraryRight.h"
+#include "MessagesLibraryLog.h"
+#include "MessagesLibraryRight.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/Request.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Request.h"
 
 #include "Conversion.h"
 #include "Env.h"
@@ -62,6 +62,8 @@ namespace synthese
 			map.insert(PARAMETER_NAME, _name);
 			map.insert(PARAMETER_SHORT_MESSAGE, _shortMessage);
 			map.insert(PARAMETER_TYPE, static_cast<int>(_level));
+			map.insert(PARAMETER_PARENT_ID, _parentId);
+			map.insert(PARAMETER_IS_FOLDER, _isFolder);
 			return map;
 		}
 
@@ -73,7 +75,7 @@ namespace synthese
 			if (_level == ALARM_LEVEL_UNKNOWN)
 				throw ActionException("Bad value for level");
 			
-			_isFolder = map.getBool(PARAMETER_IS_FOLDER, true, false, FACTORY_KEY);
+			_isFolder = map.getBool(PARAMETER_IS_FOLDER, false, false, FACTORY_KEY);
 
 			_parentId = map.getUid(PARAMETER_PARENT_ID, true, FACTORY_KEY);
 			if (_parentId > 0)

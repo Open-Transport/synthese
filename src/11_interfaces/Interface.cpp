@@ -122,5 +122,15 @@ namespace synthese
 		{
 			return _name;
 		}
+
+		void Interface::setDefaultClientURL( const std::string& value )
+		{
+			_defaultClientURL = value;
+		}
+
+		const std::string& Interface::getDefaultClientURL() const
+		{
+			return _defaultClientURL;
+		}
 	}
 }

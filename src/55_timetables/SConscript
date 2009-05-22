@@ -2,7 +2,7 @@ Import ('s3env')
 
 senv = s3env.Clone ()
 
-CppLibProject(
+CppSynthese3LibProject(
 	senv,
 	's3-timetables',
 	s3env['S3VERSION'],

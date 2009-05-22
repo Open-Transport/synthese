@@ -44,7 +44,7 @@ namespace synthese
 		):	Registrable(key),
 			Scenario()
 			, _isEnabled(false)
-			, _periodStart(TIME_UNKNOWN)
+			, _periodStart(TIME_CURRENT)
 			, _periodEnd(TIME_UNKNOWN)
 			, _template(NULL)
 		{
@@ -55,7 +55,7 @@ namespace synthese
 		):	Scenario(source.getName()),
 			Registrable(UNKNOWN_VALUE),
 			_isEnabled(false),
-			_periodStart(TIME_UNKNOWN),
+			_periodStart(TIME_CURRENT),
 			_periodEnd(TIME_UNKNOWN),
 			_template(&source)
 		{
@@ -67,7 +67,7 @@ namespace synthese
 		):	Scenario(source._template ? source._template->getName() : source.getName()),
 			Registrable(UNKNOWN_VALUE),
 			_isEnabled(false),
-			_periodStart(TIME_UNKNOWN),
+			_periodStart(TIME_CURRENT),
 			_periodEnd(TIME_UNKNOWN),
 			_template(source._template),
 			_variables(source._variables)

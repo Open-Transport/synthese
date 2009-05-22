@@ -131,7 +131,7 @@ namespace synthese
 			}
 
 			// Log
-			ArrivalDepartureTableLog::addCreateTypeEntry(&dt, _request->getUser().get());
+			ArrivalDepartureTableLog::addCreateEntry(dt, *_request->getUser());
 		}
 
 

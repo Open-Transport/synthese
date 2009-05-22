@@ -74,6 +74,8 @@
 #include "MessageAdmin.h"
 #include "SentScenario.h"
 #include "MessagesScenarioAdmin.h"
+#include "Interface.h"
+#include "DisplayScreenCPUAdmin.h"
 
 #include <utility>
 #include <sstream>
@@ -211,6 +213,13 @@ namespace synthese
 				ActionFunctionRequest<DisplayScreenRemove, AdminRequest> deleteRequest(_request);
 				deleteRequest.getFunction()->setPage<DisplaySearchAdmin>();
 				deleteRequest.getAction()->setDisplayScreen(_displayScreen);
+
+				FunctionRequest<AdminRequest> goCPURequest(_request);
+				goCPURequest.getFunction()->setPage<DisplayScreenCPUAdmin>();
+				if(_displayScreen->getCPU())
+				{
+					goCPURequest.setObjectId(_displayScreen->getCPU()->getKey());
+				}
 				
 				stream << "<h1>Propriétés</h1>";
 
@@ -233,13 +242,21 @@ namespace synthese
 							_displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE
 					)	)
 				;
+				stream << t.cell("Adresse MAC", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS, _displayScreen->getMacAddress()));
 				
 				stream << t.title("Connexion");
-				stream << t.cell("Code de branchement bus RS485", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()));
 				
 				if (_displayScreen->getLocalization() != NULL && !_env.getRegistry<DisplayScreenCPU>().empty())
 				{
-					stream << t.cell("Unité centrale", t.getForm().getSelectInput(UpdateDisplayScreenAction::PARAMETER_CPU, _env.getRegistry<DisplayScreenCPU>(), (_displayScreen->getCPU() != NULL) ? RegistryKeyType(0) : _displayScreen->getCPU()->getKey()));
+					stream << t.cell(
+						"Unité centrale",
+						t.getForm().getSelectInput(
+							UpdateDisplayScreenAction::PARAMETER_CPU,
+							_env.getRegistry<DisplayScreenCPU>(),
+							_displayScreen->getCPU() ? _displayScreen->getCPU()->getKey() : RegistryKeyType(0),
+							"(pas d'unité centrale)"
+						) + " " + (_displayScreen->getCPU() ? goCPURequest.getHTMLForm().getLinkButton("Ouvrir", string(), "server.png") : string())
+					);
 				}
 				stream <<
 					t.cell(
@@ -252,7 +269,8 @@ namespace synthese
 							"(inutilisé)"
 					)	)
 				;
-				
+				stream << t.cell("Code de branchement bus RS485", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()));
+
 				stream << t.close();
 
 				stream << "<p class=\"info\">Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalités proposées. Selon le type de l'afficheur, certains champs peuvent donc être sans effet sur l'affichage.</p>";
@@ -449,8 +467,8 @@ namespace synthese
 				rmForbiddenRequest.getFunction()->setSamePage(this);
 
 				vector<pair<EndFilter, string> > endFilterMap;
-				endFilterMap.push_back(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
 				endFilterMap.push_back(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
+				endFilterMap.push_back(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
 
 				// Propriétés
 				stream << "<h1>Propriétés</h1>";
@@ -743,6 +761,12 @@ namespace synthese
 				// Requests
 				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
 				viewRequest.setObjectId(_displayScreen->getKey());
+				if(	_displayScreen->getType() &&
+					_displayScreen->getType()->getDisplayInterface() &&
+					!_displayScreen->getType()->getDisplayInterface()->getDefaultClientURL().empty()
+				){
+					viewRequest.setClientURL(_displayScreen->getType()->getDisplayInterface()->getDefaultClientURL());
+				}
 
 				FunctionRequest<AdminRequest> viewMessageRequest(_request);
 				viewMessageRequest.getFunction()->setPage<MessageAdmin>();
@@ -776,6 +800,9 @@ namespace synthese
 				vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, _displayScreen->getKey()));
 				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 				{
+					// Avoid malformed message
+					if(alarm->getScenario() == NULL) continue;
+
 					stream << t.row();
 					stream << t.col() << priority++;
 					stream << t.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
@@ -785,7 +812,7 @@ namespace synthese
 					;
 					stream << t.col();
 
-					viewScenarioRequest.setObjectId(alarm->getKey());
+					viewScenarioRequest.setObjectId(alarm->getScenario()->getKey());
 					stream << HTMLModule::getLinkButton(viewScenarioRequest.getURL(), "Editer", string(), "note.png");
 				}
 
@@ -889,7 +916,8 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			
 			if (parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY &&
-				currentPage.getFactoryKey() == FACTORY_KEY
+				currentPage.getFactoryKey() == FACTORY_KEY &&
+				parentLink.parameterValue.empty()
 			){
 				links.push_back(currentPage.getPageLink());
 			}

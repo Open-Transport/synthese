@@ -22,7 +22,9 @@
 
 #include "ArrivalDepartureTableLog.h"
 #include "DisplayScreen.h"
+#include "DisplayScreenCPU.h"
 #include "DisplayScreenTableSync.h"
+#include "DisplayScreenCPUTableSync.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
 #include "User.h"
@@ -57,20 +59,28 @@ namespace synthese
 
 
 		bool ArrivalDepartureTableLog::isAuthorized(
-			const Request& request
+			const Request& request,
+			const security::RightLevel& level
 		) const {
-			return request.isAuthorized<ArrivalDepartureTableRight>(READ);
+			return request.isAuthorized<ArrivalDepartureTableRight>(level);
 		}
 
 
 
 		void ArrivalDepartureTableLog::addUpdateEntry(
-			const DisplayScreen* screen,
-			const std::string& text, const User* user
+			const DisplayScreen& screen,
+			const std::string& text, const User& user
 		){
 			DBLogEntry::Content content;
 			content.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, screen.getKey());
+		}
+
+		void ArrivalDepartureTableLog::addUpdateEntry( const DisplayScreenCPU& cpu , const std::string& text , const security::User& user )
+		{
+			DBLogEntry::Content content;
+			content.push_back(text);
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 
 		std::string ArrivalDepartureTableLog::getObjectName( uid id ) const
@@ -80,7 +90,7 @@ namespace synthese
 				Env env;
 				if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 				{
-					shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL);
+					shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id, env);
 					return ds->getFullName();
 				}
 				else if (decodeTableId(id) == DisplayTypeTableSync::TABLE.ID)
@@ -88,7 +98,11 @@ namespace synthese
 					shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return dt->getName();
 				}
-
+				else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
+				{
+					shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					return cpu->getName();
+				}
 			}
 			catch(...)
 			{
@@ -117,11 +131,11 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
 		}
 
-		void ArrivalDepartureTableLog::addCreateTypeEntry(const DisplayType* type , const security::User* user )
+		void ArrivalDepartureTableLog::addCreateEntry(const DisplayType& type , const security::User& user )
 		{
 			DBLogEntry::Content content;
-			content.push_back("Création type d'afficheur " + type->getName());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
+			content.push_back("Création type d'afficheur " + type.getName());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, type.getKey());
 		}
 
 		void ArrivalDepartureTableLog::addDeleteTypeEntry(const DisplayType* type , const security::User* user )
@@ -129,6 +143,20 @@ namespace synthese
 			DBLogEntry::Content content;
 			content.push_back("Suppression type d'afficheur " + type->getName());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
+		}
+
+		void ArrivalDepartureTableLog::addCreateEntry( const DisplayScreenCPU& cpu , const security::User& user )
+		{
+			DBLogEntry::Content content;
+			content.push_back("Création");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
+		}
+
+		void ArrivalDepartureTableLog::addCreateEntry( const DisplayScreen& cpu , const security::User& user )
+		{
+			DBLogEntry::Content content;
+			content.push_back("Création");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 	}
 }

@@ -65,11 +65,13 @@ namespace synthese
 			std::string	_name;
 			PagesMap	_pages;
 			std::string	_noSessionDefaultPageCode;
+			std::string	_defaultClientURL;
 
 		public:
 			//! \name Setters
 			//@{
 				void	setName(const std::string& name);
+				void	setDefaultClientURL(const std::string& value);
 			//@}
 
 			//! \name Getters
@@ -92,6 +94,7 @@ namespace synthese
 
 				const std::string& getNoSessionDefaultPageCode() const;
 				const std::string& getName() const;
+				const std::string& getDefaultClientURL() const;
 			//@}
 
 			//! \name Modifiers

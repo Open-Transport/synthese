@@ -30,6 +30,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
+#include "DBModule.h"
 
 #include "DateTime.h"
 
@@ -214,6 +215,17 @@ namespace synthese
 				query << " OFFSET " << Conversion::ToString(first);
 
 			LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+		void DBLogEntryTableSync::Purge( const std::string& logKey, const time::DateTime& endDate )
+		{
+			stringstream query;
+			query <<
+				"DELETE FROM " << TABLE.NAME <<
+				" WHERE " << COL_DATE << "<=" << endDate.toSQLString() <<
+				" AND " << COL_LOG_KEY << "=" << Conversion::ToSQLiteString(logKey)
+			;
+			DBModule::GetSQLite()->execQuery(query.str());
 		}
 	}
 }

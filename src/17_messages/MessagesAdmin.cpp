@@ -367,7 +367,7 @@ namespace synthese
 				t1.col() <<
 				t1.getActionForm().getSelectInput(
 					NewScenarioSendAction::PARAMETER_TEMPLATE,
-					MessagesModule::GetScenarioTemplatesLabels("(message seul)"),
+					MessagesModule::GetScenarioTemplatesLabels(string(),"(pas de modéle)"),
 					uid(UNKNOWN_VALUE)
 				)
 			;

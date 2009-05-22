@@ -50,7 +50,8 @@ namespace synthese
 	namespace messages
 	{
 		std::vector<pair<uid, std::string> > MessagesModule::GetScenarioTemplatesLabels(
-			string withAllLabel
+			string withAllLabel,
+			string withNoLabel
 			, uid folderId
 			, string prefix
 		){
@@ -58,6 +59,10 @@ namespace synthese
 			if (!withAllLabel.empty())
 			{
 				m.push_back(make_pair(UNKNOWN_VALUE, withAllLabel));
+			}
+			if (!withNoLabel.empty())
+			{
+				m.push_back(make_pair(0, withNoLabel));
 			}
 
 			Env env;
@@ -72,7 +77,7 @@ namespace synthese
 				ScenarioFolderTableSync::Search(env, folderId);
 				BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, env.getRegistry<ScenarioFolder>())
 				{
-					std::vector<pair<uid, std::string> > r(GetScenarioTemplatesLabels(string(), folder->getKey(), prefix + folder->getName() +"/"));
+					std::vector<pair<uid, std::string> > r(GetScenarioTemplatesLabels(string(), string(), folder->getKey(), prefix + folder->getName() +"/"));
 					m.insert(m.end(),r.begin(), r.end());
 				}
 			}

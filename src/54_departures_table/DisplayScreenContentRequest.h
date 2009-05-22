@@ -69,6 +69,8 @@ namespace synthese
 			virtual bool _isAuthorized() const;
 
 			virtual std::string getOutputMimeType() const;
+
+			void setDisplay(const util::RegistryKeyType id);
 		};
 	}
 }

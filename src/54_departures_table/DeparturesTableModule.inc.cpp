@@ -30,6 +30,7 @@
 #include "DisplayAdmin.h"
 #include "DisplayTypeAdmin.h"
 #include "DisplayScreenCPUAdmin.h"
+#include "DeparturesTableBenchmarkAdmin.h"
 
 #include "DisplayTypeTableSync.h"
 #include "DisplayScreenTableSync.h"
@@ -55,6 +56,8 @@
 #include "DisplayScreenRemoveForbiddenPlaceAction.h"
 #include "UpdateDisplayMaintenanceAction.h"
 #include "DisplayScreenAddDisplayedPlace.h"
+#include "DisplayScreenCPUCreateAction.h"
+#include "DisplayScreenCPUUpdateAction.h"
 
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayMaintenanceRight.h"
@@ -70,3 +73,4 @@
 #include "DisplayScreenPhysicalStopFunction.h"
 #include "DisplayGetNagiosStatusFunction.h"
 #include "CentreonConfigExportFunction.h"
+#include "CPUGetWiredScreensFunction.h"
