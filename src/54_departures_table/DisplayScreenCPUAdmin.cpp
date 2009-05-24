@@ -39,11 +39,17 @@
 #include "DisplayAdmin.h"
 #include "DisplayScreenTableSync.h"
 #include "CreateDisplayScreenAction.h"
+#include "ObjectNotFoundException.h"
+#include "DisplayMonitoringStatusTableSync.h"
+#include "DisplayScreenCPUMaintenanceUpdateAction.h"
+#include "DisplayMaintenanceLog.h"
+#include "HTMLList.h"
 
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 
 namespace synthese
@@ -51,15 +57,15 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
-	using namespace util;
 	using namespace departurestable;
 	using namespace security;
 	using namespace html;
+	using namespace util;
 	
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, DisplayScreenCPUAdmin>::FACTORY_KEY("DisplayScreenCPUAdmin");
+		template<> const string util::FactorableTemplate<AdminInterfaceElement, DisplayScreenCPUAdmin>::FACTORY_KEY("DisplayScreenCPUAdmin");
 	}
 
 	namespace admin
@@ -77,7 +83,8 @@ namespace synthese
 
 		DisplayScreenCPUAdmin::DisplayScreenCPUAdmin()
 		:	AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>(),
-			_generalLogView(TAB_LOG)
+			_generalLogView(TAB_LOG),
+			_maintenanceLogView(TAB_MAINTENANCE)
 		{ }
 		
 		
@@ -99,9 +106,11 @@ namespace synthese
 			}
 
 			_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _cpu->getKey());
+			_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _cpu->getKey());
 
 			if(!doDisplayPreparationActions) return;
 
+			_lastContact = DisplayMonitoringStatusTableSync::GetLastContact(*_cpu);
 			DisplayScreenTableSync::SearchFromCPU(_env, _cpu->getKey());
 		}
 		
@@ -137,10 +146,119 @@ namespace synthese
 				stream << t.close();
 
 			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// MAINTENANCE TAB
 			if (openTabContent(stream, TAB_MAINTENANCE))
 			{
+				// Update action
+				ActionFunctionRequest<DisplayScreenCPUMaintenanceUpdateAction,AdminRequest> updateRequest(_request);
+				updateRequest.getFunction()->setSamePage(this);
+				updateRequest.getAction()->setCPU(_cpu->getKey());
 
+				// Log search
+				FunctionRequest<AdminRequest> searchRequest(_request);
+				searchRequest.getFunction()->setSamePage(this);
+
+				stream << "<h1>Paramètres de maintenance</h1>";
+
+				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
+				t.getForm().setUpdateRight(tabHasWritePermissions());
+
+				stream << t.open();
+				stream <<
+					t.cell(
+						"Unité centrale déclarée en service",
+						t.getForm().getOuiNonRadioInput(
+							DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_IS_ONLINE,
+							_cpu->getIsOnline()
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Message de maintenance",
+						t.getForm().getTextAreaInput(
+							DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_MAINTENANCE_MESSAGE,
+							_cpu->getMaintenanceMessage(),
+							3, 60
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Durée entre les ¨requêtes",
+						t.getForm().getSelectNumberInput(
+							DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_MONITORING_DELAY,
+							1, 120,
+							_cpu->getMonitoringDelay().minutes(),
+							1
+						)+ " minutes"
+					)
+				;
+				stream << t.close();
+
+				stream << "<h1>Informations de supervision</h1>";
+
+				bool monitored(_cpu->isMonitored());
+
+				HTMLList l;
+				stream << l.open();
+
+
+				if(!monitored)
+				{
+					stream <<
+						l.element() <<
+						HTMLModule::getHTMLImage("help.png", "Information") <<
+						" Cette unité centrale n'est pas supervisée."
+						;
+				} else {
+					stream <<
+						l.element() <<
+						"Durée théorique entre les contacts : " <<
+						_cpu->getMonitoringDelay().minutes() << " min"
+					;
+
+
+					if(_lastContact.is_not_a_date_time())
+					{
+						stream <<
+							l.element() <<
+							HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
+							" KO : Cette unité centrale n'est jamais entré en contact.";
+					}
+					else
+					{
+						if(	_cpu->isDown(_lastContact)
+						){
+							stream <<
+								l.element() <<
+								HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
+								" KO : Cette unité centrale n'est plus en contact alors qu'elle est déclarée online."
+							;
+						}
+					}
+
+					if(!_lastContact.is_not_a_date_time())
+					{
+						stream << l.element() << "Dernier contact le " << to_simple_string(_lastContact);
+						
+					}
+				}
+
+				stream << l.close();
+
+				stream << "<h1>Journal de maintenance</h1>";
+
+				_maintenanceLogView.display(
+					stream,
+					searchRequest
+				);
 			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// DISPLAYS TAB
 			if (openTabContent(stream, TAB_DISPLAYS))
 			{
 				FunctionRequest<AdminRequest> displayRequest(_request);
@@ -196,7 +314,7 @@ namespace synthese
 			if (_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return true;
 			if (_cpu.get() == NULL) return false;
 			if (_cpu->getPlace() == NULL) return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
-			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_cpu->getPlace()->getKey()));
+			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey()));
 		}
 		
 		AdminInterfaceElement::PageLinks DisplayScreenCPUAdmin::getSubPagesOfParent(
@@ -236,17 +354,21 @@ namespace synthese
 
 		std::string DisplayScreenCPUAdmin::getParameterValue() const
 		{
-			return _cpu.get() ? Conversion::ToString(_cpu->getKey()) : string();
+			return _cpu.get() ? lexical_cast<string>(_cpu->getKey()) : string();
 		}
 
 		void DisplayScreenCPUAdmin::_buildTabs(
 		) const {
 			_tabs.clear();
 
-			bool writePermission(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_cpu->getPlace()->getKey())));
+			bool writePermission(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())));
 			_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writePermission, "cog.png"));
-			_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writePermission, "wrench.png"));
-			_tabs.push_back(Tab("Afficheurs", TAB_DISPLAYS, writePermission, "monitor.png"));
+
+			if(_cpu->getPlace())
+			{
+				_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writePermission, "wrench.png"));
+				_tabs.push_back(Tab("Afficheurs", TAB_DISPLAYS, writePermission, "monitor.png"));
+			}
 			_tabs.push_back(Tab("Journal", TAB_LOG, writePermission, "book.png"));
 			
 			_tabBuilded = true;

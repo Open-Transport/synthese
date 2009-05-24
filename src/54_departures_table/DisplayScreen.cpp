@@ -39,9 +39,11 @@
 
 #include <sstream>
 #include <boost/foreach.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -614,7 +616,7 @@ namespace synthese
 				return false;
 			}
 		
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 			if(now - status.getTime() <= getType()->getTimeBetweenChecks())
 			{
 				return false;
@@ -628,7 +630,7 @@ namespace synthese
 			return getIsOnline() &&
 				getType() != NULL &&
 				getType()->getMonitoringInterface() != NULL &&
-				getType()->getTimeBetweenChecks() > 0
+				getType()->getTimeBetweenChecks().minutes() > 0
 			;
 		}
 

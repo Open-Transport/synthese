@@ -23,11 +23,13 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "Conversion.h"
-
+#include "CommercialLine.h"
 #include "LineMarkerInterfacePage.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -46,16 +48,19 @@ namespace synthese
 			, const string& tableClosingHTML
 			, int pixelWidth
 			, int pixelHeight
-			, const CommercialLine* line
+			, const CommercialLine& line
 			, const Request* request /*= NULL */
 		) const {
 			ParametersVector pv;
 			pv.push_back(tableOpeningHTML);
 			pv.push_back(tableClosingHTML);
-			pv.push_back(Conversion::ToString(pixelWidth));
-			pv.push_back(Conversion::ToString(pixelHeight));
+			pv.push_back(lexical_cast<string>(pixelWidth));
+			pv.push_back(lexical_cast<string>(pixelHeight));
+			pv.push_back(line.getStyle());
+			pv.push_back(line.getImage());
+			pv.push_back(line.getShortName());
 			
-			InterfacePage::_display(stream, pv, vars, static_cast<const void*>(line), request);
+			InterfacePage::_display(stream, pv, vars, static_cast<const void*>(&line), request);
 		}
 
 

@@ -167,7 +167,7 @@ namespace synthese
 			CalendarTemplateTableSync::Search(env);
 			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, env.getRegistry<CalendarTemplate>())
 			{
-				AdminInterfaceElement::PageLink link;
+				AdminInterfaceElement::PageLink link(getPageLink());
 				link.factoryKey = CalendarTemplateAdmin::FACTORY_KEY;
 				link.icon = CalendarTemplateAdmin::ICON;
 				link.name = ct->getText();

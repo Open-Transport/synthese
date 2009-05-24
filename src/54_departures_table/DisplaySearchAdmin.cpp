@@ -196,7 +196,7 @@ namespace synthese
 				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 				if(_place)
 				{
-					createDisplayRequest.getAction()->setPlace((*_place)->getKey());
+					createDisplayRequest.getAction()->setPlace(_place->get() ? (*_place)->getKey() : 0);
 				}
 				createDisplayRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 
@@ -434,9 +434,7 @@ namespace synthese
 					v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
 				}
 				v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
-				v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
 				v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
-				v.push_back(make_pair(string(), "Actions"));
 				v.push_back(make_pair(string(), "Actions"));
 
 				ActionResultHTMLTable t(
@@ -475,6 +473,8 @@ namespace synthese
 							;
 					}
 					stream << t.col() << cpu->getName();
+
+					stream << t.col();
 					
 					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
 					

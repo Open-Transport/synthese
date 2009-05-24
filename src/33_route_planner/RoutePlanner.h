@@ -151,9 +151,9 @@ namespace synthese
 
 
 			/** Best journey finder.
+				@param accessDirection Type of computing : search of better arrival or of a better departure
 				@param ovam Vertex access map containing each departure physical stops.
 				@param dvam Vertex access map containing each destination stops.
-				@param accessDirection Type of computing : search of better arrival or of a better departure
 				@param currentJourney Journey conducting to the departure vam
 				@param sctrictTime Filter : 
 					- true : solutions starting at the vam time are only selected
@@ -163,6 +163,7 @@ namespace synthese
 					- false :solutions allowing a time saving are only selected
 			*/
 			void findBestJourney(
+				graph::AccessDirection accessDirection,
 				graph::Journey& result
 				, const graph::VertexAccessMap& startVam
 				, const graph::VertexAccessMap& endVam

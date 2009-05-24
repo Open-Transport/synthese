@@ -34,6 +34,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -91,7 +92,7 @@ namespace synthese
 			object->setName(rows->getText ( DisplayTypeTableSync::COL_NAME));
 			object->setRowNumber(rows->getInt ( DisplayTypeTableSync::COL_ROWS_NUMBER));
 			object->setMaxStopsNumber(rows->getInt ( DisplayTypeTableSync::COL_MAX_STOPS_NUMBER));
-			object->setTimeBetweenChecks(rows->getInt(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS));
+			object->setTimeBetweenChecks(minutes(rows->getInt(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS)));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -160,7 +161,7 @@ namespace synthese
 				<< "," << ((object->getMonitoringInterface() != NULL) ? Conversion::ToString(object->getMonitoringInterface()->getKey()) : "0")
 				<< "," << Conversion::ToString(object->getRowNumber())
 				<< "," << Conversion::ToString(object->getMaxStopsNumber())
-				<< "," << Conversion::ToString(object->getTimeBetweenChecks())
+				<< "," << object->getTimeBetweenChecks().minutes()
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}

@@ -1,6 +1,6 @@
 
-/** UpdateDisplayTypeAction class header.
-	@file UpdateDisplayTypeAction.h
+/** DisplayScreenCPUMaintenanceUpdateAction class header.
+	@file DisplayScreenCPUCreateAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,49 +20,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_UpdateDisplayTypeAction_H__
-#define SYNTHESE_UpdateDisplayTypeAction_H__
+#ifndef SYNTHESE_DisplayScreenCPUMaintenanceUpdateAction_H__
+#define SYNTHESE_DisplayScreenCPUMaintenanceUpdateAction_H__
 
-#include "UId.h"
-#include "FactorableTemplate.h"
 #include "Action.h"
+#include "FactorableTemplate.h"
+
+#include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace synthese
 {
-	namespace interfaces
-	{
-		class Interface;
-	}
-
 	namespace departurestable
 	{
-		class DisplayType;
+		class DisplayScreenCPU;
 
-		/** UpdateDisplayTypeAction action class.
+		/** Display screen maintenance update action class.
 			@ingroup m54Actions refActions
 		*/
-		class UpdateDisplayTypeAction : public util::FactorableTemplate<server::Action, UpdateDisplayTypeAction>
+		class DisplayScreenCPUMaintenanceUpdateAction :
+			public util::FactorableTemplate<server::Action, DisplayScreenCPUMaintenanceUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_ID;
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_INTERFACE_ID;
-			static const std::string PARAMETER_AUDIO_INTERFACE_ID;
-			static const std::string PARAMETER_MONITORING_INTERFACE_ID;
-			static const std::string PARAMETER_ROWS_NUMBER;
-			static const std::string PARAMETER_MAX_STOPS_NUMBER;
-			static const std::string PARAMETER_TIME_BETWEEN_CHECKS;
+			static const std::string PARAMETER_CPU;
+			static const std::string PARAMETER_IS_ONLINE;
+			static const std::string PARAMETER_MAINTENANCE_MESSAGE;
+			static const std::string PARAMETER_MONITORING_DELAY;
 
 		private:
-			boost::shared_ptr<DisplayType> _dt;
-			std::string _name;
-			boost::shared_ptr<const interfaces::Interface>	_interface;
-			boost::shared_ptr<const interfaces::Interface>	_monitoringInterface;
-			boost::shared_ptr<const interfaces::Interface>	_audioInterface;
-			int	_rows_number;
-			int	_max_stops_number;
-			boost::posix_time::time_duration	_timeBetweenChecks;
+			boost::shared_ptr<DisplayScreenCPU>		_cpu;
+			bool									_isOnline;
+			std::string								_maintenanceMessage;
+			boost::posix_time::time_duration		_monitoringDelay;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -79,12 +68,11 @@ namespace synthese
 			*/
 			void run();
 
-
-			void setTypeId(util::RegistryKeyType id);
+			void setCPU(util::RegistryKeyType id);
 
 			virtual bool _isAuthorized() const;
 		};
 	}
 }
 
-#endif // SYNTHESE_UpdateDisplayTypeAction_H__
+#endif 

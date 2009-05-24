@@ -26,7 +26,9 @@
 #include "DisplayMonitoringStatusTableSync.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayScreen.h"
+#include "DisplayScreenCPU.h"
 #include "DisplayScreenTableSync.h"
+#include "DisplayScreenCPUTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -35,16 +37,17 @@
 #include "DisplayMaintenanceLog.h"
 
 #include <sstream>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace departurestable;
-	using namespace time;
 
 	namespace util
 	{
@@ -117,7 +120,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			object->setTime(DateTime::FromSQLTimestamp(rows->getText(DisplayMonitoringStatusTableSync::COL_TIME)));
+			object->setTime(rows->getTimestamp(DisplayMonitoringStatusTableSync::COL_TIME));
 			object->setGeneralStatus(static_cast<DisplayMonitoringStatus::Status>(rows->getInt(DisplayMonitoringStatusTableSync::COL_GENERAL_STATUS)));
 			object->setMemoryStatus(static_cast<DisplayMonitoringStatus::Status>(rows->getInt(DisplayMonitoringStatusTableSync::COL_MEMORY_STATUS)));
 			object->setClockStatus(static_cast<DisplayMonitoringStatus::Status>(rows->getInt(DisplayMonitoringStatusTableSync::COL_CLOCK_STATUS)));
@@ -136,13 +139,25 @@ namespace synthese
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				RegistryKeyType id(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID));
 				try
 				{
-					object->setScreen(DisplayScreenTableSync::Get(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID), env, linkLevel).get());
+					if(decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
+					{
+						object->setScreen(DisplayScreenTableSync::Get(id, env, linkLevel).get());
+					}
+					else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
+					{
+						object->setCPU(DisplayScreenCPUTableSync::Get(id, env, linkLevel).get());
+					}
+					else
+					{
+						Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : "+ Conversion::ToString(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
+					}
 				}
 				catch (ObjectNotFoundException<DisplayScreen>&)
 				{
-					Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ Conversion::ToString(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
+					Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : "+ Conversion::ToString(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
 				}
 			}
 		}
@@ -159,9 +174,12 @@ namespace synthese
                
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey()) << ","
-				<< ((object->getScreen() == NULL) ? "0" : Conversion::ToString(object->getScreen()->getKey())) << ","
-				<< object->getTime().toSQLString() << ","
+				<< Conversion::ToString(object->getKey()) << "," <<
+				(	(object->getScreen() == NULL) ? 
+					(object->getCPU() == NULL ? "0" : lexical_cast<string>(object->getCPU()->getKey())) : 
+					lexical_cast<string>(object->getScreen()->getKey())
+				) << "," <<
+				"'" << to_iso_string(object->getTime()) << "',"
 				<< static_cast<int>(object->getGeneralStatus()) << ","
 				<< static_cast<int>(object->getMemoryStatus()) << ","
 				<< static_cast<int>(object->getClockStatus()) << ","
@@ -247,10 +265,32 @@ namespace synthese
 			shared_ptr<DisplayMonitoringStatus> status(env.getEditableRegistry<DisplayMonitoringStatus>().front());
 			if(screen.isDown(*status))
 			{
-				DisplayMaintenanceLog::AddMonitorDownEntry(screen);
+				DisplayMaintenanceLog::AddMonitoringDownEntry(screen);
 			}
 
 			return status;
+		}
+
+
+
+		boost::posix_time::ptime DisplayMonitoringStatusTableSync::GetLastContact(
+			const DisplayScreenCPU& cpu
+		){
+			Env env;
+			Search(env, cpu.getKey(), 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL);
+
+			if(env.getRegistry<DisplayMonitoringStatus>().empty())
+			{
+				return not_a_date_time;
+			}
+
+			shared_ptr<DisplayMonitoringStatus> status(env.getEditableRegistry<DisplayMonitoringStatus>().front());
+			if(cpu.isDown(status->getTime()))
+			{
+				DisplayMaintenanceLog::AddMonitoringDownEntry(cpu);
+			}
+
+			return status->getTime();
 		}
 	}
 }

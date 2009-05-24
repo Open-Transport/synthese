@@ -27,7 +27,9 @@
 #include "DisplayMaintenanceRight.h"
 #include "Request.h"
 #include "DisplayScreen.h"
+#include "DisplayScreenCPU.h"
 #include "DisplayScreenTableSync.h"
+#include "DisplayScreenCPUTableSync.h"
 #include "DisplayMonitoringStatus.h"
 #include "Conversion.h"
 
@@ -35,6 +37,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -95,6 +98,20 @@ namespace synthese
 			DBLog::_addEntry(FACTORY_KEY, level, c, &user, screen.getKey());
 		}
 
+		void DisplayMaintenanceLog::AddAdminEntry( const DisplayScreenCPU& cpu , const security::User& user , const std::string& field , const std::string& oldValue , const std::string& newValue , const dblog::DBLogEntry::Level level /*= dblog::DBLogEntry::DB_LOG_INFO */ )
+		{
+			if (oldValue == newValue)
+				return;
+
+			DBLogEntry::Content c;
+			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MAINTENANCE_ADMIN)));
+			c.push_back(field);
+			c.push_back(oldValue + " => " + newValue);
+			DBLog::_addEntry(FACTORY_KEY, level, c, &user, cpu.getKey());
+		}
+
+
+
 		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry& cols ) const
 		{
 			ColumnsVector v;
@@ -117,13 +134,22 @@ namespace synthese
 			return v;
 		}
 
+
+
 		std::string DisplayMaintenanceLog::getObjectName( uid id ) const
 		{
-			// Screen
 			try
 			{
-				shared_ptr<const DisplayScreen> screen = DisplayScreenTableSync::Get(id, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
-				return screen->getFullName();
+				if(decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
+				{
+					shared_ptr<const DisplayScreen> screen = DisplayScreenTableSync::Get(id, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
+					return screen->getFullName();
+				}
+				else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
+				{
+					shared_ptr<const DisplayScreenCPU> cpu = DisplayScreenCPUTableSync::Get(id, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
+					return cpu->getFullName();
+				}
 			}
 			catch (...)
 			{
@@ -131,6 +157,8 @@ namespace synthese
 			}
 
 		}
+
+
 
 		std::string DisplayMaintenanceLog::getName() const
 		{
@@ -178,12 +206,12 @@ namespace synthese
 
 		void DisplayMaintenanceLog::AddMonitoringUpEntry(
 			const DisplayScreen& screen,
-			const DateTime& downTime
+			const ptime& downTime
 		){
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_UP)));
 			c.push_back(string());
-			c.push_back("Etait perdu depuis " + downTime.toString());
+			c.push_back("Etait perdu depuis " + to_simple_string(downTime));
 
 			DBLog::_addEntry(
 				FACTORY_KEY,
@@ -194,9 +222,27 @@ namespace synthese
 			);
 		}
 
+		void DisplayMaintenanceLog::AddMonitoringUpEntry(
+			const DisplayScreenCPU& cpu,
+			const ptime& downTime )
+		{
+			DBLogEntry::Content c;
+			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_UP)));
+			c.push_back(string());
+			c.push_back("Etait perdu depuis " + to_simple_string(downTime));
+
+			DBLog::_addEntry(
+				FACTORY_KEY,
+				DBLogEntry::DB_LOG_INFO,
+				c,
+				NULL,
+				cpu.getKey()
+			);
+		}
 
 
-		void DisplayMaintenanceLog::AddMonitorDownEntry(
+
+		void DisplayMaintenanceLog::AddMonitoringDownEntry(
 			const DisplayScreen& screen
 		){
 			// Control last entry : if already a down entry, do not reyrite any identical entry
@@ -272,6 +318,47 @@ namespace synthese
 					screen.getKey()
 				);
 			}
+		}
+
+		void DisplayMaintenanceLog::AddMonitoringFirstEntry( const DisplayScreenCPU& cpu, const DisplayMonitoringStatus& value )
+		{
+			DBLogEntry::Content c;
+			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_UP)));
+			c.push_back(string());
+			c.push_back("Premier contact");
+
+			DBLog::_addEntry(
+				FACTORY_KEY,
+				DBLogEntry::DB_LOG_INFO,
+				c,
+				NULL,
+				cpu.getKey()
+			);
+		}
+
+		void DisplayMaintenanceLog::AddMonitoringDownEntry( const DisplayScreenCPU& cpu )
+		{
+			// Control last entry : if already a down entry, do not rewrite any identical entry
+			shared_ptr<const DBLogEntry> lastEntry(DBLog::_getLastEntry(FACTORY_KEY, cpu.getKey()));
+			if(	lastEntry.get() == NULL ||
+				lastEntry->getContent()[0] == Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_DOWN))
+			){
+				return;
+			}
+
+			// Write the entry
+			DBLogEntry::Content c;
+			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_DOWN)));
+			c.push_back(string());
+			c.push_back(string());
+
+			DBLog::_addEntry(
+				FACTORY_KEY,
+				DBLogEntry::DB_LOG_ERROR,
+				c,
+				NULL,
+				cpu.getKey()
+			);
 		}
 	}
 }

@@ -36,6 +36,7 @@
 
 // Boost
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace synthese
 {
@@ -43,6 +44,7 @@ namespace synthese
 	{
 		class DisplayMonitoringStatus;
 		class DisplayScreen;
+		class DisplayScreenCPU;
 
 		////////////////////////////////////////////////////////////////////////
 		/// DisplayMonitoringStatus table synchronizer class.
@@ -110,6 +112,23 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			static boost::shared_ptr<DisplayMonitoringStatus> GetStatus(
 				const DisplayScreen& screen
+			);
+
+
+
+			////////////////////////////////////////////////////////////////////
+			///	Gets the last contact time of a screen CPU.
+			///	@param cpu the cpu to read
+			///	@return time of the last contact with the CPU
+			///	@author Hugues Romain
+			///	@date 2009
+			///	If the cpu has never sent monitoring messages, then a
+			///	not_a_date_time value is returned (no exception)
+			/// Writes a log if the cpu is down according to the delay
+			/// between checks
+			////////////////////////////////////////////////////////////////////
+			static boost::posix_time::ptime GetLastContact(
+				const DisplayScreenCPU& cpu
 			);
 		};
 	}

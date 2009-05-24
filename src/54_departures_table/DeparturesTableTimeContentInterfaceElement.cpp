@@ -25,7 +25,6 @@
 #include "DateTime.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
-#include "LineMarkerInterfacePage.h"
 #include "DeparturesTableTypes.h"
 #include "DeparturesTableTimeContentInterfaceElement.h"
 #include "DepartureTableRowInterfacePage.h"

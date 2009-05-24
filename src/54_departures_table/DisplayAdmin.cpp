@@ -163,7 +163,7 @@ namespace synthese
 						);
 					}
 				}
-							}
+			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
 				throw AdminParametersException("Display screen not found");
@@ -403,7 +403,7 @@ namespace synthese
 				if(_status.get() != NULL)
 				{
 					DisplayMonitoringStatus::Status globalStatus(_status->getGlobalStatus());
-					stream << l.element() << "Dernière mesure le " << _status->getTime().toString();
+					stream << l.element() << "Dernière mesure le " << to_simple_string(_status->getTime());
 					stream << l.element() << "Dernier état mesuré : " <<
 						HTMLModule::getHTMLImage(
 							DisplayMonitoringStatus::GetStatusIcon(globalStatus),
@@ -959,8 +959,9 @@ namespace synthese
 				_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writeRight, "cog.png"));
 			}
 
-			if (_request->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
-			{
+			if(	_displayScreen->getLocalization() &&
+				_request->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()))
+			){
 				bool writeRight(_request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
 				_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writeRight, "wrench.png"));
 			}

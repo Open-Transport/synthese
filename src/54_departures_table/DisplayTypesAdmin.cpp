@@ -174,7 +174,7 @@ namespace synthese
 				
 				stream << t.col();
 				if(	dt->getMonitoringInterface() != NULL &&
-					dt->getTimeBetweenChecks() > 0
+					dt->getTimeBetweenChecks().minutes() > 0
 				){
 					stream << dt->getMonitoringInterface()->getName();
 				} else {

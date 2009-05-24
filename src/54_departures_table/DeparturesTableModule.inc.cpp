@@ -58,6 +58,7 @@
 #include "DisplayScreenAddDisplayedPlace.h"
 #include "DisplayScreenCPUCreateAction.h"
 #include "DisplayScreenCPUUpdateAction.h"
+#include "DisplayScreenCPUMaintenanceUpdateAction.h"
 
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayMaintenanceRight.h"

@@ -53,6 +53,10 @@ namespace synthese
 		/// </displayScreens>
 		/// @endcode
 		///
+		/// This function is also in charge of keeping the contact between the 
+		/// cpu and the server. It writes a fake monitoring entry in the database
+		/// indicating that the cpu is still alive.
+		///
 		class CPUGetWiredScreensFunction
 			:	public util::FactorableTemplate<server::Function, CPUGetWiredScreensFunction>
 		{
@@ -103,6 +107,9 @@ namespace synthese
 
 
 			virtual std::string getOutputMimeType() const;
+
+			void setCPU(util::RegistryKeyType id);
+			void setCPU(const std::string& mac);
 		};
 	}
 }

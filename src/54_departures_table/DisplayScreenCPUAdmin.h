@@ -44,7 +44,9 @@ namespace synthese
 		:	public admin::AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>
 		{
 			boost::shared_ptr<const DisplayScreenCPU>	_cpu;
-			dblog::DBLogHTMLView								_generalLogView;
+			dblog::DBLogHTMLView						_generalLogView;
+			dblog::DBLogHTMLView						_maintenanceLogView;
+			boost::posix_time::ptime					_lastContact;
 
 		public:
 			static const std::string TAB_TECHNICAL;

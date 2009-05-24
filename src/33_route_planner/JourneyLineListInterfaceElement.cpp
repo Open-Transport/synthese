@@ -79,7 +79,7 @@ namespace synthese
 						, _rowEndHtml->getValue(parameters, variables, object, request)
 						, Conversion::ToInt(_pixelWidth->getValue(parameters, variables, object, request))
 						, Conversion::ToInt(_pixelHeight->getValue(parameters, variables, object, request))
-						, static_cast<const Line*>(leg.getService()->getPath ())->getCommercialLine()
+						, *static_cast<const Line*>(leg.getService()->getPath ())->getCommercialLine()
 						, request
 					);
 				}

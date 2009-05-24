@@ -95,8 +95,8 @@ namespace synthese
 			pv.push_back( commercialLine->getShortName() ); // 12
 			pv.push_back( commercialLine->getLongName() ); // 13
 			pv.push_back( continuousService ? Conversion::ToString(continuousService->getMaxWaitingTime()) : string() ); // 14
-			pv.push_back( string() );
-			pv.push_back( string() );
+			pv.push_back( commercialLine->getStyle() ); //15
+			pv.push_back( commercialLine->getImage() );
 			pv.push_back( string() );
 			pv.push_back( string() );	//18
 			pv.push_back( alarm ? alarm->getLongMessage() : string());

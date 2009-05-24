@@ -27,16 +27,17 @@
 #define SYNTHESE_departurestable_DisplayMonitoringStatus_h__
 
 #include <string>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "DateTime.h"
 
 namespace synthese
 {
 	namespace departurestable
 	{
 		class DisplayScreen;
+		class DisplayScreenCPU;
 
 		////////////////////////////////////////////////////////////////////////
 		///	Display monitoring status class.
@@ -62,8 +63,9 @@ namespace synthese
 			
 		protected:
 			// Attributes
-			const DisplayScreen*	_displayScreen;
-			time::DateTime			_time;
+			const DisplayScreen*		_displayScreen;
+			const DisplayScreenCPU*		_cpu;
+			boost::posix_time::ptime	_time;
 			Status					_generalStatus;
 			Status					_memoryStatus;
 			Status					_clockStatus;
@@ -119,6 +121,24 @@ namespace synthese
 			);
 
 
+
+			////////////////////////////////////////////////////////////////////
+			///	Constructor for a CPU status.
+			/// @param cpu the monitored display screen CPU
+			///	@author Hugues Romain
+			///	@date 2009
+			///
+			///	The time of the monitoring status is initialized at the current
+			/// time at the object construction.
+			///
+			/// A display screen CPU is not properly monitored. The status
+			/// is only used to show the last contact time.
+			////////////////////////////////////////////////////////////////////
+			DisplayMonitoringStatus(
+				const DisplayScreenCPU* cpu
+			);
+
+
 			
 			////////////////////////////////////////////////////////////////////
 			///	DisplayMonitoringStatus Destructor.
@@ -143,8 +163,9 @@ namespace synthese
 				double				getTemperatureValue()		const;
 				Status				getCommunicationStatus()	const;
 				Status				getLocalizationStatus()		const;
-				const time::DateTime	getTime()				const;
+				const boost::posix_time::ptime&	 getTime()		const;
 				const DisplayScreen*	getScreen()				const;
+				const DisplayScreenCPU*	getCPU()				const;
 			//@}
 			
 			//! @name Setters
@@ -163,9 +184,10 @@ namespace synthese
 				void	setTemperatureStatus(Status value);
 				void	setTemperatureValue(double value);
 				void	setCommunicationStatus(Status value);
-				void	setTime(const time::DateTime& value);
+				void	setTime(const boost::posix_time::ptime& value);
 				void	setLocalizationStatus(Status value);
 				void	setScreen(const DisplayScreen* value);
+				void	setCPU(const DisplayScreenCPU* value);
 			//@}
 			
 			//! @name Queries

@@ -121,6 +121,7 @@ namespace synthese
 
 		void CreateDisplayScreenAction::setPlace(RegistryKeyType id)
 		{
+			if(id <= 0) return;
 			try
 			{
 				_place = ConnectionPlaceTableSync::Get(id, _env);
@@ -135,11 +136,16 @@ namespace synthese
 
 		bool CreateDisplayScreenAction::_isAuthorized(
 		) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey()));
+			return
+				_place.get() ?
+				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
+				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE)
+			;
 		}
 
 		void CreateDisplayScreenAction::setCPU( util::RegistryKeyType id )
 		{
+			if(id <= 0) return;
 			try
 			{
 				_cpu = DisplayScreenCPUTableSync::Get(id, _env);

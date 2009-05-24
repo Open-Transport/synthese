@@ -23,6 +23,8 @@
 #include "DisplayType.h"
 #include "Registry.h"
 
+using namespace boost::posix_time;
+
 namespace synthese
 {
 	using namespace interfaces;
@@ -58,7 +60,7 @@ namespace synthese
 			_displayInterface(NULL),
 			_audioInterface(NULL),
 			_monitoringInterface(NULL),
-			_timeBetweenChecks(1),
+			_timeBetweenChecks(minutes(1)),
 			_rowNumber(1),
 			_maxStopsNumber(UNKNOWN_VALUE)
 		{
@@ -126,14 +128,14 @@ namespace synthese
 
 
 		void DisplayType::setTimeBetweenChecks(
-			int value
-		) {
+			const time_duration& value
+		){
 			_timeBetweenChecks = value;
 		}
 
 
 
-		int DisplayType::getTimeBetweenChecks(
+		const time_duration& DisplayType::getTimeBetweenChecks(
 		) const {
 			return _timeBetweenChecks;
 		}

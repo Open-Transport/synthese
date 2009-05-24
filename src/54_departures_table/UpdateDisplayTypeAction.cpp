@@ -38,6 +38,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -128,8 +130,8 @@ namespace synthese
 				}
 
 				// Time between checks
-				_timeBetweenChecks = map.getInt(PARAMETER_TIME_BETWEEN_CHECKS, true, FACTORY_KEY);
-				if (_timeBetweenChecks < 0)
+				_timeBetweenChecks = minutes(map.getInt(PARAMETER_TIME_BETWEEN_CHECKS, true, FACTORY_KEY));
+				if (_timeBetweenChecks.minutes() < 0)
 				{
 					throw ActionException("La durée entre les tests de supervision doit être positive.");
 				}
@@ -150,7 +152,7 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(log, "Interface audio", (_dt->getAudioInterface() != NULL) ? _dt->getAudioInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
 			DBLogModule::appendToLogIfChange(log, "Nombre de lignes", _dt->getRowNumber(), _rows_number);
 			DBLogModule::appendToLogIfChange(log, "Nombre d'arrêts intermédiaires", _dt->getMaxStopsNumber(), _max_stops_number);
-			DBLogModule::appendToLogIfChange(log, "Temps entre les contrôles de supervision", _dt->getTimeBetweenChecks(), _timeBetweenChecks);
+			DBLogModule::appendToLogIfChange(log, "Temps entre les contrôles de supervision", to_simple_string(_dt->getTimeBetweenChecks()), to_simple_string(_timeBetweenChecks));
 
 			// Update
 			_dt->setName(_name);

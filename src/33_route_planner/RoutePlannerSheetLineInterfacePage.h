@@ -23,15 +23,14 @@
 #ifndef SYNTHESE_RoutePlannerSheetLineInterfacePage_H__
 #define SYNTHESE_RoutePlannerSheetLineInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
 	namespace geography
 	{
-		class Place;
+		class NamedPlace;
 	}
 
 	namespace server
@@ -54,6 +53,9 @@ namespace synthese
 					- true/1 = even
 				- 2 : 0|1 is origin row
 				- 3 : 0|1 is destination row
+				- 4 : Place name
+
+			Object: the place
 		*/
 		class RoutePlannerSheetLineInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLineInterfacePage>
 		{
@@ -76,7 +78,7 @@ namespace synthese
 				, bool isOrigin
 				, bool isDestination
 				, interfaces::VariablesMap& variables
-				, const geography::Place* place
+				, const geography::NamedPlace& place
 				, const server::Request* request = NULL
 			) const;
 

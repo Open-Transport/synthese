@@ -38,6 +38,7 @@
 #include "ActionResultHTMLTable.h"
 #include "InterfaceTableSync.h"
 #include "UpdateDisplayPreselectionParametersAction.h"
+#include "CPUGetWiredScreensFunction.h"
 
 #include <boost/foreach.hpp>
 
@@ -83,23 +84,44 @@ namespace synthese
 			DisplayScreenCPUTableSync::Search(_env);
 			
 			FunctionRequest<DisplayScreenContentRequest> r(_request);
+			FunctionRequest<CPUGetWiredScreensFunction> r2(_request);
+			ptime t0(microsec_clock::local_time());
+			time_duration duration;
 			BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, _env.getRegistry<DisplayScreen>())
 			{
 				stringstream s;
-				ptime t1(microsec_clock::local_time());
 				r.getFunction()->setDisplay(screen->getKey());
 				r.run(s);
 				ptime t2(microsec_clock::local_time());
 				TestCase t;
 				t.method = DisplayScreenContentRequest::FACTORY_KEY;
 				t.screen = screen;
-				t.duration = t2 - t1;
+				t.duration = t2 - (t0 + duration);
 				t.size = s.str().size();
 				_testCases.push_back(t);
+				duration = t2 - t0;
 			}
 
 			BOOST_FOREACH(shared_ptr<const DisplayScreenCPU> cpu, _env.getRegistry<DisplayScreenCPU>())
 			{
+				stringstream s;
+				if(!cpu->getMacAddress().empty())
+				{
+					r2.getFunction()->setCPU(cpu->getMacAddress());
+				}
+				else
+				{
+					r2.getFunction()->setCPU(cpu->getKey());
+				}
+				r2.run(s);
+				ptime t2(microsec_clock::local_time());
+				TestCase t;
+				t.method = CPUGetWiredScreensFunction::FACTORY_KEY;
+				t.cpu = cpu;
+				t.duration = t2 - (t0 + duration);
+				t.size = s.str().size();
+				_testCases.push_back(t);
+				duration = t2 - t0;
 			}
 		}
 
@@ -121,6 +143,12 @@ namespace synthese
 
 			if(_doIt)
 			{
+				FunctionRequest<AdminRequest> reloadRequest(_request);
+				reloadRequest.getFunction()->setSamePage(this);
+				reloadRequest.getFunction()->setParameter(PARAMETER_DOIT, "1");
+
+				stream << "<h1>Résultats</h1>";
+
 				HTMLTable::ColsVector h;
 				h.push_back("N°");
 				h.push_back("Nature");
@@ -142,13 +170,19 @@ namespace synthese
 					if(testCase.method == DisplayScreenContentRequest::FACTORY_KEY)
 					{
 						stream << "Tableau de départs " << UpdateDisplayPreselectionParametersAction::GetFunctionList()[UpdateDisplayPreselectionParametersAction::GetFunction(*testCase.screen)];
+						stream << t.col();
+						stream << testCase.screen->getFullName();
 					}
-					stream << t.col();
-					stream << testCase.screen->getFullName();
+					if(testCase.method == CPUGetWiredScreensFunction::FACTORY_KEY)
+					{
+						stream << "Unité centrale ";
+						stream << t.col();
+						stream << testCase.cpu->getFullName();
+					}
 					stream << t.col();
 					stream << testCase.duration.total_microseconds() << " &micro;s";
 					stream << t.col();
-					stream << (static_cast<float>(testCase.size) / 1024) << " ko";
+					stream << setprecision(2) << fixed << (static_cast<float>(testCase.size) / 1024) << " ko";
 					total_duration += testCase.duration;
 					total_size += testCase.size;
 				}
@@ -156,9 +190,26 @@ namespace synthese
 				stream << t.row();
 				stream << t.col(3) << "TOTAL";
 				stream << t.col() << total_duration.total_milliseconds() << " ms";
-				stream << t.col() << (static_cast<float>(total_size) / 1024) << " ko";
+				stream << t.col() << setprecision(2) << fixed << (static_cast<float>(total_size) / 1024) << " ko";
+
+				if(rank > 1)
+				{
+					stream << t.row();
+					stream << t.col(3) << "MOYENNE PAR EQUIPEMENT";
+					stream << t.col() << total_duration.total_milliseconds() / (rank - 1) << " ms";
+					stream << t.col();
+				}
+
+				stream << t.row();
+				stream << t.col(3) << "Taux d'utilisation du serveur si une requête par minute";
+				stream << t.col() << setprecision(2) << fixed << (static_cast<float>(total_duration.total_milliseconds()) / 600) << " %";
+				stream << t.col();
+
 				stream << t.close();
 
+				stream << "<p>" << reloadRequest.getHTMLForm().getLinkButton("Relancer le benchmark", string(), ICON) << "</p>";
+
+				stream << "<h1>Informations</h1>";
 				stream << "<p class=\"info\">Les temps mesurés s'entendent hors requêtes de supervision.</p>";
 				stream << "<p class=\"info\">Les tailles mesurées s'entendent hors fichiers joints éventuels (images, etc.)</p>";
 			}

@@ -48,6 +48,7 @@ synthese::departurestable::DisplayScreenRemove::integrate();
 synthese::departurestable::DisplayScreenAppearanceUpdateAction::integrate();
 synthese::departurestable::DisplayScreenCPUCreateAction::integrate();
 synthese::departurestable::DisplayScreenCPUUpdateAction::integrate();
+synthese::departurestable::DisplayScreenCPUMaintenanceUpdateAction::integrate();
 
 synthese::departurestable::DisplayScreenContentRequest::integrate();
 synthese::departurestable::DisplayScreenSupervisionRequest::integrate();

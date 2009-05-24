@@ -109,8 +109,12 @@ namespace synthese
 
 
 		bool DisplayScreenCPUCreateAction::_isAuthorized(
-			) const {
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey()));
+		) const {
+			return
+				_place.get() ?
+				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
+				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE)
+			;
 		}
 	}
 }

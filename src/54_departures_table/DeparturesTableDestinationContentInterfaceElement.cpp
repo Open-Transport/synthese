@@ -28,7 +28,6 @@
 #include "PlainCharFilter.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
-#include "LineMarkerInterfacePage.h"
 #include "City.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "DeparturesTableTypes.h"

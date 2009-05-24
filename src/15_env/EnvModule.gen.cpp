@@ -5,11 +5,6 @@
 synthese::env::LineMarkerInterfacePage::integrate();
 synthese::env::ReservationRuleInterfacePage::integrate();
 
-synthese::env::LogicalStopNameValueInterfaceElement::integrate();
-synthese::env::LineStyleInterfaceElement::integrate();
-synthese::env::LineShortNameInterfaceElement::integrate();
-synthese::env::LineImageURLInterfaceElement::integrate();
-
 synthese::env::FareTableSync::integrate();
 synthese::env::ReservationContactTableSync::integrate();
 synthese::env::RollingStockTableSync::integrate();

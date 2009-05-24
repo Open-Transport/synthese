@@ -29,9 +29,9 @@
 
 namespace synthese
 {
-	namespace road
+	namespace env
 	{
-		class AddressablePlace;
+		class PhysicalStop;
 	}
 
 	namespace messages
@@ -54,6 +54,8 @@ namespace synthese
 				- 5 Odd or even color
 				- 6 Fist time
 				- 7 Last time (empty if continuous service)
+				- 8 WGS84 longitude
+				- 9 WGS84 latitude
 		*/
 		class JourneyBoardStopCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardStopCellInterfacePage>
 		{
@@ -74,10 +76,10 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, bool isItArrival
-				, const messages::SentAlarm* alarm
-				, bool isItTerminus
-				, const road::AddressablePlace* place
-				, bool color
+				, const messages::SentAlarm* alarm,
+				bool isItTerminus,
+				const env::PhysicalStop& physicalStop,
+				bool color
 				, const time::DateTime& time
 				, int continuousServiceRange
 				, const server::Request* request = NULL

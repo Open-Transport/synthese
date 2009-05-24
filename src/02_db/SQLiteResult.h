@@ -76,6 +76,8 @@ class SQLiteResult
     virtual boost::posix_time::ptime getTimestamp (int column) const;
     virtual boost::posix_time::ptime getTimestamp (const std::string& name) const;
 
+	boost::posix_time::time_duration getDuration(const std::string& name) const;
+
     virtual SQLiteResultRow getRow () const;
 
     std::vector<int> computeMaxColWidths () const;

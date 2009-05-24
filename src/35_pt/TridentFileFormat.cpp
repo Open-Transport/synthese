@@ -76,6 +76,7 @@
 
 // Boost
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -271,8 +272,7 @@ namespace synthese
 				os << "<objectId>" << TridentId (peerid, "StopArea", *ps) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << "\n";
 
-				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
-					ps->getConnectionPlace ()->getName ();
+				os << "<name>" << ps->getConnectionPlace ()->getName ();
 				if (!ps->getName().empty()) os << " (" + ps->getName () + ")";
 				os << "</name>" << "\n";
 
@@ -299,7 +299,7 @@ namespace synthese
 			{
 				os << "<StopArea>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopArea", *cp) << "</objectId>" << "\n";
-				os << "<name>" << cp->getCity ()->getName () << " " << cp->getName () << "</name>" << "\n";
+				os << "<name>" << cp->getName () << "</name>" << "\n";
 
 				// Contained physical stops
 				const PublicTransportStopZoneConnectionPlace::PhysicalStops& stops(cp->getPhysicalStops());
@@ -332,18 +332,18 @@ namespace synthese
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", *ps) << "</objectId>" << "\n";
 			    
 				Point2D pt (ps->getX (), ps->getY ());
-				GeoPoint gp = FromLambertIIe (pt);
+				GeoPoint gp = WGS84FromLambert(pt);
 			    
-				os << "<longitude>" << Conversion::ToString (gp.getLongitude ()) << "</longitude>" << "\n";
-				os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << "\n";
+				os << "<longitude>" << GetCoordinate(gp.getLongitude ()) << "</longitude>" << "\n";
+				os << "<latitude>" << GetCoordinate(gp.getLatitude ()) << "</latitude>" << "\n";
 				os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
 
 				// we do not provide full addresses right now.
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
 				os << "<projectedPoint>" << "\n";
-				os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << "\n";
-				os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << "\n";
+				os << "<X>" << GetCoordinate(pt.getX()) << "</X>" << "\n";
+				os << "<Y>" << GetCoordinate(pt.getY()) << "</Y>" << "\n";
 				os << "<projectionType>" << "LambertIIe" << "</projectionType>" << "\n";
 				os << "</projectedPoint>" << "\n";
 
@@ -530,17 +530,17 @@ namespace synthese
 				os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << "\n";
 
 				Point2D pt (ps->getX (), ps->getY ());
-				GeoPoint gp = FromLambertIIe (pt);
+				GeoPoint gp = WGS84FromLambert(pt);
 				
-				os << "<longitude>" << Conversion::ToString (gp.getLongitude ()) << "</longitude>" << "\n";
-				os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << "\n";
+				os << "<longitude>" << GetCoordinate(gp.getLongitude()) << "</longitude>" << "\n";
+				os << "<latitude>" << GetCoordinate(gp.getLatitude()) << "</latitude>" << "\n";
 				os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
 				
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
 				os << "<projectedPoint>" << "\n";
-				os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << "\n";
-				os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << "\n";
+				os << "<X>" << GetCoordinate(pt.getX()) << "</X>" << "\n";
+				os << "<Y>" << GetCoordinate(pt.getY()) << "</Y>" << "\n";
 				os << "<projectionType>" << "LambertIIe" << "</projectionType>" << "\n";
 				os << "</projectedPoint>" << "\n";
 
@@ -1333,6 +1333,14 @@ namespace synthese
 		TridentFileFormat::~TridentFileFormat()
 		{
 
+		}
+
+		std::string TridentFileFormat::GetCoordinate( const double value )
+		{
+			return
+				(value > 0) ?
+				lexical_cast<string>(value) :
+				string();
 		}
 	}
 }

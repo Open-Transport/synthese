@@ -33,6 +33,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -64,7 +65,8 @@ namespace synthese
 			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_displayScreen(NULL),
-			_time(TIME_CURRENT)
+			_cpu(NULL),
+			_time(second_clock::local_time())
 		{
 
 		}
@@ -88,7 +90,8 @@ namespace synthese
 			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_displayScreen(screen),
-			_time(TIME_CURRENT)
+			_cpu(NULL),
+			_time(second_clock::local_time())
 		{
 			typedef tokenizer<char_separator<char> > tokenizer;
 			char_separator<char> sep1 ("|","",keep_empty_tokens);
@@ -202,6 +205,27 @@ namespace synthese
 				_localizationStatus = (_displayScreen->getLocalization() != NULL) ?
 					DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR;
 			}
+		}
+
+		DisplayMonitoringStatus::DisplayMonitoringStatus(
+			const DisplayScreenCPU* cpu
+		):	Registrable(UNKNOWN_VALUE),
+			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
+			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
+			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
+			_eepromStatus(DISPLAY_MONITORING_UNKNOWN),
+			_tempSensorStatus(DISPLAY_MONITORING_UNKNOWN),
+			_lightStatus(DISPLAY_MONITORING_UNKNOWN),
+			_displayStatus(DISPLAY_MONITORING_UNKNOWN),
+			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
+			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
+			_temperatureValue(static_cast<double>(UNKNOWN_VALUE)),
+			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
+			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
+			_cpu(cpu),
+			_displayScreen(NULL),
+			_time(second_clock::local_time())
+		{
 		}
 
 
@@ -396,7 +420,7 @@ namespace synthese
 
 
 
-		const time::DateTime DisplayMonitoringStatus::getTime(
+		const ptime& DisplayMonitoringStatus::getTime(
 		) const {
 			return _time;
 		}
@@ -404,8 +428,8 @@ namespace synthese
 
 
 		void DisplayMonitoringStatus::setTime(
-		const time::DateTime& value
-			) {
+		const ptime& value
+		) {
 			_time = value;
 		}
 
@@ -618,6 +642,16 @@ namespace synthese
 			}
 			assert(false);
 			return string();
+		}
+
+		const DisplayScreenCPU* DisplayMonitoringStatus::getCPU() const
+		{
+			return _cpu;
+		}
+
+		void DisplayMonitoringStatus::setCPU( const DisplayScreenCPU* value )
+		{
+			_cpu = value;
 		}
 	}
 }

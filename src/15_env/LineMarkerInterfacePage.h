@@ -48,6 +48,9 @@ namespace synthese
 				- 1 : table closing HTML code
 				- 2 : width of the marker (pixels)
 				- 3 : height of the marker (pixels)
+				- 4 : line style name
+				- 5 : line picto image url
+				- 6 : line short name
 
 			Object : CommercialLine
 		*/
@@ -73,7 +76,7 @@ namespace synthese
 				, const std::string& tableClosingHTML
 				, int pixelWidth
 				, int pixelHeight
-				, const env::CommercialLine* commercialLine
+				, const env::CommercialLine& commercialLine
 				, const server::Request* request = NULL
 			) const;
 

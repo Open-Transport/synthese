@@ -68,8 +68,8 @@ namespace synthese
 				- 12 : Line short name
 				- 13 : Line full description
 				- 14 : Waiting duration
-				- 15 : (nothing)
-				- 16 : (nothing)
+				- 15 : Line style
+				- 16 : Line picto url
 				- 17 : (nothing)
 				- 18 : (nothing)
 				- 19 : Alarm message

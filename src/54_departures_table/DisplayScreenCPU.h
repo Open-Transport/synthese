@@ -31,6 +31,7 @@
 
 #include <string>
 #include <set>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace synthese
 {
@@ -63,7 +64,7 @@ namespace synthese
 			std::string											_name;
 			const env::PublicTransportStopZoneConnectionPlace*	_place;
 			std::string											_mac_address;
-			int													_monitoring_delay;
+			boost::posix_time::time_duration					_monitoring_delay;
 			bool												_is_online;
 			std::string											_maintenance_message;
 
@@ -90,7 +91,7 @@ namespace synthese
 				const std::string&									getName()				const;
 				const env::PublicTransportStopZoneConnectionPlace*	getPlace()				const;
 				const std::string&									getMacAddress()			const;
-				int													getMonitoringDelay()	const;
+				boost::posix_time::time_duration					getMonitoringDelay()	const;
 				bool												getIsOnline()			const;
 				const std::string&									getMaintenanceMessage()	const;
 				const WiredScreens&									getWiredScreens()		const;
@@ -101,7 +102,7 @@ namespace synthese
 				void setName(const std::string& value);
 				void setPlace(const env::PublicTransportStopZoneConnectionPlace* const value);
 				void setMacAddress(const std::string& value);
-				void setMonitoringDelay(const int value);
+				void setMonitoringDelay(const boost::posix_time::time_duration value);
 				void setIsOnline(const bool value);
 				void setMaintenanceMessage(const std::string& value);
 				void addWiredScreen(const DisplayScreen* value);
@@ -111,6 +112,16 @@ namespace synthese
 			//! @name Queries
 			//@{
 				std::string getFullName() const;
+				bool isMonitored() const;
+
+				/** Analyzes a monitoring status to determinate if the cpu is down or up.
+					@param status Status to read
+					@return true if the status is too old for the cpu
+					If the screen is not monitored for any reason, then the method always returns false.
+					@warning This method checks only if the status is too old. It does not read the status itself.
+				*/
+				bool isDown(const boost::posix_time::ptime& status) const;
+
 			//@}
 			
 			//! @name Others

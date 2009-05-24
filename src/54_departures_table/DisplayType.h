@@ -29,6 +29,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace synthese
 {
@@ -64,7 +65,7 @@ namespace synthese
 			const interfaces::Interface*	_monitoringInterface;	//!< Interface used to parse monitoring outputs (see DisplayMonitoringStatus)
 			int								_rowNumber;
 			int								_maxStopsNumber;
-			int								_timeBetweenChecks;		//!< Time between monitoring checks (0 = no value)
+			boost::posix_time::time_duration	_timeBetweenChecks;		//!< Time between monitoring checks (0 = no value)
 
 		public:
 			
@@ -87,7 +88,7 @@ namespace synthese
 				const interfaces::Interface*	getMonitoringInterface()	const;
 				int								getRowNumber()				const;
 				int								getMaxStopsNumber()			const;
-				int								getTimeBetweenChecks()		const;
+				const boost::posix_time::time_duration&	getTimeBetweenChecks()		const;
 			//@}
 
 			//! @name Setters
@@ -98,7 +99,7 @@ namespace synthese
 				void setMonitoringInterface(const interfaces::Interface* value);
 				void setRowNumber(int number);
 				void setMaxStopsNumber(int number);
-				void setTimeBetweenChecks(int value);
+				void setTimeBetweenChecks(const boost::posix_time::time_duration& value);
 			//@}
 		};
 	}

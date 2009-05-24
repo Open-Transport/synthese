@@ -5,12 +5,6 @@
 #include "LineMarkerInterfacePage.h"
 #include "ReservationRuleInterfacePage.h"
 
-#include "LogicalStopNameValueInterfaceElement.h"
-#include "LineStyleInterfaceElement.h"
-#include "LineShortNameInterfaceElement.h"
-#include "LineImageURLInterfaceElement.h"
-#include "LogicalStopNameValueInterfaceElement.h"
-
 #include "LinesListFunction.cpp"
 
 #include "CommercialLineTableSync.h"

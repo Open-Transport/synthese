@@ -31,6 +31,9 @@
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "DisplayScreen.h"
+#include "DisplayMonitoringStatus.h"
+#include "DisplayMonitoringStatusTableSync.h"
+#include "DisplayMaintenanceLog.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -71,30 +74,46 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_CPU_ID, false, FACTORY_KEY));
 			if(id > 0)
 			{
-				try
-				{
-					_cpu = Env::GetOfficialEnv().getRegistry<DisplayScreenCPU>().get(id);
-				}
-				catch (...)
-				{
-					throw RequestException("Display screen CPU " + Conversion::ToString(id) + " not found");
-				}
+				setCPU(id);
 			}
 			else
 			{
 				string macAddress(map.getString(PARAMETER_CPU_MAC_ADDRESS, true, FACTORY_KEY));
-				DisplayScreenCPUTableSync::Search(_env, optional<RegistryKeyType>(), macAddress);
-				if(_env.getRegistry<DisplayScreenCPU>().empty())
-				{
-					throw RequestException("Display screen CPU MAC address "+ macAddress +" invalid.");
-				}
-				_cpu = Env::GetOfficialEnv().getRegistry<DisplayScreenCPU>().get(_env.getRegistry<DisplayScreenCPU>().getOrderedVector().front()->getKey());
+				setCPU(macAddress);
 			}
+
+			// Last monitoring status
+			DisplayMonitoringStatusTableSync::Search(_env, _cpu->getKey(), 0, 1, true, false);
 		}
 
 
 		void CPUGetWiredScreensFunction::_run( std::ostream& stream ) const
 		{
+			// Standard status object creation
+			DisplayMonitoringStatus status(_cpu.get());
+
+			// Last monitoring message
+			if (_env.getRegistry<DisplayMonitoringStatus>().empty())
+			{
+				// First contact
+				DisplayMaintenanceLog::AddMonitoringFirstEntry(*_cpu, status);
+			}
+			else
+			{
+				boost::shared_ptr<DisplayMonitoringStatus> lastStatus(_env.getEditableRegistry<DisplayMonitoringStatus>().front());
+				status.setKey(lastStatus->getKey());
+
+				// Up contact?
+				if (status.getTime() - lastStatus->getTime() > _cpu->getMonitoringDelay())
+				{
+					DisplayMaintenanceLog::AddMonitoringUpEntry(*_cpu, lastStatus->getTime());
+				}
+			}
+
+			// Saving
+			DisplayMonitoringStatusTableSync::Save(&status);
+
+			// Output generation
 			stream <<
 				"<?xml version='1.0' encoding='ISO-8859-15'?>\n" <<
 				"<" << DISPLAY_SCREENS_XML_TAG << ">\n";
@@ -120,6 +139,28 @@ namespace synthese
 		std::string CPUGetWiredScreensFunction::getOutputMimeType() const
 		{
 			return "text/xml";
+		}
+
+		void CPUGetWiredScreensFunction::setCPU( util::RegistryKeyType id )
+		{
+			try
+			{
+				_cpu = Env::GetOfficialEnv().getRegistry<DisplayScreenCPU>().get(id);
+			}
+			catch (...)
+			{
+				throw RequestException("Display screen CPU " + Conversion::ToString(id) + " not found");
+			}
+		}
+
+		void CPUGetWiredScreensFunction::setCPU( const std::string& macAddress )
+		{
+			DisplayScreenCPUTableSync::Search(_env, optional<RegistryKeyType>(), macAddress);
+			if(_env.getRegistry<DisplayScreenCPU>().empty())
+			{
+				throw RequestException("Display screen CPU MAC address "+ macAddress +" invalid.");
+			}
+			_cpu = Env::GetOfficialEnv().getRegistry<DisplayScreenCPU>().get(_env.getRegistry<DisplayScreenCPU>().getOrderedVector().front()->getKey());
 		}
 	}
 }

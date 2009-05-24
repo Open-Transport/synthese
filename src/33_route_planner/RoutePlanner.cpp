@@ -496,7 +496,7 @@ namespace synthese
 			_maxArrivalTime.addDaysDuration(7);	/// @todo Replace 7 by a parameter
 		    
 			// Look for best arrival
-			findBestJourney (result, ovam, dvam, _minDepartureTime, false, false);
+			findBestJourney(DEPARTURE_TO_ARRIVAL, result, ovam, dvam, _minDepartureTime, false, false);
 		    
 			if (result.empty() || result.getDepartureTime() > _journeySheetEndTime)
 			{
@@ -512,8 +512,7 @@ namespace synthese
 			result.reverse();
 		
 			// Look for best departure
-			// A revoir il faut surement faire currentJourney = result
-			findBestJourney (result, dvam, ovam, _maxArrivalTime, true, true);
+			findBestJourney(ARRIVAL_TO_DEPARTURE, result, dvam, ovam, _maxArrivalTime, true, true);
 
 			if (result.getDepartureTime() > _journeySheetEndTime)
 			{
@@ -571,14 +570,16 @@ namespace synthese
 // -------------------------------------------------------------------------- Recursion
 
 		void RoutePlanner::findBestJourney(
-			Journey& result
-			, const VertexAccessMap& startVam
-			, const VertexAccessMap& endVam
-			, const time::DateTime& startTime
-			, bool strictTime
-			, bool inverted
+			AccessDirection accessDirection,
+			Journey& result,
+			const VertexAccessMap& startVam,
+			const VertexAccessMap& endVam,
+			const time::DateTime& startTime,
+			bool strictTime,
+			bool inverted
 		){
-			const AccessDirection& accessDirection(result.getMethod());
+			assert(accessDirection != UNDEFINED_DIRECTION);
+			assert(result.getMethod() == UNDEFINED_DIRECTION || result.getMethod() == accessDirection);
 
 			JourneysResult<JourneyComparator> todo;
 			int integralSerachsNumber(1);

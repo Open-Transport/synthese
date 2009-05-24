@@ -30,11 +30,14 @@
 #include "DBLogEntry.h"
 #include "FactorableTemplate.h"
 
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+
 namespace synthese
 {
 	namespace departurestable
 	{
 		class DisplayScreen;
+		class DisplayScreenCPU;
 		class DisplayMonitoringStatus;
 
 		////////////////////////////////////////////////////////////////////
@@ -120,6 +123,31 @@ namespace synthese
 			);
 
 
+
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for administration console uses logging.
+			///	@param cpu The edited cpu
+			///	@param user User who has made the edition
+			///	@param field Edited field
+			///	@param oldValue Old value of a field
+			///	@param newValue New value of a field
+			///	@param level Level of the entry (default Info)
+			///	@author Hugues Romain
+			///	@date 2008
+			///
+			/// The log entry is created only if oldValue and newValue are
+			/// different.
+			////////////////////////////////////////////////////////////////////
+			static void	AddAdminEntry(
+				const DisplayScreenCPU& cpu
+				, const security::User& user
+				, const std::string& field
+				, const std::string& oldValue
+				, const std::string& newValue
+				, const dblog::DBLogEntry::Level level = dblog::DBLogEntry::DB_LOG_INFO
+			);
+
+
 			
 			////////////////////////////////////////////////////////////////////
 			///	Entry creator for status change.
@@ -156,7 +184,24 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			static void AddMonitoringUpEntry(
 				const DisplayScreen& screen,
-				const time::DateTime& downTime
+				const boost::posix_time::ptime& downTime
+			);
+
+
+			
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for monitoring contact up.
+			///	@param cpu The monitored cpu
+			///	@param downTime time of the contact down
+			///	@author Hugues Romain
+			///	@date 2008
+			/// Level : Info
+			/// User : none
+			/// Text : informations about duration of the contact loss period
+			////////////////////////////////////////////////////////////////////
+			static void AddMonitoringUpEntry(
+				const DisplayScreenCPU& cpu,
+				const boost::posix_time::ptime& downTime
 			);
 
 
@@ -174,6 +219,20 @@ namespace synthese
 			);
 
 
+			
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for the first monitoring check.
+			///	@param cpu The monitored cpu
+			///	@param value Status of the display screen
+			///	@author Hugues Romain
+			///	@date 2008
+			////////////////////////////////////////////////////////////////////
+			static void AddMonitoringFirstEntry(
+				const DisplayScreenCPU& cpu,
+				const DisplayMonitoringStatus& value
+			);
+
+
 
 			////////////////////////////////////////////////////////////////////
 			///	Entry creator for monitoring contact down.
@@ -184,8 +243,23 @@ namespace synthese
 			/// User : none
 			/// Text : nothing
 			////////////////////////////////////////////////////////////////////
-			static void AddMonitorDownEntry(
+			static void AddMonitoringDownEntry(
 				const DisplayScreen& screen
+			);
+
+
+
+			////////////////////////////////////////////////////////////////////
+			///	Entry creator for monitoring contact down.
+			///	@param cpu The monitored cpu
+			///	@author Hugues Romain
+			///	@date 2008
+			/// Level : Error
+			/// User : none
+			/// Text : nothing
+			////////////////////////////////////////////////////////////////////
+			static void AddMonitoringDownEntry(
+				const DisplayScreenCPU& cpu
 			);
 		};
 	}

@@ -87,6 +87,7 @@ namespace synthese
 			static std::string TridentId (const std::string& peer, const std::string clazz, const uid& id);
 			static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
 			static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
+			static std::string GetCoordinate(const double value);
 		};
 	}
 }

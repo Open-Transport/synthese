@@ -37,10 +37,12 @@
 #include "Crossing.h"
 #include "AddressablePlace.h"
 #include "Interface.h"
+#include "NamedPlace.h"
 
 #include "DateTime.h"
 
 #include <vector>
+#include <boost/foreach.hpp>
 
 using namespace boost;
 using namespace std;
@@ -226,19 +228,21 @@ namespace synthese
 
 				// Initialization of text lines
 				bool color(false);
-				for (PlaceList::const_iterator it(placesList.begin()); it != placesList.end(); ++it)
+				BOOST_FOREACH(const PlaceInformation& pi, placesList)
 				{
+					assert(dynamic_cast<const NamedPlace*>(pi.place));
+
 					lineInterfacePage->display(
 						stream
-						, it->content->str()
+						, pi.content->str()
 						, color
-						, it->isOrigin
-						, it->isDestination
+						, pi.isOrigin
+						, pi.isDestination
 						, variables
-						, it->place
+						, *dynamic_cast<const NamedPlace*>(pi.place)
 						, request
 					);
-					delete it->content;
+					delete pi.content;
 					color = !color;
 				}
 

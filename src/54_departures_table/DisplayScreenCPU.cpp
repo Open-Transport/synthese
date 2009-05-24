@@ -25,9 +25,13 @@
 
 #include "DisplayScreenCPU.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
+#include "DisplayMonitoringStatus.h"
+
 #include <sstream>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -46,7 +50,6 @@ namespace synthese
 			_name(),
 			_place(NULL),
 			_mac_address(),
-			_monitoring_delay(0),
 			_is_online(true),
 			_maintenance_message()
 		{
@@ -56,15 +59,14 @@ namespace synthese
 
 
 		DisplayScreenCPU::~DisplayScreenCPU(
-		) {
+		){
 			_place = NULL;
 		}
 
 
 
 		const std::string& DisplayScreenCPU::getName(
-
-			) const {
+		) const {
 			return _name;
 		}
 
@@ -78,32 +80,28 @@ namespace synthese
 
 
 		const std::string& DisplayScreenCPU::getMacAddress(
-
-			) const {
+		) const {
 			return _mac_address;
 		}
 
 
 
-		int DisplayScreenCPU::getMonitoringDelay(
-
-			) const {
+		time_duration DisplayScreenCPU::getMonitoringDelay(
+		) const {
 			return _monitoring_delay;
 		}
 
 
 
 		bool DisplayScreenCPU::getIsOnline(
-
-			) const {
+		) const {
 			return _is_online;
 		}
 
 
 
 		const std::string& DisplayScreenCPU::getMaintenanceMessage(
-
-			) const {
+		) const {
 			return _maintenance_message;
 		}
 
@@ -111,7 +109,7 @@ namespace synthese
 
 		void DisplayScreenCPU::setName(
 			const std::string& value
-			) {
+		){
 			_name = value;
 		}
 
@@ -119,7 +117,7 @@ namespace synthese
 
 		void DisplayScreenCPU::setPlace(
 			const env::PublicTransportStopZoneConnectionPlace* const value
-		) {
+		){
 			_place = value;
 		}
 
@@ -134,8 +132,8 @@ namespace synthese
 
 
 		void DisplayScreenCPU::setMonitoringDelay(
-			const int value
-		) {
+			const time_duration value
+		){
 			_monitoring_delay = value;
 		}
 
@@ -143,7 +141,7 @@ namespace synthese
 
 		void DisplayScreenCPU::setIsOnline(
 			const bool value
-		) {
+		){
 			_is_online  =value;
 		}
 
@@ -151,7 +149,7 @@ namespace synthese
 
 		void DisplayScreenCPU::setMaintenanceMessage(
 			const std::string& value
-		) {
+		){
 			_maintenance_message = value;
 		}
 
@@ -190,6 +188,28 @@ namespace synthese
 		void DisplayScreenCPU::removeWiredScreen( const DisplayScreen* value )
 		{
 			_wiredScreens.erase(value);
+		}
+
+		bool DisplayScreenCPU::isMonitored() const
+		{
+			return _is_online && (_monitoring_delay.minutes() > 0);
+		}
+
+		bool DisplayScreenCPU::isDown(
+			const ptime& lastContact
+		) const	{
+			if(	!isMonitored()
+			){
+				return false;
+			}
+
+			ptime now(second_clock::local_time());
+
+			if(now - lastContact <= _monitoring_delay)
+			{
+				return false;
+			}
+			return true;
 		}
 	}
 }

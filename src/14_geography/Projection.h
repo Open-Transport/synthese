@@ -1,46 +1,44 @@
 #ifndef SYNTHESE_GEOGRAPHY_PROJECTION_H
 #define SYNTHESE_GEOGRAPHY_PROJECTION_H
 
-#include "14_geography/GeoPoint.h"
+#include "GeoPoint.h"
 
 #include <iostream>
 
 
-
 namespace synthese
 {
-
-namespace geometry
-{
-    class Point2D;
-}
-
-
-/** Projection service functions
-    @ingroup m09
-*/
-
-namespace geography
-{
+	namespace geometry
+	{
+		class Point2D;
+	}
 
 
-    typedef enum { LAMBERT_93, LAMBERT_II, LAMBERT_IIe } LambertOrigin;
+	namespace geography
+	{
+		/// @ingroup m09
+		typedef enum
+		{
+			LAMBERT_93,
+			LAMBERT_II,
+			LAMBERT_IIe
+		} LambertOrigin;
 
 
-
-    GeoPoint FromLambertIIe (const geometry::Point2D& p);
-    GeoPoint FromLambert (const LambertOrigin& orig, const geometry::Point2D& p);
-
-
-
-
-}
-
+		//////////////////////////////////////////////////////////////////
+		/// WGS84 point generation from LambertII.
+		/// @param point Lambert II point to convert
+		/// @return WGS84 converted point
+		/// @ingroup m09
+		///
+		/// http://www.ign.fr/telechargement/MPro/geodesie/CIRCE/transfo.pdf
+		/// http://www.ign.fr/telechargement/MPro/geodesie/CIRCE/NTG_80.pdf
+		/// http://www.ign.fr/telechargement/MPro/geodesie/CIRCE/NTG_71.pdf
+		GeoPoint WGS84FromLambert(
+			const geometry::Point2D& point,
+			const LambertOrigin orig = LAMBERT_IIe
+		);
+	}
 }
 
 #endif
-
-
-
-
-

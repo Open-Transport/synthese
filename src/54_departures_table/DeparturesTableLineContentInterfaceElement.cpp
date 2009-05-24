@@ -75,7 +75,7 @@ namespace synthese
 				, _htmlEndLine->getValue(parameters, variables, object, request)
 				, Conversion::ToInt(_cellWidth->getValue(parameters, variables, object, request))
 				, Conversion::ToInt(_cellHeight->getValue(parameters, variables, object,request))
-				, line->getCommercialLine()
+				, *line->getCommercialLine()
 				, request
 				);
 			return string();

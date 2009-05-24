@@ -30,7 +30,7 @@
 #include "Request.h"
 
 #include "Edge.h"
-#include "Vertex.h"
+#include "PhysicalStop.h"
 #include "AddressablePlace.h"
 #include "Road.h"
 #include "ServiceUse.h"
@@ -87,10 +87,7 @@ namespace synthese
 			// Loop on lines of the board
 			bool __Couleur = false;
 
-			const AddressablePlace* lastPlace(
-				AddressablePlace::GetPlace(
-					journey->getOrigin()->getHub()
-			)	);
+			const Hub* lastPlace(journey->getOrigin()->getHub());
 			int distance(0);
 
 			const Journey::ServiceUses& services(journey->getServiceUses());
@@ -103,13 +100,8 @@ namespace synthese
 				{
 					distance = 0;
 					
-					const AddressablePlace* place(
-						AddressablePlace::GetPlace(
-							leg.getDepartureEdge()->getHub()
-					)	);
-
 					// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
-					if (place != lastPlace)
+					if (leg.getDepartureEdge()->getHub() != lastPlace)
 					{
 						/*					DateTime debutPrem(leg.getDepartureDateTime());
 						DateTime finPrem(debutPrem);
@@ -122,14 +114,14 @@ namespace synthese
 							, false
 							, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 							, false
-							, place
+							, *static_cast<const PhysicalStop*>(leg.getDepartureEdge()->getFromVertex())
 							, __Couleur
 							, leg.getDepartureDateTime()
 							, journey->getContinuousServiceRange()
 							, request
 							);
 
-						lastPlace = place;
+						lastPlace = leg.getDepartureEdge()->getHub();
 						__Couleur = !__Couleur;
 					}
 
@@ -165,22 +157,18 @@ namespace synthese
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();
 */
-					const AddressablePlace* aPlace(
-						AddressablePlace::GetPlace(
-							leg.getArrivalEdge()->getHub()
-					)	);
 
 					stopCellInterfacePage->display( stream, true
 						, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub()
-						, aPlace
+						, *static_cast<const PhysicalStop*>(leg.getArrivalEdge()->getFromVertex())
 						, __Couleur
 						, leg.getArrivalDateTime()
 						, journey->getContinuousServiceRange()
 						, request
 					);
 
-					lastPlace = aPlace;
+					lastPlace = leg.getArrivalEdge()->getHub();
 					__Couleur = !__Couleur;
 
 				}

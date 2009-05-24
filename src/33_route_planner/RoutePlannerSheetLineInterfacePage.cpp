@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/RoutePlannerSheetLineInterfacePage.h"
+#include "RoutePlannerSheetLineInterfacePage.h"
+#include "NamedPlace.h"
 
 namespace synthese
 {
@@ -40,7 +41,7 @@ namespace synthese
 			, bool isOrigin
 			, bool isDestination
 			, VariablesMap& variables,
-		    const Place* place, 
+		    const NamedPlace& place, 
 		    const server::Request* request /*= NULL */
 		) const {
 			ParametersVector pv;
@@ -48,8 +49,9 @@ namespace synthese
 			pv.push_back(Conversion::ToString( alternateColor ));
 			pv.push_back(Conversion::ToString(isOrigin));
 			pv.push_back(Conversion::ToString(isDestination));
+			pv.push_back(place.getFullName());
 
-			InterfacePage::_display( stream, pv, variables, place, request );
+			InterfacePage::_display( stream, pv, variables, &place, request );
 		}
 
 

@@ -37,6 +37,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -56,6 +57,7 @@ namespace synthese
 		const std::string DisplayScreenCPUTableSync::COL_PLACE_ID("place_id");
 		const std::string DisplayScreenCPUTableSync::COL_MAC_ADDRESS("mac_address");
 		const std::string DisplayScreenCPUTableSync::COL_MONITORING_DELAY("monitoring_delay");
+		const std::string DisplayScreenCPUTableSync::COL_IS_ONLINE("is_online");
 		const std::string DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE("maintenance_message");
 	}
 
@@ -72,6 +74,7 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_PLACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_MAC_ADDRESS, SQL_TEXT),
 			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_MONITORING_DELAY, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_IS_ONLINE, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
@@ -93,7 +96,8 @@ namespace synthese
 			object->setName(rows->getText(DisplayScreenCPUTableSync::COL_NAME));
 			object->setMacAddress(rows->getText(DisplayScreenCPUTableSync::COL_MAC_ADDRESS));
 			object->setMaintenanceMessage(rows->getText(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE));
-			object->setMonitoringDelay(rows->getInt(DisplayScreenCPUTableSync::COL_MONITORING_DELAY));
+			object->setMonitoringDelay(minutes(rows->getInt(DisplayScreenCPUTableSync::COL_MONITORING_DELAY)));
+			object->setIsOnline(rows->getBool(DisplayScreenCPUTableSync::COL_IS_ONLINE));
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -125,7 +129,8 @@ namespace synthese
 				<< Conversion::ToSQLiteString(object->getName()) << ","
 				<< ((object->getPlace() != NULL) ? Conversion::ToString(object->getPlace()->getKey()) : "0") << ","
 				<< Conversion::ToSQLiteString(object->getMacAddress()) << ","
-				<< Conversion::ToString(object->getMonitoringDelay()) << ","
+				<< object->getMonitoringDelay().minutes() << ","
+				<< Conversion::ToString(object->getIsOnline()) << ","
 				<< Conversion::ToSQLiteString(object->getMaintenanceMessage())
 				<< ")";
 			sqlite->execUpdate(query.str());
