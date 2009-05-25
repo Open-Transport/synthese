@@ -70,6 +70,12 @@ namespace synthese
 			 - 14 : Online reservation is available
 			 - 15 : Departure time (internal format)
 			 - 16 : Is it the last journey board ?
+			 - 17 : Last departure time if continuous service (empty = single service)
+			 - 18 : Last arrival time if continuous service (empty = single service)
+			 - 19 : Departure place longitude
+			 - 20 : Departure place latitude
+			 - 21 : Arrival place longitude
+			 - 22 : Arrival place latitude
 		*/
 		class JourneyBoardInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardInterfacePage>
 		{

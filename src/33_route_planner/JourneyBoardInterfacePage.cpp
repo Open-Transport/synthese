@@ -37,10 +37,13 @@
 #include "CommercialLine.h"
 #include "Conversion.h"
 #include "Env.h"
+#include "GeoPoint.h"
+#include "Projection.h"
 
 #include <sstream>
 #include <set>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -129,6 +132,13 @@ namespace synthese
 				)->getFullName()
 			);
 
+			DateTime lastDeparture(journey->getDepartureTime());
+			lastDeparture += journey->getContinuousServiceRange();
+			DateTime lastArrival(journey->getArrivalTime());
+			lastArrival += journey->getContinuousServiceRange();
+
+			GeoPoint departurePoint(WGS84FromLambert(departurePlace->getPoint()));
+			GeoPoint arrivalPoint(WGS84FromLambert(arrivalPlace->getPoint()));
 
 			ParametersVector pv;
 			pv.push_back(Conversion::ToString(n));
@@ -148,6 +158,12 @@ namespace synthese
 			pv.push_back(Conversion::ToString(onlineBooking));
 			pv.push_back(journey->getDepartureTime().toSQLString(false));
 			pv.push_back(Conversion::ToString(isTheLast));
+			pv.push_back(journey->getContinuousServiceRange() ? lastDeparture.getHour().toString() : string()); //17
+			pv.push_back(journey->getContinuousServiceRange() ? lastArrival.getHour().toString() : string()); //18
+			pv.push_back(lexical_cast<string>(departurePoint.getLongitude()));
+			pv.push_back(lexical_cast<string>(departurePoint.getLatitude()));
+			pv.push_back(lexical_cast<string>(arrivalPoint.getLongitude()));
+			pv.push_back(lexical_cast<string>(arrivalPoint.getLatitude()));
 			
 			InterfacePage::_display(stream, pv, variables, static_cast<const void*>(journey), request);
 		}

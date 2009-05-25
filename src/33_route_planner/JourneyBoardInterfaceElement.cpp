@@ -76,11 +76,12 @@ namespace synthese
 			const Journey* journey = static_cast<const Journey*>(object);
 			int __FiltreHandicape = (Conversion::ToInt(_handicappedFilter->getValue(parameters, variables, object, request)) > 1);
 			int __FiltreVelo = (Conversion::ToInt(_bikeFilter->getValue(parameters, variables, object, request)) > 1 );
+			const string pageCode(_pageCode.get() ? _pageCode->getValue(parameters, variables, object, request) : string());
 
 			// Resources
-			const JourneyBoardStopCellInterfacePage* stopCellInterfacePage = _page->getInterface()->getPage<JourneyBoardStopCellInterfacePage>();
-			const JourneyBoardServiceCellInterfacePage* serviceCellInterfacePage = _page->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>();
-			const JourneyBoardJunctionCellInterfacePage* junctionCellInterfacePage = _page->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>();
+			const JourneyBoardStopCellInterfacePage* stopCellInterfacePage = _page->getInterface()->getPage<JourneyBoardStopCellInterfacePage>(pageCode);
+			const JourneyBoardServiceCellInterfacePage* serviceCellInterfacePage = _page->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>(pageCode);
+			const JourneyBoardJunctionCellInterfacePage* junctionCellInterfacePage = _page->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>(pageCode);
 			const Hour unknownHour(TIME_UNKNOWN );
 			const DateTime unknownDateTime(TIME_UNKNOWN );
 
@@ -216,10 +217,14 @@ namespace synthese
 
 		void JourneyBoardInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
 		{
-			if (vel.size() != 2)
+			if (vel.size() < 2)
 				throw InterfacePageException("Insufficient parameters number");
 			_handicappedFilter = vel.front();
 			_bikeFilter = vel.front();
+			if(!vel.isEmpty())
+			{
+				_pageCode = vel.front();
+			}
 		}
 	}
 }

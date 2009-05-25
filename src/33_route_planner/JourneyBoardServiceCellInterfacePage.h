@@ -70,7 +70,7 @@ namespace synthese
 				- 14 : Waiting duration
 				- 15 : Line style
 				- 16 : Line picto url
-				- 17 : (nothing)
+				- 17 : Line id
 				- 18 : (nothing)
 				- 19 : Alarm message
 				- 20 : Alarm level

@@ -42,12 +42,14 @@ namespace synthese
 			Parameters :
 			 - 0 : Handicapped filter
 			 - 1 : Bike filter
+			 - 2 : Page code for the rows of the board renderer (optional)
 		*/
 		class JourneyBoardInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,JourneyBoardInterfaceElement>
 		{
 		private:
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _handicappedFilter;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _bikeFilter;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pageCode;
 			
 		public:
 			std::string display(

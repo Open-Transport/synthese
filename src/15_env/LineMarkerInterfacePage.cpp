@@ -59,7 +59,8 @@ namespace synthese
 			pv.push_back(line.getStyle());
 			pv.push_back(line.getImage());
 			pv.push_back(line.getShortName());
-			
+			pv.push_back(lexical_cast<string>(line.getKey()));
+
 			InterfacePage::_display(stream, pv, vars, static_cast<const void*>(&line), request);
 		}
 

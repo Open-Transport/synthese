@@ -9,7 +9,7 @@ synthese::routeplanner::RoutePlannerNoSolutionInterfacePage::integrate();
 synthese::routeplanner::RoutePlannerInterfacePage::integrate();
 synthese::routeplanner::JourneyBoardInterfacePage::integrate();
 synthese::routeplanner::UserFavoriteInterfacePage::integrate();
-
+synthese::routeplanner::ResultLinesListInterfaceElement::integrate();
 synthese::routeplanner::JourneyLineListInterfaceElement::integrate();
 synthese::routeplanner::JourneyBoardInterfaceElement::integrate();
 synthese::routeplanner::SchedulesTableInterfaceElement::integrate();

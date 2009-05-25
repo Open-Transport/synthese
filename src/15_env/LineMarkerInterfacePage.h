@@ -51,6 +51,7 @@ namespace synthese
 				- 4 : line style name
 				- 5 : line picto image url
 				- 6 : line short name
+				- 7 : line ID
 
 			Object : CommercialLine
 		*/
