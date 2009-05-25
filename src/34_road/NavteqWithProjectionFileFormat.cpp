@@ -67,6 +67,26 @@ namespace synthese
 			if(it == paths.end() || it->second.empty()) return false;
 			return true;
 		}
+
+		NavteqWithProjectionFileFormat::~NavteqWithProjectionFileFormat()
+		{}
+
+		void NavteqWithProjectionFileFormat::build(std::ostream& os)
+		{}
+
+		void NavteqWithProjectionFileFormat::save(std::ostream& os
+		) const {
+		}
+
+
+		void NavteqWithProjectionFileFormat::_parse(
+				const std::string& text,
+				std::ostream& os,
+				std::string key
+		){
+		}
+
+
 	}
 }
 

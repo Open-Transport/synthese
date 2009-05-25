@@ -31,7 +31,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
-
+#include <boost/foreach.hpp>
 
 namespace synthese
 {
@@ -118,11 +118,11 @@ namespace synthese
 					int nbMatches = 10
 				) const {
 					std::vector<const T*> result;
-					const LexicalMatcher<const NamedPlace*>& matcher(_lexicalMatchers[T::FACTORY_KEY]);
-					LexicalMatcher<const NamedPlace*>::MatchResult matches = matcher.bestMatches (
+					const lexmatcher::LexicalMatcher<const NamedPlace*>& matcher(_lexicalMatchers[T::FACTORY_KEY]);
+					lexmatcher::LexicalMatcher<const NamedPlace*>::MatchResult matches = matcher.bestMatches (
 						fuzzyName, nbMatches
 						);
-					BOOST_FOREACH(const LexicalMatcher<const NamedPlace*>::MatchResult::value_type& it, matches)
+					BOOST_FOREACH(const lexmatcher::LexicalMatcher<const NamedPlace*>::MatchResult::value_type& it, matches)
 					{
 						result.push_back(static_cast<const T*>(it.value));
 					}

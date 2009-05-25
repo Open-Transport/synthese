@@ -63,7 +63,7 @@ namespace synthese
 				bool isFirstSync = false
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
-				ObjectClass::Registry& registry(env.getEditableRegistry<ObjectClass::Registry::ObjectsClass>());
+				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
 				try
 				{
 					if (registry.contains(rows->getKey()))
@@ -79,7 +79,7 @@ namespace synthese
 						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
 						Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						registry.add(
-							boost::static_pointer_cast<ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
+							boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
 						);
 					}
 				}
@@ -97,7 +97,7 @@ namespace synthese
 				const SQLiteResultSPtr& rows
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
-				ObjectClass::Registry& registry(env.getEditableRegistry<ObjectClass::Registry::ObjectsClass>());
+				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
 				try
 				{
 					util::RegistryKeyType id(rows->getKey());
@@ -124,7 +124,7 @@ namespace synthese
 				const SQLiteResultSPtr& rows
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
-				ObjectClass::Registry& registry(env.getEditableRegistry<ObjectClass::Registry::ObjectsClass>());
+				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
 				try
 				{
 					uid id = rows->getKey();

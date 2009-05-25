@@ -44,7 +44,7 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			) const {
-				return boost::static_pointer_cast<BaseClass, TableSync::ObjectType>(TableSync::GetEditable(key, env, linkLevel, autoCreate));
+				return boost::static_pointer_cast<BaseClass, typename TableSync::ObjectType>(TableSync::GetEditable(key, env, linkLevel, autoCreate));
 			}
 
 			virtual boost::shared_ptr<const BaseClass> _get(
@@ -53,7 +53,7 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			) const {
-				return boost::static_pointer_cast<const BaseClass, const TableSync::ObjectType>(TableSync::Get(key, env, linkLevel, autoCreate));
+				return boost::static_pointer_cast<const BaseClass, const typename TableSync::ObjectType>(TableSync::Get(key, env, linkLevel, autoCreate));
 			}
 		};
 	}

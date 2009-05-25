@@ -25,6 +25,8 @@
 
 #include "Factory.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace synthese
 {
 	namespace db
@@ -60,8 +62,8 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				string ts(Conversion::ToString(decodeTableId(key)));
-				auto_ptr<Fetcher<BaseClass> > pf(Factory<Fetcher<BaseClass> >::create(ts));
+				std::string ts(boost::lexical_cast<std::string>(decodeTableId(key)));
+				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
 				return pf->_getEditable(key, env, linkLevel, autoCreate);
 			}
 
@@ -71,8 +73,8 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				string ts(Conversion::ToString(decodeTableId(key)));
-				auto_ptr<Fetcher<BaseClass> > pf(Factory<Fetcher<BaseClass> >::create(ts));
+				std::string ts(boost::lexical_cast<std::string>(decodeTableId(key)));
+				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
 				return pf->_get(key, env, linkLevel, autoCreate);
 			}
 

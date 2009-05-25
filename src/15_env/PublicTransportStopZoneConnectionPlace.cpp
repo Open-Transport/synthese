@@ -41,6 +41,7 @@ namespace synthese
 	using namespace pt;
 	using namespace time;
 	using namespace road;
+	using namespace geography;
 
 	namespace util
 	{

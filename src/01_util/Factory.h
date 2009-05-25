@@ -102,7 +102,7 @@ namespace synthese
 		public:
 
 			typedef typename Map::key_type KeyType;
-			typedef std::set<typename KeyType> Keys;
+			typedef std::set<KeyType> Keys;
 			typedef std::vector<boost::shared_ptr<RootObject> > ObjectsCollection;
 
 			static size_t size()
@@ -173,7 +173,7 @@ namespace synthese
 			
 			static void Destroy()
 			{
-				BOOST_FOREACH(const Map::value_type& it, _registeredCreator)
+				BOOST_FOREACH(const typename Map::value_type& it, _registeredCreator)
 				{
 					delete it.second;
 				}
@@ -187,9 +187,9 @@ namespace synthese
 			///	@return a collection of new elements of each factorable subclass.
 			///	@author Hugues Romain
 			///	@date 2008
-			static typename ObjectsCollection GetNewCollection()
+			static ObjectsCollection GetNewCollection()
 			{
-				typename ObjectsCollection result;
+				ObjectsCollection result;
 				BOOST_FOREACH(const typename Map::value_type& it, _registeredCreator)
 				{
 					result.push_back(boost::shared_ptr<RootObject>(it.second->create()));
@@ -204,9 +204,9 @@ namespace synthese
 			///	@return a set containing all registered keys
 			///	@author Hugues Romain
 			///	@date 2009
-			static typename Keys GetKeys()
+			static Keys GetKeys()
 			{
-				typename Keys result;
+				Keys result;
 				BOOST_FOREACH(const typename Map::value_type& it, _registeredCreator)
 				{
 					result.insert(it.first);
