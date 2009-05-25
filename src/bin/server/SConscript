@@ -10,12 +10,6 @@ CppSynthese3BinProject(
 		's3-departures-table.cpplib',
 		's3-map.cpplib',
 		's3-route-planner.cpplib',
-		's3-places-list.cpplib',
-		's3-admin.cpplib',
-		's3-dblog.cpplib',
-		's3-impex.cpplib',
-		's3-env.cpplib',
-		's3-util-iostreams.cpplib',
 		's3-timetables.cpplib',
 		'boost.cppinc',
 		('boost-program-options.cpplib',s3env['BOOSTVERSION'])

@@ -6,6 +6,7 @@ CppSynthese3LibProject(
 	dependencies = [
 		's3-graph.cpplib',
 		's3-env.cpplib',
+		's3-db.cpplib',
 		's3-impex.cpplib'
 	]
 )
