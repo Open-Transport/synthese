@@ -67,6 +67,7 @@ namespace synthese
 			
 			typedef typename std::vector<MatchHit> MatchResult;
 			typedef std::map<std::string, T> Map;
+			typedef T Content;
 
 		 private:
 

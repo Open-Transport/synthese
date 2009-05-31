@@ -1,6 +1,6 @@
 
-/** ParseDisplayReturnInterfacePage class implementation.
-	@file ParseDisplayReturnInterfacePage.cpp
+/** RoutePlanningTableGenerator class header.
+	@file StandardArrivalDepartureTableGenerator.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,38 +20,51 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ParseDisplayReturnInterfacePage.h"
+#ifndef SYNTHESE_RoutePlanningTableGenerator_H
+#define SYNTHESE_RoutePlanningTableGenerator_H
 
-using namespace std;
+#include "DeparturesTableTypes.h"
 
 namespace synthese
 {
-	using namespace interfaces;
-	using namespace departurestable;
-
-	namespace util
+	namespace time
 	{
-		 template<> const string FactorableTemplate<InterfacePage, ParseDisplayReturnInterfacePage>::FACTORY_KEY("parse_display_return");
+		class DateTime;
+	}
+
+	namespace env
+	{
+		class PublicTransportStopZoneConnectionPlace;
 	}
 
 	namespace departurestable
 	{
-		const string ParseDisplayReturnInterfacePage::DATA_STRING("string");
 
-		void ParseDisplayReturnInterfacePage::display(std::ostream& stream, const std::string& text, VariablesMap& variables, const server::Request* request /*= NULL*/) const
+		class RoutePlanningTableGenerator
 		{
-			ParametersVector pv;
-			pv.push_back(text);
+		private:
+			//! \name Parameters
+			//@{
+				const env::PublicTransportStopZoneConnectionPlace& _origin;
+				const DisplayedPlacesList _destinations;
+				const time::DateTime _startDateTime;
+				const time::DateTime _endDateTime;
+				bool _withTransfer;
+			//@}
 
-			InterfacePage::_display(stream, pv, variables, NULL, request);
-		}
+		public:
+			RoutePlanningTableGenerator(
+				const env::PublicTransportStopZoneConnectionPlace& origin,
+				const DisplayedPlacesList& destinations,
+				const time::DateTime& startDateTime,
+				const time::DateTime& endDateTime,
+				bool withTransfer
+			);
 
+			RoutePlanningList run();
+		};
 
-
-		ParseDisplayReturnInterfacePage::ParseDisplayReturnInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
-		{
-
-		}
 	}
 }
+
+#endif

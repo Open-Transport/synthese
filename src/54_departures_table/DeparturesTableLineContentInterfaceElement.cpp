@@ -65,7 +65,7 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const Line* line(static_cast<const LineStop*>(static_cast<const ArrivalDepartureRow*>(object)->first.servicePointer.getEdge())->getLine());
+			const Line* line(static_cast<const LineStop*>(static_cast<const ArrivalDepartureRow*>(object)->first.getEdge())->getLine());
 			const LineMarkerInterfacePage* page(_page->getInterface()->getPage<LineMarkerInterfacePage>());
 
 			page->display(

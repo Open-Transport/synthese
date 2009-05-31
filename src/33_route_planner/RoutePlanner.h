@@ -118,36 +118,7 @@ namespace synthese
 				//!< 
 			//@}
 
-		public:
-			/** Constructor.
-				@param origin Origin place
-				@param destination Destination place
-				@param accessParameters Access Parameters
-				@param planningOrder Planning order
-				@param journeySheetStartTime Start date time
-				@param journeySheetEndTime End date time
-				@param maxSolutionsNumber Maximum of solutions number
-				@author Hugues Romain
-				@date 2007
-			*/
-			RoutePlanner(
-				 const geography::Place* origin,
-				 const geography::Place* destination,
-				 const graph::AccessParameters& accessParameters,
-				 const PlanningOrder& planningOrder,
-				 const time::DateTime& journeySheetStartTime,
-				 const time::DateTime& journeySheetEndTime
-				 , int maxSolutionsNumber = UNKNOWN_VALUE
-				 , std::ostream* logStream = NULL
-				 , util::Log::Level				logLevel = util::Log::LEVEL_NONE
-			);
-
-			~RoutePlanner ();
-
-
-			//! @name Query methods
-			//@{
-
+				
 
 
 			/** Best journey finder.
@@ -178,13 +149,42 @@ namespace synthese
 				, const graph::VertexAccessMap& dvam
 			);
 
-			/** Launch of the route planning, applying the "from the departure to the arrival" method.
-				@return JourneyBoardJourneys The founded journeys
-				@warning The journeys must be deleted after use to avoid memory leak
+		public:
+			/** Constructor.
+				@param origin Origin place
+				@param destination Destination place
+				@param accessParameters Access Parameters
+				@param planningOrder Planning order
+				@param journeySheetStartTime Start date time
+				@param journeySheetEndTime End date time
+				@param maxSolutionsNumber Maximum of solutions number
 				@author Hugues Romain
 				@date 2007
 			*/
-			const Result& computeJourneySheetDepartureArrival ();
+			RoutePlanner(
+				 const geography::Place* origin,
+				 const geography::Place* destination,
+				 const graph::AccessParameters& accessParameters,
+				 const PlanningOrder& planningOrder,
+				 const time::DateTime& journeySheetStartTime,
+				 const time::DateTime& journeySheetEndTime
+				 , int maxSolutionsNumber = UNKNOWN_VALUE
+				 , std::ostream* logStream = NULL
+				 , util::Log::Level				logLevel = util::Log::LEVEL_NONE
+			);
+
+			~RoutePlanner ();
+
+
+			//! @name Query methods
+			//@{
+				/** Launch of the route planning, applying the "from the departure to the arrival" method.
+					@return JourneyBoardJourneys The founded journeys
+					@warning The journeys must be deleted after use to avoid memory leak
+					@author Hugues Romain
+					@date 2007
+				*/
+				const Result& computeJourneySheetDepartureArrival ();
 			//@}
 		};
 	}

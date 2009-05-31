@@ -49,6 +49,17 @@ namespace synthese
 		class RoutePlannerSheetColumnInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetColumnInterfacePage>
 		{
 		public:
+			static const std::string DATA_IS_FIRST_ROW;
+			static const std::string DATA_IS_LAST_ROW;
+			static const std::string DATA_COLUMN_NUMBER;
+			static const std::string DATA_IS_FOOT;
+			static const std::string DATA_FIRST_TIME;
+			static const std::string DATA_LAST_TIME;
+			static const std::string DATA_IS_CONTINUOUS_SERVICE;
+			static const std::string DATA_IS_FIRST_WRITING;
+			static const std::string DATA_IS_LAST_WRITING;
+			static const std::string DATA_IS_FIRST_FOOT;
+
 			RoutePlannerSheetColumnInterfacePage();
 
 			/** Display of schedule sheet cell.

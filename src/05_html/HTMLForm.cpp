@@ -204,7 +204,7 @@ namespace synthese
 			vector<pair<int, string> > m;
 			m.push_back(make_pair(0, "NON"));
 			m.push_back(make_pair(1, "OUI"));
-			return getRadioInput(name, m, value ? 1 : 0);
+			return getRadioInputCollection(name, m, value ? 1 : 0);
 		}
 
 		std::string HTMLForm::getCheckBox( const std::string& name, const std::string& value, bool checked )

@@ -47,12 +47,11 @@ namespace synthese
 				, const ForbiddenPlacesList&	forbiddenPlaces
 				, const DateTime& startDateTime
 				, const DateTime& endDateTime
-				, int blinkingDelay
 				, size_t maxSize
 		) : _physicalStops(physicalStops), _direction(direction), _endFilter(endfilter)
-		, _lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces), _startDateTime(startDateTime)
-			, _endDateTime(endDateTime), _maxSize(maxSize), _blinkingDelay(blinkingDelay)
-			, _calculationDateTime(TIME_CURRENT)
+			, _lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces), _startDateTime(startDateTime)
+			, _endDateTime(endDateTime), _maxSize(maxSize),
+			_calculationDateTime(TIME_CURRENT)
 		{}
 
 
@@ -91,12 +90,6 @@ namespace synthese
 			const ServicePointer& servicePointer
 			, UnlimitedSize unlimitedSize
 		){
-			// Values
-			DeparturesTableElement element(
-				servicePointer
-				, (servicePointer.getActualDateTime() - _startDateTime) < _blinkingDelay
-				);
-
 			ActualDisplayedArrivalsList arrivals;
 			set<const PublicTransportStopZoneConnectionPlace*> encounteredPlaces;
 			const PublicTransportStopZoneConnectionPlace* destinationPlace(
@@ -127,7 +120,7 @@ namespace synthese
 			}
 
 			/** - Insertion */
-			pair<ArrivalDepartureList::iterator, bool> insertResult = _result.insert(pair<DeparturesTableElement, ActualDisplayedArrivalsList>(element, arrivals));
+			pair<ArrivalDepartureList::iterator, bool> insertResult = _result.insert(make_pair(servicePointer, arrivals));
 
 			/** - Control of size : if too long, deletion of the last element */
 			if (unlimitedSize == SIZE_AS_DEFINED && _maxSize != UNLIMITED_SIZE && _result.size() > _maxSize)

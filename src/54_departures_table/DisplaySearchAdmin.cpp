@@ -51,6 +51,7 @@
 #include "DisplayScreenCPUAdmin.h"
 #include "DisplayScreenCPUCreateAction.h"
 #include "DisplayScreenCPUTableSync.h"
+#include "Interface.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -248,6 +249,12 @@ namespace synthese
 				{
 					updateRequest.setObjectId(screen->getKey());
 					viewRequest.setObjectId(screen->getKey());
+					if(	screen->getType() &&
+						screen->getType()->getDisplayInterface() &&
+						!screen->getType()->getDisplayInterface()->getDefaultClientURL().empty()
+					){
+						viewRequest.setClientURL(screen->getType()->getDisplayInterface()->getDefaultClientURL());
+					}
 					
 					vector<shared_ptr<SentAlarm> > alarms(
 						DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey(), 1)

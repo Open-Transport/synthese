@@ -72,6 +72,9 @@ namespace synthese
 
 			if (!vel.isEmpty())
 				_displayTeam = vel.front();
+
+			if (!vel.isEmpty())
+				_blinkingDelay = vel.front();
 		}
 
 		string DeparturesTableInterfaceElement::display(
@@ -95,6 +98,13 @@ namespace synthese
 			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);
 			bool displayTeam(_displayTeam ? Conversion::ToBool(_displayTeam->getValue(parameters, variables, object, request)) : false);
 			int numberOfIntermediatesStops(_numberOfIntermediatesStops ? Conversion::ToInt(_numberOfIntermediatesStops->getValue(parameters, variables, object, request)) : UNKNOWN_VALUE);
+			int blinkingDelay(_blinkingDelay? Conversion::ToInt(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
+
+			const DepartureTableRowInterfacePage* page(_page->getInterface()->getPage<DepartureTableRowInterfacePage>());
+			if(page == NULL)
+			{
+				return string();
+			}
 
 			// Gestion des pages
 			int __NombrePages(1);
@@ -131,7 +141,6 @@ namespace synthese
 						: (1 + __NumeroPage % __NombrePagesRangee);     // 1 : Numero de page
 
 					// Lancement de l'affichage de la rangee
-					const DepartureTableRowInterfacePage* page(_page->getInterface()->getPage<DepartureTableRowInterfacePage>());
 					page->display(
 						stream
 						, variables
@@ -140,7 +149,8 @@ namespace synthese
 						, displayQuai
 						, displayServiceNumber
 						, displayTeam
-						, numberOfIntermediatesStops
+						, numberOfIntermediatesStops,
+						blinkingDelay
 						, ___DP
 						, request
 					);

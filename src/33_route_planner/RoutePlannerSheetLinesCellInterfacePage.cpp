@@ -23,6 +23,8 @@
 #include "RoutePlannerSheetLinesCellInterfacePage.h"
 #include "Request.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace interfaces;
@@ -32,6 +34,8 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		const string RoutePlannerSheetLinesCellInterfacePage::DATA_COLUMN_NUMBER("column_number");
+
 		void RoutePlannerSheetLinesCellInterfacePage::display( 
 		    std::ostream& stream, 
 		    size_t columnNumber, 

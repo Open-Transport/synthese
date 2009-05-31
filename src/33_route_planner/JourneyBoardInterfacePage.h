@@ -52,7 +52,7 @@ namespace synthese
 		/** JourneyBoardInterfacePage Interface Page Class.
 			@ingroup m53Pages refPages
 
-			Parameters :
+			Available data :
 			 - 0 : index of the journey board
 			 - 1 : Handicapped filter
 			 - 2 : Bike filter
@@ -80,6 +80,30 @@ namespace synthese
 		class JourneyBoardInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardInterfacePage>
 		{
 		public:
+			static const std::string DATA_RANK;
+			static const std::string DATA_HANDICAPPED_FILTER;
+			static const std::string DATA_BIKE_FILTER;
+			static const std::string DATA_DEPARTURE_TIME;
+			static const std::string DATA_DEPARTURE_PLACE_NAME;
+			static const std::string DATA_ARRIVAL_TIME;
+			static const std::string DATA_ARRIVAL_PLACE_NAME;
+			static const std::string DATA_DEPARTURE_DATE;
+			static const std::string DATA_RESERVATION_AVAILABLE;
+			static const std::string DATA_RESERVATION_COMPULSORY;
+			static const std::string DATA_RESERVATION_DELAY;
+			static const std::string DATA_RESERVATION_DEADLINE;
+			static const std::string DATA_RESERVATION_PHONE_NUMBER;
+			static const std::string DATA_ONLINE_RESERVATION;
+			static const std::string DATA_DEPARTURE_TIME_INTERNAL_FORMAT;
+			static const std::string DATA_IS_THE_LAST_JOURNEY_BOARD;
+			static const std::string DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME;
+			static const std::string DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME;
+			static const std::string DATA_DEPARTURE_PLACE_LONGITUDE;
+			static const std::string DATA_DEPARTURE_PLACE_LATITUDE;
+			static const std::string DATA_ARRIVAL_PLACE_LONGITUDE;
+			static const std::string DATA_ARRIVAL_PLACE_LATITUDE;
+
+
 			JourneyBoardInterfacePage();
 
 			/** Overloaded display method for specific parameter conversion.

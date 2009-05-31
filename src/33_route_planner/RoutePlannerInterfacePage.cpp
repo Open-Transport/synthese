@@ -54,6 +54,22 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		const string RoutePlannerInterfacePage::DATA_INTERNAL_DATE("internal_date");
+		const string RoutePlannerInterfacePage::DATA_IS_HOME("is_home");
+		const string RoutePlannerInterfacePage::DATA_ORIGIN_CITY_TEXT("origin_city_text");
+		const string RoutePlannerInterfacePage::DATA_HANDICAPPED_FILTER("handicapped_filter");
+		const string RoutePlannerInterfacePage::DATA_ORIGIN_PLACE_TEXT("origin_place_text");
+		const string RoutePlannerInterfacePage::DATA_BIKE_FILTER("bike_filter");
+		const string RoutePlannerInterfacePage::DATA_DESTINATION_CITY_TEXT("destination_city_text");
+		const string RoutePlannerInterfacePage::DATA_DESTINATION_PLACE_ID("destination_place_id");
+		const string RoutePlannerInterfacePage::DATA_DESTINATION_PLACE_TEXT("destination_place_text");
+		const string RoutePlannerInterfacePage::DATA_PERIOD_ID("period_id");
+		const string RoutePlannerInterfacePage::DATA_DATE("date");
+		const string RoutePlannerInterfacePage::DATA_PERIOD("period");
+		const string RoutePlannerInterfacePage::DATA_SOLUTIONS_NUMBER("solutions_number");
+		const string RoutePlannerInterfacePage::DATA_ACCESSIBILITY_CODE("accessibility_code");
+		const string RoutePlannerInterfacePage::DATA_SITE_ID("site_id");
+		const string RoutePlannerInterfacePage::DATA_IS_SAME_PLACES("is_same_places");
 
 		void RoutePlannerInterfacePage::display(
 			ostream& stream

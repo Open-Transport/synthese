@@ -23,9 +23,7 @@
 */
 
 #include "UserFavoriteInterfacePage.h"
-
-#include "33_route_planner/UserFavoriteJourney.h"
-
+#include "UserFavoriteJourney.h"
 
 using namespace std;
 
@@ -41,6 +39,12 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		const string UserFavoriteInterfacePage::DATA_ID("id");
+		const string UserFavoriteInterfacePage::DATA_RANK("rank");
+		const string UserFavoriteInterfacePage::DATA_ORIGIN_CITY_NAME("origin_city_name");
+		const string UserFavoriteInterfacePage::DATA_ORIGIN_PLACE_NAME("origin_place_name");
+		const string UserFavoriteInterfacePage::DATA_DESTINATION_CITY_NAME("destination_city_name");
+		const string UserFavoriteInterfacePage::DATA_DESTINATION_PLACE_NAME("destination_place_name");
 
 		void UserFavoriteInterfacePage::display(
 			std::ostream& stream

@@ -37,14 +37,16 @@ namespace synthese
 	{
 		/** Redirection interface page.
 			
-			Parameters :
-				-# HTTP url to redirect
+			Available data :
+				- url : HTTP url to redirect
 
 			@ingroup m11Pages refPages
 		*/
 		class RedirectInterfacePage : public util::FactorableTemplate<InterfacePage,RedirectInterfacePage>
 		{
 		public:
+			static const std::string DATA_URL;
+
 			RedirectInterfacePage();
 
 			/** Overloaded display method for specific parameter conversion.

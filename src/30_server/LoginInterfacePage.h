@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_LoginInterfacePage_H__
 #define SYNTHESE_LoginInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -52,6 +51,10 @@ namespace synthese
 			: public util::FactorableTemplate<interfaces::InterfacePage, LoginInterfacePage>
 		{
 		public:
+			static const std::string DATA_FUNCTION_KEY_IF_SUCCESS;
+			static const std::string DATA_FUNCTION_PARAMETER;
+			static const std::string DATA_TITLE;
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on

@@ -23,6 +23,8 @@
 #include "RoutePlannerSheetLineInterfacePage.h"
 #include "NamedPlace.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace interfaces;
@@ -34,6 +36,12 @@ namespace synthese
 	
 	namespace routeplanner
 	{
+		const string RoutePlannerSheetLineInterfacePage::DATA_TEXT_CONTAINING_CELLS("text_containing_cells");
+		const string RoutePlannerSheetLineInterfacePage::DATA_IS_ODD_ROW("is_odd_row");
+		const string RoutePlannerSheetLineInterfacePage::DATA_IS_ORIGIN_ROW("is_origin_row");
+		const string RoutePlannerSheetLineInterfacePage::DATA_IS_DESTINATION_ROW("is_destination_row");
+		const string RoutePlannerSheetLineInterfacePage::DATA_PLACE_NAME("place_name");
+
 		void RoutePlannerSheetLineInterfacePage::display( 
 		    std::ostream& stream, 
 		    const std::string& text, 

@@ -122,6 +122,7 @@ namespace synthese
 				int							_maxDelay;			//!< Max time length for the table
 				int							_clearingDelay;
 				int							_firstRow;
+				bool						_routePlanningWithTransfer;
 			//@}
 
 			//!	\name Preselection
@@ -176,6 +177,7 @@ namespace synthese
 				void	setDisplayClock(bool value);
 				void	setComPort(int value);
 				void	setMacAddress(const std::string& value);
+				void	setRoutePlanningWithTransfer(bool value);
 			//@}
 
 			//! \name Modifiers
@@ -224,6 +226,7 @@ namespace synthese
 				int								getComPort()					const;
 				bool							getDisplayClock()				const;
 				std::string						getMacAddress()					const;
+				bool							getRoutePlanningWithTransfer()	const;
 			//@}
 
 			//! \name Queries

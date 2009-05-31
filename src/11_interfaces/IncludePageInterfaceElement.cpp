@@ -22,11 +22,10 @@
 
 #include "IncludePageInterfaceElement.h"
 
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/InterfacePage.h"
-
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
+#include "InterfacePageException.h"
+#include "InterfacePage.h"
+#include "Interface.h"
+#include "ValueElementList.h"
 
 using namespace boost;
 using namespace std;

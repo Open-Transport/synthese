@@ -1,6 +1,6 @@
 
-/** DeparturesTableInterfaceElement class header.
-	@file DeparturesTableInterfaceElement.h
+/** DeparturesTableRoutePlanningInterfaceElement class header.
+	@file DeparturesTableRoutePlanningInterfaceElement.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,57 +20,39 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DeparturesTableInterfaceElement_H__
-#define SYNTHESE_DeparturesTableInterfaceElement_H__
+#ifndef SYNTHESE_DeparturesTableRoutePlanningInterfaceElement_H__
+#define SYNTHESE_DeparturesTableRoutePlanningInterfaceElement_H__
 
 #include <string>
 
-#include "11_interfaces/LibraryInterfaceElement.h"
+#include "LibraryInterfaceElement.h"
 
 namespace synthese
 {
-    namespace interfaces
-    {
-	class ValueInterfaceElement;
-	
-    }
-
-
 	namespace departurestable
 	{
 
-		/** Departure table based on a display screen definition.
+		/** Route planning departure table based on a display screen definition.
 			@ingroup m54Library refLibrary
-			@todo Verify the documentation
-
+			
 			Displays : The defined departure table.
 			Parameters :
-				- 0 : Step to use for going to the next page (if you don't know what to do, put 1)
-				- 1 : Max page number :
-					- 0 : Don't handle page
-					- -1 : Unlimited pages number (one per displayed stop)
-					- n>0 : max of n pages (one per displayed stop)
-				- 2 : Separator between pages
-				- 3 : Number of departures to hide (default = 0)
-				- 4 : Message to display
-				- 5 : Display services number (default : false)
-				- 6 : Display track number
-				- 7 : Number of intermediates stops
-				- 8 : Display team
-				- 9 : Blinking delay
+				- 0 : Origin id
+				- 1 : Number of departures to hide (default = 0)
+				- 2 : Display services number (default : false)
+				- 3 : Display track number
+				- 4 : With transfer
+				- 5 : Blinking delay
 		*/
-		class DeparturesTableInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableInterfaceElement>
+		class DeparturesTableRoutePlanningInterfaceElement:
+			public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableRoutePlanningInterfaceElement>
 		{
 		private:
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _multiplicateurRangeeVIE;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pagesVIE;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pageSeparator;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _originId;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _departuresToHide;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _message;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayServiceNumber;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayQuai;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _numberOfIntermediatesStops;
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayTeam;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _withTransfer;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _blinkingDelay;
 
 		public:

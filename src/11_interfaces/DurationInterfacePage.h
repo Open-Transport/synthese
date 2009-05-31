@@ -38,16 +38,20 @@ namespace synthese
 		/** Duration interface page.
 			@ingroup m11Pages refPages
 
-			The duration interface page takes the following arguments :
-				-# Duration in minutes
-				-# Contained hours
-				-# Minutes completing the hours
+			Available data :
+				- total_minutes : Duration in minutes
+				- hours : Contained hours
+				- minutes : Minutes completing the hours
 
 			The display can be "#1 min" or "#2 h #3 min" etc.
 		*/
 		class DurationInterfacePage : public util::FactorableTemplate<InterfacePage,DurationInterfacePage>
 		{
 		public:
+			static const std::string DATA_TOTAL_MINUTES;
+			static const std::string DATA_HOURS;
+			static const std::string DATA_MINUTES;
+
 			DurationInterfacePage();
 
 			/** Overloaded display method for specific parameter conversion.

@@ -2,17 +2,16 @@
 synthese::departurestable::DeparturesTableModule::integrate();
 
 synthese::departurestable::DeparturesTableInterfaceElement::integrate();
-synthese::departurestable::DeparturesTableTimeContentInterfaceElement::integrate();
+synthese::departurestable::DeparturesTableRoutePlanningInterfaceElement::integrate();
 synthese::departurestable::DeparturesTableLineContentInterfaceElement::integrate();
 synthese::departurestable::DeparturesTableDestinationContentInterfaceElement::integrate();
-synthese::departurestable::DeparturesTableRowServiceNumberInterfaceElement::integrate();
 synthese::departurestable::DisplayScreenHasAlarmValueInterfaceElement::integrate();
 synthese::departurestable::DisplayScreenAlarmContentValueInterfaceElement::integrate();
-synthese::departurestable::DeparturesTableTeamCell::integrate();
-synthese::departurestable::DeparturesTableTrackCell::integrate();
 
 synthese::departurestable::DeparturesTableInterfacePage::integrate();
+synthese::departurestable::DeparturesTableRoutePlanningInterfacePage::integrate();
 synthese::departurestable::DepartureTableRowInterfacePage::integrate();
+synthese::departurestable::DeparturesTableRoutePlanningRowInterfacePage::integrate();
 synthese::departurestable::ParseDisplayReturnInterfacePage::integrate();
 
 synthese::departurestable::DisplaySearchAdmin::integrate();
@@ -38,7 +37,7 @@ synthese::departurestable::UpdateAllStopsDisplayScreenAction::integrate();
 synthese::departurestable::AddDepartureStopToDisplayScreenAction::integrate();
 synthese::departurestable::AddForbiddenPlaceToDisplayScreen::integrate();
 synthese::departurestable::UpdateDisplayPreselectionParametersAction::integrate();
-synthese::departurestable::DisplayScreenAddDisplayedPlace::integrate();
+synthese::departurestable::DisplayScreenAddDisplayedPlaceAction::integrate();
 synthese::departurestable::DisplayScreenRemovePhysicalStopAction::integrate();
 synthese::departurestable::DisplayScreenRemoveDisplayedPlaceAction::integrate();
 synthese::departurestable::DisplayScreenRemoveForbiddenPlaceAction::integrate();

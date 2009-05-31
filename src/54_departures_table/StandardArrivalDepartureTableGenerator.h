@@ -45,7 +45,6 @@ namespace synthese
 				, const ForbiddenPlacesList&
 				, const time::DateTime& startDateTime
 				, const time::DateTime& endDateTime
-				, int blinkingDelay
 				, size_t maxSize = UNLIMITED_SIZE
 				);
 

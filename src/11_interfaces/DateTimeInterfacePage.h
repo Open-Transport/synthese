@@ -46,7 +46,7 @@ namespace synthese
 		/** DateTimeInterfacePage Interface Page Class.
 			@ingroup m11Pages refPages
 
-			Params :
+			Date :
 			 - year
 			 - month
 			 - day
@@ -60,6 +60,13 @@ namespace synthese
 		class DateTimeInterfacePage : public util::FactorableTemplate<InterfacePage,DateTimeInterfacePage>
 		{
 		public:
+			static const std::string DATA_YEAR;
+			static const std::string DATA_MONTH;
+			static const std::string DATA_DAY;
+			static const std::string DATA_HOURS;
+			static const std::string DATA_MINUTES;
+			static const std::string DATA_DAY_OF_WEEK;
+
 			DateTimeInterfacePage();
 
 			/** Overloaded display method for specific parameter conversion.

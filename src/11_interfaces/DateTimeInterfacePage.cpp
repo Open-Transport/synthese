@@ -22,7 +22,7 @@
 
 #include "DateTimeInterfacePage.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 using namespace std;
 
@@ -34,13 +34,14 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<InterfacePage,DateTimeInterfacePage>::FACTORY_KEY("datetime");
 
-	namespace util
-	{
-		// template<> const string FactoryTemplate<InterfacePage, DateTimeInterfacePage>::FACTORY_KEY("datetime");
-	}
-
 	namespace interfaces
 	{
+		const string DateTimeInterfacePage::DATA_DAY("day");
+		const string DateTimeInterfacePage::DATA_DAY_OF_WEEK("day_of_week");
+		const string DateTimeInterfacePage::DATA_HOURS("hours");
+		const string DateTimeInterfacePage::DATA_MINUTES("minutes");
+		const string DateTimeInterfacePage::DATA_MONTH("month");
+		const string DateTimeInterfacePage::DATA_YEAR("year");
 
 		void DateTimeInterfacePage::display(std::ostream& stream, VariablesMap& variables	, const time::DateTime& dateTime
 			, const server::Request* request /*= NULL*/) const

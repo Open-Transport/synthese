@@ -41,6 +41,12 @@ namespace synthese
 
 	namespace transportwebsite
 	{
+		const std::string PlacesListInterfacePage::PARAMETER_IS_CITY_LIST("is_city_list");
+		const std::string PlacesListInterfacePage::PARAMETER_IS_FOR_ORIGIN("is_for_origin");
+
+		const std::string PlacesListInterfacePage::DATA_CITY_ID("city_id");
+		const std::string PlacesListInterfacePage::DATA_CITY_NAME("city_name");
+		const std::string PlacesListInterfacePage::DATA_RESULTS_SIZE("size");
 
 		void PlacesListInterfacePage::display(
 			std::ostream& stream

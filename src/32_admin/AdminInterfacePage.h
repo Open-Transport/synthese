@@ -35,19 +35,24 @@ namespace synthese
 		class AdminInterfaceElement;
 
 		/** Admin template page.
-		@code admin @endcode
+			@code admin @endcode
 			@ingroup m14Pages refPages
+
+			Available data :
+				- object_id : current object id
 		*/
 		class AdminInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,AdminInterfacePage>
 		{
 		public:
+			static const std::string DATA_OBJECT_ID;
+
 			AdminInterfacePage();
 
 			/** Display of the admin page.
-			@param stream Stream to write on
-			@param pageKey Key of the AdminInterfaceElement to display
-			@param parameters Parameters to transmit to the AdminInterfaceElement to display
-			@param site Displayed site
+				@param stream Stream to write on
+				@param pageKey Key of the AdminInterfaceElement to display
+				@param parameters Parameters to transmit to the AdminInterfaceElement to display
+				@param site Displayed site
 			*/
 			void display( std::ostream& stream
 				, const boost::shared_ptr<const AdminInterfaceElement>* page

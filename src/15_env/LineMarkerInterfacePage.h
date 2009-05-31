@@ -44,20 +44,32 @@ namespace synthese
 			@code line_marker @endcode
 
 			Parameters :
-				- 0 : table opening HTML code
-				- 1 : table closing HTML code
-				- 2 : width of the marker (pixels)
-				- 3 : height of the marker (pixels)
-				- 4 : line style name
-				- 5 : line picto image url
-				- 6 : line short name
-				- 7 : line ID
+				- opening_html_code : table opening HTML code
+				- closing_html_code : table closing HTML code
+				- width : width of the marker (pixels)
+				- height : height of the marker (pixels)
+
+			Available data :
+				- style : line style name
+				- image : line picto image url
+				- short_name : line short name
+				- id : line ID
 
 			Object : CommercialLine
 		*/
 		class LineMarkerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, LineMarkerInterfacePage>
 		{
 		public:
+			static const std::string PARAMETER_OPENING_HTML_CODE;
+			static const std::string PARAMETER_CLOSING_HTML_CODE;
+			static const std::string PARAMETER_WIDTH;
+			static const std::string PARAMETER_HEIGHT;
+
+			static const std::string DATA_STYLE_NAME;
+			static const std::string DATA_IMAGE_URL;
+			static const std::string DATA_SHORT_NAME;
+			static const std::string DATA_ID;
+
 			LineMarkerInterfacePage();
 
 			/** Display of line of schedule sheet.

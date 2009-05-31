@@ -26,6 +26,8 @@
 
 #include "PublicTransportStopZoneConnectionPlace.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace boost;
 using namespace std;
 
@@ -41,6 +43,15 @@ namespace synthese
 
 	namespace departurestable
 	{
+		const string DeparturesTableInterfacePage::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
+		const string DeparturesTableInterfacePage::DATA_DISPLAY_TEAM("display_team");
+		const string DeparturesTableInterfacePage::DATA_DISPLAY_TRACK_NUMBER("display_track_number");
+		const string DeparturesTableInterfacePage::DATA_INTERMEDIATE_STOPS_NUMBER("intermediate_stops_number");
+		const string DeparturesTableInterfacePage::DATA_STOP_NAME("stop_name");
+		const string DeparturesTableInterfacePage::DATA_TITLE("title");
+		const string DeparturesTableInterfacePage::DATA_WIRING_CODE("wiring_code");
+		const string DeparturesTableInterfacePage::DATA_BLINKING_DELAY("blinking_delay");
+
 		void DeparturesTableInterfacePage::display( std::ostream& stream
 			, VariablesMap& vars
 			, const std::string& title
@@ -48,7 +59,8 @@ namespace synthese
 			, bool displayServiceNumber
 			, bool displayTrackNumber
 			, bool displayTeam
-			, int intermediatesStopsToDisplay
+			, int intermediatesStopsToDisplay,
+			int blinkingDelay
 			, const env::PublicTransportStopZoneConnectionPlace* place
 			, const ArrivalDepartureListWithAlarm& rows
 			, const server::Request* request /*= NULL*/ ) const
@@ -61,6 +73,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(intermediatesStopsToDisplay));
 			pv.push_back(Conversion::ToString(displayTeam));
 			pv.push_back(place->getFullName());
+			pv.push_back(lexical_cast<string>(blinkingDelay));
 
 			InterfacePage::_display(
 				stream
@@ -70,6 +83,38 @@ namespace synthese
 				, request);
 		}
 
+
+
+		void DeparturesTableInterfacePage::display(
+			std::ostream& stream ,
+			interfaces::VariablesMap& vars ,
+			const std::string& title ,
+			int wiringCode ,
+			bool displayServiceNumber ,
+			bool displayTrackNumber ,
+			int blinkingDelay,
+			const env::PublicTransportStopZoneConnectionPlace* place ,
+			const RoutePlanningListWithAlarm& rows ,
+			const server::Request* request /*= NULL */ 
+		) const	{
+			ParametersVector pv;
+			pv.push_back(title);
+			pv.push_back(Conversion::ToString(wiringCode));
+			pv.push_back(Conversion::ToString(displayServiceNumber));
+			pv.push_back(Conversion::ToString(displayTrackNumber));
+			pv.push_back(string());
+			pv.push_back(string());
+			pv.push_back(place->getFullName());
+			pv.push_back(lexical_cast<string>(blinkingDelay));
+
+			InterfacePage::_display(
+				stream
+				, pv
+				, vars
+				, (const void*) &rows
+				, request
+			);
+		}
 
 
 		DeparturesTableInterfacePage::DeparturesTableInterfacePage()

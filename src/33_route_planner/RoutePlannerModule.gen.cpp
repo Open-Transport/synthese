@@ -5,7 +5,6 @@ synthese::routeplanner::RoutePlannerSheetColumnInterfacePage::integrate();
 synthese::routeplanner::JourneyBoardStopCellInterfacePage::integrate();
 synthese::routeplanner::JourneyBoardServiceCellInterfacePage::integrate();
 synthese::routeplanner::JourneyBoardJunctionCellInterfacePage::integrate();
-synthese::routeplanner::RoutePlannerNoSolutionInterfacePage::integrate();
 synthese::routeplanner::RoutePlannerInterfacePage::integrate();
 synthese::routeplanner::JourneyBoardInterfacePage::integrate();
 synthese::routeplanner::UserFavoriteInterfacePage::integrate();

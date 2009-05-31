@@ -24,6 +24,11 @@
 
 #include "Conversion.h"
 #include "DepartureTableRowInterfacePage.h"
+#include "DateTime.h"
+#include "Service.h"
+#include "ServicePointer.h"
+#include "PhysicalStop.h"
+#include "Edge.h"
 
 using namespace boost;
 using namespace std;
@@ -32,6 +37,9 @@ namespace synthese
 {
 	using namespace util;
 	using namespace interfaces;
+	using namespace time;
+	using namespace env;
+	
 
 	namespace util
 	{
@@ -40,6 +48,15 @@ namespace synthese
 
 	namespace departurestable
 	{
+		const string DepartureTableRowInterfacePage::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
+		const string DepartureTableRowInterfacePage::DATA_DISPLAY_TEAM("display_team");
+		const string DepartureTableRowInterfacePage::DATA_DISPLAY_TRACK_NUMBER("display_track");
+		const string DepartureTableRowInterfacePage::DATA_INTERMEDIATE_STOPS_NUMBER("intermediale_stops_number");
+		const string DepartureTableRowInterfacePage::DATA_PAGE_NUMBER("page_number");
+		const string DepartureTableRowInterfacePage::DATA_ROW_RANK("rank");
+		const string DepartureTableRowInterfacePage::DATA_BLINKS("blinks");
+		const string DepartureTableRowInterfacePage::DATA_TIME("time");
+
 		void DepartureTableRowInterfacePage::display(std::ostream& stream
 			, VariablesMap& vars
 			, int rowId
@@ -47,7 +64,8 @@ namespace synthese
             , bool displayQuai
 			, bool displayServiceNumber
 			, bool displayTeam
-			, int intermediatesStopsToDisplay
+			, int intermediatesStopsToDisplay,
+			int blinkingDelay
 			, const ArrivalDepartureRow& ptd
 			, const server::Request* request
 		) const {
@@ -58,6 +76,29 @@ namespace synthese
 			parameters.push_back(Conversion::ToString(displayServiceNumber));
 			parameters.push_back(Conversion::ToString(intermediatesStopsToDisplay));
 			parameters.push_back(Conversion::ToString(displayTeam));
+			if(ptd.first.getService() == NULL)
+			{
+				parameters.push_back(string());
+				parameters.push_back(string());
+				parameters.push_back(string());
+				parameters.push_back(string());
+				parameters.push_back(string());
+			}
+			else
+			{
+				parameters.push_back(
+					(blinkingDelay > 0 && (ptd.first.getActualDateTime() - DateTime(TIME_CURRENT)) <= blinkingDelay) ?
+					string("1") : string("0")
+					);
+				parameters.push_back(ptd.first.getActualDateTime().getHour().toString());
+				parameters.push_back(ptd.first.getService()->getServiceNumber());
+				parameters.push_back(
+					static_cast<const PhysicalStop*>(ptd.first.getEdge()->getFromVertex())->getName()
+					);
+				parameters.push_back(
+					ptd.first.getService()->getTeam()
+					);
+			}
 			
 			InterfacePage::_display(
 				stream

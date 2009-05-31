@@ -52,6 +52,26 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		const string JourneyBoardServiceCellInterfacePage::DATA_FIRST_DEPARTURE_TIME("first_departure_time");
+		const string JourneyBoardServiceCellInterfacePage::DATA_LAST_DEPARTURE_TIME("last_departure_time");
+		const string JourneyBoardServiceCellInterfacePage::DATA_FIRST_ARRIVAL_TIME("first_arrival_time");
+		const string JourneyBoardServiceCellInterfacePage::DATA_LAST_ARRIVAL_TIME("last_arrival_time");
+		const string JourneyBoardServiceCellInterfacePage::DATA_ROLLINGSTOCK_ID("rolling_stock_id");
+		const string JourneyBoardServiceCellInterfacePage::DATA_ROLLINGSTOCK_NAME("rolling_stock_name");
+		const string JourneyBoardServiceCellInterfacePage::DATA_ROLLINGSTOCK_ARTICLE("rolling_stock_article");
+		const string JourneyBoardServiceCellInterfacePage::DATA_DESTINATION_NAME("destination_name");
+		const string JourneyBoardServiceCellInterfacePage::DATA_HANDICAPPED_FILTER_STATUS("handicapped_filter_status");
+		const string JourneyBoardServiceCellInterfacePage::DATA_HANDICAPPED_PLACES_NUMBER("handicapped_places_number");
+		const string JourneyBoardServiceCellInterfacePage::DATA_BIKE_FILTER_STATUS("bike_filter_status");
+		const string JourneyBoardServiceCellInterfacePage::DATA_BIKE_PLACES_NUMBER("bike_places_number");
+		const string JourneyBoardServiceCellInterfacePage::DATA_LINE_TEXT("line_text");
+		const string JourneyBoardServiceCellInterfacePage::DATA_LINE_IMAGE("line_image");
+		const string JourneyBoardServiceCellInterfacePage::DATA_LINE_ID("line_id");
+		const string JourneyBoardServiceCellInterfacePage::DATA_ALARM_MESSAGE("alarm_message");
+		const string JourneyBoardServiceCellInterfacePage::DATA_ALARM_LEVEL("alarm_level");
+		const string JourneyBoardServiceCellInterfacePage::DATA_ODD_ROW("is_odd_row");
+
+
 		void JourneyBoardServiceCellInterfacePage::display(
 			std::ostream& stream
 			, const ServiceUse& serviceUse

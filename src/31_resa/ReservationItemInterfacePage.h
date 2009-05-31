@@ -62,6 +62,14 @@ namespace synthese
 			: public util::FactorableTemplate<interfaces::InterfacePage, ReservationItemInterfacePage>
 		{
 		public:
+			static const std::string DATA_DEPARTURE_PLACE_NAME;
+			static const std::string DATA_DEPARTURE_TIME;
+			static const std::string DATA_ARRIVAL_PLACE_NAME;
+			static const std::string DATA_ARRIVAL_TIME;
+			static const std::string DATA_SEATS;
+			static const std::string DATA_URL_TO_CANCELLATION;
+			static const std::string DATA_STATUS_CANCELLED;
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on

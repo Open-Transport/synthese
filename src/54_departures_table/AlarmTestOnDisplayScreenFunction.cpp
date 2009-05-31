@@ -134,8 +134,7 @@ namespace synthese
 				{
 					ServicePointer sp(DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN, &lineStop);
 					sp.setActualTime(d);
-					DeparturesTableElement dte(sp, false);
-					displayedObject.map.insert(make_pair(dte, places));
+					displayedObject.map.insert(make_pair(sp, places));
 					d += 1;
 				}
 
@@ -164,7 +163,8 @@ namespace synthese
 					, false
 					, false
 					, false
-					, _type->getMaxStopsNumber()
+					, _type->getMaxStopsNumber(),
+					0
 					, &place
 					, displayedObject
 				);

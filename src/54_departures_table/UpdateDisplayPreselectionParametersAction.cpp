@@ -100,7 +100,8 @@ namespace synthese
 				_screen->setGenerationMethod(DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD);
 				break;
 
-			case ROUTE_PLANNING:
+			case ROUTE_PLANNING_WITH_TRANSFER:
+			case ROUTE_PLANNING_WITHOUT_TRANSFER:
 				_screen->setGenerationMethod(DisplayScreen::ROUTE_PLANNING);
 				break;
 			}
@@ -108,7 +109,8 @@ namespace synthese
 			{
 			case DEPARTURES_CHRONOLOGICAL:
 			case DEPARTURES_PRESELECTION:
-			case ROUTE_PLANNING:
+			case ROUTE_PLANNING_WITHOUT_TRANSFER:
+			case ROUTE_PLANNING_WITH_TRANSFER:
 				_screen->setDirection(DISPLAY_DEPARTURES);
 				break;
 
@@ -117,7 +119,18 @@ namespace synthese
 				_screen->setDirection(DISPLAY_ARRIVALS);
 				break;
 			}
-			
+
+			switch (_function)
+			{
+			case ROUTE_PLANNING_WITHOUT_TRANSFER:
+				_screen->setRoutePlanningWithTransfer(false);
+				break;
+
+			case ROUTE_PLANNING_WITH_TRANSFER:
+				_screen->setRoutePlanningWithTransfer(true);
+				break;
+			}
+
 			// Preselection delay
 			if (_preselectionDelay > 0)
 			{
@@ -160,7 +173,8 @@ namespace synthese
 			directionMap.insert(make_pair(DEPARTURES_PRESELECTION, "Départs avec présélection"));
 			directionMap.insert(make_pair(ARRIVAL_CHRONOLOGICAL, "Arrivées chronologiques"));
 			directionMap.insert(make_pair(ARRIVAL_PRESELECTION, "Arrivées avec présélection"));
-			directionMap.insert(make_pair(ROUTE_PLANNING, "Calcul d'itinéraire"));
+			directionMap.insert(make_pair(ROUTE_PLANNING_WITH_TRANSFER, "Calcul d'itinéraire avec correspondance"));
+			directionMap.insert(make_pair(ROUTE_PLANNING_WITHOUT_TRANSFER, "Calcul d'itinéraire sans correspondance"));
 			return directionMap;
 		}
 
@@ -188,8 +202,14 @@ namespace synthese
 		UpdateDisplayPreselectionParametersAction::DisplayFunction UpdateDisplayPreselectionParametersAction::GetFunction(
 			const DisplayScreen& screen
 		){
-			if(screen.getGenerationMethod() == DisplayScreen::ROUTE_PLANNING) return UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING;
-			if(screen.getGenerationMethod() == DisplayScreen::STANDARD_METHOD) return (screen.getDirection() == DISPLAY_DEPARTURES) ? DEPARTURES_CHRONOLOGICAL : ARRIVAL_CHRONOLOGICAL;
+			if(screen.getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
+			{
+				return screen.getRoutePlanningWithTransfer() ? UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING_WITH_TRANSFER : UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING_WITHOUT_TRANSFER;
+			}
+			if(screen.getGenerationMethod() == DisplayScreen::STANDARD_METHOD)
+			{
+				return (screen.getDirection() == DISPLAY_DEPARTURES) ? DEPARTURES_CHRONOLOGICAL : ARRIVAL_CHRONOLOGICAL;
+			}
 			return (screen.getDirection() == DISPLAY_DEPARTURES) ? DEPARTURES_PRESELECTION : ARRIVAL_PRESELECTION;
 		}
 

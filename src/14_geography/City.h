@@ -31,6 +31,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <boost/foreach.hpp>
 
 namespace synthese
@@ -55,13 +56,13 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<City>	Registry;
 
-			typedef lexmatcher::LexicalMatcher<const Place*> LexicalMatcher;
+			typedef lexmatcher::LexicalMatcher<const NamedPlace*> PlacesMatcher;
 
 		private:
-			typedef std::map<std::string, LexicalMatcher> Lexicalmatchers;
+			typedef std::map<std::string, PlacesMatcher> PlacesMatchers;
 			
-			LexicalMatcher	_allPlacesMatcher;
-			Lexicalmatchers _lexicalMatchers;
+			PlacesMatcher	_allPlacesMatcher;
+			PlacesMatchers _lexicalMatchers;
 			
 			std::string _name;
 			std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
@@ -84,17 +85,17 @@ namespace synthese
 				const std::string& getName() const { return _name; }
 				void setName(const std::string& code) { _name = code; }
 
-				LexicalMatcher& getLexicalMatcher(
+				PlacesMatcher& getLexicalMatcher(
 					const std::string& key
 				);
-				const LexicalMatcher& getLexicalMatcher(
+				const PlacesMatcher& getLexicalMatcher(
 					const std::string& key
 				) const;
 
-				LexicalMatcher& getAllPlacesMatcher(
+				PlacesMatcher& getAllPlacesMatcher(
 				);
 
-				const LexicalMatcher& getAllPlacesMatcher(
+				const PlacesMatcher& getAllPlacesMatcher(
 				) const;
 			//@}
 
@@ -112,17 +113,20 @@ namespace synthese
 					graph::GraphIdType whatToSearch
 				) const;
 				
+
+
 				template<class T>
 				std::vector<const T*> search(
 					const std::string& fuzzyName,
 					int nbMatches = 10
 				) const {
 					std::vector<const T*> result;
-					const lexmatcher::LexicalMatcher<const NamedPlace*>& matcher(_lexicalMatchers[T::FACTORY_KEY]);
-					lexmatcher::LexicalMatcher<const NamedPlace*>::MatchResult matches = matcher.bestMatches (
+					const PlacesMatchers::const_iterator itMatcher(_lexicalMatchers.find(T::FACTORY_KEY));
+					assert(itMatcher != _lexicalMatchers.end());
+					PlacesMatcher::MatchResult matches = itMatcher->second.bestMatches (
 						fuzzyName, nbMatches
-						);
-					BOOST_FOREACH(const lexmatcher::LexicalMatcher<const NamedPlace*>::MatchResult::value_type& it, matches)
+					);
+					BOOST_FOREACH(const PlacesMatcher::MatchResult::value_type& it, matches)
 					{
 						result.push_back(static_cast<const T*>(it.value));
 					}
@@ -132,7 +136,7 @@ namespace synthese
 
 				template<class T>
 				void addPlaceToMatcher(
-					const T* place
+					PlacesMatcher::Content place
 				){
 					getLexicalMatcher(place->getFactoryKey()).add(place->getName(), place);
 					_allPlacesMatcher.add(place->getNameForAllPlacesMatcher(),place);
@@ -141,7 +145,7 @@ namespace synthese
 
 				template<class T>
 				void removePlaceFromMatcher(
-					const T* place
+					PlacesMatcher::Content place
 				){
 					getLexicalMatcher(place->getFactoryKey()).remove(place->getName());
 					_allPlacesMatcher.remove(place->getNameForAllPlacesMatcher());

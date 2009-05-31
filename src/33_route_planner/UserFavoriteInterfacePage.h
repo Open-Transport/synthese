@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_UserFavoriteInterfacePage_H__
 #define SYNTHESE_UserFavoriteInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -61,6 +60,13 @@ namespace synthese
 			: public util::FactorableTemplate<interfaces::InterfacePage, UserFavoriteInterfacePage>
 		{
 		public:
+			static const std::string DATA_ID;
+			static const std::string DATA_RANK;
+			static const std::string DATA_ORIGIN_CITY_NAME;
+			static const std::string DATA_ORIGIN_PLACE_NAME;
+			static const std::string DATA_DESTINATION_CITY_NAME;
+			static const std::string DATA_DESTINATION_PLACE_NAME;
+
 			UserFavoriteInterfacePage();
 
 			/** Overloaded display method for specific parameter conversion.

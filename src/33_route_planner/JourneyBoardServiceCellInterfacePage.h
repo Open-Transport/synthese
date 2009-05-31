@@ -82,6 +82,25 @@ namespace synthese
 		class JourneyBoardServiceCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardServiceCellInterfacePage>
 		{
 		public:
+			static const std::string DATA_FIRST_DEPARTURE_TIME;
+			static const std::string DATA_LAST_DEPARTURE_TIME;
+			static const std::string DATA_FIRST_ARRIVAL_TIME;
+			static const std::string DATA_LAST_ARRIVAL_TIME;
+			static const std::string DATA_ROLLINGSTOCK_ID;
+			static const std::string DATA_ROLLINGSTOCK_NAME;
+			static const std::string DATA_ROLLINGSTOCK_ARTICLE;
+			static const std::string DATA_DESTINATION_NAME;
+			static const std::string DATA_HANDICAPPED_FILTER_STATUS;
+			static const std::string DATA_HANDICAPPED_PLACES_NUMBER;
+			static const std::string DATA_BIKE_FILTER_STATUS;
+			static const std::string DATA_BIKE_PLACES_NUMBER;
+			static const std::string DATA_LINE_TEXT;
+			static const std::string DATA_LINE_IMAGE;
+			static const std::string DATA_LINE_ID;
+			static const std::string DATA_ALARM_MESSAGE;
+			static const std::string DATA_ALARM_LEVEL;
+			static const std::string DATA_ODD_ROW;
+
 			JourneyBoardServiceCellInterfacePage();
 
 			/** Display.

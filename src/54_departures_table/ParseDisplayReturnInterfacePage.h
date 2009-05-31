@@ -80,6 +80,8 @@ namespace synthese
 		class ParseDisplayReturnInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, ParseDisplayReturnInterfacePage>
 		{
 		public:
+			static const std::string DATA_STRING;
+
 			ParseDisplayReturnInterfacePage();
 
 

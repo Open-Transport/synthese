@@ -20,12 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "AdminInterfaceElement.h"
+#include "AdminInterfacePage.h"
 
-#include "32_admin/AdminInterfaceElement.h"
-#include "32_admin/AdminInterfacePage.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -36,13 +37,15 @@ namespace synthese
 
 	namespace admin
 	{
+		const string AdminInterfacePage::DATA_OBJECT_ID("object_id");
+
 		void AdminInterfacePage::display(
 			std::ostream& stream
 			, const boost::shared_ptr<const AdminInterfaceElement>* page
 			, const uid objectId , const server::Request* request /*= NULL */ ) const
 		{
 			ParametersVector parameters;
-			parameters.push_back(Conversion::ToString(objectId));
+			parameters.push_back(lexical_cast<string>(objectId));
 			VariablesMap vars;
 
 			InterfacePage::_display(

@@ -24,8 +24,8 @@
 
 #include "LoginInterfacePage.h"
 
-#include "30_server/Function.h"
-#include "30_server/Request.h"
+#include "Function.h"
+#include "Request.h"
 
 using namespace std;
 
@@ -40,6 +40,9 @@ namespace synthese
 
 	namespace server
 	{
+		const std::string LoginInterfacePage::DATA_FUNCTION_KEY_IF_SUCCESS("function_if_success");
+		const std::string LoginInterfacePage::DATA_FUNCTION_PARAMETER("function_parameters");
+		const std::string LoginInterfacePage::DATA_TITLE("title");
 
 		void LoginInterfacePage::display(
 			std::ostream& stream

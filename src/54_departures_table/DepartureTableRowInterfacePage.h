@@ -34,13 +34,18 @@ namespace synthese
 		/** Departure table row Interface Page.
 			@code departurestablerow @endcode
 
-			Parameters :
+			Available data :
 				- 0 : Rank of the row in the departure table
 				- 1 : Number of the page to display for multiple page protocol (eg Lumiplan)
 				- 2 : Display track number
 				- 3 : Display service number
 				- 4 : Number of intermediates stops to display
 				- 5 : Display team number
+				- 6 : blinks : Departure blinks ?
+				- 7 : time : Departure time
+				- 8 : service_number : Service number
+				- 9 : track : Track name
+				- 10 : team : Team number
 
 			Object :
 				- Must be a ArrivalDepartureRow object
@@ -48,6 +53,18 @@ namespace synthese
 		class DepartureTableRowInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, DepartureTableRowInterfacePage>
 		{
 		public:
+			static const std::string DATA_ROW_RANK;
+			static const std::string DATA_PAGE_NUMBER;
+			static const std::string DATA_DISPLAY_TRACK_NUMBER;
+			static const std::string DATA_DISPLAY_SERVICE_NUMBER;
+			static const std::string DATA_DISPLAY_TEAM;
+			static const std::string DATA_INTERMEDIATE_STOPS_NUMBER;
+			static const std::string DATA_BLINKS;
+			static const std::string DATA_TIME;
+			static const std::string DATA_SERVICE_NUMBER;
+			static const std::string DATA_TRACK;
+			static const std::string DATA_TEAM;
+
 			DepartureTableRowInterfacePage();
 
 			/** Display of the admin page.
@@ -59,7 +76,8 @@ namespace synthese
 				, bool displayQuaiNumber
 				, bool displayServiceNumber
 				, bool displayTeam
-				, int intermediatesStopsToDisplay
+				, int intermediatesStopsToDisplay,
+				int blinkingDelay
 				, const ArrivalDepartureRow& row
 				, const server::Request* request = NULL
 				) const;

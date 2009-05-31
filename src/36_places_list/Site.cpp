@@ -247,7 +247,7 @@ namespace synthese
 
 			if (!placeName.empty())
 			{
-				City::LexicalMatcher::MatchResult places(
+				City::PlacesMatcher::MatchResult places(
 					city->getAllPlacesMatcher().bestMatches(placeName, 1)
 				);
 				if (!places.empty())

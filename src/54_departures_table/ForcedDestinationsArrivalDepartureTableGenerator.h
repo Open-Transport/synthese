@@ -61,7 +61,6 @@ namespace synthese
 				, size_t maxSize
 				, const ForcedDestinationsSet&
 				, int persistanceDuration
-				, int blinkingDelay
 				);
 
 

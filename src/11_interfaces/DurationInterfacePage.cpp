@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "11_interfaces/DurationInterfacePage.h"
+#include "DurationInterfacePage.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -32,6 +33,9 @@ namespace synthese
 
 	namespace interfaces
 	{
+		const string DurationInterfacePage::DATA_HOURS("hours");
+		const string DurationInterfacePage::DATA_MINUTES("minutes");
+		const string DurationInterfacePage::DATA_TOTAL_MINUTES("total_minutes");
 
 		void DurationInterfacePage::display(std::ostream& stream, int duration, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/) const
 		{

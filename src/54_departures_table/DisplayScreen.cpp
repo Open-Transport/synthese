@@ -32,10 +32,12 @@
 #include "DisplayType.h"
 #include "DisplayMaintenanceLog.h"
 #include "DeparturesTableInterfacePage.h"
+#include "DeparturesTableRoutePlanningInterfacePage.h"
 #include "DisplayScreenAlarmRecipient.h"
 #include "DisplayScreenCPU.h"
 #include "NamedPlace.h"
 #include "DisplayMonitoringStatus.h"
+#include "RoutePlanningTableGenerator.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -125,56 +127,6 @@ namespace synthese
 		}
 
 
-
-		shared_ptr<ArrivalDepartureTableGenerator> DisplayScreen::getGenerator(const DateTime& startDateTime) const
-		{
-			if (_displayType == NULL)
-			{
-				throw Exception("Display type must be defined to build the generator of the display screen");
-			}
-
-			// End time
-			DateTime realStartDateTime(startDateTime);
-			realStartDateTime += (-_clearingDelay + 1);
-			DateTime endDateTime(realStartDateTime);
-			endDateTime += _maxDelay;
-
-			// Construction of the generator
-			switch (_generationMethod)
-			{
-			case STANDARD_METHOD:
-				return shared_ptr<ArrivalDepartureTableGenerator>((ArrivalDepartureTableGenerator*) new StandardArrivalDepartureTableGenerator(
-					getPhysicalStops()
-					, _direction
-					, _originsOnly
-					, _forbiddenLines
-					, _displayedPlaces
-					, _forbiddenArrivalPlaces
-					, realStartDateTime
-					, endDateTime
-					, _blinkingDelay
-					, _displayType->getRowNumber()
-				));
-
-			case WITH_FORCED_DESTINATIONS_METHOD:
-				return shared_ptr<ArrivalDepartureTableGenerator>((ArrivalDepartureTableGenerator*) new ForcedDestinationsArrivalDepartureTableGenerator(
-					getPhysicalStops()
-					, _direction
-					, _originsOnly
-					, _forbiddenLines
-					, _displayedPlaces
-					, _forbiddenArrivalPlaces
-					, realStartDateTime
-					, endDateTime
-					, _displayType->getRowNumber()
-					, _forcedDestinations
-					, _destinationForceDelay
-					, _blinkingDelay
-				));
-			}
-			assert(false);
-			return shared_ptr<ArrivalDepartureTableGenerator>();
-		}
 
 		const PublicTransportStopZoneConnectionPlace* DisplayScreen::getLocalization() const
 		{
@@ -269,30 +221,110 @@ namespace synthese
 
 		void DisplayScreen::display( std::ostream& stream, const DateTime& date ) const
 		{
-			if (!_displayType || !_displayType->getDisplayInterface() || !_maintenanceIsOnline)
+			if (!_displayType || !_displayType->getDisplayInterface() || !_maintenanceIsOnline || !_localization)
 				return;
 
 			try
 			{
-				shared_ptr<ArrivalDepartureTableGenerator> generator = getGenerator(date);
-				ArrivalDepartureListWithAlarm displayedObject;
-				displayedObject.map = generator->generate();
-				displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
-				const DeparturesTableInterfacePage* page(_displayType->getDisplayInterface()->getPage<DeparturesTableInterfacePage>());
+				shared_ptr<ArrivalDepartureTableGenerator> generator;
+
+				// End time
+				DateTime realStartDateTime(date);
+				realStartDateTime += (-_clearingDelay + 1);
+				DateTime endDateTime(realStartDateTime);
+				endDateTime += _maxDelay;
+
 				VariablesMap variables;
+
+				if(_generationMethod == ROUTE_PLANNING)
+				{
+					const DeparturesTableRoutePlanningInterfacePage* page(
+						_displayType->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()
+					);
+
+					RoutePlanningTableGenerator generator(
+						*_localization,
+						getDisplayedPlaces(),
+						realStartDateTime,
+						endDateTime,
+						_routePlanningWithTransfer
+					);
+
+					RoutePlanningListWithAlarm displayedObject;
+					displayedObject.map = generator.run();
+					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
+
+					page->display(
+						stream,
+						variables,
+						getTitle(),
+						getWiringCode(),
+						getServiceNumberDisplay(),
+						getTrackNumberDisplay(),
+						getRoutePlanningWithTransfer(),
+						getBlinkingDelay(),
+						*getLocalization(),
+						displayedObject
+					);
+				}
+				else
+				{
+					const DeparturesTableInterfacePage* page(
+						_displayType->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
+					);
+
+					switch (_generationMethod)
+					{
+					case STANDARD_METHOD:
+						generator.reset(static_cast<ArrivalDepartureTableGenerator*>(
+							new StandardArrivalDepartureTableGenerator(
+								getPhysicalStops()
+								, _direction
+								, _originsOnly
+								, _forbiddenLines
+								, _displayedPlaces
+								, _forbiddenArrivalPlaces
+								, realStartDateTime
+								, endDateTime
+								, _displayType->getRowNumber()
+						)	)	);
+						break;
+
+					case WITH_FORCED_DESTINATIONS_METHOD:
+						generator.reset(static_cast<ArrivalDepartureTableGenerator*>(
+							new ForcedDestinationsArrivalDepartureTableGenerator(
+								getPhysicalStops()
+								, _direction
+								, _originsOnly
+								, _forbiddenLines
+								, _displayedPlaces
+								, _forbiddenArrivalPlaces
+								, realStartDateTime
+								, endDateTime
+								, _displayType->getRowNumber()
+								, _forcedDestinations
+								, _destinationForceDelay
+						)	)	);
+					}
+
+					ArrivalDepartureListWithAlarm displayedObject;
+					displayedObject.map = generator->generate();
+					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
 				
-				page->display(
-					stream
-					, variables
-					, getTitle()
-					, getWiringCode()
-					, getServiceNumberDisplay()
-					, getTrackNumberDisplay()
-					, getDisplayTeam()
-					, getType()->getMaxStopsNumber()
-					, getLocalization()
-					, displayedObject
-				);
+					page->display(
+						stream
+						, variables
+						, getTitle()
+						, getWiringCode()
+						, getServiceNumberDisplay()
+						, getTrackNumberDisplay()
+						, getDisplayTeam()
+						, getType()->getMaxStopsNumber(),
+						getBlinkingDelay()
+						, getLocalization()
+						, displayedObject
+					);
+				}
 			}
 			catch (InterfacePageException& e)
 			{
@@ -642,6 +674,16 @@ namespace synthese
 		std::string DisplayScreen::getMacAddress() const
 		{
 			return _macAddress;
+		}
+
+		void DisplayScreen::setRoutePlanningWithTransfer( bool value )
+		{
+			_routePlanningWithTransfer = value;
+		}
+
+		bool DisplayScreen::getRoutePlanningWithTransfer() const
+		{
+			return _routePlanningWithTransfer;
 		}
 	}
 }

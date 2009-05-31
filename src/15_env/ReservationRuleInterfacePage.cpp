@@ -48,6 +48,10 @@ namespace synthese
 
 	namespace env
 	{
+		const string ReservationRuleInterfacePage::DATA_DEADLINE("deadline");
+		const string ReservationRuleInterfacePage::DATA_DELAY("delay");
+		const string ReservationRuleInterfacePage::DATA_IS_COMPULSORY("is_compulsory");
+		const string ReservationRuleInterfacePage::DATA_IS_OPTIONAL("is_optional");
 
 		void ReservationRuleInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const Journey& journey, const server::Request* request /*= NULL  */ ) const
 		{

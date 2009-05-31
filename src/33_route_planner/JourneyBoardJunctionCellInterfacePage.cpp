@@ -42,6 +42,11 @@ namespace synthese
 	
 	namespace routeplanner
 	{
+		const string JourneyBoardJunctionCellInterfacePage::DATA_REACHED_PLACE_NAME("reached_place_name");
+		const string JourneyBoardJunctionCellInterfacePage::DATA_ODD_ROW("is_odd_row");
+		const string JourneyBoardJunctionCellInterfacePage::DATA_ROAD_NAME("road_name");
+		const string JourneyBoardJunctionCellInterfacePage::DATA_LENGTH("length");
+
 		void JourneyBoardJunctionCellInterfacePage::display( 
 		    ostream& stream
 		    , const Place* place

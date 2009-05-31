@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_ReservationsListInterfacePage_H__
 #define SYNTHESE_ReservationsListInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -69,6 +68,13 @@ namespace synthese
 			: public util::FactorableTemplate<interfaces::InterfacePage, ReservationsListInterfacePage>
 		{
 		public:
+			static const std::string DATA_LINE_ID;
+			static const std::string DATA_CUSTOMER_ID;
+			static const std::string DATA_RESERVATION_NAME;
+			static const std::string DATA_DATE;
+			static const std::string DATA_WITH_CANCELLED_RESERVATIONS;
+			static const std::string DATA_LINE_NAME;
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on

@@ -47,11 +47,14 @@ namespace synthese
 			, const ForbiddenPlacesList& forbiddenPlaces
 			, const DateTime& startTime
 			, const DateTime& endDateTime
-			, int blinkingDelay
 			, size_t maxSize
-		) : ArrivalDepartureTableGenerator(physicalStops, direction, endfilter, lineFilter
-										, displayedPlacesList, forbiddenPlaces, startTime, endDateTime, blinkingDelay, maxSize)
-		{}
+		):	ArrivalDepartureTableGenerator(
+			physicalStops, direction, endfilter, lineFilter,
+			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize
+		){
+		}
+
+
 
 		const ArrivalDepartureList& StandardArrivalDepartureTableGenerator::generate()
 		{

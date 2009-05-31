@@ -1,6 +1,6 @@
 
-/** DeparturesTableInterfacePage class header.
-	@file DeparturesTableInterfacePage.h
+/** DeparturesTableRoutePlanningInterfacePage class header.
+	@file DeparturesTableRoutePlanningInterfacePage.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DeparturesTableInterfacePage_H__
-#define SYNTHESE_DeparturesTableInterfacePage_H__
+#ifndef SYNTHESE_DeparturesTableRoutePlanningInterfacePage_H__
+#define SYNTHESE_DeparturesTableRoutePlanningInterfacePage_H__
 
 #include <string>
 
@@ -47,9 +47,9 @@ namespace synthese
 				- 1 : Wiring code
 				- 2 : 1|0 : Service number display
 				- 3 : display the track number
-				- 4 : number of intermediates stops to display
-				- 5 : display the team identifier
-				- 6 : name of the stop
+				- 4 : with transfer
+				- 5 : id of the origin place
+				- 6 : name of the origin place
 				- 7 : blinking_delay : blinking delay
 				
 			Object :
@@ -57,40 +57,20 @@ namespace synthese
 
 			@ingroup m54Pages refPages
 		*/
-		class DeparturesTableInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, DeparturesTableInterfacePage>
+		class DeparturesTableRoutePlanningInterfacePage :
+			public util::FactorableTemplate<interfaces::InterfacePage, DeparturesTableRoutePlanningInterfacePage>
 		{
 		public:
 			static const std::string DATA_TITLE;
 			static const std::string DATA_WIRING_CODE;
 			static const std::string DATA_DISPLAY_SERVICE_NUMBER;
 			static const std::string DATA_DISPLAY_TRACK_NUMBER;
-			static const std::string DATA_DISPLAY_TEAM;
-			static const std::string DATA_STOP_NAME;
-			static const std::string DATA_INTERMEDIATE_STOPS_NUMBER;
+			static const std::string DATA_ORIGIN_ID;
+			static const std::string DATA_ORIGIN_NAME;
+			static const std::string DATA_WITH_TRANSFER;
 			static const std::string DATA_BLINKING_DELAY;
 
-			DeparturesTableInterfacePage();
-
-			/** Display of the departures table from a departures list result object (standard and preselection methods).
-
-				@param title Title to display in the generated code
-				@param wiringCode Wiring code to display in the generated code
-				@param displayServiceNumber The service number must be displayed in this departure table
-			*/
-			void display(
-				std::ostream& stream
-				, interfaces::VariablesMap& vars
-				, const std::string& title
-				, int wiringCode
-				, bool displayServiceNumber
-				, bool displayTrackNumber
-				, bool displayTeam
-				, int intermediatesStopsToDisplay
-				, int blinkingDelay
-				, const env::PublicTransportStopZoneConnectionPlace* place
-				, const ArrivalDepartureListWithAlarm& rows
-				, const server::Request* request = NULL
-			) const;
+			DeparturesTableRoutePlanningInterfacePage();
 
 
 			/** Display of the departures table from route planning result object (route planning method).
@@ -105,9 +85,10 @@ namespace synthese
 				, const std::string& title
 				, int wiringCode
 				, bool displayServiceNumber
-				, bool displayTrackNumber
+				, bool displayTrackNumber,
+				bool withTransfer
 				, int blinkingDelay
-				, const env::PublicTransportStopZoneConnectionPlace* place
+				, const env::PublicTransportStopZoneConnectionPlace& place
 				, const RoutePlanningListWithAlarm& rows
 				, const server::Request* request = NULL
 			) const;

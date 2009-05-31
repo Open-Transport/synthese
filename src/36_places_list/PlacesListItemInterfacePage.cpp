@@ -39,6 +39,9 @@ namespace synthese
 
 	namespace transportwebsite
 	{
+		const string PlacesListItemInterfacePage::DATA_NAME("name");
+		const string PlacesListItemInterfacePage::DATA_ID("id");
+		const string PlacesListItemInterfacePage::DATA_RANK("rank");
 
 		void PlacesListItemInterfacePage::display(
 			std::ostream& stream

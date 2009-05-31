@@ -49,6 +49,10 @@ namespace synthese
 		class PlacesListItemInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,PlacesListItemInterfacePage>
 		{
 		public:
+			static const std::string DATA_RANK;
+			static const std::string DATA_NAME;
+			static const std::string DATA_ID;
+
 			PlacesListItemInterfacePage();
 
 			/** Overloaded display method for specific parameter conversion.

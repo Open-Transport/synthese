@@ -27,6 +27,7 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -43,35 +44,33 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";
+		const string DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE(Action_PARAMETER_PREFIX + "pl");
+		const string DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_SCREEN(Action_PARAMETER_PREFIX + "sc");
 
 
 		ParametersMap DisplayScreenRemoveDisplayedPlaceAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_screen.get())
+			{
+				map.insert(PARAMETER_SCREEN, lexical_cast<string>(_screen->getKey()));
+			}
+			if(_place.get())
+			{
+				map.insert(PARAMETER_PLACE, lexical_cast<string>(_place->getKey()));
+			}
 			return map;
 		}
 
+
+
 		void DisplayScreenRemoveDisplayedPlaceAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
-
-				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
-				_place = ConnectionPlaceTableSync::Get(id, _env);
-
-			}
-			catch (ObjectNotFoundException<DisplayScreen>&)
-			{
-				throw ActionException("Display screen not found");
-			}
-			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
-			{
-				throw ActionException("Specified place not found");
-			}
+			setScreen(map.getUid(PARAMETER_SCREEN, true, FACTORY_KEY));
+			setPlace(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
 		}
+
+
 
 		void DisplayScreenRemoveDisplayedPlaceAction::run()
 		{
@@ -82,9 +81,33 @@ namespace synthese
 
 
 		bool DisplayScreenRemoveDisplayedPlaceAction::_isAuthorized(
-
-			) const {
+		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		}
+
+		void DisplayScreenRemoveDisplayedPlaceAction::setScreen( const util::RegistryKeyType id )
+		{
+			try
+			{
+				_screen = DisplayScreenTableSync::GetEditable(id, _env);
+			}
+			catch (ObjectNotFoundException<DisplayScreen>&)
+			{
+				throw ActionException("Display screen not found");
+			}
+		}
+
+		void DisplayScreenRemoveDisplayedPlaceAction::setPlace( const util::RegistryKeyType id )
+		{
+			try
+			{
+				_place = ConnectionPlaceTableSync::Get(id, _env);
+
+			}
+			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+			{
+				throw ActionException("Specified place not found");
+			}
 		}
 	}
 }

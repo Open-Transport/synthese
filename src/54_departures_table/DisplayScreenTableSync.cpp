@@ -105,6 +105,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_COM_PORT("com_port");
 		const string DisplayScreenTableSync::COL_CPU_HOST_ID("cpu_host_id");
 		const string DisplayScreenTableSync::COL_MAC_ADDRESS("mac_address");
+		const string DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER("route_planning_with_transfer");
 	}
 
 	namespace db
@@ -145,6 +146,7 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_COM_PORT, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_CPU_HOST_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAC_ADDRESS, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER, SQL_BOOLEAN),
 			SQLiteTableSync::Field()
 		};
 		
@@ -181,6 +183,7 @@ namespace synthese
 			object->setDisplayClock(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_CLOCK));
 			object->setComPort(rows->getInt(DisplayScreenTableSync::COL_COM_PORT));
 			object->setMacAddress(rows->getText(DisplayScreenTableSync::COL_MAC_ADDRESS));
+			object->setRoutePlanningWithTransfer(rows->getBool(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER));
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -359,12 +362,12 @@ namespace synthese
 				<< ",'";
 
 			count = 0;
-			for (DisplayedPlacesList::const_iterator itd = object->getDisplayedPlaces().begin(); itd != object->getDisplayedPlaces().end(); ++itd)
+			BOOST_FOREACH(const DisplayedPlacesList::value_type& itd, object->getDisplayedPlaces())
 			{
-				assert(itd->second->getKey() > 0);
+				assert(itd.second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itd->first);
+				query << Conversion::ToString(itd.second->getKey());
 			}
 
 			query
@@ -375,12 +378,12 @@ namespace synthese
 				<< ",'";
 
 			count = 0;
-			for (DisplayedPlacesList::const_iterator itd2 = object->getForcedDestinations().begin(); itd2 != object->getForcedDestinations().end(); ++itd2)
+			BOOST_FOREACH(const DisplayedPlacesList::value_type& itd2, object->getForcedDestinations())
 			{
-				assert(itd2->second->getKey() > 0);
+				assert(itd2.second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itd2->first);
+				query << Conversion::ToString(itd2.second->getKey());
 			}
 
 			query <<
@@ -391,7 +394,8 @@ namespace synthese
 				Conversion::ToString(object->getDisplayClock()) << "," <<
 				Conversion::ToString(object->getComPort()) << "," <<
 				(object->getCPU() != NULL ? Conversion::ToString(object->getCPU()->getKey()) : "0") << "," <<
-				Conversion::ToSQLiteString(object->getMacAddress()) <<
+				Conversion::ToSQLiteString(object->getMacAddress()) << "," <<
+				object->getRoutePlanningWithTransfer() <<
 				")"
 			;
 			

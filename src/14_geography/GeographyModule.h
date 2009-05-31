@@ -29,6 +29,7 @@
 #include "FactorableTemplate.h"
 #include "ModuleClass.h"
 #include "LexicalMatcher.h"
+#include "City.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -48,9 +49,6 @@ namespace synthese
 	*/
 	namespace geography
 	{
-		class City;
-		class Place;
-
 		/** 09 Geography Module class.
 			@author Hugues Romain
 			@date 2008
@@ -59,13 +57,12 @@ namespace synthese
 			public util::FactorableTemplate<util::ModuleClass, GeographyModule>
 		{
 		public:
-			typedef std::vector<City*> CityList;
-
 			typedef lexmatcher::LexicalMatcher<City*> CitiesMatcher;
+			typedef std::vector<CitiesMatcher::Content> CityList;
 
 		private:
 
-			static CitiesMatcher _citiesMatcher; //!< @todo To be moved in 36_transport_website
+			static CitiesMatcher _citiesMatcher;
 			static CitiesMatcher _citiesT9Matcher;
 
 		public:
@@ -78,28 +75,42 @@ namespace synthese
 			virtual std::string getName() const;
 
 
-			static const geography::Place* FetchPlace(const std::string& city, const std::string& place);
+			//////////////////////////////////////////////////////////////////////////
+			/// Finds the best place corresponding to a pair of texts : city name and
+			/// place name.
+			/// @param city name of the city
+			/// @param place name of the place within the city
+			/// @return the best choice
+			/// Even if no place name really corresponds to the entered texts,
+			/// a result is ever returned.
+			static const Place* FetchPlace(
+				const std::string& city,
+				const std::string& place
+			);
+
 
 
 			/** Find the best matches in the city list comparing to a text entry.
-			@param fuzzyName The text entry to compare
-			@param nbMatches The number of matches to return
-			@param t9 true indicates that the text entry follows the t9 format (optional : default = false)
-			@return synthese::env::CityList The list of results
-			@author Hugues Romain
-			@date 2008
-
+				@param fuzzyName The text entry to compare
+				@param nbMatches The number of matches to return
+				@param t9 true indicates that the text entry follows the t9 format (optional : default = false)
+				@return synthese::env::CityList The list of results
+				@author Hugues Romain
+				@date 2008
 			*/
 			static CityList GuessCity(
 				const std::string& fuzzyName
 				, int nbMatches = 10
 				, bool t9 = false
-				);
+			);
 
-			static void AddToCitiesMatchers(geography::City* city);
-			static void RemoveFromCitiesMatchers(geography::City* city);
+			static void AddToCitiesMatchers(
+				CitiesMatcher::Content city
+			);
 
-
+			static void RemoveFromCitiesMatchers(
+				CitiesMatcher::Content city
+			);
 
 		};
 	}

@@ -373,20 +373,32 @@ namespace synthese
 					@date 2008					
 				*/
 				template<class K>
-				std::string getRadioInput(const std::string& name, const K& valueIfSelected, const K& valueToSelect, const std::string label="", bool disabled=false);
+				std::string getRadioInput(
+					const std::string& name,
+					const K& valueIfSelected,
+					const K& valueToSelect,
+					const std::string label="",
+					bool disabled=false
+				);
 
 				
 				
-				/** Radio input collection generated upon a vector of values (input type=radio).
-					@param name name of the field
-					@param choices vector of pairs : first is the value of an element, second is the corresponding label
-					@param value default value of the field that determinate which radio element is checked at the page load
-					@return std::string the HTML generated code
-					@author Hugues Romain
-					@date 2008					
-				*/
+				//////////////////////////////////////////////////////////////////////////
+				/// Radio input collection generated upon a vector of values (input type=radio).
+				///	@param name name of the field
+				///	@param choices vector of pairs : first is the value of an element, second is the corresponding label
+				///	@param value default value of the field that determinate which radio element is checked at the page load
+				/// @param withBR adds a BR tag after each label
+				///	@return std::string the HTML generated code
+				///	@author Hugues Romain
+				///	@date 2008					
 				template<class K>
-				std::string getRadioInput(const std::string& name, const std::vector<std::pair<K, std::string> >& choices, const K& value);
+				std::string getRadioInputCollection(
+					const std::string& name,
+					const std::vector<std::pair<K, std::string> >& choices,
+					const K& value,
+					bool withBR = false
+				);
 
 
 
@@ -395,11 +407,17 @@ namespace synthese
 				///	@param name name of the field
 				///	@param choices map : first is the value of an element, second is the corresponding label
 				///	@param value default value of the field that determinate which radio element is checked at the page load
+				/// @param withBR adds a BR tag after each label
 				///	@return std::string the HTML generated code
 				///	@author Hugues Romain
 				///	@date 2008
 				template<class K>
-				std::string getRadioInput(const std::string& name, const std::map<K, std::string>& choices, const K& value);
+				std::string getRadioInputCollection(
+					const std::string& name,
+					const std::map<K, std::string>& choices,
+					const K& value,
+					bool withBR = false
+				);
 
 
 
@@ -748,12 +766,20 @@ namespace synthese
 		}
 
 		template<class K>
-		std::string HTMLForm::getRadioInput(const std::string& name, const std::vector<std::pair<K, std::string> >& choices, const K& value)
-		{
+		std::string HTMLForm::getRadioInputCollection(
+			const std::string& name,
+			const std::vector<std::pair<K, std::string> >& choices,
+			const K& value,
+			bool withBR
+		){
 			std::stringstream s;
 			for (typename std::vector<std::pair<K, std::string> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << getRadioInput(name, it->first, value, it->second);
+				if(withBR)
+				{
+					s << "<br />";
+				}
 			}
 			return s.str();
 		}
@@ -761,12 +787,20 @@ namespace synthese
 
 
 		template<class K>
-		std::string HTMLForm::getRadioInput(const std::string& name, const std::map<K, std::string>& choices, const K& value)
-		{
+		std::string HTMLForm::getRadioInputCollection(
+			const std::string& name,
+			const std::map<K, std::string>& choices,
+			const K& value,
+			bool withBR
+		){
 			std::stringstream s;
 			for (typename std::map<K, std::string>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << getRadioInput(name, it->first, value, it->second);
+				if(withBR)
+				{
+					s << "<br />";
+				}
 			}
 			return s.str();
 		}

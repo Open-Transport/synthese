@@ -80,7 +80,7 @@ namespace synthese
 
 		void PlacesListFunction::_run( std::ostream& stream ) const
 		{
-			LexicalMatcher<const City*>::MatchResult cities(
+			Site::CitiesMatcher::MatchResult cities(
 				_site->getCitiesMatcher().bestMatches(_cityText, 1)
 			);
 			if (cities.empty())
@@ -90,9 +90,9 @@ namespace synthese
 			const City* city(cities.front().value);
 
 			PlacesList placesList;
-			City::LexicalMatcher::MatchResult places(city->getAllPlacesMatcher().bestMatches(_input, _n));
+			City::PlacesMatcher::MatchResult places(city->getAllPlacesMatcher().bestMatches(_input, _n));
 			
-			BOOST_FOREACH(const City::LexicalMatcher::MatchHit it, places)
+			BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
 			{
 				placesList.push_back(make_pair(UNKNOWN_VALUE /*it.value->getKey()*/, it.key));
 			}

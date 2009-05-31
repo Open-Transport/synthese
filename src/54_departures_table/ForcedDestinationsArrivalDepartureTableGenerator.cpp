@@ -53,7 +53,6 @@ namespace synthese
 			, size_t maxSize
 			, const ForcedDestinationsSet& forcedDestinations
 			, int persistanceDuration
-			, int blinkingDelay
 		):	ArrivalDepartureTableGenerator(
 				physicalStops,
 				direction,
@@ -63,7 +62,6 @@ namespace synthese
 				forbiddenPlaces,
 				startTime,
 				endDateTime,
-				blinkingDelay,
 				maxSize
 			),
 			_forcedDestinations(forcedDestinations),
@@ -152,7 +150,7 @@ namespace synthese
 						}
 						// Else optimizing a previously founded ptd
 						else if(serviceInstance.getActualDateTime() <
-							reachedDestination[connectionPlace]->first.servicePointer.getActualDateTime()
+							reachedDestination[connectionPlace]->first.getActualDateTime()
 						){
 							// Allocation
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
@@ -184,7 +182,7 @@ namespace synthese
 					_result.size() < _maxSize && itr != standardTableResult.end(); ++itr)
 				{
 					if (_result.find(itr->first) == _result.end())
-						_insert(itr->first.servicePointer);
+						_insert(itr->first);
 				}
 			}
 

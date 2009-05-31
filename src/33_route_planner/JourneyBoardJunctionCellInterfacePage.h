@@ -51,8 +51,8 @@ namespace synthese
 
 			Parameters :
 				- 0 : Reached place name
-				- 1 : Alarm
-				- 2 : Alarm
+				- 1 : Alarm (unused)
+				- 2 : Alarm (unused)
 				- 3 : Odd or even row in the journey board
 				- 4 : Road name
 				- 5 : Length of the junction
@@ -61,6 +61,11 @@ namespace synthese
 		:	public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardJunctionCellInterfacePage>
 		{
 		public:
+			static const std::string DATA_REACHED_PLACE_NAME;
+			static const std::string DATA_ODD_ROW;
+			static const std::string DATA_ROAD_NAME;
+			static const std::string DATA_LENGTH;
+
 			JourneyBoardJunctionCellInterfacePage();
 
 			/** Display.

@@ -36,11 +36,16 @@ namespace synthese
 		/** Schedule sheet lines list cell.
 			@code schedule_sheet_lines_cell @endcode
 			@ingroup m53Pages refPages
+
+			Available data :
+				- column_number : Column number
 		*/
 		class RoutePlannerSheetLinesCellInterfacePage
 		:	public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLinesCellInterfacePage>
 		{
 		public:
+			static const std::string DATA_COLUMN_NUMBER;
+
 			RoutePlannerSheetLinesCellInterfacePage();
 
 			/** Display of schedule sheet lines list cell.

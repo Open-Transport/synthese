@@ -27,9 +27,8 @@
 
 #include "33_route_planner/Types.h"
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -86,6 +85,23 @@ namespace synthese
 		class RoutePlannerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerInterfacePage>
 		{
 		public:
+			static const std::string DATA_INTERNAL_DATE;
+			static const std::string DATA_IS_HOME;
+			static const std::string DATA_ORIGIN_CITY_TEXT;
+			static const std::string DATA_HANDICAPPED_FILTER;
+			static const std::string DATA_ORIGIN_PLACE_TEXT;
+			static const std::string DATA_BIKE_FILTER;
+			static const std::string DATA_DESTINATION_CITY_TEXT;
+			static const std::string DATA_DESTINATION_PLACE_ID;
+			static const std::string DATA_DESTINATION_PLACE_TEXT;
+			static const std::string DATA_PERIOD_ID;
+			static const std::string DATA_DATE;
+			static const std::string DATA_PERIOD;
+			static const std::string DATA_SOLUTIONS_NUMBER;
+			static const std::string DATA_ACCESSIBILITY_CODE;
+			static const std::string DATA_SITE_ID;
+			static const std::string DATA_IS_SAME_PLACES;
+
 			RoutePlannerInterfacePage();
 
 			/** Display of a successful route planning

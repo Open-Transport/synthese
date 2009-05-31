@@ -27,9 +27,8 @@
 
 #include "36_places_list/Types.h"
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -51,6 +50,8 @@ namespace synthese
 			Parameters :
 			 - 0 : 1|0 is city list
 			 - 1 : 1|0 is for origin selection
+
+			Available Data :
 			 - 2 : size of the results
 			 - 3 : if places list, city id
 			 - 4 : if places list, city name
@@ -61,6 +62,13 @@ namespace synthese
 		class PlacesListInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, PlacesListInterfacePage>
 		{
 		public:
+			static const std::string PARAMETER_IS_CITY_LIST;
+			static const std::string PARAMETER_IS_FOR_ORIGIN;
+
+			static const std::string DATA_RESULTS_SIZE;
+			static const std::string DATA_CITY_ID;
+			static const std::string DATA_CITY_NAME;
+
 			PlacesListInterfacePage();
 
 			/** Overloaded display method for specific parameter conversion.

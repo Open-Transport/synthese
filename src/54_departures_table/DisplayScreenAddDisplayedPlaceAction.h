@@ -1,6 +1,6 @@
 
-/** DisplayScreenAddDisplayedPlace class header.
-	@file DisplayScreenAddDisplayedPlace.h
+/** DisplayScreenAddDisplayedPlaceAction class header.
+	@file DisplayScreenAddDisplayedPlaceAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DisplayScreenAddDisplayedPlace_H__
-#define SYNTHESE_DisplayScreenAddDisplayedPlace_H__
+#ifndef SYNTHESE_DisplayScreenAddDisplayedPlaceAction_H__
+#define SYNTHESE_DisplayScreenAddDisplayedPlaceAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
@@ -37,17 +37,26 @@ namespace synthese
 	{
 		class DisplayScreen;
 
-		/** DisplayScreenAddDisplayedPlace action class.
+		/** Adds a displayed place to a display screen.
 			@ingroup m54Actions refActions
+
+			The place to add can be specified in two ways :
+				-  directly by a place ID
+				-  by city and place names : in this case the lexical matcher is used to determinate
+					the nearest choice
 		*/
-		class DisplayScreenAddDisplayedPlace : public util::FactorableTemplate<server::Action, DisplayScreenAddDisplayedPlace>
+		class DisplayScreenAddDisplayedPlaceAction:
+			public util::FactorableTemplate<server::Action, DisplayScreenAddDisplayedPlaceAction>
 		{
 		public:
 			static const std::string PARAMETER_PLACE;
+			static const std::string PARAMETER_CITY_NAME;
+			static const std::string PARAMETER_PLACE_NAME;
 
 		private:
 			boost::shared_ptr<DisplayScreen>			_screen;
-			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
+			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> _placeSptr;
+			const env::PublicTransportStopZoneConnectionPlace*	_place;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

@@ -46,7 +46,7 @@
 #include "UpdateAllStopsDisplayScreenAction.h"
 #include "AddDepartureStopToDisplayScreenAction.h"
 #include "AddForbiddenPlaceToDisplayScreen.h"
-#include "DisplayScreenAddDisplayedPlace.h"
+#include "DisplayScreenAddDisplayedPlaceAction.h"
 #include "DisplayScreenRemovePhysicalStopAction.h"
 #include "DisplayScreenRemoveDisplayedPlaceAction.h"
 #include "DisplayScreenRemoveForbiddenPlaceAction.h"
@@ -76,10 +76,12 @@
 #include "MessagesScenarioAdmin.h"
 #include "Interface.h"
 #include "DisplayScreenCPUAdmin.h"
+#include "City.h"
 
 #include <utility>
 #include <sstream>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -432,6 +434,14 @@ namespace synthese
 			// CONTENT TAB
 			if (openTabContent(stream, TAB_CONTENT))
 			{
+				// Add display request
+				ActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,AdminRequest> addDisplayRequest(_request);
+				addDisplayRequest.getFunction()->setSamePage(this);
+
+				// Remove displayed place request
+				ActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,AdminRequest> rmDisplayedRequest(_request);
+				rmDisplayedRequest.getFunction()->setSamePage(this);
+				rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
 
 				// Update request
 				ActionFunctionRequest<UpdateAllStopsDisplayScreenAction,AdminRequest> updateAllDisplayRequest(_request);
@@ -478,16 +488,18 @@ namespace synthese
 
 				stream << t.open();
 				stream << t.title("Contenu");
-				stream << t.cell("Type de contenu", t.getForm().getRadioInput(
-					UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_FUNCTION,
-					UpdateDisplayPreselectionParametersAction::GetFunctionList(),
-					UpdateDisplayPreselectionParametersAction::GetFunction(*_displayScreen)
-				));
-				stream << t.cell("Terminus", t.getForm().getRadioInput(
-					UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_END_FILTER,
-					endFilterMap,
-					_displayScreen->getEndFilter()
-				));
+				stream << t.cell("Type de contenu", t.getForm().getRadioInputCollection(
+						UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_FUNCTION,
+						UpdateDisplayPreselectionParametersAction::GetFunctionList(),
+						UpdateDisplayPreselectionParametersAction::GetFunction(*_displayScreen),
+						true
+				)	);
+				stream << t.cell("Terminus", t.getForm().getRadioInputCollection(
+						UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_END_FILTER,
+						endFilterMap,
+						_displayScreen->getEndFilter(),
+						true
+				)	);
 				stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
 				stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
 					UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
@@ -511,132 +523,177 @@ namespace synthese
 				
 				stream << t.close();
 
-				// Used physical stops
-				stream << "<h1>Arrêts de desserte</h1>";
-
-				HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
-				uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()));
-				stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
-				stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
-				stream << "</p>";
-				HTMLList l;
-
-				if (!_displayScreen->getAllPhysicalStopsDisplayed())
+				if(_displayScreen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 				{
+					stream << "<h1>Arrêts de destination</h1>";
+
 					if(_displayScreen->getLocalization() == NULL)
 					{
-						stream << "Afficheur non localisé, aucun arrêt à sélectionner.";
+						stream << "Afficheur non localisé, aucune destination ne peut être sélectionnée.";
 					}
 					else
 					{
-						HTMLTable t(4, ResultHTMLTable::CSS_CLASS);
-						stream << t.open();
-						stream << t.row();
-						stream << t.col(1, string(), true) << "Nom";
-						stream << t.col(1, string(), true) << "Code exploitant";
-						stream << t.col(1, string(), true) << "Lignes";
-						stream << t.col(1, string(), true) << "Affiché";
-						BOOST_FOREACH(
-							const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
-							_displayScreen->getLocalization()->getPhysicalStops()
-						){
+						HTMLForm f(addDisplayRequest.getHTMLForm("addplace"));
+
+						HTMLTable::ColsVector c;
+						c.push_back("Commune");
+						c.push_back("Arrêt");
+						c.push_back("Actions");
+						HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+						stream << f.open() << t.open();
+
+						BOOST_FOREACH(const DisplayedPlacesList::value_type& it, _displayScreen->getDisplayedPlaces())
+						{
+							rmDisplayedRequest.getAction()->setPlace(it.second->getKey());
 							stream << t.row();
+							stream << t.col() << it.second->getCity()->getName();
 							stream << t.col() << it.second->getName();
-							stream << t.col() << it.second->getOperatorCode();
-							
-							// Lines column
-							stream << t.col();
-							set<const CommercialLine*> lines;
-							BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
-							{
-								lines.insert(
-									static_cast<const LineStop*>(edge)->getLine()->getCommercialLine()
-								);
-							}
-							BOOST_FOREACH(const CommercialLine* line, lines)
-							{
-								stream <<
-									"<span class=\"line " << line->getStyle() << "\">" <<
-									line->getShortName() <<
-									"</span>"
-								;
-							}
-							
-							// Activated column
-							stream << t.col();							
-							if(	_displayScreen->getPhysicalStops().find(it.first) ==
-								_displayScreen->getPhysicalStops().end()
-							){
-								addPhysicalRequest.getAction()->setStopId(it.first);
-								stream <<
-									HTMLModule::getHTMLLink(
-										addPhysicalRequest.getHTMLForm().getURL(),
-										HTMLModule::getHTMLImage(
-											"cross.png",
-											"Arrêt non affiché, cliquer pour afficher"
-									)	)
-								;
-							} else {
-								rmPhysicalRequest.getAction()->setStopId(it.first);
-								stream <<
-									HTMLModule::getHTMLLink(
-										rmPhysicalRequest.getHTMLForm().getURL(),
-										HTMLModule::getHTMLImage(
-											"tick.png",
-											"Arrêt affiché, cliquer pour enlever"
-									)	)
-								;
-							}
+							stream << t.col() << rmDisplayedRequest.getHTMLForm().getLinkButton(
+								"Supprimer",
+								"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
+								"delete.png"
+							);
+
 						}
-						stream << t.close();
+
+						stream << t.row();
+						stream << t.col() << f.getTextInput(DisplayScreenAddDisplayedPlaceAction::PARAMETER_CITY_NAME, string());
+						stream << t.col() << f.getTextInput(DisplayScreenAddDisplayedPlaceAction::PARAMETER_PLACE_NAME, string());
+						stream << t.col() << f.getSubmitButton("Ajouter");
+
+						stream << t.close() << f.close();
 					}
 				}
+				else
+				{
+					// Used physical stops
+					stream << "<h1>Arrêts de desserte</h1>";
 
-				// Forbidden places
-				stream <<
-					"<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>"
-				;
+					HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
+					uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()));
+					stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
+					stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
+					stream << "</p>";
+					HTMLList l;
 
-				HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
-				stream << ant.open() << l.open();
+					if (!_displayScreen->getAllPhysicalStopsDisplayed())
+					{
+						if(_displayScreen->getLocalization() == NULL)
+						{
+							stream << "Afficheur non localisé, aucun arrêt à sélectionner.";
+						}
+						else
+						{
+							HTMLTable t(4, ResultHTMLTable::CSS_CLASS);
+							stream << t.open();
+							stream << t.row();
+							stream << t.col(1, string(), true) << "Nom";
+							stream << t.col(1, string(), true) << "Code exploitant";
+							stream << t.col(1, string(), true) << "Lignes";
+							stream << t.col(1, string(), true) << "Affiché";
+							BOOST_FOREACH(
+								const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
+								_displayScreen->getLocalization()->getPhysicalStops()
+							){
+								stream << t.row();
+								stream << t.col() << it.second->getName();
+								stream << t.col() << it.second->getOperatorCode();
+								
+								// Lines column
+								stream << t.col();
+								set<const CommercialLine*> lines;
+								BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
+								{
+									lines.insert(
+										static_cast<const LineStop*>(edge)->getLine()->getCommercialLine()
+									);
+								}
+								BOOST_FOREACH(const CommercialLine* line, lines)
+								{
+									stream <<
+										"<span class=\"line " << line->getStyle() << "\">" <<
+										line->getShortName() <<
+										"</span>"
+									;
+								}
+								
+								// Activated column
+								stream << t.col();							
+								if(	_displayScreen->getPhysicalStops().find(it.first) ==
+									_displayScreen->getPhysicalStops().end()
+								){
+									addPhysicalRequest.getAction()->setStopId(it.first);
+									stream <<
+										HTMLModule::getHTMLLink(
+											addPhysicalRequest.getHTMLForm().getURL(),
+											HTMLModule::getHTMLImage(
+												"cross.png",
+												"Arrêt non affiché, cliquer pour afficher"
+										)	)
+									;
+								} else {
+									rmPhysicalRequest.getAction()->setStopId(it.first);
+									stream <<
+										HTMLModule::getHTMLLink(
+											rmPhysicalRequest.getHTMLForm().getURL(),
+											HTMLModule::getHTMLImage(
+												"tick.png",
+												"Arrêt affiché, cliquer pour enlever"
+										)	)
+									;
+								}
+							}
+							stream << t.close();
+						}
+					}
 
-				BOOST_FOREACH(
-					const DisplayedPlacesList::value_type& it,
-					_displayScreen->getForbiddenPlaces()
-				){
-					HTMLForm ntu(
-						rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString(it.second->getKey()))
-					);
-					ntu.addHiddenField(
-						DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE,
-						Conversion::ToString(it.second->getKey())
-					);
-					stream << l.element("broadcastpoint");
+					// Forbidden places
 					stream <<
-						HTMLModule::getHTMLLink(
-							ntu.getURL(),
-							HTMLModule::getHTMLImage("delete.png","Supprimer")
-						) <<
-						it.second->getFullName()
+						"<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>"
 					;
-				}
 
-				stream << l.element("broadcastpoint");
-				stream << ant.getImageSubmitButton("add.png", "Ajouter");
-				stream << ant.getSelectInput(
-					AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE,
-					_prodScreen->getSortedAvaliableDestinationsLabels(
+					HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
+					stream << ant.open() << l.open();
+
+					BOOST_FOREACH(
+						const DisplayedPlacesList::value_type& it,
 						_displayScreen->getForbiddenPlaces()
-					),
-					uid(0)
-				);
-				stream << l.close() << ant.close();
+					){
+						HTMLForm ntu(
+							rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString(it.second->getKey()))
+						);
+						ntu.addHiddenField(
+							DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE,
+							lexical_cast<string>(it.second->getKey())
+						);
+						stream << l.element("broadcastpoint");
+						stream <<
+							HTMLModule::getHTMLLink(
+								ntu.getURL(),
+								HTMLModule::getHTMLImage("delete.png","Supprimer")
+							) <<
+							it.second->getFullName()
+						;
+					}
+
+					stream << l.element("broadcastpoint");
+					stream << ant.getImageSubmitButton("add.png", "Ajouter");
+					stream << ant.getSelectInput(
+						AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE,
+						_prodScreen->getSortedAvaliableDestinationsLabels(
+							_displayScreen->getForbiddenPlaces()
+						),
+						uid(0)
+					);
+					stream << l.close() << ant.close();
+				}
 
 				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
 				{
 					// Additional preselection stops
 					stream << "<h1>Arrêts de présélection</h1>";
 
+					HTMLList l;
 					HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
 					stream << psaf.open() << l.open();
 
@@ -684,12 +741,13 @@ namespace synthese
 			{
 
 				// Add display request
-				ActionFunctionRequest<DisplayScreenAddDisplayedPlace,AdminRequest> addDisplayRequest(_request);
+				ActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,AdminRequest> addDisplayRequest(_request);
 				addDisplayRequest.getFunction()->setSamePage(this);
 
 				// Remove displayed place request
 				ActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,AdminRequest> rmDisplayedRequest(_request);
 				rmDisplayedRequest.getFunction()->setSamePage(this);
+				rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
 
 				// Properties Update request
 				ActionFunctionRequest<DisplayScreenAppearanceUpdateAction,AdminRequest> updateRequest(_request);
@@ -726,31 +784,44 @@ namespace synthese
 
 				stream << t.close();
 
-				HTMLList l;
-
 				// Intermediate stops to display
-				stream << "<h1>Affichage arrêts intermédiaires</h1>";
-
-				HTMLForm amf(addDisplayRequest.getHTMLForm("adddispl"));
-
-				stream << amf.open();
-				stream << l.open();
-
-				for (DisplayedPlacesList::const_iterator it(_displayScreen->getDisplayedPlaces().begin()); it != _displayScreen->getDisplayedPlaces().end(); ++it)
+				if(_displayScreen->getGenerationMethod() != DisplayScreen::ROUTE_PLANNING)
 				{
-					HTMLForm mf(rmDisplayedRequest.getHTMLForm("rmdp" + Conversion::ToString(it->second->getKey())));
-					mf.addHiddenField(DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE, Conversion::ToString(it->second->getKey()));
+					stream << "<h1>Affichage arrêts intermédiaires</h1>";
 
-					stream << l.element("broadcastpoint");
-					stream << HTMLModule::getHTMLLink(mf.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer")) << it->second->getFullName();
+					HTMLForm f(addDisplayRequest.getHTMLForm("addplace"));
+
+					HTMLTable::ColsVector c;
+					c.push_back("Commune");
+					c.push_back("Arrêt");
+					c.push_back("Actions");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					stream << f.open() << t.open();
+
+					BOOST_FOREACH(const DisplayedPlacesList::value_type& it, _displayScreen->getDisplayedPlaces())
+					{
+						rmDisplayedRequest.getAction()->setPlace(it.second->getKey());
+						stream << t.row();
+						stream << t.col() << it.second->getCity()->getName();
+						stream << t.col() << it.second->getName();
+						stream << t.col() << rmDisplayedRequest.getHTMLForm().getLinkButton(
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
+							"delete.png"
+						);
+					}
+
+					stream << t.row();
+					stream << t.col(2) << f.getSelectInput(
+						DisplayScreenAddDisplayedPlaceAction::PARAMETER_PLACE,
+						_prodScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
+						uid(0)
+					);
+						
+					stream << t.col() << f.getSubmitButton("Ajouter");
+
+					stream << t.close() << f.close();
 				}
-
-				stream << l.element("broadcastpoint");
-				stream << amf.getImageSubmitButton("add.png", "Ajouter");
-				stream << amf.getSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _prodScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
-
-				stream << l.close();
-				stream << amf.close();
 
 			}
 
@@ -821,8 +892,16 @@ namespace synthese
 					stream << t.row();
 					stream << t.col() << priority++;
 					stream << t.col() << HTMLModule::getHTMLImage("times_display.png", "Affichage de lignes");
-					stream << t.col() << "Horaires " << ((_displayScreen->getDirection() == DISPLAY_DEPARTURES) ? "de départ" : "d'arrivée")
-						<< ((_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD) ? " avec présélection" : " chronologiques");
+					stream << t.col();
+					if(_displayScreen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
+					{
+						stream << "Calcul d'itinéraires " << (_displayScreen->getRoutePlanningWithTransfer() ? "avec" : "sans") << " correspondances";
+					}
+					else
+					{
+						stream << "Horaires " << ((_displayScreen->getDirection() == DISPLAY_DEPARTURES) ? "de départ" : "d'arrivée")
+							<< ((_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD) ? " avec présélection" : " chronologiques");
+					}
 					stream << t.col() << "(illimité)";
 					stream << t.col() << getTabLinkButton(TAB_CONTENT);
 				}

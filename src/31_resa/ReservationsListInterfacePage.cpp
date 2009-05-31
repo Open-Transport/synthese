@@ -24,13 +24,13 @@
 
 #include "ReservationsListInterfacePage.h"
 
-#include "15_env/CommercialLine.h"
+#include "CommercialLine.h"
+#include "User.h"
 
-#include "12_security/User.h"
-
-#include "01_util/Conversion.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -45,6 +45,12 @@ namespace synthese
 
 	namespace resa
 	{
+		const string ReservationsListInterfacePage::DATA_LINE_ID("line_id");
+		const string ReservationsListInterfacePage::DATA_CUSTOMER_ID("customer_id");
+		const string ReservationsListInterfacePage::DATA_RESERVATION_NAME("reservation_name");
+		const string ReservationsListInterfacePage::DATA_DATE("date");
+		const string ReservationsListInterfacePage::DATA_WITH_CANCELLED_RESERVATIONS("with_cancelled");
+		const string ReservationsListInterfacePage::DATA_LINE_NAME("line_name");
 
 		void ReservationsListInterfacePage::display(
 			std::ostream& stream

@@ -49,6 +49,17 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		const string JourneyBoardStopCellInterfacePage::DATA_IS_ARRIVAL("is_arrival");
+		const string JourneyBoardStopCellInterfacePage::DATA_AlARM_LEVEL("alarm_level");
+		const string JourneyBoardStopCellInterfacePage::DATA_ALARM_MESSAGE("alarm_message");
+		const string JourneyBoardStopCellInterfacePage::DATA_IS_TERMINUS("is_terminus");
+		const string JourneyBoardStopCellInterfacePage::DATA_STOP_NAME("stop_name");
+		const string JourneyBoardStopCellInterfacePage::DATA_ODD_ROW("is_odd_row");
+		const string JourneyBoardStopCellInterfacePage::DATA_FIRST_TIME("first_time");
+		const string JourneyBoardStopCellInterfacePage::DATA_LAST_TIME("last_time");
+		const string JourneyBoardStopCellInterfacePage::DATA_LONGITUDE("longitude");
+		const string JourneyBoardStopCellInterfacePage::DATA_LATITUDE("latitude");
+
 		void JourneyBoardStopCellInterfacePage::display(
 			std::ostream& stream
 			, bool isItArrival

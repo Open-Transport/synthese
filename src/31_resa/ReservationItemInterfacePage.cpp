@@ -23,9 +23,8 @@
 */
 
 #include "ReservationItemInterfacePage.h"
-
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTransaction.h"
+#include "Reservation.h"
+#include "ReservationTransaction.h"
 
 using namespace std;
 
@@ -42,6 +41,13 @@ namespace synthese
 
 	namespace resa
 	{
+		const string ReservationItemInterfacePage::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
+		const string ReservationItemInterfacePage::DATA_DEPARTURE_TIME("departure_time");
+		const string ReservationItemInterfacePage::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
+		const string ReservationItemInterfacePage::DATA_ARRIVAL_TIME("arrival_time");
+		const string ReservationItemInterfacePage::DATA_SEATS("seats");
+		const string ReservationItemInterfacePage::DATA_URL_TO_CANCELLATION("url_to_cancellation");
+		const string ReservationItemInterfacePage::DATA_STATUS_CANCELLED("status_cancelled");
 
 		void ReservationItemInterfacePage::display(
 			std::ostream& stream

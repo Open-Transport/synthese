@@ -21,7 +21,6 @@
 */
 
 #include "SchedulesTableInterfaceElement.h"
-#include "RoutePlannerNoSolutionInterfacePage.h"
 #include "RoutePlannerSheetColumnInterfacePage.h"
 #include "RoutePlannerSheetLineInterfacePage.h"
 
@@ -72,14 +71,7 @@ namespace synthese
 		) const {
 			const RoutePlannerResult* jv(static_cast<const RoutePlannerResult*>(object));
 
-			if ( jv == NULL || jv->result.empty())  // No solution or type error
-			{
-				const RoutePlannerNoSolutionInterfacePage* noSolutionPage( 
-					_page->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>()
-				);
-				noSolutionPage->display(stream, request);
-			}
-			else
+			if ( jv != NULL && !jv->result.empty())  // No solution or type error
 			{
 				const PlaceList placesList(
 					getStopsListForScheduleTable(jv->result, jv->departurePlace, jv->arrivalPlace)

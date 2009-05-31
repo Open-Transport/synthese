@@ -21,11 +21,11 @@
 */
 
 #include "ParameterValueInterfaceElement.h"
+#include "ValueElementList.h"
+#include "InterfacePageException.h"
+#include "StaticValueInterfaceElement.h"
 
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/InterfacePageException.h"
-
-#include "01_util/Conversion.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 using namespace std;
@@ -37,7 +37,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<LibraryInterfaceElement, ParameterValueInterfaceElement>::FACTORY_KEY = "param";
+		template<> const string FactorableTemplate<LibraryInterfaceElement, ParameterValueInterfaceElement>::FACTORY_KEY = "param";
 	}
 
 	namespace interfaces
@@ -48,7 +48,7 @@ namespace synthese
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
-			int value(Conversion::ToInt(_rank->getValue(parameters, variables, object, request)));
+			int value(lexical_cast<int>(_rank->getValue(parameters, variables, object, request)));
 			if (value >= parameters.size() || value < 0)
 				Log::GetInstance().warn("Invalid parameter rank in interface module");
 			else
@@ -63,6 +63,18 @@ namespace synthese
 			_rank = vel.front();
 		}
 
+		ParameterValueInterfaceElement::ParameterValueInterfaceElement(
+			const std::string& key
+		):	_rank(new StaticValueInterfaceElement(key))
+		{
+
+		}
+
+		ParameterValueInterfaceElement::ParameterValueInterfaceElement()
+			: _rank()
+		{
+
+		}
 	}
 }
 

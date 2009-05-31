@@ -52,7 +52,11 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL
 				) const;
+			
 			void storeParameters(ValueElementList& vel);
+
+			ParameterValueInterfaceElement();
+			ParameterValueInterfaceElement(const std::string& key);
 		};
 	}
 }

@@ -23,14 +23,15 @@
 #include <vector>
 
 #include "ValueElementList.h"
+#include "ParameterValueInterfaceElement.h"
+#include "LibraryInterfaceElement.h"
+#include "StaticValueInterfaceElement.h"
+#include "InterfacePageException.h"
 
-#include "11_interfaces/LibraryInterfaceElement.h"
-#include "11_interfaces/StaticValueInterfaceElement.h"
-#include "11_interfaces/InterfacePageException.h"
+#include "Exception.h"
+#include "Factory.h"
 
-#include "01_util/Conversion.h"
-#include "01_util/Exception.h"
-#include "01_util/Factory.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 
@@ -129,7 +130,7 @@ namespace synthese
 						if ((delimiter == '{' && text[wordEndPos] == '}') || (delimiter == '[' && text[wordEndPos] == ']'))
 							--numberOfOpenedBraces;
 						if (numberOfOpenedBraces < 0)
-							throw InterfacePageException("Parse error : too much closing braces at "+ Conversion::ToString(wordEndPos) +" in "+ text);
+							throw InterfacePageException("Parse error : too much closing braces at "+ lexical_cast<string>(wordEndPos) +" in "+ text);
 					}
 				}
 
@@ -145,19 +146,25 @@ namespace synthese
 				shared_ptr<LibraryInterfaceElement> vie;
 				const std::string& str = *it;
 
-				// Case 1 : single word
-				if (str.at(0) != '{' && str.at(0) != '[')
+				// Case 1 : Parameter
+				if(str.size() > 1 && str[0] == '@')
+				{
+					vie.reset(new ParameterValueInterfaceElement(str.substr(1)));
+				}
+
+				// Case 2 : single word
+				else if (str.at(0) != '{' && str.at(0) != '[')
 				{
 					vie.reset(new StaticValueInterfaceElement(str));
 				} 
 
-				// Case 2 : multiple word
+				// Case 3 : multiple word
 				else if(str.size() > 1 && (str.at(0) == '{' && str.at(1) != '{' || str.at(0) == '['))
 				{
 					vie.reset(new StaticValueInterfaceElement(str.substr(1, str.size() - 2)));
 				}
 
-				// Case 3 : recursive call
+				// Case 4 : recursive call
 				else if(str.size() > 4 && str.substr(0,2) == "{{" && str.substr(str.size() -2, 2) == "}}")
 				{
 					// Search of the end of the first word

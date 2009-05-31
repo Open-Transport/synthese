@@ -30,14 +30,14 @@
 
 #include "ServicePointer.h"
 #include "DateTime.h"
-#include "UId.h"
-
+#include "Registry.h"
+#include "Journey.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class PublicTransportStopZoneConnectionPlace;
 		class Line;
 		class LineStop;
 	}
@@ -59,31 +59,37 @@ namespace synthese
 		WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 		} BroadcastPointsPresence;
 
-	typedef std::map<uid,const env::PublicTransportStopZoneConnectionPlace*> DisplayedPlacesList;
-	typedef std::map<uid,const env::Line*> LineFilter;
-	typedef std::map<uid,const env::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
+	typedef std::map<util::RegistryKeyType, const env::PublicTransportStopZoneConnectionPlace*> DisplayedPlacesList;
+	typedef std::map<util::RegistryKeyType,const env::Line*> LineFilter;
+	typedef std::map<util::RegistryKeyType,const env::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 1, WITH_PASSING = 0 } EndFilter;
-	struct DeparturesTableElement { 
-		const graph::ServicePointer servicePointer;
-		bool blinking;
-		DeparturesTableElement(const graph::ServicePointer& __servicePointer, bool __blinking)
-			: servicePointer(__servicePointer), blinking(__blinking) {}
-	};
-	struct DeparturesTableElementLess : public std::binary_function<DeparturesTableElement, DeparturesTableElement, bool>
+	
+	struct DeparturesTableElementLess : public std::binary_function<graph::ServicePointer, graph::ServicePointer, bool>
 	{
-		bool operator()(const DeparturesTableElement& _Left, const DeparturesTableElement& _Right) const
+		bool operator()(const graph::ServicePointer& _Left, const graph::ServicePointer& _Right) const
 		{
-			return (_Left.servicePointer.getActualDateTime() < _Right.servicePointer.getActualDateTime()
-				|| _Left.servicePointer.getActualDateTime() == _Right.servicePointer.getActualDateTime() 
-				&& _Left.servicePointer.getEdge() < _Right.servicePointer.getEdge()
+			return (_Left.getActualDateTime() < _Right.getActualDateTime()
+				|| _Left.getActualDateTime() == _Right.getActualDateTime() 
+				&& _Left.getEdge() < _Right.getEdge()
 				);
 		}
 	};
 	typedef std::vector<const env::PublicTransportStopZoneConnectionPlace*> ActualDisplayedArrivalsList;
-	typedef std::pair<DeparturesTableElement, ActualDisplayedArrivalsList> ArrivalDepartureRow;
-	typedef std::map<DeparturesTableElement, ActualDisplayedArrivalsList, DeparturesTableElementLess> ArrivalDepartureList;
+	typedef std::map<graph::ServicePointer, ActualDisplayedArrivalsList, DeparturesTableElementLess> ArrivalDepartureList;
+	typedef ArrivalDepartureList::value_type ArrivalDepartureRow;
 	struct ArrivalDepartureListWithAlarm { ArrivalDepartureList map; const messages::Alarm* alarm; };
+
+	struct RoutePlanningListElementLess : public std::binary_function<env::PublicTransportStopZoneConnectionPlace*, env::PublicTransportStopZoneConnectionPlace*, bool>
+	{
+		bool operator()(const env::PublicTransportStopZoneConnectionPlace* _Left, const env::PublicTransportStopZoneConnectionPlace* _Right) const
+		{
+			return _Left->getFullName() < _Right->getFullName();
+		}
+	};
+	typedef std::map<const env::PublicTransportStopZoneConnectionPlace*, graph::Journey, RoutePlanningListElementLess> RoutePlanningList;
+	typedef RoutePlanningList::value_type RoutePlanningRow;
+	struct RoutePlanningListWithAlarm { RoutePlanningList map; const messages::Alarm* alarm; };
 
 	/** @} */
 }

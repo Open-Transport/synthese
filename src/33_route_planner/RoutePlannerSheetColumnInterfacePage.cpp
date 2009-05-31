@@ -38,6 +38,17 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		const string RoutePlannerSheetColumnInterfacePage::DATA_IS_FIRST_ROW("is_first_row");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_IS_LAST_ROW("is_last_row");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_COLUMN_NUMBER("column_number");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_IS_FOOT("is_foot");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_FIRST_TIME("first_time");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_LAST_TIME("last_time");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_IS_CONTINUOUS_SERVICE("is_continuous_service");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_IS_FIRST_WRITING("is_first_writing");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_IS_LAST_WRITING("is_last_writing");
+		const string RoutePlannerSheetColumnInterfacePage::DATA_IS_FIRST_FOOT("is_first_foot");
+
 		void RoutePlannerSheetColumnInterfacePage::display(
 			ostream& stream
 			, bool isItFirstLine

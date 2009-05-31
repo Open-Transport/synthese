@@ -27,6 +27,7 @@
 #include <assert.h>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -55,7 +56,7 @@ namespace synthese
 			BOOST_FOREACH(const string& key, keys)
 			{
 				_lexicalMatchers.insert(
-					make_pair(key, LexicalMatcher())
+					make_pair(key, PlacesMatcher())
 				);
 			}
 		}
@@ -117,31 +118,31 @@ namespace synthese
 
 
 
-		City::LexicalMatcher& City::getAllPlacesMatcher()
+		City::PlacesMatcher& City::getAllPlacesMatcher()
 		{
 			return _allPlacesMatcher;
 		}
 
-		const City::LexicalMatcher& City::getAllPlacesMatcher() const
+		const City::PlacesMatcher& City::getAllPlacesMatcher() const
 		{
 			return _allPlacesMatcher;
 		}
 
 
-		City::LexicalMatcher& City::getLexicalMatcher(
+		City::PlacesMatcher& City::getLexicalMatcher(
 			const std::string& key
 		){
-			Lexicalmatchers::iterator it(_lexicalMatchers.find(key));
+			PlacesMatchers::iterator it(_lexicalMatchers.find(key));
 			assert(it != _lexicalMatchers.end());
 			return it->second;
 		}
 
 
 
-		const City::LexicalMatcher& City::getLexicalMatcher(
+		const City::PlacesMatcher& City::getLexicalMatcher(
 			const std::string& key
 		) const	{
-			Lexicalmatchers::const_iterator it(_lexicalMatchers.find(key));
+			PlacesMatchers::const_iterator it(_lexicalMatchers.find(key));
 			assert(it != _lexicalMatchers.end());
 			return it->second;
 		}

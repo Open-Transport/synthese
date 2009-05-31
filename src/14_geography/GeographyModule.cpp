@@ -60,8 +60,11 @@ namespace synthese
 
 		}
 
-		void GeographyModule::AddToCitiesMatchers( City* city )
-		{
+
+
+		void GeographyModule::AddToCitiesMatchers(
+			GeographyModule::CitiesMatcher::Content city
+		){
 			_citiesMatcher.add(city->getName (), city);
 
 			stringstream ss;
@@ -73,8 +76,11 @@ namespace synthese
 			_citiesT9Matcher.add(ss.str(), city);
 		}
 
-		void GeographyModule::RemoveFromCitiesMatchers( City* city )
-		{
+
+
+		void GeographyModule::RemoveFromCitiesMatchers(
+			GeographyModule::CitiesMatcher::Content city
+		){
 			_citiesMatcher.remove(city->getName());
 
 			stringstream ss;
@@ -86,8 +92,12 @@ namespace synthese
 			_citiesT9Matcher.remove(ss.str());
 		}
 
-		const Place* GeographyModule::FetchPlace( const std::string& cityName, const std::string& placeName )
-		{
+
+
+		const Place* GeographyModule::FetchPlace(
+			const std::string& cityName,
+			const std::string& placeName
+		){
 			const Place* place(NULL);
 
 			if (cityName.empty())
@@ -96,13 +106,13 @@ namespace synthese
 			CityList cityList = GuessCity(cityName, 1);
 			if (cityName.empty())
 				throw Exception("An error has occured in city name search");
-			City* city(cityList.front());
+			CitiesMatcher::Content city(cityList.front());
 			place = city;
 			assert(place != NULL);
 
 			if (!placeName.empty())
 			{
-				City::LexicalMatcher::MatchResult places(city->getAllPlacesMatcher().bestMatches(placeName, 1));
+				City::PlacesMatcher::MatchResult places(city->getAllPlacesMatcher().bestMatches(placeName, 1));
 				if (!places.empty())
 				{
 					place = places.front().value;
@@ -110,17 +120,15 @@ namespace synthese
 			}
 
 			return place;		
-
-
 		}
 
 
 
-
-
-
-		GeographyModule::CityList GeographyModule::GuessCity (const std::string& fuzzyName, int nbMatches, bool t9)
-		{
+		GeographyModule::CityList GeographyModule::GuessCity (
+			const std::string& fuzzyName,
+			int nbMatches,
+			bool t9
+		){
 			CityList result;
 			CitiesMatcher::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).bestMatches (fuzzyName, nbMatches);
 			BOOST_FOREACH(const CitiesMatcher::MatchResult::value_type& it, matches)

@@ -51,15 +51,20 @@ namespace synthese
 		/** ReservationRuleInterfacePage Interface Page Class.
 			@ingroup m35Pages refPages
 
-			Parameters :
-			 - Reservation is optional 1|0
-			 - Reservation is compulsory 1|0
-			 - Reservation delay (0 if reservation impossible)
-			 - Reservation deadline (-1/-1/-1 if reservation impossible)
+			Available data :
+			 - is_optional : Reservation is optional 1|0
+			 - is_compulsory : Reservation is compulsory 1|0
+			 - delay : Reservation delay (0 if reservation impossible)
+			 - deadline : Reservation deadline (-1/-1/-1 if reservation impossible)
 		*/
 		class ReservationRuleInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,env::ReservationRuleInterfacePage>
 		{
 		public:
+			static const std::string DATA_IS_OPTIONAL;
+			static const std::string DATA_IS_COMPULSORY;
+			static const std::string DATA_DELAY;
+			static const std::string DATA_DEADLINE;
+
 			ReservationRuleInterfacePage();
 
 			/** Overloaded display method for specific parameter conversion.

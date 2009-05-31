@@ -84,6 +84,7 @@ namespace synthese
 				static const std::string COL_COM_PORT;
 				static const std::string COL_CPU_HOST_ID;
 				static const std::string COL_MAC_ADDRESS;
+				static const std::string COL_ROUTE_PLANNING_WITH_TRANSFER;
 			//@}
 			
 

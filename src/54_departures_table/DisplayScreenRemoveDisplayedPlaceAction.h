@@ -38,13 +38,14 @@ namespace synthese
 	{
 		class DisplayScreen;
 
-		/** DisplayScreenRemoveDisplayedPlaceAction action class.
+		/** Action class : removes a displayed place from a displayed screen.
 			@ingroup m54Actions refActions
 		*/
 		class DisplayScreenRemoveDisplayedPlaceAction : public util::FactorableTemplate<server::Action, DisplayScreenRemoveDisplayedPlaceAction>
 		{
 		public:
 			static const std::string PARAMETER_PLACE;
+			static const std::string PARAMETER_SCREEN;
 
 		private:
 			boost::shared_ptr<DisplayScreen>			_screen;
@@ -67,6 +68,9 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+
+			void setScreen(const util::RegistryKeyType id);
+			void setPlace(const util::RegistryKeyType id);
 		};
 	}
 }

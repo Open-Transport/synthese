@@ -41,6 +41,16 @@ namespace synthese
 
 	namespace env
 	{
+		const string LineMarkerInterfacePage::PARAMETER_OPENING_HTML_CODE("opening_html_code");
+		const string LineMarkerInterfacePage::PARAMETER_CLOSING_HTML_CODE("closing_html_code");
+		const string LineMarkerInterfacePage::PARAMETER_WIDTH("width");
+		const string LineMarkerInterfacePage::PARAMETER_HEIGHT("height");
+
+		const string LineMarkerInterfacePage::DATA_STYLE_NAME("style");
+		const string LineMarkerInterfacePage::DATA_ID("id");
+		const string LineMarkerInterfacePage::DATA_IMAGE_URL("image");
+		const string LineMarkerInterfacePage::DATA_SHORT_NAME("short_name");
+
 		void LineMarkerInterfacePage::display(
 			ostream& stream
 			, VariablesMap& vars

@@ -60,6 +60,12 @@ namespace synthese
 		class RoutePlannerSheetLineInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerSheetLineInterfacePage>
 		{
 		public:
+			static const std::string DATA_TEXT_CONTAINING_CELLS;
+			static const std::string DATA_IS_ODD_ROW;
+			static const std::string DATA_IS_ORIGIN_ROW;
+			static const std::string DATA_IS_DESTINATION_ROW;
+			static const std::string DATA_PLACE_NAME;
+
 			RoutePlannerSheetLineInterfacePage();
 
 			/** Display of line of schedule sheet.

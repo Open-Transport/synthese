@@ -26,6 +26,8 @@
 
 #include "RedirectInterfacePage.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace server;
@@ -34,6 +36,8 @@ namespace synthese
 
 	namespace interfaces
 	{
+		const string RedirectInterfacePage::DATA_URL("url");
+
 		void RedirectInterfacePage::display( std::ostream& stream, VariablesMap& vars, const std::string& url, const server::Request* request /*= NULL*/ ) const
 		{
 			ParametersVector pv;

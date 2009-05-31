@@ -60,6 +60,17 @@ namespace synthese
 		class JourneyBoardStopCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardStopCellInterfacePage>
 		{
 		public:
+			static const std::string DATA_IS_ARRIVAL;
+			static const std::string DATA_AlARM_LEVEL;
+			static const std::string DATA_ALARM_MESSAGE;
+			static const std::string DATA_IS_TERMINUS;
+			static const std::string DATA_STOP_NAME;
+			static const std::string DATA_ODD_ROW;
+			static const std::string DATA_FIRST_TIME;
+			static const std::string DATA_LAST_TIME;
+			static const std::string DATA_LONGITUDE;
+			static const std::string DATA_LATITUDE;
+
 			JourneyBoardStopCellInterfacePage();
 
 			/** Display.

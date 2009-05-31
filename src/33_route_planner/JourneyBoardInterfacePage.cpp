@@ -67,6 +67,28 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		const string JourneyBoardInterfacePage::DATA_RANK("rank");
+		const string JourneyBoardInterfacePage::DATA_HANDICAPPED_FILTER("handicapped_filter");
+		const string JourneyBoardInterfacePage::DATA_BIKE_FILTER("bike_filter");
+		const string JourneyBoardInterfacePage::DATA_DEPARTURE_TIME("departure_time");
+		const string JourneyBoardInterfacePage::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
+		const string JourneyBoardInterfacePage::DATA_ARRIVAL_TIME("arrival_time");
+		const string JourneyBoardInterfacePage::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
+		const string JourneyBoardInterfacePage::DATA_DEPARTURE_DATE("departure_date");
+		const string JourneyBoardInterfacePage::DATA_RESERVATION_AVAILABLE("reservation_available");
+		const string JourneyBoardInterfacePage::DATA_RESERVATION_COMPULSORY("reservation_compulsory");
+		const string JourneyBoardInterfacePage::DATA_RESERVATION_DELAY("reservation_delay");
+		const string JourneyBoardInterfacePage::DATA_RESERVATION_DEADLINE("reservation_deadline");
+		const string JourneyBoardInterfacePage::DATA_RESERVATION_PHONE_NUMBER("reservation_phone_number");
+		const string JourneyBoardInterfacePage::DATA_ONLINE_RESERVATION("online_reservation");
+		const string JourneyBoardInterfacePage::DATA_DEPARTURE_TIME_INTERNAL_FORMAT("internal_departure_time");
+		const string JourneyBoardInterfacePage::DATA_IS_THE_LAST_JOURNEY_BOARD("is_the_last_journey_board");
+		const string JourneyBoardInterfacePage::DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME("continuous_service_last_departure_time");
+		const string JourneyBoardInterfacePage::DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME("continuous_service_last_arrival_time");
+		const string JourneyBoardInterfacePage::DATA_DEPARTURE_PLACE_LONGITUDE("departure_longitude");
+		const string JourneyBoardInterfacePage::DATA_DEPARTURE_PLACE_LATITUDE("departure_latitude");
+		const string JourneyBoardInterfacePage::DATA_ARRIVAL_PLACE_LONGITUDE("arrival_longitude");
+		const string JourneyBoardInterfacePage::DATA_ARRIVAL_PLACE_LATITUDE("arrival_latitude");
 
 		void JourneyBoardInterfacePage::display(
 			std::ostream& stream
