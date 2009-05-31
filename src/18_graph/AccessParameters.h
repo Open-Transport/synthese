@@ -26,6 +26,8 @@
 #include "GraphTypes.h"
 #include "GraphConstants.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace graph
@@ -44,7 +46,7 @@ namespace synthese
 			double		_maxApproachDistance;
 			double		_maxApproachTime;
 			double		_approachSpeed;
-			int			_maxTransportConnectionCount;
+			boost::optional<size_t>		_maxTransportConnectionCount;
 			bool		_drtOnly;
 			bool		_withoutDrt;
 //			Fare*		_fare;
@@ -73,7 +75,7 @@ namespace synthese
 				, double		maxApproachDistance = 1000
 				, double		maxApproachTime = 23
 				, double		approachSpeed = 67
-				, int			maxTransportConnectionCount = 10
+				, boost::optional<size_t>	maxTransportConnectionCount = boost::optional<size_t>()
 			);
 
 
@@ -106,6 +108,7 @@ namespace synthese
 			//@{
 				graph::UserClassCode	getUserClass()	const;
 				double	getApproachSpeed()		const;
+				boost::optional<size_t>	getMaxtransportConnectionsCount() const;
 			//@}
 		};
 	}

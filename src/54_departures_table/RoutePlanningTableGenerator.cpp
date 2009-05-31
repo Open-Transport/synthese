@@ -45,12 +45,21 @@ namespace synthese
 				RoutePlanner rp(
 					&_origin,
 					itDestination.second,
-					AccessParameters(),
+					AccessParameters(
+						USER_PEDESTRIAN,
+						false,
+						false,
+						0,
+						0,
+						67,
+						_withTransfer ? 2 : 1
+					),
 					ARRIVAL_FIRST,
 					_startDateTime,
 					_endDateTime,
 					1
 				);
+				
 				const RoutePlanner::Result& solution(rp.computeJourneySheetDepartureArrival());
 				result.insert(
 					make_pair(

@@ -39,7 +39,7 @@ namespace synthese
 			, double maxApproachDistance /*= 1000 */
 			, double maxApproachTime /*= 23 */
 			, double approachSpeed /*= 34 */
-			, int maxTransportConnectionCount /*= 10  */
+			, optional<size_t> maxTransportConnectionCount /*= 10  */
 		)	: _maxApproachDistance(maxApproachDistance)
 			, _maxApproachTime(maxApproachTime)
 			, _approachSpeed(approachSpeed)
@@ -84,6 +84,11 @@ namespace synthese
 		UserClassCode AccessParameters::getUserClass() const
 		{
 			return _userClass;
+		}
+
+		boost::optional<size_t> AccessParameters::getMaxtransportConnectionsCount() const
+		{
+			return _maxTransportConnectionCount;
 		}
 	}
 }

@@ -403,8 +403,14 @@ namespace synthese
 									todo.add(todoJourney);
 								}
 
-								// Storage of the journey as a result
-								if(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) ||
+								// Storage of the journey as a result :
+								//	- if goal reached
+								//	- if useful for a transfer
+								if(	(	(	!_accessParameters.getMaxtransportConnectionsCount() ||
+											resultJourney->getServiceUses().size() < *_accessParameters.getMaxtransportConnectionsCount()
+										) &&
+										reachedVertex->getHub()->containsAnyVertex(_whatToSearch)
+									) ||
 									isGoalReached
 								){
 									_result.add(resultJourney);
