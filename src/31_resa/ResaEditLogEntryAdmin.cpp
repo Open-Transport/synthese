@@ -75,22 +75,33 @@ namespace synthese
 	namespace resa
 	{
 		ResaEditLogEntryAdmin::ResaEditLogEntryAdmin()
-			: AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>()
+			: AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>(),
+			_log("log")
 		{ }
 		
 		void ResaEditLogEntryAdmin::setFromParametersMap(
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 			try
 			{
-				_entry = DBLogEntryTableSync::Get(id, _env);
+				_entry = DBLogEntryTableSync::Get(_request->getObjectId(), _env);
 			}
 			catch (...)
 			{
 				throw AdminParametersException("No such log entry");
 			}
+
+			_log.set(
+				map,
+				ResaDBLog::FACTORY_KEY,
+				UNKNOWN_VALUE,
+				UNKNOWN_VALUE,
+				DBLogEntry::DB_LOG_UNKNOWN,
+				TIME_UNKNOWN,
+				TIME_UNKNOWN,
+				lexical_cast<string>(_entry->getKey()) + "|"
+			);
 		}
 		
 		
@@ -107,27 +118,26 @@ namespace synthese
 		) const	{
 			// Requests
 			ActionFunctionRequest<ResaLogEntryUpdateAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<ResaEditLogEntryAdmin>();
-			updateRequest.setObjectId(_entry->getKey());
+			updateRequest.getFunction()->setSamePage(this);
 			updateRequest.getAction()->setEntryId(_entry->getKey());
 
-			// Search
-			vector<shared_ptr<DBLogEntry> > result;
+			FunctionRequest<AdminRequest> searchRequest(_request);
+			searchRequest.getFunction()->setSamePage(this);
 
 			// Display
 			DBLogEntry::Content content(_entry->getContent());
 
 			vector<pair<ResaDBLog::_EntryType,string> > choices;
-			choices.push_back(make_pair(ResaDBLog::CALL_ENTRY,"Appel"));
-			choices.push_back(make_pair(ResaDBLog::FAKE_CALL,"Saisie"));
-			choices.push_back(make_pair(ResaDBLog::RADIO_CALL,"Contact radio"));
+			choices.push_back(make_pair(ResaDBLog::CALL_ENTRY, ResaDBLog::GetIcon(ResaDBLog::CALL_ENTRY) +" "+ ResaDBLog::GetText(ResaDBLog::CALL_ENTRY)));
+			choices.push_back(make_pair(ResaDBLog::FAKE_CALL,ResaDBLog::GetIcon(ResaDBLog::FAKE_CALL) +" "+ ResaDBLog::GetText(ResaDBLog::FAKE_CALL)));
+			choices.push_back(make_pair(ResaDBLog::RADIO_CALL,ResaDBLog::GetIcon(ResaDBLog::RADIO_CALL) +" "+ResaDBLog::GetText(ResaDBLog::RADIO_CALL)));
 
 			vector<pair<ResaDBLog::_EntryType,string> > addChoices;
-			addChoices.push_back(make_pair(ResaDBLog::CUSTOMER_COMMENT_ENTRY,"Réclamation"));
-			addChoices.push_back(make_pair(ResaDBLog::INFORMATION_ENTRY,"Information"));
-			addChoices.push_back(make_pair(ResaDBLog::REDIRECTION_ENTRY,"Redirection sur bus"));
-			addChoices.push_back(make_pair(ResaDBLog::TECHNICAL_SUPPORT_ENTRY,"Support technique"));
-			addChoices.push_back(make_pair(ResaDBLog::OTHER,"Autre"));
+			addChoices.push_back(make_pair(ResaDBLog::CUSTOMER_COMMENT_ENTRY,ResaDBLog::GetIcon(ResaDBLog::CUSTOMER_COMMENT_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::CUSTOMER_COMMENT_ENTRY)));
+			addChoices.push_back(make_pair(ResaDBLog::INFORMATION_ENTRY,ResaDBLog::GetIcon(ResaDBLog::INFORMATION_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::INFORMATION_ENTRY)));
+			addChoices.push_back(make_pair(ResaDBLog::REDIRECTION_ENTRY,ResaDBLog::GetIcon(ResaDBLog::REDIRECTION_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::REDIRECTION_ENTRY)));
+			addChoices.push_back(make_pair(ResaDBLog::TECHNICAL_SUPPORT_ENTRY,ResaDBLog::GetIcon(ResaDBLog::TECHNICAL_SUPPORT_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::TECHNICAL_SUPPORT_ENTRY)));
+			addChoices.push_back(make_pair(ResaDBLog::OTHER,ResaDBLog::GetIcon(ResaDBLog::OTHER) +" "+ResaDBLog::GetText(ResaDBLog::OTHER)));
 
 			PropertiesHTMLTable t(updateRequest.getHTMLForm());
 			stream << "<h1>Propriétés</h1>";
@@ -138,21 +148,41 @@ namespace synthese
 			stream << t.cell("Date fin", d.toString(true));
 			stream << t.cell("Durée", Conversion::ToString(d.getSecondsDifference(_entry->getDate())) + " s");
 			shared_ptr<const User> customer;
+			shared_ptr<const User> op;
 			if (_entry->getObjectId() > 0)
 			{
-				customer = UserTableSync::Get(_entry->getObjectId(), _env);
+				try
+				{
+					customer = UserTableSync::Get(_entry->getObjectId(), _env);
+				}
+				catch(...)
+				{
+
+				}
+			}
+			if(_entry->getUserId() > 0)
+			{
+				try
+				{
+					op = UserTableSync::Get(_entry->getUserId(), _env);
+				}
+				catch(...)
+				{
+
+				}
 			}
 			stream << t.cell("Client", customer.get() ? customer->getFullName() : "inconnu");
-// 			stream << t.cell("Opérateur", _entry->getUser() ? _entry->getUser()->getFullName() : "inconnu");
-			stream << t.cell("Type d'appel", t.getForm().getRadioInputCollection(ResaLogEntryUpdateAction::PARAMETER_TYPE, choices, static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE]))));
+ 			stream << t.cell("Opérateur", op.get() ? op->getFullName() : "inconnu");
+			stream << t.cell("Type d'appel", t.getForm().getRadioInputCollection(ResaLogEntryUpdateAction::PARAMETER_CALL_TYPE, choices, static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE]))));
 			stream << t.title("Ajout d'information sur l'appel");
 			stream << t.cell("Type d'ajout", t.getForm().getRadioInputCollection(ResaLogEntryUpdateAction::PARAMETER_TYPE, addChoices, ResaDBLog::CALL_ENTRY));
 			stream << t.cell("Texte", t.getForm().getTextAreaInput(ResaLogEntryUpdateAction::PARAMETER_TEXT, string(), 4, 50));
+			stream << t.getForm().setFocus(ResaLogEntryUpdateAction::PARAMETER_TYPE);
 			stream << t.close();
 
-			stream << "<h1>Historique</h1>";
-			//ResultHTMLTable t(_request->getHTMLForm());
-			//stream <<
+			stream << "<h1>Evénements liés à l'appel</h1>";
+			
+			_log.display(stream, searchRequest);
 		}
 
 		bool ResaEditLogEntryAdmin::isAuthorized() const

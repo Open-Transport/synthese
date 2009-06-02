@@ -116,14 +116,40 @@ namespace synthese
 				const security::RightLevel& level
 			) const;
 
-			virtual DBLog::ColumnsVector parse(const dblog::DBLogEntry& entry) const;
+			virtual DBLog::ColumnsVector parse(
+				const dblog::DBLogEntry& entry,
+				const server::Request& searchRequest
+			) const;
 
 			static uid AddCallEntry(const security::User* user);
+			
+			static void AddCallInformationEntry(
+				const dblog::DBLogEntry& callEntry,
+				const ResaDBLog::_EntryType& type,
+				const std::string& text,
+				const security::User& user
+			);
 			static void UpdateCallEntryDate(uid callId);
 			static void UpdateCallEntryCustomer(uid callId, uid customerId);
 
 			static void AddBookReservationEntry(const server::Session* user, const ReservationTransaction& transaction);
 			static void AddCancelReservationEntry(const server::Session* user, const ReservationTransaction& transaction, ReservationStatus oldStatus);
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds an HTML image representing an entry type.
+			/// @param type of entry
+			/// @return URL of the icon
+			static std::string GetIconURL(
+				const ResaDBLog::_EntryType& type
+			);
+
+			static std::string GetText(
+				const ResaDBLog::_EntryType& type
+			);
+
+			static std::string GetIcon(
+				const ResaDBLog::_EntryType& type
+			);
 		};
 	}
 }

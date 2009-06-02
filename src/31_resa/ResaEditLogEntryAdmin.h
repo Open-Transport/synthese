@@ -26,6 +26,7 @@
 #define SYNTHESE_ResaEditLogEntryAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
+#include "DBLogHTMLView.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -46,6 +47,7 @@ namespace synthese
 		class ResaEditLogEntryAdmin : public admin::AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>
 		{
 			boost::shared_ptr<const dblog::DBLogEntry>	_entry;
+			dblog::DBLogHTMLView						_log;
 
 		public:
 			ResaEditLogEntryAdmin();

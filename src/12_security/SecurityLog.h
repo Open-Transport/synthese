@@ -61,7 +61,10 @@ namespace synthese
 		public:
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
-			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
+			DBLog::ColumnsVector parse(
+				const dblog::DBLogEntry::Content& cols,
+				const server::Request& searchRequest
+			) const;
 
 			static void addUserLogin(const User* user);
 			static void addUserAdmin(

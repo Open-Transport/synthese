@@ -29,8 +29,10 @@
 
 #include "31_resa/ResaDBLog.h"
 
-#include "01_util/FactorableTemplate.h"
+#include "FactorableTemplate.h"
 #include "01_util/UId.h"
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -49,13 +51,15 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_LOG_ENTRY_ID;
+			static const std::string PARAMETER_CALL_TYPE;
 			static const std::string PARAMETER_TEXT;
 			static const std::string PARAMETER_TYPE;
 
 		private:
 			boost::shared_ptr<dblog::DBLogEntry>	_entry;
 			std::string								_text;
-			ResaDBLog::_EntryType					_type;
+			boost::optional<ResaDBLog::_EntryType>	_type;
+			ResaDBLog::_EntryType					_callType;
 
 
 		protected:

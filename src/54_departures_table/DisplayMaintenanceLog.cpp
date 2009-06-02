@@ -112,8 +112,10 @@ namespace synthese
 
 
 
-		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry& cols ) const
-		{
+		DBLog::ColumnsVector DisplayMaintenanceLog::parse(
+			const DBLogEntry& cols,
+			const server::Request& searchRequest
+		) const	{
 			ColumnsVector v;
 			const DBLogEntry::Content& c(cols.getContent());
 

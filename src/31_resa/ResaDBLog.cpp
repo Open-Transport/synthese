@@ -100,6 +100,7 @@ namespace synthese
 			DBLog::ColumnsVector v;
 			v.push_back("");
 			v.push_back("Description");
+			v.push_back("Action");
 			return v;
 		}
 
@@ -209,10 +210,19 @@ namespace synthese
 
 
 
-		DBLog::ColumnsVector ResaDBLog::parse( const dblog::DBLogEntry& entry) const
-		{
+		DBLog::ColumnsVector ResaDBLog::parse(
+			const dblog::DBLogEntry& entry,
+			const Request& searchRequest
+		) const	{
 			DBLog::ColumnsVector result;
 			const DBLogEntry::Content& content(entry.getContent());
+
+			// Rights
+			bool writingRight(searchRequest.isAuthorized<ResaRight>(WRITE,UNKNOWN_RIGHT_LEVEL));
+
+			// Cancel request
+			Request cancelRequest(searchRequest);
+//			cancelRequest._setAction(shared_ptr<Action>(new CancelReservationAction));
 
 			ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE])));
 			shared_ptr<ReservationTransaction> tr;
@@ -229,29 +239,13 @@ namespace synthese
 			// Column Symbol
 			{
 				stringstream stream;
-				switch (entryType)
+				stream << GetIcon(entryType);
+
+				if(entryType == ResaDBLog::RESERVATION_ENTRY)
 				{
-				case CALL_ENTRY:
-					stream << HTMLModule::getHTMLImage("phone.png","Appel");
-					break;
-
-				case ResaDBLog::RESERVATION_ENTRY:
-					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation");
 					stream << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), tr->getFullStatusText());
-					break;
-
-				case ResaDBLog::CANCELLATION_ENTRY:
-					stream << HTMLModule::getHTMLImage("bullet_delete.png", "Annulation de réservation");
-					break;
-
-				case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-					stream << HTMLModule::getHTMLImage("error.png", "Annulation de réservation hors délai");
-					break;
-
-				case ResaDBLog::NO_SHOW:
-					stream << HTMLModule::getHTMLImage("exclamation.png", "Absence");
-					break;
 				}
+
 				result.push_back(stream.str());
 			}
 
@@ -288,11 +282,154 @@ namespace synthese
 					stream << "ABSENCE sur : ";
 					ResaModule::DisplayReservations(stream, tr.get());
 					break;
+
+				default:
+					stream << GetText(entryType) << "<br />" << content[ResaDBLog::COL_TEXT];
 				}
 
 				result.push_back(stream.str());
 			}
+
+
+			if (writingRight)
+			{
+				stringstream stream;
+				switch(status)
+				{
+				case OPTION:
+					stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", "bullet_delete.png");
+					break;
+
+				case TO_BE_DONE:
+					stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", "error.png");
+					break;
+
+				case AT_WORK:
+					stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "exclamation.png");
+					break;
+				}
+				result.push_back(stream.str());
+			}
+
+
 			return result;
+		}
+
+		void ResaDBLog::AddCallInformationEntry(
+			const DBLogEntry& callEntry,
+			const ResaDBLog::_EntryType& type,
+			const std::string& text,
+			const security::User& user
+		){
+			DBLogEntry::Content c;
+			c.push_back(lexical_cast<string>(callEntry.getKey()));
+			c.push_back(lexical_cast<string>(type));
+			c.push_back(string());
+			c.push_back(text);
+			c.push_back(string());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, &user, callEntry.getObjectId());
+		}
+
+		std::string ResaDBLog::GetIconURL(
+			const ResaDBLog::_EntryType& type
+		){
+			switch (type)
+			{
+			case CALL_ENTRY:
+				return "phone.png";
+
+			case ResaDBLog::RESERVATION_ENTRY:
+				return "resa_compulsory.png";
+
+			case ResaDBLog::CANCELLATION_ENTRY:
+				return "bullet_delete.png";
+
+			case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
+				return "error.png";
+				
+			case ResaDBLog::NO_SHOW:
+				return "exclamation.png";
+				
+			case ResaDBLog::CUSTOMER_COMMENT_ENTRY:
+				return "user_comment.png";
+
+			case ResaDBLog::INFORMATION_ENTRY:
+				return "information.png";
+
+			case ResaDBLog::REDIRECTION_ENTRY:
+				return "lorry.png";
+
+			case ResaDBLog::TECHNICAL_SUPPORT_ENTRY:
+				return "wrench.png";
+
+			case ResaDBLog::RADIO_CALL:
+				return "transmit.png";
+
+			case ResaDBLog::FAKE_CALL:
+				return "keyboard.png";
+
+			case ResaDBLog::EMAIL:
+				return "email.png";
+
+			case ResaDBLog::OTHER:
+			default:
+				return "help.png";
+			}
+		}
+
+		std::string ResaDBLog::GetIcon( const ResaDBLog::_EntryType& type )
+		{
+			return HTMLModule::getHTMLImage(
+				GetIconURL(type),
+				GetText(type)
+			);
+		}
+
+		std::string ResaDBLog::GetText( const ResaDBLog::_EntryType& type )
+		{
+			switch (type)
+			{
+			case CALL_ENTRY:
+				return "Appel";
+
+			case ResaDBLog::RESERVATION_ENTRY:
+				return "Réservation";
+
+			case ResaDBLog::CANCELLATION_ENTRY:
+				return "Annulation de réservation";
+
+			case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
+				return "Annulation de réservation hors délai";
+
+			case ResaDBLog::NO_SHOW:
+				return "Absence";
+
+			case ResaDBLog::CUSTOMER_COMMENT_ENTRY:
+				return "Réclamation";
+
+			case ResaDBLog::INFORMATION_ENTRY:
+				return "Information";
+
+			case ResaDBLog::REDIRECTION_ENTRY:
+				return "Redirection vers ligne régulière";
+
+			case ResaDBLog::TECHNICAL_SUPPORT_ENTRY:
+				return "Support technique";
+
+			case ResaDBLog::RADIO_CALL:
+				return "Appel radio / service";
+
+			case ResaDBLog::FAKE_CALL:
+				return "Saisie";
+
+			case ResaDBLog::EMAIL:
+				return "E-mail";
+
+			case ResaDBLog::OTHER:
+			default:
+				return "Autre";
+			}
 		}
 	}
 }

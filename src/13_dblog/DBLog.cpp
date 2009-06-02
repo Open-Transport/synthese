@@ -31,6 +31,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace time;
+	using namespace server;
 
 	namespace dblog
 	{
@@ -86,8 +87,10 @@ namespace synthese
 
 
 
-		DBLog::ColumnsVector DBLog::parse(const DBLogEntry& entry) const
-		{
+		DBLog::ColumnsVector DBLog::parse(
+			const DBLogEntry& entry,
+			const Request& searchRequest
+		) const	{
 			return static_cast<ColumnsVector>(entry.getContent());
 		}
 

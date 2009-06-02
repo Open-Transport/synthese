@@ -122,7 +122,19 @@ namespace synthese
 				const security::RightLevel& level
 			) const = 0;
 
-			virtual ColumnsVector parse(const DBLogEntry& entry) const;
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Generates the display of the log specific columns.
+			/// @param entry to parse
+			/// @searchRequest request which has generated the display : can be reused
+			///		to generate other requests at the display
+			/// @return all columns content to display
+			virtual ColumnsVector parse(
+				const DBLogEntry& entry,
+				const server::Request& searchRequest
+			) const;
+
 			virtual std::string getObjectName(uid id) const;
 
 			static uid AddSimpleEntry(

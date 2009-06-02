@@ -92,7 +92,8 @@ namespace synthese
 			
 			
 			DBLog::ColumnsVector parse(
-				const dblog::DBLogEntry& entry
+				const dblog::DBLogEntry& entry,
+				const server::Request& searchRequest
 			) const;
 			
 			std::string getObjectName(uid id) const;

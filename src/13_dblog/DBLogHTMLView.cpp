@@ -329,7 +329,7 @@ namespace synthese
 					;
 				}
 
-				DBLog::ColumnsVector cols = _dbLog->parse(*dbe);
+				DBLog::ColumnsVector cols = _dbLog->parse(*dbe, searchRequest);
 				BOOST_FOREACH(const DBLog::ColumnsVector::value_type& col, cols)
 				{
 					stream << t.col() << col;

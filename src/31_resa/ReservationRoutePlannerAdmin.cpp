@@ -251,13 +251,21 @@ namespace synthese
 			}
 
 			HTMLTable::ColsVector v;
-			v.push_back("Départ<br />" + dynamic_cast<const NamedPlace*>(startPlace)->getFullName());
+			v.push_back("Départ<br />" + (
+					dynamic_cast<const NamedPlace*>(startPlace) ?
+					dynamic_cast<const NamedPlace*>(startPlace)->getFullName() :
+					dynamic_cast<const City*>(startPlace)->getName()
+			)	);
 			v.push_back("Ligne");
 			v.push_back("Arrivée");
 			v.push_back("Correspondance");
 			v.push_back("Départ");
 			v.push_back("Ligne");
-			v.push_back("Arrivée<br />" + dynamic_cast<const NamedPlace*>(endPlace)->getFullName());
+			v.push_back("Arrivée<br />" + (
+					dynamic_cast<const NamedPlace*>(endPlace) ?
+					dynamic_cast<const NamedPlace*>(endPlace)->getFullName() :
+					dynamic_cast<const City*>(endPlace)->getName()
+			)	);
 			HTMLTable t(v,"adminresults");
 
 			// Reservation

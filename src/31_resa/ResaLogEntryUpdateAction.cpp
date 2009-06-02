@@ -30,7 +30,10 @@
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -47,6 +50,7 @@ namespace synthese
 	namespace resa
 	{
 		const string ResaLogEntryUpdateAction::PARAMETER_LOG_ENTRY_ID = Action_PARAMETER_PREFIX + "li";
+		const string ResaLogEntryUpdateAction::PARAMETER_CALL_TYPE(Action_PARAMETER_PREFIX + "ct");
 		const string ResaLogEntryUpdateAction::PARAMETER_TEXT = Action_PARAMETER_PREFIX + "te";
 		const string ResaLogEntryUpdateAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
 		
@@ -79,19 +83,30 @@ namespace synthese
 				_text = map.getString(PARAMETER_TEXT, false, FACTORY_KEY);
 				if (_text.empty())
 					throw ActionException("Vous devez saisir un texte complémentaire");
-			}			
+			}
+			_callType = static_cast<ResaDBLog::_EntryType>(map.getInt(PARAMETER_CALL_TYPE, true, FACTORY_KEY));
 		}
 		
 		
 		
 		void ResaLogEntryUpdateAction::run()
 		{
+			// Update the call status if necessary
 			DBLogEntry::Content content(_entry->getContent());
-			content[ResaDBLog::COL_TEXT] = _text;
-			content[ResaDBLog::COL_TYPE] = Conversion::ToString(_type);
+			content[ResaDBLog::COL_TYPE] = lexical_cast<string>(_callType);
 			_entry->setContent(content);
-
 			DBLogEntryTableSync::Save(_entry.get());
+
+			// Create the additional information if necessary
+			if(_type)
+			{
+				ResaDBLog::AddCallInformationEntry(
+					*_entry,
+					*_type,
+					_text,
+					*_request->getUser()
+				);
+			}
 		}
 
 

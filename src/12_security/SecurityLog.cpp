@@ -95,8 +95,12 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, subject->getKey());
 		}
 
-		DBLog::ColumnsVector SecurityLog::parse( const dblog::DBLogEntry::Content& cols ) const
-		{
+
+
+		DBLog::ColumnsVector SecurityLog::parse(
+			const dblog::DBLogEntry::Content& cols,
+			const server::Request& searchRequest
+		) const	{
 			DBLog::ColumnsVector v;
 			Env env;
 			switch ((_EntryType) Conversion::ToInt(cols[0]))
