@@ -27,6 +27,7 @@
 #include "Registry.h"
 #include "LexicalMatcher.h"
 #include "IncludingPlace.h"
+#include "NamedPlace.h"
 
 #include <string>
 #include <iostream>
