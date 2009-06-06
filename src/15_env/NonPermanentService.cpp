@@ -22,6 +22,7 @@
 
 #include "NonPermanentService.h"
 #include "Path.h"
+#include "PTUseRule.h"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 	using namespace graph;
+	using namespace pt;
 
 	namespace env
 	{

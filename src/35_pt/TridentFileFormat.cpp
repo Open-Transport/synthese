@@ -51,7 +51,7 @@
 #include "NonConcurrencyRuleTableSync.h"
 #include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
-#include "UseRules.h"
+#include "PTUseRule.h"
 #include "ServiceDate.h"
 #include "PTConstants.h"
 // 06 Geometry
@@ -617,7 +617,8 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<ScheduledService> srv, _env->getRegistry<ScheduledService>())
 			{
 				bool isDRT(
-					srv->getUseRule(USER_PEDESTRIAN).getReservationType() != UseRule::RESERVATION_FORBIDDEN
+					&dynamic_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)) != NULL &&
+					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 				);
 
 				os << "<VehicleJourney";
@@ -666,50 +667,53 @@ namespace synthese
 
 				if (_withTisseoExtension)
 				{
-					const UseRules* rules(srv->getActualRules());
-					const UseRule& hRule(rules->getUseRule(USER_HANDICAPPED));
+					const UseRule& hRule(srv->getUseRule(USER_HANDICAPPED));
 					os <<
 						"<mobilityRestrictedSuitability>" <<
-						Conversion::ToString(hRule.getAccess()) <<
+						(hRule.getAccessCapacity() ? lexical_cast<string>(*hRule.getAccessCapacity()) : "999") <<
 						"</mobilityRestrictedSuitability>" <<
 						"\n"
 					;
-/*					if(	hRule.getReservationType() != UseRule::RESERVATION_FORBIDDEN)
-					{
+					if(	&dynamic_cast<const PTUseRule&>(hRule) != NULL &&
+						static_cast<const PTUseRule&>(hRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					){
 						os << "<mobilityRestrictedReservationRule>" <<
 							TridentId(
 								peerid,
 								"ReservationRule",
-								srv->getHandicappedCompliance()->getReservationRule()
+								static_cast<const PTUseRule&>(hRule).getKey()
 							) <<
 							"</mobilityRestrictedReservationRule>" <<
 							"\n"
 						;
-					}*/
-					const UseRule& bRule(srv->getUseRule(USER_BIKE_IN_PT));
+					}
+
+					const UseRule& bRule(srv->getUseRule(USER_BIKE));
 					os <<
 						"<bikeSuitability>" <<
-						Conversion::ToString(bRule.getAccess()) <<
+						(bRule.getAccessCapacity() ? Conversion::ToString(*bRule.getAccessCapacity()) : "999") <<
 						"</bikeSuitability>" <<
 						"\n"
 					;
-/*					if (bRule.getReservationType() != UseRule::RESERVATION_FORBIDDEN)
-					{
+					if (&dynamic_cast<const PTUseRule&>(bRule) != NULL &&
+						static_cast<const PTUseRule&>(bRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					){
 						os <<
 							"<bikeReservationRule>" <<
 							TridentId(
 								peerid,
 								"ReservationRule",
-								*srv->getBikeCompliance()->getReservationRule()
+								static_cast<const PTUseRule&>(bRule).getKey()
 							) <<
 							"</bikeReservationRule>" <<
 							"\n"
 						;
-					}*/
-/*					if (isDRT)
+					}
+					if (isDRT)
 					{
-						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", *srv->getReservationRule()) << "</reservationRule>" << "\n";
-					}*/
+						const PTUseRule& pRule(static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)));
+						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", pRule.getKey()) << "</reservationRule>" << "\n";
+					}
 				}
 				os << "</VehicleJourney>" << "\n";
 			}
@@ -717,7 +721,8 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<ContinuousService> srv, _env->getRegistry<ContinuousService>())
 			{
 				bool isDRT(
-					srv->getUseRule(USER_PEDESTRIAN).getReservationType() != UseRule::RESERVATION_FORBIDDEN
+					&dynamic_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)) &&
+					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 				);
 
 				os << "<VehicleJourney";
@@ -761,46 +766,50 @@ namespace synthese
 					const UseRule& hRule(srv->getUseRule(USER_HANDICAPPED));
 					os <<
 						"<mobilityRestrictedSuitability>" <<
-						Conversion::ToString(hRule.getAccess()) <<
+						(hRule.getAccessCapacity() ? lexical_cast<string>(*hRule.getAccessCapacity()) : "999") <<
 						"</mobilityRestrictedSuitability>" <<
 						"\n"
 					;
-/*					if(	hRule.getReservationType() != UseRule::RESERVATION_FORBIDDEN)
-					{
+					if(	&dynamic_cast<const PTUseRule&>(hRule) != NULL &&
+						static_cast<const PTUseRule&>(hRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					){
 						os << "<mobilityRestrictedReservationRule>" <<
 							TridentId(
 								peerid,
 								"ReservationRule",
-								srv->getHandicappedCompliance()->getReservationRule()
+								static_cast<const PTUseRule&>(hRule).getKey()
 							) <<
 							"</mobilityRestrictedReservationRule>" <<
 							"\n"
 						;
-					}*/
-					const UseRule& bRule(srv->getUseRule(USER_BIKE_IN_PT));
+					}
+
+					const UseRule& bRule(srv->getUseRule(USER_BIKE));
 					os <<
 						"<bikeSuitability>" <<
-						Conversion::ToString(bRule.getAccess()) <<
+						(bRule.getAccessCapacity() ? Conversion::ToString(*bRule.getAccessCapacity()) : "999") <<
 						"</bikeSuitability>" <<
 						"\n"
 					;
-/*					if (bRule.getReservationType() != UseRule::RESERVATION_FORBIDDEN)
-					{
+					if (&dynamic_cast<const PTUseRule&>(bRule) != NULL &&
+						static_cast<const PTUseRule&>(bRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					){
 						os <<
 							"<bikeReservationRule>" <<
 							TridentId(
 								peerid,
 								"ReservationRule",
-								*srv->getBikeCompliance()->getReservationRule()
+								static_cast<const PTUseRule&>(bRule).getKey()
 							) <<
 							"</bikeReservationRule>" <<
 							"\n"
 						;
-					}*/
-/*					if (isDRT)
+					}
+					if (isDRT)
 					{
-						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", *srv->getReservationRule()) << "</reservationRule>" << "\n";
-					}*/
+						const PTUseRule& pRule(static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)));
+						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", pRule.getKey()) << "</reservationRule>" << "\n";
+					}
 				}
 				os << "</VehicleJourney>" << "\n";
 			}
@@ -814,43 +823,43 @@ namespace synthese
 			{
 				// Reservation Rules -----------------------------------------------------------------------
 
-// 				BOOST_FOREACH(shared_ptr<ReservationRule> r, _env->getRegistry<ReservationRule>())
-// 				{
-// 					const ReservationRule& rule(*r);
-// 
-// 					if (rule.getType() == RESERVATION_FORBIDDEN || (rule.getMinDelayDays() == 0 && rule.getMinDelayMinutes() == 0))	continue;
-// 
-// 					os << "<ReservationRule>" << "\n";
-// 					os << "<objectId>" << TridentId (peerid, "ReservationRule", rule.getKey ()) << "</objectId>" << "\n";
-// 					os << "<ReservationCompulsory>" << ((rule.getType() == RESERVATION_COMPULSORY) ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
-// 					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << "\n";
-// 					if (rule.getMinDelayMinutes() > 0)
-// 					{
-// 						os << "<minMinutesDurationBeforeDeadline>" << ToXsdDuration(rule.getMinDelayMinutes()) << "</minMinutesDurationBeforeDeadline>" << "\n";
-// 					}
-// 					if (rule.getMinDelayDays() > 0)
-// 					{
-// 						os << "<minDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMinDelayDays()) << "</minDaysDurationBeforeDeadline>" << "\n";
-// 					}
-// 					if (!rule.getHourDeadLine().isUnknown())
-// 					{
-// 						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << "\n";
-// 					}
-// 					if (rule.getMaxDelayDays() > 0)
-// 					{
-// 						os << "<maxDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMaxDelayDays()) << "</maxDaysDurationBeforeDeadline>" << "\n";
-// 					}
+ 				BOOST_FOREACH(shared_ptr<const PTUseRule> r, _env->getRegistry<PTUseRule>())
+ 				{
+ 					const PTUseRule& rule(*r);
+ 
+					if (rule.getReservationType() == PTUseRule::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays() == 0 && rule.getMinDelayMinutes() == 0))	continue;
+ 
+ 					os << "<ReservationRule>" << "\n";
+ 					os << "<objectId>" << TridentId (peerid, "ReservationRule", rule.getKey ()) << "</objectId>" << "\n";
+					os << "<ReservationCompulsory>" << ((rule.getReservationType() == PTUseRule::RESERVATION_RULE_COMPULSORY) ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
+ 					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << "\n";
+ 					if (rule.getMinDelayMinutes() > 0)
+ 					{
+ 						os << "<minMinutesDurationBeforeDeadline>" << ToXsdDuration(rule.getMinDelayMinutes()) << "</minMinutesDurationBeforeDeadline>" << "\n";
+					}
+ 					if (rule.getMinDelayDays() > 0)
+ 					{
+ 						os << "<minDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMinDelayDays()) << "</minDaysDurationBeforeDeadline>" << "\n";
+ 					}
+ 					if (!rule.getHourDeadLine().isUnknown())
+ 					{
+ 						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << "\n";
+ 					}
+ 					if (rule.getMaxDelayDays() > 0)
+ 					{
+ 						os << "<maxDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMaxDelayDays()) << "</maxDaysDurationBeforeDeadline>" << "\n";
+ 					}
 // 					if (!rule.getPhoneExchangeNumber().empty())
-// 					{
-// 						os << "<phoneNumber>" << rule.getPhoneExchangeNumber() << "</phoneNumber>" << "\n";
-// 						os << "<callcenterOpeningPeriod>" << rule.getPhoneExchangeOpeningHours() << "</callcenterOpeningPeriod>" << "\n";
-// 					}
+ //					{
+ //						os << "<phoneNumber>" << rule.getPhoneExchangeNumber() << "</phoneNumber>" << "\n";
+ //						os << "<callcenterOpeningPeriod>" << rule.getPhoneExchangeOpeningHours() << "</callcenterOpeningPeriod>" << "\n";
+ //					}
 // 					if (!rule.getWebSiteUrl().empty())
 // 					{
 // 						os << "<bookingWebsiteURL>" << rule.getWebSiteUrl() << "</bookingWebsiteURL>" << "\n";
 // 					}
-// 					os << "</ReservationRule>" << "\n";
-// 				}
+ 					os << "</ReservationRule>" << "\n";
+ 				}
 
 				// Non concurrency -----------------------------------------------------------------------
 				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, _env->getRegistry<NonConcurrencyRule>())

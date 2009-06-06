@@ -45,7 +45,6 @@
 #include "SearchFormHTMLTable.h"
 #include "PTConstants.h"
 #include "Journey.h"
-#include "UseRules.h"
 #include "ServiceUse.h"
 #include "Line.h"
 #include "CommercialLine.h"
@@ -245,8 +244,15 @@ namespace synthese
 
 			if (jv.journeys.empty())
 			{
-				stream << "Aucun résultat trouvé de " << dynamic_cast<const NamedPlace*>(startPlace)->getFullName() 
-					<< " à " << dynamic_cast<const NamedPlace*>(endPlace)->getFullName();
+				stream << "Aucun résultat trouvé de " << (
+						dynamic_cast<const NamedPlace*>(startPlace) ?
+						dynamic_cast<const NamedPlace*>(startPlace)->getFullName() :
+						dynamic_cast<const City*>(startPlace)->getName()
+					) << " à " << (
+						dynamic_cast<const NamedPlace*>(endPlace) ?
+						dynamic_cast<const NamedPlace*>(endPlace)->getFullName() :
+						dynamic_cast<const City*>(endPlace)->getName()
+					);
 				return;
 			}
 

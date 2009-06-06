@@ -175,7 +175,7 @@ namespace synthese
 
 			case BIKE_ACCESSIBILITY:
 				return AccessParameters(
-					USER_BIKE_IN_PT, false, false, 3000, 23, 201, _maxTransportConnectionsCount
+					USER_BIKE, false, false, 3000, 23, 201, _maxTransportConnectionsCount
 				);
 
 			default:

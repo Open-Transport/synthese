@@ -59,7 +59,7 @@ namespace synthese
 				time::DateTime		_originDateTime;
 				time::DateTime		_actualTime;
 				int					_serviceIndex;
-				UseRule				_useRule;
+				const UseRule*		_useRule;
 			//@}
 
 				int							_range;
@@ -88,25 +88,21 @@ namespace synthese
 				AccessDirection			getMethod()				const;
 				int						getServiceIndex()		const;
 				int						getServiceRange()		const;
-				const UseRule&			getUseRule()			const;
+				const UseRule*			getUseRule()			const;
 				UserClassCode			getUserClass()			const;
 			//@}
 
 			//! @name Queries
 			//@{
 				/** Test the respect of the reservation rules.
-					@param computingDateTime date of the request
 					@return bool true if the service can be used
 					@warning If the service is determinated by ARRIVAL_TO_DEPARTURE, then this method always aswers true, because the reservation
 						deadline depends only on the departure time, which is not known at this stage. Use ServiceUse::isReservationRuleCompliant method to validate the reservation
 						deadline respect.
 					@author Hugues Romain
 					@date 2007
-				
-					@todo Handle mixed reservation type
 				*/
-				virtual bool isReservationRuleCompliant(
-					const time::DateTime& computingDateTime
+				virtual UseRule::RunPossibilityType isUseRuleCompliant(
 				)	const;
 				const Edge*	getEdge() const;
 			//@}

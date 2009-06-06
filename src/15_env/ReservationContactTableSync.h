@@ -44,13 +44,6 @@ namespace synthese
 		:	public db::SQLiteRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>
 		{
 		public:
-			static const std::string COL_TYPE;
-			static const std::string COL_ONLINE;
-			static const std::string COL_ORIGINISREFERENCE;
-			static const std::string COL_MINDELAYMINUTES;
-			static const std::string COL_MINDELAYDAYS;
-			static const std::string COL_MAXDELAYDAYS;
-			static const std::string COL_HOURDEADLINE;
 			static const std::string COL_PHONEEXCHANGENUMBER;
 			static const std::string COL_PHONEEXCHANGEOPENINGHOURS;
 			static const std::string COL_DESCRIPTION;

@@ -26,7 +26,7 @@
 #define SYNTHESE_ResaLogAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
-#include "ResultHTMLTable.h"
+#include "DBLogHTMLView.h"
 #include "Date.h"
 
 namespace synthese
@@ -40,8 +40,7 @@ namespace synthese
 		*/
 		class ResaLogAdmin : public admin::AdminInterfaceElementTemplate<ResaLogAdmin>
 		{
-			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			time::Date									_searchDate;
+			dblog::DBLogHTMLView						_log;
 
 		public:
 			static const std::string PARAMETER_DATE;

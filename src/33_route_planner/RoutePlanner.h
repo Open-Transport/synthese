@@ -102,7 +102,6 @@ namespace synthese
 				const time::DateTime		_journeySheetStartTime;  //!< Start time of schedule sheet.
 				const time::DateTime		_journeySheetEndTime;    //!< End time of schedule sheet.
 				const PlanningOrder			_planningOrder;  //!< Define planning sequence.
-				const time::DateTime		_calculationTime;    //!< Time of calculation (initialized to current time)
 				const int					_maxSolutionsNumber;
 			//@}
 

@@ -554,15 +554,19 @@ namespace synthese
 			return _score;
 		}
 
+
+
 		boost::logic::tribool Journey::getReservationCompliance() const
 		{
 			boost::logic::tribool result(false);
 			BOOST_FOREACH(const ServiceUse& su, _journeyLegs)
 			{
-				const UseRule& rule(su.getUseRule());
-				if (rule.getReservationType() == UseRule::RESERVATION_COMPULSORY)
+				const UseRule::ReservationAvailabilityType& resa(
+					su.getUseRule()->getReservationAvailability(su)
+				);
+				if(resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE)
 					return true;
-				if (rule.getReservationType() == UseRule::RESERVATION_OPTIONAL)
+				if(resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE)
 					result = boost::logic::indeterminate;
 			}
 			return result;
@@ -574,11 +578,13 @@ namespace synthese
 			boost::logic::tribool compliance(getReservationCompliance());
 			BOOST_FOREACH(const ServiceUse& su, _journeyLegs)
 			{
-				const UseRule& rule(su.getUseRule());
+				const UseRule::ReservationAvailabilityType& resa(
+					su.getUseRule()->getReservationAvailability(su)
+				);
 				if(	(	boost::logic::indeterminate(compliance) &&
-						rule.getReservationType() == UseRule::RESERVATION_OPTIONAL
+						resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE
 					)||(compliance == true &&
-						rule.getReservationType() == UseRule::RESERVATION_COMPULSORY
+						resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE
 				)	){
 					DateTime deadLine(su.getReservationDeadLine());
 					if (result.isUnknown() || deadLine < result)

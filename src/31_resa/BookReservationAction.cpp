@@ -37,7 +37,7 @@
 #include "ResaModule.h"
 #include "ActionException.h"
 #include "Request.h"
-
+#include "PTUseRule.h"
 #include "Place.h"
 #include "City.h"
 #include "Journey.h"
@@ -72,6 +72,7 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace geography;
+	using namespace pt;	
 	
 
 	namespace util
@@ -332,14 +333,13 @@ namespace synthese
 				}
 
 
-				if(	su.getUseRule().isReservationPossible(
-					su.getOriginDateTime()
-					, now
-					, su.getDepartureDateTime()
-				))
-				{
-					r->setReservationRuleId(su.getService()->getActualRulesId());
-					r->setReservationDeadLine(su.getUseRule().getReservationDeadLine(
+				if(	UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
+				){
+					if(dynamic_cast<const PTUseRule*>(su.getUseRule()))
+					{
+						r->setReservationRuleId(static_cast<const PTUseRule*>(su.getUseRule())->getKey());
+					}
+					r->setReservationDeadLine(su.getUseRule()->getReservationDeadLine(
 						su.getOriginDateTime()
 						, su.getDepartureDateTime()
 					));

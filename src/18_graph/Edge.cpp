@@ -252,7 +252,6 @@ namespace synthese
 			UserClassCode userClass,
 			DateTime departureMoment
 			, const DateTime& maxDepartureMoment
-			, const DateTime& calculationMoment
 			, bool controlIfTheServiceIsReachable
 			, int minNextServiceIndex
 			, bool inverted
@@ -280,7 +279,6 @@ namespace synthese
 								userClass
 								, this
 								, departureMoment
-								, calculationMoment
 								, controlIfTheServiceIsReachable
 								, inverted
 							)
@@ -317,7 +315,6 @@ namespace synthese
 			UserClassCode userClass,
 			DateTime arrivalMoment
 			, const DateTime& minArrivalMoment
-			, const DateTime& computingDateTime
 			, bool controlIfTheServiceIsReachable
 			, int maxPreviousServiceIndex
 			, bool inverted
@@ -337,7 +334,6 @@ namespace synthese
 								userClass
 								, this
 								, arrivalMoment
-								, computingDateTime
 								, controlIfTheServiceIsReachable
 								, inverted
 							)

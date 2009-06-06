@@ -68,38 +68,17 @@ namespace synthese
 		const string ResaLogAdmin::PARAMETER_DATE("da");
 
 		ResaLogAdmin::ResaLogAdmin()
-			: AdminInterfaceElementTemplate<ResaLogAdmin>()
-			, _searchDate(TIME_CURRENT)
+			: AdminInterfaceElementTemplate<ResaLogAdmin>(),
+			_log("log")
 		{ }
 		
 		void ResaLogAdmin::setFromParametersMap(
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_DATE, 50, false);
-			_searchDate = map.getDate(PARAMETER_DATE, false, FACTORY_KEY);
-
-			if(!doDisplayPreparationActions) return;
-
-			// Search
-			DateTime searchStartDate(_searchDate);
-			DateTime searchEndDate(searchStartDate);
-			searchEndDate += 1;
-			DBLogEntryTableSync::Search(
-				_env,
+			_log.set(
+				map,
 				ResaDBLog::FACTORY_KEY
-				, searchStartDate
-				, searchEndDate
-				, UNKNOWN_VALUE // _searchUser.get() ? _searchUser->getKey() : UNKNOWN_VALUE
-				, DBLogEntry::DB_LOG_UNKNOWN
-				, UNKNOWN_VALUE // _searchObjectId
-				, "" // _searchText
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAMETER_DATE
-				, false // _resultTableRequestParameters.orderField == PARAMETER_SEARCH_USER
-				, false // _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
-				, _requestParameters.raisingOrder
 			);
 		}
 		
@@ -107,8 +86,7 @@ namespace synthese
 		
 		server::ParametersMap ResaLogAdmin::getParametersMap() const
 		{
-			ParametersMap m(_requestParameters.getParametersMap());
-			m.insert(PARAMETER_DATE, _searchDate);
+			ParametersMap m;
 			return m;
 		}
 
@@ -119,27 +97,12 @@ namespace synthese
 			FunctionRequest<AdminRequest> searchRequest(_request);
 			searchRequest.getFunction()->setSamePage(this);
 
-			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
-			cancelRequest.getFunction()->setSamePage(this);
-
-			ResultHTMLTable::ResultParameters rp;
-			rp.setFromResult(_requestParameters, _env.getEditableRegistry<DBLogEntry>());
-			
-			// Search form
-			SearchFormHTMLTable st(searchRequest.getHTMLForm());
-			stream << st.open();
-			stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _searchDate));
-			stream << st.close();
-
 			// Results
-			ResaModule::DisplayResaDBLog(
-				stream
-				, _env
-				, PARAMETER_DATE
-				, searchRequest
-				, cancelRequest
-				, _requestParameters
-				, true
+			_log.display(
+				stream,
+				searchRequest,
+				true,
+				true
 			);
 		}
 

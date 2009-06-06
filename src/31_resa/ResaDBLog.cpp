@@ -38,6 +38,8 @@
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
 #include "Session.h"
+#include "AdminRequest.h"
+#include "ResaEditLogEntryAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -51,6 +53,7 @@ namespace synthese
 	using namespace time;
 	using namespace html;
 	using namespace server;
+	using namespace admin;
 
 	namespace util
 	{
@@ -294,6 +297,18 @@ namespace synthese
 			if (writingRight)
 			{
 				stringstream stream;
+				switch (entryType)
+				{
+				case CALL_ENTRY:
+				case FAKE_CALL:
+				case RADIO_CALL:
+					FunctionRequest<AdminRequest> openCallRequest(&searchRequest);
+					openCallRequest.getFunction()->setPage<ResaEditLogEntryAdmin>();
+					openCallRequest.setObjectId(entry.getKey());
+					stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir");
+					break;
+				}
+
 				switch(status)
 				{
 				case OPTION:

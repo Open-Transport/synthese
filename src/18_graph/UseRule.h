@@ -26,205 +26,174 @@
 #ifndef SYNTHESE_UseRule_h__
 #define SYNTHESE_UseRule_h__
 
-#include "DateTime.h"
+#include <boost/optional.hpp>
 
 namespace synthese
 {
+	namespace time
+	{
+		class DateTime;
+	}
+
 	namespace graph
 	{
-		////
+		class ServiceUse;
+		class ServicePointer;
+		class AccessParameters;
+
+		//////////////////////////////////////////////////////////////////////////
 		/// Use rule class.
+		///
+		/// A use rule indicates if a customer profile is allowed to use a service
+		/// regarding some criteria.
+		///
+		/// For example, a service can be used by non handicapped persons without
+		/// any constraint, two handicapped persons can use the service, and
+		/// persons with bikes can use the service if they have booked it two
+		/// hours earlier.
+		/// This case is implemented by 3 use rules objects (one per customer
+		/// profile)
+		///
+		/// UseRule is an interface. Each implementation of the graph module must
+		/// implement it at least once.
+		///
+		/// When no use rule is specified for a service and a customer profile,
+		/// it seems that the access to the service is forbidden for the profile
+		/// members. It is equivalent to the FORBIDDEN_USE_RULE static instance 
+		/// of UseRule.
+		///
 		/// @ingroup m18
 		class UseRule
 		{
 		public:
-			////
-			/// Reservation rule type.
-			///	- FORBIDDEN : it is impossible to book a seat on the service
-			///	- COMPULSORY : it is impossible to use the service without having booked a seat
-			///	- OPTIONAL : is is possible to book a place on the service, but it is possible to use 
-			///   the service without having booked a seat
-			///	- MIXED_BY_DEPARTURE_PLACE : it is impossible to use the service without having booked 
-			///   a place, except for journeys beginning at several places, defined in the path.
-			typedef enum {
-				RESERVATION_FORBIDDEN = 0,
-				RESERVATION_COMPULSORY = 1,
-				RESERVATION_OPTIONAL = 2,
-				RESERVATION_MIXED_BY_DEPARTURE_PLACE = 3
-			} ReservationRuleType;
-			
-			
-			////
-			/// Access level.
-			/// The rule is applicable on a user class (see @ref UseRules ) :
-			///  - FORBIDDEN : The access is not allowed to the user class members
-			///  - ALLOWED : The access is allowed to the user class members
-			///  - COMPULSORY : The access is allowed only to the user class members
+
+
 			typedef enum
 			{
-				ACCESS_FORBIDDEN = 0,
-				ACCESS_ALLOWED = 1,
-				ACCESS_COMPULSORY = 2,
-				ACCESS_UNKNOWN = 3
-			} Access;
+				RESERVATION_FORBIDDEN = 0,
+				RESERVATION_COMPULSORY_POSSIBLE = 1,
+				RESERVATION_COMPULSORY_TOO_EARLY = 2,
+				RESERVATION_COMPULSORY_TOO_LATE = 3,
+				RESERVATION_OPTIONAL_POSSIBLE = 4,
+				RESERVATION_OPTIONAL_TOO_EARLY = 5,
+				RESERVATION_OPTIONAL_TOO_LATE = 6,
+				RESERVATION_DEPENDING_ON_DEPARTURE_PLACE = 7
+			} ReservationAvailabilityType;
 
-			typedef unsigned int Capacity;
+
+			typedef enum
+			{
+				RUN_POSSIBLE = 0,
+				RUN_NOT_POSSIBLE = 1,
+				RUN_DEPENDING_ON_DEPARTURE_PLACE = 2,
+			} RunPossibilityType;
 			
-			static const Capacity UNLIMITED_CAPACITY;
-
-			static const UseRule ALLOWED;
-			static const UseRule FORBIDDEN;
-			static const UseRule UNKNOWN;
-
-		private:
 			
-			//! @name Access
-			//@{
-				////
-				/// Value (see the derivated class for the signification of the 3 availables status)
-				Access _access;
-				
-				////
-				/// Maximal person number which can be served
-				/// The maximum value of the attribute seems unlimited capacity
-				Capacity _capacity;
-			//@}
-				
-			//! @name Reservation
-			//@{
-				////
-				/// Type of the reservation rule.
-				ReservationRuleType		_reservationType;
-				
-				////
-				/// Whether reference departure time is the line run departure time at its origin (true)
-				/// or client departure time (false).
-				bool _originIsReference;
-
-				////
-				/// Minimum delay in minutes between reservation and reference moment
-				int _minDelayMinutes;
-				
-				int _minDelayDays;   //!< Minimum delay in days between reservation and reference moment
-				int _maxDelayDays;  //!< Maxium number of days between reservation and departure.
-
-				time::Hour _hourDeadLine; //!< Latest reservation hour the last day open for reservation
-
-			//@}
+			//////////////////////////////////////////////////////////////////////////
+			/// Maximal seats number for the user category.
+			/// Values :
+			///  - 0 : the use of the service is forbidden for the user category;
+			///  - >0 : the use of the service is allowed for the user category, the 
+			///    available seats number is limited to the specified value;
+			///  - unspecified : the use of the service is allowed for the user category,
+			///    and there is no seats number limit.
+			typedef boost::optional<size_t> AccessCapacity;
 			
-		public:
-			////
-			/// Constructor.
-			/// The constructor builds a most permissive rule :
-			///  - allowed access
-			///  - no reservation
-			///  - unlimited capacity
-			UseRule(
-				Access access = ACCESS_UNKNOWN
+
+			/** Reference function for reservation dead line calculation.
+				@param originTime Time of start of the corresponding service
+				@param departureTime Desired departure time.
+
+				It is done according to the following steps:
+					- Choice of reference time (client departure or line run departure at origin)
+					- Calculation 1 : x minutes before reference time :
+					- Decrease of _minDelayMinutes before reference
+
+					- Calculation 2 : x days before reference time :
+					- Decrease of _minDelayDays before reference
+					- Sets hour to _hourDeadLine
+
+					- The smallest date time is chosen.
+
+				If no explicit rule defines the reservation dead line, 
+				the actual reservation time is returned.
+			*/
+			virtual time::DateTime getReservationDeadLine (
+				const time::DateTime& originTime,
+				const time::DateTime& departureTime
+			) const = 0;
+
+
+			virtual AccessCapacity getAccessCapacity(
+			) const = 0;
+
+
+			/** Reference function for calculation of the date time of the opening of reservations.
+				@param reservationTime Time when booking is done.
+				@return The minimum date time to make a reservation.
+			
+				If no explicit rule defines this minimum time, the actual reservation time is returned.
+			*/
+			virtual time::DateTime getReservationOpeningTime ( 
+				const ServicePointer& servicePointer
+			) const = 0;
+			
+			
+			
+			/** Indicates whether or not a path can be taken at a given date, 
+				taking into account reservation delay rules.
+				@param originTime Time of start of the corresponding service
+				@param reservationTime Time of booking, if required.
+				@param departureTime Desired departure time.
+				@return true if the line run can be taken, false otherwise.
+
+				This methods checks the following conditions :
+					- if reservation is not compulsory, the run can be taken.
+					- if reservation is compulsory, reservation time must precede reservation 
+				dead line and be after reservation opening time.
+			*/
+			virtual RunPossibilityType isRunPossible (
+				const ServiceUse& serviceUse
+			) const = 0;
+
+
+
+			virtual RunPossibilityType isRunPossible (
+				const ServicePointer& servicePointer
+			) const = 0;
+
+
+			/** Indicates whether or not a reservation is possible for a given run,
+				at a certain date, taking into account delay rules.
+				@param originTime Time of start of the corresponding service
+				@param reservationTime Time of booking.
+				@param departureTime Desired departure time.
+				@return true if the reservation is possible, false otherwise.
+			 
+				This methods checks the following conditions :
+					- reservation time must precede reservation dead line
+					- reservation time must be later than reservation start time.
+			*/
+			virtual ReservationAvailabilityType getReservationAvailability(
+				const ServiceUse& serviceUse
+			) const = 0;
+
+
+			virtual ReservationAvailabilityType getReservationAvailability(
+				const ServicePointer& servicePointer
+			) const = 0;
+
+
+			virtual bool isCompatibleWith(
+				const AccessParameters& accessParameters
+			) const = 0;
+
+			static bool IsReservationPossible(
+				const ReservationAvailabilityType& value
 			);
+
+			UseRule();
 			~UseRule();
-		
-			//! @name Getters
-			//@{
-				Capacity			getCapacity() const;
-				Access				getAccess() const;
-				bool				getOriginIsReference()			const;
-				const time::Hour&	getHourDeadLine()				const;
-				int					getMinDelayDays()				const;
-				int					getMinDelayMinutes()			const;
-				int					getMaxDelayDays()				const;
-				ReservationRuleType	getReservationType()			const;
-			//@}
-			
-			//! @name Setters
-			//@{
-				void setHourDeadLine (const synthese::time::Hour& hourDeadLine);
-				void setMinDelayMinutes (int minDelayMinutes);
-				void setMinDelayDays (int minDelayDays);
-				void setMaxDelayDays (int maxDelayDays);
-				void setOriginIsReference (bool originIsReference);
-				void setReservationType(ReservationRuleType value);
-			//@}
-
-			//! @name Queries
-			//@{
-			
-				/** Reference function for reservation dead line calculation.
-					@param originTime Time of start of the corresponding service
-					@param departureTime Desired departure time.
-
-					It is done according to the following steps:
-						- Choice of reference time (client departure or line run departure at origin)
-						- Calculation 1 : x minutes before reference time :
-						- Decrease of _minDelayMinutes before reference
-
-						- Calculation 2 : x days before reference time :
-						- Decrease of _minDelayDays before reference
-						- Sets hour to _hourDeadLine
-
-						- The smallest date time is chosen.
-
-					If no explicit rule defines the reservation dead line, 
-					the actual reservation time is returned.
-				*/
-				time::DateTime getReservationDeadLine (
-					const time::DateTime& originTime
-					, const time::DateTime& departureTime
-				) const;
-				
-				
-				
-				/** Reference function for calculation of start reservation date time.
-					@param reservationTime Time when booking is done.
-					@return The minimum date time to make a reservation.
-				
-					If no explicit rule defines this minimum time, the actual reservation time is returned.
-				*/
-				time::DateTime getReservationStartTime ( 
-					const time::DateTime& reservationTime
-				) const;
-				
-				
-				
-				/** Indicates whether or not a path can be taken at a given date, 
-					taking into account reservation delay rules.
-					@param originTime Time of start of the corresponding service
-					@param reservationTime Time of booking, if required.
-					@param departureTime Desired departure time.
-					@return true if the line run can be taken, false otherwise.
-
-					This methods checks the following conditions :
-						- if reservation is not compulsory, the run can be taken.
-						- if reservation is compulsory, reservation time must precede reservation 
-					dead line and be after reservation opening time.
-				*/
-				bool isRunPossible (
-					const time::DateTime& originTime,
-					bool stopBelongsToOptionalReservationPlaces,
-					const time::DateTime& reservationTime,
-					const time::DateTime& departureTime
-				) const;
-
-
-
-				/** Indicates whether or not a reservation is possible for a given run,
-					at a certain date, taking into account delay rules.
-					@param originTime Time of start of the corresponding service
-					@param reservationTime Time of booking.
-					@param departureTime Desired departure time.
-					@return true if the reservation is possible, false otherwise.
-				 
-					This methods checks the following conditions :
-						- reservation time must precede reservation dead line
-						- reservation time must be later than reservation start time.
-				*/
-				bool isReservationPossible (
-					const time::DateTime& originTime
-					, const time::DateTime& reservationTime
-					, const time::DateTime& departureTime
-				) const;
-
-			//@}
 		};
 	}
 }

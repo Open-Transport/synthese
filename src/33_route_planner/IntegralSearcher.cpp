@@ -40,7 +40,7 @@
 #include "CommercialLine.h"
 #include "RoadModule.h"
 #include "DateTime.h"
-
+#include "Service.h"
 #include "Log.h"
 
 #include <sstream>
@@ -69,11 +69,9 @@ namespace synthese
 			, JourneysResult<graph::JourneyComparator>&				result
 			, BestVertexReachesMap& bestVertexReachesMap
 			, const VertexAccessMap& destinationVam
-			, const DateTime& calculationDateTime
 			, DateTime&	minMaxDateTimeAtDestination
 			, int previousContinuousServiceDuration
 			, const DateTime& previousContinuousServiceLastDeparture
-			, int maxDepth
 			, bool optim
 			, bool inverted
 			, ostream* const logStream
@@ -85,11 +83,9 @@ namespace synthese
 			_result(result)
 			, _bestVertexReachesMap(bestVertexReachesMap)
 			, _destinationVam(destinationVam)
-			, _calculationTime(calculationDateTime)
 			, _minMaxDateTimeAtDestination(minMaxDateTimeAtDestination)
 			, _previousContinuousServiceDuration(previousContinuousServiceDuration)
 			, _previousContinuousServiceLastDeparture(previousContinuousServiceLastDeparture)
-			, _maxDepth(maxDepth)
 			, _optim(optim)
 			, _inverted(inverted)
 			, _logStream(logStream)
@@ -292,7 +288,7 @@ namespace synthese
 					){
 						const Edge* edge = (*itEdge);
 
-						if (!_accessParameters.isCompatibleWith(edge->getParentPath()->getActualRules()))
+						if (!edge->getParentPath()->isCompatibleWith(_accessParameters))
 							continue;
 
 						int serviceNumber(UNKNOWN_VALUE);
@@ -306,7 +302,6 @@ namespace synthese
 										_accessParameters.getUserClass(),
 										departureMoment
 										, _minMaxDateTimeAtDestination
-										, _calculationTime
 										, true
 										, serviceNumber
 										, _inverted
@@ -315,7 +310,6 @@ namespace synthese
 										_accessParameters.getUserClass(),
 										departureMoment
 										, _minMaxDateTimeAtDestination
-										, _calculationTime
 										, true
 										, serviceNumber
 										, _inverted
@@ -334,9 +328,8 @@ namespace synthese
 							serviceNumber = serviceInstance.getServiceIndex() + 1;
 
 							// Check for service compliance rules.
-							/// @todo ERROR : must be integrated in ServicePointer constructor. A similar line can be written for edge level.
-							//					if (!serviceInstance.getService()->isCompatibleWith(_accessParameters.complyer))
-							//						continue;
+							if (!serviceInstance.getService()->isCompatibleWith(_accessParameters))
+								continue;
 
 							PtrEdgeStep step(	
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
@@ -369,7 +362,7 @@ namespace synthese
 								// Storage of the useful solution
 								Journey* resultJourney(new Journey(fullApproachJourney));
 								ServiceUse serviceUse(serviceInstance, curEdge);
-								if (_accessDirection == ARRIVAL_TO_DEPARTURE && !serviceUse.isReservationRuleCompliant(_calculationTime))
+								if (serviceUse.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
 									continue;
 
 								resultJourney->push(serviceUse);

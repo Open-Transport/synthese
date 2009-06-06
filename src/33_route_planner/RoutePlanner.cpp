@@ -89,7 +89,6 @@ namespace synthese
 			, _minDepartureTime(TIME_UNKNOWN)
 			, _maxArrivalTime(TIME_UNKNOWN)
 			, _previousContinuousServiceLastDeparture(TIME_UNKNOWN)
-			, _calculationTime(TIME_CURRENT)
 			, _logStream(logStream)
 			, _logLevel(logLevel)
 		{
@@ -170,11 +169,9 @@ namespace synthese
 				, originJourneys
 				, bvrmd
 				, _destinationVam
-				, _calculationTime
 				, dt3
 				, 0
 				, dt4
-				, std::numeric_limits<int>::max ()
 				, false
 				, false
 				, _logStream
@@ -304,11 +301,9 @@ namespace synthese
 				, destinationJourneys
 				, bvrmo
 				, _originVam
-				, _calculationTime
 				, dt1
 				, 0
 				, dt2
-				, std::numeric_limits<int>::max ()
 				, false
 				, true
 				, _logStream
@@ -633,11 +628,9 @@ namespace synthese
 				, todo
 				, bestVertexReachesMap
 				, endVam
-				, _calculationTime
 				, bestEndTime
 				, _previousContinuousServiceDuration
 				, _previousContinuousServiceLastDeparture
-				, 0
 				, strictTime
 				, inverted
 				, _logStream

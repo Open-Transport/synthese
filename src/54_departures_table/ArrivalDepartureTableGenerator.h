@@ -67,7 +67,6 @@ namespace synthese
 				const time::DateTime			_startDateTime;
 				const time::DateTime			_endDateTime;
 				const size_t					_maxSize;	//!< Maximal size of the departure table according to the demand rules.
-				const time::DateTime			_calculationDateTime;
 			//@}
 
 			//!	\name Results

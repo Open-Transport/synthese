@@ -114,7 +114,6 @@ namespace synthese
 						USER_PEDESTRIAN,
 						_startDateTime
 						, maxTimeForForcedDestination
-						, _calculationDateTime
 						, false
 					);
 					

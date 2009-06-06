@@ -43,13 +43,6 @@ namespace synthese
 
 	namespace env
 	{
-		const string ReservationContactTableSync::COL_TYPE ("reservation_type");
-		const string ReservationContactTableSync::COL_ONLINE ("online");
-		const string ReservationContactTableSync::COL_ORIGINISREFERENCE ("origin_is_reference");
-		const string ReservationContactTableSync::COL_MINDELAYMINUTES ("min_delay_minutes");
-		const string ReservationContactTableSync::COL_MINDELAYDAYS ("min_delay_days");
-		const string ReservationContactTableSync::COL_MAXDELAYDAYS ("max_delay_days");
-		const string ReservationContactTableSync::COL_HOURDEADLINE ("hour_deadline");
 		const string ReservationContactTableSync::COL_PHONEEXCHANGENUMBER ("phone_exchange_number");
 		const string ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS ("phone_exchange_opening_hours");
 		const string ReservationContactTableSync::COL_DESCRIPTION ("description");
@@ -59,19 +52,12 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationContactTableSync>::TABLE(
-			"t021_reservation_rules"
+			"t021_reservation_contacts"
 			);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ReservationContactTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_TYPE, SQL_INTEGER),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_ONLINE, SQL_BOOLEAN),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_HOURDEADLINE, SQL_TIME),
 			SQLiteTableSync::Field(ReservationContactTableSync::COL_PHONEEXCHANGENUMBER, SQL_TEXT),
 			SQLiteTableSync::Field(ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS, SQL_TEXT),
 			SQLiteTableSync::Field(ReservationContactTableSync::COL_DESCRIPTION, SQL_TEXT),
@@ -91,17 +77,6 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-		    bool online (rows->getBool (ReservationContactTableSync::COL_ONLINE));
-
-		    bool originIsReference (rows->getBool (ReservationContactTableSync::COL_ORIGINISREFERENCE));
-		    
-		    int minDelayMinutes = rows->getInt (ReservationContactTableSync::COL_MINDELAYMINUTES);
-		    int minDelayDays = rows->getInt (ReservationContactTableSync::COL_MINDELAYDAYS);
-		    int maxDelayDays = rows->getInt (ReservationContactTableSync::COL_MAXDELAYDAYS);
-		    
-		    synthese::time::Hour hourDeadline = 
-			synthese::time::Hour::FromSQLTime (rows->getText (ReservationContactTableSync::COL_HOURDEADLINE));
-		    
 		    string phoneExchangeNumber (
 			rows->getText (ReservationContactTableSync::COL_PHONEEXCHANGENUMBER));
 
@@ -114,15 +89,6 @@ namespace synthese
 		    string webSiteUrl (
 			rows->getText (ReservationContactTableSync::COL_WEBSITEURL));
 
-// 			ReservationRuleType ruleType(static_cast<ReservationRuleType>(rows->getInt(ReservationContactTableSync::COL_TYPE)));
-
-// 			rr->setType(ruleType);
-		    rr->setOnline (online);
-// 		    rr->setOriginIsReference (originIsReference);
-// 		    rr->setMinDelayMinutes (minDelayMinutes);
-// 		    rr->setMinDelayDays (minDelayDays);
-// 		    rr->setMaxDelayDays (maxDelayDays);
-// 		    rr->setHourDeadLine (hourDeadline);
 		    rr->setPhoneExchangeNumber (phoneExchangeNumber);
 		    rr->setPhoneExchangeOpeningHours (phoneExchangeOpeningHours);
 		    rr->setDescription (description);
@@ -140,12 +106,6 @@ namespace synthese
             query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey()) << ","
-// 				<< static_cast<int>(object->getType()) << ","
-				<< Conversion::ToString(object->getOnline()) << ","
-// 				<< object->getMinDelayMinutes() << ","
-// 				<< object->getMinDelayDays() << ","
-// 				<< object->getMaxDelayDays() << ","
-// 				<< object->getHourDeadLine().toSQLString() << ","
 				<< Conversion::ToSQLiteString(object->getPhoneExchangeNumber()) << ","
 				<< Conversion::ToSQLiteString(object->getPhoneExchangeOpeningHours()) << ","
 				<< Conversion::ToSQLiteString(object->getDescription()) << ","

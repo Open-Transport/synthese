@@ -28,6 +28,8 @@
 #include "Registry.h"
 #include "Address.h"
 #include "VertexAccessMap.h"
+#include "AllowedUseRule.h"
+#include "GraphConstants.h"
 
 using namespace std;
 using namespace boost;
@@ -51,6 +53,9 @@ namespace synthese
 		):	Registrable(key),
 			NamedPlaceTemplate<RoadPlace>()
 		{
+			addRule(USER_PEDESTRIAN, AllowedUseRule::INSTANCE.get());
+			addRule(USER_HANDICAPPED, AllowedUseRule::INSTANCE.get());
+			addRule(USER_BIKE, AllowedUseRule::INSTANCE.get());
 		}
 		
 		

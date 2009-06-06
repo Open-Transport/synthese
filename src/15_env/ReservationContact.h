@@ -45,8 +45,6 @@ namespace synthese
 
 		private:
 
-			bool _online;  //!< Reservation via SYNTHESE active
-			
 			std::string _phoneExchangeNumber;  //!< Phone number for reservation
 			std::string _phoneExchangeOpeningHours;  //!< Opening hours for phone exchange
 			std::string _description;   //!< Additional info about phone exchange or reservation mode
@@ -64,7 +62,6 @@ namespace synthese
 				const std::string&	getPhoneExchangeOpeningHours()	const;
 				const std::string&	getWebSiteUrl ()				const;
 				const std::string&	getDescription ()				const;
-				bool				getOnline()						const;
 			//@}
 
 			//! @name Setters
@@ -73,8 +70,10 @@ namespace synthese
 				void setPhoneExchangeOpeningHours (const std::string& phoneExchangeOpeningHours);
 				void setWebSiteUrl (const std::string& webSiteUrl);
 				void setDescription (const std::string& description);
-				void setOnline (bool online);
 			//@}
+
+			virtual bool getOnline() const;
+
 		};
 	}
 }

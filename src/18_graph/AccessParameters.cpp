@@ -20,8 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "UseRules.h"
 #include "AccessParameters.h"
+#include "RuleUser.h"
+#include "UseRule.h"
 
 using namespace std;
 using namespace boost;
@@ -50,25 +51,6 @@ namespace synthese
 		{
 		}
 
-		bool AccessParameters::isCompatibleWith(
-			const UseRules* rules
-		) const {
-			if (rules == NULL) return true;
-			
-			const UseRule& rule(rules->getUseRule(_userClass));
-			
-			if(!rule.getAccess()) return false;
-			
-// 			if (_fare && complyer.getFare()->isCompliant() == logic::tribool(true) && complyer.getFare().get() != _fare)
-// 				return false;
-
- 			if (_drtOnly && rule.getReservationType() == UseRule::RESERVATION_FORBIDDEN) return false;
-
- 			if (_withoutDrt && rule.getReservationType() != UseRule::RESERVATION_FORBIDDEN) return false;
-
-			return true;
-		}
-
 		bool AccessParameters::isCompatibleWithApproach( double distance, double duration) const
 		{
 			return distance < _maxApproachDistance && duration < _maxApproachTime;
@@ -89,6 +71,16 @@ namespace synthese
 		boost::optional<size_t> AccessParameters::getMaxtransportConnectionsCount() const
 		{
 			return _maxTransportConnectionCount;
+		}
+
+		bool AccessParameters::getDRTOnly() const
+		{
+			return _drtOnly;
+		}
+
+		bool AccessParameters::getWithoutDRT() const
+		{
+			return _withoutDrt;
 		}
 	}
 }

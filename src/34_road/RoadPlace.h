@@ -61,6 +61,11 @@ namespace synthese
 		public:
 			/////////////////////////////////////////////////////////////////////
 			/// RoadModule Constructor.
+			/// Initializes the following default use rules :
+			///  - USER_PEDESTRIAN : allowed
+			///  - USER_BIKE : allowed
+			///  - USER_CAR : allowed
+			///  - USER_BUS : allowed
 			RoadPlace(
 				util::RegistryKeyType id = UNKNOWN_VALUE
 			);

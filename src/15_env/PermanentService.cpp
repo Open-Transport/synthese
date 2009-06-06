@@ -44,7 +44,6 @@ namespace synthese
 			UserClassCode userClass
 			, const Edge* edge
 			, const DateTime& presenceDateTime
-			, const DateTime& computingTime
 			, bool controlIfTheServiceIsReachable
 			, bool inverted
 		) const	{

@@ -120,10 +120,10 @@ namespace synthese
 				const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
 				if(line == NULL) continue;
 				
-				if(	line->getCommercialLine()->getReservationContact(su.getUserClass()) &&
-					su.getUseRule().getReservationType() != UseRule::RESERVATION_FORBIDDEN
+				if(	line->getCommercialLine()->getReservationContact() &&
+					UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
 				){
-					resaRules.insert(line->getCommercialLine()->getReservationContact(su.getUserClass()));
+					resaRules.insert(line->getCommercialLine()->getReservationContact());
 				}
 			}
 			stringstream sPhones;

@@ -33,16 +33,19 @@ namespace synthese
 {
 	namespace graph
 	{
-		class UseRules;
 		class UseRule;
+		class AccessParameters;
 		
 		/////////////////////////////////////////////////////////////////////////
 		/// Interface for user of rules defined by UseRules class.
 		/// @ingroup m18
 		class RuleUser
 		{
+		public:
+			typedef std::map<UserClassCode, const UseRule*> Map;
+
 		private:
-			const UseRules* _rules;
+			Map _rules;
 		
 		protected:
 			virtual const RuleUser* _getParentRuleUser() const = 0;
@@ -58,20 +61,46 @@ namespace synthese
 				/// Rules getter.
 				/// @return only the rules registered to the current object.
 				/// To obtain the actual rule inherited from parent object,
-				/// use getUseRule() instead.
-				const UseRules* getRules() const;
+				/// use getActualRules() instead.
+				const Map& getRules() const;
 			//@}
 			
 			//! @name Setters
 			//@{
-				void setRules(const UseRules* value);
+				void addRule(
+					const Map::key_type userClass,
+					const Map::mapped_type value
+				);
+				void remove(
+					const Map::key_type userClass
+				);
 			//@}
 			
 			//! @name Queries
 			//@{
-				const UseRules* getActualRules() const;
-				const UseRule&	getUseRule(UserClassCode userClass) const;
-				util::RegistryKeyType getActualRulesId() const;
+				/////////////////////////////////////////////////////////////////
+				/// Consolidated rules query.
+				/// @return all the rules defined by the object and its parents.
+				Map getActualRules() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Use rule fetcher.
+				/// Search for a definition of the use rule for the specified user class.
+				///  - if found in the object : return it.
+				///  - if the object has a parent in the RuleUser tree : recursive call
+				///  - it the object has no parent : return the FORBIDDEN default use rule.
+				const UseRule&	getUseRule(
+					const UserClassCode userClass
+				) const;
+
+
+
+				bool isCompatibleWith(
+					const AccessParameters& accessParameters
+				) const;
+
 			//@}
 		};
 	}

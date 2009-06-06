@@ -11,57 +11,93 @@
 //
 
 #include "RuleUser.h"
-#include "UseRules.h"
+#include "ForbiddenUseRule.h"
+#include "Exception.h"
+#include "AccessParameters.h"
+
+#include <boost/foreach.hpp>
+
+using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+	using namespace graph;
+	
 	namespace graph
 	{
 		RuleUser::RuleUser(
-		):	_rules(NULL)
-		{
+		){
 		}
 		
 		
-		const UseRules* RuleUser::getRules() const
+		const RuleUser::Map& RuleUser::getRules() const
 		{
 			return _rules;
 		}
 		
 		
 		
-		const UseRules* RuleUser::getActualRules() const
+		RuleUser::Map RuleUser::getActualRules() const
 		{
-			if (_rules != NULL) return _rules;
-			if (_getParentRuleUser() != NULL) return _getParentRuleUser()->getActualRules();
-			return NULL;
+			Map result;
+			for(const RuleUser* ruleUser(this); ruleUser != NULL; ruleUser = ruleUser->_getParentRuleUser())
+			{
+				BOOST_FOREACH(const Map::value_type& it, _rules)
+				{
+					Map::const_iterator its(result.find(it.first));
+					if(its != result.end())
+					{
+						continue;
+					}
+					result.insert(make_pair(it.first, it.second));
+				}
+			}
+			return result;
 		}
 		
 		
-		util::RegistryKeyType RuleUser::getActualRulesId() const
-		{
-			const UseRules* rules(getActualRules());
-			return
-				(rules == NULL) ?
-				util::RegistryKeyType(0) :
-				rules->getKey();
+
+		const UseRule& RuleUser::getUseRule(
+			const UserClassCode userClass
+		) const	{
+			Map::const_iterator it(_rules.find(userClass));
+			if(it != _rules.end())
+			{
+				return *it->second;
+			}
+			if (_getParentRuleUser() == NULL)
+			{
+				return *ForbiddenUseRule::INSTANCE;
+			}
+			return _getParentRuleUser()->getUseRule(userClass);
 		}
 		
 		
-		const UseRule&	RuleUser::getUseRule(UserClassCode userClass) const
-		{
-			const UseRules* rules(getActualRules());
-			return
-				(rules == NULL) ?
-				UseRule::ALLOWED :
-				rules->getUseRule(userClass);
+		
+		void RuleUser::addRule(
+			const RuleUser::Map::key_type userClass,
+			const RuleUser::Map::mapped_type value
+		){
+			_rules.insert(make_pair(userClass, value));
 		}
-		
-		
-		
-		void RuleUser::setRules(const UseRules* value)
+
+
+
+		void RuleUser::remove(
+			const RuleUser::Map::key_type userClass
+		){
+			Map::iterator it(_rules.find(userClass));
+			if(it != _rules.end())
+			{
+				_rules.erase(it);
+			}
+		}
+
+		bool RuleUser::isCompatibleWith( const AccessParameters& accessParameters ) const
 		{
-			_rules = value;
+			const UseRule& rule(getUseRule(accessParameters.getUserClass()));
+			return rule.isCompatibleWith(accessParameters);
 		}
 	}
 }

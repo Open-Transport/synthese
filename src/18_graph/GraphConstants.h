@@ -30,6 +30,8 @@ namespace synthese
 	namespace graph
 	{
 		static const graph::UserClassCode USER_PEDESTRIAN(35001);
+		static const graph::UserClassCode USER_HANDICAPPED(35002);
+		static const graph::UserClassCode USER_BIKE(35003);
 	}
 }
 

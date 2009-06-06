@@ -28,6 +28,11 @@
 
 namespace synthese
 {
+	namespace pt
+	{
+		class PTUseRule;
+	}
+
 	namespace env
 	{
 		/** NonPermanentService class.
@@ -52,7 +57,6 @@ namespace synthese
 			);
 
 		public:
-
 			/** Latest schedule of the service : the last arrival at the last vertex.
 				@return The latest schedule of the service
 			*/

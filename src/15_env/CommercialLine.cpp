@@ -22,7 +22,8 @@
 
 #include "CommercialLine.h"
 #include "Registry.h"
-#include "PTConstants.h"
+#include "GraphConstants.h"
+#include "AllowedUseRule.h"
 
 namespace synthese
 {
@@ -54,10 +55,10 @@ namespace synthese
 			graph::PathGroup(key)
 			, _color (0, 0, 0)
 			, _network(NULL),
-			_generalReservationContact(NULL),
-			_bikeReservationContact(NULL),
-			_handicappedReservationContact(NULL)
+			_reservationContact(NULL)
 		{
+			// Default use rules
+			addRule(USER_PEDESTRIAN, AllowedUseRule::INSTANCE.get());
 		}
 
 		const std::string& CommercialLine::getName() const
@@ -144,54 +145,26 @@ namespace synthese
 			_optionalReservationPlaces.insert(place);
 		}
 
-		const ReservationContact* CommercialLine::getReservationContact(
-			const UserClassCode userClass
-		) const {
-			if(userClass == USER_BIKE_IN_PT && _bikeReservationContact != NULL)
-			{
-				return _bikeReservationContact;
-			}
-			else if(userClass == USER_HANDICAPPED && _handicappedReservationContact != NULL)
-			{
-				return _handicappedReservationContact;
-			} else {
-				return _generalReservationContact;
-			}
-		}
-		
-		const ReservationContact* CommercialLine::getGeneralReservationContact() const
+
+
+		const ReservationContact* CommercialLine::getReservationContact() const
 		{
-			return _generalReservationContact;
+			return _reservationContact;
 		}
-		
-		const ReservationContact* CommercialLine::getBikeReservationContact() const
-		{
-			return _bikeReservationContact;
-		}
-		
-		const ReservationContact* CommercialLine::getHandicappedReservationContact() const
-		{
-			return _handicappedReservationContact;
-		}
-		
-		void CommercialLine::setGeneralReservationContact(
+
+
+
+		void CommercialLine::setReservationContact(
 			const ReservationContact* value
 		){
-			_generalReservationContact = value;
+			_reservationContact = value;
 		}
-		
-		
-		void CommercialLine::setBikeReservationContact(
-			const ReservationContact* value
-		){
-			_bikeReservationContact = value;
-		}
-		
-		
-		void CommercialLine::setHandicappedReservationContact(
-			const ReservationContact* value
-		){
-			_handicappedReservationContact = value;
+
+
+
+		bool CommercialLine::isOptionalReservationPlace( const env::PublicTransportStopZoneConnectionPlace* place ) const
+		{
+			return _optionalReservationPlaces.find(place) != _optionalReservationPlaces.end();
 		}
 	}
 }

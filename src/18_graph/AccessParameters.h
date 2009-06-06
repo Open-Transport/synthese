@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace graph
 	{
-		class UseRules;
+		class RuleUser;
 
 		/** Network access parameters class.
 			@ingroup m18
@@ -81,18 +81,6 @@ namespace synthese
 
 			//! @name Controls
 			//@{
-				/** Controls if a complyer object respects the filter rules contained in the current object.
-					@param rules object to test
-					@return bool true if the object can be used according to the current rules
-					@author Hugues Romain
-					@date 2008				
-				*/
- 				bool isCompatibleWith(
- 					const graph::UseRules* rules
- 				) const;
-
-
-
 				/** Approach compatibility control.
 					@param distance length of the approach
 					@param duration duration of the approach
@@ -109,6 +97,8 @@ namespace synthese
 				graph::UserClassCode	getUserClass()	const;
 				double	getApproachSpeed()		const;
 				boost::optional<size_t>	getMaxtransportConnectionsCount() const;
+				bool	getDRTOnly()	const;
+				bool	getWithoutDRT()	const;
 			//@}
 		};
 	}

@@ -70,15 +70,17 @@ namespace synthese
 			std::string			_image;		//!< Display image (cartouche)
 
 			const pt::TransportNetwork*	_network;	//!< Network
-			const ReservationContact*	_generalReservationContact;	//!< Reservation contact
-			const ReservationContact*	_bikeReservationContact;	//!< Bike user dedicated reservation contact
-			const ReservationContact*	_handicappedReservationContact;	//!< Handicapped user dedicated Reservation contact
 
+			const ReservationContact*	_reservationContact;	//!< Reservation contact
 			PlacesSet	_optionalReservationPlaces;
 			
 			std::string _creatorId;
 
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			/// Initializes the following default use rules :
+			///  - USER_PEDESTRIAN : allowed
 			CommercialLine(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 			//! @name Getters
@@ -90,9 +92,7 @@ namespace synthese
 				const std::string& getImage () const;
 				const util::RGBColor& getColor () const;
 				const std::string& getName () const;
-				const ReservationContact* getGeneralReservationContact() const;
-				const ReservationContact* getBikeReservationContact() const;
-				const ReservationContact* getHandicappedReservationContact() const;
+				const ReservationContact* getReservationContact() const;
 				const std::string& getCreatorId() const;
 				const PlacesSet& getOptionalReservationPlaces() const;
 			//@}
@@ -106,16 +106,14 @@ namespace synthese
 				void setImage (const std::string& image);
 				void setColor (const util::RGBColor& color);
 				void setName (const std::string& name);
-				void setGeneralReservationContact(const ReservationContact* value);
-				void setBikeReservationContact(const ReservationContact* value);
-				void setHandicappedReservationContact(const ReservationContact* value);
+				void setReservationContact(const ReservationContact* value);
 				void setCreatorId(const std::string& value);
 			//@}
 
 			//! @name Queries
 			//@{
-				const ReservationContact* getReservationContact(
-					const graph::UserClassCode userClass
+				bool isOptionalReservationPlace(
+					const env::PublicTransportStopZoneConnectionPlace* place
 				) const;
 			//@}
 			

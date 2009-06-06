@@ -47,13 +47,13 @@ namespace synthese
 			, _range(0)
 			, _edge(edge),
 			_userClass(userClassCode),
-			_useRule(UseRule::ACCESS_UNKNOWN)
+			_useRule(NULL)
 		{
 		}
 
 
 
-		const UseRule& ServicePointer::getUseRule(
+		const UseRule* ServicePointer::getUseRule(
 		) const {
 			return _useRule;
 		}
@@ -68,7 +68,7 @@ namespace synthese
 		void ServicePointer::setService( const Service* service )
 		{
 			_service = service;
-			_useRule = service->getUseRule(_userClass);
+			_useRule = &service->getUseRule(_userClass);
 		}
 
 		void ServicePointer::setOriginDateTime( const time::DateTime& dateTime )
@@ -81,23 +81,11 @@ namespace synthese
 			_serviceIndex = index;
 		}
 
-		bool ServicePointer::isReservationRuleCompliant(
-			const DateTime& computingDateTime
+		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
 		) const	{
-			if (_determinationMethod == ARRIVAL_TO_DEPARTURE)
-				return true;
-
-			UseRule::ReservationRuleType reservationRuleType(_useRule.getReservationType());
-			if(reservationRuleType != UseRule::RESERVATION_FORBIDDEN)
-			{
-				return _useRule.isRunPossible(
-					_originDateTime,
-					(reservationRuleType == UseRule::RESERVATION_MIXED_BY_DEPARTURE_PLACE) ? false : true,
-					computingDateTime,
-					_actualTime
-				);
-			}
-			return true;
+			return _useRule->isRunPossible(
+				*this
+			);
 		}
 
 		const Service* ServicePointer::getService() const

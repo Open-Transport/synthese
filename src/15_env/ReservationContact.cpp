@@ -41,8 +41,7 @@ namespace synthese
 	{
 		ReservationContact::ReservationContact(
 			RegistryKeyType key
-		):	Registrable(key),
-			_online(false)
+		):	Registrable(key)
 		{
 		}
 
@@ -118,20 +117,10 @@ namespace synthese
 
 
 
-		void 
-		ReservationContact::setOnline (bool online)
-		{
-			_online = online;
-		}
-		 
-
-
-
-
 
 		bool ReservationContact::getOnline() const
 		{
-			return _online;
+			return false;
 		}
 	}
 }

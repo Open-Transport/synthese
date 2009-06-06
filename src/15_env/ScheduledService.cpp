@@ -88,7 +88,6 @@ namespace synthese
 			UserClassCode userClass
 			, const Edge* edge
 			, const time::DateTime& presenceDateTime
-			, const time::DateTime& computingTime
 			, bool controlIfTheServiceIsReachable
 			, bool inverted
 		) const {
@@ -129,12 +128,11 @@ namespace synthese
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
-				if (!ptr.isReservationRuleCompliant(computingTime))
+				if (!ptr.isUseRuleCompliant())
 					return ServicePointer(method, userClass);
 			}
 			else
 			{
-				/// @todo Implement the reservation control
 			}
 			
 

@@ -107,12 +107,16 @@ namespace synthese
 			pv.push_back( line->getRollingStock() ? line->getRollingStock()->getArticle() : string()  ); // 6
 			pv.push_back( line->getDirection().empty() ? line->getDestination()->getConnectionPlace()->getFullName() : line->getDirection() ); // 7
 			pv.push_back( Conversion::ToString( handicappedFilterStatus ) );
-			pv.push_back( Conversion::ToString(
-					serviceUse.getUseRule().getCapacity ()
-			)	);
+			pv.push_back( 
+				serviceUse.getUseRule()->getAccessCapacity () ?
+				lexical_cast<string>(*serviceUse.getUseRule()->getAccessCapacity ()) :
+				"9999"
+			);
 			pv.push_back( Conversion::ToString( bikeFilterStatus) );
 			pv.push_back( Conversion::ToString(
-					serviceUse.getUseRule().getCapacity()
+				serviceUse.getUseRule()->getAccessCapacity () ?
+				lexical_cast<string>(*serviceUse.getUseRule()->getAccessCapacity ()) :
+				"9999"
 			)	); // 11
 			pv.push_back( commercialLine->getShortName() ); // 12
 			pv.push_back( commercialLine->getLongName() ); // 13

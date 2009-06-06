@@ -105,27 +105,22 @@ namespace synthese
 			setServiceRange(getServiceRange() - duration);
 		}
 
-		bool ServiceUse::isReservationRuleCompliant( const time::DateTime& computingDateTime ) const
-		{
-			if (_useRule.getReservationType() != UseRule::RESERVATION_FORBIDDEN)
-			{
-				return _useRule.isRunPossible(
-					_originDateTime,
-					(_useRule.getReservationType() == UseRule::RESERVATION_MIXED_BY_DEPARTURE_PLACE) ?
-						false :
-						true,
-					computingDateTime,
-					getDepartureDateTime()
-				);
-			}
-			return true;
+		UseRule::RunPossibilityType ServiceUse::isUseRuleCompliant(
+		) const	{
+			return _useRule->isRunPossible(
+				*this
+			);
 		}
+
+
 
 		DateTime ServiceUse::getReservationDeadLine() const
 		{
-			if (_useRule.getReservationType() != UseRule::RESERVATION_FORBIDDEN)
-			{
-				return _useRule.getReservationDeadLine(
+			UseRule::ReservationAvailabilityType resa(_useRule->getReservationAvailability(*this));
+			if(	resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+				resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE
+			){
+				return _useRule->getReservationDeadLine(
 					_originDateTime,
 					getDepartureDateTime()
 				);

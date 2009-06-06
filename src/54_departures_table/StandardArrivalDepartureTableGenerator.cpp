@@ -77,7 +77,6 @@ namespace synthese
 								USER_PEDESTRIAN,
 								departureDateTime
 								, _endDateTime
-								, _calculationDateTime
 								, false
 								, index
 						)	);

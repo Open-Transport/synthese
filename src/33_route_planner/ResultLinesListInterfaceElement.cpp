@@ -58,6 +58,7 @@ namespace synthese
 		{
 			// Read the result
 			const RoutePlannerResult* jv = static_cast<const RoutePlannerResult*>(object);
+			if(jv == NULL) return string();
 
 			// Fetch the line display page
 			const LineMarkerInterfacePage* lineInterfacePage(

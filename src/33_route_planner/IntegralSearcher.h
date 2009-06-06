@@ -85,11 +85,9 @@ namespace synthese
 				JourneysResult<graph::JourneyComparator>&	_result;
 				BestVertexReachesMap&						_bestVertexReachesMap;
 				const graph::VertexAccessMap&				_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
-				const time::DateTime&						_calculationTime;
 				time::DateTime&								_minMaxDateTimeAtDestination;
 				const int									_previousContinuousServiceDuration;
 				const time::DateTime&						_previousContinuousServiceLastDeparture;
-				const int									_maxDepth;
 				const bool									_optim;
 				const bool									_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
 				std::ostream* const							_logStream;
@@ -106,11 +104,9 @@ namespace synthese
 				, JourneysResult<graph::JourneyComparator>&	result
 				, BestVertexReachesMap&			bestVertexReachesMap
 				, const graph::VertexAccessMap&	destinationVam
-				, const time::DateTime&			calculationTime
 				, time::DateTime&				minMaxDateTimeAtDestination
 				, int							previousContinuousServiceDuration
 				, const time::DateTime&			previousContinuousServiceLastDeparture
-				, const int						maxDepth
 				, bool							optim
 				, bool							inverted
 				, std::ostream* const			logStream = NULL

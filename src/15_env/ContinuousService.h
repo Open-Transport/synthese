@@ -90,7 +90,6 @@ namespace synthese
 						- ServicePointer::ARRIVAL_TO_DEPARTURE
 					@param edge Edge
 					@param presenceDateTime Goal  time
-					@param computingTime Time of the computing
 					@param controlIfTheServiceIsReachable service selection method :
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
@@ -104,7 +103,6 @@ namespace synthese
 					graph::UserClassCode userClass
 					, const graph::Edge* edge
 					, const time::DateTime& presenceDateTime
-					, const time::DateTime& computingTime
 					, bool controlIfTheServiceIsReachable
 					, bool inverted
 				) const;

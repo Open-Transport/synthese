@@ -178,7 +178,6 @@ namespace synthese
 				/** Provides next departure service number (method 1)
 					@param departureMoment Presence hour at departure place
 					@param maxDepartureMoment Maximum departure hour
-					@param calculationMoment Calculation moment for reservation delay checking
 					@param controlIfTheServiceIsReachable service selection method :
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
@@ -191,7 +190,6 @@ namespace synthese
 					UserClassCode userClass,
 					time::DateTime departureMoment
 					, const time::DateTime& maxDepartureMoment
-					, const time::DateTime& calculationMoment
 					, bool controlIfTheServiceIsReachable
 					, int minNextServiceIndex = UNKNOWN_VALUE					
 					, bool inverted = false
@@ -202,7 +200,6 @@ namespace synthese
 				/** Provides previous arrival service number
 					@param arrivalMoment Presence hour at arrival place
 					@param minArrivalMoment Minimum arrival hour
-					@param calculationMoment Calculation moment for reservation delay checking
 					@param controlIfTheServiceIsReachable service selection method :
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
@@ -215,7 +212,6 @@ namespace synthese
 					UserClassCode userClass,
 					time::DateTime arrivalMoment
 					, const time::DateTime& minArrivalMoment
-					, const time::DateTime& calculationMoment
 					, bool controlIfTheServiceIsReachable
 					, int maxPreviousServiceIndex = UNKNOWN_VALUE
 					, bool inverted = false
