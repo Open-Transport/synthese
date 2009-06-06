@@ -128,7 +128,7 @@ namespace synthese
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
-				if (!ptr.isUseRuleCompliant())
+				if (ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
 					return ServicePointer(method, userClass);
 			}
 			else
