@@ -94,8 +94,11 @@ namespace synthese
 
 				_authorizedLogin = map.getBool(PARAMETER_AUTHORIZED_LOGIN, true, false, FACTORY_KEY);
 
-				uid id(map.getUid(PARAMETER_PROFILE_ID, true, FACTORY_KEY));
-				_profile = ProfileTableSync::Get(id, _env);
+				uid id(map.getUid(PARAMETER_PROFILE_ID, false, FACTORY_KEY));
+				if(id > 0)
+				{
+					*_profile = ProfileTableSync::Get(id, _env);
+				}
 			}
 			catch (ObjectNotFoundException<Profile>& e)
 			{
@@ -116,7 +119,10 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(s, "Code postal", _user->getPostCode(), _postalCode);
 			DBLogModule::appendToLogIfChange(s, "Ville", _user->getCityText(), _city);
 			DBLogModule::appendToLogIfChange(s, "Téléphone", _user->getPhone(), _phone);
-			DBLogModule::appendToLogIfChange(s, "Profil", (_user->getProfile() != NULL) ? _user->getProfile()->getName() : string(), (_profile != NULL) ? _profile->getName() : string());
+			if(_profile)
+			{
+				DBLogModule::appendToLogIfChange(s, "Profil", (_user->getProfile() != NULL) ? _user->getProfile()->getName() : string(), (*_profile != NULL) ? (*_profile)->getName() : string());
+			}
 			DBLogModule::appendToLogIfChange(s, "Autorisation de connexion", Conversion::ToString(_user->getConnectionAllowed()), Conversion::ToString(_authorizedLogin));
 			DBLogModule::appendToLogIfChange(s, "Nom", _user->getName(), _name);
 			DBLogModule::appendToLogIfChange(s, "Prénom", _user->getSurname(), _surname);
@@ -127,7 +133,10 @@ namespace synthese
 			_user->setPostCode(_postalCode);
 			_user->setCityText(_city);
 			_user->setPhone(_phone);
-			_user->setProfile(_profile.get());
+			if(_profile)
+			{
+				_user->setProfile(_profile->get());
+			}
 			_user->setConnectionAllowed(_authorizedLogin);
 			_user->setName(_name);
 			_user->setSurname(_surname);

@@ -27,7 +27,6 @@
 
 #include "AdminInterfaceElementTemplate.h"
 #include "DBLogHTMLView.h"
-#include "Date.h"
 
 namespace synthese
 {
@@ -43,8 +42,6 @@ namespace synthese
 			dblog::DBLogHTMLView						_log;
 
 		public:
-			static const std::string PARAMETER_DATE;
-
 			ResaLogAdmin();
 			
 			/** Initialization of the parameters from a parameters map.

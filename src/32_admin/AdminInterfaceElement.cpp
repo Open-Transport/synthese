@@ -280,10 +280,10 @@ namespace synthese
 				return false;
 			}
 
-			stream << "<div class=\"tabdiv ";
+			stream << "<div class=\"tabdiv";
 			if (_activeTab.empty() && first || _activeTab == _currentTab->getId())
 			{
-				stream << "active_tab_content";
+				stream << " active_tab_content";
 			}
 			stream << "\" id=\"tab_" << _currentTab->getId() << "_content\">";
 			return true;

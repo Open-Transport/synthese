@@ -55,6 +55,7 @@ namespace synthese
 		class ResaRight : public env::NetworkLineBasedRight<ResaRight>
 		{
 		public:
+			ResaRight();
 		};
 	}
 }

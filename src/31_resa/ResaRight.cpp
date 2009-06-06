@@ -55,5 +55,11 @@ namespace synthese
 
 	namespace resa
 	{
+
+		ResaRight::ResaRight()
+			: env::NetworkLineBasedRight<ResaRight>()
+		{
+			setParameter(GLOBAL_PERIMETER);
+		}
 	}
 }

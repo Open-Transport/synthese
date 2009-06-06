@@ -84,33 +84,21 @@ namespace synthese
 
 	namespace resa
 	{
-		const string ResaCustomerAdmin::PARAMETER_DISPLAY_CANCELLED("dc");
-		const string ResaCustomerAdmin::PARAMETER_DISPLAY_EVENTS("de");
-		const string ResaCustomerAdmin::PARAMETER_EVENT_DATE("ed");
-		const string ResaCustomerAdmin::PARAMETER_TRAVEL_DATE("td");
+		const string ResaCustomerAdmin::TAB_PROPERTIES("properties");
+		const string ResaCustomerAdmin::TAB_PARAMETERS("parameters");
+		const string ResaCustomerAdmin::TAB_LOG("log");
 
-		ResaCustomerAdmin::ResaCustomerAdmin()
-			: AdminInterfaceElementTemplate<ResaCustomerAdmin>()
-			, _eventDate(TIME_CURRENT)
-			, _displayCancelled(false)
-			, _displayEvents(false)
+		ResaCustomerAdmin::ResaCustomerAdmin(
+		): AdminInterfaceElementTemplate<ResaCustomerAdmin>(),
+			_log("log")
 		{
-			_eventDate -= 14;
 		}
 		
 		void ResaCustomerAdmin::setFromParametersMap(
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
-			_displayEvents = map.getBool(PARAMETER_DISPLAY_EVENTS, false, false, FACTORY_KEY);
-			Date da = map.getDate(PARAMETER_EVENT_DATE, false, FACTORY_KEY);
-			if (!da.isUnknown())
-				_eventDate = da;
-
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_EVENT_DATE, 50, false);
-			
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			uid id(_request->getObjectId());
 			try
 			{
 				_user = UserTableSync::Get(id, _env);
@@ -119,16 +107,19 @@ namespace synthese
 			{
 				throw AdminParametersException("Bad user id");
 			}
+
+			_log.set(
+				map,
+				ResaDBLog::FACTORY_KEY,
+				_user->getKey()
+			);
 		}
 		
 		
 		
 		server::ParametersMap ResaCustomerAdmin::getParametersMap() const
 		{
-			ParametersMap m(_requestParameters.getParametersMap());
-			m.insert(PARAMETER_DISPLAY_CANCELLED, _displayCancelled);
-			m.insert(PARAMETER_DISPLAY_EVENTS, _displayEvents);
-			m.insert(PARAMETER_EVENT_DATE, _eventDate);
+			ParametersMap m;
 			return m;
 		}
 
@@ -138,85 +129,95 @@ namespace synthese
 			, VariablesMap& variables
 		) const	{
 
-			// Requests
-			ActionFunctionRequest<UserUpdateAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<ResaCustomerAdmin>();
-			updateRequest.setObjectId(_request->getObjectId());
+			////////////////////////////////////////////////////////////////////
+			// LOG TAB
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
 
-			FunctionRequest<AdminRequest> routeplannerRequest(_request);
-			routeplannerRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
-			routeplannerRequest.getFunction()->setParameter(ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID, Conversion::ToString(_user->getKey()));
+				// Requests
+				ActionFunctionRequest<UserUpdateAction,AdminRequest> updateRequest(_request);
+				updateRequest.getFunction()->setPage<ResaCustomerAdmin>();
+				updateRequest.setObjectId(_request->getObjectId());
 
-			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<ResaCustomerAdmin>();
-			searchRequest.setObjectId(_request->getObjectId());
+				FunctionRequest<AdminRequest> routeplannerRequest(_request);
+				routeplannerRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
+				routeplannerRequest.getFunction()->setParameter(ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID, Conversion::ToString(_user->getKey()));
 
-			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
-			cancelRequest.getFunction()->setPage<ResaCustomerAdmin>();
-			cancelRequest.setObjectId(_request->getObjectId());
+				// Display
+				stream << "<h1>Liens</h1>";
+				stream << "<p>";
+				stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinéraire", "", ReservationRoutePlannerAdmin::ICON);
+				stream << "</p>";
+				
+				stream << "<h1>Coordonnées</h1>";
 
-			bool writingRight(_request->isAuthorized<ResaRight>(WRITE,WRITE));
+				PropertiesHTMLTable t(updateRequest.getHTMLForm("upd"));
+				t.getForm().setUpdateRight(tabHasWritePermissions());
+				stream << t.open();
+				stream << t.title("Connexion");
+				stream << t.cell("Login", t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()));
 
-			// Search
-			Env env;
-			DBLogEntryTableSync::Search(
-				env,
-				ResaDBLog::FACTORY_KEY
-				, DateTime(_eventDate, Hour(TIME_MIN))
-				, DateTime(TIME_MAX)
-				, UNKNOWN_VALUE
-				, DBLogEntry::DB_LOG_UNKNOWN
-				, _user->getKey()
-				, ""
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAMETER_EVENT_DATE
-				, false
-				, false
-				, _requestParameters.raisingOrder 
-			);
+				stream << t.title("Coordonnées");
+				stream << t.cell("Prénom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
+				stream << t.cell("Nom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName()));
+				stream << t.cell("Adresse", t.getForm().getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50));
+				stream << t.cell("Code postal", t.getForm().getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()));
+				stream << t.cell("Ville", t.getForm().getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText()));
+				stream << t.cell("Téléphone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
+				stream << t.cell("E-mail",t.getForm().getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
 
-			// Display
-			stream << "<h1>Liens</h1>";
-			stream << "<p>";
-			stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinéraire", "", ReservationRoutePlannerAdmin::ICON);
-			stream << "</p>";
-			
-			stream << "<h1>Coordonnées</h1>";
+				stream << t.title("Droits");
+				stream << t.cell("Accès site web",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
 
-			PropertiesHTMLTable t(updateRequest.getHTMLForm("upd"));
-			t.getForm().setUpdateRight(writingRight);
-			stream << t.open();
-			stream << t.title("Connexion");
-			stream << t.cell("Login", t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()));
+				if(_user->getProfile()->getKey() == ResaModule::GetBasicResaCustomerProfile()->getKey() ||
+					_user->getProfile()->getKey() == ResaModule::GetAutoResaResaCustomerProfile()->getKey()
+				){
+					map<uid, string> profiles;
+					profiles[ResaModule::GetBasicResaCustomerProfile()->getKey()] = "Auto réservation interdite";
+					profiles[ResaModule::GetAutoResaResaCustomerProfile()->getKey()] = "Auto réservation autorisée";
 
-			stream << t.title("Coordonnées");
-			stream << t.cell("Prénom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
-			stream << t.cell("Nom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName()));
-			stream << t.cell("Adresse", t.getForm().getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50));
-			stream << t.cell("Code postal", t.getForm().getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()));
-			stream << t.cell("Ville", t.getForm().getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText()));
-			stream << t.cell("Téléphone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
-			stream << t.cell("E-mail",t.getForm().getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
+					stream << t.cell(
+						"Auto-réservation",
+						t.getForm().getRadioInputCollection(UserUpdateAction::PARAMETER_PROFILE_ID, profiles, _user->getProfile()->getKey(), true)
+					);
+				}
+				else
+				{
+					stream << t.cell("Droits","Cet utilisateur n'est pas un client. Son niveau de droits est défini par ailleurs et ne peut être visualisé ni modifié ici.");
+				}
+				stream << t.close();
+			}
 
-			stream << t.title("Droits");
-	//		stream << t.cell("Connexion autorisée",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
-			stream << t.cell("Auto réservation autorisée","");
-			stream << t.close();
 
-//			stream << "<h1>Trajets favoris</h1>";
+			////////////////////////////////////////////////////////////////////
+			// LOG TAB
+			if (openTabContent(stream, TAB_PARAMETERS))
+			{
+				stream << "<h1>Trajets favoris</h1>";
+			}
 
-			stream << "<h1>Historique / Réservations</h1>";
+			////////////////////////////////////////////////////////////////////
+			// LOG TAB
+			if (openTabContent(stream, TAB_LOG))
+			{
+				stream << "<h1>Historique / Réservations</h1>";
 
-			ResaModule::DisplayResaDBLog(
-				stream
-				, env
-				, PARAMETER_EVENT_DATE
-				, searchRequest
-				, cancelRequest
-				, _requestParameters
-				, false
-			);
+				// Requests
+				FunctionRequest<AdminRequest> searchRequest(_request);
+				searchRequest.getFunction()->setSamePage(this);
+
+				// Results
+				_log.display(
+					stream,
+					searchRequest,
+					true,
+					true
+				);
+			}
+
+			////////////////////////////////////////////////////////////////////
+			/// END TABS
+			closeTabContent(stream);
 		}
 
 		bool ResaCustomerAdmin::isAuthorized() const
@@ -257,5 +258,20 @@ namespace synthese
 		{
 			return _user.get() ? Conversion::ToString(_user->getKey()) : string();
 		}
+
+
+		
+		void ResaCustomerAdmin::_buildTabs(
+		) const {
+			_tabs.clear();
+			bool writeRight(_request->isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
+
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "user.png"));
+			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "cog.png"));
+			_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
+
+			_tabBuilded = true;
+		}
+
 	}
 }

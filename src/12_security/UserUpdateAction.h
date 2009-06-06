@@ -24,10 +24,10 @@
 #define SYNTHESE_UserUpdateAction_H__
 
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -64,7 +64,7 @@ namespace synthese
 			std::string				_phone;
 			std::string				_email;
 			bool					_authorizedLogin;
-			boost::shared_ptr<const Profile>		_profile;
+			boost::optional<boost::shared_ptr<const Profile> >		_profile;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

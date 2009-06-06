@@ -153,8 +153,10 @@ namespace synthese
 			static _SessionsCallIdMap _sessionsCallIds;
 
 			static const std::string _BASIC_PROFILE_NAME;
+			static const std::string _AUTORESA_PROFILE_NAME;
 
 			static boost::shared_ptr<security::Profile>	_basicProfile;
+			static boost::shared_ptr<security::Profile>	_autoresaProfile;
 
 		public:
 			
@@ -169,6 +171,7 @@ namespace synthese
 			virtual std::string getName() const;
 
 			static boost::shared_ptr<security::Profile> GetBasicResaCustomerProfile();
+			static boost::shared_ptr<security::Profile> GetAutoResaResaCustomerProfile();
 
 			static void DisplayReservations(
 				std::ostream& stream

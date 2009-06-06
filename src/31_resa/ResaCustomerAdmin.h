@@ -27,6 +27,7 @@
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
+#include "DBLogHTMLView.h"
 
 namespace synthese
 {
@@ -45,17 +46,13 @@ namespace synthese
 		class ResaCustomerAdmin : public admin::AdminInterfaceElementTemplate<ResaCustomerAdmin>
 		{
 			boost::shared_ptr<const security::User>		_user;
-			bool										_displayCancelled;
-			bool										_displayEvents;
-			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			time::Date									_eventDate;
-			
+			dblog::DBLogHTMLView						_log;
+
+			static const std::string TAB_PROPERTIES;
+			static const std::string TAB_PARAMETERS;
+			static const std::string TAB_LOG;
 	
 		public:
-			static const std::string PARAMETER_DISPLAY_CANCELLED;
-			static const std::string PARAMETER_DISPLAY_EVENTS;
-			static const std::string PARAMETER_EVENT_DATE;
-			static const std::string PARAMETER_TRAVEL_DATE;
 
 			ResaCustomerAdmin();
 			
@@ -140,6 +137,8 @@ namespace synthese
 				@date 2008
 			*/
 			virtual std::string getParameterValue() const;
+
+			virtual void _buildTabs() const;
 		};
 	}
 }

@@ -65,8 +65,6 @@ namespace synthese
 
 	namespace resa
 	{
-		const string ResaLogAdmin::PARAMETER_DATE("da");
-
 		ResaLogAdmin::ResaLogAdmin()
 			: AdminInterfaceElementTemplate<ResaLogAdmin>(),
 			_log("log")

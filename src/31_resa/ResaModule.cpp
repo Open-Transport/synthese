@@ -75,9 +75,11 @@ namespace synthese
 	namespace resa
 	{
 		const string ResaModule::_BASIC_PROFILE_NAME("Basic Resa Customer");	// Never change this or the database will be corrupted
+		const string ResaModule::_AUTORESA_PROFILE_NAME("Autoresa Resa Customer");	// Never change this or the database will be corrupted
 
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
 		shared_ptr<Profile> ResaModule::_basicProfile;
+		shared_ptr<Profile> ResaModule::_autoresaProfile;
 
 		std::string ResaModule::getName() const
 		{
@@ -148,6 +150,7 @@ namespace synthese
 		void ResaModule::initialize()
 		{
 			Env env;
+			// Basic resa profile
 			ProfileTableSync::Search(env, _BASIC_PROFILE_NAME);
 			if (env.getRegistry<Profile>().empty())
 				_basicProfile.reset(new Profile);
@@ -160,6 +163,25 @@ namespace synthese
 			_basicProfile->cleanRights();
 			_basicProfile->addRight(r);
 			ProfileTableSync::Save(_basicProfile.get());
+
+			// Autoresa profile
+			ProfileTableSync::Search(env, _AUTORESA_PROFILE_NAME);
+			if (env.getRegistry<Profile>().empty())
+				_autoresaProfile.reset(new Profile);
+			else
+				_autoresaProfile= env.getEditableRegistry<Profile>().front();
+			_autoresaProfile->setName(_AUTORESA_PROFILE_NAME);
+			shared_ptr<Right> r2(new GlobalRight);
+			r2->setPrivateLevel(FORBIDDEN);
+			r2->setPublicLevel(FORBIDDEN);
+			_autoresaProfile->cleanRights();
+			_autoresaProfile->addRight(r2);
+			shared_ptr<Right> r3(new ResaRight);
+			r3->setPrivateLevel(WRITE);
+			r3->setPublicLevel(FORBIDDEN);
+			_autoresaProfile->addRight(r3);
+			ProfileTableSync::Save(_autoresaProfile.get());
+
 		}
 
 
@@ -375,6 +397,11 @@ namespace synthese
 
 			stream << rt.close();
 
+		}
+
+		boost::shared_ptr<security::Profile> ResaModule::GetAutoResaResaCustomerProfile()
+		{
+			return _autoresaProfile;
 		}
 	}
 }
