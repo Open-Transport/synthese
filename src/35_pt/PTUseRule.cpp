@@ -445,7 +445,7 @@ namespace synthese
 
 		bool PTUseRule::isCompatibleWith( const AccessParameters& accessParameters ) const
 		{
-			if(_accessCapacity && *_accessCapacity) return false;
+			if(_accessCapacity && *_accessCapacity == 0) return false;
 
 			// 			if (_fare && complyer.getFare()->isCompliant() == logic::tribool(true) && complyer.getFare().get() != _fare)
 			// 				return false;
@@ -459,6 +459,21 @@ namespace synthese
 			) return false;
 
 			return true;
+		}
+
+		const std::string& PTUseRule::getName() const
+		{
+			return _name;
+		}
+
+		void PTUseRule::setName( const std::string& value )
+		{
+			_name = value;
+		}
+
+		void PTUseRule::setAccessCapacity( UseRule::AccessCapacity value )
+		{
+			_accessCapacity = value;
 		}
 	}
 }

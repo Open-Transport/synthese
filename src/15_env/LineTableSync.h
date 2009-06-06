@@ -59,12 +59,9 @@ namespace synthese
 			static const std::string COL_USEINTIMETABLES;
 			static const std::string COL_USEINROUTEPLANNING;
 			static const std::string COL_ROLLINGSTOCKID;
-			static const std::string COL_FAREID;
-			static const std::string COL_ALARMID;
 			static const std::string COL_BIKECOMPLIANCEID;
 			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
-			static const std::string COL_RESERVATIONRULEID;
 			static const std::string COL_WAYBACK;
 			static const std::string COL_DATASOURCE_ID;
 

@@ -30,7 +30,11 @@
 #include "EnvModule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
-
+#include "PTUseRule.h"
+#include "PTUseRuleTableSync.h"
+#include "ReservationContact.h"
+#include "ReservationContactTableSync.h"
+#include "GraphConstants.h"
 // Db
 #include "DBModule.h"
 #include "SQLiteResult.h"
@@ -62,6 +66,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace geography;
+	using namespace graph;
 
 	namespace util
 	{
@@ -78,6 +83,10 @@ namespace synthese
 		const string CommercialLineTableSync::COL_IMAGE ("image");
 		const string CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES("optional_reservation_places");
 		const string CommercialLineTableSync::COL_CREATOR_ID("creator_id");
+		const string CommercialLineTableSync::COL_BIKE_USE_RULE("bike_compliance_id");
+		const string CommercialLineTableSync::COL_HANDICAPPED_USE_RULE ("handicapped_compliance_id");
+		const string CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE("pedestrian_compliance_id");
+		const string CommercialLineTableSync::COL_RESERVATION_CONTACT_ID("reservation_contact_id");
 	}
 
 	namespace db
@@ -98,6 +107,10 @@ namespace synthese
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_CREATOR_ID, SQL_TEXT),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 
 		};
@@ -128,24 +141,63 @@ namespace synthese
 
 				object->setNetwork (tn);
 
-//				if (temporary == GET_REGISTRY)
-				{
-					typedef tokenizer<char_separator<char> > tokenizer;
-					string stops(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
+				typedef tokenizer<char_separator<char> > tokenizer;
+				string stops(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
 
-					// Parse all optional reservation places separated by ,
-					char_separator<char> sep1 (",");
-					tokenizer stopsTokens (stops, sep1);
+				// Parse all optional reservation places separated by ,
+				char_separator<char> sep1 (",");
+				tokenizer stopsTokens (stops, sep1);
 
-					for(tokenizer::iterator it(stopsTokens.begin());
-						it != stopsTokens.end ();
-						++it
-					){
-						uid id(Conversion::ToLongLong(*it));
-						const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(id,env,linkLevel).get());
-						object->addOptionalReservationPlace(place);
-					}
+				for(tokenizer::iterator it(stopsTokens.begin());
+					it != stopsTokens.end ();
+					++it
+				){
+					uid id(Conversion::ToLongLong(*it));
+					const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(id,env,linkLevel).get());
+					object->addOptionalReservationPlace(place);
 				}
+
+				uid bikeComplianceId(
+					rows->getLongLong (CommercialLineTableSync::COL_BIKE_USE_RULE)
+					);
+				uid handicappedComplianceId(
+					rows->getLongLong (CommercialLineTableSync::COL_HANDICAPPED_USE_RULE)
+					);
+				uid pedestrianComplianceId(
+					rows->getLongLong (CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE)
+					);
+				uid reservationContactId(
+					rows->getLongLong(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID)
+				);
+
+				if(bikeComplianceId > 0)
+				{
+					object->addRule(
+						USER_BIKE,
+						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
+					);
+				}
+				if(handicappedComplianceId > 0)
+				{
+					object->addRule(
+						USER_HANDICAPPED,
+						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
+					);
+				}
+				if(pedestrianComplianceId > 0)
+				{
+					object->addRule(
+						USER_PEDESTRIAN,
+						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
+					);
+				}
+				if(reservationContactId > 0)
+				{
+					object->setReservationContact(
+						ReservationContactTableSync::Get(reservationContactId, env, linkLevel).get()
+					);
+				}
+
 			}
 		}
 
@@ -192,6 +244,22 @@ namespace synthese
 			}
 			query << "'"
 				<< "," << Conversion::ToSQLiteString(object->getCreatorId())
+				<< "," << (
+					object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey()) :
+					"0")
+				<< "," << (
+					object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey()) :
+					"0")
+				<< "," << (
+					object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey()) :
+					"0")
+				<< "," << (
+					object->getReservationContact() ? lexical_cast<string>(object->getReservationContact()->getKey()) : "0"
+				)
+
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -371,7 +439,7 @@ namespace synthese
 			}
 			if (mustBeBookable)
 			{
-				query << " AND EXISTS(SELECT " << TABLE_COL_ID << " FROM " << LineTableSync::TABLE.NAME << " AS l WHERE l." << LineTableSync::COL_RESERVATIONRULEID << ">0 AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID << ")";
+				query << " AND " << COL_RESERVATION_CONTACT_ID << ">0";
 			}
 
 			return query.str();

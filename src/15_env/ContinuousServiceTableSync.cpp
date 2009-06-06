@@ -41,8 +41,10 @@
 #include "ServiceDate.h"
 #include "ServiceDateTableSync.h"
 #include "Schedule.h"
-
+#include "PTUseRuleTableSync.h"
+#include "PTUseRule.h"
 #include "Point2D.h"
+#include "GraphConstants.h"
 
 #include <set>
 #include <boost/algorithm/string.hpp>
@@ -58,6 +60,7 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace graph;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("15.60.02 Continuous services");
 	template<> const string FetcherTemplate<NonPermanentService, ContinuousServiceTableSync>::FACTORY_KEY("17");
@@ -69,9 +72,9 @@ namespace synthese
 		const std::string ContinuousServiceTableSync::COL_PATHID ("path_id");
 		const std::string ContinuousServiceTableSync::COL_RANGE ("range");
 		const std::string ContinuousServiceTableSync::COL_MAXWAITINGTIME ("max_waiting_time");
-		const std::string ContinuousServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const std::string ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const std::string ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+		const std::string ContinuousServiceTableSync::COL_BIKE_USE_RULE("bike_compliance_id");
+		const std::string ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE ("handicapped_compliance_id");
+		const std::string ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE("pedestrian_compliance_id");
 	}
 
 	namespace db
@@ -88,9 +91,9 @@ namespace synthese
 			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_PATHID, SQL_INTEGER),
 			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_RANGE, SQL_INTEGER),
 			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
+			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
+			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 		
@@ -181,22 +184,36 @@ namespace synthese
 	//			assert (path->getEdges ().size () == arrivalSchedules.size ());
 
 				uid bikeComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_BIKECOMPLIANCEID)
+					rows->getLongLong (ContinuousServiceTableSync::COL_BIKE_USE_RULE)
 				);
 				uid handicappedComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID)
+					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE)
 				);
 				uid pedestrianComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID)
+					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE)
 				);
 
-// 				cs->setBikeCompliance (BikeComplianceTableSync::Get(bikeComplianceId, env, linkLevel));
-// 				cs->setHandicappedCompliance(
-// 					HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel)
-// 				);
-// 				cs->setPedestrianCompliance(
-// 					PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel)
-// 				);
+				if(bikeComplianceId > 0)
+				{
+					cs->addRule(
+						USER_BIKE,
+						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
+					);
+				}
+				if(handicappedComplianceId > 0)
+				{
+					cs->addRule(
+						USER_HANDICAPPED,
+						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
+					);
+				}
+				if(pedestrianComplianceId > 0)
+				{
+					cs->addRule(
+						USER_PEDESTRIAN,
+						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
+					);
+				}
 
 				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}

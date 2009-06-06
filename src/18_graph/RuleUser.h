@@ -75,6 +75,13 @@ namespace synthese
 					const Map::key_type userClass
 				);
 			//@}
+
+			//! @name Getters
+			//@{
+				const Map::mapped_type getRule(
+					const Map::key_type userClass
+				) const;
+			//@}
 			
 			//! @name Queries
 			//@{

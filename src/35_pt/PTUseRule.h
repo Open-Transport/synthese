@@ -27,6 +27,7 @@
 #include "UseRule.h"
 #include "Registrable.h"
 #include "Registry.h"
+#include <string>
 
 namespace synthese
 {
@@ -63,7 +64,9 @@ namespace synthese
 
 
 		private:
-			
+
+			std::string _name;
+
 			//! @name Access
 			//@{
 				////
@@ -115,6 +118,7 @@ namespace synthese
 				int					getMinDelayMinutes()			const;
 				int					getMaxDelayDays()				const;
 				ReservationRuleType	getReservationType()			const;
+				const std::string&	getName()						const;
 			//@}
 			
 			//! @name Setters
@@ -125,6 +129,8 @@ namespace synthese
 				void setMaxDelayDays (int maxDelayDays);
 				void setOriginIsReference (bool originIsReference);
 				void setReservationType(ReservationRuleType value);
+				void setName(const std::string& value);
+				void setAccessCapacity(AccessCapacity value);
 			//@}
 
 

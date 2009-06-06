@@ -43,7 +43,7 @@ namespace synthese
 		const string PTUseRuleTableSync::COL_MINDELAYDAYS ("min_delay_days");
 		const string PTUseRuleTableSync::COL_MAXDELAYDAYS ("max_delay_days");
 		const string PTUseRuleTableSync::COL_HOURDEADLINE ("hour_deadline");
-
+		const string PTUseRuleTableSync::COL_NAME("name");
 	}
 
 	namespace db
@@ -55,7 +55,8 @@ namespace synthese
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<PTUseRuleTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_CAPACITY, SQL_INTEGER),
+			SQLiteTableSync::Field(PTUseRuleTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(PTUseRuleTableSync::COL_CAPACITY, SQL_TEXT),
 			SQLiteTableSync::Field(PTUseRuleTableSync::COL_RESERVATION_TYPE, SQL_INTEGER),
 			SQLiteTableSync::Field(PTUseRuleTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
 			SQLiteTableSync::Field(PTUseRuleTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
@@ -82,6 +83,7 @@ namespace synthese
 			int minDelayDays = rows->getInt (PTUseRuleTableSync::COL_MINDELAYDAYS);
 			int maxDelayDays = rows->getInt (PTUseRuleTableSync::COL_MAXDELAYDAYS);
 
+
 			Hour hourDeadline = 
 			Hour::FromSQLTime (rows->getText (PTUseRuleTableSync::COL_HOURDEADLINE));
 
@@ -93,7 +95,8 @@ namespace synthese
  		    rr->setMinDelayDays (minDelayDays);
  		    rr->setMaxDelayDays (maxDelayDays);
  		    rr->setHourDeadLine (hourDeadline);
-
+			rr->setName(rows->getText(PTUseRuleTableSync::COL_NAME));
+			rr->setAccessCapacity(rows->getOptionalUnsignedInt(PTUseRuleTableSync::COL_CAPACITY));
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Save(
@@ -104,15 +107,16 @@ namespace synthese
 			if (object->getKey() == UNKNOWN_VALUE)
 				object->setKey(getId());
 			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey()) << ","
-				<< (object->getAccessCapacity() ? Conversion::ToString(*object->getAccessCapacity()) : "") << ","
-				 				<< static_cast<int>(object->getReservationType()) << ","
-				 				<< object->getMinDelayMinutes() << ","
-				 				<< object->getMinDelayDays() << ","
-				 				<< object->getMaxDelayDays() << ","
-				 				<< object->getHourDeadLine().toSQLString() << ","
-				<< ")";
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				Conversion::ToSQLiteString(object->getName()) << "," <<
+				object->getKey() << "," <<
+				(object->getAccessCapacity() ? Conversion::ToString(*object->getAccessCapacity()) : "''") << "," <<
+				static_cast<int>(object->getReservationType()) << "," <<
+				object->getMinDelayMinutes() << "," <<
+				object->getMinDelayDays() << "," <<
+				object->getMaxDelayDays() << "," <<
+				object->getHourDeadLine().toSQLString() << "," <<
+			")";
 			sqlite->execUpdate(query.str());
 		}
 

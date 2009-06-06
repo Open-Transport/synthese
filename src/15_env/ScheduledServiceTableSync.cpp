@@ -28,7 +28,9 @@
 #include "CommercialLineTableSync.h"
 #include "ServiceDate.h"
 #include "ServiceDateTableSync.h"
-
+#include "PTUseRuleTableSync.h"
+#include "PTUseRule.h"
+#include "GraphConstants.h"
 #include <sstream>
 
 #include "Conversion.h"
@@ -70,7 +72,6 @@ namespace synthese
 		const string ScheduledServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
 		const string ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
 		const string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string ScheduledServiceTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
 		const string ScheduledServiceTableSync::COL_TEAM("team");
 	}
 
@@ -89,7 +90,6 @@ namespace synthese
 			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
 			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
@@ -182,12 +182,28 @@ namespace synthese
 
 				uid pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
 
-				uid reservationRuleId (rows->getLongLong (ScheduledServiceTableSync::COL_RESERVATIONRULEID));
 
-// 				ss->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel, AUTO_CREATE));
-// 				ss->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId, env, linkLevel, AUTO_CREATE));
-// 				ss->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
-// 				ss->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel, AUTO_CREATE));
+				if(bikeComplianceId > 0)
+				{
+					ss->addRule(
+						USER_BIKE,
+						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
+					);
+				}
+				if(handicappedComplianceId > 0)
+				{
+					ss->addRule(
+						USER_HANDICAPPED,
+						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
+					);
+				}
+				if(pedestrianComplianceId > 0)
+				{
+					ss->addRule(
+						USER_PEDESTRIAN,
+						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
+					);
+				}
 
 				path->addService(
 					ss,
@@ -226,12 +242,22 @@ namespace synthese
 				query << object->getArrivalSchedules()[i].toSQLString(false) << "#" << object->getDepartureSchedules()[i].toSQLString(false);
 			}
 			query <<
-				"'," << object->getPathId() <<
-				",0" <<
-				",0" <<
-				",0" <<
-				",0" <<
-				",''" <<
+				"'," << object->getPathId()
+				<< "," << (
+					object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey()) :
+				"0")
+					<< "," << (
+					object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey()) :
+				"0")
+					<< "," << (
+					object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey()) :
+				"0") <<
+
+
+				"," << Conversion::ToSQLiteString(object->getTeam()) <<
 			")";
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}

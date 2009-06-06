@@ -43,6 +43,7 @@ namespace synthese
 		:	public db::SQLiteRegistryTableSyncTemplate<PTUseRuleTableSync,PTUseRule>
 		{
 		public:
+			static const std::string COL_NAME;
 			static const std::string COL_CAPACITY;
 			static const std::string COL_RESERVATION_TYPE;
 			static const std::string COL_ORIGINISREFERENCE;

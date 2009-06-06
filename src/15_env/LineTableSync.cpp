@@ -28,12 +28,14 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
+#include "GraphConstants.h"
 #include "CommercialLineTableSync.h"
 #include "LineTableSync.h"
 #include "FareTableSync.h"
 #include "RollingStockTableSync.h"
 #include "DataSourceTableSync.h"
+#include "PTUseRuleTableSync.h"
+#include "PTUseRule.h"
 
 using namespace std;
 using namespace boost;
@@ -44,7 +46,8 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace impex;
-	
+	using namespace graph;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,LineTableSync>::FACTORY_KEY(
 		"15.30.01 Lines"
@@ -52,23 +55,20 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string LineTableSync::COL_AXISID ("axis_id");
-		const std::string LineTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
-		const std::string LineTableSync::COL_NAME ("name");
-		const std::string LineTableSync::COL_TIMETABLENAME ("timetable_name");
-		const std::string LineTableSync::COL_DIRECTION ("direction");
-		const std::string LineTableSync::COL_ISWALKINGLINE ("is_walking_line");
-		const std::string LineTableSync::COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
-		const std::string LineTableSync::COL_USEINTIMETABLES ("use_in_timetables");
-		const std::string LineTableSync::COL_USEINROUTEPLANNING ("use_in_routeplanning");
-		const std::string LineTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
-		const std::string LineTableSync::COL_FAREID ("fare_id");
-		const std::string LineTableSync::COL_ALARMID ("alarm_id");
-		const std::string LineTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const std::string LineTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const std::string LineTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const std::string LineTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
-		const std::string LineTableSync::COL_WAYBACK("wayback");
+		const string LineTableSync::COL_AXISID ("axis_id");
+		const string LineTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
+		const string LineTableSync::COL_NAME ("name");
+		const string LineTableSync::COL_TIMETABLENAME ("timetable_name");
+		const string LineTableSync::COL_DIRECTION ("direction");
+		const string LineTableSync::COL_ISWALKINGLINE ("is_walking_line");
+		const string LineTableSync::COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
+		const string LineTableSync::COL_USEINTIMETABLES ("use_in_timetables");
+		const string LineTableSync::COL_USEINROUTEPLANNING ("use_in_routeplanning");
+		const string LineTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
+		const string LineTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
+		const string LineTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+		const string LineTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+		const string LineTableSync::COL_WAYBACK("wayback");
 		const string LineTableSync::COL_DATASOURCE_ID("data_source");
 	}
 
@@ -90,12 +90,9 @@ namespace synthese
 			SQLiteTableSync::Field(LineTableSync::COL_USEINTIMETABLES, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineTableSync::COL_USEINROUTEPLANNING, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_FAREID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_ALARMID, SQL_INTEGER),
 			SQLiteTableSync::Field(LineTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(LineTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(LineTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
 			SQLiteTableSync::Field(LineTableSync::COL_WAYBACK, SQL_INTEGER),
 			SQLiteTableSync::Field(LineTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
@@ -115,11 +112,11 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			std::string name (
+			string name (
 			    rows->getText (LineTableSync::COL_NAME));
-			std::string timetableName (
+			string timetableName (
 			    rows->getText (LineTableSync::COL_TIMETABLENAME));
-			std::string direction (
+			string direction (
 			    rows->getText (LineTableSync::COL_DIRECTION));
 
 			bool isWalkingLine (rows->getBool (LineTableSync::COL_ISWALKINGLINE));
@@ -140,12 +137,9 @@ namespace synthese
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				uid rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
-				uid fareId (rows->getLongLong (LineTableSync::COL_FAREID));
-				uid alarmId (rows->getLongLong (LineTableSync::COL_ALARMID));
 				uid bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
 				uid pedestrianComplianceId (rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
 				uid handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-				uid reservationRuleId (rows->getLongLong (LineTableSync::COL_RESERVATIONRULEID));
 				RegistryKeyType commercialLineId(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID));
 
 				try
@@ -174,11 +168,27 @@ namespace synthese
 
 
 				line->setRollingStock(RollingStockTableSync::Get(rollingStockId, env, linkLevel, AUTO_CREATE).get());
-// 				line->setFare (FareTableSync::Get (fareId, env, linkLevel, AUTO_CREATE));
-// 				line->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId,env, linkLevel, AUTO_CREATE));
-// 				line->setHandicappedCompliance (HandicappedComplianceTableSync::Get (handicappedComplianceId,env, linkLevel, AUTO_CREATE));
-// 				line->setPedestrianCompliance (PedestrianComplianceTableSync::Get (pedestrianComplianceId, env, linkLevel, AUTO_CREATE));
-// 				line->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId,env, linkLevel, AUTO_CREATE));
+				if(bikeComplianceId > 0)
+				{
+					line->addRule(
+						USER_BIKE,
+						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
+					);
+				}
+				if(handicappedComplianceId > 0)
+				{
+					line->addRule(
+						USER_HANDICAPPED,
+						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
+					);
+				}
+				if(pedestrianComplianceId > 0)
+				{
+					line->addRule(
+						USER_PEDESTRIAN,
+						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
+					);
+				}
 				
 			}
 		}
@@ -205,8 +215,18 @@ namespace synthese
 				"," << (
 					object->getRollingStock() ? Conversion::ToString(object->getRollingStock()->getKey()) :
 					"0") <<
-				",0" <<
-				",0,0,0,0,0" <<
+				"," << (
+					object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey()) :
+				"0")
+					<< "," << (
+					object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey()) :
+				"0")
+					<< "," << (
+					object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey()) :
+				"0") <<
 				"," << Conversion::ToString(object->getWayBack()) <<
 				"," << (object->getDataSource() ? Conversion::ToString(object->getDataSource()->getKey()) : "0") <<
 			")";

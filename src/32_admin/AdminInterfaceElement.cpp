@@ -127,15 +127,22 @@ namespace synthese
 					tree.isNodeOpened = true;
 				}
 				
-				auto_ptr<AdminInterfaceElement>			subPage(link.getAdminPage());
-				AdminInterfaceElement::PageLinksTree	subTree(_buildTreeRecursion(subPage.get(), position));
+				try
+				{
+					auto_ptr<AdminInterfaceElement>			subPage(link.getAdminPage());
+					AdminInterfaceElement::PageLinksTree	subTree(_buildTreeRecursion(subPage.get(), position));
 
-				if (link == currentLink)
-					subTree.isNodeOpened = true;
+					if (link == currentLink)
+						subTree.isNodeOpened = true;
 
-				tree.subPages.push_back(subTree);
-				if (!tree.isNodeOpened)
-					tree.isNodeOpened = subPage->isPageVisibleInTree(*this) || subTree.isNodeOpened;
+					tree.subPages.push_back(subTree);
+					if (!tree.isNodeOpened)
+						tree.isNodeOpened = subPage->isPageVisibleInTree(*this) || subTree.isNodeOpened;
+				}
+				catch(...)
+				{
+					continue;
+				}
 
 				position.pop_back();
 			}

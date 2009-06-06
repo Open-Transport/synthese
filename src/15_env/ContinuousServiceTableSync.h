@@ -51,9 +51,9 @@ namespace synthese
 			static const std::string COL_PATHID;
 			static const std::string COL_RANGE;
 			static const std::string COL_MAXWAITINGTIME;
-			static const std::string COL_BIKECOMPLIANCEID;
-			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
-			static const std::string COL_PEDESTRIANCOMPLIANCEID;
+			static const std::string COL_PEDESTRIAN_USE_RULE;
+			static const std::string COL_HANDICAPPED_USE_RULE;
+			static const std::string COL_BIKE_USE_RULE;
 			
 			ContinuousServiceTableSync();
 

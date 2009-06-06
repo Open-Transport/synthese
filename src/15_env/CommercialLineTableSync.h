@@ -58,6 +58,10 @@ namespace synthese
 			static const std::string COL_IMAGE;
 			static const std::string COL_OPTIONAL_RESERVATION_PLACES;
 			static const std::string COL_CREATOR_ID;
+			static const std::string COL_PEDESTRIAN_USE_RULE;
+			static const std::string COL_HANDICAPPED_USE_RULE;
+			static const std::string COL_BIKE_USE_RULE;
+			static const std::string COL_RESERVATION_CONTACT_ID;
 
 			CommercialLineTableSync();
 
@@ -98,7 +102,7 @@ namespace synthese
 				@param orderByNetwork Orders the result by network, name
 				@param orderByName Orders the result by name
 				@param raisingOrder true = ascendant order, false = descendant order
-				@param mustbeBookable true = only transport on demand lines
+				@param mustbeBookable true = only demand responsive lines
 				@return vector<CommercialLine*> Founded CommercialLine objects.
 				@author Hugues Romain
 				@date 2006

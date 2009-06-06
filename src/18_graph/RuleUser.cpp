@@ -79,7 +79,7 @@ namespace synthese
 			const RuleUser::Map::key_type userClass,
 			const RuleUser::Map::mapped_type value
 		){
-			_rules.insert(make_pair(userClass, value));
+			_rules[userClass] = value;
 		}
 
 
@@ -98,6 +98,14 @@ namespace synthese
 		{
 			const UseRule& rule(getUseRule(accessParameters.getUserClass()));
 			return rule.isCompatibleWith(accessParameters);
+		}
+
+		const RuleUser::Map::mapped_type RuleUser::getRule(
+			const Map::key_type userClass
+		) const	{
+			Map::const_iterator it(_rules.find(userClass));
+			if(it == _rules.end()) return NULL;
+			return it->second;
 		}
 	}
 }
