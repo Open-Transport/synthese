@@ -47,8 +47,8 @@ namespace synthese
 		{
 			bool											_displayCancelled;
 			boost::shared_ptr<const env::CommercialLine>	_line;
-			time::DateTime									_startDateTime;
-			time::DateTime									_endDateTime;
+			time::Date										_date;
+			bool											_hideOldServices;
 
 		public:
 			static const std::string PARAMETER_DISPLAY_CANCELLED;

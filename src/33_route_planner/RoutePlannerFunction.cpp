@@ -21,25 +21,19 @@
 */
 
 #include "RoutePlannerFunction.h"
+#include "UserFavoriteJourneyTableSync.h"
+#include "UserFavoriteJourney.h"
+#include "Site.h"
+#include "HourPeriod.h"
+#include "RoutePlannerInterfacePage.h"
+#include "RoutePlanner.h"
+#include "RequestException.h"
+#include "Request.h"
+#include "Interface.h"
+#include "TimeParseException.h"
+#include "ObjectNotFoundException.h"
 
-#include "33_route_planner/UserFavoriteJourneyTableSync.h"
-#include "33_route_planner/UserFavoriteJourney.h"
-
-#include "36_places_list/Site.h"
-#include "36_places_list/HourPeriod.h"
-
-#include "33_route_planner/RoutePlannerInterfacePage.h"
-#include "33_route_planner/RoutePlanner.h"
-
-#include "30_server/RequestException.h"
-#include "30_server/Request.h"
-
-#include "11_interfaces/Interface.h"
-
-#include "04_time/TimeParseException.h"
-
-#include "01_util/Conversion.h"
-#include "01_util/ObjectNotFoundException.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -53,6 +47,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace transportwebsite;
 	using namespace db;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
@@ -80,7 +75,7 @@ namespace synthese
 			FunctionWithSite::_setFromParametersMap(map);
 			if(!_site->getInterface())
 			{
-				throw RequestException("Site "+ Conversion::ToString(_site->getKey()) + " is corrupted : it has no interface");
+				throw RequestException("Site "+ lexical_cast<string>(_site->getKey()) + " is corrupted : it has no interface");
 			}
 
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
@@ -156,10 +151,10 @@ namespace synthese
 				throw RequestException("Bad max solutions number");
 
 			// Accessibility
-			_accessibility = static_cast<AccessibilityParameter>(
-				map.getInt(PARAMETER_ACCESSIBILITY, !_home, string())
-			);
-			_accessParameters = _site->getAccessParameters(_accessibility);
+			_accessParameters = _site->getAccessParameters(
+				static_cast<UserClassCode>(
+					map.getInt(PARAMETER_ACCESSIBILITY, !_home, string())
+			)	);
 		}
 
 		void RoutePlannerFunction::_run( ostream& stream ) const
@@ -199,7 +194,6 @@ namespace synthese
 					, _period
 					, _accessParameters
 					, _request
-					, _accessibility
 					, _site.get()
 					, jv.samePlaces
 				);
@@ -219,7 +213,6 @@ namespace synthese
 					, _period
 					, _accessParameters
 					, _request
-					, _accessibility
 					, _site.get()
 				);
 			}

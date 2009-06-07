@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_RoutePlannerInterfacePage_H__
 #define SYNTHESE_RoutePlannerInterfacePage_H__
 
-#include "36_places_list/Types.h"
+#include "GraphTypes.h"
 
 #include "33_route_planner/Types.h"
 
@@ -119,7 +119,6 @@ namespace synthese
 				, const transportwebsite::HourPeriod* period
 				, const graph::AccessParameters& accessParameters
 				, const server::Request* request
-				, const transportwebsite::AccessibilityParameter& accessibility
 				, const transportwebsite::Site* site
 				, bool samePlaces
 			) const;
@@ -137,7 +136,6 @@ namespace synthese
 				, const transportwebsite::HourPeriod* period
 				, const graph::AccessParameters& accessParameters
 				, const server::Request* request
-				, const transportwebsite::AccessibilityParameter& accessibility
 				, const transportwebsite::Site* site
 			) const;
 		};

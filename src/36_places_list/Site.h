@@ -24,12 +24,12 @@
 #define SYNTHESE_CSITE_H
 
 #include "HourPeriod.h"
-#include "Types.h"
 #include "DateTime.h"
 #include "LexicalMatcher.h"
 #include "Registrable.h"
 #include "Registry.h"
 #include "01_util/Constants.h"
+#include "GraphTypes.h"
 
 #include <string>
 #include <set>
@@ -166,7 +166,7 @@ namespace synthese
 					@date 2007
 					@todo Modify the generated object to avoid memory leaks due to the use of new operator
 				*/
-				graph::AccessParameters	getAccessParameters(AccessibilityParameter parameter)	const;
+				graph::AccessParameters	getAccessParameters(graph::UserClassCode parameter)	const;
 	
 				bool dateControl() const;
 

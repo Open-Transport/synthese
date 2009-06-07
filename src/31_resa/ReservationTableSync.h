@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace time
+	{
+		class Date;
+	}
+
 	namespace resa
 	{
 		/** Reservation table synchronizer.
@@ -76,7 +81,29 @@ namespace synthese
 				const util::RegistryKeyType transactionId
 				, int first = 0
 				, int number = 0,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+			/** Search of reservations by line and date.
+				The returned reservations includes their corresponding transaction as shared pointer.
+				@param commercialLineId Commercial line ID
+				@param day Day of departure of the service at its origin (not necessarily the day of the departure of the customer)
+				@param first First Reservation object to answer
+				@param number Number of Reservation objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<Reservation*> Founded Reservation objects.
+				@author Hugues Romain
+				@date 2009
+			*/
+			static void Search(
+				util::Env& env,
+				const util::RegistryKeyType commercialLineId,
+				const time::Date& day,
+				bool orderByService = true,
+				bool raisingOrder = true, 
+				int first = 0,
+				int number = 0,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}

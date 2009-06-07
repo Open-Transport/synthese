@@ -84,8 +84,7 @@ namespace synthese
 	{
 		const string BookReservationAction::PARAMETER_SITE = Action_PARAMETER_PREFIX + "sit";
 		
-		const string BookReservationAction::PARAMETER_ACCESSIBILITY(Action_PARAMETER_PREFIX + "ac");
-		const string BookReservationAction::PARAMETER_DISABLED_CUSTOMER(Action_PARAMETER_PREFIX + "dc");
+		const string BookReservationAction::PARAMETER_USER_CLASS(Action_PARAMETER_PREFIX + "ac");
 		const string BookReservationAction::PARAMETER_DRT_ONLY(Action_PARAMETER_PREFIX + "do");
 
 		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + "dct";
@@ -233,18 +232,20 @@ namespace synthese
 
 			// Accessibility
 			AccessParameters ap;
-
+			int i(map.getInt(PARAMETER_USER_CLASS, false, FACTORY_KEY));
+			UserClassCode userClassCode(USER_PEDESTRIAN);
+			if(i > 0)
+			{
+				userClassCode = static_cast<UserClassCode>(i);
+			}
 			
 			if (site.get())
 			{			
-				AccessibilityParameter accessibility(static_cast<AccessibilityParameter>(
-					map.getInt(PARAMETER_ACCESSIBILITY, false, string()))
-				);
-				ap = site->getAccessParameters(accessibility);
+				ap = site->getAccessParameters(userClassCode);
 			}
 			else
 			{
-				ap = AccessParameters(false, NULL, _disabledCustomer, true, _drtOnly, false);
+				ap = AccessParameters(userClassCode);
 			}
 
 			RoutePlanner rp(
@@ -359,7 +360,6 @@ namespace synthese
 		BookReservationAction::BookReservationAction()
 			: FactorableTemplate<Action, BookReservationAction>()
 			, _journey()
-			, _disabledCustomer(false)
 			, _drtOnly(false)
 		{
 

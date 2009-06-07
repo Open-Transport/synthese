@@ -21,11 +21,14 @@
 */
 
 #include "PlacesListModule.h"
+#include "GraphConstants.h"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace graph;
+	
 	template<> const std::string util::FactorableTemplate<util::ModuleClass,transportwebsite::PlacesListModule>::FACTORY_KEY("36_places_list");
 
 	namespace transportwebsite
@@ -40,12 +43,12 @@ namespace synthese
 			return "Site web transport public";
 		}
 
-		std::vector<std::pair<AccessibilityParameter, std::string> > PlacesListModule::GetAccessibilityNames()
+		PlacesListModule::UserClassNames PlacesListModule::GetAccessibilityNames()
 		{
-			vector<pair<AccessibilityParameter, string> > result;
-			result.push_back(make_pair(PEDESTRIAN_ACCESSIBILITY, "Piéton"));
-			result.push_back(make_pair(HANDICCAPED_ACCESSIBILITY, "PMR"));
-			result.push_back(make_pair(BIKE_ACCESSIBILITY, "Vélo"));
+			UserClassNames result;
+			result.push_back(make_pair(USER_PEDESTRIAN, "Piéton"));
+			result.push_back(make_pair(USER_HANDICAPPED, "PMR"));
+			result.push_back(make_pair(USER_BIKE, "Vélo"));
 			return result;
 		}
 	}

@@ -24,39 +24,38 @@
 #define SYNTHESE_resa_ServiceReservations_h__
 
 #include <boost/shared_ptr.hpp>
-#include <vector>
+#include <set>
 
 #include "Env.h"
 
 namespace synthese
 {
-	namespace graph
-	{
-		class Service;
-	}
-
 	namespace resa
 	{
 		class Reservation;
-		class ReservationTransaction;
 
-		/** ServiceReservations class.
+		/** Container for ordered reservations list of a service class.
 			@ingroup m31
 		*/
 		class ServiceReservations
 		{
 		public:
-			const graph::Service*	service;
-			util::Env				reservationsEnv;
-			int						seatsNumber;
-			bool					overflow;
-			bool					status;
+			struct ReservationsLess : public std::binary_function<boost::shared_ptr<const Reservation>, boost::shared_ptr<const Reservation>, bool>
+			{
+				bool operator()(boost::shared_ptr<const Reservation> left, boost::shared_ptr<const Reservation> right) const;
+			};
 
-			ServiceReservations();
+			typedef std::set<boost::shared_ptr<const Reservation>, ReservationsLess> ReservationsList;
+			
 
-			boost::shared_ptr<Reservation>	getReservation(
-				const ReservationTransaction* transaction
-			) const;
+		private:
+			ReservationsList	_reservations;
+
+		public:
+			void addReservation(boost::shared_ptr<const Reservation> reservation);
+			const ReservationsList& getReservations() const;
+
+			int getSeatsNumber() const;
 		};
 	}
 }

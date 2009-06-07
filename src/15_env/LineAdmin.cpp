@@ -98,9 +98,10 @@ namespace synthese
 				ScheduledServiceTableSync::Search(
 					_env,
 					_line->getKey(),
-					UNKNOWN_VALUE,
-					UNKNOWN_VALUE,
-					TIME_UNKNOWN,
+					optional<RegistryKeyType>(),
+					optional<RegistryKeyType>(),
+					optional<Date>(),
+					false,
 					0, 0, true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);

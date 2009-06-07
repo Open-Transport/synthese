@@ -24,10 +24,10 @@
 #ifndef SYNTHESE_PlacesListModule_H__
 #define SYNTHESE_PlacesListModule_H__
 
-#include "36_places_list/Types.h"
+#include "GraphTypes.h"
 
-#include "01_util/ModuleClass.h"
-#include "01_util/FactorableTemplate.h"
+#include "ModuleClass.h"
+#include "FactorableTemplate.h"
 
 #include <utility>
 #include <vector>
@@ -78,7 +78,8 @@ namespace synthese
 
 			virtual std::string getName() const;
 
-			static std::vector<std::pair<AccessibilityParameter, std::string> >  GetAccessibilityNames();
+			typedef std::vector<std::pair<graph::UserClassCode, std::string> > UserClassNames;
+			static UserClassNames GetAccessibilityNames();
 		};
 	}
 

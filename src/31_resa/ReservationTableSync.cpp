@@ -22,8 +22,6 @@
 
 #include <sstream>
 
-#include "Conversion.h"
-
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -33,6 +31,11 @@
 
 #include "ReservationTransaction.h"
 #include "ReservationTableSync.h"
+#include "ReservationTransactionTableSync.h"
+#include "ScheduledServiceTableSync.h"
+#include "LineTableSync.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -43,6 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace time;
+	using namespace env;
 
 	namespace util
 	{
@@ -95,9 +99,7 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ReservationTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(ReservationTableSync::COL_LINE_ID.c_str(), ""),
-			SQLiteTableSync::Index(ReservationTableSync::COL_DEPARTURE_PLACE_ID.c_str(), ""),
-			SQLiteTableSync::Index(ReservationTableSync::COL_ARRIVAL_PLACE_ID.c_str(), ""),
+			SQLiteTableSync::Index(ReservationTableSync::COL_SERVICE_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -120,11 +122,20 @@ namespace synthese
 			object->setReservationRuleId(rows->getLongLong ( ReservationTableSync::COL_RESERVATION_RULE_ID));
 			object->setOriginDateTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_ORIGIN_DATE_TIME)));
 			object->setReservationDeadLine(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_RESERVATION_DEAD_LINE)));
+
+			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			{
+				object->setTransaction(
+					ReservationTransactionTableSync::Get(
+						rows->getLongLong(ReservationTableSync::COL_TRANSACTION_ID),
+						env, linkLevel
+					).get()
+				);
+			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object)
 		{
-
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Save(Reservation* object)
@@ -136,19 +147,19 @@ namespace synthese
                
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToString(object->getTransaction()->getKey())
-				<< "," << Conversion::ToString(object->getLineId())
+				<< lexical_cast<string>(object->getKey())
+				<< "," << (object->getTransaction() ? lexical_cast<string>(object->getTransaction()->getKey()) : "0")
+				<< "," << lexical_cast<string>(object->getLineId())
 				<< "," << Conversion::ToSQLiteString(object->getLineCode())
-				<< "," << Conversion::ToString(object->getServiceId())
+				<< "," << lexical_cast<string>(object->getServiceId())
 				<< "," << Conversion::ToSQLiteString(object->getServiceCode())
-				<< "," << Conversion::ToString(object->getDeparturePlaceId())
+				<< "," << lexical_cast<string>(object->getDeparturePlaceId())
 				<< "," << Conversion::ToSQLiteString(object->getDeparturePlaceName())
 				<< "," << object->getDepartureTime().toSQLString()
-				<< "," << Conversion::ToString(object->getArrivalPlaceId())
+				<< "," << lexical_cast<string>(object->getArrivalPlaceId())
 				<< "," << Conversion::ToSQLiteString(object->getArrivalPlaceName())
 				<< "," << object->getArrivalTime().toSQLString()
-				<< "," << Conversion::ToString(object->getReservationRuleId())
+				<< "," << lexical_cast<string>(object->getReservationRuleId())
 				<< "," << object->getOriginDateTime().toSQLString()
 				<< "," << object->getReservationDeadLine().toSQLString()
 				<< ")";
@@ -175,16 +186,46 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			if (transactionId != UNKNOWN_VALUE)
-			{
-				query << COL_TRANSACTION_ID << "=" << transactionId;
-			}
+				<< " WHERE "
+				<< COL_TRANSACTION_ID << "=" << transactionId
+			;
 			query << " ORDER BY " << COL_DEPARTURE_TIME;
 			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+				query << " LIMIT " << lexical_cast<string>(number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << lexical_cast<string>(first);
+
+			LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+		void ReservationTableSync::Search(
+			util::Env& env,
+			const util::RegistryKeyType commercialLineId,
+			const Date& day,
+			bool orderByService,
+			bool raisingOrder, 
+			int first /*= 0 */,
+			int number /*= 0*/,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			stringstream query;
+			query <<
+				" SELECT " << TABLE.NAME << ".*" <<
+				" FROM " << TABLE.NAME <<
+				" INNER JOIN " << ScheduledServiceTableSync::TABLE.NAME << " s ON s." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_SERVICE_ID <<
+				" INNER JOIN " << LineTableSync::TABLE.NAME << " l ON l." << TABLE_COL_ID << "=s." << ScheduledServiceTableSync::COL_PATHID <<
+				" WHERE " <<
+				"l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
+				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << " LIKE '" << day.toSQLString(false) << "%'"
+			;
+			if(orderByService)
+			{
+				query << " ORDER BY substr(s." << ScheduledServiceTableSync::COL_SCHEDULES << ",0,17) " << (raisingOrder ? "ASC" : "DESC");
+			}
+			if (number > 0)
+				query << " LIMIT " << lexical_cast<string>(number + 1);
+			if (first > 0)
+				query << " OFFSET " << lexical_cast<string>(first);
 
 			LoadFromQuery(query.str(), env, linkLevel);
 		}

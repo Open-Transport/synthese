@@ -26,7 +26,6 @@
 #define SYNTHESE_RoutePlannerFunction_H__
 
 #include "FunctionWithSite.h"
-#include "36_places_list/Types.h"
 #include "AccessParameters.h"
 #include "DateTime.h"
 #include "FactorableTemplate.h"
@@ -82,7 +81,6 @@ namespace synthese
 				int											_periodId;
 				const transportwebsite::HourPeriod*			_period;
 				bool										_home;
-				transportwebsite::AccessibilityParameter	_accessibility;
 				uid											_favoriteId;
 			//@}
 

@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_SiteRoutePlannerAdmin_H__
 #define SYNTHESE_SiteRoutePlannerAdmin_H__
 
-#include "36_places_list/Types.h"
+#include "GraphTypes.h"
 
 #include "AdminInterfaceElementTemplate.h"
 #include "DateTime.h"
@@ -51,7 +51,7 @@ namespace synthese
 			std::string						_endPlace;
 			time::DateTime					_dateTime;
 			int								_resultsNumber;
-			AccessibilityParameter			_accessibility;
+			graph::UserClassCode			_accessibility;
 			bool							_log;
 
 		public:

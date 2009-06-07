@@ -34,9 +34,9 @@
 
 #include "Date.h"
 #include "NamedPlace.h"
-#include "Conversion.h"
 
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -82,7 +82,6 @@ namespace synthese
 			, const HourPeriod* period
 			, const AccessParameters& accessParameters
 			, const server::Request* request /*= NULL*/
-			, const AccessibilityParameter& accessibility
 			, const Site* site
 			, bool samePlaces
 		) const	{
@@ -111,19 +110,19 @@ namespace synthese
 			pv.push_back(date.toSQLString(false));
 			pv.push_back("0");
 			pv.push_back(originCity->getName());
-			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_HANDICAPPED));
+			pv.push_back(lexical_cast<string>(accessParameters.getUserClass() == USER_HANDICAPPED));
 			pv.push_back(originPlaceName);
-			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_BIKE));
+			pv.push_back(lexical_cast<string>(accessParameters.getUserClass() == USER_BIKE));
 			pv.push_back(destinationCity->getName());
-			pv.push_back("" /*Conversion::ToString(destinationPlace->getKey())*/);
+			pv.push_back("" /*lexical_cast<string>(destinationPlace->getKey())*/);
 			pv.push_back(destinationPlaceName);
-			pv.push_back(Conversion::ToString(periodId));
+			pv.push_back(lexical_cast<string>(periodId));
 			pv.push_back(sDate.str());
 			pv.push_back((period == NULL) ? string() : period->getCaption());
-			pv.push_back(Conversion::ToString(object.result.size()));
-			pv.push_back(Conversion::ToString(accessibility));
-			pv.push_back(Conversion::ToString(site->getKey()));
-			pv.push_back(Conversion::ToString(samePlaces));
+			pv.push_back(lexical_cast<string>(object.result.size()));
+			pv.push_back(lexical_cast<string>(accessParameters.getUserClass()));
+			pv.push_back(lexical_cast<string>(site->getKey()));
+			pv.push_back(lexical_cast<string>(samePlaces));
 
 			InterfacePage::_display(stream, pv, variables, vobj, request);
 		}
@@ -141,7 +140,6 @@ namespace synthese
 			, const transportwebsite::HourPeriod* period 
 			, const AccessParameters& accessParameters
 			, const server::Request* request /*= NULL  */
-			, const AccessibilityParameter& accessibility
 			, const Site* site
 		) const	{
 			// Text formatted date
@@ -151,20 +149,20 @@ namespace synthese
 
 			ParametersVector pv;
 			pv.push_back(date.toSQLString(false));
-			pv.push_back(Conversion::ToString(home));
+			pv.push_back(lexical_cast<string>(home));
 			pv.push_back(originCity);
-			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_HANDICAPPED));
+			pv.push_back(lexical_cast<string>(accessParameters.getUserClass() == USER_HANDICAPPED));
 			pv.push_back(originPlace);
-			pv.push_back(Conversion::ToString(accessParameters.getUserClass() == USER_BIKE));
+			pv.push_back(lexical_cast<string>(accessParameters.getUserClass() == USER_BIKE));
 			pv.push_back(destinationCity);
 			pv.push_back(string());
 			pv.push_back(destinationPlace);
-			pv.push_back(Conversion::ToString(periodId));
+			pv.push_back(lexical_cast<string>(periodId));
 			pv.push_back(sDate.str());
 			pv.push_back((period == NULL) ? string() : period->getCaption());
 			pv.push_back("0");
-			pv.push_back(Conversion::ToString(accessibility));
-			pv.push_back(Conversion::ToString(site->getKey()));
+			pv.push_back(lexical_cast<string>(accessParameters.getUserClass()));
+			pv.push_back(lexical_cast<string>(site->getKey()));
 			pv.push_back("0");
 
 			InterfacePage::_display(stream, pv, variables, NULL, request);

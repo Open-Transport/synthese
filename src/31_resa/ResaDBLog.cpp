@@ -167,7 +167,10 @@ namespace synthese
 
 
 
-		void ResaDBLog::AddCancelReservationEntry( const server::Session* session, const ReservationTransaction& transaction, ReservationStatus oldStatus )
+		void ResaDBLog::AddCancelReservationEntry(
+			const server::Session* session,
+			const ReservationTransaction& transaction,
+			ReservationStatus oldStatus )
 		{
 			shared_ptr<const Reservation> r1(*transaction.getReservations().begin());
 			uid callId(ResaModule::GetCurrentCallId(session));

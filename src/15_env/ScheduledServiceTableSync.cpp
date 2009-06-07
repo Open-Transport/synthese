@@ -275,10 +275,11 @@ namespace synthese
 
 		void ScheduledServiceTableSync::Search(
 			Env& env,
-			RegistryKeyType lineId,
-			RegistryKeyType commercialLineId,
-			RegistryKeyType dataSourceId,
-			Date date,
+			optional<RegistryKeyType> lineId,
+			optional<RegistryKeyType> commercialLineId,
+			optional<RegistryKeyType> dataSourceId,
+			optional<Date> date,
+			bool hideOldServices,
 			int first, /*= 0*/
 			int number, /*= 0*/
 			bool orderByOriginTime,
@@ -289,20 +290,26 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME;
-			if (commercialLineId != UNKNOWN_VALUE || dataSourceId != UNKNOWN_VALUE)
+			if (commercialLineId || dataSourceId)
 				query << " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
-			if (!date.isUnknown())
+			if (date)
 				query << " INNER JOIN " << ServiceDateTableSync::TABLE.NAME << " AS d ON d." << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " WHERE 1 ";
-			if (lineId != UNKNOWN_VALUE)
-				query << " AND " << ScheduledServiceTableSync::COL_PATHID << "=" << lineId;
-			if (commercialLineId != UNKNOWN_VALUE)
-				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId;
-			if (dataSourceId != UNKNOWN_VALUE)
-				query << " AND l." << LineTableSync::COL_DATASOURCE_ID << "=" << dataSourceId;
-			if (!date.isUnknown())
-				query << " AND d." << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString();
-			if (!date.isUnknown())
+			if (lineId)
+				query << " AND " << ScheduledServiceTableSync::COL_PATHID << "=" << *lineId;
+			if (commercialLineId)
+				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
+			if (dataSourceId)
+				query << " AND l." << LineTableSync::COL_DATASOURCE_ID << "=" << *dataSourceId;
+			if (date)
+				query << " AND d." << ServiceDateTableSync::COL_DATE << "=" << date->toSQLString();
+			if(hideOldServices)
+			{
+				Hour now(TIME_CURRENT);
+				Schedule snow(now, now <= Hour(3,0));
+				query << " AND " << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#" << snow.toSQLString(false) << "'" ;
+			}
+			if (date)
 				query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY ";
 			if (orderByOriginTime)

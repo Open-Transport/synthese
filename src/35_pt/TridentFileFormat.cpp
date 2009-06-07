@@ -203,9 +203,10 @@ namespace synthese
 				ScheduledServiceTableSync::Search(
 					*_env,
 					line->getKey(),
-					UNKNOWN_VALUE,
+					optional<RegistryKeyType>(),
 					_dataSource->getKey(),
-					Date(TIME_UNKNOWN),
+					optional<Date>(),
+					false,
 					0, 0, true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);
@@ -1108,7 +1109,16 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<Line> line, _env->getRegistry<Line>())
 			{
 				LineStopTableSync::Search(*_env, line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ScheduledServiceTableSync::Search(*_env, line->getKey(), UNKNOWN_VALUE, UNKNOWN_VALUE, Date(TIME_UNKNOWN), 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				ScheduledServiceTableSync::Search(
+					*_env,
+					line->getKey(),
+					optional<RegistryKeyType>(),
+					optional<RegistryKeyType>(),
+					optional<Date>(),
+					false,
+					0, 0, true, true,
+					UP_LINKS_LOAD_LEVEL
+				);
 			}
 			
 			// Chouette routes

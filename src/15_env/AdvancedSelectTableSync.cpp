@@ -114,7 +114,11 @@ namespace synthese
 		){
 			RunHours result;
 			Env env;
-			ScheduledServiceTableSync::Search(env, UNKNOWN_VALUE, id);
+			ScheduledServiceTableSync::Search(
+				env,
+				optional<RegistryKeyType>(),
+				id
+			);
 			BOOST_FOREACH(shared_ptr<ScheduledService> serv, env.getRegistry<ScheduledService>())
 			{
 				ServiceDateTableSync::SetActiveDates(*serv);

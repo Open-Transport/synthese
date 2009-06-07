@@ -82,7 +82,7 @@ namespace synthese
 			// Load of the transaction
 			try
 			{
-				_transaction = ReservationTransactionTableSync::GetEditable(map.getUid(PARAMETER_RESERVATION_TRANSACTION_ID, true, FACTORY_KEY), _env);
+				_transaction = ReservationTransactionTableSync::GetEditable(map.getUid(PARAMETER_RESERVATION_TRANSACTION_ID, true, FACTORY_KEY), _env, UP_DOWN_LINKS_LOAD_LEVEL);
 			}
 			catch(...)
 			{

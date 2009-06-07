@@ -87,9 +87,9 @@ namespace synthese
 
 
 		BookableCommercialLineAdmin::BookableCommercialLineAdmin()
-			: AdminInterfaceElementTemplate<BookableCommercialLineAdmin>()
-			, _startDateTime(TIME_CURRENT)
-			, _endDateTime(TIME_CURRENT, TIME_CURRENT, TIME_CURRENT, TIME_MAX, TIME_MAX)
+			: AdminInterfaceElementTemplate<BookableCommercialLineAdmin>(),
+			_date(TIME_UNKNOWN),
+			_hideOldServices(false)
 		{ }
 		
 		void BookableCommercialLineAdmin::setFromParametersMap(
@@ -100,11 +100,15 @@ namespace synthese
 			// Date
 			try
 			{
-				DateTime dateTime(map.getDateTime(PARAMETER_DATE, false, getFactoryKey()));
-				if (!dateTime.isUnknown())
+				_date = map.getDate(PARAMETER_DATE, false, getFactoryKey());
+				if(_date.isUnknown())
 				{
-					_startDateTime = dateTime;
-					_endDateTime = DateTime(dateTime.getDate(), Hour(TIME_MAX));
+					_date = Date(TIME_CURRENT);
+					if(Hour(TIME_CURRENT) < Hour(3,0))
+					{
+						_date--;
+					}
+					_hideOldServices = true;
 				}
 			}
 			catch (...)
@@ -113,7 +117,7 @@ namespace synthese
 			}
 			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
 
-			uid lineId(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			uid lineId(_request->getObjectId());
 			try
 			{
 				_line = CommercialLineTableSync::Get(lineId, _env);
@@ -122,6 +126,25 @@ namespace synthese
 			{
 				throw RequestException("Bad value for line ID");
 			}
+
+			if(!doDisplayPreparationActions) return;
+
+			// Services reading
+			ScheduledServiceTableSync::Search(
+				_env,
+				optional<RegistryKeyType>(),
+				_line->getKey(),
+				optional<RegistryKeyType>(),
+				_date,
+				_hideOldServices
+			);
+
+			// Reservations reading
+			ReservationTableSync::Search(
+				_env,
+				_line->getKey(),
+				_date
+			);
 		}
 		
 		
@@ -129,7 +152,10 @@ namespace synthese
 		server::ParametersMap BookableCommercialLineAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			m.insert(PARAMETER_DATE, _startDateTime);
+			if(!_hideOldServices)
+			{
+				m.insert(PARAMETER_DATE, _date);
+			}
 			m.insert(PARAMETER_DISPLAY_CANCELLED, _displayCancelled);
 			return m;
 		}
@@ -165,7 +191,7 @@ namespace synthese
 
 			SearchFormHTMLTable st(searchRequest.getHTMLForm());
 			stream << st.open();
-			stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _startDateTime.getDate()));
+			stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
 			stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
 			stream << st.close();
 
@@ -184,55 +210,25 @@ namespace synthese
 			HTMLTable t(c,"adminresults");
 			stream << t.open();
 
-			// Boucle sur les circulations
-			Env env;
-			ScheduledServiceTableSync::Search(
-				env,
-				UNKNOWN_VALUE,
-				UNKNOWN_VALUE
-				, _line->getKey()
-				, _startDateTime.getDate()
-			);
 
-			// Download reservations
+			// Sort reservations
 			map<const ScheduledService*, ServiceReservations> reservations;
-			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.getRegistry<ScheduledService>())
+			BOOST_FOREACH(shared_ptr<const Reservation> resa, _env.getRegistry<Reservation>())
 			{
-				ServiceReservations obj;
-
-				ReservationTransactionTableSync::Search(
-					obj.reservationsEnv,
-					service->getKey()
-					, _startDateTime.getDate()
-					, _displayCancelled
-					);
-				obj.seatsNumber = 0;
-				BOOST_FOREACH(shared_ptr<ReservationTransaction> resa, obj.reservationsEnv.getRegistry<ReservationTransaction>())
+				const ScheduledService* service(_env.getRegistry<ScheduledService>().get(resa->getServiceId()).get());
+				if(reservations.find(service) == reservations.end())
 				{
-					if (resa->getCancellationTime().isUnknown())
-						obj.seatsNumber += resa->getSeats();
+					reservations.insert(make_pair(service, ServiceReservations()));
 				}
-
-				obj.overflow = false; // rule->getCapacity() && (obj.seatsNumber > rule->getCapacity());
-
-				int lastDepartureLineStop(getRankOfLastDepartureLineStop(service->getPathId()));
-
-// 				const ReservationRule* rule(service->getReservationRule().get());
-// 				obj.status = rule->isReservationPossible(
-// 					DateTime(_startDateTime.getDate(), service->getDepartureSchedule())
-// 					, now
-// 					, DateTime(_startDateTime.getDate(), service->getDepartureSchedule(lastDepartureLineStop))
-// 					);
-				obj.service = service.get();
-
-				reservations.insert(make_pair(service.get(), obj));
-
+				reservations[service].addReservation(resa);
 			}
 
-			BOOST_FOREACH(shared_ptr<ScheduledService> service, env.getRegistry<ScheduledService>())
+			// Display of services
+			BOOST_FOREACH(shared_ptr<const ScheduledService> service, _env.getRegistry<ScheduledService>().getOrderedVector())
 			{
-				const ServiceReservations& serviceReservations (reservations[service.get()]);
-				string plural((serviceReservations.seatsNumber > 1) ? "s" : "");
+				const ServiceReservations::ReservationsList& serviceReservations (reservations[service.get()].getReservations());
+				int serviceSeatsNumber(reservations[service.get()].getSeatsNumber());
+				string plural((serviceSeatsNumber > 1) ? "s" : "");
 
 
 				/*				if ((retour || course) && $circulation = $circulation_suivante)
@@ -245,26 +241,25 @@ namespace synthese
 				elseif($circulation = $circulations->GetSuivant())
 				{
 				*/					// Dates of departure
-				DateTime originDateTime(DateTime(_startDateTime.getDate(), service->getDepartureSchedule()));
+				DateTime originDateTime(DateTime(_date, service->getDepartureSchedule()));
 
 
 
 				// Display
 				stream << t.row();
 				stream << t.col(8, string(), true) << "Service " << service->getServiceNumber() << " - départ de " << service->getDepartureSchedule().getHour().toString();
-				if (serviceReservations.seatsNumber > 0)
-					stream << " - " << serviceReservations.seatsNumber << " place" << plural << " réservée" << plural;
+				if (serviceSeatsNumber > 0)
+					stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
 
-				if (serviceReservations.reservationsEnv.getRegistry<Reservation>().empty())
+				if (serviceReservations.empty())
 				{
 					stream << t.row();
 					stream << t.col(8) << "Aucune réservation";
 				}
 				else
 				{
-					BOOST_FOREACH(shared_ptr<ReservationTransaction> transac, serviceReservations.reservationsEnv.getRegistry<ReservationTransaction>())
+					BOOST_FOREACH(shared_ptr<const Reservation> reservation, serviceReservations)
 					{
-						const Reservation* reservation(serviceReservations.getReservation(transac.get()).get());
 						ReservationStatus status(reservation->getStatus());
 
 						customerRequest.setObjectId(reservation->getTransaction()->getCancelUserId());

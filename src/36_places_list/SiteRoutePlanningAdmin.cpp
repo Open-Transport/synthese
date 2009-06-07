@@ -91,7 +91,8 @@ namespace synthese
 			: AdminInterfaceElementTemplate<SiteRoutePlanningAdmin>()
 			, _resultsNumber(UNKNOWN_VALUE)
 			, _dateTime(TIME_UNKNOWN)
-			, _log(false)
+			, _log(false),
+			_accessibility(USER_PEDESTRIAN)
 		{ }
 		
 		void SiteRoutePlanningAdmin::setFromParametersMap(
@@ -107,7 +108,7 @@ namespace synthese
 			if (_dateTime.isUnknown())
 				_dateTime = DateTime(TIME_CURRENT);
 			_resultsNumber = map.getInt(PARAMETER_RESULTS_NUMBER, false, FACTORY_KEY);
-			_accessibility = static_cast<AccessibilityParameter>(
+			_accessibility = static_cast<UserClassCode>(
 				map.getInt(PARAMETER_ACCESSIBILITY, false, string())
 			);
 		

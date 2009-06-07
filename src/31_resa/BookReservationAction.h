@@ -63,8 +63,7 @@ namespace synthese
 			static const std::string PARAMETER_SITE;
 			
 			// Accessibility
-			static const std::string PARAMETER_ACCESSIBILITY;
-			static const std::string PARAMETER_DISABLED_CUSTOMER;
+			static const std::string PARAMETER_USER_CLASS;
 			static const std::string PARAMETER_DRT_ONLY;
 
 			// Journey information
@@ -92,7 +91,6 @@ namespace synthese
 			graph::Journey						_journey;
 			boost::shared_ptr<security::User>	_customer;
 			bool								_createCustomer;
-			bool								_disabledCustomer;
 			bool								_drtOnly;
 			int									_seatsNumber;
 

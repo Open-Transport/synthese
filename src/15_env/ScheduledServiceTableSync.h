@@ -28,6 +28,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <boost/optional.hpp>
 
 #include "Date.h"
 
@@ -72,10 +73,11 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				util::RegistryKeyType lineId = UNKNOWN_VALUE,
-				util::RegistryKeyType commercialLineId = UNKNOWN_VALUE,
-				util::RegistryKeyType dataSource = UNKNOWN_VALUE,
-				time::Date date = time::Date(time::TIME_UNKNOWN),
+				boost::optional<util::RegistryKeyType> lineId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> commercialLineId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> dataSource = boost::optional<util::RegistryKeyType>(),
+				boost::optional<time::Date> date = boost::optional<time::Date>(),
+				bool hideOldServices = false,
 				int first = 0,
 				int number = 0,
 				bool orderByOriginTime = true,
