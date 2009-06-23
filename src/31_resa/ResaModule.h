@@ -23,14 +23,11 @@
 #ifndef SYNTHESE_ResaModule_h__
 #define SYNTHESE_ResaModule_h__
 
-#include "ResultHTMLTable.h"
-
-#include "ActionFunctionRequest.h"
-
 #include "31_resa/Types.h"
 
 #include "ModuleClass.h"
 #include "FactorableTemplate.h"
+#include "Registry.h"
 
 #include <map>
 #include <ostream>
@@ -149,14 +146,16 @@ namespace synthese
 		class ResaModule : public util::FactorableTemplate<util::ModuleClass, ResaModule>
 		{
 		private:
-			typedef std::map<const server::Session*, uid> _SessionsCallIdMap;
+			typedef std::map<const server::Session*, util::RegistryKeyType> _SessionsCallIdMap;
 			static _SessionsCallIdMap _sessionsCallIds;
 
 			static const std::string _BASIC_PROFILE_NAME;
 			static const std::string _AUTORESA_PROFILE_NAME;
+			static const std::string _ADMIN_PROFILE_NAME;
 
 			static boost::shared_ptr<security::Profile>	_basicProfile;
 			static boost::shared_ptr<security::Profile>	_autoresaProfile;
+			static boost::shared_ptr<security::Profile>	_adminProfile;
 
 		public:
 			
@@ -174,26 +173,16 @@ namespace synthese
 			static boost::shared_ptr<security::Profile> GetAutoResaResaCustomerProfile();
 
 			static void DisplayReservations(
-				std::ostream& stream
-				, const ReservationTransaction* reservation
+				std::ostream& stream,
+				const ReservationTransaction& reservation
 			);
 
 			static void CallOpen(const server::Session* session);
 			static void CallClose(const server::Session* session);
-			static uid GetCurrentCallId(const server::Session* session);
+			static util::RegistryKeyType GetCurrentCallId(const server::Session* session);
 
 			static std::string GetStatusIcon(ReservationStatus status);
 			static std::string GetStatusText(ReservationStatus status);
-
-			static void DisplayResaDBLog(
-				std::ostream& stream
-				, const util::Env& resaEnv
-				, const std::string& parameterDate
-				, server::FunctionRequest<admin::AdminRequest>& searchRequest
-				, server::ActionFunctionRequest<CancelReservationAction,admin::AdminRequest>& cancelRequest
-				, const html::ResultHTMLTable::RequestParameters& _requestParameters
-				, bool displayCustomer
-			);
 		};
 	}
 	/** @} */

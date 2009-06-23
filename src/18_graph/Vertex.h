@@ -28,6 +28,7 @@
 #include "Registrable.h"
 #include "Point2D.h"
 #include "GraphTypes.h"
+#include "FactoryBase.h"
 
 namespace synthese
 {
@@ -43,8 +44,8 @@ namespace synthese
 			A vertex is necessarily connected to its corresponding path.
 			@ingroup m35
 		*/
-		class Vertex
-		:	public geometry::Point2D,
+		class Vertex :
+			public geometry::Point2D,
 			public virtual util::Registrable
 		{
 		public:

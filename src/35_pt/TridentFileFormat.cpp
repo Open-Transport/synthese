@@ -73,6 +73,7 @@
 #include <locale>
 #include <string>
 #include <utility>
+#include <fstream>
 
 // Boost
 #include <boost/foreach.hpp>
@@ -271,7 +272,7 @@ namespace synthese
 				os << "<StopArea>" << "\n";
 
 				os << "<objectId>" << TridentId (peerid, "StopArea", *ps) << "</objectId>" << "\n";
-				os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << "\n";
+				os << "<creatorId>" << ps->getCodeBySource() << "</creatorId>" << "\n";
 
 				os << "<name>" << ps->getConnectionPlace ()->getName ();
 				if (!ps->getName().empty()) os << " (" + ps->getName () + ")";
@@ -287,7 +288,7 @@ namespace synthese
 				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", *ps) << "</centroidOfArea>" << "\n";
 				os << "<StopAreaExtension>" << "\n";
 				os << "<areaType>" << "Quay" << "</areaType>" << "\n";
-				string rn = ps->getOperatorCode ();
+				string rn = ps->getCodeBySource();
 				if (rn.empty ()) rn = "0";
 				os << "<registration><registrationNumber>" << rn << "</registrationNumber></registration>" << "\n";
 				os << "</StopAreaExtension>" << "\n";
@@ -528,7 +529,7 @@ namespace synthese
 
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopPoint", *ls) << "</objectId>" << "\n";
-				os << "<creatorId>" << ps->getOperatorCode() << "</creatorId>" << "\n";
+				os << "<creatorId>" << ps->getCodeBySource() << "</creatorId>" << "\n";
 
 				Point2D pt (ps->getX (), ps->getY ());
 				GeoPoint gp = WGS84FromLambert(pt);
@@ -950,11 +951,22 @@ namespace synthese
 
 
 		void TridentFileFormat::_parse(
-			const string& text,
+			const string& filePath,
 			ostream& os,
 			string fileKey
 		){
-			XMLNode allNode = XMLNode::parseString (text.c_str (), "ChouettePTNetwork");
+			ifstream ifs(filePath.c_str());
+			if (!ifs)
+			{
+				throw Exception("Could no open the file" + filePath);
+			}
+
+			// Read the whole file into a string
+			stringstream text;
+			text << ifs.rdbuf();
+			ifs.close();
+
+			XMLNode allNode = XMLNode::parseString (text.str().c_str(), "ChouettePTNetwork");
 			
 			// Title
 			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
@@ -1175,7 +1187,7 @@ namespace synthese
 					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << routeIdNode.getText() << "<br />";
 					route.reset(new Line);
 					route->setCommercialLine(cline.get());
-					route->setName(routeNames[routeIdNode.getText()]);
+					route->setCodeBySource(routeNames[routeIdNode.getText()]);
 					route->setWayBack(routeWaybacks[routeIdNode.getText()]);
 					route->setDataSource(_dataSource);
 					route->setKey(LineTableSync::getId());

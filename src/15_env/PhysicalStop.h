@@ -26,6 +26,7 @@
 #include "01_util/Constants.h"
 #include "Vertex.h"
 #include "Registry.h"
+#include "Importable.h"
 
 #include <string>
 
@@ -44,7 +45,8 @@ namespace synthese
 		///	@ingroup m35
 		//////////////////////////////////////////////////////////////////////////
 		class PhysicalStop
-		:	public graph::Vertex
+		:	public graph::Vertex,
+			public impex::Importable
 		{
 		public:
 
@@ -54,7 +56,6 @@ namespace synthese
 		private:
 
 			std::string _name; //! Physical stop name
-			std::string _operatorCode;	//! Code as known by the operator
 			
 		public:
 
@@ -70,12 +71,10 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-				const std::string&	getOperatorCode()	const;
 				const PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
 
 				const std::string& getName () const;
 				void setName (const std::string& name);
-				void setOperatorCode(const std::string& code);
 			//@}
 
 

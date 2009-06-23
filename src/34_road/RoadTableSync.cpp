@@ -26,13 +26,11 @@
 #include "RoadPlaceTableSync.h"
 #include "CityTableSync.h"
 #include "FareTableSync.h"
-
+#include "RoadChunkTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
-#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -53,13 +51,10 @@ namespace synthese
 
 	namespace road
 	{
-		const string RoadTableSync::COL_NAME ("name");
 		const string RoadTableSync::COL_ROADTYPE ("road_type");
-		const string RoadTableSync::COL_FAREID ("fare_id");
 		const string RoadTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
 		const string RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
 		const string RoadTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string RoadTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
 		const string RoadTableSync::COL_VIAPOINTS ("via_points");
 		const string RoadTableSync::COL_ROAD_PLACE_ID("road_place_id");
 	}
@@ -73,13 +68,10 @@ namespace synthese
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RoadTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadTableSync::COL_FAREID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadTableSync::COL_RESERVATIONRULEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_VIAPOINTS, SQL_TEXT),
 			SQLiteTableSync::Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
@@ -107,10 +99,6 @@ namespace synthese
 				object->setRoadPlace(roadPlace);
 				roadPlace->addRoad(*object);
 				
-				// Fare
-// 				uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));
-// 				object->setFare(FareTableSync::Get (fareId, env, linkLevel));
-
 // 				uid bikeComplianceId (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID));
 // 				object->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel));
 
@@ -119,9 +107,6 @@ namespace synthese
 
 // 				uid pedestrianComplianceId (rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID));
 // 				object->setPedestrianCompliance(PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel));
-
-// 				uid reservationRuleId (rows->getLongLong (RoadTableSync::COL_RESERVATIONRULEID));
-// 				object->setReservationRule (ReservationRuleTableSync::Get (reservationRuleId, env, linkLevel));
 			}
 		}
 
@@ -135,13 +120,15 @@ namespace synthese
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
-				object->setKey(getId());	/// @todo Use grid ID
+				object->setKey(getId());
                
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
+			 query <<
+				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				object->getKey() << "," <<
+				static_cast<int>(object->getType()) << "," <<
+				"0,0,0,''," <<
+				(object->getRoadPlace() ? object->getRoadPlace()->getKey() : RegistryKeyType(0)) <<
+			")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -156,6 +143,9 @@ namespace synthese
 
 		void RoadTableSync::Search(
 			Env& env,
+			boost::optional<util::RegistryKeyType> roadPlaceId,
+			boost::optional<util::RegistryKeyType> startingNodeId,
+			boost::optional<util::RegistryKeyType> endingNodeId,
 			int first /*= 0*/,
 			int number /*= 0*/,
 			LinkLevel linkLevel
@@ -165,12 +155,18 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if(roadPlaceId)
+			{
+				query << " AND " << COL_ROAD_PLACE_ID << "=" << *roadPlaceId;
+			}
+			if(startingNodeId)
+			{
+				query << " AND (SELECT " << RoadChunkTableSync::COL_ADDRESSID << " FROM " << RoadChunkTableSync::TABLE.NAME << " WHERE " << RoadChunkTableSync::COL_ROADID << "=" << TABLE.NAME << "." << TABLE_COL_ID << " AND " << RoadChunkTableSync::COL_RANKINPATH << "=0)=" << *startingNodeId;
+			}
+			if(endingNodeId)
+			{
+				query << " AND (SELECT " << RoadChunkTableSync::COL_ADDRESSID << " FROM " << RoadChunkTableSync::TABLE.NAME << " WHERE " << RoadChunkTableSync::COL_ROADID << "=" << TABLE.NAME << "." << TABLE_COL_ID << " ORDER BY " << RoadChunkTableSync::COL_RANKINPATH << " DESC LIMIT 1)=" << *startingNodeId;
+			}
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

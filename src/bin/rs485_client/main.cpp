@@ -21,6 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <boost/asio.hpp>
+
 #ifdef WIN32
 	#include "Windows.h"
 #endif
@@ -30,7 +32,8 @@
 #include "Conversion.h"
 #include "01_util/Log.h"
 
-#include "BasicClient.h"
+#include "HTTPRequestParser.hpp"
+#include "HTTPRequest.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -39,7 +42,7 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/iostreams/stream.hpp>
-
+#include <boost/foreach.hpp>
 
 #define MAX_QUERY_SIZE 4096
 #define STATUS_MESSAGE_SIZE 17
@@ -68,9 +71,9 @@
 
 
 using namespace synthese::util;
-using namespace synthese::tcp;
 using namespace std;
-
+using boost::asio::ip::tcp;
+using namespace synthese::server;
 
 /** Main function of the RS485 Client binary.
 	@param argc Number of execution parameters
@@ -95,7 +98,7 @@ int main(int argc, char* argv[])
 	}
 
     string server(argv[1]);
-    int port = atoi (argv[2]);
+    string port = argv[2];
     string comm(argv[3]);
     bool useCOM (false);
     if ( (comm.substr (0, 3) == "COM") || (comm.substr (0, 3) == "com") )
@@ -114,13 +117,13 @@ int main(int argc, char* argv[])
     if (useCOM)
     {
 		hCom = CreateFile( comm.c_str(),
-				   GENERIC_READ | GENERIC_WRITE,
-				   0,    // must be opened with exclusive-access
-				   NULL, // no security attributes
-				   OPEN_EXISTING, // must use OPEN_EXISTING
-				   0,    // not overlapped I/O
-				   NULL  // hTemplate must be NULL for comm devices
-			);
+		   GENERIC_READ | GENERIC_WRITE,
+		   0,    // must be opened with exclusive-access
+		   NULL, // no security attributes
+		   OPEN_EXISTING, // must use OPEN_EXISTING
+		   0,    // not overlapped I/O
+		   NULL  // hTemplate must be NULL for comm devices
+		);
 		
 		if (hCom == INVALID_HANDLE_VALUE) 
 		{
@@ -167,140 +170,253 @@ int main(int argc, char* argv[])
     char buf[MAX_QUERY_SIZE];
     DWORD readComm = 0;
 
-    while (true)
-    {
-        time_t now;
-        struct tm *hms;
-        int stamp;
-        time(&now);
-        hms = localtime(&now);
-        stamp = hms->tm_min;
+	while(true)
+	{
+
+		time_t now;
+		struct tm *hms;
+		int stamp;
+		time(&now);
+		hms = localtime(&now);
+		stamp = hms->tm_min;
 
 
 		for(int client=0; client<nbclients; client++)
 		{
+			stringstream received;
 			try
 			{
 
-			  if(outdate[client] == stamp) continue;
-			  
-			  //if(!SetCommState(hCom, &dcb))
-			  //    fichier << "erreur reinit port com" << endl;
-			  
-			  Log::GetInstance ().info ("Connecting " + std::string (server) 
+				if(outdate[client] == stamp) continue;
+
+				//if(!SetCommState(hCom, &dcb))
+				//    fichier << "erreur reinit port com" << endl;
+
+				Log::GetInstance ().info ("Connecting " + std::string (server) 
 					+ std::string (":") + Conversion::ToString (port));
-			  
-              int timeout = 2; // 2 seconds timeout
-			  {
-				  TcpClientSocket clientSock (server, port, timeout);
-			      
-				  while (clientSock.isConnected () == false)
-				  {
-					  clientSock.tryToConnect ();
-					  Thread::Sleep (500);
-				  }
-			      
-				  // The client is connected.
-				  Log::GetInstance ().info ("Connected.");
-			      
-				  // Create commodity stream:
-				  boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-				  cliSocketStream.open (clientSock);
-			      
-				  cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] 
-						  << "&ipaddr=0.0.0.0" << std::endl;
-				  
-				  cliSocketStream.flush ();
-				  memset (buf, 0, sizeof (buf));
-				  cliSocketStream.getline (buf, sizeof (buf), (char) 0);
-				  cliSocketStream.close ();
-			  }
-			  std::string received (buf);  
 
-		  if (received.empty ())
-		  {
-		      Log::GetInstance ().warn ("Received empty command ! Maybe a server crash ?");
-		      outdate[client] = hms->tm_min;
-		  } 
-		  else
-		  {
-		      Log::GetInstance ().info ("Received command : " + received);
-		      
-		      time(&now);
-		      hms = localtime(&now);
-	        
-		      if (useCOM)
-		      {
-			  for (char* bufptr=buf ; *bufptr ; bufptr++)
-			  {
-			      fSuccess = TransmitCommChar (hCom, *bufptr);
-			  }
-		      }
-			  
-		      outdate[client] = hms->tm_min;
-		      
-		      if (useCOM)
-		      {
-			  // Read is updated with the number of bytes read
-			  fSuccess = ReadFile (hCom, buf, STATUS_MESSAGE_SIZE, &readComm, NULL); 
-			  if (!fSuccess)
-			  {
-			      Log::GetInstance ().error ("Error while reading status ! Returned status message will be empty or incomplete."); 
-			  }
-		      }
+				boost::asio::io_service io_service;
 
-		      // Create status message to be sent back to server. 
-		      // It will be sent the next time that the client will ask for update.
-		      std::stringstream status;
-		      for (int i=0; i<STATUS_MESSAGE_SIZE; ++i)
-		      {
-			  status << std::hex << std::setw (2) << std::setfill ('0') << ((int) buf[i]);
-		      }
-		      
-		      {
-			  Log::GetInstance ().info ("Connecting " + std::string (server) 
-						    + std::string (":") + Conversion::ToString (port));
-			  TcpClientSocket clientSock (server, port, timeout);
-			  
-			  while (clientSock.isConnected () == false)
-			  {
-			      clientSock.tryToConnect ();
-			      Thread::Sleep (500);
-			  }
-			  
-			  // The client is connected.
-			  Log::GetInstance ().info ("Connected.");
-			  
-			  // Create commodity stream:
-			  boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-			  cliSocketStream.open (clientSock);
-			  
-			  cliSocketStream << "fonction=tds&tb=" << codes[client] 
-					  << "&status=" << status.str () << "&ipaddr=0.0.0.0" << std::endl;
-			  
-			  cliSocketStream.flush ();
-			  memset (buf, 0, sizeof (buf));
-			  cliSocketStream.getline (buf, sizeof (buf), (char) 0);
-			  cliSocketStream.close ();
-			  Log::GetInstance ().info ("Status : " + status.str ());
-		      }
-		      
-		  }
-              } 
-              catch (std::exception e) 
-              {
-		  Log::GetInstance ().error ("Error while updating client " + Conversion::ToString (client) + e.what ());
-              }
-              catch (...) 
-              {
-		  Log::GetInstance ().error ("Unexpected error !");
-              }
-	      
+				// Get a list of endpoints corresponding to the server name.
+				tcp::resolver resolver(io_service);
+				tcp::resolver::query query(server, port);
+				tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+				tcp::resolver::iterator end;
+
+				// Try each endpoint until we successfully establish a connection.
+				tcp::socket socket(io_service);
+				boost::system::error_code error = boost::asio::error::host_not_found;
+				while (error && endpoint_iterator != end)
+				{
+					socket.close();
+					socket.connect(*endpoint_iterator++, error);
+				}
+				if (error)
+					throw boost::system::system_error(error);
+
+				// Form the request. We specify the "Connection: close" header so that the
+				// server will close the socket after transmitting the response. This will
+				// allow us to treat all data up until the EOF as the content.
+				boost::asio::streambuf request;
+				std::ostream request_stream(&request);
+				request_stream << "GET " << "/synthese3/admin?fonction=tdg&date=A&tb=" << codes[client] 
+				<< " HTTP/1.0\r\n";
+				request_stream << "Host: " << server << "\r\n";
+				request_stream << "Accept: */*\r\n";
+				request_stream << "Connection: close\r\n\r\n";
+
+				// Send the request.
+				boost::asio::write(socket, request);
+
+				// Read the response status line.
+				boost::asio::streambuf response;
+				boost::asio::read_until(socket, response, "\r\n");
+
+				// Check that response is OK.
+				std::istream response_stream(&response);
+				std::string http_version;
+				response_stream >> http_version;
+				unsigned int status_code;
+				response_stream >> status_code;
+				std::string status_message;
+				std::getline(response_stream, status_message);
+				if (!response_stream || http_version.substr(0, 5) != "HTTP/")
+				{
+					std::cout << "Invalid response\n";
+					continue;
+				}
+				if (status_code != 200)
+				{
+					std::cout << "Response returned with status code " << status_code << "\n";
+					continue;
+				}
+
+				// Read the response headers, which are terminated by a blank line.
+				boost::asio::read_until(socket, response, "\r\n\r\n");
+
+				// Process the response headers.
+				vector<string> headers;
+				string header;
+				while (std::getline(response_stream, header) && header != "\r")
+					headers.push_back(header);
+
+				// Write whatever content we already have to output.
+				if (response.size() > 0)
+					received << &response;
+
+				// Read until EOF, writing data to output as we go.
+				while (boost::asio::read(socket, response,
+					boost::asio::transfer_at_least(1), error))
+					received << &response;
+				if (error != boost::asio::error::eof)
+					throw boost::system::system_error(error);
+			}
+			catch (std::exception& e)
+			{
+				std::cout << "Exception: " << e.what() << "\n";
+				continue;
+			}
+
+
+			if (received.str().empty ())
+			{
+				Log::GetInstance ().warn ("Received empty command ! Maybe a server crash ?");
+				outdate[client] = hms->tm_min;
+			} 
+			else
+			{
+				Log::GetInstance ().info ("Received command : " + received.str());
+
+				time(&now);
+				hms = localtime(&now);
+
+				if (useCOM)
+				{
+					BOOST_FOREACH(char bufptr, received.str())
+					{
+						fSuccess = TransmitCommChar (hCom, bufptr);
+					}
+				}
+
+				outdate[client] = hms->tm_min;
+
+				if (useCOM)
+				{
+					// Read is updated with the number of bytes read
+					fSuccess = ReadFile (hCom, buf, STATUS_MESSAGE_SIZE, &readComm, NULL); 
+					if (!fSuccess)
+					{
+						Log::GetInstance ().error ("Error while reading status ! Returned status message will be empty or incomplete."); 
+					}
+
+					// Create status message to be sent back to server. 
+					// It will be sent the next time that the client will ask for update.
+					std::stringstream status;
+					for (int i=0; i<STATUS_MESSAGE_SIZE; ++i)
+					{
+						status << std::hex << std::setw (2) << std::setfill ('0') << ((int) buf[i]);
+					}
+					Log::GetInstance ().info ("Status : " + status.str ());
+
+
+
+					try
+					{
+
+						if(outdate[client] == stamp) continue;
+
+						//if(!SetCommState(hCom, &dcb))
+						//    fichier << "erreur reinit port com" << endl;
+
+						Log::GetInstance ().info ("Connecting " + std::string (server) 
+							+ std::string (":") + Conversion::ToString (port));
+
+						boost::asio::io_service io_service;
+
+						// Get a list of endpoints corresponding to the server name.
+						tcp::resolver resolver(io_service);
+						tcp::resolver::query query(server, "http");
+						tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+						tcp::resolver::iterator end;
+
+						// Try each endpoint until we successfully establish a connection.
+						tcp::socket socket(io_service);
+						boost::system::error_code error = boost::asio::error::host_not_found;
+						while (error && endpoint_iterator != end)
+						{
+							socket.close();
+							socket.connect(*endpoint_iterator++, error);
+						}
+						if (error)
+							throw boost::system::system_error(error);
+
+						// Form the request. We specify the "Connection: close" header so that the
+						// server will close the socket after transmitting the response. This will
+						// allow us to treat all data up until the EOF as the content.
+						boost::asio::streambuf request;
+						std::ostream request_stream(&request);
+						request_stream << "GET " << "/synthese3/admin?fonction=tds&tb=" << codes[client] 
+						<< "&status=" << status.str () << " HTTP/1.0\r\n";
+						request_stream << "Host: " << server << "\r\n";
+						request_stream << "Accept: */*\r\n";
+						request_stream << "Connection: close\r\n\r\n";
+
+						// Send the request.
+						boost::asio::write(socket, request);
+
+						// Read the response status line.
+						boost::asio::streambuf response;
+						boost::asio::read_until(socket, response, "\r\n");
+
+						// Check that response is OK.
+						std::istream response_stream(&response);
+						std::string http_version;
+						response_stream >> http_version;
+						unsigned int status_code;
+						response_stream >> status_code;
+						std::string status_message;
+						std::getline(response_stream, status_message);
+						if (!response_stream || http_version.substr(0, 5) != "HTTP/")
+						{
+							std::cout << "Invalid response\n";
+							continue;
+						}
+						if (status_code != 200)
+						{
+							std::cout << "Response returned with status code " << status_code << "\n";
+							continue;
+						}
+
+						// Read the response headers, which are terminated by a blank line.
+						boost::asio::read_until(socket, response, "\r\n\r\n");
+
+						// Process the response headers.
+						std::string header;
+						while (std::getline(response_stream, header) && header != "\r")
+							received << header << "\n";
+						received << "\n";
+
+						// Write whatever content we already have to output.
+						if (response.size() > 0)
+							received << &response;
+
+						// Read until EOF, writing data to output as we go.
+						while (boost::asio::read(socket, response,
+							boost::asio::transfer_at_least(1), error))
+							received << &response;
+						if (error != boost::asio::error::eof)
+							throw boost::system::system_error(error);
+
+					}
+					catch (std::exception& e)
+					{
+						std::cout << "Exception: " << e.what() << "\n";
+					}
+				} 
+			}
+		}
+		Thread::Sleep(60000);
 	}
-	Thread::Sleep (100);
-    }
-    
-    Thread::Sleep (1000);
 }
 
 

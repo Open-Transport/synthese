@@ -86,7 +86,7 @@ namespace synthese
 			);
 
 			virtual void _parse(
-				const std::string& text,
+				const std::string& path,
 				std::ostream& os,
 				std::string key = std::string()
 			) = 0;

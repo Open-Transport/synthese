@@ -151,10 +151,10 @@ namespace synthese
 				throw RequestException("Bad max solutions number");
 
 			// Accessibility
+			int acint(map.getInt(PARAMETER_ACCESSIBILITY, false, string()));
 			_accessParameters = _site->getAccessParameters(
-				static_cast<UserClassCode>(
-					map.getInt(PARAMETER_ACCESSIBILITY, !_home, string())
-			)	);
+				acint >= 0 ? static_cast<UserClassCode>(acint) : USER_PEDESTRIAN
+			);
 		}
 
 		void RoutePlannerFunction::_run( ostream& stream ) const

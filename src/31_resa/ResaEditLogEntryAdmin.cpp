@@ -97,6 +97,7 @@ namespace synthese
 				ResaDBLog::FACTORY_KEY,
 				UNKNOWN_VALUE,
 				UNKNOWN_VALUE,
+				UNKNOWN_VALUE,
 				DBLogEntry::DB_LOG_UNKNOWN,
 				TIME_UNKNOWN,
 				TIME_UNKNOWN,
@@ -129,6 +130,7 @@ namespace synthese
 
 			vector<pair<ResaDBLog::_EntryType,string> > choices;
 			choices.push_back(make_pair(ResaDBLog::CALL_ENTRY, ResaDBLog::GetIcon(ResaDBLog::CALL_ENTRY) +" "+ ResaDBLog::GetText(ResaDBLog::CALL_ENTRY)));
+			choices.push_back(make_pair(ResaDBLog::OUTGOING_CALL, ResaDBLog::GetIcon(ResaDBLog::OUTGOING_CALL) +" "+ ResaDBLog::GetText(ResaDBLog::OUTGOING_CALL)));
 			choices.push_back(make_pair(ResaDBLog::FAKE_CALL,ResaDBLog::GetIcon(ResaDBLog::FAKE_CALL) +" "+ ResaDBLog::GetText(ResaDBLog::FAKE_CALL)));
 			choices.push_back(make_pair(ResaDBLog::RADIO_CALL,ResaDBLog::GetIcon(ResaDBLog::RADIO_CALL) +" "+ResaDBLog::GetText(ResaDBLog::RADIO_CALL)));
 

@@ -26,7 +26,8 @@
 #include "FileFormatTemplate.h"
 
 #include <iostream>
-
+#include <map>
+#include <string>
 #include <vector>
 
 namespace synthese
@@ -35,8 +36,16 @@ namespace synthese
 	{
 		class Registrable;
 	}
-	
 	namespace road
+	{
+		class Address;
+	}
+	namespace geography
+	{
+		class City;
+	}
+	
+	namespace pt
 	{
 
 		//////////////////////////////////////////////////////////////////////////
@@ -49,9 +58,29 @@ namespace synthese
 		public:
 			static const std::string FILE_NODES;
 			static const std::string FILE_STREETS;
+			static const std::string FILE_MTDAREA;
 		    
 		private:
-		
+			static const std::string _FIELD_ID;
+			static const std::string _FIELD_X;
+			static const std::string _FIELD_Y;
+			static const std::string _FIELD_LINK_ID;
+			static const std::string _FIELD_ST_NAME;
+			static const std::string _FIELD_L_AREA_ID;
+			static const std::string _FIELD_R_AREA_ID;
+			static const std::string _FIELD_REF_IN_ID;
+			static const std::string _FIELD_NREF_IN_ID;
+			static const std::string _FIELD_AREA_ID;
+			static const std::string _FIELD_AREACODE_3;
+			static const std::string _FIELD_GOVT_CODE;
+			static const std::string _FIELD_ADMIN_LVL;
+
+			typedef std::map<std::string, road::Address*> _AddressesMap;
+			typedef std::map<std::string, geography::City*> _CitiesMap;
+
+			_AddressesMap _navteqAddressses;
+			_CitiesMap _citiesMap;
+
 		protected:
 
 			virtual bool _controlPathsMap(
@@ -59,7 +88,7 @@ namespace synthese
 			);
 			
 			virtual void _parse(
-				const std::string& text,
+				const std::string& path,
 				std::ostream& os,
 				std::string key
 			);

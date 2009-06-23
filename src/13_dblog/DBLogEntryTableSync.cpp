@@ -62,12 +62,13 @@ namespace synthese
 		const std::string DBLogEntryTableSync::COL_LEVEL = "level";
 		const std::string DBLogEntryTableSync::COL_CONTENT = "content";
 		const std::string DBLogEntryTableSync::COL_OBJECT_ID = "object_id";
+		const std::string DBLogEntryTableSync::COL_OBJECT2_ID = "object2_id";
 	}
 
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE(
-			"t045_log_entries"
+			"t045_log_entries", true
 		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DBLogEntryTableSync>::_FIELDS[] =
@@ -79,6 +80,7 @@ namespace synthese
 			SQLiteTableSync::Field(DBLogEntryTableSync::COL_LEVEL, SQL_INTEGER),
 			SQLiteTableSync::Field(DBLogEntryTableSync::COL_CONTENT, SQL_TEXT),
 			SQLiteTableSync::Field(DBLogEntryTableSync::COL_OBJECT_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DBLogEntryTableSync::COL_OBJECT2_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 
 		};
@@ -88,6 +90,17 @@ namespace synthese
 			SQLiteTableSync::Index(
 				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
 				DBLogEntryTableSync::COL_OBJECT_ID.c_str(),
+				DBLogEntryTableSync::COL_DATE.c_str(),
+				""
+			),
+			SQLiteTableSync::Index(
+				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
+				DBLogEntryTableSync::COL_OBJECT2_ID.c_str(),
+				DBLogEntryTableSync::COL_DATE.c_str(),
+				""
+			),
+			SQLiteTableSync::Index(
+				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
 				DBLogEntryTableSync::COL_DATE.c_str(),
 				""
 			),
@@ -103,7 +116,8 @@ namespace synthese
 			object->setLogKey(rows->getText ( DBLogEntryTableSync::COL_LOG_KEY));
 			object->setDate(DateTime::FromSQLTimestamp(rows->getText ( DBLogEntryTableSync::COL_DATE)));
 			object->setLevel((DBLogEntry::Level) rows->getInt ( DBLogEntryTableSync::COL_LEVEL));
-			object->setObjectId(rows->getLongLong ( DBLogEntryTableSync::COL_OBJECT_ID));
+			object->setObjectId(rows->getLongLong(DBLogEntryTableSync::COL_OBJECT_ID));
+			object->setObjectId2(rows->getLongLong(DBLogEntryTableSync::COL_OBJECT2_ID));
 
 			// Content column : parse all contents separated by | 
 			DBLogEntry::Content v;
@@ -153,7 +167,8 @@ namespace synthese
 
 			query
 				<< "'"
-				<< "," << Conversion::ToString(object->getObjectId())
+				<< "," << object->getObjectId()
+				<< "," << object->getObjectId2()
 				<< ")";
 
 			sqlite->execUpdate(query.str());
@@ -176,6 +191,7 @@ namespace synthese
 			, uid userId
 			, DBLogEntry::Level level
 			, uid objectId
+			, uid objectId2
 			, const std::string& text
 			, int first
 			, int number
@@ -190,7 +206,7 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE "
-					<< COL_LOG_KEY << " LIKE " << Conversion::ToSQLiteString(logKey);
+					<< COL_LOG_KEY << "=" << Conversion::ToSQLiteString(logKey);
 			if (!startDate.isUnknown())
 				query << " AND " << COL_DATE << ">=" << startDate.toSQLString();
 			if (!endDate.isUnknown())
@@ -203,6 +219,8 @@ namespace synthese
 				query << " AND " << COL_CONTENT << " LIKE '%" << Conversion::ToSQLiteString(text, false) << "%'";
 			if (objectId != UNKNOWN_VALUE)
 				query << " AND " << COL_OBJECT_ID << "=" << Conversion::ToString(objectId);
+			if (objectId2 != UNKNOWN_VALUE)
+				query << " AND " << COL_OBJECT2_ID << "=" << Conversion::ToString(objectId2);
 			if (orderByDate)
 				query << " ORDER BY " << COL_DATE << (raisingOrder ? " ASC" : " DESC");
 			if (orderByUser)

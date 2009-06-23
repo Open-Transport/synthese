@@ -25,6 +25,7 @@
 
 #include "PublicPlaceTableSync.h"
 #include "PublicPlace.h"
+#include "City.h"
 #include "CityTableSync.h"
 
 #include "DBModule.h"
@@ -111,13 +112,14 @@ namespace synthese
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
-				object->setKey(getId());	/// @todo Use grid ID
+				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				object->getKey() << "," <<
+				Conversion::ToSQLiteString(object->getName()) << "," <<
+				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) <<
+			")";
 			sqlite->execUpdate(query.str());
 		}
 

@@ -16,7 +16,8 @@ synthese::env::LineTableSync::integrate();
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::ConnectionPlaceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::env::ConnectionPlaceTableSync>::integrate();
 
-synthese::env::PhysicalStopTableSync::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::PhysicalStopTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::env::PhysicalStopTableSync>::integrate();
 
 synthese::env::LineStopTableSync::integrate();
 

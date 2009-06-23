@@ -192,7 +192,7 @@ namespace synthese
 				*/
 				iterator end();
 
-				boost::shared_ptr<T> front() { return _orderedVector.front(); }
+				boost::shared_ptr<T> front() const { return _orderedVector.front(); }
 			//@}
 
 		    

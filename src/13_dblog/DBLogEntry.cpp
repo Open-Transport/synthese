@@ -116,5 +116,15 @@ namespace synthese
 		{
 
 		}
+
+		void DBLogEntry::setObjectId2( util::RegistryKeyType id )
+		{
+			_objectId2 = id;
+		}
+
+		util::RegistryKeyType DBLogEntry::getObjectId2() const
+		{
+			return _objectId2;
+		}
 	}
 }

@@ -113,14 +113,11 @@ namespace synthese
 				object->setKey(getId());
                
 			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << (
-					object->getCity() ?
-					Conversion::ToString(object->getCity()->getKey()) :
-					"0"
-				)<< ")";
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				object->getKey() << "," <<
+				Conversion::ToSQLiteString(object->getName())	<< "," <<
+				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) <<
+			")";
 			
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
@@ -152,7 +149,9 @@ namespace synthese
 
 		void RoadPlaceTableSync::Search(
 			Env& env,
-			string name,
+			boost::optional<util::RegistryKeyType> cityId,
+			boost::optional<std::string> exactName,
+			boost::optional<std::string> likeName,
 			int first, /*= 0*/
 			int number, /*= 0*/
 			bool orderByName,
@@ -164,9 +163,12 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			// @todo Fill Where criteria
-			if (!name.empty())
-			 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			if (exactName)
+			 	query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(*exactName);
+			if (likeName)
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*exactName);
+			if (cityId)
+				query << " AND " << COL_CITYID << "=" <<*cityId;
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
@@ -175,6 +177,19 @@ namespace synthese
 				query << " OFFSET " << Conversion::ToString(first);
 
 			LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+		boost::shared_ptr<RoadPlace> RoadPlaceTableSync::GetEditableFromCityAndName(
+			util::RegistryKeyType cityId,
+			const std::string& name,
+			util::Env& environment,
+			util::LinkLevel linkLevel
+		){
+			Env tenv;
+			Search(tenv, cityId, name, 0, 1, false, false, FIELDS_ONLY_LOAD_LEVEL);
+			if(tenv.getRegistry<RoadPlace>().empty()) return shared_ptr<RoadPlace>();
+			shared_ptr<RoadPlace> result(tenv.getRegistry<RoadPlace>().front());
+			return GetEditable(result->getKey(), environment, linkLevel);
 		}
 	}
 }

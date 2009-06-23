@@ -122,8 +122,8 @@ namespace synthese
 				tokenizer::iterator valueIter = valueTokens.begin();
 
 				// departureRank:arrivalRank:transferDelay
-				uid startStop(Conversion::ToLongLong(*valueIter));
-				uid endStop(Conversion::ToLongLong(*(++valueIter)));
+				RegistryKeyType startStop(Conversion::ToLongLong(*valueIter));
+				RegistryKeyType endStop(Conversion::ToLongLong(*(++valueIter)));
 				cp->addTransferDelay (startStop, endStop, Conversion::ToInt (*(++valueIter)));
 			}
 

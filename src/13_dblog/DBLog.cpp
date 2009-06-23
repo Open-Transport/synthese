@@ -41,7 +41,8 @@ namespace synthese
 			, DBLogEntry::Level level
 			, const DBLogEntry::Content& content
 			, const security::User* user /*= NULL*/ 
-			, util::RegistryKeyType objectId
+			, util::RegistryKeyType objectId,
+			util::RegistryKeyType objectId2
 		){
 			DBLogEntry e;
 			e.setLevel(level);
@@ -49,6 +50,7 @@ namespace synthese
 			e.setLogKey(logKey);
 			e.setContent(content);
 			e.setObjectId(objectId);
+			e.setObjectId2(objectId2);
 			DBLogEntryTableSync::Save(&e);
 
 			return e.getKey();
@@ -74,6 +76,7 @@ namespace synthese
 				UNKNOWN_VALUE,
 				DBLogEntry::DB_LOG_UNKNOWN,
 				objectId ? *objectId : UNKNOWN_VALUE,
+				UNKNOWN_VALUE,
 				string(),
 				0, 1,
 				true, false, false,false
@@ -99,8 +102,14 @@ namespace synthese
 			return Conversion::ToString(id);
 		}
 
-		uid DBLog::AddSimpleEntry( const std::string& logKey, DBLogEntry::Level level, const std::string& content, const security::User* user, util::RegistryKeyType objectId /*= 0 */ )
-		{
+		uid DBLog::AddSimpleEntry(
+			const std::string& logKey,
+			DBLogEntry::Level level,
+			const std::string& content,
+			const security::User* user,
+			util::RegistryKeyType objectId /*= 0 */,
+			RegistryKeyType objectId2
+		){
 			shared_ptr<DBLog> dbLog(Factory<DBLog>::create(logKey));
 			int cols(dbLog->getColumnNames().size());
 			DBLogEntry::Content c;
@@ -109,7 +118,17 @@ namespace synthese
 			{
 				c.push_back(string());
 			}
-			return _addEntry(logKey, level, c, user, objectId);
+			return _addEntry(logKey, level, c, user, objectId, objectId2);
+		}
+
+		std::string DBLog::getObjectColumnName() const
+		{
+			return string("Objet");
+		}
+
+		std::string DBLog::getObject2ColumnName() const
+		{
+			return string();
 		}
 	}
 }

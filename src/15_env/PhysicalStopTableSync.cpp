@@ -40,6 +40,7 @@ namespace synthese
     using namespace util;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,PhysicalStopTableSync>::FACTORY_KEY("15.55.01 Physical stops");
+	template<> const string FetcherTemplate<graph::Vertex, PhysicalStopTableSync>::FACTORY_KEY("12");
 
 	namespace env
 	{
@@ -53,8 +54,8 @@ namespace synthese
     namespace db
     {
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE(
-				"t012_physical_stops"
-				);
+			"t012_physical_stops"
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<PhysicalStopTableSync>::_FIELDS[]=
 		{
@@ -83,7 +84,7 @@ namespace synthese
 		){
 			object->setName(rows->getText ( PhysicalStopTableSync::COL_NAME));
 			object->setXY (rows->getDouble ( PhysicalStopTableSync::COL_X), rows->getDouble ( PhysicalStopTableSync::COL_Y));
-			object->setOperatorCode(rows->getText ( PhysicalStopTableSync::COL_OPERATOR_CODE));
+			object->setCodeBySource(rows->getText ( PhysicalStopTableSync::COL_OPERATOR_CODE));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{

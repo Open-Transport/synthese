@@ -62,11 +62,10 @@ namespace synthese
 
 	namespace resa
 	{
-		const int ResaDBLog::COL_CALL(0);
-		const int ResaDBLog::COL_TYPE(1);
-		const int ResaDBLog::COL_DATE2(2);
-		const int ResaDBLog::COL_TEXT(3);
-		const int ResaDBLog::COL_RESA(4);
+		const int ResaDBLog::COL_TYPE(0);
+		const int ResaDBLog::COL_DATE2(1);
+		const int ResaDBLog::COL_TEXT(2);
+		const int ResaDBLog::COL_RESA(3);
 
 
 		std::string ResaDBLog::getObjectName( uid id ) const
@@ -101,7 +100,8 @@ namespace synthese
 		DBLog::ColumnsVector resa::ResaDBLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
-			v.push_back("");
+			v.push_back("Evénement");
+			v.push_back("Evénement");
 			v.push_back("Description");
 			v.push_back("Action");
 			return v;
@@ -114,13 +114,12 @@ namespace synthese
 			uid callId(ResaModule::GetCurrentCallId(session));
 
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(callId));
 			content.push_back(Conversion::ToString(RESERVATION_ENTRY));
 			content.push_back(r1->getDepartureTime().toSQLString(false));
 			content.push_back("Réservation");
 			content.push_back(Conversion::ToString(transaction.getKey()));
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session->getUser().get(), transaction.getCustomerUserId());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session->getUser().get(), transaction.getCustomerUserId(), callId);
 
 			UpdateCallEntryCustomer(callId, transaction.getCustomerUserId());
 		}
@@ -128,7 +127,6 @@ namespace synthese
 		uid ResaDBLog::AddCallEntry(const security::User* user)
 		{
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(UNKNOWN_VALUE));
 			content.push_back(Conversion::ToString(CALL_ENTRY));
 			content.push_back(string());
 			content.push_back("Réception d'appel");
@@ -203,13 +201,12 @@ namespace synthese
 				assert(false);
 			}
 
-			content.push_back(Conversion::ToString(callId));
 			content.push_back(Conversion::ToString(type));
 			content.push_back(r1->getDepartureTime().toSQLString(false));
 			content.push_back(description);
 			content.push_back(Conversion::ToString(transaction.getKey()));
 
-			_addEntry(FACTORY_KEY, level, content, session->getUser().get(), transaction.getCustomerUserId());
+			_addEntry(FACTORY_KEY, level, content, session->getUser().get(), transaction.getCustomerUserId(), callId);
 
 			UpdateCallEntryCustomer(callId, transaction.getCustomerUserId());
 		}
@@ -222,6 +219,21 @@ namespace synthese
 		) const	{
 			DBLog::ColumnsVector result;
 			const DBLogEntry::Content& content(entry.getContent());
+
+			if(content.size() <= COL_RESA || entry.getDate().isUnknown())
+			{
+				ColumnsVector cv;
+				cv.push_back(GetIcon(OTHER));
+				cv.push_back("Données incomplètes");
+				stringstream s;
+				BOOST_FOREACH(const string& col, content)
+				{
+					s << col << " ";
+				}
+				cv.push_back(s.str());
+				cv.push_back(string());
+				return ColumnsVector(cv);
+			}
 
 			// Rights
 			bool writingRight(searchRequest.isAuthorized<ResaRight>(WRITE,UNKNOWN_RIGHT_LEVEL));
@@ -243,17 +255,8 @@ namespace synthese
 			}
 
 			// Column Symbol
-			{
-				stringstream stream;
-				stream << GetIcon(entryType);
-
-				if(entryType == ResaDBLog::RESERVATION_ENTRY)
-				{
-					stream << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), tr->getFullStatusText());
-				}
-
-				result.push_back(stream.str());
-			}
+			result.push_back(GetIcon(entryType));
+			result.push_back(GetText(entryType));
 
 			// Column Description
 			{
@@ -262,35 +265,35 @@ namespace synthese
 				switch (entryType)
 				{
 				case CALL_ENTRY:
+				case OUTGOING_CALL:
+				case RADIO_CALL:
 					{
 						DateTime d(DateTime::FromSQLTimestamp(content[ResaDBLog::COL_DATE2]));
-						stream << "APPEL";
 						if (!d.isUnknown())
-							stream << " jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry.getDate())) << " s)";
+							stream << "Jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry.getDate())) << " s)";
 					}
 					break;
 
 				case ResaDBLog::RESERVATION_ENTRY:
-					ResaModule::DisplayReservations(stream, tr.get());
+					if(tr.get())
+					{
+						ResaModule::DisplayReservations(stream, *tr);
+						stream << "<br />Statut actuel de la réservation : " << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), tr->getFullStatusText()) << " " << tr->getFullStatusText();
+					}
+
 					break;
 
 				case ResaDBLog::CANCELLATION_ENTRY:
-					stream << "ANNULATION de : ";
-					ResaModule::DisplayReservations(stream, tr.get());
-					break;
-
 				case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-					stream << "ANNULATION HORS DELAI de : ";
-					ResaModule::DisplayReservations(stream, tr.get());
-					break;
-
 				case ResaDBLog::NO_SHOW:
-					stream << "ABSENCE sur : ";
-					ResaModule::DisplayReservations(stream, tr.get());
+					if(tr.get())
+					{
+						ResaModule::DisplayReservations(stream, *tr);
+					}
 					break;
 
 				default:
-					stream << GetText(entryType) << "<br />" << content[ResaDBLog::COL_TEXT];
+					stream << content[ResaDBLog::COL_TEXT];
 				}
 
 				result.push_back(stream.str());
@@ -305,6 +308,7 @@ namespace synthese
 				case CALL_ENTRY:
 				case FAKE_CALL:
 				case RADIO_CALL:
+				case OUTGOING_CALL:
 					FunctionRequest<AdminRequest> openCallRequest(&searchRequest);
 					openCallRequest.getFunction()->setPage<ResaEditLogEntryAdmin>();
 					openCallRequest.setObjectId(entry.getKey());
@@ -340,13 +344,12 @@ namespace synthese
 			const security::User& user
 		){
 			DBLogEntry::Content c;
-			c.push_back(lexical_cast<string>(callEntry.getKey()));
 			c.push_back(lexical_cast<string>(type));
 			c.push_back(string());
 			c.push_back(text);
 			c.push_back(string());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, &user, callEntry.getObjectId());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, &user, callEntry.getObjectId(), callEntry.getKey());
 		}
 
 		std::string ResaDBLog::GetIconURL(
@@ -356,6 +359,9 @@ namespace synthese
 			{
 			case CALL_ENTRY:
 				return "phone.png";
+
+			case OUTGOING_CALL:
+				return "phone_sound.png";
 
 			case ResaDBLog::RESERVATION_ENTRY:
 				return "resa_compulsory.png";
@@ -389,6 +395,12 @@ namespace synthese
 
 			case ResaDBLog::EMAIL:
 				return "email.png";
+
+			case ResaDBLog::AUTORESA_ACTIVATION:
+				return "application_form_add.png";
+
+			case ResaDBLog::AUTORESA_DEACTIVATION:
+				return "application_form_delete.png";
 
 			case ResaDBLog::OTHER:
 			default:
@@ -444,10 +456,24 @@ namespace synthese
 			case ResaDBLog::EMAIL:
 				return "E-mail";
 
+			case ResaDBLog::OUTGOING_CALL:
+				return "Appel sortant";
+
+			case ResaDBLog::AUTORESA_ACTIVATION:
+				return "Activation auto réservation";
+
+			case ResaDBLog::AUTORESA_DEACTIVATION:
+				return "Desactivation auto réservation";
+
 			case ResaDBLog::OTHER:
 			default:
 				return "Autre";
 			}
+		}
+
+		std::string ResaDBLog::getObjectColumnName() const
+		{
+			return "Client";
 		}
 	}
 }

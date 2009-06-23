@@ -7,6 +7,9 @@
     gourmelon@enssat.fr
     http://www.enssat.fr
 
+	Updated by Hugues Romain 2009
+	New version integrated to the SYNTHESE project
+
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
 License as published by the Free Software Foundation; either
@@ -29,12 +32,13 @@ MA 02139, USA.
 //#include "stdafx.h"
 // and turn the following lines into comments:
 
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 #include "cdbfile.h" 
+
+using namespace std;
 
 namespace synthese
 {
@@ -110,11 +114,6 @@ CDBFile::CDBFile()	// Classical init procedure
 	FirstField=NULL;
 }
 
-CDBFile::CDBFile(char* Path)  // Creating the object with a path as argument
-// Automatically opens the file
-{
-if (OpenFile(Path)==false) Path[0]=0;
-}
 
 
 bool CDBFile::Clean() 	
@@ -191,7 +190,7 @@ void CDBFile::ClearAllRecords()
 	}
 }	
 
-bool CDBFile::OpenFile(char* Path)
+bool CDBFile::OpenFile(const char* Path)
 {
 
 unsigned char dBaseVersion,NLength,NDecCount;
@@ -439,73 +438,89 @@ void CDBFile::SortOn(unsigned short Criterium1/* , unsigned short Criterium2*/)
 }
 	
 
-void* CDBFile::GetFieldValue(Record* Rec, CField* Field)	
-// Returns a pointer to the value of the field *Field in the record *Rec.
-// Since we do not know the type of the value, we have to return a "void*"
-// pointer, which has to be deleted by the recipient of the pointer.
-// See also : SetFieldValue(), DeleteVoidPointer().
-{
-	char* Data;
-	char* RecContents;
+		void* CDBFile::GetFieldValue(Record* Rec, CField* Field)	
+		// Returns a pointer to the value of the field *Field in the record *Rec.
+		// Since we do not know the type of the value, we have to return a "void*"
+		// pointer, which has to be deleted by the recipient of the pointer.
+		// See also : SetFieldValue(), DeleteVoidPointer().
+		{
+			char* Data;
+			char* RecContents;
 
-	RecContents = &(Rec->Contents[Field->GetOffset()]);
-	// RecContents points at the beginning of the field within the record.
-	Data=new char[Field->GetLength()+1];  // Data is allocated dynamically
-	strncpy(Data, RecContents, Field->GetLength());
-	// Data now contains the string that has to be converted.
+			RecContents = &(Rec->Contents[Field->GetOffset()]);
+			// RecContents points at the beginning of the field within the record.
+			Data=new char[Field->GetLength()+1];  // Data is allocated dynamically
+			strncpy(Data, RecContents, Field->GetLength());
+			// Data now contains the string that has to be converted.
 
-	switch(Field->GetType())
-	{
-		case 'N':  // The field is of numeric type, either :
-				if (Field->GetDecCount()==0)	// an integer (no decimals)
-				{
-					long *Result1;
-					Result1=new long;
-					*Result1=atol(Data);
-					delete []Data;
-					return (void*)Result1;
-				}
-				else							// a double
-				{
-					double *Result1;	
-					Result1=new double;
-					*Result1=atof(Data);
-					delete []Data;
-					return (void*)Result1;
-				}
-		case 'D': // I won't do any specific conversion for dates
-				  // Please feel free to do it if you feel like.
-		case 'C': // Here, we add a Clipper / FoxPro notion: the field decimal
-				  // count is considered as an additional field length number.
-				char* Result2;
-				Result2=strncpy(Data, RecContents,
-							 Field->GetLength()+256*Field->GetDecCount()+1);
-				Result2[Field->GetLength()+256*Field->GetDecCount()]=0;
-			
-				return (void*)Result2;
-		case 'L': // Here I decided that Logical values should be converted to
-			      // booleans. I could have kept it as a single character.
-				char c;
-				bool* Result3;
-				Result3=new bool;
-				sscanf(Data, "%c", c);
-				*Result3= (c=='Y')||(c=='y')||(c=='T')||(c=='t');
-				delete []Data;
-				return (void*)Result3;
-		case 'M':
-		default: 
-				return NULL;
-	}// end switch;
-	
-}	
+ 			switch(Field->GetType())
+			{
+				case 'N':  // The field is of numeric type, either :
+						if (Field->GetDecCount()==0)	// an integer (no decimals)
+						{
+							long *Result1;
+							Result1=new long;
+							*Result1=atol(Data);
+							delete []Data;
+							return (void*)Result1;
+						}
+						else							// a double
+						{
+							double *Result1;	
+							Result1=new double;
+							*Result1=atof(Data);
+							delete []Data;
+							return (void*)Result1;
+						}
+				case 'D': // I won't do any specific conversion for dates
+						  // Please feel free to do it if you feel like.
+				case 'C': // Here, we add a Clipper / FoxPro notion: the field decimal
+						  // count is considered as an additional field length number.
+						char* Result2;
+						Result2=strncpy(Data, RecContents,
+									 Field->GetLength()+256*Field->GetDecCount()+1);
+						Result2[Field->GetLength()+256*Field->GetDecCount()]=0;
+					
+						return (void*)Result2;
+				case 'L': // Here I decided that Logical values should be converted to
+						  // booleans. I could have kept it as a single character.
+						char c;
+						bool* Result3;
+						Result3=new bool;
+						sscanf(Data, "%c", c);
+						*Result3= (c=='Y')||(c=='y')||(c=='T')||(c=='t');
+						delete []Data;
+						return (void*)Result3;
+				case 'M':
+				default: 
+						return NULL;
+			}// end switch;
+
+		}	
 
 
-// Overloaded, public versions of GetFieldValue. :
-void* CDBFile::GetFieldValue(char* Field)
-{return GetFieldValue(CurrentRec,FirstField->GetField(Field));}
 
-void* CDBFile::GetFieldValue(unsigned short FieldNum)
-{return GetFieldValue(CurrentRec,FirstField->GetField(FieldNum));}
+		std::string CDBFile::getText( Record* Rec, CField* Field )
+		{
+			string result(&(Rec->Contents[Field->GetOffset()]), Field->GetLength());
+			return result.erase(result.find_last_not_of(" ")+1);
+		}
+
+
+
+		std::string CDBFile::getText( const std::string& field )
+		{
+			return(getText(CurrentRec,FirstField->GetField(field)));
+		}
+
+
+
+		// Overloaded, public versions of GetFieldValue. :
+		void* CDBFile::GetFieldValue(const string& Field)
+		{return GetFieldValue(CurrentRec,FirstField->GetField(Field));}
+
+		void* CDBFile::GetFieldValue(unsigned short FieldNum)
+		{return GetFieldValue(CurrentRec,FirstField->GetField(FieldNum));}
 
 
 void CDBFile::DeleteVoidPointer(void* Pointer, CField* Field)

@@ -33,6 +33,8 @@
 
 #include "SQLiteRegistryTableSyncTemplate.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace road
@@ -65,14 +67,22 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				std::string name = std::string(),
-				//TODO add other search criterias
+				boost::optional<util::RegistryKeyType> cityId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::string> exactName = boost::optional<std::string>(),
+				boost::optional<std::string> likeName = boost::optional<std::string>(),
 				int first = 0,
 				int number = 0,
 				bool orderByName = true,
-				//TODO add other ordering fields
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
+
+
+			static boost::shared_ptr<RoadPlace> GetEditableFromCityAndName(
+				util::RegistryKeyType cityId,
+				const std::string& name,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}

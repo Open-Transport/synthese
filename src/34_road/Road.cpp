@@ -137,9 +137,10 @@ namespace synthese
 
 
 		void Road::addRoadChunk(
-			RoadChunk* chunk
+			RoadChunk* chunk,
+			bool autoShift
 		){
-			addEdge(static_cast<Edge*>(chunk));
+			addEdge(static_cast<Edge*>(chunk), autoShift);
 
 			if(_reverseRoad)
 			{
@@ -150,7 +151,7 @@ namespace synthese
 						-chunk->getRankInPath(),
 						_reverseRoad
 				)	);
-				_reverseRoad->addEdge(reverseChunk);
+				_reverseRoad->addEdge(reverseChunk, autoShift);
 			}
 		}
 

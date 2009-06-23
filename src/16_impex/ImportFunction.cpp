@@ -102,7 +102,7 @@ namespace synthese
 					FileFormat::FilePathsMap paths;
 					BOOST_FOREACH(const string& key, files)
 					{
-						paths.insert(make_pair(key, map.getString(PARAMETER_PATH, false, FACTORY_KEY)));
+						paths.insert(make_pair(key, map.getString(PARAMETER_PATH + key, false, FACTORY_KEY)));
 					}
 					_fileFormat->parseFiles(paths, output);
 				}

@@ -4,7 +4,8 @@
 // Factories
 
 synthese::road::RoadTableSync::integrate();
-synthese::road::AddressTableSync::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::road::AddressTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::road::AddressTableSync>::integrate();
 synthese::road::RoadChunkTableSync::integrate();
 synthese::road::RoadPlaceTableSync::integrate();
 synthese::road::RoadModule::integrate();

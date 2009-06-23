@@ -27,6 +27,8 @@ MA 02139, USA.
 #ifndef SYNTHESE_util_cdbfile_h__
 #define SYNTHESE_util_cdbfile_h__
 
+#include <string>
+
 namespace synthese
 {
 	namespace util
@@ -86,14 +88,14 @@ namespace synthese
 		CField* GetNext()				{	return Next;	}
 		void SetNext(CField* NextField)	{	Next=NextField;	}
 
-		CField* GetField(char* FieldName, CField* Start=NULL)
+		CField* GetField(const std::string& FieldName, CField* Start=NULL)
 		{	// Pass the name of the field for argument 
 			if (Start==NULL) Start=this;	/* NULL is passed for the initial call of
 											this  recursive function in the program */
 			else 
 				if (Start==this) return NULL;	/* We've checked all the elements of 
 											the dynamic ring: none matches FieldName */
-			if (strcmp(FieldName, Name)!=0) 
+			if (strcmp(FieldName.c_str(), Name)!=0) 
 				return Next->GetField(FieldName, Start); /* Proceed to next element */
 			else
 				return this;	/* FieldName matches Name */
@@ -141,18 +143,18 @@ namespace synthese
 		public:
 
 		CDBFile();
-		CDBFile(char* Path);
 		~CDBFile();
 		bool IsOpen()	{ return FileHandle!=NULL; }
 		bool Clean();
-		bool OpenFile(char* Path);
+		bool OpenFile(const char* Path);
 		bool CloseFile();
 		unsigned long LoadFileToMemory();
 		unsigned long WriteAllToFile(char *Path=NULL);
 		unsigned long WriteModified();
 		void SortOn(unsigned short Criterium1/*, unsigned short Criterium2*/);
-		void* GetFieldValue(char* Field);
+		void* GetFieldValue(const std::string& Field);
 		void* GetFieldValue(unsigned short FieldNum);
+		std::string getText(const std::string& field);
 		void GetAtRecord(unsigned long RecordNum) { CurrentRec=GetRecord(RecordNum); }
 		unsigned long GetRecordNum() {	if (CurrentRec) 
 											return CurrentRec->RecordNumber;
@@ -190,6 +192,7 @@ namespace synthese
 		Record* GetRecord(unsigned long RecordNum);
 		void Append(Record* Rec, Record* Tail=NULL);
 		void* GetFieldValue(Record* Rec, CField* Field);
+		std::string getText(Record* Rec, CField* Field);
 		void SetFieldValue(Record* Rec, CField* Field, void* Value);
 		void DeleteRecord(Record *Rec);
 		void SortAllRecords(Record *Head, Record *Tail,
@@ -200,4 +203,5 @@ namespace synthese
 		};
 	}
 }
+
 #endif // SYNTHESE_util_cdbfile_h__

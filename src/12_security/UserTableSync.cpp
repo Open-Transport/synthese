@@ -72,8 +72,8 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<UserTableSync>::TABLE(
-				"t026_users"
-				);
+			"t026_users", true
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<UserTableSync>::_FIELDS[]=
 		{

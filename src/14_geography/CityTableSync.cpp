@@ -110,5 +110,50 @@ namespace synthese
 		{
 
 		}
+
+		void CityTableSync::Search(
+			util::Env& env,
+			boost::optional<std::string> exactName /*= boost::optional<std::string>()*/,
+			boost::optional<std::string> likeName /*= boost::optional<std::string>()*/,
+			boost::optional<std::string> code /*= boost::optional<std::string>()*/,
+			int first /*= 0*/,
+			int number /*= 0*/,
+			bool orderByName /*= true*/,
+			bool raisingOrder /*= true*/,
+			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+		){
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE.NAME
+				<< " WHERE 1 ";
+			if (exactName)
+				query << " AND " << TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(*exactName);
+			if (likeName)
+				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(*exactName);
+			if (code)
+				query << " AND " << TABLE_COL_CODE << "=" << Conversion::ToSQLiteString(*code);
+			if (orderByName)
+				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			LoadFromQuery(query.str(), env, linkLevel);
+
+		}
+
+		boost::shared_ptr<City> CityTableSync::GetEditableFromCode(
+			const string& code,
+			util::Env& environment,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			Env tenv;
+			Search(tenv, optional<string>(), optional<string>(), code, 0, 1, false, false, FIELDS_ONLY_LOAD_LEVEL);
+			if(tenv.getRegistry<City>().empty()) return shared_ptr<City>();
+			shared_ptr<const City> result(tenv.getRegistry<City>().front());
+			return GetEditable(result->getKey(), environment, linkLevel);
+		}
 	}
 }

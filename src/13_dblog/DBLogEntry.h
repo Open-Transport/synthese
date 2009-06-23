@@ -62,6 +62,7 @@ namespace synthese
 			Content					_content;
 			Level					_level;
 			util::RegistryKeyType	_objectId;
+			util::RegistryKeyType	_objectId2;
 
 		public:
 			DBLogEntry(util::RegistryKeyType key = UNKNOWN_VALUE);
@@ -72,6 +73,7 @@ namespace synthese
 			void					setContent(const Content& content);
 			void					setLevel(Level level);
 			void					setObjectId(util::RegistryKeyType id);
+			void					setObjectId2(util::RegistryKeyType id);
 
 			const std::string&		getLogKey()			const;
 			time::DateTime			getDate()			const;
@@ -80,6 +82,7 @@ namespace synthese
 			std::string				getStringContent()	const;
 			Level					getLevel()			const;
 			util::RegistryKeyType	getObjectId()		const;
+			util::RegistryKeyType	getObjectId2()		const;
 		};
 	}
 }

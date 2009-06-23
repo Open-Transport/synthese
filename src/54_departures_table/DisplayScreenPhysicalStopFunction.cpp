@@ -85,7 +85,7 @@ namespace synthese
 			const ArrivalDepartureTableGenerator::PhysicalStops& stops(place->getPhysicalStops());
 			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, stops)
 			{
-				if(it.second->getOperatorCode() == oc)
+				if(it.second->getCodeBySource() == oc)
 					screen->addPhysicalStop(it.second);
 			}
 			screen->setType(_type.get());

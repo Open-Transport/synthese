@@ -91,14 +91,23 @@ namespace synthese
 
 
 		void AddressablePlace::addTransferDelay(
-			uid departureId,
-			uid arrivalId,
+			AddressablePlace::TransferDelaysMap::key_type::first_type fromVertex,
+			AddressablePlace::TransferDelaysMap::key_type::second_type toVertex,
 			MinutesDuration transferDelay
 		){
 			assert(transferDelay >= 0 && transferDelay <= FORBIDDEN_TRANSFER_DELAY);
 
-			_transferDelays[std::make_pair (departureId, arrivalId)] = transferDelay;
+			_transferDelays[std::make_pair (fromVertex, toVertex)] = transferDelay;
 			_minTransferDelay = UNKNOWN_VALUE;
+		}
+
+
+		void AddressablePlace::addForbiddenTransferDelay(
+			AddressablePlace::TransferDelaysMap::key_type::first_type fromVertex,
+			AddressablePlace::TransferDelaysMap::key_type::second_type toVertex
+		){
+				_transferDelays[std::make_pair (fromVertex, toVertex)] = FORBIDDEN_TRANSFER_DELAY;
+				_minTransferDelay = UNKNOWN_VALUE;
 		}
 
 
@@ -118,7 +127,7 @@ namespace synthese
 			) const {
 				if(!_allowedConnection) return false;
 
-				return getTransferDelay(fromVertex,	toVertex) != FORBIDDEN_TRANSFER_DELAY;
+				return getTransferDelay(fromVertex, toVertex) != FORBIDDEN_TRANSFER_DELAY;
 		}
 
 
@@ -126,7 +135,7 @@ namespace synthese
 		MinutesDuration AddressablePlace::getTransferDelay(
 			const Vertex& fromVertex,
 			const Vertex& toVertex
-			) const {
+		) const {
 				TransferDelaysMap::const_iterator it(
 					_transferDelays.find(make_pair(fromVertex.getKey(), toVertex.getKey()))
 				);

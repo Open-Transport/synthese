@@ -70,7 +70,7 @@ namespace synthese
 			// Call the update schema step on all synchronizers.
 			BOOST_FOREACH(const shared_ptr<SQLiteTableSync> tableSync, tableSyncs)
 			{
-				Log::GetInstance().info("Updating schema for table "+ tableSync->getFactoryKey());
+				Log::GetInstance().info("Updating schema for table "+ tableSync->getFactoryKey() +"...");
 			    try 
 			    {
 					tableSync->updateSchema(emitter);
@@ -84,6 +84,7 @@ namespace synthese
 			_isRegistered = true;
 
 
+			Log::GetInstance().info("Initializing local auto-increments...");
 			BOOST_FOREACH(const shared_ptr<SQLiteTableSync> tableSync, tableSyncs)
 			{
 				tableSync->initAutoIncrement();
@@ -92,7 +93,7 @@ namespace synthese
 			// Call the first sync step on all synchronizers.
 			BOOST_FOREACH(const shared_ptr<SQLiteTableSync> tableSync, tableSyncs)
 			{
-			    Log::GetInstance().info("Loading table " + tableSync->getFactoryKey());
+			    Log::GetInstance().info("Loading table " + tableSync->getFactoryKey() +"...");
 			    try 
 			    {
 					tableSync->firstSync (emitter, this);

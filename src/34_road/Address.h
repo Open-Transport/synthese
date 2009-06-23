@@ -26,6 +26,7 @@
 #include "Vertex.h"
 #include "Registry.h"
 #include "01_util/Constants.h"
+#include "Importable.h"
 
 #include <vector>
 #include <set>
@@ -43,7 +44,8 @@ namespace synthese
 			@ingroup m34
 		*/
 		class Address
-		:	 public graph::Vertex
+		:	public graph::Vertex,
+			public impex::Importable
 		{
 		public:
 

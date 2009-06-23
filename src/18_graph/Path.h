@@ -141,6 +141,7 @@ namespace synthese
 
 				/** Adds edge at the end of the path.
 					@param edge The edge to add
+					@param autoShift Shift the following edges if an edge with the same rank already exists, else throw an Exception
 
 					All the pointer links necessary to the graph exploration are created :
 						- the links between edges (describing the path)
@@ -148,7 +149,10 @@ namespace synthese
 					The order of addEdge calls can be random : the rankinpath attribute of edge
 					is used to insert the new object at the good position.
 				*/
-				void addEdge (Edge* edge);
+				void addEdge(
+					Edge* edge,
+					bool autoShift = false
+				);
 
 
 

@@ -57,6 +57,7 @@ namespace synthese
 		const string DBLogHTMLView::PARAMETER_END_DATE = "dlved";
 		const string DBLogHTMLView::PARAMETER_SEARCH_TEXT = "dlvsx";
 		const string DBLogHTMLView::PARAMETER_OBJECT_ID = "dlvoi";
+		const string DBLogHTMLView::PARAMETER_OBJECT_ID2 = "dlvo2";
 
 		DBLogHTMLView::DBLogHTMLView(
 			const std::string& code
@@ -65,6 +66,7 @@ namespace synthese
 			_searchStartDate(TIME_UNKNOWN),
 			_searchEndDate(TIME_UNKNOWN),
 			_searchObjectId(UNKNOWN_VALUE),
+			_searchObjectId2(UNKNOWN_VALUE),
 			_searchUserId(UNKNOWN_VALUE),
 			_fixedLevel(true),
 			_fixedStartDate(true),
@@ -80,6 +82,7 @@ namespace synthese
 			const server::ParametersMap& map,
 			std::string logKey,
 			util::RegistryKeyType searchObjectId,
+			util::RegistryKeyType searchObjectId2,
 			util::RegistryKeyType searchUserId,
 			DBLogEntry::Level searchLevel,
 			time::DateTime searchStartDate,
@@ -155,6 +158,16 @@ namespace synthese
 			}
 			_searchObjectId = searchObjectId;
 
+			// Object 2
+			if(searchObjectId2 == UNKNOWN_VALUE)
+			{
+				searchObjectId2 = map.getUid(
+					_getParameterName(PARAMETER_OBJECT_ID2), false, FACTORY_KEY
+				);
+				_fixedObjectId2 = false;
+			}
+			_searchObjectId2 = searchObjectId2;
+
 			// table parameters
 			_requestParameters.setFromParametersMap(
 				map.getMap(),
@@ -172,8 +185,9 @@ namespace synthese
 				, _searchEndDate
 				, _searchUserId
 				, _searchLevel
-				, _searchObjectId
-				, _searchText
+				, _searchObjectId,
+				_searchObjectId2,
+				_searchText
 				, _requestParameters.first
 				, _requestParameters.maxSize
 				, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
@@ -268,9 +282,13 @@ namespace synthese
 			{
 				v.push_back(make_pair(_getParameterName(PARAMETER_SEARCH_USER), "Utilisateur"));
 			}
-			if(!_fixedObjectId)
+			if(!_fixedObjectId && !_dbLog->getObjectColumnName().empty())
 			{
-				v.push_back(make_pair(string(), "Objet"));
+				v.push_back(make_pair(string(), _dbLog->getObjectColumnName()));
+			}
+			if(!_fixedObjectId2 && !_dbLog->getObject2ColumnName().empty())
+			{
+				v.push_back(make_pair(string(), _dbLog->getObject2ColumnName()));
 			}
 			DBLog::ColumnsVector customCols = _dbLog->getColumnNames();
 			BOOST_FOREACH(
@@ -318,12 +336,22 @@ namespace synthese
 						)
 					;
 				}
-				if(!_fixedObjectId)
+				if(!_fixedObjectId && !_dbLog->getObjectColumnName().empty())
 				{
 					stream <<
 						t.col() <<
 						(	(dbe->getObjectId() > 0) ?
 							_dbLog->getObjectName(dbe->getObjectId()) :
+							string()
+						)
+					;
+				}
+				if(!_fixedObjectId2 && !_dbLog->getObject2ColumnName().empty())
+				{
+					stream <<
+						t.col() <<
+						(	(dbe->getObjectId2() > 0) ?
+							_dbLog->getObjectName(dbe->getObjectId2()) :
 							string()
 						)
 					;
@@ -389,6 +417,7 @@ namespace synthese
 			m.insert(_getParameterName(PARAMETER_END_DATE), _searchEndDate);
 			m.insert(_getParameterName(PARAMETER_SEARCH_TEXT), _searchText);
 			m.insert(_getParameterName(PARAMETER_OBJECT_ID), _searchObjectId);
+			m.insert(_getParameterName(PARAMETER_OBJECT_ID2), _searchObjectId2);
 			return m;
 		}
 	}

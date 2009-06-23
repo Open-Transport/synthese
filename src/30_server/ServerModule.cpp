@@ -31,6 +31,8 @@
 //#include "ServerThreadExec.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 #ifdef UNIX
   #define DEFAULT_TEMP_DIR "/tmp"
@@ -79,7 +81,11 @@ namespace synthese
 				std::size_t num_threads = boost::lexical_cast<std::size_t>(GetParameter(MODULE_PARAM_NB_THREADS));
 				
 				HTTPServer s("0.0.0.0", GetParameter (MODULE_PARAM_PORT), num_threads);
-				s.run();
+
+				boost::thread* t(new thread(boost::bind(&HTTPServer::run, &s)));
+
+				t->join();
+//				s.run();
 
 
 
@@ -155,7 +161,7 @@ namespace synthese
 
 		std::string ServerModule::getName() const
 		{
-			return "Serveur TCP";
+			return "Serveur HTTP";
 		}
 
 	}

@@ -50,6 +50,7 @@ namespace synthese
 			static const std::string COL_LEVEL;
 			static const std::string COL_CONTENT;
 			static const std::string COL_OBJECT_ID;
+			static const std::string COL_OBJECT2_ID;
 
 			DBLogEntryTableSync();
 
@@ -61,6 +62,7 @@ namespace synthese
 				@param userId ID of user
 				@param level level of the entry
 				@param id ID of the object
+				@param id2 ID of the second object
 				@param text text in the content (LIKE format)
 				@param first First DBLog object to answer
 				@param number Number of DBLog objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
@@ -74,9 +76,10 @@ namespace synthese
 				, const time::DateTime& startDate
 				, const time::DateTime& endDate
 				, uid userId
-				, DBLogEntry::Level level
-				, uid id
-				, const std::string& text
+				, DBLogEntry::Level level,
+				util::RegistryKeyType id,
+				util::RegistryKeyType id2,
+				const std::string& text
 				, int first = 0
 				, int number = 0
 				, bool orderByDate = true

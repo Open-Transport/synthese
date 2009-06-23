@@ -597,7 +597,7 @@ namespace synthese
 							){
 								stream << t.row();
 								stream << t.col() << it.second->getName();
-								stream << t.col() << it.second->getOperatorCode();
+								stream << t.col() << it.second->getCodeBySource();
 								
 								// Lines column
 								stream << t.col();

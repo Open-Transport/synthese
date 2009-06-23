@@ -9,6 +9,7 @@
 #include "ServiceDateTableSync.h"
 #include "PTUseRuleTableSync.h"
 #include "PTModule.h"
+#include "NavteqWithProjectionFileFormat.h"
 
 // Registries
 

@@ -47,7 +47,6 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace time;
-	using namespace env;
 
 	namespace util
 	{
@@ -71,8 +70,8 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE(
-				"t046_reservation_transactions"
-				);
+			"t046_reservation_transactions", true
+		);
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ReservationTransactionTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),

@@ -29,15 +29,11 @@
 #include <boost/logic/tribool.hpp>
 
 #include "Path.h"
+#include "Importable.h"
 #include "Registry.h"
 
 namespace synthese
 {
-	namespace impex
-	{
-		class DataSource;
-	}
-	
 	namespace graph
 	{
 		class Service;
@@ -78,7 +74,8 @@ namespace synthese
 			If a service is responsible of a break of the preceding rules, then the line is copied as a SubLine, and the service is linked to the new line. The _sublines container keeps a pointer on each SubLine.
 		*/
 		class Line
-		:	public graph::Path
+		:	public graph::Path,
+			public impex::Importable
 		{
 		public:
 
@@ -103,7 +100,6 @@ namespace synthese
 			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
 			boost::logic::tribool		_wayBack;	//!< true if back route, false if forward route, indeterminate if unknown
-			const impex::DataSource*	_dataSource;
 
 		public:
 
@@ -129,7 +125,6 @@ namespace synthese
 				const CommercialLine*		getCommercialLine()			const;
 				const SubLines				getSubLines()				const;
 				boost::logic::tribool		getWayBack()				const;
-				const impex::DataSource*	getDataSource()				const;
 			//@}
 
 
@@ -145,7 +140,6 @@ namespace synthese
 				void setUseInTimetables (bool useInTimetables);
 				void setCommercialLine(CommercialLine* value);
 				void setWayBack(boost::logic::tribool value);
-				void setDataSource(const impex::DataSource* value);
 			//@}
 
 

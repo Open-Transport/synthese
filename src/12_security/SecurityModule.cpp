@@ -147,7 +147,7 @@ namespace synthese
 		{
 			vector<shared_ptr<Profile> > v;
 			Env env;
-			ProfileTableSync::Search(env, profile);
+			ProfileTableSync::Search(env, profile.get() ? profile->getKey() : RegistryKeyType(0), 0, UNKNOWN_VALUE, FIELDS_ONLY_LOAD_LEVEL);
 			BOOST_FOREACH(shared_ptr<Profile> cprofile, env.getRegistry<Profile>())
 			{
 				 v.push_back(cprofile);

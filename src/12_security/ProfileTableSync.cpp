@@ -187,8 +187,8 @@ namespace synthese
 
 		void ProfileTableSync::Search(
 			Env& env,
-			shared_ptr<const Profile> parent
-			, int first /*= 0*/,
+			RegistryKeyType parentId,
+			int first /*= 0*/,
 			int number, /*= -1*/
 			LinkLevel linkLevel
 		){
@@ -197,7 +197,7 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME					
 				<< " WHERE " 
-				<< TABLE_COL_PARENT_ID << "=" << (parent.get() ? Conversion::ToString(parent->getKey()) : "0");
+				<< TABLE_COL_PARENT_ID << "=" << parentId;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

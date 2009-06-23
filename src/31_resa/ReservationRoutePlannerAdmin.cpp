@@ -192,7 +192,7 @@ namespace synthese
 			{
 				stream << "<h1>Réservation confirmée</h1>";
 
-				ResaModule::DisplayReservations(stream, _confirmedTransaction.get());
+				ResaModule::DisplayReservations(stream, *_confirmedTransaction);
 			}
 
 			// Search form
@@ -213,6 +213,9 @@ namespace synthese
 
 			// No calculation without cities
 			if (_startCity.empty() || _endCity.empty())
+				return;
+
+			if(_confirmedTransaction.get())
 				return;
 
 			stream << "<h1>Résultats</h1>";

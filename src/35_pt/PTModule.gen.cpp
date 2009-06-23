@@ -9,6 +9,7 @@ synthese::pt::TridentFileFormat::integrate ();
 synthese::pt::ServiceDateTableSync::integrate();
 synthese::pt::PTUseRuleTableSync::integrate();
 synthese::pt::PTModule::integrate();
+synthese::pt::NavteqWithProjectionFileFormat::integrate();
 
 // Registries
 

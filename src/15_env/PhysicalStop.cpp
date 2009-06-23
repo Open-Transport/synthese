@@ -47,9 +47,9 @@ namespace synthese
 			, double x
 			, double y
 		)	: Registrable(id)
-			, Vertex (place, x, y)
-			, _name (name),
-			_operatorCode()
+			, Vertex (place, x, y),
+			Importable(),
+			_name (name)
 		{
 		}
 
@@ -75,17 +75,6 @@ namespace synthese
 			_name = name;
 		}
 
-
-
-		const std::string& PhysicalStop::getOperatorCode() const
-		{
-			return _operatorCode;
-		}
-
-		void PhysicalStop::setOperatorCode( const std::string& code )
-		{
-			_operatorCode = code;
-		}
 
 
 		const PublicTransportStopZoneConnectionPlace* PhysicalStop::getConnectionPlace() const

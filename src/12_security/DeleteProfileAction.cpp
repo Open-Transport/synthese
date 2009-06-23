@@ -39,6 +39,7 @@ using boost::shared_ptr;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;	
 	
 	template<> const std::string util::FactorableTemplate<Action,security::DeleteProfileAction>::FACTORY_KEY("dpa");
 
@@ -62,12 +63,12 @@ namespace synthese
 			}
 
 			// Search of child profiles
-			ProfileTableSync::Search(_env, _profile, 0, 1);
+			ProfileTableSync::Search(_env, _profile.get() ? _profile->getKey() : 0, 0, 1, FIELDS_ONLY_LOAD_LEVEL);
 			if (!_env.getRegistry<Profile>().empty())
 				throw ActionException("Au moins un profil hérite du profil spécifié. La suppression est impossible.");
 
 			// Search of users
-			UserTableSync::Search(_env, "%","%","%","%", _profile->getKey(), boost::logic::indeterminate, 0, 1);
+			UserTableSync::Search(_env, "%","%","%","%", _profile->getKey(), boost::logic::indeterminate, 0, 1, false, false, false, false, FIELDS_ONLY_LOAD_LEVEL);
 			if (!_env.getRegistry<User>().empty())
 				throw ActionException("Au moins un utilisateur appartient au profil spécifié. La suppression est impossible.");
 		}

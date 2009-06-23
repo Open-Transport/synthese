@@ -151,7 +151,7 @@ ThreadManager::run ()
     }
     else 
     {
-	Log::GetInstance ().info ("Running ThreadManager multithreaded...");
+ 	Log::GetInstance ().info ("Running ThreadManager multithreaded...");
 	while (true)
 	{
 	    Thread::Sleep (500);

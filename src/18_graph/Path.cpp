@@ -30,8 +30,10 @@
 #include "Hub.h"
 
 #include <assert.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -164,8 +166,10 @@ namespace synthese
 
 
 
-		void Path::addEdge (Edge* edge)
-		{
+		void Path::addEdge(
+			Edge* edge,
+			bool autoShift
+		){
 			// Empty path : just put the edge in the vector
 
 			if (_edges.empty())
@@ -177,8 +181,18 @@ namespace synthese
 			// Non empty path : determinate the good position of the edge
 			Edges::iterator insertionPosition;
 			for(insertionPosition = _edges.begin();
-				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() <= edge->getRankInPath();
+				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() < edge->getRankInPath();
 				++insertionPosition);
+
+			// If an edge with the same rank exists, then throw an exception of shift all ranks after it (depends on the parameter)
+			if(insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() == edge->getRankInPath())
+			{
+				if(!autoShift) throw Exception("An edge with the rank "+ lexical_cast<string>(edge->getRankInPath()) + " already exists in the path " + lexical_cast<string>(getKey()));
+				for(Edges::iterator it(insertionPosition+1); it != _edges.end(); ++it)
+				{
+					(*it)->setRankInPath((*it)->getRankInPath() + 1);
+				}
+			}
 
 			// Next arrival and next in path of the previous
 			if(insertionPosition != _edges.begin())

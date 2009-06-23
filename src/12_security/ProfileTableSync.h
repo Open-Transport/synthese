@@ -83,8 +83,8 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				boost::shared_ptr<const Profile> parent
-				, int first = 0,
+				util::RegistryKeyType parentId,
+				int first = 0,
 				int number = -1,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);

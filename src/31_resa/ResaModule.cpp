@@ -76,21 +76,25 @@ namespace synthese
 	{
 		const string ResaModule::_BASIC_PROFILE_NAME("Basic Resa Customer");	// Never change this or the database will be corrupted
 		const string ResaModule::_AUTORESA_PROFILE_NAME("Autoresa Resa Customer");	// Never change this or the database will be corrupted
+		const string ResaModule::_ADMIN_PROFILE_NAME("Resa admin user");	// Never change this or the database will be corrupted
 
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
 		shared_ptr<Profile> ResaModule::_basicProfile;
 		shared_ptr<Profile> ResaModule::_autoresaProfile;
+		shared_ptr<Profile> ResaModule::_adminProfile;
 
 		std::string ResaModule::getName() const
 		{
 			return "TAD Réservation";
 		}
 
-		void ResaModule::DisplayReservations( std::ostream& stream, const ReservationTransaction* tr)
-		{
-			stream << tr->getSeats() << " place" << ((tr->getSeats() > 1) ? "s" : "") << " au nom de " << tr->getCustomerName() << " (" << tr->getCustomerPhone() << ") sur :";
+		void ResaModule::DisplayReservations(
+			std::ostream& stream,
+			const ReservationTransaction& tr
+		){
+			stream << tr.getSeats() << " place" << ((tr.getSeats() > 1) ? "s" : "") << " au nom de " << tr.getCustomerName() << " (" << tr.getCustomerPhone() << ") sur :";
 			stream << "<ul>";
-			ReservationTransaction::Reservations rs(tr->getReservations());
+			ReservationTransaction::Reservations rs(tr.getReservations());
 			for (ReservationTransaction::Reservations::const_iterator itrs(rs.begin()); itrs != rs.end(); ++itrs)
 			{
 				stream << "<li>";
@@ -138,7 +142,7 @@ namespace synthese
 			}
 		}
 
-		uid ResaModule::GetCurrentCallId( const server::Session* session )
+		RegistryKeyType ResaModule::GetCurrentCallId( const server::Session* session )
 		{
 			_SessionsCallIdMap::iterator it(_sessionsCallIds.find(session));
 
@@ -149,38 +153,64 @@ namespace synthese
 
 		void ResaModule::initialize()
 		{
-			Env env;
-			// Basic resa profile
-			ProfileTableSync::Search(env, _BASIC_PROFILE_NAME);
-			if (env.getRegistry<Profile>().empty())
-				_basicProfile.reset(new Profile);
-			else
-				_basicProfile = env.getEditableRegistry<Profile>().front();
-			_basicProfile->setName(_BASIC_PROFILE_NAME);
-			shared_ptr<Right> r(new GlobalRight);
-			r->setPrivateLevel(FORBIDDEN);
-			r->setPublicLevel(FORBIDDEN);
-			_basicProfile->cleanRights();
-			_basicProfile->addRight(r);
-			ProfileTableSync::Save(_basicProfile.get());
+			{
+				Env env;
+				// Basic resa profile
+				ProfileTableSync::Search(env, _BASIC_PROFILE_NAME);
+				if (env.getRegistry<Profile>().empty())
+					_basicProfile.reset(new Profile);
+				else
+					_basicProfile = env.getEditableRegistry<Profile>().front();
+				_basicProfile->setName(_BASIC_PROFILE_NAME);
+				shared_ptr<Right> r(new GlobalRight);
+				r->setPrivateLevel(FORBIDDEN);
+				r->setPublicLevel(FORBIDDEN);
+				_basicProfile->cleanRights();
+				_basicProfile->addRight(r);
+				ProfileTableSync::Save(_basicProfile.get());
+			}
 
 			// Autoresa profile
-			ProfileTableSync::Search(env, _AUTORESA_PROFILE_NAME);
-			if (env.getRegistry<Profile>().empty())
-				_autoresaProfile.reset(new Profile);
-			else
-				_autoresaProfile= env.getEditableRegistry<Profile>().front();
-			_autoresaProfile->setName(_AUTORESA_PROFILE_NAME);
-			shared_ptr<Right> r2(new GlobalRight);
-			r2->setPrivateLevel(FORBIDDEN);
-			r2->setPublicLevel(FORBIDDEN);
-			_autoresaProfile->cleanRights();
-			_autoresaProfile->addRight(r2);
-			shared_ptr<Right> r3(new ResaRight);
-			r3->setPrivateLevel(WRITE);
-			r3->setPublicLevel(FORBIDDEN);
-			_autoresaProfile->addRight(r3);
-			ProfileTableSync::Save(_autoresaProfile.get());
+			{
+				Env env;
+				ProfileTableSync::Search(env, _AUTORESA_PROFILE_NAME);
+				if (env.getRegistry<Profile>().empty())
+					_autoresaProfile.reset(new Profile);
+				else
+					_autoresaProfile= env.getEditableRegistry<Profile>().front();
+				_autoresaProfile->setName(_AUTORESA_PROFILE_NAME);
+				shared_ptr<Right> r2(new GlobalRight);
+				r2->setPrivateLevel(FORBIDDEN);
+				r2->setPublicLevel(FORBIDDEN);
+				_autoresaProfile->cleanRights();
+				_autoresaProfile->addRight(r2);
+				shared_ptr<Right> r3(new ResaRight);
+				r3->setPrivateLevel(WRITE);
+				r3->setPublicLevel(FORBIDDEN);
+				_autoresaProfile->addRight(r3);
+				ProfileTableSync::Save(_autoresaProfile.get());
+			}
+
+			// Admin profile
+			{
+				Env env;
+				ProfileTableSync::Search(env, _ADMIN_PROFILE_NAME);
+				if (env.getRegistry<Profile>().empty())
+					_adminProfile.reset(new Profile);
+				else
+					_adminProfile= env.getEditableRegistry<Profile>().front();
+				_adminProfile->setName(_ADMIN_PROFILE_NAME);
+				shared_ptr<Right> r4(new GlobalRight);
+				r4->setPrivateLevel(FORBIDDEN);
+				r4->setPublicLevel(FORBIDDEN);
+				_adminProfile->cleanRights();
+				_adminProfile->addRight(r4);
+				shared_ptr<Right> r5(new ResaRight);
+				r5->setPrivateLevel(WRITE);
+				r5->setPublicLevel(WRITE);
+				_adminProfile->addRight(r5);
+				ProfileTableSync::Save(_adminProfile.get());
+			}
 
 		}
 
@@ -197,13 +227,13 @@ namespace synthese
 		{
 			switch(status)
 			{
-			case OPTION: return "bullet_yellow.png";
-			case TO_BE_DONE: return "bullet_green.png";
-			case CANCELLED: return "bullet_black.png";
-			case CANCELLED_AFTER_DELAY: "error.png";
+			case OPTION: return "stop_blue.png";
+			case TO_BE_DONE: return "stop_green.png";
+			case CANCELLED: return "cross.png";
+			case CANCELLED_AFTER_DELAY: "asterisk_red.png";
 			case AT_WORK: return "car.png";
-			case NO_SHOW: return "exclamation.png";
-			case DONE: return "bullet_white.png";
+			case NO_SHOW: return "user_cross.png";
+			case DONE: return "tick.png";
 			}
 			return string();
 		}
@@ -226,178 +256,6 @@ namespace synthese
 		}
 
 
-
-		void ResaModule::DisplayResaDBLog(
-			ostream& stream
-			, const Env& logEnv
-			, const std::string& parameterDate
-			, server::FunctionRequest<admin::AdminRequest>& searchRequest
-			, server::ActionFunctionRequest<CancelReservationAction,admin::AdminRequest>& cancelRequest
-			, const html::ResultHTMLTable::RequestParameters& _requestParameters
-			, bool displayCustomer
-		){
-			// Request
-			FunctionRequest<AdminRequest> editRequest(searchRequest);
-			editRequest.getFunction()->setPage<ResaEditLogEntryAdmin>();
-			
-			// Rights
-			bool writingRight(searchRequest.isAuthorized<ResaRight>(WRITE,WRITE));
-
-			// Results
-			ResultHTMLTable::ResultParameters resultParameters;
-			resultParameters.setFromResult(_requestParameters, logEnv.getEditableRegistry<DBLogEntry>());
-
-			// Display
-			DateTime now(TIME_CURRENT);
-			ResultHTMLTable::HeaderVector ht;
-			ht.push_back(make_pair(parameterDate, "Date"));
-			if (displayCustomer)
-				ht.push_back(make_pair(string(), "Client"));
-			ht.push_back(make_pair(string(), "Objet"));
-			ht.push_back(make_pair(string(), "Description"));
-			ht.push_back(make_pair(string(), "Opérateur"));
-			ht.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable rt(ht, searchRequest.getHTMLForm(), _requestParameters, resultParameters);
-			stream << rt.open();
-			Env userEnv;
-
-			BOOST_FOREACH(shared_ptr<DBLogEntry> entry, logEnv.getRegistry<DBLogEntry>())
-			{
-				DBLogEntry::Content content(entry->getContent());
-				ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE])));
-				shared_ptr<ReservationTransaction> tr;
-				ReservationStatus status(NO_RESERVATION);
-// 				const User* entryUser(entry->getUserId());
-				shared_ptr<const User> customer;
-				if (displayCustomer && entry->getObjectId() > 0)
-					try
-					{
-						customer = UserTableSync::Get(entry->getObjectId(), userEnv);
-					}
-					catch(...)
-					{
-
-					}
-
-				if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
-				{
-					tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), userEnv);
-					//ReservationTableSync::search(tr.get());
-					status = tr->getStatus();
-					cancelRequest.getAction()->setTransaction(tr);
-				}
-
-				if (entryType == ResaDBLog::CALL_ENTRY)
-				{
-					DateTime d(DateTime::FromSQLTimestamp(content[ResaDBLog::COL_DATE2]));
-
-					stream << rt.row();
-					stream << rt.col(1,string(),true) << entry->getDate().toString();
-					if (displayCustomer)
-					{
-						stream << rt.col(1, string(), true);
-						if (customer.get())
-							stream << customer->getFullName();
-					}
-					stream << rt.col(1,string(),true) << HTMLModule::getHTMLImage("phone.png","Appel");
-					stream << rt.col(1,string(),true) << "APPEL";
-					if (!d.isUnknown())
-						stream << " jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry->getDate())) << " s)";
-// 					stream << rt.col(1,string(),true) << ((entryUser != NULL) ? entryUser->getFullName() : "(inconnu)");
-					stream << rt.col(1,string(),true);
-// 					if(searchRequest.isAuthorized<ResaRight>(DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
-// 						||	searchRequest.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE) && entryUser == searchRequest.getSession()->getUser().get()
-// 					){
-// 						editRequest.setObjectId(entry->getKey());
-// 						stream << HTMLModule::getLinkButton(editRequest.getURL(), "Modifier", string(), "pencil.png");
-// 					}
-
-				}
-				else
-				{
-					stream << rt.row();
-
-					stream << rt.col() << entry->getDate().toString();
-
-					if (displayCustomer)
-					{
-						stream << rt.col();
-						if (customer.get())
-							stream << customer->getFullName();
-					}
-					stream << rt.col();
-					switch (entryType)
-					{
-					case ResaDBLog::RESERVATION_ENTRY:
-						stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation");
-						stream << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), tr->getFullStatusText());
-						break;
-
-					case ResaDBLog::CANCELLATION_ENTRY:
-						stream << HTMLModule::getHTMLImage("bullet_delete.png", "Annulation de réservation");
-						break;
-
-					case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-						stream << HTMLModule::getHTMLImage("error.png", "Annulation de réservation hors délai");
-						break;
-
-					case ResaDBLog::NO_SHOW:
-						stream << HTMLModule::getHTMLImage("exclamation.png", "Absence");
-						break;
-					}
-
-					stream << rt.col();
-					switch (entryType)
-					{
-					case ResaDBLog::RESERVATION_ENTRY:
-						ResaModule::DisplayReservations(stream, tr.get());
-						break;
-
-					case ResaDBLog::CANCELLATION_ENTRY:
-						stream << "ANNULATION de : ";
-						ResaModule::DisplayReservations(stream, tr.get());
-						break;
-
-					case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-						stream << "ANNULATION HORS DELAI de : ";
-						ResaModule::DisplayReservations(stream, tr.get());
-						break;
-
-					case ResaDBLog::NO_SHOW:
-						stream << "ABSENCE sur : ";
-						ResaModule::DisplayReservations(stream, tr.get());
-						break;
-					}
-
-					stream << rt.col()
-// 						<< ((entryUser != NULL) ? entryUser->getFullName() : "(inconnu)")
-					;
-
-
-					stream << rt.col();
-					if (writingRight)
-					{
-						switch(status)
-						{
-						case OPTION:
-							stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", "bullet_delete.png");
-							break;
-
-						case TO_BE_DONE:
-							stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", "error.png");
-							break;
-
-						case AT_WORK:
-							stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "exclamation.png");
-							break;
-						}
-					}
-				}
-			}
-
-			stream << rt.close();
-
-		}
 
 		boost::shared_ptr<security::Profile> ResaModule::GetAutoResaResaCustomerProfile()
 		{

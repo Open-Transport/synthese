@@ -48,15 +48,15 @@ namespace synthese
 			util::RegistryKeyType id,
 			std::string name
 		):	util::Registrable(id)
-			, Path()
-			, _name (name)
+			, Path(),
+			Importable(),
+			_name (name)
 			, _rollingStock (NULL)
 			, _isWalkingLine (false)
 			, _useInDepartureBoards (true)
 			, _useInTimetables (true)
 			, _useInRoutePlanning (true)
-			, _wayBack(boost::logic::indeterminate),
-			_dataSource(NULL)
+			, _wayBack(boost::logic::indeterminate)
 		{	}
 
 
@@ -67,20 +67,6 @@ namespace synthese
 				delete *it;
 		}
 
-
-
-		const DataSource* Line::getDataSource() const
-		{
-			return _dataSource;
-		}
-		
-		
-		
-		void Line::setDataSource(const DataSource* value)
-		{
-			_dataSource = value;
-		}
-		
 
 
 		const std::string& Line::getName() const

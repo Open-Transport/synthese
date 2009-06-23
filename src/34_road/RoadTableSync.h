@@ -47,13 +47,10 @@ namespace synthese
 			- on update : 
 			- on delete : X
 			*/
-			static const std::string COL_NAME;
 			static const std::string COL_ROADTYPE;
-			static const std::string COL_FAREID;
 			static const std::string COL_BIKECOMPLIANCEID;
 			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
-			static const std::string COL_RESERVATIONRULEID;
 			static const std::string COL_VIAPOINTS;
 			static const std::string COL_ROAD_PLACE_ID;
 			
@@ -70,9 +67,12 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
+				boost::optional<util::RegistryKeyType> roadPlaceId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> startingNodeId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> endingNodeId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				int number = 0,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}

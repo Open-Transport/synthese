@@ -29,8 +29,8 @@
 #include <iostream>
 
 #include "Address.h"
-
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "FetcherTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -44,12 +44,16 @@ namespace synthese
 				- on update : 
 				- on delete : X
 		*/
-		class AddressTableSync : public db::SQLiteRegistryTableSyncTemplate<AddressTableSync,Address>
+		class AddressTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<AddressTableSync,Address>,
+			public db::FetcherTemplate<graph::Vertex, AddressTableSync>
 		{
 		public:
 			static const std::string COL_PLACEID;  // NU
 			static const std::string COL_X;  // U ??
 			static const std::string COL_Y;  // U ??
+			static const std::string COL_CODE_BY_SOURCE;
+			static const std::string COL_SOURCE_ID;
 			
 			AddressTableSync();
 			~AddressTableSync();

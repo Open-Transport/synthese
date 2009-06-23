@@ -59,6 +59,7 @@ namespace synthese
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_SEARCH_TEXT;
 			static const std::string PARAMETER_OBJECT_ID;
+			static const std::string PARAMETER_OBJECT_ID2;
 
 			
 		private:
@@ -77,7 +78,9 @@ namespace synthese
 			std::string						_searchText;
 			bool							_fixedText;
 			util::RegistryKeyType			_searchObjectId;
+			util::RegistryKeyType			_searchObjectId2;
 			bool							_fixedObjectId;
+			bool							_fixedObjectId2;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 			html::ResultHTMLTable::ResultParameters		_resultParameters;
 			
@@ -119,6 +122,7 @@ namespace synthese
 					const server::ParametersMap& map,
 					std::string logKey,
 					util::RegistryKeyType searchObjectId = UNKNOWN_VALUE,
+					util::RegistryKeyType searchObjectId2 = UNKNOWN_VALUE,
 					util::RegistryKeyType searchUserId = UNKNOWN_VALUE,
 					DBLogEntry::Level searchLevel = DBLogEntry::DB_LOG_UNKNOWN,
 					time::DateTime searchStartDate = time::TIME_UNKNOWN,

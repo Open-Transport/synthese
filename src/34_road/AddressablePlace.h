@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Vertex;
+	}
+
 	namespace road
 	{
 		class Address;
@@ -50,7 +55,7 @@ namespace synthese
 			typedef std::vector<const Address*> Addresses;
 
 		private:
-			typedef std::map< std::pair<uid, uid>, time::MinutesDuration> TransferDelaysMap;
+			typedef std::map< std::pair<util::RegistryKeyType, util::RegistryKeyType>, time::MinutesDuration> TransferDelaysMap;
 
 		protected:
 			static const time::MinutesDuration FORBIDDEN_TRANSFER_DELAY;
@@ -100,7 +105,15 @@ namespace synthese
 
 			//! @name Update methods.
 			//@{
-				void addTransferDelay(uid departureId, uid arrivalId, time::MinutesDuration transferDelay);
+				void addTransferDelay(
+					TransferDelaysMap::key_type::first_type departure,
+					TransferDelaysMap::key_type::second_type arrival,
+					time::MinutesDuration transferDelay
+				);
+				void addForbiddenTransferDelay(
+					TransferDelaysMap::key_type::first_type departure,
+					TransferDelaysMap::key_type::second_type arrival
+				);
 				void clearTransferDelays ();
 			//@}
 

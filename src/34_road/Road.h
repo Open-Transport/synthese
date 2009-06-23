@@ -112,7 +112,10 @@ namespace synthese
 
 		//! @name Update methods.
 		//@{
-			void addRoadChunk(RoadChunk* address);
+			void addRoadChunk(
+				RoadChunk* address,
+				bool autoShift = false
+			);
 		//@}
 		};
 	}

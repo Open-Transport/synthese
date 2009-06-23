@@ -85,7 +85,7 @@ namespace synthese
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
-				"Ajout de l'arrêt de départ "+ _stop->getOperatorCode() +"/"+ _stop->getName(),
+				"Ajout de l'arrêt de départ "+ _stop->getCodeBySource() +"/"+ _stop->getName(),
 				*_request->getUser()
 			);
 			

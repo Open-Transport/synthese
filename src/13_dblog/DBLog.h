@@ -91,6 +91,7 @@ namespace synthese
 				, const DBLogEntry::Content& content
 				, const security::User* user
 				, util::RegistryKeyType objectId = 0
+				, util::RegistryKeyType objectId2 = 0
 			);
 
 
@@ -111,6 +112,21 @@ namespace synthese
 			virtual ColumnsVector getColumnNames() const = 0;
 			
 			
+			//////////////////////////////////////////////////////////////////////////
+			/// Object column name getter.
+			/// If empty result, then the column is not displayed.
+			/// Virtual method : the default implementation returns "Objet"
+			virtual std::string getObjectColumnName() const;
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Object column name getter.
+			/// If empty result, then the column is not displayed.
+			/// Virtual method : the default implementation returns empty string
+			virtual std::string getObject2ColumnName() const;
+
+			
+			//////////////////////////////////////////////////////////////////////////
 			/** Authorization tester.
 			 * Each subclass of DBLog must implement an authorization method depending on the request.
 			 * @param request the request which generated the display of the log
@@ -142,7 +158,8 @@ namespace synthese
 				DBLogEntry::Level level,
 				const std::string& content,
 				const security::User* user,
-				util::RegistryKeyType objectId = 0
+				util::RegistryKeyType objectId = 0,
+				util::RegistryKeyType objectId2 = 0
 			);
 
 		};

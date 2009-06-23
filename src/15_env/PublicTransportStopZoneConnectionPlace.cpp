@@ -80,7 +80,7 @@ namespace synthese
 			if (withAll)
 				m.push_back(make_pair(0, "(tous)"));
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
-				m.push_back(make_pair(it->first, it->second->getOperatorCode() + " / " + it->second->getName()));
+				m.push_back(make_pair(it->first, it->second->getCodeBySource() + " / " + it->second->getName()));
 			return m;
 		}
 
@@ -89,7 +89,7 @@ namespace synthese
 			PhysicalStopsLabels m;
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 				if (noDisplay.find(it->first) == noDisplay.end())
-					m.push_back(make_pair(it->first, it->second->getOperatorCode() + " / " + it->second->getName()));
+					m.push_back(make_pair(it->first, it->second->getCodeBySource() + " / " + it->second->getName()));
 			return m;
 		}
 

@@ -85,8 +85,9 @@ namespace synthese
 				CALL_ENTRY = 10
 				, RADIO_CALL = 12
 				, AUTO_CALL_ENTRY = 14
-				, FAKE_CALL = 15
-				, RESERVATION_ENTRY = 20
+				, FAKE_CALL = 15,
+				OUTGOING_CALL = 16,
+				RESERVATION_ENTRY = 20
 				, CANCELLATION_ENTRY = 30
 				, DELAYED_CANCELLATION_ENTRY = 35
 				, CUSTOMER_COMMENT_ENTRY = 40
@@ -94,14 +95,14 @@ namespace synthese
 				, REDIRECTION_ENTRY = 60
 				, TECHNICAL_SUPPORT_ENTRY = 70
 				, NO_SHOW = 75
-				, AUTORESA_ACTIVATION = 80
+				, AUTORESA_ACTIVATION = 80,
+				AUTORESA_DEACTIVATION = 81
 				, PERSONAL_DATA_UPDATE = 85
 				, PASSWORD_UPDATE = 90
 				, EMAIL = 95
 				, OTHER = 100
 			} _EntryType;
 
-			static const int COL_CALL;
 			static const int COL_TYPE;
 			static const int COL_DATE2;
 			static const int COL_TEXT;
@@ -111,6 +112,11 @@ namespace synthese
 			DBLog::ColumnsVector getColumnNames() const;
 			virtual std::string getObjectName(uid id) const;
 			
+			//////////////////////////////////////////////////////////////////////////
+			/// Object 1 column name getter.
+			/// If empty result, then the column is not displayed (default behavior).
+			virtual std::string getObjectColumnName() const;
+
 			virtual bool isAuthorized(
 				const server::Request& request,
 				const security::RightLevel& level

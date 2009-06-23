@@ -29,6 +29,7 @@
 #include <iostream>
 
 #include "SQLiteRegistryTableSyncTemplate.h"
+#include "FetcherTemplate.h"
 
 namespace synthese
 {
@@ -46,7 +47,9 @@ namespace synthese
 
 				@todo Use load / get / replace 
 		*/
-		class PhysicalStopTableSync : public db::SQLiteRegistryTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>
+		class PhysicalStopTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>,
+			public db::FetcherTemplate<graph::Vertex, PhysicalStopTableSync>
 		{
 		public:
 			static const std::string COL_NAME;

@@ -35,7 +35,8 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 #include "LinkException.h"
-
+#include "DataSource.h"
+#include "DataSourceTableSync.h"
 #include "Conversion.h"
 
 using namespace std;
@@ -47,10 +48,13 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace road;
+	using namespace impex;
+	using namespace graph;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,AddressTableSync>::FACTORY_KEY("15.50.02 Addresses");
+		template<> const string FetcherTemplate<Vertex, AddressTableSync>::FACTORY_KEY("2");
 	}
 
 	namespace road
@@ -58,6 +62,8 @@ namespace synthese
 		const std::string AddressTableSync::COL_PLACEID ("place_id");  // NU
 		const std::string AddressTableSync::COL_X ("x");  // U ??
 		const std::string AddressTableSync::COL_Y ("y");  // U ??
+		const std::string AddressTableSync::COL_CODE_BY_SOURCE ("code_by_source");  // U ??
+		const std::string AddressTableSync::COL_SOURCE_ID ("source_id");  // U ??
 	}
 
 	namespace db
@@ -72,6 +78,8 @@ namespace synthese
 			SQLiteTableSync::Field(AddressTableSync::COL_PLACEID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(AddressTableSync::COL_X, SQL_DOUBLE),
 			SQLiteTableSync::Field(AddressTableSync::COL_Y, SQL_DOUBLE),
+			SQLiteTableSync::Field(AddressTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			SQLiteTableSync::Field(AddressTableSync::COL_SOURCE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -88,11 +96,13 @@ namespace synthese
 		){
 			// Properties
 		    object->setXY (rows->getDouble (AddressTableSync::COL_X), rows->getDouble (AddressTableSync::COL_Y));
+			object->setCodeBySource(rows->getText(AddressTableSync::COL_CODE_BY_SOURCE));
 		
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				// Columns reading
-				uid placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
+				RegistryKeyType placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
+				RegistryKeyType sourceId = rows->getLongLong (AddressTableSync::COL_SOURCE_ID);
 				int tableId = decodeTableId(placeId);
 
 				// Links from the object
@@ -125,6 +135,10 @@ namespace synthese
 						crossing->setAddress(object);
 						env.getEditableRegistry<Crossing>().add(crossing);
 						object->setHub(crossing.get());
+					}
+					if(sourceId > 0)
+					{
+						object->setDataSource(DataSourceTableSync::Get(sourceId, env, linkLevel).get());
 					}
 				}
 				catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
@@ -163,13 +177,20 @@ namespace synthese
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
-				object->setKey(getId());	/// @todo Use grid ID
+				object->setKey(getId());
                
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
+			 query <<
+				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				object->getKey() << "," <<
+				(	dynamic_cast<const Registrable*>(object->getHub()) && !dynamic_cast<const Crossing*>(object->getHub()) ?
+					lexical_cast<string>(dynamic_cast<const Registrable*>(object->getHub())->getKey()) :
+					"0"
+				) << "," <<
+				object->getX() << "," <<
+				object->getY() << "," <<
+				Conversion::ToSQLiteString(object->getCodeBySource()) << "," <<
+				(object->getDataSource() ? lexical_cast<string>(object->getDataSource()->getKey()) : "0") <<
+			")";
 			sqlite->execUpdate(query.str());
 		}
 

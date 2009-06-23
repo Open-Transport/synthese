@@ -34,6 +34,7 @@
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminRequest.h"
+#include "GlobalRight.h"
 
 using namespace std;
 
@@ -45,6 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace map;
 	using namespace html;
+	using namespace security;
 
 	namespace util
 	{
@@ -148,7 +150,7 @@ namespace synthese
 
 		bool TestMapAdmin::isAuthorized() const
 		{
-			return true;
+			return _request->isAuthorized<GlobalRight>(READ);;
 		}
 		
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfParent(

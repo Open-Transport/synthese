@@ -27,7 +27,6 @@
 #include <stdarg.h>
 #include <boost/foreach.hpp>
 #include <sstream>
-#include <fstream>
 
 using namespace std;
 
@@ -86,18 +85,7 @@ namespace synthese
 		){
 			BOOST_FOREACH(const std::string& path, paths)
 			{
-				ifstream ifs(path.c_str());
-				if (!ifs)
-				{
-					throw Exception("Could no open the file" + path);
-				}
-			
-				// Read the whole file into a string
-				stringstream ss;
-				ss << ifs.rdbuf();
-				ifs.close();
-				
-				_parse(ss.str(), os);
+				_parse(path, os);
 			}
 		}
 
@@ -119,18 +107,7 @@ namespace synthese
 					continue;
 				const string& path(it->second);
 
-				ifstream ifs(path.c_str());
-				if (!ifs)
-				{
-					throw Exception("Could no open the "+ key +" file" + path);
-				}
-			
-				// Read the whole file into a string
-				stringstream ss;
-				ss << ifs.rdbuf();
-				ifs.close();
-				
-				_parse(ss.str(), os, key);
+				_parse(path, os, key);
 			}
 		}
 	}

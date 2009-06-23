@@ -24,11 +24,18 @@
 #define SYNTHESE_db_Fetcher_h__
 
 #include "Factory.h"
+#include "UtilTypes.h"
+#include "02_db/Types.h"
 
 #include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
 	namespace db
 	{
 		/** Fetcher template class.
