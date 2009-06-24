@@ -40,18 +40,19 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////
 		/// Module class.
 		///
-		///	Each module must implement a ModuleClass subclass and register it by the Generic Factory.
+		///	Each module must implement a ModuleClassTemplate subclass and register it by the Generic Factory.
 		///	Chosen key indicates the order of loading and can be important in several cases.
+		///
 		class ModuleClass
 		:	public util::FactoryBase<ModuleClass>
 		{
 		public:
 			ModuleClass();
 
-			virtual void preInit () {};
-			virtual void initialize () {};
-			virtual std::string getName() const = 0;
-
+			virtual void preInit() const = 0;
+			virtual void init() const = 0;
+			virtual void end() const = 0;
+			virtual std::string& getName() const = 0;
 		};
 
 		//@}
