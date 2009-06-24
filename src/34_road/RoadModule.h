@@ -67,14 +67,7 @@ namespace synthese
 		class RoadModule:
 			public graph::GraphModuleTemplate<RoadModule>
 		{
-
-
 		public:
-		
-			void initialize();
-			
-
-			virtual std::string getName() const;
 			
 		};
 	}

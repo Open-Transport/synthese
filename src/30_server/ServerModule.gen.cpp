@@ -15,3 +15,4 @@ synthese::server::ValidSessionInterfaceElement::integrate();
 synthese::server::ObjectIdInterfaceElement::integrate();
 synthese::server::HtmlFormCalendarFieldInterfaceElement::integrate();
 synthese::server::HtmlFormFieldInterfaceElement::integrate();
+synthese::server::DbModuleConfigTableSync::integrate();

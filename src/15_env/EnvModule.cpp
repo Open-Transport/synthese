@@ -71,22 +71,35 @@ namespace synthese
 	using namespace road;
 	using namespace pt;
 	using namespace geography;
-	
+	using namespace env;
+	using namespace server;
 
 	namespace util
 	{
 		template<>
-		const string FactorableTemplate<ModuleClass,env::EnvModule>::FACTORY_KEY("35_env");
+		const string FactorableTemplate<ModuleClass,EnvModule>::FACTORY_KEY("35_env");
 	}
 
-    namespace env
-    {
-		void EnvModule::initialize()
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<EnvModule>::NAME("Réseaux de transport public");
+		
+		
+		template<> void ModuleClassTemplate<EnvModule>::PreInit()
 		{
 		}
-
+		
+		template<> void ModuleClassTemplate<EnvModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<EnvModule>::End()
+		{
+		}
+	}
 	
-
+    namespace env
+    {
 		std::vector<pair<uid, std::string> > EnvModule::getCommercialLineLabels(
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
@@ -136,12 +149,7 @@ namespace synthese
 				m.push_back(make_pair(Conversion::ToString(line->getKey()), line->getName() ));
 
 		}
-
-		std::string EnvModule::getName() const
-		{
-			return  "Réseaux de transport public";
-		}
-
+		
 		
 		
 		int EnvModule::GetMaxAlarmLevel(
@@ -208,6 +216,5 @@ namespace synthese
 */			}
 			return maxAlarmLevel;
 		}
-
     }
 }

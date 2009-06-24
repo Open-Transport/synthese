@@ -41,8 +41,61 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
+	using namespace server;
+	using namespace security;
 
-	template<> const string util::FactorableTemplate<ModuleClass, security::SecurityModule>::FACTORY_KEY("12_security");
+	template<> const string util::FactorableTemplate<ModuleClass,SecurityModule>::FACTORY_KEY("12_security");
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<SecurityModule>::NAME("Sécurité");
+		
+		template<> void ModuleClassTemplate<SecurityModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<SecurityModule>::Init()
+		{
+			Env env;
+			ProfileTableSync::Search(env, SecurityModule::ROOT_PROFILE);
+			if (env.getRegistry<Profile>().empty())
+				SecurityModule::_rootProfile.reset(new Profile);
+			else
+				SecurityModule::_rootProfile = env.getEditableRegistry<Profile>().front();
+	
+			SecurityModule::_rootProfile->setName(SecurityModule::ROOT_PROFILE);
+			shared_ptr<Right> r(new GlobalRight);
+			r->setPublicLevel(DELETE_RIGHT);
+			r->setPrivateLevel(DELETE_RIGHT);
+			SecurityModule::_rootProfile->cleanRights();
+			SecurityModule::_rootProfile->addRight(r);
+			ProfileTableSync::Save(SecurityModule::_rootProfile.get());
+
+			UserTableSync::Search(
+				env,
+				SecurityModule::ROOT_USER,
+				SecurityModule::ROOT_USER,
+				"%","%",
+				SecurityModule::_rootProfile->getKey()
+			);
+			if (env.getRegistry<User>().empty())
+			{
+				SecurityModule::_rootUser.reset(new User);
+				SecurityModule::_rootUser->setLogin(SecurityModule::ROOT_USER);
+				SecurityModule::_rootUser->setPassword(SecurityModule::ROOT_USER);
+			}
+			else
+				SecurityModule::_rootUser = env.getEditableRegistry<User>().front();
+			SecurityModule::_rootUser->setName(SecurityModule::ROOT_USER);
+			SecurityModule::_rootUser->setProfile(SecurityModule::_rootProfile.get());
+			SecurityModule::_rootUser->setConnectionAllowed(true);
+			UserTableSync::Save(SecurityModule::_rootUser.get());
+		}
+		
+		template<> void ModuleClassTemplate<SecurityModule>::End()
+		{
+		}
+	}
 
 	namespace security
 	{
@@ -54,38 +107,6 @@ namespace synthese
 		shared_ptr<Profile> SecurityModule::_rootProfile;
 
 		shared_ptr<Profile>	_rootProfile;
-
-		void SecurityModule::initialize()
-		{
-			Env env;
-			ProfileTableSync::Search(env, ROOT_PROFILE);
-			if (env.getRegistry<Profile>().empty())
-				_rootProfile.reset(new Profile);
-			else
-				_rootProfile = env.getEditableRegistry<Profile>().front();
-	
-			_rootProfile->setName(ROOT_PROFILE);
-			shared_ptr<Right> r(new GlobalRight);
-			r->setPublicLevel(DELETE_RIGHT);
-			r->setPrivateLevel(DELETE_RIGHT);
-			_rootProfile->cleanRights();
-			_rootProfile->addRight(r);
-			ProfileTableSync::Save(_rootProfile.get());
-
-			UserTableSync::Search(env, ROOT_USER, ROOT_USER, "%","%", _rootProfile->getKey());
-			if (env.getRegistry<User>().empty())
-			{
-				_rootUser.reset(new User);
-				_rootUser->setLogin(ROOT_USER);
-				_rootUser->setPassword(ROOT_USER);
-			}
-			else
-				_rootUser = env.getEditableRegistry<User>().front();
-			_rootUser->setName(ROOT_USER);
-			_rootUser->setProfile(_rootProfile.get());
-			_rootUser->setConnectionAllowed(true);
-			UserTableSync::Save(_rootUser.get());
-		}
 
 
 
@@ -153,11 +174,6 @@ namespace synthese
 				 v.push_back(cprofile);
 			}
 			return v;
-		}
-
-		std::string SecurityModule::getName() const
-		{
-			return "Sécurité";
 		}
 	}
 }

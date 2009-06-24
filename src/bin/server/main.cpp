@@ -27,9 +27,9 @@
 #include "Log.h"
 #include "Factory.h"
 #include "ModuleClass.h"
+#include "DBModule.h"
 #include "01_util/threads/Thread.h"
 #include "01_util/threads/ThreadManager.h"
-#include "DbModuleClass.h"
 #include "ServerModule.h"
 
 #include <csignal>
@@ -201,7 +201,7 @@ int main( int argc, char **argv )
 		}
 #endif        
     
-		DbModuleClass::Parameters defaultParams;
+		ModuleClass::Parameters defaultParams;
 		for (std::vector<std::string>::const_iterator it = params.begin (); 
 			 it != params.end (); ++it)
 		{
@@ -269,8 +269,8 @@ int main( int argc, char **argv )
 		const boost::filesystem::path& workingDir = boost::filesystem::current_path();
 		Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
 
-		DbModuleClass::SetDefaultParameters (defaultParams);
-		DbModuleClass::SetDatabasePath (dbpath);
+		ModuleClass::SetDefaultParameters (defaultParams);
+		DBModule::SetDatabasePath (dbpath);
 	    
 		// Initialize modules
 //		if (Factory<ModuleClass>::size() == 0)
@@ -287,7 +287,7 @@ int main( int argc, char **argv )
 		BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
 		{
 			Log::GetInstance ().info ("Initializing module " + module->getFactoryKey() + "...");
-			module->initialize();
+			module->init();
 		}
 
 
@@ -310,6 +310,12 @@ int main( int argc, char **argv )
 #endif    
 
 		ThreadManager::Instance ()->run ();
+		
+		BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
+		{
+			Log::GetInstance ().info ("Terminating module " + module->getFactoryKey() + "...");
+			module->end();
+		}
     }
     catch (std::exception& e)
     {

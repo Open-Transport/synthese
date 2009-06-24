@@ -1,14 +1,14 @@
 #ifndef SYNTHESE_DBRING_MODULE_H
 #define SYNTHESE_DBRING_MODULE_H
 
-#include "02_db/DbModuleClass.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "ModuleClassTemplate.h"
 
 namespace synthese
 {
 	/** @defgroup m101 101 Database synchronization ring.
 		@ingroup m1
+		
+		When this module will run correctly, integrate it into 10_db
 
 	@{
 	*/
@@ -21,27 +21,22 @@ namespace synthese
 
 	    class Node;
 
-		class DbRingModule : public util::FactorableTemplate<db::DbModuleClass, DbRingModule>
+		class DbRingModule:
+			public server::ModuleClassTemplate<DbRingModule>
 	    {
 	    private:
 		
-		static Node* _Node;
+			static Node* _Node;
 		
 	    public:
 		
-		void preInit ();
-		void initialize();
+			static Node* GetNode ();
 		
-		static Node* GetNode ();
-		
-		/** Called whenever a parameter registered by this module is changed
-		 */
-		static void ParameterCallback (const std::string& name, 
-					       const std::string& value);
-		   
-		virtual std::string getName() const;
-	    };
-	    
+			/** Called whenever a parameter registered by this module is changed
+			*/
+			static void ParameterCallback (const std::string& name, 
+							const std::string& value);
+		};
 	}
 	
 	/** @} */

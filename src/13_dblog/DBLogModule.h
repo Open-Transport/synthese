@@ -27,10 +27,8 @@
 #include <utility>
 #include <sstream>
 
-#include "01_util/ModuleClass.h"
-#include "01_util/FactorableTemplate.h"
-
-#include "13_dblog/DBLogEntry.h"
+#include "ModuleClassTemplate.hpp"
+#include "DBLogEntry.h"
 
 namespace synthese
 {
@@ -77,7 +75,8 @@ namespace synthese
 	{
 		/** Database stored applicative log module class.
 		*/
-		class DBLogModule : public util::FactorableTemplate<util::ModuleClass, DBLogModule>
+		class DBLogModule:
+			public server::ModuleClassTemplate<DBLogModule>
 		{
 		public:
 			static std::vector<std::pair<int, std::string> >	getEntryLevelLabels(bool withAll=false);
@@ -90,10 +89,6 @@ namespace synthese
 				if (oldValue != newValue)
 					s << " - " << label << " : " << oldValue << " => " << newValue;
 			}
-
-			void initialize();
-
-			virtual std::string getName() const;
 		};
 	}
 

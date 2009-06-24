@@ -41,10 +41,29 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
+	using namespace server;
+	using namespace messages;
 	
 	namespace util
 	{
 		template<> const std::string util::FactorableTemplate<ModuleClass, messages::MessagesModule>::FACTORY_KEY("17_messages");
+	}
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<MessagesModule>::NAME("Gestion d'actualités");
+		
+		template<> void ModuleClassTemplate<MessagesModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<MessagesModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<MessagesModule>::End()
+		{
+		}
 	}
 
 	namespace messages
@@ -189,16 +208,6 @@ namespace synthese
 			case ALARM_CONFLICT: return "En conflit";
 			default: return "Inconnu";
 			}
-		}
-
-		void MessagesModule::initialize()
-		{
-
-		}
-
-		std::string MessagesModule::getName() const
-		{
-			return "Gestion d'actualités";
 		}
 	}
 }

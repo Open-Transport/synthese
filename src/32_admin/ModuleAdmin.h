@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace util
+	namespace server
 	{
 		class ModuleClass;
 	}
@@ -41,10 +41,11 @@ namespace synthese
 			@author Hugues Romain
 			@date 2008
 		*/
-		class ModuleAdmin : public admin::AdminInterfaceElementTemplate<ModuleAdmin>
+		class ModuleAdmin:
+			public admin::AdminInterfaceElementTemplate<ModuleAdmin>
 		{
 			std::string								_moduleKey;
-			boost::shared_ptr<util::ModuleClass>	_moduleClass;
+			boost::shared_ptr<server::ModuleClass>	_moduleClass;
 
 		public:
 			static const std::string PARAMETER_MODULE;
@@ -67,8 +68,8 @@ namespace synthese
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
-				*/
+					@date 2007
+			*/
 			virtual server::ParametersMap getParametersMap() const;
 
 

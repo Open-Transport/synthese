@@ -23,20 +23,11 @@
 #ifndef SYNTHESE_GraphModuleTemplate_H__
 #define SYNTHESE_GraphModuleTemplate_H__
 
-#include "ModuleClass.h"
-#include "FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
 #include "GraphTypes.h"
 
 namespace synthese
 {
-	namespace graph
-	{
-	}
-	
-	/**	
-	*/
-
-
 	/** 
 	*/
 	namespace graph
@@ -45,7 +36,7 @@ namespace synthese
 		*/
 		template<class T>
 		class GraphModuleTemplate:
-			public util::FactorableTemplate<util::ModuleClass, T>
+			public server::ModuleClassTemplate<T>
 		{
 		public:
 			static const GraphIdType GRAPH_ID;

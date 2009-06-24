@@ -23,10 +23,9 @@
 #ifndef SYNTHESE_MessagesModule_H__
 #define SYNTHESE_MessagesModule_H__
 
-#include "ModuleClass.h"
 #include "UId.h"
 #include "01_util/Constants.h"
-#include "FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
 #include "Registry.h"
 #include "17_messages/Types.h"
 
@@ -48,11 +47,10 @@ namespace synthese
 	{
 		/** 17 Messages module class.
 		*/
-		class MessagesModule : public util::FactorableTemplate<util::ModuleClass, MessagesModule>
+		class MessagesModule:
+			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
-			void initialize();
-
 			/** Labels list containing each scenario template ordered by folder, indicating the full path in the folder tree.
 				@param withAllLabel if non empty, add an option "all scenarios" (value -1) with the specified label
 				@param folderId id of the main parent folder (optional) :
@@ -96,8 +94,6 @@ namespace synthese
 
 			static std::string							getLevelLabel(const AlarmLevel& level);
 			static std::string							getConflictLabel(const AlarmConflict& conflict);
-
-			virtual std::string getName() const;
 		};
 	}
 	/** @} */

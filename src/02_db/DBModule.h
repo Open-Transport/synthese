@@ -25,10 +25,11 @@
 #ifndef SYNTHESE_DBModule_H__
 #define SYNTHESE_DBModule_H__
 
-#include "DbModuleClass.h"
+#include <boost/filesystem/path.hpp>
+
+#include "ModuleClassTemplate.hpp"
 #include "02_db/Constants.h"
 
-#include "FactorableTemplate.h"
 #include "UId.h"
 
 namespace synthese
@@ -49,25 +50,32 @@ namespace synthese
 
 	    class SQLite;
 	    class SQLiteHandle;
-		class SQLiteTableSync;	    
+		class SQLiteTableSync;
 
 //		static const std::string TRIGGERS_ENABLED_CLAUSE;
 
-		class DBModule : public util::FactorableTemplate<DbModuleClass, DBModule>
+		//////////////////////////////////////////////////////////////
+		/// Database handling module class.
+		///
+		class DBModule:
+			public server::ModuleClassTemplate<DBModule>
 		{
+			friend class server::ModuleClassTemplate<DBModule>;
+			
 		public:
 			typedef std::map<uid, std::string>	SubClassMap;
 
 		private:
-		    
+
 		    static SQLiteHandle*	_sqlite;
 			static SubClassMap		_subClassMap;
 			static std::map<std::string,std::string>	_tableSyncMap;
+		    static boost::filesystem::path _DatabasePath;
 
 		public:
 
-		    void preInit ();
-		    void initialize();
+		    static const boost::filesystem::path& GetDatabasePath ();
+		    static void SetDatabasePath (const boost::filesystem::path& databasePath);
 
 		    static SQLite* GetSQLite ();
 
@@ -80,11 +88,7 @@ namespace synthese
 
 			static void AddSubClass(uid, const std::string&);
 			static std::string GetSubClass(uid id);
-
-			virtual std::string getName() const;
 		};
-		
-
 	}
 
 	/** @} */

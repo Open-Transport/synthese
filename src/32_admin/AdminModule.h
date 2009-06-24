@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_AdminModule_H__
 #define SYNTHESE_AdminModule_H__
 
-#include "01_util/ModuleClass.h"
+#include "ModuleClassTemplate.hpp"
 
 namespace synthese
 {
@@ -61,7 +61,8 @@ namespace synthese
 	{
 		/** 14 Generic administration console module class.
 		*/
-		class AdminModule : public util::ModuleClass
+		class AdminModule:
+			public server::ModuleClassTemplate<AdminModule>
 		{
 		private:
 
@@ -69,10 +70,6 @@ namespace synthese
 			static const std::string TABLE_COL_ID;
 			static const std::string ICON_PATH_INTERFACE_VARIABLE;
 
-			void initialize();
-
-			virtual std::string getName() const;
-			
 			static void ChangePageInRequest(
 				server::Request& request,
 				const std::string& oldPage,

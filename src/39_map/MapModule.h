@@ -23,11 +23,7 @@
 #ifndef SYNTHESE_MapModule_H__
 #define SYNTHESE_MapModule_H__
 
-#include "01_util/FactorableTemplate.h"
-
-#include "01_util/FactorableTemplate.h"
-#include "02_db/DbModuleClass.h"
-
+#include "ModuleClassTemplate.hpp"
 
 namespace synthese
 {
@@ -94,24 +90,19 @@ namespace synthese
 	{
 
 		/** 59 Map module class. */
-		class MapModule : public util::FactorableTemplate<db::DbModuleClass, MapModule>
+		class MapModule:
+			public server::ModuleClassTemplate<MapModule>
 		{
 		public:
 
 		    static const std::string PARAM_HTTP_TEMP_DIR;
 		    static const std::string PARAM_HTTP_TEMP_URL;
 		    static const std::string PARAM_BACKGROUNDS_DIR;
-		    
-
-		    void preInit ();
-		    
-		    
+			
 		    /** Called whenever a parameter registered by this module is changed
 		     */
 		    static void ParameterCallback (const std::string& name, 
 						   const std::string& value);		
-
-			virtual std::string getName() const;
 		};
 	}
 	/** @} */

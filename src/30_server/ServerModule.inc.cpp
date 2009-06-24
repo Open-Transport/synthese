@@ -10,5 +10,5 @@
 #include "30_server/ObjectIdInterfaceElement.h"
 #include "30_server/HtmlFormCalendarFieldInterfaceElement.h"
 #include "30_server/HtmlFormFieldInterfaceElement.h"
-
+#include "30_server/DbModuleConfigTableSync.h"
 #include "30_server/LoginInterfacePage.h"

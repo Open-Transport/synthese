@@ -2,35 +2,39 @@
 #ifndef SYNTHESE_ServerModule_H__
 #define SYNTHESE_ServerModule_H__
 
+#include <boost/asio.hpp>
 #include <boost/filesystem/path.hpp>
 
-#include "02_db/DbModuleClass.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
+#include "HTTPConnection.hpp"
 
 namespace synthese
 {
-	/**	@defgroup m18Actions 18 Actions
-		@ingroup m18
+	/**	@defgroup m15Actions 15 Actions
+		@ingroup m15
 
-		@defgroup m18Functions 18 Functions
-		@ingroup m18
+		@defgroup m18Functions 15 Functions
+		@ingroup m15
 	
-		@defgroup m18 18 Server
+		@defgroup m15 15 Server
 		@ingroup m1
 		@{
 	*/
 
-	/** 08 Server module namespace.
+	/** 15 Server module namespace.
 	*/
 	namespace server
 	{
 		class Session;
+		class HTTPRequest;
+		class HTTPReply;
 
-		/** 08 Server module class.
+		/** 15 Server module class.
 		*/
-		class ServerModule : public util::FactorableTemplate<db::DbModuleClass, ServerModule>
+		class ServerModule:
+			public ModuleClassTemplate<ServerModule>
 		{
+			friend class ModuleClassTemplate<ServerModule>;
 		public:
 
 		    //! DbModule parameters
@@ -44,81 +48,46 @@ namespace synthese
 		private:
 
 			static SessionMap				_sessionMap;
+			
+			/// The io_service used to perform asynchronous operations.
+			static boost::asio::io_service _io_service;
+			
+			/// Acceptor used to listen for incoming connections.
+			static boost::asio::ip::tcp::acceptor _acceptor;
+			
+			/// The next connection to be accepted.
+			static connection_ptr _new_connection;
+
 
 		public:
-
-			void preInit ();
-
-			/** Standard module initializer, launched as the ones from others modules at the server opening.
-			*/
-			void initialize ();
-
 			static SessionMap& getSessions();
-
+			
 			/** Called whenever a parameter registered by this module is changed
 			 */
-			static void ParameterCallback (const std::string& name, 
-						       const std::string& value);
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
+			);
 
-			virtual std::string getName() const;
 
+		public:
+			/// Handle completion of an asynchronous accept operation.
+			static void HandleAccept(
+				const boost::system::error_code& e
+			);
+			
+			/// Handle a request and produce a reply.
+			/// @param req HTTP request to handle
+			/// @param rep HTTP Reply to write the result on
+			static void HandleRequest(
+				const HTTPRequest& req,
+				HTTPReply& rep
+			);
+
+			/// Perform URL-decoding on a string. 
+			/// @return false if the encoding was invalid.
+			static bool URLDecode(const std::string& in, std::string& out);
 		};
-
-		/// @todo Move constants below in corresponding Request class
-
-		//! Function codes TO BE TRANSFORMED AS REQUEST SUBCLASSES
-		static const std::string FUNCTION_HOME ("ac");
-		static const std::string FUNCTION_SCHEDULE_SHEET ("fh");
-		static const std::string FUNCTION_STOP_DESCRIPTION ("fa");
-		static const std::string FUNCTION_STOP_LIST ("lpa");
-		static const std::string FUNCTION_SCHEDULE_SHEET_VALIDATION ("vfh");
-		static const std::string FUNCTION_STATION_DEPARTURE_TABLE ("tdg");
-		static const std::string FUNCTION_DEPARTURE_TABLE ("td");
-		static const std::string FUNCTION_TINY_DEPARTURE_TABLE ("mtd");
-		static const std::string FUNCTION_RESERVATION_FORM ("fres");
-		static const std::string FUNCTION_RESERVATION_VALIDATION ("vres");
-		static const std::string FUNCTION_RESERVATION_CANCELLING ("ares");
-
-		static const std::string PARAMETER_SEARCH ("rec");
-		static const std::string PARAMETER_CITY ("com");
-		static const std::string PARAMETER_CITY_NUMBER ("ncom");
-		static const std::string PARAMETER_DIRECTION ("sens");
-		static const std::string PARAMETER_DATE ("date");
-		static const std::string PARAMETER_PERIOD ("per");
-		static const std::string PARAMETER_TAXIBUS ("tax");
-		static const std::string PARAMETER_BIKE ("vel");
-		static const std::string PARAMETER_HANDICAPPED ("han");
-		static const std::string PARAMETER_PRICE ("tar");
-		static const std::string PARAMETER_DEPARTURE_CITY ("comd");
-		static const std::string PARAMETER_ARRIVAL_CITY ("coma");
-
-		static const std::string PARAMETER_DEPARTURE_STOP ("ad");
-		static const std::string PARAMETER_ARRIVAL_STOP ("aa");
-
-		static const std::string PARAMETER_DEPARTURE_CITY_NUMBER ("ncomd");
-		static const std::string PARAMETER_ARRIVAL_CITY_NUMBER ("ncoma");
-		static const std::string PARAMETER_STOP_NUMBER ("npa");
-		static const std::string PARAMETER_DEPARTURE_STOP_NUMBER ("npad");
-		static const std::string PARAMETER_ARRIVAL_STOP_NUMBER ("npaa");
-
-		static const std::string PARAMETER_DEPARTURE_WORDING_NUMBER ("ndd");
-		static const std::string PARAMETER_ARRIVAL_WORDING_NUMBER ("nda");
-		static const std::string PARAMETER_PROPOSAL_COUNT ("np");
-		static const std::string PARAMETER_LINE_CODE ("lig");
-		static const std::string PARAMETER_SERVICE_NUMBER  ("serv");
-		static const std::string PARAMETER_RESERVATION_CODE ("res");
-		static const std::string PARAMETER_CLIENT_NAME ("Nom");
-		static const std::string PARAMETER_CLIENT_FIRST_NAME ("Prenom");
-		static const std::string PARAMETER_CLIENT_ADDRESS ("Adresse");
-		static const std::string PARAMETER_CLIENT_EMAIL ("Email");
-		static const std::string PARAMETER_CLIENT_PHONE ("Telephone");
-		static const std::string PARAMETER_CLIENT_REGISTRATION_NUMBER ("NumAbonne");
-		static const std::string PARAMETER_DEPARTURE_ADDRESS ("AdresseDepart");
-		static const std::string PARAMETER_ARRIVAL_ADDRESS ("AdresseArrivee");
-
-		static const std::string PARAMETER_RESERVATION_COUNT ("NbPlaces");
-		static const std::string PARAMETER_DEPARTURE_TABLE_CODE ("tb");
-
 	}
 	/** @} */
 }

@@ -24,24 +24,41 @@
 #include "AdminRequest.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace server;
+	using namespace admin;
+	
+	namespace util
+	{
+		template<> const string	FactorableTemplate<ModuleClass,AdminModule>::FACTORY_KEY("14_admin");
+	}
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<AdminModule>::NAME("Console d'administration");
+		
+		template<> void ModuleClassTemplate<AdminModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<AdminModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<AdminModule>::End()
+		{
+		}
+	}
 	
 	namespace admin
 	{
 		const std::string AdminModule::TABLE_COL_ID = "id";
 		const std::string AdminModule::ICON_PATH_INTERFACE_VARIABLE = "icon_path";
 
-		void AdminModule::initialize()
-		{
-		}
-
-		std::string AdminModule::getName() const
-		{
-			return "Console d'administration";
-		}
 
 
 		void AdminModule::ChangePageInRequest(

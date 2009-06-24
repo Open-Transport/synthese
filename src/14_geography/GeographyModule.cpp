@@ -36,10 +36,29 @@ namespace synthese
 {
 	using namespace util;
 	using namespace geography;
+	using namespace server;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<ModuleClass,GeographyModule>::FACTORY_KEY("14_geography");
+	}
+	
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<GeographyModule>::NAME("Géographie");
+	
+		template<> void ModuleClassTemplate<GeographyModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<GeographyModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<GeographyModule>::End()
+		{
+		}
 	}
 
 
@@ -47,18 +66,6 @@ namespace synthese
 	{
 		GeographyModule::CitiesMatcher GeographyModule::_citiesMatcher; 
 		GeographyModule::CitiesMatcher GeographyModule::_citiesT9Matcher;
-
-		std::string GeographyModule::getName() const
-		{
-			return "Géographie";
-		}
-
-
-
-		void GeographyModule::initialize()
-		{
-
-		}
 
 
 

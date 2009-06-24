@@ -26,8 +26,7 @@
 #ifndef SYNTHESE_GeographyModule_H__
 #define SYNTHESE_GeographyModule_H__
 
-#include "FactorableTemplate.h"
-#include "ModuleClass.h"
+#include "ModuleClassTemplate.hpp"
 #include "LexicalMatcher.h"
 #include "City.h"
 
@@ -54,7 +53,7 @@ namespace synthese
 			@date 2008
 		*/
 		class GeographyModule:
-			public util::FactorableTemplate<util::ModuleClass, GeographyModule>
+			public server::ModuleClassTemplate<GeographyModule>
 		{
 		public:
 			typedef lexmatcher::LexicalMatcher<City*> CitiesMatcher;
@@ -66,14 +65,6 @@ namespace synthese
 			static CitiesMatcher _citiesT9Matcher;
 
 		public:
-			/** Initialization of the 09 Geography module after the automatic database loads.
-				@author Hugues Romain
-				@date 2008
-			*/			
-			void initialize();
-			
-			virtual std::string getName() const;
-
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Finds the best place corresponding to a pair of texts : city name and

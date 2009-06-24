@@ -44,26 +44,36 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
+	using namespace interfaces;
+	using namespace server;
 
-	template<> const string util::FactorableTemplate<util::ModuleClass, interfaces::InterfaceModule>::FACTORY_KEY("11_interfaces");
+	template<> const string util::FactorableTemplate<ModuleClass,InterfaceModule>::FACTORY_KEY("11_interfaces");
+
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<InterfaceModule>::NAME("Moteur d'interfaces");
+		
+		template<> void ModuleClassTemplate<InterfaceModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<InterfaceModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<InterfaceModule>::End()
+		{
+		}
+	}
 
 	namespace interfaces
 	{
-		void InterfaceModule::initialize()
-		{
-		}
-
 		std::string InterfaceModule::getVariableFromMap(const VariablesMap& variables, const std::string& varName )
 		{
 			VariablesMap::const_iterator it = variables.find(varName);
 			if (it == variables.end())
 				return "";
 			return it->second;
-		}
-
-		std::string InterfaceModule::getName() const
-		{
-			return "Moteur d'interfaces";
 		}
 	}
 }

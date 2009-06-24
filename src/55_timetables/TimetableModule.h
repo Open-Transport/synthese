@@ -23,8 +23,7 @@
 #ifndef SYNTHESE_timetables_TimetableModule_h__
 #define SYNTHESE_timetables_TimetableModule_h__
 
-#include "01_util/ModuleClass.h"
-#include "01_util/FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
 
 namespace synthese
 {
@@ -71,10 +70,10 @@ namespace synthese
 	{
 		/** TimetableModule class.
 		*/
-		class TimetableModule : public util::FactorableTemplate<util::ModuleClass, TimetableModule>
+		class TimetableModule:
+			public server::ModuleClassTemplate<TimetableModule>
 		{
 		public:
-			std::string getName() const;
 		};
 	}
 }

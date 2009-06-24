@@ -28,21 +28,30 @@ using namespace std;
 namespace synthese
 {
 	using namespace graph;
+	using namespace server;
+	using namespace transportwebsite;
 	
-	template<> const std::string util::FactorableTemplate<util::ModuleClass,transportwebsite::PlacesListModule>::FACTORY_KEY("36_places_list");
+	template<> const std::string util::FactorableTemplate<ModuleClass,PlacesListModule>::FACTORY_KEY("36_places_list");
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<PlacesListModule>::NAME("Site web transport public");
+		
+		template<> void ModuleClassTemplate<PlacesListModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<PlacesListModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<PlacesListModule>::End()
+		{
+		}
+	}
 
 	namespace transportwebsite
 	{
-		void PlacesListModule::initialize()
-		{
-
-		}
-
-		std::string PlacesListModule::getName() const
-		{
-			return "Site web transport public";
-		}
-
 		PlacesListModule::UserClassNames PlacesListModule::GetAccessibilityNames()
 		{
 			UserClassNames result;

@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_ImpExModule_H__
 #define SYNTHESE_ImpExModule_H__
 
-#include "01_util/ModuleClass.h"
+#include "ModuleClassTemplate.hpp"
 
 namespace synthese
 {
@@ -75,20 +75,13 @@ namespace synthese
 			@author Hugues Romain
 			@date 2008
 		*/
-		class ImpExModule : public util::ModuleClass
+		class ImpExModule:
+			public server::ModuleClassTemplate<ImpExModule>
 		{
 		private:
-			// static Object::Registry _registry;	//!< Objects registry
 			
 			
 		public:
-			/** Initialization of the 16 Import export framework module after the automatic database loads.
-				@author Hugues Romain
-				@date 2008
-			*/			
-			void initialize();
-			
-			// static Object::Registry& getObjects();
 		};
 	}
 	/** @} */

@@ -69,7 +69,7 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				std::string ts(boost::lexical_cast<std::string>(decodeTableId(key)));
+				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(key)));
 				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
 				return pf->_getEditable(key, env, linkLevel, autoCreate);
 			}
@@ -80,7 +80,7 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				std::string ts(boost::lexical_cast<std::string>(decodeTableId(key)));
+				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(key)));
 				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
 				return pf->_get(key, env, linkLevel, autoCreate);
 			}

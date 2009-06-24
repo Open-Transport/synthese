@@ -27,8 +27,7 @@
 #include <set>
 #include <utility>
 
-#include "ModuleClass.h"
-#include "FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
 #include "UtilTypes.h"
 #include "Env.h"
 
@@ -53,15 +52,13 @@ namespace synthese
 
 		/** 35 Transport network module class.
 		*/
-		class EnvModule : public util::FactorableTemplate<util::ModuleClass, EnvModule>
+		class EnvModule:
+			public server::ModuleClassTemplate<EnvModule>
 		{
 		private:
 
 
 		public:
-		
-			void initialize();
-
 			static boost::shared_ptr<NonPermanentService> FetchEditableService(
 				const util::RegistryKeyType& id,
 				util::Env& env = util::Env::GetOfficialEnv()
@@ -77,8 +74,6 @@ namespace synthese
 
 			static void getNetworkLinePlaceRightParameterList(security::ParameterLabelsVector& m);
 
-			virtual std::string getName() const;
-			
 			static int GetMaxAlarmLevel(
 				const graph::Journey&
 			);

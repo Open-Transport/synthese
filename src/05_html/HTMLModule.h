@@ -28,9 +28,6 @@
 
 #include <string>
 
-#include "ModuleClass.h"
-#include "FactorableTemplate.h"
-
 namespace synthese
 {
 	/** @defgroup m05 05 HTML Library
@@ -46,7 +43,6 @@ namespace synthese
 		/** HTML module class.
 		*/
 		class HTMLModule
-		:	public util::FactorableTemplate<util::ModuleClass, HTMLModule>
 		{
 		public:
 			/** Link displayed as a button.
@@ -103,8 +99,6 @@ input[type=submit]:hover {background-color:#0080E0;}
 			static std::string GetHTMLJavascriptOpen(std::string url=std::string());
 
 			static std::string GetHTMLJavascriptClose();
-
-			virtual std::string getName() const;
 		};
 
 

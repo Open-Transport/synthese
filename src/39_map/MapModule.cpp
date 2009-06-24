@@ -41,14 +41,14 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace db;
+	using namespace server;
 	using namespace util;
-	
+	using namespace map;
 	
 	namespace util
 	{
 		template<>
-		const string FactorableTemplate<DbModuleClass, map::MapModule>::FACTORY_KEY("59_map");
+		const string FactorableTemplate<ModuleClass, MapModule>::FACTORY_KEY("59_map");
 	}
 
 
@@ -58,21 +58,36 @@ namespace synthese
 	    const std::string MapModule::PARAM_HTTP_TEMP_DIR ("http_temp_dir");
 	    const std::string MapModule::PARAM_HTTP_TEMP_URL ("http_temp_url");
 	    const std::string MapModule::PARAM_BACKGROUNDS_DIR ("backgrounds_dir");
-
-
-	    void MapModule::preInit ()
+	}
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<MapModule>::NAME("Cartographie");
+		
+		
+	    template<> void ModuleClassTemplate<MapModule>::PreInit ()
 	    {
-			RegisterParameter (PARAM_HTTP_TEMP_DIR, DEFAULT_TEMP_DIR, &ParameterCallback);
-			RegisterParameter (PARAM_HTTP_TEMP_URL, "http://localhost/tmp", &ParameterCallback);
-			RegisterParameter (PARAM_BACKGROUNDS_DIR, "backgrounds", &ParameterCallback);
+			RegisterParameter (MapModule::PARAM_HTTP_TEMP_DIR, DEFAULT_TEMP_DIR, &MapModule::ParameterCallback);
+			RegisterParameter (MapModule::PARAM_HTTP_TEMP_URL, "http://localhost/tmp", &MapModule::ParameterCallback);
+			RegisterParameter (MapModule::PARAM_BACKGROUNDS_DIR, "backgrounds", &MapModule::ParameterCallback);
 	    }
-	    
+		
+		template<> void ModuleClassTemplate<MapModule>::Init()
+		{
+		}
+		
+		
+		template<> void ModuleClassTemplate<MapModule>::End()
+		{
+		}
+	}
 
-	    
-	    void 
-	    MapModule::ParameterCallback (const std::string& name, 
-					  const std::string& value)
-	    {
+	namespace map
+	{
+	    void MapModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
 			if (name == PARAM_HTTP_TEMP_DIR) 
 			{
 				boost::filesystem::path path (value, boost::filesystem::native);
@@ -90,14 +105,6 @@ namespace synthese
 				boost::filesystem::path path (value, boost::filesystem::native);
 				MapBackgroundManager::Initialize (path);
 			}
-	    }
-
-		std::string MapModule::getName() const
-		{
-			return "Cartographie";
 		}
-
-
 	}
 }
-

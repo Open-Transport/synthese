@@ -26,7 +26,6 @@
 #define SYNTHESE_SQLiteTableSyncTemplate_H__
 
 #include "DBModule.h"
-#include "DbModuleClass.h"
 #include "SQLite.h"
 #include "SQLiteTableSync.h"
 #include "SQLiteResult.h"
@@ -41,6 +40,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
@@ -50,7 +50,8 @@ namespace synthese
 		/// Table synchronizer template.
 		///	@ingroup m10
 		template <class K>
-		class SQLiteTableSyncTemplate : public util::FactorableTemplate<SQLiteTableSync, K>
+		class SQLiteTableSyncTemplate:
+			public util::FactorableTemplate<SQLiteTableSync, K>
 		{
 		public:
 			////////////////////////////////////////////////////////////////////
@@ -154,11 +155,15 @@ namespace synthese
 				{
 					// TODO : plenty of functions should be at SQLiteTableSync level directly.
 					// default value is 1 for compatibility
-					static int nodeId = util::Conversion::ToInt (DbModuleClass::GetParameter ("dbring_node_id", "1"));
-					return util::encodeUId (K::TABLE.ID, 
+					static int nodeId = boost::lexical_cast<int>(
+						server::ModuleClass::GetParameter("dbring_node_id", "1")
+					);
+					return util::encodeUId(
+						K::TABLE.ID,
 						1, // TODO : remove grid id, deprecated with ring nodes
-						nodeId, 
-						objectId);
+						nodeId,
+						objectId
+					);
 				}
 
 

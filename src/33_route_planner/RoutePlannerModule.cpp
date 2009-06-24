@@ -26,18 +26,33 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace server;
+	using namespace routeplanner;
+	
 	namespace util
 	{
 		template<>
-		const string FactorableTemplate<ModuleClass, routeplanner::RoutePlannerModule>::FACTORY_KEY("53_route_planner");
+		const string FactorableTemplate<ModuleClass,RoutePlannerModule>::FACTORY_KEY("53_route_planner");
+	}
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<RoutePlannerModule>::NAME("Calcul d'itinéraires");
+		
+		template<> void ModuleClassTemplate<RoutePlannerModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<RoutePlannerModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<RoutePlannerModule>::End()
+		{
+		}
 	}
 
 	namespace routeplanner
 	{
-
-		std::string RoutePlannerModule::getName() const
-		{
-			return "Calcul d'itinéraires";
-		}
 	}
 }

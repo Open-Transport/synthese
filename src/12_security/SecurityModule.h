@@ -29,9 +29,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "01_util/ModuleClass.h"
-#include "01_util/UId.h"
-#include "01_util/FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
+#include "UId.h"
 
 namespace synthese
 {
@@ -73,8 +72,11 @@ namespace synthese
 
 		/** 12 Security module class.
 		*/
-		class SecurityModule : public util::FactorableTemplate<util::ModuleClass, SecurityModule>
+		class SecurityModule:
+			public server::ModuleClassTemplate<SecurityModule>
 		{
+			friend class server::ModuleClassTemplate<SecurityModule>;
+			
 		public:
 			static const std::string ROOT_PROFILE;
 			static const std::string ROOT_RIGHTS;
@@ -85,8 +87,6 @@ namespace synthese
 			static boost::shared_ptr<User>		_rootUser;
 
 		public:
-			void initialize();
-
 			static std::vector<std::pair<std::string, std::string> > getRightsTemplates();
 			static std::vector<std::pair<uid, std::string> > getProfileLabels(bool withAll=false, int first=0, int last=-1);
 			static std::vector<std::pair<uid, std::string> > getUserLabels(bool withAll=false, int first=0, int last=-1);
@@ -98,8 +98,6 @@ namespace synthese
 					@date 2007					
 			*/
 			static std::vector<boost::shared_ptr<Profile> > getSubProfiles(boost::shared_ptr<const Profile> profile);
-
-			virtual std::string getName() const;
 		};
 	}
 	/** @} */

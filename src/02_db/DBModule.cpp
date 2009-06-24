@@ -28,7 +28,6 @@
 #include "Conversion.h"
 #include "Log.h"
 #include "Factory.h"
-#include "TcpService.h"
 
 #include <iostream>
 #include <boost/foreach.hpp>
@@ -39,42 +38,75 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
+	using namespace db;
+	using namespace server;
 
-	template<> const string util::FactorableTemplate<db::DbModuleClass, db::DBModule>::FACTORY_KEY("02_db");
+	template<> const string util::FactorableTemplate<ModuleClass,DBModule>::FACTORY_KEY("02_db");
 	
 	namespace db
 	{
+		filesystem::path DBModule::_DatabasePath;
+
 		map<string,string>	DBModule::_tableSyncMap;
 
-	    SQLiteHandle* DBModule::_sqlite = 0;
+		SQLiteHandle* DBModule::_sqlite = 0;
 		DBModule::SubClassMap DBModule::_subClassMap;
+	}
+
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<DBModule>::NAME("Base de données SQLite");
+		
+		
+		
+		template<> void ModuleClassTemplate<DBModule>::PreInit ()
+		{
+		}
 
 
-	    void DBModule::preInit ()
-	    {
-	    }
 
-
-
-	    void DBModule::initialize()
-	    {
-			_sqlite = new SQLiteHandle (GetDatabasePath ());
+		template<> void ModuleClassTemplate<DBModule>::Init()
+		{
+			DBModule::_sqlite = new SQLiteHandle(DBModule::GetDatabasePath ());
 
 			Log::GetInstance ().info ("Using lib SQLite version " + SQLite::GetLibVersion ());
 			
 			bool autorespawn (true);
 
 			SQLiteSync* syncHook = new SQLiteSync ();
-			_sqlite->registerUpdateHook(syncHook);
+			DBModule::_sqlite->registerUpdateHook(syncHook);
 
-			_tableSyncMap.clear();
+			DBModule::_tableSyncMap.clear();
 			vector<shared_ptr<SQLiteTableSync> > tableSyncs(Factory<SQLiteTableSync>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<SQLiteTableSync>& sync, tableSyncs)
 			{
-				_tableSyncMap[sync->getFormat().NAME] = sync->getFactoryKey();
+				DBModule::_tableSyncMap[sync->getFormat().NAME] = sync->getFactoryKey();
 			}
 	    }
-	    
+	
+	
+	
+		template<> void ModuleClassTemplate<DBModule>::End()
+		{
+		}
+	}
+	
+	namespace db
+	{
+	    const boost::filesystem::path& DBModule::GetDatabasePath ()
+	    {
+			return _DatabasePath;
+	    }
+
+		
+		
+	    void DBModule::SetDatabasePath(
+	    	const boost::filesystem::path& databasePath
+	    ){
+			_DatabasePath = databasePath;
+		}
+	
+	
 
 		boost::shared_ptr<SQLiteTableSync> DBModule::GetTableSync(const std::string& tableName)
 		{
@@ -85,12 +117,14 @@ namespace synthese
 			}
 			return shared_ptr<SQLiteTableSync>(Factory<SQLiteTableSync>::create(it->second));
 		}
-	    
+
+
 
 	    SQLite* DBModule::GetSQLite ()
 	    {
 			return _sqlite;
 	    }
+
 
 
 	    void 
@@ -99,10 +133,14 @@ namespace synthese
 	    {
 	    }
 
+
+
 		void DBModule::AddSubClass( uid id, const string& subclass)
 		{
 			_subClassMap[id] = subclass;
 		}
+
+
 
 		string DBModule::GetSubClass(uid id )
 		{
@@ -110,12 +148,5 @@ namespace synthese
 			return (it == _subClassMap.end()) ? string() : it->second;
 		}
 
-		string DBModule::getName() const
-		{
-			return "Base de données SQLite";
-		}
-
 	}
 }
-
-

@@ -27,6 +27,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace pt;
+	using namespace server;
 
 	namespace graph
 	{
@@ -39,18 +40,25 @@ namespace synthese
 		const string FactorableTemplate<ModuleClass,PTModule>::FACTORY_KEY("35_pt");
 	}
 
+
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<PTModule>::NAME("Transport public");
+		
+		template<> void ModuleClassTemplate<PTModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<PTModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<PTModule>::End()
+		{
+		}
+	}
+
 	namespace pt
 	{
-
-
-		void PTModule::initialize()
-		{
-
-		}
-
-		std::string PTModule::getName() const
-		{
-			return "Transport public";
-		}
 	}
 }

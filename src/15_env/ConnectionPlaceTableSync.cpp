@@ -45,7 +45,7 @@ namespace synthese
 	using namespace geography;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,env::ConnectionPlaceTableSync>::FACTORY_KEY("15.40.01 Connection places");
-	template<> const string FetcherTemplate<NamedPlace, ConnectionPlaceTableSync>::FACTORY_KEY("7");
+	template<> const string FactorableTemplate<Fetcher<NamedPlace>, ConnectionPlaceTableSync>::FACTORY_KEY("7");
 
 	namespace env
 	{

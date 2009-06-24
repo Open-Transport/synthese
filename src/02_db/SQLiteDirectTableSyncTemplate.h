@@ -26,9 +26,7 @@
 #define SYNTHESE_SQLiteDirectTableSyncTemplate_H__
 
 
-#include "DBModule.h"
 #include "02_db/Types.h"
-#include "DbModuleClass.h"
 #include "SQLite.h"
 #include "SQLiteTableSyncTemplate.h"
 #include "SQLiteResult.h"

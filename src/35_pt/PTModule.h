@@ -68,15 +68,7 @@ namespace synthese
 		class PTModule:
 			public graph::GraphModuleTemplate<PTModule>
 		{
-
-
 		public:
-		
-			void initialize();
-			
-
-			virtual std::string getName() const;
-			
 		};
 	}
 	/** @} */

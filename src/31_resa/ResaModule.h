@@ -25,8 +25,7 @@
 
 #include "31_resa/Types.h"
 
-#include "ModuleClass.h"
-#include "FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
 #include "Registry.h"
 
 #include <map>
@@ -143,8 +142,11 @@ namespace synthese
 
 		/** 31 Reservation module class.
 		*/
-		class ResaModule : public util::FactorableTemplate<util::ModuleClass, ResaModule>
+		class ResaModule:
+			public server::ModuleClassTemplate<ResaModule>
 		{
+			friend class server::ModuleClassTemplate<ResaModule>;
+			
 		private:
 			typedef std::map<const server::Session*, util::RegistryKeyType> _SessionsCallIdMap;
 			static _SessionsCallIdMap _sessionsCallIds;
@@ -158,17 +160,6 @@ namespace synthese
 			static boost::shared_ptr<security::Profile>	_adminProfile;
 
 		public:
-			
-			/** Module initialization method.
-				@author Hugues Romain
-				@date 2008
-				
-				The initialization consists in the creation of a profile for the basic Resa clients
-			*/
-			virtual void initialize();
-
-			virtual std::string getName() const;
-
 			static boost::shared_ptr<security::Profile> GetBasicResaCustomerProfile();
 			static boost::shared_ptr<security::Profile> GetAutoResaResaCustomerProfile();
 

@@ -1,1 +1,0 @@
-synthese::html::HTMLModule::integrate();

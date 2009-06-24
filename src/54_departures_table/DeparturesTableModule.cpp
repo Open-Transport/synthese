@@ -41,10 +41,29 @@ namespace synthese
 	using namespace env;
 	using namespace security;
 	using namespace util;
+	using namespace departurestable;
+	using namespace server;
 
 	namespace util
 	{
 		template<> const std::string util::FactorableTemplate<ModuleClass, departurestable::DeparturesTableModule>::FACTORY_KEY("54_departures_table");
+	}
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<DeparturesTableModule>::NAME("SAI Tableaux de départs");
+		
+		template<> void ModuleClassTemplate<DeparturesTableModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<DeparturesTableModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<DeparturesTableModule>::End()
+		{
+		}
 	}
 
 	namespace departurestable
@@ -109,16 +128,6 @@ namespace synthese
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			}
 			return m;
-		}
-
-		void DeparturesTableModule::initialize()
-		{
-
-		}
-
-		std::string DeparturesTableModule::getName() const
-		{
-			return "SAI Tableaux de départs";
 		}
 	}
 }

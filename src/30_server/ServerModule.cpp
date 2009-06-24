@@ -20,8 +20,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "HTTPServer.hpp"
-
 #include "Log.h"
 //#include "threads/ManagedThread.h"
 //#include "Conversion.h"
@@ -41,52 +39,87 @@
   #define DEFAULT_TEMP_DIR "c:/temp"
 #endif
 
+#include "HTTPReply.hpp"
+#include "HTTPRequest.hpp"
+#include "Log.h"
+#include "Request.h"
+#include "RequestException.h"
+#include "ActionException.h"
+
 using namespace boost;
 using namespace std;
-
 
 namespace synthese
 {
 	using namespace util;
+	using namespace server;
 	
-	template<> const std::string util::FactorableTemplate<db::DbModuleClass, server::ServerModule>::FACTORY_KEY("999_server");
+	template<> const std::string util::FactorableTemplate<ModuleClass, ServerModule>::FACTORY_KEY("999_server");
 
     namespace server
     {
 		ServerModule::SessionMap	ServerModule::_sessionMap;
+		boost::asio::io_service ServerModule::_io_service;
+		boost::asio::ip::tcp::acceptor ServerModule::_acceptor(ServerModule::_io_service);
+		connection_ptr ServerModule::_new_connection(new HTTPConnection(ServerModule::_io_service));
+
 
 		const std::string ServerModule::MODULE_PARAM_PORT ("port");
 		const std::string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
 		const std::string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
 		const std::string ServerModule::MODULE_PARAM_TMP_DIR ("tmp_dir");
 
-		void ServerModule::preInit ()
+		template<> const string ModuleClassTemplate<ServerModule>::NAME("Noyau serveur");
+
+
+		template<> void ModuleClassTemplate<ServerModule>::PreInit()
 		{
-			RegisterParameter (MODULE_PARAM_PORT, "8080", &ParameterCallback);
-			RegisterParameter (MODULE_PARAM_NB_THREADS, "5", &ParameterCallback);
-			RegisterParameter (MODULE_PARAM_LOG_LEVEL, "1", &ParameterCallback);
-			RegisterParameter (MODULE_PARAM_TMP_DIR, DEFAULT_TEMP_DIR, &ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_PORT, "8080", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_NB_THREADS, "5", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL, "1", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_TMP_DIR, DEFAULT_TEMP_DIR, &ServerModule::ParameterCallback);
 		}
 
 
 
-		void ServerModule::initialize()
+		template<> void ModuleClassTemplate<ServerModule>::Init()
 		{
-
-			Log::GetInstance ().info ("HTTP Server is listening on port " + GetParameter (MODULE_PARAM_PORT) +"...");
-			
 			try 
 			{
-				// Initialize server.
-				std::size_t num_threads = boost::lexical_cast<std::size_t>(GetParameter(MODULE_PARAM_NB_THREADS));
+	
+				// Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
+				string address("0.0.0.0");
+				string port(GetParameter(ServerModule::MODULE_PARAM_PORT));
+				size_t threadsNumber(lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)));
 				
-				HTTPServer s("0.0.0.0", GetParameter (MODULE_PARAM_PORT), num_threads);
-
-				boost::thread* t(new thread(boost::bind(&HTTPServer::run, &s)));
-
-				t->join();
-//				s.run();
-
+				
+				asio::ip::tcp::resolver resolver(ServerModule::_io_service);
+				asio::ip::tcp::resolver::query query(address, port);
+				asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
+				
+				ServerModule::_acceptor.open(endpoint.protocol());
+				ServerModule::_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+				ServerModule::_acceptor.bind(endpoint);
+				ServerModule::_acceptor.listen();
+				ServerModule::_acceptor.async_accept(
+					ServerModule::_new_connection->socket(),
+					bind(&ServerModule::HandleAccept, asio::placeholders::error)
+				);
+	
+				// Create a pool of threads to run all of the io_services.
+				std::vector<boost::shared_ptr<boost::thread> > threads;
+				for (std::size_t i = 0; i < threadsNumber; ++i)
+				{
+					boost::shared_ptr<boost::thread> thread(
+						new boost::thread(
+							boost::bind(&boost::asio::io_service::run, &ServerModule::_io_service)
+					)	);
+					threads.push_back(thread);
+				}
+	
+	
+				Log::GetInstance ().info ("HTTP Server is listening on port " + port +" by "+ lexical_cast<string>(threadsNumber) + " threads ...");
+			
 
 
 	/*		    synthese::tcp::TcpService* service = 
@@ -130,24 +163,26 @@ namespace synthese
 			{
 				Log::GetInstance ().fatal ("Unexpected exception");
 			}
-
-			// @todo : decide when to clse the service ??
-			// synthese::tcp::TcpService::closeService (_config.getPort ());
-
-			}
+		}
 
 
 
-			ServerModule::SessionMap& ServerModule::getSessions()
-			{
+		template<> void ModuleClassTemplate<ServerModule>::End()
+		{
+			ServerModule::_io_service.stop();
+		}
+		
+
+		ServerModule::SessionMap& ServerModule::getSessions()
+		{
 			return _sessionMap;
-			}
+		}
 
 
-			void 
-			ServerModule::ParameterCallback (const std::string& name, 
-							 const std::string& value)
-			{
+		void ServerModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
 			if (name == "port") 
 			{
 				// TODO : close and reopen service on the new port
@@ -156,12 +191,112 @@ namespace synthese
 			{
 				Log::GetInstance ().setLevel (static_cast<Log::Level>(lexical_cast<int>(value)));
 			}
+		}
+		
+		
+		void ServerModule::HandleAccept(
+			const boost::system::error_code& e
+		){
+			if (!e)
+			{
+				_new_connection->start();
+				_new_connection.reset(new HTTPConnection(_io_service));
+				_acceptor.async_accept(
+					_new_connection->socket(),
+					boost::bind(
+						&ServerModule::HandleAccept,
+						boost::asio::placeholders::error
+					)
+				);
+			}
+		}
 
-	    }
 
-		std::string ServerModule::getName() const
-		{
-			return "Serveur HTTP";
+		void ServerModule::HandleRequest(
+			const HTTPRequest& req,
+			HTTPReply& rep
+		){
+			Log::GetInstance ().debug ("Received request : " + 
+				req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)");
+	
+			try
+			{
+				Request request(req);
+				stringstream output;
+				request.run(output);
+				rep.status = HTTPReply::ok;
+				rep.content.append(output.str());
+				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
+				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType()));
+			}
+			catch (RequestException& e)
+			{
+				Log::GetInstance().debug("Request error", e);
+				rep = HTTPReply::stock_reply(HTTPReply::bad_request);
+			}
+			catch (ActionException& e)
+			{
+				Log::GetInstance().debug("Action error", e);
+				rep = HTTPReply::stock_reply(HTTPReply::bad_request);
+			}
+			catch(util::Exception& e)
+			{
+				Log::GetInstance().debug("Exception", e);
+				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
+			}
+			catch(std::exception& e)
+			{
+				Log::GetInstance().debug("An unhandled exception has occured : " + std::string (e.what ()));
+				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
+			}
+			catch(...)
+			{
+				Log::GetInstance().debug("An unhandled exception has occured.");
+				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
+			}
+		}
+
+
+
+		bool ServerModule::URLDecode(
+			const std::string& in,
+			std::string& out
+		){
+		  out.clear();
+		  out.reserve(in.size());
+		  for (std::size_t i = 0; i < in.size(); ++i)
+		  {
+			if (in[i] == '%')
+			{
+			  if (i + 3 <= in.size())
+			  {
+				int value;
+				std::istringstream is(in.substr(i + 1, 2));
+				if (is >> std::hex >> value)
+				{
+				  out += static_cast<char>(value);
+				  i += 2;
+				}
+				else
+				{
+				  return false;
+				}
+			  }
+			  else
+			  {
+				return false;
+			  }
+			}
+			else if (in[i] == '+')
+			{
+			  out += ' ';
+			}
+			else
+			{
+			  out += in[i];
+			}
+		  }
+		  return true;
 		}
 
 	}

@@ -63,7 +63,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("15.60.02 Continuous services");
-	template<> const string FetcherTemplate<NonPermanentService, ContinuousServiceTableSync>::FACTORY_KEY("17");
+	template<> const string FactorableTemplate<Fetcher<NonPermanentService>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 
 	namespace env
 	{

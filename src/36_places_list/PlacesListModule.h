@@ -26,8 +26,7 @@
 
 #include "GraphTypes.h"
 
-#include "ModuleClass.h"
-#include "FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
 
 #include <utility>
 #include <vector>
@@ -70,14 +69,10 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** 16 Transport website module class. */
-		class PlacesListModule : public util::FactorableTemplate<util::ModuleClass, PlacesListModule>
+		class PlacesListModule:
+			public server::ModuleClassTemplate<PlacesListModule>
 		{
 		public:
-
-			void initialize();
-
-			virtual std::string getName() const;
-
 			typedef std::vector<std::pair<graph::UserClassCode, std::string> > UserClassNames;
 			static UserClassNames GetAccessibilityNames();
 		};

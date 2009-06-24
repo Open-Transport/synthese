@@ -26,20 +26,32 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace timetables;
+	using namespace server;
+	
 	namespace util
 	{
-		template<> const string FactorableTemplate<ModuleClass, timetables::TimetableModule>::FACTORY_KEY("55_timetables");
+		template<> const string FactorableTemplate<ModuleClass,TimetableModule>::FACTORY_KEY("55_timetables");
+	}
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<TimetableModule>::NAME("Fiches horaires");
+		
+		template<> void ModuleClassTemplate<TimetableModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<TimetableModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<TimetableModule>::End()
+		{
+		}
 	}
 
 	namespace timetables
 	{
-
-
-
-
-		std::string TimetableModule::getName() const
-		{
-			return "Fiches horaires";
-		}
 	}
 }

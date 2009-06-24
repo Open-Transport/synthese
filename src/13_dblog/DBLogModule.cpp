@@ -20,10 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "13_dblog/DBLogModule.h"
+#include "DBLogModule.h"
 
 #include "05_html/Constants.h"
-
 #include "01_util/Constants.h"
 
 using namespace std;
@@ -31,10 +30,30 @@ using namespace std;
 namespace synthese
 {
 	using namespace html;
+	using namespace server;
+	using namespace dblog;
 
 	namespace util
 	{
 		template<> const std::string util::FactorableTemplate<ModuleClass, dblog::DBLogModule>::FACTORY_KEY("13_dblog");
+	}
+	
+	
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<DBLogModule>::NAME("Journaux");
+		
+		template<> void ModuleClassTemplate<DBLogModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<DBLogModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<DBLogModule>::End()
+		{
+		}
 	}
 
 
@@ -73,16 +92,6 @@ namespace synthese
 			case DBLogEntry::DB_LOG_ERROR : return IMG_URL_ERROR;
 			default : return string();
 			}
-		}
-
-		void DBLogModule::initialize()
-		{
-
-		}
-
-		std::string DBLogModule::getName() const
-		{
-			return "Journaux";
 		}
 	}
 }

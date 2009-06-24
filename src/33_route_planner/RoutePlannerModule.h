@@ -25,8 +25,7 @@
 #ifndef SYNTHESE_RoutePlannerModule_H__
 #define SYNTHESE_RoutePlannerModule_H__
 
-#include "01_util/FactorableTemplate.h"
-#include "01_util/ModuleClass.h"
+#include "ModuleClassTemplate.hpp"
 
 namespace synthese
 {
@@ -128,19 +127,13 @@ namespace synthese
 			@author Hugues Romain
 			@date 2007
 		*/
-		class RoutePlannerModule : public util::FactorableTemplate<util::ModuleClass, RoutePlannerModule>
+		class RoutePlannerModule:
+			public server::ModuleClassTemplate<RoutePlannerModule>
 		{
 		private:
 			
 			
 		public:
-			/** Initialization of the 33 53 Route planner. module after the automatic database loads.
-				@author Hugues Romain
-				@date 2007
-			*/			
-//			void initialize();
-
-			virtual std::string getName() const;
 		};
 	}
 	/** @} */

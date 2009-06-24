@@ -48,7 +48,7 @@ namespace synthese
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync, PublicPlaceTableSync>::FACTORY_KEY("34.40.03 Public places");
-		template<> const string FetcherTemplate<NamedPlace, PublicPlaceTableSync>::FACTORY_KEY("13");
+		template<> const string FactorableTemplate<Fetcher<NamedPlace>, PublicPlaceTableSync>::FACTORY_KEY("13");
 	}
 
 	namespace road

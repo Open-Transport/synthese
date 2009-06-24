@@ -27,7 +27,7 @@
 #include "RequestMissingParameterException.h"
 #include "DateTime.h"
 #include "Conversion.h"
-#include "HTTPRequestHandler.hpp"
+#include "ServerModule.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
@@ -59,7 +59,7 @@ namespace synthese
 
 				string parameterName (parameterToken.substr (0, pos));
 				string parameterValue;
-				if(HTTPRequestHandler::url_decode(parameterToken.substr(pos+1), parameterValue))
+				if(ServerModule::URLDecode(parameterToken.substr(pos+1), parameterValue))
 				{
 					_map.insert (make_pair (parameterName, parameterValue));
 				}

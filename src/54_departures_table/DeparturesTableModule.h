@@ -26,8 +26,7 @@
 #include <utility>
 #include <string>
 
-#include "ModuleClass.h"
-#include "FactorableTemplate.h"
+#include "ModuleClassTemplate.hpp"
 
 #include "12_security/Types.h"
 
@@ -89,7 +88,8 @@ namespace synthese
 	*/
 	namespace departurestable
 	{
-		class DeparturesTableModule : public util::FactorableTemplate<util::ModuleClass, DeparturesTableModule>
+		class DeparturesTableModule:
+			public server::ModuleClassTemplate<DeparturesTableModule>
 		{
 		public:
 			static std::vector<std::pair<uid, std::string> > getDisplayTypeLabels(
@@ -103,10 +103,6 @@ namespace synthese
 				, bool withAll = false
 				);
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineWithBroadcastLabels(bool withAll = false);
-
-			void initialize();
-
-			virtual std::string getName() const;
 		};
 	}
 

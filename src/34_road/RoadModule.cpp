@@ -27,6 +27,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace road;
+	using namespace server;
 
 	namespace graph
 	{
@@ -39,18 +40,24 @@ namespace synthese
 		const string FactorableTemplate<ModuleClass,RoadModule>::FACTORY_KEY("34_road");
 	}
 
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<RoadModule>::NAME("Voirie");
+		
+		template<> void ModuleClassTemplate<RoadModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<RoadModule>::Init()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<RoadModule>::End()
+		{
+		}
+	}
+
 	namespace road
 	{
-
-
-		void RoadModule::initialize()
-		{
-
-		}
-
-		std::string RoadModule::getName() const
-		{
-			return "Voirie";
-		}
 	}
 }

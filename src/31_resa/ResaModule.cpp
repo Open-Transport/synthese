@@ -69,8 +69,59 @@ namespace synthese
 	using namespace time;
 	using namespace dblog;
 	using namespace util;
+	using namespace resa;
 
-	template<> const std::string util::FactorableTemplate<util::ModuleClass, resa::ResaModule>::FACTORY_KEY("31_resa");
+	template<> const std::string util::FactorableTemplate<ModuleClass,ResaModule>::FACTORY_KEY("31_resa");
+
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<ResaModule>::NAME("TAD Réservation");
+		
+		template<> void ModuleClassTemplate<ResaModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<ResaModule>::Init()
+		{
+			Env env;
+			
+			// Basic resa profile
+			ProfileTableSync::Search(env, ResaModule::_BASIC_PROFILE_NAME);
+			if (env.getRegistry<Profile>().empty())
+				ResaModule::_basicProfile.reset(new Profile);
+			else
+				ResaModule::_basicProfile = env.getEditableRegistry<Profile>().front();
+			ResaModule::_basicProfile->setName(ResaModule::_BASIC_PROFILE_NAME);
+			shared_ptr<Right> r(new GlobalRight);
+			r->setPrivateLevel(FORBIDDEN);
+			r->setPublicLevel(FORBIDDEN);
+			ResaModule::_basicProfile->cleanRights();
+			ResaModule::_basicProfile->addRight(r);
+			ProfileTableSync::Save(ResaModule::_basicProfile.get());
+
+			// Autoresa profile
+			ProfileTableSync::Search(env, ResaModule::_AUTORESA_PROFILE_NAME);
+			if (env.getRegistry<Profile>().empty())
+				ResaModule::_autoresaProfile.reset(new Profile);
+			else
+				ResaModule::_autoresaProfile= env.getEditableRegistry<Profile>().front();
+			ResaModule::_autoresaProfile->setName(ResaModule::_AUTORESA_PROFILE_NAME);
+			shared_ptr<Right> r2(new GlobalRight);
+			r2->setPrivateLevel(FORBIDDEN);
+			r2->setPublicLevel(FORBIDDEN);
+			ResaModule::_autoresaProfile->cleanRights();
+			ResaModule::_autoresaProfile->addRight(r2);
+			shared_ptr<Right> r3(new ResaRight);
+			r3->setPrivateLevel(WRITE);
+			r3->setPublicLevel(FORBIDDEN);
+			ResaModule::_autoresaProfile->addRight(r3);
+			ProfileTableSync::Save(ResaModule::_autoresaProfile.get());
+		}
+		
+		template<> void ModuleClassTemplate<ResaModule>::End()
+		{
+		}
+	}
 
 	namespace resa
 	{
@@ -82,11 +133,6 @@ namespace synthese
 		shared_ptr<Profile> ResaModule::_basicProfile;
 		shared_ptr<Profile> ResaModule::_autoresaProfile;
 		shared_ptr<Profile> ResaModule::_adminProfile;
-
-		std::string ResaModule::getName() const
-		{
-			return "TAD Réservation";
-		}
 
 		void ResaModule::DisplayReservations(
 			std::ostream& stream,
@@ -147,71 +193,6 @@ namespace synthese
 			_SessionsCallIdMap::iterator it(_sessionsCallIds.find(session));
 
 			return (it == _sessionsCallIds.end()) ? UNKNOWN_VALUE : it->second;
-		}
-
-
-
-		void ResaModule::initialize()
-		{
-			{
-				Env env;
-				// Basic resa profile
-				ProfileTableSync::Search(env, _BASIC_PROFILE_NAME);
-				if (env.getRegistry<Profile>().empty())
-					_basicProfile.reset(new Profile);
-				else
-					_basicProfile = env.getEditableRegistry<Profile>().front();
-				_basicProfile->setName(_BASIC_PROFILE_NAME);
-				shared_ptr<Right> r(new GlobalRight);
-				r->setPrivateLevel(FORBIDDEN);
-				r->setPublicLevel(FORBIDDEN);
-				_basicProfile->cleanRights();
-				_basicProfile->addRight(r);
-				ProfileTableSync::Save(_basicProfile.get());
-			}
-
-			// Autoresa profile
-			{
-				Env env;
-				ProfileTableSync::Search(env, _AUTORESA_PROFILE_NAME);
-				if (env.getRegistry<Profile>().empty())
-					_autoresaProfile.reset(new Profile);
-				else
-					_autoresaProfile= env.getEditableRegistry<Profile>().front();
-				_autoresaProfile->setName(_AUTORESA_PROFILE_NAME);
-				shared_ptr<Right> r2(new GlobalRight);
-				r2->setPrivateLevel(FORBIDDEN);
-				r2->setPublicLevel(FORBIDDEN);
-				_autoresaProfile->cleanRights();
-				_autoresaProfile->addRight(r2);
-				shared_ptr<Right> r3(new ResaRight);
-				r3->setPrivateLevel(WRITE);
-				r3->setPublicLevel(FORBIDDEN);
-				_autoresaProfile->addRight(r3);
-				ProfileTableSync::Save(_autoresaProfile.get());
-			}
-
-			// Admin profile
-			{
-				Env env;
-				ProfileTableSync::Search(env, _ADMIN_PROFILE_NAME);
-				if (env.getRegistry<Profile>().empty())
-					_adminProfile.reset(new Profile);
-				else
-					_adminProfile= env.getEditableRegistry<Profile>().front();
-				_adminProfile->setName(_ADMIN_PROFILE_NAME);
-				shared_ptr<Right> r4(new GlobalRight);
-				r4->setPrivateLevel(FORBIDDEN);
-				r4->setPublicLevel(FORBIDDEN);
-				_adminProfile->cleanRights();
-				_adminProfile->addRight(r4);
-				shared_ptr<Right> r5(new ResaRight);
-				r5->setPrivateLevel(WRITE);
-				r5->setPublicLevel(WRITE);
-				_adminProfile->addRight(r5);
-				ProfileTableSync::Save(_adminProfile.get());
-			}
-
 		}
 
 

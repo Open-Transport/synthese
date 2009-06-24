@@ -26,9 +26,8 @@
 #include <vector>
 #include <utility>
 
-#include "ModuleClass.h"
+#include "ModuleClassTemplate.hpp"
 #include "UId.h"
-#include "FactorableTemplate.h"
 
 #include "11_interfaces/Types.h"
 
@@ -109,14 +108,11 @@ namespace synthese
 	{
 		/** Interface module class.
 		*/
-		class InterfaceModule : public util::FactorableTemplate<util::ModuleClass, InterfaceModule>
+		class InterfaceModule:
+			public server::ModuleClassTemplate<InterfaceModule>
 		{
 		public:
-			void initialize();
-
 			static std::string getVariableFromMap(const VariablesMap& variables, const std::string& varName);
-
-			virtual std::string getName() const;
 		};
 	}
 	/** @} */
