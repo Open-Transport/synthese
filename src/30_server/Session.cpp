@@ -20,18 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// At first to avoid the Windows bug "WinSock.h has already been included"
+#include "ServerModule.h"
+
 #include <time.h>
 #include <stdlib.h>
+#include <boost/lexical_cast.hpp>
 
-#include "01_util/Conversion.h"
+#include "DateTime.h"
 
-#include "04_time/DateTime.h"
+#include "Session.h"
+#include "SessionException.h"
+#include "ServerModule.h"
 
-#include "30_server/Session.h"
-#include "30_server/SessionException.h"
-#include "30_server/ServerModule.h"
-
-using namespace  boost;
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -70,7 +73,7 @@ namespace synthese
 			srand( (unsigned) ::time( NULL ) );
 			for (size_t i=0; i< Session::KEY_LENGTH; ++i)
 			{
-				key += Conversion::ToString(rand());
+				key += lexical_cast<string>(rand());
 			}
 			return key;
 		}

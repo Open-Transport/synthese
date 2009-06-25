@@ -20,6 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// At first to avoid the Windows bug "WinSock.h has already been included"
+#include "ServerModule.h"
+
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "HTMLModule.h"
@@ -36,7 +39,6 @@
 #include "SecurityRight.h"
 #include "Request.h"
 #include "Session.h"
-#include "ServerModule.h"
 #include "ActionFunctionRequest.h"
 
 #include "AdminModule.h"

@@ -20,21 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// At first to avoid the Windows bug "WinSock.h has already been included"
+#include "ServerModule.h"
+
 #include "LoginAction.h"
 #include "RequestMissingParameterException.h"
-#include "30_server/ActionException.h"
-#include "30_server/Session.h"
-#include "30_server/Request.h"
-#include "30_server/ServerModule.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Session.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 #include <boost/shared_ptr.hpp>
 
-#include "12_security/User.h"
-#include "12_security/UserException.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/UserTableSyncException.h"
-#include "12_security/SecurityLog.h"
+#include "User.h"
+#include "UserException.h"
+#include "UserTableSync.h"
+#include "UserTableSyncException.h"
+#include "SecurityLog.h"
 
 using namespace std;
 using namespace boost;

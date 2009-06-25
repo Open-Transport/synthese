@@ -41,7 +41,10 @@ namespace synthese
 	{
 		const string DbModuleConfigTableSync::COL_PARAMNAME("param_name");
 		const string DbModuleConfigTableSync::COL_PARAMVALUE("param_value");
+	}
 
+	namespace db
+	{
 	    template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DbModuleConfigTableSync>::TABLE(
 			"t999_config", true, true, TRIGGERS_ENABLED_CLAUSE, false
 			);
@@ -57,9 +60,10 @@ namespace synthese
 		{
 			SQLiteTableSync::Index()
 		};
+	}
 
-
-
+	namespace server
+	{
 		DbModuleConfigTableSync::DbModuleConfigTableSync ()
 			: SQLiteTableSyncTemplate<DbModuleConfigTableSync>()
 		{

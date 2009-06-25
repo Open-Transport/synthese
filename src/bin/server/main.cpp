@@ -22,7 +22,9 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "Conversion.h"
+// At first to avoid the Windows bug "WinSock.h has already been included"
+#include "ServerModule.h"
+
 #include "Exception.h"
 #include "Log.h"
 #include "Factory.h"
@@ -30,7 +32,6 @@
 #include "DBModule.h"
 #include "01_util/threads/Thread.h"
 #include "01_util/threads/ThreadManager.h"
-#include "ServerModule.h"
 
 #include <csignal>
 #include <string>
@@ -42,6 +43,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 // included auto generated code
 #include "includes.cpp.inc"
@@ -61,7 +63,7 @@ void sig_INT_handler(int sig)
 {
     // Catch INT signal and close server properly with exit.
     // This allows profiling info to be dumped.
-    Log::GetInstance ().info ("Caught signal no. " + Conversion::ToString (sig));
+    Log::GetInstance ().info ("Caught signal no. " + lexical_cast<string>(sig));
 
     // Last chance cleaning actions can be added here as well ...
     // Delete PID file
@@ -259,7 +261,7 @@ int main( int argc, char **argv )
 		{
 			pid = daemonize ();
 		}
-		Log::GetInstance ().info ("Process PID = " + Conversion::ToString (pid) + (daemonMode ? " (daemon mode)" : ""));
+		Log::GetInstance ().info ("Process PID = " + lexical_cast<string>(pid) + (daemonMode ? " (daemon mode)" : ""));
 #endif        
 
 		// included auto generated code

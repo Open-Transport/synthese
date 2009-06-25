@@ -22,12 +22,14 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+// At first to avoid the Windows bug "WinSock.h has already been included"
+#include "ServerModule.h"
+
 #include "ParametersMap.h"
 #include "Request.h"
 #include "RequestMissingParameterException.h"
 #include "DateTime.h"
 #include "Conversion.h"
-#include "ServerModule.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>

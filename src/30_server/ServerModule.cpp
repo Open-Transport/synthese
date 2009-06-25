@@ -20,13 +20,12 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Log.h"
-//#include "threads/ManagedThread.h"
-//#include "Conversion.h"
 
 #include "ServerModule.h"
+
+#include "Log.h"
+//#include "threads/ManagedThread.h"
 //#include "CleanerThreadExec.h"
-//#include "ServerThreadExec.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
