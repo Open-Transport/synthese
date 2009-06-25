@@ -34,6 +34,7 @@ MA 02139, USA.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "cdbfile.h" 
