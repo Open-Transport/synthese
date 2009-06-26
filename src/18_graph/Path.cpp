@@ -222,10 +222,10 @@ namespace synthese
 							if (it == _edges.begin()) break;
 						}
 					}
-
-					edge->setFollowingArrivalForFineSteppingOnly(nextArrival);
-					edge->setFollowingConnectionArrival(nextConnectingArrival);
 				}
+
+				edge->setFollowingArrivalForFineSteppingOnly(nextArrival);
+				edge->setFollowingConnectionArrival(nextConnectingArrival);
 			}
 			else
 			{
@@ -275,10 +275,10 @@ namespace synthese
 							(*it)->setPreviousConnectionDeparture(edge);
 						}
 					}
-
-					edge->setPreviousDepartureForFineSteppingOnly(previousDeparture);
-					edge->setPreviousConnectionDeparture(previousConnectingDeparture);
 				}
+
+				edge->setPreviousDepartureForFineSteppingOnly(previousDeparture);
+				edge->setPreviousConnectionDeparture(previousConnectingDeparture);
 			}
 			else
 			{
