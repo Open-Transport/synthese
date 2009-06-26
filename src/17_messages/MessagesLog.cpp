@@ -26,10 +26,11 @@
 #include "AlarmTableSync.h"
 #include "ScenarioTableSync.h"
 #include "Env.h"
-#include "Conversion.h"
 #include "MessagesRight.h"
 #include "Request.h"
 #include "ScenarioTemplate.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -72,7 +73,7 @@ namespace synthese
 			const security::User* user
 		){
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(alarm.getKey()));
+			content.push_back(lexical_cast<string>(alarm.getKey()));
 			content.push_back("Ajout de message");
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
 		}
@@ -131,7 +132,7 @@ namespace synthese
 			, const security::User* user
 		){
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(alarm->getKey()));
+			content.push_back(lexical_cast<string>(alarm->getKey()));
 			content.push_back(text);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
@@ -141,18 +142,24 @@ namespace synthese
 			Env env;
 			int tableId = decodeTableId(id);
 
-			if (tableId == AlarmTableSync::TABLE.ID)
+			try
 			{
-				shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
-				return alarm->getShortMessage();
+				if (tableId == AlarmTableSync::TABLE.ID)
+				{
+					shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					return alarm->getShortMessage();
+				}
+				else if (tableId == ScenarioTableSync::TABLE.ID)
+				{
+					shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					return scenario->getName();
+				}
 			}
-			else if (tableId == ScenarioTableSync::TABLE.ID)
+			catch(...)
 			{
-				shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
-				return scenario->getName();
 			}
 
-			return std::string();
+			return lexical_cast<string>(id);
 		}
 
 		std::string MessagesLog::getName() const
@@ -163,7 +170,7 @@ namespace synthese
 		void MessagesLog::AddDeleteEntry( const SentAlarm* alarm , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(alarm->getKey()));
+			content.push_back(lexical_cast<string>(alarm->getKey()));
 			stringstream text;
 			text
 				<< "Suppression du message " << alarm->getShortMessage()
