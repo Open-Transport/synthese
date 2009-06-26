@@ -228,7 +228,6 @@ namespace synthese
 			// Route planning
 			AccessParameters ap(
 				_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
-				NULL, 
 				_drtOnly
 			);
 			const Place* startPlace(GeographyModule::FetchPlace(_startCity, _startPlace));
