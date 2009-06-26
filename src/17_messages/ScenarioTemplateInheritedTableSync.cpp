@@ -172,8 +172,8 @@ namespace synthese
 				AlarmTableSync::Save(&alarm);
 
 				AlarmObjectLinkTableSync::CopyRecipients(
-					templateAlarm->getKey(),
-					alarm.getKey()
+					*templateAlarm,
+					alarm
 				);
 			}
 		}

@@ -33,10 +33,7 @@
 #include "Registrable.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-#include "SQLiteDirectTableSyncTemplate.h"
+#include "SQLiteConditionalRegistryTableSyncTemplate.h"
 
 #include "AlarmObjectLink.h"
 #include "MessagesModule.h"
@@ -49,16 +46,23 @@ namespace synthese
 			@ingroup m17LS refLS
 			
 			Only the links concerning the sent alarms are loaded in ram.
+
+			Load method behavior per load level :
+			 - less than FIELDS_ONLY_LOAD_LEVEL : not usable (assertion)
+			 - FIELDS_ONLY_LOAD_LEVEL and above : links the object to its alarm
+			 - RECURSIVE_LINKS_LOAD_LEVEL and above : links its alarm to the corresponding object according to the rules defined in the recipient class
+			   only if the alarm is a SentAlarm object
+
+			Unlink method behavior :
+			 - removes the link between the alarm and the object if the alarm is a SentAlarm object (no exception is thrown if it does not exists)
 		*/
 		class AlarmObjectLinkTableSync
-		:	public db::SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
+		:	public db::SQLiteConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;
 			static const std::string COL_OBJECT_ID;
 			static const std::string COL_ALARM_ID;
-
-			AlarmObjectLinkTableSync();
 
 			/** Search of alarm object links for a specified alarm in a specified recipient type.
 				@param alarm Alarm to the object must be liked with
@@ -105,32 +109,9 @@ namespace synthese
 
 
 			static void CopyRecipients(
-				util::RegistryKeyType sourceId,
-				util::RegistryKeyType destId
+				const Alarm& sourceAlarm,
+				Alarm& destAlarm
 			);
-
-			/** Action to do on  creation.
-				This method loads a new object in ram.
-			*/
-			void rowsAdded (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
-
-			/** Action to do on  creation.
-				This method updates the corresponding object in ram.
-			*/
-			void rowsUpdated (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
-			/** Action to do on  deletion.
-				This method deletes the corresponding object in ram and runs 
-				all necessary cleaning actions.
-			*/
-			void rowsRemoved (db::SQLite* sqlite, 
-				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
-
 		};
 
 		template<class K, class T>

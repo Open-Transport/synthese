@@ -32,6 +32,7 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Alarm;
 
 		/** Link between an alarm and an object.
 			@ingroup m17
@@ -48,18 +49,18 @@ namespace synthese
 
 		private:
 			uid				_objectId;
-			uid				_alarmId;
+			Alarm*			_alarm;
 			std::string		_recipientKey;
 
 		public:
 			AlarmObjectLink(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 			uid getObjectId() const;
-			uid getAlarmId() const;
+			Alarm* getAlarm() const;
 			std::string getRecipientKey() const;
 
 			void setObjectId(uid key);
-			void setAlarmId(uid key);
+			void setAlarm(Alarm* value);
 			void setRecipientKey(const std::string& key);
 		};
 	}

@@ -27,6 +27,10 @@
 #include "SentAlarm.h"
 #include "Registry.h"
 #include "AlarmTableSync.h"
+#include "LoadException.h"
+#include "LinkException.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -53,7 +57,7 @@ namespace synthese
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE(
 			"t040_alarm_object_links"
-			);
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::_FIELDS[]=
 		{
@@ -77,40 +81,58 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			object->setAlarmId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_ALARM_ID));
+			// It makes no sense to load such an object without the up links
+			assert(linkLevel > FIELDS_ONLY_LOAD_LEVEL);
+
 			object->setObjectId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_OBJECT_ID));
 			object->setRecipientKey(rows->getText ( AlarmObjectLinkTableSync::COL_RECIPIENT_KEY));
-		
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
-				shared_ptr<SentAlarm> alarm(dynamic_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(
-					object->getAlarmId(),
-					env
-				)	)	);
-				if(!ar.get())
-					Log::GetInstance().error ("Alarm object link error (t040_alarm_object_links table) : alarm "+ Conversion::ToString(object->getAlarmId()) + " is not sent alarm");
 
-				try
+			try
+			{
+				shared_ptr<Alarm> alarm(AlarmTableSync::GetEditable(
+						rows->getLongLong ( AlarmObjectLinkTableSync::COL_ALARM_ID),
+						env,
+						linkLevel
+				)	);
+				object->setAlarm(alarm.get());
+
+				if(linkLevel >= RECURSIVE_LINKS_LOAD_LEVEL && dynamic_cast<SentAlarm*>(alarm.get()))
 				{
-					if(alarm.get())
-						ar->addObject(alarm.get(), object->getObjectId());
+					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
+					ar->addObject(static_cast<SentAlarm*>(alarm.get()), object->getObjectId());
 				}
-				catch (AlarmObjectLinkException e)
-				{
-					Log::GetInstance().error ("Alarm object link error (t040_alarm_object_links table) : ", e);
-				}
+			}
+			catch(FactoryException<AlarmRecipient> e)
+			{
+				throw LoadException<AlarmObjectLinkTableSync>(rows, AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, "Unconsistent recipient type");
+			}
+			catch(ObjectNotFoundException<Alarm> e)
+			{
+				throw LinkException<AlarmObjectLinkTableSync>(rows, AlarmObjectLinkTableSync::COL_ALARM_ID, e);
+			}
+			catch (AlarmObjectLinkException e)
+			{
+				throw LoadException<AlarmObjectLinkTableSync>(rows, AlarmObjectLinkTableSync::COL_OBJECT_ID, e.getMessage());
 			}
 		}
 
 
 
 		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
-			AlarmObjectLink* aol
+			AlarmObjectLink* object
 		){
-			shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(aol->getRecipientKey()));
-			shared_ptr<SentAlarm> alarm = Env::GetOfficialEnv().getEditableRegistry<SentAlarm>().getEditable(aol->getAlarmId());
-			ar->removeObject(alarm.get(), aol->getObjectId());
+			if(dynamic_cast<SentAlarm*>(object->getAlarm()))
+			{
+				try
+				{
+					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
+					ar->removeObject(static_cast<SentAlarm*>(object->getAlarm()), object->getObjectId());
+				}
+				catch(FactoryException<AlarmRecipient> e)
+				{
+					Log::GetInstance().error("Unhanded recipient type "+ object->getRecipientKey() +" in "+ TABLE.NAME +" object "+ lexical_cast<string>(object->getKey()), e);
+				}
+			}
 		}
 
 
@@ -125,53 +147,27 @@ namespace synthese
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getRecipientKey())
 				<< "," << Conversion::ToString(object->getObjectId())
-				<< "," << Conversion::ToString(object->getAlarmId())
+				<< "," << (object->getAlarm() ? object->getAlarm()->getKey() : RegistryKeyType(0))
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
+		template<> bool SQLiteConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::IsLoaded( const SQLiteResultSPtr& row )
+		{
+			shared_ptr<Alarm> alarm(AlarmTableSync::GetEditable(
+				row->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
+				Env::GetOfficialEnv(),
+				FIELDS_ONLY_LOAD_LEVEL
+			)	);
+			return
+				dynamic_cast<SentAlarm*>(alarm.get()) &&
+				Factory<AlarmRecipient>::contains(row->getText(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY))
+			;
+		}
 	}
 
 	namespace messages
 	{
-		AlarmObjectLinkTableSync::AlarmObjectLinkTableSync()
-			: SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>()
-		{
-		}
-
-		void AlarmObjectLinkTableSync::rowsAdded(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-			Env& env(Env::GetOfficialEnv());
-			Registry<AlarmObjectLink>& registry(env.getEditableRegistry<AlarmObjectLink>());
-			while (rows->next ())
-			{
-				shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
-				aol->setKey(rows->getLongLong(TABLE_COL_ID));
-				Load(aol.get(), rows, env);
-				registry.add(aol);
-			}
-		}
-
-		void AlarmObjectLinkTableSync::rowsUpdated(db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
-			rowsAdded(sqlite, sync, rows);
-		}
-
-		void AlarmObjectLinkTableSync::rowsRemoved( db::SQLite* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
-		{
-			while (rows->next ())
-			{
-				if (!Env::GetOfficialEnv().getRegistry<AlarmObjectLink>().contains(rows->getLongLong (TABLE_COL_ID)))
-					continue;
-
-				shared_ptr<AlarmObjectLink> aol = Env::GetOfficialEnv().getEditableRegistry<AlarmObjectLink>().getEditable(rows->getLongLong (TABLE_COL_ID));
-				
-				// Alarm not found in ram : this is not a template
-				Unlink(aol.get());
-				Env::GetOfficialEnv().getEditableRegistry<AlarmObjectLink>().remove(rows->getLongLong (TABLE_COL_ID));
-			}
-		}
-
 		void AlarmObjectLinkTableSync::Remove( uid alarmId, uid objectId )
 		{
 			stringstream query;
@@ -188,17 +184,18 @@ namespace synthese
 		
 		
 		void AlarmObjectLinkTableSync::CopyRecipients(
-			util::RegistryKeyType sourceId,
-			util::RegistryKeyType destId
+			const Alarm& sourceAlarm,
+			Alarm& destAlarm
 		){
 			Env lenv;
-			Search(lenv, sourceId);
+			Search(lenv, sourceAlarm.getKey());
 			BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, lenv.getRegistry<AlarmObjectLink>())
 			{
-				aol->setAlarmId(destId);
-				aol->setObjectId(aol->getObjectId());
-				aol->setRecipientKey(aol->getRecipientKey());
-				Save(aol.get());
+				AlarmObjectLink naol;
+				naol.setAlarm(&destAlarm);
+				naol.setObjectId(aol->getObjectId());
+				naol.setRecipientKey(aol->getRecipientKey());
+				Save(&naol);
 			}
 		}
 

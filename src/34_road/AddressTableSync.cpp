@@ -143,7 +143,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 				{
-					throw LinkException<AddressTableSync>(object->getKey(), "Connection place ("+ AddressTableSync::COL_PLACEID +")", e);
+					throw LinkException<AddressTableSync>(rows, AddressTableSync::COL_PLACEID, e);
 				}
 			}
 		}

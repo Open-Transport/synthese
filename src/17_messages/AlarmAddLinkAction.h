@@ -47,7 +47,7 @@ namespace synthese
 
 		private:
 			std::string		_recipientKey;
-			boost::shared_ptr<const Alarm>		_alarm;
+			boost::shared_ptr<Alarm>		_alarm;
 			util::RegistryKeyType				_objectId;
 
 		protected:
@@ -63,7 +63,7 @@ namespace synthese
 
 		public:
 			void setRecipientKey(const std::string& key);
-			void setAlarm(boost::shared_ptr<const Alarm> alarm);
+			void setAlarmId(util::RegistryKeyType alarmId);
 			void setObjectId(util::RegistryKeyType id);
 
 			/** Action to run, defined by each subclass.

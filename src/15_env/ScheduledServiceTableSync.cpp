@@ -156,7 +156,7 @@ namespace synthese
 				arrivalSchedules.size () <= 0 ||
 				departureSchedules.size() != arrivalSchedules.size ()
 			){
-				throw LoadException<ScheduledServiceTableSync>(ss->getKey(), ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
+				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
 			}
 		    
 		    ss->setServiceNumber(serviceNumber);
@@ -173,7 +173,7 @@ namespace synthese
 				
 				if(	path->getEdges ().size () != arrivalSchedules.size ()
 				){
-					throw LoadException<ScheduledServiceTableSync>(ss->getKey(), ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
+					throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
 				}
 
 				uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));

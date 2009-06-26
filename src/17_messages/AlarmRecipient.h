@@ -71,6 +71,12 @@ namespace synthese
 
 			virtual AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const = 0;
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds an object to the alarm as the current recipient type.
+			/// @param alarm alarm to add the object into
+			/// @param objectId id of the object to add
+			/// @throws AlarmObjectLinkException if the object cannot be added (each
+			/// recipient type implements a rule)
 			virtual void addObject(const SentAlarm* alarm, uid objectId) = 0;
 			virtual void removeObject(const SentAlarm* alarm, uid objectId) = 0;
 			virtual AlarmConflict getConflictStatus(const SentAlarm* alarm) const = 0;

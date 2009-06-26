@@ -149,7 +149,7 @@ namespace synthese
 				}
 				catch(ObjectNotFoundException<City>& e)
 				{
-					throw LinkException<ConnectionPlaceTableSync>(cp->getKey(), ConnectionPlaceTableSync::TABLE_COL_CITYID, e);
+					throw LinkException<ConnectionPlaceTableSync>(rows, ConnectionPlaceTableSync::TABLE_COL_CITYID, e);
 				}
 			}
 

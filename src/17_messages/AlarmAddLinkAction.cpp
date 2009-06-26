@@ -74,18 +74,10 @@ namespace synthese
 				throw ActionException("Specified recipient not found");
 
 			// Alarm ID
-			RegistryKeyType id(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
-			try
-			{
-				_alarm = AlarmTableSync::Get(id, _env);
-			}
-			catch (ObjectNotFoundException<Alarm>)
-			{
-				throw ActionException("Specified alarm not found");
-			}
+			setAlarmId(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
 			
 			// Object ID
-			_objectId = map.getUid(PARAMETER_OBJECT_ID, true, FACTORY_KEY);
+			setObjectId(map.getUid(PARAMETER_OBJECT_ID, true, FACTORY_KEY));
 		}
 
 		void AlarmAddLinkAction::run()
@@ -93,7 +85,7 @@ namespace synthese
 			// Action
 			shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
 			aol->setRecipientKey(_recipientKey);
-			aol->setAlarmId(_alarm->getKey());
+			aol->setAlarm(_alarm.get());
 			aol->setObjectId(_objectId);
 			AlarmObjectLinkTableSync::Save(aol.get());
 
@@ -115,9 +107,16 @@ namespace synthese
 			_recipientKey = key;
 		}
 
-		void AlarmAddLinkAction::setAlarm( boost::shared_ptr<const Alarm> alarm )
+		void AlarmAddLinkAction::setAlarmId(RegistryKeyType id)
 		{
-			_alarm = alarm;
+			try
+			{
+				_alarm = AlarmTableSync::GetEditable(id, _env);
+			}
+			catch (ObjectNotFoundException<Alarm>)
+			{
+				throw ActionException("Specified alarm not found");
+			}
 		}
 
 		void AlarmAddLinkAction::setObjectId(RegistryKeyType id )

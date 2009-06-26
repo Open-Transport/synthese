@@ -137,11 +137,11 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Road>& e)
 				{
-					throw LinkException<RoadChunkTableSync>(object->getKey(), RoadChunkTableSync::COL_ROADID, e);
+					throw LinkException<RoadChunkTableSync>(rows, RoadChunkTableSync::COL_ROADID, e);
 				}
 				catch (ObjectNotFoundException<Address>& e)
 				{
-					throw LinkException<RoadChunkTableSync>(object->getKey(), RoadChunkTableSync::COL_ADDRESSID, e);
+					throw LinkException<RoadChunkTableSync>(rows, RoadChunkTableSync::COL_ADDRESSID, e);
 				}
 			}
 		}

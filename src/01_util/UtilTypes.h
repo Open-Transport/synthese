@@ -26,13 +26,11 @@
 #ifndef SYNTHESE_util_UtilTypes_h__
 #define SYNTHESE_util_UtilTypes_h__
 
-#include "UId.h"
-
 namespace synthese
 {
 	namespace util
 	{
-		typedef uid RegistryKeyType;
+		typedef signed long long int RegistryKeyType;
 
 		typedef enum
 		{

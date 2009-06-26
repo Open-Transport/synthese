@@ -23,8 +23,8 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SYNTHESE_db_SQLiteRegistryTableSyncTemplate_h__
-#define SYNTHESE_db_SQLiteRegistryTableSyncTemplate_h__
+#ifndef SYNTHESE_db_SQLiteConditionalRegistryTableSyncTemplate_h__
+#define SYNTHESE_db_SQLiteConditionalRegistryTableSyncTemplate_h__
 
 #include "SQLiteDirectTableSyncTemplate.h"
 
@@ -36,17 +36,29 @@ namespace synthese
 	namespace db
 	{
 		////////////////////////////////////////////////////////////////////
-		/// Table sync class with  synchronization between
+		/// Table sync class with conditional synchronization between
 		/// database and physical memory.
 		///		- class K : Class of the table sync
 		///		- class T : Class of the corresponding objects
 		///	@ingroup m10
 		template<class K, class T>
-		class SQLiteRegistryTableSyncTemplate:
+		class SQLiteConditionalRegistryTableSyncTemplate:
 			public SQLiteDirectTableSyncTemplate<K,T>
 		{
 		public:
-			SQLiteRegistryTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>() {}
+			SQLiteConditionalRegistryTableSyncTemplate() : SQLiteDirectTableSyncTemplate<K,T>() {}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Static method to be implemented by template instanciation 
+			/// determinating if a row corresponds to an object that must be
+			/// loaded into phyisical memory or not.
+			/// @param row row to read
+			/// @result true if the object mest be loaded into the physical memory
+			static bool IsLoaded(
+				const SQLiteResultSPtr& row
+			);
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -57,31 +69,35 @@ namespace synthese
 				SQLiteSync* sync,
 				const SQLiteResultSPtr& rows,
 				bool isFirstSync = false
-				){
-					util::Env& env(util::Env::GetOfficialEnv());
-					util::Registry<T>& registry(env.getEditableRegistry<T>());
-					while (rows->next ())
+			){
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
+				while (rows->next ())
+				{
+					try
 					{
-						try
+						if(!IsLoaded(rows))
 						{
-							if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
-							{
-								boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
-								SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get());
-								Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-							}
-							else
-							{
-								boost::shared_ptr<T> object(K::GetNewObject(rows));
-								Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-								registry.add(object);
-							}
+							continue;
 						}
-						catch(util::Exception& e)
+						if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
 						{
-							util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
+							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get());
+							Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+						}
+						else
+						{
+							boost::shared_ptr<T> object(K::GetNewObject(rows));
+							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							registry.add(object);
 						}
 					}
+					catch(util::Exception& e)
+					{
+						util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
+					}
+				}
 			}
 
 
@@ -95,25 +111,25 @@ namespace synthese
 				SQLite* sqlite
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
-				){
-					util::Env& env(util::Env::GetOfficialEnv());
-					util::Registry<T>& registry(env.getEditableRegistry<T>());
-					while (rows->next ())
+			){
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
+				while (rows->next ())
+				{
+					try
 					{
-						try
+						if (registry.contains(rows->getKey()))
 						{
-							if (registry.contains(rows->getKey()))
-							{
-								boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
-								Unlink(address.get());
-								Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-							}
-						}
-						catch (util::Exception& e)
-						{
-							util::Log::GetInstance().warn("Error on load after row update : ", e);
+							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
+							Unlink(address.get());
+							Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 					}
+					catch (util::Exception& e)
+					{
+						util::Log::GetInstance().warn("Error on load after row update : ", e);
+					}
+				}
 			}
 
 
@@ -126,25 +142,25 @@ namespace synthese
 				SQLite* sqlite
 				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
-				){
-					util::Env& env(util::Env::GetOfficialEnv());
-					util::Registry<T>& registry(env.getEditableRegistry<T>());
-					while (rows->next ())
+			){
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
+				while (rows->next ())
+				{
+					try
 					{
-						try
+						util::RegistryKeyType id(rows->getKey());
+						if (registry.contains(id))
 						{
-							util::RegistryKeyType id(rows->getKey());
-							if (registry.contains(id))
-							{
-								SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get());
-								registry.remove(id);
-							}
-						}
-						catch (util::Exception& e)
-						{
-							util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get());
+							registry.remove(id);
 						}
 					}
+					catch (util::Exception& e)
+					{
+						util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
+					}
+				}
 			}
 		};
 	}

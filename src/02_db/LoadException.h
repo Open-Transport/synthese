@@ -20,12 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_db_LinkException_h__
-#define SYNTHESE_db_LinkException_h__
+#ifndef SYNTHESE_db_LoadException_h__
+#define SYNTHESE_db_LoadException_h__
 
 #include "01_util/Exception.h"
-#include "01_util/UId.h"
-#include "01_util/Conversion.h"
+
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
@@ -36,16 +36,19 @@ namespace synthese
 			@ingroup m10Exceptions refExceptions
 		*/
 		template<class C>
-		class LoadException : public util::Exception
+		class LoadException:
+			public util::Exception
 		{
 		public:
 			LoadException(
-				uid currentId,
+				const db::SQLiteResultSPtr& row,
 				const std::string& field,
 				const std::string& text
 			):	util::Exception(
-				"There was an error in "+ C::TABLE.NAME +" table at row "+ util::Conversion::ToString(currentId) +" in field "+ field +" : "+ text
-			)
+					"There was a load error in "+ C::TABLE.NAME +
+					" table at row "+ boost::lexical_cast<std::string>(row->getLongLong(TABLE_COL_ID)) +
+					" in field "+ field +" : "+ text
+				)
 			{}
 		};
 	}

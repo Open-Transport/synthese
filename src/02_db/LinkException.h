@@ -24,25 +24,38 @@
 #define SYNTHESE_db_LinkException_h__
 
 #include "01_util/Exception.h"
-#include "01_util/UId.h"
-#include "01_util/Conversion.h"
 
 namespace synthese
 {
 	namespace db
 	{
 		/** LinkException class template.
-				- class C : Class of the table sync of the current object
+			A link exception is thrown by a table sync loader when an inconsistent object is loaded due to
+			bad link informations.
+			Examples :
+			 - an id points to an inexistent object, whereas the link is compulsory
+			 - an id points to an existing object, but the load of the object has failed
+			 - etc.
+
+			Template class C : Class of the table sync of the current object
 			@ingroup m10Exceptions refExceptions
 		*/
 		template<class C>
 		class LinkException : public util::Exception
 		{
 		public:
-			LinkException(uid currentId, const std::string& field, const util::Exception& e)
-			    : Exception("There was an error in "+ C::TABLE.NAME +" table at row "+ util::Conversion::ToString(currentId) +" in field "+ field +" : "+ e.getMessage())
-			{	}
-
+			LinkException(
+				const db::SQLiteResultSPtr& row,
+				const std::string& field,
+				const util::Exception& e
+			):	util::Exception(
+					"There was a link error in "+ C::TABLE.NAME +
+					" table at row "+ row->getText(TABLE_COL_ID) +
+					" when loading object "+ row->getText(field) +
+					" at field "+ field +
+					" : "+ e.getMessage()
+				)
+			{}
 		};
 	}
 }

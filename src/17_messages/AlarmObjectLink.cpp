@@ -41,9 +41,9 @@ namespace synthese
 			return _objectId;
 		}
 
-		uid AlarmObjectLink::getAlarmId() const
+		Alarm* AlarmObjectLink::getAlarm() const
 		{
-			return _alarmId;
+			return _alarm;
 		}
 
 		std::string AlarmObjectLink::getRecipientKey() const
@@ -56,9 +56,9 @@ namespace synthese
 			_objectId = key;
 		}
 
-		void AlarmObjectLink::setAlarmId( uid key )
+		void AlarmObjectLink::setAlarm(Alarm* alarm)
 		{
-			_alarmId = key;
+			_alarm = alarm;
 		}
 
 		void AlarmObjectLink::setRecipientKey( const std::string& key )
@@ -70,7 +70,8 @@ namespace synthese
 
 		AlarmObjectLink::AlarmObjectLink(
 			RegistryKeyType key /*= UNKNOWN_VALUE*/
-		):	Registrable(key)
+		):	Registrable(key),
+			_alarm(NULL)
 		{
 		
 		}

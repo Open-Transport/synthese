@@ -159,7 +159,7 @@ namespace synthese
 
 					ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(_request);
 					addRequest.getFunction()->setSamePage(this);
-					addRequest.getAction()->setAlarm(_alarm);
+					addRequest.getAction()->setAlarmId(_alarm->getKey());
 					addRequest.getAction()->setRecipientKey(recipient->getFactoryKey());
 
 					ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
