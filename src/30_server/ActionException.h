@@ -29,6 +29,7 @@
 #include "UtilTypes.h"
 #include "ObjectNotFoundException.h"
 #include "ParametersMap.h"
+#include "Action.h"
 
 #include <string>
 #include <iostream>
@@ -37,8 +38,6 @@ namespace synthese
 {
 	namespace server
 	{
-		class Action;
-		
 		////////////////////////////////////////////////////////////////////////
 		/// Action related exception class.
 		/// @ingroup m18/exception
@@ -75,8 +74,8 @@ namespace synthese
 				const std::string& field,
 				const util::ObjectNotFoundException<C>& e,
 				const Action& action
-				) throw():
-				Exception("Specified "+ field + " " + lexical_cast<string>(e.getKey()) +" not found in "+ action.getFactoryKey() + ":" + e.getMessage())
+			) throw():
+				Exception("Specified "+ field + " " + boost::lexical_cast<std::string>(e.getKey()) +" not found in "+ action.getFactoryKey() + ":" + e.getMessage())
 			{
 
 			}

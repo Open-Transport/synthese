@@ -28,7 +28,6 @@
 
 #include "FactoryBase.h"
 #include "Env.h"
-#include "ActionException.h"
 
 #define Action_PARAMETER_PREFIX std::string("actionParam")
 

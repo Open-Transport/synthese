@@ -65,6 +65,7 @@ namespace synthese
 				MissingParameterException(
 					const std::string& field
 				);
+				~MissingParameterException() throw();
 
 				virtual const char* what() const throw();
 

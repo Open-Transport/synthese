@@ -220,6 +220,10 @@ namespace synthese
 
 		}
 
+		ParametersMap::MissingParameterException::~MissingParameterException() throw()
+		{
+		}
+
 		const char* ParametersMap::MissingParameterException::what() const throw()
 		{
 			stringstream s;

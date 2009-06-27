@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace server
+	{
+		class ActionException;
+	}
+
 	namespace messages
 	{
 		class Scenario;
