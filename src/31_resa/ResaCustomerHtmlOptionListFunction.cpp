@@ -25,7 +25,6 @@
 #include "Conversion.h"
 #include "Request.h"
 #include "RequestException.h"
-#include "RequestMissingParameterException.h"
 #include "ResaRight.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
 #include "User.h"

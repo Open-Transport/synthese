@@ -46,6 +46,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -66,7 +67,7 @@ namespace synthese
 			, const AccessParameters&	accessParameters
 			, GraphIdType whatToSearch
 			, GraphIdType graphToUse
-			, JourneysResult<graph::JourneyComparator>&				result
+			, JourneysResult<graph::JourneyComparator>&	result
 			, BestVertexReachesMap& bestVertexReachesMap
 			, const VertexAccessMap& destinationVam
 			, DateTime&	minMaxDateTimeAtDestination
@@ -105,17 +106,20 @@ namespace synthese
 			JourneysResult<_JourneyComparator> todo;
 			todo.addEmptyJourney();
 
+#ifdef DEBUG
 			string s("<table class=\"adminresults\">");
 			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
 				Log::GetInstance().trace(s);
 			if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 				*_logStream << s;
+#endif
 
 			// The Loop
 			while(!todo.empty())
 			{
-				const Journey* journey(todo.front());
+				shared_ptr<Journey> journey(todo.front());
 
+#ifdef DEBUG
 				if(	!journey->empty()
 				&&	(Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 					|| _logLevel <= Log::LEVEL_TRACE
@@ -234,6 +238,7 @@ namespace synthese
 						*_logStream << s;
 					}
 				}
+#endif
 
 				VertexAccessMap vam;
 				DateTime desiredTime(TIME_UNKNOWN);
@@ -360,7 +365,7 @@ namespace synthese
 								}
 
 								// Storage of the useful solution
-								Journey* resultJourney(new Journey(fullApproachJourney));
+								shared_ptr<Journey> resultJourney(new Journey(fullApproachJourney));
 								ServiceUse serviceUse(serviceInstance, curEdge);
 								if (serviceUse.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
 									continue;
@@ -376,8 +381,6 @@ namespace synthese
 								pair<bool,bool> evaluationResult(evaluateJourney(*resultJourney, _optim));
 								if (!evaluationResult.first)
 								{
-									delete resultJourney;
-
 									if (!evaluationResult.second)
 										break;
 									else
@@ -387,14 +390,6 @@ namespace synthese
 								resultJourney->setEndReached(isGoalReached);
 								resultJourney->setSquareDistanceToEnd(_destinationVam);
 								resultJourney->setMinSpeedToEnd(_minMaxDateTimeAtDestination);
-
-								// Storage of the journey for recursion
-								if (journey->getJourneyLegCount() < maxDepth)
-								{
-									Journey* todoJourney(new Journey(*journey));
-									todoJourney->push(serviceUse);
-									todo.add(todoJourney);
-								}
 
 								// Storage of the journey as a result :
 								//	- if goal reached
@@ -407,6 +402,14 @@ namespace synthese
 									isGoalReached
 								){
 									_result.add(resultJourney);
+								}
+
+								// Storage of the journey for recursion
+								if (journey->getJourneyLegCount() < maxDepth)
+								{
+									shared_ptr<Journey> todoJourney(new Journey(*journey));
+									todoJourney->push(serviceUse);
+									todo.add(todoJourney);
 								}
 
 								// Storage of the reach time at the vertex in the best vertex reaches map
@@ -439,6 +442,8 @@ namespace synthese
 				}
 			}
 */
+
+#ifdef DEBUG
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 				|| _logLevel <= Log::LEVEL_TRACE
 				){
@@ -459,7 +464,7 @@ namespace synthese
 					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 						*_logStream << s.str();
 			}
-
+#endif
 		}
 
 // ------------------------------------------------------------------------- Utilities
@@ -563,7 +568,7 @@ namespace synthese
 
 
 
-		bool IntegralSearcher::_JourneyComparator::operator() (const Journey* j1, const Journey* j2) const
+		bool IntegralSearcher::_JourneyComparator::operator() (shared_ptr<Journey> j1, shared_ptr<Journey> j2) const
 		{
 			assert(j1 != NULL);
 			assert(j2 != NULL);

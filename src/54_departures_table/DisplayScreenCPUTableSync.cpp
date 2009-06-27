@@ -125,12 +125,12 @@ namespace synthese
                
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey()) << ","
+				<< object->getKey() << ","
 				<< Conversion::ToSQLiteString(object->getName()) << ","
-				<< ((object->getPlace() != NULL) ? Conversion::ToString(object->getPlace()->getKey()) : "0") << ","
+				<< ((object->getPlace() != NULL) ? object->getPlace()->getKey() : 0) << ","
 				<< Conversion::ToSQLiteString(object->getMacAddress()) << ","
 				<< object->getMonitoringDelay().minutes() << ","
-				<< Conversion::ToString(object->getIsOnline()) << ","
+				<< object->getIsOnline() << ","
 				<< Conversion::ToSQLiteString(object->getMaintenanceMessage())
 				<< ")";
 			sqlite->execUpdate(query.str());
@@ -185,11 +185,11 @@ namespace synthese
 			}
 			if (number > 0)
 			{
-				query << " LIMIT " << Conversion::ToString(number + 1);
+				query << " LIMIT " << (number + 1);
 			}
 			if (first > 0)
 			{
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 			}
 
 			LoadFromQuery(query.str(), env, linkLevel);

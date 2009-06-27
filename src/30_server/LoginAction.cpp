@@ -24,7 +24,6 @@
 #include "ServerModule.h"
 
 #include "LoginAction.h"
-#include "RequestMissingParameterException.h"
 #include "ActionException.h"
 #include "Session.h"
 #include "Request.h"
@@ -60,8 +59,15 @@ namespace synthese
 
 		void LoginAction::_setFromParametersMap(const ParametersMap& map )
 		{
-			_login = map.getString(PARAMETER_LOGIN, false, FACTORY_KEY);
-			_password = map.getString(PARAMETER_PASSWORD, false, FACTORY_KEY);
+			try
+			{
+				_login = map.get<string>(PARAMETER_LOGIN);
+				_password = map.get<string>(PARAMETER_PASSWORD);
+			}
+			catch(ParametersMap::MissingParameterException e)
+			{
+				throw ActionException(e, *this);
+			}
 		}
 
 		void LoginAction::run()

@@ -74,10 +74,9 @@ namespace synthese
 		
 		void ScenarioFolderRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
 			try
 			{
-				_folder = ScenarioFolderTableSync::Get(id, _env);
+				_folder = ScenarioFolderTableSync::Get(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID), _env);
 			}
 			catch (...)
 			{

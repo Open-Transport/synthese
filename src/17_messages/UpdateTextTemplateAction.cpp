@@ -24,16 +24,15 @@
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 
-#include "13_dblog/DBLogModule.h"
+#include "DBLogModule.h"
 
-#include "17_messages/MessagesLibraryLog.h"
-#include "17_messages/MessagesLibraryRight.h"
+#include "MessagesLibraryLog.h"
+#include "MessagesLibraryRight.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/Request.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Request.h"
 
-#include "01_util/Conversion.h"
 #include "Env.h"
 
 using namespace std;
@@ -71,14 +70,13 @@ namespace synthese
 			try
 			{
 				// Text ID
-				uid id = map.getUid(PARAMETER_TEXT_ID, true, FACTORY_KEY);
-				_text = TextTemplateTableSync::GetEditable(id, _env);
+				_text = TextTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TEXT_ID), _env);
 		
 				//id = map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY);
 				//_folder = TextTemplateTableSync::Get(id, _env);
 
 				// Name
-				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+				_name = map.get<string>(PARAMETER_NAME);
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
 
@@ -88,14 +86,18 @@ namespace synthese
 					throw ActionException("Un texte portant ce nom existe déjà.");
 
 				// Short message
-				_shortMessage = map.getString(PARAMETER_SHORT_MESSAGE, true, FACTORY_KEY);
+				_shortMessage = map.get<string>(PARAMETER_SHORT_MESSAGE);
 				
 				// Long message
-				_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
+				_longMessage = map.get<string>(PARAMETER_LONG_MESSAGE);
 			}
 			catch (ObjectNotFoundException<TextTemplate>& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException("text template", e, *this);
+			}
+			catch(ParametersMap::MissingParameterException e)
+			{
+				throw ActionException(e, *this);
 			}
 		}
 

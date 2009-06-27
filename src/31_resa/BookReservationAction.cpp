@@ -136,20 +136,20 @@ namespace synthese
 			// Right control
 			if (_request->isAuthorized<ResaRight>(WRITE, WRITE))
 			{
-				_createCustomer = map.getBool(PARAMETER_CREATE_CUSTOMER, false, false, FACTORY_KEY);
+				_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
 
 				if (_createCustomer)
 				{
 					_customer.reset(new User);
-					_customer->setName(map.getString(PARAMETER_CUSTOMER_NAME, true, FACTORY_KEY));
+					_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
 					if (_customer->getName().empty())
 						throw ActionException("Le nom du client doit être rempli");
 
-					_customer->setSurname(map.getString(PARAMETER_CUSTOMER_SURNAME, true, FACTORY_KEY));
+					_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
 					if (_customer->getSurname().empty())
 						throw ActionException("Le prénom du client doit être rempli");
 
-					_customer->setPhone(map.getString(PARAMETER_CUSTOMER_PHONE, true, FACTORY_KEY));
+					_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
 					if (_customer->getPhone().empty())
 						throw ActionException("Le numéro de téléphone doit être rempli");
 
@@ -159,23 +159,23 @@ namespace synthese
 					if (!env.getRegistry<User>().empty())
 						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
 					
-					_customer->setEMail(map.getString(PARAMETER_CUSTOMER_EMAIL, false, FACTORY_KEY));
+					_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
 					_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
 				}
 				else
 				{
 					// Customer ID
-					uid id(map.getUid(PARAMETER_CUSTOMER_ID, false, FACTORY_KEY));
-					if (id != UNKNOWN_VALUE)
-						_customer = UserTableSync::GetEditable(id, _env);
+					optional<RegistryKeyType> id(map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID));
+					if (id)
+						_customer = UserTableSync::GetEditable(*id, _env);
 				}
 			}
-			else if (_request->isAuthorized<ResaRight>(FORBIDDEN, WRITE))
+			if(!_customer.get())
 			{
 				_customer = const_pointer_cast<User, const User>(_request->getUser());
 
 				// Password control
-				string password(map.getString(PARAMETER_PASSWORD, true, FACTORY_KEY));
+				string password(map.get<string>(PARAMETER_PASSWORD));
 				if (password.empty())
 					throw ActionException("Le mot de passe doit être fourni");
 
@@ -203,7 +203,7 @@ namespace synthese
 				site = Env::GetOfficialEnv().getRegistry<Site>().get(id);
 
 			// Seats number
-			_seatsNumber = map.getInt(PARAMETER_SEATS_NUMBER, true, FACTORY_KEY);
+			_seatsNumber = map.get<int>(PARAMETER_SEATS_NUMBER);
 			if (_seatsNumber < 1 || _seatsNumber > 99)
 				throw ActionException("Invalid seats number");
 
@@ -232,11 +232,11 @@ namespace synthese
 
 			// Accessibility
 			AccessParameters ap;
-			int i(map.getInt(PARAMETER_USER_CLASS, false, FACTORY_KEY));
+			optional<int> i(map.getOptional<int>(PARAMETER_USER_CLASS));
 			UserClassCode userClassCode(USER_PEDESTRIAN);
-			if(i > 0)
+			if(i)
 			{
-				userClassCode = static_cast<UserClassCode>(i);
+				userClassCode = static_cast<UserClassCode>(*i);
 			}
 			
 			if (site.get())

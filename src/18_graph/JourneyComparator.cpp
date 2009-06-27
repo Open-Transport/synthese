@@ -25,11 +25,13 @@
 
 #include <assert.h>
 
+using namespace boost;
+
 namespace synthese
 {
 	namespace graph
 	{
-		bool JourneyComparator::operator() (const Journey* j1, const Journey* j2) const
+		bool JourneyComparator::operator() (shared_ptr<Journey> j1, shared_ptr<Journey> j2) const
 		{
 			assert(j1 != NULL);
 			assert(j2 != NULL);

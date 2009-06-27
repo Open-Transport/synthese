@@ -21,17 +21,15 @@
 */
 
 #include "UpdateRightAction.h"
-#include "RequestMissingParameterException.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/SecurityModule.h"
-#include "12_security/Right.h"
-#include "12_security/SecurityLog.h"
+#include "ProfileTableSync.h"
+#include "SecurityModule.h"
+#include "Right.h"
+#include "SecurityLog.h"
 #include "SecurityRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
-
-#include "13_dblog/DBLogModule.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
+#include "DBLogModule.h"
 
 using namespace std;
 

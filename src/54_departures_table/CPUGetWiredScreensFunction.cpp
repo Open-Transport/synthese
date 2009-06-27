@@ -24,9 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#include "Conversion.h"
 #include "RequestException.h"
-#include "RequestMissingParameterException.h"
 #include "CPUGetWiredScreensFunction.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"

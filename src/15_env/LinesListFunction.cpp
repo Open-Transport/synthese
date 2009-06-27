@@ -23,9 +23,7 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "Conversion.h"
 #include "RequestException.h"
-#include "RequestMissingParameterException.h"
 #include "LinesListFunction.h"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
@@ -33,6 +31,7 @@
 #include "CommercialLineTableSync.h"
 
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -95,7 +94,7 @@ namespace synthese
 			}
 			catch (...)
 			{
-				throw RequestException("Transport network " + Conversion::ToString(id) + " not found");
+				throw RequestException("Transport network " + lexical_cast<string>(id) + " not found");
 			}
 		}
 

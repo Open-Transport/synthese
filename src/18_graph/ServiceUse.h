@@ -61,7 +61,7 @@ namespace synthese
 				const time::DateTime&	getDepartureDateTime()		const;
 				const time::DateTime&	getArrivalDateTime()		const;
 				int						getDuration()				const;
-				int						getDistance()				const;
+				double					getDistance()				const;
 				UseRule::RunPossibilityType		isUseRuleCompliant(
 				)	const;
 				time::DateTime			getReservationDeadLine()	const;

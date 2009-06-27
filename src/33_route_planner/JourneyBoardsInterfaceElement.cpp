@@ -88,7 +88,7 @@ namespace synthese
 					stream
 					, variables
 					, i
-					, *it
+					, it->get()
 					, result->departurePlace
 					, result->arrivalPlace
 					, hFilter

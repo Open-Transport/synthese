@@ -39,7 +39,6 @@
 #include "AdminModule.h"
 #include "AdminRequest.h"
 #include "ModuleAdmin.h"
-#include "RequestMissingParameterException.h"
 #include "Request.h"
 
 #include <boost/foreach.hpp>

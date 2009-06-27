@@ -20,17 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
-#include "RequestMissingParameterException.h"
-#include "12_security/AddRightAction.h"
-#include "12_security/SecurityModule.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/Right.h"
-#include "12_security/SecurityLog.h"
+#include "AddRightAction.h"
+#include "SecurityModule.h"
+#include "ProfileTableSync.h"
+#include "Right.h"
+#include "SecurityLog.h"
 #include "SecurityRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 using namespace boost;

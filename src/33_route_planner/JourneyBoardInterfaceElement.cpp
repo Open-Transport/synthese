@@ -89,7 +89,7 @@ namespace synthese
 			bool __Couleur = false;
 
 			const Hub* lastPlace(journey->getOrigin()->getHub());
-			int distance(0);
+			double distance(0);
 
 			const Journey::ServiceUses& services(journey->getServiceUses());
 			for (Journey::ServiceUses::const_iterator it = services.begin(); it != services.end(); ++it)

@@ -23,10 +23,8 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "Conversion.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
-#include "RequestMissingParameterException.h"
 #include "ObjectNotFoundException.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -81,35 +79,34 @@ namespace synthese
 		{
 			try
 			{
-				setScreenId(map.getUid(PARAMETER_DISPLAY_SCREEN, true, FACTORY_KEY));
+				setScreenId(map.get<RegistryKeyType>(PARAMETER_DISPLAY_SCREEN));
 
-				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
-				_wiringCode = map.getInt(PARAMETER_WIRING_CODE, true, FACTORY_KEY);
+				_name = map.get<string>(PARAMETER_NAME);
+				_wiringCode = map.get<int>(PARAMETER_WIRING_CODE);
 				
-				uid id(map.getUid(PARAMETER_TYPE, true, FACTORY_KEY));
-				_type = DisplayTypeTableSync::Get(id, _env);
+				_type = DisplayTypeTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TYPE), _env);
 
-				_comPort = map.getInt(PARAMETER_COM_PORT, true, FACTORY_KEY);
+				_comPort = map.get<int>(PARAMETER_COM_PORT);
 
-				_macAddress = map.getString(PARAMETER_MAC_ADDRESS, false, FACTORY_KEY);
+				_macAddress = map.getDefault<string>(PARAMETER_MAC_ADDRESS);
 
-				id = map.getUid(PARAMETER_CPU, false, FACTORY_KEY);
-				if (id > 0)
+				optional<RegistryKeyType> id = map.getOptional<RegistryKeyType>(PARAMETER_CPU);
+				if (id)
 				{
-					_cpu = DisplayScreenCPUTableSync::Get(id, _env);
+					_cpu = DisplayScreenCPUTableSync::Get(*id, _env);
 				}
 			}
 			catch (ObjectNotFoundException<DisplayType>& e)
 			{
-				throw ActionException("display type", FACTORY_KEY, e);
+				throw ActionException("display type", e, *this);
 			}
 			catch(ObjectNotFoundException<DisplayScreenCPU>& e)
 			{
-				throw ActionException("central unit", FACTORY_KEY, e);
+				throw ActionException("central unit", e, *this);
 			}
-			catch(RequestMissingParameterException& e)
+			catch(ParametersMap::MissingParameterException& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
 		}
 
@@ -151,7 +148,7 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
-				throw ActionException("display screen", id, FACTORY_KEY, e);
+				throw ActionException("display screen", e, *this);
 			}
 		}
 

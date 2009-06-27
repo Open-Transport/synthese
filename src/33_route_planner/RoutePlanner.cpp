@@ -77,11 +77,11 @@ namespace synthese
 			const AccessParameters& accessParameters,
 			const PlanningOrder& planningOrder,
 			const DateTime& journeySheetStartTime,
-			const DateTime& journeySheetEndTime
-			, int maxSolutionsNumber
-			, std::ostream* 			logStream
-			, util::Log::Level			logLevel
-		)	: _accessParameters (accessParameters)
+			const DateTime& journeySheetEndTime,
+			optional<size_t> maxSolutionsNumber,
+			std::ostream* 			logStream,
+			util::Log::Level			logLevel
+		):	_accessParameters (accessParameters)
 			, _planningOrder (planningOrder)
 			, _journeySheetStartTime (journeySheetStartTime)
 			, _journeySheetEndTime (journeySheetEndTime)
@@ -119,11 +119,6 @@ namespace synthese
 		}
 
 
-		   
-		RoutePlanner::~RoutePlanner ()
-		{
-		}
-
 
 // --------------------------------------------------------- Journey sheet calculation
 
@@ -131,7 +126,7 @@ namespace synthese
 		{
 			_result.clear();
 
-			// Log
+#ifdef DEBUG			// Log
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 				|| _logLevel <= Log::LEVEL_TRACE
 			){
@@ -143,7 +138,7 @@ namespace synthese
 				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 					*_logStream << s.str();
 			}
-
+#endif
 			// Control if the departure place and the arrival place have a common point
 			_result.samePlaces = false;
 			for (VertexAccessMap::VamMap::const_iterator itd(_originVam.getMap().begin()); itd != _originVam.getMap().end(); ++itd)
@@ -194,62 +189,59 @@ namespace synthese
 			// (cos not taken into account in returned journey vector).
 			ovam.mergeWithFilter(_originVam, PTModule::GRAPH_ID);
 
-			Journey* candidate(new Journey());
-			for(JourneysResult<JourneyComparator>::ResultSet::const_iterator itoj(originJourneys.getJourneys().begin());
-				itoj != originJourneys.getJourneys().end ();
-				++itoj
-			){
-				const Journey& oj = (**itoj);
-			
+			shared_ptr<Journey> candidate;
+			BOOST_FOREACH(shared_ptr<Journey> oj, originJourneys.getJourneys())
+			{
 				// Store each reached physical stop with full approach time addition :
 				//	- approach time in departure place
 				//	- duration of the approach journey
 				//	- transfer delay between approach journey end address and physical stop
 				int commonApproachTime(
-					_originVam.getVertexAccess(oj.getOrigin()->getFromVertex()).approachTime
-					+ oj.getDuration ()
+					_originVam.getVertexAccess(oj->getOrigin()->getFromVertex()).approachTime
+					+ oj->getDuration ()
 				);
-				int commonApproachDistance(
-					_originVam.getVertexAccess(oj.getOrigin()->getFromVertex()).approachDistance
-					+ oj.getDistance ()
+				double commonApproachDistance(
+					_originVam.getVertexAccess(oj->getOrigin()->getFromVertex()).approachDistance
+					+ oj->getDistance ()
 				);
 				VertexAccessMap vam;
-				const Hub* cp(oj.getDestination()->getHub());
-				const Vertex& v(*oj.getDestination()->getFromVertex());
+				const Hub* cp(oj->getDestination()->getHub());
+				const Vertex& v(*oj->getDestination()->getFromVertex());
 				cp->getVertexAccessMap(
 					vam
 					, DEPARTURE_TO_ARRIVAL
 					, PTModule::GRAPH_ID
 					, v
 				);
-				for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
+				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam.getMap())
 				{
-					if (_destinationVam.contains(it->first))
+					if (_destinationVam.contains(it.first))
 						continue;
 
 					ovam.insert(
-						it->first
+						it.first
 						, VertexAccess(
-							commonApproachTime + cp->getTransferDelay(v, *it->first)
+							commonApproachTime + cp->getTransferDelay(v, *it.first)
 							, commonApproachDistance
-							, oj
+							, *oj
 						)
 					);
 				}
 
 				// Store the journey as a candidate if it goes directly to the destination
-				if(	_destinationVam.contains(oj.getDestination()->getFromVertex())
-					&& oj.isBestThan(*candidate)
-				)	*candidate = oj;
+				if(	_destinationVam.contains(oj->getDestination()->getFromVertex()) &&
+					(	!candidate.get() ||
+						oj->isBestThan(*candidate)
+				)	){
+					candidate = oj;
+				}
 			}
 
 			// If a candidate was elected, store it in the result array
-			if (!candidate->empty())
+			if (candidate.get())
 				_result.journeys.push_back(candidate);
-			else
-				delete candidate;
 
-			// Log
+#ifdef DEBUG			// Log
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 				|| _logLevel <= Log::LEVEL_TRACE
 				){
@@ -287,7 +279,7 @@ namespace synthese
 					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 						*_logStream << s.str();
 			}
-
+#endif
 			// Create destination vam from integral search on roads
 			JourneysResult<JourneyComparator> destinationJourneys;
 			BestVertexReachesMap bvrmo(DEPARTURE_TO_ARRIVAL, true);
@@ -326,48 +318,46 @@ namespace synthese
 			// (cos not taken into account in returned journey vector).
 			dvam.mergeWithFilter(_destinationVam, PTModule::GRAPH_ID);
 
-			for(JourneysResult<JourneyComparator>::ResultSet::const_iterator itdj(destinationJourneys.getJourneys().begin());
-				itdj != destinationJourneys.getJourneys().end ();
-				++itdj
-			){
-				const Journey& j(**itdj);
-
+			BOOST_FOREACH(shared_ptr<Journey> dj, destinationJourneys.getJourneys())
+			{
 				// Store each reached physical stop with full approach time addition :
 				//	- approach time in destination place
 				//	- duration of the approach journey
 				//	- transfer delay between approach journey end address and physical stop
 				int commonApproachTime(
-					_destinationVam.getVertexAccess(j.getDestination()->getFromVertex()).approachTime
-					+ j.getDuration ()
+					_destinationVam.getVertexAccess(
+						dj->getDestination()->getFromVertex()
+					).approachTime	+ dj->getDuration ()
 				);
-				int commonApproachDistance(
-					_destinationVam.getVertexAccess(j.getDestination()->getFromVertex()).approachDistance
-					+ j.getDistance ()
+				double commonApproachDistance(
+					_destinationVam.getVertexAccess(
+						dj->getDestination()->getFromVertex()
+					).approachDistance + dj->getDistance ()
 				);
 				VertexAccessMap vam;
-				const Hub* cp(j.getOrigin()->getHub());
-				const Vertex& v(*j.getOrigin()->getFromVertex());
+				const Hub* cp(dj->getOrigin()->getHub());
+				const Vertex& v(*dj->getOrigin()->getFromVertex());
 				cp->getVertexAccessMap(
 					vam,
 					ARRIVAL_TO_DEPARTURE,
 					PTModule::GRAPH_ID,
 					v
 				);
-				for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
+				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam.getMap())
 				{
-					if (!_originVam.contains(it->first))
+					if (!_originVam.contains(it.first))
 						dvam.insert(
-							it->first
-							, VertexAccess(
-								commonApproachTime + cp->getTransferDelay(*it->first, v)
-								, commonApproachDistance
-								, j
+							it.first,
+							VertexAccess(
+								commonApproachTime + cp->getTransferDelay(*it.first, v),
+								commonApproachDistance,
+								*dj
 							)
 						);
 				}
 			}
 
-			// Log
+#ifdef DEBUG			// Log
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 				|| _logLevel <= Log::LEVEL_TRACE
 				){
@@ -395,14 +385,14 @@ namespace synthese
 					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 						*_logStream << s.str();
 			}
-
+#endif
 			if (_result.journeys.empty())
 			{
 				_previousContinuousServiceDuration = 0;
 			}
 			else
 			{
-				const Journey* journey(_result.journeys.front());
+				shared_ptr<Journey> journey(_result.journeys.front());
 				_previousContinuousServiceDuration = journey->getDuration();
 				_previousContinuousServiceLastDeparture = journey->getDepartureTime();
 				_previousContinuousServiceLastDeparture += journey->getContinuousServiceRange();
@@ -411,13 +401,11 @@ namespace synthese
 			// Time loop
 			int solutionNumber(0);
 			for(_minDepartureTime = _journeySheetStartTime; 
-				(_minDepartureTime <= _journeySheetEndTime
-				&&	(_maxSolutionsNumber == UNKNOWN_VALUE 
-					|| _maxSolutionsNumber > _result.journeys.size()
-					)
+				(	_minDepartureTime <= _journeySheetEndTime &&
+					(!_maxSolutionsNumber || *_maxSolutionsNumber > _result.journeys.size())
 				);
 			){
-
+#ifdef DEBUG
 				if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 					|| _logLevel <= Log::LEVEL_TRACE
 					){
@@ -429,9 +417,9 @@ namespace synthese
 						if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 							*_logStream << s.str();
 				}
+#endif
 
-
-				Journey* journey(new Journey());
+				shared_ptr<Journey> journey(new Journey());
 				computeRoutePlanningDepartureArrival(*journey, ovam, dvam);
 				
 				//! <li> If no journey was found and last service is continuous, 
@@ -606,7 +594,7 @@ namespace synthese
 						: _minDepartureTime + itVertex->second.approachTime
 				);
 			}
-
+#ifdef DEBUG
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 				|| _logLevel <= Log::LEVEL_TRACE
 				){
@@ -618,7 +606,7 @@ namespace synthese
 					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 						*_logStream << s.str();
 			}
-
+#endif
 			// Initialization of the integral searcher
 			IntegralSearcher is(
 				accessDirection
@@ -659,10 +647,15 @@ namespace synthese
 					const VertexAccess& va = endVam.getVertexAccess(reachedVertex);
 					
 					// Attempt to elect the solution as the result
+#ifdef DEBUG
 					bool saved(journey.isBestThan(result));
-					if (saved)
+#endif
+					if (journey.isBestThan(result))
+					{
 						result = journey;
+					}
 
+#ifdef DEBUG
 					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
 					{
 						Log::GetInstance().trace(
@@ -681,9 +674,12 @@ namespace synthese
 							;
 						}
 					}
+#endif
 
 					if (va.approachTime == 0)
+					{
 						todo.remove(*it);
+					}
 										
 					it = next;
 				}
@@ -694,6 +690,7 @@ namespace synthese
 				if (todo.empty())
 					break;
 
+#ifdef DEBUG
 				if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 					|| _logLevel <= Log::LEVEL_TRACE
 				){
@@ -703,120 +700,119 @@ namespace synthese
 					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 						*_logStream << s << "</table>";
 				}
-
+#endif
 				lastBestEndTime = bestEndTime;
 
-				const Journey* journey(todo.front());
+				shared_ptr<const Journey> journey(todo.front());
+#ifdef DEBUG
+				if(	!journey->empty() &&
+					(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE ||
+						_logLevel <= Log::LEVEL_TRACE
+				)	){
+					stringstream stream;
+					stream
+						<< "<h3>Integral search " << integralSerachsNumber++ << "</h3>"
+						<< "<table class=\"adminresults\"><tr>"
+						<< "<th colspan=\"7\">Journey</th>"
+						<< "</tr>"
+						;
 
-				if(	!journey->empty()
-					&&	(Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-					|| _logLevel <= Log::LEVEL_TRACE
-					)
-					){
-						stringstream stream;
-						stream
-							<< "<h3>Integral search " << integralSerachsNumber++ << "</h3>"
-							<< "<table class=\"adminresults\"><tr>"
-							<< "<th colspan=\"7\">Journey</th>"
-							<< "</tr>"
+					// Departure time
+					Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
+
+					/*					if (journey->getContinuousServiceRange() > 1)
+					{
+					DateTime endRange(its->getDepartureDateTime());
+					endRange += journey->getContinuousServiceRange();
+					stream << " - Service continu jusqu'à " << endRange.toString();
+					}
+					if (journey->getReservationCompliance() == true)
+					{
+					stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine().toString();
+					}
+					if (journey->getReservationCompliance() == boost::logic::indeterminate)
+					{
+					stream << " - Réservation facultative avant le " << journey->getReservationDeadLine().toString();
+					}
+					*/
+					stream << "<tr>";
+					stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+
+					// Line
+					const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
+					const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+					stream << "<td";
+					if (ls)
+						stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
+					stream << ">";
+					stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
+
+					// Transfers
+					if (its == journey->getServiceUses().end() -1)
+					{
+						stream << "<td colspan=\"4\">(trajet direct)</td>";
+					}
+					else
+					{
+						while(true)
+						{
+							// Arrival
+							stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
+
+							// Place
+							stream <<
+								"<td>" <<
+								dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName() <<
+								"</td>"
 							;
 
-						// Departure time
-						Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
+							// Next service use
+							++its;
 
-						/*					if (journey->getContinuousServiceRange() > 1)
-						{
-						DateTime endRange(its->getDepartureDateTime());
-						endRange += journey->getContinuousServiceRange();
-						stream << " - Service continu jusqu'à " << endRange.toString();
+							// Departure
+							stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+
+							// Line
+							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
+							const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+							stream << "<td";
+							if (ls)
+								stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
+							stream << ">";
+							stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
+
+							// Exit if last service use
+							if (its == journey->getServiceUses().end() -1)
+								break;
+
+							// Empty final arrival col
+							stream << "<td></td>";
+
+							// New row and empty origin departure cols;
+							stream << "</tr><tr>";
+							stream << "<td></td>";
+							stream << "<td></td>";
 						}
-						if (journey->getReservationCompliance() == true)
-						{
-						stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine().toString();
-						}
-						if (journey->getReservationCompliance() == boost::logic::indeterminate)
-						{
-						stream << " - Réservation facultative avant le " << journey->getReservationDeadLine().toString();
-						}
-						*/
-						stream << "<tr>";
-						stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+					}
 
-						// Line
-						const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-						const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-						stream << "<td";
-						if (ls)
-							stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
-						stream << ">";
-						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
-
-						// Transfers
-						if (its == journey->getServiceUses().end() -1)
-						{
-							stream << "<td colspan=\"4\">(trajet direct)</td>";
-						}
-						else
-						{
-							while(true)
-							{
-								// Arrival
-								stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
-
-								// Place
-								stream <<
-									"<td>" <<
-									dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName() <<
-									"</td>"
-								;
-
-								// Next service use
-								++its;
-
-								// Departure
-								stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
-
-								// Line
-								const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-								const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-								stream << "<td";
-								if (ls)
-									stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
-								stream << ">";
-								stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
-
-								// Exit if last service use
-								if (its == journey->getServiceUses().end() -1)
-									break;
-
-								// Empty final arrival col
-								stream << "<td></td>";
-
-								// New row and empty origin departure cols;
-								stream << "</tr><tr>";
-								stream << "<td></td>";
-								stream << "<td></td>";
-							}
-						}
-
-						// Final arrival
-						stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
+					// Final arrival
+					stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
 
 
-						string s(todo.getLog());
-						if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						{
-							Log::GetInstance().trace(stream.str());
-							Log::GetInstance().trace(s);
-							Log::GetInstance().trace("</table>");
-						}
-						if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						{
-							*_logStream << stream.str();
-							*_logStream << s << "</table>";
-						}
+					string s(todo.getLog());
+					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					{
+						Log::GetInstance().trace(stream.str());
+						Log::GetInstance().trace(s);
+						Log::GetInstance().trace("</table>");
+					}
+					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+					{
+						*_logStream << stream.str();
+						*_logStream << s << "</table>";
+					}
 				}
-
+#endif
 				VertexAccessMap vertices;
 				const Vertex& vertex(*journey->getEndEdge()->getFromVertex());
 				vertex.getHub()->getVertexAccessMap(
@@ -833,10 +829,8 @@ namespace synthese
 					, 0
 					, false
 				);
-
-				delete journey;
 			}
-
+#ifdef DEBUG
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
 				|| _logLevel <= Log::LEVEL_TRACE
 			){
@@ -848,17 +842,12 @@ namespace synthese
 				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
 					*_logStream << s.str();
 			}
-		}
-
-		RoutePlanner::Result::~Result()
-		{
-			clear();
+#endif
 		}
 
 		void RoutePlanner::Result::clear()
 		{
-			for(JourneyBoardJourneys::iterator it(journeys.begin()); it != journeys.end(); ++it)
-				delete *it;
+			journeys.clear();
 		}
 	}
 }

@@ -27,6 +27,8 @@
 
 #include "Exception.h"
 #include "UtilTypes.h"
+#include "ObjectNotFoundException.h"
+#include "ParametersMap.h"
 
 #include <string>
 #include <iostream>
@@ -35,10 +37,13 @@ namespace synthese
 {
 	namespace server
 	{
+		class Action;
+		
 		////////////////////////////////////////////////////////////////////////
 		/// Action related exception class.
 		/// @ingroup m18/exception
-		class ActionException : public synthese::util::Exception
+		class ActionException:
+			public util::Exception
 		{
 			//lint --e{1712}
 
@@ -51,9 +56,8 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2008
 			explicit ActionException(
-				const std::string& field,
-				const std::string& source,
-				const Exception& e
+				const ParametersMap::MissingParameterException& e,
+				const Action& action
 			) throw();
 
 
@@ -66,12 +70,16 @@ namespace synthese
 			/// @param e Catch exception
 			///	@author Hugues Romain
 			///	@date 2008
+			template<class C>
 			explicit ActionException(
 				const std::string& field,
-				util::RegistryKeyType id,
-				const std::string& source,
-				const Exception& e
-			) throw();
+				const util::ObjectNotFoundException<C>& e,
+				const Action& action
+				) throw():
+				Exception("Specified "+ field + " " + lexical_cast<string>(e.getKey()) +" not found in "+ action.getFactoryKey() + ":" + e.getMessage())
+			{
+
+			}
 
 			
 			

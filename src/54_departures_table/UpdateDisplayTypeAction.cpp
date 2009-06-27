@@ -82,11 +82,11 @@ namespace synthese
 
 		void UpdateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setTypeId(map.getUid(PARAMETER_ID, true, FACTORY_KEY));
+			setTypeId(map.get<RegistryKeyType>(PARAMETER_ID));
 			try
 			{
 				// Name
-				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+				_name = map.get<string>(PARAMETER_NAME);
 				if (_name != _dt->getName())
 				{
 					if (_name.empty())
@@ -99,38 +99,38 @@ namespace synthese
 				}
 
 				// Rows number
-				_rows_number = map.getInt(PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
+				_rows_number = map.get<int>(PARAMETER_ROWS_NUMBER);
 				if (_rows_number < 0)
 				{
 					throw ActionException("Un nombre positif de rangées doit être choisi");
 				}
 
 				// Interface
-				RegistryKeyType id(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID));
 				if (id > 0)
 				{
 					_interface = InterfaceTableSync::Get(id, _env);
 				}
-				id = map.getUid(PARAMETER_AUDIO_INTERFACE_ID, true, FACTORY_KEY);
+				id = map.get<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID);
 				if (id > 0)
 				{
 					_audioInterface = InterfaceTableSync::Get(id, _env);
 				}
-				id = map.getUid(PARAMETER_MONITORING_INTERFACE_ID, true, FACTORY_KEY);
+				id = map.get<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
 				if (id > 0)
 				{
 					_monitoringInterface = InterfaceTableSync::Get(id, _env);
 				}
 
 				// Max stops number
-				_max_stops_number = map.getInt(PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
+				_max_stops_number = map.get<int>(PARAMETER_MAX_STOPS_NUMBER);
 				if (_max_stops_number < UNKNOWN_VALUE)
 				{
 					throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
 				}
 
 				// Time between checks
-				_timeBetweenChecks = minutes(map.getInt(PARAMETER_TIME_BETWEEN_CHECKS, true, FACTORY_KEY));
+				_timeBetweenChecks = minutes(map.get<int>(PARAMETER_TIME_BETWEEN_CHECKS));
 				if (_timeBetweenChecks.minutes() < 0)
 				{
 					throw ActionException("La durée entre les tests de supervision doit être positive.");

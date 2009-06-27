@@ -81,12 +81,12 @@ namespace synthese
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 
 			// Origin and destination places
-			_favoriteId = map.getUid(PARAMETER_FAVORITE_ID, false, FACTORY_KEY);
-			if (_favoriteId != UNKNOWN_VALUE)
+			_favoriteId = map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID);
+			if (_favoriteId)
 			{
 				try
 				{
-					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(_favoriteId, _env));
+					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(*_favoriteId, _env));
 					if (favorite->getUser()->getKey() != _request->getUser()->getKey())
 					{
 						throw RequestException("Forbidden favorite");
@@ -103,14 +103,14 @@ namespace synthese
 			}
 			else
 			{
-				_originCityText = map.getString(PARAMETER_DEPARTURE_CITY_TEXT, false, string());
-				_destinationCityText = map.getString(PARAMETER_ARRIVAL_CITY_TEXT, false, string());
+				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
+				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
 				if (_originCityText.empty() || _destinationCityText.empty())
 					_home = true;
 				else
 				{
-					_originPlaceText = map.getString(PARAMETER_DEPARTURE_PLACE_TEXT, false, string());
-					_destinationPlaceText = map.getString(PARAMETER_ARRIVAL_PLACE_TEXT, false, string());
+					_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
+					_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
 				}
 			}
 			if (!_home)
@@ -119,9 +119,9 @@ namespace synthese
 				_arrival_place = _site->fetchPlace(_destinationCityText, _destinationPlaceText);
 			}
 
-			// Date
 			try
 			{
+				// Date
 				Date day(map.getDate(PARAMETER_DAY, false, string()));
 				if (day.isUnknown())
 				{
@@ -131,8 +131,8 @@ namespace synthese
 				}
 				else
 				{
-					_periodId = map.getInt(PARAMETER_PERIOD_ID, true, string());
-					if (_periodId < 0 || _periodId >= _site->getPeriods().size())
+					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
+					if (_periodId >= _site->getPeriods().size())
 						throw RequestException("Bad value for period id");
 					_startDate = DateTime(day, Hour(0, 0));
 					_endDate = _startDate;
@@ -144,16 +144,18 @@ namespace synthese
 			{
 				throw RequestException("Bad date");
 			}
+			catch(ParametersMap::MissingParameterException& e)
+			{
+				throw RequestException(e.what());
+			}
 
 			// Max solutions number
-			_maxSolutionsNumber = map.getInt(PARAMETER_MAX_SOLUTIONS_NUMBER, false, string());
-			if (_maxSolutionsNumber < UNKNOWN_VALUE)
-				throw RequestException("Bad max solutions number");
+			_maxSolutionsNumber = map.getOptional<size_t>(PARAMETER_MAX_SOLUTIONS_NUMBER);
 
 			// Accessibility
-			int acint(map.getInt(PARAMETER_ACCESSIBILITY, false, string()));
+			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
 			_accessParameters = _site->getAccessParameters(
-				acint >= 0 ? static_cast<UserClassCode>(acint) : USER_PEDESTRIAN
+				acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN
 			);
 		}
 
@@ -221,23 +223,20 @@ namespace synthese
 		RoutePlannerFunction::RoutePlannerFunction()
 			: _startDate(TIME_UNKNOWN)
 			, _endDate(TIME_UNKNOWN)
-			, _periodId(UNKNOWN_VALUE)
 			, _period(NULL)
 			, _departure_place(NULL)
 			, _arrival_place(NULL)
 			, _home(false)
-			, _maxSolutionsNumber(UNKNOWN_VALUE)
-			, _favoriteId(UNKNOWN_VALUE)
 		{
 			
 		}
 
-		int RoutePlannerFunction::getMaxSolutions() const
+		const optional<std::size_t>& RoutePlannerFunction::getMaxSolutions() const
 		{
 			return _maxSolutionsNumber;
 		}
 
-		void RoutePlannerFunction::setMaxSolutions( int number )
+		void RoutePlannerFunction::setMaxSolutions(boost::optional<std::size_t> number)
 		{
 			_maxSolutionsNumber = number;
 		}

@@ -25,7 +25,6 @@
 #include "ActionException.h"
 #include "UpdateAlarmMessagesAction.h"
 #include "ObjectNotFoundException.h"
-#include "RequestMissingParameterException.h"
 #include "MessagesModule.h"
 #include "Alarm.h"
 #include "AlarmTemplate.h"
@@ -72,14 +71,14 @@ namespace synthese
 		{
 			try
 			{
-				setAlarmId(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
-				_type = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE, true, FACTORY_KEY));
-				_shortMessage = map.getString(PARAMETER_SHORT_MESSAGE, true, FACTORY_KEY);
-				_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
+				setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
+				_type = static_cast<AlarmLevel>(map.get<int>(PARAMETER_TYPE));
+				_shortMessage = map.get<string>(PARAMETER_SHORT_MESSAGE);
+				_longMessage = map.get<string>(PARAMETER_LONG_MESSAGE);
 			}
-			catch (RequestMissingParameterException& e)
+			catch (ParametersMap::MissingParameterException& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
 		}
 
@@ -137,7 +136,7 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<Alarm>& e)
 			{
-				throw ActionException("message", id, FACTORY_KEY, e);
+				throw ActionException("message", e, *this);
 			}
 		}
 	}

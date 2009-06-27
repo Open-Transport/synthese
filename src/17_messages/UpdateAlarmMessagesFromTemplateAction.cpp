@@ -25,7 +25,6 @@
 #include "UpdateAlarmMessagesFromTemplateAction.h"
 #include "ActionException.h"
 #include "ObjectNotFoundException.h"
-#include "RequestMissingParameterException.h"
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
 #include "Alarm.h"
@@ -69,17 +68,16 @@ namespace synthese
 		{
 			try
 			{
-				setAlarmId(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
-				uid id = map.getUid(PARAMETER_TEMPLATE_ID, true, FACTORY_KEY);
-				_template = TextTemplateTableSync::Get(id, _env);
+				setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
+				_template = TextTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), _env);
 			}
 			catch(ObjectNotFoundException<TextTemplate>& e)
 			{
-				throw ActionException("template", FACTORY_KEY, e);
+				throw ActionException("template", e, *this);
 			}
-			catch(RequestMissingParameterException& e)
+			catch(ParametersMap::MissingParameterException& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
 		}
 
@@ -102,9 +100,8 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<Alarm>& e)
 			{
-				throw ActionException("edited message", id, FACTORY_KEY, e);
-			}
-			
+				throw ActionException("edited message", e, *this);
+			}			
 		}
 
 

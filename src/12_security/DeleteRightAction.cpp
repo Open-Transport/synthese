@@ -21,14 +21,13 @@
 */
 
 #include "DeleteRightAction.h"
-#include "RequestMissingParameterException.h"
-#include "12_security/Right.h"
-#include "12_security/SecurityModule.h"
-#include "12_security/ProfileTableSync.h"
+#include "Right.h"
+#include "SecurityModule.h"
+#include "ProfileTableSync.h"
 #include "SecurityRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 

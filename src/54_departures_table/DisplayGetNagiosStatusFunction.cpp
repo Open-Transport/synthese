@@ -26,7 +26,6 @@
 
 #include "Conversion.h"
 #include "RequestException.h"
-#include "RequestMissingParameterException.h"
 #include "DisplayGetNagiosStatusFunction.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"

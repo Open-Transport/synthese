@@ -74,19 +74,25 @@ namespace synthese
 		
 		void AddUserFavoriteJourneyAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_USER_ID, true, FACTORY_KEY));
 			try
 			{
-				_user = UserTableSync::Get(id, _env);
+				try
+				{
+					_user = UserTableSync::Get(map.get<RegistryKeyType>(PARAMETER_USER_ID), _env);
+				}
+				catch (ObjectNotFoundException<User>& e)
+				{
+					throw ActionException(e.getMessage());
+				}
+				_originCityName = map.get<string>(PARAMETER_ORIGIN_CITY_NAME);
+				_originPlaceName = map.getDefault<string>(PARAMETER_ORIGIN_PLACE_NAME);
+				_destinationCityName = map.get<string>(PARAMETER_DESTINATION_CITY_NAME);
+				_destinationPlaceName = map.getDefault<string>(PARAMETER_DESTINATION_PLACE_NAME);
 			}
-			catch (ObjectNotFoundException<User>& e)
+			catch(ParametersMap::MissingParameterException e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
-			_originCityName = map.getString(PARAMETER_ORIGIN_CITY_NAME, true, FACTORY_KEY);
-			_originPlaceName = map.getString(PARAMETER_ORIGIN_PLACE_NAME, true, FACTORY_KEY);
-			_destinationCityName = map.getString(PARAMETER_DESTINATION_CITY_NAME, true, FACTORY_KEY);
-			_destinationPlaceName = map.getString(PARAMETER_DESTINATION_PLACE_NAME, true, FACTORY_KEY);
 		}
 		
 		

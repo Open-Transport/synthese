@@ -32,6 +32,7 @@
 #include "UId.h"
 
 #include <boost/optional.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
@@ -44,14 +45,32 @@ namespace synthese
 	namespace server
 	{
 		class Request;
-		class RequestMissingParameterException;
 
 		/** ParametersMap class.
-			@ingroup m18
+			@ingroup m15
 		*/
 		class ParametersMap
 		{
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Missing parameter at parsing exception.
+			/// @ingroup m15Exception refException
+			class MissingParameterException:
+				public std::exception
+			{
+			private:
+				const std::string _field;
+
+			public:
+				MissingParameterException(
+					const std::string& field
+				);
+
+				virtual const char* what() const throw();
+
+				const std::string& getField() const;
+			};
+
 			typedef std::map<std::string, std::string> Map;
 
 		private:
@@ -75,7 +94,7 @@ namespace synthese
 					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
 					@param source Name of the action or function that requested the parameter (for the error message only)
 					@return std::string Value of the parameter (empty if parameter nor found)
-					@throw RequestMissingParameterException if the parameter is not found and if it is needed
+					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
 					@author Hugues Romain
 					@date 2007
 				*/
@@ -95,7 +114,7 @@ namespace synthese
 					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
 					@param source Name of the action or function that requested the parameter (for the error message only)
 					@return uid Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-					@throw RequestMissingParameterException if the parameter is not found and if it is needed
+					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
 					@author Hugues Romain
 					@date 2007
 				*/
@@ -110,7 +129,7 @@ namespace synthese
 					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
 					@param source Name of the action or function that requested the parameter (for the error message only)
 					@return int Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-					@throw RequestMissingParameterException if the parameter is not found and if it is needed
+					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
 					@author Hugues Romain
 					@date 2007
 				*/
@@ -121,13 +140,12 @@ namespace synthese
 				) const;
 
 
-
 				/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
 					@param parameterName Name of the searched parameter
 					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
 					@param source Name of the action or function that requested the parameter (for the error message only)
 					@return int Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-					@throw RequestMissingParameterException if the parameter is not found and if it is needed
+					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
 					@author Hugues Romain
 					@date 2007
 				*/
@@ -144,7 +162,7 @@ namespace synthese
 					@param defaultValue Value to return if the parameter is not found
 					@param source Name of the action or function that requested the parameter (for the error message only)
 					@return int Value of the parameter (defaultValue if parameter nor found)
-					@throw RequestMissingParameterException if the parameter is not found and if it is needed
+					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
 					@author Hugues Romain
 					@date 2007
 				*/
@@ -160,7 +178,7 @@ namespace synthese
 					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
 					@param source Name of the action or function that requested the parameter (for the error message only)
 					@return DateTime Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-					@throw RequestMissingParameterException if the parameter is not found and if it is needed
+					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
 					@throw TimeParseException if the parameter can not be parsed as a date time (eg : empty string)
 					@author Hugues Romain
 					@date 2007
@@ -176,7 +194,7 @@ namespace synthese
 					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
 					@param source Name of the action or function that requested the parameter (for the error message only)
 					@return Date Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-					@throw RequestMissingParameterException if the parameter is not found and if it is needed
+					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
 					@throw TimeParseException if the parameter can not be parsed as a date time (eg : empty string)
 					@author Hugues Romain
 					@date 2007
@@ -200,7 +218,28 @@ namespace synthese
 					@date 2007					
 				*/
 				std::string getURI();
-		
+
+				template<class C>
+				boost::optional<C> getOptional(
+					const std::string& parameterName
+				) const;
+
+				template<class C>
+				C get(
+					const std::string& parameterName
+				) const;
+
+				template<class C>
+				C getDefault(
+					const std::string& parameterName,
+					const C defaultValue
+				) const;
+
+				template<class C>
+				C getDefault(
+					const std::string& parameterName
+				) const;
+	
 			//@}
 
 			//! \name Modifiers
@@ -221,6 +260,68 @@ namespace synthese
 				void merge(const ParametersMap& other);
 			//@}
 		};
+
+		template<class C>
+		boost::optional<C> ParametersMap::getOptional(
+			const std::string& parameterName
+		) const {
+			try
+			{
+				Map::const_iterator it(_map.find(parameterName));
+				return (it == _map.end()) ? boost::optional<C>() : boost::lexical_cast<C>(it->second);
+			}
+			catch(...)
+			{
+				return boost::optional<C>();
+			}
+		}
+
+
+		template<class C>
+		C ParametersMap::getDefault(
+			const std::string& parameterName,
+			const C defaultValue
+		) const {
+			try
+			{
+				Map::const_iterator it(_map.find(parameterName));
+				return (it == _map.end()) ? defaultValue : boost::lexical_cast<C>(it->second);
+			}
+			catch(...)
+			{
+				return defaultValue;
+			}
+		}
+
+
+
+		template<class C>
+		C ParametersMap::getDefault(
+			const std::string& parameterName
+		) const {
+			return getDefault(parameterName, C());
+		}
+
+
+
+		template<class C>
+		C ParametersMap::get(
+			const std::string& parameterName
+		) const {
+			try
+			{
+				Map::const_iterator it(_map.find(parameterName));
+				if (it == _map.end())
+				{
+					throw ParametersMap::MissingParameterException(parameterName);
+				}
+				return boost::lexical_cast<C>(it->second);
+			}
+			catch(...)
+			{
+				throw ParametersMap::MissingParameterException(parameterName);
+			}
+		}
 	}
 }
 

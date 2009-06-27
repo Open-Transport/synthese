@@ -29,6 +29,8 @@
 
 #include "Interface.h"
 
+#include <boost/foreach.hpp>
+
 using namespace boost;
 using namespace std;
 
@@ -36,6 +38,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace env;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetLinesListLineInterfaceElement>::FACTORY_KEY("schedules_lines");
 	
@@ -52,9 +55,10 @@ namespace synthese
 			const RoutePlannerSheetLinesCellInterfacePage* linesInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetLinesCellInterfacePage>();
 
 			int n = 1;
-			for (JourneyBoardJourneys::const_iterator it = jv->result.begin(); it != jv->result.end(); ++it, ++n )
+			BOOST_FOREACH(shared_ptr<Journey> journey, jv->result)
 			{
-				linesInterfacePage->display( stream, n, variables, *it, request );
+				linesInterfacePage->display( stream, n, variables, journey.get(), request );
+				++n;
 			}
 
 			return string();

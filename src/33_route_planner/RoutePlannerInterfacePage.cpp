@@ -76,7 +76,7 @@ namespace synthese
 			, VariablesMap& variables
 			, const RoutePlannerResult& object
 			, const time::Date& date
-			, int periodId
+			, size_t periodId
 			, const Place* originPlace
 			, const Place* destinationPlace
 			, const HourPeriod* period
@@ -131,7 +131,7 @@ namespace synthese
 			ostream& stream
 			, interfaces::VariablesMap& variables
 			, const time::Date& date
-			, int periodId
+			, size_t periodId
 			, bool home
 			, const string& originCity
 			, const string& originPlace

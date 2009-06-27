@@ -30,6 +30,8 @@
 #include "DateTime.h"
 #include "FactorableTemplate.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace transportwebsite
@@ -77,11 +79,11 @@ namespace synthese
 				time::DateTime								_startDate;
 				time::DateTime								_endDate;
 				graph::AccessParameters						_accessParameters;
-				int											_maxSolutionsNumber;
-				int											_periodId;
+				boost::optional<std::size_t>				_maxSolutionsNumber;
+				std::size_t									_periodId;
 				const transportwebsite::HourPeriod*			_period;
 				bool										_home;
-				uid											_favoriteId;
+				boost::optional<util::RegistryKeyType>		_favoriteId;
 			//@}
 
 
@@ -100,9 +102,8 @@ namespace synthese
 			*/
 			void _run(std::ostream& stream) const;
 
-			int getMaxSolutions() const;
-
-			void setMaxSolutions(int number);
+			const boost::optional<std::size_t>& getMaxSolutions() const;
+			void setMaxSolutions(boost::optional<std::size_t> number);
 
 			RoutePlannerFunction();
 

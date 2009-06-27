@@ -38,6 +38,8 @@
 
 #include "33_route_planner/Types.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 
@@ -88,8 +90,8 @@ namespace synthese
 			public:
 				bool samePlaces;
 				JourneyBoardJourneys journeys;
+
 				void clear();
-				~Result();
 			};
 
 		private:
@@ -102,7 +104,7 @@ namespace synthese
 				const time::DateTime		_journeySheetStartTime;  //!< Start time of schedule sheet.
 				const time::DateTime		_journeySheetEndTime;    //!< End time of schedule sheet.
 				const PlanningOrder			_planningOrder;  //!< Define planning sequence.
-				const int					_maxSolutionsNumber;
+				const boost::optional<std::size_t>	_maxSolutionsNumber;
 			//@}
 
 			//! @name Working variables
@@ -166,13 +168,11 @@ namespace synthese
 				 const graph::AccessParameters& accessParameters,
 				 const PlanningOrder& planningOrder,
 				 const time::DateTime& journeySheetStartTime,
-				 const time::DateTime& journeySheetEndTime
-				 , int maxSolutionsNumber = UNKNOWN_VALUE
-				 , std::ostream* logStream = NULL
-				 , util::Log::Level				logLevel = util::Log::LEVEL_NONE
+				 const time::DateTime& journeySheetEndTime,
+				 const boost::optional<std::size_t> maxSolutionsNumber = boost::optional<std::size_t>(),
+				 std::ostream* logStream = NULL,
+				 util::Log::Level logLevel = util::Log::LEVEL_NONE
 			);
-
-			~RoutePlanner ();
 
 
 			//! @name Query methods

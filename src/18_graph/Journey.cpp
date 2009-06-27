@@ -307,7 +307,7 @@ namespace synthese
 			return _effectiveDuration;
 		}
 
-		int Journey::getDistance() const
+		double Journey::getDistance() const
 		{
 			return _distance;
 		}

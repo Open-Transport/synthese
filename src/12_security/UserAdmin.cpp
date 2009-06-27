@@ -21,7 +21,6 @@
 */
 
 #include "PropertiesHTMLTable.h"
-#include "RequestMissingParameterException.h"
 #include "UserAdmin.h"
 #include "UsersAdmin.h"
 #include "User.h"

@@ -32,7 +32,6 @@
 #include "ArrivalDepartureTableRight.h"
 #include "Conversion.h"
 #include "ObjectNotFoundException.h"
-#include "RequestMissingParameterException.h"
 
 using namespace std;
 using namespace boost;
@@ -69,16 +68,16 @@ namespace synthese
 		{
 			try
 			{
-				setScreenId(map.getUid(PARAMETER_DISPLAY_SCREEN, true, FACTORY_KEY));
-				_cleaningDelay = map.getInt(PARAMETER_CLEANING_DELAY, true, FACTORY_KEY);
-				_maxDelay = map.getInt(PARAMETER_DISPLAY_MAX_DELAY, true, FACTORY_KEY);
-				_function = static_cast<DisplayFunction>(map.getInt(PARAMETER_DISPLAY_FUNCTION, true, FACTORY_KEY));
-				_preselectionDelay = map.getInt(PARAMETER_PRESELECTION_DELAY, false, FACTORY_KEY);
-				_endFilter = static_cast<EndFilter>(map.getInt(PARAMETER_DISPLAY_END_FILTER, true, FACTORY_KEY));
+				setScreenId(map.get<RegistryKeyType>(PARAMETER_DISPLAY_SCREEN));
+				_cleaningDelay = map.get<int>(PARAMETER_CLEANING_DELAY);
+				_maxDelay = map.get<int>(PARAMETER_DISPLAY_MAX_DELAY);
+				_function = static_cast<DisplayFunction>(map.get<int>(PARAMETER_DISPLAY_FUNCTION));
+				_preselectionDelay = map.get<int>(PARAMETER_PRESELECTION_DELAY);
+				_endFilter = static_cast<EndFilter>(map.get<int>(PARAMETER_DISPLAY_END_FILTER));
 			}
-			catch (RequestMissingParameterException& e)
+			catch (ParametersMap::MissingParameterException& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
 		}
 
@@ -236,7 +235,7 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
-				throw ActionException("display screen", id, FACTORY_KEY, e);
+				throw ActionException("display screen", e, *this);
 			}
 		}
 	}

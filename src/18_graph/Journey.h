@@ -73,7 +73,7 @@ namespace synthese
 				mutable int		_continuousServiceRange;
 				int				_effectiveDuration;
 				int				_transportConnectionCount;
-				int				_distance;
+				double			_distance;
 			//@}
 			
 			//! @name Oriented supplemental data
@@ -166,7 +166,7 @@ namespace synthese
 				time::DateTime getArrivalTime () const;
 
 				int getDuration () const;
-				int getDistance () const;
+				double getDistance () const;
 		
 		
 				/** Detects max alarm level in journey.

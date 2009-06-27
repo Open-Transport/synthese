@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Conversion.h"
-
 #include "Interface.h"
 #include "InterfaceTableSync.h"
 #include "Request.h"
@@ -35,6 +33,7 @@
 #include "ArrivalDepartureTableLog.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -77,7 +76,7 @@ namespace synthese
 		void CreateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Name
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.get<string>(PARAMETER_NAME);
 			if (_name.empty())
 				throw ActionException("Le nom ne peut être vide.");
 			Env env;
@@ -86,32 +85,32 @@ namespace synthese
 				throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 
 			// Rows number
-			_rows_number = map.getInt(PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
+			_rows_number = map.get<int>(PARAMETER_ROWS_NUMBER);
 			if (_rows_number < 0)
 				throw ActionException("Un nombre positif de lignes doit être choisi");
 
 			// Interface
-			RegistryKeyType id(map.getUid(PARAMETER_INTERFACE_ID, false, FACTORY_KEY));
-			if(id > 0)
+			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
+			if(id)
 			try
 			{
-				_interface = InterfaceTableSync::Get(id, _env);
+				_interface = InterfaceTableSync::Get(*id, _env);
 			}
 			catch (ObjectNotFoundException<Interface>& e)
 			{
-				throw ActionException("Interface d'affichage", id, FACTORY_KEY, e);
+				throw ActionException("Interface d'affichage", e, *this);
 			}
 		
 			// Monitoring Interface
-			id = map.getUid(PARAMETER_MONITORING_INTERFACE_ID, false, FACTORY_KEY);
-			if(id > 0)
+			id = map.getOptional<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
+			if(id)
 			try
 			{
-				_monitoringInterface = InterfaceTableSync::Get(id, _env);
+				_monitoringInterface = InterfaceTableSync::Get(*id, _env);
 			}
 			catch (ObjectNotFoundException<Interface>& e)
 			{
-				throw ActionException("Interface de supervision", id, FACTORY_KEY, e);
+				throw ActionException("Interface de supervision", e, *this);
 			}
 		}
 

@@ -24,7 +24,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ActionException.h"
-#include "Conversion.h"
+#include "Action.h"
+
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
 
 namespace synthese
 {
@@ -43,24 +47,16 @@ namespace synthese
 
 
 		ActionException::ActionException(
-			const std::string& field,
-			const std::string& source,
-			const Exception& e
+			const ParametersMap::MissingParameterException& e,
+			const Action& source
 		) throw():
-			Exception("Specified "+ field +" not found in "+ source + ":" + e.getMessage())
+			Exception("Specified "+ e.getField() +" not found or malformed in "+ source.getFactoryKey() + " action.")
 		{
 
 		}
 
 
 
-		ActionException::ActionException(
-			const std::string& field, util::RegistryKeyType id, const std::string& source, const Exception& e
-		) throw() :
-			Exception("Specified "+ field + Conversion::ToString(id) +" not found in "+ source + ":" + e.getMessage())
-		{
-
-		}
 		ActionException::~ActionException() throw ()
 		{
 

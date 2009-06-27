@@ -82,8 +82,8 @@ namespace synthese
 				, const geography::Place* place
 				, const messages::SentAlarm* alarm
 				, bool color
-				, const road::Road* road
-				, int distance
+				, const road::Road* road,
+				double distance
 				, const server::Request* request = NULL
 			) const;
 

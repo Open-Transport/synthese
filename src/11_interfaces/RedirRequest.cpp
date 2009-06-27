@@ -20,13 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
-
-#include "11_interfaces/RedirectInterfacePage.h"
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/RedirRequest.h"
-#include "RequestMissingParameterException.h"
-#include "30_server/RequestException.h"
+#include "RedirectInterfacePage.h"
+#include "Interface.h"
+#include "RedirRequest.h"
+#include "RequestException.h"
 
 using namespace std;
 using namespace boost;

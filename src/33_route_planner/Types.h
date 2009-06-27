@@ -51,7 +51,7 @@ namespace synthese
 			@{
 		*/
 
-		typedef std::vector<graph::Journey*>			JourneyBoardJourneys;
+		typedef std::vector<boost::shared_ptr<graph::Journey> >			JourneyBoardJourneys;
 		typedef std::vector<const env::PublicTransportStopZoneConnectionPlace*>	JourneyBoardPlaces;
 
 		struct RoutePlannerResult

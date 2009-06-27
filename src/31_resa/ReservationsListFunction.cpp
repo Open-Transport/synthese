@@ -24,22 +24,21 @@
 
 #include "ReservationsListFunction.h"
 
-#include "36_places_list/Site.h"
+#include "Site.h"
 #include "ResaRight.h"
-#include "31_resa/ReservationsListInterfacePage.h"
+#include "ReservationsListInterfacePage.h"
 
-#include "30_server/RequestException.h"
-#include "30_server/RequestMissingParameterException.h"
-#include "30_server/LoginInterfacePage.h"
-#include "30_server/Request.h"
+#include "RequestException.h"
+#include "LoginInterfacePage.h"
+#include "Request.h"
 #include "Conversion.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/CommercialLineTableSync.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
 
-#include "11_interfaces/Interface.h"
+#include "Interface.h"
 
 using namespace std;
 using namespace boost;

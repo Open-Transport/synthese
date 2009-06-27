@@ -66,7 +66,7 @@ namespace synthese
 		
 		void CalendarTemplateAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_text = map.getString(PARAMETER_TEXT, true, FACTORY_KEY);
+			_text = map.get<string>(PARAMETER_TEXT);
 			if (_text.empty())
 				throw ActionException("Le texte doit être non vide.");
 		}

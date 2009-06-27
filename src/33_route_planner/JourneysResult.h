@@ -46,14 +46,14 @@ namespace synthese
 	
 	namespace routeplanner
 	{
-		/** JourneysResult class.
+		/** List of journeys that should be part of the result of a routing process.
 			@ingroup m53
 		*/
 		template<class JourneyComparator>
 		class JourneysResult
 		{			
 		public:
-			typedef std::set<graph::Journey*, JourneyComparator> ResultSet;
+			typedef std::set<boost::shared_ptr<graph::Journey>, JourneyComparator> ResultSet;
 
 		private:
 			typedef std::map<const graph::Vertex*, typename ResultSet::iterator> IndexMap;
@@ -86,7 +86,7 @@ namespace synthese
 					@param journey the journey to remove
 					@author Hugues Romain
 				*/
-				void remove(const graph::Journey* journey)
+				void remove(boost::shared_ptr<graph::Journey> journey)
 				{
 					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
 					remove(vertex);
@@ -100,10 +100,8 @@ namespace synthese
 					if (it != _index.end())
 					{
 						typename ResultSet::iterator its(it->second);
-						const graph::Journey* ptr = *its;
 						_result.erase(its);
 						_index.erase(it);
-						delete ptr;
 					}
 				}
 
@@ -113,7 +111,7 @@ namespace synthese
 					@param journey the journey to add
 					@author Hugues Romain
 				*/
-				void add(graph::Journey* journey)
+				void add(boost::shared_ptr<graph::Journey> journey)
 				{
 					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
 					remove(vertex);
@@ -130,7 +128,7 @@ namespace synthese
 				void addEmptyJourney()
 				{
 					graph::Vertex* nullVertex(NULL);
-					_index.insert(make_pair(nullVertex, _result.insert(new graph::Journey()).first));
+					_index.insert(make_pair(nullVertex, _result.insert(boost::shared_ptr<graph::Journey>(new graph::Journey)).first));
 				}
 
 
@@ -139,11 +137,11 @@ namespace synthese
 					@return Pointer to the first journey
 					@warning The returned pointer must be deleted after use
 				*/
-				const graph::Journey* front()
+				boost::shared_ptr<graph::Journey> front()
 				{
 					assert(!empty());
 
-					const graph::Journey* ptr(*_result.begin());
+					boost::shared_ptr<graph::Journey> ptr(*_result.begin());
 					_index.erase(ptr->empty() ? NULL : ptr->getEndEdge()->getFromVertex());
 					_result.erase(_result.begin());
 					return ptr;
@@ -162,11 +160,11 @@ namespace synthese
 					, const time::DateTime& newMaxTime
 					, const BestVertexReachesMap& bvrm
 				){
-					std::vector<graph::Journey*> journeysToAdd;
-					std::vector<graph::Journey*> journeysToRemove;
+					std::vector<boost::shared_ptr<graph::Journey> > journeysToAdd;
+					std::vector<boost::shared_ptr<graph::Journey> > journeysToRemove;
 					for (typename IndexMap::iterator it(_index.begin()); it != _index.end();)
 					{
-						graph::Journey* journey(*it->second);
+						boost::shared_ptr<graph::Journey> journey(*it->second);
 						typename IndexMap::iterator next(it);
 						++next;
 						if (bvrm.mustBeCleared(it->first, journey->getEndTime(), newMaxTime))
@@ -180,11 +178,11 @@ namespace synthese
 						}
 						it = next;
 					}
-					BOOST_FOREACH(graph::Journey* journey, journeysToRemove)
+					BOOST_FOREACH(boost::shared_ptr<graph::Journey> journey, journeysToRemove)
 					{
 						remove(journey);
 					}
-					BOOST_FOREACH(graph::Journey* journey, journeysToAdd)
+					BOOST_FOREACH(boost::shared_ptr<graph::Journey> journey, journeysToAdd)
 					{
 						add(journey);
 					}
@@ -200,7 +198,7 @@ namespace synthese
 					@return const env::Journey* const The result journey that reaches the specified vertex
 					@author Hugues Romain
 				*/
-				const graph::Journey* const get(const graph::Vertex* vertex) const
+				boost::shared_ptr<graph::Journey> get(const graph::Vertex* vertex) const
 				{
 					typename IndexMap::const_iterator it(_index.find(vertex));
 					if (it != _index.end())
@@ -224,7 +222,7 @@ namespace synthese
 				}
 
 
-				
+
 				/** Log generator.
 					@return std::string description of the journey for logging purposes
 					@author Hugues Romain
@@ -235,7 +233,7 @@ namespace synthese
 					s	<< "<tr><th colspan=\"7\">Exploration queue (size=" << _result.size() << ")</th></tr>"
 						<< "<tr><th>Place</th><th>Time</th><th>Score</th><th>Dist</th><th>Min spd</th><th>Dist.MinSpd</th><th>Place score</th></tr>"
 						;
-					BOOST_FOREACH(const graph::Journey* journey, _result)
+					BOOST_FOREACH(boost::shared_ptr<graph::Journey> journey, _result)
 					{
 						if (journey->empty())
 						{

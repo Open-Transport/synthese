@@ -113,7 +113,7 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, const RoutePlannerResult& object
 				, const time::Date& date
-				, int periodId
+				, size_t periodId
 				, const geography::Place* originPlace
 				, const geography::Place* destinationPlace
 				, const transportwebsite::HourPeriod* period
@@ -127,7 +127,7 @@ namespace synthese
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
 				, const time::Date& date
-				, int periodId
+				, size_t periodId
 				, bool home
 				, const std::string& originCity
 				, const std::string& originPlace

@@ -23,7 +23,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ScenarioUpdateDatesAction.h"
-#include "RequestMissingParameterException.h"
 #include "MessagesModule.h"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
@@ -79,14 +78,14 @@ namespace synthese
 		{
 			try
 			{
-				setScenarioId(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
+				setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
 
 				// Name
-				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+				_name = map.get<string>(PARAMETER_NAME);
 
 				if(_tscenario.get())
 				{
-					uid folderId(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
+					uid folderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
 
 					if (folderId != 0)
 					{
@@ -102,7 +101,7 @@ namespace synthese
 
 				if(_sscenario.get())
 				{
-					_enabled = map.getBool(PARAMETER_ENABLED, true, false, FACTORY_KEY);
+					_enabled = map.get<bool>(PARAMETER_ENABLED);
 
 					_startDate = map.getDateTime(PARAMETER_START_DATE, true, FACTORY_KEY);
 
@@ -113,14 +112,17 @@ namespace synthese
 						const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
 						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
 						{
-							_variables.insert(make_pair(variable.second.code, map.getString(PARAMETER_VARIABLE + variable.second.code, variable.second.compulsory, FACTORY_KEY)));
+							_variables.insert(make_pair(
+									variable.second.code,
+									variable.second.compulsory ? map.get<string>(PARAMETER_VARIABLE + variable.second.code) : map.getDefault<string>(PARAMETER_VARIABLE + variable.second.code)
+							)	);
 						}
 					}
 				}
 			}
-			catch(RequestMissingParameterException& e)
+			catch(ParametersMap::MissingParameterException& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
 			catch(TimeParseException& e)
 			{
@@ -231,7 +233,7 @@ namespace synthese
 			}
 			catch(ObjectNotFoundException<Scenario>& e)
 			{
-				throw ActionException(PARAMETER_SCENARIO_ID, id, FACTORY_KEY, e);
+				throw ActionException(PARAMETER_SCENARIO_ID, e, *this);
 			}
 		}
 	}

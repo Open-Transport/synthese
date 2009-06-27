@@ -67,7 +67,7 @@ namespace synthese
 			try
 			{
 				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
-				setStopId(map.getUid(PARAMETER_STOP, true, FACTORY_KEY));
+				setStopId(map.get<RegistryKeyType>(PARAMETER_STOP));
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
@@ -109,7 +109,7 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<PhysicalStop>& e)
 			{
-				throw ActionException("Departure physical stop", id, FACTORY_KEY, e);
+				throw ActionException("Departure physical stop", e, *this);
 			}
 		}
 	}

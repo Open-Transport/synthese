@@ -27,12 +27,12 @@
 
 #include "ParametersMap.h"
 #include "Request.h"
-#include "RequestMissingParameterException.h"
 #include "DateTime.h"
 #include "Conversion.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 #include <sstream>
 
 using namespace std;
@@ -89,7 +89,7 @@ namespace synthese
 			if (it == _map.end())
 			{
 				if (neededParameter)
-					throw RequestMissingParameterException(parameterName, source);
+					throw ParametersMap::MissingParameterException(parameterName);
 				return string();
 			}
 			return it->second;
@@ -211,6 +211,25 @@ namespace synthese
 		{
 			Map::const_iterator it(_map.find(parameterName));
 			return (it == _map.end()) ? optional<string>() : optional<string>(it->second);
+		}
+
+		
+		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
+			_field(field)
+		{
+
+		}
+
+		const char* ParametersMap::MissingParameterException::what() const throw()
+		{
+			stringstream s;
+			s << "Missing parameter in request parsing : " << _field;
+			return s.str().c_str();
+		}
+
+		const std::string& ParametersMap::MissingParameterException::getField() const
+		{
+			return _field;
 		}
 	}
 }

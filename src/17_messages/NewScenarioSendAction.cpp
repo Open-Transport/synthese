@@ -68,29 +68,29 @@ namespace synthese
 
 		void NewScenarioSendAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			RegistryKeyType id(map.getUid(PARAMETER_MESSAGE_TO_COPY, false, FACTORY_KEY));
-			if(id > 0)
+			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY));
+			if(id)
 			{
 				try
 				{
-					_scenarioToCopy = SentScenarioInheritedTableSync::Get(id, _env);
+					_scenarioToCopy = SentScenarioInheritedTableSync::Get(*id, _env);
 				}
-				catch(Exception& e)
+				catch(ObjectNotFoundException<SentScenario>& e)
 				{
-					throw ActionException("scenario to copy", id, FACTORY_KEY, e);
+					throw ActionException("scenario to copy", e, *this);
 				}
 			} else {
 				// Template to source
-				id = map.getUid(PARAMETER_TEMPLATE, false, FACTORY_KEY);
-				if(id > 0)
+				id = map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE);
+				if(*id)
 				{
 					try
 					{
-						_template = ScenarioTemplateInheritedTableSync::Get(id, _env);
+						_template = ScenarioTemplateInheritedTableSync::Get(*id, _env);
 					}
-					catch(Exception& e)
+					catch(ObjectNotFoundException<ScenarioTemplate>& e)
 					{
-						throw ActionException("scenario template", id, FACTORY_KEY, e);
+						throw ActionException("scenario template", e, *this);
 					}
 				}
 			}

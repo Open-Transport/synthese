@@ -40,6 +40,7 @@ namespace synthese
 	using namespace time;
 	using namespace db;
 	using namespace security;
+	using namespace util;
 	
 	namespace util
 	{
@@ -79,16 +80,12 @@ namespace synthese
 		
 		void CalendarTemplateElementAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setCalendarId(map.getUid(PARAMETER_CALENDAR_ID, true, FACTORY_KEY));
+			setCalendarId(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID));
 			_minDate = map.getDate(PARAMETER_MIN_DATE, false, FACTORY_KEY);
 			_maxDate = map.getDate(PARAMETER_MAX_DATE, false, FACTORY_KEY);
-			_interval = map.getInt(PARAMETER_INTERVAL, false, FACTORY_KEY);
-			if (_interval == UNKNOWN_VALUE)
-				_interval = 1;
-			_positive = map.getBool(PARAMETER_POSITIVE, true, true, FACTORY_KEY);
-			_rank = map.getInt(PARAMETER_RANK, false, FACTORY_KEY);
-			if (_rank == UNKNOWN_VALUE)
-				_rank = CalendarTemplateElementTableSync::GetMaxRank(_calendar->getKey()) + 1;
+			_interval = map.getDefault<int>(PARAMETER_INTERVAL, 1);
+			_positive = map.get<bool>(PARAMETER_POSITIVE);
+			_rank = map.getDefault<int>(PARAMETER_RANK, CalendarTemplateElementTableSync::GetMaxRank(_calendar->getKey()) + 1);
 		}
 		
 		

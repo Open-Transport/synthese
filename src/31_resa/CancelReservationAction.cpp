@@ -82,7 +82,7 @@ namespace synthese
 			// Load of the transaction
 			try
 			{
-				_transaction = ReservationTransactionTableSync::GetEditable(map.getUid(PARAMETER_RESERVATION_TRANSACTION_ID, true, FACTORY_KEY), _env, UP_DOWN_LINKS_LOAD_LEVEL);
+				_transaction = ReservationTransactionTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_RESERVATION_TRANSACTION_ID), _env, UP_DOWN_LINKS_LOAD_LEVEL);
 			}
 			catch(...)
 			{
@@ -99,7 +99,7 @@ namespace synthese
 				if (_request->getUser()->getKey() != _transaction->getCustomerUserId())
 					throw ActionException("Non autorisé");
 
-				string password(map.getString(PARAMETER_PASSWORD, true, FACTORY_KEY));
+				string password(map.get<string>(PARAMETER_PASSWORD));
 				if (password.empty())
 					throw ActionException("Le mot de passe doit être fourni");
 

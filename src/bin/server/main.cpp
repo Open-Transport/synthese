@@ -67,7 +67,8 @@ void sig_INT_handler(int sig)
 
     // Last chance cleaning actions can be added here as well ...
     // Delete PID file
-    boost::filesystem::remove (*pidFile);
+	if(pidFile)
+	    boost::filesystem::remove (*pidFile);
 
     Log::GetInstance ().info ("Exit!");
     exit (0);
@@ -151,7 +152,11 @@ createCompletePath (const std::string& s)
 
 int main( int argc, char **argv )
 {
-    std::signal (SIGINT, sig_INT_handler);
+#ifdef WIN32
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#endif
+
+	std::signal (SIGINT, sig_INT_handler);
     std::signal (SIGTERM, sig_INT_handler);
 
 #ifndef WIN32

@@ -39,6 +39,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
+	using namespace util;
 	
 	namespace util
 	{
@@ -71,21 +72,17 @@ namespace synthese
 		
 		void TimetableAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_BOOK_ID, true, FACTORY_KEY));
-			if (id > 0)
 			try
 			{
-				_book = TimetableTableSync::Get(id, _env);
+				_book = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_BOOK_ID), _env);
 			}
 			catch (...)
 			{
 				throw ActionException("No such book");
 			}
-			_rank = map.getInt(PARAMETER_RANK, false, FACTORY_KEY);
-			if (_rank < 0)
-				_rank = TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0) + 1;
-			_title = map.getString(PARAMETER_TITLE, false, FACTORY_KEY);
-			_isBook = map.getBool(PARAMETER_IS_BOOK, true, false, FACTORY_KEY);
+			_rank = map.getDefault<int>(PARAMETER_RANK, TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0) + 1);
+			_title = map.getDefault<string>(PARAMETER_TITLE);
+			_isBook = map.get<bool>(PARAMETER_IS_BOOK);
 		}
 		
 		

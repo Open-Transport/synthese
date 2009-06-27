@@ -20,9 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/LogoutAction.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "LogoutAction.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 namespace synthese
 {

@@ -21,19 +21,18 @@
 */
 
 #include "AddProfileAction.h"
-#include "RequestMissingParameterException.h"
-#include "12_security/Profile.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/GlobalRight.h"
-#include "12_security/SecurityLog.h"
+#include "Profile.h"
+#include "ProfileTableSync.h"
+#include "GlobalRight.h"
+#include "SecurityLog.h"
 #include "SecurityRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/Request.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
+#include "Request.h"
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -60,23 +59,32 @@ namespace synthese
 
 		void AddProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Name
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
-
-			// Template
-			uid id = map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY);
-			if (id != UNKNOWN_VALUE)
+			try
 			{
-				if (!Env::GetOfficialEnv().getRegistry<Profile>().contains(id))
-					throw ActionException("Specified root profile not found.");
-				_templateProfile = ProfileTableSync::Get(id, _env);
-			}
+				// Name
+				_name = map.get<string>(PARAMETER_NAME);
 
-			// Name unicity
-			Env env;
-			ProfileTableSync::Search(env, _name, string(),0,1);
-			if (!env.getRegistry<Profile>().empty())
-				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
+				// Template
+				optional<RegistryKeyType> id = map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE_ID);
+				if (id)
+				{
+					_templateProfile = ProfileTableSync::Get(*id, _env);
+				}
+
+				// Name unicity
+				Env env;
+				ProfileTableSync::Search(env, _name, string(),0,1);
+				if (!env.getRegistry<Profile>().empty())
+					throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
+			}
+			catch(ObjectNotFoundException<Profile> e)
+			{
+				throw ActionException("root profile", e, *this);
+			}
+			catch(ParametersMap::MissingParameterException e)
+			{
+				throw ActionException(e, *this);
+			}
 		}
 
 		void AddProfileAction::run()

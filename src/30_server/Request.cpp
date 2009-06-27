@@ -31,7 +31,6 @@
 #include "Action.h"
 #include "Function.h"
 #include "RequestException.h"
-#include "RequestMissingParameterException.h"
 
 #include "Exception.h"
 #include "FactoryException.h"

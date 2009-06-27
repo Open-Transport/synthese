@@ -30,7 +30,6 @@
 #include "DisplayScreenAppearanceUpdateAction.h"
 #include "ArrivalDepartureTableRight.h"
 #include "Request.h"
-#include "RequestMissingParameterException.h"
 #include "DBLogModule.h"
 #include "ObjectNotFoundException.h"
 #include "ArrivalDepartureTableLog.h"
@@ -80,17 +79,17 @@ namespace synthese
 		{
 			try
 			{
-				setScreenId(map.getUid(PARAMETER_DISPLAY_SCREEN, true, FACTORY_KEY));
-				_title = map.getString(PARAMETER_TITLE, true, FACTORY_KEY);
-				_blinkingDelay = map.getInt(PARAMETER_BLINKING_DELAY, true, FACTORY_KEY);
-				_displayPlatform = map.getBool(PARAMETER_DISPLAY_PLATFORM, false, true, FACTORY_KEY);
-				_displayServiceNumber = map.getBool(PARAMETER_DISPLAY_SERVICE_NUMBER, false, false, FACTORY_KEY);
-				_displayTeam = map.getBool(PARAMETER_DISPLAY_TEAM, false, true, FACTORY_KEY);
-				_displayClock = map.getBool(PARAMETER_DISPLAY_CLOCK, false, false, FACTORY_KEY);
+				setScreenId(map.get<RegistryKeyType>(PARAMETER_DISPLAY_SCREEN));
+				_title = map.get<string>(PARAMETER_TITLE);
+				_blinkingDelay = map.get<int>(PARAMETER_BLINKING_DELAY);
+				_displayPlatform = map.getDefault<bool>(PARAMETER_DISPLAY_PLATFORM, true);
+				_displayServiceNumber = map.getDefault<bool>(PARAMETER_DISPLAY_SERVICE_NUMBER, false);
+				_displayTeam = map.getDefault<bool>(PARAMETER_DISPLAY_TEAM, true);
+				_displayClock = map.getDefault<bool>(PARAMETER_DISPLAY_CLOCK, false);
 			}
-			catch(RequestMissingParameterException& e)
+			catch(ParametersMap::MissingParameterException& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
 		}
 		

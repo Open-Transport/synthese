@@ -68,7 +68,7 @@ namespace synthese
 			int current(Conversion::ToInt(_current->getValue(parameters, variables, object, request)));
 
 			stream << "<select name=\"" << RoutePlannerFunction::PARAMETER_PERIOD_ID << "\">";
-			for(int i(0); i<periods.size(); ++i)
+			for(size_t i(0); i<periods.size(); ++i)
 			{
 				stream << "<option value=\"" << i << "\"";
 				if (i == current)

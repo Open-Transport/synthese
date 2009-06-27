@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_env_JourneyComparator_h__
 #define SYNTHESE_env_JourneyComparator_h__
 
+#include <boost/shared_ptr.hpp>
+
 namespace synthese
 {
 	namespace graph
@@ -51,7 +53,7 @@ namespace synthese
 		class JourneyComparator
 		{
 		public:
-			bool operator()(const Journey* j1, const Journey* j2) const;
+			bool operator()(boost::shared_ptr<Journey> j1, boost::shared_ptr<Journey> j2) const;
 
 		};
 	}

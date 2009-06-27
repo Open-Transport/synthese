@@ -25,10 +25,8 @@
 #ifndef SYNTHESE_CancelReservationAction_H__
 #define SYNTHESE_CancelReservationAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {

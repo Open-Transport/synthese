@@ -31,7 +31,6 @@
 #include "MessagesRight.h"
 #include "AlarmRemoveLinkAction.h"
 #include "AlarmObjectLinkTableSync.h"
-#include "RequestMissingParameterException.h"
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
 #include "AlarmTemplate.h"
@@ -68,12 +67,12 @@ namespace synthese
 		{
 			try
 			{
-				setAlarmId(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
-				setObjectId(map.getUid(PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+				setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
+				setObjectId(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID));
 			}
-			catch (RequestMissingParameterException& e)
+			catch (ParametersMap::MissingParameterException& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
 		}
 
@@ -102,7 +101,7 @@ namespace synthese
 			}
 			catch(ObjectNotFoundException<Alarm>& e)
 			{
-				throw ActionException("message", id, FACTORY_KEY, e);
+				throw ActionException("message", e, *this);
 			}
 		}
 

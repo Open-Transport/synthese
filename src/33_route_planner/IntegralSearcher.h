@@ -73,7 +73,7 @@ namespace synthese
 			class _JourneyComparator
 			{
 			public:
-				bool operator()(const graph::Journey* j1, const graph::Journey* j2) const;
+				bool operator()(boost::shared_ptr<graph::Journey> j1, boost::shared_ptr<graph::Journey> j2) const;
 			};
 
 			//! @name Parameters
@@ -117,14 +117,14 @@ namespace synthese
 			/** Integral search of objects within the network.
 				@param startVam the search is launched at this vertices
 				@param desiredTime Desired time.
-				@param currentJourney Journey currently being built.
+				@param startJourney Journey currently being built.
 				@param maxDepth Maximum recursion depth.
 				@param strictTime Must the departure time be strictly equal to desired time ?
 			 */
 			void integralSearch(
 				const graph::VertexAccessMap& vertices
 				, const time::DateTime& desiredTime
-				, const graph::Journey& currentJourney
+				, const graph::Journey& startJourney
 				, int maxDepth
 				, bool strictTime = false
 			);

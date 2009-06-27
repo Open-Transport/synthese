@@ -24,10 +24,12 @@
 #include "SentAlarm.h"
 #include "Place.h"
 #include "Road.h"
-#include "Conversion.h"
 #include "RoadPlace.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -53,16 +55,16 @@ namespace synthese
 		    , const SentAlarm* alarm
 		    , bool color
 			, const Road* road
-			, int distance
+			, double distance
 		    , const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector pv;
 			pv.push_back("" /*Conversion::ToString(place->getKey())*/);
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
-			pv.push_back(Conversion::ToString(color));
+			pv.push_back(lexical_cast<string>(color));
 			pv.push_back((road && road->getRoadPlace()) ? road->getRoadPlace()->getName() : string());
-			pv.push_back(Conversion::ToString(distance));
+			pv.push_back(lexical_cast<string>(distance));
 
 			VariablesMap vm;
 

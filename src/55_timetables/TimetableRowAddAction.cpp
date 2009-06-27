@@ -43,6 +43,7 @@ namespace synthese
 	using namespace server;
 	using namespace env;
 	using namespace security;
+	using namespace util;
 	
 	namespace util
 	{
@@ -81,25 +82,22 @@ namespace synthese
 		
 		void TimetableRowAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_TIMETABLE_ID, true, FACTORY_KEY));
 			try
 			{
-				_timetable = TimetableTableSync::Get(id, _env);
+				_timetable = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TIMETABLE_ID), _env);
 			}
 			catch (...)
 			{
 				throw ActionException("No such timetable");
 			}
 
-			_rank = map.getInt(PARAMETER_RANK, false, FACTORY_KEY);
-			if (_rank < 0)
-				_rank = TimetableRowTableSync::GetMaxRank(_timetable->getKey())+1;
+			_rank = map.getDefault<int>(PARAMETER_RANK, TimetableRowTableSync::GetMaxRank(_timetable->getKey())+1);
 
-			_isArrival = map.getBool(PARAMETER_IS_ARRIVAL, false, true, FACTORY_KEY);
-			_isDeparture = map.getBool(PARAMETER_IS_DEPARTURE, false, true, FACTORY_KEY);
-			_isCompulsory = map.getBool(PARAMETER_IS_COMPULSORY, false, false, FACTORY_KEY);
-			_isSufficient = map.getBool(PARAMETER_IS_SUFFICIENT, false, true, FACTORY_KEY);
-			_isDisplayed = map.getBool(PARAMETER_IS_DISPLAYED, false, true, FACTORY_KEY);
+			_isArrival = map.getDefault<bool>(PARAMETER_IS_ARRIVAL, true);
+			_isDeparture = map.getDefault<bool>(PARAMETER_IS_DEPARTURE, true);
+			_isCompulsory = map.getDefault<bool>(PARAMETER_IS_COMPULSORY, false);
+			_isSufficient = map.getDefault<bool>(PARAMETER_IS_SUFFICIENT, true);
+			_isDisplayed = map.getDefault<bool>(PARAMETER_IS_DISPLAYED, true);
 
 //			_place = dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(EnvModule::FetchPlace(
 //				map.getString(PARAMETER_CITY_NAME, true, FACTORY_KEY)

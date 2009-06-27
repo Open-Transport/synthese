@@ -89,9 +89,9 @@ namespace synthese
 			return getArrivalDateTime() - getDepartureDateTime();
 		}
 
-		int ServiceUse::getDistance() const
+		double ServiceUse::getDistance() const
 		{
-			return static_cast<int>(getArrivalEdge()->getMetricOffset() - getDepartureEdge()->getMetricOffset());
+			return getArrivalEdge()->getMetricOffset() - getDepartureEdge()->getMetricOffset();
 		}
 
 		void ServiceUse::shift( int duration)

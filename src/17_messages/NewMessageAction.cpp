@@ -66,7 +66,14 @@ namespace synthese
 
 		void NewMessageAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
-			setScenarioId(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
+			try
+			{
+				setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
+			}
+			catch(ParametersMap::MissingParameterException e)
+			{
+				throw ActionException(e, *this);
+			}
 		}
 
 		void NewMessageAction::run() throw(ActionException)
@@ -114,9 +121,9 @@ namespace synthese
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
 				_scenarioTemplate = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
 			}
-			catch(Exception& e)
+			catch(ObjectNotFoundException<Scenario>& e)
 			{
-				throw ActionException("Scenario", key, FACTORY_KEY, e);
+				throw ActionException("Scenario", e, *this);
 			}
 		}
 

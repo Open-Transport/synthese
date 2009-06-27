@@ -68,7 +68,7 @@ namespace synthese
 
 			// Selection of the lines to display
 			set<const CommercialLine*> lines;
-			BOOST_FOREACH(const Journey* journey, jv->result)
+			BOOST_FOREACH(shared_ptr<Journey> journey, jv->result)
 			{
 				BOOST_FOREACH(const ServiceUse& service, journey->getServiceUses())
 				{

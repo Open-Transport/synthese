@@ -35,7 +35,6 @@
 #include "ParametersMap.h"
 #include "Request.h"
 #include "ActionException.h"
-#include "RequestMissingParameterException.h"
 
 using namespace std;
 
@@ -66,9 +65,9 @@ namespace synthese
 			{
 				setAlarmId(map.getUid(PARAMETER_ALARM, true, FACTORY_KEY));
 			}
-			catch(RequestMissingParameterException& e)
+			catch(ParametersMap::MissingParameterException& e)
 			{
-				throw ActionException(e.getMessage());
+				throw ActionException(e, *this);
 			}
 		}
 
