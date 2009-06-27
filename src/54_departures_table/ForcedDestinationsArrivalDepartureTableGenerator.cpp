@@ -81,7 +81,6 @@ namespace synthese
 						ls->getLine()->getDestination()->getConnectionPlace()
 					);
 					_forcedDestinations.insert(make_pair(place->getKey(), place));
-					_displayedPlaces.insert(make_pair(place->getKey(), place));
 				}
 			}
 		}

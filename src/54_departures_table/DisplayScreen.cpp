@@ -320,7 +320,8 @@ namespace synthese
 						, getTrackNumberDisplay()
 						, getDisplayTeam()
 						, getType()->getMaxStopsNumber(),
-						getBlinkingDelay()
+						getBlinkingDelay(),
+						getDisplayClock()
 						, getLocalization()
 						, displayedObject
 					);

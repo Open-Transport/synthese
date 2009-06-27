@@ -32,15 +32,17 @@
 #include "DBEmptyResultException.h"
 #include "SQLiteException.h"
 #include "FactorableTemplate.h"
-#include "01_util/Constants.h"
-#include "Conversion.h"
+#include "UtilTypes.h"
 #include "Log.h"
 
+#include <limits>
 #include <sstream>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+
+#undef max
 
 namespace synthese
 {
@@ -151,8 +153,9 @@ namespace synthese
 
 			//! @name Table run variables handlers
 			//@{
-				static uid encodeUId (long objectId)
-				{
+				static util::RegistryKeyType encodeUId(
+					long objectId
+				){
 					// TODO : plenty of functions should be at SQLiteTableSync level directly.
 					// default value is 1 for compatibility
 					static int nodeId = boost::lexical_cast<int>(
@@ -178,18 +181,18 @@ namespace synthese
 						SQLite* sqlite = DBModule::GetSQLite();
 						std::stringstream query;
 						query
-							<< "SELECT " << util::Conversion::ToString((uid) 0x00000000FFFFFFFFLL) 
-							<< " & MAX(id) AS maxid FROM " << K::TABLE.NAME
-							<< " WHERE (id & " << util::Conversion::ToString((uid) 0xFFFFFFFF00000000LL) << ") = " 
-							<< util::Conversion::ToString(encodeUId(0)); 
-
-						/// @todo GRID and NODEGRID to be replaced by the correct values
-
+							<< "SELECT " << 0x00000000FFFFFFFFLL
+							<< " & MAX(" << TABLE_COL_ID << ") AS maxid FROM " << K::TABLE.NAME
+							<< " WHERE " << TABLE_COL_ID << ">=" << encodeUId(0) << " AND "
+							<< TABLE_COL_ID << "<=" << encodeUId(
+									std::numeric_limits<long>::max()
+								)
+						;
 
 						SQLiteResultSPtr result (sqlite->execQuery(query.str()));
 						if (result->next ())
 						{
-							uid maxid = result->getLongLong ("maxid");
+							util::RegistryKeyType maxid = result->getLongLong("maxid");
 							if (maxid > 0) _autoIncrementValue = util::decodeObjectId(maxid) + 1;
 						}
 
@@ -217,14 +220,14 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007				
 				*/
-				static SQLiteResultSPtr _GetRow( uid key )
+				static SQLiteResultSPtr _GetRow(util::RegistryKeyType key )
 				{
 					SQLite* sqlite = DBModule::GetSQLite();
 					std::stringstream query;
 					query
 						<< "SELECT * "
 						<< "FROM " << K::TABLE.NAME
-						<< " WHERE " << TABLE_COL_ID << "=" << util::Conversion::ToString(key)
+						<< " WHERE " << TABLE_COL_ID << "=" << key
 						<< " LIMIT 1";
 					SQLiteResultSPtr rows (sqlite->execQuery (query.str()));
 					if (rows->next() == false) throw DBEmptyResultException<K>(key);
@@ -304,7 +307,7 @@ namespace synthese
 				std::stringstream query;
 				query
 					<< "SELECT " << field << " FROM " << K::TABLE.NAME
-					<< " WHERE " << TABLE_COL_ID << "=" << util::Conversion::ToString(id);
+					<< " WHERE " << TABLE_COL_ID << "=" << id;
 				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				if (!rows->next())
 					throw DBEmptyResultException<K>(id);

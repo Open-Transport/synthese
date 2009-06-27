@@ -46,11 +46,12 @@ namespace synthese
 				- 0 : Title of the screen
 				- 1 : Wiring code
 				- 2 : 1|0 : Service number display
-				- 3 : display the track number
+				- 3 : 1|0 : display the track number
 				- 4 : number of intermediates stops to display
-				- 5 : display the team identifier
-				- 6 : name of the stop
+				- 5 : 1|0 : display the team identifier
+				- 6 : text : name of the stop
 				- 7 : blinking_delay : blinking delay
+				- 8 : 1|0 : Clock display
 				
 			Object :
 				- result of table generation
@@ -68,6 +69,7 @@ namespace synthese
 			static const std::string DATA_STOP_NAME;
 			static const std::string DATA_INTERMEDIATE_STOPS_NUMBER;
 			static const std::string DATA_BLINKING_DELAY;
+			static const std::string DATA_DISPLAY_CLOCK;
 
 			DeparturesTableInterfacePage();
 
@@ -86,7 +88,8 @@ namespace synthese
 				, bool displayTrackNumber
 				, bool displayTeam
 				, int intermediatesStopsToDisplay
-				, int blinkingDelay
+				, int blinkingDelay,
+				bool displayClock
 				, const env::PublicTransportStopZoneConnectionPlace* place
 				, const ArrivalDepartureListWithAlarm& rows
 				, const server::Request* request = NULL
@@ -106,7 +109,8 @@ namespace synthese
 				, int wiringCode
 				, bool displayServiceNumber
 				, bool displayTrackNumber
-				, int blinkingDelay
+				, int blinkingDelay,
+				bool displayClock
 				, const env::PublicTransportStopZoneConnectionPlace* place
 				, const RoutePlanningListWithAlarm& rows
 				, const server::Request* request = NULL

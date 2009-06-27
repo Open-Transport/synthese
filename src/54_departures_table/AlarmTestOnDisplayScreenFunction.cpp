@@ -162,7 +162,8 @@ namespace synthese
 					, false
 					, false
 					, _type->getMaxStopsNumber(),
-					0
+					0,
+					true
 					, &place
 					, displayedObject
 				);

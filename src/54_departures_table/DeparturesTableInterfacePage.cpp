@@ -21,9 +21,6 @@
 */
 
 #include "DeparturesTableInterfacePage.h"
-
-#include "01_util/Conversion.h"
-
 #include "PublicTransportStopZoneConnectionPlace.h"
 
 #include <boost/lexical_cast.hpp>
@@ -51,6 +48,7 @@ namespace synthese
 		const string DeparturesTableInterfacePage::DATA_TITLE("title");
 		const string DeparturesTableInterfacePage::DATA_WIRING_CODE("wiring_code");
 		const string DeparturesTableInterfacePage::DATA_BLINKING_DELAY("blinking_delay");
+		const string DeparturesTableInterfacePage::DATA_DISPLAY_CLOCK("display_clock");
 
 		void DeparturesTableInterfacePage::display( std::ostream& stream
 			, VariablesMap& vars
@@ -60,20 +58,22 @@ namespace synthese
 			, bool displayTrackNumber
 			, bool displayTeam
 			, int intermediatesStopsToDisplay,
-			int blinkingDelay
+			int blinkingDelay,
+			bool displayClock
 			, const env::PublicTransportStopZoneConnectionPlace* place
 			, const ArrivalDepartureListWithAlarm& rows
 			, const server::Request* request /*= NULL*/ ) const
 		{
 			ParametersVector pv;
 			pv.push_back(title);
-			pv.push_back(Conversion::ToString(wiringCode));
-			pv.push_back(Conversion::ToString(displayServiceNumber));
-			pv.push_back(Conversion::ToString(displayTrackNumber));
-			pv.push_back(Conversion::ToString(intermediatesStopsToDisplay));
-			pv.push_back(Conversion::ToString(displayTeam));
+			pv.push_back(lexical_cast<string>(wiringCode));
+			pv.push_back(lexical_cast<string>(displayServiceNumber));
+			pv.push_back(lexical_cast<string>(displayTrackNumber));
+			pv.push_back(lexical_cast<string>(intermediatesStopsToDisplay));
+			pv.push_back(lexical_cast<string>(displayTeam));
 			pv.push_back(place->getFullName());
 			pv.push_back(lexical_cast<string>(blinkingDelay));
+			pv.push_back(lexical_cast<string>(displayClock));
 
 			InterfacePage::_display(
 				stream
@@ -93,19 +93,21 @@ namespace synthese
 			bool displayServiceNumber ,
 			bool displayTrackNumber ,
 			int blinkingDelay,
+			bool displayClock,
 			const env::PublicTransportStopZoneConnectionPlace* place ,
 			const RoutePlanningListWithAlarm& rows ,
 			const server::Request* request /*= NULL */ 
 		) const	{
 			ParametersVector pv;
 			pv.push_back(title);
-			pv.push_back(Conversion::ToString(wiringCode));
-			pv.push_back(Conversion::ToString(displayServiceNumber));
-			pv.push_back(Conversion::ToString(displayTrackNumber));
+			pv.push_back(lexical_cast<string>(wiringCode));
+			pv.push_back(lexical_cast<string>(displayServiceNumber));
+			pv.push_back(lexical_cast<string>(displayTrackNumber));
 			pv.push_back(string());
 			pv.push_back(string());
 			pv.push_back(place->getFullName());
 			pv.push_back(lexical_cast<string>(blinkingDelay));
+			pv.push_back(lexical_cast<string>(displayClock));
 
 			InterfacePage::_display(
 				stream
