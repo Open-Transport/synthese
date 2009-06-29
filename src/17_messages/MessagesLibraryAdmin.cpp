@@ -44,7 +44,7 @@
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 
@@ -91,7 +91,7 @@ namespace synthese
 			if(!doDisplayPreparationActions) return;
 
 			ScenarioTemplateInheritedTableSync::Search(
-				_env,
+				_getEnv(),
 				_folderId
 				, string(), NULL
 				, 0, -1
@@ -155,13 +155,13 @@ namespace synthese
 
 			// Search
 			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, _env.getEditableRegistry<ScenarioTemplate>());
+			p.setFromResult(_requestParameters, _getEnv().getEditableRegistry<ScenarioTemplate>());
 
 			if (_folderId > 0)
 			{
 				stream << "<h1>Répertoire</h1>";
 
-				if (_env.getRegistry<ScenarioTemplate>().empty() && _env.getRegistry<ScenarioFolder>().empty())
+				if (_getEnv().getRegistry<ScenarioTemplate>().empty() && _getEnv().getRegistry<ScenarioFolder>().empty())
 					stream << "<p>" << HTMLModule::getLinkButton(removeFolderRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
 
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
@@ -180,7 +180,7 @@ namespace synthese
 			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, p, addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
 			stream << t3.open();
 			
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, _env.getRegistry<ScenarioTemplate>())
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, _getEnv().getRegistry<ScenarioTemplate>())
 			{
 				updateScenarioRequest.setObjectId(scenario->getKey());
 				deleteScenarioRequest.getAction()->setScenario(scenario);
@@ -286,7 +286,7 @@ namespace synthese
 				try
 				{
 					_folderId = id;
-					_folder = ScenarioFolderTableSync::Get(_folderId, _env);
+					_folder = ScenarioFolderTableSync::Get(_folderId, _getEnv());
 				}
 				catch (...)
 				{

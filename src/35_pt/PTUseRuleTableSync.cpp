@@ -22,8 +22,12 @@
 
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
+#include "FareTableSync.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -31,6 +35,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace time;
+	using namespace env;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,PTUseRuleTableSync>::FACTORY_KEY("35.10.06 Public transportation use rules");
 
@@ -44,6 +49,7 @@ namespace synthese
 		const string PTUseRuleTableSync::COL_MAXDELAYDAYS ("max_delay_days");
 		const string PTUseRuleTableSync::COL_HOURDEADLINE ("hour_deadline");
 		const string PTUseRuleTableSync::COL_NAME("name");
+		const string PTUseRuleTableSync::COL_DEFAULT_FARE("default_fare_id");
 	}
 
 	namespace db
@@ -63,6 +69,7 @@ namespace synthese
 			SQLiteTableSync::Field(PTUseRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
 			SQLiteTableSync::Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
 			SQLiteTableSync::Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
+			SQLiteTableSync::Field(PTUseRuleTableSync::COL_DEFAULT_FARE, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -93,10 +100,26 @@ namespace synthese
  		    rr->setOriginIsReference (originIsReference);
  		    rr->setMinDelayMinutes (minDelayMinutes);
  		    rr->setMinDelayDays (minDelayDays);
- 		    rr->setMaxDelayDays (maxDelayDays);
+			rr->setMaxDelayDays(maxDelayDays > 0 ? maxDelayDays : optional<size_t>());
  		    rr->setHourDeadLine (hourDeadline);
 			rr->setName(rows->getText(PTUseRuleTableSync::COL_NAME));
 			rr->setAccessCapacity(rows->getOptionalUnsignedInt(PTUseRuleTableSync::COL_CAPACITY));
+
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				RegistryKeyType id(rows->getLongLong(PTUseRuleTableSync::COL_DEFAULT_FARE));
+				if(id > 0)
+				{
+					try
+					{
+						rr->setDefaultFare(FareTableSync::Get(id, env, linkLevel).get());
+					}
+					catch(ObjectNotFoundException<Fare> e)
+					{
+						Log::GetInstance().warn("Fare "+ lexical_cast<string>(id) +" not found in PT Use Rule "+ lexical_cast<string>(rr->getKey()));
+					}
+				}
+			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Save(
@@ -116,6 +139,7 @@ namespace synthese
 				object->getMinDelayDays() << "," <<
 				object->getMaxDelayDays() << "," <<
 				object->getHourDeadLine().toSQLString() << "," <<
+				(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0)) <<
 			")";
 			sqlite->execUpdate(query.str());
 		}

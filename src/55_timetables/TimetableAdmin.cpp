@@ -50,7 +50,7 @@
 #include "ActionFunctionRequest.h"
 
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "AdminParametersException.h"
 
 #include <boost/foreach.hpp>
@@ -100,7 +100,7 @@ namespace synthese
 
 			try
 			{
-				_timetable = TimetableTableSync::Get(id, _env);
+				_timetable = TimetableTableSync::Get(id, _getEnv());
 			}
 			catch(...)
 			{
@@ -113,7 +113,7 @@ namespace synthese
 			if (!doDisplayPreparationActions) return;
 
 			TimetableRowTableSync::Search(
-				_env,
+				_getEnv(),
 				_timetable->getKey()
 				, _requestParameters.orderField == PARAMETER_RANK
 				, _requestParameters.raisingOrder
@@ -138,21 +138,15 @@ namespace synthese
 		) const	{
 			// Requests
 			ActionFunctionRequest<TimetableUpdateAction,AdminRequest> updateRequest(_request);
-			updateRequest.setObjectId(_timetable->getKey());
-			updateRequest.getFunction()->setPage<TimetableAdmin>();
 			
 			ActionFunctionRequest<TimetableRowAddAction,AdminRequest> addRowRequest(_request);
-			addRowRequest.setObjectId(_timetable->getKey());
 			addRowRequest.getAction()->setTimetable(_timetable);
-			addRowRequest.getFunction()->setPage<TimetableAdmin>();
 
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<TimetableAdmin>();
-			searchRequest.setObjectId(_timetable->getKey());
 
 			// Search
 			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, _env.getEditableRegistry<TimetableRow>());
+			p.setFromResult(_requestParameters, _getEnv().getEditableRegistry<TimetableRow>());
 
 			// Display
 			stream << "<h1>Propriétés</h1>";
@@ -182,7 +176,7 @@ namespace synthese
 
 			int maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
 			int lastRank(UNKNOWN_VALUE);
-			BOOST_FOREACH(shared_ptr<TimetableRow> row, _env.getRegistry<TimetableRow>())
+			BOOST_FOREACH(shared_ptr<TimetableRow> row, _getEnv().getRegistry<TimetableRow>())
 			{
 				lastRank = row->getRank();
 
@@ -250,7 +244,7 @@ namespace synthese
 
 			stream << "<h1>Résultat simulé</h1>";
 
-			auto_ptr<TimetableGenerator> g(_timetable->getGenerator(_env));
+			auto_ptr<TimetableGenerator> g(_timetable->getGenerator(_getEnv()));
 			Calendar c;
 			Date d(TIME_CURRENT);
 			for (int i(0); i<60; ++i)

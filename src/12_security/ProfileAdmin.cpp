@@ -38,7 +38,7 @@
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include <boost/foreach.hpp>
 
@@ -87,7 +87,7 @@ namespace synthese
 				uid id = map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
 				if (id != UNKNOWN_VALUE && id != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
-					_profile = ProfileTableSync::Get(id,_env);
+					_profile = ProfileTableSync::Get(id,_getEnv());
 				}
 			}
 			catch (ObjectNotFoundException<Profile>& e)
@@ -109,20 +109,9 @@ namespace synthese
 		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			ActionFunctionRequest<UpdateProfileAction, AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<ProfileAdmin>();
-			updateRequest.setObjectId(_profile->getKey());
-
 			ActionFunctionRequest<UpdateRightAction, AdminRequest> updateRightRequest(_request);
-			updateRightRequest.getFunction()->setPage<ProfileAdmin>();
-			updateRightRequest.setObjectId(_profile->getKey());
-			
 			ActionFunctionRequest<DeleteRightAction,AdminRequest> deleteRightRequest(_request);
-			deleteRightRequest.getFunction()->setPage<ProfileAdmin>();
-			deleteRightRequest.setObjectId(_profile->getKey());
-			
 			ActionFunctionRequest<AddRightAction,AdminRequest> addRightRequest(_request);
-			addRightRequest.getFunction()->setPage<ProfileAdmin>();
-			addRightRequest.setObjectId(_profile->getKey());
 			
 			vector<pair<int, string> > privatePublicMap;
 			privatePublicMap.push_back(make_pair((int) FORBIDDEN, "Interdit"));

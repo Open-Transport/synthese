@@ -45,7 +45,7 @@
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ActionException.h"
 
 #include <boost/foreach.hpp>
@@ -88,7 +88,7 @@ namespace synthese
 
 			try
 			{
-				_alarm = AlarmTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+				_alarm = AlarmTableSync::Get(id, _getEnv(), UP_LINKS_LOAD_LEVEL);
 			}
 			catch(...)
 			{
@@ -120,7 +120,6 @@ namespace synthese
 				stream << "<h1>Contenu</h1>";
 
 				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
-				templateRequest.getFunction()->setSamePage(this);
 				templateRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				vector<pair<uid, string> > tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
@@ -135,7 +134,6 @@ namespace synthese
 				}
 
 				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
-				updateMessagesRequest.getFunction()->setSamePage(this);
 				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
@@ -154,19 +152,14 @@ namespace synthese
 				// TAB STOPS
 				if (openTabContent(stream, recipient->getFactoryKey()))
 				{
-					FunctionRequest<AdminRequest> searchRequest(_request);
-					searchRequest.getFunction()->setSamePage(this);
-
 					ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(_request);
-					addRequest.getFunction()->setSamePage(this);
 					addRequest.getAction()->setAlarmId(_alarm->getKey());
 					addRequest.getAction()->setRecipientKey(recipient->getFactoryKey());
 
 					ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
-					removeRequest.getFunction()->setSamePage(this);
 					removeRequest.getAction()->setAlarmId(_alarm->getKey());
 
-					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
+					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, FunctionRequest<AdminRequest>(_request), addRequest, removeRequest);
 				}
 			}
 			

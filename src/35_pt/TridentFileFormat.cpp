@@ -847,9 +847,9 @@ namespace synthese
  					{
  						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << "\n";
  					}
- 					if (rule.getMaxDelayDays() > 0)
+ 					if (rule.getMaxDelayDays())
  					{
- 						os << "<maxDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMaxDelayDays()) << "</maxDaysDurationBeforeDeadline>" << "\n";
+ 						os << "<maxDaysDurationBeforeDeadline>" << ToXsdDaysDuration(*rule.getMaxDelayDays()) << "</maxDaysDurationBeforeDeadline>" << "\n";
  					}
 // 					if (!rule.getPhoneExchangeNumber().empty())
  //					{

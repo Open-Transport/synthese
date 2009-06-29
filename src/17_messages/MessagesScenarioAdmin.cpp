@@ -44,7 +44,7 @@
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ActionException.h"
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
@@ -93,7 +93,7 @@ namespace synthese
 
 			try
 			{
-				_scenario = ScenarioTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+				_scenario = ScenarioTableSync::Get(id, _getEnv(), UP_LINKS_LOAD_LEVEL);
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
 				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
 			}
@@ -280,14 +280,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_LOG))
 			{
 				// Log search
-				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
-
-				_generalLogView.display(
-					stream,
-					searchRequest
-				);
-
+				_generalLogView.display(stream, FunctionRequest<AdminRequest>(_request));
 			}
 
 			closeTabContent(stream);

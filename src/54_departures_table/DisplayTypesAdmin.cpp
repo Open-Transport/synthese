@@ -23,7 +23,7 @@
 #include "HTMLForm.h"
 #include "Interface.h"
 #include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "DisplayType.h"
 #include "DeparturesTableModule.h"
@@ -83,7 +83,7 @@ namespace synthese
 			if(doDisplayPreparationActions)
 			{
 				DisplayTypeTableSync::Search(
-					_env,
+					_getEnv(),
 					"%"+ _searchName +"%",
 					_searchInterfaceId,
 					_requestParameters.first,
@@ -94,7 +94,7 @@ namespace synthese
 					_requestParameters.raisingOrder,
 					UP_LINKS_LOAD_LEVEL
 				);
-				_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayType>());
+				_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<DisplayType>());
 			}
 		}
 
@@ -119,14 +119,12 @@ namespace synthese
 			bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 			
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(_request);
 			createRequest.getFunction()->setPage<DisplayTypeAdmin>();
 			createRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			
 			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(_request);
-			deleteRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> openRequest(_request);
 			openRequest.getFunction()->setPage<DisplayTypeAdmin>();
@@ -162,7 +160,7 @@ namespace synthese
 
 			// Display types loop
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<DisplayType> dt, _env.getRegistry<DisplayType>())
+			BOOST_FOREACH(shared_ptr<DisplayType> dt, _getEnv().getRegistry<DisplayType>())
 			{
 				deleteRequest.getAction()->setType(dt);
 				openRequest.setObjectId(dt->getKey());

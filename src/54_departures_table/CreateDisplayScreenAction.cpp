@@ -75,7 +75,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY));
 			if (id > 0)
 			{
-				_template = DisplayScreenTableSync::Get(id, _env);
+				_template = DisplayScreenTableSync::Get(id, *_env);
 			}
 
 			id = map.getUid(PARAMETER_CPU_ID, false, FACTORY_KEY);
@@ -124,7 +124,7 @@ namespace synthese
 			if(id <= 0) return;
 			try
 			{
-				_place = ConnectionPlaceTableSync::Get(id, _env);
+				_place = ConnectionPlaceTableSync::Get(id, *_env);
 			}
 			catch (...)
 			{
@@ -148,7 +148,7 @@ namespace synthese
 			if(id <= 0) return;
 			try
 			{
-				_cpu = DisplayScreenCPUTableSync::Get(id, _env);
+				_cpu = DisplayScreenCPUTableSync::Get(id, *_env);
 				if(_cpu->getPlace())
 				{
 					setPlace(_cpu->getPlace()->getKey());

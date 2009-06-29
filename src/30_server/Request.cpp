@@ -73,7 +73,7 @@ namespace synthese
 		):	_session(NULL)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
-			, _object_id(0)
+			, _object_id(request ? request->getObjectId() : UNKNOWN_VALUE)
 		{
 			if (action.get())
 				_setAction(action);
@@ -83,7 +83,7 @@ namespace synthese
 			{
 				_clientURL = request->_clientURL;
 				_session = request->_session;
-				if (_function.get())
+				if (_function.get() && _function->getFactoryKey() == function->getFactoryKey())
 					_function->_copy(request->_function);
 			}
 		}

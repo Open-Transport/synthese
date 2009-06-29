@@ -97,7 +97,21 @@ namespace synthese
 				, const AdminInterfaceElement& currentPage
 			) const;
 			
-			
+
+
+			/** Sub pages getter.
+				@param request User request
+				@return PageLinks Ordered vector of sub pages links
+				@author Hugues Romain
+				@date 2008
+				
+				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
+				This method can be overloaded to create customized sub tree.
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage
+			) const;
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain

@@ -35,7 +35,7 @@
 #include "FunctionRequest.h"
 #include "Session.h"
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "User.h"
 #include "Profile.h"
 
@@ -101,7 +101,7 @@ namespace synthese
 			if(!doDisplayPreparationActions) return;
 			
 			_searchResult = searchConnectionPlacesWithBroadcastPoints(
-				_env,
+				_getEnv(),
 				_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 				, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 				, READ
@@ -142,7 +142,6 @@ namespace synthese
 			goRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			vector<pair<int, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));

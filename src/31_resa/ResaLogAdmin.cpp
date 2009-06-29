@@ -32,7 +32,7 @@
 #include "Request.h"
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "SearchFormHTMLTable.h"
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
@@ -91,14 +91,10 @@ namespace synthese
 		
 		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
-			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
-
 			// Results
 			_log.display(
 				stream,
-				searchRequest,
+				FunctionRequest<AdminRequest>(_request),
 				true,
 				true
 			);

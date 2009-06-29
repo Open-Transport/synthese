@@ -111,7 +111,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::GetEditable(id, _env);
+				_alarm = AlarmTableSync::GetEditable(id, *_env);
 			}
 			catch (ObjectNotFoundException<Alarm>)
 			{

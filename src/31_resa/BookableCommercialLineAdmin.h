@@ -34,6 +34,7 @@ namespace synthese
 	namespace env
 	{
 		class CommercialLine;
+		class ScheduledService;
 	}
 
 	namespace resa
@@ -49,10 +50,12 @@ namespace synthese
 			boost::shared_ptr<const env::CommercialLine>	_line;
 			time::Date										_date;
 			bool											_hideOldServices;
+			boost::shared_ptr<const env::ScheduledService>	_service;
 
 		public:
 			static const std::string PARAMETER_DISPLAY_CANCELLED;
 			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_SERVICE;
 
 			BookableCommercialLineAdmin();
 			
@@ -136,6 +139,8 @@ namespace synthese
 				@date 2008
 			*/
 			virtual std::string getParameterValue() const;
+
+			void setServiceId(util::RegistryKeyType id);
 		};
 	}
 }

@@ -32,6 +32,7 @@
 #include "TridentFileFormat.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -58,13 +59,13 @@ namespace synthese
 
 		void TridentExportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_LINE_ID, true, FACTORY_KEY));
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LINE_ID));
 			if (id == UNKNOWN_VALUE)
 				throw RequestException("Line id must be specified");
 
 			try
 			{
-				_line = CommercialLineTableSync::Get(id, _env);
+				_line = CommercialLineTableSync::Get(id, *_env);
 			}
 			catch (...)
 			{
@@ -76,8 +77,7 @@ namespace synthese
 
 		void TridentExportFunction::_run( std::ostream& stream ) const
 		{
-			Env env;
-			TridentFileFormat t(&env, _line->getKey(), _withTisseoExtension);
+			TridentFileFormat t(_env.get(), _line->getKey(), _withTisseoExtension);
 			t.build(stream);
 		}
 
@@ -91,6 +91,12 @@ namespace synthese
 		std::string TridentExportFunction::getOutputMimeType() const
 		{
 			return "text/xml";
+		}
+
+		TridentExportFunction::TridentExportFunction()
+			: FactorableTemplate<Function, TridentExportFunction>()
+		{
+			setEnv(shared_ptr<Env>(new Env));
 		}
 	}
 }

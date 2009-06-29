@@ -65,13 +65,13 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY));
 			if (id > 0)
 			{
-				_template = DisplayScreenCPUTableSync::Get(id, _env);
+				_template = DisplayScreenCPUTableSync::Get(id, *_env);
 			}
 
 			id = map.getUid(PARAMETER_LOCALIZATION_ID, true, FACTORY_KEY);
 			try
 			{
-				_place = ConnectionPlaceTableSync::Get(id, _env);
+				_place = ConnectionPlaceTableSync::Get(id, *_env);
 			}
 			catch (...)
 			{

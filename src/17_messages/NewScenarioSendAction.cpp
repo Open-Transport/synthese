@@ -73,7 +73,7 @@ namespace synthese
 			{
 				try
 				{
-					_scenarioToCopy = SentScenarioInheritedTableSync::Get(*id, _env);
+					_scenarioToCopy = SentScenarioInheritedTableSync::Get(*id, *_env);
 				}
 				catch(ObjectNotFoundException<SentScenario>& e)
 				{
@@ -86,7 +86,7 @@ namespace synthese
 				{
 					try
 					{
-						_template = ScenarioTemplateInheritedTableSync::Get(*id, _env);
+						_template = ScenarioTemplateInheritedTableSync::Get(*id, *_env);
 					}
 					catch(ObjectNotFoundException<ScenarioTemplate>& e)
 					{

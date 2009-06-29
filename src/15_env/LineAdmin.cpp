@@ -90,13 +90,13 @@ namespace synthese
 		){
 			try
 			{
-				_line = LineTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+				_line = LineTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
 
 				if(!doDisplayPreparationActions) return;
 
-				LineStopTableSync::Search(_env, _line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
+				LineStopTableSync::Search(_getEnv(), _line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
 				ScheduledServiceTableSync::Search(
-					_env,
+					_getEnv(),
 					_line->getKey(),
 					optional<RegistryKeyType>(),
 					optional<RegistryKeyType>(),
@@ -106,7 +106,7 @@ namespace synthese
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);
 				ContinuousServiceTableSync::Search(
-					_env,
+					_getEnv(),
 					_line->getKey(),
 					optional<RegistryKeyType>(),
 					0,
@@ -153,7 +153,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<LineStop> lineStop, _env.getRegistry<LineStop>())
+				BOOST_FOREACH(shared_ptr<LineStop> lineStop, _getEnv().getRegistry<LineStop>())
 				{
 					stream << t.row();
 					stream << t.col() << lineStop->getRankInPath();
@@ -172,7 +172,7 @@ namespace synthese
 			// TAB SCHEDULED SERVICES
 			if (openTabContent(stream, TAB_SCHEDULED_SERVICES))
 			{
-				const Registry<ScheduledService>& services(_env.getRegistry<ScheduledService>());
+				const Registry<ScheduledService>& services(_getEnv().getRegistry<ScheduledService>());
 				if (services.empty())
 					stream << "<p>Aucun service à horaire</p>";
 				else
@@ -211,7 +211,7 @@ namespace synthese
 			// TAB CONTINUOUS SERVICES
 			if (openTabContent(stream, TAB_CONTINUOUS_SERVICES))
 			{
-				const Registry<ContinuousService>& cservices(_env.getRegistry<ContinuousService>());
+				const Registry<ContinuousService>& cservices(_getEnv().getRegistry<ContinuousService>());
 				if (cservices.empty())
 					stream << "<p>Aucun service continu</p>";
 				else

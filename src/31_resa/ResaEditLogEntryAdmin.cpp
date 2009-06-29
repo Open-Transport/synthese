@@ -42,7 +42,7 @@
 #include "ActionFunctionRequest.h"
 
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include "PropertiesHTMLTable.h"
 
@@ -85,7 +85,7 @@ namespace synthese
 		){
 			try
 			{
-				_entry = DBLogEntryTableSync::Get(_request->getObjectId(), _env);
+				_entry = DBLogEntryTableSync::Get(_request->getObjectId(), _getEnv());
 			}
 			catch (...)
 			{
@@ -96,12 +96,7 @@ namespace synthese
 				map,
 				ResaDBLog::FACTORY_KEY,
 				UNKNOWN_VALUE,
-				UNKNOWN_VALUE,
-				UNKNOWN_VALUE,
-				DBLogEntry::DB_LOG_UNKNOWN,
-				TIME_UNKNOWN,
-				TIME_UNKNOWN,
-				lexical_cast<string>(_entry->getKey()) + "|"
+				_entry->getKey()
 			);
 		}
 		
@@ -119,11 +114,9 @@ namespace synthese
 		) const	{
 			// Requests
 			ActionFunctionRequest<ResaLogEntryUpdateAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setSamePage(this);
 			updateRequest.getAction()->setEntryId(_entry->getKey());
 
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			// Display
 			DBLogEntry::Content content(_entry->getContent());
@@ -155,7 +148,7 @@ namespace synthese
 			{
 				try
 				{
-					customer = UserTableSync::Get(_entry->getObjectId(), _env);
+					customer = UserTableSync::Get(_entry->getObjectId(), _getEnv());
 				}
 				catch(...)
 				{
@@ -166,7 +159,7 @@ namespace synthese
 			{
 				try
 				{
-					op = UserTableSync::Get(_entry->getUserId(), _env);
+					op = UserTableSync::Get(_entry->getUserId(), _getEnv());
 				}
 				catch(...)
 				{

@@ -89,7 +89,7 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(id, _env);
+				_screen = DisplayScreenTableSync::GetEditable(id, *_env);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
@@ -101,7 +101,7 @@ namespace synthese
 		{
 			try
 			{
-				_place = ConnectionPlaceTableSync::Get(id, _env);
+				_place = ConnectionPlaceTableSync::Get(id, *_env);
 
 			}
 			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)

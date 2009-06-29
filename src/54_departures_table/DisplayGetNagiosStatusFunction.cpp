@@ -68,7 +68,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, FACTORY_KEY));
 			try
 			{
-				_screen = DisplayScreenTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+				_screen = DisplayScreenTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{

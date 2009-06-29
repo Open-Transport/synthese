@@ -23,7 +23,7 @@
 #include "ValueElementList.h"
 #include "FunctionRequest.h"
 #include "AdminInterfaceElement.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "AdminContentInterfaceElement.h"
 
 using namespace std;

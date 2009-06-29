@@ -62,7 +62,7 @@ namespace synthese
 			RegistryKeyType dataSourceId(map.getUid(PARAMETER_DATA_SOURCE, true, FACTORY_KEY));
 			try
 			{
-				_dataSource = DataSourceTableSync::Get(dataSourceId, _env);
+				_dataSource = DataSourceTableSync::Get(dataSourceId, *_env);
 			}
 			catch(ObjectNotFoundException<DataSource> e)
 			{
@@ -80,7 +80,7 @@ namespace synthese
 
 				// Paths
 				FileFormat::Files::FilesVector files(_fileFormat->getFiles());
-				_fileFormat->setEnv(&_env);
+				_fileFormat->setEnv(_env.get());
 				_fileFormat->setDataSource(_dataSource.get());
 
 				if(files.empty())

@@ -46,7 +46,7 @@
 #include "Request.h"
 
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 using namespace std;
 
@@ -114,7 +114,7 @@ namespace synthese
 		
 			try
 			{
-				_site = SiteTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env);
+				_site = SiteTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv());
 			}
 			catch (...)
 			{
@@ -145,7 +145,6 @@ namespace synthese
 		void SiteRoutePlanningAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			// Search form
 			stream << "<h1>Recherche</h1>";

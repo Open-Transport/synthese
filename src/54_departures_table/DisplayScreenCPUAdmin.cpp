@@ -29,7 +29,7 @@
 #include "DisplayScreenCPUTableSync.h"
 #include "DisplaySearchAdmin.h"
 #include "DeparturesTableModule.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ActionFunctionRequest.h"
 #include "AdminParametersException.h"
 #include "ArrivalDepartureTableRight.h"
@@ -98,7 +98,7 @@ namespace synthese
 			
 			try
 			{
-				_cpu = DisplayScreenCPUTableSync::Get(id, _env);
+				_cpu = DisplayScreenCPUTableSync::Get(id, _getEnv());
 			}
 			catch (ObjectNotFoundException<DisplayScreenCPU>& e)
 			{
@@ -111,7 +111,7 @@ namespace synthese
 			if(!doDisplayPreparationActions) return;
 
 			_lastContact = DisplayMonitoringStatusTableSync::GetLastContact(*_cpu);
-			DisplayScreenTableSync::SearchFromCPU(_env, _cpu->getKey());
+			DisplayScreenTableSync::SearchFromCPU(_getEnv(), _cpu->getKey());
 		}
 		
 		
@@ -133,7 +133,6 @@ namespace synthese
 			if (openTabContent(stream, TAB_TECHNICAL))
 			{
 				ActionFunctionRequest<DisplayScreenCPUUpdateAction, AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setSamePage(this);
 				updateRequest.getAction()->setCPU(_cpu->getKey());
 
 				stream << "<h1>Propriétés</h1>";
@@ -154,12 +153,10 @@ namespace synthese
 			{
 				// Update action
 				ActionFunctionRequest<DisplayScreenCPUMaintenanceUpdateAction,AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setSamePage(this);
 				updateRequest.getAction()->setCPU(_cpu->getKey());
 
 				// Log search
 				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
 
 				stream << "<h1>Paramètres de maintenance</h1>";
 
@@ -297,14 +294,7 @@ namespace synthese
 			// LOG TAB
 			if (openTabContent(stream, TAB_LOG))
 			{
-				// Log search
-				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
-
-				_generalLogView.display(
-					stream,
-					searchRequest
-				);
+				_generalLogView.display(stream,	FunctionRequest<AdminRequest>(_request));
 			}
 			closeTabContent(stream);
 		}

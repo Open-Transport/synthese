@@ -38,7 +38,7 @@
 
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include "RoutePlanner.h"
 
@@ -129,7 +129,7 @@ namespace synthese
 			{
 				try
 				{
-					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(id, _env);
+					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(id, _getEnv());
 					//ReservationTableSync::Search(_confirmedTransaction.get());
 				}
 				catch (...)
@@ -143,7 +143,7 @@ namespace synthese
 			{
 				try
 				{
-					_customer = UserTableSync::Get(id, _env);
+					_customer = UserTableSync::Get(id, _getEnv());
 				}
 				catch (...)
 				{
@@ -177,10 +177,8 @@ namespace synthese
 		void ReservationRoutePlannerAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<BookReservationAction,AdminRequest> resaRequest(_request);
-			resaRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
 			customerSearchRequest.getFunction()->setNumber(20);

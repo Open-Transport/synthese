@@ -34,12 +34,13 @@
 #include "HTMLModule.h"
 #include "User.h"
 #include "UserTableSync.h"
-#include "Conversion.h"
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
 #include "Session.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ResaEditLogEntryAdmin.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -79,7 +80,7 @@ namespace synthese
 				return user->getFullName();
 			}
 
-			return Conversion::ToString(id);
+			return lexical_cast<string>(id);
 		}
 
 
@@ -114,10 +115,10 @@ namespace synthese
 			uid callId(ResaModule::GetCurrentCallId(session));
 
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(RESERVATION_ENTRY));
+			content.push_back(lexical_cast<string>(RESERVATION_ENTRY));
 			content.push_back(r1->getDepartureTime().toSQLString(false));
 			content.push_back("Réservation");
-			content.push_back(Conversion::ToString(transaction.getKey()));
+			content.push_back(lexical_cast<string>(transaction.getKey()));
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session->getUser().get(), transaction.getCustomerUserId(), callId);
 
@@ -127,10 +128,10 @@ namespace synthese
 		uid ResaDBLog::AddCallEntry(const security::User* user)
 		{
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(CALL_ENTRY));
+			content.push_back(lexical_cast<string>(CALL_ENTRY));
 			content.push_back(string());
 			content.push_back("Réception d'appel");
-			content.push_back(Conversion::ToString(UNKNOWN_VALUE));
+			content.push_back(lexical_cast<string>(UNKNOWN_VALUE));
 
 			return _addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, UNKNOWN_VALUE);
 		}
@@ -201,10 +202,10 @@ namespace synthese
 				assert(false);
 			}
 
-			content.push_back(Conversion::ToString(type));
+			content.push_back(lexical_cast<string>(type));
 			content.push_back(r1->getDepartureTime().toSQLString(false));
 			content.push_back(description);
-			content.push_back(Conversion::ToString(transaction.getKey()));
+			content.push_back(lexical_cast<string>(transaction.getKey()));
 
 			_addEntry(FACTORY_KEY, level, content, session->getUser().get(), transaction.getCustomerUserId(), callId);
 
@@ -367,13 +368,13 @@ namespace synthese
 				return "resa_compulsory.png";
 
 			case ResaDBLog::CANCELLATION_ENTRY:
-				return "bullet_delete.png";
+				return ResaModule::GetStatusIcon(ReservationStatus::CANCELLED);
 
 			case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-				return "error.png";
+				return ResaModule::GetStatusIcon(ReservationStatus::CANCELLED_AFTER_DELAY);
 				
 			case ResaDBLog::NO_SHOW:
-				return "exclamation.png";
+				return ResaModule::GetStatusIcon(ReservationStatus::NO_SHOW);
 				
 			case ResaDBLog::CUSTOMER_COMMENT_ENTRY:
 				return "user_comment.png";

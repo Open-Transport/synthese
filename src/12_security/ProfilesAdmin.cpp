@@ -37,7 +37,7 @@
 #include "12_security/Constants.h"
 #include "ActionFunctionRequest.h"
 #include "AdminModule.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "Request.h"
 
@@ -90,7 +90,7 @@ namespace synthese
 
 			// Search
 			ProfileTableSync::Search(
-				_env,
+				_getEnv(),
 				"%"+_searchName+"%"
 				, "%"+_searchRightName+"%"
 				, _requestParameters.first
@@ -98,7 +98,7 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
 				, _requestParameters.raisingOrder
 			);
-			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<Profile>());
+			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<Profile>());
 		}
 		
 		
@@ -115,13 +115,11 @@ namespace synthese
 		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> profileRequest(_request);
 			profileRequest.getFunction()->setPage<ProfileAdmin>();
 
 			ActionFunctionRequest<DeleteProfileAction, AdminRequest> deleteProfileRequest(_request);
-			deleteProfileRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(_request);
 			addProfileRequest.getFunction()->setPage<ProfileAdmin>();
@@ -156,7 +154,7 @@ namespace synthese
 			stream << t.open();
 			
 			// Profiles loop
-			BOOST_FOREACH(shared_ptr<Profile> profile, _env.getRegistry<Profile>())
+			BOOST_FOREACH(shared_ptr<Profile> profile, _getEnv().getRegistry<Profile>())
 			{
 				profileRequest.setObjectId(profile->getKey());
 				deleteProfileRequest.setObjectId(profile->getKey());

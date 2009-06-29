@@ -23,9 +23,9 @@
 #include <boost/foreach.hpp>
 #include <assert.h>
 
+#include "AdminInterfaceElement.h"
 #include "HTMLModule.h"
 #include "FunctionRequest.h"
-#include "AdminRequest.h"
 #include "HomeAdmin.h"
 #include "Interface.h"
 #include "Profile.h"
@@ -356,6 +356,10 @@ namespace synthese
 				ParametersMap parameter;
 				parameter.insert(parameterName, parameterValue);
 				page->setFromParametersMap(parameter, false);
+				if(parameterName == Request::PARAMETER_OBJECT_ID)
+				{
+					const_cast<FunctionRequest<AdminRequest>* >(page->_request)->setObjectId(lexical_cast<RegistryKeyType>(parameterValue));
+				}
 			}
 			return page;
 		}
@@ -438,9 +442,14 @@ namespace synthese
 
 
 
-		const Request* AdminInterfaceElement::getRequest(
+		const server::FunctionRequest<admin::AdminRequest>* AdminInterfaceElement::getRequest(
 		) const {
 			return _request;
+		}
+
+		util::Env& AdminInterfaceElement::_getEnv() const
+		{
+			return *_request->getFunction()->getEnv();
 		}
 	}
 }

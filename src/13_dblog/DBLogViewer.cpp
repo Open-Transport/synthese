@@ -35,7 +35,7 @@
 #include "DBLogRight.h"
 #include "AdminParametersException.h"
 #include "AdminModule.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ActionFunctionRequest.h"
 #include "ModuleAdmin.h"
 #include "DBLog.h"
@@ -87,7 +87,7 @@ namespace synthese
 		){
 			_viewer.set(
 				map,
-				map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY)
+				map.get<string>(PARAMETER_LOG_KEY)
 			);
 		}
 		
@@ -110,10 +110,8 @@ namespace synthese
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<DBLogPurgeAction, AdminRequest> purgeRequest(_request);
-			purgeRequest.getFunction()->setSamePage(this);
 			purgeRequest.getAction()->setDBLog(_viewer.getLogKey());
 
 			_viewer.display(

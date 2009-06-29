@@ -21,6 +21,7 @@
 */
 
 #include <sstream>
+#include <assert.h>
 
 #include "Conversion.h"
 #include "FactoryException.h"
@@ -32,7 +33,7 @@
 #include "HomeAdmin.h"
 #include "AdminInterfacePage.h"
 #include "AdminInterfaceElement.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "AdminParametersException.h"
 
 using namespace std;
@@ -152,6 +153,11 @@ namespace synthese
 
 		void AdminRequest::setPage(shared_ptr<AdminInterfaceElement> aie )
 		{
+			assert(aie.get());
+			if(_page.get() && _page->getFactoryKey() != aie->getFactoryKey() && _request->getObjectId() != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			{
+				_request->setObjectId(UNKNOWN_VALUE);
+			}
 			_page = aie;
 		}
 
@@ -178,19 +184,22 @@ namespace synthese
 
 
 
-		void AdminRequest::setSamePage(
-			const AdminInterfaceElement* page
-		) {
-			_page.reset(Factory<AdminInterfaceElement>::create(page->getFactoryKey()));
-			_page->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
-			_request->setObjectId(page->getRequest()->getObjectId());
-			_page->setActiveTab(page->getCurrentTab());
-			_page->setFromParametersMap(page->getParametersMap(), false);
-		}
-
 		std::string AdminRequest::getOutputMimeType() const
 		{
 			return "text/html";
+		}
+
+		void AdminRequest::_copy( boost::shared_ptr<const Function> other )
+		{
+			RequestWithInterface::_copy(other);
+
+			assert(dynamic_cast<const AdminRequest*>(other.get()));
+			const AdminRequest& ar(static_cast<const AdminRequest&>(*other));
+			boost::shared_ptr<AdminInterfaceElement> p(util::Factory<AdminInterfaceElement>::create(ar.getPage()->getFactoryKey()));
+			p->setRequest(static_cast<FunctionRequest<AdminRequest>* >(_request));
+			p->setActiveTab(ar.getPage()->getCurrentTab());
+			p->setFromParametersMap(ar.getPage()->getParametersMap(), false);
+			setPage(p);			
 		}
 	}
 }

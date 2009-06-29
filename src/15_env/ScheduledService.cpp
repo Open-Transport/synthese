@@ -24,6 +24,7 @@
 #include "Path.h"
 #include "Edge.h"
 #include "Registry.h"
+#include "GraphConstants.h"
 
 using namespace std;
 
@@ -221,5 +222,25 @@ namespace synthese
 			return _arrivalSchedules;
 		}
 
+		graph::UseRule::ReservationAvailabilityType ScheduledService::getReservationAbility() const
+		{
+			// Pedestrian
+			const Path::Edges& edges(getPath()->getEdges());
+			for(Path::Edges::const_reverse_iterator it(edges.rbegin()); it != edges.rend(); ++it)
+			{
+				if((*it)->isDeparture())
+				{
+					ServicePointer p(getFromPresenceTime(
+						DEPARTURE_TO_ARRIVAL,
+						USER_PEDESTRIAN,
+						*it,
+						DateTime(TIME_CURRENT),
+						false,
+						false
+					)	);
+					return getUseRule(USER_PEDESTRIAN).getReservationAvailability(p);
+				}
+			}
+		}
 	}
 }

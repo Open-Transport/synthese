@@ -74,18 +74,6 @@ namespace synthese
 
 
 		public:
-			////////////////////////////////////////////////////////////////////
-			///	Sets the function to display the same page with same parameters.
-			///	@param page the current page (always use this)
-			///	@author Hugues Romain
-			///	@date 2008
-			/// The following parameters are copied :
-			///		- page key
-			///		- object id
-			///		- active tab = current tab of this at the method call
-			////////////////////////////////////////////////////////////////////
-			void setSamePage(const AdminInterfaceElement* page);
-
 			void setPage(boost::shared_ptr<AdminInterfaceElement> aie);
 
 			template<class T>
@@ -101,6 +89,19 @@ namespace synthese
 			void setParameter(const std::string& name, const std::string value);
 
 			virtual std::string getOutputMimeType() const;
+
+			////////////////////////////////////////////////////////////////////
+			///	Sets the function to display the same page with same parameters.
+			///	@param page the current page (always use this)
+			///	@author Hugues Romain
+			///	@date 2008
+			/// The following parameters are copied :
+			///		- page key
+			///		- object id
+			///		- active tab = current tab of this at the method call
+			///		- same env
+			////////////////////////////////////////////////////////////////////
+			virtual void _copy(boost::shared_ptr<const Function> other);
 		};
 
 		template<class T>

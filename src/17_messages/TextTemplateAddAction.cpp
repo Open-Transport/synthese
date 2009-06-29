@@ -83,7 +83,7 @@ namespace synthese
 				shared_ptr<const TextTemplate> parent;
 				try
 				{
-					parent = TextTemplateTableSync::Get(_parentId, _env);
+					parent = TextTemplateTableSync::Get(_parentId, *_env);
 				}
 				catch(...)
 				{

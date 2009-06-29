@@ -89,7 +89,7 @@ namespace synthese
 
 					if (folderId != 0)
 					{
-						_folder = ScenarioFolderTableSync::GetEditable(folderId, _env);
+						_folder = ScenarioFolderTableSync::GetEditable(folderId, *_env);
 					}
 
 					// Uniqueness control
@@ -227,7 +227,7 @@ namespace synthese
 		) throw(ActionException) {
 			try
 			{
-				_scenario = ScenarioTableSync::GetEditable(id, _env, UP_LINKS_LOAD_LEVEL);
+				_scenario = ScenarioTableSync::GetEditable(id, *_env, UP_LINKS_LOAD_LEVEL);
 				_sscenario = dynamic_pointer_cast<SentScenario, Scenario>(_scenario);
 				_tscenario = dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario);
 			}

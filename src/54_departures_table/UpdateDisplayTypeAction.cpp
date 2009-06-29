@@ -109,17 +109,17 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID));
 				if (id > 0)
 				{
-					_interface = InterfaceTableSync::Get(id, _env);
+					_interface = InterfaceTableSync::Get(id, *_env);
 				}
 				id = map.get<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID);
 				if (id > 0)
 				{
-					_audioInterface = InterfaceTableSync::Get(id, _env);
+					_audioInterface = InterfaceTableSync::Get(id, *_env);
 				}
 				id = map.get<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
 				if (id > 0)
 				{
-					_monitoringInterface = InterfaceTableSync::Get(id, _env);
+					_monitoringInterface = InterfaceTableSync::Get(id, *_env);
 				}
 
 				// Max stops number
@@ -176,7 +176,7 @@ namespace synthese
 			try
 			{
 				// Display type
-				_dt = DisplayTypeTableSync::GetEditable(id, _env, UP_LINKS_LOAD_LEVEL);
+				_dt = DisplayTypeTableSync::GetEditable(id, *_env, UP_LINKS_LOAD_LEVEL);
 			}			
 			catch (ObjectNotFoundException<DisplayType>& e)
 			{

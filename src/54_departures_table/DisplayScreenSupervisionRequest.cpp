@@ -84,7 +84,7 @@ namespace synthese
 			}
 
 			// Last monitoring status
-			DisplayMonitoringStatusTableSync::Search(_env, _displayScreen->getKey(), 0, 1, true, false);
+			DisplayMonitoringStatusTableSync::Search(*_env, _displayScreen->getKey(), 0, 1, true, false);
 		}
 
 		void DisplayScreenSupervisionRequest::_run( std::ostream& stream ) const
@@ -105,14 +105,14 @@ namespace synthese
 			DisplayMonitoringStatus status(s.str(), _displayScreen.get());
 
 			// Last monitoring message
-			if (_env.getRegistry<DisplayMonitoringStatus>().empty())
+			if (_env->getRegistry<DisplayMonitoringStatus>().empty())
 			{
 				// First contact
 				DisplayMaintenanceLog::AddMonitoringFirstEntry(*_displayScreen, status);
 			}
 			else
 			{
-				boost::shared_ptr<DisplayMonitoringStatus> lastStatus(_env.getEditableRegistry<DisplayMonitoringStatus>().front());
+				boost::shared_ptr<DisplayMonitoringStatus> lastStatus(_env->getEditableRegistry<DisplayMonitoringStatus>().front());
 				status.setKey(lastStatus->getKey());
 
 				// Up contact?

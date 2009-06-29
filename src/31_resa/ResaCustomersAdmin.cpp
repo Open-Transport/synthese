@@ -36,7 +36,7 @@
 
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include "SearchFormHTMLTable.h"
 #include "ResultHTMLTable.h"
@@ -92,7 +92,7 @@ namespace synthese
 
 			// Search
 			UserTableSync::Search(
-				_env,
+				_getEnv(),
 				"%" + _searchLogin + "%"
 				, "%" + _searchName + "%"
 				, "%" + _searchSurname + "%"
@@ -106,7 +106,7 @@ namespace synthese
 				, false
 				, _requestParameters.raisingOrder
 			);
-			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<User>());
+			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<User>());
 		}
 		
 		
@@ -125,7 +125,6 @@ namespace synthese
 		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> openRequest(_request);
 			openRequest.getFunction()->setPage<ResaCustomerAdmin>();
@@ -143,7 +142,7 @@ namespace synthese
 			stream << "<h1>Résultats</h1>";
 
 			// Results
-			if (_env.getRegistry<User>().empty())
+			if (_getEnv().getRegistry<User>().empty())
 				stream << "<p>Aucun client trouvé.</p>";
 			else
 			{
@@ -157,7 +156,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<User> user, _env.getRegistry<User>())
+				BOOST_FOREACH(shared_ptr<User> user, _getEnv().getRegistry<User>())
 				{
 					openRequest.setObjectId(user->getKey());
 

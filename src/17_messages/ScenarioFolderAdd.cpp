@@ -111,7 +111,7 @@ namespace synthese
 			{
 				try
 				{
-					_parent = ScenarioFolderTableSync::GetEditable(id, _env);
+					_parent = ScenarioFolderTableSync::GetEditable(id, *_env);
 				}
 				catch(...)
 				{

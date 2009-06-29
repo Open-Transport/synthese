@@ -45,7 +45,7 @@
 #include "DBLogEntryTableSync.h"
 
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include "User.h"
 #include "UserTableSync.h"
@@ -101,7 +101,7 @@ namespace synthese
 			uid id(_request->getObjectId());
 			try
 			{
-				_user = UserTableSync::Get(id, _env);
+				_user = UserTableSync::Get(id, _getEnv());
 			}
 			catch (...)
 			{
@@ -202,14 +202,10 @@ namespace synthese
 			{
 				stream << "<h1>Historique / Réservations</h1>";
 
-				// Requests
-				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
-
 				// Results
 				_log.display(
 					stream,
-					searchRequest,
+					FunctionRequest<AdminRequest>(_request),
 					true,
 					true
 				);

@@ -62,7 +62,7 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), _env);
+				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), *_env);
 
 				_rightName = map.getString(PARAMETER_RIGHT, true, FACTORY_KEY);
 				if (!Factory<Right>::contains(_rightName))

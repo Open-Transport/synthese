@@ -80,6 +80,8 @@ namespace synthese
 			//! @name Query methods
 			//@{
 				virtual bool isContinuous () const;
+
+				graph::UseRule::ReservationAvailabilityType getReservationAbility() const;
 				
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
 					@param method Search departure or arrival :

@@ -27,12 +27,20 @@
 #include "UseRule.h"
 #include "Registrable.h"
 #include "Registry.h"
+
 #include <string>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
+	namespace env
+	{
+		class Fare;
+	}
+
 	namespace pt
 	{
+	
 		/** Public transportation use rule class.
 			@ingroup m35
 		*/
@@ -80,6 +88,8 @@ namespace synthese
 				////
 				/// Type of the reservation rule.
 				ReservationRuleType		_reservationType;
+
+				const env::Fare*	_defaultFare;
 				
 				////
 				/// Whether reference departure time is the line run departure time at its origin (true)
@@ -91,7 +101,7 @@ namespace synthese
 				int _minDelayMinutes;
 				
 				int _minDelayDays;   //!< Minimum delay in days between reservation and reference moment
-				int _maxDelayDays;  //!< Maxium number of days between reservation and departure.
+				boost::optional<std::size_t> _maxDelayDays;  //!< Maxium number of days between reservation and departure.
 
 				time::Hour _hourDeadLine; //!< Latest reservation hour the last day open for reservation
 
@@ -111,14 +121,15 @@ namespace synthese
 			
 			//! @name Getters
 			//@{
-				virtual AccessCapacity		getAccessCapacity() const;
-				bool				getOriginIsReference()			const;
+				virtual AccessCapacity				getAccessCapacity()		const;
+				bool								getOriginIsReference()	const;
 				const time::Hour&	getHourDeadLine()				const;
 				int					getMinDelayDays()				const;
 				int					getMinDelayMinutes()			const;
-				int					getMaxDelayDays()				const;
+				const boost::optional<std::size_t>&	getMaxDelayDays()		const;
 				ReservationRuleType	getReservationType()			const;
 				const std::string&	getName()						const;
+				const env::Fare*	getDefaultFare()				const;
 			//@}
 			
 			//! @name Setters
@@ -126,11 +137,12 @@ namespace synthese
 				void setHourDeadLine (const synthese::time::Hour& hourDeadLine);
 				void setMinDelayMinutes (int minDelayMinutes);
 				void setMinDelayDays (int minDelayDays);
-				void setMaxDelayDays (int maxDelayDays);
+				void setMaxDelayDays (const boost::optional<std::size_t> maxDelayDays);
 				void setOriginIsReference (bool originIsReference);
 				void setReservationType(ReservationRuleType value);
 				void setName(const std::string& value);
 				void setAccessCapacity(AccessCapacity value);
+				void setDefaultFare(const env::Fare* value);
 			//@}
 
 

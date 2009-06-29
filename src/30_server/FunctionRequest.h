@@ -42,16 +42,23 @@ namespace synthese
 		class FunctionRequest : public Request
 		{
 		public:
-			FunctionRequest(const Request* request=NULL);
+			FunctionRequest(
+				const Request* request
+			);
 
 			boost::shared_ptr<F> getFunction();
 			boost::shared_ptr<const F> getFunction() const;
 		};
 
 		template<class F>
-		FunctionRequest<F>::FunctionRequest(const Request* request)
-			: Request(request, boost::shared_ptr<F>(new F))
+		FunctionRequest<F>::FunctionRequest(
+			const Request* request
+		):	Request(
+				request,
+				boost::shared_ptr<F>(new F)
+			)
 		{
+			_getFunction()->setEnv(request->_getFunction()->getEnv());
 		}
 
 		template<class F>

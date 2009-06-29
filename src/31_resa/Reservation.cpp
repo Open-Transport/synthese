@@ -259,7 +259,7 @@ namespace synthese
 			{
 			case OPTION: return statusText + " pouvant être annulée avant le " + _reservationDeadLine.toString();
 			case CANCELLED: return statusText + " le " + getTransaction()->getCancellationTime().toString();
-			case CANCELLED_AFTER_DELAY: statusText + " le " + getTransaction()->getCancellationTime().toString();
+			case CANCELLED_AFTER_DELAY: return statusText + " le " + getTransaction()->getCancellationTime().toString();
 			case NO_SHOW: return statusText + " constantée le " + getTransaction()->getCancellationTime().toString();
 			}
 

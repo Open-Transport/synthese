@@ -86,7 +86,8 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(*_favoriteId, _env));
+					Env env;
+					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(*_favoriteId, env));
 					if (favorite->getUser()->getKey() != _request->getUser()->getKey())
 					{
 						throw RequestException("Forbidden favorite");

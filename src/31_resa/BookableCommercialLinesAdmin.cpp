@@ -35,7 +35,7 @@
 
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include <boost/foreach.hpp>
 
@@ -165,7 +165,7 @@ namespace synthese
 				AdminInterfaceElement::PageLink link(getPageLink());
 				link.factoryKey = BookableCommercialLineAdmin::FACTORY_KEY;
 				link.icon = "chart_line.png";
-				link.name = line->getName();
+				link.name = line->getShortName();
 				link.parameterName = Request::PARAMETER_OBJECT_ID;
 				link.parameterValue = Conversion::ToString(line->getKey());
 				links.push_back(link);

@@ -23,7 +23,7 @@
 #include "HTMLForm.h"
 #include "Interface.h"
 #include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "DeparturesTableBenchmarkAdmin.h"
 #include "DeparturesTableModule.h"
@@ -80,14 +80,14 @@ namespace synthese
 
 			if(!doDisplayPreparationActions || !_doIt) return;
 
-			DisplayScreenTableSync::Search(_env);
-			DisplayScreenCPUTableSync::Search(_env);
+			DisplayScreenTableSync::Search(_getEnv());
+			DisplayScreenCPUTableSync::Search(_getEnv());
 			
 			FunctionRequest<DisplayScreenContentRequest> r(_request);
 			FunctionRequest<CPUGetWiredScreensFunction> r2(_request);
 			ptime t0(microsec_clock::local_time());
 			time_duration duration;
-			BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, _env.getRegistry<DisplayScreen>())
+			BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, _getEnv().getRegistry<DisplayScreen>())
 			{
 				stringstream s;
 				r.getFunction()->setDisplay(screen->getKey());
@@ -102,7 +102,7 @@ namespace synthese
 				duration = t2 - t0;
 			}
 
-			BOOST_FOREACH(shared_ptr<const DisplayScreenCPU> cpu, _env.getRegistry<DisplayScreenCPU>())
+			BOOST_FOREACH(shared_ptr<const DisplayScreenCPU> cpu, _getEnv().getRegistry<DisplayScreenCPU>())
 			{
 				stringstream s;
 				if(!cpu->getMacAddress().empty())
@@ -144,7 +144,6 @@ namespace synthese
 			if(_doIt)
 			{
 				FunctionRequest<AdminRequest> reloadRequest(_request);
-				reloadRequest.getFunction()->setSamePage(this);
 				reloadRequest.getFunction()->setParameter(PARAMETER_DOIT, "1");
 
 				stream << "<h1>Résultats</h1>";
@@ -216,7 +215,6 @@ namespace synthese
 			else
 			{
 				FunctionRequest<AdminRequest> doRequest(_request);
-				doRequest.getFunction()->setSamePage(this);
 
 				stream << "<p class=\"info\">Le lancement du benchmark peut affecter les performances du système durant le test. Etes-vous sûr de vouloir lancer le benchmark ?</p>";
 				HTMLForm f(doRequest.getHTMLForm());

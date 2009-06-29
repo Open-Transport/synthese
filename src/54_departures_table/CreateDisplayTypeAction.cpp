@@ -94,7 +94,7 @@ namespace synthese
 			if(id)
 			try
 			{
-				_interface = InterfaceTableSync::Get(*id, _env);
+				_interface = InterfaceTableSync::Get(*id, *_env);
 			}
 			catch (ObjectNotFoundException<Interface>& e)
 			{
@@ -106,7 +106,7 @@ namespace synthese
 			if(id)
 			try
 			{
-				_monitoringInterface = InterfaceTableSync::Get(*id, _env);
+				_monitoringInterface = InterfaceTableSync::Get(*id, *_env);
 			}
 			catch (ObjectNotFoundException<Interface>& e)
 			{

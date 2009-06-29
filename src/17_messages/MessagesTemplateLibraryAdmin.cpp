@@ -33,7 +33,7 @@
 
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
@@ -91,7 +91,7 @@ namespace synthese
 			{
 				try
 				{
-					_folder = TextTemplateTableSync::Get(id, _env);
+					_folder = TextTemplateTableSync::Get(id, _getEnv());
 				}
 				catch(ObjectNotFoundException<TextTemplate>& e)
 				{
@@ -117,17 +117,13 @@ namespace synthese
 		{
 			// Requests
 			ActionFunctionRequest<UpdateTextTemplateAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<DeleteTextTemplateAction,AdminRequest> deleteRequest(_request);
-			deleteRequest.getFunction()->setSamePage(this);
 			
 			ActionFunctionRequest<TextTemplateAddAction,AdminRequest> addRequest(_request);
-			addRequest.getFunction()->setSamePage(this);
 			addRequest.getAction()->setParentId(_folder.get() ? _folder->getKey() : uid(0));
 			
 			ActionFunctionRequest<TextTemplateFolderUpdateAction,AdminRequest> updateFolderRequest(_request);
-			updateFolderRequest.getFunction()->setSamePage(this);
 			
 
 			// Rights

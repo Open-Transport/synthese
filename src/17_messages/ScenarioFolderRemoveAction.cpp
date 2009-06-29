@@ -76,7 +76,7 @@ namespace synthese
 		{
 			try
 			{
-				_folder = ScenarioFolderTableSync::Get(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID), _env);
+				_folder = ScenarioFolderTableSync::Get(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID), *_env);
 			}
 			catch (...)
 			{
@@ -84,12 +84,12 @@ namespace synthese
 			}
 
 			ScenarioTemplateInheritedTableSync::Search(
-				_env, 
+				*_env, 
 				_folder->getKey()
 				, string(), NULL
 				, 0, 1
 			);
-			if (!_env.getRegistry<ScenarioTemplate>().empty())
+			if (!_env->getRegistry<ScenarioTemplate>().empty())
 				throw ActionException("Non empty folder");
 		}
 		

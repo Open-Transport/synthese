@@ -49,7 +49,6 @@ namespace synthese
 		class LineTableSync : public db::SQLiteRegistryTableSyncTemplate<LineTableSync,Line>
 		{
 		public:
-			static const std::string COL_AXISID;
 			static const std::string COL_COMMERCIAL_LINE_ID;
 			static const std::string COL_NAME;
 			static const std::string COL_TIMETABLENAME;

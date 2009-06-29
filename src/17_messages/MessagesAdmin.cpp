@@ -43,7 +43,7 @@
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "ScenarioTemplate.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "AdminModule.h"
 #include "AdminParametersException.h"
@@ -122,7 +122,7 @@ namespace synthese
 				{
 //					_searchLevel = ALARM_LEVEL_SCENARIO;
 					if(id != UNKNOWN_VALUE)
-					_searchScenario = ScenarioTemplateInheritedTableSync::Get(id, _env).get();
+					_searchScenario = ScenarioTemplateInheritedTableSync::Get(id, _getEnv()).get();
 				}
 //				else if (id != UNKNOWN_VALUE)
 //				{
@@ -138,7 +138,7 @@ namespace synthese
 				if(!doDisplayPreparationActions) return;
 
 				SentScenarioInheritedTableSync::Search(
-					_env,
+					_getEnv(),
 					_searchName,
 					_searchStatus,
 					_date,
@@ -152,7 +152,7 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
 					, _requestParameters.raisingOrder
 				);
-				_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<SentScenario>());
+				_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<SentScenario>());
 			}
 			catch (TimeParseException e)
 			{
@@ -178,7 +178,6 @@ namespace synthese
 		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
@@ -189,7 +188,6 @@ namespace synthese
 			scenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 
 			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(_request);
-			scenarioStopRequest.getFunction()->setSamePage(this);
 			
 			vector<pair<SentScenarioInheritedTableSync::StatusSearch, string> > statusMap;
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING, "En diffusion / prévu"));
@@ -258,7 +256,7 @@ namespace synthese
 			
 			stream << t1.open();
 
-			BOOST_FOREACH(shared_ptr<const SentScenario> message, _env.getRegistry<SentScenario>())
+			BOOST_FOREACH(shared_ptr<const SentScenario> message, _getEnv().getRegistry<SentScenario>())
 			{
 				bool isDisplayedWithEndDate(
 					(message->getPeriodStart().isUnknown() || message->getPeriodStart() <= now)

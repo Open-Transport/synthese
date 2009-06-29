@@ -32,7 +32,7 @@
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "SentAlarm.h"
 #include "DisplayAdmin.h"
 #include "DeparturesTableModule.h"
@@ -134,7 +134,7 @@ namespace synthese
 
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(id, _env);
+				_displayScreen = DisplayScreenTableSync::Get(id, _getEnv());
 				
 				_status = DisplayMonitoringStatusTableSync::GetStatus(_displayScreen->getKey());
 				_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
@@ -145,7 +145,7 @@ namespace synthese
 				if(_displayScreen->getLocalization() != NULL)
 				{
 					PhysicalStopTableSync::Search(
-						_env,
+						_getEnv(),
 						_displayScreen->getLocalization()->getKey(),
 						string("%"),
 						0, 0, UP_LINKS_LOAD_LEVEL
@@ -156,7 +156,7 @@ namespace synthese
 						_displayScreen->getLocalization()->getPhysicalStops()
 					){
 						LineStopTableSync::Search(
-							_env,
+							_getEnv(),
 							UNKNOWN_VALUE,
 							it.first,
 							0, 0,
@@ -178,7 +178,7 @@ namespace synthese
 			// CPU search
 			if (_displayScreen->getLocalization() != NULL)
 			{
-				DisplayScreenCPUTableSync::Search(_env, _displayScreen->getLocalization()->getKey());
+				DisplayScreenCPUTableSync::Search(_getEnv(), _displayScreen->getLocalization()->getKey());
 			}
 		}
 		
@@ -188,6 +188,7 @@ namespace synthese
 		{
 			ParametersMap m(_maintenanceLogView.getParametersMap());
 			m.merge(_generalLogView.getParametersMap());
+			if(_displayScreen.get()) m.insert(Request::PARAMETER_OBJECT_ID, _displayScreen->getKey());
 			return m;
 		}
 
@@ -208,7 +209,6 @@ namespace synthese
 			{
 				// Update request
 				ActionFunctionRequest<UpdateDisplayScreenAction,AdminRequest> updateDisplayRequest(_request);
-				updateDisplayRequest.getFunction()->setSamePage(this);
 				updateDisplayRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Delete the screen request
@@ -248,13 +248,13 @@ namespace synthese
 				
 				stream << t.title("Connexion");
 				
-				if (_displayScreen->getLocalization() != NULL && !_env.getRegistry<DisplayScreenCPU>().empty())
+				if (_displayScreen->getLocalization() != NULL && !_getEnv().getRegistry<DisplayScreenCPU>().empty())
 				{
 					stream << t.cell(
 						"Unité centrale",
 						t.getForm().getSelectInput(
 							UpdateDisplayScreenAction::PARAMETER_CPU,
-							_env.getRegistry<DisplayScreenCPU>(),
+							_getEnv().getRegistry<DisplayScreenCPU>(),
 							_displayScreen->getCPU() ? _displayScreen->getCPU()->getKey() : RegistryKeyType(0),
 							"(pas d'unité centrale)"
 						) + " " + (_displayScreen->getCPU() ? goCPURequest.getHTMLForm().getLinkButton("Ouvrir", string(), "server.png") : string())
@@ -292,7 +292,6 @@ namespace synthese
 			{
 				// Update action
 				ActionFunctionRequest<UpdateDisplayMaintenanceAction,AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setSamePage(this);
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
 				
 				// Go to maintenance log
@@ -312,7 +311,6 @@ namespace synthese
 				
 				// Log search
 				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
 
 				stream << "<h1>Paramètres de maintenance</h1>";
 
@@ -436,45 +434,35 @@ namespace synthese
 			{
 				// Add display request
 				ActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,AdminRequest> addDisplayRequest(_request);
-				addDisplayRequest.getFunction()->setSamePage(this);
 
 				// Remove displayed place request
 				ActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,AdminRequest> rmDisplayedRequest(_request);
-				rmDisplayedRequest.getFunction()->setSamePage(this);
 				rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
 
 				// Update request
 				ActionFunctionRequest<UpdateAllStopsDisplayScreenAction,AdminRequest> updateAllDisplayRequest(_request);
-				updateAllDisplayRequest.getFunction()->setSamePage(this);
 
 				// Add physical request
 				ActionFunctionRequest<AddDepartureStopToDisplayScreenAction,AdminRequest> addPhysicalRequest(_request);
-				addPhysicalRequest.getFunction()->setSamePage(this);
 
 				// Add preselection request
 				ActionFunctionRequest<AddPreselectionPlaceToDisplayScreen,AdminRequest> addPreselRequest(_request);
-				addPreselRequest.getFunction()->setSamePage(this);
 
 				// Add not to serve request
 				ActionFunctionRequest<AddForbiddenPlaceToDisplayScreen,AdminRequest> addNSRequest(_request);
-				addNSRequest.getFunction()->setSamePage(this);
 
 				// Update preselection request
 				ActionFunctionRequest<UpdateDisplayPreselectionParametersAction,AdminRequest> updPreselRequest(_request);
-				updPreselRequest.getFunction()->setSamePage(this);
 				updPreselRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Remove preselection stop request
 				ActionFunctionRequest<RemovePreselectionPlaceFromDisplayScreenAction,AdminRequest> rmPreselRequest(_request);
-				rmPreselRequest.getFunction()->setSamePage(this);
 
 				// Remove physical stop request
 				ActionFunctionRequest<DisplayScreenRemovePhysicalStopAction,AdminRequest> rmPhysicalRequest(_request);
-				rmPhysicalRequest.getFunction()->setSamePage(this);
 
 				// Remove Forbidden place request
 				ActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,AdminRequest> rmForbiddenRequest(_request);
-				rmForbiddenRequest.getFunction()->setSamePage(this);
 
 				vector<pair<EndFilter, string> > endFilterMap;
 				endFilterMap.push_back(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
@@ -742,16 +730,13 @@ namespace synthese
 
 				// Add display request
 				ActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,AdminRequest> addDisplayRequest(_request);
-				addDisplayRequest.getFunction()->setSamePage(this);
 
 				// Remove displayed place request
 				ActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,AdminRequest> rmDisplayedRequest(_request);
-				rmDisplayedRequest.getFunction()->setSamePage(this);
 				rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
 
 				// Properties Update request
 				ActionFunctionRequest<DisplayScreenAppearanceUpdateAction,AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setSamePage(this);
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Maps for particular select fields
@@ -868,7 +853,7 @@ namespace synthese
 					stream << t.col() << getTabLinkButton(TAB_MAINTENANCE);
 				}
 
-				vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, _displayScreen->getKey()));
+				vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(_getEnv(), _displayScreen->getKey()));
 				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 				{
 					// Avoid malformed message
@@ -910,7 +895,7 @@ namespace synthese
 				stream << "<h1>Contenus en attente</h1>";
 
 				vector<shared_ptr<SentAlarm> > futures(DisplayScreenTableSync::GetFutureDisplayedMessages(
-					_env,
+					_getEnv(),
 					_displayScreen->getKey()
 				)	);
 				if(!futures.empty())
@@ -954,14 +939,7 @@ namespace synthese
 			// LOG TAB
 			if (openTabContent(stream, TAB_LOG))
 			{
-				// Log search
-				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
-
-				_generalLogView.display(
-					stream,
-					searchRequest
-				);
+				_generalLogView.display(stream, FunctionRequest<AdminRequest>(_request));
 			}
 
 

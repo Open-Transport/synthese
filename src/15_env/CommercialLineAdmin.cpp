@@ -33,7 +33,7 @@
 #include "LineTableSync.h"
 #include "TransportNetworkRight.h"
 
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "Request.h"
 
 #include "AdminParametersException.h"
@@ -90,7 +90,7 @@ namespace synthese
 
 			try
 			{
-				_cline = CommercialLineTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+				_cline = CommercialLineTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -100,7 +100,7 @@ namespace synthese
 			if(!doDisplayPreparationActions) return;
 
 			LineTableSync::Search(
-				_env,
+				_getEnv(),
 				_cline->getKey(),
 				UNKNOWN_VALUE,
 				_requestParameters.first,
@@ -108,7 +108,7 @@ namespace synthese
 				_requestParameters.orderField == PARAMETER_SEARCH_NAME,
 				_requestParameters.raisingOrder
 			);
-			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<Line>());
+			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<Line>());
 
 			_runHours = getCommercialLineRunHours(_cline->getKey(), _startDate, _endDate);
 		}
@@ -131,7 +131,6 @@ namespace synthese
 			{
 				// Requests
 				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setPage<CommercialLineAdmin>();
 				searchRequest.setObjectId(_cline->getKey());
 
 				FunctionRequest<AdminRequest> lineOpenRequest(_request);
@@ -155,7 +154,7 @@ namespace synthese
 				ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
 
 				stream << t.open();
-				BOOST_FOREACH(shared_ptr<Line> line, _env.getRegistry<Line>())
+				BOOST_FOREACH(shared_ptr<Line> line, _getEnv().getRegistry<Line>())
 				{
 					lineOpenRequest.setObjectId(line->getKey());
 					stream << t.row();
@@ -244,7 +243,7 @@ namespace synthese
 		
 		std::string CommercialLineAdmin::getTitle() const
 		{
-			return _cline.get() ? "<span class=\"" + _cline->getStyle() +"\">" + _cline->getShortName() + "</span>" : DEFAULT_TITLE;
+			return _cline.get() ? "<span class=\"linesmall " + _cline->getStyle() +"\">" + _cline->getShortName() + "</span>" : DEFAULT_TITLE;
 		}
 
 		std::string CommercialLineAdmin::getParameterName() const

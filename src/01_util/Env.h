@@ -102,25 +102,9 @@ namespace synthese
 			typedef std::map<std::string, RegistryCreatorInterface*> RegistryCreatorMap;
 
 			static RegistryCreatorMap	_registryCreators;
-			static Env					_officialRegistries;
+			static boost::shared_ptr<Env>	_officialRegistries;
 
 		public:
-
-
-			//////////////////////////////////////////////////////////////////////////
-			///	Constructor.
-			///	Builds a map containing an empty registry by integrated Registrable class
-			//////////////////////////////////////////////////////////////////////////
-			Env();
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			///	Destructor.
-			/// No operation.
-			//////////////////////////////////////////////////////////////////////////
-			~Env();
-
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -195,7 +179,16 @@ namespace synthese
 			/// @return Pointer to the main environment containing the physical memory loaded
 			/// of each table that use this feature (see SQLiteDirectTableSyncTemplate).
 			//////////////////////////////////////////////////////////////////////////
-			static Env& GetOfficialEnv();
+			static Env& GetOfficialEnv() { return *_officialRegistries; }
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Official environment static getter.
+			/// @return Pointer to the main environment containing the physical memory loaded
+			/// of each table that use this feature (see SQLiteDirectTableSyncTemplate).
+			//////////////////////////////////////////////////////////////////////////
+			static boost::shared_ptr<Env> GetOfficialEnvSPtr() { return _officialRegistries; }
+
 		};
 	}
 }

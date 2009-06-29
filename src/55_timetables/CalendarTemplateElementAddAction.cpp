@@ -115,7 +115,7 @@ namespace synthese
 		{
 			try
 			{
-				_calendar = CalendarTemplateTableSync::GetEditable(id, _env);
+				_calendar = CalendarTemplateTableSync::GetEditable(id, *_env);
 			}
 			catch (...)
 			{

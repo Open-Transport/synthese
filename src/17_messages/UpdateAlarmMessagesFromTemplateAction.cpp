@@ -69,7 +69,7 @@ namespace synthese
 			try
 			{
 				setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
-				_template = TextTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), _env);
+				_template = TextTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<TextTemplate>& e)
 			{
@@ -96,7 +96,7 @@ namespace synthese
 
 			try
 			{
-				_message = AlarmTableSync::GetEditable(id, _env);
+				_message = AlarmTableSync::GetEditable(id, *_env);
 			}
 			catch (ObjectNotFoundException<Alarm>& e)
 			{

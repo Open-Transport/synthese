@@ -33,7 +33,7 @@
 #include "PropertiesHTMLTable.h"
 #include "UpdateDisplayTypeAction.h"
 #include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "DisplayTypeRemoveAction.h"
 #include "Interface.h"
 #include "ArrivalDepartureTableRight.h"
@@ -75,12 +75,12 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			RegistryKeyType id(_request->getObjectId());
 			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
 
 			try
 			{
-				_type = DisplayTypeTableSync::GetEditable(id, _env, UP_LINKS_LOAD_LEVEL);
+				_type = DisplayTypeTableSync::GetEditable(id, _getEnv(), UP_LINKS_LOAD_LEVEL);
 			}
 			catch (ObjectNotFoundException<DisplayType>& e)
 			{
@@ -214,6 +214,11 @@ namespace synthese
 			boost::shared_ptr<DisplayType> value
 		) {
 			_type = value;
+		}
+
+		AdminInterfaceElement::PageLinks DisplayTypeAdmin::getSubPages( const AdminInterfaceElement& currentPage ) const
+		{
+			return AdminInterfaceElement::PageLinks();
 		}
 	}
 }

@@ -84,7 +84,7 @@ namespace synthese
 				_name = map.get<string>(PARAMETER_NAME);
 				_wiringCode = map.get<int>(PARAMETER_WIRING_CODE);
 				
-				_type = DisplayTypeTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TYPE), _env);
+				_type = DisplayTypeTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TYPE), *_env);
 
 				_comPort = map.get<int>(PARAMETER_COM_PORT);
 
@@ -93,7 +93,7 @@ namespace synthese
 				optional<RegistryKeyType> id = map.getOptional<RegistryKeyType>(PARAMETER_CPU);
 				if (id)
 				{
-					_cpu = DisplayScreenCPUTableSync::Get(*id, _env);
+					_cpu = DisplayScreenCPUTableSync::Get(*id, *_env);
 				}
 			}
 			catch (ObjectNotFoundException<DisplayType>& e)
@@ -144,7 +144,7 @@ namespace synthese
 		) {
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(id, _env);
+				_screen = DisplayScreenTableSync::GetEditable(id, *_env);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{

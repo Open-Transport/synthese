@@ -70,10 +70,10 @@ namespace synthese
 			try
 			{
 				// Text ID
-				_text = TextTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TEXT_ID), _env);
+				_text = TextTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TEXT_ID), *_env);
 		
 				//id = map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY);
-				//_folder = TextTemplateTableSync::Get(id, _env);
+				//_folder = TextTemplateTableSync::Get(id, *_env);
 
 				// Name
 				_name = map.get<string>(PARAMETER_NAME);

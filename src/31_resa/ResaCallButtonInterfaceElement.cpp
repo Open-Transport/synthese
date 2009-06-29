@@ -26,7 +26,7 @@
 
 #include "11_interfaces/ValueElementList.h"
 
-#include "32_admin/AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include "31_resa/CallBeginAction.h"
 #include "31_resa/CallEndAction.h"

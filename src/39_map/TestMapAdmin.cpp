@@ -33,7 +33,7 @@
 #include "Request.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "GlobalRight.h"
 
 using namespace std;
@@ -85,7 +85,7 @@ namespace synthese
 			{
 				try
 				{
-					FunctionRequest<MapRequest> r;
+					FunctionRequest<MapRequest> r(_request);
 					r.getFunction()->setUseEnvironment(_useEnvironment);
 					r.getFunction()->setData(_dataXml);
 					r.getFunction()->setQuery(_queryXml);

@@ -39,7 +39,7 @@
 #include "SearchFormHTMLTable.h"
 #include "ActionFunctionRequest.h"
 #include "AdminModule.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
@@ -125,7 +125,7 @@ namespace synthese
 			if(!doDisplayPreparationActions) return;
 			
 				DisplayScreenTableSync::Search(
-					_env,
+					_getEnv(),
 					_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 					, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 					, READ
@@ -149,10 +149,10 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
 					, _requestParameters.raisingOrder
 					);
-				_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<DisplayScreen>());
+				_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<DisplayScreen>());
 
 				DisplayScreenCPUTableSync::Search(
-					_env,
+					_getEnv(),
 					_place ? (_place->get() ? (*_place)->getKey() : 0) : optional<RegistryKeyType>(),
 					optional<string>(),
 					_requestParameters.first,
@@ -203,8 +203,7 @@ namespace synthese
 
 
 				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
-
+	
 				FunctionRequest<AdminRequest> updateRequest(_request);
 				updateRequest.getFunction()->setPage<DisplayAdmin>();
 
@@ -245,7 +244,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, _env.getRegistry<DisplayScreen>())
+				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, _getEnv().getRegistry<DisplayScreen>())
 				{
 					updateRequest.setObjectId(screen->getKey());
 					viewRequest.setObjectId(screen->getKey());
@@ -257,7 +256,7 @@ namespace synthese
 					}
 					
 					vector<shared_ptr<SentAlarm> > alarms(
-						DisplayScreenTableSync::GetCurrentDisplayedMessage(_env, screen->getKey(), 1)
+						DisplayScreenTableSync::GetCurrentDisplayedMessage(_getEnv(), screen->getKey(), 1)
 					);
 					shared_ptr<SentAlarm> alarm(alarms.empty() ? shared_ptr<SentAlarm>() : alarms.front());
 
@@ -420,7 +419,6 @@ namespace synthese
 
 
 				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.getFunction()->setSamePage(this);
 
 				FunctionRequest<AdminRequest> updateRequest(_request);
 				updateRequest.getFunction()->setPage<DisplayScreenCPUAdmin>();
@@ -457,7 +455,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, _env.getRegistry<DisplayScreenCPU>())
+				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, _getEnv().getRegistry<DisplayScreenCPU>())
 				{
 					updateRequest.setObjectId(cpu->getKey());
 					
@@ -623,7 +621,7 @@ namespace synthese
 			{
 				try
 				{
-					_place = ConnectionPlaceTableSync::Get(id, _env);
+					_place = ConnectionPlaceTableSync::Get(id, _getEnv());
 				}
 				catch (...)
 				{

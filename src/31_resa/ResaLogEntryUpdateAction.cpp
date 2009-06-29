@@ -115,7 +115,7 @@ namespace synthese
 		{
 			try
 			{
-				_entry = DBLogEntryTableSync::GetEditable(id, _env);
+				_entry = DBLogEntryTableSync::GetEditable(id, *_env);
 				if (_entry->getLogKey() != ResaDBLog::FACTORY_KEY)
 					throw ActionException("Bad entry : does not belong to resa log");
 			}

@@ -73,12 +73,17 @@ namespace synthese
 
 		protected:
 			Request* _request;
-			mutable util::Env	_env;
+			mutable boost::shared_ptr<util::Env>	_env;
 
 			//////////////////////////////////////////////////////////////////////////
 			///	Constructor.
 			//////////////////////////////////////////////////////////////////////////
-			Function();
+			Function(
+				boost::shared_ptr<util::Env> env = util::Env::GetOfficialEnvSPtr()
+			):	FactoryBase<Function>(),
+				_env(env)
+			{
+			}
 
 		public:
 			/** Conversion from fixed attributes to generic parameter map.
@@ -101,6 +106,9 @@ namespace synthese
 				@return Mime type of the data produced by the function
 			*/
 			virtual std::string getOutputMimeType() const = 0;
+
+			boost::shared_ptr<util::Env> getEnv() const { return _env; }
+			void setEnv(boost::shared_ptr<util::Env> value) { _env = value; }
 
 		private:
 

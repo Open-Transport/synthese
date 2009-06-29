@@ -75,7 +75,7 @@ namespace synthese
 			{
 				try
 				{
-					_template = ScenarioTemplateInheritedTableSync::Get(id, _env);
+					_template = ScenarioTemplateInheritedTableSync::Get(id, *_env);
 				}
 				catch(...)
 				{
@@ -147,7 +147,7 @@ namespace synthese
 			{
 				try
 				{
-					_folder = ScenarioFolderTableSync::GetEditable(id, _env);
+					_folder = ScenarioFolderTableSync::GetEditable(id, *_env);
 				}
 				catch (...)
 				{

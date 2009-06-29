@@ -56,12 +56,18 @@ namespace synthese
 
 		protected:
 			Request* _request;
-			mutable util::Env	_env;
+			mutable boost::shared_ptr<util::Env>	_env;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			//////////////////////////////////////////////////////////////////////////
-			Action();
+			Action(
+				boost::shared_ptr<util::Env> env = util::Env::GetOfficialEnvSPtr()
+			):	FactoryBase<Action>(),
+				_env(env)
+			{
+			}
+
 
 		private:
 
@@ -103,6 +109,10 @@ namespace synthese
 			virtual void run() = 0;
 
 			friend class Request;
+
+		public:
+			boost::shared_ptr<util::Env> getEnv() const { return _env; }
+			void setEnv(boost::shared_ptr<util::Env> value) { _env = value; }
 		};
 	}
 }

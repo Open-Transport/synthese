@@ -74,7 +74,7 @@ namespace synthese
 		{
 			try
 			{
-				_book = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_BOOK_ID), _env);
+				_book = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_BOOK_ID), *_env);
 			}
 			catch (...)
 			{

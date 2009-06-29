@@ -57,8 +57,8 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
-				_place = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE), _env);
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), *_env);
+				_place = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE), *_env);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
 			{

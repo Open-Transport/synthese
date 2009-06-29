@@ -40,7 +40,7 @@
 #include "Request.h"
 
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "AdminParametersException.h"
 
 using namespace std;
@@ -88,7 +88,7 @@ namespace synthese
 			
 			try
 			{
-				_book = TimetableTableSync::Get(id, _env);
+				_book = TimetableTableSync::Get(id, _getEnv());
 			}
 			catch(...)
 			{
@@ -102,7 +102,7 @@ namespace synthese
 
 			// Search
 			TimetableTableSync::Search(
-				_env,
+				_getEnv(),
 				_book->getKey()
 				, _requestParameters.orderField == PARAMETER_RANK
 				, _requestParameters.orderField == PARAMETER_TITLE
@@ -151,7 +151,7 @@ namespace synthese
 			goFolderRequest.getFunction()->setPage<TimetableBookAdmin>();
 
 			ResultHTMLTable::ResultParameters tt_rp;
-			tt_rp.setFromResult(_requestParameters, _env.getEditableRegistry<Timetable>());
+			tt_rp.setFromResult(_requestParameters, _getEnv().getEditableRegistry<Timetable>());
 
 
 			// Folder properties
@@ -186,7 +186,7 @@ namespace synthese
 			int lastRank(UNKNOWN_VALUE);
 			int maxRank(TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0));
 			
-			BOOST_FOREACH(shared_ptr<Timetable> tt, _env.getRegistry<Timetable>())
+			BOOST_FOREACH(shared_ptr<Timetable> tt, _getEnv().getRegistry<Timetable>())
 			{
 				if (tt->getIsBook())
 					goFolderRequest.setObjectId(tt->getKey());

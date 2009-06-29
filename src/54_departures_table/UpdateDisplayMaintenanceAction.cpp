@@ -104,7 +104,7 @@ namespace synthese
 		){
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::GetEditable(id, _env);
+				_displayScreen = DisplayScreenTableSync::GetEditable(id, *_env);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
 			{

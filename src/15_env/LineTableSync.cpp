@@ -55,7 +55,6 @@ namespace synthese
 
 	namespace env
 	{
-		const string LineTableSync::COL_AXISID ("axis_id");
 		const string LineTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
 		const string LineTableSync::COL_NAME ("name");
 		const string LineTableSync::COL_TIMETABLENAME ("timetable_name");
@@ -81,7 +80,6 @@ namespace synthese
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(LineTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_AXISID, SQL_INTEGER),
 			SQLiteTableSync::Field(LineTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(LineTableSync::COL_TIMETABLENAME, SQL_TEXT),
 			SQLiteTableSync::Field(LineTableSync::COL_DIRECTION, SQL_TEXT),

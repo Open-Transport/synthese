@@ -117,7 +117,7 @@ namespace synthese
 		{
 			try
 			{
-				boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(key, _env));
+				boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(key, *_env));
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
 				_scenarioTemplate = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
 			}

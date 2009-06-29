@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_env_AccessParameters_h__
-#define SYNTHESE_env_AccessParameters_h__
+#ifndef SYNTHESE_getEnv()_AccessParameters_h__
+#define SYNTHESE_getEnv()_AccessParameters_h__
 
 #include "GraphTypes.h"
 #include "GraphConstants.h"
@@ -49,7 +49,7 @@ namespace synthese
 			boost::optional<size_t>		_maxTransportConnectionCount;
 			bool		_drtOnly;
 			bool		_withoutDrt;
-//			Fare*		_fare;
+			//const Fare*		_fare;
 			UserClassCode	_userClass;
 
 		public:
@@ -104,4 +104,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_env_AccessParameters_h__
+#endif // SYNTHESE_getEnv()_AccessParameters_h__

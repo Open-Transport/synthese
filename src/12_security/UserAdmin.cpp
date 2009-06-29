@@ -31,7 +31,7 @@
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "Conversion.h"
 
 using namespace std;
@@ -75,7 +75,7 @@ namespace synthese
 				uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
 				if (id != UNKNOWN_VALUE && id != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				{
-					_user = UserTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+					_user = UserTableSync::Get(id,_getEnv(), UP_LINKS_LOAD_LEVEL);
 				}
 			}
 			catch (ObjectNotFoundException<User>& e)
@@ -98,12 +98,7 @@ namespace synthese
 		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			ActionFunctionRequest<UserUpdateAction, AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<UserAdmin>();
-			updateRequest.setObjectId(_request->getObjectId());
-
 			ActionFunctionRequest<UserPasswordUpdateAction, AdminRequest> userPasswordUpdateRequest(_request);
-			userPasswordUpdateRequest.getFunction()->setPage<UserAdmin>();
-			userPasswordUpdateRequest.setObjectId(_request->getObjectId());
 
 			{
 				stream << "<h1>Propriétés</h1>";

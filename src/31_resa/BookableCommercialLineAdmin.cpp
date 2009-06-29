@@ -33,7 +33,10 @@
 #include "CancelReservationAction.h"
 #include "ResaCustomerAdmin.h"
 #include "ResaRight.h"
-
+#include "Line.h"
+#include "LineTableSync.h"
+#include "LineStop.h"
+#include "LineStopTableSync.h"
 #include "SearchFormHTMLTable.h"
 
 #include "CommercialLine.h"
@@ -48,7 +51,7 @@
 
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -68,6 +71,8 @@ namespace synthese
 	using namespace html;
 	using namespace security;
 	using namespace graph;
+	using namespace geography;
+	
 
 	namespace util
 	{
@@ -84,6 +89,7 @@ namespace synthese
 	{
 		const string BookableCommercialLineAdmin::PARAMETER_DATE("da");
 		const string BookableCommercialLineAdmin::PARAMETER_DISPLAY_CANCELLED("dc");
+		const string BookableCommercialLineAdmin::PARAMETER_SERVICE("se");
 
 
 		BookableCommercialLineAdmin::BookableCommercialLineAdmin()
@@ -100,7 +106,7 @@ namespace synthese
 			// Date
 			try
 			{
-				_date = map.getDate(PARAMETER_DATE, false, getFactoryKey());
+				_date = map.getDate(PARAMETER_DATE, false, FACTORY_KEY);
 				if(_date.isUnknown())
 				{
 					_date = Date(TIME_CURRENT);
@@ -115,33 +121,51 @@ namespace synthese
 			{
 				throw RequestException("Bad value for date");
 			}
-			_displayCancelled = map.getBool(PARAMETER_DISPLAY_CANCELLED, false, false, FACTORY_KEY);
+			_displayCancelled = map.getDefault<bool>(PARAMETER_DISPLAY_CANCELLED, false);
 
-			uid lineId(_request->getObjectId());
+			RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			try
 			{
-				_line = CommercialLineTableSync::Get(lineId, _env);
+				_line = CommercialLineTableSync::Get(id, _getEnv());
 			}
 			catch (...)
 			{
 				throw RequestException("Bad value for line ID");
 			}
 
+			optional<RegistryKeyType> sid(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE));
+			if(sid) setServiceId(*sid);
+
 			if(!doDisplayPreparationActions) return;
+
+			// Routes reading
+			LineTableSync::Search(_getEnv(), _line->getKey());
+			BOOST_FOREACH(shared_ptr<Line> line, _getEnv().getRegistry<Line>())
+			{
+				LineStopTableSync::Search(
+					_getEnv(),
+					line->getKey(),
+					UNKNOWN_VALUE,
+					0, 0, true, true,
+					UP_LINKS_LOAD_LEVEL
+				);
+			}
+
 
 			// Services reading
 			ScheduledServiceTableSync::Search(
-				_env,
+				_getEnv(),
 				optional<RegistryKeyType>(),
 				_line->getKey(),
 				optional<RegistryKeyType>(),
 				_date,
-				_hideOldServices
+				_hideOldServices,
+				0, 0, true, true, UP_LINKS_LOAD_LEVEL
 			);
 
 			// Reservations reading
 			ReservationTableSync::Search(
-				_env,
+				_getEnv(),
 				_line->getKey(),
 				_date
 			);
@@ -170,13 +194,13 @@ namespace synthese
 
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 
 			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
-			cancelRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> customerRequest(_request);
 			customerRequest.getFunction()->setPage<ResaCustomerAdmin>();
+
+			FunctionRequest<AdminRequest> printRequest(_request);
 			
 			// Local variables
 			DateTime now(TIME_CURRENT);
@@ -187,16 +211,29 @@ namespace synthese
 			bool next_overflow = false;
 			bool course = false;
 
-			stream << "<h1>Recherche</h1>";
+			if(!_service.get())
+			{
 
-			SearchFormHTMLTable st(searchRequest.getHTMLForm());
-			stream << st.open();
-			stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
-			stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
-			stream << st.close();
+				stream << "<h1>Recherche</h1>";
 
-			stream << "<h1>Résultats</h1>";
+				SearchFormHTMLTable st(searchRequest.getHTMLForm());
+				stream << st.open();
+				stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
+				stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
+				stream << st.close();
 
+				stream << "<h1>Résultats</h1>";
+			}
+			else
+			{
+				stream << "<h1>Réservations du " << _date.toString() << "</h1>";
+
+				if(_service->getReservationAbility() == UseRule::RESERVATION_COMPULSORY_POSSIBLE)
+				{
+					stream << "<p class=\"info\">ATTENTION Cette liste de réservations est provisoire, le service n'étant pas encore cloturé</p>";
+				}
+			}
+			
 			HTMLTable::ColsVector c;
 			c.push_back("Statut");
 			c.push_back("Heure départ");
@@ -205,7 +242,7 @@ namespace synthese
 			c.push_back("Heure arrivée");
 			c.push_back("Places");
 			c.push_back("Client");
-			if (globalDeleteRight)
+			if (globalDeleteRight && !_service.get())
 				c.push_back("Actions");
 			HTMLTable t(c,"adminresults");
 			stream << t.open();
@@ -213,9 +250,9 @@ namespace synthese
 
 			// Sort reservations
 			map<const ScheduledService*, ServiceReservations> reservations;
-			BOOST_FOREACH(shared_ptr<const Reservation> resa, _env.getRegistry<Reservation>())
+			BOOST_FOREACH(shared_ptr<const Reservation> resa, _getEnv().getRegistry<Reservation>())
 			{
-				const ScheduledService* service(_env.getRegistry<ScheduledService>().get(resa->getServiceId()).get());
+				const ScheduledService* service(_getEnv().getRegistry<ScheduledService>().get(resa->getServiceId()).get());
 				if(reservations.find(service) == reservations.end())
 				{
 					reservations.insert(make_pair(service, ServiceReservations()));
@@ -224,7 +261,7 @@ namespace synthese
 			}
 
 			// Display of services
-			BOOST_FOREACH(shared_ptr<const ScheduledService> service, _env.getRegistry<ScheduledService>().getOrderedVector())
+			BOOST_FOREACH(shared_ptr<const ScheduledService> service, _getEnv().getRegistry<ScheduledService>().getOrderedVector())
 			{
 				const ServiceReservations::ReservationsList& serviceReservations (reservations[service.get()].getReservations());
 				int serviceSeatsNumber(reservations[service.get()].getSeatsNumber());
@@ -247,9 +284,14 @@ namespace synthese
 
 				// Display
 				stream << t.row();
-				stream << t.col(8, string(), true) << "Service " << service->getServiceNumber() << " - départ de " << service->getDepartureSchedule().getHour().toString();
+				stream << t.col(7, string(), true) << "Service " << service->getServiceNumber() << " - départ de " <<
+					dynamic_cast<const NamedPlace*>(static_cast<const Line*>(service->getPath())->getEdge(0)->getHub())->getFullName() <<
+					" à " << service->getDepartureSchedule().getHour().toString();
 				if (serviceSeatsNumber > 0)
 					stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
+
+				static_pointer_cast<BookableCommercialLineAdmin,AdminInterfaceElement>(printRequest.getFunction()->getPage())->setServiceId(service->getKey());
+				stream << t.col() << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
 
 				if (serviceReservations.empty())
 				{
@@ -264,7 +306,7 @@ namespace synthese
 
 						customerRequest.setObjectId(reservation->getTransaction()->getCancelUserId());
 						
-						cancelRequest.getAction()->setTransaction(ReservationTransactionTableSync::GetEditable(reservation->getTransaction()->getKey(), _env));
+						cancelRequest.getAction()->setTransaction(ReservationTransactionTableSync::GetEditable(reservation->getTransaction()->getKey(), _getEnv()));
 
 						stream << t.row();
 						stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
@@ -282,21 +324,21 @@ namespace synthese
 							stream << reservation->getTransaction()->getCustomerName();
 
 						// Cancel link
-						if (globalDeleteRight)
+						if (globalDeleteRight && !_service.get())
 						{
 							stream << t.col();
 							switch(status)
 							{
 							case OPTION:
-								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", "bullet_delete.png");
+								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", ResaModule::GetStatusIcon(CANCELLED));
 								break;
 
 							case TO_BE_DONE:
-								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", "error.png");
+								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY));
 								break;
 
 							case AT_WORK:
-								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "exclamation.png");
+								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
 								break;
 							}
 						}
@@ -468,6 +510,13 @@ namespace synthese
 			}
 			*/
 			stream << t.close();
+
+			if(_service.get())
+			{
+				stream << HTMLModule::GetHTMLJavascriptOpen() <<
+					"window.print();" << HTMLModule::GetHTMLJavascriptClose();
+			}
+
 		}
 
 		bool BookableCommercialLineAdmin::isAuthorized() const
@@ -483,10 +532,6 @@ namespace synthese
 			, const AdminInterfaceElement& currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			/// @todo Implement it or leave empty
-			// Example
-			// if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
-			//	links.push_back(getPageLink());
 			return links;
 		}
 		
@@ -495,14 +540,13 @@ namespace synthese
 			, const AdminInterfaceElement& currentPage
 		) const {
 			AdminInterfaceElement::PageLinks links;
-			/// @todo Implement it or remove the method to get the default behaviour
 			return links;
 		}
 
 
 		std::string BookableCommercialLineAdmin::getTitle() const
 		{
-			return _line.get() ? _line->getName() : DEFAULT_TITLE;
+			return _line.get() ? "<span class=\"linesmall " + _line->getStyle() +"\">" + _line->getShortName() + "</span>" : DEFAULT_TITLE;
 		}
 
 		std::string BookableCommercialLineAdmin::getParameterName() const
@@ -513,6 +557,18 @@ namespace synthese
 		std::string BookableCommercialLineAdmin::getParameterValue() const
 		{
 			return _line.get() ? Conversion::ToString(_line->getKey()) : string();
+		}
+
+		void BookableCommercialLineAdmin::setServiceId( util::RegistryKeyType id )
+		{
+			try
+			{
+				_service = ScheduledServiceTableSync::Get(id, _getEnv());
+			}
+			catch (ObjectNotFoundException<ScheduledService> e)
+			{
+				throw RequestException("Service not found");
+			}			
 		}
 	}
 }

@@ -99,6 +99,7 @@ namespace synthese
 				util::Env& env,
 				const util::RegistryKeyType commercialLineId,
 				const time::Date& day,
+				const boost::optional<util::RegistryKeyType> serviceId = boost::optional<util::RegistryKeyType>(),
 				bool orderByService = true,
 				bool raisingOrder = true, 
 				int first = 0,

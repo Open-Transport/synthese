@@ -88,11 +88,11 @@ namespace synthese
 			id = map.getUid(PARAMETER_DISPLAY_TYPE_ID, true, FACTORY_KEY);
 			try
 			{
-				_type = DisplayTypeTableSync::Get(id, _env);
+				_type = DisplayTypeTableSync::Get(id, *_env);
 				if (!_type->getDisplayInterface())
 					throw RequestException("The specified type has no display interface");
 				InterfacePageTableSync::Search(
-					_env,
+					*_env,
 					_type->getDisplayInterface()->getKey(),
 					optional<int>(),
 					optional<int>(),
@@ -177,7 +177,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::Get(id, _env);
+				_alarm = AlarmTableSync::Get(id, *_env);
 			}
 			catch (...)
 			{

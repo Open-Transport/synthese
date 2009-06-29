@@ -68,9 +68,9 @@ namespace synthese
 
 		void LinesListFunction::_run( std::ostream& stream ) const
 		{
-			CommercialLineTableSync::Search(_env, _network->getKey());
+			CommercialLineTableSync::Search(*_env, _network->getKey());
 			
-			BOOST_FOREACH(shared_ptr<const CommercialLine> line, _env.getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<const CommercialLine> line, _env->getRegistry<CommercialLine>())
 			{
 				stream << line->getKey() << ";" << line->getShortName() << "\n";
 			}
@@ -90,7 +90,7 @@ namespace synthese
 		) throw(RequestException) {
 			try
 			{
-				_network = TransportNetworkTableSync::Get(id, _env);
+				_network = TransportNetworkTableSync::Get(id, *_env);
 			}
 			catch (...)
 			{

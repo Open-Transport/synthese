@@ -23,12 +23,9 @@
 #include <sstream>
 
 #include "HTMLModule.h"
-
 #include "ValueElementList.h"
-
 #include "FunctionRequest.h"
 #include "Conversion.h"
-#include "AdminRequest.h"
 #include "AdminInterfaceElement.h"
 #include "AdminPagePositionInterfaceElement.h"
 #include "AdminParametersException.h"

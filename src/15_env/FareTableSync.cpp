@@ -82,21 +82,13 @@ namespace synthese
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE.NAME << " SET "
-					/// @todo fill fields [,]FIELD=VALUE
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
 				object->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE.NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					/// @todo fill other fields separated by ,
-					<< ")";
-			}
+            query
+				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
+				<< object->getKey() << "," <<
+				Conversion::ToSQLiteString(object->getName()) << "," <<
+				static_cast<int>(object->getType()) <<
+			")";
 			sqlite->execUpdate(query.str());
 		}
 

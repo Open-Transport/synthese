@@ -21,38 +21,28 @@
 */
 
 #include "ResaModule.h"
-
-#include "01_util/Conversion.h"
-
-#include "04_time/DateTime.h"
-
-#include "05_html/HTMLModule.h"
-
-#include "12_security/Profile.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
-
-#include "13_dblog/DBLogEntry.h"
-#include "13_dblog/DBLogEntryTableSync.h"
-
-#include "30_server/Session.h"
-#include "30_server/ActionFunctionRequest.h"
-
-#include "31_resa/Reservation.h"
-#include "31_resa/ReservationTableSync.h"
-#include "31_resa/ResaRight.h"
-#include "31_resa/ReservationTransaction.h"
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/ResaDBLog.h"
-#include "31_resa/ResaCustomerAdmin.h"
-#include "31_resa/CancelReservationAction.h"
-#include "31_resa/ResaEditLogEntryAdmin.h"
-
-#include "15_env/CommercialLine.h"
-#include "15_env/CommercialLineTableSync.h"
-
-#include "32_admin/AdminRequest.h"
+#include "DateTime.h"
+#include "HTMLModule.h"
+#include "Profile.h"
+#include "ProfileTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
+#include "DBLogEntry.h"
+#include "DBLogEntryTableSync.h"
+#include "Session.h"
+#include "ActionFunctionRequest.h"
+#include "Reservation.h"
+#include "ReservationTableSync.h"
+#include "ResaRight.h"
+#include "ReservationTransaction.h"
+#include "ReservationTransactionTableSync.h"
+#include "ResaDBLog.h"
+#include "ResaCustomerAdmin.h"
+#include "CancelReservationAction.h"
+#include "ResaEditLogEntryAdmin.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "AdminRequest.h"
 
 #include <boost/foreach.hpp>
 
@@ -73,56 +63,6 @@ namespace synthese
 
 	template<> const std::string util::FactorableTemplate<ModuleClass,ResaModule>::FACTORY_KEY("31_resa");
 
-	namespace server
-	{
-		template<> const string ModuleClassTemplate<ResaModule>::NAME("TAD Réservation");
-		
-		template<> void ModuleClassTemplate<ResaModule>::PreInit()
-		{
-		}
-		
-		template<> void ModuleClassTemplate<ResaModule>::Init()
-		{
-			Env env;
-			
-			// Basic resa profile
-			ProfileTableSync::Search(env, ResaModule::_BASIC_PROFILE_NAME);
-			if (env.getRegistry<Profile>().empty())
-				ResaModule::_basicProfile.reset(new Profile);
-			else
-				ResaModule::_basicProfile = env.getEditableRegistry<Profile>().front();
-			ResaModule::_basicProfile->setName(ResaModule::_BASIC_PROFILE_NAME);
-			shared_ptr<Right> r(new GlobalRight);
-			r->setPrivateLevel(FORBIDDEN);
-			r->setPublicLevel(FORBIDDEN);
-			ResaModule::_basicProfile->cleanRights();
-			ResaModule::_basicProfile->addRight(r);
-			ProfileTableSync::Save(ResaModule::_basicProfile.get());
-
-			// Autoresa profile
-			ProfileTableSync::Search(env, ResaModule::_AUTORESA_PROFILE_NAME);
-			if (env.getRegistry<Profile>().empty())
-				ResaModule::_autoresaProfile.reset(new Profile);
-			else
-				ResaModule::_autoresaProfile= env.getEditableRegistry<Profile>().front();
-			ResaModule::_autoresaProfile->setName(ResaModule::_AUTORESA_PROFILE_NAME);
-			shared_ptr<Right> r2(new GlobalRight);
-			r2->setPrivateLevel(FORBIDDEN);
-			r2->setPublicLevel(FORBIDDEN);
-			ResaModule::_autoresaProfile->cleanRights();
-			ResaModule::_autoresaProfile->addRight(r2);
-			shared_ptr<Right> r3(new ResaRight);
-			r3->setPrivateLevel(WRITE);
-			r3->setPublicLevel(FORBIDDEN);
-			ResaModule::_autoresaProfile->addRight(r3);
-			ProfileTableSync::Save(ResaModule::_autoresaProfile.get());
-		}
-		
-		template<> void ModuleClassTemplate<ResaModule>::End()
-		{
-		}
-	}
-
 	namespace resa
 	{
 		const string ResaModule::_BASIC_PROFILE_NAME("Basic Resa Customer");	// Never change this or the database will be corrupted
@@ -133,7 +73,65 @@ namespace synthese
 		shared_ptr<Profile> ResaModule::_basicProfile;
 		shared_ptr<Profile> ResaModule::_autoresaProfile;
 		shared_ptr<Profile> ResaModule::_adminProfile;
+	}
 
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<ResaModule>::NAME("TAD Réservation");
+		
+		template<> void ModuleClassTemplate<ResaModule>::PreInit()
+		{
+		}
+		
+		template<> void ModuleClassTemplate<ResaModule>::Init()
+		{
+			
+			// Basic resa profile
+			{
+				Env env;
+				ProfileTableSync::Search(env, ResaModule::_BASIC_PROFILE_NAME);
+				if (env.getRegistry<Profile>().empty())
+					ResaModule::_basicProfile.reset(new Profile);
+				else
+					ResaModule::_basicProfile = env.getEditableRegistry<Profile>().front();
+				ResaModule::_basicProfile->setName(ResaModule::_BASIC_PROFILE_NAME);
+				shared_ptr<Right> r(new GlobalRight);
+				r->setPrivateLevel(FORBIDDEN);
+				r->setPublicLevel(FORBIDDEN);
+				ResaModule::_basicProfile->cleanRights();
+				ResaModule::_basicProfile->addRight(r);
+				ProfileTableSync::Save(ResaModule::_basicProfile.get());
+			}
+
+			// Autoresa profile
+			{
+				Env env;
+				ProfileTableSync::Search(env, ResaModule::_AUTORESA_PROFILE_NAME);
+				if (env.getRegistry<Profile>().empty())
+					ResaModule::_autoresaProfile.reset(new Profile);
+				else
+					ResaModule::_autoresaProfile= env.getEditableRegistry<Profile>().front();
+				ResaModule::_autoresaProfile->setName(ResaModule::_AUTORESA_PROFILE_NAME);
+				shared_ptr<Right> r2(new GlobalRight);
+				r2->setPrivateLevel(FORBIDDEN);
+				r2->setPublicLevel(FORBIDDEN);
+				ResaModule::_autoresaProfile->cleanRights();
+				ResaModule::_autoresaProfile->addRight(r2);
+				shared_ptr<Right> r3(new ResaRight);
+				r3->setPrivateLevel(WRITE);
+				r3->setPublicLevel(FORBIDDEN);
+				ResaModule::_autoresaProfile->addRight(r3);
+				ProfileTableSync::Save(ResaModule::_autoresaProfile.get());
+			}
+		}
+		
+		template<> void ModuleClassTemplate<ResaModule>::End()
+		{
+		}
+	}
+
+	namespace resa
+	{
 		void ResaModule::DisplayReservations(
 			std::ostream& stream,
 			const ReservationTransaction& tr
@@ -211,7 +209,7 @@ namespace synthese
 			case OPTION: return "stop_blue.png";
 			case TO_BE_DONE: return "stop_green.png";
 			case CANCELLED: return "cross.png";
-			case CANCELLED_AFTER_DELAY: "asterisk_red.png";
+			case CANCELLED_AFTER_DELAY: return "asterisk_red.png";
 			case AT_WORK: return "car.png";
 			case NO_SHOW: return "user_cross.png";
 			case DONE: return "tick.png";
@@ -228,7 +226,7 @@ namespace synthese
 			case OPTION: return "option";
 			case TO_BE_DONE: return "confirmé";
 			case CANCELLED: return "annulé";
-			case CANCELLED_AFTER_DELAY: "annulé hors délai";
+			case CANCELLED_AFTER_DELAY: return "annulé hors délai";
 			case AT_WORK: return "en cours";
 			case NO_SHOW: return "absence";
 			case DONE: return "terminé";

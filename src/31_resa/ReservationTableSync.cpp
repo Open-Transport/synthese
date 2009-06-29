@@ -202,6 +202,7 @@ namespace synthese
 			util::Env& env,
 			const util::RegistryKeyType commercialLineId,
 			const Date& day,
+			const optional<RegistryKeyType> serviceId,
 			bool orderByService,
 			bool raisingOrder, 
 			int first /*= 0 */,
@@ -218,6 +219,10 @@ namespace synthese
 				"l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
 				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << " LIKE '" << day.toSQLString(false) << "%'"
 			;
+			if(serviceId)
+			{
+				query << " AND s." << TABLE_COL_ID << "=" << *serviceId;
+			}
 			if(orderByService)
 			{
 				query << " ORDER BY substr(s." << ScheduledServiceTableSync::COL_SCHEDULES << ",0,17) " << (raisingOrder ? "ASC" : "DESC");

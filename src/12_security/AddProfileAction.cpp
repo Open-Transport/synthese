@@ -68,7 +68,7 @@ namespace synthese
 				optional<RegistryKeyType> id = map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE_ID);
 				if (id)
 				{
-					_templateProfile = ProfileTableSync::Get(*id, _env);
+					_templateProfile = ProfileTableSync::Get(*id, *_env);
 				}
 
 				// Name unicity

@@ -42,7 +42,7 @@
 
 #include "AdminModule.h"
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include <boost/foreach.hpp>
 
@@ -87,9 +87,9 @@ namespace synthese
 
 			// Searched profile
 			uid id(map.getUid(PARAM_SEARCH_PROFILE_ID, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE && _env.getRegistry<Profile>().contains(id))
+			if (id != UNKNOWN_VALUE && _getEnv().getRegistry<Profile>().contains(id))
 			{
-				_searchProfile = ProfileTableSync::Get(id, _env);
+				_searchProfile = ProfileTableSync::Get(id, _getEnv());
 			}
 
 			// Table Parameters
@@ -99,7 +99,7 @@ namespace synthese
 			
 			// Search
 			UserTableSync::Search(
-				_env,
+				_getEnv(),
 				"%"+_searchLogin+"%"
 				, "%"+_searchName+"%"
 				, "%"+_searchSurname+"%"
@@ -114,7 +114,7 @@ namespace synthese
 				, _requestParameters.raisingOrder,
 				UP_LINKS_LOAD_LEVEL
 			);
-			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<User>());
+			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<User>());
 		}
 		
 		
@@ -145,7 +145,6 @@ namespace synthese
 		) const	{
 			// Request for search form
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setSamePage(this);
 			SearchFormHTMLTable searchTable(searchRequest.getHTMLForm("search"));
 			
 			// Request for add user action form
@@ -156,7 +155,6 @@ namespace synthese
 
 			// Request for delete action form
 			ActionFunctionRequest<DelUserAction, AdminRequest> deleteUserRequest(_request);
-			deleteUserRequest.getFunction()->setSamePage(this);
 			
 			// Request for user link
 			FunctionRequest<AdminRequest> userRequest(_request);
@@ -174,7 +172,7 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			if (_env.getRegistry<User>().empty())
+			if (_getEnv().getRegistry<User>().empty())
 				stream << "Aucun utilisateur trouvé";
 
 
@@ -187,7 +185,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<User> user, _env.getRegistry<User>())
+			BOOST_FOREACH(shared_ptr<User> user, _getEnv().getRegistry<User>())
 			{
 				userRequest.setObjectId(user->getKey());
 				deleteUserRequest.setObjectId(user->getKey());

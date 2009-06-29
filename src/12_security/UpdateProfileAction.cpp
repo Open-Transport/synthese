@@ -62,7 +62,7 @@ namespace synthese
 			// Profile
 			try
 			{
-				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), _env);
+				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), *_env);
 			}
 			catch (ObjectNotFoundException<Profile>& e)
 			{

@@ -30,6 +30,9 @@
 #include "DateTime.h"
 #include "AccessParameters.h"
 
+using namespace boost;
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
@@ -52,7 +55,6 @@ namespace synthese
 			_reservationType(RESERVATION_RULE_FORBIDDEN),
 			_minDelayMinutes(0),
 			_minDelayDays(0),
-			_maxDelayDays(0),
 			_hourDeadLine(TIME_UNKNOWN)
 		{
 		}
@@ -79,8 +81,9 @@ namespace synthese
 
 
 
-		void PTUseRule::setMaxDelayDays (int maxDelayDays)
-		{
+		void PTUseRule::setMaxDelayDays(
+			const optional<size_t> maxDelayDays
+		){
 			_maxDelayDays = maxDelayDays;
 		}
 
@@ -106,7 +109,7 @@ namespace synthese
 			return _minDelayMinutes;
 		}
 
-		int PTUseRule::getMaxDelayDays() const
+		const optional<size_t>& PTUseRule::getMaxDelayDays() const
 		{
 			return _maxDelayDays;
 		}
@@ -432,15 +435,14 @@ namespace synthese
 		time::DateTime PTUseRule::getReservationOpeningTime(
 			const graph::ServicePointer& servicePointer
 		) const {
-			DateTime reservationStartTime(servicePointer.getOriginDateTime());
-
-			if ( _maxDelayDays )
+			if(_maxDelayDays)
 			{
-				reservationStartTime.subDaysDuration( _maxDelayDays );
+				DateTime reservationStartTime(servicePointer.getOriginDateTime());
+				reservationStartTime.subDaysDuration(static_cast<int>(*_maxDelayDays));
 				reservationStartTime.setHour(Hour(TIME_MIN));
+				return reservationStartTime;
 			}
-
-			return reservationStartTime;
+			return DateTime(TIME_MIN);
 		}
 
 		bool PTUseRule::isCompatibleWith( const AccessParameters& accessParameters ) const
@@ -474,6 +476,16 @@ namespace synthese
 		void PTUseRule::setAccessCapacity( UseRule::AccessCapacity value )
 		{
 			_accessCapacity = value;
+		}
+
+		void PTUseRule::setDefaultFare( const env::Fare* value )
+		{
+			_defaultFare = value;
+		}
+
+		const env::Fare* PTUseRule::getDefaultFare() const
+		{
+			return _defaultFare;
 		}
 	}
 }

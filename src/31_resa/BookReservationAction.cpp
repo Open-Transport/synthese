@@ -167,7 +167,7 @@ namespace synthese
 					// Customer ID
 					optional<RegistryKeyType> id(map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID));
 					if (id)
-						_customer = UserTableSync::GetEditable(*id, _env);
+						_customer = UserTableSync::GetEditable(*id, *_env);
 				}
 			}
 			if(!_customer.get())
@@ -184,10 +184,10 @@ namespace synthese
 					throw ActionException("Mot de passe erronné");
 				}
 			}
-			else
+			if(!_customer.get())
+			{
 				throw ActionException("Not authorized");
-
-			assert(_customer.get());
+			}
 
 			// Deduce naming fields from the customer if already recognized
 			if (_customer->getName().empty())

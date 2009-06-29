@@ -107,7 +107,7 @@ namespace synthese
 		{
 			try
 			{
-				_cpu = DisplayScreenCPUTableSync::GetEditable(id, _env);
+				_cpu = DisplayScreenCPUTableSync::GetEditable(id, *_env);
 			}
 			catch (...)
 			{

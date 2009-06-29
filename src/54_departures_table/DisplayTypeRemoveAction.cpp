@@ -58,7 +58,7 @@ namespace synthese
 			uid id(map.getUid(PARAMETER_TYPE_ID, true, FACTORY_KEY));
 			try
 			{
-				_type = DisplayTypeTableSync::Get(id, _env);
+				_type = DisplayTypeTableSync::Get(id, *_env);
 			}
 			catch(...)
 			{
@@ -66,7 +66,7 @@ namespace synthese
 			}
 			
 			DisplayScreenTableSync::Search(
-				_env,
+				*_env,
 				RightsOfSameClassMap()
 				, true
 				, UNKNOWN_RIGHT_LEVEL
@@ -82,7 +82,7 @@ namespace synthese
 				, 0
 				, 1
 			);
-			if (!_env.getRegistry<DisplayScreen>().empty())
+			if (!_env->getRegistry<DisplayScreen>().empty())
 				throw ActionException("Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur.");
 		}
 

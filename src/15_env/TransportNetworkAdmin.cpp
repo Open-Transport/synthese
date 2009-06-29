@@ -36,7 +36,7 @@
 #include "LineAdmin.h"
 #include "TransportNetworkRight.h"
 
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 
@@ -87,7 +87,7 @@ namespace synthese
 
 			try
 			{
-				_network = TransportNetworkTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+				_network = TransportNetworkTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -97,7 +97,7 @@ namespace synthese
 			if(!doDisplayPreparationActions) return;
 
 			CommercialLineTableSync::Search(
-				_env,
+				_getEnv(),
 				_network->getKey()
 				, string("%"+_searchName+"%"),
 				optional<string>(),
@@ -107,7 +107,7 @@ namespace synthese
 				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
 				, _requestParameters.raisingOrder				
 			);
-			_resultParameters.setFromResult(_requestParameters, _env.getEditableRegistry<CommercialLine>());
+			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<CommercialLine>());
 		}
 		
 		
@@ -125,8 +125,6 @@ namespace synthese
 		{
 			// Requests
 			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<TransportNetworkAdmin>();
-			searchRequest.setObjectId(_network->getKey());
 
 			FunctionRequest<AdminRequest> lineOpenRequest(_request);
 			lineOpenRequest.getFunction()->setPage<CommercialLineAdmin>();
@@ -150,7 +148,7 @@ namespace synthese
 			ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
 
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, _env.getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, _getEnv().getRegistry<CommercialLine>())
 			{
 				lineOpenRequest.setObjectId(line->getKey());
 				stream << t.row();

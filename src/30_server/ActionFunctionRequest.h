@@ -23,15 +23,15 @@
 #ifndef SYNTHESE_ActionFunctionRequest_h__
 #define SYNTHESE_ActionFunctionRequest_h__
 
-#include "30_server/FunctionRequest.h"
-#include "30_server/Action.h"
+#include "FunctionRequest.h"
+#include "Action.h"
 
 namespace synthese
 {
 	namespace server
 	{
 		/** Template for a Request containing an action and a function.
-			@ingroup m18
+			@ingroup m15
 		*/
 		template<class A, class F>
 		class ActionFunctionRequest : public FunctionRequest<F>
@@ -42,7 +42,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			ActionFunctionRequest(const Request* request=NULL);
+			ActionFunctionRequest(
+				const Request* request
+			);
 
 			boost::shared_ptr<A> getAction();
 			boost::shared_ptr<const A> getAction() const;
@@ -63,10 +65,12 @@ namespace synthese
 		}
 
 		template<class A, class F>
-		ActionFunctionRequest<A, F>::ActionFunctionRequest(const Request* request)
-			: FunctionRequest<F>(request)
+		ActionFunctionRequest<A, F>::ActionFunctionRequest(
+			const Request* request
+		):	FunctionRequest<F>(request)
 		{
-			Request::_setAction(boost::shared_ptr<Action>(new A));
+			Request::_setAction(boost::shared_ptr<Action>(new A()));
+			Request::_getAction()->setEnv(request->_getAction().get() ? request->_getAction()->getEnv() : request->_getFunction()->getEnv());
 		}
 	}
 }

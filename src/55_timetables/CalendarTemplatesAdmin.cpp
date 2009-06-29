@@ -39,7 +39,7 @@
 #include "ActionFunctionRequest.h"
 
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 #include "AdminParametersException.h"
 
 #include <boost/foreach.hpp>
@@ -80,7 +80,7 @@ namespace synthese
 		){
 			if(!doDisplayPreparationActions) return;
 
-			CalendarTemplateTableSync::Search(_env);
+			CalendarTemplateTableSync::Search(_getEnv());
 		}
 		
 		
@@ -116,7 +116,7 @@ namespace synthese
 			HTMLTable t(c,ResultHTMLTable::CSS_CLASS);
 			stream << f.open() << t.open();
 
-			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, _env.getRegistry<CalendarTemplate>())
+			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, _getEnv().getRegistry<CalendarTemplate>())
 			{
 				editCalendar.setObjectId(ct->getKey());
 

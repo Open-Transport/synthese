@@ -67,10 +67,6 @@ namespace synthese
 		void DataSource::setFormat(
 			const string& value
 		){
-			if(!Factory<FileFormat>::contains(value))
-			{
-				throw Exception("Unconsistant file format");
-			}
 			_format = value;
 		}
 

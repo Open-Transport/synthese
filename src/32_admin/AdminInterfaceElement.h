@@ -27,8 +27,8 @@
 
 #include "FactoryBase.h"
 #include "11_interfaces/Types.h"
-#include "FunctionRequest.h"
-#include "Env.h"
+#include "ActionFunctionRequest.h"
+#include "AdminRequest.h"
 
 #include <vector>
 
@@ -218,11 +218,6 @@ namespace synthese
 				mutable bool			_tabBuilded;
 			//@}
 
-			//! \name Temporary data
-			//@{
-				mutable util::Env	_env;
-			//@}
-
 			//! \name Properties
 			//@{
 				const server::FunctionRequest<admin::AdminRequest>*		_request;
@@ -233,6 +228,8 @@ namespace synthese
 				const AdminInterfaceElement* page,
 				const PageLinks position
 			) const;
+
+			util::Env& _getEnv() const;
 
 			
 			
@@ -362,7 +359,7 @@ namespace synthese
 				const Tabs&				getTabs()			const;
 				std::string				getCurrentTab()		const;
 				const std::string&		getActiveTab()		const;
-				const server::Request*	getRequest()		const;
+				const server::FunctionRequest<admin::AdminRequest>*	getRequest()		const;
 			//@}
 
 

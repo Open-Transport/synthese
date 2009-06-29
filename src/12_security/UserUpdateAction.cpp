@@ -68,7 +68,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::GetEditable(_request->getObjectId(), _env);
+				_user = UserTableSync::GetEditable(_request->getObjectId(), *_env);
 
 				_login = map.getString(PARAMETER_LOGIN, true, FACTORY_KEY);
 				if (_login.empty())
@@ -96,7 +96,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_PROFILE_ID, false, FACTORY_KEY));
 				if(id > 0)
 				{
-					*_profile = ProfileTableSync::Get(id, _env);
+					*_profile = ProfileTableSync::Get(id, *_env);
 				}
 			}
 			catch (ObjectNotFoundException<Profile>& e)

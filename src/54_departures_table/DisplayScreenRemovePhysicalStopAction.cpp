@@ -68,7 +68,7 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), _env);
+				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), *_env);
 
 				setStopId(map.get<RegistryKeyType>(PARAMETER_PHYSICAL));
 			}
@@ -107,7 +107,7 @@ namespace synthese
 		){
 			try
 			{
-				_stop = PhysicalStopTableSync::Get(id, _env, UP_LINKS_LOAD_LEVEL);
+				_stop = PhysicalStopTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (ObjectNotFoundException<PhysicalStop>& e)
 			{

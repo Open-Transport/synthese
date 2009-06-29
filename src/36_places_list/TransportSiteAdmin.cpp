@@ -38,7 +38,7 @@
 
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminInterfaceElement.h"
 
 #include "ResultHTMLTable.h"
 #include "PropertiesHTMLTable.h"
@@ -87,7 +87,7 @@ namespace synthese
 		){
 			try
 			{
-				_site = SiteTableSync::GetEditable(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _env, UP_LINKS_LOAD_LEVEL);
+				_site = SiteTableSync::GetEditable(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
 			}
 			catch (...)
 			{
@@ -112,7 +112,6 @@ namespace synthese
 			// Requests
 			ActionFunctionRequest<SiteUpdateAction,AdminRequest> updateRequest(_request);
 			updateRequest.getAction()->setSiteId(_site->getKey());
-			updateRequest.getFunction()->setSamePage(this);
 
 			FunctionRequest<AdminRequest> routeplannerRequest(_request);
 			routeplannerRequest.getFunction()->setPage<SiteRoutePlanningAdmin>();

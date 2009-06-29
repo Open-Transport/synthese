@@ -107,7 +107,7 @@ namespace synthese
 			{
 				try
 				{
-					_line = CommercialLineTableSync::Get(lineId, _env);
+					_line = CommercialLineTableSync::Get(lineId, *_env);
 				}
 				catch (...)
 				{
@@ -121,7 +121,7 @@ namespace synthese
 			{
 				try
 				{
-					_user = UserTableSync::Get(customerId, _env);
+					_user = UserTableSync::Get(customerId, *_env);
 				}
 				catch (...)
 				{
@@ -177,6 +177,7 @@ namespace synthese
 			: _startDateTime(TIME_CURRENT)
 			, _endDateTime(TIME_CURRENT, TIME_CURRENT, TIME_CURRENT, TIME_MAX, TIME_MAX)
 		{
+			setEnv(shared_ptr<Env>(new Env));
 		}
 
 		void ReservationsListFunction::setLine(shared_ptr<const CommercialLine> line )
