@@ -42,7 +42,7 @@
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ActionFunctionRequest.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "ActionException.h"

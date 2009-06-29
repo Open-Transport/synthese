@@ -47,7 +47,7 @@
 #include "ModuleAdmin.h"
 #include "AdminModule.h"
 #include "AdminParametersException.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "MessageAdmin.h"
 
 #include <boost/foreach.hpp>

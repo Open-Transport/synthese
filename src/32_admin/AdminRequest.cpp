@@ -23,6 +23,8 @@
 #include <sstream>
 #include <assert.h>
 
+#include "AdminRequest.h"
+
 #include "Conversion.h"
 #include "FactoryException.h"
 #include "HTMLForm.h"
@@ -136,8 +138,15 @@ namespace synthese
 			{
 				if (_interface != NULL)
 				{
-					const AdminInterfacePage* const aip = _interface->getPage<AdminInterfacePage>();
-					aip->display(stream, &const_pointer_cast<const AdminInterfaceElement>(_page), _request->getObjectId(), (const FunctionRequest<AdminRequest>*) _request);
+					const AdminInterfacePage* const aip(
+						_interface->getPage<AdminInterfacePage>()
+					);
+					aip->display(
+						stream,
+						&const_pointer_cast<const AdminInterfaceElement>(_page),
+						_request->getObjectId(),
+						static_cast<const FunctionRequest<AdminRequest>* >(_request)
+					);
 				}
 				else
 				{

@@ -39,7 +39,7 @@
 #include "AdminModule.h"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
-#include "Request.h"
+#include "AdminRequest.h"
 
 #include <boost/foreach.hpp>
 #include <map>

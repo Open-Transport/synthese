@@ -36,7 +36,7 @@
 #include "Constants.h"
 #include "ProfilesAdmin.h"
 #include "ActionFunctionRequest.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 

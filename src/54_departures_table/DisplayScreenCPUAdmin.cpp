@@ -44,6 +44,7 @@
 #include "DisplayScreenCPUMaintenanceUpdateAction.h"
 #include "DisplayMaintenanceLog.h"
 #include "HTMLList.h"
+#include "AdminRequest.h"
 
 #include <boost/lexical_cast.hpp>
 

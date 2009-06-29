@@ -36,7 +36,7 @@
 #include "UserTableSync.h"
 #include "UsersAdmin.h"
 #include "SecurityRight.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "Session.h"
 #include "ActionFunctionRequest.h"
 

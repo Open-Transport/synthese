@@ -23,21 +23,17 @@
 */
 
 #include "ResaCallButtonInterfaceElement.h"
-
-#include "11_interfaces/ValueElementList.h"
-
+#include "ValueElementList.h"
 #include "AdminInterfaceElement.h"
-
-#include "31_resa/CallBeginAction.h"
-#include "31_resa/CallEndAction.h"
-#include "31_resa/ReservationRoutePlannerAdmin.h"
-#include "31_resa/ResaEditLogEntryAdmin.h"
-#include "31_resa/ResaModule.h"
-#include "31_resa/ResaRight.h"
-
-#include "30_server/ActionFunctionRequest.h"
-
-#include "05_html/HTMLModule.h"
+#include "CallBeginAction.h"
+#include "CallEndAction.h"
+#include "ReservationRoutePlannerAdmin.h"
+#include "ResaEditLogEntryAdmin.h"
+#include "ResaModule.h"
+#include "ResaRight.h"
+#include "ActionFunctionRequest.h"
+#include "HTMLModule.h"
+#include "AdminRequest.h"
 
 using namespace std;
 

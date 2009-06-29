@@ -34,7 +34,7 @@
 #include "DisplayScreenTableSync.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "ArrivalDepartureTableRight.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "ActionResultHTMLTable.h"
 #include "InterfaceTableSync.h"
 #include "UpdateDisplayPreselectionParametersAction.h"

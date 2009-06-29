@@ -37,7 +37,7 @@
 #include "CalendarTemplateElementAddAction.h"
 
 #include "Request.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "ActionFunctionRequest.h"
 
 #include "AdminParametersException.h"

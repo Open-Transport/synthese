@@ -31,7 +31,7 @@
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 
-#include "Request.h"
+#include "AdminRequest.h"
 
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"

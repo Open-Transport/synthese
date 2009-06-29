@@ -27,7 +27,6 @@
 #include "SecurityLog.h"
 #include "SecurityRight.h"
 #include "ActionException.h"
-#include "Request.h"
 #include "ParametersMap.h"
 #include "Request.h"
 

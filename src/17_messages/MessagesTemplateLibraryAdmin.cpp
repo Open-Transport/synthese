@@ -29,7 +29,7 @@
 #include "HTMLList.h"
 
 #include "ActionFunctionRequest.h"
-#include "Request.h"
+#include "AdminRequest.h"
 
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"

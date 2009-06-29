@@ -37,7 +37,7 @@
 
 #include "PropertiesHTMLTable.h"
 
-#include "Request.h"
+#include "AdminRequest.h"
 #include "ActionFunctionRequest.h"
 #include "Request.h"
 

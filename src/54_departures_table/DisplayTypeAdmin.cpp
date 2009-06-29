@@ -26,7 +26,7 @@
 #include "DisplayTypeAdmin.h"
 #include "DisplayTypesAdmin.h"
 #include "DeparturesTableModule.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "AdminParametersException.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"

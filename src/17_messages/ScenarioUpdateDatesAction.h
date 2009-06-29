@@ -29,6 +29,7 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "SentScenario.h"
+#include "ActionException.h"
 
 #include <string>
 

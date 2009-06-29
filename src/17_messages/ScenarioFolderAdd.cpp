@@ -25,7 +25,6 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
-#include "Request.h"
 #include "MessagesLibraryRight.h"
 #include "ScenarioFolderAdd.h"
 #include "ScenarioFolder.h"

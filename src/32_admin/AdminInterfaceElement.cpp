@@ -31,6 +31,7 @@
 #include "Profile.h"
 #include "User.h"
 #include "Session.h"
+#include "AdminRequest.h"
 
 using namespace std;
 using namespace boost;
@@ -332,6 +333,7 @@ namespace synthese
 		) const	{
 			assert(request);
 			assert(request->getSession());
+			
 			assert(request->getFunction());
 			assert(request->getFunction()->getInterface());
 

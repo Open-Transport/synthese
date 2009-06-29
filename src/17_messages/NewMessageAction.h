@@ -28,6 +28,7 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "UId.h"
+#include "ActionException.h"
 
 namespace synthese
 {

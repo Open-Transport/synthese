@@ -42,7 +42,7 @@
 #include "ScenarioTemplateInheritedTableSync.h"
 
 #include "ActionFunctionRequest.h"
-#include "Request.h"
+#include "AdminRequest.h"
 
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"

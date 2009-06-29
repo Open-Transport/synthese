@@ -27,6 +27,7 @@
 
 #include "FactorableTemplate.h"
 #include "Action.h"
+#include "ActionException.h"
 
 #include <boost/shared_ptr.hpp>
 

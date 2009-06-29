@@ -42,7 +42,7 @@
 
 #include "SearchFormHTMLTable.h"
 
-#include "Request.h"
+#include "AdminRequest.h"
 #include "Request.h"
 
 #include "AdminParametersException.h"

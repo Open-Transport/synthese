@@ -41,6 +41,7 @@
 #include "DBLog.h"
 #include "DBLogPurgeAction.h"
 #include "PropertiesHTMLTable.h"
+#include "AdminRequest.h"
 
 #include <sstream>
 #include <boost/shared_ptr.hpp>

@@ -30,7 +30,7 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
 #include "ActionFunctionRequest.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "SentAlarm.h"

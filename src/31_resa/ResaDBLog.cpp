@@ -23,7 +23,7 @@
 
 #include "ResaDBLog.h"
 #include "ResaRight.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "Reservation.h"
 #include "ReservationTransaction.h"
 #include "ResaModule.h"
@@ -193,7 +193,7 @@ namespace synthese
 				break;
 
 			case AT_WORK:
-				type = ResaDBLog::NO_SHOW;
+				type = ResaDBLog::NO_SHOW_ENTRY;
 				description = "Absence";
 				level = DBLogEntry::DB_LOG_ERROR;
 				break;
@@ -286,7 +286,7 @@ namespace synthese
 
 				case ResaDBLog::CANCELLATION_ENTRY:
 				case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-				case ResaDBLog::NO_SHOW:
+				case ResaDBLog::NO_SHOW_ENTRY:
 					if(tr.get())
 					{
 						ResaModule::DisplayReservations(stream, *tr);
@@ -368,13 +368,13 @@ namespace synthese
 				return "resa_compulsory.png";
 
 			case ResaDBLog::CANCELLATION_ENTRY:
-				return ResaModule::GetStatusIcon(ReservationStatus::CANCELLED);
+				return ResaModule::GetStatusIcon(CANCELLED);
 
 			case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-				return ResaModule::GetStatusIcon(ReservationStatus::CANCELLED_AFTER_DELAY);
+				return ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY);
 				
-			case ResaDBLog::NO_SHOW:
-				return ResaModule::GetStatusIcon(ReservationStatus::NO_SHOW);
+			case ResaDBLog::NO_SHOW_ENTRY:
+				return ResaModule::GetStatusIcon(NO_SHOW);
 				
 			case ResaDBLog::CUSTOMER_COMMENT_ENTRY:
 				return "user_comment.png";
@@ -433,7 +433,7 @@ namespace synthese
 			case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
 				return "Annulation de réservation hors délai";
 
-			case ResaDBLog::NO_SHOW:
+			case ResaDBLog::NO_SHOW_ENTRY:
 				return "Absence";
 
 			case ResaDBLog::CUSTOMER_COMMENT_ENTRY:

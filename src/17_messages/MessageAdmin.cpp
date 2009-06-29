@@ -43,7 +43,7 @@
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
 #include "ActionFunctionRequest.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "ActionException.h"
@@ -159,7 +159,8 @@ namespace synthese
 					ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
 					removeRequest.getAction()->setAlarmId(_alarm->getKey());
 
-					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, FunctionRequest<AdminRequest>(_request), addRequest, removeRequest);
+					FunctionRequest<AdminRequest> searchRequest(_request);
+					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
 				}
 			}
 			

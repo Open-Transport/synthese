@@ -38,6 +38,7 @@
 #include "AdminInterfaceElement.h"
 #include "User.h"
 #include "Profile.h"
+#include "AdminRequest.h"
 
 #include <map>
 #include <boost/foreach.hpp>

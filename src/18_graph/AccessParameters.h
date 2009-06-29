@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_getEnv()_AccessParameters_h__
-#define SYNTHESE_getEnv()_AccessParameters_h__
+#ifndef SYNTHESE_env_AccessParameters_h__
+#define SYNTHESE_env_AccessParameters_h__
 
 #include "GraphTypes.h"
 #include "GraphConstants.h"

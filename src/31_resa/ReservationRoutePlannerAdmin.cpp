@@ -33,7 +33,7 @@
 #include "Reservation.h"
 #include "ReservationTableSync.h"
 #include "NamedPlace.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "ActionFunctionRequest.h"
 
 #include "ModuleAdmin.h"

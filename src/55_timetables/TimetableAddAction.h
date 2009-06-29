@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_TimetableAddAction_H__
 #define SYNTHESE_TimetableAddAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {

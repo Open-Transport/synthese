@@ -28,7 +28,7 @@
 #include "JpegRenderer.h"
 #include "PostscriptRenderer.h"
 #include "PropertiesHTMLTable.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "FunctionRequest.h"
 #include "Request.h"
 #include "ModuleAdmin.h"

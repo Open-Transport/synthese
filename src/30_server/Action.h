@@ -63,7 +63,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			Action(
 				boost::shared_ptr<util::Env> env = util::Env::GetOfficialEnvSPtr()
-			):	FactoryBase<Action>(),
+			):	util::FactoryBase<Action>(),
 				_env(env)
 			{
 			}

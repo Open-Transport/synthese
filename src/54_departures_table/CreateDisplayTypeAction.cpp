@@ -22,7 +22,6 @@
 
 #include "Interface.h"
 #include "InterfaceTableSync.h"
-#include "Request.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"

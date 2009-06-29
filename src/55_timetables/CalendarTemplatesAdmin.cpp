@@ -35,7 +35,7 @@
 #include "TimetableRight.h"
 
 #include "Request.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "ActionFunctionRequest.h"
 
 #include "ModuleAdmin.h"

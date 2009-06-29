@@ -45,7 +45,7 @@
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 
-#include "Request.h"
+#include "AdminRequest.h"
 #include "RequestException.h"
 #include "ActionFunctionRequest.h"
 

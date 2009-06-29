@@ -36,11 +36,12 @@ namespace synthese
 	namespace admin
 	{
 		class AdminInterfaceElement;
-
+		
 		/** Administration console Function Class.
 			@ingroup m14Functions refFunctions
 		*/
-		class AdminRequest : public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, AdminRequest>
+		class AdminRequest:
+			public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, AdminRequest>
 		{
 		public:
 			static const std::string PARAMETER_PAGE;

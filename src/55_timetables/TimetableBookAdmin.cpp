@@ -35,9 +35,8 @@
 #include "TimetableAddAction.h"
 #include "TimetableRight.h"
 
-#include "Request.h"
+#include "AdminRequest.h"
 #include "ActionFunctionRequest.h"
-#include "Request.h"
 
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"

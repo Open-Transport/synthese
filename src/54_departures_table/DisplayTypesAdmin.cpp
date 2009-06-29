@@ -34,7 +34,7 @@
 #include "DisplayTypeRemoveAction.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayTypeAdmin.h"
-#include "Request.h"
+#include "AdminRequest.h"
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "DeparturesTableInterfacePage.h"
