@@ -80,6 +80,7 @@ namespace synthese
 			case DBLogEntry::DB_LOG_WARNING : return "Alerte";
 			case DBLogEntry::DB_LOG_ERROR : return "Erreur";
 			}
+			return string();
 		}
 
 		std::string DBLogModule::getEntryIcon( const DBLogEntry::Level& level )

@@ -230,6 +230,8 @@ namespace synthese
 					RUN_NOT_POSSIBLE
 				;
 			}
+			
+			return RUN_NOT_POSSIBLE;
 		}
 
 
@@ -273,6 +275,8 @@ namespace synthese
 					RUN_NOT_POSSIBLE
 				;
 			}
+			
+			return RUN_NOT_POSSIBLE;
 		}
 
 
@@ -361,6 +365,8 @@ namespace synthese
 
 				}
 			}
+			
+			return RESERVATION_FORBIDDEN;
 		}
 
 
@@ -430,6 +436,8 @@ namespace synthese
 					return RESERVATION_COMPULSORY_POSSIBLE;
 				}
 			}
+			
+			return RESERVATION_FORBIDDEN;
 		}
 
 		time::DateTime PTUseRule::getReservationOpeningTime(

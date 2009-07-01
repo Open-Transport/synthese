@@ -201,6 +201,8 @@ namespace synthese
 			for (Path::Edges::const_reverse_iterator it(getPath()->getEdges().rbegin()); it != getPath()->getEdges().rend(); ++it)
 				if ((*it)->isDeparture())
 					return _departureSchedules[(*it)->getRankInPath()];
+			assert(false);
+			return _departureSchedules[0];
 		}
 
 		void ScheduledService::setTeam( const std::string& team )
@@ -241,6 +243,8 @@ namespace synthese
 					return getUseRule(USER_PEDESTRIAN).getReservationAvailability(p);
 				}
 			}
+			assert(false);
+			return UseRule::RESERVATION_FORBIDDEN;
 		}
 	}
 }

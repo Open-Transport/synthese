@@ -106,8 +106,8 @@ namespace synthese
 			}
 			catch(...)
 			{
-				return "(unknown)";
 			}
+			return "(unknown)";
 		}
 
 		std::string ArrivalDepartureTableLog::getName() const

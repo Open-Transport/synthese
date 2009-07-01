@@ -460,8 +460,7 @@ namespace synthese
 
 		std::string Request::getOutputMimeType()
 		{
-			if(_function.get())
-				return _function->getOutputMimeType();
+			return _function.get() ? _function->getOutputMimeType() : string();
 		}
 
 		void Request::setHostName( const std::string& value )
