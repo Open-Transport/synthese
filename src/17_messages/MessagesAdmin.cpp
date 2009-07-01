@@ -47,7 +47,8 @@
 #include "ModuleAdmin.h"
 #include "AdminModule.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "MessageAdmin.h"
 
 #include <boost/foreach.hpp>
@@ -177,17 +178,15 @@ namespace synthese
 		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<MessagesAdmin> searchRequest(_request);
 
-			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(_request);
-			newScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
+			AdminActionFunctionRequest<NewScenarioSendAction,MessagesScenarioAdmin> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
-			newScenarioRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			newScenarioRequest.setActionWillCreateObject();
 			
-			FunctionRequest<AdminRequest> scenarioRequest(_request);
-			scenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
+			AdminFunctionRequest<MessagesScenarioAdmin> scenarioRequest(_request);
 
-			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(_request);
+			AdminActionFunctionRequest<ScenarioStopAction,MessagesAdmin> scenarioStopRequest(_request);
 			
 			vector<pair<SentScenarioInheritedTableSync::StatusSearch, string> > statusMap;
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING, "En diffusion / prévu"));
@@ -256,7 +255,7 @@ namespace synthese
 			
 			stream << t1.open();
 
-			BOOST_FOREACH(shared_ptr<const SentScenario> message, _getEnv().getRegistry<SentScenario>())
+			BOOST_FOREACH(shared_ptr<SentScenario> message, _getEnv().getRegistry<SentScenario>())
 			{
 				bool isDisplayedWithEndDate(
 					(message->getPeriodStart().isUnknown() || message->getPeriodStart() <= now)
@@ -349,12 +348,12 @@ namespace synthese
 //				stream << t1.col() << MessagesModule::getConflictLabel(message.conflict); /// @todo put a graphic bullet
 				stream << t1.col();
 
-				scenarioRequest.setObjectId(message->getKey());
+				scenarioRequest.getPage()->setScenario(message);
 
 				stream << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Modifier");
 				if (message->isApplicable(DateTime(TIME_CURRENT)))
 				{
-					scenarioStopRequest.setObjectId(message->getKey());
+					scenarioStopRequest.getAction()->setScenario(message);
 					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");
 				}
 			}
@@ -381,12 +380,22 @@ namespace synthese
 			return _request->isAuthorized<MessagesRight>(READ);
 		}
 
-		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfModule(
+			const string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
+			
+			if (moduleKey == MessagesModule::FACTORY_KEY)
 			{
-				links.push_back(getPageLink());
+				if(dynamic_cast<const MessagesAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
 			}
 			return links;
 		}
@@ -399,29 +408,38 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
+		
 			AdminInterfaceElement::PageLinks links;
-			if(currentPage.getFactoryKey() == MessagesScenarioAdmin::FACTORY_KEY)
-			{
-				const MessagesScenarioAdmin& currentSPage(static_cast<const MessagesScenarioAdmin&>(currentPage));
-				if (dynamic_cast<const SentScenario*>(currentSPage.getScenario().get()))
-					links.push_back(currentPage.getPageLink());
-			}
-			else if(currentPage.getFactoryKey() == MessageAdmin::FACTORY_KEY)
-			{
-				const MessageAdmin& currentSPage(static_cast<const MessageAdmin&>(currentPage));
-				shared_ptr<const Alarm> alarm(currentSPage.getAlarm());
-				const Scenario* scenario(alarm->getScenario());
-				if (dynamic_cast<const SentScenario*>(scenario))
+			
+			const MessagesScenarioAdmin* sa(
+				dynamic_cast<const MessagesScenarioAdmin*>(currentPage.get())
+			);
+			const MessageAdmin* ma(
+				dynamic_cast<const MessageAdmin*>(currentPage.get())
+			);
+			
+			if(	sa &&
+				dynamic_cast<const SentScenario*>(sa->getScenario().get()) ||
+				ma &&
+				dynamic_cast<const SentAlarm*>(ma->getAlarm().get())
+			){
+				if(sa)
 				{
-					AdminInterfaceElement::PageLink link(getPageLink());
-					link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
-					link.name = scenario->getName();
-					link.icon = MessagesScenarioAdmin::ICON;
-					link.parameterName = Request::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString(scenario->getKey());
-					links.push_back(link);
+					AddToLinks(links, currentPage);
+				}
+				else if(ma)
+				{
+					shared_ptr<MessagesScenarioAdmin> p(
+						getNewOtherPage<MessagesScenarioAdmin>()
+					);
+					p->setScenario(
+						SentScenarioInheritedTableSync::GetEditable(
+							ma->getAlarm()->getScenario()->getKey(),
+							_getEnv()
+					)	);
+					AddToLinks(links, p);
 				}
 			}
 			return links;

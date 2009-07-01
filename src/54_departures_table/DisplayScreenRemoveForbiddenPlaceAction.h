@@ -23,9 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef SYNTHESE_DisplayScreenRemoveForbiddenPlaceAction_H__
 #define SYNTHESE_DisplayScreenRemoveForbiddenPlaceAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -41,9 +40,11 @@ namespace synthese
 		/** DisplayScreenRemoveForbiddenPlaceAction action class.
 		@ingroup m54Actions refActions
 		*/
-		class DisplayScreenRemoveForbiddenPlaceAction : public util::FactorableTemplate<server::Action, DisplayScreenRemoveForbiddenPlaceAction>
+		class DisplayScreenRemoveForbiddenPlaceAction :
+			public util::FactorableTemplate<server::Action, DisplayScreenRemoveForbiddenPlaceAction>
 		{
 		public:
+			static const std::string PARAMETER_SCREEN_ID;
 			static const std::string PARAMETER_PLACE;
 
 		private:
@@ -67,6 +68,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 		};
 	}
 }

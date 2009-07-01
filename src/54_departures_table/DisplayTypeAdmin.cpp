@@ -26,13 +26,13 @@
 #include "DisplayTypeAdmin.h"
 #include "DisplayTypesAdmin.h"
 #include "DeparturesTableModule.h"
-#include "AdminRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
 #include "PropertiesHTMLTable.h"
 #include "UpdateDisplayTypeAction.h"
-#include "ActionFunctionRequest.h"
 #include "AdminInterfaceElement.h"
 #include "DisplayTypeRemoveAction.h"
 #include "Interface.h"
@@ -75,12 +75,15 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			RegistryKeyType id(_request->getObjectId());
-			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
+			if(_request->getActionWillCreateObject()) return;
 
 			try
 			{
-				_type = DisplayTypeTableSync::GetEditable(id, _getEnv(), UP_LINKS_LOAD_LEVEL);
+				_type = DisplayTypeTableSync::GetEditable(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv(),
+					UP_LINKS_LOAD_LEVEL
+				);
 			}
 			catch (ObjectNotFoundException<DisplayType>& e)
 			{
@@ -93,6 +96,7 @@ namespace synthese
 		ParametersMap DisplayTypeAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_type.get()) m.insert(Request::PARAMETER_OBJECT_ID, _type->getKey());
 			return m;
 		}
 		
@@ -101,13 +105,14 @@ namespace synthese
 		void DisplayTypeAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			ActionFunctionRequest<UpdateDisplayTypeAction,AdminRequest> updateRequest(_request);
-			updateRequest.getFunction()->setPage<DisplayTypeAdmin>();
-			updateRequest.setObjectId(_type->getKey());
+			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(
+				_request
+			);
 			updateRequest.getAction()->setTypeId(_type->getKey());
 
-			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(_request);
-			deleteRequest.getFunction()->setPage<DisplayTypesAdmin>();
+			AdminActionFunctionRequest<DisplayTypeRemoveAction,DisplayTypesAdmin> deleteRequest(
+				_request
+			);
 			deleteRequest.getAction()->setType(_type);
 
 			// Display
@@ -179,18 +184,6 @@ namespace synthese
 			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks DisplayTypeAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == DisplayTypesAdmin::FACTORY_KEY && parentLink.parameterValue == Conversion::ToString(_type->getKey()))
-			{
-				links.push_back(getPageLink());
-			}
-			return links;
-		}
-		
 
 
 		std::string DisplayTypeAdmin::getTitle() const
@@ -198,27 +191,18 @@ namespace synthese
 			return _type.get() ? _type->getName() : DEFAULT_TITLE;
 		}
 
-		std::string DisplayTypeAdmin::getParameterName() const
-		{
-			return _type.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string DisplayTypeAdmin::getParameterValue() const
-		{
-			return _type.get() ? Conversion::ToString(_type->getKey()) : string();
-		}
-
 
 
 		void DisplayTypeAdmin::setType(
-			boost::shared_ptr<DisplayType> value
-		) {
+			boost::shared_ptr<const DisplayType> value
+		){
 			_type = value;
 		}
 
-		AdminInterfaceElement::PageLinks DisplayTypeAdmin::getSubPages( const AdminInterfaceElement& currentPage ) const
+		
+		boost::shared_ptr<const DisplayType> DisplayTypeAdmin::getType() const
 		{
-			return AdminInterfaceElement::PageLinks();
+			return _type;
 		}
 	}
 }

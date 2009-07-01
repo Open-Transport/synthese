@@ -118,9 +118,6 @@ namespace synthese
 				page->setFromParametersMap(map);
 				page->setActiveTab(map.getString(PARAMETER_TAB, false, FACTORY_KEY));
 				_page = page;
-				
-				// Parameters saving
-				_parameters = map;
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
 			{
@@ -144,7 +141,6 @@ namespace synthese
 					aip->display(
 						stream,
 						&const_pointer_cast<const AdminInterfaceElement>(_page),
-						_request->getObjectId(),
 						static_cast<const FunctionRequest<AdminRequest>* >(_request)
 					);
 				}
@@ -163,22 +159,14 @@ namespace synthese
 		void AdminRequest::setPage(shared_ptr<AdminInterfaceElement> aie )
 		{
 			assert(aie.get());
-			if(_page.get() && _page->getFactoryKey() != aie->getFactoryKey() && _request->getObjectId() != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-			{
-				_request->setObjectId(UNKNOWN_VALUE);
-			}
 			_page = aie;
+			aie->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 		}
 
 		
 		shared_ptr<AdminInterfaceElement> AdminRequest::getPage() const
 		{
 			return _page;
-		}
-
-		void AdminRequest::setParameter( const std::string& name, const std::string value )
-		{
-			_parameters.insert(name,value);
 		}
 
 		void AdminRequest::setActionFailedPage(shared_ptr<AdminInterfaceElement> aie )
@@ -196,19 +184,6 @@ namespace synthese
 		std::string AdminRequest::getOutputMimeType() const
 		{
 			return "text/html";
-		}
-
-		void AdminRequest::_copy( boost::shared_ptr<const Function> other )
-		{
-			RequestWithInterface::_copy(other);
-
-			assert(dynamic_cast<const AdminRequest*>(other.get()));
-			const AdminRequest& ar(static_cast<const AdminRequest&>(*other));
-			boost::shared_ptr<AdminInterfaceElement> p(util::Factory<AdminInterfaceElement>::create(ar.getPage()->getFactoryKey()));
-			p->setRequest(static_cast<FunctionRequest<AdminRequest>* >(_request));
-			p->setActiveTab(ar.getPage()->getCurrentTab());
-			p->setFromParametersMap(ar.getPage()->getParametersMap(), false);
-			setPage(p);			
 		}
 	}
 }

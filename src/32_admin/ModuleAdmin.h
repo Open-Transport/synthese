@@ -44,13 +44,24 @@ namespace synthese
 		class ModuleAdmin:
 			public admin::AdminInterfaceElementTemplate<ModuleAdmin>
 		{
-			std::string								_moduleKey;
-			boost::shared_ptr<server::ModuleClass>	_moduleClass;
-
 		public:
 			static const std::string PARAMETER_MODULE;
+		
+		private:
+			boost::shared_ptr<const server::ModuleClass>	_moduleClass;
 
+		public:
 			ModuleAdmin();
+			
+			//! @name Getters
+			//@{
+				boost::shared_ptr<const server::ModuleClass>	getModuleClass() const;
+			//@}
+			
+			//! @name Setters
+			//@{
+				void setModuleClass(boost::shared_ptr<const server::ModuleClass> value);
+			//@}
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -95,14 +106,11 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 
 			virtual std::string getTitle() const;
-			virtual std::string getParameterName() const;
-			virtual std::string getParameterValue() const;
 
 			/** Gets the opening position of the node in the tree view.
 				@return A module page is always visible in the tree

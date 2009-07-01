@@ -34,7 +34,7 @@
 #include <vector>
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -45,17 +45,23 @@ namespace synthese
 
 	namespace security
 	{
+		const string DeleteProfileAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "p");
+		
 		ParametersMap DeleteProfileAction::getParametersMap() const
 		{
-			ParametersMap map;
-			return map;
+			ParametersMap m;
+			if(_profile.get()) m.insert(PARAMETER_PROFILE_ID, _profile->getKey());
+			return m;
 		}
 
 		void DeleteProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				_profile = ProfileTableSync::Get(_request->getObjectId(),*_env);
+				_profile = ProfileTableSync::Get(
+					map.get<RegistryKeyType>(PARAMETER_PROFILE_ID),
+					*_env
+				);
 			}
 			catch(...)
 			{
@@ -86,6 +92,11 @@ namespace synthese
 		bool DeleteProfileAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<SecurityRight>(DELETE_RIGHT);
+		}
+		
+		void DeleteProfileAction::setProfile(boost::shared_ptr<Profile> value)
+		{
+			_profile = const_pointer_cast<const Profile>(value);
 		}
 	}
 }

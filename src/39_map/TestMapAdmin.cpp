@@ -28,9 +28,7 @@
 #include "JpegRenderer.h"
 #include "PostscriptRenderer.h"
 #include "PropertiesHTMLTable.h"
-#include "AdminRequest.h"
-#include "FunctionRequest.h"
-#include "Request.h"
+#include "AdminFunctionRequest.hpp"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -123,8 +121,7 @@ namespace synthese
 		void TestMapAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> testMapRequest(_request);
-			testMapRequest.getFunction()->setPage<TestMapAdmin>();
+			AdminFunctionRequest<TestMapAdmin> testMapRequest(_request);
 			
 			// Form
 			PropertiesHTMLTable  st(testMapRequest.getHTMLForm("test"));
@@ -153,20 +150,22 @@ namespace synthese
 			return _request->isAuthorized<GlobalRight>(READ);;
 		}
 		
-		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MapModule::FACTORY_KEY)
-				links.push_back(getPageLink());
-			return links;
-		}
-		
-		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
+			if(moduleKey == MapModule::FACTORY_KEY)
+			{
+				if(dynamic_cast<const TestMapAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
+			}
 			return links;
 		}
 	}

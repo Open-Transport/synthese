@@ -43,7 +43,8 @@ namespace synthese
 			@author Hugues Romain
 			@date 2008
 		*/
-		class ResaCustomerAdmin : public admin::AdminInterfaceElementTemplate<ResaCustomerAdmin>
+		class ResaCustomerAdmin :
+			public admin::AdminInterfaceElementTemplate<ResaCustomerAdmin>
 		{
 			boost::shared_ptr<const security::User>		_user;
 			dblog::DBLogHTMLView						_log;
@@ -94,28 +95,6 @@ namespace synthese
 			bool isAuthorized(
 			) const;
 			
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param parentLink Link to the parent page
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the parent page designed in parentLink
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
-			
-			/** Sub pages getter.
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the current page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
 			
 			/** Title generator.
 				@return The title of the page
@@ -124,21 +103,11 @@ namespace synthese
 			*/
 			virtual std::string getTitle() const;
 			
-			/** Parameter name getter.
-				@return The name of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterName() const;
 			
-			/** Parameter value getter.
-				@return The value of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterValue() const;
-
 			virtual void _buildTabs() const;
+			
+			void setUser(boost::shared_ptr<security::User> value);
+			void setUser(boost::shared_ptr<const security::User> value);
 		};
 	}
 }

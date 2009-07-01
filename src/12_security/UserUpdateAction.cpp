@@ -33,6 +33,7 @@
 #include "DBLogModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -45,22 +46,23 @@ namespace synthese
 	
 	namespace security
 	{
-		const std::string UserUpdateAction::PARAMETER_LOGIN = Action_PARAMETER_PREFIX + "login";
-		const std::string UserUpdateAction::PARAMETER_SURNAME = Action_PARAMETER_PREFIX + "surn";
-		const std::string UserUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
-		const std::string UserUpdateAction::PARAMETER_ADDRESS = Action_PARAMETER_PREFIX + "addr";
-		const std::string UserUpdateAction::PARAMETER_POSTAL_CODE = Action_PARAMETER_PREFIX + "post";
-		const std::string UserUpdateAction::PARAMETER_CITY = Action_PARAMETER_PREFIX + "city";
-		const std::string UserUpdateAction::PARAMETER_PHONE = Action_PARAMETER_PREFIX + "phon";
-		const std::string UserUpdateAction::PARAMETER_EMAIL = Action_PARAMETER_PREFIX + "email";
-		const std::string UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN = Action_PARAMETER_PREFIX + "auth";
-		const std::string UserUpdateAction::PARAMETER_PROFILE_ID = Action_PARAMETER_PREFIX + "prof";
+		const string UserUpdateAction::PARAMETER_USER_ID(Action_PARAMETER_PREFIX + "u");
+		const string UserUpdateAction::PARAMETER_LOGIN = Action_PARAMETER_PREFIX + "login";
+		const string UserUpdateAction::PARAMETER_SURNAME = Action_PARAMETER_PREFIX + "surn";
+		const string UserUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
+		const string UserUpdateAction::PARAMETER_ADDRESS = Action_PARAMETER_PREFIX + "addr";
+		const string UserUpdateAction::PARAMETER_POSTAL_CODE(Action_PARAMETER_PREFIX + "post");
+		const string UserUpdateAction::PARAMETER_CITY = Action_PARAMETER_PREFIX + "city";
+		const string UserUpdateAction::PARAMETER_PHONE = Action_PARAMETER_PREFIX + "phon";
+		const string UserUpdateAction::PARAMETER_EMAIL = Action_PARAMETER_PREFIX + "email";
+		const string UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN(Action_PARAMETER_PREFIX + "a");
+		const string UserUpdateAction::PARAMETER_PROFILE_ID = Action_PARAMETER_PREFIX + "prof";
 
 
 		ParametersMap UserUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_user.get()) map.insert(PARAMETER_USER_ID, _user->getKey());
 			return map;
 		}
 
@@ -68,12 +70,15 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::GetEditable(_request->getObjectId(), *_env);
+				_user = UserTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_USER_ID),
+					*_env
+				);
 
 				_login = map.getString(PARAMETER_LOGIN, true, FACTORY_KEY);
 				if (_login.empty())
 					throw ActionException("Le login ne peut être vide");
-				// Put a control of unicity
+				//TODO Put a control of unicity
 
 				_surname = map.getString(PARAMETER_SURNAME, true, FACTORY_KEY);
 
@@ -151,6 +156,12 @@ namespace synthese
 		) const {
 			return _request->isAuthorized<SecurityRight>(WRITE) ||
 				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
+		}
+		
+		
+		void UserUpdateAction::setUser(boost::shared_ptr<const User> value)
+		{
+			_user = const_pointer_cast<User>(value);
 		}
 	}
 }

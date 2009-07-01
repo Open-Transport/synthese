@@ -29,6 +29,7 @@
 #include "AdminInterfaceElement.h"
 #include "AdminPagePositionInterfaceElement.h"
 #include "AdminParametersException.h"
+#include "AdminRequest.h"
 
 using namespace boost;
 using namespace std;
@@ -76,6 +77,7 @@ namespace synthese
 			const AdminInterfaceElement::PageLinks& links((*page)->getTreePosition());
 
 			bool first(true);
+			FunctionRequest<AdminRequest> r(request);
 			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
 			{
 				if(!withFirst && it == links.begin() && it != links.end()-1) continue;
@@ -92,13 +94,14 @@ namespace synthese
 
 				if(withImages)
 				{
-					stream << HTMLModule::getHTMLImage(it->icon, it->name);
+					stream << HTMLModule::getHTMLImage((*it)->getIcon(), (*it)->getTitle());
 				}
 
+				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(*it));
 				if (withLinks && it != (links.end() -1))
-					stream << HTMLModule::getHTMLLink(it->getURL(), it->name);
+					stream << HTMLModule::getHTMLLink(r.getURL(), (*it)->getTitle());
 				else
-					stream << it->name;
+					stream << (*it)->getTitle();
 			}
 			return string();
 		}

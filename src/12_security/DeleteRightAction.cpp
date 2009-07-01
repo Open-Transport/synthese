@@ -30,17 +30,20 @@
 #include "ParametersMap.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<Action, security::DeleteRightAction>::FACTORY_KEY("dra");
 	
 	namespace security
 	{
+		const string DeleteRightAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "p");
 		const string DeleteRightAction::PARAMETER_RIGHT = Action_PARAMETER_PREFIX + "right";
-		const string DeleteRightAction::PARAMETER_PARAMETER = Action_PARAMETER_PREFIX + "param";
+		const string DeleteRightAction::PARAMETER_PARAMETER(Action_PARAMETER_PREFIX + "m");
 
 		ParametersMap DeleteRightAction::getParametersMap() const
 		{
@@ -50,6 +53,7 @@ namespace synthese
 				map.insert(PARAMETER_RIGHT, _right->getFactoryKey());
 				map.insert(PARAMETER_PARAMETER, _right->getParameter());
 			}
+			if(_profile.get()) map.insert(PARAMETER_PROFILE_ID, _profile->getKey());
 			return map;
 		}
 
@@ -57,7 +61,10 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), *_env);
+				_profile = ProfileTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_PROFILE_ID),
+					*_env
+				);
 			}
 			catch(...)
 			{
@@ -86,6 +93,12 @@ namespace synthese
 		bool DeleteRightAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<SecurityRight>(WRITE);
+		}
+		
+		
+		void DeleteRightAction::setProfile(boost::shared_ptr<const Profile> value)
+		{
+			_profile = const_pointer_cast<Profile>(value);
 		}
 	}
 }

@@ -23,14 +23,13 @@
 #ifndef SYNTHESE_INTERFACES_ADMIN_INTERFACE_ELEMENT_H
 #define SYNTHESE_INTERFACES_ADMIN_INTERFACE_ELEMENT_H
 
-#include <string>
-
 #include "FactoryBase.h"
 #include "11_interfaces/Types.h"
 #include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
 
+#include <string>
 #include <vector>
+#include <boost/enable_shared_from_this.hpp>
 
 namespace synthese
 {
@@ -55,60 +54,33 @@ namespace synthese
 		///		- un utilisateur anonyme n'a accès à aucun composant d'administration
 		///		- un administrateur a accès à tous les composants d'administration.
 		////////////////////////////////////////////////////////////////////
-		class AdminInterfaceElement
-		:	public util::FactoryBase<AdminInterfaceElement>
+		class AdminInterfaceElement:
+			public util::FactoryBase<AdminInterfaceElement>,
+			public boost::enable_shared_from_this<AdminInterfaceElement>
 		{
 		public:
-			////////////////////////////////////////////////////////////////////
-			/// Link to the administrative page.
-			////////////////////////////////////////////////////////////////////
-			struct PageLink
-			{
-				std::string name;
-				std::string factoryKey;
-				std::string parameterName;
-				std::string parameterValue;
-				std::string icon;
-				const server::FunctionRequest<admin::AdminRequest>* request;
-
-				bool operator==(const PageLink& other) const;
-
-				
-				
-				////////////////////////////////////////////////////////////////////
-				///	URL generator.
-				///	@return std::string the URL to access to the page
-				///	@author Hugues Romain
-				///	@date 2008
-				////////////////////////////////////////////////////////////////////
-				std::string getURL(
-				) const;
-
-				
-				
-				////////////////////////////////////////////////////////////////////
-				///	Admin Page generator.
-				///	@return AdminInterfaceElement* the page (delete after use)
-				///	@author Hugues Romain
-				///	@date 2008
-				////////////////////////////////////////////////////////////////////
-				AdminInterfaceElement* getAdminPage(
-				) const;
-			};
+			typedef std::vector<boost::shared_ptr<const AdminInterfaceElement> > PageLinks;
 			
-			typedef std::vector<PageLink> PageLinks;
+			template<class T>
+			static void AddToLinks(PageLinks& links, boost::shared_ptr<T> o)
+			{
+				links.push_back(boost::static_pointer_cast<const AdminInterfaceElement, T>(o));
+			}
 			
 			////////////////////////////////////////////////////////////////////
 			/// Tree of links to administrative pages.
 			////////////////////////////////////////////////////////////////////
 			struct PageLinksTree
 			{
-				PageLink					pageLink;
-				std::vector<PageLinksTree>	subPages;
-				bool						isNodeOpened;
+				boost::shared_ptr<const AdminInterfaceElement>	page;
+				std::vector<PageLinksTree>		subPages;
+				bool							isNodeOpened;
 
-				PageLinksTree()
-					: pageLink(), subPages(), isNodeOpened(false) {}
+				PageLinksTree(
+					boost::shared_ptr<const AdminInterfaceElement> page_
+				):	page(page_), subPages(), isNodeOpened(false) {}
+				PageLinksTree(
+				):	page(), subPages(), isNodeOpened(false) {}
 			};
 
 
@@ -225,7 +197,7 @@ namespace synthese
 			//@}
 
 			PageLinksTree	_buildTreeRecursion(
-				const AdminInterfaceElement* page,
+				boost::shared_ptr<const AdminInterfaceElement> page,
 				const PageLinks position
 			) const;
 
@@ -242,7 +214,7 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			void _buildTree(
 			) const;
-
+			
 			
 			
 			//! \name Tabs management
@@ -443,29 +415,7 @@ namespace synthese
 
 				virtual std::string getIcon() const = 0;
 				virtual std::string getTitle() const = 0;
-				virtual std::string getParameterName() const;
-				virtual std::string getParameterValue() const;
-
-				/** Current page link getter.
-					@return const PageLink& Current page link
-					@author Hugues Romain
-					@date 2008					
-				*/
-				PageLink getPageLink() const;
-
-				/** Gets sub page of the designed parent page, which are from the current class.
-					@param factoryKey Key of the parent class
-					@param request User request
-					@return PageLinks Ordered vector of sub pages links
-					@author Hugues Romain
-					@date 2008
-					
-				*/
-				virtual PageLinks getSubPagesOfParent(
-					const PageLink& parentLink
-					, const AdminInterfaceElement& currentPage
-				) const = 0;
-
+				
 
 				/** Sub pages getter.
 					@param request User request
@@ -477,10 +427,27 @@ namespace synthese
 					This method can be overloaded to create customized sub tree.
 				*/
 				virtual PageLinks getSubPages(
-					const AdminInterfaceElement& currentPage
+					boost::shared_ptr<const AdminInterfaceElement> currentPage
 				) const;
 
 
+
+				virtual PageLinks getSubPagesOfModule(
+					const std::string& moduleKey,
+					boost::shared_ptr<const AdminInterfaceElement> currentPage
+				) const;
+
+
+				boost::shared_ptr<AdminInterfaceElement> getNewPage() const;
+
+
+				template<class T>
+				boost::shared_ptr<T> getNewOtherPage() const {
+					boost::shared_ptr<T> page(new T);
+					page->setRequest(_request);
+					return page;
+				}
+				
 
 				/** Gets the opening position of the node in the tree view.
 					@return bool true = the page is visible, all the superior nodes are open, false = the page must not be visible, and will be hidden if no one another page of the same level must be visible.

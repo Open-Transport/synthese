@@ -20,7 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Conversion.h"
 #include "01_util/Constants.h"
 #include "ActionResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
@@ -39,8 +38,10 @@
 #include "AdminModule.h"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 
+#include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <map>
 #include <string>
@@ -114,17 +115,15 @@ namespace synthese
 		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<ProfilesAdmin> searchRequest(_request);
 
-			FunctionRequest<AdminRequest> profileRequest(_request);
-			profileRequest.getFunction()->setPage<ProfileAdmin>();
+			AdminFunctionRequest<ProfileAdmin> profileRequest(_request);
 
-			ActionFunctionRequest<DeleteProfileAction, AdminRequest> deleteProfileRequest(_request);
+			AdminActionFunctionRequest<DeleteProfileAction, ProfilesAdmin> deleteProfileRequest(_request);
 			
-			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(_request);
-			addProfileRequest.getFunction()->setPage<ProfileAdmin>();
+			AdminActionFunctionRequest<AddProfileAction, ProfileAdmin> addProfileRequest(_request);
 			addProfileRequest.getFunction()->setActionFailedPage<ProfilesAdmin>();
-			addProfileRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addProfileRequest.setActionWillCreateObject();
 
 			
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
@@ -149,17 +148,20 @@ namespace synthese
 				AddProfileAction::PARAMETER_TEMPLATE_ID,
 				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
 			);
-			t.getActionForm().addHiddenField(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE));
+			t.getActionForm().addHiddenField(
+				AddProfileAction::PARAMETER_TEMPLATE_ID,
+				lexical_cast<string>(UNKNOWN_VALUE)
+			);
 
 			stream << t.open();
 			
 			// Profiles loop
 			BOOST_FOREACH(shared_ptr<Profile> profile, _getEnv().getRegistry<Profile>())
 			{
-				profileRequest.setObjectId(profile->getKey());
-				deleteProfileRequest.setObjectId(profile->getKey());
+				profileRequest.getPage()->setProfile(profile);
+				deleteProfileRequest.getAction()->setProfile(profile);
 
-				stream << t.row(Conversion::ToString(profile->getKey()));
+				stream << t.row(lexical_cast<string>(profile->getKey()));
 				stream << t.col() << profile->getName();
 				stream << t.col();
 
@@ -201,14 +203,22 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfParent(
-			const PageLink& parentLink,
-			const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
+			const string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == SecurityModule::FACTORY_KEY)
+			
+			if(moduleKey == SecurityModule::FACTORY_KEY)
 			{
-				links.push_back(getPageLink());
+				if(dynamic_cast<const ProfilesAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
 			}
 			return links;
 		}

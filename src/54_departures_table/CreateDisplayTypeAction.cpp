@@ -123,10 +123,7 @@ namespace synthese
 			DisplayTypeTableSync::Save(&dt);
 
 			// Request update
-			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-			{
-				_request->setObjectId(dt.getKey());
-			}
+			_request->setActionCreatedId(dt.getKey());
 
 			// Log
 			ArrivalDepartureTableLog::addCreateEntry(dt, *_request->getUser());

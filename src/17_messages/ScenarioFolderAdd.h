@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_ScenarioFolderAdd_H__
 #define SYNTHESE_ScenarioFolderAdd_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -69,7 +68,12 @@ namespace synthese
 			
 			ScenarioFolderAdd();
 
-			void setParentId(uid value);
+			void setParent(
+				boost::shared_ptr<ScenarioFolder> value
+			);
+			void setParent(
+				boost::shared_ptr<const ScenarioFolder> value
+			);
 
 			virtual bool _isAuthorized() const;
 		};

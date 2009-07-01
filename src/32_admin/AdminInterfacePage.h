@@ -40,12 +40,16 @@ namespace synthese
 
 			Available data :
 				- object_id : current object id
+			
+			Parameters :
+				- 0 : user_full_name : User full name
 		*/
-		class AdminInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,AdminInterfacePage>
+		class AdminInterfacePage :
+			public util::FactorableTemplate<interfaces::InterfacePage,AdminInterfacePage>
 		{
 		public:
-			static const std::string DATA_OBJECT_ID;
-
+			static const std::string DATA_USER_FULL_NAME;
+			
 			AdminInterfacePage();
 
 			/** Display of the admin page.
@@ -54,10 +58,11 @@ namespace synthese
 				@param parameters Parameters to transmit to the AdminInterfaceElement to display
 				@param site Displayed site
 			*/
-			void display( std::ostream& stream
-				, const boost::shared_ptr<const AdminInterfaceElement>* page
-				, const uid objectId
-				, const server::Request* request = NULL ) const;
+			void display(
+				std::ostream& stream,
+				const boost::shared_ptr<const AdminInterfaceElement>* page,
+				const server::Request* request = NULL
+			) const;
 
 		};
 	}

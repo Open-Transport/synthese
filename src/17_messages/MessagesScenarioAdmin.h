@@ -115,16 +115,6 @@ namespace synthese
 
 			bool isAuthorized() const;
 
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param factoryKey Key of the parent class
-				@return PageLinks A link to the page if the parent is DBLogList and if the page is the currently displayed one
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
 
 			/** Sub pages getter.
 				@return PageLinks Ordered vector of sub pages links
@@ -134,16 +124,16 @@ namespace synthese
 				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
 				This method can be overloaded to create customized sub tree.
 			*/
-			virtual PageLinks getSubPages(const AdminInterfaceElement& currentPage
+			virtual PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 
 			virtual std::string getTitle() const;
-			virtual std::string getParameterName() const;
-			virtual std::string getParameterValue() const;
 
 			virtual void _buildTabs() const;
 
 			boost::shared_ptr<const Scenario> getScenario() const;
+			void setScenario(boost::shared_ptr<Scenario> value);
 		};
 	}
 }

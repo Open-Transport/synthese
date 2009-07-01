@@ -115,19 +115,30 @@ namespace synthese
 
 
 
-		void ScenarioTemplateInheritedTableSync::Search( util::Env& env, uid folderId , const std::string name /*= std::string() */, const ScenarioTemplate* scenarioToBeDifferentWith /*= NULL */, int first /*= 0 */, int number /*= -1 */, bool orderByName /*= true */, bool raisingOrder /*= false*/, util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */ )
-		{
+		void ScenarioTemplateInheritedTableSync::Search(
+			util::Env& env,
+			optional<RegistryKeyType> folderId,
+			const std::string name /*= std::string() */,
+			const ScenarioTemplate* scenarioToBeDifferentWith /*= NULL */,
+			int first /*= 0 */,
+			int number /*= -1 */,
+			bool orderByName /*= true */,
+			bool raisingOrder /*= false*/,
+			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				<< COL_IS_TEMPLATE << "=1";
-			if (folderId > 0)
-				query << " AND " << COL_FOLDER_ID << "=" << Conversion::ToString(folderId);
-			else if (folderId == 0)
-				query << " AND (" << COL_FOLDER_ID << "=0 OR " << COL_FOLDER_ID << " IS NULL)";
-
+			if(folderId)
+			{
+				query << " AND (" << COL_FOLDER_ID << "=" << *folderId;
+				if (*folderId == 0)
+					query << " OR " << COL_FOLDER_ID << " IS NULL";
+				query << ")";
+			}
 			if (!name.empty())
 				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
 			if (scenarioToBeDifferentWith)

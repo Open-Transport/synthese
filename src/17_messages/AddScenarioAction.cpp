@@ -69,12 +69,14 @@ namespace synthese
 		void AddScenarioAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Template to copy
-			uid id(map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE)
+			optional<RegistryKeyType> id(
+				map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE_ID)
+			);
+			if (id)
 			{
 				try
 				{
-					_template = ScenarioTemplateInheritedTableSync::Get(id, *_env);
+					_template = ScenarioTemplateInheritedTableSync::Get(*id, *_env);
 				}
 				catch(...)
 				{
@@ -83,10 +85,21 @@ namespace synthese
 			}
 
 			// Folder
-			setFolderId(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
+			id = map.getOptional<RegistryKeyType>(PARAMETER_FOLDER_ID);
+			if(id && *id > 0)
+			{
+				try
+				{
+					_folder = ScenarioFolderTableSync::GetEditable(*id, *_env);
+				}
+				catch (...)
+				{
+					throw ActionException("Bad folder ID");
+				}
+			}
 			
 			// Name
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.get<string>(PARAMETER_NAME);
 			if(_name.empty())
 				throw ActionException("Le scénario doit avoir un nom.");
 			Env env;
@@ -110,10 +123,7 @@ namespace synthese
 				);
 
 				// Remember of the id of created object to view it after the action
-				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_request->setObjectId(scenario.getKey());
-				}
+				_request->setActionCreatedId(scenario.getKey());
 
 				// Log
 				MessagesLibraryLog::addCreateEntry(
@@ -129,10 +139,7 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 
 				// Remember of the id of created object to view it after the action
-				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_request->setObjectId(scenario.getKey());
-				}
+				_request->setActionCreatedId(scenario.getKey());
 
 				MessagesLibraryLog::addCreateEntry(
 					scenario, _request->getUser().get()
@@ -140,19 +147,15 @@ namespace synthese
 			}
 		}
 
-		void AddScenarioAction::setFolderId( uid id)
-		{
-			if (id > 0)
-			{
-				try
-				{
-					_folder = ScenarioFolderTableSync::GetEditable(id, *_env);
-				}
-				catch (...)
-				{
-					throw ActionException("Bad folder ID");
-				}
-			}
+		void AddScenarioAction::setFolder(
+			shared_ptr<ScenarioFolder> value
+		){
+			_folder = value;
+		}
+		void AddScenarioAction::setFolder(
+			shared_ptr<const ScenarioFolder> value
+		){
+			_folder = const_pointer_cast<ScenarioFolder>(value);
 		}
 
 

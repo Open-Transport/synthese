@@ -42,7 +42,8 @@
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "ActionException.h"
@@ -87,13 +88,15 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				return;
-
+			if(_request->getActionWillCreateObject()) return;
+			
 			try
 			{
-				_scenario = ScenarioTableSync::Get(id, _getEnv(), UP_LINKS_LOAD_LEVEL);
+				_scenario = ScenarioTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv(),
+					UP_LINKS_LOAD_LEVEL
+				);
 				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
 				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
 			}
@@ -133,9 +136,7 @@ namespace synthese
 			// TAB PARAMETERS
 			if (openTabContent(stream, TAB_PARAMETERS))
 			{
-				ActionFunctionRequest<ScenarioUpdateDatesAction, AdminRequest> updateDatesRequest(_request);
-				updateDatesRequest.getFunction()->setPage<MessagesScenarioAdmin>();
-				updateDatesRequest.setObjectId(_scenario->getKey());
+				AdminActionFunctionRequest<ScenarioUpdateDatesAction, MessagesScenarioAdmin> updateDatesRequest(_request);
 				updateDatesRequest.getAction()->setScenarioId(_scenario->getKey());
 
 				stream << "<h1>Paramètres</h1>";
@@ -181,16 +182,10 @@ namespace synthese
 			// TAB MESSAGES
 			if (openTabContent(stream, TAB_MESSAGES))
 			{
-				FunctionRequest<AdminRequest> messRequest(_request);
-				messRequest.getFunction()->setPage<MessageAdmin>();
+				AdminActionFunctionRequest<DeleteAlarmAction,MessagesScenarioAdmin> deleteRequest(_request);
 
-				ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(_request);
-				deleteRequest.getFunction()->setPage<MessagesScenarioAdmin>();
-				deleteRequest.setObjectId(_scenario->getKey());
-
-				ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(_request);
-				addRequest.getFunction()->setPage<MessageAdmin>();
-				addRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+				AdminActionFunctionRequest<NewMessageAction,MessageAdmin> addRequest(_request);
+				addRequest.setActionWillCreateObject();
 				addRequest.getAction()->setScenarioId(_scenario->getKey());
 
 				stream << "<h1>Messages</h1>";
@@ -224,9 +219,10 @@ namespace synthese
 
 				stream << t.open();
 
+				AdminFunctionRequest<MessageAdmin> messRequest(_request);
 				BOOST_FOREACH(shared_ptr<Alarm> alarm, v)
 				{
-					messRequest.setObjectId(alarm->getKey());
+					messRequest.getPage()->setMessage(alarm);
 					deleteRequest.getAction()->setAlarmId(alarm->getKey());
 
 					stream << t.row(Conversion::ToString(alarm->getKey()));
@@ -302,19 +298,17 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPagesOfParent(
-			const PageLink& parentLink,
-			const AdminInterfaceElement& currentPage
-		) const	{
+
+
+		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages(
+			shared_ptr<const AdminInterfaceElement> currentPage
+		) const {
 			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
-
-
-
-		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages( const AdminInterfaceElement& currentPage) const
-		{
-			AdminInterfaceElement::PageLinks links;
+			
+			const MessageAdmin* ma(
+				dynamic_cast<const MessageAdmin*>(currentPage.get())
+			);
+			
 			Env env;
 			if (_sentScenario.get())
 			{
@@ -323,13 +317,19 @@ namespace synthese
 				);
 				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, env.getRegistry<SentAlarm>())
 				{
-					AdminInterfaceElement::PageLink link(getPageLink());
-					link.factoryKey = MessageAdmin::FACTORY_KEY;
-					link.name = alarm->getShortMessage();
-					link.icon = MessageAdmin::ICON;
-					link.parameterName = Request::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString(alarm->getKey());
-					links.push_back(link);
+					if(	ma &&
+						ma->getAlarm()->getKey() == alarm->getKey()
+					){
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<MessageAdmin> p(
+							getNewOtherPage<MessageAdmin>()
+						);
+						p->setMessage(alarm);
+						AddToLinks(links, p);
+					}
 				}
 			}
 			else if (_templateScenario.get())
@@ -339,13 +339,19 @@ namespace synthese
 				);
 				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
 				{
-					AdminInterfaceElement::PageLink link(getPageLink());
-					link.factoryKey = MessageAdmin::FACTORY_KEY;
-					link.name = alarm->getShortMessage();
-					link.icon = MessageAdmin::ICON;
-					link.parameterName = Request::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString(alarm->getKey());
-					links.push_back(link);
+					if(	ma &&
+						ma->getAlarm()->getKey() == alarm->getKey()
+					){
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<MessageAdmin> p(
+							getNewOtherPage<MessageAdmin>()
+						);
+						p->setMessage(alarm);
+						AddToLinks(links, p);
+					}
 				}
 			}
 
@@ -359,15 +365,6 @@ namespace synthese
 			return _scenario.get() ? _scenario->getName() : DEFAULT_TITLE;
 		}
 
-		std::string MessagesScenarioAdmin::getParameterName() const
-		{
-			return _scenario.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string MessagesScenarioAdmin::getParameterValue() const
-		{
-			return _scenario.get() ? Conversion::ToString(_scenario->getKey()) : string();
-		}
 
 
 
@@ -391,6 +388,11 @@ namespace synthese
 		boost::shared_ptr<const Scenario> MessagesScenarioAdmin::getScenario() const
 		{
 			return _scenario;
+		}
+		
+		void MessagesScenarioAdmin::setScenario(boost::shared_ptr<Scenario> value)
+		{
+			_scenario = const_pointer_cast<const Scenario>(value);
 		}
 	}
 }

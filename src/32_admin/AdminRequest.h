@@ -39,6 +39,8 @@ namespace synthese
 		
 		/** Administration console Function Class.
 			@ingroup m14Functions refFunctions
+			
+			@warning Must be linked to the Request by FunctionRequest<AdminRequest> or its subclasses.
 		*/
 		class AdminRequest:
 			public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, AdminRequest>
@@ -54,7 +56,6 @@ namespace synthese
 			//@{
 				boost::shared_ptr<AdminInterfaceElement>	_page;
 				boost::shared_ptr<AdminInterfaceElement>	_actionFailedPage;
-				server::ParametersMap						_parameters;
 			//@}
 
 
@@ -72,37 +73,24 @@ namespace synthese
 
 			virtual bool _isAuthorized() const;
 
-
-
 		public:
-			void setPage(boost::shared_ptr<AdminInterfaceElement> aie);
+		
+			//! @name Getters
+			//@{
+				boost::shared_ptr<AdminInterfaceElement> getPage() const;
+			//@}
+			
+			//! @name Setters
+			//@{
+				void setPage(boost::shared_ptr<AdminInterfaceElement> aie);
+				void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie);
+	
+				template<class T>
+				void setActionFailedPage();
+			//@}
 
-			template<class T>
-			void setPage();
-
-			void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie);
-
-			template<class T>
-			void setActionFailedPage();
-
-			boost::shared_ptr<AdminInterfaceElement> getPage() const;
-
-			void setParameter(const std::string& name, const std::string value);
 
 			virtual std::string getOutputMimeType() const;
-
-			////////////////////////////////////////////////////////////////////
-			///	Sets the function to display the same page with same parameters.
-			///	@param page the current page (always use this)
-			///	@author Hugues Romain
-			///	@date 2008
-			/// The following parameters are copied :
-			///		- page key
-			///		- object id
-			///		- active tab = current tab of this at the method call
-			///		- same env
-			////////////////////////////////////////////////////////////////////
-			virtual void _copy(boost::shared_ptr<const Function> other);
 		};
 
 		template<class T>
@@ -110,13 +98,6 @@ namespace synthese
 		{
 		    _actionFailedPage.reset(new T);
 			_actionFailedPage->setRequest(static_cast<const server::FunctionRequest<AdminRequest>* >(_request));
-		}
-
-		template<class T>
-		void AdminRequest::setPage()
-		{
-			_page.reset(new T);
-			_page->setRequest(static_cast<const server::FunctionRequest<AdminRequest>* >(_request));
 		}
 	}
 }

@@ -21,10 +21,10 @@
 */
 
 #include "RoutePlannerInterfacePage.h"
-
+#include "Request.h"
 #include "HourPeriod.h"
 #include "Site.h"
-
+#include "User.h"
 #include "City.h"
 #include "Place.h"
 #include "AccessParameters.h"
@@ -70,6 +70,8 @@ namespace synthese
 		const string RoutePlannerInterfacePage::DATA_ACCESSIBILITY_CODE("accessibility_code");
 		const string RoutePlannerInterfacePage::DATA_SITE_ID("site_id");
 		const string RoutePlannerInterfacePage::DATA_IS_SAME_PLACES("is_same_places");
+		const string RoutePlannerInterfacePage::DATA_USER_FULL_NAME("user_full_name");
+		const string RoutePlannerInterfacePage::DATA_USER_PHONE("user_phone");
 
 		void RoutePlannerInterfacePage::display(
 			ostream& stream
@@ -123,6 +125,21 @@ namespace synthese
 			pv.push_back(lexical_cast<string>(accessParameters.getUserClass()));
 			pv.push_back(lexical_cast<string>(site->getKey()));
 			pv.push_back(lexical_cast<string>(samePlaces));
+			pv.push_back(
+				request->getUser().get() ?
+				request->getUser()->getFullName() :
+				string()
+			);
+			pv.push_back(
+				request->getUser().get() ?
+				request->getUser()->getPhone() :
+				string()
+			);
+			pv.push_back(
+				request->getUser().get() ?
+				lexical_cast<string>(request->getUser()->getKey()) :
+				string()
+			);
 
 			InterfacePage::_display(stream, pv, variables, vobj, request);
 		}
@@ -164,6 +181,21 @@ namespace synthese
 			pv.push_back(lexical_cast<string>(accessParameters.getUserClass()));
 			pv.push_back(lexical_cast<string>(site->getKey()));
 			pv.push_back("0");
+			pv.push_back(
+				request->getUser().get() ?
+				request->getUser()->getFullName() :
+				string()
+			);
+			pv.push_back(
+				request->getUser().get() ?
+				request->getUser()->getPhone() :
+				string()
+			);
+			pv.push_back(
+				request->getUser().get() ?
+				lexical_cast<string>(request->getUser()->getKey()) :
+				string()
+			);
 
 			InterfacePage::_display(stream, pv, variables, NULL, request);
 

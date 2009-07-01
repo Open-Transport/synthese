@@ -72,11 +72,26 @@ namespace synthese
 		
 		void ScenarioFolderUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setFolderId(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			RegistryKeyType id(
+				map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+			);
+			try
+			{
+				if (id > 0)
+				{
+					_folder = ScenarioFolderTableSync::GetEditable(id, *_env);
+				}
+			}
+			catch(...)
+			{
+				throw ActionException("No such folder");
+			}
 
 			try
 			{
-				uid id(map.getUid(PARAMETER_PARENT_FOLDER_ID, true, FACTORY_KEY));
+				RegistryKeyType id(
+					map.get<RegistryKeyType>(PARAMETER_PARENT_FOLDER_ID)
+				);
 				if (id > 0)
 				{
 					_parentFolder = ScenarioFolderTableSync::GetEditable(id, *_env);
@@ -90,7 +105,7 @@ namespace synthese
 			if ((!_folder.get() && !_parentFolder.get()) || (_folder.get() && _parentFolder.get() && _folder->getKey() == _parentFolder->getKey()))
 				throw ActionException("The folder and the parent folder cannot be the same");
 
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.get<string>(PARAMETER_NAME);
 
 			if (_name != _folder->getName())
 			{
@@ -113,20 +128,18 @@ namespace synthese
 
 
 
-		void ScenarioFolderUpdateAction::setFolderId( uid id )
-		{
-			try
-			{
-				if (id > 0)
-				{
-					_folder = ScenarioFolderTableSync::GetEditable(id, *_env);
-				}
-			}
-			catch(...)
-			{
-				throw ActionException("No such folder");
-			}
+		void ScenarioFolderUpdateAction::setFolder(
+			shared_ptr<ScenarioFolder> value
+		){
+			_folder = value;
+		}
 
+
+
+		void ScenarioFolderUpdateAction::setFolder(
+			shared_ptr<const ScenarioFolder> value
+		){
+			_folder = const_pointer_cast<ScenarioFolder>(value);
 		}
 
 

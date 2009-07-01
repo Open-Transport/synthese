@@ -25,9 +25,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -38,9 +37,11 @@ namespace synthese
 		/** DeleteProfileAction action class.
 			@ingroup m12Actions refActions
 		*/
-		class DeleteProfileAction : public util::FactorableTemplate<server::Action, DeleteProfileAction>
+		class DeleteProfileAction:
+			public util::FactorableTemplate<server::Action, DeleteProfileAction>
 		{
 		public:
+			static const std::string PARAMETER_PROFILE_ID;
 
 		private:
 			boost::shared_ptr<const Profile>	_profile;
@@ -61,6 +62,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setProfile(boost::shared_ptr<Profile> value);
 		};
 	}
 }

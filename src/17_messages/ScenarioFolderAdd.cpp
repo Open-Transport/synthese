@@ -75,11 +75,27 @@ namespace synthese
 		
 		void ScenarioFolderAdd::_setFromParametersMap(const ParametersMap& map)
 		{
-			setParentId(map.getUid(PARAMETER_PARENT_ID, false, FACTORY_KEY));
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_PARENT_ID));
+			if (id > 0)
+			{
+				try
+				{
+					_parent = ScenarioFolderTableSync::GetEditable(id, *_env);
+				}
+				catch(...)
+				{
+					throw ActionException("Le répertoire parent désigné n'existe pas.");
+				}
+			}
+			
+			_name = map.get<string>(PARAMETER_NAME);
 
 			Env env;
-			ScenarioFolderTableSync::Search(env, _parent.get() ? _parent->getKey() : 0, _name, 0, 1);
+			ScenarioFolderTableSync::Search(
+				env,
+				_parent.get() ? _parent->getKey() : 0,
+				_name, 0, 1
+			);
 			if (!env.getRegistry<ScenarioFolder>().empty())
 				throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
 		}
@@ -94,31 +110,25 @@ namespace synthese
 
 			ScenarioFolderTableSync::Save(&f);
 
-			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-			{
-				_request->setObjectId(f.getKey());
-			}
+			_request->setActionCreatedId(f.getKey());
 
 			MessagesLibraryLog::AddCreateEntry(f, _request->getUser().get());
 		}
 
 
 
-		void ScenarioFolderAdd::setParentId( uid id)
-		{
-			if (id > 0)
-			{
-				try
-				{
-					_parent = ScenarioFolderTableSync::GetEditable(id, *_env);
-				}
-				catch(...)
-				{
-					throw ActionException("Le répertoire parent désigné n'existe pas.");
-				}
-			}
-			if (id < 0)
-				throw ActionException("Bad parent folder id");
+		void ScenarioFolderAdd::setParent(
+			boost::shared_ptr<ScenarioFolder> value
+		){
+			_parent = value;
+		}
+
+
+
+		void ScenarioFolderAdd::setParent(
+			boost::shared_ptr<const ScenarioFolder> value
+		){
+			_parent = const_pointer_cast<ScenarioFolder>(value);
 		}
 
 

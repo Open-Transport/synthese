@@ -28,13 +28,13 @@
 #include "SecurityModule.h"
 #include "UserUpdateAction.h"
 #include "UserPasswordUpdateAction.h"
-#include "ActionFunctionRequest.h"
+#include "AdminActionFunctionRequest.hpp"
 #include "AdminRequest.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
-#include "Conversion.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -70,13 +70,15 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
+			if(_request->getActionWillCreateObject()) return;
+			
 			try
 			{
-				uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
-				if (id != UNKNOWN_VALUE && id != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_user = UserTableSync::Get(id,_getEnv(), UP_LINKS_LOAD_LEVEL);
-				}
+				_user = UserTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv(),
+					UP_LINKS_LOAD_LEVEL
+				);
 			}
 			catch (ObjectNotFoundException<User>& e)
 			{
@@ -89,7 +91,7 @@ namespace synthese
 		server::ParametersMap UserAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			m.insert(Request::PARAMETER_OBJECT_ID, _request->getObjectId());
+			if(_user.get()) m.insert(Request::PARAMETER_OBJECT_ID, _user->getKey());
 			return m;
 		}
 
@@ -97,8 +99,11 @@ namespace synthese
 
 		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
 		{
-			ActionFunctionRequest<UserUpdateAction, AdminRequest> updateRequest(_request);
-			ActionFunctionRequest<UserPasswordUpdateAction, AdminRequest> userPasswordUpdateRequest(_request);
+			AdminActionFunctionRequest<UserUpdateAction, UserAdmin> updateRequest(_request);
+			updateRequest.getAction()->setUser(_user);
+			
+			AdminActionFunctionRequest<UserPasswordUpdateAction, UserAdmin> userPasswordUpdateRequest(_request);
+			userPasswordUpdateRequest.getAction()->setUser(_user);
 
 			{
 				stream << "<h1>Propriétés</h1>";
@@ -139,29 +144,17 @@ namespace synthese
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks UserAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == UsersAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
-			{
-				links.push_back(currentPage.getPageLink());
-			}
-			return links;
-		}
+
 
 		std::string UserAdmin::getTitle() const
 		{
 			return _user.get() ? _user->getSurname() + " " + _user->getName() : DEFAULT_TITLE;
 		}
-
-		std::string UserAdmin::getParameterName() const
+		
+		
+		void UserAdmin::setUser(shared_ptr<User> value)
 		{
-			return _user.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string UserAdmin::getParameterValue() const
-		{
-			return _user.get() ? Conversion::ToString(_user->getKey()) : string();
+			_user = value;
 		}
 	}
 }

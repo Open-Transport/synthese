@@ -47,45 +47,20 @@ namespace synthese
 	namespace admin
 	{
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
-			const AdminInterfaceElement& currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
-			AdminInterfaceElement::PageLinks links;
-			if (!currentPage.isAuthorized()) return links;
-
-			PageLink currentPageLink(getPageLink());
-			Factory<AdminInterfaceElement>::ObjectsCollection pages(Factory<AdminInterfaceElement>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement> page, pages)
-			{
-				page->setRequest(_request);
-				if (page->isAuthorized())
-				{
-					PageLinks l(page->getSubPagesOfParent(currentPageLink, currentPage));
-					links.insert(links.end(), l.begin(), l.end());
-				}
-				else if(currentPage.getFactoryKey() == page->getFactoryKey())
-				{
-					PageLinks l(currentPage.getSubPagesOfParent(currentPageLink, currentPage));
-					links.insert(links.end(), l.begin(), l.end());
-				}
-			}
-			return links;
 		}
 
 
-		AdminInterfaceElement::PageLink AdminInterfaceElement::getPageLink() const
-		{
-			PageLink link;
-			link.factoryKey = getFactoryKey();
-			link.icon = getIcon();
-			link.name = getTitle();
-			link.parameterName = getParameterName();
-			link.parameterValue = getParameterValue();
-			link.request = _request;
-			return link;
+		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
+		) const {
+			return PageLinks();
 		}
-		
-		
-		
+
+
+
 		void AdminInterfaceElement::_buildTree(
 		) const {
 			// Cleaning
@@ -93,35 +68,42 @@ namespace synthese
 			_treePosition.clear();
 
 			// Initialisation
-			auto_ptr<HomeAdmin> homeAdmin(new HomeAdmin);
-			homeAdmin->setRequest(_request);
+			shared_ptr<HomeAdmin> homeAdmin;
+			if(dynamic_cast<const HomeAdmin*>(this))
+			{
+				homeAdmin = const_pointer_cast<HomeAdmin>(
+					static_pointer_cast<const HomeAdmin, const AdminInterfaceElement>(
+						shared_from_this()
+				)	);
+			}
+			else
+			{
+				homeAdmin.reset(new HomeAdmin);
+				homeAdmin->setRequest(_request);
+			}
 			PageLinks position;
-			PageLink homeLink(homeAdmin->getPageLink());
-			position.push_back(homeLink);
-			_tree = _buildTreeRecursion(homeAdmin.get(), position);
-			if (homeLink == getPageLink())
+			AddToLinks(position, homeAdmin);
+			_tree = _buildTreeRecursion(homeAdmin, position);
+			if (homeAdmin == shared_from_this())
 				_treePosition = position;
 		}
 
 
 
 		AdminInterfaceElement::PageLinksTree AdminInterfaceElement::_buildTreeRecursion(
-			const AdminInterfaceElement* adminPage,
+			shared_ptr<const AdminInterfaceElement> adminPage,
 			PageLinks position
 		) const {
 
 			// Local variables
-			AdminInterfaceElement::PageLinksTree	tree;
-			
-			// Tree
-			tree.pageLink = adminPage->getPageLink();
-			PageLink currentLink = getPageLink();
+			AdminInterfaceElement::PageLinksTree tree(adminPage);
+			shared_ptr<const AdminInterfaceElement> currentLink(shared_from_this());
 			
 			// Recursion
-			PageLinks pages = adminPage->getSubPages(*this);
-			BOOST_FOREACH(AdminInterfaceElement::PageLink link, pages)
+			PageLinks pages = adminPage->getSubPages(currentLink);
+			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, pages)
 			{
-				position.push_back(link);
+				AddToLinks(position, link);
 				if (link == currentLink)
 				{
 					_treePosition = position;
@@ -130,15 +112,21 @@ namespace synthese
 				
 				try
 				{
-					auto_ptr<AdminInterfaceElement>			subPage(link.getAdminPage());
-					AdminInterfaceElement::PageLinksTree	subTree(_buildTreeRecursion(subPage.get(), position));
+					AdminInterfaceElement::PageLinksTree subTree(
+						_buildTreeRecursion(link, position)
+					);
 
 					if (link == currentLink)
 						subTree.isNodeOpened = true;
 
 					tree.subPages.push_back(subTree);
 					if (!tree.isNodeOpened)
-						tree.isNodeOpened = subPage->isPageVisibleInTree(*this) || subTree.isNodeOpened;
+					{
+						tree.isNodeOpened =
+							link->isPageVisibleInTree(*this) ||
+							subTree.isNodeOpened
+						;
+					}
 				}
 				catch(...)
 				{
@@ -167,18 +155,6 @@ namespace synthese
 				_buildTree();
 			}
 			return _tree;
-		}
-
-		std::string AdminInterfaceElement::getParameterName() const
-		{
-			return std::string();
-		}
-
-
-
-		std::string AdminInterfaceElement::getParameterValue() const
-		{
-			return std::string();
 		}
 
 
@@ -319,54 +295,6 @@ namespace synthese
 		}
 
 
-		bool AdminInterfaceElement::PageLink::operator==(const AdminInterfaceElement::PageLink& other) const
-		{
-			return
-				factoryKey == other.factoryKey &&
-				parameterName == other.parameterName &&
-				parameterValue == other.parameterValue;
-		}
-
-
-
-		std::string AdminInterfaceElement::PageLink::getURL(
-		) const	{
-			assert(request);
-			assert(request->getSession());
-			
-			assert(request->getFunction());
-			assert(request->getFunction()->getInterface());
-
-			Request r;
-			r.getInternalParameters().insert(Request::PARAMETER_FUNCTION, AdminRequest::FACTORY_KEY);
-			r.getInternalParameters().insert(Request::PARAMETER_SESSION, request->getSession()->getKey());
-			r.getInternalParameters().insert(AdminRequest::PARAMETER_PAGE, factoryKey);
-			r.getInternalParameters().insert(AdminRequest::PARAMETER_INTERFACE, request->getFunction()->getInterface()->getKey());
-			if (!parameterName.empty())
-				r.getInternalParameters().insert(parameterName, parameterValue);
-			return r.getURL();
-		}
-
-
-
-		AdminInterfaceElement* AdminInterfaceElement::PageLink::getAdminPage(
-		) const {
-			AdminInterfaceElement* page(Factory<AdminInterfaceElement>::create(factoryKey));
-			page->setRequest(request);
-			if (!parameterName.empty())
-			{
-				ParametersMap parameter;
-				parameter.insert(parameterName, parameterValue);
-				page->setFromParametersMap(parameter, false);
-				if(parameterName == Request::PARAMETER_OBJECT_ID)
-				{
-					const_cast<FunctionRequest<AdminRequest>* >(page->_request)->setObjectId(lexical_cast<RegistryKeyType>(parameterValue));
-				}
-			}
-			return page;
-		}
-
-
 
 		AdminInterfaceElement::Tab::Tab(
 			std::string title,
@@ -453,5 +381,15 @@ namespace synthese
 		{
 			return *_request->getFunction()->getEnv();
 		}
+		
+		boost::shared_ptr<AdminInterfaceElement> AdminInterfaceElement::getNewPage() const
+		{
+			shared_ptr<AdminInterfaceElement> page(
+				Factory<AdminInterfaceElement>::create(getFactoryKey())
+			);
+			page->setRequest(_request);
+			return page;
+		}
+
 	}
 }

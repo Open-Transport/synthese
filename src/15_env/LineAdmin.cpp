@@ -267,28 +267,11 @@ namespace synthese
 			return _request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks LineAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 		
 
 		std::string LineAdmin::getTitle() const
 		{
 			return _line.get() ? "Route " + _line->getName() : DEFAULT_TITLE;
-		}
-
-		std::string LineAdmin::getParameterName() const
-		{
-			return _line.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string LineAdmin::getParameterValue() const
-		{
-			return _line.get() ? Conversion::ToString(_line->getKey()) : string();
 		}
 
 		boost::shared_ptr<const Line> LineAdmin::getLine() const
@@ -307,6 +290,11 @@ namespace synthese
 			_tabs.push_back(Tab("Services continus", TAB_CONTINUOUS_SERVICES, true));
 
 			_tabBuilded = true;
+		}
+		
+		void LineAdmin::setLine(boost::shared_ptr<Line> value)
+		{
+			_line = const_pointer_cast<const Line>(value);
 		}
 	}
 }

@@ -29,21 +29,15 @@
 #include "SiteUpdateAction.h"
 #include "SiteRoutePlanningAdmin.h"
 #include "TransportWebsiteRight.h"
-
-#include "AdminRequest.h"
-#include "ActionFunctionRequest.h"
-#include "Request.h"
-
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "RoutePlannerFunction.h"
-
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
-
 #include "ResultHTMLTable.h"
 #include "PropertiesHTMLTable.h"
 #include "HTMLModule.h"
-
 #include "Interface.h"
 #include "InterfaceTableSync.h"
 #include "RoutePlannerInterfacePage.h"
@@ -110,12 +104,13 @@ namespace synthese
 		void TransportSiteAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			ActionFunctionRequest<SiteUpdateAction,AdminRequest> updateRequest(_request);
+			AdminActionFunctionRequest<SiteUpdateAction,TransportSiteAdmin> updateRequest(
+				_request
+			);
 			updateRequest.getAction()->setSiteId(_site->getKey());
 
-			FunctionRequest<AdminRequest> routeplannerRequest(_request);
-			routeplannerRequest.getFunction()->setPage<SiteRoutePlanningAdmin>();
-			routeplannerRequest.setObjectId(_site->getKey());
+			AdminFunctionRequest<SiteRoutePlanningAdmin> routeplannerRequest(_request);
+			routeplannerRequest.getPage()->setSite(_site);
 
 			FunctionRequest<RoutePlannerFunction> rpHomeRequest(_request);
 			rpHomeRequest.getFunction()->setSite(_site);
@@ -172,41 +167,70 @@ namespace synthese
 			return _request->isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
+			const string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == PlacesListModule::FACTORY_KEY)
+			
+			if(moduleKey == PlacesListModule::FACTORY_KEY)
 			{
+				const TransportSiteAdmin* sp(
+					dynamic_cast<const TransportSiteAdmin*>(currentPage.get())
+				);
+
 				Env env;
 				SiteTableSync::Search(env);
 				BOOST_FOREACH(shared_ptr<Site> site, env.getRegistry<Site>())
 				{
-					PageLink link(getPageLink());
-					link.name = site->getName();
-					link.parameterName = Request::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString(site->getKey());
-					links.push_back(link);
+					if(	sp &&
+						sp->_site->getKey() == site->getKey()
+					){
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<TransportSiteAdmin> p(
+							getNewOtherPage<TransportSiteAdmin>()
+						);
+						p->_site = site;
+						AddToLinks(links, p);
+					}
 				}
 			}
 			return links;
 		}
 		
 
+		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPages(
+			shared_ptr<const AdminInterfaceElement> currentPage
+		) const	{
+			AdminInterfaceElement::PageLinks links;
+			
+			const SiteRoutePlanningAdmin* rp(
+				dynamic_cast<const SiteRoutePlanningAdmin*>(currentPage.get())
+			);
+			
+			if(	rp &&
+				rp->getSite()->getKey() == _site->getKey()
+			){
+				AddToLinks(links, currentPage);
+			}
+			else
+			{
+				shared_ptr<SiteRoutePlanningAdmin> p(
+					getNewOtherPage<SiteRoutePlanningAdmin>()
+				);
+				p->setSite(_site);
+				AddToLinks(links, p);
+			}
+			
+			return links;
+		}
+
 		std::string TransportSiteAdmin::getTitle() const
 		{
 			return _site.get() ? _site->getName() : DEFAULT_TITLE;
-		}
-
-		std::string TransportSiteAdmin::getParameterName() const
-		{
-			return _site.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string TransportSiteAdmin::getParameterValue() const
-		{
-			return _site.get() ? Conversion::ToString(_site->getKey()) : string();
 		}
 	}
 }

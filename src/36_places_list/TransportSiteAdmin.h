@@ -90,11 +90,17 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const std::string& moduleKey,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 			
+			
+			
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
+			) const;
+
 			
 			/** Title generator.
 				@return The title of the page
@@ -102,20 +108,6 @@ namespace synthese
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-			
-			/** Parameter name getter.
-				@return The name of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterName() const;
-			
-			/** Parameter value getter.
-				@return The value of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterValue() const;
 		};
 	}
 }

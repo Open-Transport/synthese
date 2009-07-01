@@ -32,6 +32,7 @@
 #include "DBLogModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -46,10 +47,11 @@ namespace synthese
 	
 	namespace security
 	{
-		const string UpdateRightAction::PARAMETER_RIGHT_CODE = Action_PARAMETER_PREFIX + "co";
-		const string UpdateRightAction::PARAMETER_RIGHT_PARAMETER = Action_PARAMETER_PREFIX + "pr";
-		const string UpdateRightAction::PARAMETER_PUBLIC_VALUE = Action_PARAMETER_PREFIX + "uv";
-		const string UpdateRightAction::PARAMETER_PRIVATE_VALUE = Action_PARAMETER_PREFIX + "rv";
+		const string UpdateRightAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "p");
+		const string UpdateRightAction::PARAMETER_RIGHT_CODE = Action_PARAMETER_PREFIX + "c";
+		const string UpdateRightAction::PARAMETER_RIGHT_PARAMETER(Action_PARAMETER_PREFIX + "r");
+		const string UpdateRightAction::PARAMETER_PUBLIC_VALUE = Action_PARAMETER_PREFIX + "v";
+		const string UpdateRightAction::PARAMETER_PRIVATE_VALUE(Action_PARAMETER_PREFIX + "t");
 		
 		ParametersMap UpdateRightAction::getParametersMap() const
 		{
@@ -61,6 +63,7 @@ namespace synthese
 				map.insert(PARAMETER_PUBLIC_VALUE, static_cast<int>(_right->getPublicRightLevel()));
 				map.insert(PARAMETER_PRIVATE_VALUE, static_cast<int>(_right->getPrivateRightLevel()));
 			}
+			if(_profile.get()) map.insert(PARAMETER_PROFILE_ID, _profile->getKey());
 			return map;
 		}
 
@@ -68,7 +71,10 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), *_env);
+				_profile = ProfileTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_PROFILE_ID),
+					*_env
+				);
 			}
 			catch(...)
 			{
@@ -76,19 +82,21 @@ namespace synthese
 			}
 
 			// Right code
-			string rightCode(map.getString(PARAMETER_RIGHT_CODE, true, FACTORY_KEY));
+			string rightCode(map.get<string>(PARAMETER_RIGHT_CODE));
 
 			// Right parameter
-			string parameter(map.getString(PARAMETER_RIGHT_PARAMETER, true, FACTORY_KEY));
+			string parameter(map.get<string>(PARAMETER_RIGHT_PARAMETER));
 			_right = _profile->getRight(rightCode, parameter);
 			if (!_right.get())
 				throw ActionException("Specified right not found on profile");
 
 			// Public level
-			_publicLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PUBLIC_VALUE, true, FACTORY_KEY));
+			_publicLevel = static_cast<RightLevel>(map.get<int>(PARAMETER_PUBLIC_VALUE));
 
 			// Private level
-			_privateLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PRIVATE_VALUE, false, FACTORY_KEY));
+			_privateLevel = static_cast<RightLevel>(
+				map.getDefault<int>(PARAMETER_PRIVATE_VALUE, UNKNOWN_VALUE)
+			);
 		}
 
 		void UpdateRightAction::run()
@@ -111,6 +119,12 @@ namespace synthese
 		) const {
 			return _request->isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a control on the profile of the user
+		}
+		
+		
+		void UpdateRightAction::setProfile(boost::shared_ptr<const Profile> value)
+		{
+			_profile = const_pointer_cast<Profile>(value);
 		}
 	}
 }

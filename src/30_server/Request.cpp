@@ -56,8 +56,6 @@ namespace synthese
 	{
 		const string Request::PARAMETER_SEPARATOR ("&");
 		const string Request::PARAMETER_ASSIGNMENT ("=");
-		const uid Request::UID_WILL_BE_GENERATED_BY_THE_ACTION = -2;
-
 		const string Request::PARAMETER_STARTER ("?");
 		const string Request::PARAMETER_ACTION ("a");
 		const string Request::PARAMETER_FUNCTION = "fonction";
@@ -73,7 +71,7 @@ namespace synthese
 		):	_session(NULL)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
-			, _object_id(request ? request->getObjectId() : UNKNOWN_VALUE)
+			, _actionWillCreateObject(false)
 		{
 			if (action.get())
 				_setAction(action);
@@ -96,7 +94,7 @@ namespace synthese
 			_ip(httpRequest.ipaddr)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
-			, _object_id(0)
+			, _actionWillCreateObject(false)
 		{
 			// IP
 			if (_ip.empty())
@@ -140,7 +138,7 @@ namespace synthese
 			}
 
 			// Session
-			string sid(map.getString(Request::PARAMETER_SESSION, false, "Request"));
+			string sid(map.getDefault<string>(Request::PARAMETER_SESSION));
 			if (sid.empty())
 			{
 				_session = NULL;
@@ -171,18 +169,15 @@ namespace synthese
 			}
 
 			// Function name
-			string functionName(map.getString(Request::PARAMETER_FUNCTION, false, "Request"));
+			string functionName(map.getDefault<string>(Request::PARAMETER_FUNCTION));
 			if (functionName.empty())
 				throw RequestException("Function not specified");
 			if (!Factory<Function>::contains(functionName))
 				throw RequestException("Function not found");
 			_setFunction(shared_ptr<Function>(Factory<Function>::create(functionName)));
 
-			// Object ID
-			_object_id = map.getUid(Request::PARAMETER_OBJECT_ID, false, "Request");
-
 			// Action name
-			string actionName(map.getString(Request::PARAMETER_ACTION, false, "Request"));
+			string actionName(map.getDefault<string>(Request::PARAMETER_ACTION));
 			if (!actionName.empty())
 			{
 				if (!Factory<Action>::contains(actionName))
@@ -193,9 +188,6 @@ namespace synthese
 				try
 				{
 					_action->_setFromParametersMap(map);
-
-					// Object ID update
-					map.insert(Request::PARAMETER_OBJECT_ID, _object_id);
 				}
 				catch (ActionException& e)	// Action parameters error
 				{
@@ -206,26 +198,25 @@ namespace synthese
 			}
 
 			// Last action error
-			int num = map.getInt(Request::PARAMETER_ERROR_LEVEL, false, string());
-			if (!_actionException || (num != UNKNOWN_VALUE && static_cast<ErrorLevel>(num) > _errorLevel))
+			optional<int> num(map.getOptional<int>(Request::PARAMETER_ERROR_LEVEL));
+			if (!_actionException || (num && static_cast<ErrorLevel>(*num) > _errorLevel))
 			{
-				_actionException = map.getBool(Request::PARAMETER_ACTION_FAILED, false, false, "Request");
+				_actionException = map.getDefault<bool>(Request::PARAMETER_ACTION_FAILED, false);
 
 				// Error message
-				_errorMessage = map.getString(Request::PARAMETER_ERROR_MESSAGE, false, "Request");
+				_errorMessage = map.getDefault<string>(Request::PARAMETER_ERROR_MESSAGE);
 				if (!_errorMessage.empty() && _errorLevel < REQUEST_ERROR_WARNING)
 					_errorLevel = REQUEST_ERROR_WARNING;	// Default error level if non empty message
 
 				// Error level
-				if (num != UNKNOWN_VALUE)
+				if (num)
 				{
-					_errorLevel = static_cast<ErrorLevel>(num);
+					_errorLevel = static_cast<ErrorLevel>(*num);
 				}
 			}
 
 			// Function parameters
 			_function->_setFromParametersMap(map);
-
 		}
 
 
@@ -262,7 +253,7 @@ namespace synthese
 						{
 							// Run of the action
 							_action->run();
-
+							
 							// Run after the action
 							if (_function->_runAfterSucceededAction(stream))	// Overloaded method
 								return;
@@ -348,16 +339,6 @@ namespace synthese
 		}
 
 
-		void Request::setObjectId( uid id )
-		{
-			_object_id = id;
-		}
-
-		uid Request::getObjectId() const
-		{
-			return _object_id;
-		}
-
 		const std::string& Request::getErrorMessage() const
 		{
 			return _errorMessage;
@@ -389,8 +370,8 @@ namespace synthese
 			result.insert(Request::PARAMETER_SESSION, _session ? _session->getKey() : string());
 
 			// Object ID
-			if (_object_id)
-				result.insert(Request::PARAMETER_OBJECT_ID, _object_id);
+			if (_actionCreatedId)
+				result.insert(Request::PARAMETER_OBJECT_ID, *_actionCreatedId);
 
 			// Internal parameters
 			ParametersMap::Map internalMap(_internalParameters.getMap());
@@ -474,9 +455,7 @@ namespace synthese
 
 
 		Request::~Request(
-
-			) {
-
+		){
 		}
 
 		std::string Request::getOutputMimeType()
@@ -493,6 +472,26 @@ namespace synthese
 		const std::string& Request::getHostName() const
 		{
 			return _hostName;
+		}
+		
+		const optional<RegistryKeyType>& Request::getActionCreatedId() const
+		{
+			return _actionCreatedId;
+		}
+		
+		bool Request::getActionWillCreateObject() const
+		{
+			return _actionWillCreateObject;
+		}
+	
+		void Request::setActionCreatedId(util::RegistryKeyType id)
+		{
+			if(_actionWillCreateObject) _actionCreatedId = id;
+		}
+		
+		void Request::setActionWillCreateObject()
+		{
+			_actionWillCreateObject = true;
 		}
 	}
 }

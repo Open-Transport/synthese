@@ -37,15 +37,20 @@ namespace synthese
 
 	namespace admin
 	{
-		const string AdminInterfacePage::DATA_OBJECT_ID("object_id");
-
+		const string AdminInterfacePage::DATA_USER_FULL_NAME("user_full_name");
+		
 		void AdminInterfacePage::display(
-			std::ostream& stream
-			, const boost::shared_ptr<const AdminInterfaceElement>* page
-			, const uid objectId , const server::Request* request /*= NULL */ ) const
-		{
+			std::ostream& stream,
+			const boost::shared_ptr<const AdminInterfaceElement>* page,
+			const server::Request* request /*= NULL */
+		) const	{
 			ParametersVector parameters;
-			parameters.push_back(lexical_cast<string>(objectId));
+			parameters.push_back(
+				request->getUser().get() ?
+				request->getUser()->getFullName() :
+				string()
+			);
+			
 			VariablesMap vars;
 
 			InterfacePage::_display(
@@ -53,7 +58,8 @@ namespace synthese
 				, parameters
 				, vars
 				, (const void*) page
-				, request);
+				, request
+			);
 		}
 
 

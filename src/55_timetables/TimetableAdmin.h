@@ -51,6 +51,10 @@ namespace synthese
 		public:
 			TimetableAdmin();
 			
+			void setTimetable(boost::shared_ptr<Timetable> timetable);
+			
+			boost::shared_ptr<const Timetable> getTimetable() const;
+			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -65,10 +69,10 @@ namespace synthese
 			
 			
 			/** Parameters map generator, used when building an url to the admin page.
-					@return server::ParametersMap The generated parameters map
-					@author Hugues Romain
-					@date 2007					
-				*/
+				@return server::ParametersMap The generated parameters map
+				@author Hugues Romain
+				@date 2007					
+			*/
 			virtual server::ParametersMap getParametersMap() const;
 
 
@@ -92,49 +96,12 @@ namespace synthese
 			*/
 			virtual bool isAuthorized() const;
 			
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param parentLink Link to the parent page
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the parent page designed in parentLink
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink,
-				const AdminInterfaceElement& currentPage
-			) const;
-			
-			/** Sub pages getter.
-				@param currentPage Currently displayed page
-				@param request User request
-				@return PageLinks each subpage of the current page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const AdminInterfaceElement& currentPage
-			) const;
-			
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-			
-			/** Parameter name getter.
-				@return The name of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterName() const;
-			
-			/** Parameter value getter.
-				@return The value of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterValue() const;
 		};
 	}
 }

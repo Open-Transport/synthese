@@ -45,9 +45,8 @@
 #include "TimetableUpdateAction.h"
 #include "TimetableRowAddAction.h"
 
-#include "Request.h"
-#include "AdminRequest.h"
-#include "ActionFunctionRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
@@ -94,13 +93,14 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				return;
-
+			if(_request->getActionWillCreateObject()) return;
+			
 			try
 			{
-				_timetable = TimetableTableSync::Get(id, _getEnv());
+				_timetable = TimetableTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv()
+				);
 			}
 			catch(...)
 			{
@@ -294,35 +294,22 @@ namespace synthese
 			return _request->isAuthorized<TimetableRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
-		
-		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 
 
 		std::string TimetableAdmin::getTitle() const
 		{
 			return _timetable.get() ? _timetable->getTitle() : DEFAULT_TITLE;
 		}
-
-		std::string TimetableAdmin::getParameterName() const
+		
+		void TimetableAdmin::setTimetable(boost::shared_ptr<Timetable> timetable)
 		{
-			return _timetable.get() ? Request::PARAMETER_OBJECT_ID : string();
+			_timetable = const_pointer_cast<const Timetable, Timetable>(timetable);
+		}
+	
+		boost::shared_ptr<const Timetable> TimetableAdmin::getTimetable() const
+		{
+			return _timetable;
 		}
 
-		std::string TimetableAdmin::getParameterValue() const
-		{
-			return _timetable.get() ? Conversion::ToString(_timetable->getKey()) : string();
-		}
 	}
 }

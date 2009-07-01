@@ -88,9 +88,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const std::string& moduleKey,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 			
 			/** Sub pages getter.
@@ -100,7 +100,7 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const AdminInterfaceElement& currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 		};
 	}

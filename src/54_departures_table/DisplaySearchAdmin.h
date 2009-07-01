@@ -187,14 +187,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const std::string& moduleKey,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 
 			virtual std::string getTitle() const;
-			virtual std::string getParameterName() const;
-			virtual std::string getParameterValue() const;
 
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible
@@ -206,6 +204,7 @@ namespace synthese
 			virtual void _buildTabs() const;
 
 			void setPlace(const util::RegistryKeyType id);
+			boost::optional<boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> > getPlace() const;
 		};
 	}
 }

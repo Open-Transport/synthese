@@ -82,13 +82,12 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
+			if(_request->getActionWillCreateObject()) return;
+			
 			try
 			{
-				uid id = map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY);
-				if (id != UNKNOWN_VALUE && id != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_profile = ProfileTableSync::Get(id,_getEnv());
-				}
+				RegistryKeyType id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
+				_profile = ProfileTableSync::Get(id,_getEnv());
 			}
 			catch (ObjectNotFoundException<Profile>& e)
 			{
@@ -101,6 +100,7 @@ namespace synthese
 		server::ParametersMap ProfileAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_profile.get()) m.insert(Request::PARAMETER_OBJECT_ID, _profile->getKey());
 			return m;
 		}
 
@@ -109,9 +109,16 @@ namespace synthese
 		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
 		{
 			ActionFunctionRequest<UpdateProfileAction, AdminRequest> updateRequest(_request);
+			updateRequest.getAction()->setProfile(_profile);
+			
 			ActionFunctionRequest<UpdateRightAction, AdminRequest> updateRightRequest(_request);
+			updateRightRequest.getAction()->setProfile(_profile);
+			
 			ActionFunctionRequest<DeleteRightAction,AdminRequest> deleteRightRequest(_request);
+			deleteRightRequest.getAction()->setProfile(_profile);
+			
 			ActionFunctionRequest<AddRightAction,AdminRequest> addRightRequest(_request);
+			addRightRequest.getAction()->setProfile(_profile);
 			
 			vector<pair<int, string> > privatePublicMap;
 			privatePublicMap.push_back(make_pair((int) FORBIDDEN, "Interdit"));
@@ -225,29 +232,14 @@ namespace synthese
 			return true;
 		}
 
-		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ProfilesAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
-			{
-				links.push_back(currentPage.getPageLink());
-			}
-			return links;
-		}
-
 		std::string ProfileAdmin::getTitle() const
 		{
 			return _profile.get() ? _profile->getName() : DEFAULT_TITLE;
 		}
 
-		std::string ProfileAdmin::getParameterName() const
+		void ProfileAdmin::setProfile(boost::shared_ptr<Profile> value)
 		{
-			return _profile.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string ProfileAdmin::getParameterValue() const
-		{
-			return _profile.get() ? Conversion::ToString(_profile->getKey()) : string();
+			_profile = const_pointer_cast<const Profile>(value);
 		}
 	}
 }

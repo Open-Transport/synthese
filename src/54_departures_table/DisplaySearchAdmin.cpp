@@ -37,7 +37,8 @@
 #include "Conversion.h"
 #include "ActionResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
-#include "ActionFunctionRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "AdminModule.h"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
@@ -46,7 +47,6 @@
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
 #include "SentAlarm.h"
-#include "AdminRequest.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUAdmin.h"
 #include "DisplayScreenCPUCreateAction.h"
@@ -190,22 +190,20 @@ namespace synthese
 			/// TAB SCREENS
 			if (openTabContent(stream, TAB_DISPLAY_SCREENS))
 			{
-				ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(
+				AdminActionFunctionRequest<CreateDisplayScreenAction,DisplayAdmin> createDisplayRequest(
 					_request
 				);
-				createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
 				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 				if(_place)
 				{
 					createDisplayRequest.getAction()->setPlace(_place->get() ? (*_place)->getKey() : 0);
 				}
-				createDisplayRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+				createDisplayRequest.setActionWillCreateObject();
 
 
-				FunctionRequest<AdminRequest> searchRequest(_request);
+				AdminFunctionRequest<DisplaySearchAdmin> searchRequest(_request);
 	
-				FunctionRequest<AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setPage<DisplayAdmin>();
+				AdminFunctionRequest<DisplayAdmin> updateRequest(_request);
 
 				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
 
@@ -246,8 +244,8 @@ namespace synthese
 
 				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, _getEnv().getRegistry<DisplayScreen>())
 				{
-					updateRequest.setObjectId(screen->getKey());
-					viewRequest.setObjectId(screen->getKey());
+					updateRequest.getPage()->setScreen(screen);
+					viewRequest.getFunction()->setScreen(screen);
 					if(	screen->getType() &&
 						screen->getType()->getDisplayInterface() &&
 						!screen->getType()->getDisplayInterface()->getDefaultClientURL().empty()
@@ -406,22 +404,20 @@ namespace synthese
 			/// TAB CPU
 			if (openTabContent(stream, TAB_CPU))
 			{
-				ActionFunctionRequest<DisplayScreenCPUCreateAction,AdminRequest> createCPURequest(
+				AdminActionFunctionRequest<DisplayScreenCPUCreateAction,DisplayScreenCPUAdmin> createCPURequest(
 					_request
 				);
-				createCPURequest.getFunction()->setPage<DisplayScreenCPUAdmin>();
 				createCPURequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 				if(_place)
 				{
 					createCPURequest.getAction()->setPlace(*_place);
 				}
-				createCPURequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+				createCPURequest.setActionWillCreateObject();
 
 
-				FunctionRequest<AdminRequest> searchRequest(_request);
+				AdminFunctionRequest<DisplaySearchAdmin> searchRequest(_request);
 
-				FunctionRequest<AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setPage<DisplayScreenCPUAdmin>();
+				AdminFunctionRequest<DisplayScreenCPUAdmin> updateRequest(_request);
 
 				if (!_place)
 				{
@@ -457,7 +453,7 @@ namespace synthese
 
 				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, _getEnv().getRegistry<DisplayScreenCPU>())
 				{
-					updateRequest.setObjectId(cpu->getKey());
+					updateRequest.getPage()->setCPU(cpu);
 					
 					stream << t.row(Conversion::ToString(cpu->getKey()));
 					if (!_place)
@@ -537,52 +533,61 @@ namespace synthese
 			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 
-		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
 			// General search page
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY)
 			{
-				links.push_back(getPageLink());
+				const DisplaySearchAdmin* sa(
+					dynamic_cast<const DisplaySearchAdmin*>(currentPage.get())
+				);
+				
+				// General search
+				if(	sa &&
+					!sa->_place
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<DisplaySearchAdmin> p(getNewOtherPage<DisplaySearchAdmin>());
+					p->_place = optional<shared_ptr<const PublicTransportStopZoneConnectionPlace> >();
+					AddToLinks(links, p);
+				}
+			
+				// Stock
+				if(	sa &&
+					sa->_place &&
+					!sa->_place->get()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<DisplaySearchAdmin> p(getNewOtherPage<DisplaySearchAdmin>());
+					p->_place = shared_ptr<const PublicTransportStopZoneConnectionPlace>();
+					AddToLinks(links, p);
+				}
 			}
-
-
-			// Spare store page
-			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY &&
-				parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY
-			){
-				DisplaySearchAdmin page;
-				page.setPlace(0);
-				page.setRequest(_request);
-				links.push_back(page.getPageLink());
-			}
-
-
-			// Broadcast points search
-			if (parentLink.factoryKey == BroadcastPointsAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY && static_cast<const DisplaySearchAdmin&>(currentPage)._place && static_cast<const DisplaySearchAdmin&>(currentPage)._place->get())
-			{
-				links.push_back(currentPage.getPageLink());
-			}
-			return links;
 		}
 
 		std::string DisplaySearchAdmin::getTitle() const
 		{
-			return _place ? (_place->get() ? (*_place)->getFullName() : "Equipements en stock") : DEFAULT_TITLE;
+			return
+				_place ?
+				(	_place->get() ? 
+					(*_place)->getFullName() :
+					"Equipements en stock"
+				):
+				DEFAULT_TITLE
+			;
 		}
 
-		std::string DisplaySearchAdmin::getParameterName() const
-		{
-			return _place ? PARAMETER_SEARCH_LOCALIZATION_ID : string();
-		}
 
-		std::string DisplaySearchAdmin::getParameterValue() const
-		{
-			return _place ? (_place->get() ? lexical_cast<string>((*_place)->getKey()) : "0") : string();
-		}
 
 		bool DisplaySearchAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
 		{
@@ -628,6 +633,11 @@ namespace synthese
 					throw AdminParametersException("Specified place not found");
 				}
 			}
+		}
+		
+		boost::optional<boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> > DisplaySearchAdmin::getPlace() const
+		{
+			return _place;
 		}
 	}
 }

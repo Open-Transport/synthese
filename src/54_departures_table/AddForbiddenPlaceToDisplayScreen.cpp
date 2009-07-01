@@ -24,6 +24,7 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include "ArrivalDepartureTableRight.h"
+#include "ArrivalDepartureTableLog.h"
 #include "AddForbiddenPlaceToDisplayScreen.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
@@ -47,13 +48,16 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";
+		const string AddForbiddenPlaceToDisplayScreen::PARAMETER_SCREEN_ID(
+			Action_PARAMETER_PREFIX + "s"
+		);
+		const string AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "p";
 
 
 		ParametersMap AddForbiddenPlaceToDisplayScreen::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_PLACE, _xxx));
+			if(_screen.get()) map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
 			return map;
 		}
 
@@ -61,11 +65,14 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), *_env);
-
-				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
-				
-				_place = ConnectionPlaceTableSync::Get(id, *_env);
+				_screen = DisplayScreenTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_SCREEN_ID),
+					*_env
+				);
+				_place = ConnectionPlaceTableSync::Get(
+					map.get<RegistryKeyType>(PARAMETER_PLACE),
+					*_env
+				);
 			}
 			catch (...)
 			{
@@ -77,14 +84,33 @@ namespace synthese
 		{
 			_screen->addForbiddenPlace(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
+			
+			// Log
+			ArrivalDepartureTableLog::addUpdateEntry(
+				*_screen,
+				"Ajout de l'arrêt à ne pas desservir "+ _place->getFullName(),
+				*_request->getUser()
+			);
 		}
 
 
 
 		bool AddForbiddenPlaceToDisplayScreen::_isAuthorized(
-
-			) const {
+		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		}
+		
+		
+		void AddForbiddenPlaceToDisplayScreen::setScreen(boost::shared_ptr<DisplayScreen> value)
+		{
+			_screen = value;
+		}
+	
+	
+		void AddForbiddenPlaceToDisplayScreen::setScreen(
+			boost::shared_ptr<const DisplayScreen> value)
+		{
+			_screen = const_pointer_cast<DisplayScreen>(value);
 		}
 	}
 }

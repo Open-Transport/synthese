@@ -38,8 +38,8 @@
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
 
-#include "AdminRequest.h"
-#include "ActionFunctionRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -85,7 +85,10 @@ namespace synthese
 		){
 			try
 			{
-				_entry = DBLogEntryTableSync::Get(_request->getObjectId(), _getEnv());
+				_entry = DBLogEntryTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv()
+				);
 			}
 			catch (...)
 			{
@@ -105,6 +108,7 @@ namespace synthese
 		server::ParametersMap ResaEditLogEntryAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_entry.get()) m.insert(Request::PARAMETER_OBJECT_ID, _entry->getKey());
 			return m;
 		}
 
@@ -113,10 +117,10 @@ namespace synthese
 		void ResaEditLogEntryAdmin::display(ostream& stream, VariablesMap& variables
 		) const	{
 			// Requests
-			ActionFunctionRequest<ResaLogEntryUpdateAction,AdminRequest> updateRequest(_request);
+			AdminActionFunctionRequest<ResaLogEntryUpdateAction,ResaEditLogEntryAdmin> updateRequest(_request);
 			updateRequest.getAction()->setEntryId(_entry->getKey());
 
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<ResaEditLogEntryAdmin> searchRequest(_request);
 
 			// Display
 			DBLogEntry::Content content(_entry->getContent());
@@ -185,23 +189,6 @@ namespace synthese
 			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
-		AdminInterfaceElement::PageLinks ResaEditLogEntryAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == ResaLogAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
-				links.push_back(currentPage.getPageLink());
-			return links;
-		}
-		
-		AdminInterfaceElement::PageLinks ResaEditLogEntryAdmin::getSubPages(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 
 
 		std::string ResaEditLogEntryAdmin::getTitle() const
@@ -209,14 +196,10 @@ namespace synthese
 			return _entry.get() ? _entry->getDate().toString() : DEFAULT_TITLE;
 		}
 
-		std::string ResaEditLogEntryAdmin::getParameterName() const
+	
+		void ResaEditLogEntryAdmin::setEntry(boost::shared_ptr<const dblog::DBLogEntry> value)
 		{
-			return _entry.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string ResaEditLogEntryAdmin::getParameterValue() const
-		{
-			return _entry.get() ? Conversion::ToString(_entry->getKey()) : string();
+			_entry = value;
 		}
 	}
 }

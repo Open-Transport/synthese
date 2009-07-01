@@ -81,8 +81,12 @@ namespace synthese
 				- 13 : accessibility code
 				- 14 : site id
 				- 15 : empty result because of same places
+				- 16 : user full name
+				- 17 : user phone
+				- 18 : user ID
 		*/
-		class RoutePlannerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerInterfacePage>
+		class RoutePlannerInterfacePage :
+			public util::FactorableTemplate<interfaces::InterfacePage,RoutePlannerInterfacePage>
 		{
 		public:
 			static const std::string DATA_INTERNAL_DATE;
@@ -101,6 +105,9 @@ namespace synthese
 			static const std::string DATA_ACCESSIBILITY_CODE;
 			static const std::string DATA_SITE_ID;
 			static const std::string DATA_IS_SAME_PLACES;
+			static const std::string DATA_USER_FULL_NAME;
+			static const std::string DATA_USER_PHONE;
+			static const std::string DATA_USER_ID;
 
 			RoutePlannerInterfacePage();
 

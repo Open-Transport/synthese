@@ -105,13 +105,22 @@ namespace synthese
 			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
-		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPagesOfModule(
+				const std::string& moduleKey,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
-				links.push_back(getPageLink());
+			if(moduleKey == ResaModule::FACTORY_KEY)
+			{
+				if(dynamic_cast<const ResaLogAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
+			}
 			return links;
 		}
 	}

@@ -35,8 +35,8 @@
 #include "TimetableRight.h"
 
 #include "Request.h"
-#include "AdminRequest.h"
-#include "ActionFunctionRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
@@ -97,13 +97,10 @@ namespace synthese
 			VariablesMap& variables
 		) const {
 			// Requests
-			FunctionRequest<AdminRequest> editCalendar(_request);
-			editCalendar.getFunction()->setPage<CalendarTemplateAdmin>();
 
-			ActionFunctionRequest<CalendarTemplateAddAction,AdminRequest> addCalendar(_request);
-			addCalendar.getFunction()->setPage<CalendarTemplateAdmin>();
+			AdminActionFunctionRequest<CalendarTemplateAddAction,CalendarTemplateAdmin> addCalendar(_request);
 			addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
-			addCalendar.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addCalendar.setActionWillCreateObject();
 			
 			
 			// Display
@@ -116,9 +113,12 @@ namespace synthese
 			HTMLTable t(c,ResultHTMLTable::CSS_CLASS);
 			stream << f.open() << t.open();
 
-			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, _getEnv().getRegistry<CalendarTemplate>())
-			{
-				editCalendar.setObjectId(ct->getKey());
+			AdminFunctionRequest<CalendarTemplateAdmin> editCalendar(_request);
+			BOOST_FOREACH(
+				shared_ptr<CalendarTemplate> ct,
+				_getEnv().getRegistry<CalendarTemplate>()
+			){
+				editCalendar.getPage()->setCalendar(ct);
 
 				stream << t.row();
 				stream << t.col() << ct->getText();
@@ -148,32 +148,57 @@ namespace synthese
 			return _request->isAuthorized<TimetableRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == TimetableModule::FACTORY_KEY)
-				links.push_back(getPageLink());
+			
+			const CalendarTemplatesAdmin* ta(
+				dynamic_cast<const CalendarTemplatesAdmin*>(currentPage.get())
+			);
+			
+			if(	moduleKey == TimetableModule::FACTORY_KEY
+			){
+				if(ta)
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
+			}
 			return links;
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const {
 			AdminInterfaceElement::PageLinks links;
+
+			const CalendarTemplateAdmin* ta(
+				dynamic_cast<const CalendarTemplateAdmin*>(currentPage.get())
+			);
 
 			Env env;
 			CalendarTemplateTableSync::Search(env);
 			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, env.getRegistry<CalendarTemplate>())
 			{
-				AdminInterfaceElement::PageLink link(getPageLink());
-				link.factoryKey = CalendarTemplateAdmin::FACTORY_KEY;
-				link.icon = CalendarTemplateAdmin::ICON;
-				link.name = ct->getText();
-				link.parameterName = Request::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString(ct->getKey());
-				links.push_back(link);
+				if(	ta &&
+					ta->getCalendar().get() &&
+					ta->getCalendar()->getKey() == ct->getKey()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<CalendarTemplateAdmin> p(
+					 	getNewOtherPage<CalendarTemplateAdmin>()
+					);
+					p->setCalendar(ct);
+					AddToLinks(links, p);
+				}
 			}
 
 			return links;

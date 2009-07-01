@@ -36,9 +36,8 @@
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateElementAddAction.h"
 
-#include "Request.h"
-#include "AdminRequest.h"
-#include "ActionFunctionRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -79,12 +78,14 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
-
+			if(_request->getActionWillCreateObject()) return;
+			
 			try
 			{
-				_calendar = CalendarTemplateTableSync::Get(id, _getEnv());
+				_calendar = CalendarTemplateTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv()
+				);
 			}
 			catch(...)
 			{
@@ -101,6 +102,7 @@ namespace synthese
 		server::ParametersMap CalendarTemplateAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_calendar.get()) m.insert(Request::PARAMETER_OBJECT_ID, _calendar->getKey());
 			return m;
 		}
 
@@ -111,9 +113,7 @@ namespace synthese
 			VariablesMap& variables
 		) const {
 			// Requests
-			ActionFunctionRequest<CalendarTemplateElementAddAction,AdminRequest> addRequest(_request);
-			addRequest.getFunction()->setPage<CalendarTemplateAdmin>();
-			addRequest.setObjectId(_calendar->getKey());
+			AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
 			addRequest.getAction()->setCalendarId(_calendar->getKey());
 
 			// Display
@@ -164,35 +164,22 @@ namespace synthese
 			return _request->isAuthorized<TimetableRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
-		
-		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 
 
 		std::string CalendarTemplateAdmin::getTitle() const
 		{
 			return _calendar.get() ? _calendar->getText() : DEFAULT_TITLE;
 		}
-
-		std::string CalendarTemplateAdmin::getParameterName() const
+		
+		void CalendarTemplateAdmin::setCalendar(shared_ptr<CalendarTemplate> value)
 		{
-			return _calendar.get() ? Request::PARAMETER_OBJECT_ID : string();
+			_calendar = const_pointer_cast<const CalendarTemplate>(value);
 		}
-
-		std::string CalendarTemplateAdmin::getParameterValue() const
+		
+		boost::shared_ptr<const CalendarTemplate> CalendarTemplateAdmin::getCalendar() const
 		{
-			return _calendar.get() ? Conversion::ToString(_calendar->getKey()) : string();
+			return _calendar;
 		}
+		
 	}
 }

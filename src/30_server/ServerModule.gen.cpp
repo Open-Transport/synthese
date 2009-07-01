@@ -12,7 +12,6 @@ synthese::server::LoginHtmlField::integrate();
 synthese::server::PasswordHtmlField::integrate();
 synthese::server::RequestErrorMessageInterfaceElement::integrate();
 synthese::server::ValidSessionInterfaceElement::integrate();
-synthese::server::ObjectIdInterfaceElement::integrate();
 synthese::server::HtmlFormCalendarFieldInterfaceElement::integrate();
 synthese::server::HtmlFormFieldInterfaceElement::integrate();
 synthese::server::DbModuleConfigTableSync::integrate();

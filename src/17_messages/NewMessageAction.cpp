@@ -82,10 +82,7 @@ namespace synthese
 				AlarmTemplate alarm(UNKNOWN_VALUE, _scenarioTemplate.get());
 				AlarmTableSync::Save(&alarm);
 				
-				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_request->setObjectId(alarm.getKey());
-				}
+				_request->setActionCreatedId(alarm.getKey());
 				
 				MessagesLog::AddNewScenarioMessageEntry(
 					alarm,
@@ -99,8 +96,7 @@ namespace synthese
 					
 				AlarmTableSync::Save(&alarm);
 				
-				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-					_request->setObjectId(alarm.getKey());
+				_request->setActionCreatedId(alarm.getKey());
 			
 				MessagesLog::AddNewScenarioMessageEntry(
 					alarm,

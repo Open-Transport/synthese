@@ -45,6 +45,7 @@ namespace synthese
 		:	public util::FactorableTemplate<server::Action, AddDepartureStopToDisplayScreenAction>
 		{
 		public:
+			static const std::string PARAMETER_SCREEN_ID;
 			static const std::string PARAMETER_STOP;
 
 		private:
@@ -71,6 +72,12 @@ namespace synthese
 			
 			void setStopId(
 				util::RegistryKeyType id
+			);
+			void setScreen(
+				boost::shared_ptr<DisplayScreen> screen
+			);
+			void setScreen(
+				boost::shared_ptr<const DisplayScreen> screen
 			);
 		};
 	}

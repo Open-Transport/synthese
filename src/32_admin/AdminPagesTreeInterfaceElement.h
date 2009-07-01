@@ -23,13 +23,10 @@
 #ifndef SYNTHESE_AdminPagesTreeInterfaceElement_H__
 #define SYNTHESE_AdminPagesTreeInterfaceElement_H__
 
-#include "32_admin/AdminInterfaceElement.h"
-
-#include "30_server/FunctionRequest.h"
-
-#include "11_interfaces/LibraryInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "AdminInterfaceElement.h"
+#include "FunctionRequest.h"
+#include "LibraryInterfaceElement.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -54,12 +51,12 @@ namespace synthese
 				- Opened Node last sub page introducer
 				- Closed Node last sub page introducer
 		*/
-		class AdminPagesTreeInterfaceElement
-			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagesTreeInterfaceElement>
+		class AdminPagesTreeInterfaceElement:
+			public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagesTreeInterfaceElement>
 		{
 			std::string getSubPages(
-				const AdminInterfaceElement::PageLinksTree& pages
-				, const AdminInterfaceElement& currentPage
+				const AdminInterfaceElement::PageLinksTree& pages,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 				, int level
 				, std::string prefix
 				, bool last

@@ -39,12 +39,8 @@
 #include "TransportWebsiteRight.h"
 #include "RoadPlace.h"
 #include "RoutePlanner.h"
-
 #include "SearchFormHTMLTable.h"
-
-#include "AdminRequest.h"
-#include "Request.h"
-
+#include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 
@@ -114,7 +110,10 @@ namespace synthese
 		
 			try
 			{
-				_site = SiteTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv());
+				_site = SiteTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv()
+				);
 			}
 			catch (...)
 			{
@@ -144,7 +143,7 @@ namespace synthese
 
 		void SiteRoutePlanningAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<SiteRoutePlanningAdmin> searchRequest(_request);
 
 			// Search form
 			stream << "<h1>Recherche</h1>";
@@ -295,38 +294,17 @@ namespace synthese
 			return _request->isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks SiteRoutePlanningAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == TransportSiteAdmin::FACTORY_KEY)
-			{
-				PageLink link(getPageLink());
-				link.parameterName = Request::PARAMETER_OBJECT_ID;
-				link.parameterValue = parentLink.parameterValue;
-				links.push_back(link);
-			}
-			return links;
+		
+		boost::shared_ptr<const Site> SiteRoutePlanningAdmin::getSite() const
+		{
+			return _site;
 		}
 		
-		AdminInterfaceElement::PageLinks SiteRoutePlanningAdmin::getSubPages(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
-
-
-		std::string SiteRoutePlanningAdmin::getParameterName() const
+		void SiteRoutePlanningAdmin::setSite(boost::shared_ptr<const Site> value)
 		{
-			return _site.get() ? Request::PARAMETER_OBJECT_ID : string();
+			_site = value;
 		}
+		
 
-		std::string SiteRoutePlanningAdmin::getParameterValue() const
-		{
-			return _site.get() ? Conversion::ToString(_site->getKey()) : string();
-		}
 	}
 }

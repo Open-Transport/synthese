@@ -82,6 +82,8 @@ namespace synthese
 
 		public:
 			ProfileAdmin();
+			
+			void setProfile(boost::shared_ptr<Profile> value);
 
 			/** Initialization of the parameters from a request.
 			@param request The request to use for the initialization.
@@ -108,21 +110,7 @@ namespace synthese
 			bool isAuthorized(
 			) const;
 
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param factoryKey Key of the parent class
-				@return PageLinks A link to the page if the parent is DBLogList and if the page is the currently displayed one
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
-
 			virtual std::string getTitle() const;
-			virtual std::string getParameterName() const;
-			virtual std::string getParameterValue() const;
-
 		};
 	}
 }

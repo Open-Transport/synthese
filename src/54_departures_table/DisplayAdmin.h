@@ -175,6 +175,8 @@ namespace synthese
 
 		public:
 			DisplayAdmin();
+			
+			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
@@ -196,31 +198,8 @@ namespace synthese
 			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
 			bool isAuthorized() const;
 
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param factoryKey Key of the parent class
-				@param request User request
-				@return PageLinks A link to the page if the parent is Displays and if the page is the currently displayed one
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
-
-			/** Sub pages getter.
-				@param request User request
-				@return PageLinks Link to the maintenance page for the same display
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const AdminInterfaceElement& currentPage
-			) const;
 
 			virtual std::string getTitle() const;
-			virtual std::string getParameterName() const;
-			virtual std::string getParameterValue() const;
 
 			virtual void _buildTabs() const;
 		};

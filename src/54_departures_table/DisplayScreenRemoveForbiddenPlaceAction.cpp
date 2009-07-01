@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
+#include "ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -38,18 +39,20 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace security;
+	using namespace dblog;
 
 	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemoveForbiddenPlaceAction>::FACTORY_KEY("dsrfp");
 
 	namespace departurestable
 	{
+		const string DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_SCREEN_ID = Action_PARAMETER_PREFIX + "s";
 		const string DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";
 
 
 		ParametersMap DisplayScreenRemoveForbiddenPlaceAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_screen.get()) map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
 			return map;
 		}
 
@@ -57,7 +60,10 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), *_env);
+				_screen = DisplayScreenTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_SCREEN_ID),
+					*_env
+				);
 				_place = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE), *_env);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
@@ -74,6 +80,15 @@ namespace synthese
 		{
 			_screen->removeForbiddenPlace(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
+			
+						
+			// Log
+			ArrivalDepartureTableLog::addUpdateEntry(
+				*_screen,
+				"Retrait de l'arrêt à ne pas desservir "+ _place->getFullName(),
+				*_request->getUser()
+			);
+
 		}
 
 
@@ -82,6 +97,13 @@ namespace synthese
 
 			) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		}
+		
+		
+		void DisplayScreenRemoveForbiddenPlaceAction::setScreen(
+			boost::shared_ptr<const DisplayScreen> value
+		){
+			_screen = const_pointer_cast<DisplayScreen>(value);
 		}
 	}
 }

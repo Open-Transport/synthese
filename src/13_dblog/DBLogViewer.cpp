@@ -144,36 +144,42 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfModule(
+			const std::string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(	parentLink.factoryKey == ModuleAdmin::FACTORY_KEY &&
-				parentLink.parameterValue == DBLogModule::FACTORY_KEY
+			
+			if(	moduleKey == DBLogModule::FACTORY_KEY
 			){
+				const DBLogViewer* la(
+					dynamic_cast<const DBLogViewer*>(currentPage.get())
+				);
+				
 				vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
 				BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
 				{
-					AdminInterfaceElement::PageLink link(getPageLink());
-					link.name = loge->getName();
-					link.parameterName = PARAMETER_LOG_KEY;
-					link.parameterValue = loge->getFactoryKey();
-					links.push_back(link);
+					if(	la &&
+						la->_viewer.getLogKey() == loge->getFactoryKey()
+					){
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<DBLogViewer> p(
+							getNewOtherPage<DBLogViewer>()
+						);
+						p->_viewer.setLogKey(
+							loge->getFactoryKey()
+						);
+						AddToLinks(links, p);
+					}
 				}
 			}
 			return links;
 		}
 
 
-
-		AdminInterfaceElement::PageLinks DBLogViewer::getSubPages(
-			const AdminInterfaceElement& currentPage
-		) const {
-			return AdminInterfaceElement::PageLinks();
-		}
-		
-		
 
 		std::string DBLogViewer::getTitle() const
 		{
@@ -182,24 +188,6 @@ namespace synthese
 				DEFAULT_TITLE :
 				_viewer.getLogName()
 			;
-		}
-
-
-
-		std::string DBLogViewer::getParameterName() const
-		{
-			return
-				_viewer.getLogKey().empty() ?
-				string() :
-				PARAMETER_LOG_KEY
-			;
-		}
-
-
-
-		std::string DBLogViewer::getParameterValue() const
-		{
-			return _viewer.getLogKey();
 		}
 
 

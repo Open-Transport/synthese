@@ -43,6 +43,7 @@ namespace synthese
 		class AddForbiddenPlaceToDisplayScreen : public util::FactorableTemplate<server::Action,AddForbiddenPlaceToDisplayScreen>
 		{
 		public:
+			static const std::string PARAMETER_SCREEN_ID;
 			static const std::string PARAMETER_PLACE;
 
 		private:
@@ -66,6 +67,9 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setScreen(boost::shared_ptr<DisplayScreen> value);
+			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 		};
 	}
 }

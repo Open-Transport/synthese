@@ -21,12 +21,12 @@
 */
 
 #include "DelUserAction.h"
-
-#include "12_security/UserTableSync.h"
+#include "UserTableSync.h"
 #include "SecurityRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "SecurityLog.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 
@@ -39,16 +39,23 @@ namespace synthese
 	
 	namespace security
 	{
+		const string DelUserAction::PARAMETER_USER_ID(Action_PARAMETER_PREFIX + "u");
+		
 		ParametersMap DelUserAction::getParametersMap() const
 		{
-			return ParametersMap();
+			ParametersMap m;
+			if(_user.get()) m.insert(PARAMETER_USER_ID, _user->getKey());
+			return m;
 		}
 
 		void DelUserAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				_user = UserTableSync::Get(_request->getObjectId(), *_env);
+				_user = UserTableSync::Get(
+					map.get<RegistryKeyType>(PARAMETER_USER_ID),
+					*_env
+				);
 			}
 			catch (ObjectNotFoundException<User>& e)
 			{
@@ -60,6 +67,12 @@ namespace synthese
 		void DelUserAction::run()
 		{
 			UserTableSync::Remove(_user->getKey());
+			
+			SecurityLog::addUserAdmin(
+				_request->getUser().get(),
+				_user.get(),
+				"Suppression de l'utilisateur "+ _user->getLogin()
+			);
 		}
 
 
@@ -67,6 +80,12 @@ namespace synthese
 		bool DelUserAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<SecurityRight>(DELETE_RIGHT);
+		}
+		
+		
+		void DelUserAction::setUser(boost::shared_ptr<User> value)
+		{
+			_user = value;
 		}
 	}
 }

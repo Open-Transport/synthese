@@ -80,8 +80,7 @@ namespace synthese
 
 			CalendarTemplateTableSync::Save(&c);
 
-			if (_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				_request->setObjectId(c.getKey());
+			_request->setActionCreatedId(c.getKey());
 		}
 	
 		

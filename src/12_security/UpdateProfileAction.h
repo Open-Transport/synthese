@@ -23,11 +23,8 @@
 #ifndef SYNTHESE_UpdateProfileAction_H__
 #define SYNTHESE_UpdateProfileAction_H__
 
-#include <boost/shared_ptr.hpp>
-
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -38,9 +35,11 @@ namespace synthese
 		/** UpdateProfileAction action class.
 			@ingroup m12Actions refActions
 		*/
-		class UpdateProfileAction : public util::FactorableTemplate<server::Action,UpdateProfileAction>
+		class UpdateProfileAction :
+			public util::FactorableTemplate<server::Action,UpdateProfileAction>
 		{
 		public:
+			static const std::string PARAMETER_PROFILE_ID;
 			static const std::string PARAMETER_NAME;
 
 		private:
@@ -63,6 +62,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setProfile(boost::shared_ptr<const Profile> value);
 		};
 	}
 }

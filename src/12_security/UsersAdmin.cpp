@@ -36,7 +36,8 @@
 #include "UserTableSync.h"
 #include "UsersAdmin.h"
 #include "SecurityRight.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "Session.h"
 #include "ActionFunctionRequest.h"
 
@@ -144,21 +145,19 @@ namespace synthese
 		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables
 		) const	{
 			// Request for search form
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<UsersAdmin> searchRequest(_request);
 			SearchFormHTMLTable searchTable(searchRequest.getHTMLForm("search"));
 			
 			// Request for add user action form
-			ActionFunctionRequest<AddUserAction, AdminRequest> addUserRequest(_request);
-			addUserRequest.getFunction()->setPage<UserAdmin>();
+			AdminActionFunctionRequest<AddUserAction, UserAdmin> addUserRequest(_request);
 			addUserRequest.getFunction()->setActionFailedPage<UsersAdmin>();
-			addUserRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addUserRequest.setActionWillCreateObject();
 
 			// Request for delete action form
-			ActionFunctionRequest<DelUserAction, AdminRequest> deleteUserRequest(_request);
+			AdminActionFunctionRequest<DelUserAction, UsersAdmin> deleteUserRequest(_request);
 			
 			// Request for user link
-			FunctionRequest<AdminRequest> userRequest(_request);
-			userRequest.getFunction()->setPage<UserAdmin>();
+			AdminFunctionRequest<UserAdmin> userRequest(_request);
 
 			// Search form
 			stream << "<h1>Recherche d'utilisateur</h1>";
@@ -187,8 +186,8 @@ namespace synthese
 
 			BOOST_FOREACH(shared_ptr<User> user, _getEnv().getRegistry<User>())
 			{
-				userRequest.setObjectId(user->getKey());
-				deleteUserRequest.setObjectId(user->getKey());
+				userRequest.getPage()->setUser(user);
+				deleteUserRequest.getAction()->setUser(user);
 				stream << t.row();
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getLogin());
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getName());
@@ -211,14 +210,45 @@ namespace synthese
 		
 		}
 
-		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
+			
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == SecurityModule::FACTORY_KEY)
+			
+			if (moduleKey == SecurityModule::FACTORY_KEY)
 			{
-				links.push_back(getPageLink());
+				if(dynamic_cast<const UsersAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
 			}
 			return links;
 		}
+		
+		
+		AdminInterfaceElement::PageLinks UsersAdmin::getSubPages(
+			shared_ptr<const AdminInterfaceElement> currentPage
+		) const	{
+			
+			AdminInterfaceElement::PageLinks links;
+			
+			const UserAdmin* ua(
+				dynamic_cast<const UserAdmin*>(currentPage.get())
+			);
+			
+			if(ua)
+			{
+				AddToLinks(links, currentPage);
+			}
+			
+			return links;
+		}
+
 	}
 }

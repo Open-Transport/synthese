@@ -47,12 +47,14 @@ namespace synthese
 
 	namespace security
 	{
+		const string UpdateProfileAction::PARAMETER_PROFILE_ID = Action_PARAMETER_PREFIX + "p";
 		const string UpdateProfileAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
 
 
 		ParametersMap UpdateProfileAction::getParametersMap() const
 		{
 			ParametersMap map;
+			if(_profile.get()) map.insert(PARAMETER_PROFILE_ID, _profile->getKey());
 			map.insert(PARAMETER_NAME, _name);
 			return map;
 		}
@@ -62,7 +64,10 @@ namespace synthese
 			// Profile
 			try
 			{
-				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), *_env);
+				_profile = ProfileTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_PROFILE_ID),
+					*_env
+				);
 			}
 			catch (ObjectNotFoundException<Profile>& e)
 			{
@@ -97,6 +102,12 @@ namespace synthese
 		) const {
 			/// @todo add a control on the users profile
 			return _request->isAuthorized<SecurityRight>(WRITE);
+		}
+		
+		
+		void UpdateProfileAction::setProfile(boost::shared_ptr<const Profile> value)
+		{
+			_profile = const_pointer_cast<Profile>(value);
 		}
 	}
 }

@@ -91,10 +91,7 @@ namespace synthese
 			DisplayScreenCPUTableSync::Save(&cpu);
 
 			// Request update
-			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-			{
-				_request->setObjectId(cpu.getKey());
-			}
+			_request->setActionCreatedId(cpu.getKey());
 
 			// Log
 			ArrivalDepartureTableLog::addCreateEntry(cpu, *_request->getUser());

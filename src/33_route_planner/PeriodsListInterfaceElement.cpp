@@ -59,7 +59,10 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 
-			shared_ptr<const RoutePlannerFunction> function(request->getFunction<RoutePlannerFunction>());
+			shared_ptr<const RoutePlannerFunction> function(
+				static_pointer_cast<const RoutePlannerFunction>(
+					request->_getFunction()
+			)	);
 
 			assert(function.get());
 

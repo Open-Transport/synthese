@@ -31,9 +31,10 @@
 #include "ResaEditLogEntryAdmin.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
-#include "ActionFunctionRequest.h"
+#include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
 #include "AdminRequest.h"
+#include "DBLogEntryTableSync.h"
 
 using namespace std;
 
@@ -44,6 +45,7 @@ namespace synthese
 	using namespace html;
 	using namespace server;
 	using namespace security;
+	using namespace dblog;
 	
 	namespace util
 	{
@@ -76,15 +78,25 @@ namespace synthese
 			if (callId == UNKNOWN_VALUE)
 			{ // Case call start
 
-				ActionFunctionRequest<CallBeginAction,AdminRequest> callRequest(request);
-				callRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
+				AdminActionFunctionRequest<CallBeginAction,ReservationRoutePlannerAdmin> callRequest(
+					static_cast<const FunctionRequest<AdminRequest>* >(request)
+				);
 				stream << HTMLModule::getLinkButton(callRequest.getURL(), _takeCallText->getValue(parameters,variables,object,request),string(), _takeCallIcon->getValue(parameters,variables,object,request));
 			}
 			else
 			{
-				ActionFunctionRequest<CallEndAction,AdminRequest> callRequest(request);
-				callRequest.getFunction()->setPage<ResaEditLogEntryAdmin>();
-				callRequest.setObjectId(callId);
+				
+				AdminActionFunctionRequest<CallEndAction,ResaEditLogEntryAdmin> callRequest(
+					static_cast<const FunctionRequest<AdminRequest>* >(request)
+				);
+				
+				callRequest.getPage()->setEntry(
+					DBLogEntryTableSync::Get(
+						callId,
+						*static_cast<const FunctionRequest<AdminRequest>* >(
+							request
+						)->getFunction()->getEnv()
+				)	);
 				stream << HTMLModule::getLinkButton(callRequest.getURL(), _stopCallText->getValue(parameters,variables,object,request),string(), _stopCallIcon->getValue(parameters,variables,object,request));
 			}
 

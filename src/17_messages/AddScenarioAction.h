@@ -67,7 +67,12 @@ namespace synthese
 			*/
 			void run();
 
-			void setFolderId(uid value);
+			void setFolder(
+				boost::shared_ptr<ScenarioFolder> value
+			);
+			void setFolder(
+				boost::shared_ptr<const ScenarioFolder> value
+			);
 
 			virtual bool _isAuthorized() const;
 		};

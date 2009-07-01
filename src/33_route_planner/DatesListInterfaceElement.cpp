@@ -60,7 +60,10 @@ namespace synthese
 		) const {
 			
 			Date dateDefaut(Date::FromSQLDate(_value->getValue(parameters, variables, object, request)));
-			shared_ptr<const RoutePlannerFunction> function(request->getFunction<RoutePlannerFunction>());
+			shared_ptr<const RoutePlannerFunction> function(
+				static_pointer_cast<const RoutePlannerFunction>(
+					request->_getFunction()
+			)	);
 
 			assert(function.get());
 			

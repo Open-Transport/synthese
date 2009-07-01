@@ -23,11 +23,9 @@
 #ifndef SYNTHESE_ScenarioStopAction_H__
 #define SYNTHESE_ScenarioStopAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
-
-#include "04_time/DateTime.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
+#include "DateTime.h"
 
 namespace synthese
 {
@@ -38,8 +36,12 @@ namespace synthese
 		/** ScenarioStopAction action class.
 			@ingroup m17Actions refActions
 		*/
-		class ScenarioStopAction : public util::FactorableTemplate<server::Action, ScenarioStopAction>
+		class ScenarioStopAction:
+			public util::FactorableTemplate<server::Action, ScenarioStopAction>
 		{
+		public:
+			static const std::string PARAMETER_SCENARIO_ID;
+			
 		private:
 			boost::shared_ptr<SentScenario>	_scenario;
 			const time::DateTime			_stopDateTime;
@@ -63,6 +65,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setScenario(boost::shared_ptr<SentScenario> value);
 		};
 	}
 }

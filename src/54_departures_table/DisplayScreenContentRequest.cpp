@@ -40,6 +40,7 @@
 #include "Env.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -67,14 +68,18 @@ namespace synthese
 
 		void DisplayScreenContentRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(0);
 			try
 			{
+				RegistryKeyType id;
 				// Screen
-				if (_request->getObjectId() > 0)
-					id = _request->getObjectId();
+				if (map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+				{
+					id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
+				}
 				else
-					id = map.getUid(PARAMETER_TB, true, FACTORY_KEY);
+				{
+					id = map.get<RegistryKeyType>(PARAMETER_TB);
+				}
 
 				if (decodeTableId(id) == ConnectionPlaceTableSync::TABLE.ID)
 				{
@@ -89,7 +94,7 @@ namespace synthese
 				}
 				else if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 				{
-					setDisplay(id);
+					_screen = DisplayScreenTableSync::Get(id, *_env);
 				}
 				else
 					throw RequestException("Not a display screen nor a connection place");
@@ -99,9 +104,9 @@ namespace synthese
 				if (_date.isUnknown())
 					_date = DateTime(TIME_CURRENT);
 			}
-			catch (...)
+			catch (ObjectNotFoundException<DisplayScreen> e)
 			{
-				throw RequestException("Display screen " + Conversion::ToString(id) + " not found");
+				throw RequestException("Display screen not found "+ e.getMessage());
 			}
 		}
 
@@ -119,8 +124,7 @@ namespace synthese
 
 
 		bool DisplayScreenContentRequest::_isAuthorized(
-
-			) const {
+		) const {
 			return true;
 		}
 
@@ -137,9 +141,10 @@ namespace synthese
 			;
 		}
 
-		void DisplayScreenContentRequest::setDisplay( const util::RegistryKeyType id )
-		{
-			_screen = Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(id);
+		void DisplayScreenContentRequest::setScreen(
+			shared_ptr<const DisplayScreen> value
+		){
+			_screen = value;
 		}
 	}
 }

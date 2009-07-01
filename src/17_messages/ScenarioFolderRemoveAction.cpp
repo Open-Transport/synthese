@@ -98,15 +98,13 @@ namespace synthese
 		void ScenarioFolderRemoveAction::run()
 		{
 			ScenarioFolderTableSync::Remove(_folder->getKey());
-
-			if (_request->getObjectId() == _folder->getKey())
-				_request->setObjectId(_folder->getParent() ? _folder->getParent()->getKey() : 0);
 		}
 
 
 
-		void ScenarioFolderRemoveAction::setFolder( boost::shared_ptr<const ScenarioFolder> value )
-		{
+		void ScenarioFolderRemoveAction::setFolder(
+			boost::shared_ptr<const ScenarioFolder> value
+		){
 			_folder = value;
 		}
 

@@ -21,14 +21,20 @@
 */
 
 #include "HomeAdmin.h"
+#include "ModuleAdmin.h"
+#include "ModuleClass.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace admin;
-
+	using namespace util;
+	
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, HomeAdmin>::FACTORY_KEY = "home";
@@ -71,11 +77,47 @@ namespace synthese
 	
 		}
 
-		AdminInterfaceElement::PageLinks HomeAdmin::getSubPagesOfParent( 
-			const PageLink& parentLink 
-			, const AdminInterfaceElement& currentPage 
-		) const	{
-			return AdminInterfaceElement::PageLinks();
+
+		AdminInterfaceElement::PageLinks HomeAdmin::getSubPages(
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
+		) const {
+			AdminInterfaceElement::PageLinks links;
+			
+			const ModuleAdmin* ma(
+				dynamic_cast<const ModuleAdmin*>(currentPage.get())
+			);
+			const string moduleKey(
+				ma ?
+				ma->getModuleClass()->getFactoryKey() :
+				string()
+			);
+
+			vector<shared_ptr<ModuleClass> > modules(
+				Factory<ModuleClass>::GetNewCollection()
+			);
+			BOOST_FOREACH(shared_ptr<ModuleClass> module, modules)
+			{
+				if(	ma &&
+					moduleKey == module->getFactoryKey()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<ModuleAdmin> link(
+						getNewOtherPage<ModuleAdmin>()
+					);
+					link->setModuleClass(
+						const_pointer_cast<const ModuleClass, ModuleClass>(module)
+					);
+					if (!link->getSubPages(currentPage).empty())
+					{
+						AddToLinks(links, link);
+					}
+				}
+			}
+			
+			return links;
 		}
 	}
 }

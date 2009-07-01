@@ -38,7 +38,8 @@
 #include "AdminInterfaceElement.h"
 #include "User.h"
 #include "Profile.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -139,11 +140,6 @@ namespace synthese
 
 		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
 		{
-			FunctionRequest<AdminRequest> goRequest(_request);
-			goRequest.getFunction()->setPage<DisplaySearchAdmin>();
-
-			FunctionRequest<AdminRequest> searchRequest(_request);
-
 			vector<pair<int, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
 			m.push_back(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
@@ -151,6 +147,7 @@ namespace synthese
 
 			stream << "<h1>Recherche</h1>";
 
+			AdminFunctionRequest<BroadcastPointsAdmin> searchRequest(_request);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune", st.getForm().getTextInput(PARAMETER_CITY_NAME, _cityName));
@@ -186,6 +183,7 @@ namespace synthese
 			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, _resultParameters);
 
 			stream << t.open();
+			AdminFunctionRequest<DisplaySearchAdmin> goRequest(_request);
 			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> pl, _searchResult)
 			{
 				stream << t.row();
@@ -212,12 +210,38 @@ namespace synthese
 			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 
-		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY)
 			{
-				links.push_back(getPageLink());
+				if(dynamic_cast<const BroadcastPointsAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
+			}
+			return links;
+		}
+
+
+		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPages(
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
+		) const	{
+			AdminInterfaceElement::PageLinks links;
+			const DisplaySearchAdmin* sa(
+				dynamic_cast<const DisplaySearchAdmin*>(currentPage.get())
+			);
+			if(	sa &&
+				sa->getPlace() &&
+				sa->getPlace().get()
+			){
+				AddToLinks(links, currentPage);
 			}
 			return links;
 		}

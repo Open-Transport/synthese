@@ -73,10 +73,16 @@ namespace synthese
 
 
 		std::string AdminPagesTreeInterfaceElement::display(
-			ostream& stream
-			, const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
-		{
-			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
+			ostream& stream,
+			const ParametersVector& parameters,
+			interfaces::VariablesMap& variables,
+			const void* object /* = NULL */,
+			const server::Request* request /* = NULL */
+		) const {
+			const shared_ptr<const AdminInterfaceElement> page(
+				*(const shared_ptr<const AdminInterfaceElement>*) object
+			);
+			
 			_lastLevelIndenter = _lastLevelIndenterVIE->getValue(parameters, variables, object, request);
 			_levelIndenter = _levelIndenterVIE->getValue(parameters, variables, object, request);
 			_lastSubpageIntroducer = _lastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
@@ -91,8 +97,8 @@ namespace synthese
 			_closedFolderLastSubpageIntroducer = _closedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
 
 			stream << getSubPages(
-				(*page)->getTree()
-				, **page
+				page->getTree()
+				, page
 				, 0
 				, string()
 				, true
@@ -102,8 +108,8 @@ namespace synthese
 		}
 
 		std::string AdminPagesTreeInterfaceElement::getSubPages(
-			const AdminInterfaceElement::PageLinksTree& pages
-			, const AdminInterfaceElement& currentPage
+			const AdminInterfaceElement::PageLinksTree& pages,
+			shared_ptr<const AdminInterfaceElement> currentPage
 			, int level
 			, string prefix
 			, bool last
@@ -119,30 +125,80 @@ namespace synthese
 				if (last)
 				{
 					curPrefix += _lastLevelIndenter;
-					str << (pages.subPages.empty() ? _lastSubpageIntroducer : (pages.isNodeOpened ? _openedFolderLastSubpageIntroducer : _closedFolderLastSubpageIntroducer ));
+					str <<
+						(	pages.subPages.empty() ?
+							_lastSubpageIntroducer :
+							(	pages.isNodeOpened ?
+								_openedFolderLastSubpageIntroducer :
+								_closedFolderLastSubpageIntroducer
+						)	)
+					;
 				}
 				else
 				{
 					curPrefix += _levelIndenter;
-					str << (pages.subPages.empty() ? _subpageIntroducer : (pages.isNodeOpened ? _openedFolderSubpageIntroducer : _closedFolderSubpageIntroducer));
+					str <<
+						(	pages.subPages.empty() ?
+							_subpageIntroducer :
+							(	pages.isNodeOpened ?
+								_openedFolderSubpageIntroducer :
+								_closedFolderSubpageIntroducer
+						)	)
+					;
 				}
 			}
 
-			if (pages.pageLink == currentPage.getPageLink())
+			// Display current page
+			FunctionRequest<AdminRequest> r(currentPage->getRequest());
+			if (pages.page == currentPage)
 			{
-				str << HTMLModule::getHTMLImage(currentPage.getPageLink().icon, std::string())
-					<< currentPage.getPageLink().name;
+				str <<
+					HTMLModule::getHTMLImage(
+						currentPage->getIcon(),
+						string()
+					) <<
+					currentPage->getTitle()
+				;
 			}
 			else
 			{
-				str << HTMLModule::getHTMLImage(pages.pageLink.icon, std::string())
-					<< HTMLModule::getHTMLLink(pages.pageLink.getURL(), pages.pageLink.name);
+				r.getFunction()->setPage(
+					const_pointer_cast<AdminInterfaceElement>(pages.page)
+				);
+				str <<
+					HTMLModule::getHTMLImage(
+						pages.page->getIcon(),
+						std::string()
+					) <<
+					HTMLModule::getHTMLLink(
+						r.getURL(),
+						pages.page->getTitle()
+					)
+				;
 			}
-			str << (pages.isNodeOpened ? _subpagesIntroducerIfOpened : _subpagesIntroducerIfClosed);
+			str <<
+				(	pages.isNodeOpened ?
+					_subpagesIntroducerIfOpened :
+					_subpagesIntroducerIfClosed
+				)
+			;
 
-			for (vector<AdminInterfaceElement::PageLinksTree>::const_iterator it = pages.subPages.begin(); it != pages.subPages.end(); ++it)
-			{
-				str << getSubPages(*it, currentPage, level+1, curPrefix, it==(pages.subPages.end()-1) );
+			// Recursion
+			for(vector<AdminInterfaceElement::PageLinksTree>::const_iterator it(
+					pages.subPages.begin()
+				);
+				it != pages.subPages.end();
+				++it
+			){
+				str <<
+					getSubPages(
+						*it,
+						currentPage,
+						level+1,
+						curPrefix,
+						it==(pages.subPages.end()-1)
+					)
+				;
 			}
 			str << _ending;
 

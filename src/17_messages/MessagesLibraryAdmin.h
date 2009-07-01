@@ -80,13 +80,16 @@ namespace synthese
 
 		private:
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			uid											_folderId;
 			boost::shared_ptr<const ScenarioFolder>		_folder;
 			util::Env									_subFoldersEnv;
 
 			
 		public:
 			MessagesLibraryAdmin();
+
+			boost::shared_ptr<const ScenarioFolder> getFolder() const;
+			void setFolder(boost::shared_ptr<ScenarioFolder> folder);
+			void setFolder(boost::shared_ptr<const ScenarioFolder> folder);
 
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
@@ -114,7 +117,6 @@ namespace synthese
 
 			bool isAuthorized() const;
 
-			void setFolderId(uid folder);
 
 
 
@@ -124,9 +126,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const std::string& moduleKey,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 
 			/** Sub pages getter.
@@ -137,12 +139,11 @@ namespace synthese
 				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
 				This method can be overloaded to create customized sub tree.
 			*/
-			virtual PageLinks getSubPages(const AdminInterfaceElement& currentPage
+			virtual PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 
 			virtual std::string getTitle() const;
-			virtual std::string getParameterName() const;
-			virtual std::string getParameterValue() const;
 			virtual std::string getIcon() const;
 
 			/** Gets the opening position of the node in the tree view.

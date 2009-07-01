@@ -26,10 +26,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "12_security/Types.h"
-
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -40,9 +38,11 @@ namespace synthese
 		/** Right update action class.
 			@ingroup m12Actions refActions
 		*/
-		class UpdateRightAction : public util::FactorableTemplate<server::Action,UpdateRightAction>
+		class UpdateRightAction :
+			public util::FactorableTemplate<server::Action,UpdateRightAction>
 		{
 		public:
+			static const std::string PARAMETER_PROFILE_ID;
 			static const std::string PARAMETER_RIGHT_CODE;
 			static const std::string PARAMETER_RIGHT_PARAMETER;
 			static const std::string PARAMETER_PUBLIC_VALUE;
@@ -71,6 +71,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setProfile(boost::shared_ptr<const Profile> value);
 		};
 	}
 }

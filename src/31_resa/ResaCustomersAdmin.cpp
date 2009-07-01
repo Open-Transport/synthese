@@ -31,9 +31,8 @@
 #include "ResaRight.h"
 #include "ResaCustomerAdmin.h"
 
-#include "AdminRequest.h"
-#include "Request.h"
-
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -124,10 +123,9 @@ namespace synthese
 		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<ResaCustomersAdmin> searchRequest(_request);
 
-			FunctionRequest<AdminRequest> openRequest(_request);
-			openRequest.getFunction()->setPage<ResaCustomerAdmin>();
+			AdminFunctionRequest<ResaCustomerAdmin> openRequest(_request);
 			
 			// Form
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
@@ -158,7 +156,7 @@ namespace synthese
 
 				BOOST_FOREACH(shared_ptr<User> user, _getEnv().getRegistry<User>())
 				{
-					openRequest.setObjectId(user->getKey());
+					openRequest.getPage()->setUser(user);
 
 					stream << t.row();
 
@@ -180,13 +178,23 @@ namespace synthese
 			return _request->isAuthorized<ResaRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfModule(
+			const string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
-				links.push_back(getPageLink());
+			
+			if(moduleKey == ResaModule::FACTORY_KEY)
+			{
+				if(dynamic_cast<const ResaCustomersAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links,currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
+			}
 			return links;
 		}
 	}

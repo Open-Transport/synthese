@@ -23,7 +23,7 @@
 */
 
 #include "BookableCommercialLineAdmin.h"
-
+#include "UserTableSync.h"
 #include "ResaModule.h"
 #include "ServiceReservations.h"
 #include "ReservationTransactionTableSync.h"
@@ -44,8 +44,8 @@
 #include "CommercialLineTableSync.h"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
-
-#include "AdminRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "RequestException.h"
 #include "ActionFunctionRequest.h"
 
@@ -134,7 +134,14 @@ namespace synthese
 			}
 
 			optional<RegistryKeyType> sid(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE));
-			if(sid) setServiceId(*sid);
+			if(sid) try
+			{
+				_service = ScheduledServiceTableSync::Get(*sid, _getEnv());
+			}
+			catch (ObjectNotFoundException<ScheduledService> e)
+			{
+				throw RequestException("Service not found");
+			}			
 
 			if(!doDisplayPreparationActions) return;
 
@@ -181,6 +188,8 @@ namespace synthese
 				m.insert(PARAMETER_DATE, _date);
 			}
 			m.insert(PARAMETER_DISPLAY_CANCELLED, _displayCancelled);
+			if(_line.get()) m.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
+			if(_service.get()) m.insert(PARAMETER_SERVICE, _service->getKey());
 			return m;
 		}
 
@@ -193,14 +202,13 @@ namespace synthese
 			bool globalDeleteRight(_request->isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL));
 
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<BookableCommercialLineAdmin> searchRequest(_request);
 
-			ActionFunctionRequest<CancelReservationAction,AdminRequest> cancelRequest(_request);
+			AdminActionFunctionRequest<CancelReservationAction,BookableCommercialLineAdmin> cancelRequest(_request);
 
-			FunctionRequest<AdminRequest> customerRequest(_request);
-			customerRequest.getFunction()->setPage<ResaCustomerAdmin>();
+			AdminFunctionRequest<ResaCustomerAdmin> customerRequest(_request);
 
-			FunctionRequest<AdminRequest> printRequest(_request);
+			AdminFunctionRequest<BookableCommercialLineAdmin> printRequest(_request);
 			
 			// Local variables
 			DateTime now(TIME_CURRENT);
@@ -290,7 +298,7 @@ namespace synthese
 				if (serviceSeatsNumber > 0)
 					stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
 
-				static_pointer_cast<BookableCommercialLineAdmin,AdminInterfaceElement>(printRequest.getFunction()->getPage())->setServiceId(service->getKey());
+				printRequest.getPage()->setService(service);
 				stream << t.col() << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
 
 				if (serviceReservations.empty())
@@ -304,9 +312,17 @@ namespace synthese
 					{
 						ReservationStatus status(reservation->getStatus());
 
-						customerRequest.setObjectId(reservation->getTransaction()->getCancelUserId());
+						customerRequest.getPage()->setUser(
+							UserTableSync::Get(
+								reservation->getTransaction()->getCancelUserId(),
+								_getEnv()
+						)	);
 						
-						cancelRequest.getAction()->setTransaction(ReservationTransactionTableSync::GetEditable(reservation->getTransaction()->getKey(), _getEnv()));
+						cancelRequest.getAction()->setTransaction(
+							ReservationTransactionTableSync::GetEditable(
+								reservation->getTransaction()->getKey(),
+								_getEnv()
+						)	);
 
 						stream << t.row();
 						stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
@@ -527,21 +543,6 @@ namespace synthese
 			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_line->getKey()));
 		}
 		
-		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
-		
-		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPages(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 
 
 		std::string BookableCommercialLineAdmin::getTitle() const
@@ -549,26 +550,20 @@ namespace synthese
 			return _line.get() ? "<span class=\"linesmall " + _line->getStyle() +"\">" + _line->getShortName() + "</span>" : DEFAULT_TITLE;
 		}
 
-		std::string BookableCommercialLineAdmin::getParameterName() const
+
+		void BookableCommercialLineAdmin::setService(shared_ptr<const ScheduledService> value)
 		{
-			return _line.get() ? Request::PARAMETER_OBJECT_ID : string();
+			_service = value;
+		}
+		
+		void BookableCommercialLineAdmin::setCommercialLine(boost::shared_ptr<env::CommercialLine> value)
+		{
+			_line = const_pointer_cast<const CommercialLine>(value);
 		}
 
-		std::string BookableCommercialLineAdmin::getParameterValue() const
+		boost::shared_ptr<const env::CommercialLine> BookableCommercialLineAdmin::getCommercialLine() const
 		{
-			return _line.get() ? Conversion::ToString(_line->getKey()) : string();
-		}
-
-		void BookableCommercialLineAdmin::setServiceId( util::RegistryKeyType id )
-		{
-			try
-			{
-				_service = ScheduledServiceTableSync::Get(id, _getEnv());
-			}
-			catch (ObjectNotFoundException<ScheduledService> e)
-			{
-				throw RequestException("Service not found");
-			}			
+			return _line;
 		}
 	}
 }

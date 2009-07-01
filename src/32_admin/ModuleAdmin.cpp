@@ -27,6 +27,7 @@
 #include "ModuleClass.h"
 #include "HTMLModule.h"
 #include "AdminParametersException.h"
+#include "AdminRequest.h"
 
 #include <boost/foreach.hpp>
 
@@ -67,10 +68,9 @@ namespace synthese
 		){
 			try
 			{
-				_moduleKey = map.getString(PARAMETER_MODULE, true, FACTORY_KEY);
-				
-				_moduleClass.reset(Factory<ModuleClass>::create(_moduleKey));
-
+				setModuleClass(shared_ptr<const ModuleClass>(
+						Factory<ModuleClass>::create(map.get<string>(PARAMETER_MODULE))
+				)	);
 			}
 			catch(...)
 			{
@@ -83,7 +83,7 @@ namespace synthese
 		server::ParametersMap ModuleAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			m.insert(PARAMETER_MODULE, _moduleKey);
+			if(_moduleClass.get()) m.insert(PARAMETER_MODULE, _moduleClass->getFactoryKey());
 			return m;
 		}
 		
@@ -106,11 +106,13 @@ namespace synthese
 			
 			stream << "<ul>";
 
-			AdminInterfaceElement::PageLinks links(getSubPages(*this));
-			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
+			FunctionRequest<AdminRequest> r(_request);
+			AdminInterfaceElement::PageLinks links(getSubPages(shared_from_this()));
+			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> page, links)
 			{
-				stream << "<li>" << HTMLModule::getHTMLImage(it->icon, it->name);
-				stream << HTMLModule::getHTMLLink(it->getURL(), it->name);
+				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(page));
+				stream << "<li>" << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
+				stream << HTMLModule::getHTMLLink(r.getURL(), page->getTitle());
 				stream << "</li>";
 			}
 			stream << "</ul>";
@@ -121,46 +123,72 @@ namespace synthese
 			return true;
 		}
 		
-		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPages(
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
+			
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == HomeAdmin::FACTORY_KEY)
+
+			Factory<AdminInterfaceElement>::ObjectsCollection pages(Factory<AdminInterfaceElement>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement> page, pages)
+			{
+				page->setRequest(_request);
+				if (page->isAuthorized())
+				{
+					PageLinks l(
+						page->getSubPagesOfModule(_moduleClass->getFactoryKey(), currentPage)
+					);
+					links.insert(links.end(), l.begin(), l.end());
+				}
+				else if(currentPage->getFactoryKey() == page->getFactoryKey())
+				{
+					PageLinks l(
+						currentPage->getSubPagesOfModule(
+							_moduleClass->getFactoryKey(),
+							currentPage
+					)	);
+					links.insert(links.end(), l.begin(), l.end());
+				}
+			}
+			return links;
+			
+			
+			
+/*			AdminInterfaceElement::PageLinks links;
+			const HomeAdmin* homeAdmin(dynamic_cast<const HomeAdmin*>(&parentLink));
+			if(homeAdmin)
 			{
 				vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
 				BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
 				{
-					AdminInterfaceElement::PageLink link(getPageLink());
-					link.parameterValue = module->getFactoryKey();
-					link.parameterName = PARAMETER_MODULE;
-					link.name = module->getName();
+					shared_ptr<ModuleAdmin> link(new ModuleAdmin);
+					link->_moduleClass = module;
 
-					if (!link.getAdminPage()->getSubPages(currentPage).empty())
+					if (!link->getSubPages(currentPage).empty())
 						links.insert(links.begin(), link);
 				}
 			}
 			return links;
-		}
+*/		}
 
 		std::string ModuleAdmin::getTitle() const
 		{
 			return _moduleClass.get() ? _moduleClass->getName() : DEFAULT_TITLE;
 		}
 
-		std::string ModuleAdmin::getParameterName() const
-		{
-			return _moduleClass.get() ? PARAMETER_MODULE : string();
-		}
-
-		std::string ModuleAdmin::getParameterValue() const
-		{
-			return _moduleClass.get() ? _moduleKey : string();
-		}
-
 		bool ModuleAdmin::isPageVisibleInTree(const AdminInterfaceElement& currentPage) const
 		{
 			return true;
-		}		
+		}
+		
+		boost::shared_ptr<const server::ModuleClass> ModuleAdmin::getModuleClass() const
+		{
+			return _moduleClass;
+		}
+		
+		void ModuleAdmin::setModuleClass(boost::shared_ptr<const server::ModuleClass> value)
+		{
+			_moduleClass = value;
+		}
 	}
 }

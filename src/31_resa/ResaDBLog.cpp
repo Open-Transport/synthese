@@ -23,7 +23,7 @@
 
 #include "ResaDBLog.h"
 #include "ResaRight.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
 #include "Reservation.h"
 #include "ReservationTransaction.h"
 #include "ResaModule.h"
@@ -39,6 +39,7 @@
 #include "Session.h"
 #include "AdminInterfaceElement.h"
 #include "ResaEditLogEntryAdmin.h"
+#include "AdminRequest.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -310,9 +311,16 @@ namespace synthese
 				case FAKE_CALL:
 				case RADIO_CALL:
 				case OUTGOING_CALL:
-					FunctionRequest<AdminRequest> openCallRequest(&searchRequest);
-					openCallRequest.getFunction()->setPage<ResaEditLogEntryAdmin>();
-					openCallRequest.setObjectId(entry.getKey());
+					AdminFunctionRequest<ResaEditLogEntryAdmin> openCallRequest(
+						static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+					);
+					openCallRequest.getPage()->setEntry(
+						DBLogEntryTableSync::Get(
+							entry.getKey(),
+							*static_cast<const FunctionRequest<AdminRequest>* >(
+								&searchRequest
+							)->getFunction()->getEnv()
+					)	);
 					stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir");
 					break;
 				}

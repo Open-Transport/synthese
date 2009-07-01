@@ -36,7 +36,8 @@
 #include "TimetableRight.h"
 
 #include "AdminRequest.h"
-#include "ActionFunctionRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
@@ -79,33 +80,40 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
+			if(_request->getActionWillCreateObject()) return;
+			
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK, ResultHTMLTable::UNLIMITED_SIZE);
-						
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
-			
-			if(id <= 0) return;
-			
-			try
+
+			optional<RegistryKeyType> id(
+				map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+			);
+			if(id)
 			{
-				_book = TimetableTableSync::Get(id, _getEnv());
+				try
+				{
+					_book = TimetableTableSync::Get(*id, _getEnv());
+				}
+				catch(...)
+				{
+					throw AdminParametersException("No such book");
+				}
+				if (!_book->getIsBook())
+					throw AdminParametersException("Timetable is not a book");
 			}
-			catch(...)
-			{
-				throw AdminParametersException("No such book");
-			}
-			if (!_book->getIsBook())
-				throw AdminParametersException("Timetable is not a book");
-			
 
 			if(!doDisplayPreparationActions) return;
 
 			// Search
 			TimetableTableSync::Search(
 				_getEnv(),
-				_book->getKey()
+				_book.get() ? _book->getKey() : 0
 				, _requestParameters.orderField == PARAMETER_RANK
 				, _requestParameters.orderField == PARAMETER_TITLE
 				, _requestParameters.raisingOrder
+			);
+			_resultParameters.setFromResult(
+				_requestParameters,
+				_getEnv().getEditableRegistry<Timetable>()
 			);
 		}
 		
@@ -114,6 +122,7 @@ namespace synthese
 		server::ParametersMap TimetableBookAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
+			if(_book.get()) m.insert(Request::PARAMETER_OBJECT_ID, _book->getKey());
 			return m;
 		}
 		
@@ -124,10 +133,7 @@ namespace synthese
 			VariablesMap& variables
 		) const {
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<TimetableBookAdmin>();
-			searchRequest.setObjectId(_book.get() ? _book->getKey() : 0);
-
+			
 //			ActionFunctionRequest<TimetableBookRemoveAction,AdminRequest> removeFolderRequest(request);
 //			removeFolderRequest.getAction()->setBook(_book);
 //			removeFolderRequest.getFunction()->setPage<TimetableBookAdmin>();
@@ -136,22 +142,6 @@ namespace synthese
 //			updateFolderRequest.getAction()->setFolderId(_book.get() ? _book->getKey() : 0);
 //			updateFolderRequest.getFunction()->setPage<TimetableBookAdmin>();
 //			updateFolderRequest.setObjectId(_book.get() ? _book->getKey() : 0);
-
-			ActionFunctionRequest<TimetableAddAction,AdminRequest> addTimetableRequest(_request);
-			addTimetableRequest.getAction()->setBook(_book);
-			addTimetableRequest.getFunction()->setPage<TimetableAdmin>();
-			addTimetableRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
-
-
-			FunctionRequest<AdminRequest> editTimetableRequest(_request);
-			editTimetableRequest.getFunction()->setPage<TimetableAdmin>();
-
-			FunctionRequest<AdminRequest> goFolderRequest(_request);
-			goFolderRequest.getFunction()->setPage<TimetableBookAdmin>();
-
-			ResultHTMLTable::ResultParameters tt_rp;
-			tt_rp.setFromResult(_requestParameters, _getEnv().getEditableRegistry<Timetable>());
-
 
 			// Folder properties
 			if (_book.get())
@@ -171,6 +161,11 @@ namespace synthese
 			// Pages
 			stream << "<h1>Fiches horaires</h1>";
 
+			AdminFunctionRequest<TimetableBookAdmin> searchRequest(_request);
+			AdminActionFunctionRequest<TimetableAddAction,TimetableAdmin> addTimetableRequest(_request);
+			addTimetableRequest.getAction()->setBook(_book);
+			addTimetableRequest.setActionWillCreateObject();
+
 			ActionResultHTMLTable::HeaderVector h3;
 			h3.push_back(make_pair(string(), string()));
 			h3.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
@@ -180,17 +175,27 @@ namespace synthese
 			h3.push_back(make_pair(string(), "Actions"));
 			h3.push_back(make_pair(string(), "Actions"));
 			h3.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, tt_rp, addTimetableRequest.getHTMLForm("addtimetable"), TimetableAddAction::PARAMETER_RANK);
+			ActionResultHTMLTable t3(
+				h3,
+				searchRequest.getHTMLForm(),
+				_requestParameters,
+				_resultParameters,
+				addTimetableRequest.getHTMLForm("addtimetable"),
+				TimetableAddAction::PARAMETER_RANK
+			);
 			stream << t3.open();
 			int lastRank(UNKNOWN_VALUE);
 			int maxRank(TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0));
 			
+			// Links to folders or timetable edition
+			AdminFunctionRequest<TimetableBookAdmin> goFolderRequest(_request);
+			AdminFunctionRequest<TimetableAdmin> editTimetableRequest(_request);
 			BOOST_FOREACH(shared_ptr<Timetable> tt, _getEnv().getRegistry<Timetable>())
 			{
 				if (tt->getIsBook())
-					goFolderRequest.setObjectId(tt->getKey());
+					goFolderRequest.getPage()->setBook(tt);
 				else
-					editTimetableRequest.setObjectId(tt->getKey());
+					editTimetableRequest.getPage()->setTimetable(tt);
 
 				lastRank = tt->getRank();
 
@@ -248,16 +253,27 @@ namespace synthese
 
 		
 		
-		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPagesOfParent(
-			const PageLink& parentLink,
-			const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			if(	parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY &&
-				parentLink.parameterValue == TimetableModule::FACTORY_KEY
+			const TimetableBookAdmin* ta(
+				dynamic_cast<const TimetableBookAdmin*>(currentPage.get())
+			);
+			
+			if(	moduleKey == TimetableModule::FACTORY_KEY
 			){
-				links.push_back(getPageLink());
+				if(	ta &&
+					!ta->_book.get())
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
 			}
 			return links;
 		}
@@ -265,8 +281,16 @@ namespace synthese
 		
 		
 		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const {
+			const TimetableBookAdmin* ba(
+				dynamic_cast<const TimetableBookAdmin*>(currentPage.get())
+			);
+			
+			const TimetableAdmin* ta(
+				dynamic_cast<const TimetableAdmin*>(currentPage.get())
+			);
+
 			AdminInterfaceElement::PageLinks links;
 
 			// Subpages
@@ -274,13 +298,40 @@ namespace synthese
 			TimetableTableSync::Search(env, _book.get() ? _book->getKey() : 0);
 			BOOST_FOREACH(shared_ptr<Timetable> tt, env.getRegistry<Timetable>())
 			{
-				PageLink link(currentPage.getPageLink());
-				link.factoryKey = tt->getIsBook() ? TimetableBookAdmin::FACTORY_KEY : TimetableAdmin::FACTORY_KEY;
-				link.icon = tt->getIsBook() ? TimetableBookAdmin::ICON :  TimetableAdmin::ICON;
-				link.name = tt->getTitle();
-				link.parameterName = Request::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString(tt->getKey());
-				links.push_back(link);
+				if(tt->getIsBook())
+				{
+					if(	ba &&
+						ba->_book.get() &&
+						tt->getKey() == ba->_book->getKey()
+					){
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<TimetableBookAdmin> page(
+							getNewOtherPage<TimetableBookAdmin>()
+						);
+						page->setBook(tt);
+						AddToLinks(links, page);
+					}
+				}
+				else
+				{
+					if(	ta &&
+						ta->getTimetable().get() &&
+						ta->getTimetable()->getKey() == tt->getKey()
+					){
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<TimetableAdmin> page(
+							getNewOtherPage<TimetableAdmin>()
+						);
+						page->setTimetable(tt);
+						AddToLinks(links, page);
+					}
+				}
 			}
 
 			return links;
@@ -293,19 +344,16 @@ namespace synthese
 			return _book.get() ? _book->getTitle() : DEFAULT_TITLE;
 		}
 
-		std::string TimetableBookAdmin::getParameterName() const
-		{
-			return _book.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
 
-		std::string TimetableBookAdmin::getParameterValue() const
-		{
-			return _book.get() ? Conversion::ToString(_book->getKey()) : string();
-		}
-		
+
 		bool TimetableBookAdmin::isAuthorized() const
 		{
 			return _request->isAuthorized<TimetableRight>(READ);
+		}
+		
+		void TimetableBookAdmin::setBook(boost::shared_ptr<Timetable> value)
+		{
+			_book = const_pointer_cast<const Timetable, Timetable>(value);
 		}
 	}
 }

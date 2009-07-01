@@ -34,7 +34,8 @@
 #include "DisplayTypeRemoveAction.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayTypeAdmin.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "DeparturesTableInterfacePage.h"
@@ -118,16 +119,18 @@ namespace synthese
 			// Right
 			bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 			
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<DisplayTypesAdmin> searchRequest(_request);
 
-			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(_request);
-			createRequest.getFunction()->setPage<DisplayTypeAdmin>();
-			createRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			AdminActionFunctionRequest<CreateDisplayTypeAction,DisplayTypeAdmin> createRequest(
+				_request
+			);
+			createRequest.setActionWillCreateObject();
 			
-			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(_request);
+			AdminActionFunctionRequest<DisplayTypeRemoveAction,DisplayTypesAdmin> deleteRequest(
+				_request
+			);
 
-			FunctionRequest<AdminRequest> openRequest(_request);
-			openRequest.getFunction()->setPage<DisplayTypeAdmin>();
+			AdminFunctionRequest<DisplayTypeAdmin> openRequest(_request);
 			
 			stream << "<h1>Recherche</h1>";
 
@@ -163,7 +166,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<DisplayType> dt, _getEnv().getRegistry<DisplayType>())
 			{
 				deleteRequest.getAction()->setType(dt);
-				openRequest.setObjectId(dt->getKey());
+				openRequest.getPage()->setType(dt);
 
 				stream << t.row();
 				stream << t.col() << dt->getName();
@@ -239,7 +242,11 @@ namespace synthese
 
 		bool DisplayTypesAdmin::isAuthorized() const
 		{
-			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER);
+			return _request->isAuthorized<ArrivalDepartureTableRight>(
+				READ,
+				UNKNOWN_RIGHT_LEVEL,
+				GLOBAL_PERIMETER
+			);
 		}
 
 		DisplayTypesAdmin::DisplayTypesAdmin()
@@ -249,14 +256,22 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfParent(
-			const PageLink& parentLink,
-			const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
+			
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY)
 			{
-				links.push_back(getPageLink());
+				if(dynamic_cast<const DisplayTypesAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
 			}
 			return links;
 		}
@@ -271,20 +286,29 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const {
+		
+			const DisplayTypeAdmin* da(
+				dynamic_cast<const DisplayTypeAdmin*>(currentPage.get())
+			);
+			
 			Env env;
 			DisplayTypeTableSync::Search(env, "%", UNKNOWN_VALUE, 0, UNKNOWN_VALUE, true, false, false, true, FIELDS_ONLY_LOAD_LEVEL);
 			AdminInterfaceElement::PageLinks links;
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.getRegistry<DisplayType>())
 			{
-				PageLink link(getPageLink());
-				link.factoryKey = DisplayTypeAdmin::FACTORY_KEY;
-				link.icon = DisplayTypeAdmin::ICON;
-				link.name = displayType->getName();
-				link.parameterName = Request::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString(displayType->getKey());
-				links.push_back(link);
+				if(	da &&
+					da->getType()->getKey() == displayType->getKey()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<DisplayTypeAdmin> p(getNewOtherPage<DisplayTypeAdmin>());
+					p->setType(displayType);
+					AddToLinks(links, p);
+				}
 			}
 			return links;
 		}

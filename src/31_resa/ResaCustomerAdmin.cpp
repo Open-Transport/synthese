@@ -37,8 +37,8 @@
 
 #include "PropertiesHTMLTable.h"
 
-#include "AdminRequest.h"
-#include "ActionFunctionRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "Request.h"
 
 #include "DBLogEntry.h"
@@ -98,10 +98,12 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(_request->getObjectId());
 			try
 			{
-				_user = UserTableSync::Get(id, _getEnv());
+				_user = UserTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv()
+				);
 			}
 			catch (...)
 			{
@@ -120,6 +122,7 @@ namespace synthese
 		server::ParametersMap ResaCustomerAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_user.get()) m.insert(Request::PARAMETER_OBJECT_ID, _user->getKey());
 			return m;
 		}
 
@@ -135,13 +138,15 @@ namespace synthese
 			{
 
 				// Requests
-				ActionFunctionRequest<UserUpdateAction,AdminRequest> updateRequest(_request);
-				updateRequest.getFunction()->setPage<ResaCustomerAdmin>();
-				updateRequest.setObjectId(_request->getObjectId());
+				AdminActionFunctionRequest<UserUpdateAction,ResaCustomerAdmin> updateRequest(
+					_request
+				);
+				updateRequest.getAction()->setUser(_user);
 
-				FunctionRequest<AdminRequest> routeplannerRequest(_request);
-				routeplannerRequest.getFunction()->setPage<ReservationRoutePlannerAdmin>();
-				routeplannerRequest.getFunction()->setParameter(ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID, Conversion::ToString(_user->getKey()));
+				AdminFunctionRequest<ReservationRoutePlannerAdmin> routeplannerRequest(
+					_request
+				);
+				routeplannerRequest.getPage()->setCustomer(_user);
 
 				// Display
 				stream << "<h1>Liens</h1>";
@@ -221,38 +226,11 @@ namespace synthese
 			return _request->isAuthorized<ResaRight>(READ, READ);
 		}
 		
-		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == ResaCustomersAdmin::FACTORY_KEY && currentPage.getFactoryKey() == FACTORY_KEY)
-				links.push_back(currentPage.getPageLink());
-			return links;
-		}
-		
-		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPages(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 
 
 		std::string ResaCustomerAdmin::getTitle() const
 		{
 			return _user.get() ? _user->getFullName() : DEFAULT_TITLE;
-		}
-
-		std::string ResaCustomerAdmin::getParameterName() const
-		{
-			return _user.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string ResaCustomerAdmin::getParameterValue() const
-		{
-			return _user.get() ? Conversion::ToString(_user->getKey()) : string();
 		}
 
 
@@ -269,5 +247,17 @@ namespace synthese
 			_tabBuilded = true;
 		}
 
+
+
+		void ResaCustomerAdmin::setUser(boost::shared_ptr<User> value)
+		{
+			_user = const_pointer_cast<const User>(value);
+		}
+	
+	
+		void ResaCustomerAdmin::setUser(boost::shared_ptr<const User> value)
+		{
+			_user = value;
+		}
 	}
 }

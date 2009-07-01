@@ -21,14 +21,10 @@
 */
 
 #include "RequestInterfaceElement.h"
-
-#include "33_route_planner/RoutePlannerFunction.h"
-
-#include "30_server/FunctionRequest.h"
-
-#include "11_interfaces/ValueElementList.h"
-
-#include "05_html/HTMLForm.h"
+#include "RoutePlannerFunction.h"
+#include "FunctionRequest.h"
+#include "ValueElementList.h"
+#include "HTMLForm.h"
 
 using namespace std;
 
@@ -60,7 +56,11 @@ namespace synthese
 			string html(_html->getValue(parameters, variables, object, request));
 			
 			FunctionRequest<RoutePlannerFunction> rprequest(request);
-			rprequest.getFunction()->setMaxSolutions(request->getFunction<RoutePlannerFunction>()->getMaxSolutions());
+			rprequest.getFunction()->setMaxSolutions(
+				static_cast<const FunctionRequest<RoutePlannerFunction>* >(
+					request
+				)->getFunction()->getMaxSolutions()
+			);
 
 			HTMLForm form(rprequest.getHTMLForm(formName));
 			stream << form.open(html);

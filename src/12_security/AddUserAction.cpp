@@ -21,15 +21,14 @@
 */
 
 #include "AddUserAction.h"
-
-#include "12_security/ProfileTableSync.h"
-#include "12_security/UserTableSync.h"
-#include "12_security/Profile.h"
+#include "ProfileTableSync.h"
+#include "UserTableSync.h"
+#include "Profile.h"
 #include "SecurityRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "SecurityLog.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using boost::shared_ptr;
 
@@ -81,17 +80,20 @@ namespace synthese
 
 		void AddUserAction::run()
 		{
-			shared_ptr<User> user(new User);
-			user->setLogin(_login);
-			user->setName(_name);
-			user->setProfile(_profile.get());
-			UserTableSync::Save(user.get());
+			User user;
+			user.setLogin(_login);
+			user.setName(_name);
+			user.setProfile(_profile.get());
+			UserTableSync::Save(&user);
 			
-						
-			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-			{
-				_request->setObjectId(user->getKey());
-			}
+			_request->setActionCreatedId(user.getKey());
+				
+			// DBLog
+			SecurityLog::addUserAdmin(
+				_request->getUser().get(),
+				&user,
+				"Création de l'utilisateur " + user.getLogin()
+			);
 		}
 
 

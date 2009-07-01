@@ -49,6 +49,9 @@ namespace synthese
 	
 	namespace departurestable
 	{
+		const string DisplayScreenRemovePhysicalStopAction::PARAMETER_SCREEN_ID(
+			Action_PARAMETER_PREFIX + "s"
+		);
 		const string DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL = Action_PARAMETER_PREFIX + "phy";
 
 
@@ -59,6 +62,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PHYSICAL, _stop->getKey());
 			}
+			if(_screen.get()) map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
 			return map;
 		}
 
@@ -68,7 +72,10 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), *_env);
+				_screen = DisplayScreenTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_SCREEN_ID)
+					, *_env
+				);
 
 				setStopId(map.get<RegistryKeyType>(PARAMETER_PHYSICAL));
 			}
@@ -113,6 +120,13 @@ namespace synthese
 			{
 				throw ActionException("Departure physical stop", e, *this);
 			}
+		}
+		
+		
+		void DisplayScreenRemovePhysicalStopAction::setScreen(
+			boost::shared_ptr<const DisplayScreen> value
+		){
+			_screen = const_pointer_cast<DisplayScreen>(value);
 		}
 	}
 }

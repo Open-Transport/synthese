@@ -70,7 +70,7 @@ namespace synthese
 
 			virtual std::string getOutputMimeType() const;
 
-			void setDisplay(const util::RegistryKeyType id);
+			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 		};
 	}
 }

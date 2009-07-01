@@ -25,9 +25,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -40,6 +39,9 @@ namespace synthese
 		*/
 		class DelUserAction : public util::FactorableTemplate<server::Action, DelUserAction>
 		{
+		public:
+			static const std::string PARAMETER_USER_ID;
+			
 		private:
 			boost::shared_ptr<const User>	_user;
 
@@ -60,6 +62,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setUser(boost::shared_ptr<User> value);
 		};
 	}
 }

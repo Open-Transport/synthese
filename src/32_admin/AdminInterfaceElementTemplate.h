@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_admin_AdminInterfaceElementTemplate_h__
 #define SYNTHESE_admin_AdminInterfaceElementTemplate_h__
 
-#include "32_admin/AdminInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "AdminInterfaceElement.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -45,23 +44,10 @@ namespace synthese
 				: util::FactorableTemplate<AdminInterfaceElement, T>()
 			{
 			}
-
-			virtual std::string getIcon() const;
-
-			virtual std::string getTitle() const;
+			
+			virtual std::string getIcon() const { return ICON; }
+			virtual std::string getTitle() const { return DEFAULT_TITLE; }
 		};
-
-		template<class T>
-		std::string synthese::admin::AdminInterfaceElementTemplate<T>::getTitle() const
-		{
-			return DEFAULT_TITLE;
-		}
-
-		template<class T>
-		std::string synthese::admin::AdminInterfaceElementTemplate<T>::getIcon() const
-		{
-			return ICON;
-		}
 	}
 }
 

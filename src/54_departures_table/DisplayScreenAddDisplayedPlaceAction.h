@@ -49,6 +49,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Action, DisplayScreenAddDisplayedPlaceAction>
 		{
 		public:
+			static const std::string PARAMETER_SCREEN_ID;
 			static const std::string PARAMETER_PLACE;
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_PLACE_NAME;
@@ -75,6 +76,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 		};
 	}
 }

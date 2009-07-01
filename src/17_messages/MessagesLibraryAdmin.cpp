@@ -42,7 +42,8 @@
 #include "ScenarioTemplateInheritedTableSync.h"
 
 #include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
@@ -84,15 +85,35 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions			
 		){
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
+			_requestParameters.setFromParametersMap(
+				map.getMap(),
+				PARAMETER_NAME,
+				ResultHTMLTable::UNLIMITED_SIZE
+			);
 			
-			setFolderId(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
+			if(_request->getActionWillCreateObject()) return;
+			
+			optional<RegistryKeyType> id(
+				map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+			);
+
+			if (id)
+			{
+				try
+				{
+					_folder = ScenarioFolderTableSync::Get(*id, _getEnv());
+				}
+				catch (...)
+				{
+					throw AdminParametersException("Bad folder ID");
+				}
+			}
 
 			if(!doDisplayPreparationActions) return;
 
 			ScenarioTemplateInheritedTableSync::Search(
 				_getEnv(),
-				_folderId
+				_folder.get() ? _folder->getKey() : 0
 				, string(), NULL
 				, 0, -1
 				, _requestParameters.orderField == PARAMETER_NAME
@@ -100,7 +121,7 @@ namespace synthese
 			);
 			ScenarioFolderTableSync::Search(
 				_subFoldersEnv,
-				_folderId
+				_folder.get() ? _folder->getKey() : 0
 			);
 		}
 
@@ -109,61 +130,72 @@ namespace synthese
 		server::ParametersMap MessagesLibraryAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
+			if(_folder.get()) m.insert(Request::PARAMETER_OBJECT_ID, _folder->getKey());
 			return m;
 		}
 
 
 
-
-		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
-		{
+		void MessagesLibraryAdmin::display(
+			ostream& stream,
+			interfaces::VariablesMap& variables
+		) const {
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<MessagesLibraryAdmin>();
-			searchRequest.setObjectId(_folderId);
+			AdminFunctionRequest<MessagesLibraryAdmin> searchRequest(_request);
+			searchRequest.getPage()->setFolder(_folder);
 
-			FunctionRequest<AdminRequest> updateScenarioRequest(_request);
-			updateScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
+			AdminFunctionRequest<MessagesScenarioAdmin> updateScenarioRequest(_request);
 			
-			ActionFunctionRequest<DeleteScenarioAction,AdminRequest> deleteScenarioRequest(_request);
-			deleteScenarioRequest.getFunction()->setPage<MessagesLibraryAdmin>();
-			deleteScenarioRequest.setObjectId(_folderId);
+			AdminActionFunctionRequest<DeleteScenarioAction,MessagesLibraryAdmin> deleteScenarioRequest(_request);
 			
-			ActionFunctionRequest<AddScenarioAction,AdminRequest> addScenarioRequest(_request);
-			addScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
+			AdminActionFunctionRequest<AddScenarioAction,MessagesScenarioAdmin> addScenarioRequest(_request);
 			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
-			addScenarioRequest.getAction()->setFolderId(_folderId);
-			addScenarioRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addScenarioRequest.getAction()->setFolder(_folder);
+			addScenarioRequest.setActionWillCreateObject();
 
-			ActionFunctionRequest<ScenarioFolderAdd,AdminRequest> addFolderRequest(_request);
-			addFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
+			AdminActionFunctionRequest<ScenarioFolderAdd,MessagesLibraryAdmin> addFolderRequest(_request);
 			addFolderRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
-			addFolderRequest.getAction()->setParentId(_folderId);
-			addFolderRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+			addFolderRequest.getAction()->setParent(_folder);
+			addFolderRequest.setActionWillCreateObject();
 
-			FunctionRequest<AdminRequest> goFolderRequest(_request);
-			goFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
-
-			ActionFunctionRequest<ScenarioFolderRemoveAction,AdminRequest> removeFolderRequest(_request);
-			removeFolderRequest.getAction()->setFolder(_folder);
-			removeFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
-
-			ActionFunctionRequest<ScenarioFolderUpdateAction,AdminRequest> updateFolderRequest(_request);
-			updateFolderRequest.getAction()->setFolderId(_folder.get() ? _folder->getKey() : 0);
-			updateFolderRequest.getFunction()->setPage<MessagesLibraryAdmin>();
-			updateFolderRequest.setObjectId(_folder.get() ? _folder->getKey() : 0);
+			AdminFunctionRequest<MessagesLibraryAdmin> goFolderRequest(_request);
 
 			// Search
 			ResultHTMLTable::ResultParameters p;
 			p.setFromResult(_requestParameters, _getEnv().getEditableRegistry<ScenarioTemplate>());
 
-			if (_folderId > 0)
+			if (_folder.get())
 			{
 				stream << "<h1>Répertoire</h1>";
 
-				if (_getEnv().getRegistry<ScenarioTemplate>().empty() && _getEnv().getRegistry<ScenarioFolder>().empty())
-					stream << "<p>" << HTMLModule::getLinkButton(removeFolderRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
+				if(	_getEnv().getRegistry<ScenarioTemplate>().empty() &&
+					_getEnv().getRegistry<ScenarioFolder>().empty()
+				){
+					AdminActionFunctionRequest<ScenarioFolderRemoveAction,MessagesLibraryAdmin> removeFolderRequest(_request);
+					removeFolderRequest.getAction()->setFolder(_folder);
+					removeFolderRequest.getPage()->setFolder(
+						_folder->getParent() ?
+						ScenarioFolderTableSync::Get(
+							_folder->getParent()->getKey(),
+							_getEnv()
+						):
+						shared_ptr<const ScenarioFolder>()
+					);
+					
+					stream <<
+						"<p>" <<
+						HTMLModule::getLinkButton(
+							removeFolderRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?",
+							"folder_delete.png"
+						) << "</p>"
+					;
+				}
 
+				AdminActionFunctionRequest<ScenarioFolderUpdateAction,MessagesLibraryAdmin> updateFolderRequest(_request);
+				updateFolderRequest.getAction()->setFolder(_folder);
+				
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.cell("Nom", t.getForm().getTextInput(ScenarioFolderUpdateAction::PARAMETER_NAME, _folder->getName()));
@@ -182,7 +214,7 @@ namespace synthese
 			
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, _getEnv().getRegistry<ScenarioTemplate>())
 			{
-				updateScenarioRequest.setObjectId(scenario->getKey());
+				updateScenarioRequest.getPage()->setScenario(scenario);
 				deleteScenarioRequest.getAction()->setScenario(scenario);
 				stream << t3.row(Conversion::ToString(scenario->getKey()));
 				stream << t3.col() << scenario->getName();
@@ -210,7 +242,7 @@ namespace synthese
 			{
 				if(folder == _folder) continue;
 
-				goFolderRequest.setObjectId(folder->getKey());
+				goFolderRequest.getPage()->setFolder(folder);
 				stream << l.element("folder");
 				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), folder->getName());
 			}
@@ -233,86 +265,95 @@ namespace synthese
 			
 		}
 
-		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
+			
+			if(	moduleKey == MessagesModule::FACTORY_KEY)
 			{
-				links.push_back(getPageLink());
+				const MessagesLibraryAdmin* ma(
+					dynamic_cast<const MessagesLibraryAdmin*>(currentPage.get())
+				);
+				
+				if(	ma &&
+					!ma->_folder.get()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
 			}
 			return links;
 		}
 
-		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages( const AdminInterfaceElement& currentPage) const
-		{
+		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages(
+			shared_ptr<const AdminInterfaceElement> currentPage
+		) const {
 			PageLinks links;
 
+			const MessagesLibraryAdmin* la(
+				dynamic_cast<const MessagesLibraryAdmin*>(currentPage.get())
+			);
+			const MessagesScenarioAdmin* sa(
+				dynamic_cast<const MessagesScenarioAdmin*>(currentPage.get())
+			);
+			
 			// Folders
 			Env env;
 			ScenarioFolderTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
 			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, env.getRegistry<ScenarioFolder>())
 			{
-				PageLink link(getPageLink());
-				link.factoryKey = MessagesLibraryAdmin::FACTORY_KEY;
-				link.icon = "folder.png";
-				link.name = cfolder->getName();
-				link.parameterName = Request::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString(cfolder->getKey());
-				links.push_back(link);
+				if(	la &&
+					la->_folder->getKey() == cfolder->getKey()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<MessagesLibraryAdmin> p(
+						getNewOtherPage<MessagesLibraryAdmin>()
+					);
+					p->setFolder(cfolder);
+					AddToLinks(links, p);
+				}
 			}
 			
 			// Scenarios
-			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
+			ScenarioTemplateInheritedTableSync::Search(
+				env,
+				_folder.get() ? _folder->getKey() : 0
+			);
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, env.getRegistry<ScenarioTemplate>())
 			{
-				PageLink link(getPageLink());
-				link.factoryKey = MessagesScenarioAdmin::FACTORY_KEY;
-				link.icon = MessagesScenarioAdmin::ICON;
-				link.name = tpl->getName();
-				link.parameterName = Request::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString(tpl->getKey());
-				links.push_back(link);
+				if(	sa &&
+					sa->getScenario()->getKey() == tpl->getKey()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<MessagesScenarioAdmin> p(
+						getNewOtherPage<MessagesScenarioAdmin>()
+					);
+					p->setScenario(tpl);
+					AddToLinks(links, p);
+				}
 			}
 			
 			return links;
 		}
 
 
-
-		void MessagesLibraryAdmin::setFolderId( uid id)
-		{
-			if (id > 0)
-			{
-				try
-				{
-					_folderId = id;
-					_folder = ScenarioFolderTableSync::Get(_folderId, _getEnv());
-				}
-				catch (...)
-				{
-					throw AdminParametersException("Bad folder ID");
-				}
-			}
-			else
-			{
-				_folderId = 0;
-			}
-		}
 
 		std::string MessagesLibraryAdmin::getTitle() const
 		{
 			return _folder.get() ? _folder->getName() : DEFAULT_TITLE;
 		}
 
-		std::string MessagesLibraryAdmin::getParameterName() const
-		{
-			return _folder.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string MessagesLibraryAdmin::getParameterValue() const
-		{
-			return _folder.get() ? Conversion::ToString(_folder->getKey()) : string();
-		}
 
 		std::string MessagesLibraryAdmin::getIcon() const
 		{
@@ -322,6 +363,21 @@ namespace synthese
 		bool MessagesLibraryAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
 		{
 			return !_folder.get();
+		}
+		
+		boost::shared_ptr<const ScenarioFolder> MessagesLibraryAdmin::getFolder() const
+		{
+			return _folder;
+		}
+		
+		void MessagesLibraryAdmin::setFolder(boost::shared_ptr<ScenarioFolder> folder)
+		{
+			_folder = const_pointer_cast<const ScenarioFolder>(folder);
+		}
+	
+		void MessagesLibraryAdmin::setFolder(boost::shared_ptr<const ScenarioFolder> folder)
+		{
+			_folder = folder;
 		}
 	}
 }

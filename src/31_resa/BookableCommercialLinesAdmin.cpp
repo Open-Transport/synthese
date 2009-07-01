@@ -31,8 +31,8 @@
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 
-#include "AdminRequest.h"
-
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
@@ -102,11 +102,9 @@ namespace synthese
 			rp.setFromResult(_requestParameters, env.getEditableRegistry<CommercialLine>());
 
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
-			searchRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
+			AdminFunctionRequest<BookableCommercialLinesAdmin> searchRequest(_request);
 
-			FunctionRequest<AdminRequest> openRequest(_request);
-			openRequest.getFunction()->setPage<BookableCommercialLineAdmin>();
+			AdminFunctionRequest<BookableCommercialLineAdmin> openRequest(_request);
 
 			// Display
 			stream << "<h1>Lignes</h1>";
@@ -120,7 +118,7 @@ namespace synthese
 
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 			{
-				openRequest.setObjectId(line->getKey());
+				openRequest.getPage()->setCommercialLine(line);
 
 				stream << t.row();
 				stream << t.col(1, line->getStyle()) << line->getShortName();
@@ -136,20 +134,33 @@ namespace synthese
 			return _request->isAuthorized<ResaRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
-				links.push_back(getPageLink());
+			if(moduleKey == ResaModule::FACTORY_KEY)
+			{
+				if(dynamic_cast<const BookableCommercialLinesAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
+			}
 			return links;
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const {
 			AdminInterfaceElement::PageLinks links;
+
+			const BookableCommercialLineAdmin* ba(
+				dynamic_cast<const BookableCommercialLineAdmin*>(currentPage.get())
+			);
 
 			Env env;
 			CommercialLineTableSync::Search(
@@ -162,13 +173,19 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 			{
-				AdminInterfaceElement::PageLink link(getPageLink());
-				link.factoryKey = BookableCommercialLineAdmin::FACTORY_KEY;
-				link.icon = "chart_line.png";
-				link.name = line->getShortName();
-				link.parameterName = Request::PARAMETER_OBJECT_ID;
-				link.parameterValue = Conversion::ToString(line->getKey());
-				links.push_back(link);
+				if(	ba &&
+					ba->getCommercialLine()->getKey() == line->getKey()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<BookableCommercialLineAdmin> p(
+						getNewOtherPage<BookableCommercialLineAdmin>()
+					);
+					p->setCommercialLine(line);
+					AddToLinks(links, p);
+				}
 			}
 
 			return links;

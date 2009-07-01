@@ -102,8 +102,7 @@ namespace synthese
 			TimetableTableSync::Save(&t);
 
 			// ID update
-			if (_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				_request->setObjectId(t.getKey());
+			_request->setActionCreatedId(t.getKey());
 		}
 
 

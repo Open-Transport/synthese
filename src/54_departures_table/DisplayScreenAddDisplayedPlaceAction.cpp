@@ -45,15 +45,22 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string DisplayScreenAddDisplayedPlaceAction::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pl";
-		const string DisplayScreenAddDisplayedPlaceAction::PARAMETER_CITY_NAME = Action_PARAMETER_PREFIX + "cn";
+		const string DisplayScreenAddDisplayedPlaceAction::PARAMETER_SCREEN_ID(
+			Action_PARAMETER_PREFIX + "s"
+		);
+		const string DisplayScreenAddDisplayedPlaceAction::PARAMETER_PLACE(
+			Action_PARAMETER_PREFIX + "pl"
+		);
+		const string DisplayScreenAddDisplayedPlaceAction::PARAMETER_CITY_NAME(
+			Action_PARAMETER_PREFIX + "cn"
+		);
 		const string DisplayScreenAddDisplayedPlaceAction::PARAMETER_PLACE_NAME = Action_PARAMETER_PREFIX + "pn";
 
 
 		ParametersMap DisplayScreenAddDisplayedPlaceAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_screen.get()) map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
 			return map;
 		}
 
@@ -61,7 +68,10 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), *_env);
+				_screen = DisplayScreenTableSync::GetEditable(
+						map.get<RegistryKeyType>(PARAMETER_SCREEN_ID),
+						*_env
+					);
 
 				uid id(map.getUid(PARAMETER_PLACE, false, FACTORY_KEY));
 
@@ -108,6 +118,13 @@ namespace synthese
 		bool DisplayScreenAddDisplayedPlaceAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		}
+		
+		
+		void DisplayScreenAddDisplayedPlaceAction::setScreen(
+			boost::shared_ptr<const DisplayScreen> value
+		){
+			_screen = const_pointer_cast<DisplayScreen>(value);
 		}
 	}
 }

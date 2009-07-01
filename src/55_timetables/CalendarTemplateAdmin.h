@@ -38,12 +38,16 @@ namespace synthese
 			@author Hugues Romain
 			@date 2008
 		*/
-		class CalendarTemplateAdmin : public admin::AdminInterfaceElementTemplate<CalendarTemplateAdmin>
+		class CalendarTemplateAdmin:
+			public admin::AdminInterfaceElementTemplate<CalendarTemplateAdmin>
 		{
 			boost::shared_ptr<const CalendarTemplate>	_calendar;
 
 		public:
 			CalendarTemplateAdmin();
+			
+			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
+			boost::shared_ptr<const CalendarTemplate> getCalendar() const;
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -85,55 +89,14 @@ namespace synthese
 			bool isAuthorized(
 			) const;
 			
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param parentLink Link to the parent page
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the parent page designed in parentLink
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
-			
-			
-			
-			/** Sub pages getter.
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the current page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const AdminInterfaceElement& currentPage
-			) const;
-			
 			
 			
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
 				@date 2008
-				REMOVE IF YOU WANT ALWAYS USE THE DEFAULT_TITLE
 			*/
 			virtual std::string getTitle() const;
-			
-			/** Parameter name getter.
-				@return The name of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-				REMOVE IF YOU DONT USE A PARAMETER
-			*/
-			virtual std::string getParameterName() const;
-			
-			/** Parameter value getter.
-				@return The value of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-				REMOVE IF YOU DONT USE A PARAMETER
-			*/
-			virtual std::string getParameterValue() const;
 		};
 	}
 }

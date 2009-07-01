@@ -46,17 +46,25 @@ namespace synthese
 	
 	namespace messages
 	{
+		const string ScenarioStopAction::PARAMETER_SCENARIO_ID(
+			Action_PARAMETER_PREFIX + "s"
+		);
+		
 		ParametersMap ScenarioStopAction::getParametersMap() const
 		{
-			ParametersMap map;
-			return map;
+			ParametersMap m;
+			if(_scenario.get()) m.insert(PARAMETER_SCENARIO_ID, _scenario->getKey());
+			return m;
 		}
 
 		void ScenarioStopAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				_scenario = SentScenarioInheritedTableSync::GetEditable(_request->getObjectId(), *_env);
+				_scenario = SentScenarioInheritedTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID),
+					*_env
+				);
 			}
 			catch (...) {
 				throw ActionException("Invalid scenario");
@@ -68,6 +76,7 @@ namespace synthese
 			// Action
 			_scenario->setPeriodEnd(_stopDateTime);
 			_scenario->setIsEnabled(false);
+			
 			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
@@ -85,6 +94,10 @@ namespace synthese
 		bool ScenarioStopAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<MessagesRight>(WRITE);
+		}
+		
+		void ScenarioStopAction::setScenario(boost::shared_ptr<SentScenario> value){
+			_scenario = value;
 		}
 	}
 }

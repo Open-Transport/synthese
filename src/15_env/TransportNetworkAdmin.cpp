@@ -25,8 +25,7 @@
 #include "TransportNetworkAdmin.h"
 #include "EnvModule.h"
 
-#include "AdminRequest.h"
-#include "Request.h"
+#include "AdminFunctionRequest.hpp"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
 #include "CommercialLine.h"
@@ -81,13 +80,18 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-
-			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
+			if(_request->getActionWillCreateObject()) return;
+			
+			_searchName = map.getDefault<string>(PARAMETER_SEARCH_NAME);
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
 
 			try
 			{
-				_network = TransportNetworkTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
+				_network = TransportNetworkTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv(),
+					UP_LINKS_LOAD_LEVEL
+				);
 			}
 			catch (...)
 			{
@@ -116,6 +120,7 @@ namespace synthese
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAMETER_SEARCH_NAME,_searchName);
+			if(_network.get()) m.insert(Request::PARAMETER_OBJECT_ID, _network->getKey());
 			return m;
 		}
 
@@ -124,13 +129,10 @@ namespace synthese
 		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
-
-			FunctionRequest<AdminRequest> lineOpenRequest(_request);
-			lineOpenRequest.getFunction()->setPage<CommercialLineAdmin>();
-
+			
 			// Search form
 			stream << "<h1>Recherche</h1>";
+			AdminFunctionRequest<TransportNetworkAdmin> searchRequest(_request);
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
 			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
@@ -148,9 +150,10 @@ namespace synthese
 			ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
 
 			stream << t.open();
+			AdminFunctionRequest<CommercialLineAdmin> lineOpenRequest(_request);
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, _getEnv().getRegistry<CommercialLine>())
 			{
-				lineOpenRequest.setObjectId(line->getKey());
+				lineOpenRequest.getPage()->setCommercialLine(line);
 				stream << t.row();
 				stream << t.col(1, line->getStyle(), true);
 				stream << line->getShortName();
@@ -167,23 +170,36 @@ namespace synthese
 			return _request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == EnvModule::FACTORY_KEY)
+			if(moduleKey == EnvModule::FACTORY_KEY)
 			{
+				const TransportNetworkAdmin* tna(
+					dynamic_cast<const TransportNetworkAdmin*>(currentPage.get())
+				);
+				RegistryKeyType currentNetworkId;
+				if(tna) currentNetworkId = tna->_network->getKey();
+				
 				Env env;
 				TransportNetworkTableSync::Search(env);
 				BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.getRegistry<TransportNetwork>())
 				{
-					PageLink link(getPageLink());
-					link.name = network->getName();
-					link.parameterName = Request::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString(network->getKey());
-					links.push_back(link);
+					if(network->getKey() == currentNetworkId)
+					{
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<TransportNetworkAdmin> link(
+							getNewOtherPage<TransportNetworkAdmin>()
+						);
+						link->_network = network;
+						AddToLinks(links, link);
+					}
 				}
 			}
 				
@@ -194,27 +210,38 @@ namespace synthese
 		{
 			return _network.get() ? _network->getName() : DEFAULT_TITLE;
 		}
-
-		std::string TransportNetworkAdmin::getParameterName() const
-		{
-			return _network.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string TransportNetworkAdmin::getParameterValue() const
-		{
-			return _network.get() ? Conversion::ToString(_network->getKey()) : string();
-		}
+				
 
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			if (currentPage.getFactoryKey() == FACTORY_KEY && _network->getKey() == static_cast<const TransportNetworkAdmin&>(currentPage)._network->getKey()
-				|| currentPage.getFactoryKey() == CommercialLineAdmin::FACTORY_KEY && _network->getKey() == static_cast<const CommercialLineAdmin&>(currentPage).getCommercialLine()->getNetwork()->getKey()
-				|| currentPage.getFactoryKey() == LineAdmin::FACTORY_KEY && _network->getKey() == static_cast<const LineAdmin&>(currentPage).getLine()->getCommercialLine()->getNetwork()->getKey()
-			)
-			{
+			const LineAdmin* la(
+				dynamic_cast<const LineAdmin*>(currentPage.get())
+			);
+			
+			const CommercialLineAdmin* ca(
+				dynamic_cast<const CommercialLineAdmin*>(currentPage.get())
+			);
+
+			const TransportNetworkAdmin* na(
+				dynamic_cast<const TransportNetworkAdmin*>(currentPage.get())
+			);
+
+			if(	la &&
+				la->getLine().get() &&
+				la->getLine()->getCommercialLine() &&
+				la->getLine()->getCommercialLine()->getNetwork() &&
+				la->getLine()->getCommercialLine()->getNetwork()->getKey() == _network->getKey() ||
+				ca &&
+				ca->getCommercialLine().get() &&
+				ca->getCommercialLine()->getNetwork() &&
+				ca->getCommercialLine()->getNetwork()->getKey() == _network->getKey() ||
+				na &&
+				na->_network.get() &&
+				na->_network->getKey() == _network->getKey()
+			){
 				Env env;
 				CommercialLineTableSync::Search(
 					env,
@@ -227,13 +254,19 @@ namespace synthese
 				);
 				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
 				{
-					PageLink link(getPageLink());
-					link.factoryKey = CommercialLineAdmin::FACTORY_KEY;
-					link.icon = CommercialLineAdmin::ICON;
-					link.name = line->getName();
-					link.parameterName = Request::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString(line->getKey());
-					links.push_back(link);
+					if(	ca &&
+						ca->getCommercialLine()->getKey() == line->getKey()
+					){
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<CommercialLineAdmin> p(
+							getNewOtherPage<CommercialLineAdmin>()
+						);
+						p->setCommercialLine(line);
+						AddToLinks(links, p);
+					}
 				}
 			}
 			return links;

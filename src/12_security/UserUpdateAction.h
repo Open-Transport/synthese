@@ -39,9 +39,11 @@ namespace synthese
 		/** UserUpdateAction action class.
 			@ingroup m12Actions refActions
 		*/
-		class UserUpdateAction : public util::FactorableTemplate<server::Action,UserUpdateAction>
+		class UserUpdateAction :
+			public util::FactorableTemplate<server::Action,UserUpdateAction>
 		{
 		public:
+			static const std::string PARAMETER_USER_ID;
 			static const std::string PARAMETER_LOGIN;
 			static const std::string PARAMETER_SURNAME;
 			static const std::string PARAMETER_NAME;
@@ -74,6 +76,7 @@ namespace synthese
 			/** Conversion from generic parameters map to attributes.
 				Removes the used parameters from the map.
 				@exception ActionException Occurs when some parameters are missing or incorrect.
+				@todo Unicity control of login !!!
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 
@@ -83,6 +86,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setUser(boost::shared_ptr<const User> value);
 		};
 	}
 }

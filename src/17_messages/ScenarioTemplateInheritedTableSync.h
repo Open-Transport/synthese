@@ -56,13 +56,13 @@ namespace synthese
 			*/
 			static void Search(
 				util::Env& env,
-				uid folderId
-				, const std::string name = std::string()
-				, const ScenarioTemplate* scenarioToBeDifferentWith = NULL
-				, int first = 0
-				, int number = -1
-				, bool orderByName = true
-				, bool raisingOrder = false,
+				boost::optional<util::RegistryKeyType> folderId,
+				const std::string name = std::string(),
+				const ScenarioTemplate* scenarioToBeDifferentWith = NULL,
+				int first = 0,
+				int number = -1,
+				bool orderByName = true,
+				bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 			

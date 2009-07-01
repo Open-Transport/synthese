@@ -25,9 +25,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -38,9 +37,11 @@ namespace synthese
 		/** Password update action class.
 			@ingroup m12Actions refActions
 		*/
-		class UserPasswordUpdateAction : public util::FactorableTemplate<server::Action, UserPasswordUpdateAction>
+		class UserPasswordUpdateAction:
+			public util::FactorableTemplate<server::Action, UserPasswordUpdateAction>
 		{
 		public:
+			static const std::string PARAMETER_USER_ID;
 			static const std::string PARAMETER_PASS1;
 			static const std::string PARAMETER_PASS2;
 
@@ -65,6 +66,9 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setUser(boost::shared_ptr<User> value);
+			void setUser(boost::shared_ptr<const User> value);
 		};
 	}
 }

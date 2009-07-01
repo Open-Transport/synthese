@@ -106,10 +106,7 @@ namespace synthese
 			}
 			ProfileTableSync::Save(profile.get());
 			
-			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-			{
-				_request->setObjectId(profile->getKey());
-			}
+			_request->setActionCreatedId(profile->getKey());
 
 			// DBLog
 			SecurityLog::addProfileAdmin(_request->getUser().get(), profile.get(), "Création du profil" + (_templateProfile.get() ? " à partir de " + _templateProfile->getName() : string()));

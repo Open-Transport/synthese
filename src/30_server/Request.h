@@ -38,6 +38,7 @@
 #include "Factory.h"
 
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 
 #include <ostream>
 #include <map>
@@ -56,7 +57,7 @@ namespace synthese
 		class HTTPRequest;
 
 		/** Parsed request.
-			@ingroup m18
+			@ingroup m15
 
 			A request object determinates a couple of services to run, and can be used to launch it or to describe it (build of links, etc.)
 
@@ -107,8 +108,7 @@ namespace synthese
 
 			static const std::string PARAMETER_SEPARATOR;
 			static const std::string PARAMETER_ASSIGNMENT;
-			static const uid UID_WILL_BE_GENERATED_BY_THE_ACTION;
-
+			
 			static const std::string PARAMETER_STARTER;
 			static const std::string PARAMETER_FUNCTION;
 			static const std::string PARAMETER_SESSION;
@@ -131,7 +131,8 @@ namespace synthese
 			bool						_actionException;
 			std::string					_errorMessage;
 			ErrorLevel					_errorLevel;
-			uid							_object_id;			//!< Object ID to display (generic parameter which can be used or not by the subclasses)
+			bool						_actionWillCreateObject;
+			boost::optional<util::RegistryKeyType>		_actionCreatedId;
 			ParametersMap				_internalParameters;
 
 
@@ -198,10 +199,11 @@ namespace synthese
 				bool getActionException() const;
 				const Session*		getSession()		const;
 
-				ParametersMap&					getInternalParameters();
+				ParametersMap&									getInternalParameters();
 				const std::string&	getClientURL()		const;
 				const std::string&	getIP()				const;
-				uid					getObjectId()		const;
+				const boost::optional<util::RegistryKeyType>& 	getActionCreatedId()	const;
+				bool				getActionWillCreateObject()	const;
 				const std::string&	getErrorMessage()	const;
 				const std::string&	getHostName()		const;
 
@@ -226,7 +228,8 @@ namespace synthese
 				void _setErrorMessage(const std::string& message);
 				void _setActionException(bool value);
 				void _setErrorLevel(const ErrorLevel& level);
-				virtual void setObjectId(uid id);
+				void setActionCreatedId(util::RegistryKeyType id);
+				void setActionWillCreateObject();
 				void setSession(Session* session);
 				void setHostName(const std::string& value);
 
@@ -295,19 +298,9 @@ namespace synthese
 					@return The query string corresponding to the request.
 				*/
 				std::string getURI() const;
-
-
-				template <class F>
-				boost::shared_ptr<const F> getFunction() const;
 			//@}
 		};
 
-		template <class F>
-		boost::shared_ptr<const F>
-			synthese::server::Request::getFunction() const
-		{
-			return boost::dynamic_pointer_cast<const F, const Function>(_getFunction());
-		}
 
 		template<class R>
 		bool Request::isAuthorized(security::RightLevel publicr, security::RightLevel privater, std::string parameter /*= security::GLOBAL_PERIMETER*/ ) const

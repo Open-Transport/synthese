@@ -28,6 +28,7 @@
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "ConnectionPlaceTableSync.h"
+#include "ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -47,13 +48,18 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";
+		const string AddPreselectionPlaceToDisplayScreen::PARAMETER_SCREEN_ID(
+			Action_PARAMETER_PREFIX + "s"
+		);
+		const string AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE(
+			Action_PARAMETER_PREFIX + "p"
+		);
 
 
 		ParametersMap AddPreselectionPlaceToDisplayScreen::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_screen.get()) map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
 			return map;
 		}
 
@@ -61,11 +67,14 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), *_env);
-
-				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
-				_place = ConnectionPlaceTableSync::Get(id, *_env);
-				
+				_screen = DisplayScreenTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_SCREEN_ID),
+					*_env
+				);
+				_place = ConnectionPlaceTableSync::Get(
+					map.get<RegistryKeyType>(PARAMETER_PLACE),
+					*_env
+				);
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
@@ -81,14 +90,33 @@ namespace synthese
 		{
 			_screen->addForcedDestination(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
+			
+			// Log
+			ArrivalDepartureTableLog::addUpdateEntry(
+				*_screen,
+				"Ajout de l'arrêt de présélection "+ _place->getFullName(),
+				*_request->getUser()
+			);
 		}
 
 
 
 		bool AddPreselectionPlaceToDisplayScreen::_isAuthorized(
-
-			) const {
+		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		}
+		
+		
+		void AddPreselectionPlaceToDisplayScreen::setScreen(boost::shared_ptr<DisplayScreen> value)
+		{
+			_screen = value;
+		}
+	
+	
+		void AddPreselectionPlaceToDisplayScreen::setScreen(
+			boost::shared_ptr<const DisplayScreen> value)
+		{
+			_screen = const_pointer_cast<DisplayScreen>(value);
 		}
 	}
 }

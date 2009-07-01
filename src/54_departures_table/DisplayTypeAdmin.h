@@ -44,7 +44,7 @@ namespace synthese
 		class DisplayTypeAdmin
 		:	public admin::AdminInterfaceElementTemplate<DisplayTypeAdmin>
 		{
-			boost::shared_ptr<DisplayType>	_type;
+			boost::shared_ptr<const DisplayType>	_type;
 
 		public:
 			DisplayTypeAdmin();
@@ -85,32 +85,6 @@ namespace synthese
 			*/
 			bool isAuthorized() const;
 			
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param parentLink Link to the parent page
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the parent page designed in parentLink
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
-			
-
-
-			/** Sub pages getter.
-				@param request User request
-				@return PageLinks Ordered vector of sub pages links
-				@author Hugues Romain
-				@date 2008
-				
-				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
-				This method can be overloaded to create customized sub tree.
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const AdminInterfaceElement& currentPage
-			) const;
 
 			/** Title generator.
 				@return The title of the page
@@ -119,22 +93,10 @@ namespace synthese
 			*/
 			virtual std::string getTitle() const;
 			
-			/** Parameter name getter.
-				@return The name of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterName() const;
-			
-			/** Parameter value getter.
-				@return The value of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterValue() const;
 
 
-			void setType(boost::shared_ptr<DisplayType> value);
+			void setType(boost::shared_ptr<const DisplayType> value);
+			boost::shared_ptr<const DisplayType> getType() const;
 		};
 	}
 }

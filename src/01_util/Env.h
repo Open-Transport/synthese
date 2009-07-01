@@ -171,6 +171,47 @@ namespace synthese
 				it = _map.find(Registry<R>::KEY);
 				return * boost::static_pointer_cast<Registry<R>, RegistryBase>(it->second);
 			}
+			
+			
+			
+			template<class R>
+			boost::shared_ptr<const R> get(
+				util::RegistryKeyType id
+			) const {
+				return this->getEditableRegistry<R>().get(id);
+			}
+
+
+
+
+			template<class R>
+			boost::shared_ptr<R> getEditable(
+				util::RegistryKeyType id
+			) const {
+				return this->getEditableRegistry<R>().getEditable(id);
+			}
+
+
+
+			template<class R>
+			boost::shared_ptr<const R> getSPtr(
+				const R* object
+			) const {
+				if(object == NULL) return boost::shared_ptr<const R>();
+				assert(object == this->getEditableRegistry<R>().get(object->getKey()).get());
+				return this->getEditableRegistry<R>().get(object->getKey());
+			}
+
+
+
+			template<class R>
+			boost::shared_ptr<R> getEditableSPtr(
+				R* object
+			) const {
+				if(object == NULL) return boost::shared_ptr<R>();
+				assert(object == this->getEditableRegistry<R>().getEditable(object->getKey()).get());
+				return this->getEditableRegistry<R>().getEditable(object->getKey());
+			}
 
 
 

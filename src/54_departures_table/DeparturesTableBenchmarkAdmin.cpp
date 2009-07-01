@@ -22,7 +22,8 @@
 
 #include "HTMLForm.h"
 #include "Interface.h"
-#include "ActionFunctionRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "DeparturesTableBenchmarkAdmin.h"
@@ -34,7 +35,6 @@
 #include "DisplayScreenTableSync.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "ArrivalDepartureTableRight.h"
-#include "AdminRequest.h"
 #include "ActionResultHTMLTable.h"
 #include "InterfaceTableSync.h"
 #include "UpdateDisplayPreselectionParametersAction.h"
@@ -90,7 +90,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, _getEnv().getRegistry<DisplayScreen>())
 			{
 				stringstream s;
-				r.getFunction()->setDisplay(screen->getKey());
+				r.getFunction()->setScreen(screen);
 				r.run(s);
 				ptime t2(microsec_clock::local_time());
 				TestCase t;
@@ -143,8 +143,8 @@ namespace synthese
 
 			if(_doIt)
 			{
-				FunctionRequest<AdminRequest> reloadRequest(_request);
-				reloadRequest.getFunction()->setParameter(PARAMETER_DOIT, "1");
+				AdminFunctionRequest<DeparturesTableBenchmarkAdmin> reloadRequest(_request);
+				reloadRequest.getPage()->_doIt = true;
 
 				stream << "<h1>Résultats</h1>";
 
@@ -238,14 +238,21 @@ namespace synthese
 
 		}
 
-		AdminInterfaceElement::PageLinks DeparturesTableBenchmarkAdmin::getSubPagesOfParent(
-			const PageLink& parentLink,
-			const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks DeparturesTableBenchmarkAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (parentLink.factoryKey == ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == DeparturesTableModule::FACTORY_KEY)
+			if(	moduleKey == DeparturesTableModule::FACTORY_KEY)
 			{
-				links.push_back(getPageLink());
+				if(dynamic_cast<const DeparturesTableBenchmarkAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
 			}
 			return links;
 		}
@@ -255,15 +262,6 @@ namespace synthese
 		bool DeparturesTableBenchmarkAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
 		{
 			return true;
-		}
-
-
-
-		AdminInterfaceElement::PageLinks DeparturesTableBenchmarkAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
 		}
 	}
 }

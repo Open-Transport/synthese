@@ -231,26 +231,26 @@ namespace synthese
 		
 
 
-		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == MessagesModule::FACTORY_KEY)
+			
+			if(moduleKey == MessagesModule::FACTORY_KEY)
 			{
-				MessagesTemplateLibraryAdmin a;
-				a.setRequest(_request);
-				links.push_back(a.getPageLink());
+				if(dynamic_cast<const MessagesTemplateLibraryAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewOtherPage<MessagesTemplateLibraryAdmin>());
+				}
 			}
 			return links;
 		}
 		
-		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 
 		bool MessagesTemplateLibraryAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
 		{
@@ -262,20 +262,6 @@ namespace synthese
 		std::string MessagesTemplateLibraryAdmin::getTitle() const
 		{
 			return _folder.get() ? _folder->getName() : DEFAULT_TITLE;
-		}
-
-
-
-		std::string MessagesTemplateLibraryAdmin::getParameterName() const
-		{
-			return _folder.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-
-
-		std::string MessagesTemplateLibraryAdmin::getParameterValue() const
-		{
-			return _folder.get() ? Conversion::ToString(_folder->getKey()) : string();
 		}
 	}
 }

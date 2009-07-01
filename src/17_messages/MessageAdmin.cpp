@@ -82,13 +82,15 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
-			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				return;
+			if(_request->getActionWillCreateObject()) return;
 
 			try
 			{
-				_alarm = AlarmTableSync::Get(id, _getEnv(), UP_LINKS_LOAD_LEVEL);
+				_alarm = AlarmTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv(),
+					UP_LINKS_LOAD_LEVEL
+				);
 			}
 			catch(...)
 			{
@@ -201,16 +203,6 @@ namespace synthese
 		
 		}
 
-		AdminInterfaceElement::PageLinks MessageAdmin::getSubPagesOfParent( const PageLink& parentLink , const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
-
-		AdminInterfaceElement::PageLinks MessageAdmin::getSubPages( const AdminInterfaceElement& currentPage
-		) const	{
-			return AdminInterfaceElement::PageLinks();
-		}
 
 		boost::shared_ptr<const Alarm> MessageAdmin::getAlarm() const
 		{
@@ -222,26 +214,26 @@ namespace synthese
 			return _alarm.get() ? _alarm->getShortMessage() : DEFAULT_TITLE;
 		}
 
-		std::string MessageAdmin::getParameterName() const
-		{
-			return _alarm.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
 
-		std::string MessageAdmin::getParameterValue() const
-		{
-			return _alarm.get() ? Conversion::ToString(_alarm->getKey()) : string();
-		}
-
-		bool MessageAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
-		{
-			if (currentPage.getFactoryKey() != MessagesScenarioAdmin::FACTORY_KEY)
-				return false;
+		bool MessageAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage
+		) const {
+			const MessagesScenarioAdmin* ma(
+				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage)
+			);
+			
+			if(	!ma) return false;
 
 			assert(_alarm->getScenario());
 			if(!_alarm->getScenario())
 				return false;
 
-			return _alarm->getScenario()->getKey() == Conversion::ToLongLong(currentPage.getPageLink().parameterValue);
+			return _alarm->getScenario()->getKey() == ma->getScenario()->getKey();
+		}
+		
+		void MessageAdmin::setMessage(boost::shared_ptr<const Alarm> value)
+		{
+			_alarm = value;
 		}
 	}
 }

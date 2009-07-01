@@ -59,6 +59,11 @@ namespace synthese
 
 			BookableCommercialLineAdmin();
 			
+			void setService(boost::shared_ptr<const env::ScheduledService> value);
+			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
+			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
+
+			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -96,28 +101,7 @@ namespace synthese
 			*/
 			bool isAuthorized() const;
 			
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param parentLink Link to the parent page
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the parent page designed in parentLink
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
 			
-			/** Sub pages getter.
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the current page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
 			
 			/** Title generator.
 				@return The title of the page
@@ -125,22 +109,6 @@ namespace synthese
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-			
-			/** Parameter name getter.
-				@return The name of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterName() const;
-			
-			/** Parameter value getter.
-				@return The value of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterValue() const;
-
-			void setServiceId(util::RegistryKeyType id);
 		};
 	}
 }

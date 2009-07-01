@@ -69,6 +69,9 @@ namespace synthese
 
 			ReservationRoutePlannerAdmin();
 			
+			
+			void setCustomer(boost::shared_ptr<const security::User> value);
+			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -112,22 +115,11 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const std::string& moduleKey,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 			
-			/** Sub pages getter.
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the current page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
-			) const;
-
 			virtual bool isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const;
 		};
 	}

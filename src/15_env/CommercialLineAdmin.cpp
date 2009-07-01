@@ -34,7 +34,7 @@
 #include "TransportNetworkRight.h"
 
 #include "AdminInterfaceElement.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
 
 #include "AdminParametersException.h"
 #include "SearchFormHTMLTable.h"
@@ -130,12 +130,8 @@ namespace synthese
 			if (openTabContent(stream, TAB_ROUTES))
 			{
 				// Requests
-				FunctionRequest<AdminRequest> searchRequest(_request);
-				searchRequest.setObjectId(_cline->getKey());
-
-				FunctionRequest<AdminRequest> lineOpenRequest(_request);
-				lineOpenRequest.getFunction()->setPage<LineAdmin>();
-
+				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
+				
 				// Search form
 				stream << "<h1>Recherche</h1>";
 				SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
@@ -154,9 +150,10 @@ namespace synthese
 				ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
 
 				stream << t.open();
-				BOOST_FOREACH(shared_ptr<Line> line, _getEnv().getRegistry<Line>())
+				AdminFunctionRequest<LineAdmin> lineOpenRequest(_request);
+ 				BOOST_FOREACH(shared_ptr<Line> line, _getEnv().getRegistry<Line>())
 				{
-					lineOpenRequest.setObjectId(line->getKey());
+					lineOpenRequest.getPage()->setLine(line);
 					stream << t.row();
 					stream << t.col();
 					stream << line->getName();
@@ -233,48 +230,51 @@ namespace synthese
 			return _request->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
-		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 		
 		std::string CommercialLineAdmin::getTitle() const
 		{
 			return _cline.get() ? "<span class=\"linesmall " + _cline->getStyle() +"\">" + _cline->getShortName() + "</span>" : DEFAULT_TITLE;
 		}
 
-		std::string CommercialLineAdmin::getParameterName() const
-		{
-			return _cline.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string CommercialLineAdmin::getParameterValue() const
-		{
-			return _cline.get() ? Conversion::ToString(_cline->getKey()) : string();
-		}
-
-		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages( const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages(
+			shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (currentPage.getFactoryKey() == CommercialLineAdmin::FACTORY_KEY && _cline->getKey() == static_cast<const CommercialLineAdmin&>(currentPage).getCommercialLine()->getKey()
-				|| currentPage.getFactoryKey() == LineAdmin::FACTORY_KEY && _cline->getKey() == static_cast<const LineAdmin&>(currentPage).getLine()->getCommercialLine()->getKey()
-				)
-			{
+			
+			const LineAdmin* la(
+				dynamic_cast<const LineAdmin*>(currentPage.get())
+			);
+			
+			const CommercialLineAdmin* ca(
+				dynamic_cast<const CommercialLineAdmin*>(currentPage.get())
+			);
+			
+			if(	la &&
+				la->getLine().get() &&
+				la->getLine()->getCommercialLine() &&
+				la->getLine()->getCommercialLine()->getKey() == _cline->getKey() ||
+				ca &&
+				ca->getCommercialLine().get() &&
+				ca->getCommercialLine()->getKey() == _cline->getKey()
+			){
 				Env env;
 				LineTableSync::Search(env, _cline->getKey());
 				const Registry<Line>& lines(env.getRegistry<Line>());
-				for(Registry<Line>::const_iterator it(lines.begin()); it != lines.end(); ++it)
+				BOOST_FOREACH(shared_ptr<Line> line, lines)
 				{
-					PageLink link(getPageLink());
-					link.factoryKey = LineAdmin::FACTORY_KEY;
-					link.icon = LineAdmin::ICON;
-					link.name = (*it)->getName();
-					link.parameterName = Request::PARAMETER_OBJECT_ID;
-					link.parameterValue = Conversion::ToString((*it)->getKey());
-					links.push_back(link);
+					if(	la &&
+						la->getLine()->getCommercialLine()->getKey() == line->getKey()
+					){
+						AddToLinks(links, currentPage);
+					}
+					else
+					{
+						shared_ptr<LineAdmin> p(
+							getNewOtherPage<LineAdmin>()
+						);
+						p->setLine(line);
+						AddToLinks(links, p);
+					}
 				}
 			}
 			return links;
@@ -293,6 +293,11 @@ namespace synthese
 		boost::shared_ptr<const CommercialLine> CommercialLineAdmin::getCommercialLine() const
 		{
 			return _cline;
+		}
+		
+		void CommercialLineAdmin::setCommercialLine(boost::shared_ptr<CommercialLine> value)
+		{
+			_cline = const_pointer_cast<CommercialLine>(value);
 		}
 	}
 }

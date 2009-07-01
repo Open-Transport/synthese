@@ -109,10 +109,7 @@ namespace synthese
 			DisplayScreenTableSync::Save(&screen);
 
 			// Request update
-			if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-			{
-				_request->setObjectId(screen.getKey());
-			}
+			_request->setActionCreatedId(screen.getKey());
 
 			// Log
 			ArrivalDepartureTableLog::addCreateEntry(screen, *_request->getUser());

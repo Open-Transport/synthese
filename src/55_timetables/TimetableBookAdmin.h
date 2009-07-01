@@ -38,8 +38,11 @@ namespace synthese
 			@ingroup m55Admin refAdmin
 			@author Hugues Romain
 			@date 2008
+			
+			_book is NULL when the page is the root page of the books
 		*/
-		class TimetableBookAdmin : public admin::AdminInterfaceElementTemplate<TimetableBookAdmin>
+		class TimetableBookAdmin:
+			public admin::AdminInterfaceElementTemplate<TimetableBookAdmin>
 		{
 		public:
 			static const std::string PARAMETER_RANK;
@@ -48,9 +51,12 @@ namespace synthese
 		private:
 			boost::shared_ptr<const Timetable>			_book;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-
+			html::ResultHTMLTable::ResultParameters		_resultParameters;
+			
 		public:
 			TimetableBookAdmin();
+			
+			void setBook(boost::shared_ptr<Timetable> value);
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -90,9 +96,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const std::string& moduleKey,
+				boost::shared_ptr<const admin::AdminInterfaceElement> currentPage
 			) const;
 			
 			/** Sub pages getter.
@@ -103,7 +109,7 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const AdminInterfaceElement& currentPage
+				boost::shared_ptr<const admin::AdminInterfaceElement> currentPage
 			) const;
 			
 			/** Title generator.
@@ -113,27 +119,12 @@ namespace synthese
 			*/
 			virtual std::string getTitle() const;
 			
-			/** Parameter name getter.
-				@return The name of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterName() const;
-			
-			/** Parameter value getter.
-				@return The value of the parameter of the page
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual std::string getParameterValue() const;
-			
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
 				@date 2008
 			*/
 			virtual bool isAuthorized() const;
-
 		};
 	}
 }

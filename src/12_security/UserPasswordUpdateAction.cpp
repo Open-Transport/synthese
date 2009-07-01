@@ -23,11 +23,13 @@
 #include "UserPasswordUpdateAction.h"
 #include "UserTableSync.h"
 #include "SecurityRight.h"
+#include "SecurityLog.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -39,14 +41,15 @@ namespace synthese
 	
 	namespace security
 	{
-		const std::string UserPasswordUpdateAction::PARAMETER_PASS1 = Action_PARAMETER_PREFIX + "pass1";
-		const std::string UserPasswordUpdateAction::PARAMETER_PASS2 = Action_PARAMETER_PREFIX + "pass2";
+		const string UserPasswordUpdateAction::PARAMETER_USER_ID(Action_PARAMETER_PREFIX + "u");
+		const string UserPasswordUpdateAction::PARAMETER_PASS1(Action_PARAMETER_PREFIX + "p1");
+		const string UserPasswordUpdateAction::PARAMETER_PASS2(Action_PARAMETER_PREFIX + "p2");
 
 
 		ParametersMap UserPasswordUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_user.get()) map.insert(PARAMETER_USER_ID, _user->getKey());
 			return map;
 		}
 
@@ -54,7 +57,10 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::GetEditable(_request->getObjectId(), *_env);
+				_user = UserTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_USER_ID),
+					*_env
+				);
 
 				_password = map.getString(PARAMETER_PASS1, true, FACTORY_KEY);
 
@@ -71,7 +77,14 @@ namespace synthese
 		void UserPasswordUpdateAction::run()
 		{
 			_user->setPassword(_password);
+			
 			UserTableSync::Save(_user.get());
+			
+			SecurityLog::addUserAdmin(
+				_request->getUser().get(),
+				_user.get(),
+				"Modification du mot de passe"
+			);
 		}
 
 
@@ -80,6 +93,17 @@ namespace synthese
 		) const {
 			return _request->isAuthorized<SecurityRight>(WRITE) ||
 				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
+		}
+		
+		
+		void UserPasswordUpdateAction::setUser(boost::shared_ptr<User> value)
+		{
+			_user = value;
+		}
+	
+		void UserPasswordUpdateAction::setUser(boost::shared_ptr<const User> value)
+		{
+			_user = const_pointer_cast<User>(value);
 		}
 	}
 }

@@ -46,15 +46,17 @@ namespace synthese
 	
 	namespace security
 	{
-		const string AddRightAction::PARAMETER_RIGHT = Action_PARAMETER_PREFIX + "right";
-		const string AddRightAction::PARAMETER_PUBLIC_LEVEL = Action_PARAMETER_PREFIX + "pulev";
-		const string AddRightAction::PARAMETER_PRIVATE_LEVEL = Action_PARAMETER_PREFIX + "prlev";
-		const string AddRightAction::PARAMETER_PARAMETER = Action_PARAMETER_PREFIX + "param";
+		const string AddRightAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "p");
+		const string AddRightAction::PARAMETER_RIGHT = Action_PARAMETER_PREFIX + "r";
+		const string AddRightAction::PARAMETER_PUBLIC_LEVEL = Action_PARAMETER_PREFIX + "u";
+		const string AddRightAction::PARAMETER_PRIVATE_LEVEL = Action_PARAMETER_PREFIX + "t";
+		const string AddRightAction::PARAMETER_PARAMETER = Action_PARAMETER_PREFIX + "f";
 
 
 		ParametersMap AddRightAction::getParametersMap() const
 		{
 			ParametersMap map;
+			if(_profile.get()) map.insert(PARAMETER_PROFILE_ID, _profile->getKey());
 			return map;
 		}
 
@@ -62,15 +64,22 @@ namespace synthese
 		{
 			try
 			{
-				_profile = ProfileTableSync::GetEditable(_request->getObjectId(), *_env);
+				_profile = ProfileTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_PROFILE_ID),
+					*_env
+				);
 
-				_rightName = map.getString(PARAMETER_RIGHT, true, FACTORY_KEY);
+				_rightName = map.get<string>(PARAMETER_RIGHT);
 				if (!Factory<Right>::contains(_rightName))
 					throw ActionException("Specified right class not found");
 				
-				_parameter = map.getString(PARAMETER_PARAMETER, true, FACTORY_KEY);
-				_publicLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PUBLIC_LEVEL, true, FACTORY_KEY));
-				_privateLevel = static_cast<RightLevel>(map.getInt(PARAMETER_PRIVATE_LEVEL, false, FACTORY_KEY));
+				_parameter = map.get<string>(PARAMETER_PARAMETER);
+				_publicLevel = static_cast<RightLevel>(
+					map.get<int>(PARAMETER_PUBLIC_LEVEL)
+				);
+				_privateLevel = static_cast<RightLevel>(
+					map.getDefault<int>(PARAMETER_PRIVATE_LEVEL, UNKNOWN_VALUE)
+				);
 			}
 			catch(ObjectNotFoundException<Profile>& e)
 			{
@@ -98,5 +107,17 @@ namespace synthese
 			return _request->isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a control on the profile on the user who creates the new profile
 		}
-	}
+		
+		void AddRightAction::setProfile(boost::shared_ptr<Profile> value)
+		{
+			_profile = value;
+		}
+	
+	
+	
+		void AddRightAction::setProfile(boost::shared_ptr<const Profile> value)
+		{
+			_profile = const_pointer_cast<Profile>(value);
+		}
+}
 }

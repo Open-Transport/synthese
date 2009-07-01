@@ -21,12 +21,13 @@
 */
 
 #include "UpdateAllStopsDisplayScreenAction.h"
-
+#include "ArrivalDepartureTableLog.h"
 #include "DisplayScreenTableSync.h"
 #include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
+#include "DBLogModule.h"
 
 using namespace std;
 using namespace boost;
@@ -37,18 +38,20 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
+	using namespace dblog;
 
 	template<> const string util::FactorableTemplate<Action, departurestable::UpdateAllStopsDisplayScreenAction>::FACTORY_KEY("uasdsa");
 
 	namespace departurestable
 	{
+		const string UpdateAllStopsDisplayScreenAction::PARAMETER_SCREEN_ID = Action_PARAMETER_PREFIX + "s";
 		const string UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE = Action_PARAMETER_PREFIX + "val";
 
 
 		ParametersMap UpdateAllStopsDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if(_screen.get()) map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
 			return map;
 		}
 
@@ -56,7 +59,10 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DisplayScreenTableSync::GetEditable(_request->getObjectId(), *_env);
+				_screen = DisplayScreenTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_SCREEN_ID),
+					*_env
+				);
 
 				_value = map.getBool(PARAMETER_VALUE, true, false, FACTORY_KEY);
 
@@ -69,8 +75,23 @@ namespace synthese
 
 		void UpdateAllStopsDisplayScreenAction::run()
 		{
+			// Comparison for log text generation
+			stringstream log;
+			DBLogModule::appendToLogIfChange(
+				log,
+				"Affichage tous arrêts",
+				_screen->getAllPhysicalStopsDisplayed() ? "OUI" : "NON",
+				_value ? "OUI" : "NON"
+			);
+			
 			_screen->setAllPhysicalStopsDisplayed(_value);
 			DisplayScreenTableSync::Save(_screen.get());
+			
+			ArrivalDepartureTableLog::addUpdateEntry(
+				*_screen,
+				log.str(),
+				*_request->getUser()
+			);
 		}
 
 
@@ -78,6 +99,13 @@ namespace synthese
 		bool UpdateAllStopsDisplayScreenAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		}
+		
+		
+		void UpdateAllStopsDisplayScreenAction::setScreen(
+			boost::shared_ptr<const DisplayScreen> value
+		){
+			_screen = const_pointer_cast<DisplayScreen>(value);
 		}
 	}
 }

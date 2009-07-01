@@ -40,9 +40,11 @@ namespace synthese
 		/** Action class : removes a stop to the selection of a departures table.
 			@ingroup m54Actions refActions
 		*/
-		class DisplayScreenRemovePhysicalStopAction : public util::FactorableTemplate<server::Action, departurestable::DisplayScreenRemovePhysicalStopAction>
+		class DisplayScreenRemovePhysicalStopAction :
+			public util::FactorableTemplate<server::Action, departurestable::DisplayScreenRemovePhysicalStopAction>
 		{
 		public:
+			static const std::string PARAMETER_SCREEN_ID;
 			static const std::string PARAMETER_PHYSICAL;
 
 		private:
@@ -70,6 +72,7 @@ namespace synthese
 			void setStopId(
 				util::RegistryKeyType id
 			);
+			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 		};
 	}
 }

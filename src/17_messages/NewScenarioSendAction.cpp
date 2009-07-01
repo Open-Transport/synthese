@@ -104,10 +104,7 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 	
 				// Remember of the id of created object to view it after the action
-				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_request->setObjectId(scenario.getKey());
-				}
+				_request->setActionCreatedId(scenario.getKey());
 					
 				SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
 	 				_scenarioToCopy->getTemplate()->getKey(),
@@ -129,10 +126,7 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 	
 				// Remember of the id of created object to view it after the action
-				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_request->setObjectId(scenario.getKey());
-				}
+				_request->setActionCreatedId(scenario.getKey());
 				
 				// The action on the alarms
 				SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
@@ -155,10 +149,7 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 
 				// Remember of the id of created object to view it after the action
-				if(_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_request->setObjectId(scenario.getKey());
-				}
+				_request->setActionCreatedId(scenario.getKey());
 
 				// The log
 				MessagesLog::AddNewSentScenarioEntry(

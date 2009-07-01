@@ -354,7 +354,7 @@ namespace synthese
 			ResaDBLog::AddBookReservationEntry(_request->getSession(), rt);
 
 			// Redirect
-			_request->setObjectId(rt.getKey());
+			_request->setActionCreatedId(rt.getKey());
 		}
 
 		BookReservationAction::BookReservationAction()

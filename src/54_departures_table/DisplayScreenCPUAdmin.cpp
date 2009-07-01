@@ -44,7 +44,8 @@
 #include "DisplayScreenCPUMaintenanceUpdateAction.h"
 #include "DisplayMaintenanceLog.h"
 #include "HTMLList.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -94,12 +95,14 @@ namespace synthese
 			const ParametersMap& map,
 			bool doDisplayPreparationActions
 		){
-			uid id(_request->getObjectId());
-			if (id == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return;
+			if(_request->getActionWillCreateObject()) return;
 			
 			try
 			{
-				_cpu = DisplayScreenCPUTableSync::Get(id, _getEnv());
+				_cpu = DisplayScreenCPUTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					_getEnv()
+				);
 			}
 			catch (ObjectNotFoundException<DisplayScreenCPU>& e)
 			{
@@ -120,6 +123,7 @@ namespace synthese
 		server::ParametersMap DisplayScreenCPUAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_cpu.get()) m.insert(Request::PARAMETER_OBJECT_ID, _cpu->getKey());
 			return m;
 		}
 		
@@ -133,7 +137,7 @@ namespace synthese
 			// TECHNICAL TAB
 			if (openTabContent(stream, TAB_TECHNICAL))
 			{
-				ActionFunctionRequest<DisplayScreenCPUUpdateAction, AdminRequest> updateRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenCPUUpdateAction, DisplayScreenCPUAdmin> updateRequest(_request);
 				updateRequest.getAction()->setCPU(_cpu->getKey());
 
 				stream << "<h1>Propriétés</h1>";
@@ -153,11 +157,11 @@ namespace synthese
 			if (openTabContent(stream, TAB_MAINTENANCE))
 			{
 				// Update action
-				ActionFunctionRequest<DisplayScreenCPUMaintenanceUpdateAction,AdminRequest> updateRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenCPUMaintenanceUpdateAction,DisplayScreenCPUAdmin> updateRequest(_request);
 				updateRequest.getAction()->setCPU(_cpu->getKey());
 
 				// Log search
-				FunctionRequest<AdminRequest> searchRequest(_request);
+				AdminFunctionRequest<DisplayScreenCPUAdmin> searchRequest(_request);
 
 				stream << "<h1>Paramètres de maintenance</h1>";
 
@@ -259,12 +263,12 @@ namespace synthese
 			// DISPLAYS TAB
 			if (openTabContent(stream, TAB_DISPLAYS))
 			{
-				FunctionRequest<AdminRequest> displayRequest(_request);
-				displayRequest.getFunction()->setPage<DisplayAdmin>();
+				AdminFunctionRequest<DisplayAdmin> displayRequest(_request);
 
-				ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(_request);
-				createDisplayRequest.getFunction()->setPage<DisplayAdmin>();
-				createDisplayRequest.setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+				AdminActionFunctionRequest<CreateDisplayScreenAction,DisplayAdmin> createDisplayRequest(
+					_request
+				);
+				createDisplayRequest.setActionWillCreateObject();
 				createDisplayRequest.getAction()->setCPU(_cpu->getKey());
 				
 				HTMLTable::ColsVector c;
@@ -277,7 +281,9 @@ namespace synthese
 				stream << t.open();
 				BOOST_FOREACH(const DisplayScreen* screen, _cpu->getWiredScreens())
 				{
-					displayRequest.setObjectId(screen->getKey());
+					displayRequest.getPage()->setScreen(
+						_getEnv().getSPtr(screen)
+					);
 					stream << t.row();
 					stream << t.col() << screen->getLocalizationComment();
 					stream << t.col() << screen->getComPort();
@@ -302,35 +308,20 @@ namespace synthese
 
 		bool DisplayScreenCPUAdmin::isAuthorized() const
 		{
-			if (_request->getObjectId() == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION) return true;
+			if(_request->getActionWillCreateObject()) return true;
+			
 			if (_cpu.get() == NULL) return false;
-			if (_cpu->getPlace() == NULL) return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
-			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey()));
-		}
-		
-		AdminInterfaceElement::PageLinks DisplayScreenCPUAdmin::getSubPagesOfParent(
-			const PageLink& parentLink,
-			const AdminInterfaceElement& currentPage
-		) const	{
-			PageLinks links;
-			if(	parentLink.factoryKey == DisplaySearchAdmin::FACTORY_KEY &&
-				parentLink.parameterValue.empty()
-			){
-				if (currentPage.getFactoryKey() == FACTORY_KEY)
-				{
-					links.push_back(currentPage.getPageLink());
-				}
+			if (_cpu->getPlace() == NULL)
+			{
+				return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
 			}
-
-			return links;
+			return _request->isAuthorized<ArrivalDepartureTableRight>(
+				READ,
+				UNKNOWN_RIGHT_LEVEL,
+				lexical_cast<string>(_cpu->getPlace()->getKey())
+			);
 		}
 		
-		AdminInterfaceElement::PageLinks DisplayScreenCPUAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
 
 
 		std::string DisplayScreenCPUAdmin::getTitle() const
@@ -338,15 +329,6 @@ namespace synthese
 			return _cpu.get() ? _cpu->getName() : DEFAULT_TITLE;
 		}
 
-		std::string DisplayScreenCPUAdmin::getParameterName() const
-		{
-			return _cpu.get() ? Request::PARAMETER_OBJECT_ID : string();
-		}
-
-		std::string DisplayScreenCPUAdmin::getParameterValue() const
-		{
-			return _cpu.get() ? lexical_cast<string>(_cpu->getKey()) : string();
-		}
 
 		void DisplayScreenCPUAdmin::_buildTabs(
 		) const {
@@ -364,5 +346,11 @@ namespace synthese
 			
 			_tabBuilded = true;
 		}
+		
+		void DisplayScreenCPUAdmin::setCPU(boost::shared_ptr<const DisplayScreenCPU> value)
+		{
+			_cpu = value;
+		}
+
 	}
 }

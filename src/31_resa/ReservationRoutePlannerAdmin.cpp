@@ -33,8 +33,8 @@
 #include "Reservation.h"
 #include "ReservationTableSync.h"
 #include "NamedPlace.h"
-#include "AdminRequest.h"
-#include "ActionFunctionRequest.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
@@ -176,9 +176,10 @@ namespace synthese
 		
 		void ReservationRoutePlannerAdmin::display(ostream& stream, VariablesMap& variables) const
 		{
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
 
-			ActionFunctionRequest<BookReservationAction,AdminRequest> resaRequest(_request);
+			AdminActionFunctionRequest<BookReservationAction,ReservationRoutePlannerAdmin> resaRequest(_request);
+			resaRequest.setActionWillCreateObject();
 
 			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
 			customerSearchRequest.getFunction()->setNumber(20);
@@ -456,27 +457,33 @@ namespace synthese
 			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
-		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfParent(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
+		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfModule(
+				const std::string& moduleKey,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(parentLink.factoryKey == admin::ModuleAdmin::FACTORY_KEY && parentLink.parameterValue == ResaModule::FACTORY_KEY)
-				links.push_back(getPageLink());
+			if(moduleKey == ResaModule::FACTORY_KEY)
+			{
+				if(dynamic_cast<const ReservationRoutePlannerAdmin*>(currentPage.get()))
+				{
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					AddToLinks(links, getNewPage());
+				}
+			}
 			return links;
 		}
 		
-		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPages(
-			const PageLink& parentLink
-			, const AdminInterfaceElement& currentPage
-		) const {
-			AdminInterfaceElement::PageLinks links;
-			return links;
-		}
-
 		bool ReservationRoutePlannerAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
 		{
 			return true;
+		}
+		
+		void ReservationRoutePlannerAdmin::setCustomer(boost::shared_ptr<const User> value)
+		{
+			_customer = value;
 		}
 	}
 }

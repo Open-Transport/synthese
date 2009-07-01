@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_UpdateAllStopsDisplayScreenAction_H__
 #define SYNTHESE_UpdateAllStopsDisplayScreenAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -39,6 +38,7 @@ namespace synthese
 		class UpdateAllStopsDisplayScreenAction : public util::FactorableTemplate<server::Action, UpdateAllStopsDisplayScreenAction>
 		{
 		public:
+			static const std::string PARAMETER_SCREEN_ID;
 			static const std::string PARAMETER_VALUE;
 
 		private:
@@ -62,6 +62,8 @@ namespace synthese
 			void run();
 
 			virtual bool _isAuthorized() const;
+			
+			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 		};
 	}
 }

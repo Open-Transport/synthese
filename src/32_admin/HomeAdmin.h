@@ -75,15 +75,9 @@ namespace synthese
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
 
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param factoryKey Key of the parent class
-				@return PageLinks Nothing
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfParent(
-				const PageLink& parentLink
-				, const AdminInterfaceElement& currentPage
+
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
 			) const;
 
 			bool isAuthorized() const;
