@@ -573,6 +573,8 @@ namespace synthese
 					AddToLinks(links, p);
 				}
 			}
+			
+			return links;
 		}
 
 		std::string DisplaySearchAdmin::getTitle() const

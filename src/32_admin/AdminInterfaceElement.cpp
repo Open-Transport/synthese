@@ -49,6 +49,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
 			boost::shared_ptr<const AdminInterfaceElement> currentPage
 		) const	{
+			return PageLinks();
 		}
 
 
