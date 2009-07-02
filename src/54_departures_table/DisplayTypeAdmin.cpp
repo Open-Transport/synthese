@@ -73,9 +73,10 @@ namespace synthese
 		
 		void DisplayTypeAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 
 			try
 			{
@@ -102,7 +103,8 @@ namespace synthese
 		
 		
 		
-		void DisplayTypeAdmin::display(ostream& stream, VariablesMap& variables) const
+		void DisplayTypeAdmin::display(ostream& stream, VariablesMap& variables,
+					const FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Requests
 			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(
@@ -178,10 +180,12 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool DisplayTypeAdmin::isAuthorized() const
+		bool DisplayTypeAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			if (_type.get() == NULL) return false;
-			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
+			return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 		
 

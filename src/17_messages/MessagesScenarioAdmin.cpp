@@ -86,9 +86,10 @@ namespace synthese
 
 		void MessagesScenarioAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 			
 			try
 			{
@@ -129,7 +130,8 @@ namespace synthese
 
 		void MessagesScenarioAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables
+			interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -282,11 +284,14 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
-		bool MessagesScenarioAdmin::isAuthorized() const
+		bool MessagesScenarioAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			if (_scenario.get() == NULL) return false;
-			if (dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario).get() != NULL) return _request->isAuthorized<MessagesRight>(READ);
-			return _request->isAuthorized<MessagesLibraryRight>(READ);
+			if (dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario).get() != NULL)
+				return _request.isAuthorized<MessagesRight>(READ);
+			return _request.isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessagesScenarioAdmin::MessagesScenarioAdmin(
@@ -301,7 +306,8 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			
@@ -369,6 +375,7 @@ namespace synthese
 
 
 		void MessagesScenarioAdmin::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			_tabs.clear();
 

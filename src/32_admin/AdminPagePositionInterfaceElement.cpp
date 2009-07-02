@@ -64,8 +64,10 @@ namespace synthese
 		std::string AdminPagePositionInterfaceElement::display(
 			ostream& stream
 			, const ParametersVector& parameters
-			, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
-		{
+			, interfaces::VariablesMap& variables,
+			const void* object /* = NULL */,
+			const server::Request* request /* = NULL */
+		) const {
 			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
 			string normalSeparator(_normalSeparator->getValue(parameters, variables, object, request));
 			string lastSeparator(_lastSeparator->getValue(parameters, variables, object, request));
@@ -74,7 +76,10 @@ namespace synthese
 			bool withFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
 			bool lastSeparatorIfFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
 
-			const AdminInterfaceElement::PageLinks& links((*page)->getTreePosition());
+			const AdminInterfaceElement::PageLinks& links(
+				(*page)->getTreePosition(
+					static_cast<const FunctionRequest<AdminRequest>& >(*request)
+			)	);
 
 			bool first(true);
 			FunctionRequest<AdminRequest> r(request);

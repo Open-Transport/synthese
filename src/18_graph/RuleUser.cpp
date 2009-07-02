@@ -100,8 +100,8 @@ namespace synthese
 			return rule.isCompatibleWith(accessParameters);
 		}
 
-		const RuleUser::Map::mapped_type RuleUser::getRule(
-			const Map::key_type userClass
+		RuleUser::Map::mapped_type RuleUser::getRule(
+			Map::key_type userClass
 		) const	{
 			Map::const_iterator it(_rules.find(userClass));
 			if(it == _rules.end()) return NULL;

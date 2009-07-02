@@ -125,9 +125,10 @@ namespace synthese
 
 		void DisplayAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 
 			try
 			{
@@ -199,7 +200,8 @@ namespace synthese
 
 		void DisplayAdmin::display(
 			std::ostream& stream,
-			interfaces::VariablesMap& variables
+			interfaces::VariablesMap& variables,
+			const FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			// Display screen read in the main environment
 			shared_ptr<const DisplayScreen> _prodScreen(
@@ -823,7 +825,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_RESULT))
 			{
 				// Requests
-				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
+				FunctionRequest<DisplayScreenContentRequest> viewRequest(&_request);
 				viewRequest.getFunction()->setScreen(_displayScreen);
 				if(	_displayScreen->getType() &&
 					_displayScreen->getType()->getDisplayInterface() &&
@@ -953,13 +955,15 @@ namespace synthese
 
 
 
-		bool DisplayAdmin::isAuthorized() const
+		bool DisplayAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			if (_displayScreen.get() == NULL) return false;
-			if (_displayScreen->getLocalization() == NULL) return  _request->isAuthorized<ArrivalDepartureTableRight>(READ) || _request->isAuthorized<DisplayMaintenanceRight>(READ);
+			if (_displayScreen->getLocalization() == NULL) return  _request.isAuthorized<ArrivalDepartureTableRight>(READ) || _request.isAuthorized<DisplayMaintenanceRight>(READ);
 			return
-				_request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
-				_request->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
+				_request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
+				_request.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
 		}
 
 		DisplayAdmin::DisplayAdmin(
@@ -978,25 +982,29 @@ namespace synthese
 
 
 		void DisplayAdmin::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			_tabs.clear();
 
-			if (_request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
-			{
-				bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+			if(	_request.isAuthorized<ArrivalDepartureTableRight>(
+					READ,
+					UNKNOWN_RIGHT_LEVEL,
+					lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+			)	){
+				bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
 				_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writeRight, "cog.png"));
 			}
 
 			if(	_displayScreen->getLocalization() &&
-				_request->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()))
+				_request.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()))
 			){
-				bool writeRight(_request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+				bool writeRight(_request.isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
 				_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writeRight, "wrench.png"));
 			}
 
-			if (_request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
+			if (_request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
 			{
-				bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+				bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
 				_tabs.push_back(Tab("Sélection", TAB_CONTENT, writeRight, "times_display.png"));
 				_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
 				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));
@@ -1009,6 +1017,11 @@ namespace synthese
 		void DisplayAdmin::setScreen(boost::shared_ptr<const DisplayScreen> value)
 		{
 			_displayScreen = value;
+		}
+		
+		boost::shared_ptr<const DisplayScreen> DisplayAdmin::getScreen() const
+		{
+			return _displayScreen;
 		}
 	}
 }

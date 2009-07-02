@@ -57,6 +57,7 @@ namespace synthese
 			DisplayScreenCPUAdmin();
 			
 			void setCPU(boost::shared_ptr<const DisplayScreenCPU> value);
+			boost::shared_ptr<const DisplayScreenCPU> getCPU() const;
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -66,7 +67,8 @@ namespace synthese
 			*/
 			virtual void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 			
 			
@@ -86,14 +88,20 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
+			void display(
+				std::ostream& stream,
+				interfaces::VariablesMap& variables,
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 			
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
 				@date 2008
 			*/
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 			
 			
 			/** Title generator.
@@ -109,14 +117,15 @@ namespace synthese
 			/// Tabs builder.
 			/// @author Hugues Romain
 			/// @date 2008
-			/// REMOVE IF THE ADMIN PAGE DOES NOT USE TABS
 			/// This method has in charge to :
 			///		- the control of the profile of the user to determine the 
 			///			tabs list. 
 			///		- to set _tabBuilded at true to avoid the method to be
 			///			relaunched
 			////////////////////////////////////////////////////////////////////
-			virtual void _buildTabs() const;
+			virtual void _buildTabs(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 		};
 	}
 }

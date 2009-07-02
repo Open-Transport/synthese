@@ -56,7 +56,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 			
 			
@@ -73,14 +74,21 @@ namespace synthese
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
+			void display(
+				std::ostream& stream,
+				interfaces::VariablesMap& variables,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
 
 
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 		};
 	}
 }

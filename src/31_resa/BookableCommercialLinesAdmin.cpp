@@ -72,7 +72,8 @@ namespace synthese
 		
 		void BookableCommercialLinesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 		}
 		
@@ -85,14 +86,17 @@ namespace synthese
 
 
 		
-		void BookableCommercialLinesAdmin::display(ostream& stream, VariablesMap& variables) const
-		{
+		void BookableCommercialLinesAdmin::display(
+			ostream& stream,
+			VariablesMap& variables,
+			const FunctionRequest<AdminRequest>& _request
+		) const {
 			// Search
 			Env env;
 			CommercialLineTableSync::Search(
 				env,
-				_request->getUser()->getProfile()->getRightsForModuleClass<ResaRight>()
-				, _request->getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
+				_request.getUser()->getProfile()->getRightsForModuleClass<ResaRight>()
+				, _request.getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
 				, READ
 				, _requestParameters.first
 				, _requestParameters.maxSize
@@ -129,14 +133,17 @@ namespace synthese
 
 		}
 
-		bool BookableCommercialLinesAdmin::isAuthorized() const
+		bool BookableCommercialLinesAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<ResaRight>(READ);
+			return _request.isAuthorized<ResaRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY)
@@ -154,7 +161,8 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
@@ -165,8 +173,8 @@ namespace synthese
 			Env env;
 			CommercialLineTableSync::Search(
 				env,
-				_request->getUser()->getProfile()->getRightsForModuleClass<ResaRight>()
-				, _request->getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
+				request.getUser()->getProfile()->getRightsForModuleClass<ResaRight>(),
+				request.getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
 				, READ
 				, 0, 0
 				, false, true, true, true

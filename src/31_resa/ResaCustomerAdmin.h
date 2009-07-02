@@ -65,7 +65,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 			
 			
@@ -84,7 +85,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
 			/** Authorization control.
@@ -93,6 +95,8 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			
 			) const;
 			
 			
@@ -104,7 +108,9 @@ namespace synthese
 			virtual std::string getTitle() const;
 			
 			
-			virtual void _buildTabs() const;
+			virtual void _buildTabs(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 			
 			void setUser(boost::shared_ptr<security::User> value);
 			void setUser(boost::shared_ptr<const security::User> value);

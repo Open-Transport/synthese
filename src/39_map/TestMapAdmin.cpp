@@ -64,45 +64,20 @@ namespace synthese
 		const string TestMapAdmin::PARAMETER_USE_ENVIRONMENT("ue");
 
 		TestMapAdmin::TestMapAdmin()
-			: AdminInterfaceElementTemplate<TestMapAdmin>()
-			, _useEnvironment(true)
-			, _error(false)
+			: AdminInterfaceElementTemplate<TestMapAdmin>(),
+			_useEnvironment(true)
 		{ }
 		
 		void TestMapAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+			bool objectWillBeCreatedLater
 		){
 			_dataXml = map.getString(PARAMETER_DATA_XML, false, FACTORY_KEY);
 			_queryXml = map.getString(PARAMETER_QUERY_XML, false, FACTORY_KEY);
 			_useEnvironment = map.getBool(PARAMETER_USE_ENVIRONMENT, false, true, FACTORY_KEY);
 			
 			if(!doDisplayPreparationActions) return;
-
-			if (!_queryXml.empty())
-			{
-				try
-				{
-					FunctionRequest<MapRequest> r(_request);
-					r.getFunction()->setUseEnvironment(_useEnvironment);
-					r.getFunction()->setData(_dataXml);
-					r.getFunction()->setQuery(_queryXml);
-					r.getFunction()->setOutput(PostscriptRenderer::FACTORY_KEY);
-					stringstream s;
-					r.run(s);
-					_postScript = s.str();
-
-					r.getFunction()->setOutput(JpegRenderer::FACTORY_KEY);
-					stringstream t;
-					r.run(t);
-					_tempFileUrl = t.str();
-
-				}
-				catch(...)
-				{
-					_error = true;
-				}
-			}
 		}
 		
 		
@@ -118,10 +93,42 @@ namespace synthese
 
 
 		
-		void TestMapAdmin::display(ostream& stream, VariablesMap& variables) const
+		void TestMapAdmin::display(
+			ostream& stream,
+			VariablesMap& variables,
+			const FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Requests
 			AdminFunctionRequest<TestMapAdmin> testMapRequest(_request);
+			
+			
+			std::string _tempFileUrl;
+			std::string	_postScript;
+			bool		_error;
+			if (!_queryXml.empty())
+			{
+				try
+				{
+					FunctionRequest<MapRequest> r(&_request);
+					r.getFunction()->setUseEnvironment(_useEnvironment);
+					r.getFunction()->setData(_dataXml);
+					r.getFunction()->setQuery(_queryXml);
+					r.getFunction()->setOutput(PostscriptRenderer::FACTORY_KEY);
+					stringstream s;
+					r.run(s);
+					_postScript = s.str();
+
+					r.getFunction()->setOutput(JpegRenderer::FACTORY_KEY);
+					stringstream t;
+					r.run(t);
+					_tempFileUrl = t.str();
+				}
+				catch(...)
+				{
+					_error = true;
+				}
+			}
+
 			
 			// Form
 			PropertiesHTMLTable  st(testMapRequest.getHTMLForm("test"));
@@ -145,14 +152,17 @@ namespace synthese
 			stream << _postScript;
 		}
 
-		bool TestMapAdmin::isAuthorized() const
+		bool TestMapAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<GlobalRight>(READ);;
+			return _request.isAuthorized<GlobalRight>(READ);;
 		}
 		
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == MapModule::FACTORY_KEY)

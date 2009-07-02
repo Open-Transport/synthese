@@ -35,8 +35,8 @@
 #include "DeleteRightAction.h"
 #include "Constants.h"
 #include "ProfilesAdmin.h"
-#include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 
@@ -80,9 +80,10 @@ namespace synthese
 		
 		void ProfileAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 			
 			try
 			{
@@ -106,18 +107,19 @@ namespace synthese
 
 
 
-		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
+		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
-			ActionFunctionRequest<UpdateProfileAction, AdminRequest> updateRequest(_request);
+			AdminActionFunctionRequest<UpdateProfileAction, ProfileAdmin> updateRequest(_request);
 			updateRequest.getAction()->setProfile(_profile);
 			
-			ActionFunctionRequest<UpdateRightAction, AdminRequest> updateRightRequest(_request);
+			AdminActionFunctionRequest<UpdateRightAction, ProfileAdmin> updateRightRequest(_request);
 			updateRightRequest.getAction()->setProfile(_profile);
 			
-			ActionFunctionRequest<DeleteRightAction,AdminRequest> deleteRightRequest(_request);
+			AdminActionFunctionRequest<DeleteRightAction,ProfileAdmin> deleteRightRequest(_request);
 			deleteRightRequest.getAction()->setProfile(_profile);
 			
-			ActionFunctionRequest<AddRightAction,AdminRequest> addRightRequest(_request);
+			AdminActionFunctionRequest<AddRightAction,ProfileAdmin> addRightRequest(_request);
 			addRightRequest.getAction()->setProfile(_profile);
 			
 			vector<pair<int, string> > privatePublicMap;
@@ -227,7 +229,9 @@ namespace synthese
 
 
 
-		bool ProfileAdmin::isAuthorized() const
+		bool ProfileAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			return true;
 		}
@@ -241,5 +245,42 @@ namespace synthese
 		{
 			_profile = const_pointer_cast<const Profile>(value);
 		}
+		
+		shared_ptr<const Profile> ProfileAdmin::getProfile() const
+		{
+			return _profile;
+		}
+		
+		
+		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPages(
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const {
+					AdminInterfaceElement::PageLinks links;
+			
+			const ProfileAdmin* pa(
+				dynamic_cast<const ProfileAdmin*>(currentPage.get())
+			);
+			
+			BOOST_FOREACH(shared_ptr<Profile> profile, _getEnv().getRegistry<Profile>())
+			{
+				if(profile->getParent() != _profile.get()) continue;
+				
+				if(	pa &&
+					pa->getProfile()->getKey() == profile->getKey()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
+					p->setProfile(profile);
+					AddToLinks(links, p);
+				}
+			}
+			
+			return links;
+		}
+
 	}
 }

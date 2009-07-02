@@ -80,7 +80,8 @@ namespace synthese
 
 		void UsersAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
 			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
@@ -135,14 +136,17 @@ namespace synthese
 
 
 
-		bool UsersAdmin::isAuthorized() const
+		bool UsersAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<SecurityRight>(READ);
+			return _request.isAuthorized<SecurityRight>(READ);
 		}
 
 
 
-		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables
+		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			// Request for search form
 			AdminFunctionRequest<UsersAdmin> searchRequest(_request);
@@ -212,7 +216,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
@@ -233,7 +238,8 @@ namespace synthese
 		
 		
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;

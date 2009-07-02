@@ -96,23 +96,27 @@ namespace synthese
 			_openedFolderLastSubpageIntroducer = _openedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
 			_closedFolderLastSubpageIntroducer = _closedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
 
-			stream << getSubPages(
-				page->getTree()
-				, page
+			stream << displaySubPages(
+				page->getTree(
+					static_cast<const FunctionRequest<AdminRequest>& >(*request)
+				),
+				page
 				, 0
 				, string()
-				, true
+				, true,
+				*request
 			);
 	
 			return string();
 		}
 
-		std::string AdminPagesTreeInterfaceElement::getSubPages(
+		std::string AdminPagesTreeInterfaceElement::displaySubPages(
 			const AdminInterfaceElement::PageLinksTree& pages,
 			shared_ptr<const AdminInterfaceElement> currentPage
 			, int level
 			, string prefix
-			, bool last
+			, bool last,
+			const Request& request
 		) const {
 
 			stringstream str;
@@ -149,7 +153,7 @@ namespace synthese
 			}
 
 			// Display current page
-			FunctionRequest<AdminRequest> r(currentPage->getRequest());
+			FunctionRequest<AdminRequest> r(&request);
 			if (pages.page == currentPage)
 			{
 				str <<
@@ -191,12 +195,13 @@ namespace synthese
 				++it
 			){
 				str <<
-					getSubPages(
+					displaySubPages(
 						*it,
 						currentPage,
 						level+1,
 						curPrefix,
-						it==(pages.subPages.end()-1)
+						it==(pages.subPages.end()-1),
+						request
 					)
 				;
 			}

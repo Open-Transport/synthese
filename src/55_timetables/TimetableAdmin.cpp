@@ -91,9 +91,10 @@ namespace synthese
 		
 		void TimetableAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 			
 			try
 			{
@@ -134,15 +135,16 @@ namespace synthese
 		
 		void TimetableAdmin::display(
 			ostream& stream,
-			VariablesMap& variables
+			VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			// Requests
-			ActionFunctionRequest<TimetableUpdateAction,AdminRequest> updateRequest(_request);
+			AdminActionFunctionRequest<TimetableUpdateAction,TimetableAdmin> updateRequest(_request);
 			
-			ActionFunctionRequest<TimetableRowAddAction,AdminRequest> addRowRequest(_request);
+			AdminActionFunctionRequest<TimetableRowAddAction,TimetableAdmin> addRowRequest(_request);
 			addRowRequest.getAction()->setTimetable(_timetable);
 
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
 
 			// Search
 			ResultHTMLTable::ResultParameters p;
@@ -289,9 +291,11 @@ namespace synthese
 
 		}
 
-		bool TimetableAdmin::isAuthorized() const
+		bool TimetableAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<TimetableRight>(READ);
+			return _request.isAuthorized<TimetableRight>(READ);
 		}
 		
 

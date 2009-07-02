@@ -86,7 +86,8 @@ namespace synthese
 		
 		void LineAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			try
 			{
@@ -127,12 +128,14 @@ namespace synthese
 		server::ParametersMap LineAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_line.get()) m.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
 			return m;
 		}
 
 
 		
-		void LineAdmin::display(ostream& stream, VariablesMap& variables) const
+		void LineAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			////////////////////////////////////////////////////////////////////
 			// TAB STOPS
@@ -261,10 +264,12 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
-		bool LineAdmin::isAuthorized() const
+		bool LineAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			if (_line.get() == NULL) return false;
-			return _request->isAuthorized<TransportNetworkRight>(READ);
+			return _request.isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		
@@ -282,6 +287,7 @@ namespace synthese
 
 
 		void LineAdmin::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			_tabs.clear();
 

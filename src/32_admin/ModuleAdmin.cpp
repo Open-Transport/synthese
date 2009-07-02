@@ -64,7 +64,8 @@ namespace synthese
 		
 		void ModuleAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+			bool objectWillBeCreatedLater
 		){
 			try
 			{
@@ -91,7 +92,8 @@ namespace synthese
 		
 		void ModuleAdmin::display(
 			ostream& stream,
-			VariablesMap& variables
+			VariablesMap& variables,
+			const FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			stream << "<h1>Informations sur le module</h1>";
 
@@ -106,8 +108,8 @@ namespace synthese
 			
 			stream << "<ul>";
 
-			FunctionRequest<AdminRequest> r(_request);
-			AdminInterfaceElement::PageLinks links(getSubPages(shared_from_this()));
+			FunctionRequest<AdminRequest> r(&_request);
+			AdminInterfaceElement::PageLinks links(getSubPages(shared_from_this(), _request));
 			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> page, links)
 			{
 				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(page));
@@ -118,13 +120,16 @@ namespace synthese
 			stream << "</ul>";
 		}
 
-		bool ModuleAdmin::isAuthorized() const
+		bool ModuleAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			return true;
 		}
 		
 		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
@@ -132,11 +137,11 @@ namespace synthese
 			Factory<AdminInterfaceElement>::ObjectsCollection pages(Factory<AdminInterfaceElement>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement> page, pages)
 			{
-				page->setRequest(_request);
-				if (page->isAuthorized())
+				page->setEnv(_env);
+				if (page->isAuthorized(request))
 				{
 					PageLinks l(
-						page->getSubPagesOfModule(_moduleClass->getFactoryKey(), currentPage)
+						page->getSubPagesOfModule(_moduleClass->getFactoryKey(), currentPage, request)
 					);
 					links.insert(links.end(), l.begin(), l.end());
 				}
@@ -145,31 +150,14 @@ namespace synthese
 					PageLinks l(
 						currentPage->getSubPagesOfModule(
 							_moduleClass->getFactoryKey(),
-							currentPage
+							currentPage,
+							request
 					)	);
 					links.insert(links.end(), l.begin(), l.end());
 				}
 			}
 			return links;
-			
-			
-			
-/*			AdminInterfaceElement::PageLinks links;
-			const HomeAdmin* homeAdmin(dynamic_cast<const HomeAdmin*>(&parentLink));
-			if(homeAdmin)
-			{
-				vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
-				BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
-				{
-					shared_ptr<ModuleAdmin> link(new ModuleAdmin);
-					link->_moduleClass = module;
-
-					if (!link->getSubPages(currentPage).empty())
-						links.insert(links.begin(), link);
-				}
-			}
-			return links;
-*/		}
+		}
 
 		std::string ModuleAdmin::getTitle() const
 		{

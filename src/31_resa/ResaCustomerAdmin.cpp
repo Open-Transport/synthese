@@ -96,7 +96,8 @@ namespace synthese
 		
 		void ResaCustomerAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+			bool objectWillBeCreatedLater
 		){
 			try
 			{
@@ -128,8 +129,9 @@ namespace synthese
 
 		
 		void ResaCustomerAdmin::display(
-			ostream& stream
-			, VariablesMap& variables
+			ostream& stream,
+			VariablesMap& variables,
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -160,7 +162,10 @@ namespace synthese
 				t.getForm().setUpdateRight(tabHasWritePermissions());
 				stream << t.open();
 				stream << t.title("Connexion");
-				stream << t.cell("Login", t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()));
+				stream << t.cell(
+					"Login",
+					t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin())
+				);
 
 				stream << t.title("Coordonnées");
 				stream << t.cell("Prénom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
@@ -221,9 +226,11 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
-		bool ResaCustomerAdmin::isAuthorized() const
+		bool ResaCustomerAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<ResaRight>(READ, READ);
+			return _request.isAuthorized<ResaRight>(READ, READ);
 		}
 		
 
@@ -236,9 +243,10 @@ namespace synthese
 
 		
 		void ResaCustomerAdmin::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			_tabs.clear();
-			bool writeRight(_request->isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
+			bool writeRight(_request.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "user.png"));
 			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "cog.png"));

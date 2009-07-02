@@ -75,7 +75,8 @@ namespace synthese
 
 		void DisplayTypesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), DisplayTypeTableSync::COL_NAME, 20);
 			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
@@ -114,10 +115,11 @@ namespace synthese
 			
 		void DisplayTypesAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables
+			interfaces::VariablesMap& variables,
+			const FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			// Right
-			bool writeRight(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
+			bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 			
 			AdminFunctionRequest<DisplayTypesAdmin> searchRequest(_request);
 
@@ -240,9 +242,11 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool DisplayTypesAdmin::isAuthorized() const
+		bool DisplayTypesAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<ArrivalDepartureTableRight>(
+			return _request.isAuthorized<ArrivalDepartureTableRight>(
 				READ,
 				UNKNOWN_RIGHT_LEVEL,
 				GLOBAL_PERIMETER
@@ -258,7 +262,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -286,7 +291,8 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 		
 			const DisplayTypeAdmin* da(

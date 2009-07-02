@@ -81,7 +81,8 @@ namespace synthese
 		
 		void ResaEditLogEntryAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 			try
 			{
@@ -114,7 +115,8 @@ namespace synthese
 
 
 
-		void ResaEditLogEntryAdmin::display(ostream& stream, VariablesMap& variables
+		void ResaEditLogEntryAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			// Requests
 			AdminActionFunctionRequest<ResaLogEntryUpdateAction,ResaEditLogEntryAdmin> updateRequest(_request);
@@ -184,9 +186,11 @@ namespace synthese
 			_log.display(stream, searchRequest);
 		}
 
-		bool ResaEditLogEntryAdmin::isAuthorized() const
+		bool ResaEditLogEntryAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 

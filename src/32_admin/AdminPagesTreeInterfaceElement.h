@@ -54,14 +54,6 @@ namespace synthese
 		class AdminPagesTreeInterfaceElement:
 			public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagesTreeInterfaceElement>
 		{
-			std::string getSubPages(
-				const AdminInterfaceElement::PageLinksTree& pages,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
-				, int level
-				, std::string prefix
-				, bool last
-			) const;
-
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _subpageIntroducerVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _lastSubpageIntroducerVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _levelIndenterVIE;
@@ -88,6 +80,16 @@ namespace synthese
 			mutable std::string _openedFolderLastSubpageIntroducer;
 			mutable std::string _closedFolderLastSubpageIntroducer;
 
+			std::string displaySubPages(
+				const AdminInterfaceElement::PageLinksTree& pages,
+				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				, int level
+				, std::string prefix
+				, bool last
+				, const server::Request& request
+			) const;
+
+
 		public:
 			/** Controls and store the internals parameters.
 				@param vel Parameters list to read
@@ -101,6 +103,8 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL
 			) const;
+			
+			
 		};
 	}
 }

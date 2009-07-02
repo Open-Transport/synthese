@@ -78,11 +78,13 @@ namespace synthese
 		
 		void TimetableBookAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
 			
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK, ResultHTMLTable::UNLIMITED_SIZE);
+			
+			if(objectWillBeCreatedLater) return;
 
 			optional<RegistryKeyType> id(
 				map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
@@ -130,7 +132,8 @@ namespace synthese
 		
 		void TimetableBookAdmin::display(
 			ostream& stream,
-			VariablesMap& variables
+			VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			// Requests
 			
@@ -255,7 +258,8 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -281,7 +285,8 @@ namespace synthese
 		
 		
 		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			const TimetableBookAdmin* ba(
 				dynamic_cast<const TimetableBookAdmin*>(currentPage.get())
@@ -346,9 +351,11 @@ namespace synthese
 
 
 
-		bool TimetableBookAdmin::isAuthorized() const
+		bool TimetableBookAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<TimetableRight>(READ);
+			return _request.isAuthorized<TimetableRight>(READ);
 		}
 		
 		void TimetableBookAdmin::setBook(boost::shared_ptr<Timetable> value)

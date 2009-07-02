@@ -79,7 +79,8 @@ namespace synthese
 		
 		void ResaCustomersAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
 			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
@@ -120,7 +121,8 @@ namespace synthese
 		}
 
 		
-		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables) const
+		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Requests
 			AdminFunctionRequest<ResaCustomersAdmin> searchRequest(_request);
@@ -174,13 +176,16 @@ namespace synthese
 		}
 
 		bool ResaCustomersAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			
 		) const	{
-			return _request->isAuthorized<ResaRight>(READ);
+			return _request.isAuthorized<ResaRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfModule(
 			const string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -195,6 +200,21 @@ namespace synthese
 					AddToLinks(links, getNewPage());
 				}
 			}
+			return links;
+		}
+	
+	
+		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPages(
+			shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
+			AdminInterfaceElement::PageLinks links;
+			
+			if(dynamic_cast<const ResaCustomerAdmin*>(currentPage.get()))
+			{
+				AddToLinks(links,currentPage);
+			}
+			
 			return links;
 		}
 	}

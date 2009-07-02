@@ -221,6 +221,12 @@ namespace synthese
 
 
 
+		Request::~Request(
+		){
+		}
+
+		
+		
 		std::string Request::getURI() const
 		{
 			return _getParametersMap().getURI();
@@ -373,10 +379,6 @@ namespace synthese
 			if (_actionCreatedId)
 				result.insert(Request::PARAMETER_OBJECT_ID, *_actionCreatedId);
 
-			// Internal parameters
-			ParametersMap::Map internalMap(_internalParameters.getMap());
-			for (ParametersMap::Map::const_iterator it(internalMap.begin()); it != internalMap.end(); ++it)
-				result.insert(it->first, it->second);
 			return result;
 		}
 
@@ -447,16 +449,7 @@ namespace synthese
 			return _session;
 		}
 
-		ParametersMap& Request::getInternalParameters()
-		{
-			return _internalParameters;
-		}
 
-
-
-		Request::~Request(
-		){
-		}
 
 		std::string Request::getOutputMimeType()
 		{

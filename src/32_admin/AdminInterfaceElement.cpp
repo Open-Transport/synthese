@@ -46,8 +46,17 @@ namespace synthese
 
 	namespace admin
 	{
+		AdminInterfaceElement::AdminInterfaceElement(
+		):	_tabBuilded(false),
+			_currentTab(NULL)
+		{
+		}
+		
+		
+		
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			return PageLinks();
 		}
@@ -55,7 +64,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			return PageLinks();
 		}
@@ -63,6 +73,7 @@ namespace synthese
 
 
 		void AdminInterfaceElement::_buildTree(
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			// Cleaning
 			_tree.subPages.clear();
@@ -80,11 +91,10 @@ namespace synthese
 			else
 			{
 				homeAdmin.reset(new HomeAdmin);
-				homeAdmin->setRequest(_request);
 			}
 			PageLinks position;
 			AddToLinks(position, homeAdmin);
-			_tree = _buildTreeRecursion(homeAdmin, position);
+			_tree = _buildTreeRecursion(homeAdmin, position, request);
 			if (homeAdmin == shared_from_this())
 				_treePosition = position;
 		}
@@ -93,7 +103,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinksTree AdminInterfaceElement::_buildTreeRecursion(
 			shared_ptr<const AdminInterfaceElement> adminPage,
-			PageLinks position
+			PageLinks position,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 
 			// Local variables
@@ -101,7 +112,7 @@ namespace synthese
 			shared_ptr<const AdminInterfaceElement> currentLink(shared_from_this());
 			
 			// Recursion
-			PageLinks pages = adminPage->getSubPages(currentLink);
+			PageLinks pages = adminPage->getSubPages(currentLink, request);
 			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, pages)
 			{
 				AddToLinks(position, link);
@@ -114,7 +125,7 @@ namespace synthese
 				try
 				{
 					AdminInterfaceElement::PageLinksTree subTree(
-						_buildTreeRecursion(link, position)
+						_buildTreeRecursion(link, position, request)
 					);
 
 					if (link == currentLink)
@@ -140,20 +151,24 @@ namespace synthese
 			return tree;
 		}
 
-		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getTreePosition() const
+		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getTreePosition(
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const
 		{
 			if (_treePosition.empty())
 			{
-				_buildTree();
+				_buildTree(request);
 			}
 			return _treePosition;
 		}
 
-		const AdminInterfaceElement::PageLinksTree& AdminInterfaceElement::getTree() const
+		const AdminInterfaceElement::PageLinksTree& AdminInterfaceElement::getTree(
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const
 		{
 			if (_treePosition.empty())
 			{
-				_buildTree();
+				_buildTree(request);
 			}
 			return _tree;
 		}
@@ -167,21 +182,11 @@ namespace synthese
 
 
 
-		void AdminInterfaceElement::setRequest(
-			const server::FunctionRequest<admin::AdminRequest>* value
-		) {
-			_request = value;
-		}
-
-
-
 		void AdminInterfaceElement::displayTabs(
-			std::ostream& stream, interfaces::VariablesMap& variables
+			std::ostream& stream,
+			interfaces::VariablesMap& variables,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
-			assert(_request != NULL);
-
-			if (!_tabBuilded) _buildTabs();
-
 			if (_tabs.empty()) return;
 
 			bool first(true);
@@ -216,20 +221,18 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::AdminInterfaceElement(
-		):	_request(NULL),
-			_tabBuilded(false),
-			_currentTab(NULL)
-		{
-		}
-
-
-
 		void AdminInterfaceElement::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			_tabBuilded = true;
 		}
 
+
+		void AdminInterfaceElement::setEnv(
+			boost::shared_ptr<util::Env> value
+		){
+			_env = value;
+		}
 
 
 		bool AdminInterfaceElement::openTabContent(
@@ -237,11 +240,6 @@ namespace synthese
 			const std::string& key
 		) const {
 			closeTabContent(stream);
-
-			if (!_tabBuilded)
-			{
-				_buildTabs();
-			}
 
 			bool first(true);
 			BOOST_FOREACH(const Tab& rtab, _tabs)
@@ -342,11 +340,6 @@ namespace synthese
 		std::string AdminInterfaceElement::getTabLinkButton(
 			const string& tab
 		) const {
-			if (!_tabBuilded)
-			{
-				_buildTabs();
-			}
-
 			BOOST_FOREACH(const Tab& rtab, _tabs)
 			{
 				if(rtab.getId() == tab)
@@ -373,14 +366,10 @@ namespace synthese
 
 
 
-		const server::FunctionRequest<admin::AdminRequest>* AdminInterfaceElement::getRequest(
-		) const {
-			return _request;
-		}
-
 		util::Env& AdminInterfaceElement::_getEnv() const
 		{
-			return *_request->getFunction()->getEnv();
+			assert(_env.get());
+			return *_env;
 		}
 		
 		boost::shared_ptr<AdminInterfaceElement> AdminInterfaceElement::getNewPage() const
@@ -388,7 +377,13 @@ namespace synthese
 			shared_ptr<AdminInterfaceElement> page(
 				Factory<AdminInterfaceElement>::create(getFactoryKey())
 			);
-			page->setRequest(_request);
+			page->setEnv(_env);
+			page->setActiveTab(getCurrentTab());
+			page->setFromParametersMap(
+				getParametersMap(),
+				false,
+				false
+			);
 			return page;
 		}
 

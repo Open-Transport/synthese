@@ -42,8 +42,8 @@
 #include "MessagesScenarioAdmin.h"
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
-#include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "ActionException.h"
@@ -80,9 +80,10 @@ namespace synthese
 
 		void MessageAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 
 			try
 			{
@@ -113,7 +114,8 @@ namespace synthese
 
 
 
-		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
+		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			////////////////////////////////////////////////////////////////////
 			// TAB PARAMETERS
@@ -121,7 +123,7 @@ namespace synthese
 			{
 				stream << "<h1>Contenu</h1>";
 
-				ActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,AdminRequest> templateRequest(_request);
+				AdminActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,MessageAdmin> templateRequest(_request);
 				templateRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				vector<pair<uid, string> > tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
@@ -135,7 +137,7 @@ namespace synthese
 					stream << "</p>" << fc.close();
 				}
 
-				ActionFunctionRequest<UpdateAlarmMessagesAction,AdminRequest> updateMessagesRequest(_request);
+				AdminActionFunctionRequest<UpdateAlarmMessagesAction,MessageAdmin> updateMessagesRequest(_request);
 				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
@@ -154,14 +156,14 @@ namespace synthese
 				// TAB STOPS
 				if (openTabContent(stream, recipient->getFactoryKey()))
 				{
-					ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(_request);
+					AdminActionFunctionRequest<AlarmAddLinkAction,MessageAdmin> addRequest(_request);
 					addRequest.getAction()->setAlarmId(_alarm->getKey());
 					addRequest.getAction()->setRecipientKey(recipient->getFactoryKey());
 
-					ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(_request);
+					AdminActionFunctionRequest<AlarmRemoveLinkAction,MessageAdmin> removeRequest(_request);
 					removeRequest.getAction()->setAlarmId(_alarm->getKey());
 
-					FunctionRequest<AdminRequest> searchRequest(_request);
+					AdminFunctionRequest<MessageAdmin> searchRequest(_request);
 					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
 				}
 			}
@@ -175,6 +177,7 @@ namespace synthese
 
 
 		void MessageAdmin::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			_tabs.clear();
 
@@ -190,11 +193,13 @@ namespace synthese
 			_tabBuilded = true;
 		}
 
-		bool MessageAdmin::isAuthorized() const
-		{
+		bool MessageAdmin::isAuthorized(
+			const server::FunctionRequest<admin::AdminRequest>& _request
+ 		) const {
 			if (_alarm.get() == NULL) return false;
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() == NULL) return _request->isAuthorized<MessagesRight>(READ);
-			return _request->isAuthorized<MessagesLibraryRight>(READ);
+			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() == NULL)
+				return _request.isAuthorized<MessagesRight>(READ);
+			return _request.isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessageAdmin::MessageAdmin()

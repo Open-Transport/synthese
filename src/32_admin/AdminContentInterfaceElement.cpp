@@ -54,7 +54,11 @@ namespace synthese
 
 			if(aie != NULL && aie->get() != NULL)
 			{
-				(*aie)->display(stream, variables);
+				(*aie)->display(
+					stream,
+					variables,
+					static_cast<const FunctionRequest<AdminRequest>&>(*request)
+				);
 			}
 			return string();
 		}

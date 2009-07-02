@@ -87,7 +87,7 @@ namespace synthese
 					@return The required page, directly known as its type.
 				*/
 				template <class T>
-				const T* const getPage(std::string pageKey = std::string()) const
+				const T* getPage(std::string pageKey = std::string()) const
 				{
 					return static_cast<const T*>(getPage(T::FACTORY_KEY, pageKey));
 				}

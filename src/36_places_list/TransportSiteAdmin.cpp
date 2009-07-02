@@ -77,8 +77,10 @@ namespace synthese
 		
 		void TransportSiteAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
+			if(objectWillBeCreatedLater) return;
 			try
 			{
 				_site = SiteTableSync::GetEditable(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
@@ -101,7 +103,8 @@ namespace synthese
 
 
 		
-		void TransportSiteAdmin::display(ostream& stream, VariablesMap& variables) const
+		void TransportSiteAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Requests
 			AdminActionFunctionRequest<SiteUpdateAction,TransportSiteAdmin> updateRequest(
@@ -112,7 +115,7 @@ namespace synthese
 			AdminFunctionRequest<SiteRoutePlanningAdmin> routeplannerRequest(_request);
 			routeplannerRequest.getPage()->setSite(_site);
 
-			FunctionRequest<RoutePlannerFunction> rpHomeRequest(_request);
+			FunctionRequest<RoutePlannerFunction> rpHomeRequest(&_request);
 			rpHomeRequest.getFunction()->setSite(_site);
 
 			// Display
@@ -162,14 +165,17 @@ namespace synthese
 			stream << "<h1>Périmètre de la base transport</h1>";
 		}
 
-		bool TransportSiteAdmin::isAuthorized() const
+		bool TransportSiteAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<TransportWebsiteRight>(READ);
+			return _request.isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
 			const string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -203,7 +209,8 @@ namespace synthese
 		
 
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			

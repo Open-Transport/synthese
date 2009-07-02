@@ -64,9 +64,8 @@ namespace synthese
 				size_t size;
 			};
 			typedef std::vector<TestCase> TestCases;
-
+		
 			bool		_doIt;
-			TestCases	_testCases;
 			
 		public:
 			static const std::string PARAMETER_DOIT;
@@ -78,7 +77,8 @@ namespace synthese
 			*/
 			virtual void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 
 			/** Parameters map generator, used when building an url to the admin page.
@@ -92,9 +92,12 @@ namespace synthese
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const;
 
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
@@ -104,7 +107,8 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
 

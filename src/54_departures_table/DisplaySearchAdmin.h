@@ -128,8 +128,7 @@ namespace synthese
 			int												_searchState;
 			int												_searchMessage;
 			html::ResultHTMLTable::RequestParameters		_requestParameters;
-			html::ResultHTMLTable::ResultParameters			_resultParameters;
-
+			
 		public:
 			static const std::string PARAMETER_SEARCH_CITY;
 			static const std::string PARAMETER_SEARCH_STOP;
@@ -150,7 +149,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions ,
+					bool objectWillBeCreatedLater
 			);
 			
 			
@@ -167,7 +167,8 @@ namespace synthese
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 
 
@@ -178,7 +179,9 @@ namespace synthese
 				, const std::string& displayName
 				, uid lineUid, uid typeUid, int state, int message );
 
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
@@ -189,7 +192,14 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+			
+			
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
 			virtual std::string getTitle() const;
@@ -201,7 +211,9 @@ namespace synthese
 			*/
 			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
 
-			virtual void _buildTabs() const;
+			virtual void _buildTabs(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 
 			void setPlace(const util::RegistryKeyType id);
 			boost::optional<boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> > getPlace() const;

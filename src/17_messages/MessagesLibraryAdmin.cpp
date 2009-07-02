@@ -83,7 +83,8 @@ namespace synthese
 		
 		void MessagesLibraryAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions			
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			_requestParameters.setFromParametersMap(
 				map.getMap(),
@@ -91,7 +92,7 @@ namespace synthese
 				ResultHTMLTable::UNLIMITED_SIZE
 			);
 			
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 			
 			optional<RegistryKeyType> id(
 				map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
@@ -138,7 +139,8 @@ namespace synthese
 
 		void MessagesLibraryAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables
+			interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			// Requests
 			AdminFunctionRequest<MessagesLibraryAdmin> searchRequest(_request);
@@ -254,9 +256,11 @@ namespace synthese
 
 		}
 
-		bool MessagesLibraryAdmin::isAuthorized() const
+		bool MessagesLibraryAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<MessagesLibraryRight>(READ);
+			return _request.isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessagesLibraryAdmin::MessagesLibraryAdmin()
@@ -267,7 +271,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -291,7 +296,8 @@ namespace synthese
 		}
 
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			PageLinks links;
 

@@ -68,9 +68,10 @@ namespace synthese
 		
 		void UserAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 			
 			try
 			{
@@ -97,7 +98,8 @@ namespace synthese
 
 
 
-		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables) const
+		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			AdminActionFunctionRequest<UserUpdateAction, UserAdmin> updateRequest(_request);
 			updateRequest.getAction()->setUser(_user);
@@ -139,7 +141,9 @@ namespace synthese
 
 
 
-		bool UserAdmin::isAuthorized() const
+		bool UserAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			return true;
 		}

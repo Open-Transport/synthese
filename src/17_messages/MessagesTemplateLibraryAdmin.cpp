@@ -28,8 +28,8 @@
 #include "PropertiesHTMLTable.h"
 #include "HTMLList.h"
 
-#include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
@@ -84,7 +84,8 @@ namespace synthese
 
 		void MessagesTemplateLibraryAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			uid id(map.getUid(PARAMETER_FOLDER_ID, false, FACTORY_KEY));
 			if (id > 0)
@@ -113,22 +114,23 @@ namespace synthese
 
 
 
-		void MessagesTemplateLibraryAdmin::display(ostream& stream, VariablesMap& variables) const
+		void MessagesTemplateLibraryAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Requests
-			ActionFunctionRequest<UpdateTextTemplateAction,AdminRequest> updateRequest(_request);
+			AdminActionFunctionRequest<UpdateTextTemplateAction,MessagesTemplateLibraryAdmin> updateRequest(_request);
 			
-			ActionFunctionRequest<DeleteTextTemplateAction,AdminRequest> deleteRequest(_request);
+			AdminActionFunctionRequest<DeleteTextTemplateAction,MessagesTemplateLibraryAdmin> deleteRequest(_request);
 			
-			ActionFunctionRequest<TextTemplateAddAction,AdminRequest> addRequest(_request);
+			AdminActionFunctionRequest<TextTemplateAddAction,MessagesTemplateLibraryAdmin> addRequest(_request);
 			addRequest.getAction()->setParentId(_folder.get() ? _folder->getKey() : uid(0));
 			
-			ActionFunctionRequest<TextTemplateFolderUpdateAction,AdminRequest> updateFolderRequest(_request);
+			AdminActionFunctionRequest<TextTemplateFolderUpdateAction,MessagesTemplateLibraryAdmin> updateFolderRequest(_request);
 			
 
 			// Rights
-			bool updateRight(_request->isAuthorized<MessagesLibraryRight>(WRITE));
-			bool deleteRight(_request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
+			bool updateRight(_request.isAuthorized<MessagesLibraryRight>(WRITE));
+			bool deleteRight(_request.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
 
 			// Search
 			Env tenv;
@@ -224,16 +226,19 @@ namespace synthese
 
 
 
-		bool MessagesTemplateLibraryAdmin::isAuthorized() const
+		bool MessagesTemplateLibraryAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<MessagesLibraryRight>(READ);
+			return _request.isAuthorized<MessagesLibraryRight>(READ);
 		}
 		
 
 
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			

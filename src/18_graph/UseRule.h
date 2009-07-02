@@ -85,7 +85,7 @@ namespace synthese
 			{
 				RUN_NOT_POSSIBLE = 0,
 				RUN_POSSIBLE = 1,
-				RUN_DEPENDING_ON_DEPARTURE_PLACE = 2,
+				RUN_DEPENDING_ON_DEPARTURE_PLACE = 2
 			} RunPossibilityType;
 			
 			

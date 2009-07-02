@@ -45,14 +45,16 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::ICON = "house.png";
 		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::DEFAULT_TITLE = "Accueil";
 
-		void HomeAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables) const
+		void HomeAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables,
+					const FunctionRequest<admin::AdminRequest>& request) const
 		{
 			stream << "Bienvenue sur le panneau de configuration de SYNTHESE";
 		}
 
 		void HomeAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 		}
 		
@@ -66,7 +68,9 @@ namespace synthese
 
 
 
-		bool HomeAdmin::isAuthorized() const
+		bool HomeAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			return true;
 		}
@@ -79,7 +83,8 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks HomeAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			
@@ -110,7 +115,7 @@ namespace synthese
 					link->setModuleClass(
 						const_pointer_cast<const ModuleClass, ModuleClass>(module)
 					);
-					if (!link->getSubPages(currentPage).empty())
+					if (!link->getSubPages(currentPage, request).empty())
 					{
 						AddToLinks(links, link);
 					}

@@ -74,55 +74,10 @@ namespace synthese
 
 		void DeparturesTableBenchmarkAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+			bool objectWillBeCreatedLater
 		){
-			_doIt = map.getBool(PARAMETER_DOIT, false, false, FACTORY_KEY);
-
-			if(!doDisplayPreparationActions || !_doIt) return;
-
-			DisplayScreenTableSync::Search(_getEnv());
-			DisplayScreenCPUTableSync::Search(_getEnv());
-			
-			FunctionRequest<DisplayScreenContentRequest> r(_request);
-			FunctionRequest<CPUGetWiredScreensFunction> r2(_request);
-			ptime t0(microsec_clock::local_time());
-			time_duration duration;
-			BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, _getEnv().getRegistry<DisplayScreen>())
-			{
-				stringstream s;
-				r.getFunction()->setScreen(screen);
-				r.run(s);
-				ptime t2(microsec_clock::local_time());
-				TestCase t;
-				t.method = DisplayScreenContentRequest::FACTORY_KEY;
-				t.screen = screen;
-				t.duration = t2 - (t0 + duration);
-				t.size = s.str().size();
-				_testCases.push_back(t);
-				duration = t2 - t0;
-			}
-
-			BOOST_FOREACH(shared_ptr<const DisplayScreenCPU> cpu, _getEnv().getRegistry<DisplayScreenCPU>())
-			{
-				stringstream s;
-				if(!cpu->getMacAddress().empty())
-				{
-					r2.getFunction()->setCPU(cpu->getMacAddress());
-				}
-				else
-				{
-					r2.getFunction()->setCPU(cpu->getKey());
-				}
-				r2.run(s);
-				ptime t2(microsec_clock::local_time());
-				TestCase t;
-				t.method = CPUGetWiredScreensFunction::FACTORY_KEY;
-				t.cpu = cpu;
-				t.duration = t2 - (t0 + duration);
-				t.size = s.str().size();
-				_testCases.push_back(t);
-				duration = t2 - t0;
-			}
+			_doIt = map.getDefault<bool>(PARAMETER_DOIT, false);
 		}
 
 
@@ -138,11 +93,58 @@ namespace synthese
 			
 		void DeparturesTableBenchmarkAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables
+			interfaces::VariablesMap& variables,
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 
 			if(_doIt)
 			{
+				TestCases	_testCases;
+				
+				DisplayScreenTableSync::Search(_getEnv());
+				DisplayScreenCPUTableSync::Search(_getEnv());
+				
+				FunctionRequest<DisplayScreenContentRequest> r(&_request);
+				FunctionRequest<CPUGetWiredScreensFunction> r2(&_request);
+				ptime t0(microsec_clock::local_time());
+				time_duration duration;
+				BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, _getEnv().getRegistry<DisplayScreen>())
+				{
+					stringstream s;
+					r.getFunction()->setScreen(screen);
+					r.run(s);
+					ptime t2(microsec_clock::local_time());
+					TestCase t;
+					t.method = DisplayScreenContentRequest::FACTORY_KEY;
+					t.screen = screen;
+					t.duration = t2 - (t0 + duration);
+					t.size = s.str().size();
+					_testCases.push_back(t);
+					duration = t2 - t0;
+				}
+	
+				BOOST_FOREACH(shared_ptr<const DisplayScreenCPU> cpu, _getEnv().getRegistry<DisplayScreenCPU>())
+				{
+					stringstream s;
+					if(!cpu->getMacAddress().empty())
+					{
+						r2.getFunction()->setCPU(cpu->getMacAddress());
+					}
+					else
+					{
+						r2.getFunction()->setCPU(cpu->getKey());
+					}
+					r2.run(s);
+					ptime t2(microsec_clock::local_time());
+					TestCase t;
+					t.method = CPUGetWiredScreensFunction::FACTORY_KEY;
+					t.cpu = cpu;
+					t.duration = t2 - (t0 + duration);
+					t.size = s.str().size();
+					_testCases.push_back(t);
+					duration = t2 - t0;
+				}
+				
 				AdminFunctionRequest<DeparturesTableBenchmarkAdmin> reloadRequest(_request);
 				reloadRequest.getPage()->_doIt = true;
 
@@ -226,9 +228,15 @@ namespace synthese
 			
 		}
 
-		bool DeparturesTableBenchmarkAdmin::isAuthorized() const
+		bool DeparturesTableBenchmarkAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER);
+			return _request.isAuthorized<ArrivalDepartureTableRight>(
+				DELETE_RIGHT,
+				UNKNOWN_RIGHT_LEVEL,
+				GLOBAL_PERIMETER
+			);
 		}
 
 		DeparturesTableBenchmarkAdmin::DeparturesTableBenchmarkAdmin()
@@ -240,7 +248,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DeparturesTableBenchmarkAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	moduleKey == DeparturesTableModule::FACTORY_KEY)

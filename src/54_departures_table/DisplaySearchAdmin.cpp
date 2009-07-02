@@ -106,7 +106,8 @@ namespace synthese
 
 		void DisplaySearchAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 			setPlace(map.getUid(PARAMETER_SEARCH_LOCALIZATION_ID, false, FACTORY_KEY));
 			if (!_place)
@@ -121,45 +122,6 @@ namespace synthese
 			}
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_CITY, 30);
-
-			if(!doDisplayPreparationActions) return;
-			
-				DisplayScreenTableSync::Search(
-					_getEnv(),
-					_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-					, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-					, READ
-					, UNKNOWN_VALUE
-					, _place ? (*_place ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
-					, _searchLineId
-					, _searchTypeId
-					, _searchCity
-					, _searchStop
-					, _searchName
-					, _searchState
-					, _searchMessage
-					, _requestParameters.first
-					, _requestParameters.maxSize
-					, false
-					, _requestParameters.orderField == PARAMETER_SEARCH_CITY
-					, _requestParameters.orderField == PARAMETER_SEARCH_STOP
-					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-					, _requestParameters.orderField == PARAMETER_SEARCH_TYPE_ID
-					, _requestParameters.orderField == PARAMETER_SEARCH_STATE
-					, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
-					, _requestParameters.raisingOrder
-					);
-				_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<DisplayScreen>());
-
-				DisplayScreenCPUTableSync::Search(
-					_getEnv(),
-					_place ? (_place->get() ? (*_place)->getKey() : 0) : optional<RegistryKeyType>(),
-					optional<string>(),
-					_requestParameters.first,
-					_requestParameters.maxSize,
-					_requestParameters.orderField == PARAMETER_SEARCH_NAME,
-					_requestParameters.raisingOrder
-				);
 		}
 		
 		
@@ -183,8 +145,48 @@ namespace synthese
 		}
 
 
-		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables
+		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
+					const FunctionRequest<admin::AdminRequest>& _request
 		) const	{
+			
+			html::ResultHTMLTable::ResultParameters			_resultParameters;
+			DisplayScreenTableSync::Search(
+				_getEnv(),
+				_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+				, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+				, READ
+				, UNKNOWN_VALUE
+				, _place ? (*_place ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
+				, _searchLineId
+				, _searchTypeId
+				, _searchCity
+				, _searchStop
+				, _searchName
+				, _searchState
+				, _searchMessage
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, false
+				, _requestParameters.orderField == PARAMETER_SEARCH_CITY
+				, _requestParameters.orderField == PARAMETER_SEARCH_STOP
+				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+				, _requestParameters.orderField == PARAMETER_SEARCH_TYPE_ID
+				, _requestParameters.orderField == PARAMETER_SEARCH_STATE
+				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
+				, _requestParameters.raisingOrder
+				);
+			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<DisplayScreen>());
+
+			DisplayScreenCPUTableSync::Search(
+				_getEnv(),
+				_place ? (_place->get() ? (*_place)->getKey() : 0) : optional<RegistryKeyType>(),
+				optional<string>(),
+				_requestParameters.first,
+				_requestParameters.maxSize,
+				_requestParameters.orderField == PARAMETER_SEARCH_NAME,
+				_requestParameters.raisingOrder
+			);
+
 			
 			///////////////////////////////////////////////
 			/// TAB SCREENS
@@ -205,7 +207,7 @@ namespace synthese
 	
 				AdminFunctionRequest<DisplayAdmin> updateRequest(_request);
 
-				FunctionRequest<DisplayScreenContentRequest> viewRequest(_request);
+				FunctionRequest<DisplayScreenContentRequest> viewRequest(&_request);
 
 				if (!_place)
 				{
@@ -529,13 +531,16 @@ namespace synthese
 		}
 
 		bool DisplaySearchAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			
 		) const	{
-			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
+			return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
@@ -577,6 +582,40 @@ namespace synthese
 			return links;
 		}
 
+
+
+		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPages(
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const {
+		
+			AdminInterfaceElement::PageLinks links;
+
+			if(	!_place || !_place->get())
+			{
+				const DisplayAdmin* da(
+					dynamic_cast<const DisplayAdmin*>(currentPage.get())
+				);
+				const DisplayScreenCPUAdmin* ca(
+					dynamic_cast<const DisplayScreenCPUAdmin*>(currentPage.get())
+				);
+				
+				if(	(	da &&
+						(	(da->getScreen()->getLocalization() && !_place) ||
+							(!da->getScreen()->getLocalization() && _place)
+					)	) ||
+					(	ca &&
+						(	(ca->getCPU()->getPlace() && !_place) ||
+							(!ca->getCPU()->getPlace() && _place)
+				)	)	){
+					AddToLinks(links, currentPage);
+				}
+			}
+			
+			return links;
+		}
+
+
 		std::string DisplaySearchAdmin::getTitle() const
 		{
 			return
@@ -599,10 +638,11 @@ namespace synthese
 
 
 		void DisplaySearchAdmin::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			bool writeRight(
 				_place ?
-				_request->isAuthorized<ArrivalDepartureTableRight>(
+				_request.isAuthorized<ArrivalDepartureTableRight>(
 					WRITE,
 					UNKNOWN_RIGHT_LEVEL,
 					(_place->get() ? lexical_cast<string>((*_place)->getKey()) : string("0"))) :

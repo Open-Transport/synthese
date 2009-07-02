@@ -80,7 +80,8 @@ namespace synthese
 		
 		void CommercialLineAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
 			_startDate = map.getOptionalDate(PARAMETER_DATES_START);
@@ -118,12 +119,14 @@ namespace synthese
 		server::ParametersMap CommercialLineAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			if(_cline.get()) m.insert(Request::PARAMETER_OBJECT_ID, _cline->getKey());
 			return m;
 		}
 
 
 
-		void CommercialLineAdmin::display(ostream& stream, VariablesMap& variables) const
+		void CommercialLineAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			////////////////////////////////////////////////////////////////////
 			// TAB STOPS
@@ -224,10 +227,12 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
-		bool CommercialLineAdmin::isAuthorized() const
+		bool CommercialLineAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			if (_cline.get() == NULL) return false;
-			return _request->isAuthorized<TransportNetworkRight>(READ);
+			return _request.isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		
@@ -237,7 +242,8 @@ namespace synthese
 		}
 
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -281,6 +287,7 @@ namespace synthese
 		}
 
 		void CommercialLineAdmin::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			_tabs.clear();
 

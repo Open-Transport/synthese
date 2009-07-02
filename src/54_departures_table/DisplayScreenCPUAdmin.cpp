@@ -93,9 +93,10 @@ namespace synthese
 		
 		void DisplayScreenCPUAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 			
 			try
 			{
@@ -131,7 +132,8 @@ namespace synthese
 		
 		void DisplayScreenCPUAdmin::display(
 			ostream& stream,
-			VariablesMap& variables
+			VariablesMap& variables,
+					const FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			////////////////////////////////////////////////////////////////////
 			// TECHNICAL TAB
@@ -306,16 +308,18 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
-		bool DisplayScreenCPUAdmin::isAuthorized() const
+		bool DisplayScreenCPUAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			if(_request->getActionWillCreateObject()) return true;
+			if(_request.getActionWillCreateObject()) return true;
 			
 			if (_cpu.get() == NULL) return false;
 			if (_cpu->getPlace() == NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
+				return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
 			}
-			return _request->isAuthorized<ArrivalDepartureTableRight>(
+			return _request.isAuthorized<ArrivalDepartureTableRight>(
 				READ,
 				UNKNOWN_RIGHT_LEVEL,
 				lexical_cast<string>(_cpu->getPlace()->getKey())
@@ -331,10 +335,11 @@ namespace synthese
 
 
 		void DisplayScreenCPUAdmin::_buildTabs(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			_tabs.clear();
 
-			bool writePermission(_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())));
+			bool writePermission(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())));
 			_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writePermission, "cog.png"));
 
 			if(_cpu->getPlace())
@@ -352,5 +357,9 @@ namespace synthese
 			_cpu = value;
 		}
 
+		boost::shared_ptr<const DisplayScreenCPU> DisplayScreenCPUAdmin::getCPU() const
+		{
+			return _cpu;
+		}
 	}
 }

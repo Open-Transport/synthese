@@ -25,7 +25,7 @@
 
 #include "FactoryBase.h"
 #include "11_interfaces/Types.h"
-#include "ActionFunctionRequest.h"
+#include "FunctionRequest.h"
 
 #include <string>
 #include <vector>
@@ -36,6 +36,11 @@ namespace synthese
 	namespace security
 	{
 		class Right;
+	}
+	
+	namespace server
+	{
+		class ParametersMap;
 	}
 
 	namespace admin
@@ -192,13 +197,14 @@ namespace synthese
 
 			//! \name Properties
 			//@{
-				const server::FunctionRequest<admin::AdminRequest>*		_request;
-				std::string												_activeTab;
+				boost::shared_ptr<util::Env>	_env;
+				std::string _activeTab;
 			//@}
 
 			PageLinksTree	_buildTreeRecursion(
 				boost::shared_ptr<const AdminInterfaceElement> page,
-				const PageLinks position
+				const PageLinks position,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
 			util::Env& _getEnv() const;
@@ -213,10 +219,11 @@ namespace synthese
 			/// This method has to be called by the current displayed admin page.
 			////////////////////////////////////////////////////////////////////
 			void _buildTree(
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 			
 			
-			
+public:
 			//! \name Tabs management
 			//@{
 				////////////////////////////////////////////////////////////////////
@@ -232,7 +239,9 @@ namespace synthese
 				///		- to set _tabBuilded at true to avoid the method to be
 				///			relaunched
 				////////////////////////////////////////////////////////////////////
-				virtual void _buildTabs() const;
+				virtual void _buildTabs(
+					const server::FunctionRequest<admin::AdminRequest>& _request
+				) const;
 
 
 
@@ -292,8 +301,6 @@ namespace synthese
 			//@}
 				
 
-
-		public:
 			////////////////////////////////////////////////////////////////////
 			///	AdminInterfaceElement constructor.
 			///	@author Hugues Romain
@@ -304,16 +311,6 @@ namespace synthese
 			//! \name Setters
 			//@{
 				////////////////////////////////////////////////////////////////////
-				///	Request setter.
-				///	@param value the request calling the page
-				///	@author Hugues Romain
-				///	@date 2008
-				////////////////////////////////////////////////////////////////////
-				void setRequest(const server::FunctionRequest<admin::AdminRequest>*	value);
-
-
-				
-				////////////////////////////////////////////////////////////////////
 				///	Active tab setter.
 				///	@param value ID of the active tab at the page load. 
 				///		Empty = first tab.
@@ -321,17 +318,24 @@ namespace synthese
 				///	@date 2008
 				////////////////////////////////////////////////////////////////////
 				void setActiveTab(const std::string& value);
+				
+				void setEnv(
+					boost::shared_ptr<util::Env> value
+				);
 			//@}
 
 
 			//! \name Getters
 			//@{
-				const PageLinks&		getTreePosition()	const;
-				const PageLinksTree&	getTree()			const;
+				const PageLinks&		getTreePosition(
+					const server::FunctionRequest<admin::AdminRequest>& request
+				)	const;
+				const PageLinksTree&	getTree(
+					const server::FunctionRequest<admin::AdminRequest>& request
+				)	const;
 				const Tabs&				getTabs()			const;
 				std::string				getCurrentTab()		const;
 				const std::string&		getActiveTab()		const;
-				const server::FunctionRequest<admin::AdminRequest>*	getRequest()		const;
 			//@}
 
 
@@ -360,7 +364,8 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			void displayTabs(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables
+				interfaces::VariablesMap& variables,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
 
@@ -382,7 +387,8 @@ namespace synthese
 				/// doDisplayPreparationActions.
 				virtual void setFromParametersMap(
 					const server::ParametersMap& map,
-					bool doDisplayPreparationActions = true
+					bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 				) = 0;
 			//@}
 
@@ -401,7 +407,9 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 				*/
-				virtual bool isAuthorized() const = 0;
+				virtual bool isAuthorized(
+					const server::FunctionRequest<admin::AdminRequest>& _request
+				) const = 0;
 
 				/** Display of the content of the admin element.
 					@param stream Stream to write on.
@@ -410,7 +418,8 @@ namespace synthese
 				*/
 				virtual void display(
 					std::ostream& stream,
-					interfaces::VariablesMap& variables
+					interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 				) const = 0;
 
 				virtual std::string getIcon() const = 0;
@@ -427,14 +436,16 @@ namespace synthese
 					This method can be overloaded to create customized sub tree.
 				*/
 				virtual PageLinks getSubPages(
-					boost::shared_ptr<const AdminInterfaceElement> currentPage
+					boost::shared_ptr<const AdminInterfaceElement> currentPage,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 				) const;
 
 
 
 				virtual PageLinks getSubPagesOfModule(
 					const std::string& moduleKey,
-					boost::shared_ptr<const AdminInterfaceElement> currentPage
+					boost::shared_ptr<const AdminInterfaceElement> currentPage,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 				) const;
 
 
@@ -443,9 +454,18 @@ namespace synthese
 
 				template<class T>
 				boost::shared_ptr<T> getNewOtherPage() const {
-					boost::shared_ptr<T> page(new T);
-					page->setRequest(_request);
-					return page;
+					boost::shared_ptr<T> p(new T);
+					p->setEnv(_env);
+					if(getFactoryKey() == T::FACTORY_KEY)
+					{
+						p->setActiveTab(getCurrentTab());
+						p->setFromParametersMap(
+							getParametersMap(),
+							false,
+							false
+						);
+					}
+					return p;
 				}
 				
 

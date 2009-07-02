@@ -73,7 +73,7 @@ namespace synthese
 
 		protected:
 			Request* _request;
-			mutable boost::shared_ptr<util::Env>	_env;
+			boost::shared_ptr<util::Env>	_env;
 
 			//////////////////////////////////////////////////////////////////////////
 			///	Constructor.

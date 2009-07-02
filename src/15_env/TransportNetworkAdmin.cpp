@@ -78,9 +78,10 @@ namespace synthese
 		
 		void TransportNetworkAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 			
 			_searchName = map.getDefault<string>(PARAMETER_SEARCH_NAME);
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
@@ -126,7 +127,8 @@ namespace synthese
 
 
 		
-		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables) const
+		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Requests
 			
@@ -165,14 +167,17 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool TransportNetworkAdmin::isAuthorized() const
+		bool TransportNetworkAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<TransportNetworkRight>(READ);
+			return _request.isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -213,7 +218,8 @@ namespace synthese
 				
 
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

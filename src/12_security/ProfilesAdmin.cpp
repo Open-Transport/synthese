@@ -76,7 +76,8 @@ namespace synthese
 		
 		void ProfilesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			// Profile name
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
@@ -112,7 +113,8 @@ namespace synthese
 		}
 
 
-		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
+		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Requests
 			AdminFunctionRequest<ProfilesAdmin> searchRequest(_request);
@@ -192,9 +194,11 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool ProfilesAdmin::isAuthorized() const
+		bool ProfilesAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<SecurityRight>(READ);
+			return _request.isAuthorized<SecurityRight>(READ);
 		}
 
 		ProfilesAdmin::ProfilesAdmin()
@@ -205,7 +209,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
 			const string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -220,6 +225,37 @@ namespace synthese
 					AddToLinks(links, getNewPage());
 				}
 			}
+			return links;
+		}
+	
+	
+		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPages(
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
+			AdminInterfaceElement::PageLinks links;
+			
+			const ProfileAdmin* pa(
+				dynamic_cast<const ProfileAdmin*>(currentPage.get())
+			);
+			
+			BOOST_FOREACH(shared_ptr<Profile> profile, _getEnv().getRegistry<Profile>())
+			{
+				if(profile->getParent()) continue;
+				
+				if(	pa &&
+					pa->getProfile()->getKey() == profile->getKey()
+				){
+					AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
+					p->setProfile(profile);
+					AddToLinks(links, p);
+				}
+			}
+			
 			return links;
 		}
 	}

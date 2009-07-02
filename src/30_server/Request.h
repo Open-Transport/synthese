@@ -104,7 +104,13 @@ namespace synthese
 		class Request
 		{
 		public:
-			typedef enum { REQUEST_ERROR_NONE, REQUEST_ERROR_INFO, REQUEST_ERROR_WARNING, REQUEST_ERROR_FATAL } ErrorLevel;
+			typedef enum
+			{
+				REQUEST_ERROR_NONE,
+				REQUEST_ERROR_INFO,
+				REQUEST_ERROR_WARNING,
+				REQUEST_ERROR_FATAL
+			} ErrorLevel;
 
 			static const std::string PARAMETER_SEPARATOR;
 			static const std::string PARAMETER_ASSIGNMENT;
@@ -133,8 +139,7 @@ namespace synthese
 			ErrorLevel					_errorLevel;
 			bool						_actionWillCreateObject;
 			boost::optional<util::RegistryKeyType>		_actionCreatedId;
-			ParametersMap				_internalParameters;
-
+			
 
 			ParametersMap _getParametersMap() const;
 
@@ -199,7 +204,6 @@ namespace synthese
 				bool getActionException() const;
 				const Session*		getSession()		const;
 
-				ParametersMap&									getInternalParameters();
 				const std::string&	getClientURL()		const;
 				const std::string&	getIP()				const;
 				const boost::optional<util::RegistryKeyType>& 	getActionCreatedId()	const;

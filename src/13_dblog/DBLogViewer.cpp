@@ -36,12 +36,12 @@
 #include "AdminParametersException.h"
 #include "AdminModule.h"
 #include "AdminInterfaceElement.h"
-#include "ActionFunctionRequest.h"
+#include "AdminActionFunctionRequest.hpp"
 #include "ModuleAdmin.h"
 #include "DBLog.h"
 #include "DBLogPurgeAction.h"
 #include "PropertiesHTMLTable.h"
-#include "AdminRequest.h"
+#include "AdminFunctionRequest.hpp"
 
 #include <sstream>
 #include <boost/shared_ptr.hpp>
@@ -84,7 +84,8 @@ namespace synthese
 
 		void DBLogViewer::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			_viewer.set(
 				map,
@@ -105,14 +106,15 @@ namespace synthese
 
 		void DBLogViewer::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables
+			interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			stream << "<h1>Journal</h1>";
 
 			// Requests
-			FunctionRequest<AdminRequest> searchRequest(_request);
+			AdminFunctionRequest<DBLogViewer> searchRequest(_request);
 
-			ActionFunctionRequest<DBLogPurgeAction, AdminRequest> purgeRequest(_request);
+			AdminActionFunctionRequest<DBLogPurgeAction, DBLogViewer> purgeRequest(_request);
 			purgeRequest.getAction()->setDBLog(_viewer.getLogKey());
 
 			_viewer.display(
@@ -132,12 +134,14 @@ namespace synthese
 			}
 		}
 
-		bool DBLogViewer::isAuthorized() const
+		bool DBLogViewer::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			return
-				_request->isAuthorized<DBLogRight>(READ) &&
+				_request.isAuthorized<DBLogRight>(READ) &&
 				(	_viewer.getLogKey().empty() ||
-					_viewer.isAuthorized(*_request)
+					_viewer.isAuthorized(_request)
 				)
 			;
 		}
@@ -146,7 +150,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			

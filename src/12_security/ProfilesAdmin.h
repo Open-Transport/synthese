@@ -91,7 +91,8 @@ namespace synthese
 			ProfilesAdmin();
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions ,
+				bool objectWillBeCreatedLater
 			);
 			
 			
@@ -105,10 +106,13 @@ namespace synthese
 			
 			
 			
-			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
 			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			
 			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
@@ -119,7 +123,13 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+			
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 		};
 	}

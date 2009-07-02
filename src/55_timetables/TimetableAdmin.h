@@ -63,7 +63,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 			
 			
@@ -85,7 +86,8 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables
+				interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
 			/** Authorization control.
@@ -94,7 +96,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual bool isAuthorized() const;
+			virtual bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 			
 			/** Title generator.
 				@return The title of the page

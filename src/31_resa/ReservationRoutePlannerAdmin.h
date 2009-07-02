@@ -80,7 +80,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 			);
 
 
@@ -99,14 +100,17 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const;
 			
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
 				@date 2008
 			*/
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
@@ -117,7 +121,8 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 			
 			virtual bool isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const;

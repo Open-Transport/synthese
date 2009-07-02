@@ -94,7 +94,8 @@ namespace synthese
 			*/
 			virtual void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 			);
 
 			
@@ -111,9 +112,12 @@ namespace synthese
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const;
 
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 
 
 			/** Sub pages getter.
@@ -125,12 +129,15 @@ namespace synthese
 				This method can be overloaded to create customized sub tree.
 			*/
 			virtual PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
 			virtual std::string getTitle() const;
 
-			virtual void _buildTabs() const;
+			virtual void _buildTabs(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 
 			boost::shared_ptr<const Scenario> getScenario() const;
 			void setScenario(boost::shared_ptr<Scenario> value);

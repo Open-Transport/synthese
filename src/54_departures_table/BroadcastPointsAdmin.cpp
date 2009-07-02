@@ -85,7 +85,8 @@ namespace synthese
 
 		void BroadcastPointsAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 			_cityName = map.getString(PARAMETER_CITY_NAME, false, FACTORY_KEY);
 			_placeName = map.getString(PARAMETER_PLACE_NAME, false, FACTORY_KEY);
@@ -99,28 +100,6 @@ namespace synthese
 			_lineUId = map.getUid(PARAMETER_LINE_ID, false, FACTORY_KEY);
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
-			
-			if(!doDisplayPreparationActions) return;
-			
-			_searchResult = searchConnectionPlacesWithBroadcastPoints(
-				_getEnv(),
-				_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-				, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-				, READ
-				, _cityName
-				, _placeName
-				, _displayNumber
-				, _cpuNumber
-				, _lineUId
-				, _requestParameters.maxSize
-				, _requestParameters.first
-				, _requestParameters.orderField == PARAMETER_CITY_NAME
-				, _requestParameters.orderField == PARAMETER_PLACE_NAME
-				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
-				, _requestParameters.orderField == PARAMETER_CPU_NUMBER
-				, _requestParameters.raisingOrder
-			);
-			_resultParameters.setFromResult(_requestParameters, _searchResult);
 		}
 		
 		
@@ -138,8 +117,33 @@ namespace synthese
 
 
 
-		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
+		void BroadcastPointsAdmin::display(
+			ostream& stream,
+			interfaces::VariablesMap& variables,
+			const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
+			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > _searchResult;
+			html::ResultHTMLTable::ResultParameters		_resultParameters;
+			_searchResult = searchConnectionPlacesWithBroadcastPoints(
+				_getEnv(),
+				_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+				, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+				, READ
+				, _cityName
+				, _placeName
+				, _displayNumber
+				, _cpuNumber
+				, _lineUId
+				, _requestParameters.maxSize
+				, _requestParameters.first
+				, _requestParameters.orderField == PARAMETER_CITY_NAME
+				, _requestParameters.orderField == PARAMETER_PLACE_NAME
+				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
+				, _requestParameters.orderField == PARAMETER_CPU_NUMBER
+				, _requestParameters.raisingOrder
+			);
+			_resultParameters.setFromResult(_requestParameters, _searchResult);
+			
 			vector<pair<int, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
 			m.push_back(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
@@ -163,8 +167,7 @@ namespace synthese
 			stream << st.cell("Ligne", st.getForm().getSelectInput(
 				PARAMETER_LINE_ID,
 				EnvModule::getCommercialLineLabels(
-					_request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-					, _request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+					_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(), _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 					, READ
 					, true
 				),
@@ -205,14 +208,17 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool BroadcastPointsAdmin::isAuthorized() const
+		bool BroadcastPointsAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
+			return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY)
@@ -231,7 +237,8 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			const DisplaySearchAdmin* sa(

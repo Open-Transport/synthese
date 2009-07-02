@@ -116,7 +116,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 			);
 			
 			
@@ -128,14 +129,19 @@ namespace synthese
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 
-			virtual void _buildTabs() const;
+			virtual void _buildTabs(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const;
 
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 
 
 

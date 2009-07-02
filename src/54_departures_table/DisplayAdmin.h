@@ -177,13 +177,15 @@ namespace synthese
 			DisplayAdmin();
 			
 			void setScreen(boost::shared_ptr<const DisplayScreen> value);
+			boost::shared_ptr<const DisplayScreen> getScreen() const;
 
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 			
 			
@@ -195,13 +197,22 @@ namespace synthese
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 			
-			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
-			bool isAuthorized() const;
+			void display(
+				std::ostream& stream,
+				interfaces::VariablesMap& variables,
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
+			
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 
 
 			virtual std::string getTitle() const;
 
-			virtual void _buildTabs() const;
+			virtual void _buildTabs(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 		};
 	}
 }

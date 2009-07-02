@@ -40,11 +40,8 @@ namespace synthese
 		{
 			std::string	_dataXml;
 			std::string	_queryXml;
-			std::string _tempFileUrl;
-			std::string	_postScript;
 			bool		_useEnvironment;
-			bool		_error;
-
+			
 		public:
 			static const std::string PARAMETER_DATA_XML;
 			static const std::string PARAMETER_QUERY_XML;
@@ -60,7 +57,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 
 
@@ -79,14 +77,20 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables) const;
+			void display(
+				std::ostream& stream,
+				interfaces::VariablesMap& variables,
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 			
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
 				@date 2008
 			*/
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
@@ -97,7 +101,8 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 		};
 	}

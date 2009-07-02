@@ -23,7 +23,7 @@
 */
 
 #include "ResaLogAdmin.h"
-
+#include "ResaEditLogEntryAdmin.h"
 #include "ResaModule.h"
 #include "ResaDBLog.h"
 #include "ResaRight.h"
@@ -72,7 +72,8 @@ namespace synthese
 		
 		void ResaLogAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			_log.set(
 				map,
@@ -89,7 +90,8 @@ namespace synthese
 		}
 
 		
-		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables) const
+		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Results
 			_log.display(
@@ -101,13 +103,16 @@ namespace synthese
 		}
 
 		bool ResaLogAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			
 		) const	{
-			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPagesOfModule(
-				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+			const std::string& moduleKey,
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY)
@@ -121,6 +126,22 @@ namespace synthese
 					AddToLinks(links, getNewPage());
 				}
 			}
+			return links;
+		}
+	
+	
+	
+		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPages(
+			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
+			AdminInterfaceElement::PageLinks links;
+				
+			if(dynamic_cast<const ResaEditLogEntryAdmin*>(currentPage.get()))
+			{
+				AddToLinks(links, currentPage);
+			}
+			
 			return links;
 		}
 	}

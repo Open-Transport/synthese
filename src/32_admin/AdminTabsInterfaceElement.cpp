@@ -33,6 +33,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace server;
 	
 	namespace util
 	{
@@ -57,7 +58,11 @@ namespace synthese
 
 			if(aie != NULL && aie->get() != NULL)
 			{
-				(*aie)->displayTabs(stream, variables);
+				(*aie)->displayTabs(
+					stream,
+					variables,
+					static_cast<const FunctionRequest<AdminRequest>& >(*request)
+				);
 			}
 			return string();
 		}

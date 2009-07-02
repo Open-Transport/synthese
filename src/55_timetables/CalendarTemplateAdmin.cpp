@@ -76,9 +76,10 @@ namespace synthese
 		
 		void CalendarTemplateAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
-			if(_request->getActionWillCreateObject()) return;
+			if(objectWillBeCreatedLater) return;
 			
 			try
 			{
@@ -110,7 +111,8 @@ namespace synthese
 		
 		void CalendarTemplateAdmin::display(
 			ostream& stream,
-			VariablesMap& variables
+			VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			// Requests
 			AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
@@ -160,8 +162,9 @@ namespace synthese
 		}
 
 		bool CalendarTemplateAdmin::isAuthorized(
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
-			return _request->isAuthorized<TimetableRight>(READ);
+			return _request.isAuthorized<TimetableRight>(READ);
 		}
 		
 

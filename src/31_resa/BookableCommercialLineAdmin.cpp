@@ -100,7 +100,8 @@ namespace synthese
 		
 		void BookableCommercialLineAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 
 			// Date
@@ -195,11 +196,16 @@ namespace synthese
 
 
 
-		void BookableCommercialLineAdmin::display(ostream& stream, VariablesMap& variables) const
+		void BookableCommercialLineAdmin::display(ostream& stream, VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Rights
-			bool globalReadRight(_request->isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL));
-			bool globalDeleteRight(_request->isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL));
+			bool globalReadRight(
+				_request.isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL)
+			);
+			bool globalDeleteRight(
+				_request.isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
+			);
 
 			// Requests
 			AdminFunctionRequest<BookableCommercialLineAdmin> searchRequest(_request);
@@ -535,12 +541,14 @@ namespace synthese
 
 		}
 
-		bool BookableCommercialLineAdmin::isAuthorized() const
+		bool BookableCommercialLineAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
 			if (!_line.get())
 				return false;
 
-			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_line->getKey()));
+			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_line->getKey()));
 		}
 		
 

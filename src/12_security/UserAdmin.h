@@ -94,7 +94,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 			);
 			
 			
@@ -108,10 +109,13 @@ namespace synthese
 			
 			
 
-			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
 			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			
 			) const;
 
 			virtual std::string getTitle() const;

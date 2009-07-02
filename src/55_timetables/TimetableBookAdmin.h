@@ -66,7 +66,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 			
 			
@@ -85,7 +86,8 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables
+				interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
 			
@@ -98,7 +100,8 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const admin::AdminInterfaceElement> currentPage
+				boost::shared_ptr<const admin::AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 			
 			/** Sub pages getter.
@@ -109,7 +112,8 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				boost::shared_ptr<const admin::AdminInterfaceElement> currentPage
+				boost::shared_ptr<const admin::AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 			
 			/** Title generator.
@@ -124,7 +128,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			virtual bool isAuthorized() const;
+			virtual bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 		};
 	}
 }

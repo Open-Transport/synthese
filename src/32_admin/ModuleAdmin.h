@@ -49,7 +49,7 @@ namespace synthese
 		
 		private:
 			boost::shared_ptr<const server::ModuleClass>	_moduleClass;
-
+			
 		public:
 			ModuleAdmin();
 			
@@ -71,7 +71,8 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 			);
 			
 			
@@ -90,7 +91,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 			
 			/** Authorization control.
@@ -98,7 +100,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			bool isAuthorized() const;
+			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
@@ -107,7 +111,8 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 
 			virtual std::string getTitle() const;

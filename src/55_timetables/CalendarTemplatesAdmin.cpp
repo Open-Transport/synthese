@@ -76,7 +76,8 @@ namespace synthese
 		
 		void CalendarTemplatesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+					bool objectWillBeCreatedLater
 		){
 			if(!doDisplayPreparationActions) return;
 
@@ -94,7 +95,8 @@ namespace synthese
 		
 		void CalendarTemplatesAdmin::display(
 			ostream& stream,
-			VariablesMap& variables
+			VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			// Requests
 
@@ -143,14 +145,17 @@ namespace synthese
 			stream << t.close() << f.close();
 		}
 
-		bool CalendarTemplatesAdmin::isAuthorized() const
+		bool CalendarTemplatesAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<TimetableRight>(READ);
+			return _request.isAuthorized<TimetableRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -173,7 +178,8 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 

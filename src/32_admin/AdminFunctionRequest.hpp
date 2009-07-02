@@ -42,22 +42,11 @@ namespace synthese
 		{
 		public:
 			AdminFunctionRequest(
-				const server::FunctionRequest<AdminRequest>* request
-			):	server::FunctionRequest<AdminRequest>(NULL)
+				const server::FunctionRequest<AdminRequest>& request
+			):	server::FunctionRequest<AdminRequest>(&request)
 			{
-				assert(request);
-				
-				boost::shared_ptr<P> p(new P);
+				boost::shared_ptr<P> p(request.getFunction()->getPage()->getNewOtherPage<P>());
 				this->getFunction()->setPage(p);
-				
-				if(request->getFunction()->getPage()->getFactoryKey() == P::FACTORY_KEY)
-				{
-					p->setActiveTab(request->getFunction()->getPage()->getCurrentTab());
-					p->setFromParametersMap(
-						request->getFunction()->getPage()->getParametersMap(),
-						false
-					);
-				}
 			}
 			
 			boost::shared_ptr<P> getPage() const

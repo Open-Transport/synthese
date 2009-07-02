@@ -101,7 +101,8 @@ namespace synthese
 
 		void MessagesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			try
 			{
@@ -175,7 +176,8 @@ namespace synthese
 
 
 
-		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables) const
+		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
 			// Requests
 			AdminFunctionRequest<MessagesAdmin> searchRequest(_request);
@@ -376,13 +378,16 @@ namespace synthese
 
 
 		bool MessagesAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			
 		) const	{
-			return _request->isAuthorized<MessagesRight>(READ);
+			return _request.isAuthorized<MessagesRight>(READ);
 		}
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfModule(
 			const string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -408,7 +413,8 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage
+			shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 		
 			AdminInterfaceElement::PageLinks links;

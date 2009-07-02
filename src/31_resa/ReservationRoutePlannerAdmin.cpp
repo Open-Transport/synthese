@@ -109,7 +109,8 @@ namespace synthese
 		
 		void ReservationRoutePlannerAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions
+			bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 		){
 			_startCity = map.getString(PARAMETER_START_CITY, false, FACTORY_KEY);
 			_startPlace = map.getString(PARAMETER_START_PLACE, false, FACTORY_KEY);
@@ -174,14 +175,19 @@ namespace synthese
 
 		
 		
-		void ReservationRoutePlannerAdmin::display(ostream& stream, VariablesMap& variables) const
-		{
+		void ReservationRoutePlannerAdmin::display(
+			ostream& stream,
+			VariablesMap& variables,
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const {
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
 
-			AdminActionFunctionRequest<BookReservationAction,ReservationRoutePlannerAdmin> resaRequest(_request);
+			AdminActionFunctionRequest<BookReservationAction,ReservationRoutePlannerAdmin> resaRequest(
+				_request
+			);
 			resaRequest.setActionWillCreateObject();
 
-			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
+			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(&_request);
 			customerSearchRequest.getFunction()->setNumber(20);
 
 			stream << HTMLModule::GetHTMLJavascriptOpen("resa.js");
@@ -452,14 +458,17 @@ namespace synthese
 			}
 		}
 
-		bool ReservationRoutePlannerAdmin::isAuthorized() const
+		bool ReservationRoutePlannerAdmin::isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			) const
 		{
-			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY)

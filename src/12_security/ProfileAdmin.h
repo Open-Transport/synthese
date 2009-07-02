@@ -84,13 +84,15 @@ namespace synthese
 			ProfileAdmin();
 			
 			void setProfile(boost::shared_ptr<Profile> value);
+			boost::shared_ptr<const Profile> getProfile() const;
 
 			/** Initialization of the parameters from a request.
 			@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions = true
+				bool doDisplayPreparationActions,
+				bool objectWillBeCreatedLater
 			);
 			
 			
@@ -104,10 +106,19 @@ namespace synthese
 
 
 
-			void display(std::ostream& stream, interfaces::VariablesMap& variables
+			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+
+
 			bool isAuthorized(
+				const server::FunctionRequest<admin::AdminRequest>& _request
+			
 			) const;
 
 			virtual std::string getTitle() const;

@@ -96,8 +96,7 @@ namespace synthese
 		template<class T>
 		void AdminRequest::setActionFailedPage()
 		{
-		    _actionFailedPage.reset(new T);
-			_actionFailedPage->setRequest(static_cast<const server::FunctionRequest<AdminRequest>* >(_request));
+		    _actionFailedPage = _page->getNewOtherPage<T>();
 		}
 	}
 }

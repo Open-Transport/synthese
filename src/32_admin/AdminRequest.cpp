@@ -92,31 +92,34 @@ namespace synthese
 				string pageKey;
 				if (_request->getActionException())
 				{	// Prepare the KO page
-					pageKey = map.getString(PARAMETER_ACTION_FAILED_PAGE, false, FACTORY_KEY);
+					pageKey = map.getDefault<string>(PARAMETER_ACTION_FAILED_PAGE);
 					if (pageKey.empty())
-						pageKey = map.getString(PARAMETER_PAGE, false, FACTORY_KEY);
+						pageKey = map.getDefault<string>(PARAMETER_PAGE);
 				}
 				else
 				{	// Prepare the OK page
 
 					// Saving of the action failed page for url output purposes
-					pageKey = map.getString(PARAMETER_ACTION_FAILED_PAGE, false, FACTORY_KEY);
+					pageKey = map.getDefault<string>(PARAMETER_ACTION_FAILED_PAGE);
 					if (!pageKey.empty())
 					{
 						_actionFailedPage.reset(Factory<AdminInterfaceElement>::create(pageKey));
-						_actionFailedPage->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
-						_actionFailedPage->setActiveTab(map.getString(PARAMETER_ACTION_FAILED_TAB, false, FACTORY_KEY));
+						_actionFailedPage->setActiveTab(
+							map.getDefault<string>(PARAMETER_ACTION_FAILED_TAB)
+						);
 					}
 
-					pageKey = map.getString(PARAMETER_PAGE, false, FACTORY_KEY);
+					pageKey = map.getDefault<string>(PARAMETER_PAGE);
 				}
 				shared_ptr<AdminInterfaceElement> page(pageKey.empty()
 					? new HomeAdmin
 					: Factory<AdminInterfaceElement>::create(pageKey)
 				);
-				page->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
-				page->setFromParametersMap(map);
-				page->setActiveTab(map.getString(PARAMETER_TAB, false, FACTORY_KEY));
+				page->setFromParametersMap(map, true, _request->getActionWillCreateObject());
+				page->_buildTabs(
+					static_cast<const FunctionRequest<AdminRequest>* >(_request)
+				);
+				page->setActiveTab(map.getDefault<string>(PARAMETER_TAB));
 				_page = page;
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
@@ -147,7 +150,11 @@ namespace synthese
 				else
 				{
 					VariablesMap variables;
-					_page->display(stream, variables);
+					_page->display(
+						stream,
+						variables,
+						static_cast<FunctionRequest<AdminRequest>& >(*_request)
+					);
 				}
 			}
 			catch (Exception e)
@@ -158,9 +165,7 @@ namespace synthese
 
 		void AdminRequest::setPage(shared_ptr<AdminInterfaceElement> aie )
 		{
-			assert(aie.get());
 			_page = aie;
-			aie->setRequest(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 		}
 
 		
@@ -176,7 +181,7 @@ namespace synthese
 
 		bool AdminRequest::_isAuthorized() const
 		{
-			return _page->isAuthorized();
+			return _page->isAuthorized(static_cast<FunctionRequest<AdminRequest>& >(*_request));
 		}
 
 

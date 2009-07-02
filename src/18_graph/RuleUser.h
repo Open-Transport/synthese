@@ -78,8 +78,8 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const Map::mapped_type getRule(
-					const Map::key_type userClass
+				Map::mapped_type getRule(
+					Map::key_type userClass
 				) const;
 			//@}
 			
