@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
@@ -453,11 +454,15 @@ public:
 
 
 				template<class T>
-				boost::shared_ptr<T> getNewOtherPage() const {
+				boost::shared_ptr<T> getNewOtherPage(
+					boost::logic::tribool copyParameters = boost::logic::indeterminate
+				) const {
 					boost::shared_ptr<T> p(new T);
 					p->setEnv(_env);
-					if(getFactoryKey() == T::FACTORY_KEY)
-					{
+					if(	copyParameters == true ||
+						boost::logic::indeterminate(copyParameters) &&
+						this->getFactoryKey() == T::FACTORY_KEY
+					){
 						p->setActiveTab(getCurrentTab());
 						p->setFromParametersMap(
 							getParametersMap(),

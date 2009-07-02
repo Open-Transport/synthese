@@ -172,7 +172,7 @@ namespace synthese
 					else
 					{
 						shared_ptr<DBLogViewer> p(
-							getNewOtherPage<DBLogViewer>()
+							getNewOtherPage<DBLogViewer>(false)
 						);
 						p->_viewer.setLogKey(
 							loge->getFactoryKey()

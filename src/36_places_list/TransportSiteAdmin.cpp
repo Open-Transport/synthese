@@ -197,7 +197,7 @@ namespace synthese
 					else
 					{
 						shared_ptr<TransportSiteAdmin> p(
-							getNewOtherPage<TransportSiteAdmin>()
+							getNewOtherPage<TransportSiteAdmin>(false)
 						);
 						p->_site = site;
 						AddToLinks(links, p);

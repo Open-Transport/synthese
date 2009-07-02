@@ -200,7 +200,7 @@ namespace synthese
 					else
 					{
 						shared_ptr<TransportNetworkAdmin> link(
-							getNewOtherPage<TransportNetworkAdmin>()
+							getNewOtherPage<TransportNetworkAdmin>(false)
 						);
 						link->_network = network;
 						AddToLinks(links, link);

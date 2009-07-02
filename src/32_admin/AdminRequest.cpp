@@ -120,6 +120,7 @@ namespace synthese
 					static_cast<const FunctionRequest<AdminRequest>* >(_request)
 				);
 				page->setActiveTab(map.getDefault<string>(PARAMETER_TAB));
+				page->setEnv(_env);
 				_page = page;
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
