@@ -90,7 +90,7 @@ namespace synthese
 			}
 			else
 			{
-				homeAdmin.reset(new HomeAdmin);
+				homeAdmin = getNewOtherPage<HomeAdmin>();
 			}
 			PageLinks position;
 			AddToLinks(position, homeAdmin);

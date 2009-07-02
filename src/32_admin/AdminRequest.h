@@ -89,6 +89,7 @@ namespace synthese
 				void setActionFailedPage();
 			//@}
 
+			virtual void _copy(boost::shared_ptr<const Function> function);
 
 			virtual std::string getOutputMimeType() const;
 		};

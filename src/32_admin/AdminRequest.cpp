@@ -115,12 +115,12 @@ namespace synthese
 					? new HomeAdmin
 					: Factory<AdminInterfaceElement>::create(pageKey)
 				);
+				page->setEnv(_env);
 				page->setFromParametersMap(map, true, _request->getActionWillCreateObject());
 				page->_buildTabs(
 					static_cast<const FunctionRequest<AdminRequest>* >(_request)
 				);
 				page->setActiveTab(map.getDefault<string>(PARAMETER_TAB));
-				page->setEnv(_env);
 				_page = page;
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
@@ -190,6 +190,12 @@ namespace synthese
 		std::string AdminRequest::getOutputMimeType() const
 		{
 			return "text/html";
+		}
+
+		void AdminRequest::_copy( boost::shared_ptr<const Function> function )
+		{
+			RequestWithInterfaceAndRequiredSession::_copy(function);
+			_page = static_pointer_cast<const AdminRequest>(function)->_page;
 		}
 	}
 }
