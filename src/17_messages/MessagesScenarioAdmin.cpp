@@ -98,15 +98,13 @@ namespace synthese
 					_getEnv(),
 					UP_LINKS_LOAD_LEVEL
 				);
-				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario);
-				_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(_scenario);
 			}
 			catch(...)
 			{
 				throw AdminParametersException("Specified scenario not found");
 			}
 			
-			if(_sentScenario.get())
+			if(dynamic_cast<const SentScenario*>(_scenario.get()))
 			{
 				_generalLogView.set(map, MessagesLog::FACTORY_KEY, _scenario->getKey());
 			}
@@ -134,6 +132,10 @@ namespace synthese
 					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 
+			const SentScenario* _sentScenario = dynamic_cast<const SentScenario*>(_scenario.get());
+			const ScenarioTemplate* _templateScenario = dynamic_cast<const ScenarioTemplate*>(_scenario.get());
+
+
 			////////////////////////////////////////////////////////////////////
 			// TAB PARAMETERS
 			if (openTabContent(stream, TAB_PARAMETERS))
@@ -147,11 +149,11 @@ namespace synthese
 				stream << udt.open();
 				stream << udt.title("Propriétés");
 				stream << udt.cell("Nom", udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_NAME, _scenario->getName()));
-				if (_templateScenario.get())
+				if (_templateScenario)
 				{
 					stream << udt.cell("Répertoire", udt.getForm().getSelectInput(ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(), _templateScenario->getFolder() ? _templateScenario->getFolder()->getKey() : 0));
 				}
-				if(_sentScenario.get())
+				if(_sentScenario)
 				{
 					stream << udt.title("Diffusion");
 					stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
@@ -195,7 +197,7 @@ namespace synthese
 				vector<shared_ptr<Alarm> > v;
 				Env env;
 
-				if (_sentScenario.get())
+				if (_sentScenario)
 				{
 					ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario->getKey());
 					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, env.getRegistry<SentAlarm>())
@@ -315,13 +317,13 @@ namespace synthese
 				dynamic_cast<const MessageAdmin*>(currentPage.get())
 			);
 			
-			Env env;
-			if (_sentScenario.get())
+			if (dynamic_cast<const SentScenario*>(_scenario.get()))
 			{
 				ScenarioSentAlarmInheritedTableSync::Search(
-					env, _sentScenario->getKey(), 0, 0, false, false, false, false, UP_LINKS_LOAD_LEVEL
+					*_env,
+					_scenario->getKey(), 0, 0, false, false, false, false, UP_LINKS_LOAD_LEVEL
 				);
-				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, env.getRegistry<SentAlarm>())
+				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, _env->getRegistry<SentAlarm>())
 				{
 					if(	ma &&
 						ma->getAlarm()->getKey() == alarm->getKey()
@@ -338,12 +340,13 @@ namespace synthese
 					}
 				}
 			}
-			else if (_templateScenario.get())
+			else if (dynamic_cast<const ScenarioTemplate*>(_scenario.get()))
 			{
 				AlarmTemplateInheritedTableSync::Search(
-					env, _templateScenario->getKey(), 0, 0, false, false, UP_LINKS_LOAD_LEVEL
+					*_env,
+					_scenario->getKey(), 0, 0, false, false, UP_LINKS_LOAD_LEVEL
 				);
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, _env->getRegistry<AlarmTemplate>())
 				{
 					if(	ma &&
 						ma->getAlarm()->getKey() == alarm->getKey()
@@ -381,7 +384,8 @@ namespace synthese
 
 			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, true, "table.png"));
 			_tabs.push_back(Tab("Messages", TAB_MESSAGES, true, "note.png"));
-			if(_templateScenario.get())
+			
+			if(dynamic_cast<const ScenarioTemplate*>(_scenario.get()))
 			{
 				_tabs.push_back(Tab("Variables", TAB_VARIABLES, true));
 			}

@@ -115,11 +115,14 @@ namespace synthese
 					? new HomeAdmin
 					: Factory<AdminInterfaceElement>::create(pageKey)
 				);
-				page->setEnv(_env);
+				page->setEnv(shared_ptr<Env>(new Env));
 				page->setFromParametersMap(map, true, _request->getActionWillCreateObject());
-				page->_buildTabs(
-					static_cast<const FunctionRequest<AdminRequest>* >(_request)
-				);
+				if(!_request->getActionWillCreateObject())
+				{
+					page->_buildTabs(
+						static_cast<const FunctionRequest<AdminRequest>* >(_request)
+					);
+				}
 				page->setActiveTab(map.getDefault<string>(PARAMETER_TAB));
 				_page = page;
 			}

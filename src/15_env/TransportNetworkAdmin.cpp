@@ -193,7 +193,8 @@ namespace synthese
 				TransportNetworkTableSync::Search(env);
 				BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.getRegistry<TransportNetwork>())
 				{
-					if(network->getKey() == currentNetworkId)
+					if(	tna &&
+						network->getKey() == currentNetworkId)
 					{
 						AddToLinks(links, currentPage);
 					}

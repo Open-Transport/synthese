@@ -81,8 +81,6 @@ namespace synthese
 			static const std::string	TAB_LOG;
 
 		private:
-			boost::shared_ptr<const SentScenario>		_sentScenario;
-			boost::shared_ptr<const ScenarioTemplate>	_templateScenario;
 			boost::shared_ptr<const Scenario>			_scenario;
 			dblog::DBLogHTMLView						_generalLogView;
 

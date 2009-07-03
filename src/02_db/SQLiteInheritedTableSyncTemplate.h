@@ -147,6 +147,7 @@ namespace synthese
 					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 					while (rows->next ())
 					{
+						if(registry.contains(rows->getKey())) continue;
 						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
 						Load(object.get(), rows, env, linkLevel);
 						registry.add(

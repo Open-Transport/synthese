@@ -64,6 +64,7 @@ namespace synthese
 		const string Request::PARAMETER_ACTION_FAILED = "raf";
 		const string Request::PARAMETER_ERROR_MESSAGE = "rem";
 		const string Request::PARAMETER_ERROR_LEVEL = "rel";
+		const string Request::PARAMETER_ACTION_WILL_CREATE_OBJECT = "co";
 
 		Request::Request(
 			const Request* request/*=NULL*/,
@@ -135,6 +136,12 @@ namespace synthese
 			{
 				ParametersMap getMap(uri.substr(separator+1));
 				map.merge(getMap);
+			}
+
+			// Action will create object
+			if(map.getDefault<bool>(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT, false))
+			{
+				_actionWillCreateObject = true;
 			}
 
 			// Session
@@ -364,12 +371,13 @@ namespace synthese
 			}
 			
 			// Action name and parameters
-			if (_action != NULL)
+			if (_action.get())
 			{
 				result.insert(Request::PARAMETER_ACTION, _action->getFactoryKey());
 				ParametersMap::Map actionMap(_action->getParametersMap().getMap());
 				for (ParametersMap::Map::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
 					result.insert(it->first, it->second);
+				result.insert(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT, _actionWillCreateObject);
 			}
 
 			// Session

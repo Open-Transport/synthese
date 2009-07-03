@@ -123,6 +123,7 @@ namespace synthese
 			static const std::string PARAMETER_ACTION_FAILED;
 			static const std::string PARAMETER_ERROR_MESSAGE;
 			static const std::string PARAMETER_ERROR_LEVEL;
+			static const std::string PARAMETER_ACTION_WILL_CREATE_OBJECT;
 
 
 		private:

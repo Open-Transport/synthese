@@ -187,6 +187,9 @@ namespace synthese
 			// If an edge with the same rank exists, then throw an exception of shift all ranks after it (depends on the parameter)
 			if(insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() == edge->getRankInPath())
 			{
+				// If the edge is the same, do nothing
+				if((*insertionPosition) == edge) return;
+
 				if(!autoShift) throw Exception("An edge with the rank "+ lexical_cast<string>(edge->getRankInPath()) + " already exists in the path " + lexical_cast<string>(getKey()));
 				for(Edges::iterator it(insertionPosition+1); it != _edges.end(); ++it)
 				{

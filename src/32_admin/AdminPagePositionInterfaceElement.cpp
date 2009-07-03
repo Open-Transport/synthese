@@ -99,7 +99,7 @@ namespace synthese
 
 				if(withImages)
 				{
-					stream << HTMLModule::getHTMLImage((*it)->getIcon(), (*it)->getTitle());
+					stream << HTMLModule::getHTMLImage((*it)->getIcon(), string("-"));
 				}
 
 				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(*it));

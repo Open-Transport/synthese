@@ -251,7 +251,7 @@ namespace synthese
 			
 			if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
 			{
-				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), env);
+				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), env, DOWN_LINKS_LOAD_LEVEL);
 				//ReservationTableSync::search(tr.get());
 				status = tr->getStatus();
 			}

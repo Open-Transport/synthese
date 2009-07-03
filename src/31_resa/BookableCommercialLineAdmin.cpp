@@ -134,6 +134,19 @@ namespace synthese
 				throw RequestException("Bad value for line ID");
 			}
 
+			// Routes reading
+			LineTableSync::Search(_getEnv(), _line->getKey());
+			BOOST_FOREACH(shared_ptr<Line> line, _getEnv().getRegistry<Line>())
+			{
+				LineStopTableSync::Search(
+					_getEnv(),
+					line->getKey(),
+					UNKNOWN_VALUE,
+					0, 0, true, true,
+					UP_LINKS_LOAD_LEVEL
+					);
+			}
+
 			optional<RegistryKeyType> sid(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE));
 			if(sid) try
 			{
@@ -145,20 +158,6 @@ namespace synthese
 			}			
 
 			if(!doDisplayPreparationActions) return;
-
-			// Routes reading
-			LineTableSync::Search(_getEnv(), _line->getKey());
-			BOOST_FOREACH(shared_ptr<Line> line, _getEnv().getRegistry<Line>())
-			{
-				LineStopTableSync::Search(
-					_getEnv(),
-					line->getKey(),
-					UNKNOWN_VALUE,
-					0, 0, true, true,
-					UP_LINKS_LOAD_LEVEL
-				);
-			}
-
 
 			// Services reading
 			ScheduledServiceTableSync::Search(
@@ -305,7 +304,11 @@ namespace synthese
 					stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
 
 				printRequest.getPage()->setService(service);
-				stream << t.col() << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
+
+				if(!_service.get())
+				{
+					stream << t.col(1, string(), true) << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
+				}
 
 				if (serviceReservations.empty())
 				{
@@ -339,32 +342,34 @@ namespace synthese
 						stream << t.col() << reservation->getTransaction()->getSeats();
 
 						// Customer name
-						stream << t.col();
-						if (globalReadRight)
-							stream  << HTMLModule::getHTMLLink(customerRequest.getURL(), reservation->getTransaction()->getCustomerName());
-						else
-							stream << reservation->getTransaction()->getCustomerName();
-
-						// Cancel link
-						if (globalDeleteRight && !_service.get())
+						if(!_service.get())
 						{
 							stream << t.col();
-							switch(status)
+							if (globalReadRight)
+								stream  << HTMLModule::getHTMLLink(customerRequest.getURL(), reservation->getTransaction()->getCustomerName());
+							else
+								stream << reservation->getTransaction()->getCustomerName();
+
+							// Cancel link
+							if (globalDeleteRight && !_service.get())
 							{
-							case OPTION:
-								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", ResaModule::GetStatusIcon(CANCELLED));
-								break;
+								stream << t.col();
+								switch(status)
+								{
+								case OPTION:
+									stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", ResaModule::GetStatusIcon(CANCELLED));
+									break;
 
-							case TO_BE_DONE:
-								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY));
-								break;
+								case TO_BE_DONE:
+									stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY));
+									break;
 
-							case AT_WORK:
-								stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
-								break;
+								case AT_WORK:
+									stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
+									break;
+								}
 							}
 						}
-
 					}
 				}
 				/*				}

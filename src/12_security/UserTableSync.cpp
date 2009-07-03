@@ -260,7 +260,11 @@ namespace synthese
 			if (orderByProfileName)
 				query << " ORDER BY p." << ProfileTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByLogin)
-				query << " ORDER BY t." << TABLE_COL_LOGIN << (raisingOrder ? " ASC" : " DESC");
+				query <<
+					" ORDER BY t." << TABLE_COL_LOGIN << (raisingOrder ? " ASC" : " DESC") << "," <<
+					TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << "," <<
+					TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC")
+				;
 			if (orderByName)
 				query << " ORDER BY t." << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",t." << TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)

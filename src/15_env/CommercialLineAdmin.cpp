@@ -269,7 +269,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<Line> line, lines)
 				{
 					if(	la &&
-						la->getLine()->getCommercialLine()->getKey() == line->getKey()
+						la->getLine()->getKey() == line->getKey()
 					){
 						AddToLinks(links, currentPage);
 					}

@@ -101,7 +101,7 @@ namespace synthese
 				uid id(map.getUid(PARAMETER_PROFILE_ID, false, FACTORY_KEY));
 				if(id > 0)
 				{
-					*_profile = ProfileTableSync::Get(id, *_env);
+					_profile = ProfileTableSync::Get(id, *_env);
 				}
 			}
 			catch (ObjectNotFoundException<Profile>& e)
