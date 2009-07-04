@@ -189,9 +189,8 @@ namespace synthese
 				RegistryKeyType currentNetworkId;
 				if(tna) currentNetworkId = tna->_network->getKey();
 				
-				Env env;
-				TransportNetworkTableSync::Search(env);
-				BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.getRegistry<TransportNetwork>())
+				TransportNetworkTableSync::Search(*_env);
+				BOOST_FOREACH(shared_ptr<TransportNetwork> network, _env->getRegistry<TransportNetwork>())
 				{
 					if(	tna &&
 						network->getKey() == currentNetworkId)
@@ -249,9 +248,8 @@ namespace synthese
 				na->_network.get() &&
 				na->_network->getKey() == _network->getKey()
 			){
-				Env env;
 				CommercialLineTableSync::Search(
-					env,
+					*_env,
 					_network->getKey(),
 					optional<string>(),
 					optional<string>(),
@@ -259,7 +257,7 @@ namespace synthese
 					true, false, true,
 					UP_LINKS_LOAD_LEVEL
 				);
-				BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
+				BOOST_FOREACH(shared_ptr<CommercialLine> line, _env->getRegistry<CommercialLine>())
 				{
 					if(	ca &&
 						ca->getCommercialLine()->getKey() == line->getKey()

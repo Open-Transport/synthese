@@ -187,9 +187,8 @@ namespace synthese
 				dynamic_cast<const CalendarTemplateAdmin*>(currentPage.get())
 			);
 
-			Env env;
-			CalendarTemplateTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, env.getRegistry<CalendarTemplate>())
+			CalendarTemplateTableSync::Search(*_env);
+			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, _env->getRegistry<CalendarTemplate>())
 			{
 				if(	ta &&
 					ta->getCalendar().get() &&

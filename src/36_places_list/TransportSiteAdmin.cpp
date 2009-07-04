@@ -185,9 +185,8 @@ namespace synthese
 					dynamic_cast<const TransportSiteAdmin*>(currentPage.get())
 				);
 
-				Env env;
-				SiteTableSync::Search(env);
-				BOOST_FOREACH(shared_ptr<Site> site, env.getRegistry<Site>())
+				SiteTableSync::Search(*_env);
+				BOOST_FOREACH(shared_ptr<Site> site, _env->getRegistry<Site>())
 				{
 					if(	sp &&
 						sp->_site->getKey() == site->getKey()

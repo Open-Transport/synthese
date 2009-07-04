@@ -299,9 +299,8 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			// Subpages
-			Env env;
-			TimetableTableSync::Search(env, _book.get() ? _book->getKey() : 0);
-			BOOST_FOREACH(shared_ptr<Timetable> tt, env.getRegistry<Timetable>())
+			TimetableTableSync::Search(*_env, _book.get() ? _book->getKey() : 0);
+			BOOST_FOREACH(shared_ptr<Timetable> tt, _env->getRegistry<Timetable>())
 			{
 				if(tt->getIsBook())
 				{

@@ -195,20 +195,19 @@ namespace synthese
 				stream << "<h1>Messages</h1>";
 
 				vector<shared_ptr<Alarm> > v;
-				Env env;
-
+				
 				if (_sentScenario)
 				{
-					ScenarioSentAlarmInheritedTableSync::Search(env, _sentScenario->getKey());
-					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, env.getRegistry<SentAlarm>())
+					ScenarioSentAlarmInheritedTableSync::Search(*_env, _sentScenario->getKey());
+					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, _env->getRegistry<SentAlarm>())
 					{
 						v.push_back(static_pointer_cast<Alarm, SentAlarm>(alarm));
 					}
 				}
 				else
 				{
-					AlarmTemplateInheritedTableSync::Search(env, _templateScenario->getKey());
-					BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
+					AlarmTemplateInheritedTableSync::Search(*_env, _templateScenario->getKey());
+					BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, _env->getRegistry<AlarmTemplate>())
 					{
 						v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
 					}

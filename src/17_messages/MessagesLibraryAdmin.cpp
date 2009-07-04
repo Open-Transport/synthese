@@ -309,9 +309,8 @@ namespace synthese
 			);
 			
 			// Folders
-			Env env;
-			ScenarioFolderTableSync::Search(env, _folder.get() ? _folder->getKey() : 0);
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, env.getRegistry<ScenarioFolder>())
+			ScenarioFolderTableSync::Search(*_env, _folder.get() ? _folder->getKey() : 0);
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, _env->getRegistry<ScenarioFolder>())
 			{
 				if(	la &&
 					la->_folder->getKey() == cfolder->getKey()
@@ -330,10 +329,10 @@ namespace synthese
 			
 			// Scenarios
 			ScenarioTemplateInheritedTableSync::Search(
-				env,
+				*_env,
 				_folder.get() ? _folder->getKey() : 0
 			);
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, env.getRegistry<ScenarioTemplate>())
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, _env->getRegistry<ScenarioTemplate>())
 			{
 				if(	sa &&
 					sa->getScenario()->getKey() == tpl->getKey()

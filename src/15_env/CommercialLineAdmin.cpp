@@ -263,9 +263,8 @@ namespace synthese
 				ca->getCommercialLine().get() &&
 				ca->getCommercialLine()->getKey() == _cline->getKey()
 			){
-				Env env;
-				LineTableSync::Search(env, _cline->getKey());
-				const Registry<Line>& lines(env.getRegistry<Line>());
+				LineTableSync::Search(*_env, _cline->getKey());
+				const Registry<Line>& lines(_env->getRegistry<Line>());
 				BOOST_FOREACH(shared_ptr<Line> line, lines)
 				{
 					if(	la &&

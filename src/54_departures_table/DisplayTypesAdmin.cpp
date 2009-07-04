@@ -299,10 +299,9 @@ namespace synthese
 				dynamic_cast<const DisplayTypeAdmin*>(currentPage.get())
 			);
 			
-			Env env;
-			DisplayTypeTableSync::Search(env, "%", UNKNOWN_VALUE, 0, UNKNOWN_VALUE, true, false, false, true, FIELDS_ONLY_LOAD_LEVEL);
+			DisplayTypeTableSync::Search(*_env, "%", UNKNOWN_VALUE, 0, UNKNOWN_VALUE, true, false, false, true, FIELDS_ONLY_LOAD_LEVEL);
 			AdminInterfaceElement::PageLinks links;
-			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.getRegistry<DisplayType>())
+			BOOST_FOREACH(shared_ptr<DisplayType> displayType, _env->getRegistry<DisplayType>())
 			{
 				if(	da &&
 					da->getType()->getKey() == displayType->getKey()
