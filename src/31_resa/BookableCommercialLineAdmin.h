@@ -39,12 +39,22 @@ namespace synthese
 
 	namespace resa
 	{
-		/** BookableCommercialLineAdmin Class.
+		/** Admin page class presenting the list of actual reservations on services on a commercial line.
+
+			Two way of display are available :
+				- reservations of all the services : the reservations are grouped by services, which are sorted on departure time.
+				- reservations of a specific service
+
+			The reservations are sorted on their departure time
+
+			@todo If several services have the same number, the reservations are aggregated into one unique group, corresponding to the customer view.
+
 			@ingroup m31Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/
-		class BookableCommercialLineAdmin : public admin::AdminInterfaceElementTemplate<BookableCommercialLineAdmin>
+		class BookableCommercialLineAdmin:
+			public admin::AdminInterfaceElementTemplate<BookableCommercialLineAdmin>
 		{
 			bool											_displayCancelled;
 			boost::shared_ptr<const env::CommercialLine>	_line;
@@ -73,16 +83,16 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map,
 				bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+				bool objectWillBeCreatedLater
 			);
 			
 			
 			
 			/** Parameters map generator, used when building an url to the admin page.
-					@return server::ParametersMap The generated parameters map
-					@author Hugues Romain
-					@date 2007					
-				*/
+				@return server::ParametersMap The generated parameters map
+				@author Hugues Romain
+				@date 2007					
+			*/
 			virtual server::ParametersMap getParametersMap() const;
 
 
