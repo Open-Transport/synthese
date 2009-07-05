@@ -264,7 +264,45 @@ namespace synthese
 				stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
 				stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
 				stream << st.close();
+				
+				stream << "<h1>Liens</h1>";
+				
+				Date date(_date);
+				date -= 1;
+				searchRequest.getPage()->_hideOldServices = false;
+				searchRequest.getPage()->_date = date;
+				
+				stream <<
+					"<p>" << HTMLModule::getLinkButton(
+						searchRequest.getURL(),
+						"Jour précédent",
+						string(),
+						"resultset_previous.png"
+					) << " ";
+				
+				searchRequest.getPage()->_date = _date;
+				searchRequest.getPage()->_hideOldServices = !_hideOldServices;	
+					
+				stream << HTMLModule::getLinkButton(
+						searchRequest.getURL(),
+						_hideOldServices ? "Journée entière" : "Prochains services",
+						string(),
+						_hideOldServices ? "stop_blue.png" : "stop_green.png"
+					) << " ";
+				
+				date = _date;
+				date += 1;
+				searchRequest.getPage()->_hideOldServices = false;
+				searchRequest.getPage()->_date = date;
 
+				stream << HTMLModule::getLinkButton(
+						searchRequest.getURL(),
+						"Jour suivant",
+						string(),
+						"resultset_next.png"
+					) << "</p>"
+				;
+				
 				stream << "<h1>Résultats</h1>";
 			}
 			else
@@ -319,6 +357,7 @@ namespace synthese
 				const ServiceReservations::ReservationsList& serviceReservations (reservations[service.get()].getReservations());
 				int serviceSeatsNumber(reservations[service.get()].getSeatsNumber());
 				string plural((serviceSeatsNumber > 1) ? "s" : "");
+				seatsNumber += serviceSeatsNumber;
 
 
 				/*				if ((retour || course) && $circulation = $circulation_suivante)
@@ -339,7 +378,28 @@ namespace synthese
 				if(!_service.get())
 				{
 					stream << t.row();
-					stream << t.col(7, string(), true) << "Service " << service->getServiceNumber() << " - départ de " <<
+					
+					stream << t.col(1, string(), true);
+					
+					UseRule::ReservationAvailabilityType status(
+						service->getReservationAbility(_date)
+					);
+					switch(status)
+					{
+						case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
+							stream << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+							break;
+							
+						case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
+							stream << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+							break;
+							
+						case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
+							stream << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+							break;
+					}
+					
+					stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de " <<
 						dynamic_cast<const NamedPlace*>(static_cast<const Line*>(service->getPath())->getEdge(0)->getHub())->getFullName() <<
 						" à " << service->getDepartureSchedule().getHour().toString();
 					if (serviceSeatsNumber > 0)
@@ -588,14 +648,18 @@ namespace synthese
 				}
 				*/			} // End services loop
 
-			/*			$tableau->Fermer();
-
-			if (!$temps_reel)
-			{
-			print '<p>'. $nombre_places_page .' places réservées au total.</p>';
-			}
-			*/
 			stream << t.close();
+
+			if(!_service.get())
+			{
+				string plural(seatsNumber > 1 ? "s" : "");
+				stream << "<h1>Total</h1>";
+				stream <<
+					"<p class=\"info\">" <<
+					seatsNumber << " place" << plural << " réservée" << plural << " au total." <<
+					"</p>"
+				;
+			}
 
 			if(_service.get())
 			{
