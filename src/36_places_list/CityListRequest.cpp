@@ -56,8 +56,9 @@ namespace synthese
 		void CityListRequest::_run( ostream& stream ) const
 		{
 			PlacesList placesList;
+			
 			Site::CitiesMatcher::MatchResult matches(
-				_site->getCitiesMatcher().bestMatches(_input, _n)
+				_site->getCitiesMatcher().findCombined(_input, _n)
 			);
 			//for(LexicalMatcher<const City*>::MatchResult::iterator it(matches.begin());
 			//	it != matches.end();

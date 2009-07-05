@@ -17,6 +17,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/foreach.hpp>
 
 #include "01_util/Exception.h"
 
@@ -83,24 +84,22 @@ namespace synthese
 			static const double WWM_SCORE_THRESHOLD; // score threshold to consider that the whole word is matched
 
 
-			typedef 
-			struct
+			struct MatchHitSort
 			{
 				int operator () ( const MatchHit& op1, 
 						  const MatchHit& op2 ) const
 				{
 					return op1.score > op2.score;
 				}
-			} MatchHitSort;
-		    
-			typedef 
-			struct 
+			};
+			
+			struct PreprocessedKey
 			{
 				std::vector<std::string> tokens;
 				size_t size;
 				std::string oneWord;
 				int maxWwmBonus;
-			} PreprocessedKey;
+			};
 
 
 
@@ -117,11 +116,13 @@ namespace synthese
 
 		 public:
 
-			LexicalMatcher (bool ignoreCase=true,
-					bool ignoreWordOrder=true,
-					bool ignoreWordSpacing = true,
-					const TranslationMap& translations = FrenchTranslationMap (),
-					const std::string& separatorCharacters = "-,;.' &()");
+			LexicalMatcher(
+				bool ignoreCase = true,
+				bool ignoreWordOrder = false,
+				bool ignoreWordSpacing = false,
+				const TranslationMap& translations = FrenchTranslationMap (),
+				const std::string& separatorCharacters = "-,;.' &()"
+			);
 
 			~LexicalMatcher ();
 
@@ -139,6 +140,8 @@ namespace synthese
 				MatchResult	bestMatches (const std::string& fuzzyKey, int nbMatches = 10) const;
 				MatchResult	match (const std::string& fuzzyKey, double minScore = 0.0, int maxNbValues = -1) const;
 
+				MatchResult findBeginsBy(const std::string& text, int nbMatches = 10) const;
+				MatchResult findCombined(const std::string& text, int nbMatches = 10) const;
 
 		    
 			//! @name Update methods
@@ -517,6 +520,59 @@ namespace synthese
 
 		}
 
+		template<class T>
+		typename LexicalMatcher<T>::MatchResult LexicalMatcher<T>::findBeginsBy(
+			const std::string& text,
+			int nbMatches
+		) const {
+			MatchResult r;
+			BOOST_FOREACH(typename Map::value_type v, _map)
+			{
+				if(v.first.size() < text.size()) continue;
+				int c(v.first.compare(0, text.size(), 0, text.size()));
+				if(c == 0)
+				{
+					MatchHit h;
+					h.value = v.second;
+					h.key = v.first;
+					r.push_back(h);
+					continue;
+				}
+				if(c > 0) break;
+			}
+			return r;
+		}
+		
+		
+		template<class T>
+		typename LexicalMatcher<T>::MatchResult LexicalMatcher<T>::findCombined(
+			const std::string& text,
+			int nbMatches
+		) const {
+			MatchResult r1(findBeginsBy(text, nbMatches));
+			if(r1.size() < nbMatches)
+			{
+				MatchResult r2(bestMatches(text, nbMatches));
+				BOOST_FOREACH(const MatchHit& h2, r2)
+				{
+					bool ok(true);
+					BOOST_FOREACH(const MatchHit& h1, r1)
+					{
+						if(h1.key == h2.key)
+						{
+							ok = false;
+							break;
+						}
+					}
+					if(ok)
+					{
+						r1.push_back(h2);
+					}
+					if(r1.size() == nbMatches) break;
+				}
+			}
+			return r1;
+		}
 
 
 		template<class T>
