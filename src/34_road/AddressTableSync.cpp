@@ -208,10 +208,10 @@ namespace synthese
 
 		}
 
-		void AddressTableSync::Search(
+		AddressTableSync::SearchResult AddressTableSync::Search(
 			Env& env,
 			int first /*= 0*/,
-			int number /*= 0*/,
+			boost::optional<std::size_t> number /*= 0*/,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -222,12 +222,12 @@ namespace synthese
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
 				;
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

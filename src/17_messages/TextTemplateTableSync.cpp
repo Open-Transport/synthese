@@ -51,7 +51,6 @@ namespace synthese
 		const string TextTemplateTableSync::COL_NAME = "name";
 		const string TextTemplateTableSync::COL_SHORT_TEXT = "short_text";
 		const string TextTemplateTableSync::COL_LONG_TEXT = "long_text";
-		const string TextTemplateTableSync::COL_LEVEL = "level";
 		const string TextTemplateTableSync::COL_IS_FOLDER("is_folder");
 		const string TextTemplateTableSync::COL_PARENT_ID("parent_id");
 	}
@@ -68,7 +67,6 @@ namespace synthese
 			SQLiteTableSync::Field(TextTemplateTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(TextTemplateTableSync::COL_SHORT_TEXT, SQL_TEXT),
 			SQLiteTableSync::Field(TextTemplateTableSync::COL_LONG_TEXT, SQL_TEXT),
-			SQLiteTableSync::Field(TextTemplateTableSync::COL_LEVEL, SQL_INTEGER),
 			SQLiteTableSync::Field(TextTemplateTableSync::COL_IS_FOLDER, SQL_INTEGER),
 			SQLiteTableSync::Field(TextTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
@@ -76,7 +74,6 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TextTemplateTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(TextTemplateTableSync::COL_LEVEL.c_str(), ""),
 			SQLiteTableSync::Index(TextTemplateTableSync::COL_PARENT_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
@@ -90,7 +87,6 @@ namespace synthese
 			object->setName(rows->getText (TextTemplateTableSync::COL_NAME));
 			object->setShortMessage(rows->getText ( TextTemplateTableSync::COL_SHORT_TEXT));
 			object->setLongMessage(rows->getText ( TextTemplateTableSync::COL_LONG_TEXT));
-			object->setAlarmLevel(static_cast<AlarmLevel>(rows->getInt ( TextTemplateTableSync::COL_LEVEL)));
 			object->setIsFolder(rows->getBool(TextTemplateTableSync::COL_IS_FOLDER));
 			object->setParentId(rows->getLongLong(TextTemplateTableSync::COL_PARENT_ID));
 		}
@@ -112,7 +108,6 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getName())
 				<< "," << Conversion::ToSQLiteString(object->getShortMessage())
 				<< "," << Conversion::ToSQLiteString(object->getLongMessage())
-				<< "," << Conversion::ToString(static_cast<int>(object->getAlarmLevel()))
 				<< "," << Conversion::ToString(object->getIsFolder())
 				<< "," << Conversion::ToString(object->getParentId())
 				<< ")";
@@ -123,21 +118,14 @@ namespace synthese
 
 	namespace messages
 	{
-		TextTemplateTableSync::TextTemplateTableSync()
-			: SQLiteNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>()
-		{
-		}
-
-
-		void TextTemplateTableSync::Search(
+		TextTemplateTableSync::SearchResult TextTemplateTableSync::Search(
 			Env& env,
-			AlarmLevel level
-			, uid parentId
+			uid parentId
 			, bool isFolder
 			, string name
 			, const TextTemplate* templateToBeDifferentWith
 			, int first
-			, int number
+			, boost::optional<std::size_t> number
 			, bool orderByName
 			, bool orderByShortText
 			, bool orderByLongText
@@ -151,16 +139,14 @@ namespace synthese
 				<< " WHERE "
 
 			// Filtering
-				<< "is_folder=" << Conversion::ToString(isFolder)
+				<< "is_folder=" << isFolder
 			;
-			if (level != ALARM_LEVEL_UNKNOWN)
-				query << " AND " << COL_LEVEL << "=" << Conversion::ToString(static_cast<int>(level));
 			if (parentId != static_cast<uid>(UNKNOWN_VALUE))
 				query << " AND " << COL_PARENT_ID << "=" << parentId;
 			if (!name.empty())
 				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
 			if (templateToBeDifferentWith)
-				query << " AND " << TABLE_COL_ID << "!=" << Conversion::ToString(templateToBeDifferentWith->getKey());
+				query << " AND " << TABLE_COL_ID << "!=" << templateToBeDifferentWith->getKey();
 			
 			// Ordering
 			if (orderByName)
@@ -171,12 +157,14 @@ namespace synthese
 				query << " ORDER BY " << COL_LONG_TEXT << (raisingOrder ? " ASC" : " DESC");
 			
 			// Size
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			if (number)
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

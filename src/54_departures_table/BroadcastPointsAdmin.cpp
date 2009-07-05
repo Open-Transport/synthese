@@ -85,8 +85,7 @@ namespace synthese
 
 		void BroadcastPointsAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_cityName = map.getString(PARAMETER_CITY_NAME, false, FACTORY_KEY);
 			_placeName = map.getString(PARAMETER_PLACE_NAME, false, FACTORY_KEY);
@@ -122,28 +121,6 @@ namespace synthese
 			interfaces::VariablesMap& variables,
 			const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
-			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > _searchResult;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
-			_searchResult = searchConnectionPlacesWithBroadcastPoints(
-				_getEnv(),
-				_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-				, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-				, READ
-				, _cityName
-				, _placeName
-				, _displayNumber
-				, _cpuNumber
-				, _lineUId
-				, _requestParameters.maxSize
-				, _requestParameters.first
-				, _requestParameters.orderField == PARAMETER_CITY_NAME
-				, _requestParameters.orderField == PARAMETER_PLACE_NAME
-				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
-				, _requestParameters.orderField == PARAMETER_CPU_NUMBER
-				, _requestParameters.raisingOrder
-			);
-			_resultParameters.setFromResult(_requestParameters, _searchResult);
-			
 			vector<pair<int, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
 			m.push_back(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
@@ -177,17 +154,43 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
+			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(
+				searchConnectionPlacesWithBroadcastPoints(
+					_getEnv(),
+					_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+					, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+					, READ
+					, _cityName
+					, _placeName
+					, _displayNumber
+					, _cpuNumber
+					, _lineUId
+					, _requestParameters.maxSize
+					, _requestParameters.first
+					, _requestParameters.orderField == PARAMETER_CITY_NAME
+					, _requestParameters.orderField == PARAMETER_PLACE_NAME
+					, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
+					, _requestParameters.orderField == PARAMETER_CPU_NUMBER
+					, _requestParameters.raisingOrder
+			)	);
+			
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_CITY_NAME, "Commune"));
 			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
 			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
 			h.push_back(make_pair(PARAMETER_CPU_NUMBER, "Unités centrales"));
 			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, _resultParameters);
+			
+			ResultHTMLTable t(
+				h,
+				searchRequest.getHTMLForm(),
+				_requestParameters,
+				searchResult
+			);
 
 			stream << t.open();
 			AdminFunctionRequest<DisplaySearchAdmin> goRequest(_request);
-			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> pl, _searchResult)
+			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> pl, searchResult)
 			{
 				stream << t.row();
 				try
@@ -208,12 +211,15 @@ namespace synthese
 			stream << t.close();
 		}
 
+
+
 		bool BroadcastPointsAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const {
 			return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
+
+
 
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,

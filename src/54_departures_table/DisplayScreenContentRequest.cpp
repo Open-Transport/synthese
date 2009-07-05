@@ -63,6 +63,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_DATE, _date);
+			if(_screen.get()) map.insert(Request::PARAMETER_OBJECT_ID, _screen->getKey());
 			return map;
 		}
 

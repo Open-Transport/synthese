@@ -120,7 +120,7 @@ namespace synthese
 
 		    if (event.opType == SQLITE_INSERT) 
 		    {
-				tableSync->rowsAdded (emitter, this, tableSync->getRowById(emitter, event.rowId), false);
+				tableSync->rowsAdded (emitter, this, tableSync->getRowById(emitter, event.rowId));
 		    }
 		    else if (event.opType == SQLITE_UPDATE) 
 		    {

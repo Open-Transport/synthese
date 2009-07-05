@@ -81,8 +81,7 @@ namespace synthese
 		
 		void ResaEditLogEntryAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			try
 			{

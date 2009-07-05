@@ -52,8 +52,6 @@ namespace synthese
 			static const std::string COL_MAXDELAYDAYS;
 			static const std::string COL_HOURDEADLINE;
 			static const std::string COL_DEFAULT_FARE;
-			
-			PTUseRuleTableSync();
 		};
 	}
 }

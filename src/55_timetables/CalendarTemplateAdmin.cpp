@@ -76,8 +76,7 @@ namespace synthese
 		
 		void CalendarTemplateAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 			
@@ -92,10 +91,6 @@ namespace synthese
 			{
 				throw AdminParametersException("No such calendar");
 			}
-			
-			if(!doDisplayPreparationActions) return;
-
-			CalendarTemplateElementTableSync::Search(_getEnv(), _calendar->getKey());
 		}
 		
 		
@@ -112,13 +107,17 @@ namespace synthese
 		void CalendarTemplateAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			// Requests
 			AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
 			addRequest.getAction()->setCalendarId(_calendar->getKey());
 
 			// Display
+			CalendarTemplateElementTableSync::SearchResult elements(
+				CalendarTemplateElementTableSync::Search(_getEnv(), _calendar->getKey())
+			);
+			
 			HTMLForm f(addRequest.getHTMLForm("add"));
 			HTMLTable::ColsVector c;
 			c.push_back(string());
@@ -131,7 +130,7 @@ namespace synthese
 
 			stream << f.open() << t.open();
 
-			BOOST_FOREACH(shared_ptr<CalendarTemplateElement> ct, _getEnv().getRegistry<CalendarTemplateElement>()) 
+			BOOST_FOREACH(shared_ptr<CalendarTemplateElement> ct, elements)
 			{
 				stream << t.row();
 

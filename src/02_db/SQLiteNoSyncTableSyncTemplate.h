@@ -49,10 +49,9 @@ namespace synthese
 			This method loads a new object in ram.
 			*/
 			void rowsAdded(
-				SQLite* sqlite
-				, SQLiteSync* sync
-				, const SQLiteResultSPtr& rows
-				, bool isFirstSync = false
+				SQLite* sqlite __attribute__ ((unused))
+				, SQLiteSync* sync __attribute__ ((unused))
+				, const SQLiteResultSPtr& rows __attribute__ ((unused))
 			){
 			}
 
@@ -61,9 +60,9 @@ namespace synthese
 			This method updates the corresponding object in ram.
 			*/
 			void rowsUpdated(
-				SQLite* sqlite
-				, SQLiteSync* sync
-				, const SQLiteResultSPtr& rows
+				SQLite* sqlite __attribute__ ((unused))
+				, SQLiteSync* sync __attribute__ ((unused))
+				, const SQLiteResultSPtr& rows __attribute__ ((unused))
 			){
 			}
 
@@ -73,9 +72,9 @@ namespace synthese
 			all necessary cleaning actions.
 			*/
 			void rowsRemoved(
-				SQLite* sqlite
-				, SQLiteSync* sync
-				, const SQLiteResultSPtr& rows
+				SQLite* sqlite __attribute__ ((unused))
+				, SQLiteSync* sync __attribute__ ((unused))
+				, const SQLiteResultSPtr& rows __attribute__ ((unused))
 			){
 			}
 

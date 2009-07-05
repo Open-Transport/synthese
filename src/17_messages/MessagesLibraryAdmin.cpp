@@ -83,13 +83,12 @@ namespace synthese
 		
 		void MessagesLibraryAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_requestParameters.setFromParametersMap(
 				map.getMap(),
 				PARAMETER_NAME,
-				ResultHTMLTable::UNLIMITED_SIZE
+				optional<size_t>()
 			);
 			
 			if(objectWillBeCreatedLater) return;
@@ -109,21 +108,6 @@ namespace synthese
 					throw AdminParametersException("Bad folder ID");
 				}
 			}
-
-			if(!doDisplayPreparationActions) return;
-
-			ScenarioTemplateInheritedTableSync::Search(
-				_getEnv(),
-				_folder.get() ? _folder->getKey() : 0
-				, string(), NULL
-				, 0, -1
-				, _requestParameters.orderField == PARAMETER_NAME
-				, _requestParameters.raisingOrder
-			);
-			ScenarioFolderTableSync::Search(
-				_subFoldersEnv,
-				_folder.get() ? _folder->getKey() : 0
-			);
 		}
 
 
@@ -142,30 +126,6 @@ namespace synthese
 			interfaces::VariablesMap& variables,
 					const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
-			// Requests
-			AdminFunctionRequest<MessagesLibraryAdmin> searchRequest(_request);
-			searchRequest.getPage()->setFolder(_folder);
-
-			AdminFunctionRequest<MessagesScenarioAdmin> updateScenarioRequest(_request);
-			
-			AdminActionFunctionRequest<DeleteScenarioAction,MessagesLibraryAdmin> deleteScenarioRequest(_request);
-			
-			AdminActionFunctionRequest<AddScenarioAction,MessagesScenarioAdmin> addScenarioRequest(_request);
-			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
-			addScenarioRequest.getAction()->setFolder(_folder);
-			addScenarioRequest.setActionWillCreateObject();
-
-			AdminActionFunctionRequest<ScenarioFolderAdd,MessagesLibraryAdmin> addFolderRequest(_request);
-			addFolderRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
-			addFolderRequest.getAction()->setParent(_folder);
-			addFolderRequest.setActionWillCreateObject();
-
-			AdminFunctionRequest<MessagesLibraryAdmin> goFolderRequest(_request);
-
-			// Search
-			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, _getEnv().getEditableRegistry<ScenarioTemplate>());
-
 			if (_folder.get())
 			{
 				stream << "<h1>Répertoire</h1>";
@@ -207,14 +167,46 @@ namespace synthese
 
 			stream << "<h1>Scénarios</h1>";
 
+			// Requests
+			AdminFunctionRequest<MessagesLibraryAdmin> searchRequest(_request);
+			searchRequest.getPage()->setFolder(_folder);
+
+			AdminFunctionRequest<MessagesScenarioAdmin> updateScenarioRequest(_request);
+			
+			AdminActionFunctionRequest<DeleteScenarioAction,MessagesLibraryAdmin> deleteScenarioRequest(_request);
+			
+			AdminActionFunctionRequest<AddScenarioAction,MessagesScenarioAdmin> addScenarioRequest(_request);
+			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
+			addScenarioRequest.getAction()->setFolder(_folder);
+			addScenarioRequest.setActionWillCreateObject();
+			
+			// Search
+			ScenarioTemplateInheritedTableSync::SearchResult scenarios(
+				ScenarioTemplateInheritedTableSync::Search(
+					_getEnv(),
+					_folder.get() ? _folder->getKey() : 0
+					, string(), NULL
+					, 0, -1
+					, _requestParameters.orderField == PARAMETER_NAME
+					, _requestParameters.raisingOrder
+			)	);
+			
 			ActionResultHTMLTable::HeaderVector h3;
 			h3.push_back(make_pair(PARAMETER_NAME, "Nom"));
 			h3.push_back(make_pair(string(), "Actions"));
 			h3.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, p, addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
+			
+			ActionResultHTMLTable t3(
+				h3,
+				searchRequest.getHTMLForm(),
+				_requestParameters,
+				scenarios,
+				addScenarioRequest.getHTMLForm("addscenario"),
+				AddScenarioAction::PARAMETER_TEMPLATE_ID
+			);
 			stream << t3.open();
 			
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, _getEnv().getRegistry<ScenarioTemplate>())
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, scenarios)
 			{
 				updateScenarioRequest.getPage()->setScenario(scenario);
 				deleteScenarioRequest.getAction()->setScenario(scenario);
@@ -231,16 +223,29 @@ namespace synthese
 
 			stream << "<h1>Sous-répertoires</h1>";
 
-			if (_subFoldersEnv.getRegistry<ScenarioFolder>().empty())
+			ScenarioFolderTableSync::SearchResult folders(
+				ScenarioFolderTableSync::Search(
+					_getEnv(),
+					_folder.get() ? _folder->getKey() : 0
+			)	);
+
+			if(folders.empty())
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
 			
+			AdminFunctionRequest<MessagesLibraryAdmin> goFolderRequest(_request);
+			
+			AdminActionFunctionRequest<ScenarioFolderAdd,MessagesLibraryAdmin> addFolderRequest(_request);
+			addFolderRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
+			addFolderRequest.getAction()->setParent(_folder);
+			addFolderRequest.setActionWillCreateObject();
+
 			HTMLForm f(addFolderRequest.getHTMLForm());
 			HTMLList l;
 			stream << f.open() << l.open();
 
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, _subFoldersEnv.getRegistry<ScenarioFolder>())
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, folders)
 			{
 				if(folder == _folder) continue;
 
@@ -309,10 +314,13 @@ namespace synthese
 			);
 			
 			// Folders
-			ScenarioFolderTableSync::Search(*_env, _folder.get() ? _folder->getKey() : 0);
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, _env->getRegistry<ScenarioFolder>())
+			ScenarioFolderTableSync::SearchResult folders(
+				ScenarioFolderTableSync::Search(*_env, _folder.get() ? _folder->getKey() : 0)
+			);
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, folders)
 			{
 				if(	la &&
+					la->_folder.get() &&
 					la->_folder->getKey() == cfolder->getKey()
 				){
 					AddToLinks(links, currentPage);
@@ -328,11 +336,12 @@ namespace synthese
 			}
 			
 			// Scenarios
-			ScenarioTemplateInheritedTableSync::Search(
-				*_env,
-				_folder.get() ? _folder->getKey() : 0
-			);
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, _env->getRegistry<ScenarioTemplate>())
+			ScenarioTemplateInheritedTableSync::SearchResult scenarios(
+				ScenarioTemplateInheritedTableSync::Search(
+					*_env,
+					_folder.get() ? _folder->getKey() : 0
+			)	);
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, scenarios)
 			{
 				if(	sa &&
 					sa->getScenario()->getKey() == tpl->getKey()

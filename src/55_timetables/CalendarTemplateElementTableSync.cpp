@@ -145,18 +145,11 @@ namespace synthese
 	
 	namespace timetables
 	{
-		CalendarTemplateElementTableSync::CalendarTemplateElementTableSync()
-			: SQLiteNoSyncTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>()
-		{
-		}
-
-
-
-		void CalendarTemplateElementTableSync::Search(
+		CalendarTemplateElementTableSync::SearchResult CalendarTemplateElementTableSync::Search(
 			Env& env,
 			uid calendarId
 			, int first /*= 0*/
-			, int number /*= 0*/,
+			, boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -165,15 +158,17 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (calendarId != UNKNOWN_VALUE)
-			 	query << " AND " << COL_CALENDAR_ID << "=" << calendarId
-				;
+				query << " AND " << COL_CALENDAR_ID << "=" << calendarId
+			;
 			query << " ORDER BY " << COL_RANK << " ASC";
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			if (number)
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 

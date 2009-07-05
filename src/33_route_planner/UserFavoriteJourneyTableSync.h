@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -46,7 +46,8 @@ namespace synthese
 		/** UserFavoriteJourney table synchronizer.
 			@ingroup m53LS refLS
 		*/
-		class UserFavoriteJourneyTableSync : public db::SQLiteNoSyncTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>
+		class UserFavoriteJourneyTableSync:
+			public db::SQLiteNoSyncTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>
 		{
 		public:
 			static const std::string COL_USER_ID;
@@ -56,22 +57,21 @@ namespace synthese
 			static const std::string COL_DESTINATION_CITY_NAME;
 			static const std::string COL_DESTINATION_PLACE_NAME;
 
-			UserFavoriteJourneyTableSync();
 
 
 			/** UserFavoriteJourney search.
 				(other search parameters)
 				@param first First UserFavoriteJourney object to answer
 				@param number Number of UserFavoriteJourney objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<UserFavoriteJourney> Founded UserFavoriteJourney objects.
+				@return Found UserFavoriteJourney objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				const security::User* user
 				, int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);

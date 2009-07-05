@@ -178,12 +178,7 @@ namespace synthese
 
 	namespace dblog
 	{
-		DBLogEntryTableSync::DBLogEntryTableSync()
-			: SQLiteNoSyncTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>()
-		{
-		}
-
-		void DBLogEntryTableSync::Search(
+		DBLogEntryTableSync::SearchResult DBLogEntryTableSync::Search(
 			Env& env,
 			const std::string& logKey
 			, const time::DateTime& startDate
@@ -194,7 +189,7 @@ namespace synthese
 			, uid objectId2
 			, const std::string& text
 			, int first
-			, int number
+			, boost::optional<std::size_t> number
 			, bool orderByDate
 			, bool orderByUser
 			, bool orderByLevel
@@ -227,13 +222,15 @@ namespace synthese
 				query << " ORDER BY " << COL_USER_ID << (raisingOrder ? " ASC" : " DESC") << "," << COL_DATE << (raisingOrder ? " ASC" : " DESC");
 			if (orderByLevel)
 				query << " ORDER BY " << COL_LEVEL << (raisingOrder ? " ASC" : " DESC") << "," << COL_DATE << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+
+
 
 		void DBLogEntryTableSync::Purge( const std::string& logKey, const time::DateTime& endDate )
 		{

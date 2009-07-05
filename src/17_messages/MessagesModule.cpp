@@ -85,16 +85,20 @@ namespace synthese
 			}
 
 			Env env;
-			ScenarioTemplateInheritedTableSync::Search(env, folderId);
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> st, env.getRegistry<ScenarioTemplate>())
+			ScenarioTemplateInheritedTableSync::SearchResult templates(
+				ScenarioTemplateInheritedTableSync::Search(env, folderId)
+			);
+			BOOST_FOREACH(shared_ptr<ScenarioTemplate> st, templates)
 			{
 				m.push_back(make_pair(st->getKey(), prefix + st->getName()));
 			}
 
 			if (folderId != UNKNOWN_VALUE)
 			{
-				ScenarioFolderTableSync::Search(env, folderId);
-				BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, env.getRegistry<ScenarioFolder>())
+				ScenarioFolderTableSync::SearchResult folders(
+					ScenarioFolderTableSync::Search(env, folderId)
+				);
+				BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, folders)
 				{
 					std::vector<pair<uid, std::string> > r(GetScenarioTemplatesLabels(string(), string(), folder->getKey(), prefix + folder->getName() +"/"));
 					m.insert(m.end(),r.begin(), r.end());
@@ -115,8 +119,10 @@ namespace synthese
 				m.push_back(make_pair(0, "(racine)"));
 
 			Env env;
-			ScenarioFolderTableSync::Search(env, folderId);
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, env.getRegistry<ScenarioFolder>())
+			ScenarioFolderTableSync::SearchResult folders(
+				ScenarioFolderTableSync::Search(env, folderId)
+			);
+			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, folders)
 			{
 				if (folder->getKey() == forbiddenFolderId)
 					continue;
@@ -177,8 +183,10 @@ namespace synthese
 		{
 			Env env;
 			vector<pair<uid, string> > m;
-			TextTemplateTableSync::Search(env, level);
-			BOOST_FOREACH(shared_ptr<TextTemplate> text, env.getRegistry<TextTemplate>())
+			TextTemplateTableSync::SearchResult templates(
+				TextTemplateTableSync::Search(env, level)
+			);
+			BOOST_FOREACH(shared_ptr<TextTemplate> text, templates)
 			{
 				m.push_back(make_pair(text->getKey(), text->getName()));
 			}

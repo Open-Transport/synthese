@@ -52,10 +52,9 @@ namespace synthese
 				Only if the event is a replacement, and if the concerned object is already loaded into the registry, then it is updated.
 			*/
 			void rowsAdded(
-				SQLite* sqlite
-				, SQLiteSync* sync
+				SQLite* sqlite __attribute__ ((unused))
+				, SQLiteSync* sync __attribute__ ((unused))
 				, const SQLiteResultSPtr& rows
-				, bool isFirstSync = false
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
 				util::Registry<T>& registry(env.getEditableRegistry<T>());

@@ -140,20 +140,13 @@ namespace synthese
 	
 	namespace road
 	{
-		RoadPlaceTableSync::RoadPlaceTableSync()
-			: SQLiteRegistryTableSyncTemplate<RoadPlaceTableSync,RoadPlace>()
-		{
-		}
-
-
-
-		void RoadPlaceTableSync::Search(
+		RoadPlaceTableSync::SearchResult RoadPlaceTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> cityId,
 			boost::optional<std::string> exactName,
 			boost::optional<std::string> likeName,
 			int first, /*= 0*/
-			int number, /*= 0*/
+			boost::optional<std::size_t> number, /*= 0*/
 			bool orderByName,
 			bool raisingOrder,
 			LinkLevel linkLevel
@@ -171,12 +164,14 @@ namespace synthese
 				query << " AND " << COL_CITYID << "=" <<*cityId;
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			if (number)
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 		boost::shared_ptr<RoadPlace> RoadPlaceTableSync::GetEditableFromCityAndName(
@@ -186,9 +181,11 @@ namespace synthese
 			util::LinkLevel linkLevel
 		){
 			Env tenv;
-			Search(tenv, cityId, name, 0, 1, false, false, FIELDS_ONLY_LOAD_LEVEL);
-			if(tenv.getRegistry<RoadPlace>().empty()) return shared_ptr<RoadPlace>();
-			shared_ptr<RoadPlace> result(tenv.getRegistry<RoadPlace>().front());
+			SearchResult roadPlaces(
+				Search(tenv, cityId, optional<string>(), name, 0, 1, false, false, FIELDS_ONLY_LOAD_LEVEL)
+			);
+			if(roadPlaces.empty()) return shared_ptr<RoadPlace>();
+			shared_ptr<RoadPlace> result(roadPlaces.front());
 			return GetEditable(result->getKey(), environment, linkLevel);
 		}
 	}

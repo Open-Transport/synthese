@@ -166,8 +166,10 @@ namespace synthese
 
 
 			// Insertion of profiles
-			ProfileTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<const Profile> profile, env.getRegistry<Profile>())
+			ProfileTableSync::SearchResult profiles(
+				ProfileTableSync::Search(env)
+			);
+			BOOST_FOREACH(shared_ptr<const Profile> profile, profiles)
 			{
 				if(!profile->isAuthorized<DisplayMaintenanceRight>()) continue;
 
@@ -196,8 +198,10 @@ namespace synthese
 
 			// Insertion of the users
 			MD5Wrapper md5;
-			UserTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<const User> user, env.getRegistry<User>())
+			UserTableSync::SearchResult users(
+				UserTableSync::Search(env)
+			);
+			BOOST_FOREACH(shared_ptr<const User> user, users)
 			{
 				if(user->getLogin() == SecurityModule::ROOT_USER) continue;
 				if(!user->getProfile()->isAuthorized<DisplayMaintenanceRight>()) continue;
@@ -244,8 +248,10 @@ namespace synthese
 
 
 			// Insertion of the hostgroups
-			DisplayTypeTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<const DisplayType> type, env.getRegistry<DisplayType>())
+			DisplayTypeTableSync::SearchResult types(
+				DisplayTypeTableSync::Search(env)
+			);
+			BOOST_FOREACH(shared_ptr<const DisplayType> type, types)
 			{
 				stream <<
 					"REPLACE INTO hostgroup(hg_id,hg_name,hg_alias,hg_comment,hg_activate) VALUES(" <<
@@ -279,8 +285,10 @@ namespace synthese
 
 
 			// Insertion of the hosts
-			DisplayScreenTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, env.getRegistry<DisplayScreen>())
+			DisplayScreenTableSync::SearchResult screens(
+				DisplayScreenTableSync::Search(env)
+			);
+			BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, screens)
 			{
 				if(!screen->isMonitored()) continue;
 

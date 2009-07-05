@@ -57,16 +57,12 @@ namespace synthese
 			static const std::string COL_PARAMVALUE;
 
 
-			DbModuleConfigTableSync ();
-			~DbModuleConfigTableSync ();
-
 
 			 virtual const std::string& getTableName() const;
 			void rowsAdded(
 				db::SQLite* sqlite,
 				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows,
-				bool isFirstSync = false
+				const db::SQLiteResultSPtr& rows
 			);
 
 			void rowsUpdated(

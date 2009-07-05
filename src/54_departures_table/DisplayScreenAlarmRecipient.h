@@ -35,7 +35,8 @@ namespace synthese
 		/** DisplayScreenAlarmRecipient class.
 			@ingroup m54Messages refAlarmrecipients
 		*/
-		class DisplayScreenAlarmRecipient : public messages::AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>
+		class DisplayScreenAlarmRecipient:
+			public messages::AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>
 		{
 		public:
 			static const std::string PARAMETER_SEARCH_CITY_NAME;

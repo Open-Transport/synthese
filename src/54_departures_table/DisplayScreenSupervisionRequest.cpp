@@ -82,9 +82,6 @@ namespace synthese
 			{
 				throw RequestException("This screen cannot be monitored because its monitoring interface does not contain the parsing rules");
 			}
-
-			// Last monitoring status
-			DisplayMonitoringStatusTableSync::Search(*_env, _displayScreen->getKey(), 0, 1, true, false);
 		}
 
 		void DisplayScreenSupervisionRequest::_run( std::ostream& stream ) const
@@ -95,6 +92,12 @@ namespace synthese
 			assert(_displayScreen->getType()->getMonitoringInterface() != NULL);
 			assert(_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>() != NULL);
 			
+			
+			// Last monitoring status
+			DisplayMonitoringStatusTableSync::SearchResult entries(
+				DisplayMonitoringStatusTableSync::Search(*_env, _displayScreen->getKey(), 0, 1, true, false)
+			);
+
 			// Parsing
 			stringstream s;
 			const ParseDisplayReturnInterfacePage* page(_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>());
@@ -105,14 +108,14 @@ namespace synthese
 			DisplayMonitoringStatus status(s.str(), _displayScreen.get());
 
 			// Last monitoring message
-			if (_env->getRegistry<DisplayMonitoringStatus>().empty())
+			if (entries.empty())
 			{
 				// First contact
 				DisplayMaintenanceLog::AddMonitoringFirstEntry(*_displayScreen, status);
 			}
 			else
 			{
-				boost::shared_ptr<DisplayMonitoringStatus> lastStatus(_env->getEditableRegistry<DisplayMonitoringStatus>().front());
+				boost::shared_ptr<DisplayMonitoringStatus> lastStatus(entries.front());
 				status.setKey(lastStatus->getKey());
 
 				// Up contact?

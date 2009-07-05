@@ -53,7 +53,6 @@ namespace synthese
 			static const std::string COL_ROADID ;  // NU
 			static const std::string COL_METRICOFFSET;  // U ??
 			
-			RoadChunkTableSync();
 
 
 			/** RoadChunk search.
@@ -64,10 +63,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};

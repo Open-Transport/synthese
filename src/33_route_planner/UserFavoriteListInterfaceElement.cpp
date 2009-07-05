@@ -71,8 +71,10 @@ namespace synthese
 			const User* user(request->getUser().get());
 			
 			Env env;
-			UserFavoriteJourneyTableSync::Search(env, user);
-			BOOST_FOREACH(shared_ptr<UserFavoriteJourney> fav, env.getRegistry<UserFavoriteJourney>())
+			UserFavoriteJourneyTableSync::SearchResult favorites(
+				UserFavoriteJourneyTableSync::Search(env, user)
+			);	
+			BOOST_FOREACH(shared_ptr<UserFavoriteJourney> fav, favorites)
 			{
 				page->display(stream, fav.get(), variables, request);
 			}

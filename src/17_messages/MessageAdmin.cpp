@@ -71,7 +71,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<MessageAdmin>::ICON("note.png");
-		template<> const string AdminInterfaceElementTemplate<MessageAdmin>::DEFAULT_TITLE("Message inconnu");
+		template<> const string AdminInterfaceElementTemplate<MessageAdmin>::DEFAULT_TITLE("(pas de texte)");
 	}
 
 	namespace messages
@@ -80,8 +80,7 @@ namespace synthese
 
 		void MessageAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 
@@ -216,7 +215,7 @@ namespace synthese
 
 		std::string MessageAdmin::getTitle() const
 		{
-			return _alarm.get() ? _alarm->getShortMessage() : DEFAULT_TITLE;
+			return _alarm.get() && !_alarm->getShortMessage().empty() ? _alarm->getShortMessage() : DEFAULT_TITLE;
 		}
 
 

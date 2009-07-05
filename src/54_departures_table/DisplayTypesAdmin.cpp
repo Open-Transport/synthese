@@ -75,29 +75,11 @@ namespace synthese
 
 		void DisplayTypesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), DisplayTypeTableSync::COL_NAME, 20);
 			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
-			_searchInterfaceId = map.getUid(PARAMETER_INTERFACE_ID, false, FACTORY_KEY);
-
-			if(doDisplayPreparationActions)
-			{
-				DisplayTypeTableSync::Search(
-					_getEnv(),
-					"%"+ _searchName +"%",
-					_searchInterfaceId,
-					_requestParameters.first,
-					_requestParameters.maxSize + 1,
-					_requestParameters.orderField == DisplayTypeTableSync::COL_NAME,
-					_requestParameters.orderField == DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID,
-					_requestParameters.orderField == DisplayTypeTableSync::COL_ROWS_NUMBER,
-					_requestParameters.raisingOrder,
-					UP_LINKS_LOAD_LEVEL
-				);
-				_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<DisplayType>());
-			}
+			_searchInterfaceId = map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID);
 		}
 
 
@@ -106,8 +88,7 @@ namespace synthese
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAMETER_NAME, _searchName);
-			m.insert(PARAMETER_INTERFACE_ID, _searchInterfaceId);
-			
+			if(_searchInterfaceId) m.insert(PARAMETER_INTERFACE_ID, *_searchInterfaceId);
 			return m;
 		}
 		
@@ -144,13 +125,27 @@ namespace synthese
 				f.getForm().getSelectInput(
 					PARAMETER_INTERFACE_ID,
 					InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(),
-					_searchInterfaceId
+					_searchInterfaceId ? *_searchInterfaceId : UNKNOWN_VALUE
 				)
 			);
 			stream << f.close();
 
 			stream << "<h1>Résultat de la recherche</h1>";
 
+			DisplayTypeTableSync::SearchResult types(
+				DisplayTypeTableSync::Search(
+					_getEnv(),
+					"%"+ _searchName +"%",
+					_searchInterfaceId,
+					_requestParameters.first,
+					_requestParameters.maxSize,
+					_requestParameters.orderField == DisplayTypeTableSync::COL_NAME,
+					_requestParameters.orderField == DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID,
+					_requestParameters.orderField == DisplayTypeTableSync::COL_ROWS_NUMBER,
+					_requestParameters.raisingOrder,
+					UP_LINKS_LOAD_LEVEL
+			)	);
+			
 			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(DisplayTypeTableSync::COL_NAME, "Nom"));
 			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Interface d'affichage"));
@@ -161,11 +156,18 @@ namespace synthese
 			{
 				v.push_back(make_pair(string(), "Actions"));
 			}
-			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _resultParameters, createRequest.getHTMLForm("create"));
+			
+			ActionResultHTMLTable t(
+				v,
+				searchRequest.getHTMLForm(),
+				_requestParameters,
+				types,
+				createRequest.getHTMLForm("create")
+			);
 
 			// Display types loop
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<DisplayType> dt, _getEnv().getRegistry<DisplayType>())
+			BOOST_FOREACH(shared_ptr<DisplayType> dt, types)
 			{
 				deleteRequest.getAction()->setType(dt);
 				openRequest.getPage()->setType(dt);
@@ -253,13 +255,8 @@ namespace synthese
 			);
 		}
 
-		DisplayTypesAdmin::DisplayTypesAdmin()
-			: AdminInterfaceElementTemplate<DisplayTypesAdmin>(),
-			_searchInterfaceId(UNKNOWN_VALUE)
-		{
-
-		}
-
+		
+		
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			boost::shared_ptr<const AdminInterfaceElement> currentPage,
@@ -299,9 +296,21 @@ namespace synthese
 				dynamic_cast<const DisplayTypeAdmin*>(currentPage.get())
 			);
 			
-			DisplayTypeTableSync::Search(*_env, "%", UNKNOWN_VALUE, 0, UNKNOWN_VALUE, true, false, false, true, FIELDS_ONLY_LOAD_LEVEL);
+			DisplayTypeTableSync::SearchResult types(
+				DisplayTypeTableSync::Search(
+					*_env,
+					"%",
+					UNKNOWN_VALUE,
+					0,
+					optional<size_t>(),
+					true,
+					false,
+					false,
+					true,
+					FIELDS_ONLY_LOAD_LEVEL
+			)	);
 			AdminInterfaceElement::PageLinks links;
-			BOOST_FOREACH(shared_ptr<DisplayType> displayType, _env->getRegistry<DisplayType>())
+			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)
 			{
 				if(	da &&
 					da->getType()->getKey() == displayType->getKey()

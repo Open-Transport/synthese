@@ -52,30 +52,25 @@ namespace synthese
 			static const std::string COL_USE_DATES_RANGE;
 			static const std::string COL_PERIODS;
 
-			/** Site SQLite table constructor.
-			*/
-			SiteTableSync();
+
 
 			/** Site search.
 				(other search parameters)
 				@param first First Site object to answer
 				@param number Number of Site objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<Site> Founded Site objects.
+				@return Found Site objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				std::string name = std::string()
 				, int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByName = true
 				, bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
-
-
-
 		};
 	}
 }

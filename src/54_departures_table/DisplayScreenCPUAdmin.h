@@ -46,7 +46,6 @@ namespace synthese
 			boost::shared_ptr<const DisplayScreenCPU>	_cpu;
 			dblog::DBLogHTMLView						_generalLogView;
 			dblog::DBLogHTMLView						_maintenanceLogView;
-			boost::posix_time::ptime					_lastContact;
 
 		public:
 			static const std::string TAB_TECHNICAL;
@@ -67,8 +66,7 @@ namespace synthese
 			*/
 			virtual void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+				bool objectWillBeCreatedLater
 			);
 			
 			

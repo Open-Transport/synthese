@@ -100,18 +100,7 @@ namespace synthese
 
 	namespace geography
 	{
-		CityTableSync::CityTableSync ()
-			: SQLiteAutoRegisterTableSyncTemplate<CityTableSync,City> ()
-		{
-		}
-
-
-		CityTableSync::~CityTableSync ()
-		{
-
-		}
-
-		void CityTableSync::Search(
+		CityTableSync::SearchResult CityTableSync::Search(
 			util::Env& env,
 			boost::optional<std::string> exactName /*= boost::optional<std::string>()*/,
 			boost::optional<std::string> likeName /*= boost::optional<std::string>()*/,
@@ -140,7 +129,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 
 		}
 
@@ -150,9 +139,17 @@ namespace synthese
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		){
 			Env tenv;
-			Search(tenv, optional<string>(), optional<string>(), code, 0, 1, false, false, FIELDS_ONLY_LOAD_LEVEL);
-			if(tenv.getRegistry<City>().empty()) return shared_ptr<City>();
-			shared_ptr<const City> result(tenv.getRegistry<City>().front());
+			SearchResult cities(
+				Search(
+					tenv,
+					optional<string>(),
+					optional<string>(),
+					code,
+					0, 1, false, false,
+					FIELDS_ONLY_LOAD_LEVEL
+			)	);
+			if(cities.empty()) return shared_ptr<City>();
+			shared_ptr<const City> result(cities.front());
 			return GetEditable(result->getKey(), environment, linkLevel);
 		}
 	}

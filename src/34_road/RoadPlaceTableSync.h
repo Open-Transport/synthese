@@ -49,7 +49,7 @@ namespace synthese
 			static const std::string COL_NAME;
 			static const std::string COL_CITYID;
 
-			RoadPlaceTableSync ();
+
 
 			/** RoadPlace search.
 				@param env Environment to read and populate
@@ -65,13 +65,13 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> cityId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<std::string> exactName = boost::optional<std::string>(),
 				boost::optional<std::string> likeName = boost::optional<std::string>(),
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL

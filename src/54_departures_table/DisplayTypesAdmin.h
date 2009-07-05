@@ -68,23 +68,21 @@ namespace synthese
 		class DisplayTypesAdmin : public admin::AdminInterfaceElementTemplate<DisplayTypesAdmin>
 		{
 			std::string									_searchName;
-			util::RegistryKeyType						_searchInterfaceId;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
+			boost::optional<util::RegistryKeyType>		_searchInterfaceId;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 			
 		public:
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_INTERFACE_ID;
 			
-			DisplayTypesAdmin();
+			
 			
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
 			virtual void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+				bool objectWillBeCreatedLater
 			);
 
 			/** Parameters map generator, used when building an url to the admin page.

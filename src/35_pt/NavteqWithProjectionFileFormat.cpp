@@ -115,25 +115,25 @@ namespace synthese
 
 		void NavteqWithProjectionFileFormat::save(std::ostream& os
 		) const {
-			BOOST_FOREACH(shared_ptr<Address> address, _env->getEditableRegistry<Address>())
+			BOOST_FOREACH(Registry<Address>::value_type address, _env->getEditableRegistry<Address>())
 			{
-				AddressTableSync::Save(address.get());
+				AddressTableSync::Save(address.second.get());
 			}
-			BOOST_FOREACH(shared_ptr<PublicTransportStopZoneConnectionPlace> stop, _env->getEditableRegistry<PublicTransportStopZoneConnectionPlace>())
+			BOOST_FOREACH(Registry<PublicTransportStopZoneConnectionPlace>::value_type stop, _env->getEditableRegistry<PublicTransportStopZoneConnectionPlace>())
 			{
-				ConnectionPlaceTableSync::Save(stop.get());
+				ConnectionPlaceTableSync::Save(stop.second.get());
 			}
-			BOOST_FOREACH(shared_ptr<RoadPlace> roadplace, _env->getEditableRegistry<RoadPlace>())
+			BOOST_FOREACH(Registry<RoadPlace>::value_type roadplace, _env->getEditableRegistry<RoadPlace>())
 			{
-				RoadPlaceTableSync::Save(roadplace.get());
+				RoadPlaceTableSync::Save(roadplace.second.get());
 			}
-			BOOST_FOREACH(shared_ptr<Road> road, _env->getEditableRegistry<Road>())
+			BOOST_FOREACH(Registry<Road>::value_type road, _env->getEditableRegistry<Road>())
 			{
-				RoadTableSync::Save(road.get());
+				RoadTableSync::Save(road.second.get());
 			}
-			BOOST_FOREACH(shared_ptr<RoadChunk> roadChunk, _env->getEditableRegistry<RoadChunk>())
+			BOOST_FOREACH(Registry<RoadChunk>::value_type roadChunk, _env->getEditableRegistry<RoadChunk>())
 			{
-				RoadChunkTableSync::Save(roadChunk.get());
+// 				RoadChunkTableSync::Save(roadChunk.second.get());
 			}
 		}
 

@@ -72,14 +72,10 @@ namespace synthese
 	{
 		const string TransportNetworkAdmin::PARAMETER_SEARCH_NAME("sn");
 
-		TransportNetworkAdmin::TransportNetworkAdmin()
-			: AdminInterfaceElementTemplate<TransportNetworkAdmin>()
-		{ }
 		
 		void TransportNetworkAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 			
@@ -98,21 +94,6 @@ namespace synthese
 			{
 				throw AdminParametersException("No such network");
 			}
-
-			if(!doDisplayPreparationActions) return;
-
-			CommercialLineTableSync::Search(
-				_getEnv(),
-				_network->getKey()
-				, string("%"+_searchName+"%"),
-				optional<string>(),
-				_requestParameters.first
-				, _requestParameters.maxSize
-				, false
-				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-				, _requestParameters.raisingOrder				
-			);
-			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<CommercialLine>());
 		}
 		
 		
@@ -134,6 +115,7 @@ namespace synthese
 			
 			// Search form
 			stream << "<h1>Recherche</h1>";
+			
 			AdminFunctionRequest<TransportNetworkAdmin> searchRequest(_request);
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
@@ -145,15 +127,28 @@ namespace synthese
 			// Results display
 			stream << "<h1>Lignes du réseau</h1>";
 			
+			CommercialLineTableSync::SearchResult lines(
+				CommercialLineTableSync::Search(
+					_getEnv(),
+					_network->getKey()
+					, string("%"+_searchName+"%"),
+					optional<string>(),
+					_requestParameters.first
+					, _requestParameters.maxSize
+					, false
+					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+					, _requestParameters.raisingOrder				
+			)	);
+
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(), "N°"));
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
+			ResultHTMLTable t(h,sortedForm,_requestParameters, lines);
 
 			stream << t.open();
 			AdminFunctionRequest<CommercialLineAdmin> lineOpenRequest(_request);
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, _getEnv().getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 			{
 				lineOpenRequest.getPage()->setCommercialLine(line);
 				stream << t.row();
@@ -189,8 +184,10 @@ namespace synthese
 				RegistryKeyType currentNetworkId;
 				if(tna) currentNetworkId = tna->_network->getKey();
 				
-				TransportNetworkTableSync::Search(*_env);
-				BOOST_FOREACH(shared_ptr<TransportNetwork> network, _env->getRegistry<TransportNetwork>())
+				TransportNetworkTableSync::SearchResult networks(
+					TransportNetworkTableSync::Search(*_env)
+				);
+				BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
 				{
 					if(	tna &&
 						network->getKey() == currentNetworkId)
@@ -248,16 +245,18 @@ namespace synthese
 				na->_network.get() &&
 				na->_network->getKey() == _network->getKey()
 			){
-				CommercialLineTableSync::Search(
-					*_env,
-					_network->getKey(),
-					optional<string>(),
-					optional<string>(),
-					0, 0,
-					true, false, true,
-					UP_LINKS_LOAD_LEVEL
-				);
-				BOOST_FOREACH(shared_ptr<CommercialLine> line, _env->getRegistry<CommercialLine>())
+				CommercialLineTableSync::SearchResult lines(
+					CommercialLineTableSync::Search(
+						*_env,
+						_network->getKey(),
+						optional<string>(),
+						optional<string>(),
+						0,
+						optional<size_t>(),
+						true, false, true,
+						UP_LINKS_LOAD_LEVEL
+				)	);
+				BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				{
 					if(	ca &&
 						ca->getCommercialLine()->getKey() == line->getKey()

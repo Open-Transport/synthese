@@ -72,7 +72,6 @@ namespace synthese
 			static const std::string COL_COMMUNICATION_STATUS;
 			static const std::string COL_LOCALIZATION_STATUS;
 			
-			DisplayMonitoringStatusTableSync();
 
 
 			/** DisplayMonitoringStatus search.
@@ -84,11 +83,11 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType screenId = UNKNOWN_VALUE,
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByScreenId = true,
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL

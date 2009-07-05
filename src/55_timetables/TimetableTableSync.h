@@ -61,7 +61,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				uid bookId = UNKNOWN_VALUE
 				, bool orderByParent = true

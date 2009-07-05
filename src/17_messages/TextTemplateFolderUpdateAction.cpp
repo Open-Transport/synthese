@@ -89,7 +89,11 @@ namespace synthese
 			Env env;
 			TextTemplateTableSync::Search(
 				env,
-				ALARM_LEVEL_UNKNOWN, _folder->getParentId(), true, _name, _folder.get(), 0, 1
+				_folder->getParentId(),
+				true,
+				_name,
+				_folder.get(),
+				0, 1
 			);
 
 			if (!env.getRegistry<TextTemplate>().empty())

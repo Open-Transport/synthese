@@ -260,8 +260,7 @@ namespace synthese
 			virtual void rowsAdded(
 				SQLite* sqlite, 
 				SQLiteSync* sync,
-				const SQLiteResultSPtr& rows,
-				bool isFirstSync
+				const SQLiteResultSPtr& rows
 			) = 0;
 
 			virtual void rowsUpdated (SQLite* sqlite, 

@@ -64,7 +64,6 @@ namespace synthese
 		
 		void ModuleAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
 			bool objectWillBeCreatedLater
 		){
 			try

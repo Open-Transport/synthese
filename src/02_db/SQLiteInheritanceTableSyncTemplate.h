@@ -128,15 +128,16 @@ namespace synthese
 				return false;
 			}
 
-			virtual void rowsAdded (SQLite* sqlite, 
+			virtual void rowsAdded(
+				SQLite* sqlite,
 				SQLiteSync* sync,
-				const SQLiteResultSPtr& rows, bool isFirstSync = false)
-			{
+				const SQLiteResultSPtr& rows
+			){
 				while (rows->next ())
 				{
 					std::string subClassKey(_GetSubClassKey(rows));
 					boost::shared_ptr<K> tablesync(util::Factory<K>::create(subClassKey));
-					tablesync->rowsAdded(sqlite, sync, rows, isFirstSync);
+					tablesync->rowsAdded(sqlite, sync, rows);
 					if (tablesync->getRegisterInSubClassMap())
 						DBModule::AddSubClass(rows->getKey(), subClassKey);
 				}

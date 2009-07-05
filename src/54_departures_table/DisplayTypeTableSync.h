@@ -41,7 +41,8 @@ namespace synthese
 		/** DisplayType table synchronizer.
 			@ingroup m54LS refLS
 		*/
-		class DisplayTypeTableSync : public db::SQLiteRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>
+		class DisplayTypeTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -52,7 +53,6 @@ namespace synthese
 			static const std::string COL_MAX_STOPS_NUMBER;
 			static const std::string COL_TIME_BETWEEN_CHECKS;
 	
-			DisplayTypeTableSync();
 
 
 			////////////////////////////////////////////////////////////////////
@@ -80,12 +80,12 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2006
 			////////////////////////////////////////////////////////////////////
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				std::string nameLike = "%",
-				util::RegistryKeyType interfaceId = UNKNOWN_VALUE,
+				boost::optional<util::RegistryKeyType> interfaceId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
-				int number = UNKNOWN_VALUE,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,
 				bool orderByInterfaceName = false,
 				bool orderByRows = false,

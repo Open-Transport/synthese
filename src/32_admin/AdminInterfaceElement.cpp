@@ -381,7 +381,6 @@ namespace synthese
 			page->setActiveTab(getCurrentTab());
 			page->setFromParametersMap(
 				getParametersMap(),
-				false,
 				false
 			);
 			return page;

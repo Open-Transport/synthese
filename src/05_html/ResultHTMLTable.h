@@ -25,9 +25,12 @@
 
 #include <utility>
 #include <vector>
+#include <sstream>
 
 #include "HTMLTable.h"
 #include "HTMLForm.h"
+
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
@@ -40,7 +43,6 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<std::pair<std::string, std::string> > HeaderVector;
-			static const int			UNLIMITED_SIZE;
 			static const std::string	CSS_CLASS;
 
 			struct RequestParameters
@@ -57,16 +59,16 @@ namespace synthese
 					const std::string& parameter
 				) const;
 
-				int					maxSize;
-				int					first;
+				boost::optional<size_t> maxSize;
+				size_t					first;
 				std::string			orderField;
 				bool				raisingOrder;
 				std::string			_prefix;
 				
 				RequestParameters() 
-					: first(0)
-					, maxSize(30)
-					, raisingOrder(true)
+					: maxSize(30),
+					first(0),
+					raisingOrder(true)
 				{}
 
 
@@ -80,31 +82,12 @@ namespace synthese
 				void setFromParametersMap(
 					const std::map<std::string, std::string>& map,
 					const std::string defaultOrderField = std::string(),
-					int defaultMaxSize = UNLIMITED_SIZE,
+					boost::optional<size_t> defaultMaxSize = boost::optional<size_t>(),
 					bool defaultRaisingOrder = true,
 					const std::string& prefix = std::string()
 				);
 
 				std::map<std::string, std::string> getParametersMap() const;
-			};
-
-
-			struct ResultParameters
-			{
-				bool				next;
-				int					size;
-
-				template<class T>
-				void setFromResult(const RequestParameters& p, T& v)
-				{
-					if (p.maxSize != UNKNOWN_VALUE)
-					{
-						next = v.size() == p.maxSize + 1;
-						if (next && !v.empty())
-							v.pop_back();
-						size = v.size();
-					}
-				}
 			};
 
 		private:
@@ -114,7 +97,8 @@ namespace synthese
 			static const std::string _PARAMETER_MAX_SIZE;
 
 			RequestParameters	_requestParameters;
-			ResultParameters	_resultParameters;
+			bool				next;
+			size_t				size;
 
 		protected:
 			HTMLForm		_searchForm;
@@ -126,15 +110,92 @@ namespace synthese
 				@param actionRequest A request to launch by the table content (NULL = no action request)
 				@param selectFieldName A first col with radio buttons will be drawn, named by the parameter. If empty then no radio button.
 			*/
+			template<class T>
 			ResultHTMLTable(
-				const HeaderVector& header
-				, const HTMLForm& searchForm
-				, const RequestParameters& requestParameters
-				, const ResultParameters& resultParameters
-				, std::string iconPath = std::string()
-			);
+				const HeaderVector& header,
+				const HTMLForm& searchForm,
+				const RequestParameters& requestParameters,
+				T& v,
+				std::string iconPath = std::string()
+			):	HTMLTable(header.size(), CSS_CLASS),
+				_requestParameters(requestParameters),
+				_searchForm(searchForm)
+			{
+				if (requestParameters.maxSize)
+				{
+					next = v.size() == *requestParameters.maxSize + 1;
+					if (next && !v.empty())
+						v.pop_back();
+					size = v.size();
+				}
 
-			virtual std::string close();			
+				std::stringstream s;
+				int colspan(1);
+				for (HeaderVector::const_iterator it = header.begin(); it != header.end(); ++it)
+				{
+					if ((it+1) != header.end() && *(it+1) == *it)
+						++colspan;
+					else
+					{
+						s << "<th";
+						if (colspan > 1)
+							s << " colspan=\"" << colspan << "\"";
+						s << ">";
+	
+						// This column is sortable
+						if (!it->first.empty())
+						{
+							HTMLForm::HiddenFieldsMap h;
+							h.insert(make_pair(
+									_requestParameters._getParameterCode(_PARAMETER_ORDER_FIELD),
+									it->first
+							)	);
+							h.insert(make_pair(
+									_requestParameters._getParameterCode(_PARAMETER_RAISING_ORDER),
+									boost::lexical_cast<std::string>(
+										_requestParameters.orderField == it->first ?
+										!_requestParameters.raisingOrder :
+										true
+							)	)	);
+							s << HTMLModule::getHTMLLink(_searchForm.getURL(h), it->second);
+	
+							if (it->first == _requestParameters.orderField)
+							{
+								s << "&nbsp;" << HTMLModule::getHTMLImage(
+									iconPath + (_requestParameters.raisingOrder ? "up" : "down") + ".png",
+									_requestParameters.raisingOrder ? "V" : "^"
+								);
+							}						
+						}
+						else
+							s << it->second;
+						s << "</th>";
+						colspan = 1;
+					}
+				}
+				_headers = s.str();
+	
+				_searchForm.addHiddenField(
+					_requestParameters._getParameterCode(_PARAMETER_FIRST),
+					boost::lexical_cast<std::string>(_requestParameters.first)
+				);
+				_searchForm.addHiddenField(
+					_requestParameters._getParameterCode(_PARAMETER_ORDER_FIELD),
+					boost::lexical_cast<std::string>(_requestParameters.orderField)
+				);
+				_searchForm.addHiddenField(
+					_requestParameters._getParameterCode(_PARAMETER_RAISING_ORDER),
+					boost::lexical_cast<std::string>(_requestParameters.raisingOrder)
+				);
+				_searchForm.addHiddenField(
+					_requestParameters._getParameterCode(_PARAMETER_MAX_SIZE),
+					boost::lexical_cast<std::string>(_requestParameters.maxSize)
+				);
+			}
+			
+
+
+			virtual std::string close();
 		};
 	}
 }

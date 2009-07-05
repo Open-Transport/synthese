@@ -190,13 +190,6 @@ namespace synthese
 	}
 	namespace security
 	{
-		UserTableSync::UserTableSync()
-			: db::SQLiteNoSyncTableSyncTemplate<UserTableSync,User>()
-		{
-		}
-
-
-
 		shared_ptr<User> UserTableSync::getUserFromLogin(const string& login )
 		{
 			Env& env(Env::GetOfficialEnv());
@@ -224,7 +217,7 @@ namespace synthese
 
 
 
-		void UserTableSync::Search(
+		UserTableSync::SearchResult UserTableSync::Search(
 			Env& env,
 			const string login
 			, const string name
@@ -232,7 +225,8 @@ namespace synthese
 			, const string phone
 			, uid profileId
 			, tribool emptyLogin
-			, int first /*= 0*/, int number /*= 0*/
+			, int first /*= 0*/,
+			boost::optional<std::size_t> number /*= 0*/
 			, bool orderByLogin
 			, bool orderByName
 			, bool orderByProfileName
@@ -265,14 +259,14 @@ namespace synthese
 					TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << "," <<
 					TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC")
 				;
-			if (orderByName)
+			else if (orderByName)
 				query << " ORDER BY t." << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",t." << TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 

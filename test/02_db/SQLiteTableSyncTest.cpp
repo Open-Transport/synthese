@@ -172,8 +172,7 @@ public:
 
     void rowsAdded (SQLite* sqlite, 
 		    SQLiteSync* sync,
-		    const SQLiteResult& rows,
-	            bool isFirstSync = false) {}
+		    const SQLiteResult& rows) {}
 	
     void rowsUpdated (SQLite* sqlite, 
 		      SQLiteSync* sync,

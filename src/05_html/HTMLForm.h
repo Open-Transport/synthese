@@ -36,6 +36,7 @@
 #include <string>
 #include <sstream>
 #include <boost/foreach.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -355,8 +356,8 @@ namespace synthese
 				template<class T>
 				std::string getSelectInput(
 					const std::string& name,
-					const util::Registry<T>& registry,
-					const util::RegistryKeyType value,
+					const std::vector<boost::shared_ptr<T> >& registry,
+					boost::optional<boost::shared_ptr<T> > value,
 					const std::string& zeroLabel = std::string(),
 					const std::string& unknownLabel = std::string()
 				);
@@ -633,23 +634,16 @@ namespace synthese
 		template<class T>
 		std::string HTMLForm::getSelectInput(
 			const std::string& name,
-			const util::Registry<T>& registry,
-			const util::RegistryKeyType value,
+			const std::vector<boost::shared_ptr<T> >& registry,
+			const boost::optional<boost::shared_ptr<T> > value,
 			const std::string& zeroLabel /*= std::string()*/,
 			const std::string& unknownLabel /*= std::string()*/
 		){
 			std::stringstream s;
 
-			if (!_updateRight)
+			if (!_updateRight && value)
 			{
-				try
-				{
-					s << registry.get(value)->getName();
-				}
-				catch(util::ObjectNotFoundException<T>&)
-				{
-					s << "(inconnu)";
-				}
+				s << (*value)->getName();
 			}
 			else
 			{
@@ -657,21 +651,21 @@ namespace synthese
 				if (!unknownLabel.empty())
 				{
 					s << "<option value=\"" << UNKNOWN_VALUE << "\"";
-					if (value == static_cast<util::RegistryKeyType>(UNKNOWN_VALUE))
+					if (value == boost::optional<boost::shared_ptr<T> >())
 						s << " selected=\"selected\"";
 					s << ">" << unknownLabel << "</option>";
 				}
 				if (!zeroLabel.empty())
 				{
 					s << "<option value=\"0\"";
-					if (value == static_cast<util::RegistryKeyType>(0))
+					if (value && *value == boost::shared_ptr<T>())
 						s << " selected=\"selected\"";
 					s << ">" << zeroLabel << "</option>";
 				}
-				BOOST_FOREACH(boost::shared_ptr<const T> object, registry.getOrderedVector())
+				BOOST_FOREACH(boost::shared_ptr<const T> object, registry)
 				{
 					s << "<option value=\"" << object->getKey() << "\"";
-					if (object->getKey() == value)
+					if (value && object == *value)
 						s << " selected=\"selected\"";
 					s << ">" << object->getName() << "</option>";
 				}

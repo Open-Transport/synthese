@@ -52,7 +52,6 @@ namespace synthese
 			static const std::string COL_OBJECT_ID;
 			static const std::string COL_OBJECT2_ID;
 
-			DBLogEntryTableSync();
 
 
 			/** DBLog search.
@@ -66,11 +65,11 @@ namespace synthese
 				@param text text in the content (LIKE format)
 				@param first First DBLog object to answer
 				@param number Number of DBLog objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<DBLogEntry*> Vector of shared pointers to founded DBLog linked-objects.
+				@return Vector of shared pointers to found DBLog linked-objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				const std::string& logKey
 				, const time::DateTime& startDate
@@ -81,7 +80,7 @@ namespace synthese
 				util::RegistryKeyType id2,
 				const std::string& text
 				, int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByDate = true
 				, bool orderByUser = false
 				, bool orderByLevel = false

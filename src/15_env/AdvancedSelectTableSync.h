@@ -34,11 +34,17 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+	
 	namespace env
 	{
 		typedef std::map<std::pair<time::Date, int>, int> RunHours;
 
 		RunHours getCommercialLineRunHours(
+			util::Env& env,
 			util::RegistryKeyType id,
 			const boost::optional<time::Date>& startDate,
 			const boost::optional<time::Date>& endDate

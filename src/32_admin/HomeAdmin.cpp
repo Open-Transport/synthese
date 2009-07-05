@@ -53,8 +53,7 @@ namespace synthese
 
 		void HomeAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 		}
 		

@@ -96,7 +96,6 @@ namespace synthese
 		
 		void ResaCustomerAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
 			bool objectWillBeCreatedLater
 		){
 			try

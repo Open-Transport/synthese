@@ -57,8 +57,8 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScenarioFolderTableSync>::TABLE(
-				"t051_scenario_folder"
-				);
+			"t051_scenario_folder"
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ScenarioFolderTableSync>::_FIELDS[]=
 		{
@@ -110,7 +110,7 @@ namespace synthese
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
-               
+			 
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
@@ -132,19 +132,12 @@ namespace synthese
 	
 	namespace messages
 	{
-		ScenarioFolderTableSync::ScenarioFolderTableSync()
-			: SQLiteNoSyncTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>()
-		{
-		}
-
-
-
-		void ScenarioFolderTableSync::Search(
+		ScenarioFolderTableSync::SearchResult ScenarioFolderTableSync::Search(
 			Env& env,
 			optional<RegistryKeyType> parentFolderId
 			, optional<string> name
 			, int first /*= 0*/
-			, int number, /*= 0*/
+			, boost::optional<std::size_t> number, /*= 0*/
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -162,12 +155,12 @@ namespace synthese
 				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
 			}
 			query << " ORDER BY " << COL_NAME << " ASC";
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

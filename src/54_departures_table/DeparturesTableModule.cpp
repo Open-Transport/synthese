@@ -82,8 +82,10 @@ namespace synthese
 				m.push_back(make_pair(0, "(non défini)"));
 			}
 			Env env;
-			DisplayTypeTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<DisplayType> displayType, env.getRegistry<DisplayType>())
+			DisplayTypeTableSync::SearchResult types(
+				DisplayTypeTableSync::Search(env)
+			);
+			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)
 			{
 				m.push_back(make_pair(displayType->getKey(), displayType->getName()));
 			}

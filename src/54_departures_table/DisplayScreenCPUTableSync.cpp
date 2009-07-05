@@ -149,19 +149,12 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		DisplayScreenCPUTableSync::DisplayScreenCPUTableSync(
-		):	SQLiteRegistryTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>()
-		{
-		}
-
-
-
-		void DisplayScreenCPUTableSync::Search(
+		DisplayScreenCPUTableSync::SearchResult DisplayScreenCPUTableSync::Search(
 			Env& env,
 			boost::optional<RegistryKeyType> placeId,
 			boost::optional<std::string> macAddress,
 			int first /*= 0*/,
-			int number /*= 0*/,
+			boost::optional<std::size_t> number  /*= 0*/,
 			bool orderByName,
 			bool raisingOrder,
 			LinkLevel linkLevel
@@ -183,16 +176,16 @@ namespace synthese
 			{
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			}
-			if (number > 0)
+			if (number)
 			{
-				query << " LIMIT " << (number + 1);
+				query << " LIMIT " << (*number + 1);
 			}
 			if (first > 0)
 			{
 				query << " OFFSET " << first;
 			}
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

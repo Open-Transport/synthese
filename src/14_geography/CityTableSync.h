@@ -47,10 +47,9 @@ namespace synthese
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_CODE;
 
-			CityTableSync ();
-			~CityTableSync ();
 
-			static void Search(
+
+			static SearchResult Search(
 				util::Env& env,
 				boost::optional<std::string> exactName = boost::optional<std::string>(),
 				boost::optional<std::string> likeName = boost::optional<std::string>(),

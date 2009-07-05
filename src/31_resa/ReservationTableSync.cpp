@@ -170,16 +170,11 @@ namespace synthese
 
 	namespace resa
 	{
-		ReservationTableSync::ReservationTableSync()
-			: SQLiteNoSyncTableSyncTemplate<ReservationTableSync,Reservation>()
-		{
-		}
-
-		void ReservationTableSync::Search(
+		ReservationTableSync::SearchResult ReservationTableSync::Search(
 			Env& env,
 			RegistryKeyType transactionId
 			, int first /*= 0*/
-			, int number /*= 0*/,
+			, boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -190,15 +185,17 @@ namespace synthese
 				<< COL_TRANSACTION_ID << "=" << transactionId
 			;
 			query << " ORDER BY " << COL_DEPARTURE_TIME;
-			if (number > 0)
-				query << " LIMIT " << lexical_cast<string>(number + 1);
+			if (number)
+				query << " LIMIT " << lexical_cast<string>(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << lexical_cast<string>(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
-		void ReservationTableSync::Search(
+
+
+		ReservationTableSync::SearchResult ReservationTableSync::Search(
 			util::Env& env,
 			const util::RegistryKeyType commercialLineId,
 			const Date& day,
@@ -206,7 +203,7 @@ namespace synthese
 			bool orderByService,
 			bool raisingOrder, 
 			int first /*= 0 */,
-			int number /*= 0*/,
+			boost::optional<std::size_t> number  /*= 0*/,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		){
 			stringstream query;
@@ -227,17 +224,12 @@ namespace synthese
 			{
 				query << " ORDER BY substr(s." << ScheduledServiceTableSync::COL_SCHEDULES << ",0,17) " << (raisingOrder ? "ASC" : "DESC");
 			}
-			if (number > 0)
-				query << " LIMIT " << lexical_cast<string>(number + 1);
+			if (number)
+				query << " LIMIT " << lexical_cast<string>(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << lexical_cast<string>(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
-		}
-
-		ReservationTableSync::~ReservationTableSync()
-		{
-
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

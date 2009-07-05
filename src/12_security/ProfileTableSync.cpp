@@ -122,9 +122,9 @@ namespace synthese
 				query
 					<< "REPLACE INTO " << TABLE.NAME
 					<< " VALUES(" 
-					<< Conversion::ToString(profile->getKey())
+					<< profile->getKey()
 					<< "," << Conversion::ToSQLiteString(profile->getName())
-					<< "," << ((profile == NULL) ? "0" : Conversion::ToString(profile->getKey()))
+					<< "," << (profile->getParent() == NULL ? 0 : profile->getParent()->getKey())
 					<< "," << Conversion::ToSQLiteString(ProfileTableSync::getRightsString(profile))
 					<< ")";
 				sqlite->execUpdate(query.str());
@@ -148,18 +148,12 @@ namespace synthese
 
 	namespace security
 	{
-		ProfileTableSync::ProfileTableSync()
-			: db::SQLiteRegistryTableSyncTemplate<ProfileTableSync,Profile>()
-		{
-		}
-
-
-		void ProfileTableSync::Search(
+		ProfileTableSync::SearchResult ProfileTableSync::Search(
 			Env& env,
 			string name
 			, string right
 			, int first /*= 0*/
-			, int number /*= -1*/ 
+			, boost::optional<std::size_t> number  /*= -1*/ 
 			, bool orderByName
 			, bool raisingOrder,
 			LinkLevel linkLevel
@@ -175,21 +169,21 @@ namespace synthese
 				query << " AND " << TABLE_COL_RIGHTS_STRING << " LIKE " << Conversion::ToSQLiteString(right);
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
 
-		void ProfileTableSync::Search(
+		ProfileTableSync::SearchResult ProfileTableSync::Search(
 			Env& env,
 			RegistryKeyType parentId,
 			int first /*= 0*/,
-			int number, /*= -1*/
+			boost::optional<std::size_t> number , /*= -1*/
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -198,12 +192,12 @@ namespace synthese
 				<< " FROM " << TABLE.NAME					
 				<< " WHERE " 
 				<< TABLE_COL_PARENT_ID << "=" << parentId;
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
@@ -225,6 +219,8 @@ namespace synthese
 			}
 			return s.str();
 		}
+
+
 
 		void ProfileTableSync::setRightsFromString(Profile* profile, const string& text )
 		{

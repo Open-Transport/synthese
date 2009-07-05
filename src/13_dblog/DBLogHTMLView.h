@@ -82,7 +82,6 @@ namespace synthese
 			bool							_fixedObjectId;
 			bool							_fixedObjectId2;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
 			
 			std::string _getParameterName(const std::string& parameter) const;
 		public:

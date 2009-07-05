@@ -114,26 +114,12 @@ namespace synthese
 
     namespace env
     {
-		PhysicalStopTableSync::PhysicalStopTableSync ()
-			: SQLiteRegistryTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>()
-		{
-		}
-
-
-
-		PhysicalStopTableSync::~PhysicalStopTableSync ()
-		{
-
-		}
-
-
-
-		void PhysicalStopTableSync::Search(
+		PhysicalStopTableSync::SearchResult PhysicalStopTableSync::Search(
 			Env& env, 
 			uid placeId /*= UNKNOWN_VALUE */,
 			string operatorCode,
 			int first /*= 0 */,
-			int number /*= 0 */,
+			boost::optional<std::size_t> number  /*= 0 */,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -145,12 +131,12 @@ namespace synthese
 			;
 			if (placeId != UNKNOWN_VALUE)
 				query << " AND " << COL_PLACEID << "=" << placeId;
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

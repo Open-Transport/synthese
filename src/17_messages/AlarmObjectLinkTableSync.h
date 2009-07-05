@@ -79,23 +79,24 @@ namespace synthese
 				util::RegistryKeyType alarmId,
 				const std::string& recipientKey,
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 			/** Search of alarm object links for a specified alarm in all the recipient types.
+				@param env Environment to populate
 				@param alarm Alarm to the object must be liked with
 				@param first First  object to answer
 				@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<*> Founded  objects.
+				@return Found objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType alarmId,
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
@@ -120,7 +121,7 @@ namespace synthese
 			util::RegistryKeyType alarmId,
 			const std::string& recipientKey,
 			int first /*= 0*/,
-			int number /*= 0*/,
+			boost::optional<std::size_t> number  /*= 0*/,
 			util::LinkLevel linkLevel
 		){
 			std::stringstream query;
@@ -131,10 +132,10 @@ namespace synthese
 				<< " WHERE " 
 					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId)
 					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToSQLiteString(recipientKey);
-			if (number > 0)
-			    query << " LIMIT " << util::Conversion::ToString(number + 1);
+			if (number)
+			    query << " LIMIT " << (*number + 1);
 			if (first > 0)
-			    query << " OFFSET " << util::Conversion::ToString(first);
+			    query << " OFFSET " << first;
 
 			try
 			{

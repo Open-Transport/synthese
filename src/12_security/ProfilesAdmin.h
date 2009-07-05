@@ -84,14 +84,11 @@ namespace synthese
 			std::string _searchName;
 			std::string _searchRightName;
 
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
-			ProfilesAdmin();
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions ,
 				bool objectWillBeCreatedLater
 			);
 			

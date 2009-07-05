@@ -95,17 +95,14 @@ namespace synthese
 			std::string									_searchSurname;
 			boost::shared_ptr<const Profile>			_searchProfile;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
 
 		public:
-			UsersAdmin();
 
 			/** Initialization of the parameters from a request.
 				@param map The request parameters to use at the initialization.
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
 				bool objectWillBeCreatedLater
 			);
 			

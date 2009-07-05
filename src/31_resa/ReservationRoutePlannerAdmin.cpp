@@ -109,8 +109,7 @@ namespace synthese
 		
 		void ReservationRoutePlannerAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_startCity = map.getString(PARAMETER_START_CITY, false, FACTORY_KEY);
 			_startPlace = map.getString(PARAMETER_START_PLACE, false, FACTORY_KEY);

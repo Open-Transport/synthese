@@ -184,16 +184,11 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		SiteTableSync::SiteTableSync()
-			: db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>()
-		{
-		}
-
-
-		void SiteTableSync::Search(
+		SiteTableSync::SearchResult SiteTableSync::Search(
 			Env& env,
 			std::string name
-			, int first /*= 0*/, int number /*= 0*/ 
+			, int first /*= 0*/,
+			boost::optional<std::size_t> number
 			, bool orderByName
 			, bool raisingOrder,
 			LinkLevel linkLevel
@@ -208,12 +203,12 @@ namespace synthese
 				;
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

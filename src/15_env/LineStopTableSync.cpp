@@ -193,18 +193,12 @@ namespace synthese
 
 	namespace env
 	{
-		LineStopTableSync::LineStopTableSync()
-			: SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>()
-		{
-		}
-
-
-		void LineStopTableSync::Search(
+		LineStopTableSync::SearchResult LineStopTableSync::Search(
 			Env& env,
 			uid lineId
 			, uid physicalStopId
 			, int first /*= 0*/
-			, int number /*= 0*/
+			, boost::optional<std::size_t> number
 			, bool orderByRank
 			, bool raisingOrder,
 			LinkLevel linkLevel
@@ -220,12 +214,12 @@ namespace synthese
 				query << " AND " << COL_PHYSICALSTOPID << "=" << physicalStopId;
 			if (orderByRank)
 				query << " ORDER BY " << COL_RANKINPATH << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

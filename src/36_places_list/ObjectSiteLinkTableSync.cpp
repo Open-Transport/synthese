@@ -133,22 +133,13 @@ namespace synthese
 	
 	namespace transportwebsite
 	{
-		ObjectSiteLinkTableSync::ObjectSiteLinkTableSync()
-			: SQLiteRegistryTableSyncTemplate<ObjectSiteLinkTableSync, ObjectSiteLink>()
-		{
-		}
-
-
-
-		void ObjectSiteLinkTableSync::Search(
+		ObjectSiteLinkTableSync::SearchResult ObjectSiteLinkTableSync::Search(
 			Env& env,
 			uid siteId
 			, int first /*= 0*/
-			, int number, /*= 0*/
+			, boost::optional<std::size_t> number, /*= 0*/
 			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -158,12 +149,12 @@ namespace synthese
 			{
 				query << " AND " << COL_SITE_ID << "=" << siteId;
 			}
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

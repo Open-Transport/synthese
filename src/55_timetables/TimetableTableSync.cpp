@@ -115,9 +115,10 @@ namespace synthese
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				Env env;
-				TimetableRowTableSync::Search(env, object->getKey());
-				BOOST_FOREACH(shared_ptr<TimetableRow> row, env.getRegistry<TimetableRow>())
+				TimetableRowTableSync::SearchResult rows(
+					TimetableRowTableSync::Search(env, object->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
 				{
 					object->addRow(*row);
 				}
@@ -166,7 +167,7 @@ namespace synthese
 
 
 
-		void TimetableTableSync::Search(
+		TimetableTableSync::SearchResult TimetableTableSync::Search(
 			Env& env,
 			uid bookId
 			, bool orderByParent
@@ -201,7 +202,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 

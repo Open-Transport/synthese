@@ -70,14 +70,11 @@ namespace synthese
 		
 		void TestMapAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
 			bool objectWillBeCreatedLater
 		){
 			_dataXml = map.getString(PARAMETER_DATA_XML, false, FACTORY_KEY);
 			_queryXml = map.getString(PARAMETER_QUERY_XML, false, FACTORY_KEY);
 			_useEnvironment = map.getBool(PARAMETER_USE_ENVIRONMENT, false, true, FACTORY_KEY);
-			
-			if(!doDisplayPreparationActions) return;
 		}
 		
 		

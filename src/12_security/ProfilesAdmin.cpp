@@ -76,8 +76,7 @@ namespace synthese
 		
 		void ProfilesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			// Profile name
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
@@ -87,20 +86,6 @@ namespace synthese
 
 			// Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
-			
-			if(!doDisplayPreparationActions) return;
-
-			// Search
-			ProfileTableSync::Search(
-				_getEnv(),
-				"%"+_searchName+"%"
-				, "%"+_searchRightName+"%"
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-				, _requestParameters.raisingOrder
-			);
-			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<Profile>());
 		}
 		
 		
@@ -137,6 +122,18 @@ namespace synthese
 				
 			stream << "<h1>Résultats de la recherche</h1>";
 
+			// Search
+			ProfileTableSync::SearchResult profiles(
+				ProfileTableSync::Search(
+					_getEnv(),
+					"%"+_searchName+"%"
+					, "%"+_searchRightName+"%"
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+					, _requestParameters.raisingOrder
+			)	);
+
 			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
 			v.push_back(make_pair(string(), string("Résumé")));
@@ -145,7 +142,7 @@ namespace synthese
 				v,
 				searchRequest.getHTMLForm(),
 				_requestParameters,
-				_resultParameters,
+				profiles,
 				addProfileRequest.getHTMLForm("add"),
 				AddProfileAction::PARAMETER_TEMPLATE_ID,
 				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
@@ -158,7 +155,7 @@ namespace synthese
 			stream << t.open();
 			
 			// Profiles loop
-			BOOST_FOREACH(shared_ptr<Profile> profile, _getEnv().getRegistry<Profile>())
+			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
 				profileRequest.getPage()->setProfile(profile);
 				deleteProfileRequest.getAction()->setProfile(profile);
@@ -201,12 +198,8 @@ namespace synthese
 			return _request.isAuthorized<SecurityRight>(READ);
 		}
 
-		ProfilesAdmin::ProfilesAdmin()
-			: AdminInterfaceElementTemplate<ProfilesAdmin>()
-		{
-
-		}
-
+		
+		
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
 			const string& moduleKey,
 			shared_ptr<const AdminInterfaceElement> currentPage,
@@ -239,10 +232,13 @@ namespace synthese
 				dynamic_cast<const ProfileAdmin*>(currentPage.get())
 			);
 			
-			BOOST_FOREACH(shared_ptr<Profile> profile, _getEnv().getRegistry<Profile>())
+			ProfileTableSync::SearchResult profiles(
+				ProfileTableSync::Search(
+					_getEnv(),
+					0
+			)	);
+			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
-				if(profile->getParent()) continue;
-				
 				if(	pa &&
 					pa->getProfile()->getKey() == profile->getKey()
 				){

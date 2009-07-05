@@ -153,12 +153,7 @@ namespace synthese
 		}
 	}
 
-		namespace pt
-		{
-			PTUseRuleTableSync::PTUseRuleTableSync()
-				: SQLiteRegistryTableSyncTemplate<PTUseRuleTableSync,PTUseRule>()
-			{
-			}
-
+	namespace pt
+	{
 	}
 }

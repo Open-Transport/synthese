@@ -125,8 +125,7 @@ namespace synthese
 
 		void DisplayAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 
@@ -143,32 +142,6 @@ namespace synthese
 				;
 				_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
 				_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
-
-				if(!doDisplayPreparationActions) return;
-
-				if(_displayScreen->getLocalization() != NULL)
-				{
-					PhysicalStopTableSync::Search(
-						_getEnv(),
-						_displayScreen->getLocalization()->getKey(),
-						string("%"),
-						0, 0, UP_LINKS_LOAD_LEVEL
-					);
-					
-					BOOST_FOREACH(
-						const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
-						_displayScreen->getLocalization()->getPhysicalStops()
-					){
-						LineStopTableSync::Search(
-							_getEnv(),
-							UNKNOWN_VALUE,
-							it.first,
-							0, 0,
-							true, true,
-							UP_LINKS_LOAD_LEVEL
-						);
-					}
-				}
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
@@ -177,12 +150,6 @@ namespace synthese
 			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 			{
 				throw AdminParametersException("Place not found");
-			}
-
-			// CPU search
-			if (_displayScreen->getLocalization() != NULL)
-			{
-				DisplayScreenCPUTableSync::Search(_getEnv(), _displayScreen->getLocalization()->getKey());
 			}
 		}
 		
@@ -208,6 +175,33 @@ namespace synthese
 				Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(_displayScreen->getKey())
 			);
 			
+			if(_displayScreen->getLocalization() != NULL)
+			{
+				PhysicalStopTableSync::Search(
+					_getEnv(),
+					_displayScreen->getLocalization()->getKey(),
+					string("%"),
+					0,
+					optional<size_t>(),
+					UP_LINKS_LOAD_LEVEL
+				);
+				
+				BOOST_FOREACH(
+					const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
+					_displayScreen->getLocalization()->getPhysicalStops()
+				){
+					LineStopTableSync::Search(
+						_getEnv(),
+						UNKNOWN_VALUE,
+						it.first,
+						0,
+						optional<size_t>(),
+						true, true,
+						UP_LINKS_LOAD_LEVEL
+					);
+				}
+			}
+			
 			////////////////////////////////////////////////////////////////////
 			// TECHNICAL TAB
 			if (openTabContent(stream, TAB_TECHNICAL))
@@ -227,7 +221,14 @@ namespace synthese
 
 				stream << t.open();
 				stream << t.title("Emplacement");
-				stream << t.cell("Zone d'arrêt", _displayScreen->getLocalization()->getFullName());
+				if(_displayScreen->getLocalization())
+				{
+					stream << t.cell("Zone d'arrêt", _displayScreen->getLocalization()->getFullName());
+				}
+				else
+				{
+					stream << t.cell("Localisation","Stock");
+				}
 				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getLocalizationComment()));
 
 				stream << t.title("Données techniques");
@@ -245,30 +246,43 @@ namespace synthese
 				
 				stream << t.title("Connexion");
 				
-				if (_displayScreen->getLocalization() != NULL && !_getEnv().getRegistry<DisplayScreenCPU>().empty())
+				if (_displayScreen->getLocalization() != NULL)
 				{
-					AdminFunctionRequest<DisplayScreenCPUAdmin> goCPURequest(_request);
-					goCPURequest.getPage()->setCPU(
-						_getEnv().getSPtr(_displayScreen->getCPU())
-					);
+					// CPU search
+					DisplayScreenCPUTableSync::SearchResult cpus(
+						DisplayScreenCPUTableSync::Search(
+							_getEnv(),
+							_displayScreen->getLocalization()->getKey()
+					)	);
 					
-					stream << t.cell(
-						"Unité centrale",
-						t.getForm().getSelectInput(
-							UpdateDisplayScreenAction::PARAMETER_CPU,
-							_getEnv().getRegistry<DisplayScreenCPU>(),
-							_displayScreen->getCPU() ? _displayScreen->getCPU()->getKey() : RegistryKeyType(0),
-							"(pas d'unité centrale)"
-						) + " " +(
-							_displayScreen->getCPU() ?
-							goCPURequest.getHTMLForm().getLinkButton(
-									"Ouvrir",
-									string(),
-									"server.png"
-								) :
-							string()
-						)
-					);
+					if(!cpus.empty())
+					{
+						AdminFunctionRequest<DisplayScreenCPUAdmin> goCPURequest(_request);
+						goCPURequest.getPage()->setCPU(
+							_getEnv().getSPtr(_displayScreen->getCPU())
+						);
+						
+						stream << t.cell(
+							"Unité centrale",
+							t.getForm().getSelectInput(
+								UpdateDisplayScreenAction::PARAMETER_CPU,
+								cpus,
+								optional<shared_ptr<DisplayScreenCPU> >(
+									_getEnv().getEditableSPtr(
+										const_cast<DisplayScreenCPU*>(_displayScreen->getCPU())
+								)	),
+								"(pas d'unité centrale)"
+							) + " " +(
+								_displayScreen->getCPU() ?
+								goCPURequest.getHTMLForm().getLinkButton(
+										"Ouvrir",
+										string(),
+										"server.png"
+									) :
+								string()
+							)
+						);
+					}
 				}
 				stream <<
 					t.cell(
@@ -986,25 +1000,68 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			if(	_request.isAuthorized<ArrivalDepartureTableRight>(
+			if(	_displayScreen->getLocalization() &&
+				_request.isAuthorized<ArrivalDepartureTableRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL,
 					lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+				) ||
+				!_displayScreen->getLocalization() &&
+				_request.isAuthorized<ArrivalDepartureTableRight>(
+					READ,
+					UNKNOWN_RIGHT_LEVEL
 			)	){
-				bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+				bool writeRight(
+					_displayScreen->getLocalization() ?
+					_request.isAuthorized<ArrivalDepartureTableRight>(
+						WRITE,
+						UNKNOWN_RIGHT_LEVEL,
+						Conversion::ToString(_displayScreen->getLocalization()->getKey())
+					) :
+					_request.isAuthorized<ArrivalDepartureTableRight>(
+						WRITE,
+						UNKNOWN_RIGHT_LEVEL
+				)	);
 				_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writeRight, "cog.png"));
 			}
 
 			if(	_displayScreen->getLocalization() &&
-				_request.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()))
+				_request.isAuthorized<DisplayMaintenanceRight>(
+					READ,
+					UNKNOWN_RIGHT_LEVEL,
+					lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+				) ||
+				!_displayScreen->getLocalization() &&
+				_request.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL)
 			){
-				bool writeRight(_request.isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+				bool writeRight(
+					_displayScreen->getLocalization() ?
+					_request.isAuthorized<DisplayMaintenanceRight>(
+						WRITE,
+						UNKNOWN_RIGHT_LEVEL,
+						lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+					) :
+					_request.isAuthorized<DisplayMaintenanceRight>(
+						WRITE,
+						UNKNOWN_RIGHT_LEVEL
+				)	);
 				_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writeRight, "wrench.png"));
 			}
 
-			if (_request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())))
-			{
-				bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+			if (_displayScreen->getLocalization() &&
+				_request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
+				!_displayScreen->getLocalization() &&
+				_request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL)
+			){
+				bool writeRight(
+					_displayScreen->getLocalization() ?
+					_request.isAuthorized<ArrivalDepartureTableRight>(
+						WRITE,
+						UNKNOWN_RIGHT_LEVEL,
+						lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+					) :
+					_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL)
+				);
 				_tabs.push_back(Tab("Sélection", TAB_CONTENT, writeRight, "times_display.png"));
 				_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
 				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));

@@ -75,11 +75,11 @@ namespace synthese
 
 		void DeleteScenarioAction::run()
 		{
-
 			// The action on the alarms
-			Env env;
-			AlarmTemplateInheritedTableSync::Search(env,_scenario->getKey());
-			BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, env.getRegistry<AlarmTemplate>())
+			AlarmTemplateInheritedTableSync::SearchResult alarms(
+				AlarmTemplateInheritedTableSync::Search(*_env,_scenario->getKey())
+			);
+			BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
 			{
 				AlarmObjectLinkTableSync::Remove(alarm->getKey());
 				AlarmTableSync::Remove(alarm->getKey());

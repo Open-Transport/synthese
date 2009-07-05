@@ -62,7 +62,6 @@ namespace synthese
 			static const std::string COL_BIRTH_DATE;
 
 
-			UserTableSync();
 
 			/** Gets a user in the database, founded by his login.
 				@param login login to search
@@ -87,13 +86,12 @@ namespace synthese
 				@param orderByName Order the results by name and surname
 				@param orderByProfile Order the results by profile name
 				@param raisingOrder True = Ascendant order, false = descendant order
-				@return vector<share_ptr<User>> Founded vector of shared pointers to User linked-objects. 
-				@warning only one of the orderBy parameters must be true, or no one. More of one true value will throw an exception.
+				@return Found vector of shared pointers to User linked-objects. 
 				@throw UserTableSyncException If the query has failed (does not occurs in normal case)
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				const std::string login = std::string("%")
 				, const std::string name = std::string("%")
@@ -102,7 +100,7 @@ namespace synthese
 				, uid profileId = UNKNOWN_VALUE
 				, boost::logic::tribool emptyLogin = boost::logic::indeterminate
 				, int first = 0
-				, int number = -1
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByLogin = true
 				, bool orderByName = false
 				, bool orderByProfileName = false

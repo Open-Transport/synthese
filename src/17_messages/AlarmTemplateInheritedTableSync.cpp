@@ -92,20 +92,11 @@ namespace synthese
 
 	namespace messages
 	{
-
-		AlarmTemplateInheritedTableSync::AlarmTemplateInheritedTableSync()
-			: SQLiteInheritedNoSyncTableSyncTemplate<AlarmTableSync, AlarmTemplateInheritedTableSync, AlarmTemplate>()
-		{
-
-		}
-
-
-
-		void AlarmTemplateInheritedTableSync::Search(
+		AlarmTemplateInheritedTableSync::SearchResult AlarmTemplateInheritedTableSync::Search(
 			Env& env,
 			RegistryKeyType scenarioId,
 			int first /*= 0 */,
-			int number /*= 0 */,
+			boost::optional<std::size_t> number /*= 0 */,
 			bool orderByLevel /*= false */,
 			bool raisingOrder /*= false*/,
 			LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
@@ -117,12 +108,12 @@ namespace synthese
 				<< " WHERE "
 				<< COL_IS_TEMPLATE << "=1"
 				<< " AND " << COL_SCENARIO_ID << "=" << scenarioId;
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 			
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

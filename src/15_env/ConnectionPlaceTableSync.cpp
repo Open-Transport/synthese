@@ -175,21 +175,7 @@ namespace synthese
 
 	namespace env
 	{
-		ConnectionPlaceTableSync::ConnectionPlaceTableSync ()
-		: SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace> ()
-		{
-		}
-
-
-
-		ConnectionPlaceTableSync::~ConnectionPlaceTableSync ()
-		{
-
-		}
-
-
-
-		void ConnectionPlaceTableSync::Search(
+		ConnectionPlaceTableSync::SearchResult ConnectionPlaceTableSync::Search(
 			Env& env,
 			RegistryKeyType cityId /*= UNKNOWN_VALUE */
 			, logic::tribool mainConnectionOnly
@@ -218,7 +204,7 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

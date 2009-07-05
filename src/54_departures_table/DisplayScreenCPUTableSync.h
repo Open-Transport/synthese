@@ -55,27 +55,23 @@ namespace synthese
 			static const std::string COL_IS_ONLINE;
 			static const std::string COL_MAINTENANCE_MESSAGE;
 
-
-		public:
-
-			DisplayScreenCPUTableSync();
-
-
+			
+			
 			////////////////////////////////////////////////////////////////////
 			/// DisplayScreenCPU search.
 			///	@param env Environment to populate
 			///	@param first First DisplayScreenCPU object to answer
 			///	@param number Number of DisplayScreenCPU objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 			///	@param raisingOrder true = ascendant order, false = descendant order (default = true)
-			///	@return vector<DisplayScreenCPU> Founded DisplayScreenCPU objects.
+			///	@return Found DisplayScreenCPU objects.
 			///	@author Hugues Romain
 			///	@date 2008
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> placeId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<std::string> macAddress = boost::optional<std::string>(),
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL

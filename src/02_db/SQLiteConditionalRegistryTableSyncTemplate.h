@@ -67,8 +67,7 @@ namespace synthese
 			void rowsAdded(
 				SQLite* sqlite,
 				SQLiteSync* sync,
-				const SQLiteResultSPtr& rows,
-				bool isFirstSync = false
+				const SQLiteResultSPtr& rows
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
 				util::Registry<T>& registry(env.getEditableRegistry<T>());

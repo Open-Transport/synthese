@@ -53,35 +53,34 @@ namespace synthese
 			/// Action to do on row insertion / replacement.
 			///	This method loads the object in physical memory.
 			void rowsAdded(
-				SQLite* sqlite,
-				SQLiteSync* sync,
-				const SQLiteResultSPtr& rows,
-				bool isFirstSync = false
-				){
-					util::Env& env(util::Env::GetOfficialEnv());
-					util::Registry<T>& registry(env.getEditableRegistry<T>());
-					while (rows->next ())
+				SQLite* sqlite __attribute__ ((unused)),
+				SQLiteSync* sync __attribute__ ((unused)),
+				const SQLiteResultSPtr& rows
+			){
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
+				while (rows->next ())
+				{
+					try
 					{
-						try
+						if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
 						{
-							if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
-							{
-								boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
-								SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get());
-								Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-							}
-							else
-							{
-								boost::shared_ptr<T> object(K::GetNewObject(rows));
-								Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-								registry.add(object);
-							}
+							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get());
+							Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
-						catch(util::Exception& e)
+						else
 						{
-							util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
+							boost::shared_ptr<T> object(K::GetNewObject(rows));
+							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							registry.add(object);
 						}
 					}
+					catch(util::Exception& e)
+					{
+						util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
+					}
+				}
 			}
 
 
@@ -92,28 +91,28 @@ namespace synthese
 			/// already be loaded.
 			/// @throws nothing
 			void rowsUpdated(
-				SQLite* sqlite
-				, SQLiteSync* sync
+				SQLite* sqlite __attribute__ ((unused))
+				, SQLiteSync* sync __attribute__ ((unused))
 				, const SQLiteResultSPtr& rows
-				){
-					util::Env& env(util::Env::GetOfficialEnv());
-					util::Registry<T>& registry(env.getEditableRegistry<T>());
-					while (rows->next ())
+			){
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
+				while (rows->next ())
+				{
+					try
 					{
-						try
+						if (registry.contains(rows->getKey()))
 						{
-							if (registry.contains(rows->getKey()))
-							{
-								boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
-								Unlink(address.get());
-								Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-							}
-						}
-						catch (util::Exception& e)
-						{
-							util::Log::GetInstance().warn("Error on load after row update : ", e);
+							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
+							Unlink(address.get());
+							Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 					}
+					catch (util::Exception& e)
+					{
+						util::Log::GetInstance().warn("Error on load after row update : ", e);
+					}
+				}
 			}
 
 
@@ -123,28 +122,28 @@ namespace synthese
 			/// This method deletes the corresponding object in ram and runs 
 			/// all necessary cleaning actions.
 			void rowsRemoved(
-				SQLite* sqlite
-				, SQLiteSync* sync
+				SQLite* sqlite __attribute__ ((unused))
+				, SQLiteSync* sync __attribute__ ((unused))
 				, const SQLiteResultSPtr& rows
-				){
-					util::Env& env(util::Env::GetOfficialEnv());
-					util::Registry<T>& registry(env.getEditableRegistry<T>());
-					while (rows->next ())
+			){
+				util::Env& env(util::Env::GetOfficialEnv());
+				util::Registry<T>& registry(env.getEditableRegistry<T>());
+				while (rows->next ())
+				{
+					try
 					{
-						try
+						util::RegistryKeyType id(rows->getKey());
+						if (registry.contains(id))
 						{
-							util::RegistryKeyType id(rows->getKey());
-							if (registry.contains(id))
-							{
-								SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get());
-								registry.remove(id);
-							}
-						}
-						catch (util::Exception& e)
-						{
-							util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
+							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get());
+							registry.remove(id);
 						}
 					}
+					catch (util::Exception& e)
+					{
+						util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
+					}
+				}
 			}
 		};
 	}

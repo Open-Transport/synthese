@@ -100,8 +100,7 @@ namespace synthese
 		
 		void BookableCommercialLineAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 
 			// Date
@@ -135,16 +134,20 @@ namespace synthese
 			}
 
 			// Routes reading
-			LineTableSync::Search(_getEnv(), _line->getKey());
-			BOOST_FOREACH(shared_ptr<Line> line, _getEnv().getRegistry<Line>())
+			LineTableSync::SearchResult routes(
+				LineTableSync::Search(_getEnv(), _line->getKey())
+			);
+			BOOST_FOREACH(shared_ptr<Line> line, routes)
 			{
 				LineStopTableSync::Search(
 					_getEnv(),
 					line->getKey(),
 					UNKNOWN_VALUE,
-					0, 0, true, true,
+					0,
+					optional<size_t>(),
+					true, true,
 					UP_LINKS_LOAD_LEVEL
-					);
+				);
 			}
 
 			optional<RegistryKeyType> sid(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE));
@@ -156,26 +159,6 @@ namespace synthese
 			{
 				throw RequestException("Service not found");
 			}			
-
-			if(!doDisplayPreparationActions) return;
-
-			// Services reading
-			ScheduledServiceTableSync::Search(
-				_getEnv(),
-				optional<RegistryKeyType>(),
-				_line->getKey(),
-				optional<RegistryKeyType>(),
-				_date,
-				_hideOldServices,
-				0, 0, true, true, UP_LINKS_LOAD_LEVEL
-			);
-
-			// Reservations reading
-			ReservationTableSync::Search(
-				_getEnv(),
-				_line->getKey(),
-				_date
-			);
 		}
 		
 		
@@ -215,6 +198,8 @@ namespace synthese
 
 			AdminFunctionRequest<BookableCommercialLineAdmin> printRequest(_request);
 			
+			
+
 			// Local variables
 			DateTime now(TIME_CURRENT);
 
@@ -260,10 +245,31 @@ namespace synthese
 			HTMLTable t(c,"adminresults");
 			stream << t.open();
 
+			// Reservations reading
+			ReservationTableSync::SearchResult sqlreservations(
+				ReservationTableSync::Search(
+					_getEnv(),
+					_line->getKey(),
+					_date
+			)	);
+			// Services reading
+			ScheduledServiceTableSync::SearchResult services(
+				ScheduledServiceTableSync::Search(
+					_getEnv(),
+					optional<RegistryKeyType>(),
+					_line->getKey(),
+					optional<RegistryKeyType>(),
+					_date,
+					_hideOldServices,
+					0,
+					optional<size_t>(),
+					true, true, UP_LINKS_LOAD_LEVEL
+			)	);
 
 			// Sort reservations
+			/// @todo See if the sort operation can be done by the SQL request directly
 			map<const ScheduledService*, ServiceReservations> reservations;
-			BOOST_FOREACH(shared_ptr<const Reservation> resa, _getEnv().getRegistry<Reservation>())
+			BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
 			{
 				const ScheduledService* service(_getEnv().getRegistry<ScheduledService>().get(resa->getServiceId()).get());
 				if(reservations.find(service) == reservations.end())
@@ -274,7 +280,7 @@ namespace synthese
 			}
 
 			// Display of services
-			BOOST_FOREACH(shared_ptr<const ScheduledService> service, _getEnv().getRegistry<ScheduledService>().getOrderedVector())
+			BOOST_FOREACH(shared_ptr<const ScheduledService> service, services)
 			{
 				const ServiceReservations::ReservationsList& serviceReservations (reservations[service.get()].getReservations());
 				int serviceSeatsNumber(reservations[service.get()].getSeatsNumber());

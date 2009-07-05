@@ -106,8 +106,7 @@ namespace synthese
 
 		void DisplaySearchAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			setPlace(map.getUid(PARAMETER_SEARCH_LOCALIZATION_ID, false, FACTORY_KEY));
 			if (!_place)
@@ -145,47 +144,49 @@ namespace synthese
 		}
 
 
-		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
-					const FunctionRequest<admin::AdminRequest>& _request
+		void DisplaySearchAdmin::display(
+			ostream& stream,
+			interfaces::VariablesMap& variables,
+			const FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			
-			html::ResultHTMLTable::ResultParameters			_resultParameters;
-			DisplayScreenTableSync::Search(
-				_getEnv(),
-				_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-				, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-				, READ
-				, UNKNOWN_VALUE
-				, _place ? (*_place ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
-				, _searchLineId
-				, _searchTypeId
-				, _searchCity
-				, _searchStop
-				, _searchName
-				, _searchState
-				, _searchMessage
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, false
-				, _requestParameters.orderField == PARAMETER_SEARCH_CITY
-				, _requestParameters.orderField == PARAMETER_SEARCH_STOP
-				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-				, _requestParameters.orderField == PARAMETER_SEARCH_TYPE_ID
-				, _requestParameters.orderField == PARAMETER_SEARCH_STATE
-				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
-				, _requestParameters.raisingOrder
-				);
-			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<DisplayScreen>());
+			DisplayScreenTableSync::SearchResult screens(
+				DisplayScreenTableSync::Search(
+					_getEnv(),
+					_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+					, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+					, READ
+					, UNKNOWN_VALUE
+					, _place ? (*_place ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
+					, _searchLineId
+					, _searchTypeId
+					, _searchCity
+					, _searchStop
+					, _searchName
+					, _searchState
+					, _searchMessage
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, false
+					, _requestParameters.orderField == PARAMETER_SEARCH_CITY
+					, _requestParameters.orderField == PARAMETER_SEARCH_STOP
+					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+					, _requestParameters.orderField == PARAMETER_SEARCH_TYPE_ID
+					, _requestParameters.orderField == PARAMETER_SEARCH_STATE
+					, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
+					, _requestParameters.raisingOrder
+			)	);
 
-			DisplayScreenCPUTableSync::Search(
-				_getEnv(),
-				_place ? (_place->get() ? (*_place)->getKey() : 0) : optional<RegistryKeyType>(),
-				optional<string>(),
-				_requestParameters.first,
-				_requestParameters.maxSize,
-				_requestParameters.orderField == PARAMETER_SEARCH_NAME,
-				_requestParameters.raisingOrder
-			);
+			DisplayScreenCPUTableSync::SearchResult cpus(
+				DisplayScreenCPUTableSync::Search(
+					_getEnv(),
+					_place ? (_place->get() ? (*_place)->getKey() : 0) : optional<RegistryKeyType>(),
+					optional<string>(),
+					_requestParameters.first,
+					_requestParameters.maxSize,
+					_requestParameters.orderField == PARAMETER_SEARCH_NAME,
+					_requestParameters.raisingOrder
+			)	);
 
 			
 			///////////////////////////////////////////////
@@ -235,7 +236,7 @@ namespace synthese
 					v
 					, searchRequest.getHTMLForm()
 					, _requestParameters
-					, _resultParameters
+					, screens
 					, createDisplayRequest.getHTMLForm("create")
 					, CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID
 					, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
@@ -244,7 +245,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, _getEnv().getRegistry<DisplayScreen>())
+				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 				{
 					updateRequest.getPage()->setScreen(screen);
 					viewRequest.getFunction()->setScreen(screen);
@@ -444,7 +445,7 @@ namespace synthese
 					v
 					, searchRequest.getHTMLForm()
 					, _requestParameters
-					, _resultParameters
+					, cpus
 					, createCPURequest.getHTMLForm("createCPU")
 					, DisplayScreenCPUCreateAction::PARAMETER_TEMPLATE_ID
 					, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
@@ -453,7 +454,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, _getEnv().getRegistry<DisplayScreenCPU>())
+				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, cpus)
 				{
 					updateRequest.getPage()->setCPU(cpu);
 					

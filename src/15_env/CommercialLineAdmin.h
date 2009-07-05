@@ -62,12 +62,8 @@ namespace synthese
 			boost::optional<time::Date>	_endDate;
 
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
-
-			RunHours _runHours;
 
 		public:
-			CommercialLineAdmin();
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -77,7 +73,6 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
 				bool objectWillBeCreatedLater
 			);
 			

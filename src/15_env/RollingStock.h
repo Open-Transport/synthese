@@ -24,7 +24,7 @@
 #define SYNTHESE_ENV_ROLLING_STOCK_H
 
 #include "Registrable.h"
-#include "RegistryWithAutocreationEnabled.h"
+#include "Registry.h"
 
 #include <string>
 
@@ -43,7 +43,7 @@ namespace synthese
 		public:
 
 			/// Chosen registry class.
-			typedef util::RegistryWithAutocreationEnabled<RollingStock>	Registry;
+			typedef util::Registry<RollingStock>	Registry;
 
 		protected:
 			std::string _name;

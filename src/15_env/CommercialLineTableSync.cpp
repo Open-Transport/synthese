@@ -204,7 +204,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
-			CommercialLine* obj
+			CommercialLine* obj __attribute__ ((unused))
 		){
 
 		}
@@ -268,19 +268,14 @@ namespace synthese
 
 	namespace env
 	{
-		CommercialLineTableSync::CommercialLineTableSync()
-			: SQLiteRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>()
-		{
-		}
 
-
-		void CommercialLineTableSync::Search(
+		CommercialLineTableSync::SearchResult CommercialLineTableSync::Search(
 			Env& env,
 			optional<RegistryKeyType> networkId,
 			optional<string> name,
 			optional<string> creatorId,
 			int first
-			, int number
+			, boost::optional<std::size_t> number
 			, bool orderByNetwork
 			, bool orderByName
 			, bool raisingOrder,
@@ -311,23 +306,27 @@ namespace synthese
 				query << " ORDER BY "
 					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
 					<< ",l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (orderByName)
+			else if (orderByName)
 				query << " ORDER BY l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			if(number)
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
-		void CommercialLineTableSync::Search(
+		
+		
+		CommercialLineTableSync::SearchResult CommercialLineTableSync::Search(
 			Env& env,
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
-			, RightLevel neededLevel 
-			, int first /*= 0 */
-			, int number /*= 0 */
+			, RightLevel neededLevel,
+			int first
+			, boost::optional<std::size_t> number
 			, bool orderByNetwork /*= true */
 			, bool orderByName /*= false */
 			, bool raisingOrder /*= true */
@@ -343,13 +342,15 @@ namespace synthese
 				<< "," << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
 				query << " ORDER BY " << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+
+
 
 		std::string CommercialLineTableSync::getSQLLinesList(
 			const security::RightsOfSameClassMap& rights

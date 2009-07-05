@@ -108,18 +108,20 @@ namespace synthese
 
 
 		env::RunHours getCommercialLineRunHours(
+			util::Env& env,
 			util::RegistryKeyType id,
 			const boost::optional<time::Date>& startDate,
 			const boost::optional<time::Date>& endDate
 		){
 			RunHours result;
-			Env env;
-			ScheduledServiceTableSync::Search(
-				env,
-				optional<RegistryKeyType>(),
-				id
-			);
-			BOOST_FOREACH(shared_ptr<ScheduledService> serv, env.getRegistry<ScheduledService>())
+			
+			ScheduledServiceTableSync::SearchResult services(
+				ScheduledServiceTableSync::Search(
+					env,
+					optional<RegistryKeyType>(),
+					id
+			)	);
+			BOOST_FOREACH(shared_ptr<ScheduledService> serv, services)
 			{
 				ServiceDateTableSync::SetActiveDates(*serv);
 				BOOST_FOREACH(const Date& date, serv->getActiveDates())
@@ -176,8 +178,11 @@ namespace synthese
 					}
 				}
 			}
-			ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), id);
-			BOOST_FOREACH(shared_ptr<ContinuousService> serv, env.getRegistry<ContinuousService>())
+			
+			ContinuousServiceTableSync::SearchResult cservices(
+				ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), id)
+			);
+			BOOST_FOREACH(shared_ptr<ContinuousService> serv, cservices)
 			{
 				ServiceDateTableSync::SetActiveDates(*serv);
 				BOOST_FOREACH(const Date& date, serv->getActiveDates())

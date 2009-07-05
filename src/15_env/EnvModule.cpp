@@ -111,8 +111,10 @@ namespace synthese
 			m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
 
 			Env env;
-			CommercialLineTableSync::Search(env, rights, totalControl, neededLevel);
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
+			CommercialLineTableSync::SearchResult lines(
+				CommercialLineTableSync::Search(env, rights, totalControl, neededLevel)
+			);
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			return m;
 		}
@@ -137,17 +139,20 @@ namespace synthese
 		void EnvModule::getNetworkLinePlaceRightParameterList(ParameterLabelsVector& m)
 		{
 			Env env;
-			TransportNetworkTableSync::Search(env);
-			CommercialLineTableSync::Search(env);
+			TransportNetworkTableSync::SearchResult networks(
+				TransportNetworkTableSync::Search(env)
+			);
+			CommercialLineTableSync::SearchResult lines(
+				CommercialLineTableSync::Search(env)
+			);
 
 			m.push_back(make_pair(string(), "--- Réseaux ---"));
-			BOOST_FOREACH(shared_ptr<TransportNetwork> network, env.getRegistry<TransportNetwork>())
+			BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
 				m.push_back(make_pair(Conversion::ToString(network->getKey()), network->getName() ));
 
 			m.push_back(make_pair(string(), "--- Lignes ---"));
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, env.getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				m.push_back(make_pair(Conversion::ToString(line->getKey()), line->getName() ));
-
 		}
 		
 		

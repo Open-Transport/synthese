@@ -188,8 +188,10 @@ namespace synthese
 			Alarm& destAlarm
 		){
 			Env lenv;
-			Search(lenv, sourceAlarm.getKey());
-			BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, lenv.getRegistry<AlarmObjectLink>())
+			SearchResult links(
+				Search(lenv, sourceAlarm.getKey())
+			);
+			BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, links)
 			{
 				AlarmObjectLink naol;
 				naol.setAlarm(&destAlarm);
@@ -199,11 +201,11 @@ namespace synthese
 			}
 		}
 
-		void AlarmObjectLinkTableSync::Search(
+		AlarmObjectLinkTableSync::SearchResult AlarmObjectLinkTableSync::Search(
 			Env& env,
 			util::RegistryKeyType alarmId,
 			int first /*= 0*/,
-			int number, /*= 0*/
+			boost::optional<std::size_t> number, /*= 0*/
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -212,12 +214,12 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId);
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

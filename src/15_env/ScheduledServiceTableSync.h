@@ -56,8 +56,7 @@ namespace synthese
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_TEAM;
 			
-			ScheduledServiceTableSync();
-
+			
 
 			/** ScheduledService search.
 				@param line Line which the service must belong to
@@ -67,11 +66,11 @@ namespace synthese
 				@param number Number of ScheduledService objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@param orderByOriginTime order chronologically by origin time
 				@param raisingOrder true = ascending order, false = descending order
-				@return vector<ScheduledService*> Founded ScheduledService objects.
+				@return Found ScheduledService objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> lineId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<util::RegistryKeyType> commercialLineId = boost::optional<util::RegistryKeyType>(),
@@ -79,7 +78,7 @@ namespace synthese
 				boost::optional<time::Date> date = boost::optional<time::Date>(),
 				bool hideOldServices = false,
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByOriginTime = true,
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL

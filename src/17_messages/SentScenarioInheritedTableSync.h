@@ -45,11 +45,6 @@ namespace synthese
 			: public db::SQLiteInheritedRegistryTableSync<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>
 		{
 		public:
-			
-			SentScenarioInheritedTableSync();
-
-
-
 			typedef enum
 			{
 				BROADCAST_OVER,
@@ -76,7 +71,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				boost::optional<std::string> name = boost::optional<std::string>(),
 				//AlarmConflict conflict,
@@ -85,7 +80,7 @@ namespace synthese
 				boost::optional<time::DateTime> date = boost::optional<time::DateTime>(),
 				boost::optional<util::RegistryKeyType> scenarioId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<int> first = boost::optional<int>(),
-				boost::optional<int> number = boost::optional<int>(),
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByDate = true,
 				bool orderByName = false,
 				bool orderByStatus = false,

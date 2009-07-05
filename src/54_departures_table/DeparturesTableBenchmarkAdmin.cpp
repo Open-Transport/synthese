@@ -74,7 +74,6 @@ namespace synthese
 
 		void DeparturesTableBenchmarkAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
 			bool objectWillBeCreatedLater
 		){
 			_doIt = map.getDefault<bool>(PARAMETER_DOIT, false);
@@ -101,14 +100,18 @@ namespace synthese
 			{
 				TestCases	_testCases;
 				
-				DisplayScreenTableSync::Search(_getEnv());
-				DisplayScreenCPUTableSync::Search(_getEnv());
+				DisplayScreenTableSync::SearchResult screens(
+					DisplayScreenTableSync::Search(_getEnv())
+				);
+				DisplayScreenCPUTableSync::SearchResult cpus(
+					DisplayScreenCPUTableSync::Search(_getEnv())
+				);
 				
 				FunctionRequest<DisplayScreenContentRequest> r(&_request);
 				FunctionRequest<CPUGetWiredScreensFunction> r2(&_request);
 				ptime t0(microsec_clock::local_time());
 				time_duration duration;
-				BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, _getEnv().getRegistry<DisplayScreen>())
+				BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, screens)
 				{
 					stringstream s;
 					r.getFunction()->setScreen(screen);
@@ -123,7 +126,7 @@ namespace synthese
 					duration = t2 - t0;
 				}
 	
-				BOOST_FOREACH(shared_ptr<const DisplayScreenCPU> cpu, _getEnv().getRegistry<DisplayScreenCPU>())
+				BOOST_FOREACH(shared_ptr<const DisplayScreenCPU> cpu, cpus)
 				{
 					stringstream s;
 					if(!cpu->getMacAddress().empty())

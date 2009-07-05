@@ -86,35 +86,13 @@ namespace synthese
 		
 		void LineAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			try
 			{
-				_line = LineTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
-
-				if(!doDisplayPreparationActions) return;
-
-				LineStopTableSync::Search(_getEnv(), _line->getKey(), UNKNOWN_VALUE, 0, 0, true, true, UP_LINKS_LOAD_LEVEL);
-				ScheduledServiceTableSync::Search(
-					_getEnv(),
-					_line->getKey(),
-					optional<RegistryKeyType>(),
-					optional<RegistryKeyType>(),
-					optional<Date>(),
-					false,
-					0, 0, true, true,
-					UP_DOWN_LINKS_LOAD_LEVEL
-				);
-				ContinuousServiceTableSync::Search(
-					_getEnv(),
-					_line->getKey(),
-					optional<RegistryKeyType>(),
-					0,
-					0,
-					true,
-					true,
-					UP_DOWN_LINKS_LOAD_LEVEL
+				_line = LineTableSync::Get(
+					map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(),
+					UP_LINKS_LOAD_LEVEL
 				);
 			}
 			catch (Exception& e)
@@ -143,6 +121,17 @@ namespace synthese
 			{
 				// Reservation
 // 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
+				LineStopTableSync::SearchResult lineStops(
+					LineStopTableSync::Search(
+						_getEnv(),
+						_line->getKey(),
+						UNKNOWN_VALUE,
+						0,
+						optional<size_t>(),
+						true,
+						true,
+						UP_LINKS_LOAD_LEVEL
+				)	);
 
 				HTMLTable::ColsVector v;
 				v.push_back("Rang");
@@ -156,7 +145,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<LineStop> lineStop, _getEnv().getRegistry<LineStop>())
+				BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineStops)
 				{
 					stream << t.row();
 					stream << t.col() << lineStop->getRankInPath();
@@ -175,8 +164,20 @@ namespace synthese
 			// TAB SCHEDULED SERVICES
 			if (openTabContent(stream, TAB_SCHEDULED_SERVICES))
 			{
-				const Registry<ScheduledService>& services(_getEnv().getRegistry<ScheduledService>());
-				if (services.empty())
+				ScheduledServiceTableSync::SearchResult sservices(
+					ScheduledServiceTableSync::Search(
+						_getEnv(),
+						_line->getKey(),
+						optional<RegistryKeyType>(),
+						optional<RegistryKeyType>(),
+						optional<Date>(),
+						false,
+						0,
+						optional<size_t>(),
+						true, true,
+						UP_DOWN_LINKS_LOAD_LEVEL
+				)	);
+				if (sservices.empty())
 					stream << "<p>Aucun service à horaire</p>";
 				else
 				{
@@ -190,7 +191,7 @@ namespace synthese
 
 					stream << ts.open();
 
-					BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
+					BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
 					{
 						Schedule ds(service->getDepartureSchedule());
 						Schedule as(service->getLastArrivalSchedule());
@@ -214,7 +215,17 @@ namespace synthese
 			// TAB CONTINUOUS SERVICES
 			if (openTabContent(stream, TAB_CONTINUOUS_SERVICES))
 			{
-				const Registry<ContinuousService>& cservices(_getEnv().getRegistry<ContinuousService>());
+				ContinuousServiceTableSync::SearchResult cservices(
+					ContinuousServiceTableSync::Search(
+						_getEnv(),
+						_line->getKey(),
+						optional<RegistryKeyType>(),
+						0,
+						optional<size_t>(),
+						true,
+						true,
+						UP_DOWN_LINKS_LOAD_LEVEL
+				)	);
 				if (cservices.empty())
 					stream << "<p>Aucun service continu</p>";
 				else

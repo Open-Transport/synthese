@@ -61,7 +61,7 @@ public:
 
     virtual void rowsAdded (db::SQLite* sqlite, 
 			    db::SQLiteSync* sync,
-			    const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
+			    const db::SQLiteResultSPtr& rows);
 
     virtual void rowsUpdated (db::SQLite* sqlite, 
 			      db::SQLiteSync* sync,

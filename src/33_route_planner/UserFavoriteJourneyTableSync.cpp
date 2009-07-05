@@ -150,18 +150,11 @@ namespace synthese
 	
 	namespace routeplanner
 	{
-		UserFavoriteJourneyTableSync::UserFavoriteJourneyTableSync()
-			: SQLiteNoSyncTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>()
-		{
-		}
-
-
-
-		void UserFavoriteJourneyTableSync::Search(
+		UserFavoriteJourneyTableSync::SearchResult UserFavoriteJourneyTableSync::Search(
 			Env& env,
 			const User* user
 			, int first /*= 0*/
-			, int number /*= 0*/
+			, boost::optional<std::size_t> number /*= 0*/
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
@@ -172,12 +165,14 @@ namespace synthese
 				<< " WHERE "
 				<< COL_USER_ID << "=" << user->getKey()
 				<< " ORDER BY " << COL_RANK << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
-
-			LoadFromQuery(query.str(), env, linkLevel);
+			if (number)
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << Conversion::ToString(first);
+			}
+			
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

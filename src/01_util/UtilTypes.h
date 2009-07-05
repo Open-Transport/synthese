@@ -28,6 +28,9 @@
 
 namespace synthese
 {
+	/// @defgroup m01 Utilities
+	/// @ingroup m0
+	/// @{
 	namespace util
 	{
 		typedef signed long long int RegistryKeyType;
@@ -43,6 +46,7 @@ namespace synthese
 			ALGORITHMS_OPTIMIZATION_LOAD_LEVEL = 30
 		} LinkLevel;
 	}
+	/// @}
 }
 
 #endif // SYNTHESE_util_UtilTypes_h__

@@ -51,7 +51,6 @@ namespace synthese
 		private:
 			boost::shared_ptr<const Timetable>			_book;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
 			
 		public:
 			TimetableBookAdmin();
@@ -66,8 +65,7 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+				bool objectWillBeCreatedLater
 			);
 			
 			

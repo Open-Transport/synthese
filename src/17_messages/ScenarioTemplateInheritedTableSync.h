@@ -40,8 +40,6 @@ namespace synthese
 			>
 		{
 		public:
-			ScenarioTemplateInheritedTableSync();
-
 			/** Template scenario search.
 				@param env Environment to populate
 				@param name Name of the template
@@ -54,13 +52,13 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> folderId,
 				const std::string name = std::string(),
 				const ScenarioTemplate* scenarioToBeDifferentWith = NULL,
 				int first = 0,
-				int number = -1,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,
 				bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL

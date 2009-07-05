@@ -537,9 +537,9 @@ namespace synthese
 			if (m == 0) return n;
 
 
-			for ( int i = 0; i <= n; matrix[i][0] = i++ );
-			for ( int j = 1; j <= m; matrix[0][j] = j++ );
-		    
+			for(int i = 0; i <= n; matrix[i][0] = i++) ;
+			for(int j = 1; j <= m; matrix[0][j] = j++) ;
+			
 			for ( int i = 1; i <= n; i++ ) 
 			{
 				char sc = s[i-1];

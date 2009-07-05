@@ -65,10 +65,10 @@ namespace synthese
 			assert(_columns.empty());
 
 			// Loop on each line of the database
-			BOOST_FOREACH(shared_ptr<const Line> linePtr, _env.getRegistry<Line>())
+			BOOST_FOREACH(Registry<Line>::value_type it, _env.getRegistry<Line>())
 			{
 				// Line selection
-				const Line& line(*linePtr);
+				const Line& line(*it.second);
 				if (!_isLineSelected(line))
 					continue;
 

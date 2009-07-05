@@ -77,8 +77,7 @@ namespace synthese
 		
 		void TransportSiteAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 			try
@@ -185,8 +184,10 @@ namespace synthese
 					dynamic_cast<const TransportSiteAdmin*>(currentPage.get())
 				);
 
-				SiteTableSync::Search(*_env);
-				BOOST_FOREACH(shared_ptr<Site> site, _env->getRegistry<Site>())
+				SiteTableSync::SearchResult sites(
+					SiteTableSync::Search(*_env)
+				);
+				BOOST_FOREACH(shared_ptr<Site> site, sites)
 				{
 					if(	sp &&
 						sp->_site->getKey() == site->getKey()

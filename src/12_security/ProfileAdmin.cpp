@@ -80,8 +80,7 @@ namespace synthese
 		
 		void ProfileAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 			
@@ -256,16 +255,19 @@ namespace synthese
 			boost::shared_ptr<const AdminInterfaceElement> currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
-					AdminInterfaceElement::PageLinks links;
+			AdminInterfaceElement::PageLinks links;
 			
 			const ProfileAdmin* pa(
 				dynamic_cast<const ProfileAdmin*>(currentPage.get())
 			);
 			
-			BOOST_FOREACH(shared_ptr<Profile> profile, _getEnv().getRegistry<Profile>())
+			ProfileTableSync::SearchResult profiles(
+				ProfileTableSync::Search(
+					_getEnv(),
+					_profile->getKey()
+			)	);
+			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
-				if(profile->getParent() != _profile.get()) continue;
-				
 				if(	pa &&
 					pa->getProfile()->getKey() == profile->getKey()
 				){

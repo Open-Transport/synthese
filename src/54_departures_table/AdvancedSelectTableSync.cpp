@@ -64,7 +64,7 @@ namespace synthese
 			, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
 			, BroadcastPointsPresence cpuPresence
 			, uid lineId /*= UNKNOWN_VALUE*/
-			, int number/*=UNKNOWN_VALUE*/
+			, boost::optional<std::size_t> number /*=UNKNOWN_VALUE*/
 			, int first/*=0*/ 
 			, bool orderByCity
 			, bool orderByName
@@ -132,10 +132,12 @@ namespace synthese
 				query << " ORDER BY cc" << (raisingOrder ? " ASC" : " DESC");
 			}
 			// Limits
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			if (number)
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			try
 			{
@@ -163,8 +165,9 @@ namespace synthese
 		
 		std::vector<shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints(
 			Env& env,
-			int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
-		{
+			boost::optional<std::size_t> number /*=UNKNOWN_VALUE*/,
+			int first/*=0*/
+		){
 			stringstream query;
 			query << " SELECT "
 				<< "c." << TABLE_COL_ID << " AS " << TABLE_COL_ID
@@ -175,10 +178,10 @@ namespace synthese
 				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID
 				<< " GROUP BY c." << TABLE_COL_ID
 				<< " ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME;
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
 			try
 			{

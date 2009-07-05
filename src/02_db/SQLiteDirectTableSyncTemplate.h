@@ -68,14 +68,7 @@ namespace synthese
 		public:
 			typedef K		TableSync;
 			typedef T		ObjectType;
-
-		protected:
-			////////////////////////////////////////////////////////////////////
-			///	SQLiteDirectTableSyncTemplate constructor.
-			////////////////////////////////////////////////////////////////////
-			SQLiteDirectTableSyncTemplate()
-			{
-			}
+			typedef std::vector<boost::shared_ptr<T> > SearchResult;
 
 
 		public:
@@ -201,32 +194,39 @@ namespace synthese
 
 			
 			////////////////////////////////////////////////////////////////////
-			/// Load objects into an environment, from a SQL query.
+			/// Load objects into an environment, from a SQL query, and return 
+			/// the list of loaded objects.
 			///	@param query SQL query
 			///	@param env Environment to write
 			///	@param linkLevel Link level
+			/// @return search result (oredered vector of pointer to objects)
 			///	@throws Exception if the load failed
 			////////////////////////////////////////////////////////////////////
-			static void LoadFromQuery(
+			static SearchResult LoadFromQuery(
 				const std::string& query,
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
 //				try
 //				{
+					SearchResult result;
 					util::Registry<T>& registry(env.template getEditableRegistry<T>());
 					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 					while (rows->next ())
 					{
 						if(registry.contains(rows->getKey()))
 						{
-							Load(registry.getEditable(rows->getKey()).get(), rows, env, linkLevel);
-						} else {
+							result.push_back(registry.getEditable(rows->getKey()));
+						}
+						else
+						{
 							boost::shared_ptr<T> object(K::GetNewObject(rows));
 							Load(object.get(), rows, env, linkLevel);
 							registry.add(object);
+							result.push_back(object);
 						}
 					}
+					return result;
 //				}
 //				catch(SQLiteException& e)
 //				{

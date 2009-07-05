@@ -45,7 +45,8 @@ namespace synthese
 
 			@warning The load method does not update the transaction attribute. To do it, load the transaction first and load each reservation which belongs to it.
 		*/
-		class ReservationTableSync : public db::SQLiteNoSyncTableSyncTemplate<ReservationTableSync,Reservation>
+		class ReservationTableSync:
+			public db::SQLiteNoSyncTableSyncTemplate<ReservationTableSync,Reservation>
 		{
 		public:
 			static const std::string COL_TRANSACTION_ID;
@@ -63,8 +64,6 @@ namespace synthese
 			static const std::string COL_RESERVATION_RULE_ID;
 			static const std::string COL_RESERVATION_DEAD_LINE;
 
-			ReservationTableSync();
-			~ReservationTableSync();
 
 
 			/** Reservation search.
@@ -72,15 +71,15 @@ namespace synthese
 				@param transaction Transaction
 				@param first First Reservation object to answer
 				@param number Number of Reservation objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<Reservation*> Founded Reservation objects.
+				@return Found Reservation objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				const util::RegistryKeyType transactionId
 				, int first = 0
-				, int number = 0,
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
@@ -91,11 +90,11 @@ namespace synthese
 				@param day Day of departure of the service at its origin (not necessarily the day of the departure of the customer)
 				@param first First Reservation object to answer
 				@param number Number of Reservation objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<Reservation*> Founded Reservation objects.
+				@return Found Reservation objects.
 				@author Hugues Romain
 				@date 2009
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				const util::RegistryKeyType commercialLineId,
 				const time::Date& day,
@@ -103,7 +102,7 @@ namespace synthese
 				bool orderByService = true,
 				bool raisingOrder = true, 
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};

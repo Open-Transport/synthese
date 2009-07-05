@@ -134,7 +134,7 @@ namespace synthese
 	void 
 	NodeInfoTableSync::rowsAdded (SQLite* sqlite, 
 				      SQLiteSync* sync,
-				      const SQLiteResultSPtr& rows, bool isFirstSync)
+				      const SQLiteResultSPtr& rows)
 	{
 	    rowsUpdated (sqlite, sync, rows);
 	}

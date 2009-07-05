@@ -74,14 +74,10 @@ namespace synthese
 		const string CommercialLineAdmin::PARAMETER_DATES_START("ds");
 		const string CommercialLineAdmin::PARAMETER_DATES_END("de");
 
-		CommercialLineAdmin::CommercialLineAdmin()
-			: AdminInterfaceElementTemplate<CommercialLineAdmin>()
-		{ }
 		
 		void CommercialLineAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
 			_startDate = map.getOptionalDate(PARAMETER_DATES_START);
@@ -97,21 +93,6 @@ namespace synthese
 			{
 				throw AdminParametersException("No such line");
 			}
-
-			if(!doDisplayPreparationActions) return;
-
-			LineTableSync::Search(
-				_getEnv(),
-				_cline->getKey(),
-				UNKNOWN_VALUE,
-				_requestParameters.first,
-				_requestParameters.maxSize,
-				_requestParameters.orderField == PARAMETER_SEARCH_NAME,
-				_requestParameters.raisingOrder
-			);
-			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<Line>());
-
-			_runHours = getCommercialLineRunHours(_cline->getKey(), _startDate, _endDate);
 		}
 		
 		
@@ -125,9 +106,11 @@ namespace synthese
 
 
 
-		void CommercialLineAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
-		{
+		void CommercialLineAdmin::display(
+			ostream& stream,
+			VariablesMap& variables,
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const {
 			////////////////////////////////////////////////////////////////////
 			// TAB STOPS
 			if (openTabContent(stream, TAB_ROUTES))
@@ -137,6 +120,7 @@ namespace synthese
 				
 				// Search form
 				stream << "<h1>Recherche</h1>";
+				
 				SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 				stream << s.open();
 				stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
@@ -147,14 +131,26 @@ namespace synthese
 				// Results display
 				stream << "<h1>Parcours de la ligne</h1>";
 
+				LineTableSync::SearchResult routes(
+					LineTableSync::Search(
+						_getEnv(),
+						_cline->getKey(),
+						UNKNOWN_VALUE,
+						_requestParameters.first,
+						_requestParameters.maxSize,
+						_requestParameters.orderField == PARAMETER_SEARCH_NAME,
+						_requestParameters.raisingOrder
+				)	);
+				
 				ResultHTMLTable::HeaderVector h;
 				h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 				h.push_back(make_pair(string(), "Actions"));
-				ResultHTMLTable t(h,sortedForm,_requestParameters, _resultParameters);
+				
+				ResultHTMLTable t(h,sortedForm,_requestParameters, routes);
 
 				stream << t.open();
 				AdminFunctionRequest<LineAdmin> lineOpenRequest(_request);
- 				BOOST_FOREACH(shared_ptr<Line> line, _getEnv().getRegistry<Line>())
+ 				BOOST_FOREACH(shared_ptr<Line> line, routes)
 				{
 					lineOpenRequest.getPage()->setLine(line);
 					stream << t.row();
@@ -166,9 +162,13 @@ namespace synthese
 				stream << t.close();
 			}
 			////////////////////////////////////////////////////////////////////
-			// TAB STOPS
+			// TAB HOURS
 			if (openTabContent(stream, TAB_DATES))
 			{
+				RunHours _runHours(
+					getCommercialLineRunHours(_getEnv(), _cline->getKey(), _startDate, _endDate)
+				);
+
 				stream << "<style>td.red {background-color:red;width:8px; height:8px; color:white; text-align:center; } td.green {background-color:#008000;width:10px; height:10px; color:white; text-align:center; }</style>"; 
 				HTMLTable::ColsVector cols;
 				cols.push_back("Date");
@@ -263,9 +263,10 @@ namespace synthese
 				ca->getCommercialLine().get() &&
 				ca->getCommercialLine()->getKey() == _cline->getKey()
 			){
-				LineTableSync::Search(*_env, _cline->getKey());
-				const Registry<Line>& lines(_env->getRegistry<Line>());
-				BOOST_FOREACH(shared_ptr<Line> line, lines)
+				LineTableSync::SearchResult routes(
+					LineTableSync::Search(*_env, _cline->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<Line> line, routes)
 				{
 					if(	la &&
 						la->getLine()->getKey() == line->getKey()

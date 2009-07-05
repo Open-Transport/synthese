@@ -74,7 +74,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<MessagesScenarioAdmin>::ICON("cog.png");
-		template<> const string AdminInterfaceElementTemplate<MessagesScenarioAdmin>::DEFAULT_TITLE("Scénario inconnu");
+		template<> const string AdminInterfaceElementTemplate<MessagesScenarioAdmin>::DEFAULT_TITLE("(pas de nom)");
 	}
 
 	namespace messages
@@ -86,8 +86,7 @@ namespace synthese
 
 		void MessagesScenarioAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 			
@@ -198,16 +197,20 @@ namespace synthese
 				
 				if (_sentScenario)
 				{
-					ScenarioSentAlarmInheritedTableSync::Search(*_env, _sentScenario->getKey());
-					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, _env->getRegistry<SentAlarm>())
+					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
+						ScenarioSentAlarmInheritedTableSync::Search(*_env, _sentScenario->getKey())
+					);
+					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 					{
 						v.push_back(static_pointer_cast<Alarm, SentAlarm>(alarm));
 					}
 				}
 				else
 				{
-					AlarmTemplateInheritedTableSync::Search(*_env, _templateScenario->getKey());
-					BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, _env->getRegistry<AlarmTemplate>())
+					AlarmTemplateInheritedTableSync::SearchResult alarms(
+						AlarmTemplateInheritedTableSync::Search(*_env, _templateScenario->getKey())
+					);
+					BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
 					{
 						v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
 					}
@@ -218,7 +221,13 @@ namespace synthese
 				h.push_back(make_pair(string(), "Emplacement"));
 				h.push_back(make_pair(string(), "Actions"));
 				h.push_back(make_pair(string(), "Actions"));
-				ActionResultHTMLTable t(h, HTMLForm(string(), string()), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addRequest.getHTMLForm("add"));
+				ActionResultHTMLTable t(
+					h,
+					HTMLForm(string(), string()),
+					ActionResultHTMLTable::RequestParameters(),
+					v,
+					addRequest.getHTMLForm("add")
+				);
 
 				stream << t.open();
 
@@ -318,11 +327,12 @@ namespace synthese
 			
 			if (dynamic_cast<const SentScenario*>(_scenario.get()))
 			{
-				ScenarioSentAlarmInheritedTableSync::Search(
-					*_env,
-					_scenario->getKey(), 0, 0, false, false, false, false, UP_LINKS_LOAD_LEVEL
-				);
-				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, _env->getRegistry<SentAlarm>())
+				ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
+					ScenarioSentAlarmInheritedTableSync::Search(
+						*_env,
+						_scenario->getKey(), 0, optional<size_t>(), false, false, false, false, UP_LINKS_LOAD_LEVEL
+				)	);
+				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 				{
 					if(	ma &&
 						ma->getAlarm()->getKey() == alarm->getKey()
@@ -341,11 +351,12 @@ namespace synthese
 			}
 			else if (dynamic_cast<const ScenarioTemplate*>(_scenario.get()))
 			{
-				AlarmTemplateInheritedTableSync::Search(
-					*_env,
-					_scenario->getKey(), 0, 0, false, false, UP_LINKS_LOAD_LEVEL
-				);
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, _env->getRegistry<AlarmTemplate>())
+				AlarmTemplateInheritedTableSync::SearchResult alarms(
+					AlarmTemplateInheritedTableSync::Search(
+						*_env,
+						_scenario->getKey(), 0, optional<size_t>(), false, false, UP_LINKS_LOAD_LEVEL
+				)	);
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
 				{
 					if(	ma &&
 						ma->getAlarm()->getKey() == alarm->getKey()
@@ -370,7 +381,7 @@ namespace synthese
 
 		std::string MessagesScenarioAdmin::getTitle() const
 		{
-			return _scenario.get() ? _scenario->getName() : DEFAULT_TITLE;
+			return _scenario.get() && !_scenario->getName().empty() ? _scenario->getName() : DEFAULT_TITLE;
 		}
 
 

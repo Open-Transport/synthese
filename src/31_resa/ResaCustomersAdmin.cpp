@@ -73,40 +73,16 @@ namespace synthese
 		const string ResaCustomersAdmin::PARAM_SEARCH_NAME("sn");
 		const string ResaCustomersAdmin::PARAM_SEARCH_SURNAME("ss");
 
-		ResaCustomersAdmin::ResaCustomersAdmin()
-			: AdminInterfaceElementTemplate<ResaCustomersAdmin>()
-		{ }
 		
 		void ResaCustomersAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
 			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
 			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
 			
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
-
-			if(!doDisplayPreparationActions) return;
-
-			// Search
-			UserTableSync::Search(
-				_getEnv(),
-				"%" + _searchLogin + "%"
-				, "%" + _searchName + "%"
-				, "%" + _searchSurname + "%"
-				, "%"
-				, UNKNOWN_VALUE
-				, logic::indeterminate
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAM_SEARCH_LOGIN
-				, _requestParameters.orderField == PARAM_SEARCH_NAME
-				, false
-				, _requestParameters.raisingOrder
-			);
-			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<User>());
 		}
 		
 		
@@ -141,8 +117,26 @@ namespace synthese
 
 			stream << "<h1>Résultats</h1>";
 
+			// Search
+			UserTableSync::SearchResult users(
+				UserTableSync::Search(
+					_getEnv(),
+					"%" + _searchLogin + "%"
+					, "%" + _searchName + "%"
+					, "%" + _searchSurname + "%"
+					, "%"
+					, UNKNOWN_VALUE
+					, logic::indeterminate
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAM_SEARCH_LOGIN
+					, _requestParameters.orderField == PARAM_SEARCH_NAME
+					, false
+					, _requestParameters.raisingOrder
+			)	);
+
 			// Results
-			if (_getEnv().getRegistry<User>().empty())
+			if (users.empty())
 				stream << "<p>Aucun client trouvé.</p>";
 			else
 			{
@@ -152,11 +146,12 @@ namespace synthese
 				h.push_back(make_pair(string(), "Téléphone"));
 				h.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
 				h.push_back(make_pair(string(), "Action"));
-				ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, _resultParameters);
+				
+				ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, users);
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<User> user, _getEnv().getRegistry<User>())
+				BOOST_FOREACH(shared_ptr<User> user, users)
 				{
 					openRequest.getPage()->setUser(user);
 

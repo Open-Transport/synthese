@@ -50,7 +50,6 @@ namespace synthese
 		const string TextTemplateAddAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lm";
 		const string TextTemplateAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string TextTemplateAddAction::PARAMETER_SHORT_MESSAGE = Action_PARAMETER_PREFIX + "sm";
-		const string TextTemplateAddAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
 		const string TextTemplateAddAction::PARAMETER_IS_FOLDER(Action_PARAMETER_PREFIX + "if");
 		const string TextTemplateAddAction::PARAMETER_PARENT_ID(Action_PARAMETER_PREFIX + "pi");
 
@@ -61,7 +60,6 @@ namespace synthese
 			map.insert(PARAMETER_LONG_MESSAGE, _longMessage);
 			map.insert(PARAMETER_NAME, _name);
 			map.insert(PARAMETER_SHORT_MESSAGE, _shortMessage);
-			map.insert(PARAMETER_TYPE, static_cast<int>(_level));
 			map.insert(PARAMETER_PARENT_ID, _parentId);
 			map.insert(PARAMETER_IS_FOLDER, _isFolder);
 			return map;
@@ -71,10 +69,6 @@ namespace synthese
 		{
 			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
 
-			_level = static_cast<AlarmLevel>(map.getInt(PARAMETER_TYPE , true, FACTORY_KEY));
-			if (_level == ALARM_LEVEL_UNKNOWN)
-				throw ActionException("Bad value for level");
-			
 			_isFolder = map.getBool(PARAMETER_IS_FOLDER, false, false, FACTORY_KEY);
 
 			_parentId = map.getUid(PARAMETER_PARENT_ID, true, FACTORY_KEY);
@@ -94,7 +88,7 @@ namespace synthese
 			}
 
 			Env env;
-			TextTemplateTableSync::Search(env, _level, _parentId, _isFolder, _name, NULL, 0, 1);
+			TextTemplateTableSync::Search(env, _parentId, _isFolder, _name, NULL, 0, 1);
 			if (!env.getRegistry<TextTemplate>().empty())
 				throw ActionException("Un texte portant ce nom existe déjà.");
 
@@ -105,7 +99,6 @@ namespace synthese
 		void TextTemplateAddAction::run()
 		{
 			TextTemplate tt;
-			tt.setAlarmLevel(_level);
 			tt.setLongMessage(_longMessage);
 			tt.setShortMessage(_shortMessage);
 			tt.setName(_name);
@@ -115,13 +108,6 @@ namespace synthese
 
 			// Log
 			MessagesLibraryLog::AddTemplateCreationEntry(tt, _request->getUser().get());
-		}
-
-
-
-		void TextTemplateAddAction::setLevel( AlarmLevel level )
-		{
-			_level = level;
 		}
 
 

@@ -89,11 +89,13 @@ namespace synthese
 			// Basic resa profile
 			{
 				Env env;
-				ProfileTableSync::Search(env, ResaModule::_BASIC_PROFILE_NAME);
-				if (env.getRegistry<Profile>().empty())
+				ProfileTableSync::SearchResult profiles(
+					ProfileTableSync::Search(env, ResaModule::_BASIC_PROFILE_NAME)
+				);
+				if (profiles.empty())
 					ResaModule::_basicProfile.reset(new Profile);
 				else
-					ResaModule::_basicProfile = env.getEditableRegistry<Profile>().front();
+					ResaModule::_basicProfile = profiles.front();
 				ResaModule::_basicProfile->setName(ResaModule::_BASIC_PROFILE_NAME);
 				shared_ptr<Right> r(new GlobalRight);
 				r->setPrivateLevel(FORBIDDEN);
@@ -106,11 +108,13 @@ namespace synthese
 			// Autoresa profile
 			{
 				Env env;
-				ProfileTableSync::Search(env, ResaModule::_AUTORESA_PROFILE_NAME);
-				if (env.getRegistry<Profile>().empty())
+				ProfileTableSync::SearchResult profiles(
+					ProfileTableSync::Search(env, ResaModule::_AUTORESA_PROFILE_NAME)
+				);
+				if (profiles.empty())
 					ResaModule::_autoresaProfile.reset(new Profile);
 				else
-					ResaModule::_autoresaProfile= env.getEditableRegistry<Profile>().front();
+					ResaModule::_autoresaProfile = profiles.front();
 				ResaModule::_autoresaProfile->setName(ResaModule::_AUTORESA_PROFILE_NAME);
 				shared_ptr<Right> r2(new GlobalRight);
 				r2->setPrivateLevel(FORBIDDEN);

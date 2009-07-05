@@ -57,10 +57,9 @@ namespace synthese
 			static const std::string COL_NAME13;
 			static const std::string COL_NAME26;
 
-			ConnectionPlaceTableSync ();
-			~ConnectionPlaceTableSync ();
 
-			static void Search(
+
+			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType cityId = UNKNOWN_VALUE
 				, boost::logic::tribool mainConnection = boost::logic::indeterminate

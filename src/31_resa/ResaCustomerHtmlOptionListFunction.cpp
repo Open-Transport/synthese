@@ -70,8 +70,23 @@ namespace synthese
 				return;
 
 			Env env;
-			UserTableSync::Search(env, "%", _name, _surname, "%", UNKNOWN_VALUE, logic::indeterminate, 0, _number, false, true, false, true);
-			BOOST_FOREACH(shared_ptr<User> user, env.getRegistry<User>())
+			UserTableSync::SearchResult users(
+				UserTableSync::Search(
+					env,
+					"%",
+					_name,
+					_surname,
+					"%",
+					UNKNOWN_VALUE,
+					logic::indeterminate,
+					0,
+					_number,
+					false,
+					true,
+					false,
+					true
+			)	);
+			BOOST_FOREACH(shared_ptr<User> user, users)
 			{
 				stream << "<option value=\"" << user->getKey() << "\">" << user->getName() << " " << user->getSurname() << " (" << user->getPhone() << " / " << user->getEMail() << ")</option>";
 			}

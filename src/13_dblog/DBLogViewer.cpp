@@ -84,8 +84,7 @@ namespace synthese
 
 		void DBLogViewer::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_viewer.set(
 				map,

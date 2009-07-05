@@ -91,8 +91,7 @@ namespace synthese
 		
 		void TimetableAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 			
@@ -110,17 +109,6 @@ namespace synthese
 			if (_timetable->getIsBook())
 				throw AdminParametersException("Timetable is document");
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK);
-			
-			if (!doDisplayPreparationActions) return;
-
-			TimetableRowTableSync::Search(
-				_getEnv(),
-				_timetable->getKey()
-				, _requestParameters.orderField == PARAMETER_RANK
-				, _requestParameters.raisingOrder
-				, _requestParameters.first
-				, _requestParameters.maxSize
-			);
 		}
 		
 		
@@ -146,10 +134,6 @@ namespace synthese
 
 			AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
 
-			// Search
-			ResultHTMLTable::ResultParameters p;
-			p.setFromResult(_requestParameters, _getEnv().getEditableRegistry<TimetableRow>());
-
 			// Display
 			stream << "<h1>Propriétés</h1>";
 
@@ -160,6 +144,17 @@ namespace synthese
 
 			stream << "<h1>Contenu</h1>";
 
+			// Search
+			TimetableRowTableSync::SearchResult rows(
+				TimetableRowTableSync::Search(
+					_getEnv(),
+					_timetable->getKey()
+					, _requestParameters.orderField == PARAMETER_RANK
+					, _requestParameters.raisingOrder
+					, _requestParameters.first
+					, _requestParameters.maxSize
+			)	);
+			
 			ActionResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
 			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_down.png", "V")));
@@ -172,13 +167,20 @@ namespace synthese
 			h.push_back(make_pair(string(), "Sel"));
 			h.push_back(make_pair(string(), "Aff"));
 			h.push_back(make_pair(string(), "Action"));
-			ActionResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, p, addRowRequest.getHTMLForm("addrow"), TimetableRowAddAction::PARAMETER_RANK);
+			ActionResultHTMLTable t(
+				h,
+				searchRequest.getHTMLForm(),
+				_requestParameters,
+				rows,
+				addRowRequest.getHTMLForm("addrow"),
+				TimetableRowAddAction::PARAMETER_RANK
+			);
 
 			stream << t.open();
 
 			int maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
 			int lastRank(UNKNOWN_VALUE);
-			BOOST_FOREACH(shared_ptr<TimetableRow> row, _getEnv().getRegistry<TimetableRow>())
+			BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
 			{
 				lastRank = row->getRank();
 

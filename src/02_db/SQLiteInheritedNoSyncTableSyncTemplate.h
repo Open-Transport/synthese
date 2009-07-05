@@ -52,9 +52,8 @@ namespace synthese
 
 			void rowsAdded (SQLite* sqlite, 
 				SQLiteSync* sync,
-				const SQLiteResultSPtr& rows, bool isFirstSync = false)
-			{
-
+				const SQLiteResultSPtr& rows
+			){
 			}
 
 			void rowsUpdated (SQLite* sqlite, 

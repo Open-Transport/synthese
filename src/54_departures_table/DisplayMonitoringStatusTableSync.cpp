@@ -212,24 +212,15 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		DisplayMonitoringStatusTableSync::DisplayMonitoringStatusTableSync(
-		):	SQLiteNoSyncTableSyncTemplate<DisplayMonitoringStatusTableSync, DisplayMonitoringStatus>()
-		{
-		}
-
-
-
-		void DisplayMonitoringStatusTableSync::Search(
+		DisplayMonitoringStatusTableSync::SearchResult DisplayMonitoringStatusTableSync::Search(
 			Env& env,
 			RegistryKeyType screenId,
 			int first /*= 0*/,
-			int number /*= 0*/,
+			boost::optional<std::size_t> number /*= 0*/,
 			bool orderByScreenId,
 			bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -241,12 +232,12 @@ namespace synthese
 			}
 			if (orderByScreenId)
 				query << " ORDER BY " << COL_SCREEN_ID << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
@@ -255,14 +246,16 @@ namespace synthese
 			const DisplayScreen& screen
 		){
 			Env env;
-			Search(env, screen.getKey(), 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL);
+			SearchResult entries(
+				Search(env, screen.getKey(), 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL)
+			);
 
-			if(env.getRegistry<DisplayMonitoringStatus>().empty())
+			if(entries.empty())
 			{
 				return shared_ptr<DisplayMonitoringStatus>();
 			}
 
-			shared_ptr<DisplayMonitoringStatus> status(env.getEditableRegistry<DisplayMonitoringStatus>().front());
+			shared_ptr<DisplayMonitoringStatus> status(entries.front());
 			if(screen.isDown(*status))
 			{
 				DisplayMaintenanceLog::AddMonitoringDownEntry(screen);
@@ -277,14 +270,16 @@ namespace synthese
 			const DisplayScreenCPU& cpu
 		){
 			Env env;
-			Search(env, cpu.getKey(), 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL);
+			SearchResult entries(
+				Search(env, cpu.getKey(), 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL)
+			);
 
-			if(env.getRegistry<DisplayMonitoringStatus>().empty())
+			if(entries.empty())
 			{
 				return not_a_date_time;
 			}
 
-			shared_ptr<DisplayMonitoringStatus> status(env.getEditableRegistry<DisplayMonitoringStatus>().front());
+			shared_ptr<DisplayMonitoringStatus> status(entries.front());
 			if(cpu.isDown(status->getTime()))
 			{
 				DisplayMaintenanceLog::AddMonitoringDownEntry(cpu);

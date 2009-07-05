@@ -101,8 +101,7 @@ namespace synthese
 
 		void MessagesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			try
 			{
@@ -136,25 +135,6 @@ namespace synthese
 				_searchName = map.getOptionalString(PARAMETER_SEARCH_NAME);
 
 				_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_LEVEL, 15, false);
-
-				if(!doDisplayPreparationActions) return;
-
-				SentScenarioInheritedTableSync::Search(
-					_getEnv(),
-					_searchName,
-					_searchStatus,
-					_date,
-					_searchScenario ?
-						(*_searchScenario ? (*_searchScenario)->getKey() : 0):
-						optional<RegistryKeyType>(),
-					_requestParameters.first
-					, _requestParameters.maxSize
-					, _requestParameters.orderField == PARAMETER_SEARCH_DATE
-					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
-					, _requestParameters.raisingOrder
-				);
-				_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<SentScenario>());
 			}
 			catch (TimeParseException e)
 			{
@@ -238,6 +218,23 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
+			SentScenarioInheritedTableSync::SearchResult scenarios(
+				SentScenarioInheritedTableSync::Search(
+					_getEnv(),
+					_searchName,
+					_searchStatus,
+					_date,
+					_searchScenario ?
+						(*_searchScenario ? (*_searchScenario)->getKey() : 0):
+						optional<RegistryKeyType>(),
+					_requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAMETER_SEARCH_DATE
+					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
+					, _requestParameters.raisingOrder
+			)	);
+			
 			ActionResultHTMLTable::HeaderVector v1;
 			v1.push_back(make_pair(string(), string("Statut")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_DATE, string("Dates")));
@@ -249,7 +246,7 @@ namespace synthese
 				v1,
 				searchRequest.getHTMLForm(),
 				_requestParameters,
-				_resultParameters,
+				scenarios,
 				newScenarioRequest.getHTMLForm("newscen"),
 				NewScenarioSendAction::PARAMETER_MESSAGE_TO_COPY,
 				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
@@ -257,7 +254,7 @@ namespace synthese
 			
 			stream << t1.open();
 
-			BOOST_FOREACH(shared_ptr<SentScenario> message, _getEnv().getRegistry<SentScenario>())
+			BOOST_FOREACH(shared_ptr<SentScenario> message, scenarios)
 			{
 				bool isDisplayedWithEndDate(
 					(message->getPeriodStart().isUnknown() || message->getPeriodStart() <= now)

@@ -174,17 +174,10 @@ namespace synthese
 
 	namespace road
 	{
-		RoadChunkTableSync::RoadChunkTableSync()
-			: SQLiteRegistryTableSyncTemplate<RoadChunkTableSync,RoadChunk>()
-		{
-		}
-
-
-
-	    void RoadChunkTableSync::Search(
+	    RoadChunkTableSync::SearchResult RoadChunkTableSync::Search(
 			Env& env,
 			int first /*= 0*/,
-			int number /*= 0*/,
+			boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -198,12 +191,12 @@ namespace synthese
 			;
 			//if (orderByName)
 			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 	    }
 	}
 }

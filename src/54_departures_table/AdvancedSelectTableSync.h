@@ -28,9 +28,9 @@
 
 #include <boost/logic/tribool.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 
 #include "12_security/Types.h"
-
 #include "01_util/Constants.h"
 
 namespace synthese
@@ -79,7 +79,7 @@ namespace synthese
 			, BroadcastPointsPresence bpPresence = WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 			, BroadcastPointsPresence cpuPresence = WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 			, uid lineId = UNKNOWN_VALUE
-			, int number = UNKNOWN_VALUE
+			, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 			, int first = 0
 			, bool orderByCity = true
 			, bool orderByName = false
@@ -92,11 +92,11 @@ namespace synthese
 
 
 		/** Line searcher.
-			@result map founded searched physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
+			@result found physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
 		*/
 		std::vector<boost::shared_ptr<const env::CommercialLine> > getCommercialLineWithBroadcastPoints(
 			util::Env& env,
-			int number = UNKNOWN_VALUE,
+			boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 			int first = 0
 		);
 	}

@@ -235,9 +235,6 @@ namespace synthese
 				}
 			//@}
 
-			SQLiteTableSyncTemplate(
-			):	util::FactorableTemplate<SQLiteTableSync, K>()
-			{}
 
 			//! @name Virtual access to instantiated static methods
 			//@{
@@ -278,7 +275,7 @@ namespace synthese
 					std::stringstream ss;
 					ss << "SELECT *  FROM " << K::TABLE.NAME;
 					SQLiteResultSPtr result = sqlite->execQuery (ss.str ());
-					K().rowsAdded (sqlite, sync, result, true);
+					K().rowsAdded (sqlite, sync, result);
 				}
 			}
 

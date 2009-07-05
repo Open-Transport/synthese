@@ -132,34 +132,24 @@ namespace synthese
 				maxDate = DateTime(TIME_CURRENT);
 
 			Env env;
-			ReservationTransactionTableSync::Search(
-				env,
-				request->getSession()->getUser()->getKey()
-				, minDate
-				, maxDate
-				, Conversion::ToBool(_displayCanceledReservations->getValue(parameters, variables, object, request))
-				, Conversion::ToInt(_first->getValue(parameters, variables, object, request))
-				, Conversion::ToInt(_number->getValue(parameters, variables, object, request))
-				, DOWN_LINKS_LOAD_LEVEL
-			);
-			BOOST_FOREACH(shared_ptr<ReservationTransaction> tran, env.getRegistry<ReservationTransaction>())
+			ReservationTransactionTableSync::SearchResult transactions(
+				ReservationTransactionTableSync::Search(
+					env,
+					request->getSession()->getUser()->getKey()
+					, minDate
+					, maxDate
+					, Conversion::ToBool(_displayCanceledReservations->getValue(parameters, variables, object, request))
+					, Conversion::ToInt(_first->getValue(parameters, variables, object, request))
+					, Conversion::ToInt(_number->getValue(parameters, variables, object, request))
+					, DOWN_LINKS_LOAD_LEVEL
+			)	);
+			BOOST_FOREACH(shared_ptr<ReservationTransaction> tran, transactions)
 			{
 				const ReservationItemInterfacePage* page(_page->getInterface()->getPage<ReservationItemInterfacePage>());
 				page->display(stream, *tran, variables, request);
 			}
 
 			return string();
-		}
-
-		ReservationsListInterfaceElement::ReservationsListInterfaceElement()
-			: util::FactorableTemplate<interfaces::LibraryInterfaceElement, ReservationsListInterfaceElement>()
-		{
-
-		}
-
-
-		ReservationsListInterfaceElement::~ReservationsListInterfaceElement()
-		{
 		}
 	}
 }

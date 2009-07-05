@@ -22,7 +22,7 @@
 
 #include <sstream>
 
-#include "05_html/ActionResultHTMLTable.h"
+#include "ActionResultHTMLTable.h"
 
 using namespace std;
 
@@ -30,19 +30,6 @@ namespace synthese
 {
 	namespace html
 	{
-		ActionResultHTMLTable::ActionResultHTMLTable( const HeaderVector& header , const HTMLForm& searchForm, RequestParameters requestParameters, ResultParameters resultParameters, const HTMLForm& actionForm, std::string selectName/*="" */, std::string iconPath/*=""*/ )
-			: ResultHTMLTable(header, searchForm, requestParameters, resultParameters, iconPath), _actionForm(actionForm), _selectName(selectName)
-		{
-			stringstream s;
-			if (!_selectName.empty())
-			{
-				s << "<th>Sel</th>";
-				++_cols;
-			}
-			s << _headers;
-			_headers = s.str();
-		}
-
 		std::string ActionResultHTMLTable::open()
 		{
 			stringstream s;

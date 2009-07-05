@@ -84,8 +84,7 @@ namespace synthese
 
 		void MessagesTemplateLibraryAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			uid id(map.getUid(PARAMETER_FOLDER_ID, false, FACTORY_KEY));
 			if (id > 0)
@@ -133,41 +132,39 @@ namespace synthese
 			bool deleteRight(_request.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
 
 			// Search
-			Env tenv;
-			TextTemplateTableSync::Search(
-				tenv,
-				ALARM_LEVEL_UNKNOWN
-				, _folder.get() ? _folder->getKey() : 0
-				, false
-				, string()
-				, NULL
-				, 0
-				, -1
-				, true
-				, false
-				, false
-				, true
-			);
+			TextTemplateTableSync::SearchResult templates(
+				TextTemplateTableSync::Search(
+					_getEnv(),
+					_folder.get() ? _folder->getKey() : 0
+					, false
+					, string()
+					, NULL
+					, 0
+					, optional<size_t>()
+					, true
+					, false
+					, false
+					, true
+			)	);
 
-			Env fenv;
-			TextTemplateTableSync::Search(
-				fenv,
-				ALARM_LEVEL_UNKNOWN
-				, _folder.get() ? _folder->getKey() : 0
-				, true
-				, string()
-				, NULL
-				, 0
-				, -1
-				, true
-				, false
-				, false
-				, true
-			);
+			TextTemplateTableSync::SearchResult folders(
+				TextTemplateTableSync::Search(
+					_getEnv(),
+					_folder.get() ? _folder->getKey() : 0
+					, true
+					, string()
+					, NULL
+					, 0
+					, optional<size_t>()
+					, true
+					, false
+					, false
+					, true
+			)	);
 
 /*			stream << "<h1>Répertoires</h1>";
 			HTMLList l;
-			BOOST_FOREACH(shared_ptr<TextTemplate> folder, fenv.getRegistry<TextTemplate>())
+			BOOST_FOREACH(shared_ptr<TextTemplate> folder, folders)
 			{
 			}
 
@@ -186,10 +183,10 @@ namespace synthese
 			}
 */
 
-			if(!tenv.getRegistry<TextTemplate>().empty())
+			if(!templates.empty())
 			{
 				stream << "<h1>Modèles de texte</h1>";
-				BOOST_FOREACH(shared_ptr<TextTemplate> tt, tenv.getRegistry<TextTemplate>())
+				BOOST_FOREACH(shared_ptr<TextTemplate> tt, templates)
 				{
 					// Variables
 					deleteRequest.getAction()->setTemplate(tt);

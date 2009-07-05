@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -41,7 +41,8 @@ namespace synthese
 		/** CalendarTemplateElement table synchronizer.
 			@ingroup m55LS refLS
 		*/
-		class CalendarTemplateElementTableSync : public db::SQLiteNoSyncTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>
+		class CalendarTemplateElementTableSync:
+			public db::SQLiteNoSyncTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>
 		{
 		public:
 			static const std::string COL_CALENDAR_ID;
@@ -52,21 +53,21 @@ namespace synthese
 			static const std::string COL_POSITIVE;
 			static const std::string COL_INCLUDE_ID;
 			
-			CalendarTemplateElementTableSync();
-
-
 			/** CalendarTemplateElement search.
-				(other search parameters)
+				@param env Environment to populate
+				@param calendarId ID of the calendar which the searched elements must belong
 				@param first First CalendarTemplateElement object to answer
 				@param number Number of CalendarTemplateElement objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@param linkLevel level of link of the objects in the environment
+				@return found objects
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				uid calendarId
 				, int first = 0
-				, int number = 0,
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 

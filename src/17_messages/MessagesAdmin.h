@@ -128,7 +128,6 @@ namespace synthese
 			boost::optional<std::string>						_searchName;
 			boost::optional<const ScenarioTemplate*>			_searchScenario;
 			html::ActionResultHTMLTable::RequestParameters		_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters 		_resultParameters;
 
 			server::ParametersMap	_parametersMap;
 			
@@ -146,7 +145,6 @@ namespace synthese
 			*/
 			virtual void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
 				bool objectWillBeCreatedLater
 			);
 			

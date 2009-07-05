@@ -38,7 +38,8 @@ namespace synthese
 		/** LineStop table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class LineStopTableSync : public db::SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>
+		class LineStopTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>
 		{
 		public:
 			static const std::string COL_PHYSICALSTOPID;
@@ -50,23 +51,22 @@ namespace synthese
 			static const std::string COL_SCHEDULEINPUT;
 			static const std::string COL_VIAPOINTS;
 			
-			LineStopTableSync();
 
 
 			/** LineStop search.
 				(other search parameters)
 				@param first First LineStop object to answer
 				@param number Number of LineStop objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<LineStop*> Founded LineStop objects.
+				@return Found LineStop objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				uid lineId = UNKNOWN_VALUE
 				, uid physicalStopId = UNKNOWN_VALUE
 				, int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByRank = true
 				, bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL

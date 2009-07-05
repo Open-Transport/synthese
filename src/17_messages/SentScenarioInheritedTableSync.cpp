@@ -160,16 +160,7 @@ namespace synthese
 
 	namespace messages
 	{
-
-		SentScenarioInheritedTableSync::SentScenarioInheritedTableSync()
-			: SQLiteInheritedRegistryTableSync<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>()
-		{
-
-		}
-
-
-
-		void SentScenarioInheritedTableSync::Search(
+		SentScenarioInheritedTableSync::SearchResult SentScenarioInheritedTableSync::Search(
 			util::Env& env,
 			boost::optional<std::string> name /*= boost::optional<std::string>()*/,
 			/*AlarmConflict conflict, */
@@ -178,7 +169,7 @@ namespace synthese
 			boost::optional<time::DateTime> date /*= boost::optional<time::DateTime>()*/,
 			boost::optional<util::RegistryKeyType> scenarioId /*= boost::optional<util::RegistryKeyType>()*/,
 			boost::optional<int> first /*= boost::optional<int>()*/,
-			boost::optional<int> number /*= boost::optional<int>()*/,
+			boost::optional<std::size_t> number /*= boost::optional<int>()*/,
 			bool orderByDate /*= true*/,
 			bool orderByName /*= false*/,
 			bool orderByStatus /*= false*/,
@@ -299,11 +290,11 @@ namespace synthese
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+				query << " LIMIT " << (*number + 1);
 			if (first)
-				query << " OFFSET " << Conversion::ToString(*first);
+				query << " OFFSET " << *first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 		
@@ -314,8 +305,10 @@ namespace synthese
 		){
 			// The action on the alarms
 			Env env;
-			AlarmTemplateInheritedTableSync::Search(env, sourceId);
-			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, env.getRegistry<AlarmTemplate>())
+			AlarmTemplateInheritedTableSync::SearchResult alarms(
+				AlarmTemplateInheritedTableSync::Search(env, sourceId)
+			);
+			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, alarms)
 			{
 				SentAlarm alarm(dest, *templateAlarm);
 				AlarmTableSync::Save(&alarm);
@@ -335,8 +328,10 @@ namespace synthese
 		){
 			// The action on the alarms
 			Env env;
-			ScenarioSentAlarmInheritedTableSync::Search(env, sourceId);
-			BOOST_FOREACH(shared_ptr<SentAlarm> templateAlarm, env.getRegistry<SentAlarm>())
+			ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
+				ScenarioSentAlarmInheritedTableSync::Search(env, sourceId)
+			);
+			BOOST_FOREACH(shared_ptr<SentAlarm> templateAlarm, alarms)
 			{
 				SentAlarm alarm(static_cast<SentAlarm&>(*templateAlarm));
 				AlarmTableSync::Save(&alarm);
@@ -353,11 +348,13 @@ namespace synthese
 		void SentScenarioInheritedTableSync::WriteVariablesIntoMessages( const SentScenario& scenario )
 		{
 			Env env;
-			ScenarioSentAlarmInheritedTableSync::Search(env, scenario.getKey());
+			ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
+				ScenarioSentAlarmInheritedTableSync::Search(env, scenario.getKey())
+			);
 
 			const SentScenario::VariablesMap& values(scenario.getVariables());
 			
-			BOOST_FOREACH(shared_ptr<SentAlarm> alarm, env.getEditableRegistry<SentAlarm>())
+			BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 			{
 				if (!alarm->getTemplate()) continue;
 

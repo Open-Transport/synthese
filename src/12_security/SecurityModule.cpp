@@ -57,11 +57,13 @@ namespace synthese
 		template<> void ModuleClassTemplate<SecurityModule>::Init()
 		{
 			Env env;
-			ProfileTableSync::Search(env, SecurityModule::ROOT_PROFILE);
-			if (env.getRegistry<Profile>().empty())
+			ProfileTableSync::SearchResult rootProfiles(
+				ProfileTableSync::Search(env, SecurityModule::ROOT_PROFILE)
+			);
+			if (rootProfiles.empty())
 				SecurityModule::_rootProfile.reset(new Profile);
 			else
-				SecurityModule::_rootProfile = env.getEditableRegistry<Profile>().front();
+				SecurityModule::_rootProfile = rootProfiles.front();
 	
 			SecurityModule::_rootProfile->setName(SecurityModule::ROOT_PROFILE);
 			shared_ptr<Right> r(new GlobalRight);
@@ -71,21 +73,22 @@ namespace synthese
 			SecurityModule::_rootProfile->addRight(r);
 			ProfileTableSync::Save(SecurityModule::_rootProfile.get());
 
-			UserTableSync::Search(
-				env,
-				SecurityModule::ROOT_USER,
-				SecurityModule::ROOT_USER,
-				"%","%",
-				SecurityModule::_rootProfile->getKey()
-			);
-			if (env.getRegistry<User>().empty())
+			UserTableSync::SearchResult rootUsers(
+				UserTableSync::Search(
+					env,
+					SecurityModule::ROOT_USER,
+					SecurityModule::ROOT_USER,
+					"%","%",
+					SecurityModule::_rootProfile->getKey()
+			)	);
+			if (rootUsers.empty())
 			{
 				SecurityModule::_rootUser.reset(new User);
 				SecurityModule::_rootUser->setLogin(SecurityModule::ROOT_USER);
 				SecurityModule::_rootUser->setPassword(SecurityModule::ROOT_USER);
 			}
 			else
-				SecurityModule::_rootUser = env.getEditableRegistry<User>().front();
+				SecurityModule::_rootUser = rootUsers.front();
 			SecurityModule::_rootUser->setName(SecurityModule::ROOT_USER);
 			SecurityModule::_rootUser->setProfile(SecurityModule::_rootProfile.get());
 			SecurityModule::_rootUser->setConnectionAllowed(true);
@@ -128,8 +131,10 @@ namespace synthese
 				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
 			
 			Env env;
-			ProfileTableSync::Search(env);
-			BOOST_FOREACH(shared_ptr<Profile> profile, env.getRegistry<Profile>())
+			ProfileTableSync::SearchResult profiles(
+				ProfileTableSync::Search(env)
+			);
+			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
 				m.push_back(make_pair(profile->getKey(), profile->getName()));
 			}
@@ -143,8 +148,10 @@ namespace synthese
 				m.push_back(make_pair(uid(UNKNOWN_VALUE), "(tous)"));
 
 			Env env;
-			UserTableSync::Search(env, "%","%","%","%",UNKNOWN_VALUE, false);
-			BOOST_FOREACH(shared_ptr<User> user, env.getRegistry<User>())
+			UserTableSync::SearchResult users(
+				UserTableSync::Search(env, "%","%","%","%",UNKNOWN_VALUE, false)
+			);
+			BOOST_FOREACH(shared_ptr<User> user, users)
 			{
 				m.push_back(make_pair(user->getKey(), user->getSurname() + " " + user->getName()));
 			}
@@ -168,8 +175,14 @@ namespace synthese
 		{
 			vector<shared_ptr<Profile> > v;
 			Env env;
-			ProfileTableSync::Search(env, profile.get() ? profile->getKey() : RegistryKeyType(0), 0, UNKNOWN_VALUE, FIELDS_ONLY_LOAD_LEVEL);
-			BOOST_FOREACH(shared_ptr<Profile> cprofile, env.getRegistry<Profile>())
+			ProfileTableSync::SearchResult profiles(
+				ProfileTableSync::Search(
+					env, profile.get() ? profile->getKey() : RegistryKeyType(0),
+					0,
+					UNKNOWN_VALUE,
+					FIELDS_ONLY_LOAD_LEVEL
+			)	);
+			BOOST_FOREACH(shared_ptr<Profile> cprofile, profiles)
 			{
 				 v.push_back(cprofile);
 			}

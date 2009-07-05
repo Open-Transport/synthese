@@ -29,9 +29,6 @@
 #include <iostream>
 
 #include "SQLiteNoSyncTableSyncTemplate.h"
-
-#include "17_messages/Types.h"
-
 #include "TextTemplate.h"
 
 namespace synthese
@@ -41,36 +38,34 @@ namespace synthese
 		/** TextTemplate table synchronizer.
 			@ingroup m17LS refLS
 		*/
-		class TextTemplateTableSync : public db::SQLiteNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>
+		class TextTemplateTableSync:
+			public db::SQLiteNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>
 		{
 		public:
 			static const std::string COL_NAME;
 			static const std::string COL_SHORT_TEXT;
 			static const std::string COL_LONG_TEXT;
-			static const std::string COL_LEVEL;
 			static const std::string COL_IS_FOLDER;
 			static const std::string COL_PARENT_ID;
 
-			TextTemplateTableSync();
 
 
 			/** TextTemplate search.
-				(other search parameters)
+				@param env Environment to populate
 				@param first First TextTemplate object to answer
 				@param number Number of TextTemplate objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<TextTemplate*> Founded TextTemplate objects.
+				@return Found TextTemplate objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
-				AlarmLevel level = ALARM_LEVEL_UNKNOWN
-				, uid parentId = static_cast<uid>(UNKNOWN_VALUE)
+				uid parentId = static_cast<uid>(UNKNOWN_VALUE)
 				, bool isFolder = false
 				, std::string name = std::string()
 				, const TextTemplate* templateToBeDifferentWith = NULL
 				, int first = 0
-				, int number = -1
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByName = true
 				, bool orderByShortText = false
 				, bool orderByLongText = false

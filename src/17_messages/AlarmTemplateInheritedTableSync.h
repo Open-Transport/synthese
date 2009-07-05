@@ -41,15 +41,11 @@ namespace synthese
 			>
 		{
 		public:
-			/** Constructor.
-			*/
-			AlarmTemplateInheritedTableSync();
-
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType scenarioTemplateId = UNKNOWN_VALUE
 				, int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByLevel = false
 				, bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL

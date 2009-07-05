@@ -78,11 +78,14 @@ namespace synthese
 		
 		void TimetableBookAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK, ResultHTMLTable::UNLIMITED_SIZE);
+			_requestParameters.setFromParametersMap(
+				map.getMap(),
+				PARAMETER_RANK,
+				optional<size_t>()
+			);
 			
 			if(objectWillBeCreatedLater) return;
 
@@ -102,21 +105,6 @@ namespace synthese
 				if (!_book->getIsBook())
 					throw AdminParametersException("Timetable is not a book");
 			}
-
-			if(!doDisplayPreparationActions) return;
-
-			// Search
-			TimetableTableSync::Search(
-				_getEnv(),
-				_book.get() ? _book->getKey() : 0
-				, _requestParameters.orderField == PARAMETER_RANK
-				, _requestParameters.orderField == PARAMETER_TITLE
-				, _requestParameters.raisingOrder
-			);
-			_resultParameters.setFromResult(
-				_requestParameters,
-				_getEnv().getEditableRegistry<Timetable>()
-			);
 		}
 		
 		
@@ -164,6 +152,16 @@ namespace synthese
 			// Pages
 			stream << "<h1>Fiches horaires</h1>";
 
+			// Search
+			TimetableTableSync::SearchResult timetables(
+				TimetableTableSync::Search(
+					_getEnv(),
+					_book.get() ? _book->getKey() : 0
+					, _requestParameters.orderField == PARAMETER_RANK
+					, _requestParameters.orderField == PARAMETER_TITLE
+					, _requestParameters.raisingOrder
+			)	);
+			
 			AdminFunctionRequest<TimetableBookAdmin> searchRequest(_request);
 			AdminActionFunctionRequest<TimetableAddAction,TimetableAdmin> addTimetableRequest(_request);
 			addTimetableRequest.getAction()->setBook(_book);
@@ -182,7 +180,7 @@ namespace synthese
 				h3,
 				searchRequest.getHTMLForm(),
 				_requestParameters,
-				_resultParameters,
+				timetables,
 				addTimetableRequest.getHTMLForm("addtimetable"),
 				TimetableAddAction::PARAMETER_RANK
 			);
@@ -193,7 +191,7 @@ namespace synthese
 			// Links to folders or timetable edition
 			AdminFunctionRequest<TimetableBookAdmin> goFolderRequest(_request);
 			AdminFunctionRequest<TimetableAdmin> editTimetableRequest(_request);
-			BOOST_FOREACH(shared_ptr<Timetable> tt, _getEnv().getRegistry<Timetable>())
+			BOOST_FOREACH(shared_ptr<Timetable> tt, timetables)
 			{
 				if (tt->getIsBook())
 					goFolderRequest.getPage()->setBook(tt);
@@ -299,8 +297,10 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			// Subpages
-			TimetableTableSync::Search(*_env, _book.get() ? _book->getKey() : 0);
-			BOOST_FOREACH(shared_ptr<Timetable> tt, _env->getRegistry<Timetable>())
+			TimetableTableSync::SearchResult timetables(
+				TimetableTableSync::Search(*_env, _book.get() ? _book->getKey() : 0)
+			);
+			BOOST_FOREACH(shared_ptr<Timetable> tt, timetables)
 			{
 				if(tt->getIsBook())
 				{

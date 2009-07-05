@@ -81,7 +81,7 @@ namespace synthese
 					throw ActionException("Le nom ne peut être vide");
 
 				Env env;
-				TextTemplateTableSync::Search(env, ALARM_LEVEL_UNKNOWN, _text->getParentId(), false, _name, _text.get(), 0, 1);
+				TextTemplateTableSync::Search(env, _text->getParentId(), false, _name, _text.get(), 0, 1);
 				if (!env.getRegistry<TextTemplate>().empty())
 					throw ActionException("Un texte portant ce nom existe déjà.");
 

@@ -24,7 +24,7 @@
 #define SYNTHESE_ENV_FARE_H
 
 #include "Registrable.h"
-#include "RegistryWithAutocreationEnabled.h"
+#include "Registry.h"
 
 #include <string>
 
@@ -55,7 +55,7 @@ namespace synthese
 			} FareType;
 
 			/// Chosen registry class.
-			typedef util::RegistryWithAutocreationEnabled<Fare>	Registry;
+			typedef util::Registry<Fare>	Registry;
 
 		 private:
 		    

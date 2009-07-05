@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_ReservationsListInterfaceElement_H__
 #define SYNTHESE_ReservationsListInterfaceElement_H__
 
-#include "11_interfaces/LibraryInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "LibraryInterfaceElement.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -87,9 +86,6 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL
 			) const;
-				
-			ReservationsListInterfaceElement();
-			~ReservationsListInterfaceElement();
 		};
 	}
 }

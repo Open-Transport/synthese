@@ -93,8 +93,7 @@ namespace synthese
 		
 		void DisplayScreenCPUAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			if(objectWillBeCreatedLater) return;
 			
@@ -112,11 +111,6 @@ namespace synthese
 
 			_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _cpu->getKey());
 			_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _cpu->getKey());
-
-			if(!doDisplayPreparationActions) return;
-
-			_lastContact = DisplayMonitoringStatusTableSync::GetLastContact(*_cpu);
-			DisplayScreenTableSync::SearchFromCPU(_getEnv(), _cpu->getKey());
 		}
 		
 		
@@ -135,6 +129,7 @@ namespace synthese
 			VariablesMap& variables,
 					const FunctionRequest<admin::AdminRequest>& _request
 		) const	{
+			
 			////////////////////////////////////////////////////////////////////
 			// TECHNICAL TAB
 			if (openTabContent(stream, TAB_TECHNICAL))
@@ -217,6 +212,11 @@ namespace synthese
 						" Cette unité centrale n'est pas supervisée."
 						;
 				} else {
+					
+					boost::posix_time::ptime _lastContact(
+						DisplayMonitoringStatusTableSync::GetLastContact(*_cpu)
+					);
+
 					stream <<
 						l.element() <<
 						"Durée théorique entre les contacts : " <<
@@ -273,6 +273,10 @@ namespace synthese
 				createDisplayRequest.setActionWillCreateObject();
 				createDisplayRequest.getAction()->setCPU(_cpu->getKey());
 				
+				DisplayScreenTableSync::SearchResult screens(
+					DisplayScreenTableSync::SearchFromCPU(_getEnv(), _cpu->getKey())
+				);
+
 				HTMLTable::ColsVector c;
 				c.push_back("Nom");
 				c.push_back("Port COM");
@@ -281,11 +285,9 @@ namespace synthese
 				c.push_back("Actions");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
-				BOOST_FOREACH(const DisplayScreen* screen, _cpu->getWiredScreens())
+				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 				{
-					displayRequest.getPage()->setScreen(
-						_getEnv().getSPtr(screen)
-					);
+					displayRequest.getPage()->setScreen(screen);
 					stream << t.row();
 					stream << t.col() << screen->getLocalizationComment();
 					stream << t.col() << screen->getComPort();

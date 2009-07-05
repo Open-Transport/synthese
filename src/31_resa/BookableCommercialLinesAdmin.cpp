@@ -72,8 +72,7 @@ namespace synthese
 		
 		void BookableCommercialLinesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 		}
 		
@@ -92,17 +91,16 @@ namespace synthese
 			const FunctionRequest<AdminRequest>& _request
 		) const {
 			// Search
-			CommercialLineTableSync::Search(
-				*_env,
-				_request.getUser()->getProfile()->getRightsForModuleClass<ResaRight>()
-				, _request.getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
-				, READ
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, false, true, true, true
-			);
-			ResultHTMLTable::ResultParameters rp;
-			rp.setFromResult(_requestParameters, _env->getEditableRegistry<CommercialLine>());
+			CommercialLineTableSync::SearchResult lines(
+				CommercialLineTableSync::Search(
+					*_env,
+					_request.getUser()->getProfile()->getRightsForModuleClass<ResaRight>()
+					, _request.getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
+					, READ
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, false, true, true, true
+			)	);
 
 			// Requests
 			AdminFunctionRequest<BookableCommercialLinesAdmin> searchRequest(_request);
@@ -116,10 +114,10 @@ namespace synthese
 			h.push_back(make_pair(string(),"Ligne"));
 			h.push_back(make_pair(string(),"Description"));
 			h.push_back(make_pair(string(),"Liens"));
-			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, rp);
+			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, lines);
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, _env->getRegistry<CommercialLine>())
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 			{
 				openRequest.getPage()->setCommercialLine(line);
 
@@ -169,15 +167,17 @@ namespace synthese
 				dynamic_cast<const BookableCommercialLineAdmin*>(currentPage.get())
 			);
 
-			CommercialLineTableSync::Search(
-				*_env,
-				request.getUser()->getProfile()->getRightsForModuleClass<ResaRight>(),
-				request.getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
-				, READ
-				, 0, 0
-				, false, true, true, true
-			);
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, _env->getRegistry<CommercialLine>())
+			CommercialLineTableSync::SearchResult lines(
+				CommercialLineTableSync::Search(
+					*_env,
+					request.getUser()->getProfile()->getRightsForModuleClass<ResaRight>(),
+					request.getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
+					, READ
+					, 0,
+					optional<size_t>()
+					, false, true, true, true
+			)	);
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 			{
 				if(	ba &&
 					ba->getCommercialLine()->getKey() == line->getKey()

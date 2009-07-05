@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -43,7 +43,8 @@ namespace synthese
 
 			@ingroup m12LS refLS
 		*/
-		class ProfileTableSync : public db::SQLiteRegistryTableSyncTemplate<ProfileTableSync,Profile>
+		class ProfileTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<ProfileTableSync,Profile>
 		{
 
 		public:
@@ -57,35 +58,37 @@ namespace synthese
 			static std::string getRightsString(const Profile*);
 			static void setRightsFromString(Profile*, const std::string& text);
 
-			ProfileTableSync();
+
 
 			/** Profile search.
 				@param name name to search (LIKE format)
 				@param right right to search
 				@param first First user to answer
 				@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others users to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<Profile*> Founded users. 
+				@return Found users.
 				@author Hugues Romain
-				@date 2006				
+				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				std::string name = std::string()
 				, std::string right = std::string()
 				, int first = 0
-				, int number = UNKNOWN_VALUE
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByName = true
 				, bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-				);
+			);
+
+
 
 			/** Profile search by parent.
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType parentId,
 				int first = 0,
-				int number = -1,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 

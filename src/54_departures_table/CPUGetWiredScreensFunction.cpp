@@ -79,26 +79,28 @@ namespace synthese
 				string macAddress(map.getString(PARAMETER_CPU_MAC_ADDRESS, true, FACTORY_KEY));
 				setCPU(macAddress);
 			}
-
-			// Last monitoring status
-			DisplayMonitoringStatusTableSync::Search(*_env, _cpu->getKey(), 0, 1, true, false);
 		}
 
 
 		void CPUGetWiredScreensFunction::_run( std::ostream& stream ) const
 		{
+			// Last monitoring status
+			DisplayMonitoringStatusTableSync::SearchResult entries(
+				DisplayMonitoringStatusTableSync::Search(*_env, _cpu->getKey(), 0, 1, true, false)
+			);
+
 			// Standard status object creation
 			DisplayMonitoringStatus status(_cpu.get());
 
 			// Last monitoring message
-			if (_env->getRegistry<DisplayMonitoringStatus>().empty())
+			if (entries.empty())
 			{
 				// First contact
 				DisplayMaintenanceLog::AddMonitoringFirstEntry(*_cpu, status);
 			}
 			else
 			{
-				boost::shared_ptr<DisplayMonitoringStatus> lastStatus(_env->getEditableRegistry<DisplayMonitoringStatus>().front());
+				boost::shared_ptr<DisplayMonitoringStatus> lastStatus(entries.front());
 				status.setKey(lastStatus->getKey());
 
 				// Up contact?
@@ -153,12 +155,14 @@ namespace synthese
 
 		void CPUGetWiredScreensFunction::setCPU( const std::string& macAddress )
 		{
-			DisplayScreenCPUTableSync::Search(*_env, optional<RegistryKeyType>(), macAddress);
-			if(_env->getRegistry<DisplayScreenCPU>().empty())
+			DisplayScreenCPUTableSync::SearchResult cpus(
+				DisplayScreenCPUTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), macAddress)
+			);
+			if(cpus.empty())
 			{
 				throw RequestException("Display screen CPU MAC address "+ macAddress +" invalid.");
 			}
-			_cpu = Env::GetOfficialEnv().getRegistry<DisplayScreenCPU>().get(_env->getRegistry<DisplayScreenCPU>().getOrderedVector().front()->getKey());
+			_cpu = cpus.front();
 		}
 	}
 }

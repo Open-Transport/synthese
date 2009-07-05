@@ -45,6 +45,9 @@ namespace synthese
 		class SQLiteInheritedTableSyncTemplate
 			: public util::FactorableTemplate<ParentTableSyncClass,TableSyncClass>
 		{
+		public:
+			typedef std::vector<boost::shared_ptr<ObjectClass> > SearchResult;
+
 		protected:
 			/** Object links loader from the SQLite database.
 				@param obj Pointer to the object to load from the database
@@ -87,9 +90,13 @@ namespace synthese
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
-				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
+				typename ObjectClass::Registry& registry(
+					env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>()
+				);
 				if (registry.contains(key))
+				{
 					return boost::static_pointer_cast<ObjectClass,typename ObjectClass::Registry::ObjectsClass>(registry.getEditable(key));
+				}
 
 				boost::shared_ptr<ObjectClass> object;
 				try
@@ -106,8 +113,9 @@ namespace synthese
 				}
 
 				env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>().add(
-					boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass, ObjectClass>(object)
-				);
+					boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass, ObjectClass>(
+						object
+				)	);
 
 				return object;
 			}
@@ -136,24 +144,35 @@ namespace synthese
 				@param linkLevel Link level
 				@throws Exception if the load failed
 			*/
-			static void LoadFromQuery(
+			static SearchResult LoadFromQuery(
 				const std::string& query,
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
 				try
 				{
+					SearchResult r;
 					typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
 					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 					while (rows->next ())
 					{
-						if(registry.contains(rows->getKey())) continue;
-						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
-						Load(object.get(), rows, env, linkLevel);
-						registry.add(
-							boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
-						);
+						if(registry.contains(rows->getKey()))
+						{
+							r.push_back(registry.get(rows->getKey()));
+						}
+						else
+						{
+							boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
+							Load(object.get(), rows, env, linkLevel);
+							registry.add(
+								boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
+							);
+							r.push_back(
+								boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
+							);
+						}
 					}
+					return r;
 				}
 				catch(SQLiteException& e)
 				{

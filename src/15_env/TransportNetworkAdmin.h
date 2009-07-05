@@ -50,12 +50,10 @@ namespace synthese
 			std::string	_searchName;
 
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			html::ResultHTMLTable::ResultParameters		_resultParameters;
-
+			
 		public:
 			static const std::string PARAMETER_SEARCH_NAME;
-
-			TransportNetworkAdmin();
+			
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -65,7 +63,6 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
 				bool objectWillBeCreatedLater
 			);
 			

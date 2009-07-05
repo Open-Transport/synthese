@@ -41,17 +41,12 @@ namespace synthese
 			>
 		{
 		public:
-			/** Constructor.
-			*/
-			ScenarioSentAlarmInheritedTableSync();
-
-
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType scenarioId,
-				int first = 0
-				, int number = 0
-				, bool orderByLevel = false
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByLevel = false
 				, bool orderByStatus = false
 				, bool orderByConflict = false
 				, bool raisingOrder = false,

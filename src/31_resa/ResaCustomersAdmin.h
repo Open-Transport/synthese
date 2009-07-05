@@ -54,10 +54,8 @@ namespace synthese
 			std::string										_searchName;
 			std::string										_searchSurname;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
-			html::ResultHTMLTable::ResultParameters			_resultParameters;
 
 		public:
-			ResaCustomersAdmin();
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -67,8 +65,7 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+				bool objectWillBeCreatedLater
 			);
 			
 			

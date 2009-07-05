@@ -58,15 +58,14 @@ namespace synthese
 			static const std::string COL_Y;
 			static const std::string COL_OPERATOR_CODE;
 
-			PhysicalStopTableSync ();
-			~PhysicalStopTableSync ();
 
-			static void Search(
+
+			static SearchResult Search(
 				util::Env& env,
 				uid placeId = UNKNOWN_VALUE,
 				std::string operatorCode = std::string("%")
 				, int first = 0
-				, int number = 0,
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};

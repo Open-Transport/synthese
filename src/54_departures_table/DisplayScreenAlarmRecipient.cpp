@@ -195,6 +195,22 @@ namespace synthese
 				, searchMessage
 				);
 
+			DisplayScreenTableSync::SearchResult screens(
+				DisplayScreenTableSync::Search(
+					env,
+					searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>()
+					, searchRequest.getUser()->getProfile()->getGlobalPublicRight<MessagesRight>() >= READ
+					, WRITE
+					, UNKNOWN_VALUE
+					, UNKNOWN_VALUE
+					, searchLine
+					, searchType
+					, searchCity
+					, searchStop
+					, searchName
+					, searchState
+					, searchMessage
+			)	);
 
 			ResultHTMLTable::HeaderVector v1;
 			v1.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
@@ -202,26 +218,16 @@ namespace synthese
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, "Etat"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
 			v1.push_back(make_pair(string(), "Ajout"));
-			ResultHTMLTable t1(v1,searchRequest.getHTMLForm(), ResultHTMLTable::RequestParameters(), ResultHTMLTable::ResultParameters());
+			ResultHTMLTable t1(
+				v1,
+				searchRequest.getHTMLForm(),
+				ResultHTMLTable::RequestParameters(),
+				screens
+			);
 
 			stream << t1.open();
 
-			DisplayScreenTableSync::Search(
-				env,
-				searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>()
-				, searchRequest.getUser()->getProfile()->getGlobalPublicRight<MessagesRight>() >= READ
-				, WRITE
-				, UNKNOWN_VALUE
-				, UNKNOWN_VALUE
-				, searchLine
-				, searchType
-				, searchCity
-				, searchStop
-				, searchName
-				, searchState
-				, searchMessage
-			);
-			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, env.getRegistry<DisplayScreen>())
+			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 			{
 				if (screen->getLocalization() == NULL)
 					continue;

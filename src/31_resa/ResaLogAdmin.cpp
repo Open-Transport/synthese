@@ -72,8 +72,7 @@ namespace synthese
 		
 		void ResaLogAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_log.set(
 				map,

@@ -136,18 +136,13 @@ namespace synthese
 
 	namespace road
 	{
-		RoadTableSync::RoadTableSync()
-			: SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>()
-		{
-		}
-
-		void RoadTableSync::Search(
+		RoadTableSync::SearchResult RoadTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> roadPlaceId,
 			boost::optional<util::RegistryKeyType> startingNodeId,
 			boost::optional<util::RegistryKeyType> endingNodeId,
 			int first /*= 0*/,
-			int number /*= 0*/,
+			boost::optional<std::size_t> number /*= 0*/,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -167,12 +162,14 @@ namespace synthese
 			{
 				query << " AND (SELECT " << RoadChunkTableSync::COL_ADDRESSID << " FROM " << RoadChunkTableSync::TABLE.NAME << " WHERE " << RoadChunkTableSync::COL_ROADID << "=" << TABLE.NAME << "." << TABLE_COL_ID << " ORDER BY " << RoadChunkTableSync::COL_RANKINPATH << " DESC LIMIT 1)=" << *startingNodeId;
 			}
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			if (number)
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

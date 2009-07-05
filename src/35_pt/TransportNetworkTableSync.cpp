@@ -106,19 +106,12 @@ namespace synthese
 
 	namespace pt
 	{
-		TransportNetworkTableSync::TransportNetworkTableSync ()
-		: SQLiteRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>()
-		{
-		}
-
-
-	    
-	    void TransportNetworkTableSync::Search(
+	    TransportNetworkTableSync::SearchResult TransportNetworkTableSync::Search(
 			Env& env,
 			string name,
 			string creatorId,
 			int first, /*= 0*/
-			int number, /*= 0*/
+			boost::optional<std::size_t> number,
 			bool orderByName,
 			bool raisingOrder,
 			LinkLevel linkLevel
@@ -134,12 +127,12 @@ namespace synthese
 				query << " AND " << COL_CREATOR_ID << " LIKE " << Conversion::ToSQLiteString(creatorId);
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

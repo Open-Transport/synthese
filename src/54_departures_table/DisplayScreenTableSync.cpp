@@ -275,10 +275,7 @@ namespace synthese
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
-					}
-				}
-			}
-		}
+		}	}	}	}
 
 
 
@@ -400,20 +397,11 @@ namespace synthese
 			;
 			
 			sqlite->execUpdate(query.str());
-		}
-
-	}
+	}	}
 
 	namespace departurestable
 	{
-		DisplayScreenTableSync::DisplayScreenTableSync()
-			: SQLiteRegistryTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>()
-		{
-		}
-
-
-	    
-	    void DisplayScreenTableSync::Search(
+	    DisplayScreenTableSync::SearchResult DisplayScreenTableSync::Search(
 			Env& env,
 			optional<const security::RightsOfSameClassMap&> rights 
 			, bool totalControl 
@@ -428,7 +416,7 @@ namespace synthese
 			, int state 
 			, int message 
 			, int first /*= 0*/
-			, int number /*= 0*/ 
+			, boost::optional<std::size_t> number
 			, bool orderByUid /*= false*/
 			, bool orderByCity /*= true*/
 			, bool orderByStopName /*= false*/
@@ -444,87 +432,112 @@ namespace synthese
 			    << " SELECT"
 			    << " d.*"
 			    << " FROM "
-			    << TABLE.NAME << " AS d"
-			    << " INNER JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
-			    << " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
-			    << " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
+			    << TABLE.NAME << " AS d";
+			if(localizationid != 0)
+			{
+				query
+					<< " INNER JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
+					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
+					<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
 				;
-			if (lineid != UNKNOWN_VALUE || neededLevel > FORBIDDEN)
-			    query
-				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
-				<< " INNER JOIN " << LineTableSync::TABLE.NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
+			
+				if (lineid != UNKNOWN_VALUE || neededLevel > FORBIDDEN)
+					query
+					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+					<< " INNER JOIN " << LineTableSync::TABLE.NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
 				;
+			}
 			
 			// Filtering
 			query << " WHERE 1 ";
-			if (neededLevel > FORBIDDEN && rights)
-			    query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(*rights, totalControl, neededLevel, false) << ")";
-			if (!cityName.empty())
-			    query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
-			if (!stopName.empty())
-			    query << " AND p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(stopName, false) << "%'";
+			if(localizationid != 0)
+			{
+				if (neededLevel > FORBIDDEN && rights)
+					query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(*rights, totalControl, neededLevel, false) << ")";
+				if (!cityName.empty())
+					query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
+				if (!stopName.empty())
+					query << " AND p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(stopName, false) << "%'";
+				if (lineid != UNKNOWN_VALUE)
+					query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid;
+			}
 			if (!name.empty())
 			    query << " AND d." << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
 			if (duid != UNKNOWN_VALUE)
-			    query << " AND d." << TABLE_COL_ID << "=" << Conversion::ToString(duid);
+			    query << " AND d." << TABLE_COL_ID << "=" << duid;
 			if (localizationid != UNKNOWN_VALUE)
-			    query << " AND p." << TABLE_COL_ID << "=" << Conversion::ToString(localizationid);
+			    query << " AND d." << COL_PLACE_ID << "=" << localizationid;
 			if (typeuid != UNKNOWN_VALUE)
 			    query << " AND d." << COL_TYPE_ID << "=" << typeuid;
-			if (lineid != UNKNOWN_VALUE)
-			    query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid;
 			
 			// Grouping
 			query << " GROUP BY d." << TABLE_COL_ID;
 			
 			// Ordering
 			if (orderByUid)
-			    query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
-			else if (orderByCity)
-			    query
-				<< " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				;
-			else if (orderByStopName)
-			    query
-				<< " ORDER BY s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				;
-			else if (orderByName)
-			    query
-				<< " ORDER BY d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				;
-			else if (orderByType)
-			    query
-				<< " ORDER BY (SELECT " << DisplayTypeTableSync::COL_NAME << " FROM " << DisplayTypeTableSync::TABLE.NAME << " WHERE " << DisplayTypeTableSync::TABLE.NAME << "." << TABLE_COL_ID << " = d." << COL_TYPE_ID << (raisingOrder ? ") ASC" : ") DESC")
-				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				;
-			if (number > 0)
 			{
-			    query << " LIMIT " << Conversion::ToString(number + 1);
-			    if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
+			}
+			else if (localizationid != 0 && orderByCity)
+			{
+				query
+					<< " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				;
+			}
+			else if (localizationid != 0 && orderByStopName)
+			{
+				query
+					<< " ORDER BY s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				;
+			}
+			else if (orderByName)
+			{
+				query << " ORDER BY d." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				if(localizationid != 0)
+				{
+					query <<
+						",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+						<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					;
+			}	}
+			else if (orderByType)
+			{
+			    query <<
+			    	" ORDER BY (SELECT " << DisplayTypeTableSync::COL_NAME << " FROM " <<
+			    	DisplayTypeTableSync::TABLE.NAME << " WHERE " << 
+			    	DisplayTypeTableSync::TABLE.NAME << "." << TABLE_COL_ID << " = d." << 
+			    	COL_TYPE_ID << (raisingOrder ? ") ASC" : ") DESC");
+				if(localizationid != 0)
+				{
+					query << ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				}
+				query << ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			}
+			if (number)
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
 			}
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
 
-		void DisplayScreenTableSync::SearchFromCPU(
+		DisplayScreenTableSync::SearchResult DisplayScreenTableSync::SearchFromCPU(
 			util::Env& env,
 			util::RegistryKeyType cpuId,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		){
 			stringstream query;
-			query
-				<< " SELECT"
+			query <<
+				" SELECT"
 				<< " *"
 				<< " FROM "
 				<< TABLE.NAME <<
@@ -532,11 +545,9 @@ namespace synthese
 				COL_CPU_HOST_ID << "=" << cpuId <<
 				" ORDER BY " <<
 				COL_COM_PORT << "," << COL_WIRING_CODE
-
 			;
 
-
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
@@ -545,7 +556,7 @@ namespace synthese
 			util::Env& env,
 			util::RegistryKeyType screenId,
 			int limit
-		) {
+		){
 			DateTime now(TIME_CURRENT);
 			stringstream q;
 			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
@@ -575,7 +586,7 @@ namespace synthese
 
 		bool DisplayScreenTableSync::GetIsAtLeastALineDisplayed(
 			util::RegistryKeyType screenId
-		) {
+		){
 			stringstream q;
 			q	<< "SELECT l." << TABLE_COL_ID
 				<< " FROM " << TABLE.NAME << " AS d"
@@ -625,6 +636,4 @@ namespace synthese
 				result.push_back(static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)));
 			}
 			return result;
-		}
-	}
-}
+}	}	}

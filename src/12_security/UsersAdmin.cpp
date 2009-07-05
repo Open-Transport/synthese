@@ -80,8 +80,7 @@ namespace synthese
 
 		void UsersAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-				bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
 			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
 			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
@@ -96,27 +95,6 @@ namespace synthese
 
 			// Table Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_LOGIN, 30);
-
-			if(!doDisplayPreparationActions) return;
-			
-			// Search
-			UserTableSync::Search(
-				_getEnv(),
-				"%"+_searchLogin+"%"
-				, "%"+_searchName+"%"
-				, "%"+_searchSurname+"%"
-				, "%"
-				, _searchProfile.get() ? _searchProfile->getKey() : UNKNOWN_VALUE
-				, false
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAM_SEARCH_LOGIN
-				, _requestParameters.orderField == PARAM_SEARCH_NAME
-				, _requestParameters.orderField == PARAM_SEARCH_PROFILE_ID
-				, _requestParameters.raisingOrder,
-				UP_LINKS_LOAD_LEVEL
-			);
-			_resultParameters.setFromResult(_requestParameters, _getEnv().getEditableRegistry<User>());
 		}
 		
 		
@@ -175,7 +153,26 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			if (_getEnv().getRegistry<User>().empty())
+			// Search
+			UserTableSync::SearchResult users(
+				UserTableSync::Search(
+					_getEnv(),
+					"%"+_searchLogin+"%"
+					, "%"+_searchName+"%"
+					, "%"+_searchSurname+"%"
+					, "%"
+					, _searchProfile.get() ? _searchProfile->getKey() : UNKNOWN_VALUE
+					, false
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAM_SEARCH_LOGIN
+					, _requestParameters.orderField == PARAM_SEARCH_NAME
+					, _requestParameters.orderField == PARAM_SEARCH_PROFILE_ID
+					, _requestParameters.raisingOrder,
+					UP_LINKS_LOAD_LEVEL
+			)	);
+			
+			if (users.empty())
 				stream << "Aucun utilisateur trouvé";
 
 
@@ -184,11 +181,20 @@ namespace synthese
 			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
 			v.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _resultParameters, addUserRequest.getHTMLForm("add"),"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			
+			ActionResultHTMLTable t(
+				v,
+				searchRequest.getHTMLForm(),
+				_requestParameters,
+				users,
+				addUserRequest.getHTMLForm("add"),
+				string(),
+				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+			);
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<User> user, _getEnv().getRegistry<User>())
+			BOOST_FOREACH(shared_ptr<User> user, users)
 			{
 				userRequest.getPage()->setUser(user);
 				deleteUserRequest.getAction()->setUser(user);
@@ -208,11 +214,7 @@ namespace synthese
 			stream << t.close();
 		}
 
-		UsersAdmin::UsersAdmin()
-			: AdminInterfaceElementTemplate<UsersAdmin>()
-		{
-		
-		}
+
 
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,

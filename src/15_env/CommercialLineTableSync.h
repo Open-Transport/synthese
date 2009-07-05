@@ -46,7 +46,8 @@ namespace synthese
 		/** CommercialLine table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class CommercialLineTableSync : public db::SQLiteRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>
+		class CommercialLineTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>
 		{
 		public:
 			static const std::string COL_NETWORK_ID;
@@ -63,9 +64,6 @@ namespace synthese
 			static const std::string COL_BIKE_USE_RULE;
 			static const std::string COL_RESERVATION_CONTACT_ID;
 
-			CommercialLineTableSync();
-
-
 			/** CommercialLine search.
 				@param networkId Id of the network which the lines must belong (default = UNKNOWN_VALUE = all networks)
 				@param name SQL LIKE mask that line names must respect (default = "%" = all names). Use % and ? to specify jokers.
@@ -74,17 +72,17 @@ namespace synthese
 				@param orderByNetwork Order the results by network name, and by line name (default = true)
 				@param orderByName Order the result by line name (default = false)
 				@param raisingOrder true = ascendant order, false = descendant order (default = true)
-				@return vector<CommercialLine*> Founded CommercialLine objects.
+				@return Found CommercialLine objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> networkId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<std::string> name = boost::optional<std::string>(),
 				boost::optional<std::string> creatorId = boost::optional<std::string>(),
 				int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByNetwork = true
 				, bool orderByName = false
 				, bool raisingOrder = true,
@@ -103,7 +101,7 @@ namespace synthese
 				@param orderByName Orders the result by name
 				@param raisingOrder true = ascendant order, false = descendant order
 				@param mustbeBookable true = only demand responsive lines
-				@return vector<CommercialLine*> Founded CommercialLine objects.
+				@return Found CommercialLine objects.
 				@author Hugues Romain
 				@date 2006
 
@@ -115,13 +113,13 @@ totalControl = request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDep
 neededLevel = READ
 				@endcode
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				const security::RightsOfSameClassMap& rights
 				, bool totalControl
 				, security::RightLevel neededLevel
 				, int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByNetwork = true
 				, bool orderByName = false
 				, bool raisingOrder = true
@@ -161,7 +159,7 @@ neededLevel = READ
 				, security::RightLevel neededLevel
 				, bool mustBeBookable
 				, std::string selectedColumns = db::TABLE_COL_ID
-				);
+			);
 		};
 	}
 }

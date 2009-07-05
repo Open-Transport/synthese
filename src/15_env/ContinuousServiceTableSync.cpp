@@ -248,19 +248,12 @@ namespace synthese
 
 	namespace env
 	{
-		ContinuousServiceTableSync::ContinuousServiceTableSync()
-			: SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>()
-		{
-		}
-
-
-
-		void ContinuousServiceTableSync::Search(
+		ContinuousServiceTableSync::SearchResult ContinuousServiceTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> lineId,
 			boost::optional<util::RegistryKeyType> commercialLineId,
 			int first /*= 0*/
-			, int number /*= 0*/
+			, boost::optional<std::size_t> number  /*= 0*/
 			, bool orderByDepartureTime
 			, bool raisingOrder,
 			LinkLevel linkLevel
@@ -284,12 +277,12 @@ namespace synthese
 			}
 			if (orderByDepartureTime)
 				query << " ORDER BY " << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

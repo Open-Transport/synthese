@@ -170,17 +170,12 @@ namespace synthese
 
 	namespace departurestable
 	{
-		DisplayTypeTableSync::DisplayTypeTableSync()
-			: SQLiteRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>()
-		{
-		}
-
-		void DisplayTypeTableSync::Search(
+		DisplayTypeTableSync::SearchResult DisplayTypeTableSync::Search(
 			Env& env,
 			string exactName,
-			RegistryKeyType interfaceId,
+			boost::optional<util::RegistryKeyType> interfaceId,
 			int first, /*= 0*/
-			int number, /*= 0*/
+			boost::optional<std::size_t> number, /*= 0*/
 			bool orderByName,
 			bool orderByInterfaceName,
 			bool orderByRows,
@@ -193,7 +188,10 @@ namespace synthese
 				<< " FROM " << TABLE.NAME << " AS t";
 			if (orderByInterfaceName)
 			{
-				query << " LEFT JOIN " << InterfaceTableSync::TABLE.NAME << " AS i ON i." << TABLE_COL_ID  << "=t." << DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID;
+				query <<
+					" LEFT JOIN " << InterfaceTableSync::TABLE.NAME << " AS i ON i." << TABLE_COL_ID  <<
+					"=t." << DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID
+				;
 			}
 
 			query << " WHERE 1";
@@ -201,9 +199,9 @@ namespace synthese
 			{
 				query << " AND t." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(exactName);
 			}
-			if (interfaceId != UNKNOWN_VALUE)
+			if(interfaceId)
 			{
-				query << " AND t." << COL_DISPLAY_INTERFACE_ID << "=" << Conversion::ToString(interfaceId);
+				query << " AND t." << COL_DISPLAY_INTERFACE_ID << "=" << *interfaceId;
 			}
 
 			if (orderByName)
@@ -219,12 +217,12 @@ namespace synthese
 				query << " ORDER BY t." << COL_ROWS_NUMBER << (raisingOrder ? " ASC" : " DESC");
 			}
 
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

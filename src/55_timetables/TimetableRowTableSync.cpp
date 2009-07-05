@@ -160,20 +160,13 @@ namespace synthese
 	
 	namespace timetables
 	{
-		TimetableRowTableSync::TimetableRowTableSync()
-			: SQLiteNoSyncTableSyncTemplate<TimetableRowTableSync,TimetableRow>()
-		{
-		}
-
-
-
-		void TimetableRowTableSync::Search(
+		TimetableRowTableSync::SearchResult TimetableRowTableSync::Search(
 			Env& env,
 			uid timetableId
 			, bool orderByTimetable
 			, bool raisingOrder
 			, int first
-			, int number,
+			, boost::optional<std::size_t> number,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -194,12 +187,12 @@ namespace synthese
 					<< "," << COL_RANK << (raisingOrder ? " ASC" : " DESC");
 
 			// Size
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 

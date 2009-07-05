@@ -46,13 +46,28 @@ namespace synthese
 				@param actionRequest A request to launch by the table content (NULL = no action request)
 				@param selectFieldName A first col with radio buttons will be drawn, named by the parameter. If empty then no radio button.
 			*/
-			ActionResultHTMLTable(const HeaderVector& header
-				, const HTMLForm& searchForm
-				, RequestParameters requestParameters
-				, ResultParameters resultParameters
-				, const HTMLForm& actionForm
-				, std::string selectName=std::string()
-				, std::string iconPath=std::string());
+			template<class T>
+			ActionResultHTMLTable(
+				const HeaderVector& header,
+				const HTMLForm& searchForm,
+				RequestParameters requestParameters,
+				T& v,
+				const HTMLForm& actionForm,
+				std::string selectName=std::string(),
+				std::string iconPath=std::string()
+			):	ResultHTMLTable(header, searchForm, requestParameters, v, iconPath),
+				_actionForm(actionForm),
+				_selectName(selectName)
+			{
+				std::stringstream s;
+				if (!_selectName.empty())
+				{
+					s << "<th>Sel</th>";
+					++_cols;
+				}
+				s << _headers;
+				_headers = s.str();
+			}
 
 			std::string open();
 			std::string close();

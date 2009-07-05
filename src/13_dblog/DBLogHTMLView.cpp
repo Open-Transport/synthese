@@ -176,29 +176,6 @@ namespace synthese
 				false,
 				PARAMETER_PREFIX  + _code
 			);
-
-			// Search
-			DBLogEntryTableSync::Search(
-				_env,
-				_dbLog->getFactoryKey()
-				, _searchStartDate
-				, _searchEndDate
-				, _searchUserId
-				, _searchLevel
-				, _searchObjectId,
-				_searchObjectId2,
-				_searchText
-				, _requestParameters.first
-				, _requestParameters.maxSize
-				, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
-				, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
-				, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
-				, _requestParameters.raisingOrder
-			);
-			_resultParameters.setFromResult(
-				_requestParameters,
-				_env.getEditableRegistry<DBLogEntry>()
-			);
 		}
 		
 		
@@ -216,6 +193,7 @@ namespace synthese
 			bool withForm,
 			bool withLinkToAdminPage
 		) const {
+
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("searchlog"+ _code));
 			if(withForm)
 			{
@@ -298,16 +276,35 @@ namespace synthese
 				v.push_back(make_pair(string(), col));
 			}
 
+			// Search
+			DBLogEntryTableSync::SearchResult entries(
+				DBLogEntryTableSync::Search(
+					_env,
+					_dbLog->getFactoryKey()
+					, _searchStartDate
+					, _searchEndDate
+					, _searchUserId
+					, _searchLevel
+					, _searchObjectId,
+					_searchObjectId2,
+					_searchText
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
+					, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
+					, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
+					, _requestParameters.raisingOrder
+			)	);
+
 			ResultHTMLTable t(
 				v,
 				searchRequest.getHTMLForm(),
 				_requestParameters,
-				_resultParameters
+				entries
 			);
 
 			stream << t.open();
-			
-			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, _env.getRegistry<DBLogEntry>())
+			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, entries)
 			{
 				shared_ptr<const User> user;
 				try

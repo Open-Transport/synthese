@@ -48,7 +48,6 @@ namespace synthese
 			static const std::string COL_HIDDEN_LINE_ID;
 			static const std::string COL_DELAY;
 			
-			NonConcurrencyRuleTableSync();
 
 
 			/** NonConcurrencyRule search.
@@ -57,17 +56,17 @@ namespace synthese
 				@param hiddenAndPriority true indicates that the two filters must be passed, false indicates that at least one of them must be passed
 				@param first First NonConcurrencyRule object to answer
 				@param number Number of NonConcurrencyRule objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<NonConcurrencyRule> Founded NonConcurrencyRule objects.
+				@return Found NonConcurrencyRule objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType hiddenLineId = UNKNOWN_VALUE
 				, util::RegistryKeyType priorityLineId = UNKNOWN_VALUE
 				, bool hiddenAndPriority = true
 				, int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByPriorityLine = true
 				, bool orderByHiddenLine = false
 				, bool orderByDelay = false

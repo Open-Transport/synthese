@@ -64,27 +64,13 @@ namespace synthese
 
 	namespace server
 	{
-		DbModuleConfigTableSync::DbModuleConfigTableSync ()
-			: SQLiteTableSyncTemplate<DbModuleConfigTableSync>()
-		{
-		}
-
-
-
-		DbModuleConfigTableSync::~DbModuleConfigTableSync ()
-		{
-
-		}
-
-
-
 		void 
 		DbModuleConfigTableSync::rowsAdded (SQLite* sqlite, 
 						    SQLiteSync* sync,
-						    const SQLiteResultSPtr& rows, bool isFirstSync)
-		{
-		    while (rows->next ())
-		    {
+						    const SQLiteResultSPtr& rows
+		){
+			while (rows->next ())
+			{
 				ModuleClass::SetParameter (rows->getText (COL_PARAMNAME), 
 						     rows->getText (COL_PARAMVALUE));
 			}

@@ -124,18 +124,13 @@ namespace synthese
 	
 	namespace env
 	{
-		NonConcurrencyRuleTableSync::NonConcurrencyRuleTableSync()
-			: SQLiteRegistryTableSyncTemplate<NonConcurrencyRuleTableSync, NonConcurrencyRule>()
-		{
-		}
-
-		void NonConcurrencyRuleTableSync::Search(
+		NonConcurrencyRuleTableSync::SearchResult NonConcurrencyRuleTableSync::Search(
 			Env& env,
 			util::RegistryKeyType hiddenLineId
 			, util::RegistryKeyType priorityLineId
 			, bool hiddenAndPriority
 			, int first /*= 0*/
-			, int number /*= 0*/ 
+			, boost::optional<std::size_t> number  /*= 0*/ 
 			, bool orderByPriorityLine //= true
 			, bool orderByHiddenLine //= false
 			, bool orderByDelay //= false
@@ -165,12 +160,12 @@ namespace synthese
 			else if(orderByDelay)
 				query << " ORDER BY " << COL_DELAY << (raisingOrder ? " ASC" : " DESC");
 
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

@@ -116,7 +116,7 @@ namespace synthese
 					: Factory<AdminInterfaceElement>::create(pageKey)
 				);
 				page->setEnv(shared_ptr<Env>(new Env));
-				page->setFromParametersMap(map, true, _request->getActionWillCreateObject());
+				page->setFromParametersMap(map, _request->getActionWillCreateObject());
 				if(!_request->getActionWillCreateObject())
 				{
 					page->_buildTabs(

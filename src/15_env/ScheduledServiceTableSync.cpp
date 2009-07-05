@@ -78,8 +78,8 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE(
-				"t016_scheduled_services"
-				);
+			"t016_scheduled_services"
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ScheduledServiceTableSync>::_FIELDS[]=
 		{
@@ -266,14 +266,7 @@ namespace synthese
 
 	namespace env
 	{
-		ScheduledServiceTableSync::ScheduledServiceTableSync()
-			: SQLiteRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>()
-		{
-		}
-
-
-
-		void ScheduledServiceTableSync::Search(
+		ScheduledServiceTableSync::SearchResult ScheduledServiceTableSync::Search(
 			Env& env,
 			optional<RegistryKeyType> lineId,
 			optional<RegistryKeyType> commercialLineId,
@@ -281,7 +274,7 @@ namespace synthese
 			optional<Date> date,
 			bool hideOldServices,
 			int first, /*= 0*/
-			int number, /*= 0*/
+			boost::optional<std::size_t> number, /*= 0*/
 			bool orderByOriginTime,
 			bool raisingOrder,
 			LinkLevel linkLevel
@@ -315,12 +308,12 @@ namespace synthese
 			if (orderByOriginTime)
 				query << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
 
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

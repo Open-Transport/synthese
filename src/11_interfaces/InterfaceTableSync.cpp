@@ -108,13 +108,7 @@ namespace synthese
 
 	namespace interfaces
 	{
-		InterfaceTableSync::InterfaceTableSync()
-			: db::SQLiteRegistryTableSyncTemplate<InterfaceTableSync,Interface> ()
-		{
-		}
-
-
-		void InterfaceTableSync::Search(
+		InterfaceTableSync::SearchResult InterfaceTableSync::Search(
 			util::Env& env,
 			boost::optional<std::string> interfacePageKey,
 			bool orderByName,
@@ -141,7 +135,7 @@ namespace synthese
 			if (first)
 				query << " OFFSET " << Conversion::ToString(*first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
@@ -160,8 +154,10 @@ namespace synthese
 				m.push_back(make_pair(0, *textWithNo));
 			}
 			Env env;
-			Search(env, pageFilter);
-			BOOST_FOREACH(shared_ptr<Interface> interf, env.getRegistry<Interface>())
+			SearchResult interfaces(
+				Search(env, pageFilter)
+			);
+			BOOST_FOREACH(shared_ptr<Interface> interf, interfaces)
 			{
 				m.push_back(make_pair(interf->getKey(), interf->getName()));
 			}

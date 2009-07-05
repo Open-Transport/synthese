@@ -112,9 +112,10 @@ namespace synthese
 
 			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
-				Env senv;
-				ReservationTableSync::Search(senv, object->getKey());
-				BOOST_FOREACH(shared_ptr<Reservation> reser, senv.getRegistry<Reservation>())
+				ReservationTableSync::SearchResult reservations(
+					ReservationTableSync::Search(env, object->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<Reservation> reser, reservations)
 				{
 					object->addReservation(reser);
 				}
@@ -154,18 +155,13 @@ namespace synthese
 
 	namespace resa
 	{
-		ReservationTransactionTableSync::ReservationTransactionTableSync()
-			: SQLiteNoSyncTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>()
-		{
-		}
-
-		void ReservationTransactionTableSync::Search(
+		ReservationTransactionTableSync::SearchResult ReservationTransactionTableSync::Search(
 			Env& env,
 			util::RegistryKeyType serviceId
 			, const time::Date& originDate
 			, bool withCancelled
 			, int first /*= 0*/
-			, int number, /*= 0*/
+			, boost::optional<std::size_t> number, /*= 0*/
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -182,22 +178,22 @@ namespace synthese
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
 			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME;
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
-		void ReservationTransactionTableSync::Search(
+		ReservationTransactionTableSync::SearchResult ReservationTransactionTableSync::Search(
 			Env& env,
 			uid userId
 			, const time::DateTime& minDate
 			, const time::DateTime& maxDate
 			, bool withCancelled
 			, int first
-			, int number,
+			, boost::optional<std::size_t> number,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -215,17 +211,12 @@ namespace synthese
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
 			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME << " DESC";
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (number)
+				query << " LIMIT " << Conversion::ToString(*number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			LoadFromQuery(query.str(), env, linkLevel);
-		}
-
-		ReservationTransactionTableSync::~ReservationTransactionTableSync()
-		{
-
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

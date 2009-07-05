@@ -52,8 +52,7 @@ namespace synthese
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map,
-				bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+				bool objectWillBeCreatedLater
 			);
 			
 			

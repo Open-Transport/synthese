@@ -68,23 +68,24 @@ namespace synthese
 			boost::optional<util::RegistryKeyType> objectId
 		){
 			Env env;
-			DBLogEntryTableSync::Search(
-				env,
-				logKey,
-				DateTime(TIME_UNKNOWN),
-				DateTime(TIME_UNKNOWN),
-				UNKNOWN_VALUE,
-				DBLogEntry::DB_LOG_UNKNOWN,
-				objectId ? *objectId : UNKNOWN_VALUE,
-				UNKNOWN_VALUE,
-				string(),
-				0, 1,
-				true, false, false,false
-			);
+			DBLogEntryTableSync::SearchResult entries(
+				DBLogEntryTableSync::Search(
+					env,
+					logKey,
+					DateTime(TIME_UNKNOWN),
+					DateTime(TIME_UNKNOWN),
+					UNKNOWN_VALUE,
+					DBLogEntry::DB_LOG_UNKNOWN,
+					objectId ? *objectId : UNKNOWN_VALUE,
+					UNKNOWN_VALUE,
+					string(),
+					0, 1,
+					true, false, false,false
+			)	);
 			return
-				env.getRegistry<DBLogEntry>().empty() ?
+				entries.empty() ?
 				shared_ptr<DBLogEntry>() :
-				env.getEditableRegistry<DBLogEntry>().front()
+				entries.front()
 			;
 		}
 

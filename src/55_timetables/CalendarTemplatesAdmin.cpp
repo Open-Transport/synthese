@@ -76,12 +76,9 @@ namespace synthese
 		
 		void CalendarTemplatesAdmin::setFromParametersMap(
 			const ParametersMap& map,
-			bool doDisplayPreparationActions,
-					bool objectWillBeCreatedLater
+			bool objectWillBeCreatedLater
 		){
-			if(!doDisplayPreparationActions) return;
 
-			CalendarTemplateTableSync::Search(_getEnv());
 		}
 		
 		
@@ -108,6 +105,10 @@ namespace synthese
 			// Display
 			stream << "<h1>Calendriers</h1>";
 
+			CalendarTemplateTableSync::SearchResult calendars(
+				CalendarTemplateTableSync::Search(_getEnv())
+			);
+
 			HTMLForm f(addCalendar.getHTMLForm("add"));
 			HTMLTable::ColsVector c;
 			c.push_back("Description");
@@ -118,7 +119,7 @@ namespace synthese
 			AdminFunctionRequest<CalendarTemplateAdmin> editCalendar(_request);
 			BOOST_FOREACH(
 				shared_ptr<CalendarTemplate> ct,
-				_getEnv().getRegistry<CalendarTemplate>()
+				calendars
 			){
 				editCalendar.getPage()->setCalendar(ct);
 
@@ -187,8 +188,10 @@ namespace synthese
 				dynamic_cast<const CalendarTemplateAdmin*>(currentPage.get())
 			);
 
-			CalendarTemplateTableSync::Search(*_env);
-			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, _env->getRegistry<CalendarTemplate>())
+			CalendarTemplateTableSync::SearchResult calendars(
+				CalendarTemplateTableSync::Search(*_env)
+			);
+			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
 			{
 				if(	ta &&
 					ta->getCalendar().get() &&

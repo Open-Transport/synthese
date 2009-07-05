@@ -23,12 +23,8 @@
 #ifndef SYNTHESE_TextTemplateAddAction_H__
 #define SYNTHESE_TextTemplateAddAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
-#include "01_util/UId.h"
-
-#include "17_messages/Types.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -43,7 +39,6 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_SHORT_MESSAGE;
 			static const std::string PARAMETER_LONG_MESSAGE;
-			static const std::string PARAMETER_TYPE;
 			static const std::string PARAMETER_PARENT_ID;
 			static const std::string PARAMETER_IS_FOLDER;
 
@@ -51,7 +46,6 @@ namespace synthese
 			std::string		_name;
 			std::string		_shortMessage;
 			std::string		_longMessage;
-			AlarmLevel		_level;
 			uid				_parentId;
 			bool			_isFolder;
 
@@ -78,7 +72,6 @@ namespace synthese
 			*/
 			void run();
 
-			void setLevel(AlarmLevel level);
 			void setParentId(uid value);
 			void setIsFolder(bool value);
 		};

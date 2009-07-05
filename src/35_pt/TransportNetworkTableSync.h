@@ -44,7 +44,7 @@ namespace synthese
 			 static const std::string COL_NAME;
 			 static const std::string COL_CREATOR_ID;
 
-			TransportNetworkTableSync ();
+
 
 			/** Network search.
 				@param name Part of the name of the server
@@ -53,16 +53,16 @@ namespace synthese
 					or equal to number, then all users were returned despite of the number limit. If the 
 					size is greater than number (actually equal to number + 1) then there is others accounts 
 					to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<shared_ptr<TransportNetwork>> Founded network objects.
+				@return Found network objects.
 				@author Hugues Romain
 				@date 2007
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				std::string name = std::string(),
 				std::string creatorId = std::string()
 				, int first = 0
-				, int number = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByName = true
 				, bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL

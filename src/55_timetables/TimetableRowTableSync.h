@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -41,7 +41,8 @@ namespace synthese
 		/** TimetablesRow table synchronizer.
 			@ingroup m55LS refLS
 		*/
-		class TimetableRowTableSync : public db::SQLiteNoSyncTableSyncTemplate<TimetableRowTableSync,TimetableRow>
+		class TimetableRowTableSync:
+			public db::SQLiteNoSyncTableSyncTemplate<TimetableRowTableSync,TimetableRow>
 		{
 		public:
 			static const std::string COL_TIMETABLE_ID;
@@ -52,24 +53,23 @@ namespace synthese
 			static const std::string COL_IS_COMPULSORY;
 			
 			
-			TimetableRowTableSync();
-
 
 			/** TimetablesRow search.
-				(other search parameters)
+				@param env Environment to populate
+				@param timetableId ID of the timetable which the rows must belong
 				@param first First TimetablesRow object to answer
 				@param number Number of TimetablesRow objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<TimetablesRow> Founded TimetablesRow objects.
+				@return Found TimetablesRow objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				uid timetableId = UNKNOWN_VALUE
 				, bool orderByTimetable = true
 				, bool raisingOrder = true
 				, int first = 0
-				, int number = 0,
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
