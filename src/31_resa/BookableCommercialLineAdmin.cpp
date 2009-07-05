@@ -38,7 +38,6 @@
 #include "LineStop.h"
 #include "LineStopTableSync.h"
 #include "SearchFormHTMLTable.h"
-#include "ServiceDateTableSync.h"
 #include "CommercialLine.h"
 #include "AdvancedSelectTableSync.h"
 #include "CommercialLineTableSync.h"
@@ -154,7 +153,6 @@ namespace synthese
 			if(sid) try
 			{
 				_service = ScheduledServiceTableSync::GetEditable(*sid, _getEnv());
-				ServiceDateTableSync::SetActiveDates(*_service);
 			}
 			catch (ObjectNotFoundException<ScheduledService> e)
 			{

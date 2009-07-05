@@ -300,7 +300,10 @@ namespace synthese
 			{
 				Hour now(TIME_CURRENT);
 				Schedule snow(now, now <= Hour(3,0));
-				query << " AND " << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#" << snow.toSQLString(false) << "'" ;
+				query <<
+					" AND " << ScheduledServiceTableSync::COL_SCHEDULES <<
+					">='00:00:00#" << snow.toSQLString(false) << "'" 
+				;
 			}
 			if (date)
 				query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
@@ -313,7 +316,16 @@ namespace synthese
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);
 
-			return LoadFromQuery(query.str(), env, linkLevel);
-		}
-	}
-}
+			ScheduledServiceTableSync::SearchResult result(
+				LoadFromQuery(query.str(), env, linkLevel)
+			);
+			
+			if(date)
+			{
+				BOOST_FOREACH(shared_ptr<ScheduledService> service, result)
+				{
+					service->setActive(*date);
+			}	}
+				
+			return result;
+}	}	}
