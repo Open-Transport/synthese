@@ -52,8 +52,8 @@ namespace synthese
 				Only if the event is a replacement, and if the concerned object is already loaded into the registry, then it is updated.
 			*/
 			void rowsAdded(
-				SQLite* sqlite __attribute__ ((unused))
-				, SQLiteSync* sync __attribute__ ((unused))
+				SQLite* sqlite
+				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
 				util::Env& env(util::Env::GetOfficialEnv());

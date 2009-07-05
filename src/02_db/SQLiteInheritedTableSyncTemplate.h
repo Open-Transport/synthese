@@ -158,7 +158,7 @@ namespace synthese
 					{
 						if(registry.contains(rows->getKey()))
 						{
-							r.push_back(registry.get(rows->getKey()));
+							r.push_back(registry.getEditable(rows->getKey()));
 						}
 						else
 						{

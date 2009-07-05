@@ -53,8 +53,8 @@ namespace synthese
 			/// Action to do on row insertion / replacement.
 			///	This method loads the object in physical memory.
 			void rowsAdded(
-				SQLite* sqlite __attribute__ ((unused)),
-				SQLiteSync* sync __attribute__ ((unused)),
+				SQLite* sqlite,
+				SQLiteSync* sync,
 				const SQLiteResultSPtr& rows
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
@@ -91,8 +91,8 @@ namespace synthese
 			/// already be loaded.
 			/// @throws nothing
 			void rowsUpdated(
-				SQLite* sqlite __attribute__ ((unused))
-				, SQLiteSync* sync __attribute__ ((unused))
+				SQLite* sqlite
+				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
@@ -122,8 +122,8 @@ namespace synthese
 			/// This method deletes the corresponding object in ram and runs 
 			/// all necessary cleaning actions.
 			void rowsRemoved(
-				SQLite* sqlite __attribute__ ((unused))
-				, SQLiteSync* sync __attribute__ ((unused))
+				SQLite* sqlite
+				, SQLiteSync* sync
 				, const SQLiteResultSPtr& rows
 			){
 				util::Env& env(util::Env::GetOfficialEnv());

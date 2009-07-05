@@ -204,7 +204,7 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
-			CommercialLine* obj __attribute__ ((unused))
+			CommercialLine* obj
 		){
 
 		}
