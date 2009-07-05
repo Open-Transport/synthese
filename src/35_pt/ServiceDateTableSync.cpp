@@ -131,13 +131,6 @@ namespace synthese
 
 	namespace pt
 	{
-		ServiceDateTableSync::ServiceDateTableSync()
-			: SQLiteRegistryTableSyncTemplate<ServiceDateTableSync,ServiceDate>()
-		{
-		}
-		
-		
-
 		void ServiceDateTableSync::DeleteDatesFromNow(
 			util::RegistryKeyType serviceId
 		){

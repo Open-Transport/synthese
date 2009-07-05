@@ -81,8 +81,13 @@ namespace synthese
 			//@{
 				virtual bool isContinuous () const;
 
-				graph::UseRule::ReservationAvailabilityType getReservationAbility() const;
-				
+				graph::UseRule::ReservationAvailabilityType getReservationAbility(
+					const time::Date& date
+				) const;
+				time::DateTime getReservationDeadLine(
+					const time::Date& date
+				) const;
+
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
 					@param method Search departure or arrival :
 						- ServicePointer::DEPARTURE_TO_ARRIVAL

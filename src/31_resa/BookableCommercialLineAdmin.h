@@ -60,7 +60,7 @@ namespace synthese
 			boost::shared_ptr<const env::CommercialLine>	_line;
 			time::Date										_date;
 			bool											_hideOldServices;
-			boost::shared_ptr<const env::ScheduledService>	_service;
+			boost::shared_ptr<env::ScheduledService>		_service;
 
 		public:
 			static const std::string PARAMETER_DISPLAY_CANCELLED;
@@ -69,9 +69,10 @@ namespace synthese
 
 			BookableCommercialLineAdmin();
 			
-			void setService(boost::shared_ptr<const env::ScheduledService> value);
+			void setService(boost::shared_ptr<env::ScheduledService> value);
 			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
 			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
+			boost::shared_ptr<const env::ScheduledService> getService() const;
 
 			
 			/** Initialization of the parameters from a parameters map.
@@ -102,7 +103,7 @@ namespace synthese
 				@date 2008
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
 			/** Authorization control.
@@ -114,7 +115,17 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
-			
+			/** Sub pages getter.
+				@param currentPage Currently displayed page
+				@return PageLinks each subpage of the current page
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+
 			
 			/** Title generator.
 				@return The title of the page
@@ -122,6 +133,15 @@ namespace synthese
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
+		
+		
+			/** Icon generator.
+				@return The icon path of the page
+				@author Hugues Romain
+				@date 2008
+			*/
+			virtual std::string getIcon() const;
+
 		};
 	}
 }

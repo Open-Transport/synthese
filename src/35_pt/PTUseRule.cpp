@@ -346,20 +346,20 @@ namespace synthese
 				{
 					DateTime reservationTime(TIME_CURRENT);
 					if(	reservationTime < getReservationOpeningTime(servicePointer)
-						){
-							return RESERVATION_COMPULSORY_TOO_EARLY;
+					){
+						return RESERVATION_COMPULSORY_TOO_EARLY;
 					}
 					if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getActualDateTime())
-						){
-							return RESERVATION_COMPULSORY_TOO_LATE;
+					){
+						return RESERVATION_COMPULSORY_TOO_LATE;
 					}
 					if (servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 					{
 						return RESERVATION_COMPULSORY_POSSIBLE;
 					}
 					if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getOriginDateTime())
-						){
-							return RESERVATION_COMPULSORY_POSSIBLE;
+					){
+						return RESERVATION_COMPULSORY_POSSIBLE;
 					}
 					return RESERVATION_DEPENDING_ON_DEPARTURE_PLACE;
 

@@ -224,8 +224,9 @@ namespace synthese
 			return _arrivalSchedules;
 		}
 
-		graph::UseRule::ReservationAvailabilityType ScheduledService::getReservationAbility() const
-		{
+		graph::UseRule::ReservationAvailabilityType ScheduledService::getReservationAbility(
+			const Date& date
+		) const {
 			// Pedestrian
 			const Path::Edges& edges(getPath()->getEdges());
 			for(Path::Edges::const_reverse_iterator it(edges.rbegin()); it != edges.rend(); ++it)
@@ -236,7 +237,10 @@ namespace synthese
 						DEPARTURE_TO_ARRIVAL,
 						USER_PEDESTRIAN,
 						*it,
-						DateTime(TIME_CURRENT),
+						DateTime(
+							date,
+							getDepartureSchedule((*it)->getRankInPath())
+						),
 						false,
 						false
 					)	);
@@ -245,6 +249,37 @@ namespace synthese
 			}
 			assert(false);
 			return UseRule::RESERVATION_FORBIDDEN;
+		}
+		
+		
+		time::DateTime ScheduledService::getReservationDeadLine(
+			const Date& date
+		) const {
+			// Pedestrian
+			const Path::Edges& edges(getPath()->getEdges());
+			for(Path::Edges::const_reverse_iterator it(edges.rbegin()); it != edges.rend(); ++it)
+			{
+				if((*it)->isDeparture())
+				{
+					ServicePointer p(getFromPresenceTime(
+						DEPARTURE_TO_ARRIVAL,
+						USER_PEDESTRIAN,
+						*it,
+						DateTime(
+							date,
+							getDepartureSchedule((*it)->getRankInPath())
+						),
+						false,
+						false
+					)	);
+					return getUseRule(USER_PEDESTRIAN).getReservationDeadLine(
+						p.getOriginDateTime(),
+						p.getActualDateTime()
+					);
+				}
+			}
+			assert(false);
+			return DateTime(TIME_UNKNOWN);
 		}
 	}
 }

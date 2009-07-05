@@ -52,7 +52,6 @@ namespace synthese
 			static const std::string COL_SERVICEID;
 			static const std::string COL_DATE;
 			
-			ServiceDateTableSync();
 
 
 			/** Sets all active dates on a service.

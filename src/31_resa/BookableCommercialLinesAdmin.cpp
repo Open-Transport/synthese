@@ -180,7 +180,8 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 			{
 				if(	ba &&
-					ba->getCommercialLine()->getKey() == line->getKey()
+					ba->getCommercialLine()->getKey() == line->getKey() &&
+					!ba->getService().get()
 				){
 					AddToLinks(links, currentPage);
 				}

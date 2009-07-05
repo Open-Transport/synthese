@@ -200,8 +200,9 @@ namespace synthese
 			const util::RegistryKeyType commercialLineId,
 			const Date& day,
 			const optional<RegistryKeyType> serviceId,
+			bool hideOldServices,
 			bool orderByService,
-			bool raisingOrder, 
+			bool raisingOrder,
 			int first /*= 0 */,
 			boost::optional<std::size_t> number  /*= 0*/,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
@@ -210,8 +211,10 @@ namespace synthese
 			query <<
 				" SELECT " << TABLE.NAME << ".*" <<
 				" FROM " << TABLE.NAME <<
-				" INNER JOIN " << ScheduledServiceTableSync::TABLE.NAME << " s ON s." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_SERVICE_ID <<
-				" INNER JOIN " << LineTableSync::TABLE.NAME << " l ON l." << TABLE_COL_ID << "=s." << ScheduledServiceTableSync::COL_PATHID <<
+				" INNER JOIN " << ScheduledServiceTableSync::TABLE.NAME <<
+					" s ON s." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_SERVICE_ID <<
+				" INNER JOIN " << LineTableSync::TABLE.NAME <<
+					" l ON l." << TABLE_COL_ID << "=s." << ScheduledServiceTableSync::COL_PATHID <<
 				" WHERE " <<
 				"l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
 				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << " LIKE '" << day.toSQLString(false) << "%'"
@@ -220,14 +223,27 @@ namespace synthese
 			{
 				query << " AND s." << TABLE_COL_ID << "=" << *serviceId;
 			}
+			if(hideOldServices)
+			{
+				Hour now(TIME_CURRENT);
+				Schedule snow(now, now <= Hour(3,0));
+				query <<
+					" AND s." << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#" <<
+					snow.toSQLString(false) << "'" ;
+			}
+			
 			if(orderByService)
 			{
-				query << " ORDER BY substr(s." << ScheduledServiceTableSync::COL_SCHEDULES << ",0,17) " << (raisingOrder ? "ASC" : "DESC");
+				query <<
+					" ORDER BY substr(s." << ScheduledServiceTableSync::COL_SCHEDULES << ",0,17) " <<
+					(raisingOrder ? "ASC" : "DESC");
 			}
 			if (number)
-				query << " LIMIT " << lexical_cast<string>(*number + 1);
-			if (first > 0)
-				query << " OFFSET " << lexical_cast<string>(first);
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
