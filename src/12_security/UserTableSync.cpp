@@ -243,7 +243,7 @@ namespace synthese
 				query << " INNER JOIN " << ProfileTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=t." << TABLE_COL_PROFILE_ID;
 			query << " WHERE 1 "; 
 			if(login)
-				query << " t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToSQLiteString(*login);
+				query << " AND t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToSQLiteString(*login);
 			if(name)
 				query << " AND t." << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
 			if(surname)
