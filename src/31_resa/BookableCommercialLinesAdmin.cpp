@@ -60,7 +60,7 @@ namespace synthese
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>::ICON("chart_line.png");
+		template<> const string AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>::ICON("reservation_compulsory.png");
 		template<> const string AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>::DEFAULT_TITLE("Réservations par ligne");
 	}
 

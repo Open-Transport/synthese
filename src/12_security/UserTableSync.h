@@ -93,19 +93,20 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				const std::string login = std::string("%")
-				, const std::string name = std::string("%")
-				, const std::string surname = std::string("%")
-				, const std::string phone = std::string("%")
-				, uid profileId = UNKNOWN_VALUE
-				, boost::logic::tribool emptyLogin = boost::logic::indeterminate
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
-				, bool orderByLogin = true
-				, bool orderByName = false
-				, bool orderByProfileName = false
-				, bool raisingOrder = true
-				, util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+				boost::optional<std::string> login = boost::optional<std::string>(),
+				boost::optional<std::string> name = boost::optional<std::string>(),
+				boost::optional<std::string> surname = boost::optional<std::string>(),
+				boost::optional<std::string> phone = boost::optional<std::string>(),
+				boost::optional<util::RegistryKeyType> profileId = boost::optional<util::RegistryKeyType>(),
+				boost::logic::tribool emptyLogin = boost::logic::indeterminate,
+				boost::logic::tribool emptyPhone = boost::logic::indeterminate,
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByLogin = true,
+				bool orderByName = false,
+				bool orderByProfileName = false,
+				bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 

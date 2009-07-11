@@ -82,15 +82,24 @@ namespace synthese
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
-			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
-			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
-			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
+			if(!map.getDefault<string>(PARAM_SEARCH_LOGIN).empty())
+			{
+				_searchLogin = map.getOptional<string>(PARAM_SEARCH_LOGIN);
+			}
+			if(!map.getDefault<string>(PARAM_SEARCH_NAME).empty())
+			{
+				_searchName = map.getOptional<string>(PARAM_SEARCH_NAME);
+			}
+			if(!map.getDefault<string>(PARAM_SEARCH_SURNAME).empty())
+			{
+				_searchSurname = map.getOptional<string>(PARAM_SEARCH_SURNAME);
+			}
 
 			// Searched profile
-			uid id(map.getUid(PARAM_SEARCH_PROFILE_ID, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE && _getEnv().getRegistry<Profile>().contains(id))
+			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAM_SEARCH_PROFILE_ID));
+			if (id && *id != UNKNOWN_VALUE && _getEnv().getRegistry<Profile>().contains(*id))
 			{
-				_searchProfile = ProfileTableSync::Get(id, _getEnv());
+				_searchProfile = ProfileTableSync::Get(*id, _getEnv());
 			}
 
 			// Table Parameters
@@ -102,9 +111,12 @@ namespace synthese
 		server::ParametersMap UsersAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
-			m.insert(PARAM_SEARCH_LOGIN, _searchLogin);
-			m.insert(PARAM_SEARCH_NAME, _searchName);
-			m.insert(PARAM_SEARCH_SURNAME, _searchSurname);
+			if(_searchLogin)
+				m.insert(PARAM_SEARCH_LOGIN, *_searchLogin);
+			if(_searchName)
+				m.insert(PARAM_SEARCH_NAME, *_searchName);
+			if(_searchSurname)
+				m.insert(PARAM_SEARCH_SURNAME, *_searchSurname);
 			if(_searchProfile.get())
 			{
 				m.insert(PARAM_SEARCH_PROFILE_ID, _searchProfile->getKey());
@@ -115,16 +127,17 @@ namespace synthese
 
 
 		bool UsersAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const	{
 			return _request.isAuthorized<SecurityRight>(READ);
 		}
 
 
 
-		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+		void UsersAdmin::display(
+			std::ostream& stream,
+			interfaces::VariablesMap& variables,
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			// Request for search form
 			AdminFunctionRequest<UsersAdmin> searchRequest(_request);
@@ -145,10 +158,10 @@ namespace synthese
 			stream << "<h1>Recherche d'utilisateur</h1>";
 				
 			stream << searchTable.open();
-			stream << searchTable.cell("Login", searchTable.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin));
-			stream << searchTable.cell("Nom", searchTable.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
-			stream << searchTable.cell("Prénom", searchTable.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname));
-			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfile.get() ? _searchProfile->getKey() : uid(0)));
+			stream << searchTable.cell("Login", searchTable.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin ? *_searchLogin : string()));
+			stream << searchTable.cell("Nom", searchTable.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName ? *_searchName : string()));
+			stream << searchTable.cell("Prénom", searchTable.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname ? *_searchSurname : string()));
+			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfile.get() ? _searchProfile->getKey() : RegistryKeyType(0)));
 			stream << searchTable.close();
 
 			stream << "<h1>Résultats de la recherche</h1>";
@@ -157,13 +170,14 @@ namespace synthese
 			UserTableSync::SearchResult users(
 				UserTableSync::Search(
 					_getEnv(),
-					"%"+_searchLogin+"%"
-					, "%"+_searchName+"%"
-					, "%"+_searchSurname+"%"
-					, "%"
-					, _searchProfile.get() ? _searchProfile->getKey() : UNKNOWN_VALUE
-					, false
-					, _requestParameters.first
+					_searchLogin ? "%"+ *_searchLogin+"%" : _searchLogin,
+					_searchName ? "%"+*_searchName+"%" : _searchName,
+					_searchSurname ? "%"+ *_searchSurname+"%" : _searchSurname,
+					optional<string>(),
+					_searchProfile.get() ? _searchProfile->getKey() : optional<RegistryKeyType>(),
+					logic::indeterminate,
+					logic::indeterminate,
+					_requestParameters.first
 					, _requestParameters.maxSize
 					, _requestParameters.orderField == PARAM_SEARCH_LOGIN
 					, _requestParameters.orderField == PARAM_SEARCH_NAME

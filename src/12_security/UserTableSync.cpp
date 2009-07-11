@@ -36,8 +36,8 @@
 #include "UserTableSyncException.h"
 
 using namespace std;
+using namespace boost;
 using namespace boost::logic;
-using boost::shared_ptr;
 
 namespace synthese
 {
@@ -219,18 +219,19 @@ namespace synthese
 
 		UserTableSync::SearchResult UserTableSync::Search(
 			Env& env,
-			const string login
-			, const string name
-			, const string surname
-			, const string phone
-			, uid profileId
-			, tribool emptyLogin
-			, int first /*= 0*/,
-			boost::optional<std::size_t> number /*= 0*/
-			, bool orderByLogin
-			, bool orderByName
-			, bool orderByProfileName
-			, bool raisingOrder,
+			optional<string> login,
+			optional<string> name,
+			optional<string> surname,
+			optional<string> phone,
+			optional<RegistryKeyType> profileId,
+			tribool emptyLogin,
+			tribool emptyPhone,
+			int first, /*= 0*/
+			boost::optional<std::size_t> number, /*= 0*/
+			bool orderByLogin,
+			bool orderByName,
+			bool orderByProfileName,
+			bool raisingOrder,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -240,20 +241,24 @@ namespace synthese
 				<< " FROM " << TABLE.NAME << " AS t";
 			if (orderByProfileName)
 				query << " INNER JOIN " << ProfileTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=t." << TABLE_COL_PROFILE_ID;
-			query
-				<< " WHERE " 
-				<< " t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToSQLiteString(login)
-				<< " AND t." << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(name)
-				<< " AND t." << TABLE_COL_SURNAME << " LIKE " << Conversion::ToSQLiteString(surname)
-				<< " AND t." << TABLE_COL_PHONE << " LIKE " << Conversion::ToSQLiteString(phone)
-			;
-			if (profileId != UNKNOWN_VALUE)
-				query << " AND " << TABLE_COL_PROFILE_ID << "=" << profileId;
+			query << " WHERE 1 "; 
+			if(login)
+				query << " t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToSQLiteString(*login);
+			if(name)
+				query << " AND t." << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+			if(surname)
+				query << " AND t." << TABLE_COL_SURNAME << " LIKE " << Conversion::ToSQLiteString(*surname);
+			if(phone)
+				query << " AND t." << TABLE_COL_PHONE << " LIKE " << Conversion::ToSQLiteString(*phone);
+			if(profileId)
+				query << " AND " << TABLE_COL_PROFILE_ID << "=" << *profileId;
 			if (emptyLogin != tribool::indeterminate_value)
 				query << " AND " << TABLE_COL_LOGIN << (emptyLogin ? "=''" : "!=''");
+			if (emptyPhone != tribool::indeterminate_value)
+				query << " AND " << TABLE_COL_PHONE << (emptyPhone ? "=''" : "!=''");
 			if (orderByProfileName)
 				query << " ORDER BY p." << ProfileTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (orderByLogin)
+			else if (orderByLogin)
 				query <<
 					" ORDER BY t." << TABLE_COL_LOGIN << (raisingOrder ? " ASC" : " DESC") << "," <<
 					TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << "," <<
@@ -262,9 +267,11 @@ namespace synthese
 			else if (orderByName)
 				query << " ORDER BY t." << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",t." << TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
 			if (number)
+			{
 				query << " LIMIT " << (*number + 1);
-			if (first > 0)
-				query << " OFFSET " << first;
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

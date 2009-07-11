@@ -116,8 +116,8 @@ namespace synthese
     {
 		PhysicalStopTableSync::SearchResult PhysicalStopTableSync::Search(
 			Env& env, 
-			uid placeId /*= UNKNOWN_VALUE */,
-			string operatorCode,
+			optional<RegistryKeyType> placeId /*= UNKNOWN_VALUE */,
+			optional<string> operatorCode,
 			int first /*= 0 */,
 			boost::optional<std::size_t> number  /*= 0 */,
 			LinkLevel linkLevel
@@ -126,15 +126,17 @@ namespace synthese
 			query <<
 				" SELECT *" <<
 				" FROM " << TABLE.NAME <<
-				" WHERE " <<
-				COL_OPERATOR_CODE << " LIKE " << Conversion::ToSQLiteString(operatorCode)
-			;
-			if (placeId != UNKNOWN_VALUE)
-				query << " AND " << COL_PLACEID << "=" << placeId;
+				" WHERE 1 ";
+			if(operatorCode)
+				query << COL_OPERATOR_CODE << " LIKE " << Conversion::ToSQLiteString(*operatorCode);
+			if(placeId)
+				query << " AND " << COL_PLACEID << "=" << *placeId;
 			if (number)
+			{
 				query << " LIMIT " << Conversion::ToString(*number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				if (first > 0)
+					query << " OFFSET " << Conversion::ToString(first);
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

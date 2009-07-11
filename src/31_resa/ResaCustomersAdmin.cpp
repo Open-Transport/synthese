@@ -78,9 +78,18 @@ namespace synthese
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
-			_searchName = map.getString(PARAM_SEARCH_NAME, false, FACTORY_KEY);
-			_searchSurname = map.getString(PARAM_SEARCH_SURNAME, false, FACTORY_KEY);
-			_searchLogin = map.getString(PARAM_SEARCH_LOGIN, false, FACTORY_KEY);
+			if(!map.getDefault<string>(PARAM_SEARCH_NAME).empty())
+			{
+				_searchName = map.getOptional<string>(PARAM_SEARCH_NAME);
+			}
+			if(!map.getDefault<string>(PARAM_SEARCH_SURNAME).empty())
+			{
+				_searchSurname = map.getOptional<string>(PARAM_SEARCH_SURNAME);
+			}
+			if(!map.getDefault<string>(PARAM_SEARCH_LOGIN).empty())
+			{
+				_searchLogin = map.getOptional<string>(PARAM_SEARCH_LOGIN);
+			}
 			
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
 		}
@@ -90,9 +99,12 @@ namespace synthese
 		server::ParametersMap ResaCustomersAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
-			m.insert(PARAM_SEARCH_NAME, _searchName);
-			m.insert(PARAM_SEARCH_SURNAME, _searchSurname);
-			m.insert(PARAM_SEARCH_LOGIN, _searchLogin);
+			if(_searchName)
+				m.insert(PARAM_SEARCH_NAME, *_searchName);
+			if(_searchSurname)
+				m.insert(PARAM_SEARCH_SURNAME, *_searchSurname);
+			if(_searchLogin)
+				m.insert(PARAM_SEARCH_LOGIN, *_searchLogin);
 			return m;
 		}
 
@@ -109,9 +121,9 @@ namespace synthese
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << "<h1>Recherche</h1>";
 			stream << st.open();
-			stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
-			stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname));
-			stream << st.cell("Login", st.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin));
+			stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName ? *_searchName : string()));
+			stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname ? *_searchSurname : string()));
+			stream << st.cell("Login", st.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin ? *_searchLogin : string()));
 			stream << st.close();
 			stream << st.getForm().setFocus(PARAM_SEARCH_NAME);
 
@@ -121,13 +133,14 @@ namespace synthese
 			UserTableSync::SearchResult users(
 				UserTableSync::Search(
 					_getEnv(),
-					"%" + _searchLogin + "%"
-					, "%" + _searchName + "%"
-					, "%" + _searchSurname + "%"
-					, "%"
-					, UNKNOWN_VALUE
-					, logic::indeterminate
-					, _requestParameters.first
+					_searchLogin ? "%" + *_searchLogin + "%" : _searchLogin,
+					_searchName ? "%" + *_searchName + "%" : _searchName,
+					_searchSurname ? "%" + *_searchSurname + "%" : _searchSurname,
+					optional<string>(),
+					optional<RegistryKeyType>(),
+					logic::indeterminate,
+					logic::indeterminate,
+					_requestParameters.first
 					, _requestParameters.maxSize
 					, _requestParameters.orderField == PARAM_SEARCH_LOGIN
 					, _requestParameters.orderField == PARAM_SEARCH_NAME
@@ -166,17 +179,18 @@ namespace synthese
 				}
 
 				stream << t.close();
-			}
+		}	}
 
-		}
+
 
 		bool ResaCustomersAdmin::isAuthorized(
 				const server::FunctionRequest<admin::AdminRequest>& _request
-			
 		) const	{
 			return _request.isAuthorized<ResaRight>(READ);
 		}
-		
+
+
+
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfModule(
 			const string& moduleKey,
 			shared_ptr<const AdminInterfaceElement> currentPage,
@@ -193,8 +207,7 @@ namespace synthese
 				else
 				{
 					AddToLinks(links, getNewPage());
-				}
-			}
+			}	}
 			return links;
 		}
 	
@@ -212,5 +225,4 @@ namespace synthese
 			
 			return links;
 		}
-	}
-}
+}	}

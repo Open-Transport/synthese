@@ -73,12 +73,17 @@ namespace synthese
 		const string DisplayTypesAdmin::PARAMETER_NAME("na");
 		const string DisplayTypesAdmin::PARAMETER_INTERFACE_ID("ii");
 
+
+
 		void DisplayTypesAdmin::setFromParametersMap(
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), DisplayTypeTableSync::COL_NAME, 20);
-			_searchName = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
+			if(!map.getDefault<string>(PARAMETER_NAME).empty())
+			{
+				_searchName = map.getOptional<string>(PARAMETER_NAME);
+			}
 			_searchInterfaceId = map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID);
 		}
 
@@ -119,7 +124,7 @@ namespace synthese
 
 			SearchFormHTMLTable f(searchRequest.getHTMLForm());
 			stream << f.open();
-			stream << f.cell("Nom", f.getForm().getTextInput(PARAMETER_NAME, _searchName));
+			stream << f.cell("Nom", f.getForm().getTextInput(PARAMETER_NAME, _searchName ? *_searchName : string()));
 			stream << f.cell(
 				"Interface d'affichage",
 				f.getForm().getSelectInput(
@@ -135,7 +140,7 @@ namespace synthese
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
 					_getEnv(),
-					"%"+ _searchName +"%",
+					_searchName ? "%"+ *_searchName +"%" : _searchName,
 					_searchInterfaceId,
 					_requestParameters.first,
 					_requestParameters.maxSize,
@@ -299,8 +304,8 @@ namespace synthese
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
 					*_env,
-					"%",
-					UNKNOWN_VALUE,
+					optional<string>(),
+					optional<RegistryKeyType>(),
 					0,
 					optional<size_t>(),
 					true,

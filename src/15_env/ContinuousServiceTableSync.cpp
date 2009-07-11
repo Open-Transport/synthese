@@ -99,6 +99,7 @@ namespace synthese
 		
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ContinuousServiceTableSync>::_INDEXES[]=
 		{
+			SQLiteTableSync::Index(ContinuousServiceTableSync::COL_PATHID.c_str(), ContinuousServiceTableSync::COL_SCHEDULES.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 

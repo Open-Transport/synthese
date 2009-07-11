@@ -67,7 +67,7 @@ namespace synthese
 		*/
 		class DisplayTypesAdmin : public admin::AdminInterfaceElementTemplate<DisplayTypesAdmin>
 		{
-			std::string									_searchName;
+			boost::optional<std::string>				_searchName;
 			boost::optional<util::RegistryKeyType>		_searchInterfaceId;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 			

@@ -53,32 +53,41 @@ namespace synthese
 		ParametersMap ResaCustomerHtmlOptionListFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_NUMBER, _number);
+			if(_name) map.insert(PARAMETER_NAME, *_name);
+			if(_surname) map.insert(PARAMETER_NUMBER, *_surname);
+			map.insert(PARAMETER_NUMBER, static_cast<int>(_number));
 			return map;
 		}
 
 		void ResaCustomerHtmlOptionListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_surname = "%" + map.getString(PARAMETER_SURNAME, true, FACTORY_KEY) +"%";
-			_name = "%" + map.getString(PARAMETER_NAME, true, FACTORY_KEY) + "%";
-			_number = map.getInt(PARAMETER_NUMBER, true, FACTORY_KEY);
+			if(!map.getDefault<string>(PARAMETER_SURNAME).empty())
+			{
+				_surname = map.getOptional<string>(PARAMETER_SURNAME);
+			}
+			if(!map.getDefault<string>(PARAMETER_NAME).empty())
+			{
+				_name = map.getOptional<string>(PARAMETER_NAME);
+			}
+			_number = map.getDefault<size_t>(PARAMETER_NUMBER, 20);
 		}
 
 		void ResaCustomerHtmlOptionListFunction::_run( std::ostream& stream ) const
 		{
-			if (_name == "%%" && _surname == "%%")
+			if (!_name && !_surname)
 				return;
 
 			Env env;
 			UserTableSync::SearchResult users(
 				UserTableSync::Search(
 					env,
-					"%",
-					_name,
-					_surname,
-					"%",
-					UNKNOWN_VALUE,
+					optional<string>(),
+					_name ? "%"+ *_name +"%" : _name,
+					_surname ? "%"+ *_surname +"%" : _surname,
+					optional<string>(),
+					optional<RegistryKeyType>(),
 					logic::indeterminate,
+					false,
 					0,
 					_number,
 					false,

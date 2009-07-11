@@ -47,9 +47,9 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				std::string _name;
-				std::string _surname;
-				int			_number;
+				boost::optional<std::string> _name;
+				boost::optional<std::string> _surname;
+				size_t						_number;
 			//@}
 			
 			

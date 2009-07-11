@@ -131,6 +131,12 @@ namespace synthese
 			return result.empty() ? Date(TIME_UNKNOWN) : Date::FromSQLDate(result);
 		}
 
+		time::Hour ParametersMap::getHour( const std::string& parameterName , bool neededParameter , const std::string& source ) const
+		{
+			const string result(getString(parameterName, neededParameter, source));
+			return result.empty() ? Hour(TIME_UNKNOWN) : Hour::FromSQLTime(result);
+		}
+
 		void ParametersMap::insert( const std::string& parameterName, const std::string& value )
 		{
 			_map[parameterName] = value;
@@ -157,6 +163,11 @@ namespace synthese
 		}
 
 		void ParametersMap::insert( const std::string& parameterName, const time::DateTime& value )
+		{
+			insert(parameterName, value.toSQLString(false));
+		}
+
+		void ParametersMap::insert( const std::string& parameterName, const time::Hour& value )
 		{
 			insert(parameterName, value.toSQLString(false));
 		}

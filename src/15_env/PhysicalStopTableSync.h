@@ -44,8 +44,6 @@ namespace synthese
 				- on insert : 
 				- on update : 
 				- on delete : X
-
-				@todo Use load / get / replace 
 		*/
 		class PhysicalStopTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>,
@@ -62,10 +60,10 @@ namespace synthese
 
 			static SearchResult Search(
 				util::Env& env,
-				uid placeId = UNKNOWN_VALUE,
-				std::string operatorCode = std::string("%")
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				boost::optional<util::RegistryKeyType> placeId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::string> operatorCode = boost::optional<std::string>(),
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 		};

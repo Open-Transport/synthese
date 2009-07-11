@@ -40,6 +40,7 @@ namespace synthese
 	{
 		class DateTime;
 		class Date;
+		class Hour;
 	}
 
 	namespace server
@@ -206,6 +207,11 @@ namespace synthese
 					, const std::string& source
 				) const;
 
+				time::Hour getHour(
+					const std::string& parameterName
+					, bool neededParameter
+					, const std::string& source
+				) const;
 
 				boost::optional<time::Date> getOptionalDate(
 					const std::string& parameterName
@@ -252,7 +258,8 @@ namespace synthese
 				void insert(const std::string& parameterName, bool value);
 				void insert(const std::string& parameterName, const time::DateTime& value);
 				void insert(const std::string& parameterName, const time::Date& value);
-				
+				void insert(const std::string& parameterName, const time::Hour& value);
+
 				
 				/** Merge this map with an other, with priority to the current one.
 				 * 

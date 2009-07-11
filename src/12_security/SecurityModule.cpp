@@ -78,7 +78,8 @@ namespace synthese
 					env,
 					SecurityModule::ROOT_USER,
 					SecurityModule::ROOT_USER,
-					"%","%",
+					optional<string>(),
+					optional<string>(),
 					SecurityModule::_rootProfile->getKey()
 			)	);
 			if (rootUsers.empty())
@@ -149,8 +150,15 @@ namespace synthese
 
 			Env env;
 			UserTableSync::SearchResult users(
-				UserTableSync::Search(env, "%","%","%","%",UNKNOWN_VALUE, false)
-			);
+				UserTableSync::Search(
+					env,
+					optional<string>(),
+					optional<string>(),
+					optional<string>(),
+					optional<string>(),
+					optional<RegistryKeyType>(),
+					false
+			)	);
 			BOOST_FOREACH(shared_ptr<User> user, users)
 			{
 				m.push_back(make_pair(user->getKey(), user->getSurname() + " " + user->getName()));

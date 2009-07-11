@@ -90,9 +90,9 @@ namespace synthese
 			static const std::string PARAM_SEARCH_LOGIN;
 
 		private:
-			std::string									_searchLogin;
-			std::string									_searchName;
-			std::string									_searchSurname;
+			boost::optional<std::string>				_searchLogin;
+			boost::optional<std::string>				_searchName;
+			boost::optional<std::string>				_searchSurname;
 			boost::shared_ptr<const Profile>			_searchProfile;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 

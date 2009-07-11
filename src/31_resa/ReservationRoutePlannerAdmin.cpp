@@ -93,15 +93,14 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_START_PLACE("sp");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_END_CITY("ec");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_END_PLACE("ep");
-		const std::string ReservationRoutePlannerAdmin::PARAMETER_DATE_TIME("dt");
-		const std::string ReservationRoutePlannerAdmin::PARAMETER_RESULTS_NUMBER("rn");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_DATE("da");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_TIME("ti");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_DISABLED_PASSENGER("dp");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_DRT_ONLY("do");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID("cu");
 
 		ReservationRoutePlannerAdmin::ReservationRoutePlannerAdmin()
 			: AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>()
-			, _resultsNumber(5)
 			, _disabledPassenger(false)
 			, _drtOnly(false)
 			, _dateTime(TIME_CURRENT)
@@ -111,26 +110,36 @@ namespace synthese
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
-			_startCity = map.getString(PARAMETER_START_CITY, false, FACTORY_KEY);
-			_startPlace = map.getString(PARAMETER_START_PLACE, false, FACTORY_KEY);
-			_endCity = map.getString(PARAMETER_END_CITY, false, FACTORY_KEY);
-			_endPlace = map.getString(PARAMETER_END_PLACE, false, FACTORY_KEY);
-			_dateTime = map.getDateTime(PARAMETER_DATE_TIME, false, FACTORY_KEY);
-			if (_dateTime.isUnknown())
-				_dateTime = DateTime(TIME_CURRENT);
-			int i(map.getInt(PARAMETER_RESULTS_NUMBER, false, FACTORY_KEY));
-			if (i > 0)
-				_resultsNumber = i;
-			_disabledPassenger = map.getBool(PARAMETER_DISABLED_PASSENGER, false, false, FACTORY_KEY);
-			_drtOnly = map.getBool(PARAMETER_DRT_ONLY, false, false, FACTORY_KEY);
+			_startCity = map.getDefault<string>(PARAMETER_START_CITY);
+			_startPlace = map.getDefault<string>(PARAMETER_START_PLACE);
+			_endCity = map.getDefault<string>(PARAMETER_END_CITY);
+			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
+			if(map.getOptional<string>(PARAMETER_DATE))
+			{
+				_dateTime = map.getDate(PARAMETER_DATE, false, FACTORY_KEY);
+			}
+			if(map.getOptional<string>(PARAMETER_TIME))
+			{
+				_dateTime.setHour(map.getHour(PARAMETER_TIME, false, FACTORY_KEY));
+			}
+			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
+			_drtOnly = map.getDefault<bool>(PARAMETER_DRT_ONLY, false);
 
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE)
+			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 			{
 				try
 				{
-					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(id, _getEnv());
-					//ReservationTableSync::Search(_confirmedTransaction.get());
+					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+						_getEnv()
+					);
+					ReservationTableSync::SearchResult reservations(
+						ReservationTableSync::Search(*_env, _confirmedTransaction->getKey())
+					);
+					BOOST_FOREACH(shared_ptr<Reservation> reser, reservations)
+					{
+						_confirmedTransaction->addReservation(reser);
+					}
 				}
 				catch (...)
 				{
@@ -138,12 +147,14 @@ namespace synthese
 				}
 			}
 			
-			id = map.getUid(PARAMETER_CUSTOMER_ID, false, FACTORY_KEY);
-			if (id != UNKNOWN_VALUE)
+			if(map.getOptional<RegistryKeyType>(PARAMETER_CUSTOMER_ID))
 			{
 				try
 				{
-					_customer = UserTableSync::Get(id, _getEnv());
+					_customer = UserTableSync::Get(
+						map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID),
+						_getEnv()
+					);
 				}
 				catch (...)
 				{
@@ -154,15 +165,15 @@ namespace synthese
 		
 		
 		
-		server::ParametersMap ReservationRoutePlannerAdmin::getParametersMap() const
+		ParametersMap ReservationRoutePlannerAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			m.insert(PARAMETER_START_CITY, _startCity);
 			m.insert(PARAMETER_START_PLACE, _startPlace);
 			m.insert(PARAMETER_END_CITY, _endCity);
 			m.insert(PARAMETER_END_PLACE, _endPlace);
-			m.insert(PARAMETER_DATE_TIME, _dateTime);
-			m.insert(PARAMETER_RESULTS_NUMBER, _resultsNumber);
+			m.insert(PARAMETER_DATE, _dateTime.getDate());
+			m.insert(PARAMETER_TIME, _dateTime.getHour());
 			m.insert(PARAMETER_DISABLED_PASSENGER, _disabledPassenger);
 			m.insert(PARAMETER_DRT_ONLY, _drtOnly);
 			if(_customer.get())
@@ -179,6 +190,22 @@ namespace synthese
 			VariablesMap& variables,
 			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
+
+			vector<pair<string, string> > dates;
+			vector<pair<string, string> > hours;
+			{
+				Date date(TIME_CURRENT);
+				for(size_t i=0; i<14; ++i)
+				{
+					dates.push_back(make_pair(date.toSQLString(false), date.toString()));
+					date++;
+				}
+				for(size_t i=0; i<24; ++i)
+				{
+					hours.push_back(make_pair(lexical_cast<string>(i) +":00", lexical_cast<string>(i) +":00"));
+				}
+			}
+
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
 
 			AdminActionFunctionRequest<BookReservationAction,ReservationRoutePlannerAdmin> resaRequest(
@@ -208,8 +235,8 @@ namespace synthese
 			stream << st.cell("Arrêt départ", st.getForm().getTextInput(PARAMETER_START_PLACE, _startPlace));
 			stream << st.cell("Commune arrivée", st.getForm().getTextInput(PARAMETER_END_CITY, _endCity));
 			stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(PARAMETER_END_PLACE, _endPlace));
-			stream << st.cell("Date/Heure", st.getForm().getCalendarInput(PARAMETER_DATE_TIME, _dateTime));
-			stream << st.cell("Nombre réponses", st.getForm().getSelectNumberInput(PARAMETER_RESULTS_NUMBER, 1, 99, _resultsNumber, 1, "(illimité)"));
+			stream << st.cell("Date", st.getForm().getSelectInput(PARAMETER_DATE, dates, _dateTime.getDate().toSQLString(false)));
+			stream << st.cell("Heure", st.getForm().getSelectInput(PARAMETER_TIME, hours, lexical_cast<string>(_dateTime.getHour().getHours())+":00"));
 			stream << st.cell("PMR", st.getForm().getOuiNonRadioInput(PARAMETER_DISABLED_PASSENGER, _disabledPassenger));
 			stream << st.cell("TAD seulement", st.getForm().getOuiNonRadioInput(PARAMETER_DRT_ONLY, _drtOnly));
 			stream << st.close();
@@ -219,34 +246,79 @@ namespace synthese
 			if (_startCity.empty() || _endCity.empty())
 				return;
 
-			if(_confirmedTransaction.get())
-				return;
-
-			stream << "<h1>Résultats</h1>";
-
-			DateTime endDate(_dateTime);
-			endDate++;
-
-			DateTime now(TIME_CURRENT);
-
-			// Route planning
-			AccessParameters ap(
-				_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
-				_drtOnly
-			);
+			RoutePlanner::Result jv;
 			const Place* startPlace(GeographyModule::FetchPlace(_startCity, _startPlace));
 			const Place* endPlace(GeographyModule::FetchPlace(_endCity, _endPlace));
-			stringstream trace;
-			RoutePlanner r(
-				startPlace
-				, endPlace
-				, ap
-				, PlanningOrder()
-				, _dateTime
-				, endDate
-				, _resultsNumber
-			);
-			const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
+			DateTime now(TIME_CURRENT);
+
+			if(!_confirmedTransaction.get())
+			{
+				DateTime endDate(_dateTime);
+				endDate++;
+
+				// Route planning
+				AccessParameters ap(
+					_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
+					_drtOnly
+					);
+				stringstream trace;
+				RoutePlanner r(
+					startPlace
+					, endPlace
+					, ap
+					, PlanningOrder()
+					, _dateTime
+					, endDate
+					, 5
+					);
+				jv = r.computeJourneySheetDepartureArrival();
+			}
+
+			stream << "<h1>Liens</h1><p>";
+			DateTime date(_dateTime);
+			date.subDaysDuration(1);
+			searchRequest.getPage()->_dateTime = date;
+			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour précédent", string(), "rewind_blue.png") << " ";
+			
+			if(!jv.journeys.empty())
+			{
+				date = _dateTime;
+				date -= 120;
+				searchRequest.getPage()->_dateTime = date;
+				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions précédentes", string(), "resultset_previous.png") << " ";
+			}
+
+			searchRequest.getPage()->_dateTime = _dateTime;
+			searchRequest.getPage()->_startCity = _endCity;
+			searchRequest.getPage()->_startPlace = _endPlace;
+			searchRequest.getPage()->_endCity = _startCity;
+			searchRequest.getPage()->_endPlace = _startPlace;
+			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Trajet retour", string(), "arrow_undo.png") << " ";
+			searchRequest.getPage()->_startCity = _startCity;
+			searchRequest.getPage()->_startPlace = _startPlace;
+			searchRequest.getPage()->_endCity = _endCity;
+			searchRequest.getPage()->_endPlace = _endPlace;
+
+			if(!jv.journeys.empty())
+			{
+				JourneyBoardJourneys::const_iterator it(jv.journeys.end() - 1);
+				date = (*it)->getDepartureTime();
+				date += 1;
+				searchRequest.getPage()->_dateTime = date;
+				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions suivantes", string(), "resultset_next.png") << " ";
+
+			}
+
+			date = _dateTime;
+			date.addDaysDuration(1);
+			searchRequest.getPage()->_dateTime = date;
+			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour suivant", string(), "forward_blue.png");
+
+			stream << "</p>";
+
+			if(_confirmedTransaction.get()) return;
+
+			stream << "<h1>Résultats</h1>";
 
 			if (jv.journeys.empty())
 			{

@@ -350,7 +350,7 @@ namespace synthese
 			stream << t.open();
 
 			// Display of services
-			BOOST_FOREACH(shared_ptr<const ScheduledService> service, services)
+			BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
 			{
 				const ServiceReservations::ReservationsList& serviceReservations (reservations[service.get()].getReservations());
 				int serviceSeatsNumber(reservations[service.get()].getSeatsNumber());
@@ -748,6 +748,7 @@ namespace synthese
 			
 			if(	!_service.get() &&
 				ba &&
+				ba->_line == _line &&
 				ba->_service.get()
 			){
 				AddToLinks(links, currentPage);

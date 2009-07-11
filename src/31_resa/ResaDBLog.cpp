@@ -251,7 +251,16 @@ namespace synthese
 			
 			if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
 			{
-				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), env, DOWN_LINKS_LOAD_LEVEL);
+				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), env);
+				
+				ReservationTableSync::SearchResult reservations(
+					ReservationTableSync::Search(env, tr->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<Reservation> reser, reservations)
+				{
+					tr->addReservation(reser);
+				}
+
 				//ReservationTableSync::search(tr.get());
 				status = tr->getStatus();
 			}

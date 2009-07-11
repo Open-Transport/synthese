@@ -82,7 +82,7 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			static SearchResult Search(
 				util::Env& env,
-				std::string nameLike = "%",
+				boost::optional<std::string> nameLike = boost::optional<std::string>(),
 				boost::optional<util::RegistryKeyType> interfaceId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),

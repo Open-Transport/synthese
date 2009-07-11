@@ -172,7 +172,7 @@ namespace synthese
 	{
 		DisplayTypeTableSync::SearchResult DisplayTypeTableSync::Search(
 			Env& env,
-			string exactName,
+			optional<string> likeName,
 			boost::optional<util::RegistryKeyType> interfaceId,
 			int first, /*= 0*/
 			boost::optional<std::size_t> number, /*= 0*/
@@ -195,9 +195,9 @@ namespace synthese
 			}
 
 			query << " WHERE 1";
-			if (!exactName.empty())
+			if (likeName)
 			{
-				query << " AND t." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(exactName);
+				query << " AND t." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*likeName);
 			}
 			if(interfaceId)
 			{

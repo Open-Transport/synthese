@@ -99,7 +99,14 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ReservationTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(ReservationTableSync::COL_SERVICE_ID.c_str(), ""),
+			SQLiteTableSync::Index(
+				ReservationTableSync::COL_SERVICE_ID.c_str(),
+				ReservationTableSync::COL_ORIGIN_DATE_TIME.c_str(),
+			""),
+			SQLiteTableSync::Index(
+				ReservationTableSync::COL_TRANSACTION_ID.c_str(),
+				ReservationTableSync::COL_DEPARTURE_TIME.c_str(),
+			""),
 			SQLiteTableSync::Index()
 		};
 
@@ -217,7 +224,11 @@ namespace synthese
 					" l ON l." << TABLE_COL_ID << "=s." << ScheduledServiceTableSync::COL_PATHID <<
 				" WHERE " <<
 				"l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
-				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << " LIKE '" << day.toSQLString(false) << "%'"
+				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">=" << day.toSQLString();
+			Date dayp(day);
+			dayp += 1;
+			query <<
+				" AND " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << "<" << dayp.toSQLString()
 			;
 			if(serviceId)
 			{
