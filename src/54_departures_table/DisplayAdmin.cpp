@@ -180,7 +180,7 @@ namespace synthese
 				PhysicalStopTableSync::Search(
 					_getEnv(),
 					_displayScreen->getLocalization()->getKey(),
-					string("%"),
+					optional<string>(),
 					0,
 					optional<size_t>(),
 					UP_LINKS_LOAD_LEVEL

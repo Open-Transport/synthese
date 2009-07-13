@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_DisplayScreenCPUCreateAction_H__
 #define SYNTHESE_DisplayScreenCPUCreateAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 

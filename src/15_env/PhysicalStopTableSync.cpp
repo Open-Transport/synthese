@@ -128,7 +128,7 @@ namespace synthese
 				" FROM " << TABLE.NAME <<
 				" WHERE 1 ";
 			if(operatorCode)
-				query << COL_OPERATOR_CODE << " LIKE " << Conversion::ToSQLiteString(*operatorCode);
+				query << COL_OPERATOR_CODE << " AND LIKE " << Conversion::ToSQLiteString(*operatorCode);
 			if(placeId)
 				query << " AND " << COL_PLACEID << "=" << *placeId;
 			if (number)

@@ -101,7 +101,7 @@ namespace synthese
 			
 			std::string _tempFileUrl;
 			std::string	_postScript;
-			bool		_error;
+			bool		_error(false);
 			if (!_queryXml.empty())
 			{
 				try

@@ -1112,8 +1112,11 @@ namespace synthese
 				string stopKey(keyNode.getText());
 			
 				PhysicalStopTableSync::SearchResult pstops(
-					PhysicalStopTableSync::Search(*_env, UNKNOWN_VALUE, stopKey)
-				);
+					PhysicalStopTableSync::Search(
+						*_env,
+						optional<RegistryKeyType>(),
+						stopKey
+				)	);
 				if(pstops.empty())
 				{
 					os << "ERR  : stop not found " << stopKey << " (" << nameNode.getText() << ")<br />";

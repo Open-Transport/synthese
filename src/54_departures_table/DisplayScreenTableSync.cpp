@@ -188,38 +188,46 @@ namespace synthese
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Localization
-				uid placeId(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID));
-				try
+				RegistryKeyType placeId(rows->getLongLong( DisplayScreenTableSync::COL_PLACE_ID));
+				if(placeId != 0) try
 				{
 					object->setLocalization(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ Conversion::ToString(placeId) + " not found");
+					Log::GetInstance().warn(
+						"Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ lexical_cast<string>(placeId) + " not found"
+					);
 				}
 				
 				// CPU
 				RegistryKeyType cpuId(rows->getLongLong(DisplayScreenTableSync::COL_CPU_HOST_ID));
-				if (cpuId > 0)
+				if (cpuId != 0) try
 				{
-					try
-					{
-						object->setCPU(DisplayScreenCPUTableSync::Get(cpuId, env, linkLevel).get());
-						DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel)->addWiredScreen(object);
-					}
-					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
-					{
-						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on display screen : cpu host " +
-							Conversion::ToString(cpuId) + " not found"
-						);
-					}
+					object->setCPU(DisplayScreenCPUTableSync::Get(cpuId, env, linkLevel).get());
+					DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel)->addWiredScreen(object);
+				}
+				catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+				{
+					Log::GetInstance().warn(
+						"Data corrupted in "+ TABLE.NAME + " on display screen : cpu host " +
+						lexical_cast<string>(cpuId) + " not found"
+					);
 				}
 
 				// Type
-				uid typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
-				if (typeId > 0)
+				RegistryKeyType typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
+				if (typeId > 0) try
+				{
 					object->setType(DisplayTypeTableSync::Get(typeId, env, linkLevel).get());
+				}
+				catch(ObjectNotFoundException<DisplayType>& e)
+				{
+					Log::GetInstance().warn(
+						"Data corrupted in "+ TABLE.NAME + " on display screen : type " +
+						lexical_cast<string>(typeId) + " not found"
+					);
+				}
 
 				// Physical stops
 				vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
@@ -227,7 +235,7 @@ namespace synthese
 				{
 					try
 					{
-						uid id(Conversion::ToLongLong(stop));
+						RegistryKeyType id(Conversion::ToLongLong(stop));
 						object->addPhysicalStop(PhysicalStopTableSync::Get(id, env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<PhysicalStop>& e)
@@ -286,12 +294,6 @@ namespace synthese
 			{
 				const_cast<DisplayScreenCPU*>(object->getCPU())->removeWiredScreen(object);
 			}
-			object->setLocalization(NULL);
-			object->setType(NULL);
-			object->clearPhysicalStops();
-			object->clearForbiddenPlaces();
-			object->clearDisplayedPlaces();
-			object->clearForcedDestinations();
 		}
 
 
@@ -306,16 +308,16 @@ namespace synthese
 
             query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << (object->getLocalization() ? Conversion::ToString(object->getLocalization()->getKey()) : "0")
+				<< object->getKey()
+				<< "," << (object->getLocalization() ? object->getLocalization()->getKey() : RegistryKeyType(0))
 				<< "," << Conversion::ToSQLiteString(object->getLocalizationComment())
-				<< "," << (object->getType() ? Conversion::ToString(object->getType()->getKey()) : "0")
-				<< "," << Conversion::ToString(object->getWiringCode())
+				<< "," << (object->getType() ? object->getType()->getKey() : RegistryKeyType(0))
+				<< "," << object->getWiringCode()
 				<< "," << Conversion::ToSQLiteString(object->getTitle())
-				<< "," << Conversion::ToString(object->getBlinkingDelay())
-				<< "," << Conversion::ToString(object->getTrackNumberDisplay())
-				<< "," << Conversion::ToString(object->getServiceNumberDisplay())
-				<< "," << Conversion::ToString(object->getDisplayTeam())
+				<< "," << object->getBlinkingDelay()
+				<< "," << object->getTrackNumberDisplay()
+				<< "," << object->getServiceNumberDisplay()
+				<< "," << object->getDisplayTeam()
 				<< ",'";
 
 			int count=0;
@@ -326,11 +328,11 @@ namespace synthese
 
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itp.first);
+				query << itp.first;
 			}
 
 			query
-				<< "'," << Conversion::ToString(object->getAllPhysicalStopsDisplayed())
+				<< "'," << object->getAllPhysicalStopsDisplayed()
 				<< ",'";
 
 			count = 0;
@@ -339,7 +341,7 @@ namespace synthese
 				assert(itf->second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itf->first);
+				query << itf->first;
 			}
 
 			query << "','";
@@ -350,12 +352,12 @@ namespace synthese
 				assert(itl->second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itl->first);
+				query << itl->first;
 			}
 
 			query
-				<< "'," << Conversion::ToString(static_cast<int>(object->getDirection()))
-				<< "," << Conversion::ToString(static_cast<int>(object->getEndFilter()))
+				<< "'," << static_cast<int>(object->getDirection())
+				<< "," << static_cast<int>(object->getEndFilter())
 				<< ",'";
 
 			count = 0;
@@ -364,14 +366,14 @@ namespace synthese
 				assert(itd.second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itd.second->getKey());
+				query << itd.second->getKey();
 			}
 
 			query
-				<< "'," << Conversion::ToString(object->getMaxDelay())
-				<< "," << Conversion::ToString(object->getClearingDelay())
-				<< "," << Conversion::ToString(object->getFirstRow())
-				<< "," << Conversion::ToString(static_cast<int>(object->getGenerationMethod()))
+				<< "'," << object->getMaxDelay()
+				<< "," << object->getClearingDelay()
+				<< "," << object->getFirstRow()
+				<< "," << static_cast<int>(object->getGenerationMethod())
 				<< ",'";
 
 			count = 0;
@@ -380,21 +382,20 @@ namespace synthese
 				assert(itd2.second->getKey() > 0);
 				if (count++)
 					query << ",";
-				query << Conversion::ToString(itd2.second->getKey());
+				query << itd2.second->getKey();
 			}
 
 			query <<
-				"'," << Conversion::ToString(object->getForceDestinationDelay()) <<
+				"'," << object->getForceDestinationDelay() <<
 				",''" <<
-				"," << Conversion::ToString(object->getIsOnline()) <<
+				"," << object->getIsOnline() <<
 				"," << Conversion::ToSQLiteString(object->getMaintenanceMessage()) << "," <<
-				Conversion::ToString(object->getDisplayClock()) << "," <<
-				Conversion::ToString(object->getComPort()) << "," <<
-				(object->getCPU() != NULL ? Conversion::ToString(object->getCPU()->getKey()) : "0") << "," <<
+				object->getDisplayClock() << "," <<
+				object->getComPort() << "," <<
+				(object->getCPU() != NULL ? object->getCPU()->getKey() : RegistryKeyType(0)) << "," <<
 				Conversion::ToSQLiteString(object->getMacAddress()) << "," <<
 				object->getRoutePlanningWithTransfer() <<
-				")"
-			;
+			")";
 			
 			sqlite->execUpdate(query.str());
 	}	}
@@ -563,7 +564,7 @@ namespace synthese
 				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
 				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
 				<< " INNER JOIN " << ScenarioTableSync::TABLE.NAME << " AS s ON s." << TABLE_COL_ID << "=a." << AlarmTableSync::COL_SCENARIO_ID
-				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << Conversion::ToString(screenId)
+				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << screenId
 				<< " AND s." << ScenarioTableSync::COL_ENABLED
 				<< " AND NOT s." << ScenarioTableSync::COL_IS_TEMPLATE
 				<< " AND (s." << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR s." << ScenarioTableSync::COL_PERIODSTART << "<" << now.toSQLString() << ")"
@@ -592,7 +593,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME << " AS d"
 				<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=d." << COL_PLACE_ID
 				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l ON l." << LineStopTableSync::COL_PHYSICALSTOPID << "=s." << TABLE_COL_ID
-				<< " WHERE d." << TABLE_COL_ID << "=" << Conversion::ToString(screenId)
+				<< " WHERE d." << TABLE_COL_ID << "=" << screenId
 				<< " AND (d." << COL_ALL_PHYSICAL_DISPLAYED << " OR d." << COL_PHYSICAL_STOPS_IDS << " LIKE ('%'|| s." << TABLE_COL_ID << " ||'%'))"
 				<< " AND (l." << LineStopTableSync::COL_ISDEPARTURE << " AND d." << COL_DIRECTION << " OR l." << LineStopTableSync::COL_ISARRIVAL << " AND NOT d." << COL_DIRECTION << ")"
 				<< " AND (NOT d." << COL_ORIGINS_ONLY << " OR l." << LineStopTableSync::COL_RANKINPATH << "=0)"
@@ -620,7 +621,7 @@ namespace synthese
 				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
 				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
 				<< " INNER JOIN " << ScenarioTableSync::TABLE.NAME << " AS s ON s." << TABLE_COL_ID << "=a." << AlarmTableSync::COL_SCENARIO_ID
-				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << Conversion::ToString(screenId)
+				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << screenId
 				<< " AND s." << ScenarioTableSync::COL_ENABLED
 				<< " AND NOT s." << ScenarioTableSync::COL_IS_TEMPLATE
 				<< " AND s." << ScenarioTableSync::COL_PERIODSTART << ">" << now.toSQLString()

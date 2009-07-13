@@ -341,7 +341,11 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			bool writePermission(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())));
+			bool writePermission(
+				_cpu->getPlace() ?
+				_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
+				_request.isAuthorized<ArrivalDepartureTableRight>(WRITE)
+			);
 			_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writePermission, "cog.png"));
 
 			if(_cpu->getPlace())

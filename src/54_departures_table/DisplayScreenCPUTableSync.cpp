@@ -102,9 +102,10 @@ namespace synthese
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Links
-				try
+				RegistryKeyType placeId(rows->getLongLong(DisplayScreenCPUTableSync::COL_PLACE_ID));
+				if(placeId != 0) try
 				{
-					object->setPlace(ConnectionPlaceTableSync::Get(rows->getLongLong(DisplayScreenCPUTableSync::COL_PLACE_ID), env, linkLevel).get());
+					object->setPlace(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<DisplayScreenCPU>& e)
 				{

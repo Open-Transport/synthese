@@ -54,21 +54,20 @@ namespace synthese
 		ParametersMap DisplayScreenCPUCreateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_TEMPLATE_ID, _template ? _template->getKey() : uid(0));
-			map.insert(PARAMETER_LOCALIZATION_ID, _place.get() ? _place->getKey() : uid(UNKNOWN_VALUE));
+			if(_template.get()) map.insert(PARAMETER_TEMPLATE_ID, _template->getKey());
+			map.insert(PARAMETER_LOCALIZATION_ID, _place.get() ? _place->getKey() : RegistryKeyType(0));
 			return map;
 		}
 
 		void DisplayScreenCPUCreateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY));
-			if (id > 0)
+			if(map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE_ID))
 			{
-				_template = DisplayScreenCPUTableSync::Get(id, *_env);
+				_template = DisplayScreenCPUTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
 			}
 
-			id = map.getUid(PARAMETER_LOCALIZATION_ID, true, FACTORY_KEY);
-			try
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LOCALIZATION_ID));
+			if(id != 0) try
 			{
 				_place = ConnectionPlaceTableSync::Get(id, *_env);
 			}
