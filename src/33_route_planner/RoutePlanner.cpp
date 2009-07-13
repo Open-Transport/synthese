@@ -139,6 +139,12 @@ namespace synthese
 					*_logStream << s.str();
 			}
 #endif
+			// Control if departure and arrival VAMs has contains at least one vertex
+			if(_originVam.getMap().empty() || _destinationVam.getMap().empty())
+			{
+				return _result;
+			}
+
 			// Control if the departure place and the arrival place have a common point
 			_result.samePlaces = false;
 			for (VertexAccessMap::VamMap::const_iterator itd(_originVam.getMap().begin()); itd != _originVam.getMap().end(); ++itd)

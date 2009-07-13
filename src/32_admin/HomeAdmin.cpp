@@ -99,8 +99,9 @@ namespace synthese
 			vector<shared_ptr<ModuleClass> > modules(
 				Factory<ModuleClass>::GetNewCollection()
 			);
-			BOOST_FOREACH(shared_ptr<ModuleClass> module, modules)
+			for(vector<shared_ptr<ModuleClass> >::const_reverse_iterator it(modules.rbegin()); it != modules.rend(); ++it)
 			{
+				shared_ptr<ModuleClass> module(*it);
 				if(	ma &&
 					moduleKey == module->getFactoryKey()
 				){

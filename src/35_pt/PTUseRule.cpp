@@ -55,7 +55,8 @@ namespace synthese
 			_reservationType(RESERVATION_RULE_FORBIDDEN),
 			_minDelayMinutes(0),
 			_minDelayDays(0),
-			_hourDeadLine(TIME_UNKNOWN)
+			_hourDeadLine(TIME_UNKNOWN),
+			_defaultFare(NULL)
 		{
 		}
 

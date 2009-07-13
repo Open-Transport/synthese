@@ -133,7 +133,7 @@ namespace synthese
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
 				Conversion::ToSQLiteString(object->getName()) << "," <<
 				object->getKey() << "," <<
-				(object->getAccessCapacity() ? Conversion::ToString(*object->getAccessCapacity()) : "''") << "," <<
+				(object->getAccessCapacity() ? lexical_cast<string>(*object->getAccessCapacity()) : "''") << "," <<
 				static_cast<int>(object->getReservationType()) << "," <<
 				object->getMinDelayMinutes() << "," <<
 				object->getMinDelayDays() << "," <<

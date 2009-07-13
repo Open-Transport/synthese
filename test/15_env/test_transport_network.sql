@@ -12,7 +12,7 @@ DELETE FROM t016_scheduled_services;
 DELETE FROM t017_continuous_services;
 DELETE FROM t011_place_aliases;
 DELETE FROM t013_public_places;
-DELETE FROM t021_reservation_rules;
+DELETE FROM t021_reservation_contacts;
 DELETE FROM t047_online_reservation_rules;
 DELETE FROM t022_transport_networks;
 DELETE FROM t015_roads;
@@ -217,7 +217,7 @@ REPLACE INTO t047_online_reservation_rules(id,reservation_rule_id,email,copy_ema
 	VALUES(13229323905400833,5910974511914805,'','',0,0,1,0,0,1000,'');
 
 REPLACE INTO t061_pt_use_rules(id,name,capacity,reservation_type,origin_is_reference,min_delay_minutes,min_delay_days,max_delay_days,hour_deadline,default_fare_id) 
-	VALUES(2305843009213693953,'DRT Test',0,5,0,10,0,60,'23:59:00',NULL);
+	VALUES(2305843009213693953,'DRT Test','',3,0,10,0,60,'23:59:00',NULL);
 
 REPLACE INTO t059_data_sources VALUES(16607023625928705,'test source','Trident');
 
