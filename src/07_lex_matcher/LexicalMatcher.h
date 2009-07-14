@@ -16,6 +16,7 @@
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
 
@@ -528,9 +529,7 @@ namespace synthese
 			MatchResult r;
 			BOOST_FOREACH(typename Map::value_type v, _map)
 			{
-				if(v.first.size() < text.size()) continue;
-				int c(v.first.compare(0, text.size(), 0, text.size()));
-				if(c == 0)
+				if(boost::algorithm::istarts_with(v.first, text))
 				{
 					MatchHit h;
 					h.value = v.second;
@@ -538,7 +537,6 @@ namespace synthese
 					r.push_back(h);
 					continue;
 				}
-				if(c > 0) break;
 			}
 			return r;
 		}

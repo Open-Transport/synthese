@@ -158,13 +158,14 @@ namespace synthese
 		}
 
 
-		boost::shared_ptr<Reservation> ReservationTransaction::newReservation()
+		Reservation* ReservationTransaction::newReservation()
 		{
-			shared_ptr<Reservation> reservation(new Reservation);
+			Reservation* reservation(new Reservation);
 			reservation->setTransaction(this);
-			_reservations.push_back(reservation);
 			return reservation;
 		}
+
+
 
 		const ReservationTransaction::Reservations& ReservationTransaction::getReservations() const
 		{
@@ -222,9 +223,8 @@ namespace synthese
 
 
 
-		void ReservationTransaction::addReservation( shared_ptr<Reservation> resa )
+		void ReservationTransaction::addReservation(Reservation* resa )
 		{
-			resa->setTransaction(this);
 			_reservations.push_back(resa);
 		}
 	}

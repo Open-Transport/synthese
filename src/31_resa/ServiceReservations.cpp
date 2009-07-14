@@ -53,6 +53,10 @@ namespace synthese
 				left->getDepartureTime() < right->getDepartureTime() ||
 				(	left->getDepartureTime() == right->getDepartureTime() &&
 					left->getArrivalTime() < right->getArrivalTime()
+				) || (
+					left->getDepartureTime() == right->getDepartureTime() &&
+					left->getArrivalTime() == right->getArrivalTime() &&
+					left.get() < right.get()
 				)
 			;
 		}

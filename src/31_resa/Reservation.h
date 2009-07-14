@@ -43,8 +43,6 @@ namespace synthese
 
 			A Reservation object can link to its departures and arrival places, commercial lines, etc.
 			In order to prevent from broken links, the object contains a copy of the main informations.
-
-			@warning Do not create a single Reservation object. Use ReservationTransaction::newReservation() instead.
 		*/
 		class Reservation
 		:	public virtual util::Registrable
@@ -96,7 +94,16 @@ namespace synthese
 				void setArrivalAddress		(const std::string& address);
 				void setDepartureTime		(const time::DateTime& time);
 				void setArrivalTime			(const time::DateTime& time);
-				void setTransaction			(const ReservationTransaction* transaction);
+		
+
+
+				/** Transaction setter.
+					@param transaction the transaction which the reservation belongs
+					@author Hugues Romain
+					@date 2009
+					The reservation is also added to the transaction.
+				*/
+				void setTransaction			(ReservationTransaction* transaction);
 				void setOriginDateTime		(const time::DateTime& time);
 				void setReservationDeadLine	(const time::DateTime& time);
 			//@}

@@ -85,10 +85,10 @@ namespace synthese
 			return str.str();
 		}
 
-		std::string HTMLModule::getHTMLImage( const std::string& url, const std::string& alt )
+		std::string HTMLModule::getHTMLImage( const std::string& url, const std::string& title )
 		{
 			stringstream s;
-			s << "<img src=\"" << url << "\" alt=\"" << alt << "\" />";
+			s << "<img src=\"" << url << "\" alt=\"" << title << "\" title=\"" << title << "\" />";
 			return s.str();
 		}
 

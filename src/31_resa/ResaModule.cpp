@@ -159,10 +159,9 @@ namespace synthese
 				if ((*itrs)->getReservationRuleId() != UNKNOWN_VALUE)
 				{
 					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Place réservée sur ce tronçon");
-					stream << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon((*itrs)->getStatus()), (*itrs)->getFullStatusText());
 				}
-				stream << " de " << (*itrs)->getDepartureTime().toString();
-				stream << " à " << (*itrs)->getDeparturePlaceName();
+				stream << " de " << (*itrs)->getDeparturePlaceName();
+				stream << " à " << (*itrs)->getDepartureTime().toString();
 				stream << " jusqu'à " << (*itrs)->getArrivalPlaceName();
 				stream << " à " << (*itrs)->getArrivalTime().toString();
 				stream << "</li>";

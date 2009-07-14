@@ -133,7 +133,7 @@ namespace synthese
 			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
 				object->setTransaction(
-					ReservationTransactionTableSync::Get(
+					ReservationTransactionTableSync::GetEditable(
 						rows->getLongLong(ReservationTableSync::COL_TRANSACTION_ID),
 						env, linkLevel
 					).get()
@@ -208,6 +208,7 @@ namespace synthese
 			const Date& day,
 			const optional<RegistryKeyType> serviceId,
 			bool hideOldServices,
+			logic::tribool cancellations,
 			bool orderByService,
 			bool raisingOrder,
 			int first /*= 0 */,
@@ -221,7 +222,13 @@ namespace synthese
 				" INNER JOIN " << ScheduledServiceTableSync::TABLE.NAME <<
 					" s ON s." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_SERVICE_ID <<
 				" INNER JOIN " << LineTableSync::TABLE.NAME <<
-					" l ON l." << TABLE_COL_ID << "=s." << ScheduledServiceTableSync::COL_PATHID <<
+					" l ON l." << TABLE_COL_ID << "=s." << ScheduledServiceTableSync::COL_PATHID
+			;
+			if(!indeterminate(cancellations))
+			{
+				query << " INNER JOIN " << ReservationTransactionTableSync::TABLE.NAME << " t ON t." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_TRANSACTION_ID;
+			}
+			query <<
 				" WHERE " <<
 				"l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
 				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">=" << day.toSQLString();
@@ -234,6 +241,11 @@ namespace synthese
 			{
 				query << " AND s." << TABLE_COL_ID << "=" << *serviceId;
 			}
+			if(!indeterminate(cancellations))
+			{
+				query << " AND t." << ReservationTransactionTableSync::COL_CANCELLATION_TIME << " IS " << (cancellations == true ? "NOT " : "") << " NULL";
+			}
+
 			if(hideOldServices)
 			{
 				Hour now(TIME_CURRENT);

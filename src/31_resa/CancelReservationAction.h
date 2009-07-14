@@ -64,8 +64,6 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
-			
-			CancelReservationAction();
 
 			void setTransaction(boost::shared_ptr<ReservationTransaction> transaction);
 

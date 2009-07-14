@@ -100,6 +100,7 @@ namespace synthese
 				const time::Date& day,
 				const boost::optional<util::RegistryKeyType> serviceId = boost::optional<util::RegistryKeyType>(),
 				bool hideOldServices = false,
+				boost::logic::tribool cancelled = false,
 				bool orderByService = true,
 				bool raisingOrder = true, 
 				int first = 0,

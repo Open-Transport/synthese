@@ -26,7 +26,6 @@
 
 #include "Site.h"
 #include "ResaRight.h"
-#include "ReservationsListInterfacePage.h"
 
 #include "RequestException.h"
 #include "LoginInterfacePage.h"
@@ -144,19 +143,6 @@ namespace synthese
 		{
 			if (_request->getSession())
 			{
-				const ReservationsListInterfacePage* page(_site->getInterface()->getPage<ReservationsListInterfacePage>());
-				VariablesMap vm;
-
-				page->display(
-					stream
-					, _line
-					, _user
-					, _userName
-					, _startDateTime.getDate()
-					, _displayCancelled
-					, vm
-					, _request
-				);
 			}
 			else
 			{

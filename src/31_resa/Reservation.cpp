@@ -179,9 +179,10 @@ namespace synthese
 			return _transaction;
 		}
 
-		void Reservation::setTransaction( const ReservationTransaction* transaction )
+		void Reservation::setTransaction(ReservationTransaction* transaction )
 		{
 			_transaction = transaction;
+			transaction->addReservation(this);
 		}
 
 		const time::DateTime& Reservation::getOriginDateTime() const

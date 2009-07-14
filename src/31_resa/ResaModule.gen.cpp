@@ -12,10 +12,8 @@ synthese::resa::ResaLogEntryUpdateAction::integrate();
 synthese::resa::ReservationsListFunction::integrate();
 synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
 
-synthese::resa::ReservationsListInterfacePage::integrate();
 synthese::resa::ReservationItemInterfacePage::integrate();
 
-synthese::resa::ReservationsListInterfaceElement::integrate();
 synthese::resa::ResaCallButtonInterfaceElement::integrate();
 
 synthese::resa::ReservationTableSync::integrate();

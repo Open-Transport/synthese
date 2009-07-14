@@ -18,10 +18,8 @@
 #include "31_resa/ReservationsListFunction.h"
 #include "31_resa/ResaCustomerHtmlOptionListFunction.h"
 
-#include "31_resa/ReservationsListInterfacePage.h"
 #include "31_resa/ReservationItemInterfacePage.h"
 
-#include "31_resa/ReservationsListInterfaceElement.h"
 #include "31_resa/ResaCallButtonInterfaceElement.h"
 
 #include "31_resa/BookableCommercialLineAdmin.h"

@@ -62,6 +62,7 @@ this_is_also_an_element
 			const std::string _value;
 
 		public:
+			StaticValueInterfaceElement();
 			StaticValueInterfaceElement(const std::string& value);
 			std::string	display(
 				std::ostream&

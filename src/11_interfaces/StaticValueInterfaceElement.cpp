@@ -49,6 +49,13 @@ namespace synthese
 		{
 			
 		}
+
+
+
+		StaticValueInterfaceElement::StaticValueInterfaceElement()
+		{
+			assert(false);
+		}
 	}
 }
 

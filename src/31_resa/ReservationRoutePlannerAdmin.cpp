@@ -136,10 +136,6 @@ namespace synthese
 					ReservationTableSync::SearchResult reservations(
 						ReservationTableSync::Search(*_env, _confirmedTransaction->getKey())
 					);
-					BOOST_FOREACH(shared_ptr<Reservation> reser, reservations)
-					{
-						_confirmedTransaction->addReservation(reser);
-					}
 				}
 				catch (...)
 				{

@@ -40,6 +40,7 @@
 #include "AdminInterfaceElement.h"
 #include "ResaEditLogEntryAdmin.h"
 #include "AdminRequest.h"
+#include "CancelReservationAction.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -112,7 +113,7 @@ namespace synthese
 
 		void ResaDBLog::AddBookReservationEntry(const server::Session* session, const ReservationTransaction& transaction)
 		{
-			shared_ptr<const Reservation> r1(*transaction.getReservations().begin());
+			const Reservation* r1(*transaction.getReservations().begin());
 			uid callId(ResaModule::GetCurrentCallId(session));
 
 			DBLog::ColumnsVector content;
@@ -240,10 +241,6 @@ namespace synthese
 			// Rights
 			bool writingRight(searchRequest.isAuthorized<ResaRight>(WRITE,UNKNOWN_RIGHT_LEVEL));
 
-			// Cancel request
-			Request cancelRequest(searchRequest);
-//			cancelRequest._setAction(shared_ptr<Action>(new CancelReservationAction));
-
 			ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE])));
 			shared_ptr<ReservationTransaction> tr;
 			ReservationStatus status(NO_RESERVATION);
@@ -256,10 +253,6 @@ namespace synthese
 				ReservationTableSync::SearchResult reservations(
 					ReservationTableSync::Search(env, tr->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<Reservation> reser, reservations)
-				{
-					tr->addReservation(reser);
-				}
 
 				//ReservationTableSync::search(tr.get());
 				status = tr->getStatus();
@@ -320,32 +313,61 @@ namespace synthese
 				case FAKE_CALL:
 				case RADIO_CALL:
 				case OUTGOING_CALL:
-					AdminFunctionRequest<ResaEditLogEntryAdmin> openCallRequest(
-						static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
-					);
-					openCallRequest.getPage()->setEntry(
-						DBLogEntryTableSync::Get(
-							entry.getKey(),
-							*static_cast<const FunctionRequest<AdminRequest>* >(
-								&searchRequest
-							)->getFunction()->getEnv()
-					)	);
-					stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir");
-					break;
-				}
-
-				switch(status)
-				{
-				case OPTION:
-					stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", "bullet_delete.png");
+					{
+						AdminFunctionRequest<ResaEditLogEntryAdmin> openCallRequest(
+							static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+						);
+						openCallRequest.getPage()->setEntry(
+							DBLogEntryTableSync::Get(
+								entry.getKey(),
+								*static_cast<const FunctionRequest<AdminRequest>* >(
+									&searchRequest
+								)->getFunction()->getEnv()
+						)	);
+						stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir");
+					}
 					break;
 
-				case TO_BE_DONE:
-					stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", "error.png");
-					break;
+				case RESERVATION_ENTRY:
+					{
+						// Cancel request
+						shared_ptr<CancelReservationAction> action(new CancelReservationAction);
+						action->setTransaction(tr);
+						Request cancelRequest(
+							&searchRequest,
+							shared_ptr<Function>(searchRequest._getFunction()->clone()),
+							static_pointer_cast<Action, CancelReservationAction>(action)
+						);
+	
+						switch(status)
+						{
+						case OPTION:
+							stream << HTMLModule::getLinkButton(
+									cancelRequest.getURL(),
+									"Annuler",
+									"Etes-vous sûr de vouloir annuler la réservation ?",
+									ResaModule::GetStatusIcon(CANCELLED)
+								);
+							break;
 
-				case AT_WORK:
-					stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "exclamation.png");
+						case TO_BE_DONE:
+							stream << HTMLModule::getLinkButton(
+									cancelRequest.getURL(),
+									"Annuler hors délai",
+									"Etes-vous sûr de vouloir annuler la réservation (hors délai) ?",
+									ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY)
+								);
+							break;
+
+						case AT_WORK:
+							stream << HTMLModule::getLinkButton(
+									cancelRequest.getURL(),
+									"Noter absence",
+									"Etes-vous sûr de noter l'absence du client à l'arrêt ?",
+									ResaModule::GetStatusIcon(NO_SHOW)
+								);
+							break;
+						}	}
 					break;
 				}
 				result.push_back(stream.str());

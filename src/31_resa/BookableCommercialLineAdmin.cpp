@@ -215,7 +215,8 @@ namespace synthese
 					_line->getKey(),
 					_date,
 					_service.get() ? _service->getKey() : optional<RegistryKeyType>(),
-					_hideOldServices
+					_hideOldServices,
+					_displayCancelled ? logic::indeterminate : logic::tribool(false)
 			)	);
 			// Services reading
 			ScheduledServiceTableSync::SearchResult services;

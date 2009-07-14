@@ -81,7 +81,7 @@ namespace synthese
 		void PlacesListFunction::_run( std::ostream& stream ) const
 		{
 			Site::CitiesMatcher::MatchResult cities(
-				_site->getCitiesMatcher().bestMatches(_cityText, 1)
+				_site->getCitiesMatcher().findCombined(_cityText, 1)
 			);
 			if (cities.empty())
 			{
@@ -90,7 +90,7 @@ namespace synthese
 			const City* city(cities.front().value);
 
 			PlacesList placesList;
-			City::PlacesMatcher::MatchResult places(city->getAllPlacesMatcher().bestMatches(_input, _n));
+			City::PlacesMatcher::MatchResult places(city->getAllPlacesMatcher().findCombined(_input, _n));
 			
 			BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
 			{

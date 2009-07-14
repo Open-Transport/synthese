@@ -50,7 +50,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<ReservationTransaction>	Registry;
 
-			typedef std::vector<boost::shared_ptr<Reservation> > Reservations;
+			typedef std::vector<Reservation*> Reservations;
 			
 		private:
 
@@ -115,10 +115,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			boost::shared_ptr<Reservation> newReservation();
+			Reservation* newReservation();
 
 
-			void addReservation(boost::shared_ptr<Reservation> resa);
+			void addReservation(Reservation* resa);
 
 			//! @name Queries
 			//@{				

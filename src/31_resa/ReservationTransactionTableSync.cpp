@@ -109,17 +109,6 @@ namespace synthese
 			object->setBookingUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_BOOKING_USER_ID));
 			object->setCancelUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CANCEL_USER_ID));
 			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
-
-			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
-			{
-				ReservationTableSync::SearchResult reservations(
-					ReservationTableSync::Search(env, object->getKey())
-				);
-				BOOST_FOREACH(shared_ptr<Reservation> reser, reservations)
-				{
-					object->addReservation(reser);
-				}
-			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Save(ReservationTransaction* object)

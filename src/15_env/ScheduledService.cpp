@@ -244,6 +244,7 @@ namespace synthese
 						false,
 						false
 					)	);
+					if(!p.getService()) return UseRule::RESERVATION_FORBIDDEN;
 					return getUseRule(USER_PEDESTRIAN).getReservationAvailability(p);
 				}
 			}

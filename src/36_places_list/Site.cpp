@@ -239,7 +239,7 @@ namespace synthese
 				throw Exception("Empty city name");
 
 			CitiesMatcher::MatchResult cities(
-				_citiesMatcher.bestMatches(cityName,1)
+				_citiesMatcher.findCombined(cityName,1)
 			);
 			if(cities.empty()) throw Exception("An error has occured in city name search");
 			const City* city(cities.front().value);
@@ -249,7 +249,7 @@ namespace synthese
 			if (!placeName.empty())
 			{
 				City::PlacesMatcher::MatchResult places(
-					city->getAllPlacesMatcher().bestMatches(placeName, 1)
+					city->getAllPlacesMatcher().findCombined(placeName, 1)
 				);
 				if (!places.empty())
 				{
