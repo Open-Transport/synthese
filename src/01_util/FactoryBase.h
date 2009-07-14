@@ -52,7 +52,7 @@ namespace synthese
 			///	@return the factory key of the class of the object.
 			virtual const std::string& getFactoryKey() const = 0;
 
-			virtual typename F* clone() const = 0;
+			virtual F* clone() const = 0;
 		};
 	}
 }

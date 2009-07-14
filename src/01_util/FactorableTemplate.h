@@ -47,7 +47,7 @@ namespace synthese
 
 			virtual const std::string& getFactoryKey() const;
 
-			virtual typename F* clone() const;
+			virtual F* clone() const;
 
 			static void integrate ();
 		};
@@ -69,7 +69,7 @@ namespace synthese
 		}
 
 		template<class F, class C>
-		typename F* FactorableTemplate<F, C>::clone() const
+		F* FactorableTemplate<F, C>::clone() const
 		{
 			return new C;
 		}
