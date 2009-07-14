@@ -69,8 +69,23 @@ namespace synthese
 
 
 
+
 		void EMail::send( const std::string& smtpServer, string service) const
 		{
+		   struct Local
+		   {
+				static void _Process(
+					boost::asio::ip::tcp::socket& socket,
+					boost::asio::streambuf& request,
+					boost::asio::streambuf& response
+				){
+					boost::system::error_code error;
+					boost::asio::write(socket, request);
+					boost::asio::read(socket, response, boost::asio::transfer_at_least(1), error);
+					if (error) throw boost::system::system_error(error);
+				}
+			};
+			
 			boost::asio::io_service io_service;
 
 			// Get a list of endpoints corresponding to the server name.
@@ -96,30 +111,27 @@ namespace synthese
 			std::ostream request_stream(&request);
 
 			// Receive initial response from SMTP server
-			boost::asio::read(socket, response);
+			boost::asio::read(socket, response, boost::asio::transfer_at_least(1), error);
+			if (error) throw boost::system::system_error(error);
 
 			// Send HELO server.com
 			request_stream << "HELO " << smtpServer << CRLF;
-			boost::asio::write(socket, request);
-			boost::asio::read(socket, response);
+			Local::_Process(socket, request, response);
 
 			// Send MAIL FROM: <sender@mydomain.com>
 			request_stream << "MAIL FROM:<" << _sender << ">" << CRLF;
-			boost::asio::write(socket, request);
-			boost::asio::read(socket, response);
+			Local::_Process(socket, request, response);
 
 			// Send RCPT TO: <receiver@domain.com>
 			BOOST_FOREACH(const string& recipient, _recipients)
 			{
 				request_stream << "RCPT TO:<" << recipient << ">" << CRLF;
-				boost::asio::write(socket, request);
-				boost::asio::read(socket, response);
+				Local::_Process(socket, request, response);
 			}
 
 			// Send DATA
 			request_stream << "DATA" << CRLF;
-			boost::asio::write(socket, request);
-			boost::asio::read(socket, response);
+			Local::_Process(socket, request, response);
 
 			request_stream << 
 				"Subject: " << _subject << CRLF <<
@@ -134,14 +146,11 @@ namespace synthese
 			}
 
 			request_stream << _content << CRLF << "." << CRLF;
-			boost::asio::write(socket, request);
-			boost::asio::read(socket, response);
+			Local::_Process(socket, request, response);
 
 			// Send QUIT
 			request_stream << "QUIT" << CRLF;
-			boost::asio::write(socket, request);
-			boost::asio::read(socket, response);
-
+			Local::_Process(socket, request, response);
 		}
 	}
 }
