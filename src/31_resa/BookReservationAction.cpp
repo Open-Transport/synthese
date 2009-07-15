@@ -364,21 +364,21 @@ namespace synthese
 			}
 
 			// Mail
-			if(!_customer->getEMail().empty())
-			{
-				EMail email;
-				email.setFormat(EMail::EMAIL_HTML);
-				email.setSender("contact@reseaux-conseil.com");
-				email.setSubject("Récapitulatif de votre réservation Tisséo");
-				email.addRecipient(_customer->getEMail());
-				stringstream content;
-				content << "<html><body><h1>Merci pour votre réservation</h1><p>Rappel de votre trajet : ";
-				ResaModule::DisplayReservations(content, rt);
-				content << "</p><p>IMPORTANT : En cas de désistement, veuillez impérativement nous prévenir</p></body></html>";
-				email.setContent(content.str());
-				email.send("mail.bluewin.ch");
-			}
-
+// 			if(!_customer->getEMail().empty())
+// 			{
+// 				EMail email;
+// 				email.setFormat(EMail::EMAIL_HTML);
+// 				email.setSender("contact@reseaux-conseil.com");
+// 				email.setSubject("Récapitulatif de votre réservation Tisséo");
+// 				email.addRecipient(_customer->getEMail());
+// 				stringstream content;
+// 				content << "<html><body><h1>Merci pour votre réservation</h1><p>Rappel de votre trajet : ";
+// 				ResaModule::DisplayReservations(content, rt);
+// 				content << "</p><p>IMPORTANT : En cas de désistement, veuillez impérativement nous prévenir</p></body></html>";
+// 				email.setContent(content.str());
+// 				email.send("mail.bluewin.ch");
+// 			}
+// 
 
 			// Log
 			ResaDBLog::AddBookReservationEntry(_request->getSession(), rt);

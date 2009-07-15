@@ -173,7 +173,7 @@ namespace synthese
 			const ReservationTransaction& transaction,
 			ReservationStatus oldStatus )
 		{
-			shared_ptr<const Reservation> r1(*transaction.getReservations().begin());
+			const Reservation* r1(*transaction.getReservations().begin());
 			uid callId(ResaModule::GetCurrentCallId(session));
 			string description;
 			DBLogEntry::Level level;
