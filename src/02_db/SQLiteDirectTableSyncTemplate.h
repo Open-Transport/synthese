@@ -227,7 +227,7 @@ namespace synthese
 					}	}
 					catch(std::exception& e)
 					{
-						Log::GetInstance().warn("Skipped object in results load of " + query, e);
+						util::Log::GetInstance().warn("Skipped object in results load of " + query, e);
 				}	}
 				return result;
 			}

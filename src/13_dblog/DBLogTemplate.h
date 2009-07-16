@@ -44,7 +44,7 @@ namespace synthese
 				const server::Request& request,
 				const security::RightLevel& level
 			){
-				return request.isAuthorized<DBLogRight>(level, security::UNKNOWN_RIGHT_LEVEL, FACTORY_KEY);
+				return request.isAuthorized<DBLogRight>(level, security::UNKNOWN_RIGHT_LEVEL, T::FACTORY_KEY);
 			}
 
 

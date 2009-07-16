@@ -276,7 +276,7 @@ namespace synthese
 			try
 			{
 				Map::const_iterator it(_map.find(parameterName));
-				return (it == _map.end()) ? boost::optional<C>() : boost::lexical_cast<C>(it->second);
+				return (it == _map.end()) ? boost::optional<C>() : boost::optional<C>(boost::lexical_cast<C>(it->second));
 			}
 			catch(...)
 			{
