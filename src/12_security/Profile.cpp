@@ -141,7 +141,7 @@ namespace synthese
 			RightsOfSameClassMap m = getRights(right.getFactoryKey());
 			BOOST_FOREACH(const RightsOfSameClassMap::value_type& it, m)
 			{
-				if (it.second->perimeterIncludes(right.getParameter()))
+				if (right.getParameter().empty() || it.second->perimeterIncludes(right.getParameter()))
 				{
 					if (it.second->getPrivateRightLevel() >= right.getPrivateRightLevel())
 						privateAuthorization = true;

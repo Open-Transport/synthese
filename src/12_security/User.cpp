@@ -45,7 +45,8 @@ namespace synthese
 			: Registrable(id)
 			, _cityId(0)
 			, _isConnectionAllowed(true)
-			, _birthDate(TIME_UNKNOWN)
+			, _birthDate(TIME_UNKNOWN),
+			_profile(NULL)
 		{
 		}
 

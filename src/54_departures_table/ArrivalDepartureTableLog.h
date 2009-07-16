@@ -23,8 +23,7 @@
 #ifndef SYNTHESE_ARRIVAL_DEPARTURE_TABLE_LOG
 #define SYNTHESE_ARRIVAL_DEPARTURE_TABLE_LOG
 
-#include "DBLog.h"
-#include "FactorableTemplate.h"
+#include "DBLogTemplate.h"
 
 namespace synthese
 {
@@ -42,17 +41,14 @@ namespace synthese
 			@ingroup m54Log refLog
 		*/
 		class ArrivalDepartureTableLog :
-			public util::FactorableTemplate<dblog::DBLog, ArrivalDepartureTableLog>
+			public dblog::DBLogTemplate<ArrivalDepartureTableLog>
 		{
 		public:
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			
-			virtual bool isAuthorized(
-				const server::Request& request,
-				const security::RightLevel& level
-			) const;
-			
+
+
 			static void	addUpdateEntry(
 				const DisplayScreen& screen
 				, const std::string& text

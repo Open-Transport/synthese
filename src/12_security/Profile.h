@@ -127,7 +127,7 @@ namespace synthese
 				bool isAuthorized(
 					security::RightLevel publicr = security::USE
 					, security::RightLevel privater = security::UNKNOWN_RIGHT_LEVEL
-					, std::string parameter = security::UNKNOWN_PERIMETER
+					, std::string parameter = security::GLOBAL_PERIMETER
 				) const;
 
 

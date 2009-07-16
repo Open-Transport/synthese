@@ -134,7 +134,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const
 		{
-			return _request.isAuthorized<ResaRight>(READ);
+			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
@@ -143,7 +143,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == ResaModule::FACTORY_KEY)
+			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const BookableCommercialLinesAdmin*>(currentPage.get()))
 				{

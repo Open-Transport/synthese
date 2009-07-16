@@ -129,7 +129,7 @@ namespace synthese
 					t.col() <<
 					HTMLModule::getLinkButton(
 						editCalendar.getURL(),
-						"Modifier",
+						"Ouvrir",
 						string(),
 						"calendar_edit.png"
 					)
@@ -160,12 +160,13 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			const CalendarTemplatesAdmin* ta(
-				dynamic_cast<const CalendarTemplatesAdmin*>(currentPage.get())
-			);
-			
-			if(	moduleKey == TimetableModule::FACTORY_KEY
+			if(	moduleKey == TimetableModule::FACTORY_KEY &&
+				isAuthorized(request)
 			){
+				const CalendarTemplatesAdmin* ta(
+					dynamic_cast<const CalendarTemplatesAdmin*>(currentPage.get())
+				);
+
 				if(ta)
 				{
 					AddToLinks(links, currentPage);

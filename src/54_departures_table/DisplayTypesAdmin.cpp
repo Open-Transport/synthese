@@ -193,7 +193,7 @@ namespace synthese
 				
 				stream <<
 					t.col() <<
-					openRequest.getHTMLForm().getLinkButton("Modifier", string(), "monitor_edit.png")
+					openRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "monitor_edit.png")
 				;
 				if (writeRight)
 				{
@@ -269,7 +269,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY)
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const DisplayTypesAdmin*>(currentPage.get()))
 				{

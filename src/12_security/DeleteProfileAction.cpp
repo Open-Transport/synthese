@@ -69,9 +69,13 @@ namespace synthese
 			}
 
 			// Search of child profiles
-			ProfileTableSync::Search(*_env, _profile.get() ? _profile->getKey() : 0, 0, 1, FIELDS_ONLY_LOAD_LEVEL);
-			if (!_env->getRegistry<Profile>().empty())
+			ProfileTableSync::SearchResult profiles(
+				ProfileTableSync::Search(*_env, _profile.get() ? _profile->getKey() : 0, 0, 1, FIELDS_ONLY_LOAD_LEVEL)
+			);
+			if(!profiles.empty())
+			{
 				throw ActionException("Au moins un profil hérite du profil spécifié. La suppression est impossible.");
+			}
 
 			// Search of users
 			UserTableSync::Search(
@@ -83,6 +87,7 @@ namespace synthese
 				_profile->getKey(),
 				boost::logic::indeterminate,
 				boost::logic::indeterminate,
+				optional<RegistryKeyType>(),
 				0, 1,
 				false, false, false, false,
 				FIELDS_ONLY_LOAD_LEVEL

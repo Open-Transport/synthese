@@ -255,7 +255,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(	moduleKey == DeparturesTableModule::FACTORY_KEY)
+			if(	moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const DeparturesTableBenchmarkAdmin*>(currentPage.get()))
 				{

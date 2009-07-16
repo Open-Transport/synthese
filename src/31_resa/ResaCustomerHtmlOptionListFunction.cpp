@@ -88,6 +88,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					logic::indeterminate,
 					false,
+					optional<RegistryKeyType>(),
 					0,
 					_number,
 					false,

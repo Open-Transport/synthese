@@ -207,12 +207,12 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
-//				try
-//				{
-					SearchResult result;
-					util::Registry<T>& registry(env.template getEditableRegistry<T>());
-					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
-					while (rows->next ())
+				SearchResult result;
+				util::Registry<T>& registry(env.template getEditableRegistry<T>());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
+				while (rows->next ())
+				{
+					try
 					{
 						if(registry.contains(rows->getKey()))
 						{
@@ -224,14 +224,12 @@ namespace synthese
 							Load(object.get(), rows, env, linkLevel);
 							registry.add(object);
 							result.push_back(object);
-						}
-					}
-					return result;
-//				}
-//				catch(SQLiteException& e)
-//				{
-//					throw util::Exception(e.getMessage());
-//				}
+					}	}
+					catch(std::exception& e)
+					{
+						Log::GetInstance().warn("Skipped object in results load of " + query, e);
+				}	}
+				return result;
 			}
 		};
 	}

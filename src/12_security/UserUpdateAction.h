@@ -65,8 +65,8 @@ namespace synthese
 			std::string				_city;
 			std::string				_phone;
 			std::string				_email;
-			bool					_authorizedLogin;
-			boost::optional<boost::shared_ptr<const Profile> >		_profile;
+			boost::optional<bool>								_authorizedLogin;
+			boost::optional<boost::shared_ptr<const Profile> >	_profile;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

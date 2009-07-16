@@ -240,7 +240,7 @@ namespace synthese
 					stream << t.row(Conversion::ToString(alarm->getKey()));
 					stream << t.col() << alarm->getShortMessage();
 					stream << t.col() << ""; // Emplacement
-					stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Modifier");
+					stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Ouvrir");
 					stream << t.col() << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le message du scénario ?");
 				}
 

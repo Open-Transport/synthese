@@ -149,12 +149,12 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
-				try
+				SearchResult r;
+				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
+				while (rows->next ())
 				{
-					SearchResult r;
-					typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
-					SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
-					while (rows->next ())
+					try
 					{
 						if(registry.contains(rows->getKey()))
 						{
@@ -170,14 +170,12 @@ namespace synthese
 							r.push_back(
 								boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
 							);
-						}
-					}
-					return r;
-				}
-				catch(SQLiteException& e)
-				{
-					throw util::Exception(e.getMessage());
-				}
+					}	}
+					catch(std::exception& e)
+					{
+						Log::GetInstance().warn("Skipped object in results load of " + query, e);
+				}	}
+				return r;
 			}
 
 

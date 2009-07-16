@@ -57,14 +57,6 @@ namespace synthese
 			v.push_back("Action");
 			return v;
 		}
-		
-		
-		bool SecurityLog::isAuthorized(
-			const Request& request,
-			const security::RightLevel& level
-		) const {
-			return request.isAuthorized<SecurityRight>(level);
-		}
 
 
 

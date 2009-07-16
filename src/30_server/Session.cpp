@@ -45,7 +45,7 @@ namespace synthese
 	namespace server
 	{
 		const size_t Session::KEY_LENGTH = 20;
-		const int Session::MAX_MINUTES_DURATION = 10;
+		const int Session::MAX_MINUTES_DURATION = 30;
 
 		Session::Session(const std::string& ip)
 			: _ip(ip)

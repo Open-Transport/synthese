@@ -239,7 +239,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == MessagesModule::FACTORY_KEY)
+			if(moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const MessagesTemplateLibraryAdmin*>(currentPage.get()))
 				{

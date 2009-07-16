@@ -134,26 +134,13 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			Factory<AdminInterfaceElement>::ObjectsCollection pages(Factory<AdminInterfaceElement>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement> page, pages)
+			BOOST_FOREACH(shared_ptr<AdminInterfaceElement> page, pages)
 			{
 				page->setEnv(_env);
-				if (page->isAuthorized(request))
-				{
-					PageLinks l(
-						page->getSubPagesOfModule(_moduleClass->getFactoryKey(), currentPage, request)
-					);
-					links.insert(links.end(), l.begin(), l.end());
-				}
-				else if(currentPage->getFactoryKey() == page->getFactoryKey())
-				{
-					PageLinks l(
-						currentPage->getSubPagesOfModule(
-							_moduleClass->getFactoryKey(),
-							currentPage,
-							request
-					)	);
-					links.insert(links.end(), l.begin(), l.end());
-				}
+				PageLinks l(
+					page->getSubPagesOfModule(_moduleClass->getFactoryKey(), currentPage, request)
+				);
+				links.insert(links.end(), l.begin(), l.end());
 			}
 			return links;
 		}

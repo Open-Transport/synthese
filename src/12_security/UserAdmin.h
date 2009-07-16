@@ -88,6 +88,8 @@ namespace synthese
 			UserAdmin();
 			
 			void setUser(boost::shared_ptr<User> value);
+			void setUserC(boost::shared_ptr<const User> value);
+			boost::shared_ptr<const User> getUser() const;
 
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.

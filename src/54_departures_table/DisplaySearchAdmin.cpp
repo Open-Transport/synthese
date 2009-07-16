@@ -389,7 +389,7 @@ namespace synthese
 							}
 						}
 					}
-					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
+					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Ouvrir", string(), "monitor_edit.png");
 					stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png");
 				}
 
@@ -480,7 +480,7 @@ namespace synthese
 
 					stream << t.col();
 					
-					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
+					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Ouvrir", string(), "monitor_edit.png");
 					
 				}
 
@@ -533,20 +533,19 @@ namespace synthese
 
 		bool DisplaySearchAdmin::isAuthorized(
 				const server::FunctionRequest<admin::AdminRequest>& _request
-			
 		) const	{
-			return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
+			return _request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
 			// General search page
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY)
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
 				const DisplaySearchAdmin* sa(
 					dynamic_cast<const DisplaySearchAdmin*>(currentPage.get())

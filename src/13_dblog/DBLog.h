@@ -134,9 +134,9 @@ namespace synthese
 			 * @return true if the log can be displayed
 			 */
 			virtual bool isAuthorized(
-				const server::Request& request,
-				const security::RightLevel& level
-			) const = 0;
+ 				const server::Request& request,
+ 				const security::RightLevel& level
+ 			) = 0;
 
 
 

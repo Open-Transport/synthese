@@ -54,6 +54,7 @@ namespace synthese
 		///			- Masque de code SYNTHESE d'objet (MP/TLS/*, MP/TLS/14/*...)
 		///			- Liste d'objet(s) (MP/TLS/14;MP/TLS/41)
 		///			- @c * = Pas de restriction de périmètre
+		///			- vide = Au moins un périmètre (utilisé uniquement pour la validation d'habilitation)
 		///		-# un niveau de droit sur les objets appartenant à l'utilisateur (droits privés)
 		///		-# un niveau de droit sur les objets n'appartenant pas à l'utilisateur (droits publics)
 		///
@@ -101,7 +102,7 @@ namespace synthese
 				
 				/** Perimeter inclusion test.
 					@param env Environment to read
-					@param perimeter Perimeter to include
+					@param perimeter Perimeter to test
 					@return bool True if the current perimeter includes the compared one
 					@author Hugues Romain
 					@date 2007				

@@ -226,6 +226,7 @@ namespace synthese
 			optional<RegistryKeyType> profileId,
 			tribool emptyLogin,
 			tribool emptyPhone,
+			boost::optional<util::RegistryKeyType> differentUserId,
 			int first, /*= 0*/
 			boost::optional<std::size_t> number, /*= 0*/
 			bool orderByLogin,
@@ -256,6 +257,9 @@ namespace synthese
 				query << " AND " << TABLE_COL_LOGIN << (emptyLogin ? "=''" : "!=''");
 			if (emptyPhone != tribool::indeterminate_value)
 				query << " AND " << TABLE_COL_PHONE << (emptyPhone ? "=''" : "!=''");
+			if(differentUserId)
+				query << " AND " << TABLE_COL_ID << "!=" << *differentUserId;
+
 			if (orderByProfileName)
 				query << " ORDER BY p." << ProfileTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			else if (orderByLogin)

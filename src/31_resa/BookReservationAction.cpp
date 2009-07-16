@@ -165,6 +165,7 @@ namespace synthese
 						optional<RegistryKeyType>(),
 						logic::indeterminate,
 						logic::indeterminate,
+						optional<RegistryKeyType>(),
 						0, 1
 					);
 					if (!env.getRegistry<User>().empty())

@@ -58,15 +58,6 @@ namespace synthese
 
 
 
-		bool ArrivalDepartureTableLog::isAuthorized(
-			const Request& request,
-			const security::RightLevel& level
-		) const {
-			return request.isAuthorized<ArrivalDepartureTableRight>(level);
-		}
-
-
-
 		void ArrivalDepartureTableLog::addUpdateEntry(
 			const DisplayScreen& screen,
 			const std::string& text, const User& user

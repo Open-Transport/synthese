@@ -71,15 +71,7 @@ namespace synthese
 		}
 
 
-		bool DisplayMaintenanceLog::isAuthorized(
-			const Request& request,
-			const security::RightLevel& level
-		) const {
-			return request.isAuthorized<DisplayMaintenanceRight>(level);
-		}
-
-
-
+	
 		void DisplayMaintenanceLog::AddAdminEntry(
 			const DisplayScreen& screen
 			, const security::User& user

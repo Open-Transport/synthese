@@ -93,12 +93,6 @@ namespace synthese
 		}
 
 
-		bool ResaDBLog::isAuthorized(
-			const Request& request,
-			const security::RightLevel& level
-		) const {
-			return request.isAuthorized<ResaRight>(level);
-		}
 
 		DBLog::ColumnsVector resa::ResaDBLog::getColumnNames() const
 		{

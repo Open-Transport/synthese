@@ -216,7 +216,7 @@ namespace synthese
 		bool BroadcastPointsAdmin::isAuthorized(
 			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
-			return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
+			return _request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 
@@ -227,7 +227,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY)
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const BroadcastPointsAdmin*>(currentPage.get()))
 				{

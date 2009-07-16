@@ -176,7 +176,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == EnvModule::FACTORY_KEY)
+			if(moduleKey == EnvModule::FACTORY_KEY && isAuthorized(request))
 			{
 				const TransportNetworkAdmin* tna(
 					dynamic_cast<const TransportNetworkAdmin*>(currentPage.get())

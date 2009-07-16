@@ -96,10 +96,12 @@ namespace synthese
 			}
 
 			// Searched profile
-			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAM_SEARCH_PROFILE_ID));
-			if (id && *id != UNKNOWN_VALUE && _getEnv().getRegistry<Profile>().contains(*id))
+			if (map.getOptional<RegistryKeyType>(PARAM_SEARCH_PROFILE_ID)) try
 			{
-				_searchProfile = ProfileTableSync::Get(*id, _getEnv());
+				_searchProfile = ProfileTableSync::Get(map.get<RegistryKeyType>(PARAM_SEARCH_PROFILE_ID), _getEnv());
+			}
+			catch(...)
+			{
 			}
 
 			// Table Parameters
@@ -161,7 +163,11 @@ namespace synthese
 			stream << searchTable.cell("Login", searchTable.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin ? *_searchLogin : string()));
 			stream << searchTable.cell("Nom", searchTable.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName ? *_searchName : string()));
 			stream << searchTable.cell("Prénom", searchTable.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname ? *_searchSurname : string()));
-			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfile.get() ? _searchProfile->getKey() : RegistryKeyType(0)));
+			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(
+					PARAM_SEARCH_PROFILE_ID,
+					SecurityModule::getProfileLabels(true),
+					_searchProfile.get() ? _searchProfile->getKey() : RegistryKeyType(0)
+			)	);
 			stream << searchTable.close();
 
 			stream << "<h1>Résultats de la recherche</h1>";
@@ -177,6 +183,7 @@ namespace synthese
 					_searchProfile.get() ? _searchProfile->getKey() : optional<RegistryKeyType>(),
 					logic::indeterminate,
 					logic::indeterminate,
+					optional<RegistryKeyType>(),
 					_requestParameters.first
 					, _requestParameters.maxSize
 					, _requestParameters.orderField == PARAM_SEARCH_LOGIN
@@ -216,7 +223,7 @@ namespace synthese
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getLogin());
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getName());
 				stream << t.col() << user->getProfile()->getName();
-				stream << t.col() << userRequest.getHTMLForm().getLinkButton("Modifier") << "&nbsp;"
+				stream << t.col() << userRequest.getHTMLForm().getLinkButton("Ouvrir") << "&nbsp;"
 					<< deleteUserRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer l\\'utilisateur " + user->getLogin() + " ?");
 			}
 
@@ -238,7 +245,7 @@ namespace synthese
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == SecurityModule::FACTORY_KEY)
+			if (moduleKey == SecurityModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const UsersAdmin*>(currentPage.get()))
 				{

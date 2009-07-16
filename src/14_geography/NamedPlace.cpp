@@ -22,11 +22,6 @@
 
 #include "NamedPlace.h"
 #include "City.h"
-#include "WithoutAccentsFilter.h"
-#include "PlainCharFilter.h"
-
-#include <boost/iostreams/filtering_stream.hpp>
-#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -110,38 +105,12 @@ namespace synthese
 
 		string NamedPlace::getName13OrName() const
 		{
-			if (_name13.empty())
-			{
-				stringstream ss;
-				boost::iostreams::filtering_ostream out;
-				out.push (WithoutAccentsFilter());
-				out.push (PlainCharFilter());
-				out.push (ss);
-				out << _name << std::flush;
-
-				return ss.str().substr(0, 13);
-			}
-			else
-				return _name13;
+			return _name13.empty() ? _name.substr(0, 13) : _name13;
 		}
 
 		std::string NamedPlace::getName26OrName() const
 		{
-			if (_name26.empty())
-			{
-				stringstream ss;
-				boost::iostreams::filtering_ostream out;
-				out.push (WithoutAccentsFilter());
-				out.push (PlainCharFilter());
-				out.push (ss);
-				out << _name << std::flush;
-
-				return ss.str().substr(0, 26);
-			}
-			else
-				return _name26;
-
+			return _name26.empty() ? _name.substr(0, 26) : _name26;
 		}
-		
 	}
 }

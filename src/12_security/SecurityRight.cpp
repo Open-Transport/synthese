@@ -74,7 +74,7 @@ namespace synthese
 		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return true;
-			if (perimeter == UNKNOWN_PERIMETER)
+			if (perimeter.empty())
 				return true;
 
 			const Registry<Profile>& registry(env.getRegistry<Profile>());

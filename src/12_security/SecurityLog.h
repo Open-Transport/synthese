@@ -25,8 +25,7 @@
 
 #include <string>
 
-#include "DBLog.h"
-#include "FactorableTemplate.h"
+#include "DBLogTemplate.h"
 
 namespace synthese
 {
@@ -54,7 +53,8 @@ namespace synthese
 
 			@ingroup m12Logs refLogs
 		*/
-		class SecurityLog : public util::FactorableTemplate<dblog::DBLog, SecurityLog>
+		class SecurityLog:
+			public dblog::DBLogTemplate<SecurityLog>
 		{
 			typedef enum { LOGIN_ENTRY = 10, USER_ADMIN_ENTRY = 20, PROFILE_ADMIN_ENTRY = 30 } _EntryType;
 
@@ -77,11 +77,6 @@ namespace synthese
 				, const Profile* subject
 				, const std::string& text
 			);
-			
-			virtual bool isAuthorized(
-				const server::Request& request,
-				const security::RightLevel& level
-			) const;
 		};
 	}
 }

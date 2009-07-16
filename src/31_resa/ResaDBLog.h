@@ -26,9 +26,7 @@
 #include <string>
 
 #include "31_resa/Types.h"
-
-#include "DBLog.h"
-#include "FactorableTemplate.h"
+#include "DBLogTemplate.h"
 
 namespace synthese
 {
@@ -76,7 +74,8 @@ namespace synthese
 				- reservation id
 					
 		*/
-		class ResaDBLog : public util::FactorableTemplate<dblog::DBLog, ResaDBLog>
+		class ResaDBLog:
+			public dblog::DBLogTemplate<ResaDBLog>
 		{
 		public:
 		
@@ -117,10 +116,7 @@ namespace synthese
 			/// If empty result, then the column is not displayed (default behavior).
 			virtual std::string getObjectColumnName() const;
 
-			virtual bool isAuthorized(
-				const server::Request& request,
-				const security::RightLevel& level
-			) const;
+
 
 			virtual DBLog::ColumnsVector parse(
 				const dblog::DBLogEntry& entry,

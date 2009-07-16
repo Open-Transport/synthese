@@ -58,13 +58,6 @@ namespace synthese
 			return v;
 		}
 
-		bool MessagesLog::isAuthorized(
-			const Request& request,
-			const security::RightLevel& level
-		) const {
-			return request.isAuthorized<MessagesRight>(level);
-		}
-
 
 		
 		void MessagesLog::AddNewScenarioMessageEntry(

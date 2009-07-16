@@ -178,7 +178,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == PlacesListModule::FACTORY_KEY)
+			if(moduleKey == PlacesListModule::FACTORY_KEY && isAuthorized(request))
 			{
 				const TransportSiteAdmin* sp(
 					dynamic_cast<const TransportSiteAdmin*>(currentPage.get())

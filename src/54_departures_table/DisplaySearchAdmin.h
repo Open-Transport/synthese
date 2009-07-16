@@ -91,7 +91,7 @@ namespace synthese
 							- le point est orange avec une infobulle contenant un aperçu du message, si un message est diffusé sur l'afficheur
 							- le point est rouge avec une infobulle "Conflit" indiquant le nombre de messages en confli, le message effectivement affiché, et le(s) message(s) masqué(s) par le conflit
 					- @c Actions : Trois boutons permettent d'accéder aux fonctions suivantes :
-						- @c Modifier : Dirige vers la page @ref synthese::interface::DisplayAdmin
+						- @c Ouvrir: Dirige vers la page @ref synthese::interface::DisplayAdmin
 						- @c Simuler : Ouvre une fenêtre pop-up effectuant un affichage similaire à ce qui est diffusé sur l'afficheur, pour les écrans de type HTML. Pour les écran au protocole Lumiplan, le code Lumiplan est affiché.
 						- @c Supervision : Dirige vers la page @ref synthese::interface::DisplayMaintenanceAdmin
 					- La dernière ligne du tableau comprend un lien "Créer un nouvel afficheur" et donne sur une page de paramétrage d'afficheur vide.

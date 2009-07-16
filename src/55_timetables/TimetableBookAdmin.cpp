@@ -223,7 +223,7 @@ namespace synthese
 					t3.col() <<
 					HTMLModule::getLinkButton(
 						tt->getIsBook() ? goFolderRequest.getURL() : editTimetableRequest.getURL(),
-						"Modifier",
+						"Ouvrir",
 						string(),
 						"table_edit.png"
 					);
@@ -261,12 +261,13 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			const TimetableBookAdmin* ta(
-				dynamic_cast<const TimetableBookAdmin*>(currentPage.get())
-			);
-			
-			if(	moduleKey == TimetableModule::FACTORY_KEY
+			if(	moduleKey == TimetableModule::FACTORY_KEY &&
+				isAuthorized(request)
 			){
+				const TimetableBookAdmin* ta(
+					dynamic_cast<const TimetableBookAdmin*>(currentPage.get())
+				);
+
 				if(	ta &&
 					!ta->_book.get())
 				{

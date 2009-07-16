@@ -32,6 +32,7 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 	using namespace server;
+	using namespace security;
 
 	namespace dblog
 	{

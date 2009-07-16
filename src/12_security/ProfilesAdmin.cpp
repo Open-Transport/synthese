@@ -134,10 +134,17 @@ namespace synthese
 					, _requestParameters.raisingOrder
 			)	);
 
+			bool generalDeleteRight(
+				_request.isAuthorized<SecurityRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, string())
+			);
 			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
 			v.push_back(make_pair(string(), string("Résumé")));
 			v.push_back(make_pair(string(), string("Actions")));
+			if(generalDeleteRight)
+			{
+				v.push_back(make_pair(string(), string("Actions")));
+			}
 			ActionResultHTMLTable t(
 				v,
 				searchRequest.getHTMLForm(),
@@ -180,14 +187,20 @@ namespace synthese
 				stream
 					<< l.close()
 					<< t.col()
-					<< profileRequest.getHTMLForm().getLinkButton("Modifier", string(), "group_edit.png")
-					<< deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
-			}
+					<< profileRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "group_edit.png")
+				;
+				if(generalDeleteRight)
+				{
+					stream << t.col();
+					if(_request.isAuthorized<SecurityRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(profile->getKey())))
+					{
+						stream << deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
+			}	}	}
 
 			stream << t.row();
 			stream << t.col() << t.getActionForm().getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici");
 			stream << t.col() << "(sélectionner un profil existant duquel héritera le nouveau profil)";
-			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
+			stream << t.col(2) << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
 		}
 
@@ -195,7 +208,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const
 		{
-			return _request.isAuthorized<SecurityRight>(READ);
+			return _request.isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		
@@ -207,7 +220,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == SecurityModule::FACTORY_KEY)
+			if(moduleKey == SecurityModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const ProfilesAdmin*>(currentPage.get()))
 				{

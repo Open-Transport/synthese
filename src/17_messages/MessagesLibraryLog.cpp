@@ -60,12 +60,7 @@ namespace synthese
 			return v;
 		}
 
-		bool MessagesLibraryLog::isAuthorized(
-			const Request& request,
-			const security::RightLevel& level
-		) const {
-			return request.isAuthorized<MessagesLibraryRight>(level);
-		}
+
 
 		std::string MessagesLibraryLog::getObjectName( uid id ) const
 		{

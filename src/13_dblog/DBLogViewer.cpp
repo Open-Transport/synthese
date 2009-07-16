@@ -134,15 +134,9 @@ namespace synthese
 		}
 
 		bool DBLogViewer::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return
-				_request.isAuthorized<DBLogRight>(READ) &&
-				(	_viewer.getLogKey().empty() ||
-					_viewer.isAuthorized(_request)
-				)
-			;
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const	{
+			return _viewer.isAuthorized(_request);
 		}
 
 
@@ -163,6 +157,8 @@ namespace synthese
 				vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
 				BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
 				{
+					if(!loge->isAuthorized(request, READ)) continue;
+
 					if(	la &&
 						la->_viewer.getLogKey() == loge->getFactoryKey()
 					){

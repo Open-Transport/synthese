@@ -140,6 +140,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					logic::indeterminate,
 					logic::indeterminate,
+					optional<RegistryKeyType>(),
 					_requestParameters.first
 					, _requestParameters.maxSize
 					, _requestParameters.orderField == PARAM_SEARCH_LOGIN
@@ -198,7 +199,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == ResaModule::FACTORY_KEY)
+			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const ResaCustomersAdmin*>(currentPage.get()))
 				{

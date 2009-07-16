@@ -102,10 +102,12 @@ namespace synthese
 		}
 
 		bool ResaLogAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
-			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return
+				request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL) &&
+				ResaDBLog::IsAuthorized(request, READ)
+			;
 		}
 		
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPagesOfModule(
@@ -114,7 +116,7 @@ namespace synthese
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == ResaModule::FACTORY_KEY)
+			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const ResaLogAdmin*>(currentPage.get()))
 				{

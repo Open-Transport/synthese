@@ -23,8 +23,7 @@
 #ifndef SYNTHESE_MESSAGES_LIBRARY_LOG
 #define SYNTHESE_MESSAGES_LIBRARY_LOG
 
-#include "DBLog.h"
-#include "FactorableTemplate.h"
+#include "DBLogTemplate.h"
 
 namespace synthese
 {
@@ -44,17 +43,15 @@ namespace synthese
 
 			@ingroup m17Logs refLogs
 		*/
-		class MessagesLibraryLog : public util::FactorableTemplate<dblog::DBLog, MessagesLibraryLog>
+		class MessagesLibraryLog:
+			public dblog::DBLogTemplate<MessagesLibraryLog>
 		{
 		public:
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			
-			virtual bool isAuthorized(
-				const server::Request& request,
-				const security::RightLevel& level
-			) const;
-			
+
+
 			static void	addUpdateEntry(
 				const AlarmTemplate* alarm
 				, const std::string& text

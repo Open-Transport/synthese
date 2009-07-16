@@ -23,6 +23,8 @@
 #include "HomeAdmin.h"
 #include "ModuleAdmin.h"
 #include "ModuleClass.h"
+#include "UserAdmin.h"
+#include "SecurityRight.h"
 
 #include <boost/foreach.hpp>
 
@@ -34,6 +36,8 @@ namespace synthese
 	using namespace server;
 	using namespace admin;
 	using namespace util;
+	using namespace security;
+	
 	
 	namespace util
 	{
@@ -119,6 +123,24 @@ namespace synthese
 					{
 						AddToLinks(links, link);
 					}
+				}
+			}
+
+			if(request.isAuthorized<SecurityRight>(UNKNOWN_RIGHT_LEVEL, READ, string()))
+			{
+				const UserAdmin* ua(
+					dynamic_cast<const UserAdmin*>(currentPage.get())
+					);
+				if(	ua &&
+					ua->getUser()->getKey() == request.getUser()->getKey()
+					){
+						AddToLinks(links, currentPage);
+				}
+				else
+				{
+					shared_ptr<UserAdmin> userPage(getNewOtherPage<UserAdmin>());
+					userPage->setUserC(request.getUser());
+					AddToLinks(links, userPage);
 				}
 			}
 			

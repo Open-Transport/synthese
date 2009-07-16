@@ -26,9 +26,8 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "DBLog.h"
+#include "DBLogTemplate.h"
 #include "DBLogEntry.h"
-#include "FactorableTemplate.h"
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
@@ -65,8 +64,8 @@ namespace synthese
 		///			- UNKNOWN_VALUE for status change entries
 		///			- ID of the user who made the action for admin action entries
 		////////////////////////////////////////////////////////////////////
-		class DisplayMaintenanceLog
-		:	public util::FactorableTemplate<dblog::DBLog, DisplayMaintenanceLog>
+		class DisplayMaintenanceLog:
+			public dblog::DBLogTemplate<DisplayMaintenanceLog>
 		{
 			static const int _COL_TYPE;
 			static const int _COL_FIELD;
@@ -85,12 +84,7 @@ namespace synthese
 			DBLog::ColumnsVector getColumnNames() const;
 			
 			
-			virtual bool isAuthorized(
-				const server::Request& request,
-				const security::RightLevel& level
-			) const;
-			
-			
+
 			DBLog::ColumnsVector parse(
 				const dblog::DBLogEntry& entry,
 				const server::Request& searchRequest

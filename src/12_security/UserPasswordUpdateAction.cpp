@@ -101,7 +101,7 @@ namespace synthese
 			_user = value;
 		}
 	
-		void UserPasswordUpdateAction::setUser(boost::shared_ptr<const User> value)
+		void UserPasswordUpdateAction::setUserC(boost::shared_ptr<const User> value)
 		{
 			_user = const_pointer_cast<User>(value);
 		}

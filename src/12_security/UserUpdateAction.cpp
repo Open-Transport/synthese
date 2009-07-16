@@ -75,33 +75,49 @@ namespace synthese
 					*_env
 				);
 
-				_login = map.getString(PARAMETER_LOGIN, true, FACTORY_KEY);
+				_login = map.getDefault<string>(PARAMETER_LOGIN);
 				if (_login.empty())
 					throw ActionException("Le login ne peut être vide");
-				//TODO Put a control of unicity
 
-				_surname = map.getString(PARAMETER_SURNAME, true, FACTORY_KEY);
+				UserTableSync::SearchResult users(
+					UserTableSync::Search(
+						*_env,
+						_login,
+						optional<string>(),
+						optional<string>(),
+						optional<string>(),
+						optional<RegistryKeyType>(),
+						logic::indeterminate,
+						logic::indeterminate,
+						_user->getKey(),
+						0, 1, false, false, false, false, FIELDS_ONLY_LOAD_LEVEL
+				)	);
+				if(!users.empty())
+				{
+					throw ActionException("Ce login est déjà utilisé.");
+				}
 
-				_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+				_surname = map.getDefault<string>(PARAMETER_SURNAME);
+
+				_name = map.getDefault<string>(PARAMETER_NAME);
 				if (_name.empty())
 					throw ActionException("Le nom de l'utilisateur ne peut être vide");
 
-				_address = map.getString(PARAMETER_ADDRESS, true, FACTORY_KEY);
+				_address = map.getDefault<string>(PARAMETER_ADDRESS);
 
-				_postalCode = map.getString(PARAMETER_POSTAL_CODE, true, FACTORY_KEY);
+				_postalCode = map.getDefault<string>(PARAMETER_POSTAL_CODE);
 
-				_phone = map.getString(PARAMETER_PHONE, true, FACTORY_KEY);
+				_phone = map.getDefault<string>(PARAMETER_PHONE);
 
-				_city = map.getString(PARAMETER_CITY, true, FACTORY_KEY);
+				_city = map.getDefault<string>(PARAMETER_CITY);
 
-				_email = map.getString(PARAMETER_EMAIL, true, FACTORY_KEY);
+				_email = map.getDefault<string>(PARAMETER_EMAIL);
 
-				_authorizedLogin = map.getBool(PARAMETER_AUTHORIZED_LOGIN, true, false, FACTORY_KEY);
+				_authorizedLogin = map.getOptional<bool>(PARAMETER_AUTHORIZED_LOGIN);
 
-				uid id(map.getUid(PARAMETER_PROFILE_ID, false, FACTORY_KEY));
-				if(id > 0)
+				if(map.getOptional<RegistryKeyType>(PARAMETER_PROFILE_ID))
 				{
-					_profile = ProfileTableSync::Get(id, *_env);
+					_profile = ProfileTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PROFILE_ID), *_env);
 				}
 			}
 			catch (ObjectNotFoundException<Profile>& e)
@@ -127,7 +143,10 @@ namespace synthese
 			{
 				DBLogModule::appendToLogIfChange(s, "Profil", (_user->getProfile() != NULL) ? _user->getProfile()->getName() : string(), (*_profile != NULL) ? (*_profile)->getName() : string());
 			}
-			DBLogModule::appendToLogIfChange(s, "Autorisation de connexion", Conversion::ToString(_user->getConnectionAllowed()), Conversion::ToString(_authorizedLogin));
+			if(_authorizedLogin)
+			{
+				DBLogModule::appendToLogIfChange(s, "Autorisation de connexion", lexical_cast<string>(_user->getConnectionAllowed()), lexical_cast<string>(*_authorizedLogin));
+			}
 			DBLogModule::appendToLogIfChange(s, "Nom", _user->getName(), _name);
 			DBLogModule::appendToLogIfChange(s, "Prénom", _user->getSurname(), _surname);
 
@@ -141,7 +160,10 @@ namespace synthese
 			{
 				_user->setProfile(_profile->get());
 			}
-			_user->setConnectionAllowed(_authorizedLogin);
+			if(_authorizedLogin)
+			{
+				_user->setConnectionAllowed(*_authorizedLogin);
+			}
 			_user->setName(_name);
 			_user->setSurname(_surname);
 

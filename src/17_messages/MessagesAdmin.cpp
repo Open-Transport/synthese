@@ -310,7 +310,7 @@ namespace synthese
 					{
 						stream << "Archivé";
 					}
-					if(message->getPeriodStart().isUnknown() || message->getPeriodStart() <= now)
+					else if(message->getPeriodStart().isUnknown() || message->getPeriodStart() <= now)
 					{
 						stream << "En cours";
 					}
@@ -349,7 +349,7 @@ namespace synthese
 
 				scenarioRequest.getPage()->setScenario(message);
 
-				stream << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Modifier");
+				stream << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Ouvrir");
 				if (message->isApplicable(DateTime(TIME_CURRENT)))
 				{
 					scenarioStopRequest.getAction()->setScenario(message);
@@ -388,7 +388,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == MessagesModule::FACTORY_KEY)
+			if (moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const MessagesAdmin*>(currentPage.get()))
 				{

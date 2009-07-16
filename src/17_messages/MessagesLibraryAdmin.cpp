@@ -186,7 +186,8 @@ namespace synthese
 					_getEnv(),
 					_folder.get() ? _folder->getKey() : 0
 					, string(), NULL
-					, 0, -1
+					, 0,
+					optional<size_t>()
 					, _requestParameters.orderField == PARAMETER_NAME
 					, _requestParameters.raisingOrder
 			)	);
@@ -212,7 +213,7 @@ namespace synthese
 				deleteScenarioRequest.getAction()->setScenario(scenario);
 				stream << t3.row(Conversion::ToString(scenario->getKey()));
 				stream << t3.col() << scenario->getName();
-				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Modifier", string(), "cog_edit.png");
+				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Ouvrir", string(), "cog_edit.png");
 				stream << t3.col() << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "cog_delete.png");
 			}
 
@@ -281,7 +282,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == MessagesModule::FACTORY_KEY)
+			if(	moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
 			{
 				const MessagesLibraryAdmin* ma(
 					dynamic_cast<const MessagesLibraryAdmin*>(currentPage.get())

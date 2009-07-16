@@ -187,10 +187,13 @@ namespace synthese
 					_requestParameters._getParameterCode(_PARAMETER_RAISING_ORDER),
 					boost::lexical_cast<std::string>(_requestParameters.raisingOrder)
 				);
-				_searchForm.addHiddenField(
-					_requestParameters._getParameterCode(_PARAMETER_MAX_SIZE),
-					boost::lexical_cast<std::string>(_requestParameters.maxSize)
-				);
+				if(_requestParameters.maxSize)
+				{
+					_searchForm.addHiddenField(
+						_requestParameters._getParameterCode(_PARAMETER_MAX_SIZE),
+						boost::lexical_cast<std::string>(*_requestParameters.maxSize)
+					);
+				}
 			}
 			
 

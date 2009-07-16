@@ -43,7 +43,8 @@ namespace synthese
 			@todo Update the opened session on user update
 		*/
 
-		class UserTableSync : public db::SQLiteNoSyncTableSyncTemplate<UserTableSync,User>
+		class UserTableSync:
+			public db::SQLiteNoSyncTableSyncTemplate<UserTableSync,User>
 		{
 		public:
 			static const std::string TABLE_COL_LOGIN;
@@ -100,6 +101,7 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> profileId = boost::optional<util::RegistryKeyType>(),
 				boost::logic::tribool emptyLogin = boost::logic::indeterminate,
 				boost::logic::tribool emptyPhone = boost::logic::indeterminate,
+				boost::optional<util::RegistryKeyType> differentUserId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByLogin = true,

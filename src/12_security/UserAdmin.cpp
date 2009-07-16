@@ -32,6 +32,7 @@
 #include "AdminRequest.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
+#include "SecurityRight.h"
 
 using namespace std;
 using namespace boost;
@@ -104,11 +105,26 @@ namespace synthese
 			updateRequest.getAction()->setUser(_user);
 			
 			AdminActionFunctionRequest<UserPasswordUpdateAction, UserAdmin> userPasswordUpdateRequest(_request);
-			userPasswordUpdateRequest.getAction()->setUser(_user);
+			userPasswordUpdateRequest.getAction()->setUserC(_user);
+
+			bool writeRights(
+				_request.isAuthorized<SecurityRight>(
+					WRITE,
+					UNKNOWN_RIGHT_LEVEL,
+					_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
+				) ||
+				_user->getKey() == _request.getUser()->getKey() &&
+				_request.isAuthorized<SecurityRight>(
+					UNKNOWN_RIGHT_LEVEL,
+					WRITE,
+					string()
+			)	);
+
 
 			{
 				stream << "<h1>Propriétés</h1>";
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
+				t.getForm().setUpdateRight(writeRights);
 				stream << t.open();
 				stream << t.title("Connexion");
 				stream << t.cell("Login", t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()));
@@ -122,14 +138,22 @@ namespace synthese
 				stream << t.cell("Téléphone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
 				stream << t.cell("E-mail",t.getForm().getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
 				
-				stream << t.title("Droits");
-				stream << t.cell("Connexion autorisée",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
-				stream << t.cell("Profil",t.getForm().getSelectInput(UserUpdateAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), _user->getProfile()->getKey()));
+				if(	_request.isAuthorized<SecurityRight>(
+						WRITE,
+						UNKNOWN_RIGHT_LEVEL,
+						_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
+				)	){
+					stream << t.title("Droits");
+					stream << t.cell("Connexion autorisée",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
+					stream << t.cell("Profil",t.getForm().getSelectInput(UserUpdateAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), _user->getProfile()->getKey()));
+				}
 				stream << t.close();
 			}
 
-			stream << "<h1>Changement de mot de passe</h1>";
+			if(writeRights)
 			{
+				stream << "<h1>Changement de mot de passe</h1>";
+	
 				PropertiesHTMLTable t(userPasswordUpdateRequest.getHTMLForm("pass"));
 				stream << t.open();
 				stream << t.cell("Mot de passe", t.getForm().getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS1, ""));
@@ -141,10 +165,19 @@ namespace synthese
 
 
 		bool UserAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return true;
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const	{
+			return 	_request.isAuthorized<SecurityRight>(
+						READ,
+						UNKNOWN_RIGHT_LEVEL,
+						_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
+					) ||
+					_user->getKey() == _request.getUser()->getKey() &&
+					_request.isAuthorized<SecurityRight>(
+						UNKNOWN_RIGHT_LEVEL,
+						READ,
+						string()
+				);
 		}
 
 
@@ -158,6 +191,17 @@ namespace synthese
 		void UserAdmin::setUser(shared_ptr<User> value)
 		{
 			_user = value;
+		}
+
+		void UserAdmin::setUserC(shared_ptr<const User> value)
+		{
+			_user = const_pointer_cast<const User>(value);
+		}
+
+
+		boost::shared_ptr<const User> UserAdmin::getUser() const
+		{
+			return _user;
 		}
 	}
 }

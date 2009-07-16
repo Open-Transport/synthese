@@ -56,7 +56,7 @@ namespace synthese
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
 			{
-				m.push_back(make_pair(UNKNOWN_PERIMETER, "=== " + recipient->getTitle() + " ==="));
+				m.push_back(make_pair(string(), "=== " + recipient->getTitle() + " ==="));
 				recipient->getStaticParametersLabelsVirtual(m);
 			}
 

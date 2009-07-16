@@ -21,13 +21,6 @@
 */
 
 #include "Place.h"
-#include "VertexAccessMap.h"
-
-#include "WithoutAccentsFilter.h"
-#include "PlainCharFilter.h"
-
-#include <sstream>
-#include <boost/iostreams/filtering_stream.hpp>
 
 using namespace std;
 

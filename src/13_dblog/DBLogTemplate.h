@@ -1,6 +1,6 @@
 
-/** Security module related constants definitions file.
-	@file 12_security/Constants.h
+/** DBLogTemplate class header.
+	@file DBLogTemplate.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,21 +20,44 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_SecurityConstants_h__
-#define SYNTHESE_SecurityConstants_h__
+#ifndef SYNTHESE_dblog_DBLogTemplate_h__
+#define SYNTHESE_dblog_DBLogTemplate_h__
 
-#include <string>
+#include "DBLogRight.h"
+#include "DBLog.h"
+#include "FactorableTemplate.h"
+#include "Request.h"
 
 namespace synthese
 {
-	namespace security
+	namespace dblog
 	{
-		/** @addtogroup m12
-			@{
+		/** DBLogTemplate class.
+			@ingroup m13
 		*/
-			static const std::string GLOBAL_PERIMETER = "*";
-		/** @} */
+		template<class T>
+		class DBLogTemplate:
+			public util::FactorableTemplate<DBLog,T>
+		{
+		public:
+			static bool IsAuthorized(
+				const server::Request& request,
+				const security::RightLevel& level
+			){
+				return request.isAuthorized<DBLogRight>(level, security::UNKNOWN_RIGHT_LEVEL, FACTORY_KEY);
+			}
+
+
+
+			virtual bool isAuthorized(
+				const server::Request& request,
+				const security::RightLevel& level
+			){
+				return IsAuthorized(request, level);
+			};
+
+		};
 	}
 }
 
-#endif // SYNTHESE_Constants_h__
+#endif // SYNTHESE_dblog_DBLogTemplate_h__

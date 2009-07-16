@@ -49,7 +49,7 @@ namespace synthese
 					- <tt>Interface</tt> : Liste de choix présentant les interfaces installées (exemple : Lumiplan, HTML charte 1, HTML charte 2, etc.)
 					- <tt>Lignes</tt> : Nombre de départs affichés sous forme de liste de choix proposant les nombres de 1 à 50
 					- <tt>Actions</tt> : Boutons : 
-						- <tt>Modifier</tt> : enregistre les modifications effectuées sur la ligne du tableau correspondante. Si un champ ne respecte pas les règles énumérées, un message d'erreur empêche l'enregistrement des modifications :
+						- <tt>Ouvrir</tt> : enregistre les modifications effectuées sur la ligne du tableau correspondante. Si un champ ne respecte pas les règles énumérées, un message d'erreur empêche l'enregistrement des modifications :
 						@code Le type ne peut être modifié car un ou plusieurs champ n'est pas correctement renseigné @endcode
 						- <tt>Supprimer</tt> : supprime le type d'afficheur, seulement s'il n'est utilisé par aucun afficheur. Ce bouton n'apparaît que sur les types non utilisés. Un contrôle d'intégrité est réalisé à nouveau au moment de la suppression proprement dite. En cas d'existence d'afficheur au moment de la suppression, un message d'erreur apparaît :
 						@code Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur. @endcode

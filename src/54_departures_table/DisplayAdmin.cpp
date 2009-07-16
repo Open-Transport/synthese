@@ -775,6 +775,7 @@ namespace synthese
 				stream << "<h1>Propriétés</h1>";
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
+				t.getForm().setUpdateRight(tabHasWritePermissions());
 
 				stream << t.open();
 				stream << t.cell("Titre", t.getForm().getTextInput(DisplayScreenAppearanceUpdateAction::PARAMETER_TITLE, _displayScreen->getTitle()));
@@ -1065,7 +1066,11 @@ namespace synthese
 				_tabs.push_back(Tab("Sélection", TAB_CONTENT, writeRight, "times_display.png"));
 				_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
 				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));
-				_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
+
+				if (ArrivalDepartureTableLog::IsAuthorized(_request, READ))
+				{
+					_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
+				}
 			}
 
 			_tabBuilded = true;

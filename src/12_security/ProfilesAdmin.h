@@ -56,7 +56,7 @@ namespace synthese
 							-# le statut public/privé
 							-# la désignation de l'habilitation
 							-# le périmètre de l'habilitation (selon spécificités de l'habilitation)
-					-# bouton <tt>Modifier</tt> dans les lignes de profil existant, si le profil est modifiable
+					-# bouton <tt>OuvrirModifier</tt> dans les lignes de profil existant, si le profil est modifiable
 					-# bouton <tt>Ajouter</tt> : permet de créer un nouveau profil. Un nom non vide doit être entré.
 				-# <b>Bouton <tt>Supprimer</tt></b> : permet de supprimer les profils sélectionnés, uniquement si ceux-ci ne sont pas utilisés
 

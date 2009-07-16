@@ -150,19 +150,20 @@ namespace synthese
 		}
 
 		bool TestMapAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const {
 			return _request.isAuthorized<GlobalRight>(READ);;
 		}
 		
+
+
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			boost::shared_ptr<const AdminInterfaceElement> currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == MapModule::FACTORY_KEY)
+			if(moduleKey == MapModule::FACTORY_KEY && isAuthorized(request))
 			{
 				if(dynamic_cast<const TestMapAdmin*>(currentPage.get()))
 				{
