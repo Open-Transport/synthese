@@ -195,6 +195,7 @@ namespace synthese
 		bool MessageAdmin::isAuthorized(
 			const server::FunctionRequest<admin::AdminRequest>& _request
  		) const {
+			if(_request.getActionWillCreateObject()) return true;
 			if (_alarm.get() == NULL) return false;
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() == NULL)
 				return _request.isAuthorized<MessagesRight>(READ);

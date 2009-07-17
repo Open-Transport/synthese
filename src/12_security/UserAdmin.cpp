@@ -167,6 +167,7 @@ namespace synthese
 		bool UserAdmin::isAuthorized(
 			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
+			if(_request.getActionWillCreateObject()) return true;
 			return 	_request.isAuthorized<SecurityRight>(
 						READ,
 						UNKNOWN_RIGHT_LEVEL,

@@ -889,7 +889,7 @@ namespace synthese
 					stream << t.col();
 
 					viewMessageRequest.getPage()->setMessage(alarm);
-					stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Editer", string(), "note.png");
+					stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Ouvrir", string(), "note.png");
 				}
 
 				if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(_displayScreen->getKey()))
@@ -938,7 +938,7 @@ namespace synthese
 						stream << t2.col();
 
 						viewMessageRequest.getPage()->setMessage(alarm);
-						stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Editer", string(), "note.png");
+						stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Ouvrir", string(), "note.png");
 					}
 					stream << t2.close();
 				}
@@ -974,6 +974,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const
 		{
+			if(_request.getActionWillCreateObject()) return true;
 			if (_displayScreen.get() == NULL) return false;
 			if (_displayScreen->getLocalization() == NULL) return  _request.isAuthorized<ArrivalDepartureTableRight>(READ) || _request.isAuthorized<DisplayMaintenanceRight>(READ);
 			return

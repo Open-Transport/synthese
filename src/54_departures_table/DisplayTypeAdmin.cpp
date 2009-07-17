@@ -180,9 +180,9 @@ namespace synthese
 		}
 
 		bool DisplayTypeAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const	{
+			if(_request.getActionWillCreateObject()) return true;
 			if (_type.get() == NULL) return false;
 			return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
 		}

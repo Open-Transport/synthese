@@ -39,6 +39,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
+#include "SecurityRight.h"
 
 #include <boost/foreach.hpp>
 
@@ -232,7 +233,8 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const
 		{
-			return true;
+			if(_request.getActionWillCreateObject()) return true;
+			return _request.isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		std::string ProfileAdmin::getTitle() const

@@ -85,6 +85,7 @@ namespace synthese
 				_searchName = map.getOptional<string>(PARAMETER_NAME);
 			}
 			_searchInterfaceId = map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID);
+			if(_searchInterfaceId && *_searchInterfaceId == UNKNOWN_VALUE) _searchInterfaceId = optional<RegistryKeyType>();
 		}
 
 
@@ -92,7 +93,7 @@ namespace synthese
 		ParametersMap DisplayTypesAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
-			m.insert(PARAMETER_NAME, _searchName);
+			if(_searchName) m.insert(PARAMETER_NAME, *_searchName);
 			if(_searchInterfaceId) m.insert(PARAMETER_INTERFACE_ID, *_searchInterfaceId);
 			return m;
 		}
@@ -140,7 +141,7 @@ namespace synthese
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
 					_getEnv(),
-					_searchName ? "%"+ *_searchName +"%" : _searchName,
+					_searchName ? optional<string>("%"+ *_searchName +"%") : _searchName,
 					_searchInterfaceId,
 					_requestParameters.first,
 					_requestParameters.maxSize,
@@ -312,7 +313,7 @@ namespace synthese
 					false,
 					false,
 					true,
-					FIELDS_ONLY_LOAD_LEVEL
+					UP_LINKS_LOAD_LEVEL
 			)	);
 			AdminInterfaceElement::PageLinks links;
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)

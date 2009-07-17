@@ -298,6 +298,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const
 		{
+			if(_request.getActionWillCreateObject()) return true;
 			if (_scenario.get() == NULL) return false;
 			if (dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario).get() != NULL)
 				return _request.isAuthorized<MessagesRight>(READ);

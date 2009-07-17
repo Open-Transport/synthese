@@ -201,7 +201,7 @@ namespace synthese
 					stream << t.col() << pl->cpuNumber;
 					HTMLForm gf(goRequest.getHTMLForm());
 					gf.addHiddenField(DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID, Conversion::ToString(pl->place->getKey()));
-					stream << t.col() << gf.getLinkButton("Editer", string(), "building_edit.png");
+					stream << t.col() << gf.getLinkButton("Ouvrir", string(), "building_edit.png");
 				}
 				catch (...)
 				{

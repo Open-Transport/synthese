@@ -18,6 +18,7 @@ synthese::interfaces::LineLabelInterfaceElement::integrate();
 synthese::interfaces::IncludePageInterfaceElement::integrate();
 synthese::interfaces::GotoInterfaceElement::integrate();
 synthese::interfaces::SetInterfaceElement::integrate();
+synthese::interfaces::StrLenInterfaceElement::integrate();
 
 synthese::interfaces::InterfaceTableSync::integrate();
 synthese::interfaces::InterfacePageTableSync::integrate();
