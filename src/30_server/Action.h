@@ -77,16 +77,9 @@ namespace synthese
 				@date 2007
 				
 			*/
-			virtual bool _beforeSessionControl() const { return false; }
+			virtual bool _isSessionRequired() const { return true; }
 
 
-			/** Function to run before the action launch if no session is registered.
-				@return True if the process must be interrupted
-				@author Hugues Romain
-				@date 2007
-				
-			*/
-			virtual bool _runBeforeActionIfNoSession() { return true; }
 
 			/** Authorization control.
 				@return True if the action run is authorized

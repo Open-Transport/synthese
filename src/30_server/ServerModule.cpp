@@ -228,6 +228,11 @@ namespace synthese
 				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
 				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType()));
 			}
+			catch(Request::ForbiddenRequestException& e)
+			{
+				Log::GetInstance().debug("Forbidden request");
+				rep = HTTPReply::stock_reply(HTTPReply::forbidden);
+			}
 			catch (RequestException& e)
 			{
 				Log::GetInstance().debug("Request error", e);

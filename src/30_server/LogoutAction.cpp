@@ -46,9 +46,9 @@ namespace synthese
 			_request->deleteSession();
 		}
 
-		bool LogoutAction::_beforeSessionControl() const
+		bool LogoutAction::_isSessionRequired() const
 		{
-			return true;
+			return false;
 		}
 
 

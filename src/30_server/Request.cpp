@@ -202,6 +202,19 @@ namespace synthese
 					_errorLevel = REQUEST_ERROR_WARNING;
 					_errorMessage = "Action error : "+ e.getMessage();
 				}
+
+				if(_action->_isSessionRequired() &&	_session == NULL)
+				{
+					_actionException = true;
+					_errorMessage = "Active session required for this action! Action dropped.";
+					_errorLevel = REQUEST_ERROR_WARNING;
+				}
+				else if (!_action->_isAuthorized())
+				{
+					_actionException = true;
+					_errorMessage = "Forbidden Action";
+					_errorLevel = REQUEST_ERROR_WARNING;
+				}
 			}
 
 			// Last action error
@@ -224,16 +237,15 @@ namespace synthese
 
 			// Function parameters
 			_function->_setFromParametersMap(map);
+
+			if (!_function->_isAuthorized())
+			{
+				throw ForbiddenRequestException();
+			}
 		}
 
 
 
-		Request::~Request(
-		){
-		}
-
-		
-		
 		std::string Request::getURI() const
 		{
 			return _getParametersMap().getURI();
@@ -246,50 +258,27 @@ namespace synthese
 			// Handle of the action
 			if (_action.get() && !_actionException)
 			{
-				if(	!_action->_beforeSessionControl()
-				&&	_session == NULL && _action->_runBeforeActionIfNoSession()
-				){
+				try
+				{
+					// Run of the action
+					_action->run();
+					
+					// Run after the action
+					if (_function->_runAfterSucceededAction(stream))	// Overloaded method
+						return;
+				}
+				catch (ActionException e)	// Action run error
+				{
 					_actionException = true;
-					_errorMessage = "Active session required for this action! Action dropped.";
+					_errorMessage = e.getMessage();
 					_errorLevel = REQUEST_ERROR_WARNING;
 				}
-				else
-					try
-					{
-						if (!_action->_isAuthorized())
-						{
-							_actionException = true;
-							_errorMessage = "Forbidden Action";
-							_errorLevel = REQUEST_ERROR_WARNING;
-						}
-						else
-						{
-							// Run of the action
-							_action->run();
-							
-							// Run after the action
-							if (_function->_runAfterSucceededAction(stream))	// Overloaded method
-								return;
-						}
-					}
-					catch (ActionException e)	// Action run error
-					{
-						_actionException = true;
-						_errorMessage = e.getMessage();
-						_errorLevel = REQUEST_ERROR_WARNING;
-					}
 			}
 
 			// No session is active.
 			if (_session == NULL && _function->_runBeforeDisplayIfNoSession(stream))
 				return;
 			
-			if (!_function->_isAuthorized())
-			{
-				stream << "Forbidden";
-				return;
-			}
-
 			// Run the display
 			_function->_run(stream);
 		}
@@ -315,6 +304,9 @@ namespace synthese
 			str << _clientURL << Request::PARAMETER_STARTER << getURI();
 			return str.str();
 		}
+
+
+
 		const std::string& Request::getClientURL() const
 		{
 			return _clientURL;

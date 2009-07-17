@@ -100,9 +100,9 @@ namespace synthese
 			}
 		}
 
-		bool LoginAction::_beforeSessionControl() const
+		bool LoginAction::_isSessionRequired() const
 		{
-			return true;
+			return false;
 		}
 
 		void LoginAction::setLogin( const std::string& login )

@@ -104,6 +104,12 @@ namespace synthese
 		class Request
 		{
 		public:
+
+			class ForbiddenRequestException:
+				public std::exception
+			{
+			};
+
 			typedef enum
 			{
 				REQUEST_ERROR_NONE,
@@ -190,8 +196,6 @@ namespace synthese
 					, boost::shared_ptr<Function> function=boost::shared_ptr<Function>()
 					, boost::shared_ptr<Action> action=boost::shared_ptr<Action>()
 				);
-
-				virtual ~Request();
 			//@}
 
 			//! \name Getters

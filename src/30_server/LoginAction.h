@@ -60,7 +60,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			bool _beforeSessionControl() const;
+			bool _isSessionRequired() const;
 
 		public:
 

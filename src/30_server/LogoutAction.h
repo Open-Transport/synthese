@@ -46,11 +46,11 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 			/** Activates the action before the session control.
-				@return TRUE
+				@return false
 				@author Hugues Romain
 				@date 2007				
 			*/
-			bool _beforeSessionControl() const;
+			bool _isSessionRequired() const;
 		
 		public:
 

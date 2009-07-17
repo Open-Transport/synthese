@@ -185,7 +185,7 @@ namespace synthese
 
 		bool AdminRequest::_isAuthorized() const
 		{
-			return _page->isAuthorized(static_cast<FunctionRequest<AdminRequest>& >(*_request));
+			return !_page.get() || _page->isAuthorized(static_cast<FunctionRequest<AdminRequest>& >(*_request));
 		}
 
 
