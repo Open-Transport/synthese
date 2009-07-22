@@ -254,8 +254,10 @@ namespace synthese
 		}
 		
 
-		bool MessagesTemplateLibraryAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
-		{
+		bool MessagesTemplateLibraryAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const {
 			return true;
 		}
 

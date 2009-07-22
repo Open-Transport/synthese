@@ -156,7 +156,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008					
 			*/
-			virtual bool isPageVisibleInTree(const AdminInterfaceElement& currentPage) const;
+			virtual bool isPageVisibleInTree(
+				const AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
 		};
 	}
 }

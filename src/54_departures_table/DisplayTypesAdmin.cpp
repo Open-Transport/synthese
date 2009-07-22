@@ -286,8 +286,10 @@ namespace synthese
 
 
 
-		bool DisplayTypesAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
-		{
+		bool DisplayTypesAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
 			return true;
 		}
 

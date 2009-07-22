@@ -150,8 +150,10 @@ namespace synthese
 			return _moduleClass.get() ? _moduleClass->getName() : DEFAULT_TITLE;
 		}
 
-		bool ModuleAdmin::isPageVisibleInTree(const AdminInterfaceElement& currentPage) const
-		{
+		bool ModuleAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
 			return true;
 		}
 		

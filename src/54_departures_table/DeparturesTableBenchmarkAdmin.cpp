@@ -271,8 +271,10 @@ namespace synthese
 
 
 
-		bool DeparturesTableBenchmarkAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
-		{
+		bool DeparturesTableBenchmarkAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const {
 			return true;
 		}
 	}

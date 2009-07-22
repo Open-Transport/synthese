@@ -123,7 +123,10 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 			
-			virtual bool isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const;
+			virtual bool isPageVisibleInTree(
+				const AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
 		};
 	}
 }

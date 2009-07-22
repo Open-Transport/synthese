@@ -76,11 +76,11 @@ namespace synthese
 				);
 
 				_login = map.getDefault<string>(PARAMETER_LOGIN);
-				if (_login.empty())
-					throw ActionException("Le login ne peut être vide");
 
-				UserTableSync::SearchResult users(
-					UserTableSync::Search(
+				if(!_login.empty())
+				{
+					UserTableSync::SearchResult users(
+						UserTableSync::Search(
 						*_env,
 						_login,
 						optional<string>(),
@@ -91,10 +91,11 @@ namespace synthese
 						logic::indeterminate,
 						_user->getKey(),
 						0, 1, false, false, false, false, FIELDS_ONLY_LOAD_LEVEL
-				)	);
-				if(!users.empty())
-				{
-					throw ActionException("Ce login est déjà utilisé.");
+						)	);
+					if(!users.empty())
+					{
+						throw ActionException("Ce login est déjà utilisé.");
+					}
 				}
 
 				_surname = map.getDefault<string>(PARAMETER_SURNAME);

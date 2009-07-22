@@ -259,8 +259,10 @@ namespace synthese
 			return links;
 		}
 
-		bool BroadcastPointsAdmin::isPageVisibleInTree(const AdminInterfaceElement& currentPage) const
-		{
+		bool BroadcastPointsAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const {
 			return true;
 		}
 	}

@@ -472,7 +472,8 @@ public:
 					@date 2008					
 				*/
 				virtual bool isPageVisibleInTree(
-					const AdminInterfaceElement& currentPage
+					const AdminInterfaceElement& currentPage,
+					const server::FunctionRequest<admin::AdminRequest>& _request
 				) const;
 			//@}
 		};

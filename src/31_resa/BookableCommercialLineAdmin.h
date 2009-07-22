@@ -127,6 +127,11 @@ namespace synthese
 			) const;
 
 			
+			virtual bool isPageVisibleInTree(
+				const AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain

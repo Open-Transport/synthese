@@ -757,5 +757,15 @@ namespace synthese
 			
 			return links;
 		}
+
+
+
+		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
+		{
+			return
+				!request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL) &&
+				request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string())
+			;
+		}
 	}
 }

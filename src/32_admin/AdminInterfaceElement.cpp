@@ -135,7 +135,7 @@ namespace synthese
 					if (!tree.isNodeOpened)
 					{
 						tree.isNodeOpened =
-							link->isPageVisibleInTree(*this) ||
+							link->isPageVisibleInTree(*this, request) ||
 							subTree.isNodeOpened
 						;
 					}
@@ -175,8 +175,10 @@ namespace synthese
 
 
 
-		bool AdminInterfaceElement::isPageVisibleInTree(const AdminInterfaceElement& currentPage) const
-		{
+		bool AdminInterfaceElement::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
 			return false;
 		}
 

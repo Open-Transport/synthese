@@ -375,8 +375,10 @@ namespace synthese
 			return _folder.get() ? "folder.png" : ICON;
 		}
 
-		bool MessagesLibraryAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
-		{
+		bool MessagesLibraryAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
 			return !_folder.get();
 		}
 		

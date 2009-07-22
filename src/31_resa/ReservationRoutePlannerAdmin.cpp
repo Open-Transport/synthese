@@ -552,8 +552,10 @@ namespace synthese
 			return links;
 		}
 		
-		bool ReservationRoutePlannerAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
-		{
+		bool ReservationRoutePlannerAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
 			return true;
 		}
 		

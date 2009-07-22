@@ -221,7 +221,8 @@ namespace synthese
 
 
 		bool MessageAdmin::isPageVisibleInTree(
-			const AdminInterfaceElement& currentPage
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			const MessagesScenarioAdmin* ma(
 				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage)

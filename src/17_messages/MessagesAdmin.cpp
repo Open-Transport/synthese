@@ -402,8 +402,10 @@ namespace synthese
 			return links;
 		}
 
-		bool MessagesAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
-		{
+		bool MessagesAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const {
 			return true;
 		}
 

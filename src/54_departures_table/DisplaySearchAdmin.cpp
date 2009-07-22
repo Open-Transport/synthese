@@ -630,8 +630,10 @@ namespace synthese
 
 
 
-		bool DisplaySearchAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage ) const
-		{
+		bool DisplaySearchAdmin::isPageVisibleInTree(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const {
 			return true;
 		}
 

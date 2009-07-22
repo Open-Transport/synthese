@@ -226,10 +226,9 @@ namespace synthese
 		}
 
 		bool ResaCustomerAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<ResaRight>(READ, READ);
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const	{
+			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 
