@@ -170,6 +170,7 @@ namespace synthese
 						_line->getKey(),
 						optional<RegistryKeyType>(),
 						optional<RegistryKeyType>(),
+						optional<string>(),
 						optional<Date>(),
 						false,
 						0,

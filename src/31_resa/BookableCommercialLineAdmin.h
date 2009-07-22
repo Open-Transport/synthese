@@ -60,7 +60,7 @@ namespace synthese
 			boost::shared_ptr<const env::CommercialLine>	_line;
 			time::Date										_date;
 			bool											_hideOldServices;
-			boost::shared_ptr<env::ScheduledService>		_service;
+			boost::optional<std::string>					_serviceNumber;
 
 		public:
 			static const std::string PARAMETER_DISPLAY_CANCELLED;
@@ -69,10 +69,10 @@ namespace synthese
 
 			BookableCommercialLineAdmin();
 			
-			void setService(boost::shared_ptr<env::ScheduledService> value);
+			void setServiceNumber(const boost::optional<std::string>& value);
 			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
 			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
-			boost::shared_ptr<const env::ScheduledService> getService() const;
+			const boost::optional<std::string>& getServiceNumber() const;
 
 			
 			/** Initialization of the parameters from a parameters map.

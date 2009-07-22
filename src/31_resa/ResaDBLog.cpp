@@ -418,6 +418,9 @@ namespace synthese
 			case ResaDBLog::REDIRECTION_ENTRY:
 				return "lorry.png";
 
+			case ResaDBLog::RESERVATIONS_READ_ENTRY:
+				return "table.png";
+
 			case ResaDBLog::TECHNICAL_SUPPORT_ENTRY:
 				return "wrench.png";
 
@@ -477,6 +480,9 @@ namespace synthese
 
 			case ResaDBLog::REDIRECTION_ENTRY:
 				return "Redirection vers ligne régulière";
+
+			case ResaDBLog::RESERVATIONS_READ_ENTRY:
+				return "Lecture liste de réservations";
 
 			case ResaDBLog::TECHNICAL_SUPPORT_ENTRY:
 				return "Support technique";

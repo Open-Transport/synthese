@@ -204,9 +204,9 @@ namespace synthese
 
 		ReservationTableSync::SearchResult ReservationTableSync::Search(
 			util::Env& env,
-			const util::RegistryKeyType commercialLineId,
+			util::RegistryKeyType commercialLineId,
 			const Date& day,
-			const optional<RegistryKeyType> serviceId,
+			optional<string> serviceNumber,
 			bool hideOldServices,
 			logic::tribool cancellations,
 			bool orderByService,
@@ -237,9 +237,9 @@ namespace synthese
 			query <<
 				" AND " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << "<" << dayp.toSQLString()
 			;
-			if(serviceId)
+			if(serviceNumber)
 			{
-				query << " AND s." << TABLE_COL_ID << "=" << *serviceId;
+				query << " AND s." << ScheduledServiceTableSync::COL_SERVICENUMBER << "=" << *serviceNumber;
 			}
 			if(!indeterminate(cancellations))
 			{

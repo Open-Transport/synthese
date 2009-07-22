@@ -75,6 +75,7 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> lineId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<util::RegistryKeyType> commercialLineId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<util::RegistryKeyType> dataSource = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::string> serviceNumber = boost::optional<std::string>(),
 				boost::optional<time::Date> date = boost::optional<time::Date>(),
 				bool hideOldServices = false,
 				int first = 0,

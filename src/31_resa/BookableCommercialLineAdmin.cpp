@@ -149,15 +149,7 @@ namespace synthese
 				);
 			}
 
-			optional<RegistryKeyType> sid(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE));
-			if(sid) try
-			{
-				_service = ScheduledServiceTableSync::GetEditable(*sid, _getEnv());
-			}
-			catch (ObjectNotFoundException<ScheduledService> e)
-			{
-				throw RequestException("Service not found");
-			}
+			_serviceNumber = map.getOptional<string>(PARAMETER_SERVICE);
 		}
 		
 		
@@ -171,7 +163,7 @@ namespace synthese
 			}
 			m.insert(PARAMETER_DISPLAY_CANCELLED, _displayCancelled);
 			if(_line.get()) m.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
-			if(_service.get()) m.insert(PARAMETER_SERVICE, _service->getKey());
+			if(_serviceNumber) m.insert(PARAMETER_SERVICE, *_serviceNumber);
 			return m;
 		}
 
@@ -214,46 +206,53 @@ namespace synthese
 					_getEnv(),
 					_line->getKey(),
 					_date,
-					_service.get() ? _service->getKey() : optional<RegistryKeyType>(),
+					_serviceNumber,
 					_hideOldServices,
 					_displayCancelled ? logic::indeterminate : logic::tribool(false)
 			)	);
 			// Services reading
-			ScheduledServiceTableSync::SearchResult services;
-			if(_service.get())
+			vector<shared_ptr<ScheduledService> > sortedServices;
 			{
-				services.push_back(_service);
+				map<string, shared_ptr<ScheduledService> > servicesByNumber;
+				
+				ScheduledServiceTableSync::SearchResult services(
+					ScheduledServiceTableSync::Search(
+						_getEnv(),
+						optional<RegistryKeyType>(),
+						_line->getKey(),
+						optional<RegistryKeyType>(),
+						_serviceNumber,
+						_date,
+						_hideOldServices,
+						0,
+						optional<size_t>(),
+						true, true, UP_LINKS_LOAD_LEVEL
+				)	);
+				BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
+				{
+					if(servicesByNumber.find(service->getServiceNumber()) != servicesByNumber.end()) continue;
+
+					servicesByNumber.insert(make_pair(service->getServiceNumber(), service));
+					sortedServices.push_back(service);
+				}
 			}
-			else
-			{
-				services = ScheduledServiceTableSync::Search(
-					_getEnv(),
-					optional<RegistryKeyType>(),
-					_line->getKey(),
-					optional<RegistryKeyType>(),
-					_date,
-					_hideOldServices,
-					0,
-					optional<size_t>(),
-					true, true, UP_LINKS_LOAD_LEVEL
-				);
-			}
+			if(_serviceNumber && sortedServices.empty()) return;
 
 			// Sort reservations
-			map<const ScheduledService*, ServiceReservations> reservations;
+			map<string, ServiceReservations> reservations;
 			BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
 			{
 				if(!_getEnv().getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
 				
 				const ScheduledService* service(_getEnv().getRegistry<ScheduledService>().get(resa->getServiceId()).get());
-				if(reservations.find(service) == reservations.end())
+				if(reservations.find(service->getServiceNumber()) == reservations.end())
 				{
-					reservations.insert(make_pair(service, ServiceReservations()));
+					reservations.insert(make_pair(service->getServiceNumber(), ServiceReservations()));
 				}
-				reservations[service].addReservation(resa);
+				reservations[service->getServiceNumber()].addReservation(resa);
 			}
 
-			if(!_service.get())
+			if(!_serviceNumber)
 			{
 
 				stream << "<h1>Recherche</h1>";
@@ -306,7 +305,7 @@ namespace synthese
 			}
 			else
 			{
-				int serviceSeatsNumber(reservations[_service.get()].getSeatsNumber());
+				int serviceSeatsNumber(reservations[sortedServices[0]->getServiceNumber()].getSeatsNumber());
 				string plural((serviceSeatsNumber > 1) ? "s" : "");
 				stream << "<h1>";
 				if (serviceSeatsNumber > 0)
@@ -319,14 +318,16 @@ namespace synthese
 				}
 				stream << "</h1>";
 
-				if(_service->getReservationAbility(_date) == UseRule::RESERVATION_COMPULSORY_POSSIBLE)
-				{
+				UseRule::ReservationAvailabilityType ability(sortedServices[0]->getReservationAbility(_date));
+				if(	ability == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+					ability == UseRule::RESERVATION_OPTIONAL_POSSIBLE
+				){
 					stream <<
 						"<p class=\"info\">" <<
 						"ATTENTION Cette liste de réservations est provisoire tant que le service est ouvert à la réservation." <<
 						"</p>"
 					;
-					DateTime deadLine(_service->getReservationDeadLine(_date));
+					DateTime deadLine(sortedServices[0]->getReservationDeadLine(_date));
 					stream <<
 						"<p class=\"info\">" <<
 						"Le service sera fermé à la réservation à partir du " <<
@@ -345,16 +346,16 @@ namespace synthese
 			c.push_back("Heure arrivée");
 			c.push_back("Places");
 			c.push_back("Client");
-			if (globalDeleteRight && !_service.get())
+			if (globalDeleteRight && !_serviceNumber)
 				c.push_back("Actions");
 			HTMLTable t(c,"adminresults");
 			stream << t.open();
 
 			// Display of services
-			BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
+			BOOST_FOREACH(shared_ptr<ScheduledService> service, sortedServices)
 			{
-				const ServiceReservations::ReservationsList& serviceReservations (reservations[service.get()].getReservations());
-				int serviceSeatsNumber(reservations[service.get()].getSeatsNumber());
+				const ServiceReservations::ReservationsList& serviceReservations (reservations[service->getServiceNumber()].getReservations());
+				int serviceSeatsNumber(reservations[service->getServiceNumber()].getSeatsNumber());
 				string plural((serviceSeatsNumber > 1) ? "s" : "");
 				seatsNumber += serviceSeatsNumber;
 
@@ -374,14 +375,14 @@ namespace synthese
 
 
 				// Display
-				if(!_service.get())
+				if(!_serviceNumber)
 				{
 					stream << t.row();
 					
 					stream << t.col(1, string(), true);
 					
 					UseRule::ReservationAvailabilityType status(
-						service->getReservationAbility(_date)
+						sortedServices[0]->getReservationAbility(_date)
 					);
 					switch(status)
 					{
@@ -404,7 +405,7 @@ namespace synthese
 					if (serviceSeatsNumber > 0)
 						stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
 
-					printRequest.getPage()->setService(service);
+					printRequest.getPage()->setServiceNumber(service->getServiceNumber());
 
 					stream << t.col(1, string(), true) << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
 				}
@@ -454,7 +455,7 @@ namespace synthese
 
 						// Customer name
 						stream << t.col();
-						if (globalReadRight && !_service.get())
+						if (globalReadRight && !_serviceNumber)
 						{
 							stream  << HTMLModule::getHTMLLink(
 								customerRequest.getURL(),
@@ -466,10 +467,10 @@ namespace synthese
 							stream << reservation->getTransaction()->getCustomerName();
 						}
 
-						if(!_service.get())
+						if(!_serviceNumber)
 						{
 							// Cancel link
-							if (globalDeleteRight && !_service.get())
+							if (globalDeleteRight)
 							{
 								stream << t.col();
 								switch(status)
@@ -649,7 +650,7 @@ namespace synthese
 
 			stream << t.close();
 
-			if(!_service.get())
+			if(!_serviceNumber)
 			{
 				string plural(seatsNumber > 1 ? "s" : "");
 				stream << "<h1>Total</h1>";
@@ -660,7 +661,7 @@ namespace synthese
 				;
 			}
 
-			if(_service.get())
+			if(_serviceNumber)
 			{
 				stream << HTMLModule::GetHTMLJavascriptOpen() <<
 					"window.print();" << HTMLModule::GetHTMLJavascriptClose();
@@ -685,14 +686,28 @@ namespace synthese
 			if(_line.get())
 			{
 				stringstream s;
-				if(_service.get())
+				if(_serviceNumber)
 				{
-					DateTime date(_date, _service->getDepartureSchedule());
+					ScheduledServiceTableSync::SearchResult services(
+						ScheduledServiceTableSync::Search(
+							_getEnv(),
+							optional<RegistryKeyType>(),
+							_line->getKey(),
+							optional<RegistryKeyType>(),
+							_serviceNumber,
+							_date,
+							_hideOldServices,
+							0, 1,
+							true, true, UP_LINKS_LOAD_LEVEL
+					)	);
+					if(services.empty()) return string();
+
+					DateTime date(_date, services[0]->getDepartureSchedule());
 					s <<
 						"Ligne " << _line->getShortName() <<
-						" - service " << _service->getServiceNumber() <<
+						" - service " << services[0]->getServiceNumber() <<
 						" - départ de " << dynamic_cast<const NamedPlace*>(
-								static_cast<const Line*>(_service->getPath())->getEdge(0)->getHub()
+								static_cast<const Line*>(services[0]->getPath())->getEdge(0)->getHub()
 							)->getFullName() <<
 						" le " << date.getDate().toString() <<
 						" à " << date.getHour().toString()
@@ -714,17 +729,17 @@ namespace synthese
 
 		std::string BookableCommercialLineAdmin::getIcon() const
 		{
-			return _service.get() ? "car.png" : ICON;
+			return _serviceNumber ? "car.png" : ICON;
 		}
 
-		void BookableCommercialLineAdmin::setService(shared_ptr<ScheduledService> value)
+		void BookableCommercialLineAdmin::setServiceNumber(const optional<string>& value)
 		{
-			_service = value;
+			_serviceNumber = value;
 		}
 		
-		boost::shared_ptr<const env::ScheduledService> BookableCommercialLineAdmin::getService() const
+		const optional<string>& BookableCommercialLineAdmin::getServiceNumber() const
 		{
-			return _service;
+			return _serviceNumber;
 		}
 		
 		void BookableCommercialLineAdmin::setCommercialLine(boost::shared_ptr<env::CommercialLine> value)
@@ -747,10 +762,10 @@ namespace synthese
 			
 			PageLinks links;
 			
-			if(	!_service.get() &&
+			if(	!_serviceNumber &&
 				ba &&
 				ba->_line == _line &&
-				ba->_service.get()
+				ba->_serviceNumber
 			){
 				AddToLinks(links, currentPage);
 			}

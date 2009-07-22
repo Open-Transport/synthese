@@ -96,9 +96,9 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				const util::RegistryKeyType commercialLineId,
+				util::RegistryKeyType commercialLineId,
 				const time::Date& day,
-				const boost::optional<util::RegistryKeyType> serviceId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::string> serviceNumber = boost::optional<std::string>(),
 				bool hideOldServices = false,
 				boost::logic::tribool cancelled = false,
 				bool orderByService = true,

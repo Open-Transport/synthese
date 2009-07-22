@@ -137,6 +137,7 @@ namespace synthese
 			addChoices.push_back(make_pair(ResaDBLog::INFORMATION_ENTRY,ResaDBLog::GetIcon(ResaDBLog::INFORMATION_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::INFORMATION_ENTRY)));
 			addChoices.push_back(make_pair(ResaDBLog::REDIRECTION_ENTRY,ResaDBLog::GetIcon(ResaDBLog::REDIRECTION_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::REDIRECTION_ENTRY)));
 			addChoices.push_back(make_pair(ResaDBLog::TECHNICAL_SUPPORT_ENTRY,ResaDBLog::GetIcon(ResaDBLog::TECHNICAL_SUPPORT_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::TECHNICAL_SUPPORT_ENTRY)));
+			addChoices.push_back(make_pair(ResaDBLog::RESERVATIONS_READ_ENTRY,ResaDBLog::GetIcon(ResaDBLog::RESERVATIONS_READ_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::RESERVATIONS_READ_ENTRY)));
 			addChoices.push_back(make_pair(ResaDBLog::OTHER,ResaDBLog::GetIcon(ResaDBLog::OTHER) +" "+ResaDBLog::GetText(ResaDBLog::OTHER)));
 
 			PropertiesHTMLTable t(updateRequest.getHTMLForm());

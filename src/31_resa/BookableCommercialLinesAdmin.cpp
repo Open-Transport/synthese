@@ -181,7 +181,7 @@ namespace synthese
 			{
 				if(	ba &&
 					ba->getCommercialLine()->getKey() == line->getKey() &&
-					!ba->getService().get()
+					!ba->getServiceNumber()
 				){
 					AddToLinks(links, currentPage);
 				}

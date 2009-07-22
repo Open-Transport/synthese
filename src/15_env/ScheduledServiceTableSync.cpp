@@ -272,6 +272,7 @@ namespace synthese
 			optional<RegistryKeyType> lineId,
 			optional<RegistryKeyType> commercialLineId,
 			optional<RegistryKeyType> dataSourceId,
+			optional<string> serviceNumber,
 			optional<Date> date,
 			bool hideOldServices,
 			int first, /*= 0*/
@@ -295,6 +296,8 @@ namespace synthese
 				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
 			if (dataSourceId)
 				query << " AND l." << LineTableSync::COL_DATASOURCE_ID << "=" << *dataSourceId;
+			if(serviceNumber)
+				query << " AND " << COL_SERVICENUMBER << "=" << *serviceNumber;
 			if (date)
 				query << " AND d." << ServiceDateTableSync::COL_DATE << "=" << date->toSQLString();
 			if(hideOldServices)
