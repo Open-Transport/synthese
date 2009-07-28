@@ -105,6 +105,8 @@ namespace synthese
 				*/
 				int getWeekDay () const;
 
+				std::string getTextWeekDay() const;
+
 
 				/** Checks this date values.
 					@return true If this date is an existing day.

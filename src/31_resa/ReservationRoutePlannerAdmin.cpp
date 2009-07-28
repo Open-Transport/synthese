@@ -98,14 +98,20 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_DISABLED_PASSENGER("dp");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_DRT_ONLY("do");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID("cu");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_SEATS_NUMBER("sn");
+
+
 
 		ReservationRoutePlannerAdmin::ReservationRoutePlannerAdmin()
 			: AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>()
 			, _disabledPassenger(false)
 			, _drtOnly(false)
-			, _dateTime(TIME_CURRENT)
+			, _dateTime(TIME_CURRENT),
+			_seatsNumber(1)
 		{ }
 		
+
+
 		void ReservationRoutePlannerAdmin::setFromParametersMap(
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
@@ -172,6 +178,7 @@ namespace synthese
 			m.insert(PARAMETER_TIME, _dateTime.getHour());
 			m.insert(PARAMETER_DISABLED_PASSENGER, _disabledPassenger);
 			m.insert(PARAMETER_DRT_ONLY, _drtOnly);
+			m.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
 			if(_customer.get())
 			{
 				m.insert(PARAMETER_CUSTOMER_ID, _customer->getKey());
@@ -193,7 +200,7 @@ namespace synthese
 				Date date(TIME_CURRENT);
 				for(size_t i=0; i<14; ++i)
 				{
-					dates.push_back(make_pair(date.toSQLString(false), date.toString()));
+					dates.push_back(make_pair(date.toSQLString(false), date.getTextWeekDay() +" "+ date.toString()));
 					date++;
 				}
 				for(size_t i=0; i<24; ++i)
@@ -225,12 +232,41 @@ namespace synthese
 			// Search form
 			stream << "<h1>Recherche</h1>";
 
+			const Place* startPlace(NULL);
+			const Place* endPlace(NULL);
+
+			if (!_startCity.empty() && !_endCity.empty())
+			{
+				startPlace = GeographyModule::FetchPlace(_startCity, _startPlace);
+				endPlace = GeographyModule::FetchPlace(_endCity, _endPlace);
+			}
+
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
-			stream << st.cell("Commune départ", st.getForm().getTextInput(PARAMETER_START_CITY, _startCity));
-			stream << st.cell("Arrêt départ", st.getForm().getTextInput(PARAMETER_START_PLACE, _startPlace));
-			stream << st.cell("Commune arrivée", st.getForm().getTextInput(PARAMETER_END_CITY, _endCity));
-			stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(PARAMETER_END_PLACE, _endPlace));
+			stream << st.cell("Commune départ", st.getForm().getTextInput(
+						PARAMETER_START_CITY, 
+						startPlace ? 
+						(dynamic_cast<const City*>(startPlace) ? dynamic_cast<const City*>(startPlace)->getName() : dynamic_cast<const NamedPlace*>(startPlace)->getCity()->getName()) :
+						_startCity
+				)	);
+			stream << st.cell("Arrêt départ", st.getForm().getTextInput(
+						PARAMETER_START_PLACE,
+						startPlace ? 
+						(dynamic_cast<const City*>(startPlace) ? string() : dynamic_cast<const NamedPlace*>(startPlace)->getName()) :
+						_startPlace
+				)	);
+			stream << st.cell("Commune arrivée", st.getForm().getTextInput(
+						PARAMETER_END_CITY,
+						endPlace ? 
+						(dynamic_cast<const City*>(endPlace) ? dynamic_cast<const City*>(endPlace)->getName() : dynamic_cast<const NamedPlace*>(endPlace)->getCity()->getName()) :
+						_endCity
+				)	);	
+			stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(
+						PARAMETER_END_PLACE,
+						endPlace ? 
+						(dynamic_cast<const City*>(endPlace) ? string() : dynamic_cast<const NamedPlace*>(endPlace)->getName()) :
+						_endPlace
+				)	);
 			stream << st.cell("Date", st.getForm().getSelectInput(PARAMETER_DATE, dates, _dateTime.getDate().toSQLString(false)));
 			stream << st.cell("Heure", st.getForm().getSelectInput(PARAMETER_TIME, hours, lexical_cast<string>(_dateTime.getHour().getHours())+":00"));
 			stream << st.cell("PMR", st.getForm().getOuiNonRadioInput(PARAMETER_DISABLED_PASSENGER, _disabledPassenger));
@@ -243,8 +279,6 @@ namespace synthese
 				return;
 
 			RoutePlanner::Result jv;
-			const Place* startPlace(GeographyModule::FetchPlace(_startCity, _startPlace));
-			const Place* endPlace(GeographyModule::FetchPlace(_endCity, _endPlace));
 			DateTime now(TIME_CURRENT);
 
 			if(!_confirmedTransaction.get())
@@ -256,7 +290,8 @@ namespace synthese
 				AccessParameters ap(
 					_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
 					_drtOnly
-					);
+				);
+				resaRequest.getAction()->setAccessParameters(ap);
 				stringstream trace;
 				RoutePlanner r(
 					startPlace
@@ -266,7 +301,7 @@ namespace synthese
 					, _dateTime
 					, endDate
 					, 5
-					);
+				);
 				jv = r.computeJourneySheetDepartureArrival();
 			}
 
@@ -394,9 +429,33 @@ namespace synthese
 				{
 					stream << " - " << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative avant le " << (*it)->getReservationDeadLine().toString();
 				}
+				if(dynamic_cast<const City*>(startPlace) || dynamic_cast<const City*>(endPlace))
+				{
+					stream << " (";
+					if(dynamic_cast<const City*>(startPlace))
+					{
+						stream << "départ de " << 
+							static_cast<const PublicTransportStopZoneConnectionPlace*>(
+								its->getDepartureEdge()->getHub()
+							)->getFullName()
+						;
+					}
+					if(dynamic_cast<const City*>(endPlace))
+					{
+						if(dynamic_cast<const City*>(startPlace)) stream << " - ";
+						Journey::ServiceUses::const_iterator ite((*it)->getServiceUses().end() - 1);
+						stream << "arrivée à " << 
+							static_cast<const PublicTransportStopZoneConnectionPlace*>(
+								ite->getArrivalEdge()->getHub()
+							)->getFullName()
+						;
+					}
+					stream << ")";
+				}
+
 
 				stream << t.row();
-				stream << t.col() << its->getDepartureDateTime().toString();
+				stream << t.col() << "<b>" << its->getDepartureDateTime().toString() << "</b>";
 
 				// Line
 				const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -451,7 +510,7 @@ namespace synthese
 				}
 
 				// Final arrival
-				stream << t.col() << its->getArrivalDateTime().toString();
+				stream << t.col() << "<b>" << its->getArrivalDateTime().toString() << "</b>";
 			}
 			stream << t.close();
 
@@ -502,6 +561,16 @@ namespace synthese
 						<< "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').value"
 						<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').value"
 						<< "); };";
+					stream <<
+						"document.forms." << rf.getName() << ".onsubmit = " <<
+						"function(){" <<
+						"document.getElementById('" << rf.getFieldId(PARAMETER_SEATS_NUMBER) << "').value=" <<
+						"document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_SEATS_NUMBER) << "').value;" <<
+						"document.getElementById('" << rf.getFieldId(PARAMETER_CUSTOMER_ID) << "').value=" <<
+						"document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_ID) << "').value;" <<
+						"};"
+					;
+
 					stream << HTMLModule::GetHTMLJavascriptClose();
 
 					stream << rt.row();
@@ -516,7 +585,7 @@ namespace synthese
 				
 				stream << rt.row();
 				stream << rt.col() << "Nombre de places";
-				stream << rt.col() << rf.getTextInput(BookReservationAction::PARAMETER_SEATS_NUMBER, "1");
+				stream << rt.col() << rf.getTextInput(BookReservationAction::PARAMETER_SEATS_NUMBER, lexical_cast<string>(_seatsNumber));
 
 				stream << rt.row();
 				stream << rt.col(2, string(), true) << rf.getSubmitButton("Réserver");

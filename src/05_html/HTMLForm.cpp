@@ -426,7 +426,13 @@ namespace synthese
 
 			stringstream s;
 			for (HiddenFieldsMap::const_iterator it = _hiddenFields.begin(); it != _hiddenFields.end(); ++it)
-				s << "<input type=\"hidden\" name=\"" << it->first << "\" value=\"" << it->second << "\" />";
+			{
+				s <<
+					"<input type=\"hidden\" name=\"" << it->first << "\" " <<
+					"value=\"" << it->second << "\" " <<
+					"id=\"" << _getFieldId(it->first) << "\" " <<
+				"/>";
+			}
 			_hiddenFields.clear();
 			return s.str();
 		}

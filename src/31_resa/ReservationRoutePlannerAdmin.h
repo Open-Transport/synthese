@@ -54,6 +54,7 @@ namespace synthese
 			bool							_drtOnly;
 			boost::shared_ptr<ReservationTransaction>	_confirmedTransaction;
 			boost::shared_ptr<const security::User>		_customer;
+			int											_seatsNumber;
 
 		public:
 			static const std::string PARAMETER_START_CITY;
@@ -65,6 +66,7 @@ namespace synthese
 			static const std::string PARAMETER_DISABLED_PASSENGER;
 			static const std::string PARAMETER_DRT_ONLY;
 			static const std::string PARAMETER_CUSTOMER_ID;
+			static const std::string PARAMETER_SEATS_NUMBER;
 
 			ReservationRoutePlannerAdmin();
 			

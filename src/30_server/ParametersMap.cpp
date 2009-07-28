@@ -226,9 +226,9 @@ namespace synthese
 
 		
 		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
-			_field(field)
+			_field(field),
+			_message("Missing parameter in request parsing : " + _field)
 		{
-
 		}
 
 		ParametersMap::MissingParameterException::~MissingParameterException() throw()
@@ -237,9 +237,7 @@ namespace synthese
 
 		const char* ParametersMap::MissingParameterException::what() const throw()
 		{
-			stringstream s;
-			s << "Missing parameter in request parsing : " << _field;
-			return s.str().c_str();
+			return _message.c_str();
 		}
 
 		const std::string& ParametersMap::MissingParameterException::getField() const

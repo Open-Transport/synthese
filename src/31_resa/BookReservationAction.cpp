@@ -85,8 +85,7 @@ namespace synthese
 	{
 		const string BookReservationAction::PARAMETER_SITE = Action_PARAMETER_PREFIX + "sit";
 		
-		const string BookReservationAction::PARAMETER_USER_CLASS(Action_PARAMETER_PREFIX + "ac");
-		const string BookReservationAction::PARAMETER_DRT_ONLY(Action_PARAMETER_PREFIX + "do");
+		const string BookReservationAction::PARAMETER_ACCESS_PARAMETERS(Action_PARAMETER_PREFIX + "ac");
 
 		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + "dct";
 		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + "dpt";
@@ -128,6 +127,7 @@ namespace synthese
 				{
 					map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
 				}
+				map.insert(PARAMETER_ACCESS_PARAMETERS, _accessParameters.serialize());
 			}
 			return map;
 		}
@@ -243,28 +243,16 @@ namespace synthese
 			DateTime departureDateTime(map.getDateTime(PARAMETER_DATE_TIME, true, FACTORY_KEY));
 
 			// Accessibility
-			AccessParameters ap;
-			optional<int> i(map.getOptional<int>(PARAMETER_USER_CLASS));
-			UserClassCode userClassCode(USER_PEDESTRIAN);
-			if(i)
+			if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
 			{
-				userClassCode = static_cast<UserClassCode>(*i);
-			}
-			
-			if (site.get())
-			{			
-				ap = site->getAccessParameters(userClassCode);
-			}
-			else
-			{
-				ap = AccessParameters(userClassCode);
+				_accessParameters = AccessParameters(map.get<string>(PARAMETER_ACCESS_PARAMETERS));
 			}
 
 			RoutePlanner rp(
 				originPlace
 				, destinationPlace
-				, ap
-				, PlanningOrder()
+				, _accessParameters,
+				PlanningOrder()
 				, departureDateTime
 				, departureDateTime
 				, 1
@@ -388,13 +376,6 @@ namespace synthese
 			_request->setActionCreatedId(rt.getKey());
 		}
 
-		BookReservationAction::BookReservationAction()
-			: FactorableTemplate<Action, BookReservationAction>()
-			, _journey()
-			, _drtOnly(false)
-		{
-
-		}
 
 		void BookReservationAction::setJourney( const Journey& journey )
 		{
@@ -408,6 +389,13 @@ namespace synthese
 			return
 				_request->isAuthorized<ResaRight>(WRITE) ||
 				_customer->getKey() == _request->getUser()->getKey() && _request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+		}
+
+
+
+		void BookReservationAction::setAccessParameters( const AccessParameters& value )
+		{
+			_accessParameters = value;
 		}
 	}
 }

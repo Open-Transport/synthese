@@ -43,6 +43,8 @@ namespace synthese
 		*/
 		class AccessParameters
 		{
+			static const char* _SERIALIZATION_SEPARATOR;
+
 			double		_maxApproachDistance;
 			double		_maxApproachTime;
 			double		_approachSpeed;
@@ -78,8 +80,12 @@ namespace synthese
 				, boost::optional<size_t>	maxTransportConnectionCount = boost::optional<size_t>()
 			);
 
+			explicit AccessParameters(
+				const std::string& serialized
+			);
 
-			//! @name Controls
+
+			//! @name Queries
 			//@{
 				/** Approach compatibility control.
 					@param distance length of the approach
@@ -89,6 +95,8 @@ namespace synthese
 					@date 2008				
 				*/
 				bool isCompatibleWithApproach(double distance, double duration) const;
+
+				std::string serialize() const;
 			//@}
 
 

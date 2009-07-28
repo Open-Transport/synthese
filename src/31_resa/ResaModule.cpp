@@ -73,6 +73,7 @@ namespace synthese
 		shared_ptr<Profile> ResaModule::_basicProfile;
 		shared_ptr<Profile> ResaModule::_autoresaProfile;
 		shared_ptr<Profile> ResaModule::_adminProfile;
+		boost::recursive_mutex ResaModule::_sessionsCallIdsMutex;
 	}
 
 	namespace server
@@ -161,9 +162,9 @@ namespace synthese
 					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Place réservée sur ce tronçon");
 				}
 				stream << " de " << (*itrs)->getDeparturePlaceName();
-				stream << " à " << (*itrs)->getDepartureTime().toString();
+				stream << " le " << (*itrs)->getDepartureTime().getDate().getTextWeekDay() << " " << (*itrs)->getDepartureTime().toString();
 				stream << " jusqu'à " << (*itrs)->getArrivalPlaceName();
-				stream << " à " << (*itrs)->getArrivalTime().toString();
+				stream << " le " << (*itrs)->getArrivalTime().getDate().getTextWeekDay() << " " <<(*itrs)->getArrivalTime().toString();
 				stream << "</li>";
 			}
 			stream << "</ul>";
@@ -171,6 +172,8 @@ namespace synthese
 
 		void ResaModule::CallOpen( const server::Session* session )
 		{
+			recursive_mutex::scoped_lock lock(_sessionsCallIdsMutex);
+
 			CallClose(session);
 				
 			uid entryId(ResaDBLog::AddCallEntry(session->getUser().get()));
@@ -180,6 +183,8 @@ namespace synthese
 
 		void ResaModule::CallClose( const server::Session* session )
 		{
+			recursive_mutex::scoped_lock lock(_sessionsCallIdsMutex);
+
 			_SessionsCallIdMap::iterator it(_sessionsCallIds.find(session));
 
 			if (it != _sessionsCallIds.end())
@@ -191,6 +196,8 @@ namespace synthese
 
 		RegistryKeyType ResaModule::GetCurrentCallId( const server::Session* session )
 		{
+			recursive_mutex::scoped_lock lock(_sessionsCallIdsMutex);
+
 			_SessionsCallIdMap::iterator it(_sessionsCallIds.find(session));
 
 			return (it == _sessionsCallIds.end()) ? UNKNOWN_VALUE : it->second;

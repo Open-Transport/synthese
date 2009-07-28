@@ -24,6 +24,7 @@
 #define SYNTHESE_util_MacAddressGetter_h__
 
 #include <string>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -35,7 +36,7 @@ namespace synthese
 		class MacAddressGetter
 		{
 		public:
-			static std::string GetMACaddress(size_t interfaceId);
+			static std::string GetMACaddress(boost::optional<std::size_t> interfaceId = boost::optional<std::size_t>());
 		};
 	}
 }

@@ -61,6 +61,7 @@ namespace synthese
 			{
 			private:
 				const std::string _field;
+				const std::string _message;
 
 			public:
 				MissingParameterException(

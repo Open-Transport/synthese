@@ -91,7 +91,7 @@ namespace synthese
 				_macAddress = map.getDefault<string>(PARAMETER_MAC_ADDRESS);
 
 				optional<RegistryKeyType> id = map.getOptional<RegistryKeyType>(PARAMETER_CPU);
-				if (id)
+				if (id && *id>0)
 				{
 					_cpu = DisplayScreenCPUTableSync::Get(*id, *_env);
 				}

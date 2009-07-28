@@ -25,6 +25,8 @@
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util;
@@ -142,6 +144,8 @@ namespace synthese
 
 		void CommercialLine::addOptionalReservationPlace(const PublicTransportStopZoneConnectionPlace* place )
 		{
+			recursive_mutex::scoped_lock lock(_optionalReservationPlacesMutex);
+
 			_optionalReservationPlaces.insert(place);
 		}
 
@@ -164,7 +168,28 @@ namespace synthese
 
 		bool CommercialLine::isOptionalReservationPlace( const env::PublicTransportStopZoneConnectionPlace* place ) const
 		{
+			recursive_mutex::scoped_lock lock(_optionalReservationPlacesMutex);
+
 			return _optionalReservationPlaces.find(place) != _optionalReservationPlaces.end();
+		}
+
+
+
+		void CommercialLine::addConcurrencyRule( const NonConcurrencyRule* rule )
+		{
+			recursive_mutex::scoped_lock lock(_nonConcurrencyRulesMutex);
+
+			_nonConcurrencyRules.insert(rule);
+		}
+
+
+
+		void CommercialLine::removeConcurrencyRule( const NonConcurrencyRule* rule )
+		{
+			recursive_mutex::scoped_lock lock(_nonConcurrencyRulesMutex);
+
+			NonConcurrencyRules::iterator it(_nonConcurrencyRules.find(rule));
+			if(it != _nonConcurrencyRules.end()) _nonConcurrencyRules.erase(it);
 		}
 	}
 }

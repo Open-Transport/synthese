@@ -549,5 +549,25 @@ namespace synthese
 				Conversion::ToInt (sqlTimestamp.substr (firstSlash+1, secondSlash - firstSlash)),
 				Conversion::ToInt (sqlTimestamp.substr (0, firstSlash+1)));
 		}
+
+
+
+		std::string Date::getTextWeekDay() const
+		{
+			int weekDay(getWeekDay());
+			if(weekDay < 0 || weekDay > 6) return string();
+
+			static vector<string> weekDays;
+			weekDays.push_back("Dimanche");
+			weekDays.push_back("Lundi");
+			weekDays.push_back("Mardi");
+			weekDays.push_back("Mercredi");
+			weekDays.push_back("Jeudi");
+			weekDays.push_back("Vendredi");
+			weekDays.push_back("Samedi");
+
+
+			return weekDays[weekDay];
+		}
 	}
 }

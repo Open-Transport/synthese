@@ -30,6 +30,8 @@
 #include "RGBColor.h"
 #include "GraphTypes.h"
 
+#include <boost/thread/recursive_mutex.hpp>
+
 namespace synthese
 {
 	namespace pt
@@ -40,6 +42,7 @@ namespace synthese
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
+		class NonConcurrencyRule;
 	}
 
 	namespace env
@@ -60,7 +63,12 @@ namespace synthese
 
 			typedef std::set<const env::PublicTransportStopZoneConnectionPlace*> PlacesSet;
 
+			typedef std::set<const NonConcurrencyRule*> NonConcurrencyRules;
+
 		private:
+			mutable boost::recursive_mutex _optionalReservationPlacesMutex;
+			mutable boost::recursive_mutex _nonConcurrencyRulesMutex;
+
 			std::string			_name;		//!< Name (code)
 			std::string			_shortName;	//!< Name (cartouche)
 			std::string			_longName;	//!< Name for schedule card
@@ -75,6 +83,8 @@ namespace synthese
 			PlacesSet	_optionalReservationPlaces;
 			
 			std::string _creatorId;
+
+			NonConcurrencyRules _nonConcurrencyRules;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -108,6 +118,8 @@ namespace synthese
 				void setName (const std::string& name);
 				void setReservationContact(const ReservationContact* value);
 				void setCreatorId(const std::string& value);
+				void addConcurrencyRule(const NonConcurrencyRule* rule);
+				void removeConcurrencyRule(const NonConcurrencyRule* rule);
 			//@}
 
 			//! @name Queries

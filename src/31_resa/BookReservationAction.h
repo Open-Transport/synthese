@@ -28,6 +28,7 @@
 #include "Action.h"
 #include "Journey.h"
 #include "FactorableTemplate.h"
+#include "AccessParameters.h"
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -63,8 +64,7 @@ namespace synthese
 			static const std::string PARAMETER_SITE;
 			
 			// Accessibility
-			static const std::string PARAMETER_USER_CLASS;
-			static const std::string PARAMETER_DRT_ONLY;
+			static const std::string PARAMETER_ACCESS_PARAMETERS;
 
 			// Journey information
 			static const std::string PARAMETER_ORIGIN_CITY;
@@ -91,7 +91,7 @@ namespace synthese
 			graph::Journey						_journey;
 			boost::shared_ptr<security::User>	_customer;
 			bool								_createCustomer;
-			bool								_drtOnly;
+			graph::AccessParameters				_accessParameters;
 			int									_seatsNumber;
 
 		protected:
@@ -112,9 +112,9 @@ namespace synthese
 			*/
 			void run();
 
-			BookReservationAction();
 			
 			void setJourney(const graph::Journey& journey);
+			void setAccessParameters(const graph::AccessParameters& value);
 
 			virtual bool _isAuthorized() const;
 		};

@@ -24,6 +24,9 @@
 #include "RuleUser.h"
 #include "UseRule.h"
 
+#include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -33,6 +36,8 @@ namespace synthese
 	
 	namespace graph
 	{
+		const char* AccessParameters::_SERIALIZATION_SEPARATOR("|");
+
 		AccessParameters::AccessParameters(
 			UserClassCode userClass,
 			bool drtOnly /*= boost::logic::indeterminate */
@@ -41,7 +46,7 @@ namespace synthese
 			, double maxApproachTime /*= 23 */
 			, double approachSpeed /*= 34 */
 			, optional<size_t> maxTransportConnectionCount /*= 10  */
-		)	: _maxApproachDistance(maxApproachDistance)
+		):	_maxApproachDistance(maxApproachDistance)
 			, _maxApproachTime(maxApproachTime)
 			, _approachSpeed(approachSpeed)
 			, _maxTransportConnectionCount(maxTransportConnectionCount)
@@ -50,6 +55,45 @@ namespace synthese
 			_userClass(userClass)
 		{
 		}
+
+
+
+		AccessParameters::AccessParameters( const std::string& serialized )
+		{
+			tokenizer<char_separator<char> > tokens(serialized, char_separator<char>(_SERIALIZATION_SEPARATOR, 0, keep_empty_tokens));
+			tokenizer<char_separator<char> >::iterator it(tokens.begin());
+			_maxApproachDistance = lexical_cast<double>(*it);
+			++it;
+			_maxApproachTime = lexical_cast<double>(*it);
+			++it;
+			_approachSpeed = lexical_cast<double>(*it);
+			++it;
+			if(!it->empty()) _maxTransportConnectionCount = lexical_cast<size_t>(*it);
+			++it;
+			_drtOnly = lexical_cast<bool>(*it);
+			++it;
+			_withoutDrt = lexical_cast<bool>(*it);
+			++it;
+			_userClass = lexical_cast<UserClassCode>(*it);
+		}
+
+
+
+		std::string AccessParameters::serialize() const
+		{
+			stringstream s;
+			s <<
+				_maxApproachDistance << _SERIALIZATION_SEPARATOR <<
+				_maxApproachTime << _SERIALIZATION_SEPARATOR <<
+				_approachSpeed << _SERIALIZATION_SEPARATOR <<
+				(_maxTransportConnectionCount ? lexical_cast<string>(*_maxTransportConnectionCount) : string()) << _SERIALIZATION_SEPARATOR <<
+				_drtOnly << _SERIALIZATION_SEPARATOR <<
+				_withoutDrt << _SERIALIZATION_SEPARATOR <<
+				_userClass
+			;
+			return s.str();
+		}
+
 
 		bool AccessParameters::isCompatibleWithApproach( double distance, double duration) const
 		{

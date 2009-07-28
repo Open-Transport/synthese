@@ -37,14 +37,16 @@
 #endif
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	namespace util
 	{
 		// Fetches the MAC address and prints it
-		string MacAddressGetter::GetMACaddress(size_t interfaceId)
-		{
+		string MacAddressGetter::GetMACaddress(
+			optional<size_t> interfaceId
+		){
 #ifdef WIN32
 			IP_ADAPTER_INFO AdapterInfo[16];			// Allocate information for up to 16 NICs
 			DWORD dwBufLen = sizeof(AdapterInfo);		// Save the memory size of buffer
@@ -55,21 +57,24 @@ namespace synthese
 			assert(dwStatus == ERROR_SUCCESS);			// Verify return value is valid, no buffer overflow
 
 			size_t i(0);
-			PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;// Contains pointer to current adapter info
-			do {
-				pAdapterInfo = pAdapterInfo->Next;		// Progress through linked list
-			}
-			while(pAdapterInfo && i<interfaceId);						// Terminate if last adapter
+			PIP_ADAPTER_INFO pAdapterInfo;
+			for(pAdapterInfo = AdapterInfo;// Contains pointer to current adapter info
+				pAdapterInfo &&
+				(	!interfaceId && pAdapterInfo->AddressLength != 6 ||
+					interfaceId && i < *interfaceId
+				);						// Terminate if last adapter
+				pAdapterInfo = pAdapterInfo->Next		// Progress through linked list
+			);
+
 
 			if(pAdapterInfo)
 			{
 				stringstream s;
-				s << setbase(ios_base::hex); 
-				s << setw(2);
-				s << setfill('0');
 				for(int j(0); j<6; ++j)
 				{
-					s << pAdapterInfo->Address[j];
+					if(j>0) s << "-";
+					if(pAdapterInfo->Address[j] < 16) s << "0";
+					s << hex << static_cast<int>(pAdapterInfo->Address[j]);
 				}
 				return s.str();
 			}

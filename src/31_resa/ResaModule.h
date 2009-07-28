@@ -31,6 +31,8 @@
 #include <map>
 #include <ostream>
 
+#include <boost/thread/recursive_mutex.hpp>
+
 namespace synthese
 {
 	namespace util
@@ -150,6 +152,7 @@ namespace synthese
 		private:
 			typedef std::map<const server::Session*, util::RegistryKeyType> _SessionsCallIdMap;
 			static _SessionsCallIdMap _sessionsCallIds;
+			static boost::recursive_mutex _sessionsCallIdsMutex;
 
 			static const std::string _BASIC_PROFILE_NAME;
 			static const std::string _AUTORESA_PROFILE_NAME;
