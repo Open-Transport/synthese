@@ -18,6 +18,7 @@
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -40,6 +41,8 @@ namespace synthese
 		
 		RuleUser::Map RuleUser::getActualRules() const
 		{
+			recursive_mutex::scoped_lock lock(_rulesMutex);
+
 			Map result;
 			for(const RuleUser* ruleUser(this); ruleUser != NULL; ruleUser = ruleUser->_getParentRuleUser())
 			{
@@ -61,6 +64,8 @@ namespace synthese
 		const UseRule& RuleUser::getUseRule(
 			const UserClassCode userClass
 		) const	{
+			recursive_mutex::scoped_lock lock(_rulesMutex);
+
 			Map::const_iterator it(_rules.find(userClass));
 			if(it != _rules.end())
 			{
@@ -79,14 +84,18 @@ namespace synthese
 			const RuleUser::Map::key_type userClass,
 			const RuleUser::Map::mapped_type value
 		){
+			recursive_mutex::scoped_lock lock(_rulesMutex);
+
 			_rules[userClass] = value;
 		}
 
 
 
-		void RuleUser::remove(
+		void RuleUser::removeRule(
 			const RuleUser::Map::key_type userClass
 		){
+			recursive_mutex::scoped_lock lock(_rulesMutex);
+
 			Map::iterator it(_rules.find(userClass));
 			if(it != _rules.end())
 			{
@@ -96,16 +105,31 @@ namespace synthese
 
 		bool RuleUser::isCompatibleWith( const AccessParameters& accessParameters ) const
 		{
+			recursive_mutex::scoped_lock lock(_rulesMutex);
+
 			const UseRule& rule(getUseRule(accessParameters.getUserClass()));
 			return rule.isCompatibleWith(accessParameters);
 		}
 
+
+
 		RuleUser::Map::mapped_type RuleUser::getRule(
 			Map::key_type userClass
 		) const	{
+			recursive_mutex::scoped_lock lock(_rulesMutex);
+
 			Map::const_iterator it(_rules.find(userClass));
 			if(it == _rules.end()) return NULL;
 			return it->second;
+		}
+
+
+
+		void RuleUser::clearRules()
+		{
+			recursive_mutex::scoped_lock lock(_rulesMutex);
+
+			_rules.clear();
 		}
 	}
 }

@@ -131,6 +131,7 @@ namespace synthese
 			
 			//! @name Modifiers
 			//@{
+				void cleanOptionalReservationPlaces();
 				void addOptionalReservationPlace(
 					const PublicTransportStopZoneConnectionPlace* place
 				);

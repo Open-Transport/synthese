@@ -65,7 +65,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<DisplayScreen>	_screen;
-			int									_preselectionDelay;
+			boost::optional<int>				_preselectionDelay;
 			DisplayFunction						_function;
 			int									_cleaningDelay;
 			EndFilter							_endFilter;

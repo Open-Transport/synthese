@@ -129,6 +129,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				cp->setCity(NULL);
 				uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
 
 				try
@@ -168,7 +169,6 @@ namespace synthese
 			if (city != NULL)
 			{
 				city->removePlaceFromMatcher<PublicTransportStopZoneConnectionPlace>(cp);
-				cp->setCity(NULL);
 			}
 		}
 	}

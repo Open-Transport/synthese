@@ -165,6 +165,7 @@ namespace synthese
 		    ss->setArrivalSchedules(arrivalSchedules);
 			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
 			ss->setPathId(pathId);
+			ss->clearRules();
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{

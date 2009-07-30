@@ -52,7 +52,7 @@ namespace synthese
 		ParametersMap TridentExportFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_LINE_ID, _line->getKey());
+			if(_line.get()) map.insert(PARAMETER_LINE_ID, _line->getKey());
 			map.insert(PARAMETER_WITH_TISSEO_EXTENSION, _withTisseoExtension);
 			return map;
 		}
@@ -94,9 +94,24 @@ namespace synthese
 		}
 
 		TridentExportFunction::TridentExportFunction()
-			: FactorableTemplate<Function, TridentExportFunction>()
+		:	FactorableTemplate<Function, TridentExportFunction>(),
+			_withTisseoExtension(false)
 		{
 			setEnv(shared_ptr<Env>(new Env));
+		}
+
+
+
+		void TridentExportFunction::setCommercialLine( boost::shared_ptr<const env::CommercialLine> line )
+		{
+			_line = line;
+		}
+
+
+
+		void TridentExportFunction::setWithTisseoExtension( bool value )
+		{
+			_withTisseoExtension = value;
 		}
 	}
 }

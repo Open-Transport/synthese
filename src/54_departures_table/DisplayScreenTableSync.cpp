@@ -184,6 +184,13 @@ namespace synthese
 			object->setComPort(rows->getInt(DisplayScreenTableSync::COL_COM_PORT));
 			object->setMacAddress(rows->getText(DisplayScreenTableSync::COL_MAC_ADDRESS));
 			object->setRoutePlanningWithTransfer(rows->getBool(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER));
+			object->setLocalization(NULL);
+			object->setCPU(NULL);
+			object->setType(NULL);
+			object->clearForbiddenPlaces();
+			object->clearDisplayedPlaces();
+			object->clearForcedDestinations();
+			object->clearPhysicalStops();
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -202,7 +209,7 @@ namespace synthese
 				
 				// CPU
 				RegistryKeyType cpuId(rows->getLongLong(DisplayScreenTableSync::COL_CPU_HOST_ID));
-				if (cpuId != 0) try
+				if (cpuId > 0) try
 				{
 					object->setCPU(DisplayScreenCPUTableSync::Get(cpuId, env, linkLevel).get());
 					DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel)->addWiredScreen(object);

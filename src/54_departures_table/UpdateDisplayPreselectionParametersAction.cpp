@@ -72,7 +72,7 @@ namespace synthese
 				_cleaningDelay = map.get<int>(PARAMETER_CLEANING_DELAY);
 				_maxDelay = map.get<int>(PARAMETER_DISPLAY_MAX_DELAY);
 				_function = static_cast<DisplayFunction>(map.get<int>(PARAMETER_DISPLAY_FUNCTION));
-				_preselectionDelay = map.get<int>(PARAMETER_PRESELECTION_DELAY);
+				_preselectionDelay = map.getOptional<int>(PARAMETER_PRESELECTION_DELAY);
 				_endFilter = static_cast<EndFilter>(map.get<int>(PARAMETER_DISPLAY_END_FILTER));
 			}
 			catch (ParametersMap::MissingParameterException& e)
@@ -131,15 +131,15 @@ namespace synthese
 			}
 
 			// Preselection delay
-			if (_preselectionDelay > 0)
+			if (_preselectionDelay)
 			{
 				DBLogModule::appendToLogIfChange(
 					t,
 					"Délai de préselection",
 					_screen->getForceDestinationDelay(),
-					_preselectionDelay
+					*_preselectionDelay
 				);
-				_screen->setDestinationForceDelay(_preselectionDelay);
+				_screen->setDestinationForceDelay(*_preselectionDelay);
 			}
 			
 			// Terminus

@@ -85,6 +85,7 @@ namespace synthese
 			object->setName(rows->getText ( PhysicalStopTableSync::COL_NAME));
 			object->setXY (rows->getDouble ( PhysicalStopTableSync::COL_X), rows->getDouble ( PhysicalStopTableSync::COL_Y));
 			object->setCodeBySource(rows->getText ( PhysicalStopTableSync::COL_OPERATOR_CODE));
+			object->setHub(NULL);
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{

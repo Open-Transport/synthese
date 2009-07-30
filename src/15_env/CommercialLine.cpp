@@ -191,5 +191,14 @@ namespace synthese
 			NonConcurrencyRules::iterator it(_nonConcurrencyRules.find(rule));
 			if(it != _nonConcurrencyRules.end()) _nonConcurrencyRules.erase(it);
 		}
+
+
+
+		void CommercialLine::cleanOptionalReservationPlaces()
+		{
+			recursive_mutex::scoped_lock lock(_optionalReservationPlacesMutex);
+
+			_optionalReservationPlaces.clear();
+		}
 	}
 }

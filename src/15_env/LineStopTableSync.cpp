@@ -128,6 +128,8 @@ namespace synthese
 			ls->setIsArrival(isArrival);
 			ls->setIsDeparture(isDeparture);
 			ls->setRankInPath(rankInPath);
+			ls->setLine(NULL);
+			ls->setPhysicalStop(NULL);
 			
 			if (rows->getColumnIndex (LineStopTableSync::COL_SCHEDULEINPUT) != UNKNOWN_VALUE)
 				ls->setScheduleInput(rows->getBool(LineStopTableSync::COL_SCHEDULEINPUT));
@@ -151,9 +153,6 @@ namespace synthese
 			LineStop* obj
 		){
 			/// @todo line remove edge
-
-			obj->setLine(NULL);
-			obj->setPhysicalStop(NULL);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Save(LineStop* object)

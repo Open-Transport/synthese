@@ -29,6 +29,8 @@
 #include "Registry.h"
 #include "GraphTypes.h"
 
+#include <boost/thread/recursive_mutex.hpp>
+
 namespace synthese
 {
 	namespace graph
@@ -46,6 +48,7 @@ namespace synthese
 
 		private:
 			Map _rules;
+			mutable boost::recursive_mutex _rulesMutex;
 		
 		protected:
 			virtual const RuleUser* _getParentRuleUser() const = 0;
@@ -71,9 +74,11 @@ namespace synthese
 					const Map::key_type userClass,
 					const Map::mapped_type value
 				);
-				void remove(
+				void removeRule(
 					const Map::key_type userClass
 				);
+
+				void clearRules();
 			//@}
 
 			//! @name Getters

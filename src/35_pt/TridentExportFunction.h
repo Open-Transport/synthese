@@ -73,6 +73,9 @@ namespace synthese
 			virtual bool _isAuthorized() const;
 
 			virtual std::string getOutputMimeType() const;
+
+			void setCommercialLine(boost::shared_ptr<const env::CommercialLine> line);
+			void setWithTisseoExtension(bool value);
 		};
 	}
 }

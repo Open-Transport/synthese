@@ -174,6 +174,7 @@ namespace synthese
 			cs->setDepartureSchedules(departureSchedules);
 			cs->setArrivalSchedules(arrivalSchedules);
 			cs->setPathId(pathId);
+			cs->clearRules();
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{

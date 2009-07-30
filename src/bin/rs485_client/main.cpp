@@ -23,9 +23,9 @@
 
 #include <boost/asio.hpp>
 
-#ifdef WIN32
-	#include "Windows.h"
-#endif
+//#ifdef WIN32
+//	#include "Windows.h"
+//#endif
 
 #include "01_util/threads/Thread.h"
 
@@ -155,11 +155,12 @@ std::string SendToDisplay(const std::string& comPort, const std::string& text)
 	{
 		Log::GetInstance ().error ("Error while reading status ! Returned status message will be empty or incomplete."); 
 	}
+	Log::GetInstance ().info(lexical_cast<string>(readComm) + " bytes read :"); 
 
 	// Create status message to be sent back to server. 
 	// It will be sent the next time that the client will ask for update.
 	std::stringstream status;
-	for (int i=0; i<STATUS_MESSAGE_SIZE; ++i)
+	for (DWORD i=0; i<readComm; ++i)
 	{
 		status << std::hex << std::setw (2) << std::setfill ('0') << ((int) buf[i]);
 	}

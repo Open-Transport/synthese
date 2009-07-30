@@ -131,6 +131,9 @@ namespace synthese
 			line->setUseInTimetables (useInTimetables);
 			line->setUseInRoutePlanning (useInRoutePlanning);
 			line->setWayBack(wayBack);
+			line->setCommercialLine(NULL);
+			line->setDataSource(NULL);
+			line->clearRules();
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{

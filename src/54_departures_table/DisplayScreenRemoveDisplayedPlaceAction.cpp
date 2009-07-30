@@ -28,6 +28,7 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include <boost/lexical_cast.hpp>
+#include "ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -76,6 +77,13 @@ namespace synthese
 		{
 			_screen->removeDisplayedPlace(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
+
+			// Log
+			ArrivalDepartureTableLog::addUpdateEntry(
+				*_screen,
+				"Retrait de l'arrêt de sélection "+ _place->getFullName(),
+				*_request->getUser()
+			);
 		}
 
 

@@ -230,7 +230,7 @@ namespace synthese
 
 				// End time
 				DateTime realStartDateTime(date);
-				realStartDateTime += (-_clearingDelay + 1);
+				realStartDateTime -= _clearingDelay;
 				DateTime endDateTime(realStartDateTime);
 				endDateTime += _maxDelay;
 

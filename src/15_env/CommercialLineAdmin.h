@@ -50,6 +50,7 @@ namespace synthese
 		public:
 			static const std::string TAB_ROUTES;
 			static const std::string TAB_DATES;
+			static const std::string TAB_EXPORT;
 			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_DATES_START;
 			static const std::string PARAMETER_DATES_END;

@@ -210,7 +210,7 @@ namespace synthese
 					*_env,
 					line.getKey(),
 					optional<RegistryKeyType>(),
-					_dataSource->getKey(),
+					optional<RegistryKeyType>(),
 					optional<string>(),
 					optional<Date>(),
 					false,
@@ -257,12 +257,12 @@ namespace synthese
 			// --------------------------------------------------- Company
 			os << "<Company>" << "\n";
 			os << "<objectId>SYNTHESE:Company:1</objectId>" << "\n";
-			os << "<name>Tisséo Réseau Urbain</name>" << "\n";
-			os << "<shortName>TRU</shortName>" << "\n";
+			os << "<name>" << tn->getName() << "</name>" << "\n";
+			os << "<shortName>" << tn->getName() << "</shortName>" << "\n";
 			os << "<organisationalUnit></organisationalUnit>" << "\n";
 			os << "<operatingDepartmentName></operatingDepartmentName>" << "\n";
-			os << "<code>31000</code>" << "\n";
-			os << "<phone>0561417070</phone>" << "\n";
+			os << "<code>-</code>" << "\n";
+			os << "<phone>-</phone>" << "\n";
 			os << "<fax></fax>" << "\n";
 			os << "<email></email>" << "\n";
 			os << "<registration><registrationNumber>1</registrationNumber></registration>" << "\n";
@@ -645,7 +645,7 @@ namespace synthese
 			{
 				const ScheduledService* srv(itsrv.second.get());
 				bool isDRT(
-					&dynamic_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)) != NULL &&
+					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN)) != NULL &&
 					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 				);
 
@@ -704,7 +704,7 @@ namespace synthese
 						"</mobilityRestrictedSuitability>" <<
 						"\n"
 					;
-					if(	&dynamic_cast<const PTUseRule&>(hRule) != NULL &&
+					if(	dynamic_cast<const PTUseRule*>(&hRule) != NULL &&
 						static_cast<const PTUseRule&>(hRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 					){
 						os << "<mobilityRestrictedReservationRule>" <<
@@ -725,7 +725,7 @@ namespace synthese
 						"</bikeSuitability>" <<
 						"\n"
 					;
-					if (&dynamic_cast<const PTUseRule&>(bRule) != NULL &&
+					if (dynamic_cast<const PTUseRule*>(&bRule) != NULL &&
 						static_cast<const PTUseRule&>(bRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 					){
 						os <<
@@ -752,7 +752,7 @@ namespace synthese
 			{
 				const ContinuousService* srv(itsrv.second.get());
 				bool isDRT(
-					&dynamic_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)) &&
+					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN)) &&
 					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 				);
 
@@ -802,7 +802,7 @@ namespace synthese
 						"</mobilityRestrictedSuitability>" <<
 						"\n"
 					;
-					if(	&dynamic_cast<const PTUseRule&>(hRule) != NULL &&
+					if(	dynamic_cast<const PTUseRule*>(&hRule) != NULL &&
 						static_cast<const PTUseRule&>(hRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 					){
 						os << "<mobilityRestrictedReservationRule>" <<
@@ -823,7 +823,7 @@ namespace synthese
 						"</bikeSuitability>" <<
 						"\n"
 					;
-					if (&dynamic_cast<const PTUseRule&>(bRule) != NULL &&
+					if (dynamic_cast<const PTUseRule*>(&bRule) != NULL &&
 						static_cast<const PTUseRule&>(bRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 					){
 						os <<

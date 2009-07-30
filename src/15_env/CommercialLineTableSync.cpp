@@ -133,6 +133,10 @@ namespace synthese
 		    object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 		    object->setCreatorId(rows->getText ( CommercialLineTableSync::COL_CREATOR_ID));
+			object->setNetwork(NULL);
+			object->cleanOptionalReservationPlaces();
+			object->clearRules();
+			object->setReservationContact(NULL);
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{

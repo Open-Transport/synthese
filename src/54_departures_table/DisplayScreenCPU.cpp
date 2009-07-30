@@ -125,7 +125,7 @@ namespace synthese
 
 		void DisplayScreenCPU::setMacAddress(
 			const std::string& value
-		) {
+		){
 			_mac_address = value;
 		}
 

@@ -102,6 +102,7 @@ namespace synthese
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Links
+				object->setPlace(NULL);
 				RegistryKeyType placeId(rows->getLongLong(DisplayScreenCPUTableSync::COL_PLACE_ID));
 				if(placeId != 0) try
 				{

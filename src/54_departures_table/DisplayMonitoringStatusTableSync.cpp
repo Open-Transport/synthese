@@ -142,6 +142,8 @@ namespace synthese
 				RegistryKeyType id(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID));
 				try
 				{
+					object->setScreen(NULL);
+					object->setCPU(NULL);
 					if(decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 					{
 						object->setScreen(DisplayScreenTableSync::Get(id, env, linkLevel).get());
@@ -204,7 +206,6 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Unlink(
 			DisplayMonitoringStatus* obj
 		){
-			obj->setScreen(NULL);
 		}
 	}
 	

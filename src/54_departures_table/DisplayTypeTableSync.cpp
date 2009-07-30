@@ -98,6 +98,7 @@ namespace synthese
 			{
 				try
 				{
+					object->setDisplayInterface(NULL);
 					uid id(rows->getLongLong(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID));
 					if (id > 0)
 					{
@@ -110,6 +111,7 @@ namespace synthese
 				}
 				try
 				{
+					object->setAudioInterface(NULL);
 					uid id(rows->getLongLong(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID));
 					if (id > 0)
 					{
@@ -122,6 +124,7 @@ namespace synthese
 				}
 				try
 				{
+					object->setMonitoringInterface(NULL);
 					uid id(rows->getLongLong(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID));
 					if (id > 0)
 					{
@@ -138,9 +141,6 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Unlink(
 			DisplayType* obj
 		){
-			obj->setDisplayInterface(NULL);
-			obj->setAudioInterface(NULL);
-			obj->setMonitoringInterface(NULL);
 		}
 
     

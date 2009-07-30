@@ -32,7 +32,7 @@
 #include "LineAdmin.h"
 #include "LineTableSync.h"
 #include "TransportNetworkRight.h"
-
+#include "TridentExportFunction.h"
 #include "AdminInterfaceElement.h"
 #include "AdminFunctionRequest.hpp"
 
@@ -52,6 +52,7 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 	using namespace time;
+	using namespace pt;
 	
 	
 
@@ -70,6 +71,7 @@ namespace synthese
 	{
 		const string CommercialLineAdmin::TAB_DATES("da");
 		const string CommercialLineAdmin::TAB_ROUTES("ro");
+		const string CommercialLineAdmin::TAB_EXPORT("ex");
 		const string CommercialLineAdmin::PARAMETER_SEARCH_NAME("na");
 		const string CommercialLineAdmin::PARAMETER_DATES_START("ds");
 		const string CommercialLineAdmin::PARAMETER_DATES_END("de");
@@ -223,6 +225,21 @@ namespace synthese
 			}
 
 			////////////////////////////////////////////////////////////////////
+			// TAB EXPORT
+			if (openTabContent(stream, TAB_EXPORT))
+			{
+				FunctionRequest<TridentExportFunction> tridentExportFunction(&_request);
+				tridentExportFunction.getFunction()->setCommercialLine(_cline);
+				stream << "<h1>Formats Trident</h1>";
+				stream << "<p>";
+				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident standard", string(), "page_white_go.png");
+				stream << " ";
+				tridentExportFunction.getFunction()->setWithTisseoExtension(true);
+				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "page_white_go.png");
+				stream << "</p>";
+			}
+
+			////////////////////////////////////////////////////////////////////
 			// END TABS
 			closeTabContent(stream);
 		}
@@ -293,6 +310,7 @@ namespace synthese
 
 			_tabs.push_back(Tab("Parcours", TAB_ROUTES, true));
 			_tabs.push_back(Tab("Dates de fonctionnement", TAB_DATES, true));
+			_tabs.push_back(Tab("Export", TAB_EXPORT, true));
 
 			_tabBuilded = true;
 		}

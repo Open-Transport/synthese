@@ -114,6 +114,7 @@ namespace synthese
 				_request
 			);
 			createRequest.setActionWillCreateObject();
+			createRequest.getFunction()->setActionFailedPage<DisplayTypesAdmin>();
 			
 			AdminActionFunctionRequest<DisplayTypeRemoveAction,DisplayTypesAdmin> deleteRequest(
 				_request
@@ -321,6 +322,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)
 			{
 				if(	da &&
+					da->getType().get() &&
 					da->getType()->getKey() == displayType->getKey()
 				){
 					AddToLinks(links, currentPage);
