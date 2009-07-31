@@ -28,11 +28,16 @@
 #include "Registry.h"
 
 #include <string>
+#include <boost/tuple/tuple.hpp>
+#include <boost/tuple/tuple_comparison.hpp>
+#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace synthese
 {
 	namespace env
 	{
+		class Line;
 
 		/** Scheduled service.
 			@ingroup m35
@@ -47,6 +52,18 @@ namespace synthese
 			typedef util::Registry<ScheduledService>	Registry;
 
 		private:
+			typedef std::map<
+				boost::tuples::tuple<
+					std::size_t,
+					std::size_t,
+					graph::UserClassCode,
+					boost::gregorian::date
+				>, bool
+			> _NonConcurrencyCache;
+
+			mutable _NonConcurrencyCache _nonConcurrencyCache;
+			mutable boost::recursive_mutex _nonConcurrencyCacheMutex;
+
 			Schedules	_departureSchedules;	//!< Departure schedules
 			Schedules	_arrivalSchedules;		//!< Arrival schedules
 			std::string	_team;
@@ -67,6 +84,7 @@ namespace synthese
 				virtual std::string getTeam() const;
 				const Schedules& getDepartureSchedules() const;
 				const Schedules& getArrivalSchedules() const;
+				const Line* getRoute() const;
 			//@}
 
 			//! @name Setters
@@ -80,6 +98,13 @@ namespace synthese
 			//! @name Query methods
 			//@{
 				virtual bool isContinuous () const;
+
+				virtual bool nonConcurrencyRuleOK(
+					const time::Date& date,
+					const graph::Edge& departureEdge,
+					const graph::Edge& arrivalEdge,
+					graph::UserClassCode userClass
+				) const;
 
 				graph::UseRule::ReservationAvailabilityType getReservationAbility(
 					const time::Date& date

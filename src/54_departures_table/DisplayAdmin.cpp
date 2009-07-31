@@ -613,10 +613,10 @@ namespace synthese
 								// Lines column
 								stream << t.col();
 								set<const CommercialLine*> lines;
-								BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
+								BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 								{
 									lines.insert(
-										static_cast<const LineStop*>(edge)->getLine()->getCommercialLine()
+										static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
 									);
 								}
 								BOOST_FOREACH(const CommercialLine* line, lines)

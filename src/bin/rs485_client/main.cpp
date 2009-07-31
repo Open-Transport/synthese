@@ -368,7 +368,8 @@ int main(int argc, char* argv[])
 				{
 					string status(SendToDisplay(comm, command));
 
-					SendToServer(server, port, "/synthese3/admin?fonction=tds&tb=" + status);
+					if(!status.empty())
+					SendToServer(server, port, "/synthese3/admin?fonction=tds&tb=" + lexical_cast<string>(screenId) + "&status=" + status);
 				}
 
 				Thread::Sleep(500);

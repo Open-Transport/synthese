@@ -105,11 +105,21 @@ namespace synthese
 			setServiceRange(getServiceRange() - duration);
 		}
 
+
+
 		UseRule::RunPossibilityType ServiceUse::isUseRuleCompliant(
 		) const	{
-			return _useRule->isRunPossible(
-				*this
-			);
+			return
+				_useRule->isRunPossible(*this) == UseRule::RUN_POSSIBLE &&
+				_service->nonConcurrencyRuleOK(
+					_originDateTime.getDate(),
+					*getDepartureEdge(),
+					*getArrivalEdge(),
+					_userClass
+				) ?
+				UseRule::RUN_POSSIBLE :
+				UseRule::RUN_NOT_POSSIBLE
+			;
 		}
 
 

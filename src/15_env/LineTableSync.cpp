@@ -131,6 +131,7 @@ namespace synthese
 			line->setUseInTimetables (useInTimetables);
 			line->setUseInRoutePlanning (useInRoutePlanning);
 			line->setWayBack(wayBack);
+			line->setRollingStock(NULL);
 			line->setCommercialLine(NULL);
 			line->setDataSource(NULL);
 			line->clearRules();
@@ -145,7 +146,9 @@ namespace synthese
 
 				try
 				{
-					line->setCommercialLine(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
+					CommercialLine* cline(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
+					line->setCommercialLine(cline);
+					cline->addPath(line);
 				}
 				catch(ObjectNotFoundException<CommercialLine>)
 				{
@@ -238,9 +241,8 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Unlink(Line* obj)
 		{
-			obj->setRollingStock(NULL);
-			obj->setCommercialLine(NULL);
-			obj->setDataSource(NULL);
+			if(obj->getCommercialLine())
+				const_cast<CommercialLine*>(obj->getCommercialLine())->removePath(obj);
 		}
 
 	}

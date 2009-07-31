@@ -106,9 +106,9 @@ namespace synthese
 					ScoresMap scores;
 					BOOST_FOREACH(PhysicalStops::value_type its, _physicalStops)
 					{
-						BOOST_FOREACH(const Edge* edge, its.second->getDepartureEdges())
+						BOOST_FOREACH(const Vertex::Edges::value_type& edge, its.second->getDepartureEdges())
 						{
-							const Line* route(static_cast<const Line*>(edge->getParentPath()));
+							const Line* route(static_cast<const Line*>(edge.first));
 							ScoresMap::iterator itl(
 								scores.find(route->getCommercialLine())
 							);

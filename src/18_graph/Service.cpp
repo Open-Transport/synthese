@@ -173,5 +173,12 @@ namespace synthese
 			// No failure : return OK
 			return true;
 		}
+
+
+
+		bool Service::nonConcurrencyRuleOK( const time::Date& date, const graph::Edge& departureEdge, const graph::Edge& arrivalEdge, graph::UserClassCode userClass ) const
+		{
+			return true;
+		}
 	}
 }

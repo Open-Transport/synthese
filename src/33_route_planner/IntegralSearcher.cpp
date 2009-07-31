@@ -285,16 +285,15 @@ namespace synthese
 						correctedDesiredTime -= static_cast<int>(itVertex->second.approachTime);
 
 					// Goal edges loop
-					const std::set<const Edge*>& edges((_accessDirection == DEPARTURE_TO_ARRIVAL) ? origin->getDepartureEdges() : origin->getArrivalEdges());
+					const Vertex::Edges& edges((_accessDirection == DEPARTURE_TO_ARRIVAL) ? origin->getDepartureEdges() : origin->getArrivalEdges());
 
-					for(std::set<const Edge*>::const_iterator itEdge = edges.begin ()
-						; itEdge != edges.end ()
-						; ++itEdge
-					){
-						const Edge* edge = (*itEdge);
-
-						if (!edge->getParentPath()->isCompatibleWith(_accessParameters))
+					BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, edges)
+					{
+						if (!itEdge.first->isCompatibleWith(_accessParameters))
 							continue;
+
+						assert(itEdge.second);
+						const Edge& edge(*itEdge.second);
 
 						int serviceNumber(UNKNOWN_VALUE);
 						for(bool loopOnServices(true); loopOnServices;)
@@ -303,7 +302,7 @@ namespace synthese
 							DateTime departureMoment(correctedDesiredTime);
 							ServicePointer serviceInstance(
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
-								?	edge->getNextService(
+								?	edge.getNextService(
 										_accessParameters.getUserClass(),
 										departureMoment
 										, _minMaxDateTimeAtDestination
@@ -311,7 +310,7 @@ namespace synthese
 										, serviceNumber
 										, _inverted
 									)
-								:	edge->getPreviousService(
+								:	edge.getPreviousService(
 										_accessParameters.getUserClass(),
 										departureMoment
 										, _minMaxDateTimeAtDestination
@@ -338,18 +337,18 @@ namespace synthese
 
 							PtrEdgeStep step(	
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
-								?(	_destinationVam.needFineSteppingForArrival (edge->getParentPath())
+								?(	_destinationVam.needFineSteppingForArrival (edge.getParentPath())
 									? (&Edge::getFollowingArrivalForFineSteppingOnly)
 									: (&Edge::getFollowingConnectionArrival)
-								):(	_destinationVam.needFineSteppingForDeparture (edge->getParentPath())
+								):(	_destinationVam.needFineSteppingForDeparture (edge.getParentPath())
 									? (&Edge::getPreviousDepartureForFineSteppingOnly)
 									: (&Edge::getPreviousConnectionDeparture)
 								)
 							);
 
 							// The path is traversed
-							for (const Edge* curEdge = (edge->*step) ();
-								curEdge != 0; curEdge = (curEdge->*step) ())
+							for (const Edge* curEdge = (edge.*step) ();
+								curEdge != NULL; curEdge = (curEdge->*step) ())
 							{
 								// The reached vertex is analyzed only in two cases :
 								//  - if the vertex belongs to the goal

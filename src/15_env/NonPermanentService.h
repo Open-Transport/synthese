@@ -56,6 +56,7 @@ namespace synthese
 				, graph::Path* path
 			);
 
+
 		public:
 			/** Latest schedule of the service : the last arrival at the last vertex.
 				@return The latest schedule of the service

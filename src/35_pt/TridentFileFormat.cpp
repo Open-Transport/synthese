@@ -278,7 +278,7 @@ namespace synthese
 			BOOST_FOREACH(Registry<PhysicalStop>::value_type itps, _env->getRegistry<PhysicalStop>())
 			{
 				const PhysicalStop* ps(itps.second.get());
-				if ((ps->getDepartureEdges ().size () == 0) && (ps->getArrivalEdges ().size () == 0)) continue;
+				if (ps->getDepartureEdges().empty() && ps->getArrivalEdges().empty()) continue;
 
 				os << "<StopArea>" << "\n";
 
@@ -291,9 +291,9 @@ namespace synthese
 
 				Vertex::Edges edges(ps->getDepartureEdges());
 				edges.insert(ps->getArrivalEdges().begin(), ps->getArrivalEdges().end());
-				BOOST_FOREACH(const Edge* ls, edges)
+				BOOST_FOREACH(const Vertex::Edges::value_type& ls, edges)
 				{
-					os << "<contains>" << TridentId (peerid, "StopPoint", *ls)  << "</contains>" << "\n";
+					os << "<contains>" << TridentId (peerid, "StopPoint", *ls.second)  << "</contains>" << "\n";
 				}
 
 				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", *ps) << "</centroidOfArea>" << "\n";
@@ -899,9 +899,9 @@ namespace synthese
 					const NonConcurrencyRule& rule(*itrule.second);
 					os << "<LineConflict>" << "\n";
 					os << "<objectId>" << TridentId (peerid, "LineConflict", rule) << "</objectId>" << "\n";
-					os << "<forbiddenLine>" << TridentId (peerid, "Line", rule.getHiddenLine()) << "</forbiddenLine>" << "\n";
-					os << "<usedLine>" << TridentId (peerid, "Line", rule.getPriorityLine()) << "</usedLine>" << "\n";
-					os << "<conflictDelay>" << ToXsdDuration(rule.getDelay()) << "</conflictDelay>" << "\n";
+					os << "<forbiddenLine>" << TridentId (peerid, "Line", rule.getHiddenLine()->getKey()) << "</forbiddenLine>" << "\n";
+					os << "<usedLine>" << TridentId (peerid, "Line", rule.getPriorityLine()->getKey()) << "</usedLine>" << "\n";
+					os << "<conflictDelay>" << ToXsdDuration(rule.getDelay().minutes()) << "</conflictDelay>" << "\n";
 					os << "</LineConflict>" << "\n";
 				}
 
@@ -1248,11 +1248,11 @@ namespace synthese
 					BOOST_FOREACH(PhysicalStop* stop, routeStops)
 					{
 						shared_ptr<LineStop> ls(new LineStop);
+						ls->setLine(route.get());
 						ls->setPhysicalStop(stop);
 						ls->setRankInPath(rank);
 						ls->setIsArrival(rank > 0);
 						ls->setIsDeparture(rank < routeStops.size() - 1);
-						ls->setLine(route.get());
 						ls->setMetricOffset(0);
 						ls->setKey(LineStopTableSync::getId());
 						route->addEdge(ls.get());

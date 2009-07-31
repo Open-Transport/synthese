@@ -476,12 +476,14 @@ namespace synthese
 						stream << t.col() << its->getArrivalDateTime().toString();
 
 						// Place
-						stream <<
-							t.col() <<
-							static_cast<const PublicTransportStopZoneConnectionPlace*>(
-								its->getArrivalEdge()->getHub()
-							)->getFullName()
-						;
+						stream << t.col();
+						if(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(its->getArrivalEdge()->getHub()))
+						{
+							stream <<
+								static_cast<const PublicTransportStopZoneConnectionPlace*>(
+									its->getArrivalEdge()->getHub()
+								)->getFullName();
+						}
 
 						// Next service use
 						++its;

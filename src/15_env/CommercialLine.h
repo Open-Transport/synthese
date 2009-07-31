@@ -105,6 +105,9 @@ namespace synthese
 				const ReservationContact* getReservationContact() const;
 				const std::string& getCreatorId() const;
 				const PlacesSet& getOptionalReservationPlaces() const;
+				boost::recursive_mutex& getOptionalReservationPlacesMutex() const;
+				const NonConcurrencyRules& getNonConcurrencyRules() const;
+				boost::recursive_mutex& getNonConcurrencyRulesMutex() const;
 			//@}
 			
 			//! @name Setters

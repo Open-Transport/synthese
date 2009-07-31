@@ -42,5 +42,32 @@ namespace synthese
 		{
 			return NULL;
 		}
+
+
+
+		void PathGroup::addPath( Path* path )
+		{
+			if(_paths.find(path) != _paths.end()) return;
+
+			_paths.insert(path);
+		}
+
+
+
+		void PathGroup::removePath( Path* path )
+		{
+			Paths::iterator it(_paths.find(path));
+
+			if(it == _paths.end()) return;
+
+			_paths.erase(it);
+		}
+
+
+
+		const PathGroup::Paths& PathGroup::getPaths() const
+		{
+			return _paths;
+		}
 	}
 }

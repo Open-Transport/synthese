@@ -26,7 +26,14 @@
 #include "Registry.h"
 #include "GraphConstants.h"
 
+#include "Line.h"
+#include "CommercialLine.h"
+#include "PhysicalStop.h"
+#include "NonConcurrencyRule.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -127,15 +134,11 @@ namespace synthese
 				return ServicePointer(method, userClass);
 
 			// Reservation control
-			if (controlIfTheServiceIsReachable)
-			{
-				if (ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
-					return ServicePointer(method, userClass);
-			}
-			else
-			{
-			}
-			
+			if(	controlIfTheServiceIsReachable &&
+				ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE
+			){
+				return ServicePointer(method, userClass);
+			}		
 
 			return ptr;
 		}
@@ -281,6 +284,123 @@ namespace synthese
 			}
 			assert(false);
 			return DateTime(TIME_UNKNOWN);
+		}
+
+
+
+		bool ScheduledService::nonConcurrencyRuleOK(
+			const time::Date& date,
+			const Edge& departureEdge,
+			const Edge& arrivalEdge,
+			UserClassCode userClass
+		) const {
+			const CommercialLine* line(getRoute()->getCommercialLine());
+			if(line->getNonConcurrencyRules().empty()) return true;
+
+			boost::recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
+
+			_NonConcurrencyCache::const_iterator it(
+				_nonConcurrencyCache.find(
+					_NonConcurrencyCache::key_type(
+						departureEdge.getRankInPath(),
+						arrivalEdge.getRankInPath(),
+						userClass,
+						gregorian::date(date.getYear(), date.getMonth(), date.getDay())
+			)	)	);
+			if(it != _nonConcurrencyCache.end()) return it->second;
+
+			recursive_mutex::scoped_lock lineLock(line->getNonConcurrencyRulesMutex());
+
+			const CommercialLine::NonConcurrencyRules& rules(line->getNonConcurrencyRules());
+			const PublicTransportStopZoneConnectionPlace::PhysicalStops& startStops(
+				static_cast<const PhysicalStop*>(departureEdge.getFromVertex())->getConnectionPlace()->getPhysicalStops()
+			);
+			const Hub* arrivalHub(
+				arrivalEdge.getFromVertex()->getHub()
+			);
+
+			typedef graph::Edge* (graph::Edge::*PtrEdgeStep) () const;
+			PtrEdgeStep step(
+				arrivalHub->isConnectionPossible()
+				? (&Edge::getFollowingArrivalForFineSteppingOnly)
+				: (&Edge::getFollowingConnectionArrival)
+			);
+
+
+			BOOST_FOREACH(const NonConcurrencyRule* rule, rules)
+			{
+				CommercialLine* priorityLine(rule->getPriorityLine());
+				const CommercialLine::Paths& paths(priorityLine->getPaths());
+				DateTime minStartTime(date, getDepartureSchedule(departureEdge.getRankInPath()));
+				minStartTime -= rule->getDelay().minutes();
+				DateTime maxStartTime(date, getDepartureSchedule(departureEdge.getRankInPath()));
+				maxStartTime += rule->getDelay().minutes();
+
+				// Loop on all vertices of the starting place
+				BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& itStartStop, startStops)
+				{
+					// Loop on all non concurrent paths
+					BOOST_FOREACH(const Path* path, paths)
+					{
+						if(path == getPath()) continue;
+
+						const Vertex::Edges& departureEdges(itStartStop.second->getDepartureEdges());
+						Vertex::Edges::const_iterator its(departureEdges.find(path));
+						if(its == departureEdges.end()) continue;
+
+						const Edge& startEdge(*its->second);
+						// Search a service at the time of the possible
+
+						ServicePointer serviceInstance(
+							startEdge.getNextService(
+								userClass,
+								minStartTime,
+								maxStartTime,
+								true
+						)	);
+						// If no service, advance to the next path
+						if (!serviceInstance.getService()) continue;
+
+						// Path traversal
+						for (const Edge* endEdge = (startEdge.*step) ();
+							endEdge != NULL; endEdge = (endEdge->*step) ())
+						{
+							// Found eligible arrival place
+							if(endEdge->getHub() == arrivalHub)
+							{
+								_nonConcurrencyCache.insert(
+									make_pair(
+										_NonConcurrencyCache::key_type(
+											departureEdge.getRankInPath(),
+											arrivalEdge.getRankInPath(),
+											userClass,
+											gregorian::date(date.getYear(), date.getMonth(), date.getDay())
+										), false
+								)	);
+								return false;
+							}
+						}
+					}
+				}
+			}
+
+			_nonConcurrencyCache.insert(
+				make_pair(
+					_NonConcurrencyCache::key_type(
+						departureEdge.getRankInPath(),
+						arrivalEdge.getRankInPath(),
+						userClass,
+						gregorian::date(date.getYear(), date.getMonth(), date.getDay())
+					), true
+			)	);
+			return true;
+		}
+
+
+
+		const Line* ScheduledService::getRoute() const
+		{
+			return static_cast<const Line*>(getPath());
 		}
 	}
 }

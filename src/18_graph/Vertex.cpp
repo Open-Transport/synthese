@@ -23,6 +23,8 @@
 #include "Vertex.h"
 #include "Edge.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace geometry;
@@ -72,7 +74,10 @@ namespace synthese
 		void 
 		Vertex::addDepartureEdge ( const Edge* edge )
 		{
-			_departureEdges.insert (edge);    
+			assert(edge);
+			assert(edge->getParentPath());
+
+			_departureEdges.insert(make_pair(edge->getParentPath(), edge));
 		}
 
 
@@ -80,7 +85,10 @@ namespace synthese
 		void 
 		Vertex::addArrivalEdge ( const Edge* edge )
 		{
-			_arrivalEdges.insert (edge);    
+			assert(edge);
+			assert(edge->getParentPath());
+
+			_arrivalEdges.insert(make_pair(edge->getParentPath(), edge));    
 		}
 
 		void Vertex::setHub(

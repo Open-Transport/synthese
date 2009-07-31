@@ -30,10 +30,14 @@
 #include "Registry.h"
 #include "RuleUser.h"
 
+#include <set>
+
 namespace synthese
 {
 	namespace graph
 	{
+		class Path;
+
 		/////////////////////////////////////////////////////////////////////////
 		/// Path group representing a human readable object.
 		/// @ingroup m18
@@ -41,12 +45,23 @@ namespace synthese
 		:	public RuleUser,
 			public virtual util::Registrable
 		{
+		public:
+			typedef std::set<Path*> Paths;
+
 		protected:
+			Paths _paths;
+
 			virtual const RuleUser* _getParentRuleUser() const;
 
 			PathGroup(
 				util::RegistryKeyType id = UNKNOWN_VALUE
 			);
+
+		public:
+			void addPath(Path* path);
+			void removePath(Path* path);
+
+			const Paths& getPaths() const;
 		};
 	}
 }

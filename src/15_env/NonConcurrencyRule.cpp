@@ -21,7 +21,8 @@
 */
 
 #include "NonConcurrencyRule.h"
-#include "Registry.h"
+
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -37,42 +38,39 @@ namespace synthese
 
 
 		NonConcurrencyRule::NonConcurrencyRule(
-			RegistryKeyType key,
-			RegistryKeyType priorityLine, /*= NULL */
-			RegistryKeyType hiddenLine, /*= NULL */
-			int delay /*= UNKNOWN_VALUE  */
+			RegistryKeyType key
 		):	Registrable(key),
-			_prorityLine(priorityLine),
-			_hiddenLine(hiddenLine),
-			_delay(delay)
+			_prorityLine(NULL),
+			_hiddenLine(NULL),
+			_delay(minutes(0))
 		{}
 
-		uid NonConcurrencyRule::getPriorityLine() const
+		CommercialLine* NonConcurrencyRule::getPriorityLine() const
 		{
 			return _prorityLine;
 		}
 
-		uid NonConcurrencyRule::getHiddenLine() const
+		CommercialLine* NonConcurrencyRule::getHiddenLine() const
 		{
 			return _hiddenLine;
 		}
 
-		int NonConcurrencyRule::getDelay() const
+		const time_duration& NonConcurrencyRule::getDelay() const
 		{
 			return _delay;
 		}
 
-		void NonConcurrencyRule::setPriorityLine(uid value )
+		void NonConcurrencyRule::setPriorityLine(CommercialLine* value )
 		{
 			_prorityLine = value;
 		}
 
-		void NonConcurrencyRule::setHiddenLine(uid value )
+		void NonConcurrencyRule::setHiddenLine(CommercialLine* value )
 		{
 			_hiddenLine = value;
 		}
 
-		void NonConcurrencyRule::setDelay( int value )
+		void NonConcurrencyRule::setDelay(const time_duration& value )
 		{
 			_delay = value;
 		}

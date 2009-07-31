@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENV_VERTEX_H
 #define SYNTHESE_ENV_VERTEX_H
 
-#include <set>
+#include <map>
 
 #include "Registrable.h"
 #include "Point2D.h"
@@ -49,7 +49,7 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		public:
-			typedef std::set<const Edge*> Edges;
+			typedef std::map<const Path*, const Edge*> Edges;
 
 		protected:
 			const Hub*	_hub;

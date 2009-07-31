@@ -60,9 +60,9 @@ namespace synthese
 		{
 			BOOST_FOREACH(PhysicalStops::value_type it, _physicalStops)
 			{
-				BOOST_FOREACH(const Edge* edge, it.second->getDepartureEdges())
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
-					const LineStop* ls = static_cast<const LineStop*>(edge);
+					const LineStop* ls = static_cast<const LineStop*>(edge.second);
 
 					if (!_allowedLineStop(ls))
 						continue;

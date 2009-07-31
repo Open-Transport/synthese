@@ -106,15 +106,15 @@ namespace synthese
 				if (!vertex->getHub()->isConnectionPossible())
 				{
 					// Departure vertices
-					BOOST_FOREACH(const Edge* edge, vertex->getDepartureEdges())
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, vertex->getDepartureEdges())
 					{
-						_pathOnWhichFineSteppingForDeparture.insert(edge->getParentPath());
+						_pathOnWhichFineSteppingForDeparture.insert(edge.first);
 					}
 
 					// Arrival vertices
-					BOOST_FOREACH(const Edge* edge, vertex->getArrivalEdges())
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, vertex->getArrivalEdges())
 					{
-						_pathOnWhichFineSteppingForArrival.insert(edge->getParentPath());
+						_pathOnWhichFineSteppingForArrival.insert(edge.first);
 					}
 				}
 			}

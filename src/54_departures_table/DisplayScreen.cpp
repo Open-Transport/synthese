@@ -468,10 +468,10 @@ namespace synthese
 			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, getPhysicalStops())
 			{
 				const PhysicalStop* p(it.second);
-				const std::set<const Edge*>& edges = p->getDepartureEdges();
-				BOOST_FOREACH(const Edge* e, edges)
+				const Vertex::Edges& edges = p->getDepartureEdges();
+				BOOST_FOREACH(const Vertex::Edges::value_type& e, edges)
 				{
-					for(const Edge* edge= e->getFollowingArrivalForFineSteppingOnly();
+					for(const Edge* edge= e.second->getFollowingArrivalForFineSteppingOnly();
 						edge != NULL;
 						edge = edge->getFollowingArrivalForFineSteppingOnly()
 					){

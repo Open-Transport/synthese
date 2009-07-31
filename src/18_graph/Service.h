@@ -126,6 +126,12 @@ namespace synthese
 				virtual time::Schedule getArrivalBeginScheduleToIndex(int rankInPath) const = 0;
 				virtual time::Schedule getArrivalEndScheduleToIndex(int rankInPath) const = 0;
 
+				virtual bool nonConcurrencyRuleOK(
+					const time::Date& date,
+					const graph::Edge& departureEdge,
+					const graph::Edge& arrivalEdge,
+					graph::UserClassCode userClass
+				) const;
 
 
 				/** Tests if the service could be inserted in the same line than the current one, according to the line theory.

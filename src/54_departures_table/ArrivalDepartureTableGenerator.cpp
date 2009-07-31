@@ -24,8 +24,9 @@
 #include "Line.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
-
+#include "Service.h"
 #include "ArrivalDepartureTableGenerator.h"
+#include "GraphConstants.h"
 
 using namespace std;
 
@@ -96,26 +97,40 @@ namespace synthese
 					servicePointer.getEdge()->getParentPath()
 				)->getDestination()->getConnectionPlace()
 			);
-			for(const LineStop* curLinestop = static_cast<const LineStop*>(servicePointer.getEdge());
+
+			const LineStop* curLinestop(static_cast<const LineStop*>(servicePointer.getEdge()));
+			const PublicTransportStopZoneConnectionPlace* place(curLinestop->getPhysicalStop()->getConnectionPlace());
+
+			// Adding of the beginning place
+			arrivals.push_back(place);
+			encounteredPlaces.insert(place);
+
+			for(curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly());
 				curLinestop != NULL;
 				curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
 			){
-				const PublicTransportStopZoneConnectionPlace* place(
-					curLinestop->getPhysicalStop()->getConnectionPlace()
-				);
+				if(!servicePointer.getService()->nonConcurrencyRuleOK(
+						servicePointer.getOriginDateTime().getDate(),
+						*servicePointer.getEdge(),
+						*curLinestop,
+						USER_PEDESTRIAN
+				)	) continue;
+
+				place = curLinestop->getPhysicalStop()->getConnectionPlace();
 				
-				if(	(	_displayedPlaces.find(place->getKey()) != _displayedPlaces.end() &&
-						// If the place must be displayed according to the display rules (only once per place)
-						encounteredPlaces.find(place) == encounteredPlaces.end() &&
-						place != destinationPlace
-					)||
-					// or if the place is the terminus
-					curLinestop->getFollowingArrivalForFineSteppingOnly() == NULL ||
-					curLinestop == servicePointer.getEdge()			// or if the place is the origin
+				// If the place must be displayed according to the display rules (only once per place)
+				if(	_displayedPlaces.find(place->getKey()) != _displayedPlaces.end() &&
+					encounteredPlaces.find(place) == encounteredPlaces.end() &&
+					place != destinationPlace
 				){
 					arrivals.push_back(place);
 					encounteredPlaces.insert(place);
 				}
+			}
+			// Add the ending stop
+			if(arrivals.empty() || *(arrivals.end()-1) != place)
+			{
+				arrivals.push_back(place);
 			}
 
 			/** - Insertion */

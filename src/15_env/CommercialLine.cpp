@@ -179,6 +179,9 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(_nonConcurrencyRulesMutex);
 
+			NonConcurrencyRules::iterator it(_nonConcurrencyRules.find(rule));
+			if(it != _nonConcurrencyRules.end()) return;
+
 			_nonConcurrencyRules.insert(rule);
 		}
 
@@ -189,7 +192,9 @@ namespace synthese
 			recursive_mutex::scoped_lock lock(_nonConcurrencyRulesMutex);
 
 			NonConcurrencyRules::iterator it(_nonConcurrencyRules.find(rule));
-			if(it != _nonConcurrencyRules.end()) _nonConcurrencyRules.erase(it);
+			if(it == _nonConcurrencyRules.end()) return;
+			
+			_nonConcurrencyRules.erase(it);
 		}
 
 
@@ -199,6 +204,27 @@ namespace synthese
 			recursive_mutex::scoped_lock lock(_optionalReservationPlacesMutex);
 
 			_optionalReservationPlaces.clear();
+		}
+
+
+
+		boost::recursive_mutex& CommercialLine::getOptionalReservationPlacesMutex() const
+		{
+			return _optionalReservationPlacesMutex;
+		}
+
+
+
+		const CommercialLine::NonConcurrencyRules& CommercialLine::getNonConcurrencyRules() const
+		{
+			return _nonConcurrencyRules;
+		}
+
+
+
+		boost::recursive_mutex& CommercialLine::getNonConcurrencyRulesMutex() const
+		{
+			return _nonConcurrencyRulesMutex;
 		}
 	}
 }

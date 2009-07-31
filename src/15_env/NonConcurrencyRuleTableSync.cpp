@@ -26,16 +26,18 @@
 
 #include "NonConcurrencyRuleTableSync.h"
 #include "NonConcurrencyRule.h"
-
+#include "CommercialLineTableSync.h"
+#include "CommercialLine.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
+#include "LinkException.h"
 #include "Conversion.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -82,15 +84,40 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Columns reading
-			uid hiddenLineId(rows->getLongLong(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID));
-			uid priorityLineId(rows->getLongLong(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID));
-			int delay(rows->getInt(NonConcurrencyRuleTableSync::COL_DELAY));
-
 			// Properties
-			object->setDelay(delay);
-			object->setHiddenLine(hiddenLineId);
-			object->setPriorityLine(priorityLineId);
+			object->setDelay(minutes(rows->getInt(NonConcurrencyRuleTableSync::COL_DELAY)));
+			object->setHiddenLine(NULL);
+			object->setPriorityLine(NULL);
+
+			if(linkLevel < UP_LINKS_LOAD_LEVEL) return;
+
+			try
+			{
+				object->setPriorityLine(CommercialLineTableSync::GetEditable(
+						rows->getLongLong(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID),
+						env
+				).get()	);
+			}
+			catch(ObjectNotFoundException<CommercialLine>& e)
+			{
+				throw LinkException<NonConcurrencyRuleTableSync>(rows, NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, e);
+			}
+
+			try
+			{
+				object->setHiddenLine(CommercialLineTableSync::GetEditable(
+					rows->getLongLong(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID),
+					env
+				).get()	);
+			}
+			catch(ObjectNotFoundException<CommercialLine>& e)
+			{
+				throw LinkException<NonConcurrencyRuleTableSync>(rows, NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, e);
+			}
+
+			if(linkLevel < ALGORITHMS_OPTIMIZATION_LOAD_LEVEL) return;
+
+			object->getHiddenLine()->addConcurrencyRule(object);
 		}
 
 
@@ -103,11 +130,13 @@ namespace synthese
 			if (object->getKey() <= 0)
 				object->setKey(getId());
                
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
+			query <<
+				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				object->getKey() << "," <<
+				object->getPriorityLine() << "," <<
+				object->getHiddenLine() << "," <<
+				object->getDelay() <<
+			")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -116,7 +145,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
 			NonConcurrencyRule* obj
 		){
-			
+			if(obj->getHiddenLine()) obj->getHiddenLine()->removeConcurrencyRule(obj);
 		}
 	}
 	

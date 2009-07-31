@@ -142,9 +142,9 @@ namespace synthese
 				uid lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
 				Line* line(LineTableSync::GetEditable (lineId, env, linkLevel).get());
 
-				ls->setPhysicalStop(PhysicalStopTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());
 				ls->setLine(line);
-
+				ls->setPhysicalStop(PhysicalStopTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());
+				
 				line->addEdge(ls);
 			}
 		}

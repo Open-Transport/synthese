@@ -26,10 +26,14 @@
 #include "Registrable.h"
 #include "Registry.h"
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 namespace synthese
 {
 	namespace env
 	{
+		class CommercialLine;
+
 		/** Non-concurrency rule class.
 			@ingroup m35
 		*/
@@ -42,25 +46,22 @@ namespace synthese
 			typedef util::Registry<NonConcurrencyRule>	Registry;
 
 		protected:
-			util::RegistryKeyType	_prorityLine;
-			util::RegistryKeyType	_hiddenLine;
-			int	_delay;
+			CommercialLine* _prorityLine;
+			CommercialLine* _hiddenLine;
+			boost::posix_time::time_duration	_delay;
 
 		public:
 			NonConcurrencyRule(
-				util::RegistryKeyType key,
-				util::RegistryKeyType priorityLine = UNKNOWN_VALUE
-				, util::RegistryKeyType hiddenLine = UNKNOWN_VALUE
-				, int delay = UNKNOWN_VALUE
+				util::RegistryKeyType key
 			);
 
-			uid getPriorityLine()	const;
-			uid	getHiddenLine()		const;
-			int	getDelay()			const;
+			CommercialLine* getPriorityLine()	const;
+			CommercialLine*	getHiddenLine()		const;
+			const boost::posix_time::time_duration&	getDelay()			const;
 
-			void setPriorityLine(util::RegistryKeyType value);
-			void setHiddenLine(util::RegistryKeyType value);
-			void setDelay(int value);
+			void setPriorityLine(CommercialLine* value);
+			void setHiddenLine(CommercialLine* value);
+			void setDelay(const boost::posix_time::time_duration& value);
 
 		};
 	}

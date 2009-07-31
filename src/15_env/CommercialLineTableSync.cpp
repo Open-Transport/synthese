@@ -35,7 +35,7 @@
 #include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
 #include "GraphConstants.h"
-// Db
+#include "AllowedUseRule.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -136,6 +136,7 @@ namespace synthese
 			object->setNetwork(NULL);
 			object->cleanOptionalReservationPlaces();
 			object->clearRules();
+			object->addRule(USER_PEDESTRIAN, AllowedUseRule::INSTANCE.get());
 			object->setReservationContact(NULL);
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
