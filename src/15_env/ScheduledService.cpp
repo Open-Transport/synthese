@@ -322,8 +322,8 @@ namespace synthese
 			typedef graph::Edge* (graph::Edge::*PtrEdgeStep) () const;
 			PtrEdgeStep step(
 				arrivalHub->isConnectionPossible()
-				? (&Edge::getFollowingArrivalForFineSteppingOnly)
-				: (&Edge::getFollowingConnectionArrival)
+				? (&Edge::getFollowingConnectionArrival)
+				: (&Edge::getFollowingArrivalForFineSteppingOnly)
 			);
 
 
