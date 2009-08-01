@@ -25,6 +25,7 @@
 #include "Conversion.h"
 #include "Edge.h"
 #include "LineStop.h"
+#include "PathGroup.h"
 
 using namespace std;
 
@@ -71,6 +72,8 @@ namespace synthese
 				)	);
 				addEdge(newEdge);
 			}
+
+			_pathGroup->addPath(this);
 		}
 
 		bool SubLine::addServiceIfCompatible( Service* service )
@@ -87,6 +90,8 @@ namespace synthese
 		{
 			for (Path::Edges::iterator it(_edges.begin()); it != _edges.end(); ++it)
 				delete *it;
+			assert(_pathGroup);
+			_pathGroup->removePath(this);
 		}
 
 		Line* SubLine::getMainLine() const
