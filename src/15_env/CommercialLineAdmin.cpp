@@ -25,7 +25,9 @@
 #include "CommercialLineAdmin.h"
 #include "TransportNetworkAdmin.h"
 #include "EnvModule.h"
-
+#include "NonConcurrencyRuleTableSync.h"
+#include "NonConcurrencyRule.h"
+#include "TransportNetwork.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "Line.h"
@@ -71,6 +73,7 @@ namespace synthese
 	{
 		const string CommercialLineAdmin::TAB_DATES("da");
 		const string CommercialLineAdmin::TAB_ROUTES("ro");
+		const string CommercialLineAdmin::TAB_NON_CONCURRENCY("nc");
 		const string CommercialLineAdmin::TAB_EXPORT("ex");
 		const string CommercialLineAdmin::PARAMETER_SEARCH_NAME("na");
 		const string CommercialLineAdmin::PARAMETER_DATES_START("ds");
@@ -225,6 +228,33 @@ namespace synthese
 			}
 
 			////////////////////////////////////////////////////////////////////
+			// TAB NON CONCURRENCY
+			if (openTabContent(stream, TAB_NON_CONCURRENCY))
+			{
+				stream << "<h1>Lignes prioritaires</h1>";
+
+				NonConcurrencyRuleTableSync::SearchResult rules(NonConcurrencyRuleTableSync::Search(_getEnv(), _cline->getKey()));
+				HTMLTable::ColsVector cols;
+				cols.push_back("Réseau");
+				cols.push_back("Ligne");
+				cols.push_back("Délai");
+				cols.push_back("Action");
+				HTMLTable t(cols, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+
+				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, rules)
+				{
+					stream << t.row();
+					stream << t.col() << rule->getPriorityLine()->getNetwork()->getName();
+					stream << t.col(1, rule->getPriorityLine()->getStyle()) << rule->getPriorityLine()->getShortName();
+					stream << t.col() << rule->getDelay().minutes();
+					stream << t.col() << "Supprimer";
+				}
+
+				stream << t.close();
+			}
+
+			////////////////////////////////////////////////////////////////////
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
@@ -308,9 +338,10 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Parcours", TAB_ROUTES, true));
-			_tabs.push_back(Tab("Dates de fonctionnement", TAB_DATES, true));
-			_tabs.push_back(Tab("Export", TAB_EXPORT, true));
+			_tabs.push_back(Tab("Parcours", TAB_ROUTES, true, LineAdmin::ICON));
+			_tabs.push_back(Tab("Dates de fonctionnement", TAB_DATES, true, "calendar.png"));
+			_tabs.push_back(Tab("Non concurrence", TAB_NON_CONCURRENCY, true, "lock.png"));
+			_tabs.push_back(Tab("Export", TAB_EXPORT, true, "page_white_go.png"));
 
 			_tabBuilded = true;
 		}

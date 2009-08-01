@@ -320,7 +320,10 @@ namespace synthese
 			, bool inverted
 		) const	{
 			int previous(getArrivalFromIndex (arrivalMoment.getHours ()));
-			
+
+			if (maxPreviousServiceIndex < previous)
+				previous = maxPreviousServiceIndex;
+
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{
 				if (getParentPath()->isActive(arrivalMoment.getDate()))

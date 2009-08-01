@@ -296,7 +296,8 @@ namespace synthese
 						const Edge& edge(*itEdge.second);
 
 						int serviceNumber(UNKNOWN_VALUE);
-						for(bool loopOnServices(true); loopOnServices;)
+						set<const Edge*> nonServedEdges;
+						while(true)
 						{
 							// Reach of the next/previous service serving the edge
 							DateTime departureMoment(correctedDesiredTime);
@@ -319,17 +320,18 @@ namespace synthese
 										, _inverted
 									)
 							);
-							loopOnServices = false;
 
 							// If no service, advance to the next edge
 							if (!serviceInstance.getService())
-								continue;
+								break;
 
 							// Strict time control if the departure time must be exactly the desired one (optimization only)
 							if (strictTime && serviceInstance.getActualDateTime() != correctedDesiredTime)
-								continue;
+								break;
 
-							serviceNumber = serviceInstance.getServiceIndex() + 1;
+							serviceNumber = serviceInstance.getServiceIndex() +
+								(_accessDirection == DEPARTURE_TO_ARRIVAL ? 1 : -1)
+							;
 
 							// Check for service compliance rules.
 							if (!serviceInstance.getService()->isCompatibleWith(_accessParameters))
@@ -346,10 +348,22 @@ namespace synthese
 								)
 							);
 
+							bool nonServedEdgesSearch(!nonServedEdges.empty());
+
 							// The path is traversed
 							for (const Edge* curEdge = (edge.*step) ();
 								curEdge != NULL; curEdge = (curEdge->*step) ())
 							{
+								// If the path traversal is only to find non served edges, analyse it only if
+								// it belongs to the list
+								if(nonServedEdgesSearch)
+								{
+									set<const Edge*>::iterator it(nonServedEdges.find(curEdge));
+									if(it == nonServedEdges.end())
+										continue;
+									nonServedEdges.erase(it);
+								}
+
 								// The reached vertex is analyzed only in two cases :
 								//  - if the vertex belongs to the goal
 								//  - if the vertex is a connecting vertex
@@ -367,7 +381,10 @@ namespace synthese
 								shared_ptr<Journey> resultJourney(new Journey(fullApproachJourney));
 								ServiceUse serviceUse(serviceInstance, curEdge);
 								if (serviceUse.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
+								{
+									nonServedEdges.insert(curEdge);
 									continue;
+								}
 
 								resultJourney->push(serviceUse);
 
@@ -424,6 +441,9 @@ namespace synthese
 										_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
 								}
 							} // next arrival edge
+
+							if(nonServedEdges.empty())
+								break;
 						} // next service
 					} // next departure edge
 				} // next vertex in vam

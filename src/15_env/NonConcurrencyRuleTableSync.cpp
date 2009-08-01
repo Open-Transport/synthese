@@ -28,6 +28,7 @@
 #include "NonConcurrencyRule.h"
 #include "CommercialLineTableSync.h"
 #include "CommercialLine.h"
+#include "TransportNetworkTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -41,6 +42,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace pt;
 	using namespace db;
 	using namespace util;
 	using namespace env;
@@ -155,8 +157,8 @@ namespace synthese
 	{
 		NonConcurrencyRuleTableSync::SearchResult NonConcurrencyRuleTableSync::Search(
 			Env& env,
-			util::RegistryKeyType hiddenLineId
-			, util::RegistryKeyType priorityLineId
+			optional<RegistryKeyType> hiddenLineId,
+			optional<RegistryKeyType> priorityLineId
 			, bool hiddenAndPriority
 			, int first /*= 0*/
 			, boost::optional<std::size_t> number  /*= 0*/ 
@@ -169,23 +171,41 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
+				<< " FROM " << TABLE.NAME;
+			if(orderByPriorityLine)
+			{
+				query <<
+					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_PRIORITY_LINE_ID <<
+					" INNER JOIN " << TransportNetworkTableSync::TABLE.NAME << " n ON n." << TABLE_COL_ID << "=c." << CommercialLineTableSync::COL_NETWORK_ID
+				;
+			}
+			else if(orderByHiddenLine)
+			{
+				query <<
+					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_HIDDEN_LINE_ID <<
+					" INNER JOIN " << TransportNetworkTableSync::TABLE.NAME << " n ON n." << TABLE_COL_ID << "=c." << CommercialLineTableSync::COL_NETWORK_ID
+				;
+			}
+			query
 				<< " WHERE 1 ";
-			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
+			if (priorityLineId || hiddenLineId)
 				query << " AND (";
-			if (priorityLineId != UNKNOWN_VALUE)
-				query << COL_PRIORITY_LINE_ID << "=" << priorityLineId;
-			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
+			if (priorityLineId)
+				query << COL_PRIORITY_LINE_ID << "=" << *priorityLineId;
+			if (priorityLineId && hiddenLineId)
 				query << (hiddenAndPriority ? " AND " : " OR ");
-			if (hiddenLineId != UNKNOWN_VALUE)
-				query << COL_HIDDEN_LINE_ID << "=" << hiddenLineId;
-			if (priorityLineId != UNKNOWN_VALUE && hiddenLineId != UNKNOWN_VALUE)
+			if (hiddenLineId)
+				query << COL_HIDDEN_LINE_ID << "=" << *hiddenLineId;
+			if (priorityLineId || hiddenLineId)
 				query << ")";
 
-			if(orderByPriorityLine)
-				query << " ORDER BY " << COL_PRIORITY_LINE_ID << (raisingOrder ? " ASC" : " DESC");
-			else if(orderByHiddenLine)
-				query << " ORDER BY " << COL_HIDDEN_LINE_ID << (raisingOrder ? " ASC" : " DESC");
+			if(orderByPriorityLine || orderByHiddenLine)
+			{
+				query <<
+					" ORDER BY n." << TransportNetworkTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC") << "," <<
+					" c." << CommercialLineTableSync::COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC")				
+				;
+			}
 			else if(orderByDelay)
 				query << " ORDER BY " << COL_DELAY << (raisingOrder ? " ASC" : " DESC");
 

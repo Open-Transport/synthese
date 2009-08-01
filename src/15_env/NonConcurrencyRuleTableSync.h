@@ -62,16 +62,16 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				util::RegistryKeyType hiddenLineId = UNKNOWN_VALUE
-				, util::RegistryKeyType priorityLineId = UNKNOWN_VALUE
-				, bool hiddenAndPriority = true
+				boost::optional<util::RegistryKeyType> hiddenLineId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> priorityLineId = boost::optional<util::RegistryKeyType>(),
+				bool hiddenAndPriority = true
 				, int first = 0
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByPriorityLine = true
 				, bool orderByHiddenLine = false
 				, bool orderByDelay = false
 				, bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}
