@@ -321,7 +321,7 @@ namespace synthese
 		) const	{
 			int previous(getArrivalFromIndex (arrivalMoment.getHours ()));
 
-			if (maxPreviousServiceIndex < previous)
+			if (maxPreviousServiceIndex != UNKNOWN_VALUE && maxPreviousServiceIndex < previous)
 				previous = maxPreviousServiceIndex;
 
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
