@@ -345,6 +345,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, scenarios)
 			{
 				if(	sa &&
+					sa->getScenario() &&
 					sa->getScenario()->getKey() == tpl->getKey()
 				){
 					AddToLinks(links, currentPage);

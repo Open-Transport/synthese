@@ -124,6 +124,8 @@ namespace synthese
 			, const std::string& text
 			, const security::User* user
 		){
+			if(!alarm->getScenario()) return;
+
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(alarm->getKey()));
 			content.push_back(text);

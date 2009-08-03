@@ -112,6 +112,8 @@ namespace synthese
 			, const std::string& text
 			, const security::User* user
 		){
+			if(!alarm->getScenario()) return;
+
 			DBLogEntry::Content content;
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			content.push_back(text);
@@ -187,6 +189,8 @@ namespace synthese
 
 		void MessagesLibraryLog::AddDeleteEntry( const AlarmTemplate* alarm , const security::User* user )
 		{
+			if(!alarm->getScenario()) return;
+
 			DBLog::ColumnsVector content;
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			stringstream text;
