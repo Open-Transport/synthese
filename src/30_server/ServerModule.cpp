@@ -68,6 +68,8 @@ namespace synthese
 		const std::string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
 		const std::string ServerModule::MODULE_PARAM_TMP_DIR ("tmp_dir");
 
+		const std::string ServerModule::VERSION("3.1.6");
+
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Noyau serveur");
 
 

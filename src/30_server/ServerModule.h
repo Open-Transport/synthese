@@ -70,6 +70,8 @@ namespace synthese
 		    static const std::string MODULE_PARAM_LOG_LEVEL;
 		    static const std::string MODULE_PARAM_TMP_DIR;
 
+			static const std::string VERSION;
+
 		    typedef std::map<std::string, Session*> SessionMap;
 
 		private:

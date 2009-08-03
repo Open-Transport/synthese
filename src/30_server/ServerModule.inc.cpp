@@ -11,3 +11,4 @@
 #include "30_server/HtmlFormFieldInterfaceElement.h"
 #include "30_server/DbModuleConfigTableSync.h"
 #include "30_server/LoginInterfacePage.h"
+#include "ServerModuleVersionInterfaceElement.h"
