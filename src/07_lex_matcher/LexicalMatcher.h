@@ -105,6 +105,7 @@ namespace synthese
 
 
 			Map _map;
+			Map _lowerCaseMap;
 			std::map<std::string, PreprocessedKey > _ppKeys;
 
 			bool _ignoreCase;
@@ -329,7 +330,7 @@ namespace synthese
 			// Do some filtering...
 			if (_ignoreCase)
 			{
-			boost::algorithm::to_lower (tmpkey); 
+				boost::algorithm::to_lower (tmpkey); 
 			}
 
 			// Apply global translations
@@ -526,16 +527,29 @@ namespace synthese
 			const std::string& text,
 			int nbMatches
 		) const {
+			const std::string lowerCaseText(_ignoreCase ? boost::algorithm::to_lower_copy(text) : text);
 			MatchResult r;
-			BOOST_FOREACH(typename Map::value_type v, _map)
+			const Map& lowerCaseMap(_ignoreCase ? _lowerCaseMap : _map);
+			BOOST_FOREACH(typename Map::value_type v, lowerCaseMap)
 			{
-				if(boost::algorithm::istarts_with(v.first, text))
+				if(v.first == lowerCaseText)
 				{
 					MatchHit h;
 					h.value = v.second;
 					h.key = v.first;
 					r.push_back(h);
-					continue;
+					if(r.size() == nbMatches) break;
+				}
+			}
+			BOOST_FOREACH(typename Map::value_type v, lowerCaseMap)
+			{
+				if(v.first != lowerCaseText && boost::algorithm::istarts_with(v.first, lowerCaseText))
+				{
+					MatchHit h;
+					h.value = v.second;
+					h.key = v.first;
+					r.push_back(h);
+					if(r.size() == nbMatches) break;
 				}
 			}
 			return r;
@@ -615,6 +629,7 @@ namespace synthese
 		{
 			_map.clear ();
 			_ppKeys.clear ();
+			_lowerCaseMap.clear();
 		}
 
 
@@ -626,6 +641,7 @@ namespace synthese
 			if (key.empty()) return;
 			_map.insert (std::make_pair (key, ptr));
 			_ppKeys.insert (std::make_pair (key, preprocessKey (key)));
+			_lowerCaseMap.insert(std::make_pair(_ignoreCase ? boost::algorithm::to_lower_copy(key) : key, ptr));
 		}
 
 
@@ -636,6 +652,7 @@ namespace synthese
 		{
 			_map.erase (key);
 			_ppKeys.erase (key);
+			_lowerCaseMap.erase(_ignoreCase ? boost::algorithm::to_lower_copy(key) : key);
 		}
 
 

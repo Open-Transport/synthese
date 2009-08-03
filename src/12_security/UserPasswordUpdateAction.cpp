@@ -67,6 +67,9 @@ namespace synthese
 				string pass2(map.getString(PARAMETER_PASS2, false, FACTORY_KEY));
 				if (pass2 != _password)
 					throw ActionException("Les mots de passe entrés ne sont pas identiques");
+
+				if(_password.empty())
+					throw ActionException("Le mot de passe ne peut pas être vide");
 			}
 			catch (ObjectNotFoundException<User>)
 			{
