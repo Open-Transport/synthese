@@ -77,6 +77,9 @@ namespace synthese
 			private:
 				virtual boost::shared_ptr<RegistryBase> create() = 0;
 				friend class Env;
+
+			public:
+				virtual ~RegistryCreatorInterface() {}
 			};
 
 
@@ -97,9 +100,12 @@ namespace synthese
 				{
 					return boost::shared_ptr<RegistryBase>(new typename R::Registry);
 				}
+
+			public:
+				virtual ~RegistryCreator() {}
 			};
 
-			typedef std::map<std::string, RegistryCreatorInterface*> RegistryCreatorMap;
+			typedef std::map<std::string, boost::shared_ptr<RegistryCreatorInterface> > RegistryCreatorMap;
 
 			static RegistryCreatorMap	_registryCreators;
 			static boost::shared_ptr<Env>	_officialRegistries;
@@ -121,7 +127,7 @@ namespace synthese
 					throw util::EnvException(Registry<R>::KEY);
 
 				// Saving of the auto generated builder
-				RegistryCreatorInterface* creator = new RegistryCreator<R>;
+				boost::shared_ptr<RegistryCreatorInterface> creator(new RegistryCreator<R>);
 				_registryCreators.insert(make_pair(Registry<R>::KEY, creator));
 			}
 

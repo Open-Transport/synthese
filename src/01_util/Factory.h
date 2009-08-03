@@ -63,6 +63,9 @@ namespace synthese
 			private:
 				virtual RootObject* create() = 0;
 				friend class Factory;
+
+			public:
+				virtual ~CreatorInterface() {}
 			};
 
 
@@ -85,13 +88,16 @@ namespace synthese
 				{
 					return static_cast<RootObject*>(new T);
 				}
+
+			public:
+				virtual ~Creator() {}
 			};
 
 
 
 			////////////////////////////////////////////////////////////////////
 			/// Registered subclasses map type.
-			typedef std::map<std::string, CreatorInterface*> Map;
+			typedef std::map<std::string, boost::shared_ptr<CreatorInterface> > Map;
 
 			////////////////////////////////////////////////////////////////////
 			/// The registered subclasses map.
@@ -124,7 +130,7 @@ namespace synthese
 					throw FactoryException<RootObject>("Attempted to integrate a class twice : "+ key);
 
 				// Saving of the auto generated builder
-				CreatorInterface* creator = new Creator<T>;
+				boost::shared_ptr<CreatorInterface> creator(new Creator<T>);
 				_registeredCreator.insert(make_pair(key, creator));
 			}
 
