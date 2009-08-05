@@ -415,7 +415,7 @@ namespace synthese
 
 
 
-		const char* ServerModule::ThreadInfo::Exception::what() const
+		const char* ServerModule::ThreadInfo::Exception::what() const throw()
 		{
 			return "Current thread is unregistered. Cannot retrieve thread info.";
 		}

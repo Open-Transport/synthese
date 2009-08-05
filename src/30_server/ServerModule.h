@@ -81,7 +81,7 @@ namespace synthese
 				class Exception : public std::exception
 				{
 				public:
-					const char* what() const;
+					const char* what() const throw();
 				};
 
 				boost::shared_ptr<boost::thread> theThread;
