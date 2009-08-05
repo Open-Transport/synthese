@@ -23,7 +23,10 @@
 #include "Log.h"
 
 #include <iomanip>
+#include <boost/thread/thread.hpp>
 
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -234,6 +237,7 @@ namespace synthese
 				  << std::setw (2) << _logTimeInfo->tm_hour << ":"
 				  << std::setw (2) << _logTimeInfo->tm_min << ":"
 				  << std::setw (2) << _logTimeInfo->tm_sec
+				  << setw (6) << " # " << this_thread::get_id()
 				  << " # " << message;
 
 			if (exception != 0)

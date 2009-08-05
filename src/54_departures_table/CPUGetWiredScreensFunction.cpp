@@ -120,6 +120,7 @@ namespace synthese
 
 			BOOST_FOREACH(const DisplayScreen* screen, _cpu->getWiredScreens())
 			{
+				if(!screen->getIsOnline()) continue;
 				stream <<
 					"<" << DISPLAY_SCREEN_XML_TAG << " " <<
 					DISPLAY_SCREEN_ID_XML_FIELD << "=\"" << screen->getKey() << "\" " <<

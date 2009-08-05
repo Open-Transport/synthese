@@ -12,3 +12,6 @@
 #include "30_server/DbModuleConfigTableSync.h"
 #include "30_server/LoginInterfacePage.h"
 #include "ServerModuleVersionInterfaceElement.h"
+#include "ServerAdminRight.h"
+#include "ThreadsAdmin.h"
+#include "ThreadKillAction.h"

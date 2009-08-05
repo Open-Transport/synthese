@@ -282,8 +282,7 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, uid objectId )
 		{
-			Env env;
-			remove(DisplayScreenTableSync::Get(objectId, env).get(), alarm);
+			remove(DisplayScreenTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
 		}
 	}
 }

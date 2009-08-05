@@ -261,6 +261,7 @@ namespace synthese
 				try
 				{
 					// Run of the action
+					ServerModule::SetCurrentThreadRunningAction();
 					_action->run();
 					
 					// Run after the action
@@ -280,6 +281,7 @@ namespace synthese
 				return;
 			
 			// Run the display
+			ServerModule::SetCurrentThreadRunningFunction();
 			_function->_run(stream);
 		}
 

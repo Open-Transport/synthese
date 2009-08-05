@@ -61,6 +61,9 @@ namespace synthese
 		boost::asio::io_service ServerModule::_io_service;
 		boost::asio::ip::tcp::acceptor ServerModule::_acceptor(ServerModule::_io_service);
 		connection_ptr ServerModule::_new_connection(new HTTPConnection(ServerModule::_io_service));
+		ServerModule::Threads ServerModule::_threads;
+		size_t ServerModule::_waitingThreads(0);
+		recursive_mutex ServerModule::_threadManagementMutex;
 
 
 		const std::string ServerModule::MODULE_PARAM_PORT ("port");
@@ -68,9 +71,9 @@ namespace synthese
 		const std::string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
 		const std::string ServerModule::MODULE_PARAM_TMP_DIR ("tmp_dir");
 
-		const std::string ServerModule::VERSION("3.1.6");
+		const std::string ServerModule::VERSION("3.1.7");
 
-		template<> const string ModuleClassTemplate<ServerModule>::NAME("Noyau serveur");
+		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
 
 		template<> void ModuleClassTemplate<ServerModule>::PreInit()
@@ -108,52 +111,12 @@ namespace synthese
 				);
 	
 				// Create a pool of threads to run all of the io_services.
-				std::vector<boost::shared_ptr<boost::thread> > threads;
 				for (std::size_t i = 0; i < threadsNumber; ++i)
 				{
-					boost::shared_ptr<boost::thread> thread(
-						new boost::thread(
-							boost::bind(&boost::asio::io_service::run, &ServerModule::_io_service)
-					)	);
-					threads.push_back(thread);
+					ServerModule::AddHTTPThread();
 				}
 	
-	
-				Log::GetInstance ().info ("HTTP Server is listening on port " + port +" by "+ lexical_cast<string>(threadsNumber) + " threads ...");
-			
-
-
-	/*		    synthese::tcp::TcpService* service = 
-				synthese::tcp::TcpService::openService (port);
-			    
-				// CleanerThreadExec* cleanerExec = new CleanerThreadExec ();
-			    
-				// Every 4 hours, old files of http temp dir are cleant 
-				// time_duration checkPeriod = hours(4); 
-				// cleanerExec->addTempDirectory (_config.getHttpTempDir (), checkPeriod);
-
-				// Can be shared between threads because no state variables
-				ServerThreadExec* serverThreadExec = 
-				new ServerThreadExec (service);
-			    
-				for (int i=0; i<nb_threads; ++i) 
-				{
-				ManagedThread* serverThread = 
-					new ManagedThread (serverThreadExec,
-							   "tcp_" + Conversion::ToString (i), 
-							   100, true);
-				}
-					    
-				// Create the cleaner thread (check every 5s)
-				/* buggé !! ManagedThread* cleanerThread = 
-				   new ManagedThread (cleanerExec,
-				   "cleaner",
-				   5000, true);
-				*/
-
-				// cleanerThread->start ();
-				// cleanerThread->waitForReadyState ();
-			    
+				Log::GetInstance ().info ("HTTP Server is listening on port " + port +" by at least "+ lexical_cast<string>(threadsNumber) + " threads ...");
 			}
 			
 			catch (std::exception& ex)
@@ -217,12 +180,14 @@ namespace synthese
 			const HTTPRequest& req,
 			HTTPReply& rep
 		){
-			Log::GetInstance ().debug ("Received request : " + 
-				req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)");
-	
 			try
 			{
+				Log::GetInstance ().debug ("Received request : " + 
+					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" + (req.postData.empty() ? string() : " + "+ lexical_cast<string>(req.postData.size()) +" bytes of POST data : "+ req.postData.substr(0, 100) ) );
+
+				SetCurrentThreadAnalysing(req.uri + (req.postData.empty() ? string() : " + "+ req.postData.substr(0, 100)));
 				Request request(req);
+
 				stringstream output;
 				request.run(output);
 				rep.status = HTTPReply::ok;
@@ -250,6 +215,12 @@ namespace synthese
 				Log::GetInstance().debug("Exception", e);
 				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
 			}
+			catch(thread_interrupted)
+			{
+				Log::GetInstance().debug("Current thread externally interrupted");
+				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
+				throw thread_interrupted();
+			}
 			catch(std::exception& e)
 			{
 				Log::GetInstance().debug("An unhandled exception has occured : " + std::string (e.what ()));
@@ -260,6 +231,8 @@ namespace synthese
 				Log::GetInstance().debug("An unhandled exception has occured.");
 				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
 			}
+
+			SetCurrentThreadWaiting();
 		}
 
 
@@ -305,6 +278,147 @@ namespace synthese
 		  return true;
 		}
 
+
+
+		const ServerModule::Threads& ServerModule::GetThreads()
+		{
+			return _threads;
+		}
+
+
+
+		void ServerModule::KillThread(const string& key)
+		{
+			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+			Threads::iterator it(_threads.find(key));
+			if(it == _threads.end()) return;
+			shared_ptr<thread> theThread(it->second.theThread);
+			_threads.erase(it);
+			theThread->interrupt();
+			Log::GetInstance ().info ("Attempted to kill the thread "+ key);
+			if(_threads.size() < lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)))
+			{
+				thread::id newId(AddHTTPThread());
+				Log::GetInstance ().info ("Create the thread "+ lexical_cast<string>(newId) +" because the minimum threads number was reached");
+			}
+		}
+
+
+
+		boost::thread::id ServerModule::AddHTTPThread()
+		{
+			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+			shared_ptr<thread> theThread(
+				new thread(
+					bind(&asio::io_service::run, &ServerModule::_io_service)
+			)	);
+			ThreadInfo info;
+			info.status = ThreadInfo::THREAD_WAITING;
+			info.theThread = theThread;
+			info.lastChangeTime = posix_time::microsec_clock::local_time();
+			_threads.insert(make_pair(lexical_cast<string>(theThread->get_id()), info));
+			++_waitingThreads;
+			return theThread->get_id();
+		}
+
+
+
+		void ServerModule::SetCurrentThreadAnalysing( const std::string& queryString )
+		{
+			try
+			{
+				recursive_mutex::scoped_lock lock(_threadManagementMutex);
+				ThreadInfo& info(GetCurrentThreadInfo());
+				if(info.status != ThreadInfo::THREAD_WAITING) return;
+				info.status = ThreadInfo::THREAD_ANALYSING_REQUEST;
+				info.queryString = queryString;
+				info.lastChangeTime = posix_time::microsec_clock::local_time();
+				--_waitingThreads;
+				if(_waitingThreads == 0)
+				{
+					AddHTTPThread();
+					Log::GetInstance ().info ("Raised HTTP threads number to "+ lexical_cast<string>(_threads.size()) +" due to pool saturation.");
+				}
+			}
+			catch (ThreadInfo::Exception& e)
+			{
+			}
+		}
+
+
+
+		ServerModule::ThreadInfo& ServerModule::GetCurrentThreadInfo()
+		{
+			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+			Threads::iterator it(_threads.find(lexical_cast<string>(this_thread::get_id())));
+			if(it == _threads.end()) throw ThreadInfo::Exception();
+			return it->second;
+		}
+
+
+
+		void ServerModule::SetCurrentThreadRunningAction()
+		{
+			try
+			{
+				recursive_mutex::scoped_lock lock(_threadManagementMutex);
+				ThreadInfo& info(GetCurrentThreadInfo());
+				info.status = ThreadInfo::THREAD_RUNNING_ACTION;
+				info.lastChangeTime = posix_time::microsec_clock::local_time();
+			}
+			catch (ThreadInfo::Exception& e)
+			{
+			}
+		}
+
+
+
+		void ServerModule::SetCurrentThreadRunningFunction()
+		{
+			try
+			{
+				recursive_mutex::scoped_lock lock(_threadManagementMutex);
+				ThreadInfo& info(GetCurrentThreadInfo());
+				info.status = ThreadInfo::THREAD_RUNNING_FUNCTION;
+				info.lastChangeTime = posix_time::microsec_clock::local_time();
+			}
+			catch (ThreadInfo::Exception& e)
+			{
+			}
+		}
+
+
+
+		void ServerModule::SetCurrentThreadWaiting()
+		{
+			try
+			{
+				recursive_mutex::scoped_lock lock(_threadManagementMutex);
+				ThreadInfo& info(GetCurrentThreadInfo());
+				if(info.status == ThreadInfo::THREAD_WAITING) return;
+				info.status = ThreadInfo::THREAD_WAITING;
+				info.lastChangeTime = posix_time::microsec_clock::local_time();
+				++_waitingThreads;
+			}
+			catch (ThreadInfo::Exception& e)
+			{
+			}
+		}
+
+
+
+		boost::recursive_mutex& ServerModule::GetThreadManagementMutex()
+		{
+			return _threadManagementMutex;
+		}
+
+
+
+
+		const char* ServerModule::ThreadInfo::Exception::what() const
+		{
+			return "Current thread is unregistered. Cannot retrieve thread info.";
+		}
 	}
 }
 

@@ -70,6 +70,7 @@ namespace synthese
 					// Loop on services
 					DateTime departureDateTime = _startDateTime;
 					int index(UNKNOWN_VALUE);
+					size_t insertedServices(0);
 					while(true)
 					{
 						ServicePointer servicePointer(
@@ -85,6 +86,8 @@ namespace synthese
 						_insert(servicePointer);
 						index = servicePointer.getServiceIndex() + 1;
 						departureDateTime = servicePointer.getActualDateTime();
+						++insertedServices;
+						if(insertedServices >= _maxSize) break;
 					}		
 				}
 			}

@@ -45,6 +45,8 @@
 
 #include <sstream>
 
+#include <boost/thread/thread.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -117,6 +119,7 @@ namespace synthese
 			// The Loop
 			while(!todo.empty())
 			{
+				this_thread::interruption_point();
 				shared_ptr<Journey> journey(todo.front());
 
 #ifdef DEBUG
@@ -266,6 +269,8 @@ namespace synthese
 					; itVertex != vam.getMap ().end ()
 					; ++itVertex
 				){
+					this_thread::interruption_point();
+
 					// Initialization of loop local variables
 					const Vertex* origin(itVertex->first);
 
@@ -299,6 +304,8 @@ namespace synthese
 						set<const Edge*> nonServedEdges;
 						while(true)
 						{
+							this_thread::interruption_point();
+
 							// Reach of the next/previous service serving the edge
 							DateTime departureMoment(correctedDesiredTime);
 							ServicePointer serviceInstance(
@@ -354,6 +361,8 @@ namespace synthese
 							for (const Edge* curEdge = (edge.*step) ();
 								curEdge != NULL; curEdge = (curEdge->*step) ())
 							{
+								this_thread::interruption_point();
+
 								// If the path traversal is only to find non served edges, analyse it only if
 								// it belongs to the list
 								if(nonServedEdgesSearch)

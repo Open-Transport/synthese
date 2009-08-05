@@ -31,6 +31,8 @@
 #include "Registrable.h"
 #include "GraphTypes.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace geometry
@@ -188,11 +190,11 @@ namespace synthese
 				*/
 				ServicePointer getNextService (
 					UserClassCode userClass,
-					time::DateTime departureMoment
-					, const time::DateTime& maxDepartureMoment
-					, bool controlIfTheServiceIsReachable
-					, int minNextServiceIndex = UNKNOWN_VALUE					
-					, bool inverted = false
+					time::DateTime departureMoment,
+					const time::DateTime& maxDepartureMoment,
+					bool controlIfTheServiceIsReachable,
+					boost::optional<int> minNextServiceIndex = boost::optional<int>(),
+					bool inverted = false
 				) const;
 
 			    
@@ -210,11 +212,11 @@ namespace synthese
 				*/
 				ServicePointer getPreviousService(
 					UserClassCode userClass,
-					time::DateTime arrivalMoment
-					, const time::DateTime& minArrivalMoment
-					, bool controlIfTheServiceIsReachable
-					, int maxPreviousServiceIndex = UNKNOWN_VALUE
-					, bool inverted = false
+					time::DateTime arrivalMoment,
+					const time::DateTime& minArrivalMoment,
+					bool controlIfTheServiceIsReachable,
+					boost::optional<int> maxPreviousServiceIndex = boost::optional<int>(),
+					bool inverted = false
 				) const;
 			    
 			//@}

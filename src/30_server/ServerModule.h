@@ -31,6 +31,9 @@
 
 #include <boost/asio.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "ModuleClassTemplate.hpp"
 #include "HTTPConnection.hpp"
@@ -62,7 +65,32 @@ namespace synthese
 			public ModuleClassTemplate<ServerModule>
 		{
 			friend class ModuleClassTemplate<ServerModule>;
+
 		public:
+			struct ThreadInfo
+			{
+				typedef enum
+				{
+					THREAD_WAITING,
+					THREAD_ANALYSING_REQUEST,
+					THREAD_RUNNING_ACTION,
+					THREAD_RUNNING_FUNCTION,
+					THREAD_OTHER
+				} Status;
+
+				class Exception : public std::exception
+				{
+				public:
+					const char* what() const;
+				};
+
+				boost::shared_ptr<boost::thread> theThread;
+				Status status;
+				std::string queryString;
+				boost::posix_time::ptime lastChangeTime;
+			};
+
+			typedef std::map<std::string, ThreadInfo> Threads;
 
 		    //! DbModule parameters
 		    static const std::string MODULE_PARAM_PORT;
@@ -87,8 +115,22 @@ namespace synthese
 			/// The next connection to be accepted.
 			static connection_ptr _new_connection;
 
+			// Threads
+			static Threads _threads;
+			static std::size_t _waitingThreads;
+			static boost::recursive_mutex _threadManagementMutex;
 
 		public:
+			static boost::thread::id AddHTTPThread();
+			static void KillThread(const std::string& key);
+			static const Threads& GetThreads();
+			static void SetCurrentThreadAnalysing(const std::string& queryString);
+			static void SetCurrentThreadRunningAction();
+			static void SetCurrentThreadRunningFunction();
+			static void SetCurrentThreadWaiting();
+			static ThreadInfo& GetCurrentThreadInfo();
+			static boost::recursive_mutex& GetThreadManagementMutex();
+
 			static SessionMap& getSessions();
 			
 			/** Called whenever a parameter registered by this module is changed

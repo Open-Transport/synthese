@@ -27,6 +27,8 @@
 #include "Vertex.h"
 #include "Schedule.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace time;
@@ -250,11 +252,11 @@ namespace synthese
 
 		ServicePointer Edge::getNextService(
 			UserClassCode userClass,
-			DateTime departureMoment
-			, const DateTime& maxDepartureMoment
-			, bool controlIfTheServiceIsReachable
-			, int minNextServiceIndex
-			, bool inverted
+			DateTime departureMoment,
+			const DateTime& maxDepartureMoment,
+			bool controlIfTheServiceIsReachable,
+			optional<int> minNextServiceIndex,
+			bool inverted
 		) const	{
 			// Search schedule
 			int next(getDepartureFromIndex (departureMoment.getHours ()));
@@ -262,8 +264,8 @@ namespace synthese
 			if ( next == UNKNOWN_VALUE )
 				next = getParentPath ()->getServices().size();
 
-			if (minNextServiceIndex > next )
-				next = minNextServiceIndex;
+			if (minNextServiceIndex && *minNextServiceIndex > next )
+				next = *minNextServiceIndex;
 
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
@@ -313,16 +315,16 @@ namespace synthese
 
 		ServicePointer Edge::getPreviousService(
 			UserClassCode userClass,
-			DateTime arrivalMoment
-			, const DateTime& minArrivalMoment
-			, bool controlIfTheServiceIsReachable
-			, int maxPreviousServiceIndex
-			, bool inverted
+			DateTime arrivalMoment,
+			const DateTime& minArrivalMoment,
+			bool controlIfTheServiceIsReachable,
+			optional<int> maxPreviousServiceIndex,
+			bool inverted
 		) const	{
 			int previous(getArrivalFromIndex (arrivalMoment.getHours ()));
 
-			if (maxPreviousServiceIndex != UNKNOWN_VALUE && maxPreviousServiceIndex < previous)
-				previous = maxPreviousServiceIndex;
+			if (maxPreviousServiceIndex && *maxPreviousServiceIndex < previous)
+				previous = *maxPreviousServiceIndex;
 
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{

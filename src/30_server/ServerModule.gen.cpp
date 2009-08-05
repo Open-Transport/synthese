@@ -5,6 +5,7 @@ synthese::server::LoginInterfacePage::integrate();
 
 synthese::server::LoginAction::integrate();
 synthese::server::LogoutAction::integrate();
+synthese::server::ThreadKillAction::integrate();
 
 synthese::server::HtmlFormInterfaceElement::integrate();
 synthese::server::LogoutHTMLLinkInterfaceElement::integrate();
@@ -17,3 +18,7 @@ synthese::server::HtmlFormFieldInterfaceElement::integrate();
 synthese::server::ServerModuleVersionInterfaceElement::integrate();
 
 synthese::server::DbModuleConfigTableSync::integrate();
+
+synthese::server::ServerAdminRight::integrate();
+
+synthese::server::ThreadsAdmin::integrate();

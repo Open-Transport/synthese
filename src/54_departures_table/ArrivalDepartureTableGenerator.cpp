@@ -128,7 +128,7 @@ namespace synthese
 				}
 			}
 			// Add the ending stop
-			if(arrivals.empty() || *(arrivals.end()-1) != place)
+			if(*(arrivals.end()-1) != place || arrivals.size() <= 1)
 			{
 				arrivals.push_back(place);
 			}

@@ -188,7 +188,7 @@ namespace synthese
 
 		bool AlarmTestOnDisplayScreenFunction::_isAuthorized(
 		) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(READ);
+			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		std::string AlarmTestOnDisplayScreenFunction::getOutputMimeType() const
