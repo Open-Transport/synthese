@@ -300,7 +300,7 @@ namespace synthese
 						assert(itEdge.second);
 						const Edge& edge(*itEdge.second);
 
-						int serviceNumber(UNKNOWN_VALUE);
+						optional<int> serviceNumber;
 						set<const Edge*> nonServedEdges;
 						while(true)
 						{
