@@ -62,7 +62,7 @@ namespace synthese
 		ParametersMap DisplayScreenContentRequest::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_DATE, _date);
+			if(_date) map.insert(PARAMETER_DATE, *_date);
 			if(_screen.get()) map.insert(Request::PARAMETER_OBJECT_ID, _screen->getKey());
 			return map;
 		}
@@ -101,9 +101,10 @@ namespace synthese
 					throw RequestException("Not a display screen nor a connection place");
 
 				// Date
-				_date = map.getDateTime(PARAMETER_DATE, false, FACTORY_KEY);
-				if (_date.isUnknown())
-					_date = DateTime(TIME_CURRENT);
+				if(map.getOptional<string>(PARAMETER_DATE))
+				{
+					_date = map.getDateTime(PARAMETER_DATE, false, FACTORY_KEY);
+				}
 			}
 			catch (ObjectNotFoundException<DisplayScreen> e)
 			{
@@ -113,13 +114,7 @@ namespace synthese
 
 		void DisplayScreenContentRequest::_run( std::ostream& stream ) const
 		{
-			_screen->display(stream, _date);
-		}
-
-		DisplayScreenContentRequest::DisplayScreenContentRequest()
-			: _date(TIME_CURRENT)
-		{
-	
+			_screen->display(stream, _date ? *_date : DateTime(TIME_CURRENT));
 		}
 
 
