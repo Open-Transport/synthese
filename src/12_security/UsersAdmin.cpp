@@ -224,7 +224,7 @@ namespace synthese
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getName());
 				stream << t.col() << user->getProfile()->getName();
 				stream << t.col() << userRequest.getHTMLForm().getLinkButton("Ouvrir") << "&nbsp;"
-					<< deleteUserRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer l\\'utilisateur " + user->getLogin() + " ?");
+					<< deleteUserRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer l'utilisateur " + user->getLogin() + " ?");
 			}
 
 			stream << t.row();

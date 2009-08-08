@@ -229,7 +229,7 @@ namespace synthese
 						HTMLModule::getHTMLImage("bullet_white.png", "Non affiché")
 					)
 				;
-				stream << t.col() << HTMLModule::getLinkButton(string(), "Supprimer", "Etes-vous sûr de vouloir supprimer l\\'arrêt ?");
+				stream << t.col() << HTMLModule::getLinkButton(string(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
 			}
 			stream << t.row(Conversion::ToString(UNKNOWN_VALUE));
 			stream << t.col();
