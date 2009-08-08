@@ -132,6 +132,7 @@ namespace synthese
 					const graph::Edge& arrivalEdge,
 					graph::UserClassCode userClass
 				) const;
+				virtual void clearNonConcurrencyCache() const;
 
 
 				/** Tests if the service could be inserted in the same line than the current one, according to the line theory.

@@ -373,5 +373,24 @@ namespace synthese
 			return _cpu == static_cast<const DisplayScreenCPUAdmin&>(other)._cpu;
 		}
 
+
+
+		AdminInterfaceElement::PageLinks DisplayScreenCPUAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+
+			DisplayScreenTableSync::SearchResult screens(
+				DisplayScreenTableSync::SearchFromCPU(_getEnv(), _cpu->getKey())
+			);
+			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+			{
+				shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
+				p->setScreen(screen);
+				AddToLinks(links, p);
+			}
+
+			return links;
+		}
+
 	}
 }

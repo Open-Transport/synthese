@@ -24,6 +24,10 @@
 #include "Registry.h"
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
+#include "Path.h"
+#include "Service.h"
+
+#include <boost/foreach.hpp>
 
 using namespace boost;
 
@@ -183,6 +187,14 @@ namespace synthese
 			if(it != _nonConcurrencyRules.end()) return;
 
 			_nonConcurrencyRules.insert(rule);
+
+			BOOST_FOREACH(const Path* path, _paths)
+			{
+				BOOST_FOREACH(const Service* service, path->getServices())
+				{
+					service->clearNonConcurrencyCache();
+				}
+			}
 		}
 
 
@@ -195,6 +207,14 @@ namespace synthese
 			if(it == _nonConcurrencyRules.end()) return;
 			
 			_nonConcurrencyRules.erase(it);
+
+			BOOST_FOREACH(const Path* path, _paths)
+			{
+				BOOST_FOREACH(const Service* service, path->getServices())
+				{
+					service->clearNonConcurrencyCache();
+				}
+			}
 		}
 
 

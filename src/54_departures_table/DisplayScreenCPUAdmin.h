@@ -109,6 +109,10 @@ namespace synthese
 			*/
 			virtual std::string getTitle() const;
 			
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 			

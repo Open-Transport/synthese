@@ -37,9 +37,12 @@
 #include "TridentExportFunction.h"
 #include "AdminInterfaceElement.h"
 #include "AdminFunctionRequest.hpp"
-
+#include "NonConcurrencyRuleAddAction.h"
+#include "NonConcurrencyRuleRemoveAction.h"
 #include "AdminParametersException.h"
 #include "SearchFormHTMLTable.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "ActionResultHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -231,25 +234,67 @@ namespace synthese
 			// TAB NON CONCURRENCY
 			if (openTabContent(stream, TAB_NON_CONCURRENCY))
 			{
+				AdminActionFunctionRequest<NonConcurrencyRuleAddAction,CommercialLineAdmin> addRequest(_request);
+				addRequest.getAction()->setHiddenLine(_cline);
+				AdminActionFunctionRequest<NonConcurrencyRuleRemoveAction, CommercialLineAdmin> removeRequest(_request);
+				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
+
 				stream << "<h1>Lignes prioritaires</h1>";
 
 				NonConcurrencyRuleTableSync::SearchResult rules(NonConcurrencyRuleTableSync::Search(_getEnv(), _cline->getKey()));
-				HTMLTable::ColsVector cols;
-				cols.push_back("Réseau");
-				cols.push_back("Ligne");
-				cols.push_back("Délai");
-				cols.push_back("Action");
-				HTMLTable t(cols, ResultHTMLTable::CSS_CLASS);
+				ActionResultHTMLTable::HeaderVector cols;
+				cols.push_back(make_pair(string(),"Réseau"));
+				cols.push_back(make_pair(string(),"Ligne"));
+				cols.push_back(make_pair(string(),"Délai"));
+				cols.push_back(make_pair(string(),"Action"));
+				
+				ActionResultHTMLTable t(
+					cols,
+					searchRequest.getHTMLForm(),
+					_requestParameters,
+					rules,
+					addRequest.getHTMLForm("create")
+				);
+
 				stream << t.open();
 
 				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, rules)
 				{
+					removeRequest.getAction()->setRule(const_pointer_cast<const NonConcurrencyRule>(rule));
+
 					stream << t.row();
 					stream << t.col() << rule->getPriorityLine()->getNetwork()->getName();
 					stream << t.col(1, rule->getPriorityLine()->getStyle()) << rule->getPriorityLine()->getShortName();
 					stream << t.col() << rule->getDelay().minutes();
-					stream << t.col() << "Supprimer";
+					stream << t.col() <<
+						HTMLModule::getLinkButton(
+							removeRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer la règle de non concurrence avec la ligne " + rule->getPriorityLine()->getShortName() + " ?",
+							"lock_delete.png"
+						)
+					;
 				}
+
+				stream << t.row();
+				stream << t.col(2);
+				stream << t.getActionForm().getSelectInput(
+					NonConcurrencyRuleAddAction::PARAMETER_PRIORITY_LINE_ID,
+					EnvModule::getCommercialLineLabels(
+						_request.getUser()->getProfile()->getRightsForModuleClass<TransportNetworkRight>(),
+						_request.getUser()->getProfile()->getGlobalPublicRight<TransportNetworkRight>() >= READ,
+						READ
+					),
+					RegistryKeyType(UNKNOWN_VALUE)
+				);
+				stream << t.col() <<
+					t.getActionForm().getSelectNumberInput(
+					NonConcurrencyRuleAddAction::PARAMETER_DURATION,
+					0, 120
+					);
+
+				stream << t.col() <<
+					t.getActionForm().getSubmitButton("Ajouter");
 
 				stream << t.close();
 			}

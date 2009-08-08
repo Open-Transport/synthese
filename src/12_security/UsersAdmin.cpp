@@ -267,7 +267,7 @@ namespace synthese
 			if(ua)
 			{
 				shared_ptr<UserAdmin> p(getNewOtherPage<UserAdmin>());
-				p->setUser(ua->getUser());
+				p->setUserC(ua->getUser());
 				AddToLinks(links, p);
 			}
 			

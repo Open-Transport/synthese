@@ -771,7 +771,7 @@ namespace synthese
 				shared_ptr<BookableCommercialLineAdmin> p(
 					getNewOtherPage<BookableCommercialLineAdmin>()
 				);
-				p->setCommercialLine(_line);
+				p->setCommercialLineC(_line);
 				p->_serviceNumber = ba->_serviceNumber;
 
 				AddToLinks(links, p);
@@ -797,6 +797,13 @@ namespace synthese
 				!request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL) &&
 				request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string())
 			;
+		}
+
+
+
+		void BookableCommercialLineAdmin::setCommercialLineC( boost::shared_ptr<const env::CommercialLine> value )
+		{
+			_line = value;
 		}
 	}
 }

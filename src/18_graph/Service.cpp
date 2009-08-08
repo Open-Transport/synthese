@@ -180,5 +180,12 @@ namespace synthese
 		{
 			return true;
 		}
+
+
+
+		void Service::clearNonConcurrencyCache() const
+		{
+
+		}
 	}
 }

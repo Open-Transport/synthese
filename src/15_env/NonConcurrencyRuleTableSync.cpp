@@ -135,9 +135,9 @@ namespace synthese
 			query <<
 				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
 				object->getKey() << "," <<
-				object->getPriorityLine() << "," <<
-				object->getHiddenLine() << "," <<
-				object->getDelay() <<
+				object->getPriorityLine()->getKey() << "," <<
+				object->getHiddenLine()->getKey() << "," <<
+				object->getDelay().minutes() <<
 			")";
 			sqlite->execUpdate(query.str());
 		}

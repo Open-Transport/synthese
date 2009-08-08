@@ -992,7 +992,7 @@ namespace synthese
 
 		std::string DisplayAdmin::getTitle() const
 		{
-			return _displayScreen.get() ? _displayScreen->getFullName() : DEFAULT_TITLE;
+			return _displayScreen.get() ? _displayScreen->getLocalizationComment() : DEFAULT_TITLE;
 		}
 
 

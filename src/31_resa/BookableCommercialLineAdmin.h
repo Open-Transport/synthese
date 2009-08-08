@@ -71,6 +71,7 @@ namespace synthese
 			
 			void setServiceNumber(const boost::optional<std::string>& value);
 			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
+			void setCommercialLineC(boost::shared_ptr<const env::CommercialLine> value);
 			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
 			const boost::optional<std::string>& getServiceNumber() const;
 

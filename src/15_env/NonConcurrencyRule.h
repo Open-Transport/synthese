@@ -52,7 +52,7 @@ namespace synthese
 
 		public:
 			NonConcurrencyRule(
-				util::RegistryKeyType key
+				util::RegistryKeyType key = UNKNOWN_VALUE
 			);
 
 			CommercialLine* getPriorityLine()	const;

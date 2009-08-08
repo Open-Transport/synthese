@@ -80,7 +80,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::ICON("computer.png");
-		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::DEFAULT_TITLE("Equipements");
+		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::DEFAULT_TITLE("Recherche d'équipements");
 	}
 
 	namespace departurestable
@@ -157,7 +157,7 @@ namespace synthese
 					, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 					, READ
 					, UNKNOWN_VALUE
-					, _place ? (*_place ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
+					, _place ? (_place->get() ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
 					, _searchLineId
 					, _searchTypeId
 					, _searchCity
@@ -539,7 +539,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
@@ -547,36 +547,15 @@ namespace synthese
 			// General search page
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
-				const DisplaySearchAdmin* sa(
-					dynamic_cast<const DisplaySearchAdmin*>(currentPage.get())
-				);
-				
 				// General search
-				if(	sa &&
-					!sa->_place
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<DisplaySearchAdmin> p(getNewOtherPage<DisplaySearchAdmin>());
-					p->_place = optional<shared_ptr<const PublicTransportStopZoneConnectionPlace> >();
-					AddToLinks(links, p);
-				}
+				shared_ptr<DisplaySearchAdmin> p1(getNewOtherPage<DisplaySearchAdmin>());
+				p1->_place = optional<shared_ptr<const PublicTransportStopZoneConnectionPlace> >();
+				AddToLinks(links, p1);
 			
 				// Stock
-				if(	sa &&
-					sa->_place &&
-					!sa->_place->get()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<DisplaySearchAdmin> p(getNewOtherPage<DisplaySearchAdmin>());
-					p->_place = shared_ptr<const PublicTransportStopZoneConnectionPlace>();
-					AddToLinks(links, p);
-				}
+				shared_ptr<DisplaySearchAdmin> p2(getNewOtherPage<DisplaySearchAdmin>());
+				p2->_place = shared_ptr<const PublicTransportStopZoneConnectionPlace>();
+				AddToLinks(links, p2);
 			}
 			
 			return links;
@@ -585,30 +564,49 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 		
 			AdminInterfaceElement::PageLinks links;
 
-			if(	!_place || !_place->get())
-			{
-				const DisplayAdmin* da(
-					dynamic_cast<const DisplayAdmin*>(currentPage.get())
-				);
-				const DisplayScreenCPUAdmin* ca(
-					dynamic_cast<const DisplayScreenCPUAdmin*>(currentPage.get())
-				);
-				
-				if(	(	da &&
-						(	(da->getScreen()->getLocalization() && !_place) ||
-							(!da->getScreen()->getLocalization() && _place)
-					)	) ||
-					(	ca &&
-						(	(ca->getCPU()->getPlace() && !_place) ||
-							(!ca->getCPU()->getPlace() && _place)
-				)	)	){
-					AddToLinks(links, currentPage);
+			const DisplaySearchAdmin* sa(dynamic_cast<const DisplaySearchAdmin*>(&currentPage));
+			const DisplayAdmin* da(dynamic_cast<const DisplayAdmin*>(&currentPage));
+			const DisplayScreenCPUAdmin* ca(dynamic_cast<const DisplayScreenCPUAdmin*>(&currentPage));
+
+			if( _place &&
+				(	sa && sa->_place == _place ||	
+					da && da->getScreen()->getLocalization() == _place->get() ||
+					ca && ca->getCPU()->getPlace() == _place->get()
+			)	){
+				DisplayScreenTableSync::SearchResult screens(
+					DisplayScreenTableSync::Search(
+						_getEnv(),
+						request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+						, request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+						, READ
+						, UNKNOWN_VALUE
+						, _place->get() ? (*_place)->getKey() : 0
+				)	);
+				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+				{
+					if(screen->getCPU()) continue;
+					shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
+					p->setScreen(screen);
+					AddToLinks(links, p);
+				}
+
+				DisplayScreenCPUTableSync::SearchResult cpus(
+					DisplayScreenCPUTableSync::Search(
+						_getEnv(),
+						_place->get() ? (*_place)->getKey() : 0,
+						optional<string>()
+				)	);
+				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, cpus)
+				{
+					shared_ptr<DisplayScreenCPUAdmin> p(getNewOtherPage<DisplayScreenCPUAdmin>());
+					p->setCPU(cpu);
+					AddToLinks(links, p);
 				}
 			}
 			

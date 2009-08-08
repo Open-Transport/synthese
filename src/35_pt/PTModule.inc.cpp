@@ -10,6 +10,8 @@
 #include "PTUseRuleTableSync.h"
 #include "PTModule.h"
 #include "NavteqWithProjectionFileFormat.h"
+#include "NonConcurrencyRuleAddAction.h"
+#include "NonConcurrencyRuleRemoveAction.h"
 
 // Registries
 

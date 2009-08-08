@@ -10,6 +10,8 @@ synthese::pt::ServiceDateTableSync::integrate();
 synthese::pt::PTUseRuleTableSync::integrate();
 synthese::pt::PTModule::integrate();
 synthese::pt::NavteqWithProjectionFileFormat::integrate();
+synthese::pt::NonConcurrencyRuleAddAction::integrate();
+synthese::pt::NonConcurrencyRuleRemoveAction::integrate();
 
 // Registries
 

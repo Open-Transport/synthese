@@ -49,12 +49,12 @@ namespace synthese
 			, const void* rootObject /*= NULL*/,
 			const server::Request* request /*= NULL*/ ) const
 		{
-			const shared_ptr<const AdminInterfaceElement>* aie = static_cast<const shared_ptr<const AdminInterfaceElement>* >(rootObject);
-			assert(aie != NULL && aie->get() != NULL);
+			const AdminInterfaceElement* aie = static_cast<const AdminInterfaceElement*>(rootObject);
+			assert(aie != NULL);
 
-			if(aie != NULL && aie->get() != NULL)
+			if(aie != NULL)
 			{
-				(*aie)->display(
+				aie->display(
 					stream,
 					variables,
 					static_cast<const FunctionRequest<AdminRequest>&>(*request)

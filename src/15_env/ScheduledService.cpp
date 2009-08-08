@@ -402,5 +402,13 @@ namespace synthese
 		{
 			return static_cast<const Line*>(getPath());
 		}
+
+
+
+		void ScheduledService::clearNonConcurrencyCache() const
+		{
+			recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
+			_nonConcurrencyCache.clear();
+		}
 	}
 }

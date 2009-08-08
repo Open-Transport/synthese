@@ -106,6 +106,8 @@ namespace synthese
 					graph::UserClassCode userClass
 				) const;
 
+				virtual void clearNonConcurrencyCache() const;
+
 				graph::UseRule::ReservationAvailabilityType getReservationAbility(
 					const time::Date& date
 				) const;
