@@ -26,6 +26,7 @@
 #include "GraphTypes.h"
 #include "GraphConstants.h"
 
+#include <string>
 #include <boost/optional.hpp>
 
 namespace synthese
