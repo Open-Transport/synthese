@@ -366,11 +366,11 @@ namespace synthese
 			result = _seconds + retain * 60 - op2._seconds;
 
 			// 1: Minutes
-			retain = ( 3599 + op2._minutes -_minutes) / 3600;
-			result += 60 * (_minutes + retain * 3600 - op2._minutes);
+			int retain2 = ( 3599 + op2._minutes -_minutes) / 3600;
+			result += 60 * (_minutes + retain2 * 3600 - op2._minutes - retain);
 
 			// 2: Hours
-			result += 3600 * (_hours - op2._hours - retain );
+			result += 3600 * (_hours - op2._hours - retain2 );
 
 			return result;
 		}
