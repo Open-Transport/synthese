@@ -77,14 +77,12 @@ namespace synthese
 			, std::string cityName = std::string()
 			, std::string placeName = std::string()
 			, BroadcastPointsPresence bpPresence = WITH_OR_WITHOUT_ANY_BROADCASTPOINT
-			, BroadcastPointsPresence cpuPresence = WITH_OR_WITHOUT_ANY_BROADCASTPOINT
-			, uid lineId = UNKNOWN_VALUE
+			, boost::optional<util::RegistryKeyType> lineId = boost::optional<util::RegistryKeyType>()
 			, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 			, int first = 0
 			, bool orderByCity = true
 			, bool orderByName = false
 			, bool orderByNumber = false
-			, bool orderByCPUNumber = false
 			, bool raisingOrder = true
 		);
 

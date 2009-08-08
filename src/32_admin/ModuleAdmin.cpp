@@ -108,7 +108,7 @@ namespace synthese
 			stream << "<ul>";
 
 			FunctionRequest<AdminRequest> r(&_request);
-			AdminInterfaceElement::PageLinks links(getSubPages(shared_from_this(), _request));
+			AdminInterfaceElement::PageLinks links(getSubPages(*this, _request));
 			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> page, links)
 			{
 				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(page));
@@ -127,7 +127,7 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			

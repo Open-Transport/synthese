@@ -183,5 +183,9 @@ namespace synthese
 			return _calendar;
 		}
 		
+		bool CalendarTemplateAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _calendar == static_cast<const CalendarTemplateAdmin&>(other)._calendar;
+		}
 	}
 }

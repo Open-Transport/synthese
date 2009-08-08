@@ -113,6 +113,9 @@ namespace synthese
 			
 			void setUser(boost::shared_ptr<security::User> value);
 			void setUser(boost::shared_ptr<const security::User> value);
+			boost::shared_ptr<const security::User> getUser() const;
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
 	}
 }

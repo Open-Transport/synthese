@@ -53,7 +53,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	
-	template<> const std::string util::FactorableTemplate<ModuleClass, ServerModule>::FACTORY_KEY("999_server");
+	template<> const std::string util::FactorableTemplate<ModuleClass, ServerModule>::FACTORY_KEY("15_server");
 
     namespace server
     {
@@ -71,7 +71,7 @@ namespace synthese
 		const std::string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
 		const std::string ServerModule::MODULE_PARAM_TMP_DIR ("tmp_dir");
 
-		const std::string ServerModule::VERSION("3.1.7");
+		const std::string ServerModule::VERSION("3.1.8");
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
@@ -90,12 +90,9 @@ namespace synthese
 		{
 			try 
 			{
-	
 				// Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
 				string address("0.0.0.0");
 				string port(GetParameter(ServerModule::MODULE_PARAM_PORT));
-				size_t threadsNumber(lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)));
-				
 				
 				asio::ip::tcp::resolver resolver(ServerModule::_io_service);
 				asio::ip::tcp::resolver::query query(address, port);
@@ -109,14 +106,6 @@ namespace synthese
 					ServerModule::_new_connection->socket(),
 					bind(&ServerModule::HandleAccept, asio::placeholders::error)
 				);
-	
-				// Create a pool of threads to run all of the io_services.
-				for (std::size_t i = 0; i < threadsNumber; ++i)
-				{
-					ServerModule::AddHTTPThread();
-				}
-	
-				Log::GetInstance ().info ("HTTP Server is listening on port " + port +" by at least "+ lexical_cast<string>(threadsNumber) + " threads ...");
 			}
 			
 			catch (std::exception& ex)
@@ -129,6 +118,17 @@ namespace synthese
 			}
 		}
 
+
+		void ServerModule::RunHTTPServer()
+		{
+			// Create a pool of threads to run all of the io_services.
+			ServerModule::KillAllThreads();
+	
+			Log::GetInstance().info(
+				"HTTP Server is now listening on port " + GetParameter(ServerModule::MODULE_PARAM_PORT) +
+				" by at least "+ GetParameter(ServerModule::MODULE_PARAM_NB_THREADS) + " threads ..."
+			);
+		}
 
 
 		template<> void ModuleClassTemplate<ServerModule>::End()
@@ -287,7 +287,7 @@ namespace synthese
 
 
 
-		void ServerModule::KillThread(const string& key)
+		void ServerModule::KillThread(const string& key, bool autoRestart)
 		{
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
 			Threads::iterator it(_threads.find(key));
@@ -296,10 +296,54 @@ namespace synthese
 			_threads.erase(it);
 			theThread->interrupt();
 			Log::GetInstance ().info ("Attempted to kill the thread "+ key);
-			if(_threads.size() < lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)))
+			if(autoRestart && _threads.size() < lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)))
 			{
 				thread::id newId(AddHTTPThread());
 				Log::GetInstance ().info ("Create the thread "+ lexical_cast<string>(newId) +" because the minimum threads number was reached");
+			}
+		}
+
+
+
+		void ServerModule::KillAllThreads(bool autoRestart)
+		{
+			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+			vector<string> threadsId;
+			BOOST_FOREACH(const ServerModule::Threads::value_type it, _threads)
+			{
+				threadsId.push_back(it.first);
+			}
+			BOOST_FOREACH(const string& threadId, threadsId)
+			{
+				ServerModule::KillThread(threadId, false);
+			}
+			
+			if(autoRestart)
+			{
+				size_t threadsNumber(lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)));
+				for (std::size_t i = 0; i < threadsNumber; ++i)
+				{
+					ServerModule::AddHTTPThread();
+				}
+			}
+			else
+			{
+				Log::GetInstance ().info ("HTTP Server is now stopped.");
+			}
+		}
+
+
+		void ServerModule::Wait()
+		{
+			while(true)
+			{
+				shared_ptr<thread> theThread;
+				{
+					recursive_mutex::scoped_lock lock(_threadManagementMutex);
+					if(_threads.empty()) break;
+					theThread = _threads.begin()->second.theThread;
+				}
+				theThread->join();
 			}
 		}
 

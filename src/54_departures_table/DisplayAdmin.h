@@ -206,6 +206,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 
 			virtual std::string getTitle() const;
 

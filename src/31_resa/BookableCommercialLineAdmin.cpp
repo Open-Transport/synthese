@@ -94,7 +94,8 @@ namespace synthese
 		BookableCommercialLineAdmin::BookableCommercialLineAdmin()
 			: AdminInterfaceElementTemplate<BookableCommercialLineAdmin>(),
 			_date(TIME_UNKNOWN),
-			_hideOldServices(false)
+			_hideOldServices(false),
+			_displayCancelled(false)
 		{ }
 		
 		void BookableCommercialLineAdmin::setFromParametersMap(
@@ -753,11 +754,11 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			const BookableCommercialLineAdmin* ba(
-				dynamic_cast<const BookableCommercialLineAdmin*>(currentPage.get())
+				dynamic_cast<const BookableCommercialLineAdmin*>(&currentPage)
 			);
 			
 			PageLinks links;
@@ -767,13 +768,28 @@ namespace synthese
 				ba->_line == _line &&
 				ba->_serviceNumber
 			){
-				AddToLinks(links, currentPage);
+				shared_ptr<BookableCommercialLineAdmin> p(
+					getNewOtherPage<BookableCommercialLineAdmin>()
+				);
+				p->setCommercialLine(_line);
+				p->_serviceNumber = ba->_serviceNumber;
+
+				AddToLinks(links, p);
 			}
 			
 			return links;
 		}
 
 
+		bool BookableCommercialLineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			const BookableCommercialLineAdmin& bother(static_cast<const BookableCommercialLineAdmin&>(other));
+			return
+				_line == bother._line &&
+				_serviceNumber == bother._serviceNumber
+			;
+		}
+		
 
 		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
 		{

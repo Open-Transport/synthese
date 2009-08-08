@@ -317,5 +317,11 @@ namespace synthese
 			return _timetable;
 		}
 
+
+		bool TimetableAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _timetable == static_cast<const TimetableAdmin&>(other)._timetable;
+		}
+			
 	}
 }

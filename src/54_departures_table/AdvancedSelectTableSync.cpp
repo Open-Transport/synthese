@@ -62,14 +62,12 @@ namespace synthese
 			, std::string cityName /*= ""*/
 			, std::string placeName /*= ""*/
 			, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
-			, BroadcastPointsPresence cpuPresence
-			, uid lineId /*= UNKNOWN_VALUE*/
+			, optional<RegistryKeyType> lineId /*= UNKNOWN_VALUE*/
 			, boost::optional<std::size_t> number /*=UNKNOWN_VALUE*/
 			, int first/*=0*/ 
 			, bool orderByCity
 			, bool orderByName
 			, bool orderByNumber
-			, bool orderByCPUNumber
 			, bool raisingOrder
 		){
 			stringstream query;
@@ -90,26 +88,18 @@ namespace synthese
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
 				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
-			if (lineId != UNKNOWN_VALUE)
-				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId;
+			if (lineId)
+				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << *lineId;
 			if (!cityName.empty())
 				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
 			if (!placeName.empty())
 				query << " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(placeName, false) << "%'";
 			if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
 			{
-				query << " AND bc ";
+				query << " AND bc+cc ";
 				if (bpPresence == AT_LEAST_ONE_BROADCASTPOINT)
 					query << ">0";
 				if (bpPresence == NO_BROADCASTPOINT)
-					query << "=0";
-			}
-			if (cpuPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
-			{
-				query << " AND cc ";
-				if (cpuPresence == AT_LEAST_ONE_BROADCASTPOINT)
-					query << ">0";
-				if (cpuPresence == NO_BROADCASTPOINT)
 					query << "=0";
 			}
 			// Grouping
@@ -127,10 +117,7 @@ namespace synthese
 			{
 				query << " ORDER BY bc" << (raisingOrder ? " ASC" : " DESC");
 			}
-			else if (orderByCPUNumber)
-			{
-				query << " ORDER BY cc" << (raisingOrder ? " ASC" : " DESC");
-			}
+			
 			// Limits
 			if (number)
 			{

@@ -82,11 +82,11 @@ namespace synthese
 
 			std::string displaySubPages(
 				const AdminInterfaceElement::PageLinksTree& pages,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage
-				, int level
-				, std::string prefix
-				, bool last
-				, const server::Request& request
+				const AdminInterfaceElement* currentPage,
+				int level,
+				std::string prefix,
+				bool last,
+				const server::Request& request
 			) const;
 
 

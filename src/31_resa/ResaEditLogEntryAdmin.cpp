@@ -205,5 +205,17 @@ namespace synthese
 		{
 			_entry = value;
 		}
+		
+		
+		boost::shared_ptr<const dblog::DBLogEntry> ResaEditLogEntryAdmin::getEntry() const
+		{
+			return _entry;
+		}
+		
+		bool ResaEditLogEntryAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _entry == static_cast<const ResaEditLogEntryAdmin&>(other)._entry;
+		}
+			
 	}
 }

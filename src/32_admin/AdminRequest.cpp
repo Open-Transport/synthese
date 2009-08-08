@@ -147,7 +147,7 @@ namespace synthese
 					);
 					aip->display(
 						stream,
-						&const_pointer_cast<const AdminInterfaceElement>(_page),
+						_page.get(),
 						static_cast<const FunctionRequest<AdminRequest>* >(_request)
 					);
 				}

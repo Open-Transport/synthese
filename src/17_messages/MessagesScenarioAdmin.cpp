@@ -317,14 +317,10 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
-			
-			const MessageAdmin* ma(
-				dynamic_cast<const MessageAdmin*>(currentPage.get())
-			);
 			
 			if (dynamic_cast<const SentScenario*>(_scenario.get()))
 			{
@@ -335,19 +331,11 @@ namespace synthese
 				)	);
 				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 				{
-					if(	ma &&
-						ma->getAlarm()->getKey() == alarm->getKey()
-					){
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<MessageAdmin> p(
-							getNewOtherPage<MessageAdmin>()
-						);
-						p->setMessage(alarm);
-						AddToLinks(links, p);
-					}
+					shared_ptr<MessageAdmin> p(
+						getNewOtherPage<MessageAdmin>()
+					);
+					p->setMessage(alarm);
+					AddToLinks(links, p);
 				}
 			}
 			else if (dynamic_cast<const ScenarioTemplate*>(_scenario.get()))
@@ -359,19 +347,11 @@ namespace synthese
 				)	);
 				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
 				{
-					if(	ma &&
-						ma->getAlarm()->getKey() == alarm->getKey()
-					){
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<MessageAdmin> p(
-							getNewOtherPage<MessageAdmin>()
-						);
-						p->setMessage(alarm);
-						AddToLinks(links, p);
-					}
+					shared_ptr<MessageAdmin> p(
+						getNewOtherPage<MessageAdmin>()
+					);
+					p->setMessage(alarm);
+					AddToLinks(links, p);
 				}
 			}
 
@@ -415,6 +395,12 @@ namespace synthese
 		void MessagesScenarioAdmin::setScenario(boost::shared_ptr<Scenario> value)
 		{
 			_scenario = const_pointer_cast<const Scenario>(value);
+		}
+	
+		bool MessagesScenarioAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			const MessagesScenarioAdmin& mother(static_cast<const MessagesScenarioAdmin&>(other));
+			return _scenario && mother._scenario && _scenario->getKey() == mother._scenario->getKey();
 		}
 	}
 }

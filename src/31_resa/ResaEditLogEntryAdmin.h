@@ -53,6 +53,7 @@ namespace synthese
 			ResaEditLogEntryAdmin();
 			
 			void setEntry(boost::shared_ptr<const dblog::DBLogEntry> value);
+			boost::shared_ptr<const dblog::DBLogEntry> getEntry() const;
 			
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -102,6 +103,10 @@ namespace synthese
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
+			
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+			
 		};
 	}
 }

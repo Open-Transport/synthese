@@ -86,62 +86,33 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks HomeAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			
-			const ModuleAdmin* ma(
-				dynamic_cast<const ModuleAdmin*>(currentPage.get())
-			);
-			const string moduleKey(
-				ma ?
-				ma->getModuleClass()->getFactoryKey() :
-				string()
-			);
-
 			vector<shared_ptr<ModuleClass> > modules(
 				Factory<ModuleClass>::GetNewCollection()
 			);
 			for(vector<shared_ptr<ModuleClass> >::const_reverse_iterator it(modules.rbegin()); it != modules.rend(); ++it)
 			{
-				shared_ptr<ModuleClass> module(*it);
-				if(	ma &&
-					moduleKey == module->getFactoryKey()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
+				shared_ptr<ModuleAdmin> link(
+					getNewOtherPage<ModuleAdmin>()
+				);
+				link->setModuleClass(
+					const_pointer_cast<const ModuleClass, ModuleClass>(*it)
+				);
+				if (!link->getSubPages(currentPage, request).empty())
 				{
-					shared_ptr<ModuleAdmin> link(
-						getNewOtherPage<ModuleAdmin>()
-					);
-					link->setModuleClass(
-						const_pointer_cast<const ModuleClass, ModuleClass>(module)
-					);
-					if (!link->getSubPages(currentPage, request).empty())
-					{
-						AddToLinks(links, link);
-					}
+					AddToLinks(links, link);
 				}
 			}
 
 			if(request.isAuthorized<SecurityRight>(UNKNOWN_RIGHT_LEVEL, READ, string()))
 			{
-				const UserAdmin* ua(
-					dynamic_cast<const UserAdmin*>(currentPage.get())
-					);
-				if(	ua &&
-					ua->getUser()->getKey() == request.getUser()->getKey()
-					){
-						AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<UserAdmin> userPage(getNewOtherPage<UserAdmin>());
-					userPage->setUserC(request.getUser());
-					AddToLinks(links, userPage);
-				}
+				shared_ptr<UserAdmin> userPage(getNewOtherPage<UserAdmin>());
+				userPage->setUserC(request.getUser());
+				AddToLinks(links, userPage);
 			}
 			
 			return links;

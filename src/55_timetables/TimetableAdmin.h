@@ -105,6 +105,9 @@ namespace synthese
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+			
 		};
 	}
 }

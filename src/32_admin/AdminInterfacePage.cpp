@@ -41,7 +41,7 @@ namespace synthese
 		
 		void AdminInterfacePage::display(
 			std::ostream& stream,
-			const boost::shared_ptr<const AdminInterfaceElement>* page,
+			const AdminInterfaceElement* page,
 			const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector parameters;
@@ -54,11 +54,11 @@ namespace synthese
 			VariablesMap vars;
 
 			InterfacePage::_display(
-				stream
-				, parameters
-				, vars
-				, (const void*) page
-				, request
+				stream,
+				parameters,
+				vars,
+				static_cast<const void*>(page),
+				request
 			);
 		}
 

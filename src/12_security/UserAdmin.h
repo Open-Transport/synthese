@@ -116,7 +116,6 @@ namespace synthese
 			
 			bool isAuthorized(
 				const server::FunctionRequest<admin::AdminRequest>& _request
-			
 			) const;
 
 			virtual std::string getTitle() const;

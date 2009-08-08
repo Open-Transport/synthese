@@ -22,15 +22,15 @@
 
 #include "AdminPagesTreeInterfaceElement.h"
 
-#include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
-#include "32_admin/HomeAdmin.h"
+#include "AdminParametersException.h"
+#include "AdminRequest.h"
+#include "HomeAdmin.h"
 
-#include "05_html/HTMLModule.h"
+#include "HTMLModule.h"
 
-#include "11_interfaces/ValueElementList.h"
+#include "ValueElementList.h"
 
-#include "30_server/FunctionRequest.h"
+#include "FunctionRequest.h"
 
 #include <sstream>
 
@@ -79,8 +79,8 @@ namespace synthese
 			const void* object /* = NULL */,
 			const server::Request* request /* = NULL */
 		) const {
-			const shared_ptr<const AdminInterfaceElement> page(
-				*(const shared_ptr<const AdminInterfaceElement>*) object
+			const AdminInterfaceElement* page(
+				static_cast<const AdminInterfaceElement*>(object)
 			);
 			
 			_lastLevelIndenter = _lastLevelIndenterVIE->getValue(parameters, variables, object, request);
@@ -112,10 +112,10 @@ namespace synthese
 
 		std::string AdminPagesTreeInterfaceElement::displaySubPages(
 			const AdminInterfaceElement::PageLinksTree& pages,
-			shared_ptr<const AdminInterfaceElement> currentPage
-			, int level
-			, string prefix
-			, bool last,
+			const AdminInterfaceElement* currentPage,
+			int level,
+			string prefix,
+			bool last,
 			const Request& request
 		) const {
 
@@ -154,7 +154,7 @@ namespace synthese
 
 			// Display current page
 			FunctionRequest<AdminRequest> r(&request);
-			if (pages.page == currentPage)
+			if (pages.page.get() == currentPage)
 			{
 				str <<
 					HTMLModule::getHTMLImage(

@@ -367,5 +367,11 @@ namespace synthese
 		{
 			return _cpu;
 		}
+		
+		bool DisplayScreenCPUAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _cpu == static_cast<const DisplayScreenCPUAdmin&>(other)._cpu;
+		}
+
 	}
 }

@@ -102,6 +102,9 @@ namespace synthese
 			virtual void _buildTabs(
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+			
 		};
 	}
 }

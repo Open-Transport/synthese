@@ -30,8 +30,6 @@
 #include "Factory.h"
 #include "ModuleClass.h"
 #include "DBModule.h"
-#include "01_util/threads/Thread.h"
-#include "01_util/threads/ThreadManager.h"
 
 #include <csignal>
 #include <string>
@@ -44,11 +42,13 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 // included auto generated code
 #include "includes.cpp.inc"
 
 using namespace boost;
+using namespace std;
 using namespace synthese::util;
 using namespace synthese::db;
 using namespace synthese::server;
@@ -58,6 +58,7 @@ namespace po = boost::program_options;
 
 boost::filesystem::path* pidFile (0);
 
+void quit();
 
 void sig_INT_handler(int sig)
 {
@@ -65,13 +66,16 @@ void sig_INT_handler(int sig)
     // This allows profiling info to be dumped.
     Log::GetInstance ().info ("Caught signal no. " + lexical_cast<string>(sig));
 
-    // Last chance cleaning actions can be added here as well ...
-    // Delete PID file
-	if(pidFile)
-	    boost::filesystem::remove (*pidFile);
+    quit();
+}
 
-    Log::GetInstance ().info ("Exit!");
-    exit (0);
+void sig_SEGV_handler(int sig)
+{
+    // Catch SIGSEGV and ignore it. We do not want the program to 
+    // die on a segmentation fault error
+    Log::GetInstance ().warn("Segmentation fault detected : restarting all threads.");
+
+	ServerModule::KillAllThreads();
 }
 
 #ifndef WIN32
@@ -81,7 +85,6 @@ void sig_PIPE_handler(int sig)
     // Catch SIGPIPE and ignore it. We do not want the program to 
     // die on a broken pipe error, which is well detected at socket level.
     Log::GetInstance ().info ("Ignoring broken pipe.");
-    
 }
 
 
@@ -93,18 +96,18 @@ pid_t daemonize ()
     pid = fork ();
     if (pid < 0)
     {
-	Log::GetInstance ().fatal ("fork() failed !");
-	exit (1);
+		Log::GetInstance ().fatal ("fork() failed !");
+		exit (1);
     }
     if (pid > 0) 
     {
-	// Wait for PID file to exist
-	while ((pidFile == 0) || boost::filesystem::exists (*pidFile) == false)
-	{
-	    Thread::Sleep (100);
+		// Wait for PID file to exist
+		while ((pidFile == 0) || boost::filesystem::exists (*pidFile) == false)
+		{
+			this_thread::sleep(posix_time::milliseconds(100));
+		}
+		exit(0);
 	}
-	exit (0);
-    }
     
     umask(022);
     if (setsid () < 0)
@@ -124,8 +127,7 @@ pid_t daemonize ()
 
 #endif
 
-void 
-ensureWritablePath (const boost::filesystem::path& path, bool removeOnSuccess)
+void ensureWritablePath (const boost::filesystem::path& path, bool removeOnSuccess)
 {
     std::ofstream tos (path.string ().c_str (), std::ios_base::app);
     if (tos.good () == false)
@@ -141,13 +143,35 @@ ensureWritablePath (const boost::filesystem::path& path, bool removeOnSuccess)
 }
 
 
-boost::filesystem::path 
-createCompletePath (const std::string& s)
+filesystem::path createCompletePath (const std::string& s)
 {
     boost::filesystem::path path (s, boost::filesystem::native);
     return boost::filesystem::complete (path, boost::filesystem::initial_path());
 }
 
+
+void quit()
+{
+	// End all threads
+	ServerModule::KillAllThreads(false);
+	
+	// Terminate all modules
+	vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
+	BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
+	{
+		Log::GetInstance ().info ("Terminating module " + module->getFactoryKey() + "...");
+		module->end();
+	}
+
+    // Last chance cleaning actions can be added here as well ...
+    // Delete PID file
+	if(pidFile)
+	    boost::filesystem::remove (*pidFile);
+
+    Log::GetInstance ().info ("Exit!");
+
+	exit(0);
+}
 
 
 int main( int argc, char **argv )
@@ -158,6 +182,7 @@ int main( int argc, char **argv )
 
 	std::signal (SIGINT, sig_INT_handler);
     std::signal (SIGTERM, sig_INT_handler);
+    std::signal(SIGSEGV, sig_SEGV_handler);
 
 #ifndef WIN32
 	std::signal(SIGPIPE, sig_PIPE_handler);
@@ -182,10 +207,7 @@ int main( int argc, char **argv )
 			("logfile", po::value<std::string>(&logf)->default_value (std::string ("-")), "Log file path or - for standard output)")
 #ifndef WIN32
 			("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file ( - = no pid file )")
-#endif        
-#ifdef DEBUG
-			("monothread", "Enable monothread emulation")
-#endif        
+#endif
 			("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
 		
 		po::variables_map vm;
@@ -199,15 +221,8 @@ int main( int argc, char **argv )
 		}
 #ifndef WIN32
 		bool daemonMode (vm.count("daemon") != 0);
-#endif        
-#ifdef DEBUG
-		bool monothread (vm.count("monothread") != 0);
-		if (monothread)
-		{
-			ThreadManager::SetMonothreadEmulation (monothread);
-		}
-#endif        
-    
+#endif
+		 
 		ModuleClass::Parameters defaultParams;
 		for (std::vector<std::string>::const_iterator it = params.begin (); 
 			 it != params.end (); ++it)
@@ -316,13 +331,10 @@ int main( int argc, char **argv )
 		}
 #endif    
 
-		ThreadManager::Instance ()->run ();
+		ServerModule::RunHTTPServer();
+		ServerModule::Wait();
 		
-		BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
-		{
-			Log::GetInstance ().info ("Terminating module " + module->getFactoryKey() + "...");
-			module->end();
-		}
+		quit();
     }
     catch (std::exception& e)
     {

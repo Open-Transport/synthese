@@ -289,17 +289,17 @@ namespace synthese
 		}
 
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			const LineAdmin* la(
-				dynamic_cast<const LineAdmin*>(currentPage.get())
+				dynamic_cast<const LineAdmin*>(&currentPage)
 			);
 			
 			const CommercialLineAdmin* ca(
-				dynamic_cast<const CommercialLineAdmin*>(currentPage.get())
+				dynamic_cast<const CommercialLineAdmin*>(&currentPage)
 			);
 			
 			if(	la &&
@@ -315,19 +315,11 @@ namespace synthese
 				);
 				BOOST_FOREACH(shared_ptr<Line> line, routes)
 				{
-					if(	la &&
-						la->getLine()->getKey() == line->getKey()
-					){
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<LineAdmin> p(
-							getNewOtherPage<LineAdmin>()
-						);
-						p->setLine(line);
-						AddToLinks(links, p);
-					}
+					shared_ptr<LineAdmin> p(
+						getNewOtherPage<LineAdmin>()
+					);
+					p->setLine(line);
+					AddToLinks(links, p);
 				}
 			}
 			return links;
@@ -354,6 +346,12 @@ namespace synthese
 		void CommercialLineAdmin::setCommercialLine(boost::shared_ptr<CommercialLine> value)
 		{
 			_cline = const_pointer_cast<CommercialLine>(value);
+		}
+		
+		
+		bool CommercialLineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _cline == static_cast<const CommercialLineAdmin&>(other)._cline;
 		}
 	}
 }

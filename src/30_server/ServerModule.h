@@ -122,7 +122,9 @@ namespace synthese
 
 		public:
 			static boost::thread::id AddHTTPThread();
-			static void KillThread(const std::string& key);
+			static void KillThread(const std::string& key, bool autoRestart=true);
+			static void KillAllThreads(bool autoRestart=true);
+			static void Wait();
 			static const Threads& GetThreads();
 			static void SetCurrentThreadAnalysing(const std::string& queryString);
 			static void SetCurrentThreadRunningAction();
@@ -130,6 +132,7 @@ namespace synthese
 			static void SetCurrentThreadWaiting();
 			static ThreadInfo& GetCurrentThreadInfo();
 			static boost::recursive_mutex& GetThreadManagementMutex();
+			static void RunHTTPServer();
 
 			static SessionMap& getSessions();
 			

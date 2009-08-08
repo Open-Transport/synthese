@@ -67,7 +67,6 @@ namespace synthese
 			AdminActionFunctionRequest<ThreadKillAction,ThreadsAdmin> killRequest(request);
 
 			const ServerModule::Threads& threads(ServerModule::GetThreads());
-
 			stream << "<h1>" << threads.size() << " threads</h1>";
 
 			HTMLTable::ColsVector c;
@@ -137,21 +136,14 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ThreadsAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			PageLinks links;
 
 			if(	moduleKey == ServerModule::FACTORY_KEY)
 			{
-				if(dynamic_cast<const ThreadsAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}

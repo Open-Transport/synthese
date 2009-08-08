@@ -251,20 +251,13 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DeparturesTableBenchmarkAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const DeparturesTableBenchmarkAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}

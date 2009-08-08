@@ -256,27 +256,15 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
 			if(	moduleKey == TimetableModule::FACTORY_KEY &&
 				isAuthorized(request)
 			){
-				const TimetableBookAdmin* ta(
-					dynamic_cast<const TimetableBookAdmin*>(currentPage.get())
-				);
-
-				if(	ta &&
-					!ta->_book.get())
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
@@ -284,17 +272,9 @@ namespace synthese
 		
 		
 		AdminInterfaceElement::PageLinks TimetableBookAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
-			const TimetableBookAdmin* ba(
-				dynamic_cast<const TimetableBookAdmin*>(currentPage.get())
-			);
-			
-			const TimetableAdmin* ta(
-				dynamic_cast<const TimetableAdmin*>(currentPage.get())
-			);
-
 			AdminInterfaceElement::PageLinks links;
 
 			// Subpages
@@ -305,37 +285,19 @@ namespace synthese
 			{
 				if(tt->getIsBook())
 				{
-					if(	ba &&
-						ba->_book.get() &&
-						tt->getKey() == ba->_book->getKey()
-					){
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<TimetableBookAdmin> page(
-							getNewOtherPage<TimetableBookAdmin>()
-						);
-						page->setBook(tt);
-						AddToLinks(links, page);
-					}
+					shared_ptr<TimetableBookAdmin> page(
+						getNewOtherPage<TimetableBookAdmin>()
+					);
+					page->setBook(tt);
+					AddToLinks(links, page);
 				}
 				else
 				{
-					if(	ta &&
-						ta->getTimetable().get() &&
-						ta->getTimetable()->getKey() == tt->getKey()
-					){
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<TimetableAdmin> page(
-							getNewOtherPage<TimetableAdmin>()
-						);
-						page->setTimetable(tt);
-						AddToLinks(links, page);
-					}
+					shared_ptr<TimetableAdmin> page(
+						getNewOtherPage<TimetableAdmin>()
+					);
+					page->setTimetable(tt);
+					AddToLinks(links, page);
 				}
 			}
 
@@ -362,5 +324,12 @@ namespace synthese
 		{
 			_book = const_pointer_cast<const Timetable, Timetable>(value);
 		}
+		
+		
+		bool TimetableBookAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _book == static_cast<const TimetableBookAdmin&>(other)._book;
+		}
+			
 	}
 }

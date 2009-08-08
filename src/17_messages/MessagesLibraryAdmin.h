@@ -131,7 +131,7 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
@@ -144,7 +144,7 @@ namespace synthese
 				This method can be overloaded to create customized sub tree.
 			*/
 			virtual PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 

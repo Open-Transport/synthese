@@ -314,5 +314,12 @@ namespace synthese
 		{
 			_line = const_pointer_cast<const Line>(value);
 		}
+		
+		
+		bool LineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _line == static_cast<const LineAdmin&>(other)._line;
+		}
+			
 	}
 }

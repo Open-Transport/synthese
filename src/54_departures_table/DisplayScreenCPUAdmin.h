@@ -110,6 +110,7 @@ namespace synthese
 			virtual std::string getTitle() const;
 			
 			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 			
 			////////////////////////////////////////////////////////////////////
 			/// Tabs builder.

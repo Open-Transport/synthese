@@ -173,35 +173,23 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
 			const string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(moduleKey == PlacesListModule::FACTORY_KEY && isAuthorized(request))
 			{
-				const TransportSiteAdmin* sp(
-					dynamic_cast<const TransportSiteAdmin*>(currentPage.get())
-				);
-
 				SiteTableSync::SearchResult sites(
 					SiteTableSync::Search(*_env)
 				);
 				BOOST_FOREACH(shared_ptr<Site> site, sites)
 				{
-					if(	sp &&
-						sp->_site->getKey() == site->getKey()
-					){
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<TransportSiteAdmin> p(
-							getNewOtherPage<TransportSiteAdmin>(false)
-						);
-						p->_site = site;
-						AddToLinks(links, p);
-					}
+					shared_ptr<TransportSiteAdmin> p(
+						getNewOtherPage<TransportSiteAdmin>(false)
+					);
+					p->_site = site;
+					AddToLinks(links, p);
 				}
 			}
 			return links;
@@ -209,28 +197,16 @@ namespace synthese
 		
 
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			const SiteRoutePlanningAdmin* rp(
-				dynamic_cast<const SiteRoutePlanningAdmin*>(currentPage.get())
+			shared_ptr<SiteRoutePlanningAdmin> p(
+				getNewOtherPage<SiteRoutePlanningAdmin>()
 			);
-			
-			if(	rp &&
-				rp->getSite()->getKey() == _site->getKey()
-			){
-				AddToLinks(links, currentPage);
-			}
-			else
-			{
-				shared_ptr<SiteRoutePlanningAdmin> p(
-					getNewOtherPage<SiteRoutePlanningAdmin>()
-				);
-				p->setSite(_site);
-				AddToLinks(links, p);
-			}
+			p->setSite(_site);
+			AddToLinks(links, p);
 			
 			return links;
 		}
@@ -239,5 +215,12 @@ namespace synthese
 		{
 			return _site.get() ? _site->getName() : DEFAULT_TITLE;
 		}
+		
+		
+		bool TransportSiteAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _site == static_cast<const TransportSiteAdmin&>(other)._site;
+		}
+			
 	}
 }

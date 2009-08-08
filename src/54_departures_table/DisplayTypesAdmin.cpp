@@ -266,21 +266,14 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const DisplayTypesAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
@@ -297,14 +290,10 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 		
-			const DisplayTypeAdmin* da(
-				dynamic_cast<const DisplayTypeAdmin*>(currentPage.get())
-			);
-			
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
 					*_env,
@@ -321,18 +310,9 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)
 			{
-				if(	da &&
-					da->getType().get() &&
-					da->getType()->getKey() == displayType->getKey()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<DisplayTypeAdmin> p(getNewOtherPage<DisplayTypeAdmin>());
-					p->setType(displayType);
-					AddToLinks(links, p);
-				}
+				shared_ptr<DisplayTypeAdmin> p(getNewOtherPage<DisplayTypeAdmin>());
+				p->setType(displayType);
+				AddToLinks(links, p);
 			}
 			return links;
 		}

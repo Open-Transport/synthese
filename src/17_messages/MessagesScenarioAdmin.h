@@ -126,7 +126,7 @@ namespace synthese
 				This method can be overloaded to create customized sub tree.
 			*/
 			virtual PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
@@ -138,6 +138,9 @@ namespace synthese
 
 			boost::shared_ptr<const Scenario> getScenario() const;
 			void setScenario(boost::shared_ptr<Scenario> value);
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+			
 		};
 	}
 }

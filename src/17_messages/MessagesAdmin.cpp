@@ -383,21 +383,14 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfModule(
 			const string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if (moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const MessagesAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
@@ -412,17 +405,17 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 		
 			AdminInterfaceElement::PageLinks links;
 			
 			const MessagesScenarioAdmin* sa(
-				dynamic_cast<const MessagesScenarioAdmin*>(currentPage.get())
+				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage)
 			);
 			const MessageAdmin* ma(
-				dynamic_cast<const MessageAdmin*>(currentPage.get())
+				dynamic_cast<const MessageAdmin*>(&currentPage)
 			);
 			
 			if(	sa &&
@@ -430,22 +423,15 @@ namespace synthese
 				ma &&
 				dynamic_cast<const SentAlarm*>(ma->getAlarm().get())
 			){
-				if(sa)
-				{
-					AddToLinks(links, currentPage);
-				}
-				else if(ma)
-				{
-					shared_ptr<MessagesScenarioAdmin> p(
-						getNewOtherPage<MessagesScenarioAdmin>()
-					);
-					p->setScenario(
-						SentScenarioInheritedTableSync::GetEditable(
-							ma->getAlarm()->getScenario()->getKey(),
-							_getEnv()
-					)	);
-					AddToLinks(links, p);
-				}
+				shared_ptr<MessagesScenarioAdmin> p(
+					getNewOtherPage<MessagesScenarioAdmin>()
+				);
+				p->setScenario(
+					SentScenarioInheritedTableSync::GetEditable(
+						sa ? sa->getScenario()->getKey() : ma->getAlarm()->getScenario()->getKey(),
+						_getEnv()
+				)	);
+				AddToLinks(links, p);
 			}
 			return links;
 		}

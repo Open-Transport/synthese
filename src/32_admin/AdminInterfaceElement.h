@@ -29,7 +29,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/logic/tribool.hpp>
 
 namespace synthese
@@ -61,8 +60,7 @@ namespace synthese
 		///		- un administrateur a accès à tous les composants d'administration.
 		////////////////////////////////////////////////////////////////////
 		class AdminInterfaceElement:
-			public util::FactoryBase<AdminInterfaceElement>,
-			public boost::enable_shared_from_this<AdminInterfaceElement>
+			public util::FactoryBase<AdminInterfaceElement>
 		{
 		public:
 			typedef std::vector<boost::shared_ptr<const AdminInterfaceElement> > PageLinks;
@@ -210,7 +208,7 @@ namespace synthese
 
 			util::Env& _getEnv() const;
 
-			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 			
 			////////////////////////////////////////////////////////////////////
 			///	Tree generator.
@@ -351,6 +349,8 @@ public:
 				/// @throw Exception if tab was not found
 				////////////////////////////////////////////////////////////////////
 				const Tab&	getTab(const std::string& key) const;
+			
+				bool operator==(const AdminInterfaceElement& other) const;
 			//@}
 			
 			
@@ -430,7 +430,7 @@ public:
 					This method can be overloaded to create customized sub tree.
 				*/
 				virtual PageLinks getSubPages(
-					boost::shared_ptr<const AdminInterfaceElement> currentPage,
+					const AdminInterfaceElement& currentPage,
 					const server::FunctionRequest<admin::AdminRequest>& _request
 				) const;
 
@@ -438,7 +438,7 @@ public:
 
 				virtual PageLinks getSubPagesOfModule(
 					const std::string& moduleKey,
-					boost::shared_ptr<const AdminInterfaceElement> currentPage,
+					const AdminInterfaceElement& currentPage,
 					const server::FunctionRequest<admin::AdminRequest>& _request
 				) const;
 

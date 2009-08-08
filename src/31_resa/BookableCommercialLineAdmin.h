@@ -122,7 +122,7 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
@@ -147,6 +147,7 @@ namespace synthese
 			*/
 			virtual std::string getIcon() const;
 
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
 	}
 }

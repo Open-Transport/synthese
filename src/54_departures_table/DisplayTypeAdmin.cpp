@@ -207,5 +207,11 @@ namespace synthese
 		{
 			return _type;
 		}
+		
+		
+		bool DisplayTypeAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _type == static_cast<const DisplayTypeAdmin&>(other)._type;
+		}
 	}
 }

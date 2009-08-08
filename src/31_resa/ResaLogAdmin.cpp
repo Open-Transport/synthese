@@ -112,20 +112,13 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const ResaLogAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
@@ -133,14 +126,20 @@ namespace synthese
 	
 	
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-				
-			if(dynamic_cast<const ResaEditLogEntryAdmin*>(currentPage.get()))
+			
+			const ResaEditLogEntryAdmin* rp(
+				dynamic_cast<const ResaEditLogEntryAdmin*>(&currentPage)
+			);
+			
+			if(rp)
 			{
-				AddToLinks(links, currentPage);
+				shared_ptr<ResaEditLogEntryAdmin> p(getNewOtherPage<ResaEditLogEntryAdmin>());
+				p->setEntry(rp->getEntry());
+				AddToLinks(links, p);
 			}
 			
 			return links;

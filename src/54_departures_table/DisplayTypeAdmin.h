@@ -99,7 +99,9 @@ namespace synthese
 			*/
 			virtual std::string getTitle() const;
 			
-
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+			
 
 			void setType(boost::shared_ptr<const DisplayType> value);
 			boost::shared_ptr<const DisplayType> getType() const;

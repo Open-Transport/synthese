@@ -241,5 +241,15 @@ namespace synthese
 		{
 			_alarm = value;
 		}
+		
+		
+		bool MessageAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			const MessageAdmin& mother(static_cast<const MessageAdmin&>(other));
+			return _alarm && mother._alarm && _alarm->getKey() == mother._alarm->getKey();
+		}
+
+
+
 	}
 }

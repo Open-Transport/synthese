@@ -604,24 +604,19 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfModule(
-				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const std::string& moduleKey,
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const ReservationRoutePlannerAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
+		
+		
 		
 		bool ReservationRoutePlannerAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,

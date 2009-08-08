@@ -143,37 +143,25 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(	moduleKey == DBLogModule::FACTORY_KEY
 			){
-				const DBLogViewer* la(
-					dynamic_cast<const DBLogViewer*>(currentPage.get())
-				);
-				
 				vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
 				BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
 				{
 					if(!loge->isAuthorized(request, READ)) continue;
 
-					if(	la &&
-						la->_viewer.getLogKey() == loge->getFactoryKey()
-					){
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<DBLogViewer> p(
-							getNewOtherPage<DBLogViewer>(false)
-						);
-						p->_viewer.setLogKey(
-							loge->getFactoryKey()
-						);
-						AddToLinks(links, p);
-					}
+					shared_ptr<DBLogViewer> p(
+						getNewOtherPage<DBLogViewer>(false)
+					);
+					p->_viewer.setLogKey(
+						loge->getFactoryKey()
+					);
+					AddToLinks(links, p);
 				}
 			}
 			return links;

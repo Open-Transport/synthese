@@ -98,7 +98,7 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const admin::AdminInterfaceElement> currentPage,
+				const admin::AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 			
@@ -110,7 +110,7 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				boost::shared_ptr<const admin::AdminInterfaceElement> currentPage,
+				const admin::AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 			
@@ -129,6 +129,9 @@ namespace synthese
 			virtual bool isAuthorized(
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+			
 		};
 	}
 }

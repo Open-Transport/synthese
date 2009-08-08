@@ -107,6 +107,9 @@ namespace synthese
 			bool isAuthorized(
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+			
 		};
 	}
 }

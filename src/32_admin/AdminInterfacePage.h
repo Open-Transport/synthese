@@ -60,7 +60,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const boost::shared_ptr<const AdminInterfaceElement>* page,
+				const AdminInterfaceElement* page,
 				const server::Request* request = NULL
 			) const;
 

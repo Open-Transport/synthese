@@ -1077,6 +1077,11 @@ namespace synthese
 			_tabBuilded = true;
 		}
 		
+		bool DisplayAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _displayScreen == static_cast<const DisplayAdmin&>(other)._displayScreen;
+		}
+
 		void DisplayAdmin::setScreen(boost::shared_ptr<const DisplayScreen> value)
 		{
 			_displayScreen = value;

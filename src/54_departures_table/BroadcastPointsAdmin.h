@@ -77,9 +77,8 @@ namespace synthese
 		{
 			std::string									_cityName;
 			std::string									_placeName;
-			uid											_lineUId;
-			BroadcastPointsPresence						_displayNumber;
-			BroadcastPointsPresence						_cpuNumber;
+			boost::optional<util::RegistryKeyType>		_lineUId;
+			BroadcastPointsPresence						_searchDevicesNumber;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 
@@ -87,8 +86,7 @@ namespace synthese
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_PLACE_NAME;
 			static const std::string PARAMETER_LINE_ID;
-			static const std::string PARAMETER_DISPLAY_NUMBER;
-			static const std::string PARAMETER_CPU_NUMBER;
+			static const std::string PARAMETER_DEVICES_NUMBER;
 
 			BroadcastPointsAdmin();
 			
@@ -135,14 +133,16 @@ namespace synthese
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
+
+
 
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible

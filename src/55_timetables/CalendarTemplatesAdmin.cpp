@@ -155,59 +155,35 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(	moduleKey == TimetableModule::FACTORY_KEY &&
 				isAuthorized(request)
 			){
-				const CalendarTemplatesAdmin* ta(
-					dynamic_cast<const CalendarTemplatesAdmin*>(currentPage.get())
-				);
-
-				if(ta)
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
-
-			const CalendarTemplateAdmin* ta(
-				dynamic_cast<const CalendarTemplateAdmin*>(currentPage.get())
-			);
 
 			CalendarTemplateTableSync::SearchResult calendars(
 				CalendarTemplateTableSync::Search(*_env)
 			);
 			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
 			{
-				if(	ta &&
-					ta->getCalendar().get() &&
-					ta->getCalendar()->getKey() == ct->getKey()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<CalendarTemplateAdmin> p(
-					 	getNewOtherPage<CalendarTemplateAdmin>()
-					);
-					p->setCalendar(ct);
-					AddToLinks(links, p);
-				}
+				shared_ptr<CalendarTemplateAdmin> p(
+					getNewOtherPage<CalendarTemplateAdmin>()
+				);
+				p->setCalendar(ct);
+				AddToLinks(links, p);
 			}
 
 			return links;

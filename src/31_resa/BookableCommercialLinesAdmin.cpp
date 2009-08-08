@@ -139,33 +139,22 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const BookableCommercialLinesAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
-
-			const BookableCommercialLineAdmin* ba(
-				dynamic_cast<const BookableCommercialLineAdmin*>(currentPage.get())
-			);
 
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
@@ -179,20 +168,11 @@ namespace synthese
 			)	);
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 			{
-				if(	ba &&
-					ba->getCommercialLine()->getKey() == line->getKey() &&
-					!ba->getServiceNumber()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<BookableCommercialLineAdmin> p(
-						getNewOtherPage<BookableCommercialLineAdmin>()
-					);
-					p->setCommercialLine(line);
-					AddToLinks(links, p);
-				}
+				shared_ptr<BookableCommercialLineAdmin> p(
+					getNewOtherPage<BookableCommercialLineAdmin>()
+				);
+				p->setCommercialLine(line);
+				AddToLinks(links, p);
 			}
 
 			return links;

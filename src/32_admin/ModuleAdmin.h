@@ -110,8 +110,8 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+				const AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 
 			virtual std::string getTitle() const;

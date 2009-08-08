@@ -254,14 +254,10 @@ namespace synthese
 		
 		
 		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
+			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
-			
-			const ProfileAdmin* pa(
-				dynamic_cast<const ProfileAdmin*>(currentPage.get())
-			);
 			
 			ProfileTableSync::SearchResult profiles(
 				ProfileTableSync::Search(
@@ -270,21 +266,19 @@ namespace synthese
 			)	);
 			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
-				if(	pa &&
-					pa->getProfile()->getKey() == profile->getKey()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
-					p->setProfile(profile);
-					AddToLinks(links, p);
-				}
+				shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
+				p->setProfile(profile);
+				AddToLinks(links, p);
 			}
 			
 			return links;
 		}
 
+
+		bool ProfileAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _profile == static_cast<const ProfileAdmin&>(other)._profile;
+		}
+			
 	}
 }

@@ -308,6 +308,11 @@ namespace synthese
 			_site = value;
 		}
 		
-
+		
+		bool SiteRoutePlanningAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _site == static_cast<const SiteRoutePlanningAdmin&>(other)._site;
+		}
+			
 	}
 }

@@ -5,7 +5,6 @@ CppSynthese3LibProject(
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = [
 		's3-util.cpplib',
-		's3-util-threads.cpplib',
 		's3-security.cpplib',
 		's3-dblog.cpplib',
 		's3-interfaces.cpplib',

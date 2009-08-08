@@ -277,63 +277,37 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(	moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
 			{
-				const MessagesLibraryAdmin* ma(
-					dynamic_cast<const MessagesLibraryAdmin*>(currentPage.get())
-				);
-				
-				if(	ma &&
-					!ma->_folder.get()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
 
+		
+		
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const {
 			PageLinks links;
 
-			const MessagesLibraryAdmin* la(
-				dynamic_cast<const MessagesLibraryAdmin*>(currentPage.get())
-			);
-			const MessagesScenarioAdmin* sa(
-				dynamic_cast<const MessagesScenarioAdmin*>(currentPage.get())
-			);
-			
 			// Folders
 			ScenarioFolderTableSync::SearchResult folders(
 				ScenarioFolderTableSync::Search(*_env, _folder.get() ? _folder->getKey() : 0)
 			);
 			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, folders)
 			{
-				if(	la &&
-					la->_folder.get() &&
-					la->_folder->getKey() == cfolder->getKey()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<MessagesLibraryAdmin> p(
-						getNewOtherPage<MessagesLibraryAdmin>()
-					);
-					p->setFolder(cfolder);
-					AddToLinks(links, p);
-				}
+				shared_ptr<MessagesLibraryAdmin> p(
+					getNewOtherPage<MessagesLibraryAdmin>()
+				);
+				p->setFolder(cfolder);
+				AddToLinks(links, p);
 			}
 			
 			// Scenarios
@@ -344,20 +318,11 @@ namespace synthese
 			)	);
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, scenarios)
 			{
-				if(	sa &&
-					sa->getScenario() &&
-					sa->getScenario()->getKey() == tpl->getKey()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<MessagesScenarioAdmin> p(
-						getNewOtherPage<MessagesScenarioAdmin>()
-					);
-					p->setScenario(tpl);
-					AddToLinks(links, p);
-				}
+				shared_ptr<MessagesScenarioAdmin> p(
+					getNewOtherPage<MessagesScenarioAdmin>()
+				);
+				p->setScenario(tpl);
+				AddToLinks(links, p);
 			}
 			
 			return links;

@@ -171,37 +171,23 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(moduleKey == EnvModule::FACTORY_KEY && isAuthorized(request))
 			{
-				const TransportNetworkAdmin* tna(
-					dynamic_cast<const TransportNetworkAdmin*>(currentPage.get())
-				);
-				RegistryKeyType currentNetworkId;
-				if(tna) currentNetworkId = tna->_network->getKey();
-				
 				TransportNetworkTableSync::SearchResult networks(
 					TransportNetworkTableSync::Search(*_env)
 				);
 				BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
 				{
-					if(	tna &&
-						network->getKey() == currentNetworkId)
-					{
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<TransportNetworkAdmin> link(
-							getNewOtherPage<TransportNetworkAdmin>(false)
-						);
-						link->_network = network;
-						AddToLinks(links, link);
-					}
+					shared_ptr<TransportNetworkAdmin> link(
+						getNewOtherPage<TransportNetworkAdmin>(false)
+					);
+					link->_network = network;
+					AddToLinks(links, link);
 				}
 			}
 				
@@ -215,21 +201,21 @@ namespace synthese
 				
 
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
 			const LineAdmin* la(
-				dynamic_cast<const LineAdmin*>(currentPage.get())
+				dynamic_cast<const LineAdmin*>(&currentPage)
 			);
 			
 			const CommercialLineAdmin* ca(
-				dynamic_cast<const CommercialLineAdmin*>(currentPage.get())
+				dynamic_cast<const CommercialLineAdmin*>(&currentPage)
 			);
 
 			const TransportNetworkAdmin* na(
-				dynamic_cast<const TransportNetworkAdmin*>(currentPage.get())
+				dynamic_cast<const TransportNetworkAdmin*>(&currentPage)
 			);
 
 			if(	la &&
@@ -258,22 +244,21 @@ namespace synthese
 				)	);
 				BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				{
-					if(	ca &&
-						ca->getCommercialLine()->getKey() == line->getKey()
-					){
-						AddToLinks(links, currentPage);
-					}
-					else
-					{
-						shared_ptr<CommercialLineAdmin> p(
-							getNewOtherPage<CommercialLineAdmin>()
-						);
-						p->setCommercialLine(line);
-						AddToLinks(links, p);
-					}
+					shared_ptr<CommercialLineAdmin> p(
+						getNewOtherPage<CommercialLineAdmin>()
+					);
+					p->setCommercialLine(line);
+					AddToLinks(links, p);
 				}
 			}
 			return links;
 		}
+		
+		
+		bool TransportNetworkAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _network == static_cast<const TransportNetworkAdmin&>(other)._network;
+		}
+		
 	}
 }

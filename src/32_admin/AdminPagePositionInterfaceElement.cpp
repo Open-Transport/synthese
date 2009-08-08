@@ -68,7 +68,7 @@ namespace synthese
 			const void* object /* = NULL */,
 			const server::Request* request /* = NULL */
 		) const {
-			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
+			const AdminInterfaceElement* page = static_cast<const AdminInterfaceElement*>(object);
 			string normalSeparator(_normalSeparator->getValue(parameters, variables, object, request));
 			string lastSeparator(_lastSeparator->getValue(parameters, variables, object, request));
 			bool withImages(Conversion::ToBool(_withImages->getValue(parameters, variables, object, request)));
@@ -77,7 +77,7 @@ namespace synthese
 			bool lastSeparatorIfFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
 
 			const AdminInterfaceElement::PageLinks& links(
-				(*page)->getTreePosition(
+				page->getTreePosition(
 					static_cast<const FunctionRequest<AdminRequest>& >(*request)
 			)	);
 

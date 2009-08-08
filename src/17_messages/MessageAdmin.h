@@ -119,7 +119,10 @@ namespace synthese
 				bool objectWillBeCreatedLater
 			);
 			
-			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+
+
+
 			
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map

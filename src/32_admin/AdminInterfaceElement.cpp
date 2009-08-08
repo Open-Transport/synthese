@@ -55,8 +55,8 @@ namespace synthese
 		
 		
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			return PageLinks();
 		}
@@ -64,8 +64,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const {
 			return PageLinks();
 		}
@@ -80,25 +80,31 @@ namespace synthese
 			_treePosition.clear();
 
 			// Initialisation
-			shared_ptr<HomeAdmin> homeAdmin;
-			if(dynamic_cast<const HomeAdmin*>(this))
-			{
-				homeAdmin = const_pointer_cast<HomeAdmin>(
-					static_pointer_cast<const HomeAdmin, const AdminInterfaceElement>(
-						shared_from_this()
-				)	);
-			}
-			else
-			{
-				homeAdmin = getNewOtherPage<HomeAdmin>();
-			}
+			shared_ptr<HomeAdmin> homeAdmin(
+				getNewOtherPage<HomeAdmin>()
+			);
+			
 			PageLinks position;
 			AddToLinks(position, homeAdmin);
 			_tree = _buildTreeRecursion(homeAdmin, position, request);
-			if (homeAdmin == shared_from_this())
+			if (dynamic_cast<const HomeAdmin*>(this))
+			{
 				_treePosition = position;
+			}
 		}
 
+
+
+		bool AdminInterfaceElement::operator==(const AdminInterfaceElement& other) const
+		{
+			return getFactoryKey() == other.getFactoryKey() && _hasSameContent(other);
+		}
+		
+		
+		bool AdminInterfaceElement::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return true;
+		}
 
 
 		AdminInterfaceElement::PageLinksTree AdminInterfaceElement::_buildTreeRecursion(
@@ -109,14 +115,13 @@ namespace synthese
 
 			// Local variables
 			AdminInterfaceElement::PageLinksTree tree(adminPage);
-			shared_ptr<const AdminInterfaceElement> currentLink(shared_from_this());
 			
 			// Recursion
-			PageLinks pages = adminPage->getSubPages(currentLink, request);
+			PageLinks pages = adminPage->getSubPages(*this, request);
 			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, pages)
 			{
 				AddToLinks(position, link);
-				if (link == currentLink)
+				if (*link == *this)
 				{
 					_treePosition = position;
 					tree.isNodeOpened = true;
@@ -128,7 +133,7 @@ namespace synthese
 						_buildTreeRecursion(link, position, request)
 					);
 
-					if (link == currentLink)
+					if (*link == *this)
 						subTree.isNodeOpened = true;
 
 					tree.subPages.push_back(subTree);

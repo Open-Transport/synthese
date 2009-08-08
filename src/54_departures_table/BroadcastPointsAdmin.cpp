@@ -40,6 +40,8 @@
 #include "Profile.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
+#include "DisplayAdmin.h"
+#include "DisplayScreenCPUAdmin.h"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -70,16 +72,14 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const string BroadcastPointsAdmin::PARAMETER_CPU_NUMBER("cn");
+		const string BroadcastPointsAdmin::PARAMETER_DEVICES_NUMBER("cn");
 		const string BroadcastPointsAdmin::PARAMETER_CITY_NAME = "city";
 		const string BroadcastPointsAdmin::PARAMETER_PLACE_NAME = "place";
 		const string BroadcastPointsAdmin::PARAMETER_LINE_ID = "line";
-		const string BroadcastPointsAdmin::PARAMETER_DISPLAY_NUMBER = "dpln";
 		
-		BroadcastPointsAdmin::BroadcastPointsAdmin()
-			: AdminInterfaceElementTemplate<BroadcastPointsAdmin>(),
-			_displayNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT),
-			_cpuNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT),
+		BroadcastPointsAdmin::BroadcastPointsAdmin():
+			AdminInterfaceElementTemplate<BroadcastPointsAdmin>(),
+			_searchDevicesNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT),
 			_lineUId(UNKNOWN_VALUE)
 		{}
 
@@ -87,16 +87,13 @@ namespace synthese
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
-			_cityName = map.getString(PARAMETER_CITY_NAME, false, FACTORY_KEY);
-			_placeName = map.getString(PARAMETER_PLACE_NAME, false, FACTORY_KEY);
+			_cityName = map.getDefault<string>(PARAMETER_CITY_NAME);
+			_placeName = map.getDefault<string>(PARAMETER_PLACE_NAME);
 			
-			int i(map.getInt(PARAMETER_DISPLAY_NUMBER, false, FACTORY_KEY));
-			if (i != UNKNOWN_VALUE)	_displayNumber = static_cast<BroadcastPointsPresence>(i);
+			optional<int> i(map.getOptional<int>(PARAMETER_DEVICES_NUMBER));
+			if (i)	_searchDevicesNumber = static_cast<BroadcastPointsPresence>(*i);
 
-			i = map.getInt(PARAMETER_CPU_NUMBER, false, FACTORY_KEY);
-			if (i != UNKNOWN_VALUE) _cpuNumber = static_cast<BroadcastPointsPresence>(i);
-
-			_lineUId = map.getUid(PARAMETER_LINE_ID, false, FACTORY_KEY);
+			_lineUId = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
 		}
@@ -108,9 +105,8 @@ namespace synthese
 			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAMETER_CITY_NAME, _cityName);
 			m.insert(PARAMETER_PLACE_NAME, _placeName);
-			m.insert(PARAMETER_DISPLAY_NUMBER, static_cast<int>(_displayNumber));
-			m.insert(PARAMETER_CPU_NUMBER, static_cast<int>(_cpuNumber));
-			m.insert(PARAMETER_LINE_ID, _lineUId);
+			m.insert(PARAMETER_DEVICES_NUMBER, static_cast<int>(_searchDevicesNumber));
+			if(_lineUId) m.insert(PARAMETER_LINE_ID, *_lineUId);
 			return m;
 		}
 
@@ -134,22 +130,19 @@ namespace synthese
 			stream << st.cell("Commune", st.getForm().getTextInput(PARAMETER_CITY_NAME, _cityName));
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAMETER_PLACE_NAME, _placeName));
 			stream << st.cell(
-				"Terminaux d'affichage",
-				st.getForm().getSelectInput(PARAMETER_DISPLAY_NUMBER, m, static_cast<int>(_displayNumber))
-			);
-			stream << st.cell(
-				"Unités centrales",
-				st.getForm().getSelectInput(PARAMETER_CPU_NUMBER, m, static_cast<int>(_cpuNumber))
+				"Equipements",
+				st.getForm().getSelectInput(PARAMETER_DEVICES_NUMBER, m, static_cast<int>(_searchDevicesNumber))
 			);
 			stream << st.cell("Ligne", st.getForm().getSelectInput(
-				PARAMETER_LINE_ID,
-				EnvModule::getCommercialLineLabels(
-					_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(), _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-					, READ
-					, true
-				),
-				_lineUId)
-			);
+					PARAMETER_LINE_ID,
+					EnvModule::getCommercialLineLabels(
+						_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(),
+						_request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+						, READ
+						, true
+					),
+					_lineUId ? *_lineUId : UNKNOWN_VALUE
+			)	);
 			stream << st.close();
 
 			stream << "<h1>Résultats de la recherche</h1>";
@@ -162,23 +155,20 @@ namespace synthese
 					, READ
 					, _cityName
 					, _placeName
-					, _displayNumber
-					, _cpuNumber
-					, _lineUId
+					, _searchDevicesNumber,
+					_lineUId
 					, _requestParameters.maxSize
 					, _requestParameters.first
 					, _requestParameters.orderField == PARAMETER_CITY_NAME
 					, _requestParameters.orderField == PARAMETER_PLACE_NAME
-					, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
-					, _requestParameters.orderField == PARAMETER_CPU_NUMBER
+					, _requestParameters.orderField == PARAMETER_DEVICES_NUMBER
 					, _requestParameters.raisingOrder
 			)	);
 			
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_CITY_NAME, "Commune"));
 			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
-			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
-			h.push_back(make_pair(PARAMETER_CPU_NUMBER, "Unités centrales"));
+			h.push_back(make_pair(PARAMETER_DEVICES_NUMBER, "Equipements"));
 			h.push_back(make_pair(string(), "Actions"));
 			
 			ResultHTMLTable t(
@@ -197,8 +187,22 @@ namespace synthese
 				{
 					stream << t.col() << pl->cityName;
 					stream << t.col() << pl->place->getName();
-					stream << t.col() << pl->broadCastPointsNumber;
-					stream << t.col() << pl->cpuNumber;
+					stream << t.col();
+					if(pl->cpuNumber > 0)
+					{
+						stream << pl->cpuNumber << "x" <<
+							HTMLModule::getHTMLImage(DisplayScreenCPUAdmin::ICON, "unité centrale") << " ";
+					}
+					if(pl->broadCastPointsNumber > 0)
+					{
+						stream << pl->broadCastPointsNumber << "x" <<
+							HTMLModule::getHTMLImage(DisplayAdmin::ICON, "écran");
+					}
+					if(pl->cpuNumber == 0 && pl->broadCastPointsNumber == 0)
+					{
+						stream << "aucun";
+					}
+					
 					HTMLForm gf(goRequest.getHTMLForm());
 					gf.addHiddenField(DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID, Conversion::ToString(pl->place->getKey()));
 					stream << t.col() << gf.getLinkButton("Ouvrir", string(), "building_edit.png");
@@ -223,41 +227,62 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const BroadcastPointsAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
 
 
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPages(
-			boost::shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
+			
 			const DisplaySearchAdmin* sa(
-				dynamic_cast<const DisplaySearchAdmin*>(currentPage.get())
+				dynamic_cast<const DisplaySearchAdmin*>(&currentPage)
 			);
-			if(	sa &&
-				sa->getPlace() &&
-				sa->getPlace().get()
-			){
-				AddToLinks(links, currentPage);
+			
+			vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(
+				searchConnectionPlacesWithBroadcastPoints(
+					_getEnv(),
+					request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(),
+					request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+					, READ
+					, string()
+					, string()
+					, AT_LEAST_ONE_BROADCASTPOINT
+			)	);
+
+			bool currentToAdd(sa && sa->getPlace() && sa->getPlace()->get());
+			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> result, searchResult)
+			{
+				shared_ptr<DisplaySearchAdmin> p(
+					getNewOtherPage<DisplaySearchAdmin>()
+				);
+				p->setPlace(result->place->getKey());
+				AddToLinks(links, p);
+				if(*p == currentPage) currentToAdd = false;
+			}
+			
+			if(currentToAdd)
+			{
+				shared_ptr<DisplaySearchAdmin> p(
+					getNewOtherPage<DisplaySearchAdmin>()
+				);
+				p->setPlace((*sa->getPlace())->getKey());
+				AddToLinks(links, p);
 			}
 			return links;
 		}
+		
+		
 
 		bool BroadcastPointsAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,

@@ -265,5 +265,16 @@ namespace synthese
 		{
 			_user = value;
 		}
+		
+		
+		bool ResaCustomerAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _user == static_cast<const ResaCustomerAdmin&>(other)._user;
+		}
+
+		boost::shared_ptr<const security::User> ResaCustomerAdmin::getUser() const
+		{
+			return _user;
+		}
 	}
 }

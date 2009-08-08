@@ -106,11 +106,11 @@ namespace synthese
 
 
 			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
 			virtual AdminInterfaceElement::PageLinks getSubPages(
-				boost::shared_ptr<const AdminInterfaceElement> currentPage,
+				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
@@ -121,6 +121,10 @@ namespace synthese
 			) const;
 
 			virtual std::string getTitle() const;
+			
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+			
 		};
 	}
 }

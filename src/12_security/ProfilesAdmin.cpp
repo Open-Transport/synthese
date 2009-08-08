@@ -215,35 +215,24 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
 			const string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(moduleKey == SecurityModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const ProfilesAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewPage());
-				}
+				AddToLinks(links, getNewPage());
 			}
 			return links;
 		}
 	
 	
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPages(
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
-			const ProfileAdmin* pa(
-				dynamic_cast<const ProfileAdmin*>(currentPage.get())
-			);
 			
 			ProfileTableSync::SearchResult profiles(
 				ProfileTableSync::Search(
@@ -252,17 +241,9 @@ namespace synthese
 			)	);
 			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
-				if(	pa &&
-					pa->getProfile()->getKey() == profile->getKey()
-				){
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
-					p->setProfile(profile);
-					AddToLinks(links, p);
-				}
+				shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
+				p->setProfile(profile);
+				AddToLinks(links, p);
 			}
 			
 			return links;

@@ -234,21 +234,14 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
-			shared_ptr<const AdminInterfaceElement> currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
 			{
-				if(dynamic_cast<const MessagesTemplateLibraryAdmin*>(currentPage.get()))
-				{
-					AddToLinks(links, currentPage);
-				}
-				else
-				{
-					AddToLinks(links, getNewOtherPage<MessagesTemplateLibraryAdmin>());
-				}
+				AddToLinks(links, getNewOtherPage<MessagesTemplateLibraryAdmin>());
 			}
 			return links;
 		}
