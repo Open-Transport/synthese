@@ -210,6 +210,8 @@ namespace synthese
 
 			void setPlace(const util::RegistryKeyType id);
 			boost::optional<boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> > getPlace() const;
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
 	}
 }

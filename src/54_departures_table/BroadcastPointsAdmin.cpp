@@ -170,6 +170,7 @@ namespace synthese
 			h.push_back(make_pair(PARAMETER_CITY_NAME, "Commune"));
 			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
 			h.push_back(make_pair(PARAMETER_DEVICES_NUMBER, "Equipements"));
+			h.push_back(make_pair(PARAMETER_DEVICES_NUMBER, "Equipements"));
 			h.push_back(make_pair(string(), "Actions"));
 			
 			ResultHTMLTable t(
@@ -188,20 +189,25 @@ namespace synthese
 				{
 					stream << t.col() << pl->cityName;
 					stream << t.col() << pl->place->getName();
-					stream << t.col();
-					if(pl->cpuNumber > 0)
-					{
-						stream << pl->cpuNumber << "x" <<
-							HTMLModule::getHTMLImage(DisplayScreenCPUAdmin::ICON, "unité centrale") << " ";
-					}
-					if(pl->broadCastPointsNumber > 0)
-					{
-						stream << pl->broadCastPointsNumber << "x" <<
-							HTMLModule::getHTMLImage(DisplayAdmin::ICON, "écran");
-					}
+					
 					if(pl->cpuNumber == 0 && pl->broadCastPointsNumber == 0)
 					{
-						stream << "aucun";
+						stream << t.col(2) << "aucun";
+					}
+					else
+					{
+						stream << t.col();
+						if(pl->cpuNumber > 0)
+						{
+							stream << pl->cpuNumber << "x" <<
+								HTMLModule::getHTMLImage(DisplayScreenCPUAdmin::ICON, "unité centrale") << " ";
+						}
+						stream << t.col();
+						if(pl->broadCastPointsNumber > 0)
+						{
+							stream << pl->broadCastPointsNumber << "x" <<
+								HTMLModule::getHTMLImage(DisplayAdmin::ICON, "écran");
+						}
 					}
 					
 					HTMLForm gf(goRequest.getHTMLForm());

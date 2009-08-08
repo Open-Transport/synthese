@@ -125,6 +125,8 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
 	}
 }

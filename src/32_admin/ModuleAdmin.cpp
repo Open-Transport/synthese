@@ -166,5 +166,11 @@ namespace synthese
 		{
 			_moduleClass = value;
 		}
+		
+		
+		bool ModuleAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _moduleClass == static_cast<const ModuleAdmin&>(other)._moduleClass;
+		}
 	}
 }

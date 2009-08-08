@@ -671,5 +671,12 @@ namespace synthese
 		{
 			return _place;
 		}
+		
+		
+		bool DisplaySearchAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _place == static_cast<const DisplaySearchAdmin&>(other)._place;
+		}
+
 	}
 }
