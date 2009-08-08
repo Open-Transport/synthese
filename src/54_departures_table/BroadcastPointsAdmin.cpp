@@ -199,14 +199,18 @@ namespace synthese
 						stream << t.col();
 						if(pl->cpuNumber > 0)
 						{
-							stream << pl->cpuNumber << "x" <<
-								HTMLModule::getHTMLImage(DisplayScreenCPUAdmin::ICON, "unité centrale") << " ";
+							stream <<
+								HTMLModule::getHTMLImage(DisplayScreenCPUAdmin::ICON, "unité centrale") <<
+								"x" << pl->cpuNumber
+							;
 						}
 						stream << t.col();
 						if(pl->broadCastPointsNumber > 0)
 						{
-							stream << pl->broadCastPointsNumber << "x" <<
-								HTMLModule::getHTMLImage(DisplayAdmin::ICON, "écran");
+							stream <<
+								HTMLModule::getHTMLImage(DisplayAdmin::ICON, "écran") <<
+								"x" << pl->broadCastPointsNumber
+							;
 						}
 					}
 					

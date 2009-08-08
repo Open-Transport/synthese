@@ -170,7 +170,7 @@ namespace synthese
 		
 		bool ModuleAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _moduleClass == static_cast<const ModuleAdmin&>(other)._moduleClass;
+			return _moduleClass->getFactoryKey() == static_cast<const ModuleAdmin&>(other)._moduleClass->getFactoryKey();
 		}
 	}
 }

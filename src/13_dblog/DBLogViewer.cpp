@@ -191,5 +191,12 @@ namespace synthese
 				throw AdminParametersException("Invalid log key : " + key);
 			}
 		}
+		
+		
+		bool DBLogViewer::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _viewer.getLogKey() == static_cast<const DBLogViewer&>(other)._viewer.getLogKey();
+		}
+
 	}
 }

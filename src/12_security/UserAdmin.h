@@ -119,6 +119,9 @@ namespace synthese
 			) const;
 
 			virtual std::string getTitle() const;
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+
 		};
 	}
 }

@@ -154,6 +154,8 @@ namespace synthese
 				@date 2008				
 			*/
 			void setLogKey(const std::string& key);
+			
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
 	}
 }

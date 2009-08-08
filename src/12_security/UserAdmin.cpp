@@ -204,5 +204,12 @@ namespace synthese
 		{
 			return _user;
 		}
+		
+		
+		bool UserAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		{
+			return _user == static_cast<const UserAdmin&>(other)._user;
+		}
+
 	}
 }
