@@ -231,11 +231,11 @@ namespace synthese
 			query <<
 				" WHERE " <<
 				"l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
-				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">=" << day.toSQLString();
+				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">='" << day.toSQLString(false) << " 03:00' ";
 			Date dayp(day);
 			dayp += 1;
 			query <<
-				" AND " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << "<" << dayp.toSQLString()
+				" AND " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << "<'" << dayp.toSQLString(false) << " 03:00'"
 			;
 			if(serviceNumber)
 			{
