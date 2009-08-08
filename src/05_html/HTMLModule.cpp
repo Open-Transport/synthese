@@ -20,13 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// Std
 #include <sstream>
+#include <boost/algorithm/string/replace.hpp>
 
-// Html
 #include "HTMLModule.h"
 
 using namespace std;
+using namespace boost;
+
 
 namespace synthese
 {
@@ -59,7 +60,11 @@ namespace synthese
 			}
 			else
 			{
-				s << "href=\"#\" onclick=\"if (window.confirm('" << confirm << "')) ";
+				string escapedConfirm(confirm);
+				algorithm::replace_all(escapedConfirm, "'", "\\'");
+				algorithm::replace_all(escapedConfirm, "\"", "&quot;");
+
+				s << "href=\"#\" onclick=\"if (window.confirm('" << escapedConfirm << "')) ";
 				if (useOnclick)
 				{
 					s << url;
