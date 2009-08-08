@@ -94,6 +94,7 @@ namespace synthese
 			if (i)	_searchDevicesNumber = static_cast<BroadcastPointsPresence>(*i);
 
 			_lineUId = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
+			if(_lineUId && *_lineUId == UNKNOWN_VALUE) _lineUId = optional<RegistryKeyType>();
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
 		}

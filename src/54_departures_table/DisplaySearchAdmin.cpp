@@ -579,23 +579,6 @@ namespace synthese
 					da && da->getScreen()->getLocalization() == _place->get() ||
 					ca && ca->getCPU()->getPlace() == _place->get()
 			)	){
-				DisplayScreenTableSync::SearchResult screens(
-					DisplayScreenTableSync::Search(
-						_getEnv(),
-						request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-						, request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-						, READ
-						, UNKNOWN_VALUE
-						, _place->get() ? (*_place)->getKey() : 0
-				)	);
-				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
-				{
-					if(screen->getCPU()) continue;
-					shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
-					p->setScreen(screen);
-					AddToLinks(links, p);
-				}
-
 				DisplayScreenCPUTableSync::SearchResult cpus(
 					DisplayScreenCPUTableSync::Search(
 						_getEnv(),
@@ -606,6 +589,22 @@ namespace synthese
 				{
 					shared_ptr<DisplayScreenCPUAdmin> p(getNewOtherPage<DisplayScreenCPUAdmin>());
 					p->setCPU(cpu);
+					AddToLinks(links, p);
+				}
+				DisplayScreenTableSync::SearchResult screens(
+					DisplayScreenTableSync::Search(
+					_getEnv(),
+					request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+					, request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+					, READ
+					, UNKNOWN_VALUE
+					, _place->get() ? (*_place)->getKey() : 0
+					)	);
+				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+				{
+					if(screen->getCPU()) continue;
+					shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
+					p->setScreen(screen);
 					AddToLinks(links, p);
 				}
 			}
@@ -624,15 +623,6 @@ namespace synthese
 				):
 				DEFAULT_TITLE
 			;
-		}
-
-
-
-		bool DisplaySearchAdmin::isPageVisibleInTree(
-			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
-		) const {
-			return true;
 		}
 
 

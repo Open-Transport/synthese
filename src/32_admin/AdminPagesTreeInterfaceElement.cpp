@@ -154,7 +154,7 @@ namespace synthese
 
 			// Display current page
 			FunctionRequest<AdminRequest> r(&request);
-			if (pages.page.get() == currentPage)
+			if (*pages.page == *currentPage)
 			{
 				str <<
 					HTMLModule::getHTMLImage(
