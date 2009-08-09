@@ -129,14 +129,14 @@ namespace synthese
 				" FROM " << TABLE.NAME <<
 				" WHERE 1 ";
 			if(operatorCode)
-				query << COL_OPERATOR_CODE << " AND LIKE " << Conversion::ToSQLiteString(*operatorCode);
+				query << " AND " << COL_OPERATOR_CODE << " LIKE " << Conversion::ToSQLiteString(*operatorCode);
 			if(placeId)
 				query << " AND " << COL_PLACEID << "=" << *placeId;
 			if (number)
 			{
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+				query << " LIMIT " << (*number + 1);
 				if (first > 0)
-					query << " OFFSET " << Conversion::ToString(first);
+					query << " OFFSET " << first;
 			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);

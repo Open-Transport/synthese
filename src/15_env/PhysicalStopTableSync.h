@@ -64,7 +64,7 @@ namespace synthese
 				boost::optional<std::string> operatorCode = boost::optional<std::string>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}

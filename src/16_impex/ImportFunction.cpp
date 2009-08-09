@@ -47,7 +47,17 @@ namespace synthese
 		const string ImportFunction::PARAMETER_PATH("pa");
 		const string ImportFunction::PARAMETER_DATA_SOURCE("ds");
 		const string ImportFunction::PARAMETER_DO_IMPORT("di");
-		
+
+
+
+		ImportFunction::ImportFunction()
+			: FactorableTemplate<Function, ImportFunction>()
+		{
+			setEnv(shared_ptr<Env>(new Env));
+		}
+
+
+
 		ParametersMap ImportFunction::_getParametersMap() const
 		{
 			ParametersMap map;

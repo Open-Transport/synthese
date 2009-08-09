@@ -155,7 +155,7 @@ namespace synthese
 				stream << t.col(1, line->getStyle(), true);
 				stream << line->getShortName();
 				stream << t.col();
-				stream << line->getLongName();
+				stream << line->getName();
 				stream << t.col();
 				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 			}

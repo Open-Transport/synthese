@@ -58,13 +58,20 @@ do_import=0|1
 			@date 2009
 			@ingroup m16Functions refFunctions
 		*/
-		class ImportFunction :  public util::FactorableTemplate<server::Function, ImportFunction>
+		class ImportFunction:
+			public util::FactorableTemplate<server::Function, ImportFunction>
 		{
 		public:
 			static const std::string PARAMETER_PATH;	//!< Path of the files to import
 			static const std::string PARAMETER_DO_IMPORT;	//!< do_import parameter
 			static const std::string PARAMETER_DATA_SOURCE;	//!< clear_network parameter
-			
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			/// Initializes a dedicated environment for the storage of the imported
+			/// data.
+			ImportFunction();
+
 		protected:
 			//! \name Page parameters
 			//@{
