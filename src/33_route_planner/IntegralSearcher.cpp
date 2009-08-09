@@ -302,12 +302,12 @@ namespace synthese
 
 						optional<int> serviceNumber;
 						set<const Edge*> nonServedEdges;
+						DateTime departureMoment(correctedDesiredTime);
 						while(true)
 						{
 							this_thread::interruption_point();
 
 							// Reach of the next/previous service serving the edge
-							DateTime departureMoment(correctedDesiredTime);
 							ServicePointer serviceInstance(
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
 								?	edge.getNextService(
@@ -339,6 +339,7 @@ namespace synthese
 							serviceNumber = serviceInstance.getServiceIndex() +
 								(_accessDirection == DEPARTURE_TO_ARRIVAL ? 1 : -1)
 							;
+							departureMoment = serviceInstance.getActualDateTime();
 
 							// Check for service compliance rules.
 							if (!serviceInstance.getService()->isCompatibleWith(_accessParameters))
