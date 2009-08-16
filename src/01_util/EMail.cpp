@@ -34,6 +34,16 @@ namespace synthese
 {
 	namespace util
 	{
+		EMail::EMail(
+			const std::string& smtpServer,
+			const std::string smtpPort /*= "mail" */
+		):	_smtpServer(smtpServer),
+			_smtpPort(smtpPort)
+		{
+		}
+
+
+
 		void EMail::setFormat( EMail::Format value )
 		{
 			_format = value;
@@ -48,9 +58,10 @@ namespace synthese
 
 
 
-		void EMail::addRecipient( const std::string& value )
-		{
-			_recipients.push_back(value);
+		void EMail::addRecipient( const std::string& email,
+			string name
+		){
+			_recipients.push_back(make_pair(email, name));
 		}
 
 
@@ -70,7 +81,7 @@ namespace synthese
 
 
 
-		void EMail::send( const std::string& smtpServer, string service) const
+		void EMail::send() const
 		{
 		   struct Local
 		   {
@@ -90,7 +101,7 @@ namespace synthese
 
 			// Get a list of endpoints corresponding to the server name.
 			tcp::resolver resolver(io_service);
-			tcp::resolver::query query(smtpServer, service);
+			tcp::resolver::query query(_smtpServer, _smtpPort);
 			tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
 			tcp::resolver::iterator end;
 
@@ -115,7 +126,7 @@ namespace synthese
 			if (error) throw boost::system::system_error(error);
 
 			// Send HELO server.com
-			request_stream << "HELO " << smtpServer << CRLF;
+			request_stream << "HELO " << _smtpServer << CRLF;
 			Local::_Process(socket, request, response);
 
 			// Send MAIL FROM: <sender@mydomain.com>
@@ -123,9 +134,9 @@ namespace synthese
 			Local::_Process(socket, request, response);
 
 			// Send RCPT TO: <receiver@domain.com>
-			BOOST_FOREACH(const string& recipient, _recipients)
+			BOOST_FOREACH(const _Recipients::value_type& recipient, _recipients)
 			{
-				request_stream << "RCPT TO:<" << recipient << ">" << CRLF;
+				request_stream << "RCPT TO:<" << recipient.first << ">" << CRLF;
 				Local::_Process(socket, request, response);
 			}
 
@@ -135,8 +146,31 @@ namespace synthese
 
 			request_stream << 
 				"Subject: " << _subject << CRLF <<
-				"From: " << _sender << CRLF
-			;
+				"From: ";
+			if(_senderName.empty())
+			{
+				request_stream << _sender;
+			}
+			else
+			{
+				request_stream << _senderName << " <" << _sender << ">";
+			}
+			request_stream << CRLF;
+
+			BOOST_FOREACH(const _Recipients::value_type& recipient, _recipients)
+			{
+				request_stream << "To: ";
+				if(recipient.second.empty())
+				{
+					request_stream << recipient.first;
+				}
+				else
+				{
+					request_stream << recipient.second << " <" << recipient.first << ">";
+				}
+				request_stream << CRLF;
+			}
+
 			if(_format == EMAIL_HTML)
 			{
 				request_stream <<
@@ -151,6 +185,13 @@ namespace synthese
 			// Send QUIT
 			request_stream << "QUIT" << CRLF;
 			Local::_Process(socket, request, response);
+		}
+
+
+
+		void EMail::setSenderName( const std::string& value )
+		{
+			_senderName = value;
 		}
 	}
 }

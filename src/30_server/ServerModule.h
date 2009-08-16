@@ -40,6 +40,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class EMail;
+	}
+
 	/**	@defgroup m15Actions 15 Actions
 		@ingroup m15
 
@@ -96,7 +101,8 @@ namespace synthese
 		    static const std::string MODULE_PARAM_PORT;
 		    static const std::string MODULE_PARAM_NB_THREADS;
 		    static const std::string MODULE_PARAM_LOG_LEVEL;
-		    static const std::string MODULE_PARAM_TMP_DIR;
+			static const std::string MODULE_PARAM_SMTP_SERVER;
+			static const std::string MODULE_PARAM_SMTP_PORT;
 
 			static const std::string VERSION;
 
@@ -120,6 +126,7 @@ namespace synthese
 			static std::size_t _waitingThreads;
 			static boost::recursive_mutex _threadManagementMutex;
 
+
 		public:
 			static boost::thread::id AddHTTPThread();
 			static void KillThread(const std::string& key, bool autoRestart=true);
@@ -133,6 +140,7 @@ namespace synthese
 			static ThreadInfo& GetCurrentThreadInfo();
 			static boost::recursive_mutex& GetThreadManagementMutex();
 			static void RunHTTPServer();
+			static util::EMail GetEMailSender();
 
 			static SessionMap& getSessions();
 			

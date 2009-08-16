@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <utility>
 
 namespace synthese
 {
@@ -49,20 +50,33 @@ namespace synthese
 			};
 
 		private:
+			typedef std::vector<std::pair<std::string, std::string> > _Recipients;
+
+			const std::string			_smtpServer;
+			const std::string			_smtpPort;
 			Format						_format;
 			std::string					_content;
-			std::vector<std::string>	_recipients;
+			_Recipients					_recipients;
 			std::string					_sender;
+			std::string					_senderName;
 			std::string					_subject;
 
 		public:
+			EMail(
+				const std::string& smtpServer,
+				const std::string smtpPort = "mail"
+			);
 			void setFormat(Format value);
 			void setContent(const std::string& value);
-			void addRecipient(const std::string& value);
+			void addRecipient(
+				const std::string& email,
+				std::string name = std::string()
+			);
 			void setSender(const std::string& value);
+			void setSenderName(const std::string& value);
 			void setSubject(const std::string& value);
 
-			void send(const std::string& smtpServer, std::string service = "mail") const;
+			void send() const;
 		};
 	}
 }

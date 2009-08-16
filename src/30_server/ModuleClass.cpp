@@ -71,7 +71,7 @@ namespace synthese
 			const std::string& value,
 			bool runCallback
 		){
-			_Parameters.insert (std::make_pair (name, value));
+			_Parameters[name] = value;
 			
 			Log::GetInstance ().info ("Parameter " + name + " set to : " + value);
 		

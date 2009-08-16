@@ -22,10 +22,8 @@
 
 
 #include "ServerModule.h"
-
+#include "EMail.h"
 #include "Log.h"
-//#include "threads/ManagedThread.h"
-//#include "CleanerThreadExec.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
@@ -66,12 +64,13 @@ namespace synthese
 		recursive_mutex ServerModule::_threadManagementMutex;
 
 
-		const std::string ServerModule::MODULE_PARAM_PORT ("port");
-		const std::string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
-		const std::string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
-		const std::string ServerModule::MODULE_PARAM_TMP_DIR ("tmp_dir");
+		const string ServerModule::MODULE_PARAM_PORT ("port");
+		const string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
+		const string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
+		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
+		const string ServerModule::MODULE_PARAM_SMTP_SERVER ("smtp_server");
 
-		const std::string ServerModule::VERSION("3.1.8");
+		const std::string ServerModule::VERSION("3.1.9");
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
@@ -81,7 +80,8 @@ namespace synthese
 			RegisterParameter(ServerModule::MODULE_PARAM_PORT, "8080", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_NB_THREADS, "5", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL, "1", &ServerModule::ParameterCallback);
-			RegisterParameter(ServerModule::MODULE_PARAM_TMP_DIR, DEFAULT_TEMP_DIR, &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER, "smtp", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT, "mail", &ServerModule::ParameterCallback);
 		}
 
 
@@ -147,13 +147,17 @@ namespace synthese
 			const std::string& name,
 			const std::string& value
 		){
-			if (name == "port") 
+			if (name == MODULE_PARAM_PORT) 
 			{
 				// TODO : close and reopen service on the new port
 			}
-			if (name == "log_level") 
+			if (name == MODULE_PARAM_LOG_LEVEL) 
 			{
 				Log::GetInstance ().setLevel (static_cast<Log::Level>(lexical_cast<int>(value)));
+			}
+			if(name == MODULE_PARAM_NB_THREADS)
+			{
+				
 			}
 		}
 		
@@ -454,6 +458,16 @@ namespace synthese
 		boost::recursive_mutex& ServerModule::GetThreadManagementMutex()
 		{
 			return _threadManagementMutex;
+		}
+
+
+
+		util::EMail ServerModule::GetEMailSender()
+		{
+			return EMail(
+				GetParameter(MODULE_PARAM_SMTP_SERVER),
+				GetParameter(MODULE_PARAM_SMTP_PORT)
+			);
 		}
 
 

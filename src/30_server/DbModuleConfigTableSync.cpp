@@ -46,7 +46,7 @@ namespace synthese
 	namespace db
 	{
 	    template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DbModuleConfigTableSync>::TABLE(
-			"t999_config", true, true, TRIGGERS_ENABLED_CLAUSE, false
+			"t999_config", false, true, TRIGGERS_ENABLED_CLAUSE, false
 			);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DbModuleConfigTableSync>::_FIELDS[]=
