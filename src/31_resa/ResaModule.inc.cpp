@@ -15,8 +15,8 @@
 #include "31_resa/CallEndAction.h"
 #include "31_resa/ResaLogEntryUpdateAction.h"
 
-#include "31_resa/ReservationsListFunction.h"
-#include "31_resa/ResaCustomerHtmlOptionListFunction.h"
+#include "XMLReservationFunction.h"
+#include "ResaCustomerHtmlOptionListFunction.h"
 
 #include "31_resa/ReservationItemInterfacePage.h"
 

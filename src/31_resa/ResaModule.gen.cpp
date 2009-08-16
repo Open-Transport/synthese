@@ -9,7 +9,7 @@ synthese::resa::CallBeginAction::integrate();
 synthese::resa::CallEndAction::integrate();
 synthese::resa::ResaLogEntryUpdateAction::integrate();
 
-synthese::resa::ReservationsListFunction::integrate();
+synthese::resa::XMLReservationFunction::integrate();
 synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
 
 synthese::resa::ReservationItemInterfacePage::integrate();
