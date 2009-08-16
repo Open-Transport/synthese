@@ -2,6 +2,7 @@
 #include "11_interfaces/InterfaceTableSync.h"
 #include "11_interfaces/InterfacePageTableSync.h"
 #include "11_interfaces/InterfaceModule.h"
+
 #include "11_interfaces/StaticValueInterfaceElement.h"
 #include "11_interfaces/ParameterValueInterfaceElement.h"
 #include "11_interfaces/ParameterValueInterfaceElement.h"
@@ -13,6 +14,8 @@
 #include "11_interfaces/DebugInterfaceElement.h"
 #include "11_interfaces/CommentInterfaceElement.h"
 #include "11_interfaces/FormattedNumberInterfaceElement.h"
+#include "InterfaceIdInterfaceElement.h"
+
 #include "11_interfaces/RedirectInterfacePage.h"
 #include "11_interfaces/SimplePageRequest.h"
 #include "11_interfaces/SetInterfaceElement.h"

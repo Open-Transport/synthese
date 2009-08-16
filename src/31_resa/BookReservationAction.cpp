@@ -53,10 +53,10 @@
 #include "User.h"
 #include "UserTableSync.h"
 #include "GeographyModule.h"
-#include "Conversion.h"
-#include "EMail.h"
+#include "OnlineReservationRule.h"
 
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -285,6 +285,7 @@ namespace synthese
 			ReservationTransactionTableSync::Save(&rt);
 
 			// New reservation for each journey leg
+			const OnlineReservationRule* reservationContact(NULL);
 			BOOST_FOREACH(const ServiceUse& su, _journey.getServiceUses())
 			{
 				assert(su.getService() != NULL);
@@ -338,6 +339,17 @@ namespace synthese
 
 				if(	UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
 				){
+					if(	dynamic_cast<const Line*>(su.getService()->getPath()) &&
+						static_cast<const Line*>(su.getService()->getPath())->getCommercialLine()
+					){
+						const OnlineReservationRule* onlineContact(OnlineReservationRule::GetOnlineReservationRule(
+								static_cast<const Line*>(su.getService()->getPath())->getCommercialLine()->getReservationContact()
+						)	);
+						if(onlineContact)
+						{
+							reservationContact = onlineContact;
+						}
+					}
 					if(dynamic_cast<const PTUseRule*>(su.getUseRule()))
 					{
 						r->setReservationRuleId(static_cast<const PTUseRule*>(su.getUseRule())->getKey());
@@ -348,26 +360,16 @@ namespace synthese
 					));
 				}
 				r->setServiceId(su.getService()->getKey());
-				r->setServiceCode(Conversion::ToString(su.getService()->getServiceNumber()));
+				r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
 				ReservationTableSync::Save(r.get());
 			}
 
 			// Mail
-// 			if(!_customer->getEMail().empty())
-// 			{
-// 				EMail email;
-// 				email.setFormat(EMail::EMAIL_HTML);
-// 				email.setSender("contact@reseaux-conseil.com");
-// 				email.setSubject("Récapitulatif de votre réservation Tisséo");
-// 				email.addRecipient(_customer->getEMail());
-// 				stringstream content;
-// 				content << "<html><body><h1>Merci pour votre réservation</h1><p>Rappel de votre trajet : ";
-// 				ResaModule::DisplayReservations(content, rt);
-// 				content << "</p><p>IMPORTANT : En cas de désistement, veuillez impérativement nous prévenir</p></body></html>";
-// 				email.setContent(content.str());
-// 				email.send("mail.bluewin.ch");
-// 			}
-// 
+			if(!_customer->getEMail().empty() && reservationContact)
+ 			{
+				reservationContact->sendCustomerEMail(rt);
+ 			}
+ 
 
 			// Log
 			ResaDBLog::AddBookReservationEntry(_request->getSession(), rt);

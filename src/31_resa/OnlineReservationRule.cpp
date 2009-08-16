@@ -20,10 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ServerModule.h"
+#include "EMail.h"
+#include "ReservationTransaction.h"
 #include "OnlineReservationRule.h"
 #include "Registry.h"
-
+#include "ResaModule.h"
 #include "EnvModule.h"
+#include "ReservationConfirmationEMailInterfacePage.h"
+#include "Interface.h"
 
 #include "01_util/Constants.h"
 
@@ -33,6 +38,9 @@ using namespace std;
 namespace synthese
 {
 	using namespace env;
+	using namespace util;
+	using namespace server;
+	using namespace interfaces;
 
 	namespace util
 	{
@@ -43,12 +51,13 @@ namespace synthese
 	{
 		OnlineReservationRule::OnlineReservationRuleMap OnlineReservationRule::_onlineReservationRuleMap;
 
-		OnlineReservationRule::OnlineReservationRule(util::RegistryKeyType key)
-			: util::Registrable(key)
-			, _maxSeats(UNKNOWN_VALUE)
-			, _reservationRule(NULL)
-		{
-			
+		OnlineReservationRule::OnlineReservationRule(
+			RegistryKeyType key
+		):	Registrable(key),
+			_maxSeats(UNKNOWN_VALUE),
+			_reservationRule(NULL),
+			_eMailInterface(NULL)
+		{		
 		}
 
 		const env::ReservationContact* OnlineReservationRule::getReservationContact() const
@@ -170,6 +179,101 @@ namespace synthese
 		OnlineReservationRule::~OnlineReservationRule()
 		{
 
+		}
+
+
+
+		bool OnlineReservationRule::sendCustomerEMail(
+			const ReservationTransaction& resa
+		) const {
+
+			if(	_eMailInterface == NULL ||
+				_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>() == NULL
+			){
+				return false;
+			}
+
+			try
+			{
+				EMail email(ServerModule::GetEMailSender());
+				email.setFormat(EMail::EMAIL_HTML);
+				email.setSender(_senderEMail);
+				email.setSenderName(_senderName);
+				email.setSubject(_eMailSubject);
+				email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
+				
+				stringstream content;
+				VariablesMap v;
+				_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>()->display(
+					content,
+					resa,
+					v
+				);
+				email.setContent(content.str());
+
+				email.send();
+				return true;
+			}
+			catch(boost::system::system_error)
+			{
+				return false;
+			}
+		}
+
+
+
+		void OnlineReservationRule::setSenderEMail( const std::string& value )
+		{
+			_senderEMail = value;
+		}
+
+
+
+		void OnlineReservationRule::setSenderName( const std::string& value )
+		{
+			_senderName = value;
+		}
+
+
+
+		void OnlineReservationRule::setEMailSubject( const std::string& value )
+		{
+			_eMailSubject = value;
+		}
+
+
+
+		const std::string& OnlineReservationRule::getSenderEMail() const
+		{
+			return _senderEMail;
+		}
+
+
+
+		const std::string& OnlineReservationRule::getSenderName() const
+		{
+			return _senderName;
+		}
+
+
+
+		const std::string& OnlineReservationRule::getEMailSubject() const
+		{
+			return _eMailSubject;
+		}
+
+
+
+		void OnlineReservationRule::setEMailInterface( interfaces::Interface* value )
+		{
+			_eMailInterface = value;
+		}
+
+
+
+		interfaces::Interface* OnlineReservationRule::getEMailInterface() const
+		{
+			return _eMailInterface;
 		}
 	}
 }

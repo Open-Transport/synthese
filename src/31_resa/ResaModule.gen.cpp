@@ -13,6 +13,8 @@ synthese::resa::XMLReservationFunction::integrate();
 synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
 
 synthese::resa::ReservationItemInterfacePage::integrate();
+synthese::resa::ReservationConfirmationEMailInterfacePage::integrate();
+synthese::resa::ReservationConfirmationEMailItemInterfacePage::integrate();
 
 synthese::resa::ResaCallButtonInterfaceElement::integrate();
 

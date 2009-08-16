@@ -23,7 +23,7 @@
 #include "OnlineReservationRuleTableSync.h"
 
 #include "ReservationContactTableSync.h"
-
+#include "InterfaceTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -42,6 +42,7 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace env;
+	using namespace interfaces;
 
 	namespace util
 	{
@@ -52,7 +53,7 @@ namespace synthese
 
 	namespace resa
 	{
-		const string OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
+		const string OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID = "reservation_rule_id";
 		const string OnlineReservationRuleTableSync::COL_EMAIL = "email";
 		const string OnlineReservationRuleTableSync::COL_COPY_EMAIL = "copy_email";
 		const string OnlineReservationRuleTableSync::COL_NEEDS_SURNAME = "needs_surname";
@@ -62,6 +63,10 @@ namespace synthese
 		const string OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER = "needs_customer_number";
 		const string OnlineReservationRuleTableSync::COL_MAX_SEATS = "max_seat";
 		const string OnlineReservationRuleTableSync::COL_THRESHOLDS = "thresholds";
+		const string OnlineReservationRuleTableSync::COL_SENDER_EMAIL("sender_email");
+		const string OnlineReservationRuleTableSync::COL_SENDER_NAME("sender_name");
+		const string OnlineReservationRuleTableSync::COL_EMAIL_SUBJECT("email_subject");
+		const string OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID("email_interface_id");
 	}
 
 	namespace db
@@ -73,7 +78,7 @@ namespace synthese
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL, SQL_TEXT),
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_COPY_EMAIL, SQL_TEXT),
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_SURNAME, SQL_INTEGER),
@@ -83,12 +88,16 @@ namespace synthese
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER, SQL_INTEGER),
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_MAX_SEATS, SQL_INTEGER),
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_THRESHOLDS, SQL_INTEGER),
+			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_EMAIL, SQL_TEXT),
+			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL_SUBJECT, SQL_TEXT),
+			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID.c_str(), ""),
+			SQLiteTableSync::Index(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -103,13 +112,17 @@ namespace synthese
 			object->setMaxSeats(rows->getInt(OnlineReservationRuleTableSync::COL_MAX_SEATS));
 			/// @todo Finish to implement the loader
 
+			object->setSenderEMail(rows->getText(OnlineReservationRuleTableSync::COL_SENDER_EMAIL));
+			object->setSenderName(rows->getText(OnlineReservationRuleTableSync::COL_SENDER_NAME));
+			object->setEMailSubject(rows->getText(OnlineReservationRuleTableSync::COL_EMAIL_SUBJECT));
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				try
 				{
 					object->setReservationContact(
 						ReservationContactTableSync::Get(
-							rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID),
+							rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID),
 							env,
 							linkLevel
 						).get()
@@ -119,6 +132,22 @@ namespace synthese
 				{
 					Log::GetInstance().warn("Reservation rule not found for online reservation rule "+ Conversion::ToString(object->getKey()));
 				}
+
+				try
+				{
+					object->setEMailInterface(
+						InterfaceTableSync::GetEditable(
+							rows->getLongLong(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID),
+							env,
+							linkLevel
+						).get()
+					);
+				}
+				catch (...)
+				{
+					Log::GetInstance().warn("E-Mail interface not found for online reservation rule "+ Conversion::ToString(object->getKey()));
+				}
+
 			}
 		}
 
@@ -148,14 +177,7 @@ namespace synthese
 
 	namespace resa
 	{
-		OnlineReservationRuleTableSync::OnlineReservationRuleTableSync()
-			: SQLiteRegistryTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>()
-		{
-		}
-
-
-
-		void OnlineReservationRuleTableSync::Search(
+		OnlineReservationRuleTableSync::SearchResult OnlineReservationRuleTableSync::Search(
 			Env& env,
 			int first /*= 0*/,
 			int number /*= 0*/,
@@ -170,16 +192,11 @@ namespace synthese
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
 				;
 			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+				query << " LIMIT " << (number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
-			LoadFromQuery(query.str(), env, linkLevel);
-		}
-
-		OnlineReservationRuleTableSync::~OnlineReservationRuleTableSync()
-		{
-
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

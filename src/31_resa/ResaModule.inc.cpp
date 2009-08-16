@@ -18,7 +18,9 @@
 #include "XMLReservationFunction.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
 
-#include "31_resa/ReservationItemInterfacePage.h"
+#include "ReservationItemInterfacePage.h"
+#include "ReservationConfirmationEMailInterfacePage.h"
+#include "ReservationConfirmationEMailItemInterfacePage.h"
 
 #include "31_resa/ResaCallButtonInterfaceElement.h"
 

@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace interfaces
+	{
+		class Interface;
+	}
+
 	namespace env
 	{
 		class ReservationContact;
@@ -40,6 +45,7 @@ namespace synthese
 
 	namespace resa
 	{
+		class ReservationTransaction;
 
 		/**	Online reservation rule class.
 			@author Hugues Romain
@@ -68,6 +74,14 @@ namespace synthese
 			//@{
 				std::string _eMail;		//!< Adresse e-mail du destinataire des mails d'états de réservations (ex: le transporteur)
 				std::string	_copyEMail;	//!< Adresse e-mail de copie des mails d'états de réservations (ex: l'organisme autoritaire)
+			//@}
+
+			//! \name Customer e-mail sending options
+			//@{
+				std::string _senderEMail;
+				std::string _senderName;
+				std::string _eMailSubject;
+				interfaces::Interface*	_eMailInterface;
 			//@}
 
 			//! \name Optional form fields
@@ -101,6 +115,10 @@ namespace synthese
 				boost::logic::tribool			getNeedsEMail()				const;
 				int								getMaxSeats()				const;
 				const CapacityThresholds&		getThresholds()				const;
+				const std::string&				getSenderEMail()			const;
+				const std::string&				getSenderName()				const;
+				const std::string&				getEMailSubject()			const;
+				interfaces::Interface*			getEMailInterface()			const;
 			//@}
 
 			//! \name Setters
@@ -115,6 +133,23 @@ namespace synthese
 				void	setNeedsEMail(boost::logic::tribool value);
 				void	setMaxSeats(int value);
 				void	setThresholds(const CapacityThresholds& thresholds);
+				void	setSenderEMail(const std::string& value);
+				void	setSenderName(const std::string& value);
+				void	setEMailSubject(const std::string& value);
+				void	setEMailInterface(interfaces::Interface* value);
+			//@}
+
+			//! \name Queries
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Sends resume e-mail to the customer after booking a new reservation.
+				/// @param resa Reservation transaction
+				/// @return true if the e-mail is sent.
+				/// @author Hugues Romain
+				/// @date 2009
+				bool	sendCustomerEMail(
+					const ReservationTransaction& resa
+				) const;
 			//@}
 
 			//! \name Constructeurs et destructeurs

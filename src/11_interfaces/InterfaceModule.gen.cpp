@@ -10,6 +10,7 @@ synthese::interfaces::SuperiorValueInterfaceElement::integrate();
 synthese::interfaces::SubstrValueInterfaceElement::integrate();
 synthese::interfaces::AndValueInterfaceElement::integrate();
 synthese::interfaces::PlainCharFilterValueInterfaceElement::integrate();
+synthese::interfaces::InterfaceIdInterfaceElement::integrate();
 
 synthese::interfaces::CommentInterfaceElement::integrate();
 synthese::interfaces::PrintInterfaceElement::integrate();
