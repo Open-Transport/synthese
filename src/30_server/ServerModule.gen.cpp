@@ -22,3 +22,5 @@ synthese::server::DbModuleConfigTableSync::integrate();
 synthese::server::ServerAdminRight::integrate();
 
 synthese::server::ThreadsAdmin::integrate();
+
+synthese::server::XMLSessionFunction::integrate();

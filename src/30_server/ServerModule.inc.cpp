@@ -15,3 +15,5 @@
 #include "ServerAdminRight.h"
 #include "ThreadsAdmin.h"
 #include "ThreadKillAction.h"
+
+#include "XMLSessionFunction.h"
