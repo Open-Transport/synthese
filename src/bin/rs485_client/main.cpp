@@ -27,8 +27,6 @@
 //	#include "Windows.h"
 //#endif
 
-#include "01_util/threads/Thread.h"
-
 #include "Conversion.h"
 #include "01_util/Log.h"
 
@@ -48,6 +46,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/foreach.hpp>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #define MAX_QUERY_SIZE 4096
 #define STATUS_MESSAGE_SIZE 17
@@ -268,6 +267,94 @@ std::string SendToServer(
 
 }
 
+typedef map<RegistryKeyType, string> ScreensMap;
+
+
+void exec_thread(
+	bool autoconf,
+	ScreensMap& screens,
+	const string& server,
+	const string& port
+){
+	try
+	{
+		// Reads configuration from the server
+		if(autoconf)
+		{
+			const string macAddress(MacAddressGetter::GetMACaddress());
+
+			Log::GetInstance ().info ("Discovering displays list for MAC address : " + macAddress);
+
+			screens.clear();
+			string received(
+				SendToServer(
+				server,
+				port,
+				"/synthese3/admin?fonction=CPUGetWiredScreensFunction&ma=" + macAddress
+				)	);
+
+			if (received.empty ())
+			{
+				Log::GetInstance ().warn ("Received empty displays list ! Maybe a server crash ?");
+			} 
+			else
+			{
+				Log::GetInstance ().info ("Received displays list : " + received);
+			}
+
+			XMLNode screensNode = XMLNode::parseString (received.c_str(), CPUGetWiredScreensFunction::DISPLAY_SCREENS_XML_TAG.c_str());
+			int screensNumber(screensNode.nChildNode(CPUGetWiredScreensFunction::DISPLAY_SCREEN_XML_TAG.c_str()));
+			for(int screenRank(0); screenRank < screensNumber; ++screenRank)
+			{
+				XMLNode screenNode(screensNode.getChildNode(CPUGetWiredScreensFunction::DISPLAY_SCREEN_XML_TAG.c_str(), screenRank));
+				const string comPort("COM" + string(screenNode.getAttribute(CPUGetWiredScreensFunction::DISPLAY_SCREEN_COMPORT_XML_FIELD.c_str())));
+				const RegistryKeyType screenId(lexical_cast<RegistryKeyType>(screenNode.getAttribute(CPUGetWiredScreensFunction::DISPLAY_SCREEN_ID_XML_FIELD.c_str())));
+
+				screens.insert(make_pair(screenId, comPort));
+			}
+		}
+
+		// Display on each screen
+		BOOST_FOREACH(const ScreensMap::value_type& it, screens)
+		{
+			const RegistryKeyType screenId(it.first);
+			const string& comm(it.second);
+
+			string command(
+				SendToServer(
+				server, port,
+				"/synthese3/admin?fonction=tdg&date=A&tb=" + lexical_cast<string>(screenId)
+				)	);
+
+
+			if (command.empty ())
+			{
+				Log::GetInstance ().warn ("Received empty command ! Maybe a server crash ?");
+				continue;
+			} 
+
+			Log::GetInstance ().info ("Received command : " + command);
+
+			if ( (comm.substr(0, 3) == "COM") || (comm.substr (0, 3) == "com") )
+			{
+				string status(SendToDisplay(comm, command));
+
+				if(!status.empty())
+					SendToServer(server, port, "/synthese3/admin?fonction=tds&tb=" + lexical_cast<string>(screenId) + "&status=" + status);
+			}
+
+			this_thread::sleep(posix_time::millisec(500));
+		}
+	}
+	catch(boost::thread_interrupted)
+	{
+		Log::GetInstance ().warn ("Thread interrupted due to a timeout.");
+	}
+	catch(...)
+	{
+		Log::GetInstance ().warn ("Unhandled exception.");
+	}
+}
 
 
 
@@ -288,7 +375,6 @@ int main(int argc, char* argv[])
 	const string port =(argc >= 3 ? argv[2] : "80");
 	bool autoconf(argc < 4);
 
-	typedef map<RegistryKeyType, string> ScreensMap;
 	ScreensMap screens;
 	if(!autoconf)
 	{
@@ -305,82 +391,16 @@ int main(int argc, char* argv[])
 
 	while(true)
 	{
-		try
+		thread theThread(bind(&exec_thread));
+
+		theThread.timed_join(posix_time::seconds(60));
+
+		if(theThread.joinable())
 		{
-			// Reads configuration from the server
-			if(autoconf)
-			{
-				const string macAddress(MacAddressGetter::GetMACaddress());
-
-				Log::GetInstance ().info ("Discovering displays list for MAC address : " + macAddress);
-
-				screens.clear();
-				string received(
-					SendToServer(
-					server,
-					port,
-					"/synthese3/admin?fonction=CPUGetWiredScreensFunction&ma=" + macAddress
-					)	);
-
-				if (received.empty ())
-				{
-					Log::GetInstance ().warn ("Received empty displays list ! Maybe a server crash ?");
-				} 
-				else
-				{
-					Log::GetInstance ().info ("Received displays list : " + received);
-				}
-
-				XMLNode screensNode = XMLNode::parseString (received.c_str(), CPUGetWiredScreensFunction::DISPLAY_SCREENS_XML_TAG.c_str());
-				int screensNumber(screensNode.nChildNode(CPUGetWiredScreensFunction::DISPLAY_SCREEN_XML_TAG.c_str()));
-				for(int screenRank(0); screenRank < screensNumber; ++screenRank)
-				{
-					XMLNode screenNode(screensNode.getChildNode(CPUGetWiredScreensFunction::DISPLAY_SCREEN_XML_TAG.c_str(), screenRank));
-					const string comPort("COM" + string(screenNode.getAttribute(CPUGetWiredScreensFunction::DISPLAY_SCREEN_COMPORT_XML_FIELD.c_str())));
-					const RegistryKeyType screenId(lexical_cast<RegistryKeyType>(screenNode.getAttribute(CPUGetWiredScreensFunction::DISPLAY_SCREEN_ID_XML_FIELD.c_str())));
-
-					screens.insert(make_pair(screenId, comPort));
-				}
-			}
-
-			// Display on each screen
-			BOOST_FOREACH(const ScreensMap::value_type& it, screens)
-			{
-				const RegistryKeyType screenId(it.first);
-				const string& comm(it.second);
-
-				string command(
-					SendToServer(
-					server, port,
-					"/synthese3/admin?fonction=tdg&date=A&tb=" + lexical_cast<string>(screenId)
-					)	);
-
-
-				if (command.empty ())
-				{
-					Log::GetInstance ().warn ("Received empty command ! Maybe a server crash ?");
-					continue;
-				} 
-
-				Log::GetInstance ().info ("Received command : " + command);
-
-				if ( (comm.substr(0, 3) == "COM") || (comm.substr (0, 3) == "com") )
-				{
-					string status(SendToDisplay(comm, command));
-
-					if(!status.empty())
-					SendToServer(server, port, "/synthese3/admin?fonction=tds&tb=" + lexical_cast<string>(screenId) + "&status=" + status);
-				}
-
-				Thread::Sleep(500);
-			}
-		}
-		catch(...)
-		{
-			Log::GetInstance ().warn ("Unhandled exception.");
+			theThread.interrupt();
 		}
 
-		Thread::Sleep(60000);
+		theThread.join();
 	}
 }
 
