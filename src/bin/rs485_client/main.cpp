@@ -21,13 +21,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
 //#ifdef WIN32
 //	#include "Windows.h"
 //#endif
 
-#include "Conversion.h"
 #include "01_util/Log.h"
 
 #include "HTTPRequestParser.hpp"
@@ -46,6 +46,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #define MAX_QUERY_SIZE 4096
@@ -97,7 +98,7 @@ std::string SendToDisplay(const std::string& comPort, const std::string& text)
 
 	if (hCom == INVALID_HANDLE_VALUE) 
 	{
-		Log::GetInstance ().fatal ("Error while creating comm file " + Conversion::ToString (GetLastError()));
+		Log::GetInstance ().fatal ("Error while creating comm file " + lexical_cast<string>(GetLastError()));
 		return string();
 	}
 
@@ -110,7 +111,7 @@ std::string SendToDisplay(const std::string& comPort, const std::string& text)
 	if (!fSuccess) 
 	{
 		// Handle the error.
-		Log::GetInstance ().fatal ("Error while getting comm state " + Conversion::ToString (GetLastError()));
+		Log::GetInstance ().fatal ("Error while getting comm state " + lexical_cast<string>(GetLastError()));
 		CloseHandle(hCom);
 		return string();
 	}
@@ -133,7 +134,7 @@ std::string SendToDisplay(const std::string& comPort, const std::string& text)
 	if (!fSuccess) 
 	{
 		// Handle the error.
-		Log::GetInstance ().fatal ("SetCommState failed with error " + Conversion::ToString (GetLastError()));
+		Log::GetInstance ().fatal ("SetCommState failed with error " + lexical_cast<string>(GetLastError()));
 		CloseHandle(hCom);
 		return string();
 	}
@@ -391,16 +392,18 @@ int main(int argc, char* argv[])
 
 	while(true)
 	{
-		thread theThread(bind(&exec_thread));
+		thread theThread(
+			boost::bind(
+				&exec_thread,
+				autoconf,
+				screens,
+				server,
+				port
+		)	);
 
 		theThread.timed_join(posix_time::seconds(60));
 
-		if(theThread.joinable())
-		{
-			theThread.interrupt();
-		}
-
-		theThread.join();
+		theThread.interrupt();
 	}
 }
 
