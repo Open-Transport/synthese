@@ -39,6 +39,7 @@
 #include "CityTableSync.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <map>
 
 using namespace std;
@@ -133,7 +134,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(Registry<RoadChunk>::value_type roadChunk, _env->getEditableRegistry<RoadChunk>())
 			{
-// 				RoadChunkTableSync::Save(roadChunk.second.get());
+ 				RoadChunkTableSync::Save(roadChunk.second.get());
 			}
 		}
 
@@ -148,32 +149,33 @@ namespace synthese
 			dbfile.OpenFile(path.c_str());
 			if(!dbfile.IsOpen())
 			{
-				throw Exception("Could no open the file" + path);
+				throw Exception("Could no open the file " + path);
 			}
+			dbfile.LoadFileToMemory();
 
 			// 1 : Cities
 			if(key == FILE_MTDAREA)
 			{
 				map<string, string> departementCodes;
-
+				
 				// Departements
 				for(int i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
-					dbfile.LoadRecord(i);
+					dbfile.GetAtRecord(i);
 					if(dbfile.getText(_FIELD_ADMIN_LVL) != "3") continue;
-					string item(dbfile.getText(_FIELD_AREACODE_3));
+					string item(algorithm::trim_copy(dbfile.getText(_FIELD_AREACODE_3)));
 					if(departementCodes.find(item) != departementCodes.end()) continue;
-					departementCodes.insert(make_pair(item, dbfile.getText(_FIELD_GOVT_CODE)));
+					departementCodes.insert(make_pair(item, algorithm::trim_copy(dbfile.getText(_FIELD_GOVT_CODE))));
 				}
 
 				// Cities
 				for(int i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
-					dbfile.LoadRecord(i);
+					dbfile.GetAtRecord(i);
 					if(dbfile.getText(_FIELD_ADMIN_LVL) != "4") continue;
 					stringstream code;
-					code << departementCodes[dbfile.getText(_FIELD_AREACODE_3)];
-					code << setw(3) << lexical_cast<int>(dbfile.getText(_FIELD_GOVT_CODE));
+					code << departementCodes[algorithm::trim_copy(dbfile.getText(_FIELD_AREACODE_3))];
+					code << setw(3) << setfill('0') << lexical_cast<int>(algorithm::trim_copy(dbfile.getText(_FIELD_GOVT_CODE)));
 					if(_citiesMap.find(code.str()) != _citiesMap.end()) continue;
 
 					shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), *_env));
@@ -185,13 +187,13 @@ namespace synthese
 			{
 				for(int i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
-					dbfile.LoadRecord(i);
+					dbfile.GetAtRecord(i);
 					shared_ptr<Address> address(new Address);
 
-					address->setCodeBySource(dbfile.getText(_FIELD_ID));
+					address->setCodeBySource(algorithm::trim_copy(dbfile.getText(_FIELD_ID)));
 					address->setXY(
-						lexical_cast<double>(dbfile.getText(_FIELD_X)),
-						lexical_cast<double>(dbfile.getText(_FIELD_Y))
+						lexical_cast<double>(algorithm::trim_copy(dbfile.getText(_FIELD_X))),
+						lexical_cast<double>(algorithm::trim_copy(dbfile.getText(_FIELD_Y)))
 					);
 					address->setDataSource(_dataSource);
 					address->setKey(AddressTableSync::getId());
@@ -200,7 +202,7 @@ namespace synthese
 					RegistryKeyType stopId(0); 
 					try
 					{
-						stopId = lexical_cast<RegistryKeyType>(dbfile.getText(_FIELD_LINK_ID));
+						stopId = lexical_cast<RegistryKeyType>(algorithm::trim_copy(dbfile.getText(_FIELD_LINK_ID)));
 					}
 					catch(...)
 					{
@@ -251,11 +253,11 @@ namespace synthese
 			{
 				for(int i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
-					dbfile.LoadRecord(i);
-					string roadName(dbfile.getText(_FIELD_ST_NAME));
-					string leftId(dbfile.getText(_FIELD_REF_IN_ID));
-					string rightId(dbfile.getText(_FIELD_NREF_IN_ID));
-					string lAreaId(dbfile.getText(_FIELD_L_AREA_ID));
+					dbfile.GetAtRecord(i);
+					string roadName(algorithm::trim_copy(dbfile.getText(_FIELD_ST_NAME)));
+					string leftId(algorithm::trim_copy(dbfile.getText(_FIELD_REF_IN_ID)));
+					string rightId(algorithm::trim_copy(dbfile.getText(_FIELD_NREF_IN_ID)));
+					string lAreaId(algorithm::trim_copy(dbfile.getText(_FIELD_L_AREA_ID)));
 
 					_CitiesMap::const_iterator itc(_citiesMap.find(lAreaId));
 					_AddressesMap::const_iterator ita1(_navteqAddressses.find(leftId));

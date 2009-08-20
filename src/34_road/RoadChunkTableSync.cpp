@@ -154,20 +154,20 @@ namespace synthese
 	    
 	    template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,RoadChunk>::Save(RoadChunk* object)
 	    {
-		SQLite* sqlite = DBModule::GetSQLite();
-		stringstream query;
-		if (object->getKey() <= 0)
-		    object->setKey(getId());	
-		query
-		    << " REPLACE INTO " << TABLE.NAME << " VALUES("
-		    << Conversion::ToString(object->getKey())
-			<< (object->getFromAddress() ? Conversion::ToString(object->getFromAddress()->getKey()) : "0")
-			<< Conversion::ToString(object->getRankInPath())
-			<< ""
-			<< (object->getRoad() ? Conversion::ToString(object->getRoad()->getKey()) : "0")
-			<< Conversion::ToString(object->getMetricOffset())
-		    << ")";
-		sqlite->execUpdate(query.str());
+			SQLite* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->getKey() <= 0)
+				object->setKey(getId());	
+			query
+				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				object->getKey() << "," <<
+				(object->getFromAddress() ? Conversion::ToString(object->getFromAddress()->getKey()) : "0") << "," <<
+				object->getRankInPath() << "," <<
+				"''" << "," <<
+				(object->getRoad() ? Conversion::ToString(object->getRoad()->getKey()) : "0") << "," <<
+				object->getMetricOffset() << "," <<
+			")";
+			sqlite->execUpdate(query.str());
 	    }
 
 	}

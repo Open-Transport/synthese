@@ -5,6 +5,7 @@
 
 #include "ImportFunction.h"
 #include "DataSourceTableSync.h"
+#include "DataSourcesAdmin.h"
 
 // Registries
 

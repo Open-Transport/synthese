@@ -64,16 +64,14 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
 				std::string name = std::string(),
-				//TODO add other search criterias
 				int first = 0,
-				int number = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,
-				//TODO add other ordering fields
 				bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}
