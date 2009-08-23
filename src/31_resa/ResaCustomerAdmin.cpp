@@ -122,7 +122,7 @@ namespace synthese
 		
 		server::ParametersMap ResaCustomerAdmin::getParametersMap() const
 		{
-			ParametersMap m;
+			ParametersMap m(_log.getParametersMap());
 			if(_user.get()) m.insert(Request::PARAMETER_OBJECT_ID, _user->getKey());
 			return m;
 		}
@@ -300,9 +300,7 @@ namespace synthese
 						{
 							shared_ptr<const User> user(UserTableSync::Get(entry->getObjectId(), *_env));
 
-							shared_ptr<ResaCustomerAdmin> p(
-								getNewOtherPage<ResaCustomerAdmin>()
-							);
+							shared_ptr<ResaCustomerAdmin> p(new ResaCustomerAdmin);
 							p->setUser(user);
 
 							AddToLinks(result, p);
