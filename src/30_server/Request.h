@@ -105,6 +105,16 @@ namespace synthese
 		{
 		public:
 
+			class RedirectException:
+				public std::exception
+			{
+				std::string _location;
+
+			public:
+				RedirectException(const std::string& location);
+				const std::string& getLocation();
+			};
+
 			class ForbiddenRequestException:
 				public std::exception
 			{
@@ -130,7 +140,7 @@ namespace synthese
 			static const std::string PARAMETER_ERROR_MESSAGE;
 			static const std::string PARAMETER_ERROR_LEVEL;
 			static const std::string PARAMETER_ACTION_WILL_CREATE_OBJECT;
-
+			static const std::string PARAMETER_NO_REDIRECT_AFTER_ACTION;
 
 		private:
 
@@ -145,8 +155,9 @@ namespace synthese
 			std::string					_errorMessage;
 			ErrorLevel					_errorLevel;
 			bool						_actionWillCreateObject;
-			boost::optional<util::RegistryKeyType>		_actionCreatedId;
-			
+			boost::optional<util::RegistryKeyType>	_actionCreatedId;
+			bool									_redirectAfterAction;
+
 
 			ParametersMap _getParametersMap() const;
 

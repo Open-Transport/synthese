@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// SimplePageRequest class header.
-///	@file SimplePageRequest.h
+/// SimplePageFunction class header.
+///	@file SimplePageFunction.h
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -27,9 +27,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "11_interfaces/RequestWithInterface.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "RequestWithInterface.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -46,7 +45,8 @@ namespace synthese
 		///
 		///	NB : Only non registered pages can be displayed. To display a
 		/// registered page, call a proper function directly.
-		class SimplePageRequest : public util::FactorableTemplate<RequestWithInterface, SimplePageRequest>
+		class SimplePageFunction:
+			public util::FactorableTemplate<RequestWithInterface, SimplePageFunction>
 		{
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_PAGE_CLASS;

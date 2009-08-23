@@ -44,7 +44,7 @@ namespace synthese
 	namespace interfaces
 	{
 		class Interface;
-		class SimplePageRequest;
+		class SimplePageFunction;
 		class IncludePageInterfaceElement;
 		class RequestWithInterfaceAndRequiredSession;
 
@@ -59,7 +59,7 @@ namespace synthese
 		:	public util::FactoryBase<InterfacePage>,
 			public virtual util::Registrable
 		{
-			friend class SimplePageRequest;
+			friend class SimplePageFunction;
 			friend class IncludePageInterfaceElement;
 			friend class RequestWithInterfaceAndRequiredSession;
 

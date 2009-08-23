@@ -118,13 +118,7 @@ namespace synthese
 			*/
 			virtual void _setFromParametersMap(const ParametersMap& map) = 0;
 
-			/** Method to run after action execution.
-				@return true if the current execution must be stopped
 
-				This method has to be overloaded.
-				The default behavior is to do nothing and continue the execution after the action run.
-			*/
-			virtual bool _runAfterSucceededAction(std::ostream& stream) { return false; }
 
 			/** Method to run before display when no session is detected.
 				@return true if the current execution must be stopped

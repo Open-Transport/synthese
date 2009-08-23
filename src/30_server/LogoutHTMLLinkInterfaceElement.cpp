@@ -22,18 +22,18 @@
 
 #include "LogoutHTMLLinkInterfaceElement.h"
 
-#include "30_server/LogoutAction.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "LogoutAction.h"
+#include "ActionFunctionRequest.h"
 
-#include "05_html/HTMLForm.h"
+#include "HTMLForm.h"
 
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/InterfacePage.h"
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/RedirRequest.h"
-#include "11_interfaces/SimplePageRequest.h"
-#include "11_interfaces/NonPredefinedInterfacePage.h"
+#include "ValueElementList.h"
+#include "InterfacePage.h"
+#include "InterfacePageException.h"
+#include "Interface.h"
+#include "RedirFunction.h"
+#include "SimplePageFunction.h"
+#include "NonPredefinedInterfacePage.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -81,7 +81,7 @@ namespace synthese
 			{
 				try
 				{
-					ActionFunctionRequest<LogoutAction,SimplePageRequest> redirRequest(request);
+					ActionFunctionRequest<LogoutAction,SimplePageFunction> redirRequest(request);
 					redirRequest.getFunction()->setPage(_page->getInterface()->getPage(NonPredefinedInterfacePage::FACTORY_KEY, requestKey));
 					stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 				}
@@ -92,7 +92,7 @@ namespace synthese
 			}
 			if (url.size())
 			{
-				ActionFunctionRequest<LogoutAction,RedirRequest> redirRequest(request);
+				ActionFunctionRequest<LogoutAction,RedirFunction> redirRequest(request);
 				redirRequest.getFunction()->setRedirURL(url);
 				stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 			}

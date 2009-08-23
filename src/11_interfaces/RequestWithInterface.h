@@ -38,11 +38,9 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_INTERFACE;
-			static const std::string PARAMETER_NO_REDIRECT_AFTER_ACTION;
 
 		protected:
 			boost::shared_ptr<const Interface>	_interface;
-			bool								_redirectAfterAction;
 
 			/** Conversion from generic parameters map to attributes.
 			*/
@@ -52,11 +50,6 @@ namespace synthese
 			*/
 			virtual server::ParametersMap _getParametersMap() const;
 
-
-			/** Redirection to the same request without the action.
-			@return true : interrupts the display of the request with the action.
-			*/
-			virtual bool _runAfterSucceededAction(std::ostream& stream);
 
 			virtual void _copy(boost::shared_ptr<const Function> function);
 

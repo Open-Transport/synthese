@@ -1,6 +1,6 @@
 
-/** RedirRequest class implementation.
-	@file RedirRequest.cpp
+/** RedirFunction class implementation.
+	@file RedirFunction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,10 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RedirectInterfacePage.h"
 #include "Interface.h"
-#include "RedirRequest.h"
+#include "RedirFunction.h"
 #include "RequestException.h"
+#include "Request.h"
 
 using namespace std;
 using namespace boost;
@@ -33,13 +33,13 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 
-	template<> const string util::FactorableTemplate<interfaces::RequestWithInterface,interfaces::RedirRequest>::FACTORY_KEY("redir");
+	template<> const string util::FactorableTemplate<interfaces::RequestWithInterface,interfaces::RedirFunction>::FACTORY_KEY("redir");
 
 	namespace interfaces
 	{
-		const std::string RedirRequest::PARAMETER_URL = "url";
+		const std::string RedirFunction::PARAMETER_URL = "url";
 		
-		ParametersMap RedirRequest::_getParametersMap() const
+		ParametersMap RedirFunction::_getParametersMap() const
 		{
 			ParametersMap map(RequestWithInterface::_getParametersMap());
 
@@ -47,47 +47,38 @@ namespace synthese
 			return map;
 		}
 
-		void RedirRequest::_setFromParametersMap(const ParametersMap& map)
+		void RedirFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			RequestWithInterface::_setFromParametersMap(map);
 
 			_url = map.getString(PARAMETER_URL, true, FACTORY_KEY);
 		}
 
-		void RedirRequest::_run( std::ostream& stream ) const
+		void RedirFunction::_run( std::ostream& stream ) const
 		{
-			try
-			{
-				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
-				VariablesMap vm;
-				page->display(stream, vm, _url, _request);
-			}
-			catch (Exception& e)
-			{
-				
-			}
+			throw Request::RedirectException(_url);
 		}
 
-		void RedirRequest::setRedirURL( const std::string& url )
+		void RedirFunction::setRedirURL( const std::string& url )
 		{
 			_url = url;
 		}
 
-		const std::string& RedirRequest::getRedirURL() const
+		const std::string& RedirFunction::getRedirURL() const
 		{
 			return _url;
 		}
 
 
 
-		bool RedirRequest::_isAuthorized(
+		bool RedirFunction::_isAuthorized(
 		) const {
 			return true;
 		}
 
-		std::string RedirRequest::getOutputMimeType() const
+		std::string RedirFunction::getOutputMimeType() const
 		{
-			return _interface->getPage<RedirectInterfacePage>()->getMimeType();
+			return string();
 		}
 	}
 }

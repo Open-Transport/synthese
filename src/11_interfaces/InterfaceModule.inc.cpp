@@ -16,8 +16,7 @@
 #include "11_interfaces/FormattedNumberInterfaceElement.h"
 #include "InterfaceIdInterfaceElement.h"
 
-#include "11_interfaces/RedirectInterfacePage.h"
-#include "11_interfaces/SimplePageRequest.h"
+#include "11_interfaces/SimplePageFunction.h"
 #include "11_interfaces/SetInterfaceElement.h"
 #include "11_interfaces/StrLenInterfaceElement.h"
 #include "11_interfaces/EqualsValueInterfaceElement.h"
@@ -29,7 +28,6 @@
 #include "11_interfaces/PlainCharFilterValueInterfaceElement.h"
 #include "11_interfaces/DateTimeInterfacePage.h"
 #include "11_interfaces/NonPredefinedInterfacePage.h"
-#include "11_interfaces/RedirRequest.h"
 
 // Registries
 #include "Interface.h"

@@ -1,6 +1,6 @@
 
-/** SimplePageRequest class implementation.
-	@file SimplePageRequest.cpp
+/** SimplePageFunction class implementation.
+	@file SimplePageFunction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "SimplePageRequest.h"
+#include "SimplePageFunction.h"
 
 #include "Interface.h"
 #include "InterfacePage.h"
@@ -37,14 +37,14 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 
-	template<> const string util::FactorableTemplate<interfaces::RequestWithInterface, interfaces::SimplePageRequest>::FACTORY_KEY("page");
+	template<> const string util::FactorableTemplate<interfaces::RequestWithInterface, interfaces::SimplePageFunction>::FACTORY_KEY("page");
 
 	namespace interfaces
 	{
-		const string SimplePageRequest::PARAMETER_PAGE_CLASS("pcl");
-		const string SimplePageRequest::PARAMETER_PAGE = "page";
+		const string SimplePageFunction::PARAMETER_PAGE_CLASS("pcl");
+		const string SimplePageFunction::PARAMETER_PAGE = "page";
 
-		void SimplePageRequest::_run( ostream& stream ) const
+		void SimplePageFunction::_run( ostream& stream ) const
 		{
 			if (_page == NULL)
 				return;
@@ -60,7 +60,7 @@ namespace synthese
 			_page->_display(stream, pv, vm, NULL, _request);
 		}
 
-		void SimplePageRequest::_setFromParametersMap(const ParametersMap& map )
+		void SimplePageFunction::_setFromParametersMap(const ParametersMap& map )
 		{
 			RequestWithInterface::_setFromParametersMap(map);
 
@@ -88,7 +88,7 @@ namespace synthese
 				throw RequestException("Forbidden page : "+ classKey + "/" + key);
 		}
 
-		ParametersMap SimplePageRequest::_getParametersMap() const
+		ParametersMap SimplePageFunction::_getParametersMap() const
 		{
 			ParametersMap map(RequestWithInterface::_getParametersMap());
 
@@ -100,24 +100,24 @@ namespace synthese
 			return map;
 		}
 
-		void SimplePageRequest::setPage(const InterfacePage* page )
+		void SimplePageFunction::setPage(const InterfacePage* page )
 		{
 			_page = page;
 		}
 
-		bool SimplePageRequest::_runBeforeDisplayIfNoSession( ostream& stream )
+		bool SimplePageFunction::_runBeforeDisplayIfNoSession( ostream& stream )
 		{
 			return false;
 		}
 
 
 
-		bool SimplePageRequest::_isAuthorized(
+		bool SimplePageFunction::_isAuthorized(
 		) const {
 			return true;
 		}
 
-		std::string SimplePageRequest::getOutputMimeType() const
+		std::string SimplePageFunction::getOutputMimeType() const
 		{
 			return (_page == NULL) ? "text/plain" : _page->getMimeType();
 		}

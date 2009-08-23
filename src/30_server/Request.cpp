@@ -65,6 +65,8 @@ namespace synthese
 		const string Request::PARAMETER_ERROR_MESSAGE = "rem";
 		const string Request::PARAMETER_ERROR_LEVEL = "rel";
 		const string Request::PARAMETER_ACTION_WILL_CREATE_OBJECT = "co";
+		const string Request::PARAMETER_NO_REDIRECT_AFTER_ACTION = "nr";
+
 
 		Request::Request(
 			const Request* request/*=NULL*/,
@@ -72,7 +74,8 @@ namespace synthese
 		):	_session(NULL)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
-			, _actionWillCreateObject(false)
+			, _actionWillCreateObject(false),
+			_redirectAfterAction(request ? request->_redirectAfterAction : true)
 		{
 			if (action.get())
 				_setAction(action);
@@ -95,7 +98,8 @@ namespace synthese
 			_ip(httpRequest.ipaddr)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
-			, _actionWillCreateObject(false)
+			, _actionWillCreateObject(false),
+			_redirectAfterAction(true)
 		{
 			// IP
 			if (_ip.empty())
@@ -142,6 +146,11 @@ namespace synthese
 			if(map.getDefault<bool>(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT, false))
 			{
 				_actionWillCreateObject = true;
+			}
+
+			if(map.getOptional<bool>(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION))
+			{
+				_redirectAfterAction = !map.get<bool>(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION);
 			}
 
 			// Session
@@ -265,8 +274,11 @@ namespace synthese
 					_action->run();
 					
 					// Run after the action
-					if (_function->_runAfterSucceededAction(stream))	// Overloaded method
-						return;
+					if (_redirectAfterAction)
+					{
+						deleteAction();
+						throw RedirectException(getURL());
+					}
 				}
 				catch (ActionException e)	// Action run error
 				{
@@ -381,6 +393,12 @@ namespace synthese
 			if (_actionCreatedId)
 				result.insert(Request::PARAMETER_OBJECT_ID, *_actionCreatedId);
 
+			// No redirection
+			if(!_redirectAfterAction)
+			{
+				result.insert(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION, 1);
+			}
+
 			return result;
 		}
 
@@ -486,6 +504,21 @@ namespace synthese
 		void Request::setActionWillCreateObject()
 		{
 			_actionWillCreateObject = true;
+		}
+
+
+
+		Request::RedirectException::RedirectException( const std::string& location )
+			: _location(location)
+		{
+
+		}
+
+
+
+		const std::string& Request::RedirectException::getLocation()
+		{
+			return _location;
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// RedirRequest class header.
-///	@file RedirRequest.h
+/// RedirFunction class header.
+///	@file RedirFunction.h
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -37,8 +37,8 @@ namespace synthese
 		///	@ingroup m11Functions refFunctions
 		///
 		///	The redirection avoids to run an action.
-		class RedirRequest
-		:	public util::FactorableTemplate<RequestWithInterface,RedirRequest>
+		class RedirFunction
+		:	public util::FactorableTemplate<RequestWithInterface,RedirFunction>
 		{
 			static const std::string PARAMETER_URL;
 			

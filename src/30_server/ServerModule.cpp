@@ -199,6 +199,11 @@ namespace synthese
 				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
 				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType()));
 			}
+			catch(Request::RedirectException& e)
+			{
+				rep = HTTPReply::stock_reply(HTTPReply::moved_temporarily);
+				rep.headers.insert(make_pair("Location", e.getLocation()));
+			}
 			catch(Request::ForbiddenRequestException& e)
 			{
 				Log::GetInstance().debug("Forbidden request");

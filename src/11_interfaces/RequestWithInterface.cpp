@@ -22,16 +22,13 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "HTMLForm.h"
 
-#include "05_html/HTMLForm.h"
+#include "RequestWithInterface.h"
+#include "Interface.h"
 
-#include "11_interfaces/RequestWithInterface.h"
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/RedirectInterfacePage.h"
-
-#include "30_server/RequestException.h"
-#include "30_server/Request.h"
+#include "RequestException.h"
+#include "Request.h"
 
 using namespace std;
 using namespace boost;
@@ -45,28 +42,14 @@ namespace synthese
 	namespace interfaces
 	{
 		const std::string RequestWithInterface::PARAMETER_INTERFACE = "i";
-		const std::string RequestWithInterface::PARAMETER_NO_REDIRECT_AFTER_ACTION = "nr";
 
 		RequestWithInterface::RequestWithInterface()
 			: Function()
-			, _redirectAfterAction(true)
 		{
 
 		}
 
-		/** @todo to be moved elsewhere because the interface is not necessarily an html interface */
-		bool RequestWithInterface::_runAfterSucceededAction(ostream& stream)
-		{
-			if (_redirectAfterAction && _interface)
-			{
-				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
-				_request->deleteAction();
-				VariablesMap vm;
-				page->display(stream, vm, _request);
-				return true;
-			}
-			return _interface == NULL;
-		}
+
 
 		void RequestWithInterface::_setFromParametersMap( const ParametersMap& map )
 		{
@@ -78,8 +61,6 @@ namespace synthese
 				{
 					_interface = Env::GetOfficialEnv().getRegistry<Interface>().get(id);
 				}
-
-				_redirectAfterAction = !map.getBool(PARAMETER_NO_REDIRECT_AFTER_ACTION, false, false, "RWI");
 			}
 			catch (ObjectNotFoundException<Interface>& e)
 			{
