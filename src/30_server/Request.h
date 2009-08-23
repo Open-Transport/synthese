@@ -113,6 +113,7 @@ namespace synthese
 			public:
 				RedirectException(const std::string& location);
 				const std::string& getLocation();
+				virtual ~RedirectException() throw();
 			};
 
 			class ForbiddenRequestException:

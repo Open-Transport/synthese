@@ -515,6 +515,9 @@ namespace synthese
 		}
 
 
+		Request::RedirectException::~RedirectException() throw()
+		{
+		}
 
 		const std::string& Request::RedirectException::getLocation()
 		{
