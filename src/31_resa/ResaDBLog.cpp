@@ -445,6 +445,9 @@ namespace synthese
 			case ResaDBLog::PASSWORD_UPDATE:
 				return "key.png";
 
+			case ResaDBLog::PERSONAL_DATA_UPDATE:
+				return "user_edit.png"
+
 			case ResaDBLog::OTHER:
 			default:
 				return "help.png";
@@ -516,6 +519,9 @@ namespace synthese
 
 			case ResaDBLog::PASSWORD_UPDATE:
 				return "Changement de mot de passe";
+
+			case ResaDBLog::PERSONAL_DATA_UPDATE:
+				return "Modification des informations de contact";
 
 			case ResaDBLog::OTHER:
 			default:

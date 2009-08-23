@@ -331,7 +331,7 @@ namespace synthese
 				{
 					assert(line->getCommercialLine() != NULL);
 
-					r->setLineCode(line->getCommercialLine()->getName());
+					r->setLineCode(line->getCommercialLine()->getShortName());
 					r->setLineId(line->getCommercialLine()->getKey());
 				}
 				const Road* road(dynamic_cast<const Road*>(su.getService()->getPath()));
