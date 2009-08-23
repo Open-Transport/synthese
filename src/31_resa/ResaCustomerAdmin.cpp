@@ -49,7 +49,8 @@
 
 #include "User.h"
 #include "UserTableSync.h"
-#include "UserUpdateAction.h"
+#include "ReservationUserUpdateAction.h"
+#include "SendPasswordAction.h"
 #include "SecurityModule.h"
 
 #include "DateTime.h"
@@ -139,10 +140,15 @@ namespace synthese
 			{
 
 				// Requests
-				AdminActionFunctionRequest<UserUpdateAction,ResaCustomerAdmin> updateRequest(
+				AdminActionFunctionRequest<ReservationUserUpdateAction,ResaCustomerAdmin> updateRequest(
 					_request
 				);
 				updateRequest.getAction()->setUser(_user);
+
+				AdminActionFunctionRequest<SendPasswordAction,ResaCustomerAdmin> sendPasswordRequest(
+					_request
+				);
+				sendPasswordRequest.getAction()->setUser(_user);
 
 				AdminFunctionRequest<ReservationRoutePlannerAdmin> routeplannerRequest(
 					_request
@@ -163,31 +169,27 @@ namespace synthese
 				stream << t.title("Connexion");
 				stream << t.cell(
 					"Login",
-					t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin())
+					t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_LOGIN, _user->getLogin())
 				);
 
 				stream << t.title("Coordonnées");
-				stream << t.cell("Prénom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
-				stream << t.cell("Nom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName()));
-				stream << t.cell("Adresse", t.getForm().getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50));
-				stream << t.cell("Code postal", t.getForm().getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()));
-				stream << t.cell("Ville", t.getForm().getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText()));
-				stream << t.cell("Téléphone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
-				stream << t.cell("E-mail",t.getForm().getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
+				stream << t.cell("Prénom", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
+				stream << t.cell("Nom", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_NAME, _user->getName()));
+				stream << t.cell("Adresse", t.getForm().getTextAreaInput(ReservationUserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50));
+				stream << t.cell("Code postal", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()));
+				stream << t.cell("Ville", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_CITY, _user->getCityText()));
+				stream << t.cell("Téléphone",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
+				stream << t.cell("E-mail",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
 
 				stream << t.title("Droits");
-				stream << t.cell("Accès site web",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
+				stream << t.cell("Accès site web",t.getForm().getOuiNonRadioInput(ReservationUserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
 
 				if(_user->getProfile()->getKey() == ResaModule::GetBasicResaCustomerProfile()->getKey() ||
 					_user->getProfile()->getKey() == ResaModule::GetAutoResaResaCustomerProfile()->getKey()
 				){
-					map<uid, string> profiles;
-					profiles[ResaModule::GetBasicResaCustomerProfile()->getKey()] = "Auto réservation interdite";
-					profiles[ResaModule::GetAutoResaResaCustomerProfile()->getKey()] = "Auto réservation autorisée";
-
 					stream << t.cell(
-						"Auto-réservation",
-						t.getForm().getRadioInputCollection(UserUpdateAction::PARAMETER_PROFILE_ID, profiles, _user->getProfile()->getKey(), true)
+						"Auto-réservation autorisée",
+						t.getForm().getOuiNonRadioInput(ReservationUserUpdateAction::PARAMETER_AUTORESA_ACTIVATED, _user->getProfile()->getKey() == ResaModule::GetAutoResaResaCustomerProfile()->getKey())
 					);
 				}
 				else
@@ -195,6 +197,8 @@ namespace synthese
 					stream << t.cell("Droits","Cet utilisateur n'est pas un client. Son niveau de droits est défini par ailleurs et ne peut être visualisé ni modifié ici.");
 				}
 				stream << t.close();
+
+				stream << "<p>" << HTMLModule::getLinkButton(sendPasswordRequest.getURL(), "Envoi de nouveau mot de passe par e-mail", string(), ResaDBLog::GetIconURL(ResaDBLog::EMAIL)) << "</p>";
 			}
 
 
@@ -275,6 +279,44 @@ namespace synthese
 		boost::shared_ptr<const security::User> ResaCustomerAdmin::getUser() const
 		{
 			return _user;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPagesOfModule( const std::string& moduleKey, const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
+		{
+			PageLinks result;
+			if(moduleKey == ResaModule::FACTORY_KEY)
+			{
+				util::RegistryKeyType callId(ResaModule::GetCurrentCallId(request.getSession()));
+
+				if(callId > 0)
+				{
+					shared_ptr<const DBLogEntry> entry(DBLogEntryTableSync::Get(callId, *_env));
+
+					if(entry->getObjectId() > 0)
+					{
+						try
+						{
+							shared_ptr<const User> user(UserTableSync::Get(entry->getObjectId(), *_env));
+
+							shared_ptr<ResaCustomerAdmin> p(
+								getNewOtherPage<ResaCustomerAdmin>()
+							);
+							p->setUser(user);
+
+							AddToLinks(result, p);
+						}
+						catch(...)
+						{
+
+						}
+
+					}
+	
+				}
+			}
+			return result;
 		}
 	}
 }

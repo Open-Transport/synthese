@@ -1,8 +1,8 @@
 
-/** CancelReservationAction class header.
-	@file CancelReservationAction.h
-	@author Hugues Romain
-	@date 2007
+/** ReservationUserUpdateAction class header.
+	@file ReservationUserUpdateAction.h
+	@author Hugues
+	@date 2009
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,30 +22,56 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CancelReservationAction_H__
-#define SYNTHESE_CancelReservationAction_H__
+#ifndef SYNTHESE_ReservationUserUpdateAction_H__
+#define SYNTHESE_ReservationUserUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace resa
 	{
-		class ReservationTransaction;
-
-		/** CancelReservationAction action class.
+		/** ReservationUserUpdateAction action class.
 			@ingroup m31Actions refActions
+
+			@bug If two new logins are requested for the same couple surname / name at the
+			same time, it is possible that the two users become the same login
 		*/
-		class CancelReservationAction
-			: public util::FactorableTemplate<server::Action, CancelReservationAction>
+		class ReservationUserUpdateAction:
+			public util::FactorableTemplate<server::Action, ReservationUserUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_RESERVATION_TRANSACTION_ID;
+			static const std::string PARAMETER_USER_ID;
+			static const std::string PARAMETER_LOGIN;
+			static const std::string PARAMETER_SURNAME;
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_ADDRESS;
+			static const std::string PARAMETER_POSTAL_CODE;
+			static const std::string PARAMETER_CITY;
+			static const std::string PARAMETER_PHONE;
+			static const std::string PARAMETER_EMAIL;
+			static const std::string PARAMETER_AUTHORIZED_LOGIN;
+			static const std::string PARAMETER_AUTORESA_ACTIVATED;
 
 		private:
-			boost::shared_ptr<ReservationTransaction>	_transaction;
-			
+			boost::shared_ptr<security::User>	_user;
+			std::string				_login;
+			std::string				_surname;
+			std::string				_name;
+			std::string				_address;
+			std::string				_postalCode;
+			std::string				_city;
+			std::string				_phone;
+			std::string				_email;
+			boost::optional<bool>	_authorizedLogin;
+			boost::optional<bool>	_autoResaActivated;
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
@@ -63,12 +89,12 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
-
-			void setTransaction(boost::shared_ptr<ReservationTransaction> transaction);
-
+			
 			virtual bool _isAuthorized() const;
+
+			void setUser(boost::shared_ptr<const security::User> value);
 		};
 	}
 }
 
-#endif // SYNTHESE_CancelReservationAction_H__
+#endif // SYNTHESE_ReservationUserUpdateAction_H__

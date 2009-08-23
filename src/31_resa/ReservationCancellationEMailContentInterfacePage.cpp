@@ -1,6 +1,6 @@
 
-/** ReservationConfirmationEMailInterfacePage class implementation.
-	@file ReservationConfirmationEMailInterfacePage.cpp
+/** ReservationCancellationEMailContentInterfacePage class implementation.
+	@file ReservationCancellationEMailContentInterfacePage.cpp
 	@author Hugues
 	@date 2009
 
@@ -22,15 +22,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ReservationConfirmationEMailInterfacePage.h"
+#include "ReservationCancellationEMailContentInterfacePage.h"
 #include "ReservationTransaction.h"
 #include "ReservationConfirmationEMailItemInterfacePage.h"
 #include "Reservation.h"
 #include "Interface.h"
 
-#include <sstream>
 #include <boost/lexical_cast.hpp>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -39,28 +37,28 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
+	using namespace resa;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<InterfacePage, resa::ReservationConfirmationEMailInterfacePage>::FACTORY_KEY("reservation_confirmation_email_content");
+		template<> const string FactorableTemplate<InterfacePage, resa::ReservationCancellationEMailContentInterfacePage>::FACTORY_KEY("reservation_cancellation_email_content");
 	}
 
 	namespace resa
 	{
-		ReservationConfirmationEMailInterfacePage::ReservationConfirmationEMailInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, ReservationConfirmationEMailInterfacePage>(),
+		ReservationCancellationEMailContentInterfacePage::ReservationCancellationEMailContentInterfacePage()
+			: FactorableTemplate<interfaces::InterfacePage, ReservationCancellationEMailContentInterfacePage>(),
 			Registrable(UNKNOWN_VALUE)
 		{
-
 		}
+		
+		
 
-
-
-		void ReservationConfirmationEMailInterfacePage::display(
+		void ReservationCancellationEMailContentInterfacePage::display(
 			std::ostream& stream,
-			const ReservationTransaction& resa
-			, VariablesMap& variables
-			, const server::Request* request /*= NULL*/
+			const ReservationTransaction& resa,
+			VariablesMap& variables,
+			const server::Request* request /*= NULL*/
 		) const	{
 			ParametersVector pv;
 

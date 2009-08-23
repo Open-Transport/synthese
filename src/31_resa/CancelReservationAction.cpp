@@ -30,12 +30,15 @@
 #include "ReservationTableSync.h"
 #include "ResaRight.h"
 #include "ResaDBLog.h"
-
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "OnlineReservationRule.h"
+#include "OnlineReservationRuleTableSync.h"
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
 #include "User.h"
-#include "Conversion.h"
+#include "UserTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -48,6 +51,8 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace time;
+	using namespace env;
+	
 	
 	namespace util
 	{
@@ -56,7 +61,6 @@ namespace synthese
 
 	namespace resa
 	{
-		const string CancelReservationAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pw";
 		const string CancelReservationAction::PARAMETER_RESERVATION_TRANSACTION_ID = Action_PARAMETER_PREFIX + "rt";
 
 		
@@ -91,15 +95,6 @@ namespace synthese
 			{
 				if (_request->getUser()->getKey() != _transaction->getCustomerUserId())
 					throw ActionException("Non autorisé");
-
-				string password(map.get<string>(PARAMETER_PASSWORD));
-				if (password.empty())
-					throw ActionException("Le mot de passe doit être fourni");
-
-				if (password != _request->getUser()->getPassword())
-				{
-					throw ActionException("Mot de passe erronné");
-				}
 			}
 
 			// Control of the date : a cancellation has no sense if after the arrival time
@@ -115,6 +110,12 @@ namespace synthese
 						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
 					break;
 				}
+			}
+
+			// Tests if the reservation is already cancelled
+			if(!_transaction->getCancellationTime().isUnknown())
+			{
+				throw ActionException("Cette réservation est déjà annulée.");
 			}
 		}
 		
@@ -133,6 +134,35 @@ namespace synthese
 
 			// Write the log
 			ResaDBLog::AddCancelReservationEntry(_request->getSession(), *_transaction, oldStatus);
+
+			// Mail
+			shared_ptr<const User> customer(UserTableSync::Get(_transaction->getCustomerUserId(), *_env));
+			const OnlineReservationRule* reservationContact(NULL);
+			BOOST_FOREACH(const Reservation* resa, _transaction->getReservations())
+			{
+				try
+				{
+					shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(resa->getLineId(), *_env));
+					const OnlineReservationRule* onlineContact(OnlineReservationRule::GetOnlineReservationRule(
+							line->getReservationContact()
+					)	);
+					if(onlineContact)
+					{
+						reservationContact = onlineContact;
+						break;
+					}
+				}
+				catch(...)
+				{
+					continue;
+				}
+			}
+			if(	customer.get() && !customer->getEMail().empty() && reservationContact)
+			{
+				reservationContact->sendCustomerCancellationEMail(*_transaction);
+
+				ResaDBLog::AddEMailEntry(*_request->getSession(), *customer, "Annulation de réservation");
+			}
 		}
 
 

@@ -1,6 +1,6 @@
 
-/** ReservationConfirmationEMailInterfacePage class header.
-	@file ReservationConfirmationEMailInterfacePage.h
+/** ReservationEditInterfacePage class header.
+	@file ReservationEditInterfacePage.h
 	@author Hugues
 	@date 2009
 
@@ -22,8 +22,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ReservationConfirmationEMailInterfacePage_H__
-#define SYNTHESE_ReservationConfirmationEMailInterfacePage_H__
+#ifndef SYNTHESE_ReservationEditInterfacePage_H__
+#define SYNTHESE_ReservationEditInterfacePage_H__
 
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
@@ -34,21 +34,24 @@ namespace synthese
 	{
 		class Request;
 	}
-
+	
 	namespace resa
 	{
 		class ReservationTransaction;
+	}
 
-		/** ReservationConfirmationEMailInterfacePage Interface Page Class.
+	namespace resa
+	{
+		/** ReservationEditInterfacePage Interface Page Class.
 			@ingroup m31Pages refPages
 			@author Hugues
 			@date 2009
 
-			@code reservation_confirmation_email_content @endcode
+			@code reservation_edit @endcode
 
 			Parameters :
-				- 0 : journey detail
-				- 1 : ID of the reservation transaction
+				- 0 : ID of the reservation transaction
+				- 1 : journey detail
 				- 2 : ID of the customer
 				- 3 : date of cancellation dead line
 				- 4 : time of cancellation dead line
@@ -57,32 +60,37 @@ namespace synthese
 				- 7 : travel date
 				- 8 : customer name
 				- 9 : customer phone
+				- 10 : status text
+				- 11 : can be cancelled
+				- 12 : session ID
+				- 13 : cancellation date
+				- 14 : cancellation time
+
+			Parameters 1 to 13 are sent only if a valid user is logged in.
 
 			Object : ReservationTransaction
 		*/
-		class ReservationConfirmationEMailInterfacePage
-			: public util::FactorableTemplate<interfaces::InterfacePage, ReservationConfirmationEMailInterfacePage>
+		class ReservationEditInterfacePage
+			: public util::FactorableTemplate<interfaces::InterfacePage, ReservationEditInterfacePage>
 		{
 		public:
-			ReservationConfirmationEMailInterfacePage();
-
-
-
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
-				@param resa Reservation transaction to confirm
+				@param ...	
 				@param variables Execution variables
 				@param request Source request
 			*/
 			void display(
 				std::ostream& stream,
-				const ReservationTransaction& resa,
+				const resa::ReservationTransaction& object,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;
+			
+			ReservationEditInterfacePage();
 		};
 	}
 }
 
-#endif // SYNTHESE_ReservationConfirmationEMailInterfacePage_H__
+#endif // SYNTHESE_ReservationEditInterfacePage_H__

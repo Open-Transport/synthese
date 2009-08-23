@@ -223,8 +223,9 @@ INSERT INTO t022_transport_networks VALUES(6192449487677437,'Network2','');
 
 REPLACE INTO t021_reservation_contacts(id,phone_exchange_number,phone_exchange_opening_hours,description,web_site_url) 
 	VALUES(5910974511914805,'0800 929 929 (gratuit depuis un poste fixe) ou 05 34 25 33 75','entre 6h30 et 22h30','Test','');
-REPLACE INTO t047_online_reservation_rules(id,reservation_rule_id,email,copy_email,needs_surname,needs_address,needs_phone,needs_email,needs_customer_number,max_seat,thresholds,sender_email,sender_name,email_subject,email_interface_id)
-	VALUES(13229323905400833,5910974511914805,'','',0,0,1,0,0,1000,'','hromain@reseaux-conseil.com','Centrale de réservation RCS', 'Récapitulatif de votre réservation',6755399441055759);
+REPLACE INTO t047_online_reservation_rules(id,reservation_rule_id,email,copy_email,needs_surname,needs_address,needs_phone,needs_email,needs_customer_number,max_seat,thresholds,sender_email,sender_name,email_interface_id)
+	VALUES(13229323905400833,5910974511914805,'','',0,0,1,0,0,1000,'','hromain@reseaux-conseil.com','Centrale de réservation RCS',6755399441055759);
+REPLACE INTO t999_config(param_name,param_value) VALUES('reservation_contact',13229323905400833);
 
 REPLACE INTO t061_pt_use_rules(id,name,capacity,reservation_type,origin_is_reference,min_delay_minutes,min_delay_days,max_delay_days,hour_deadline,default_fare_id) 
 	VALUES(2305843009213693953,'DRT Test','',3,0,10,0,60,'23:59:00',NULL);

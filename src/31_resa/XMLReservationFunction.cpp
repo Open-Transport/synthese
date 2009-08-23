@@ -28,6 +28,7 @@
 #include "Request.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -74,6 +75,14 @@ namespace synthese
 		std::string XMLReservationFunction::getOutputMimeType() const
 		{
 			return "text/xml";
+		}
+
+
+
+		XMLReservationFunction::XMLReservationFunction():
+		FactorableTemplate<server::Function,XMLReservationFunction>()
+		{
+			setEnv(shared_ptr<Env>(new Env));
 		}
 	}
 }

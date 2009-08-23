@@ -28,7 +28,14 @@
 #include "ResaModule.h"
 #include "EnvModule.h"
 #include "ReservationConfirmationEMailInterfacePage.h"
+#include "ReservationConfirmationEMailSubjectInterfacePage.h"
 #include "Interface.h"
+#include "CustomerPasswordEMailContentInterfacePage.h"
+#include "CustomerPasswordEMailSubjectInterfacePage.h"
+#include "User.h"
+#include "ReservationCancellationEMailContentInterfacePage.h"
+#include "ReservationCancellationEMailSubjectInterfacePage.h"
+#include "ReservationContact.h"
 
 #include "01_util/Constants.h"
 
@@ -41,6 +48,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace interfaces;
+	using namespace security;
 
 	namespace util
 	{
@@ -114,12 +122,12 @@ namespace synthese
 		{
 			if (_reservationRule != NULL)
 			{
-				OnlineReservationRuleMap::iterator it(_onlineReservationRuleMap.find(_reservationRule));
+				OnlineReservationRuleMap::iterator it(_onlineReservationRuleMap.find(_reservationRule->getKey()));
 				assert(it != _onlineReservationRuleMap.end());
 				_onlineReservationRuleMap.erase(it);
 			}
 			_reservationRule = rule;
-			_onlineReservationRuleMap.insert(make_pair(rule, this));
+			_onlineReservationRuleMap.insert(make_pair(rule->getKey(), this));
 		}
 
 		void OnlineReservationRule::setEMail( const std::string& email )
@@ -170,7 +178,7 @@ namespace synthese
 		const OnlineReservationRule* OnlineReservationRule::GetOnlineReservationRule(
 			const env::ReservationContact* rule
 		){
-			OnlineReservationRuleMap::const_iterator it(_onlineReservationRuleMap.find(rule));
+			OnlineReservationRuleMap::const_iterator it(_onlineReservationRuleMap.find(rule->getKey()));
 			return (it == _onlineReservationRuleMap.end()) ? NULL : it->second;
 		}
 
@@ -188,7 +196,8 @@ namespace synthese
 		) const {
 
 			if(	_eMailInterface == NULL ||
-				_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>() == NULL
+				_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>() == NULL ||
+				_eMailInterface->getPage<ReservationConfirmationEMailSubjectInterfacePage>() == NULL
 			){
 				return false;
 			}
@@ -199,11 +208,18 @@ namespace synthese
 				email.setFormat(EMail::EMAIL_HTML);
 				email.setSender(_senderEMail);
 				email.setSenderName(_senderName);
-				email.setSubject(_eMailSubject);
+
+				stringstream subject;
+				VariablesMap v;
+				_eMailInterface->getPage<ReservationConfirmationEMailSubjectInterfacePage>()->display(
+					subject,
+					resa,
+					v
+				);
+				email.setSubject(subject.str());
 				email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
 				
 				stringstream content;
-				VariablesMap v;
 				_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>()->display(
 					content,
 					resa,
@@ -222,6 +238,51 @@ namespace synthese
 
 
 
+		bool OnlineReservationRule::sendCustomerEMail( const security::User& customer ) const
+		{
+			if(	_eMailInterface == NULL ||
+				_eMailInterface->getPage<CustomerPasswordEMailContentInterfacePage>() == NULL ||
+				_eMailInterface->getPage<CustomerPasswordEMailSubjectInterfacePage>() == NULL ||
+				customer.getEMail().empty()
+			){
+				return false;
+			}
+
+			try
+			{
+				EMail email(ServerModule::GetEMailSender());
+				email.setFormat(EMail::EMAIL_HTML);
+				email.setSender(_senderEMail);
+				email.setSenderName(_senderName);
+
+				VariablesMap v;
+				stringstream subject;
+				_eMailInterface->getPage<CustomerPasswordEMailSubjectInterfacePage>()->display(
+					subject,
+					customer,
+					v
+				);
+				email.setSubject(subject.str());
+				email.addRecipient(customer.getEMail(), customer.getFullName());
+
+				stringstream content;
+				_eMailInterface->getPage<CustomerPasswordEMailContentInterfacePage>()->display(
+					content,
+					customer,
+					v
+				);
+				email.setContent(content.str());
+
+				email.send();
+				return true;
+			}
+			catch(boost::system::system_error)
+			{
+				return false;
+			}
+		}
+
+
 		void OnlineReservationRule::setSenderEMail( const std::string& value )
 		{
 			_senderEMail = value;
@@ -232,13 +293,6 @@ namespace synthese
 		void OnlineReservationRule::setSenderName( const std::string& value )
 		{
 			_senderName = value;
-		}
-
-
-
-		void OnlineReservationRule::setEMailSubject( const std::string& value )
-		{
-			_eMailSubject = value;
 		}
 
 
@@ -257,13 +311,6 @@ namespace synthese
 
 
 
-		const std::string& OnlineReservationRule::getEMailSubject() const
-		{
-			return _eMailSubject;
-		}
-
-
-
 		void OnlineReservationRule::setEMailInterface( interfaces::Interface* value )
 		{
 			_eMailInterface = value;
@@ -274,6 +321,52 @@ namespace synthese
 		interfaces::Interface* OnlineReservationRule::getEMailInterface() const
 		{
 			return _eMailInterface;
+		}
+
+
+
+		bool OnlineReservationRule::sendCustomerCancellationEMail(
+			const ReservationTransaction& resa
+		) const	{
+			if(	_eMailInterface == NULL ||
+				_eMailInterface->getPage<ReservationCancellationEMailSubjectInterfacePage>() == NULL ||
+				_eMailInterface->getPage<ReservationCancellationEMailContentInterfacePage>() == NULL
+			){
+				return false;
+			}
+
+			try
+			{
+				EMail email(ServerModule::GetEMailSender());
+				email.setFormat(EMail::EMAIL_HTML);
+				email.setSender(_senderEMail);
+				email.setSenderName(_senderName);
+
+				stringstream subject;
+				VariablesMap v;
+				_eMailInterface->getPage<ReservationCancellationEMailSubjectInterfacePage>()->display(
+					subject,
+					resa,
+					v
+					);
+				email.setSubject(subject.str());
+				email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
+
+				stringstream content;
+				_eMailInterface->getPage<ReservationCancellationEMailContentInterfacePage>()->display(
+					content,
+					resa,
+					v
+					);
+				email.setContent(content.str());
+
+				email.send();
+				return true;
+			}
+			catch(boost::system::system_error)
+			{
+				return false;
+			}
 		}
 	}
 }

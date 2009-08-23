@@ -8,13 +8,22 @@ synthese::resa::CancelReservationAction::integrate();
 synthese::resa::CallBeginAction::integrate();
 synthese::resa::CallEndAction::integrate();
 synthese::resa::ResaLogEntryUpdateAction::integrate();
+synthese::resa::ReservationUserUpdateAction::integrate();
+synthese::resa::SendPasswordAction::integrate();
 
 synthese::resa::XMLReservationFunction::integrate();
 synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
+synthese::resa::ReservationEditFunction::integrate();
 
 synthese::resa::ReservationItemInterfacePage::integrate();
 synthese::resa::ReservationConfirmationEMailInterfacePage::integrate();
 synthese::resa::ReservationConfirmationEMailItemInterfacePage::integrate();
+synthese::resa::CustomerPasswordEMailContentInterfacePage::integrate();
+synthese::resa::ReservationConfirmationEMailSubjectInterfacePage::integrate();
+synthese::resa::CustomerPasswordEMailSubjectInterfacePage::integrate();
+synthese::resa::ReservationEditInterfacePage::integrate();
+synthese::resa::ReservationCancellationEMailSubjectInterfacePage::integrate();
+synthese::resa::ReservationCancellationEMailContentInterfacePage::integrate();
 
 synthese::resa::ResaCallButtonInterfaceElement::integrate();
 

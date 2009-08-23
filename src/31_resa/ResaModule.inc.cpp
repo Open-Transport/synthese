@@ -14,15 +14,24 @@
 #include "31_resa/CallBeginAction.h"
 #include "31_resa/CallEndAction.h"
 #include "31_resa/ResaLogEntryUpdateAction.h"
+#include "ReservationUserUpdateAction.h"
+#include "SendPasswordAction.h"
 
 #include "XMLReservationFunction.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
+#include "ReservationEditFunction.h"
 
 #include "ReservationItemInterfacePage.h"
 #include "ReservationConfirmationEMailInterfacePage.h"
 #include "ReservationConfirmationEMailItemInterfacePage.h"
+#include "CustomerPasswordEMailContentInterfacePage.h"
+#include "ReservationConfirmationEMailSubjectInterfacePage.h"
+#include "CustomerPasswordEMailSubjectInterfacePage.h"
+#include "ReservationEditInterfacePage.h"
+#include "ReservationCancellationEMailSubjectInterfacePage.h"
+#include "ReservationCancellationEMailContentInterfacePage.h"
 
-#include "31_resa/ResaCallButtonInterfaceElement.h"
+#include "ResaCallButtonInterfaceElement.h"
 
 #include "31_resa/BookableCommercialLineAdmin.h"
 #include "31_resa/BookableCommercialLinesAdmin.h"

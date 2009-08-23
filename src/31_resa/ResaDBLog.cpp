@@ -439,6 +439,12 @@ namespace synthese
 			case ResaDBLog::AUTORESA_DEACTIVATION:
 				return "application_form_delete.png";
 
+			case ResaDBLog::CUSTOMER_CREATION_ENTRY:
+				return "user_add.png";
+
+			case ResaDBLog::PASSWORD_UPDATE:
+				return "key.png";
+
 			case ResaDBLog::OTHER:
 			default:
 				return "help.png";
@@ -505,6 +511,12 @@ namespace synthese
 			case ResaDBLog::AUTORESA_DEACTIVATION:
 				return "Desactivation auto réservation";
 
+			case ResaDBLog::CUSTOMER_CREATION_ENTRY:
+				return "Création du client";
+
+			case ResaDBLog::PASSWORD_UPDATE:
+				return "Changement de mot de passe";
+
 			case ResaDBLog::OTHER:
 			default:
 				return "Autre";
@@ -514,6 +526,98 @@ namespace synthese
 		std::string ResaDBLog::getObjectColumnName() const
 		{
 			return "Client";
+		}
+
+
+
+		void ResaDBLog::AddUserAdminEntry(
+			const server::Session& session,
+			const User& subject,
+			const std::string& text
+		){
+			uid callId(ResaModule::GetCurrentCallId(&session));
+
+			DBLog::ColumnsVector content;
+			content.push_back(lexical_cast<string>(PERSONAL_DATA_UPDATE));
+			content.push_back(string());
+			content.push_back(text);
+			content.push_back(string());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+
+			UpdateCallEntryCustomer(callId, subject.getKey());
+		}
+
+
+
+		void ResaDBLog::AddUserChangeAutoResaActivationEntry( const server::Session& session, const User& subject )
+		{
+			uid callId(ResaModule::GetCurrentCallId(&session));
+
+			DBLog::ColumnsVector content;
+			content.push_back(lexical_cast<string>(
+					(subject.getProfile()->getKey() == ResaModule::GetBasicResaCustomerProfile()->getKey()) ?
+					AUTORESA_DEACTIVATION :
+					AUTORESA_ACTIVATION
+			)	);
+			content.push_back(string());
+			content.push_back(string());
+			content.push_back(string());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+
+			UpdateCallEntryCustomer(callId, subject.getKey());
+		}
+
+
+
+		void ResaDBLog::AddCustomerCreationEntry( const server::Session& session, const User& subject )
+		{
+			uid callId(ResaModule::GetCurrentCallId(&session));
+
+			DBLog::ColumnsVector content;
+			content.push_back(lexical_cast<string>(CUSTOMER_CREATION_ENTRY));
+			content.push_back(string());
+			content.push_back(subject.getFullName());
+			content.push_back(string());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+
+			UpdateCallEntryCustomer(callId, subject.getKey());
+		}
+
+
+
+		void ResaDBLog::AddEMailEntry( const server::Session& session, const User& subject, const std::string& text )
+		{
+			uid callId(ResaModule::GetCurrentCallId(&session));
+
+			DBLog::ColumnsVector content;
+			content.push_back(lexical_cast<string>(EMAIL));
+			content.push_back(string());
+			content.push_back(text);
+			content.push_back(string());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+
+			UpdateCallEntryCustomer(callId, subject.getKey());
+		}
+
+
+
+		void ResaDBLog::AddPasswordInitEntry( const server::Session& session, const security::User& subject )
+		{
+			uid callId(ResaModule::GetCurrentCallId(&session));
+
+			DBLog::ColumnsVector content;
+			content.push_back(lexical_cast<string>(PASSWORD_UPDATE));
+			content.push_back(string());
+			content.push_back("Réinitialisation aléatoire");
+			content.push_back(string());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+
+			UpdateCallEntryCustomer(callId, subject.getKey());
 		}
 	}
 }

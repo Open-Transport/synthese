@@ -65,7 +65,6 @@ namespace synthese
 		const string OnlineReservationRuleTableSync::COL_THRESHOLDS = "thresholds";
 		const string OnlineReservationRuleTableSync::COL_SENDER_EMAIL("sender_email");
 		const string OnlineReservationRuleTableSync::COL_SENDER_NAME("sender_name");
-		const string OnlineReservationRuleTableSync::COL_EMAIL_SUBJECT("email_subject");
 		const string OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID("email_interface_id");
 	}
 
@@ -90,7 +89,6 @@ namespace synthese
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_THRESHOLDS, SQL_INTEGER),
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_EMAIL, SQL_TEXT),
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL_SUBJECT, SQL_TEXT),
 			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
@@ -114,7 +112,6 @@ namespace synthese
 
 			object->setSenderEMail(rows->getText(OnlineReservationRuleTableSync::COL_SENDER_EMAIL));
 			object->setSenderName(rows->getText(OnlineReservationRuleTableSync::COL_SENDER_NAME));
-			object->setEMailSubject(rows->getText(OnlineReservationRuleTableSync::COL_EMAIL_SUBJECT));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{

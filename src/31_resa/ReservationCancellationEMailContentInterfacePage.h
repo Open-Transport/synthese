@@ -1,6 +1,6 @@
 
-/** ReservationConfirmationEMailInterfacePage class header.
-	@file ReservationConfirmationEMailInterfacePage.h
+/** ReservationCancellationEMailContentInterfacePage class header.
+	@file ReservationCancellationEMailContentInterfacePage.h
 	@author Hugues
 	@date 2009
 
@@ -22,8 +22,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ReservationConfirmationEMailInterfacePage_H__
-#define SYNTHESE_ReservationConfirmationEMailInterfacePage_H__
+#ifndef SYNTHESE_ReservationCancellationEMailContentInterfacePage_H__
+#define SYNTHESE_ReservationCancellationEMailContentInterfacePage_H__
 
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
@@ -34,55 +34,48 @@ namespace synthese
 	{
 		class Request;
 	}
-
+	
 	namespace resa
 	{
 		class ReservationTransaction;
+	}
 
-		/** ReservationConfirmationEMailInterfacePage Interface Page Class.
+	namespace resa
+	{
+		/** ReservationCancellationEMailContentInterfacePage Interface Page Class.
 			@ingroup m31Pages refPages
 			@author Hugues
 			@date 2009
 
-			@code reservation_confirmation_email_content @endcode
+			@code reservation_cancellation_email_content @endcode
 
 			Parameters :
-				- 0 : journey detail
-				- 1 : ID of the reservation transaction
-				- 2 : ID of the customer
-				- 3 : date of cancellation dead line
-				- 4 : time of cancellation dead line
-				- 5 : departure stop
-				- 6 : arrival stop
-				- 7 : travel date
-				- 8 : customer name
-				- 9 : customer phone
+				- 0 :
+				- 1 :
 
 			Object : ReservationTransaction
 		*/
-		class ReservationConfirmationEMailInterfacePage
-			: public util::FactorableTemplate<interfaces::InterfacePage, ReservationConfirmationEMailInterfacePage>
+		class ReservationCancellationEMailContentInterfacePage
+			: public util::FactorableTemplate<interfaces::InterfacePage, ReservationCancellationEMailContentInterfacePage>
 		{
 		public:
-			ReservationConfirmationEMailInterfacePage();
-
-
-
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
-				@param resa Reservation transaction to confirm
+				@param ...	
 				@param variables Execution variables
 				@param request Source request
 			*/
 			void display(
 				std::ostream& stream,
-				const ReservationTransaction& resa,
+				const resa::ReservationTransaction& object,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;
+			
+			ReservationCancellationEMailContentInterfacePage();
 		};
 	}
 }
 
-#endif // SYNTHESE_ReservationConfirmationEMailInterfacePage_H__
+#endif // SYNTHESE_ReservationCancellationEMailContentInterfacePage_H__

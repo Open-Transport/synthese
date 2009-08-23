@@ -65,7 +65,7 @@ namespace synthese
 			
 			
 		public:
-			/// @todo Getters/Setters for parsed parameters
+			XMLReservationFunction();
 
 
 

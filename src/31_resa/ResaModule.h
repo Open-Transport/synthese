@@ -35,6 +35,11 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class ReservationContact;
+	}
+
 	namespace util
 	{
 		class Env;
@@ -141,6 +146,7 @@ namespace synthese
 	{
 		class ReservationTransaction;
 		class CancelReservationAction;
+		class OnlineReservationRule;
 
 		/** 31 Reservation module class.
 		*/
@@ -157,14 +163,23 @@ namespace synthese
 			static const std::string _BASIC_PROFILE_NAME;
 			static const std::string _AUTORESA_PROFILE_NAME;
 			static const std::string _ADMIN_PROFILE_NAME;
+			static const std::string _RESERVATION_CONTACT_PARAMETER;
 
 			static boost::shared_ptr<security::Profile>	_basicProfile;
 			static boost::shared_ptr<security::Profile>	_autoresaProfile;
 			static boost::shared_ptr<security::Profile>	_adminProfile;
+			static boost::shared_ptr<OnlineReservationRule> _reservationContact;
 
 		public:
 			static boost::shared_ptr<security::Profile> GetBasicResaCustomerProfile();
 			static boost::shared_ptr<security::Profile> GetAutoResaResaCustomerProfile();
+
+			/** Called whenever a parameter registered by this module is changed
+			*/
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
+			);
 
 			static void DisplayReservations(
 				std::ostream& stream,
@@ -177,6 +192,8 @@ namespace synthese
 
 			static std::string GetStatusIcon(ReservationStatus status);
 			static std::string GetStatusText(ReservationStatus status);
+
+			static OnlineReservationRule* GetReservationContact();
 		};
 	}
 	/** @} */

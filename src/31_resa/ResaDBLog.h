@@ -97,8 +97,9 @@ namespace synthese
 				, NO_SHOW_ENTRY = 75
 				, AUTORESA_ACTIVATION = 80,
 				AUTORESA_DEACTIVATION = 81
-				, PERSONAL_DATA_UPDATE = 85
-				, PASSWORD_UPDATE = 90
+				, PERSONAL_DATA_UPDATE = 85,
+				CUSTOMER_CREATION_ENTRY = 86,
+				PASSWORD_UPDATE = 90
 				, EMAIL = 95
 				, OTHER = 100
 			} _EntryType;
@@ -135,8 +136,43 @@ namespace synthese
 			static void UpdateCallEntryDate(uid callId);
 			static void UpdateCallEntryCustomer(uid callId, uid customerId);
 
-			static void AddBookReservationEntry(const server::Session* user, const ReservationTransaction& transaction);
-			static void AddCancelReservationEntry(const server::Session* user, const ReservationTransaction& transaction, ReservationStatus oldStatus);
+			static void AddBookReservationEntry(
+				const server::Session* user,
+				const ReservationTransaction& transaction
+			);
+			static void AddCancelReservationEntry(
+				const server::Session* user,
+				const ReservationTransaction& transaction,
+				ReservationStatus oldStatus
+			);
+
+			static void AddUserAdminEntry(
+				const server::Session& session,
+				const security::User& subject,
+				const std::string& text
+			);
+
+			static void AddCustomerCreationEntry(
+				const server::Session& session,
+				const security::User& subject
+			);
+
+			static void AddUserChangeAutoResaActivationEntry(
+				const server::Session& session,
+				const security::User& subject
+			);
+
+			static void AddEMailEntry(
+				const server::Session& session,
+				const security::User& subject,
+				const std::string& text
+			);
+
+			static void AddPasswordInitEntry(
+				const server::Session& session,
+				const security::User& subject
+			);
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds an HTML image representing an entry type.

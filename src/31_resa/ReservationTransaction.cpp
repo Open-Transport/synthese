@@ -201,8 +201,8 @@ namespace synthese
 			{
 			case OPTION: return statusText + " pouvant être annulée avant le " + getReservationDeadLine().toString();
 			case CANCELLED: return statusText + " le " + _cancellationTime.toString();
-			case CANCELLED_AFTER_DELAY: statusText + " le " + _cancellationTime.toString();
-			case NO_SHOW: return statusText + " constantée le " + _cancellationTime.toString();
+			case CANCELLED_AFTER_DELAY: return statusText + " le " + _cancellationTime.toString();
+			case NO_SHOW: return statusText + " constatée le " + _cancellationTime.toString();
 			}
 
 			return statusText;

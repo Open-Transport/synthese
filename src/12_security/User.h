@@ -94,6 +94,7 @@ namespace synthese
 				void setPhone(const std::string& phone);
 				void setConnectionAllowed(bool value);
 				void setBirthDate(const time::Date& date);
+				void setRandomPassword();
 			//@}
 
 			//! \name Getters

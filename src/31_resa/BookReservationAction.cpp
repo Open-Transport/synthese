@@ -106,6 +106,17 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_SEATS_NUMBER = Action_PARAMETER_PREFIX + "senu";
 
 
+
+
+
+		BookReservationAction::BookReservationAction():
+			util::FactorableTemplate<server::Action, BookReservationAction>(),
+			_createCustomer(false)
+		{
+
+		}
+
+
 		ParametersMap BookReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -185,16 +196,6 @@ namespace synthese
 			if(!_customer.get())
 			{
 				_customer = const_pointer_cast<User, const User>(_request->getUser());
-
-				// Password control
-				string password(map.get<string>(PARAMETER_PASSWORD));
-				if (password.empty())
-					throw ActionException("Le mot de passe doit être fourni");
-
-				if (password != _customer->getPassword())
-				{
-					throw ActionException("Mot de passe erronné");
-				}
 			}
 			if(!_customer.get())
 			{
@@ -270,7 +271,11 @@ namespace synthese
 		{
 			// Save customer if necessary
 			if (_createCustomer)
+			{
 				UserTableSync::Save(_customer.get());
+
+				ResaDBLog::AddCustomerCreationEntry(*_request->getSession(), *_customer);
+			}
 
 			// New ReservationTransaction
 			const DateTime now(TIME_CURRENT);
@@ -364,15 +369,17 @@ namespace synthese
 				ReservationTableSync::Save(r.get());
 			}
 
+			// Log
+			ResaDBLog::AddBookReservationEntry(_request->getSession(), rt);
+
 			// Mail
 			if(!_customer->getEMail().empty() && reservationContact)
  			{
 				reservationContact->sendCustomerEMail(rt);
+
+				ResaDBLog::AddEMailEntry(*_request->getSession(), *_customer, "Récapitulatif de réservation");
  			}
  
-
-			// Log
-			ResaDBLog::AddBookReservationEntry(_request->getSession(), rt);
 
 			// Redirect
 			_request->setActionCreatedId(rt.getKey());

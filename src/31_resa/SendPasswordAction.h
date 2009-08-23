@@ -1,8 +1,8 @@
 
-/** ResaCustomerHtmlOptionListFunction class header.
-	@file ResaCustomerHtmlOptionListFunction.h
-	@author Hugues Romain
-	@date 2008
+/** SendPasswordAction class header.
+	@file SendPasswordAction.h
+	@author Hugues
+	@date 2009
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,64 +22,56 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ResaCustomerHtmlOptionListFunction_H__
-#define SYNTHESE_ResaCustomerHtmlOptionListFunction_H__
+#ifndef SYNTHESE_SendPasswordAction_H__
+#define SYNTHESE_SendPasswordAction_H__
 
+#include "Action.h"
 #include "FactorableTemplate.h"
-#include "Function.h"
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace resa
 	{
-		/** ResaCustomerHtmlOptionListFunction Function class.
-			@author Hugues Romain
-			@date 2008
-			@ingroup m31Functions refFunctions
+		/** SendPasswordAction action class.
+			@ingroup m31Actions refActions
 		*/
-		class ResaCustomerHtmlOptionListFunction:
-			public util::FactorableTemplate<server::Function,ResaCustomerHtmlOptionListFunction>
+		class SendPasswordAction:
+			public util::FactorableTemplate<server::Action, SendPasswordAction>
 		{
 		public:
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_SURNAME;
-			static const std::string PARAMETER_NUMBER;
-			
+			static const std::string PARAMETER_USER;
+
+		private:
+			boost::shared_ptr<security::User> _user;
+
 		protected:
-			//! \name Page parameters
-			//@{
-				boost::optional<std::string> _name;
-				boost::optional<std::string> _surname;
-				size_t						_number;
-			//@}
-			
-			
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
-			server::ParametersMap _getParametersMap() const;
-			
+			server::ParametersMap getParametersMap() const;
+
 			/** Conversion from generic parameters map to attributes.
+				Removes the used parameters from the map.
 				@param map Parameters map to interpret
+				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
-			
-			
-			
-		public:
-			ResaCustomerHtmlOptionListFunction();
 
+		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void _run(std::ostream& stream) const;
-
-			void setNumber(int number);
-
+			void run();
+			
 			virtual bool _isAuthorized() const;
 
-			virtual std::string getOutputMimeType() const;
+			void setUser(boost::shared_ptr<const security::User> value);
 		};
 	}
 }
 
-#endif // SYNTHESE_ResaCustomerHtmlOptionListFunction_H__
+#endif // SYNTHESE_SendPasswordAction_H__

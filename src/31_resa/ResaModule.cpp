@@ -43,6 +43,8 @@
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "AdminRequest.h"
+#include "OnlineReservationRule.h"
+#include "OnlineReservationRuleTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -68,12 +70,14 @@ namespace synthese
 		const string ResaModule::_BASIC_PROFILE_NAME("Basic Resa Customer");	// Never change this or the database will be corrupted
 		const string ResaModule::_AUTORESA_PROFILE_NAME("Autoresa Resa Customer");	// Never change this or the database will be corrupted
 		const string ResaModule::_ADMIN_PROFILE_NAME("Resa admin user");	// Never change this or the database will be corrupted
+		const string ResaModule::_RESERVATION_CONTACT_PARAMETER("reservation_contact");
 
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
 		shared_ptr<Profile> ResaModule::_basicProfile;
 		shared_ptr<Profile> ResaModule::_autoresaProfile;
 		shared_ptr<Profile> ResaModule::_adminProfile;
-		boost::recursive_mutex ResaModule::_sessionsCallIdsMutex;
+		recursive_mutex ResaModule::_sessionsCallIdsMutex;
+		shared_ptr<OnlineReservationRule> ResaModule::_reservationContact;
 	}
 
 	namespace server
@@ -82,6 +86,7 @@ namespace synthese
 		
 		template<> void ModuleClassTemplate<ResaModule>::PreInit()
 		{
+			RegisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER, "0", &ResaModule::ParameterCallback);
 		}
 		
 		template<> void ModuleClassTemplate<ResaModule>::Init()
@@ -249,6 +254,28 @@ namespace synthese
 		boost::shared_ptr<security::Profile> ResaModule::GetAutoResaResaCustomerProfile()
 		{
 			return _autoresaProfile;
+		}
+
+
+
+		OnlineReservationRule* ResaModule::GetReservationContact()
+		{
+			return _reservationContact.get();
+		}
+
+
+
+		void ResaModule::ParameterCallback( const std::string& name, const std::string& value )
+		{
+			if(name == _RESERVATION_CONTACT_PARAMETER)
+			{
+				RegistryKeyType id(lexical_cast<RegistryKeyType>(value));
+
+				if(id > 0)
+				{
+					ResaModule::_reservationContact = OnlineReservationRuleTableSync::GetEditable(id, Env::GetOfficialEnv());				
+				}
+			}
 		}
 	}
 }

@@ -43,6 +43,11 @@ namespace synthese
 		class ReservationContact;
 	}
 
+	namespace security
+	{
+		class User;
+	}
+
 	namespace resa
 	{
 		class ReservationTransaction;
@@ -61,7 +66,7 @@ namespace synthese
 			typedef util::Registry<OnlineReservationRule>	Registry;
 
 			typedef std::set<int> CapacityThresholds;
-			typedef std::map<const env::ReservationContact*, const OnlineReservationRule*> OnlineReservationRuleMap;
+			typedef std::map<util::RegistryKeyType, const OnlineReservationRule*> OnlineReservationRuleMap;
 
 		private:
 			//! \name Link with env reservation rules
@@ -80,7 +85,6 @@ namespace synthese
 			//@{
 				std::string _senderEMail;
 				std::string _senderName;
-				std::string _eMailSubject;
 				interfaces::Interface*	_eMailInterface;
 			//@}
 
@@ -117,7 +121,6 @@ namespace synthese
 				const CapacityThresholds&		getThresholds()				const;
 				const std::string&				getSenderEMail()			const;
 				const std::string&				getSenderName()				const;
-				const std::string&				getEMailSubject()			const;
 				interfaces::Interface*			getEMailInterface()			const;
 			//@}
 
@@ -135,7 +138,6 @@ namespace synthese
 				void	setThresholds(const CapacityThresholds& thresholds);
 				void	setSenderEMail(const std::string& value);
 				void	setSenderName(const std::string& value);
-				void	setEMailSubject(const std::string& value);
 				void	setEMailInterface(interfaces::Interface* value);
 			//@}
 
@@ -148,6 +150,22 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2009
 				bool	sendCustomerEMail(
+					const ReservationTransaction& resa
+				) const;
+
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Sends e-mail to the customer containing his password.
+				/// @param customer Reservation transaction
+				/// @return true if the e-mail is sent.
+				/// @author Hugues Romain
+				/// @date 2009
+				bool	sendCustomerEMail(
+					const security::User& customer
+				) const;
+
+
+				bool sendCustomerCancellationEMail(
 					const ReservationTransaction& resa
 				) const;
 			//@}

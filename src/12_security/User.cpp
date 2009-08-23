@@ -21,12 +21,17 @@
 */
 
 #include <sstream>
+#include <stdlib.h>
+#include <vector>
+#include <time.h>
 
 #include "Registry.h"
 #include "User.h"
 #include "UserException.h"
 
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -204,6 +209,35 @@ namespace synthese
 		uid User::getCityId() const
 		{
 			return _cityId;
+		}
+
+
+
+		void User::setRandomPassword()
+		{
+			vector<char> characters;
+			for(char c='a'; c<='z'; ++c)
+			{
+				characters.push_back(c);
+			}
+			for(char c='A'; c<='Z'; ++c)
+			{
+				characters.push_back(c);
+			}
+			for(char c='0'; c<='9'; ++c)
+			{
+				characters.push_back(c);
+			}
+
+			string password;
+			srand( (unsigned) ::time( NULL ) );
+
+			for(int i=0; i<8; ++i)
+			{
+				password += characters[(rand() * 62) / (RAND_MAX + 1)];
+			}
+
+			setPassword(password);
 		}
 	}
 }

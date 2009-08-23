@@ -118,5 +118,13 @@ namespace synthese
 		{
 			return "text/html";
 		}
+
+
+
+		ResaCustomerHtmlOptionListFunction::ResaCustomerHtmlOptionListFunction():
+			FactorableTemplate<server::Function,ResaCustomerHtmlOptionListFunction>()
+		{
+			setEnv(shared_ptr<Env>(new Env));
+		}
 	}
 }
