@@ -21,9 +21,11 @@
 */
 
 #include <sstream>
-#include <stdlib.h>
 #include <vector>
-#include <time.h>
+
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/variate_generator.hpp>
 
 #include "Registry.h"
 #include "User.h"
@@ -229,12 +231,16 @@ namespace synthese
 				characters.push_back(c);
 			}
 
+			boost::mt19937 rng;                 // produces randomness out of thin air
+			boost::uniform_int<> six(0,61);      // distribution that maps to 1..6
+			boost::variate_generator<boost::mt19937&, boost::uniform_int<> >
+				die(rng, six);             // glues randomness with mapping
+			
 			string password;
-			srand( (unsigned) ::time( NULL ) );
 
 			for(int i=0; i<8; ++i)
 			{
-				password += characters[(rand() * 62) / (RAND_MAX + 1)];
+				password += characters[die()];
 			}
 
 			setPassword(password);

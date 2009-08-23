@@ -446,7 +446,7 @@ namespace synthese
 				return "key.png";
 
 			case ResaDBLog::PERSONAL_DATA_UPDATE:
-				return "user_edit.png"
+				return "user_edit.png";
 
 			case ResaDBLog::OTHER:
 			default:
