@@ -1,6 +1,6 @@
 
-/** DisplayScreenSupervisionRequest class header.
-	@file DisplayScreenSupervisionRequest.h
+/** DisplayScreenSupervisionFunction class header.
+	@file DisplayScreenSupervisionFunction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -35,10 +35,11 @@ namespace synthese
 	{
 		class DisplayScreen;
 
-		/** DisplayScreenSupervisionRequest class.
+		/** DisplayScreenSupervisionFunction class.
 			@ingroup m54Functions refFunctions
 		*/
-		class DisplayScreenSupervisionRequest : public util::FactorableTemplate<server::Function,DisplayScreenSupervisionRequest>
+		class DisplayScreenSupervisionFunction:
+			public util::FactorableTemplate<server::Function,DisplayScreenSupervisionFunction>
 		{
 			static const std::string PARAMETER_DISPLAY_SCREEN_ID;
 			static const std::string PARAMETER_STATUS;
@@ -59,6 +60,8 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			DisplayScreenSupervisionFunction();
+
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;

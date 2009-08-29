@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// DisplayScreenRemove class header.
-///	@file DisplayScreenRemove.h
+/// DisplayScreenRemoveAction class header.
+///	@file DisplayScreenRemoveAction.h
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -38,7 +38,7 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////
 		/// Display screen remove action class.
 		///	@ingroup m54Actions refActions
-		class DisplayScreenRemove : public util::FactorableTemplate<server::Action, DisplayScreenRemove>
+		class DisplayScreenRemoveAction : public util::FactorableTemplate<server::Action, DisplayScreenRemoveAction>
 		{
 		public:
 			static const std::string PARAMETER_DISPLAY_SCREEN_ID;

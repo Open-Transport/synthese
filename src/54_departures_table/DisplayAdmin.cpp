@@ -41,18 +41,18 @@
 #include "UpdateDisplayScreenAction.h"
 #include "DisplayScreenTableSync.h"
 #include "UpdateDisplayPreselectionParametersAction.h"
-#include "AddPreselectionPlaceToDisplayScreen.h"
+#include "AddPreselectionPlaceToDisplayScreenAction.h"
 #include "RemovePreselectionPlaceFromDisplayScreenAction.h"
 #include "UpdateAllStopsDisplayScreenAction.h"
 #include "AddDepartureStopToDisplayScreenAction.h"
-#include "AddForbiddenPlaceToDisplayScreen.h"
+#include "AddForbiddenPlaceToDisplayScreenAction.h"
 #include "DisplayScreenAddDisplayedPlaceAction.h"
 #include "DisplayScreenRemovePhysicalStopAction.h"
 #include "DisplayScreenRemoveDisplayedPlaceAction.h"
 #include "DisplayScreenRemoveForbiddenPlaceAction.h"
 #include "DisplaySearchAdmin.h"
-#include "DisplayScreenRemove.h"
-#include "DisplayScreenContentRequest.h"
+#include "DisplayScreenRemoveAction.h"
+#include "DisplayScreenContentFunction.h"
 #include "ArrivalDepartureTableRight.h"
 #include "UpdateDisplayMaintenanceAction.h"
 #include "DisplayMaintenanceLog.h"
@@ -211,7 +211,7 @@ namespace synthese
 				updateDisplayRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Delete the screen request
-				AdminActionFunctionRequest<DisplayScreenRemove, DisplaySearchAdmin> deleteRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenRemoveAction, DisplaySearchAdmin> deleteRequest(_request);
 				deleteRequest.getAction()->setDisplayScreen(_displayScreen);
 
 				stream << "<h1>Propriétés</h1>";
@@ -464,11 +464,11 @@ namespace synthese
 				addPhysicalRequest.getAction()->setScreen(_displayScreen);
 
 				// Add preselection request
-				AdminActionFunctionRequest<AddPreselectionPlaceToDisplayScreen,DisplayAdmin> addPreselRequest(_request);
+				AdminActionFunctionRequest<AddPreselectionPlaceToDisplayScreenAction,DisplayAdmin> addPreselRequest(_request);
 				addPreselRequest.getAction()->setScreen(_displayScreen);
 
 				// Add not to serve request
-				AdminActionFunctionRequest<AddForbiddenPlaceToDisplayScreen,DisplayAdmin> addNSRequest(_request);
+				AdminActionFunctionRequest<AddForbiddenPlaceToDisplayScreenAction,DisplayAdmin> addNSRequest(_request);
 				addNSRequest.getAction()->setScreen(_displayScreen);
 
 				// Update preselection request
@@ -690,7 +690,7 @@ namespace synthese
 					stream << l.element("broadcastpoint");
 					stream << ant.getImageSubmitButton("add.png", "Ajouter");
 					stream << ant.getSelectInput(
-						AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE,
+						AddForbiddenPlaceToDisplayScreenAction::PARAMETER_PLACE,
 						_prodScreen->getSortedAvaliableDestinationsLabels(
 							_displayScreen->getForbiddenPlaces()
 						),
@@ -733,7 +733,7 @@ namespace synthese
 					stream << psaf.getImageSubmitButton("add.png", "Ajouter");
 					stream <<
 						psaf.getSelectInput(
-							AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE,
+							AddPreselectionPlaceToDisplayScreenAction::PARAMETER_PLACE,
 							_prodScreen->getSortedAvaliableDestinationsLabels(
 								_displayScreen->getForcedDestinations()
 							),
@@ -840,7 +840,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_RESULT))
 			{
 				// Requests
-				FunctionRequest<DisplayScreenContentRequest> viewRequest(&_request);
+				FunctionRequest<DisplayScreenContentFunction> viewRequest(&_request);
 				viewRequest.getFunction()->setScreen(_displayScreen);
 				if(	_displayScreen->getType() &&
 					_displayScreen->getType()->getDisplayInterface() &&

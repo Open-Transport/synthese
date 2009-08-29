@@ -1,6 +1,6 @@
 
-/** DisplayScreenRemove class implementation.
-	@file DisplayScreenRemove.cpp
+/** DisplayScreenRemoveAction class implementation.
+	@file DisplayScreenRemoveAction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DisplayScreenRemove.h"
+#include "DisplayScreenRemoveAction.h"
 #include "DisplayScreenTableSync.h"
 #include "ArrivalDepartureTableLog.h"
 #include "ArrivalDepartureTableRight.h"
@@ -38,21 +38,21 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemove>::FACTORY_KEY("dsra");
+	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemoveAction>::FACTORY_KEY("dsra");
 
 	namespace departurestable
 	{
-		const string DisplayScreenRemove::PARAMETER_DISPLAY_SCREEN_ID(Action_PARAMETER_PREFIX + "dsi");
+		const string DisplayScreenRemoveAction::PARAMETER_DISPLAY_SCREEN_ID(Action_PARAMETER_PREFIX + "dsi");
 
 
-		ParametersMap DisplayScreenRemove::getParametersMap() const
+		ParametersMap DisplayScreenRemoveAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_DISPLAY_SCREEN_ID, _displayScreen->getKey());
 			return map;
 		}
 
-		void DisplayScreenRemove::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
+		void DisplayScreenRemoveAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
 			uid id(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, FACTORY_KEY));
 			
@@ -66,14 +66,14 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenRemove::run() throw(ActionException)
+		void DisplayScreenRemoveAction::run() throw(ActionException)
 		{
 			DisplayScreenTableSync::Remove(_displayScreen->getKey());
 
 			ArrivalDepartureTableLog::addRemoveEntry(_displayScreen.get(), _request->getUser().get());
 		}
 
-		bool DisplayScreenRemove::_isAuthorized() const
+		bool DisplayScreenRemoveAction::_isAuthorized() const
 		{
 			return _request->isAuthorized<ArrivalDepartureTableRight>(
 				DELETE_RIGHT
@@ -82,7 +82,7 @@ namespace synthese
 				);
 		}
 
-		void DisplayScreenRemove::setDisplayScreen( boost::shared_ptr<const DisplayScreen> screen )
+		void DisplayScreenRemoveAction::setDisplayScreen( boost::shared_ptr<const DisplayScreen> screen )
 		{
 			_displayScreen = screen;
 		}

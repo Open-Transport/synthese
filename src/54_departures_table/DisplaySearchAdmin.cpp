@@ -25,7 +25,7 @@
 #include "DisplayScreenTableSync.h"
 #include "CreateDisplayScreenAction.h"
 #include "DisplayAdmin.h"
-#include "DisplayScreenContentRequest.h"
+#include "DisplayScreenContentFunction.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
 #include "ArrivalDepartureTableRight.h"
@@ -208,7 +208,7 @@ namespace synthese
 	
 				AdminFunctionRequest<DisplayAdmin> updateRequest(_request);
 
-				FunctionRequest<DisplayScreenContentRequest> viewRequest(&_request);
+				FunctionRequest<DisplayScreenContentFunction> viewRequest(&_request);
 
 				if (!_place)
 				{

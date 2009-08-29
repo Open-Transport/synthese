@@ -1,6 +1,6 @@
 
-/** AddPreselectionPlaceToDisplayScreen class implementation.
-	@file AddPreselectionPlaceToDisplayScreen.cpp
+/** AddForbiddenPlaceToDisplayScreenAction class implementation.
+	@file AddForbiddenPlaceToDisplayScreenAction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -24,11 +24,11 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include "ArrivalDepartureTableRight.h"
-#include "AddPreselectionPlaceToDisplayScreen.h"
+#include "ArrivalDepartureTableLog.h"
+#include "AddForbiddenPlaceToDisplayScreenAction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "ConnectionPlaceTableSync.h"
-#include "ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -43,27 +43,25 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, departurestable::AddPreselectionPlaceToDisplayScreen>::FACTORY_KEY("apptds");
+		template<> const string FactorableTemplate<Action, departurestable::AddForbiddenPlaceToDisplayScreenAction>::FACTORY_KEY("afptdsa");
 	}
 	
 	namespace departurestable
 	{
-		const string AddPreselectionPlaceToDisplayScreen::PARAMETER_SCREEN_ID(
+		const string AddForbiddenPlaceToDisplayScreenAction::PARAMETER_SCREEN_ID(
 			Action_PARAMETER_PREFIX + "s"
 		);
-		const string AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE(
-			Action_PARAMETER_PREFIX + "p"
-		);
+		const string AddForbiddenPlaceToDisplayScreenAction::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "p";
 
 
-		ParametersMap AddPreselectionPlaceToDisplayScreen::getParametersMap() const
+		ParametersMap AddForbiddenPlaceToDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_screen.get()) map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
 			return map;
 		}
 
-		void AddPreselectionPlaceToDisplayScreen::_setFromParametersMap(const ParametersMap& map)
+		void AddForbiddenPlaceToDisplayScreenAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
@@ -76,44 +74,40 @@ namespace synthese
 					*_env
 				);
 			}
-			catch (ObjectNotFoundException<DisplayScreen>&)
+			catch (...)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
-			{
-				throw ActionException("Specified place not found");
-			}
 		}
 
-		void AddPreselectionPlaceToDisplayScreen::run()
+		void AddForbiddenPlaceToDisplayScreenAction::run()
 		{
-			_screen->addForcedDestination(_place.get());
+			_screen->addForbiddenPlace(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
 			
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
-				"Ajout de l'arrêt de présélection "+ _place->getFullName(),
+				"Ajout de l'arrêt à ne pas desservir "+ _place->getFullName(),
 				*_request->getUser()
 			);
 		}
 
 
 
-		bool AddPreselectionPlaceToDisplayScreen::_isAuthorized(
+		bool AddForbiddenPlaceToDisplayScreenAction::_isAuthorized(
 		) const {
 			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 		
 		
-		void AddPreselectionPlaceToDisplayScreen::setScreen(boost::shared_ptr<DisplayScreen> value)
+		void AddForbiddenPlaceToDisplayScreenAction::setScreen(boost::shared_ptr<DisplayScreen> value)
 		{
 			_screen = value;
 		}
 	
 	
-		void AddPreselectionPlaceToDisplayScreen::setScreen(
+		void AddForbiddenPlaceToDisplayScreenAction::setScreen(
 			boost::shared_ptr<const DisplayScreen> value)
 		{
 			_screen = const_pointer_cast<DisplayScreen>(value);

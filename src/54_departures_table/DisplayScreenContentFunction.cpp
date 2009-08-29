@@ -1,6 +1,6 @@
 
-/** DisplayScreenContentRequest class implementation.
-	@file DisplayScreenContentRequest.cpp
+/** DisplayScreenContentFunction class implementation.
+	@file DisplayScreenContentFunction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -27,7 +27,7 @@
 #include "RequestException.h"
 #include "Request.h"
 
-#include "DisplayScreenContentRequest.h"
+#include "DisplayScreenContentFunction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayType.h"
@@ -51,15 +51,15 @@ namespace synthese
 	using namespace interfaces;
 	using namespace db;
 
-	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenContentRequest>::FACTORY_KEY("tdg");
+	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenContentFunction>::FACTORY_KEY("tdg");
 
 	namespace departurestable
 	{
-		const std::string DisplayScreenContentRequest::PARAMETER_DATE = "date";
-		const std::string DisplayScreenContentRequest::PARAMETER_TB = "tb";
-		const std::string DisplayScreenContentRequest::PARAMETER_INTERFACE_ID("i");
+		const std::string DisplayScreenContentFunction::PARAMETER_DATE = "date";
+		const std::string DisplayScreenContentFunction::PARAMETER_TB = "tb";
+		const std::string DisplayScreenContentFunction::PARAMETER_INTERFACE_ID("i");
 
-		ParametersMap DisplayScreenContentRequest::_getParametersMap() const
+		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
 			ParametersMap map;
 			if(_date) map.insert(PARAMETER_DATE, *_date);
@@ -67,7 +67,7 @@ namespace synthese
 			return map;
 		}
 
-		void DisplayScreenContentRequest::_setFromParametersMap(const ParametersMap& map)
+		void DisplayScreenContentFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
@@ -112,19 +112,19 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenContentRequest::_run( std::ostream& stream ) const
+		void DisplayScreenContentFunction::_run( std::ostream& stream ) const
 		{
 			_screen->display(stream, _date ? *_date : DateTime(TIME_CURRENT));
 		}
 
 
 
-		bool DisplayScreenContentRequest::_isAuthorized(
+		bool DisplayScreenContentFunction::_isAuthorized(
 		) const {
 			return true;
 		}
 
-		std::string DisplayScreenContentRequest::getOutputMimeType() const
+		std::string DisplayScreenContentFunction::getOutputMimeType() const
 		{
 			return
 				(	_screen.get() &&
@@ -137,7 +137,7 @@ namespace synthese
 			;
 		}
 
-		void DisplayScreenContentRequest::setScreen(
+		void DisplayScreenContentFunction::setScreen(
 			shared_ptr<const DisplayScreen> value
 		){
 			_screen = value;

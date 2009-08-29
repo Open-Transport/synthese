@@ -1,6 +1,6 @@
 
-/** DisplayScreenSupervisionRequest class implementation.
-	@file DisplayScreenSupervisionRequest.cpp
+/** DisplayScreenSupervisionFunction class implementation.
+	@file DisplayScreenSupervisionFunction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -21,7 +21,7 @@
 */
 
 #include "RequestException.h"
-#include "DisplayScreenSupervisionRequest.h"
+#include "DisplayScreenSupervisionFunction.h"
 #include "ParseDisplayReturnInterfacePage.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
@@ -35,6 +35,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -43,14 +44,24 @@ namespace synthese
 	using namespace dblog;
 	using namespace interfaces;
 
-	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenSupervisionRequest>::FACTORY_KEY("tds");
+	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenSupervisionFunction>::FACTORY_KEY("tds");
 
 	namespace departurestable
 	{
-		const std::string DisplayScreenSupervisionRequest::PARAMETER_DISPLAY_SCREEN_ID = "tb";
-		const std::string DisplayScreenSupervisionRequest::PARAMETER_STATUS = "status";
+		const std::string DisplayScreenSupervisionFunction::PARAMETER_DISPLAY_SCREEN_ID = "tb";
+		const std::string DisplayScreenSupervisionFunction::PARAMETER_STATUS = "status";
 		
-		ParametersMap DisplayScreenSupervisionRequest::_getParametersMap() const
+
+
+		DisplayScreenSupervisionFunction::DisplayScreenSupervisionFunction()
+			: util::FactorableTemplate<server::Function,DisplayScreenSupervisionFunction>()
+		{
+			setEnv(shared_ptr<Env>(new Env));
+		}
+
+
+
+		ParametersMap DisplayScreenSupervisionFunction::_getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_DISPLAY_SCREEN_ID, _displayScreen->getKey());
@@ -58,7 +69,7 @@ namespace synthese
 			return map;
 		}
 
-		void DisplayScreenSupervisionRequest::_setFromParametersMap(const ParametersMap& map)
+		void DisplayScreenSupervisionFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
@@ -84,7 +95,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenSupervisionRequest::_run( std::ostream& stream ) const
+		void DisplayScreenSupervisionFunction::_run( std::ostream& stream ) const
 		{
 			// Assertions
 			assert(_displayScreen.get() != NULL);
@@ -137,12 +148,12 @@ namespace synthese
 
 
 
-		bool DisplayScreenSupervisionRequest::_isAuthorized(
+		bool DisplayScreenSupervisionFunction::_isAuthorized(
 		) const {
 			return true;
 		}
 
-		std::string DisplayScreenSupervisionRequest::getOutputMimeType() const
+		std::string DisplayScreenSupervisionFunction::getOutputMimeType() const
 		{
 			return "text/plain";
 		}

@@ -1,6 +1,6 @@
 
-/** AddPreselectionPlaceToDisplayScreen class header.
-	@file AddPreselectionPlaceToDisplayScreen.h
+/** AddPreselectionPlaceToDisplayScreenAction class header.
+	@file AddPreselectionPlaceToDisplayScreenAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -37,10 +37,10 @@ namespace synthese
 	{
 		class DisplayScreen;
 
-		/** AddPreselectionPlaceToDisplayScreen action class.
+		/** AddPreselectionPlaceToDisplayScreenAction action class.
 			@ingroup m54Actions refActions
 		*/
-		class AddPreselectionPlaceToDisplayScreen : public util::FactorableTemplate<server::Action,AddPreselectionPlaceToDisplayScreen>
+		class AddPreselectionPlaceToDisplayScreenAction : public util::FactorableTemplate<server::Action,AddPreselectionPlaceToDisplayScreenAction>
 		{
 		public:
 			static const std::string PARAMETER_SCREEN_ID;

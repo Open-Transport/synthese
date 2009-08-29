@@ -1,6 +1,6 @@
 
 /** CentreonConfigExportFunction class header.
-	@file DisplayScreenContentRequest.h
+	@file DisplayScreenContentFunction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -66,4 +66,5 @@ namespace synthese
 		};
 	}
 }
-#endif // SYNTHESE_DisplayScreenContentRequest_H__
+
+#endif

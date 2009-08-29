@@ -1,6 +1,6 @@
 
-/** AddForbiddenPlaceToDisplayScreen class header.
-	@file AddForbiddenPlaceToDisplayScreen.h
+/** DisplayScreenContentFunction class header.
+	@file DisplayScreenContentFunction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,58 +20,56 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_AddForbiddenPlaceToDisplayScreen_H__
-#define SYNTHESE_AddForbiddenPlaceToDisplayScreen_H__
+#ifndef SYNTHESE_DisplayScreenContentRequest_H__
+#define SYNTHESE_DisplayScreenContentRequest_H__
 
-#include "Action.h"
+#include "DateTime.h"
+#include "Function.h"
 #include "FactorableTemplate.h"
 
 namespace synthese
 {
-	namespace env
-	{
-		class PublicTransportStopZoneConnectionPlace;
-	}
-
 	namespace departurestable
 	{
 		class DisplayScreen;
+		class DisplayType;
 
-		/** AddForbiddenPlaceToDisplayScreen action class.
-			@ingroup m54Actions refActions
+		/** DisplayScreenContentFunction class.
+			@ingroup m54Functions refFunctions
 		*/
-		class AddForbiddenPlaceToDisplayScreen : public util::FactorableTemplate<server::Action,AddForbiddenPlaceToDisplayScreen>
+		class DisplayScreenContentFunction : public util::FactorableTemplate<server::Function,DisplayScreenContentFunction>
 		{
-		public:
-			static const std::string PARAMETER_SCREEN_ID;
-			static const std::string PARAMETER_PLACE;
+			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_TB;
+			static const std::string PARAMETER_INTERFACE_ID;
+			
+			//! \name Page parameters
+			//@{
+				boost::shared_ptr<const DisplayScreen>	_screen;
+				boost::shared_ptr<DisplayType>			_type;
+				boost::optional<time::DateTime>			_date;
+			//@}
 
-		private:
-			boost::shared_ptr<DisplayScreen>			_screen;
-			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
 
-		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::ParametersMap getParametersMap() const;
+			server::ParametersMap _getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void _run(std::ostream& stream) const;
 
 			virtual bool _isAuthorized() const;
-			
-			void setScreen(boost::shared_ptr<DisplayScreen> value);
+
+			virtual std::string getOutputMimeType() const;
+
 			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 		};
 	}
 }
-
-#endif // SYNTHESE_AddForbiddenPlaceToDisplayScreen_H__
+#endif // SYNTHESE_DisplayScreenContentRequest_H__

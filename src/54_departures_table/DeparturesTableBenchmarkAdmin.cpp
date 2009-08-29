@@ -31,7 +31,7 @@
 #include "DisplayScreen.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayAdmin.h"
-#include "DisplayScreenContentRequest.h"
+#include "DisplayScreenContentFunction.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "ArrivalDepartureTableRight.h"
@@ -107,7 +107,7 @@ namespace synthese
 					DisplayScreenCPUTableSync::Search(_getEnv())
 				);
 				
-				FunctionRequest<DisplayScreenContentRequest> r(&_request);
+				FunctionRequest<DisplayScreenContentFunction> r(&_request);
 				FunctionRequest<CPUGetWiredScreensFunction> r2(&_request);
 				ptime t0(microsec_clock::local_time());
 				time_duration duration;
@@ -118,7 +118,7 @@ namespace synthese
 					r.run(s);
 					ptime t2(microsec_clock::local_time());
 					TestCase t;
-					t.method = DisplayScreenContentRequest::FACTORY_KEY;
+					t.method = DisplayScreenContentFunction::FACTORY_KEY;
 					t.screen = screen;
 					t.duration = t2 - (t0 + duration);
 					t.size = s.str().size();
@@ -171,7 +171,7 @@ namespace synthese
 					stream << t.col();
 					stream << rank++;
 					stream << t.col();
-					if(testCase.method == DisplayScreenContentRequest::FACTORY_KEY)
+					if(testCase.method == DisplayScreenContentFunction::FACTORY_KEY)
 					{
 						stream << "Tableau de départs " << UpdateDisplayPreselectionParametersAction::GetFunctionList()[UpdateDisplayPreselectionParametersAction::GetFunction(*testCase.screen)];
 						stream << t.col();
