@@ -201,13 +201,19 @@ namespace synthese
 					stream << t.row();
 					stream << t.col(3) << "MOYENNE PAR EQUIPEMENT";
 					stream << t.col() << total_duration.total_milliseconds() / (rank - 1) << " ms";
-					stream << t.col();
-				}
+					stream << t.col() << setprecision(2) << fixed << (static_cast<float>(total_size) / (1024 * (rank - 1))) << " ko";;
+				
+					stream << t.row();
+					stream << t.col(3) << "Taux d'utilisation du serveur si une requête par minute";
+					stream << t.col(2) << setprecision(2) << fixed << (static_cast<float>(total_duration.total_milliseconds()) / 600) << " %";
 
-				stream << t.row();
-				stream << t.col(3) << "Taux d'utilisation du serveur si une requête par minute";
-				stream << t.col() << setprecision(2) << fixed << (static_cast<float>(total_duration.total_milliseconds()) / 600) << " %";
-				stream << t.col();
+					if(total_duration.total_milliseconds() > 0)
+					{
+						stream << t.row();
+						stream << t.col(3) << "Capacité du serveur si une requête par minute";
+						stream << t.col(2) << "Env. " << setprecision(0) << fixed << ((60000 * (rank - 1)) / total_duration.total_milliseconds()) << " équipements";
+					}
+				}
 
 				stream << t.close();
 
