@@ -101,10 +101,10 @@ namespace synthese
 				TestCases	_testCases;
 				
 				DisplayScreenTableSync::SearchResult screens(
-					DisplayScreenTableSync::Search(_getEnv())
+					DisplayScreenTableSync::Search(Env::GetOfficialEnv())
 				);
 				DisplayScreenCPUTableSync::SearchResult cpus(
-					DisplayScreenCPUTableSync::Search(_getEnv())
+					DisplayScreenCPUTableSync::Search(Env::GetOfficialEnv())
 				);
 				
 				FunctionRequest<DisplayScreenContentFunction> r(&_request);
