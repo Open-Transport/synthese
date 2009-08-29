@@ -69,14 +69,6 @@ void sig_INT_handler(int sig)
     quit();
 }
 
-void sig_SEGV_handler(int sig)
-{
-    // Catch SIGSEGV and ignore it. We do not want the program to 
-    // die on a segmentation fault error
-    Log::GetInstance ().warn("Segmentation fault detected : restarting all threads.");
-
-	ServerModule::KillAllThreads();
-}
 
 #ifndef WIN32
 
@@ -182,7 +174,6 @@ int main( int argc, char **argv )
 
 	std::signal (SIGINT, sig_INT_handler);
     std::signal (SIGTERM, sig_INT_handler);
-    std::signal(SIGSEGV, sig_SEGV_handler);
 
 #ifndef WIN32
 	std::signal(SIGPIPE, sig_PIPE_handler);
