@@ -26,6 +26,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "Registry.h"
 #include "User.h"
@@ -231,10 +232,10 @@ namespace synthese
 				characters.push_back(c);
 			}
 
-			boost::mt19937 rng;                 // produces randomness out of thin air
-			boost::uniform_int<> six(0,61);      // distribution that maps to 1..6
-			boost::variate_generator<boost::mt19937&, boost::uniform_int<> >
-				die(rng, six);             // glues randomness with mapping
+			mt19937 rng;                 // produces randomness out of thin air
+			rng.seed(getKey() * posix_time::microsec_clock::local_time().time_of_day().total_microseconds());
+			uniform_int<> six(0,61);      // distribution that maps to 1..6
+			variate_generator<mt19937&, uniform_int<> >	die(rng, six); // glues randomness with mapping
 			
 			string password;
 
