@@ -401,9 +401,11 @@ int main(int argc, char* argv[])
 				port
 		)	);
 
-		theThread.timed_join(posix_time::seconds(60));
+		theThread.timed_join(posix_time::seconds(30));
 
 		theThread.interrupt();
+
+		this_thread::sleep(posix_time::seconds(59));
 	}
 }
 
