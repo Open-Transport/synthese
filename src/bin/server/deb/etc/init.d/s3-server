@@ -16,10 +16,15 @@ case "$1" in
 
     start)
 	echo "Starting $NAME server... "
-	($DAEMON --daemon --pidfile $S3_SERVER_PID_FILE --logfile $S3_SERVER_LOG_FILE --db $S3_SERVER_DB_FILE --param tmp_dir=$S3_SERVER_TMP_DIR --param port=$S3_SERVER_PORT --param db_port=$S3_SERVER_DB_PORT --param log_level=$S3_SERVER_LOG_LEVEL --param dbring_node_id=$S3_SERVER_NODE_ID --param dbring_authority=$S3_SERVER_AUTHORITY_NODE_ID) || (echo "Failed!" && exit 1)
+	/opt/rcs/bin/$NAME-wd.sh &
+	while [ ! -e $S3_SERVER_PID_FILE ]
+	do
+		sleep 1
+	done
 	;;
     stop)
 	echo "Stopping $NAME server... "
+	killall -q $NAME-wd.sh
 	test -f $S3_SERVER_PID_FILE && kill -15 `cat $S3_SERVER_PID_FILE`
 	pkill -P 1 ${NAME:0:15} >& /dev/null
 	;;
