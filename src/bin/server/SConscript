@@ -14,4 +14,7 @@ CppSynthese3BinProject(
 		'boost.cppinc',
 		('boost-program-options.cpplib',s3env['BOOSTVERSION'])
 	],
+	extra_dependencies = [
+		('psmisc', '22')
+	]
 )
