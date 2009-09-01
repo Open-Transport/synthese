@@ -199,8 +199,9 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == ResaModule::FACTORY_KEY)
-			{
+			if(	moduleKey == ResaModule::FACTORY_KEY &&
+				isAuthorized(request)
+			){
 				AddToLinks(links, getNewPage());
 			}
 			return links;

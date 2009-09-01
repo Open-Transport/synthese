@@ -141,8 +141,9 @@ namespace synthese
 		) const	{
 			PageLinks links;
 
-			if(	moduleKey == ServerModule::FACTORY_KEY)
-			{
+			if(	moduleKey == ServerModule::FACTORY_KEY &&
+				isAuthorized(request)
+			){
 				AddToLinks(links, getNewPage());
 			}
 			return links;
