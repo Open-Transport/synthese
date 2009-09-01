@@ -301,69 +301,68 @@ namespace synthese
 			if (writingRight)
 			{
 				stringstream stream;
-				switch (entryType)
+				if(entryType == RESERVATION_ENTRY)
 				{
-				case CALL_ENTRY:
-				case FAKE_CALL:
-				case RADIO_CALL:
-				case OUTGOING_CALL:
+					// Cancel request
+					shared_ptr<CancelReservationAction> action(new CancelReservationAction);
+					action->setTransaction(tr);
+					Request cancelRequest(
+						&searchRequest,
+						shared_ptr<Function>(searchRequest._getFunction()->clone()),
+						static_pointer_cast<Action, CancelReservationAction>(action)
+					);
+
+					switch(status)
 					{
-						AdminFunctionRequest<ResaEditLogEntryAdmin> openCallRequest(
-							static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+					case OPTION:
+						stream << HTMLModule::getLinkButton(
+							cancelRequest.getURL(),
+							"Annuler",
+							"Etes-vous sûr de vouloir annuler la réservation ?",
+							ResaModule::GetStatusIcon(CANCELLED)
 						);
-						openCallRequest.getPage()->setEntry(
-							DBLogEntryTableSync::Get(
-								entry.getKey(),
-								*static_cast<const FunctionRequest<AdminRequest>* >(
-									&searchRequest
-								)->getFunction()->getEnv()
-						)	);
-						stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir");
+						break;
+
+					case TO_BE_DONE:
+						stream << HTMLModule::getLinkButton(
+							cancelRequest.getURL(),
+							"Annuler hors délai",
+							"Etes-vous sûr de vouloir annuler la réservation (hors délai) ?",
+							ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY)
+						);
+						break;
+
+					case AT_WORK:
+						stream << HTMLModule::getLinkButton(
+							cancelRequest.getURL(),
+							"Noter absence",
+							"Etes-vous sûr de noter l'absence du client à l'arrêt ?",
+							ResaModule::GetStatusIcon(NO_SHOW)
+						);
+						break;
 					}
-					break;
-
-				case RESERVATION_ENTRY:
-					{
-						// Cancel request
-						shared_ptr<CancelReservationAction> action(new CancelReservationAction);
-						action->setTransaction(tr);
-						Request cancelRequest(
-							&searchRequest,
-							shared_ptr<Function>(searchRequest._getFunction()->clone()),
-							static_pointer_cast<Action, CancelReservationAction>(action)
-						);
-	
-						switch(status)
-						{
-						case OPTION:
-							stream << HTMLModule::getLinkButton(
-									cancelRequest.getURL(),
-									"Annuler",
-									"Etes-vous sûr de vouloir annuler la réservation ?",
-									ResaModule::GetStatusIcon(CANCELLED)
-								);
-							break;
-
-						case TO_BE_DONE:
-							stream << HTMLModule::getLinkButton(
-									cancelRequest.getURL(),
-									"Annuler hors délai",
-									"Etes-vous sûr de vouloir annuler la réservation (hors délai) ?",
-									ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY)
-								);
-							break;
-
-						case AT_WORK:
-							stream << HTMLModule::getLinkButton(
-									cancelRequest.getURL(),
-									"Noter absence",
-									"Etes-vous sûr de noter l'absence du client à l'arrêt ?",
-									ResaModule::GetStatusIcon(NO_SHOW)
-								);
-							break;
-						}	}
-					break;
+					stream << " ";
 				}
+
+				if(	entryType == CALL_ENTRY ||
+					entryType == FAKE_CALL ||
+					entryType == RADIO_CALL ||
+					entryType == OUTGOING_CALL ||
+					entry.getObjectId2() > 0
+				){
+					AdminFunctionRequest<ResaEditLogEntryAdmin> openCallRequest(
+						static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+					);
+					openCallRequest.getPage()->setEntry(
+						DBLogEntryTableSync::Get(
+							entry.getObjectId2() > 0 ? entry.getObjectId2() : entry.getKey(),
+							*static_cast<const FunctionRequest<AdminRequest>* >(
+								&searchRequest
+							)->getFunction()->getEnv()
+					)	);
+					stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir", string(), GetIconURL(CALL_ENTRY));
+				}
+			
 				result.push_back(stream.str());
 			}
 
