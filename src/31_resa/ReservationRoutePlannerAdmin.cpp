@@ -96,7 +96,7 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_DATE("da");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_TIME("ti");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_DISABLED_PASSENGER("dp");
-		const std::string ReservationRoutePlannerAdmin::PARAMETER_DRT_ONLY("do");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_WITHOUT_TRANSFER("wt");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID("cu");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_SEATS_NUMBER("sn");
 
@@ -105,7 +105,7 @@ namespace synthese
 		ReservationRoutePlannerAdmin::ReservationRoutePlannerAdmin()
 			: AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>()
 			, _disabledPassenger(false)
-			, _drtOnly(false)
+			, _withoutTransfer(false)
 			, _dateTime(TIME_CURRENT),
 			_seatsNumber(1)
 		{ }
@@ -129,7 +129,7 @@ namespace synthese
 				_dateTime.setHour(map.getHour(PARAMETER_TIME, false, FACTORY_KEY));
 			}
 			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
-			_drtOnly = map.getDefault<bool>(PARAMETER_DRT_ONLY, false);
+			_withoutTransfer = map.getDefault<bool>(PARAMETER_WITHOUT_TRANSFER, false);
 
 			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 			{
@@ -177,7 +177,7 @@ namespace synthese
 			m.insert(PARAMETER_DATE, _dateTime.getDate());
 			m.insert(PARAMETER_TIME, _dateTime.getHour());
 			m.insert(PARAMETER_DISABLED_PASSENGER, _disabledPassenger);
-			m.insert(PARAMETER_DRT_ONLY, _drtOnly);
+			m.insert(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer);
 			m.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
 			if(_customer.get())
 			{
@@ -270,7 +270,7 @@ namespace synthese
 			stream << st.cell("Date", st.getForm().getSelectInput(PARAMETER_DATE, dates, _dateTime.getDate().toSQLString(false)));
 			stream << st.cell("Heure", st.getForm().getSelectInput(PARAMETER_TIME, hours, lexical_cast<string>(_dateTime.getHour().getHours())+":00"));
 			stream << st.cell("PMR", st.getForm().getOuiNonRadioInput(PARAMETER_DISABLED_PASSENGER, _disabledPassenger));
-			stream << st.cell("TAD seulement", st.getForm().getOuiNonRadioInput(PARAMETER_DRT_ONLY, _drtOnly));
+			stream << st.cell("Sans correspondance", st.getForm().getOuiNonRadioInput(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer));
 			stream << st.close();
 			stream << st.getForm().setFocus(PARAMETER_START_CITY);
 
@@ -289,7 +289,8 @@ namespace synthese
 				// Route planning
 				AccessParameters ap(
 					_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
-					_drtOnly
+					false, false, 1000, 23, 67,
+					_withoutTransfer ? 1 : optional<size_t>()
 				);
 				resaRequest.getAction()->setAccessParameters(ap);
 				stringstream trace;

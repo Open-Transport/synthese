@@ -51,7 +51,7 @@ namespace synthese
 			std::string						_endPlace;
 			time::DateTime					_dateTime;
 			bool							_disabledPassenger;
-			bool							_drtOnly;
+			bool										_withoutTransfer;
 			boost::shared_ptr<ReservationTransaction>	_confirmedTransaction;
 			boost::shared_ptr<const security::User>		_customer;
 			int											_seatsNumber;
@@ -64,7 +64,7 @@ namespace synthese
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_TIME;
 			static const std::string PARAMETER_DISABLED_PASSENGER;
-			static const std::string PARAMETER_DRT_ONLY;
+			static const std::string PARAMETER_WITHOUT_TRANSFER;
 			static const std::string PARAMETER_CUSTOMER_ID;
 			static const std::string PARAMETER_SEATS_NUMBER;
 
