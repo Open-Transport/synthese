@@ -39,7 +39,8 @@ namespace synthese
 	{
 		CallStatisticsTableSync::CallCountSearchResult CallStatisticsTableSync::CountCalls(
 			boost::gregorian::date_period period,
-			Step step
+			Step step,
+			logic::tribool autoresa
 		){
 			CallCountSearchResult r;
 			stringstream s;
@@ -53,7 +54,10 @@ namespace synthese
 				" WHERE " <<
 					DBLogEntryTableSync::COL_LOG_KEY << "='" << ResaDBLog::FACTORY_KEY << "' AND " <<
 					DBLogEntryTableSync::COL_DATE << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
-					DBLogEntryTableSync::COL_DATE << "<='" << gregorian::to_iso_extended_string(period.last()) << " 23:59:59'" <<
+					DBLogEntryTableSync::COL_DATE << "<'" << gregorian::to_iso_extended_string(period.end()) << " 00:00:00'";
+			if(!indeterminate(autoresa))
+				s << " AND " << DBLogEntryTableSync::COL_OBJECT_ID << (autoresa ? "=" : "!=") << DBLogEntryTableSync::COL_USER_ID;
+			s <<
 				" GROUP BY strftime('" << GetGroupBy(step) << "'," << DBLogEntryTableSync::COL_DATE << ")," <<
 				" CAST(" << DBLogEntryTableSync::COL_CONTENT << " AS INTEGER)" <<
 				" ORDER BY CAST(" << DBLogEntryTableSync::COL_CONTENT << " AS INTEGER)"

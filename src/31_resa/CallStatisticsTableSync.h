@@ -29,6 +29,7 @@
 #include <string>
 
 #include <boost/date_time/gregorian/gregorian_types.hpp>
+#include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
@@ -59,7 +60,8 @@ namespace synthese
 
 			static CallCountSearchResult CountCalls(
 				boost::gregorian::date_period period,
-				Step step
+				Step step,
+				boost::logic::tribool autoresa = boost::logic::indeterminate
 			);
 
 			static std::string GetGroupBy(Step step);

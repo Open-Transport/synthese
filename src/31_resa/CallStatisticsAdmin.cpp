@@ -147,63 +147,128 @@ namespace synthese
 				stream << t.close();
 			}
 
-			CallStatisticsTableSync::CallCountSearchResult r(
-				CallStatisticsTableSync::CountCalls(
+			{
+				CallStatisticsTableSync::CallCountSearchResult r(
+					CallStatisticsTableSync::CountCalls(
 					_searchPeriod,
-					_searchStep
-			)	);
+					_searchStep,
+					false
+					)	);
 
-			typedef set<CallStatisticsTableSync::CallCountSearchResult::mapped_type::key_type> _Cols;
-			_Cols cols;
-			BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::value_type& type, r)
-			{
-				BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::mapped_type::value_type step, type.second)
+				typedef set<CallStatisticsTableSync::CallCountSearchResult::mapped_type::key_type> _Cols;
+				_Cols cols;
+				BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::value_type& type, r)
 				{
-					if(cols.find(step.first) == cols.end())
-						cols.insert(step.first);
-				}
-			}
-
-			HTMLTable::ColsVector v;
-			v.push_back("Type");
-			v.push_back("Type");
-			BOOST_FOREACH(const _Cols::value_type& col, cols)
-			{
-				v.push_back(col);
-			}
-			v.push_back("Total");
-			HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
-			stream << "<h1>Statistiques</h1>";
-			stream << t.open();
-
-			BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::value_type& type, r)
-			{
-				size_t typeSum(0);
-
-				stream << t.row();
-				stream << t.col() << ResaDBLog::GetIcon(type.first);
-				stream << t.col() << ResaDBLog::GetText(type.first);
-
-				BOOST_FOREACH(const _Cols::value_type col, cols)
-				{
-					stream << t.col();
-
-					CallStatisticsTableSync::CallCountSearchResult::mapped_type::const_iterator it(type.second.find(col));
-					if(it == type.second.end())
+					BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::mapped_type::value_type step, type.second)
 					{
-						stream << 0;
-					}
-					else
-					{
-						stream << it->second;
-						typeSum += it->second;
+						if(cols.find(step.first) == cols.end())
+							cols.insert(step.first);
 					}
 				}
 
-				stream << t.col() << typeSum;
+				HTMLTable::ColsVector v;
+				v.push_back("Type");
+				v.push_back("Type");
+				BOOST_FOREACH(const _Cols::value_type& col, cols)
+				{
+					v.push_back(col);
+				}
+				v.push_back("Total");
+				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
+				stream << "<h1>Statistiques centre d'appels</h1>";
+				stream << t.open();
+
+				BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::value_type& type, r)
+				{
+					size_t typeSum(0);
+
+					stream << t.row();
+					stream << t.col() << ResaDBLog::GetIcon(type.first);
+					stream << t.col() << ResaDBLog::GetText(type.first);
+
+					BOOST_FOREACH(const _Cols::value_type col, cols)
+					{
+						stream << t.col();
+
+						CallStatisticsTableSync::CallCountSearchResult::mapped_type::const_iterator it(type.second.find(col));
+						if(it == type.second.end())
+						{
+							stream << 0;
+						}
+						else
+						{
+							stream << it->second;
+							typeSum += it->second;
+						}
+					}
+
+					stream << t.col() << typeSum;
+				}
+
+				stream << t.close();
 			}
 
-			stream << t.close();
+			{
+				CallStatisticsTableSync::CallCountSearchResult r(
+					CallStatisticsTableSync::CountCalls(
+					_searchPeriod,
+					_searchStep,
+					true
+				)	);
+
+				typedef set<CallStatisticsTableSync::CallCountSearchResult::mapped_type::key_type> _Cols;
+				_Cols cols;
+				BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::value_type& type, r)
+				{
+					BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::mapped_type::value_type step, type.second)
+					{
+						if(cols.find(step.first) == cols.end())
+							cols.insert(step.first);
+					}
+				}
+
+				HTMLTable::ColsVector v;
+				v.push_back("Type");
+				v.push_back("Type");
+				BOOST_FOREACH(const _Cols::value_type& col, cols)
+				{
+					v.push_back(col);
+				}
+				v.push_back("Total");
+				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
+				stream << "<h1>Statistiques auto-réservation</h1>";
+				stream << t.open();
+
+				BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::value_type& type, r)
+				{
+					size_t typeSum(0);
+
+					stream << t.row();
+					stream << t.col() << ResaDBLog::GetIcon(type.first);
+					stream << t.col() << ResaDBLog::GetText(type.first);
+
+					BOOST_FOREACH(const _Cols::value_type col, cols)
+					{
+						stream << t.col();
+
+						CallStatisticsTableSync::CallCountSearchResult::mapped_type::const_iterator it(type.second.find(col));
+						if(it == type.second.end())
+						{
+							stream << 0;
+						}
+						else
+						{
+							stream << it->second;
+							typeSum += it->second;
+						}
+					}
+
+					stream << t.col() << typeSum;
+				}
+
+				stream << t.close();
+			}
+
 		}
 
 
