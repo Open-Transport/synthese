@@ -92,6 +92,8 @@ namespace synthese
 		void ResaLogAdmin::display(ostream& stream, VariablesMap& variables,
 					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
+			stream << "<h1>Journal</h1>";
+
 			// Results
 			_log.display(
 				stream,

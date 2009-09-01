@@ -38,6 +38,7 @@ synthese::resa::BookableCommercialLinesAdmin::integrate();
 synthese::resa::ReservationRoutePlannerAdmin::integrate();
 synthese::resa::ResaLogAdmin::integrate();
 synthese::resa::ResaEditLogEntryAdmin::integrate();
+synthese::resa::CallStatisticsAdmin::integrate();
 
 synthese::resa::ResaDBLog::integrate();
 

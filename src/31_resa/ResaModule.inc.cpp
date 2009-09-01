@@ -40,6 +40,7 @@
 #include "31_resa/ReservationRoutePlannerAdmin.h"
 #include "31_resa/ResaLogAdmin.h"
 #include "31_resa/ResaEditLogEntryAdmin.h"
+#include "CallStatisticsAdmin.h"
 
 // Registries
 #include "Reservation.h"
