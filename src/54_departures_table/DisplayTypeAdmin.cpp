@@ -172,7 +172,7 @@ namespace synthese
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS,
 						1, 120,
-						_type->getTimeBetweenChecks().minutes(),
+						_type->getTimeBetweenChecks().total_seconds() / 60,
 						1
 					)+ " minutes"	
 				);

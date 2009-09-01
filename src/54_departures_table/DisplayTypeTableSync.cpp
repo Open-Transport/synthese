@@ -154,14 +154,14 @@ namespace synthese
 			stringstream query;
 			query
 				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
+				<< object->getKey()
 				<< "," << Conversion::ToSQLiteString(object->getName())
 				<< "," << ((object->getDisplayInterface() != NULL) ? Conversion::ToString(object->getDisplayInterface()->getKey()) : "0")
 				<< "," << ((object->getAudioInterface() != NULL) ? Conversion::ToString(object->getAudioInterface()->getKey()) : "0")
 				<< "," << ((object->getMonitoringInterface() != NULL) ? Conversion::ToString(object->getMonitoringInterface()->getKey()) : "0")
-				<< "," << Conversion::ToString(object->getRowNumber())
-				<< "," << Conversion::ToString(object->getMaxStopsNumber())
-				<< "," << object->getTimeBetweenChecks().minutes()
+				<< "," << object->getRowNumber()
+				<< "," << object->getMaxStopsNumber()
+				<< "," << (object->getTimeBetweenChecks().total_seconds() / 60)
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
