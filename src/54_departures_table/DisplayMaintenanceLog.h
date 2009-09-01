@@ -1,5 +1,3 @@
-#ifndef SYNTHESE_DISPLAY_MAINTENANCE_LOG
-#define SYNTHESE_DISPLAY_MAINTENANCE_LOG
 
 ////////////////////////////////////////////////////////////////////////////////
 /// DisplayMaintenanceLog class header.
@@ -25,6 +23,9 @@
 ///	along with this program; if not, write to the Free Software Foundation,
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
+
+#ifndef SYNTHESE_DISPLAY_MAINTENANCE_LOG
+#define SYNTHESE_DISPLAY_MAINTENANCE_LOG
 
 #include "DBLogTemplate.h"
 #include "DBLogEntry.h"
@@ -90,7 +91,10 @@ namespace synthese
 				const server::Request& searchRequest
 			) const;
 			
-			std::string getObjectName(uid id) const;
+			std::string getObjectName(
+				util::RegistryKeyType id,
+				const server::Request& searchRequest
+			) const;
 			
 			
 			

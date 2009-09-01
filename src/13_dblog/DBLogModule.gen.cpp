@@ -1,7 +1,7 @@
 
 synthese::dblog::DBLogModule::integrate();
 
-synthese::dblog::DBLogViewer::integrate();
+synthese::dblog::DBLogAdmin::integrate();
 
 synthese::dblog::DBLogRight::integrate();
 

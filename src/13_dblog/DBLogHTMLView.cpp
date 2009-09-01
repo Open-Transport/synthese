@@ -338,7 +338,7 @@ namespace synthese
 					stream <<
 						t.col() <<
 						(	(dbe->getObjectId() > 0) ?
-							_dbLog->getObjectName(dbe->getObjectId()) :
+							_dbLog->getObjectName(dbe->getObjectId(), searchRequest) :
 							string()
 						)
 					;
@@ -348,7 +348,7 @@ namespace synthese
 					stream <<
 						t.col() <<
 						(	(dbe->getObjectId2() > 0) ?
-							_dbLog->getObjectName(dbe->getObjectId2()) :
+							_dbLog->getObjectName(dbe->getObjectId2(), searchRequest) :
 							string()
 						)
 					;

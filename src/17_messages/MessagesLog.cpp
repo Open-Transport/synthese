@@ -132,8 +132,10 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
 
-		std::string MessagesLog::getObjectName( uid id ) const
-		{
+		std::string MessagesLog::getObjectName(
+			RegistryKeyType id,
+			const server::Request& searchRequest
+		) const	{
 			Env env;
 			int tableId = decodeTableId(id);
 
@@ -154,7 +156,7 @@ namespace synthese
 			{
 			}
 
-			return lexical_cast<string>(id);
+			return DBLog::getObjectName(id, searchRequest);
 		}
 
 		std::string MessagesLog::getName() const

@@ -27,7 +27,6 @@
 #include "AlarmTableSync.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
-#include "Conversion.h"
 #include "MessagesLibraryRight.h"
 #include "Request.h"
 #include "SentScenario.h"
@@ -62,8 +61,10 @@ namespace synthese
 
 
 
-		std::string MessagesLibraryLog::getObjectName( uid id ) const
-		{
+		std::string MessagesLibraryLog::getObjectName(
+			RegistryKeyType id,
+			const server::Request& searchRequest
+		) const	{
 			try
 			{
 				int tableId = decodeTableId(id);
@@ -92,7 +93,7 @@ namespace synthese
 			catch (...)
 			{
 			}
-			return Conversion::ToString(id);
+			return DBLog::getObjectName(id,searchRequest);
 		}
 
 		void MessagesLibraryLog::addUpdateEntry(
@@ -115,7 +116,7 @@ namespace synthese
 			if(!alarm->getScenario()) return;
 
 			DBLogEntry::Content content;
-			content.push_back(Conversion::ToString(alarm->getKey()));
+			content.push_back(lexical_cast<string>(alarm->getKey()));
 			content.push_back(text);
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
@@ -192,7 +193,7 @@ namespace synthese
 			if(!alarm->getScenario()) return;
 
 			DBLog::ColumnsVector content;
-			content.push_back(Conversion::ToString(alarm->getKey()));
+			content.push_back(lexical_cast<string>(alarm->getKey()));
 			stringstream text;
 			text
 				<< "Suppression du message " << alarm->getShortMessage()

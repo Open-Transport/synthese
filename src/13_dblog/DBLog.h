@@ -113,10 +113,28 @@ namespace synthese
 			
 			
 			//////////////////////////////////////////////////////////////////////////
+			/// Generates the display of the log specific columns.
+			/// @param entry to parse
+			/// @searchRequest request which has generated the display : can be reused
+			///		to generate other requests at the display
+			/// @return all columns content to display
+			virtual ColumnsVector parse(
+				const DBLogEntry& entry,
+				const server::Request& searchRequest
+			) const;
+
+			//////////////////////////////////////////////////////////////////////////
 			/// Object column name getter.
 			/// If empty result, then the column is not displayed.
 			/// Virtual method : the default implementation returns "Objet"
 			virtual std::string getObjectColumnName() const;
+
+
+			virtual std::string getObjectName(
+				util::RegistryKeyType id,
+				const server::Request& searchRequest
+			) const;
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -124,6 +142,13 @@ namespace synthese
 			/// If empty result, then the column is not displayed.
 			/// Virtual method : the default implementation returns empty string
 			virtual std::string getObject2ColumnName() const;
+
+
+
+			virtual std::string getObject2Name(
+				util::RegistryKeyType id,
+				const server::Request& searchRequest
+			) const;
 
 			
 			//////////////////////////////////////////////////////////////////////////
@@ -139,19 +164,6 @@ namespace synthese
  			) = 0;
 
 
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Generates the display of the log specific columns.
-			/// @param entry to parse
-			/// @searchRequest request which has generated the display : can be reused
-			///		to generate other requests at the display
-			/// @return all columns content to display
-			virtual ColumnsVector parse(
-				const DBLogEntry& entry,
-				const server::Request& searchRequest
-			) const;
-
-			virtual std::string getObjectName(uid id) const;
 
 			static uid AddSimpleEntry(
 				const std::string& logKey,

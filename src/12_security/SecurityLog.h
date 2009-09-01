@@ -56,14 +56,23 @@ namespace synthese
 		class SecurityLog:
 			public dblog::DBLogTemplate<SecurityLog>
 		{
-			typedef enum { LOGIN_ENTRY = 10, USER_ADMIN_ENTRY = 20, PROFILE_ADMIN_ENTRY = 30 } _EntryType;
+			typedef enum {
+				LOGIN_ENTRY = 10,
+				USER_ADMIN_ENTRY = 20,
+				PROFILE_ADMIN_ENTRY = 30
+			} _EntryType;
 
 		public:
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			DBLog::ColumnsVector parse(
-				const dblog::DBLogEntry::Content& cols,
+				const dblog::DBLogEntry& entry,
 				const server::Request& searchRequest
+			) const;
+
+			virtual std::string getObjectName(
+				util::RegistryKeyType id,
+				const server::Request& request
 			) const;
 
 			static void addUserLogin(const User* user);

@@ -59,7 +59,6 @@
 #include "DisplayMaintenanceRight.h"
 #include "05_html/Constants.h"
 #include "HTMLList.h"
-#include "DBLogViewer.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
 #include "DisplayScreenCPUTableSync.h"

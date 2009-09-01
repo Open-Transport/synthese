@@ -41,6 +41,7 @@
 #include "ResaEditLogEntryAdmin.h"
 #include "AdminRequest.h"
 #include "CancelReservationAction.h"
+#include "ResaCustomerAdmin.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -71,25 +72,39 @@ namespace synthese
 		const int ResaDBLog::COL_RESA(3);
 
 
-		std::string ResaDBLog::getObjectName( uid id ) const
-		{
+		std::string ResaDBLog::getObjectName(
+			RegistryKeyType id,
+			const server::Request& searchRequest
+		) const	{
 			int tableId = decodeTableId(id);
 
 			if (tableId == UserTableSync::TABLE.ID)
 			{
-				Env env;
-				shared_ptr<const User> user(UserTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
-				return user->getFullName();
+				AdminFunctionRequest<ResaCustomerAdmin> openRequest(
+					static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+				);
+
+				shared_ptr<const User> user(
+					UserTableSync::Get(
+						id,
+						*static_cast<const FunctionRequest<AdminRequest>* >(
+							&searchRequest
+						)->getFunction()->getEnv(),
+						FIELDS_ONLY_LOAD_LEVEL
+				)	);
+
+				openRequest.getPage()->setUser(user);
+				return HTMLModule::getHTMLLink(openRequest.getURL(), user->getFullName());
 			}
 
-			return lexical_cast<string>(id);
+			return DBLog::getObjectName(id, searchRequest);
 		}
 
 
 
 		std::string resa::ResaDBLog::getName() const
 		{
-			return "Réservation";
+			return string();
 		}
 
 

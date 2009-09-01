@@ -24,6 +24,8 @@
 #include "DBLogEntryTableSync.h"
 #include "User.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace boost;
 using namespace std;
 
@@ -99,10 +101,16 @@ namespace synthese
 			return static_cast<ColumnsVector>(entry.getContent());
 		}
 
-		std::string DBLog::getObjectName( uid id ) const
-		{
-			return Conversion::ToString(id);
+
+
+		std::string DBLog::getObjectName(
+			RegistryKeyType id,
+			const server::Request& searchRequest
+		) const	{
+			return lexical_cast<string>(id);
 		}
+
+
 
 		uid DBLog::AddSimpleEntry(
 			const std::string& logKey,
@@ -131,6 +139,15 @@ namespace synthese
 		std::string DBLog::getObject2ColumnName() const
 		{
 			return string();
+		}
+
+
+
+		std::string DBLog::getObject2Name(
+			util::RegistryKeyType id,
+			const server::Request& searchRequest
+		) const	{
+			return lexical_cast<string>(id);
 		}
 	}
 }

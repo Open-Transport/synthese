@@ -81,27 +81,27 @@ namespace synthese
 		
 			typedef enum
 			{
-				CALL_ENTRY = 10
-				, RADIO_CALL = 12
-				, AUTO_CALL_ENTRY = 14
-				, FAKE_CALL = 15,
+				CALL_ENTRY = 10,
+				RADIO_CALL = 12,
+				AUTO_CALL_ENTRY = 14,
+				FAKE_CALL = 15,
 				OUTGOING_CALL = 16,
-				RESERVATION_ENTRY = 20
-				, CANCELLATION_ENTRY = 30
-				, DELAYED_CANCELLATION_ENTRY = 35
-				, CUSTOMER_COMMENT_ENTRY = 40
-				, INFORMATION_ENTRY = 50
-				, REDIRECTION_ENTRY = 60,
+				RESERVATION_ENTRY = 20,
+				CANCELLATION_ENTRY = 30,
+				DELAYED_CANCELLATION_ENTRY = 35,
+				CUSTOMER_COMMENT_ENTRY = 40,
+				INFORMATION_ENTRY = 50,
+				REDIRECTION_ENTRY = 60,
 				RESERVATIONS_READ_ENTRY = 65,
-				TECHNICAL_SUPPORT_ENTRY = 70
-				, NO_SHOW_ENTRY = 75
-				, AUTORESA_ACTIVATION = 80,
-				AUTORESA_DEACTIVATION = 81
-				, PERSONAL_DATA_UPDATE = 85,
+				TECHNICAL_SUPPORT_ENTRY = 70,
+				NO_SHOW_ENTRY = 75,
+				AUTORESA_ACTIVATION = 80,
+				AUTORESA_DEACTIVATION = 81,
+				PERSONAL_DATA_UPDATE = 85,
 				CUSTOMER_CREATION_ENTRY = 86,
-				PASSWORD_UPDATE = 90
-				, EMAIL = 95
-				, OTHER = 100
+				PASSWORD_UPDATE = 90,
+				EMAIL = 95,
+				OTHER = 100
 			} _EntryType;
 
 			static const int COL_TYPE;
@@ -111,7 +111,11 @@ namespace synthese
 
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
-			virtual std::string getObjectName(uid id) const;
+			
+			virtual std::string getObjectName(
+				util::RegistryKeyType id,
+				const server::Request& searchRequest
+			) const;
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Object 1 column name getter.
@@ -119,7 +123,7 @@ namespace synthese
 			virtual std::string getObjectColumnName() const;
 
 
-
+			
 			virtual DBLog::ColumnsVector parse(
 				const dblog::DBLogEntry& entry,
 				const server::Request& searchRequest

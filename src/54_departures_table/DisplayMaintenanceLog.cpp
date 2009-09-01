@@ -130,8 +130,10 @@ namespace synthese
 
 
 
-		std::string DisplayMaintenanceLog::getObjectName( uid id ) const
-		{
+		std::string DisplayMaintenanceLog::getObjectName(
+			RegistryKeyType id,
+			const server::Request& searchRequest
+		) const	{
 			try
 			{
 				if(decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
@@ -148,7 +150,7 @@ namespace synthese
 			catch (...)
 			{
 			}
-			return DBLog::getObjectName(id);
+			return DBLog::getObjectName(id, searchRequest);
 		}
 
 

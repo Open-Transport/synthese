@@ -44,48 +44,56 @@ namespace synthese
 			public dblog::DBLogTemplate<ArrivalDepartureTableLog>
 		{
 		public:
-			std::string getName() const;
-			DBLog::ColumnsVector getColumnNames() const;
-			
+			//! @name Display virtual methods
+			//@{
+				std::string getName() const;
+				DBLog::ColumnsVector getColumnNames() const;
+
+				std::string getObjectName(
+					util::RegistryKeyType id,
+					const server::Request& searchRequest
+				) const;
+			//@}
 
 
-			static void	addUpdateEntry(
-				const DisplayScreen& screen
-				, const std::string& text
-				, const security::User& user
-			);
-			static void	addUpdateEntry(
-				const DisplayScreenCPU& cpu
-				, const std::string& text
-				, const security::User& user
-			);
-			static void	addCreateEntry(
-				const DisplayScreenCPU& cpu
-				, const security::User& user
-			);
-			static void	addCreateEntry(
-				const DisplayScreen& screen
-				, const security::User& user
-			);
-			static void addCreateEntry(
-				const DisplayType& type
-				, const security::User& user
-			);
-			static void addRemoveEntry(
-				const DisplayScreen* screen
-				, const security::User* user
+			//! @name Static entry adders
+			//@{
+				static void	addUpdateEntry(
+					const DisplayScreen& screen
+					, const std::string& text
+					, const security::User& user
 				);
-			static void addUpdateTypeEntry(
-				const DisplayType* type
-				, const security::User* user
-				, const std::string& text
+				static void	addUpdateEntry(
+					const DisplayScreenCPU& cpu
+					, const std::string& text
+					, const security::User& user
 				);
-			static void addDeleteTypeEntry(
-				const DisplayType* type
-				, const security::User* user
+				static void	addCreateEntry(
+					const DisplayScreenCPU& cpu
+					, const security::User& user
 				);
-
-			std::string getObjectName(uid id) const;
+				static void	addCreateEntry(
+					const DisplayScreen& screen
+					, const security::User& user
+				);
+				static void addCreateEntry(
+					const DisplayType& type
+					, const security::User& user
+				);
+				static void addRemoveEntry(
+					const DisplayScreen* screen
+					, const security::User* user
+				);
+				static void addUpdateTypeEntry(
+					const DisplayType* type
+					, const security::User* user
+					, const std::string& text
+				);
+				static void addDeleteTypeEntry(
+					const DisplayType* type
+					, const security::User* user
+				);
+			//@}
 		};
 	}
 }

@@ -30,6 +30,13 @@
 #include "User.h"
 #include "ArrivalDepartureTableRight.h"
 #include "Request.h"
+#include "AdminFunctionRequest.hpp"
+#include "DisplayAdmin.h"
+#include "DisplayTypeAdmin.h"
+#include "DisplayScreenCPUAdmin.h"
+#include "HTMLModule.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 
@@ -41,6 +48,8 @@ namespace synthese
 	using namespace departurestable;
 	using namespace util;
 	using namespace server;
+	using namespace admin;
+	using namespace html;
 
 	namespace util
 	{
@@ -58,6 +67,49 @@ namespace synthese
 
 
 
+		std::string ArrivalDepartureTableLog::getObjectName(
+			util::RegistryKeyType id,
+			const server::Request& searchRequest
+		) const	{
+			try
+			{
+				Env env;
+				if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
+				{
+					AdminFunctionRequest<DisplayAdmin> openRequest(
+						static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+						);
+					shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id, env);
+					openRequest.getPage()->setScreen(ds);
+					return HTMLModule::getHTMLLink(openRequest.getURL(), ds->getFullName());
+				}
+				else if (decodeTableId(id) == DisplayTypeTableSync::TABLE.ID)
+				{
+					AdminFunctionRequest<DisplayTypeAdmin> openRequest(
+						static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+						);
+					shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					openRequest.getPage()->setType(dt);
+					return HTMLModule::getHTMLLink(openRequest.getURL(), dt->getName());
+				}
+				else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
+				{
+					AdminFunctionRequest<DisplayScreenCPUAdmin> openRequest(
+						static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+						);
+					shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					openRequest.getPage()->setCPU(cpu);
+					return HTMLModule::getHTMLLink(openRequest.getURL(), cpu->getName());
+				}
+			}
+			catch(...)
+			{
+				return DBLog::getObjectName(id, searchRequest);
+			}
+		}
+
+		
+
 		void ArrivalDepartureTableLog::addUpdateEntry(
 			const DisplayScreen& screen,
 			const std::string& text, const User& user
@@ -67,6 +119,8 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, screen.getKey());
 		}
 
+
+
 		void ArrivalDepartureTableLog::addUpdateEntry( const DisplayScreenCPU& cpu , const std::string& text , const security::User& user )
 		{
 			DBLogEntry::Content content;
@@ -74,32 +128,8 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 
-		std::string ArrivalDepartureTableLog::getObjectName( uid id ) const
-		{
-			try
-			{
-				Env env;
-				if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
-				{
-					shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id, env);
-					return ds->getFullName();
-				}
-				else if (decodeTableId(id) == DisplayTypeTableSync::TABLE.ID)
-				{
-					shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
-					return dt->getName();
-				}
-				else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
-				{
-					shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
-					return cpu->getName();
-				}
-			}
-			catch(...)
-			{
-			}
-			return "(unknown)";
-		}
+
+
 
 		std::string ArrivalDepartureTableLog::getName() const
 		{

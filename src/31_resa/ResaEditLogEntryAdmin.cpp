@@ -43,8 +43,10 @@
 
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
-
+#include "ResaCustomerAdmin.h"
 #include "PropertiesHTMLTable.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -146,10 +148,16 @@ namespace synthese
 			stream << t.title("Appel");
 			stream << t.cell("Date début", _entry->getDate().toString(true));
 			DateTime d(DateTime::FromSQLTimestamp(content[ResaDBLog::COL_DATE2]));
-			stream << t.cell("Date fin", d.toString(true));
-			stream << t.cell("Durée", Conversion::ToString(d.getSecondsDifference(_entry->getDate())) + " s");
+			stream << t.cell("Date fin", d.isUnknown() ? "inconnu" : d.toString(true));
+
+			// Duration
+			if(!d.isUnknown())
+			{
+				stream << t.cell("Durée", lexical_cast<string>(d.getSecondsDifference(_entry->getDate())) + " s");
+			}
+
+			// Customer
 			shared_ptr<const User> customer;
-			shared_ptr<const User> op;
 			if (_entry->getObjectId() > 0)
 			{
 				try
@@ -161,6 +169,17 @@ namespace synthese
 
 				}
 			}
+			if(customer.get())
+			{
+				AdminFunctionRequest<ResaCustomerAdmin> openUserRequest(_request);
+				openUserRequest.getPage()->setUser(customer);
+				stream << t.cell("Client", HTMLModule::getHTMLLink(openUserRequest.getURL(), customer->getFullName()));
+			}
+			else
+				stream << t.cell("Client", "inconnu");
+
+			// Operator
+			shared_ptr<const User> op;
 			if(_entry->getUserId() > 0)
 			{
 				try
@@ -172,9 +191,8 @@ namespace synthese
 
 				}
 			}
-			stream << t.cell("Client", customer.get() ? customer->getFullName() : "inconnu");
- 			stream << t.cell("Opérateur", op.get() ? op->getFullName() : "inconnu");
-			stream << t.cell("Type d'appel", t.getForm().getRadioInputCollection(ResaLogEntryUpdateAction::PARAMETER_CALL_TYPE, choices, static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE]))));
+			stream << t.cell("Opérateur", op.get() ? op->getFullName() : "inconnu");
+			stream << t.cell("Type d'appel", t.getForm().getRadioInputCollection(ResaLogEntryUpdateAction::PARAMETER_CALL_TYPE, choices, static_cast<ResaDBLog::_EntryType>(lexical_cast<int>(content[ResaDBLog::COL_TYPE]))));
 			stream << t.title("Ajout d'information sur l'appel");
 			stream << t.cell("Type d'ajout", t.getForm().getRadioInputCollection(ResaLogEntryUpdateAction::PARAMETER_TYPE, addChoices, ResaDBLog::CALL_ENTRY));
 			stream << t.cell("Texte", t.getForm().getTextAreaInput(ResaLogEntryUpdateAction::PARAMETER_TEXT, string(), 4, 50));

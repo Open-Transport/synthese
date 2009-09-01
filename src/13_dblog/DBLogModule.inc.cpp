@@ -1,7 +1,7 @@
 
 #include "DBLogModule.h"
 
-#include "DBLogViewer.h"
+#include "DBLogAdmin.h"
 #include "DBLogRight.h"
 #include "DBLogEntryTableSync.h"
 #include "DBLogPurgeAction.h"

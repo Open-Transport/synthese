@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// DBLogViewer class implementation.
-///	@file DBLogViewer.cpp
+/// DBLogAdmin class implementation.
+///	@file DBLogAdmin.cpp
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -29,7 +29,7 @@
 #include "SecurityModule.h"
 #include "User.h"
 #include "UserTableSync.h"
-#include "DBLogViewer.h"
+#include "DBLogAdmin.h"
 #include "DBLogModule.h"
 #include "DBLogEntryTableSync.h"
 #include "DBLogRight.h"
@@ -63,26 +63,26 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement,DBLogViewer>::FACTORY_KEY("dblog");
+		template<> const string FactorableTemplate<AdminInterfaceElement,DBLogAdmin>::FACTORY_KEY("dblog");
 	}
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<DBLogViewer>::ICON("book_open.png");
-		template<> const string AdminInterfaceElementTemplate<DBLogViewer>::DEFAULT_TITLE("Journal inconnu");
+		template<> const string AdminInterfaceElementTemplate<DBLogAdmin>::ICON("book_open.png");
+		template<> const string AdminInterfaceElementTemplate<DBLogAdmin>::DEFAULT_TITLE("Journal inconnu");
 	}
 
 	namespace dblog
 	{
-		const string DBLogViewer::PARAMETER_LOG_KEY = "dlvk";
+		const string DBLogAdmin::PARAMETER_LOG_KEY = "dlvk";
 
 
-		DBLogViewer::DBLogViewer()
-		:	AdminInterfaceElementTemplate<DBLogViewer>(),
+		DBLogAdmin::DBLogAdmin()
+		:	AdminInterfaceElementTemplate<DBLogAdmin>(),
 			_viewer(FACTORY_KEY)
 		{}
 
-		void DBLogViewer::setFromParametersMap(
+		void DBLogAdmin::setFromParametersMap(
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
@@ -94,7 +94,7 @@ namespace synthese
 		
 		
 		
-		server::ParametersMap DBLogViewer::getParametersMap() const
+		server::ParametersMap DBLogAdmin::getParametersMap() const
 		{
 			ParametersMap m(_viewer.getParametersMap());
 			m.insert(PARAMETER_LOG_KEY, _viewer.getLogKey());
@@ -103,7 +103,7 @@ namespace synthese
 
 
 
-		void DBLogViewer::display(
+		void DBLogAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
 					const server::FunctionRequest<admin::AdminRequest>& _request
@@ -111,9 +111,9 @@ namespace synthese
 			stream << "<h1>Journal</h1>";
 
 			// Requests
-			AdminFunctionRequest<DBLogViewer> searchRequest(_request);
+			AdminFunctionRequest<DBLogAdmin> searchRequest(_request);
 
-			AdminActionFunctionRequest<DBLogPurgeAction, DBLogViewer> purgeRequest(_request);
+			AdminActionFunctionRequest<DBLogPurgeAction, DBLogAdmin> purgeRequest(_request);
 			purgeRequest.getAction()->setDBLog(_viewer.getLogKey());
 
 			_viewer.display(
@@ -133,7 +133,7 @@ namespace synthese
 			}
 		}
 
-		bool DBLogViewer::isAuthorized(
+		bool DBLogAdmin::isAuthorized(
 			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
 			return _viewer.isAuthorized(_request);
@@ -141,7 +141,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks DBLogViewer::getSubPagesOfModule(
+		AdminInterfaceElement::PageLinks DBLogAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
 			const server::FunctionRequest<admin::AdminRequest>& request
@@ -153,10 +153,10 @@ namespace synthese
 				vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
 				BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
 				{
-					if(!loge->isAuthorized(request, READ)) continue;
+					if(!loge->isAuthorized(request, READ) || loge->getName().empty()) continue;
 
-					shared_ptr<DBLogViewer> p(
-						getNewOtherPage<DBLogViewer>(false)
+					shared_ptr<DBLogAdmin> p(
+						getNewOtherPage<DBLogAdmin>(false)
 					);
 					p->_viewer.setLogKey(
 						loge->getFactoryKey()
@@ -169,7 +169,7 @@ namespace synthese
 
 
 
-		std::string DBLogViewer::getTitle() const
+		std::string DBLogAdmin::getTitle() const
 		{
 			return
 				_viewer.getLogKey().empty() ?
@@ -180,7 +180,7 @@ namespace synthese
 
 
 
-		void DBLogViewer::setLogKey( const std::string& key )
+		void DBLogAdmin::setLogKey( const std::string& key )
 		{
 			try
 			{
@@ -193,9 +193,9 @@ namespace synthese
 		}
 		
 		
-		bool DBLogViewer::_hasSameContent(const AdminInterfaceElement& other) const
+		bool DBLogAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _viewer.getLogKey() == static_cast<const DBLogViewer&>(other)._viewer.getLogKey();
+			return _viewer.getLogKey() == static_cast<const DBLogAdmin&>(other)._viewer.getLogKey();
 		}
 
 	}

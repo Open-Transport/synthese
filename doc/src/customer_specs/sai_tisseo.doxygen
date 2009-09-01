@@ -259,7 +259,7 @@
 		@copydoc synthese::dblog::DBLogList
 
 		@subsubsection csst_ihm_journal_viewer Visualisation d'un journal
-		@copydoc synthese::dblog::DBLogViewer
+		@copydoc synthese::dblog::DBLogAdmin
 
 
 

@@ -110,7 +110,10 @@ namespace synthese
 			);
 
 
-			std::string getObjectName(uid id) const;
+			virtual std::string getObjectName(
+				util::RegistryKeyType id,
+				const server::Request& searchRequest
+			) const;
 		};
 	}
 }

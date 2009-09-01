@@ -83,7 +83,7 @@ La notion d'utilisateur est implémentée par la classe @ref synthese::security::U
 La notion de composant d'administration est implémentée par des sous-classes de @ref synthese::interfaces::AdminInterfaceElement.
 
 @subsubsection defLog Journaux
-@copydoc synthese::interfaces::DBLogViewer
+@copydoc synthese::interfaces::DBLogAdmin
 
 
 

@@ -1,6 +1,6 @@
 
-/** DBLogViewer class header.
-	@file DBLogViewer.h
+/** DBLogAdmin class header.
+	@file DBLogAdmin.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -86,8 +86,8 @@ namespace synthese
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 		*/
-		class DBLogViewer
-		:	public admin::AdminInterfaceElementTemplate<DBLogViewer>
+		class DBLogAdmin
+		:	public admin::AdminInterfaceElementTemplate<DBLogAdmin>
 		{
 			//! \name Stored parameters
 			//@{
@@ -97,7 +97,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_LOG_KEY;
 			
-			DBLogViewer();
+			DBLogAdmin();
 			
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
