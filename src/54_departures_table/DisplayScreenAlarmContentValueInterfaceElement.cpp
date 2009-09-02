@@ -62,11 +62,13 @@ namespace synthese
 				return string();
 
 			const Alarm* alarm(static_cast<const ArrivalDepartureListWithAlarm*>(object)->alarm);
-			
-			if (_messageSize->getValue(parameters, variables, object, request) == VALUE_BIG)
-				stream << alarm->getLongMessage();
-			else
-				stream << alarm->getShortMessage();
+			if(alarm)
+			{
+				if (_messageSize->getValue(parameters, variables, object, request) == VALUE_BIG)
+					stream << alarm->getLongMessage();
+				else
+					stream << alarm->getShortMessage();
+			}
 
 			return string();
 		}
