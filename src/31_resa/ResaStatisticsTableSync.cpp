@@ -61,7 +61,7 @@ namespace synthese
 				" INNER JOIN " << ReservationTransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_TRANSACTION_ID <<
 				" LEFT JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS sd ON sd." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_DEPARTURE_PLACE_ID <<
 				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS cd ON cd." << TABLE_COL_ID << "=sd." << ConnectionPlaceTableSync::TABLE_COL_CITYID <<
-				" LEFT JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS sa ON sa." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_DEPARTURE_PLACE_ID <<
+				" LEFT JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS sa ON sa." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_ARRIVAL_PLACE_ID <<
 				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS ca ON ca." << TABLE_COL_ID << "=sa." << ConnectionPlaceTableSync::TABLE_COL_CITYID <<
 				" WHERE " <<
 				ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
