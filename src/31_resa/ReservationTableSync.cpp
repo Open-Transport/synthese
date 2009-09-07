@@ -249,6 +249,7 @@ namespace synthese
 			if(hideOldServices)
 			{
 				Hour now(TIME_CURRENT);
+				now -= 60;
 				Schedule snow(now, now <= Hour(3,0));
 				query <<
 					" AND s." << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#" <<
