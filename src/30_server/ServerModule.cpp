@@ -40,6 +40,7 @@
 #include "HTTPRequest.hpp"
 #include "Log.h"
 #include "Request.h"
+#include "Function.h"
 #include "RequestException.h"
 #include "ActionException.h"
 
@@ -70,7 +71,7 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SMTP_SERVER ("smtp_server");
 
-		const std::string ServerModule::VERSION("3.1.11");
+		const std::string ServerModule::VERSION("3.1.12");
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
@@ -198,6 +199,10 @@ namespace synthese
 				rep.content.append(output.str());
 				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
 				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType()));
+				if(request._getFunction().get() && !request._getFunction()->getFileName().empty())
+				{
+					rep.headers.insert(make_pair("Content-Disposition", "attachement; filename="+ request._getFunction()->getFileName()));
+				}
 			}
 			catch(Request::RedirectException& e)
 			{

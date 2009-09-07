@@ -107,6 +107,14 @@ namespace synthese
 			*/
 			virtual std::string getOutputMimeType() const = 0;
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the default name of the generated file.
+			/// @return default name of the generated file
+			///    empty = display directly the result in the browser
+			virtual std::string getFileName() const { return std::string(); }
+
 			boost::shared_ptr<util::Env> getEnv() const { return _env; }
 			void setEnv(boost::shared_ptr<util::Env> value) { _env = value; }
 
