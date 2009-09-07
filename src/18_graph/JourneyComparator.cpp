@@ -36,8 +36,8 @@ namespace synthese
 			assert(j1 != NULL);
 			assert(j2 != NULL);
 			assert(j1->getMethod() == j2->getMethod());
-			assert(j1->getSquareDistanceToEnd().getSquareDistance() != UNKNOWN_VALUE);
-			assert(j2->getSquareDistanceToEnd().getSquareDistance() != UNKNOWN_VALUE);
+			//assert(j1->getSquareDistanceToEnd().getSquareDistance() != UNKNOWN_VALUE);
+			//assert(j2->getSquareDistanceToEnd().getSquareDistance() != UNKNOWN_VALUE);
 
 			/// @todo Add imitation function (which search to imitate _results.rbegin and _results.rbegin+1
 

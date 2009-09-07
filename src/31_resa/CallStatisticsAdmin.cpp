@@ -273,24 +273,6 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks CallStatisticsAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
-			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
-		) const	{
-			
-			AdminInterfaceElement::PageLinks links;
-			
-			if (moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
-			{
-				AddToLinks(links, getNewPage());
-			}
-			
-			return links;
-		}
-
-
-
 		CallStatisticsAdmin::_StepsVector CallStatisticsAdmin::_GetStepsVector()
 		{
 			_StepsVector result;

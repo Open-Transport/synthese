@@ -74,12 +74,13 @@ namespace synthese
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
+			_requestParameters.setFromParametersMap(map.getMap());
 		}
 		
 		
 		server::ParametersMap BookableCommercialLinesAdmin::getParametersMap() const
 		{
-			ParametersMap m;
+			ParametersMap m(_requestParameters.getParametersMap());
 			return m;
 		}
 

@@ -1,8 +1,8 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-/// CallStatisticsAdmin class header.
-///	@file CallStatisticsAdmin.h
+/// ResaStatisticsMenuAdmin class header.
+///	@file ResaStatisticsMenuAdmin.h
 ///	@author Hugues
 ///	@date 2009
 ///
@@ -23,54 +23,39 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_CallStatisticsAdmin_H__
-#define SYNTHESE_CallStatisticsAdmin_H__
+#ifndef SYNTHESE_ResaStatisticsMenuAdmin_H__
+#define SYNTHESE_ResaStatisticsMenuAdmin_H__
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
-#include "CallStatisticsTableSync.h"
-
-#include <vector>
-#include <utility>
 
 namespace synthese
 {
 	namespace resa
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// CallStatisticsAdmin Admin compound class.
+		/// ResaStatisticsMenuAdmin Admin compound class.
 		///	@ingroup m31Admin refAdmin
 		///	@author Hugues
 		///	@date 2009
-		class CallStatisticsAdmin:
-			public admin::AdminInterfaceElementTemplate<CallStatisticsAdmin>
+		class ResaStatisticsMenuAdmin:
+			public admin::AdminInterfaceElementTemplate<ResaStatisticsMenuAdmin>
 		{
 		public:
-			/// @name Parameter identifiers
-			//@{
-				static const std::string PARAM_SEARCH_START_DATE;
-				static const std::string PARAM_SEARCH_END_DATE;
-				static const std::string PARAM_SEARCH_STEP;
-			//@}
 
 		private:
-
-			/// @name Search parameters
-			//@{
-				boost::gregorian::date_period _searchPeriod;
-				CallStatisticsTableSync::Step _searchStep;
-			//@}
-
-				typedef std::vector<std::pair<CallStatisticsTableSync::Step, std::string> > _StepsVector;
-				static _StepsVector _GetStepsVector();
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		protected:
+
+
+
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			///	@author Hugues
 			///	@date 2009
-			CallStatisticsAdmin();
+			ResaStatisticsMenuAdmin();
 			
 			
 			
@@ -102,7 +87,7 @@ namespace synthese
 			/// Display of the content of the admin element.
 			///	@param stream Stream to write the page content on.
 			///	@param variables Environment variables defined by the interface
-			///	@param request The current request
+				///	@param request The current request
 			///	@author Hugues
 			///	@date 2009
 			void display(
@@ -124,8 +109,40 @@ namespace synthese
 			bool isAuthorized(
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
+
+
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds links to the pages of the current class to put directly under
+			/// a module admin page in the pages tree.
+			///	@param moduleKey Key of the module
+			///	@param currentPage Currently displayed page
+			/// @param request Current request
+			///	@return PageLinks each page to put under the module page in the page
+			///	@author Hugues
+			///	@date 2009
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const std::string& moduleKey,
+				const AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+			
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds links to the pages to put directly under the current page in
+			/// the pages tree.
+			///	@param currentPage Currently displayed page
+			/// @param request Current request
+			///	@return PageLinks each page to put under the current page
+			///	@author Hugues
+			///	@date 2009
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
 		};
 	}
 }
 
-#endif // SYNTHESE_CallStatisticsAdmin_H__
+#endif // SYNTHESE_ResaStatisticsMenuAdmin_H__

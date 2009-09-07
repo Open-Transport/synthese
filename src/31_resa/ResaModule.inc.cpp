@@ -20,6 +20,7 @@
 #include "XMLReservationFunction.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
 #include "ReservationEditFunction.h"
+#include "CSVResaStatisticsFunction.h"
 
 #include "ReservationItemInterfacePage.h"
 #include "ReservationConfirmationEMailInterfacePage.h"
@@ -41,6 +42,8 @@
 #include "31_resa/ResaLogAdmin.h"
 #include "31_resa/ResaEditLogEntryAdmin.h"
 #include "CallStatisticsAdmin.h"
+#include "ResaStatisticsAdmin.h"
+#include "ResaStatisticsMenuAdmin.h"
 
 // Registries
 #include "Reservation.h"

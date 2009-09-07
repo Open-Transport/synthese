@@ -1,8 +1,8 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-/// CallStatisticsAdmin class header.
-///	@file CallStatisticsAdmin.h
+/// ResaStatisticsAdmin class header.
+///	@file ResaStatisticsAdmin.h
 ///	@author Hugues
 ///	@date 2009
 ///
@@ -23,56 +23,71 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_CallStatisticsAdmin_H__
-#define SYNTHESE_CallStatisticsAdmin_H__
+#ifndef SYNTHESE_ResaStatisticsAdmin_H__
+#define SYNTHESE_ResaStatisticsAdmin_H__
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
-#include "CallStatisticsTableSync.h"
+#include "ResaStatisticsTableSync.h"
 
 #include <vector>
 #include <utility>
 
 namespace synthese
 {
+	namespace env
+	{
+		class CommercialLine;
+	}
+
 	namespace resa
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// CallStatisticsAdmin Admin compound class.
+		/// ResaStatisticsAdmin Admin compound class.
 		///	@ingroup m31Admin refAdmin
 		///	@author Hugues
 		///	@date 2009
-		class CallStatisticsAdmin:
-			public admin::AdminInterfaceElementTemplate<CallStatisticsAdmin>
+		class ResaStatisticsAdmin:
+			public admin::AdminInterfaceElementTemplate<ResaStatisticsAdmin>
 		{
 		public:
 			/// @name Parameter identifiers
 			//@{
+				static const std::string PARAM_LINE_ID;
 				static const std::string PARAM_SEARCH_START_DATE;
 				static const std::string PARAM_SEARCH_END_DATE;
-				static const std::string PARAM_SEARCH_STEP;
+				static const std::string PARAM_ROW_STEP;
+				static const std::string PARAM_COL_STEP;
 			//@}
 
 		private:
-
 			/// @name Search parameters
 			//@{
+				boost::shared_ptr<const env::CommercialLine>	_line;
 				boost::gregorian::date_period _searchPeriod;
-				CallStatisticsTableSync::Step _searchStep;
+				ResaStatisticsTableSync::Step _searchRowStep;
+				ResaStatisticsTableSync::Step _searchColStep;
 			//@}
 
-				typedef std::vector<std::pair<CallStatisticsTableSync::Step, std::string> > _StepsVector;
-				static _StepsVector _GetStepsVector();
 
 		protected:
+
 		public:
+			static std::string GetColumnName(ResaStatisticsTableSync::Step step);
+			typedef std::vector<std::pair<ResaStatisticsTableSync::Step, std::string> > _StepsVector;
+			static _StepsVector _GetStepsVector();
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			///	@author Hugues
 			///	@date 2009
-			CallStatisticsAdmin();
+			ResaStatisticsAdmin();
 			
 			
+			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
+			void setCommercialLineC(boost::shared_ptr<const env::CommercialLine> value);
+			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
+
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
@@ -88,8 +103,8 @@ namespace synthese
 				bool objectWillBeCreatedLater
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues
@@ -124,8 +139,18 @@ namespace synthese
 			bool isAuthorized(
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
+
+
+			/** Title generator.
+				@return The title of the page
+				@author Hugues Romain
+				@date 2009
+			*/
+			virtual std::string getTitle() const;
+
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
 	}
 }
 
-#endif // SYNTHESE_CallStatisticsAdmin_H__
+#endif // SYNTHESE_ResaStatisticsAdmin_H__

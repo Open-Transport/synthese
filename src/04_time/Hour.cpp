@@ -310,6 +310,8 @@ namespace synthese
 
 		Hour Hour::FromString (const std::string& str)
 		{
+			if(str.empty()) return Hour(TIME_UNKNOWN);
+
 			typedef tokenizer<char_separator<char> > tokenizer;
 			char_separator<char> sep (":","",keep_empty_tokens);
 			tokenizer columns (str, sep);

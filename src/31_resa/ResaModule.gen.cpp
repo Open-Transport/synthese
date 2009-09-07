@@ -14,6 +14,7 @@ synthese::resa::SendPasswordAction::integrate();
 synthese::resa::XMLReservationFunction::integrate();
 synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
 synthese::resa::ReservationEditFunction::integrate();
+synthese::resa::CSVResaStatisticsFunction::integrate();
 
 synthese::resa::ReservationItemInterfacePage::integrate();
 synthese::resa::ReservationConfirmationEMailInterfacePage::integrate();
@@ -39,6 +40,9 @@ synthese::resa::ReservationRoutePlannerAdmin::integrate();
 synthese::resa::ResaLogAdmin::integrate();
 synthese::resa::ResaEditLogEntryAdmin::integrate();
 synthese::resa::CallStatisticsAdmin::integrate();
+synthese::resa::ResaStatisticsAdmin::integrate();
+synthese::resa::ResaStatisticsMenuAdmin::integrate();
+
 
 synthese::resa::ResaDBLog::integrate();
 
