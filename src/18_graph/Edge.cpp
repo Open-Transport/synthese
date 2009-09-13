@@ -270,7 +270,7 @@ namespace synthese
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
 				// Look in schedule for when the line is in service
-				if (getParentPath()->isActive(departureMoment.getDate()))
+				if (getParentPath()->isActive(gregorian::date(departureMoment.getDate().getYear(), departureMoment.getDate().getMonth(), departureMoment.getDate().getDay())))
 				{
 					for (; next < getParentPath ()->getServices().size(); ++next)  // boucle sur les services
 					{
@@ -328,7 +328,7 @@ namespace synthese
 
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{
-				if (getParentPath()->isActive(arrivalMoment.getDate()))
+				if (getParentPath()->isActive(gregorian::date(arrivalMoment.getDate().getYear(), arrivalMoment.getDate().getMonth(), arrivalMoment.getDay())))
 				{
 					for (; previous >= 0; --previous)  // Loop over services
 					{

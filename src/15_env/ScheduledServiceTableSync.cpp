@@ -330,7 +330,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(shared_ptr<ScheduledService> service, result)
 				{
-					service->setActive(*date);
+					service->setActive(gregorian::date(date->getYear(), date->getMonth(), date->getDay()));
 			}	}
 				
 			return result;

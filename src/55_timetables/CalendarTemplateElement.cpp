@@ -22,6 +22,10 @@
 
 #include "CalendarTemplateElement.h"
 
+using namespace std;
+using namespace boost;
+using namespace boost::gregorian;
+
 namespace synthese
 {
 	using namespace util;
@@ -37,11 +41,9 @@ namespace synthese
 		CalendarTemplateElement::CalendarTemplateElement(
 			RegistryKeyType id
 		):	Registrable(id),
-			_minDate(TIME_UNKNOWN)
-			, _maxDate(TIME_UNKNOWN)
-			, _interval(0)
-			, _positive(true)
-			, _includeId(0)
+			_interval(days(1)),
+			_positive(true),
+			_period(date(not_a_date_time), date(not_a_date_time))
 		{
 
 		}
@@ -52,46 +54,46 @@ namespace synthese
 		{
 			Calendar result;
 
-			if (_includeId == UNKNOWN_VALUE)
+			if (!_includeId)
 			{
-				Date minDate(_minDate);
-				if(minDate.isUnknown() || minDate < mask.getFirstActiveDate())
+				date minDate(_period.begin());
+				if(minDate.is_not_a_date() || minDate < mask.getFirstActiveDate())
 					minDate = mask.getFirstActiveDate();
-				Date maxDate(_maxDate);
-				if (maxDate.isUnknown() || maxDate > mask.getLastActiveDate())
+				date maxDate(_period.last());
+				if (maxDate.is_not_a_date() || maxDate > mask.getLastActiveDate())
 					maxDate = mask.getLastActiveDate();
 
-				for (Date date = minDate; date <= maxDate; date += _interval)
-					if (mask.isActive(date))
-						result.setActive(date);
+				for (date d = minDate; d <= maxDate; d += _interval)
+					if (mask.isActive(d))
+						result.setActive(d);
 			}
 			return result;
 		}
 
 
 
-		int CalendarTemplateElement::getRank() const
+		size_t CalendarTemplateElement::getRank() const
 		{
 			return _rank;
 		}
 
 
 
-		const time::Date& CalendarTemplateElement::getMinDate() const
+		date CalendarTemplateElement::getMinDate() const
 		{
-			return _minDate;
+			return _period.begin();
 		}
 
 
 
-		const time::Date& CalendarTemplateElement::getMaxDate() const
+		date CalendarTemplateElement::getMaxDate() const
 		{
-			return _maxDate;
+			return _period.last();
 		}
 
 
 
-		int CalendarTemplateElement::getInterval() const
+		date_duration CalendarTemplateElement::getInterval() const
 		{
 			return _interval;
 		}
@@ -105,35 +107,35 @@ namespace synthese
 
 
 
-		uid CalendarTemplateElement::getIncludeId() const
+		optional<RegistryKeyType> CalendarTemplateElement::getIncludeId() const
 		{
 			return _includeId;
 		}
 
 
 
-		void CalendarTemplateElement::setRank( int text )
+		void CalendarTemplateElement::setRank(size_t text )
 		{
 			_rank = text;
 		}
 
 
 
-		void CalendarTemplateElement::setMinDate( const time::Date& date )
+		void CalendarTemplateElement::setMinDate( const date& d)
 		{
-			_minDate = date;
+			_period = _period.is_null() ? date_period(d, d + days(1)) : date_period(d, _period.end());
 		}
 
 
 
-		void CalendarTemplateElement::setMaxDate( const time::Date& date )
+		void CalendarTemplateElement::setMaxDate( const date& d)
 		{
-			_maxDate = date;
+			_period = _period.is_null() ? date_period(d, d + days(1)) : date_period(_period.begin(), d + days(1));
 		}
 
 
 
-		void CalendarTemplateElement::setInterval( int interval )
+		void CalendarTemplateElement::setInterval( date_duration interval )
 		{
 			_interval = interval;
 		}
@@ -147,7 +149,7 @@ namespace synthese
 
 
 
-		void CalendarTemplateElement::setIncludeId( uid id )
+		void CalendarTemplateElement::setIncludeId( optional<RegistryKeyType> id )
 		{
 			_includeId = id;
 		}

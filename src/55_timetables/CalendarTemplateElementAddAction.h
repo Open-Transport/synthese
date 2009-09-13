@@ -25,11 +25,12 @@
 #ifndef SYNTHESE_CalendarTemplateElementAddAction_H__
 #define SYNTHESE_CalendarTemplateElementAddAction_H__
 
-#include "30_server/Action.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
+#include "Registry.h"
 
-#include "01_util/FactorableTemplate.h"
-
-#include "04_time/Date.h"
+#include <boost/optional.hpp>
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 namespace synthese
 {
@@ -54,11 +55,11 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<CalendarTemplate>	_calendar;
-			time::Date	_minDate;
-			time::Date	_maxDate;
-			int			_interval;
-			int			_rank;
-			uid			_includeId;
+			boost::gregorian::date	_minDate;
+			boost::gregorian::date	_maxDate;
+			boost::gregorian::date_duration	_interval;
+			size_t			_rank;
+			boost::optional<util::RegistryKeyType>	_includeId;
 			bool		_positive;
 
 		protected:
@@ -81,7 +82,8 @@ namespace synthese
 			
 			CalendarTemplateElementAddAction();
 
-			void setCalendarId(uid id);
+			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
+			void setCalendar(boost::shared_ptr<const CalendarTemplate> value);
 			
 			virtual bool _isAuthorized() const;
 		};

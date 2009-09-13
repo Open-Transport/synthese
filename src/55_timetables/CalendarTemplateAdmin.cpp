@@ -43,6 +43,7 @@
 #include "AdminInterfaceElement.h"
 
 #include <boost/foreach.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 using namespace std;
 using namespace boost;
@@ -111,7 +112,7 @@ namespace synthese
 		) const {
 			// Requests
 			AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
-			addRequest.getAction()->setCalendarId(_calendar->getKey());
+			addRequest.getAction()->setCalendar(_calendar);
 
 			// Display
 			CalendarTemplateElementTableSync::SearchResult elements(
@@ -137,15 +138,15 @@ namespace synthese
 				stream << t.col() << ct->getRank();
 				stream << t.col() << ct->getPositive();
 				
-				if (ct->getIncludeId() != UNKNOWN_VALUE)
+				if (ct->getIncludeId())
 				{
-					stream << t.col() << ct->getMinDate().toString();
-					stream << t.col() << ct->getMaxDate().toString();
-					stream << t.col() << ct->getInterval();
+					stream << t.col(3) << "Inclusion de " << *ct->getIncludeId();
 				}
 				else
 				{
-					stream << t.col(3) << "Inclusion de " << ct->getIncludeId();
+					stream << t.col() << ct->getMinDate();
+					stream << t.col() << ct->getMaxDate();
+					stream << t.col() << ct->getInterval().days();
 				}
 				stream << t.col() << HTMLModule::getLinkButton(string(), "Supprimer");
 			}

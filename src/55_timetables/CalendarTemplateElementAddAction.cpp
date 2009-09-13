@@ -33,6 +33,8 @@
 #include "CalendarTemplateElementTableSync.h"
 
 using namespace std;
+using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -60,9 +62,8 @@ namespace synthese
 		
 		
 		CalendarTemplateElementAddAction::CalendarTemplateElementAddAction()
-			: util::FactorableTemplate<Action, CalendarTemplateElementAddAction>()
-			, _minDate(TIME_UNKNOWN)
-			, _maxDate(TIME_UNKNOWN)
+			: util::FactorableTemplate<Action, CalendarTemplateElementAddAction>(),
+			_interval(days(1))
 		{
 		}
 		
@@ -80,12 +81,20 @@ namespace synthese
 		
 		void CalendarTemplateElementAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setCalendarId(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID));
-			_minDate = map.getDate(PARAMETER_MIN_DATE, false, FACTORY_KEY);
-			_maxDate = map.getDate(PARAMETER_MAX_DATE, false, FACTORY_KEY);
-			_interval = map.getDefault<int>(PARAMETER_INTERVAL, 1);
+			try
+			{
+				_calendar = CalendarTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID), *_env);
+			}
+			catch (...)
+			{
+				throw ActionException("No such calendar");
+			}
+
+			_minDate = from_string(map.get<string>(PARAMETER_MIN_DATE));
+			_maxDate = from_string(map.get<string>(PARAMETER_MAX_DATE));
+			_interval = days(map.getDefault<int>(PARAMETER_INTERVAL, 1));
 			_positive = map.get<bool>(PARAMETER_POSITIVE);
-			_rank = map.getDefault<int>(PARAMETER_RANK, CalendarTemplateElementTableSync::GetMaxRank(_calendar->getKey()) + 1);
+			_rank = map.getDefault<size_t>(PARAMETER_RANK, CalendarTemplateElementTableSync::GetMaxRank(_calendar->getKey()) + 1);
 		}
 		
 		
@@ -111,18 +120,16 @@ namespace synthese
 
 
 
-		void CalendarTemplateElementAddAction::setCalendarId( uid id )
+		void CalendarTemplateElementAddAction::setCalendar(boost::shared_ptr<CalendarTemplate> value)
 		{
-			try
-			{
-				_calendar = CalendarTemplateTableSync::GetEditable(id, *_env);
-			}
-			catch (...)
-			{
-				throw ActionException("No such calendar");
-			}
+			_calendar = value;
 		}
-		
+
+		void CalendarTemplateElementAddAction::setCalendar(boost::shared_ptr<const CalendarTemplate> value)
+		{
+			_calendar = const_pointer_cast<CalendarTemplate>(value);
+		}
+
 		
 		bool CalendarTemplateElementAddAction::_isAuthorized() const
 		{

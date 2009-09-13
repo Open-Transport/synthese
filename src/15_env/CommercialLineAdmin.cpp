@@ -46,6 +46,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -88,8 +89,10 @@ namespace synthese
 			bool objectWillBeCreatedLater
 		){
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
-			_startDate = map.getOptionalDate(PARAMETER_DATES_START);
-			_endDate = map.getOptionalDate(PARAMETER_DATES_END);
+			if(map.getOptional<string>(PARAMETER_DATES_START))
+				_startDate = from_string(map.get<string>(PARAMETER_DATES_START));
+			if(map.getOptional<string>(PARAMETER_DATES_END))
+				_endDate = from_string(map.get<string>(PARAMETER_DATES_END));
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
 
@@ -184,33 +187,33 @@ namespace synthese
 				{
 					cols.push_back(Conversion::ToString(i));
 				}
-				optional<Date> date;
+				optional<date> d;
 				int lastHour;
 				HTMLTable t(cols, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
 				BOOST_FOREACH(const RunHours::value_type& it, _runHours)
 				{
-					if(!date || date != it.first.first)
+					if(!d || d != it.first.first)
 					{
-						if (date)
+						if (d)
 						{
 							for(int i(lastHour+1); i<=23; ++i)
 							{
 								stream << t.col(1, "red") << "0";
 							}
-							for((*date)++; *date < it.first.first; (*date)++)
+							for(d = *d + days(1); *d < it.first.first; d = *d + days(1))
 							{
 								stream << t.row();
-								stream << t.col(1, string(), true) << date->toString();
+								stream << t.col(1, string(), true) << to_iso_extended_string(*d);
 								for(int i(0); i<=23; ++i)
 								{
 									stream << t.col(1, "red") << "0";
 								}
 							}
 						}
-						date = it.first.first;
+						d = it.first.first;
 						stream << t.row();
-						stream << t.col(1, string(), true) << date->toString();
+						stream << t.col(1, string(), true) << to_iso_extended_string(*d);
 						lastHour = -1;
 					}
 					for(int i(lastHour+1); i<it.first.second; ++i)
@@ -220,7 +223,7 @@ namespace synthese
 					stream << t.col(1, "green") << it.second;
 					lastHour = it.first.second;
 				}
-				if(date)
+				if(d)
 				{
 					for(int i(lastHour+1); i<=23; ++i)
 					{

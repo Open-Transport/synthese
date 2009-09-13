@@ -81,6 +81,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -140,15 +141,15 @@ namespace synthese
 			return s.str();
 		}
 
-		string ToXsdDate (const Date& date)
+		string ToXsdDate (const date& d)
 		{
 			stringstream ss;
 			ss << setw( 4 ) << setfill ( '0' )
-			   << date.getYear () << "-"
+			   << d.year() << "-"
 			   << setw( 2 ) << setfill ( '0' )
-			   << date.getMonth () << "-"
+			   << d.month() << "-"
 			   << setw( 2 ) << setfill ( '0' )
-			   << date.getDay ();
+			   << d.day();
 			return ss.str ();
 		}
 
@@ -242,7 +243,7 @@ namespace synthese
 			const TransportNetwork* tn(_commercialLine->getNetwork());
 			os << "<PTNetwork>" << "\n";
 			os << "<objectId>" << TridentId (peerid, "PTNetwork", *tn) << "</objectId>" << "\n";
-			os << "<versionDate>" << ToXsdDate (Date (TIME_CURRENT)) << "</versionDate>" << "\n";
+			os << "<versionDate>" << ToXsdDate(day_clock::local_day()) << "</versionDate>" << "\n";
 			os << "<name>" << tn->getName () << "</name>" << "\n";
 			os << "<registration>" << "\n";
 			os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << "\n";
@@ -410,9 +411,9 @@ namespace synthese
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
 
-				BOOST_FOREACH(const Date& date, srv->getActiveDates())
+				BOOST_FOREACH(const date& d, srv->getActiveDates())
 				{
-					os << "<calendarDay>" << ToXsdDate (date) << "</calendarDay>" << "\n";
+					os << "<calendarDay>" << ToXsdDate (d) << "</calendarDay>" << "\n";
 				}
 				os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
@@ -424,9 +425,9 @@ namespace synthese
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
 
-				BOOST_FOREACH(const Date& date, srv->getActiveDates())
+				BOOST_FOREACH(const date& d, srv->getActiveDates())
 				{
-					os << "<calendarDay>" << ToXsdDate (date) << "</calendarDay>" << "\n";
+					os << "<calendarDay>" << ToXsdDate (d) << "</calendarDay>" << "\n";
 				}
 				os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
@@ -1348,7 +1349,7 @@ namespace synthese
 			
 			// Calendars
 			int calendarNumber(allNode.nChildNode("Timetable"));
-			Date today(TIME_CURRENT);
+			date today(day_clock::local_day());
 			for(int calendarRank(0); calendarRank < calendarNumber; ++calendarRank)
 			{
 				XMLNode calendarNode(allNode.getChildNode("Timetable", calendarRank));
@@ -1358,15 +1359,15 @@ namespace synthese
 				for(int dayRank(0); dayRank < daysNumber; ++dayRank)
 				{
 					XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
-					Date date(Date::FromSQLDate(dayNode.getText()));
-					if(date < today) continue;
+					date d(from_string(dayNode.getText()));
+					if(d < today) continue;
 					
 					for(int serviceRank(0); serviceRank < servicesNumber; ++serviceRank)
 					{
 						XMLNode serviceNode(calendarNode.getChildNode("vehicleJourneyId", serviceRank));
 						shared_ptr<ServiceDate> sd(new ServiceDate);
 						sd->setService(services[serviceNode.getText()]);
-						sd->setDate(date);
+						sd->setDate(d);
 						sd->setKey(ServiceDateTableSync::getId());
 						_serviceDates.push_back(sd);
 					}

@@ -23,7 +23,6 @@
 #include <sstream>
 
 #include "Registry.h"
-#include "Conversion.h"
 
 #include "DBModule.h"
 #include "SQLiteResult.h"
@@ -38,13 +37,13 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace env;
-	using namespace time;
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ServiceDateTableSync>::FACTORY_KEY("15.70.01 Service dates");
@@ -82,8 +81,8 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			const Date date(Date::FromSQLDate (rows->getText (ServiceDateTableSync::COL_DATE)));
-			ss->setDate(date);
+			const date d(from_string(rows->getText (ServiceDateTableSync::COL_DATE)));
+			ss->setDate(d);
 			
 			shared_ptr<NonPermanentService> service(
 				Fetcher<NonPermanentService>::FetchEditable(
@@ -95,7 +94,7 @@ namespace synthese
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				service->setActive(date);
+				service->setActive(d);
 			}
 		}
 		
@@ -111,9 +110,9 @@ namespace synthese
 			stringstream query;
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToString(object->getService()->getKey())
-				<< "," << object->getDate().toSQLString()
+				<< object->getKey()
+				<< "," << object->getService()->getKey()
+				<< ",'" << to_iso_extended_string(object->getDate()) << "'"
 				<< ")";
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
@@ -134,12 +133,12 @@ namespace synthese
 		void ServiceDateTableSync::DeleteDatesFromNow(
 			util::RegistryKeyType serviceId
 		){
-			Date now(TIME_CURRENT);
+			date now(day_clock::local_day());
 			stringstream query;
 			query <<
 				"DELETE FROM " << TABLE.NAME <<
 				" WHERE " << COL_SERVICEID << "=" << serviceId <<
-				" AND " << COL_DATE << ">" << now.toSQLString()
+				" AND " << COL_DATE << ">'" << to_iso_extended_string(now) << "'"
 			;
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}
@@ -157,10 +156,10 @@ namespace synthese
 					<< service.getKey() << " ORDER BY " << COL_DATE;
 				
 				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
-				service.clearDates();
+				service.clear();
 				while(rows->next())
 				{
-					service.setActive(Date::FromSQLDate(rows->getText(COL_DATE)));
+					service.setActive(from_string(rows->getText(COL_DATE)));
 				}
 			}
 			catch(SQLiteException& e)

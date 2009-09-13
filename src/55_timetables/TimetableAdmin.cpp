@@ -25,8 +25,6 @@
 #include "TimetableAdmin.h"
 #include "TimetableModule.h"
 
-#include "Date.h"
-
 #include "PropertiesHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "HTMLModule.h"
@@ -56,6 +54,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -250,11 +249,11 @@ namespace synthese
 
 			auto_ptr<TimetableGenerator> g(_timetable->getGenerator(_getEnv()));
 			Calendar c;
-			Date d(TIME_CURRENT);
-			for (int i(0); i<60; ++i)
+			date d(day_clock::local_day());
+			for (size_t i(0); i<60; ++i)
 			{
 				c.setActive(d);
-				d++;
+				d += days(1);
 			}
 			g->setBaseCalendar(c);
 			g->build();

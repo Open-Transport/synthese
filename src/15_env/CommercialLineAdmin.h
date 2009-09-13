@@ -26,7 +26,6 @@
 #define SYNTHESE_CommercialLineAdmin_H__
 
 #include "ResultHTMLTable.h"
-#include "Date.h"
 
 #include "AdminInterfaceElementTemplate.h"
 
@@ -60,8 +59,8 @@ namespace synthese
 			boost::shared_ptr<const CommercialLine>	_cline;
 
 			std::string _searchName;
-			boost::optional<time::Date>	_startDate;
-			boost::optional<time::Date>	_endDate;
+			boost::optional<boost::gregorian::date>	_startDate;
+			boost::optional<boost::gregorian::date>	_endDate;
 
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 

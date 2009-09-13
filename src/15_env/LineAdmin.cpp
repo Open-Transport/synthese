@@ -205,7 +205,7 @@ namespace synthese
 
 						stream << ts.col() << (as - ds);
 
-						stream << ts.col() << service->getLastActiveDate().toString();
+						stream << ts.col() << to_iso_extended_string(service->getLastActiveDate());
 					}
 
 					stream << ts.close();
@@ -264,7 +264,7 @@ namespace synthese
 						stream << tc.col() << service->getRange();
 						stream << tc.col() << service->getMaxWaitingTime();
 
-						stream << tc.col() << service->getLastActiveDate().toString();
+						stream << tc.col() << to_iso_extended_string(service->getLastActiveDate());
 					}
 
 					stream << tc.close();

@@ -22,6 +22,9 @@
 
 #include "ServiceDate.h"
 
+using namespace boost::gregorian;
+
+
 namespace synthese
 {
 	using namespace util;
@@ -35,8 +38,7 @@ namespace synthese
 	{
 		ServiceDate::ServiceDate(
 			RegistryKeyType key
-		):	_date(time::TIME_UNKNOWN),
-			_service(NULL),
+		):	_service(NULL),
 			Registrable(key)
 		{ }
 		
@@ -45,7 +47,7 @@ namespace synthese
 			return _service;
 		}
 		
-		const time::Date&				ServiceDate::getDate() const
+		const date&				ServiceDate::getDate() const
 		{
 			return _date;
 		}
@@ -55,7 +57,7 @@ namespace synthese
 			_service = value;
 		}
 		
-		void ServiceDate::setDate(const time::Date& value)
+		void ServiceDate::setDate(const date& value)
 		{
 			_date = value;
 		}

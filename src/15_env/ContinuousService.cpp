@@ -29,6 +29,7 @@
 #include "DateTime.h"
 
 using namespace std;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -183,7 +184,7 @@ namespace synthese
 			ptr.setOriginDateTime(originDateTime);
 
 			// Date control
-			if (!isActive(originDateTime.getDate()))
+			if (!isActive(date(originDateTime.getDate().getYear(), originDateTime.getDate().getMonth(), originDateTime.getDate().getDay() )))
 				return ServicePointer(method, userClass);
 
 			// Reservation control

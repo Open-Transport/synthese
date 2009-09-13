@@ -67,13 +67,13 @@ namespace synthese
 			 * Updates the calendar of the path too.
 			 * @param date the date to mark 
 			 */
-			virtual void setActive(const time::Date& date);
+			virtual void setActive(const boost::gregorian::date& d);
 			
 			/** Unmarks a date on the calendar of the service.
 			 * Updates the calendar of the path too.
 			 * @param date the date to unmark 
 			 */
-			virtual void setInactive(const time::Date& date);
+			virtual void setInactive(const boost::gregorian::date& d);
 		};
 	}
 }

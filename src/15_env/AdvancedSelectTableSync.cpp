@@ -43,12 +43,12 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace time;
 	using namespace pt;
 
 	namespace env
@@ -110,8 +110,8 @@ namespace synthese
 		env::RunHours getCommercialLineRunHours(
 			util::Env& env,
 			util::RegistryKeyType id,
-			const boost::optional<time::Date>& startDate,
-			const boost::optional<time::Date>& endDate
+			const boost::optional<date>& startDate,
+			const boost::optional<date>& endDate
 		){
 			RunHours result;
 			
@@ -124,10 +124,10 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<ScheduledService> serv, services)
 			{
 				ServiceDateTableSync::SetActiveDates(*serv);
-				BOOST_FOREACH(const Date& date, serv->getActiveDates())
+				BOOST_FOREACH(const date& d, serv->getActiveDates())
 				{
-					if(startDate && date < *startDate) continue;
-					if(endDate && date > *endDate) continue;
+					if(startDate && d < *startDate) continue;
+					if(endDate && d > *endDate) continue;
 
 					const int startHour(serv->getDepartureBeginScheduleToIndex(0).getHour().getHours());
 					const int endHour(serv->getDepartureEndScheduleToIndex(0).getHour().getHours());
@@ -135,7 +135,7 @@ namespace synthese
 					{
 						for(int h(startHour); h <= endHour; ++h)
 						{
-							RunHours::key_type key(make_pair(date, h));
+							RunHours::key_type key(make_pair(d, h));
 							RunHours::iterator it(result.find(key));
 							if (it == result.end())
 							{
@@ -151,7 +151,7 @@ namespace synthese
 					{
 						for(int h(0); h <= endHour; ++h)
 						{
-							RunHours::key_type key(make_pair(date, h));
+							RunHours::key_type key(make_pair(d, h));
 							RunHours::iterator it(result.find(key));
 							if (it == result.end())
 							{
@@ -164,7 +164,7 @@ namespace synthese
 						}
 						for(int h(startHour); h <= 23; ++h)
 						{
-							RunHours::key_type key(make_pair(date, h));
+							RunHours::key_type key(make_pair(d, h));
 							RunHours::iterator it(result.find(key));
 							if (it == result.end())
 							{
@@ -185,10 +185,10 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<ContinuousService> serv, cservices)
 			{
 				ServiceDateTableSync::SetActiveDates(*serv);
-				BOOST_FOREACH(const Date& date, serv->getActiveDates())
+				BOOST_FOREACH(const date& d, serv->getActiveDates())
 				{
-					if(startDate && date < *startDate) continue;
-					if(endDate && date > *endDate) continue;
+					if(startDate && d < *startDate) continue;
+					if(endDate && d > *endDate) continue;
 
 					const int startHour(serv->getDepartureBeginScheduleToIndex(0).getHour().getHours());
 					const int endHour(serv->getDepartureEndScheduleToIndex(0).getHour().getHours());
@@ -196,7 +196,7 @@ namespace synthese
 					{
 						for(int h(startHour); h <= endHour; ++h)
 						{
-							RunHours::key_type key(make_pair(date, h));
+							RunHours::key_type key(make_pair(d, h));
 							RunHours::iterator it(result.find(key));
 							if (it == result.end())
 							{
@@ -212,7 +212,7 @@ namespace synthese
 					{
 						for(int h(0); h <= endHour; ++h)
 						{
-							RunHours::key_type key(make_pair(date, h));
+							RunHours::key_type key(make_pair(d, h));
 							RunHours::iterator it(result.find(key));
 							if (it == result.end())
 							{
@@ -225,7 +225,7 @@ namespace synthese
 						}
 						for(int h(startHour); h <= 23; ++h)
 						{
-							RunHours::key_type key(make_pair(date, h));
+							RunHours::key_type key(make_pair(d, h));
 							RunHours::iterator it(result.find(key));
 							if (it == result.end())
 							{

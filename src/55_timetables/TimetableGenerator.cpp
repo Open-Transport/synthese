@@ -81,7 +81,7 @@ namespace synthese
 						continue;
 
 					// Calendar filter
-					if(	!(_baseCalendar || *service)
+					if(	!(_baseCalendar.hasAtLeastOneCommonDateWith(*service))
 						|| !_withContinuousServices && service->isContinuous()
 					)	continue;
 
@@ -158,7 +158,7 @@ namespace synthese
 
 
 			// A0: Line selection upon calendar
-			if (!line.getAllDays() && !(_baseCalendar || line))
+			if (!line.getAllDays() && !_baseCalendar.hasAtLeastOneCommonDateWith(line))
 				return false;
 
 

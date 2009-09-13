@@ -24,10 +24,10 @@
 #define SYNTHESE_timetables_CalendarTemplateElement_h__
 
 #include "Registrable.h"
-#include "UId.h"
-#include "Date.h"
 #include "Calendar.h"
 #include "Registry.h"
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -42,7 +42,6 @@ namespace synthese
 				- day of a week from s to e : minDate=s, maxDate=e, interval=7
 				- the maxDate can be unknown date (unlimited range)
 			
-			ddd
 		*/
 		class CalendarTemplateElement
 		:	public virtual util::Registrable
@@ -52,12 +51,11 @@ namespace synthese
 			typedef util::Registry<CalendarTemplateElement>	Registry;
 			
 		private:
-			int			_rank;
-			time::Date	_minDate;
-			time::Date	_maxDate;
-			int			_interval;
+			std::size_t			_rank;
+			boost::gregorian::date_period	_period;
+			boost::gregorian::date_duration	_interval;
 			bool		_positive;
-			uid			_includeId;
+			boost::optional<util::RegistryKeyType>	_includeId;
 
 		public:
 			CalendarTemplateElement(
@@ -71,22 +69,22 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				int					getRank()		const;
-				const time::Date&	getMinDate()	const;
-				const time::Date&	getMaxDate()	const;
-				int					getInterval()	const;
+				size_t					getRank()		const;
+				boost::gregorian::date	getMinDate()	const;
+				boost::gregorian::date	getMaxDate()	const;
+				boost::gregorian::date_duration	getInterval()	const;
 				bool				getPositive()	const;
-				uid					getIncludeId()	const;
+				boost::optional<util::RegistryKeyType>	getIncludeId()	const;
 			//@}
 
 			//! @name Setters
 			//@{ 
-				void setRank(int text);
-				void setMinDate(const time::Date& date);
-				void setMaxDate(const time::Date& date);
-				void setInterval(int interval);
+				void setRank(size_t text);
+				void setMinDate(const boost::gregorian::date& date);
+				void setMaxDate(const boost::gregorian::date& date);
+				void setInterval(boost::gregorian::date_duration interval);
 				void setPositive(bool value);
-				void setIncludeId(uid id);
+				void setIncludeId(boost::optional<util::RegistryKeyType> id);
 			//@}
 
 			//! @name Modifiers

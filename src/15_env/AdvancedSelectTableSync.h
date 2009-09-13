@@ -24,13 +24,13 @@
 #define SYNTHESE_env_AdvancedSelectTableSync_h__
 
 #include "UId.h"
-#include "Date.h"
 #include "Registry.h"
 
 #include <map>
 #include <utility>
 
 #include <boost/optional.hpp>
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 namespace synthese
 {
@@ -41,13 +41,13 @@ namespace synthese
 	
 	namespace env
 	{
-		typedef std::map<std::pair<time::Date, int>, int> RunHours;
+		typedef std::map<std::pair<boost::gregorian::date, int>, int> RunHours;
 
 		RunHours getCommercialLineRunHours(
 			util::Env& env,
 			util::RegistryKeyType id,
-			const boost::optional<time::Date>& startDate,
-			const boost::optional<time::Date>& endDate
+			const boost::optional<boost::gregorian::date>& startDate,
+			const boost::optional<boost::gregorian::date>& endDate
 		);
 
 		bool isPlaceServedByCommercialLine(uid Line, uid place);

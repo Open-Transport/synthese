@@ -32,19 +32,15 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 
-#include "Conversion.h"
-
-#include "Date.h"
-
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace timetables;
-	using namespace time;
 
 	namespace util
 	{
@@ -103,11 +99,12 @@ namespace synthese
 
 			// Properties
 			object->setKey(id);
-			object->setRank(rows->getInt(CalendarTemplateElementTableSync::COL_RANK));
-			object->setIncludeId(rows->getLongLong(CalendarTemplateElementTableSync::COL_INCLUDE_ID));
-			object->setMinDate(Date::FromSQLDate(rows->getText(CalendarTemplateElementTableSync::COL_MIN_DATE)));
-			object->setMaxDate(Date::FromSQLDate(rows->getText(CalendarTemplateElementTableSync::COL_MAX_DATE)));
-			object->setInterval(rows->getInt(CalendarTemplateElementTableSync::COL_INTERVAL));
+			object->setRank(static_cast<size_t>(rows->getInt(CalendarTemplateElementTableSync::COL_RANK)));
+			RegistryKeyType iid(rows->getLongLong(CalendarTemplateElementTableSync::COL_INCLUDE_ID));
+			object->setIncludeId(iid > 0 ? optional<RegistryKeyType>(iid) : optional<RegistryKeyType>());
+			object->setMinDate(from_string(rows->getText(CalendarTemplateElementTableSync::COL_MIN_DATE)));
+			object->setMaxDate(from_string(rows->getText(CalendarTemplateElementTableSync::COL_MAX_DATE)));
+			object->setInterval(days(rows->getInt(CalendarTemplateElementTableSync::COL_INTERVAL)));
 			object->setPositive(rows->getBool(CalendarTemplateElementTableSync::COL_POSITIVE));
 		}
 
@@ -123,12 +120,12 @@ namespace synthese
                
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
+				<< object->getKey()
 				<< "," << object->getRank()
-				<< "," << object->getMinDate().toSQLString()
-				<< "," << object->getMaxDate().toSQLString()
-				<< "," << Conversion::ToString(object->getPositive())
-				<< "," << Conversion::ToString(object->getIncludeId())
+				<< ",'" << to_iso_extended_string(object->getMinDate()) << "'"
+				<< ",'" << to_iso_extended_string(object->getMaxDate()) << "'"
+				<< "," << object->getPositive()
+				<< "," << (object->getIncludeId() ? *object->getIncludeId() : 0)
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}

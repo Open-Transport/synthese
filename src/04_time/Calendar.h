@@ -25,11 +25,11 @@
 #ifndef SYNTHESE_ENV_CALENDAR_H
 #define SYNTHESE_ENV_CALENDAR_H
 
-#include "Date.h"
-
 #include <boost/dynamic_bitset.hpp>
-#include <vector>
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
+#include <map>
+#include <vector>
 
 namespace synthese
 {
@@ -41,49 +41,45 @@ namespace synthese
 			The Calendar class implements the service calendar, holding a 
 			bitset representing year days. Each year day can be activated or not.
 
-			The first bit of the internal bitset corresponds to the first
-			marked date. The last bit corresponds to the last date marked.
-
+			The active dates of the calendar are marked as activated bits on a bitset per year.
+			Each year containing at least one activated date has a full bitset.
+			In a year bitset, a date is represented by the bit at the rank corresponding to its day number in the year.
+			Example : 2008-02-03 => bit 34 of the 2008 bitset.
 		*/
 		class Calendar 
 		{
 		public:
-
+			typedef std::vector<boost::gregorian::date> DatesVector;
 
 		private:
 
-			Date _firstMarkedDate;
-			Date _lastMarkedDate;
+			typedef std::map<
+				boost::gregorian::greg_year,
+				boost::dynamic_bitset<>
+			> _BitSets;
+			
+			_BitSets _markedDates;
 
-			boost::dynamic_bitset<> _markedDates;
+			static size_t _BitPos(const boost::gregorian::date& d);
 
 		public:
 
-			Calendar();
-		 
-			~Calendar();
-
-
 			//! @name Getters/Setters
 			//@{
-				Date getFirstActiveDate () const;
-				Date getLastActiveDate () const;
+				boost::gregorian::date getFirstActiveDate () const;
+				boost::gregorian::date getLastActiveDate () const;
 			//@}
 
 
 			//! @name Query methods
 			//@{
-				int getNbActiveDates () const;
-				
-				
-				
 				/** Tests if a date is active according to the calendar.
 				 * This method can be overloaded by subclasses to do additional controls.
 				 * @param date date to test
 				 * @return true if the calendar is active at the specified date
 				 */
 				virtual bool isActive(
-					const Date& date
+					const boost::gregorian::date& date
 				) const;
 				
 				
@@ -92,75 +88,36 @@ namespace synthese
 				 * 
 				 * @return vector containing the active dates of the calendar
 				 */
-				std::vector<Date> getActiveDates () const;
+				DatesVector getActiveDates () const;
+
+				/** Or comparison operator : tests if at least one date is marked in the two calendars.
+					@param op calendar to compare with
+					@return bool true if at least one date is marked in the two calendars
+					@author Hugues Romain
+					@date 2008				
+				*/
+				bool hasAtLeastOneCommonDateWith(const Calendar& op) const;
+
+				Calendar& operator&= (const Calendar& op);
+				Calendar& operator|= (const Calendar& op);
+				Calendar operator& (const Calendar& op2) const;
+				Calendar operator| (const Calendar& op2) const;
+
+				bool operator==(const Calendar& op) const;
 			//@}
 
 
 
 			//! @name Update methods
 			//@{
-				virtual void setActive(const Date& date);
-				virtual void setInactive(const Date& date);
+				virtual void setActive(const boost::gregorian::date& date);
+				virtual void setInactive(const boost::gregorian::date& date);
 				void subDates(const Calendar& calendar);
-				void clearDates();
+				void clear();
 			//@}
-
-
-			
-			
-			/** Or comparison operator : tests if at least one date is marked in the two calendars.
-				@param op calendar to compare with
-				@return bool true if at least one date is marked in the two calendars
-				@author Hugues Romain
-				@date 2008				
-			*/
-			bool operator || (const Calendar& op) const;
-
-			Calendar& operator&= (const Calendar& op);
-			Calendar& operator|= (const Calendar& op);
-
-			bool operator==(const Calendar& op) const;
-
-			static void LogicalAnd(
-				Calendar& dest,
-				const Calendar& op1,
-				const Calendar& op2
-			);
-			static void LogicalOr(
-				Calendar& dest,
-				const Calendar& op1,
-				const Calendar& op2
-			);
-
-		private:
-
-			void pop_front (int nbBits);
-			void pop_back (int nbBits);
-
-			void push_front (int nbBits, bool value = false);
-			void push_back (int nbBits, bool value = false);
-
-			void updateFirstMark ();
-			void updateLastMark ();
-
-			static Date DateAfter(
-				Date date,
-				unsigned int nbBits
-			);
-			static Date DateBefore(
-				Date date,
-				unsigned int nbBits
-			);
-
-			static int NbBitsBetweenDates(
-				Date date1,
-				Date date2
-			);
 		};
 
 
-		Calendar operator& (const Calendar& op1, const Calendar& op2);
-		Calendar operator| (const Calendar& op1, const Calendar& op2);
 	}
 }
 

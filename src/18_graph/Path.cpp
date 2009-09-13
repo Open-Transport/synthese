@@ -34,6 +34,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -117,9 +118,9 @@ namespace synthese
 
 
 
-		bool Path::isActive(const Date& date) const
+		bool Path::isActive(const date& d) const
 		{
-			return _allDays || Calendar::isActive(date);
+			return _allDays || Calendar::isActive(d);
 		}
 
 

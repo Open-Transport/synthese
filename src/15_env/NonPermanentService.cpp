@@ -25,6 +25,7 @@
 #include "PTUseRule.h"
 
 using namespace std;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -57,10 +58,10 @@ namespace synthese
 
 
 		void NonPermanentService::setInactive(
-			const Date& date
+			const date& d
 		){
 			// Mark the date in service calendar
-			Calendar::setInactive(date);
+			Calendar::setInactive(d);
 		
 		    /// @todo Implement it : 
 			// see in each date if there is at least an other service which runs.
@@ -69,19 +70,19 @@ namespace synthese
 		
 		
 		void NonPermanentService::setActive(
-			const Date& date
+			const date& d
 		){
 			// Mark the date in service calendar
-			Calendar::setActive(date);
+			Calendar::setActive(d);
 			
 			if(getPath())
 			{
-				Date newDate(date);
+				date newDate(d);
 				for(int i(getDepartureSchedule().getDaysSinceDeparture());
 					i<= getLastArrivalSchedule().getDaysSinceDeparture();
-					++i, newDate++
-					){
-						getPath()->setActive(newDate);
+					++i, newDate += days(1)
+				){
+					getPath()->setActive(newDate);
 				}
 			}
 		

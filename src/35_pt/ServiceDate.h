@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_ServiceDate_h__
 #define SYNTHESE_ServiceDate_h__
 
-#include "Date.h"
 #include "Registrable.h"
 #include "Registry.h"
+
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 namespace synthese
 {
@@ -51,7 +52,7 @@ namespace synthese
 		
 		private:
 			env::NonPermanentService*	_service;
-			time::Date	_date;
+			boost::gregorian::date	_date;
 			
 		public:
 			ServiceDate(
@@ -59,10 +60,10 @@ namespace synthese
 			);
 			
 			env::NonPermanentService*	getService() const;
-			const time::Date&				getDate() const;
+			const boost::gregorian::date&				getDate() const;
 			
 			void setService(env::NonPermanentService* value);
-			void setDate(const time::Date& value);
+			void setDate(const boost::gregorian::date& value);
 		};
 	}
 }

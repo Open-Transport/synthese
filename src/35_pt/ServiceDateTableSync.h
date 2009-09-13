@@ -27,8 +27,6 @@
 #include <string>
 #include <iostream>
 
-#include "Date.h"
-
 #include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese

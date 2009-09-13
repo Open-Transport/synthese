@@ -133,7 +133,7 @@ namespace synthese
 
 				Edge*	getLastEdge()	const;
 				
-				virtual bool isActive(const time::Date& date) const;
+				virtual bool isActive(const boost::gregorian::date& date) const;
 			//@}
 			
 			//! @name Update methods.
