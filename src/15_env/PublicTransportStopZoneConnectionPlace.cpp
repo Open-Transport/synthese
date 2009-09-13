@@ -33,6 +33,7 @@
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -54,7 +55,7 @@ namespace synthese
 		PublicTransportStopZoneConnectionPlace::PublicTransportStopZoneConnectionPlace(
 			util::RegistryKeyType id /*= UNKNOWN_VALUE */
 			, bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
-			, MinutesDuration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
+			, posix_time::time_duration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
 		):	AddressablePlace(allowedConnection, defaultTransferDelay),
 			Registrable(id),
 			NamedPlaceTemplate<PublicTransportStopZoneConnectionPlace>()

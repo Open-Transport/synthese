@@ -30,6 +30,7 @@
 #include <assert.h>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -41,27 +42,24 @@ namespace synthese
 
 	namespace road
 	{
-		const MinutesDuration AddressablePlace::FORBIDDEN_TRANSFER_DELAY(99);
-
 		AddressablePlace::AddressablePlace(
-			bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
-			, MinutesDuration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
+			bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */,
+			boost::posix_time::time_duration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
 		):	Place(),
 			_allowedConnection(allowedConnection),
-			_defaultTransferDelay(defaultTransferDelay),
-			_minTransferDelay (UNKNOWN_VALUE)
+			_defaultTransferDelay(defaultTransferDelay)
 		{
 		}
 
 
-		MinutesDuration AddressablePlace::getDefaultTransferDelay(
+		boost::posix_time::time_duration AddressablePlace::getDefaultTransferDelay(
 			) const {
 				return _defaultTransferDelay;
 		}
 
-		MinutesDuration AddressablePlace::getMinTransferDelay() const
+		boost::posix_time::time_duration AddressablePlace::getMinTransferDelay() const
 		{
-			if (_minTransferDelay == UNKNOWN_VALUE)
+			if (_minTransferDelay.is_not_a_date_time())
 			{
 				_minTransferDelay = _defaultTransferDelay;
 				for (TransferDelaysMap::const_iterator it(_transferDelays.begin()); it != _transferDelays.end(); ++it)
@@ -74,12 +72,12 @@ namespace synthese
 
 
 		void AddressablePlace::setDefaultTransferDelay(
-			MinutesDuration defaultTransferDelay
-			){
-				assert(defaultTransferDelay >= 0 && defaultTransferDelay <= FORBIDDEN_TRANSFER_DELAY);
+			boost::posix_time::time_duration defaultTransferDelay
+		){
+			assert(defaultTransferDelay >= posix_time::minutes(0) && !defaultTransferDelay.is_not_a_date_time());
 
-				_defaultTransferDelay = defaultTransferDelay;
-				_minTransferDelay = UNKNOWN_VALUE;
+			_defaultTransferDelay = defaultTransferDelay;
+			_minTransferDelay = boost::posix_time::time_duration();
 		}
 
 		void AddressablePlace::setAllowedConnection(
@@ -93,12 +91,12 @@ namespace synthese
 		void AddressablePlace::addTransferDelay(
 			AddressablePlace::TransferDelaysMap::key_type::first_type fromVertex,
 			AddressablePlace::TransferDelaysMap::key_type::second_type toVertex,
-			MinutesDuration transferDelay
+			posix_time::time_duration transferDelay
 		){
-			assert(transferDelay >= 0 && transferDelay <= FORBIDDEN_TRANSFER_DELAY);
+			assert(transferDelay >= posix_time::minutes(0) && !transferDelay.is_not_a_date_time());
 
 			_transferDelays[std::make_pair (fromVertex, toVertex)] = transferDelay;
-			_minTransferDelay = UNKNOWN_VALUE;
+			_minTransferDelay = posix_time::time_duration();
 		}
 
 
@@ -106,8 +104,8 @@ namespace synthese
 			AddressablePlace::TransferDelaysMap::key_type::first_type fromVertex,
 			AddressablePlace::TransferDelaysMap::key_type::second_type toVertex
 		){
-				_transferDelays[std::make_pair (fromVertex, toVertex)] = FORBIDDEN_TRANSFER_DELAY;
-				_minTransferDelay = UNKNOWN_VALUE;
+			_transferDelays[std::make_pair (fromVertex, toVertex)] = posix_time::time_duration();
+			_minTransferDelay = posix_time::time_duration();
 		}
 
 
@@ -115,8 +113,8 @@ namespace synthese
 		void AddressablePlace::clearTransferDelays()
 		{
 			_transferDelays.clear ();
-			_defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY;
-			_minTransferDelay = UNKNOWN_VALUE;
+			_defaultTransferDelay = posix_time::time_duration();
+			_minTransferDelay = posix_time::time_duration();
 		}
 
 
@@ -124,24 +122,24 @@ namespace synthese
 		bool AddressablePlace::isConnectionAllowed(
 			const Vertex& fromVertex,
 			const Vertex& toVertex
-			) const {
-				if(!_allowedConnection) return false;
+		) const {
+			if(!_allowedConnection) return false;
 
-				return getTransferDelay(fromVertex, toVertex) != FORBIDDEN_TRANSFER_DELAY;
+			return getTransferDelay(fromVertex, toVertex) != posix_time::time_duration();
 		}
 
 
 
-		MinutesDuration AddressablePlace::getTransferDelay(
+		boost::posix_time::time_duration AddressablePlace::getTransferDelay(
 			const Vertex& fromVertex,
 			const Vertex& toVertex
 		) const {
-				TransferDelaysMap::const_iterator it(
-					_transferDelays.find(make_pair(fromVertex.getKey(), toVertex.getKey()))
-				);
+			TransferDelaysMap::const_iterator it(
+				_transferDelays.find(make_pair(fromVertex.getKey(), toVertex.getKey()))
+			);
 
-				// If not defined in map, return default transfer delay
-				return (it == _transferDelays.end ()) ? _defaultTransferDelay : it->second;
+			// If not defined in map, return default transfer delay
+			return (it == _transferDelays.end ()) ? _defaultTransferDelay : it->second;
 		}
 
 

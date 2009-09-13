@@ -130,13 +130,13 @@ namespace synthese
 		}
 
 
-		string ToXsdDuration (int transferDelayMinutes)
+		string ToXsdDuration(posix_time::time_duration duration)
 		{
 			stringstream s;
 			s << "PT";
-			if (transferDelayMinutes > 59)
-				s << (transferDelayMinutes / 60) << "H";
-			s << (transferDelayMinutes % 60) << "M";
+			if(duration.hours() > 0)
+				s << duration.hours() << "H";
+			s << duration.minutes() << "M";
 			return s.str();
 		}
 
@@ -378,6 +378,7 @@ namespace synthese
 				_env->getRegistry<PublicTransportStopZoneConnectionPlace>()
 			){
 				const PublicTransportStopZoneConnectionPlace& cp(*itcp.second);
+				if(!cp.isConnectionPossible()) continue;
 				
 				// Contained physical stops
 				const PublicTransportStopZoneConnectionPlace::PhysicalStops& stops(cp.getPhysicalStops());
@@ -385,6 +386,9 @@ namespace synthese
 				{
 					BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it2, stops)
 					{
+						if(!cp.isConnectionAllowed(*it1.second, *it2.second))
+							continue;
+
 						os << "<ConnectionLink>" << "\n";
 						stringstream clkey;
 						clkey << it1.second->getKey () << "t" << it2.second->getKey ();
@@ -785,8 +789,8 @@ namespace synthese
 						os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
 						const Schedule& schedule((ls->getRankInPath() > 0 && ls->isArrival()) ? srv->getArrivalBeginScheduleToIndex(ls->getRankInPath()) : srv->getDepartureBeginScheduleToIndex(ls->getRankInPath()));
-						os << "<elapseDuration>" << ToXsdDuration(schedule - srv->getDepartureBeginScheduleToIndex(0)) << "</elapseDuration>" << "\n";
-						os << "<headwayFrequency>" << ToXsdDuration(srv->getMaxWaitingTime()) << "</headwayFrequency>" << "\n";
+						os << "<elapseDuration>" << ToXsdDuration(posix_time::minutes(schedule - srv->getDepartureBeginScheduleToIndex(0))) << "</elapseDuration>" << "\n";
+						os << "<headwayFrequency>" << ToXsdDuration(posix_time::minutes(srv->getMaxWaitingTime())) << "</headwayFrequency>" << "\n";
 
 						os << "</vehicleJourneyAtStop>" << "\n";
 					}
@@ -864,14 +868,14 @@ namespace synthese
  					os << "<ReservationRule>" << "\n";
  					os << "<objectId>" << TridentId (peerid, "ReservationRule", rule.getKey ()) << "</objectId>" << "\n";
 					os << "<ReservationCompulsory>" << ((rule.getReservationType() == PTUseRule::RESERVATION_RULE_COMPULSORY) ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
- 					os << "<deadLineIsTheCustomerDeparture>" << Conversion::ToString(!rule.getOriginIsReference()) << "</deadLineIsTheCustomerDeparture>" << "\n";
+ 					os << "<deadLineIsTheCustomerDeparture>" << !rule.getOriginIsReference() << "</deadLineIsTheCustomerDeparture>" << "\n";
  					if (rule.getMinDelayMinutes() > 0)
  					{
- 						os << "<minMinutesDurationBeforeDeadline>" << ToXsdDuration(rule.getMinDelayMinutes()) << "</minMinutesDurationBeforeDeadline>" << "\n";
+						os << "<minMinutesDurationBeforeDeadline>" << ToXsdDuration(posix_time::minutes(rule.getMinDelayMinutes())) << "</minMinutesDurationBeforeDeadline>" << "\n";
 					}
  					if (rule.getMinDelayDays() > 0)
  					{
- 						os << "<minDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMinDelayDays()) << "</minDaysDurationBeforeDeadline>" << "\n";
+						os << "<minDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMinDelayDays()) << "</minDaysDurationBeforeDeadline>" << "\n";
  					}
  					if (!rule.getHourDeadLine().isUnknown())
  					{
@@ -901,7 +905,7 @@ namespace synthese
 					os << "<objectId>" << TridentId (peerid, "LineConflict", rule) << "</objectId>" << "\n";
 					os << "<forbiddenLine>" << TridentId (peerid, "Line", rule.getHiddenLine()->getKey()) << "</forbiddenLine>" << "\n";
 					os << "<usedLine>" << TridentId (peerid, "Line", rule.getPriorityLine()->getKey()) << "</usedLine>" << "\n";
-					os << "<conflictDelay>" << ToXsdDuration(rule.getDelay().minutes()) << "</conflictDelay>" << "\n";
+					os << "<conflictDelay>" << ToXsdDuration(rule.getDelay()) << "</conflictDelay>" << "\n";
 					os << "</LineConflict>" << "\n";
 				}
 

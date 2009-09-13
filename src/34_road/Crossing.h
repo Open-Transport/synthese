@@ -85,12 +85,12 @@ namespace synthese
 				
 				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;
 
-				virtual time::MinutesDuration getTransferDelay(
+				virtual boost::posix_time::time_duration getTransferDelay(
 					const graph::Vertex& fromVertex
 					, const graph::Vertex& toVertex
 				) const;
 
-				virtual int	getMinTransferDelay() const;
+				virtual boost::posix_time::time_duration getMinTransferDelay() const;
 
 				/** Links the crossing with the address.
 					@param address Address to link

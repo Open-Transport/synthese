@@ -71,9 +71,10 @@ namespace synthese
 			, GraphIdType graphToUse
 			, JourneysResult<graph::JourneyComparator>&	result
 			, BestVertexReachesMap& bestVertexReachesMap
-			, const VertexAccessMap& destinationVam
-			, DateTime&	minMaxDateTimeAtDestination
-			, int previousContinuousServiceDuration
+			, const VertexAccessMap& destinationVam,
+			const time::DateTime&			originDateTime,
+			DateTime&	minMaxDateTimeAtDestination
+			, posix_time::time_duration previousContinuousServiceDuration
 			, const DateTime& previousContinuousServiceLastDeparture
 			, bool optim
 			, bool inverted
@@ -85,7 +86,8 @@ namespace synthese
 			_graphToUse(graphToUse),
 			_result(result)
 			, _bestVertexReachesMap(bestVertexReachesMap)
-			, _destinationVam(destinationVam)
+			, _destinationVam(destinationVam),
+			_originDateTime(originDateTime)
 			, _minMaxDateTimeAtDestination(minMaxDateTimeAtDestination)
 			, _previousContinuousServiceDuration(previousContinuousServiceDuration)
 			, _previousContinuousServiceLastDeparture(previousContinuousServiceLastDeparture)
@@ -97,15 +99,49 @@ namespace synthese
 
 
 
-		void IntegralSearcher::integralSearch(
-			const graph::VertexAccessMap& startVam
-			, const time::DateTime& startTime
-			, const Journey& startJourney
-			, int maxDepth
-			, bool strictTime /*= false  */ 
+		void IntegralSearcher::integralSearch( const graph::VertexAccessMap& vertices, int maxDepth, bool strictTime )
+		{
+			Journey emptyJourney;
+			_integralSearch(
+				vertices,
+				emptyJourney,
+				_originDateTime,
+				maxDepth,
+				strictTime
+			);
+		}
+
+
+
+		void IntegralSearcher::integralSearch( const graph::Journey& startJourney, int maxDepth )
+		{
+			VertexAccessMap vam;
+			startJourney.getEndEdge()->getHub()->getVertexAccessMap(
+				vam,
+				_accessDirection,
+				_graphToUse,
+				*startJourney.getEndEdge()->getFromVertex()
+			);
+			_integralSearch(
+				vam,
+				startJourney,
+				startJourney.getEndTime(),
+				maxDepth,
+				false
+			);
+		}
+
+
+
+		void IntegralSearcher::_integralSearch(
+			const graph::VertexAccessMap& vam,
+			const graph::Journey& startJourney,
+			const time::DateTime& desiredTime,
+			int maxDepth,
+			bool strictTime /*= false  */ 
 		){
 			// Recusrions to do
-			JourneysResult<_JourneyComparator> todo;
+			JourneysResult<_JourneyComparator> todo(_originDateTime);
 			todo.addEmptyJourney();
 
 #ifdef DEBUG
@@ -243,24 +279,6 @@ namespace synthese
 				}
 #endif
 
-				VertexAccessMap vam;
-				DateTime desiredTime(TIME_UNKNOWN);
-				if (journey->empty())
-				{
-					vam = startVam;
-					desiredTime = startTime;
-				}
-				else
-				{
-					journey->getEndEdge()->getHub()->getVertexAccessMap(
-						vam,
-						_accessDirection,
-						_graphToUse,
-						*journey->getEndEdge()->getFromVertex()
-					);
-					desiredTime = journey->getEndTime();
-				}
-
 				Journey currentJourney(startJourney);
 				currentJourney.push(*journey);
 
@@ -285,9 +303,9 @@ namespace synthese
 
 					DateTime correctedDesiredTime(desiredTime);
 					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
-						correctedDesiredTime += static_cast<int>(itVertex->second.approachTime);
+						correctedDesiredTime += static_cast<int>(itVertex->second.approachTime.minutes());
 					else
-						correctedDesiredTime -= static_cast<int>(itVertex->second.approachTime);
+						correctedDesiredTime -= static_cast<int>(itVertex->second.approachTime.minutes());
 
 					// Goal edges loop
 					const Vertex::Edges& edges((_accessDirection == DEPARTURE_TO_ARRIVAL) ? origin->getDepartureEdges() : origin->getArrivalEdges());
@@ -404,10 +422,10 @@ namespace synthese
 
 								// Analyze of the utility of the edge
 								// If the edge is useless, the path is not traversed anymore
-								pair<bool,bool> evaluationResult(evaluateJourney(*resultJourney, _optim));
-								if (!evaluationResult.first)
+								_JourneyUsefulness evaluationResult(evaluateJourney(*resultJourney, _optim));
+								if (!evaluationResult.canBeAResultPart)
 								{
-									if (!evaluationResult.second)
+									if (!evaluationResult.continueToTraverseThePath)
 										break;
 									else
 										continue;
@@ -431,24 +449,21 @@ namespace synthese
 								}
 
 								// Storage of the journey for recursion
-								if (journey->getJourneyLegCount() < maxDepth)
+								if (journey->size() < maxDepth)
 								{
 									shared_ptr<Journey> todoJourney(new Journey(*journey));
 									todoJourney->push(serviceUse);
 									todo.add(todoJourney);
 								}
 
-								// Storage of the reach time at the vertex in the best vertex reaches map
-								_bestVertexReachesMap.insert (serviceUse);
-
 								// Storage of the reach time at the goal if applicable
 								if (isGoalReached)
 								{
 									_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
 									if (_accessDirection == DEPARTURE_TO_ARRIVAL)
-										_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
+										_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime.total_seconds() / 60;
 									else
-										_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
+										_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime.total_seconds() / 60;
 								}
 							} // next arrival edge
 
@@ -483,7 +498,7 @@ namespace synthese
 					else
 						s << "ARRIVAL_TO_DEPARTURE   ";
 					s	<< " IntegralSearch. Start "
-						<< " at " << startTime.toString()
+						<< " at " << desiredTime.toString()
 						<< "</th></tr>"
 						<< "</table>"
 						;
@@ -498,9 +513,9 @@ namespace synthese
 
 // ------------------------------------------------------------------------- Utilities
 
-		pair<bool,bool> IntegralSearcher::evaluateJourney(
-			const Journey& journey
-			, bool optim
+		IntegralSearcher::_JourneyUsefulness IntegralSearcher::evaluateJourney(
+			const Journey& journey,
+			bool optim
 		) const {
 
 			assert(!journey.empty());
@@ -514,18 +529,18 @@ namespace synthese
 					only road legs, filter approach (= walk distance and duration).
 				*/
 				if(!_accessParameters.isCompatibleWithApproach(journey.getDistance(), journey.getEffectiveDuration()))
-					return make_pair(false,false);
+					return _JourneyUsefulness(false,false);
 			}
 
-			/// <h2>Determination of the utility to store the service use</h2>
+			/// <h2>Determination of the usefulness to store the service use</h2>
 
 			/** - Continuous service breaking test : if the solution is between a service continuous range
 				then it is stored only if its duration is better than the one of the continuous service.
 			*/
-			if(	(_previousContinuousServiceDuration > 0)
+			if(	(_previousContinuousServiceDuration.total_milliseconds() > 0)
 			&&	(journey.getDepartureTime() < _previousContinuousServiceLastDeparture)
 			&&	(journey.getDuration() >= _previousContinuousServiceDuration)
-			)	return make_pair(false,false);
+			)	return _JourneyUsefulness(false,false);
 
 
 			/** - To be worse than the absolute best time is forbidden. */
@@ -537,7 +552,7 @@ namespace synthese
 			||	(	(method == DEPARTURE_TO_ARRIVAL)
 				&&	(reachDateTime > _minMaxDateTimeAtDestination)
 				)
-			)	return make_pair(false,false);
+			)	return _JourneyUsefulness(false,false);
 
 			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate 
 				if there is any chance to reach the goal more efficiently by using this path
@@ -562,15 +577,15 @@ namespace synthese
 				}
 */
 				DateTime bestHopedGoalAccessDateTime (reachDateTime);
-				int minimalGoalReachDuration(
+				posix_time::time_duration minimalGoalReachDuration(
 					reachedVertex->getHub()->getMinTransferDelay()	// Minimal time to transfer
-					+ 1															// Minimal time to reach the goal
+					+ posix_time::minutes(1)						// Minimal time to reach the goal
 				);
 
 				if (method == DEPARTURE_TO_ARRIVAL)
-					bestHopedGoalAccessDateTime += minimalGoalReachDuration;
+					bestHopedGoalAccessDateTime += minimalGoalReachDuration.total_seconds() / 60;
 				else
-					bestHopedGoalAccessDateTime -= minimalGoalReachDuration;
+					bestHopedGoalAccessDateTime -= minimalGoalReachDuration.total_seconds() / 60;
 
 				if(	(	(method == ARRIVAL_TO_DEPARTURE)
 					&&	(bestHopedGoalAccessDateTime < _minMaxDateTimeAtDestination)
@@ -578,21 +593,16 @@ namespace synthese
 				||	(	(method == DEPARTURE_TO_ARRIVAL)
 					&&	(bestHopedGoalAccessDateTime > _minMaxDateTimeAtDestination)
 					)
-				)	return make_pair(false,true);
+				)	return _JourneyUsefulness(false,true);
 			}
 
-			/** - Best vertex map control : the service use is useful only if no other already founded
+			/** - Best vertex map control : the service use is useful only if no other already found
 				service use reaches the vertex at a strictly better time.
 			*/
-			if( (	(method == ARRIVAL_TO_DEPARTURE)
-				&&	(reachDateTime < _bestVertexReachesMap.getBestTime(reachedVertex, reachDateTime))
-				)
-			||	(	(method == DEPARTURE_TO_ARRIVAL)
-				&&	(reachDateTime > _bestVertexReachesMap.getBestTime (reachedVertex, reachDateTime))
-				)
-			)	return make_pair(false,true);
+			if(	_bestVertexReachesMap.isUseLess(reachedVertex, journey.size(), posix_time::minutes(method == DEPARTURE_TO_ARRIVAL ? journey.getEndTime() - _originDateTime : _originDateTime - journey.getEndTime()))
+			)	return _JourneyUsefulness(false,true);
 
-			return make_pair(true,true);
+			return _JourneyUsefulness(true,true);
 		}
 
 
@@ -603,13 +613,22 @@ namespace synthese
 			assert(j2 != NULL);
 			assert(j1->getMethod() == j2->getMethod());
 
-			int duration1(j1->getDuration());
-			int duration2(j2->getDuration());
+			posix_time::time_duration duration1(j1->getDuration());
+			posix_time::time_duration duration2(j2->getDuration());
 
 			if (duration1 != duration2)
 				return duration1 < duration2;
 
 			return j1 < j2;
 		}
+
+
+
+		IntegralSearcher::_JourneyUsefulness::_JourneyUsefulness(
+			bool _canBeAResultPart,
+			bool _continueToTraverseThePath
+		):	canBeAResultPart(_canBeAResultPart),
+			continueToTraverseThePath(_continueToTraverseThePath)
+		{}
 	}
 }

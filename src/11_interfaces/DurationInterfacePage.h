@@ -26,6 +26,8 @@
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 namespace synthese
 {
 	namespace server
@@ -59,9 +61,13 @@ namespace synthese
 
 				@param duration Duration to display
 			*/
-			void display(std::ostream& stream, int duration, interfaces::VariablesMap& variables
+			void display(
+				std::ostream& stream,
+				boost::posix_time::time_duration duration,
+				interfaces::VariablesMap& variables
 				, const void* object = NULL
-				, const server::Request* request = NULL) const;
+				, const server::Request* request = NULL
+			) const;
 		};
 	}
 }

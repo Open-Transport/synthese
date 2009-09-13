@@ -25,6 +25,8 @@
 
 #include "ServicePointer.h"
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 namespace synthese
 {
 	namespace graph
@@ -69,7 +71,7 @@ namespace synthese
 
 			//! @name Update
 			//@{
-				void shift(int duration);
+				void shift(boost::posix_time::time_duration duration);
 				void reverse();
 			//@}
 		};

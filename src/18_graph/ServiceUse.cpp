@@ -25,6 +25,8 @@
 #include "Edge.h"
 #include "UseRule.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace time;
@@ -94,15 +96,15 @@ namespace synthese
 			return getArrivalEdge()->getMetricOffset() - getDepartureEdge()->getMetricOffset();
 		}
 
-		void ServiceUse::shift( int duration)
+		void ServiceUse::shift(posix_time::time_duration duration)
 		{
-			if (duration == 0)
+			if (duration.total_seconds() == 0)
 				return;
 
-			_actualTime += duration;
-			_originDateTime += duration;
-			_secondActualDateTime += duration;
-			setServiceRange(getServiceRange() - duration);
+			_actualTime += 60 * duration.total_seconds();
+			_originDateTime += 60 * duration.total_seconds();
+			_secondActualDateTime += 60 * duration.total_seconds();
+			setServiceRange(getServiceRange() - 60 * duration.total_seconds());
 		}
 
 

@@ -25,6 +25,7 @@
 
 #include <deque>
 #include <boost/logic/tribool.hpp>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #include "ServiceUse.h"
 #include "SquareDistance.h"
@@ -78,8 +79,8 @@ namespace synthese
 			
 			//! @name Oriented supplemental data
 			//@{
-				int				_startApproachDuration;
-				int				_endApproachDuration;
+				boost::posix_time::time_duration				_startApproachDuration;
+				boost::posix_time::time_duration				_endApproachDuration;
 			//@}
 
 			//! @name Oriented operators
@@ -128,8 +129,8 @@ namespace synthese
 				bool		getEndReached() const;
 				const time::DateTime::ComparisonOperator& getBestTimeStrictOperator() const;
 				int			getScore()	const;
-				int			getStartApproachDuration()	const;
-				int			getEndApproroachDuration()	const;
+				boost::posix_time::time_duration getStartApproachDuration()	const;
+				boost::posix_time::time_duration getEndApproroachDuration()	const;
 			//@}
 
 			//! @name Setters
@@ -143,16 +144,16 @@ namespace synthese
 			//@{
 				const ServiceUse& getEndServiceUse() const;
 				const ServiceUse& getStartServiceUse() const;
-				void setEndApproachDuration(int duration);
-				void setStartApproachDuration(int duration);
+				void setEndApproachDuration(boost::posix_time::time_duration duration);
+				void setStartApproachDuration(boost::posix_time::time_duration duration);
 			//@}
 
 			//! @name Query methods
 			//@{
 				bool empty()	const;
-				int getJourneyLegCount () const;
+				std::size_t size() const;
 				
-				const ServiceUse& getJourneyLeg (int index) const;
+				const ServiceUse& getJourneyLeg (std::size_t index) const;
 				const ServiceUse& getFirstJourneyLeg () const;
 				const ServiceUse& getLastJourneyLeg () const;
 				
@@ -165,7 +166,7 @@ namespace synthese
 				time::DateTime getDepartureTime () const;
 				time::DateTime getArrivalTime () const;
 
-				int getDuration () const;
+				boost::posix_time::time_duration getDuration () const;
 				double getDistance () const;
 		
 		
@@ -208,7 +209,10 @@ namespace synthese
 				void prepend (const Journey& journey);
 				void append (const Journey& journey);
 
-				void shift(int duration, int continuousServiceRange = UNKNOWN_VALUE);
+				void shift(
+					boost::posix_time::time_duration duration,
+					int continuousServiceRange = UNKNOWN_VALUE
+				);
 				void reverse();
 
 				void setSquareDistanceToEnd(const VertexAccessMap& vam);

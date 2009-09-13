@@ -32,6 +32,8 @@
 #include "IsoBarycentre.h"
 #include "SquareDistance.h"
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 namespace synthese
 {
 	namespace graph
@@ -40,12 +42,12 @@ namespace synthese
 		class Path;
 
 		struct VertexAccess {
-			int approachTime;
+			boost::posix_time::time_duration approachTime;
 			double approachDistance;
 			Journey approachJourney;
 			
 			VertexAccess(
-				int __approachTime,
+				boost::posix_time::time_duration __approachTime,
 				double __approachDistance,
 				const Journey& __approachJourney
 			):	approachTime(__approachTime),
@@ -55,7 +57,7 @@ namespace synthese
 
 
 			VertexAccess(
-				int __approachTime = 0,
+				boost::posix_time::time_duration __approachTime = boost::posix_time::minutes(0),
 				double __approachDistance = 0
 			):	approachTime(__approachTime),
 				approachDistance(__approachDistance),
@@ -87,7 +89,7 @@ TRIDENT : VertexAccess => AccesPoint
 			mutable geometry::IsoBarycentre _isobarycentre;   //!< Isobarycenter of all points contained in this map.
 			mutable geometry::SquareDistance _isobarycenterMaxSquareDistance;   //!< Maximum square distance of one map point with the isobarycenter.
 
-			int _minApproachTime;
+			boost::posix_time::time_duration _minApproachTime;
 
 
 		// une fonction qui verifie pour une ligne donnée si elle passe par l'un des vertex
@@ -129,7 +131,7 @@ TRIDENT : VertexAccess => AccesPoint
 			const geometry::IsoBarycentre& getIsobarycenter () const;
 			const geometry::SquareDistance& getIsobarycenterMaxSquareDistance () const;
 		    
-			int getMinApproachTime () const;
+			boost::posix_time::time_duration getMinApproachTime () const;
 
 		private:
 

@@ -443,14 +443,14 @@ namespace synthese
 		){
 			vector<bool> result;
 			int l(0);
-			const ServiceUse* curET((l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l));
+			const ServiceUse* curET((l >= __TrajetATester.size()) ? NULL : &__TrajetATester.getJourneyLeg (l));
 			for (int i(0); i <= LigneMax && pl[ i ].place != NULL; i++ )
 			{
 				if(curET != NULL && pl[ i ].place == AddressablePlace::GetPlace(curET->getDepartureEdge()->getHub())
 				){
 					result.push_back(true);
 					++l;
-					curET = (l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l);
+					curET = (l >= __TrajetATester.size()) ? NULL : &__TrajetATester.getJourneyLeg (l);
 				}
 				else
 				{

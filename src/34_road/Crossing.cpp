@@ -29,6 +29,7 @@
 #include "VertexAccessMap.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -70,9 +71,9 @@ namespace synthese
 		}
 
 
-		int Crossing::getMinTransferDelay() const
+		posix_time::time_duration Crossing::getMinTransferDelay() const
 		{
-			return 0;
+			return posix_time::minutes(0);
 		}
 
 
@@ -120,9 +121,11 @@ namespace synthese
 
 
 
-		time::MinutesDuration Crossing::getTransferDelay( const graph::Vertex& fromVertex , const graph::Vertex& toVertex ) const
-		{
-			return 0;
+		posix_time::time_duration Crossing::getTransferDelay(
+			const graph::Vertex& fromVertex,
+			const graph::Vertex& toVertex
+		) const	{
+			return posix_time::minutes(0);
 		}
 	}
 }

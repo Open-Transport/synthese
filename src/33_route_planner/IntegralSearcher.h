@@ -32,10 +32,6 @@
 #include "JourneysResult.h"
 #include "GraphModuleTemplate.h"
 
-#include <map>
-#include <list>
-#include <utility>
-
 namespace synthese
 {
 	namespace graph
@@ -70,6 +66,13 @@ namespace synthese
 		private:
 			typedef graph::Edge* (graph::Edge::*PtrEdgeStep) () const;
 
+			struct _JourneyUsefulness
+			{
+				bool canBeAResultPart;
+				bool continueToTraverseThePath;
+				_JourneyUsefulness(bool _canBeAResultPart, bool _continueToTraverseThePath);
+			};
+
 			class _JourneyComparator
 			{
 			public:
@@ -78,15 +81,16 @@ namespace synthese
 
 			//! @name Parameters
 			//@{
-				const graph::AccessParameters					_accessParameters;
+				const graph::AccessParameters				_accessParameters;
 				const graph::AccessDirection				_accessDirection;
-				const graph::GraphIdType							_whatToSearch;
-				const graph::GraphIdType							_graphToUse;
+				const graph::GraphIdType					_whatToSearch;
+				const graph::GraphIdType					_graphToUse;
 				JourneysResult<graph::JourneyComparator>&	_result;
 				BestVertexReachesMap&						_bestVertexReachesMap;
 				const graph::VertexAccessMap&				_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
+				const time::DateTime&						_originDateTime;
 				time::DateTime&								_minMaxDateTimeAtDestination;
-				const int									_previousContinuousServiceDuration;
+				const boost::posix_time::time_duration		_previousContinuousServiceDuration;
 				const time::DateTime&						_previousContinuousServiceLastDeparture;
 				const bool									_optim;
 				const bool									_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
@@ -95,6 +99,14 @@ namespace synthese
 			//@}
 
 
+			void _integralSearch(
+				const graph::VertexAccessMap& vertices,
+				const graph::Journey& startJourney,
+				const time::DateTime& originDateTime,
+				int maxDepth,
+				bool strictTime
+			);
+
 		public:
 			IntegralSearcher(
 				graph::AccessDirection			accessDirection
@@ -102,10 +114,11 @@ namespace synthese
 				, graph::GraphIdType			whatToSearch
 				, graph::GraphIdType			graphToUse
 				, JourneysResult<graph::JourneyComparator>&	result
-				, BestVertexReachesMap&			bestVertexReachesMap
-				, const graph::VertexAccessMap&	destinationVam
-				, time::DateTime&				minMaxDateTimeAtDestination
-				, int							previousContinuousServiceDuration
+				, BestVertexReachesMap&			bestVertexReachesMap,
+				const graph::VertexAccessMap&	destinationVam,
+				const time::DateTime&			originDateTime,
+				time::DateTime&				minMaxDateTimeAtDestination
+				, boost::posix_time::time_duration previousContinuousServiceDuration
 				, const time::DateTime&			previousContinuousServiceLastDeparture
 				, bool							optim
 				, bool							inverted
@@ -114,19 +127,27 @@ namespace synthese
 			);
 
 
-			/** Integral search of objects within the network.
-				@param startVam the search is launched at this vertices
-				@param desiredTime Desired time.
-				@param startJourney Journey currently being built.
-				@param maxDepth Maximum recursion depth.
-				@param strictTime Must the departure time be strictly equal to desired time ?
-			 */
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Integral search from the start vertex access map.
+			/// @param startVam the search is launched at this vertices
+			///	@param maxDepth Maximum recursion depth.
+			///	@param strictTime Must the departure time be strictly equal to desired time ?
 			void integralSearch(
-				const graph::VertexAccessMap& vertices
-				, const time::DateTime& desiredTime
-				, const graph::Journey& startJourney
-				, int maxDepth
-				, bool strictTime = false
+				const graph::VertexAccessMap& vertices,
+				int maxDepth,
+				bool strictTime
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Integral search after a journey (transfer).
+			/// @param startJourney connecting journey
+			/// @param maxDepth limit of transfers
+			void integralSearch(
+				const graph::Journey& startJourney,
+				int maxDepth
 			);
 
 
@@ -136,12 +157,11 @@ namespace synthese
 				@param bool optimization mode
 				@return pair<bool,bool> Possible values : false/false, true/true, false/true
 					- first : utility to store the journey as result or a future result part.
-					- second.first : utility to continue to traverse the rest of the path
-					- second.second : utility to continue to iterate ont services of the same path
+					- second : utility to continue to traverse the rest of the path
 				@author Hugues Romain
 				@date 2007				
 			*/
-			std::pair<bool,bool> evaluateJourney(
+			_JourneyUsefulness evaluateJourney(
 				const graph::Journey& journey
 				, bool optim
 			) const;

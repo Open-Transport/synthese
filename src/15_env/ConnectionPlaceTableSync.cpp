@@ -97,7 +97,7 @@ namespace synthese
 			string name13(rows->getText(ConnectionPlaceTableSync::COL_NAME13));
 			string name26(rows->getText(ConnectionPlaceTableSync::COL_NAME26));
 			bool connectionType(rows->getBool(ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
-			int defaultTransferDelay (rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY));
+			posix_time::time_duration defaultTransferDelay(posix_time::minutes(rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
 			string transferDelaysStr (rows->getText (ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
 
 			// Update of the object
@@ -111,9 +111,9 @@ namespace synthese
 			cp->clearTransferDelays ();    
 			cp->setDefaultTransferDelay (defaultTransferDelay);
 
-			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-			boost::char_separator<char> sep1 (",");
-			boost::char_separator<char> sep2 (":");
+			typedef tokenizer<char_separator<char> > tokenizer;
+			char_separator<char> sep1 (",");
+			char_separator<char> sep2 (":");
 			tokenizer tripletTokens (transferDelaysStr, sep1);
 			for (tokenizer::iterator tripletIter = tripletTokens.begin();
 				tripletIter != tripletTokens.end (); ++tripletIter)
@@ -124,7 +124,7 @@ namespace synthese
 				// departureRank:arrivalRank:transferDelay
 				RegistryKeyType startStop(Conversion::ToLongLong(*valueIter));
 				RegistryKeyType endStop(Conversion::ToLongLong(*(++valueIter)));
-				cp->addTransferDelay (startStop, endStop, Conversion::ToInt (*(++valueIter)));
+				cp->addTransferDelay (startStop, endStop, posix_time::minutes(lexical_cast<long>(*(++valueIter))));
 			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)

@@ -25,9 +25,8 @@
 
 #include "GraphTypes.h"
 
-#include "DateTime.h"
-
 #include <map>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace synthese
 {
@@ -35,7 +34,7 @@ namespace synthese
 	namespace graph
 	{
 		class Vertex;
-		class ServiceUse;
+		class VertexAccessMap;
 	}
 
 
@@ -43,70 +42,108 @@ namespace synthese
 	{
 		/** Best vertex reaches map class.
 			@ingroup m53
+
+			BestVertexReachesMap is not thread safe ! It is intended to be used only internally by a computing thread.
+
+			The map stores for each vertex and each journey size the best time of vertex reach by number of transfers.
+
+			The map helps to determinate :
+				- if a journey ca be a source of recursion in the route planning process
+				- if it is necessary to follow the current path to build other useful journeys
+
+			The map stores for each goal vertex a list of best time used to reach the vertex with a minimal number of transfers.
+
+			For example :
+				- at least 2 transfers => best reach in 35 minutes
+				- at least 3 transfers => best reach in 25 minutes
+
+			Constant rule :
+				- the reach duration for a greater number of transfer must be always shorter
+
+			The way to determinate if a journey is useful is :
+				- if the vertex record is empty, insert the journey and accept it
+				- if the vertex is not empty, loop on the ascending transfer number. For each one :
+					- if the recorded transfers number is less than the transfer number of the journey 
+						- if the recorded duration is smaller or equal to the duration of the journey, return not to keep the journey
+						- if the recorded duration is longer than the duration of the journey, do nothing and continue the loop
+					- if the recorded transfers number is equal to the transfers number of the journey :
+						- if the recorded duration is smaller or equal to the duration of the journey, return not to keep the journey
+						- if the recorded duration is longer than the duration of the journey, replace it by the value of the journey, delete all records with more transfers, and return to keep the journey
+					- if the recorded transfers number is greater than the transfer number of the journey :
+						- if the recorded duration is smaller than the duration of the journey, insert the values of the journey into the map and return to keep it
+						- if the recorded duration is greater or equal to the duration of the journey, then insert the value of the journey, delete all records with more transfers including the current one, and return to keep the journey
+
+			Examples :
+			In the following map :
+				- at least 2 transfers => best reach in 35 minutes
+				- at least 3 transfers => best reach in 25 minutes
+
+			Case : a 4 transfer journey with 30 minutes of duration
+			Result : no update of the map, because of the duration of 25 minutes with only 3 transfers
+
+			Case : a 2 transfer journey with 30 minutes of duration
+			Result : replacement of the 2 transfers record :
+				- at least 2 transfers => best reach in 30 minutes
+				- at least 3 transfers => best reach in 25 minutes
+
+			Case : a 4 transfer journey with 20 minutes of duration
+			Result : insertion of the journey :
+				- at least 2 transfers => best reach in 30 minutes
+				- at least 3 transfers => best reach in 25 minutes
+				- at least 4 transfers => best reach in 20 minutes
 		*/
 		class BestVertexReachesMap
 		{
 		 private:
 
-
-			typedef std::map<const graph::Vertex*, time::DateTime> TimeMap;
+			typedef std::map<
+				const graph::Vertex*,
+				std::map<
+					std::size_t,
+					boost::posix_time::time_duration
+			>	> TimeMap;
 		    
-			const graph::AccessDirection _accessDirection;
 			TimeMap _bestTimeMap;
+			const graph::AccessDirection _accessDirection;
 
-			time::DateTime::ComparisonOperator	_comparison;
-			time::DateTime::ComparisonOperator	_cleanUpUselessComparison;
-			time::DateTime::ComparisonOperator	_strictWeakCTimeComparison;
+			void _insert(
+				const TimeMap::key_type& vertex,
+				const TimeMap::mapped_type::key_type& transfers,
+				const TimeMap::mapped_type::mapped_type& duration
+			);
 
-		 public:
+			void _insertAndPropagateInConnectionPlace(
+				const TimeMap::key_type& vertex,
+				const TimeMap::mapped_type::key_type& transfers,
+				const TimeMap::mapped_type::mapped_type& duration
+			);
 
+			void _removeDurationsForMoreTransfers(
+				const TimeMap::key_type& vertex,
+				const TimeMap::mapped_type::key_type& transfers
+			);
 
+		public:
 			BestVertexReachesMap(
 				graph::AccessDirection accessDirection,
-				bool optim
+				const graph::VertexAccessMap& vam
 			);
-			~BestVertexReachesMap();
-
-
-			//! @name Getters/Setters
-			//@{
-			//@}
-
 
 			//! @name Query methods
 			//@{
-				bool contains (const graph::Vertex* vertex) const;
-
-				const time::DateTime& getBestTime(
-					const graph::Vertex* vertex
-					, const time::DateTime& defaultValue
-				) const;
-
-				bool isUseless(
-					const graph::Vertex* vertex
-					, const time::DateTime& dateTime
-				) const;
-				bool mustBeCleared(
-					const graph::Vertex* vertex
-					, const time::DateTime& dateTime
-					, const time::DateTime& bestEndTime
-				) const;
-
-
-			//@}
-
-
-			//! @name Update methods
-			//@{
-				void insert(const graph::ServiceUse& journeyLeg);
-			    
-				void insert(
-					const graph::Vertex* vertex
-					, const time::DateTime& dateTime
-					, bool propagateInConnectionPlace = true
+				/** Tests if the journey is useless according to the map.
+					The methods auto-updates the map if the journey is useful.
+					@param vertex Pointer to the reached vertex
+					@param transferNumber Number of transfers of the journey
+					@param duration Duration needed to reach the vertex
+					@return true if the described journey is useful
+				*/
+				bool isUseLess(
+					const TimeMap::key_type& vertex,
+					const TimeMap::mapped_type::key_type& transferNumber,
+					const TimeMap::mapped_type::mapped_type& duration
 				);
 			//@}
-
 		};
 	}
 }

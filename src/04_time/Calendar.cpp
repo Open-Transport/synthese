@@ -89,6 +89,8 @@ namespace synthese
 			{
 				_markedDates[NbBitsBetweenDates (_firstMarkedDate, date)] = true;
 			}
+
+			assert(_firstMarkedDate == Date::UNKNOWN_DATE || _markedDates.size() == 1 + NbBitsBetweenDates (_firstMarkedDate, _lastMarkedDate));
 		}
 		
 		
@@ -122,6 +124,8 @@ namespace synthese
 			{
 				_markedDates[NbBitsBetweenDates (_firstMarkedDate, date)] = false;
 			}
+
+			assert(_firstMarkedDate == Date::UNKNOWN_DATE || _markedDates.size() == NbBitsBetweenDates (_firstMarkedDate, _lastMarkedDate));
 		}
 	
 	

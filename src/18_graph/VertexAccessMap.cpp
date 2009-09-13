@@ -21,8 +21,6 @@
 */
 
 
-#define NOMINMAX
-#include <limits>
 #include "VertexAccessMap.h"
 
 #include "Vertex.h"
@@ -34,6 +32,7 @@
 #include <set>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -44,7 +43,6 @@ namespace synthese
 		VertexAccessMap::VertexAccessMap ()
 			: _isobarycentreToUpdate (false)
 			, _isobarycenterMaxSquareDistanceUpToDate (false)
-			, _minApproachTime (std::numeric_limits<int>::max ())
 		{
 		}
 
@@ -126,7 +124,7 @@ namespace synthese
 				)	it->second = vertexAccess;
 			}
 
-			if (vertexAccess.approachTime < _minApproachTime)
+			if (_minApproachTime.is_not_a_date_time() || vertexAccess.approachTime < _minApproachTime)
 			{
 				_minApproachTime = vertexAccess.approachTime;
 			}
@@ -178,8 +176,7 @@ namespace synthese
 
 
 
-		int 
-		VertexAccessMap::getMinApproachTime () const
+		posix_time::time_duration VertexAccessMap::getMinApproachTime() const
 		{
 			return _minApproachTime;
 		}

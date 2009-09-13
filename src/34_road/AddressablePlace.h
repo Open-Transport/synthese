@@ -55,11 +55,14 @@ namespace synthese
 			typedef std::vector<const Address*> Addresses;
 
 		private:
-			typedef std::map< std::pair<util::RegistryKeyType, util::RegistryKeyType>, time::MinutesDuration> TransferDelaysMap;
+			typedef std::map<
+				std::pair<
+					util::RegistryKeyType,
+					util::RegistryKeyType
+				>, boost::posix_time::time_duration
+			> TransferDelaysMap;
 
 		protected:
-			static const time::MinutesDuration FORBIDDEN_TRANSFER_DELAY;
-
 			//! @name Content
 			//@{
 				Addresses _addresses; 
@@ -69,17 +72,17 @@ namespace synthese
 			//@{
 				bool					_allowedConnection;
 				TransferDelaysMap		_transferDelays; //!< Transfer delays between vertices (in minutes)
-				time::MinutesDuration	_defaultTransferDelay;
+				boost::posix_time::time_duration	_defaultTransferDelay;
 			//@}
 
 			//! @name Caching
 			//@{
-				mutable int _minTransferDelay;
+				mutable boost::posix_time::time_duration _minTransferDelay;
 			//@}
 
 			AddressablePlace(
 				bool allowedConnection= false,
-				time::MinutesDuration defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY
+				boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration()
 			);
 
 		public:
@@ -91,14 +94,14 @@ namespace synthese
 				/** Gets addresses of this place.
 				 */
 				const Addresses&				getAddresses () const;
-				time::MinutesDuration			getDefaultTransferDelay() const;
-				virtual time::MinutesDuration	getMinTransferDelay() const;
+				boost::posix_time::time_duration	getDefaultTransferDelay() const;
+				virtual boost::posix_time::time_duration	getMinTransferDelay() const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void	setDefaultTransferDelay(
-					time::MinutesDuration defaultTransferDelay
+				void setDefaultTransferDelay(
+					boost::posix_time::time_duration defaultTransferDelay
 				);
 				void	setAllowedConnection(bool value);
 			//@}
@@ -108,7 +111,7 @@ namespace synthese
 				void addTransferDelay(
 					TransferDelaysMap::key_type::first_type departure,
 					TransferDelaysMap::key_type::second_type arrival,
-					time::MinutesDuration transferDelay
+					boost::posix_time::time_duration transferDelay
 				);
 				void addForbiddenTransferDelay(
 					TransferDelaysMap::key_type::first_type departure,
@@ -124,7 +127,7 @@ namespace synthese
 					, const graph::Vertex& toVertex
 				) const;
 
-				virtual time::MinutesDuration getTransferDelay(
+				virtual boost::posix_time::time_duration getTransferDelay(
 					const graph::Vertex& fromVertex
 					, const graph::Vertex& toVertex
 				) const;

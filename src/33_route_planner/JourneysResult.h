@@ -36,6 +36,7 @@
 #include "Vertex.h"
 #include "Hub.h"
 #include "NamedPlace.h"
+#include "GraphTypes.h"
 
 #include "DateTime.h"
 
@@ -43,7 +44,7 @@ namespace synthese
 {
 	using namespace env;
 	using namespace geography;
-	
+
 	namespace routeplanner
 	{
 		/** List of journeys that should be part of the result of a routing process.
@@ -53,16 +54,25 @@ namespace synthese
 		class JourneysResult
 		{			
 		public:
-			typedef std::set<boost::shared_ptr<graph::Journey>, JourneyComparator> ResultSet;
+			typedef std::map<
+				boost::shared_ptr<graph::Journey>,
+				boost::posix_time::time_duration,
+				JourneyComparator
+			> ResultSet;
 
 		private:
 			typedef std::map<const graph::Vertex*, typename ResultSet::iterator> IndexMap;
 			
+			const time::DateTime& _originDateTime;
+			boost::optional<graph::AccessDirection> _accessDirection;
 			ResultSet	_result;
 			IndexMap	_index;
 
 		public:
-			JourneysResult() {}
+			JourneysResult(
+				const time::DateTime& originDateTime
+			):	_originDateTime(originDateTime)
+			{}
 
 
 
@@ -113,9 +123,24 @@ namespace synthese
 				*/
 				void add(boost::shared_ptr<graph::Journey> journey)
 				{
+					if(!_accessDirection) _accessDirection = journey->getMethod();
+					assert(*_accessDirection == journey->getMethod());
+
 					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
+					boost::posix_time::time_duration duration(
+						boost::posix_time::minutes(
+							_accessDirection == DEPARTURE_TO_ARRIVAL ?
+							journey->getEndTime() - _originDateTime :
+							_originDateTime - journey->getEndTime()
+					)	);
 					remove(vertex);
-					_index.insert(make_pair(vertex, _result.insert(journey).first));
+					_index.insert(
+						std::make_pair(
+							vertex,
+							_result.insert(
+								make_pair(journey, duration)
+							).first
+					)	);
 				}
 
 			
@@ -128,7 +153,15 @@ namespace synthese
 				void addEmptyJourney()
 				{
 					graph::Vertex* nullVertex(NULL);
-					_index.insert(make_pair(nullVertex, _result.insert(boost::shared_ptr<graph::Journey>(new graph::Journey)).first));
+					_index.insert(
+						std::make_pair(
+							nullVertex,
+							_result.insert(
+								std::make_pair(
+									boost::shared_ptr<graph::Journey>(new graph::Journey),
+									boost::posix_time::minutes(0)
+							)	).first
+					)	);
 				}
 
 
@@ -141,7 +174,7 @@ namespace synthese
 				{
 					assert(!empty());
 
-					boost::shared_ptr<graph::Journey> ptr(*_result.begin());
+					boost::shared_ptr<graph::Journey> ptr(_result.begin()->first);
 					_index.erase(ptr->empty() ? NULL : ptr->getEndEdge()->getFromVertex());
 					_result.erase(_result.begin());
 					return ptr;
@@ -156,19 +189,23 @@ namespace synthese
 					@author Hugues Romain
 				*/
 				void cleanup(
-					bool updateMinSpeed
-					, const time::DateTime& newMaxTime
-					, const BestVertexReachesMap& bvrm
+					bool updateMinSpeed,
+					const time::DateTime& newMaxTime,
+					BestVertexReachesMap& bvrm
 				){
 					std::vector<boost::shared_ptr<graph::Journey> > journeysToAdd;
 					std::vector<boost::shared_ptr<graph::Journey> > journeysToRemove;
 					for (typename IndexMap::iterator it(_index.begin()); it != _index.end();)
 					{
-						boost::shared_ptr<graph::Journey> journey(*it->second);
+						boost::shared_ptr<graph::Journey> journey(it->second->first);
 						typename IndexMap::iterator next(it);
 						++next;
-						if (bvrm.mustBeCleared(it->first, journey->getEndTime(), newMaxTime))
+						if(	journey->getMethod() == DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
+							journey->getMethod() == ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime ||
+							bvrm.isUseLess(it->first, journey->size(), it->second->second)
+						){
 							journeysToRemove.push_back(journey);
+						}
 						else if (updateMinSpeed)
 						{
 							_result.erase(it->second);
@@ -204,7 +241,7 @@ namespace synthese
 					if (it != _index.end())
 					{
 						typename ResultSet::const_iterator its(it->second);
-						return *its;
+						return its->first;
 					}
 					else
 						return NULL;
@@ -233,8 +270,9 @@ namespace synthese
 					s	<< "<tr><th colspan=\"7\">Exploration queue (size=" << _result.size() << ")</th></tr>"
 						<< "<tr><th>Place</th><th>Time</th><th>Score</th><th>Dist</th><th>Min spd</th><th>Dist.MinSpd</th><th>Place score</th></tr>"
 						;
-					BOOST_FOREACH(boost::shared_ptr<graph::Journey> journey, _result)
+					BOOST_FOREACH(const ResultSet::value_type& it, _result)
 					{
+						boost::shared_ptr<graph::Journey> journey(it.first);
 						if (journey->empty())
 						{
 							s << "<tr><td colspan=\"7\">Empty fake journey</td></tr>";

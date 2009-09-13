@@ -75,10 +75,10 @@ namespace synthese
 
 			bool type(Conversion::ToBool(typeStr));
 
-			int defaultTransferDelay(GetIntAttr(
+			posix_time::time_duration defaultTransferDelay(posix_time::minutes(GetIntAttr(
 					node, 
 					"defaultTransferDelay"
-			)	);
+			)	)	);
 
 			shared_ptr<const City> city = cities.get (cityId);
 

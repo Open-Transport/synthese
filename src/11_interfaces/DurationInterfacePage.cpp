@@ -22,6 +22,8 @@
 
 #include "DurationInterfacePage.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace boost;
 using namespace std;
 
@@ -37,12 +39,17 @@ namespace synthese
 		const string DurationInterfacePage::DATA_MINUTES("minutes");
 		const string DurationInterfacePage::DATA_TOTAL_MINUTES("total_minutes");
 
-		void DurationInterfacePage::display(std::ostream& stream, int duration, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/) const
-		{
+		void DurationInterfacePage::display(
+			std::ostream& stream,
+			posix_time::time_duration duration,
+			VariablesMap& variables,
+			const void* object /*= NULL*/,
+			const server::Request* request /*= NULL*/
+		) const	{
 			ParametersVector pv;
-			pv.push_back(Conversion::ToString(duration));
-			pv.push_back(Conversion::ToString(duration / 60));
-			pv.push_back(Conversion::ToString(duration % 60));
+			pv.push_back(lexical_cast<string>(60 * duration.total_seconds()));
+			pv.push_back(lexical_cast<string>(duration.hours()));
+			pv.push_back(lexical_cast<string>(duration.minutes()));
 
 			InterfacePage::_display(stream, pv, variables, object, request);
 		}

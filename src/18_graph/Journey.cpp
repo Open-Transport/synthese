@@ -49,8 +49,8 @@ namespace synthese
 			, _effectiveDuration (0)
 			, _transportConnectionCount (0)
 			, _distance (0)
-			, _startApproachDuration(0)
-			, _endApproachDuration(0)
+			, _startApproachDuration(posix_time::minutes(0))
+			, _endApproachDuration(posix_time::minutes(0))
 			, _endReached(false)
 			, _squareDistanceToEnd(UNKNOWN_VALUE)
 			, _minSpeedToEnd(UNKNOWN_VALUE),
@@ -66,20 +66,20 @@ namespace synthese
 
 
 
-		int Journey::getJourneyLegCount(
+		size_t Journey::size(
 		) const	{
-			return static_cast<int>(_journeyLegs.size());
+			return _journeyLegs.size();
 		}
 
 
 
 
 		const ServiceUse& Journey::getJourneyLeg(
-			int index
+			size_t index
 		) const	{
 			assert(!empty());
 
-			return _journeyLegs.at (index);
+			return _journeyLegs.at(index);
 		}
 
 
@@ -126,7 +126,7 @@ namespace synthese
 			DateTime d(getFirstJourneyLeg ().getDepartureDateTime());
 			if (d.isUnknown())
 				return d;
-			d -= (_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration;
+			d -= 60 * ((_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration).total_seconds();
 			return d;
 		}
 
@@ -137,7 +137,7 @@ namespace synthese
 			DateTime d(getLastJourneyLeg ().getArrivalDateTime());
 			if (d.isUnknown())
 				return d;
-			d += (_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration;
+			d += 60 * ((_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration).total_seconds();
 			return d;
 		}
 
@@ -245,12 +245,13 @@ namespace synthese
 
 
 
-		int	Journey::getDuration () const
+		posix_time::time_duration Journey::getDuration () const
 		{
 			if (getDepartureTime ().getHour ().isUnknown () ||
-			getArrivalTime ().getHour ().isUnknown ()) return UNKNOWN_VALUE;
+				getArrivalTime ().getHour ().isUnknown ()
+			) return posix_time::time_duration();
 		    
-			return getArrivalTime () - getDepartureTime ();
+			return posix_time::minutes(getArrivalTime () - getDepartureTime ());
 		}
 
 
@@ -289,8 +290,8 @@ namespace synthese
 			_effectiveDuration = 0;
 			_transportConnectionCount = 0;
 			_distance = 0;
-			_endApproachDuration = 0;
-			_startApproachDuration = 0;
+			_endApproachDuration = posix_time::minutes(0);
+			_startApproachDuration = posix_time::minutes(0);
 			_endReached = false;
 			_journeyLegs.clear();
 			_method = UNDEFINED_DIRECTION;
@@ -361,52 +362,29 @@ namespace synthese
 			return _journeyLegs.empty();
 		}
 
-// 		bool Journey::verifyAxisConstraints( const Axis* axis ) const
-// 		{
-// 			// Null Axis is allowed
-// 			if (axis == NULL)
-// 				return true;
-//
-// 			// Check if axis is allowed.
-// 			if (!axis->isAllowed())
-// 				return false;
-// 			
-// 			// Check if axis is free
-// 			if (axis->isFree())
-// 				return true;
-// 
-// 			// Check if current journey is empty
-// 			if (_journeyLegs.empty())
-// 				return true;
-// 
-// 			// Check axis against already followed axes
-// 			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
-// 			{
-// 				if (it->getEdge()->getParentPath()->getAxis () == axis)
-// 					return false;
-// 			}
-// 			return true;
-// 		}
 
-		void Journey::setEndApproachDuration(int duration)
+
+		void Journey::setEndApproachDuration(boost::posix_time::time_duration duration)
 		{
 			_endApproachDuration = duration;
 		}
 
 
 
-		void Journey::shift( int duration, int continuousServiceRange /*= UNKNOWN_VALUE*/ )
-		{
+		void Journey::shift(
+			posix_time::time_duration duration,
+			int continuousServiceRange /*= UNKNOWN_VALUE*/
+		){
 			for(ServiceUses::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
 				it->shift(duration);
 			}
-			_continuousServiceRange = (continuousServiceRange == UNKNOWN_VALUE) ? _continuousServiceRange - duration : continuousServiceRange;
+			_continuousServiceRange = (continuousServiceRange == UNKNOWN_VALUE) ? _continuousServiceRange - duration.total_seconds() * 60 : continuousServiceRange;
 		}
 
 
 
-		void Journey::setStartApproachDuration( int duration )
+		void Journey::setStartApproachDuration(boost::posix_time::time_duration duration )
 		{
 			_startApproachDuration = duration;
 		}
@@ -429,7 +407,7 @@ namespace synthese
 		{
 			if(_method == UNDEFINED_DIRECTION) return;
 
-			int duration(_startApproachDuration);
+			boost::posix_time::time_duration duration(_startApproachDuration);
 			_startApproachDuration = _endApproachDuration;
 			_endApproachDuration = duration;
 
@@ -622,14 +600,14 @@ namespace synthese
 
 
 
-		int Journey::getStartApproachDuration() const
+		posix_time::time_duration Journey::getStartApproachDuration() const
 		{
 			return _startApproachDuration;
 		}
 
 
 
-		int Journey::getEndApproroachDuration() const
+		posix_time::time_duration Journey::getEndApproroachDuration() const
 		{
 			return _endApproachDuration;
 		}

@@ -27,7 +27,8 @@
 #define SYNTHESE_HUB_H
 
 #include "GraphTypes.h"
-#include "TimeTypes.h"
+
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace synthese
 {
@@ -49,7 +50,7 @@ namespace synthese
 		public:
 			//! @name Interface for query methods
 			//@{
-				virtual time::MinutesDuration getMinTransferDelay(
+				virtual boost::posix_time::time_duration getMinTransferDelay(
 				) const = 0;
 				
 
@@ -65,9 +66,9 @@ namespace synthese
 					, const Vertex& destination
 				) const = 0;
 
-				virtual time::MinutesDuration getTransferDelay(
-					const Vertex& origin
-					, const Vertex& destination
+				virtual boost::posix_time::time_duration getTransferDelay(
+					const Vertex& origin,
+					const Vertex& destination
 				) const = 0;
 
 

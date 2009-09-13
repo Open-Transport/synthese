@@ -91,7 +91,7 @@ namespace synthese
 			PublicTransportStopZoneConnectionPlace(
 				util::RegistryKeyType id = UNKNOWN_VALUE
 				, bool allowedConnection = false
-				, time::MinutesDuration defaultTransferDelay = AddressablePlace::FORBIDDEN_TRANSFER_DELAY
+				, boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration()
 			);
 
 			//! @name Getters
