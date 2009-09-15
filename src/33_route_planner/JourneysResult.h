@@ -129,7 +129,7 @@ namespace synthese
 					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
 					boost::posix_time::time_duration duration(
 						boost::posix_time::minutes(
-							_accessDirection == DEPARTURE_TO_ARRIVAL ?
+							_accessDirection == graph::DEPARTURE_TO_ARRIVAL ?
 							journey->getEndTime() - _originDateTime :
 							_originDateTime - journey->getEndTime()
 					)	);
@@ -138,7 +138,7 @@ namespace synthese
 						std::make_pair(
 							vertex,
 							_result.insert(
-								make_pair(journey, duration)
+								std::make_pair(journey, duration)
 							).first
 					)	);
 				}
@@ -200,8 +200,8 @@ namespace synthese
 						boost::shared_ptr<graph::Journey> journey(it->second->first);
 						typename IndexMap::iterator next(it);
 						++next;
-						if(	journey->getMethod() == DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
-							journey->getMethod() == ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime ||
+						if(	journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
+							journey->getMethod() == graph::ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime ||
 							bvrm.isUseLess(it->first, journey->size(), it->second->second)
 						){
 							journeysToRemove.push_back(journey);
@@ -270,7 +270,7 @@ namespace synthese
 					s	<< "<tr><th colspan=\"7\">Exploration queue (size=" << _result.size() << ")</th></tr>"
 						<< "<tr><th>Place</th><th>Time</th><th>Score</th><th>Dist</th><th>Min spd</th><th>Dist.MinSpd</th><th>Place score</th></tr>"
 						;
-					BOOST_FOREACH(const ResultSet::value_type& it, _result)
+					BOOST_FOREACH(const typename ResultSet::value_type& it, _result)
 					{
 						boost::shared_ptr<graph::Journey> journey(it.first);
 						if (journey->empty())
