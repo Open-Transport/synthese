@@ -35,6 +35,7 @@
 #include "ArrivalDepartureTableLog.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -144,7 +145,7 @@ namespace synthese
 			return _request->isAuthorized<ArrivalDepartureTableRight>(
 				WRITE,
 				UNKNOWN_RIGHT_LEVEL,
-				Conversion::ToString(_screen->getKey())
+				lexical_cast<string>(_screen->getKey())
 			);
 		}
 	}

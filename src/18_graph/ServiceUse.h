@@ -47,7 +47,8 @@ namespace synthese
 
 		public:
 			ServiceUse(const ServicePointer& servicePointer, const Edge* edge);
-	//		ServiceUse();
+			
+			ServiceUse();
 			
 
 			//! @name Getters

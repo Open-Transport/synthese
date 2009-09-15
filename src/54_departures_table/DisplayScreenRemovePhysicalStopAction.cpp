@@ -104,7 +104,12 @@ namespace synthese
 
 		bool DisplayScreenRemovePhysicalStopAction::_isAuthorized(
 		) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+			assert(_screen.get() != NULL);
+			return _request->isAuthorized<ArrivalDepartureTableRight>(
+				WRITE,
+				UNKNOWN_RIGHT_LEVEL,
+				lexical_cast<string>(_screen->getKey())
+			);
 		}
 		
 		

@@ -50,6 +50,15 @@ namespace synthese
 			_useRule(NULL)
 		{
 		}
+		ServicePointer::ServicePointer():
+			_service(NULL),
+			_edge(NULL),
+			_determinationMethod(UNDEFINED_DIRECTION),
+			_actualTime(TIME_UNKNOWN),
+			_serviceIndex(UNKNOWN_VALUE),
+			_useRule(NULL),
+			_originDateTime(TIME_UNKNOWN)
+		{	}
 
 
 

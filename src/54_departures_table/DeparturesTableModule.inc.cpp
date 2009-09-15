@@ -22,6 +22,8 @@
 #include "ParseDisplayReturnInterfacePage.h"
 #include "DeparturesTableInterfacePage.h"
 #include "DeparturesTableRoutePlanningInterfacePage.h"
+#include "DeparturesTableDestinationInterfacepage.h"
+#include "DeparturesTableTransferDestinationInterfacePage.h"
 
 #include "DisplaySearchAdmin.h"
 #include "DisplayTypesAdmin.h"
@@ -58,6 +60,8 @@
 #include "DisplayScreenCPUCreateAction.h"
 #include "DisplayScreenCPUUpdateAction.h"
 #include "DisplayScreenCPUMaintenanceUpdateAction.h"
+#include "DisplayScreenTransferDestinationAddAction.h"
+#include "DisplayScreenTransferDestinationRemoveAction.h"
 
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayMaintenanceRight.h"

@@ -45,6 +45,7 @@
 #include "GraphConstants.h"
 #include "InterfacePageTableSync.h"
 #include "SentScenario.h"
+#include "PhysicalStop.h"
 
 using namespace std;
 using namespace boost;
@@ -115,23 +116,29 @@ namespace synthese
 				PublicTransportStopZoneConnectionPlace place;
 				place.setName("TEST");
 				place.setCity(&city);
-				vector<const PublicTransportStopZoneConnectionPlace*> places;
-				places.push_back(&place);
-				places.push_back(&place);
+				PhysicalStop ps(UNKNOWN_VALUE, string(), &place);
 				CommercialLine cline;
 				cline.setShortName("00");
 				Line line;
 				line.setCommercialLine(&cline);
 				LineStop lineStop;
 				lineStop.setLine(&line);
+				lineStop.setPhysicalStop(&ps);
 				DateTime d(TIME_CURRENT);
-				
 
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
 					ServicePointer sp(DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN, &lineStop);
 					sp.setActualTime(d);
-					displayedObject.map.insert(make_pair(sp, places));
+					ActualDisplayedArrivalsList destinations;
+					destinations.push_back(IntermediateStop(&place));
+					destinations.push_back(IntermediateStop(&place));
+
+					displayedObject.map.insert(
+						make_pair(
+							sp,
+							destinations		
+					)	);
 					d += 1;
 				}
 

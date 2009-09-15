@@ -55,7 +55,8 @@ namespace synthese
 				, const EndFilter&
 				, const LineFilter&
 				, const DisplayedPlacesList&
-				, const ForbiddenPlacesList&
+				, const ForbiddenPlacesList&,
+				const TransferDestinationsList&
 				, const time::DateTime& startDateTime
 				, const time::DateTime& endDateTime
 				, size_t maxSize

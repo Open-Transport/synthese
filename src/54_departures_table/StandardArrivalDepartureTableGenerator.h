@@ -42,8 +42,9 @@ namespace synthese
 				, const EndFilter&
 				, const LineFilter&
 				, const DisplayedPlacesList&
-				, const ForbiddenPlacesList&
-				, const time::DateTime& startDateTime
+				, const ForbiddenPlacesList&,
+				const TransferDestinationsList&,
+				const time::DateTime& startDateTime
 				, const time::DateTime& endDateTime
 				, size_t maxSize = UNLIMITED_SIZE
 				);

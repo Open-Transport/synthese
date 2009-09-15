@@ -88,6 +88,7 @@ namespace synthese
 				ROUTE_PLANNING = 2
 			} GenerationMethod;
 
+
 		protected:
 			//! \name Technical data
 			//@{
@@ -108,6 +109,8 @@ namespace synthese
 				bool				_serviceNumberDisplay;
 				bool				_displayTeam;
 				bool				_displayClock;
+				DisplayedPlacesList		_displayedPlaces;
+				TransferDestinationsList	_transfers;
 			//@}
 
 			//! \name Content
@@ -118,7 +121,6 @@ namespace synthese
 				LineFilter					_forbiddenLines;
 				DeparturesTableDirection	_direction;
 				EndFilter					_originsOnly;
-				DisplayedPlacesList			_displayedPlaces;
 				int							_maxDelay;			//!< Max time length for the table
 				int							_clearingDelay;
 				int							_firstRow;
@@ -195,6 +197,30 @@ namespace synthese
 				void	removeForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace*);
 				void	removeForcedDestination(const env::PublicTransportStopZoneConnectionPlace*);
 				void	removePhysicalStop(const env::PhysicalStop*);
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Adds a destination by transfer to display if necessary.
+				/// @param transferPlace place to the transfer must be
+				/// @param destinationPlace destination place 
+				void addTransferDestination(
+					TransferDestinationsList::key_type transferPlace,
+					TransferDestinationsList::mapped_type::value_type destinationPlace
+				);
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Remove a destination by transfer to display if necessary.
+				/// @param transferPlace place to the transfer must be
+				/// @param destinationPlace destination place 
+				void removeTransferDestination(
+					TransferDestinationsList::key_type transferPlace,
+					TransferDestinationsList::mapped_type::value_type destinationPlace
+				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Clears the destination by transfer list.
+				void clearTransferDestinations();
 			//@}
 
 			//!	\name Getters
@@ -227,6 +253,7 @@ namespace synthese
 				bool							getDisplayClock()				const;
 				std::string						getMacAddress()					const;
 				bool							getRoutePlanningWithTransfer()	const;
+				const TransferDestinationsList&	getTransferdestinations()		const;
 			//@}
 
 			//! \name Queries

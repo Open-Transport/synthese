@@ -27,6 +27,7 @@
 #include "Service.h"
 #include "ArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
+#include "RoutePlanner.h"
 
 using namespace std;
 
@@ -35,6 +36,8 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace graph;
+	using namespace routeplanner;
+	
 
 	namespace departurestable
 	{
@@ -45,12 +48,15 @@ namespace synthese
 				, const EndFilter&			endfilter
 				, const LineFilter&			lineFilter
 				, const DisplayedPlacesList&	displayedPlacesList
-				, const ForbiddenPlacesList&	forbiddenPlaces
+				, const ForbiddenPlacesList&	forbiddenPlaces,
+				const TransferDestinationsList& transferDestinations
 				, const DateTime& startDateTime
 				, const DateTime& endDateTime
 				, size_t maxSize
 		) : _physicalStops(physicalStops), _direction(direction), _endFilter(endfilter)
-			, _lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces), _startDateTime(startDateTime)
+			, _lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces),
+			_transferDestinations(transferDestinations),
+			_startDateTime(startDateTime)
 			, _endDateTime(endDateTime), _maxSize(maxSize)
 		{}
 
@@ -99,10 +105,11 @@ namespace synthese
 			);
 
 			const LineStop* curLinestop(static_cast<const LineStop*>(servicePointer.getEdge()));
+			const LineStop* lastLineStop(NULL);
 			const PublicTransportStopZoneConnectionPlace* place(curLinestop->getPhysicalStop()->getConnectionPlace());
 
 			// Adding of the beginning place
-			arrivals.push_back(place);
+			arrivals.push_back(IntermediateStop(place));
 			encounteredPlaces.insert(place);
 
 			for(curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly());
@@ -117,20 +124,22 @@ namespace synthese
 				)	) continue;
 
 				place = curLinestop->getPhysicalStop()->getConnectionPlace();
+				lastLineStop = curLinestop;
 				
 				// If the place must be displayed according to the display rules (only once per place)
 				if(	_displayedPlaces.find(place->getKey()) != _displayedPlaces.end() &&
 					encounteredPlaces.find(place) == encounteredPlaces.end() &&
 					place != destinationPlace
 				){
-					arrivals.push_back(place);
+					ServiceUse serviceUse(servicePointer, curLinestop);
+					_push_back(arrivals, serviceUse);
 					encounteredPlaces.insert(place);
 				}
 			}
 			// Add the ending stop
-			if(*(arrivals.end()-1) != place || arrivals.size() <= 1)
+			if((arrivals.end()-1)->place != place || arrivals.size() <= 1)
 			{
-				arrivals.push_back(place);
+				_push_back(arrivals, ServiceUse(servicePointer, lastLineStop));
 			}
 
 			/** - Insertion */
@@ -146,5 +155,58 @@ namespace synthese
 		}
 
 
+
+		void ArrivalDepartureTableGenerator::_push_back(
+			ActualDisplayedArrivalsList& list,
+			const graph::ServiceUse& serviceUse
+		){
+			IntermediateStop::TransferDestinations transfers;
+
+			TransferDestinationsList::const_iterator it(
+				_transferDestinations.find(
+					dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getSecondEdge()->getFromVertex()->getHub())
+			)	);
+			if(it != _transferDestinations.end())
+			{
+				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
+				{
+					RoutePlanner rp(
+						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getEdge()->getFromVertex()->getHub()),
+						it2,
+						AccessParameters(
+							USER_PEDESTRIAN,
+							false,
+							false,
+							0,
+							0,
+							67,
+							2
+						),
+						ARRIVAL_FIRST,
+						_startDateTime,
+						_endDateTime,
+						1
+					);
+					
+					const RoutePlanner::Result& solution(rp.computeJourneySheetDepartureArrival());
+
+					if(solution.journeys.empty()) continue;
+
+					const Journey& journey(*solution.journeys.front());
+
+					if(	journey.size() == 2 &&
+						journey.getJourneyLeg(0).getArrivalEdge()->getFromVertex()->getHub() == serviceUse.getArrivalEdge()->getFromVertex()->getHub() &&
+						journey.getJourneyLeg(0).getService() == serviceUse.getService()
+					){
+						transfers.insert(journey.getJourneyLeg(1));
+					}
+				}
+			}
+			list.push_back(IntermediateStop(
+				dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getSecondEdge()->getFromVertex()->getHub()),
+				serviceUse,
+				transfers
+			)	);
+		}
 	}
 }

@@ -70,6 +70,7 @@ namespace synthese
 				UserClassCode userclass,
 				const Edge* edge = NULL
 			);
+			ServicePointer();
 
 			//! @name Setters
 			//@{

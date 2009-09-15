@@ -28,7 +28,7 @@
 #include <vector>
 #include <map>
 
-#include "ServicePointer.h"
+#include "ServiceUse.h"
 #include "DateTime.h"
 #include "Registry.h"
 #include "Journey.h"
@@ -75,10 +75,49 @@ namespace synthese
 				);
 		}
 	};
-	typedef std::vector<const env::PublicTransportStopZoneConnectionPlace*> ActualDisplayedArrivalsList;
-	typedef std::map<graph::ServicePointer, ActualDisplayedArrivalsList, DeparturesTableElementLess> ArrivalDepartureList;
+
+	struct DeparturesTableServiceUseElementLess : public std::binary_function<graph::ServiceUse, graph::ServiceUse, bool>
+	{
+		bool operator()(const graph::ServiceUse& _Left, const graph::ServiceUse& _Right) const
+		{
+			return
+				_Left.getActualDateTime() < _Right.getActualDateTime() ||
+				_Left.getActualDateTime() == _Right.getActualDateTime() && _Left.getSecondActualDateTime() < _Right.getSecondActualDateTime() ||
+				_Left.getActualDateTime() == _Right.getActualDateTime() && _Left.getSecondActualDateTime() == _Right.getSecondActualDateTime() && _Left.getSecondEdge() < _Right.getSecondEdge()
+			;
+		}
+	};
+
+	typedef std::map<
+		const env::PublicTransportStopZoneConnectionPlace*,
+		std::set<const env::PublicTransportStopZoneConnectionPlace*>
+	> TransferDestinationsList;
+	
+	struct IntermediateStop
+	{
+		typedef std::set<graph::ServiceUse, DeparturesTableServiceUseElementLess> TransferDestinations;
+		const env::PublicTransportStopZoneConnectionPlace* place;
+		graph::ServiceUse serviceUse;
+		TransferDestinations transferDestinations;
+		IntermediateStop(const env::PublicTransportStopZoneConnectionPlace* _place) : place(_place), serviceUse(), transferDestinations() {}
+		IntermediateStop(const env::PublicTransportStopZoneConnectionPlace* _place, const graph::ServiceUse& _serviceUse, const TransferDestinations& _transferDestinations) : place(_place), serviceUse(_serviceUse), transferDestinations(_transferDestinations) {}
+	};
+
+	typedef std::vector<IntermediateStop> ActualDisplayedArrivalsList;
+	
+	typedef std::map<
+		graph::ServicePointer,
+		ActualDisplayedArrivalsList,
+		DeparturesTableElementLess
+	> ArrivalDepartureList;
+	
 	typedef ArrivalDepartureList::value_type ArrivalDepartureRow;
-	struct ArrivalDepartureListWithAlarm { ArrivalDepartureList map; const messages::Alarm* alarm; };
+
+	struct ArrivalDepartureListWithAlarm
+	{
+		ArrivalDepartureList map;
+		const messages::Alarm* alarm;
+	};
 
 	struct RoutePlanningListElementLess : public std::binary_function<env::PublicTransportStopZoneConnectionPlace*, env::PublicTransportStopZoneConnectionPlace*, bool>
 	{

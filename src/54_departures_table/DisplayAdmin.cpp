@@ -76,6 +76,8 @@
 #include "Interface.h"
 #include "DisplayScreenCPUAdmin.h"
 #include "City.h"
+#include "DisplayScreenTransferDestinationAddAction.h"
+#include "DisplayScreenTransferDestinationRemoveAction.h"
 
 #include <utility>
 #include <sstream>
@@ -749,15 +751,6 @@ namespace synthese
 			// APPEARANCE TAB
 			if (openTabContent(stream, TAB_APPEARANCE))
 			{
-
-				// Add display request
-				AdminActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,DisplayAdmin> addDisplayRequest(_request);
-				addDisplayRequest.getAction()->setScreen(_displayScreen);
-
-				// Remove displayed place request
-				AdminActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,DisplayAdmin> rmDisplayedRequest(_request);
-				rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
-
 				// Properties Update request
 				AdminActionFunctionRequest<DisplayScreenAppearanceUpdateAction,DisplayAdmin> updateRequest(_request);
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
@@ -796,6 +789,14 @@ namespace synthese
 				// Intermediate stops to display
 				if(_displayScreen->getGenerationMethod() != DisplayScreen::ROUTE_PLANNING)
 				{
+					// Add display request
+					AdminActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,DisplayAdmin> addDisplayRequest(_request);
+					addDisplayRequest.getAction()->setScreen(_displayScreen);
+
+					// Remove displayed place request
+					AdminActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,DisplayAdmin> rmDisplayedRequest(_request);
+					rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
+
 					stream << "<h1>Affichage arrêts intermédiaires</h1>";
 
 					HTMLForm f(addDisplayRequest.getHTMLForm("addplace"));
@@ -830,8 +831,69 @@ namespace synthese
 					stream << t.col() << f.getSubmitButton("Ajouter");
 
 					stream << t.close() << f.close();
-				}
 
+
+					// Add transfer request
+					AdminActionFunctionRequest<DisplayScreenTransferDestinationAddAction,DisplayAdmin> addTransferRequest(_request);
+					addTransferRequest.getAction()->setScreen(_displayScreen);
+
+					// Remove transfer place request
+					AdminActionFunctionRequest<DisplayScreenTransferDestinationRemoveAction,DisplayAdmin> rmTransferRequest(_request);
+					rmTransferRequest.getAction()->setScreen(_displayScreen);
+
+					stream << "<h1>Affichage de correspondances</h1>";
+					HTMLForm ft(addTransferRequest.getHTMLForm("addtransfer"));
+
+					HTMLTable::ColsVector ct;
+					ct.push_back("Arrêt de correspondance");
+					ct.push_back("Arrêt de correspondance");
+					ct.push_back("Destination");
+					ct.push_back("Destination");
+					ct.push_back("Actions");
+					HTMLTable tt(ct, ResultHTMLTable::CSS_CLASS);
+					stream << ft.open() << tt.open();
+
+					BOOST_FOREACH(const TransferDestinationsList::value_type& it, _displayScreen->getTransferdestinations())
+					{
+						rmTransferRequest.getAction()->setTransferPlace(ConnectionPlaceTableSync::Get(it.first->getKey(), _getEnv()));
+
+						BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it.second)
+						{
+							rmTransferRequest.getAction()->setDestinationPlace(ConnectionPlaceTableSync::Get(it2->getKey(), _getEnv()));
+
+							stream << tt.row();
+							stream << tt.col() << it.first->getCity()->getName();
+							stream << tt.col() << it.first->getName();
+							stream << tt.col() << it2->getCity()->getName();
+							stream << tt.col() << it2->getName();
+							stream << tt.col() << rmTransferRequest.getHTMLForm().getLinkButton(
+								"Supprimer",
+								"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
+								"delete.png"
+							);
+					}	}
+
+					stream << tt.row();
+					stream << tt.col(2) << ft.getSelectInput(
+						DisplayScreenTransferDestinationAddAction::PARAMETER_TRANSFER_PLACE_ID,
+						_prodScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
+						uid(0)
+					);
+					stream << tt.col() << ft.getTextInput(
+						DisplayScreenTransferDestinationAddAction::PARAMETER_DESTINATION_PLACE_CITY_NAME,
+						string(),
+						"(commune)"
+					);
+					stream << tt.col() << ft.getTextInput(
+						DisplayScreenTransferDestinationAddAction::PARAMETER_DESTINATION_PLACE_NAME,
+						string(),
+						"(arrêt)"
+					);
+
+					stream << tt.col() << ft.getSubmitButton("Ajouter");
+
+					stream << tt.close() << ft.close();
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////

@@ -44,13 +44,14 @@ namespace synthese
 			, const EndFilter& endfilter
 			, const LineFilter& lineFilter
 			, const DisplayedPlacesList& displayedPlacesList
-			, const ForbiddenPlacesList& forbiddenPlaces
+			, const ForbiddenPlacesList& forbiddenPlaces,
+			const TransferDestinationsList& transfers
 			, const DateTime& startTime
 			, const DateTime& endDateTime
 			, size_t maxSize
 		):	ArrivalDepartureTableGenerator(
 			physicalStops, direction, endfilter, lineFilter,
-			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize
+			displayedPlacesList, forbiddenPlaces, transfers, startTime, endDateTime, maxSize
 		){
 		}
 

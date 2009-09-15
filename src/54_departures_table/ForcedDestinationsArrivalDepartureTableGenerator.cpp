@@ -47,7 +47,8 @@ namespace synthese
 			, const EndFilter& endfilter
 			, const LineFilter& lineFilter
 			, const DisplayedPlacesList& displayedPlacesList
-			, const ForbiddenPlacesList& forbiddenPlaces
+			, const ForbiddenPlacesList& forbiddenPlaces,
+			const TransferDestinationsList& transferDestinations
 			, const DateTime& startTime
 			, const DateTime& endDateTime
 			, size_t maxSize
@@ -60,6 +61,7 @@ namespace synthese
 				lineFilter,
 				displayedPlacesList,
 				forbiddenPlaces,
+				transferDestinations,
 				startTime,
 				endDateTime,
 				maxSize
@@ -173,7 +175,7 @@ namespace synthese
 			if (_result.size() < _maxSize)
 			{
 				StandardArrivalDepartureTableGenerator standardTable(_physicalStops, _direction, _endFilter
-					, _lineFilter, DisplayedPlacesList(), _forbiddenPlaces, _startDateTime, _endDateTime, _maxSize + _result.size());
+					, _lineFilter, DisplayedPlacesList(), _forbiddenPlaces, _transferDestinations, _startDateTime, _endDateTime, _maxSize + _result.size());
 				const ArrivalDepartureList& standardTableResult = standardTable.generate();
 
 				for (ArrivalDepartureList::const_iterator itr = standardTableResult.begin();

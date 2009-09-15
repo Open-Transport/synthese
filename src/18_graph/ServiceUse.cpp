@@ -44,6 +44,15 @@ namespace synthese
 
 
 
+		ServiceUse::ServiceUse():
+			ServicePointer(),
+			_secondEdge(NULL),
+			_secondActualDateTime(TIME_UNKNOWN)
+		{
+
+		}
+
+
 		const Edge* ServiceUse::getDepartureEdge() const
 		{
 			return (_determinationMethod == DEPARTURE_TO_ARRIVAL)

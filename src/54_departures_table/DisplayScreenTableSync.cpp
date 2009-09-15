@@ -106,6 +106,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_CPU_HOST_ID("cpu_host_id");
 		const string DisplayScreenTableSync::COL_MAC_ADDRESS("mac_address");
 		const string DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER("route_planning_with_transfer");
+		const string DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS("transfer_destinations");
 	}
 
 	namespace db
@@ -147,6 +148,7 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_CPU_HOST_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAC_ADDRESS, SQL_TEXT),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER, SQL_BOOLEAN),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 		
@@ -191,6 +193,7 @@ namespace synthese
 			object->clearDisplayedPlaces();
 			object->clearForcedDestinations();
 			object->clearPhysicalStops();
+			object->clearTransferDestinations();
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -290,7 +293,33 @@ namespace synthese
 					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
-		}	}	}	}
+				}	}
+
+				// Transfers
+				stops = Conversion::ToStringVector(rows->getText(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS));
+				BOOST_FOREACH(const string& stop, stops)
+				{
+					typedef tokenizer<char_separator<char> > tokenizer;
+					tokenizer tokens (stop, char_separator<char>(":"));
+					tokenizer::iterator it(tokens.begin());
+					string id1(*it);
+					++it;
+					string id2(*it);
+
+					try
+					{
+						object->addTransferDestination(
+							ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(id1), env, linkLevel).get(),
+							ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(id2), env, linkLevel).get()
+						);
+					}
+					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+					}
+				}
+			
+		}	}
 
 
 
@@ -401,8 +430,19 @@ namespace synthese
 				object->getComPort() << "," <<
 				(object->getCPU() != NULL ? object->getCPU()->getKey() : RegistryKeyType(0)) << "," <<
 				Conversion::ToSQLiteString(object->getMacAddress()) << "," <<
-				object->getRoutePlanningWithTransfer() <<
-			")";
+				object->getRoutePlanningWithTransfer() << ",'";
+			count = 0;
+			BOOST_FOREACH(const TransferDestinationsList::value_type& it, object->getTransferdestinations())
+			{
+				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it.second)
+				{
+					if (count++) query << ",";
+					query << it.first->getKey() << ":" << it2->getKey();
+				}
+			}
+			query << "'";
+
+			query << ")";
 			
 			sqlite->execUpdate(query.str());
 	}	}

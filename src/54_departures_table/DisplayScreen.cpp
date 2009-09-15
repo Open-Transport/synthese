@@ -283,7 +283,8 @@ namespace synthese
 								, _originsOnly
 								, _forbiddenLines
 								, _displayedPlaces
-								, _forbiddenArrivalPlaces
+								, _forbiddenArrivalPlaces,
+								_transfers
 								, realStartDateTime
 								, endDateTime
 								, _displayType->getRowNumber()
@@ -298,7 +299,8 @@ namespace synthese
 								, _originsOnly
 								, _forbiddenLines
 								, _displayedPlaces
-								, _forbiddenArrivalPlaces
+								, _forbiddenArrivalPlaces,
+								_transfers
 								, realStartDateTime
 								, endDateTime
 								, _displayType->getRowNumber()
@@ -685,6 +687,45 @@ namespace synthese
 		bool DisplayScreen::getRoutePlanningWithTransfer() const
 		{
 			return _routePlanningWithTransfer;
+		}
+
+
+
+		void DisplayScreen::addTransferDestination(
+			TransferDestinationsList::key_type transferPlace,
+			TransferDestinationsList::mapped_type::value_type destinationPlace
+		){
+			TransferDestinationsList::iterator it(_transfers.find(transferPlace));
+			if(it == _transfers.end())
+			{
+				it = _transfers.insert(make_pair(transferPlace, TransferDestinationsList::mapped_type())).first;
+			}
+			it->second.insert(destinationPlace);
+		}
+
+
+
+		void DisplayScreen::removeTransferDestination( TransferDestinationsList::key_type transferPlace, TransferDestinationsList::mapped_type::value_type destinationPlace )
+		{
+			TransferDestinationsList::iterator it(_transfers.find(transferPlace));
+			if(it == _transfers.end()) return;
+			TransferDestinationsList::mapped_type::iterator it2(it->second.find(destinationPlace));
+			if(it2 == it->second.end()) return;
+			it->second.erase(it2);
+		}
+
+
+
+		const TransferDestinationsList& DisplayScreen::getTransferdestinations() const
+		{
+			return _transfers;
+		}
+
+
+
+		void DisplayScreen::clearTransferDestinations()
+		{
+			_transfers.clear();
 		}
 	}
 }

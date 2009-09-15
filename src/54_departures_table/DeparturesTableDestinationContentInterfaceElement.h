@@ -45,13 +45,15 @@ namespace synthese
 					- char(13) : 13 chars name if exists, connection place name truncated else
 					- char(26) : 26 chars name if exists, connection place name truncated else
 					- else : connection place name
-					- 4 : Display city name
+				- 4 : Display city name
 					- station_city : adds the city name before the connection place name
 					- station_city_if_new : adds the city name before the connection place name only at city changes
 					- else : do not add the city name before the connection place name
 				- 4 : stopsSeparator
 				- 5 : beforeCity
 				- 6 : afterCity
+				- 7 : beforeWholwStopName
+				- 8 : afterWholeStopName
 			
 			Object : ArrivalDepartureRow object
 
@@ -65,6 +67,7 @@ namespace synthese
 			static const std::string TYPE_CHAR_13;
 			static const std::string TYPE_CHAR_26;
 			static const std::string TYPE_CHAR_26_OR_STATION_CITY_IF_NEW;
+			static const std::string TYPE_USE_INTERFACE;
 			
 
 		private:

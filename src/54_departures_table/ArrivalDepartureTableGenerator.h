@@ -54,6 +54,11 @@ namespace synthese
 			typedef std::map<util::RegistryKeyType, const env::PhysicalStop*> PhysicalStops;
 		private:
 
+			void _push_back(
+				ActualDisplayedArrivalsList& list,
+				const graph::ServiceUse& serviceUse
+			);
+
 		protected:
 			DisplayedPlacesList _displayedPlaces;	//!< Places to be displayed according to the demand rules
 
@@ -64,6 +69,7 @@ namespace synthese
 				const EndFilter					_endFilter;
 				const LineFilter				_lineFilter;
 				const ForbiddenPlacesList		_forbiddenPlaces;
+				const TransferDestinationsList	_transferDestinations;
 				const time::DateTime			_startDateTime;
 				const time::DateTime			_endDateTime;
 				const size_t					_maxSize;	//!< Maximal size of the departure table according to the demand rules.
@@ -86,7 +92,7 @@ namespace synthese
 				ArrivalDepartureList::iterator _insert(
 					const graph::ServicePointer& servicePointer
 					, UnlimitedSize unlimitedSize=SIZE_AS_DEFINED
-					);
+				);
 
 			/** Constructor.
 				@param maxSize Maximal size of the departure table (default = unlimited).
@@ -97,7 +103,8 @@ namespace synthese
 				, const EndFilter&
 				, const LineFilter&
 				, const DisplayedPlacesList&
-				, const ForbiddenPlacesList&
+				, const ForbiddenPlacesList&,
+				const TransferDestinationsList&
 				, const time::DateTime& startDateTime
 				, const time::DateTime& endDateTime
 				, size_t maxSize = UNLIMITED_SIZE

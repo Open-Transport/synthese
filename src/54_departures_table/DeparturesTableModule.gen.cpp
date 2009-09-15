@@ -13,6 +13,8 @@ synthese::departurestable::DeparturesTableRoutePlanningInterfacePage::integrate(
 synthese::departurestable::DepartureTableRowInterfacePage::integrate();
 synthese::departurestable::DeparturesTableRoutePlanningRowInterfacePage::integrate();
 synthese::departurestable::ParseDisplayReturnInterfacePage::integrate();
+synthese::departurestable::DeparturesTableTransferDestinationInterfacePage::integrate();
+synthese::departurestable::DeparturesTableDestinationInterfacepage::integrate();
 
 synthese::departurestable::DisplaySearchAdmin::integrate();
 synthese::departurestable::DisplayTypesAdmin::integrate();
@@ -48,6 +50,8 @@ synthese::departurestable::DisplayScreenAppearanceUpdateAction::integrate();
 synthese::departurestable::DisplayScreenCPUCreateAction::integrate();
 synthese::departurestable::DisplayScreenCPUUpdateAction::integrate();
 synthese::departurestable::DisplayScreenCPUMaintenanceUpdateAction::integrate();
+synthese::departurestable::DisplayScreenTransferDestinationAddAction::integrate();
+synthese::departurestable::DisplayScreenTransferDestinationRemoveAction::integrate();
 
 synthese::departurestable::DisplayScreenContentFunction::integrate();
 synthese::departurestable::DisplayScreenSupervisionFunction::integrate();

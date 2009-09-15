@@ -34,6 +34,9 @@
 #include "DeparturesTableDestinationContentInterfaceElement.h"
 #include "DepartureTableRowInterfacePage.h"
 #include "NamedPlace.h"
+#include "DeparturesTableTransferDestinationInterfacePage.h"
+#include "DeparturesTableDestinationInterfacepage.h"
+#include "Interface.h"
 
 using namespace std;
 using namespace boost;
@@ -58,6 +61,7 @@ namespace synthese
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_13 = "char(13)";
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_26 = "char(26)";
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_26_OR_STATION_CITY_IF_NEW("char(26)/station_city_if_new");
+		const string DeparturesTableDestinationContentInterfaceElement::TYPE_USE_INTERFACE("use_interface");
 
 		void DeparturesTableDestinationContentInterfaceElement::storeParameters(ValueElementList& vel)
 		{
@@ -71,8 +75,6 @@ namespace synthese
 			_stopsSeparatorVIE = vel.front();
 			_beforeCityVIE = vel.front();
 			_afterCityVIE = vel.front();
-			
-			//	_displayCityVIE = vel.front();
 		}
 
 		string DeparturesTableDestinationContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
@@ -88,7 +90,8 @@ namespace synthese
 			string __AvantCommune = _beforeCityVIE->getValue(parameters, variables, object, request);
 			string __ApresCommune = _afterCityVIE->getValue(parameters, variables, object, request);
 			
-			const City* __DerniereCommune = dynamic_cast<const NamedPlace*>(__DP->second.at(0))->getCity();
+			const City* __DerniereCommune = dynamic_cast<const NamedPlace*>(__DP->second.at(0).place)->getCity();
+			size_t totalTransferRank(0);
 
 			int terminusRank(__DP->second.size() - 1);
 			for(int i((numberOfIntermediatesStops != 0) ? firstIntermediatesStops : terminusRank);
@@ -102,10 +105,42 @@ namespace synthese
 				)	continue;
 
 				// Place
-				const PublicTransportStopZoneConnectionPlace* place(__DP->second.at(i));
+				const PublicTransportStopZoneConnectionPlace* place(__DP->second.at(i).place);
 
 				if (i > firstIntermediatesStops)
 					stream << __SeparateurEntreArrets;
+
+				if(__TypeAffichage == TYPE_USE_INTERFACE)
+				{
+					const DeparturesTableDestinationInterfacepage* destinationPage(_page->getInterface()->getPage<DeparturesTableDestinationInterfacepage>());
+					stringstream transferString;
+					try
+					{
+						const DeparturesTableTransferDestinationInterfacePage* transferPage(_page->getInterface()->getPage<DeparturesTableTransferDestinationInterfacePage>());
+
+						// Loop on the transfer pages
+						size_t localTransferRank(0);
+						BOOST_FOREACH(const IntermediateStop::TransferDestinations::value_type& transferServiceUse, __DP->second.at(i).transferDestinations)
+						{
+							transferPage->display(transferString, transferServiceUse, localTransferRank++, totalTransferRank++, variables, request);
+						}
+					}
+					catch(InterfacePageException& e)
+					{
+					}
+
+					destinationPage->display(
+						stream,
+						__DP->second.at(i).serviceUse,
+						place->getCity() == __DerniereCommune,
+						i == terminusRank,
+						transferString.str(),
+						variables,
+						request
+					);
+
+					continue;
+				}
 
 				// Display of the city name if necessary
 				if(	__TypeAffichage == TYPE_STATION_CITY

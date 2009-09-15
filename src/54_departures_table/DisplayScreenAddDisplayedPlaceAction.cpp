@@ -28,6 +28,7 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include "GeographyModule.h"
+#include "ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -110,14 +111,27 @@ namespace synthese
 		void DisplayScreenAddDisplayedPlaceAction::run()
 		{
 			_screen->addDisplayedPlace(_place);
+
 			DisplayScreenTableSync::Save(_screen.get());
+
+			// Log
+			ArrivalDepartureTableLog::addUpdateEntry(
+				*_screen,
+				"Ajout de destination : "+ _place->getFullName(),
+				*_request->getUser()
+			);
 		}
 
 
 
 		bool DisplayScreenAddDisplayedPlaceAction::_isAuthorized(
 		) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+			assert(_screen.get() != NULL);
+			return _request->isAuthorized<ArrivalDepartureTableRight>(
+				WRITE,
+				UNKNOWN_RIGHT_LEVEL,
+				lexical_cast<string>(_screen->getKey())
+			);
 		}
 		
 		
