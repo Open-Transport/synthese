@@ -147,7 +147,7 @@ namespace synthese
 			ss << setw( 4 ) << setfill ( '0' )
 			   << d.year() << "-"
 			   << setw( 2 ) << setfill ( '0' )
-			   << d.month() << "-"
+			   << d.month().as_number() << "-"
 			   << setw( 2 ) << setfill ( '0' )
 			   << d.day();
 			return ss.str ();
@@ -564,15 +564,15 @@ namespace synthese
 				Point2D pt (ps->getX (), ps->getY ());
 				GeoPoint gp = WGS84FromLambert(pt);
 				
-				os << "<longitude>" << GetCoordinate(gp.getLongitude()) << "</longitude>" << "\n";
-				os << "<latitude>" << GetCoordinate(gp.getLatitude()) << "</latitude>" << "\n";
+				os << "<longitude>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(gp.getLongitude())) << "</longitude>" << "\n";
+				os << "<latitude>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(gp.getLatitude())) << "</latitude>" << "\n";
 				os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
 				
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
 				os << "<projectedPoint>" << "\n";
-				os << "<X>" << GetCoordinate(pt.getX()) << "</X>" << "\n";
-				os << "<Y>" << GetCoordinate(pt.getY()) << "</Y>" << "\n";
+				os << "<X>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(pt.getX())) << "</X>" << "\n";
+				os << "<Y>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(pt.getY())) << "</Y>" << "\n";
 				os << "<projectionType>" << "LambertIIe" << "</projectionType>" << "\n";
 				os << "</projectedPoint>" << "\n";
 
