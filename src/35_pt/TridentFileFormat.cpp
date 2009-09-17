@@ -349,19 +349,20 @@ namespace synthese
 				os << "<AreaCentroid>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", *ps) << "</objectId>" << "\n";
 			    
+
 				Point2D pt (ps->getX (), ps->getY ());
 				GeoPoint gp = WGS84FromLambert(pt);
-			    
-				os << "<longitude>" << GetCoordinate(gp.getLongitude ()) << "</longitude>" << "\n";
-				os << "<latitude>" << GetCoordinate(gp.getLatitude ()) << "</latitude>" << "\n";
+				
+				os << "<longitude>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(gp.getLongitude ())) << "</longitude>" << "\n";
+				os << "<latitude>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(gp.getLatitude ())) << "</latitude>" << "\n";
 				os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
 
 				// we do not provide full addresses right now.
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
 				os << "<projectedPoint>" << "\n";
-				os << "<X>" << GetCoordinate(pt.getX()) << "</X>" << "\n";
-				os << "<Y>" << GetCoordinate(pt.getY()) << "</Y>" << "\n";
+				os << "<X>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(pt.getX())) << "</X>" << "\n";
+				os << "<Y>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(pt.getY())) << "</Y>" << "\n";
 				os << "<projectionType>" << "LambertIIe" << "</projectionType>" << "\n";
 				os << "</projectedPoint>" << "\n";
 
