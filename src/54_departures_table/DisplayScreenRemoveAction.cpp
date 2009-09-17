@@ -28,9 +28,9 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include "Right.h"
-#include "Conversion.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -75,11 +75,15 @@ namespace synthese
 
 		bool DisplayScreenRemoveAction::_isAuthorized() const
 		{
-			return _request->isAuthorized<ArrivalDepartureTableRight>(
-				DELETE_RIGHT
-				, UNKNOWN_RIGHT_LEVEL
-				, Conversion::ToString(_displayScreen->getKey())
-				);
+			assert(_displayScreen.get() != NULL);
+			if (_displayScreen->getLocalization() != NULL)
+			{
+				return _request->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocalization()->getKey()));
+			}
+			else
+			{
+				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+			}
 		}
 
 		void DisplayScreenRemoveAction::setDisplayScreen( boost::shared_ptr<const DisplayScreen> screen )

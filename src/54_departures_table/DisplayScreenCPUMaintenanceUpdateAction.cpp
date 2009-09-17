@@ -91,7 +91,9 @@ namespace synthese
 		bool DisplayScreenCPUMaintenanceUpdateAction::_isAuthorized(
 		) const {
 			return
-				_request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey()))
+				_cpu->getPlace() ?
+				_request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
+				_request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
 			;
 		}
 
