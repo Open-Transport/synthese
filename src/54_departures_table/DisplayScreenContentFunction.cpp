@@ -58,6 +58,7 @@ namespace synthese
 		const std::string DisplayScreenContentFunction::PARAMETER_DATE = "date";
 		const std::string DisplayScreenContentFunction::PARAMETER_TB = "tb";
 		const std::string DisplayScreenContentFunction::PARAMETER_INTERFACE_ID("i");
+		const string DisplayScreenContentFunction::PARAMETER_MAC_ADDRESS("m");
 
 		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
@@ -71,34 +72,38 @@ namespace synthese
 		{
 			try
 			{
-				RegistryKeyType id;
+				optional<RegistryKeyType> id;
 				// Screen
-				if (map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+				id = map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
+				if (!id)
 				{
-					id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
+					id = map.getOptional<RegistryKeyType>(PARAMETER_TB);
+				}
+				if(id)
+				{
+					if (decodeTableId(*id) == ConnectionPlaceTableSync::TABLE.ID)
+					{
+						DisplayScreen* screen(new DisplayScreen);
+						_type.reset(new DisplayType);
+						_type->setRowNumber(10);
+						_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get());
+						screen->setLocalization(Env::GetOfficialEnv().getRegistry<PublicTransportStopZoneConnectionPlace>().get(*id).get());
+						screen->setAllPhysicalStopsDisplayed(true);					
+						screen->setType(_type.get());
+						_screen.reset(screen);
+					}
+					else if (decodeTableId(*id) == DisplayScreenTableSync::TABLE.ID)
+					{
+						_screen = DisplayScreenTableSync::Get(*id, *_env);
+					}
+					else
+						throw RequestException("Not a display screen nor a connection place");
 				}
 				else
 				{
-					id = map.get<RegistryKeyType>(PARAMETER_TB);
+					string macAddress(map.get<string>(PARAMETER_MAC_ADDRESS));
+					_screen = DisplayScreenTableSync::GetByMACAddress(*_env, macAddress, UP_LINKS_LOAD_LEVEL);
 				}
-
-				if (decodeTableId(id) == ConnectionPlaceTableSync::TABLE.ID)
-				{
-					DisplayScreen* screen(new DisplayScreen);
-					_type.reset(new DisplayType);
-					_type->setRowNumber(10);
-					_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY)).get());
-					screen->setLocalization(Env::GetOfficialEnv().getRegistry<PublicTransportStopZoneConnectionPlace>().get(id).get());
-					screen->setAllPhysicalStopsDisplayed(true);					
-					screen->setType(_type.get());
-					_screen.reset(screen);
-				}
-				else if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
-				{
-					_screen = DisplayScreenTableSync::Get(id, *_env);
-				}
-				else
-					throw RequestException("Not a display screen nor a connection place");
 
 				// Date
 				if(map.getOptional<string>(PARAMETER_DATE))

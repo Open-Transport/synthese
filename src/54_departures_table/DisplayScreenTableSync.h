@@ -144,6 +144,22 @@ namespace synthese
 
 
 
+			/** DisplayScreen search.
+				(other search parameters)
+				@param first First DisplayScreen object to answer
+				@param number Number of DisplayScreen objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return Found DisplayScreen objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static boost::shared_ptr<DisplayScreen> GetByMACAddress(
+				util::Env& env,
+				const std::string& macAddress,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Gets the message currently displayed on a screen.
 			/// @param env Environment to populate

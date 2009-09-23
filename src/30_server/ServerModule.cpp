@@ -71,7 +71,7 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SMTP_SERVER ("smtp_server");
 
-		const std::string ServerModule::VERSION("3.1.13");
+		const std::string ServerModule::VERSION("3.1.14");
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 

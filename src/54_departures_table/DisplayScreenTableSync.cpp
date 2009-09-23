@@ -684,4 +684,41 @@ namespace synthese
 				result.push_back(static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)));
 			}
 			return result;
+		}
+
+
+
+		shared_ptr<DisplayScreen> DisplayScreenTableSync::GetByMACAddress(
+			util::Env& env,
+			const std::string& macAddress,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */ )
+		{
+			stringstream query;
+			query <<
+				" SELECT"
+				<< " *"
+				<< " FROM "
+				<< TABLE.NAME <<
+				" WHERE " <<
+				COL_MAC_ADDRESS << "=" << Conversion::ToSQLiteString(macAddress) <<
+				" LIMIT 1 "
+			;
+
+			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
+			if(rows->next ())
+			{
+				util::Registry<DisplayScreen>& registry(env.getEditableRegistry<DisplayScreen>());
+				if(registry.contains(rows->getKey()))
+				{
+					return registry.getEditable(rows->getKey());
+				}
+				else
+				{
+					boost::shared_ptr<DisplayScreen> object(DisplayScreenTableSync::GetNewObject(rows));
+					Load(object.get(), rows, env, linkLevel);
+					registry.add(object);
+					return object;
+				}
+			}
+			throw Exception("Display screen not found");
 }	}	}

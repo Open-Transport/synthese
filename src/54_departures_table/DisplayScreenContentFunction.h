@@ -42,6 +42,7 @@ namespace synthese
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_TB;
 			static const std::string PARAMETER_INTERFACE_ID;
+			static const std::string PARAMETER_MAC_ADDRESS;
 			
 			//! \name Page parameters
 			//@{
