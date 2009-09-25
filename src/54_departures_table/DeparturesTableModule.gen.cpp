@@ -12,6 +12,7 @@ synthese::departurestable::DeparturesTableInterfacePage::integrate();
 synthese::departurestable::DeparturesTableRoutePlanningInterfacePage::integrate();
 synthese::departurestable::DepartureTableRowInterfacePage::integrate();
 synthese::departurestable::DeparturesTableRoutePlanningRowInterfacePage::integrate();
+synthese::departurestable::DeparturesTableRoutePlanningRowKeyInterfacePage::integrate();
 synthese::departurestable::ParseDisplayReturnInterfacePage::integrate();
 synthese::departurestable::DeparturesTableTransferDestinationInterfacePage::integrate();
 synthese::departurestable::DeparturesTableDestinationInterfacepage::integrate();

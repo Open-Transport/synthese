@@ -30,6 +30,7 @@
 #include "DeparturesTableTypes.h"
 #include "DeparturesTableRoutePlanningInterfaceElement.h"
 #include "DeparturesTableRoutePlanningRowInterfacePage.h"
+#include "DeparturesTableRoutePlanningRowKeyInterfacePage.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
 
@@ -90,7 +91,8 @@ namespace synthese
 			int withtransfer(_withTransfer ? Conversion::ToBool(_withTransfer->getValue(parameters, variables, object, request)) : false);
 			int blinkingDelay(_blinkingDelay? Conversion::ToInt(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
 			shared_ptr<const PublicTransportStopZoneConnectionPlace> place(ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(_originId->getValue(parameters, variables, object, request)), Env::GetOfficialEnv()));
-			
+			int departuresNumber = ptds.size() - departuresToHide;
+
 			// Lancement de l'affichage de la rangee
 			const DeparturesTableRoutePlanningRowInterfacePage* page(_page->getInterface()->getPage<DeparturesTableRoutePlanningRowInterfacePage>());
 			if(page == NULL || place.get() == NULL)
@@ -98,10 +100,36 @@ namespace synthese
 				return string();
 			}
 
+			// Sort of the rows
+			typedef map<string,RoutePlanningList::const_iterator> SortedRows;
+			SortedRows sortedRows;
+			try
+			{
+				const DeparturesTableRoutePlanningRowKeyInterfacePage* keyPage(_page->getInterface()->getPage<DeparturesTableRoutePlanningRowKeyInterfacePage>());
+				for(RoutePlanningList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
+				{
+					stringstream s;
+					keyPage->display(
+						s,
+						*place,
+						*it,
+						variables,
+						request
+					);
+					sortedRows.insert(make_pair(s.str(), it));
+				}
+			}
+			catch(InterfacePageException& e)
+			{
+				for(RoutePlanningList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
+				{
+					sortedRows.insert(make_pair(algorithm::to_lower_copy(it->first->getFullName()), it));
+				}
+			}
+
 			// Boucle sur les rangees
-			int departuresNumber = ptds.size() - departuresToHide;
 			int rank(0);
-			for (RoutePlanningList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber, ++rank)
+			for (SortedRows::const_iterator it = sortedRows.begin(); it != sortedRows.end(); ++it, ++rank)
 			{
 				page->display(
 					stream,
@@ -112,7 +140,7 @@ namespace synthese
 					blinkingDelay,
 					withtransfer,
 					*place,
-					*it,
+					*it->second,
 					request
 				);
 			}

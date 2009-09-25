@@ -19,6 +19,7 @@
 
 #include "DepartureTableRowInterfacePage.h"
 #include "DeparturesTableRoutePlanningRowInterfacePage.h"
+#include "DeparturesTableRoutePlanningRowKeyInterfacePage.h"
 #include "ParseDisplayReturnInterfacePage.h"
 #include "DeparturesTableInterfacePage.h"
 #include "DeparturesTableRoutePlanningInterfacePage.h"
