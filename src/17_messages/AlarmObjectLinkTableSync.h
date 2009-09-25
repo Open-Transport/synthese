@@ -137,25 +137,25 @@ namespace synthese
 			if (first > 0)
 			    query << " OFFSET " << first;
 
-			try
+			db::SQLiteResultSPtr rows = db::DBModule::GetSQLite()->execQuery(query.str());
+			std::vector< boost::shared_ptr<T> > objects;
+			while (rows->next ())
 			{
-				db::SQLiteResultSPtr rows = db::DBModule::GetSQLite()->execQuery(query.str());
-				std::vector< boost::shared_ptr<T> > objects;
-				while (rows->next ())
+				try
 				{
-				    objects.push_back(
+					objects.push_back(
 						db::SQLiteDirectTableSyncTemplate<K,T>::GetEditable(
-						   rows->getLongLong (COL_OBJECT_ID),
-						   env,
-						   linkLevel
-					)	);
+						rows->getLongLong (COL_OBJECT_ID),
+						env,
+						linkLevel
+						)	);
 				}
-				return objects;
+				catch(util::Exception& e)
+				{
+					Log::GetInstance().warn(e.getMessage(), e);
+				}
 			}
-			catch(db::SQLiteException& e)
-			{
-				throw util::Exception(e.getMessage());
-			}
+			return objects;
 		}
 
 	}
