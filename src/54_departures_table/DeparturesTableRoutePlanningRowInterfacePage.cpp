@@ -33,6 +33,7 @@
 #include "Edge.h"
 #include "DateTime.h"
 #include "City.h"
+#include "RollingStock.h"
 
 using namespace boost;
 using namespace std;
@@ -183,6 +184,30 @@ namespace synthese
 				v.push_back(string());
 				v.push_back(string());
 				v.push_back(string());
+				v.push_back(string());
+				v.push_back(string());
+			}
+
+			if(!row.second.empty())
+			{
+				const ServiceUse& s(row.second.getStartServiceUse());
+
+				const Line* line(static_cast<const Line*>(s.getEdge()->getParentPath()));
+				v.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
+
+				if(row.second.getServiceUses().size() > 1)
+				{
+					const ServiceUse& s(row.second.getEndServiceUse());
+					const Line* line(static_cast<const Line*>(s.getEdge()->getParentPath()));
+					v.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
+				}
+				else
+				{
+					v.push_back(string());
+				}
+			}
+			else
+			{
 				v.push_back(string());
 				v.push_back(string());
 			}

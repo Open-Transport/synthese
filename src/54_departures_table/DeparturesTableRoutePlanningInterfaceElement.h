@@ -43,6 +43,7 @@ namespace synthese
 				- 3 : Display track number
 				- 4 : With transfer
 				- 5 : Blinking delay
+				- 6 : 
 		*/
 		class DeparturesTableRoutePlanningInterfaceElement:
 			public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableRoutePlanningInterfaceElement>

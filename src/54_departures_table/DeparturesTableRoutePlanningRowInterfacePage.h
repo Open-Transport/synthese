@@ -53,6 +53,7 @@ namespace synthese
 				- 8 : Line text 1
 				- 9 : Line image 1
 				- 10 : Line style 1
+				- 27 : Rolling stock id
 			Second line :
 				- 11 : Track number 2
 				- 12 : Service number 2
@@ -60,6 +61,7 @@ namespace synthese
 				- 14 : Line text 2
 				- 15 : Line image 2
 				- 16 : Line style 2
+				- 28 : Rolling stock id
 			Destination :
 				- 17 : City name
 				- 18 : City is different than display screen place
