@@ -16,6 +16,7 @@
 #include "11_interfaces/FormattedNumberInterfaceElement.h"
 #include "InterfaceIdInterfaceElement.h"
 #include "LogicalAndInterfaceElement.h"
+#include "LowerCaseInterfaceElement.h"
 
 #include "11_interfaces/SimplePageFunction.h"
 #include "11_interfaces/SetInterfaceElement.h"
