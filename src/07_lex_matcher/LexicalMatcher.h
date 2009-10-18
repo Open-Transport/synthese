@@ -193,8 +193,8 @@ namespace synthese
 			MatchResult r;
 			BOOST_FOREACH(typename Map::value_type v, _map)
 			{
-				if(v.first.getSource() == lowerCaseText)
-				{
+				if(	boost::algorithm::iequals(v.first, lowerCaseText)
+				){
 					MatchHit h;
 					h.value = v.second;
 					h.key = v.first;
@@ -232,14 +232,16 @@ namespace synthese
 					bool ok(true);
 					BOOST_FOREACH(const MatchHit& h1, r1)
 					{
-						if(h1.key == h2.key)
-						{
+						if(	_ignoreCase ?
+							algorithm::to_lower_copy(h1.key) == algorithm::to_lower_copy(h2.key) :
+							h1.key == h2.key
+						){
 							ok = false;
 							break;
 						}
 					}
-					if(ok)
-					{
+					if(	ok
+					){
 						r1.push_back(h2);
 					}
 					if(r1.size() == nbMatches) break;
