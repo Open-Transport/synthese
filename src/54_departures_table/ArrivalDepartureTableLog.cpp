@@ -104,8 +104,8 @@ namespace synthese
 			}
 			catch(...)
 			{
-				return DBLog::getObjectName(id, searchRequest);
 			}
+			return DBLog::getObjectName(id, searchRequest);
 		}
 
 		

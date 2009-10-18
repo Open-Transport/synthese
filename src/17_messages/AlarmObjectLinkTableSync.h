@@ -152,7 +152,7 @@ namespace synthese
 				}
 				catch(util::Exception& e)
 				{
-					Log::GetInstance().warn(e.getMessage(), e);
+					util::Log::GetInstance().warn(e.getMessage(), e);
 				}
 			}
 			return objects;

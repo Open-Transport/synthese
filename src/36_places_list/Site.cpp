@@ -304,7 +304,7 @@ namespace synthese
 			CitiesMatcher::Map::const_iterator it(_citiesMatcher.entries().find(name));
 			if(it != _citiesMatcher.entries().end())
 			{
-				string oldName(it->first);
+				string oldName(it->first.getSource());
 				const City* oldCity(it->second);
 				_citiesMatcher.remove(oldName);
 				_citiesMatcher.add(oldName + " (" + oldCity->getCode().substr(0,2) + ")", oldCity);

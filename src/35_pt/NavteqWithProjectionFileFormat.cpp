@@ -225,8 +225,16 @@ namespace synthese
 							{
 								if(ps2.second == stop.get())
 								{
-									place->addTransferDelay(ps2.second->getKey(), address->getKey(), 0);
-									place->addTransferDelay(address->getKey(), ps2.second->getKey(), 0);
+									place->addTransferDelay(
+										ps2.second->getKey(),
+										address->getKey(),
+										posix_time::minutes(0)
+									);
+									place->addTransferDelay(
+										address->getKey(),
+										ps2.second->getKey(),
+										posix_time::minutes(0)
+									);
 								}
 								else
 								{

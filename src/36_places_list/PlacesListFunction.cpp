@@ -94,7 +94,7 @@ namespace synthese
 			
 			BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
 			{
-				placesList.push_back(make_pair(UNKNOWN_VALUE /*it.value->getKey()*/, it.key));
+				placesList.push_back(make_pair(UNKNOWN_VALUE /*it.value->getKey()*/, it.key.getSource()));
 			}
 
 			VariablesMap vm;

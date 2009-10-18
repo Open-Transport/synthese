@@ -65,7 +65,7 @@ namespace synthese
 			//	++it
 			BOOST_FOREACH(LexicalMatcher<const City*>::MatchHit it, matches)
 			{
-				placesList.push_back(make_pair(it.value->getKey(), it.key));
+				placesList.push_back(make_pair(it.value->getKey(), it.key.getSource()));
 			}
 
 			VariablesMap vm;
