@@ -76,7 +76,7 @@ namespace synthese
 			static const std::string _FIELD_ADMIN_LVL;
 
 			typedef std::map<std::string, road::Address*> _AddressesMap;
-			typedef std::map<std::string, geography::City*> _CitiesMap;
+			typedef std::map<int, geography::City*> _CitiesMap;
 
 			_AddressesMap _navteqAddressses;
 			_CitiesMap _citiesMap;

@@ -174,13 +174,17 @@ namespace synthese
 					dbfile.GetAtRecord(i);
 					if(dbfile.getText(_FIELD_ADMIN_LVL) != "4") continue;
 					stringstream code;
+					int cityID(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(_FIELD_AREA_ID))));
 					code << departementCodes[algorithm::trim_copy(dbfile.getText(_FIELD_AREACODE_3))];
 					code << setw(3) << setfill('0') << lexical_cast<int>(algorithm::trim_copy(dbfile.getText(_FIELD_GOVT_CODE)));
-					if(_citiesMap.find(code.str()) != _citiesMap.end()) continue;
+					if(_citiesMap.find(cityID) != _citiesMap.end()) continue;
 
 					shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), *_env));
 
-					_citiesMap.insert(make_pair(code.str(), city.get()));
+					_citiesMap.insert(make_pair(
+							cityID,
+							city.get()
+					)	);
 				}
 			} // 2 : Nodes
 			else if(key == FILE_NODES)
@@ -265,7 +269,7 @@ namespace synthese
 					string roadName(algorithm::trim_copy(dbfile.getText(_FIELD_ST_NAME)));
 					string leftId(algorithm::trim_copy(dbfile.getText(_FIELD_REF_IN_ID)));
 					string rightId(algorithm::trim_copy(dbfile.getText(_FIELD_NREF_IN_ID)));
-					string lAreaId(algorithm::trim_copy(dbfile.getText(_FIELD_L_AREA_ID)));
+					int lAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(_FIELD_L_AREA_ID))));
 
 					_CitiesMap::const_iterator itc(_citiesMap.find(lAreaId));
 					_AddressesMap::const_iterator ita1(_navteqAddressses.find(leftId));

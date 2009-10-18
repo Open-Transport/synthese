@@ -220,6 +220,10 @@ namespace synthese
 					true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);
+				BOOST_FOREACH(Registry<ScheduledService>::value_type itServ, _env->getRegistry<ScheduledService>())
+				{
+					ServiceDateTableSync::SetActiveDates(*itServ.second);
+				}
 				ContinuousServiceTableSync::Search(
 					*_env,
 					line.getKey(),
@@ -229,6 +233,10 @@ namespace synthese
 					true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);
+				BOOST_FOREACH(Registry<ContinuousService>::value_type itServC, _env->getRegistry<ContinuousService>())
+				{
+					ServiceDateTableSync::SetActiveDates(*itServC.second);
+				}
 			}
 
 
