@@ -52,21 +52,37 @@ namespace synthese
 		const string CityListRequest::PARAMETER_INPUT("t");
 		const string CityListRequest::PARAMETER_NUMBER("n");
 		const string CityListRequest::PARAMETER_IS_FOR_ORIGIN("o");
+		const string CityListRequest::PARAMETER_PAGE("p");
 		
 		void CityListRequest::_run( ostream& stream ) const
 		{
-			PlacesList placesList;
-			
 			Site::CitiesMatcher::MatchResult matches(
 				_site->getCitiesMatcher().bestMatches(_input, _n)
 			);
-			BOOST_FOREACH(LexicalMatcher<const City*>::MatchHit it, matches)
-			{
-				placesList.push_back(make_pair(it.value->getKey(), it.key.getSource()));
-			}
 
-			VariablesMap vm;
-			_page->display(stream, vm, placesList, true, _isForOrigin, NULL, _request);
+			if(_page)
+			{
+				PlacesList placesList;
+				BOOST_FOREACH(LexicalMatcher<const City*>::MatchHit it, matches)
+				{
+					placesList.push_back(make_pair(it.value->getKey(), it.key.getSource()));
+				}
+
+				VariablesMap vm;
+				_page->display(stream, vm, placesList, true, _isForOrigin, NULL, _request);
+			}
+			else
+			{
+				stream <<
+					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<options xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+				;
+				BOOST_FOREACH(LexicalMatcher<const City*>::MatchHit it, matches)
+				{
+					stream << "<option type=\"city\" score=\"" << it.score << "\">" << it.key.getSource() << "</option>";
+				}
+				stream << "</options>";
+			}
 		}
 
 		ParametersMap CityListRequest::_getParametersMap() const
@@ -75,6 +91,7 @@ namespace synthese
 			pm.insert(PARAMETER_INPUT, _input);
 			pm.insert(PARAMETER_NUMBER, _n);
 			pm.insert(PARAMETER_IS_FOR_ORIGIN, _isForOrigin);
+			if(_page) pm.insert(PARAMETER_PAGE, _page->getFactoryKey());
 			return pm;
 		}
 
@@ -82,11 +99,14 @@ namespace synthese
 		{
 			FunctionWithSite::_setFromParametersMap(map);
 
-			_page = _site->getInterface()->getPage<PlacesListInterfacePage>();
-			_input = map.getString(PARAMETER_INPUT, true, FACTORY_KEY);
-			_isForOrigin = map.getBool(PARAMETER_IS_FOR_ORIGIN, false, false, FACTORY_KEY);
+			if(map.getOptional<string>(PARAMETER_PAGE))
+			{
+				_page = _site->getInterface()->getPage<PlacesListInterfacePage>(map.get<string>(PARAMETER_PAGE));
+			}
+			_input = map.get<string>(PARAMETER_INPUT);
+			_isForOrigin = map.getDefault<bool>(PARAMETER_IS_FOR_ORIGIN, false);
 		
-			_n = map.getInt(PARAMETER_NUMBER, true, FACTORY_KEY);
+			_n = map.get<int>(PARAMETER_NUMBER);
 			if (_n < 0)
 				throw RequestException("Bad value for number");
 		}
@@ -107,6 +127,11 @@ namespace synthese
 		}
 
 
+		CityListRequest::CityListRequest():
+			_page(NULL)
+		{
+		}
+
 
 		bool CityListRequest::_isAuthorized(
 		) const {
@@ -115,7 +140,7 @@ namespace synthese
 
 		std::string CityListRequest::getOutputMimeType() const
 		{
-			return _page->getMimeType();
+			return _page ? _page->getMimeType() : "text/xml";
 		}
 	}
 }

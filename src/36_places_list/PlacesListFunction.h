@@ -48,9 +48,11 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_INPUT;
+			static const std::string PARAMETER_OLD_INPUT;
 			static const std::string PARAMETER_CITY_TEXT;
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_IS_FOR_ORIGIN;
+			static const std::string PARAMETER_PAGE;
 			
 		protected:
 			//! \name Page parameters
@@ -76,6 +78,8 @@ namespace synthese
 			/// @todo Getters/Setters for parsed parameters
 			
 		public:
+			PlacesListFunction();
+
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;
