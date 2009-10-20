@@ -119,7 +119,7 @@ namespace synthese
 
 			if (!placeName.empty())
 			{
-				City::PlacesMatcher::MatchResult places(city->getAllPlacesMatcher().findCombined(placeName, 1));
+				City::PlacesMatcher::MatchResult places(city->getAllPlacesMatcher().bestMatches(placeName, 1));
 				if (!places.empty())
 				{
 					place = places.front().value;
@@ -137,7 +137,7 @@ namespace synthese
 			bool t9
 		){
 			CityList result;
-			CitiesMatcher::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).findCombined(fuzzyName, nbMatches);
+			CitiesMatcher::MatchResult matches = (t9 ? _citiesT9Matcher : _citiesMatcher).bestMatches(fuzzyName, nbMatches);
 			BOOST_FOREACH(const CitiesMatcher::MatchResult::value_type& it, matches)
 			{
 				result.push_back(it.value);

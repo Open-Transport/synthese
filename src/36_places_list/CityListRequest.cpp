@@ -58,11 +58,8 @@ namespace synthese
 			PlacesList placesList;
 			
 			Site::CitiesMatcher::MatchResult matches(
-				_site->getCitiesMatcher().findCombined(_input, _n)
+				_site->getCitiesMatcher().bestMatches(_input, _n)
 			);
-			//for(LexicalMatcher<const City*>::MatchResult::iterator it(matches.begin());
-			//	it != matches.end();
-			//	++it
 			BOOST_FOREACH(LexicalMatcher<const City*>::MatchHit it, matches)
 			{
 				placesList.push_back(make_pair(it.value->getKey(), it.key.getSource()));

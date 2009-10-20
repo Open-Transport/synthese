@@ -41,8 +41,9 @@ namespace synthese
 			typedef double ComparisonScore;
 			
 		private:
-			std::string							_source;
-			std::vector<FrenchPhoneticString>	_words;
+			typedef std::vector<FrenchPhoneticString> _Words;
+			std::string		_source;
+			_Words			_words;
 			
 			static std::string	_ConvertAlias(const std::string& source);
 			
@@ -55,8 +56,12 @@ namespace synthese
 			
 			ComparisonScore compare(const FrenchSentence& s) const;
 			
-			int operator<(const FrenchSentence& s) const;
+			bool operator<(const FrenchSentence& s) const;
 			bool operator==(const FrenchSentence& s) const;
+
+			bool startsWith(const FrenchSentence& s) const;
+
+			size_t size() const;
 		};
 	}
 }

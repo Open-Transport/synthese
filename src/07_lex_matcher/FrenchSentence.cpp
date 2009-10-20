@@ -126,18 +126,24 @@ namespace synthese
 			typedef map<size_t, pair<size_t, ComparisonScore> > Relations;
 			
 			Relations othersToThis;
+			Relations thisToOthers;
 			
+			// Storage of scores by words
 			for(size_t i(0); i<_words.size(); ++i)
 			{
+				if(_words[i].getPhonetic().empty()) continue;
+
 				ComparisonScore bestScore(0);
 				
 				for(size_t j(0); j<s._words.size(); ++j)
 				{
+					if(s._words[j].getPhonetic().empty()) continue;
+
 					FrenchPhoneticString::LevenshteinDistance distance(
 						_words[i].levenshtein(s._words[j])
 					);
 					ComparisonScore score(
-						1 - distance / (s._words[j].getPhonetic().size() + _words[i].getPhonetic().size())
+						1 - static_cast<double>(distance) / static_cast<double>(distance > s._words[j].getPhonetic().size() ? distance : s._words[j].getPhonetic().size())
 					);
 					assert(score >= 0 && score <= 1);
 					if(score > bestScore)
@@ -146,22 +152,81 @@ namespace synthese
 							othersToThis[j].second < score
 						)
 							othersToThis[j] = make_pair(i, score);
+
 					}
 				}
 			}
-			
+
+
+			// Average score
 			ComparisonScore totalScores(0);
 			for(size_t j(0); j<s._words.size(); ++j)
 			{
-				if(othersToThis.find(j) != othersToThis.end())
-				{
+				if(	othersToThis.find(j) != othersToThis.end()
+				){
 					totalScores += othersToThis[j].second;
 				}
 			}
-			return totalScores / s._words.size();
+			totalScores /= s._words.size();
+
+			// Order
+			size_t lastIndex(othersToThis.size());
+			size_t penalties(0);
+			BOOST_FOREACH(Relations::value_type s, othersToThis)
+			{
+				if(s.first < lastIndex) ++penalties;
+				lastIndex = s.first;
+			}
+			if(penalties) totalScores /= penalties;
+
+			return totalScores;
 		}
-		
-		int FrenchSentence::operator<(const FrenchSentence& s) const
+
+		bool FrenchSentence::startsWith(const FrenchSentence& s) const
+		{
+			if(s.size() > size()) return false;
+
+			size_t iword(0);
+			size_t jword(0);
+			size_t ipos(0);
+			size_t jpos(0);
+
+			while(iword < _words.size() &&
+				jword < s._words.size() &&
+				ipos < _words[iword].getPhonetic().size() &&
+				jpos < s._words[jword].getPhonetic().size()
+			){
+				if(_words[iword].getPhonetic().at(ipos) != s._words[jword].getPhonetic().at(jpos)) return false;
+
+				++ipos;
+				++jpos;
+				if(ipos >= _words[iword].getPhonetic().size())
+				{
+					ipos = 0;
+					++iword;
+				}
+				if(jpos >= s._words[jword].getPhonetic().size())
+				{
+					jpos = 0;
+					++jword;
+				}
+			}
+			return true;
+		}
+
+
+
+		size_t FrenchSentence::size() const
+		{
+			size_t size(0);
+			BOOST_FOREACH(_Words::value_type word, _words)
+			{
+				size += word.getPhonetic().size();
+			}
+			return size;
+		}
+
+		bool FrenchSentence::operator<(const FrenchSentence& s) const
 		{
 			return _source < s._source;
 		}

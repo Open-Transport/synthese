@@ -102,6 +102,10 @@ namespace synthese
 			case ROUTE_PLANNING_WITH_TRANSFER:
 			case ROUTE_PLANNING_WITHOUT_TRANSFER:
 				_screen->setGenerationMethod(DisplayScreen::ROUTE_PLANNING);
+
+			case DEPARTURES_BY_PHYSICAL_STOP:
+			case ARRIVALS_BY_PHYSICAL_STOP:
+				_screen->setGenerationMethod(DisplayScreen::BY_PHYSICAL_STOP);
 				break;
 			}
 			switch (_function)
@@ -110,11 +114,13 @@ namespace synthese
 			case DEPARTURES_PRESELECTION:
 			case ROUTE_PLANNING_WITHOUT_TRANSFER:
 			case ROUTE_PLANNING_WITH_TRANSFER:
+			case DEPARTURES_BY_PHYSICAL_STOP:
 				_screen->setDirection(DISPLAY_DEPARTURES);
 				break;
 
 			case ARRIVAL_CHRONOLOGICAL:
 			case ARRIVAL_PRESELECTION:
+			case ARRIVALS_BY_PHYSICAL_STOP:
 				_screen->setDirection(DISPLAY_ARRIVALS);
 				break;
 			}
@@ -174,6 +180,8 @@ namespace synthese
 			directionMap.insert(make_pair(ARRIVAL_PRESELECTION, "Arrivées avec présélection"));
 			directionMap.insert(make_pair(ROUTE_PLANNING_WITH_TRANSFER, "Calcul d'itinéraire avec correspondance"));
 			directionMap.insert(make_pair(ROUTE_PLANNING_WITHOUT_TRANSFER, "Calcul d'itinéraire sans correspondance"));
+			directionMap.insert(make_pair(DEPARTURES_BY_PHYSICAL_STOP, "Départs par arrêt physique"));
+			directionMap.insert(make_pair(ARRIVALS_BY_PHYSICAL_STOP, "Arrivées par arrêt physique"));
 			return directionMap;
 		}
 

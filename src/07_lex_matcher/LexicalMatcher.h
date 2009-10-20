@@ -84,16 +84,6 @@ namespace synthese
 					size_t maxNbValues
 				) const;
 
-				MatchResult findBeginsBy(
-					const std::string& text,
-					size_t nbMatches
-				) const;
-				
-				MatchResult findCombined(
-					const std::string& text,
-					size_t nbMatches
-				) const;
-
 			
 			//! @name Update methods
 			//@{
@@ -165,8 +155,20 @@ namespace synthese
 			{
 				MatchHit hit;
 				hit.score = ppkey.compare(value.first);
+				if(hit.score == 1)
+				{
+					hit.score = 2;
+				}
+				else
+				{
+					if(value.first.startsWith(ppkey))
+					{
+						++hit.score;
+					}
+				}
 				if (hit.score >= minScore)
 				{
+					hit.score /= double(2);	// ensure that score value is between 0 and 1
 					hit.key = value.first;
 					hit.value = value.second;
 					result.push_back(hit);
@@ -185,76 +187,7 @@ namespace synthese
 
 
 		template<class T>
-		typename LexicalMatcher<T>::MatchResult LexicalMatcher<T>::findBeginsBy(
-			const std::string& text,
-			size_t nbMatches
-		) const {
-			const std::string lowerCaseText(boost::algorithm::to_lower_copy(text));
-			MatchResult r;
-			BOOST_FOREACH(typename Map::value_type v, _map)
-			{
-				if(	boost::algorithm::iequals(v.first, lowerCaseText)
-				){
-					MatchHit h;
-					h.value = v.second;
-					h.key = v.first;
-					r.push_back(h);
-					if(r.size() == nbMatches) break;
-				}
-			}
-			BOOST_FOREACH(typename Map::value_type v, _map)
-			{
-				if(	v.first.getSource() != lowerCaseText &&
-					boost::algorithm::istarts_with(v.first.getSource(), lowerCaseText)
-				){
-					MatchHit h;
-					h.value = v.second;
-					h.key = v.first;
-					r.push_back(h);
-					if(r.size() == nbMatches) break;
-				}
-			}
-			return r;
-		}
-		
-		
-		template<class T>
-		typename LexicalMatcher<T>::MatchResult LexicalMatcher<T>::findCombined(
-			const std::string& text,
-			size_t nbMatches
-		) const {
-			MatchResult r1(findBeginsBy(text, nbMatches));
-			if(r1.size() < nbMatches)
-			{
-				MatchResult r2(bestMatches(text, nbMatches));
-				BOOST_FOREACH(const MatchHit& h2, r2)
-				{
-					bool ok(true);
-					BOOST_FOREACH(const MatchHit& h1, r1)
-					{
-						if(	_ignoreCase ?
-							algorithm::to_lower_copy(h1.key) == algorithm::to_lower_copy(h2.key) :
-							h1.key == h2.key
-						){
-							ok = false;
-							break;
-						}
-					}
-					if(	ok
-					){
-						r1.push_back(h2);
-					}
-					if(r1.size() == nbMatches) break;
-				}
-			}
-			return r1;
-		}
-
-
-
-		template<class T>
-		void 
-		LexicalMatcher<T>::clear ()
+		void LexicalMatcher<T>::clear ()
 		{
 			_map.clear ();
 		}
@@ -262,8 +195,7 @@ namespace synthese
 
 
 		template<class T>
-		void 
-		LexicalMatcher<T>::add (const std::string& key, T ptr)
+		void LexicalMatcher<T>::add (const std::string& key, T ptr)
 		{
 			if (key.empty()) return;
 			_map.insert(std::make_pair(FrenchSentence(key), ptr));
@@ -272,8 +204,7 @@ namespace synthese
 
 
 		template<class T>
-		void 
-		LexicalMatcher<T>::remove (const std::string& key)
+		void LexicalMatcher<T>::remove (const std::string& key)
 		{
 			_map.erase(FrenchSentence(key));
 		}

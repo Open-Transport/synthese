@@ -85,7 +85,8 @@ namespace synthese
 			typedef enum {
 				STANDARD_METHOD = 0,
 				WITH_FORCED_DESTINATIONS_METHOD = 1,
-				ROUTE_PLANNING = 2
+				ROUTE_PLANNING = 2,
+				BY_PHYSICAL_STOP = 3
 			} GenerationMethod;
 
 

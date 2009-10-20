@@ -166,9 +166,12 @@ namespace synthese
 					stream << l.element("display");
 					stream << HTMLModule::getHTMLLink(removeRequest.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer"));
 					
-					stream << ds->getLocalization()->getFullName() << "/" << ds->getLocalization()->getName();
-					if (ds->getLocalizationComment() != "")
-						stream << "/" << ds->getLocalizationComment();
+					if(ds->getLocalization())
+					{
+						stream << ds->getLocalization()->getFullName() << "/" << ds->getLocalization()->getName();
+						if (ds->getLocalizationComment() != "")
+							stream << "/" << ds->getLocalizationComment();
+					}
 				}
 
 				stream << l.close();

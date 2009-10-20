@@ -51,7 +51,10 @@ namespace synthese
 				ARRIVAL_CHRONOLOGICAL,
 				ARRIVAL_PRESELECTION,
 				ROUTE_PLANNING_WITH_TRANSFER,
-				ROUTE_PLANNING_WITHOUT_TRANSFER
+				ROUTE_PLANNING_WITHOUT_TRANSFER,
+				DEPARTURES_BY_PHYSICAL_STOP,
+				ARRIVALS_BY_PHYSICAL_STOP
+
 			} DisplayFunction;
 
 			typedef std::map<DisplayFunction, std::string> DisplayFunctionNames;
