@@ -27,7 +27,7 @@
 
 #include "Function.h"
 #include "FactorableTemplate.h"
-#include "UId.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -41,6 +41,9 @@ namespace synthese
 		class DisplayType;
 
 		/** AlarmTestOnDisplayScreenFunction Function class.
+
+			Acts on a temporary environment.
+
 			@author Hugues Romain
 			@date 2008
 			@ingroup m54Functions refFunctions
@@ -69,11 +72,13 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 			
 		public:
+			AlarmTestOnDisplayScreenFunction();
+
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;
 
-			void setAlarmId(uid id);
+			void setAlarmId(util::RegistryKeyType id);
 
 			virtual bool _isAuthorized() const;
 

@@ -72,6 +72,12 @@ namespace synthese
 		const string AlarmTestOnDisplayScreenFunction::PARAMETER_DISPLAY_TYPE_ID("dt");
 		
 
+		AlarmTestOnDisplayScreenFunction::AlarmTestOnDisplayScreenFunction()
+			: util::FactorableTemplate<server::Function,AlarmTestOnDisplayScreenFunction>()
+		{
+			setEnv(shared_ptr<Env>(new Env));
+		}
+
 		ParametersMap AlarmTestOnDisplayScreenFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -179,7 +185,9 @@ namespace synthese
 			}
 		}
 
-		void AlarmTestOnDisplayScreenFunction::setAlarmId(uid id)
+
+
+		void AlarmTestOnDisplayScreenFunction::setAlarmId(RegistryKeyType id)
 		{
 			try
 			{
