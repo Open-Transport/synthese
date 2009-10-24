@@ -25,8 +25,8 @@
 #include "CentreonConfigExportFunction.h"
 
 #include "RequestException.h"
-#include "Request.h"
-
+#include "FunctionRequest.h"
+#include "UniqueStringsSet.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayType.h"
@@ -40,8 +40,10 @@
 #include "Interface.h"
 #include "DisplayGetNagiosStatusFunction.h"
 #include "Env.h"
-
+#include "PlainCharFilter.h"
+#include "AlphanumericFilter.h"
 #include "MD5Wrapper.h"
+#include "DisplayScreenContentFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -55,20 +57,24 @@ namespace synthese
 	using namespace interfaces;
 	using namespace db;
 	using namespace security;
+	using namespace departurestable;
 
 	template<> const string util::FactorableTemplate<Function,departurestable::CentreonConfigExportFunction>::FACTORY_KEY("CentreonConfigExportFunction");
 
 	namespace departurestable
 	{
+		const string CentreonConfigExportFunction::PARAMETER_ACTION("ac");
 
 		ParametersMap CentreonConfigExportFunction::_getParametersMap() const
 		{
 			ParametersMap map;
+			map.insert(PARAMETER_ACTION, static_cast<int>(_action));
 			return map;
 		}
 
 		void CentreonConfigExportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			_action = static_cast<Action>(map.get<int>(PARAMETER_ACTION));
 		}
 
 		void CentreonConfigExportFunction::_run(
@@ -87,296 +93,331 @@ namespace synthese
 			const string HARDWARE_SERVICE_NAME("'Harware test'");
 			const string SYNTHESE_PING_SERVICE_ID("5001");
 			const string SYNTHESE_PING_SERVICE_NAME("'Ping'");
+			const string DUMMY_CONTACT_ID("9999999");
 			const size_t MAX_PROFILES(99999);
 
-			// Deletion of existing objects
-			stream <<
-				"BEGIN;" << endl <<
-				"DELETE FROM host;" << endl <<
-				"DELETE FROM hostgroup;" << endl <<
-				"DELETE FROM hostgroup_relation;" << endl <<
-				"DELETE FROM service;" << endl <<
-				"DELETE FROM host_service_relation;" << endl <<
-				"DELETE FROM contactgroup_service_relation;" << endl
-			;
+			stream << "BEGIN;" << endl;
 
-			// Insertion of the SYNTHESE command
-			stream <<
-				"REPLACE INTO command(command_id,command_name,command_line,command_type) VALUES(" <<
-				CHECK_SYNTHESE_COMMAND_ID << "," << CHECK_SYNTHESE_COMMAND_NAME <<
-				",'$USER1$#S#check_synthese.sh  \"http://" <<
-				_request->getHostName() << _request->getClientURL() <<
-				Request::PARAMETER_STARTER << Request::PARAMETER_FUNCTION <<
-				Request::PARAMETER_ASSIGNMENT << DisplayGetNagiosStatusFunction::FACTORY_KEY <<
-				Request::PARAMETER_SEPARATOR << DisplayGetNagiosStatusFunction::PARAMETER_DISPLAY_SCREEN_ID <<
-				Request::PARAMETER_ASSIGNMENT << "$HOSTADDRESS$\"',2);" << endl;
-
-
-
-			// Services
-			stream <<
-				"REPLACE INTO service(" <<
-				"service_id,command_command_id,timeperiod_tp_id,timeperiod_tp_id2," << //4
-				"service_description,service_is_volatile,service_max_check_attempts,service_normal_check_interval," << //4
-				"service_retry_check_interval,service_active_checks_enabled,service_passive_checks_enabled," << //3
-				"service_parallelize_check,service_obsess_over_service,service_check_freshness," << //3
-				"service_event_handler_enabled,service_flap_detection_enabled,service_process_perf_data," << //3
-				"service_retain_status_information,service_retain_nonstatus_information,service_notification_interval," << //3
-				"service_notification_options,service_notifications_enabled,service_comment," << //3
-				"service_register,service_activate" << //2
-				") VALUES (" <<
-				HARDWARE_SERVICE_ID << "," << CHECK_SYNTHESE_COMMAND_ID << ",1,1," << //4
-				HARDWARE_SERVICE_NAME << ",'2',5000,1," << //4
-				"1,'2','2'," << //3
-				"'2','2','2'," << //3
-				"'2','2','1'," << //3
-				"'1','2',720," << //3
-				"'w,u,c,r,f','2'," << GENERATED_BY_SYNTHESE << "," << //3
-				"'1','1'" << //2
-			");" << endl <<
-
-			"REPLACE INTO extended_service_information(esi_id,service_service_id) VALUES(" <<
-				HARDWARE_SERVICE_ID << "," << HARDWARE_SERVICE_ID <<
-			");" << endl <<
-
-			"REPLACE INTO service(" <<
-				"service_id,command_command_id,timeperiod_tp_id,timeperiod_tp_id2," <<
-				"service_description,service_is_volatile,service_max_check_attempts,service_normal_check_interval," <<
-				"service_retry_check_interval,service_active_checks_enabled,service_passive_checks_enabled," <<
-				"service_parallelize_check,service_obsess_over_service,service_check_freshness," <<
-				"service_event_handler_enabled,service_flap_detection_enabled,service_process_perf_data," <<
-				"service_retain_status_information,service_retain_nonstatus_information,service_notification_interval," <<
-				"service_notification_options,service_notifications_enabled,service_comment," <<
-				"command_command_id_arg,service_register,service_activate" <<
-				") VALUES (" <<
-				SYNTHESE_PING_SERVICE_ID << ",(SELECT command_id FROM command WHERE command_name='check_centreon_ping'),1,1," <<
-				SYNTHESE_PING_SERVICE_NAME << ",'2',5000,1," <<
-				"1,'2','2'," <<
-				"'2','2','2'," <<
-				"'2','2','1'," <<
-				"'1','2',15," <<
-				"'w,u,c,r,f','2'," << GENERATED_BY_SYNTHESE << "," <<
-				"'!3!200,20%!400,50%','1','1'" <<
-			");" << endl <<
-
-			"REPLACE INTO extended_service_information(esi_id,service_service_id) VALUES(" <<
-				SYNTHESE_PING_SERVICE_ID << "," << SYNTHESE_PING_SERVICE_ID <<
-			");" << endl
-			;
-
-
-			// Insertion of profiles
-			ProfileTableSync::SearchResult profiles(
-				ProfileTableSync::Search(env)
-			);
-			BOOST_FOREACH(shared_ptr<const Profile> profile, profiles)
+			if(_action == CLEAN)
 			{
-				if(!profile->isAuthorized<DisplayMaintenanceRight>()) continue;
-
+				// Deletion of existing objects
 				stream <<
-					"REPLACE INTO contactgroup(cg_id,cg_name,cg_alias,cg_comment,cg_activate) VALUES(" <<
-						decodeObjectId(profile->getKey()) << "," <<
-						Conversion::ToSQLiteString(profile->getName()) << "," <<
-						Conversion::ToSQLiteString(profile->getName()) << "," <<
-						GENERATED_BY_SYNTHESE << "," <<
-						"'1'"
-					");" << endl <<
-
-					"REPLACE INTO contactgroup_service_relation(cgsr_id,contactgroup_cg_id,service_service_id) VALUES(" <<
-						decodeObjectId(profile->getKey()) << "," <<
-						decodeObjectId(profile->getKey()) << "," <<
-						SYNTHESE_PING_SERVICE_ID <<
-					");" << endl <<
-
-					"REPLACE INTO contactgroup_service_relation(cgsr_id,contactgroup_cg_id,service_service_id) VALUES(" <<
-						(decodeObjectId(profile->getKey()) + MAX_PROFILES) << "," <<
-						decodeObjectId(profile->getKey()) << "," <<
-						HARDWARE_SERVICE_ID <<
-					");" << endl
+					"DELETE FROM contact WHERE contact_comment=" << GENERATED_BY_SYNTHESE << ";" << endl <<
+					"DELETE FROM contactgroup WHERE cg_comment=" << GENERATED_BY_SYNTHESE << ";" << endl <<
+					"DELETE FROM command WHERE command_id=" << CHECK_SYNTHESE_COMMAND_ID << ";" << endl <<
+					"DELETE FROM host WHERE host_comment=" << GENERATED_BY_SYNTHESE << ";" << endl <<
+					"DELETE FROM hostgroup WHERE hg_comment=" << GENERATED_BY_SYNTHESE << ";" << endl <<
+					"DELETE FROM service WHERE service_comment=" << GENERATED_BY_SYNTHESE << ";" << endl
 				;
 			}
-
-			// Insertion of the users
-			MD5Wrapper md5;
-			UserTableSync::SearchResult users(
-				UserTableSync::Search(env)
-			);
-			BOOST_FOREACH(shared_ptr<const User> user, users)
+			else if(_action == GENERATE)
 			{
-				if(user->getLogin() == SecurityModule::ROOT_USER) continue;
-				if(!user->getProfile()->isAuthorized<DisplayMaintenanceRight>()) continue;
 
+				// Insertion of the SYNTHESE command
 				stream <<
-					"REPLACE INTO contact(contact_id,timeperiod_tp_id,timeperiod_tp_id2," <<
-					"contact_name,contact_alias,contact_passwd," <<
-					"contact_lang,contact_host_notification_options,contact_service_notification_options," <<
-					"contact_email,contact_comment,contact_oreon,contact_admin," <<
-					"contact_type_msg,contact_activate,contact_auth_type" <<
-					") VALUES (" <<
-					decodeObjectId(user->getKey()) << ",1,1," << 
-					Conversion::ToSQLiteString(user->getFullName()) << "," << Conversion::ToSQLiteString(user->getLogin()) << "," << Conversion::ToSQLiteString(md5.getHashFromString(user->getPassword())) << "," <<
-					"'fr_FR','n','n'," <<
-					Conversion::ToSQLiteString(user->getEMail()) << "," << GENERATED_BY_SYNTHESE << ",'1','0'," << 
-					"'txt','1','local'" <<
-					");" << endl
-				;
+					"INSERT INTO command(command_id,command_name,command_line,command_type) VALUES(" <<
+					CHECK_SYNTHESE_COMMAND_ID << "," << CHECK_SYNTHESE_COMMAND_NAME <<
+					",'$USER1$#S#check_synthese.sh  \"http://" <<
+					_request->getHostName() << _request->getClientURL() <<
+					Request::PARAMETER_STARTER << Request::PARAMETER_FUNCTION <<
+					Request::PARAMETER_ASSIGNMENT << DisplayGetNagiosStatusFunction::FACTORY_KEY <<
+					Request::PARAMETER_SEPARATOR << DisplayGetNagiosStatusFunction::PARAMETER_DISPLAY_SCREEN_ID <<
+					Request::PARAMETER_ASSIGNMENT << "$HOSTADDRESS$\"',2);" << endl;
 
+
+
+				// Services
 				stream <<
-					"REPLACE INTO contact_servicecommands_relation(" <<
-						"csc_id,contact_contact_id,command_command_id" <<
+					"INSERT INTO service(" <<
+						"service_id,command_command_id,timeperiod_tp_id,timeperiod_tp_id2," << //4
+						"service_description,service_is_volatile,service_max_check_attempts,service_normal_check_interval," << //4
+						"service_retry_check_interval,service_active_checks_enabled,service_passive_checks_enabled," << //3
+						"service_parallelize_check,service_obsess_over_service,service_check_freshness," << //3
+						"service_event_handler_enabled,service_flap_detection_enabled,service_process_perf_data," << //3
+						"service_retain_status_information,service_retain_nonstatus_information,service_notification_interval," << //3
+						"service_notification_options,service_notifications_enabled,service_comment," << //3
+						"service_register,service_activate" << //2
 					") VALUES (" <<
-						decodeObjectId(user->getKey()) << "," << decodeObjectId(user->getKey()) << "," <<
-						"(SELECT command_id FROM command WHERE command_name='notify-by-email')" <<
+						HARDWARE_SERVICE_ID << "," << CHECK_SYNTHESE_COMMAND_ID << ",1,1," << //4
+						HARDWARE_SERVICE_NAME << ",'2',5000,1," << //4
+						"1,'2','2'," << //3
+						"'2','2','2'," << //3
+						"'2','2','1'," << //3
+						"'1','2',720," << //3
+						"'w,u,c,r,f','2'," << GENERATED_BY_SYNTHESE << "," << //3
+						"'1','1'" << //2
 					");" << endl <<
 
-					"REPLACE INTO contact_hostcommands_relation(" <<
-						"chr_id,contact_contact_id,command_command_id" <<
-					") VALUES (" <<
-						decodeObjectId(user->getKey()) << "," << decodeObjectId(user->getKey()) << "," <<
-						"(SELECT command_id FROM command WHERE command_name='notify-by-email')" <<
-					");" << endl <<
+				"INSERT INTO extended_service_information(esi_id,service_service_id) VALUES(" <<
+					HARDWARE_SERVICE_ID << "," << HARDWARE_SERVICE_ID <<
+				");" << endl <<
 
-					"REPLACE INTO contactgroup_contact_relation(" <<
-						"cgr_id,contact_contact_id,contactgroup_cg_id" <<
+				"INSERT INTO service(" <<
+					"service_id,command_command_id,timeperiod_tp_id,timeperiod_tp_id2," <<
+					"service_description,service_is_volatile,service_max_check_attempts,service_normal_check_interval," <<
+					"service_retry_check_interval,service_active_checks_enabled,service_passive_checks_enabled," <<
+					"service_parallelize_check,service_obsess_over_service,service_check_freshness," <<
+					"service_event_handler_enabled,service_flap_detection_enabled,service_process_perf_data," <<
+					"service_retain_status_information,service_retain_nonstatus_information,service_notification_interval," <<
+					"service_notification_options,service_notifications_enabled,service_comment," <<
+					"command_command_id_arg,service_register,service_activate" <<
 					") VALUES (" <<
-						decodeObjectId(user->getKey()) << "," <<
-						decodeObjectId(user->getKey()) << "," <<
-						decodeObjectId(user->getProfile()->getKey()) <<
-					");" << endl
+					SYNTHESE_PING_SERVICE_ID << ",(SELECT command_id FROM command WHERE command_name='check_centreon_ping'),1,1," <<
+					SYNTHESE_PING_SERVICE_NAME << ",'2',5000,1," <<
+					"1,'2','2'," <<
+					"'2','2','2'," <<
+					"'2','2','1'," <<
+					"'1','2',15," <<
+					"'w,u,c,r,f','2'," << GENERATED_BY_SYNTHESE << "," <<
+					"'!3!200,20%!400,50%','1','1'" <<
+				");" << endl <<
+
+				"INSERT INTO extended_service_information(esi_id,service_service_id) VALUES(" <<
+					SYNTHESE_PING_SERVICE_ID << "," << SYNTHESE_PING_SERVICE_ID <<
+				");" << endl
 				;
-			}
 
 
-			// Insertion of the hostgroups
-			DisplayTypeTableSync::SearchResult types(
-				DisplayTypeTableSync::Search(env)
-			);
-			BOOST_FOREACH(shared_ptr<const DisplayType> type, types)
-			{
+				// Insertion of profiles
+				ProfileTableSync::SearchResult profiles(
+					ProfileTableSync::Search(env)
+				);
+				BOOST_FOREACH(shared_ptr<const Profile> profile, profiles)
+				{
+					if(!profile->isAuthorized<DisplayMaintenanceRight>()) continue;
+
+					stream <<
+						"INSERT INTO contactgroup(cg_id,cg_name,cg_alias,cg_comment,cg_activate) VALUES(" <<
+							decodeObjectId(profile->getKey()) << "," <<
+							Conversion::ToSQLiteString(_ConvertToNagiosName(profile->getName())) << "," <<
+							Conversion::ToSQLiteString(_ConvertToNagiosName(profile->getName())) << "," <<
+							GENERATED_BY_SYNTHESE << "," <<
+							"'1'"
+						");" << endl <<
+
+						"INSERT INTO contactgroup_service_relation(cgsr_id,contactgroup_cg_id,service_service_id) VALUES(" <<
+							decodeObjectId(profile->getKey()) << "," <<
+							decodeObjectId(profile->getKey()) << "," <<
+							SYNTHESE_PING_SERVICE_ID <<
+						");" << endl <<
+
+						"INSERT INTO contactgroup_service_relation(cgsr_id,contactgroup_cg_id,service_service_id) VALUES(" <<
+							(decodeObjectId(profile->getKey()) + MAX_PROFILES) << "," <<
+							decodeObjectId(profile->getKey()) << "," <<
+							HARDWARE_SERVICE_ID <<
+						");" << endl
+					;
+				}
+
+				// Insertion of the users
+				MD5Wrapper md5;
+				UserTableSync::SearchResult users(
+					UserTableSync::Search(env)
+				);
+				BOOST_FOREACH(shared_ptr<const User> user, users)
+				{
+					if(user->getLogin() == SecurityModule::ROOT_USER) continue;
+					if(!user->getProfile()->isAuthorized<DisplayMaintenanceRight>()) continue;
+
+					stream <<
+						"INSERT INTO contact(contact_id,timeperiod_tp_id,timeperiod_tp_id2," <<
+							"contact_name,contact_alias,contact_passwd," <<
+							"contact_lang,contact_host_notification_options,contact_service_notification_options," <<
+							"contact_email,contact_comment,contact_oreon,contact_admin," <<
+							"contact_type_msg,contact_activate,contact_auth_type" <<
+						") VALUES (" <<
+							decodeObjectId(user->getKey()) << ",1,1," << 
+							Conversion::ToSQLiteString(_ConvertToNagiosName(user->getFullName())) << "," <<
+							Conversion::ToSQLiteString(user->getLogin()) << "," << 
+							Conversion::ToSQLiteString(md5.getHashFromString(user->getPassword())) << "," <<
+							"'fr_FR','n','n'," <<
+							Conversion::ToSQLiteString(user->getEMail()) << "," << GENERATED_BY_SYNTHESE << ",'1','0'," << 
+							"'txt','1','local'" <<
+						");" << endl
+					;
+
+					stream <<
+						"INSERT INTO contact_servicecommands_relation(" <<
+							"csc_id,contact_contact_id,command_command_id" <<
+						") VALUES (" <<
+							decodeObjectId(user->getKey()) << "," << decodeObjectId(user->getKey()) << "," <<
+							"(SELECT command_id FROM command WHERE command_name='service-notify-by-email')" <<
+						");" << endl <<
+
+						"INSERT INTO contact_hostcommands_relation(" <<
+							"chr_id,contact_contact_id,command_command_id" <<
+						") VALUES (" <<
+							decodeObjectId(user->getKey()) << "," << decodeObjectId(user->getKey()) << "," <<
+							"(SELECT command_id FROM command WHERE command_name='host-notify-by-email')" <<
+						");" << endl <<
+
+						"INSERT INTO contactgroup_contact_relation(" <<
+							"cgr_id,contact_contact_id,contactgroup_cg_id" <<
+						") VALUES (" <<
+							decodeObjectId(user->getKey()) << "," <<
+							decodeObjectId(user->getKey()) << "," <<
+							decodeObjectId(user->getProfile()->getKey()) <<
+						");" << endl
+					;
+				}
+
+
+				// Insertion of the hostgroups
+				DisplayTypeTableSync::SearchResult types(
+					DisplayTypeTableSync::Search(env)
+				);
+				UniqueStringsSet hostgroups;
+				BOOST_FOREACH(shared_ptr<const DisplayType> type, types)
+				{
+					const string& hostgroup(hostgroups.getUniqueString(_ConvertToNagiosName(type->getName())));
+					stream <<
+						"INSERT INTO hostgroup(hg_id,hg_name,hg_alias,hg_comment,hg_activate) VALUES(" <<
+							decodeObjectId(type->getKey()) << "," <<
+							Conversion::ToSQLiteString(hostgroup) << "," <<
+							Conversion::ToSQLiteString(hostgroup) << "," <<
+							GENERATED_BY_SYNTHESE << "," <<
+							"'1'" <<
+						");" << endl <<
+
+						"INSERT INTO host_service_relation(hsr_id,hostgroup_hg_id,service_service_id) VALUES (" <<
+							decodeObjectId(type->getKey()) << "," <<
+							decodeObjectId(type->getKey()) << "," <<
+							HARDWARE_SERVICE_ID <<
+						");" << endl
+					;				
+				}
 				stream <<
-					"REPLACE INTO hostgroup(hg_id,hg_name,hg_alias,hg_comment,hg_activate) VALUES(" <<
-					decodeObjectId(type->getKey()) << "," <<
-					Conversion::ToSQLiteString(type->getName()) << "," <<
-					Conversion::ToSQLiteString(type->getName()) << "," <<
+					"INSERT INTO hostgroup(hg_id,hg_name,hg_alias,hg_comment,hg_activate) VALUES(" <<
+					SYNTHESE_SERVER_CLASS << "," <<
+					SYNTHESE_SERVER_NAME << "," <<
+					SYNTHESE_SERVER_NAME << "," <<
 					GENERATED_BY_SYNTHESE << "," <<
 					"'1'" <<
-					");" << endl <<
+				");" << endl <<
 
-					"REPLACE INTO host_service_relation(hsr_id,hostgroup_hg_id,service_service_id) VALUES (" <<
-					decodeObjectId(type->getKey()) << "," <<
-					decodeObjectId(type->getKey()) << "," <<
-					HARDWARE_SERVICE_ID <<
-					");" << endl
-				;				
-			}
-			stream <<
-				"INSERT INTO hostgroup(hg_id,hg_name,hg_alias) VALUES(" <<
-				SYNTHESE_SERVER_CLASS << "," <<
-				SYNTHESE_SERVER_NAME << "," <<
-				SYNTHESE_SERVER_NAME <<
-			");" << endl <<
-
-			"REPLACE INTO host_service_relation(hsr_id,hostgroup_hg_id,service_service_id) VALUES (" <<
-				SYNTHESE_SERVER_CLASS << "," <<
-				SYNTHESE_SERVER_CLASS << "," <<
-				SYNTHESE_PING_SERVICE_ID <<
-			");" << endl
-			;
+				"INSERT INTO host_service_relation(hsr_id,hostgroup_hg_id,service_service_id) VALUES (" <<
+					SYNTHESE_SERVER_CLASS << "," <<
+					SYNTHESE_SERVER_CLASS << "," <<
+					SYNTHESE_PING_SERVICE_ID <<
+				");" << endl
+				;
 
 
-			// Insertion of the hosts
-			DisplayScreenTableSync::SearchResult screens(
-				DisplayScreenTableSync::Search(env)
-			);
-			BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, screens)
-			{
-				if(!screen->isMonitored()) continue;
+				// Insertion of the hosts
+				FunctionRequest<DisplayScreenContentFunction> displayRequest(NULL);
+				
+				DisplayScreenTableSync::SearchResult screens(
+					DisplayScreenTableSync::Search(env)
+				);
+				UniqueStringsSet hosts;
+				BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, screens)
+				{
+					if(!screen->isMonitored()) continue;
+
+					displayRequest.getFunction()->setScreen(screen);
+					const string& host(hosts.getUniqueString(_ConvertToNagiosName(screen->getFullName())));
+
+					stream <<
+						"INSERT INTO host(host_id,command_command_id," <<
+							"command_command_id_arg1,"
+							"timeperiod_tp_id,timeperiod_tp_id2," <<
+							"host_name,host_alias," <<
+							"host_address,host_max_check_attempts," <<
+							"host_check_interval,host_active_checks_enabled," <<
+							"host_passive_checks_enabled,host_checks_enabled," <<
+							"host_obsess_over_host,host_check_freshness," <<
+							"host_event_handler_enabled,host_flap_detection_enabled," <<
+							"host_process_perf_data,host_retain_status_information," <<
+							"host_retain_nonstatus_information,host_notification_interval," <<
+							"host_notification_options,host_notifications_enabled," <<
+							"host_snmp_version,host_comment,host_register,host_activate" <<
+						") VALUES(" <<
+							decodeObjectId(screen->getKey()) << ",(SELECT command_id FROM command WHERE command_name='check_centreon_dummy')," <<
+							"'!0!N/A'," <<
+							"1,1," <<
+							Conversion::ToSQLiteString(host) << "," << 
+							Conversion::ToSQLiteString(host) << "," <<
+							screen->getKey() << ",1000," <<
+							"'1','2'," <<
+							"'2','2'," <<
+							"'2','2'," <<
+							"'2','2'," <<
+							"'2','2'," <<
+							"'2',720," <<
+							"'d,u,r,f','2'," <<
+							"'0'," << GENERATED_BY_SYNTHESE << ",'1','1'" <<
+						");" << endl <<
+						
+						"INSERT INTO extended_host_information(" <<
+							"ehi_id,host_host_id,ehi_notes_url" <<
+						") VALUES (" <<
+							decodeObjectId(screen->getKey()) << "," << 
+							decodeObjectId(screen->getKey()) << "," <<
+							"'" << displayRequest.getURL() << "'"
+						");" << endl <<
+						
+						"INSERT INTO hostgroup_relation(hgr_id,hostgroup_hg_id,host_host_id) VALUES(" <<
+							decodeObjectId(screen->getKey()) << "," <<
+							decodeObjectId(screen->getType()->getKey()) << "," <<
+							decodeObjectId(screen->getKey()) <<
+						");" << endl <<
+
+						"INSERT INTO ns_host_relation(nagios_server_id,host_host_id) VALUES(" <<
+							"(SELECT id FROM nagios_server ORDER BY id LIMIT 1)," <<
+							decodeObjectId(screen->getKey()) <<
+						");" << endl
+					;
+				}
+
 
 				stream <<
-					"INSERT INTO host(host_id,command_command_id," <<
-					"command_command_id_arg1,"
-					"timeperiod_tp_id,timeperiod_tp_id2," <<
-					"host_name,host_alias," <<
-					"host_address,host_max_check_attempts," <<
-					"host_check_interval,host_active_checks_enabled," <<
-					"host_passive_checks_enabled,host_checks_enabled," <<
-					"host_obsess_over_host,host_check_freshness," <<
-					"host_event_handler_enabled,host_flap_detection_enabled," <<
-					"host_process_perf_data,host_retain_status_information," <<
-					"host_retain_nonstatus_information,host_notification_interval," <<
-					"host_notification_options,host_notifications_enabled," <<
-					"host_snmp_version,host_comment,host_register,host_activate" <<
+					"INSERT INTO host(host_id,command_command_id," << 
+						"timeperiod_tp_id,timeperiod_tp_id2," <<
+						"host_name,host_alias," <<
+						"host_address,host_max_check_attempts," <<
+						"host_check_interval,host_active_checks_enabled," <<
+						"host_passive_checks_enabled,host_checks_enabled," <<
+						"host_obsess_over_host,host_check_freshness," <<
+						"host_event_handler_enabled,host_flap_detection_enabled," <<
+						"host_process_perf_data,host_retain_status_information," <<
+						"host_retain_nonstatus_information,host_notification_interval," <<
+						"host_notification_options,host_notifications_enabled," <<
+						"host_snmp_version,host_comment,host_register,host_activate" <<
 					") VALUES(" <<
-					decodeObjectId(screen->getKey()) << ",(SELECT command_id FROM command WHERE command_name='check_centreon_dummy')," <<
-					"'!0!N/A'," <<
-					"1,1," <<
-					Conversion::ToSQLiteString(screen->getFullName()) << "," << Conversion::ToSQLiteString(screen->getFullName()) << "," <<
-					screen->getKey() << ",1000," <<
-					"'1','2'," <<
-					"'2','2'," <<
-					"'2','2'," <<
-					"'2','2'," <<
-					"'2','2'," <<
-					"'2',720," <<
-					"'d,u,r,f','2'," <<
-					"'0'," << GENERATED_BY_SYNTHESE << ",'1','1'" <<
+						SYNTHESE_SERVER_ID << ",(SELECT command_id FROM command WHERE command_name='check_host_alive')," <<
+						"1,1," <<
+						SYNTHESE_SERVER_NAME << "," << SYNTHESE_SERVER_NAME << "," <<
+						Conversion::ToSQLiteString(_request->getHostName()) << ",1000," <<
+						"'1','2'," <<
+						"'2','2'," <<
+						"'2','2'," <<
+						"'2','2'," <<
+						"'2','2'," <<
+						"'2',720," <<
+						"'d,u,r,f','2'," <<
+						"'0'," << GENERATED_BY_SYNTHESE << ",'1','1'" <<
 					");" << endl <<
-					
+
 					"INSERT INTO extended_host_information(" <<
-					"ehi_id,host_host_id" <<
-					") VALUES (" <<
-					decodeObjectId(screen->getKey()) << "," << decodeObjectId(screen->getKey()) <<
+						"ehi_id,host_host_id" <<
+						") VALUES (" <<
+						SYNTHESE_SERVER_ID << "," << SYNTHESE_SERVER_ID <<
 					");" << endl <<
-					
+
 					"INSERT INTO hostgroup_relation(hgr_id,hostgroup_hg_id,host_host_id) VALUES(" <<
-					decodeObjectId(screen->getKey()) << "," <<
-					decodeObjectId(screen->getType()->getKey()) << "," <<
-					decodeObjectId(screen->getKey()) <<
-					");" << endl
+						SYNTHESE_SERVER_ID << "," <<
+						SYNTHESE_SERVER_CLASS << "," <<
+						SYNTHESE_SERVER_ID  <<
+					");" << endl <<
+
+					"INSERT INTO ns_host_relation(nagios_server_id,host_host_id)" <<
+					 " SELECT (SELECT id FROM nagios_server ORDER BY id LIMIT 1), host_id FROM host" <<
+					 " WHERE host_comment=" << GENERATED_BY_SYNTHESE << ";" << endl <<
+
+					 // Temporary
+					 "INSERT INTO contact_host_relation(chr_id,host_host_id,contact_id) SELECT host_id,host_id,18 FROM host;" << endl
 				;
 			}
-
-
-			stream <<
-				"INSERT INTO host(host_id,command_command_id," << 
-				"timeperiod_tp_id,timeperiod_tp_id2," <<
-				"host_name,host_alias," <<
-				"host_address,host_max_check_attempts," <<
-				"host_check_interval,host_active_checks_enabled," <<
-				"host_passive_checks_enabled,host_checks_enabled," <<
-				"host_obsess_over_host,host_check_freshness," <<
-				"host_event_handler_enabled,host_flap_detection_enabled," <<
-				"host_process_perf_data,host_retain_status_information," <<
-				"host_retain_nonstatus_information,host_notification_interval," <<
-				"host_notification_options,host_notifications_enabled," <<
-				"host_snmp_version,host_comment,host_register,host_activate" <<
-				") VALUES(" <<
-				SYNTHESE_SERVER_ID << ",(SELECT command_id FROM command WHERE command_name='check_host_alive')," <<
-				"1,1," <<
-				SYNTHESE_SERVER_NAME << "," << SYNTHESE_SERVER_NAME << "," <<
-				Conversion::ToSQLiteString(_request->getHostName()) << ",1000," <<
-				"'1','2'," <<
-				"'2','2'," <<
-				"'2','2'," <<
-				"'2','2'," <<
-				"'2','2'," <<
-				"'2',720," <<
-				"'d,u,r,f','2'," <<
-				"'0'," << GENERATED_BY_SYNTHESE << ",'1','1'" <<
-				");" << endl <<
-
-				"INSERT INTO extended_host_information(" <<
-				"ehi_id,host_host_id" <<
-				") VALUES (" <<
-				SYNTHESE_SERVER_ID << "," << SYNTHESE_SERVER_ID <<
-				");" << endl <<
-
-				"INSERT INTO hostgroup_relation(hgr_id,hostgroup_hg_id,host_host_id) VALUES(" <<
-				SYNTHESE_SERVER_ID << "," <<
-				SYNTHESE_SERVER_CLASS << "," <<
-				SYNTHESE_SERVER_ID  <<
-				");" << endl
-			;
 
 			stream << "COMMIT;";
 		}
@@ -396,6 +437,19 @@ namespace synthese
 		std::string CentreonConfigExportFunction::getOutputMimeType() const
 		{
 			return "text/plain";
+		}
+
+
+
+		std::string CentreonConfigExportFunction::_ConvertToNagiosName( const std::string& text )
+		{
+			stringstream sout;
+			boost::iostreams::filtering_ostream out;
+			out.push(AlphanumericFilter());
+			out.push(PlainCharFilter());
+			out.push(sout);
+			out << text << flush;
+			return sout.str();
 		}
 	}
 }

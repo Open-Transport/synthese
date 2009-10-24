@@ -29,6 +29,7 @@
 #include "AccessParameters.h"
 #include "DateTime.h"
 #include "FactorableTemplate.h"
+#include "Site.h"
 
 #include <boost/optional.hpp>
 
@@ -70,8 +71,8 @@ namespace synthese
 			//! \name Parameters
 			//@{
 				const RoutePlannerInterfacePage*			_page;
-				const geography::Place*						_departure_place;
-				const geography::Place*						_arrival_place;
+				transportwebsite::Site::ExtendedFetchPlaceResult				_departure_place;
+				transportwebsite::Site::ExtendedFetchPlaceResult				_arrival_place;
 				std::string									_originCityText;
 				std::string									_destinationCityText;
 				std::string									_originPlaceText;

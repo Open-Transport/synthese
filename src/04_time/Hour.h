@@ -30,6 +30,7 @@
 #include <iostream>
 #include <string>
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace synthese
 {
@@ -118,6 +119,8 @@ namespace synthese
 			int operator- (const Hour& op2 ) const;
 
 			int getSecondsDifference(const Hour& op2) const;
+
+			boost::posix_time::time_duration toPosixTimeDuration() const;
 		};
 
 		std::ostream& operator<< ( std::ostream& os, const Hour& op );

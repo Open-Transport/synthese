@@ -31,6 +31,7 @@
 #include <string>
 
 #include <boost/optional.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace synthese
 {
@@ -203,6 +204,7 @@ namespace synthese
 				bool operator == (const Date& op2 ) const;
 				bool operator != (const Date& op2 ) const;
 
+				boost::gregorian::date toGregorianDate() const;
 		};
 
 		std::ostream& operator<< ( std::ostream& os, const Date& op );

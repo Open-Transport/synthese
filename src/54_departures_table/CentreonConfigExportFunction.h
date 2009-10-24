@@ -26,6 +26,9 @@
 #include "Function.h"
 #include "FactorableTemplate.h"
 
+#include <set>
+#include <string>
+
 namespace synthese
 {
 	namespace departurestable
@@ -34,16 +37,28 @@ namespace synthese
 		class DisplayType;
 
 		/** Centreon configuration export function class.
+
+			Parameters :
+				- ac=0|1 : action (0=clean the Centreon database, 1=export SYNTHESE configuration into Centreon database)
+
 			@ingroup m54Functions refFunctions
 		*/
 		class CentreonConfigExportFunction :
 			public util::FactorableTemplate<server::Function,CentreonConfigExportFunction>
 		{
-			
+			typedef enum
+			{
+				CLEAN = 0,
+				GENERATE = 1
+			} Action;
+
+
 			//! \name Page parameters
 			//@{
+				static const std::string PARAMETER_ACTION;
 			//@}
 
+			Action _action;
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -52,6 +67,20 @@ namespace synthese
 			/** Conversion from generic parameters map to attributes.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
+
+			
+			
+			/** Makes a name compatible with Nagios.
+				@param text name to convert
+				@return converted name
+				@author Hugues Romain
+				@date 2009
+
+				The Nagios compatible name mus respect the following rules :
+					- No accentuated characters
+					- Only alphanumeric characters
+			*/
+			static std::string _ConvertToNagiosName(const std::string& text);
 
 		public:
 			CentreonConfigExportFunction();

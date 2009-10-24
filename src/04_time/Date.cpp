@@ -569,5 +569,12 @@ namespace synthese
 
 			return weekDays[weekDay];
 		}
+
+
+
+		boost::gregorian::date Date::toGregorianDate() const
+		{
+			return gregorian::date(_year, _month, _day);
+		}
 	}
 }

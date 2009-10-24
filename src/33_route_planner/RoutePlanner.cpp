@@ -83,14 +83,16 @@ namespace synthese
 			util::Log::Level			logLevel
 		):	_accessParameters (accessParameters)
 			, _planningOrder (planningOrder)
-			, _journeySheetStartTime (journeySheetStartTime)
-			, _journeySheetEndTime (journeySheetEndTime)
 			, _maxSolutionsNumber(maxSolutionsNumber)
 			, _minDepartureTime(TIME_UNKNOWN)
 			, _maxArrivalTime(TIME_UNKNOWN)
 			, _previousContinuousServiceLastDeparture(TIME_UNKNOWN)
 			, _logStream(logStream)
-			, _logLevel(logLevel)
+			, _logLevel(logLevel),
+			_journeySheetEndArrivalTime(journeySheetEndTime),
+			_journeySheetEndDepartureTime(journeySheetEndTime),
+			_journeySheetStartArrivalTime(journeySheetStartTime),
+			_journeySheetStartDepartureTime(journeySheetStartTime)
 		{
 			origin->getVertexAccessMap(
 				_originVam
@@ -158,9 +160,9 @@ namespace synthese
 
 
 			// Create origin vam from integral search on roads
-			JourneysResult<JourneyComparator> originJourneys(_journeySheetStartTime);
+			JourneysResult<JourneyComparator> originJourneys(_journeySheetStartDepartureTime);
 			BestVertexReachesMap bvrmd(DEPARTURE_TO_ARRIVAL, _originVam); // was optim=true
-			DateTime dt3(_journeySheetEndTime);
+			DateTime dt3(_journeySheetEndArrivalTime);
 			DateTime dt4(TIME_UNKNOWN);
 			IntegralSearcher iso(
 				DEPARTURE_TO_ARRIVAL
@@ -170,7 +172,7 @@ namespace synthese
 				, originJourneys
 				, bvrmd
 				, _destinationVam,
-				_journeySheetStartTime
+				_journeySheetStartDepartureTime
 				, dt3
 				, posix_time::minutes(0)
 				, dt4
@@ -280,9 +282,9 @@ namespace synthese
 			}
 #endif
 			// Create destination vam from integral search on roads
-			JourneysResult<JourneyComparator> destinationJourneys(_journeySheetEndTime);
+			JourneysResult<JourneyComparator> destinationJourneys(_journeySheetEndArrivalTime);
 			BestVertexReachesMap bvrmo(DEPARTURE_TO_ARRIVAL, _destinationVam); // was optim=true
-			DateTime dt1(_journeySheetStartTime);
+			DateTime dt1(_journeySheetStartDepartureTime);
 			DateTime dt2(TIME_UNKNOWN);
 			IntegralSearcher isd(
 				ARRIVAL_TO_DEPARTURE
@@ -292,7 +294,7 @@ namespace synthese
 				, destinationJourneys
 				, bvrmo
 				, _originVam,
-				_journeySheetEndTime
+				_journeySheetEndArrivalTime
 				, dt1
 				, posix_time::minutes(0)
 				, dt2
@@ -392,8 +394,8 @@ namespace synthese
 
 			// Time loop
 			int solutionNumber(0);
-			for(_minDepartureTime = _journeySheetStartTime; 
-				(	_minDepartureTime <= _journeySheetEndTime &&
+			for(_minDepartureTime = _journeySheetStartDepartureTime; 
+				(	_minDepartureTime <= _journeySheetEndArrivalTime &&
 					(!_maxSolutionsNumber || *_maxSolutionsNumber > _result.journeys.size())
 				);
 			){
@@ -467,13 +469,13 @@ namespace synthese
 			, const VertexAccessMap& ovam
 			, const VertexAccessMap& dvam
 		){
-			_maxArrivalTime = _journeySheetEndTime;
+			_maxArrivalTime = _journeySheetEndArrivalTime;
 			_maxArrivalTime.addDaysDuration(7);	/// @todo Replace 7 by a parameter
 		    
 			// Look for best arrival
 			findBestJourney(DEPARTURE_TO_ARRIVAL, result, ovam, dvam, _minDepartureTime, false, false);
 		    
-			if (result.empty() || result.getDepartureTime() > _journeySheetEndTime)
+			if (result.empty() || result.getDepartureTime() > _journeySheetEndArrivalTime)
 			{
 				result.clear();
 				return;
@@ -489,7 +491,7 @@ namespace synthese
 			// Look for best departure
 			findBestJourney(ARRIVAL_TO_DEPARTURE, result, dvam, ovam, _maxArrivalTime, true, true);
 
-			if (result.getDepartureTime() > _journeySheetEndTime)
+			if (result.getDepartureTime() > _journeySheetEndArrivalTime)
 			{
 				result.clear();
 				return;
@@ -802,6 +804,64 @@ namespace synthese
 			}
 #endif
 		}
+
+
+
+		const time::DateTime& RoutePlanner::getJourneySheetStartDepartureTime() const
+		{
+			return _journeySheetStartDepartureTime;
+		}
+
+
+
+		void RoutePlanner::setJourneySheetStartDepartureTime( const time::DateTime& value )
+		{
+			_journeySheetStartDepartureTime = value;
+		}
+
+
+
+		const time::DateTime& RoutePlanner::getJourneySheetEndDepartureTime() const
+		{
+			return _journeySheetEndDepartureTime;
+		}
+
+
+
+		void RoutePlanner::setJourneySheetEndDepartureTime( const time::DateTime& value )
+		{
+			_journeySheetEndDepartureTime = value;
+		}
+
+
+
+		const time::DateTime& RoutePlanner::getJourneySheetStartArrivalTime() const
+		{
+			return _journeySheetStartArrivalTime;
+		}
+
+
+
+		void RoutePlanner::setJourneySheetStartArrivalTime( const time::DateTime& value )
+		{
+			_journeySheetStartArrivalTime = value;
+		}
+
+
+
+		const time::DateTime& RoutePlanner::getJourneySheetEndArrivalTime() const
+		{
+			return _journeySheetEndArrivalTime;
+		}
+
+
+
+		void RoutePlanner::setJourneySheetEndArrivalTime( const time::DateTime& value )
+		{
+			_journeySheetEndArrivalTime = value;
+		}
+
+
 
 		void RoutePlanner::Result::clear()
 		{

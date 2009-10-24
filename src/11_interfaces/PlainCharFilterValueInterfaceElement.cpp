@@ -34,7 +34,6 @@
 
 #include <sstream>
 
-#include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/operations.hpp>
 
 

@@ -30,6 +30,7 @@
 #include "Registry.h"
 #include "01_util/Constants.h"
 #include "GraphTypes.h"
+#include "City.h"
 
 #include <string>
 #include <set>
@@ -44,7 +45,6 @@ namespace synthese
 	namespace geography
 	{
 		class Place;
-		class City;
 	}
 	
 	namespace graph
@@ -226,6 +226,17 @@ namespace synthese
 					, const std::string& placeName
 				) const;
 
+
+				struct ExtendedFetchPlaceResult
+				{
+					CitiesMatcher::MatchResult::value_type cityResult;
+					lexmatcher::LexicalMatcher<const geography::Place*>::MatchResult::value_type placeResult;
+				};
+
+				ExtendedFetchPlaceResult extendedFetchPlace(
+					const std::string& cityName
+					, const std::string& placeName
+				) const;
 			//@}
 
 		};

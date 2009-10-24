@@ -34,6 +34,7 @@
 #include "ObjectNotFoundException.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -48,6 +49,7 @@ namespace synthese
 	using namespace transportwebsite;
 	using namespace db;
 	using namespace graph;
+	using namespace geography;
 
 	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
@@ -73,12 +75,10 @@ namespace synthese
 		void RoutePlannerFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			FunctionWithSite::_setFromParametersMap(map);
-			if(!_site->getInterface())
+			if(_site->getInterface())
 			{
-				throw RequestException("Site "+ lexical_cast<string>(_site->getKey()) + " is corrupted : it has no interface");
+				_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 			}
-
-			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 
 			// Origin and destination places
 			_favoriteId = map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID);
@@ -116,8 +116,8 @@ namespace synthese
 			}
 			if (!_home)
 			{
-				_departure_place = _site->fetchPlace(_originCityText, _originPlaceText);
-				_arrival_place = _site->fetchPlace(_destinationCityText, _destinationPlaceText);
+				_departure_place = _site->extendedFetchPlace(_originCityText, _originPlaceText);
+				_arrival_place = _site->extendedFetchPlace(_destinationCityText, _destinationPlaceText);
 			}
 
 			try
@@ -163,12 +163,12 @@ namespace synthese
 		void RoutePlannerFunction::_run( ostream& stream ) const
 		{
 			VariablesMap vm;
-			if (_departure_place && _arrival_place)
+			if (_departure_place.placeResult.value && _arrival_place.placeResult.value)
 			{
 				// Initialisation
 				RoutePlanner r(
-					_departure_place
-					, _arrival_place
+					_departure_place.placeResult.value
+					, _arrival_place.placeResult.value
 					, _accessParameters
 					, PlanningOrder()
 					, _startDate
@@ -182,26 +182,187 @@ namespace synthese
 				// Build of the result object
 				RoutePlannerResult result;
 				result.result = jv.journeys;
-				result.departurePlace = _departure_place;
-				result.arrivalPlace = _arrival_place;
+				result.departurePlace = _departure_place.placeResult.value;
+				result.arrivalPlace = _arrival_place.placeResult.value;
 				
 				// Display
-				_page->display(
-					stream
-					, vm
-					, result
-					, _startDate.getDate()
-					, _periodId
-					, _departure_place
-					, _arrival_place
-					, _period
-					, _accessParameters
-					, _request
-					, _site.get()
-					, jv.samePlaces
-				);
+				if(_page)
+				{
+					_page->display(
+						stream
+						, vm
+						, result
+						, _startDate.getDate()
+						, _periodId
+						, _departure_place.placeResult.value
+						, _arrival_place.placeResult.value
+						, _period
+						, _accessParameters
+						, _request
+						, _site.get()
+						, jv.samePlaces
+					);
+				}
+				else
+				{
+					stream <<
+						"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+						"<routePlannerResult xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/routeplanner_result.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" <<
+						"<query"
+					;
+					if(_maxSolutionsNumber)
+					{
+						stream << " maxSolutions=\"" << _maxSolutionsNumber << "\"";
+					}
+					stream << " userProfile=\"" << _accessParameters.getUserClass() << "\"";
+					if(_request->getSession())
+					{
+						stream << " sessionId=\"" << _request->getSession()->getKey() << "\"";
+					}
+					stream <<
+						" siteId=\"" << _site->getKey() << "\">" <<
+						"<timeBounds minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetEndDepartureTime().toPosixTime()) << "\"" <<
+						" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetStartArrivalTime().toPosixTime()) << "\"" <<
+						" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetEndArrivalTime().toPosixTime()) << "\"" <<
+						" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetStartDepartureTime().toPosixTime()) << "\" />"
+					;
+					if(_period)
+					{
+						stream <<
+							"<timePeriod id=\"" << _periodId << "\" date=\"" <<
+							to_iso_extended_string(_startDate.getDate().toGregorianDate()) << "\" name=\"" <<
+							_period->getCaption() << "\" />"
+						;
+					}
+					stream <<
+						"<places departureCity=\"" << _departure_place.cityResult.key.getSource() << "\" departureCityNameTrust=\"" << _departure_place.cityResult.score << "\"" <<
+						" arrivalCity=\"" << _arrival_place.cityResult.key.getSource() << "\" arrivalCityNameTrust=\"" << _arrival_place.cityResult.score << "\""
+					;
+					if(dynamic_cast<const Place*>(_departure_place.cityResult.value) != dynamic_cast<const Place*>(_departure_place.placeResult.value))
+					{
+						stream <<
+							" departureStop=\"" << _departure_place.placeResult.key.getSource() << "\" departureStopNameTrust=\"" << _departure_place.placeResult.score << "\""
+						;
+					}
+					if(dynamic_cast<const Place*>(_arrival_place.cityResult.value) != dynamic_cast<const Place*>(_arrival_place.placeResult.value))
+					{
+						stream <<
+							" arrivalStop=\"" << _arrival_place.placeResult.key.getSource() << "\" arrivalStopNameTrust=\"" << _arrival_place.placeResult.score << "\""
+						;
+					}
+					stream << " />";
+					if(_favoriteId)
+					{
+						stream <<
+							"<favorite id=\"" << *_favoriteId << "\" />"
+						;
+					}
+/*
+					<transportModeFilter id=\"2147483647\" name=\"Tous modes\"/>
+*/
+					stream <<
+						"</query>" <<
+						"<journeys>"
+					;
+					BOOST_FOREACH(const JourneyBoardJourneys::value_type& journey, jv.journeys)
+					{
+						bool hasALineAlert(false); // Interactive
+						bool hasAStopAlert(false); // Interactive
+
+						stream <<
+							"<journey hasALineAlert=\"" << (hasALineAlert ? "true" : "false") << "\" hasAStopAlert=\"" << (hasAStopAlert ? "true" : "false") << "\""
+						;
+						if(journey->getContinuousServiceRange() != UNKNOWN_VALUE)
+						{
+							stream << " continuousServiceDuration=\"" << journey->getContinuousServiceRange() << "\"";
+						}
+						stream << ">";
+
+						if(journey->getReservationCompliance() != false)
+						{
+							bool online(true); // Interactive
+							string openingHours; // Interactive
+							string phoneNumber; // Interactive
+
+							stream << "<reservation" <<
+								" online=\"" << (online ? "true" : "false") << "\"" <<
+								" type=\"" << (journey->getReservationCompliance() == true ? "compulsory" : "optional") << "\""
+							;
+							if(!openingHours.empty())
+							{
+								stream << " openingHours=\"" << openingHours << "\"";
+							}
+							if(!phoneNumber.empty())
+							{
+								stream << " phoneNumber=\"" << phoneNumber << "\"";
+							}
+							stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey->getReservationDeadLine().toPosixTime()) << "\" />";
+						}
+						stream << "<chunks>";
+/*
+						<transport departureTime=\"2001-12-17T09:30:47.0Z\" arrivalTime=\"2001-12-17T19:30:47.0Z\" length=\"800000\" startStopIsTerminus=\"true\" endStopIsTerminus=\"true\" >
+							<startStop latitude=\"0.0\" longitude=\"0.0\" id=\"1\" x=\"0\" y=\"0\" name=\"Quai 1\">
+								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"TOULOUSE\" x=\"0\" y=\"0\" name=\"Matabiau\">
+								</connectionPlace>
+							</startStop>
+							<endStop latitude=\"0.0\" longitude=\"0.0\" id=\"2\" x=\"0\" y=\"0\" name=\"Quai 26\">
+								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"2\" city=\"PARIS\" x=\"0\" y=\"0\" name=\"Montparnasse\">
+								</connectionPlace>
+							</endStop>
+							<line id=\"5675\" color=\"#CCCCCC\" cssClass=\"gris\" imgURL=\"tgv.png\" longName=\"le TGV Atlantique\" shortName=\"TGV\">
+							<alert id=\"9834\" level=\"interruption\" startValidity=\"2000-01-01T00:00:07.0Z\" endValidity=\"2099-12-31T23:59:00.0Z\">SNCF en grève</alert>
+							</line>
+							<vehicleType id=\"456\" name=\"TGV\" />
+						</transport>
+						<street length=\"600000\" city=\"BORDEAUX\" name=\"Autoroute A10\" departureTime=\"2001-12-17T17:30:47.0Z\" arrivalTime=\"2001-12-17T17:25:47.0Z\">
+							<startAddress>
+								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" x=\"0\" y=\"0\" city=\"BORDEAUX\"  name=\"Saint-Jean\"><alert id=\"1444\" startValidity=\"2001-12-10T09:30:47.0Z\" endValidity=\"2002-12-24T09:30:47.0Z\" level=\"info\">Travaux sur le parvis de la gare</alert>
+								</connectionPlace>
+							</startAddress>
+							<endAddress>
+								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"PARIS\" x=\"0\" y=\"0\" name=\"Montparnasse\">
+								</connectionPlace>
+							</endAddress>
+						</street>
+						<connection length=\"0\" departureTime=\"2001-12-17T21:00:47.0Z\" arrivalTime=\"2001-12-17T21:30:47.0Z\" endDepartureTime=\"2001-12-17T22:00:47.0Z\" endArrivalTime=\"2001-12-17T22:30:47.0Z\">
+							<startStop latitude=\"0.0\" longitude=\"0.0\" id=\"1\" x=\"0\" y=\"0\" name=\"Parvis\">
+								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"PARIS\" x=\"0\" y=\"0\" name=\"Austerlitz\">
+								</connectionPlace>
+							</startStop>
+							<endStop latitude=\"0.0\" longitude=\"0.0\" id=\"1\" x=\"0\" y=\"0\" name=\"Parvis\">
+								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"PARIS\" x=\"0\" y=\"0\" name=\"Montparnasse\">
+								</connectionPlace>
+							</endStop>
+						</connection>
+*/
+						stream << "</chunks>";
+					}
+					stream <<
+						"</journeys>" <<
+						"<resultTable>";
+
+//					BOOST_FOREACH()
+					{
+/*						<row type=\"departure\">
+							<cells>
+								<cell departureDateTime=\"2001-12-17T09:30:47.0Z\" />
+								<cell departureDateTime=\"2001-12-17T10:30:47.0Z\" />
+								<cell departureDateTime=\"2001-12-17T11:30:47.0Z\" endDepartureDateTime=\"2001-12-17T12:30:47.0Z\" />
+							</cells>
+							<place>
+								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"a\" x=\"0\" y=\"0\" name=\"a\">
+								</connectionPlace>
+							</place>
+						</row>
+*/
+					}
+					stream <<
+						"</resultTable>" <<
+						"</routePlannerResult>"
+					;
+				}
 			}
-			else
+			else if(_page)
 			{
 				_page->display(
 					stream
@@ -221,21 +382,25 @@ namespace synthese
 			}
 		}
 
+
+
 		RoutePlannerFunction::RoutePlannerFunction()
 			: _startDate(TIME_UNKNOWN)
 			, _endDate(TIME_UNKNOWN)
 			, _period(NULL)
-			, _departure_place(NULL)
-			, _arrival_place(NULL)
-			, _home(false)
-		{
-			
+			, _home(false),
+			_page(NULL)
+		{			
 		}
+
+
 
 		const optional<std::size_t>& RoutePlannerFunction::getMaxSolutions() const
 		{
 			return _maxSolutionsNumber;
 		}
+
+
 
 		void RoutePlannerFunction::setMaxSolutions(boost::optional<std::size_t> number)
 		{

@@ -30,10 +30,10 @@
 
 #include <boost/tokenizer.hpp>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "04_time/Schedule.h"
-#include "04_time/TimeParseException.h"
+#include "Schedule.h"
+#include "TimeParseException.h"
 
 using namespace boost;
 
@@ -377,6 +377,12 @@ namespace synthese
 			return result;
 		}
 
+
+
+		boost::posix_time::time_duration Hour::toPosixTimeDuration() const
+		{
+			return posix_time::time_duration(posix_time::hours(_hours) + posix_time::minutes(_minutes) + posix_time::seconds(_seconds));
+		}
 
 	}
 }

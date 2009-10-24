@@ -126,7 +126,7 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				uid id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
-				if (id != UNKNOWN_VALUE)
+				if (id > 0)
 				{
 					try
 					{

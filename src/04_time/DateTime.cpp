@@ -22,12 +22,11 @@
 
 #include "DateTime.h"
 
-#include "04_time/TimeParseException.h"
-#include "04_time/Schedule.h"
-
-#include "01_util/Conversion.h"
+#include "TimeParseException.h"
+#include "Schedule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -391,6 +390,13 @@ namespace synthese
 			// 2: Days since departure
 			result += ((_date - op2._date) - retain) * 86400;
 			return result;
+		}
+
+
+
+		boost::posix_time::ptime DateTime::toPosixTime() const
+		{
+			return posix_time::ptime(_date.toGregorianDate(), _hour.toPosixTimeDuration());
 		}
 	}
 }

@@ -101,8 +101,10 @@ namespace synthese
 				graph::VertexAccessMap		_originVam;
 				graph::VertexAccessMap		_destinationVam;
 				const graph::AccessParameters	_accessParameters;
-				const time::DateTime		_journeySheetStartTime;  //!< Start time of schedule sheet.
-				const time::DateTime		_journeySheetEndTime;    //!< End time of schedule sheet.
+				time::DateTime		_journeySheetStartDepartureTime;  //!< Start time of schedule sheet.
+				time::DateTime		_journeySheetEndDepartureTime;    //!< End time of schedule sheet.
+				time::DateTime		_journeySheetStartArrivalTime;  //!< Start time of schedule sheet.
+				time::DateTime		_journeySheetEndArrivalTime;    //!< End time of schedule sheet.
 				const PlanningOrder			_planningOrder;  //!< Define planning sequence.
 				const boost::optional<std::size_t>	_maxSolutionsNumber;
 			//@}
@@ -173,6 +175,16 @@ namespace synthese
 				 std::ostream* logStream = NULL,
 				 util::Log::Level logLevel = util::Log::LEVEL_NONE
 			);
+
+			const time::DateTime&		getJourneySheetStartDepartureTime() const;
+			const time::DateTime&		getJourneySheetEndDepartureTime() const;
+			const time::DateTime&		getJourneySheetStartArrivalTime() const;
+			const time::DateTime&		getJourneySheetEndArrivalTime() const;
+
+			void		setJourneySheetStartDepartureTime(const time::DateTime& value);
+			void		setJourneySheetEndDepartureTime(const time::DateTime& value);
+			void		setJourneySheetStartArrivalTime(const time::DateTime& value);
+			void		setJourneySheetEndArrivalTime(const time::DateTime& value);
 
 
 			//! @name Query methods

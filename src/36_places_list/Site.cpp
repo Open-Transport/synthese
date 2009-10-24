@@ -58,12 +58,13 @@ namespace synthese
 		const string Site::TEMPS_MIN_CIRCULATIONS ("r");
 		const string Site::TEMPS_MAX_CIRCULATIONS ("R");
 
-		Site::Site(RegistryKeyType id)
-			: Registrable(id)
-			, _startValidityDate(TIME_UNKNOWN)
-			, _endValidityDate(TIME_UNKNOWN)
-		{
-			
+		Site::Site(
+			RegistryKeyType id
+		):	Registrable(id),
+			_startValidityDate(TIME_UNKNOWN),
+			_endValidityDate(TIME_UNKNOWN),
+			_interface(NULL)
+		{		
 		}
 
 		const Interface* Site::getInterface() const
@@ -229,36 +230,6 @@ namespace synthese
 			_useDateRange = range;
 		}
 
-		const Place* Site::fetchPlace(
-			const string& cityName,
-			const string& placeName
-		) const {
-			const Place* place(NULL);
-
-			if (cityName.empty())
-				throw Exception("Empty city name");
-
-			CitiesMatcher::MatchResult cities(
-				_citiesMatcher.bestMatches(cityName,1)
-			);
-			if(cities.empty()) throw Exception("An error has occured in city name search");
-			const City* city(cities.front().value);
-			place = city;
-			assert(place != NULL);
-
-			if (!placeName.empty())
-			{
-				City::PlacesMatcher::MatchResult places(
-					city->getAllPlacesMatcher().bestMatches(placeName, 1)
-				);
-				if (!places.empty())
-				{
-					place = places.front().value;
-				}
-			}
-
-			return place;
-		}
 
 		const std::string& Site::getName() const
 		{
@@ -325,6 +296,51 @@ namespace synthese
 			
 			_citiesT9Matcher.add(ss.str(), city->getKey());
 */
+		}
+
+
+
+		const Place* Site::fetchPlace(
+			const string& cityName,
+			const string& placeName
+		) const {
+			return extendedFetchPlace(cityName, placeName).placeResult.value;
+		}
+
+
+
+		Site::ExtendedFetchPlaceResult Site::extendedFetchPlace( const std::string& cityName , const std::string& placeName ) const
+		{
+			ExtendedFetchPlaceResult result;
+
+			if (cityName.empty())
+				throw Exception("Empty city name");
+
+			CitiesMatcher::MatchResult cities(
+				_citiesMatcher.bestMatches(cityName,1)
+			);
+			if(cities.empty()) throw Exception("An error has occured in city name search");
+			result.cityResult = cities.front();
+			result.placeResult.key = result.cityResult.key;
+			result.placeResult.score = result.cityResult.score;
+			result.placeResult.value = result.cityResult.value;
+
+			assert(result.placeResult.value != NULL);
+			
+			if (!placeName.empty())
+			{
+				City::PlacesMatcher::MatchResult places(
+					result.cityResult.value->getAllPlacesMatcher().bestMatches(placeName, 1)
+				);
+				if (!places.empty())
+				{
+					result.placeResult.key = places.front().key;
+					result.placeResult.score = places.front().score;
+					result.placeResult.value = places.front().value;
+				}
+			}
+
+			return result;
 		}
 	}
 }

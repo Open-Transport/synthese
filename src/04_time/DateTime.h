@@ -34,6 +34,8 @@
 #include <iostream>
 #include <string>
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 namespace synthese
 {
 	namespace time
@@ -96,6 +98,7 @@ namespace synthese
 				bool isUnknown() const;
 				virtual std::string toSQLString(bool withApostrophes = true) const;
 				std::string toString(bool withSeconds = false) const;
+				boost::posix_time::ptime toPosixTime() const;
 			//@}
 
 
