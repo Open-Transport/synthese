@@ -190,9 +190,9 @@ namespace synthese
 					
 					const RoutePlanner::Result& solution(rp.computeJourneySheetDepartureArrival());
 
-					if(solution.journeys.empty()) continue;
+					if(solution.empty()) continue;
 
-					const Journey& journey(*solution.journeys.front());
+					const Journey& journey(*solution.front());
 
 					if(	journey.size() == 2 &&
 						journey.getJourneyLeg(0).getArrivalEdge()->getFromVertex()->getHub() == serviceUse.getArrivalEdge()->getFromVertex()->getHub() &&

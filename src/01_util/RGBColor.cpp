@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -50,6 +51,7 @@ namespace synthese
 			} else if (colorName == "black") {
 			r = 0; g = 0; b = 0;
 			}
+			throw Exception();
 		}
 		
 		bool RGBColor::operator == (const RGBColor& op2 ) const
@@ -62,6 +64,24 @@ namespace synthese
 			stringstream s;
 			s << "(" << r << "," << g << "," << b << ")";
 			return s.str();
+		}
+
+
+
+		std::string RGBColor::toXMLColor() const
+		{
+			stringstream s;
+			s << "#";
+			s << setw(2) << setfill('0');
+			s << hex << r << g << b;
+			return s.str();			
+		}
+
+
+		RGBColor::Exception::Exception()
+			: util::Exception("No such color")
+		{
+
 		}
 	}
 }

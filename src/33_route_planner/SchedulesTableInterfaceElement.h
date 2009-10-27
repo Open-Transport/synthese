@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/Types.h"
-
 #include "LibraryInterfaceElement.h"
 #include "FactorableTemplate.h"
 
@@ -52,55 +50,6 @@ namespace synthese
 		private:
 			static const bool _registered;
 
-			struct PlaceInformation
-			{
-				const geography::Place* place;
-				bool isOrigin;
-				bool isDestination;
-				std::ostringstream* content;
-			};
-			typedef std::vector<PlaceInformation> PlaceList;
-			
-			static int OrdrePAEchangeSiPossible(
-				const JourneyBoardJourneys&
-				, PlaceList&
-				, int PositionOrigine
-				, int PositionSouhaitee
-			);
-			
-			/** Insertion d'un arrêt de passage dans la liste des arrêts d'une fiche horaire.
-				@param ArretLogique Arrêt �  insérer
-				@param Position Position minimale �  donner �  l'arrêt
-
-				L'insertion décale les arrêts suivants une ligne plus bas. Si un trajet piéton (représenté par deux fl�šches devant être attenantes) se trouve �  la position demandée, alors l'arrêt est placé en suivant pour ne pas rompre le cheminement piéton.
-			*/
-			static int OrdrePAInsere(
-				PlaceList&
-				, const geography::Place*
-				, int Position
-				, bool isLockedAtTheTop
-				, bool isLockedAtTheEnd
-			);
-			
-			/** Contr��le de la compatibilité entre l'ordre des arrêts dans la grille horaire et les arrêts du trajet. */
-			static std::vector<bool> OrdrePAConstruitLignesAPermuter(
-				const PlaceList&
-				, const graph::Journey& __TrajetATester
-				, int LigneMax
-			);
-			
-			/** Recherche de point d'arrêt dans la liste des points d'arrêt.			*/
-			static bool OrdrePARechercheGare(
-				const PlaceList&
-				, int& i
-				, const geography::Place* GareAChercher
-			);
-
-			static PlaceList getStopsListForScheduleTable(
-				const JourneyBoardJourneys&
-				, const geography::Place* departurePlace
-				, const geography::Place* arrivalPlace
-			);
 
 		public:
 			/** Display.

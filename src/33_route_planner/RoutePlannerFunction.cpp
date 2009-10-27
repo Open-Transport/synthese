@@ -32,6 +32,20 @@
 #include "Interface.h"
 #include "TimeParseException.h"
 #include "ObjectNotFoundException.h"
+#include "GeoPoint.h"
+#include "Projection.h"
+#include "PTRoutePlannerResult.h"
+#include "Edge.h"
+#include "Line.h"
+#include "Road.h"
+#include "RoadPlace.h"
+#include "Hub.h"
+#include "Service.h"
+#include "CommercialLine.h"
+#include "RollingStock.h"
+#include "RGBColor.h"
+#include "Crossing.h"
+#include "PhysicalStop.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -50,6 +64,7 @@ namespace synthese
 	using namespace db;
 	using namespace graph;
 	using namespace geography;
+	using namespace road;
 
 	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
@@ -66,11 +81,15 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
 		const string RoutePlannerFunction::PARAMETER_FAVORITE_ID("fid");
 
+
+
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSite::_getParametersMap());
 			return map;
 		}
+
+
 
 		void RoutePlannerFunction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -158,7 +177,16 @@ namespace synthese
 			_accessParameters = _site->getAccessParameters(
 				acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN
 			);
+
+			if(	(!_departure_place.placeResult.value || !_arrival_place.placeResult.value) &&
+				!_page
+			){
+				throw RequestException("No calculation");
+			}
+
 		}
+
+
 
 		void RoutePlannerFunction::_run( ostream& stream ) const
 		{
@@ -177,13 +205,12 @@ namespace synthese
 				);
 				
 				// Computing
-				const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
-				
-				// Build of the result object
-				RoutePlannerResult result;
-				result.result = jv.journeys;
-				result.departurePlace = _departure_place.placeResult.value;
-				result.arrivalPlace = _arrival_place.placeResult.value;
+				const PTRoutePlannerResult result(
+					_departure_place.placeResult.value,
+					_arrival_place.placeResult.value,
+					r.isSamePlaces(),
+					r.computeJourneySheetDepartureArrival()
+				);
 				
 				// Display
 				if(_page)
@@ -200,7 +227,7 @@ namespace synthese
 						, _accessParameters
 						, _request
 						, _site.get()
-						, jv.samePlaces
+						, result.getSamePlaces()
 					);
 				}
 				else
@@ -221,10 +248,12 @@ namespace synthese
 					}
 					stream <<
 						" siteId=\"" << _site->getKey() << "\">" <<
-						"<timeBounds minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetEndDepartureTime().toPosixTime()) << "\"" <<
-						" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetStartArrivalTime().toPosixTime()) << "\"" <<
-						" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetEndArrivalTime().toPosixTime()) << "\"" <<
-						" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetStartDepartureTime().toPosixTime()) << "\" />"
+						"<timeBounds" <<
+							" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetEndDepartureTime().toPosixTime()) << "\"" <<
+							" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetStartArrivalTime().toPosixTime()) << "\"" <<
+							" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetEndArrivalTime().toPosixTime()) << "\"" <<
+							" maxDepartureHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetStartDepartureTime().toPosixTime()) << "\"" <<
+						" />"
 					;
 					if(_period)
 					{
@@ -264,15 +293,30 @@ namespace synthese
 						"</query>" <<
 						"<journeys>"
 					;
-					BOOST_FOREACH(const JourneyBoardJourneys::value_type& journey, jv.journeys)
+					const PTRoutePlannerResult::PlaceList& placesList(
+						result.getOrderedPlaces()
+					);
+					typedef vector<ostringstream*> PlacesContentVector;
+					PlacesContentVector sheetRows(placesList.size());
+					BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
+					{
+						stream = new ostringstream;
+					}
+
+					BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
 					{
 						bool hasALineAlert(false); // Interactive
 						bool hasAStopAlert(false); // Interactive
+						bool pedestrianMode = false;
+						bool lastPedestrianMode = false;
+
+						PlacesContentVector::iterator itSheetRow(sheetRows.begin());
+						PTRoutePlannerResult::PlaceList::const_iterator itPlaces(placesList.begin());
 
 						stream <<
 							"<journey hasALineAlert=\"" << (hasALineAlert ? "true" : "false") << "\" hasAStopAlert=\"" << (hasAStopAlert ? "true" : "false") << "\""
 						;
-						if(journey->getContinuousServiceRange() != UNKNOWN_VALUE)
+						if(journey->getContinuousServiceRange() > 0)
 						{
 							stream << " continuousServiceDuration=\"" << journey->getContinuousServiceRange() << "\"";
 						}
@@ -299,62 +343,211 @@ namespace synthese
 							stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey->getReservationDeadLine().toPosixTime()) << "\" />";
 						}
 						stream << "<chunks>";
-/*
-						<transport departureTime=\"2001-12-17T09:30:47.0Z\" arrivalTime=\"2001-12-17T19:30:47.0Z\" length=\"800000\" startStopIsTerminus=\"true\" endStopIsTerminus=\"true\" >
-							<startStop latitude=\"0.0\" longitude=\"0.0\" id=\"1\" x=\"0\" y=\"0\" name=\"Quai 1\">
-								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"TOULOUSE\" x=\"0\" y=\"0\" name=\"Matabiau\">
-								</connectionPlace>
-							</startStop>
-							<endStop latitude=\"0.0\" longitude=\"0.0\" id=\"2\" x=\"0\" y=\"0\" name=\"Quai 26\">
-								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"2\" city=\"PARIS\" x=\"0\" y=\"0\" name=\"Montparnasse\">
-								</connectionPlace>
-							</endStop>
-							<line id=\"5675\" color=\"#CCCCCC\" cssClass=\"gris\" imgURL=\"tgv.png\" longName=\"le TGV Atlantique\" shortName=\"TGV\">
-							<alert id=\"9834\" level=\"interruption\" startValidity=\"2000-01-01T00:00:07.0Z\" endValidity=\"2099-12-31T23:59:00.0Z\">SNCF en grève</alert>
-							</line>
-							<vehicleType id=\"456\" name=\"TGV\" />
-						</transport>
-						<street length=\"600000\" city=\"BORDEAUX\" name=\"Autoroute A10\" departureTime=\"2001-12-17T17:30:47.0Z\" arrivalTime=\"2001-12-17T17:25:47.0Z\">
-							<startAddress>
-								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" x=\"0\" y=\"0\" city=\"BORDEAUX\"  name=\"Saint-Jean\"><alert id=\"1444\" startValidity=\"2001-12-10T09:30:47.0Z\" endValidity=\"2002-12-24T09:30:47.0Z\" level=\"info\">Travaux sur le parvis de la gare</alert>
-								</connectionPlace>
-							</startAddress>
-							<endAddress>
-								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"PARIS\" x=\"0\" y=\"0\" name=\"Montparnasse\">
-								</connectionPlace>
-							</endAddress>
-						</street>
-						<connection length=\"0\" departureTime=\"2001-12-17T21:00:47.0Z\" arrivalTime=\"2001-12-17T21:30:47.0Z\" endDepartureTime=\"2001-12-17T22:00:47.0Z\" endArrivalTime=\"2001-12-17T22:30:47.0Z\">
-							<startStop latitude=\"0.0\" longitude=\"0.0\" id=\"1\" x=\"0\" y=\"0\" name=\"Parvis\">
-								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"PARIS\" x=\"0\" y=\"0\" name=\"Austerlitz\">
-								</connectionPlace>
-							</startStop>
-							<endStop latitude=\"0.0\" longitude=\"0.0\" id=\"1\" x=\"0\" y=\"0\" name=\"Parvis\">
-								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"PARIS\" x=\"0\" y=\"0\" name=\"Montparnasse\">
-								</connectionPlace>
-							</endStop>
-						</connection>
-*/
-						stream << "</chunks>";
+
+						// Loop on each leg
+						const Journey::ServiceUses& jl(journey->getServiceUses());
+						for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
+						{
+							const ServiceUse& curET(*itl);
+
+							if(	itl == jl.begin() ||
+								!curET.getEdge()->getParentPath()->isPedestrianMode() ||
+								lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode()
+							){
+								const NamedPlace* placeToSearch(
+									(	itl == jl.begin() &&
+										dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
+									)?
+									dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value) :
+									dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
+								);
+
+								for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
+								{
+									**itSheetRow << "<cell />";
+								}
+
+								pedestrianMode = curET.getEdge()->getParentPath()->isPedestrianMode();
+								
+								// Saving of the columns on each lines
+								if(itl == jl.begin())
+								{
+									**itSheetRow << "<cell";
+								}
+								**itSheetRow <<
+									" departureDateTime=\"" <<
+									posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"";
+								if(journey->getContinuousServiceRange() > 0)
+								{
+									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
+									edTime += posix_time::minutes(journey->getContinuousServiceRange());
+									**itSheetRow << " endDepartureDateTime=\"" << 
+										posix_time::to_iso_extended_string(edTime) << "\"";
+								}
+								**itSheetRow << " />";
+
+								++itPlaces; ++itSheetRow;
+								lastPedestrianMode = pedestrianMode;
+							}
+							
+							if(	itl == jl.end()-1
+							||	!(itl+1)->getEdge()->getParentPath()->isPedestrianMode()
+							||	!curET.getEdge()->getParentPath()->isPedestrianMode()
+							){
+								const NamedPlace* placeToSearch(
+									itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
+									dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value) :
+									dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
+								);
+								
+								for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
+								{
+									**itSheetRow << "/><cell ";
+								}
+								if(	itl != jl.end() - 1)
+								{
+									**itSheetRow << " />";
+								}
+								**itSheetRow << "<cell arrivalDateTime=\"" <<
+									posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
+								if(journey->getContinuousServiceRange() > 0)
+								{
+									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
+									eaTime += posix_time::minutes(journey->getContinuousServiceRange());
+									**itSheetRow << " endArrivalDateTime=\"" <<
+										posix_time::to_iso_extended_string(eaTime) << "\"";
+								}
+							}
+
+
+							const Line* line(dynamic_cast<const Line*> (curET.getService()->getPath()));
+							if(line != NULL)
+							{
+								stream <<
+									"<" << (line->isPedestrianMode() ? "connection" : "transport") <<
+										" length=\"" << curET.getDistance() << "\"" <<
+										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"" <<
+										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
+								if(journey->getContinuousServiceRange() > 0)
+								{
+									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
+									edTime += posix_time::minutes(journey->getContinuousServiceRange());
+									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
+									eaTime += posix_time::minutes(journey->getContinuousServiceRange());
+									stream <<
+										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
+										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+								}
+								stream <<
+										" startStopIsTerminus=\"" << (curET.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<
+										" endStopIsTerminus=\"" << (curET.getArrivalEdge()->getRankInPath() == curET.getArrivalEdge()->getParentPath()->getEdges().size() - 1 ? "true" : "false") << "\"" <<
+									">";
+								_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const PhysicalStop&>(*curET.getDepartureEdge()->getFromVertex()));
+								_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const PhysicalStop&>(*curET.getArrivalEdge()->getFromVertex()));
+								if(!line->isPedestrianMode())
+								{
+									stream <<
+										"<line" <<
+										" id=\"" << line->getKey() << "\"";
+									if(line->getCommercialLine()->getColor())
+									{
+										stream << " color=\"" << line->getCommercialLine()->getColor()->toXMLColor() << "\"";
+									}
+									if(!line->getCommercialLine()->getStyle().empty())
+									{
+										stream << " cssClass=\"" << line->getCommercialLine()->getStyle() << "\"";
+									}
+									if(!line->getCommercialLine()->getImage().empty())
+									{
+										stream << " imgURL=\"" << line->getCommercialLine()->getImage() << "\"";
+									}
+									if(!line->getCommercialLine()->getLongName().empty())
+									{
+										stream << " longName=\"" << line->getCommercialLine()->getLongName() << "\"";
+									}
+									if(!line->getCommercialLine()->getShortName().empty())
+									{
+										stream << " shortName=\"" << line->getCommercialLine()->getShortName() << "\"";
+									}
+									stream << ">";
+									if(false) // Transform into interactive
+									{
+									}
+									stream <<
+										"</line>";
+									if(line->getRollingStock())
+									{
+										stream <<
+											"<vehicleType" <<
+											" id=\"" << line->getRollingStock()->getKey() << "\"" <<
+											" name=\"" << line->getRollingStock()->getArticle() << line->getRollingStock()->getName() << "\"" <<
+											" />";
+									}
+								}
+								stream << "</transport>";
+							}
+
+							const Road* road(dynamic_cast<const Road*> (curET.getService()->getPath ()));
+							if(road != NULL)
+							{
+								stream << 
+									"<street" <<
+										" length=\"" << curET.getDistance() << "\"" <<
+										" city=\"" << road->getRoadPlace()->getCity()->getName() << "\"" <<
+										" name=\"" << road->getRoadPlace()->getName() << "\"" <<
+										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"" <<
+										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
+								if(journey->getContinuousServiceRange() > 0)
+								{
+									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
+									edTime += posix_time::minutes(journey->getContinuousServiceRange());
+									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
+									eaTime += posix_time::minutes(journey->getContinuousServiceRange());
+									stream <<
+										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
+										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+								}
+								stream <<
+									">" <<
+									"<startAddress>";
+								_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getDepartureEdge()->getHub()));
+								stream <<
+									"</startAddress>" <<
+									"<endAddress>";
+								_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getArrivalEdge()->getHub()));
+								stream <<
+									"</endAddress>" <<
+									"</street>"
+								;
+							}
+						}
+
+						stream << "</chunks></journey>";
+
+						**itSheetRow << " />";
 					}
 					stream <<
 						"</journeys>" <<
 						"<resultTable>";
 
-//					BOOST_FOREACH()
+					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
+					BOOST_FOREACH(const PTRoutePlannerResult::PlaceList::value_type& row, result.getOrderedPlaces())
 					{
-/*						<row type=\"departure\">
-							<cells>
-								<cell departureDateTime=\"2001-12-17T09:30:47.0Z\" />
-								<cell departureDateTime=\"2001-12-17T10:30:47.0Z\" />
-								<cell departureDateTime=\"2001-12-17T11:30:47.0Z\" endDepartureDateTime=\"2001-12-17T12:30:47.0Z\" />
-							</cells>
-							<place>
-								<connectionPlace latitude=\"0.0\" longitude=\"0.0\" id=\"1\" city=\"a\" x=\"0\" y=\"0\" name=\"a\">
-								</connectionPlace>
-							</place>
-						</row>
-*/
+						GeoPoint gp(WGS84FromLambert(row.place->getPoint()));
+						assert(dynamic_cast<const NamedPlace*>(row.place));
+						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
+
+						stream <<
+							"<row type=\"departure\">" <<
+							"<cells>" <<
+							(*itSheetRow)->str() <<
+							"</cells>" <<
+							"<place>";
+						_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*row.place));
+						stream <<
+							"</place>" <<
+							"</row>";
+						++itSheetRow;
 					}
 					stream <<
 						"</resultTable>" <<
@@ -416,7 +609,59 @@ namespace synthese
 
 		std::string RoutePlannerFunction::getOutputMimeType() const
 		{
-			return _page->getMimeType();
+			return _page ? _page->getMimeType() : "text/xml";
+		}
+
+		void RoutePlannerFunction::_XMLDisplayConnectionPlace(
+			std::ostream& stream,
+			const NamedPlace& np
+		){
+			GeoPoint gp(WGS84FromLambert(np.getPoint()));
+
+			stream <<
+				"<connectionPlace" <<
+					" latitude=\"" << gp.getLatitude() << "\"" <<
+					" longitude=\"" << gp.getLongitude() << "\"" <<
+					" id=\"" << np.getKey() << "\"" <<
+					" city=\"" << np.getCity()->getName() << "\"" <<
+					" x=\"" << lexical_cast<int>(np.getPoint().getX()) << "\"" <<
+					" y=\"" << lexical_cast<int>(np.getPoint().getY()) << "\""
+					" name=\"" << np.getName() << "\"" <<
+				">";
+			if(false) // Test if alarm on place
+			{
+				stream <<
+					"<alert" <<
+						" id=\"9834\"" <<
+						" level=\"interruption\"" <<
+						" startValidity=\"2000-01-01T00:00:07.0Z\"" <<
+						" endValidity=\"2099-12-31T23:59:00.0Z\"" <<
+					">SNCF en grève</alert>"
+				;
+			}
+			stream << "</connectionPlace>";
+		}
+
+
+
+		void RoutePlannerFunction::_XMLDisplayPhysicalStop(
+			std::ostream& stream,
+			const std::string& tag,
+			const env::PhysicalStop& stop
+		){
+			GeoPoint gp(WGS84FromLambert(stop));
+
+			stream <<
+				"<" << tag <<
+					" latitude=\"" << gp.getLatitude() << "\"" <<
+					" longitude=\"" << gp.getLongitude() << "\"" <<
+					" id=\"" << stop.getKey() << "\"" <<
+					" x=\"" << lexical_cast<int>(stop.getX()) << "\"" <<
+					" y=\"" << lexical_cast<int>(stop.getY()) << "\"" <<
+					" name=\"" << stop.getName() << "\"" <<
+				">";
+			_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*stop.getHub()));
+			stream << "</" << tag << ">";
 		}
 	}
 }

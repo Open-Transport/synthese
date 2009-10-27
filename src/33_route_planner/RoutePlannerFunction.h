@@ -43,6 +43,13 @@ namespace synthese
 	namespace geography
 	{
 		class Place;
+		class NamedPlace;
+	}
+
+	namespace env
+	{
+		class PublicTransportStopZoneConnectionPlace;
+		class PhysicalStop;
 	}
 
 	namespace routeplanner
@@ -71,8 +78,8 @@ namespace synthese
 			//! \name Parameters
 			//@{
 				const RoutePlannerInterfacePage*			_page;
-				transportwebsite::Site::ExtendedFetchPlaceResult				_departure_place;
-				transportwebsite::Site::ExtendedFetchPlaceResult				_arrival_place;
+				transportwebsite::Site::ExtendedFetchPlaceResult	_departure_place;
+				transportwebsite::Site::ExtendedFetchPlaceResult	_arrival_place;
 				std::string									_originCityText;
 				std::string									_destinationCityText;
 				std::string									_originPlaceText;
@@ -97,6 +104,16 @@ namespace synthese
 				@param map Parameters map to interpret
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
+
+			static void _XMLDisplayConnectionPlace(
+				std::ostream& stream,
+				const geography::NamedPlace& place
+			);
+			static void _XMLDisplayPhysicalStop(
+				std::ostream& stream,
+				const std::string& tag,
+				const env::PhysicalStop& place
+			);
 
 		public:
 			/** Action to run, defined by each subclass.

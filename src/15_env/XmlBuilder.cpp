@@ -39,6 +39,7 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace geography;	
 	using namespace geometry;
 	using namespace util;
 	

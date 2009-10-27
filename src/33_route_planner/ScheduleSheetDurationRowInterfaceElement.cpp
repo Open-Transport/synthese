@@ -21,14 +21,13 @@
 */
 
 #include "ScheduleSheetDurationRowInterfaceElement.h"
-#include "33_route_planner/Types.h"
-
 #include "Journey.h"
-
+#include "PTRoutePlannerResult.h"
 #include "ValueElementList.h"
 #include "DurationInterfacePage.h"
 #include "Interface.h"
 
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -36,7 +35,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace env;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetDurationRowInterfaceElement>::FACTORY_KEY("schedules_durations");
 
@@ -56,13 +54,13 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			
-			const RoutePlannerResult* jv = static_cast<const RoutePlannerResult*>(object);
+			const PTRoutePlannerResult* jv = static_cast<const PTRoutePlannerResult*>(object);
 			const DurationInterfacePage* durationInterfacePage = _page->getInterface()->getPage<DurationInterfacePage>();
 			
-			for (JourneyBoardJourneys::const_iterator it = jv->result.begin(); it != jv->result.end(); ++it)
+			BOOST_FOREACH(PTRoutePlannerResult::Journeys::value_type journey, jv->getJourneys())
 			{
 				stream << _cellHeader->getValue(parameters, variables, object, request);
-				durationInterfacePage->display(stream, (*it)->getDuration(), variables, object, request);
+				durationInterfacePage->display(stream, journey->getDuration(), variables, object, request);
 				stream << _cellFooter->getValue(parameters, variables, object, request);
 			}
 

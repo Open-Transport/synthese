@@ -23,7 +23,7 @@
 #include "SchedulesTableInterfaceElement.h"
 #include "RoutePlannerSheetColumnInterfacePage.h"
 #include "RoutePlannerSheetLineInterfacePage.h"
-
+#include "PTRoutePlannerResult.h"
 #include "Request.h"
 #include "Hub.h"
 #include "Service.h"
@@ -69,12 +69,12 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			const RoutePlannerResult* jv(static_cast<const RoutePlannerResult*>(object));
+			const PTRoutePlannerResult* jv(static_cast<const PTRoutePlannerResult*>(object));
 
-			if ( jv != NULL && !jv->result.empty())  // No solution or type error
+			if ( jv != NULL && !jv->getJourneys().empty())  // No solution or type error
 			{
-				const PlaceList placesList(
-					getStopsListForScheduleTable(jv->result, jv->departurePlace, jv->arrivalPlace)
+				const PTRoutePlannerResult::PlaceList& placesList(
+					jv->getOrderedPlaces()
 				);
 				Hour unknownTime( TIME_UNKNOWN );
 				const RoutePlannerSheetColumnInterfacePage* columnInterfacePage(
@@ -83,21 +83,29 @@ namespace synthese
 				const RoutePlannerSheetLineInterfacePage* lineInterfacePage(
 					_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>()
 				);
+				typedef vector<ostringstream*> PlacesContentVector;
+				PlacesContentVector sheetRows(placesList.size());
+				BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
+				{
+					stream = new ostringstream;
+				}
 				
 				// Cells
 				
 				// Loop on each journey
 				int i=1;
-				for(JourneyBoardJourneys::const_iterator it(jv->result.begin());
-					it != jv->result.end();
+				for(PTRoutePlannerResult::Journeys::const_iterator it(jv->getJourneys().begin());
+					it != jv->getJourneys().end();
 					++it, ++i
 				){
 
 					bool pedestrianMode = false;
 					bool lastPedestrianMode = false;
 
+					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
+					PTRoutePlannerResult::PlaceList::const_iterator itPlaces(placesList.begin());
+
 					// Loop on each leg
-					int __Ligne(0);
 					const Journey::ServiceUses& jl((*it)->getServiceUses());
 					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
@@ -107,21 +115,21 @@ namespace synthese
 							!curET.getEdge()->getParentPath()->isPedestrianMode() ||
 							lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode()
 						){
-							const Place* placeToSearch(
-								(	itl == jl.begin() &&
-									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
-								) ?
-								jv->departurePlace :
-								AddressablePlace::GetPlace(curET.getDepartureEdge()->getHub())
+							const NamedPlace* placeToSearch(
+ 								(	itl == jl.begin() &&
+ 									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
+ 								) ?
+ 								dynamic_cast<const NamedPlace*>(jv->getDeparturePlace()) :
+								dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
 							);
 
 							DateTime lastDateTime(curET.getDepartureDateTime());
 							lastDateTime += (*it)->getContinuousServiceRange();
 
-							for (; placesList[ __Ligne ].place != placeToSearch; ++__Ligne)
+							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
 								columnInterfacePage->display(
-									*(placesList[__Ligne].content)
-									, __Ligne==0
+									**itSheetRow
+									, itPlaces == jv->getOrderedPlaces().begin()
 									, (itl + 1) == jl.end()
 									, i
 									, pedestrianMode
@@ -138,8 +146,8 @@ namespace synthese
 							
 							// Saving of the columns on each lines
 							columnInterfacePage->display(
-								*(placesList[__Ligne].content)
-								, __Ligne == 0
+								**itSheetRow
+								, itPlaces == jv->getOrderedPlaces().begin()
 								, true
 								, i
 								, pedestrianMode
@@ -151,7 +159,7 @@ namespace synthese
 								, pedestrianMode && !lastPedestrianMode
 								, request
 							);
-							++__Ligne;
+							++itPlaces; ++itSheetRow;
 							lastPedestrianMode = pedestrianMode;
 						}
 						
@@ -159,15 +167,16 @@ namespace synthese
 						||	!(itl+1)->getEdge()->getParentPath()->isPedestrianMode()
 						||	!curET.getEdge()->getParentPath()->isPedestrianMode()
 						){
-							const Place* placeToSearch(
-								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub())
-								? jv->arrivalPlace
-								: AddressablePlace::GetPlace(curET.getArrivalEdge()->getHub())
+							const NamedPlace* placeToSearch(
+								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
+								dynamic_cast<const NamedPlace*>(jv->getArrivalPlace()) :
+								dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
 							);
 							
-							for (; placesList[ __Ligne ].place != placeToSearch; __Ligne++ )
+							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
+							{
 								columnInterfacePage->display(
-									*(placesList[__Ligne].content)
+									**itSheetRow
 									, true
 									, true
 									, i
@@ -180,12 +189,13 @@ namespace synthese
 									, false
 									, request
 								);
+							}
 							
 							DateTime lastDateTime(curET.getArrivalDateTime());
 							lastDateTime += (*it)->getContinuousServiceRange();
 
 							columnInterfacePage->display(
-								*(placesList[__Ligne].content)
+								**itSheetRow
 								, true
 								, (itl + 1) == jl.end()
 								, i
@@ -201,9 +211,10 @@ namespace synthese
 						}
 					}
 
-					for (++__Ligne; __Ligne < placesList.size(); ++__Ligne)
+					for (++itPlaces, ++itSheetRow; itPlaces != placesList.end(); ++itPlaces, ++itSheetRow)
+					{
 						columnInterfacePage->display(
-							*(placesList[__Ligne].content)
+							**itSheetRow
 							, true
 							, true
 							, i
@@ -216,17 +227,19 @@ namespace synthese
 							, false
 							, request
 						);
+					}
 				}
 
 				// Initialization of text lines
 				bool color(false);
-				BOOST_FOREACH(const PlaceInformation& pi, placesList)
+				PlacesContentVector::const_iterator it(sheetRows.begin());
+				BOOST_FOREACH(const PTRoutePlannerResult::PlaceList::value_type& pi, placesList)
 				{
 					assert(dynamic_cast<const NamedPlace*>(pi.place));
 
 					lineInterfacePage->display(
 						stream
-						, pi.content->str()
+						, (*it)->str()
 						, color
 						, pi.isOrigin
 						, pi.isDestination
@@ -236,6 +249,7 @@ namespace synthese
 					);
 					delete pi.content;
 					color = !color;
+					++it;
 				}
 
 
@@ -333,492 +347,6 @@ namespace synthese
 		}
 
 
-
-		int SchedulesTableInterfaceElement::OrdrePAEchangeSiPossible(
-			const JourneyBoardJourneys& jv
-			, PlaceList& pl
-			, int PositionActuelle
-			, int PositionGareSouhaitee
-		){
-			vector<bool> LignesAPermuter(PositionActuelle + 1, false);
-			bool Echangeable(true);
-			PlaceInformation tempGare;
-			int i;
-			int j;
-
-			// Construction de l'ensemble des lignes a permuter
-			LignesAPermuter[ PositionActuelle ] = true;
-			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it)
-			{
-				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, **it, PositionActuelle );
-				for ( i = PositionActuelle; i > PositionGareSouhaitee; --i)
-					if ( curLignesET[ i ] && LignesAPermuter[ i ] )
-						break;
-				for ( ; i > PositionGareSouhaitee; --i)
-					if ( curLignesET[ i ] )
-						LignesAPermuter[ i ] = true;
-			}
-
-			// Tests d'ï¿changeabilitï¿ binaire
-			// A la premiere contradiction on s'arrete
-			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it)
-			{
-				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, **it, PositionActuelle );
-				i = PositionGareSouhaitee;
-				for ( j = PositionGareSouhaitee; true; ++j)
-				{
-					for (; i<LignesAPermuter.size() && !LignesAPermuter[i]; ++i);
-
-					if ( i > PositionActuelle )
-						break;
-
-					if ( curLignesET[ i ] && curLignesET[ j ] && !LignesAPermuter[ j ] )
-					{
-						Echangeable = false;
-						break;
-					}
-					i++;
-				}
-				if ( !Echangeable )
-					break;
-			}
-
-			// Echange ou insertion
-			if ( Echangeable )
-			{
-				for ( j = 0; true; ++j)
-				{
-					for(i = j; i < LignesAPermuter.size() && !LignesAPermuter[ i ] && i <= PositionActuelle; ++i);
-
-					if ( i > PositionActuelle )
-						break;
-
-					LignesAPermuter[ i ] = false;
-
-					tempGare = pl[ i ];
-					for ( ; i > PositionGareSouhaitee + j; --i)
-						pl[i] = pl[i-1];
-
-					pl[ i ] = tempGare;
-				}
-				return PositionGareSouhaitee + j;
-			}
-			else
-				return OrdrePAInsere( pl, pl[ PositionGareSouhaitee ].place, PositionActuelle + 1, false, false);
-		}
-
-
-
-		int SchedulesTableInterfaceElement::OrdrePAInsere(
-			PlaceList& pl
-			, const Place* place
-			, int position
-			, bool lockedAtTheTop
-			, bool lockedAtTheEnd
-		){
-			if (lockedAtTheEnd)
-				position = pl.size();
-			else if (lockedAtTheTop)
-				position = 0;
-			else
-				for (; position < pl.size() && pl[position].isOrigin; ++position);
-
-			// Insertion
-			PlaceInformation pi;
-			pi.content = new ostringstream;
-			pi.isOrigin = lockedAtTheTop;
-			pi.isDestination = lockedAtTheEnd;
-			pi.place = place;
-
-			pl.insert(pl.begin() + position, pi);
-
-			// Retour de la position choisie
-			return position;
-		}
-
-		vector<bool> SchedulesTableInterfaceElement::OrdrePAConstruitLignesAPermuter(
-			const PlaceList& pl
-			, const Journey& __TrajetATester
-			, int LigneMax
-		){
-			vector<bool> result;
-			int l(0);
-			const ServiceUse* curET((l >= __TrajetATester.size()) ? NULL : &__TrajetATester.getJourneyLeg (l));
-			for (int i(0); i <= LigneMax && pl[ i ].place != NULL; i++ )
-			{
-				if(curET != NULL && pl[ i ].place == AddressablePlace::GetPlace(curET->getDepartureEdge()->getHub())
-				){
-					result.push_back(true);
-					++l;
-					curET = (l >= __TrajetATester.size()) ? NULL : &__TrajetATester.getJourneyLeg (l);
-				}
-				else
-				{
-					result.push_back(false);
-				}
-			}
-			return result;
-		}
-
-		bool SchedulesTableInterfaceElement::OrdrePARechercheGare(
-			const PlaceList& pl
-			, int& i
-			, const Place* GareAChercher
-		){
-			// Recherche de la gare en suivant ï¿ partir de la position i
-			for ( ; i < pl.size() && pl[ i ].place != NULL && pl[ i ].place != GareAChercher; ++i );
-
-			// Gare trouvï¿e en suivant avant la fin du tableau
-			if ( i < pl.size() && pl[ i ].place != NULL )
-				return true;
-
-			// Recherche de position antï¿rieure ï¿ i
-			for ( i = 0; i < pl.size() && pl[ i ].place != NULL && pl[ i ].place != GareAChercher; ++i );
-
-			return i < pl.size() && pl[ i ].place != NULL;
-
-		}
-
-		/** Build of the places list of a future schedule sheet corresponding to a journey vector.
-			@author Hugues Romain
-			@date 2001-2006
-
-			Le but de la mï¿thode est de fournir une liste ordonnï¿e de points d'arrï¿t de taille minimale dï¿terminant les lignes du tableau de fiche horaire.
-
-			Examples of results after journeys addings :
-
-			Pas 0 : Service ABD (adding of B)
-
-			<table class="Tableau" cellspacing="0" cellpadding="5">
-			<tr><td>A</td><td>X</td></tr>
-			<tr><td>B</td><td>X</td></tr>
-			<tr><td>D</td><td>X</td></tr>
-			</table>
-
-			Pas 1 : Service ACD (adding of C)
-
-			<table class="Tableau" cellspacing="0" cellpadding="5">
-			<tr><td>A</td><td>X</td><td>X</td></tr>
-			<tr><td>B</td><td>X</td><td|</td></tr>
-			<tr><td>C</td><td>|</td><td>X</td></tr>
-			<tr><td>D</td><td>X</td><td>X</td></tr>
-			</table>
-
-			Pas 2 : Service ACBD (change of the order authorized : descente de B au rang C+1)
-
-			<table class="Tableau" cellspacing="0" cellpadding="5">
-			<tr><td>A</td><td>X</td><td>X</td><td>X</td></tr>
-			<tr><td>B</td><td>X</td><td>|</td><td>|</td></tr>
-			<tr><td>C</td><td>|</td><td>X</td><td>X</td></tr>
-			<tr><td>D</td><td>X</td><td>X</td><td>-</td></tr>
-			</table>
-
-			(permutation)
-
-			<table class="Tableau" cellspacing="0" cellpadding="5">
-			<tr><td>A</td><td>X</td><td>X</td><td>X</td></tr>
-			<tr><td>C</td><td>|</td><td>X</td><td>X</td></tr>
-			<tr><td>B</td><td>X</td><td>|</td><td>X</td></tr>
-			<tr><td>D</td><td>X</td><td>X</td><td>X</td></tr>
-			</table>
-
-			Pas 3 : Service ABCD (change of the order refused : adding of an other C row)
-
-			<table class="Tableau" cellspacing="0" cellpadding="5">
-			<tr><td>A</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-			<tr><td>C</td><td>|</td><td>X</td><td>X</td><td>|</td></tr>
-			<tr><td>B</td><td>X</td><td>|</td><td>X</td><td>X</td></tr>
-			<tr><td>C</td><td>|</td><td>|</td><td>|</td><td>X</td></tr>
-			<tr><td>D</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-			</table>
-
-			Pas 4 : Service AB->CD (service continu BC)
-
-			<table class="Tableau" cellspacing="0" cellpadding="5">
-			<tr><td>A</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-			<tr><td>C</td><td>|</td><td>X</td><td>X</td><td>|</td><td>|</td></tr>
-			<tr><td>B</td><td>X</td><td>|</td><td>X</td><td>X</td><td>V</td></tr>
-			<tr><td>C</td><td>|</td><td>|</td><td>|</td><td>X</td><td>V</td></tr>
-			<tr><td>D</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-			</table>
-
-			Pas 5 : Service AED (E insï¿rï¿ avant B pour ne pas rompre la continuitï¿ BC)
-
-			<table class="Tableau" cellspacing="0" cellpadding="5">
-			<tr><td>A</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-			<tr><td>C</td><td>|</td><td>X</td><td>X</td><td>|</td><td>|</td><td>|</td></tr>
-			<tr><td>E</td><td>|</td><td>|</td><td>|</td><td>|</td><td>|</td><td>X</td></tr>
-			<tr><td>B</td><td>X</td><td>|</td><td>X</td><td>X</td><td>V</td><td>|</td></tr>
-			<tr><td>C</td><td>|</td><td>|</td><td>|</td><td>X</td><td>V</td><td>|</td></tr>
-			<tr><td>D</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-			</table>
-
-			Pour chaque trajet, on procï¿de donc par balayage dans l'ordre des gares existantes. Si la gare ï¿ relier nï¿est pas trouvï¿e entre la position de la gare prï¿cï¿dente et la fin, deux solutions :
-			- soit la gare nï¿est prï¿sente nulle part (balayage avant la position de la prï¿cï¿dente) auquel cas elle est crï¿ï¿e et rajoutï¿e ï¿ la position de la gare prï¿cï¿dente + 1
-			- soit la gare est prï¿sente avant la gare prï¿cï¿dente. Dans ce cas, on tente de descendre la ligne de la gare recherchï¿e au niveau de la position de la gare prï¿cï¿dente + 1. On contrï¿le sur chacun des trajets prï¿cï¿dents que la chronologie n'en serait pas affectï¿e. Si elle ne l'est pas, alors la ligne est descendue. Sinon une nouvelle ligne est crï¿ï¿e.
-
-			Contrôle de l'échangeabilité :
-
-			Soit \f$ \delta_{l,c}:(l,c)\mapsto\{{1\mbox{~si~le~trajet~}c\mbox{~dessert~la~ligne~}l\atop 0~sinon} \f$
-
-			Deux lignes l et m sont échangeables si et seulement si l'ordre des lignes dont \f$ \delta_{l,c}=1 \f$ pour chaque colonne est respecté.
-
-			Cet ordre s'exprime par la propriété suivante : Si \f$ \Phi \f$ est la permutation pévue, alors
-
-			<img width=283 height=27 src="interface.doxygen_fichiers/image008.gif">
-
-			Il est donc nécessaire à la fois de contrôler la possibilité de permutation, et de la déterminer éventuellement.
-
-			Si <sub><img width=25 height=24
-			src="interface.doxygen_fichiers/image009.gif"></sub>est la ligne de la gare
-			précédemment trouvée, et <sub><img width=24 height=24
-			src="interface.doxygen_fichiers/image010.gif"></sub>ï¿lï¿emplacement de la gare
-			souhaitï¿e pour permuter, alors les permutations ï¿ opï¿rer ne peuvent concerner
-			que des lignes comprises entre <sub><img width=24 height=24
-			src="interface.doxygen_fichiers/image010.gif"></sub>ï¿et <sub><img width=25
-			height=24 src="interface.doxygen_fichiers/image009.gif"></sub>. En effet, les
-			autres lignes nï¿influent pas.</p>
-
-
-			En premier lieu il est nï¿cessaire de dï¿terminer lï¿ensemble
-			des lignes ï¿ permuter. Cet ensemble est construit en explorant chaque colonne.
-			Si <sub><img width=16 height=24 src="interface.doxygen_fichiers/image011.gif"></sub>ï¿est
-			lï¿ensemble des lignes ï¿ permuter pour assurer lï¿intï¿gritï¿ des colonnes <sub><img
-			width=36 height=27 src="interface.doxygen_fichiers/image012.gif"></sub>, on
-			peut dï¿finir cet ensemble en fonction du prï¿cï¿dent <sub><img width=25
-			height=24 src="interface.doxygen_fichiers/image013.gif"></sub>&nbsp;: <sub><img
-			width=308 height=35 src="interface.doxygen_fichiers/image014.gif"></sub>
-
-			Le but ï¿tant de faire descendre la ligne <sub><img width=24
-			height=24 src="interface.doxygen_fichiers/image010.gif"></sub>ï¿vers <sub><img
-			width=25 height=24 src="interface.doxygen_fichiers/image009.gif"></sub>, les
-			lignes appartenant ï¿ L doivent ï¿tre ï¿changeables avecï¿ les positions <sub><img
-			width=216 height=27 src="interface.doxygen_fichiers/image015.gif"></sub>.
-			Lï¿ensemble de ces tests doit ï¿tre rï¿alisï¿. Au moindre ï¿chec, lï¿ensemble de la
-			permutation est rendu impossible.
-
-			Lï¿ï¿changeabilitï¿ binaire entre deux lignes l et m revient ï¿
-			contrï¿ler la propriï¿tï¿&nbsp;<sub><img width=89 height=28
-			src="interface.doxygen_fichiers/image016.gif"></sub>.
-
-			Lï¿ï¿changeabilitï¿ totale sï¿ï¿crit donc <sub><img width=145
-			height=28 src="interface.doxygen_fichiers/image017.gif"></sub>
-
-			Lï¿algorithme est donc le suivant&nbsp;:
-
-			- Construction de L
-			- Contrï¿le dï¿ï¿changeabilitï¿ binaire pour chaque ï¿lï¿ment de L avec
-			sa future position
-			- Permutation
-
-			<b>Echange</b>&nbsp;:
-
-			Exemple dï¿ï¿change&nbsp;:
-
-			<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=340
-			style='width:254.95pt;margin-left:141.6pt;border-collapse:collapse;border:
-			none'>
-			<tr>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>X</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>X</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>X</p>
-			</td>
-			</tr>
-			</table>
-
-			<span style='position:relative;z-index:16'><span
-			style='left:0px;position:absolute;left:398px;top:-1px;width:67px;height:53px'><img
-			width=67 height=53 src="interface.doxygen_fichiers/image018.gif"></span></span><span
-			style='position:relative;z-index:13'><span style='left:0px;position:absolute;
-			left:371px;top:-1px;width:67px;height:52px'><img width=67 height=52
-			src="interface.doxygen_fichiers/image019.gif"></span></span><span
-			style='position:relative;z-index:12'><span style='left:0px;position:absolute;
-			left:349px;top:-1px;width:62px;height:53px'><img width=62 height=53
-			src="interface.doxygen_fichiers/image020.gif"></span></span><span
-			style='position:relative;z-index:11'><span style='left:0px;position:absolute;
-			left:322px;top:-1px;width:69px;height:52px'><img width=69 height=52
-			src="interface.doxygen_fichiers/image021.gif"></span></span><span
-			style='position:relative;z-index:10'><span style='left:0px;position:absolute;
-			left:269px;top:-1px;width:97px;height:53px'><img width=97 height=53
-			src="interface.doxygen_fichiers/image022.gif"></span></span><span
-			style='position:relative;z-index:14'><span style='left:0px;position:absolute;
-			left:455px;top:-1px;width:37px;height:51px'><img width=37 height=51
-			src="interface.doxygen_fichiers/image023.gif"></span></span><span
-			style='position:relative;z-index:15'><span style='left:0px;position:absolute;
-			left:482px;top:-1px;width:33px;height:51px'><img width=33 height=51
-			src="interface.doxygen_fichiers/image024.gif"></span></span><span
-			style='position:relative;z-index:6'><span style='left:0px;position:absolute;
-			left:248px;top:-1px;width:262px;height:53px'><img width=262 height=53
-			src="interface.doxygen_fichiers/image025.gif"></span></span><span
-			style='position:relative;z-index:5'><span style='left:0px;position:absolute;
-			left:221px;top:-1px;width:206px;height:53px'><img width=206 height=53
-			src="interface.doxygen_fichiers/image026.gif"></span></span><span
-			style='position:relative;z-index:7'><span style='left:0px;position:absolute;
-			left:242px;top:-1px;width:97px;height:52px'><img width=97 height=52
-			src="interface.doxygen_fichiers/image027.gif"></span></span><span
-			style='position:relative;z-index:9'><span style='left:0px;position:absolute;
-			left:216px;top:-1px;width:96px;height:52px'><img width=96 height=52
-			src="interface.doxygen_fichiers/image028.gif"></span></span><span
-			style='position:relative;z-index:8'><span style='left:0px;position:absolute;
-			left:193px;top:-1px;width:96px;height:52px'><img width=96 height=52
-			src="interface.doxygen_fichiers/image029.gif"></span></span><span
-			style='position:relative;z-index:4'><span style='left:0px;position:absolute;
-			left:194px;top:-1px;width:103px;height:52px'><img width=103 height=52
-			src="interface.doxygen_fichiers/image030.gif"></span></span>
-
-			<table>
-			<tr>
-			<td>
-			<p class=Tableau>X</p>
-			</td>
-			<td>
-			<p class=Tableau>X</p>
-			</td>
-			<td>
-			<p class=Tableau>X</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			<td>
-			<p class=Tableau>-</p>
-			</td>
-			</tr>
-			</table>
-
-		*/
-		SchedulesTableInterfaceElement::PlaceList SchedulesTableInterfaceElement::getStopsListForScheduleTable(
-			const JourneyBoardJourneys& jv
-			, const Place* departurePlace
-			, const Place* arrivalPlace
-		){
-			// Variables locales
-			int i;
-			int dernieri;
-
-			// Allocation
-			PlaceList pl;
-
-			// Horizontal loop
-			for (JourneyBoardJourneys::const_iterator it(jv.begin()); it != jv.end(); ++it)
-			{
-				i = 0;
-				dernieri = -1;
-
-				// Vertical loop
-				const Journey::ServiceUses& jl((*it)->getServiceUses());
-				for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
-				{
-					const ServiceUse& curET(*itl);
-					
-					// Search of the place from the preceding one
-					if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode())
-					{
-						const Place* placeToSearch(
-							(	itl == jl.begin() &&
-								dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
-							)?
-							departurePlace :
-							AddressablePlace::GetPlace(curET.getDepartureEdge()->getHub())
-						);
-						
-						if (OrdrePARechercheGare( pl, i, placeToSearch))
-						{
-							if ( i < dernieri )
-								i = OrdrePAEchangeSiPossible( jv, pl, dernieri, i );
-						}
-						else
-						{
-							i = OrdrePAInsere(pl, placeToSearch, dernieri + 1, itl == jl.begin(), false);
-						}
-
-						dernieri = i;
-						++i;
-					}
-
-					if (itl == jl.end()-1 || !curET.getEdge()->getParentPath()->isPedestrianMode())
-					{
-						const Place* placeToSearch(
-							itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub())
-							? arrivalPlace
-							: AddressablePlace::GetPlace(curET.getArrivalEdge()->getHub())
-						);
-						
-						if (OrdrePARechercheGare(pl, i, placeToSearch))
-						{
-							if ( i < dernieri )
-								i=OrdrePAEchangeSiPossible(jv, pl, dernieri, i );
-						}
-						else
-						{
-							i = OrdrePAInsere(pl, placeToSearch, dernieri + 1, false, itl == jl.end()-1);
-						}
-						dernieri = i;
-					}
-				}
-			}
-
-			return pl;
-		}
 
 		void SchedulesTableInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
 		{

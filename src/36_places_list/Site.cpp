@@ -342,5 +342,13 @@ namespace synthese
 
 			return result;
 		}
+
+
+
+		Site::ExtendedFetchPlaceResult::ExtendedFetchPlaceResult()
+		{
+			cityResult.value = NULL;
+			placeResult.value = NULL;
+		}
 	}
 }

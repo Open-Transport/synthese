@@ -36,7 +36,7 @@
 #include "VertexAccessMap.h"
 #include "JourneyComparator.h"
 #include "RoadPlace.h"
-// To be removed by a log class
+
 #include "LineStop.h"
 #include "Road.h"
 #include "Line.h"
@@ -79,16 +79,16 @@ namespace synthese
 			const DateTime& journeySheetStartTime,
 			const DateTime& journeySheetEndTime,
 			optional<size_t> maxSolutionsNumber,
-			std::ostream* 			logStream,
-			util::Log::Level			logLevel
-		):	_accessParameters (accessParameters)
-			, _planningOrder (planningOrder)
-			, _maxSolutionsNumber(maxSolutionsNumber)
-			, _minDepartureTime(TIME_UNKNOWN)
-			, _maxArrivalTime(TIME_UNKNOWN)
-			, _previousContinuousServiceLastDeparture(TIME_UNKNOWN)
-			, _logStream(logStream)
-			, _logLevel(logLevel),
+			std::ostream* logStream,
+			util::Log::Level logLevel
+		):	_accessParameters (accessParameters),
+			_planningOrder (planningOrder),
+			_maxSolutionsNumber(maxSolutionsNumber),
+			_minDepartureTime(TIME_UNKNOWN),
+			_maxArrivalTime(TIME_UNKNOWN),
+			_previousContinuousServiceLastDeparture(TIME_UNKNOWN),
+			_logStream(logStream),
+			_logLevel(logLevel),
 			_journeySheetEndArrivalTime(journeySheetEndTime),
 			_journeySheetEndDepartureTime(journeySheetEndTime),
 			_journeySheetStartArrivalTime(journeySheetStartTime),
@@ -142,22 +142,13 @@ namespace synthese
 			}
 #endif
 			// Control if departure and arrival VAMs has contains at least one vertex
-			if(_originVam.getMap().empty() || _destinationVam.getMap().empty())
-			{
+			// or if the departure and arrival places are the same
+			if(	_originVam.getMap().empty() ||
+				_destinationVam.getMap().empty() ||
+				isSamePlaces()
+			){
 				return _result;
 			}
-
-			// Control if the departure place and the arrival place have a common point
-			_result.samePlaces = false;
-			for (VertexAccessMap::VamMap::const_iterator itd(_originVam.getMap().begin()); itd != _originVam.getMap().end(); ++itd)
-				for (VertexAccessMap::VamMap::const_iterator ita(_destinationVam.getMap().begin()); ita != _destinationVam.getMap().end(); ++ita)
-					if (itd->first->getHub() == ita->first->getHub())
-					{
-						_result.samePlaces = true;
-						return _result;
-					}
-
-
 
 			// Create origin vam from integral search on roads
 			JourneysResult<JourneyComparator> originJourneys(_journeySheetStartDepartureTime);
@@ -240,7 +231,9 @@ namespace synthese
 
 			// If a candidate was elected, store it in the result array
 			if (candidate.get())
-				_result.journeys.push_back(candidate);
+			{
+				_result.push_back(candidate);
+			}
 
 #ifdef DEBUG			// Log
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
@@ -380,13 +373,13 @@ namespace synthese
 						*_logStream << s.str();
 			}
 #endif
-			if (_result.journeys.empty())
+			if (_result.empty())
 			{
 				_previousContinuousServiceDuration = posix_time::minutes(0);
 			}
 			else
 			{
-				shared_ptr<Journey> journey(_result.journeys.front());
+				shared_ptr<Journey> journey(_result.front());
 				_previousContinuousServiceDuration = journey->getDuration();
 				_previousContinuousServiceLastDeparture = journey->getDepartureTime();
 				_previousContinuousServiceLastDeparture += journey->getContinuousServiceRange();
@@ -396,7 +389,7 @@ namespace synthese
 			int solutionNumber(0);
 			for(_minDepartureTime = _journeySheetStartDepartureTime; 
 				(	_minDepartureTime <= _journeySheetEndArrivalTime &&
-					(!_maxSolutionsNumber || *_maxSolutionsNumber > _result.journeys.size())
+					(!_maxSolutionsNumber || *_maxSolutionsNumber > _result.size())
 				);
 			){
 #ifdef DEBUG
@@ -418,8 +411,8 @@ namespace synthese
 				
 				//! <li> If no journey was found and last service is continuous, 
 					//! then repeat computation after continuous service range. </li>
-				if(	!_result.journeys.empty()
-				&&	(_result.journeys.back ()->getContinuousServiceRange () > 0)
+				if(	!_result.empty()
+				&&	(_result.back()->getContinuousServiceRange () > 0)
 				&&	(journey->empty() || journey->getDepartureTime() > _previousContinuousServiceLastDeparture)
 				){
 					_minDepartureTime = _previousContinuousServiceLastDeparture;
@@ -432,12 +425,12 @@ namespace synthese
 					break;				
 				
 				//! <li>If last continuous service was broken, update its range</li>
-				if(	!_result.journeys.empty ()
-				&&	(_result.journeys.back ()->getContinuousServiceRange () > 0)
+				if(	!_result.empty ()
+				&&	(_result.back()->getContinuousServiceRange () > 0)
 				&&	(journey->getDepartureTime () <= _previousContinuousServiceLastDeparture)
 				){
-					int duration(journey->getArrivalTime() - _result.journeys.back()->getArrivalTime () - 1);
-					_result.journeys.back()->setContinuousServiceRange (duration);
+					int duration(journey->getArrivalTime() - _result.back()->getArrivalTime () - 1);
+					_result.back()->setContinuousServiceRange (duration);
 				}
 
 				/*!	<li>En cas de nouveau service continu, enregistrement de valeur pour le calcul de la prochaine solution</li>	*/
@@ -451,7 +444,7 @@ namespace synthese
 					_previousContinuousServiceDuration = posix_time::minutes(0);
 
 
-				_result.journeys.push_back(journey);
+				_result.push_back(journey);
 				
 				_minDepartureTime = journey->getDepartureTime ();
 				_minDepartureTime += 1;
@@ -863,9 +856,17 @@ namespace synthese
 
 
 
-		void RoutePlanner::Result::clear()
+		bool RoutePlanner::isSamePlaces() const
 		{
-			journeys.clear();
+			// Control if the departure place and the arrival place have a common point
+			for (VertexAccessMap::VamMap::const_iterator itd(_originVam.getMap().begin()); itd != _originVam.getMap().end(); ++itd)
+				for (VertexAccessMap::VamMap::const_iterator ita(_destinationVam.getMap().begin()); ita != _destinationVam.getMap().end(); ++ita)
+					if (itd->first->getHub() == ita->first->getHub())
+					{
+						return true;
+					}
+			return false;
 		}
+
 	}
 }

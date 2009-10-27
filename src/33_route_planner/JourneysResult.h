@@ -42,9 +42,6 @@
 
 namespace synthese
 {
-	using namespace env;
-	using namespace geography;
-
 	namespace routeplanner
 	{
 		/** List of journeys that should be part of the result of a routing process.

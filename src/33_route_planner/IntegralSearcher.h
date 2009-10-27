@@ -28,7 +28,6 @@
 #include "GraphTypes.h"
 #include "AccessParameters.h"
 
-#include "33_route_planner/Types.h"
 #include "JourneysResult.h"
 #include "GraphModuleTemplate.h"
 

@@ -24,9 +24,6 @@
 #define SYNTHESE_RoutePlannerInterfacePage_H__
 
 #include "GraphTypes.h"
-
-#include "33_route_planner/Types.h"
-
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
 
@@ -61,6 +58,8 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		class PTRoutePlannerResult;
+
 		/** RoutePlannerInterfacePage Interface Page Class.
 			@ingroup m53Pages refPages
 
@@ -118,7 +117,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
-				, const RoutePlannerResult& object
+				, const PTRoutePlannerResult& object
 				, const time::Date& date
 				, size_t periodId
 				, const geography::Place* originPlace

@@ -28,15 +28,10 @@
 #include <map>
 
 #include "Log.h"
-
 #include "DateTime.h"
-
-#include "Place.h"
 #include "VertexAccessMap.h"
 #include "ServiceUse.h"
 #include "AccessParameters.h"
-
-#include "33_route_planner/Types.h"
 
 #include <boost/optional.hpp>
 
@@ -57,6 +52,11 @@ namespace synthese
 		class SquareDistance;
 		class ServicePointer;
 		class Journey;
+	}
+
+	namespace geography
+	{
+		class Place;
 	}
 
 	namespace routeplanner
@@ -85,42 +85,33 @@ namespace synthese
 		class RoutePlanner
 		{
 		public:
-			class Result
-			{
-			public:
-				bool samePlaces;
-				JourneyBoardJourneys journeys;
-
-				void clear();
-			};
+			typedef std::vector<boost::shared_ptr<graph::Journey> > Result;
 
 		private:
 			
 			//! @name Parameters
 			//@{
-				graph::VertexAccessMap		_originVam;
-				graph::VertexAccessMap		_destinationVam;
-				const graph::AccessParameters	_accessParameters;
-				time::DateTime		_journeySheetStartDepartureTime;  //!< Start time of schedule sheet.
-				time::DateTime		_journeySheetEndDepartureTime;    //!< End time of schedule sheet.
-				time::DateTime		_journeySheetStartArrivalTime;  //!< Start time of schedule sheet.
-				time::DateTime		_journeySheetEndArrivalTime;    //!< End time of schedule sheet.
-				const PlanningOrder			_planningOrder;  //!< Define planning sequence.
+				graph::VertexAccessMap				_originVam;
+				graph::VertexAccessMap				_destinationVam;
+				const graph::AccessParameters		_accessParameters;
+				time::DateTime						_journeySheetStartDepartureTime;  //!< Start time of schedule sheet.
+				time::DateTime						_journeySheetEndDepartureTime;    //!< End time of schedule sheet.
+				time::DateTime						_journeySheetStartArrivalTime;  //!< Start time of schedule sheet.
+				time::DateTime						_journeySheetEndArrivalTime;    //!< End time of schedule sheet.
+				const PlanningOrder					_planningOrder;  //!< Define planning sequence.
 				const boost::optional<std::size_t>	_maxSolutionsNumber;
 			//@}
 
 			//! @name Working variables
 			//@{
-				time::DateTime				_minDepartureTime;  //!< Min departure time.
-				time::DateTime				_maxArrivalTime;  //!< Max arrival time.
-				boost::posix_time::time_duration _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
-				time::DateTime				_previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
-				Result						_result;
-				std::ostream* const			_logStream;
-				const util::Log::Level		_logLevel;
-				//!< 
+				time::DateTime						_minDepartureTime;  //!< Min departure time.
+				time::DateTime						_maxArrivalTime;  //!< Max arrival time.
+				boost::posix_time::time_duration	_previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
+				time::DateTime						_previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
+				Result								_result;
+				std::ostream* const					_logStream;
+				const util::Log::Level				_logLevel;
 			//@}
-
 				
 
 
@@ -138,12 +129,12 @@ namespace synthese
 			*/
 			void findBestJourney(
 				graph::AccessDirection accessDirection,
-				graph::Journey& result
-				, const graph::VertexAccessMap& startVam
-				, const graph::VertexAccessMap& endVam
-				, const time::DateTime& startTime
-				, bool strictTime
-				, bool inverted
+				graph::Journey& result,
+				const graph::VertexAccessMap& startVam,
+				const graph::VertexAccessMap& endVam,
+				const time::DateTime& startTime,
+				bool strictTime,
+				bool inverted
 			);
 
 			void computeRoutePlanningDepartureArrival(
@@ -180,6 +171,7 @@ namespace synthese
 			const time::DateTime&		getJourneySheetEndDepartureTime() const;
 			const time::DateTime&		getJourneySheetStartArrivalTime() const;
 			const time::DateTime&		getJourneySheetEndArrivalTime() const;
+			bool	isSamePlaces() const;
 
 			void		setJourneySheetStartDepartureTime(const time::DateTime& value);
 			void		setJourneySheetEndDepartureTime(const time::DateTime& value);

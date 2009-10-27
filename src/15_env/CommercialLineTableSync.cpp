@@ -129,8 +129,20 @@ namespace synthese
 		    object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
 		    object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
 		    object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
-		    object->setColor(RGBColor(rows->getText ( CommercialLineTableSync::COL_COLOR)));
-		    object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
+			
+			string color(rows->getText(CommercialLineTableSync::COL_COLOR));
+			if(!color.empty())
+			{
+				try
+				{
+					object->setColor(RGBColor(color));
+				}
+				catch(RGBColor::Exception& e)
+				{
+					Log::GetInstance().warn("No such color "+ color +" in commercial line "+ lexical_cast<string>(object->getKey()));
+				}
+			}
+			object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 		    object->setCreatorId(rows->getText ( CommercialLineTableSync::COL_CREATOR_ID));
 			object->setNetwork(NULL);
@@ -229,7 +241,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getName())
 				<< "," << Conversion::ToSQLiteString(object->getShortName())
 				<< "," << Conversion::ToSQLiteString(object->getLongName())
-				<< "," << Conversion::ToSQLiteString(object->getColor().toString())
+				<< "," << (object->getColor() ? Conversion::ToSQLiteString(object->getColor()->toString()) : string("''"))
 				<< "," << Conversion::ToSQLiteString(object->getStyle())
 				<< "," << Conversion::ToSQLiteString(object->getImage())
 				<< ",'"

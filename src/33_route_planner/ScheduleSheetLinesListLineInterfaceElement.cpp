@@ -21,9 +21,8 @@
 */
 
 #include "ScheduleSheetLinesListLineInterfaceElement.h"
-#include "RoutePlanner.h"
+#include "PTRoutePlannerResult.h"
 #include "RoutePlannerSheetLinesCellInterfacePage.h"
-#include "33_route_planner/Types.h"
 
 #include "Request.h"
 
@@ -37,7 +36,6 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace env;
 	using namespace graph;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetLinesListLineInterfaceElement>::FACTORY_KEY("schedules_lines");
@@ -51,11 +49,11 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const RoutePlannerResult* jv = static_cast<const RoutePlannerResult*>(object);
+			const PTRoutePlannerResult* jv = static_cast<const PTRoutePlannerResult*>(object);
 			const RoutePlannerSheetLinesCellInterfacePage* linesInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetLinesCellInterfacePage>();
 
 			int n = 1;
-			BOOST_FOREACH(shared_ptr<Journey> journey, jv->result)
+			BOOST_FOREACH(shared_ptr<Journey> journey, jv->getJourneys())
 			{
 				linesInterfacePage->display( stream, n, variables, journey.get(), request );
 				++n;

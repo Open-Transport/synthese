@@ -61,7 +61,62 @@ namespace synthese
 		string	FrenchSentence::_ConvertAlias(const std::string& ssource)
 		{
 			string source(to_lower_copy(ssource));
-			
+
+			if(source == "10")
+			{
+				return "dix";
+			}
+
+			if(source == "11")
+			{
+				return "onze";
+			}
+
+			if(source == "12")
+			{
+				return "douze";
+			}
+
+			if(source == "13")
+			{
+				return "treize";
+			}
+
+			if(source == "14")
+			{
+				return "quatorze";
+			}
+
+			if(source == "15")
+			{
+				return "quinze";
+			}
+
+			if(source == "16")
+			{
+				return "seize";
+			}
+
+			if(source == "17")
+			{
+				return "disept";
+			}
+
+			if(source == "18")
+			{
+				return "disuit";
+			}
+
+			if(source == "19")
+			{
+				return "disneuf";
+			}
+
+			if(source == "20")
+			{
+				return "vin";
+			}
+
 			if(source == "st")
 			{
 				return "saint";

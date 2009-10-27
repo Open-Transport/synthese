@@ -260,10 +260,10 @@ namespace synthese
 			);
 			const RoutePlanner::Result& jr(rp.computeJourneySheetDepartureArrival());
 
-			if (jr.journeys.empty())
+			if (jr.empty())
 				throw ActionException("The route planning does not find a journey to book");
 
-			_journey = *jr.journeys.front();
+			_journey = *jr.front();
 
 		}
 

@@ -31,7 +31,7 @@
 #include "PTConstants.h"
 #include "DateTimeInterfacePage.h"
 #include "Interface.h"
-
+#include "PTRoutePlannerResult.h"
 #include "Date.h"
 #include "NamedPlace.h"
 
@@ -76,7 +76,7 @@ namespace synthese
 		void RoutePlannerInterfacePage::display(
 			ostream& stream
 			, VariablesMap& variables
-			, const RoutePlannerResult& object
+			, const PTRoutePlannerResult& object
 			, const time::Date& date
 			, size_t periodId
 			, const Place* originPlace
@@ -121,7 +121,7 @@ namespace synthese
 			pv.push_back(lexical_cast<string>(periodId));
 			pv.push_back(sDate.str());
 			pv.push_back((period == NULL) ? string() : period->getCaption());
-			pv.push_back(lexical_cast<string>(object.result.size()));
+			pv.push_back(lexical_cast<string>(object.getJourneys().size()));
 			pv.push_back(lexical_cast<string>(accessParameters.getUserClass()));
 			pv.push_back(lexical_cast<string>(site->getKey()));
 			pv.push_back(lexical_cast<string>(samePlaces));

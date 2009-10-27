@@ -21,14 +21,12 @@
 */
 
 #include "ScheduleSheetReservationRowInterfaceElement.h"
+#include "ReservationRuleInterfacePage.h"
+#include "ValueElementList.h"
+#include "Interface.h"
+#include "PTRoutePlannerResult.h"
 
-#include "33_route_planner/Types.h"
-
-#include "15_env/ReservationRuleInterfacePage.h"
-
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/Interface.h"
-
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -55,13 +53,13 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			const RoutePlannerResult* jv = static_cast<const RoutePlannerResult*>(object);
+			const PTRoutePlannerResult* jv = static_cast<const PTRoutePlannerResult*>(object);
 			const ReservationRuleInterfacePage* resaInterfacePage = _page->getInterface()->getPage<ReservationRuleInterfacePage>();
 
-			for (JourneyBoardJourneys::const_iterator it = jv->result.begin(); it != jv->result.end(); ++it)
+			BOOST_FOREACH(PTRoutePlannerResult::Journeys::value_type journey, jv->getJourneys())
 			{
 				stream << _cellHeader->getValue(parameters, variables, object, request);
-				resaInterfacePage->display(stream, variables, **it, request);
+				resaInterfacePage->display(stream, variables, *journey, request);
 				stream << _cellFooter->getValue(parameters, variables, object, request);
 			}
 

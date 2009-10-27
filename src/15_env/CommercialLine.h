@@ -31,6 +31,7 @@
 #include "GraphTypes.h"
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -73,7 +74,7 @@ namespace synthese
 			std::string			_shortName;	//!< Name (cartouche)
 			std::string			_longName;	//!< Name for schedule card
 
-			util::RGBColor		_color;		//!< Line color
+			boost::optional<util::RGBColor>		_color;		//!< Line color
 			std::string			_style;		//!< CSS style (cartouche)
 			std::string			_image;		//!< Display image (cartouche)
 
@@ -100,7 +101,7 @@ namespace synthese
 				const std::string& getShortName () const;
 				const std::string& getLongName () const;
 				const std::string& getImage () const;
-				const util::RGBColor& getColor () const;
+				const boost::optional<util::RGBColor>& getColor () const;
 				const std::string& getName () const;
 				const ReservationContact* getReservationContact() const;
 				const std::string& getCreatorId() const;
@@ -117,7 +118,7 @@ namespace synthese
 				void setShortName (const std::string& shortName);
 				void setLongName (const std::string& longName);
 				void setImage (const std::string& image);
-				void setColor (const util::RGBColor& color);
+				void setColor (const boost::optional<util::RGBColor>& color);
 				void setName (const std::string& name);
 				void setReservationContact(const ReservationContact* value);
 				void setCreatorId(const std::string& value);

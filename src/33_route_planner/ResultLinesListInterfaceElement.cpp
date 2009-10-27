@@ -22,9 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 #include "ResultLinesListInterfaceElement.h"
-#include "RoutePlanner.h"
+#include "PTRoutePlannerResult.h"
 #include "LineMarkerInterfacePage.h"
-#include "33_route_planner/Types.h"
+#include "RoutePlanner.h"
 #include "ServiceUse.h"
 #include "Service.h"
 #include "Line.h"
@@ -54,10 +54,10 @@ namespace synthese
 			, const ParametersVector& parameters
 			, VariablesMap& variables
 			, const void* object /*= NULL*/
-			, const server::Request* request /*= NULL*/ ) const
-		{
+			, const server::Request* request /*= NULL*/
+		) const	{
 			// Read the result
-			const RoutePlannerResult* jv = static_cast<const RoutePlannerResult*>(object);
+			const PTRoutePlannerResult* jv = static_cast<const PTRoutePlannerResult*>(object);
 			if(jv == NULL) return string();
 
 			// Fetch the line display page
@@ -68,7 +68,7 @@ namespace synthese
 
 			// Selection of the lines to display
 			set<const CommercialLine*> lines;
-			BOOST_FOREACH(shared_ptr<Journey> journey, jv->result)
+			BOOST_FOREACH(shared_ptr<Journey> journey, jv->getJourneys())
 			{
 				BOOST_FOREACH(const ServiceUse& service, journey->getServiceUses())
 				{

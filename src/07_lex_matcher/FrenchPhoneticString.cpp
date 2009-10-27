@@ -37,6 +37,66 @@ namespace synthese
 			{
 				switch(source[pos])
 				{
+				case '0':
+					result.push_back(Z);
+					result.push_back(E);
+					result.push_back(R);
+					result.push_back(O);
+					break;
+
+				case '1':
+					result.push_back(AN);
+					break;
+
+				case '2':
+					result.push_back(D);
+					result.push_back(E);
+					break;
+
+				case '3':
+					result.push_back(T);
+					result.push_back(R);
+					result.push_back(O);
+					result.push_back(A);
+					break;
+
+				case '4':
+					result.push_back(K);
+					result.push_back(A);
+					result.push_back(T);
+					result.push_back(R);
+					break;
+
+				case '5':
+					result.push_back(S);
+					result.push_back(AN);
+					result.push_back(K);
+					break;
+
+				case '6':
+					result.push_back(S);
+					result.push_back(I);
+					result.push_back(S);
+					break;
+
+				case '7':
+					result.push_back(S);
+					result.push_back(E);
+					result.push_back(T);
+					break;
+
+				case '8':
+					result.push_back(U);
+					result.push_back(I);
+					result.push_back(T);
+					break;
+
+				case '9':
+					result.push_back(N);
+					result.push_back(E);
+					result.push_back(F);
+					break;
+					
 				case 'a':
 				case 'à':
 				case 'ä':
@@ -385,7 +445,15 @@ namespace synthese
 						result.push_back(P);
 						break;
 					}
-					
+
+					if(	_IsFollowedBy(source, pos, "t") &&
+						_IsLast(source, pos, 2)
+					){
+						++pos;
+						result.push_back(T);
+						break;
+					}
+
 					result.push_back(P);
 					break;
 					

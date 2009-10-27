@@ -39,7 +39,6 @@ struct XMLNode;
 
 namespace synthese
 {
-	using namespace geography;
 	
 
 
@@ -117,12 +116,12 @@ class XmlBuilder
  public:
 
 
-	 static boost::shared_ptr<City> CreateCity (XMLNode& node);
+	 static boost::shared_ptr<geography::City> CreateCity (XMLNode& node);
 
     
 	 static boost::shared_ptr<PublicTransportStopZoneConnectionPlace> CreateConnectionPlace(
 		 XMLNode& node, 
-		 const util::Registry<City>& cities);
+		 const util::Registry<geography::City>& cities);
 
 	 static boost::shared_ptr<CommercialLine> CreateCommercialLine (XMLNode& node);
 

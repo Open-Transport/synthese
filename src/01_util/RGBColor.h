@@ -23,42 +23,56 @@
 #ifndef SYNTHESE_UTIL_RGBCOLOR_H
 #define SYNTHESE_UTIL_RGBCOLOR_H
 
+#include "Exception.h"
+
 #include <string>
 
 namespace synthese
 {
-namespace util
-{
+	namespace util
+	{
 
 		/** RGB Color structure.
 			@ingroup m01
 		*/
-struct RGBColor
-{
-	double r;
-	double g;
-	double b;
-	
-	RGBColor (double red, double green, double blue) 
-		: r (red), g (green), b (blue) {}
-	
-	RGBColor (int red, int green, int blue) 
-		: r (red/255.0), g (green/255.0), b (blue/255.0) {}
+		struct RGBColor
+		{
+			/** Exception to raise if a constructor fails to initialize.
+				@ingroup m01
+			*/
+			class Exception : public util::Exception
+			{
+			public:
+				Exception();
+			};
 
-	RGBColor (const std::string& colorName);
-	
+			double r;
+			double g;
+			double b;
+			
+			RGBColor (double red, double green, double blue) 
+				: r (red), g (green), b (blue) {}
+			
+			RGBColor (int red, int green, int blue) 
+				: r (red/255.0), g (green/255.0), b (blue/255.0) {}
 
-	bool operator == (const synthese::util::RGBColor& op2 ) const;
+			RGBColor (const std::string& colorName);
+			
 
-	std::string toString() const;
-};
+			bool operator == (const synthese::util::RGBColor& op2 ) const;
 
+			std::string toString() const;
 
-
+			
+			
+			/** Outputs the color in XML format (#RRGGBB).
+				@return std::string the color in XML Format (#RRGGBB)
+				@author Hugues Romain
+				@date 2009		
+			*/
+			std::string toXMLColor() const;
+		};
+	}
 }
-}
-
-
 
 #endif
-

@@ -64,7 +64,7 @@ namespace synthese
 				result.insert(
 					make_pair(
 						itDestination.second,
-						solution.journeys.empty() ? Journey() : *solution.journeys.front()
+						solution.empty() ? Journey() : *solution.front()
 				)	);
 			}
 

@@ -192,7 +192,7 @@ namespace synthese
 			const NamedPlace* dsp(dynamic_cast<const NamedPlace*>(startPlace));
 			const NamedPlace* dep(dynamic_cast<const NamedPlace*>(endPlace));
 
-			if (jv.journeys.empty())
+			if (jv.empty())
 			{
 				stream << "Aucun résultat trouvé de " << dsp->getFullName() << " à " << dep->getFullName();
 				return;
@@ -210,7 +210,7 @@ namespace synthese
 
 			int solution(1);
 			stream << t.open();
-			for (JourneyBoardJourneys::const_iterator it(jv.journeys.begin()); it != jv.journeys.end(); ++it)
+			for (RoutePlanner::Result::const_iterator it(jv.begin()); it != jv.end(); ++it)
 			{
 				stream << t.row();
 				stream << t.col(7, string(), true) << "Solution " << solution++;

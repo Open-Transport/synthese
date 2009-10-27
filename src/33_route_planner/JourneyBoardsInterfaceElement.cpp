@@ -21,13 +21,12 @@
 */
 
 #include "JourneyBoardsInterfaceElement.h"
-
 #include "JourneyBoardInterfacePage.h"
-#include "33_route_planner/Types.h"
-
+#include "PTRoutePlannerResult.h"
 #include "Interface.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
+#include "NamedPlace.h"
 
 #include <boost/logic/tribool.hpp>
 
@@ -61,7 +60,7 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			const RoutePlannerResult* result(static_cast<const RoutePlannerResult*>(object));
+			const PTRoutePlannerResult* result(static_cast<const PTRoutePlannerResult*>(object));
 			const JourneyBoardInterfacePage* page(
 				_page->getInterface()->getPage<JourneyBoardInterfacePage>(
 					_pageCode ?
@@ -76,12 +75,12 @@ namespace synthese
 			);
 			
 
-			if (result == NULL || result->result.empty())  // No solution or type error
+			if (result == NULL || result->getJourneys().empty())  // No solution or type error
 				return string();
 
 			int i=1;
-			for(JourneyBoardJourneys::const_iterator it(result->result.begin());
-				it != result->result.end();
+			for(PTRoutePlannerResult::Journeys::const_iterator it(result->getJourneys().begin());
+				it != result->getJourneys().end();
 				++it, ++i
 			){
 				page->display(
@@ -89,11 +88,11 @@ namespace synthese
 					, variables
 					, i
 					, it->get()
-					, result->departurePlace
-					, result->arrivalPlace
+					, result->getDeparturePlace()
+					, result->getArrivalPlace()
 					, hFilter
 					, bFilter
-					, it+1 != result->result.end()
+					, it+1 != result->getJourneys().end()
 					, request
 				);
 			}

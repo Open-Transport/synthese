@@ -231,6 +231,8 @@ namespace synthese
 				{
 					CitiesMatcher::MatchResult::value_type cityResult;
 					lexmatcher::LexicalMatcher<const geography::Place*>::MatchResult::value_type placeResult;
+
+					ExtendedFetchPlaceResult();
 				};
 
 				ExtendedFetchPlaceResult extendedFetchPlace(

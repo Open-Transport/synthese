@@ -55,7 +55,7 @@ DrawableLine::DrawableLine (const Line* line,
     : _lineId (line->getKey())
     , _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
     , _shortName (line->getName ())
-	, _color ((line->getCommercialLine ()->getColor().b < 0 || line->getCommercialLine ()->getColor().g < 0 || line->getCommercialLine ()->getColor().r < 0) ? RGBColor(0,0,0) : line->getCommercialLine ()->getColor())
+	, _color (line->getCommercialLine()->getColor() ? *line->getCommercialLine ()->getColor() : RGBColor(0,0,0))
     , _withPhysicalStops (withPhysicalStops)
 {
     for (unsigned int i=0; i<_points.size (); ++i) {
@@ -171,7 +171,7 @@ DrawableLine::setShift (int pointIndex, int shift)
 int 
 DrawableLine::firstIndexOf (const Point2D& p) const
 {
-    for (int i=0; i<_fuzzyfiedPoints.size (); ++i)
+    for(int i=0; i<_fuzzyfiedPoints.size (); ++i)
     {
 	if (_fuzzyfiedPoints[i] == p) return i;	 	
     }

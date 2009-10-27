@@ -58,9 +58,8 @@ namespace synthese
 
 		CommercialLine::CommercialLine(RegistryKeyType key)
 		:	util::Registrable(key),
-			graph::PathGroup(key)
-			, _color (0, 0, 0)
-			, _network(NULL),
+			graph::PathGroup(key),
+			_network(NULL),
 			_reservationContact(NULL)
 		{
 			// Default use rules
@@ -136,13 +135,14 @@ namespace synthese
 			_image = image;
 		}
 
-		const util::RGBColor& CommercialLine::getColor() const
+		const optional<util::RGBColor>& CommercialLine::getColor() const
 		{
 			return _color;
 		}
 
-		void CommercialLine::setColor( const util::RGBColor& color )
-		{
+		void CommercialLine::setColor(
+			const optional<util::RGBColor>& color
+		){
 			_color = color;
 		}
 

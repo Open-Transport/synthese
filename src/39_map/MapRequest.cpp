@@ -53,6 +53,7 @@ namespace synthese
 	using namespace server;
 	using namespace util::XmlToolkit;
 	using namespace env;
+	using namespace geography;
 
 	namespace util
 	{

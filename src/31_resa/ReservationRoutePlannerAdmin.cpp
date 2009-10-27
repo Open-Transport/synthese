@@ -312,7 +312,7 @@ namespace synthese
 			searchRequest.getPage()->_dateTime = date;
 			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour précédent", string(), "rewind_blue.png") << " ";
 			
-			if(!jv.journeys.empty())
+			if(!jv.empty())
 			{
 				date = _dateTime;
 				date -= 120;
@@ -331,9 +331,9 @@ namespace synthese
 			searchRequest.getPage()->_endCity = _endCity;
 			searchRequest.getPage()->_endPlace = _endPlace;
 
-			if(!jv.journeys.empty())
+			if(!jv.empty())
 			{
-				JourneyBoardJourneys::const_iterator it(jv.journeys.end() - 1);
+				RoutePlanner::Result::const_iterator it(jv.end() - 1);
 				date = (*it)->getDepartureTime();
 				date += 1;
 				searchRequest.getPage()->_dateTime = date;
@@ -352,7 +352,7 @@ namespace synthese
 
 			stream << "<h1>Résultats</h1>";
 
-			if (jv.journeys.empty())
+			if (jv.empty())
 			{
 				stream << "Aucun résultat trouvé de " << (
 						dynamic_cast<const NamedPlace*>(startPlace) ?
@@ -386,7 +386,7 @@ namespace synthese
 
 			// Reservation
 			bool withReservation(false);
-			for (JourneyBoardJourneys::const_iterator it(jv.journeys.begin()); it != jv.journeys.end(); ++it)
+			for (RoutePlanner::Result::const_iterator it(jv.begin()); it != jv.end(); ++it)
 				if ((*it)->getReservationCompliance() && (*it)->getReservationDeadLine() > now)
 				{
 					withReservation = true;
@@ -400,7 +400,7 @@ namespace synthese
 			// Solutions display loop
 			int solution(1);
 			stream << t.open();
-			for (JourneyBoardJourneys::const_iterator it(jv.journeys.begin()); it != jv.journeys.end(); ++it)
+			for (RoutePlanner::Result::const_iterator it(jv.begin()); it != jv.end(); ++it)
 			{
 				stream << t.row();
 				stream << t.col(7, string(), true);
