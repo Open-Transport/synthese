@@ -624,8 +624,8 @@ namespace synthese
 					" longitude=\"" << gp.getLongitude() << "\"" <<
 					" id=\"" << np.getKey() << "\"" <<
 					" city=\"" << np.getCity()->getName() << "\"" <<
-					" x=\"" << lexical_cast<int>(floor(np.getPoint().getX())) << "\"" <<
-					" y=\"" << lexical_cast<int>(floor(np.getPoint().getY())) << "\""
+					" x=\"" << static_cast<int>(np.getPoint().getX()) << "\"" <<
+					" y=\"" << static_cast<int>(np.getPoint().getY()) << "\""
 					" name=\"" << np.getName() << "\"" <<
 				">";
 			if(false) // Test if alarm on place
@@ -656,8 +656,8 @@ namespace synthese
 					" latitude=\"" << gp.getLatitude() << "\"" <<
 					" longitude=\"" << gp.getLongitude() << "\"" <<
 					" id=\"" << stop.getKey() << "\"" <<
-					" x=\"" << lexical_cast<int>(floor(stop.getX())) << "\"" <<
-					" y=\"" << lexical_cast<int>(floor(stop.getY())) << "\"" <<
+					" x=\"" << static_cast<int>(stop.getX()) << "\"" <<
+					" y=\"" << static_cast<int>(stop.getY()) << "\"" <<
 					" name=\"" << stop.getName() << "\"" <<
 				">";
 			_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*stop.getHub()));
