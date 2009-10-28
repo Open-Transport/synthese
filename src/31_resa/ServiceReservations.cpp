@@ -52,10 +52,21 @@ namespace synthese
 			return
 				left->getDepartureTime() < right->getDepartureTime() ||
 				(	left->getDepartureTime() == right->getDepartureTime() &&
-					left->getArrivalTime() < right->getArrivalTime()
+					left->getDeparturePlaceName() < right->getDeparturePlaceName()
 				) || (
 					left->getDepartureTime() == right->getDepartureTime() &&
-					left->getArrivalTime() == right->getArrivalTime() &&
+					left->getDeparturePlaceName() == right->getDeparturePlaceName() &&
+					left->getArrivalPlaceName() < right->getArrivalPlaceName()
+				) || (
+					left->getDepartureTime() == right->getDepartureTime() &&
+					left->getDeparturePlaceName() == right->getDeparturePlaceName() &&
+					left->getArrivalPlaceName() == right->getArrivalPlaceName() &&
+					left->getTransaction()->getBookingTime() < right->getTransaction()->getBookingTime()
+				) || (
+					left->getDepartureTime() == right->getDepartureTime() &&
+					left->getDeparturePlaceName() == right->getDeparturePlaceName() &&
+					left->getArrivalPlaceName() == right->getArrivalPlaceName() &&
+					left->getTransaction()->getBookingTime() == right->getTransaction()->getBookingTime() &&
 					left.get() < right.get()
 				)
 			;
