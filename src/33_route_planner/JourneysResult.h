@@ -278,7 +278,7 @@ namespace synthese
 
 						s	<<
 							"<tr><td>" <<
-							dynamic_cast<const NamedPlace*>(
+							dynamic_cast<const geography::NamedPlace*>(
 								journey->getEndEdge()->getHub()
 							)->getFullName() <<
 							"</td><td>" <<
