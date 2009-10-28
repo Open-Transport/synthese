@@ -402,11 +402,7 @@ namespace synthese
 								
 								for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
 								{
-									**itSheetRow << "/><cell ";
-								}
-								if(	itl != jl.end() - 1)
-								{
-									**itSheetRow << " />";
+									**itSheetRow << "<cell />";
 								}
 								**itSheetRow << "<cell arrivalDateTime=\"" <<
 									posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
@@ -416,6 +412,10 @@ namespace synthese
 									eaTime += posix_time::minutes(journey->getContinuousServiceRange());
 									**itSheetRow << " endArrivalDateTime=\"" <<
 										posix_time::to_iso_extended_string(eaTime) << "\"";
+								}
+								if(	itl == jl.end() - 1)
+								{
+									**itSheetRow << " />";
 								}
 							}
 
