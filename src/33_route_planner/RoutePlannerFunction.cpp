@@ -448,7 +448,7 @@ namespace synthese
 								{
 									stream <<
 										"<line" <<
-										" id=\"" << line->getKey() << "\"";
+										" id=\"" << line->getCommercialLine()->getKey() << "\"";
 									if(line->getCommercialLine()->getColor())
 									{
 										stream << " color=\"" << line->getCommercialLine()->getColor()->toXMLColor() << "\"";
