@@ -523,8 +523,6 @@ namespace synthese
 						}
 
 						stream << "</chunks></journey>";
-
-						**itSheetRow << " />";
 					}
 					stream <<
 						"</journeys>" <<
