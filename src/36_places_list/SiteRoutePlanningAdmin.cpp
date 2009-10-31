@@ -43,6 +43,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
 
@@ -112,7 +113,7 @@ namespace synthese
 			{
 				_site = SiteTableSync::Get(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					_getEnv()
+					Env::GetOfficialEnv()
 				);
 			}
 			catch (...)
@@ -189,23 +190,36 @@ namespace synthese
 
 			stream << "<h1>Résultats</h1>";
 
-			const NamedPlace* dsp(dynamic_cast<const NamedPlace*>(startPlace));
-			const NamedPlace* dep(dynamic_cast<const NamedPlace*>(endPlace));
-
 			if (jv.empty())
 			{
-				stream << "Aucun résultat trouvé de " << dsp->getFullName() << " à " << dep->getFullName();
+				stream << "Aucun résultat trouvé de " << (
+					dynamic_cast<const NamedPlace*>(startPlace) ?
+					dynamic_cast<const NamedPlace*>(startPlace)->getFullName() :
+				dynamic_cast<const City*>(startPlace)->getName()
+					) << " à " << (
+					dynamic_cast<const NamedPlace*>(endPlace) ?
+					dynamic_cast<const NamedPlace*>(endPlace)->getFullName() :
+				dynamic_cast<const City*>(endPlace)->getName()
+					);
 				return;
 			}
 			
 			HTMLTable::ColsVector v;
-			v.push_back("Départ<br />" + dsp->getFullName());
+			v.push_back("Départ<br />" + (
+				dynamic_cast<const NamedPlace*>(startPlace) ?
+				dynamic_cast<const NamedPlace*>(startPlace)->getFullName() :
+				dynamic_cast<const City*>(startPlace)->getName()
+			)	);
 			v.push_back("Ligne");
 			v.push_back("Arrivée");
 			v.push_back("Correspondance");
 			v.push_back("Départ");
 			v.push_back("Ligne");
-			v.push_back("Arrivée<br />" + dep->getFullName());
+			v.push_back("Arrivée<br />" + (
+				dynamic_cast<const NamedPlace*>(endPlace) ?
+				dynamic_cast<const NamedPlace*>(endPlace)->getFullName() :
+				dynamic_cast<const City*>(endPlace)->getName()
+			)	);
 			HTMLTable t(v,"adminresults");
 
 			int solution(1);
@@ -231,6 +245,29 @@ namespace synthese
 				if ((*it)->getReservationCompliance() == boost::logic::indeterminate)
 				{
 					stream << " - Réservation facultative avant le " << (*it)->getReservationDeadLine().toString();
+				}
+				if(dynamic_cast<const City*>(startPlace) || dynamic_cast<const City*>(endPlace))
+				{
+					stream << " (";
+					if(dynamic_cast<const City*>(startPlace))
+					{
+						stream << "départ de " << 
+							static_cast<const PublicTransportStopZoneConnectionPlace*>(
+								its->getDepartureEdge()->getHub()
+							)->getFullName()
+						;
+					}
+					if(dynamic_cast<const City*>(endPlace))
+					{
+						if(dynamic_cast<const City*>(startPlace)) stream << " - ";
+						Journey::ServiceUses::const_iterator ite((*it)->getServiceUses().end() - 1);
+						stream << "arrivée à " << 
+							static_cast<const PublicTransportStopZoneConnectionPlace*>(
+								ite->getArrivalEdge()->getHub()
+							)->getFullName()
+						;
+					}
+					stream << ")";
 				}
 
 				stream << t.row();
@@ -311,8 +348,7 @@ namespace synthese
 		
 		bool SiteRoutePlanningAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _site == static_cast<const SiteRoutePlanningAdmin&>(other)._site;
+			return _site->getKey() == static_cast<const SiteRoutePlanningAdmin&>(other)._site->getKey();
 		}
-			
 	}
 }
