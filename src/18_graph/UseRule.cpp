@@ -37,7 +37,7 @@ namespace synthese
 
 		bool UseRule::IsReservationPossible( const UseRule::ReservationAvailabilityType& value )
 		{
-			return value == RESERVATION_OPTIONAL_POSSIBLE || value == RESERVATION_COMPULSORY_POSSIBLE;
+			return value == RESERVATION_OPTIONAL_POSSIBLE || value == RESERVATION_COMPULSORY_POSSIBLE || value == RESERVATION_DEPENDING_ON_DEPARTURE_PLACE;
 		}
 	}
 }
