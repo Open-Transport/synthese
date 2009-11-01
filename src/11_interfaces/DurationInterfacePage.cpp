@@ -47,7 +47,7 @@ namespace synthese
 			const server::Request* request /*= NULL*/
 		) const	{
 			ParametersVector pv;
-			pv.push_back(lexical_cast<string>(60 * duration.total_seconds()));
+			pv.push_back(lexical_cast<string>(duration.total_seconds() / 60));
 			pv.push_back(lexical_cast<string>(duration.hours()));
 			pv.push_back(lexical_cast<string>(duration.minutes()));
 

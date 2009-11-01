@@ -110,10 +110,10 @@ namespace synthese
 			if (duration.total_seconds() == 0)
 				return;
 
-			_actualTime += 60 * duration.total_seconds();
-			_originDateTime += 60 * duration.total_seconds();
-			_secondActualDateTime += 60 * duration.total_seconds();
-			setServiceRange(getServiceRange() - 60 * duration.total_seconds());
+			_actualTime += duration.total_seconds() / 60;
+			_originDateTime += duration.total_seconds() / 60;
+			_secondActualDateTime += duration.total_seconds() / 60;
+			setServiceRange(getServiceRange() - duration.total_seconds() / 60);
 		}
 
 

@@ -126,7 +126,7 @@ namespace synthese
 			DateTime d(getFirstJourneyLeg ().getDepartureDateTime());
 			if (d.isUnknown())
 				return d;
-			d -= 60 * ((_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration).total_seconds();
+			d -= ((_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration).total_seconds() / 60;
 			return d;
 		}
 
@@ -137,7 +137,7 @@ namespace synthese
 			DateTime d(getLastJourneyLeg ().getArrivalDateTime());
 			if (d.isUnknown())
 				return d;
-			d += 60 * ((_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration).total_seconds();
+			d += ((_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration).total_seconds() / 60;
 			return d;
 		}
 
@@ -379,7 +379,7 @@ namespace synthese
 			{
 				it->shift(duration);
 			}
-			_continuousServiceRange = (continuousServiceRange == UNKNOWN_VALUE) ? _continuousServiceRange - duration.total_seconds() * 60 : continuousServiceRange;
+			_continuousServiceRange = (continuousServiceRange == UNKNOWN_VALUE) ? _continuousServiceRange - duration.total_seconds() / 60 : continuousServiceRange;
 		}
 
 
