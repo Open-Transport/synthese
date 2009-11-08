@@ -34,32 +34,38 @@ namespace synthese
 	namespace geometry
 	{
 
-		/** Point2D class
+		/** Two dimensions point.
 			@ingroup m06
 		*/
 		class Point2D
 		{
-			private:
+		private:
 
-				double _x; 
-				double _y; 
+			double _x; 
+			double _y; 
 
-			public:
+		public:
 
-				Point2D (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
-				virtual ~Point2D () {}
+			Point2D (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
+			virtual ~Point2D () {}
 
 
-				//! @name Getters
-				//@{
-					double getX () const { return _x; }
-					double getY () const { return _y; }
-					bool isUnknown() const;
-					double getDistanceTo(const Point2D& op);
-				//@}
+			//! @name Getters
+			//@{
+				double getX () const { return _x; }
+				double getY () const { return _y; }
+			//@}
 
-					void setXY (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
+			//! @name Queries
+			//@{
+				bool isUnknown() const;
+				double getDistanceTo(const Point2D& op) const;
+			//@}
 
+			//! @name Setters
+			//@{
+				void setXY (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
+			//@}
 		};
 
 
@@ -67,8 +73,6 @@ namespace synthese
 		bool operator!= ( const Point2D& op1, const Point2D& op2 );
 
 		std::ostream& operator<< ( std::ostream& os, const Point2D& op );
-
-
 	}
 }
 

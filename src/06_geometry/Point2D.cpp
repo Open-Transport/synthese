@@ -52,7 +52,7 @@ namespace synthese
 			return _x == UNKNOWN_VALUE;
 		}
 
-		double Point2D::getDistanceTo( const Point2D& p )
+		double Point2D::getDistanceTo( const Point2D& p ) const
 		{
 			return sqrt ((p.getX() - getX()) * (p.getX() - getX()) + 
 				(p.getY() - getY()) * (p.getY() - getY()));
