@@ -24,3 +24,4 @@ synthese::server::ServerAdminRight::integrate();
 synthese::server::ThreadsAdmin::integrate();
 
 synthese::server::XMLSessionFunction::integrate();
+synthese::server::XMLSessionIsValidFunction::integrate();
