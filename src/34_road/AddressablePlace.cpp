@@ -205,19 +205,17 @@ namespace synthese
 			VertexAccessMap& result, 
 			const AccessDirection& accessDirection,
 			const AccessParameters& accessParameters,
-			GraphIdType whatToSearch
+			const geography::Place::GraphTypes& whatToSearch
 		) const {
-			if (whatToSearch == RoadModule::GRAPH_ID)
+			if (whatToSearch.find(RoadModule::GRAPH_ID) == whatToSearch.end()) return;
+			
+			BOOST_FOREACH(const Address* address, _addresses)
 			{
-				BOOST_FOREACH(const Address* address, _addresses)
-				{
-					result.insert(
-						address,
-						VertexAccess()
-					);
-				}
-			}
-		}
+				result.insert(
+					address,
+					VertexAccess()
+				);
+		}	}
 
 
 		const geometry::Point2D& AddressablePlace::getPoint() const

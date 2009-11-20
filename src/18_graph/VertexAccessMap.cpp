@@ -204,5 +204,17 @@ namespace synthese
 				}
 			}
 		}
+
+
+
+		bool VertexAccessMap::intersercts( const VertexAccessMap& other ) const
+		{
+			// Control if the departure place and the arrival place have a common point
+			BOOST_FOREACH(const VamMap::value_type& it, _map)
+			{
+				if(other._map.find(it.first) != other._map.end()) return true;
+			}
+			return false;
+		}
 	}
 }

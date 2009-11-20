@@ -238,10 +238,10 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getServiceNumber())
 				<< ",'"
 			;
-			for(int i(0); i<object->getDepartureSchedules().size(); ++i)
+			for(int i(0); i<object->getDepartureSchedules(false).size(); ++i)
 			{
 				if(i) query << ",";
-				query << object->getArrivalSchedules()[i].toSQLString(false) << "#" << object->getDepartureSchedules()[i].toSQLString(false);
+				query << object->getArrivalSchedules(false)[i].toSQLString(false) << "#" << object->getDepartureSchedules(false)[i].toSQLString(false);
 			}
 			query <<
 				"'," << object->getPathId()

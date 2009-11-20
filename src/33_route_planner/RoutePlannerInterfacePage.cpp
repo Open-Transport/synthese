@@ -49,6 +49,7 @@ namespace synthese
 	using namespace transportwebsite;
 	using namespace geography;
 	using namespace graph;
+	using namespace ptrouteplanner;
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerInterfacePage>::FACTORY_KEY("route_planner");
 

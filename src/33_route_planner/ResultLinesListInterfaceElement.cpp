@@ -44,6 +44,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace env;
 	using namespace graph;
+	using namespace ptrouteplanner;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ResultLinesListInterfaceElement>::FACTORY_KEY("result_lines_list");
 
@@ -68,9 +69,9 @@ namespace synthese
 
 			// Selection of the lines to display
 			set<const CommercialLine*> lines;
-			BOOST_FOREACH(shared_ptr<Journey> journey, jv->getJourneys())
+			BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, jv->getJourneys())
 			{
-				BOOST_FOREACH(const ServiceUse& service, journey->getServiceUses())
+				BOOST_FOREACH(const ServiceUse& service, journey.getServiceUses())
 				{
 					if(dynamic_cast<const Line*>(service.getService()->getPath()))
 					{

@@ -78,8 +78,8 @@ namespace synthese
 			if(getPath())
 			{
 				date newDate(d);
-				for(int i(getDepartureSchedule().getDaysSinceDeparture());
-					i<= getLastArrivalSchedule().getDaysSinceDeparture();
+				for(int i(getDepartureSchedule(false,0).getDaysSinceDeparture());
+					i<= getLastArrivalSchedule(false).getDaysSinceDeparture();
 					++i, newDate += days(1)
 				){
 					getPath()->setActive(newDate);

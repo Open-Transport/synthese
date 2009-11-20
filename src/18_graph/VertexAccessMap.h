@@ -111,8 +111,18 @@ TRIDENT : VertexAccess => AccesPoint
 		    
 			bool contains (const Vertex* vertex) const;
 			
-					
 			
+			
+			/** Tests if the object and the tested one have at least one common vertex.
+				@param other the other object
+				@return bool true if the objects have at least one common vertex.
+				@author Hugues Romain
+				@date 2009
+			*/
+			bool intersercts(const VertexAccessMap& other) const;					
+
+
+
 			/** Vertex insertion.
 				@param vertex the vertex to insert
 				@param vertexAccess access conditions to the vertex

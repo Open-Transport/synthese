@@ -194,8 +194,8 @@ namespace synthese
 
 					BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
 					{
-						Schedule ds(service->getDepartureSchedule());
-						Schedule as(service->getLastArrivalSchedule());
+						Schedule ds(service->getDepartureSchedule(false, 0));
+						Schedule as(service->getLastArrivalSchedule(false));
 
 						stream << ts.row();
 						stream << ts.col() << service->getServiceNumber();
@@ -248,8 +248,8 @@ namespace synthese
 					{
 						stream << tc.row();
 
-						Schedule ds(service->getDepartureSchedule());
-						Schedule as(service->getLastArrivalSchedule());
+						Schedule ds(service->getDepartureSchedule(false, 0));
+						Schedule as(service->getLastArrivalSchedule(false));
 
 						stream << tc.col() << ds.toString();
 						ds += service->getRange();

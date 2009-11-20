@@ -48,7 +48,7 @@ namespace synthese
 					std::size_t
 			>	> CallCountSearchResult;
 
-			typedef enum Step
+			enum Step
 			{
 				HOUR_STEP,
 				DAY_STEP,

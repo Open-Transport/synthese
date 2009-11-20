@@ -68,434 +68,100 @@ namespace synthese
 	using namespace pt;
 	
 
-	namespace routeplanner
+	namespace algorithm
 	{
-
 		RoutePlanner::RoutePlanner(
-			const Place* origin,
-			const Place* destination,
-			const AccessParameters& accessParameters,
-			const PlanningOrder& planningOrder,
-			const DateTime& journeySheetStartTime,
-			const DateTime& journeySheetEndTime,
-			optional<size_t> maxSolutionsNumber,
-			std::ostream* logStream,
-			util::Log::Level logLevel
-		):	_accessParameters (accessParameters),
-			_planningOrder (planningOrder),
-			_maxSolutionsNumber(maxSolutionsNumber),
-			_minDepartureTime(TIME_UNKNOWN),
-			_maxArrivalTime(TIME_UNKNOWN),
-			_previousContinuousServiceLastDeparture(TIME_UNKNOWN),
+			const graph::VertexAccessMap& originVam,
+			const graph::VertexAccessMap& destinationVam,
+			PlanningOrder planningOrder, /*!< Define planning sequence. */
+			graph::AccessParameters accessParameters,
+			optional<posix_time::time_duration> maxDuration,
+			const time::DateTime& minBeginTime,
+			const time::DateTime& maxBeginTime,
+			const time::DateTime& maxEndTime,
+			graph::GraphIdType whatToSearch,
+			graph::GraphIdType graphToUse,
+			std::ostream* logStream /*= NULL*/,
+			util::Log::Level logLevel /*= util::Log::LEVEL_NONE */
+		):	_originVam(originVam),
+			_destinationVam(destinationVam),
+			_planningOrder(planningOrder),
+			_accessParameters(accessParameters),
+			_maxDuration(maxDuration),
+			_minBeginTime(minBeginTime),
+			_maxBeginTime(maxBeginTime),
+			_maxEndTime(maxEndTime),
+			_whatToSearch(whatToSearch),
+			_graphToUse(graphToUse),
 			_logStream(logStream),
-			_logLevel(logLevel),
-			_journeySheetEndArrivalTime(journeySheetEndTime),
-			_journeySheetEndDepartureTime(journeySheetEndTime),
-			_journeySheetStartArrivalTime(journeySheetStartTime),
-			_journeySheetStartDepartureTime(journeySheetStartTime)
+			_logLevel(logLevel)
 		{
-			origin->getVertexAccessMap(
-				_originVam
-				, DEPARTURE_TO_ARRIVAL
-				, accessParameters
-				, RoadModule::GRAPH_ID
-			);
-			origin->getVertexAccessMap(
-				_originVam
-				, DEPARTURE_TO_ARRIVAL
-				, accessParameters
-				, PTModule::GRAPH_ID
-			);
-			destination->getVertexAccessMap(
-				_destinationVam
-				, ARRIVAL_TO_DEPARTURE
-				, accessParameters
-				, RoadModule::GRAPH_ID
-			);
-			destination->getVertexAccessMap(
-				_destinationVam
-				, ARRIVAL_TO_DEPARTURE
-				, accessParameters
-				, PTModule::GRAPH_ID
-			);
 		}
 
 
 
-// --------------------------------------------------------- Journey sheet calculation
-
-		const RoutePlanner::Result& RoutePlanner::computeJourneySheetDepartureArrival()
-		{
-			_result.clear();
-
-#ifdef DEBUG			// Log
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-			){
-				stringstream s;
-				s << "<h2>Origin access map calculation</h2>";
-
-				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-					Log::GetInstance().trace(s.str());
-				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-					*_logStream << s.str();
-			}
-#endif
-			// Control if departure and arrival VAMs has contains at least one vertex
-			// or if the departure and arrival places are the same
-			if(	_originVam.getMap().empty() ||
-				_destinationVam.getMap().empty() ||
-				isSamePlaces()
-			){
-				return _result;
-			}
-
-			// Create origin vam from integral search on roads
-			JourneysResult<JourneyComparator> originJourneys(_journeySheetStartDepartureTime);
-			BestVertexReachesMap bvrmd(DEPARTURE_TO_ARRIVAL, _originVam); // was optim=true
-			DateTime dt3(_journeySheetEndArrivalTime);
-			DateTime dt4(TIME_UNKNOWN);
-			IntegralSearcher iso(
-				DEPARTURE_TO_ARRIVAL
-				, _accessParameters
-				, PTModule::GRAPH_ID
-				, RoadModule::GRAPH_ID
-				, originJourneys
-				, bvrmd
-				, _destinationVam,
-				_journeySheetStartDepartureTime
-				, dt3
-				, posix_time::minutes(0)
-				, dt4
-				, false
-				, false
-				, _logStream
-				, _logLevel
-			);
-			iso.integralSearch(_originVam, std::numeric_limits<int>::max(), false);
-			
-			VertexAccessMap ovam;
-			// Include physical stops from originVam into result of integral search
-			// (cos not taken into account in returned journey vector).
-			ovam.mergeWithFilter(_originVam, PTModule::GRAPH_ID);
-
-			shared_ptr<Journey> candidate;
-			BOOST_FOREACH(const JourneysResult<JourneyComparator>::ResultSet::value_type& it, originJourneys.getJourneys())
-			{
-				JourneysResult<JourneyComparator>::ResultSet::key_type oj(it.first);
-
-				// Store each reached physical stop with full approach time addition :
-				//	- approach time in departure place
-				//	- duration of the approach journey
-				//	- transfer delay between approach journey end address and physical stop
-				posix_time::time_duration commonApproachTime(
-					_originVam.getVertexAccess(oj->getOrigin()->getFromVertex()).approachTime
-					+ oj->getDuration ()
-				);
-				double commonApproachDistance(
-					_originVam.getVertexAccess(oj->getOrigin()->getFromVertex()).approachDistance
-					+ oj->getDistance ()
-				);
-				VertexAccessMap vam;
-				const Hub* cp(oj->getDestination()->getHub());
-				const Vertex& v(*oj->getDestination()->getFromVertex());
-				cp->getVertexAccessMap(
-					vam
-					, DEPARTURE_TO_ARRIVAL
-					, PTModule::GRAPH_ID
-					, v
-				);
-				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam.getMap())
-				{
-					if (_destinationVam.contains(it.first))
-						continue;
-
-					ovam.insert(
-						it.first
-						, VertexAccess(
-							commonApproachTime + cp->getTransferDelay(v, *it.first)
-							, commonApproachDistance
-							, *oj
-						)
-					);
-				}
-
-				// Store the journey as a candidate if it goes directly to the destination
-				if(	_destinationVam.contains(oj->getDestination()->getFromVertex()) &&
-					(	!candidate.get() ||
-						oj->isBestThan(*candidate)
-				)	){
-					candidate = oj;
-				}
-			}
-
-			// If a candidate was elected, store it in the result array
-			if (candidate.get())
-			{
-				_result.push_back(candidate);
-			}
-
-#ifdef DEBUG			// Log
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-				){
-					stringstream s;
-					s << "<h3>Origins</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
-
-					BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, ovam.getMap())
-					{
-						s	<<
-							"<tr><td>" <<
-							dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
-							"</td><td>" << static_cast<const PhysicalStop*>(it.first)->getName() <<
-							"</td><td>" << it.second.approachDistance <<
-							"</td><td>" << it.second.approachTime.total_seconds() / 60 <<
-							"</td></tr>"
-						;
-					}
-					s << "</table>";
-
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s.str());
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s.str();
-			}
-
-			// Log
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-				){
-					stringstream s;
-					s << "<h2>Destination access map calculation</h2>";
-
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s.str());
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s.str();
-			}
-#endif
-			// Create destination vam from integral search on roads
-			JourneysResult<JourneyComparator> destinationJourneys(_journeySheetEndArrivalTime);
-			BestVertexReachesMap bvrmo(DEPARTURE_TO_ARRIVAL, _destinationVam); // was optim=true
-			DateTime dt1(_journeySheetStartDepartureTime);
-			DateTime dt2(TIME_UNKNOWN);
-			IntegralSearcher isd(
-				ARRIVAL_TO_DEPARTURE
-				, _accessParameters
-				, PTModule::GRAPH_ID
-				, RoadModule::GRAPH_ID
-				, destinationJourneys
-				, bvrmo
-				, _originVam,
-				_journeySheetEndArrivalTime
-				, dt1
-				, posix_time::minutes(0)
-				, dt2
-				, false
-				, true
-				, _logStream
-				, _logLevel
-			);
-			isd.integralSearch(_destinationVam, std::numeric_limits<int>::max(), false);
-
-			VertexAccessMap dvam;
-			// Include physical stops from destinationVam into result of integral search
-			// (cos not taken into account in returned journey vector).
-			dvam.mergeWithFilter(_destinationVam, PTModule::GRAPH_ID);
-
-			BOOST_FOREACH(const JourneysResult<JourneyComparator>::ResultSet::value_type& it, destinationJourneys.getJourneys())
-			{
-				JourneysResult<JourneyComparator>::ResultSet::key_type dj(it.first);
-
-				// Store each reached physical stop with full approach time addition :
-				//	- approach time in destination place
-				//	- duration of the approach journey
-				//	- transfer delay between approach journey end address and physical stop
-				posix_time::time_duration commonApproachTime(
-					_destinationVam.getVertexAccess(
-						dj->getDestination()->getFromVertex()
-					).approachTime	+ dj->getDuration ()
-				);
-				double commonApproachDistance(
-					_destinationVam.getVertexAccess(
-						dj->getDestination()->getFromVertex()
-					).approachDistance + dj->getDistance ()
-				);
-				VertexAccessMap vam;
-				const Hub* cp(dj->getOrigin()->getHub());
-				const Vertex& v(*dj->getOrigin()->getFromVertex());
-				cp->getVertexAccessMap(
-					vam,
-					ARRIVAL_TO_DEPARTURE,
-					PTModule::GRAPH_ID,
-					v
-				);
-				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam.getMap())
-				{
-					if (!_originVam.contains(it.first))
-						dvam.insert(
-							it.first,
-							VertexAccess(
-								commonApproachTime + cp->getTransferDelay(*it.first, v),
-								commonApproachDistance,
-								*dj
-							)
-						);
-				}
-			}
-
-#ifdef DEBUG			// Log
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-				){
-					stringstream s;
-					s << "<h3>Destinations</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
-
-					BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, dvam.getMap())
-					{
-						s	<<
-							"<tr><td>" <<
-							dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
-							"</td><td>" <<
-							static_cast<const PhysicalStop* const>(it.first)->getName() <<
-							"</td><td>" <<
-							it.second.approachDistance <<
-							"</td><td>" <<
-							it.second.approachTime.total_seconds() / 60 <<
-							"</td></tr>"
-						;
-					}
-					s << "</table>";
-
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s.str());
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s.str();
-			}
-#endif
-			if (_result.empty())
-			{
-				_previousContinuousServiceDuration = posix_time::minutes(0);
-			}
-			else
-			{
-				shared_ptr<Journey> journey(_result.front());
-				_previousContinuousServiceDuration = journey->getDuration();
-				_previousContinuousServiceLastDeparture = journey->getDepartureTime();
-				_previousContinuousServiceLastDeparture += journey->getContinuousServiceRange();
-			}
-
-			// Time loop
-			int solutionNumber(0);
-			for(_minDepartureTime = _journeySheetStartDepartureTime; 
-				(	_minDepartureTime <= _journeySheetEndArrivalTime &&
-					(!_maxSolutionsNumber || *_maxSolutionsNumber > _result.size())
-				);
-			){
-#ifdef DEBUG
-				if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-					|| _logLevel <= Log::LEVEL_TRACE
-					){
-						stringstream s;
-						s << "<h2>Route planning " << ++solutionNumber << " at " << _minDepartureTime.toString() << "</h2>";
-
-						if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-							Log::GetInstance().trace(s.str());
-						if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-							*_logStream << s.str();
-				}
-#endif
-
-				shared_ptr<Journey> journey(new Journey());
-				computeRoutePlanningDepartureArrival(*journey, ovam, dvam);
-				
-				//! <li> If no journey was found and last service is continuous, 
-					//! then repeat computation after continuous service range. </li>
-				if(	!_result.empty()
-				&&	(_result.back()->getContinuousServiceRange () > 0)
-				&&	(journey->empty() || journey->getDepartureTime() > _previousContinuousServiceLastDeparture)
-				){
-					_minDepartureTime = _previousContinuousServiceLastDeparture;
-					_minDepartureTime += 1;
-					_previousContinuousServiceDuration = posix_time::minutes(0);
-					computeRoutePlanningDepartureArrival (*journey, ovam, dvam);	
-				}
-				
-				if (journey->empty())
-					break;				
-				
-				//! <li>If last continuous service was broken, update its range</li>
-				if(	!_result.empty ()
-				&&	(_result.back()->getContinuousServiceRange () > 0)
-				&&	(journey->getDepartureTime () <= _previousContinuousServiceLastDeparture)
-				){
-					int duration(journey->getArrivalTime() - _result.back()->getArrivalTime () - 1);
-					_result.back()->setContinuousServiceRange (duration);
-				}
-
-				/*!	<li>En cas de nouveau service continu, enregistrement de valeur pour le calcul de la prochaine solution</li>	*/
-				if (journey->getContinuousServiceRange() > 1)
-				{
-					_previousContinuousServiceDuration = journey->getDuration();
-					_previousContinuousServiceLastDeparture = journey->getDepartureTime();
-					_previousContinuousServiceLastDeparture += journey->getContinuousServiceRange();
-				}
-				else
-					_previousContinuousServiceDuration = posix_time::minutes(0);
-
-
-				_result.push_back(journey);
-				
-				_minDepartureTime = journey->getDepartureTime ();
-				_minDepartureTime += 1;
-			}
-			
-			return _result;
-			
-		}
-
-
-// -------------------------------------------------------------------- Column computing
-
-		void RoutePlanner::computeRoutePlanningDepartureArrival(
-			Journey& result
-			, const VertexAccessMap& ovam
-			, const VertexAccessMap& dvam
+		RoutePlanner::Result RoutePlanner::run(
 		){
-			_maxArrivalTime = _journeySheetEndArrivalTime;
-			_maxArrivalTime.addDaysDuration(7);	/// @todo Replace 7 by a parameter
-		    
-			// Look for best arrival
-			findBestJourney(DEPARTURE_TO_ARRIVAL, result, ovam, dvam, _minDepartureTime, false, false);
-		    
-			if (result.empty() || result.getDepartureTime() > _journeySheetEndArrivalTime)
-			{
-				result.clear();
-				return;
-			}
-		    
-			// If a journey was found, try to optimize by delaying departure hour as much as possible.
-			// Update bounds
-			_minDepartureTime = result.getDepartureTime ();
-			_maxArrivalTime = result.getArrivalTime ();
+			if(_originVam.intersercts(_destinationVam)) throw SamePlacesException();
 
+			Result result;
+
+			// Look for best time
+			_findBestJourney(
+				result,
+				_originVam,
+				_destinationVam,
+				_planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE,
+				_minBeginTime,
+				_maxBeginTime,
+				_maxEndTime,
+				false,
+				_maxDuration
+			);
+
+			if(result.empty()) return result;
+		    
 			result.reverse();
-		
-			// Look for best departure
-			findBestJourney(ARRIVAL_TO_DEPARTURE, result, dvam, ovam, _maxArrivalTime, true, true);
 
-			if (result.getDepartureTime() > _journeySheetEndArrivalTime)
-			{
-				result.clear();
-				return;
+			DateTime beginBound(result.getBeginTime());
+			DateTime endBound(result.getEndTime());
+			if(	_maxDuration &&
+				result.getArrivalTime() - result.getDepartureTime() > _maxDuration->total_seconds() / 60
+			){
+				endBound = 
+					_planningOrder == DEPARTURE_FIRST ?
+					result.getArrivalTime() - _maxDuration->total_seconds() / 60 :
+					result.getDepartureTime() + _maxDuration->total_seconds() / 60 
+				;
+
+				if(	_planningOrder == DEPARTURE_FIRST && result.getEndTime() < endBound ||
+					result.getEndTime() > endBound
+				){
+					result.clear();
+				}
 			}
 
-			// Inclusion of approach journeys
+			// Look for best duration
+			_findBestJourney(
+				result,
+				_destinationVam,
+				_originVam,
+				_planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL,
+				beginBound,
+				beginBound,
+				endBound,
+				true,
+				_maxDuration
+			);
+
+			if(result.empty()) return result;
+
+			// Inclusion of approach journeys in the result
 			if (result.getStartApproachDuration().total_seconds())
 			{
 				result.setStartApproachDuration(posix_time::minutes(0));
 				Journey goalApproachJourney(
-					dvam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney
+					_destinationVam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney
 				);
 				if (!goalApproachJourney.empty())
 				{
@@ -518,7 +184,7 @@ namespace synthese
 			{
 				result.setStartApproachDuration(posix_time::minutes(0));
 				Journey originApproachJourney(
-					ovam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney
+					_originVam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney
 				);
 				if (!originApproachJourney.empty())
 				{
@@ -535,30 +201,48 @@ namespace synthese
 					result.prepend(originApproachJourney);
 				}
 			}
+
+			return result;
 		}
 
 // -------------------------------------------------------------------------- Recursion
 
-		void RoutePlanner::findBestJourney(
-			AccessDirection accessDirection,
+		void RoutePlanner::_findBestJourney(
 			Journey& result,
-			const VertexAccessMap& startVam,
-			const VertexAccessMap& endVam,
-			const time::DateTime& startTime,
-			bool strictTime,
-			bool inverted
+			const graph::VertexAccessMap& startVam,
+			const graph::VertexAccessMap& endVam,
+			AccessDirection accessDirection,
+			const time::DateTime& originDateTime,
+			const time::DateTime& minMaxDateTimeAtOrigin,
+			const time::DateTime& minMaxDateTimeAtDestination,
+			bool inverted,
+			boost::optional<boost::posix_time::time_duration> maxDuration
 		){
 			assert(accessDirection != UNDEFINED_DIRECTION);
-			assert(result.getMethod() == UNDEFINED_DIRECTION || result.getMethod() == accessDirection);
+			assert(result.empty() || result.getMethod() == accessDirection);
+			if(accessDirection == DEPARTURE_TO_ARRIVAL &&
+				(originDateTime > minMaxDateTimeAtOrigin || originDateTime > minMaxDateTimeAtDestination || minMaxDateTimeAtOrigin > minMaxDateTimeAtDestination)
+			){
+				assert(false);
+				return;
+			}
+			if(accessDirection == ARRIVAL_TO_DEPARTURE &&
+				(originDateTime < minMaxDateTimeAtOrigin || originDateTime < minMaxDateTimeAtDestination || minMaxDateTimeAtOrigin < minMaxDateTimeAtDestination)
+			){
+				assert(false);
+				return;
+			}
 
-			JourneysResult<JourneyComparator> todo(startTime);
+			DateTime __minMaxDateTimeAtDestination(minMaxDateTimeAtDestination);
+
+			JourneysResult<JourneyComparator> todo(originDateTime);
 			int integralSerachsNumber(1);
 			
-			DateTime& bestEndTime((accessDirection == DEPARTURE_TO_ARRIVAL) ? _maxArrivalTime : _minDepartureTime);
-			DateTime lastBestEndTime(bestEndTime);
+			DateTime bestEndTime(minMaxDateTimeAtDestination);
+			DateTime lastBestEndTime(minMaxDateTimeAtDestination);
 			
 			// Initialization of the best vertex reaches map
-			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam); // was optim = strictTime
+			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam);
 			
 #ifdef DEBUG
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
@@ -575,24 +259,23 @@ namespace synthese
 #endif
 			// Initialization of the integral searcher
 			IntegralSearcher is(
-				accessDirection
-				, _accessParameters
-				, PTModule::GRAPH_ID
-				, PTModule::GRAPH_ID
-				, todo
-				, bestVertexReachesMap
-				, endVam,
-				startTime
-				, bestEndTime
-				, _previousContinuousServiceDuration
-				, _previousContinuousServiceLastDeparture
-				, strictTime
-				, inverted
+				accessDirection,
+				_accessParameters,
+				_whatToSearch,
+				_graphToUse,
+				todo,
+				bestVertexReachesMap,
+				endVam,
+				originDateTime,
+				minMaxDateTimeAtOrigin,
+				__minMaxDateTimeAtDestination,
+				inverted,
+				_maxDuration
 				, _logStream
 				, _logLevel
 			);
 
-			is.integralSearch(startVam, 0, strictTime);
+			is.integralSearch(startVam, optional<size_t>(0));
 			++integralSerachsNumber;
 			
 			while(true)
@@ -781,7 +464,7 @@ namespace synthese
 				}
 #endif
 
-				is.integralSearch(*journey, 0);
+				is.integralSearch(*journey, optional<size_t>(0));
 			}
 #ifdef DEBUG
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
@@ -800,73 +483,10 @@ namespace synthese
 
 
 
-		const time::DateTime& RoutePlanner::getJourneySheetStartDepartureTime() const
+		RoutePlanner::SamePlacesException::SamePlacesException()
+			: util::Exception("Same places in route planner")
 		{
-			return _journeySheetStartDepartureTime;
+
 		}
-
-
-
-		void RoutePlanner::setJourneySheetStartDepartureTime( const time::DateTime& value )
-		{
-			_journeySheetStartDepartureTime = value;
-		}
-
-
-
-		const time::DateTime& RoutePlanner::getJourneySheetEndDepartureTime() const
-		{
-			return _journeySheetEndDepartureTime;
-		}
-
-
-
-		void RoutePlanner::setJourneySheetEndDepartureTime( const time::DateTime& value )
-		{
-			_journeySheetEndDepartureTime = value;
-		}
-
-
-
-		const time::DateTime& RoutePlanner::getJourneySheetStartArrivalTime() const
-		{
-			return _journeySheetStartArrivalTime;
-		}
-
-
-
-		void RoutePlanner::setJourneySheetStartArrivalTime( const time::DateTime& value )
-		{
-			_journeySheetStartArrivalTime = value;
-		}
-
-
-
-		const time::DateTime& RoutePlanner::getJourneySheetEndArrivalTime() const
-		{
-			return _journeySheetEndArrivalTime;
-		}
-
-
-
-		void RoutePlanner::setJourneySheetEndArrivalTime( const time::DateTime& value )
-		{
-			_journeySheetEndArrivalTime = value;
-		}
-
-
-
-		bool RoutePlanner::isSamePlaces() const
-		{
-			// Control if the departure place and the arrival place have a common point
-			for (VertexAccessMap::VamMap::const_iterator itd(_originVam.getMap().begin()); itd != _originVam.getMap().end(); ++itd)
-				for (VertexAccessMap::VamMap::const_iterator ita(_destinationVam.getMap().begin()); ita != _destinationVam.getMap().end(); ++ita)
-					if (itd->first->getHub() == ita->first->getHub())
-					{
-						return true;
-					}
-			return false;
-		}
-
 	}
 }

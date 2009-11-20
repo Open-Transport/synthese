@@ -455,6 +455,17 @@ namespace synthese
 			return (this->*_endDateTimeGetter)();
 		}
 
+
+
+		DateTime Journey::getBeginTime() const
+		{
+			assert(_method != UNDEFINED_DIRECTION);
+
+			return (this->*_beginDateTimeGetter)();
+		}
+
+
+
 		void Journey::setMinSpeedToEnd( const DateTime& dateTime )
 		{
 			if (_endReached)
@@ -611,5 +622,5 @@ namespace synthese
 		{
 			return _endApproachDuration;
 		}
-	}
+}
 }

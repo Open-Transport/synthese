@@ -1,6 +1,6 @@
 
-/** RoutePlannerModule class implementation.
-	@file RoutePlannerModule.cpp
+/** RoutePlannerTypes class header.
+	@file RoutePlannerTypes.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,39 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RoutePlannerModule.h"
-
-using namespace std;
+#ifndef SYNTHESE_routeplanner_RoutePlannerTypes_h__
+#define SYNTHESE_routeplanner_RoutePlannerTypes_h__
 
 namespace synthese
 {
-	using namespace server;
-	using namespace algorithm;
-	
-	namespace util
-	{
-		template<>
-		const string FactorableTemplate<ModuleClass,RoutePlannerModule>::FACTORY_KEY("53_route_planner");
-	}
-	
-	namespace server
-	{
-		template<> const string ModuleClassTemplate<RoutePlannerModule>::NAME("Calcul d'itinéraires");
-		
-		template<> void ModuleClassTemplate<RoutePlannerModule>::PreInit()
-		{
-		}
-		
-		template<> void ModuleClassTemplate<RoutePlannerModule>::Init()
-		{
-		}
-		
-		template<> void ModuleClassTemplate<RoutePlannerModule>::End()
-		{
-		}
-	}
-
 	namespace algorithm
 	{
+		/** @addtogroup m53
+			@{
+		*/
+
+		typedef enum {DEPARTURE_FIRST, ARRIVAL_FIRST} PlanningOrder;
+
+		/** @} */
 	}
 }
+
+#endif // SYNTHESE_routeplanner_RoutePlannerTypes_h__

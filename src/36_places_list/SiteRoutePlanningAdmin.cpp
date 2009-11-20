@@ -38,12 +38,13 @@
 #include "TransportSiteAdmin.h"
 #include "TransportWebsiteRight.h"
 #include "RoadPlace.h"
-#include "RoutePlanner.h"
+#include "PTTimeSlotRoutePlanner.h"
 #include "SearchFormHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
+#include "PTRoutePlannerResult.h"
 
 using namespace std;
 
@@ -53,7 +54,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace routeplanner;
+	using namespace ptrouteplanner;
+	using namespace algorithm;
 	using namespace time;
 	using namespace html;
 	using namespace env;
@@ -91,6 +93,8 @@ namespace synthese
 			, _log(false),
 			_accessibility(USER_PEDESTRIAN)
 		{ }
+
+
 		
 		void SiteRoutePlanningAdmin::setFromParametersMap(
 			const ParametersMap& map,
@@ -175,22 +179,24 @@ namespace synthese
 			// Route planning
 			const Place* startPlace(_site->fetchPlace(_startCity, _startPlace));
 			const Place* endPlace(_site->fetchPlace(_endCity, _endPlace));
-			RoutePlanner r(
-				startPlace
-				, endPlace
-				, _site->getAccessParameters(_accessibility)
-				, PlanningOrder()
-				, _dateTime
-				, endDate
-				, _resultsNumber
-				, &stream
-				, _log ? Log::LEVEL_TRACE : Log::LEVEL_NONE
-				);
-			const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
+			PTTimeSlotRoutePlanner r(
+				startPlace,
+				endPlace,
+				_dateTime,
+				endDate,
+				_dateTime,
+				endDate,
+				_resultsNumber,
+				_site->getAccessParameters(_accessibility),
+				DEPARTURE_FIRST
+//				, &stream
+//				, _log ? Log::LEVEL_TRACE : Log::LEVEL_NONE
+			);
+			const PTRoutePlannerResult jv(r.run());
 
 			stream << "<h1>Résultats</h1>";
 
-			if (jv.empty())
+			if (jv.getJourneys().empty())
 			{
 				stream << "Aucun résultat trouvé de " << (
 					dynamic_cast<const NamedPlace*>(startPlace) ?
@@ -224,27 +230,27 @@ namespace synthese
 
 			int solution(1);
 			stream << t.open();
-			for (RoutePlanner::Result::const_iterator it(jv.begin()); it != jv.end(); ++it)
+			for(PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin()); it != jv.getJourneys().end(); ++it)
 			{
 				stream << t.row();
 				stream << t.col(7, string(), true) << "Solution " << solution++;
 
 				// Departure time
-				Journey::ServiceUses::const_iterator its((*it)->getServiceUses().begin());
+				Journey::ServiceUses::const_iterator its(it->getServiceUses().begin());
 
-				if ((*it)->getContinuousServiceRange() > 1)
+				if (it->getContinuousServiceRange() > 1)
 				{
 					DateTime endRange(its->getDepartureDateTime());
-					endRange += (*it)->getContinuousServiceRange();
+					endRange += it->getContinuousServiceRange();
 					stream << " - Service continu jusqu'à " << endRange.toString();
 				}
-				if ((*it)->getReservationCompliance() == true)
+				if (it->getReservationCompliance() == true)
 				{
-					stream << " - Réservation obligatoire avant le " << (*it)->getReservationDeadLine().toString();
+					stream << " - Réservation obligatoire avant le " << it->getReservationDeadLine().toString();
 				}
-				if ((*it)->getReservationCompliance() == boost::logic::indeterminate)
+				if (it->getReservationCompliance() == boost::logic::indeterminate)
 				{
-					stream << " - Réservation facultative avant le " << (*it)->getReservationDeadLine().toString();
+					stream << " - Réservation facultative avant le " << it->getReservationDeadLine().toString();
 				}
 				if(dynamic_cast<const City*>(startPlace) || dynamic_cast<const City*>(endPlace))
 				{
@@ -260,7 +266,7 @@ namespace synthese
 					if(dynamic_cast<const City*>(endPlace))
 					{
 						if(dynamic_cast<const City*>(startPlace)) stream << " - ";
-						Journey::ServiceUses::const_iterator ite((*it)->getServiceUses().end() - 1);
+						Journey::ServiceUses::const_iterator ite(it->getServiceUses().end() - 1);
 						stream << "arrivée à " << 
 							static_cast<const PublicTransportStopZoneConnectionPlace*>(
 								ite->getArrivalEdge()->getHub()
@@ -280,7 +286,7 @@ namespace synthese
 				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
 
 				// Transfers
-				if (its == (*it)->getServiceUses().end() -1)
+				if (its == it->getServiceUses().end() -1)
 				{
 					stream << t.col(4) << "(trajet direct)";
 				}
@@ -308,7 +314,7 @@ namespace synthese
 						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
 
 						// Exit if last service use
-						if (its == (*it)->getServiceUses().end() -1)
+						if (its == it->getServiceUses().end() -1)
 							break;
 
 						// Empty final arrival col

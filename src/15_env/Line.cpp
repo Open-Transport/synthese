@@ -257,7 +257,7 @@ namespace synthese
 		){
 			/// Test of the respect of the line theory
 			/// If OK call the normal Path service insertion
-			if (!ensureLineTheory || respectsLineTheory(*service))
+			if (!ensureLineTheory || respectsLineTheory(false, *service))
 			{
 				Path::addService(service, ensureLineTheory);
 				return;
@@ -279,24 +279,26 @@ namespace synthese
 
 
 
-		bool Line::respectsLineTheory( const Service& service ) const
-		{
+		bool Line::respectsLineTheory(
+			bool RTData,
+			const Service& service			
+		) const {
 			ServiceSet::const_iterator last_it;
 			ServiceSet::const_iterator it;
 			for(it = _services.begin();
-				it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(0) < service.getDepartureEndScheduleToIndex(0);
+				it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(RTData, 0) < service.getDepartureEndScheduleToIndex(RTData, 0);
 				last_it = it++);
 
 			// Same departure time is forbidden
-			if (it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(0) == service.getDepartureEndScheduleToIndex(0))
+			if (it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(RTData, 0) == service.getDepartureEndScheduleToIndex(RTData, 0))
 				return false;
 
 			// Control of the next service if exists
-			if (it != _services.end() && !(*it)->respectsLineTheoryWith(service))
+			if (it != _services.end() && !(*it)->respectsLineTheoryWith(RTData, service))
 				return false;
 
 			// Control of the previous service if exists
-			if (it != _services.begin() && !(*last_it)->respectsLineTheoryWith(service))
+			if (it != _services.begin() && !(*last_it)->respectsLineTheoryWith(RTData, service))
 				return false;
 
 			return true;

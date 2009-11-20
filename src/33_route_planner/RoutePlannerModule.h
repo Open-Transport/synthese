@@ -120,7 +120,7 @@ namespace synthese
 		@author Hugues Romain
 		@date 2007
 	*/
-	namespace routeplanner
+	namespace algorithm
 	{
 
 		/** 53 Route planner. Module class.

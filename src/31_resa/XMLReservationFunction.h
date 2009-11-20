@@ -33,9 +33,46 @@ namespace synthese
 	namespace resa
 	{
 		/** XMLReservationFunction Function class.
-			@author Hugues
+			@author Hugues Romain
 			@date 2009
 			@ingroup m31Functions refFunctions
+
+			Parameters :
+				- fonction=XMLReservationFunction
+				- sid=<session id> : ID of the current session
+				- roid=<id reservation> : Reservation ID (can be the BookReservationAction created id)
+			
+			Réponse
+
+			Description
+
+			Une réservation est décrite comme suit :
+
+			(schéma)
+
+				- id : identificateur de la réservation dans la base de données de SYNTHESE (vide si
+			réservation non effectuée ou non trouvée)
+				- customerId : identificateur du client dans la base de données de SYNTHESE
+				- cancellationDeadLine : date/heure limite d’annulation de la réservation
+				- departureStop : nom complet (commune + nom) de l’arrêt de départ du trajet
+			réservé
+				- arrivalStop : nom complet (commune + nom) de l’arrêt d’arrivée du trajet réservé
+				- travelDate : date/heure du départ du trajet réservé
+				- customerName : nom complet (prénom + nom) du client ayant réservé
+				- customerPhone : numéro de téléphone du client ayant réservé
+				- status : statut de la réservation (texte)
+				- canBeCancelled (booléen) : indique si la réservation peut être annulée
+				- seats : nombre de places réservées
+				- cancellationDateTime (optionnel) : sa présence indique que la réservation a été
+			annulée. Sa valeur indique la date et l’heure de l’annulation
+				- le détail du trajet réservé est décrit par une succession d’objets chunk décrivant
+			chaque étape du trajet :
+					- departurePlaceName : nom complet de l’arrêt de départ du tronçon
+					- departureDateTime : date/heure de départ du tronçon
+					- arrivalPlaceName : nom complet de l’arrêt d’arrivée du tronçon
+					- arrivalDateTime : date/heure d’arrivée du tronçon
+					- lineNumber : numéro de la ligne empruntée
+
 		*/
 		class XMLReservationFunction:
 			public util::FactorableTemplate<server::Function,XMLReservationFunction>

@@ -51,6 +51,7 @@ namespace synthese
 				AccessDirection		_determinationMethod;
 				const Edge*			_edge;
 				UserClassCode		_userClass;
+				bool				_RTData;
 			//@}
 
 			//! @name Result elements
@@ -58,7 +59,6 @@ namespace synthese
 				const Service*		_service;
 				time::DateTime		_originDateTime;
 				time::DateTime		_actualTime;
-				int					_serviceIndex;
 				const UseRule*		_useRule;
 			//@}
 
@@ -66,6 +66,7 @@ namespace synthese
 
 		public:
 			ServicePointer(
+				bool RTData,
 				AccessDirection method,
 				UserClassCode userclass,
 				const Edge* edge = NULL
@@ -77,7 +78,6 @@ namespace synthese
 				void	setActualTime(const time::DateTime& dateTime);
 				void	setService(const Service* service);
 				void	setOriginDateTime(const time::DateTime& dateTime);
-				void	setServiceIndex(int index);
 				void	setServiceRange(int duration);
 			//@}
 
@@ -87,10 +87,10 @@ namespace synthese
 				const time::DateTime&	getActualDateTime()		const;
 				const time::DateTime&	getOriginDateTime()		const;
 				AccessDirection			getMethod()				const;
-				int						getServiceIndex()		const;
 				int						getServiceRange()		const;
 				const UseRule*			getUseRule()			const;
 				UserClassCode			getUserClass()			const;
+				bool					getRTData()				const;
 			//@}
 
 			//! @name Queries

@@ -21,7 +21,8 @@
 */
 
 #include "RoutePlanningTableGenerator.h"
-#include "RoutePlanner.h"
+#include "PTTimeSlotRoutePlanner.h"
+#include "PTRoutePlannerResult.h"
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -29,8 +30,9 @@ using namespace std;
 namespace synthese
 {
 	using namespace env;
-	using namespace routeplanner;
+	using namespace ptrouteplanner;
 	using namespace graph;
+	using namespace algorithm;
 
 	namespace departurestable
 	{
@@ -42,9 +44,14 @@ namespace synthese
 
 			BOOST_FOREACH(const DisplayedPlacesList::value_type& itDestination, _destinations)
 			{
-				RoutePlanner rp(
+				PTTimeSlotRoutePlanner rp(
 					&_origin,
 					itDestination.second,
+					_startDateTime,
+					_endDateTime,
+					_startDateTime,
+					_endDateTime,
+					1,
 					AccessParameters(
 						USER_PEDESTRIAN,
 						false,
@@ -54,17 +61,14 @@ namespace synthese
 						67,
 						_withTransfer ? 2 : 1
 					),
-					ARRIVAL_FIRST,
-					_startDateTime,
-					_endDateTime,
-					1
+					DEPARTURE_FIRST
 				);
 				
-				const RoutePlanner::Result& solution(rp.computeJourneySheetDepartureArrival());
+				PTRoutePlannerResult solution(rp.run());
 				result.insert(
 					make_pair(
 						itDestination.second,
-						solution.empty() ? Journey() : *solution.front()
+						solution.getJourneys().empty() ? Journey() : solution.getJourneys().front()
 				)	);
 			}
 

@@ -108,6 +108,7 @@ namespace synthese
 				boost::optional<size_t>	getMaxtransportConnectionsCount() const;
 				bool	getDRTOnly()	const;
 				bool	getWithoutDRT()	const;
+				double getMaxApproachTime() const;
 			//@}
 		};
 	}

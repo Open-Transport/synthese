@@ -69,8 +69,8 @@ namespace synthese
 					){
 						_timeContent.push_back(
 							((*itEdge2)->isDeparture() == itRow->getIsDeparture())
-							? service.getDepartureBeginScheduleToIndex(itEdge2 - edges.begin())
-							: service.getArrivalBeginScheduleToIndex(itEdge2 - edges.begin())
+							? service.getDepartureBeginScheduleToIndex(false, itEdge2 - edges.begin())
+							: service.getArrivalBeginScheduleToIndex(false, itEdge2 - edges.begin())
 						);
 						if (itEdge2 == edges.begin())
 							_originType = Terminus;

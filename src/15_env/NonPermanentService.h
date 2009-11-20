@@ -61,7 +61,9 @@ namespace synthese
 			/** Latest schedule of the service : the last arrival at the last vertex.
 				@return The latest schedule of the service
 			*/
-			virtual const time::Schedule& getLastArrivalSchedule() const = 0;
+			virtual const time::Schedule& getLastArrivalSchedule(
+				bool RTData
+			) const = 0;
 
 			/** Marks a date on the calendar of the service.
 			 * Updates the calendar of the path too.

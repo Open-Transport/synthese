@@ -73,13 +73,13 @@ namespace synthese
 		}
 
 
-		const Service* Path::getService(
-			int serviceIndex
-		) const {
-			ServiceSet::const_iterator it(_services.begin ());
-			advance (it, serviceIndex);
-			return (*it);
-		}
+// 		const Service* Path::getService(
+// 			int serviceIndex
+// 		) const {
+// 			ServiceSet::const_iterator it(_services.begin ());
+// 			advance (it, serviceIndex);
+// 			return (*it);
+// 		}
 
 
 
@@ -324,7 +324,7 @@ namespace synthese
 	    Path::markScheduleIndexesUpdateNeeded()
 	    {
 		for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
-		    (*it)->markServiceIndexUpdateNeeded ();
+		    (*it)->markServiceIndexUpdateNeeded (false);
 	    }
 
 		void Path::setAllDays( bool value )
@@ -341,8 +341,8 @@ namespace synthese
 
 		bool cmpService::operator ()(const Service *s1, const Service *s2) const
 		{
-			return (s1->getDepartureSchedule () < s2->getDepartureSchedule ())
-				|| (s1->getDepartureSchedule () == s2->getDepartureSchedule ()
+			return (s1->getDepartureSchedule (false,0) < s2->getDepartureSchedule (false,0))
+				|| (s1->getDepartureSchedule (false,0) == s2->getDepartureSchedule (false,0)
 				&& s1 < s2)						
 				;
 		}

@@ -189,7 +189,10 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008					
 				*/
-				bool respectsLineTheory(const graph::Service& service) const;
+				bool respectsLineTheory(
+					bool RTData,
+					const graph::Service& service
+				) const;
 
 				/** Content comparison operator.
 					@param stops Array of physical stops

@@ -101,7 +101,10 @@ namespace synthese
 					@param rank Rank of the stop where to get the departure schedule
 					@return see the implementations of the method.
 				*/
-				virtual time::Schedule getDepartureSchedule (int rank = 0) const = 0;
+				virtual time::Schedule getDepartureSchedule(
+					bool RTData,
+					size_t rank
+				) const = 0;
 			//@}
 
 			//! @name Setters
@@ -121,10 +124,22 @@ namespace synthese
 
 				virtual std::string getTeam() const;
 
-				virtual time::Schedule getDepartureBeginScheduleToIndex(int rankInPath) const = 0;
-				virtual time::Schedule getDepartureEndScheduleToIndex(int rankInPath) const = 0;
-				virtual time::Schedule getArrivalBeginScheduleToIndex(int rankInPath) const = 0;
-				virtual time::Schedule getArrivalEndScheduleToIndex(int rankInPath) const = 0;
+				virtual time::Schedule getDepartureBeginScheduleToIndex(
+					bool RTData,
+					std::size_t rankInPath
+				) const = 0;
+				virtual time::Schedule getDepartureEndScheduleToIndex(
+					bool RTData,
+					std::size_t rankInPath
+				) const = 0;
+				virtual time::Schedule getArrivalBeginScheduleToIndex(
+					bool RTData,
+					std::size_t rankInPath
+				) const = 0;
+				virtual time::Schedule getArrivalEndScheduleToIndex(
+					bool RTData,
+					std::size_t rankInPath
+				) const = 0;
 
 				virtual bool nonConcurrencyRuleOK(
 					const time::Date& date,
@@ -132,6 +147,7 @@ namespace synthese
 					const graph::Edge& arrivalEdge,
 					graph::UserClassCode userClass
 				) const;
+				
 				virtual void clearNonConcurrencyCache() const;
 
 
@@ -142,7 +158,10 @@ namespace synthese
 					@date 2008
 					@warning the method must be used only at a time where the service knows its path, so use the method on the currently registered service, taking the new one as parameter
 				*/
-				bool respectsLineTheoryWith(const Service& other) const;
+				bool respectsLineTheoryWith(
+					bool RTData,
+					const Service& other
+				) const;
 
 
 
@@ -162,6 +181,7 @@ namespace synthese
 					@warning The service index is unknown in the generated ServicePointer.					
 				*/
 				virtual ServicePointer getFromPresenceTime(
+					bool RTData,
 					AccessDirection method,
 					UserClassCode userClass
 					, const Edge* edge
@@ -183,7 +203,11 @@ namespace synthese
 				@date 2007
 
 				*/
-				time::DateTime getOriginDateTime(const time::Date& departureDate, const time::Schedule& departureTime) const;
+				time::DateTime getOriginDateTime(
+					bool RTData,
+					const time::Date& departureDate,
+					const time::Schedule& departureTime
+				) const;
 			//@}
 		};
 	}

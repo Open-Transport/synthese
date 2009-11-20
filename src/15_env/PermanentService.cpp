@@ -40,6 +40,7 @@ namespace synthese
 	{
 
 		ServicePointer PermanentService::getFromPresenceTime(
+			bool RTData,
 			AccessDirection method,
 			UserClassCode userClass
 			, const Edge* edge
@@ -47,17 +48,18 @@ namespace synthese
 			, bool controlIfTheServiceIsReachable
 			, bool inverted
 		) const	{
-			ServicePointer sp(method,userClass,edge);
+			ServicePointer sp(RTData, method,userClass,edge);
 			sp.setActualTime(presenceDateTime);
 			sp.setOriginDateTime(DateTime(presenceDateTime.getDate(), Hour(TIME_MIN)));
 			sp.setService(this);
-			sp.setServiceIndex(0);
 			sp.setServiceRange(MINUTES_PER_DAY);
 			return sp;
 		}
 
-		time::DateTime PermanentService::getLeaveTime( const ServicePointer& servicePointer , const Edge* edge ) const
-		{
+		time::DateTime PermanentService::getLeaveTime(
+			const ServicePointer& servicePointer,
+			const Edge* edge
+		) const	{
 			double distance((servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				? edge->getMetricOffset() - servicePointer.getEdge()->getMetricOffset()
 				: servicePointer.getEdge()->getMetricOffset() - edge->getMetricOffset()
@@ -74,22 +76,22 @@ namespace synthese
 			return dt;
 		}
 
-		time::Schedule PermanentService::getDepartureBeginScheduleToIndex(int rankInPath) const
+		time::Schedule PermanentService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return Schedule(Hour(TIME_MIN),0);
 		}
 
-		time::Schedule PermanentService::getDepartureEndScheduleToIndex(int rankInPath) const
+		time::Schedule PermanentService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return Schedule(Hour(TIME_MAX),0);
 		}
 
-		time::Schedule PermanentService::getArrivalBeginScheduleToIndex(int rankInPath) const
+		time::Schedule PermanentService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return Schedule(Hour(TIME_MIN),0);
 		}
 
-		time::Schedule PermanentService::getArrivalEndScheduleToIndex(int rankInPath) const
+		time::Schedule PermanentService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return Schedule(Hour(TIME_MAX),0);
 		}
@@ -101,7 +103,7 @@ namespace synthese
 			return false;
 		}
 
-		Schedule PermanentService::getDepartureSchedule(int rank) const
+		Schedule PermanentService::getDepartureSchedule(bool RTData, size_t rank) const
 		{
 			assert(rank != 0);
 			return Schedule(Hour(TIME_MIN),0);

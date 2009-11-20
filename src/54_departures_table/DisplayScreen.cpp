@@ -267,6 +267,10 @@ namespace synthese
 						displayedObject
 					);
 				}
+				else if(_generationMethod == BY_PHYSICAL_STOP)
+				{
+					// To be implemented
+				}
 				else
 				{
 					const DeparturesTableInterfacePage* page(

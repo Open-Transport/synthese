@@ -38,10 +38,10 @@ namespace synthese
 	}
 
 
-	namespace routeplanner
+	namespace algorithm
 	{
 		/** Best vertex reaches map class.
-			@ingroup m53
+			@ingroup m33
 
 			BestVertexReachesMap is not thread safe ! It is intended to be used only internally by a computing thread.
 

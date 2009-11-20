@@ -126,5 +126,12 @@ namespace synthese
 		{
 			return _withoutDrt;
 		}
+
+
+
+		double AccessParameters::getMaxApproachTime() const
+		{
+			return _maxApproachTime;
+		}
 	}
 }

@@ -1,0 +1,320 @@
+
+/** TimeSlotRoutePlanner class implementation.
+	@file TimeSlotRoutePlanner.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "TimeSlotRoutePlanner.h"
+#include "RoutePlanner.h"
+#include "Log.h"
+
+#include <boost/foreach.hpp>
+#include <sstream>
+
+using namespace boost;
+using namespace std;
+
+namespace synthese
+{
+	using namespace graph;
+	using namespace time;
+	using namespace util;
+
+	namespace algorithm
+	{
+		TimeSlotRoutePlanner::TimeSlotRoutePlanner(
+			const graph::VertexAccessMap& originVam,
+			const graph::VertexAccessMap& destinationVam,
+			const time::DateTime& lowerDepartureTime,
+			const time::DateTime& higherDepartureTime,
+			const time::DateTime& lowerArrivalTime,
+			const time::DateTime& higherArrivalTime,
+			const graph::GraphIdType			whatToSearch,
+			const graph::GraphIdType			graphToUse,
+			optional<posix_time::time_duration> maxDuration,
+			optional<size_t> maxSolutionsNumber,
+			AccessParameters accessParameters,
+			PlanningOrder planningOrder,
+			std::ostream* logStream,
+			util::Log::Level logLevel
+		):	_originVam(originVam),
+			_destinationVam(destinationVam),
+			_lowestDepartureTime(lowerDepartureTime),
+			_highestDepartureTime(higherDepartureTime),
+			_lowestArrivalTime(lowerArrivalTime),
+			_highestArrivalTime(higherArrivalTime),
+			_whatToSearch(whatToSearch),
+			_graphToUse(graphToUse),
+			_maxDuration(maxDuration),
+			_maxSolutionsNumber(maxSolutionsNumber),
+			_accessParameters(accessParameters),
+			_planningOrder(planningOrder),
+			_logStream(logStream),
+			_logLevel(logLevel)
+		{
+		}
+
+
+
+		TimeSlotRoutePlanner::TimeSlotRoutePlanner(
+			const graph::VertexAccessMap& originVam,
+			const graph::VertexAccessMap& destinationVam,
+			const Result::value_type& continuousService,
+			const graph::GraphIdType			whatToSearch,
+			const graph::GraphIdType			graphToUse,
+			optional<boost::posix_time::time_duration> maxDuration,
+			optional<std::size_t>	maxSolutionsNumber,
+			AccessParameters accessParameters,
+			const PlanningOrder planningOrder,
+			std::ostream* logStream,
+			util::Log::Level logLevel
+		):	_originVam(originVam),
+			_destinationVam(destinationVam),
+			_lowestDepartureTime(continuousService.getDepartureTime()),
+			_highestDepartureTime(continuousService.getDepartureTime() + continuousService.getContinuousServiceRange()),
+			_lowestArrivalTime(continuousService.getArrivalTime()),
+			_highestArrivalTime(continuousService.getArrivalTime() + continuousService.getContinuousServiceRange()),
+			_whatToSearch(whatToSearch),
+			_graphToUse(graphToUse),
+			_maxDuration(
+				(!maxDuration || continuousService.getDuration() - posix_time::minutes(1) < *maxDuration) ?
+				continuousService.getDuration() - posix_time::minutes(1) :
+				maxDuration
+			),
+			_maxSolutionsNumber(maxSolutionsNumber),
+			_accessParameters(),
+			_planningOrder(planningOrder),
+			_logStream(logStream),
+			_logLevel(logLevel),
+			_parentContinuousService(continuousService)
+		{
+			assert(continuousService.getContinuousServiceRange() > 1);
+		}
+
+
+
+		const time::DateTime& TimeSlotRoutePlanner::getLowestDepartureTime() const
+		{
+			return _lowestDepartureTime;
+		}
+
+
+
+		const time::DateTime& TimeSlotRoutePlanner::getHighestDepartureTime() const
+		{
+			return _highestDepartureTime;
+		}
+
+
+
+		const time::DateTime& TimeSlotRoutePlanner::getLowestArrivalTime() const
+		{
+			return _lowestArrivalTime;
+		}
+
+
+
+		const time::DateTime& TimeSlotRoutePlanner::getHighestArrivalTime() const
+		{
+			return _highestArrivalTime;
+		}
+
+		TimeSlotRoutePlanner::Result TimeSlotRoutePlanner::run()
+		{
+			Result result;
+
+			// Time loop
+			size_t solutionNumber(0);
+			for(DateTime originDateTime(_planningOrder == DEPARTURE_FIRST ? _lowestDepartureTime : _highestArrivalTime);
+				_planningOrder == DEPARTURE_FIRST ? originDateTime <= _highestDepartureTime : originDateTime >= _lowestArrivalTime;
+				_planningOrder == DEPARTURE_FIRST ? originDateTime += 1 : originDateTime -= 1
+			){
+#ifdef DEBUG
+				if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE ||
+					_logLevel <= Log::LEVEL_TRACE
+				){
+					stringstream s;
+					s << "<h2>Route planning " << ++solutionNumber << " at " << _lowestDepartureTime.toString() << "</h2>";
+
+					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+						Log::GetInstance().trace(s.str());
+					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
+						*_logStream << s.str();
+				}
+#endif
+
+				RoutePlanner r(
+					_originVam,
+					_destinationVam,
+					_planningOrder,
+					_accessParameters,
+					_maxDuration,
+					originDateTime,
+					_planningOrder == DEPARTURE_FIRST ? _highestDepartureTime : _lowestArrivalTime,
+					_planningOrder == DEPARTURE_FIRST ? _highestArrivalTime : _lowestDepartureTime,
+					_whatToSearch,
+					_graphToUse,
+					_logStream,
+					_logLevel
+				);
+				RoutePlanner::Result journey(r.run());
+
+				if(journey.empty()) break;
+
+				//! <li> If the journey is continuous, attemt to break it. </li>
+				if(	journey.getContinuousServiceRange () > 1)
+				{
+					TimeSlotRoutePlanner tsr(
+						_originVam,
+						_destinationVam,
+						journey,
+						_whatToSearch,
+						_graphToUse,
+						_maxDuration,
+						_maxSolutionsNumber ? *_maxSolutionsNumber - solutionNumber : _maxSolutionsNumber,
+						_accessParameters,
+						_planningOrder,
+						_logStream,
+						_logLevel
+					);
+					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));
+			
+					if(_planningOrder == DEPARTURE_FIRST)
+					{
+						BOOST_FOREACH(const Result::value_type& sj, subResult)
+						{
+							result.push_back(sj);
+						}
+					}
+					else
+					{
+						for(Result::const_reverse_iterator it(subResult.rbegin()); it != subResult.rend(); ++it)
+						{
+							result.push_front(*it);
+						}
+					}
+				}
+				else
+				{
+					if(_planningOrder == DEPARTURE_FIRST)
+					{
+						// Verifiy that the journey is not the same continuous service than the last one.
+						// If yes, enlarge the time slot of the existing continuous service
+						result.push_back(journey);
+					}
+					else
+					{
+						// Verifiy that the journey is not the same continuous service than the first one.
+						// If yes, enlarge the time slot of the existing continuous service and shift it
+						result.push_front(journey);
+					}
+
+				}
+
+				// Replace 1 minute wide continous service by two scheduled services
+				if(!result.empty() && result.back().getContinuousServiceRange() == 1)
+				{
+					// TODO
+				}
+
+				if(!result.empty())
+				{
+					if(_planningOrder == DEPARTURE_FIRST)
+					{
+						const Journey& last(result.back());
+						originDateTime = last.getDepartureTime();
+						originDateTime += last.getContinuousServiceRange();
+					}
+					else
+					{
+						const Journey& first(result.front());
+						originDateTime = first.getArrivalTime();
+						originDateTime -= first.getContinuousServiceRange();
+					}
+				}
+			}
+
+			return result;
+		}
+
+
+
+		TimeSlotRoutePlanner::Result TimeSlotRoutePlanner::_MergeSubResultAndParentContinuousService(
+			const TimeSlotRoutePlanner::Result::value_type& parentContinuousService,
+			const TimeSlotRoutePlanner::Result& subResult
+		){
+			Result result;
+
+			if(subResult.empty())
+			{
+				result.push_back(parentContinuousService);
+				return result;
+			}
+
+			DateTime departureTime(parentContinuousService.getDepartureTime());
+			BOOST_FOREACH(const Journey& subJourney, subResult)
+			{
+				// Insertion of a journey of the parent continuous service before
+				DateTime precedingLastDepartureTime(subJourney.getArrivalTime());
+				precedingLastDepartureTime -= 1;
+				precedingLastDepartureTime -= parentContinuousService.getDuration().total_seconds() / 60;
+				if(precedingLastDepartureTime > departureTime)
+				{
+					posix_time::time_duration toShift(
+						posix_time::minutes(
+							departureTime - parentContinuousService.getDepartureTime()
+					)	);
+					TimeSlotRoutePlanner::Result::value_type j;
+					BOOST_FOREACH(Journey::ServiceUses::value_type leg, parentContinuousService.getServiceUses())
+					{
+						leg.shift(toShift);
+						j.push(leg);
+					}
+					j.setContinuousServiceRange(precedingLastDepartureTime - departureTime);
+					result.push_back(j);
+				}
+
+				result.push_back(subJourney);
+
+				departureTime = subJourney.getDepartureTime();
+				departureTime += 1;
+			}
+
+			DateTime lastDepartureTime(parentContinuousService.getDepartureTime());
+			lastDepartureTime += parentContinuousService.getContinuousServiceRange();
+			if(departureTime <= lastDepartureTime)
+			{
+				posix_time::time_duration toShift(
+					posix_time::minutes(
+						departureTime - parentContinuousService.getDepartureTime()
+				)	);
+				TimeSlotRoutePlanner::Result::value_type j;
+				BOOST_FOREACH(Journey::ServiceUses::value_type leg, parentContinuousService.getServiceUses())
+				{
+					leg.shift(toShift);
+					j.push(leg);
+				}
+				j.setContinuousServiceRange(lastDepartureTime - departureTime);
+				result.push_back(j);
+			}
+
+			return result;
+		}
+	}
+}

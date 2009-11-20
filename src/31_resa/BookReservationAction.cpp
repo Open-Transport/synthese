@@ -25,7 +25,7 @@
 #include "Site.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "RoutePlannerFunction.h"
-#include "RoutePlanner.h"
+#include "PTTimeSlotRoutePlanner.h"
 #include "JourneysResult.h"
 #include "NamedPlace.h"
 #include "ResaRight.h"
@@ -64,7 +64,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
-	using namespace routeplanner;
+	using namespace ptrouteplanner;
 	using namespace security;
 	using namespace env;
 	using namespace transportwebsite;
@@ -73,7 +73,8 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace geography;
-	using namespace pt;	
+	using namespace pt;
+	using namespace algorithm;
 	
 
 	namespace util
@@ -242,28 +243,31 @@ namespace synthese
 			
 			// Departure date time
 			DateTime departureDateTime(map.getDateTime(PARAMETER_DATE_TIME, true, FACTORY_KEY));
-
+			DateTime arrivalDateTime(TIME_UNKNOWN);
+			
 			// Accessibility
 			if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
 			{
 				_accessParameters = AccessParameters(map.get<string>(PARAMETER_ACCESS_PARAMETERS));
 			}
 
-			RoutePlanner rp(
+			PTTimeSlotRoutePlanner rp(
 				originPlace
 				, destinationPlace
-				, _accessParameters,
-				PlanningOrder()
 				, departureDateTime
-				, departureDateTime
-				, 1
+				, departureDateTime,
+				arrivalDateTime,
+				arrivalDateTime,
+				1,
+				_accessParameters,
+				DEPARTURE_FIRST
 			);
-			const RoutePlanner::Result& jr(rp.computeJourneySheetDepartureArrival());
+			PTRoutePlannerResult jr(rp.run());
 
-			if (jr.empty())
+			if (jr.getJourneys().empty())
 				throw ActionException("The route planning does not find a journey to book");
 
-			_journey = *jr.front();
+			_journey = jr.getJourneys().front();
 
 		}
 

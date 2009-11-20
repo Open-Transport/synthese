@@ -134,7 +134,7 @@ namespace synthese
 
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
-					ServicePointer sp(DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN, &lineStop);
+					ServicePointer sp(false, DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN, &lineStop);
 					sp.setActualTime(d);
 					ActualDisplayedArrivalsList destinations;
 					destinations.push_back(IntermediateStop(&place));

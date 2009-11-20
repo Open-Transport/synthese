@@ -59,61 +59,63 @@ namespace synthese
 	using namespace road;
 	using namespace geography;
 
-	namespace routeplanner
+	namespace algorithm
 	{
 
 // -----------------------------------------------------------------------1 Construction
 
 		IntegralSearcher::IntegralSearcher(
-			AccessDirection accessDirection
-			, const AccessParameters&	accessParameters
-			, GraphIdType whatToSearch
-			, GraphIdType graphToUse
-			, JourneysResult<graph::JourneyComparator>&	result
-			, BestVertexReachesMap& bestVertexReachesMap
-			, const VertexAccessMap& destinationVam,
-			const time::DateTime&			originDateTime,
-			DateTime&	minMaxDateTimeAtDestination
-			, posix_time::time_duration previousContinuousServiceDuration
-			, const DateTime& previousContinuousServiceLastDeparture
-			, bool optim
-			, bool inverted
-			, ostream* const logStream
-			, Log::Level logLevel
+			AccessDirection accessDirection,
+			const AccessParameters&	accessParameters,
+			GraphIdType whatToSearch,
+			GraphIdType graphToUse,
+			JourneysResult<graph::JourneyComparator>&	result,
+			BestVertexReachesMap& bestVertexReachesMap,
+			const VertexAccessMap& destinationVam,
+			const DateTime&			originDateTime,
+			const DateTime&	minMaxDateTimeAtOrigin,
+			DateTime&	minMaxDateTimeAtDestination,
+			bool inverted,
+			optional<posix_time::time_duration> maxDuration,
+			ostream* const logStream,
+			Log::Level logLevel
 		):	_accessDirection(accessDirection),
 			_accessParameters(accessParameters),
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
-			_result(result)
-			, _bestVertexReachesMap(bestVertexReachesMap)
-			, _destinationVam(destinationVam),
-			_originDateTime(originDateTime)
-			, _minMaxDateTimeAtDestination(minMaxDateTimeAtDestination)
-			, _previousContinuousServiceDuration(previousContinuousServiceDuration)
-			, _previousContinuousServiceLastDeparture(previousContinuousServiceLastDeparture)
-			, _optim(optim)
-			, _inverted(inverted)
-			, _logStream(logStream)
-			, _logLevel(logLevel)
-		{	}
+			_result(result),
+			_bestVertexReachesMap(bestVertexReachesMap),
+			_destinationVam(destinationVam),
+			_originDateTime(originDateTime),
+			_minMaxDateTimeAtOrigin(minMaxDateTimeAtOrigin),
+			_minMaxDateTimeAtDestination(minMaxDateTimeAtDestination),
+			_inverted(inverted),
+			_maxDuration(maxDuration),
+			_logStream(logStream),
+			_logLevel(logLevel)
+		{}
 
 
 
-		void IntegralSearcher::integralSearch( const graph::VertexAccessMap& vertices, int maxDepth, bool strictTime )
-		{
+		void IntegralSearcher::integralSearch(
+			const graph::VertexAccessMap& vertices,
+			optional<size_t> maxDepth
+		){
 			Journey emptyJourney;
 			_integralSearch(
 				vertices,
 				emptyJourney,
 				_originDateTime,
-				maxDepth,
-				strictTime
+				_minMaxDateTimeAtOrigin,
+				maxDepth
 			);
 		}
 
 
 
-		void IntegralSearcher::integralSearch( const graph::Journey& startJourney, int maxDepth )
+		void IntegralSearcher::integralSearch(
+			const graph::Journey& startJourney,
+			optional<std::size_t> maxDepth )
 		{
 			VertexAccessMap vam;
 			startJourney.getEndEdge()->getHub()->getVertexAccessMap(
@@ -126,8 +128,8 @@ namespace synthese
 				vam,
 				startJourney,
 				startJourney.getEndTime(),
-				maxDepth,
-				false
+				_minMaxDateTimeAtDestination,
+				maxDepth
 			);
 		}
 
@@ -137,10 +139,10 @@ namespace synthese
 			const graph::VertexAccessMap& vam,
 			const graph::Journey& startJourney,
 			const time::DateTime& desiredTime,
-			int maxDepth,
-			bool strictTime /*= false  */ 
+			const time::DateTime& minMaxDateTimeAtOrigin,
+			optional<size_t> maxDepth
 		){
-			// Recusrions to do
+			// Recursions to do
 			JourneysResult<_JourneyComparator> todo(_originDateTime);
 			todo.addEmptyJourney();
 
@@ -318,7 +320,8 @@ namespace synthese
 						assert(itEdge.second);
 						const Edge& edge(*itEdge.second);
 
-						optional<int> serviceNumber;
+						optional<Edge::DepartureServiceIndex::Value> departureServiceNumber;
+						optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
 						set<const Edge*> nonServedEdges;
 						DateTime departureMoment(correctedDesiredTime);
 						while(true)
@@ -330,18 +333,18 @@ namespace synthese
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
 								?	edge.getNextService(
 										_accessParameters.getUserClass(),
-										departureMoment
-										, _minMaxDateTimeAtDestination
+										departureMoment,
+										minMaxDateTimeAtOrigin
 										, true
-										, serviceNumber
+										, departureServiceNumber
 										, _inverted
 									)
 								:	edge.getPreviousService(
 										_accessParameters.getUserClass(),
-										departureMoment
-										, _minMaxDateTimeAtDestination
+										departureMoment,
+										minMaxDateTimeAtOrigin
 										, true
-										, serviceNumber
+										, arrivalServiceNumber
 										, _inverted
 									)
 							);
@@ -350,13 +353,14 @@ namespace synthese
 							if (!serviceInstance.getService())
 								break;
 
-							// Strict time control if the departure time must be exactly the desired one (optimization only)
-							if (strictTime && serviceInstance.getActualDateTime() != correctedDesiredTime)
-								break;
-
-							serviceNumber = serviceInstance.getServiceIndex() +
-								(_accessDirection == DEPARTURE_TO_ARRIVAL ? 1 : -1)
-							;
+							if(_accessDirection == DEPARTURE_TO_ARRIVAL)
+							{
+								++*departureServiceNumber; // To the next service
+							}
+							else
+							{
+								++*arrivalServiceNumber; // To the previous service (reverse iterator increment)
+							}
 							departureMoment = serviceInstance.getActualDateTime();
 
 							// Check for service compliance rules.
@@ -422,7 +426,7 @@ namespace synthese
 
 								// Analyze of the utility of the edge
 								// If the edge is useless, the path is not traversed anymore
-								_JourneyUsefulness evaluationResult(evaluateJourney(*resultJourney, _optim));
+								_JourneyUsefulness evaluationResult(evaluateJourney(*resultJourney));
 								if (!evaluationResult.canBeAResultPart)
 								{
 									if (!evaluationResult.continueToTraverseThePath)
@@ -514,12 +518,17 @@ namespace synthese
 // ------------------------------------------------------------------------- Utilities
 
 		IntegralSearcher::_JourneyUsefulness IntegralSearcher::evaluateJourney(
-			const Journey& journey,
-			bool optim
+			const Journey& journey
 		) const {
 
 			assert(!journey.empty());
-			
+
+			/// <h2>Control of the compliance with the maximal duration</h2>
+			if(_maxDuration && journey.getDuration() > *_maxDuration)
+			{
+				return _JourneyUsefulness(false, false);
+			}
+
 			/// <h2>Control of the compliance with the current filters</h2>
 			const ServiceUse& serviceUse(journey.getEndServiceUse());
 			const Vertex* reachedVertex(serviceUse.getSecondEdge()->getFromVertex());
@@ -533,15 +542,6 @@ namespace synthese
 			}
 
 			/// <h2>Determination of the usefulness to store the service use</h2>
-
-			/** - Continuous service breaking test : if the solution is between a service continuous range
-				then it is stored only if its duration is better than the one of the continuous service.
-			*/
-			if(	(_previousContinuousServiceDuration.total_milliseconds() > 0)
-			&&	(journey.getDepartureTime() < _previousContinuousServiceLastDeparture)
-			&&	(journey.getDuration() >= _previousContinuousServiceDuration)
-			)	return _JourneyUsefulness(false,false);
-
 
 			/** - To be worse than the absolute best time is forbidden. */
 			const DateTime& reachDateTime(serviceUse.getSecondActualDateTime());

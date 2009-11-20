@@ -97,11 +97,14 @@ namespace synthese
 			setPathId(path->getKey());
 		}
 
-		DateTime Service::getOriginDateTime(const Date& departureDate, const Schedule& departureTime) const
-		{
+		DateTime Service::getOriginDateTime(
+			bool RTData,
+			const Date& departureDate,
+			const Schedule& departureTime
+		) const	{
 			DateTime originDateTime(departureDate);
-			originDateTime -= (departureTime.getDaysSinceDeparture() - getDepartureSchedule().getDaysSinceDeparture());
-			originDateTime.setHour(getDepartureSchedule().getHour());
+			originDateTime -= (departureTime.getDaysSinceDeparture() - getDepartureSchedule(RTData,0).getDaysSinceDeparture());
+			originDateTime.setHour(getDepartureSchedule(RTData,0).getHour());
 			return originDateTime;
 		}
 
@@ -120,8 +123,10 @@ namespace synthese
 			return _pathId;
 		}
 
-		bool Service::respectsLineTheoryWith( const Service& other ) const
-		{
+		bool Service::respectsLineTheoryWith(
+			bool RTData,
+			const Service& other
+		) const {
 			assert (_path != NULL);
 
 			// Loop on each stop
@@ -135,36 +140,36 @@ namespace synthese
 				if ((*it)->isDeparture())
 				{
 					/// - Test 1 : Conflict between continuous service range or identical schedule
-					if (getDepartureBeginScheduleToIndex(i) <= other.getDepartureEndScheduleToIndex(i) && getDepartureEndScheduleToIndex(i) >= other.getDepartureBeginScheduleToIndex(i))
+					if (getDepartureBeginScheduleToIndex(RTData, i) <= other.getDepartureEndScheduleToIndex(RTData, i) && getDepartureEndScheduleToIndex(RTData, i) >= other.getDepartureBeginScheduleToIndex(RTData, i))
 						return false;
 
 					/// - Test 2 : Order of times
 					if (!orderDefined)
 					{
-						timeOrder = (getDepartureBeginScheduleToIndex(i) < other.getDepartureBeginScheduleToIndex(i));
+						timeOrder = (getDepartureBeginScheduleToIndex(RTData, i) < other.getDepartureBeginScheduleToIndex(RTData, i));
 						orderDefined = true;
 					}
 					else
 					{
-						if ((getDepartureBeginScheduleToIndex(i) < other.getDepartureBeginScheduleToIndex(i)) != timeOrder)
+						if ((getDepartureBeginScheduleToIndex(RTData, i) < other.getDepartureBeginScheduleToIndex(RTData, i)) != timeOrder)
 							return false;
 					}
 				}
 				if ((*it)->isArrival())
 				{
 					/// - Test 1 : Conflict between continuous service range or identical schedule
-					if (getArrivalBeginScheduleToIndex(i) <= other.getArrivalEndScheduleToIndex(i) && getArrivalEndScheduleToIndex(i) >= other.getArrivalBeginScheduleToIndex(i))
+					if (getArrivalBeginScheduleToIndex(RTData, i) <= other.getArrivalEndScheduleToIndex(RTData, i) && getArrivalEndScheduleToIndex(RTData, i) >= other.getArrivalBeginScheduleToIndex(RTData, i))
 						return false;
 
 					/// - Test 2 : Order of times
 					if (!orderDefined)
 					{
-						timeOrder = (getArrivalBeginScheduleToIndex(i) < other.getArrivalBeginScheduleToIndex(i));
+						timeOrder = (getArrivalBeginScheduleToIndex(RTData, i) < other.getArrivalBeginScheduleToIndex(RTData, i));
 						orderDefined = true;
 					}
 					else
 					{
-						if ((getArrivalBeginScheduleToIndex(i) < other.getArrivalBeginScheduleToIndex(i)) != timeOrder)
+						if ((getArrivalBeginScheduleToIndex(RTData, i) < other.getArrivalBeginScheduleToIndex(RTData, i)) != timeOrder)
 							return false;
 					}
 				}

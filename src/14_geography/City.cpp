@@ -73,7 +73,7 @@ namespace synthese
 			VertexAccessMap& result
 			, const AccessDirection& accessDirection
 			, const AccessParameters& accessParameters
-			, GraphIdType whatToSearch
+			, const GraphTypes& whatToSearch
 		) const {
 
 /*			if (_includedPlaces.empty ())

@@ -37,6 +37,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace graph;
+	using namespace ptrouteplanner;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetLinesListLineInterfaceElement>::FACTORY_KEY("schedules_lines");
 	
@@ -53,9 +54,9 @@ namespace synthese
 			const RoutePlannerSheetLinesCellInterfacePage* linesInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetLinesCellInterfacePage>();
 
 			int n = 1;
-			BOOST_FOREACH(shared_ptr<Journey> journey, jv->getJourneys())
+			BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, jv->getJourneys())
 			{
-				linesInterfacePage->display( stream, n, variables, journey.get(), request );
+				linesInterfacePage->display( stream, n, variables, &journey, request );
 				++n;
 			}
 

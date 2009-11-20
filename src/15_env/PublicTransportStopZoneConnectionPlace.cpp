@@ -195,14 +195,14 @@ namespace synthese
 			VertexAccessMap& result,
 			const AccessDirection& accessDirection,
 			const AccessParameters& accessParameters,
-			GraphIdType whatToSearch
+			const geography::Place::GraphTypes& whatToSearch
 		) const {
 			AddressablePlace::getVertexAccessMap(
 				result, accessDirection, accessParameters
 				, whatToSearch
 			);
 		    
-			if (whatToSearch != PTModule::GRAPH_ID) return;
+			if (whatToSearch.find(PTModule::GRAPH_ID) == whatToSearch.end()) return;
 
 			BOOST_FOREACH(
 				const PhysicalStops::value_type& it,

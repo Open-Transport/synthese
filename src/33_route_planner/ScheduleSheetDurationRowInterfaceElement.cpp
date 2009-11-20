@@ -35,6 +35,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace ptrouteplanner;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetDurationRowInterfaceElement>::FACTORY_KEY("schedules_durations");
 
@@ -57,10 +58,10 @@ namespace synthese
 			const PTRoutePlannerResult* jv = static_cast<const PTRoutePlannerResult*>(object);
 			const DurationInterfacePage* durationInterfacePage = _page->getInterface()->getPage<DurationInterfacePage>();
 			
-			BOOST_FOREACH(PTRoutePlannerResult::Journeys::value_type journey, jv->getJourneys())
+			BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, jv->getJourneys())
 			{
 				stream << _cellHeader->getValue(parameters, variables, object, request);
-				durationInterfacePage->display(stream, journey->getDuration(), variables, object, request);
+				durationInterfacePage->display(stream, journey.getDuration(), variables, object, request);
 				stream << _cellFooter->getValue(parameters, variables, object, request);
 			}
 

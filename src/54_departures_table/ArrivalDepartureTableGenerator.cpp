@@ -27,7 +27,8 @@
 #include "Service.h"
 #include "ArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
-#include "RoutePlanner.h"
+#include "PTTimeSlotRoutePlanner.h"
+#include "PTRoutePlannerResult.h"
 
 using namespace std;
 
@@ -36,8 +37,9 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace graph;
-	using namespace routeplanner;
-	
+	using namespace algorithm;
+	using namespace ptrouteplanner;
+		
 
 	namespace departurestable
 	{
@@ -170,9 +172,14 @@ namespace synthese
 			{
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
-					RoutePlanner rp(
+					PTTimeSlotRoutePlanner rp(
 						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getEdge()->getFromVertex()->getHub()),
 						it2,
+						_startDateTime,
+						_startDateTime,
+						_startDateTime,
+						_endDateTime,
+						1,
 						AccessParameters(
 							USER_PEDESTRIAN,
 							false,
@@ -182,17 +189,14 @@ namespace synthese
 							67,
 							2
 						),
-						ARRIVAL_FIRST,
-						_startDateTime,
-						_endDateTime,
-						1
+						DEPARTURE_FIRST
 					);
 					
-					const RoutePlanner::Result& solution(rp.computeJourneySheetDepartureArrival());
+					const PTRoutePlannerResult solution(rp.run());
 
-					if(solution.empty()) continue;
+					if(solution.getJourneys().empty()) continue;
 
-					const Journey& journey(*solution.front());
+					const Journey& journey(solution.getJourneys().front());
 
 					if(	journey.size() == 2 &&
 						journey.getJourneyLeg(0).getArrivalEdge()->getFromVertex()->getHub() == serviceUse.getArrivalEdge()->getFromVertex()->getHub() &&

@@ -78,7 +78,7 @@ namespace synthese
 
 		bool SubLine::addServiceIfCompatible( Service* service )
 		{
-			if (!respectsLineTheory(*service))
+			if (!respectsLineTheory(false, *service))
 				return false;
 
 			Path::addService(service, false);

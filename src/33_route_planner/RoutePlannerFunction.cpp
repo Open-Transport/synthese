@@ -26,7 +26,7 @@
 #include "Site.h"
 #include "HourPeriod.h"
 #include "RoutePlannerInterfacePage.h"
-#include "RoutePlanner.h"
+#include "PTTimeSlotRoutePlanner.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "Interface.h"
@@ -65,12 +65,13 @@ namespace synthese
 	using namespace graph;
 	using namespace geography;
 	using namespace road;
+	using namespace algorithm;
+	using namespace ptrouteplanner;
 
 	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
 	namespace routeplanner
 	{
-		const string RoutePlannerFunction::PARAMETER_DATE = "da";
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");
 		const string RoutePlannerFunction::PARAMETER_PERIOD_ID("pi");
@@ -80,6 +81,11 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
 		const string RoutePlannerFunction::PARAMETER_FAVORITE_ID("fid");
+		const string RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME("da");
+		const string RoutePlannerFunction::PARAMETER_LOWEST_ARRIVAL_TIME("ii");
+		const string RoutePlannerFunction::PARAMETER_HIGHEST_DEPARTURE_TIME("ha");
+		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME("ia");
+
 
 
 
@@ -101,7 +107,7 @@ namespace synthese
 
 			// Origin and destination places
 			_favoriteId = map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID);
-			if (_favoriteId)
+			if (_favoriteId) // 2b
 			{
 				try
 				{
@@ -121,7 +127,7 @@ namespace synthese
 					throw RequestException(e.getMessage());
 				}
 			}
-			else
+			else // 2a
 			{
 				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
 				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
@@ -143,14 +149,55 @@ namespace synthese
 			{
 				// Date
 				Date day(map.getDate(PARAMETER_DAY, false, string()));
-				if (day.isUnknown())
+				if (day.isUnknown()) // 1b
 				{
-					_startDate = map.getDateTime(PARAMETER_DATE, !_home, string());
-					_endDate = _startDate;
-					_endDate.addDaysDuration(1);						
+					if(	map.getDateTime(PARAMETER_HIGHEST_ARRIVAL_TIME, false, string()).isUnknown()
+					){ // All default values
+						_planningOrder = DEPARTURE_FIRST;
+						_startDate = map.getDateTime(PARAMETER_LOWEST_DEPARTURE_TIME, false, string());
+						if(_startDate.isUnknown())
+						{
+							_startDate = DateTime(TIME_CURRENT);
+						}
+						_startArrivalDate = _startDate;
+						_endDate = map.getDateTime(PARAMETER_HIGHEST_DEPARTURE_TIME, false, string());
+						if(_endDate.isUnknown())
+						{
+							_endDate = _startDate;
+							_endDate.addDaysDuration(1);
+						}
+						_endArrivalDate = _endDate;
+						if(	_departure_place.placeResult.value &&
+							_arrival_place.placeResult.value &&
+							!_departure_place.placeResult.value->getPoint().isUnknown() &&
+							!_arrival_place.placeResult.value->getPoint().isUnknown()
+						){
+							_endArrivalDate += 2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000);
+						}
+					}
+					else if(map.getDateTime(PARAMETER_LOWEST_DEPARTURE_TIME, false, string()).isUnknown())
+					{ // Arrival to departure from the specified arrival time
+						_planningOrder = ARRIVAL_FIRST;
+						_endArrivalDate = map.getDateTime(PARAMETER_HIGHEST_ARRIVAL_TIME, false, string());
+						_startArrivalDate = map.getDateTime(PARAMETER_LOWEST_ARRIVAL_TIME, false, string());
+						if(_startArrivalDate.isUnknown())
+						{
+							_startArrivalDate = _endArrivalDate;
+							_startArrivalDate.subDaysDuration(1);
+						}
+						_startDate = _startArrivalDate;
+						if(	_departure_place.placeResult.value &&
+							_arrival_place.placeResult.value &&
+							!_departure_place.placeResult.value->getPoint().isUnknown() &&
+							!_arrival_place.placeResult.value->getPoint().isUnknown()
+						){
+							_startDate -= 2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000);
+						}
+					}
 				}
-				else
+				else // 1a
 				{
+					_planningOrder = DEPARTURE_FIRST;
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
 					if (_periodId >= _site->getPeriods().size())
 						throw RequestException("Bad value for period id");
@@ -158,7 +205,20 @@ namespace synthese
 					_endDate = _startDate;
 					_period = &_site->getPeriods().at(_periodId);
 					_site->applyPeriod(*_period, _startDate, _endDate);
+					_startArrivalDate = _startDate;
+					_endArrivalDate = _endDate;
+					if(	_departure_place.placeResult.value &&
+						_arrival_place.placeResult.value &&
+						!_departure_place.placeResult.value->getPoint().isUnknown() &&
+						!_arrival_place.placeResult.value->getPoint().isUnknown()
+					){
+						_endArrivalDate += 2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000);
+					}
 				}
+			}
+			catch(Site::ForbiddenDateException)
+			{
+				throw RequestException("Date in the past is forbidden");
 			}
 			catch (time::TimeParseException)
 			{
@@ -194,23 +254,20 @@ namespace synthese
 			if (_departure_place.placeResult.value && _arrival_place.placeResult.value)
 			{
 				// Initialisation
-				RoutePlanner r(
-					_departure_place.placeResult.value
-					, _arrival_place.placeResult.value
-					, _accessParameters
-					, PlanningOrder()
-					, _startDate
-					, _endDate
-					, _maxSolutionsNumber
+				PTTimeSlotRoutePlanner r(
+					_departure_place.placeResult.value,
+					_arrival_place.placeResult.value,
+					_startDate,
+					_endDate,
+					_startArrivalDate,
+					_endArrivalDate,
+					_maxSolutionsNumber,
+					_accessParameters,
+					_planningOrder
 				);
 				
 				// Computing
-				const PTRoutePlannerResult result(
-					_departure_place.placeResult.value,
-					_arrival_place.placeResult.value,
-					r.isSamePlaces(),
-					r.computeJourneySheetDepartureArrival()
-				);
+				const PTRoutePlannerResult result(r.run());
 				
 				// Display
 				if(_page)
@@ -249,10 +306,10 @@ namespace synthese
 					stream <<
 						" siteId=\"" << _site->getKey() << "\">" <<
 						"<timeBounds" <<
-							" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetEndDepartureTime().toPosixTime()) << "\"" <<
-							" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetStartArrivalTime().toPosixTime()) << "\"" <<
-							" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetEndArrivalTime().toPosixTime()) << "\"" <<
-							" maxDepartureHour=\"" << posix_time::to_iso_extended_string(r.getJourneySheetStartDepartureTime().toPosixTime()) << "\"" <<
+							" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getLowestDepartureTime().toPosixTime()) << "\"" <<
+							" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getLowestArrivalTime().toPosixTime()) << "\"" <<
+							" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getHighestArrivalTime().toPosixTime()) << "\"" <<
+							" maxDepartureHour=\"" << posix_time::to_iso_extended_string(r.getHighestDepartureTime().toPosixTime()) << "\"" <<
 						" />"
 					;
 					if(_period)
@@ -316,13 +373,13 @@ namespace synthese
 						stream <<
 							"<journey hasALineAlert=\"" << (hasALineAlert ? "true" : "false") << "\" hasAStopAlert=\"" << (hasAStopAlert ? "true" : "false") << "\""
 						;
-						if(journey->getContinuousServiceRange() > 0)
+						if(journey.getContinuousServiceRange() > 0)
 						{
-							stream << " continuousServiceDuration=\"" << journey->getContinuousServiceRange() << "\"";
+							stream << " continuousServiceDuration=\"" << journey.getContinuousServiceRange() << "\"";
 						}
 						stream << ">";
 
-						if(journey->getReservationCompliance() != false)
+						if(journey.getReservationCompliance() != false)
 						{
 							bool online(true); // Interactive
 							string openingHours; // Interactive
@@ -330,7 +387,7 @@ namespace synthese
 
 							stream << "<reservation" <<
 								" online=\"" << (online ? "true" : "false") << "\"" <<
-								" type=\"" << (journey->getReservationCompliance() == true ? "compulsory" : "optional") << "\""
+								" type=\"" << (journey.getReservationCompliance() == true ? "compulsory" : "optional") << "\""
 							;
 							if(!openingHours.empty())
 							{
@@ -340,12 +397,12 @@ namespace synthese
 							{
 								stream << " phoneNumber=\"" << phoneNumber << "\"";
 							}
-							stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey->getReservationDeadLine().toPosixTime()) << "\" />";
+							stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine().toPosixTime()) << "\" />";
 						}
 						stream << "<chunks>";
 
 						// Loop on each leg
-						const Journey::ServiceUses& jl(journey->getServiceUses());
+						const Journey::ServiceUses& jl(journey.getServiceUses());
 						for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 						{
 							const ServiceUse& curET(*itl);
@@ -377,10 +434,10 @@ namespace synthese
 								**itSheetRow <<
 									" departureDateTime=\"" <<
 									posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"";
-								if(journey->getContinuousServiceRange() > 0)
+								if(journey.getContinuousServiceRange() > 0)
 								{
 									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
-									edTime += posix_time::minutes(journey->getContinuousServiceRange());
+									edTime += posix_time::minutes(journey.getContinuousServiceRange());
 									**itSheetRow << " endDepartureDateTime=\"" << 
 										posix_time::to_iso_extended_string(edTime) << "\"";
 								}
@@ -406,10 +463,10 @@ namespace synthese
 								}
 								**itSheetRow << "<cell arrivalDateTime=\"" <<
 									posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
-								if(journey->getContinuousServiceRange() > 0)
+								if(journey.getContinuousServiceRange() > 0)
 								{
 									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
-									eaTime += posix_time::minutes(journey->getContinuousServiceRange());
+									eaTime += posix_time::minutes(journey.getContinuousServiceRange());
 									**itSheetRow << " endArrivalDateTime=\"" <<
 										posix_time::to_iso_extended_string(eaTime) << "\"";
 								}
@@ -428,22 +485,28 @@ namespace synthese
 										" length=\"" << curET.getDistance() << "\"" <<
 										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"" <<
 										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
-								if(journey->getContinuousServiceRange() > 0)
+								if(journey.getContinuousServiceRange() > 0)
 								{
 									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
-									edTime += posix_time::minutes(journey->getContinuousServiceRange());
+									edTime += posix_time::minutes(journey.getContinuousServiceRange());
 									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
-									eaTime += posix_time::minutes(journey->getContinuousServiceRange());
+									eaTime += posix_time::minutes(journey.getContinuousServiceRange());
 									stream <<
 										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
 										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
 								}
 								stream <<
 										" startStopIsTerminus=\"" << (curET.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<
-										" endStopIsTerminus=\"" << (curET.getArrivalEdge()->getRankInPath() == curET.getArrivalEdge()->getParentPath()->getEdges().size() - 1 ? "true" : "false") << "\"" <<
+										" endStopIsTerminus=\"" << (curET.getArrivalEdge()->getRankInPath() == curET.getArrivalEdge()->getParentPath()->getEdges().size() - 1 ? "true" : "false") << "\"";
+								if(!line->getDirection().empty())
+								{
+									stream << " destinationText=\"" << line->getDirection() << "\"";
+								}
+								stream <<
 									">";
 								_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const PhysicalStop&>(*curET.getDepartureEdge()->getFromVertex()));
 								_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const PhysicalStop&>(*curET.getArrivalEdge()->getFromVertex()));
+								_XMLDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const PhysicalStop&>(*line->getLastEdge()->getFromVertex()));
 								if(!line->isPedestrianMode())
 								{
 									stream <<
@@ -497,12 +560,12 @@ namespace synthese
 										" name=\"" << road->getRoadPlace()->getName() << "\"" <<
 										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"" <<
 										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
-								if(journey->getContinuousServiceRange() > 0)
+								if(journey.getContinuousServiceRange() > 0)
 								{
 									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
-									edTime += posix_time::minutes(journey->getContinuousServiceRange());
+									edTime += posix_time::minutes(journey.getContinuousServiceRange());
 									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
-									eaTime += posix_time::minutes(journey->getContinuousServiceRange());
+									eaTime += posix_time::minutes(journey.getContinuousServiceRange());
 									stream <<
 										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
 										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
@@ -536,7 +599,7 @@ namespace synthese
 						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
 
 						stream <<
-							"<row type=\"departure\">" <<
+							"<row type=\"" << (row.isOrigin ? "departure" : row.isDestination ? "arrival" : "connection") << "\">" <<
 							"<cells>" <<
 							(*itSheetRow)->str() <<
 							"</cells>" <<
@@ -580,7 +643,9 @@ namespace synthese
 			, _endDate(TIME_UNKNOWN)
 			, _period(NULL)
 			, _home(false),
-			_page(NULL)
+			_page(NULL),
+			_startArrivalDate(TIME_UNKNOWN),
+			_endArrivalDate(TIME_UNKNOWN)
 		{			
 		}
 

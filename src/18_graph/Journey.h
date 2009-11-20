@@ -162,6 +162,7 @@ namespace synthese
 
 				const Edge* getEndEdge() const;
 				time::DateTime getEndTime() const;
+				time::DateTime getBeginTime() const;
 
 				time::DateTime getDepartureTime () const;
 				time::DateTime getArrivalTime () const;

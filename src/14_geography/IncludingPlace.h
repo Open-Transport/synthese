@@ -69,7 +69,7 @@ namespace synthese
 					graph::VertexAccessMap& result,
 					const graph::AccessDirection& accessDirection,
 					const graph::AccessParameters& accessParameters,
-					graph::GraphIdType whatToSearch
+					const GraphTypes& whatToSearch
 				) const;
 
 				virtual const geometry::Point2D& getPoint() const;

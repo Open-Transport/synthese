@@ -24,6 +24,7 @@
 
 #include "RoadPlace.h"
 #include "Road.h"
+#include "RoadModule.h"
 #include "RoadChunk.h"
 #include "Registry.h"
 #include "Address.h"
@@ -90,8 +91,10 @@ namespace synthese
 			graph::VertexAccessMap& result,
 			const graph::AccessDirection& accessDirection,
 			const graph::AccessParameters& accessParameters,
-			graph::GraphIdType whatToSearch
+			const GraphTypes& whatToSearch
 		) const	{
+			if(whatToSearch.find(RoadModule::GRAPH_ID) == whatToSearch.end()) return;
+
 			BOOST_FOREACH(const Road* road, _roads)
 			{
 				BOOST_FOREACH(const Edge* edge, road->getEdges())

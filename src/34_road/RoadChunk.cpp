@@ -97,7 +97,7 @@ namespace synthese
 			fromAddress->addArrivalEdge(static_cast<Edge*>(this));
 			fromAddress->addDepartureEdge(static_cast<Edge*>(this));
 
-			markServiceIndexUpdateNeeded();
+			markServiceIndexUpdateNeeded(false);
 		}
 
 

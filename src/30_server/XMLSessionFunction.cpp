@@ -51,7 +51,8 @@ namespace synthese
 		void XMLSessionFunction::_run( std::ostream& stream ) const
 		{
 			stream <<
-				"<?xml version='1.0' encoding='UTF-8' ?><login>" <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+				"<login xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_Session_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" <<
 				"<session>"
 			;
 			if (_request->getSession())

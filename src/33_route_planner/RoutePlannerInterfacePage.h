@@ -56,10 +56,13 @@ namespace synthese
 		class AccessParameters;
 	}
 
-	namespace routeplanner
+	namespace ptrouteplanner
 	{
 		class PTRoutePlannerResult;
+	}
 
+	namespace routeplanner
+	{
 		/** RoutePlannerInterfacePage Interface Page Class.
 			@ingroup m53Pages refPages
 
@@ -117,7 +120,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
-				, const PTRoutePlannerResult& object
+				, const ptrouteplanner::PTRoutePlannerResult& object
 				, const time::Date& date
 				, size_t periodId
 				, const geography::Place* originPlace

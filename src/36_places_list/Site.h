@@ -78,6 +78,17 @@ namespace synthese
 		{
 		public:
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Exception to throw when a route planning cannot be launched at the
+			/// specified dates according to the site rules.
+			/// @ingroup m36
+			class ForbiddenDateException:
+				public util::Exception
+			{
+			public:
+				ForbiddenDateException();
+			};
+
 			/// Chosen registry class.
 			typedef util::Registry<Site>	Registry;
 
@@ -205,6 +216,8 @@ namespace synthese
 						- Sets startTime to period start hour or to calculationTime if pastSolutions filter is active.
 						- If this period end hour is inferior to this period start hour, one day is added to endTime.
 						- Sets endTime to period endHour.
+
+					@throws Site::ForbiddenDateException if end time is in the past ans if the pastSolutions filter is active
 				*/
 				void applyPeriod(
 					const HourPeriod& period

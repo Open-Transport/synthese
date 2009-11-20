@@ -108,7 +108,7 @@ namespace synthese
 
 			//! @name Query methods.
 			//@{
-				const Service*				getService (int serviceIndex) const;
+//				const Service*				getService (int serviceIndex) const;
 
 				const Edge*					getEdge (int index) const;
 

@@ -99,6 +99,7 @@ namespace synthese
 					@warning The service index is unknown in the generated ServicePointer.					
 				*/
 				virtual graph::ServicePointer getFromPresenceTime(
+					bool RTData,
 					graph::AccessDirection method,
 					graph::UserClassCode userClass
 					, const graph::Edge* edge
@@ -110,20 +111,37 @@ namespace synthese
 				virtual time::DateTime getLeaveTime(
 					const graph::ServicePointer& servicePointer
 					, const graph::Edge* edge
-					) const;
+				) const;
 
 				/** Gets a departure schedule for this service.
 					@param rank Rank of the stop where to get the departure schedule
 					@return time::Schedule The first schedule of the continuous range, at the specified stop rank
 				*/
-				virtual time::Schedule getDepartureSchedule(int rank = 0) const;
+				virtual time::Schedule getDepartureSchedule(
+					bool RTData,
+					std::size_t rank
+				) const;
 
-				virtual const time::Schedule& getLastArrivalSchedule() const;
+				virtual const time::Schedule& getLastArrivalSchedule(
+					bool RTData
+				) const;
 
-				virtual time::Schedule getDepartureBeginScheduleToIndex(int rankInPath) const;
-				virtual time::Schedule getDepartureEndScheduleToIndex(int rankInPath) const;
-				virtual time::Schedule getArrivalBeginScheduleToIndex(int rankInPath) const;
-				virtual time::Schedule getArrivalEndScheduleToIndex(int rankInPath) const;
+				virtual time::Schedule getDepartureBeginScheduleToIndex(
+					bool RTData,
+					std::size_t rankInPath
+				) const;
+				virtual time::Schedule getDepartureEndScheduleToIndex(
+					bool RTData,
+					std::size_t rankInPath
+				) const;
+				virtual time::Schedule getArrivalBeginScheduleToIndex(
+					bool RTData,
+					std::size_t rankInPath
+				) const;
+				virtual time::Schedule getArrivalEndScheduleToIndex(
+					bool RTData,
+					std::size_t rankInPath
+				) const;
 
 			//@}
 

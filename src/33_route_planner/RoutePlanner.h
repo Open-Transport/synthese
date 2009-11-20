@@ -32,6 +32,8 @@
 #include "VertexAccessMap.h"
 #include "ServiceUse.h"
 #include "AccessParameters.h"
+#include "RoutePlannerTypes.h"
+#include "Exception.h"
 
 #include <boost/optional.hpp>
 
@@ -59,10 +61,8 @@ namespace synthese
 		class Place;
 	}
 
-	namespace routeplanner
+	namespace algorithm
 	{
-		typedef enum {DEPARTURE_FIRST, ARRIVAL_FIRST} PlanningOrder;
-
 		/** Route planner class.
 
 			Potential optimization by maximal speeds
@@ -80,35 +80,40 @@ namespace synthese
 
 			Une fois validé le fichier <b>.vmax.per</b>, lancer l'importation dans l'assistant de saisie des données. Les Vmax sont saisies automatiquement dans le fichier des points d'arret, remplaçant ainsi les anciens.
 
-			@ingroup m53
+			@ingroup m33
 		*/
 		class RoutePlanner
 		{
 		public:
-			typedef std::vector<boost::shared_ptr<graph::Journey> > Result;
+			typedef graph::Journey Result;
+
+			/** Exception to throw when the route planning has no sense because of the presence of a common vertex in
+				both the the departure and the arrival vertex access maps.
+			*/
+			class SamePlacesException:
+				public util::Exception
+			{
+			public:
+				SamePlacesException();
+			};
 
 		private:
-			
-			//! @name Parameters
+			//! @name Query parameters
 			//@{
-				graph::VertexAccessMap				_originVam;
-				graph::VertexAccessMap				_destinationVam;
-				const graph::AccessParameters		_accessParameters;
-				time::DateTime						_journeySheetStartDepartureTime;  //!< Start time of schedule sheet.
-				time::DateTime						_journeySheetEndDepartureTime;    //!< End time of schedule sheet.
-				time::DateTime						_journeySheetStartArrivalTime;  //!< Start time of schedule sheet.
-				time::DateTime						_journeySheetEndArrivalTime;    //!< End time of schedule sheet.
+				const graph::VertexAccessMap&		_originVam;
+				const graph::VertexAccessMap&		_destinationVam;
 				const PlanningOrder					_planningOrder;  //!< Define planning sequence.
-				const boost::optional<std::size_t>	_maxSolutionsNumber;
+				const graph::AccessParameters		_accessParameters;
+				const boost::optional<boost::posix_time::time_duration>	_maxDuration;
+				const time::DateTime&				_minBeginTime;
+				const time::DateTime&				_maxBeginTime;
+				const time::DateTime&				_maxEndTime;
+				const graph::GraphIdType			_whatToSearch;
+				const graph::GraphIdType			_graphToUse;
 			//@}
 
-			//! @name Working variables
+			//! @name Logging
 			//@{
-				time::DateTime						_minDepartureTime;  //!< Min departure time.
-				time::DateTime						_maxArrivalTime;  //!< Max arrival time.
-				boost::posix_time::time_duration	_previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
-				time::DateTime						_previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
-				Result								_result;
 				std::ostream* const					_logStream;
 				const util::Log::Level				_logLevel;
 			//@}
@@ -117,8 +122,6 @@ namespace synthese
 
 			/** Best journey finder.
 				@param accessDirection Type of computing : search of better arrival or of a better departure
-				@param ovam Vertex access map containing each departure physical stops.
-				@param dvam Vertex access map containing each destination stops.
 				@param currentJourney Journey conducting to the departure vam
 				@param sctrictTime Filter : 
 					- true : solutions starting at the vam time are only selected
@@ -127,21 +130,18 @@ namespace synthese
 					- true : solutions allowing a comfort raising and a time saving are selected
 					- false :solutions allowing a time saving are only selected
 			*/
-			void findBestJourney(
-				graph::AccessDirection accessDirection,
+			void _findBestJourney(
 				graph::Journey& result,
-				const graph::VertexAccessMap& startVam,
-				const graph::VertexAccessMap& endVam,
-				const time::DateTime& startTime,
-				bool strictTime,
-				bool inverted
+				const graph::VertexAccessMap& originVam,
+				const graph::VertexAccessMap& destinationVam,
+				graph::AccessDirection direction,
+				const time::DateTime& originDateTime,
+				const time::DateTime& maxMinDateTimeAtOrigin,
+				const time::DateTime& maxMinDateTimeAtDestination,
+				bool inverted,
+				boost::optional<boost::posix_time::time_duration> maxDuration
 			);
 
-			void computeRoutePlanningDepartureArrival(
-				graph::Journey& result
-				, const graph::VertexAccessMap& ovam
-				, const graph::VertexAccessMap& dvam
-			);
 
 		public:
 			/** Constructor.
@@ -156,39 +156,31 @@ namespace synthese
 				@date 2007
 			*/
 			RoutePlanner(
-				 const geography::Place* origin,
-				 const geography::Place* destination,
-				 const graph::AccessParameters& accessParameters,
-				 const PlanningOrder& planningOrder,
-				 const time::DateTime& journeySheetStartTime,
-				 const time::DateTime& journeySheetEndTime,
-				 const boost::optional<std::size_t> maxSolutionsNumber = boost::optional<std::size_t>(),
-				 std::ostream* logStream = NULL,
-				 util::Log::Level logLevel = util::Log::LEVEL_NONE
+				const graph::VertexAccessMap&		originVam,
+				const graph::VertexAccessMap&		destinationVam,
+				PlanningOrder					planningOrder,  //!< Define planning sequence.
+				graph::AccessParameters		accessParameters,
+				boost::optional<boost::posix_time::time_duration>	maxDuration,
+				const time::DateTime&				minBeginTime,
+				const time::DateTime&				maxBeginTime,
+				const time::DateTime&				maxEndTime,
+				graph::GraphIdType			whatToSearch,
+				graph::GraphIdType			graphToUse,
+				std::ostream* logStream = NULL,
+				util::Log::Level logLevel = util::Log::LEVEL_NONE
 			);
 
-			const time::DateTime&		getJourneySheetStartDepartureTime() const;
-			const time::DateTime&		getJourneySheetEndDepartureTime() const;
-			const time::DateTime&		getJourneySheetStartArrivalTime() const;
-			const time::DateTime&		getJourneySheetEndArrivalTime() const;
-			bool	isSamePlaces() const;
-
-			void		setJourneySheetStartDepartureTime(const time::DateTime& value);
-			void		setJourneySheetEndDepartureTime(const time::DateTime& value);
-			void		setJourneySheetStartArrivalTime(const time::DateTime& value);
-			void		setJourneySheetEndArrivalTime(const time::DateTime& value);
-
-
-			//! @name Query methods
-			//@{
-				/** Launch of the route planning, applying the "from the departure to the arrival" method.
-					@return JourneyBoardJourneys The founded journeys
-					@warning The journeys must be deleted after use to avoid memory leak
-					@author Hugues Romain
-					@date 2007
-				*/
-				const Result& computeJourneySheetDepartureArrival ();
-			//@}
+			
+			
+			/** Launches the computing ans return the result.
+				@return The result (Journey object)
+					- non empty if the graph allows to reach the destination from the origin according to the access parameters
+					- empty if no solution has been found
+				@throws SamePlacesException if the departure and the arrival places intersects.
+				@author Hugues
+				@date 2009				
+			*/
+			Result run();
 		};
 	}
 }

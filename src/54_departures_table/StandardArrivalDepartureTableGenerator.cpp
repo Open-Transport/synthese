@@ -28,6 +28,7 @@
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -70,7 +71,7 @@ namespace synthese
 
 					// Loop on services
 					DateTime departureDateTime = _startDateTime;
-					int index(UNKNOWN_VALUE);
+					optional<Edge::DepartureServiceIndex::Value> index;
 					size_t insertedServices(0);
 					while(true)
 					{
@@ -85,7 +86,7 @@ namespace synthese
 						if (!servicePointer.getService())
 							break;
 						_insert(servicePointer);
-						index = servicePointer.getServiceIndex() + 1;
+						++*index;
 						departureDateTime = servicePointer.getActualDateTime();
 						++insertedServices;
 						if(insertedServices >= _maxSize) break;

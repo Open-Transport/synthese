@@ -140,7 +140,7 @@ namespace synthese
 					graph::VertexAccessMap& result
 					, const graph::AccessDirection& accessDirection
 					, const graph::AccessParameters& accessParameters
-					, graph::GraphIdType whatToSearch
+					, const geography::Place::GraphTypes& whatToSearch
 				) const;
 
 				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;

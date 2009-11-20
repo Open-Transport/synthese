@@ -30,6 +30,7 @@
 #include "Schedule.h"
 #include "Registrable.h"
 #include "GraphTypes.h"
+#include "Path.h"
 
 #include <boost/optional.hpp>
 
@@ -74,6 +75,29 @@ namespace synthese
 			:	public virtual util::Registrable
 		{
 		public:
+			template<class Iterator>
+			class ServiceIndex
+			{
+			public:
+				typedef Iterator Value;
+
+			private:
+				Value _value;
+				Value _RTValue;
+
+			public:
+				Value get(bool RTData) const{ return RTData ? _RTValue : _value; }
+
+				void set(
+					bool RTData,
+					Value value
+				){
+					if(RTData) _RTValue = value; else _value = value;
+				}
+			};
+
+			typedef ServiceIndex<ServiceSet::const_iterator> DepartureServiceIndex;
+			typedef ServiceIndex<ServiceSet::const_reverse_iterator> ArrivalServiceIndex;
 
 		protected:
 			Vertex*	_fromVertex;
@@ -81,6 +105,11 @@ namespace synthese
 			double			_metricOffset;		//!< Metric offset
 		
 		private:
+			static const std::size_t INDICES_NUMBER;
+
+			typedef std::vector<DepartureServiceIndex> DepartureServiceIndices;
+			typedef std::vector<ArrivalServiceIndex> ArrivalServiceIndices;
+
 			int			_rankInPath;		//!< Rank in path.
 
 			Edge* _previousConnectionDeparture;			//!< Previous connection departure edge along path.
@@ -90,10 +119,23 @@ namespace synthese
 
 			std::vector<const geometry::Point2D*> _viaPoints;				//!< Intermediate points along the edge (for map drawing)
 
-			mutable int _departureIndex[24];	//!< First line service index by departure hour of day
-			mutable int _arrivalIndex[24];		//!< First line service index by arrival hour of day
+			mutable DepartureServiceIndices _departureIndex;	//!< First service index by departure hour of day
+			mutable ArrivalServiceIndices _arrivalIndex;		//!< First service index by arrival hour of day
 
 			mutable bool _serviceIndexUpdateNeeded;
+			mutable bool _RTserviceIndexUpdateNeeded;
+
+			/** Updates service indices.
+				@param RTData indicates if real time or theoretical indices must be updated
+				@author Hugues Romain
+			*/
+			void _updateServiceIndex(
+				bool RTData
+			) const;
+
+			bool _getServiceIndexUpdateNeeded(
+				bool RTData
+			) const;
 
 		protected:
 			Edge(
@@ -157,8 +199,15 @@ namespace synthese
 
 				const Hub* getHub() const;
 				
-				int getDepartureFromIndex (int hour) const;
-				int getArrivalFromIndex (int hour) const;
+				DepartureServiceIndex::Value getDepartureFromIndex(
+					bool RTData,
+					size_t hour
+				) const;
+
+				ArrivalServiceIndex::Value getArrivalFromIndex(
+					bool RTData,
+					size_t hour
+				) const;
 				
 				bool isArrival() const;
 				bool isDeparture() const;
@@ -184,16 +233,17 @@ namespace synthese
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
 					@param minNextServiceIndex First index to scan in the services list (optimization)
-						- UNKNOWN_VALUE / -1 : start at the beginning of the list
+						- undefined : start at the beginning of the list
 					@return Found service instance index or -1 if none was found.
 					@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
+					@retval minNextServiceIndex Index corresponding to the returned service
 				*/
 				ServicePointer getNextService (
 					UserClassCode userClass,
 					time::DateTime departureMoment,
 					const time::DateTime& maxDepartureMoment,
 					bool controlIfTheServiceIsReachable,
-					boost::optional<int> minNextServiceIndex = boost::optional<int>(),
+					boost::optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 					bool inverted = false
 				) const;
 
@@ -206,16 +256,17 @@ namespace synthese
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
 					@param maxPreviousServiceIndex First index to scan in the services list (optimization)
-						- UNKNOWN_VALUE / -1 : start at the end of the list
+						- undefined : start at the end of the list
 					@return Found service instance index or -1 if none was found.
 					@retval arrivalMoment Accurate departure moment. Meaningless if -1 returned.
+					@retval maxPreviousServiceIndex Index corresponding to the returned service
 				*/
 				ServicePointer getPreviousService(
 					UserClassCode userClass,
 					time::DateTime arrivalMoment,
 					const time::DateTime& minArrivalMoment,
 					bool controlIfTheServiceIsReachable,
-					boost::optional<int> maxPreviousServiceIndex = boost::optional<int>(),
+					boost::optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 					bool inverted = false
 				) const;
 			    
@@ -226,10 +277,7 @@ namespace synthese
 				void clearViaPoints ();
 				void addViaPoint (const geometry::Point2D& viaPoint);
 			    
-				void markServiceIndexUpdateNeeded();
-		private:
-				
-				void updateServiceIndex () const;
+				void markServiceIndexUpdateNeeded(bool RTDataOnly) const;
 			//@}
 	    
 		};

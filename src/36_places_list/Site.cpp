@@ -208,10 +208,15 @@ namespace synthese
 			if (_pastSolutionsDisplayed == false )
 			{
 				DateTime now(TIME_CURRENT);
-				assert(endTime >= now);
-
-				if ( startTime < now) 
+				if (endTime < now)
+				{
+					throw ForbiddenDateException();
+				}
+					
+				if(startTime < now) 
+				{
 					startTime = now;
+				}
 			}
 		}
 
@@ -349,6 +354,14 @@ namespace synthese
 		{
 			cityResult.value = NULL;
 			placeResult.value = NULL;
+		}
+
+
+
+		Site::ForbiddenDateException::ForbiddenDateException():
+			Exception("Forbidden date")
+		{
+
 		}
 	}
 }

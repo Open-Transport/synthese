@@ -37,6 +37,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
+	using namespace ptrouteplanner;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyBoardsInterfaceElement>::FACTORY_KEY("journey_boards");
 
@@ -87,7 +88,7 @@ namespace synthese
 					stream
 					, variables
 					, i
-					, it->get()
+					, &(*it)
 					, result->getDeparturePlace()
 					, result->getArrivalPlace()
 					, hFilter

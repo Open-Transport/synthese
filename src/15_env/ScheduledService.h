@@ -65,7 +65,9 @@ namespace synthese
 			mutable boost::recursive_mutex _nonConcurrencyCacheMutex;
 
 			Schedules	_departureSchedules;	//!< Departure schedules
+			Schedules	_RTDepartureSchedules;
 			Schedules	_arrivalSchedules;		//!< Arrival schedules
+			Schedules	_RTArrivalSchedules;
 			std::string	_team;
 
 		public:
@@ -82,15 +84,30 @@ namespace synthese
 			//! @name Getters
 			//@{
 				virtual std::string getTeam() const;
-				const Schedules& getDepartureSchedules() const;
-				const Schedules& getArrivalSchedules() const;
+				const Schedules& getDepartureSchedules(bool RTData) const;
+				const Schedules& getArrivalSchedules(bool RTData) const;
 				const Line* getRoute() const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void	setPath(graph::Path* path);
+				
+				
+				/** Departure schedules update.
+					Updates both theoretical and real time data.
+					@param schedules Departure schedules of the service
+					@author Hugues Romain
+				*/
 				void	setDepartureSchedules(const Schedules& schedules);
+
+
+
+				/** Arrival schedules update.
+					Updates both theoretical and real time data.
+					@param schedules Arrival schedules of the service
+					@author Hugues Romain
+				*/
 				void	setArrivalSchedules(const Schedules& schedules);
 				void	setTeam(const std::string& team);
 			//@}
@@ -130,6 +147,7 @@ namespace synthese
 					@warning The service index is unknown in the generated ServicePointer.					
 				*/
 				virtual graph::ServicePointer getFromPresenceTime(
+					bool RTData,
 					graph::AccessDirection method,
 					graph::UserClassCode userClass
 					, const graph::Edge* edge
@@ -141,23 +159,23 @@ namespace synthese
 				virtual time::DateTime getLeaveTime(
 					const graph::ServicePointer& servicePointer
 					, const graph::Edge* edge
-					) const;
+				) const;
 
 				
 				/** Gets a departure schedule for this service.
 					@param rank Rank of the stop where to get the departure schedule
 					@return time::Schedule The schedule at the specified stop rank
 				*/
-				virtual time::Schedule getDepartureSchedule (int rank = 0) const;
+				virtual time::Schedule getDepartureSchedule (bool RTData, std::size_t rank) const;
 
-				const time::Schedule& getLastDepartureSchedule() const;
+				const time::Schedule& getLastDepartureSchedule(bool RTData) const;
 
-				virtual const time::Schedule& getLastArrivalSchedule() const;
+				virtual const time::Schedule& getLastArrivalSchedule(bool RTData) const;
 
-				virtual time::Schedule getDepartureBeginScheduleToIndex(int rankInPath) const;
-				virtual time::Schedule getDepartureEndScheduleToIndex(int rankInPath) const;
-				virtual time::Schedule getArrivalBeginScheduleToIndex(int rankInPath) const;
-				virtual time::Schedule getArrivalEndScheduleToIndex(int rankInPath) const;
+				virtual time::Schedule getDepartureBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual time::Schedule getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual time::Schedule getArrivalBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual time::Schedule getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 
 			//@}
 

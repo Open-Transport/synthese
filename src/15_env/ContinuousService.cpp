@@ -50,16 +50,16 @@ namespace synthese
 			Path* path,
 			int range,
 			int maxWaitingTime
-		)	: Registrable(id)
+		):	Registrable(id)
 			, NonPermanentService(serviceNumber, path)
 			, _range (range)
 			, _maxWaitingTime (maxWaitingTime)
-		{	}
+		{}
 
 
 
 		ContinuousService::~ContinuousService ()
-		{	}
+		{}
 
 
 		    
@@ -104,6 +104,7 @@ namespace synthese
 
 
 		ServicePointer ContinuousService::getFromPresenceTime(
+			bool RTData,
 			AccessDirection method,
 			UserClassCode userClass
 			, const Edge* edge
@@ -112,11 +113,10 @@ namespace synthese
 			, bool inverted
 		) const	{
 
-			ServicePointer ptr(method, userClass, edge);
+			ServicePointer ptr(RTData, method, userClass, edge);
 			ptr.setService(this);
 			Schedule schedule;
 			DateTime actualDateTime(presenceDateTime);
-			DateTime validityEndTime(presenceDateTime);
 			int range;
 			int edgeIndex(edge->getRankInPath());
 			
@@ -126,7 +126,7 @@ namespace synthese
 				if (_departureSchedules.at(edgeIndex).first.getHour() <= _departureSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() > _departureSchedules.at(edgeIndex).second.getHour())
-						return ServicePointer(DEPARTURE_TO_ARRIVAL, userClass);
+						return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClass);
 					if (presenceDateTime.getHour() < schedule.getHour())
 						actualDateTime.setHour(schedule.getHour());
 				}
@@ -138,12 +138,12 @@ namespace synthese
 				}
 				if (inverted)
 				{
-					validityEndTime.setHour(_departureSchedules.at(edgeIndex).first.getHour());
+					DateTime validityEndTime(presenceDateTime.getDate(), _departureSchedules.at(edgeIndex).first);
 					range = actualDateTime - validityEndTime;
 				}
 				else
 				{
-					validityEndTime.setHour(_departureSchedules.at(edgeIndex).second.getHour());
+					DateTime validityEndTime(presenceDateTime.getDate(), _departureSchedules.at(edgeIndex).second);
 					range = validityEndTime - actualDateTime;
 				}
 			}
@@ -153,7 +153,7 @@ namespace synthese
 				if (_arrivalSchedules.at(edgeIndex).first.getHour() <= _arrivalSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() < _arrivalSchedules.at(edgeIndex).first.getHour())
-						return ServicePointer(ARRIVAL_TO_DEPARTURE, userClass);
+						return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClass);
 					if (presenceDateTime.getHour() > _arrivalSchedules.at(edgeIndex).second.getHour())
 						actualDateTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
 				}
@@ -165,12 +165,12 @@ namespace synthese
 				}
 				if (inverted)
 				{
-					validityEndTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
+					DateTime validityEndTime(presenceDateTime.getDate(), _arrivalSchedules.at(edgeIndex).second);
 					range = validityEndTime - actualDateTime;
 				}
 				else
 				{
-					validityEndTime.setHour(_arrivalSchedules.at(edgeIndex).first.getHour());
+					DateTime validityEndTime(presenceDateTime.getDate(), _arrivalSchedules.at(edgeIndex).first);
 					range = actualDateTime - validityEndTime;
 				}
 			}
@@ -185,13 +185,13 @@ namespace synthese
 
 			// Date control
 			if (!isActive(date(originDateTime.getDate().getYear(), originDateTime.getDate().getMonth(), originDateTime.getDate().getDay() )))
-				return ServicePointer(method, userClass);
+				return ServicePointer(RTData, method, userClass);
 
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
 				if (ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
-					return ServicePointer(method, userClass);
+					return ServicePointer(RTData, method, userClass);
 			}
 			else
 			{
@@ -201,21 +201,22 @@ namespace synthese
 		}
 
 		time::DateTime ContinuousService::getLeaveTime(
-			const ServicePointer& servicePointer
-			, const Edge* edge) const
-		{
+			const ServicePointer& servicePointer,
+			const Edge* edge
+		) const	{
 			int edgeIndex(edge->getRankInPath());
 			Schedule schedule(
-				(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
-				? _arrivalSchedules.at(edgeIndex).first
-				: getDepartureSchedule(edgeIndex)
-				);
+				servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL ?
+				_arrivalSchedules.at(edgeIndex).first :
+				getDepartureSchedule(servicePointer.getRTData(), edgeIndex)
+			);
 			DateTime actualDateTime(servicePointer.getOriginDateTime());
-			actualDateTime += (schedule - getDepartureSchedule());
+			actualDateTime += (schedule - getDepartureSchedule(servicePointer.getRTData(), 0));
 			return actualDateTime;
 		}
 
-		time::Schedule ContinuousService::getDepartureSchedule(int rank) const
+		time::Schedule ContinuousService::getDepartureSchedule(bool RTData,
+			std::size_t rank) const
 		{
 			return _departureSchedules.at(rank).first;
 		}
@@ -230,27 +231,30 @@ namespace synthese
 			_arrivalSchedules = schedules;
 		}
 
-		Schedule ContinuousService::getDepartureBeginScheduleToIndex(int rankInPath) const
+		Schedule ContinuousService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return _departureSchedules.at(rankInPath).first;
 		}
 
-		Schedule ContinuousService::getDepartureEndScheduleToIndex(int rankInPath) const
+		Schedule ContinuousService::getDepartureEndScheduleToIndex(bool RTData,
+			std::size_t rankInPath) const
 		{
 			return _departureSchedules.at(rankInPath).second;
 		}
 
-		Schedule ContinuousService::getArrivalBeginScheduleToIndex(int rankInPath) const
+		Schedule ContinuousService::getArrivalBeginScheduleToIndex(bool RTData,
+			std::size_t rankInPath) const
 		{
 			return _arrivalSchedules.at(rankInPath).first;
 		}
 
-		Schedule ContinuousService::getArrivalEndScheduleToIndex(int rankInPath) const
+		Schedule ContinuousService::getArrivalEndScheduleToIndex(bool RTData,
+			std::size_t rankInPath) const
 		{
 			return _arrivalSchedules.at(rankInPath).second;
 		}
 
-		const time::Schedule& ContinuousService::getLastArrivalSchedule() const
+		const time::Schedule& ContinuousService::getLastArrivalSchedule(bool RTData) const
 		{
 			const Schedules::const_iterator it(_arrivalSchedules.end() - 1);
 			return it->second;

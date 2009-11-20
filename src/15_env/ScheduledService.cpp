@@ -54,15 +54,14 @@ namespace synthese
 			RegistryKeyType id,
 			string serviceNumber,
 			Path* path
-		)	: Registrable(id)
+		):	Registrable(id)
 			, NonPermanentService(serviceNumber, path)
-		{	}
+		{}
 
 
 
 		ScheduledService::~ScheduledService ()
-		{
-		}
+		{}
 
 
 
@@ -85,14 +84,15 @@ namespace synthese
 			return
 				first.getPath() == second.getPath() &&
 				first.getServiceNumber() == second.getServiceNumber() &&
-				first.getDepartureSchedules() == second.getDepartureSchedules() &&
-				first.getArrivalSchedules() == second.getArrivalSchedules()
+				first.getDepartureSchedules(false) == second.getDepartureSchedules(false) &&
+				first.getArrivalSchedules(false) == second.getArrivalSchedules(false)
 			;
 		};
 
 
 
 		ServicePointer ScheduledService::getFromPresenceTime(
+			bool RTData,
 			AccessDirection method,
 			UserClassCode userClass
 			, const Edge* edge
@@ -102,7 +102,7 @@ namespace synthese
 		) const {
 
 			// Initializations
-			ServicePointer ptr(method, userClass, edge);
+			ServicePointer ptr(RTData,method, userClass, edge);
 			ptr.setService(this);
 			DateTime actualTime(presenceDateTime);
 			Schedule schedule;
@@ -113,13 +113,13 @@ namespace synthese
 			{
 				schedule = _departureSchedules.at(edgeIndex);
 				if (presenceDateTime.getHour() > schedule.getHour())
-					return ServicePointer(DEPARTURE_TO_ARRIVAL, userClass);
+					return ServicePointer(RTData,DEPARTURE_TO_ARRIVAL, userClass);
 			}
 			if (method == ARRIVAL_TO_DEPARTURE)
 			{
 				schedule = _arrivalSchedules.at(edgeIndex);
 				if (presenceDateTime.getHour() < schedule.getHour())
-					return ServicePointer(ARRIVAL_TO_DEPARTURE, userClass);
+					return ServicePointer(RTData,ARRIVAL_TO_DEPARTURE, userClass);
 			}
 			actualTime.setHour(schedule.getHour());
 			ptr.setActualTime(actualTime);
@@ -132,13 +132,13 @@ namespace synthese
 
 			// Date control
 			if (!isActive(date(originDateTime.getDate().getYear(),originDateTime.getDate().getMonth(),originDateTime.getDate().getDay())))
-				return ServicePointer(method, userClass);
+				return ServicePointer(RTData, method, userClass);
 
 			// Reservation control
 			if(	controlIfTheServiceIsReachable &&
 				ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE
 			){
-				return ServicePointer(method, userClass);
+				return ServicePointer(RTData, method, userClass);
 			}		
 
 			return ptr;
@@ -151,8 +151,8 @@ namespace synthese
 			int edgeIndex(edge->getRankInPath());
 			Schedule schedule(
 				(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
-				? _arrivalSchedules.at(edgeIndex)
-				: _departureSchedules.at(edgeIndex)
+				? getArrivalSchedules(servicePointer.getRTData()).at(edgeIndex)
+				: getDepartureSchedules(servicePointer.getRTData()).at(edgeIndex)
 				);
 			DateTime actualDateTime(servicePointer.getOriginDateTime());
 			actualDateTime += (schedule - _departureSchedules.at(0));
@@ -162,51 +162,53 @@ namespace synthese
 		void ScheduledService::setDepartureSchedules( const Schedules& schedules )
 		{
 			_departureSchedules = schedules;
+			_RTDepartureSchedules = schedules;
 		}
 
 		void ScheduledService::setArrivalSchedules( const Schedules& schedules )
 		{
 			_arrivalSchedules = schedules;
+			_RTArrivalSchedules = schedules;
 		}
 
-		Schedule ScheduledService::getDepartureSchedule(int rank) const
+		Schedule ScheduledService::getDepartureSchedule(bool RTData, size_t rank) const
 		{
-			return _departureSchedules.at(rank);
+			return getDepartureSchedules(RTData).at(rank);
 		}
 
-		Schedule ScheduledService::getDepartureBeginScheduleToIndex(int rankInPath) const
+		Schedule ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return _departureSchedules.at(rankInPath);
+			return getDepartureSchedules(RTData).at(rankInPath);
 		}
 
-		Schedule ScheduledService::getDepartureEndScheduleToIndex(int rankInPath) const
+		Schedule ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return _departureSchedules.at(rankInPath);
+			return getDepartureSchedules(RTData).at(rankInPath);
 		}
 
-		Schedule ScheduledService::getArrivalBeginScheduleToIndex(int rankInPath) const
+		Schedule ScheduledService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return _arrivalSchedules.at(rankInPath);
+			return getArrivalSchedules(RTData).at(rankInPath);
 		}
 
-		Schedule ScheduledService::getArrivalEndScheduleToIndex(int rankInPath) const
+		Schedule ScheduledService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return _arrivalSchedules.at(rankInPath);
+			return getArrivalSchedules(RTData).at(rankInPath);
 		}
 
-		const time::Schedule& ScheduledService::getLastArrivalSchedule() const
+		const time::Schedule& ScheduledService::getLastArrivalSchedule(bool RTData) const
 		{
-			Schedules::const_iterator it(_arrivalSchedules.end() - 1);
+			Schedules::const_iterator it(getArrivalSchedules(RTData).end() - 1);
 			return *it;
 		}
 
-		const time::Schedule& ScheduledService::getLastDepartureSchedule() const
+		const time::Schedule& ScheduledService::getLastDepartureSchedule(bool RTData) const
 		{
 			for (Path::Edges::const_reverse_iterator it(getPath()->getEdges().rbegin()); it != getPath()->getEdges().rend(); ++it)
 				if ((*it)->isDeparture())
-					return _departureSchedules[(*it)->getRankInPath()];
+					return getDepartureSchedules(RTData).at((*it)->getRankInPath());
 			assert(false);
-			return _departureSchedules[0];
+			return getDepartureSchedules(RTData).at(0);
 		}
 
 		void ScheduledService::setTeam( const std::string& team )
@@ -219,13 +221,16 @@ namespace synthese
 			return _team;
 		}
 		
-		const ScheduledService::Schedules& ScheduledService::getDepartureSchedules() const
+		const ScheduledService::Schedules& ScheduledService::getDepartureSchedules(bool RTData) const
 		{
-			return _departureSchedules;
+			return RTData ? _RTDepartureSchedules : _departureSchedules;
 		}
-		const ScheduledService::Schedules& ScheduledService::getArrivalSchedules() const
+
+
+
+		const ScheduledService::Schedules& ScheduledService::getArrivalSchedules(bool RTData) const
 		{
-			return _arrivalSchedules;
+			return RTData ? _RTArrivalSchedules : _arrivalSchedules;
 		}
 
 		graph::UseRule::ReservationAvailabilityType ScheduledService::getReservationAbility(
@@ -238,12 +243,13 @@ namespace synthese
 				if((*it)->isDeparture())
 				{
 					ServicePointer p(getFromPresenceTime(
+						false,
 						DEPARTURE_TO_ARRIVAL,
 						USER_PEDESTRIAN,
 						*it,
 						DateTime(
 							date,
-							getDepartureSchedule((*it)->getRankInPath())
+							getDepartureSchedule(false, (*it)->getRankInPath())
 						),
 						false,
 						false
@@ -267,12 +273,13 @@ namespace synthese
 				if((*it)->isDeparture())
 				{
 					ServicePointer p(getFromPresenceTime(
+						false,
 						DEPARTURE_TO_ARRIVAL,
 						USER_PEDESTRIAN,
 						*it,
 						DateTime(
 							date,
-							getDepartureSchedule((*it)->getRankInPath())
+							getDepartureSchedule(false, (*it)->getRankInPath())
 						),
 						false,
 						false
@@ -332,9 +339,9 @@ namespace synthese
 			{
 				CommercialLine* priorityLine(rule->getPriorityLine());
 				const CommercialLine::Paths& paths(priorityLine->getPaths());
-				DateTime minStartTime(date, getDepartureSchedule(departureEdge.getRankInPath()));
+				DateTime minStartTime(date, getDepartureSchedule(false, departureEdge.getRankInPath()));
 				minStartTime -= rule->getDelay().minutes();
-				DateTime maxStartTime(date, getDepartureSchedule(departureEdge.getRankInPath()));
+				DateTime maxStartTime(date, getDepartureSchedule(false, departureEdge.getRankInPath()));
 				maxStartTime += rule->getDelay().minutes();
 
 				// Loop on all vertices of the starting place
@@ -352,12 +359,14 @@ namespace synthese
 						const Edge& startEdge(*its->second);
 						// Search a service at the time of the possible
 
+						optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
 						ServicePointer serviceInstance(
 							startEdge.getNextService(
 								userClass,
 								minStartTime,
 								maxStartTime,
-								true
+								true,
+								minServiceIndex
 						)	);
 						// If no service, advance to the next path
 						if (!serviceInstance.getService()) continue;

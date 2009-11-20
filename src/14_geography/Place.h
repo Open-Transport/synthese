@@ -27,6 +27,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 #include "Registrable.h"
 #include "GraphTypes.h"
@@ -57,6 +58,7 @@ namespace synthese
 		class Place
 		{
 		public:
+			typedef std::set<graph::GraphIdType> GraphTypes;
 
 		protected:
 			mutable bool _isoBarycentreToUpdate;
@@ -78,8 +80,17 @@ namespace synthese
 				graph::VertexAccessMap& result,
 				const graph::AccessDirection& accessDirection,
 				const graph::AccessParameters& accessParameters,
-				graph::GraphIdType whatToSearch
+				const GraphTypes& whatToSearch
 			) const = 0;
+
+
+
+			graph::VertexAccessMap getVertexAccessMap(
+				graph::AccessDirection accessDirection,
+				const graph::AccessParameters& accessParameters,
+				GraphTypes::value_type whatToSearch,
+				...
+			) const;
 
 			virtual const geometry::Point2D& getPoint() const = 0;
 

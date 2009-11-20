@@ -36,29 +36,32 @@ namespace synthese
 	{
 
 		ServicePointer::ServicePointer(
+			bool RTData,
 			AccessDirection method,
 			UserClassCode userClassCode,
 			const Edge* edge
-		):	_service(NULL)
+		):	_RTData(RTData),
+			_service(NULL)
 			, _originDateTime(TIME_UNKNOWN)
-			, _serviceIndex(UNKNOWN_VALUE)
 			, _determinationMethod(method)
 			, _actualTime(TIME_UNKNOWN)
 			, _range(0)
 			, _edge(edge),
 			_userClass(userClassCode),
 			_useRule(NULL)
-		{
-		}
+		{}
+
+
+
 		ServicePointer::ServicePointer():
+			_RTData(false),
 			_service(NULL),
 			_edge(NULL),
 			_determinationMethod(UNDEFINED_DIRECTION),
 			_actualTime(TIME_UNKNOWN),
-			_serviceIndex(UNKNOWN_VALUE),
 			_useRule(NULL),
 			_originDateTime(TIME_UNKNOWN)
-		{	}
+		{}
 
 
 
@@ -85,10 +88,7 @@ namespace synthese
 			_originDateTime = dateTime;
 		}
 
-		void ServicePointer::setServiceIndex( int index )
-		{
-			_serviceIndex = index;
-		}
+
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
 		) const	{
@@ -122,10 +122,7 @@ namespace synthese
 			return _edge;
 		}
 
-		int ServicePointer::getServiceIndex() const
-		{
-			return _serviceIndex;
-		}
+		
 
 		void ServicePointer::setServiceRange(int duration)
 		{
@@ -140,6 +137,13 @@ namespace synthese
 		UserClassCode ServicePointer::getUserClass() const
 		{
 			return _userClass;
+		}
+
+
+
+		bool ServicePointer::getRTData() const
+		{
+			return _RTData;
 		}
 	}
 }

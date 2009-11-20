@@ -388,7 +388,7 @@ namespace synthese
 					
 					stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de " <<
 						dynamic_cast<const NamedPlace*>(static_cast<const Line*>(service->getPath())->getEdge(0)->getHub())->getFullName() <<
-						" à " << service->getDepartureSchedule().getHour().toString();
+						" à " << service->getDepartureSchedule(false, 0).getHour().toString();
 					if (serviceSeatsNumber > 0)
 						stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
 
@@ -534,7 +534,7 @@ namespace synthese
 					)	);
 					if(services.empty()) return string();
 
-					DateTime date(_date, services[0]->getDepartureSchedule());
+					DateTime date(_date, services[0]->getDepartureSchedule(false, 0));
 					s <<
 						"Ligne " << _line->getShortName() <<
 						" - service " << services[0]->getServiceNumber() <<

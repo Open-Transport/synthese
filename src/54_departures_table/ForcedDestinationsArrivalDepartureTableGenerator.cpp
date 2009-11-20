@@ -31,6 +31,7 @@
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -111,11 +112,13 @@ namespace synthese
 					maxTimeForForcedDestination += _persistanceDuration;
 
 					// Next service
+					optional<Edge::DepartureServiceIndex::Value> minIndex;
 					ServicePointer serviceInstance = ls->getNextService(
 						USER_PEDESTRIAN,
-						_startDateTime
-						, maxTimeForForcedDestination
-						, false
+						_startDateTime,
+						maxTimeForForcedDestination,
+						false,
+						minIndex
 					);
 					
 					// No service

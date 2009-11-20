@@ -47,6 +47,10 @@
 // included auto generated code
 #include "includes.cpp.inc"
 
+#ifdef DEBUG
+#include "date_time_visualizer.hpp"
+#endif
+
 using namespace boost;
 using namespace std;
 using namespace synthese::util;

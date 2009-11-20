@@ -48,7 +48,7 @@ namespace synthese
 					std::size_t
 			>	> ResaCountSearchResult;
 
-			typedef enum Step
+			enum Step
 			{
 				NO_STEP = 0,
 				SERVICE_STEP,

@@ -453,10 +453,10 @@ namespace synthese
 
 				os << "<TimeSlot>" << "\n";
 				os << "<objectId>" << timeSlotId << "</objectId>" << "\n";
-				os << "<beginningSlotTime>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(0).getHour()) << "</beginningSlotTime>" << "\n";
-				os << "<endSlotTime>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(0).getHour()) << "</endSlotTime>" << "\n";
-				os << "<firstDepartureTimeInSlot>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(0).getHour()) << "</firstDepartureTimeInSlot>" << "\n";
-				os << "<lastDepartureTimeInSlot>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(0).getHour()) << "</lastDepartureTimeInSlot>" << "\n";
+				os << "<beginningSlotTime>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(false, 0).getHour()) << "</beginningSlotTime>" << "\n";
+				os << "<endSlotTime>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(false, 0).getHour()) << "</endSlotTime>" << "\n";
+				os << "<firstDepartureTimeInSlot>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(false, 0).getHour()) << "</firstDepartureTimeInSlot>" << "\n";
+				os << "<lastDepartureTimeInSlot>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(false, 0).getHour()) << "</lastDepartureTimeInSlot>" << "\n";
 				os << "</TimeSlot>" << "\n";
 			}
 
@@ -692,17 +692,17 @@ namespace synthese
 					os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
 					if (ls->getRankInPath() > 0 && ls->isArrival())
-						os << "<arrivalTime>" << ToXsdTime (srv->getArrivalBeginScheduleToIndex (ls->getRankInPath()).getHour ()) 
+						os << "<arrivalTime>" << ToXsdTime (srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()).getHour ()) 
 						<< "</arrivalTime>" << "\n";
 
 					os	<< "<departureTime>";
 					if (ls->getRankInPath() != linestops.size () - 1 && ls->isDeparture())
 					{
-						os << ToXsdTime (srv->getDepartureBeginScheduleToIndex (ls->getRankInPath()).getHour());
+						os << ToXsdTime (srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()).getHour());
 					}
 					else
 					{
-						os << ToXsdTime (srv->getArrivalBeginScheduleToIndex (ls->getRankInPath()).getHour());
+						os << ToXsdTime (srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()).getHour());
 					}
 					os	<< "</departureTime>" << "\n";
 
@@ -798,8 +798,8 @@ namespace synthese
 						os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
 						os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
-						const Schedule& schedule((ls->getRankInPath() > 0 && ls->isArrival()) ? srv->getArrivalBeginScheduleToIndex(ls->getRankInPath()) : srv->getDepartureBeginScheduleToIndex(ls->getRankInPath()));
-						os << "<elapseDuration>" << ToXsdDuration(posix_time::minutes(schedule - srv->getDepartureBeginScheduleToIndex(0))) << "</elapseDuration>" << "\n";
+						const Schedule& schedule((ls->getRankInPath() > 0 && ls->isArrival()) ? srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()) : srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+						os << "<elapseDuration>" << ToXsdDuration(posix_time::minutes(schedule - srv->getDepartureBeginScheduleToIndex(false, 0))) << "</elapseDuration>" << "\n";
 						os << "<headwayFrequency>" << ToXsdDuration(posix_time::minutes(srv->getMaxWaitingTime())) << "</headwayFrequency>" << "\n";
 
 						os << "</vehicleJourneyAtStop>" << "\n";

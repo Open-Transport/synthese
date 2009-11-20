@@ -36,6 +36,8 @@ namespace synthese
 
 	namespace graph
 	{
+		const size_t Edge::INDICES_NUMBER(24);
+
 		Edge::Edge(
 			const Path* parentPath,
 			int rankInPath,
@@ -50,8 +52,10 @@ namespace synthese
 			_followingArrivalForFineSteppingOnly(NULL),
 			_serviceIndexUpdateNeeded (true),
 			_fromVertex(fromVertex),
-			_metricOffset(metricOffset)
-		{ }
+			_metricOffset(metricOffset),
+			_departureIndex(INDICES_NUMBER),
+			_arrivalIndex(INDICES_NUMBER)
+		{}
 
 
 		Edge::~Edge ()
@@ -255,28 +259,39 @@ namespace synthese
 			DateTime departureMoment,
 			const DateTime& maxDepartureMoment,
 			bool controlIfTheServiceIsReachable,
-			optional<int> minNextServiceIndex,
+			optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 			bool inverted
 		) const	{
+
+			const ServiceSet& services(getParentPath()->getServices());
+
+			if(services.empty())
+			{
+				return ServicePointer(false, DEPARTURE_TO_ARRIVAL, userClass);
+			}
+
+			bool RTData(departureMoment.toPosixTime() < posix_time::second_clock().local_time() + posix_time::hours(23));
+
 			// Search schedule
-			int next(getDepartureFromIndex (departureMoment.getHours ()));
+			DepartureServiceIndex::Value next(getDepartureFromIndex(RTData, departureMoment.getHours()));
 
-			if ( next == UNKNOWN_VALUE )
-				next = getParentPath ()->getServices().size();
-
-			if (minNextServiceIndex && *minNextServiceIndex > next )
+			if(	minNextServiceIndex &&
+				(*minNextServiceIndex == services.end() || services.value_comp()(*next, **minNextServiceIndex))
+			){
 				next = *minNextServiceIndex;
+			}
 
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
 				// Look in schedule for when the line is in service
-				if (getParentPath()->isActive(gregorian::date(departureMoment.getDate().getYear(), departureMoment.getDate().getMonth(), departureMoment.getDate().getDay())))
+				if(	getParentPath()->isActive(gregorian::date(departureMoment.getDate().getYear(), departureMoment.getDate().getMonth(), departureMoment.getDate().getDay())))
 				{
-					for (; next < getParentPath ()->getServices().size(); ++next)  // boucle sur les services
+					for (; next != services.end(); ++next)  // boucle sur les services
 					{
 						// Saving of the used service
 						ServicePointer servicePointer(
-							getParentPath ()->getService(next)->getFromPresenceTime(
+							(*next)->getFromPresenceTime(
+								RTData,
 								DEPARTURE_TO_ARRIVAL,
 								userClass
 								, this
@@ -291,24 +306,22 @@ namespace synthese
 
 						// Control of validity of departure date time
 						if (servicePointer.getActualDateTime() > maxDepartureMoment )
-							return ServicePointer(DEPARTURE_TO_ARRIVAL, userClass);
+							return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClass);
 
 						// Store the service rank in edge
-						servicePointer.setServiceIndex(next);
+						minNextServiceIndex = next;
 
 						// The service is now returned
 						return servicePointer;
-
-					} //end while
-				}
+				}	}
 				
 				departureMoment++;
 				departureMoment.setHour(Hour(TIME_MIN));
 
-				next = _departureIndex[ 0 ];
+				next = _departureIndex[0].get(RTData);
 			}
 
-			return ServicePointer(DEPARTURE_TO_ARRIVAL, userClass);
+			return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClass);
 		}
 
 
@@ -318,23 +331,37 @@ namespace synthese
 			DateTime arrivalMoment,
 			const DateTime& minArrivalMoment,
 			bool controlIfTheServiceIsReachable,
-			optional<int> maxPreviousServiceIndex,
+			optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 			bool inverted
 		) const	{
-			int previous(getArrivalFromIndex (arrivalMoment.getHours ()));
 
-			if (maxPreviousServiceIndex && *maxPreviousServiceIndex < previous)
+			const ServiceSet& services(getParentPath()->getServices());
+
+			if(services.empty())
+			{
+				return ServicePointer(false, ARRIVAL_TO_DEPARTURE, userClass);
+			}
+
+			bool RTData(arrivalMoment.toPosixTime() < posix_time::second_clock().local_time() + posix_time::hours(23));
+
+			ArrivalServiceIndex::Value previous(getArrivalFromIndex(RTData, arrivalMoment.getHours()));
+
+			if(	maxPreviousServiceIndex &&
+				(*maxPreviousServiceIndex == services.rend() || services.value_comp()(**maxPreviousServiceIndex, *previous))
+			){
 				previous = *maxPreviousServiceIndex;
+			}
 
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{
-				if (getParentPath()->isActive(gregorian::date(arrivalMoment.getDate().getYear(), arrivalMoment.getDate().getMonth(), arrivalMoment.getDay())))
+				if(	getParentPath()->isActive(gregorian::date(arrivalMoment.getDate().getYear(), arrivalMoment.getDate().getMonth(), arrivalMoment.getDay())))
 				{
-					for (; previous >= 0; --previous)  // Loop over services
+					for (; previous != services.rend(); ++previous)  // Loop over services
 					{
 						// Saving of the used service
 						ServicePointer servicePointer(
-							getParentPath ()->getService(previous)->getFromPresenceTime(
+							(*previous)->getFromPresenceTime(
+								RTData,
 								ARRIVAL_TO_DEPARTURE,
 								userClass
 								, this
@@ -349,89 +376,106 @@ namespace synthese
 
 						// Control of validity of departure date time
 						if (servicePointer.getActualDateTime() < minArrivalMoment)
-							return ServicePointer(ARRIVAL_TO_DEPARTURE, userClass);
+							return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClass);
 
 						// Store service rank in edge
-						servicePointer.setServiceIndex(previous);
+						maxPreviousServiceIndex = previous;
 
 						// The service is now returned
 						return servicePointer;
-					}
-				}
+				}	}
 
 				arrivalMoment--;
 				arrivalMoment.setHour(Hour(TIME_MAX));
-				previous = _arrivalIndex[ 23 ];
+				previous = _arrivalIndex[INDICES_NUMBER - 1].get(RTData);
 			}
 
-			return ServicePointer(ARRIVAL_TO_DEPARTURE, userClass);
+			return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClass);
 		}
 
 
 
-		void Edge::updateServiceIndex() const
-		{
-			int numHour;
-			int i;
+		void Edge::_updateServiceIndex(
+			bool RTData
+		) const {
+
+			const ServiceSet& services(getParentPath()->getServices());
+			size_t numHour;
 
 			// Reset
-			for ( numHour = 0; numHour < HOURS_PER_DAY; ++numHour)
+			for ( numHour = 0; numHour < INDICES_NUMBER; ++numHour)
 			{
-				_departureIndex[ numHour ] = UNKNOWN_VALUE;
-				_arrivalIndex[numHour] = UNKNOWN_VALUE;
+				_departureIndex[numHour].set(RTData, services.end());
+				_arrivalIndex[numHour].set(RTData, services.rend());
+			}
+			if(RTData)
+			{
+				_RTserviceIndexUpdateNeeded = false;
+			}
+			else
+			{
+				_serviceIndexUpdateNeeded = false;
 			}
 
+			if(services.empty()) return;
+
 			// Departures
-			for (i=0; i<getParentPath()->getServices().size(); ++i)
+			for(ServiceSet::const_iterator it(services.begin()); it!=services.end(); ++it)
 			{
-				const Service* service = getParentPath()->getService(i);
-				const Hour& endHour(service->getDepartureEndScheduleToIndex(getRankInPath()).getHour());
+				const Service* service = *it;
+				const Hour& endHour(service->getDepartureEndScheduleToIndex(RTData, getRankInPath()).getHour());
 				int endHours(endHour.getHours());
-				const Hour& beginHour(service->getDepartureBeginScheduleToIndex(getRankInPath()).getHour());
+				const Hour& beginHour(service->getDepartureBeginScheduleToIndex(RTData, getRankInPath()).getHour());
 
 				for (numHour = 0; numHour <= endHours; ++numHour)
 				{
-					if(	_departureIndex[numHour] == UNKNOWN_VALUE
-					||	getParentPath()->getService(_departureIndex[numHour])->getDepartureBeginScheduleToIndex(getRankInPath()).getHour() > endHour
-					)
-						_departureIndex[numHour] = i;
+					if(	_departureIndex[numHour].get(RTData) == services.end() ||
+						(*_departureIndex[numHour].get(RTData))->getDepartureBeginScheduleToIndex(RTData, getRankInPath()).getHour() > endHour
+					){
+						_departureIndex[numHour].set(RTData, it);
+					}
 				}
 				if (endHour < beginHour)
 				{
 					for (numHour = endHours; numHour < HOURS_PER_DAY; ++numHour)
 					{
-						if (_departureIndex[numHour] == UNKNOWN_VALUE)
-							_departureIndex[numHour] = i;
+						if(	_departureIndex[numHour].get(RTData) == services.end())
+						{
+							_departureIndex[numHour].set(RTData, it);
+						}
 					}
 				}
 			}
 
 			// Arrivals
-			for (i=getParentPath()->getServices().size()-1; i>=0; --i)
+			for(ServiceSet::const_reverse_iterator it(services.rbegin()); it != services.rend(); ++it)
 			{
-				const Service* service = getParentPath()->getService(i);
-				const Hour& endHour(service->getArrivalEndScheduleToIndex(getRankInPath()).getHour());
-				const Hour& beginHour(service->getArrivalBeginScheduleToIndex(getRankInPath()).getHour());
+				const Service* service = *it;
+				const Hour& endHour(service->getArrivalEndScheduleToIndex(RTData, getRankInPath()).getHour());
+				const Hour& beginHour(service->getArrivalBeginScheduleToIndex(RTData, getRankInPath()).getHour());
 				int beginHours(beginHour.getHours());
 
 				for (numHour = HOURS_PER_DAY-1; numHour >= beginHours; --numHour)
 				{
-					if (_arrivalIndex[numHour] == UNKNOWN_VALUE
-						|| getParentPath()->getService(_arrivalIndex[numHour])->getArrivalBeginScheduleToIndex(getRankInPath()).getHour() < beginHour
-						)
-						_arrivalIndex[numHour] = i;
+					if(	_arrivalIndex[numHour].get(RTData) == services.rend()	||
+						(*_arrivalIndex[numHour].get(RTData))->getArrivalBeginScheduleToIndex(RTData, getRankInPath()).getHour() < beginHour
+					){
+						_arrivalIndex[numHour].set(RTData, it);
+					}
+					if(numHour == 0) break;
 				}
 				if (endHour < beginHour)
 				{
 					for (numHour = endHour.getHours(); numHour >= 0; --numHour)
 					{
-						if (_arrivalIndex[numHour] == UNKNOWN_VALUE)
-							_arrivalIndex[numHour] = i;
+						if(	_arrivalIndex[numHour].get(RTData) == services.rend())
+						{
+							_arrivalIndex[numHour].set(RTData, it);
+						}
+						if(numHour == 0) break;
 					}
 				}
 			}
-			_serviceIndexUpdateNeeded = false;
-
 		}
 
 
@@ -455,26 +499,36 @@ namespace synthese
 
 
 
-	    void 
-	    Edge::markServiceIndexUpdateNeeded ()
-	    {
-		_serviceIndexUpdateNeeded = true;
+	    void Edge::markServiceIndexUpdateNeeded(
+			bool RTDataOnly
+		) const {
+			if(!RTDataOnly)
+			{
+				_serviceIndexUpdateNeeded = true;
+			}
+			_RTserviceIndexUpdateNeeded = true;
 	    }
 
 
 
-	    int Edge::getDepartureFromIndex (int hour) const
-	    {
-		if (_serviceIndexUpdateNeeded) updateServiceIndex ();
-		return _departureIndex[hour];
+	    Edge::DepartureServiceIndex::Value Edge::getDepartureFromIndex(
+			bool RTData,
+			size_t hour
+		) const {
+			if (_getServiceIndexUpdateNeeded(RTData)) _updateServiceIndex(RTData);
+			return  _departureIndex[hour].get(RTData);
 	    }
 
 
-	    int Edge::getArrivalFromIndex (int hour) const
-	    {
-		if (_serviceIndexUpdateNeeded) updateServiceIndex ();
-		return _arrivalIndex[hour];
+	    Edge::ArrivalServiceIndex::Value Edge::getArrivalFromIndex(
+			bool RTData,
+			size_t hour
+		) const {
+			if (_getServiceIndexUpdateNeeded(RTData)) _updateServiceIndex(RTData);
+			return _arrivalIndex[hour].get(RTData);
 	    }
+
+
 
 		bool Edge::isConnectingEdge() const
 		{
@@ -482,5 +536,11 @@ namespace synthese
 			assert(_fromVertex->getHub());
 			return _fromVertex->getHub()->isConnectionPossible();
 		}
-	}
-}
+
+
+
+		bool Edge::_getServiceIndexUpdateNeeded( bool RTData ) const
+		{
+			return RTData ? _RTserviceIndexUpdateNeeded : _serviceIndexUpdateNeeded;
+		}
+}	}

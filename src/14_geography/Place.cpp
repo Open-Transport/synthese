@@ -21,6 +21,8 @@
 */
 
 #include "Place.h"
+#include "VertexAccessMap.h"
+#include <stdarg.h>
 
 using namespace std;
 
@@ -47,5 +49,25 @@ namespace synthese
 			return place == this;
 		}
 
+
+
+		graph::VertexAccessMap Place::getVertexAccessMap(
+			AccessDirection accessDirection,
+			const AccessParameters& accessParameters,
+			GraphTypes::value_type whatToSearch,
+			...
+		) const {
+			VertexAccessMap result;
+			GraphTypes whatToSearchSet;
+			GraphTypes::value_type col(whatToSearch);
+			va_list marker;
+			for(va_start(marker, whatToSearch); col; col = va_arg(marker, GraphTypes::value_type))
+			{
+				whatToSearchSet.insert(col);
+			}
+			va_end(marker);
+			getVertexAccessMap(result, accessDirection, accessParameters, whatToSearchSet);
+			return result;
+		}
 	}
 }

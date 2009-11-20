@@ -40,7 +40,8 @@
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 
-#include "RoutePlanner.h"
+#include "PTTimeSlotRoutePlanner.h"
+#include "PTRoutePlannerResult.h"
 
 #include "SearchFormHTMLTable.h"
 #include "PTConstants.h"
@@ -70,7 +71,8 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace html;
-	using namespace routeplanner;
+	using namespace ptrouteplanner;
+	using namespace algorithm;	
 	using namespace security;
 	using namespace graph;
 	using namespace road;
@@ -278,7 +280,8 @@ namespace synthese
 			if (_startCity.empty() || _endCity.empty())
 				return;
 
-			RoutePlanner::Result jv;
+			TimeSlotRoutePlanner::Result dummy;
+			PTRoutePlannerResult jv(startPlace, endPlace, false, dummy);
 			DateTime now(TIME_CURRENT);
 
 			if(!_confirmedTransaction.get())
@@ -294,16 +297,18 @@ namespace synthese
 				);
 				resaRequest.getAction()->setAccessParameters(ap);
 				stringstream trace;
-				RoutePlanner r(
+				PTTimeSlotRoutePlanner r(
 					startPlace
-					, endPlace
-					, ap
-					, PlanningOrder()
-					, _dateTime
+					, endPlace,
+					_dateTime
+					, _dateTime,
+					endDate
 					, endDate
 					, 5
+					, ap
+					, DEPARTURE_FIRST
 				);
-				jv = r.computeJourneySheetDepartureArrival();
+				jv = r.run();
 			}
 
 			stream << "<h1>Liens</h1><p>";
@@ -312,7 +317,7 @@ namespace synthese
 			searchRequest.getPage()->_dateTime = date;
 			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour précédent", string(), "rewind_blue.png") << " ";
 			
-			if(!jv.empty())
+			if(!jv.getJourneys().empty())
 			{
 				date = _dateTime;
 				date -= 120;
@@ -331,10 +336,10 @@ namespace synthese
 			searchRequest.getPage()->_endCity = _endCity;
 			searchRequest.getPage()->_endPlace = _endPlace;
 
-			if(!jv.empty())
+			if(!jv.getJourneys().empty())
 			{
-				RoutePlanner::Result::const_iterator it(jv.end() - 1);
-				date = (*it)->getDepartureTime();
+				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().end() - 1);
+				date = it->getDepartureTime();
 				date += 1;
 				searchRequest.getPage()->_dateTime = date;
 				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions suivantes", string(), "resultset_next.png") << " ";
@@ -352,7 +357,7 @@ namespace synthese
 
 			stream << "<h1>Résultats</h1>";
 
-			if (jv.empty())
+			if (jv.getJourneys().empty())
 			{
 				stream << "Aucun résultat trouvé de " << (
 						dynamic_cast<const NamedPlace*>(startPlace) ?
@@ -386,13 +391,15 @@ namespace synthese
 
 			// Reservation
 			bool withReservation(false);
-			for (RoutePlanner::Result::const_iterator it(jv.begin()); it != jv.end(); ++it)
-				if ((*it)->getReservationCompliance() && (*it)->getReservationDeadLine() > now)
+			for (PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin()); it != jv.getJourneys().end(); ++it)
+			{
+				if (it->getReservationCompliance() && it->getReservationDeadLine() > now)
 				{
 					withReservation = true;
-					resaRequest.getAction()->setJourney(**it);
+					resaRequest.getAction()->setJourney(*it);
 					break;
 				}
+			}
 			HTMLForm rf(resaRequest.getHTMLForm("resa"));
 			if (withReservation)
 				stream << rf.open();
@@ -400,35 +407,35 @@ namespace synthese
 			// Solutions display loop
 			int solution(1);
 			stream << t.open();
-			for (RoutePlanner::Result::const_iterator it(jv.begin()); it != jv.end(); ++it)
+			for (PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin()); it != jv.getJourneys().end(); ++it)
 			{
 				stream << t.row();
 				stream << t.col(7, string(), true);
-				if ((*it)->getReservationCompliance() && (*it)->getReservationDeadLine() > now)
+				if (it->getReservationCompliance() && it->getReservationDeadLine() > now)
 				{
 					withReservation = true;
-					stream << rf.getRadioInput(BookReservationAction::PARAMETER_DATE_TIME, (*it)->getDepartureTime(), (solution==1) ? (*it)->getDepartureTime() : DateTime(UNKNOWN_VALUE), " Solution "+Conversion::ToString(solution));
+					stream << rf.getRadioInput(BookReservationAction::PARAMETER_DATE_TIME, it->getDepartureTime(), (solution==1) ? it->getDepartureTime() : DateTime(UNKNOWN_VALUE), " Solution "+ lexical_cast<string>(solution));
 				}
 				else
 					stream << "Solution " << solution;
 				++solution;
 
 				// Departure time
-				Journey::ServiceUses::const_iterator its((*it)->getServiceUses().begin());
+				Journey::ServiceUses::const_iterator its(it->getServiceUses().begin());
 
-				if ((*it)->getContinuousServiceRange() > 1)
+				if (it->getContinuousServiceRange() > 1)
 				{
 					DateTime endRange(its->getDepartureDateTime());
-					endRange += (*it)->getContinuousServiceRange();
+					endRange += it->getContinuousServiceRange();
 					stream << " - Service continu jusqu'à " << endRange.toString();
 				}
-				if ((*it)->getReservationCompliance() == true)
+				if (it->getReservationCompliance() == true)
 				{
-					stream << " - " << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire avant le " << (*it)->getReservationDeadLine().toString();
+					stream << " - " << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire avant le " << it->getReservationDeadLine().toString();
 				}
-				if ((*it)->getReservationCompliance() == boost::logic::indeterminate)
+				if (it->getReservationCompliance() == boost::logic::indeterminate)
 				{
-					stream << " - " << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative avant le " << (*it)->getReservationDeadLine().toString();
+					stream << " - " << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative avant le " << it->getReservationDeadLine().toString();
 				}
 				if(dynamic_cast<const City*>(startPlace) || dynamic_cast<const City*>(endPlace))
 				{
@@ -444,7 +451,7 @@ namespace synthese
 					if(dynamic_cast<const City*>(endPlace))
 					{
 						if(dynamic_cast<const City*>(startPlace)) stream << " - ";
-						Journey::ServiceUses::const_iterator ite((*it)->getServiceUses().end() - 1);
+						Journey::ServiceUses::const_iterator ite(it->getServiceUses().end() - 1);
 						stream << "arrivée à " << 
 							static_cast<const PublicTransportStopZoneConnectionPlace*>(
 								ite->getArrivalEdge()->getHub()
@@ -465,7 +472,7 @@ namespace synthese
 				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
 
 				// Transfers
-				if (its == (*it)->getServiceUses().end() -1)
+				if (its == it->getServiceUses().end() -1)
 				{
 					stream << t.col(4) << "(trajet direct)";
 				}
@@ -499,7 +506,7 @@ namespace synthese
 						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
 
 						// Exit if last service use
-						if (its == (*it)->getServiceUses().end() -1)
+						if (its == it->getServiceUses().end() -1)
 							break;
 
 						// Empty final arrival col

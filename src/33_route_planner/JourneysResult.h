@@ -42,7 +42,7 @@
 
 namespace synthese
 {
-	namespace routeplanner
+	namespace algorithm
 	{
 		/** List of journeys that should be part of the result of a routing process.
 			@ingroup m53

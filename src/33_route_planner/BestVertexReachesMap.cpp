@@ -46,7 +46,7 @@ namespace synthese
 	using namespace pt;
 	
 
-	namespace routeplanner
+	namespace algorithm
 	{
 
 

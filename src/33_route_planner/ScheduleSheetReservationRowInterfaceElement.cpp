@@ -35,6 +35,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace env;
+	using namespace ptrouteplanner;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetReservationRowInterfaceElement>::FACTORY_KEY("schedules_reservation");
 
@@ -59,7 +60,7 @@ namespace synthese
 			BOOST_FOREACH(PTRoutePlannerResult::Journeys::value_type journey, jv->getJourneys())
 			{
 				stream << _cellHeader->getValue(parameters, variables, object, request);
-				resaInterfacePage->display(stream, variables, *journey, request);
+				resaInterfacePage->display(stream, variables, journey, request);
 				stream << _cellFooter->getValue(parameters, variables, object, request);
 			}
 

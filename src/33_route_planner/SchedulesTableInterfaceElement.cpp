@@ -54,6 +54,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace graph;
 	using namespace road;
+	using namespace ptrouteplanner;
 	
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,SchedulesTableInterfaceElement>::FACTORY_KEY(
@@ -106,7 +107,7 @@ namespace synthese
 					PTRoutePlannerResult::PlaceList::const_iterator itPlaces(placesList.begin());
 
 					// Loop on each leg
-					const Journey::ServiceUses& jl((*it)->getServiceUses());
+					const Journey::ServiceUses& jl(it->getServiceUses());
 					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
 						const ServiceUse& curET(*itl);
@@ -124,7 +125,7 @@ namespace synthese
 							);
 
 							DateTime lastDateTime(curET.getDepartureDateTime());
-							lastDateTime += (*it)->getContinuousServiceRange();
+							lastDateTime += it->getContinuousServiceRange();
 
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
 								columnInterfacePage->display(
@@ -153,7 +154,7 @@ namespace synthese
 								, pedestrianMode
 								, curET.getDepartureDateTime().getHour()
 								, lastDateTime.getHour()
-								, (*it)->getContinuousServiceRange() > 0
+								, it->getContinuousServiceRange() > 0
 								, itl == jl.begin()
 								, true
 								, pedestrianMode && !lastPedestrianMode
@@ -192,7 +193,7 @@ namespace synthese
 							}
 							
 							DateTime lastDateTime(curET.getArrivalDateTime());
-							lastDateTime += (*it)->getContinuousServiceRange();
+							lastDateTime += it->getContinuousServiceRange();
 
 							columnInterfacePage->display(
 								**itSheetRow
@@ -202,7 +203,7 @@ namespace synthese
 								, pedestrianMode
 								, curET.getArrivalDateTime().getHour ()
 								, lastDateTime.getHour()
-								, (*it)->getContinuousServiceRange() > 0
+								, it->getContinuousServiceRange() > 0
 								, true
 								, (itl + 1) == jl.end()
 								, false
@@ -247,7 +248,6 @@ namespace synthese
 						, *dynamic_cast<const NamedPlace*>(pi.place)
 						, request
 					);
-					delete pi.content;
 					color = !color;
 					++it;
 				}

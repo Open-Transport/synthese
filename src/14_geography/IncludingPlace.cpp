@@ -67,7 +67,7 @@ namespace synthese
 			VertexAccessMap& result
 			, const AccessDirection& accessDirection
 			, const AccessParameters& accessParameters
-			, GraphIdType whatToSearch
+			, const GraphTypes& whatToSearch
 		) const	{
 			BOOST_FOREACH(
 				const Place* place, _includedPlaces
