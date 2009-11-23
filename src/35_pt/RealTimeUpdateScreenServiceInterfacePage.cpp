@@ -87,7 +87,7 @@ namespace synthese
 				lineStop.getLine()->getDestination()->getConnectionPlace()->getName26()
 			); //5
 
-			pv.push_back(lineStop.getPhysicalStop()->getName()); //6
+			pv.push_back(static_cast<const PhysicalStop*>(service.getRealTimeVertex(lineStop.getRankInPath()))->getName()); //6
 
 			pv.push_back(
 				lineStop.getLine()->getRollingStock() ?
