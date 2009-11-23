@@ -44,7 +44,7 @@ namespace synthese
 			UNDEFINED_DIRECTION
 		} AccessDirection ;
 
-		typedef unsigned short int GraphIdType;
+		typedef unsigned int GraphIdType;
 
 		typedef unsigned int UserClassCode;
 		
