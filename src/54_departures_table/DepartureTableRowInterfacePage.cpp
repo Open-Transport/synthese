@@ -104,7 +104,7 @@ namespace synthese
 				parameters.push_back(ptd.first.getActualDateTime().getHour().toString());
 				parameters.push_back(ptd.first.getService()->getServiceNumber());
 				parameters.push_back(
-					static_cast<const PhysicalStop*>(ptd.first.getDepartureRTVertex())->getName()
+					static_cast<const PhysicalStop*>(ptd.first.getRealTimeVertex())->getName()
 					);
 				parameters.push_back(
 					ptd.first.getService()->getTeam()
