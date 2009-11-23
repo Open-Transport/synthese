@@ -117,10 +117,10 @@ namespace synthese
 					DateTime minTimeForForcedDestination(_startDateTime);
 					ServicePointer serviceInstance;
 
+					optional<Edge::DepartureServiceIndex::Value> minIndex;
 					while(true)
 					{
 						// Next service
-						optional<Edge::DepartureServiceIndex::Value> minIndex;
 						serviceInstance = ls->getNextService(
 							USER_PEDESTRIAN,
 							minTimeForForcedDestination,
