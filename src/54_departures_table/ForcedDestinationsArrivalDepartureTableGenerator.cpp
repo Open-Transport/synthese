@@ -123,8 +123,8 @@ namespace synthese
 						optional<Edge::DepartureServiceIndex::Value> minIndex;
 						serviceInstance = ls->getNextService(
 							USER_PEDESTRIAN,
-							_startDateTime,
 							minTimeForForcedDestination,
+							maxTimeForForcedDestination,
 							false,
 							minIndex
 						);
