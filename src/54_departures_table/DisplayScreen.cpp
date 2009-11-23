@@ -266,6 +266,7 @@ namespace synthese
 						getTrackNumberDisplay(),
 						getRoutePlanningWithTransfer(),
 						getBlinkingDelay(),
+						getDisplayClock(),
 						*getLocalization(),
 						displayedObject,
 						request

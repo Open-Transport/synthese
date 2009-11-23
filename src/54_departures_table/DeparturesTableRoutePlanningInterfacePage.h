@@ -51,7 +51,8 @@ namespace synthese
 				- 5 : id of the origin place
 				- 6 : name of the origin place
 				- 7 : blinking_delay : blinking delay
-				
+				- 8 : display clock
+
 			Object :
 				- result of table generation
 
@@ -87,7 +88,8 @@ namespace synthese
 				, bool displayServiceNumber
 				, bool displayTrackNumber,
 				bool withTransfer
-				, int blinkingDelay
+				, int blinkingDelay,
+				bool displayClock
 				, const env::PublicTransportStopZoneConnectionPlace& place
 				, const RoutePlanningListWithAlarm& rows
 				, const server::Request* request = NULL

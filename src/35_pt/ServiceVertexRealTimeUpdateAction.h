@@ -74,6 +74,8 @@ namespace synthese
 			
 			virtual bool _isAuthorized() const;
 
+			virtual bool _isSessionRequired() const { return false; }
+
 			//! @name Setters
 			//@{
 				void setService(boost::shared_ptr<const env::ScheduledService> service);

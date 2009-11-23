@@ -93,6 +93,8 @@ namespace synthese
 			/// @todo Implement a right control on this function
 			virtual bool _isAuthorized() const;
 
+			virtual bool _isSessionRequired() const { return false; }
+
 			//! @name Setters
 			//@{
 				void setService(boost::shared_ptr<const env::ScheduledService> service);

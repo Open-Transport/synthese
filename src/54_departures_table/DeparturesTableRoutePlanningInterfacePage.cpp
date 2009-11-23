@@ -60,7 +60,8 @@ namespace synthese
 			bool displayTrackNumber ,
 			bool withTransfer,
 			int blinkingDelay,
-			const env::PublicTransportStopZoneConnectionPlace& place ,
+			bool displayClock,
+			const env::PublicTransportStopZoneConnectionPlace& place,
 			const RoutePlanningListWithAlarm& rows ,
 			const server::Request* request /*= NULL */ 
 		) const	{
@@ -73,6 +74,7 @@ namespace synthese
 			pv.push_back(lexical_cast<string>(place.getKey()));
 			pv.push_back(place.getFullName());
 			pv.push_back(lexical_cast<string>(blinkingDelay));
+			pv.push_back(lexical_cast<string>(displayClock));
 
 			InterfacePage::_display(
 				stream

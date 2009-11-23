@@ -32,6 +32,7 @@ namespace synthese
 	namespace graph
 	{
 		class Edge;
+		class Vertex;
 
 		/** ServiceUse class.
 			@ingroup m18
@@ -43,6 +44,7 @@ namespace synthese
 			//@{
 				const Edge*				_secondEdge;
 				time::DateTime			_secondActualDateTime;
+				const Vertex*			_secondRTVertex;
 			//@}
 
 		public:
@@ -55,12 +57,15 @@ namespace synthese
 			//@{
 				const Edge*				getSecondEdge()				const;
 				const time::DateTime&	getSecondActualDateTime()	const;
+				const Vertex*			getSecondVertex()			const;
 			//@}
 
 			//! @name Queries
 			//@{
 				const Edge*				getDepartureEdge()			const;
 				const Edge*				getArrivalEdge()			const;
+				const Vertex*			getDepartureRTVertex()			const;
+				const Vertex*			getArrivalRTVertex()			const;
 				const time::DateTime&	getDepartureDateTime()		const;
 				const time::DateTime&	getArrivalDateTime()		const;
 				int						getDuration()				const;

@@ -36,9 +36,10 @@ namespace synthese
 		ServiceUse::ServiceUse(
 			const ServicePointer& servicePointer,
 			const Edge* edge
-		):	ServicePointer(servicePointer)
-			, _secondEdge(edge)
-			, _secondActualDateTime(servicePointer.getService()->getLeaveTime(servicePointer, edge))
+		):	ServicePointer(servicePointer),
+			_secondEdge(edge),
+			_secondRTVertex(edge->getFromVertex()),
+			_secondActualDateTime(servicePointer.getService()->getLeaveTime(servicePointer, edge))
 		{
 		}
 
@@ -47,6 +48,7 @@ namespace synthese
 		ServiceUse::ServiceUse():
 			ServicePointer(),
 			_secondEdge(NULL),
+			_secondRTVertex(NULL),
 			_secondActualDateTime(TIME_UNKNOWN)
 		{
 
@@ -155,8 +157,11 @@ namespace synthese
 		{
 			// Reverse edge
 			const Edge* edge(_secondEdge);
+			const Vertex* vertex(_secondRTVertex);
 			_secondEdge = _edge;
 			_edge = edge;
+			_secondRTVertex = _RTVertex;
+			_RTVertex = vertex;
 
 			// Reverse time
 			DateTime dateTime(_secondActualDateTime);
@@ -164,6 +169,33 @@ namespace synthese
 			_actualTime = dateTime;
 
 			_determinationMethod = (_determinationMethod == DEPARTURE_TO_ARRIVAL) ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL;
+		}
+
+
+
+		const Vertex* ServiceUse::getSecondVertex() const
+		{
+			return _secondRTVertex;
+		}
+
+
+
+		const Vertex* ServiceUse::getDepartureRTVertex() const
+		{
+			return (_determinationMethod == DEPARTURE_TO_ARRIVAL)
+				? _RTVertex
+				: _secondRTVertex
+			;
+		}
+
+
+
+		const Vertex* ServiceUse::getArrivalRTVertex() const
+		{
+			return (_determinationMethod == DEPARTURE_TO_ARRIVAL)
+				? _secondRTVertex
+				: _RTVertex
+			;
 		}
 	}
 }

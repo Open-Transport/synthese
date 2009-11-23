@@ -115,7 +115,7 @@ namespace synthese
 				const ServiceUse& s(row.second.getStartServiceUse());
 
 				v.push_back(lexical_cast<string>((s.getDepartureDateTime() - DateTime(TIME_CURRENT)) <= blinkingDelay));
-				v.push_back(static_cast<const PhysicalStop*>(s.getRealTimeVertex())->getName());
+				v.push_back(static_cast<const PhysicalStop*>(s.getDepartureRTVertex())->getName());
 				v.push_back(s.getService()->getServiceNumber());
 				v.push_back(s.getDepartureDateTime().getHour().toString());
 				const CommercialLine* line(static_cast<const Line*>(s.getEdge()->getParentPath())->getCommercialLine());
@@ -126,7 +126,7 @@ namespace synthese
 				if(row.second.getServiceUses().size() > 1)
 				{
 					const ServiceUse& s(row.second.getEndServiceUse());
-					v.push_back(static_cast<const PhysicalStop*>(s.getRealTimeVertex())->getName());
+					v.push_back(static_cast<const PhysicalStop*>(s.getDepartureRTVertex())->getName());
 					v.push_back(s.getService()->getServiceNumber());
 					v.push_back(s.getDepartureDateTime().getHour().toString());
 					const CommercialLine* line(static_cast<const Line*>(s.getEdge()->getParentPath())->getCommercialLine());
