@@ -92,5 +92,12 @@ namespace synthese
 		{
 			return _getParametersMap();
 		}
+
+
+
+		void RequestWithInterface::setInterface( boost::shared_ptr<const Interface> value )
+		{
+			_interface = value;
+		}
 	}
 }

@@ -231,6 +231,11 @@ namespace synthese
 					, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
 				)
 			);
+			if(!originPlace)
+			{
+				throw ActionException("Invalid origin place");
+			}
+
 			const Place* destinationPlace(site.get()
 				? site->fetchPlace(
 					map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
@@ -240,11 +245,21 @@ namespace synthese
 					, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
 				)
 			);
+			if(!destinationPlace)
+			{
+				throw ActionException("Invalid destination place");
+			}
 			
 			// Departure date time
 			DateTime departureDateTime(map.getDateTime(PARAMETER_DATE_TIME, true, FACTORY_KEY));
-			DateTime arrivalDateTime(TIME_UNKNOWN);
-			
+			DateTime arrivalDateTime(departureDateTime);
+			arrivalDateTime.addDaysDuration(1);
+			if(	!originPlace->getPoint().isUnknown() &&
+				!destinationPlace->getPoint().isUnknown()
+			){
+				arrivalDateTime += 2 * static_cast<int>(originPlace->getPoint().getDistanceTo(destinationPlace->getPoint()) / 1000);
+			}
+
 			// Accessibility
 			if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
 			{

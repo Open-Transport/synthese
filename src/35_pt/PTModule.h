@@ -69,6 +69,7 @@ namespace synthese
 			public graph::GraphModuleTemplate<PTModule>
 		{
 		public:
+			static void RTDataCleaner();
 		};
 	}
 	/** @} */

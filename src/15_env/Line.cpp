@@ -334,5 +334,12 @@ namespace synthese
 			
 			return true;
 		}
+
+
+
+		const LineStop* Line::getLineStop( std::size_t rank ) const
+		{
+			return static_cast<const LineStop*>(getEdge(rank));
+		}
 	}
 }

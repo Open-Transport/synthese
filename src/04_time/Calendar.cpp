@@ -53,7 +53,7 @@ namespace synthese
 			if(_markedDates.empty())
 				return gregorian::date();
 
-			_BitSets::const_reverse_iterator it(_markedDates.rend());
+			_BitSets::const_reverse_iterator it(_markedDates.rbegin());
 
 			date result(it->first, Jan, 1);
 

@@ -46,6 +46,10 @@ namespace synthese
 				- 8 : service_number : Service number
 				- 9 : track : Track name
 				- 10 : team : Team number
+				- 11 : Rolling stock ID
+				- 12 : theoretical departure time
+				- 13 : delay duration
+				- 14 : URL to the service edition screen (on the same interface if available)
 
 			Object :
 				- Must be a ArrivalDepartureRow object
@@ -67,21 +71,30 @@ namespace synthese
 
 			DepartureTableRowInterfacePage();
 
-			/** Display of the admin page.
-			*/
-			void display( std::ostream& stream
-				, interfaces::VariablesMap& vars
-				, int rowId
-				, int pageNumber
-				, bool displayQuaiNumber
-				, bool displayServiceNumber
-				, bool displayTeam
-				, int intermediatesStopsToDisplay,
-				int blinkingDelay
-				, const ArrivalDepartureRow& row
-				, const server::Request* request = NULL
-				) const;
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Display of the admin page.
+			/// @param stream Stream to write the result on
+			/// @param vars Interface variables
+			/// @param rowId Rank of the row in the departure table
+			/// @param pageNumber Rank of the page if the display type is based on 
+			///		memory pages
+			/// @param displayQuaiNumber true if the number of the quay must be
+			///		displayed
+			void display(
+				std::ostream& stream,
+				interfaces::VariablesMap& vars,
+				int rowId,
+				int pageNumber,
+				bool displayQuaiNumber,
+				bool displayServiceNumber,
+				bool displayTeam,
+				int intermediatesStopsToDisplay,
+				int blinkingDelay,
+				const ArrivalDepartureRow& row,
+				const server::Request* request = NULL
+			) const;
 		};
 	}
 }

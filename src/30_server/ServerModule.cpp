@@ -123,7 +123,7 @@ namespace synthese
 		void ServerModule::RunHTTPServer()
 		{
 			// Create a pool of threads to run all of the io_services.
-			ServerModule::KillAllThreads();
+			ServerModule::KillAllHTTPThreads();
 	
 			Log::GetInstance().info(
 				"HTTP Server is now listening on port " + GetParameter(ServerModule::MODULE_PARAM_PORT) +
@@ -310,8 +310,10 @@ namespace synthese
 			_threads.erase(it);
 			theThread->interrupt();
 			Log::GetInstance ().info ("Attempted to kill the thread "+ key);
-			if(autoRestart && _threads.size() < lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)))
-			{
+			if(	autoRestart &&
+				GetThreadInfo(key).isHTTPThread &&
+				_threads.size() < lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS))
+			){
 				thread::id newId(AddHTTPThread());
 				Log::GetInstance ().info ("Create the thread "+ lexical_cast<string>(newId) +" because the minimum threads number was reached");
 			}
@@ -319,13 +321,31 @@ namespace synthese
 
 
 
-		void ServerModule::KillAllThreads(bool autoRestart)
+		void ServerModule::KillAllThreads()
 		{
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
 			vector<string> threadsId;
 			BOOST_FOREACH(const ServerModule::Threads::value_type it, _threads)
 			{
 				threadsId.push_back(it.first);
+			}
+			BOOST_FOREACH(const string& threadId, threadsId)
+			{
+				ServerModule::KillThread(threadId, false);
+			}
+
+			Log::GetInstance ().info ("All threads are killed and HTTP Server is now stopped.");
+		}
+
+
+
+		void ServerModule::KillAllHTTPThreads(bool autoRestart)
+		{
+			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+			vector<string> threadsId;
+			BOOST_FOREACH(const ServerModule::Threads::value_type it, _threads)
+			{
+				if(it.second.isHTTPThread) threadsId.push_back(it.first);
 			}
 			BOOST_FOREACH(const string& threadId, threadsId)
 			{
@@ -363,6 +383,23 @@ namespace synthese
 
 
 
+		void ServerModule::AddThread(
+			shared_ptr<thread> theThread,
+			const std::string& description,
+			bool isHTTPThread
+		){
+			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+			ThreadInfo info;
+			info.status = ThreadInfo::THREAD_WAITING;
+			info.theThread = theThread;
+			info.lastChangeTime = posix_time::microsec_clock::local_time();
+			info.description = description;
+			info.isHTTPThread = isHTTPThread;
+			_threads.insert(make_pair(lexical_cast<string>(theThread->get_id()), info));
+		}
+
+
+
 		boost::thread::id ServerModule::AddHTTPThread()
 		{
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
@@ -370,11 +407,7 @@ namespace synthese
 				new thread(
 					bind(&asio::io_service::run, &ServerModule::_io_service)
 			)	);
-			ThreadInfo info;
-			info.status = ThreadInfo::THREAD_WAITING;
-			info.theThread = theThread;
-			info.lastChangeTime = posix_time::microsec_clock::local_time();
-			_threads.insert(make_pair(lexical_cast<string>(theThread->get_id()), info));
+			AddThread(theThread, "HTTP", true);
 			++_waitingThreads;
 			return theThread->get_id();
 		}
@@ -386,7 +419,7 @@ namespace synthese
 			try
 			{
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
-				ThreadInfo& info(GetCurrentThreadInfo());
+				ThreadInfo& info(GetThreadInfo());
 				if(info.status != ThreadInfo::THREAD_WAITING) return;
 				info.status = ThreadInfo::THREAD_ANALYSING_REQUEST;
 				info.queryString = queryString;
@@ -405,10 +438,11 @@ namespace synthese
 
 
 
-		ServerModule::ThreadInfo& ServerModule::GetCurrentThreadInfo()
-		{
+		ServerModule::ThreadInfo& ServerModule::GetThreadInfo(
+			optional<string> key
+		){
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
-			Threads::iterator it(_threads.find(lexical_cast<string>(this_thread::get_id())));
+			Threads::iterator it(_threads.find(key ? *key : lexical_cast<string>(this_thread::get_id())));
 			if(it == _threads.end()) throw ThreadInfo::Exception();
 			return it->second;
 		}
@@ -420,7 +454,7 @@ namespace synthese
 			try
 			{
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
-				ThreadInfo& info(GetCurrentThreadInfo());
+				ThreadInfo& info(GetThreadInfo());
 				info.status = ThreadInfo::THREAD_RUNNING_ACTION;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
@@ -436,7 +470,7 @@ namespace synthese
 			try
 			{
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
-				ThreadInfo& info(GetCurrentThreadInfo());
+				ThreadInfo& info(GetThreadInfo());
 				info.status = ThreadInfo::THREAD_RUNNING_FUNCTION;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
@@ -452,7 +486,7 @@ namespace synthese
 			try
 			{
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
-				ThreadInfo& info(GetCurrentThreadInfo());
+				ThreadInfo& info(GetThreadInfo());
 				if(info.status == ThreadInfo::THREAD_WAITING) return;
 				info.status = ThreadInfo::THREAD_WAITING;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
@@ -479,7 +513,6 @@ namespace synthese
 				GetParameter(MODULE_PARAM_SMTP_PORT)
 			);
 		}
-
 
 
 

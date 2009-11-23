@@ -81,7 +81,10 @@ namespace synthese
 					@return A pointer to the existing wanted page in the interface definition. The pointer does not know the real type of the page.
 					@exception InterfacePageException The code is not available in the factory
 				*/
-				const InterfacePage* getPage(const std::string& classCode, std::string pageCode = std::string()) const;
+				const InterfacePage* getPage(
+					const std::string& classCode,
+					std::string pageCode = std::string()
+				) const;
 
 				/** Gets a stored page from its class (template).
 					@return The required page, directly known as its type.
@@ -91,6 +94,31 @@ namespace synthese
 				{
 					return static_cast<const T*>(getPage(T::FACTORY_KEY, pageKey));
 				}
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if a page exists in the interface.
+				/// @param classCode Factory key of the page
+				/// @param pageCode Variation code of the page
+				/// @return true if the page exists in the interface
+				bool hasPage(
+					const std::string& classCode,
+					std::string pageCode = std::string()
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if a page exists in the interface.
+				/// @param pageKey Variation code of the page
+				/// @return true if the page exists in the interface
+				template <class T>
+				bool hasPage(std::string pageKey = std::string()) const
+				{
+					return hasPage(T::FACTORY_KEY, pageKey);
+				}
+
 
 				const std::string& getNoSessionDefaultPageCode() const;
 				const std::string& getName() const;

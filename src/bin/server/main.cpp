@@ -149,7 +149,7 @@ filesystem::path createCompletePath (const std::string& s)
 void quit()
 {
 	// End all threads
-	ServerModule::KillAllThreads(false);
+	ServerModule::KillAllHTTPThreads(false);
 	
 	// Terminate all modules
 	vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());

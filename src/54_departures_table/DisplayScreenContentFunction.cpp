@@ -119,7 +119,7 @@ namespace synthese
 
 		void DisplayScreenContentFunction::_run( std::ostream& stream ) const
 		{
-			_screen->display(stream, _date ? *_date : DateTime(TIME_CURRENT));
+			_screen->display(stream, _date ? *_date : DateTime(TIME_CURRENT), _request);
 		}
 
 

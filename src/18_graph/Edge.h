@@ -99,6 +99,9 @@ namespace synthese
 			typedef ServiceIndex<ServiceSet::const_iterator> DepartureServiceIndex;
 			typedef ServiceIndex<ServiceSet::const_reverse_iterator> ArrivalServiceIndex;
 
+			typedef std::vector<DepartureServiceIndex> DepartureServiceIndices;
+			typedef std::vector<ArrivalServiceIndex> ArrivalServiceIndices;
+
 		protected:
 			Vertex*	_fromVertex;
 			const Path*		_parentPath;		//!< The path the edge belongs
@@ -106,9 +109,6 @@ namespace synthese
 		
 		private:
 			static const std::size_t INDICES_NUMBER;
-
-			typedef std::vector<DepartureServiceIndex> DepartureServiceIndices;
-			typedef std::vector<ArrivalServiceIndex> ArrivalServiceIndices;
 
 			int			_rankInPath;		//!< Rank in path.
 
@@ -185,7 +185,9 @@ namespace synthese
 				*/
 				const std::vector<const geometry::Point2D*>& getViaPoints () const;
 
-			
+				const DepartureServiceIndices& getDepartureIndices() const;
+				const ArrivalServiceIndices& getArrivalIndices() const;
+
 				int getRankInPath () const;
 			//@}
 

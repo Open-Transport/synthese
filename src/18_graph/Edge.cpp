@@ -543,4 +543,18 @@ namespace synthese
 		{
 			return RTData ? _RTserviceIndexUpdateNeeded : _serviceIndexUpdateNeeded;
 		}
+
+
+
+		const Edge::DepartureServiceIndices& Edge::getDepartureIndices() const
+		{
+			return _departureIndex;
+		}
+
+
+
+		const Edge::ArrivalServiceIndices& Edge::getArrivalIndices() const
+		{
+			return _arrivalIndex;
+		}
 }	}

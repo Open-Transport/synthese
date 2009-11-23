@@ -71,6 +71,7 @@ namespace synthese
 
 			HTMLTable::ColsVector c;
 			c.push_back("ID");
+			c.push_back("Role");
 			c.push_back("Status");
 			c.push_back("Query");
 			c.push_back("Duration");
@@ -86,6 +87,11 @@ namespace synthese
 				const ServerModule::ThreadInfo& info(it.second);
 				stream << t.row();
 				stream << t.col() << it.first;
+				stream << t.col() << info.description;
+				if(info.theThread->get_id() == this_thread::get_id())
+				{
+					stream << " <b>(current thread)</b>";
+				}
 				stream << t.col();
 				switch(info.status)
 				{
@@ -101,10 +107,6 @@ namespace synthese
 				case ServerModule::ThreadInfo::THREAD_RUNNING_FUNCTION:
 					stream << "Running a function";
 					break;
-				}
-				if(info.theThread->get_id() == this_thread::get_id())
-				{
-					stream << " <b>(current thread)</b>";
 				}
 				stream << t.col();
 				if(info.status != ServerModule::ThreadInfo::THREAD_WAITING)

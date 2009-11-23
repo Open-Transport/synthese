@@ -93,11 +93,15 @@ namespace synthese
 
 		const ArrivalDepartureList& ForcedDestinationsArrivalDepartureTableGenerator::generate()
 		{
+			if(_physicalStops.empty()) return _result;
+
 			/** - Search of best departure for each forced destination */
 			typedef map<const PublicTransportStopZoneConnectionPlace*, ArrivalDepartureList::iterator> ReachedDestinationMap;
 			ReachedDestinationMap reachedDestination;
+
+			const PublicTransportStopZoneConnectionPlace::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
 			
-			BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
+			BOOST_FOREACH(const PhysicalStops::value_type& it, physicalStops)
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
@@ -110,18 +114,31 @@ namespace synthese
 					// Max time for forced destination
 					DateTime maxTimeForForcedDestination(_startDateTime);
 					maxTimeForForcedDestination += _persistanceDuration;
+					DateTime minTimeForForcedDestination(_startDateTime);
+					ServicePointer serviceInstance;
 
-					// Next service
-					optional<Edge::DepartureServiceIndex::Value> minIndex;
-					ServicePointer serviceInstance = ls->getNextService(
-						USER_PEDESTRIAN,
-						_startDateTime,
-						maxTimeForForcedDestination,
-						false,
-						minIndex
-					);
-					
-					// No service
+					while(true)
+					{
+						// Next service
+						optional<Edge::DepartureServiceIndex::Value> minIndex;
+						serviceInstance = ls->getNextService(
+							USER_PEDESTRIAN,
+							_startDateTime,
+							minTimeForForcedDestination,
+							false,
+							minIndex
+						);
+
+						if(	serviceInstance.getService() == NULL ||
+							_physicalStops.find(serviceInstance.getRealTimeVertex()->getKey()) != _physicalStops.end()
+						){
+							break;
+						}
+
+						++*minIndex;
+						minTimeForForcedDestination = serviceInstance.getActualDateTime();
+					}
+
 					if (serviceInstance.getService() == NULL)
 						continue;
 

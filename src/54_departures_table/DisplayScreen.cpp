@@ -219,8 +219,11 @@ namespace synthese
 			_maintenanceMessage = message;
 		}
 
-		void DisplayScreen::display( std::ostream& stream, const DateTime& date ) const
-		{
+		void DisplayScreen::display(
+			std::ostream& stream,
+			const DateTime& date,
+			const server::Request* request
+		) const {
 			if (!_displayType || !_displayType->getDisplayInterface() || !_maintenanceIsOnline || !_localization)
 				return;
 
@@ -264,7 +267,8 @@ namespace synthese
 						getRoutePlanningWithTransfer(),
 						getBlinkingDelay(),
 						*getLocalization(),
-						displayedObject
+						displayedObject,
+						request
 					);
 				}
 				else if(_generationMethod == BY_PHYSICAL_STOP)
@@ -329,7 +333,8 @@ namespace synthese
 						getBlinkingDelay(),
 						getDisplayClock()
 						, getLocalization()
-						, displayedObject
+						, displayedObject,
+						request
 					);
 				}
 			}

@@ -136,6 +136,7 @@ namespace synthese
 				{
 					ServicePointer sp(false, DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN, &lineStop);
 					sp.setActualTime(d);
+					sp.setTheoreticalTime(d);
 					ActualDisplayedArrivalsList destinations;
 					destinations.push_back(IntermediateStop(&place));
 					destinations.push_back(IntermediateStop(&place));

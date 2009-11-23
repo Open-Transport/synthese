@@ -20,14 +20,21 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ServerModule.h"
 #include "PTModule.h"
+#include "ScheduledService.h"
+#include "Env.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace pt;
 	using namespace server;
+	using namespace util;
+	using namespace env;
+	
 
 	namespace graph
 	{
@@ -51,6 +58,11 @@ namespace synthese
 		
 		template<> void ModuleClassTemplate<PTModule>::Init()
 		{
+			shared_ptr<thread> theThread(
+				new thread(
+					&PTModule::RTDataCleaner
+			)	);
+			ServerModule::AddThread(theThread, "Real time data cleaner");
 		}
 		
 		template<> void ModuleClassTemplate<PTModule>::End()
@@ -60,5 +72,30 @@ namespace synthese
 
 	namespace pt
 	{
+		void PTModule::RTDataCleaner()
+		{
+			Registry<ScheduledService>& registry(
+				Env::GetOfficialEnv().getEditableRegistry<ScheduledService>()
+			);
+
+			while(true)
+			{
+				ServerModule::SetCurrentThreadRunningAction();
+
+				posix_time::ptime now(posix_time::second_clock::local_time());
+
+				BOOST_FOREACH(Registry<ScheduledService>::value_type& service, registry)
+				{
+					if(now > service.second->getNextRTUpdate())
+					{
+						service.second->clearRTData();
+					}
+				}
+
+				ServerModule::SetCurrentThreadWaiting();
+
+				this_thread::sleep(posix_time::minutes(1));
+			}
+		}
 	}
 }

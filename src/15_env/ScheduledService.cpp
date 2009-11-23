@@ -54,9 +54,12 @@ namespace synthese
 			RegistryKeyType id,
 			string serviceNumber,
 			Path* path
-		):	Registrable(id)
-			, NonPermanentService(serviceNumber, path)
-		{}
+		):	Registrable(id),
+			NonPermanentService(serviceNumber, path),
+			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
+		{
+			clearRTData();
+		}
 
 
 
@@ -64,10 +67,8 @@ namespace synthese
 		{}
 
 
-
-		    
-		bool 
-		ScheduledService::isContinuous () const
+	    
+		bool ScheduledService::isContinuous () const
 		{
 			return false;
 		}
@@ -76,6 +77,7 @@ namespace synthese
 		void ScheduledService::setPath(Path* path )
 		{
 			Service::setPath(path);
+			clearRTData();
 		}
 
 
@@ -104,29 +106,24 @@ namespace synthese
 			// Initializations
 			ServicePointer ptr(RTData,method, userClass, edge);
 			ptr.setService(this);
-			DateTime actualTime(presenceDateTime);
-			Schedule schedule;
 			int edgeIndex(edge->getRankInPath());
+			const Schedule& thSchedule(method == DEPARTURE_TO_ARRIVAL ? _departureSchedules.at(edgeIndex) : _arrivalSchedules.at(edgeIndex));
+			const Schedule& rtSchedule(method == DEPARTURE_TO_ARRIVAL ? _RTDepartureSchedules.at(edgeIndex) : _RTArrivalSchedules.at(edgeIndex));
+			const Schedule& schedule(RTData ? rtSchedule : thSchedule);
 
 			// Actual time
-			if (method == DEPARTURE_TO_ARRIVAL)
-			{
-				schedule = _departureSchedules.at(edgeIndex);
-				if (presenceDateTime.getHour() > schedule.getHour())
-					return ServicePointer(RTData,DEPARTURE_TO_ARRIVAL, userClass);
+			if(	method == DEPARTURE_TO_ARRIVAL && presenceDateTime.getHour() > schedule.getHour() ||
+				method == ARRIVAL_TO_DEPARTURE && presenceDateTime.getHour() < schedule.getHour()
+			){
+				return ServicePointer(RTData, method, userClass);
 			}
-			if (method == ARRIVAL_TO_DEPARTURE)
-			{
-				schedule = _arrivalSchedules.at(edgeIndex);
-				if (presenceDateTime.getHour() < schedule.getHour())
-					return ServicePointer(RTData,ARRIVAL_TO_DEPARTURE, userClass);
-			}
+			DateTime actualTime(presenceDateTime);
 			actualTime.setHour(schedule.getHour());
 			ptr.setActualTime(actualTime);
-			
+
 			// Origin departure time
 			DateTime originDateTime(actualTime);
-			int duration = schedule - _departureSchedules.at(0);
+			int duration = schedule - (RTData ? _RTDepartureSchedules.at(0) : _departureSchedules.at(0));
 			originDateTime -= duration;
 			ptr.setOriginDateTime(originDateTime);
 
@@ -141,6 +138,16 @@ namespace synthese
 				return ServicePointer(RTData, method, userClass);
 			}		
 
+			// Theoretical time
+			DateTime theoreticalTime(presenceDateTime);
+			theoreticalTime.setHour(thSchedule.getHour());
+			ptr.setTheoreticalTime(theoreticalTime);
+
+			// Real time edge
+			if(RTData)
+			{
+				ptr.setRealTimeVertex(_RTVertices[edgeIndex]);
+			}
 			return ptr;
 		}
 
@@ -165,10 +172,32 @@ namespace synthese
 			_RTDepartureSchedules = schedules;
 		}
 
+
+
+		void ScheduledService::_computeNextRTUpdate()
+		{
+			if(!_arrivalSchedules.empty())
+			{
+				const Schedule& lastThSchedule(*(_arrivalSchedules.end() - 1));
+				const Schedule& lastRTSchedule(*(_RTArrivalSchedules.end() - 1));
+				const Schedule& lastSchedule = (lastThSchedule < lastRTSchedule) ? lastRTSchedule : lastThSchedule;
+
+				posix_time::ptime now(posix_time::second_clock::local_time());
+				_nextRTUpdate = posix_time::ptime(now.date(), lastSchedule.getHour().toPosixTimeDuration());
+				if(now.time_of_day() > lastSchedule.getHour().toPosixTimeDuration())
+				{
+					_nextRTUpdate += gregorian::days(1);
+				}
+			}
+		}
+
+
+
 		void ScheduledService::setArrivalSchedules( const Schedules& schedules )
 		{
 			_arrivalSchedules = schedules;
 			_RTArrivalSchedules = schedules;
+			_computeNextRTUpdate();
 		}
 
 		Schedule ScheduledService::getDepartureSchedule(bool RTData, size_t rank) const
@@ -419,6 +448,82 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
 			_nonConcurrencyCache.clear();
+		}
+
+
+
+		void ScheduledService::applyRealTimeLateDuration(
+			std::size_t rank,
+			boost::posix_time::time_duration value,
+			bool atArrival,
+			bool atDeparture,
+			bool updateFollowingSchedules
+		){
+			if(atArrival)
+			{
+				Schedule schedule(_arrivalSchedules[rank]);
+				schedule += value.total_seconds() / 60;
+				_RTArrivalSchedules[rank] = schedule;
+			}
+			if(atDeparture)
+			{
+				Schedule schedule(_departureSchedules[rank]);
+				schedule += value.total_seconds() / 60;
+				_RTDepartureSchedules[rank] = schedule;
+			}
+			if(updateFollowingSchedules && rank + 1 < _arrivalSchedules.size())
+			{
+				applyRealTimeLateDuration(
+					rank + 1,
+					value,
+					true, true, true
+				);
+			}
+			if(atArrival && rank + 1 == _arrivalSchedules.size())
+			{
+				_computeNextRTUpdate();
+			}
+		}
+
+
+
+		const posix_time::ptime& ScheduledService::getNextRTUpdate() const
+		{
+			return _nextRTUpdate;
+		}
+
+
+
+		void ScheduledService::clearRTData()
+		{
+			_RTDepartureSchedules = _departureSchedules;
+			_RTArrivalSchedules = _arrivalSchedules;
+			if(getPath())
+			{
+				_RTVertices.clear();
+				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
+				{
+					_RTVertices.push_back(edge->getFromVertex());
+				}
+			}
+			_computeNextRTUpdate();
+		}
+
+
+
+		void ScheduledService::setRealTimeVertex(
+			size_t rank,
+			const Vertex* value
+		){
+			assert(value->getHub() == _RTVertices[rank]->getHub());
+			_RTVertices[rank] = value;
+		}
+
+
+
+		const graph::Vertex* ScheduledService::getRealTimeVertex( std::size_t rank ) const
+		{
+			return _RTVertices[rank];
 		}
 	}
 }

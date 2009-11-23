@@ -44,6 +44,7 @@ namespace synthese
 			static const std::string TAB_STOPS;
 			static const std::string TAB_SCHEDULED_SERVICES;
 			static const std::string TAB_CONTINUOUS_SERVICES;
+			static const std::string TAB_INDICES;
 
 		private:
 			boost::shared_ptr<const Line>	_line;
@@ -91,7 +92,19 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
-			
+			/** Sub pages getter.
+				@return PageLinks Ordered vector of sub pages links
+				@author Hugues Romain
+				@date 2008
+				
+				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
+				This method can be overloaded to create customized sub tree.
+			*/
+			virtual PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain

@@ -21,6 +21,7 @@
 */
 
 #include "LineStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 #include "PhysicalStop.h"
 #include "StandardArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
@@ -60,7 +61,11 @@ namespace synthese
 
 		const ArrivalDepartureList& StandardArrivalDepartureTableGenerator::generate()
 		{
-			BOOST_FOREACH(PhysicalStops::value_type it, _physicalStops)
+			if(_physicalStops.empty()) return _result;
+
+			const PublicTransportStopZoneConnectionPlace::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
+
+			BOOST_FOREACH(PhysicalStops::value_type it, physicalStops)
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
@@ -85,9 +90,11 @@ namespace synthese
 						)	);
 						if (!servicePointer.getService())
 							break;
-						_insert(servicePointer);
 						++*index;
 						departureDateTime = servicePointer.getActualDateTime();
+						if(_physicalStops.find(servicePointer.getRealTimeVertex()->getKey()) == _physicalStops.end())
+							continue;
+						_insert(servicePointer);
 						++insertedServices;
 						if(insertedServices >= _maxSize) break;
 					}		

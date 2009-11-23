@@ -26,6 +26,13 @@
 #include "RequestException.h"
 #include "XMLReservationFunction.h"
 #include "Request.h"
+#include "ReservationTableSync.h"
+#include "ReservationTransactionTableSync.h"
+#include "Reservation.h"
+#include "ReservationTransaction.h"
+#include "ResaModule.h"
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
@@ -35,6 +42,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace time;
 
 	template<> const string util::FactorableTemplate<Function,resa::XMLReservationFunction>::FACTORY_KEY("XMLReservationFunction");
 	
@@ -43,28 +51,79 @@ namespace synthese
 		ParametersMap XMLReservationFunction::_getParametersMap() const
 		{
 			ParametersMap map;
+			if(_resa.get())
+			{
+				map.insert(Request::PARAMETER_OBJECT_ID, _resa->getKey());
+			}
 			return map;
 		}
 
 		void XMLReservationFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_request->setActionWillCreateObject();
+			if(!map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+			{
+				_request->setActionWillCreateObject();
+			}
+			else
+			{
+				try
+				{
+					_resa = ReservationTransactionTableSync::Get(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+						*getEnv()
+					);
+					ReservationTableSync::Search(*getEnv(), _resa->getKey());
+				}
+				catch(ObjectNotFoundException<ReservationTransactionTableSync>)
+				{
+					throw RequestException("No such reservation");
+				}
+			}
 		}
 
 		void XMLReservationFunction::_run( std::ostream& stream ) const
 		{
-			stream <<
-				"<?xml version\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
-				"<reservation xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_reservation_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
-				" id=\"";
-			if(_request->getActionCreatedId())
+			shared_ptr<const ReservationTransaction> resa(_resa);
+			if(!resa.get() && _request->getActionCreatedId())
 			{
-				stream << *_request->getActionCreatedId();
+				resa = ReservationTransactionTableSync::Get(*_request->getActionCreatedId(), *getEnv());
+				ReservationTableSync::Search(*getEnv(), resa->getKey());
 			}
-			stream << "\"";
 
-
+			stream <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+				"<reservation xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_reservation_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
+				" id=\"" << (resa.get() ? lexical_cast<string>(resa->getKey()) : string()) << "\"" <<
+				" customerId=\"" << (resa.get() ? lexical_cast<string>(resa->getCustomerUserId()) : string()) << "\"" <<
+				" cancellationDeadLine=\"" << (resa.get() ? posix_time::to_iso_extended_string(resa->getReservationDeadLine().toPosixTime()) : string()) << "\"" <<
+				" departureStop=\"" << (resa.get() ? string()  : string()) << "\"" <<
+				" arrivalStop=\"" << (resa.get() ? string()  : string()) << "\"" <<
+				" travelDate=\"" << (resa.get() ? string()  : string()) << "\"" <<
+				" customerName=\"" << (resa.get() ? resa->getCustomerName() : string()) << "\"" <<
+				" customerPhone=\"" << (resa.get() ? resa->getCustomerPhone() : string()) << "\"" <<
+				" status=\"" << (resa.get() ? ResaModule::GetStatusText(resa->getStatus()) : "N.A.") << "\"" <<
+				" canBeCancelled=\"" << (resa.get() ? lexical_cast<string>(resa->getReservationDeadLine() > DateTime(TIME_CURRENT)) : "0") << "\"" <<
+				" seats=\"" << (resa.get() ? lexical_cast<string>(resa->getSeats()) : "0") << "\"";
+			if(resa.get() && !resa->getCancellationTime().isUnknown())
+			{
+				stream << " cancellationDateTime=\"" << posix_time::to_iso_extended_string(resa->getCancellationTime().toPosixTime()) << "\"";
+			}
 			stream << ">";
+
+			if(resa.get())
+			{
+				BOOST_FOREACH(const Reservation* r, resa->getReservations())
+				{
+					stream <<
+						"<chunk" <<
+						" departurePlaceName=\"" << r->getDeparturePlaceName() << "\"" <<
+						" departureDateTime=\"" << posix_time::to_iso_extended_string(r->getDepartureTime().toPosixTime()) << "\"" <<
+						" arrivalPlaceName=\"" << r->getArrivalPlaceName() << "\"" <<
+						" arrivalDateTime=\"" << posix_time::to_iso_extended_string(r->getArrivalTime().toPosixTime()) << "\"" <<
+						" lineNumber=\"" << r->getLineCode() << "\"" <<
+						">";
+				}
+			}
 			stream << "</reservation>";
 		}
 		

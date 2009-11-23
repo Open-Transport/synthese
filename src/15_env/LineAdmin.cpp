@@ -41,7 +41,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "TransportNetworkRight.h"
-
+#include "ServiceAdmin.h"
 #include "Request.h"
 #include "AdminRequest.h"
 
@@ -62,6 +62,9 @@ namespace synthese
 	using namespace html;
 	using namespace time;
 	using namespace security;
+	using namespace graph;
+	using namespace pt;
+	
 
 	namespace util
 	{
@@ -79,6 +82,7 @@ namespace synthese
 		const string LineAdmin::TAB_STOPS("stops");
 		const string LineAdmin::TAB_SCHEDULED_SERVICES("sserv");
 		const string LineAdmin::TAB_CONTINUOUS_SERVICES("cserv");
+		const string LineAdmin::TAB_INDICES("in");
 
 		LineAdmin::LineAdmin()
 			: AdminInterfaceElementTemplate<LineAdmin>()
@@ -91,8 +95,8 @@ namespace synthese
 			try
 			{
 				_line = LineTableSync::Get(
-					map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(),
-					UP_LINKS_LOAD_LEVEL
+					map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY),
+					Env::GetOfficialEnv()
 				);
 			}
 			catch (Exception& e)
@@ -115,6 +119,8 @@ namespace synthese
 		void LineAdmin::display(ostream& stream, VariablesMap& variables,
 					const server::FunctionRequest<admin::AdminRequest>& _request) const
 		{
+			map<const Service*, string> services;
+
 			////////////////////////////////////////////////////////////////////
 			// TAB STOPS
 			if (openTabContent(stream, TAB_STOPS))
@@ -123,7 +129,7 @@ namespace synthese
 // 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
 				LineStopTableSync::SearchResult lineStops(
 					LineStopTableSync::Search(
-						_getEnv(),
+						Env::GetOfficialEnv(),
 						_line->getKey(),
 						UNKNOWN_VALUE,
 						0,
@@ -166,7 +172,7 @@ namespace synthese
 			{
 				ScheduledServiceTableSync::SearchResult sservices(
 					ScheduledServiceTableSync::Search(
-						_getEnv(),
+						Env::GetOfficialEnv(),
 						_line->getKey(),
 						optional<RegistryKeyType>(),
 						optional<RegistryKeyType>(),
@@ -183,6 +189,7 @@ namespace synthese
 				else
 				{
 					HTMLTable::ColsVector vs;
+					vs.push_back("Num");
 					vs.push_back("Numéro");
 					vs.push_back("Départ");
 					vs.push_back("Arrivée");
@@ -192,12 +199,19 @@ namespace synthese
 
 					stream << ts.open();
 
+					size_t i(0);
 					BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
 					{
+						string number("S"+ lexical_cast<string>(i++));
+						services[service.get()] = number;
+
 						Schedule ds(service->getDepartureSchedule(false, 0));
 						Schedule as(service->getLastArrivalSchedule(false));
 
 						stream << ts.row();
+
+						stream << ts.col() << number;
+
 						stream << ts.col() << service->getServiceNumber();
 
 						stream << ts.col() << ds.toString();
@@ -218,7 +232,7 @@ namespace synthese
 			{
 				ContinuousServiceTableSync::SearchResult cservices(
 					ContinuousServiceTableSync::Search(
-						_getEnv(),
+						Env::GetOfficialEnv(),
 						_line->getKey(),
 						optional<RegistryKeyType>(),
 						0,
@@ -232,6 +246,7 @@ namespace synthese
 				else
 				{
 					HTMLTable::ColsVector vc;
+					vc.push_back("Num");
 					vc.push_back("Départ premier");
 					vc.push_back("Départ dernier");
 					vc.push_back("Arrivée premier");
@@ -244,9 +259,15 @@ namespace synthese
 
 					stream << tc.open();
 
+					size_t i(0);
 					BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
 					{
+						string number("C"+ lexical_cast<string>(i++));
+						services[service.get()] = number;
+
 						stream << tc.row();
+
+						stream << tc.col() << number;
 
 						Schedule ds(service->getDepartureSchedule(false, 0));
 						Schedule as(service->getLastArrivalSchedule(false));
@@ -269,6 +290,77 @@ namespace synthese
 
 					stream << tc.close();
 				}
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB INDICES
+			if (openTabContent(stream, TAB_INDICES))
+			{
+				stream << "<style>td.red {background-color:red;width:8px; height:8px; color:white; text-align:center; } td.green {background-color:#008000;width:10px; height:10px; color:white; text-align:center; } .mini {font-size:9px;}</style>"; 
+				HTMLTable::ColsVector cols;
+				cols.push_back("Arrêt");
+				cols.push_back("D/A");
+				for(int i(0); i<=23; ++i)
+				{
+					cols.push_back(Conversion::ToString(i));
+				}
+				HTMLTable t(cols, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+
+				BOOST_FOREACH(const Path::Edges::value_type& edge, _line->getEdges())
+				{
+					const LineStop& lineStop(dynamic_cast<const LineStop&>(*edge));
+					lineStop.getDepartureFromIndex(false,0);
+					lineStop.getDepartureFromIndex(true,0);
+
+					if(lineStop.isArrival())
+					{
+						stream << t.row();
+						stream << t.col(1, string(), true) << lineStop.getPhysicalStop()->getConnectionPlace()->getFullName();
+						stream << t.col(1, string(), true) << "A";
+
+						BOOST_FOREACH(const Edge::ArrivalServiceIndices::value_type& index, lineStop.getArrivalIndices())
+						{
+							stream << t.col();
+
+							if(index.get(false) == lineStop.getParentPath()->getServices().rend())
+							{
+								stream << "-";
+							}
+							else
+							{
+								const Service* service(*index.get(false));
+								stream << services[service];
+								stream << "<br /><span class=\"mini\">" << service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()).toString() << "</span>";
+							}
+						}
+					}
+
+					if(lineStop.isDeparture())
+					{
+						stream << t.row();
+						stream << t.col(1, string(), true) << lineStop.getPhysicalStop()->getConnectionPlace()->getFullName();
+						stream << t.col(1, string(), true) << "D";
+
+						BOOST_FOREACH(const Edge::DepartureServiceIndices::value_type& index, lineStop.getDepartureIndices())
+						{
+							stream << t.col();
+
+							if(index.get(false) == lineStop.getParentPath()->getServices().end())
+							{
+								stream << "-";
+							}
+							else
+							{
+								const Service* service(*index.get(false));
+								stream << services[service];
+								stream << "<br /><span class=\"mini\">" << service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()).toString() << "</span>";
+							}
+						}
+					}
+				}
+				stream << t.close();
+
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -306,6 +398,7 @@ namespace synthese
 			_tabs.push_back(Tab("Arrêts desservis", TAB_STOPS, true));
 			_tabs.push_back(Tab("Services à horaire", TAB_SCHEDULED_SERVICES, true));
 			_tabs.push_back(Tab("Services continus", TAB_CONTINUOUS_SERVICES, true));
+			_tabs.push_back(Tab("Index", TAB_INDICES, true));
 
 			_tabBuilded = true;
 		}
@@ -318,8 +411,60 @@ namespace synthese
 		
 		bool LineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _line == static_cast<const LineAdmin&>(other)._line;
+			return _line->getKey() == static_cast<const LineAdmin&>(other)._line->getKey();
 		}
+
+
+
+		AdminInterfaceElement::PageLinks LineAdmin::getSubPages(
+			const AdminInterfaceElement& currentPage,
+			const server::FunctionRequest<admin::AdminRequest>& request
+		) const	{
+
+			AdminInterfaceElement::PageLinks links;
+
+			const ServiceAdmin* sa(
+				dynamic_cast<const ServiceAdmin*>(&currentPage)
+			);
+
+			const LineAdmin* la(
+				dynamic_cast<const LineAdmin*>(&currentPage)
+			);
 			
+			if(	sa &&
+				sa->getService().get() &&
+				dynamic_cast<const Line*>(sa->getService()->getPath()) &&
+				dynamic_cast<const Line*>(sa->getService()->getPath())->getKey() == _line->getKey() ||
+				la &&
+				la->getLine().get() &&
+				la->getLine()->getKey() == _line->getKey()
+			){
+				ScheduledServiceTableSync::SearchResult services(
+					ScheduledServiceTableSync::Search(*_env, _line->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<const ScheduledService> service, services)
+				{
+					shared_ptr<ServiceAdmin> p(
+						getNewOtherPage<ServiceAdmin>()
+					);
+					p->setService(service);
+					AddToLinks(links, p);
+				}
+				ContinuousServiceTableSync::SearchResult cservices(
+					ContinuousServiceTableSync::Search(*_env, _line->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<const ContinuousService> service, cservices)
+				{
+					shared_ptr<ServiceAdmin> p(
+						getNewOtherPage<ServiceAdmin>()
+					);
+					p->setService(service);
+					AddToLinks(links, p);
+				}
+			}
+			return links;
+
+		}
+
 	}
 }

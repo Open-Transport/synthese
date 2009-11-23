@@ -109,7 +109,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setPath(Path* path);
+				virtual void setPath(Path* path);
 				void setPathId(uid id);
 				void setServiceNumber(std::string serviceNumber);
 			//@}

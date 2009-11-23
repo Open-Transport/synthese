@@ -12,6 +12,11 @@
 #include "NavteqWithProjectionFileFormat.h"
 #include "NonConcurrencyRuleAddAction.h"
 #include "NonConcurrencyRuleRemoveAction.h"
+#include "ServiceAdmin.h"
+#include "RealTimeUpdateFunction.h"
+#include "RealTimeUpdateScreenServiceInterfacePage.h"
+#include "ScheduleRealTimeUpdateAction.h"
+#include "ServiceVertexRealTimeUpdateAction.h"
 
 // Registries
 

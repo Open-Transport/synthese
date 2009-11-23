@@ -64,6 +64,13 @@ namespace synthese
 			*/
 			boost::shared_ptr<const Interface> getInterface() const;
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Interface setter.
+			/// @param value interface to link in the function
+			void setInterface(boost::shared_ptr<const Interface> value);
+
 			RequestWithInterface();
 		};
 	}

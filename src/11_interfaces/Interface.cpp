@@ -71,6 +71,21 @@ namespace synthese
 
 
 
+		bool Interface::hasPage(const string& classCode, string pageCode) const
+		{
+			PagesMap::const_iterator it = _pages.find(classCode);
+			if (it == _pages.end())
+			{
+				return false;
+			}
+			if (pageCode.empty())
+			{
+				return true;
+			}
+			return it->second.find(pageCode) != it->second.end();
+		}
+
+
 		void Interface::addPage(InterfacePage* page )
 		{
 			PagesMap::iterator it(_pages.find(page->getFactoryKey()));

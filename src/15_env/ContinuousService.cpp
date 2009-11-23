@@ -175,6 +175,7 @@ namespace synthese
 				}
 			}
 			ptr.setActualTime(actualDateTime);
+			ptr.setTheoreticalTime(actualDateTime);
 			ptr.setServiceRange(range);
 
 			// Origin departure time

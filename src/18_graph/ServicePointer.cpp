@@ -23,6 +23,7 @@
 #include "ServicePointer.h"
 #include "Service.h"
 #include "UseRule.h"
+#include "Edge.h"
 
 #include "04_time/module.h"
 
@@ -44,11 +45,13 @@ namespace synthese
 			_service(NULL)
 			, _originDateTime(TIME_UNKNOWN)
 			, _determinationMethod(method)
-			, _actualTime(TIME_UNKNOWN)
+			, _actualTime(TIME_UNKNOWN),
+			_theoreticalTime(TIME_UNKNOWN)
 			, _range(0)
 			, _edge(edge),
 			_userClass(userClassCode),
-			_useRule(NULL)
+			_useRule(NULL),
+			_RTVertex(edge ? edge->getFromVertex() : NULL)
 		{}
 
 
@@ -57,8 +60,10 @@ namespace synthese
 			_RTData(false),
 			_service(NULL),
 			_edge(NULL),
+			_RTVertex(NULL),
 			_determinationMethod(UNDEFINED_DIRECTION),
 			_actualTime(TIME_UNKNOWN),
+			_theoreticalTime(TIME_UNKNOWN),
 			_useRule(NULL),
 			_originDateTime(TIME_UNKNOWN)
 		{}
@@ -144,6 +149,34 @@ namespace synthese
 		bool ServicePointer::getRTData() const
 		{
 			return _RTData;
+		}
+
+
+
+		const time::DateTime& ServicePointer::getTheoreticalDateTime() const
+		{
+			return _theoreticalTime;
+		}
+
+
+
+		void ServicePointer::setTheoreticalTime( const time::DateTime& dateTime )
+		{
+			_theoreticalTime = dateTime;
+		}
+
+
+
+		void ServicePointer::setRealTimeVertex( const Vertex* value )
+		{
+			_RTVertex = value;
+		}
+
+
+
+		const Vertex* ServicePointer::getRealTimeVertex() const
+		{
+			return _RTVertex;
 		}
 	}
 }

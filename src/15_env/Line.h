@@ -182,6 +182,7 @@ namespace synthese
 
 				const PhysicalStop* getDestination () const;
 				const PhysicalStop* getOrigin () const;
+				const LineStop* getLineStop(std::size_t rank) const;
 
 				/** Tests if the line theory would be respected if the service were inserted into the line.
 					@param service service to test

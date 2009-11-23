@@ -39,6 +39,11 @@
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
+
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
@@ -260,7 +265,15 @@ namespace synthese
 			//! \name Queries
 			//@{
 				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const time::DateTime& startTime)		const;
-				void												display(std::ostream& stream, const time::DateTime& date)				const;
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Display the content generated for the screen
+				void display(
+					std::ostream& stream,
+					const time::DateTime& date,
+					const server::Request* request
+				) const;
+
 				std::string											getFullName()															const;
 				const ArrivalDepartureTableGenerator::PhysicalStops&	getPhysicalStops(bool result=true)										const;
 

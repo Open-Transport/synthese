@@ -94,7 +94,7 @@ namespace synthese
 		void DisplayScreenPhysicalStopFunction::_run( std::ostream& stream ) const
 		{
 			DateTime date(TIME_CURRENT);
-			_screen->display(stream, date);
+			_screen->display(stream, date, _request);
 		}
 
 

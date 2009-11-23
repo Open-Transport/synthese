@@ -50,6 +50,7 @@ namespace synthese
 		) const	{
 			ServicePointer sp(RTData, method,userClass,edge);
 			sp.setActualTime(presenceDateTime);
+			sp.setTheoreticalTime(presenceDateTime);
 			sp.setOriginDateTime(DateTime(presenceDateTime.getDate(), Hour(TIME_MIN)));
 			sp.setService(this);
 			sp.setServiceRange(MINUTES_PER_DAY);

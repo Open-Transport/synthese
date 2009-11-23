@@ -102,6 +102,7 @@ namespace synthese
 			case ROUTE_PLANNING_WITH_TRANSFER:
 			case ROUTE_PLANNING_WITHOUT_TRANSFER:
 				_screen->setGenerationMethod(DisplayScreen::ROUTE_PLANNING);
+				break;
 
 			case DEPARTURES_BY_PHYSICAL_STOP:
 			case ARRIVALS_BY_PHYSICAL_STOP:

@@ -32,6 +32,8 @@ namespace synthese
 {
 	namespace resa
 	{
+		class ReservationTransaction;
+
 		/** XMLReservationFunction Function class.
 			@author Hugues Romain
 			@date 2009
@@ -80,7 +82,8 @@ namespace synthese
 		public:
 			
 		protected:
-		
+			boost::shared_ptr<const ReservationTransaction> _resa;
+
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.

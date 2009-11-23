@@ -34,11 +34,11 @@
 #include "Line.h"
 #include "LineAdmin.h"
 #include "TransportNetworkRight.h"
-
+#include "ServiceAdmin.h"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
-
+#include "ScheduledService.h"
 #include "SearchFormHTMLTable.h"
 
 #include <boost/foreach.hpp>
@@ -218,7 +218,17 @@ namespace synthese
 				dynamic_cast<const TransportNetworkAdmin*>(&currentPage)
 			);
 
-			if(	la &&
+			const ServiceAdmin* sa(
+				dynamic_cast<const ServiceAdmin*>(&currentPage)
+			);
+
+			if(	sa &&
+				sa->getService().get() &&
+				dynamic_cast<const Line*>(sa->getService()->getPath()) &&
+				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine() &&
+				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine()->getNetwork() &&
+				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine()->getNetwork()->getKey() == _network->getKey() ||
+				la &&
 				la->getLine().get() &&
 				la->getLine()->getCommercialLine() &&
 				la->getLine()->getCommercialLine()->getNetwork() &&

@@ -31,13 +31,20 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Vertex;
+	}
+
 	namespace env
 	{
 		class Line;
+		class LineStop;
 
 		/** Scheduled service.
 			@ingroup m35
@@ -47,7 +54,8 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<time::Schedule> Schedules;
-
+			typedef std::vector<const graph::Vertex*> ServedVertices;
+			
 			/// Chosen registry class.
 			typedef util::Registry<ScheduledService>	Registry;
 
@@ -63,12 +71,16 @@ namespace synthese
 
 			mutable _NonConcurrencyCache _nonConcurrencyCache;
 			mutable boost::recursive_mutex _nonConcurrencyCacheMutex;
+			boost::posix_time::ptime _nextRTUpdate;
 
 			Schedules	_departureSchedules;	//!< Departure schedules
 			Schedules	_RTDepartureSchedules;
 			Schedules	_arrivalSchedules;		//!< Arrival schedules
 			Schedules	_RTArrivalSchedules;
+			ServedVertices	_RTVertices;	//!< Real time edges
 			std::string	_team;
+
+			void _computeNextRTUpdate();
 
 		public:
 
@@ -87,6 +99,7 @@ namespace synthese
 				const Schedules& getDepartureSchedules(bool RTData) const;
 				const Schedules& getArrivalSchedules(bool RTData) const;
 				const Line* getRoute() const;
+				const boost::posix_time::ptime& getNextRTUpdate() const;
 			//@}
 
 			//! @name Setters
@@ -110,6 +123,44 @@ namespace synthese
 				*/
 				void	setArrivalSchedules(const Schedules& schedules);
 				void	setTeam(const std::string& team);
+			//@}
+
+			//! @name Update methods
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Apply late duration on real time schedules of the service.
+				/// @param rank Rank of the first edge where the late begins.
+				///		rank must be inferior than the size of the schedules array
+				/// @param value Duration of the late
+				/// @param atArrival true if the late concerns the arrival time
+				/// @param atDeparture true if the late concerns the departure time
+				/// @param updateFollowingSchedules true if the method must propagate the
+				///		late on each following edges (at arrivals and departures)
+				void applyRealTimeLateDuration(
+					std::size_t rank,
+					boost::posix_time::time_duration value,
+					bool atArrival,
+					bool atDeparture,
+					bool updateFollowingSchedules
+				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Update a served edge at real time.
+				/// @param rank Rank of the edge to update
+				/// @param value Served edge 
+				void setRealTimeVertex(
+					std::size_t rank,
+					const graph::Vertex* value
+				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Restore real time data into theoretical values.
+				/// Sets the next update into the next day.
+				void clearRTData();
 			//@}
 
 			//! @name Query methods
@@ -176,6 +227,10 @@ namespace synthese
 				virtual time::Schedule getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 				virtual time::Schedule getArrivalBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 				virtual time::Schedule getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+
+				const graph::Vertex* getRealTimeVertex(
+					std::size_t rank
+				) const;
 
 			//@}
 

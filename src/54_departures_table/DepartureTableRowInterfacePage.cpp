@@ -25,10 +25,16 @@
 #include "Conversion.h"
 #include "DepartureTableRowInterfacePage.h"
 #include "DateTime.h"
-#include "Service.h"
+#include "ScheduledService.h"
 #include "ServicePointer.h"
 #include "PhysicalStop.h"
 #include "Edge.h"
+#include "Line.h"
+#include "RollingStock.h"
+#include "RealTimeUpdateScreenServiceInterfacePage.h"
+#include "RealTimeUpdateFunction.h"
+#include "Interface.h"
+#include "FunctionRequest.h"
 
 using namespace boost;
 using namespace std;
@@ -39,7 +45,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace time;
 	using namespace env;
-	
+	using namespace pt;
+	using namespace server;
 
 	namespace util
 	{
@@ -70,12 +77,12 @@ namespace synthese
 			, const server::Request* request
 		) const {
 			ParametersVector parameters;
-			parameters.push_back(Conversion::ToString(rowId));
+			parameters.push_back(Conversion::ToString(rowId)); //0
 			parameters.push_back(Conversion::ToString(pageNumber));
 			parameters.push_back(Conversion::ToString(displayQuai));
 			parameters.push_back(Conversion::ToString(displayServiceNumber));
 			parameters.push_back(Conversion::ToString(intermediatesStopsToDisplay));
-			parameters.push_back(Conversion::ToString(displayTeam));
+			parameters.push_back(Conversion::ToString(displayTeam)); //5
 			if(ptd.first.getService() == NULL)
 			{
 				parameters.push_back(string());
@@ -83,6 +90,10 @@ namespace synthese
 				parameters.push_back(string());
 				parameters.push_back(string());
 				parameters.push_back(string());
+				parameters.push_back(string());
+				parameters.push_back(string());
+				parameters.push_back(string());
+				parameters.push_back(string()); //14
 			}
 			else
 			{
@@ -97,23 +108,47 @@ namespace synthese
 					);
 				parameters.push_back(
 					ptd.first.getService()->getTeam()
-					);
+				);
+				const Line* line(static_cast<const Line*>(ptd.first.getEdge()->getParentPath()));
+				parameters.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
+
+				parameters.push_back(
+					ptd.first.getTheoreticalDateTime().getHour().toString()
+				);
+
+				parameters.push_back(
+					lexical_cast<string>(ptd.first.getActualDateTime() - ptd.first.getTheoreticalDateTime())
+				); //13
+
+				if(	getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>() &&
+					dynamic_cast<const ScheduledService*>(ptd.first.getService())
+				){
+					FunctionRequest<RealTimeUpdateFunction> realTimeRequest(request);
+					realTimeRequest.getFunction()->setInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(getInterface()->getKey()));
+					realTimeRequest.getFunction()->setService(Env::GetOfficialEnv().getRegistry<ScheduledService>().get(ptd.first.getService()->getKey()));
+					realTimeRequest.getFunction()->setLineStopRank(ptd.first.getEdge()->getRankInPath());
+					parameters.push_back(realTimeRequest.getURL());				
+				}
+				else
+				{
+					parameters.push_back(string());
+				} //14
 			}
 			
 			InterfacePage::_display(
-				stream
-				, parameters
-				, vars
-				, (const void*) &ptd
-				, request);
+				stream,
+				parameters,
+				vars,
+				static_cast<const void*>(&ptd),
+				request
+			);
 		}
 
 
 
-		DepartureTableRowInterfacePage::DepartureTableRowInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+		DepartureTableRowInterfacePage::DepartureTableRowInterfacePage(
+		):	Registrable(UNKNOWN_VALUE)
 		{
-
 		}
 	}
 }

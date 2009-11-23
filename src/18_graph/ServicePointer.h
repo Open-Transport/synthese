@@ -33,6 +33,7 @@ namespace synthese
 	{
 		class Service;
 		class Edge;
+		class Vertex;
 
 		/** Service Pointer class.
 			@ingroup m18
@@ -50,6 +51,7 @@ namespace synthese
 			//@{
 				AccessDirection		_determinationMethod;
 				const Edge*			_edge;
+				const Vertex*		_RTVertex;
 				UserClassCode		_userClass;
 				bool				_RTData;
 			//@}
@@ -59,10 +61,11 @@ namespace synthese
 				const Service*		_service;
 				time::DateTime		_originDateTime;
 				time::DateTime		_actualTime;
+				time::DateTime		_theoreticalTime;
 				const UseRule*		_useRule;
 			//@}
 
-				int							_range;
+				int					_range;
 
 		public:
 			ServicePointer(
@@ -76,21 +79,26 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void	setActualTime(const time::DateTime& dateTime);
+				void	setTheoreticalTime(const time::DateTime& dateTime);
 				void	setService(const Service* service);
 				void	setOriginDateTime(const time::DateTime& dateTime);
 				void	setServiceRange(int duration);
+				void	setRealTimeVertex(const Vertex* value);
 			//@}
 
 			//! @name Getters
 			//@{
-				const Service*			getService()			const;
-				const time::DateTime&	getActualDateTime()		const;
-				const time::DateTime&	getOriginDateTime()		const;
-				AccessDirection			getMethod()				const;
-				int						getServiceRange()		const;
-				const UseRule*			getUseRule()			const;
-				UserClassCode			getUserClass()			const;
-				bool					getRTData()				const;
+				const Edge*				getEdge()					const;
+				const Vertex*			getRealTimeVertex()			const;
+				const Service*			getService()				const;
+				const time::DateTime&	getActualDateTime()			const;
+				const time::DateTime&	getTheoreticalDateTime()	const;
+				const time::DateTime&	getOriginDateTime()			const;
+				AccessDirection			getMethod()					const;
+				int						getServiceRange()			const;
+				const UseRule*			getUseRule()				const;
+				UserClassCode			getUserClass()				const;
+				bool					getRTData()					const;
 			//@}
 
 			//! @name Queries
@@ -105,7 +113,6 @@ namespace synthese
 				*/
 				virtual UseRule::RunPossibilityType isUseRuleCompliant(
 				)	const;
-				const Edge*	getEdge() const;
 			//@}
 
 

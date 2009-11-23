@@ -92,6 +92,8 @@ namespace synthese
 				boost::shared_ptr<boost::thread> theThread;
 				Status status;
 				std::string queryString;
+				std::string description;
+				bool isHTTPThread;
 				boost::posix_time::ptime lastChangeTime;
 			};
 
@@ -129,15 +131,21 @@ namespace synthese
 
 		public:
 			static boost::thread::id AddHTTPThread();
+			static void AddThread(
+				boost::shared_ptr<boost::thread> theThread,
+				const std::string& description,
+				bool isHTTPThread = false
+			);
 			static void KillThread(const std::string& key, bool autoRestart=true);
-			static void KillAllThreads(bool autoRestart=true);
+			static void KillAllThreads();
+			static void KillAllHTTPThreads(bool autoRestart=true);
 			static void Wait();
 			static const Threads& GetThreads();
 			static void SetCurrentThreadAnalysing(const std::string& queryString);
 			static void SetCurrentThreadRunningAction();
 			static void SetCurrentThreadRunningFunction();
 			static void SetCurrentThreadWaiting();
-			static ThreadInfo& GetCurrentThreadInfo();
+			static ThreadInfo& GetThreadInfo(boost::optional<std::string> key = boost::optional<std::string>());
 			static boost::recursive_mutex& GetThreadManagementMutex();
 			static void RunHTTPServer();
 			static util::EMail GetEMailSender();

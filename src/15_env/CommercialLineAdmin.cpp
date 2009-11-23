@@ -43,6 +43,8 @@
 #include "SearchFormHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "ActionResultHTMLTable.h"
+#include "ServiceAdmin.h"
+#include "NonPermanentService.h"
 
 using namespace std;
 using namespace boost;
@@ -349,8 +351,17 @@ namespace synthese
 			const CommercialLineAdmin* ca(
 				dynamic_cast<const CommercialLineAdmin*>(&currentPage)
 			);
-			
-			if(	la &&
+
+			const ServiceAdmin* sa(
+				dynamic_cast<const ServiceAdmin*>(&currentPage)
+			);
+
+			if(	sa &&
+				sa->getService().get() &&
+				dynamic_cast<const Line*>(sa->getService()->getPath()) &&
+				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine() &&
+				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine()->getKey() == _cline->getKey() ||
+				la &&
 				la->getLine().get() &&
 				la->getLine()->getCommercialLine() &&
 				la->getLine()->getCommercialLine()->getKey() == _cline->getKey() ||

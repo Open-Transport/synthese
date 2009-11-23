@@ -26,6 +26,12 @@
 #include "Request.h"
 #include "TransportNetworkRight.h"
 #include "RealTimeUpdateFunction.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "LineStop.h"
+#include "ScheduledService.h"
+#include "RealTimeUpdateScreenServiceInterfacePage.h"
+#include "Interface.h"
+#include "Line.h"
 
 using namespace std;
 
@@ -35,33 +41,76 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace env;
+	using namespace interfaces;
 
-	template<> const string util::FactorableTemplate<Function,pt::RealTimeUpdateFunction>::FACTORY_KEY("rtu");
+	template<> const string util::FactorableTemplate<RequestWithInterface,pt::RealTimeUpdateFunction>::FACTORY_KEY("rtu");
 	
 	namespace pt
 	{
-		/// @todo Parameter names declarations
-		//const string RealTimeUpdateFunction::PARAMETER_PAGE("rub");
-		
+		const string RealTimeUpdateFunction::PARAMETER_LINE_STOP_RANK("ls");
+		const string RealTimeUpdateFunction::PARAMETER_SERVICE_ID("se");
+
+		RealTimeUpdateFunction::RealTimeUpdateFunction():
+			FactorableTemplate<RequestWithInterface, RealTimeUpdateFunction>()
+		{
+
+		}
+
 		ParametersMap RealTimeUpdateFunction::_getParametersMap() const
 		{
-			ParametersMap map;
-			/// @todo Map filling
-			// eg : map.insert(PARAMETER_PAGE, _page->getFactoryKey());
+			ParametersMap map(RequestWithInterface::_getParametersMap());
+			if(_service.get())
+			{
+				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
+			}
+			map.insert(PARAMETER_LINE_STOP_RANK, static_cast<int>(_lineStopRank));
 			return map;
 		}
 
 		void RealTimeUpdateFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
-			// 	string a = map.get<string>(PARAM_SEARCH_XXX);
-			// 	string b = map.getDefault<string>(PARAM_SEARCH_XXX);
-			// 	optional<string> c = map.getOptional<string>(PARAM_SEARCH_XXX);
+			try
+			{
+				// Interface
+				RequestWithInterface::_setFromParametersMap(map);
+				if(getInterface() == NULL)
+				{
+					throw RequestException("An interface must be specified");
+				}
+				if(!getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>())
+				{
+					throw RequestException("The interface does not implement the Real Time Update Screen");
+				}
+
+				_service = Env::GetOfficialEnv().getRegistry<ScheduledService>().get(
+					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID)
+					);
+				_lineStopRank = map.get<RegistryKeyType>(PARAMETER_LINE_STOP_RANK);
+
+				if(_lineStopRank >= _service->getArrivalSchedules(false).size())
+				{
+					throw RequestException("Inconsistent line stop number");
+				}
+			}
+			catch(ObjectNotFoundException<ScheduledService>)
+			{
+				throw RequestException("No such service");
+			}
 		}
 
 		void RealTimeUpdateFunction::_run( std::ostream& stream ) const
 		{
-			/// @todo Fill it
+			VariablesMap vm;
+			const RealTimeUpdateScreenServiceInterfacePage* page(
+				getInterface()->getPage<RealTimeUpdateScreenServiceInterfacePage>()
+			);
+			page->display(
+				stream,
+				*_service,
+				*_service->getRoute()->getLineStop(_lineStopRank),
+				vm,
+				_request
+			);
 		}
 		
 		
@@ -75,7 +124,24 @@ namespace synthese
 
 		std::string RealTimeUpdateFunction::getOutputMimeType() const
 		{
-			return "text/html";
+			return
+				getInterface() ?
+				getInterface()->getPage<RealTimeUpdateScreenServiceInterfacePage>()->getMimeType() :
+				"text/plain";
+		}
+
+
+
+		void RealTimeUpdateFunction::setService( boost::shared_ptr<const env::ScheduledService> value )
+		{
+			_service = value;
+		}
+
+
+
+		void RealTimeUpdateFunction::setLineStopRank( std::size_t value )
+		{
+			_lineStopRank = value;
 		}
 	}
 }
