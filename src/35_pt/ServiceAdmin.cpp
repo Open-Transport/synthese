@@ -161,7 +161,7 @@ namespace synthese
 				if(_scheduledService.get())
 				{
 					vs.push_back("Retard");
-					vs.push_back("Change quai");
+					vs.push_back("Changement de quai");
 				}
 				HTMLTable ts(vs, ResultHTMLTable::CSS_CLASS);
 
@@ -211,7 +211,7 @@ namespace synthese
 						stream << f.close();
 
 						stream << ts.col();
-						HTMLForm f2(scheduleUpdateRequest.getHTMLForm("quay"+lexical_cast<string>(lineStop.getRankInPath())));
+						HTMLForm f2(vertexUpdateRequest.getHTMLForm("quay"+lexical_cast<string>(lineStop.getRankInPath())));
 						stream << f2.open();
 						stream << "Quai : " << f.getSelectInput(
 							ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID,

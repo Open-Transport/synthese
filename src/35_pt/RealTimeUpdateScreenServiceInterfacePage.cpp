@@ -98,7 +98,7 @@ namespace synthese
 			pv.push_back(service.getDepartureSchedule(false, lineStop.getRankInPath()).getHour().toString()); //8
 			pv.push_back(service.getDepartureSchedule(true, lineStop.getRankInPath()).getHour().toString()); //9
 			pv.push_back(
-				lexical_cast<string>(service.getDepartureSchedule(false, lineStop.getRankInPath()) - service.getDepartureSchedule(true, lineStop.getRankInPath()))
+				lexical_cast<string>(service.getDepartureSchedule(true, lineStop.getRankInPath()) - service.getDepartureSchedule(false, lineStop.getRankInPath()))
 			); //10
 
 			ActionFunctionRequest<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> scheduleUpdateRequest(request);

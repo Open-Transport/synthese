@@ -387,7 +387,10 @@ namespace synthese
 			}
 
 			// Session
-			result.insert(Request::PARAMETER_SESSION, _session ? _session->getKey() : string());
+			if(_session)
+			{
+				result.insert(Request::PARAMETER_SESSION, _session->getKey());
+			}
 
 			// Object ID
 			if (_actionCreatedId)

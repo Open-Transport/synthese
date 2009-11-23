@@ -117,7 +117,7 @@ namespace synthese
 		
 		bool RealTimeUpdateFunction::_isAuthorized() const
 		{
-			return _request->isAuthorized<TransportNetworkRight>(READ);
+			return true;
 		}
 
 
