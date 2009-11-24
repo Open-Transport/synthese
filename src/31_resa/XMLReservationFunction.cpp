@@ -121,7 +121,7 @@ namespace synthese
 						" arrivalPlaceName=\"" << r->getArrivalPlaceName() << "\"" <<
 						" arrivalDateTime=\"" << posix_time::to_iso_extended_string(r->getArrivalTime().toPosixTime()) << "\"" <<
 						" lineNumber=\"" << r->getLineCode() << "\"" <<
-						">";
+						" />";
 				}
 			}
 			stream << "</reservation>";
