@@ -29,14 +29,13 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 
 	namespace util
 	{
-		template<> const std::string Registry<timetables::CalendarTemplateElement>::KEY("CalendarTemplateElement");
+		template<> const std::string Registry<calendar::CalendarTemplateElement>::KEY("CalendarTemplateElement");
 	}
 
-	namespace timetables
+	namespace calendar
 	{
 		CalendarTemplateElement::CalendarTemplateElement(
 			RegistryKeyType id

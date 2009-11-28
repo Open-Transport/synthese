@@ -34,12 +34,12 @@
 
 namespace synthese
 {
-	namespace timetables
+	namespace calendar
 	{
 		class CalendarTemplate;
 
 		/** CalendarTemplateElementAddAction action class.
-			@ingroup m55Actions refActions
+			@ingroup m19Actions refActions
 		*/
 		class CalendarTemplateElementAddAction
 			: public util::FactorableTemplate<server::Action, CalendarTemplateElementAddAction>

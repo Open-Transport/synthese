@@ -29,10 +29,10 @@
 
 namespace synthese
 {
-	namespace timetables
+	namespace calendar
 	{
 		/** CalendarTemplatesAdmin Class.
-			@ingroup m55Admin refAdmin
+			@ingroup m19Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/

@@ -30,10 +30,10 @@
 
 namespace synthese
 {
-	namespace timetables
+	namespace calendar
 	{
 		/** CalendarTemplateAddAction action class.
-			@ingroup m55Actions refActions
+			@ingroup m19Actions refActions
 		*/
 		class CalendarTemplateAddAction
 			: public util::FactorableTemplate<server::Action, CalendarTemplateAddAction>

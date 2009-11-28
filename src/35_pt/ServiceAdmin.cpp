@@ -40,6 +40,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
+#include "CalendarHTMLViewer.h"
 
 using namespace std;
 using namespace boost;
@@ -55,6 +56,7 @@ namespace synthese
 	using namespace env;
 	using namespace graph;
 	using namespace html;
+	using namespace calendar;
 
 	namespace util
 	{
@@ -245,6 +247,8 @@ namespace synthese
 			// TAB CALENDAR
 			if (openTabContent(stream, TAB_CALENDAR))
 			{
+				CalendarHTMLViewer cv(*_service);
+				cv.display(stream);
 			}
 		
 			////////////////////////////////////////////////////////////////////

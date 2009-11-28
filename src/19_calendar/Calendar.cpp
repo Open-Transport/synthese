@@ -32,7 +32,7 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
-    namespace time
+    namespace calendar
     {
 		date Calendar::getFirstActiveDate(
 		) const {
@@ -240,6 +240,13 @@ namespace synthese
 		size_t Calendar::_BitPos( const boost::gregorian::date& d )
 		{
 			return d.day_of_year() - 1;
+		}
+
+
+
+		bool Calendar::empty() const
+		{
+			return _markedDates.empty();
 		}
 	}
 }

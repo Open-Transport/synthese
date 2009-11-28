@@ -23,7 +23,7 @@
 */
 
 #include "CalendarTemplatesAdmin.h"
-#include "TimetableModule.h"
+#include "CalendarModule.h"
 
 #include "ResultHTMLTable.h"
 #include "HTMLModule.h"
@@ -32,7 +32,7 @@
 #include "CalendarTemplateAdmin.h"
 #include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateAddAction.h"
-#include "TimetableRight.h"
+#include "CalendarRight.h"
 
 #include "Request.h"
 #include "AdminFunctionRequest.hpp"
@@ -53,7 +53,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace timetables;
+	using namespace calendar;
 	using namespace html;
 	using namespace security;
 
@@ -68,7 +68,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<CalendarTemplatesAdmin>::DEFAULT_TITLE("Calendriers");
 	}
 
-	namespace timetables
+	namespace calendar
 	{
 		CalendarTemplatesAdmin::CalendarTemplatesAdmin()
 			: AdminInterfaceElementTemplate<CalendarTemplatesAdmin>()
@@ -150,7 +150,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const
 		{
-			return _request.isAuthorized<TimetableRight>(READ);
+			return _request.isAuthorized<CalendarRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
@@ -160,7 +160,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == TimetableModule::FACTORY_KEY &&
+			if(	moduleKey == CalendarModule::FACTORY_KEY &&
 				isAuthorized(request)
 			){
 				AddToLinks(links, getNewPage());

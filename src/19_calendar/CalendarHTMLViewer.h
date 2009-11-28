@@ -1,6 +1,6 @@
 
-/** TimetableWarning class implementation.
-	@file TimetableWarning.cpp
+/** CalendarHTMLViewer class header.
+	@file CalendarHTMLViewer.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,33 +20,36 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "TimetableWarning.h"
+#ifndef SYNTHESE_calendar_CalendarHTMLViewer_h__
+#define SYNTHESE_calendar_CalendarHTMLViewer_h__
+
+#include <ostream>
 
 namespace synthese
 {
-	using namespace calendar;
-	
-	namespace timetables
+	namespace calendar
 	{
-		TimetableWarning::TimetableWarning(
-			const Calendar& calendar,
-			int number
-		):	_calendar(calendar),
-			_number(number)
-		{		}
+		class Calendar;
 
-
-
-		size_t TimetableWarning::getNumber() const
+		/** CalendarHTMLViewer class.
+			@ingroup m19
+		*/
+		class CalendarHTMLViewer
 		{
-			return _number;
-		}
+		private:
+			const Calendar& _calendar;
 
 
+		public:
+			CalendarHTMLViewer(
+				const Calendar& calendar
+			);
 
-		const Calendar& TimetableWarning::getCalendar() const
-		{
-			return _calendar;
-		}
+			void display(
+				std::ostream& stream
+			) const;
+		};
 	}
 }
+
+#endif // SYNTHESE_calendar_CalendarHTMLViewer_h__

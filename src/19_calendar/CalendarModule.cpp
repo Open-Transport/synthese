@@ -1,6 +1,6 @@
 
-/** TimetableWarning class implementation.
-	@file TimetableWarning.cpp
+/** CalendarModule class implementation.
+	@file CalendarModule.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,33 +20,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "TimetableWarning.h"
+#include "CalendarModule.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace calendar;
-	
-	namespace timetables
+	using namespace server;
+
+	namespace util
 	{
-		TimetableWarning::TimetableWarning(
-			const Calendar& calendar,
-			int number
-		):	_calendar(calendar),
-			_number(number)
-		{		}
+		template<> const string FactorableTemplate<ModuleClass,CalendarModule>::FACTORY_KEY("19_calendar");
+	}
 
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<CalendarModule>::NAME("Calendriers");
 
-
-		size_t TimetableWarning::getNumber() const
+		template<> void ModuleClassTemplate<CalendarModule>::PreInit()
 		{
-			return _number;
 		}
 
-
-
-		const Calendar& TimetableWarning::getCalendar() const
+		template<> void ModuleClassTemplate<CalendarModule>::Init()
 		{
-			return _calendar;
 		}
+
+		template<> void ModuleClassTemplate<CalendarModule>::End()
+		{
+		}
+	}
+
+	namespace calendar
+	{
 	}
 }

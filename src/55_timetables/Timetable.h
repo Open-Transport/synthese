@@ -65,7 +65,7 @@ namespace synthese
 			// Variables
 			bool					_mustBeginAPage;
 			Rows					_rows;
-			time::Calendar			_baseCalendar;
+			calendar::Calendar			_baseCalendar;
 			std::string				_title;
 			uid						_bookId;
 			int						_rank;
@@ -82,7 +82,7 @@ namespace synthese
 			//@{
 				void setTitle(const std::string& title);
 				void setMustBeginAPage(bool newVal);
-				void setBaseCalendar(const time::Calendar& calendar);
+				void setBaseCalendar(const calendar::Calendar& calendar);
 				void setBookId(uid id);
 				void setTemplateCalendarId(uid id);
 				void setRank(int value);
@@ -97,7 +97,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				bool					getMustBeginAPage()		const;
-				const time::Calendar&	getBaseCalendar()		const;
+				const calendar::Calendar&	getBaseCalendar()		const;
 				const std::string&		getTitle()				const;
 				const Rows&				getRows()				const;
 				uid						getBookId()				const;

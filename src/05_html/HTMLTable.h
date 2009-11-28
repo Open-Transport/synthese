@@ -92,9 +92,15 @@ namespace synthese
 				@param colSpan Number of columns the cell will use
 				@param className CSS class name
 				@param isHeader If true creates a th cell, else a td one
+				@param style Style of the cell content (CSS code)
 				If the col number overloads the table col width, then a row is automatically defined. But this row can not have a CSS class name.
 			*/
-			std::string col(int colSpan=1, std::string className=std::string(), bool isHeader=false);
+			std::string col(
+				std::size_t colSpan = 1,
+				std::string className = std::string(),
+				bool isHeader = false,
+				std::string style = std::string()
+			);
 
 			/** Adds a row to the table.
 				@param className CSS class name

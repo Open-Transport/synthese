@@ -67,7 +67,7 @@ namespace synthese
 			//! @name Content definition
 			//@{
 				Rows				_rows;
-				time::Calendar		_baseCalendar;
+				calendar::Calendar		_baseCalendar;
 				Lines				_excludedLines;
 				bool				_withContinuousServices;
 				const util::Env&	_env;
@@ -120,7 +120,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setRows(const Rows& rows);
-				void setBaseCalendar(const time::Calendar& value);
+				void setBaseCalendar(const calendar::Calendar& value);
 			//@}
 		};
 	}

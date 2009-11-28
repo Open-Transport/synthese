@@ -44,14 +44,14 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace timetables;
+	using namespace calendar;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,CalendarTemplateTableSync>::FACTORY_KEY("55.10 Calendar templates");
 	}
 	
-	namespace timetables
+	namespace calendar
 	{
 		const std::string CalendarTemplateTableSync::COL_TEXT("name");
 	}
@@ -132,7 +132,7 @@ namespace synthese
 	
 	
 	
-	namespace timetables
+	namespace calendar
 	{
 		CalendarTemplateTableSync::SearchResult CalendarTemplateTableSync::Search(
 			Env& env,

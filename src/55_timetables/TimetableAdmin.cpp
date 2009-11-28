@@ -65,9 +65,10 @@ namespace synthese
 	using namespace timetables;
 	using namespace html;
 	using namespace db;
-	using namespace time;
+	using namespace calendar;
 	using namespace security;
 	using namespace env;
+	using namespace time;
 
 	namespace util
 	{

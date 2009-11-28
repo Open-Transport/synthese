@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "TimetableRight.h"
+#include "CalendarRight.h"
 #include "CalendarTemplateElementAddAction.h"
 #include "Request.h"
 #include "CalendarTemplate.h"
@@ -46,10 +46,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, timetables::CalendarTemplateElementAddAction>::FACTORY_KEY("CalendarTemplateElementAddAction");
+		template<> const string FactorableTemplate<Action, calendar::CalendarTemplateElementAddAction>::FACTORY_KEY("CalendarTemplateElementAddAction");
 	}
 
-	namespace timetables
+	namespace calendar
 	{
 		const string CalendarTemplateElementAddAction::PARAMETER_CALENDAR_ID= Action_PARAMETER_PREFIX + "ci";
 		const string CalendarTemplateElementAddAction::PARAMETER_INCLUDE_ID= Action_PARAMETER_PREFIX + "ii";
@@ -133,7 +133,7 @@ namespace synthese
 		
 		bool CalendarTemplateElementAddAction::_isAuthorized() const
 		{
-			return _request->isAuthorized<TimetableRight>(WRITE);
+			return _request->isAuthorized<CalendarRight>(WRITE);
 		}
 	}
 }

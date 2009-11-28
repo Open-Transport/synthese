@@ -38,14 +38,14 @@ namespace synthese
 		/** NonPermanentService class.
 			@ingroup m35
 			
-			Use isActive to deternminate if this service is providen a given day.
-			The date parameter corresponds tp the departure date of the service from its origin
+			Use isActive to determinate if this service is provided a given day.
+			The date parameter corresponds to the departure date of the service from its origin
 			(warning: do not test the customer departure date which can be one or more days later;
 			use getOriginDateTime to compute the origin date)
 		*/
 		class NonPermanentService
 		:	public graph::Service,
-			public time::Calendar
+			public calendar::Calendar
 		{
 		protected:
 			NonPermanentService(

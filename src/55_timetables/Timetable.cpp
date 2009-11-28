@@ -28,7 +28,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
+	using namespace calendar;
 
 	namespace util
 	{

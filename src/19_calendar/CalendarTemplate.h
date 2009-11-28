@@ -32,10 +32,10 @@
 
 namespace synthese
 {
-	namespace timetables
+	namespace calendar
 	{
 		/** CalendarTemplate class.
-			@ingroup m55
+			@ingroup m19
 			
 			<h3>Calendar template category</h3>
 
@@ -85,7 +85,7 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				time::Calendar	getCalendar(const time::Calendar& mask)	const;
+				Calendar	getCalendar(const Calendar& mask)	const;
 			//@}
 
 			//! @name Getters

@@ -40,7 +40,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace geometry;
-	using namespace time;
+	using namespace calendar;
 
 	namespace graph
 	{

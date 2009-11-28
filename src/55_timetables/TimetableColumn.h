@@ -58,7 +58,7 @@ namespace synthese
 		private:
 			// Variables
 			std::vector<time::Schedule>						_timeContent;
-			time::Calendar									_calendar;
+			calendar::Calendar									_calendar;
 			std::vector<TimetableWarning>::const_iterator	_warning;
 			const env::Line*								_line;
 			tTypeOD											_originType;
@@ -86,7 +86,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const time::Calendar&							getCalendar()			const;
+				const calendar::Calendar&						getCalendar()			const;
 				const std::vector<time::Schedule>&				getContent()			const;
 				const env::Line*								getLine()				const;
 				tTypeOD											getOriginType()			const;

@@ -75,7 +75,7 @@ namespace synthese
 		*/
 		class Path
 		:	public RuleUser,
-			public time::Calendar,
+			public calendar::Calendar,
 			public virtual util::Registrable
 		{
 		public:

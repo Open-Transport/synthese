@@ -113,8 +113,14 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string HTMLTable::col( int colSpan/*=1*/, string className, bool isHeader )
-		{
+
+
+		std::string HTMLTable::col(
+			size_t colSpan/*=1*/,
+			string className,
+			bool isHeader,
+			string style
+		){
 			stringstream s;
 			if (_cols && (_curCol > _cols) || _curRow == -1)
 				s << row();
@@ -125,6 +131,10 @@ namespace synthese
 				s << " colspan=\"" << colSpan << "\"";
 			if (!className.empty())
 				s << " class=\"" << className << "\"";
+			if(!style.empty())
+			{
+				s << " style=\"" << style << "\"";
+			}
 			s << ">";
 			_curCol += colSpan;
 			_lastColWasH = isHeader;

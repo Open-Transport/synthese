@@ -36,9 +36,10 @@ using namespace boost;
 namespace synthese
 {
 	using namespace env;
-	using namespace time;
+	using namespace calendar;
 	using namespace util;
 	using namespace graph;
+	using namespace time;
 
 	namespace timetables
 	{

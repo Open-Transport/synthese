@@ -30,7 +30,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
+	using namespace calendar;
 	using namespace graph;
 	using namespace pt;
 

@@ -29,15 +29,14 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace util;
 
 	namespace util
 	{
-		template<> const std::string Registry<timetables::CalendarTemplate>::KEY("CalendarTemplate");
+		template<> const std::string Registry<calendar::CalendarTemplate>::KEY("CalendarTemplate");
 	}
 
-	namespace timetables
+	namespace calendar
 	{
 		Calendar CalendarTemplate::getCalendar(
 			const Calendar& mask

@@ -40,8 +40,9 @@ using namespace std;
 namespace synthese
 {
 	using namespace env;
-	using namespace time;
+	using namespace calendar;
 	using namespace graph;
+	using namespace time;
 
 	namespace timetables
 	{

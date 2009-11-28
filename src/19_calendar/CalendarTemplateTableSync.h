@@ -36,10 +36,10 @@
 
 namespace synthese
 {
-	namespace timetables
+	namespace calendar
 	{
 		/** CalendarTemplate table synchronizer.
-			@ingroup m55LS refLS
+			@ingroup m19LS refLS
 		*/
 		class CalendarTemplateTableSync
 		:	public db::SQLiteRegistryTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>

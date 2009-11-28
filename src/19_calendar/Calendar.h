@@ -33,10 +33,10 @@
 
 namespace synthese
 {
-	namespace time
+	namespace calendar
 	{
 		/** Calendar described by an array of booleans (one per day).
-			@ingroup m04
+			@ingroup m19
 
 			The Calendar class implements the service calendar, holding a 
 			bitset representing year days. Each year day can be activated or not.
@@ -97,6 +97,11 @@ namespace synthese
 					@date 2008				
 				*/
 				bool hasAtLeastOneCommonDateWith(const Calendar& op) const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the calendar has no activated date.
+				/// @return true if the calendar has no activated date.
+				bool empty() const;
 
 				Calendar& operator&= (const Calendar& op);
 				Calendar& operator|= (const Calendar& op);

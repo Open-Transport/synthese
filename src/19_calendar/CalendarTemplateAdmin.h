@@ -27,21 +27,32 @@
 
 #include "AdminInterfaceElementTemplate.h"
 
+#include <boost/date_time/gregorian/greg_date.hpp>
+
 namespace synthese
 {
-	namespace timetables
+	namespace calendar
 	{
 		class CalendarTemplate;
 
 		/** CalendarTemplateAdmin Class.
-			@ingroup m55Admin refAdmin
+			@ingroup m19Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/
 		class CalendarTemplateAdmin:
 			public admin::AdminInterfaceElementTemplate<CalendarTemplateAdmin>
 		{
+		public:
+			static const std::string TAB_SOURCE;
+			static const std::string TAB_RESULT;
+			static const std::string PARAMETER_RESULT_START;
+			static const std::string PARAMETER_RESULT_END;
+
+		private:
 			boost::shared_ptr<const CalendarTemplate>	_calendar;
+			boost::gregorian::date	_resultStartDate;
+			boost::gregorian::date	_resultEndDate;
 
 		public:
 			CalendarTemplateAdmin();
@@ -68,6 +79,18 @@ namespace synthese
 					@date 2007					
 				*/
 			virtual server::ParametersMap getParametersMap() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds the tabs of the page.
+			/// @param request The current request (can be used to determinate the
+			///        current user rights.)
+			/// @author Hugues
+			/// @date 2009
+			virtual void _buildTabs(
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
 
 
 

@@ -31,10 +31,10 @@
 
 namespace synthese
 {
-	namespace timetables
+	namespace calendar
 	{
 		/** Element of calendar template class.
-			@ingroup m55
+			@ingroup m19
 			
 			An element of a calendar describes a range of dates by several ways :
 				- single date d : minDate=d, maxDate=d
@@ -64,7 +64,7 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				time::Calendar	getCalendar(const time::Calendar& mask)	const;
+				Calendar	getCalendar(const Calendar& mask)	const;
 			//@}
 
 			//! @name Getters
