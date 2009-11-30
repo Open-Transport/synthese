@@ -95,7 +95,9 @@ namespace synthese
 				CalendarTemplateElementTableSync::SearchResult elements(
 					CalendarTemplateElementTableSync::Search(
 						env,
-						object->getKey()
+						object->getKey(),
+						0, optional<size_t>(),
+						DOWN_LINKS_LOAD_LEVEL
 				)	);
 				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> e, elements)
 				{
@@ -136,6 +138,10 @@ namespace synthese
 	{
 		CalendarTemplateTableSync::SearchResult CalendarTemplateTableSync::Search(
 			Env& env,
+			boost::optional<std::string> name,
+			boost::optional<util::RegistryKeyType> forbiddenId,
+			bool orderByName,
+			bool raisingOrder,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number /*= 0*/,
 			LinkLevel linkLevel
@@ -145,18 +151,39 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if(name)
+			 	query << " AND " << COL_TEXT << "='" << Conversion::ToSQLiteString(*name, false) << "'";
+			if(forbiddenId)
+				query << " AND " << TABLE_COL_ID << "!=" << *forbiddenId;
+			if (orderByName)
+				query << " ORDER BY " << COL_TEXT << (raisingOrder ? " ASC" : " DESC");
 			if (number)
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)
 				query << " OFFSET " << first;
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		CalendarTemplateTableSync::CalendarTemplatesList CalendarTemplateTableSync::GetCalendarTemplatesList(
+			CalendarTemplateTableSync::CalendarTemplatesList::value_type::second_type zeroName,
+			optional<CalendarTemplateTableSync::CalendarTemplatesList::value_type::first_type> idToAvoid
+		){
+			Env env;
+			CalendarTemplateTableSync::SearchResult s(Search(env));
+			CalendarTemplatesList r;
+			if(!zeroName.empty())
+			{
+				r.push_back(make_pair(CalendarTemplatesList::value_type::first_type(0), zeroName));
+			}
+			BOOST_FOREACH(const CalendarTemplateTableSync::SearchResult::value_type& c, s)
+			{
+				if(c->getKey() == idToAvoid) continue;
+				r.push_back(make_pair(c->getKey(), c->getText()));
+			}
+			return r;
 		}
 	}
 }

@@ -62,7 +62,7 @@ namespace synthese
 		
 		
 		CalendarTemplateElementAddAction::CalendarTemplateElementAddAction()
-			: util::FactorableTemplate<Action, CalendarTemplateElementAddAction>(),
+		:	util::FactorableTemplate<Action, CalendarTemplateElementAddAction>(),
 			_interval(days(1))
 		{
 		}
@@ -83,18 +83,41 @@ namespace synthese
 		{
 			try
 			{
-				_calendar = CalendarTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID), *_env);
+				_calendar = CalendarTemplateTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID),
+					*_env
+				);
 			}
 			catch (...)
 			{
 				throw ActionException("No such calendar");
 			}
 
-			_minDate = from_string(map.get<string>(PARAMETER_MIN_DATE));
-			_maxDate = from_string(map.get<string>(PARAMETER_MAX_DATE));
+			_minDate =
+				map.getDefault<string>(PARAMETER_MIN_DATE).empty() ?
+				date(neg_infin) :
+				from_string(map.get<string>(PARAMETER_MIN_DATE))
+			;
+			_maxDate = 
+				map.getDefault<string>(PARAMETER_MAX_DATE).empty() ?
+				date(pos_infin) :
+				from_string(map.get<string>(PARAMETER_MAX_DATE))
+			;
 			_interval = days(map.getDefault<int>(PARAMETER_INTERVAL, 1));
-			_positive = map.get<bool>(PARAMETER_POSITIVE);
+			_positive = static_cast<CalendarTemplateElement::Operation>(map.get<int>(PARAMETER_POSITIVE));
 			_rank = map.getDefault<size_t>(PARAMETER_RANK, CalendarTemplateElementTableSync::GetMaxRank(_calendar->getKey()) + 1);
+
+			if(map.getDefault<RegistryKeyType>(PARAMETER_INCLUDE_ID, RegistryKeyType(0)))
+			{
+				try
+				{
+					_include = CalendarTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_INCLUDE_ID), *_env);
+				}
+				catch (...)
+				{
+					throw ActionException("No such calendar to include");
+				}
+			}
 		}
 		
 		
@@ -102,20 +125,18 @@ namespace synthese
 		void CalendarTemplateElementAddAction::run()
 		{
 			CalendarTemplateElement e;
-			e.setIncludeId(_includeId);
+			e.setInclude(_include.get());
 			e.setInterval(_interval);
 			e.setMaxDate(_maxDate);
 			e.setMinDate(_minDate);
-			e.setPositive(_positive);
+			e.setOperation(_positive);
 			e.setRank(_rank);
+			e.setCalendar(_calendar.get());
 
 			CalendarTemplateElementTableSync::Shift(_calendar->getKey(), _rank, 1);
-
 			CalendarTemplateElementTableSync::Save(&e);
 
 			_calendar->addElement(e);
-
-			CalendarTemplateTableSync::Save(_calendar.get());
 		}
 
 

@@ -3,5 +3,5 @@ Import ('s3env')
 CppSynthese3LibProject(
 	s3env, 's3-messages', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
-	dependencies = ['s3-security.cpplib']
+	dependencies = ['s3-time.cpplib','s3-security.cpplib']
 )

@@ -129,8 +129,8 @@ namespace synthese
 			stream << pt.open();
 			stream << pt.title("Identification");
 			stream << pt.cell("Nom", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_NAME, _site->getName()));
-			stream << pt.cell("Début validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_START_DATE, _site->getStartDate()));
-			stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_END_DATE, _site->getEndDate()));
+			stream << pt.cell("Début validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_START_DATE, _site->getStartDate().toGregorianDate()));
+			stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_END_DATE, _site->getEndDate().toGregorianDate()));
 			stream << pt.title("Apparence");
 			stream << pt.cell("Interface", pt.getForm().getSelectInput(
 						SiteUpdateAction::PARAMETER_INTERFACE_ID,

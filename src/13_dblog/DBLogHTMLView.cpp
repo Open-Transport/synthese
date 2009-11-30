@@ -205,7 +205,7 @@ namespace synthese
 							"Date début",
 							st.getForm().getCalendarInput(
 								_getParameterName(PARAMETER_START_DATE),
-								_searchStartDate
+								_searchStartDate.toPosixTime()
 						)	)
 					;
 				}
@@ -215,7 +215,7 @@ namespace synthese
 						"Date fin",
 						st.getForm().getCalendarInput(
 							_getParameterName(PARAMETER_END_DATE),
-							_searchEndDate
+							_searchEndDate.toPosixTime()
 						)	)
 					;
 				}

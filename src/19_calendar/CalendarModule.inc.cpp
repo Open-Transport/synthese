@@ -7,6 +7,8 @@
 
 #include "CalendarTemplateAddAction.h"
 #include "CalendarTemplateElementAddAction.h"
+#include "CalendarTemplateElementRemoveAction.h"
+#include "CalendarTemplatePropertiesUpdateAction.h"
 
 #include "CalendarTemplate.h"
 #include "CalendarTemplateElement.h"

@@ -26,7 +26,9 @@
 
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateElement.h"
-
+#include "Log.h"
+#include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -100,12 +102,49 @@ namespace synthese
 			// Properties
 			object->setKey(id);
 			object->setRank(static_cast<size_t>(rows->getInt(CalendarTemplateElementTableSync::COL_RANK)));
-			RegistryKeyType iid(rows->getLongLong(CalendarTemplateElementTableSync::COL_INCLUDE_ID));
-			object->setIncludeId(iid > 0 ? optional<RegistryKeyType>(iid) : optional<RegistryKeyType>());
-			object->setMinDate(from_string(rows->getText(CalendarTemplateElementTableSync::COL_MIN_DATE)));
-			object->setMaxDate(from_string(rows->getText(CalendarTemplateElementTableSync::COL_MAX_DATE)));
+			object->setMinDate(
+				rows->getText(CalendarTemplateElementTableSync::COL_MIN_DATE).empty() ?
+				date(neg_infin) :
+				from_string(rows->getText(CalendarTemplateElementTableSync::COL_MIN_DATE))
+			);
+			object->setMaxDate(
+				rows->getText(CalendarTemplateElementTableSync::COL_MAX_DATE).empty() ?
+				date(pos_infin) :
+				from_string(rows->getText(CalendarTemplateElementTableSync::COL_MAX_DATE))
+			);
 			object->setInterval(days(rows->getInt(CalendarTemplateElementTableSync::COL_INTERVAL)));
-			object->setPositive(rows->getBool(CalendarTemplateElementTableSync::COL_POSITIVE));
+			object->setOperation(
+				static_cast<CalendarTemplateElement::Operation>(
+					rows->getInt(CalendarTemplateElementTableSync::COL_POSITIVE)
+			)	);
+
+			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			{
+				try
+				{
+					object->setCalendar(CalendarTemplateTableSync::Get(rows->getLongLong(CalendarTemplateElementTableSync::COL_CALENDAR_ID), env, FIELDS_ONLY_LOAD_LEVEL).get());
+				}
+				catch (ObjectNotFoundException<CalendarTemplate> e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_CALENDAR_ID, e);
+				}
+			}
+
+			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			{
+				try
+				{
+					RegistryKeyType iid(rows->getLongLong(CalendarTemplateElementTableSync::COL_INCLUDE_ID));
+					if(iid > 0)
+					{
+						object->setInclude(CalendarTemplateTableSync::Get(rows->getLongLong(CalendarTemplateElementTableSync::COL_INCLUDE_ID), env, UP_DOWN_LINKS_LOAD_LEVEL).get());
+					}
+				}
+				catch (ObjectNotFoundException<CalendarTemplate> e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_INCLUDE_ID, e);
+				}
+			}
 		}
 
 
@@ -121,11 +160,13 @@ namespace synthese
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< object->getKey()
+				<< "," << (object->getCalendar() ? object->getCalendar()->getKey() : RegistryKeyType(0))
 				<< "," << object->getRank()
-				<< ",'" << to_iso_extended_string(object->getMinDate()) << "'"
-				<< ",'" << to_iso_extended_string(object->getMaxDate()) << "'"
-				<< "," << object->getPositive()
-				<< "," << (object->getIncludeId() ? *object->getIncludeId() : 0)
+				<< ",'" << (object->getMinDate().is_special() ? string() : to_iso_extended_string(object->getMinDate())) << "'"
+				<< ",'" << (object->getMaxDate().is_special() ? string() : to_iso_extended_string(object->getMaxDate())) << "'"
+				<< "," << (object->getInterval().days())
+				<< "," << static_cast<int>(object->getOperation())
+				<< "," << (object->getInclude() ? object->getInclude()->getKey() : RegistryKeyType(0))
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -181,7 +222,7 @@ namespace synthese
 				<< "UPDATE " << TABLE.NAME
 				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
 				<< " WHERE " << COL_CALENDAR_ID << "=" << calendarId
-				<< " AND " << COL_RANK << ((delta > 0) ? ">=" : "<=") << rank
+				<< " AND " << COL_RANK << ">=" << rank
 				;
 
 			sqlite->execUpdate(query.str());

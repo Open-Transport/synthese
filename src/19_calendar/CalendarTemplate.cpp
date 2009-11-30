@@ -26,6 +26,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -38,17 +39,33 @@ namespace synthese
 
 	namespace calendar
 	{
-		Calendar CalendarTemplate::getCalendar(
+		CalendarTemplate::CalendarTemplate(
+			RegistryKeyType id
+		):	util::Registrable(id)
+		{
+		}
+
+
+
+		Calendar CalendarTemplate::getResult(
 			const Calendar& mask
 		) const {
 			Calendar result;
 			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
 			{
-				if (element.getPositive())
+				switch(element.getOperation())
 				{
-					result |= element.getCalendar(mask);
-				} else {
-					result.subDates(element.getCalendar(mask));
+				case CalendarTemplateElement::ADD:
+					result |= element.getResult(mask);
+					break;
+
+				case CalendarTemplateElement::SUB:
+					result.subDates(element.getResult(mask));
+					break;
+
+				case CalendarTemplateElement::AND:
+					result &= element.getResult(mask);
+					break;
 				}
 			}
 			return result;
@@ -71,18 +88,35 @@ namespace synthese
 
 
 
-		CalendarTemplate::CalendarTemplate(
-			RegistryKeyType id
-		):	util::Registrable(id)
+		void CalendarTemplate::addElement( const CalendarTemplateElement& element )
 		{
-
+			_elements.insert(_elements.begin() + element.getRank(), element);
 		}
 
 
 
-		void CalendarTemplate::addElement( const CalendarTemplateElement& element )
+		boost::gregorian::date CalendarTemplate::getMinDate() const
 		{
-			_elements.insert(_elements.begin() + element.getRank(), element);
+			date result(pos_infin);
+			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
+			{
+				if(element.getMinDate() == date(neg_infin)) return date(neg_infin);
+				if(element.getMinDate() < result) result = element.getMinDate();
+			}
+			return result;
+		}
+
+
+
+		boost::gregorian::date CalendarTemplate::getMaxDate() const
+		{
+			date result(neg_infin);
+			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
+			{
+				if(element.getMaxDate() == date(pos_infin)) return date(pos_infin);
+				if(element.getMaxDate() > result) result = element.getMaxDate();
+			}
+			return result;
 		}
 	}
 }

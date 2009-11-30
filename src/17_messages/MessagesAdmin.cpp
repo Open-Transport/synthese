@@ -184,7 +184,7 @@ namespace synthese
 
 			SearchFormHTMLTable s(searchRequest.getHTMLForm());
 			stream << s.open();
-			stream << s.cell("Date", s.getForm().getCalendarInput(PARAMETER_SEARCH_DATE, _date));
+			stream << s.cell("Date", s.getForm().getCalendarInput(PARAMETER_SEARCH_DATE, _date.toPosixTime()));
 
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)

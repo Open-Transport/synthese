@@ -33,6 +33,8 @@ namespace synthese
 {
 	namespace calendar
 	{
+		class CalendarTemplate;
+
 		/** Element of calendar template class.
 			@ingroup m19
 			
@@ -49,13 +51,29 @@ namespace synthese
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<CalendarTemplateElement>	Registry;
+
+			enum Operation
+			{
+				ADD = '+',
+				SUB = '-',
+				AND = '*'
+			};
 			
 		private:
-			std::size_t			_rank;
-			boost::gregorian::date_period	_period;
-			boost::gregorian::date_duration	_interval;
-			bool		_positive;
-			boost::optional<util::RegistryKeyType>	_includeId;
+			//! @name Key
+			//@{
+				const CalendarTemplate*	_calendar;
+				std::size_t			_rank;
+			//@}
+
+			//! @name Data
+			//@{
+				boost::gregorian::date	_minDate;
+				boost::gregorian::date	_maxDate;
+				boost::gregorian::date_duration	_interval;
+				Operation		_operation;
+				const CalendarTemplate* _include;
+			//@}
 
 		public:
 			CalendarTemplateElement(
@@ -64,27 +82,29 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				Calendar	getCalendar(const Calendar& mask)	const;
+				Calendar	getResult(const Calendar& mask)	const;
 			//@}
 
 			//! @name Getters
 			//@{
 				size_t					getRank()		const;
-				boost::gregorian::date	getMinDate()	const;
-				boost::gregorian::date	getMaxDate()	const;
+				const boost::gregorian::date&	getMinDate()	const;
+				const boost::gregorian::date&	getMaxDate()	const;
 				boost::gregorian::date_duration	getInterval()	const;
-				bool				getPositive()	const;
-				boost::optional<util::RegistryKeyType>	getIncludeId()	const;
+				Operation				getOperation()	const;
+				const CalendarTemplate* getInclude()	const;
+				const CalendarTemplate*	getCalendar() const;
 			//@}
 
 			//! @name Setters
-			//@{ 
+			//@{
+				void setCalendar(const CalendarTemplate* value);
 				void setRank(size_t text);
 				void setMinDate(const boost::gregorian::date& date);
 				void setMaxDate(const boost::gregorian::date& date);
 				void setInterval(boost::gregorian::date_duration interval);
-				void setPositive(bool value);
-				void setIncludeId(boost::optional<util::RegistryKeyType> id);
+				void setOperation(Operation value);
+				void setInclude(const CalendarTemplate* value);
 			//@}
 
 			//! @name Modifiers

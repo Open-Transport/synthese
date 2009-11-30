@@ -1,8 +1,8 @@
 
-/** CalendarTemplateElementAddAction class header.
-	@file CalendarTemplateElementAddAction.h
-	@author Hugues Romain
-	@date 2008
+/** CalendarTemplatePropertiesUpdateAction class header.
+	@file CalendarTemplatePropertiesUpdateAction.h
+	@author Hugues
+	@date 2009
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,16 +22,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CalendarTemplateElementAddAction_H__
-#define SYNTHESE_CalendarTemplateElementAddAction_H__
+#ifndef SYNTHESE_CalendarTemplatePropertiesUpdateAction_H__
+#define SYNTHESE_CalendarTemplatePropertiesUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Registry.h"
-#include "CalendarTemplateElement.h"
-
-#include <boost/optional.hpp>
-#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 namespace synthese
 {
@@ -39,29 +34,19 @@ namespace synthese
 	{
 		class CalendarTemplate;
 
-		/** CalendarTemplateElementAddAction action class.
+		/** CalendarTemplatePropertiesUpdateAction action class.
 			@ingroup m19Actions refActions
 		*/
-		class CalendarTemplateElementAddAction
-			: public util::FactorableTemplate<server::Action, CalendarTemplateElementAddAction>
+		class CalendarTemplatePropertiesUpdateAction:
+			public util::FactorableTemplate<server::Action, CalendarTemplatePropertiesUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_MIN_DATE;
-			static const std::string PARAMETER_MAX_DATE;
-			static const std::string PARAMETER_INTERVAL;
-			static const std::string PARAMETER_RANK;
-			static const std::string PARAMETER_INCLUDE_ID;
-			static const std::string PARAMETER_POSITIVE;
 			static const std::string PARAMETER_CALENDAR_ID;
+			static const std::string PARAMETER_NAME;
 
 		private:
-			boost::shared_ptr<CalendarTemplate>	_calendar;
-			boost::gregorian::date	_minDate;
-			boost::gregorian::date	_maxDate;
-			boost::gregorian::date_duration	_interval;
-			size_t			_rank;
-			boost::shared_ptr<const CalendarTemplate>	_include;
-			CalendarTemplateElement::Operation	_positive;
+			boost::shared_ptr<CalendarTemplate> _calendar;
+			std::string _name;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -81,14 +66,11 @@ namespace synthese
 			*/
 			void run();
 			
-			CalendarTemplateElementAddAction();
+			virtual bool _isAuthorized() const;
 
 			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
-			void setCalendar(boost::shared_ptr<const CalendarTemplate> value);
-			
-			virtual bool _isAuthorized() const;
 		};
 	}
 }
 
-#endif // SYNTHESE_CalendarTemplateElementAddAction_H__
+#endif // SYNTHESE_CalendarTemplatePropertiesUpdateAction_H__

@@ -25,22 +25,24 @@
 #include "CalendarTemplateAdmin.h"
 #include "CalendarTemplatesAdmin.h"
 #include "CalendarModule.h"
-
+#include "HTMLModule.h"
 #include "HTMLForm.h"
-#include "ResultHTMLTable.h"
-
+#include "ActionResultHTMLTable.h"
+#include "PropertiesHTMLTable.h"
 #include "CalendarRight.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateElement.h"
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateElementAddAction.h"
-
+#include "CalendarTemplateElementRemoveAction.h"
+#include "CalendarTemplatePropertiesUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
-
+#include "CalendarHTMLViewer.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
+#include "SearchFormHTMLTable.h"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -80,7 +82,7 @@ namespace synthese
 		CalendarTemplateAdmin::CalendarTemplateAdmin()
 		:	AdminInterfaceElementTemplate<CalendarTemplateAdmin>(),
 			_resultStartDate(day_clock::local_day().year(), 1, 1),
-			_resultEndDate(day_clock::local_day().year(), 12, 31)
+			_resultEndDate(day_clock::local_day().year() + 1, 12, 31)
 		{ }
 		
 		void CalendarTemplateAdmin::setFromParametersMap(
@@ -89,6 +91,7 @@ namespace synthese
 		){
 			if(objectWillBeCreatedLater) return;
 			
+			_requestParameters.setFromParametersMap(map.getMap(), CalendarTemplateElementTableSync::COL_RANK);
 			try
 			{
 				_calendar = CalendarTemplateTableSync::Get(
@@ -114,7 +117,7 @@ namespace synthese
 		
 		server::ParametersMap CalendarTemplateAdmin::getParametersMap() const
 		{
-			ParametersMap m;
+			ParametersMap m(_requestParameters.getParametersMap());
 			if(_calendar.get()) m.insert(Request::PARAMETER_OBJECT_ID, _calendar->getKey());
 			return m;
 		}
@@ -131,59 +134,96 @@ namespace synthese
 			// TAB SOURCE
 			if (openTabContent(stream, TAB_SOURCE))
 			{
+				stream << "<h1>Propriétés</h1>";
+
+				AdminActionFunctionRequest<CalendarTemplatePropertiesUpdateAction, CalendarTemplateAdmin> updateRequest(_request);
+				updateRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
+
+				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
+				stream << pt.open();
+				stream << pt.cell("Nom", pt.getForm().getTextInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME, _calendar->getText()));
+				stream << pt.close();
+
+				stream << "<h1>Commandes</h1>";
 
 				// Requests
 				AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
-				addRequest.getAction()->setCalendar(_calendar);
+				addRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
 
+				AdminActionFunctionRequest<CalendarTemplateElementRemoveAction,CalendarTemplateAdmin> delRequest(_request);
+
+				AdminFunctionRequest<CalendarTemplateAdmin> searchRequest(_request);
+
+				AdminFunctionRequest<CalendarTemplateAdmin> goRequest(_request);
+				
 				// Display
 				CalendarTemplateElementTableSync::SearchResult elements(
 					CalendarTemplateElementTableSync::Search(_getEnv(), _calendar->getKey())
 				);
 				
 				HTMLForm f(addRequest.getHTMLForm("add"));
-				HTMLTable::ColsVector c;
-				c.push_back("Rang");
-				c.push_back("Sens");
-				c.push_back("Date début");
-				c.push_back("Date fin");
-				c.push_back("Intervale");
-				c.push_back("Inclusion");
-				c.push_back("Action");
-				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				ActionResultHTMLTable::HeaderVector c;
+				c.push_back(make_pair(CalendarTemplateElementTableSync::COL_RANK, "Rang"));
+				c.push_back(make_pair(string(), "Sens"));
+				c.push_back(make_pair(string(), "Date début"));
+				c.push_back(make_pair(string(), "Date fin"));
+				c.push_back(make_pair(string(), "Intervale"));
+				c.push_back(make_pair(string(), "Inclusion"));
+				c.push_back(make_pair(string(), "Action"));
+				ActionResultHTMLTable t(
+					c,
+					searchRequest.getHTMLForm(),
+					_requestParameters,
+					elements,
+					addRequest.getHTMLForm(),
+					CalendarTemplateElementAddAction::PARAMETER_RANK
+				);
 
 				stream << f.open() << t.open();
 
+				size_t nextRank(0);
 				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> ct, elements)
 				{
-					stream << t.row();
+					delRequest.getAction()->setElement(ct);
+					nextRank = ct->getRank() + 1;
+				
+					stream << t.row(lexical_cast<string>(ct->getRank()));
 
 					stream << t.col() << ct->getRank();
-					stream << t.col() << (ct->getPositive() ? "+" : "-");
+					stream << t.col() << static_cast<int>(ct->getOperation());
 					
-					stream << t.col() << ct->getMinDate();
-					stream << t.col() << ct->getMaxDate();
+					stream << t.col() << (ct->getMinDate().is_special() ? "-&infin;" : to_simple_string(ct->getMinDate()));
+					stream << t.col() << (ct->getMaxDate().is_special() ? "+&infin;" : to_simple_string(ct->getMaxDate()));
 					stream << t.col() << ct->getInterval().days();
 					
 					stream << t.col();
-					if (ct->getIncludeId())
+					if (ct->getInclude())
 					{
-						stream << *ct->getIncludeId();
+						goRequest.getPage()->setCalendar(const_pointer_cast<CalendarTemplate>(_getEnv().getSPtr(ct->getInclude())));
+						stream << HTMLModule::getHTMLLink(goRequest.getURL(), ct->getInclude()->getText());
 					}
 
-					stream << t.col() << HTMLModule::getLinkButton(string(), "Supprimer");
+					stream << t.col() << HTMLModule::getLinkButton(delRequest.getURL(), "Supprimer");
 				}
 
-				stream << t.row();
+				stream << t.row(lexical_cast<string>(nextRank));
 
-				vector<pair<bool, string> > addSub;
-				addSub.push_back(make_pair(true, "+"));
-				addSub.push_back(make_pair(false, "-"));
+				stream << t.col();
 
-				stream << t.col() << f.getSelectInput(CalendarTemplateElementAddAction::PARAMETER_POSITIVE, addSub, true);
+				vector<pair<CalendarTemplateElement::Operation, string> > addSub;
+				addSub.push_back(make_pair(CalendarTemplateElement::ADD, "+"));
+				addSub.push_back(make_pair(CalendarTemplateElement::SUB, "-"));
+				addSub.push_back(make_pair(CalendarTemplateElement::AND, "&"));
+
+				stream << t.col() << f.getSelectInput(CalendarTemplateElementAddAction::PARAMETER_POSITIVE, addSub, CalendarTemplateElement::ADD);
 				stream << t.col() << f.getTextInput(CalendarTemplateElementAddAction::PARAMETER_MIN_DATE, string());
 				stream << t.col() << f.getTextInput(CalendarTemplateElementAddAction::PARAMETER_MAX_DATE, string());
 				stream << t.col() << f.getSelectNumberInput(CalendarTemplateElementAddAction::PARAMETER_INTERVAL, 1, 21);
+				stream << t.col() << f.getSelectInput(
+					CalendarTemplateElementAddAction::PARAMETER_INCLUDE_ID,
+					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)", _calendar->getKey()),
+					RegistryKeyType(0)
+				);
 				stream << t.col() << f.getSubmitButton("Ajouter");
 
 				stream << t.close() << f.close();
@@ -195,7 +235,21 @@ namespace synthese
 			if (openTabContent(stream, TAB_RESULT))
 			{
 				AdminFunctionRequest<CalendarTemplateAdmin> resultRequest(_request);
+
+				stream << "<h1>Recherche</h1>";
+
+				SearchFormHTMLTable f(resultRequest.getHTMLForm());
+				stream << f.open();
+				stream << f.cell("Date min", f.getForm().getCalendarInput(PARAMETER_RESULT_START, _resultStartDate));
+				stream << f.cell("Date max", f.getForm().getCalendarInput(PARAMETER_RESULT_END, _resultEndDate));
+				stream << f.close();
+
+				stream << "<h1>Résultat</h1>";
 				
+				Calendar mask(_resultStartDate, _resultEndDate);
+				Calendar result(_calendar->getResult(mask));
+				CalendarHTMLViewer v(result);
+				v.display(stream);
 			}
 		}
 
@@ -233,7 +287,7 @@ namespace synthese
 		{
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Source", TAB_SOURCE, true));
+			_tabs.push_back(Tab("Données", TAB_SOURCE, true));
 			_tabs.push_back(Tab("Résultat", TAB_RESULT, true));
 
 			_tabBuilded = true;

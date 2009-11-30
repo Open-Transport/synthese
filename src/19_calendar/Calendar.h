@@ -63,6 +63,13 @@ namespace synthese
 			static size_t _BitPos(const boost::gregorian::date& d);
 
 		public:
+			//! @name Constructors
+			//@{
+				Calendar();
+				Calendar(
+					const boost::gregorian::date& firstDate,
+					const boost::gregorian::date& lastDate
+				);
 
 			//! @name Getters/Setters
 			//@{

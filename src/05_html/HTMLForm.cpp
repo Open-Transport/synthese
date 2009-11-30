@@ -25,16 +25,14 @@
 
 #include "HTMLForm.h"
 
-#include "04_time/DateTime.h"
-
-#include "01_util/Conversion.h"
-
 using namespace std;
+using namespace boost;
+using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 
 	namespace html
 	{
@@ -79,7 +77,7 @@ namespace synthese
 						nulValueText :
 						(	value == UNKNOWN_VALUE ?
 							unknownValueText :
-							Conversion::ToString(value)
+							lexical_cast<string>(value)
 					)	)
 				;
 			}
@@ -99,7 +97,7 @@ namespace synthese
 							nulValueText :
 							(	i == UNKNOWN_VALUE ?
 								unknownValueText :
-								Conversion::ToString(i)
+								lexical_cast<string>(i)
 				)	)	)	);
 			}
 
@@ -239,12 +237,16 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string HTMLForm::getCalendarInput( const std::string& name, const time::DateTime& value )
-		{
-			if (!_updateRight)
-				return value.toString();
 
-			removeHiddenFieldIfExists(name, value.toString());
+
+		std::string HTMLForm::getCalendarInput(
+			const std::string& name,
+			const ptime& value
+		){
+			if (!_updateRight)
+				return to_simple_string(value.date()) +" "+ to_simple_string(value.time_of_day());
+
+			removeHiddenFieldIfExists(name, to_simple_string(value.date()) +" "+ to_simple_string(value.time_of_day()));
 			string fieldId = _getFieldId(name);
 			string spanId = _getFieldId(name + "SPAN");
 			string triggerId = _getFieldId(name + "TRIGGER");
@@ -254,7 +256,7 @@ namespace synthese
 
 		std::string HTMLForm::GetCalendarInput(
 			const std::string& name
-			, const time::DateTime& value
+			, const ptime& value
 			, std::string fieldId
 			, std::string triggerId
 			, std::string spanId
@@ -272,9 +274,9 @@ namespace synthese
 				<< "readonly=\"1\" "
 				<< "name=\"" << name << "\" "
 				<< "id=\"" << fieldId << "\" "
-				<< "value=\"" << (value.isUnknown() ? string() : value.toSQLString(false)) << "\" "
+				<< "value=\"" << (value.is_not_a_date_time() ? string() : to_iso_extended_string(value.date()) +" "+ to_simple_string(value.time_of_day())) << "\" "
 				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
-				<< value.toString()
+				<< to_simple_string(value.date()) +" "+ to_simple_string(value.time_of_day())
 				<< "</span>"
 				<< "<img "
 				<< "src=\"calendar_edit.png\" "
@@ -294,8 +296,8 @@ namespace synthese
 				<< "daFormat :\"%e/%m/%Y %H:%M\","
 				<< "electric : false,"
 				<< "singleClick:true,";
-			if (!value.isUnknown())
-				s << "date:new Date(" << value.getYear() <<","<< value.getMonth() <<","<< value.getDay() <<","<< value.getHours() <<"," << value.getMinutes() <<",0),";
+			if (!value.is_not_a_date_time())
+				s << "date:new Date(" << value.date().year() <<","<< value.date().month() <<","<< value.date().day() <<","<< value.time_of_day().hours() <<"," << value.time_of_day().minutes() <<",0),";
 			s		<< "firstDay:1"
 				<< "});"
 				<< HTMLModule::GetHTMLJavascriptClose();
@@ -304,12 +306,14 @@ namespace synthese
 
 		}
 
-		std::string HTMLForm::getCalendarInput( const std::string& name, const time::Date& value )
-		{
+		std::string HTMLForm::getCalendarInput(
+			const std::string& name,
+			const date& value
+		){
 			if (!_updateRight)
-				return value.toString();
+				return to_simple_string(value);
 
-			removeHiddenFieldIfExists(name, value.toString());
+			removeHiddenFieldIfExists(name, to_simple_string(value));
 
 			return GetCalendarInput(
 				name
@@ -321,8 +325,8 @@ namespace synthese
 		}
 
 		std::string HTMLForm::GetCalendarInput(
-			const std::string& name
-			, const Date& value
+			const std::string& name,
+			const date& value
 			, string fieldId
 			, string triggerId
 			, string spanId
@@ -340,9 +344,9 @@ namespace synthese
 				<< "readonly=\"1\" "
 				<< "name=\"" << name << "\" "
 				<< "id=\"" << fieldId << "\" "
-				<< "value=\"" << (value.isUnknown() ? "" : value.toSQLString(false)) << "\" "
+				<< "value=\"" << (value.is_not_a_date() ? string() : to_iso_extended_string(value)) << "\" "
 				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
-				<< value.toString()
+				<< to_simple_string(value)
 				<< "</span>"
 				<< "<img "
 				<< "src=\"calendar_edit.png\" "
@@ -362,8 +366,8 @@ namespace synthese
 				<< "daFormat :\"%e/%m/%Y\","
 				<< "electric : false,"
 				<< "singleClick:true,";
-			if (!value.isUnknown())
-				s << "date:new Date(" << value.getYear() <<","<< value.getMonth() <<","<< value.getDay() << "),";
+			if (!value.is_not_a_date())
+				s << "date:new Date(" << value.year() <<","<< value.month() <<","<< value.day() << "),";
 			s		<< "firstDay:1"
 				<< "});"
 				<< HTMLModule::GetHTMLJavascriptClose();

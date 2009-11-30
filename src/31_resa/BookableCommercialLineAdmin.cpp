@@ -261,7 +261,7 @@ namespace synthese
 
 				SearchFormHTMLTable st(searchRequest.getHTMLForm());
 				stream << st.open();
-				stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
+				stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date.toGregorianDate()));
 				stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
 				stream << st.close();
 				

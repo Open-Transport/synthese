@@ -140,8 +140,8 @@ namespace synthese
 				SearchFormHTMLTable t(searchRequest.getHTMLForm());
 				stream << "<h1>Recherche</h1>";
 				stream << t.open();
-				stream << t.cell("Date début", t.getForm().getCalendarInput(PARAM_SEARCH_START_DATE, Date(_searchPeriod.begin().day(), _searchPeriod.begin().month(), _searchPeriod.begin().year())));
-				stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAM_SEARCH_END_DATE, Date(_searchPeriod.last().day(), _searchPeriod.last().month(), _searchPeriod.last().year())));
+				stream << t.cell("Date début", t.getForm().getCalendarInput(PARAM_SEARCH_START_DATE, _searchPeriod.begin()));
+				stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAM_SEARCH_END_DATE, _searchPeriod.last()));
 				stream << t.cell("Pas", t.getForm().getSelectInput(PARAM_SEARCH_STEP, _GetStepsVector(), _searchStep));
 				stream << t.close();
 			}

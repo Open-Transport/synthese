@@ -85,7 +85,9 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				Calendar	getCalendar(const Calendar& mask)	const;
+				Calendar	getResult(const Calendar& mask)	const;
+				boost::gregorian::date	getMinDate() const;
+				boost::gregorian::date	getMaxDate() const;
 			//@}
 
 			//! @name Getters

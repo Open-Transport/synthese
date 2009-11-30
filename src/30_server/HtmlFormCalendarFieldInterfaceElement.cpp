@@ -23,21 +23,19 @@
 */
 
 #include "HtmlFormCalendarFieldInterfaceElement.h"
+#include "ValueElementList.h"
+#include "HTMLForm.h"
 
-#include "11_interfaces/ValueElementList.h"
-
-#include "05_html/HTMLForm.h"
-
-#include "04_time/DateTime.h"
-
-#include "01_util/Conversion.h"
+#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace time;
 	using namespace util;
 	using namespace html;
 	
@@ -64,14 +62,14 @@ namespace synthese
 		) const {
 
 			string name(_name->getValue(parameters,variables,object,request));
-			if (Conversion::ToBool(_withHour->getValue(parameters,variables,object,request)))
+			if (lexical_cast<bool>(_withHour->getValue(parameters,variables,object,request)))
 			{
-				DateTime dt(DateTime::FromSQLTimestamp(_value->getValue(parameters,variables,object,request)));
+				posix_time::ptime dt(posix_time::time_from_string(_value->getValue(parameters,variables,object,request)));
 				stream << HTMLForm::GetCalendarInput(name, dt);
 			}
 			else
 			{
-				Date dt(Date::FromSQLDate(_value->getValue(parameters,variables,object,request)));
+				gregorian::date dt(gregorian::from_string(_value->getValue(parameters,variables,object,request)));
 				stream << HTMLForm::GetCalendarInput(name, dt);
 			}
 			

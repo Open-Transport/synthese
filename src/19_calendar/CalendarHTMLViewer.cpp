@@ -50,8 +50,8 @@ namespace synthese
 		{
 			date minDate;
 			date maxDate;
-			if(_calendar.empty())
-			{
+			if(	_calendar.empty()
+			){
 				minDate = day_clock::local_day();
 				maxDate = minDate;
 			}
@@ -108,7 +108,7 @@ namespace synthese
 				if( curDate.day() == 1)
 				{
 					white = 7;
-					if (curDate.day_of_week() != 1)
+					if (curDate.day() == 1)
 						leftWhite = true;
 				}
 				if (white || leftWhite)
@@ -124,6 +124,10 @@ namespace synthese
 						style << "0";
 					}
 					style << "px 0px 0px " << leftWhite << "px;";
+				}
+				else
+				{
+					style << "border:none;";
 				}
 				stream << t.col(1, string(), false, style.str());
 

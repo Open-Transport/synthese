@@ -26,6 +26,7 @@
 #define SYNTHESE_CalendarTemplateAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
+#include "ResultHTMLTable.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -48,11 +49,12 @@ namespace synthese
 			static const std::string TAB_RESULT;
 			static const std::string PARAMETER_RESULT_START;
 			static const std::string PARAMETER_RESULT_END;
-
+			
 		private:
 			boost::shared_ptr<const CalendarTemplate>	_calendar;
 			boost::gregorian::date	_resultStartDate;
 			boost::gregorian::date	_resultEndDate;
+			html::ResultHTMLTable::RequestParameters _requestParameters;
 
 		public:
 			CalendarTemplateAdmin();

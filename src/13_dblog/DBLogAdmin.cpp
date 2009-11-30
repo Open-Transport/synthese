@@ -49,6 +49,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -128,7 +129,10 @@ namespace synthese
 
 				PropertiesHTMLTable t(purgeRequest.getHTMLForm("purge"));
 				stream << t.open();
-				stream << t.cell("Date max", t.getForm().getCalendarInput(DBLogPurgeAction::PARAMETER_END_DATE, DateTime(TIME_CURRENT)));
+				stream << t.cell(
+					"Date max",
+					t.getForm().getCalendarInput(DBLogPurgeAction::PARAMETER_END_DATE, second_clock::local_time())
+				);
 				stream << t.close();
 			}
 		}

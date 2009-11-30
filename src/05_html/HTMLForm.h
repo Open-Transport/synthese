@@ -37,15 +37,11 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
+#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-		class Date;
-	}
-
 	namespace html
 	{
 
@@ -460,7 +456,10 @@ namespace synthese
 <script type="text/javascript" src="calendar-setup.js"></script>
 					@endcode
 				*/
-				std::string getCalendarInput(const std::string& name, const time::DateTime& value);
+				std::string getCalendarInput(
+					const std::string& name,
+					const boost::posix_time::ptime& value
+				);
 
 
 
@@ -479,7 +478,10 @@ namespace synthese
 <script type="text/javascript" src="calendar-setup.js"></script>
 					@endcode
 				*/
-				std::string getCalendarInput(const std::string& name, const time::Date& value);
+				std::string getCalendarInput(
+					const std::string& name,
+					const boost::gregorian::date& value
+				);
 
 
 
@@ -580,7 +582,7 @@ namespace synthese
 				*/
 				static std::string GetCalendarInput(
 					const std::string& name
-					, const time::Date& value
+					, const boost::gregorian::date& value
 					, std::string fieldId = std::string()
 					, std::string triggerId = std::string()
 					, std::string spanId = std::string()
@@ -599,8 +601,8 @@ namespace synthese
 					@date 2008
 				*/
 				static std::string GetCalendarInput(
-					const std::string& name
-					, const time::DateTime& value
+					const std::string& name,
+					const boost::posix_time::ptime& value
 					, std::string fieldId = std::string()
 					, std::string triggerId = std::string()
 					, std::string spanId = std::string()

@@ -30,6 +30,8 @@
 #include <string>
 #include <iostream>
 
+#include <boost/optional.hpp>
+
 #include "SQLiteRegistryTableSyncTemplate.h"
 
 #include "CalendarTemplate.h"
@@ -59,10 +61,25 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				// other search parameters ,
+				boost::optional<std::string> name = boost::optional<std::string>(),
+				boost::optional<util::RegistryKeyType> forbiddenId = boost::optional<util::RegistryKeyType>(),
+				bool orderByName = true,
+				bool raisingOrder = true,
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
+
+
+			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > CalendarTemplatesList;
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Generates a list of the calendar templates.
+			/// @param zeroName if non empty, a zero choice is added at the top of the list, named by the parameter value
+			/// @return List of the calendar templates, to be used at parameter of HTMLForm::getSelectInput()
+			static CalendarTemplatesList GetCalendarTemplatesList(
+				CalendarTemplatesList::value_type::second_type zeroName = CalendarTemplatesList::value_type::second_type(),
+				boost::optional<CalendarTemplatesList::value_type::first_type> idToAvoid = boost::optional<CalendarTemplatesList::value_type::first_type>()
 			);
 		};
 	}

@@ -34,6 +34,26 @@ namespace synthese
 {
     namespace calendar
     {
+		Calendar::Calendar()
+		{
+		}
+
+
+
+		Calendar::Calendar(
+			const boost::gregorian::date& firstDate,
+			const boost::gregorian::date& lastDate
+		){
+			assert(!firstDate.is_not_a_date());
+			assert(!lastDate.is_not_a_date());
+
+			for(date curDate(firstDate); curDate <= lastDate; curDate += days(1))
+			{
+				setActive(curDate);
+			}
+		}
+
+
 		date Calendar::getFirstActiveDate(
 		) const {
 			if(_markedDates.empty())
@@ -42,7 +62,9 @@ namespace synthese
 			_BitSets::const_iterator it(_markedDates.begin());
 
 			date result(it->first, Jan, 1);
-			date_duration day(it->second.find_first());
+			size_t pos(it->second.find_first());
+			if(pos == dynamic_bitset<>::npos) return gregorian::date();
+			date_duration day(pos);
 			return result + day;
 		}
 
@@ -57,11 +79,13 @@ namespace synthese
 
 			date result(it->first, Jan, 1);
 
-			size_t lp;
+			size_t lp(dynamic_bitset<>::npos);
 			for(size_t p(it->second.find_first()); p != dynamic_bitset<>::npos; p = it->second.find_next(p))
 			{
 				lp = p;
 			}
+			if(lp == dynamic_bitset<>::npos) return gregorian::date();
+
 			date_duration day(lp);
 
 			return result + day;
@@ -96,6 +120,8 @@ namespace synthese
 	
 		void Calendar::setActive(const date& d)
 		{
+			assert(!d.is_not_a_date());
+
 			_BitSets::iterator it(_markedDates.find(d.year()));
 			if(it == _markedDates.end())
 			{
@@ -118,6 +144,8 @@ namespace synthese
 		
 		void Calendar::setInactive(const date& d)
 		{
+			assert(!d.is_not_a_date());
+
 			_BitSets::iterator it(_markedDates.find(d.year()));
 			if(it == _markedDates.end())
 				return;
@@ -246,7 +274,12 @@ namespace synthese
 
 		bool Calendar::empty() const
 		{
-			return _markedDates.empty();
+			if(_markedDates.empty()) return true;
+			BOOST_FOREACH(const _BitSets::value_type& it, _markedDates)
+			{
+				if(!it.second.none()) return false;
+			}
+			return true;
 		}
 	}
 }
