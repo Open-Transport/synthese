@@ -70,6 +70,10 @@ namespace synthese
 					const boost::gregorian::date& firstDate,
 					const boost::gregorian::date& lastDate
 				);
+				Calendar( 
+					const Calendar& other
+				);
+			//@}
 
 			//! @name Getters/Setters
 			//@{
@@ -110,12 +114,15 @@ namespace synthese
 				/// @return true if the calendar has no activated date.
 				bool empty() const;
 
+				size_t size() const;
+
 				Calendar& operator&= (const Calendar& op);
 				Calendar& operator|= (const Calendar& op);
 				Calendar operator& (const Calendar& op2) const;
 				Calendar operator| (const Calendar& op2) const;
 
 				bool operator==(const Calendar& op) const;
+				bool operator!=(const Calendar& op) const;
 			//@}
 
 

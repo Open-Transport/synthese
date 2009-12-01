@@ -54,6 +54,13 @@ namespace synthese
 		}
 
 
+
+		Calendar::Calendar( const Calendar& other )
+			: _markedDates(other._markedDates)
+		{
+
+		}
+
 		date Calendar::getFirstActiveDate(
 		) const {
 			if(_markedDates.empty())
@@ -274,12 +281,31 @@ namespace synthese
 
 		bool Calendar::empty() const
 		{
-			if(_markedDates.empty()) return true;
 			BOOST_FOREACH(const _BitSets::value_type& it, _markedDates)
 			{
 				if(!it.second.none()) return false;
 			}
 			return true;
+		}
+
+
+
+		size_t Calendar::size() const
+		{
+			size_t result(0);
+			BOOST_FOREACH(const _BitSets::value_type& it, _markedDates)
+			{
+				result += it.second.count();
+			}
+			return result;
+
+		}
+
+
+
+		bool Calendar::operator!=( const Calendar& op ) const
+		{
+			return _markedDates != op._markedDates;
 		}
 	}
 }

@@ -332,7 +332,7 @@ namespace synthese
 					{
 						stream << tw.row();
 						stream << tw.col() << warn.first;
-						stream << tw.col() << CalendarModule::GetBestCalendarTitle(warn.second.getCalendar());
+						stream << tw.col() << CalendarModule::GetBestCalendarTitle(warn.second.getCalendar(), g->getBaseCalendar());
 					}
 
 					stream << tw.close();

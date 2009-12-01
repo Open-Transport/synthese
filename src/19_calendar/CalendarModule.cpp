@@ -22,6 +22,8 @@
 
 #include "CalendarModule.h"
 #include "Calendar.h"
+#include "CalendarTemplate.h"
+#include "Env.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -35,6 +37,7 @@ namespace synthese
 {
 	using namespace calendar;
 	using namespace server;
+	using namespace util;
 
 	namespace util
 	{
@@ -60,17 +63,51 @@ namespace synthese
 
 	namespace calendar
 	{
-		std::string CalendarModule::GetBestCalendarTitle( const Calendar& calendar )
-		{
-			stringstream result;
+		std::string CalendarModule::GetBestCalendarTitle(
+			const Calendar& calendar,
+			const Calendar& mask
+		){
+
+
+			shared_ptr<const CalendarTemplate> result;
+			Calendar maskedResult;
+
+			BOOST_FOREACH(const Registry<CalendarTemplate>::value_type& calendarTpl, Env::GetOfficialEnv().getRegistry<CalendarTemplate>())
+			{
+				Calendar maskedCandidate(calendarTpl.second->getResult(mask));
+				if(maskedCandidate != calendar) continue;
+
+				if(!result.get())
+				{
+					result = calendarTpl.second;
+					maskedResult = maskedCandidate;
+				}
+				else
+				{
+					if(	calendarTpl.second->getCategory() < result->getCategory() ||
+						calendarTpl.second->getCategory() == result->getCategory() &&
+						maskedCandidate.size() < maskedResult.size()
+					){
+						result = calendarTpl.second;
+						maskedResult = maskedCandidate;
+					}
+				}
+			}
+
+			if(result.get()) return result->getText();
+
+			// If not template found, generation of a generic description text
+			stringstream strresult;
 			bool first(true);
-			Calendar::DatesVector dates(calendar.getActiveDates());
+			Calendar maskedCalendar(calendar);
+			maskedCalendar &= mask;
+			Calendar::DatesVector dates(maskedCalendar.getActiveDates());
 			BOOST_FOREACH(const Calendar::DatesVector::value_type& date, dates)
 			{
-				result << (first ? string() : ",") << to_simple_string(date);
+				strresult << (first ? string() : ",") << to_simple_string(date);
 				first=false;
 			}
-			return result.str();
+			return strresult.str();
 		}
 	}
 }

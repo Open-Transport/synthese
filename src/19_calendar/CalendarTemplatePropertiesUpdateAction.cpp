@@ -27,7 +27,6 @@
 #include "CalendarTemplatePropertiesUpdateAction.h"
 #include "CalendarRight.h"
 #include "Request.h"
-#include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
 
 using namespace std;
@@ -47,6 +46,7 @@ namespace synthese
 	{
 		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_CALENDAR_ID = Action_PARAMETER_PREFIX + "ca";
 		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY = Action_PARAMETER_PREFIX + "cc";
 
 		
 		
@@ -55,6 +55,7 @@ namespace synthese
 			ParametersMap map;
 			if(_calendar.get()) map.insert(PARAMETER_CALENDAR_ID, _calendar->getKey());
 			map.insert(PARAMETER_NAME, _name);
+			map.insert(PARAMETER_CATEGORY, static_cast<int>(_category));
 			return map;
 		}
 		
@@ -83,6 +84,8 @@ namespace synthese
 			);
 			if(!r.empty())
 				throw ActionException("A calendar named "+ _name +" already exists.");
+
+			_category = static_cast<CalendarTemplate::Category>(map.get<int>(PARAMETER_CATEGORY));
 		}
 		
 		
@@ -90,6 +93,7 @@ namespace synthese
 		void CalendarTemplatePropertiesUpdateAction::run()
 		{
 			_calendar->setText(_name);
+			_calendar->setCategory(_category);
 
 			CalendarTemplateTableSync::Save(_calendar.get());
 		}

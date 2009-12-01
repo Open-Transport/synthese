@@ -81,7 +81,8 @@ namespace synthese
 		{
 		public:
 			static std::string GetBestCalendarTitle(
-				const Calendar& calendar
+				const Calendar& calendar,
+				const Calendar& mask
 			);
 		};
 	}

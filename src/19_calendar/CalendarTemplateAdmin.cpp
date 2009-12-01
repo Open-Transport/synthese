@@ -142,6 +142,7 @@ namespace synthese
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
 				stream << pt.open();
 				stream << pt.cell("Nom", pt.getForm().getTextInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME, _calendar->getText()));
+				stream << pt.cell("Catégorie", pt.getForm().getSelectInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY, CalendarTemplate::GetCategoriesList(), _calendar->getCategory()));
 				stream << pt.close();
 
 				stream << "<h1>Commandes</h1>";

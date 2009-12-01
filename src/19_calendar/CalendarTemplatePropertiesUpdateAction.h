@@ -27,13 +27,12 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "CalendarTemplate.h"
 
 namespace synthese
 {
 	namespace calendar
 	{
-		class CalendarTemplate;
-
 		/** CalendarTemplatePropertiesUpdateAction action class.
 			@ingroup m19Actions refActions
 		*/
@@ -43,10 +42,12 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_CALENDAR_ID;
 			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_CATEGORY;
 
 		private:
 			boost::shared_ptr<CalendarTemplate> _calendar;
 			std::string _name;
+			CalendarTemplate::Category _category;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

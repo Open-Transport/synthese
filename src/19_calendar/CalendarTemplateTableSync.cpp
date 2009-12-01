@@ -54,6 +54,7 @@ namespace synthese
 	namespace calendar
 	{
 		const std::string CalendarTemplateTableSync::COL_TEXT("name");
+		const std::string CalendarTemplateTableSync::COL_CATEGORY("category");
 	}
 	
 	namespace db
@@ -67,6 +68,7 @@ namespace synthese
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
+			SQLiteTableSync::Field(CalendarTemplateTableSync::COL_CATEGORY, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -89,6 +91,7 @@ namespace synthese
 			// Properties
 			object->setKey(id);
 			object->setText(rows->getText(CalendarTemplateTableSync::COL_TEXT));
+			object->setCategory(static_cast<CalendarTemplate::Category>(rows->getInt(CalendarTemplateTableSync::COL_CATEGORY)));
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -120,6 +123,7 @@ namespace synthese
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getText())
+				<< "," << static_cast<int>(object->getCategory())
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}

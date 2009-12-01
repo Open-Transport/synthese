@@ -48,8 +48,8 @@ namespace synthese
 		{
 		public:
 			static const std::string COL_TEXT;
+			static const std::string COL_CATEGORY;
 			
-
 
 			/** CalendarTemplate search.
 				@param env Environment to populate
