@@ -71,13 +71,16 @@ namespace synthese
 		
 		void TimetableAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			if(map.getDefault<RegistryKeyType>(PARAMETER_BOOK_ID, RegistryKeyType(0)))
 			{
-				_book = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_BOOK_ID), *_env);
-			}
-			catch (...)
-			{
-				throw ActionException("No such book");
+				try
+				{
+					_book = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_BOOK_ID), *_env);
+				}
+				catch (...)
+				{
+					throw ActionException("No such book");
+				}
 			}
 			_rank = map.getDefault<int>(PARAMETER_RANK, TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0) + 1);
 			_title = map.getDefault<string>(PARAMETER_TITLE);

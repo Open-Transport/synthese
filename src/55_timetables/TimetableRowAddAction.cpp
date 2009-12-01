@@ -33,7 +33,7 @@
 #include "TimetableRow.h"
 #include "TimetableRowTableSync.h"
 
-#include "EnvModule.h"
+#include "GeographyModule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
@@ -44,6 +44,7 @@ namespace synthese
 	using namespace env;
 	using namespace security;
 	using namespace util;
+	using namespace geography;
 	
 	namespace util
 	{
@@ -63,8 +64,9 @@ namespace synthese
 		const string TimetableRowAddAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "ti";
 
 		
-		TimetableRowAddAction::TimetableRowAddAction()
-			: util::FactorableTemplate<Action, TimetableRowAddAction>()
+		TimetableRowAddAction::TimetableRowAddAction():
+			util::FactorableTemplate<Action, TimetableRowAddAction>(),
+			_place(NULL)
 		{
 		}
 		
@@ -99,10 +101,10 @@ namespace synthese
 			_isSufficient = map.getDefault<bool>(PARAMETER_IS_SUFFICIENT, true);
 			_isDisplayed = map.getDefault<bool>(PARAMETER_IS_DISPLAYED, true);
 
-//			_place = dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(EnvModule::FetchPlace(
-//				map.getString(PARAMETER_CITY_NAME, true, FACTORY_KEY)
-//				, map.getString(PARAMETER_PLACE_NAME, true, FACTORY_KEY)
-//			));
+			_place = dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(GeographyModule::FetchPlace(
+				map.getString(PARAMETER_CITY_NAME, true, FACTORY_KEY),
+				map.getString(PARAMETER_PLACE_NAME, true, FACTORY_KEY)
+			));
 
 			if (_place == NULL)
 				throw ActionException("No such place");

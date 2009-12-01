@@ -298,15 +298,15 @@ namespace synthese
 				resaRequest.getAction()->setAccessParameters(ap);
 				stringstream trace;
 				PTTimeSlotRoutePlanner r(
-					startPlace
-					, endPlace,
-					_dateTime
-					, _dateTime,
-					endDate
-					, endDate
-					, 5
-					, ap
-					, DEPARTURE_FIRST
+					startPlace,
+					endPlace,
+					_dateTime,
+					endDate,
+					_dateTime,
+					endDate,
+					5,
+					ap,
+					DEPARTURE_FIRST
 				);
 				jv = r.run();
 			}

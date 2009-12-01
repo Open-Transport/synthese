@@ -28,11 +28,12 @@
 #include "TimetableTableSync.h"
 #include "TimetableRow.h"
 #include "TimetableRowTableSync.h"
-
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
 #include "01_util/Conversion.h"
 
@@ -44,6 +45,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace timetables;
+	using namespace calendar;
 
 	namespace util
 	{
@@ -108,19 +110,35 @@ namespace synthese
 			object->setKey(id);
 			object->setBookId(rows->getLongLong(TimetableTableSync::COL_BOOK_ID));
 			object->setRank(rows->getInt(TimetableTableSync::COL_RANK));
-			object->setTemplateCalendarId(rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID));
 			object->setMustBeginAPage(rows->getBool(TimetableTableSync::COL_MUST_BEGIN_A_PAGE));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
 			object->setIsBook(rows->getBool(TimetableTableSync::COL_IS_BOOK));
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				TimetableRowTableSync::SearchResult rows(
-					TimetableRowTableSync::Search(env, object->getKey())
-				);
-				BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
 				{
-					object->addRow(*row);
+					TimetableRowTableSync::SearchResult rows(
+						TimetableRowTableSync::Search(env, object->getKey())
+						);
+					BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
+					{
+						object->addRow(*row);
+					}
+				}
+
+				try
+				{
+					object->setBaseCalendar(
+						CalendarTemplateTableSync::Get(
+							rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID),
+							env,
+							UP_LINKS_LOAD_LEVEL
+						).get()
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>)
+				{
+					Log::GetInstance().warn("Error in timetable definition : no such calendar template");
 				}
 			}
 		}
@@ -137,13 +155,13 @@ namespace synthese
                
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
+				<< object->getKey()
 				<< "," << object->getBookId()
 				<< "," << object->getRank()
 				<< "," << Conversion::ToSQLiteString(object->getTitle())
-				<< "," << Conversion::ToString(object->getMustBeginAPage())
-				<< "," << Conversion::ToString(object->getTemplateCalendarId())
-				<< "," << Conversion::ToString(object->getIsBook())
+				<< "," << object->getMustBeginAPage()
+				<< "," << (object->getBaseCalendar() ? object->getBaseCalendar()->getKey() : RegistryKeyType(0))
+				<< "," << object->getIsBook()
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}

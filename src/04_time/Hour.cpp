@@ -29,6 +29,7 @@
 #include <ctime>
 
 #include <boost/tokenizer.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "Conversion.h"
 
@@ -381,7 +382,11 @@ namespace synthese
 
 		boost::posix_time::time_duration Hour::toPosixTimeDuration() const
 		{
-			return posix_time::time_duration(posix_time::hours(_hours) + posix_time::minutes(_minutes) + posix_time::seconds(_seconds));
+			return
+				isUnknown() ?
+				posix_time::time_duration(posix_time::not_a_date_time) :
+				posix_time::time_duration(posix_time::hours(_hours) + posix_time::minutes(_minutes) + posix_time::seconds(_seconds))
+			;
 		}
 
 	}

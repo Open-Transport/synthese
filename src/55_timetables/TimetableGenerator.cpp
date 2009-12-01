@@ -135,13 +135,25 @@ namespace synthese
 			int nextNumber(1);
 			for(Columns::iterator itCol(_columns.begin()); itCol != _columns.end(); ++itCol)
 			{
-				Warnings::const_iterator itWarn;
-				for(itWarn = _warnings.begin(); itWarn != _warnings.end() && !(itCol->getCalendar() == itWarn->getCalendar()); ++itWarn);
+				if(itCol->getCalendar() == _baseCalendar) continue;
+
+				const TimetableWarning* warn(NULL);
+				BOOST_FOREACH(const Warnings::value_type& itWarn, _warnings)
+				{
+					if(itWarn.second.getCalendar() == itCol->getCalendar())
+					{
+						warn = &itWarn.second;
+						break;
+					}
+				}
 				
-				if (itWarn == _warnings.end())
-					itWarn = _warnings.insert(_warnings.end(), TimetableWarning(itCol->getCalendar(), nextNumber++));
+				if (warn == NULL)
+				{
+					warn = &_warnings.insert(make_pair(nextNumber, TimetableWarning(itCol->getCalendar(), nextNumber))).first->second;
+					++nextNumber;
+				}
 				
-				itCol->setWarning(itWarn);
+				itCol->setWarning(warn);
 			}
 		}
 
@@ -172,7 +184,7 @@ namespace synthese
 
 				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
-					if((*itEdge)->isDeparture() && (*itEdge)->getHub() == itRow->getPlace())
+					if((*itEdge)->isDeparture() && dynamic_cast<const PublicTransportStopZoneConnectionPlace*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey())
 					{
 						lineIsSelected = true;
 						if (itRow->getIsArrival() || itRow->getCompulsory() == PassageSuffisant)
@@ -205,7 +217,7 @@ namespace synthese
 						arrivalLinestop != NULL;
 						arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
 					){
-						if(	arrivalLinestop->getFromVertex()->getHub() == itRow->getPlace()
+						if(	dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(arrivalLinestop->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
 						){
 							lineIsSelected = true;
 							break;
@@ -280,12 +292,19 @@ namespace synthese
 
 
 
-		std::vector<std::vector<TimetableWarning>::const_iterator> TimetableGenerator::getColumnsWarnings() const
+		TimetableGenerator::ColumnWarnings TimetableGenerator::getColumnsWarnings() const
 		{
-			std::vector<std::vector<TimetableWarning>::const_iterator> result;
+			TimetableGenerator::ColumnWarnings result;
 			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
-				result.push_back(it->getWarning());
+				result.push_back(it->getWarning() ? it->getWarning()->getNumber() : 0);
 			return result;
+		}
+
+
+
+		const calendar::Calendar& TimetableGenerator::getBaseCalendar() const
+		{
+			return _baseCalendar;
 		}
 	}
 }

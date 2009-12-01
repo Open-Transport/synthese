@@ -25,9 +25,9 @@
 
 #include "Registrable.h"
 #include "UId.h"
-#include "Calendar.h"
 #include "Registry.h"
 #include "TimetableGenerator.h"
+#include "Exception.h"
 
 #include <string>
 
@@ -36,6 +36,11 @@ namespace synthese
 	namespace util
 	{
 		class Env;
+	}
+
+	namespace calendar
+	{
+		class CalendarTemplate;
 	}
 	
 	namespace timetables
@@ -61,15 +66,21 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<Timetable>	Registry;
 
+			class ImpossibleGenerationException:
+				public util::Exception
+			{
+			public:
+				ImpossibleGenerationException();
+			};
+
 		private:
 			// Variables
 			bool					_mustBeginAPage;
 			Rows					_rows;
-			calendar::Calendar			_baseCalendar;
+			const calendar::CalendarTemplate*			_baseCalendar;
 			std::string				_title;
 			uid						_bookId;
 			int						_rank;
-			uid						_templateCalendarId;
 			bool					_isBook;
 
 		public:
@@ -82,9 +93,8 @@ namespace synthese
 			//@{
 				void setTitle(const std::string& title);
 				void setMustBeginAPage(bool newVal);
-				void setBaseCalendar(const calendar::Calendar& calendar);
+				void setBaseCalendar(const calendar::CalendarTemplate* calendar);
 				void setBookId(uid id);
-				void setTemplateCalendarId(uid id);
 				void setRank(int value);
 				void setIsBook(bool value);
 			//@}
@@ -97,17 +107,31 @@ namespace synthese
 			//! @name Getters
 			//@{
 				bool					getMustBeginAPage()		const;
-				const calendar::Calendar&	getBaseCalendar()		const;
+				const calendar::CalendarTemplate*	getBaseCalendar()		const;
 				const std::string&		getTitle()				const;
 				const Rows&				getRows()				const;
 				uid						getBookId()				const;
-				uid						getTemplateCalendarId()	const;
 				int						getRank()				const;
 				bool					getIsBook()				const;
 			//@}
 
 			//! @name Queries
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the generator can be built.
+				/// The test consists in :
+				///		- check if the base calendar is defined
+				///		- check if the base calendar is limited
+				/// @return true if the generator can be built
+				bool isGenerable() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Builds a time table generator according to the parameters of the
+				/// object.
+				/// @throws ImpossibleGenerationException if the base calendar template
+				///		is not limited
+				/// @param env Environment of the source data
+				/// @return the generator
 				std::auto_ptr<TimetableGenerator> getGenerator(
 					const util::Env& env
 				)	const;

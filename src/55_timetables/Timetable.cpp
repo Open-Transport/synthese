@@ -22,6 +22,7 @@
 
 #include "Timetable.h"
 #include "TimetableRow.h"
+#include "CalendarTemplate.h"
 
 using namespace std;
 
@@ -41,9 +42,8 @@ namespace synthese
 		:	Registrable(id),
 			_mustBeginAPage(false),
 			_bookId(0),
-			_templateCalendarId(UNKNOWN_VALUE)
+			_baseCalendar(NULL)
 		{
-
 		}
 
 
@@ -62,7 +62,7 @@ namespace synthese
 
 
 
-		void Timetable::setBaseCalendar( const Calendar& calendar )
+		void Timetable::setBaseCalendar( const CalendarTemplate* calendar )
 		{
 			_baseCalendar = calendar;
 		}
@@ -83,7 +83,7 @@ namespace synthese
 
 
 
-		const Calendar& Timetable::getBaseCalendar() const
+		const CalendarTemplate* Timetable::getBaseCalendar() const
 		{
 			return _baseCalendar;
 		}
@@ -107,20 +107,6 @@ namespace synthese
 		void Timetable::setBookId( uid id )
 		{
 			_bookId = id;
-		}
-
-
-
-		void Timetable::setTemplateCalendarId( uid id )
-		{
-			_templateCalendarId = id;
-		}
-
-
-
-		uid Timetable::getTemplateCalendarId() const
-		{
-			return _templateCalendarId;
 		}
 
 
@@ -149,8 +135,14 @@ namespace synthese
 		auto_ptr<TimetableGenerator> Timetable::getGenerator(
 			const Env& env
 		) const {
+			if(	!isGenerable()
+			){
+				throw ImpossibleGenerationException();
+			}
+
 			auto_ptr<TimetableGenerator> g(new TimetableGenerator(env));
 			g->setRows(_rows);
+			g->setBaseCalendar(_baseCalendar->getResult());
 			return g;
 		}
 
@@ -166,6 +158,23 @@ namespace synthese
 		bool Timetable::getIsBook() const
 		{
 			return _isBook;
+		}
+
+
+
+		bool Timetable::isGenerable() const
+		{
+			return
+				getBaseCalendar() != NULL &&
+				getBaseCalendar()->isLimited()
+			;
+		}
+
+
+		Timetable::ImpossibleGenerationException::ImpossibleGenerationException():
+			Exception("Timetable generation is impossible.")
+		{
+
 		}
 	}
 }

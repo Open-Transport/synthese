@@ -25,14 +25,20 @@
 #ifndef SYNTHESE_TimetableUpdateAction_H__
 #define SYNTHESE_TimetableUpdateAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class CalendarTemplate;
+	}
+
 	namespace timetables
 	{
+		class Timetable;
+
 		/** TimetableUpdateAction action class.
 			@ingroup m55Actions refActions
 		*/
@@ -40,11 +46,17 @@ namespace synthese
 			: public util::FactorableTemplate<server::Action, TimetableUpdateAction>
 		{
 		public:
-			/// @todo Parameters list
-			// static const std::string PARAMETER_xxx;
+			static const std::string PARAMETER_TIMETABLE_ID;
+			static const std::string PARAMETER_BASE_CALENDAR_ID;
+			static const std::string PARAMETER_MUST_BEGIN_A_PAGE;
+			static const std::string PARAMETER_TITLE;
 
 		private:
-			/// @todo Attributes list
+			boost::shared_ptr<Timetable> _timetable;
+			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
+			bool _mustBeginAPage;
+			std::string _title;
+
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -67,6 +79,8 @@ namespace synthese
 			TimetableUpdateAction();
 			
 			virtual bool _isAuthorized() const;
+
+			void setTimetable(boost::shared_ptr<Timetable> value);
 		};
 	}
 }

@@ -28,7 +28,7 @@
 #include "Schedule.h"
 
 #include "55_timetables/types.h"
-#include "TimetableWarning.h"
+#include "Calendar.h"
 
 namespace synthese
 {
@@ -41,6 +41,7 @@ namespace synthese
 	namespace timetables
 	{
 		class TimetableGenerator;
+		class TimetableWarning;
 
 		/** TimetableColumn class.
 			Colonne de tableau d'indicateur papier
@@ -57,12 +58,12 @@ namespace synthese
 		{
 		private:
 			// Variables
-			std::vector<time::Schedule>						_timeContent;
-			calendar::Calendar									_calendar;
-			std::vector<TimetableWarning>::const_iterator	_warning;
-			const env::Line*								_line;
-			tTypeOD											_originType;
-			tTypeOD											_destinationType;
+			std::vector<time::Schedule>		_timeContent;
+			calendar::Calendar				_calendar;
+			const TimetableWarning*			_warning;
+			const env::Line*				_line;
+			tTypeOD							_originType;
+			tTypeOD							_destinationType;
 
 		public:
 			// Constructeur
@@ -81,17 +82,17 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void	setWarning(std::vector<TimetableWarning>::const_iterator it);
+				void	setWarning(const TimetableWarning* it);
 			//@}
 
 			//! @name Getters
 			//@{
-				const calendar::Calendar&						getCalendar()			const;
-				const std::vector<time::Schedule>&				getContent()			const;
-				const env::Line*								getLine()				const;
-				tTypeOD											getOriginType()			const;
-				tTypeOD											getDestinationType()	const;
-				std::vector<TimetableWarning>::const_iterator	getWarning()			const;
+				const calendar::Calendar&				getCalendar()			const;
+				const std::vector<time::Schedule>&		getContent()			const;
+				const env::Line*						getLine()				const;
+				tTypeOD									getOriginType()			const;
+				tTypeOD									getDestinationType()	const;
+				const TimetableWarning*					getWarning()			const;
 			//@}
 		};
 	}

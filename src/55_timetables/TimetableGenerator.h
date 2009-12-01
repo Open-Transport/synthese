@@ -57,7 +57,8 @@ namespace synthese
 		class TimetableGenerator
 		{
 		public:
-			typedef std::vector<TimetableWarning>			Warnings;
+			typedef std::map<std::size_t, TimetableWarning>		Warnings;
+			typedef std::vector<std::size_t>	ColumnWarnings;
 			typedef std::vector<TimetableColumn>			Columns;
 			typedef std::vector<TimetableRow>				Rows;
 			typedef std::set<const env::CommercialLine*>	Lines;
@@ -99,6 +100,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
+				const calendar::Calendar& getBaseCalendar() const;
 				const Warnings&	getWarnings()	const;
 				const Rows&		getRows()		const;
 			//@}
@@ -114,7 +116,7 @@ namespace synthese
 				std::vector<const env::Line*>	getLines()									const;
 				std::vector<tTypeOD>			getOriginTypes()							const;
 				std::vector<tTypeOD>			getDestinationTypes()						const;
-				std::vector<std::vector<TimetableWarning>::const_iterator>	getColumnsWarnings()	const;
+				ColumnWarnings					getColumnsWarnings()	const;
 			//@}
 
 			//! @name Setters

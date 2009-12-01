@@ -28,13 +28,13 @@
 #include "PropertiesHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "HTMLModule.h"
-
+#include "CalendarModule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "City.h"
 #include "Calendar.h"
 #include "Line.h"
 #include "CommercialLine.h"
-
+#include "CalendarTemplateTableSync.h"
 #include "Timetable.h"
 #include "TimetableRight.h"
 #include "TimetableTableSync.h"
@@ -116,6 +116,7 @@ namespace synthese
 		server::ParametersMap TimetableAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
+			if(_timetable.get()) m.insert(Request::PARAMETER_OBJECT_ID, _timetable->getKey());
 			return m;
 		}
 		
@@ -128,7 +129,8 @@ namespace synthese
 		) const	{
 			// Requests
 			AdminActionFunctionRequest<TimetableUpdateAction,TimetableAdmin> updateRequest(_request);
-			
+			updateRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
+
 			AdminActionFunctionRequest<TimetableRowAddAction,TimetableAdmin> addRowRequest(_request);
 			addRowRequest.getAction()->setTimetable(_timetable);
 
@@ -139,6 +141,25 @@ namespace synthese
 
 			PropertiesHTMLTable pt(updateRequest.getHTMLForm("update"));
 			stream << pt.open();
+			stream << pt.cell(
+				"Calendrier",
+				pt.getForm().getSelectInput(
+					TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID,
+					CalendarTemplateTableSync::GetCalendarTemplatesList(),
+					_timetable->getBaseCalendar() ? _timetable->getBaseCalendar()->getKey() : RegistryKeyType(0)
+			)	);
+			stream << pt.cell(
+				"Saut de page avant",
+				pt.getForm().getOuiNonRadioInput(
+					TimetableUpdateAction::PARAMETER_MUST_BEGIN_A_PAGE,
+					_timetable->getMustBeginAPage()
+			)	);
+			stream << pt.cell(
+				"Titre",
+				pt.getForm().getTextInput(
+					TimetableUpdateAction::PARAMETER_TITLE,
+					_timetable->getTitle()
+			)	);
 
 			stream << pt.close();
 
@@ -152,7 +173,8 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_RANK
 					, _requestParameters.raisingOrder
 					, _requestParameters.first
-					, _requestParameters.maxSize
+					, _requestParameters.maxSize,
+					UP_LINKS_LOAD_LEVEL
 			)	);
 			
 			ActionResultHTMLTable::HeaderVector h;
@@ -248,55 +270,79 @@ namespace synthese
 
 			stream << "<h1>Résultat simulé</h1>";
 
-			auto_ptr<TimetableGenerator> g(_timetable->getGenerator(_getEnv()));
-			Calendar c;
-			date d(day_clock::local_day());
-			for (size_t i(0); i<60; ++i)
+			if(_timetable->isGenerable())
 			{
-				c.setActive(d);
-				d += days(1);
-			}
-			g->setBaseCalendar(c);
-			g->build();
+				auto_ptr<TimetableGenerator> g(_timetable->getGenerator(Env::GetOfficialEnv()));
+				g->build();
 
-			stream << "<h2>Fiche horaire</h2>";
+				stream << "<h2>Fiche horaire</h2>";
 
-			HTMLTable tf(0,"adminresults");
-			stream << tf.open();
-			stream << tf.row();
-			stream << tf.col() << "Ligne";
-			
-			BOOST_FOREACH(const Line* line, g->getLines())
-			{
-				stream <<
-					tf.col(1, line->getCommercialLine()->getStyle()) <<
-					line->getCommercialLine()->getShortName()
-				;
-			}
-
-			const TimetableGenerator::Rows& grows(g->getRows());
-			for (TimetableGenerator::Rows::const_iterator it(grows.begin()); it !=grows.end(); ++it)
-			{
+				HTMLTable tf(0, ResultHTMLTable::CSS_CLASS);
+				stream << tf.open();
 				stream << tf.row();
-				stream << tf.col() << it->getPlace()->getFullName();
-				vector<Schedule> cols(g->getSchedulesByRow(it));
-				for (vector<Schedule>::const_iterator its(cols.begin()); its != cols.end(); ++its)
+				stream << tf.col(1, string(), true) << "Lignes";
+
+				BOOST_FOREACH(const Line* line, g->getLines())
+				{
+					stream <<
+						tf.col(1, line->getCommercialLine()->getStyle()) <<
+						line->getCommercialLine()->getShortName()
+						;
+				}
+
+				const TimetableGenerator::Rows& grows(g->getRows());
+				for (TimetableGenerator::Rows::const_iterator it(grows.begin()); it !=grows.end(); ++it)
+				{
+					stream << tf.row();
+					stream << tf.col(1, string(), true) << it->getPlace()->getFullName();
+					vector<Schedule> cols(g->getSchedulesByRow(it));
+					for (vector<Schedule>::const_iterator its(cols.begin()); its != cols.end(); ++its)
+					{
+						stream << tf.col();
+						if (!its->getHour().isUnknown())
+							stream << its->toString();
+					}
+				}
+
+				// Notes
+				stream << tf.row();
+				stream << tf.col(1, string(), true) << "Renvois";
+				BOOST_FOREACH(const TimetableGenerator::ColumnWarnings::value_type& warn, g->getColumnsWarnings())
 				{
 					stream << tf.col();
-					if (!its->getHour().isUnknown())
-						stream << its->toString();
+					if(warn != 0)
+					{
+						stream << warn;
+					}
+				}
+
+				stream << tf.close();
+
+				if(	!g->getWarnings().empty()
+				){
+					stream << "<h2>Renvois</h2>";
+
+					HTMLTable::ColsVector v;
+					v.push_back("Num");
+					v.push_back("Texte");
+					HTMLTable tw(v, ResultHTMLTable::CSS_CLASS);
+					stream << tw.open();
+
+					BOOST_FOREACH(const TimetableGenerator::Warnings::value_type& warn, g->getWarnings())
+					{
+						stream << tw.row();
+						stream << tw.col() << warn.first;
+						stream << tw.col() << CalendarModule::GetBestCalendarTitle(warn.second.getCalendar());
+					}
+
+					stream << tw.close();
 				}
 			}
-			stream << tf.close();
-
-			stream << "<h2>Renvois</h2>";
-
 		}
 
 		bool TimetableAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const server::FunctionRequest<admin::AdminRequest>& _request
+		) const	{
 			return _request.isAuthorized<TimetableRight>(READ);
 		}
 		

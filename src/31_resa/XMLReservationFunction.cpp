@@ -90,15 +90,25 @@ namespace synthese
 				ReservationTableSync::Search(*getEnv(), resa->getKey());
 			}
 
+			string departurePlaceName;
+			string arrivalPlaceName;
+			posix_time::ptime travelDate;
+			if(resa.get() && resa->getReservations().empty())
+			{
+				departurePlaceName = (*resa->getReservations().begin())->getDeparturePlaceName();
+				travelDate = (*resa->getReservations().begin())->getDepartureTime().toPosixTime();
+				arrivalPlaceName = (*(resa->getReservations().end() - 1))->getArrivalPlaceName();
+			}
+
 			stream <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<reservation xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_reservation_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
 				" id=\"" << (resa.get() ? lexical_cast<string>(resa->getKey()) : string()) << "\"" <<
 				" customerId=\"" << (resa.get() ? lexical_cast<string>(resa->getCustomerUserId()) : string()) << "\"" <<
 				" cancellationDeadLine=\"" << (resa.get() ? posix_time::to_iso_extended_string(resa->getReservationDeadLine().toPosixTime()) : string()) << "\"" <<
-				" departureStop=\"" << (resa.get() ? string()  : string()) << "\"" <<
-				" arrivalStop=\"" << (resa.get() ? string()  : string()) << "\"" <<
-				" travelDate=\"" << (resa.get() ? string()  : string()) << "\"" <<
+				" departureStop=\"" << departurePlaceName << "\"" <<
+				" arrivalStop=\"" << arrivalPlaceName << "\"" <<
+				" travelDate=\"" << (travelDate.is_not_a_date_time() ? string()  : posix_time::to_iso_extended_string(travelDate)) << "\"" <<
 				" customerName=\"" << (resa.get() ? resa->getCustomerName() : string()) << "\"" <<
 				" customerPhone=\"" << (resa.get() ? resa->getCustomerPhone() : string()) << "\"" <<
 				" status=\"" << (resa.get() ? ResaModule::GetStatusText(resa->getStatus()) : "N.A.") << "\"" <<

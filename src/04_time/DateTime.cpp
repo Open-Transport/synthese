@@ -396,7 +396,7 @@ namespace synthese
 
 		boost::posix_time::ptime DateTime::toPosixTime() const
 		{
-			return posix_time::ptime(_date.toGregorianDate(), _hour.toPosixTimeDuration());
+			return isUnknown() ? posix_time::ptime() : posix_time::ptime(_date.toGregorianDate(), _hour.toPosixTimeDuration());
 		}
 	}
 }

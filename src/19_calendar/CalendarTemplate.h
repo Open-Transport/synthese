@@ -27,7 +27,7 @@
 #include "UId.h"
 #include "Registry.h"
 #include "CalendarTemplateElement.h"
-
+#include "Exception.h"
 #include "Calendar.h"
 
 namespace synthese
@@ -73,6 +73,13 @@ namespace synthese
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<CalendarTemplate>	Registry;
+
+			class InfiniteCalendarException:
+				public util::Exception
+			{
+			public:
+				InfiniteCalendarException();
+			};
 			
 		private:
 			std::vector<CalendarTemplateElement>	_elements;
@@ -85,9 +92,31 @@ namespace synthese
 
 			//! @name Queries
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Result calendar generation according to a mask.
+				/// @param mask the mask to apply on the template to compute the result
+				/// @return The result calendar object 
 				Calendar	getResult(const Calendar& mask)	const;
+				
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Result calendar generation.
+				/// This method can compute the result calendar only if the object is
+				/// limited (see CalendarTemplate::isLimited())
+				/// @return The result calendar object 
+				/// @throws InfiniteCalendarException if the object is not limited
+				Calendar	getResult() const;
+
 				boost::gregorian::date	getMinDate() const;
 				boost::gregorian::date	getMaxDate() const;
+				
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the calendar template defines a limited time period.
+				/// @return true if the min and max dates are not infinite.
+				bool isLimited() const;
 			//@}
 
 			//! @name Getters

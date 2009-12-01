@@ -190,7 +190,7 @@ namespace synthese
 					stream << t.row(lexical_cast<string>(ct->getRank()));
 
 					stream << t.col() << ct->getRank();
-					stream << t.col() << static_cast<int>(ct->getOperation());
+					stream << t.col() << static_cast<char>(ct->getOperation());
 					
 					stream << t.col() << (ct->getMinDate().is_special() ? "-&infin;" : to_simple_string(ct->getMinDate()));
 					stream << t.col() << (ct->getMaxDate().is_special() ? "+&infin;" : to_simple_string(ct->getMaxDate()));

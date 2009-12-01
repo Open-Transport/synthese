@@ -73,6 +73,14 @@ namespace synthese
 
 
 
+		Calendar CalendarTemplate::getResult() const
+		{
+			if(!isLimited()) throw InfiniteCalendarException();
+			Calendar mask(getMinDate(), getMaxDate());
+			return getResult(mask);
+		}
+
+
 		string CalendarTemplate::getText() const
 		{
 			return _text;
@@ -100,8 +108,13 @@ namespace synthese
 			date result(pos_infin);
 			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
 			{
-				if(element.getMinDate() == date(neg_infin)) return date(neg_infin);
-				if(element.getMinDate() < result) result = element.getMinDate();
+				if(	element.getMinDate() < result &&
+					element.getOperation() != CalendarTemplateElement::AND ||
+					element.getOperation() == CalendarTemplateElement::AND &&
+					element.getMinDate() > result
+				){
+					result = element.getMinDate();
+				}
 			}
 			return result;
 		}
@@ -113,10 +126,30 @@ namespace synthese
 			date result(neg_infin);
 			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
 			{
-				if(element.getMaxDate() == date(pos_infin)) return date(pos_infin);
-				if(element.getMaxDate() > result) result = element.getMaxDate();
+				if(	element.getMaxDate() > result &&
+					element.getOperation() != CalendarTemplateElement::AND ||
+					element.getOperation() == CalendarTemplateElement::AND &&
+					element.getMaxDate() < result
+				){
+					result = element.getMaxDate();
+				}
 			}
 			return result;
+		}
+
+
+
+		bool CalendarTemplate::isLimited() const
+		{
+			return !getMinDate().is_infinity() && !getMaxDate().is_infinity();
+		}
+
+
+
+		CalendarTemplate::InfiniteCalendarException::InfiniteCalendarException()
+			: Exception("The calendar template defines an infinite sized result.")
+		{
+
 		}
 	}
 }

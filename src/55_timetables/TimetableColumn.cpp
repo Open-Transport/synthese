@@ -49,10 +49,11 @@ namespace synthese
 		TimetableColumn::TimetableColumn(
 			const TimetableGenerator& timetablegenerator,
 			const env::NonPermanentService& service
-		):	_warning(timetablegenerator.getWarnings().end())
+		):	_warning(NULL)
 			, _line(static_cast<const Line*>(service.getPath()))
 			, _calendar(service)
 		{
+			_calendar &= timetablegenerator.getBaseCalendar();
 			const TimetableGenerator::Rows& rows(timetablegenerator.getRows());
 			const Path::Edges& edges(service.getPath()->getEdges());
 			Path::Edges::const_iterator itEdge(edges.begin());
@@ -63,7 +64,7 @@ namespace synthese
 				Path::Edges::const_iterator itEdge2;
 				for (itEdge2 = itEdge; itEdge2 != edges.end(); ++itEdge2)
 				{
-					if(	(*itEdge2)->getFromVertex()->getHub() == itRow->getPlace()
+					if(	dynamic_cast<const PublicTransportStopZoneConnectionPlace*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
 						&&(	(*itEdge2)->isDeparture() == itRow->getIsDeparture()
 							|| (*itEdge2)->isArrival() == itRow->getIsArrival()
 						)
@@ -174,7 +175,7 @@ namespace synthese
 
 
 
-		void TimetableColumn::setWarning( vector<TimetableWarning>::const_iterator it )
+		void TimetableColumn::setWarning(const TimetableWarning* it )
 		{
 			_warning = it;
 		}
@@ -216,7 +217,7 @@ namespace synthese
 
 
 
-		std::vector<TimetableWarning>::const_iterator TimetableColumn::getWarning() const
+		const TimetableWarning* TimetableColumn::getWarning() const
 		{
 			return _warning;
 		}

@@ -70,6 +70,7 @@ namespace synthese
 	*/
 	namespace calendar
 	{
+		class Calendar;
 
 		/** 19 calendar Module class.
 			@author Hugues
@@ -78,6 +79,10 @@ namespace synthese
 		class CalendarModule:
 			public server::ModuleClassTemplate<CalendarModule>
 		{
+		public:
+			static std::string GetBestCalendarTitle(
+				const Calendar& calendar
+			);
 		};
 	}
 	/** @} */

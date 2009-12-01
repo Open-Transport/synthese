@@ -27,6 +27,10 @@
 #include "Request.h"
 #include "TimetableRight.h"
 #include "TimetableUpdateAction.h"
+#include "Timetable.h"
+#include "TimetableTableSync.h"
+#include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
 
 using namespace std;
 
@@ -34,6 +38,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
+	using namespace calendar;
+	using namespace util;
 	
 	namespace util
 	{
@@ -42,8 +48,10 @@ namespace synthese
 
 	namespace timetables
 	{
-		/// @todo Parameters constants definition
-		// const string TimetableUpdateAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
+		const string TimetableUpdateAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "ti";
+		const string TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID = Action_PARAMETER_PREFIX + "ci";
+		const string TimetableUpdateAction::PARAMETER_MUST_BEGIN_A_PAGE = Action_PARAMETER_PREFIX + "mb";
+		const string TimetableUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
 		
 		
 		
@@ -57,7 +65,10 @@ namespace synthese
 		ParametersMap TimetableUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(PARAMETER_xxx, _xxx);
+			if(_timetable.get()) map.insert(PARAMETER_TIMETABLE_ID, _timetable->getKey());
+			map.insert(PARAMETER_MUST_BEGIN_A_PAGE, _mustBeginAPage);
+			if(_calendarTemplate.get()) map.insert(PARAMETER_BASE_CALENDAR_ID, _calendarTemplate->getKey());
+			map.insert(PARAMETER_TITLE, _title);
 			return map;
 		}
 		
@@ -65,22 +76,50 @@ namespace synthese
 		
 		void TimetableUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// _xxx = map.getString(PARAMETER_xxx, true, FACTORY_KEY);
-			// if (_xxx.empty())
-			//	throw ActionException("Bad value for xxx parameter ");	
-			// 
+			try
+			{
+				_timetable = TimetableTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TIMETABLE_ID), *_env);
+			}
+			catch (ObjectNotFoundException<Timetable>)
+			{
+				throw ActionException("No such timetable");
+			}
+
+			try
+			{
+				_calendarTemplate = CalendarTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID), *_env);
+			}
+			catch (ObjectNotFoundException<CalendarTemplate>)
+			{
+				throw ActionException("No such calendar");
+			}
+
+			_mustBeginAPage = map.getDefault<bool>(PARAMETER_MUST_BEGIN_A_PAGE, false);
+			_title = map.get<string>(PARAMETER_TITLE);
 		}
 		
 		
 		
 		void TimetableUpdateAction::run()
 		{
+			_timetable->setBaseCalendar(_calendarTemplate.get());
+			_timetable->setMustBeginAPage(_mustBeginAPage);
+			_timetable->setTitle(_title);
+
+			TimetableTableSync::Save(_timetable.get());
 		}
 		
 		
 		bool TimetableUpdateAction::_isAuthorized() const
 		{
 			return _request->isAuthorized<TimetableRight>(WRITE);
+		}
+
+
+
+		void TimetableUpdateAction::setTimetable( boost::shared_ptr<Timetable> value )
+		{
+			_timetable = value;
 		}
 	}
 }

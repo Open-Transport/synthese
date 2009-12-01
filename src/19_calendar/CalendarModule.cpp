@@ -21,8 +21,15 @@
 */
 
 #include "CalendarModule.h"
+#include "Calendar.h"
+
+#include <sstream>
+#include <boost/foreach.hpp>
+#include <boost/date_time/gregorian/formatters.hpp>
 
 using namespace std;
+using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -53,5 +60,17 @@ namespace synthese
 
 	namespace calendar
 	{
+		std::string CalendarModule::GetBestCalendarTitle( const Calendar& calendar )
+		{
+			stringstream result;
+			bool first(true);
+			Calendar::DatesVector dates(calendar.getActiveDates());
+			BOOST_FOREACH(const Calendar::DatesVector::value_type& date, dates)
+			{
+				result << (first ? string() : ",") << to_simple_string(date);
+				first=false;
+			}
+			return result.str();
+		}
 	}
 }

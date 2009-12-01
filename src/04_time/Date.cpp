@@ -574,7 +574,7 @@ namespace synthese
 
 		boost::gregorian::date Date::toGregorianDate() const
 		{
-			return gregorian::date(_year, _month, _day);
+			return isUnknown() ? gregorian::date() : gregorian::date(_year, _month, _day);
 		}
 	}
 }
