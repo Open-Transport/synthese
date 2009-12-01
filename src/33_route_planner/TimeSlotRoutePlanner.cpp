@@ -140,7 +140,6 @@ namespace synthese
 			Result result;
 
 			// Time loop
-			size_t solutionNumber(0);
 			for(DateTime originDateTime(_planningOrder == DEPARTURE_FIRST ? _lowestDepartureTime : _highestArrivalTime);
 				_planningOrder == DEPARTURE_FIRST ? originDateTime <= _highestDepartureTime : originDateTime >= _lowestArrivalTime;
 				_planningOrder == DEPARTURE_FIRST ? originDateTime += 1 : originDateTime -= 1
@@ -150,7 +149,7 @@ namespace synthese
 					_logLevel <= Log::LEVEL_TRACE
 				){
 					stringstream s;
-					s << "<h2>Route planning " << ++solutionNumber << " at " << _lowestDepartureTime.toString() << "</h2>";
+					s << "<h2>Route planning " << (result.size()+1) << " at " << _lowestDepartureTime.toString() << "</h2>";
 
 					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
 						Log::GetInstance().trace(s.str());
@@ -187,7 +186,7 @@ namespace synthese
 						_whatToSearch,
 						_graphToUse,
 						_maxDuration,
-						_maxSolutionsNumber ? *_maxSolutionsNumber - solutionNumber : _maxSolutionsNumber,
+						_maxSolutionsNumber ? *_maxSolutionsNumber - result.size() : _maxSolutionsNumber,
 						_accessParameters,
 						_planningOrder,
 						_logStream,
@@ -231,6 +230,22 @@ namespace synthese
 				if(!result.empty() && result.back().getContinuousServiceRange() == 1)
 				{
 					// TODO
+				}
+
+				if(_maxSolutionsNumber && result.size() >= *_maxSolutionsNumber)
+				{
+					while(result.size() > *_maxSolutionsNumber)
+					{
+						if(_planningOrder == DEPARTURE_FIRST)
+						{
+							result.pop_back();
+						}
+						else
+						{
+							result.pop_front();
+						}
+					}
+					break;
 				}
 
 				if(!result.empty())
