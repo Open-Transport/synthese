@@ -93,7 +93,7 @@ namespace synthese
 			string departurePlaceName;
 			string arrivalPlaceName;
 			posix_time::ptime travelDate;
-			if(resa.get() && resa->getReservations().empty())
+			if(resa.get() && !resa->getReservations().empty())
 			{
 				departurePlaceName = (*resa->getReservations().begin())->getDeparturePlaceName();
 				travelDate = (*resa->getReservations().begin())->getDepartureTime().toPosixTime();
@@ -112,7 +112,7 @@ namespace synthese
 				" customerName=\"" << (resa.get() ? resa->getCustomerName() : string()) << "\"" <<
 				" customerPhone=\"" << (resa.get() ? resa->getCustomerPhone() : string()) << "\"" <<
 				" status=\"" << (resa.get() ? ResaModule::GetStatusText(resa->getStatus()) : "N.A.") << "\"" <<
-				" canBeCancelled=\"" << (resa.get() ? lexical_cast<string>(resa->getReservationDeadLine() > DateTime(TIME_CURRENT)) : "0") << "\"" <<
+				" canBeCancelled=\"" << (resa.get() ? lexical_cast<string>(resa->getReservationDeadLine() > DateTime(TIME_CURRENT) && resa->getCancellationTime().isUnknown()) : "0") << "\"" <<
 				" seats=\"" << (resa.get() ? lexical_cast<string>(resa->getSeats()) : "0") << "\"";
 			if(resa.get() && !resa->getCancellationTime().isUnknown())
 			{
