@@ -23,6 +23,7 @@
 #include "Timetable.h"
 #include "TimetableRow.h"
 #include "CalendarTemplate.h"
+#include "Env.h"
 
 using namespace std;
 
@@ -42,7 +43,8 @@ namespace synthese
 		:	Registrable(id),
 			_mustBeginAPage(false),
 			_bookId(0),
-			_baseCalendar(NULL)
+			_baseCalendar(NULL),
+			_interface(NULL)
 		{
 		}
 
@@ -170,6 +172,67 @@ namespace synthese
 			;
 		}
 
+
+
+		void Timetable::generate( std::ostream& stream )
+		{
+			auto_ptr<TimetableGenerator> g(getGenerator(Env::GetOfficialEnv()));
+			g->build();
+		}
+
+
+
+		const interfaces::Interface* Timetable::getInterface() const
+		{
+			return _interface;
+		}
+
+
+
+		Timetable::Format Timetable::getFormat() const
+		{
+			return _format;
+		}
+
+
+
+		void Timetable::setInterface( const interfaces::Interface* value )
+		{
+			_interface = value;
+		}
+
+
+
+		void Timetable::setFormat( Timetable::Format value )
+		{
+			_format = value;
+		}
+
+
+
+		std::string Timetable::GetFormatName( Format value )
+		{
+			switch(value)
+			{
+			case TABLE_SERVICES_IN_COLS: return "Services en colonnes";
+			case TABLE_SERVICES_IN_ROWS: return "Services en lignes";
+			case TIMES_IN_COLS: return "Heures en colonnes";
+			case TIMES_IN_ROWS: return "Heures en lignes";
+			}
+			return "Inconnu";
+		}
+
+
+
+		Timetable::FormatsList Timetable::GetFormatsList()
+		{
+			FormatsList result;
+			result.push_back(make_pair(TABLE_SERVICES_IN_COLS, GetFormatName(TABLE_SERVICES_IN_COLS)));
+			result.push_back(make_pair(TABLE_SERVICES_IN_ROWS, GetFormatName(TABLE_SERVICES_IN_ROWS)));
+			result.push_back(make_pair(TIMES_IN_COLS, GetFormatName(TIMES_IN_COLS)));
+			result.push_back(make_pair(TIMES_IN_ROWS, GetFormatName(TIMES_IN_ROWS)));
+			return result;
+		}
 
 		Timetable::ImpossibleGenerationException::ImpossibleGenerationException():
 			Exception("Timetable generation is impossible.")

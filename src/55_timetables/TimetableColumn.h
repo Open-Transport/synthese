@@ -36,6 +36,7 @@ namespace synthese
 	{
 		class Line;
 		class NonPermanentService;
+		class PhysicalStop;
 	}
 
 	namespace timetables
@@ -56,9 +57,12 @@ namespace synthese
 		*/
 		class TimetableColumn
 		{
+		public:
+			typedef std::vector<std::pair<const env::PhysicalStop*, time::Schedule> > Content;
+
 		private:
 			// Variables
-			std::vector<time::Schedule>		_timeContent;
+			Content		_content;
 			calendar::Calendar				_calendar;
 			const TimetableWarning*			_warning;
 			const env::Line*				_line;
@@ -67,7 +71,10 @@ namespace synthese
 
 		public:
 			// Constructeur
-			TimetableColumn(const TimetableGenerator& generator, const env::NonPermanentService& service);
+			TimetableColumn(
+				const TimetableGenerator& generator,
+				const env::NonPermanentService& service
+			);
 
 			//! @name Queries
 			//@{
@@ -88,7 +95,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const calendar::Calendar&				getCalendar()			const;
-				const std::vector<time::Schedule>&		getContent()			const;
+				const Content&							getContent()			const;
 				const env::Line*						getLine()				const;
 				tTypeOD									getOriginType()			const;
 				tTypeOD									getDestinationType()	const;

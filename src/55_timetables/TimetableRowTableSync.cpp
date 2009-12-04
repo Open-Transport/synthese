@@ -208,7 +208,7 @@ namespace synthese
 				<< "UPDATE " << TABLE.NAME
 				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
 				<< " WHERE " << COL_TIMETABLE_ID << "=" << timetableId
-				<< " AND " << COL_RANK << ((delta > 0) ? ">=" : "<=") << rank
+				<< " AND " << COL_RANK << ">=" << rank
 				;
 
 			sqlite->execUpdate(query.str());

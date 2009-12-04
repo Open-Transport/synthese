@@ -37,6 +37,7 @@
 #include "RoadPlaceTableSync.h"
 #include "City.h"
 #include "CityTableSync.h"
+#include "Crossing.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -151,7 +152,6 @@ namespace synthese
 			{
 				throw Exception("Could no open the file " + path);
 			}
-			dbfile.LoadFileToMemory();
 
 			// 1 : Cities
 			if(key == FILE_MTDAREA)
@@ -159,27 +159,35 @@ namespace synthese
 				map<string, string> departementCodes;
 				
 				// Departements
-				for(int i(1); i <= dbfile.GetRecordCount(); ++i)
+				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
-					dbfile.GetAtRecord(i);
-					if(dbfile.getText(_FIELD_ADMIN_LVL) != "3") continue;
-					string item(algorithm::trim_copy(dbfile.getText(_FIELD_AREACODE_3)));
+					shared_ptr<Record> record(dbfile.ReadRecord(i));
+
+					if(dbfile.getText(*record, _FIELD_ADMIN_LVL) != "3") continue;
+					string item(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)));
 					if(departementCodes.find(item) != departementCodes.end()) continue;
-					departementCodes.insert(make_pair(item, algorithm::trim_copy(dbfile.getText(_FIELD_GOVT_CODE))));
+					departementCodes.insert(make_pair(item, algorithm::trim_copy(dbfile.getText(*record, _FIELD_GOVT_CODE))));
 				}
 
 				// Cities
-				for(int i(1); i <= dbfile.GetRecordCount(); ++i)
+				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
-					dbfile.GetAtRecord(i);
-					if(dbfile.getText(_FIELD_ADMIN_LVL) != "4") continue;
+					shared_ptr<Record> record(dbfile.ReadRecord(i));
+
+					if(dbfile.getText(*record, _FIELD_ADMIN_LVL) != "4") continue;
 					stringstream code;
-					int cityID(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(_FIELD_AREA_ID))));
-					code << departementCodes[algorithm::trim_copy(dbfile.getText(_FIELD_AREACODE_3))];
-					code << setw(3) << setfill('0') << lexical_cast<int>(algorithm::trim_copy(dbfile.getText(_FIELD_GOVT_CODE)));
+					int cityID(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREA_ID))));
+					code << departementCodes[algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3))];
+					code << setw(3) << setfill('0') << lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_GOVT_CODE)));
 					if(_citiesMap.find(cityID) != _citiesMap.end()) continue;
 
 					shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), *_env));
+
+					if(!city.get())
+					{
+						os << "WARN : City " << code.str() << " not found.<br />";
+						continue;
+					}
 
 					_citiesMap.insert(make_pair(
 							cityID,
@@ -189,24 +197,23 @@ namespace synthese
 			} // 2 : Nodes
 			else if(key == FILE_NODES)
 			{
-				for(int i(1); i <= dbfile.GetRecordCount(); ++i)
+				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
-					dbfile.GetAtRecord(i);
+					shared_ptr<Record> record(dbfile.ReadRecord(i));
 					shared_ptr<Address> address(new Address);
 
-					address->setCodeBySource(algorithm::trim_copy(dbfile.getText(_FIELD_ID)));
+					address->setCodeBySource(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ID)));
 					address->setXY(
-						lexical_cast<double>(algorithm::trim_copy(dbfile.getText(_FIELD_X))),
-						lexical_cast<double>(algorithm::trim_copy(dbfile.getText(_FIELD_Y)))
+						lexical_cast<double>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_X))),
+						lexical_cast<double>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_Y)))
 					);
 					address->setDataSource(_dataSource);
 					address->setKey(AddressTableSync::getId());
-					_navteqAddressses.insert(make_pair(address->getCodeBySource(), address.get()));
 
 					RegistryKeyType stopId(0); 
 					try
 					{
-						stopId = lexical_cast<RegistryKeyType>(algorithm::trim_copy(dbfile.getText(_FIELD_LINK_ID)));
+						stopId = lexical_cast<RegistryKeyType>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_LINK_ID)));
 					}
 					catch(...)
 					{
@@ -214,7 +221,7 @@ namespace synthese
 					}
 
 					if(stopId > 0)
-					{
+					{ // PT Connection place
 						try
 						{
 							shared_ptr<PhysicalStop> stop(PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL));
@@ -250,27 +257,35 @@ namespace synthese
 						}
 						catch(...)
 						{
-
+							shared_ptr<Crossing> crossing(new Crossing);
+							crossing->setKey(util::encodeUId(43,0,0,decodeObjectId(address->getKey())));
+							crossing->setAddress(address.get());
+							address->setHub(crossing.get());
+							_env->getEditableRegistry<Crossing>().add(crossing);
 						}
 					}
 					else
-					{
-
+					{ // Crossing
+						shared_ptr<Crossing> crossing(new Crossing);
+						crossing->setKey(util::encodeUId(43,0,0,decodeObjectId(address->getKey())));
+						crossing->setAddress(address.get());
+						address->setHub(crossing.get());
+						_env->getEditableRegistry<Crossing>().add(crossing);
 					}
 
+					_navteqAddressses.insert(make_pair(address->getCodeBySource(), address.get()));
 					_env->getEditableRegistry<Address>().add(address);
 				}
 			} // 3 : Streets
 			else if (key == FILE_STREETS)
 			{
-				for(int i(1); i <= dbfile.GetRecordCount(); ++i)
+				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
-					dbfile.GetAtRecord(i);
-					string roadName(algorithm::trim_copy(dbfile.getText(_FIELD_ST_NAME)));
-					string leftId(algorithm::trim_copy(dbfile.getText(_FIELD_REF_IN_ID)));
-					string rightId(algorithm::trim_copy(dbfile.getText(_FIELD_NREF_IN_ID)));
-					int lAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(_FIELD_L_AREA_ID))));
-
+					shared_ptr<Record> record(dbfile.ReadRecord(i));
+					string leftId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_REF_IN_ID)));
+					string rightId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_NREF_IN_ID)));
+					int lAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_AREA_ID))));
+					
 					_CitiesMap::const_iterator itc(_citiesMap.find(lAreaId));
 					_AddressesMap::const_iterator ita1(_navteqAddressses.find(leftId));
 					_AddressesMap::const_iterator ita2(_navteqAddressses.find(rightId));
@@ -280,6 +295,9 @@ namespace synthese
 					){
 						continue;
 					}
+
+					string roadName(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ST_NAME)));
+
 					City* city(itc->second);
 					Address* leftNode(ita1->second);
 					Address* rightNode(ita2->second);

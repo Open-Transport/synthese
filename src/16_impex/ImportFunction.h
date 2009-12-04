@@ -33,6 +33,7 @@ namespace synthese
 	namespace impex
 	{
 		class DataSource;
+		class FileFormat;
 		
 		/** Import Function class.
 			

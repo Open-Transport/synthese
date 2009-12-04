@@ -43,6 +43,9 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_RANK;
+			static const std::string TAB_PROPERTIES;
+			static const std::string TAB_CONTENT;
+			static const std::string TAB_RESULT;
 
 		private:
 			boost::shared_ptr<const Timetable>			_timetable;
@@ -107,7 +110,19 @@ namespace synthese
 			virtual std::string getTitle() const;
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-			
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds the tabs of the page.
+			/// @param request The current request (can be used to determinate the
+			///        current user rights.)
+			/// @author Hugues
+			/// @date 2009
+			virtual void _buildTabs(
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+
 		};
 	}
 }

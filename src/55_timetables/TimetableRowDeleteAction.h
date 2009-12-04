@@ -1,8 +1,8 @@
 
-/** TimetableUpdateAction class header.
-	@file TimetableUpdateAction.h
-	@author Hugues Romain
-	@date 2008
+/** TimetableRowDeleteAction class header.
+	@file TimetableRowDeleteAction.h
+	@author Hugues
+	@date 2009
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,50 +22,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_TimetableUpdateAction_H__
-#define SYNTHESE_TimetableUpdateAction_H__
+#ifndef SYNTHESE_TimetableRowDeleteAction_H__
+#define SYNTHESE_TimetableRowDeleteAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Timetable.h"
 
 namespace synthese
 {
-	namespace calendar
-	{
-		class CalendarTemplate;
-	}
-
-	namespace interfaces
-	{
-		class Interface;
-	}
-
 	namespace timetables
 	{
+		class TimetableRow;
 
-		/** TimetableUpdateAction action class.
+		/** TimetableRowDeleteAction action class.
 			@ingroup m55Actions refActions
 		*/
-		class TimetableUpdateAction
-			: public util::FactorableTemplate<server::Action, TimetableUpdateAction>
+		class TimetableRowDeleteAction:
+			public util::FactorableTemplate<server::Action, TimetableRowDeleteAction>
 		{
 		public:
-			static const std::string PARAMETER_TIMETABLE_ID;
-			static const std::string PARAMETER_BASE_CALENDAR_ID;
-			static const std::string PARAMETER_MUST_BEGIN_A_PAGE;
-			static const std::string PARAMETER_TITLE;
-			static const std::string PARAMETER_FORMAT;
-			static const std::string PARAMETER_INTERFACE_ID;
+			static const std::string PARAMETER_ROW_ID;
 
 		private:
-			boost::shared_ptr<Timetable> _timetable;
-			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
-			bool _mustBeginAPage;
-			std::string _title;
-			boost::shared_ptr<const interfaces::Interface> _interface;
-			Timetable::Format _format;
-
+			boost::shared_ptr<const TimetableRow> _element;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -85,13 +64,11 @@ namespace synthese
 			*/
 			void run();
 			
-			TimetableUpdateAction();
-			
 			virtual bool _isAuthorized() const;
 
-			void setTimetable(boost::shared_ptr<Timetable> value);
+			void setElement(boost::shared_ptr<const TimetableRow> value);
 		};
 	}
 }
 
-#endif // SYNTHESE_TimetableUpdateAction_H__
+#endif // SYNTHESE_TimetableRowDeleteAction_H__

@@ -80,7 +80,7 @@ namespace synthese
 			_allPhysicalStopsDisplayed(true),
 			_direction(DISPLAY_DEPARTURES),
 			_originsOnly(WITH_PASSING),
-			_maxDelay(24 * 60),			// default = 24 hours
+			_maxDelay(12 * 60),			// default = 24 hours
 			_clearingDelay(0),
 			_firstRow(0),
 			_generationMethod(STANDARD_METHOD),

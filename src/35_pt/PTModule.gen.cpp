@@ -13,6 +13,7 @@ synthese::pt::NavteqWithProjectionFileFormat::integrate();
 synthese::pt::NonConcurrencyRuleAddAction::integrate();
 synthese::pt::NonConcurrencyRuleRemoveAction::integrate();
 synthese::pt::ServiceAdmin::integrate();
+synthese::pt::PTImportAdmin::integrate();
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 synthese::pt::ScheduleRealTimeUpdateAction::integrate();

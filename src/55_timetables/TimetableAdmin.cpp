@@ -24,7 +24,7 @@
 
 #include "TimetableAdmin.h"
 #include "TimetableModule.h"
-
+#include "TimetableGenerateFunction.h"
 #include "PropertiesHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "HTMLModule.h"
@@ -42,10 +42,11 @@
 #include "TimetableRowTableSync.h"
 #include "TimetableUpdateAction.h"
 #include "TimetableRowAddAction.h"
-
+#include "TimetableRowDeleteAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
-
+#include "InterfaceTableSync.h"
+#include "TimetableInterfacePage.h"
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
 #include "AdminParametersException.h"
@@ -84,6 +85,9 @@ namespace synthese
 	namespace timetables
 	{
 		const string TimetableAdmin::PARAMETER_RANK("rk");
+		const string TimetableAdmin::TAB_CONTENT("co");
+		const string TimetableAdmin::TAB_PROPERTIES("pr");
+		const string TimetableAdmin::TAB_RESULT("re");
 
 		TimetableAdmin::TimetableAdmin()
 			: AdminInterfaceElementTemplate<TimetableAdmin>()
@@ -125,157 +129,198 @@ namespace synthese
 		void TimetableAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+			const server::FunctionRequest<admin::AdminRequest>& _request
 		) const	{
-			// Requests
-			AdminActionFunctionRequest<TimetableUpdateAction,TimetableAdmin> updateRequest(_request);
-			updateRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
 
-			AdminActionFunctionRequest<TimetableRowAddAction,TimetableAdmin> addRowRequest(_request);
-			addRowRequest.getAction()->setTimetable(_timetable);
-
-			AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
-
-			// Display
-			stream << "<h1>Propriétés</h1>";
-
-			PropertiesHTMLTable pt(updateRequest.getHTMLForm("update"));
-			stream << pt.open();
-			stream << pt.cell(
-				"Calendrier",
-				pt.getForm().getSelectInput(
-					TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID,
-					CalendarTemplateTableSync::GetCalendarTemplatesList(),
-					_timetable->getBaseCalendar() ? _timetable->getBaseCalendar()->getKey() : RegistryKeyType(0)
-			)	);
-			stream << pt.cell(
-				"Saut de page avant",
-				pt.getForm().getOuiNonRadioInput(
-					TimetableUpdateAction::PARAMETER_MUST_BEGIN_A_PAGE,
-					_timetable->getMustBeginAPage()
-			)	);
-			stream << pt.cell(
-				"Titre",
-				pt.getForm().getTextInput(
-					TimetableUpdateAction::PARAMETER_TITLE,
-					_timetable->getTitle()
-			)	);
-
-			stream << pt.close();
-
-			stream << "<h1>Contenu</h1>";
-
-			// Search
-			TimetableRowTableSync::SearchResult rows(
-				TimetableRowTableSync::Search(
-					_getEnv(),
-					_timetable->getKey()
-					, _requestParameters.orderField == PARAMETER_RANK
-					, _requestParameters.raisingOrder
-					, _requestParameters.first
-					, _requestParameters.maxSize,
-					UP_LINKS_LOAD_LEVEL
-			)	);
-			
-			ActionResultHTMLTable::HeaderVector h;
-			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
-			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_down.png", "V")));
-			h.push_back(make_pair(PARAMETER_RANK, "Rang"));
-			h.push_back(make_pair(string(), "Commune"));
-			h.push_back(make_pair(string(), "Arrêt"));
-			h.push_back(make_pair(string(), "Arr"));
-			h.push_back(make_pair(string(), "Dep"));
-			h.push_back(make_pair(string(), "Obl"));
-			h.push_back(make_pair(string(), "Sel"));
-			h.push_back(make_pair(string(), "Aff"));
-			h.push_back(make_pair(string(), "Action"));
-			ActionResultHTMLTable t(
-				h,
-				searchRequest.getHTMLForm(),
-				_requestParameters,
-				rows,
-				addRowRequest.getHTMLForm("addrow"),
-				TimetableRowAddAction::PARAMETER_RANK
-			);
-
-			stream << t.open();
-
-			int maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
-			int lastRank(UNKNOWN_VALUE);
-			BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
+			////////////////////////////////////////////////////////////////////
+			// TAB PROPERTIES
+			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				lastRank = row->getRank();
+				// Requests
+				AdminActionFunctionRequest<TimetableUpdateAction,TimetableAdmin> updateRequest(_request);
+				updateRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
 
-				stream << t.row(Conversion::ToString(lastRank));
-				stream << t.col();
-				if (lastRank > 0)
-					stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_up.png", "^"));
-				stream << t.col();
-				if (lastRank < maxRank)
-					stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));;
-				stream << t.col() << lastRank;
-				stream << t.col() << row->getPlace()->getCity()->getName();
-				stream << t.col() << row->getPlace()->getName();
-				stream <<
-					t.col() <<
-					(	row->getIsArrival() ?
-						HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") :
-						HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible")
-					)
-				;
-				stream <<
-					t.col() <<
-					(	row->getIsDeparture() ?
-						HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") :
-						HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible")
-					)
-				;
-				stream <<
-					t.col() <<
-					(	(row->getCompulsory() == PassageObligatoire) ?
-						HTMLModule::getHTMLImage("bullet_green.png", "Obligatoire") :
-						HTMLModule::getHTMLImage("bullet_white.png", "Non obligatoire")
-					)
-				;
-				stream <<
-					t.col() <<
-					(	(row->getCompulsory() == PassageSuffisant) ?
-						HTMLModule::getHTMLImage("bullet_green.png", "Suffisant") :
-						HTMLModule::getHTMLImage("bullet_white.png", "Non suffisant")
-					)
-				;
-				stream <<
-					t.col() <<
-					(	(false) ?
-						HTMLModule::getHTMLImage("bullet_green.png", "Affiché") :
-						HTMLModule::getHTMLImage("bullet_white.png", "Non affiché")
-					)
-				;
-				stream << t.col() << HTMLModule::getLinkButton(string(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
+				// Display
+				stream << "<h1>Propriétés</h1>";
+
+				PropertiesHTMLTable pt(updateRequest.getHTMLForm("update"));
+				stream << pt.open();
+				stream << pt.cell(
+					"Calendrier",
+					pt.getForm().getSelectInput(
+						TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID,
+						CalendarTemplateTableSync::GetCalendarTemplatesList(),
+						_timetable->getBaseCalendar() ? _timetable->getBaseCalendar()->getKey() : RegistryKeyType(0)
+				)	);
+				stream << pt.cell(
+					"Saut de page avant",
+					pt.getForm().getOuiNonRadioInput(
+						TimetableUpdateAction::PARAMETER_MUST_BEGIN_A_PAGE,
+						_timetable->getMustBeginAPage()
+				)	);
+				stream << pt.cell(
+					"Titre",
+					pt.getForm().getTextInput(
+						TimetableUpdateAction::PARAMETER_TITLE,
+						_timetable->getTitle()
+				)	);
+				stream << pt.cell(
+					"Interface",
+					pt.getForm().getSelectInput(
+						TimetableUpdateAction::PARAMETER_INTERFACE_ID,
+						InterfaceTableSync::GetInterfaceLabels<TimetableInterfacePage>(optional<string>()),
+						_timetable->getInterface() ? _timetable->getInterface()->getKey() : RegistryKeyType(0)
+				)	);
+				stream << pt.cell(
+					"Format",
+					pt.getForm().getRadioInputCollection(
+						TimetableUpdateAction::PARAMETER_FORMAT,
+						Timetable::GetFormatsList(),
+						_timetable->getFormat(),
+						true
+				)	);
+
+				stream << pt.close();
 			}
-			stream << t.row(Conversion::ToString(UNKNOWN_VALUE));
-			stream << t.col();
-			stream << t.col();
-			stream << t.col() << ++lastRank;
-			stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_CITY_NAME, string(), "(commune)");
-			stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_PLACE_NAME, string(), "(arrêt)");
-			stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_ARRIVAL, Conversion::ToString(true), true);
-			stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_DEPARTURE, Conversion::ToString(true), true);
-			stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_COMPULSORY, Conversion::ToString(true), false);
-			stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_SUFFICIENT, Conversion::ToString(true), true);
-			stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_DISPLAYED, Conversion::ToString(true), true);
-			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 
-			stream << t.close();
-
-			stream << "<h1>Résultat simulé</h1>";
-
-			if(_timetable->isGenerable())
+			////////////////////////////////////////////////////////////////////
+			// TAB CONTENT
+			if (openTabContent(stream, TAB_CONTENT))
 			{
+				AdminActionFunctionRequest<TimetableRowAddAction,TimetableAdmin> addRowRequest(_request);
+				addRowRequest.getAction()->setTimetable(_timetable);
+
+				AdminActionFunctionRequest<TimetableRowDeleteAction,TimetableAdmin> deleteRowRequest(_request);
+
+				AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
+
+				stream << "<h1>Arrêts</h1>";
+
+				// Search
+				TimetableRowTableSync::SearchResult rows(
+					TimetableRowTableSync::Search(
+						_getEnv(),
+						_timetable->getKey()
+						, _requestParameters.orderField == PARAMETER_RANK
+						, _requestParameters.raisingOrder
+						, _requestParameters.first
+						, _requestParameters.maxSize,
+						UP_LINKS_LOAD_LEVEL
+				)	);
+				
+				ActionResultHTMLTable::HeaderVector h;
+				h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
+				h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_down.png", "V")));
+				h.push_back(make_pair(PARAMETER_RANK, "Rang"));
+				h.push_back(make_pair(string(), "Commune"));
+				h.push_back(make_pair(string(), "Arrêt"));
+				h.push_back(make_pair(string(), "Arr"));
+				h.push_back(make_pair(string(), "Dep"));
+				h.push_back(make_pair(string(), "Obl"));
+				h.push_back(make_pair(string(), "Sel"));
+				h.push_back(make_pair(string(), "Aff"));
+				h.push_back(make_pair(string(), "Action"));
+				ActionResultHTMLTable t(
+					h,
+					searchRequest.getHTMLForm(),
+					_requestParameters,
+					rows,
+					addRowRequest.getHTMLForm("addrow"),
+					TimetableRowAddAction::PARAMETER_RANK
+				);
+
+				stream << t.open();
+
+				int maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
+				int lastRank(UNKNOWN_VALUE);
+				BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
+				{
+					lastRank = row->getRank();
+					deleteRowRequest.getAction()->setElement(const_pointer_cast<const TimetableRow>(row));
+
+					stream << t.row(Conversion::ToString(lastRank));
+					stream << t.col();
+					if (lastRank > 0)
+						stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_up.png", "^"));
+					stream << t.col();
+					if (lastRank < maxRank)
+						stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));;
+					stream << t.col() << lastRank;
+					stream << t.col() << row->getPlace()->getCity()->getName();
+					stream << t.col() << row->getPlace()->getName();
+					stream <<
+						t.col() <<
+						(	row->getIsArrival() ?
+							HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") :
+							HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible")
+						)
+					;
+					stream <<
+						t.col() <<
+						(	row->getIsDeparture() ?
+							HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") :
+							HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible")
+						)
+					;
+					stream <<
+						t.col() <<
+						(	(row->getCompulsory() == PassageObligatoire) ?
+							HTMLModule::getHTMLImage("bullet_green.png", "Obligatoire") :
+							HTMLModule::getHTMLImage("bullet_white.png", "Non obligatoire")
+						)
+					;
+					stream <<
+						t.col() <<
+						(	(row->getCompulsory() == PassageSuffisant) ?
+							HTMLModule::getHTMLImage("bullet_green.png", "Suffisant") :
+							HTMLModule::getHTMLImage("bullet_white.png", "Non suffisant")
+						)
+					;
+					stream <<
+						t.col() <<
+						(	(false) ?
+							HTMLModule::getHTMLImage("bullet_green.png", "Affiché") :
+							HTMLModule::getHTMLImage("bullet_white.png", "Non affiché")
+						)
+					;
+					stream << t.col() << HTMLModule::getLinkButton(deleteRowRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
+				}
+				stream << t.row(Conversion::ToString(UNKNOWN_VALUE));
+				stream << t.col();
+				stream << t.col();
+				stream << t.col() << ++lastRank;
+				stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_CITY_NAME, string(), "(commune)");
+				stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_PLACE_NAME, string(), "(arrêt)");
+				stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_ARRIVAL, Conversion::ToString(true), true);
+				stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_DEPARTURE, Conversion::ToString(true), true);
+				stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_COMPULSORY, Conversion::ToString(true), false);
+				stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_SUFFICIENT, Conversion::ToString(true), true);
+				stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_DISPLAYED, Conversion::ToString(true), true);
+				stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
+
+				stream << t.close();
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB RESULT
+			if (openTabContent(stream, TAB_RESULT))
+			{
+				if(_timetable->getInterface())
+				{
+					FunctionRequest<TimetableGenerateFunction> viewRequest(&_request);
+					viewRequest.getFunction()->setTimetable(_timetable);
+					if(	!_timetable->getInterface()->getDefaultClientURL().empty()
+					){
+						viewRequest.setClientURL(_timetable->getInterface()->getDefaultClientURL());
+					}
+
+					stream << "<h1>Résultat final</h1>";
+					stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), ICON) << "</p>";				}
+
+				stream << "<h1>Tableau</h1>";
+
 				auto_ptr<TimetableGenerator> g(_timetable->getGenerator(Env::GetOfficialEnv()));
 				g->build();
-
-				stream << "<h2>Fiche horaire</h2>";
 
 				HTMLTable tf(0, ResultHTMLTable::CSS_CLASS);
 				stream << tf.open();
@@ -320,7 +365,7 @@ namespace synthese
 
 				if(	!g->getWarnings().empty()
 				){
-					stream << "<h2>Renvois</h2>";
+					stream << "<h1>Renvois</h1>";
 
 					HTMLTable::ColsVector v;
 					v.push_back("Num");
@@ -332,12 +377,16 @@ namespace synthese
 					{
 						stream << tw.row();
 						stream << tw.col() << warn.first;
-						stream << tw.col() << CalendarModule::GetBestCalendarTitle(warn.second.getCalendar(), g->getBaseCalendar());
+						stream << tw.col() << warn.second.getText();
 					}
 
 					stream << tw.close();
 				}
 			}
+
+			////////////////////////////////////////////////////////////////////
+			/// END TABS
+			closeTabContent(stream);
 		}
 
 		bool TimetableAdmin::isAuthorized(
@@ -368,6 +417,19 @@ namespace synthese
 		{
 			return _timetable == static_cast<const TimetableAdmin&>(other)._timetable;
 		}
-			
+
+
+
+		void TimetableAdmin::_buildTabs( const server::FunctionRequest<admin::AdminRequest>& request ) const
+		{
+			_tabs.clear();
+
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
+			_tabs.push_back(Tab("Contenu", TAB_CONTENT, true));
+			if(_timetable->isGenerable()) _tabs.push_back(Tab("Résultat", TAB_RESULT, true));
+
+			_tabBuilded = true;
+		}
+
 	}
 }

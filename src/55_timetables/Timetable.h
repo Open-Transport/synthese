@@ -42,6 +42,11 @@ namespace synthese
 	{
 		class CalendarTemplate;
 	}
+
+	namespace interfaces
+	{
+		class Interface;
+	}
 	
 	namespace timetables
 	{
@@ -73,6 +78,20 @@ namespace synthese
 				ImpossibleGenerationException();
 			};
 
+			enum Format
+			{
+				TABLE_SERVICES_IN_COLS = 1,
+				TABLE_SERVICES_IN_ROWS = 2,
+				TIMES_IN_COLS = 3,
+				TIMES_IN_ROWS = 4
+			};
+
+			static std::string GetFormatName(Format value);
+
+			typedef std::vector<std::pair<Format, std::string> > FormatsList;
+
+			static FormatsList GetFormatsList();
+
 		private:
 			// Variables
 			bool					_mustBeginAPage;
@@ -82,6 +101,8 @@ namespace synthese
 			uid						_bookId;
 			int						_rank;
 			bool					_isBook;
+			Format					_format;
+			const interfaces::Interface*	_interface;
 
 		public:
 			// Constructeur
@@ -97,6 +118,8 @@ namespace synthese
 				void setBookId(uid id);
 				void setRank(int value);
 				void setIsBook(bool value);
+				void setFormat(Format value);
+				void setInterface(const interfaces::Interface* value);
 			//@}
 
 			//! @name Modifiers
@@ -113,6 +136,8 @@ namespace synthese
 				uid						getBookId()				const;
 				int						getRank()				const;
 				bool					getIsBook()				const;
+				Format					getFormat()				const;
+				const interfaces::Interface* getInterface()		const;
 			//@}
 
 			//! @name Queries
@@ -135,6 +160,10 @@ namespace synthese
 				std::auto_ptr<TimetableGenerator> getGenerator(
 					const util::Env& env
 				)	const;
+
+				void generate(
+					std::ostream& stream
+				);
 			//@}
 		};
 	}

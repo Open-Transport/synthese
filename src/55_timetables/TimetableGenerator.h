@@ -103,6 +103,7 @@ namespace synthese
 				const calendar::Calendar& getBaseCalendar() const;
 				const Warnings&	getWarnings()	const;
 				const Rows&		getRows()		const;
+				const Columns&	getColumns()	const;
 			//@}
 
 			//! @name Actions

@@ -17,6 +17,7 @@
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
+#include "PTImportAdmin.h"
 
 // Registries
 

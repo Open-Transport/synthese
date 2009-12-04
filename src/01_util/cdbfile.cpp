@@ -516,6 +516,12 @@ void CDBFile::SortOn(unsigned short Criterium1/* , unsigned short Criterium2*/)
 
 
 
+		std::string CDBFile::getText( Record& Rec, const std::string& fieldName )
+		{
+			return(getText(&Rec,FirstField->GetField(fieldName)));
+		}
+
+
 		// Overloaded, public versions of GetFieldValue. :
 		void* CDBFile::GetFieldValue(const string& Field)
 		{return GetFieldValue(CurrentRec,FirstField->GetField(Field));}

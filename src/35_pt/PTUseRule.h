@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace time
+	{
+		class Hour;
+	}
+
 	namespace env
 	{
 		class Fare;
@@ -134,7 +139,7 @@ namespace synthese
 			
 			//! @name Setters
 			//@{
-				void setHourDeadLine (const synthese::time::Hour& hourDeadLine);
+				void setHourDeadLine (const time::Hour& hourDeadLine);
 				void setMinDelayMinutes (int minDelayMinutes);
 				void setMinDelayDays (int minDelayDays);
 				void setMaxDelayDays (const boost::optional<std::size_t> maxDelayDays);

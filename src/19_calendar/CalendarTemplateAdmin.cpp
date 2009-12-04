@@ -252,6 +252,11 @@ namespace synthese
 				CalendarHTMLViewer v(result);
 				v.display(stream);
 			}
+
+
+			////////////////////////////////////////////////////////////////////
+			/// END TABS
+			closeTabContent(stream);
 		}
 
 		bool CalendarTemplateAdmin::isAuthorized(

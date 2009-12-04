@@ -31,6 +31,8 @@
 #include "TimetableTableSync.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
+#include "Interface.h"
+#include "InterfaceTableSync.h"
 
 using namespace std;
 
@@ -40,6 +42,7 @@ namespace synthese
 	using namespace security;
 	using namespace calendar;
 	using namespace util;
+	using namespace interfaces;
 	
 	namespace util
 	{
@@ -52,6 +55,8 @@ namespace synthese
 		const string TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID = Action_PARAMETER_PREFIX + "ci";
 		const string TimetableUpdateAction::PARAMETER_MUST_BEGIN_A_PAGE = Action_PARAMETER_PREFIX + "mb";
 		const string TimetableUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
+		const string TimetableUpdateAction::PARAMETER_FORMAT = Action_PARAMETER_PREFIX + "fo";
+		const string TimetableUpdateAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "ii";
 		
 		
 		
@@ -85,17 +90,33 @@ namespace synthese
 				throw ActionException("No such timetable");
 			}
 
-			try
+			if(map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID) > 0)
 			{
-				_calendarTemplate = CalendarTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID), *_env);
+				try
+				{
+					_calendarTemplate = CalendarTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID), *_env);
+				}
+				catch (ObjectNotFoundException<CalendarTemplate>)
+				{
+					throw ActionException("No such calendar");
+				}
 			}
-			catch (ObjectNotFoundException<CalendarTemplate>)
+
+			if(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID) > 0)
 			{
-				throw ActionException("No such calendar");
+				try
+				{
+					_interface = InterfaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID), *_env);
+				}
+				catch (ObjectNotFoundException<CalendarTemplate>)
+				{
+					throw ActionException("No such interface");
+				}
 			}
 
 			_mustBeginAPage = map.getDefault<bool>(PARAMETER_MUST_BEGIN_A_PAGE, false);
 			_title = map.get<string>(PARAMETER_TITLE);
+			_format = static_cast<Timetable::Format>(map.get<int>(PARAMETER_FORMAT));
 		}
 		
 		
@@ -105,6 +126,8 @@ namespace synthese
 			_timetable->setBaseCalendar(_calendarTemplate.get());
 			_timetable->setMustBeginAPage(_mustBeginAPage);
 			_timetable->setTitle(_title);
+			_timetable->setInterface(_interface.get());
+			_timetable->setFormat(_format);
 
 			TimetableTableSync::Save(_timetable.get());
 		}

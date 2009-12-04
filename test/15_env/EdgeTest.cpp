@@ -20,12 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Line.h"
-#include "15_env/LineStop.h"
-#include "15_env/Path.h"
-#include "15_env/ConnectionPlace.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
+#include "Line.h"
+#include "LineStop.h"
+#include "Path.h"
+#include "Hub.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PhysicalStop.h"
 
 #include "01_util/Constants.h"
 
@@ -42,14 +42,14 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 
 	Line l;
 
-	PublicTransportStopZoneConnectionPlace p1(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_LINELINE);
-	PublicTransportStopZoneConnectionPlace p2(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
-	PublicTransportStopZoneConnectionPlace p3(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
-	PublicTransportStopZoneConnectionPlace p4(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
-	PublicTransportStopZoneConnectionPlace p5(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_LINELINE);
-	PublicTransportStopZoneConnectionPlace p6(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_LINELINE);
-	PublicTransportStopZoneConnectionPlace p7(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
-	PublicTransportStopZoneConnectionPlace p8(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
+	PublicTransportStopZoneConnectionPlace p1(UNKNOWN_VALUE, true);
+	PublicTransportStopZoneConnectionPlace p2(UNKNOWN_VALUE, false);
+	PublicTransportStopZoneConnectionPlace p3(UNKNOWN_VALUE, false);
+	PublicTransportStopZoneConnectionPlace p4(UNKNOWN_VALUE, false);
+	PublicTransportStopZoneConnectionPlace p5(UNKNOWN_VALUE, true);
+	PublicTransportStopZoneConnectionPlace p6(UNKNOWN_VALUE, true);
+	PublicTransportStopZoneConnectionPlace p7(UNKNOWN_VALUE, false);
+	PublicTransportStopZoneConnectionPlace p8(UNKNOWN_VALUE, false);
 
 	PhysicalStop s1(UNKNOWN_VALUE, "s1", &p1);
 	PhysicalStop s2(UNKNOWN_VALUE, "s1", &p2);
@@ -237,49 +237,41 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 	BOOST_CHECK_EQUAL (edges[6], &l7AD);
 	BOOST_CHECK_EQUAL (edges[7], &l8A);
 
-	BOOST_CHECK_EQUAL (l1D.getNextInPath(), &l2D);
 	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
 	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l2D.getNextInPath(), &l3AD);
 	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
 	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l3AD.getNextInPath(), &l4A);
 	BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
 	BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l4A.getNextInPath(), &l5D);
 	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
 	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l5D.getNextInPath(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l6AD.getNextInPath(), &l7AD);
 	BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l7AD);
 	BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
 	BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
 
-	BOOST_CHECK_EQUAL (l7AD.getNextInPath(), &l8A);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), &l8A);
 	BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l6AD);
 	BOOST_CHECK_EQUAL (l7AD.getPreviousDepartureForFineSteppingOnly(), &l6AD);
 
-	BOOST_CHECK_EQUAL (l8A.getNextInPath(), lNULL);
 	BOOST_CHECK_EQUAL (l8A.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l8A.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l8A.getPreviousConnectionDeparture(), &l6AD);
@@ -294,14 +286,14 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 
 	Line l;
 
-	PublicTransportStopZoneConnectionPlace p1(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_LINELINE);
-	PublicTransportStopZoneConnectionPlace p2(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
-	PublicTransportStopZoneConnectionPlace p3(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
-	PublicTransportStopZoneConnectionPlace p4(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
-	PublicTransportStopZoneConnectionPlace p5(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_LINELINE);
-	PublicTransportStopZoneConnectionPlace p6(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_LINELINE);
-	PublicTransportStopZoneConnectionPlace p7(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
-	PublicTransportStopZoneConnectionPlace p8(UNKNOWN_VALUE, "p1", NULL, ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
+	PublicTransportStopZoneConnectionPlace p1(UNKNOWN_VALUE, true);
+	PublicTransportStopZoneConnectionPlace p2(UNKNOWN_VALUE, false);
+	PublicTransportStopZoneConnectionPlace p3(UNKNOWN_VALUE, false);
+	PublicTransportStopZoneConnectionPlace p4(UNKNOWN_VALUE, false);
+	PublicTransportStopZoneConnectionPlace p5(UNKNOWN_VALUE, true);
+	PublicTransportStopZoneConnectionPlace p6(UNKNOWN_VALUE, true);
+	PublicTransportStopZoneConnectionPlace p7(UNKNOWN_VALUE, false);
+	PublicTransportStopZoneConnectionPlace p8(UNKNOWN_VALUE, false);
 
 	PhysicalStop s1(UNKNOWN_VALUE, "s1", &p1);
 	PhysicalStop s2(UNKNOWN_VALUE, "s1", &p2);
@@ -327,7 +319,6 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 	Line::Edges edges = l.getEdges();
 	BOOST_CHECK_EQUAL (edges[0], &l4A);
 
-	BOOST_CHECK_EQUAL (l4A.getNextInPath(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), lNULL);
@@ -339,13 +330,11 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 	BOOST_CHECK_EQUAL (edges[0], &l2D);
 	BOOST_CHECK_EQUAL (edges[1], &l4A);
 
-	BOOST_CHECK_EQUAL (l2D.getNextInPath(), &l4A);
 	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l4A);
 	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l4A.getNextInPath(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), lNULL);
@@ -358,19 +347,16 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 	BOOST_CHECK_EQUAL (edges[1], &l4A);
 	BOOST_CHECK_EQUAL (edges[2], &l7AD);
 
-	BOOST_CHECK_EQUAL (l2D.getNextInPath(), &l4A);
 	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l4A);
 	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l4A.getNextInPath(), &l7AD);
 	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l7AD);
 	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l7AD.getNextInPath(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), lNULL);
@@ -384,25 +370,21 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 	BOOST_CHECK_EQUAL (edges[2], &l5D);
 	BOOST_CHECK_EQUAL (edges[3], &l7AD);
 
-	BOOST_CHECK_EQUAL (l2D.getNextInPath(), &l4A);
 	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l4A);
 	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l4A.getNextInPath(), &l5D);
 	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l7AD);
 	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l5D.getNextInPath(), &l7AD);
 	BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l7AD);
 	BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l7AD.getNextInPath(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l5D);
@@ -417,31 +399,26 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 	BOOST_CHECK_EQUAL (edges[3], &l6AD);
 	BOOST_CHECK_EQUAL (edges[4], &l7AD);
 
-	BOOST_CHECK_EQUAL (l2D.getNextInPath(), &l4A);
 	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l4A);
 	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l4A.getNextInPath(), &l5D);
 	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
 	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l5D.getNextInPath(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l6AD.getNextInPath(), &l7AD);
 	BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l7AD);
 	BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
 	BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
 
-	BOOST_CHECK_EQUAL (l7AD.getNextInPath(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l6AD);
@@ -461,49 +438,41 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 	BOOST_CHECK_EQUAL (edges[6], &l7AD);
 	BOOST_CHECK_EQUAL (edges[7], &l8A);
 
-	BOOST_CHECK_EQUAL (l1D.getNextInPath(), &l2D);
 	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
 	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l2D.getNextInPath(), &l3AD);
 	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
 	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l3AD.getNextInPath(), &l4A);
 	BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
 	BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l4A.getNextInPath(), &l5D);
 	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
 	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l5D.getNextInPath(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
 	BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l6AD.getNextInPath(), &l7AD);
 	BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l7AD);
 	BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
 	BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
 
-	BOOST_CHECK_EQUAL (l7AD.getNextInPath(), &l8A);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), &l8A);
 	BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l6AD);
 	BOOST_CHECK_EQUAL (l7AD.getPreviousDepartureForFineSteppingOnly(), &l6AD);
 
-	BOOST_CHECK_EQUAL (l8A.getNextInPath(), lNULL);
 	BOOST_CHECK_EQUAL (l8A.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l8A.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l8A.getPreviousConnectionDeparture(), &l6AD);

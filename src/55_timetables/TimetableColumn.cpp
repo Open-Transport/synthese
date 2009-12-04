@@ -69,11 +69,13 @@ namespace synthese
 							|| (*itEdge2)->isArrival() == itRow->getIsArrival()
 						)
 					){
-						_timeContent.push_back(
-							((*itEdge2)->isDeparture() == itRow->getIsDeparture())
-							? service.getDepartureBeginScheduleToIndex(false, itEdge2 - edges.begin())
-							: service.getArrivalBeginScheduleToIndex(false, itEdge2 - edges.begin())
-						);
+						_content.push_back(
+							make_pair(
+								dynamic_cast<const PhysicalStop*>((*itEdge2)->getFromVertex()),
+								((*itEdge2)->isDeparture() == itRow->getIsDeparture()) ?
+									service.getDepartureBeginScheduleToIndex(false, itEdge2 - edges.begin()) :
+									service.getArrivalBeginScheduleToIndex(false, itEdge2 - edges.begin())
+						)	);
 						if (itEdge2 == edges.begin())
 							_originType = Terminus;
 						if (itEdge2 == edges.end() - 1)
@@ -84,7 +86,7 @@ namespace synthese
 				}
 				if (itEdge2 == edges.end())
 				{
-					_timeContent.push_back(Schedule());
+					_content.push_back(make_pair<const PhysicalStop*, Schedule>(NULL, Schedule()));
 				}
 			}
 		}
@@ -93,41 +95,43 @@ namespace synthese
 
 		int TimetableColumn::operator<=( const TimetableColumn& other) const
 		{
-			assert(_timeContent.size() == other._timeContent.size());
+			assert(_content.size() == other._content.size());
 
-			int rowsNumber(_timeContent.size());
-			int i;
-			int j;
+			size_t rowsNumber(_content.size());
+			size_t i;
+			size_t j;
 
 			// Tentative par ligne commune
 			for (i=0; i<rowsNumber; ++i)
 			{
-				if (!_timeContent[i].getHour().isUnknown() && !other._timeContent[i].getHour().isUnknown())
+				if (!_content[i].second.getHour().isUnknown() && !other._content[i].second.getHour().isUnknown())
 				{
-					if (_timeContent[i] < other._timeContent[i])
+					if (_content[i].second < other._content[i].second)
 						return true;
-					if (other._timeContent[i] < _timeContent[i])
+					if (other._content[i].second < _content[i].second)
 						return false;
 				}
 			}
 
 			// Tentative par succession 1
-			for (int i=0; i< rowsNumber; ++i)
+			for (i=0; i< rowsNumber; ++i)
 			{
-				if (!_timeContent[i].getHour().isUnknown())
+				if (!_content[i].second.getHour().isUnknown())
 				{
 					for(j = i+1; j< rowsNumber; ++j)
 					{
-						if(	!other._timeContent[j].getHour().isUnknown()
-						&& other._timeContent[j] < _timeContent[i]
-						)	return false;
+						if(	!other._content[j].second.getHour().isUnknown() &&
+							other._content[j].second < _content[i].second
+						){
+							return false;
+						}
 						
 						if (i != 0)
 						{
-							for(int k = i-1; k>0; --k)
+							for(size_t k = i-1; k>0; --k)
 							{
-								if(	!other._timeContent[k].getHour().isUnknown()
-								&&	_timeContent[i] < other._timeContent[k]
+								if(	!other._content[k].second.getHour().isUnknown() &&
+									_content[i].second < other._content[k].second
 								)	return true;
 							}
 						}
@@ -137,12 +141,12 @@ namespace synthese
 
 			// Premiere heure
 			for (i=0; i< rowsNumber; ++i)
-				if (!_timeContent[i].getHour().isUnknown())
+				if (!_content[i].second.getHour().isUnknown())
 					break;
 			for (j=0; j< rowsNumber; ++j)
-				if (!other._timeContent[j].getHour().isUnknown())
+				if (!other._content[j].second.getHour().isUnknown())
 					break;
-			return _timeContent[i] < other._timeContent[j];
+			return _content[i].second < other._content[j].second;
 		}
 
 
@@ -167,10 +171,10 @@ namespace synthese
 
 		bool TimetableColumn::operator==( const TimetableColumn& op ) const
 		{
-			assert(op._timeContent.size() == _timeContent.size());
+			assert(op._content.size() == _content.size());
 
 			return _line->getCommercialLine() == op._line->getCommercialLine()
-				&& _timeContent == op._timeContent;
+				&& _content == op._content;
 		}
 
 
@@ -189,9 +193,9 @@ namespace synthese
 
 
 
-		const vector<time::Schedule>& TimetableColumn::getContent() const
+		const TimetableColumn::Content& TimetableColumn::getContent() const
 		{
-			return _timeContent;
+			return _content;
 		}
 
 

@@ -22,6 +22,8 @@
 
 #include "TimetableWarning.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace calendar;
@@ -30,10 +32,13 @@ namespace synthese
 	{
 		TimetableWarning::TimetableWarning(
 			const Calendar& calendar,
-			int number
+			size_t number,
+			const string& text
 		):	_calendar(calendar),
-			_number(number)
-		{		}
+			_number(number),
+			_text(text)
+		{
+		}
 
 
 
@@ -47,6 +52,13 @@ namespace synthese
 		const Calendar& TimetableWarning::getCalendar() const
 		{
 			return _calendar;
+		}
+
+
+
+		const std::string& TimetableWarning::getText() const
+		{
+			return _text;
 		}
 	}
 }

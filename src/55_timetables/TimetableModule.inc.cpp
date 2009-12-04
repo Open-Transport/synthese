@@ -9,6 +9,14 @@
 #include "TimetableAddAction.h"
 #include "TimetableRowAddAction.h"
 #include "TimetableUpdateAction.h"
+#include "TimetableRowDeleteAction.h"
+
+#include "TimetableInterfacePage.h"
+#include "TimetableNoteInterfacePage.h"
+#include "TimetableServiceRowInterfacePage.h"
+#include "TimetableServiceRowCellInterfacePage.h"
+
+#include "TimetableGenerateFunction.h"
 
 #include "TimetableRight.h"
 

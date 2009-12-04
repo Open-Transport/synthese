@@ -126,79 +126,96 @@ namespace synthese
 		class CDBFile
 		{
 		private :
+			char PathName[256];			// Path name for the dBase III file 
+			FILE *FileHandle;			// Handler for the dBase III file 
+			unsigned short HeaderSize;	// Length of header structure 
+			unsigned short FieldCount;	// Number of fields in each record 
+			unsigned long RecordCount;	// Number of records in the file 
+			bool ModifiedFlag;			// Indicates whether the data has been modified 
+			bool FullFileInMemory;		// Indicates whether the entire file is loaded 
+			unsigned short RecordLength;	// Length of the record strings 
 
-		char PathName[256];			// Path name for the dBase III file 
-		FILE *FileHandle;			// Handler for the dBase III file 
-		unsigned short HeaderSize;	// Length of header structure 
-		unsigned short FieldCount;	// Number of fields in each record 
-		unsigned long RecordCount;	// Number of records in the file 
-		bool ModifiedFlag;			// Indicates whether the data has been modified 
-		bool FullFileInMemory;		// Indicates whether the entire file is loaded 
-		unsigned short RecordLength;	// Length of the record strings 
-
-		Record* RecordList;	// Head of the list of records 
-		Record*	CurrentRec;	// Current record pointed in the list
-		CField* FirstField;	// Head of the list of fields 
+			Record* RecordList;	// Head of the list of records 
+			Record*	CurrentRec;	// Current record pointed in the list
+			CField* FirstField;	// Head of the list of fields 
 
 		public:
 
-		CDBFile();
-		~CDBFile();
-		bool IsOpen()	{ return FileHandle!=NULL; }
-		bool Clean();
-		bool OpenFile(const char* Path);
-		bool CloseFile();
-		unsigned long LoadFileToMemory();
-		unsigned long WriteAllToFile(char *Path=NULL);
-		unsigned long WriteModified();
-		void SortOn(unsigned short Criterium1/*, unsigned short Criterium2*/);
-		void* GetFieldValue(const std::string& Field);
-		void* GetFieldValue(unsigned short FieldNum);
-		std::string getText(const std::string& field);
-		void GetAtRecord(unsigned long RecordNum) { CurrentRec=GetRecord(RecordNum); }
-		unsigned long GetRecordNum() {	if (CurrentRec) 
-											return CurrentRec->RecordNumber;
-										else return 0L;}
-		bool GetNextRecord()	  { if (CurrentRec) { CurrentRec=CurrentRec->Next; return true;}
-									else return false; }
-		bool GetPreviousRecord()  { if (CurrentRec) { CurrentRec=CurrentRec->Previous; return true;}
-									else return false; }
-		void LoadRecord(unsigned long RecordNum)  { CurrentRec=ReadRecord(RecordNum);
-															 Append(CurrentRec); }
-		void DeleteCurrentRec()		{ DeleteRecord(CurrentRec);}
-		void CreateAndAppend()		{ CurrentRec=CreateNewRecord();
-										Append(CurrentRec);}	
-		void ClearAllRecords();		
-		//void AddField(CField* NewField);  /* NOT IMPLEMENTED YET. Any volunteers ? */
-		void SetFieldValue(char* Field, void* Value);
-		void SetFieldValue(unsigned short FieldNum, void* Value);
-		void DumpCurrentContents(int i, char* String);
-		unsigned char GetFieldDecCount(unsigned short NumField)
-				{ return (FirstField->GetField(NumField))->GetDecCount(); } 
-		char GetFieldType(unsigned short NumField) 
-				{ return (FirstField->GetField(NumField))->GetType(); } 
-		unsigned short GetFieldCount()	{ return FieldCount; }
-		unsigned long GetRecordCount()	{ return RecordCount; }
-		void DeleteVoidPointer(void* Pointer, unsigned short Field);
-		void DeleteVoidPointer(void* Pointer, char* Field);
+			CDBFile();
+			~CDBFile();
+
+			//! @name Handling the file
+			//@{
+				bool IsOpen()	{ return FileHandle!=NULL; }
+				bool Clean();
+				bool OpenFile(const char* Path);
+				bool CloseFile();
+			//@}
+
+			//! @name Getters
+			//@{
+				unsigned short GetFieldCount()	{ return FieldCount; }
+				unsigned long GetRecordCount()	{ return RecordCount; }
+			//@}
+
+
+			//! @name Methods with pre-load of all the data
+			//@{
+				unsigned long LoadFileToMemory();
+				unsigned long WriteAllToFile(char *Path=NULL);
+				unsigned long WriteModified();
+				void SortOn(unsigned short Criterium1/*, unsigned short Criterium2*/);
+				void* GetFieldValue(const std::string& Field);
+				void* GetFieldValue(unsigned short FieldNum);
+				std::string getText(const std::string& field);
+				void GetAtRecord(unsigned long RecordNum) { CurrentRec=GetRecord(RecordNum); }
+				unsigned long GetRecordNum() {	if (CurrentRec) 
+													return CurrentRec->RecordNumber;
+												else return 0L;}
+				bool GetNextRecord()	  { if (CurrentRec) { CurrentRec=CurrentRec->Next; return true;}
+											else return false; }
+				bool GetPreviousRecord()  { if (CurrentRec) { CurrentRec=CurrentRec->Previous; return true;}
+											else return false; }
+				void LoadRecord(unsigned long RecordNum)  { CurrentRec=ReadRecord(RecordNum);
+																	 Append(CurrentRec); }
+				void DeleteCurrentRec()		{ DeleteRecord(CurrentRec);}
+				void CreateAndAppend()		{ CurrentRec=CreateNewRecord();
+												Append(CurrentRec);}	
+				void ClearAllRecords();		
+				//void AddField(CField* NewField);  /* NOT IMPLEMENTED YET. Any volunteers ? */
+				void SetFieldValue(char* Field, void* Value);
+				void SetFieldValue(unsigned short FieldNum, void* Value);
+				void DumpCurrentContents(int i, char* String);
+				unsigned char GetFieldDecCount(unsigned short NumField)
+						{ return (FirstField->GetField(NumField))->GetDecCount(); } 
+				char GetFieldType(unsigned short NumField) 
+						{ return (FirstField->GetField(NumField))->GetType(); } 
+				void DeleteVoidPointer(void* Pointer, unsigned short Field);
+				void DeleteVoidPointer(void* Pointer, char* Field);
+			//@}
+
+			//! @name Direct access
+			//@{
+				Record* ReadRecord(unsigned long RecNum);
+				std::string getText(Record& Rec, const std::string& fieldName);
+			//@}
 
 		private:
-		bool WriteRecord(Record* Current, unsigned long RecNum);
-		bool Swap(Record* Rec1, Record* Rec2);
-		bool IsBigger(void *v1, void *v2, CField* Criterium);
-		bool IsSmaller(void *v1, void *v2, CField* Criterium);
-		Record* ReadRecord(unsigned long RecNum);
-		Record* CreateNewRecord();
-		Record* GetRecord(unsigned long RecordNum);
-		void Append(Record* Rec, Record* Tail=NULL);
-		void* GetFieldValue(Record* Rec, CField* Field);
-		std::string getText(Record* Rec, CField* Field);
-		void SetFieldValue(Record* Rec, CField* Field, void* Value);
-		void DeleteRecord(Record *Rec);
-		void SortAllRecords(Record *Head, Record *Tail,
-								 CField* Criter1/*,CField* Criter2*/);
-		bool WriteHeader(char* Path=NULL);
-		void DeleteVoidPointer(void* Pointer, CField* Field);
+			std::string getText(Record* Rec, CField* Field);
+			bool WriteRecord(Record* Current, unsigned long RecNum);
+			bool Swap(Record* Rec1, Record* Rec2);
+			bool IsBigger(void *v1, void *v2, CField* Criterium);
+			bool IsSmaller(void *v1, void *v2, CField* Criterium);
+			Record* CreateNewRecord();
+			void Append(Record* Rec, Record* Tail=NULL);
+			void* GetFieldValue(Record* Rec, CField* Field);
+			void SetFieldValue(Record* Rec, CField* Field, void* Value);
+			Record* GetRecord(unsigned long RecordNum);
+			void DeleteRecord(Record *Rec);
+			void SortAllRecords(Record *Head, Record *Tail,
+									 CField* Criter1/*,CField* Criter2*/);
+			bool WriteHeader(char* Path=NULL);
+			void DeleteVoidPointer(void* Pointer, CField* Field);
 
 		};
 	}

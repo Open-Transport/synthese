@@ -3,5 +3,5 @@ Import ('s3env')
 CppTestProject(
 	s3env, 's3-env-test', s3env['S3VERSION'],
 	source_files = s3env.Glob ('*Test.cpp'),
-	dependencies = ['s3-env.cpplib']
+	dependencies = ['s3-env.cpplib','s3-security.cpplib']
 )

@@ -159,7 +159,7 @@ namespace synthese
 			if (exactName)
 			 	query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(*exactName);
 			if (likeName)
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*exactName);
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*likeName);
 			if (cityId)
 				query << " AND " << COL_CITYID << "=" <<*cityId;
 			if (orderByName)
@@ -182,7 +182,7 @@ namespace synthese
 		){
 			Env tenv;
 			SearchResult roadPlaces(
-				Search(tenv, cityId, optional<string>(), name, 0, 1, false, false, FIELDS_ONLY_LOAD_LEVEL)
+				Search(tenv, cityId, name, optional<string>(), 0, 1, false, false, FIELDS_ONLY_LOAD_LEVEL)
 			);
 			if(roadPlaces.empty()) return shared_ptr<RoadPlace>();
 			shared_ptr<RoadPlace> result(roadPlaces.front());

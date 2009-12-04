@@ -46,8 +46,9 @@ namespace synthese
 		{
 		private:
 			// Variables
-			int				_number;
+			std::size_t				_number;
 			calendar::Calendar	_calendar;
+			std::string		_text;
 
 		public:
 			/** Constructor.
@@ -56,14 +57,19 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008				
 			*/
-			TimetableWarning(const calendar::Calendar& calendar, int number);
+			TimetableWarning(
+				const calendar::Calendar& calendar,
+				std::size_t number,
+				const std::string& text
+			);
 
 		
 
 			//! @name Getters
 			//@{
-				size_t					getNumber()			const;
+				std::size_t					getNumber()			const;
 				const calendar::Calendar&	getCalendar()		const;
+				const std::string& getText() const;
 			//@}
 		};
 	}

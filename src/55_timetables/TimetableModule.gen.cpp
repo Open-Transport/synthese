@@ -13,8 +13,16 @@ synthese::timetables::TimetableBookAdmin::integrate();
 synthese::timetables::TimetableAddAction::integrate();
 synthese::timetables::TimetableRowAddAction::integrate();
 synthese::timetables::TimetableUpdateAction::integrate();
+synthese::timetables::TimetableRowDeleteAction::integrate();
 
 synthese::timetables::TimetableRight::integrate();
+
+synthese::timetables::TimetableInterfacePage::integrate();
+synthese::timetables::TimetableNoteInterfacePage::integrate();
+synthese::timetables::TimetableServiceRowInterfacePage::integrate();
+synthese::timetables::TimetableServiceRowCellInterfacePage::integrate();
+
+synthese::timetables::TimetableGenerateFunction::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::timetables::TimetableRow>();

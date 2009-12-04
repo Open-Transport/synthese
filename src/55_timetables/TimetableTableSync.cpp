@@ -29,11 +29,11 @@
 #include "TimetableRow.h"
 #include "TimetableRowTableSync.h"
 #include "CalendarTemplate.h"
-#include "CalendarTemplateTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
+#include "Interface.h"
 
 #include "01_util/Conversion.h"
 
@@ -46,6 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace timetables;
 	using namespace calendar;
+	using namespace interfaces;
 
 	namespace util
 	{
@@ -61,6 +62,8 @@ namespace synthese
 		const std::string TimetableTableSync::COL_MUST_BEGIN_A_PAGE("must_begin_a_page");
 		const std::string TimetableTableSync::COL_CALENDAR_ID("calendar_id");
 		const std::string TimetableTableSync::COL_IS_BOOK("is_book");
+		const std::string TimetableTableSync::COL_FORMAT("format");
+		const std::string TimetableTableSync::COL_INTERFACE_ID("interface_id");
 	}
 	
 	namespace db
@@ -81,6 +84,8 @@ namespace synthese
 			SQLiteTableSync::Field(TimetableTableSync::COL_MUST_BEGIN_A_PAGE, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_IS_BOOK, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_INTERFACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -113,32 +118,46 @@ namespace synthese
 			object->setMustBeginAPage(rows->getBool(TimetableTableSync::COL_MUST_BEGIN_A_PAGE));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
 			object->setIsBook(rows->getBool(TimetableTableSync::COL_IS_BOOK));
+			object->setFormat(static_cast<Timetable::Format>(rows->getInt(TimetableTableSync::COL_FORMAT)));
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				{
 					TimetableRowTableSync::SearchResult rows(
 						TimetableRowTableSync::Search(env, object->getKey())
-						);
+					);
 					BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
 					{
 						object->addRow(*row);
 					}
 				}
 
-				try
+				if(rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID) > 0)
 				{
-					object->setBaseCalendar(
-						CalendarTemplateTableSync::Get(
-							rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID),
-							env,
-							UP_LINKS_LOAD_LEVEL
-						).get()
-					);
+					try
+					{
+						object->setBaseCalendar(
+							Env::GetOfficialEnv().get<CalendarTemplate>(rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID)).get()
+						);
+					}
+					catch(ObjectNotFoundException<CalendarTemplate>)
+					{
+						Log::GetInstance().warn("Error in timetable definition : no such calendar template");
+					}
 				}
-				catch(ObjectNotFoundException<CalendarTemplate>)
+
+				if(rows->getLongLong(TimetableTableSync::COL_INTERFACE_ID) > 0)
 				{
-					Log::GetInstance().warn("Error in timetable definition : no such calendar template");
+					try
+					{
+						object->setInterface(
+							Env::GetOfficialEnv().get<Interface>(rows->getLongLong(TimetableTableSync::COL_INTERFACE_ID)).get()
+						);
+					}
+					catch (ObjectNotFoundException<Interface> e)
+					{
+						Log::GetInstance().warn("Error in timetable definition : no such interface");
+					}
 				}
 			}
 		}
@@ -162,6 +181,8 @@ namespace synthese
 				<< "," << object->getMustBeginAPage()
 				<< "," << (object->getBaseCalendar() ? object->getBaseCalendar()->getKey() : RegistryKeyType(0))
 				<< "," << object->getIsBook()
+				<< "," << static_cast<int>(object->getFormat())
+				<< "," << (object->getInterface() ? object->getInterface()->getKey() : RegistryKeyType(0))
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -236,7 +257,7 @@ namespace synthese
 				<< "UPDATE " << TABLE.NAME
 				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
 				<< " WHERE " << COL_BOOK_ID << "=" << bookId
-				<< " AND " << COL_RANK << ((delta > 0) ? ">=" : "<=") << rank
+				<< " AND " << COL_RANK << ">=" << rank
 				;
 
 			sqlite->execUpdate(query.str());

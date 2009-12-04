@@ -60,10 +60,10 @@ namespace synthese
 			if (!_include)
 			{
 				date minDate(_minDate);
-				if(minDate.is_not_a_date() || minDate < mask.getFirstActiveDate())
+				if(minDate.is_neg_infinity())
 					minDate = mask.getFirstActiveDate();
 				date maxDate(_maxDate);
-				if (maxDate.is_not_a_date() || maxDate > mask.getLastActiveDate())
+				if (maxDate > mask.getLastActiveDate())
 					maxDate = mask.getLastActiveDate();
 
 				for (date d = minDate; d <= maxDate; d += _interval)
@@ -74,10 +74,10 @@ namespace synthese
 			{
 				Calendar included(_include->getResult(mask));
 				date minDate(_minDate);
-				if(minDate.is_not_a_date() || minDate < mask.getFirstActiveDate())
+				if(minDate.is_neg_infinity())
 					minDate = mask.getFirstActiveDate();
 				date maxDate(_maxDate);
-				if (maxDate.is_not_a_date() || maxDate > mask.getLastActiveDate())
+				if (maxDate > mask.getLastActiveDate())
 					maxDate = mask.getLastActiveDate();
 
 				for (date d = minDate; d <= maxDate; d += _interval)

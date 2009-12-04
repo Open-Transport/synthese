@@ -27,6 +27,7 @@
 #include "NonPermanentService.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "Env.h"
+#include "CalendarModule.h"
 
 #include <boost/foreach.hpp>
 
@@ -149,7 +150,14 @@ namespace synthese
 				
 				if (warn == NULL)
 				{
-					warn = &_warnings.insert(make_pair(nextNumber, TimetableWarning(itCol->getCalendar(), nextNumber))).first->second;
+					warn = &_warnings.insert(
+						make_pair(
+							nextNumber,
+							TimetableWarning(
+								itCol->getCalendar(),
+								nextNumber,
+								CalendarModule::GetBestCalendarTitle(itCol->getCalendar(), _baseCalendar)
+					)	)	).first->second;
 					++nextNumber;
 				}
 				
@@ -246,8 +254,8 @@ namespace synthese
 			vector<Schedule> result;
 			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
 			{
-				vector<Schedule> content(it->getContent());
-				result.push_back(*(content.begin() + delta));
+				const TimetableColumn::Content& content(it->getContent());
+				result.push_back((content.begin() + delta)->second);
 			}
 			return result;
 		}
@@ -305,6 +313,13 @@ namespace synthese
 		const calendar::Calendar& TimetableGenerator::getBaseCalendar() const
 		{
 			return _baseCalendar;
+		}
+
+
+
+		const TimetableGenerator::Columns& TimetableGenerator::getColumns() const
+		{
+			return _columns;
 		}
 	}
 }

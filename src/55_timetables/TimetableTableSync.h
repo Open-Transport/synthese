@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -50,6 +50,8 @@ namespace synthese
 			static const std::string COL_MUST_BEGIN_A_PAGE;
 			static const std::string COL_CALENDAR_ID;
 			static const std::string COL_IS_BOOK;
+			static const std::string COL_FORMAT;
+			static const std::string COL_INTERFACE_ID;
 			
 			TimetableTableSync();
 
