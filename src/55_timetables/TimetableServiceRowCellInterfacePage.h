@@ -39,6 +39,7 @@ namespace synthese
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
+		class RollingStock;
 	}
 
 	namespace timetables
@@ -57,6 +58,7 @@ namespace synthese
 				- 3 : City name
 				- 4 : Stop alias
 				- 5 : Rank
+				- 6 : Rolling stock ID
 
 			Object : Cell
 		*/
@@ -74,6 +76,7 @@ namespace synthese
 			void display(
 				std::ostream& stream,
 				const TimetableColumn::Content::value_type& object,
+				const env::RollingStock* rollingStock,
 				std::size_t rank,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL

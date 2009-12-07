@@ -125,7 +125,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Save(
-			NonConcurrencyRule* object
+			NonConcurrencyRule* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -139,7 +140,7 @@ namespace synthese
 				object->getHiddenLine()->getKey() << "," <<
 				object->getDelay().minutes() <<
 			")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

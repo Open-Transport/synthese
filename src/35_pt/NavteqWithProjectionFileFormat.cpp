@@ -38,6 +38,9 @@
 #include "City.h"
 #include "CityTableSync.h"
 #include "Crossing.h"
+#include "shapefil.h"
+#include "GeoPoint.h"
+#include "SQLiteTransaction.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -45,15 +48,17 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::filesystem;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace impex;
 	using namespace pt;
-	using namespace road;	
+	using namespace road;
 	using namespace env;
 	using namespace geography;
+	using namespace db;
 	
 
 	namespace util
@@ -117,40 +122,42 @@ namespace synthese
 
 		void NavteqWithProjectionFileFormat::save(std::ostream& os
 		) const {
+			SQLiteTransaction transaction;
 			BOOST_FOREACH(Registry<Address>::value_type address, _env->getEditableRegistry<Address>())
 			{
-				AddressTableSync::Save(address.second.get());
+				AddressTableSync::Save(address.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<PublicTransportStopZoneConnectionPlace>::value_type stop, _env->getEditableRegistry<PublicTransportStopZoneConnectionPlace>())
 			{
-				ConnectionPlaceTableSync::Save(stop.second.get());
+				ConnectionPlaceTableSync::Save(stop.second.get(),transaction);
 			}
 			BOOST_FOREACH(Registry<RoadPlace>::value_type roadplace, _env->getEditableRegistry<RoadPlace>())
 			{
-				RoadPlaceTableSync::Save(roadplace.second.get());
+				RoadPlaceTableSync::Save(roadplace.second.get(),transaction);
 			}
 			BOOST_FOREACH(Registry<Road>::value_type road, _env->getEditableRegistry<Road>())
 			{
-				RoadTableSync::Save(road.second.get());
+				RoadTableSync::Save(road.second.get(),transaction);
 			}
 			BOOST_FOREACH(Registry<RoadChunk>::value_type roadChunk, _env->getEditableRegistry<RoadChunk>())
 			{
- 				RoadChunkTableSync::Save(roadChunk.second.get());
+ 				RoadChunkTableSync::Save(roadChunk.second.get(),transaction);
 			}
+			transaction.run();
 		}
 
 
 		void NavteqWithProjectionFileFormat::_parse(
-			const std::string& path,
+			const path& filePath,
 			std::ostream& os,
 			std::string key
 		){
 
 			CDBFile dbfile;
-			dbfile.OpenFile(path.c_str());
+			dbfile.OpenFile(filePath.file_string().c_str());
 			if(!dbfile.IsOpen())
 			{
-				throw Exception("Could no open the file " + path);
+				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
 			// 1 : Cities
@@ -279,13 +286,23 @@ namespace synthese
 			} // 3 : Streets
 			else if (key == FILE_STREETS)
 			{
+				path shapeFilePath(filePath);
+				shapeFilePath.replace_extension("shp");
+				SHPHandle shapeFile(SHPOpen(shapeFilePath.file_string().c_str(), "rb"));
+
+				// Recently added road places
+				typedef map<pair<RegistryKeyType, string>, shared_ptr<RoadPlace> > RecentlyCreatedRoadPlaces;
+				RecentlyCreatedRoadPlaces recentlyCreatedRoadPlaces;
+
 				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
 				{
+					// Fields to test if the record can be imported
 					shared_ptr<Record> record(dbfile.ReadRecord(i));
 					string leftId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_REF_IN_ID)));
 					string rightId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_NREF_IN_ID)));
 					int lAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_AREA_ID))));
 					
+					// Test if the record can be imported
 					_CitiesMap::const_iterator itc(_citiesMap.find(lAreaId));
 					_AddressesMap::const_iterator ita1(_navteqAddressses.find(leftId));
 					_AddressesMap::const_iterator ita2(_navteqAddressses.find(rightId));
@@ -296,7 +313,22 @@ namespace synthese
 						continue;
 					}
 
+					// Other fields
+					
 					string roadName(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ST_NAME)));
+					SHPObject* shpObject(SHPReadObject(shapeFile, int(i-1)));
+					double length(0);
+					optional<GeoPoint> lastPt;
+					for(int i(0); i< shpObject->nVertices; ++i)
+					{
+						GeoPoint point(shpObject->padfX[i], shpObject->padfY[i], 0);
+						if(lastPt)
+						{
+							length += point - *lastPt;
+						}
+						lastPt = point;
+					}
+					SHPDestroyObject(shpObject);
 
 					City* city(itc->second);
 					Address* leftNode(ita1->second);
@@ -309,6 +341,18 @@ namespace synthese
 							*_env
 					)	);
 
+					// Search for a recently created road place
+					RecentlyCreatedRoadPlaces::iterator it(
+						recentlyCreatedRoadPlaces.find(
+							make_pair(
+								city->getKey(),
+								roadName
+					)	)	);
+					if(it != recentlyCreatedRoadPlaces.end())
+					{
+						roadPlace = it->second;
+					}
+
 					// Road place creation if necessary
 					if(!roadPlace.get())
 					{
@@ -317,15 +361,24 @@ namespace synthese
 						roadPlace->setKey(RoadPlaceTableSync::getId());
 						roadPlace->setName(roadName);
 						_env->getEditableRegistry<RoadPlace>().add(roadPlace);
+						recentlyCreatedRoadPlaces.insert(
+							make_pair(
+								make_pair(
+									city->getKey(),
+									roadName
+								), roadPlace
+						)	);
 					}
 
 					// Search for an existing road which ends at the left node
 					Road* road(NULL);
+					double startMetricOffset(0);
 					BOOST_FOREACH(const Road* croad, roadPlace->getRoads())
 					{
 						if(croad->getLastEdge()->getFromVertex() == leftNode)
 						{
 							road = const_cast<Road*>(croad);
+							startMetricOffset = croad->getLastEdge()->getMetricOffset();
 							break;
 						}
 					}
@@ -336,6 +389,7 @@ namespace synthese
 						secondRoadChunk->setRoad(road);
 						secondRoadChunk->setFromAddress(rightNode);
 						secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
+						secondRoadChunk->setMetricOffset(startMetricOffset + length);
 						secondRoadChunk->setKey(RoadChunkTableSync::getId());
 						road->addRoadChunk(secondRoadChunk.get());
 						_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
@@ -359,8 +413,9 @@ namespace synthese
 							firstRoadChunk->setRoad(road);
 							firstRoadChunk->setFromAddress(leftNode);
 							firstRoadChunk->setRankInPath(0);
+							firstRoadChunk->setMetricOffset(0);
 							firstRoadChunk->setKey(RoadChunkTableSync::getId());
-							road->addRoadChunk(firstRoadChunk.get(), true);
+							road->addRoadChunk(firstRoadChunk.get(), length);
 							_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
 						}
 						else
@@ -375,6 +430,7 @@ namespace synthese
 							firstRoadChunk->setRoad(road.get());
 							firstRoadChunk->setFromAddress(leftNode);
 							firstRoadChunk->setRankInPath(0);
+							firstRoadChunk->setMetricOffset(0);
 							firstRoadChunk->setKey(RoadChunkTableSync::getId());
 							road->addRoadChunk(firstRoadChunk.get());
 							_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
@@ -384,6 +440,7 @@ namespace synthese
 							secondRoadChunk->setRoad(road.get());
 							secondRoadChunk->setFromAddress(rightNode);
 							secondRoadChunk->setRankInPath(1);
+							firstRoadChunk->setMetricOffset(length);
 							secondRoadChunk->setKey(RoadChunkTableSync::getId());
 							road->addRoadChunk(secondRoadChunk.get());
 							_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);

@@ -123,7 +123,8 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Save(
-			PTUseRule* object
+			PTUseRule* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -141,7 +142,7 @@ namespace synthese
 				object->getHourDeadLine().toSQLString() << "," <<
 				(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0)) <<
 			")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

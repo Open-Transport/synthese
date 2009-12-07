@@ -67,7 +67,7 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<TimetableRow>	Rows;
-			
+						
 			/// Chosen registry class.
 			typedef util::Registry<Timetable>	Registry;
 
@@ -78,31 +78,44 @@ namespace synthese
 				ImpossibleGenerationException();
 			};
 
-			enum Format
+			enum ContentType
 			{
+				CONTAINER = 0,
 				TABLE_SERVICES_IN_COLS = 1,
 				TABLE_SERVICES_IN_ROWS = 2,
 				TIMES_IN_COLS = 3,
-				TIMES_IN_ROWS = 4
+				TIMES_IN_ROWS = 4,
+				LINE_SCHEMA = 6,
+				CALENDAR = 7
 			};
 
-			static std::string GetFormatName(Format value);
+			static std::string GetFormatName(ContentType value);
+			static std::string GetIcon(ContentType value);
 
-			typedef std::vector<std::pair<Format, std::string> > FormatsList;
+			typedef std::vector<std::pair<ContentType, std::string> > ContentTypesList;
 
-			static FormatsList GetFormatsList();
+			static ContentTypesList GetFormatsList();
 
 		private:
-			// Variables
-			bool					_mustBeginAPage;
-			Rows					_rows;
-			const calendar::CalendarTemplate*			_baseCalendar;
-			std::string				_title;
-			uid						_bookId;
-			int						_rank;
-			bool					_isBook;
-			Format					_format;
-			const interfaces::Interface*	_interface;
+			//! @name Position
+			//@{
+				util::RegistryKeyType	_bookId;
+				int						_rank;
+			//@}
+
+			//! @name Content
+			//@{
+				ContentType					_contentType;
+				TimetableGenerator::AuthorizedLines			_authorizedLines;
+				Rows					_rows;
+				const calendar::CalendarTemplate*			_baseCalendar;
+				std::string				_title;
+			//@}
+
+			//! @name Appearance
+			//@{
+				const interfaces::Interface*	_interface;
+			//@}
 
 		public:
 			// Constructeur
@@ -112,13 +125,14 @@ namespace synthese
 
 			//! @name Setters
 			//@{
+				void addAuthorizedLine(const env::CommercialLine* line);
+				void removeAuthorizedLine(const env::CommercialLine* line);
+				void clearAuthorizedLines();
+				void setBookId(util::RegistryKeyType value);
 				void setTitle(const std::string& title);
-				void setMustBeginAPage(bool newVal);
 				void setBaseCalendar(const calendar::CalendarTemplate* calendar);
-				void setBookId(uid id);
 				void setRank(int value);
-				void setIsBook(bool value);
-				void setFormat(Format value);
+				void setContentType(ContentType value);
 				void setInterface(const interfaces::Interface* value);
 			//@}
 
@@ -129,14 +143,13 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				bool					getMustBeginAPage()		const;
+				const TimetableGenerator::AuthorizedLines&	getAuthorizedLines() const;
 				const calendar::CalendarTemplate*	getBaseCalendar()		const;
 				const std::string&		getTitle()				const;
 				const Rows&				getRows()				const;
 				uid						getBookId()				const;
 				int						getRank()				const;
-				bool					getIsBook()				const;
-				Format					getFormat()				const;
+				ContentType				getContentType()		const;
 				const interfaces::Interface* getInterface()		const;
 			//@}
 

@@ -53,6 +53,12 @@ namespace synthese
 				double getEllipsoidHeight () const { return _ellipsoidHeight; }
 				void setEllipsoidHeight (double ellipsoidHeight) { _ellipsoidHeight = ellipsoidHeight; }
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Distance between two points.
+				double operator- ( const GeoPoint& other ) const;
+
+				static double Deg2rad(double deg);
+				static double Rad2deg(double rad);
 			//@}
 		};
 

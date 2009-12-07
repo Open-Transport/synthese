@@ -27,6 +27,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -86,7 +87,8 @@ namespace synthese
 		void SQLiteInheritedTableSyncTemplate<
 			AlarmTableSync,ScenarioSentAlarmInheritedTableSync, SentAlarm
 		>::Save(
-			SentAlarm* obj
+			SentAlarm* obj,
+			optional<SQLiteTransaction&> transaction
 		){
 			if (obj->getKey() == UNKNOWN_VALUE)
 				obj->setKey(getId());
@@ -104,7 +106,7 @@ namespace synthese
 				<< "," << (obj->getScenario() ? Conversion::ToString(obj->getScenario()->getKey()) : "0")
 				<< "," << (obj->getTemplate() ? Conversion::ToString(obj->getTemplate()->getKey()) : "0")
 				<< ")";
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 	}
 

@@ -112,7 +112,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Save(
-			CalendarTemplate* object
+			CalendarTemplate* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -125,7 +126,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getText())
 				<< "," << static_cast<int>(object->getCategory())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

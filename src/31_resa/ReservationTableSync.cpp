@@ -145,8 +145,10 @@ namespace synthese
 		{
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Save(Reservation* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Save(
+			Reservation* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() == UNKNOWN_VALUE)
@@ -170,7 +172,7 @@ namespace synthese
 				<< "," << object->getOriginDateTime().toSQLString()
 				<< "," << object->getReservationDeadLine().toSQLString()
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 	}

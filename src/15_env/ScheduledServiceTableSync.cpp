@@ -226,8 +226,10 @@ namespace synthese
 			ss->getPath()->removeService(ss);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(ScheduledService* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(
+			ScheduledService* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -261,7 +263,7 @@ namespace synthese
 
 				"," << Conversion::ToSQLiteString(object->getTeam()) <<
 			")";
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
 	}

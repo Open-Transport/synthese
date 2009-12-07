@@ -39,7 +39,7 @@
 
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -110,8 +110,10 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Save(Profile* profile )
-		{
+		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Save(
+			Profile* profile,
+			optional<SQLiteTransaction&> transaction
+		){
 			try
 			{
 				SQLite* sqlite = DBModule::GetSQLite();
@@ -127,7 +129,7 @@ namespace synthese
 					<< "," << (profile->getParent() == NULL ? 0 : profile->getParent()->getKey())
 					<< "," << Conversion::ToSQLiteString(ProfileTableSync::getRightsString(profile))
 					<< ")";
-				sqlite->execUpdate(query.str());
+				sqlite->execUpdate(query.str(), transaction);
 			}
 			catch (SQLiteException& e)
 			{

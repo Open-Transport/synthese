@@ -152,8 +152,10 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Save(Site* site)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Save(
+			Site* site,
+			optional<SQLiteTransaction&> transaction
+		){
 			stringstream query;
 			query << " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< site->getKey()
@@ -178,7 +180,7 @@ namespace synthese
 			}
 			query << "'"
 				<< ")";
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 	}
 

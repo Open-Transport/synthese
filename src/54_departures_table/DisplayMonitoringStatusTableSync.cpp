@@ -167,7 +167,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Save(
-			DisplayMonitoringStatus* object
+			DisplayMonitoringStatus* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -198,7 +199,7 @@ namespace synthese
 				<< static_cast<int>(object->getCommunicationStatus()) << ","
 				<< static_cast<int>(object->getLocalizationStatus())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

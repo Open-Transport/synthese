@@ -43,6 +43,7 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_RANK;
+			static const std::string PARAMETER_TITLE;
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_CONTENT;
 			static const std::string TAB_RESULT;
@@ -112,6 +113,31 @@ namespace synthese
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 
 
+
+			/** Gets sub page of the designed parent page, which are from the current class.
+			@param parentLink Link to the parent page
+			@param currentPage Currently displayed page
+			@return PageLinks each subpage of the parent page designed in parentLink
+			@author Hugues Romain
+			@date 2008
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const std::string& moduleKey,
+				const admin::AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
+
+			/** Sub pages getter.
+			@param currentPage Currently displayed page
+			@param request User request
+			@return PageLinks each subpage of the current page
+			@author Hugues Romain
+			@date 2008
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const admin::AdminInterfaceElement& currentPage,
+				const server::FunctionRequest<admin::AdminRequest>& request
+			) const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds the tabs of the page.

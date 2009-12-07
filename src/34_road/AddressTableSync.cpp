@@ -172,7 +172,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Save(
-			Address* object
+			Address* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -191,7 +192,7 @@ namespace synthese
 				Conversion::ToSQLiteString(object->getCodeBySource()) << "," <<
 				(object->getDataSource() ? lexical_cast<string>(object->getDataSource()->getKey()) : "0") <<
 			")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 	}

@@ -24,6 +24,8 @@
 
 #include "FactoryBase.h"
 #include "Env.h"
+
+#include <boost/filesystem/path.hpp>
 #include <set>
 #include <map>
 
@@ -53,13 +55,14 @@ namespace synthese
 		class FileFormat : public util::FactoryBase<FileFormat>
 		{
 		public:
-			typedef std::set<std::string> FilePathsSet;
-			typedef std::map<std::string,std::string> FilePathsMap;
+			typedef std::string FileKey;
+			typedef std::set<boost::filesystem::path> FilePathsSet;
+			typedef std::map<FileKey, boost::filesystem::path> FilePathsMap;
 
 			class Files
 			{
 			public:
-				typedef std::vector<std::string> FilesVector;
+				typedef std::vector<FileKey> FilesVector;
 
 			private:
 				FilesVector _files;
@@ -86,7 +89,7 @@ namespace synthese
 			);
 
 			virtual void _parse(
-				const std::string& path,
+				const boost::filesystem::path& filePath,
 				std::ostream& os,
 				std::string key = std::string()
 			) = 0;

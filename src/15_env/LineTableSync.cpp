@@ -199,8 +199,10 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Save(Line* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Save(
+			Line* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			if(!object->getCommercialLine()) throw Exception("Line save error. Missing commercial line");
 			stringstream query;
 			if (object->getKey() <= 0) object->setKey(getId());
@@ -232,7 +234,7 @@ namespace synthese
 				"," << object->getWayBack() <<
 				"," << (object->getDataSource() ? lexical_cast<string>(object->getDataSource()->getKey()) : "0") <<
 			")";
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
 

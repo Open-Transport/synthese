@@ -80,8 +80,10 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Save(ScenarioTemplate* obj)
-		{
+		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Save(
+			ScenarioTemplate* obj,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 
@@ -100,7 +102,7 @@ namespace synthese
 				<< ",''"
 				<< ",0"
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 	}
 

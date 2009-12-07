@@ -96,8 +96,10 @@ namespace synthese
 		){
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Save(TextTemplate* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Save(
+			TextTemplate* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() == UNKNOWN_VALUE)
@@ -111,7 +113,7 @@ namespace synthese
 				<< "," << Conversion::ToString(object->getIsFolder())
 				<< "," << Conversion::ToString(object->getParentId())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 	}

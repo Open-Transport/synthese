@@ -47,11 +47,10 @@ namespace synthese
 			static const std::string COL_BOOK_ID;
 			static const std::string COL_RANK;
 			static const std::string COL_TITLE;
-			static const std::string COL_MUST_BEGIN_A_PAGE;
 			static const std::string COL_CALENDAR_ID;
-			static const std::string COL_IS_BOOK;
 			static const std::string COL_FORMAT;
 			static const std::string COL_INTERFACE_ID;
+			static const std::string COL_AUTHORIZED_LINES;
 			
 			TimetableTableSync();
 
@@ -71,7 +70,7 @@ namespace synthese
 				, bool raisingOrder = true
 				, int first = 0
 				, int number = 0,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 

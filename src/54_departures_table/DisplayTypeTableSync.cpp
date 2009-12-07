@@ -146,8 +146,9 @@ namespace synthese
     
 
 		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Save(
-			DisplayType* object)
-		{
+			DisplayType* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -163,7 +164,7 @@ namespace synthese
 				<< "," << object->getMaxStopsNumber()
 				<< "," << (object->getTimeBetweenChecks().total_seconds() / 60)
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 	}

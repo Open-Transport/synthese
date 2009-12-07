@@ -60,7 +60,7 @@ namespace synthese
 				
 			
 			virtual void _parse(
-				const std::string& path,
+				const boost::filesystem::path& filePath,
 				std::ostream& os,
 				std::string key = std::string()
 			);

@@ -335,7 +335,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Save(
-			DisplayScreen* object
+			DisplayScreen* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -444,7 +445,7 @@ namespace synthese
 
 			query << ")";
 			
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 	}	}
 
 	namespace departurestable

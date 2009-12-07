@@ -136,8 +136,10 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Save(AlarmObjectLink* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Save(
+			AlarmObjectLink* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)

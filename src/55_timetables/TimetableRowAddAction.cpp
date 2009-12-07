@@ -95,11 +95,11 @@ namespace synthese
 
 			_rank = map.getDefault<int>(PARAMETER_RANK, TimetableRowTableSync::GetMaxRank(_timetable->getKey())+1);
 
-			_isArrival = map.getDefault<bool>(PARAMETER_IS_ARRIVAL, true);
-			_isDeparture = map.getDefault<bool>(PARAMETER_IS_DEPARTURE, true);
+			_isArrival = map.getDefault<bool>(PARAMETER_IS_ARRIVAL, false);
+			_isDeparture = map.getDefault<bool>(PARAMETER_IS_DEPARTURE, false);
 			_isCompulsory = map.getDefault<bool>(PARAMETER_IS_COMPULSORY, false);
-			_isSufficient = map.getDefault<bool>(PARAMETER_IS_SUFFICIENT, true);
-			_isDisplayed = map.getDefault<bool>(PARAMETER_IS_DISPLAYED, true);
+			_isSufficient = map.getDefault<bool>(PARAMETER_IS_SUFFICIENT, false);
+			_isDisplayed = map.getDefault<bool>(PARAMETER_IS_DISPLAYED, false);
 
 			_place = dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(GeographyModule::FetchPlace(
 				map.getString(PARAMETER_CITY_NAME, true, FACTORY_KEY),

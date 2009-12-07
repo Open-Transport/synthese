@@ -23,12 +23,13 @@
 #ifndef SYNTHESE_ENV_PATH_H
 #define SYNTHESE_ENV_PATH_H
 
-#include <vector>
-#include <set>
-
 #include "Registrable.h"
 #include "Calendar.h"
 #include "RuleUser.h"
+
+#include <boost/optional.hpp>
+#include <vector>
+#include <set>
 
 namespace synthese
 {
@@ -139,9 +140,11 @@ namespace synthese
 			//! @name Update methods.
 			//@{
 
-				/** Adds edge at the end of the path.
+				/** Inserts an edge in the path.
 					@param edge The edge to add
-					@param autoShift Shift the following edges if an edge with the same rank already exists, else throw an Exception
+					@param autoShift Shift the following edges if an edge with the same rank already exists, else throw an Exception. The value of autoShift is the distance between the edge and the next existing one.
+						- if the edge to insert is the not the first, the total length of the path is not changed. If the autoshift length is superior than the length between the two edges around the new one, then an exception is thrown
+						- if the edge to insert is the first one, then the total length of the path is changed.
 
 					All the pointer links necessary to the graph exploration are created :
 						- the links between edges (describing the path)
@@ -151,7 +154,7 @@ namespace synthese
 				*/
 				void addEdge(
 					Edge* edge,
-					bool autoShift = false
+					boost::optional<double> autoShift = boost::optional<double>()
 				);
 
 

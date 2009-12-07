@@ -155,8 +155,10 @@ namespace synthese
 			/// @todo line remove edge
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Save(LineStop* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Save(
+			LineStop* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			stringstream query;
 			
 			if(!object->getPhysicalStop()) throw Exception("Linestop save error. Missing physical stop");
@@ -185,7 +187,7 @@ namespace synthese
 			query <<
 				"'" <<
 			")";
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
 	}

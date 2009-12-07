@@ -53,10 +53,10 @@ namespace synthese
 	{
 		const string TimetableUpdateAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "ti";
 		const string TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID = Action_PARAMETER_PREFIX + "ci";
-		const string TimetableUpdateAction::PARAMETER_MUST_BEGIN_A_PAGE = Action_PARAMETER_PREFIX + "mb";
 		const string TimetableUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
 		const string TimetableUpdateAction::PARAMETER_FORMAT = Action_PARAMETER_PREFIX + "fo";
 		const string TimetableUpdateAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "ii";
+		const string TimetableUpdateAction::PARAMETER_CONTAINER_ID = Action_PARAMETER_PREFIX + "co";
 		
 		
 		
@@ -71,7 +71,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			if(_timetable.get()) map.insert(PARAMETER_TIMETABLE_ID, _timetable->getKey());
-			map.insert(PARAMETER_MUST_BEGIN_A_PAGE, _mustBeginAPage);
+			if(_container.get()) map.insert(PARAMETER_CONTAINER_ID, _container->getKey());
 			if(_calendarTemplate.get()) map.insert(PARAMETER_BASE_CALENDAR_ID, _calendarTemplate->getKey());
 			map.insert(PARAMETER_TITLE, _title);
 			return map;
@@ -88,6 +88,22 @@ namespace synthese
 			catch (ObjectNotFoundException<Timetable>)
 			{
 				throw ActionException("No such timetable");
+			}
+
+			if(map.get<RegistryKeyType>(PARAMETER_CONTAINER_ID) > 0)
+			{
+				try
+				{
+					_container = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_CONTAINER_ID), *_env);
+				}
+				catch (ObjectNotFoundException<CalendarTemplate>)
+				{
+					throw ActionException("No such calendar");
+				}
+				if(_container->getContentType() != Timetable::CONTAINER)
+				{
+					throw ActionException("The specified id does not point to a container");
+				}
 			}
 
 			if(map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID) > 0)
@@ -114,9 +130,8 @@ namespace synthese
 				}
 			}
 
-			_mustBeginAPage = map.getDefault<bool>(PARAMETER_MUST_BEGIN_A_PAGE, false);
 			_title = map.get<string>(PARAMETER_TITLE);
-			_format = static_cast<Timetable::Format>(map.get<int>(PARAMETER_FORMAT));
+			_format = static_cast<Timetable::ContentType>(map.get<int>(PARAMETER_FORMAT));
 		}
 		
 		
@@ -124,10 +139,10 @@ namespace synthese
 		void TimetableUpdateAction::run()
 		{
 			_timetable->setBaseCalendar(_calendarTemplate.get());
-			_timetable->setMustBeginAPage(_mustBeginAPage);
 			_timetable->setTitle(_title);
 			_timetable->setInterface(_interface.get());
-			_timetable->setFormat(_format);
+			_timetable->setContentType(_format);
+			_timetable->setBookId(_container.get() ? _container->getKey() : RegistryKeyType(0));
 
 			TimetableTableSync::Save(_timetable.get());
 		}

@@ -38,6 +38,7 @@
 #include <string>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/optional/optional.hpp>
 
 #include "FactorableTemplate.h"
 #include "Constants.h"
@@ -50,6 +51,8 @@ namespace synthese
 {
 	namespace db
 	{
+		class SQLiteTransaction;
+
 		////////////////////////////////////////////////////////////////////////
 		///	Table synchronizer template (abstract class) for standard SYNTHESE
 		///	tables.
@@ -172,7 +175,8 @@ namespace synthese
 				- if the object does not have any key, then the autoincrement function generates one for it.
 			*/
 			static void Save(
-				T* obj
+				T* obj,
+				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
 			);
 
 

@@ -54,7 +54,6 @@ namespace synthese
 		public:
 			typedef std::vector<const Address*> Addresses;
 
-		private:
 			typedef std::map<
 				std::pair<
 					util::RegistryKeyType,
@@ -96,6 +95,8 @@ namespace synthese
 				const Addresses&				getAddresses () const;
 				boost::posix_time::time_duration	getDefaultTransferDelay() const;
 				virtual boost::posix_time::time_duration	getMinTransferDelay() const;
+				bool	getAllowedConnection() const;
+				const TransferDelaysMap& getTransferDelays() const;
 			//@}
 
 			//! @name Setters

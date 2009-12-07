@@ -208,12 +208,13 @@ namespace synthese
 		std::string HTMLForm::getCheckBox( const std::string& name, const std::string& value, bool checked )
 		{
 			if (!_updateRight)
-				return string();
+				return checked ? "OUI" : "NON";
 
 			removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"checkbox\" "
+				<< "value=\"1\" "
 				<< "name=\"" << name << value << "\" "
 				<< (checked ? "checked=\"true\" " : "")
 				<< "id=\"" << _getFieldId(name) << "\" "

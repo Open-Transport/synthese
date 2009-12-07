@@ -100,7 +100,8 @@ namespace synthese
 		
 		
 		template<> void SQLiteDirectTableSyncTemplate<ServiceDateTableSync,ServiceDate>::Save(
-			ServiceDate* object
+			ServiceDate* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			if(!object->getService()) return;
 			
@@ -114,7 +115,7 @@ namespace synthese
 				<< "," << object->getService()->getKey()
 				<< ",'" << to_iso_extended_string(object->getDate()) << "'"
 				<< ")";
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
 

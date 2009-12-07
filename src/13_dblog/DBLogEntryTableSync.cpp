@@ -140,7 +140,8 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Save(
-			DBLogEntry* object
+			DBLogEntry* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -171,7 +172,7 @@ namespace synthese
 				<< "," << object->getObjectId2()
 				<< ")";
 
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 	}

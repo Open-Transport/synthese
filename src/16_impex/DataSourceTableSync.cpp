@@ -82,7 +82,8 @@ namespace synthese
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Save(
-			DataSource* object
+			DataSource* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -95,7 +96,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getFormat())
 				<< ")";
 			
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Unlink(

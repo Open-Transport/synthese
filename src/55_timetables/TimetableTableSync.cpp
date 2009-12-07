@@ -34,6 +34,7 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 #include "Interface.h"
+#include "CommercialLine.h"
 
 #include "01_util/Conversion.h"
 
@@ -47,6 +48,7 @@ namespace synthese
 	using namespace timetables;
 	using namespace calendar;
 	using namespace interfaces;
+	using namespace env;
 
 	namespace util
 	{
@@ -59,11 +61,10 @@ namespace synthese
 		const std::string TimetableTableSync::COL_BOOK_ID("book_id");
 		const std::string TimetableTableSync::COL_RANK("rank");
 		const std::string TimetableTableSync::COL_TITLE("title");
-		const std::string TimetableTableSync::COL_MUST_BEGIN_A_PAGE("must_begin_a_page");
 		const std::string TimetableTableSync::COL_CALENDAR_ID("calendar_id");
-		const std::string TimetableTableSync::COL_IS_BOOK("is_book");
 		const std::string TimetableTableSync::COL_FORMAT("format");
 		const std::string TimetableTableSync::COL_INTERFACE_ID("interface_id");
+		const std::string TimetableTableSync::COL_AUTHORIZED_LINES("authorized_lines");
 	}
 	
 	namespace db
@@ -81,11 +82,10 @@ namespace synthese
 			SQLiteTableSync::Field(TimetableTableSync::COL_BOOK_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_RANK, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_TITLE, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_MUST_BEGIN_A_PAGE, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_IS_BOOK, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_INTERFACE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -115,13 +115,27 @@ namespace synthese
 			object->setKey(id);
 			object->setBookId(rows->getLongLong(TimetableTableSync::COL_BOOK_ID));
 			object->setRank(rows->getInt(TimetableTableSync::COL_RANK));
-			object->setMustBeginAPage(rows->getBool(TimetableTableSync::COL_MUST_BEGIN_A_PAGE));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
-			object->setIsBook(rows->getBool(TimetableTableSync::COL_IS_BOOK));
-			object->setFormat(static_cast<Timetable::Format>(rows->getInt(TimetableTableSync::COL_FORMAT)));
+			object->setContentType(static_cast<Timetable::ContentType>(rows->getInt(TimetableTableSync::COL_FORMAT)));
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				vector<string> lines = Conversion::ToStringVector(rows->getText (TimetableTableSync::COL_AUTHORIZED_LINES));
+				object->clearAuthorizedLines();
+				BOOST_FOREACH(const string& line, lines)
+				{
+					try
+					{
+						RegistryKeyType id(lexical_cast<RegistryKeyType>(line));
+						object->addAuthorizedLine(Env::GetOfficialEnv().get<CommercialLine>(id).get());
+					}
+					catch (ObjectNotFoundException<CommercialLine>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_LINES);
+					}
+				}
+
+
 				{
 					TimetableRowTableSync::SearchResult rows(
 						TimetableRowTableSync::Search(env, object->getKey())
@@ -165,7 +179,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::Save(
-			Timetable* object
+			Timetable* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -178,13 +193,22 @@ namespace synthese
 				<< "," << object->getBookId()
 				<< "," << object->getRank()
 				<< "," << Conversion::ToSQLiteString(object->getTitle())
-				<< "," << object->getMustBeginAPage()
 				<< "," << (object->getBaseCalendar() ? object->getBaseCalendar()->getKey() : RegistryKeyType(0))
-				<< "," << object->getIsBook()
-				<< "," << static_cast<int>(object->getFormat())
-				<< "," << (object->getInterface() ? object->getInterface()->getKey() : RegistryKeyType(0))
+				<< "," << static_cast<int>(object->getContentType())
+				<< "," << (object->getInterface() ? object->getInterface()->getKey() : RegistryKeyType(0)) << "," <<
+				"\"";
+	
+			 bool first(true);
+			 BOOST_FOREACH(const CommercialLine* line, object->getAuthorizedLines())
+			 {
+				 if(!first) query << ",";
+				 query << line->getKey();
+				 first = false;
+			 }
+
+			 query << "\""
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 
@@ -289,7 +313,7 @@ namespace synthese
 			}
 			catch(SQLiteException& e)
 			{
-				throw Exception(e.getMessage());
+				throw util::Exception(e.getMessage());
 			}
 		}
 	}

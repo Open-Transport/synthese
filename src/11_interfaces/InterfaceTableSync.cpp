@@ -89,8 +89,10 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Save(Interface* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Save(
+			Interface* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -102,7 +104,7 @@ namespace synthese
 				Conversion::ToSQLiteString(object->getName()) << "," <<
 				Conversion::ToSQLiteString(object->getDefaultClientURL()) <<
 			")";
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 	}
 

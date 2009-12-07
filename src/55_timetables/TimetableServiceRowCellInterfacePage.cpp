@@ -27,6 +27,7 @@
 #include "PhysicalStop.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "City.h"
+#include "RollingStock.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -38,6 +39,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace time;
+	using namespace env;
 
 	namespace util
 	{
@@ -57,6 +59,7 @@ namespace synthese
 		void TimetableServiceRowCellInterfacePage::display(
 			std::ostream& stream,
 			const TimetableColumn::Content::value_type& object,
+			const RollingStock* rollingStock,
 			size_t rank,
 			VariablesMap& variables,
 			const server::Request* request /*= NULL*/
@@ -79,6 +82,7 @@ namespace synthese
 				pv.push_back(string());
 			}
 			pv.push_back(lexical_cast<string>(rank)); //5
+			pv.push_back(rollingStock ? lexical_cast<string>(rollingStock->getKey()) : string()); //6
 
 			InterfacePage::_display(
 				stream

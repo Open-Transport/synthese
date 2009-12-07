@@ -66,6 +66,8 @@ namespace synthese
 		{
 			assert(_columns.empty());
 
+			if(_rows.empty()) return;
+
 			// Loop on each line of the database
 			BOOST_FOREACH(Registry<Line>::value_type it, _env.getRegistry<Line>())
 			{
@@ -177,6 +179,9 @@ namespace synthese
 			Path::Edges::const_iterator itEdge;
 			const Path::Edges& edges(line.getEdges());
 
+			// Line is authorized
+			if(!_authorizedLines.empty() && _authorizedLines.find(line.getCommercialLine()) == _authorizedLines.end())
+				return false;
 
 			// A0: Line selection upon calendar
 			if (!line.getAllDays() && !_baseCalendar.hasAtLeastOneCommonDateWith(line))
@@ -320,6 +325,13 @@ namespace synthese
 		const TimetableGenerator::Columns& TimetableGenerator::getColumns() const
 		{
 			return _columns;
+		}
+
+
+
+		void TimetableGenerator::setAuthorizedLines( const AuthorizedLines& value )
+		{
+			_authorizedLines = value;
 		}
 	}
 }

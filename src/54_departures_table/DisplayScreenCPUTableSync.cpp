@@ -118,7 +118,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Save(
-			DisplayScreenCPU* object
+			DisplayScreenCPU* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -135,7 +136,7 @@ namespace synthese
 				<< object->getIsOnline() << ","
 				<< Conversion::ToSQLiteString(object->getMaintenanceMessage())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

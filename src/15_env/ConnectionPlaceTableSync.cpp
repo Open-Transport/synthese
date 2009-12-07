@@ -43,6 +43,7 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace geography;
+	using namespace road;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,env::ConnectionPlaceTableSync>::FACTORY_KEY("15.40.01 Connection places");
 	template<> const string FactorableTemplate<Fetcher<NamedPlace>, ConnectionPlaceTableSync>::FACTORY_KEY("7");
@@ -156,8 +157,35 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Save(PublicTransportStopZoneConnectionPlace* obj)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Save(
+			PublicTransportStopZoneConnectionPlace* object,
+			optional<SQLiteTransaction&> transaction
+		){
+			stringstream query;
+			if (object->getKey() <= 0)
+				object->setKey(getId());
+
+			query <<
+				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
+				object->getKey() << "," <<
+				Conversion::ToSQLiteString(object->getName()) << "," <<
+				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) << "," <<
+				object->getAllowedConnection() << "," <<
+				(object->getCity() ? object->getCity()->includes(object) : false) << "," <<
+				object->getDefaultTransferDelay() << "," <<
+				"\"";
+			bool first(true);
+			BOOST_FOREACH(const AddressablePlace::TransferDelaysMap::value_type& td, object->getTransferDelays())
+			{
+				if(!first) query << ",";
+				query << td.first.first << ":" << td.first.second << ":" << (td.second.total_seconds() / 60);
+				first = false;
+			}
+			query << "\"," <<
+				Conversion::ToSQLiteString(object->getName13()) << "," <<
+				Conversion::ToSQLiteString(object->getName26()) <<
+			")";
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 
 		}
 

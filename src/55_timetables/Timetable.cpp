@@ -31,6 +31,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace calendar;
+	using namespace env;
 
 	namespace util
 	{
@@ -41,7 +42,6 @@ namespace synthese
 	{
 		Timetable::Timetable(RegistryKeyType id)
 		:	Registrable(id),
-			_mustBeginAPage(false),
 			_bookId(0),
 			_baseCalendar(NULL),
 			_interface(NULL)
@@ -57,13 +57,6 @@ namespace synthese
 
 
 
-		void Timetable::setMustBeginAPage( bool newVal )
-		{
-			_mustBeginAPage = newVal;
-		}
-
-
-
 		void Timetable::setBaseCalendar( const CalendarTemplate* calendar )
 		{
 			_baseCalendar = calendar;
@@ -74,13 +67,6 @@ namespace synthese
 		void Timetable::addRow( const TimetableRow& row )
 		{
 			_rows.insert(_rows.begin() + row.getRank(), row);
-		}
-
-
-
-		bool Timetable::getMustBeginAPage() const
-		{
-			return _mustBeginAPage;
 		}
 
 
@@ -143,23 +129,13 @@ namespace synthese
 			}
 
 			auto_ptr<TimetableGenerator> g(new TimetableGenerator(env));
-			g->setRows(_rows);
-			g->setBaseCalendar(_baseCalendar->getResult());
+			if(_contentType != CONTAINER)
+			{
+				g->setRows(_rows);
+				g->setBaseCalendar(_baseCalendar->getResult());
+				g->setAuthorizedLines(_authorizedLines);
+			}
 			return g;
-		}
-
-
-
-		void Timetable::setIsBook( bool value )
-		{
-			_isBook = value;
-		}
-
-
-
-		bool Timetable::getIsBook() const
-		{
-			return _isBook;
 		}
 
 
@@ -167,6 +143,7 @@ namespace synthese
 		bool Timetable::isGenerable() const
 		{
 			return
+				_contentType == CONTAINER ||
 				getBaseCalendar() != NULL &&
 				getBaseCalendar()->isLimited()
 			;
@@ -189,9 +166,9 @@ namespace synthese
 
 
 
-		Timetable::Format Timetable::getFormat() const
+		Timetable::ContentType Timetable::getContentType() const
 		{
-			return _format;
+			return _contentType;
 		}
 
 
@@ -203,36 +180,88 @@ namespace synthese
 
 
 
-		void Timetable::setFormat( Timetable::Format value )
-		{
-			_format = value;
+		void Timetable::setContentType(
+			Timetable::ContentType value
+		){
+			_contentType = value;
 		}
 
 
 
-		std::string Timetable::GetFormatName( Format value )
-		{
+		std::string Timetable::GetFormatName(
+			ContentType value
+		){
 			switch(value)
 			{
 			case TABLE_SERVICES_IN_COLS: return "Services en colonnes";
 			case TABLE_SERVICES_IN_ROWS: return "Services en lignes";
 			case TIMES_IN_COLS: return "Heures en colonnes";
 			case TIMES_IN_ROWS: return "Heures en lignes";
+			case CONTAINER: return "Container";
+			case CALENDAR: return "Calendrier";
+			case LINE_SCHEMA: return "Schéma de ligne";
 			}
 			return "Inconnu";
 		}
 
 
 
-		Timetable::FormatsList Timetable::GetFormatsList()
+		Timetable::ContentTypesList Timetable::GetFormatsList()
 		{
-			FormatsList result;
+			ContentTypesList result;
 			result.push_back(make_pair(TABLE_SERVICES_IN_COLS, GetFormatName(TABLE_SERVICES_IN_COLS)));
 			result.push_back(make_pair(TABLE_SERVICES_IN_ROWS, GetFormatName(TABLE_SERVICES_IN_ROWS)));
 			result.push_back(make_pair(TIMES_IN_COLS, GetFormatName(TIMES_IN_COLS)));
 			result.push_back(make_pair(TIMES_IN_ROWS, GetFormatName(TIMES_IN_ROWS)));
+			result.push_back(make_pair(CONTAINER, GetFormatName(CONTAINER)));
 			return result;
 		}
+
+
+
+		std::string Timetable::GetIcon( ContentType value )
+		{
+			switch(value)
+			{
+			case TABLE_SERVICES_IN_COLS: return "table_col.png";
+			case TABLE_SERVICES_IN_ROWS: return "table_row.png";
+			case TIMES_IN_COLS: return "shape_align_top.png";
+			case TIMES_IN_ROWS: return "shape_align_left.png";
+			case CONTAINER: return "table_multiple.png";
+			case CALENDAR: return "calendar.png";
+			case LINE_SCHEMA: return "chart_line.png";
+			}
+			return "Inconnu";
+		}
+
+
+
+		const TimetableGenerator::AuthorizedLines& Timetable::getAuthorizedLines() const
+		{
+			return _authorizedLines;
+		}
+
+
+
+		void Timetable::clearAuthorizedLines()
+		{
+			_authorizedLines.clear();
+		}
+
+
+
+		void Timetable::addAuthorizedLine( const CommercialLine* line )
+		{
+			_authorizedLines.insert(line);
+		}
+
+
+
+		void Timetable::removeAuthorizedLine( const env::CommercialLine* line )
+		{
+			_authorizedLines.erase(line);
+		}
+
 
 		Timetable::ImpossibleGenerationException::ImpossibleGenerationException():
 			Exception("Timetable generation is impossible.")

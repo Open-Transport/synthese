@@ -30,6 +30,8 @@
 #include "Interface.h"
 #include "InterfacePageException.h"
 #include "Schedule.h"
+#include "Env.h"
+#include "TimetableTableSync.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -71,8 +73,42 @@ namespace synthese
 			stringstream content;
 			try
 			{
-				switch(object.getFormat())
+				switch(object.getContentType())
 				{
+				case Timetable::CONTAINER:
+					{
+						Env env;
+						TimetableTableSync::SearchResult contents(
+							TimetableTableSync::Search(
+								env,
+								object.getKey()
+						)	);
+						BOOST_FOREACH(shared_ptr<Timetable> tt, contents)
+						{
+							const TimetableInterfacePage* page(
+								tt->getInterface() ?
+								tt->getInterface()->getPage<TimetableInterfacePage>() :
+								this
+							);
+							auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
+							g->build();
+							page->display(content, *tt, *g, variables, request);
+						}
+					}
+					break;
+
+				case Timetable::CALENDAR:
+					{
+
+					}
+					break;
+
+				case Timetable::LINE_SCHEMA:
+					{
+
+					}
+					break;
+					
 				case Timetable::TABLE_SERVICES_IN_COLS:
 
 					break;
@@ -115,7 +151,7 @@ namespace synthese
 			}
 			pv.push_back(content.str());
 
-			pv.push_back(lexical_cast<string>(object.getMustBeginAPage())); //1
+			pv.push_back(string()); //1
 			pv.push_back(object.getTitle()); //2
 
 			// 3 : Notes

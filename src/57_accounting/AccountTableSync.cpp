@@ -35,7 +35,7 @@
 #include "57_accounting/CurrencyTableSync.h"
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -100,8 +100,10 @@ namespace synthese
 			account->setRightCurrency(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::Save(Account* account)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::Save(
+			Account* account,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (account->getKey() <= 0)
@@ -122,7 +124,7 @@ namespace synthese
 				<< "," << Conversion::ToString(account->getStockAccountId())
 				<< "," << Conversion::ToString(account->getUnitPrice())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 	}
 

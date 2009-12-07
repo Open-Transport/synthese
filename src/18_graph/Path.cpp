@@ -169,7 +169,7 @@ namespace synthese
 
 		void Path::addEdge(
 			Edge* edge,
-			bool autoShift
+			optional<double> autoShift
 		){
 			// Empty path : just put the edge in the vector
 
@@ -185,16 +185,21 @@ namespace synthese
 				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() < edge->getRankInPath();
 				++insertionPosition);
 
-			// If an edge with the same rank exists, then throw an exception of shift all ranks after it (depends on the parameter)
+			// If an edge with the same rank exists, then throw an exception or shift all ranks after it, depending on the autoshift parameter
 			if(insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() == edge->getRankInPath())
 			{
 				// If the edge is the same, do nothing
 				if((*insertionPosition) == edge) return;
 
 				if(!autoShift) throw Exception("An edge with the rank "+ lexical_cast<string>(edge->getRankInPath()) + " already exists in the path " + lexical_cast<string>(getKey()));
+
 				for(Edges::iterator it(insertionPosition+1); it != _edges.end(); ++it)
 				{
 					(*it)->setRankInPath((*it)->getRankInPath() + 1);
+					if(insertionPosition == _edges.begin())
+					{
+						(*it)->setMetricOffset((*it)->getMetricOffset() + *autoShift);
+					}
 				}
 			}
 

@@ -106,7 +106,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Save(
-			RoadPlace* object
+			RoadPlace* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -119,7 +120,7 @@ namespace synthese
 				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) <<
 			")";
 			
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
 
@@ -180,13 +181,11 @@ namespace synthese
 			util::Env& environment,
 			util::LinkLevel linkLevel
 		){
-			Env tenv;
 			SearchResult roadPlaces(
-				Search(tenv, cityId, name, optional<string>(), 0, 1, false, false, FIELDS_ONLY_LOAD_LEVEL)
+				Search(environment, cityId, name, optional<string>(), 0, 1, false, false)
 			);
 			if(roadPlaces.empty()) return shared_ptr<RoadPlace>();
-			shared_ptr<RoadPlace> result(roadPlaces.front());
-			return GetEditable(result->getKey(), environment, linkLevel);
+			return roadPlaces.front();
 		}
 	}
 }

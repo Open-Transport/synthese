@@ -149,8 +149,10 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Save(User* user )
-		{
+		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Save(
+			User* user,
+			optional<SQLiteTransaction&> transaction
+		){
 			try
 			{
 				SQLite* sqlite = DBModule::GetSQLite();
@@ -176,7 +178,7 @@ namespace synthese
 					<< "," << Conversion::ToString(user->getConnectionAllowed())
 					<< "," << user->getBirthDate().toSQLString()
 					<< ")";
-				sqlite->execUpdate(query.str());
+				sqlite->execUpdate(query.str(), transaction);
 			}
 			catch (SQLiteException e)
 			{

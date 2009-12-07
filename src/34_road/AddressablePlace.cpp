@@ -256,5 +256,17 @@ namespace synthese
 		{
 			return MIN_HUB_SCORE;
 		}
+
+
+
+		bool AddressablePlace::getAllowedConnection() const
+		{
+			return _allowedConnection;
+		}
+
+		const AddressablePlace::TransferDelaysMap& AddressablePlace::getTransferDelays() const
+		{
+			return _transferDelays;
+		}
 	}
 }

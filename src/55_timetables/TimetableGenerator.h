@@ -61,7 +61,7 @@ namespace synthese
 			typedef std::vector<std::size_t>	ColumnWarnings;
 			typedef std::vector<TimetableColumn>			Columns;
 			typedef std::vector<TimetableRow>				Rows;
-			typedef std::set<const env::CommercialLine*>	Lines;
+			typedef std::set<const env::CommercialLine*>	AuthorizedLines;
 
 		private:
 
@@ -69,7 +69,7 @@ namespace synthese
 			//@{
 				Rows				_rows;
 				calendar::Calendar		_baseCalendar;
-				Lines				_excludedLines;
+				AuthorizedLines				_authorizedLines;
 				bool				_withContinuousServices;
 				const util::Env&	_env;
 			//@}
@@ -124,6 +124,7 @@ namespace synthese
 			//@{
 				void setRows(const Rows& rows);
 				void setBaseCalendar(const calendar::Calendar& value);
+				void setAuthorizedLines(const AuthorizedLines& value);
 			//@}
 		};
 	}

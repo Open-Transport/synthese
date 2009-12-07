@@ -21,13 +21,18 @@
 */
 
 #include "TimetableModule.h"
+#include "TimetableTableSync.h"
+#include "Timetable.h"
+#include "Env.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace timetables;
 	using namespace server;
+	using namespace util;
 	
 	namespace util
 	{
@@ -53,5 +58,30 @@ namespace synthese
 
 	namespace timetables
 	{
+		TimetableModule::TimetableContainersLabels TimetableModule::GetTimetableContainersLabels(
+			util::RegistryKeyType folderId /*= 0*/,
+			std::string prefix /*= std::string() */,
+			boost::optional<util::RegistryKeyType> forbiddenFolderId /*= boost::optional<util::RegistryKeyType>() */
+		){
+			TimetableContainersLabels m;
+			if (folderId == 0)
+				m.push_back(make_pair(0, "(racine)"));
+
+			Env env;
+			TimetableTableSync::SearchResult folders(
+				TimetableTableSync::Search(env, folderId)
+			);
+			BOOST_FOREACH(shared_ptr<Timetable> folder, folders)
+			{
+				if (folder->getKey() == forbiddenFolderId)
+					continue;
+
+				m.push_back(make_pair(folder->getKey(), prefix + folder->getTitle()));
+
+				TimetableContainersLabels r(GetTimetableContainersLabels(folder->getKey(), prefix + folder->getTitle() +"/", forbiddenFolderId));
+				m.insert(m.end(),r.begin(), r.end());
+			}
+			return m;
+		}
 	}
 }

@@ -231,8 +231,10 @@ namespace synthese
 			obj->getPath()->removeService(obj);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Save(ContinuousService* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Save(
+			ContinuousService* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -243,7 +245,7 @@ namespace synthese
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 	}

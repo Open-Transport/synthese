@@ -67,7 +67,10 @@ namespace synthese
 
 
 
-			static void Save(ObjectClass* obj);
+			static void Save(
+				ObjectClass* obj,
+				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
+			);
 
 
 

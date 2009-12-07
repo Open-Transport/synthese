@@ -87,7 +87,7 @@ namespace synthese
 				size_t rank(0);
 				BOOST_FOREACH(const TimetableColumn::Content::value_type& cell, object.getContent())
 				{
-					cellPage->display(content, cell, rank++, variables, request);
+					cellPage->display(content, cell, object.getLine()->getRollingStock(), rank++, variables, request);
 				}
 			}
 			catch(InterfacePageException)

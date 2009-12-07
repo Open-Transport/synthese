@@ -1,5 +1,8 @@
 Import ('s3env')
 
+if (s3env['_PLATFORM']=='win32'):
+	s3env.Append ( LIBS = [] )  
+
 CppSynthese3BinProject(
 	s3env,
 	's3-server',

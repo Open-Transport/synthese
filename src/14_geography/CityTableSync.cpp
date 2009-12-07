@@ -92,8 +92,10 @@ namespace synthese
 			GeographyModule::RemoveFromCitiesMatchers(obj);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Save(City* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Save(
+			City* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			/// @todo Implement it
 		}
 	}

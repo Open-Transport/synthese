@@ -170,15 +170,17 @@ namespace synthese
 			)	);
 			if(it != _transferDestinations.end())
 			{
+				DateTime routePlanningEndTime(_startDateTime);
+				routePlanningEndTime++;
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
 					PTTimeSlotRoutePlanner rp(
 						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getEdge()->getFromVertex()->getHub()),
 						it2,
 						_startDateTime,
-						_startDateTime,
-						_startDateTime,
 						_endDateTime,
+						_startDateTime,
+						routePlanningEndTime,
 						1,
 						AccessParameters(
 							USER_PEDESTRIAN,

@@ -104,7 +104,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Save(
-			ScenarioFolder* object
+			ScenarioFolder* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -117,7 +118,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getName())
 				<< "," << (object->getParent() ? Conversion::ToString(object->getParent()->getKey()) : "0")
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

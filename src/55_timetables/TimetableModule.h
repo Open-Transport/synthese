@@ -24,6 +24,11 @@
 #define SYNTHESE_timetables_TimetableModule_h__
 
 #include "ModuleClassTemplate.hpp"
+#include "Registry.h"
+
+#include <vector>
+#include <utility>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -74,6 +79,22 @@ namespace synthese
 			public server::ModuleClassTemplate<TimetableModule>
 		{
 		public:
+
+			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > TimetableContainersLabels;
+
+			/** Labels list containing each container timetable, indicating the full path in the folder tree.
+				@param folderId id of the main parent folder (optional)
+				@param prefix text to add at the beginning of each item (optional)
+				@param forbiddenFolderId id of a folder which must not be present in the result
+				@return std::vector<std::pair<uid, std::string> > The list
+				@author Hugues Romain
+				@date 2008
+			*/
+			static TimetableContainersLabels GetTimetableContainersLabels(
+				util::RegistryKeyType folderId = 0,
+				std::string prefix = std::string(),
+				boost::optional<util::RegistryKeyType> forbiddenFolderId = boost::optional<util::RegistryKeyType>()
+			);
 		};
 	}
 }

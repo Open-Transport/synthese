@@ -116,7 +116,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Save(
-			InterfacePage* page
+			InterfacePage* page,
+			optional<SQLiteTransaction&> transaction
 		){
 			/// @todo Implementation
 		}

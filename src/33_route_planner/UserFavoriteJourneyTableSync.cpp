@@ -110,7 +110,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Save(
-			UserFavoriteJourney* object
+			UserFavoriteJourney* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -134,7 +135,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getDestinationCityName())
 				<< "," << Conversion::ToSQLiteString(object->getDestinationPlaceName())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

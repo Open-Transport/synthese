@@ -25,16 +25,16 @@
 #ifndef SYNTHESE_DB_SQLITEDB_H
 #define SYNTHESE_DB_SQLITEDB_H
 
-#include "02_db/SQLiteStatement.h"
-#include "02_db/SQLiteResult.h"
+#include "SQLiteStatement.h"
+#include "SQLiteResult.h"
 
-
+#include <boost/optional.hpp>
 
 namespace synthese
 {
 	namespace db
 	{
-
+		class SQLiteTransaction;
 			  
 
 		/** SQLite interface class.
@@ -65,7 +65,10 @@ namespace synthese
 			virtual SQLiteResultSPtr execQuery (const SQLData& sql, bool lazy = false) ;
 
 			virtual void execUpdate (const SQLiteStatementSPtr& statement) = 0;
-			virtual void execUpdate (const SQLData& sql) = 0;
+			virtual void execUpdate (
+				const SQLData& sql,
+				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
+			) = 0;
 
 			/** Returns true if a transaction is already opened.
 			    SQLite does not support nested transaction.

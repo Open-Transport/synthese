@@ -128,7 +128,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Save(
-			TimetableRow* object
+			TimetableRow* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -145,7 +146,7 @@ namespace synthese
 				<< "," << Conversion::ToString(object->getIsArrival())
 				<< "," << static_cast<int>(object->getCompulsory())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

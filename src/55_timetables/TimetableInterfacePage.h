@@ -49,7 +49,7 @@ namespace synthese
 
 			Parameters :
 				- 0 : Content
-				- 1 : Begin a new page
+				- 1 : (no content)
 				- 2 : Title
 				- 3 : Notes content
 

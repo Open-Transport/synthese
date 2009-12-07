@@ -107,8 +107,10 @@ namespace synthese
 			obj->setHub(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Save(PhysicalStop* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Save(
+			PhysicalStop* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			/// @todo Implementation
 		}
     }

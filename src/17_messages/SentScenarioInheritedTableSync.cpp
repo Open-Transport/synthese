@@ -108,7 +108,8 @@ namespace synthese
 
 		template<>
 		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Save(
-			SentScenario* obj
+			SentScenario* obj,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			if (obj->getKey() == UNKNOWN_VALUE)
@@ -154,7 +155,7 @@ namespace synthese
 				<< "," << AlarmTableSync::COL_PERIODEND << "=" << obj->getPeriodEnd().toSQLString()
 				<< " WHERE " 
 				<< AlarmTableSync::COL_SCENARIO_ID << "=" << obj->getKey();
-			sqlite->execUpdate(alarmquery.str());
+			sqlite->execUpdate(alarmquery.str(), transaction);
 		}
 	}
 

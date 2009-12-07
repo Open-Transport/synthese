@@ -82,6 +82,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
+using namespace boost::filesystem;
 
 namespace synthese
 {
@@ -999,14 +1000,14 @@ namespace synthese
 
 
 		void TridentFileFormat::_parse(
-			const string& filePath,
+			const path& filePath,
 			ostream& os,
 			string fileKey
 		){
-			ifstream ifs(filePath.c_str());
+			ifstream ifs(filePath.file_string().c_str());
 			if (!ifs)
 			{
-				throw Exception("Could no open the file" + filePath);
+				throw Exception("Could no open the file" + filePath.file_string());
 			}
 
 			// Read the whole file into a string

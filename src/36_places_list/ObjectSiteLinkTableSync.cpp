@@ -106,7 +106,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Save(
-			ObjectSiteLink* object
+			ObjectSiteLink* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -118,7 +119,7 @@ namespace synthese
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

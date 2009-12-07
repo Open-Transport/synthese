@@ -82,8 +82,10 @@ namespace synthese
 			object->setCreatorId(creatorId);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Save(TransportNetwork* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Save(
+			TransportNetwork* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -95,7 +97,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getCreatorId())
 				<< ")";
 			
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(

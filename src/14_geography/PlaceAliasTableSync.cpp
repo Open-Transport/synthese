@@ -121,8 +121,10 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Save(PlaceAlias* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Save(
+			PlaceAlias* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -133,7 +135,7 @@ namespace synthese
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 	}

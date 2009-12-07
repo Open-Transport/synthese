@@ -93,7 +93,7 @@ namespace synthese
 		{
 			// timetable creation
 			Timetable t;
-			t.setIsBook(_isBook);
+			t.setContentType(_isBook ? Timetable::CONTAINER : Timetable::TABLE_SERVICES_IN_COLS);
 			t.setBookId(_book.get() ? _book->getKey() : 0);
 			t.setRank(_rank);
 			t.setTitle(_title);
@@ -112,7 +112,7 @@ namespace synthese
 
 		void TimetableAddAction::setBook( boost::shared_ptr<const Timetable> book )
 		{
-			assert(!book.get() || book->getIsBook());
+			assert(!book.get() || book->getContentType() == Timetable::CONTAINER);
 
 			_book = book;
 		}

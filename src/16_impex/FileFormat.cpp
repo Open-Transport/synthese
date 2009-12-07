@@ -83,7 +83,7 @@ namespace synthese
 			const FilePathsSet& paths,
 			std::ostream& os
 		){
-			BOOST_FOREACH(const std::string& path, paths)
+			BOOST_FOREACH(const FilePathsSet::value_type& path, paths)
 			{
 				_parse(path, os);
 			}
@@ -105,7 +105,7 @@ namespace synthese
 				FilePathsMap::const_iterator it(paths.find(key));
 				if(it == paths.end())
 					continue;
-				const string& path(it->second);
+				const FilePathsMap::mapped_type& path(it->second);
 
 				_parse(path, os, key);
 			}

@@ -9,7 +9,7 @@ if s3env.GetPlatform () == 'posix':
 s3env.Append (CPPPATH = [Dir ('src').abspath])
 
 s3env.Append (S3VERSION = '3.1.14x8')
-s3env.Append(BOOSTVERSION = '1.35')
+s3env.Append(BOOSTVERSION = '1.40')
 
 Export ('s3env')
   

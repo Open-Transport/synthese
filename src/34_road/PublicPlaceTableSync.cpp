@@ -107,8 +107,10 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Save (PublicPlace* object)
-		{
+		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Save(
+			PublicPlace* object,
+			optional<SQLiteTransaction&> transaction
+		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -120,7 +122,7 @@ namespace synthese
 				Conversion::ToSQLiteString(object->getName()) << "," <<
 				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) <<
 			")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 	}

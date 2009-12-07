@@ -97,7 +97,8 @@ namespace synthese
 
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Save(
-			ReservationContact* object
+			ReservationContact* object,
+			optional<SQLiteTransaction&> transaction
 		){
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -111,7 +112,7 @@ namespace synthese
 				<< Conversion::ToSQLiteString(object->getDescription()) << ","
 				<< Conversion::ToSQLiteString(object->getWebSiteUrl())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			sqlite->execUpdate(query.str(), transaction);
 		}
 
 

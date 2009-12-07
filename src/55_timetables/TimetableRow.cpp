@@ -40,12 +40,12 @@ namespace synthese
 		TimetableRow::TimetableRow(
 			RegistryKeyType id
 		):	Registrable(id),
-			_isArrival(true)
-			, _isDeparture(true)
-			, _place(NULL)
-			, _compulsory(PassageFacultatif)
-			, _rank(UNKNOWN_VALUE)
-			, _timetableId(UNKNOWN_VALUE)
+			_isArrival(true),
+			_isDeparture(true),
+			_place(NULL),
+			_compulsory(PassageFacultatif),
+			_rank(UNKNOWN_VALUE),
+			_timetableId(UNKNOWN_VALUE)
 		{
 		}
 
