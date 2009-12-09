@@ -31,6 +31,9 @@
 #include "Conversion.h"
 #include "Log.h"
 
+#include <algorithm>
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -223,6 +226,79 @@ namespace synthese
 			callHooks (*it);
 			}
 		}
+
+
+		void SQLiteHandle::execTransaction(
+			const SQLiteTransaction& transaction
+		){
+			// Lock this method so that no database update can start before hooks
+			// have finished their execution. The mutex is recursive so that
+			// an update can still be called inside hook callback.
+			boost::recursive_mutex::scoped_lock lock (*_updateMutex);
+
+			SQLiteTSS* tss = getSQLiteTSS ();
+			tss->events.clear ();
+
+			char* errMsg = 0;
+
+			int retc = sqlite3_exec(getHandle(),"BEGIN TRANSACTION;", 0,	0, &errMsg);
+			if (retc != SQLITE_OK)
+			{
+				std::string msg (errMsg);
+				sqlite3_free (errMsg);
+
+				throw SQLiteException ("Error executing batch update when opening transaction : " + 
+					msg + " (error=" + Conversion::ToString (retc) + ")");
+			}
+
+			try
+			{
+				BOOST_FOREACH(const SQLiteTransaction::Queries::value_type& sql, transaction.getQueries())
+				{
+					retc = sqlite3_exec (getHandle (), 
+						sql.c_str (), 
+						0, 
+						0, &errMsg);
+
+					if (retc != SQLITE_OK)
+					{
+						std::string msg (errMsg);
+						sqlite3_free (errMsg);
+
+						throw SQLiteException ("Error executing batch update \"" + Conversion::ToTruncatedString (sql) + "\" : " + 
+							msg + " (error=" + Conversion::ToString (retc) + ")");
+					}
+				}
+			}
+			catch(...)
+			{
+				retc = sqlite3_exec(getHandle(),"COMMIT;", 0,	0, &errMsg);
+				if (retc != SQLITE_OK)
+				{
+					std::string msg (errMsg);
+					sqlite3_free (errMsg);
+
+					throw SQLiteException ("Error executing batch update when commiting transaction, database may be locked : " + 
+						msg + " (error=" + Conversion::ToString (retc) + ")");
+				}
+			}
+
+			retc = sqlite3_exec(getHandle(),"COMMIT;", 0,	0, &errMsg);
+			if (retc != SQLITE_OK)
+			{
+				std::string msg (errMsg);
+				sqlite3_free (errMsg);
+
+				throw SQLiteException ("Error executing batch update when commiting transaction, database may be locked : " + 
+					msg + " (error=" + Conversion::ToString (retc) + ")");
+			}
+
+			BOOST_FOREACH(const SQLiteEvent& event, tss->events)
+			{
+				callHooks(event);
+			}
+		}
+
 
 
 		void SQLiteHandle::execUpdate(

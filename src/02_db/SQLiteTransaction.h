@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_db_SQLiteTransaction_h__
 #define SYNTHESE_db_SQLiteTransaction_h__
 
-#include <sstream>
+#include <vector>
+#include <string>
 
 namespace synthese
 {
@@ -34,13 +35,15 @@ namespace synthese
 		*/
 		class SQLiteTransaction
 		{
+		public:
+			typedef std::vector<std::string> Queries;
+
 		private:
-			std::stringstream _sql;
+			Queries _sql;
 
 		public:
-			SQLiteTransaction();
-
 			void add(const std::string& query);
+			const Queries getQueries() const;
 			void run();
 		};
 	}

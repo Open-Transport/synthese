@@ -39,7 +39,7 @@
 #include "CityTableSync.h"
 #include "Crossing.h"
 #include "shapefil.h"
-#include "GeoPoint.h"
+#include "Point2D.h"
 #include "SQLiteTransaction.h"
 
 #include <boost/lexical_cast.hpp>
@@ -59,6 +59,8 @@ namespace synthese
 	using namespace env;
 	using namespace geography;
 	using namespace db;
+	using namespace geometry;
+	
 	
 
 	namespace util
@@ -318,13 +320,13 @@ namespace synthese
 					string roadName(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ST_NAME)));
 					SHPObject* shpObject(SHPReadObject(shapeFile, int(i-1)));
 					double length(0);
-					optional<GeoPoint> lastPt;
+					optional<Point2D> lastPt;
 					for(int i(0); i< shpObject->nVertices; ++i)
 					{
-						GeoPoint point(shpObject->padfX[i], shpObject->padfY[i], 0);
+						Point2D point(shpObject->padfX[i], shpObject->padfY[i]);
 						if(lastPt)
 						{
-							length += point - *lastPt;
+							length += point.getDistanceTo(*lastPt);
 						}
 						lastPt = point;
 					}

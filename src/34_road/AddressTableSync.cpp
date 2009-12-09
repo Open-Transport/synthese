@@ -186,7 +186,7 @@ namespace synthese
 				(	dynamic_cast<const Registrable*>(object->getHub()) && !dynamic_cast<const Crossing*>(object->getHub()) ?
 					lexical_cast<string>(dynamic_cast<const Registrable*>(object->getHub())->getKey()) :
 					"0"
-				) << "," <<
+				) << "," << fixed <<
 				object->getX() << "," <<
 				object->getY() << "," <<
 				Conversion::ToSQLiteString(object->getCodeBySource()) << "," <<

@@ -172,7 +172,7 @@ namespace synthese
 				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) << "," <<
 				object->getAllowedConnection() << "," <<
 				(object->getCity() ? object->getCity()->includes(object) : false) << "," <<
-				object->getDefaultTransferDelay() << "," <<
+				(object->getDefaultTransferDelay().total_seconds() / 60) << "," <<
 				"\"";
 			bool first(true);
 			BOOST_FOREACH(const AddressablePlace::TransferDelaysMap::value_type& td, object->getTransferDelays())

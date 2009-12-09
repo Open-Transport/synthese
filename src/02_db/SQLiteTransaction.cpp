@@ -24,29 +24,31 @@
 #include "DBModule.h"
 #include "SQLite.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 
 namespace synthese
 {
 	namespace db
 	{
-		SQLiteTransaction::SQLiteTransaction()
-		{
-			_sql << "BEGIN TRANSACTION;";
-		}
-
 		void SQLiteTransaction::add(
 			const string& sql
 		){
-			_sql << sql << ";";
+			_sql.push_back(sql);
 		}
 
 		void SQLiteTransaction::run(
 		){
-			_sql << "COMMIT;";
-			DBModule::GetSQLite()->execUpdate(_sql.str());
+			DBModule::GetSQLite()->execTransaction(*this);
 			_sql.clear();
-			_sql << "BEGIN TRANSACTION;";
+		}
+
+
+
+		const SQLiteTransaction::Queries SQLiteTransaction::getQueries() const
+		{
+			return _sql;
 		}
 	}
 }

@@ -63,6 +63,9 @@ namespace synthese
 
 			virtual SQLiteResultSPtr execQuery (const SQLiteStatementSPtr& statement, bool lazy = false) = 0;
 			virtual SQLiteResultSPtr execQuery (const SQLData& sql, bool lazy = false) ;
+			virtual void execTransaction(
+				const SQLiteTransaction& transaction
+			) = 0;
 
 			virtual void execUpdate (const SQLiteStatementSPtr& statement) = 0;
 			virtual void execUpdate (
