@@ -28,6 +28,7 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "Env.h"
 #include "CalendarModule.h"
+#include "SubLine.h"
 
 #include <boost/foreach.hpp>
 
@@ -76,28 +77,40 @@ namespace synthese
 				if (!_isLineSelected(line))
 					continue;
 
-				// Loop on each service
-				BOOST_FOREACH(const Service* servicePtr, line.getServices())
+				_scanServices(line);
+
+				BOOST_FOREACH(const Line::SubLines::value_type& subline, line.getSubLines())
 				{
-					// Permanent service filter
-					const NonPermanentService* service(dynamic_cast<const NonPermanentService*>(servicePtr));
-					if (service == NULL)
-						continue;
-
-					// Calendar filter
-					if(	!(_baseCalendar.hasAtLeastOneCommonDateWith(*service))
-						|| !_withContinuousServices && service->isContinuous()
-					)	continue;
-
-					// Column creation
-					TimetableColumn col(*this, *service);
-
-					// Column storage or merge
-					_insert(col);
+					_scanServices(*subline);
 				}
 			}
 
 			_buildWarnings();
+		}
+
+
+
+		void TimetableGenerator::_scanServices( const env::Line& line )
+		{
+			// Loop on each service
+			BOOST_FOREACH(const Service* servicePtr, line.getServices())
+			{
+				// Permanent service filter
+				const NonPermanentService* service(dynamic_cast<const NonPermanentService*>(servicePtr));
+				if (service == NULL)
+					continue;
+
+				// Calendar filter
+				if(	!(_baseCalendar.hasAtLeastOneCommonDateWith(*service))
+					|| !_withContinuousServices && service->isContinuous()
+				)	continue;
+
+				// Column creation
+				TimetableColumn col(*this, *service);
+
+				// Column storage or merge
+				_insert(col);
+			}
 		}
 
 

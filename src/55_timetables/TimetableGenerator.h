@@ -91,6 +91,7 @@ namespace synthese
 				bool	_isLineSelected(const env::Line& line)	const;
 				void	_insert(const TimetableColumn& col);
 				void	_buildWarnings();
+				void	_scanServices(const env::Line& line);
 			//@}
 
 		public:
