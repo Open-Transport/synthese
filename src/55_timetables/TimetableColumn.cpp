@@ -72,7 +72,7 @@ namespace synthese
 						_content.push_back(
 							make_pair(
 								dynamic_cast<const PhysicalStop*>((*itEdge2)->getFromVertex()),
-								((*itEdge2)->isDeparture() == itRow->getIsDeparture()) ?
+								((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
 									service.getDepartureBeginScheduleToIndex(false, itEdge2 - edges.begin()) :
 									service.getArrivalBeginScheduleToIndex(false, itEdge2 - edges.begin())
 						)	);

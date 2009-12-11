@@ -68,7 +68,7 @@ namespace synthese
 		ParametersMap CancelReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_RESERVATION_TRANSACTION_ID, _transaction->getKey());
+			if (_transaction->getKey()) map.insert(PARAMETER_RESERVATION_TRANSACTION_ID, _transaction->getKey());
 			return map;
 		}
 		

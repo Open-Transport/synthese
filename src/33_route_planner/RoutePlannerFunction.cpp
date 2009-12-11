@@ -46,6 +46,8 @@
 #include "RGBColor.h"
 #include "Crossing.h"
 #include "PhysicalStop.h"
+#include "OnlineReservationRule.h"
+#include "ReservationContact.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -67,6 +69,7 @@ namespace synthese
 	using namespace road;
 	using namespace algorithm;
 	using namespace ptrouteplanner;
+	using namespace resa;
 
 	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
@@ -381,21 +384,42 @@ namespace synthese
 
 						if(journey.getReservationCompliance() != false)
 						{
-							bool online(true); // Interactive
-							string openingHours; // Interactive
-							string phoneNumber; // Interactive
+							set<const ReservationContact*> resaRules;
+							BOOST_FOREACH(const ServiceUse& su, journey.getServiceUses())
+							{
+								const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
+								if(line == NULL) continue;
+
+								if(	line->getCommercialLine()->getReservationContact() &&
+									UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
+									){
+										resaRules.insert(line->getCommercialLine()->getReservationContact());
+								}
+							}
+							stringstream sPhones;
+							stringstream sOpeningHours;
+							bool onlineBooking(!resaRules.empty());
+							BOOST_FOREACH(const ReservationContact* rc, resaRules)
+							{
+								sPhones << rc->getPhoneExchangeNumber() << " ";
+								sOpeningHours << rc->getPhoneExchangeOpeningHours() << " ";
+								if (!OnlineReservationRule::GetOnlineReservationRule(rc))
+								{
+									onlineBooking = false;
+								}
+							}
 
 							stream << "<reservation" <<
-								" online=\"" << (online ? "true" : "false") << "\"" <<
+								" online=\"" << (onlineBooking ? "true" : "false") << "\"" <<
 								" type=\"" << (journey.getReservationCompliance() == true ? "compulsory" : "optional") << "\""
 							;
-							if(!openingHours.empty())
+							if(!sOpeningHours.str().empty())
 							{
-								stream << " openingHours=\"" << openingHours << "\"";
+								stream << " openingHours=\"" << sOpeningHours.str() << "\"";
 							}
-							if(!phoneNumber.empty())
+							if(!sPhones.str().empty())
 							{
-								stream << " phoneNumber=\"" << phoneNumber << "\"";
+								stream << " phoneNumber=\"" << sPhones.str() << "\"";
 							}
 							stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine().toPosixTime()) << "\" />";
 						}
