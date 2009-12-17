@@ -295,11 +295,10 @@ namespace synthese
 						posix_time::minutes(
 							departureTime - parentContinuousService.getDepartureTime()
 					)	);
-					TimeSlotRoutePlanner::Result::value_type j;
-					BOOST_FOREACH(Journey::ServiceUses::value_type leg, parentContinuousService.getServiceUses())
+					TimeSlotRoutePlanner::Result::value_type j(parentContinuousService);
+					BOOST_FOREACH(Journey::ServiceUses::value_type& leg, j.getServiceUses())
 					{
 						leg.shift(toShift);
-						j.push(leg);
 					}
 					j.setContinuousServiceRange(precedingLastDepartureTime - departureTime);
 					result.push_back(j);
@@ -319,11 +318,10 @@ namespace synthese
 					posix_time::minutes(
 						departureTime - parentContinuousService.getDepartureTime()
 				)	);
-				TimeSlotRoutePlanner::Result::value_type j;
-				BOOST_FOREACH(Journey::ServiceUses::value_type leg, parentContinuousService.getServiceUses())
+				TimeSlotRoutePlanner::Result::value_type j(parentContinuousService);
+				BOOST_FOREACH(Journey::ServiceUses::value_type& leg, j.getServiceUses())
 				{
 					leg.shift(toShift);
-					j.push(leg);
 				}
 				j.setContinuousServiceRange(lastDepartureTime - departureTime);
 				result.push_back(j);

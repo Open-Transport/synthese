@@ -174,7 +174,7 @@ namespace synthese
 						result.getContinuousServiceRange()
 					);
 					goalApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
-					result.append(goalApproachJourney);
+					result = Journey(goalApproachJourney, result);
 				}
 			}
 
@@ -198,7 +198,7 @@ namespace synthese
 						result.getContinuousServiceRange()
 					);
 					originApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
-					result.prepend(originApproachJourney);
+					result = Journey(originApproachJourney, result);
 				}
 			}
 
@@ -262,6 +262,7 @@ namespace synthese
 				accessDirection,
 				_accessParameters,
 				_whatToSearch,
+				true,
 				_graphToUse,
 				todo,
 				bestVertexReachesMap,

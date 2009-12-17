@@ -85,6 +85,7 @@ namespace synthese
 				const graph::AccessParameters				_accessParameters;
 				const graph::AccessDirection				_accessDirection;
 				const graph::GraphIdType					_whatToSearch;
+				const bool									_searchOnlyNodes;
 				const graph::GraphIdType					_graphToUse;
 				JourneysResult<graph::JourneyComparator>&	_result;
 				BestVertexReachesMap&						_bestVertexReachesMap;
@@ -112,6 +113,7 @@ namespace synthese
 				graph::AccessDirection								accessDirection,
 				const graph::AccessParameters&						accessParameters,
 				graph::GraphIdType									whatToSearch,
+				bool												searchOnlyNodes,
 				graph::GraphIdType									graphToUse,
 				JourneysResult<graph::JourneyComparator>&			result,
 				BestVertexReachesMap&								bestVertexReachesMap,

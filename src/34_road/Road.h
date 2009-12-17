@@ -114,7 +114,7 @@ namespace synthese
 		//@{
 			void addRoadChunk(
 				RoadChunk* address,
-				bool autoShift = false
+				boost::optional<double> autoShift = boost::optional<double>()
 			);
 		//@}
 		};

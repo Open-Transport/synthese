@@ -66,6 +66,7 @@ namespace synthese
 
 		void Timetable::addRow( const TimetableRow& row )
 		{
+			if(row.getRank() < 0 || row.getRank() > _rows.size()) throw util::Exception("Invalid rank in timetable");
 			_rows.insert(_rows.begin() + row.getRank(), row);
 		}
 

@@ -193,7 +193,7 @@ namespace synthese
 
 				if(!autoShift) throw Exception("An edge with the rank "+ lexical_cast<string>(edge->getRankInPath()) + " already exists in the path " + lexical_cast<string>(getKey()));
 
-				for(Edges::iterator it(insertionPosition+1); it != _edges.end(); ++it)
+				for(Edges::iterator it(insertionPosition); it != _edges.end(); ++it)
 				{
 					(*it)->setRankInPath((*it)->getRankInPath() + 1);
 					if(insertionPosition == _edges.begin())

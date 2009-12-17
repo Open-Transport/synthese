@@ -68,6 +68,7 @@ namespace synthese
 			AccessDirection accessDirection,
 			const AccessParameters&	accessParameters,
 			GraphIdType whatToSearch,
+			bool searchOnlyNodes,
 			GraphIdType graphToUse,
 			JourneysResult<graph::JourneyComparator>&	result,
 			BestVertexReachesMap& bestVertexReachesMap,
@@ -82,6 +83,7 @@ namespace synthese
 		):	_accessDirection(accessDirection),
 			_accessParameters(accessParameters),
 			_whatToSearch(whatToSearch),
+			_searchOnlyNodes(searchOnlyNodes),
 			_graphToUse(graphToUse),
 			_result(result),
 			_bestVertexReachesMap(bestVertexReachesMap),
@@ -281,8 +283,7 @@ namespace synthese
 				}
 #endif
 
-				Journey currentJourney(startJourney);
-				currentJourney.push(*journey);
+				Journey currentJourney(startJourney, *journey);
 
 				// Loop on each origin vertex
 				for(std::map<const Vertex*, VertexAccess>::const_iterator itVertex(vam.getMap ().begin())
@@ -303,7 +304,7 @@ namespace synthese
 					if(fullApproachJourney.empty())
 						fullApproachJourney.setStartApproachDuration(itVertex->second.approachTime);
 
-					DateTime correctedDesiredTime(desiredTime);
+					DateTime correctedDesiredTime(journey->empty() ? desiredTime : journey->getEndTime());
 					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 						correctedDesiredTime += static_cast<int>(itVertex->second.approachTime.minutes());
 					else
@@ -369,10 +370,10 @@ namespace synthese
 
 							PtrEdgeStep step(	
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
-								?(	_destinationVam.needFineSteppingForArrival (edge.getParentPath())
+								?(	!_searchOnlyNodes || _destinationVam.needFineSteppingForArrival (edge.getParentPath())
 									? (&Edge::getFollowingArrivalForFineSteppingOnly)
 									: (&Edge::getFollowingConnectionArrival)
-								):(	_destinationVam.needFineSteppingForDeparture (edge.getParentPath())
+								):(	!_searchOnlyNodes || _destinationVam.needFineSteppingForDeparture (edge.getParentPath())
 									? (&Edge::getPreviousDepartureForFineSteppingOnly)
 									: (&Edge::getPreviousConnectionDeparture)
 								)
@@ -396,21 +397,36 @@ namespace synthese
 									nonServedEdges.erase(it);
 								}
 
-								// The reached vertex is analyzed only in two cases :
-								//  - if the vertex belongs to the goal
-								//  - if the vertex is a connecting vertex
 								const Vertex* reachedVertex(curEdge->getFromVertex());
-								bool isGoalReached(_destinationVam.contains(reachedVertex));
-								
-								// In road integral search, all nodes are potential connection points
-								if(	!reachedVertex->getHub()->isConnectionPossible() &&
-									!isGoalReached
+
+								// The reached vertex is analyzed only in 3 cases :
+								//  - if the vertex belongs to the goal
+								//  - if the type of the vertex corresponds to the searched one (if 
+								//		the _searchOnlyNodes parameter is activated, the vertex must 
+								//		also belong to a connection place)
+								//  - if the vertex belongs to a connection place
+								bool isGoalReached(
+									_destinationVam.contains(reachedVertex)
+								);
+								bool isReturnedVertex(
+									(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) &&
+										(	!_searchOnlyNodes ||
+											(	reachedVertex->getHub()->isConnectionPossible() &&
+												(	!_accessParameters.getMaxtransportConnectionsCount() ||
+													fullApproachJourney.size() + 1 < *_accessParameters.getMaxtransportConnectionsCount()
+								)	)	)	)	);
+								bool isARecursionNode(
+									reachedVertex->getHub()->isConnectionPossible() &&
+									(	!maxDepth || journey->size() < *maxDepth)
+								);
+								if(	!isGoalReached &&
+									!isReturnedVertex &&
+									!isARecursionNode
 								){
 									continue;
 								}
 
 								// Storage of the useful solution
-								shared_ptr<Journey> resultJourney(new Journey(fullApproachJourney));
 								ServiceUse serviceUse(serviceInstance, curEdge);
 								if (serviceUse.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
 								{
@@ -418,10 +434,15 @@ namespace synthese
 									continue;
 								}
 
-								resultJourney->push(serviceUse);
-
-								if (isGoalReached)
-									resultJourney->setEndApproachDuration(_destinationVam.getVertexAccess(reachedVertex).approachTime);
+								// Result journey writing
+								shared_ptr<Journey> resultJourney(
+									new Journey(fullApproachJourney, serviceUse)
+								);
+								resultJourney->setRoutePlanningInformations(
+									isGoalReached,
+									_destinationVam,
+									_minMaxDateTimeAtDestination
+								);
 
 
 								// Analyze of the utility of the edge
@@ -435,28 +456,21 @@ namespace synthese
 										continue;
 								}
 
-								resultJourney->setEndReached(isGoalReached);
-								resultJourney->setSquareDistanceToEnd(_destinationVam);
-								resultJourney->setMinSpeedToEnd(_minMaxDateTimeAtDestination);
-
 								// Storage of the journey as a result :
 								//	- if goal reached
 								//	- if useful for a transfer
-								if(	(	(	!_accessParameters.getMaxtransportConnectionsCount() ||
-											resultJourney->getServiceUses().size() < *_accessParameters.getMaxtransportConnectionsCount()
-										) &&
-										reachedVertex->getHub()->containsAnyVertex(_whatToSearch)
-									) ||
-									isGoalReached
+								if(	isGoalReached ||
+									isReturnedVertex
 								){
 									_result.add(resultJourney);
 								}
 
 								// Storage of the journey for recursion
-								if (journey->size() < maxDepth)
-								{
-									shared_ptr<Journey> todoJourney(new Journey(*journey));
-									todoJourney->push(serviceUse);
+								if(	isARecursionNode
+								){
+									shared_ptr<Journey> todoJourney(
+										new Journey(*journey, serviceUse)
+									);
 									todo.add(todoJourney);
 								}
 

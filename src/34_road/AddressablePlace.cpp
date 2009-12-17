@@ -123,8 +123,6 @@ namespace synthese
 			const Vertex& fromVertex,
 			const Vertex& toVertex
 		) const {
-			if(!_allowedConnection) return false;
-
 			return getTransferDelay(fromVertex, toVertex) != posix_time::time_duration();
 		}
 

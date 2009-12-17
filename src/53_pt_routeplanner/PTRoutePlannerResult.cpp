@@ -92,12 +92,10 @@ namespace synthese
 					const ServiceUse& curET(*itl);
 
 					// Search of the place from the preceding one
-					if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode())
+					if (itl == jl.begin())
 					{
 						const NamedPlace* placeToSearch(
-							(	itl == jl.begin() &&
-								dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
-							)?
+							dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub()) ?
 							dynamic_cast<const NamedPlace*>(_departurePlace) :
 							dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
 						);
@@ -117,14 +115,13 @@ namespace synthese
 						++i;
 					}
 
-					if (itl == jl.end()-1 || !curET.getEdge()->getParentPath()->isPedestrianMode())
+					const NamedPlace* placeToSearch(
+						dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
+						(itl == jl.end()-1 ? dynamic_cast<const NamedPlace*>(_arrivalPlace) : NULL) :
+						dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
+					);
+					if(placeToSearch)
 					{
-						const NamedPlace* placeToSearch(
-							itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
-							dynamic_cast<const NamedPlace*>(_arrivalPlace) :
-							dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
-						);
-
 						if(_ordrePARechercheGare(i, placeToSearch))
 						{
 							if (dernieri && i < *dernieri )

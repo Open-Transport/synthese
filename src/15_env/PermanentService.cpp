@@ -66,9 +66,9 @@ namespace synthese
 				: servicePointer.getEdge()->getMetricOffset() - edge->getMetricOffset()
 			);
 
-			assert(distance > 0);
+			assert(distance >= 0);
 
-			int duration(ceil(distance * 0.015));
+			int duration(distance > 0 ? ceil(distance * 0.015) : 1);
 			DateTime dt(servicePointer.getActualDateTime());
 			if (servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				dt += duration;

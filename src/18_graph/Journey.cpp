@@ -32,9 +32,17 @@
 
 #include "01_util/Constants.h"
 
+#ifdef DEBUG
+#include "date_time_visualizer.hpp"
+#endif
+
+#include <limits>
 #include <boost/foreach.hpp>
 
+#undef max
+
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -57,7 +65,81 @@ namespace synthese
 			_method(UNDEFINED_DIRECTION)
 		{
 		}
-		
+
+
+
+		Journey::Journey(
+			const Journey& journey,
+			const ServiceUse& serviceUse
+		):	_continuousServiceRange(
+				journey._continuousServiceRange == UNKNOWN_VALUE ||	journey._continuousServiceRange > serviceUse.getServiceRange() ?
+				serviceUse.getServiceRange() :
+				journey._continuousServiceRange
+			),
+			_effectiveDuration(journey._effectiveDuration + serviceUse.getDuration()),
+			_transportConnectionCount(
+				serviceUse.getEdge()->getParentPath()->isRoad() ?
+				journey._transportConnectionCount :
+				journey._transportConnectionCount + 1
+			),
+			_distance(journey._distance + serviceUse.getDistance()),
+			_startApproachDuration(journey._startApproachDuration),
+			_endApproachDuration(posix_time::minutes(0)),
+			_endReached(false),
+			_squareDistanceToEnd(UNKNOWN_VALUE),
+			_minSpeedToEnd(UNKNOWN_VALUE)
+		{
+			assert(journey._method == UNDEFINED_DIRECTION || journey._method == serviceUse.getMethod());
+
+			_setMethod(serviceUse.getMethod());
+			_append(journey);
+			if(_method == DEPARTURE_TO_ARRIVAL)
+			{
+				_append(serviceUse);
+			}
+			else
+			{
+				_prepend(serviceUse);
+			}
+		}
+
+
+
+		Journey::Journey(
+			const Journey& journey1,
+			const Journey& journey2
+		):	_continuousServiceRange(
+				journey1._continuousServiceRange == UNKNOWN_VALUE ||
+				journey1._continuousServiceRange > journey2._continuousServiceRange ?
+				journey2._continuousServiceRange :
+				journey1._continuousServiceRange
+			),
+			_effectiveDuration(journey1._effectiveDuration + journey2._effectiveDuration),
+			_transportConnectionCount(
+				journey1._transportConnectionCount +
+				journey2._transportConnectionCount + 1
+			),
+			_distance(journey1._distance + journey2._distance),
+			_startApproachDuration(journey1._startApproachDuration),
+			_endApproachDuration(journey2._endApproachDuration),
+			_endReached(journey2._endReached),
+			_squareDistanceToEnd(journey2._squareDistanceToEnd),
+			_minSpeedToEnd(journey2._minSpeedToEnd)
+		{
+			assert(journey1._method == UNDEFINED_DIRECTION || journey2._method == UNDEFINED_DIRECTION || journey1._method == journey2._method);
+
+			_setMethod(journey1._method == UNDEFINED_DIRECTION ? journey2._method : journey1._method);
+			_append(journey1);
+			if(_method == DEPARTURE_TO_ARRIVAL)
+			{
+				_append(journey2);
+			}
+			else
+			{
+				_prepend(journey2);
+			}
+		}
+
 
 
 		Journey::~Journey ()
@@ -143,104 +225,40 @@ namespace synthese
 
 
 
-		void Journey::_prependServiceUse(
+		void Journey::_prepend(
 			const ServiceUse& leg
 		){
-			if(_method == UNDEFINED_DIRECTION)
-			{
-				_setMethod(leg.getMethod());
-			}
-
-			assert(leg.getMethod() == _method);
-
-			_journeyLegs.push_front (leg);
-			_effectiveDuration += leg.getDuration ();
-			_distance += leg.getDistance ();
-			if(	_continuousServiceRange == UNKNOWN_VALUE
-			||	_continuousServiceRange > leg.getServiceRange()
-			)	_continuousServiceRange = leg.getServiceRange();
-
-			if (!leg.getEdge()->getParentPath()->isRoad())
-				++_transportConnectionCount;
+			_journeyLegs.push_front(leg);
 		}
 
 
 
-		void Journey::prepend(
+		void Journey::_append(
+			const ServiceUse& leg
+		){
+			_journeyLegs.push_back(leg);
+		}
+
+
+
+		void Journey::_prepend(
 			const Journey& journey
 		){
-			if(journey.empty()) return;
-
-			if (_method == UNDEFINED_DIRECTION)
-			{
-				_setMethod(journey.getMethod());
-			}
-
-			assert(_method == journey._method);
-
 			for(ServiceUses::const_reverse_iterator it(journey._journeyLegs.rbegin());
 				it != journey._journeyLegs.rend();
 				++it
-			)	_prependServiceUse(*it);
-
-			if (_method == DEPARTURE_TO_ARRIVAL)
-				_startApproachDuration = journey._startApproachDuration;
-			else
-			{
-				_endReached = journey._endReached;
-				_endApproachDuration = journey._endApproachDuration;
-			}
+			)	_prepend(*it);
 		}
 
 
 
-		void Journey::_appendServiceUse(
-			const ServiceUse& leg
-		){
-			if(_method == UNDEFINED_DIRECTION)
-			{
-				_setMethod(leg.getMethod());
-			}
-
-			assert(leg.getMethod() == _method);
-
-			_journeyLegs.push_back (leg);
-			_effectiveDuration += leg.getDuration ();
-			_distance += leg.getDistance ();
-			if(	_continuousServiceRange == UNKNOWN_VALUE
-			||	_continuousServiceRange > leg.getServiceRange()
-			)	_continuousServiceRange = leg.getServiceRange();
-
-			if (!leg.getEdge()->getParentPath()->isRoad ())
-				++_transportConnectionCount;
-		}
-
-
-
-		void Journey::append(
+		void Journey::_append(
 			const Journey& journey
 		){
-			if(journey.empty()) return;
-
-			if(_method == UNDEFINED_DIRECTION)
-			{
-				_setMethod(journey.getMethod());
-			}
-
-			assert(_method == journey._method);
-
 			for(ServiceUses::const_iterator it(journey._journeyLegs.begin());
 				it != journey._journeyLegs.end();
 				++it
-			)	_appendServiceUse(*it);
-
-			if (_method == DEPARTURE_TO_ARRIVAL)
-			{
-				_endReached = journey._endReached;
-				_endApproachDuration = journey._endApproachDuration;
-			}
-			else
-				_startApproachDuration = journey._startApproachDuration;
+			)	_append(*it);
 		}
 
 
@@ -299,6 +317,13 @@ namespace synthese
 
 
 		const Journey::ServiceUses& Journey::getServiceUses() const
+		{
+			return _journeyLegs;
+		}
+
+
+
+		Journey::ServiceUses& Journey::getServiceUses()
 		{
 			return _journeyLegs;
 		}
@@ -364,13 +389,6 @@ namespace synthese
 
 
 
-		void Journey::setEndApproachDuration(boost::posix_time::time_duration duration)
-		{
-			_endApproachDuration = duration;
-		}
-
-
-
 		void Journey::shift(
 			posix_time::time_duration duration,
 			int continuousServiceRange /*= UNKNOWN_VALUE*/
@@ -425,21 +443,7 @@ namespace synthese
 			return _method;
 		}
 
-		void Journey::setEndReached( bool value )
-		{
-			_endReached = value;
-		}
 
-		void Journey::setSquareDistanceToEnd( const VertexAccessMap& vam )
-		{
-			if (_endReached)
-				_squareDistanceToEnd = 0;
-			else
-				_squareDistanceToEnd.setFromPoints(
-					vam.getIsobarycenter(),
-					getEndEdge()->getHub()->getPoint()
-				);
-		}
 
 		const Edge* Journey::getEndEdge() const
 		{
@@ -465,26 +469,6 @@ namespace synthese
 		}
 
 
-
-		void Journey::setMinSpeedToEnd( const DateTime& dateTime )
-		{
-			if (_endReached)
-				_minSpeedToEnd = 0;
-			else
-			{
-				assert((_method == DEPARTURE_TO_ARRIVAL) ? dateTime > getArrivalTime() : getDepartureTime() > dateTime);
-
-				_minSpeedToEnd = (1000 * _squareDistanceToEnd.getSquareDistance()) / ((_method == DEPARTURE_TO_ARRIVAL) ? dateTime - getArrivalTime() : getDepartureTime() - dateTime);
-
-				_score = _minSpeedToEnd;
-				if (_score < 100)
-					_score = 100;
-				if (getEndEdge()->getHub()->getScore())
-				{
-					_score /= getEndEdge()->getHub()->getScore();
-				}
-			}
-		}
 
 		Journey::MinSpeed Journey::getMinSpeedToEnd() const
 		{
@@ -521,8 +505,6 @@ namespace synthese
 				_beginEdgeGetter = &Journey::getOrigin;
 				_endDateTimeGetter = &Journey::getArrivalTime;
 				_beginDateTimeGetter = &Journey::getDepartureTime;
-				_serviceUsePusher = &Journey::_appendServiceUse;
-				_journeyPusher = &Journey::append;
 			}
 			else
 			{
@@ -533,8 +515,6 @@ namespace synthese
 				_beginEdgeGetter = &Journey::getDestination;
 				_endDateTimeGetter = &Journey::getDepartureTime;
 				_beginDateTimeGetter = &Journey::getArrivalTime;
-				_serviceUsePusher = &Journey::_prependServiceUse;
-				_journeyPusher = &Journey::prepend;
 			}
 		}
 
@@ -585,32 +565,6 @@ namespace synthese
 
 
 
-		void Journey::push( const ServiceUse& leg )
-		{
-			if(_method == UNDEFINED_DIRECTION)
-			{
-				_setMethod(leg.getMethod());
-			}
-
-			(this->*_serviceUsePusher)(leg);
-		}
-
-
-
-		void Journey::push( const Journey& journey )
-		{
-			if(journey.empty()) return;
-
-			if(_method == UNDEFINED_DIRECTION)
-			{
-				_setMethod(journey.getMethod());
-			}
-			
-			(this->*_journeyPusher)(journey);
-		}
-
-
-
 		posix_time::time_duration Journey::getStartApproachDuration() const
 		{
 			return _startApproachDuration;
@@ -622,5 +576,57 @@ namespace synthese
 		{
 			return _endApproachDuration;
 		}
-}
+
+
+
+		void Journey::setRoutePlanningInformations(
+			bool endIsReached,
+			const VertexAccessMap& goal,
+			const time::DateTime& bestTimeAtGoal 
+		){
+			_endReached = endIsReached;
+
+			if(_endReached)
+			{
+				_endApproachDuration = goal.getVertexAccess(getEndEdge()->getFromVertex()).approachTime;
+				_squareDistanceToEnd = 0;
+				_minSpeedToEnd = 0;
+			}
+			else
+			{
+				_squareDistanceToEnd.setFromPoints(
+					goal.getIsobarycenter(),
+					getEndEdge()->getHub()->getPoint()
+				);
+
+				setMinSpeedToEnd(bestTimeAtGoal);
+			}
+
+		}
+
+
+
+		void Journey::setMinSpeedToEnd( const time::DateTime& bestTimeAtGoal )
+		{
+			if(_method == DEPARTURE_TO_ARRIVAL ? bestTimeAtGoal <= getArrivalTime() : getDepartureTime() <= bestTimeAtGoal)
+			{
+				_minSpeedToEnd = numeric_limits<MinSpeed>::max();
+				_score = 0;
+			}
+			else
+			{
+				const Hub* endHub(getEndEdge()->getHub());
+
+				_minSpeedToEnd = (1000 * _squareDistanceToEnd.getSquareDistance()) / ((_method == DEPARTURE_TO_ARRIVAL) ? bestTimeAtGoal - getArrivalTime() : getDepartureTime() - bestTimeAtGoal);
+
+				_score = _minSpeedToEnd;
+				if (_score < 100)
+					_score = 100;
+				if (endHub->getScore())
+				{
+					_score /= endHub->getScore();
+				}
+			}
+		}
+	}
 }

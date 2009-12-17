@@ -57,12 +57,14 @@ namespace synthese
 
 			//! @name Content
 			//@{
-				ServiceUses		_journeyLegs;
+				AccessDirection						_method;
+				ServiceUses							_journeyLegs;
+				boost::posix_time::time_duration	_startApproachDuration;
+				boost::posix_time::time_duration	_endApproachDuration;
 			//@}
 
-			//! @name Supplemental data
+			//! @name Route planning data
 			//@{
-				AccessDirection				_method;
 				bool						_endReached;
 				geometry::SquareDistance	_squareDistanceToEnd;
 				MinSpeed					_minSpeedToEnd;
@@ -77,12 +79,6 @@ namespace synthese
 				double			_distance;
 			//@}
 			
-			//! @name Oriented supplemental data
-			//@{
-				boost::posix_time::time_duration				_startApproachDuration;
-				boost::posix_time::time_duration				_endApproachDuration;
-			//@}
-
 			//! @name Oriented operators
 			//@{
 				time::DateTime::ComparisonOperator	_bestTimeStrictOperator;
@@ -92,16 +88,19 @@ namespace synthese
 				EdgeGetter							_beginEdgeGetter;
 				DateTimeGetter						_endDateTimeGetter;
 				DateTimeGetter						_beginDateTimeGetter;
-				JourneyPusher						_journeyPusher;
-				ServiceUsePusher					_serviceUsePusher;
 			//@}
 
 				void _setMethod(AccessDirection method);
-				void _prependServiceUse(const ServiceUse& leg);
-				void _appendServiceUse(const ServiceUse& leg);
+				void _prepend(const ServiceUse& leg);
+				void _append(const ServiceUse& leg);
+				void _prepend (const Journey& journey);
+				void _append (const Journey& journey);
+
 
 		 public:
 			Journey();
+			Journey(const Journey& journey, const ServiceUse& serviceUse);
+			Journey(const Journey& journey1, const Journey& journey2);
 			~Journey();
 
 
@@ -113,6 +112,7 @@ namespace synthese
 					@date 2007					
 				*/
 				const ServiceUses& getServiceUses() const;
+				ServiceUses& getServiceUses();
 
 				AccessDirection getMethod() const;
 
@@ -136,7 +136,6 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setContinuousServiceRange (int continuousServiceRange);
-				void setEndReached(bool value);
 				geometry::SquareDistance getSquareDistanceToEnd() const;
 			//@}
 
@@ -144,7 +143,6 @@ namespace synthese
 			//@{
 				const ServiceUse& getEndServiceUse() const;
 				const ServiceUse& getStartServiceUse() const;
-				void setEndApproachDuration(boost::posix_time::time_duration duration);
 				void setStartApproachDuration(boost::posix_time::time_duration duration);
 			//@}
 
@@ -191,9 +189,6 @@ namespace synthese
 				bool isBestThan(const Journey& other) const;
 
 
-// 				bool verifyAxisConstraints(const env::Axis* axis) const;
-
-
 				boost::logic::tribool	getReservationCompliance() const;
 				time::DateTime			getReservationDeadLine() const;
 			//@}
@@ -204,20 +199,32 @@ namespace synthese
 			//@{
 				void clear ();
 
-				void push(const ServiceUse& leg);
-				void push(const Journey& journey);
-				
-				void prepend (const Journey& journey);
-				void append (const Journey& journey);
-
 				void shift(
 					boost::posix_time::time_duration duration,
 					int continuousServiceRange = UNKNOWN_VALUE
 				);
 				void reverse();
 
-				void setSquareDistanceToEnd(const VertexAccessMap& vam);
-				void setMinSpeedToEnd(const time::DateTime& dateTime);
+				//////////////////////////////////////////////////////////////////////////
+				/// Sets the informations about the position of the journey as a route
+				/// planning result.
+				/// @param endIsReached indicates that the journey has reached the goal of
+				///		a route planning.
+				/// @param goal the goal vertex access map
+				/// @param bestTimeAtGoal the best time found for an other journey to reach
+				///		the goal
+				/// Sets :
+				///		- route planning informations
+				///		- end arrival time
+				void setRoutePlanningInformations(
+					bool endIsReached,
+					const VertexAccessMap& goal,
+					const time::DateTime& bestTimeAtGoal
+				);
+
+				void setMinSpeedToEnd(
+					const time::DateTime& bestTimeAtGoal
+				);
 			//@}
 
 //			Journey& operator = (const Journey& ref);

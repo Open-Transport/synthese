@@ -72,6 +72,7 @@ namespace synthese
 			static const std::string _FIELD_NREF_IN_ID;
 			static const std::string _FIELD_AREA_ID;
 			static const std::string _FIELD_AREACODE_3;
+			static const std::string _FIELD_AREACODE_4;
 			static const std::string _FIELD_GOVT_CODE;
 			static const std::string _FIELD_ADMIN_LVL;
 

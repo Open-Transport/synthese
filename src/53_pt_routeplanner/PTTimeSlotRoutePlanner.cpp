@@ -109,20 +109,21 @@ namespace synthese
 			BestVertexReachesMap bvrmd(DEPARTURE_TO_ARRIVAL, _originVam); // was optim=true
 			DateTime highestArrivalTime(getHighestArrivalTime());
 			IntegralSearcher iso(
-				DEPARTURE_TO_ARRIVAL
-				, _accessParameters
-				, PTModule::GRAPH_ID
-				, RoadModule::GRAPH_ID
-				, originJourneys
-				, bvrmd
-				, _destinationVam,
+				DEPARTURE_TO_ARRIVAL,
+				_accessParameters,
+				PTModule::GRAPH_ID,
+				false,
+				RoadModule::GRAPH_ID,
+				originJourneys,
+				bvrmd,
+				_destinationVam,
 				getLowestDepartureTime(),
 				getHighestDepartureTime(),
 				highestArrivalTime,
 				false,
-				boost::posix_time::minutes(_accessParameters.getMaxApproachTime())
-				, _logStream
-				, _logLevel
+				boost::posix_time::minutes(_accessParameters.getMaxApproachTime()),
+				_logStream,
+				_logLevel
 			);
 			iso.integralSearch(_originVam, optional<size_t>());
 
@@ -231,20 +232,21 @@ namespace synthese
 			BestVertexReachesMap bvrmo(DEPARTURE_TO_ARRIVAL, _destinationVam); // was optim=true
 			DateTime lowestDepartureTime(getLowestDepartureTime());
 			IntegralSearcher isd(
-				ARRIVAL_TO_DEPARTURE
-				, _accessParameters
-				, PTModule::GRAPH_ID
-				, RoadModule::GRAPH_ID
-				, destinationJourneys
-				, bvrmo
-				, _originVam,
+				ARRIVAL_TO_DEPARTURE,
+				_accessParameters,
+				PTModule::GRAPH_ID,
+				false,
+				RoadModule::GRAPH_ID,
+				destinationJourneys,
+				bvrmo,
+				_originVam,
 				getHighestArrivalTime(),
 				getLowestArrivalTime(),
 				lowestDepartureTime,
 				true,
-				posix_time::minutes(_accessParameters.getMaxApproachTime())
-				, _logStream
-				, _logLevel
+				posix_time::minutes(_accessParameters.getMaxApproachTime()),
+				_logStream,
+				_logLevel
 			);
 			isd.integralSearch(_destinationVam, optional<size_t>());
 

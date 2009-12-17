@@ -194,13 +194,13 @@ namespace synthese
 							continue;
 					}
 
-					const AddressablePlace* aPlace(
+/*					const AddressablePlace* aPlace(
 						AddressablePlace::GetPlace(
 							leg.getArrivalEdge()->getHub()
 					)	);
-					junctionCellInterfacePage->display(
+*/					junctionCellInterfacePage->display(
 						stream
-						, aPlace
+						, NULL //aPlace
 						, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, __Couleur
 						, road

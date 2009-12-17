@@ -28,6 +28,7 @@
 #include "Registry.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -138,7 +139,7 @@ namespace synthese
 
 		void Road::addRoadChunk(
 			RoadChunk* chunk,
-			bool autoShift
+			optional<double> autoShift
 		){
 			addEdge(static_cast<Edge*>(chunk), autoShift);
 

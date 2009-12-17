@@ -123,11 +123,12 @@ namespace synthese
  								dynamic_cast<const NamedPlace*>(jv->getDeparturePlace()) :
 								dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
 							);
+							assert(placeToSearch != NULL);
 
 							DateTime lastDateTime(curET.getDepartureDateTime());
 							lastDateTime += it->getContinuousServiceRange();
 
-							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
+							for (; itPlaces != placesList.end() && itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
 								columnInterfacePage->display(
 									**itSheetRow
 									, itPlaces == jv->getOrderedPlaces().begin()
@@ -173,8 +174,9 @@ namespace synthese
 								dynamic_cast<const NamedPlace*>(jv->getArrivalPlace()) :
 								dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
 							);
+							assert(placeToSearch != NULL);
 							
-							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
+							for (; itPlaces != placesList.end() && itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
 							{
 								columnInterfacePage->display(
 									**itSheetRow

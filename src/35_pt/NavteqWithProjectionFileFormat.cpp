@@ -85,6 +85,7 @@ namespace synthese
 		const string NavteqWithProjectionFileFormat::_FIELD_ST_NAME("ST_NAME");
 		const string NavteqWithProjectionFileFormat::_FIELD_AREA_ID("AREA_ID");
 		const string NavteqWithProjectionFileFormat::_FIELD_AREACODE_3("AREACODE_3");
+		const string NavteqWithProjectionFileFormat::_FIELD_AREACODE_4("AREACODE_4");
 		const string NavteqWithProjectionFileFormat::_FIELD_GOVT_CODE("GOVT_CODE");
 		const string NavteqWithProjectionFileFormat::_FIELD_ADMIN_LVL("ADMIN_LVL");
 	}
@@ -162,10 +163,12 @@ namespace synthese
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
-			// 1 : Cities
+			// 1 : Administrative areas
 			if(key == FILE_MTDAREA)
 			{
 				map<string, string> departementCodes;
+				typedef map<pair<string, string>, City*> CityCodes;
+				CityCodes cityCodes;
 				
 				// Departements
 				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
@@ -202,7 +205,35 @@ namespace synthese
 							cityID,
 							city.get()
 					)	);
+					cityCodes.insert(make_pair(
+							make_pair(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)), algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_4))),
+							city.get()
+					)	);
 				}
+
+				// Places
+				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
+				{
+					shared_ptr<Record> record(dbfile.ReadRecord(i));
+
+					if(dbfile.getText(*record, _FIELD_ADMIN_LVL) != "5") continue;
+
+					CityCodes::const_iterator it(cityCodes.find(
+							make_pair(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)), algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_4)))
+					)	);
+					
+					if(it == cityCodes.end())
+					{
+						os << "WARN : City " << algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)) << "/" << algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_4)) << " not found.<br />";
+						continue;
+					}
+
+					_citiesMap.insert(make_pair(
+							lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREA_ID))),
+							it->second
+					)	);
+				}
+
 			} // 2 : Nodes
 			else if(key == FILE_NODES)
 			{
@@ -303,149 +334,154 @@ namespace synthese
 					string leftId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_REF_IN_ID)));
 					string rightId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_NREF_IN_ID)));
 					int lAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_AREA_ID))));
-					
-					// Test if the record can be imported
-					_CitiesMap::const_iterator itc(_citiesMap.find(lAreaId));
-					_AddressesMap::const_iterator ita1(_navteqAddressses.find(leftId));
-					_AddressesMap::const_iterator ita2(_navteqAddressses.find(rightId));
-					if(	itc == _citiesMap.end() ||
-						ita1 == _navteqAddressses.end() ||
-						ita2 == _navteqAddressses.end()
-					){
-						continue;
-					}
+					int rAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_AREA_ID))));
 
-					// Other fields
-					
-					string roadName(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ST_NAME)));
-					SHPObject* shpObject(SHPReadObject(shapeFile, int(i-1)));
-					double length(0);
-					optional<Point2D> lastPt;
-					for(int i(0); i< shpObject->nVertices; ++i)
+					for(size_t area(0); area< (lAreaId == rAreaId ? 1 : 2); ++area)
 					{
-						Point2D point(shpObject->padfX[i], shpObject->padfY[i]);
-						if(lastPt)
-						{
-							length += point.getDistanceTo(*lastPt);
+						// Test if the record can be imported
+						_CitiesMap::const_iterator itc(_citiesMap.find(area ? lAreaId : rAreaId));
+						_AddressesMap::const_iterator ita1(_navteqAddressses.find(leftId));
+						_AddressesMap::const_iterator ita2(_navteqAddressses.find(rightId));
+						if(	itc == _citiesMap.end() ||
+							ita1 == _navteqAddressses.end() ||
+							ita2 == _navteqAddressses.end()
+						){
+							continue;
 						}
-						lastPt = point;
-					}
-					SHPDestroyObject(shpObject);
 
-					City* city(itc->second);
-					Address* leftNode(ita1->second);
-					Address* rightNode(ita2->second);
+						// Other fields
 
-					// Search for an existing road place
-					shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditableFromCityAndName(
-							city->getKey(),
-							roadName,
-							*_env
-					)	);
+						string roadName(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ST_NAME)));
+						SHPObject* shpObject(SHPReadObject(shapeFile, int(i-1)));
+						double length(0);
+						optional<Point2D> lastPt;
+						for(int i(0); i< shpObject->nVertices; ++i)
+						{
+							Point2D point(shpObject->padfX[i], shpObject->padfY[i]);
+							if(lastPt)
+							{
+								length += point.getDistanceTo(*lastPt);
+							}
+							lastPt = point;
+						}
+						SHPDestroyObject(shpObject);
 
-					// Search for a recently created road place
-					RecentlyCreatedRoadPlaces::iterator it(
-						recentlyCreatedRoadPlaces.find(
+						City* city(itc->second);
+						Address* leftNode(ita1->second);
+						Address* rightNode(ita2->second);
+
+						// Search for an existing road place
+						shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditableFromCityAndName(
+								city->getKey(),
+								roadName,
+								*_env
+						)	);
+
+						// Search for a recently created road place
+						RecentlyCreatedRoadPlaces::iterator it(
+							recentlyCreatedRoadPlaces.find(
 							make_pair(
 								city->getKey(),
 								roadName
-					)	)	);
-					if(it != recentlyCreatedRoadPlaces.end())
-					{
-						roadPlace = it->second;
-					}
-
-					// Road place creation if necessary
-					if(!roadPlace.get())
-					{
-						roadPlace.reset(new RoadPlace);
-						roadPlace->setCity(city);
-						roadPlace->setKey(RoadPlaceTableSync::getId());
-						roadPlace->setName(roadName);
-						_env->getEditableRegistry<RoadPlace>().add(roadPlace);
-						recentlyCreatedRoadPlaces.insert(
-							make_pair(
-								make_pair(
-									city->getKey(),
-									roadName
-								), roadPlace
-						)	);
-					}
-
-					// Search for an existing road which ends at the left node
-					Road* road(NULL);
-					double startMetricOffset(0);
-					BOOST_FOREACH(const Road* croad, roadPlace->getRoads())
-					{
-						if(croad->getLastEdge()->getFromVertex() == leftNode)
+						)	)	);
+						if(it != recentlyCreatedRoadPlaces.end())
 						{
-							road = const_cast<Road*>(croad);
-							startMetricOffset = croad->getLastEdge()->getMetricOffset();
-							break;
+							roadPlace = it->second;
 						}
-					}
-					if(road)
-					{
-						// Second road chunk creation
-						shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
-						secondRoadChunk->setRoad(road);
-						secondRoadChunk->setFromAddress(rightNode);
-						secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
-						secondRoadChunk->setMetricOffset(startMetricOffset + length);
-						secondRoadChunk->setKey(RoadChunkTableSync::getId());
-						road->addRoadChunk(secondRoadChunk.get());
-						_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
-					}
-					else
-					{
-						// If not found search for an existing road which begins at the right node
+
+						// Road place creation if necessary
+						if(!roadPlace.get())
+						{
+							roadPlace.reset(new RoadPlace);
+							roadPlace->setCity(city);
+							roadPlace->setKey(RoadPlaceTableSync::getId());
+							roadPlace->setName(roadName);
+							_env->getEditableRegistry<RoadPlace>().add(roadPlace);
+							recentlyCreatedRoadPlaces.insert(
+								make_pair(
+								make_pair(
+								city->getKey(),
+								roadName
+								), roadPlace
+								)	);
+						}
+
+						// Search for an existing road which ends at the left node
+						Road* road(NULL);
+						double startMetricOffset(0);
 						BOOST_FOREACH(const Road* croad, roadPlace->getRoads())
 						{
-							if(croad->getEdge(0)->getFromVertex() == rightNode)
+							if(croad->getLastEdge()->getFromVertex() == leftNode)
 							{
 								road = const_cast<Road*>(croad);
+								startMetricOffset = croad->getLastEdge()->getMetricOffset();
 								break;
 							}
 						}
-
 						if(road)
 						{
-							// First road chunk creation
-							shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
-							firstRoadChunk->setRoad(road);
-							firstRoadChunk->setFromAddress(leftNode);
-							firstRoadChunk->setRankInPath(0);
-							firstRoadChunk->setMetricOffset(0);
-							firstRoadChunk->setKey(RoadChunkTableSync::getId());
-							road->addRoadChunk(firstRoadChunk.get(), length);
-							_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
-						}
-						else
-						{
-							shared_ptr<Road> road(new Road);
-							road->setRoadPlace(roadPlace.get());
-							road->setKey(RoadTableSync::getId());
-							_env->getEditableRegistry<Road>().add(road);
-
-							// First road chunk
-							shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
-							firstRoadChunk->setRoad(road.get());
-							firstRoadChunk->setFromAddress(leftNode);
-							firstRoadChunk->setRankInPath(0);
-							firstRoadChunk->setMetricOffset(0);
-							firstRoadChunk->setKey(RoadChunkTableSync::getId());
-							road->addRoadChunk(firstRoadChunk.get());
-							_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
-
-							// Second road chunk
+							// Second road chunk creation
 							shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
-							secondRoadChunk->setRoad(road.get());
+							secondRoadChunk->setRoad(road);
 							secondRoadChunk->setFromAddress(rightNode);
-							secondRoadChunk->setRankInPath(1);
-							firstRoadChunk->setMetricOffset(length);
+							secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
+							secondRoadChunk->setMetricOffset(startMetricOffset + length);
 							secondRoadChunk->setKey(RoadChunkTableSync::getId());
 							road->addRoadChunk(secondRoadChunk.get());
 							_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
+						}
+						else
+						{
+							// If not found search for an existing road which begins at the right node
+							BOOST_FOREACH(const Road* croad, roadPlace->getRoads())
+							{
+								if(croad->getEdge(0)->getFromVertex() == rightNode)
+								{
+									road = const_cast<Road*>(croad);
+									break;
+								}
+							}
+
+							if(road)
+							{
+								// First road chunk creation
+								shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
+								firstRoadChunk->setRoad(road);
+								firstRoadChunk->setFromAddress(leftNode);
+								firstRoadChunk->setRankInPath(0);
+								firstRoadChunk->setMetricOffset(0);
+								firstRoadChunk->setKey(RoadChunkTableSync::getId());
+								road->addRoadChunk(firstRoadChunk.get(), length);
+								_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
+							}
+							else
+							{
+								shared_ptr<Road> road(new Road);
+								road->setRoadPlace(roadPlace.get());
+								roadPlace->addRoad(*road);
+								road->setKey(RoadTableSync::getId());
+								_env->getEditableRegistry<Road>().add(road);
+
+								// First road chunk
+								shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
+								firstRoadChunk->setRoad(road.get());
+								firstRoadChunk->setFromAddress(leftNode);
+								firstRoadChunk->setRankInPath(0);
+								firstRoadChunk->setMetricOffset(0);
+								firstRoadChunk->setKey(RoadChunkTableSync::getId());
+								road->addRoadChunk(firstRoadChunk.get());
+								_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
+
+								// Second road chunk
+								shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
+								secondRoadChunk->setRoad(road.get());
+								secondRoadChunk->setFromAddress(rightNode);
+								secondRoadChunk->setRankInPath(1);
+								secondRoadChunk->setMetricOffset(length);
+								secondRoadChunk->setKey(RoadChunkTableSync::getId());
+								road->addRoadChunk(secondRoadChunk.get());
+								_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
+							}
 						}
 					}
 				}
