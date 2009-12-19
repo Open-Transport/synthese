@@ -145,5 +145,12 @@ namespace synthese
 			return result;
 		}
 
+
+
+		const GeographyModule::CitiesMatcher& GeographyModule::GetCitiesMatcher()
+		{
+			return _citiesMatcher;
+		}
+
 	}
 }

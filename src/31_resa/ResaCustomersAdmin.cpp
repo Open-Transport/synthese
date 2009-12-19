@@ -202,7 +202,7 @@ namespace synthese
 			if(	moduleKey == ResaModule::FACTORY_KEY &&
 				isAuthorized(request)
 			){
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -225,7 +225,7 @@ namespace synthese
 				);
 				p->setUser(ra->getUser());
 				
-				AddToLinks(links,p);
+				links.push_back(p);
 			}
 			
 			return links;

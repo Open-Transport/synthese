@@ -605,7 +605,7 @@ namespace synthese
 				p->setCommercialLineC(_line);
 				p->_serviceNumber = ba->_serviceNumber;
 
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 			
 			return links;

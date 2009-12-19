@@ -152,7 +152,7 @@ namespace synthese
 			
 			if (moduleKey == ImpExModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			
 			return links;
@@ -174,7 +174,7 @@ namespace synthese
 			{
 //				shared_ptr<DataSourceAdmin> p(getNewOtherPage<DataSourceAdmin>());
 //				p->setDataSource(dataSource);
-//				AddToLinks(links, p);
+//				links.push_back(p);
 			}
 
 			return links;

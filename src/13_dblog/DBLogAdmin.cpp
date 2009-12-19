@@ -165,7 +165,7 @@ namespace synthese
 					p->_viewer.setLogKey(
 						loge->getFactoryKey()
 					);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 			}
 			return links;

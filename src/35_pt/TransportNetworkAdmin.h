@@ -90,18 +90,7 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& _request
 			) const;
 			
-			/** Gets sub page of the designed parent page, which are from the current class.
-				@param parentLink Link to the parent page
-				@param currentPage Currently displayed page
-				@return PageLinks each subpage of the parent page designed in parentLink
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
-				const std::string& moduleKey,
-				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
-			) const;
+
 
 			/** Sub pages getter.
 				@return PageLinks Ordered vector of sub pages links
@@ -121,6 +110,10 @@ namespace synthese
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 			
+			//! @name Setters
+			//@{
+				void setNetwork(boost::shared_ptr<const pt::TransportNetwork> value);
+			//@}
 		};
 	}
 }

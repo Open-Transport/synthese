@@ -335,7 +335,7 @@ namespace synthese
 						getNewOtherPage<MessageAdmin>()
 					);
 					p->setMessage(alarm);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 			}
 			else if (dynamic_cast<const ScenarioTemplate*>(_scenario.get()))
@@ -351,7 +351,7 @@ namespace synthese
 						getNewOtherPage<MessageAdmin>()
 					);
 					p->setMessage(alarm);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 			}
 

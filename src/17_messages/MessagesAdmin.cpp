@@ -390,7 +390,7 @@ namespace synthese
 			
 			if (moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -431,7 +431,7 @@ namespace synthese
 						sa ? sa->getScenario()->getKey() : ma->getAlarm()->getScenario()->getKey(),
 						_getEnv()
 				)	);
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 			return links;
 		}

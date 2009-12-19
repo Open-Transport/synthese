@@ -222,7 +222,7 @@ namespace synthese
 			
 			if(moduleKey == SecurityModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -243,7 +243,7 @@ namespace synthese
 			{
 				shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
 				p->setProfile(profile);
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 			
 			return links;

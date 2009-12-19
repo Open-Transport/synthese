@@ -170,7 +170,7 @@ namespace synthese
 			
 			if (moduleKey == PTModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			
 			return links;

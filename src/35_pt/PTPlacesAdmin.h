@@ -31,6 +31,11 @@
 
 namespace synthese
 {
+	namespace geography
+	{
+		class City;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -44,14 +49,22 @@ namespace synthese
 		public:
 			/// @name Parameter identifiers
 			//@{
-			// static const std::string PARAM_SEARCH_;
+				static const std::string PARAM_SEARCH_CITY;
+				static const std::string PARAM_SEARCH_NAME;
+				static const std::string TAB_CONNECTION_PLACES;
+				static const std::string TAB_PUBLIC_PLACES;
+				static const std::string TAB_ROAD_PLACES;
+				static const std::string TAB_ALIASES;
+				static const std::string TAB_PHONETIC;
 			//@}
 
 		private:
 			/// @name Search parameters
 			//@{
-			// boost::optional<std::string>				_searchXxx;
-			// html::ResultHTMLTable::RequestParameters	_requestParameters;
+				std::string				_searchCity;
+				std::string				_searchName;
+				boost::shared_ptr<const geography::City> _city;
+				html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 
 		protected:
@@ -63,8 +76,6 @@ namespace synthese
 			///         current one.
 			/// @author Hugues
 			/// @date 2009
-			/// @todo A DEFAULT IMPLEMENTATION RETURNS ALWAYS TRUE.
-			///       REMOVE THIS METHOD OVERLOAD IF IT IS NOT NECESSARY.
 			virtual bool _hasSameContent(
 				const AdminInterfaceElement& other
 			) const;
@@ -77,8 +88,6 @@ namespace synthese
 			///        current user rights.)
 			/// @author Hugues
 			/// @date 2009
-			/// @todo A DEFAULT IMPLEMENTATION DOES NOT BUILD ANY TAB.
-			///       REMOVE THIS METHOD OVERLOAD IF IT IS NOT NECESSARY.
 			virtual void _buildTabs(
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
@@ -97,7 +106,7 @@ namespace synthese
 			///	@param map The parameters map to use for the initialization.
 			///	@param objectWillBeCreatedLater Indicates that the object that is
 			///	       supposed to be loaded by the page is not created yet. If true,
-			///	       some controls shoud be cancelled.
+			///	       some controls should be cancelled.
 			///	@throw AdminParametersException if a parameter has incorrect value.
 			///	@author Hugues
 			///	@date 2009
@@ -154,8 +163,6 @@ namespace synthese
 			///	@return PageLinks each page to put under the module page in the page
 			///	@author Hugues
 			///	@date 2009
-			/// @todo A DEFAULT IMPLEMENTATION RETURNS NOTHING.
-			///       REMOVE THIS METHOD OVERLOAD IF IT IS NOT NECESSARY.
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
 				const AdminInterfaceElement& currentPage,
@@ -172,8 +179,6 @@ namespace synthese
 			///	@return PageLinks each page to put under the current page
 			///	@author Hugues
 			///	@date 2009
-			/// @todo A DEFAULT IMPLEMENTATION RETURNS NOTHING.
-			///       REMOVE THIS METHOD OVERLOAD IF IT IS NOT NECESSARY.
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
@@ -186,9 +191,12 @@ namespace synthese
 			///	@return The title of the page
 			///	@author Hugues
 			///	@date 2009
-			/// @todo A DEFAULT IMPLEMENTATION RETURNS THE TITLE STATIC VARIABLE.
-			///       REMOVE THIS METHOD OVERLOAD IF IT IS NOT NECESSARY.
 			virtual std::string getTitle() const;
+
+
+			void setCity(boost::shared_ptr<const geography::City> value);
+
+			virtual PageLinks _getCurrentTreeBranch() const;
 		};
 	}
 }

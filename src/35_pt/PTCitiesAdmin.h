@@ -52,7 +52,7 @@ namespace synthese
 		private:
 			/// @name Search parameters
 			//@{
-				boost::optional<std::string>				_searchName;
+				std::string				_searchName;
 				html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 

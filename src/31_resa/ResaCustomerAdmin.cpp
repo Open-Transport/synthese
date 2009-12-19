@@ -303,7 +303,7 @@ namespace synthese
 							shared_ptr<ResaCustomerAdmin> p(new ResaCustomerAdmin);
 							p->setUser(user);
 
-							AddToLinks(result, p);
+							result.push_back(p);
 						}
 						catch(...)
 						{

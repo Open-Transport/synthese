@@ -120,7 +120,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -141,7 +141,7 @@ namespace synthese
 			{
 				shared_ptr<ResaEditLogEntryAdmin> p(getNewOtherPage<ResaEditLogEntryAdmin>());
 				p->setEntry(rp->getEntry());
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 			
 			return links;

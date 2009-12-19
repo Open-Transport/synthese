@@ -54,9 +54,11 @@ namespace synthese
 
 		public:
 			LineAdmin();
-			
+
+			virtual PageLinks _getCurrentTreeBranch() const;
+
 			boost::shared_ptr<const env::Line> getLine() const;
-			void setLine(boost::shared_ptr<env::Line> value);
+			void setLine(boost::shared_ptr<const env::Line> value);
 
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.

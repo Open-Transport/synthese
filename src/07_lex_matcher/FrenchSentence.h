@@ -53,6 +53,7 @@ namespace synthese
 			FrenchSentence(const std::string& source);
 			
 			const std::string& getSource() const;
+			std::string getPhoneticString() const;
 			
 			ComparisonScore compare(const FrenchSentence& s) const;
 			

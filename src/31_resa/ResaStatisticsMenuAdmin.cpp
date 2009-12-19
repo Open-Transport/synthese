@@ -161,7 +161,7 @@ namespace synthese
 			
 			if (moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			
 			return links;
@@ -180,7 +180,7 @@ namespace synthese
 			);
 			if(p->isAuthorized(request))
 			{
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 
 			CommercialLineTableSync::SearchResult lines(
@@ -199,7 +199,7 @@ namespace synthese
 					getNewOtherPage<ResaStatisticsAdmin>()
 				);
 				p->setCommercialLine(line);
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 
 			return links;

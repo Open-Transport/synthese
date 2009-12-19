@@ -68,7 +68,9 @@ namespace synthese
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
-			
+		
+			virtual PageLinks _getCurrentTreeBranch() const;
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -136,7 +138,7 @@ namespace synthese
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 			
 			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
-			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
+			void setCommercialLine(boost::shared_ptr<const env::CommercialLine> value);
 		};
 	}
 }

@@ -27,6 +27,12 @@
 #include "ParametersMap.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "GeographyModule.h"
+#include "PropertiesHTMLTable.h"
+#include "ResultHTMLTable.h"
+#include "AdminFunctionRequest.hpp"
+#include "PTPlacesAdmin.h"
+#include "FrenchSentence.h"
 
 using namespace std;
 
@@ -38,6 +44,9 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
+	using namespace geography;
+	using namespace html;
+	using namespace lexmatcher;
 
 	namespace util
 	{
@@ -53,6 +62,8 @@ namespace synthese
 	namespace pt
 	{
 		const string PTCitiesAdmin::PARAM_SEARCH_NAME("na");
+		const string PTCitiesAdmin::TAB_LIST("li");
+		const string PTCitiesAdmin::TAB_PHONETIC("ph");
 
 
 
@@ -66,10 +77,12 @@ namespace synthese
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
-			_searchName = map.getOptional<string>(PARAM_SEARCH_NAME);
+			_searchName = map.getDefault<string>(PARAM_SEARCH_NAME);
 
 			// Search table initialization
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 50);
+
+
 		}
 
 
@@ -77,11 +90,7 @@ namespace synthese
 		ParametersMap PTCitiesAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			// ParametersMap m(_requestParameters.getParametersMap());
-
-			// if(_searchXxx)
-			//	m.insert(PARAM_SEARCH_XXX, *_searchXxx);
-
+			m.insert(PARAM_SEARCH_NAME, _searchName);
 			return m;
 		}
 
@@ -101,8 +110,64 @@ namespace synthese
 			const FunctionRequest<AdminRequest>& request
 		) const	{
 		
-			/// @todo Implement the display by streaming the output to the stream variable
-		
+			////////////////////////////////////////////////////////////////////
+			// TAB LIST
+			if (openTabContent(stream, TAB_LIST))
+			{
+				AdminFunctionRequest<PTCitiesAdmin> searchRequest(request);
+			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// TAB LIST
+			if (openTabContent(stream, TAB_PHONETIC))
+			{				
+				AdminFunctionRequest<PTCitiesAdmin> searchRequest(request);
+
+				stream << "<h1>Recherche</h1>";
+
+				PropertiesHTMLTable t(searchRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.cell("Nom", t.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
+				stream << t.close();
+
+				if(!_searchName.empty())
+				{
+					AdminFunctionRequest<PTPlacesAdmin> openCityRequest(request);
+
+					stream << "<h1>Resultat</h1>";
+
+					stream << "<p>Phonétique du texte recherché : " << FrenchSentence(_searchName).getPhoneticString() << "</p>";
+
+					HTMLTable::ColsVector c;
+					c.push_back("Localité");
+					c.push_back("Phonétique");
+					c.push_back("Score");
+					c.push_back("Actions");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+
+					const GeographyModule::CitiesMatcher& matcher(GeographyModule::GetCitiesMatcher());
+					GeographyModule::CitiesMatcher::MatchResult result(matcher.bestMatches(_searchName, 20));
+										
+					BOOST_FOREACH(const GeographyModule::CitiesMatcher::MatchHit& it, result)
+					{
+						openCityRequest.getPage()->setCity(Env::GetOfficialEnv().getSPtr(it.value));
+
+						stream << t.row();
+						stream << t.col() << it.key.getSource();
+						stream << t.col() << it.key.getPhoneticString();
+						stream << t.col() << it.score;
+						stream << t.col() << HTMLModule::getLinkButton(openCityRequest.getURL(), "Ouvrir", string(), "building.png");
+					}
+
+					stream << t.close();
+				}
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// END TABS
+			closeTabContent(stream);
 		}
 
 
@@ -117,7 +182,7 @@ namespace synthese
 			
 			if (moduleKey == PTModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			
 			return links;
@@ -131,18 +196,25 @@ namespace synthese
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
-			
-			// const PTCitiesAdmin* ua(
-			//	dynamic_cast<const PTCitiesAdmin*>(&currentPage)
-			// );
-			
-			// if(ua)
-			// {
-			//	shared_ptr<PTCitiesAdmin> p(getNewOtherPage<PTCitiesAdmin>());
-			//	AddToLinks(links, p);
-			// }
+
+			if(	currentPage.getCurrentTreeBranch().find(*this))
+			{
+				links.push_back(currentPage.getCurrentTreeBranch().getNextSubPage(*this));
+			}
 			
 			return links;
+		}
+
+
+
+		void PTCitiesAdmin::_buildTabs( const server::FunctionRequest<admin::AdminRequest>& request ) const
+		{
+			_tabs.clear();
+
+			_tabs.push_back(Tab("Recherche", TAB_LIST, true, "find.png"));
+			_tabs.push_back(Tab("Recherche phonétique", TAB_PHONETIC, true, "text_allcaps.png"));
+
+			_tabBuilded = true;
 		}
 	}
 }

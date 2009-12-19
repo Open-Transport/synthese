@@ -31,6 +31,11 @@
 
 namespace synthese
 {
+	namespace road
+	{
+		class RoadPlace;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -44,15 +49,12 @@ namespace synthese
 		public:
 			/// @name Parameter identifiers
 			//@{
-				static const std::string PARAM_SEARCH_CITY_NAME;
-				static const std::string PARAM_SEARCH_NAME;
 			//@}
 
 		private:
 			/// @name Search parameters
 			//@{
-				boost::optional<std::string>				_searchCityName;
-				boost::optional<std::string>				_searchName;
+				boost::shared_ptr<const road::RoadPlace> _roadPlace;
 				html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 
@@ -119,23 +121,6 @@ namespace synthese
 
 			
 			//////////////////////////////////////////////////////////////////////////
-			/// Builds links to the pages of the current class to put directly under
-			/// a module admin page in the pages tree.
-			///	@param moduleKey Key of the module
-			///	@param currentPage Currently displayed page
-			/// @param request Current request
-			///	@return PageLinks each page to put under the module page in the page
-			///	@author Hugues
-			///	@date 2009
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
-				const std::string& moduleKey,
-				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
-			) const;
-			
-			
-			
-			//////////////////////////////////////////////////////////////////////////
 			/// Builds links to the pages to put directly under the current page in
 			/// the pages tree.
 			///	@param currentPage Currently displayed page
@@ -147,6 +132,10 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
+
+			void setRoadPlace(boost::shared_ptr<const road::RoadPlace> value);
+
+			virtual PageLinks _getCurrentTreeBranch() const;
 		};
 	}
 }

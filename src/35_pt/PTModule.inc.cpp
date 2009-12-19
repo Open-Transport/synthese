@@ -18,6 +18,12 @@
 #include "LineAdmin.h"
 #include "ServiceAdmin.h"
 #include "PTImportAdmin.h"
+#include "PTCitiesAdmin.h"
+#include "PTPlacesAdmin.h"
+#include "PTRoadsAdmin.h"
+#include "PTRoadAdmin.h"
+#include "PTNetworksAdmin.h"
+#include "PTPlaceAdmin.h"
 
 #include "RealTimeUpdateFunction.h"
 #include "RealTimeUpdateScreenServiceInterfacePage.h"

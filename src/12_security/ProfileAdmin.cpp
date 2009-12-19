@@ -268,7 +268,7 @@ namespace synthese
 			{
 				shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
 				p->setProfile(profile);
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 			
 			return links;

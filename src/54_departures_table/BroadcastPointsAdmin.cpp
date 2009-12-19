@@ -244,7 +244,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -278,7 +278,7 @@ namespace synthese
 					getNewOtherPage<DisplaySearchAdmin>()
 				);
 				p->setPlace(result->place->getKey());
-				AddToLinks(links, p);
+				links.push_back(p);
 				if(*p == currentPage) currentToAdd = false;
 			}
 			
@@ -288,7 +288,7 @@ namespace synthese
 					getNewOtherPage<DisplaySearchAdmin>()
 				);
 				p->setPlace((*sa->getPlace())->getKey());
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 			return links;
 		}

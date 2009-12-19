@@ -140,7 +140,10 @@ namespace synthese
 				PageLinks l(
 					page->getSubPagesOfModule(_moduleClass->getFactoryKey(), currentPage, request)
 				);
-				links.insert(links.end(), l.begin(), l.end());
+				BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, l)
+				{
+					links.push_back(link);
+				}
 			}
 			return links;
 		}

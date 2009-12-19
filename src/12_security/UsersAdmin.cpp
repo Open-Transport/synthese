@@ -247,7 +247,7 @@ namespace synthese
 			
 			if (moduleKey == SecurityModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -268,7 +268,7 @@ namespace synthese
 			{
 				shared_ptr<UserAdmin> p(getNewOtherPage<UserAdmin>());
 				p->setUserC(ua->getUser());
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 			
 			return links;

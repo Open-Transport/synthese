@@ -24,6 +24,7 @@
 
 #include <utility>
 #include <map>
+#include <sstream>
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/tokenizer.hpp>
@@ -289,6 +290,21 @@ namespace synthese
 		bool FrenchSentence::operator==(const FrenchSentence& s) const
 		{
 			return _source == s._source;
+		}
+
+
+
+		std::string FrenchSentence::getPhoneticString() const
+		{
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const FrenchPhoneticString& word, _words)
+			{
+				if(!first) s << " ";
+				s << word.getPhoneticString();
+				first = false;
+			}
+			return s.str();
 		}
 
 	}

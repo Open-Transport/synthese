@@ -550,12 +550,12 @@ namespace synthese
 				// General search
 				shared_ptr<DisplaySearchAdmin> p1(getNewOtherPage<DisplaySearchAdmin>());
 				p1->_place = optional<shared_ptr<const PublicTransportStopZoneConnectionPlace> >();
-				AddToLinks(links, p1);
+				links.push_back(p1);
 			
 				// Stock
 				shared_ptr<DisplaySearchAdmin> p2(getNewOtherPage<DisplaySearchAdmin>());
 				p2->_place = shared_ptr<const PublicTransportStopZoneConnectionPlace>();
-				AddToLinks(links, p2);
+				links.push_back(p2);
 			}
 			
 			return links;
@@ -589,7 +589,7 @@ namespace synthese
 				{
 					shared_ptr<DisplayScreenCPUAdmin> p(getNewOtherPage<DisplayScreenCPUAdmin>());
 					p->setCPU(cpu);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::Search(
@@ -605,7 +605,7 @@ namespace synthese
 					if(screen->getCPU()) continue;
 					shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
 					p->setScreen(screen);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 			}
 			

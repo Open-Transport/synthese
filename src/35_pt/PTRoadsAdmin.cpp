@@ -27,8 +27,17 @@
 #include "ParametersMap.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "RoadPlace.h"
+#include "ResultHTMLTable.h"
+#include "Road.h"
+#include "PTRoadAdmin.h"
+#include "AdminFunctionRequest.hpp"
+#include "PTCitiesAdmin.h"
+#include "PTPlacesAdmin.h"
+#include "City.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -38,6 +47,8 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
+	using namespace road;
+	using namespace html;
 
 	namespace util
 	{
@@ -52,11 +63,6 @@ namespace synthese
 
 	namespace pt
 	{
-		const string PTRoadsAdmin::PARAM_SEARCH_CITY_NAME("cn");
-		const string PTRoadsAdmin::PARAM_SEARCH_NAME("na");
-
-
-
 		PTRoadsAdmin::PTRoadsAdmin()
 			: AdminInterfaceElementTemplate<PTRoadsAdmin>()
 		{ }
@@ -67,11 +73,14 @@ namespace synthese
 			const ParametersMap& map,
 			bool objectWillBeCreatedLater
 		){
-			/// @todo Initialize internal attributes from the map
-			// 	string a = map.get<string>(PARAM_SEARCH_XXX);
-			// 	string b = map.getDefault<string>(PARAM_SEARCH_XXX);
-			// 	optional<string> c = map.getOptional<string>(PARAM_SEARCH_XXX);
-
+			try
+			{
+				_roadPlace = Env::GetOfficialEnv().get<RoadPlace>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+			}
+			catch (ObjectNotFoundException<RoadPlace> e)
+			{
+				throw AdminParametersException("No such road place");
+			}
 			// Search table initialization
 			// _requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_XXX, 30);
 		}
@@ -81,11 +90,10 @@ namespace synthese
 		ParametersMap PTRoadsAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			// ParametersMap m(_requestParameters.getParametersMap());
-
-			// if(_searchXxx)
-			//	m.insert(PARAM_SEARCH_XXX, *_searchXxx);
-
+			if(_roadPlace)
+			{
+				m.insert(Request::PARAMETER_OBJECT_ID, _roadPlace->getKey());
+			}
 			return m;
 		}
 
@@ -105,30 +113,34 @@ namespace synthese
 			const FunctionRequest<AdminRequest>& request
 		) const	{
 		
-			/// @todo Implement the display by streaming the output to the stream variable
-		
-		}
+			AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
 
-
-
-		AdminInterfaceElement::PageLinks PTRoadsAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
-			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
-		) const	{
-			
-			AdminInterfaceElement::PageLinks links;
-			
-			if (moduleKey == PTModule::FACTORY_KEY && isAuthorized(request))
+			HTMLTable::ColsVector c;
+			c.push_back("Début");
+			c.push_back("Fin");
+			c.push_back("Longueur");
+			c.push_back("Actions");
+			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+			stream << t.open();
+			BOOST_FOREACH(const Road* road, _roadPlace->getRoads())
 			{
-				AddToLinks(links, getNewPage());
+				openRoadRequest.getPage()->setRoad(
+					Env::GetOfficialEnv().getSPtr(road)
+				);
+
+				stream << t.row();
+				stream << t.col();
+
+				stream << t.col();
+				stream << t.col();
+				stream << t.col();
+				stream << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), PTRoadAdmin::ICON);
 			}
-			
-			return links;
+			stream << t.close();
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks PTRoadsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const FunctionRequest<AdminRequest>& request
@@ -136,16 +148,37 @@ namespace synthese
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			// const PTRoadsAdmin* ua(
-			//	dynamic_cast<const PTRoadsAdmin*>(&currentPage)
-			// );
-			
-			// if(ua)
-			// {
-			//	shared_ptr<PTRoadsAdmin> p(getNewOtherPage<PTRoadsAdmin>());
-			//	AddToLinks(links, p);
-			// }
-			
+			if(	currentPage == *this)
+			{
+				BOOST_FOREACH(const Road* road, _roadPlace->getRoads())
+				{
+					shared_ptr<PTRoadAdmin> p(getNewOtherPage<PTRoadAdmin>());
+					p->setRoad(Env::GetOfficialEnv().getSPtr(road));
+					links.push_back(p);
+				}
+			}
+			return links;
+		}
+
+
+
+		void PTRoadsAdmin::setRoadPlace( boost::shared_ptr<const RoadPlace> value )
+		{
+			_roadPlace = value;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks PTRoadsAdmin::_getCurrentTreeBranch() const
+		{
+			PageLinks links;
+
+			links.push_back(getNewOtherPage<PTCitiesAdmin>());
+			shared_ptr<PTPlacesAdmin> p(getNewOtherPage<PTPlacesAdmin>());
+			p->setCity(Env::GetOfficialEnv().getSPtr(_roadPlace->getCity()));
+			links.push_back(p);
+			links.push_back(getNewPage());
+
 			return links;
 		}
 	}

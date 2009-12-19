@@ -77,6 +77,7 @@ namespace synthese
 			void setSource(const std::string& source);
 			const std::string& getSource() const;
 			const PhoneticString& getPhonetic() const;
+			std::string getPhoneticString() const;
 			
 			LevenshteinDistance levenshtein(const FrenchPhoneticString& s) const;
 		};

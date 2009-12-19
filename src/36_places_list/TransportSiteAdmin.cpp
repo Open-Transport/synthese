@@ -189,7 +189,7 @@ namespace synthese
 						getNewOtherPage<TransportSiteAdmin>(false)
 					);
 					p->_site = site;
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 			}
 			return links;
@@ -206,7 +206,7 @@ namespace synthese
 				getNewOtherPage<SiteRoutePlanningAdmin>()
 			);
 			p->setSite(_site);
-			AddToLinks(links, p);
+			links.push_back(p);
 			
 			return links;
 		}

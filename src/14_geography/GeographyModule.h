@@ -103,6 +103,8 @@ namespace synthese
 				CitiesMatcher::Content city
 			);
 
+			static const CitiesMatcher& GetCitiesMatcher();
+
 		};
 	}
 	/** @} */

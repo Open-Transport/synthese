@@ -162,6 +162,8 @@ namespace synthese
 			void setService(boost::shared_ptr<const env::ContinuousService> value);
 			void setService(boost::shared_ptr<const env::NonPermanentService> value);
 			boost::shared_ptr<const env::NonPermanentService> getService() const;
+
+			virtual PageLinks _getCurrentTreeBranch() const;
 		};
 	}
 }

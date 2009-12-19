@@ -241,7 +241,7 @@ namespace synthese
 			
 			if(moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewOtherPage<MessagesTemplateLibraryAdmin>());
+				links.push_back(getNewOtherPage<MessagesTemplateLibraryAdmin>());
 			}
 			return links;
 		}

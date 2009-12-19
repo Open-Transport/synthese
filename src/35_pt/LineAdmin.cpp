@@ -27,7 +27,7 @@
 #include "EnvModule.h"
 
 #include "Schedule.h"
-
+#include "CommercialLine.h"
 #include "HTMLTable.h"
 #include "HTMLModule.h"
 #include "PhysicalStop.h"
@@ -403,9 +403,9 @@ namespace synthese
 			_tabBuilded = true;
 		}
 		
-		void LineAdmin::setLine(boost::shared_ptr<Line> value)
+		void LineAdmin::setLine(boost::shared_ptr<const Line> value)
 		{
-			_line = const_pointer_cast<const Line>(value);
+			_line = value;
 		}
 		
 		
@@ -423,21 +423,8 @@ namespace synthese
 
 			AdminInterfaceElement::PageLinks links;
 
-			const ServiceAdmin* sa(
-				dynamic_cast<const ServiceAdmin*>(&currentPage)
-			);
-
-			const LineAdmin* la(
-				dynamic_cast<const LineAdmin*>(&currentPage)
-			);
-			
-			if(	sa &&
-				sa->getService().get() &&
-				dynamic_cast<const Line*>(sa->getService()->getPath()) &&
-				dynamic_cast<const Line*>(sa->getService()->getPath())->getKey() == _line->getKey() ||
-				la &&
-				la->getLine().get() &&
-				la->getLine()->getKey() == _line->getKey()
+			if(	currentPage == *this ||
+				currentPage.getCurrentTreeBranch().find(*this)
 			){
 				ScheduledServiceTableSync::SearchResult services(
 					ScheduledServiceTableSync::Search(*_env, _line->getKey())
@@ -448,7 +435,7 @@ namespace synthese
 						getNewOtherPage<ServiceAdmin>()
 					);
 					p->setService(service);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 				ContinuousServiceTableSync::SearchResult cservices(
 					ContinuousServiceTableSync::Search(*_env, _line->getKey())
@@ -459,11 +446,25 @@ namespace synthese
 						getNewOtherPage<ServiceAdmin>()
 					);
 					p->setService(service);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 			}
 			return links;
 
+		}
+
+
+
+		AdminInterfaceElement::PageLinks LineAdmin::_getCurrentTreeBranch() const
+		{
+			shared_ptr<CommercialLineAdmin> p(
+				getNewOtherPage<CommercialLineAdmin>()
+			);
+			p->setCommercialLine(Env::GetOfficialEnv().getSPtr(_line->getCommercialLine()));
+
+			PageLinks links(p->_getCurrentTreeBranch());
+			links.push_back(p);
+			return links;
 		}
 
 	}

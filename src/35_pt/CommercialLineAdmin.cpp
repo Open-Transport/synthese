@@ -43,7 +43,6 @@
 #include "SearchFormHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "ActionResultHTMLTable.h"
-#include "ServiceAdmin.h"
 #include "NonPermanentService.h"
 
 using namespace std;
@@ -98,7 +97,7 @@ namespace synthese
 
 			try
 			{
-				_cline = CommercialLineTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
+				_cline = Env::GetOfficialEnv().get<CommercialLine>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			}
 			catch (...)
 			{
@@ -342,30 +341,8 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			const LineAdmin* la(
-				dynamic_cast<const LineAdmin*>(&currentPage)
-			);
-			
-			const CommercialLineAdmin* ca(
-				dynamic_cast<const CommercialLineAdmin*>(&currentPage)
-			);
-
-			const ServiceAdmin* sa(
-				dynamic_cast<const ServiceAdmin*>(&currentPage)
-			);
-
-			if(	sa &&
-				sa->getService().get() &&
-				dynamic_cast<const Line*>(sa->getService()->getPath()) &&
-				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine() &&
-				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine()->getKey() == _cline->getKey() ||
-				la &&
-				la->getLine().get() &&
-				la->getLine()->getCommercialLine() &&
-				la->getLine()->getCommercialLine()->getKey() == _cline->getKey() ||
-				ca &&
-				ca->getCommercialLine().get() &&
-				ca->getCommercialLine()->getKey() == _cline->getKey()
+			if(	currentPage == *this ||
+				currentPage.getCurrentTreeBranch().find(*this)
 			){
 				LineTableSync::SearchResult routes(
 					LineTableSync::Search(*_env, _cline->getKey())
@@ -376,7 +353,7 @@ namespace synthese
 						getNewOtherPage<LineAdmin>()
 					);
 					p->setLine(line);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 			}
 			return links;
@@ -400,15 +377,31 @@ namespace synthese
 			return _cline;
 		}
 		
-		void CommercialLineAdmin::setCommercialLine(boost::shared_ptr<CommercialLine> value)
-		{
-			_cline = const_pointer_cast<CommercialLine>(value);
+		void CommercialLineAdmin::setCommercialLine(
+			boost::shared_ptr<const CommercialLine> value
+		){
+			_cline = value;
 		}
 		
 		
 		bool CommercialLineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _cline == static_cast<const CommercialLineAdmin&>(other)._cline;
+			return _cline->getKey() == static_cast<const CommercialLineAdmin&>(other)._cline->getKey();
+		}
+
+
+
+		AdminInterfaceElement::PageLinks CommercialLineAdmin::_getCurrentTreeBranch() const
+		{
+			PageLinks links;
+
+			shared_ptr<TransportNetworkAdmin> p(
+				getNewOtherPage<TransportNetworkAdmin>()
+			);
+			p->setNetwork(Env::GetOfficialEnv().getSPtr(_cline->getNetwork()));
+
+			links.push_back(p);
+			return links;
 		}
 	}
 }

@@ -386,7 +386,7 @@ namespace synthese
 			{
 				shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
 				p->setScreen(screen);
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 
 			return links;

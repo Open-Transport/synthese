@@ -612,7 +612,7 @@ namespace synthese
 			if(	moduleKey == TimetableModule::FACTORY_KEY &&
 				isAuthorized(request)
 			){
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -633,7 +633,7 @@ namespace synthese
 					getNewOtherPage<TimetableAdmin>()
 				);
 				page->setTimetable(tt);
-				AddToLinks(links, page);
+				links.push_back(page);
 			}
 
 			return links;

@@ -273,7 +273,7 @@ namespace synthese
 			
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
 			{
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -312,7 +312,7 @@ namespace synthese
 			{
 				shared_ptr<DisplayTypeAdmin> p(getNewOtherPage<DisplayTypeAdmin>());
 				p->setType(displayType);
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 			return links;
 		}

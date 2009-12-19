@@ -104,7 +104,7 @@ namespace synthese
 				);
 				if (!link->getSubPages(currentPage, request).empty())
 				{
-					AddToLinks(links, link);
+					links.push_back(link);
 				}
 			}
 
@@ -112,7 +112,7 @@ namespace synthese
 			{
 				shared_ptr<UserAdmin> userPage(getNewOtherPage<UserAdmin>());
 				userPage->setUserC(request.getUser());
-				AddToLinks(links, userPage);
+				links.push_back(userPage);
 			}
 			
 			return links;

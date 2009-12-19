@@ -4,6 +4,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 #include <limits>
+#include <sstream>
 
 #undef max
 #undef min
@@ -701,6 +702,46 @@ namespace synthese
 				}
 			}
 			return matrix[n][m];
+		}
+
+
+
+		string FrenchPhoneticString::getPhoneticString() const
+		{
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(Phoneme p, _phonetic)
+			{
+				if(!first) s << "-";
+				switch(p)
+				{
+				case A: s << "A"; break;
+				case AN: s << "AN"; break;
+				case B: s << "B"; break;
+				case CH: s << "CH"; break;
+				case D: s << "D"; break;
+				case E: s << "E"; break;
+				case F: s << "F"; break;
+				case G: s << "G"; break;
+				case I: s << "I"; break;
+				case J: s << "J"; break;
+				case K: s << "K"; break;
+				case L: s << "L"; break;
+				case M: s << "M"; break;
+				case N: s << "N"; break;
+				case O: s << "O"; break;
+				case P: s << "P"; break;
+				case R: s << "R"; break;
+				case S: s << "S"; break;
+				case T: s << "T"; break;
+				case U: s << "U"; break;
+				case V: s << "V"; break;
+				case Z: s << "Z"; break;
+				default: s << "*"; break;
+				}
+				first = false;
+			}
+			return s.str();
 		}
 	}
 }

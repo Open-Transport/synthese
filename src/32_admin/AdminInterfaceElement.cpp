@@ -77,15 +77,14 @@ namespace synthese
 		) const {
 			// Cleaning
 			_tree.subPages.clear();
-			_treePosition.clear();
-
+			
 			// Initialisation
 			shared_ptr<HomeAdmin> homeAdmin(
 				getNewOtherPage<HomeAdmin>()
 			);
 			
 			PageLinks position;
-			AddToLinks(position, homeAdmin);
+			position.push_back(homeAdmin);
 			_tree = _buildTreeRecursion(homeAdmin, position, request);
 			if (dynamic_cast<const HomeAdmin*>(this))
 			{
@@ -117,10 +116,10 @@ namespace synthese
 			AdminInterfaceElement::PageLinksTree tree(adminPage);
 			
 			// Recursion
-			PageLinks pages = adminPage->getSubPages(*this, request);
+			PageLinks pages(adminPage->getSubPages(*this, request));
 			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, pages)
 			{
-				AddToLinks(position, link);
+				position.push_back(link);
 				if (*link == *this)
 				{
 					_treePosition = position;
@@ -140,7 +139,7 @@ namespace synthese
 					if (!tree.isNodeOpened)
 					{
 						tree.isNodeOpened =
-							link->isPageVisibleInTree(*this, request) ||
+							(link)->isPageVisibleInTree(*this, request) ||
 							subTree.isNodeOpened
 						;
 					}
@@ -158,8 +157,7 @@ namespace synthese
 
 		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getTreePosition(
 			const server::FunctionRequest<admin::AdminRequest>& request
-		) const
-		{
+		) const	{
 			if (_treePosition.empty())
 			{
 				_buildTree(request);
@@ -393,5 +391,87 @@ namespace synthese
 			return page;
 		}
 
+
+
+		AdminInterfaceElement::PageLinks AdminInterfaceElement::_getCurrentTreeBranch() const
+		{
+			return PageLinks();
+		}
+
+
+
+		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getCurrentTreeBranch() const
+		{
+			if(!_theoreticalTreePosition)
+			{
+				_theoreticalTreePosition = _getCurrentTreeBranch();
+			}
+			return *_theoreticalTreePosition;
+		}
+
+
+
+
+		bool AdminInterfaceElement::PageLinks::find( const AdminInterfaceElement& page ) const
+		{
+			BOOST_FOREACH(const Links::value_type& link, _links)
+			{
+				if(*link == page) return true;
+			}
+			return false;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks::const_iterator AdminInterfaceElement::PageLinks::begin() const
+		{
+			return _links.begin();
+		}
+
+
+
+		AdminInterfaceElement::PageLinks::iterator AdminInterfaceElement::PageLinks::begin()
+		{
+			return _links.begin();
+		}
+
+
+
+		AdminInterfaceElement::PageLinks::const_iterator AdminInterfaceElement::PageLinks::end() const
+		{
+			return _links.end();
+		}
+
+
+
+		AdminInterfaceElement::PageLinks::iterator AdminInterfaceElement::PageLinks::end()
+		{
+			return _links.end();
+		}
+
+
+
+		void AdminInterfaceElement::PageLinks::pop_back()
+		{
+			_links.pop_back();
+		}
+
+
+
+		bool AdminInterfaceElement::PageLinks::empty() const
+		{
+			return _links.empty();
+		}
+
+
+
+		boost::shared_ptr<const AdminInterfaceElement> AdminInterfaceElement::PageLinks::getNextSubPage( const AdminInterfaceElement& page ) const
+		{
+			for(Links::const_iterator it(_links.begin()); it+1 != _links.end(); ++it)
+			{
+				if(**it == page) return *(it+1);
+			}
+			return shared_ptr<const AdminInterfaceElement>();
+		}
 	}
 }

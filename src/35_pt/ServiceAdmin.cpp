@@ -32,7 +32,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "ContinuousService.h"
 #include "ResultHTMLTable.h"
-#include "Path.h"
+#include "Line.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
@@ -41,6 +41,7 @@
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "CalendarHTMLViewer.h"
+#include "LineAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -331,6 +332,20 @@ namespace synthese
 		boost::shared_ptr<const NonPermanentService> ServiceAdmin::getService() const
 		{
 			return _service;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks ServiceAdmin::_getCurrentTreeBranch() const
+		{
+			shared_ptr<LineAdmin> p(
+				getNewOtherPage<LineAdmin>()
+			);
+			p->setLine(Env::GetOfficialEnv().getSPtr(static_cast<const Line*>(_service->getPath())));
+
+			PageLinks links(p->_getCurrentTreeBranch());
+			links.push_back(p);
+			return links;
 		}
 	}
 }

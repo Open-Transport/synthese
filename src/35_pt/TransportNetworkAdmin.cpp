@@ -31,10 +31,7 @@
 #include "CommercialLine.h"
 #include "CommercialLineAdmin.h"
 #include "CommercialLineTableSync.h"
-#include "Line.h"
-#include "LineAdmin.h"
 #include "TransportNetworkRight.h"
-#include "ServiceAdmin.h"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
@@ -171,31 +168,6 @@ namespace synthese
 
 
 		
-		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
-			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
-		) const	{
-			AdminInterfaceElement::PageLinks links;
-			
-			if(moduleKey == PTModule::FACTORY_KEY && isAuthorized(request))
-			{
-				TransportNetworkTableSync::SearchResult networks(
-					TransportNetworkTableSync::Search(*_env)
-				);
-				BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
-				{
-					shared_ptr<TransportNetworkAdmin> link(
-						getNewOtherPage<TransportNetworkAdmin>(false)
-					);
-					link->_network = network;
-					AddToLinks(links, link);
-				}
-			}
-				
-			return links;
-		}
-
 		std::string TransportNetworkAdmin::getTitle() const
 		{
 			return _network.get() ? _network->getName() : DEFAULT_TITLE;
@@ -208,40 +180,8 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			const LineAdmin* la(
-				dynamic_cast<const LineAdmin*>(&currentPage)
-			);
-			
-			const CommercialLineAdmin* ca(
-				dynamic_cast<const CommercialLineAdmin*>(&currentPage)
-			);
-
-			const TransportNetworkAdmin* na(
-				dynamic_cast<const TransportNetworkAdmin*>(&currentPage)
-			);
-
-			const ServiceAdmin* sa(
-				dynamic_cast<const ServiceAdmin*>(&currentPage)
-			);
-
-			if(	sa &&
-				sa->getService().get() &&
-				dynamic_cast<const Line*>(sa->getService()->getPath()) &&
-				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine() &&
-				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine()->getNetwork() &&
-				dynamic_cast<const Line*>(sa->getService()->getPath())->getCommercialLine()->getNetwork()->getKey() == _network->getKey() ||
-				la &&
-				la->getLine().get() &&
-				la->getLine()->getCommercialLine() &&
-				la->getLine()->getCommercialLine()->getNetwork() &&
-				la->getLine()->getCommercialLine()->getNetwork()->getKey() == _network->getKey() ||
-				ca &&
-				ca->getCommercialLine().get() &&
-				ca->getCommercialLine()->getNetwork() &&
-				ca->getCommercialLine()->getNetwork()->getKey() == _network->getKey() ||
-				na &&
-				na->_network.get() &&
-				na->_network->getKey() == _network->getKey()
+			if(	currentPage == *this ||
+				currentPage.getCurrentTreeBranch().find(*this)
 			){
 				CommercialLineTableSync::SearchResult lines(
 					CommercialLineTableSync::Search(
@@ -260,7 +200,7 @@ namespace synthese
 						getNewOtherPage<CommercialLineAdmin>()
 					);
 					p->setCommercialLine(line);
-					AddToLinks(links, p);
+					links.push_back(p);
 				}
 			}
 			return links;
@@ -269,8 +209,14 @@ namespace synthese
 		
 		bool TransportNetworkAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _network == static_cast<const TransportNetworkAdmin&>(other)._network;
+			return _network->getKey() == static_cast<const TransportNetworkAdmin&>(other)._network->getKey();
 		}
-		
+
+
+
+		void TransportNetworkAdmin::setNetwork( boost::shared_ptr<const pt::TransportNetwork> value )
+		{
+			_network = value;
+		}
 	}
 }

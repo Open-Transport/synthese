@@ -18,6 +18,12 @@ synthese::pt::PTImportAdmin::integrate();
 synthese::pt::TransportNetworkAdmin::integrate();
 synthese::pt::CommercialLineAdmin::integrate();
 synthese::pt::LineAdmin::integrate();
+synthese::pt::PTCitiesAdmin::integrate();
+synthese::pt::PTPlacesAdmin::integrate();
+synthese::pt::PTRoadsAdmin::integrate();
+synthese::pt::PTRoadAdmin::integrate();
+synthese::pt::PTNetworksAdmin::integrate();
+synthese::pt::PTPlaceAdmin::integrate();
 
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();

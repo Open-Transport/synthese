@@ -163,7 +163,7 @@ namespace synthese
 			if(	moduleKey == CalendarModule::FACTORY_KEY &&
 				isAuthorized(request)
 			){
-				AddToLinks(links, getNewPage());
+				links.push_back(getNewPage());
 			}
 			return links;
 		}
@@ -183,7 +183,7 @@ namespace synthese
 					getNewOtherPage<CalendarTemplateAdmin>()
 				);
 				p->setCalendar(ct);
-				AddToLinks(links, p);
+				links.push_back(p);
 			}
 
 			return links;
