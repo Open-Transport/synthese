@@ -19,13 +19,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
 
-#include "TransportNetworkAdmin.h"
-#include "CommercialLineAdmin.h"
-#include "LineAdmin.h"
-
 #include "EnvModule.h"
-
-#include "TransportNetworkRight.h"
 
 // Registries
 #include "PhysicalStop.h"

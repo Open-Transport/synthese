@@ -30,7 +30,7 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace security;
 
 	namespace util
@@ -53,7 +53,7 @@ namespace synthese
 		}
 	}
 
-	namespace env
+	namespace pt
 	{
 		string TransportNetworkRight::displayParameter(
 			util::Env& env

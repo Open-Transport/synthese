@@ -12,12 +12,19 @@
 #include "NavteqWithProjectionFileFormat.h"
 #include "NonConcurrencyRuleAddAction.h"
 #include "NonConcurrencyRuleRemoveAction.h"
+
+#include "TransportNetworkAdmin.h"
+#include "CommercialLineAdmin.h"
+#include "LineAdmin.h"
 #include "ServiceAdmin.h"
+#include "PTImportAdmin.h"
+
 #include "RealTimeUpdateFunction.h"
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
-#include "PTImportAdmin.h"
+
+#include "TransportNetworkRight.h"
 
 // Registries
 

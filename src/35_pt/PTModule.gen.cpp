@@ -12,12 +12,19 @@ synthese::pt::PTModule::integrate();
 synthese::pt::NavteqWithProjectionFileFormat::integrate();
 synthese::pt::NonConcurrencyRuleAddAction::integrate();
 synthese::pt::NonConcurrencyRuleRemoveAction::integrate();
+
 synthese::pt::ServiceAdmin::integrate();
 synthese::pt::PTImportAdmin::integrate();
+synthese::pt::TransportNetworkAdmin::integrate();
+synthese::pt::CommercialLineAdmin::integrate();
+synthese::pt::LineAdmin::integrate();
+
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 synthese::pt::ScheduleRealTimeUpdateAction::integrate();
 synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();
+
+synthese::pt::TransportNetworkRight::integrate();
 
 // Registries
 

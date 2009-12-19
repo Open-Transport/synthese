@@ -29,15 +29,9 @@ synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::env::NonPerma
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::ScheduledServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::env::NonPermanentService>, synthese::env::ScheduledServiceTableSync>::integrate();
 
-synthese::env::TransportNetworkAdmin::integrate();
-synthese::env::CommercialLineAdmin::integrate();
-synthese::env::LineAdmin::integrate();
-
 synthese::env::EnvModule::integrate();
 
 synthese::env::LinesListFunction::integrate();
-
-synthese::env::TransportNetworkRight::integrate();
 
 synthese::env::PublicTransportStopZoneConnectionPlace::integrate();
 

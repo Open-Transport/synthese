@@ -61,8 +61,6 @@ namespace synthese
 	using namespace html;
 	using namespace time;
 	using namespace pt;
-	
-	
 
 	namespace util
 	{
@@ -75,7 +73,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<CommercialLineAdmin>::DEFAULT_TITLE("Ligne inconnue");
 	}
 
-	namespace env
+	namespace pt
 	{
 		const string CommercialLineAdmin::TAB_DATES("da");
 		const string CommercialLineAdmin::TAB_ROUTES("ro");

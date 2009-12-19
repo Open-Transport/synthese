@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** TransportNetworkRight Right Class.
 			@ingroup m35Rights refRights
@@ -51,7 +51,8 @@ namespace synthese
 			Perimeter definition :
 				- 
 		*/
-		class TransportNetworkRight : public security::RightTemplate<TransportNetworkRight>
+		class TransportNetworkRight:
+			public security::RightTemplate<TransportNetworkRight>
 		{
 		public:
 			/** Displays the interpretation of the string perimeter of the right.

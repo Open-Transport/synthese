@@ -48,7 +48,6 @@ namespace synthese
 	using namespace pt;
 	using namespace impex;
 	using namespace html;
-	using namespace env;
 
 	namespace util
 	{

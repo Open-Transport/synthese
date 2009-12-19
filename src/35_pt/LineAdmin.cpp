@@ -77,7 +77,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<LineAdmin>::DEFAULT_TITLE("Ligne inconnue");
 	}
 
-	namespace env
+	namespace pt
 	{
 		const string LineAdmin::TAB_STOPS("stops");
 		const string LineAdmin::TAB_SCHEDULED_SERVICES("sserv");

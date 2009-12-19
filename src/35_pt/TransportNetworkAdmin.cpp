@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "TransportNetworkAdmin.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 
 #include "AdminFunctionRequest.hpp"
 #include "TransportNetwork.h"
@@ -68,7 +68,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<TransportNetworkAdmin>::DEFAULT_TITLE("Réseau inconnu");
 	}
 
-	namespace env
+	namespace pt
 	{
 		const string TransportNetworkAdmin::PARAMETER_SEARCH_NAME("sn");
 
@@ -168,6 +168,8 @@ namespace synthese
 		{
 			return _request.isAuthorized<TransportNetworkRight>(READ);
 		}
+
+
 		
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
@@ -176,7 +178,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == EnvModule::FACTORY_KEY && isAuthorized(request))
+			if(moduleKey == PTModule::FACTORY_KEY && isAuthorized(request))
 			{
 				TransportNetworkTableSync::SearchResult networks(
 					TransportNetworkTableSync::Search(*_env)

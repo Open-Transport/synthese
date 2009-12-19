@@ -38,7 +38,6 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
-	using namespace env;
 
 	namespace util
 	{

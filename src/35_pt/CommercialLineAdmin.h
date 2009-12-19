@@ -38,7 +38,10 @@ namespace synthese
 	namespace env
 	{
 		class CommercialLine;
+	}
 
+	namespace pt
+	{
 		/** CommercialLineAdmin Class.
 			@ingroup m35Admin refAdmin
 			@author Hugues Romain
@@ -56,7 +59,7 @@ namespace synthese
 			static const std::string PARAMETER_DATES_END;
 
 		protected:
-			boost::shared_ptr<const CommercialLine>	_cline;
+			boost::shared_ptr<const env::CommercialLine>	_cline;
 
 			std::string _searchName;
 			boost::optional<boost::gregorian::date>	_startDate;
@@ -132,8 +135,8 @@ namespace synthese
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 			
-			boost::shared_ptr<const CommercialLine> getCommercialLine() const;
-			void setCommercialLine(boost::shared_ptr<CommercialLine> value);
+			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
+			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
 		};
 	}
 }

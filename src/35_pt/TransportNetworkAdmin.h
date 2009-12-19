@@ -34,10 +34,7 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
-	}
 	
-	namespace env
-	{
 		/** TransportNetworkAdmin Class.
 			@ingroup m35Admin refAdmin
 			@author Hugues Romain

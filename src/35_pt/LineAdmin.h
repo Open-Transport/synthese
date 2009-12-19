@@ -32,7 +32,10 @@ namespace synthese
 	namespace env
 	{
 		class Line;
+	}
 
+	namespace pt
+	{
 		/** LineAdmin Class.
 			@ingroup m35Admin refAdmin
 			@author Hugues Romain
@@ -47,13 +50,13 @@ namespace synthese
 			static const std::string TAB_INDICES;
 
 		private:
-			boost::shared_ptr<const Line>	_line;
+			boost::shared_ptr<const env::Line>	_line;
 
 		public:
 			LineAdmin();
 			
-			boost::shared_ptr<const Line> getLine() const;
-			void setLine(boost::shared_ptr<Line> value);
+			boost::shared_ptr<const env::Line> getLine() const;
+			void setLine(boost::shared_ptr<env::Line> value);
 
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
