@@ -233,7 +233,10 @@ namespace synthese
 		const AddressablePlace* AddressablePlace::GetPlace(const graph::Hub* hub)
 		{
 			const AddressablePlace* place(dynamic_cast<const AddressablePlace*>(hub));
-			if(place == NULL) throw util::Exception("bad conversion");
+			if(place == NULL)
+			{
+				throw util::Exception("bad conversion");
+			}
 			return place;
 		}
 
