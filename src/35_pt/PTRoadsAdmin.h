@@ -133,6 +133,15 @@ namespace synthese
 				const server::FunctionRequest<admin::AdminRequest>& request
 			) const;
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Title getter.
+			///	@return The title of the page
+			///	@author Hugues
+			///	@date 2009
+			virtual std::string getTitle() const;
+
 			void setRoadPlace(boost::shared_ptr<const road::RoadPlace> value);
 
 			virtual PageLinks _getCurrentTreeBranch() const;

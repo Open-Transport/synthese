@@ -67,7 +67,7 @@ namespace synthese
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<PTRoadAdmin>::ICON("building.png");
+		template<> const string AdminInterfaceElementTemplate<PTRoadAdmin>::ICON("pause_blue.png");
 		template<> const string AdminInterfaceElementTemplate<PTRoadAdmin>::DEFAULT_TITLE("Route");
 	}
 
@@ -188,9 +188,21 @@ namespace synthese
 					}
 
 					stream << t.col();
+					set<const Road*> roads;
+					if(dynamic_cast<const Crossing*>(place))
+					{
+						const Address* address(static_cast<const Crossing*>(place)->getAddress());
+						BOOST_FOREACH(const Vertex::Edges::value_type& edge, address->getDepartureEdges())
+						{
+							roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
+						}
+						BOOST_FOREACH(const Vertex::Edges::value_type& edge, address->getArrivalEdges())
+						{
+							roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
+						}
+					}
 					if(dynamic_cast<const AddressablePlace*>(place))
 					{
-						set<const Road*> roads;
 						BOOST_FOREACH(const Address* address, static_cast<const AddressablePlace*>(place)->getAddresses())
 						{
 							BOOST_FOREACH(const Vertex::Edges::value_type& edge, address->getDepartureEdges())
@@ -202,12 +214,12 @@ namespace synthese
 								roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
 							}
 						}
-						BOOST_FOREACH(const Road* road, roads)
-						{
-							if(road->getKey() <= 0) continue;
-							openRoadRequest.getPage()->setRoad(Env::GetOfficialEnv().getSPtr(road));
-							stream << HTMLModule::getHTMLLink(openRoadRequest.getURL(), road->getRoadPlace()->getName()) << " ";
-						}
+					}
+					BOOST_FOREACH(const Road* road, roads)
+					{
+						if(road->getKey() <= 0 || road == _road.get()) continue;
+						openRoadRequest.getPage()->setRoad(Env::GetOfficialEnv().getSPtr(road));
+						stream << HTMLModule::getHTMLLink(openRoadRequest.getURL(), road->getRoadPlace()->getName()) << " ";
 					}
 				}
 				stream << t.close();
@@ -267,7 +279,6 @@ namespace synthese
 				_road->getRoadPlace()
 			)	);
 			links = p->_getCurrentTreeBranch();
-			links.push_back(p);
 			links.push_back(getNewPage());
 
 			return links;

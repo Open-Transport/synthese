@@ -148,8 +148,9 @@ namespace synthese
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	currentPage == *this)
-			{
+			if(	currentPage == *this ||
+				currentPage.getCurrentTreeBranch().find(*this)
+			){
 				BOOST_FOREACH(const Road* road, _roadPlace->getRoads())
 				{
 					shared_ptr<PTRoadAdmin> p(getNewOtherPage<PTRoadAdmin>());
@@ -180,6 +181,13 @@ namespace synthese
 			links.push_back(getNewPage());
 
 			return links;
+		}
+
+
+
+		std::string PTRoadsAdmin::getTitle() const
+		{
+			return _roadPlace.get() ? _roadPlace->getName() : DEFAULT_TITLE;
 		}
 	}
 }

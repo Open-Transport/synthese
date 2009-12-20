@@ -281,7 +281,6 @@ namespace synthese
 					_connectionPlace.get() ? _connectionPlace->getCity() : _publicPlace->getCity()
 			)	);
 			links = p->_getCurrentTreeBranch();
-			links.push_back(p);
 			links.push_back(getNewPage());
 
 			return links;
